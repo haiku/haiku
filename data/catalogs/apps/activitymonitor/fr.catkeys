@@ -1,10 +1,10 @@
-1	french	x-vnd.Haiku-ActivityMonitor	2994145175
+1	french	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f Ko/s
 %.1f MB	DataSource		%.1f Mo
 %.1f faults/s	DataSource		%.1f fautes/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sec.
-ActivityMonitor	System name		Moniteur d'Activité
+ActivityMonitor	System name		Moniteur d'activité
 Add graph	ActivityWindow		Ajouter un graphe
 Additional items	ActivityView		Éléments supplémentaires
 Apps	DataSource		Applis
@@ -27,7 +27,7 @@ Page faults	DataSource		Fautes de pages
 Ports	DataSource		Ports
 Quit	ActivityWindow		Quitter
 RX	DataSource	Shorter version for Receiving.	Rx
-Raw clipboard size	DataSource		Taille du presse-papier « brut »
+Raw clipboard	DataSource		Presse-papier brut
 Receiving	DataSource		Réception
 Remove graph	ActivityView		Supprimer un graphe
 Running applications	DataSource		Applications en cours
@@ -41,7 +41,7 @@ Swap	DataSource		Échange
 Swap space	DataSource		Espace d'échange
 TX	DataSource	Shorter version for Sending	Tx
 Teams	DataSource		Processus
-Text clipboard size	DataSource		Taille du presse-papier « texte »
+Text clipboard	DataSource		Presse-papier texte
 Threads	DataSource		Tâches
 Update time interval:	SettingsWindow		Fréquence de mise à jour :
 Used memory	DataSource		Mémoire utilisée

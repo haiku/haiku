@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	3334593067
+1	belarusian	x-vnd.Haiku-MediaPlayer	303149893
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася ўнутраная памылка %app%. Файл не можа быць адкрыты.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
 100% scale	MediaPlayer-Main		Маштаб 100%
@@ -25,8 +25,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Ніз відэа
 Cancel	MediaPlayer-SettingsWindow		Адмена
 Close	MediaPlayer-Main		Закрыць
 Close	MediaPlayer-PlaylistWindow		Закрыць
-Close window when done playing movies	MediaPlayer-SettingsWindow		Закрыць акно пры заканчэнні прайграння фильмаў
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Закрыць акно пры заканчэнні прайграння гукаў
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Капіяваць Элементы
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Капіяваць элемент
 Drop files to play	MediaPlayer-Main		Перацягніце файлы, якія жадаеце прайграць
@@ -48,8 +46,6 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Медыясервер, відаць, не запушчаны.\nЗапусціць яго?
 Large	MediaPlayer-SettingsWindow		Буйны
 Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
-Loop movies by default	MediaPlayer-SettingsWindow		Зацыкліць відэа па змоўчанню
-Loop sounds by default	MediaPlayer-SettingsWindow		Зацыкліць гукі па змоўчанню
 Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
 MediaPlayer	System name		Праігравальнік Медыя
 MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
@@ -57,6 +53,7 @@ Medium	MediaPlayer-SettingsWindow		Сярэдняе
 Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
 Move Entry	MediaPlayer-MovePLItemsCmd		Перамясціць элемент
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Памылка Адпраўкі Ў Сметніцу
+Move file to Trash	MediaPlayer-PlaylistWindow		Перасунуць файл у Сметніцу
 Mute	MediaPlayer-Main		Выкл. гук
 Muted	MediaPlayer-SettingsWindow		Гук выключаны
 New player…	MediaPlayer-Main		Новы плеер
@@ -87,13 +84,11 @@ Randomize	MediaPlayer-PlaylistWindow		Перамяшаць
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Перамяшаць элементы
 Rating	MediaPlayer-Main		Рэйтынг
 Redo	MediaPlayer-PlaylistWindow		Перарабіць
-Remove (Del)	MediaPlayer-PlaylistWindow		Убраць (Del)
+Remove	MediaPlayer-PlaylistWindow		Выдаліць
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Убраць Элементы
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элементы ў Сметніцу
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Убраць Элемент
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элемент у Сметніцу
-Remove all	MediaPlayer-PlaylistWindow		Убраць усё
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Убраць і адправіць у Сметніцу
 Revert	MediaPlayer-SettingsWindow		Вярнуць
 Save	MediaPlayer-Main		Захаваць
 Save	MediaPlayer-PlaylistWindow		Захаваць
@@ -102,8 +97,8 @@ Save as…	MediaPlayer-PlaylistWindow		Захаваць як...
 Save error	MediaPlayer-PlaylistWindow		Памылка захавання
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст.\n\nПамылка:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст:\n\nПамылка:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Расцягваць элементы кіравання ў поўным экране
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Маштабаваць фільмы плаўна (рэжым без накладання)
+Select all	MediaPlayer-PlaylistWindow		Пазначыць усе
 Settings…	MediaPlayer-Main		Наладкі...
 Skip to the next track.	MediaPlayer-Main		Пераскочыць да наступнай дарожкі
 Skip to the previous track.	MediaPlayer-Main		Пераскочць да папярэдняй дарожкі.

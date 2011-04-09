@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	498395429
+1	czech	x-vnd.Haiku-libtracker	2201969114
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld bytů
@@ -169,7 +169,6 @@ Icon view	VolumeWindow		Zobrazení Ikon
 Identify	ContainerWindow		Rozpoznat
 Identify	InfoWindow		Určit
 If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Jestliže %ifYouDoAction konfigurační adresář, Haiku se nemusí chovat normálně! Jste si jistí, že to chcete udělat? K %toDoAction konfiguračního adresáře navzdory varování, klikněte na \"Provést\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Jestliže %ifYouDoAction domovskou složku, Haiku se nemusí chovat normálně! Jste si jistí, že to chcete udělat? K %toDoAction domovské složky navzdory varování, klikněte na \"Provést\".
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Jestliže %ifYouDoAction volby mime, Haiku se nemusí chovat normálně! Jste si jistí, že to chcete udělat? K %toDoAction mime voleb navzdory varování, klikněte na \"Provést\".
 If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Jestliže %ifYouDoAction adresář nastavení, Haiku se nemusí chovat normálně! Jste si jistí, že to chcete udělat? K %toDoAction adresáře nastavení navzdory varování, klikněte na \"Provést\".
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jestliže %ifYouDoAction systémovou složku, nebo její obsah, nemuselo by se vám podařit Haiku vůbec spustit! Jste si jistí, že to chcete udělat? K %toDoAction systémové složky nebo jejího obsahu navzdory varování, stiskněte klávesu Shift a klikněte na \"Provést\".

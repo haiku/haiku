@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Shortcuts	2152414241
+1	polish	x-vnd.Haiku-Shortcuts	2965605727
 (Choose application with file requester)	ShortcutsWindow		(Wybierz aplikację żądającą pliku)
 *Beep	ShortcutsWindow		*Beep
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		O Skrótach
-About Shortcuts	ShortcutsWindow		O Skrótach
 Add new shortcut	ShortcutsWindow		Dodaj nowy skrót
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Dodaj
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		MouseUp
 MoveMouse	ShortcutsSpec		MoveMouse
 MoveMouseTo	ShortcutsSpec		MoveMouseTo
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Och nie
 Open	ShortcutsWindow		Otwórz
@@ -51,5 +48,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Skróty nie zdoł
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nOparte na SpicyKeys dla BeOS autorstwa Jeremiego Friesnera
 Window	ShortcutsSpec	Name for modifier on keyboard	Window

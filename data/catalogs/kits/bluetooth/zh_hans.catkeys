@@ -1,0 +1,88 @@
+1	simplified_chinese	x-vnd.Haiku-Bluetooth	3550394259
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#无效名
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# 无效名称
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# 无效名称
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# 无效的名称
+(reserved)	DeviceClass		（保留的）
+1-17% utilized	DeviceClass		已用1-17% 
+17-33% utilized	DeviceClass		已用17-33%
+33-50% utilized	DeviceClass		已用33-50%
+50-67% utilized	DeviceClass		已用50-67% 
+67-83% utilized	DeviceClass		已用67-83% 
+83-99% utilized	DeviceClass		已用83-99% 
+Audio	DeviceClass		音频
+Audio/Video	DeviceClass		音频/视频
+Camcorder	DeviceClass		录像机
+Camera	DeviceClass		照相机
+Capturing	DeviceClass		捕捉
+Car audio	DeviceClass		汽车音响
+Card reader	DeviceClass		读卡器
+Cellular	DeviceClass		移动电话
+Combo keyboard/pointing device	DeviceClass		组合键盘/指向装置
+Common ISDN access	DeviceClass		通用 ISDN 接入
+Computer	DeviceClass		电脑
+Controller	DeviceClass		控制器
+Cordless	DeviceClass		无线电话
+Desktop workstation	DeviceClass		桌面工作站
+Device conforms to the headset profile	DeviceClass		设备符合耳机模式
+Digitizer tablet	DeviceClass		数字化仪片剂
+Display	DeviceClass		显示
+Doll/Action figure	DeviceClass		玩具/操作描述
+Fully available	DeviceClass		完全可用
+Game	DeviceClass		游戏
+Gamepad	DeviceClass		游戏杆
+Gaming/Toy	DeviceClass		游戏/玩具
+Glasses	DeviceClass		辅助眼睛
+Handheld	DeviceClass		掌上型
+Hands-free	DeviceClass		免提模式
+Headphones	DeviceClass		耳机
+Helmet	DeviceClass		辅助头盔
+HiFi audio device	DeviceClass		HiFi 音频设备
+Imaging	DeviceClass		显示图像
+Information	DeviceClass		信息
+Invalid device class!\n	DeviceClass		无效设备类别!\n
+Jacket	DeviceClass		护套
+Joystick	DeviceClass		控制杆
+Keyboard	DeviceClass		键盘
+LAN access	DeviceClass		LAN 访问
+Laptop	DeviceClass		手提电脑
+Loudspeaker	DeviceClass		扩音器
+Major class: 	DeviceClass		主要类别：
+Microphone	DeviceClass		麦克风
+Minor class: 	DeviceClass		次要类别：
+Miscellaneous	DeviceClass		其他
+Networking	DeviceClass		互联网络
+No service available	DeviceClass		无可用服务
+Not implemented	RemoteDevice		未实现
+Object transfer	DeviceClass		对象传输
+Pager	DeviceClass	A small radio device to receive short text messages	传呼机
+Palm	DeviceClass	A palm-held device	Palm 设备
+Peripheral	DeviceClass		外围设备
+Phone	DeviceClass		电话
+Pointing device	DeviceClass		定位装置
+Portable audio	DeviceClass		便携音频设备
+Positioning	DeviceClass		位置
+Printer	DeviceClass		打印机
+Remote control	DeviceClass		远程控制
+Rendering	DeviceClass		渲染
+Robot	DeviceClass		机器人
+SIM card reader	DeviceClass		SIM 读卡器
+Scanner	DeviceClass		扫描仪
+Sensing device	DeviceClass		感应设备
+Server	DeviceClass		服务器
+Service classes: 	DeviceClass		服务类别：
+Set-top box	DeviceClass		机顶盒
+Smart phone	DeviceClass		智能手机
+Telephony	DeviceClass		拨号电话
+Uncategorized	DeviceClass		未定义
+Unknown (reserved) minor device class	DeviceClass		未知设备类别
+Unspecified	DeviceClass		未注明的
+VCR	DeviceClass		录像机
+Vehicle	DeviceClass		车载设备
+Video camera	DeviceClass		录像机
+Video conferencing	DeviceClass		视频会议
+Video display and loudspeaker	DeviceClass		视频显示及扩音器
+Video monitor	DeviceClass		显示器
+Wearable	DeviceClass	A wearable computer	嵌入式计算机
+Wired modem or voice gateway	DeviceClass		无线调制或语音网关
+Wrist watch	DeviceClass		手表

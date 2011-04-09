@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-WORK	1782529098
+1	italian	x-vnd.Be-WORK	576959994
 About Workspaces…	Workspaces		Informazioni su Workspaces…
 Always on top	Workspaces		Sempre in primo piano
 Auto-raise	Workspaces		Porta automaticamente in primo piano
@@ -7,6 +7,5 @@ Invalid argument: %s\n	Workspaces		Argomento non valido: %s\n
 OK	Workspaces		OK
 Quit	Workspaces		Esci
 Show window border	Workspaces		Mostra bordi finestra
-Show window title	Workspaces		Mostra il titolo della finestra
 Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilizzo: %s [opzioni] [workspace]\ndove \"opzioni\" è uno di:\n --notitle\t\trimuove la barra del titolo, restano i bordi e il ridimensionamento.\n --noborder\t\trimuove titolo, bordi e ridimensionamento.\n --avoidfocus\t\tpreviene che la finestra sia oggetto degli eventi da tastiera.\n --alwaysontop\t\tmantiene la finestra in primo piano\n --notmovable\t\tla finestra non può spostata in giro\n --autoraise\t\tla finestra dei workspace va automaticamente in primo piano quando è in un angolo dello schermo\n --help\t\tmostra questo aiuto ed esce\ne \"workspace\" è il numero del Workspace sul quale si vuole scambiare (0-31)\n
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\nscritto da %1 e %2.\n\nCopyright ©%3, Haiku.\n\nInvia le finestre sullo sfondo usando il tasto Opzione. Sposta la finestra in primo piano usando il tasto Controllo.\n

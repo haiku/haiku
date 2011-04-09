@@ -1,7 +1,4 @@
-1	dutch	x-vnd.Haiku-InstalledPackages	2164686753
-BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Haiku's .pkg-verwijderingstoepassing, overgeërfd van BeOS.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
-Close	UninstallApplication		Sluiten
-InstalledPackages	UninstallApplication		InstalledPackages
+1	dutch	x-vnd.Haiku-InstalledPackages	148986533
 No package selected.	UninstallView		Geen pakket geselecteerd
 OK	UninstallView		Oké
 Package description	UninstallView		Beschrijving pakket

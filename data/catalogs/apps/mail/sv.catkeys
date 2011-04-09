@@ -1,7 +1,11 @@
-1	swedish	x-vnd.Be-MAIL	2507291031
+1	swedish	x-vnd.Be-MAIL	2388476802
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - mejladress
+%e wrote:\\n	Mail		%e skrev:\\n
 %n - Full name	Mail		%n - Fullständigt namn
+(Address unavailable)	Mail		(Adress saknas)
+(Date unavailable)	Mail		(Datum saknas)
+(Name unavailable)	Mail		(Namn saknas)
 Account from mail	Mail		Konto från brev
 Account:	Mail		Konto:
 Accounts…	Mail		Konton...

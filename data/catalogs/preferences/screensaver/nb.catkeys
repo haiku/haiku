@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-ScreenSaver	1160967709
+1	norwegian_bokmål	x-vnd.Haiku-ScreenSaver	1144284462
 30 seconds	ScreenSaver		30 sekunder
 Add…	ScreenSaver		Legg til...
 Blackness	ScreenSaver		Svart skjerm
@@ -7,9 +7,6 @@ Confirm password:	ScreenSaver		Bekreft passord:
 Could not load screen saver	ScreenSaver		Kunne ikke laste skjermsparer
 Display Power Management Signaling not available	ScreenSaver		Signal for strømstyring av skjerm er ikke tilgjengelig
 Done	ScreenSaver		Ferdig
-Enable screen saver	ScreenSaver		Aktiver skjermsparer
-Module settings	ScreenSaver		Modulinnstillinger
-Modules	ScreenSaver		Moduler
 No options available	ScreenSaver		Ingen valg tilgjengelig
 OK	ScreenSaver		OK
 Password Window	ScreenSaver		Passordvindu
@@ -17,7 +14,6 @@ Password lock	ScreenSaver		Passordlås
 Password:	ScreenSaver		Passord:
 Passwords don't match. Please try again.	ScreenSaver		Passordene passer ikke. Prøv igjen.
 Password…	ScreenSaver		Passord...
-Run module	ScreenSaver		Kjør modul
 ScreenSaver	System name		Skjermsparer
 Test	ScreenSaver		Test
 Turn off screen	ScreenSaver		Skru av skjerm

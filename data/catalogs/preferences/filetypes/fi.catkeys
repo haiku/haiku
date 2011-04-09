@@ -1,11 +1,10 @@
-1	finnish	x-vnd.Haiku-FileTypes	1055306485
+1	finnish	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1-sovellustyyppi
 %ld Application type%s could be removed.	Application Types Window		%ld sovellustyyppiä %s ei voitu poistaa.
 %s file type	FileType Window		%s-tiedostotyyppi
 (from application)	FileTypes Window		(sovelluksesta)
 (from super type)	FileTypes Window		(kantatyypistä)
 Abort	Application Types Window		Keskeytä
-About FileTypes…	FileTypes Window		Tiedostotyypit-ohjelmasta…
 Add	Attribute Window		Lisää
 Add	Extension Window		Lisää
 Add group	New File Type Window		Lisää ryhmä
@@ -155,5 +154,4 @@ Version:	Application Types Window		Versio:
 Visible	Attribute Window		Näkyvä
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Leveys:
 [Multiple files] file types	FileType Window		[Useita tiedostoja] tiedostotyypit
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\ttekijä: Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		ei kuvaketta

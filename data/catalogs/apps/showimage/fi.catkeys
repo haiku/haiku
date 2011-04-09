@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	1687870740
+1	finnish	x-vnd.Haiku-ShowImage	886873119
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia
 Browse	Menus		Selaa
 Cancel	ClosePrompt		Peru
@@ -23,6 +23,7 @@ High-quality zooming	Menus		Korkealaatuinen rajaus
 Image	Menus		Kuva
 Job setup	PrintOptionsWindow		Työasetukset
 Last page	Menus		Viimeinen sivu
+Leave full screen	Menus		Jätä kokoruututila
 Next file	Menus		Seuraava tiedosto
 Next page	Menus		Seuraava sivu
 OK	Alerts		Valmis

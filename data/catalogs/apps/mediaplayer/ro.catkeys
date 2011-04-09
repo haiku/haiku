@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	1740489494
+1	romanian	x-vnd.Haiku-MediaPlayer	3380857113
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 100% scale	MediaPlayer-Main		scală 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.31 : 1 (Cinemascop)
@@ -24,8 +24,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Baza video
 Cancel	MediaPlayer-SettingsWindow		Anulează
 Close	MediaPlayer-Main		Închide
 Close	MediaPlayer-PlaylistWindow		Închide
-Close window when done playing movies	MediaPlayer-SettingsWindow		Închide fereastra când s-a terminat redarea de filme
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Închide fereastra când s-a terminat redarea sunetelor
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Copiază intrări
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiază intrare
 Drop files to play	MediaPlayer-Main		Plasați fișiere pentru a le reda
@@ -46,8 +44,6 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Se pare că serverul media nu rulează.\nDoriți să îl porniți?
 Large	MediaPlayer-SettingsWindow		Larg
 Lock Peaks	MediaPlayer-PeakView		Blochează vârfuri
-Loop movies by default	MediaPlayer-SettingsWindow		Repetă filmele în mod implicit
-Loop sounds by default	MediaPlayer-SettingsWindow		Repetă sunetele în mod implicit
 Low volume	MediaPlayer-SettingsWindow		Volum redus
 MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
 Medium	MediaPlayer-SettingsWindow		Mediu
@@ -84,13 +80,10 @@ Randomize	MediaPlayer-PlaylistWindow		Amestecă aleator
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Amestecă aleator intrările
 Rating	MediaPlayer-Main		Apreciere
 Redo	MediaPlayer-PlaylistWindow		Repetă
-Remove (Del)	MediaPlayer-PlaylistWindow		Elimină (Del)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Elimină intrări
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrările la gunoi
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Elimină intrare
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrările la gunoi
-Remove all	MediaPlayer-PlaylistWindow		Elimină tot
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Elimină și plasează la gunoi
 Revert	MediaPlayer-SettingsWindow		Revenire
 Save	MediaPlayer-Main		Salvează
 Save	MediaPlayer-PlaylistWindow		Salvează
@@ -99,7 +92,6 @@ Save as…	MediaPlayer-PlaylistWindow		Salvează ca...
 Save error	MediaPlayer-PlaylistWindow		Eroare la salvare
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat.\n\nEroare:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat:\n\nEroare:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Scalează controale în modul ecran complet
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scalează filme lin (modul fără suprapunere)
 Settings…	MediaPlayer-Main		Configurări...
 Skip to the next track.	MediaPlayer-Main		Mergi la pista următoare.
@@ -112,7 +104,6 @@ Stop	MediaPlayer-Main		Oprește
 Stop playing.	MediaPlayer-Main		Oprește redarea.
 Stream settings	MediaPlayer-Main		Configurări flux
 Subtitles	MediaPlayer-Main		Subtitrări
-Thanks	MediaPlayer-Main		Mulțumesc
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nu există niciun decodor instalat pentru a gestiona formatul fișierului, sau decodorul întâmpină probleme cu versiunea specifică a formatului.
 Toggle mute.	MediaPlayer-Main		Comută pe mut.
 Toggle pause/play.	MediaPlayer-Main		Comută pornit/oprit.

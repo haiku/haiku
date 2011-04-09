@@ -1,0 +1,24 @@
+1	japanese	x-vnd.Haiku-Screen	3385899699
+%.1f Hz	Screen		%.1f Hz
+15 bits/pixel, 32768 colors	Screen		15ビット/画素, 32768色
+16 bits/pixel, 65536 colors	Screen		16ビット/画素, 65536色
+24 bits/pixel, 16 Million colors	Screen		24ビット/画素, 16,384色
+32 bits/pixel, 16 Million colors	Screen		32ビット/画素, 16,384色
+8 bits/pixel, 256 colors	Screen		8ビット/画素, 256色
+All workspaces	Screen		全てのワークスペース
+Apply	Screen		適用
+Cancel	Screen		取り消し
+Colors:	Screen		色:
+Columns:	Screen		列:
+Current workspace	Screen		現在のワークスペース
+Hz	Screen		Hz
+Keep	Screen		保持
+OK	Screen		OK
+Refresh rate	Screen		リフレッシュレート
+Refresh rate:	Screen		リフレッシュレート:
+Resolution:	Screen		解像度:
+Set background…	Screen		背景を設定...
+Undo	Screen		戻す
+Workspaces	Screen		ワークスペース
+bits/pixel	Screen		ビット/画素
+yes	Screen		yes

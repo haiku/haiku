@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Magnify	2101743114
+1	czech	x-vnd.Haiku-Magnify	3144246779
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixelů/pixel
 Add a crosshair	Magnify-Main		Zapnout kříž
 Copy image	Magnify-Main		Kopírovat obrázek
@@ -14,10 +14,8 @@ Increase window size	Magnify-Main		Zvětšit velikost okna
 Info	Magnify-Main		Informace
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informace:\n skrýt/zobrazit informace - skryje/zobrazí všechny tyto nové vlastnosti\n poznámka: při zobrazení se objeví červený čtvereček, který označuje\n u kterých pixelů budou zobrazeny rgb hodnoty\n přidat/odebrat nitkové kříže - 2 kříže mohou být přidány (nebo odebrány)\n pro pomoc s zarovnáním a rozmístěním objektů.\n Nitkové kříže jsou reprezentovány modrými čtverci a modrými liniemi.\n skrýt/zobrazit mřížku - skryje/zobrazí mřížku, která odděluje jednotlivé pixely\n
 Magnify help	Magnify-Help		Nápověda Lupy
-Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNyní s ještě více skvělých vlastností a rekompilováno pro Haiku.
 Make square	Magnify-Main		Udělat čtverec
 Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigace:\n kurzorové šipky - přesunout aktuální výběr (rgb indikátor nebo nitkový kříž)\n najdenou o 1 pixel\n šipky volby - přesune pozici myši najednou o 1 pixel\n x značí výběr - aktuální výběr v sobě obsahuje 'x'\n
-OK	Magnify-Main		OK
 Remove a crosshair	Magnify-Main		Skrýt kříž
 Save image	Magnify-Main		Uložit obrázek
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Změna velikosti:\n na čtverec - nastaví šířku a výšku na hodnotu té větší\n z nich, čímž se vetvoří čtvercový obrázek\n zvětšit/snížit velikost okna - zvětší nebo zmenší velikost\n okna o 4 pixely.\n poznámka: toto okno může být také roztáhnuto na jakoukoli velikost pomocí\n oblasti pro změnu velikosti okna\n zvýšit/snížit velikost pixelů - zvýší nebo sníží počet\n pixelů použitých na zvětšení 'opravdového' pixelu. Rozsah je od 1 do 16.\n

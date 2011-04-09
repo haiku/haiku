@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-StyledEdit	553410520
+1	dutch	x-vnd.Haiku-StyledEdit	2071192997
 ???	LoadAlert		???
 Align	Menus		Uitlijnen
 Black	Menus		Zwart
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, 
 Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
 Center	Menus		Centreren
 Characters:	Statistics		Karakters:
-Clear	Menus		Leegmaken
 Close	Menus		Sluiten
 Color	Menus		Kleur
 Cut	Menus		Knippen
@@ -55,7 +54,6 @@ Redo typing	QuitAlert		Opnieuw typen
 Replace	FindandReplaceWindow		Vervangen
 Replace all	FindandReplaceWindow		Alles vervangen
 Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
-Replace same	Menus		Hetzelfde vervangen
 Replace with:	FindandReplaceWindow		Vervangen door:
 Replace…	Menus		Vervangen...
 Revert to saved…	Menus		Herstel naar opgeslagen...

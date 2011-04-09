@@ -1,8 +1,7 @@
-1	brazilian_portuguese	x-vnd.Haiku-FileTypes	2578332496
+1	brazilian_portuguese	x-vnd.Haiku-FileTypes	1997025717
 %s file type	FileType Window		%s tipo de arquivo
 (from application)	FileTypes Window		(do aplicativo)
 (from super type)	FileTypes Window		(do super tipo)
-About FileTypes…	FileTypes Window		Sobre os Tipos de Arquivo...
 Add…	Application Type Window		Adicionar…
 Add…	FileTypes Window		Adicionar...
 Application flags	Application Type Window		Sinalizações do aplicativo
@@ -82,5 +81,4 @@ This file type already exists	New File Type Window		Este tipo de arquivo já exi
 Type name:	FileTypes Window		Nome do tipo:
 Version info	Application Type Window		Informações dessa versão
 [Multiple files] file types	FileType Window		tipos de arquivo [Multiplos arquivos]
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tescrito por Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		sem ícone

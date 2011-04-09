@@ -1,9 +1,8 @@
-1	dutch	x-vnd.Haiku-FileTypes	2268113415
+1	dutch	x-vnd.Haiku-FileTypes	1686806636
 %1 application type	Application Type Window		%1 toepassingstype
 %s file type	FileType Window		%s bestandstype
 (from application)	FileTypes Window		(van de applicatie)
 (from super type)	FileTypes Window		(van een super type)
-About FileTypes…	FileTypes Window		Over BestandsTypen...
 Add	Attribute Window		Toevoegen
 Add	Extension Window		Toevoegen
 Add group	New File Type Window		Groep toevoegen
@@ -128,5 +127,4 @@ Version:	Application Type Window		Versie:
 Visible	Attribute Window		Zichtbaar
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Breedte:
 [Multiple files] file types	FileType Window		[Meerdere bestanden] Bestandstypen
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tdoor Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		geen icoon

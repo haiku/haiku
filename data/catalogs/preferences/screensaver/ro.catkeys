@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ScreenSaver	1446908601
+1	romanian	x-vnd.Haiku-ScreenSaver	799085334
 30 seconds	ScreenSaver		30 de secunde
 Add…	ScreenSaver		Adaugă...
 Blackness	ScreenSaver		Întunecat
@@ -7,11 +7,7 @@ Confirm password:	ScreenSaver		Confirmare parolă:
 Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
 Don't fade when	ScreenSaver		Nu estompa când
 Done	ScreenSaver		Gata
-Enable screen saver	ScreenSaver		Activează protectorul de ecran
-Fade	ScreenSaver		Estompează
 Fade now when	ScreenSaver		Estompează acum când
-Module settings	ScreenSaver		Configurări modul
-Modules	ScreenSaver		Module
 No options available	ScreenSaver		Nu există opțiuni disponibile
 OK	ScreenSaver		OK
 Password Window	ScreenSaver		Fereastră parolă
@@ -19,7 +15,6 @@ Password lock	ScreenSaver		Blocare parolă
 Password:	ScreenSaver		Parolă:
 Passwords don't match. Please try again.	ScreenSaver		Parolele nu se potrivesc. Încercați din nou.
 Password…	ScreenSaver		Parolă...
-Run module	ScreenSaver		Pornește modul
 Test	ScreenSaver		Testează
 Turn off screen	ScreenSaver		Închide ecranul
 Use custom password	ScreenSaver		Utilizează parolă personalizată

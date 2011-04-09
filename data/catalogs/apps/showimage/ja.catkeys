@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-ShowImage	1422346099
-About ShowImage…	Menus		ShowImage について…
+1	japanese	x-vnd.Haiku-ShowImage	2585577103
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
 Browse	Menus		閲覧
 Cancel	ClosePrompt		中止
+Clear selection	Menus		選択解除
 Close	ClosePrompt		閉じる
 Close	Menus		閉じる
 Close document	ClosePrompt		ファイルを閉じる
@@ -12,6 +13,7 @@ Edit	Menus		編集
 File	Menus		ファイル
 First page	Menus		最初のページ
 Fit image to page	PrintOptionsWindow		画像を用紙サイズにあわせる
+Fit to window	Menus		ウィンドウに合わせる
 Flip left to right	Menus		左右反転
 Flip top to bottom	Menus		上下反転
 Full screen	Menus		全画面表示
@@ -23,7 +25,9 @@ Job setup	PrintOptionsWindow		ジョブ設定
 Last page	Menus		最後のページ
 Next file	Menus		次のファイル
 Next page	Menus		次のページ
+OK	Alerts		OK
 OK	SaveToFile		Ok
+Open…	Menus		開く...
 Original size	Menus		原寸に戻す
 Page setup…	Menus		ページ設定…
 Previous file	Menus		前のファイル
@@ -32,14 +36,18 @@ Print options	PrintOptionsWindow		印刷オプション
 Print…	Menus		印刷…
 Progress monitor	ProgressWindow		進捗状況モニター
 Quit	Menus		終了
+Rating	Menus		評価
 Resize to (in 1/72 inches):	PrintOptionsWindow		リサイズ (1/72 インチ)：
 Rotate clockwise	Menus		時計まわりに 90° 回転
 Rotate counterclockwise	Menus		反時計まわりに 90° 回転
 Save as…	Menus		ファイル形式を選んで保存…
 Select all	Menus		すべて選択
+Selection mode	Menus		選択モード
 Show caption in full screen mode	Menus		全画面表示モードでキャプションを表示
+Show tool bar	Menus		ツールバーを表示
 Slide delay	Menus		スライド間隔
 Slide show	Menus		スライドショー
+Stretch to window	Menus		ウィンドウの大きさに広げる
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		「%s」の %d ページが変更されました。それでもファイルを閉じますか？
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		画像ファイル「%s」が変更されています。保存せずに閉じますか？
 The file '%s' could not be written.	SaveToFile		画像ファイル「%s」を保存できませんでした。

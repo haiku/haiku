@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	4103143985
+1	finnish	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
 *Beep	ShortcutsWindow		*Piip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
-About Shortcuts	ShortcutsApp		Pikanäppäinasetuksista
-About Shortcuts	ShortcutsWindow		Pikanäppäinasetuksista
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
 Append	ShortcutsWindow		Liitä
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		HiiriYlös
 MoveMouse	ShortcutsSpec		SiirräHiirtä
 MoveMouseTo	ShortcutsSpec		SiirräHiiriKohteeseen
 Multi	ShortcutsSpec		Moni
-OK	ShortcutsApp		Valmis
 OK	ShortcutsWindow		Valmis
 Oh no	ShortcutsWindow		Oh ei
 Open	ShortcutsWindow		Avaa
@@ -52,5 +49,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinaset
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyenneet tallentamaan KeySet-tiedostoa!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset eivät kyenneet tallentamaan keyset-tiedostoa.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Pikanäppäinasetukset\n\nPerustuu BeOS-käyttöjärjestelmälle tehtyyn SpicyKeys-ohjelmaan, jonka tekijä oli Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Ikkuna

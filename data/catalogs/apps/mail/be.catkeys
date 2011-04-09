@@ -1,8 +1,11 @@
-1	belarusian	x-vnd.Be-MAIL	3225774574
+1	belarusian	x-vnd.Be-MAIL	2388476802
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - адрас электроннай пошты
+%e wrote:\\n	Mail		%e напісаў:\\n
 %n - Full name	Mail		%n - Поўнае імя
-About Mail…	Mail		Пра Mail…
+(Address unavailable)	Mail		(Адрэс невядомы)
+(Date unavailable)	Mail		(Дата невядома)
+(Name unavailable)	Mail		(Імя невядома)
 Account from mail	Mail		Акаунт з паведамлення
 Account:	Mail		Акаунт:
 Accounts…	Mail		Акаунты…
@@ -63,7 +66,6 @@ Leave same	Mail		Пакінуць так
 Mail	System name		Пошта
 Mail couldn't find its dictionary.	Mail		Немагчыма знайсці слоўнік.
 Mail preferences	Mail		Наладкі Пошты
-Mail\n\n	Mail		Пошта\n\n
 Mailing	Mail		Ліставанне
 Message	Mail		Паведамленне
 Move to trash	Mail		Выкінуць у сметніцу
@@ -145,7 +147,13 @@ Use default account	Mail		Ужываць прадвызначаны акаунт
 User interface	Mail		Інтэрфейс карыстача
 View	Mail		Агляд
 Warn unencodable:	Mail		Правяраць кадоўку:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Аўтар -  Robert Polic.\nРаспрацавана камандай Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 \\n - Newline	Mail		\\n - Новы радок
+draft	B_USER_DIRECTORY/mail/draft		чарнавік
 helpful message	Mail		Карыснае паведамленне
+in	B_USER_DIRECTORY/mail/in		ў
+mail	B_USER_DIRECTORY/mail		пошта
+out	B_USER_DIRECTORY/mail/out		выхад
+queries	B_USER_DIRECTORY/mail/queries		запыты
+sent	B_USER_DIRECTORY/mail/sent		дасланае
+spam	B_USER_DIRECTORY/mail/spam		смецце

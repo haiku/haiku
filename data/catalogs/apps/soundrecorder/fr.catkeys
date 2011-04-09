@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		Impossible de se connecter au media server
+Cannot connect to media server	RecorderWindow		Impossible de se connecter au serveur de média.
 Cannot connect to the selected sound input	RecorderWindow		Impossible de se connecter à la source sonore sélectionnée
 Cannot find an unused name to use for the new recording	RecorderWindow		Impossible de trouver un nom inutilisé pour le nouvel enregistrement.
 Cannot find default audio hardware	RecorderWindow		Impossible de trouver le périphérique audio par défaut

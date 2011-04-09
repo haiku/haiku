@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	3064120758
+1	french	x-vnd.Haiku-StyledEdit	1508367857
 ???	LoadAlert		???
 Align	Menus		Aligner
 Black	Menus		Noir
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossible de revenir
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
 Center	Menus		Centré
 Characters:	Statistics		Caractères :
-Clear	Menus		Vider
 Close	Menus		Fermer
 Color	Menus		Couleur
 Copy	Menus		Copier
@@ -56,7 +55,7 @@ Redo typing	QuitAlert		Rétablir la saisie
 Replace	FindandReplaceWindow		Remplacer
 Replace all	FindandReplaceWindow		Tout remplacer
 Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
-Replace same	Menus		Remplacer le même
+Replace next	Menus		Remplacer le suivant
 Replace with:	FindandReplaceWindow		Remplacer par :
 Replace…	Menus		Remplacer…
 Revert to saved…	Menus		Revenir à la dernière version enregistrée…
@@ -71,7 +70,7 @@ Search backwards	FindandReplaceWindow		Chercher en arrière
 Select all	Menus		Selectionner tout
 Size	Menus		Taille
 Statistics…	Menus		Statistiques…
-StyledEdit	System name		ÉditeurStylé
+StyledEdit	System name		Éditeur stylé
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ?
 Undo typing	QuitAlert		Annuler la saisie
 Untitled 	StyledEditWindow		Sans titre

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	2994145175
+1	german	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f KiB/s
 %.1f MB	DataSource		%.1f MiB
 %.1f faults/s	DataSource		%.1f Fehler/s
@@ -27,7 +27,7 @@ Page faults	DataSource		Seitenfehler
 Ports	DataSource		Ports
 Quit	ActivityWindow		Beenden
 RX	DataSource	Shorter version for Receiving.	Empfangen
-Raw clipboard size	DataSource		Größe der Raw-Ablage
+Raw clipboard	DataSource		Raw-Ablage
 Receiving	DataSource		Empfangen
 Remove graph	ActivityView		Graph entfernen
 Running applications	DataSource		Laufende Anwendungen
@@ -41,7 +41,7 @@ Swap	DataSource		Auslagerung
 Swap space	DataSource		Auslagerungsspeicher
 TX	DataSource	Shorter version for Sending	Senden
 Teams	DataSource		Teams
-Text clipboard size	DataSource		Größe der Text-Ablage
+Text clipboard	DataSource		Text-Ablage
 Threads	DataSource		Threads
 Update time interval:	SettingsWindow		Aktualisierungsintervall:
 Used memory	DataSource		Benutzter Speicher

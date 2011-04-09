@@ -1,7 +1,4 @@
-1	romanian	x-vnd.Haiku-InstalledPackages	186988391
-BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Aplicație de eliminare a pachetelor .pkg moștenite de la BeOS, pentru Haiku.\n\nDrepturi de autor 2007,\nŁukasz 'Sil2100' Zemczak\n\nDrepturi de autor (c) 2007 Haiku, Inc.\n
-Close	UninstallApplication		Închide
-InstalledPackages	UninstallApplication		PacheteInstalate
+1	romanian	x-vnd.Haiku-InstalledPackages	2466255467
 No package selected.	UninstallView		Niciun pachet selectat.
 Package description	UninstallView		Descriere pachet
 Remove	UninstallView		Elimină

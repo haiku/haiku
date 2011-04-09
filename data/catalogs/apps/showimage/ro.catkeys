@@ -1,5 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	3555375016
-About ShowImage…	Menus		Despre AfișeazăImagine
+1	romanian	x-vnd.Haiku-ShowImage	2010609106
 Browse	Menus		Navighează
 Cancel	ClosePrompt		Anulează
 Clear selection	Menus		Eliberează selecție
@@ -40,7 +39,7 @@ Rotate clockwise	Menus		Rotește în sens orar
 Rotate counterclockwise	Menus		Rotește în sens anti-orar
 Save as…	Menus		Salvează ca...
 Select all	Menus		Selectează tot
-Selection Mode	Menus		Mod de selectare
+Selection mode	Menus		Mod de selectare
 Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
 Slide delay	Menus		Întârziere imagine
 Slide show	Menus		Succesiune imagini

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	840804249
+1	romanian	x-vnd.Haiku-ActivityMonitor	4031078724
 Add graph	ActivityWindow		Adaugă grafic
 Additional items	ActivityView		Elemente adiționale
 Apps	DataSource		Aplicații
@@ -18,7 +18,6 @@ Network send	DataSource		Trimite în rețea
 P-faults	DataSource		Defecțiuni de tip P
 Ports	DataSource		Porturi
 Quit	ActivityWindow		Părăsește
-Raw clipboard size	DataSource		Dimensiune brută clipboard
 Receiving	DataSource		Primire
 Remove graph	ActivityView		Elimină grafic
 Running applications	DataSource		Aplicații care rulează
@@ -31,7 +30,6 @@ Show legend	ActivityView		Arată legenda
 Swap	DataSource		Swap
 Swap space	DataSource		Spaţiu swap
 Teams	DataSource		Echipe
-Text clipboard size	DataSource		Dimensiune text clipboard
 Threads	DataSource		Fire de execuție
 Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 Used memory	DataSource		Memorie utilizată

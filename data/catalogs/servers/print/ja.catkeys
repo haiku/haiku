@@ -1,4 +1,6 @@
-1	japanese	x-vnd.Be-PSRV	2970921961
+1	japanese	x-vnd.Be-PSRV	4039458322
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		その名前のプリンターは既に存在しますが、利用できません。置き換えますか?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		その名前のプリンターは既に存在しますが、ドライバーが見付かりません。置き換えますか?
 All pages	ConfigWindow		全ページ
 All pages, %1 copies	ConfigWindow		全てのページを %1 部
 Cancel	ConfigWindow		中止

@@ -1,8 +1,7 @@
-1	romanian	x-vnd.Be-MAIL	3002469710
+1	romanian	x-vnd.Be-MAIL	1344287101
 %d - Date	Mail		%d - Dată
 %e - E-mail address	Mail		%e - Adresă email
 %n - Full name	Mail		%n - Nume complet
-About Mail…	Mail		Despre Mail...
 Account from mail	Mail		Cont de la mail
 Account:	Mail		Cont:
 Accounts…	Mail		Conturi...
@@ -60,7 +59,6 @@ Leave as New	Mail		Menține ca nou
 Leave same	Mail		Menține la fel
 Mail couldn't find its dictionary.	Mail		Mail nu a putut găsi dicționarul.
 Mail preferences	Mail		Preferințe email
-Mail\n\n	Mail		Mail\n\n
 Mailing	Mail		Poștă electronică
 Message	Mail		Mesaj
 Move to trash	Mail		Mută la gunoi
@@ -138,6 +136,5 @@ Use default account	Mail		Utilizează contul implicit
 User interface	Mail		Interfață cu utilizatorul
 View	Mail		Vizualizare
 Warn unencodable:	Mail		Avertisment care nu se poate coda:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Scris de Robert Polic.\nÎmbunătățit de echipa Dr. Zoidberg.\n\nDrepturi de autor 1991-2001, Be Incorporated.\nDrepturi de autor 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Textul dumneavoastră principal conține caractere %ld care nu se pot coda. Este posibil ca un set diferit de caractere să funcționeze mai bine? Apăsați pe Trimite pentru a fi trimis oricum (un caracter de substituție va fi utilizat în locul celor care nu se pot coda), sau alegeți Anulează pentru a merge înapoi să îl reparați.
 \\n - Newline	Mail		\\n - Linie nouă

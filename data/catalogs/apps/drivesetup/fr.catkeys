@@ -29,7 +29,7 @@ Device	DiskView		Périphérique
 Device	PartitionList		Périphérique
 Disk	MainWindow		Disque
 Disk system \"%s\"\" not found!	MainWindow		Le disque système « %s » est introuvable !
-DriveSetup	System name		Gestionnaire de Disques
+DriveSetup	System name		Gestionnaire de disque
 Eject	MainWindow		Éjecter
 End: %ld MB	Support		Fin : %ld Mo
 Error: 	MainWindow	in any error alert	Erreur : 

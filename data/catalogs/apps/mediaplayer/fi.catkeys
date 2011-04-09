@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	3334593067
+1	finnish	x-vnd.Haiku-MediaPlayer	138551800
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedostoa ei kyetty avaamaan.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
 100% scale	MediaPlayer-Main		100 % skaala
@@ -25,8 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
 Cancel	MediaPlayer-SettingsWindow		Peru
 Close	MediaPlayer-Main		Sulje
 Close	MediaPlayer-PlaylistWindow		Sulje
-Close window when done playing movies	MediaPlayer-SettingsWindow		Sulje ikkuna, kun elokuvat on näytetty
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Sulje ikkuna, kun äänet on soitettu
+Close window after playing audio	MediaPlayer-SettingsWindow		Sulje ikkuna äänitiedoston soittamisen jälkeen
+Close window after playing video	MediaPlayer-SettingsWindow		Sulje ikkuna videotiedoston soittamisen jälkeen
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopioi kappaleita
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopioi kappale
 Drop files to play	MediaPlayer-Main		Pudota soitettavat tiedostot
@@ -48,8 +48,8 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnisssä.\nHaluaisitko käynnistää sen ?
 Large	MediaPlayer-SettingsWindow		Laaja
 Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
-Loop movies by default	MediaPlayer-SettingsWindow		oletuksena elokuvat silmukassa
-Loop sounds by default	MediaPlayer-SettingsWindow		oletussilmukkaäänet
+Loop audio	MediaPlayer-SettingsWindow		Äänitiedostosilmukka
+Loop video	MediaPlayer-SettingsWindow		Videotiedostosilmukka
 Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta
 MediaPlayer	System name		Mediasoitin
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset
@@ -57,6 +57,7 @@ Medium	MediaPlayer-SettingsWindow		Media
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Siirrä roskakoriin
+Move file to Trash	MediaPlayer-PlaylistWindow		Siirrä tiedosto roskakoriin
 Mute	MediaPlayer-Main		Mykistä
 Muted	MediaPlayer-SettingsWindow		Mykistetty
 New player…	MediaPlayer-Main		Uusi soitin...
@@ -87,13 +88,11 @@ Randomize	MediaPlayer-PlaylistWindow		Satunnaista
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaista kappaleita
 Rating	MediaPlayer-Main		Aset arvosana
 Redo	MediaPlayer-PlaylistWindow		Tee uudelleen
-Remove (Del)	MediaPlayer-PlaylistWindow		Poista (Del)
+Remove	MediaPlayer-PlaylistWindow		Poista
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Poista kappaleita
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Siirrä kappaleita roskakoriin
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Poista kappale
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
-Remove all	MediaPlayer-PlaylistWindow		Poista kaikki
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Poista ja laita roskakoriin
 Revert	MediaPlayer-SettingsWindow		Käänteinen
 Save	MediaPlayer-Main		Tallenna
 Save	MediaPlayer-PlaylistWindow		Tallenna
@@ -102,8 +101,9 @@ Save as…	MediaPlayer-PlaylistWindow		Tallenna nimellä...
 Save error	MediaPlayer-PlaylistWindow		Tallenna virhe
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui.\n\nVirhe:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelo tallentaminen epäonnistui:\n\nVirhe:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Skaalaa ohjaimet kokoruututilassa
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaalausohjaimet kokonäyttötilassa
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaalaa elokuvat pehmeästi (ei-kerrostustila)
+Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Settings…	MediaPlayer-Main		Asetukset...
 Skip to the next track.	MediaPlayer-Main		Hyppää seuraavan kappaleen yli.
 Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli

@@ -1,8 +1,7 @@
-1	dutch	x-vnd.Be-MAIL	3002469710
+1	dutch	x-vnd.Be-MAIL	1344287101
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-mailadres
 %n - Full name	Mail		%n - Volledige naam
-About Mail…	Mail		Over Mail…
 Account from mail	Mail		Account van mail
 Account:	Mail		Account:
 Accounts…	Mail		Accounts…
@@ -60,7 +59,6 @@ Leave as New	Mail		Als Nieuw laten
 Leave same	Mail		Ongewijzigd laten
 Mail couldn't find its dictionary.	Mail		Mail kon zijn woordenboek niet vinden.
 Mail preferences	Mail		Mailvoorkeuren
-Mail\n\n	Mail		Mail\n\n
 Mailing	Mail		Mailverkeer
 Message	Mail		Bericht
 Move to trash	Mail		Naar prullenbak verplaatsen
@@ -138,6 +136,5 @@ Use default account	Mail		Standaard-account gebruiken
 User interface	Mail		Gebruikersinterface
 View	Mail		Bekijken
 Warn unencodable:	Mail		Waarschuwen oncodeerbaar:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Door Robert Polic.\nVerbeterd door de crew van Dr. Zoidberg.\n\nCopyright 1991-2001, Be.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
 \\n - Newline	Mail		\\n - Newline

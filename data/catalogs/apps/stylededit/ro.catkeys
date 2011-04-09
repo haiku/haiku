@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-StyledEdit	1954300387
+1	romanian	x-vnd.Haiku-StyledEdit	3472082864
 ???	LoadAlert		???
 Align	Menus		Aliniază
 Black	Menus		Negru
@@ -12,7 +12,6 @@ Cancel	SaveAlert		Anulează
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
 Center	Menus		Centru
 Characters:	Statistics		Caractere:
-Clear	Menus		Eliberează
 Close	Menus		Închide
 Color	Menus		Culoare
 Copy	Menus		Copiază
@@ -50,7 +49,6 @@ Redo typing	QuitAlert		Repetă tastarea
 Replace	FindandReplaceWindow		Înlocuiește
 Replace all	FindandReplaceWindow		Înlocuiește tot
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
-Replace same	Menus		Înlocuiește același
 Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Replace…	Menus		Înlocuiește...
 Revert to saved…	Menus		Revenire la salvat...

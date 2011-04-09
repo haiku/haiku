@@ -1,0 +1,22 @@
+1	japanese	application/x-vnd.Haiku-Registrar	2292978560
+%action%?	ShutdownProcess		%action%?
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" がシャットダウンプロセスを中断しました。
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。
+Asking background applications to quit.	ShutdownProcess		バックグランドアプリケーションに終了を要求しています。
+Asking other processes to quit.	ShutdownProcess		プロセスに終了を要求しています。
+Cancel	ShutdownProcess		キャンセル
+Cancel shutdown	ShutdownProcess		シャットダウンのキャンセル
+Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動してよいですか?
+Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしてよいですか?
+It's now safe to turn off the computer.	ShutdownProcess		コンピュータの電源を切断しても安全です。 
+Kill application	ShutdownProcess		強制終了
+OK	ShutdownProcess		OK
+Restart	ShutdownProcess		再起動
+Restart system	ShutdownProcess		システムの再起動
+Shut down	ShutdownProcess		シャットダウン
+Shutdown aborted	ShutdownProcess		シャットダウンが中断されました。
+Shutdown status	ShutdownProcess		シャットダウンの状態
+Shutting down…	ShutdownProcess		シャットダウン中…
+System is shut down	ShutdownProcess		システムがシャットダウンされました
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\"がモーダルパネルでブロックしているかもしれません。
+Tidying things up a bit.	ShutdownProcess		少し片付け中です。

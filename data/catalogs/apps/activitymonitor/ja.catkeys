@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1197557042
+1	japanese	x-vnd.Haiku-ActivityMonitor	92864221
 Add graph	ActivityWindow		グラフの追加
 Additional items	ActivityView		追加項目
 Apps	DataSource		アプリ
@@ -19,7 +19,6 @@ P-faults	DataSource		ページフォルト
 Page faults	DataSource		ページフォルト数
 Ports	DataSource		ポート数
 Quit	ActivityWindow		終了
-Raw clipboard size	DataSource		クリップボードサイズ
 Receiving	DataSource		受信バイト数
 Remove graph	ActivityView		グラフの削除
 Running applications	DataSource		実行中のアプリケーション数
@@ -31,7 +30,6 @@ Show legend	ActivityView		文字を表示
 Swap	DataSource		スワップ
 Swap space	DataSource		スワップサイズ
 Teams	DataSource		チーム数
-Text clipboard size	DataSource		テキストクリップボードサイズ
 Threads	DataSource		スレッド数
 Update time interval:	SettingsWindow		更新間隔：
 Used memory	DataSource		使用メモリー

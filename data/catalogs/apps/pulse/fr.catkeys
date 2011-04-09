@@ -33,9 +33,9 @@ OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
-Pulse	System name		Pulsation
 Pulse	NormalPulseView		Pulse
 Pulse	PulseApp		Pulsation
+Pulse	System name		Pulsation
 Pulse settings	PulseWindow		Réglages de Pulsation
 Quit	DeskbarPulseView		Quitter
 Quit	MiniPulseView		Quitter

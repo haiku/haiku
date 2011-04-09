@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-ShowImage	581710495
+1	french	x-vnd.Haiku-ShowImage	886873119
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondes
-About ShowImage…	Menus		À propos de la Visionneuse…
 Browse	Menus		Parcourir
 Cancel	ClosePrompt		Annuler
 Clear selection	Menus		Effacer la sélection
@@ -24,6 +23,7 @@ High-quality zooming	Menus		Zoom haute qualité
 Image	Menus		Image
 Job setup	PrintOptionsWindow		Définir la tâche
 Last page	Menus		Dernière page
+Leave full screen	Menus		Sortie du plein écran
 Next file	Menus		Fichier suivant
 Next page	Menus		Page suivante
 OK	Alerts		OK
@@ -43,8 +43,9 @@ Rotate clockwise	Menus		Rotation horaire
 Rotate counterclockwise	Menus		Rotation antihoraire
 Save as…	Menus		Enregistrer sous…
 Select all	Menus		Selectionner tout
-Selection Mode	Menus		Mode de sélection
-Show caption in full screen mode	Menus		Afficher les miniatures en mode plein écran
+Selection mode	Menus		Mode de sélection
+Show caption in full screen mode	Menus		Afficher la légende en mode plein écran
+Show tool bar	Menus		Afficher la barre d'outils
 ShowImage	System name		Visionneuse
 Slide delay	Menus		Délai de diaporama
 Slide show	Menus		Diaporama

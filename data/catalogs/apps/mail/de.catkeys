@@ -1,8 +1,11 @@
-1	german	x-vnd.Be-MAIL	3225774574
+1	german	x-vnd.Be-MAIL	2388476802
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-Mail-Adresse
+%e wrote:\\n	Mail		%e schrieb:\\n
 %n - Full name	Mail		%n - Voller Name
-About Mail…	Mail		Über E-Mail…
+(Address unavailable)	Mail		(Adresse nicht verfügbar)
+(Date unavailable)	Mail		(Datum nicht verfügbar)
+(Name unavailable)	Mail		(Name nicht verfügbar)
 Account from mail	Mail		Konto der Nachricht
 Account:	Mail		Konto:
 Accounts…	Mail		Konten…
@@ -63,7 +66,6 @@ Leave same	Mail		Status belassen
 Mail	System name		E-Mail
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
 Mail preferences	Mail		E-Mail-Einstellungen
-Mail\n\n	Mail		E-Mail\n\n
 Mailing	Mail		Nachrichten
 Message	Mail		Nachricht
 Move to trash	Mail		In den Papierkorb verschieben
@@ -145,7 +147,13 @@ Use default account	Mail		Standardkonto
 User interface	Mail		Programmoberfläche
 View	Mail		Ansicht
 Warn unencodable:	Mail		Warnung bei nicht-kodierbaren Zeichen:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		von Robert Polic.\nErweitert durch die Dr. Zoidberg Crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 \\n - Newline	Mail		\\n - Zeilenumbruch
+draft	B_USER_DIRECTORY/mail/draft		Entwürfe
 helpful message	Mail		Tipp
+in	B_USER_DIRECTORY/mail/in		Eingang
+mail	B_USER_DIRECTORY/mail		Mail
+out	B_USER_DIRECTORY/mail/out		Ausgang
+queries	B_USER_DIRECTORY/mail/queries		Queries
+sent	B_USER_DIRECTORY/mail/sent		Gesendet
+spam	B_USER_DIRECTORY/mail/spam		Spam

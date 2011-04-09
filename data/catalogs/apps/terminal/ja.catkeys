@@ -1,0 +1,79 @@
+1	japanese	x-vnd.Haiku-Terminal	2177288425
+Appearance	Terminal PrefWindow		外観
+Background	Terminal AppearancePrefView		背景
+Black on White	Terminal colors schema		白地に黒
+Cancel	Terminal PrefWindow		取り消し
+Cancel	Terminal SetTitleWindow		取り消し
+Cancel	Terminal TermView		取り消し
+Cancel	Terminal TermWindow		取り消し
+Change directory	Terminal TermView		ディレクトリを変更
+Clear all	Terminal TermWindow		すべて消去
+Close	Terminal TermWindow		閉じる
+Close active tab	Terminal TermWindow		アクティブタブを閉じる
+Close other tabs	Terminal TermWindow		他のタブを閉じる
+Close tab	Terminal TermWindow		タブを閉じる
+Close window	Terminal TermWindow		ウィンドウを閉じる
+Color schema:	Terminal AppearancePrefView		配色：
+Color:	Terminal AppearancePrefView		色:
+Copy	Terminal TermWindow		コピー
+Copy here	Terminal TermView		カレントディレクトリへコピー
+Create link here	Terminal TermView		カレントディレクトリにリンク作成
+Custom	Terminal colors schema		カスタム
+Decrease	Terminal TermWindow		小さく
+Don't save	Terminal PrefWindow		保存しない
+Edit	Terminal TermWindow		編集
+Edit tab title…	Terminal TermWindow		タブタイトルの編集...
+Find	Terminal FindWindow		検索
+Find next	Terminal TermWindow		次を検索
+Find previous	Terminal TermWindow		前を検索
+Find…	Terminal TermWindow		検索...
+Font:	Terminal AppearancePrefView		フォント:
+Full screen	Terminal TermWindow		フルスクリーン
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku ターミナル\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
+Increase	Terminal TermWindow		大きく
+Insert path	Terminal TermView		パスを挿入
+Match case	Terminal FindWindow		大文字小文字を区別する
+Match word	Terminal FindWindow		一致する単語を検索
+Move here	Terminal TermView		カレントディレクトリへ移動
+New Terminal	Terminal TermWindow		新しいターミナルを開く
+New tab	Terminal TermWindow		新しいタブ
+No search string was entered.	Terminal TermWindow		検索テキストが入力されていません。
+Not found.	Terminal TermWindow		これ以上見つかりません。
+OK	Terminal PrefWindow		OK
+OK	Terminal SetTitleWindow		OK
+OK	Terminal TermApp		OK
+OK	Terminal TermWindow		OK
+Page setup…	Terminal TermWindow		ページ設定...
+Paste	Terminal TermWindow		貼り付け
+Print	Terminal TermWindow		印刷
+Print cancelled.	Terminal TermWindow		印刷はキャンセルされました
+Quit	Terminal TermWindow		終了
+Really close?	Terminal TermWindow		本当に閉じますか?
+Save	Terminal PrefWindow		保存
+Save as default	Terminal TermWindow		デフォルトとして保存
+Save to file…	Terminal PrefWindow		ファイルに保存...
+Search forward	Terminal FindWindow		順方向検索
+Select all	Terminal TermWindow		すべて選択
+Selected background	Terminal AppearancePrefView		選択されたテキストの背景
+Selected text	Terminal AppearancePrefView		選択されたテキスト
+Settings	Terminal TermWindow		設定
+Settings…	Terminal TermWindow		設定...
+Size:	Terminal AppearancePrefView		サイズ:
+Switch Terminals	Terminal TermWindow		ターミナルを切替える
+Tab title:	Terminal AppearancePrefView		タブタイトル：
+Tab title:	Terminal TermWindow		タブタイトル:
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
+Text	Terminal AppearancePrefView		テキスト
+Text encoding	Terminal TermWindow		テキストエンコーディング
+Text not found.	Terminal TermWindow		検索テキストが見つかりません。
+Text size	Terminal TermWindow		テキストサイズ
+Use default	Terminal SetTitleWindow		デフォルトを使用
+Use default shell	Terminal Shell		デフォルトシェルを使用
+Use selection	Terminal FindWindow		選択部で検索
+Use text:	Terminal FindWindow		テキスト指定：
+White on Black	Terminal colors schema		黒字に白
+Window size	Terminal TermWindow		ウィンドウサイズ
+Window title:	Terminal AppearancePrefView		ウィンドウタイトル：
+Window title:	Terminal TermWindow		ウィンドウタイトル：
+Window title…	Terminal TermWindow		ウィンドウタイトル...
+size	Terminal TermView		サイズ

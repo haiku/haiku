@@ -1,8 +1,7 @@
-1	polish	x-vnd.Be-MAIL	1307575650
+1	polish	x-vnd.Be-MAIL	1344287101
 %d - Date	Mail		%d - Data
 %e - E-mail address	Mail		%e - Adres e-mail
 %n - Full name	Mail		%n - Pełna nazwa
-About Mail…	Mail		O programie Mail…
 Account from mail	Mail		Konto z wiadomości
 Account:	Mail		Konto:
 Accounts…	Mail		Konta…
@@ -60,7 +59,6 @@ Leave as New	Mail		Pozostaw jako nową
 Leave same	Mail		Zostaw takie same
 Mail couldn't find its dictionary.	Mail		Mail nie mógł odnaleźć swojego słownika.
 Mail preferences	Mail		Ustawienia poczty
-Mail\n\n	Mail		Mail\n\n
 Mailing	Mail		Wiadomości
 Message	Mail		Wiadomość
 Move to trash	Mail		Przenieś do kosza

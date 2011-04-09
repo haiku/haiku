@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku.zip-o-matic	274748138
+1	belarusian	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		Дабаўлена %ld файл(а/аў).
 1 file added.	file:ZipOMaticWindow.cpp		Дабаўлены адзін файл.
 Archive	file:ZipperThread.cpp		Архіў
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Continue	file:ZipOMaticWindow.cpp		Працягваць
 Creating archive: %s	file:ZipOMaticWindow.cpp		Стварыць архіў: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Жадаеце іх спыніць?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Дзеля стварэння архіву кіньце сюды файлы.
 Error creating archive	file:ZipOMaticWindow.cpp		Памылка падчас стварэння архіву
 Filename: %s	file:ZipOMaticWindow.cpp		Імя файла: %s
 Let them continue	file:ZipOMatic.cpp		Дазволіць ім працягваць

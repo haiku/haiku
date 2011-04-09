@@ -1,5 +1,4 @@
-1	slovak	x-vnd.Haiku-LaunchBox	1244694305
-About	LaunchBox		O aplikácii
+1	slovak	x-vnd.Haiku-LaunchBox	3267282249
 Add button here	LaunchBox		Pridať tlačidlo sem
 Auto-raise	LaunchBox		Automaticky aktivovať
 Bummer	LaunchBox		Škoda
@@ -15,7 +14,6 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodaril
 Horizontal layout	LaunchBox		Vodorovné rozloženie
 Icon size	LaunchBox		Veľkosť ikon
 Ignore double-click	LaunchBox		Ignorovať dvojité kliknutie
-LaunchBox	System name		Spúšťač
 Name Panel	LaunchBox		Panel Názov
 New	LaunchBox		Nový
 OK	LaunchBox		OK
@@ -29,7 +27,6 @@ Set description…	LaunchBox		Nastaviť popis...
 Settings	LaunchBox		Nastavenia
 Show on all workspaces	LaunchBox		Zobrazovať na všetkých pracovných plochách
 Show window border	LaunchBox		Zobrazovať okraj okna
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (alias stippi)
 Vertical layout	LaunchBox		Zvislé rozloženie
 You can drag an icon here.	LaunchBox		Sem môžete pretiahnuť ikonu.
 last chance	LaunchBox		posledná šanca

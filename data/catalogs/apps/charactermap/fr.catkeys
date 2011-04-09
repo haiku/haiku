@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	3280808181
+1	french	x-vnd.Haiku-CharacterMap	1169041226
 Aegean numbers	UnicodeBlocks		Nombres égéens
 Alphabetic presentation forms	UnicodeBlocks		Formes de présentation alphabétiques
 Ancient Greek musical notation	UnicodeBlocks		Musique grecque ancienne
@@ -24,6 +24,7 @@ CJK compatibility	UnicodeBlocks		Compatibilité CJC
 CJK compatibility forms	UnicodeBlocks		Formes compatibles CJC
 CJK compatibility ideographs	UnicodeBlocks		Idéogrammes CJC de compatibilité
 CJK compatibility ideographs Supplement	UnicodeBlocks		Supplément idéogrammes CJC de compatibilité
+CJK radicals supplement	UnicodeBlocks		Formes supplémentaires de clés CJC
 CJK strokes	UnicodeBlocks		Traits CJC
 CJK symbols and punctuation	UnicodeBlocks		Ponctuation CJC
 CJK unified ideographs	UnicodeBlocks		Idéogrammes unifiés CJC
@@ -31,6 +32,7 @@ CJK unified ideographs extension A	UnicodeBlocks		Supplément A idéogrammes uni
 CJK unified ideographs extension B	UnicodeBlocks		Supplément B idéogrammes unifiés CJC
 Carian	UnicodeBlocks		Carien
 Cham	UnicodeBlocks		Cham
+CharacterMap	System name		Table des caractères
 Cherokee	UnicodeBlocks		Chérokî
 Clear	CharacterWindow		Nettoyer
 Code	CharacterWindow		Code
@@ -39,9 +41,12 @@ Control pictures	UnicodeBlocks		Pictogrammes de commande
 Coptic	UnicodeBlocks		Copte
 Counting rod numerals	UnicodeBlocks		Chiffres-bâtonnets chinois
 Cuneiform	UnicodeBlocks		Cunéiforme
+Cuneiform numbers and punctuation	UnicodeBlocks		Nombres et ponctuation cunéiformes
 Currency symbols	UnicodeBlocks		Symboles monétaires
 Cypriot syllabary	UnicodeBlocks		Syllabaire chypriote
 Cyrillic	UnicodeBlocks		Cyrillique 
+Cyrillic extended A	UnicodeBlocks		Cyrillique étendu A
+Cyrillic extended B	UnicodeBlocks		Cyrillique étendu B
 Cyrillic supplement	UnicodeBlocks		Supplément cyrillique 
 Deseret	UnicodeBlocks		Déséret
 Devanagari	UnicodeBlocks		Dévanâgarî
@@ -75,6 +80,8 @@ Hiragana	UnicodeBlocks		Hiragana
 IPA extensions	UnicodeBlocks		Phonétique international étendu
 Ideographic description characters	UnicodeBlocks		Description idéographique
 Kanbun	UnicodeBlocks		Kanboun
+Kangxi radicals	UnicodeBlocks		Clés K'ang-hsi
+Kannada	UnicodeBlocks		Kannada
 Katakana	UnicodeBlocks		Katakana
 Katakana phonetic extensions	UnicodeBlocks		Supplément phonétique katakana
 Kayah Li	UnicodeBlocks		Kayah-li
@@ -95,6 +102,7 @@ Linear B ideograms	UnicodeBlocks		Idéogrammes du linéaire B
 Linear B syllabary	UnicodeBlocks		Linéaire B phonétique
 Lycian	UnicodeBlocks		Lycien
 Lydian	UnicodeBlocks		Lydien
+Mahjong tiles	UnicodeBlocks		Tuiles de Mahjong
 Malayalam	UnicodeBlocks		Malayalam
 Mathematical alphanumeric symbols	UnicodeBlocks		Symboles mathématiques alphanumériques
 Mathematical operators	UnicodeBlocks		Opérateurs mathématiques
@@ -145,6 +153,7 @@ Tagalog	UnicodeBlocks		Tagal
 Tagbanwa	UnicodeBlocks		Tagbanoua
 Tags	UnicodeBlocks		Étiquettes
 Tai Le	UnicodeBlocks		Taï-le
+Tai Xuan Jing symbols	UnicodeBlocks		Symboles du Classique du mystère suprême
 Tamil	UnicodeBlocks		Tamoul
 Telugu	UnicodeBlocks		Télougou
 Thaana	UnicodeBlocks		Thâna
@@ -153,8 +162,11 @@ Tibetan	UnicodeBlocks		Tibétain
 Tifinagh	UnicodeBlocks		Tifinaghe
 Ugaritic	UnicodeBlocks		Ougaritique
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Syllabaires unifiés des aborigènes Canadiens
+Vai	UnicodeBlocks		Vaï
 Variation selectors	UnicodeBlocks		Sélecteurs de variante
 Variation selectors supplement	UnicodeBlocks		Supplément de sélecteurs de variante
 Vertical forms	UnicodeBlocks		Formes verticales
 View	CharacterWindow		Vue
+Yi Radicals	UnicodeBlocks		Clés yi
+Yi syllables	UnicodeBlocks		Syllabaire Yi
 Yijing hexagram symbols	UnicodeBlocks		Hexagrammes du Yi Jing

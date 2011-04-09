@@ -1,8 +1,7 @@
-1	czech	x-vnd.Be-MAIL	1806372798
+1	czech	x-vnd.Be-MAIL	148190189
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-mailová adresa
 %n - Full name	Mail		%n - Plné jméno
-About Mail…	Mail		O Mail
 Account from mail	Mail		Účet z mailu
 Account:	Mail		Účet:
 Accounts…	Mail		Účty...
@@ -62,7 +61,6 @@ Leave as New	Mail		Ponechat jako nové
 Leave same	Mail		Nechat beze změn
 Mail couldn't find its dictionary.	Mail		Mail nemohl najít svůj slovník.
 Mail preferences	Mail		Volby e-mailu
-Mail\n\n	Mail		Pošta\n\n
 Mailing	Mail		Pošta
 Message	Mail		Zpráva
 Move to trash	Mail		Přesunout do koše
@@ -144,7 +142,6 @@ Use default account	Mail		Použít implicitní účet
 User interface	Mail		Uživatelské rozhraní
 View	Mail		Zobrazit
 Warn unencodable:	Mail		Varovat před nekódovatelným:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Napsal Robert Polic.\nVylepšeno skupinou Dr. Zoidberga.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Váš text obsahuje %ld nevkladatelných znaků. Možná by bylo lepší použít jinou znakovou sadu. Stiskněte Odeslat, pokud chcete zprávu přesto poslat (místo nevkladatelných znaků budou použity znaky zástupné), nebo vyberte Zrušit pro návrat zpět a pokuste se to opravit.
 \\n - Newline	Mail		\\n - Nový řádek
 helpful message	Mail		užitečná zpráva

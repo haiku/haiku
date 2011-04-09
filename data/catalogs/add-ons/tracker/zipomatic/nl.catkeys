@@ -1,4 +1,4 @@
-1	dutch	x-vnd.haiku.zip-o-matic	274748138
+1	dutch	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		%ld bestanden toegevoegd.
 1 file added.	file:ZipOMaticWindow.cpp		1 bestand toegevoegd.
 Archive	file:ZipperThread.cpp		Archief
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		B
 Continue	file:ZipOMaticWindow.cpp		Doorgaan
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creëert archief: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Wilt u ze stoppen?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Sleep bestanden hierheen om te archiveren.
 Error creating archive	file:ZipOMaticWindow.cpp		Fout bij creatie van archief
 Filename: %s	file:ZipOMaticWindow.cpp		Bestandsnaam: %s
 Let them continue	file:ZipOMatic.cpp		Laat ze doorgaan

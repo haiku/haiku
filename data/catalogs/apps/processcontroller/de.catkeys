@@ -38,7 +38,7 @@ That's no Fun!	ProcessController		Nicht lustig!
 This is the last active processor...\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor...\nEr kann nicht abgeschaltet werden!
 This team is already gone…	ProcessController		Dieses Team existiert nicht mehr...
 This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr...
-Threads and CPU usage	ProcessController		Threads und CPU Auslastung
+Threads and CPU usage	ProcessController		Threads und CPU-Last
 Urgent display priority	ProcessController		Hohe Anzeigen-Priorität
 Urgent priority	ProcessController		Hohe Priorität
 Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n

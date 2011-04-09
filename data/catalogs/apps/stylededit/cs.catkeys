@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-StyledEdit	881610730
+1	czech	x-vnd.Haiku-StyledEdit	2399393207
 ???	LoadAlert		???
 Align	Menus		Zarovnání
 Black	Menus		Černá
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemohu se vrátit, so
 Case-sensitive	FindandReplaceWindow		Citlivé na velikost písmen
 Center	Menus		Na střed
 Characters:	Statistics		Znaky:
-Clear	Menus		Vymazat
 Close	Menus		Zavřít
 Color	Menus		Barva
 Copy	Menus		Kopírovat
@@ -56,7 +55,6 @@ Redo typing	QuitAlert		Znovu psaní
 Replace	FindandReplaceWindow		Nahradit
 Replace all	FindandReplaceWindow		Nahradit vše
 Replace in all windows	FindandReplaceWindow		Nahradit ve všech oknech
-Replace same	Menus		Nahradit stejný
 Replace with:	FindandReplaceWindow		Nahradit:
 Replace…	Menus		Nahradit...
 Revert to saved…	Menus		Vrátit se k uloženému...

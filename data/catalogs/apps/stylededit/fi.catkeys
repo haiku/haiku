@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	3064120758
+1	finnish	x-vnd.Haiku-StyledEdit	1508367857
 ???	LoadAlert		???
 Align	Menus		Tasaa
 Black	Menus		Musta
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tie
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Center	Menus		Keskitä
 Characters:	Statistics		Merkkejä:
-Clear	Menus		Tyhjennä
 Close	Menus		Sulje
 Color	Menus		Väri
 Copy	Menus		Kopioi
@@ -56,7 +55,7 @@ Redo typing	QuitAlert		Toista kirjoitus
 Replace	FindandReplaceWindow		Korvaa
 Replace all	FindandReplaceWindow		Korvaa kaikki
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
-Replace same	Menus		Korvaa sama
+Replace next	Menus		Korvaa seuraava
 Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Replace…	Menus		Korvaa…
 Revert to saved…	Menus		Palauta tallennettuun…

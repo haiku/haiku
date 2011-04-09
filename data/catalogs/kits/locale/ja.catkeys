@@ -1,9 +1,29 @@
-1	japanese	system	2677153267
+1	japanese	system	3492689314
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d バイト
+<empty>	Menu		<空>
+About %app%	AboutMenuItem		%app%について
+About %app…	Dragger		%appについて…
 Blue:	ColorControl		青：
+Close	AboutWindow		閉じる
+Copy	TextView		コピー
+Cut	TextView		切り取り
+Error	PrintJob		エラー
+Error	ZombieReplicantView		エラー
 Green:	ColorControl		緑：
+No Pages to print!	PrintJob		印刷するページがありません。
+OK	Dragger		OK
+OK	PrintJob		OK
+OK	ZombieReplicantView		OK
+Paste	TextView		貼り付け
+Print Server is not responding.	PrintJob		プリントサーバーが応答しません。
 Red:	ColorControl		赤：
+Redo	TextView		やり直し
+Remove replicant	Dragger		レプリカントを削除
+Select All	TextView		すべて選択
+Undo	TextView		元に戻す
+Warning	Dragger		警告
+Written by:	AboutWindow		作者：

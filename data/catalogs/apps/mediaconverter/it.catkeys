@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaConverter	3793354334
+1	italian	x-vnd.Haiku-MediaConverter	611032470
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canale / %lld frame
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld frame
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld frame
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d bit
 %d byte 	MediaFileInfo		%d byte 
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld frame
-About…	MediaConverter		Informazioni...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Si è verificato un errore.\n\nErrore :  leggendo le informazioni del file
 Audio encoding:	MediaConverter		Codifica Audio:
 Audio quality not supported	MediaConverter		Qualità audio non supportata
@@ -40,7 +39,6 @@ File format:	MediaConverter		Formato file:
 High	MediaConverter		Alto
 Low	MediaConverter		Basso
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Nessun audio
 No file selected	MediaConverter-FileInfo		Nessun file selezionato
 No video	Video codecs list		Nessun video

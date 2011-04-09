@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Magnify	2101743114
+1	italian	x-vnd.Haiku-Magnify	3144246779
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixel/pixel
 Add a crosshair	Magnify-Main		Aggiungi un mirino
 Copy image	Magnify-Main		Copia immagine
@@ -14,10 +14,8 @@ Increase window size	Magnify-Main		Aumenta la dimensione della finestra
 Info	Magnify-Main		Informazioni
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informazioni:\n Nascondi/Mostra informazioni - Nasconde/Mostra tutte queste nuove caratteristiche\n Nota: durante il funzionamento, un quadrato rosso apparirà, che indica\n quali valori rgb dei pixel verranno mostrati\n aggiungi/rimuovi mirino - 2 mirini possono essere aggiunti (o rimossi)\n per aiutare l'allineamento e il posizionamento degli oggetti.\n I mirini sono rappresentati da quadrati blu e da linee blu.\n Mostra/Nascondi griglia - Mostra/Nasconde la griglia che separa ogni pixel.\n
 Magnify help	Magnify-Help		Aiuto su Magnify
-Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nOra con molte altre caratteristiche e ricompilato per Haiku.
 Make square	Magnify-Main		Rendi la finestra quadrata
 Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigazione:\n Le freccette - sposta la selezione corrente (indicatore rgb o mirino)\n intorno ad 1 pixel alla volta\n Opzioni-freccette - sposta la posizione del mouse di 1 pixel alla volta\n La x indica la selezione - la selezione corrente ha una "x"\n
-OK	Magnify-Main		OK
 Remove a crosshair	Magnify-Main		Rimuovi un mirino
 Save image	Magnify-Main		Salva immagine
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Ridimensionamento:\n Rendi la finestra quadrata - imposta la larghezza e l'altezza alla più larga\n di queste per creare un'immagine quadrata\n Aumenta/Riduci la dimensione della finestra - ingrandisce o rimpicciolisce la finestra\n di 4 pixel.\n Nota: Questa finestra può anche essere ridimensionata in qualsiasi dimensione usando\n l'area di ridimensionamento della finestra\n Aumenta/Diminuisci la dimensione dei pixel - aumenta o diminuisce il numero\n di pixel usati per ingrandire un pixel 'reale'. Il campo è da 1 a 16.\n

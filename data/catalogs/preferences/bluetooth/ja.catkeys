@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	97587065
+1	japanese	x-vnd.Haiku-BluetoothPrefs	4253957200
 15 secs	Settings view		15 秒
 61 secs	Settings view		61 秒
+About Bluetooth…	Window		Bluetoothについて…
 Add device to list	Inquiry panel		デバイスを一覧に追加
 Add…	Remote devices		追加…
 Always ask	Settings view		常に確認する
@@ -14,20 +15,30 @@ Desktop	Settings view		デスクトップ
 Disconnect	Remote devices		切断
 Discoverable	Extended local device view		発見可能
 From all devices	Settings view		全てのデバイスから
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetoothシステム, (ARCE)\n\nOliver Ruiz Dorantes作\n\nその他の貢献者：\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\n次の方々にも感謝…\n\nハードウェアを提供していただいた方々:\n\t- Henry Jair Abril Florez (el Colombiano)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\n金銭的な支援をしていただいた方々:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nパッチ提供者：\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n全ての知識を提供してくれた：\n\t- yellowTABチーム
 Handheld	Settings view		ハンドヘルド機器
 Help	Window		ヘルプ
 Identify host as:	Settings view		ホスト名:
+Identify us as...	Settings view		自機名…
+Incoming connections policy:	Settings view		着信接続ポリシー：
 Inquiry	Inquiry panel		問い合わせ
 Laptop	Settings view		ラップトップ
 Local devices found on system:	Settings view		認識されたローカルデバイス :
+Manufacturer: 	Device View		製造元：
 OK	main		OK
 Only from trusted devices	Settings view		信用されているデバイスのみ
 Pair…	Remote devices		ペアリング…
+Pick LocalDevice...	Settings view		ローカルデバイスの選択…
+Policy...	Settings view		ポリシー…
+Quit	main		終了
 Refresh LocalDevices…	Window		ローカルデバイスを更新…
 Refresh…	Remote devices		更新…
+Remaining %1 seconds	Inquiry panel		残り %1 秒
 Remote devices	Window		リモートデバイス
 Remote devices list…	Window		リモートデバイス一覧…
 Remove	Remote devices		削除
+Retrieving name of %1	Inquiry panel		%1の名前を取得しています
+Retrieving names...	Inquiry panel		名前を取得しています…
 Revert	Window		元に戻す
 Scanning completed.	Inquiry panel		スキャンが完了しました。
 Scanning progress	Inquiry panel		スキャンの進行状況
@@ -35,8 +46,15 @@ Server	Settings view		サーバー
 Server	Window		サーバー
 Service classes: 	Device View		サービスクラス：
 Settings	Window		設定
+Show bluetooth console…	Window		Bluetoothコンソールを表示…
 Show name	Extended local device view		名前を表示
 Smart phone	Settings view		スマートフォン
 Start bluetooth services…	Window		Bluetoothサービスを開始…
+Start please	main		開始してください
+Starting scan...	Inquiry panel		スキャン開始…
 Stop bluetooth services…	Window		Bluetoothサービスを停止…
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムにはBluetoothローカルデバイスが登録されていません。
 View	Window		ビュー
+Work offline	main		オフライン作業
+bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_serverが動作していません。起動するか、オフライン作業を続けてください
+packets: 	Device View		パケット：

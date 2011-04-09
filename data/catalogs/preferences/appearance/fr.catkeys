@@ -35,7 +35,7 @@ Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le m
 Shadow	Colors tab		Ombre
 Shine	Colors tab		Lumière
 Strong	AntialiasingSettingsView		Épais
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version de Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version d'Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
 Success	Colors tab		Réussite
 Tooltip background	Colors tab		Arrière plan des bulles d'aide
 Tooltip text	Colors tab		Texte des bulles d'aide

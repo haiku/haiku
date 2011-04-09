@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-ScreenSaver	1446908601
+1	dutch	x-vnd.Haiku-ScreenSaver	799085334
 30 seconds	ScreenSaver		30 seconden
 Add…	ScreenSaver		Toevoegen...
 Blackness	ScreenSaver		Blackness
@@ -7,11 +7,7 @@ Confirm password:	ScreenSaver		Bevestig paswoord:
 Could not load screen saver	ScreenSaver		Kon screensaver niet laden
 Don't fade when	ScreenSaver		Niet wegvagen zodra
 Done	ScreenSaver		Klaar
-Enable screen saver	ScreenSaver		Screensaver activeren
-Fade	ScreenSaver		Wegvagen
 Fade now when	ScreenSaver		Wegvagen zodra
-Module settings	ScreenSaver		Module-instellingen
-Modules	ScreenSaver		Modules
 No options available	ScreenSaver		Geen opties aanwezig
 OK	ScreenSaver		Oké
 Password Window	ScreenSaver		Paspoortvenster
@@ -19,7 +15,6 @@ Password lock	ScreenSaver		Paswoordslot
 Password:	ScreenSaver		Paswoord:
 Passwords don't match. Please try again.	ScreenSaver		Paswoorden komen niet overeen. Probeer het nogmaals, alstublieft.
 Password…	ScreenSaver		Paswoord...
-Run module	ScreenSaver		Module actief
 Test	ScreenSaver		Test
 Turn off screen	ScreenSaver		Scherm uit
 Use custom password	ScreenSaver		Gebruik gelegenheids-paswoord

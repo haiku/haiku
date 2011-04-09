@@ -1,6 +1,5 @@
-1	brazilian_portuguese	x-vnd.Haiku-Terminal	282076526
+1	brazilian_portuguese	x-vnd.Haiku-Terminal	3397065030
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em tela inteira\n
-About Terminal…	Terminal TermWindow		Sobre o Terminal...
 Change directory	Terminal TermView		Mudar de pasta
 Close active tab	Terminal TermWindow		Fechar a aba ativa
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem aplicativos em execução
@@ -28,6 +27,5 @@ Select all	Terminal TermWindow		Selecionar tudo
 Settings	Terminal TermWindow		Configurações
 Settings…	Terminal TermWindow		Configurações...
 Shell 	Terminal TermWindow		Shell
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\natualizado por Kian Duffy 
 Use default shell	Terminal Shell		Utilizar shell padrão
 Use selection	Terminal FindWindow		Usar seleção

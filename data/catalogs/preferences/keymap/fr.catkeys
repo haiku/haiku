@@ -6,7 +6,7 @@ Diaeresis trigger	Keymap window		Tréma
 File	Keymap window		Fichier
 Font	Keymap window		Police
 Grave trigger	Keymap window		Accent grave
-Keymap	System name		Disposition Clavier
+Keymap	System name		Disposition du clavier
 Layout	Keymap window		Disposition
 Open…	Keymap window		Ouvrir…
 Quit	Keymap window		Quitter
@@ -15,7 +15,7 @@ Sample and clipboard:	Keymap window		Exemple et presse-papier :
 Save as…	Keymap window		Enregistrer sous…
 Select dead keys	Keymap window		Sélection des touches mortes
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
-Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis vers en mode Haiku
+Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
 Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
 System:	Keymap window		Système :
 Tilde trigger	Keymap window		Tilde

@@ -28,8 +28,8 @@ Device name	DevicePCI		Nom du périphérique
 Device name:	Device		Nom du périphérique :
 Device paths	Device		Chemin des périphériques
 Device paths	DevicePCI		Chemin des périphériques
-Devices	System name		Périphériques
 Devices	DevicesView		Périphériques
+Devices	System name		Périphériques
 Display controller	Device		Contrôleur d'affichage
 Docking station	Device		Station d'accueil
 Driver used	Device		Pilote utilisé

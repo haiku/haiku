@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ActivityMonitor	2994145175
+1	belarusian	x-vnd.Haiku-ActivityMonitor	1889452354
 %.1f KB/s	DataSource		%.1f КБ/сек
 %.1f MB	DataSource		%.1f МБ
 %.1f faults/s	DataSource		%.1f памылак/сек
@@ -27,7 +27,6 @@ Page faults	DataSource		Памылкі старонак памяці
 Ports	DataSource		Парты
 Quit	ActivityWindow		Выйсці
 RX	DataSource	Shorter version for Receiving.	Атрым.
-Raw clipboard size	DataSource		Памер буферу даных
 Receiving	DataSource		Атрыманне
 Remove graph	ActivityView		Выдаліць графік
 Running applications	DataSource		Запушчаныя праграмы
@@ -41,7 +40,6 @@ Swap	DataSource		Своп
 Swap space	DataSource		Прастора свопу
 TX	DataSource	Shorter version for Sending	Адпр.
 Teams	DataSource		Групы
-Text clipboard size	DataSource		Памер тэкставага буферу
 Threads	DataSource		Патокі
 Update time interval:	SettingsWindow		Інтэрвал часу абнаўлення:
 Used memory	DataSource		Ужытая памяць

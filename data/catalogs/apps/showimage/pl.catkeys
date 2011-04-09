@@ -1,6 +1,5 @@
-1	polish	x-vnd.Haiku-ShowImage	3897891778
+1	polish	x-vnd.Haiku-ShowImage	2353125868
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekund
-About ShowImage…	Menus		O Przeglądarce Obrazów…
 Browse	Menus		Przeglądaj
 Cancel	ClosePrompt		Anuluj
 Clear selection	Menus		Wyczyść zaznaczenie
@@ -42,7 +41,7 @@ Rotate clockwise	Menus		Obróć zgodnie ze wskazówkami zegara
 Rotate counterclockwise	Menus		Obróć przeciwnie do ruchu wskazówek zegara
 Save as…	Menus		Zapisz jako...
 Select all	Menus		Zaznacz wszystko
-Selection Mode	Menus		Tryb zaznaczania
+Selection mode	Menus		Tryb zaznaczania
 Show caption in full screen mode	Menus		Pokaż podpis w trybie pełnoekranowym
 Slide delay	Menus		Opóźnienie
 Slide show	Menus		Pokaż z opóźnieniem

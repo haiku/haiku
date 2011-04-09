@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-ActivityMonitor	3205963152
+1	brazilian_portuguese	x-vnd.Haiku-ActivityMonitor	2101270331
 Apps	DataSource		Aplicativos
 CPU	DataSource		CPU
 CPU usage	DataSource		Utilização da CPU
@@ -7,7 +7,6 @@ File	ActivityWindow		Arquivo
 Network receive	DataSource		Rede recebido
 Network send	DataSource		Rede enviados
 Ports	DataSource		Portas
-Raw clipboard size	DataSource		Tamanho da área de transferências
 Receiving	DataSource		Recebendo
 Running applications	DataSource		Aplicativos em utilização
 Sending	DataSource		Enviando
@@ -16,5 +15,4 @@ Settings…	ActivityWindow		Configurações...
 Swap	DataSource		Swap
 Swap space	DataSource		Espaço Swap
 Teams	DataSource		Equipes
-Text clipboard size	DataSource		Tamanho da área de transferências
 Update time interval:	SettingsWindow		Intervalo entre atualizações

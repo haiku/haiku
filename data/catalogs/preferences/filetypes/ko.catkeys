@@ -1,7 +1,6 @@
-1	korean	x-vnd.Haiku-FileTypes	301214801
+1	korean	x-vnd.Haiku-FileTypes	4014875318
 %s file type	FileType Window		%s 파일 형식
 (from super type)	FileTypes Window		(상위 형식으로부터)
-About FileTypes…	FileTypes Window		FileTypes 정보…
 Add	Attribute Window		추가
 Add	Extension Window		추가
 Add group	New File Type Window		그룹 추가
@@ -105,5 +104,4 @@ Version:	Application Type Window		버젼:
 Visible	Attribute Window		보이기
 Width:	Attribute Window	Default column width in Tracker for this attribute.	너비:
 [Multiple files] file types	FileType Window		[여러 파일] 파일 형식
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tAxel Dörfler 작성\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		아이콘 없음

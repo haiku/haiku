@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaConverter	3607188411
+1	french	x-vnd.Haiku-MediaConverter	424866547
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %Ld échantillons
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stéréo / %Ld échantillons
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d bit
 %d byte 	MediaFileInfo		%d octet
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2fips / %Ld images
-About…	MediaConverter		À propos…
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Une erreur est survenue lors de la lecture des informations du fichier.\n\nErreur : 
 Audio encoding:	MediaConverter		Encodage audio :
 Audio quality not supported	MediaConverter		Qualité audio non prise en charge
@@ -41,7 +40,6 @@ High	MediaConverter		Haute
 Low	MediaConverter		Basse
 MediaConverter	System name		MédiaConvertisseur
 MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur : Dossier d'enregistrement
-MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MédiaConvertisseur\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Pas de son
 No file selected	MediaConverter-FileInfo		Aucun fichier sélectionné
 No video	Video codecs list		Pas de vidéo

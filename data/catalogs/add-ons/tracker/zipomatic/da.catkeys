@@ -1,4 +1,4 @@
-1	danish	x-vnd.haiku.zip-o-matic	274748138
+1	danish	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		%ld filer tilføjet.
 1 file added.	file:ZipOMaticWindow.cpp		1 fil tilføjet.
 Archive	file:ZipperThread.cpp		Arkiv
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		E
 Continue	file:ZipOMaticWindow.cpp		Fortsæt
 Creating archive: %s	file:ZipOMaticWindow.cpp		Opretter arkiv: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Ønsker du at stoppe dem?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Slip filer her for at arkivere dem.
 Error creating archive	file:ZipOMaticWindow.cpp		Fejl i forbindelse med oprettelsen af arkiv
 Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
 Let them continue	file:ZipOMatic.cpp		Lad dem fortsætte

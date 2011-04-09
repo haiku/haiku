@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-About	3354362740
+1	spanish	x-vnd.Haiku-About	2350236915
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB en total
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
@@ -10,6 +10,7 @@ About this system	AboutWindow		Acerca de este sistema
 Contributors:\n	AboutView		Colaboradores:\n
 Current maintainers:\n	AboutView		Mantenedores actuales:\n
 GCC %d Hybrid	AboutView		GCC %d híbrido
+Google & their Google Summer of Code program\n	AboutView		Google y su programa Google Summer of Code\n
 Kernel:	AboutView		Núcleo:
 License: 	AboutView		Licencia: 
 Licenses: 	AboutView		Licencias: 
@@ -32,5 +33,6 @@ Unknown	AboutView		Desconocido
 Version:	AboutView		Versión:
 Website, marketing & documentation:\n	AboutView		Sitio web, márketing y documentación:\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Haga clic en un nombre para leer la licencia respectiva.]\n\n
+\nCopyrights\n\n	AboutView		\nDerechos de autor\n\n
 \n\nSpecial thanks to:\n	AboutView		\n\nAgradecimientos especiales a:\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… y probablemente algunos más que hemos olvidado mencionar (¡perdón!)\n\n

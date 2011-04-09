@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ScreenSaver	2049719641
+1	german	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 Sekunden
 Add…	ScreenSaver		Hinzu...
 Blackness	ScreenSaver		Schwarzer Bildschirm
@@ -8,11 +8,9 @@ Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen 
 Display Power Management Signaling not available	ScreenSaver		Stromsparfunktionen nicht verfügbar
 Don't fade when	ScreenSaver		Nicht starten, wenn
 Done	ScreenSaver		Fertig
-Enable screen saver	ScreenSaver		Bildschirmschoner einschalten
-Fade	ScreenSaver		Allgemein
+Enable screensaver	ScreenSaver		Bildschirmschoner aktivieren
 Fade now when	ScreenSaver		Sofort starten, wenn
-Module settings	ScreenSaver		Moduleinstellungen
-Modules	ScreenSaver		Module
+General	ScreenSaver		Allgemein
 No options available	ScreenSaver		Keine Optionen verfügbar
 OK	ScreenSaver		OK
 Password Window	ScreenSaver		Passwort-Fenster
@@ -20,8 +18,10 @@ Password lock	ScreenSaver		Passwortsperre
 Password:	ScreenSaver		Passwort:
 Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte nochmal versuchen.
 Password…	ScreenSaver		Passwort...
-Run module	ScreenSaver		Modul ausführen
 ScreenSaver	System name		Bildschirmschoner
+Screensaver settings	ScreenSaver		Bildschirmschoner-Einstellungen
+Screensavers	ScreenSaver		Bildschirmschoner
+Start screensaver	ScreenSaver		Bildschirmschoner starten
 Test	ScreenSaver		Test
 Turn off screen	ScreenSaver		Bildschirm ausschalten
 Use custom password	ScreenSaver		Benutzerdefiniertes Passwort

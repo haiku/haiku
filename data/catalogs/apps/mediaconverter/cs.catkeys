@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaConverter	3793354334
+1	czech	x-vnd.Haiku-MediaConverter	611032470
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanál / %lld snímků
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld snímků
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld snímků
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d bitový
 %d byte 	MediaFileInfo		%d byte 
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld snímků
-About…	MediaConverter		O...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla se chyba načítání informací o souboru.\n\nChyba: 
 Audio encoding:	MediaConverter		Kódování zvuku:
 Audio quality not supported	MediaConverter		Nepodporovaná kvalita zvuku
@@ -40,7 +39,6 @@ File format:	MediaConverter		Formát souboru:
 High	MediaConverter		Vysoká
 Low	MediaConverter		Nízký
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		Převaděč Médií\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Bez zvuku
 No file selected	MediaConverter-FileInfo		Nebyl zvolen žádný soubor
 No video	Video codecs list		Bez videa

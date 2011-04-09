@@ -28,8 +28,8 @@ Refresh rate:	Screen		Fréquence de rafraîchissement :
 Resolution:	Screen		Résolution :
 Revert	Screen		Rétablir
 Rows:	Screen		Lignes :
-Screen	System name		Écran
 Screen	Screen		Écran
+Screen	System name		Écran
 Screen preferences by the Haiku team	Screen		Préférences de l'écran par l'équipe Haiku
 Set background…	Screen		Choisir un fond d'écran…
 Settings will revert in %seconds seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	3064120758
+1	swedish	x-vnd.Haiku-StyledEdit	286935939
 ???	LoadAlert		???
 Align	Menus		Justera
 Black	Menus		Svart
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, fi
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
 Center	Menus		Mitten
 Characters:	Statistics		Tecken:
-Clear	Menus		Rensa
 Close	Menus		Stäng
 Color	Menus		Färg
 Copy	Menus		Kopiera
@@ -56,7 +55,6 @@ Redo typing	QuitAlert		Gör om inmatning
 Replace	FindandReplaceWindow		Ersätt
 Replace all	FindandReplaceWindow		Ersätt alla
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
-Replace same	Menus		Ersätt samma
 Replace with:	FindandReplaceWindow		Ersätt med:
 Replace…	Menus		Ersätt…
 Revert to saved…	Menus		Återgå till sparad…

@@ -1,8 +1,11 @@
-1	finnish	x-vnd.Be-MAIL	3225774574
+1	finnish	x-vnd.Be-MAIL	2388476802
 %d - Date	Mail		%d - Päivämäärä
 %e - E-mail address	Mail		%e - Sähköpostiosoite
+%e wrote:\\n	Mail		%e kirjoitti:\\n
 %n - Full name	Mail		%n - Koko nimi
-About Mail…	Mail		Mail-ohjelmasta…
+(Address unavailable)	Mail		(Ei osoitetta)
+(Date unavailable)	Mail		(Ei päivämäärää)
+(Name unavailable)	Mail		(Ei nimeä)
 Account from mail	Mail		Tili sähköpostiviestistä
 Account:	Mail		Tili:
 Accounts…	Mail		Tilit…
@@ -63,7 +66,6 @@ Leave same	Mail		Jätä samaksi
 Mail	System name		Sähköposti
 Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.
 Mail preferences	Mail		Sähköpostietusijaisuudet
-Mail\n\n	Mail		Sähköposti\n\n
 Mailing	Mail		Postitus
 Message	Mail		Viesti
 Move to trash	Mail		Siirrä roskakoriin
@@ -145,7 +147,13 @@ Use default account	Mail		Käytä oletustiliä
 User interface	Mail		Käyttäjäliitäntä
 View	Mail		Näkymä
 Warn unencodable:	Mail		Varoita koodaamattomista:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Tekijät: Robert Polic.\nOhjelman laajennus: Tri Zoidbergin ryhmä.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld merkkiä, joita ei voida koodata. Eri kirjaimisto olisi ehkä parempi? Napauttamalla Lähetä-painiketta lähetät sen kaikesta huolimatta (korvausmerkkiä käytetään koodauskelvottomien merkkien paikalla), tai valitse Peru takaisinpalaamista ja korjausyritystä varten.
 \\n - Newline	Mail		\\n - Rivinvaihto
+draft	B_USER_DIRECTORY/mail/draft		luonnos
 helpful message	Mail		hyödyllinen viesti
+in	B_USER_DIRECTORY/mail/in		tuleva
+mail	B_USER_DIRECTORY/mail		sähköposti
+out	B_USER_DIRECTORY/mail/out		lähtevä
+queries	B_USER_DIRECTORY/mail/queries		kyselyt
+sent	B_USER_DIRECTORY/mail/sent		lähetetty
+spam	B_USER_DIRECTORY/mail/spam		roskaposti

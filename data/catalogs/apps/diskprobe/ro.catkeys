@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskProbe	1365545802
+1	romanian	x-vnd.Haiku-DiskProbe	2962997473
 %ld (native)	ProbeView		%ld (nativ)
 (native)	ProbeView		(nativ)
 15 bit	TypeEditors		15 bit
@@ -11,7 +11,6 @@
 64 bit signed value:	TypeEditors		valoare întreagă 64 bit:
 8 bit palette	TypeEditors		paletă de 8 bit
 8 bit signed value:	TypeEditors		valoare întreagă 8 bit:
-About DiskProbe…	FileWindow		Despre TestareDisc...
 Add	ProbeView		Adaugă
 Attribute	AttributeWindow		Atribut
 Attribute	ProbeView		Atribut

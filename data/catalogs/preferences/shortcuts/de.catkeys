@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	4103143985
+1	german	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)
 *Beep	ShortcutsWindow		*Piepton
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
-About Shortcuts	ShortcutsApp		Über Tastenkürzel...
-About Shortcuts	ShortcutsWindow		Über Tastenkürzel...
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Anhängen
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		Maustaste losgelassen
 MoveMouse	ShortcutsSpec		Bewege Maus
 MoveMouseTo	ShortcutsSpec		Bewege Maus nach
 Multi	ShortcutsSpec		Mehrfach
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Herrje!
 Open	ShortcutsWindow		Öffnen
@@ -52,5 +49,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegun
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Tastenkürzel\n\nBasiert auf SpiceyKeys für BeOS von Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows

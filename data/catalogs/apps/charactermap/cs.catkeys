@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-CharacterMap	2137207616
+1	czech	x-vnd.Haiku-CharacterMap	1767016704
 Aegean numbers	UnicodeBlocks		Egejské číslice
 Alphabetic presentation forms	UnicodeBlocks		Abecední prezentační formy
 Ancient Greek musical notation	UnicodeBlocks		Starořecká hudební notace
@@ -33,7 +33,6 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK unifikované ideogramy, ro
 CJK unified ideographs extension B	UnicodeBlocks		Rozšíření CJK unifikovaných ideogramů B
 Carian	UnicodeBlocks		Carian
 Cham	UnicodeBlocks		Chamština
-CharacterMap	System name		Mapa znaků
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Vymazat
 Code	CharacterWindow		Kódování

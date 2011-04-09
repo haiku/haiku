@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-StyledEdit	3265249217
+1	esperanto	x-vnd.Haiku-StyledEdit	1866082924
 ???	LoadAlert		???
 Align	Menus		Ĝisrandigo
 Black	Menus		Nigra
@@ -32,7 +32,6 @@ Red	Menus		Ruĝa
 Replace	FindandReplaceWindow		Anstaŭigi
 Replace all	FindandReplaceWindow		Anstataŭigi ĉiujn
 Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiu fenestro
-Replace same	Menus		Anstataŭi saman
 Replace with:	FindandReplaceWindow		Anstataŭigi kun:
 Replace…	Menus		Anstataŭigi…
 Revert to saved…	Menus		Malfari ŝanĝojn…

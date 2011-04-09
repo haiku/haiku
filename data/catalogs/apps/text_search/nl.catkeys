@@ -1,13 +1,11 @@
-1	dutch	x-vnd.Haiku.TextSearch	343202056
+1	dutch	x-vnd.Haiku.TextSearch	2369757330
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
 %s: There was a problem running grep.	Grepper		%s: Er was een probleem bij het uitvoeren van grep.
-About TextSearch…	GrepWindow		Over Text_search
 Actions	GrepWindow		Acties
 Cancel	GrepWindow		Annuleren
 Case-sensitive	GrepWindow		Hoofd-/kleine lettergevoelig
 Close	GrepWindow		Sluiten
 Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Gemaakt door Matthijs Hollemans.\n\nMet bijdragen van Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers en momoziro.\n
 File	GrepWindow		Bestand
 History	GrepWindow		Geschiedenis
 Look in sub-folders	GrepWindow		In submappen zoeken

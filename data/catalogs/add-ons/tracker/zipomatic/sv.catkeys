@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku.zip-o-matic	274748138
+1	swedish	x-vnd.haiku.zip-o-matic	2207848100
 %ld files added.	file:ZipOMaticWindow.cpp		%ld filer tillagda.
 1 file added.	file:ZipOMaticWindow.cpp		1 fil tillagd.
 Archive	file:ZipperThread.cpp		Arkiv
@@ -7,7 +7,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		V
 Continue	file:ZipOMaticWindow.cpp		Fortsätt
 Creating archive: %s	file:ZipOMaticWindow.cpp		Skapar fil: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Vill du avbryta dem?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Släpp filer här för att zippa dem.
+Drop files here.	file:ZipOMaticWindow.cpp		Släpp filer här.
 Error creating archive	file:ZipOMaticWindow.cpp		Något gick snett.
 Filename: %s	file:ZipOMaticWindow.cpp		Filnamn: %s
 Let them continue	file:ZipOMatic.cpp		Låt dem fortsätta

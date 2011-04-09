@@ -1,8 +1,7 @@
-1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	2469567507
+1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	3987349984
 Can't undo	Menus		Impossível desfazer
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
 Center	Menus		Centralizado
-Clear	Menus		Limpar
 Copy	Menus		Copiar
 Cut	Menus		Recortar
 Default	Open_and_SaveAsPanel		Padrões
@@ -14,7 +13,6 @@ File	Menus		Arquivo
 Find selection	Menus		Localizar seleção
 Font	Menus		Fonte
 Paste	Menus		Colar
-Replace same	Menus		Substituir tudo
 Revert to saved…	Menus		Reverter para arquivo salvo...
 Save	Menus		Salvar
 Save	QuitAlert		Salvar

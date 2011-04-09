@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-StyledEdit	3670692170
+1	portuguese	x-vnd.Haiku-StyledEdit	2271525877
 ???	LoadAlert		???
 Align	Menus		Alinhar
 Black	Menus		Preto
@@ -39,7 +39,6 @@ Red	Menus		Vermelho
 Replace	FindandReplaceWindow		Substituir
 Replace all	FindandReplaceWindow		Substituir todos
 Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
-Replace same	Menus		Substituir todos
 Replace with:	FindandReplaceWindow		Substituir por:
 Replace…	Menus		Substituir...
 Revert to saved…	Menus		Reverter para o ficheiro guardado...

@@ -26,8 +26,8 @@ Print test page	PrintersWindow		Imprimer une page de test
 Printer name:	AddPrinterDialog		Nom de l'imprimante :
 Printer type:	AddPrinterDialog		Type d'imprimante :
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\nPilote : %driver%\n
-Printers	System name		Imprimantes
 Printers	PrintersWindow		Imprimantes
+Printers	System name		Imprimantes
 Processing	JobListView		Traitement
 Red	TestPageView		Rouge
 Remove	PrintersWindow		Retirer

@@ -1,12 +1,11 @@
-1	french	x-vnd.Haiku-Sudoku	4130734752
+1	french	x-vnd.Haiku-Sudoku	2463385585
 Abort	ProgressWindow		Abandon
-About	Sudoku		À propos
-About Sudoku…	SudokuWindow		À propos…
 Advanced	SudokuWindow		Expérimenté
 Blank	SudokuWindow		Vide
 Copy	SudokuWindow		Copier
 Could not open \"%s\":\n%s\n	SudokuWindow		Impossible d'ouvrir « %s » :\n%s\n
 Could not set Sudoku:\n%s\n	SudokuWindow		Impossible d'initialiser Sudoku :\n%s\n
+Creating solvable field	SudokuGenerator		Création d'un champ solvable
 Easy	SudokuWindow		Facile
 Export as…	SudokuWindow		Exporter sous…
 File	SudokuWindow		Fichier
@@ -16,7 +15,6 @@ Help	SudokuWindow		Aide
 Mark invalid values	SudokuWindow		Marquer les valeurs invalides
 Mark valid hints	SudokuWindow		Marquer les consignes valides
 New	SudokuWindow		Nouveau
-OK	Sudoku		OK
 OK	SudokuWindow		OK
 Open file…	SudokuWindow		Ouvrir un fichier…
 Progress monitor	ProgressWindow		Moniteur de progression
@@ -29,10 +27,8 @@ Solve	SudokuWindow		Résoudre
 Solve single field	SudokuWindow		Résoudre une case
 Start again	SudokuWindow		Recommencer
 Sudoku	System name		Sudoku
-Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Demande de Sudoku
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku résolu - félicitations !\n
-Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\tÉcrit par Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n
 Text	SudokuWindow		Texte
 Undo	SudokuWindow		Annuler
 View	SudokuWindow		Vue

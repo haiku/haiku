@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DiskProbe	2592803962
+1	french	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (natif)
 (native)	ProbeView		(natif)
 15 bit	TypeEditors		15 bits
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		Palette 8 bits :
 8 bit signed value:	TypeEditors		Valeur signée sur 8 bits :
 8 bit unsigned value:	TypeEditors		Valeur non signée sur 8 bits :
-About DiskProbe…	FileWindow		À propos de DiskProbe…
 Add	ProbeView		Ajouter
 Attribute	AttributeWindow		Attribut
 Attribute	ProbeView		Attribut
@@ -53,9 +52,10 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Périphérique
 Device offset: 	ProbeView		Déplacement dans le périphérique :
 Device: 	ProbeView		Périphérique :
-DiskProbe request	AttributeWindow		Requête DiskProbe
-DiskProbe request	DiskProbe		Requête DiskProbe
-DiskProbe request	ProbeView		Requête DiskProbe
+DiskProbe	System name		Sondeur Disque
+DiskProbe request	AttributeWindow		Requête Sondeur Disque
+DiskProbe request	DiskProbe		Requête Sondeur Disque
+DiskProbe request	ProbeView		Requête Sondeur Disque
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Êtes-vous sûr de vouloir supprimer l'attribut « %s » du fichier « %s » ?\n\nVous ne pourrez pas annuler cette action.
 Don't save	ProbeView		Ne pas sauvegarder
 Double precision floating-point value:	TypeEditors		Valeur en virgule flottante double précision :

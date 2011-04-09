@@ -1,7 +1,6 @@
-1	italian	x-vnd.Haiku-Terminal	4275906666
+1	italian	x-vnd.Haiku-Terminal	1196419230
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help stampa questo aiuto\n -t, --title imposta il titolo della finestra\n -f, --fullscreen avvia a schermo intero\n
 Abort	Terminal Shell		Arresta
-About Terminal…	Terminal TermWindow		Informazioni sul Terminale…
 Appearance	Terminal PrefWindow		Aspetto
 Background	Terminal AppearancePrefView		Sfondo
 Black on White	Terminal colors schema		Nero su bianco
@@ -50,7 +49,6 @@ Nothing is selected.	Terminal TermWindow		Nulla è selezionato.
 OK	Terminal PrefWindow		OK
 OK	Terminal SetTitleWindow		OK
 OK	Terminal TermApp		OK
-OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Imposta pagina…
 Paste	Terminal TermWindow		Incolla
@@ -76,7 +74,6 @@ Switch Terminals	Terminal TermWindow		Scambia Terminali
 Tab title:	Terminal AppearancePrefView		Titolo scheda:
 Tab title:	Terminal TermWindow		Titolo scheda
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Spiacente, Terminal non ha potuto avviare la shell.
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminale\n\nscritto da Kazuho Okui e Takashi Murai\naggiornato da Kian Duffy e altri\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Testo
 Text encoding	Terminal TermWindow		Codifica del testo
 Text not found.	Terminal TermWindow		Testo non trovato.

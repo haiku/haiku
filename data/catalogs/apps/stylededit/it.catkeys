@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-StyledEdit	881610730
+1	italian	x-vnd.Haiku-StyledEdit	2399393207
 ???	LoadAlert		???
 Align	Menus		Allinea
 Black	Menus		Nero
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristin
 Case-sensitive	FindandReplaceWindow		Sensibile alle maiuscole-minuscole
 Center	Menus		Centra
 Characters:	Statistics		Caratteri:
-Clear	Menus		Cancella
 Close	Menus		Chiudi
 Color	Menus		Colore
 Copy	Menus		Copia
@@ -56,7 +55,6 @@ Redo typing	QuitAlert		Ripeti digitazione
 Replace	FindandReplaceWindow		Sostituisci
 Replace all	FindandReplaceWindow		Sostituisci tutto
 Replace in all windows	FindandReplaceWindow		Sostituisci in tutte le finestre
-Replace same	Menus		Sostituisci lo stesso
 Replace with:	FindandReplaceWindow		Sostituisci con:
 Replace…	Menus		Sostituisci…
 Revert to saved…	Menus		Ripristina quanto salvato…

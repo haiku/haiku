@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DiskProbe	2592803962
+1	czech	x-vnd.Haiku-DiskProbe	4190255633
 %ld (native)	ProbeView		%Id (nativní)
 (native)	ProbeView		(nativní)
 15 bit	TypeEditors		15-bit
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8-bitová paleta
 8 bit signed value:	TypeEditors		Hodnota 8-bit signed:
 8 bit unsigned value:	TypeEditors		Hodnota 8-bit unsigned:
-About DiskProbe…	FileWindow		O programu DiskProbe
 Add	ProbeView		Přidat
 Attribute	AttributeWindow		Atribut
 Attribute	ProbeView		Atribut

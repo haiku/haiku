@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku.zip-o-matic	274748138
+1	esperanto	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		%ld dosieroj aldonitaj.
 1 file added.	file:ZipOMaticWindow.cpp		1 dosiero aldonita.
 Archive	file:ZipperThread.cpp		Arkivo
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Continue	file:ZipOMaticWindow.cpp		Daŭri
 Creating archive: %s	file:ZipOMaticWindow.cpp		Kreante arkivon: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Ĉu vi volas halti ilin?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Faligu dosierojn en la zipon.
 Error creating archive	file:ZipOMaticWindow.cpp		Eraro de kreado de arkivo
 Filename: %s	file:ZipOMaticWindow.cpp		Dosiernomo: %s
 Let them continue	file:ZipOMatic.cpp		Ili daŭru

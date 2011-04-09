@@ -1,45 +1,30 @@
-1	simplified_chinese	x-vnd.Haiku-Locale	2275653087
-Day in month (2 digits)	TimeFormatSettings		每月天数 （两位数）
-Available languages	Locale Preflet Window		可选语言
-Day of week (name)	TimeFormatSettings		每周天数（名称）
-Separator:	TimeFormatSettings		分隔符：
-Year (4 digits)	TimeFormatSettings		年(四位数)
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		没有可用语言！ 你无法使用！
-Thousand separator: 	TimeFormatSettings		千位数分隔符：
-After	TimeFormatSettings		之后
-Month name	TimeFormatSettings		月份
-Long format:	TimeFormatSettings		长格式：
-Currency	TimeFormatSettings		通用
-Before	TimeFormatSettings		之前
-Year	TimeFormatSettings		年
-Day of week in month	TimeFormatSettings		星期
-Short format:	TimeFormatSettings		短格式：
-Currency symbol:	TimeFormatSettings		通用符号：
-Space	TimeFormatSettings		时区
-Language	Locale Preflet Window		语言
-Month number	TimeFormatSettings		月份
-Year (2 digits)	TimeFormatSettings		年(两位数)
-Preferred languages	Locale Preflet Window		偏好语言
-Decimal separator: 	TimeFormatSettings		小数分隔符：
-Symbol position	TimeFormatSettings		符号位置
-Day of week (short name)	TimeFormatSettings		每周天数(简称)
-Numbers	TimeFormatSettings		数字
-24 hour	TimeFormatSettings		二十四小时
-Negative marker:	TimeFormatSettings		负号：
-Day in month	TimeFormatSettings		日期
-Separator	TimeFormatSettings		分隔符
-Country	Locale Preflet Window		国家
-Month number (2 digits)	TimeFormatSettings		月份(两位数)
-Revert	Locale Preflet Window		取消
-Negative marker	TimeFormatSettings		负号
-Day of week	TimeFormatSettings		星期
-List separator: 	TimeFormatSettings		列表分隔符：
-Time	TimeFormatSettings		时间
-Date	TimeFormatSettings		日期
+1	simplified_chinese	x-vnd.Haiku-Locale	250177593
 12 hour	TimeFormatSettings		十二小时
+24 hour	TimeFormatSettings		二十四小时
+Available languages	Locale Preflet Window		可选语言
+Cancel	Locale Preflet Window		取消
+Currency	TimeFormatSettings		通用
+Date	TimeFormatSettings		日期
+Defaults	Locale Preflet Window		默认
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		需要重新启动桌面栏和 Tracker ，这些修改才会生效。您希望重新启动它们吗？
+Formatting	Locale Preflet Window		格式
+Full format:	TimeFormatSettings		完全格式：
+Language	Locale Preflet Window		语言
 Locale	Locale Preflet		本地化
-None	TimeFormatSettings		无
-Example:	TimeFormatSettings		例如：
-Day	TimeFormatSettings		天
-Leading 0	TimeFormatSettings		归零
-Month	TimeFormatSettings		月份
+Locale	Locale Preflet Window		本地化
+Long format:	TimeFormatSettings		较长格式：
+Medium format:	TimeFormatSettings		中等格式：
+Negative:	TimeFormatSettings		负数：
+Numbers	TimeFormatSettings		数字
+OK	Locale Preflet Window		确定
+Options	Locale Preflet Window		选项
+Positive:	TimeFormatSettings		正数：
+Preferred languages	Locale Preflet Window		首选语言
+Restart	Locale Preflet Window		重新启动
+Revert	Locale Preflet Window		取消
+Short format:	TimeFormatSettings		极短格式：
+Time	TimeFormatSettings		时间
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		在桌面栏和 Tracker 中显示应用程序和目录的本地化名称。
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		没有可用语言！ 你无法使用！
+Use month/day-names from preferred language	TimeFormatSettings		使用首选语言中的 月份/日期 名称。
+already chosen	LanguageListView		已经选择

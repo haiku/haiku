@@ -1,10 +1,9 @@
-1	slovak	x-vnd.Haiku-ActivityMonitor	2994145175
+1	slovak	x-vnd.Haiku-ActivityMonitor	3373427116
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f výpadkov/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sek.
-ActivityMonitor	System name		Monitor aktivity
 Add graph	ActivityWindow		Pridať graf
 Additional items	ActivityView		Ďalšie položky
 Apps	DataSource		Aplikácie
@@ -27,7 +26,6 @@ Page faults	DataSource		Výpadky stránok
 Ports	DataSource		Porty
 Quit	ActivityWindow		Ukončiť
 RX	DataSource	Shorter version for Receiving.	RX
-Raw clipboard size	DataSource		Hrubá veľkosť schránky
 Receiving	DataSource		Prijíma sa
 Remove graph	ActivityView		Odstrániť graf
 Running applications	DataSource		Bežiace aplikácie
@@ -41,7 +39,6 @@ Swap	DataSource		Odkladací priestor
 Swap space	DataSource		Odkladací priestor
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		Tímy
-Text clipboard size	DataSource		Veľkosť textovej schránky
 Threads	DataSource		Vlákna
 Update time interval:	SettingsWindow		Časový interval aktualizácie:
 Used memory	DataSource		Využitá pamäť

@@ -1,0 +1,25 @@
+1	simplified_chinese	x-vnd.Haiku-WebPTranslator	3630570850
+Based on libwebp v0.1,	ConfigView		基于 libwebp v0.1，
+Compression method:	ConfigView		压缩方法：
+Default	ConfigView		默认
+Drawing	ConfigView		绘图
+Fast	ConfigView		快速
+High	ConfigView		高
+Icon	ConfigView		图标
+Low	ConfigView		低
+Output preset:	ConfigView		输出预设：
+Output quality:	ConfigView		输出质量：
+Photo	ConfigView		照片
+Picture	ConfigView		图片
+Preprocessing filter	ConfigView		预处理过滤
+Preset	ConfigView		预设
+Slower but better	ConfigView		慢但质量好
+Text	ConfigView		文本
+WebP Images	ConfigView		WebP 图像
+WebP Settings	main		WebP 设置
+WebP image	WebPTranslator		WebP 图像
+WebP image translator	WebPTranslator		WebP 图像转换器
+WebP images	WebPTranslator		WebP 图像
+WebPTranslator Settings	ConfigView		WebP 转换器设置
+©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
+©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.

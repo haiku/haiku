@@ -1,0 +1,26 @@
+1	japanese	x-vnd.Haiku.TV	2971561976
+Always on top	MainWin		常に最前面にする
+Channel	MainWin		チャンネル
+DVB - Digital Video Broadcasting TV	MainWin		DVB - デジタルビデオ放送 TV
+Debug	MainWin		Debug
+Error, connecting to interface failed:\n\n	MainWin		エラー、インターフェースへの接続に失敗しました：\n\n
+Error, interface is busy:\n\n	MainWin		エラー、インターフェースがビジーです：\n\n
+Full screen	MainWin		フルスクリーン
+Interface	MainWin		インターフェイス
+Keep aspect ratio	MainWin		アスペクト比を保つ
+Next channel	MainWin		次のチャンネル
+No border	MainWin		枠を消す
+No menu	MainWin		メニューを消す
+None	MainWin		無し
+OK	MainWin		Ok
+Previous channel	MainWin		前のチャンネル
+Quit	MainWin		終了
+Scale to native size	MainWin		本来のサイズに戻す
+Settings	MainWin		設定
+Settings…	MainWin		設定...
+TV	MainWin		TV
+force 544 x 576, display aspect 4:3	MainWin		544 x 576,ディスプレイアスペクト比 4:3
+force 704 x 576, display aspect 4:3	MainWin		704 x 576,ディスプレイアスペクト比 4:3
+force 720 x 576, display aspect 4:3	MainWin		720 x 576,ディスプレイアスペクト比 4:3
+pixel aspect ratio	MainWin		ピクセルのアスペクト比
+unknown	MainWin		不明

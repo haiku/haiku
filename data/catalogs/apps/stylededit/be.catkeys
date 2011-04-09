@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	3064120758
+1	belarusian	x-vnd.Haiku-StyledEdit	286935939
 ???	LoadAlert		???
 Align	Menus		Раўнаванне
 Black	Menus		Чорны
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Немагчыма в
 Case-sensitive	FindandReplaceWindow		З улікам рэгістру
 Center	Menus		Цэнтар
 Characters:	Statistics		Знакаў:
-Clear	Menus		Ачысціць
 Close	Menus		Закрыць
 Color	Menus		Колер
 Copy	Menus		Капіяваць
@@ -56,7 +55,6 @@ Redo typing	QuitAlert		Паўтарыць увод
 Replace	FindandReplaceWindow		Замяніць
 Replace all	FindandReplaceWindow		Замяняць усё
 Replace in all windows	FindandReplaceWindow		Замяняць ва ўсіх вокнах
-Replace same	Menus		Змяніць аднолькава
 Replace with:	FindandReplaceWindow		Змяніць на:
 Replace…	Menus		Замяняць…
 Revert to saved…	Menus		Вярнуцца да захаванага…

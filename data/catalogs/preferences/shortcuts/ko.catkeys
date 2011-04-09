@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Shortcuts	3066723053
+1	korean	x-vnd.Haiku-Shortcuts	3351862455
 (Choose application with file requester)	ShortcutsWindow		(요청된 파일의 어플리케이션 선택)
 *Beep	ShortcutsWindow		*비프음
 *InsertString \"Your Text Here\"	ShortcutsWindow		*문자열 삽입 \"당신의 텍스트를 여기에\"
@@ -10,7 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*마우스 이동 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*다중 \"*마우스 이동 100% 0\" \"*마우스버튼 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*메세지 보내기 application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		정말로 바뀐 것을  저장하지 않고 끝내겠습니까?
 Add new shortcut	ShortcutsWindow		새 단축키 추가
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		추가
@@ -31,7 +30,6 @@ MouseUp	ShortcutsSpec		마우스 위로
 MoveMouse	ShortcutsSpec		마우스이동
 MoveMouseTo	ShortcutsSpec		마우스 이동
 Multi	ShortcutsSpec		다중
-OK	ShortcutsApp		확인
 OK	ShortcutsWindow		확인
 Oh no	ShortcutsWindow		오 안돼
 Open	ShortcutsWindow		열기

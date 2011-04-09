@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	2994145175
+1	finnish	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f kt/s
 %.1f MB	DataSource		%.1f Mt
 %.1f faults/s	DataSource		%.1f vikaa/s
@@ -27,7 +27,7 @@ Page faults	DataSource		Sivuvirheet
 Ports	DataSource		Portit
 Quit	ActivityWindow		Poistu
 RX	DataSource	Shorter version for Receiving.	Vast.
-Raw clipboard size	DataSource		Raakaleikepöydän koko
+Raw clipboard	DataSource		Raakadataleikepöytä
 Receiving	DataSource		Vastaanotetaan
 Remove graph	ActivityView		Poista kuvaaja
 Running applications	DataSource		Suoritetaan sovelluksia
@@ -41,7 +41,7 @@ Swap	DataSource		Vaihda
 Swap space	DataSource		Vaihda tila
 TX	DataSource	Shorter version for Sending	Läh.
 Teams	DataSource		Ryhmät
-Text clipboard size	DataSource		Tekstileikepöydän koko
+Text clipboard	DataSource		Tekstileikepöytä
 Threads	DataSource		Säikeet
 Update time interval:	SettingsWindow		Päivitä aikaväli:
 Used memory	DataSource		Käytetty muisti

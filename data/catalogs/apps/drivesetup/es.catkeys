@@ -1,8 +1,12 @@
-1	spanish	x-vnd.Haiku-DriveSetup	2802932306
+1	spanish	x-vnd.Haiku-DriveSetup	568426562
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<vacío>
 <empty>	PartitionList		<vacío>
+Active	PartitionList		Activa
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere borrar la partición seleccionada?\n\n¡Toda la información en la partición se perderán irremisiblemente si lo hace!
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		¿Está seguro de que desea inicializar la partición \"%s\"? Se le preguntará nuevamente antes de que los cambios se guarden al disco.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		¿Está seguro de que desea inicializar la partición? Se le preguntará nuevamente antes de que los cambios se guarden al disco.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\nToda la información en el disco %s se perderá irremisiblemente si lo hace!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información en la partición se perderá irremisiblemente si lo hace!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información en la partición se perderá irremisiblemente si lo hace!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información en la partición se perderá irremisiblemente si lo hace!
@@ -35,12 +39,14 @@ File system	PartitionList		Sistema de archivos
 Format (not implemented)	MainWindow		Formatear (no implementado)
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inicialización de la partición %s ha fallado (no se ha escrito nada en el disco).
 Initialize	InitParamsPanel		Inicializar
+Initialize	MainWindow		Inicializar
 Mount	MainWindow		Montar
 Mount all	MainWindow		Montar todo
 Mounted at	PartitionList		Montado en
 No disk devices have been recognized.	DiskView		No se reconoce ningún dispositivo de disco.
 OK	MainWindow		Aceptar
 Offset: %ld MB	Support		Offset: %ld MB
+Parameters	PartitionList		Parámetros
 Partition	MainWindow		Partición
 Partition %ld	DiskView		Partición %ld
 Partition name:	CreateParamsPanel		Nombre de la partición:

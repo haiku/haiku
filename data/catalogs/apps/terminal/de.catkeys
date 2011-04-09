@@ -1,8 +1,7 @@
-1	german	x-vnd.Haiku-Terminal	1010009081
+1	german	x-vnd.Haiku-Terminal	2225488941
 %app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help diesen Hilfetext anzeigen\n -t, --title Fenstertitel setzen\n -f, --fullscreen Vollbildmodus starten\n
 Abort	Terminal Shell		Abbrechen
-About Terminal…	Terminal TermWindow		Über Terminal...
 Appearance	Terminal PrefWindow		Darstellung
 Background	Terminal AppearancePrefView		Hintergrund
 Black on White	Terminal colors schema		Schwarz auf Weiß
@@ -51,7 +50,6 @@ Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
 OK	Terminal PrefWindow		OK
 OK	Terminal SetTitleWindow		OK
 OK	Terminal TermApp		OK
-OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Seiten einrichten...
 Paste	Terminal TermWindow		Einfügen
@@ -78,7 +76,6 @@ Tab title:	Terminal AppearancePrefView		Reitertitel:
 Tab title:	Terminal TermWindow		Reitertitel:
 Terminal	System name		Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Das Terminal konnte die Konsole leider nicht starten.
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nvon Kazuho Okui und Takashi Murai\nAktualisiert von Kian Duffy und anderen\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Text
 Text encoding	Terminal TermWindow		Kodierung
 Text not found.	Terminal TermWindow		Der Suchbegriff wurde nicht gefunden.

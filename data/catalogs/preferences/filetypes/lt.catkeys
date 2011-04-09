@@ -1,8 +1,7 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	623421038
+1	lithuanian	x-vnd.Haiku-FileTypes	42114259
 %s file type	FileType Window		%s bylų tipas
 (from application)	FileTypes Window		(iš programos)
 (from super type)	FileTypes Window		(iš supertipo)
-About FileTypes…	FileTypes Window		Apie BylųTipus…
 Add	Attribute Window		Pridėti
 Add	Extension Window		Pridėti
 Add group	New File Type Window		Pridėti grupę
@@ -123,5 +122,4 @@ Version:	Application Type Window		Versija:
 Visible	Attribute Window		Matomi
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Plotis:
 [Multiple files] file types	FileType Window		[Daugybinės bylos] bylų tipas
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tparašyta Axel'io Dörfler'io\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		be ženkliuko

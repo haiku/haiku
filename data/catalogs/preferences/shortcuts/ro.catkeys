@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Shortcuts	3621360629
+1	romanian	x-vnd.Haiku-Shortcuts	2615775439
 (Choose application with file requester)	ShortcutsWindow		(Selectează aplicație cu solicitantul de fișier)
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsereazăȘir "Textul dumneavoastră aici"
@@ -7,8 +7,6 @@
 *MouseDown	ShortcutsWindow		*MausJos
 *MouseUp	ShortcutsWindow		*MauSus
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MutăMausLa 50% 50%
-About Shortcuts	ShortcutsApp		Despre Scurtături
-About Shortcuts	ShortcutsWindow		Despre Scurtături
 Add new shortcut	ShortcutsWindow		Adaugă scurtătură nouă
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Adaugă
@@ -28,7 +26,6 @@ MouseUp	ShortcutsSpec		MausSus
 MoveMouse	ShortcutsSpec		MutăMaus
 MoveMouseTo	ShortcutsSpec		MutăMausLa
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Oh nu
 Open	ShortcutsWindow		Deschide

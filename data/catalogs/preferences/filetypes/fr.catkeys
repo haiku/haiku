@@ -1,10 +1,10 @@
-1	french	x-vnd.Haiku-FileTypes	391885466
+1	french	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		Type d'application de %1
+%ld Application type%s could be removed.	Application Types Window		%ld Type%2$s d'application%2$s supprimé%2$s.
 %s file type	FileType Window		Type du fichier %s
 (from application)	FileTypes Window		(depuis l'application)
 (from super type)	FileTypes Window		(basé sur le super type)
 Abort	Application Types Window		Abandon
-About FileTypes…	FileTypes Window		À propos des Types de Fichiers
 Add	Attribute Window		Ajouter
 Add	Extension Window		Ajouter
 Add group	New File Type Window		Ajouter un groupe
@@ -17,7 +17,7 @@ Alignment:	Attribute Window		Alignement :
 Alpha	Application Type Window		Alpha
 Alpha	Application Types Window		Alpha
 Application flags	Application Type Window		Fanions de l'application
-Application type	Application Type Window		Types d'applications
+Application type	Application Type Window		Type d'application
 Application types	Application Types Window		Types d'application
 Application types…	FileTypes Window		Types d'applications…
 Args only	Application Type Window		Arguments seuls
@@ -70,6 +70,7 @@ File could not be opened	Preferred App Menu		Impossible d'ouvrir le fichier
 File recognition	FileTypes Window		Identification de fichier
 File type	FileType Window		Type de fichier
 FileTypes	FileTypes		Types de Fichiers
+FileTypes	System name		Types de Fichiers
 FileTypes request	FileTypes		Demande de Types de Fichiers
 FileTypes request	FileTypes Window		Requête sur les Types de Fichiers
 FileTypes request	Preferred App Menu		Requête sur les Types de Fichiers
@@ -112,8 +113,10 @@ Recognition rule is not valid:\n\n	FileTypes Window		La règle d'identification 
 Remove	Application Type Window		Supprimer
 Remove	FileTypes Window		Enlever
 Remove icon	Icon View		Supprimer l'icône
+Remove uninstalled	Application Types Window		Enlever les types d'applications désinstallées
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		La suppression d'un type de fichier ne peut pas être rétabli.\nÊtes-vous sûr de vouloir le supprimer ?
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La suppression d'un super type ne peut pas être annulée.\nTous les types de fichiers sous-jacents seront perdus !\n\nÊtes-vous sûr de vouloir l'effacer ? Pour supprimer l'ensemble du groupe, maintenez la touche « Maj » enfoncée et appuyez sur « Supprimer ».
+Removing uninstalled application types	Application Types Window		Retrait des types d'applications désinstallées
 Right	Attribute Window	Attribute column alignment in Tracker	À droite
 Rule:	FileTypes Window		Règle :
 Same as…	FileType Window	The same APPLICATION as ...	Identique à…
@@ -151,5 +154,4 @@ Version:	Application Types Window		Version :
 Visible	Attribute Window		Visible
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Largeur :
 [Multiple files] file types	FileType Window		[Plusieurs fichiers] types de fichiers
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tÉcrit par Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		pas d'icône

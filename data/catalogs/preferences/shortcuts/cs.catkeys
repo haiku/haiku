@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Shortcuts	2152414241
+1	czech	x-vnd.Haiku-Shortcuts	2965605727
 (Choose application with file requester)	ShortcutsWindow		(Vyberte aplikaci v dialogu výběru souboru)
 *Beep	ShortcutsWindow		*Pýýp
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Vložit řetězec \"Váš text zde\"
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Najeď myší na 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Aplikace Zkratky/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		O Zkratkách
-About Shortcuts	ShortcutsWindow		O Zkratkách
 Add new shortcut	ShortcutsWindow		Přidat novou zkratku
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Připojit
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		Myš nahoru
 MoveMouse	ShortcutsSpec		Pohyb myši
 MoveMouseTo	ShortcutsSpec		Najeď myší na
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Ale ne
 Open	ShortcutsWindow		Otevřít
@@ -51,5 +48,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Zkratky nemohly o
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Zkratky nebyly schopny analyzovat váš soubor KeySet!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Zkratky nebyly schopny uložit váš soubor KeySet!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Zkratky nebyly schopny uložit vaše nastavení kláves.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Zkratky\n\nVytvořeno na základě SpicyKeys pro BeOS od Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	klávesa Window

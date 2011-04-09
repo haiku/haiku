@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-FileTypes	1055306485
+1	german	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1 Anwendungstyp
 %ld Application type%s could be removed.	Application Types Window		%ld Anwendungstyp%s konnte entfernt werden.
 %s file type	FileType Window		%s Dateityp
 (from application)	FileTypes Window		(von der Anwendung)
 (from super type)	FileTypes Window		(vom Supertyp)
 Abort	Application Types Window		Abbrechen
-About FileTypes…	FileTypes Window		Über FileTypes...
 Add	Attribute Window		Hinzufügen
 Add	Extension Window		Hinzufügen
 Add group	New File Type Window		Neue Gruppe erstellen
@@ -155,5 +154,4 @@ Version:	Application Types Window		Version:
 Visible	Attribute Window		Sichtbar
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Breite:
 [Multiple files] file types	FileType Window		[Mehrere Dateien] Dateitypen
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tvon Axel Dörfler.\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		kein Icon

@@ -1,8 +1,6 @@
-1	brazilian_portuguese	x-vnd.Haiku-Shortcuts	1019130956
+1	brazilian_portuguese	x-vnd.Haiku-Shortcuts	1832322442
 (Choose application with file requester)	ShortcutsWindow		(Escolha um aplicativo que contenha um requerente de arquivo)
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Seu Texto Aqui\"
-About Shortcuts	ShortcutsApp		Sobre o Atalhos
-About Shortcuts	ShortcutsWindow		Sobre o Atalhos
 Add new shortcut	ShortcutsWindow		Adicionar novo atalho
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Juntar
@@ -23,7 +21,6 @@ MouseUp	ShortcutsSpec		Mouse para cima
 MoveMouse	ShortcutsSpec		Mover o Mouse
 MoveMouseTo	ShortcutsSpec		Mover Mouse Para
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Oh não!
 Open	ShortcutsWindow		Abrir
@@ -42,5 +39,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		O Atalhos não po
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não pode analisar seu arquivo de combinação de teclas!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		O Atalhos não pode salvar seu arquivo combinação de teclas!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Atalhos\n\nBaseado no aplicativo Teclas Picantes para o BeOS criado por Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows

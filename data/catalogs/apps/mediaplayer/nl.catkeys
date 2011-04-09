@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-MediaPlayer	3287412686
+1	dutch	x-vnd.Haiku-MediaPlayer	941484531
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
 <nothing to undo>	MediaPlayer-PlaylistWindow		<niets om ongedaan te maken>
@@ -18,8 +18,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Onderaan video
 Cancel	MediaPlayer-SettingsWindow		Annuleren
 Close	MediaPlayer-Main		Afsluiten
 Close	MediaPlayer-PlaylistWindow		Afsluiten
-Close window when done playing movies	MediaPlayer-SettingsWindow		Venster sluiten als film is afgelopen
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Venster sluiten na afloop geluidsweergave
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Onderdelen kopiëren
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Onderdeel kopiëren
 Drop files to play	MediaPlayer-Main		Bestanden verslepen om af te spelen
@@ -40,8 +38,6 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Het lijkt erop dat de mediaserver niet actief is.\nWilt u hem starten ?
 Large	MediaPlayer-SettingsWindow		Groot
 Lock Peaks	MediaPlayer-PeakView		Pieken fixeren
-Loop movies by default	MediaPlayer-SettingsWindow		Video's standaard herhalen
-Loop sounds by default	MediaPlayer-SettingsWindow		Geluiden standaard herhalen
 Low volume	MediaPlayer-SettingsWindow		Laag volume
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-instellingen
 Medium	MediaPlayer-SettingsWindow		Gemiddeld
@@ -76,13 +72,10 @@ Randomize	MediaPlayer-PlaylistWindow		Randomizeren
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Onderdelen randomizeren
 Rating	MediaPlayer-Main		Waardering
 Redo	MediaPlayer-PlaylistWindow		Opnieuw uitvoeren
-Remove (Del)	MediaPlayer-PlaylistWindow		Verwijderen (Del)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen naar Trash
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
-Remove all	MediaPlayer-PlaylistWindow		Alles verwijderen
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Verwijderen en in Trash plaatsen
 Revert	MediaPlayer-SettingsWindow		Herstellen
 Save	MediaPlayer-Main		Opslaan
 Save	MediaPlayer-PlaylistWindow		Opslaan
@@ -102,7 +95,6 @@ Stop	MediaPlayer-Main		Stoppen
 Stop playing.	MediaPlayer-Main		Stop afspelen.
 Stream settings	MediaPlayer-Main		Stream-instellingen
 Subtitles	MediaPlayer-Main		Ondertitels
-Thanks	MediaPlayer-Main		Bedankt
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Het bestand '%filename' kon niet geopend worden.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Er is geen decoder geïnstalleerd die met het bestandstype kan omgaan, ofwel heeft de decoder moeite met de specifieke versie van het type. 
 Toggle mute.	MediaPlayer-Main		Mute aan/uit.

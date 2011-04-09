@@ -1,6 +1,5 @@
-1	romanian	x-vnd.Haiku-Terminal	879822274
+1	romanian	x-vnd.Haiku-Terminal	2238213580
 Abort	Terminal Shell		Renunță
-About Terminal…	Terminal TermWindow		Despre Terminal...
 Appearance	Terminal PrefWindow		Aspect
 Background	Terminal AppearancePrefView		Fundal
 Black on White	Terminal colors schema		Negru pe alb
@@ -47,7 +46,6 @@ Nothing is selected.	Terminal TermWindow		Nimic nu este selectat.
 OK	Terminal PrefWindow		OK
 OK	Terminal SetTitleWindow		OK
 OK	Terminal TermApp		OK
-OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Configurări pagină...
 Paste	Terminal TermWindow		Lipește

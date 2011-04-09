@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Be-MAIL	3799596690
+1	norwegian_bokmål	x-vnd.Be-MAIL	3779892957
 %d - Date	Mail		%d - Dato
 %e - E-mail address	Mail		%e - E-postadresse
 %n - Full name	Mail		%n - Fullt navn
@@ -139,4 +139,5 @@ Unread	Mail		Ulest
 Use default account	Mail		Bruk standardkonto
 User interface	Mail		Brukergrensesnitt
 View	Mail		Vis
+\\n - Newline	Mail		\\n - Ny linje
 helpful message	Mail		nyttig melding

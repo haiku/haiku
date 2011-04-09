@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3180459772
+1	french	x-vnd.Haiku-libtracker	3227672959
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld o
 %Ld bytes	WidgetAttributeText		%Ld octets
@@ -71,7 +71,6 @@ Copying: 	StatusWindow		Copie :
 Could not find an application to open \"%name\" (%error). 	FSUtils		Impossible de trouver une application pour ouvrir « %name » (%error).
 Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l'application « %appname »
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Impossible d'ouvrir « %document » (Il manque la bibliothèque : %library).\n
-
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d'ouvrir « %document » (Il manque le symbole : %symbol).\n
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Impossible d'ouvrir « %document », car l'application « %app » est dans la Corbeille.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (%error).\n
@@ -160,16 +159,15 @@ Get info	VolumeWindow		Informations
 GiB	WidgetAttributeText		Gio
 Go to parent	FilePanelPriv		Aller vers le parent
 Group	FilePermissionsView		Groupe
-Handles %type	OpenWithWindow		Gère le %type
-Handles any %type	OpenWithWindow		Gère n'importe quel %type
-Handles any file	OpenWithWindow		Gère n'importe quel fichier
+Handles %type	OpenWithWindow		Support de  « %type »
+Handles any %type	OpenWithWindow		Manipule n'importe quel %type
+Handles any file	OpenWithWindow		Manipule n'importe quel fichier
 Icon view	ContainerWindow		Vue en icônes
 Icon view	DeskWindow		Vue en icônes
 Icon view	VolumeWindow		Vue en icônes
 Identify	ContainerWindow		Identifier
 Identify	InfoWindow		Identifier
 If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier des préférences, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% le dossier des préférences.
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction votre dossier personnel, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% votre dossier personnel.
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction les réglages MIME, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% les réglages MIME.
 If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier des réglages, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% le dossier des réglages.
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier du système, Haiku ne démarrera plus ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% le dossier du système.
@@ -384,7 +382,7 @@ Windows	TrackerSettingsWindow		Fenêtres
 Would you like to find a suitable application to open the file?	FSUtils		Souhaitez-vous rechercher une application appropriée pour ouvrir le fichier ?
 Would you like to find some other suitable application?	FSUtils		Souhaitez-vous rechercher une autre application appropriée ?
 Write	FilePermissionsView		Écrire
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Vous essayez de remplacer l’élément :\n\t%name%dest\npar :\n\t%name%src\n\nVoulez vous le remplacer par %movemode ?
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Vous essayez de remplacer l’élément :\n\t%name%dest\npar :\n\t%name%src\n\nVoulez vous le remplacer par %movemode ?	
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Vous ne pouvez pas déplacer un dossier dans lui-même ou dans un de ses sous-dossier.
 You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
 You can't move or copy the trash.	FSUtils		Vous ne pouvez ni déplacer, ni copier la Corbeille.

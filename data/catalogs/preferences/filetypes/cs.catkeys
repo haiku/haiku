@@ -1,11 +1,10 @@
-1	czech	x-vnd.Haiku-FileTypes	297877771
+1	czech	x-vnd.Haiku-FileTypes	4011538288
 %1 application type	Application Type Window		%1 typ aplikace
 %ld Application type%s could be removed.	Application Types Window		typ%s aplikace %ld by mohl být odstraněn.
 %s file type	FileType Window		%s typ souboru
 (from application)	FileTypes Window		(z aplikace)
 (from super type)	FileTypes Window		(z nadtypu)
 Abort	Application Types Window		Přerušit
-About FileTypes…	FileTypes Window		O FileTypes...
 Add	Attribute Window		Přidat
 Add	Extension Window		Přidat
 Add group	New File Type Window		Přidat skupinu
@@ -154,5 +153,4 @@ Version:	Application Types Window		Verze:
 Visible	Attribute Window		Viditelný
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Šířka
 [Multiple files] file types	FileType Window		Typy [Více souborů] 
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tnapsal Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		žádná ikona

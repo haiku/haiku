@@ -1,5 +1,4 @@
-1	polish	x-vnd.Haiku.TV	3791845041
-About %1…	MainWin	Parameter %1 is the name of the application.	O %1…
+1	polish	x-vnd.Haiku.TV	2971561976
 Always on top	MainWin		Zawsze na wierzchu
 Channel	MainWin		Kanał
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
@@ -20,9 +19,6 @@ Scale to native size	MainWin		Zeskaluj do natywnego rozmiaru
 Settings	MainWin		Ustawienia
 Settings…	MainWin		Ustawienia...
 TV	MainWin		Telewizja
-\nBuild 	MainWin		\nBuild
-\nRevision 	MainWin		\nRewizja
-\nVersion 	MainWin		\nWersja
 force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
 force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
 force 720 x 576, display aspect 4:3	MainWin		wymuś 720 x 576, proporcje 4:3

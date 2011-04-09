@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	2893326014
+1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	2852236457
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
 100% scale	MediaPlayer-Main		100% skalert
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -22,8 +22,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Nederst i videoen
 Cancel	MediaPlayer-SettingsWindow		Avbryt
 Close	MediaPlayer-Main		Lukk
 Close	MediaPlayer-PlaylistWindow		Lukk
-Close window when done playing movies	MediaPlayer-SettingsWindow		Lukk vindu når avspillingen er ferdig
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Lukk vindu når lyden er ferdig å spille
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopier oppføring
 Drop files to play	MediaPlayer-Main		Slipp filer for å spille av
 Edit	MediaPlayer-PlaylistWindow		Rediger
@@ -80,7 +78,6 @@ Save as…	MediaPlayer-PlaylistWindow		Lagre som...
 Save error	MediaPlayer-PlaylistWindow		Lagringsfeil
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste mislyktes.\n\nFeilmelding:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste feilet:\n\nFeilmelding:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Skaler kontroller i fullskjermmodus
 Settings…	MediaPlayer-Main		Innstillinger...
 Skip to the next track.	MediaPlayer-Main		Hopp til neste spor
 Skip to the previous track.	MediaPlayer-Main		Hopp tilbake til forrige spor

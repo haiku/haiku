@@ -1,20 +1,15 @@
-1	belarusian	x-vnd.Haiku-Touchpad	2113285797
+1	belarusian	x-vnd.Haiku-Touchpad	2308143439
 Cancel	TouchpadPrefView		Адмова
 Defaults	TouchpadPrefView		Прадвызначаныя
 Fast	TouchpadPrefView		Хутка
 High	TouchpadPrefView		Высока
-Horizontal scroll speed	TouchpadPrefView		Хуткасць гарызантальнай пракруткі
 Horizontal scrolling	TouchpadPrefView		Гарызантальная пракрутка
 OK	TouchpadPrefView		ОК
 Off	TouchpadPrefView		Выкл.
 Please confirm	TouchpadPrefView		Падцвердзіце, калі ласка
 Revert	TouchpadPrefView		Вярнуць
-Scroll acceleration	TouchpadPrefView		Паскарэнне пракруткі
 Scrolling	TouchpadPrefView		Пракрутка
 Slow	TouchpadPrefView		Павольна
-Tap click sensitivity	TouchpadPrefView		Чуткасць тапу
-Tap gesture	TouchpadPrefView		Жэсты тапаў
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Абшар пракруткі занадта вялікі і можа перашкаджаць працы указальніка мышы. Насамрэч жадаеце яго змяніць?
 Touchpad	System name		Тачпад
 Two finger scrolling	TouchpadPrefView		Двухпальцавая пракрутка
-Vertical scroll speed	TouchpadPrefView		Хуткасць вертыкальнай пракруткі

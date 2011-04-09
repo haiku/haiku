@@ -1,8 +1,7 @@
-1	italian	x-vnd.Be-MAIL	1806372798
+1	italian	x-vnd.Be-MAIL	148190189
 %d - Date	Mail		%d - Data
 %e - E-mail address	Mail		%e - Indirizzo e-mail
 %n - Full name	Mail		%n - Nome completo
-About Mail…	Mail		Informazioni su Mail…
 Account from mail	Mail		Account dal messaggio
 Account:	Mail		Account:
 Accounts…	Mail		Account…
@@ -62,7 +61,6 @@ Leave as New	Mail		Lascia come Nuovo
 Leave same	Mail		Lascia inalterato
 Mail couldn't find its dictionary.	Mail		Mail non trova il suo dizionario.
 Mail preferences	Mail		Preferenze di Mail
-Mail\n\n	Mail		Mail\n\n
 Mailing	Mail		Posta elettronica
 Message	Mail		Messaggio
 Move to trash	Mail		Sposta nel cestino
@@ -144,7 +142,6 @@ Use default account	Mail		Usa account predefinito
 User interface	Mail		Interfaccia utente
 View	Mail		Visualizza
 Warn unencodable:	Mail		Avvisa se non codificabile:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Scritto da Robert Polic.\nMigliorato dal gruppo del Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright ©2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il messaggio di posta contiene %ld caratteri che non sono ammessi dalla codifica prescelta. Forse un differente set di caratteri potrebbe funzionare meglio? Seleziona \"Invia\" per inviare comunque il messaggio (verranno usati caratteri sostitutivi al posto di quelli non codificabili), oppure selezionate \"Annulla\" per tornare indietro e cercare di risolvere il problema.
 \\n - Newline	Mail		\\n - Nuova linea
 helpful message	Mail		messaggio utile

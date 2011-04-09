@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku.zip-o-matic	274748138
+1	italian	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		Aggiunti %ld file.
 1 file added.	file:ZipOMaticWindow.cpp		Aggiunto un file.
 Archive	file:ZipperThread.cpp		Archivio
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		S
 Continue	file:ZipOMaticWindow.cpp		Continua
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creazione archivio: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Vuoi interromperli?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Trascina i file per creare un archivio zip.
 Error creating archive	file:ZipOMaticWindow.cpp		Errore nella creazione dell'archivio
 Filename: %s	file:ZipOMaticWindow.cpp		Nome del file: %s
 Let them continue	file:ZipOMatic.cpp		Falli proseguire

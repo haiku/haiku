@@ -1,20 +1,20 @@
-1	finnish	x-vnd.Haiku-Touchpad	2113285797
+1	finnish	x-vnd.Haiku-Touchpad	607725922
+Acceleration	TouchpadPrefView		Kiihtyvyys
 Cancel	TouchpadPrefView		Peru
 Defaults	TouchpadPrefView		Oletukset
 Fast	TouchpadPrefView		Nopea
 High	TouchpadPrefView		Korkea
-Horizontal scroll speed	TouchpadPrefView		Vaakasuora vierintänopeus
+Horizontal	TouchpadPrefView		Vaakasuora
 Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
 OK	TouchpadPrefView		Valmis
 Off	TouchpadPrefView		Pois päältä
 Please confirm	TouchpadPrefView		Vahvista
 Revert	TouchpadPrefView		Palauta
-Scroll acceleration	TouchpadPrefView		Vierityskiihtyvyys
 Scrolling	TouchpadPrefView		Vieritys
+Sensitivity	TouchpadPrefView		Erottelukyky
 Slow	TouchpadPrefView		Hidas
-Tap click sensitivity	TouchpadPrefView		Napautusnapsausherkkyys
-Tap gesture	TouchpadPrefView		Napautusele
+Tapping	TouchpadPrefView		Naputus
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja saattaa haitata normaalia hiiritoimintaa. Haluatko todella vaihtaa sen?
 Touchpad	System name		Levyhiiri
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
-Vertical scroll speed	TouchpadPrefView		Pystysuora vierintänopeus
+Vertical	TouchpadPrefView		Pystysuora

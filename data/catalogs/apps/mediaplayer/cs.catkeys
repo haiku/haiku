@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	2133469082
+1	czech	x-vnd.Haiku-MediaPlayer	3773836701
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americký)
 100% scale	MediaPlayer-Main		100% měřítko
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -24,8 +24,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Spodek videa
 Cancel	MediaPlayer-SettingsWindow		Zrušit
 Close	MediaPlayer-Main		Zavřít
 Close	MediaPlayer-PlaylistWindow		Zavřít
-Close window when done playing movies	MediaPlayer-SettingsWindow		Zavřít okno až skončí přehrávání
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Zavřít okno až skončí přehrávání zvuků
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopírovat položky
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopírovat položku
 Drop files to play	MediaPlayer-Main		Upusťte soubory pro jejich přehrání
@@ -47,8 +45,6 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Vypadá to, že media server neběží.\nChcete jej spustit?
 Large	MediaPlayer-SettingsWindow		Veliký
 Lock Peaks	MediaPlayer-PeakView		Zamknout špičky
-Loop movies by default	MediaPlayer-SettingsWindow		Spouštět filmy implicitně ve smyčce
-Loop sounds by default	MediaPlayer-SettingsWindow		Implicitně přehrávat zvuky ve smyčce
 Low volume	MediaPlayer-SettingsWindow		Nízká hlasitost
 MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení Přehrávače médií
 Medium	MediaPlayer-SettingsWindow		Střední
@@ -85,13 +81,10 @@ Randomize	MediaPlayer-PlaylistWindow		Náhodně
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Zamíchat položky
 Rating	MediaPlayer-Main		Hodnocení
 Redo	MediaPlayer-PlaylistWindow		Znovu
-Remove (Del)	MediaPlayer-PlaylistWindow		Odstranit (Del)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Odstranit položky
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do Koše
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Odstranit položku
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do Koše
-Remove all	MediaPlayer-PlaylistWindow		Odstranit vše
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Odstranit a dát do Koše
 Revert	MediaPlayer-SettingsWindow		Vrátit
 Save	MediaPlayer-Main		Uložit
 Save	MediaPlayer-PlaylistWindow		Uložit
@@ -100,7 +93,6 @@ Save as…	MediaPlayer-PlaylistWindow		Uložit jako...
 Save error	MediaPlayer-PlaylistWindow		Chyba uložení
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Uložení playlistu selhalo.\n\nChyba:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Uložení plalistu selhalo:\n\nChyba:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Měnit velikost kontrolních prvků v režimu celé obrazovky
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Měnit velikost filmů hladce (non-overlay režim)
 Settings…	MediaPlayer-Main		Nastavení...
 Skip to the next track.	MediaPlayer-Main		Přeskočit na další stopu.
@@ -115,7 +107,6 @@ Stream settings	MediaPlayer-Main		Nastavení streamu
 Subtitle placement:	MediaPlayer-SettingsWindow		Umístění titulků:
 Subtitle size:	MediaPlayer-SettingsWindow		Velikost Titulků:
 Subtitles	MediaPlayer-Main		Titulky
-Thanks	MediaPlayer-Main		Díky
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Soubor '%filename' nemohl být otevřen.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Není nainstalován žádný dekodér pro tento formát souboru, nebo má dekodér problém se specifickou verzí tohoto formátu.
 Toggle mute.	MediaPlayer-Main		Zapnout/vypnout zvuk.

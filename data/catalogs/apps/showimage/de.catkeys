@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	1687870740
+1	german	x-vnd.Haiku-ShowImage	886873119
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS Sekunden
 Browse	Menus		Blättern
 Cancel	ClosePrompt		Abbrechen
@@ -23,6 +23,7 @@ High-quality zooming	Menus		Zoomen mit hoher Qualität
 Image	Menus		Bild
 Job setup	PrintOptionsWindow		Druckauftrag bearbeiten
 Last page	Menus		Letzte Seite
+Leave full screen	Menus		Vollbild verlassen
 Next file	Menus		Nächste Datei
 Next page	Menus		Nächste Seite
 OK	Alerts		OK

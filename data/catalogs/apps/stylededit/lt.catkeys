@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	3670692170
+1	lithuanian	x-vnd.Haiku-StyledEdit	2271525877
 ???	LoadAlert		???
 Align	Menus		Lygiuoti
 Black	Menus		Juoda
@@ -39,7 +39,6 @@ Red	Menus		Raudona
 Replace	FindandReplaceWindow		Pakeisti
 Replace all	FindandReplaceWindow		Keisti viską
 Replace in all windows	FindandReplaceWindow		Keisti visuose languose
-Replace same	Menus		Keisti vienodus
 Replace with:	FindandReplaceWindow		Keisti į:
 Replace…	Menus		Pakeisti…
 Revert to saved…	Menus		Grįžti prie išsaugoto…

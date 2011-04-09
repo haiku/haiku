@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-StyledEdit	881610730
+1	polish	x-vnd.Haiku-StyledEdit	2399393207
 ???	LoadAlert		???
 Align	Menus		Wyrównaj
 Black	Menus		Czarny
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywróci
 Case-sensitive	FindandReplaceWindow		Wielkość liter brana pod uwagę
 Center	Menus		Wyśrodkuj
 Characters:	Statistics		Znaków:
-Clear	Menus		Wyczyść
 Close	Menus		Zamknij
 Color	Menus		Kolor
 Copy	Menus		Kopiuj
@@ -56,7 +55,6 @@ Redo typing	QuitAlert		Powtórz pisanie
 Replace	FindandReplaceWindow		Zamień
 Replace all	FindandReplaceWindow		Zamień wszystkie
 Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
-Replace same	Menus		Zamień odpowiednik
 Replace with:	FindandReplaceWindow		Zamień na:
 Replace…	Menus		Zastąp…
 Revert to saved…	Menus		Przywróć zapisane…

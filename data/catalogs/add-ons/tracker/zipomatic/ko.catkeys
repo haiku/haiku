@@ -1,4 +1,4 @@
-1	korean	x-vnd.haiku.zip-o-matic	274748138
+1	korean	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		%ld 파일 더해짐.
 1 file added.	file:ZipOMaticWindow.cpp		1 파일 추가됨.
 Archive	file:ZipperThread.cpp		압축파일
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Continue	file:ZipOMaticWindow.cpp		계속
 Creating archive: %s	file:ZipOMaticWindow.cpp		압축파일 만드는 중: %s
 Do you want to stop them?	file:ZipOMatic.cpp		당신은 작업을 중단하시겠습니까?
-Drop files to zip.	file:ZipOMaticWindow.cpp		압축할 파일을 떨어트려 주세요.
 Error creating archive	file:ZipOMaticWindow.cpp		압축파일 만드는 중에 에러 발생
 Filename: %s	file:ZipOMaticWindow.cpp		파일이름: %s
 Let them continue	file:ZipOMatic.cpp		작업 계속

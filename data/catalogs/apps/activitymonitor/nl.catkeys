@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-ActivityMonitor	2542187855
+1	dutch	x-vnd.Haiku-ActivityMonitor	1437495034
 Add graph	ActivityWindow		Voeg grafiek toe
 Additional items	ActivityView		Toegevoegde items
 Apps	DataSource		Toepassingen
@@ -19,7 +19,6 @@ P-faults	DataSource		P-onderbrekingen
 Page faults	DataSource		Page-onderbrekingen
 Ports	DataSource		Poorten
 Quit	ActivityWindow		Afsluiten
-Raw clipboard size	DataSource		Onbewerkte grootte klembord
 Receiving	DataSource		Ontvangend
 Remove graph	ActivityView		Verwijder grafiek
 Running applications	DataSource		Lopende toepassingen
@@ -32,7 +31,6 @@ Show legend	ActivityView		Toon legenda
 Swap	DataSource		Swap
 Swap space	DataSource		Swap-ruimte
 Teams	DataSource		Teams
-Text clipboard size	DataSource		Grootte klembordtekst
 Threads	DataSource		Threads
 Update time interval:	SettingsWindow		Interval bijwerktijd:
 Used memory	DataSource		Gebruikt geheugen

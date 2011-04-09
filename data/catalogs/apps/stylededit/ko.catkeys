@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-StyledEdit	3670692170
+1	korean	x-vnd.Haiku-StyledEdit	2271525877
 ???	LoadAlert		???
 Align	Menus		정렬
 Black	Menus		검정색
@@ -39,7 +39,6 @@ Red	Menus		빨강색
 Replace	FindandReplaceWindow		바꾸기
 Replace all	FindandReplaceWindow		모두 바꾸기
 Replace in all windows	FindandReplaceWindow		모든 창에서 바꾸기
-Replace same	Menus		다시 바꾸기
 Replace with:	FindandReplaceWindow		바꿀 단어:
 Replace…	Menus		바꾸기…
 Revert to saved…	Menus		저장되었던 것으로 되돌리기…

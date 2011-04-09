@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ScreenSaver	2049719641
+1	french	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 secondes
 Add…	ScreenSaver		Ajouter…
 Blackness	ScreenSaver		Ténèbres
@@ -8,11 +8,9 @@ Could not load screen saver	ScreenSaver		Impossible de charger l'économiseur d'
 Display Power Management Signaling not available	ScreenSaver		Le système d'économie d'énergie de l'écran (DPMS) n'est pas disponible
 Don't fade when	ScreenSaver		Ne pas éclipser quand
 Done	ScreenSaver		Terminé
-Enable screen saver	ScreenSaver		Activer l'économiseur d'écran
-Fade	ScreenSaver		Éclipser
+Enable screensaver	ScreenSaver		Activer l'économiseur
 Fade now when	ScreenSaver		Éclipser immédiatement quand
-Module settings	ScreenSaver		Régages du module
-Modules	ScreenSaver		Modules
+General	ScreenSaver		Général
 No options available	ScreenSaver		Aucune option disponible
 OK	ScreenSaver		OK
 Password Window	ScreenSaver		Fenêtre de mot de passe
@@ -20,8 +18,10 @@ Password lock	ScreenSaver		Verrouillage par mot de passe
 Password:	ScreenSaver		Mot de passe :
 Passwords don't match. Please try again.	ScreenSaver		Les mots de passe ne correspondent pas. Veuillez réessayez.
 Password…	ScreenSaver		Mot de passe…
-Run module	ScreenSaver		Exécuter le module
 ScreenSaver	System name		Économiseur d'écran
+Screensaver settings	ScreenSaver		Réglages de l'économiseur
+Screensavers	ScreenSaver		Économiseurs
+Start screensaver	ScreenSaver		Démarrer l'économiseur
 Test	ScreenSaver		Test
 Turn off screen	ScreenSaver		Extinction de l'écran
 Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé

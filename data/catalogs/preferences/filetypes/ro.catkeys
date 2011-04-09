@@ -1,9 +1,8 @@
-1	romanian	x-vnd.Haiku-FileTypes	1298481038
+1	romanian	x-vnd.Haiku-FileTypes	717174259
 %1 application type	Application Type Window		tip de aplicație %1
 %s file type	FileType Window		tip de fișier %s
 (from application)	FileTypes Window		(de la aplicație)
 (from super type)	FileTypes Window		(de la tipul super)
-About FileTypes…	FileTypes Window		Despre TipuriFișier...
 Add	Attribute Window		Adaugă
 Add	Extension Window		Adaugă
 Add group	New File Type Window		Adaugă grup
@@ -127,5 +126,4 @@ Version:	Application Type Window		Versiune:
 Visible	Attribute Window		Vizibil
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Lățime:
 [Multiple files] file types	FileType Window		[Fișiere multiple] tipuri de fișiere
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tscris de Axel Dörfler\n\tDrepturi de autor 2006-2007, Haiku.\n
 no icon	FileTypes Window		fără pictogramă

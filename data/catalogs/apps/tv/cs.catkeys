@@ -1,5 +1,4 @@
-1	czech	x-vnd.Haiku.TV	3791845041
-About %1…	MainWin	Parameter %1 is the name of the application.	kolem %1
+1	czech	x-vnd.Haiku.TV	2971561976
 Always on top	MainWin		Vždy navrchu
 Channel	MainWin		Kanál
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
@@ -20,9 +19,6 @@ Scale to native size	MainWin		Změnit velikost na původní
 Settings	MainWin		Nastavení
 Settings…	MainWin		Nastavení...
 TV	MainWin		TV
-\nBuild 	MainWin		\nBuild
-\nRevision 	MainWin		\nRevize
-\nVersion 	MainWin		\nVerze
 force 544 x 576, display aspect 4:3	MainWin		vynutit 544 x 576, poměr stran 4:3
 force 704 x 576, display aspect 4:3	MainWin		vynutit 704 x 576, poměr stran 4:3
 force 720 x 576, display aspect 4:3	MainWin		vynutit 720 x 576, poměr stran 4:3

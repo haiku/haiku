@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DiskProbe	1759983029
+1	polish	x-vnd.Haiku-DiskProbe	3357434700
 %ld (native)	ProbeView		%ld (natywny)
 (native)	ProbeView		(natywny)
 15 bit	TypeEditors		15-bitowy
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8-bitowa paleta
 8 bit signed value:	TypeEditors		8-bitowa wartość typu signed:
 8 bit unsigned value:	TypeEditors		8-bitowa wartość typu unsigned:
-About DiskProbe…	FileWindow		O programie Analizator Dysków...
 Add	ProbeView		Dodaj
 Attribute	AttributeWindow		Atrybut
 Attribute	ProbeView		Atrybut

@@ -75,7 +75,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lancement du gestionnaire d'amorçage…\n\nFermez le gestionnaire d'amorçage pour poursuivre l'installation.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Le Gestionnaire de Disques est lancé…\n\nFermer le Gestionnaire de Disques pour continuer l'installation.
 Scanning for disks…	InstallerWindow		Recherche des disques…
-Set up boot menu	InstallerWindow		Mettre en place le menu de de démarrage
+Set up boot menu	InstallerWindow		Mettre en place le menu de démarrage
 Set up partitions…	InstallerWindow		Ajuster les partitions…
 Show optional packages	InstallerWindow		Montrer les paquets optionnels
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Ainsi, après les autres entrées du menu vers la fin du fichier, ajouter quelque chose semblable à ces lignes :\n\n

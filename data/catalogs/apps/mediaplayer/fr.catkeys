@@ -1,5 +1,5 @@
-1	french	x-vnd.Haiku-MediaPlayer	3683491203
-%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nÉcrit par Marcus Overhagen, Stephan Aßmus et Frederik Modéen
+1	french	x-vnd.Haiku-MediaPlayer	1493380061
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a rencontré une erreur interne. Le fichier n'a pas pu être ouvert.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 100% scale	MediaPlayer-Main		Échelle 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinémascope)
@@ -10,7 +10,10 @@
 <nothing to redo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
 <nothing to undo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
 <unknown>	PlaylistItem-album		<inconnu>
+<unknown>	PlaylistItem-author		<inconnu>
+<unnamed>	PlaylistItem-name		<sans nom>
 <untitled>	PlaylistItem-title		<sans titre>
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Les fichiers n'ont pas tous pu être envoyés à la corbeille.
 Always on top	MediaPlayer-Main		Toujours au dessus
 Aspect ratio	MediaPlayer-Main		Aspect proportionnel
 Attributes	MediaPlayer-Main		Attributs
@@ -22,57 +25,79 @@ Bottom of video	MediaPlayer-SettingsWindow		Au bas de la vidéo
 Cancel	MediaPlayer-SettingsWindow		Annuler
 Close	MediaPlayer-Main		Fermer
 Close	MediaPlayer-PlaylistWindow		Fermer
-Close window when done playing movies	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des vidéos
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copier les entrées
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Copier l'entrée
 Drop files to play	MediaPlayer-Main		Déposez les fichiers à lire
+Edit	MediaPlayer-PlaylistWindow		Éditer
 Error: 	MediaPlayer-Main		Erreur :
 Error: 	MediaPlayer-RemovePLItemsCmd		Erreur :
 File Info	MediaPlayer-InfoWin		Informations du fichier
 File info…	MediaPlayer-Main		Informations du fichier…
 Full screen	MediaPlayer-Main		Plein écran
 Full volume	MediaPlayer-SettingsWindow		Plein volume
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtenir/définir le volume (0.0-2.0).
 Hide interface	MediaPlayer-Main		Masquer l'interface
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importer une entrée
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (échec du verrouillage). La liste de lecture n'a pas pu être sauvegardée.
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n'a pas pu être sauvegardée.
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n'a pas pu être sauvegardée.
-Low volume	MediaPlayer-SettingsWindow		Volume bas
-MediaPlayer	System name		MédiaPlayer
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Il semble que le serveur de médias ne soit pas en fonction.\nVoulez-vous le démarrer maintenant ?
+Large	MediaPlayer-SettingsWindow		Large
+Low volume	MediaPlayer-SettingsWindow		Volume faible
+MediaPlayer	System name		Lecteur Média
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
+Medium	MediaPlayer-SettingsWindow		Intermédiaire
+Move Entries	MediaPlayer-MovePLItemsCmd		Déplacer les entrées
+Move Entry	MediaPlayer-MovePLItemsCmd		Déplacer l'entrée
+Move file to Trash	MediaPlayer-PlaylistWindow		Envoyer le fichier à la corbeille
 Mute	MediaPlayer-Main		Muet
 Muted	MediaPlayer-SettingsWindow		Muet
 New player…	MediaPlayer-Main		Nouveau lecteur…
 Next	MediaPlayer-Main		Suivant
 No aspect correction	MediaPlayer-Main		Pas de correction d'aspect
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Aucun des fichiers que vous voulez lire ne semble être un média.
 Nothing to Play	MediaPlayer-Main		Rien à Lire
 OK	MediaPlayer-Main		OK
 OK	MediaPlayer-PlaylistWindow		OK
 OK	MediaPlayer-RemovePLItemsCmd		OK
 OK	MediaPlayer-SettingsWindow		OK
+Off	Subtitles menu		Désactivé
 Open	MediaPlayer-Main		Ouvrir
 Open	MediaPlayer-PlaylistWindow		Ouvrir
 Open Playlist	MediaPlayer-PlaylistWindow		Ouvrir une liste de lecture
 Open file…	MediaPlayer-Main		Ouvrir un fichier…
 Open…	MediaPlayer-PlaylistWindow		Ouvrir…
 Pause	MediaPlayer-Main		Pause
+Pause playback.	MediaPlayer-Main		Suspendre la lecture
 Play	MediaPlayer-Main		Jouer
 Play mode	MediaPlayer-SettingsWindow		Mode de lecture
 Playlist	MediaPlayer-PlaylistWindow		Liste de lecture
+Playlist…	MediaPlayer-Main		Liste de lecture…
 Prev	MediaPlayer-Main		Précédent
 Quit	MediaPlayer-Main		Quitter
 Randomize	MediaPlayer-PlaylistWindow		Aléatoire
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Classer les entrées aléatoirement
 Rating	MediaPlayer-Main		Évaluation
 Redo	MediaPlayer-PlaylistWindow		Rétablir
-Remove (Del)	MediaPlayer-PlaylistWindow		Supprimer (effacer)
+Remove	MediaPlayer-PlaylistWindow		Retirer
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Retirer les entrées
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Enlever l'entrée
-Remove all	MediaPlayer-PlaylistWindow		Retirer tout
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Supprimer et envoyer à la corbeille
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer les entrées à la corbeille
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Retirer l'entrée
+Revert	MediaPlayer-SettingsWindow		Rétablir
 Save	MediaPlayer-Main		Enregistrer 
 Save	MediaPlayer-PlaylistWindow		Enregistrer 
 Save Playlist	MediaPlayer-PlaylistWindow		Enregistrer la liste de lecture
 Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…
+Save error	MediaPlayer-PlaylistWindow		Enregistrer l'erreur
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur :
+Select all	MediaPlayer-PlaylistWindow		Sélectionner tout
 Settings…	MediaPlayer-Main		Réglages…
+Skip to the next track.	MediaPlayer-Main		Passer à la piste suivante
+Skip to the previous track.	MediaPlayer-Main		Passer à la piste précédante
+Small	MediaPlayer-SettingsWindow		Petit
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers ne peuvent pas être envoyés à la corbeille
+Start media server	MediaPlayer-Main		Démarrer le serveur de médias
 Start playing.	MediaPlayer-Main		Commencer la lecture.
 Stop	MediaPlayer-Main		Arrêt
 Stop playing.	MediaPlayer-Main		Arrêter la lecture.
@@ -80,7 +105,6 @@ Stream settings	MediaPlayer-Main		Réglages du flux
 Subtitle placement:	MediaPlayer-SettingsWindow		Emplacement des sous-titres :
 Subtitle size:	MediaPlayer-SettingsWindow		Taille des sous-titres :
 Subtitles	MediaPlayer-Main		Sous-titres
-Thanks	MediaPlayer-Main		Merci
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n'existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
 Track	Audio Track Menu		Piste
@@ -88,8 +112,10 @@ Track	Video Track Menu		Piste
 Track %d	MediaPlayer-Main		Piste %d
 URI	MediaPlayer-Main		URI
 Undo	MediaPlayer-PlaylistWindow		Annuler
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Utiliser le recouvrement vidéo si le matériel est disponible
 Video	MediaPlayer-Main		Vidéo
 Video track	MediaPlayer-Main		Piste vidéo
 View options	MediaPlayer-SettingsWindow		Options d'affichage
 Volume	MediaPlayer-Main		Volume
+none	Audio track menu		aucun
 none	Subtitles menu		aucun

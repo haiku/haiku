@@ -1,8 +1,7 @@
-1	belarusian	x-vnd.Haiku-Terminal	1010009081
+1	belarusian	x-vnd.Haiku-Terminal	2225488941
 %app% settings	Terminal PrefWindow	window title	Наладкі %app% 
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help паказаць гэтую даведку\n -t, --title прызначыць імя вакна\n -f, --fullscreen запусціць у поўным экране\n
 Abort	Terminal Shell		Спыніць
-About Terminal…	Terminal TermWindow		Пра Тэрмінал...
 Appearance	Terminal PrefWindow		Знешні выгляд
 Background	Terminal AppearancePrefView		Фон
 Black on White	Terminal colors schema		Чорны на Белым
@@ -51,7 +50,6 @@ Nothing is selected.	Terminal TermWindow		Нічога не выбрана.
 OK	Terminal PrefWindow		ОК
 OK	Terminal SetTitleWindow		ОК
 OK	Terminal TermApp		ОК
-OK	Terminal TermView		ОК
 OK	Terminal TermWindow		ОК
 Page setup…	Terminal TermWindow		Наладкі старонкі...
 Paste	Terminal TermWindow		Уставіць
@@ -78,7 +76,6 @@ Tab title:	Terminal AppearancePrefView		Імя ўкладкі:
 Tab title:	Terminal TermWindow		Імя ўкладкі:
 Terminal	System name		Тэрмінал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Тэрмінал не змог запусціць абалонку. Выбачайце.
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Тэрмінал\n\nнапісаны Kazuho Okui and Takashi Murai\nабноўлены Kian Duffy і іншымі\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Тэкст
 Text encoding	Terminal TermWindow		Кадоўка тэксту
 Text not found.	Terminal TermWindow		Тэкст не знойдзены.

@@ -1,7 +1,6 @@
-1	portuguese	x-vnd.Haiku-Terminal	396469586
+1	portuguese	x-vnd.Haiku-Terminal	1611949446
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em ecrã inteiro\n
 Abort	Terminal Shell		Abortar
-About Terminal…	Terminal TermWindow		Sobre o Terminal…
 Appearance	Terminal PrefWindow		Aparência
 Cancel	Terminal PrefWindow		Cancelar
 Cancel	Terminal TermView		Cancelar
@@ -38,7 +37,6 @@ No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma 
 Not found.	Terminal TermWindow		Não encontrado.
 Nothing is selected.	Terminal TermWindow		Não há nada seleccionado.
 OK	Terminal TermApp		OK
-OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Configuração de página…
 Paste	Terminal TermWindow		Colar
@@ -56,7 +54,6 @@ Settings…	Terminal TermWindow		Definições...
 Size:	Terminal AppearancePrefView		Tamanho
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		O Terminal não consegiu iniciar a shell. Desculpe.
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\nactualizado por Kian Duffy e outros\n\nCopyright ©2003-2009, Haiku.\n
 Text encoding	Terminal TermWindow		Codificação do texto
 Text not found.	Terminal TermWindow		Texto não encontrado.
 Text size	Terminal TermWindow		Tamanho do texto

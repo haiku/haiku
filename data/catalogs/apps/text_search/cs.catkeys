@@ -1,14 +1,12 @@
-1	czech	x-vnd.Haiku.TextSearch	3449010850
+1	czech	x-vnd.Haiku.TextSearch	1180598828
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nemohl otevřít jednu nebo více složek.
 %s: Not enough room to escape the filename.	Grepper		%s: Málo prostoru pro GREP vypíchnutí jména souboru.
 %s: There was a problem running grep.	Grepper		%s: Nastal problém se spuštěním grepu.
-About TextSearch…	GrepWindow		O TextSearch
 Actions	GrepWindow		Akce
 Cancel	GrepWindow		Zrušit
 Case-sensitive	GrepWindow		Rozlišovat velikost písmen
 Close	GrepWindow		Zavřít
 Copy text to clipboard	GrepWindow		Kopírovat text do schránky
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Vytvořil Matthijs Hollemans.\n\nPřispěli Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers a momoziro.\n
 Encoding	GrepWindow		Kódování
 Escape search text	GrepWindow		Vypíchnout vyhledávaný text (GREP)
 File	GrepWindow		Soubor

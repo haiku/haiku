@@ -1,13 +1,19 @@
-1	spanish	x-vnd.Haiku-ShowImage	1796713029
-About ShowImage…	Menus		Acerca de ShowImage
+1	spanish	x-vnd.Haiku-ShowImage	2585577103
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS segundos
 Browse	Menus		Navegar
 Cancel	ClosePrompt		Cancelar
+Clear selection	Menus		Limpiar selección
 Close	ClosePrompt		Cerrar
+Close	Menus		Cerrar
 Close document	ClosePrompt		Cerrar documento
+Copy	Menus		Copiar
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		¡No se pudo cargar la imagen! No existe un archivo o un traductor de imagen para cargarlo.
 DPI:	PrintOptionsWindow		Puntos por pulgada (DPI):
+Edit	Menus		Editar
+File	Menus		Archivo
 First page	Menus		Primera página
 Fit image to page	PrintOptionsWindow		Ajustar imagen a la página
+Fit to window	Menus		Ajustarse a la ventana
 Flip left to right	Menus		Invertir de izquierda a derecha
 Flip top to bottom	Menus		Invertir de arriba a abajo
 Full screen	Menus		Pantalla completa
@@ -19,18 +25,32 @@ Job setup	PrintOptionsWindow		Configuración de tareas
 Last page	Menus		Última página
 Next file	Menus		Archivo siguiente
 Next page	Menus		Página siguiente
+OK	Alerts		Aceptar
+OK	SaveToFile		Aceptar
+Open…	Menus		Abrir....
 Original size	Menus		Tamaño original
+Page setup…	Menus		Configuración de la pagina
 Previous file	Menus		Archivo anterior
 Previous page	Menus		Página anterior
 Print options	PrintOptionsWindow		Opciones de impresión
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar a  (en 1/72 pulgadas):
+Print…	Menus		Imprimir...
+Progress monitor	ProgressWindow		Monitor de progresos
+Quit	Menus		Salir
+Rating	Menus		Calificar
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar a  (en 1/72 de pulgada):
 Rotate clockwise	Menus		Rotar en sentido horario
 Rotate counterclockwise	Menus		Rotar en sentido antihorario
+Save as…	Menus		Guardar como...
+Select all	Menus		Seleccionar todo
+Selection mode	Menus		Modo de selección
 Show caption in full screen mode	Menus		Mostrar título en modo de pantalla completa
+Show tool bar	Menus		Mostrar barra de herramientas
 Slide delay	Menus		Retardo de diapositiva
 Slide show	Menus		Exponer diapositivas
+Stretch to window	Menus		Estirar ventana
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' ha cambiado. ¿Desea cerrarlo?
+The file '%s' could not be written.	SaveToFile		No se puede escribir el archivo archivo '%s'.
 Undo	Menus		Deshacer
 Use as background…	Menus		Usar como fondo de pantalla…
 View	Menus		Ver

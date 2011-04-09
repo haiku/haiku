@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	2994145175
+1	swedish	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f fel/s
@@ -27,7 +27,7 @@ Page faults	DataSource		Sidfel
 Ports	DataSource		Portar
 Quit	ActivityWindow		Avsluta
 RX	DataSource	Shorter version for Receiving.	RX
-Raw clipboard size	DataSource		Obearbetad urklippstorlek
+Raw clipboard	DataSource		Obearbetad urklipp
 Receiving	DataSource		Tar emot
 Remove graph	ActivityView		Ta bort graf
 Running applications	DataSource		Aktiva program
@@ -41,7 +41,7 @@ Swap	DataSource		Växling
 Swap space	DataSource		Växlingsutrymme
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		Processer
-Text clipboard size	DataSource		Text urklippsstorlek
+Text clipboard	DataSource		Text urklipp
 Threads	DataSource		Trådar
 Update time interval:	SettingsWindow		Uppdateringsintervall:
 Used memory	DataSource		Använt minne

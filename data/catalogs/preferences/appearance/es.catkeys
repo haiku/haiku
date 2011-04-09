@@ -18,7 +18,7 @@ Inactive window tab	Colors tab		Pestaña de ventana inactiva
 Inactive window tab text	Colors tab		Texto de la pestaña en ventana inactiva
 LCD subpixel	AntialiasingSettingsView		Subpixel LCD
 Menu background	Colors tab		Fondo de menú
-Menu item text	Colors tab		Texto de item de menú
+Menu item text	Colors tab		Texto de elemento de menú
 Monospaced fonts only	AntialiasingSettingsView		Sólo tipos de letra monoespaciados
 Navigation base	Colors tab		Base de navegación
 Navigation pulse	Colors tab		Pulso de navegación
@@ -30,7 +30,7 @@ Reduce colored edges filter strength:	AntialiasingSettingsView		Reducir fortalez
 Revert	APRWindow		Revertir
 Selected menu item background	Colors tab		Fondo de elemento de menú seleccionado
 Selected menu item border	Colors tab		Borde de item de menú seleccionado
-Selected menu item text	Colors tab		Texto de item de menú seleccionado
+Selected menu item text	Colors tab		Texto de elemento de menú seleccionado
 Shadow	Colors tab		Sombra
 Shine	Colors tab		Brillo
 Strong	AntialiasingSettingsView		Importante

@@ -1,14 +1,12 @@
-1	brazilian_portuguese	x-vnd.Haiku.TextSearch	3384815827
+1	brazilian_portuguese	x-vnd.Haiku.TextSearch	1116403805
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME não pode abrir uma ou mais pastas
 %s: Not enough room to escape the filename.	Grepper		%s. Não há espaço suficiente para escapar o nome do arquivo.
 %s: There was a problem running grep.	Grepper		%s: Houve um problema ao executar o grep.
-About TextSearch…	GrepWindow		Sobre o Localizador de Texto...
 Actions	GrepWindow		Ações
 Cancel	GrepWindow		Cancelar
 Case-sensitive	GrepWindow		Diferenciar maiúsculas e minúsculas
 Close	GrepWindow		Fechar
 Copy text to clipboard	GrepWindow		Copiar texto para a Área de Transferência
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Criado por Matthijs Hollemans.\n\nContribuído por Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers e momoziro.\n
 Encoding	GrepWindow		Codificação
 Escape search text	GrepWindow		Escapar texto de procura
 File	GrepWindow		Arquivo

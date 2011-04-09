@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-Magnify	3874122642
+1	dutch	x-vnd.Haiku-Magnify	219016360
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
 Add a crosshair	Magnify-Main		Een dradenkruis toevoegen
 Copy image	Magnify-Main		Afbeelding kopiëren
@@ -16,7 +16,6 @@ Info:\n  hide/show info - hides/shows all these new features\n    note: when sho
 Magnify help	Magnify-Help		Magnify help
 Make square	Magnify-Main		Vierkant maken
 Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigatie:\n pijltoetsen - verplaats de huidige selectie (rgb indicatie of draadkruis)\n met 1 pixel per keer\n option-pijltoets - verplaatst de muislocatie 1 pixel per keer\n selectiemarkering met x - de huidige selectie bevat een 'x'\n
-OK	Magnify-Main		Oké
 Remove a crosshair	Magnify-Main		Een dradenkruis verwijderen
 Save image	Magnify-Main		Afbeelding opslaan
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Vormen/omvormen:\n vierkant maken - stelt de breedte en de hoogte in\n naar de langste van die twee om er\n een vierkant beeld mee te maken.\n toenemen/afnemen venstergrootte - laat het venstergrootte\n toenemen of afnemen met 4 pixels.\n toenemen/afnemen pixelgrootte - laat het aantal\n pixels dat gebruikt wordt om een 'echte' pixel te vergroten, toenemen of afnemen. Begrensd tussen 1 en 16.\n

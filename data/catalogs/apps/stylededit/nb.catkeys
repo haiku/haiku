@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-StyledEdit	548562865
+1	norwegian_bokmål	x-vnd.Haiku-StyledEdit	2066345342
 ???	LoadAlert		???
 Align	Menus		Juster
 Black	Menus		Svart
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbakestill
 Case-sensitive	FindandReplaceWindow		Skiller mellom store og små bokstaver
 Center	Menus		Sentrer
 Characters:	Statistics		Bokstaver:
-Clear	Menus		Tøm
 Close	Menus		Lukk
 Color	Menus		Farge
 Copy	Menus		Kopier
@@ -56,7 +55,6 @@ Redo typing	QuitAlert		Tilbakestill skriving
 Replace	FindandReplaceWindow		Erstatt
 Replace all	FindandReplaceWindow		Erstatt alle
 Replace in all windows	FindandReplaceWindow		Erstatt i alle vinduer
-Replace same	Menus		Erstatt samme
 Replace with:	FindandReplaceWindow		Erstatt med:
 Replace…	Menus		Erstatt...
 Revert to saved…	Menus		Tilbakestill til lagret...

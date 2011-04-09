@@ -1,6 +1,5 @@
-1	brazilian_portuguese	x-vnd.Be-MAIL	3553904172
+1	brazilian_portuguese	x-vnd.Be-MAIL	1895721563
 %e - E-mail address	Mail		%e - Endereço de E-mail
-About Mail…	Mail		Sobre o Mail...
 Accounts…	Mail		Contas...
 Add enclosure…	Mail		Adicionar anexo...
 An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
@@ -23,7 +22,6 @@ Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsi
 Initial spell check mode:	Mail		Modo de correção ortográfica inicial:
 Leave as New	Mail		Marcar como Nova
 Leave same	Mail		Deixar a mesma
-Mail\n\n	Mail		Mail\n\n
 Mailing	Mail		Correio eletrônico
 Move to trash	Mail		Mover para a lixeira
 Need Tracker to move items to trash	Mail		O Tracker é necessário para mover os items para a lixeira
@@ -51,5 +49,4 @@ There is no installed handler for URL links.	Mail		Não existe nenhum programa i
 Trash	Mail		Lixeira
 Undo	Mail		Desfazer
 Use default account	Mail		Usar conta padrão
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Escrito por Robert Polic.\nMelhorado pelo bando do Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto principal contém %ld caracteres incodificáveis. Talvez um conjunto de caracteres novos funcionará melhor? Clique em Enviar para enviar de qualquer modo (um caractere alternativo será usado em vez dos incodificáveis), ou escolha Cancelar para voltar e tentar corrigir o problema.

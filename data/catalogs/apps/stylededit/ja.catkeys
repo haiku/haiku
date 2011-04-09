@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-StyledEdit	571894542
+1	japanese	x-vnd.Haiku-StyledEdit	2399393207
 ???	LoadAlert		???
 Align	Menus		配置
 Black	Menus		黒
 Blue	Menus		青
+Bold	Menus		太字
 Can't undo	Menus		元に戻せません
 Cancel	FindandReplaceWindow		中止
 Cancel	QuitAlert		中止
@@ -11,7 +12,7 @@ Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字/小文字を区別
 Center	Menus		中央揃え
-Clear	Menus		クリアー
+Characters:	Statistics		文字数:
 Close	Menus		閉じる
 Color	Menus		色
 Copy	Menus		コピー
@@ -19,6 +20,7 @@ Cut	Menus		切り取り
 Cyan	Menus		水色
 Default	Open_and_SaveAsPanel		デフォルト
 Document	Menus		ドキュメント
+Document statistics	Statistics		ドキュメント統計
 Don't save	QuitAlert		保存しない
 Don't save	SaveAlert		保存しない
 Edit	Menus		編集
@@ -34,21 +36,25 @@ Find:	FindandReplaceWindow		検索：
 Find…	Menus		検索…
 Font	Menus		フォント
 Green	Menus		緑
+Italic	Menus		イタリック
 Left	Menus		左揃え
+Lines:	Statistics		行数:
 Magenta	Menus		紫
 New	Menus		新規作成
+OK	LoadAlert		OK
 OK	RevertToSavedAlert		Ok
 OK	SaveAlert		Ok
+OK	Statistics		OK
 Open…	Menus		開く…
 Page setup…	Menus		ページ設定…
 Paste	Menus		貼り付け
 Print…	Menus		印刷…
 Quit	Menus		終了
 Red	Menus		赤
+Redo typing	QuitAlert		やり直し
 Replace	FindandReplaceWindow		置換
 Replace all	FindandReplaceWindow		全て置換
 Replace in all windows	FindandReplaceWindow		全てのウィンドウで置換
-Replace same	Menus		繰り返し置換
 Replace with:	FindandReplaceWindow		置換：
 Replace…	Menus		置換…
 Revert to saved…	Menus		最新保存版に戻す…
@@ -62,8 +68,11 @@ Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されました
 Search backwards	FindandReplaceWindow		逆方向検索
 Select all	Menus		全て選択
 Size	Menus		サイズ
+Statistics…	Menus		統計...
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
+Undo typing	QuitAlert		元に戻す
 Untitled 	StyledEditWindow		無題
+Words:	Statistics		単語数:
 Wrap lines	Menus		ワードラップ
 Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
 Yellow	Menus		黄

@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-DiskProbe	1759983029
+1	dutch	x-vnd.Haiku-DiskProbe	3357434700
 %ld (native)	ProbeView		%ld (native)
 (native)	ProbeView		(native)
 15 bit	TypeEditors		15-bit
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8-bit-palet
 8 bit signed value:	TypeEditors		8-bit-signed-waarde:
 8 bit unsigned value:	TypeEditors		8-bit-unsigned-waarde:
-About DiskProbe…	FileWindow		Over DiskProbe...
 Add	ProbeView		Toevoegen
 Attribute	AttributeWindow		Eigenschap
 Attribute	ProbeView		Eigenschap

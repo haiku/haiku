@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	3334593067
+1	german	x-vnd.Haiku-MediaPlayer	138551800
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in %app% aufgetreten. Die Datei konnte nicht geöffnet werden.
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 100% scale	MediaPlayer-Main		100% Zoom
@@ -25,8 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		Unten im Video
 Cancel	MediaPlayer-SettingsWindow		Abbrechen
 Close	MediaPlayer-Main		Schließen
 Close	MediaPlayer-PlaylistWindow		Schließen
-Close window when done playing movies	MediaPlayer-SettingsWindow		Fenster nach Abspielen von Video schließen
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Fenster nach Abspielen von Audio schließen
+Close window after playing audio	MediaPlayer-SettingsWindow		Fenster nach Audiowiedergabe schließen
+Close window after playing video	MediaPlayer-SettingsWindow		Fenster nach Videowiedergabe schließen
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Einträge kopieren
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Eintrag kopieren
 Drop files to play	MediaPlayer-Main		Dateien zum Abspielen hier fallen lassen
@@ -48,8 +48,8 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Mediaserver läuft anscheinend nicht.\nSoll er gestartet werden?
 Large	MediaPlayer-SettingsWindow		Groß
 Lock Peaks	MediaPlayer-PeakView		Ausschlag markieren
-Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
-Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
+Loop audio	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
+Loop video	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
 MediaPlayer	System name		Media-Player
 MediaPlayer settings	MediaPlayer-SettingsWindow		Media-Player-Einstellungen
@@ -57,6 +57,7 @@ Medium	MediaPlayer-SettingsWindow		Mittel
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fehler beim Verschieben in den Papierkorb
+Move file to Trash	MediaPlayer-PlaylistWindow		In Papierkorb verschieben
 Mute	MediaPlayer-Main		Stumm
 Muted	MediaPlayer-SettingsWindow		Stumm geschaltet
 New player…	MediaPlayer-Main		Neuer Player...
@@ -87,13 +88,11 @@ Randomize	MediaPlayer-PlaylistWindow		Zufällige Reihenfolge
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Einträge zufällig anordnen
 Rating	MediaPlayer-Main		Bewertung
 Redo	MediaPlayer-PlaylistWindow		Wiederholen
-Remove (Del)	MediaPlayer-PlaylistWindow		Entfernen (Entf)
+Remove	MediaPlayer-PlaylistWindow		Entfernen
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Einträge entfernen
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Einträge in den Papierkorb verschieben
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Eintrag entfernen
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
-Remove all	MediaPlayer-PlaylistWindow		Alle entfernen
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Entfernen und in den Papierkorb verschieben
 Revert	MediaPlayer-SettingsWindow		Ausgangswerte
 Save	MediaPlayer-Main		Speichern
 Save	MediaPlayer-PlaylistWindow		Speichern
@@ -102,8 +101,9 @@ Save as…	MediaPlayer-PlaylistWindow		Speichern als...
 Save error	MediaPlayer-PlaylistWindow		Speichern ist fehlgeschlagen
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen.\n\nFehler:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zoom mit hoher Qualität (nicht im Overlay-Modus)
+Select all	MediaPlayer-PlaylistWindow		Alles auswählen
 Settings…	MediaPlayer-Main		Einstellungen...
 Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
 Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.

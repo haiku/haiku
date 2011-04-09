@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	1006045360
+1	italian	x-vnd.Haiku-MediaPlayer	2646412979
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
 100% scale	MediaPlayer-Main		Scala 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -24,8 +24,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
 Cancel	MediaPlayer-SettingsWindow		Cancella
 Close	MediaPlayer-Main		Chiudi
 Close	MediaPlayer-PlaylistWindow		Chiudi
-Close window when done playing movies	MediaPlayer-SettingsWindow		Chiudi la finestra alla fine della riproduzione dei video.
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Chiudi la finestra quando alla fine della riproduzione dei suoni.
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Copia Voci
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia Voce
 Drop files to play	MediaPlayer-Main		Trascina qui i file da riprodurre
@@ -47,8 +45,6 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembra che il media server non sia in esecuzione.\nAvviarlo?
 Large	MediaPlayer-SettingsWindow		Grande
 Lock Peaks	MediaPlayer-PeakView		Picchi di blocco
-Loop movies by default	MediaPlayer-SettingsWindow		Manda i filmati in loop di default
-Loop sounds by default	MediaPlayer-SettingsWindow		Manda i suoni in loop di default
 Low volume	MediaPlayer-SettingsWindow		Volume basso
 MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazioni di MediaPlayer
 Medium	MediaPlayer-SettingsWindow		Medio
@@ -85,13 +81,10 @@ Randomize	MediaPlayer-PlaylistWindow		Casuale
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rendi le Voci casuali
 Rating	MediaPlayer-Main		Voto
 Redo	MediaPlayer-PlaylistWindow		Ripeti
-Remove (Del)	MediaPlayer-PlaylistWindow		Rimuovi (Canc)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Rimuovi Voci
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Sposta Voci nel Cestino
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Rimuovi Voce
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta Voce nel Cestino
-Remove all	MediaPlayer-PlaylistWindow		Rimuovi tutti
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Rimuovi e metti nel Cestino
 Revert	MediaPlayer-SettingsWindow		Ripristina
 Save	MediaPlayer-Main		Salva
 Save	MediaPlayer-PlaylistWindow		Salva
@@ -100,7 +93,6 @@ Save as…	MediaPlayer-PlaylistWindow		Salva come...
 Save error	MediaPlayer-PlaylistWindow		Errore di salvataggio
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Fallito il salvataggio della playlist.\n\nErrore:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Fallito il salvataggio della playlist:\n\nErrore:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Scala i controlli in modalità a schermo intero
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scala i filmati in modo fluido (modalità non-overlay)
 Settings…	MediaPlayer-Main		Impostazioni...
 Skip to the next track.	MediaPlayer-Main		Salta alla traccia successiva
@@ -113,7 +105,6 @@ Stop	MediaPlayer-Main		Ferma
 Stop playing.	MediaPlayer-Main		Ferma la riproduzione
 Stream settings	MediaPlayer-Main		Impostazioni dello stream
 Subtitles	MediaPlayer-Main		Sottotitoli
-Thanks	MediaPlayer-Main		Grazie
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Non è stato possibile aprire il file '%filename'.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Non c'è alcun decoder installato che gestisce questo formato, o il decoder ha un problema con la specifica versione del formato.
 Toggle mute.	MediaPlayer-Main		Disattiva audio.

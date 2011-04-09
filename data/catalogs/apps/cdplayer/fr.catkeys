@@ -2,7 +2,7 @@
 Audio CD	CDPlayer		CD Audio
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		Le lecteur de CD est vide
-CDPlayer	System name		LecteurCD
+CDPlayer	System name		Lecteur CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disque : %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Disque : --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Disque : 88:88 / 88:88

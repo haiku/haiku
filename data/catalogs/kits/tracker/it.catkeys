@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	498395429
+1	italian	x-vnd.Haiku-libtracker	2201969114
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld byte
@@ -169,7 +169,6 @@ Icon view	VolumeWindow		Icone
 Identify	ContainerWindow		Identifica
 Identify	InfoWindow		Identifica
 If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Se %ifYouDoAction la cartella config, Haiku potrebbe non comportarsi correttamente! Siete sicuri di volerlo fare? Per %toDoAction comunque la cartella config cliccare su \"Do it\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Se %ifYouDoAction la cartella home, Haiku potrebbe non comportarsi correttamente! Siete sicuri di volerlo fare? Per %toDoAction comunque la cartella home cliccare su \"Do it\".
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Se %ifYouDoAction i mime settings, Haiku potrebbe non comportarsi correttamente! Siete sicuri di volerlo fare? Per %toDoAction comunque i mime settings cliccare su \"Do it\".
 If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Se %ifYouDoAction la cartella config, Haiku potrebbe non comportarsi correttamente! Siete sicuri di volerlo fare? Per %toDoAction comunque la cartella config cliccare su \"Do it\".
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Se %ifYouDoAction la cartella system o il suo contenuto, non potrete far partire Haiku! Siete sicuri di volerlo fare? Per %toDoAction comunque la cartella system o il suo contenuto tenete premuto il tasto Shift e cliccate \"Do it\".

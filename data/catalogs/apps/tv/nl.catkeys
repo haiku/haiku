@@ -1,5 +1,4 @@
-1	dutch	x-vnd.Haiku.TV	2842169420
-About %1…	MainWin	Parameter %1 is the name of the application.	Over %1...
+1	dutch	x-vnd.Haiku.TV	3398834257
 Always on top	MainWin		Altijd op de voorgrond
 Channel	MainWin		Kanaal
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting tv
@@ -20,7 +19,6 @@ Scale to native size	MainWin		Schalen tot oorspronkelijke grootte
 Settings	MainWin		Instellingen
 Settings…	MainWin		Instellingen...
 TV	MainWin		TV
-\nRevision 	MainWin		\nRevisie
 force 544 x 576, display aspect 4:3	MainWin		Forceer 544 x 576, beeldverhouding 4:3
 force 704 x 576, display aspect 4:3	MainWin		Forceer 704 x 576, beeldverhouding 4:3
 pixel aspect ratio	MainWin		pixelverhouding

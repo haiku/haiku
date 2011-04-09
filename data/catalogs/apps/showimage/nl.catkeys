@@ -1,5 +1,4 @@
-1	dutch	x-vnd.Haiku-ShowImage	352425950
-About ShowImage…	Menus		Over ShowImage...
+1	dutch	x-vnd.Haiku-ShowImage	3102627336
 Browse	Menus		Doorzoeken
 Cancel	ClosePrompt		Annuleren
 Clear selection	Menus		Selectie wissen
@@ -42,7 +41,7 @@ Rotate clockwise	Menus		Roteer rechtsom
 Rotate counterclockwise	Menus		Roteer linksom
 Save as…	Menus		Opslaan als...
 Select all	Menus		Alles selecteren
-Selection Mode	Menus		Selectie-modus
+Selection mode	Menus		Selectie-modus
 Show caption in full screen mode	Menus		Toon opschrift in volledig-scherm-modus
 Slide delay	Menus		Dia-vertraging
 Slide show	Menus		Diashow

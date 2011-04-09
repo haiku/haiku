@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	3842515376
+1	french	x-vnd.Haiku-About	1001182835
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d Mio au total
 %d MiB used (%d%%)	AboutView		%d Mio utilisés (%d%%)
@@ -8,13 +8,39 @@
 ... and the many people making donations!\n\n	AboutView		… et nos nombreux donateurs!\n\n
 About this system	AboutWindow		À propos de ce système
 AboutSystem	System name		À propos du système
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. et son équipe de développement, pour avoir créé BeOS !\n\n
 Contributors:\n	AboutView		Contributeurs :\n
+Copyright © 1987, 1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987, 1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTous droits réservés.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Tous droits réservés.
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo	AboutView		Copyright © 1990-2003 Wada Laboratory, l'Université de Tokyo
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Tous droits réservés.
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Tous droits réservés.
+Copyright © 1995, 1998, 1999, 2000, 2001 by Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998, 1999, 2000, 2001 par Jef Poskanzer. Tous droits réservés.
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly et Mark Adler.
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Tous droits réservés.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Tous droits réservés.
+Copyright © 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998, 1999, 2000 Thai Open Source Software Center Ltd et Clark Cooper.
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Tous droits réservés.
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y. Takagi. Tous droits réservés.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project.  All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Projet Mesa3D. Tous droits réservés.
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tous droits réservés.
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
+Copyright © 2002, 2003, 2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002, 2003, 2004 Vivek Mohan. Tous droits réservés.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Tous droits réservés.
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, une division de Lucas Digital Ltd. LLD.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe et d'autres.
+Copyright © 2003-2006 by Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 par Intel Corporation. Tous droits réservés.
+Copyright © 2004-2005 by Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 par Intel Corporation. Tous droits réservés.
+Copyright © 2006-2007 by Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 par Intel Corporation. Tous droits réservés.
+Copyright © 2007-2009 by Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 par Marvell Semiconductor, Inc. Tous droits réservés.
 Current maintainers:\n	AboutView		Développeurs actuels :\n
 GCC %d Hybrid	AboutView		GCC %d Hybride
 Google & their Google Summer of Code program\n	AboutView		Google & leur programme « Summer of Code »\n
 Kernel:	AboutView		Noyau :
 License: 	AboutView		Licence : 
 Licenses: 	AboutView		Licences : 
+MIT license. All rights reserved.	AboutView		La licence MIT. Tous droits réservés.
 Memory:	AboutView		Mémoire :
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondateur du projet)\n\n
 Past maintainers:\n	AboutView		Précédents développeurs :\n

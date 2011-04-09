@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku.zip-o-matic	274748138
+1	portuguese	x-vnd.haiku.zip-o-matic	829498916
 %ld files added.	file:ZipOMaticWindow.cpp		%ld ficheiros adicionados.
 1 file added.	file:ZipOMaticWindow.cpp		1 ficheiro adicionado.
 Archive	file:ZipperThread.cpp		Arquivo
@@ -7,7 +7,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		T
 Continue	file:ZipOMaticWindow.cpp		Continuar
 Creating archive: %s	file:ZipOMaticWindow.cpp		A criar arquivo: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Quer pará-los?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Arraste os ficheiros que quer comprimir para esta zona.
 Error creating archive	file:ZipOMaticWindow.cpp		Erro ao criar arquivo
 Filename: %s	file:ZipOMaticWindow.cpp		Nome do ficheiro: %s
 Let them continue	file:ZipOMatic.cpp		Deixá-los continuar

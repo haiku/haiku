@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Shortcuts	4103143985
+1	belarusian	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		(Выберыце праграму, якая патрабуе выбара файлу)
 *Beep	ShortcutsWindow		*Гудок
 *InsertString \"Your Text Here\"	ShortcutsWindow		*УставіцьСтраку \"Ваш Тэкст\"
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*РухацьМышДа 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Множнае \"*РухацьМышДа 100% 0\" \"*КнопкаМышы 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*АдаслацьПаведамленне application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		Пра Гарачыя Клавішы
-About Shortcuts	ShortcutsWindow		Пра Гарачыя Клавішы
 Add new shortcut	ShortcutsWindow		Дадаць новую гарачую клавішу
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Прычапіць
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		МышУверх
 MoveMouse	ShortcutsSpec		РухацьМыш
 MoveMouseTo	ShortcutsSpec		РухацьМышДа
 Multi	ShortcutsSpec		Множнае
-OK	ShortcutsApp		ОК
 OK	ShortcutsWindow		ОК
 Oh no	ShortcutsWindow		О не!
 Open	ShortcutsWindow		Адкрыць...
@@ -52,5 +49,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Рэдактар 
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог разабраць ваш файл KeySet!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць ваш файл KeySet!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змагла захаваць вашу канфігурацыю (KeySet).
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Гарачыя клавішыn\nНа аснове SpicyKeys для BeOS, створанай Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Window

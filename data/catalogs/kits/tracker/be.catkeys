@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	498395429
+1	belarusian	x-vnd.Haiku-libtracker	2201969114
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld Б
 %Ld bytes	WidgetAttributeText		%Ld байтаў
@@ -169,7 +169,6 @@ Icon view	VolumeWindow		Від іконак
 Identify	ContainerWindow		Ідэнтыфікаваць
 Identify	InfoWindow		Ідэнтыфікаваць
 If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction каталог канфігурацый, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction каталог канфігурацый, клікніце \"Давай\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction хатні каталог, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction хатні каталог, клікніце \"Давай\".
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction наладкі mime, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction наладкі mime, клікніце \"Давай\".
 If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction каталог наладак, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction каталог наладак, клікніце \"Давай\".
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Калі вы %ifYouDoAction сістэмны каталог або яго змест, вы не зможаце запусціць Haiku! Вы ўпэўнены, што жадаеце працягваць? Каб %toDoAction сістэмны каталог або яго змест, трымайце Shift і клікайце \"Давай\".

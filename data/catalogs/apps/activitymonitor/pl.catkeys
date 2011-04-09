@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	2542187855
+1	polish	x-vnd.Haiku-ActivityMonitor	1437495034
 Add graph	ActivityWindow		Dodaj wykres
 Additional items	ActivityView		Dodatki
 Apps	DataSource		Aplikacje
@@ -19,7 +19,6 @@ P-faults	DataSource		P-błędy
 Page faults	DataSource		Błędy stronicowania
 Ports	DataSource		Porty
 Quit	ActivityWindow		Wyjdź
-Raw clipboard size	DataSource		Rozmiar schowka
 Receiving	DataSource		Otrzymano
 Remove graph	ActivityView		Usuń wykres
 Running applications	DataSource		Uruchomione aplikacje
@@ -32,7 +31,6 @@ Show legend	ActivityView		Pokaż legendę
 Swap	DataSource		Swap
 Swap space	DataSource		Przestrzeń wymiany
 Teams	DataSource		Zespoły
-Text clipboard size	DataSource		Rozmiar tekstu w schowku
 Threads	DataSource		Wątki
 Update time interval:	SettingsWindow		Częstotliwość odświeżania:
 Used memory	DataSource		Użyta pamięć

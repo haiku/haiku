@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	4103143985
+1	french	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*BougerLaSourisEn 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*EnvoyerMessage application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		À propos de Raccourcis
-About Shortcuts	ShortcutsWindow		À propos de Raccourcis
 Add new shortcut	ShortcutsWindow		Ajouter un nouveau raccourci
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Ajouter
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		SourisEnHaut
 MoveMouse	ShortcutsSpec		BougerSouris
 MoveMouseTo	ShortcutsSpec		BougerSourisEn
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Oh non!
 Open	ShortcutsWindow		Ouvrir
@@ -47,10 +44,9 @@ Save KeySet as…	ShortcutsWindow		Enregistrer le jeu de touches sous…
 Select	ShortcutsWindow		Sélectionner
 SendMessage	ShortcutsSpec		EnvoiMessage
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
-Shortcuts	System name		Raccourcis
+Shortcuts	System name		Raccourcis 
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu ouvrir le fichier de jeu de touches !
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu analyser votre fichier de jeu de touches !
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre fichier de jeu de touches !
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre jeu de touches.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Raccourcis\n\nBasé sur SpicyKeys pour BeOS, écrit par Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Fenêtre

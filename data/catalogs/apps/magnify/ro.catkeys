@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Magnify	2930742607
+1	romanian	x-vnd.Haiku-Magnify	3973246272
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
 Add a crosshair	Magnify-Main		Adaugă un reticul
 Copy image	Magnify-Main		Copiază imagine
@@ -13,10 +13,8 @@ Increase pixel size	Magnify-Main		Mărește dimensiune pixel
 Increase window size	Magnify-Main		Mărește dimensiune fereastră
 Info	Magnify-Main		Info
 Magnify help	Magnify-Help		Ajutor lupă
-Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Lupă!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nAcum cu mai multe caracteristici și recompilat pentru Haiku.
 Make square	Magnify-Main		Alcătuiește pătrat
 Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigare:\ntaste cu săgeți - mută selecția curentă (indicator rgb sau reticul)\n în jur de 1 pixel o dată\n opțiune-tastă cu săgeată - mută locația mausului cu 1 pixel o dată\n x marchează selecția - selecția curentă conține un „x”\n
-OK	Magnify-Main		Bine
 Remove a crosshair	Magnify-Main		Elimină un reticul
 Save image	Magnify-Main		Salvează imagine
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Dimensionare/Redimensionare:\nalcătuiește pătrat - configură lățimea și înălțimea la cea mai largă\n dintre ele alcătuind o imagine pătrată\n mărește/micșorează dimensiunea ferestrei - mărește sau micșorează dimensiunea\nferestrei cu 4 pixeli.\nnotă: această fereastră poate fi de asemenea redimensionată la orice mărime prin regiunea\nde redimensionare a ferestrei\nmărește/micșorează dimensiunea pixelului - mărește sau micșorează numărul\ndepixeli utilizați pentru a mări un pixel „real”. Intervalul este de la 1 la 16.\n

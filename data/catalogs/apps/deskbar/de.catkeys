@@ -1,15 +1,18 @@
-1	german	x-vnd.Be-TSKB	767695960
+1	german	x-vnd.Be-TSKB	1962084612
 <Be folder is empty>	BeMenu		<Be-Ordner ist leer>
 About Haiku	BeMenu		Über Haiku
 Always on top	PreferencesWindow		Immer im Vordergrund
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
 Applications	PreferencesWindow		Anwendungen
 Auto-raise	PreferencesWindow		Automatisch nach vorn holen
 Change time…	TimeView		Uhrzeit ändern…
 Clock	PreferencesWindow		Uhr
 Close all	WindowMenu		Alle schließen
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
 Deskbar	System name		Deskbar
 Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
 Deskbar preferences…	BeMenu		Deskbar-Einstellungen…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
 Edit menu…	PreferencesWindow		Menü bearbeiten…
 Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
 Find…	BeMenu		Suchen…
@@ -19,6 +22,7 @@ Menu	PreferencesWindow		Menü
 Mount	BeMenu		Einhängen
 No windows	WindowMenu		Keine Fenster
 Power off	BeMenu		Ausschalten
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Einstellungen
 Quit application	WindowMenu		Anwendung beenden
 Recent applications	BeMenu		Letzte Anwendungen
 Recent applications:	PreferencesWindow		Letzte Anwendungen:
