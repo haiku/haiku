@@ -683,8 +683,20 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 {
 	fFadeView = new FadeView(rect, B_TRANSLATE("General"), fSettings);
 
-	float labelWidth = be_plain_font->StringWidth(B_TRANSLATE("Turn off "
-		"screen")) + 20.0f;
+	float StringWidth1 = be_plain_font->StringWidth(B_TRANSLATE
+		("Start screensaver"));
+	float StringWidth2 = be_plain_font->StringWidth(B_TRANSLATE
+		("Turn off screen"));
+	float StringWidth3 = be_plain_font->StringWidth(B_TRANSLATE
+		("Password lock"));
+	
+	float labelWidth = StringWidth1;
+	if (labelWidth < StringWidth2)
+		labelWidth = StringWidth2;
+	if (labelWidth < StringWidth3)
+		labelWidth = StringWidth3;
+
+	labelWidth += 20.0f;
 
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
@@ -704,8 +716,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->SetLabel(fEnableCheckBox);
 	fFadeView->AddChild(box);
 
-	// Run Module
-	rect.left += radioButtonOffset;
+	// Start Screensaver
+	rect.left += radioButtonOffset + 6;
 	rect.top = fEnableCheckBox->Bounds().bottom + 8.0f;
 	rect.right = box->Bounds().right - 8;
 	BStringView* stringView = new BStringView(rect, NULL,
@@ -713,7 +725,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
-	rect.left += labelWidth;
+	rect.left += labelWidth - 4;
 	fRunSlider = new TimeSlider(rect, "RunSlider", kMsgRunSliderChanged,
 		kMsgRunSliderUpdate);
 	float width, height;
@@ -722,13 +734,14 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(fRunSlider);
 
 	// Turn Off
-	rect.left = 8;
+	rect.left = 10;
 	rect.OffsetBy(0, fRunSlider->Bounds().Height() + 4.0f);
 	fTurnOffCheckBox = new BCheckBox(rect, "TurnOffScreenCheckBox",
 		B_TRANSLATE("Turn off screen"), new BMessage(kMsgTurnOffCheckBox));
 	fTurnOffCheckBox->ResizeToPreferred();
 	box->AddChild(fTurnOffCheckBox);
 
+	rect.top += 3;
 	rect.left += radioButtonOffset + labelWidth;
 	fTurnOffSlider = new TimeSlider(rect, "TurnOffSlider",
 		kMsgTurnOffSliderChanged, kMsgTurnOffSliderUpdate);
@@ -751,13 +764,14 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(fTurnOffNotSupported);
 
 	// Password
-	rect.left = 8;
+	rect.left = 10;
 	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
 	fPasswordCheckBox = new BCheckBox(rect, "PasswordCheckbox",
 		B_TRANSLATE("Password lock"), new BMessage(kMsgPasswordCheckBox));
 	fPasswordCheckBox->ResizeToPreferred();
 	box->AddChild(fPasswordCheckBox);
 
+	rect.top += 3;
 	rect.left += radioButtonOffset + labelWidth;
 	fPasswordSlider = new TimeSlider(rect, "PasswordSlider",
 		kMsgPasswordSliderChanged, kMsgPasswordSliderUpdate);
@@ -777,7 +791,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 
 	float monitorHeight = 10 + textHeight * 3;
 	float monitorWidth = monitorHeight * 4 / 3;
-	rect.left = 15;
+	rect.left = 11;
 	rect.top = box->Bounds().Height() - 15 - monitorHeight;
 	rect.right = rect.left + monitorWidth;
 	rect.bottom = rect.top + monitorHeight;
