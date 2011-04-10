@@ -221,7 +221,7 @@ rule ExtractArchive directory : entries : archiveFile : grist
 	}
 
 	LOCATE on $(targets) = $(directory) ;
-	Depends $(targets) : $(directory) ;
+	Depends $(targets) : $(directory) $(archiveFile) ;
 	NoUpdate $(targets) ;
 
 	# one-time initialization for the main target (the directory)
@@ -235,8 +235,10 @@ rule ExtractArchive directory : entries : archiveFile : grist
 		Depends $(directory) : $(archiveFile) ;
 		switch $(archiveFile:S)
 		{
-			case .zip 	: ExtractZipArchive1 $(directory) : $(archiveFile) ;
-			case .tgz 	: ExtractTarArchive1 $(directory) : $(archiveFile) ;
+			case .zip 	: ExtractZipArchive1 $(targets) : $(directory)
+							$(archiveFile) ;
+			case .tgz 	: ExtractTarArchive1 $(targets) : $(directory)
+							$(archiveFile) ;
 			case * 		: Exit "ExtractArchive: Unhandled archive extension:
 							$(archiveFile:S)" ;
 		}
@@ -252,14 +254,14 @@ rule ExtractArchive directory : entries : archiveFile : grist
 
 actions ExtractZipArchive1
 {
-	mkdir -p $(1[1])
-	unzip -q -u -o -d $(1[1]) $(2)
+	mkdir -p $(2[1])
+	unzip -q -u -o -d $(2[1]) $(2[2])
 }
 
 actions ExtractTarArchive1
 {
-	mkdir -p $(1[1])
-	tar -C $(1[1]) -xf $(2)
+	mkdir -p $(2[1])
+	tar -C $(2[1]) -xf $(2[2])
 }
 
 actions ExtractArchiveDummy
