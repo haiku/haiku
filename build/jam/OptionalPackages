@@ -1026,8 +1026,8 @@ if [ IsOptionalHaikuImagePackageAdded Lua ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				lua-5.1.4-x86-gcc4-2010-10-31.zip
-				: $(baseURL)/lua-5.1.4-x86-gcc4-2010-10-31.zip
+				lua-5.1.4-x86-gcc4-2010-10-30.zip
+				: $(baseURL)/lua-5.1.4-x86-gcc4-2010-10-30.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
