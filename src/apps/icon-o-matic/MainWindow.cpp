@@ -281,7 +281,6 @@ MainWindow::MessageReceived(BMessage* message)
 			if (message->FindRef("directory", &ref) == B_OK
 				&& message->FindString("name", &name) == B_OK) {
 				// this message comes from the file panel
-				printf("file panel result\n");
 				BDirectory dir(&ref);
 				BEntry entry;
 				if (dir.InitCheck() >= B_OK
@@ -296,6 +295,7 @@ MainWindow::MessageReceived(BMessage* message)
 								fDocument->SetNativeSaver(saver);
 							else
 								fDocument->SetExportSaver(saver);
+							_UpdateWindowTitle();
 							fDocument->WriteUnlock();
 						}
 						saver->Save(fDocument);
@@ -305,24 +305,13 @@ MainWindow::MessageReceived(BMessage* message)
 // TODO: ...
 //				_SyncPanels(fSavePanel, fOpenPanel);
 			} else {
-				printf("configure file panel\n");
 				// configure the file panel
-				const char* saveText = NULL;
-				FileSaver* saver = dynamic_cast<FileSaver*>(
-					fDocument->NativeSaver());
-				if (saver != NULL)
-					saveText = saver->Ref()->name;
-
 				uint32 requestRefWhat = MSG_SAVE_AS;
 				bool isExportMode = message->what == MSG_EXPORT_AS
 					|| message->what == MSG_EXPORT;
-				if (isExportMode) {
+				if (isExportMode)
 					requestRefWhat = MSG_EXPORT_AS;
-					saver = dynamic_cast<FileSaver*>(
-						fDocument->ExportSaver());
-					if (saver != NULL && saver->Ref()->name != NULL)
-						saveText = saver->Ref()->name;
-				}
+				const char* saveText = _FileName(isExportMode);
 
 				BMessage requestRef(requestRefWhat);
 				if (saveText != NULL)
@@ -744,6 +733,8 @@ MainWindow::Open(const entry_ref& ref, bool append)
 	locker.Unlock();
 
 	SetIcon(icon);
+
+	_UpdateWindowTitle();
 }
 
 
@@ -1369,4 +1360,34 @@ MainWindow::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 }
 
 
+const char*
+MainWindow::_FileName(bool preferExporter) const
+{
+	FileSaver* saver1;
+	FileSaver* saver2;
+	if (preferExporter) {
+		saver1 = dynamic_cast<FileSaver*>(fDocument->ExportSaver());
+		saver2 = dynamic_cast<FileSaver*>(fDocument->NativeSaver());
+	} else {
+		saver1 = dynamic_cast<FileSaver*>(fDocument->NativeSaver());
+		saver2 = dynamic_cast<FileSaver*>(fDocument->ExportSaver());
+	}
+	const char* fileName = NULL;
+	if (saver1 != NULL)
+		fileName = saver1->Ref()->name;
+	if ((fileName == NULL || fileName[0] == '\0') && saver2 != NULL)
+		fileName = saver2->Ref()->name;
+	return fileName;
+}
+
+
+void
+MainWindow::_UpdateWindowTitle()
+{
+	const char* fileName = _FileName(false);
+	if (fileName != NULL)
+		SetTitle(fileName);
+	else
+		SetTitle(B_TRANSLATE_SYSTEM_NAME("Icon-O-Matic"));
+}
 

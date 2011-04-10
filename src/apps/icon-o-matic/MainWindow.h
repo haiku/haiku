@@ -90,6 +90,9 @@ private:
 			DocumentSaver*		_CreateSaver(const entry_ref& ref,
 									uint32 exportMode);
 
+			const char*			_FileName(bool preferExporter) const;
+			void				_UpdateWindowTitle();
+
 private:
 			IconEditorApp*		fApp;
 			Document*			fDocument;
