@@ -17,7 +17,9 @@ class BMenu;
 class BMenuBar;
 class BMenuItem;
 class CanvasView;
+class CurrentColor;
 class Document;
+class DocumentSaver;
 class IconObjectListView;
 class IconEditorApp;
 class IconView;
@@ -38,14 +40,16 @@ _USING_ICON_NAMESPACE
 class MultipleManipulatorState;
 
 enum {
-	MSG_SET_ICON	= 'sicn',
+	MSG_OPEN						= 'open',
+	MSG_APPEND						= 'apnd',
+	MSG_SAVE						= 'save',
+	MSG_EXPORT						= 'xprt',
 };
 
 
 class MainWindow : public BWindow, public Observer {
 public:
-								MainWindow(IconEditorApp* app,
-									Document* document,
+								MainWindow(BRect frame, IconEditorApp* app,
 									const BMessage* settings);
 	virtual						~MainWindow();
 
@@ -64,6 +68,11 @@ public:
 			void				MakeEmpty();
 			void				SetIcon(Icon* icon);
 
+			void				Open(const entry_ref& ref,
+									bool append = false);
+			void				Open(const BMessenger& externalObserver,
+									const uint8* data, size_t size);
+
 			void				StoreSettings(BMessage* archive);
 			void				RestoreSettings(const BMessage* archive);
 
@@ -74,10 +83,20 @@ private:
 
 			void				_ImproveScrollBarLayout(BView* target);
 
+			bool				_CheckSaveIcon(const BMessage* currentMessage);
+			void				_PickUpActionBeforeSave();
+
+			void				_MakeIconEmpty();
+			DocumentSaver*		_CreateSaver(const entry_ref& ref,
+									uint32 exportMode);
+
 private:
 			IconEditorApp*		fApp;
 			Document*			fDocument;
+			CurrentColor*		fCurrentColor;
 			Icon*				fIcon;
+
+			BMessage*			fMessageAfterSave;
 		
 			BMenu*				fPathMenu;
 			BMenu*				fStyleMenu;
@@ -88,6 +107,10 @@ private:
 		
 			BMenuItem*			fUndoMI;
 			BMenuItem*			fRedoMI;
+			BMenuItem*			fMouseFilterOffMI;
+			BMenuItem*			fMouseFilter64MI;
+			BMenuItem*			fMouseFilter32MI;
+			BMenuItem*			fMouseFilter16MI;
 		
 			CanvasView*			fCanvasView;
 			SwatchGroup*		fSwatchGroup;

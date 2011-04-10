@@ -12,6 +12,7 @@
 
 #include <AppDefs.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Message.h>
 #include <Window.h>
 
@@ -338,10 +339,10 @@ GradientControl::Draw(BRect updateRect)
 	bool isFocus = IsFocus() && Window()->IsActive();
 
 	rgb_color bg = LowColor();
+	rgb_color black;
 	rgb_color shadow;
 	rgb_color darkShadow;
 	rgb_color light;
-	rgb_color black;
 
 	if (fEnabled) {
 		shadow = tint_color(bg, B_DARKEN_1_TINT);
@@ -355,16 +356,25 @@ GradientControl::Draw(BRect updateRect)
 		black = tint_color(bg, B_DARKEN_2_TINT);
 	}
 
-	rgb_color focus = isFocus ? ui_color(B_KEYBOARD_NAVIGATION_COLOR)
-							  : black;
+	rgb_color focus = isFocus ? ui_color(B_KEYBOARD_NAVIGATION_COLOR) : black;
 
-	stroke_frame(this, b, shadow, shadow, light, light);
-	b.InsetBy(1.0, 1.0);
-	if (isFocus)
-		stroke_frame(this, b, focus, focus, focus, focus);
-	else
-		stroke_frame(this, b, darkShadow, darkShadow, bg, bg);
-	b.InsetBy(1.0, 1.0);
+	uint32 flags = 0;
+
+	if (be_control_look != NULL) {
+		if (!fEnabled)
+			flags |= BControlLook::B_DISABLED;
+		if (isFocus)
+			flags |= BControlLook::B_FOCUSED;
+		be_control_look->DrawTextControlBorder(this, b, updateRect, bg, flags);
+	} else {	
+		stroke_frame(this, b, shadow, shadow, light, light);
+		b.InsetBy(1.0, 1.0);
+		if (isFocus)
+			stroke_frame(this, b, focus, focus, focus, focus);
+		else
+			stroke_frame(this, b, darkShadow, darkShadow, bg, bg);
+		b.InsetBy(1.0, 1.0);
+	}
 
 //	DrawBitmapAsync(fGradientBitmap, b.LeftTop());
 //	Sync();
@@ -399,22 +409,30 @@ GradientControl::Draw(BRect updateRect)
 		if (i == fDropIndex)
 			SetLowColor(255, 0, 0, 255);
 
-		StrokeTriangle(markerPos, markerPos + leftBottom,
-			markerPos + rightBottom, B_SOLID_LOW);
-		if (fEnabled) {
-			SetHighColor(step->color);
+		if (be_control_look != NULL) {
+			// TODO: Drop indication!
+			BRect rect(markerPos.x + leftBottom.x, markerPos.y,
+				markerPos.x + rightBottom.x, markerPos.y + rightBottom.y);
+			be_control_look->DrawSliderTriangle(this, rect, updateRect, bg,
+				step->color, flags, B_HORIZONTAL);
 		} else {
-			rgb_color c = step->color;
-			c.red = (uint8)(((uint32)bg.red + (uint32)c.red) / 2);
-			c.green = (uint8)(((uint32)bg.green + (uint32)c.green) / 2);
-			c.blue = (uint8)(((uint32)bg.blue + (uint32)c.blue) / 2);
-			SetHighColor(c);
+			StrokeTriangle(markerPos, markerPos + leftBottom,
+				markerPos + rightBottom, B_SOLID_LOW);
+			if (fEnabled) {
+				SetHighColor(step->color);
+			} else {
+				rgb_color c = step->color;
+				c.red = (uint8)(((uint32)bg.red + (uint32)c.red) / 2);
+				c.green = (uint8)(((uint32)bg.green + (uint32)c.green) / 2);
+				c.blue = (uint8)(((uint32)bg.blue + (uint32)c.blue) / 2);
+				SetHighColor(c);
+			}
+			FillTriangle(markerPos + BPoint(0.0, 1.0),
+						 markerPos + leftBottom + BPoint(1.0, 0.0),
+						 markerPos + rightBottom + BPoint(-1.0, 0.0));
+			StrokeLine(markerPos + leftBottom + BPoint(0.0, 1.0),
+					   markerPos + rightBottom + BPoint(0.0, 1.0), B_SOLID_LOW);
 		}
-		FillTriangle(markerPos + BPoint(0.0, 1.0),
-					 markerPos + leftBottom + BPoint(1.0, 0.0),
-					 markerPos + rightBottom + BPoint(-1.0, 0.0));
-		StrokeLine(markerPos + leftBottom + BPoint(0.0, 1.0),
-				   markerPos + rightBottom + BPoint(0.0, 1.0), B_SOLID_LOW);
 	}
 }
 

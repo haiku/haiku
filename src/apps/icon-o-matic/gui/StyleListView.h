@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2011, Stephan Aßmus <superstippi@gmx.de>.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef STYLE_LIST_VIEW_H
 #define STYLE_LIST_VIEW_H
@@ -16,6 +13,7 @@
 class BMenu;
 class BMenuItem;
 class CommandStack;
+class CurrentColor;
 class Selection;
 class ShapeStyleListener;
 class StyleListItem;
@@ -30,13 +28,11 @@ _END_ICON_NAMESPACE
 _USING_ICON_NAMESPACE
 
 
-class StyleListView : public SimpleListView,
-					  public StyleContainerListener {
- public:
-								StyleListView(BRect frame,
-											 const char* name,
-											 BMessage* selectionMessage = NULL,
-											 BHandler* target = NULL);
+class StyleListView : public SimpleListView, public StyleContainerListener {
+public:
+								StyleListView(BRect frame, const char* name,
+									BMessage* selectionMessage = NULL,
+									BHandler* target = NULL);
 	virtual						~StyleListView();
 
 	// SimpleListView interface
@@ -48,9 +44,10 @@ class StyleListView : public SimpleListView,
 
 	virtual	void				MakeDragMessage(BMessage* message) const;
 
-	virtual	bool				AcceptDragMessage(const BMessage* message) const;
+	virtual	bool				AcceptDragMessage(
+									const BMessage* message) const;
 	virtual	void				SetDropTargetRect(const BMessage* message,
-												  BPoint where);
+									BPoint where);
 
 	virtual	void				MoveItems(BList& items, int32 toIndex);
 	virtual	void				CopyItems(BList& items, int32 toIndex);
@@ -70,18 +67,19 @@ class StyleListView : public SimpleListView,
 			void				SetStyleContainer(StyleContainer* container);
 			void				SetShapeContainer(ShapeContainer* container);
 			void				SetCommandStack(CommandStack* stack);
+			void				SetCurrentColor(CurrentColor* color);
 
 			void				SetCurrentShape(Shape* shape);
 			Shape*				CurrentShape() const
 									{ return fCurrentShape; }
 
- private:
+private:
 			bool				_AddStyle(Style* style, int32 index);
 			bool				_RemoveStyle(Style* style);
 
 			StyleListItem*		_ItemForStyle(Style* style) const;
 
-	friend class ShapeStyleListener;
+			friend class ShapeStyleListener;
 			void				_UpdateMarks();
 			void				_SetStyleMarked(Style* style, bool marked);
 			void				_UpdateMenu();
@@ -91,6 +89,7 @@ class StyleListView : public SimpleListView,
 			StyleContainer*		fStyleContainer;
 			ShapeContainer*		fShapeContainer;
 			CommandStack*		fCommandStack;
+			CurrentColor*		fCurrentColor;
 
 			Shape*				fCurrentShape;
 				// the style item will be marked that
@@ -104,5 +103,6 @@ class StyleListView : public SimpleListView,
 			BMenuItem*			fResetTransformationMI;
 			BMenuItem*			fRemoveMI;
 };
+
 
 #endif // STYLE_LIST_VIEW_H

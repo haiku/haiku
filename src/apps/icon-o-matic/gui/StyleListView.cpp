@@ -1,10 +1,8 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, 2011, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include "StyleListView.h"
 
@@ -255,6 +253,7 @@ StyleListView::StyleListView(BRect frame,
 	  fStyleContainer(NULL),
 	  fShapeContainer(NULL),
 	  fCommandStack(NULL),
+	  fCurrentColor(NULL),
 
 	  fCurrentShape(NULL),
 	  fShapeListener(new ShapeStyleListener(this)),
@@ -289,8 +288,16 @@ StyleListView::MessageReceived(BMessage* message)
 		case MSG_ADD: {
 			Style* style;
 			AddStylesCommand* command;
-			new_style(CurrentColor::Default()->Color(),
-					  fStyleContainer, &style, &command);
+			rgb_color color;
+			if (fCurrentColor != NULL)
+				color = fCurrentColor->Color();
+			else {
+				color.red = 0;
+				color.green = 0;
+				color.blue = 0;
+				color.alpha = 255;
+			}
+			new_style(color, fStyleContainer, &style, &command);
 			fCommandStack->Perform(command);
 			break;
 		}
@@ -670,6 +677,13 @@ void
 StyleListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
+}
+
+// SetCurrentColor
+void
+StyleListView::SetCurrentColor(CurrentColor* color)
+{
+	fCurrentColor = color;
 }
 
 // SetCurrentShape

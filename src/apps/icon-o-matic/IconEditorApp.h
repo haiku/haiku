@@ -11,23 +11,15 @@
 
 
 class BFilePanel;
-class Document;
-class DocumentSaver;
 class MainWindow;
 class SavePanel;
 
 
 enum {
 	MSG_NEW							= 'newi',
-
-	MSG_OPEN						= 'open',
-	MSG_APPEND						= 'apnd',
-
-	MSG_SAVE						= 'save',
 	MSG_SAVE_AS						= 'svas',
-
-	MSG_EXPORT						= 'xprt',
 	MSG_EXPORT_AS					= 'xpas',
+	MSG_WINDOW_CLOSED				= 'wndc',
 };
 
 
@@ -68,16 +60,7 @@ public:
 	// IconEditorApp
 
 private:
-			bool				_CheckSaveIcon(const BMessage* currentMessage);
-			void				_PickUpActionBeforeSave();
-
-			void				_MakeIconEmpty();
-			void				_Open(const entry_ref& ref,
-									  bool append = false);
-			void				_Open(const BMessenger& externalObserver,
-									  const uint8* data, size_t size);
-			DocumentSaver*		_CreateSaver(const entry_ref& ref,
-											 uint32 exportMode);
+			MainWindow*			_NewWindow();
 
 			void				_SyncPanels(BFilePanel* from,
 											BFilePanel* to);
@@ -85,12 +68,13 @@ private:
 			const char*			_LastFilePath(path_kind which);
 
 			void				_StoreSettings();
-			void				_RestoreSettings(BMessage& settings);
+			void				_RestoreSettings();
 			void				_InstallDocumentMimeType();
 
 private:
-			MainWindow*			fMainWindow;
-			Document*			fDocument;
+			int32				fWindowCount;
+			BMessage			fLastWindowSettings;
+			BRect				fLastWindowFrame;
 
 			BFilePanel*			fOpenPanel;
 			SavePanel*			fSavePanel;
@@ -98,8 +82,6 @@ private:
 			BString				fLastOpenPath;
 			BString				fLastSavePath;
 			BString				fLastExportPath;
-
-			BMessage*			fMessageAfterSave;
 };
 
 

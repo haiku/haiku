@@ -12,11 +12,7 @@
 
 #include <Alert.h>
 #include <Catalog.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
 #include <FilePanel.h>
-#include <fs_attr.h>
 #include <IconEditorProtocol.h>
 #include <Locale.h>
 #include <Message.h>
@@ -24,30 +20,10 @@
 
 #include "support_settings.h"
 
-#include "AttributeSaver.h"
 #include "AutoLocker.h"
-#include "BitmapExporter.h"
-#include "BitmapSetSaver.h"
-#include "CommandStack.h"
 #include "Defines.h"
-#include "Document.h"
-#include "FlatIconExporter.h"
-#include "FlatIconFormat.h"
-#include "FlatIconImporter.h"
-#include "Icon.h"
 #include "MainWindow.h"
-#include "MessageExporter.h"
-#include "MessageImporter.h"
-#include "MessengerSaver.h"
-#include "NativeSaver.h"
-#include "PathContainer.h"
-#include "RDefExporter.h"
 #include "SavePanel.h"
-#include "ShapeContainer.h"
-#include "SimpleFileSaver.h"
-#include "SourceExporter.h"
-#include "SVGExporter.h"
-#include "SVGImporter.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -60,33 +36,36 @@ static const char* kAppSig = "application/x-vnd.haiku-icon_o_matic";
 
 
 IconEditorApp::IconEditorApp()
-	: BApplication(kAppSig),
-	  fMainWindow(NULL),
-	  fDocument(new Document("test")),
+	:
+	BApplication(kAppSig),
+	fWindowCount(0),
+	fLastWindowFrame(50, 50, 900, 750),
 
-	  fOpenPanel(NULL),
-	  fSavePanel(NULL),
+	fOpenPanel(NULL),
+	fSavePanel(NULL),
 
-	  fLastOpenPath(""),
-	  fLastSavePath(""),
-	  fLastExportPath(""),
-
-	  fMessageAfterSave(NULL)
+	fLastOpenPath(""),
+	fLastSavePath(""),
+	fLastExportPath("")
 {
+	// create file panels
+	BMessenger messenger(this, this);
+	BMessage message(B_REFS_RECEIVED);
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL, B_FILE_NODE,
+		true, &message);
+
+	message.what = MSG_SAVE_AS;
+	fSavePanel = new SavePanel("save panel", &messenger, NULL, B_FILE_NODE
+		| B_DIRECTORY_NODE | B_SYMLINK_NODE, false, &message);
+
+	_RestoreSettings();
 }
 
 
 IconEditorApp::~IconEditorApp()
 {
-	// NOTE: it is important that the GUI has been deleted
-	// at this point, so that all the listener/observer
-	// stuff is properly detached
-	delete fDocument;
-
 	delete fOpenPanel;
 	delete fSavePanel;
-
-	delete fMessageAfterSave;
 }
 
 
@@ -96,14 +75,32 @@ IconEditorApp::~IconEditorApp()
 bool
 IconEditorApp::QuitRequested()
 {
-	if (!_CheckSaveIcon(CurrentMessage()))
+	// Run the QuitRequested() hook in each window's own thread. Otherwise
+	// the BAlert which a window shows when an icon is not saved will not
+	// repaint the window. (BAlerts check which thread is running Go() and
+	// will repaint windows when it's a BWindow.)
+	bool quit = true;
+	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
+		if (!window->Lock())
+			continue;
+		// Try to cast the window while the pointer must be valid.
+		MainWindow* mainWindow = dynamic_cast<MainWindow*>(window);
+		window->Unlock();
+		if (mainWindow == NULL)
+			continue;
+		BMessenger messenger(window, window);
+		BMessage reply;
+		if (messenger.SendMessage(B_QUIT_REQUESTED, &reply) != B_OK)
+			continue;
+		bool result;
+		if (reply.FindBool("result", &result) == B_OK && !result)
+			quit = false;
+	}
+
+	if (!quit)
 		return false;
 
 	_StoreSettings();
-
-	fMainWindow->Lock();
-	fMainWindow->Quit();
-	fMainWindow = NULL;
 
 	return true;
 }
@@ -114,7 +111,7 @@ IconEditorApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_NEW:
-			_MakeIconEmpty();
+			_NewWindow()->Show();
 			break;
 		case MSG_OPEN: {
 			BMessage openMessage(B_REFS_RECEIVED);
@@ -123,80 +120,18 @@ IconEditorApp::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_APPEND: {
+			MainWindow* window;
+			if (message->FindPointer("window", (void**)&window) != B_OK)
+				break;
 			BMessage openMessage(B_REFS_RECEIVED);
 			openMessage.AddBool("append", true);
+			openMessage.AddPointer("window", window);
 			fOpenPanel->SetMessage(&openMessage);
 			fOpenPanel->Show();
 			break;
 		}
-		case MSG_SAVE:
-		case MSG_EXPORT: {
-			DocumentSaver* saver;
-			if (message->what == MSG_SAVE)
-				saver = fDocument->NativeSaver();
-			else
-				saver = fDocument->ExportSaver();
-			if (saver != NULL) {
-				saver->Save(fDocument);
-				_PickUpActionBeforeSave();
-				break;
-			} // else fall through
-		}
-		case MSG_SAVE_AS:
-		case MSG_EXPORT_AS: {
-			int32 exportMode;
-			if (message->FindInt32("export mode", &exportMode) < B_OK)
-				exportMode = EXPORT_MODE_MESSAGE;
-			entry_ref ref;
-			const char* name;
-			if (message->FindRef("directory", &ref) == B_OK
-				&& message->FindString("name", &name) == B_OK) {
-				// this message comes from the file panel
-				BDirectory dir(&ref);
-				BEntry entry;
-				if (dir.InitCheck() >= B_OK
-					&& entry.SetTo(&dir, name, true) >= B_OK
-					&& entry.GetRef(&ref) >= B_OK) {
-
-					// create the document saver and remember it for later
-					DocumentSaver* saver = _CreateSaver(ref, exportMode);
-					if (saver) {
-						if (exportMode == EXPORT_MODE_MESSAGE)
-							fDocument->SetNativeSaver(saver);
-						else
-							fDocument->SetExportSaver(saver);
-						saver->Save(fDocument);
-						_PickUpActionBeforeSave();
-					}
-				}
-				_SyncPanels(fSavePanel, fOpenPanel);
-			} else {
-				printf("configure file panel\n");
-				// configure the file panel
-				const char* saveText = NULL;
-				FileSaver* saver = dynamic_cast<FileSaver*>(
-					fDocument->NativeSaver());
-				if (saver != NULL)
-					saveText = saver->Ref()->name;
-
-				bool isExportMode = message->what == MSG_EXPORT_AS
-					|| message->what == MSG_EXPORT;
-				if (isExportMode) {
-					saver = dynamic_cast<FileSaver*>(
-						fDocument->ExportSaver());
-					if (saver != NULL && saver->Ref()->name != NULL)
-						saveText = saver->Ref()->name;
-				}
-
-				fSavePanel->SetExportMode(isExportMode);
-//				fSavePanel->Refresh();
-				if (saveText != NULL)
-					fSavePanel->SetSaveText(saveText);
-				fSavePanel->Show();
-			}
-			break;
-		}
-		case B_EDIT_ICON_DATA: {
+		case B_EDIT_ICON_DATA:
+		{
 			BMessenger messenger;
 			if (message->FindMessenger("reply to", &messenger) < B_OK) {
 				// required
@@ -210,7 +145,41 @@ IconEditorApp::MessageReceived(BMessage* message)
 				data = NULL;
 				size = 0;
 			}
-			_Open(messenger, data, size);
+			MainWindow* window = _NewWindow();
+			window->Open(messenger, data, size);
+			window->Show();
+			break;
+		}
+		case MSG_SAVE_AS:
+		case MSG_EXPORT_AS:
+		{
+			BMessenger messenger;
+			if (message->FindMessenger("target", &messenger) != B_OK)
+				break;
+
+			fSavePanel->SetExportMode(message->what == MSG_EXPORT_AS);
+//			fSavePanel->Refresh();
+			const char* saveText;
+			if (message->FindString("save text", &saveText) == B_OK)
+				fSavePanel->SetSaveText(saveText);
+			fSavePanel->SetTarget(messenger);
+			fSavePanel->Show();
+			break;
+		}
+
+		case MSG_WINDOW_CLOSED:
+		{
+			fWindowCount--;
+			if (fWindowCount == 0)
+				PostMessage(B_QUIT_REQUESTED);
+			BMessage settings;
+			if (message->FindMessage("settings", &settings) == B_OK)
+				fLastWindowSettings = settings;
+			BRect frame;
+			if (message->FindRect("window frame", &frame) == B_OK) {
+				fLastWindowFrame = frame;
+				fLastWindowFrame.OffsetBy(-10, -10);
+			}
 			break;
 		}
 
@@ -224,22 +193,9 @@ IconEditorApp::MessageReceived(BMessage* message)
 void
 IconEditorApp::ReadyToRun()
 {
-	// create file panels
-	BMessenger messenger(this, this);
-	BMessage message(B_REFS_RECEIVED);
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL, B_FILE_NODE,
-		true, &message);
-
-	message.what = MSG_SAVE_AS;
-	fSavePanel = new SavePanel("save panel", &messenger, NULL,
-		B_FILE_NODE | B_DIRECTORY_NODE | B_SYMLINK_NODE, false, &message);
-
 	// create main window
-	BMessage settings('stns');
-	_RestoreSettings(settings);
-
-	fMainWindow = new MainWindow(this, fDocument, &settings);
-	fMainWindow->Show();
+	if (fWindowCount == 0)
+		_NewWindow()->Show();
 
 	_InstallDocumentMimeType();
 }
@@ -248,15 +204,28 @@ IconEditorApp::ReadyToRun()
 void
 IconEditorApp::RefsReceived(BMessage* message)
 {
-	// TODO: multiple documents (iterate over refs)
 	bool append;
 	if (message->FindBool("append", &append) < B_OK)
 		append = false;
 	entry_ref ref;
-	if (message->FindRef("refs", &ref) == B_OK)
-		_Open(ref, append);
+	if (append) {
+		MainWindow* window;
+		if (message->FindPointer("window", (void**)&window) != B_OK)
+			return;
+		if (!window->Lock())
+			return;
+		for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++)
+			window->Open(ref, true);
+		window->Unlock();
+	} else {
+		for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
+			MainWindow* window = _NewWindow();
+			window->Open(ref, false);
+			window->Show();
+		}
+	}
 
-	if (fOpenPanel && fSavePanel)
+	if (fOpenPanel != NULL && fSavePanel != NULL)
 		_SyncPanels(fOpenPanel, fSavePanel);
 }
 
@@ -267,357 +236,29 @@ IconEditorApp::ArgvReceived(int32 argc, char** argv)
 	if (argc < 2)
 		return;
 
-	// TODO: multiple documents (iterate over argv)
 	entry_ref ref;
-	if (get_ref_for_path(argv[1], &ref) == B_OK)
-		_Open(ref);
+
+	for (int32 i = 1; i < argc; i++) {
+		if (get_ref_for_path(argv[i], &ref) == B_OK) {
+		 	MainWindow* window = _NewWindow();
+			window->Open(ref);
+			window->Show();
+		}
+	}
 }
 
 
 // #pragma mark -
 
 
-bool
-IconEditorApp::_CheckSaveIcon(const BMessage* currentMessage)
+MainWindow*
+IconEditorApp::_NewWindow()
 {
-	if (fDocument->IsEmpty() || fDocument->CommandStack()->IsSaved())
-		return true;
-
-	BAlert* alert = new BAlert("save", 
-		B_TRANSLATE("Save changes to current icon?"), B_TRANSLATE("Discard"),
-		 B_TRANSLATE("Cancel"), B_TRANSLATE("Save"));
-	int32 choice = alert->Go();
-	switch (choice) {
-		case 0:
-			// discard
-			return true;
-		case 1:
-			// cancel
-			return false;
-		case 2:
-		default:
-			// cancel (save first) but pick what we were doing before
-			PostMessage(MSG_SAVE);
-			if (currentMessage) {
-				delete fMessageAfterSave;
-				fMessageAfterSave = new BMessage(*currentMessage);
-			}
-			return false;
-	}
-}
-
-
-void
-IconEditorApp::_PickUpActionBeforeSave()
-{
-	if (fDocument->WriteLock()) {
-		fDocument->CommandStack()->Save();
-		fDocument->WriteUnlock();
-	}
-
-	if (fMessageAfterSave == NULL)
-		return;
-
-	PostMessage(fMessageAfterSave);
-	delete fMessageAfterSave;
-	fMessageAfterSave = NULL;
-}
-
-
-// #pragma mark -
-
-
-void
-IconEditorApp::_MakeIconEmpty()
-{
-	if (!_CheckSaveIcon(CurrentMessage()))
-		return;
-
-	bool mainWindowLocked = fMainWindow && fMainWindow->Lock();
-
-	AutoWriteLocker locker(fDocument);
-
-	if (fMainWindow)
-		fMainWindow->MakeEmpty();
-
-	fDocument->MakeEmpty();
-
-	locker.Unlock();
-
-	if (mainWindowLocked)
-		fMainWindow->Unlock();
-}
-
-
-void
-IconEditorApp::_Open(const entry_ref& ref, bool append)
-{
-	if (!_CheckSaveIcon(CurrentMessage()))
-		return;
-
-	BFile file(&ref, B_READ_ONLY);
-	if (file.InitCheck() < B_OK)
-		return;
-
-	Icon* icon;
-	if (append)
-		icon = new (nothrow) Icon(*fDocument->Icon());
-	else
-		icon = new (nothrow) Icon();
-
-	if (!icon)
-		return;
-
-	enum {
-		REF_NONE = 0,
-		REF_MESSAGE,
-		REF_FLAT,
-		REF_FLAT_ATTR,
-		REF_SVG
-	};
-	uint32 refMode = REF_NONE;
-
-	// try different file types
-	FlatIconImporter flatImporter;
-	status_t ret = flatImporter.Import(icon, &file);
-	if (ret >= B_OK) {
-		refMode = REF_FLAT;
-	} else {
-		file.Seek(0, SEEK_SET);
-		MessageImporter msgImporter;
-		ret = msgImporter.Import(icon, &file);
-		if (ret >= B_OK) {
-			refMode = REF_MESSAGE;
-		} else {
-			file.Seek(0, SEEK_SET);
-			SVGImporter svgImporter;
-			ret = svgImporter.Import(icon, &ref);
-			if (ret >= B_OK) {
-				refMode = REF_SVG;
-			} else {
-				// fall back to flat icon format but use the icon attribute
-				ret = B_OK;
-				attr_info attrInfo;
-				if (file.GetAttrInfo(kVectorAttrNodeName, &attrInfo) == B_OK) {
-					if (attrInfo.type != B_VECTOR_ICON_TYPE)
-						ret = B_ERROR;
-					// If the attribute is there, we must succeed in reading
-					// an icon! Otherwise we may overwrite an existing icon
-					// when the user saves.
-					uint8* buffer = NULL;
-					if (ret == B_OK) {
-						buffer = new(nothrow) uint8[attrInfo.size];
-						if (buffer == NULL)
-							ret = B_NO_MEMORY;
-					}
-					if (ret == B_OK) {
-						ssize_t bytesRead = file.ReadAttr(kVectorAttrNodeName,
-							B_VECTOR_ICON_TYPE, 0, buffer, attrInfo.size);
-						if (bytesRead != (ssize_t)attrInfo.size) {
-							ret = bytesRead < 0 ? (status_t)bytesRead
-								: B_IO_ERROR;
-						}
-					}
-					if (ret == B_OK) {
-						ret = flatImporter.Import(icon, buffer, attrInfo.size);
-						if (ret == B_OK)
-							refMode = REF_FLAT_ATTR;
-					}
-
-					delete[] buffer;
-				} else {
-					// If there is no icon attribute, simply fall back
-					// to creating an icon for this file. TODO: We may or may
-					// not want to display an alert asking the user if that is
-					// what he wants to do.
-					refMode = REF_FLAT_ATTR;
-				}
-			}
-		}
-	}
-
-	if (ret < B_OK) {
-		// inform user of failure at this point
-		BString helper(B_TRANSLATE("Opening the document failed!"));
-		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
-		BAlert* alert = new BAlert(
-			B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
-			helper.String(), 
-			B_TRANSLATE_WITH_CONTEXT("Bummer", 
-				"Cancel button - error alert"),	
-			NULL, NULL);
-		// launch alert asynchronously
-		alert->Go(NULL);
-
-		delete icon;
-		return;
-	}
-
-	// keep the mainwindow locked while switching icons
-	bool mainWindowLocked = fMainWindow && fMainWindow->Lock();
-
-	AutoWriteLocker locker(fDocument);
-
-	if (mainWindowLocked)
-		fMainWindow->SetIcon(NULL);
-
-	// incorporate the loaded icon into the document
-	// (either replace it or append to it)
-	fDocument->MakeEmpty(!append);
-		// if append, the document savers are preserved
-	fDocument->SetIcon(icon);
-	if (!append) {
-		// document got replaced, but we have at
-		// least one ref already
-		switch (refMode) {
-			case REF_MESSAGE:
-				fDocument->SetNativeSaver(new NativeSaver(ref));
-				break;
-			case REF_FLAT:
-				fDocument->SetExportSaver(
-					new SimpleFileSaver(new FlatIconExporter(), ref));
-				break;
-			case REF_FLAT_ATTR:
-				fDocument->SetNativeSaver(
-					new AttributeSaver(ref, kVectorAttrNodeName));
-				break;
-			case REF_SVG:
-				fDocument->SetExportSaver(
-					new SimpleFileSaver(new SVGExporter(), ref));
-				break;
-		}
-	}
-
-	locker.Unlock();
-
-	if (mainWindowLocked) {
-		fMainWindow->Unlock();
-		// cause the mainwindow to adopt icon in
-		// it's own thread
-		fMainWindow->PostMessage(MSG_SET_ICON);
-	}
-}
-
-
-void
-IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
-	size_t size)
-{
-	if (!_CheckSaveIcon(CurrentMessage()))
-		return;
-
-	if (!externalObserver.IsValid())
-		return;
-
-	Icon* icon = new (nothrow) Icon();
-	if (!icon)
-		return;
-
-	if (data && size > 0) {
-		// try to open the icon from the provided data
-		FlatIconImporter flatImporter;
-		status_t ret = flatImporter.Import(icon, const_cast<uint8*>(data),
-			size);
-			// NOTE: the const_cast is a bit ugly, but no harm is done
-			// the reason is that the LittleEndianBuffer knows read and write
-			// mode, in this case it is used read-only, and it does not assume
-			// ownership of the buffer
-
-		if (ret < B_OK) {
-			// inform user of failure at this point
-			BString helper(B_TRANSLATE("Opening the icon failed!"));
-			helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
-			BAlert* alert = new BAlert(
-				B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
-				helper.String(), 
-				B_TRANSLATE_WITH_CONTEXT("Bummer", 
-					"Cancel button - error alert"),	
-				NULL, NULL);
-			// launch alert asynchronously
-			alert->Go(NULL);
-
-			delete icon;
-			return;
-		}
-	}
-
-	// keep the mainwindow locked while switching icons
-	bool mainWindowLocked = fMainWindow && fMainWindow->Lock();
-
-	AutoWriteLocker locker(fDocument);
-
-	if (mainWindowLocked)
-		fMainWindow->SetIcon(NULL);
-
-	// incorporate the loaded icon into the document
-	// (either replace it or append to it)
-	fDocument->MakeEmpty();
-	fDocument->SetIcon(icon);
-
-	fDocument->SetNativeSaver(new MessengerSaver(externalObserver));
-
-	locker.Unlock();
-
-	if (mainWindowLocked) {
-		fMainWindow->Unlock();
-		// cause the mainwindow to adopt icon in
-		// it's own thread
-		fMainWindow->PostMessage(MSG_SET_ICON);
-	}
-}
-
-
-DocumentSaver*
-IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
-{
-	DocumentSaver* saver;
-
-	switch (exportMode) {
-		case EXPORT_MODE_FLAT_ICON:
-			saver = new SimpleFileSaver(new FlatIconExporter(), ref);
-			break;
-
-		case EXPORT_MODE_ICON_ATTR:
-		case EXPORT_MODE_ICON_MIME_ATTR: {
-			const char* attrName
-				= exportMode == EXPORT_MODE_ICON_ATTR ?
-					kVectorAttrNodeName : kVectorAttrMimeName;
-			saver = new AttributeSaver(ref, attrName);
-			break;
-		}
-
-		case EXPORT_MODE_ICON_RDEF:
-			saver = new SimpleFileSaver(new RDefExporter(), ref);
-			break;
-		case EXPORT_MODE_ICON_SOURCE:
-			saver = new SimpleFileSaver(new SourceExporter(), ref);
-			break;
-
-		case EXPORT_MODE_BITMAP_16:
-			saver = new SimpleFileSaver(new BitmapExporter(16), ref);
-			break;
-		case EXPORT_MODE_BITMAP_32:
-			saver = new SimpleFileSaver(new BitmapExporter(32), ref);
-			break;
-		case EXPORT_MODE_BITMAP_64:
-			saver = new SimpleFileSaver(new BitmapExporter(64), ref);
-			break;
-
-		case EXPORT_MODE_BITMAP_SET:
-			saver = new BitmapSetSaver(ref);
-			break;
-
-		case EXPORT_MODE_SVG:
-			saver = new SimpleFileSaver(new SVGExporter(), ref);
-			break;
-
-		case EXPORT_MODE_MESSAGE:
-		default:
-			saver = new NativeSaver(ref);
-			break;
-	}
-
-	return saver;
+	fLastWindowFrame.OffsetBy(10, 10);
+	MainWindow* window = new MainWindow(fLastWindowFrame, this,
+		&fLastWindowSettings);
+	fWindowCount++;
+	return window;
 }
 
 
@@ -687,19 +328,27 @@ IconEditorApp::_StoreSettings()
 {
 	BMessage settings('stns');
 
-	fMainWindow->StoreSettings(&settings);
-
-	if (settings.ReplaceInt32("export mode", fSavePanel->ExportMode()) < B_OK)
-		settings.AddInt32("export mode", fSavePanel->ExportMode());
+	settings.AddRect("window frame", fLastWindowFrame);
+	settings.AddMessage("window settings", &fLastWindowSettings);
+	settings.AddInt32("export mode", fSavePanel->ExportMode());
 
 	save_settings(&settings, "Icon-O-Matic");
 }
 
 
 void
-IconEditorApp::_RestoreSettings(BMessage& settings)
+IconEditorApp::_RestoreSettings()
 {
+	BMessage settings('stns');
 	load_settings(&settings, "Icon-O-Matic");
+
+	BRect frame;
+	if (settings.FindRect("window frame", &frame) == B_OK) {
+		fLastWindowFrame = frame;
+		// Compensate offset for next window...
+		fLastWindowFrame.OffsetBy(-10, -10);
+	}
+	settings.FindMessage("window settings", &fLastWindowSettings);
 
 	int32 mode;
 	if (settings.FindInt32("export mode", &mode) >= B_OK)
@@ -765,3 +414,4 @@ IconEditorApp::_InstallDocumentMimeType()
 			parseError.String());
 	}
 }
+

@@ -52,7 +52,9 @@ SwatchGroup::SwatchGroup(BRect frame)
 	float v = 1.0;
 	rgb_color color;
 	color.alpha = 255;
-	float r, g, b;
+	float r = 0.0f;
+	float g = 0.0f;
+	float b = 0.0f;
 	for (int32 i = 0; i < 20; i++) {
 		if (i < 10) {
 			h = ((float)i / 9.0) * 6.0;
@@ -295,7 +297,9 @@ SwatchGroup::_SetColor(rgb_color color)
 void
 SwatchGroup::_SetColor(float h, float s, float v, uint8 a)
 {
-	float r, g, b;
+	float r = 0.0f;
+	float g = 0.0f;
+	float b = 0.0f;
 	HSV_to_RGB(h, s, v, r, g, b);
 
 	rgb_color color;
