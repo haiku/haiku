@@ -944,8 +944,8 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(B_TRANSLATE("The copyright to the Haiku code is "
 		"property of Haiku, Inc. or of the respective authors where expressly "
-		"noted in the source. Haiku and the Haiku logo are trademarks of "
-		"Haiku, Inc."
+		"noted in the source. Haiku and the HAIKU logo® are "
+		"(registered) trademarks of Haiku, Inc."
 		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
@@ -1303,7 +1303,7 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("AntiGrain Geometry")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2006 Maxim "
 			"Shemanarev (McSeem)."))
-		.SetLicenses("Anti-Grain Geometry", B_TRANSLATE("BSD (3-clause)"), 
+		.SetLicenses("Anti-Grain Geometry", B_TRANSLATE("BSD (3-clause)"),
 			"GPC", NULL)
 		.SetURL("http://www.antigrain.com"));
 
