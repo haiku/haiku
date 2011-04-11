@@ -12,6 +12,7 @@
 #include <Bitmap.h>
 #include <ListItem.h>
 #include <Path.h>
+#include <String.h>
 
 
 class TeamListItem : public BListItem  {
@@ -26,7 +27,9 @@ public:
 			const team_info*	GetInfo();
 			const BBitmap*		LargeIcon() { return &fLargeIcon; };
 			const BPath*		Path() { return &fPath; };
+			const BString*		AppSignature() { return &fAppSignature; };
 			bool				IsSystemServer();
+			bool				IsApplication();
 
 			bool				Found() const { return fFound; }
 			void				SetFound(bool found) { fFound = found; }
@@ -37,6 +40,7 @@ private:
 			team_info			fInfo;
 			BBitmap				fIcon, fLargeIcon;
 			BPath				fPath;
+			BString				fAppSignature;
 			bool				fFound;
 };
 

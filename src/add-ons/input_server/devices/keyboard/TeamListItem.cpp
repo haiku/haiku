@@ -13,6 +13,7 @@
 #include <FindDirectory.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <Roster.h>
 #include <View.h>
 
 
@@ -34,6 +35,10 @@ TeamListItem::TeamListItem(team_info &tinfo)
 		nodeInfo.GetTrackerIcon(&fIcon, B_MINI_ICON);
 		nodeInfo.GetTrackerIcon(&fLargeIcon, B_LARGE_ICON);
 	}
+
+	app_info appInfo;
+	if (be_roster->GetRunningAppInfo(fInfo.team, &appInfo) == B_OK)
+		fAppSignature = appInfo.signature;
 }
 
 
@@ -144,4 +149,14 @@ TeamListItem::IsSystemServer()
 		return true;
 	
 	return false;		
+}
+
+
+bool
+TeamListItem::IsApplication()
+{
+	if (fAppSignature.Length() > 0)
+		return true;
+	else
+		return false;
 }

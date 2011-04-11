@@ -39,6 +39,7 @@ private:
 			BListView*		fListView;
 			BButton*		fCancelButton;
 			BButton*		fKillButton;
+			BButton*		fQuitButton;
 			BButton*		fRestartButton;
 			TeamDescriptionView*		fDescriptionView;
 };

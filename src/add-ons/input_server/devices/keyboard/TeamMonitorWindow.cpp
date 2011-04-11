@@ -59,6 +59,7 @@ static const uint32 kMsgLaunchTerminal = 'TMlt';
 const uint32 TM_CANCEL = 'TMca';
 const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
+const uint32 TM_QUIT_APPLICATION = 'TMqa';
 const uint32 TM_RESTART_DESKTOP = 'TMrd';
 const uint32 TM_SELECTED_TEAM = 'TMst';
 
@@ -96,6 +97,11 @@ TeamMonitorWindow::TeamMonitorWindow()
 		new BMessage(TM_KILL_APPLICATION));
 	groupView->AddChild(fKillButton);
 	fKillButton->SetEnabled(false);
+	
+	fQuitButton = new BButton("quit", "Quit Application",
+		new BMessage(TM_QUIT_APPLICATION));
+	groupView->AddChild(fQuitButton);
+	fQuitButton->SetEnabled(false);
 
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
@@ -195,6 +201,18 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		case TM_QUIT_APPLICATION:
+		{
+			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(
+				fListView->CurrentSelection()));
+			if (item != NULL) {
+				BMessenger messenger(item->AppSignature()->String(),
+					item->GetInfo()->team);
+				messenger.SendMessage(B_QUIT_REQUESTED);
+				UpdateList();
+			}
+			break;
+		}
 		case TM_RESTART_DESKTOP:
 		{
 			if (!be_roster->IsRunning(kTrackerSignature))
@@ -211,6 +229,7 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 			TeamListItem* item = (TeamListItem*)fListView->ItemAt(
 				fListView->CurrentSelection());
 			fDescriptionView->SetItem(item);
+			fQuitButton->SetEnabled(item && item->IsApplication());
 			break;
 		}
 		case TM_CANCEL:
@@ -273,6 +292,7 @@ TeamMonitorWindow::UpdateList()
 			if (item == fDescriptionView->Item()) {
 				fDescriptionView->SetItem(NULL);
 				fKillButton->SetEnabled(false);
+				fQuitButton->SetEnabled(false);
 			}
 
 			delete fListView->RemoveItem(i);
