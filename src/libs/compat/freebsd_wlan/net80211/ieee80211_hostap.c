@@ -480,7 +480,7 @@ hostap_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 	struct ieee80211_frame *wh;
 	struct ieee80211_key *key;
 	struct ether_header *eh;
-	int hdrspace, need_tap;
+	int hdrspace, need_tap = 1;	/* mbuf need to be tapped. */
 	uint8_t dir, type, subtype, qos;
 	uint8_t *bssid;
 	uint16_t rxseq;
@@ -505,7 +505,6 @@ hostap_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 	KASSERT(ni != NULL, ("null node"));
 	ni->ni_inact = ni->ni_inact_reload;
 
-	need_tap = 1;			/* mbuf need to be tapped. */
 	type = -1;			/* undefined */
 
 	if (m->m_pkthdr.len < sizeof(struct ieee80211_frame_min)) {
@@ -884,6 +883,14 @@ hostap_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 			wh = mtod(m, struct ieee80211_frame *);
 			wh->i_fc[1] &= ~IEEE80211_FC1_WEP;
 		}
+		/*
+		 * Pass the packet to radiotap before calling iv_recv_mgmt().
+		 * Otherwise iv_recv_mgmt() might pass another packet to
+		 * radiotap, resulting in out of order packet captures.
+		 */
+		if (ieee80211_radiotap_active_vap(vap))
+			ieee80211_radiotap_rx(vap, m);
+		need_tap = 0;
 		vap->iv_recv_mgmt(ni, m, subtype, rssi, nf);
 		goto out;
 
@@ -1252,7 +1259,7 @@ ieee80211_parse_wpa(struct ieee80211vap *vap, const uint8_t *frm,
 		return IEEE80211_REASON_IE_INVALID;
 	}
 	frm += 6, len -= 4;		/* NB: len is payload only */
-	/* NB: iswapoui already validated the OUI and type */
+	/* NB: iswpaoui already validated the OUI and type */
 	w = LE_READ_2(frm);
 	if (w != WPA_VERSION) {
 		IEEE80211_DISCARD_IE(vap,

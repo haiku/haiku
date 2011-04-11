@@ -60,6 +60,7 @@ __FBSDID("$FreeBSD$");
 #ifdef IEEE80211_SUPPORT_SUPERG
 #include <net80211/ieee80211_superg.h>
 #endif
+#include <net80211/ieee80211_ratectl.h>
 
 #define	IEEE80211_RATE2MBS(r)	(((r) & IEEE80211_RATE_VAL) / 2)
 
@@ -141,6 +142,8 @@ sta_beacon_miss(struct ieee80211vap *vap)
 			vap->iv_bss->ni_essid, vap->iv_bss->ni_esslen);
 		return;
 	}
+
+	callout_stop(&vap->iv_swbmiss);
 	vap->iv_bmiss_count = 0;
 	vap->iv_stats.is_beacon_miss++;
 	if (vap->iv_roaming == IEEE80211_ROAMING_AUTO) {
@@ -517,7 +520,7 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 	struct ieee80211_frame *wh;
 	struct ieee80211_key *key;
 	struct ether_header *eh;
-	int hdrspace, need_tap;
+	int hdrspace, need_tap = 1;	/* mbuf need to be tapped. */
 	uint8_t dir, type, subtype, qos;
 	uint8_t *bssid;
 	uint16_t rxseq;
@@ -542,7 +545,6 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 	KASSERT(ni != NULL, ("null node"));
 	ni->ni_inact = ni->ni_inact_reload;
 
-	need_tap = 1;			/* mbuf need to be tapped. */
 	type = -1;			/* undefined */
 
 	if (m->m_pkthdr.len < sizeof(struct ieee80211_frame_min)) {
@@ -583,7 +585,7 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 		}
 		IEEE80211_RSSI_LPF(ni->ni_avgrssi, rssi);
 		ni->ni_noise = nf;
-		if (HAS_SEQ(type)) {
+		if (HAS_SEQ(type) && !IEEE80211_IS_MULTICAST(wh->i_addr1)) {
 			uint8_t tid = ieee80211_gettid(wh);
 			if (IEEE80211_QOS_HAS_SEQ(wh) &&
 			    TID_TO_WME_AC(tid) >= WME_AC_VI)
@@ -759,7 +761,7 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m, int rssi, int nf)
 
 		/* copy to listener after decrypt */
 		if (ieee80211_radiotap_active_vap(vap))
-			ieee80211_radiotap_tx(vap, m);
+			ieee80211_radiotap_rx(vap, m);
 		need_tap = 0;
 
 		/*
@@ -1595,6 +1597,7 @@ sta_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 			     IEEE80211_F_JOIN | IEEE80211_F_DOBRS);
 			ieee80211_setup_basic_htrates(ni, htinfo);
 			ieee80211_node_setuptxparms(ni);
+			ieee80211_ratectl_node_init(ni);
 		} else {
 #ifdef IEEE80211_SUPPORT_SUPERG
 			if (IEEE80211_ATH_CAP(vap, ni, IEEE80211_NODE_ATH))

@@ -162,6 +162,16 @@ typedef struct mtx ieee80211_ageq_lock_t;
 #define	IEEE80211_AGEQ_UNLOCK(_aq)	mtx_unlock(&(_aq)->aq_lock)
 
 /*
+ * Scan table definitions.
+ */
+typedef struct mtx ieee80211_scan_table_lock_t;
+#define	IEEE80211_SCAN_TABLE_LOCK_INIT(_st, _name) \
+	mtx_init(&(_st)->st_lock, _name, "802.11 scan table", MTX_DEF)
+#define	IEEE80211_SCAN_TABLE_LOCK_DESTROY(_st)	mtx_destroy(&(_st)->st_lock)
+#define	IEEE80211_SCAN_TABLE_LOCK(_st)		mtx_lock(&(_st)->st_lock)
+#define	IEEE80211_SCAN_TABLE_UNLOCK(_st)	mtx_unlock(&(_st)->st_lock)
+
+/*
  * Node reference counting definitions.
  *
  * ieee80211_node_initref	initialize the reference count to 1
@@ -310,6 +320,23 @@ TEXT_SET(auth_set, name##_modevent)
 void	ieee80211_scan_sta_init(void);
 void	ieee80211_scan_sta_uninit(void);
 
+
+/*
+ * Rate control modules provide tx rate control support.
+ */
+#define	IEEE80211_RATECTL_MODULE(alg, version)				\
+	_IEEE80211_POLICY_MODULE(ratectl, alg, version);		\
+
+#define	IEEE80211_RATECTL_ALG(name, alg, v)				\
+static void								\
+alg##_modevent(int type)						\
+{									\
+	if (type == MOD_LOAD)						\
+		ieee80211_ratectl_register(alg, &v);			\
+	else								\
+		ieee80211_ratectl_unregister(alg);			\
+}									\
+TEXT_SET(ratectl##_set, alg##_modevent)
 
 struct ieee80211req;
 typedef int ieee80211_ioctl_getfunc(struct ieee80211vap *,

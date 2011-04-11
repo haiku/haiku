@@ -42,7 +42,10 @@ KernelStaticLibrary libfreebsd_wlan.a :
 	ieee80211_power.c
 	ieee80211_proto.c
 	ieee80211_radiotap.c
+	ieee80211_ratectl.c
+	ieee80211_ratectl_none.c
 	ieee80211_regdomain.c
+	ieee80211_rssadapt.c
 	ieee80211_scan_sta.c
 	ieee80211_scan.c
 	ieee80211_sta.c

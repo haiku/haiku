@@ -23,7 +23,7 @@ KernelAddon iprowifi3945 :
 	libfreebsd_network.a
 	;
 
-HAIKU_WIFI_FIRMWARE_PACKAGE on iprowifi3945 = iwlwifi-3945-ucode-2.14.1.5 ;
-HAIKU_WIFI_FIRMWARE_ARCHIVE on iprowifi3945 = iwlwifi-3945-ucode-2.14.1.5.tgz ;
+HAIKU_WIFI_FIRMWARE_PACKAGE on iprowifi3945 = iwlwifi-3945-ucode-15.32.2.9 ;
+HAIKU_WIFI_FIRMWARE_ARCHIVE on iprowifi3945 = iwlwifi-3945-ucode-15.32.2.9.tgz ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on iprowifi3945 = true ;
 

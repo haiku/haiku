@@ -634,6 +634,7 @@ void	if_attach(struct ifnet *);
 int	if_delmulti(struct ifnet *, struct sockaddr *);
 void	if_detach(struct ifnet *);
 void	if_purgeaddrs(struct ifnet *);
+void    if_delallmulti(struct ifnet *);
 void	if_purgemaddrs(struct ifnet *);
 void	if_down(struct ifnet *);
 void	if_free(struct ifnet *);
