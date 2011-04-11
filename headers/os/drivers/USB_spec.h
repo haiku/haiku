@@ -16,8 +16,8 @@
 #define USB_REQTYPE_INTERFACE_OUT			0x01
 #define USB_REQTYPE_ENDPOINT_IN				0x82
 #define USB_REQTYPE_ENDPOINT_OUT			0x02
-#define USB_REQTYPE_OTHER_OUT				0x03
 #define USB_REQTYPE_OTHER_IN				0x83
+#define USB_REQTYPE_OTHER_OUT				0x03
 
 /* Request types for send_request() */
 #define USB_REQTYPE_STANDARD				0x00

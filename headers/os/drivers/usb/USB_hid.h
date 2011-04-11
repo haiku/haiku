@@ -132,7 +132,7 @@ typedef struct {
 	struct {
 		uint8	descriptor_type;
 		uint16	descriptor_length;
-	} _PACKED descriptor_info [1];
+	} _PACKED descriptor_info[1];
 } _PACKED usb_hid_descriptor;
 
 
