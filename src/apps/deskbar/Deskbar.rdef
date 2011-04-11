@@ -14,7 +14,7 @@ resource app_version {
 		"©2006-2009 Haiku, Inc."
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_EXCLUSIVE_LAUNCH;
 
 resource vector_icon {
 	$"6E6369661C050004006B020006023A498437D931BA09203C6B6D4B49E74A11B7"

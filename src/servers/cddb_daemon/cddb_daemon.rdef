@@ -1,6 +1,6 @@
 resource app_signature "application/x-vnd.Haiku-cddb_daemon";
 
-resource app_flags B_BACKGROUND_APP;
+resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
 
 resource app_version {
 	major  = 1,

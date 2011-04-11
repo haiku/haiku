@@ -14,7 +14,7 @@ resource app_version {
 		"©2006-2009 Haiku, Inc."
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_EXCLUSIVE_LAUNCH;
 
 resource file_types message {
 	"types" = "application/x-vnd.Be-symlink",

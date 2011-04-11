@@ -13,7 +13,7 @@ resource app_version {
 	long_info  = "Index Server ©2010 Haiku, Inc."
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_EXCLUSIVE_LAUNCH;
 
 resource vector_icon {
 	$"6E6369660B05000400540510057802001604378852378852378852B788524B07"
