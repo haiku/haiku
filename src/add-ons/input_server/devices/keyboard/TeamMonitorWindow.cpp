@@ -86,7 +86,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	fListView = new BListView("teams");
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
 
-	BScrollView *scrollView = new BScrollView("scroll_teams", fListView,
+	BScrollView* scrollView = new BScrollView("scroll_teams", fListView,
 		0, B_SUPPORTS_LAYOUT, false, true, B_FANCY_BORDER);
 	layout->AddView(scrollView);
 
@@ -111,7 +111,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	groupView = new BGroupView(B_HORIZONTAL);
 	layout->AddView(groupView);
 
-	BButton *forceReboot = new BButton("force", "Force Reboot",
+	BButton* forceReboot = new BButton("force", "Force Reboot",
 		new BMessage(TM_FORCE_REBOOT));
 	groupView->GroupLayout()->AddView(forceReboot);
 
@@ -164,7 +164,7 @@ TeamMonitorWindow::~TeamMonitorWindow()
 
 
 void
-TeamMonitorWindow::MessageReceived(BMessage *msg)
+TeamMonitorWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case SYSTEM_SHUTTING_DOWN:
@@ -193,8 +193,8 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 			
 		case TM_KILL_APPLICATION:
 		{
-			TeamListItem* item = (TeamListItem*)fListView->ItemAt(
-				fListView->CurrentSelection());
+			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(
+				fListView->CurrentSelection()));
 			if (item != NULL) {
 				kill_team(item->GetInfo()->team);
 				UpdateList();
@@ -209,7 +209,6 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 				BMessenger messenger(item->AppSignature()->String(),
 					item->GetInfo()->team);
 				messenger.SendMessage(B_QUIT_REQUESTED);
-				UpdateList();
 			}
 			break;
 		}
@@ -226,10 +225,10 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 		case TM_SELECTED_TEAM:
 		{
 			fKillButton->SetEnabled(fListView->CurrentSelection() >= 0);
-			TeamListItem* item = (TeamListItem*)fListView->ItemAt(
-				fListView->CurrentSelection());
+			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(
+				fListView->CurrentSelection()));
 			fDescriptionView->SetItem(item);
-			fQuitButton->SetEnabled(item && item->IsApplication());
+			fQuitButton->SetEnabled(item != NULL && item->IsApplication());
 			break;
 		}
 		case TM_CANCEL:
@@ -257,8 +256,9 @@ TeamMonitorWindow::UpdateList()
 	bool changed = false;
 
 	for (int32 i = 0; i < fListView->CountItems(); i++) {
-		TeamListItem *item = (TeamListItem*)fListView->ItemAt(i);
-		item->SetFound(false);
+		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL)
+			item->SetFound(false);
 	}
 
 	int32 cookie = 0;
@@ -269,8 +269,8 @@ TeamMonitorWindow::UpdateList()
 
 		bool found = false;
 		for (int32 i = 0; i < fListView->CountItems(); i++) {
-			TeamListItem *item = (TeamListItem*)fListView->ItemAt(i);
-			if (item->GetInfo()->team == info.team) {
+			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+			if (item != NULL && item->GetInfo()->team == info.team) {
 				item->SetFound(true);
 				found = true;
 			}
@@ -287,8 +287,8 @@ TeamMonitorWindow::UpdateList()
 	}
 
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
-		TeamListItem *item = (TeamListItem*)fListView->ItemAt(i);
-		if (!item->Found()) {
+		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL && !item->Found()) {
 			if (item == fDescriptionView->Item()) {
 				fDescriptionView->SetItem(NULL);
 				fKillButton->SetEnabled(false);
@@ -472,7 +472,7 @@ TeamDescriptionView::Draw(BRect rect)
 
 
 void
-TeamDescriptionView::GetPreferredSize(float *_width, float *_height)
+TeamDescriptionView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width != NULL) {
 		float width = 0;
@@ -503,7 +503,7 @@ TeamDescriptionView::GetPreferredSize(float *_width, float *_height)
 
 
 void
-TeamDescriptionView::SetItem(TeamListItem *item)
+TeamDescriptionView::SetItem(TeamListItem* item)
 {
 	fItem = item;
 	Invalidate();

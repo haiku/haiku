@@ -23,7 +23,7 @@
 
 
 static void
-print_key(char *chars, int32 offset)
+print_key(char* chars, int32 offset)
 {
 	int size = chars[offset++];
 
@@ -41,7 +41,7 @@ print_key(char *chars, int32 offset)
 		default:
 		{
 			// 2-, 3-, or 4-byte UTF-8 character
-			char *str = new (std::nothrow) char[size + 1];
+			char* str = new (std::nothrow) char[size + 1];
 			if (str == NULL)
 				break;
 

@@ -20,14 +20,15 @@ public:
 								TeamListItem(team_info& info);
 	virtual						~TeamListItem();
 
-	virtual						void DrawItem(BView* owner, BRect frame,
+	virtual	void				DrawItem(BView* owner, BRect frame,
 									bool complete = false);
-	virtual						void Update(BView* owner, const BFont* font);
+	virtual	void				Update(BView* owner, const BFont* font);
 
-			const team_info*	GetInfo();
-			const BBitmap*		LargeIcon() { return &fLargeIcon; };
-			const BPath*		Path() { return &fPath; };
-			const BString*		AppSignature() { return &fAppSignature; };
+	const	team_info*			GetInfo();
+	const	BBitmap*			LargeIcon() { return &fLargeIcon; };
+	const	BPath*				Path() { return &fPath; };
+	const	BString*			AppSignature() { return &fAppSignature; };
+
 			bool				IsSystemServer();
 			bool				IsApplication();
 

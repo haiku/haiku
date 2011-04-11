@@ -48,7 +48,7 @@ public:
 			fFunctionName.String());
 	}
 
-	 ~FunctionTracer()
+	~FunctionTracer()
 	{
 		debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
 		sFunctionDepth--;
@@ -207,6 +207,7 @@ KeyboardDevice::Start()
 
 	return fFD >= 0 ? B_OK : B_ERROR;
 }
+
 
 void
 KeyboardDevice::Stop()

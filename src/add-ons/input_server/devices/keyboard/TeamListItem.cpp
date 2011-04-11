@@ -48,11 +48,11 @@ TeamListItem::~TeamListItem()
 
 
 void
-TeamListItem::DrawItem(BView *owner, BRect frame, bool complete)
+TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
-	rgb_color kHighlight = { 140,140,140,0 };
-	rgb_color kBlack = { 0,0,0,0 };
-	rgb_color kBlue = { 0,0,255,0 };
+	rgb_color kHighlight = { 140, 140, 140, 0 };
+	rgb_color kBlack = { 0, 0, 0, 0 };
+	rgb_color kBlue = { 0, 0, 255, 0 };
 
 	BRect r(frame);
 
@@ -139,7 +139,8 @@ TeamListItem::IsSystemServer()
 		firstCall = false;
 	}
 	
-	if (strncmp(systemServersPath.Path(), fInfo.args, strlen(systemServersPath.Path())) == 0)
+	if (strncmp(systemServersPath.Path(), fInfo.args,
+			strlen(systemServersPath.Path())) == 0)
 		return true;
 
 	if (strncmp(trackerPath.Path(), fInfo.args, strlen(trackerPath.Path())) == 0)
