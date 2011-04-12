@@ -12,11 +12,11 @@
 
 
 #include <Box.h>
+#include <IconView.h>
 #include <Path.h>
 #include <View.h>
 #include <Window.h>
 
-#include "IconView.h"
 #include "TranslatorListView.h"
 
 

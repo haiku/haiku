@@ -65,6 +65,7 @@ MergeObject <libbe>interface_kit.o :
 	GroupLayout.cpp
 	GroupLayoutBuilder.cpp
 	GroupView.cpp
+	IconView.cpp
 	Input.cpp
 	InterfaceDefs.cpp
 	Layout.cpp

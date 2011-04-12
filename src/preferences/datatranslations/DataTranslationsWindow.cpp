@@ -23,6 +23,7 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Entry.h>
+#include <IconView.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Path.h>
@@ -36,7 +37,6 @@
 
 #include "DataTranslations.h"
 #include "DataTranslationsSettings.h"
-#include "IconView.h"
 #include "TranslatorListView.h"
 
 

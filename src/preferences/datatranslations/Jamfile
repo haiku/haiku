@@ -2,11 +2,12 @@ SubDir HAIKU_TOP src preferences datatranslations ;
 
 UseLibraryHeaders lp_solve linprog alm ;
 
+UsePrivateHeaders interface ;
+
 Preference DataTranslations :
 	DataTranslations.cpp
 	DataTranslationsWindow.cpp
 	DataTranslationsSettings.cpp
-	IconView.cpp 
 	TranslatorListView.cpp
 
 	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
