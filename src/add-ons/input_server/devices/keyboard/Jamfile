@@ -5,6 +5,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders input interface shared tracker ;
 UsePrivateSystemHeaders ;
 
+AddResources <input>keyboard : Keyboard.rdef ;
+
 Addon <input>keyboard :
 	KeyboardInputDevice.cpp
 	Keymap.cpp
@@ -12,8 +14,15 @@ Addon <input>keyboard :
 	TeamMonitorWindow.cpp
 	TeamListItem.cpp
 
-	: input_server be libshared.a $(TARGET_LIBSUPC++) ;
+	: input_server be libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) ;
 
 Package haiku-inputkit-cvs :
 	<input>keyboard :
 	boot home config add-ons input_server devices ;
+
+DoCatalogs <input>keyboard :
+	x-vnd.Haiku-KeyboardInputServerDevice
+	:
+	TeamMonitorWindow.cpp
+;
+

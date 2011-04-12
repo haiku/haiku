@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include <CardLayout.h>
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
 #include <Message.h>
@@ -30,6 +31,10 @@
 
 #include "KeyboardInputDevice.h"
 #include "TeamListItem.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Team Monitor"
 
 
 class TeamDescriptionView : public BBox {
@@ -67,7 +72,8 @@ static const uint32 kMsgRebootTick = 'TMrt';
 
 
 TeamMonitorWindow::TeamMonitorWindow()
-	: BWindow(BRect(0, 0, 350, 300), "Team Monitor",
+	:
+	BWindow(BRect(0, 0, 350, 300), B_TRANSLATE("Team Monitor"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_CLOSE_ON_ESCAPE,
@@ -93,12 +99,12 @@ TeamMonitorWindow::TeamMonitorWindow()
 	BGroupView* groupView = new BGroupView(B_HORIZONTAL);
 	layout->AddView(groupView);
 
-	fKillButton = new BButton("kill", "Kill Application",
+	fKillButton = new BButton("kill", B_TRANSLATE("Kill Application"),
 		new BMessage(TM_KILL_APPLICATION));
 	groupView->AddChild(fKillButton);
 	fKillButton->SetEnabled(false);
 	
-	fQuitButton = new BButton("quit", "Quit Application",
+	fQuitButton = new BButton("quit", B_TRANSLATE("Quit Application"),
 		new BMessage(TM_QUIT_APPLICATION));
 	groupView->AddChild(fQuitButton);
 	fQuitButton->SetEnabled(false);
@@ -111,7 +117,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	groupView = new BGroupView(B_HORIZONTAL);
 	layout->AddView(groupView);
 
-	BButton* forceReboot = new BButton("force", "Force Reboot",
+	BButton* forceReboot = new BButton("force", B_TRANSLATE("Force Reboot"),
 		new BMessage(TM_FORCE_REBOOT));
 	groupView->GroupLayout()->AddView(forceReboot);
 
@@ -119,7 +125,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	glue->SetExplicitMinSize(BSize(inset, -1));
 	groupView->GroupLayout()->AddItem(glue);
 
-	fRestartButton = new BButton("restart", "Restart the Desktop",
+	fRestartButton = new BButton("restart", B_TRANSLATE("Restart the Desktop"),
 		new BMessage(TM_RESTART_DESKTOP));
 	SetDefaultButton(fRestartButton);
 	groupView->GroupLayout()->AddView(fRestartButton);
@@ -128,7 +134,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	glue->SetExplicitMinSize(BSize(inset, -1));
 	groupView->GroupLayout()->AddItem(glue);
 
-	fCancelButton = new BButton("cancel", "Cancel",
+	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(TM_CANCEL));
 	SetDefaultButton(fCancelButton);
 	groupView->GroupLayout()->AddView(fCancelButton);
@@ -269,7 +275,8 @@ TeamMonitorWindow::UpdateList()
 
 		bool found = false;
 		for (int32 i = 0; i < fListView->CountItems(); i++) {
-			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+			TeamListItem* item
+				= dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
 			if (item != NULL && item->GetInfo()->team == info.team) {
 				item->SetFound(true);
 				found = true;
@@ -345,7 +352,8 @@ TeamMonitorWindow::Disable()
 
 
 TeamDescriptionView::TeamDescriptionView()
-	: BBox("description view", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
+	:
+	BBox("description view", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
 	fItem(NULL),
 	fSeconds(4),
 	fRebootRunner(NULL)
@@ -362,9 +370,12 @@ TeamDescriptionView::TeamDescriptionView()
 */
 	SetFont(be_plain_font);
 
-	fText[0] = "Select an application from the list above and click the";
-	fText[1] = "\"Kill Application\" button in order to close it.";
-	fText[2] = "Hold CONTROL+ALT+DELETE for %ld seconds to reboot.";
+	fText[0] = B_TRANSLATE(
+		"Select an application from the list above and click the");
+	fText[1] = B_TRANSLATE(
+		"\"Kill Application\" button in order to close it.");
+	fText[2] = B_TRANSLATE(
+		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
 
 	float width, height;
 	GetPreferredSize(&width, &height);
@@ -448,7 +459,7 @@ TeamDescriptionView::Draw(BRect rect)
 		if (fItem->IsSystemServer()) {
 			line.y += height;
 			//SetFont(be_bold_font);
-			DrawString("(This team is a system component)", line);
+			DrawString(B_TRANSLATE("(This team is a system component)"), line);
 			//SetFont(be_plain_font);
 		}
 	} else {
@@ -463,7 +474,7 @@ TeamDescriptionView::Draw(BRect rect)
 		if (fSeconds >= 0)
 			snprintf(text, sizeof(text), fText[2], fSeconds);
 		else
-			strcpy(text, "Booom!");
+			strlcpy(text, B_TRANSLATE("Booom!"), sizeof(text));
 
 		line.y += height;
 		DrawString(text, line);

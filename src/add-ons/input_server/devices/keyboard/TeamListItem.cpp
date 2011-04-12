@@ -24,7 +24,8 @@ TeamListItem::TeamListItem(team_info &tinfo)
 	:
 	fInfo(tinfo),
 	fIcon(BRect(0, 0, 15, 15), B_RGBA32),
-	fLargeIcon(BRect(0, 0, 31, 31), B_RGBA32)
+	fLargeIcon(BRect(0, 0, 31, 31), B_RGBA32),
+	fFound(false)
 {
 	int32 cookie = 0;
 	image_info info;
@@ -156,8 +157,5 @@ TeamListItem::IsSystemServer()
 bool
 TeamListItem::IsApplication()
 {
-	if (fAppSignature.Length() > 0)
-		return true;
-	else
-		return false;
+	return !fAppSignature.IsEmpty();
 }

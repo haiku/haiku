@@ -137,7 +137,7 @@ KeyboardDevice::KeyboardDevice(KeyboardInputDevice* owner, const char* path)
 {
 	KD_CALLED();
 
-	strcpy(fPath, path);
+	strlcpy(fPath, path, B_PATH_NAME_LENGTH);
 	fDeviceRef.name = get_short_name(path);
 	fDeviceRef.type = B_KEYBOARD_DEVICE;
 	fDeviceRef.cookie = this;
