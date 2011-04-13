@@ -326,17 +326,20 @@ void	ieee80211_scan_sta_uninit(void);
  */
 #define	IEEE80211_RATECTL_MODULE(alg, version)				\
 	_IEEE80211_POLICY_MODULE(ratectl, alg, version);		\
+	
+#define IEEE80211_RATECTL_ALG(name, alg, v) \
+	void \
+	ieee80211_ratectl_##name##_load() { \
+		ieee80211_ratectl_register(alg, &v); \
+	} \
+\
+\
+	void \
+	ieee80211_ratectl_##name##_unload() \
+	{ \
+		ieee80211_ratectl_unregister(alg); \
+	}
 
-#define	IEEE80211_RATECTL_ALG(name, alg, v)				\
-static void								\
-alg##_modevent(int type)						\
-{									\
-	if (type == MOD_LOAD)						\
-		ieee80211_ratectl_register(alg, &v);			\
-	else								\
-		ieee80211_ratectl_unregister(alg);			\
-}									\
-TEXT_SET(ratectl##_set, alg##_modevent)
 
 struct ieee80211req;
 typedef int ieee80211_ioctl_getfunc(struct ieee80211vap *,

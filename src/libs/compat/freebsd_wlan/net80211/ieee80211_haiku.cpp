@@ -64,9 +64,9 @@ extern "C" {
 
 #define TRACE_WLAN
 #ifdef TRACE_WLAN
-#	define TRACE(x, ...) dprintf(x, __VA_ARGS__);
+#	define TRACE(x...) dprintf(x);
 #else
-#	define TRACE(x, ...) ;
+#	define TRACE(x...) ;
 #endif
 
 

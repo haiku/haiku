@@ -60,6 +60,17 @@ void	ieee80211_ratectl_unregister(int);
 void	ieee80211_ratectl_init(struct ieee80211vap *);
 void	ieee80211_ratectl_set(struct ieee80211vap *, int);
 
+#if defined (__HAIKU__)
+void ieee80211_ratectl_attach(struct ieee80211com *ic);
+void ieee80211_ratectl_detach(struct ieee80211com *ic);
+void ieee80211_ratectl_none_load(void);
+void ieee80211_ratectl_none_unload(void);
+void ieee80211_ratectl_amrr_load(void);
+void ieee80211_ratectl_amrr_unload(void);
+void ieee80211_ratectl_rssadapt_load(void);
+void ieee80211_ratectl_rssadapt_unload(void);
+#endif
+
 MALLOC_DECLARE(M_80211_RATECTL);
 
 static void __inline

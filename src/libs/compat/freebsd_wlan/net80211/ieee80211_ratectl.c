@@ -49,6 +49,31 @@ static const char *ratectl_modnames[IEEE80211_RATECTL_MAX] = {
 
 MALLOC_DEFINE(M_80211_RATECTL, "80211ratectl", "802.11 rate control");
 
+
+#if defined(__HAIKU__)
+/*
+ * Setup ratectl support for a device/shared instance.
+ */
+void
+ieee80211_ratectl_attach(struct ieee80211com *ic)
+{
+	ieee80211_ratectl_none_load();
+	ieee80211_ratectl_amrr_load();
+	ieee80211_ratectl_rssadapt_load();
+}
+
+/*
+ * Teardown ratectl support.
+ */
+void
+ieee80211_ratectl_detach(struct ieee80211com *ic)
+{
+	ieee80211_ratectl_none_unload();
+	ieee80211_ratectl_amrr_unload();
+	ieee80211_ratectl_rssadapt_unload();
+}
+#endif
+
 void
 ieee80211_ratectl_register(int type, const struct ieee80211_ratectl *ratectl)
 {

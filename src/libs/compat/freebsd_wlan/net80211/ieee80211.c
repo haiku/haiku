@@ -293,6 +293,9 @@ ieee80211_ifattach(struct ieee80211com *ic,
 	ieee80211_scan_attach(ic);
 	ieee80211_regdomain_attach(ic);
 	ieee80211_dfs_attach(ic);
+#if defined(__HAIKU__)
+	ieee80211_ratectl_attach(ic);
+#endif
 
 	ieee80211_sysctl_attach(ic);
 
@@ -337,6 +340,9 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 	ieee80211_waitfor_parent(ic);
 
 	ieee80211_sysctl_detach(ic);
+#if defined(__HAIKU__)
+	ieee80211_ratectl_detach(ic);
+#endif
 	ieee80211_dfs_detach(ic);
 	ieee80211_regdomain_detach(ic);
 	ieee80211_scan_detach(ic);

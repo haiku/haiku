@@ -59,7 +59,6 @@ KernelStaticLibrary libfreebsd_wlan.a :
 	# NOT SUPPORTED YET ieee80211_ddb.c
 	# NOT SUPPORTED YET ieee80211_hwmp.c
 	# NOT SUPPORTED YET ieee80211_mesh.c
-	# NOT SUPPORTED YET ieee80211_rssadapt.c
 	# NOT SUPPORTED YET ieee80211_superg.c
 	# NOT SUPPORTED YET ieee80211_tdma.c
 	ieee80211_xauth.c
