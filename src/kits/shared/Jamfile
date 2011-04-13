@@ -21,6 +21,7 @@ StaticLibrary libshared.a :
 	DragTrackingFilter.cpp
 	HashString.cpp
 	IconButton.cpp
+	IconView.cpp
 	Keymap.cpp
 	NaturalCompare.cpp
 	QueryFile.cpp
