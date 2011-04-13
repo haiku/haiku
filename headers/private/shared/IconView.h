@@ -5,21 +5,28 @@
 
 
 #include <Bitmap.h>
+#include <Mime.h>
 #include <Path.h>
 #include <View.h>
 
 
 class IconView : public BView {
 public:
-							IconView(const BRect& frame, const char* name,
-								uint32 resize, uint32 flags);
+							IconView(icon_size iconSize = B_LARGE_ICON);
+
 							~IconView();
+
+			status_t		InitCheck() const;
 	virtual	void			Draw(BRect area);
-	
-			bool			DrawIcon(bool draw);
-			bool			SetIcon(const BPath& path);
+
+			void			DrawIcon(bool draw);
+			status_t		SetIcon(const BPath& path,
+								icon_size iconSize = B_LARGE_ICON);
 
 private:
+			void			_SetSize();
+
+			icon_size		fIconSize;
 			BBitmap*		fIconBitmap;
 			bool			fDrawIcon;
 };

@@ -19,7 +19,6 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
-#include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Entry.h>
@@ -182,11 +181,10 @@ DataTranslationsWindow::_SetupViews()
 			B_ALIGN_USE_FULL_HEIGHT));
 
 	// Add the translator icon view
-	fIconView = new IconView(BRect(0, 0, 31, 31), B_TRANSLATE("Icon"),
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS);
+	fIconView = new IconView();
 
 	// Add the translator info button
-	BButton* button = new BButton("STD", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
+	fButton = new BButton("info", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
 	// Populate the translators list view
@@ -201,7 +199,7 @@ DataTranslationsWindow::_SetupViews()
 			.SetInsets(0, 0, 0, 0)
 			.Add(fRightBox, 0, 0, 3, 1)
 			.Add(fIconView, 0, 1)
-			.Add(button, 2, 1);
+			.Add(fButton, 2, 1);
 
 	fTranslatorListView->MakeFocus();
 	fTranslatorListView->Select(0);
@@ -291,6 +289,7 @@ DataTranslationsWindow::MessageReceived(BMessage* message)
 			if (selected < 0) {
 				// If none selected, clear the old one
 				fIconView->DrawIcon(false);
+				fButton->SetEnabled(false);
 				fRightBox->RemoveChild(fConfigView);
 				break;
 			}
@@ -307,6 +306,7 @@ DataTranslationsWindow::MessageReceived(BMessage* message)
 			BPath path;
 			_GetTranslatorInfo(item->ID(), name, info, version, path);
 			fIconView->SetIcon(path);
+			fButton->SetEnabled(true);
 			break;
 		}
 

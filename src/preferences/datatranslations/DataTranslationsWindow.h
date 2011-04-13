@@ -12,6 +12,7 @@
 
 
 #include <Box.h>
+#include <Button.h>
 #include <IconView.h>
 #include <Path.h>
 #include <View.h>
@@ -41,6 +42,7 @@ private:
 			BBox*			fRightBox;
 			BView*			fConfigView;
 			IconView*		fIconView;
+			BButton*		fButton;
 };
 
 
