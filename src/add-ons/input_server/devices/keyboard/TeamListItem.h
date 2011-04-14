@@ -12,7 +12,11 @@
 #include <Bitmap.h>
 #include <ListItem.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
+
+
+extern bool gLocalizedNamePreferred;
 
 
 class TeamListItem : public BListItem  {
@@ -24,10 +28,12 @@ public:
 									bool complete = false);
 	virtual	void				Update(BView* owner, const BFont* font);
 
+			void				CacheLocalizedName();
+
 	const	team_info*			GetInfo();
 	const	BBitmap*			LargeIcon() { return &fLargeIcon; };
 	const	BPath*				Path() { return &fPath; };
-	const	BString*			AppSignature() { return &fAppSignature; };
+	const	char*				AppSignature() { return fAppInfo.signature; };
 
 			bool				IsSystemServer();
 			bool				IsApplication();
@@ -38,10 +44,12 @@ public:
 	static	int32				MinimalHeight();
 
 private:
-			team_info			fInfo;
-			BBitmap				fIcon, fLargeIcon;
+			team_info			fTeamInfo;
+			app_info			fAppInfo;
+			BBitmap				fMiniIcon;
+			BBitmap				fLargeIcon;
 			BPath				fPath;
-			BString				fAppSignature;
+			BString				fLocalizedName;
 			bool				fFound;
 };
 

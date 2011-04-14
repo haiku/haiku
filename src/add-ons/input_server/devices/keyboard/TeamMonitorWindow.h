@@ -13,6 +13,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <ListView.h>
+#include <MessageFilter.h>
 #include <Window.h>
 
 #include "TeamListItem.h"
@@ -30,6 +31,8 @@ public:
 
 			void			Enable();
 			void			Disable();
+			void			DeselectAll();
+			void			LocaleChanged();
 
 private:
 			void			UpdateList();
@@ -41,9 +44,10 @@ private:
 			BButton*		fKillButton;
 			BButton*		fQuitButton;
 			BButton*		fRestartButton;
-			TeamDescriptionView*		fDescriptionView;
+			TeamDescriptionView*	fDescriptionView;
 };
 
 static const uint32 kMsgCtrlAltDelPressed = 'TMcp';
+static const uint32 kMsgDeselectAll = 'TMds';
 
 #endif	// TEAM_MONITOR_WINDOW_H

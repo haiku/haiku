@@ -11,40 +11,54 @@
 #include <string.h>
 
 #include <FindDirectory.h>
+#include <LocaleRoster.h>
 #include <NodeInfo.h>
 #include <Path.h>
-#include <Roster.h>
 #include <View.h>
 
 
 static const int32 kItemMargin = 2;
 
 
-TeamListItem::TeamListItem(team_info &tinfo)
+bool gLocalizedNamePreferred;
+
+
+TeamListItem::TeamListItem(team_info &teamInfo)
 	:
-	fInfo(tinfo),
-	fIcon(BRect(0, 0, 15, 15), B_RGBA32),
+	fTeamInfo(teamInfo),
+	fAppInfo(),
+	fMiniIcon(BRect(0, 0, 15, 15), B_RGBA32),
 	fLargeIcon(BRect(0, 0, 31, 31), B_RGBA32),
 	fFound(false)
 {
 	int32 cookie = 0;
 	image_info info;
-	if (get_next_image_info(tinfo.team, &cookie, &info) == B_OK) {
+	if (get_next_image_info(teamInfo.team, &cookie, &info) == B_OK) {
 		fPath = BPath(info.name);
 		BNode node(info.name);
 		BNodeInfo nodeInfo(&node);
-		nodeInfo.GetTrackerIcon(&fIcon, B_MINI_ICON);
+		nodeInfo.GetTrackerIcon(&fMiniIcon, B_MINI_ICON);
 		nodeInfo.GetTrackerIcon(&fLargeIcon, B_LARGE_ICON);
 	}
 
-	app_info appInfo;
-	if (be_roster->GetRunningAppInfo(fInfo.team, &appInfo) == B_OK)
-		fAppSignature = appInfo.signature;
+	if (be_roster->GetRunningAppInfo(fTeamInfo.team, &fAppInfo) != B_OK)
+		fAppInfo.signature[0] = '\0';
+
+	CacheLocalizedName();
 }
 
 
 TeamListItem::~TeamListItem()
 {
+}
+
+
+void
+TeamListItem::CacheLocalizedName()
+{
+	if (BLocaleRoster::Default()->GetLocalizedFileName(fLocalizedName,
+			fAppInfo.ref, true) != B_OK)
+		fLocalizedName = fPath.Leaf();
 }
 
 
@@ -78,7 +92,7 @@ TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 		iconFrame.top + 16);
 	owner->SetDrawingMode(B_OP_ALPHA);
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	owner->DrawBitmap(&fIcon, iconFrame);
+	owner->DrawBitmap(&fMiniIcon, iconFrame);
 	owner->SetDrawingMode(B_OP_COPY);
 
 	frame.left += 16;
@@ -91,7 +105,11 @@ TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->MovePenTo(frame.left + 8, frame.top + ((frame.Height()
 			- (finfo.ascent + finfo.descent + finfo.leading)) / 2)
 		+ finfo.ascent);
-	owner->DrawString(fPath.Leaf());
+
+	if (gLocalizedNamePreferred)
+		owner->DrawString(fLocalizedName.String());
+	else
+		owner->DrawString(fPath.Leaf());
 }
 
 
@@ -116,7 +134,7 @@ TeamListItem::Update(BView* owner, const BFont* font)
 const team_info*
 TeamListItem::GetInfo()
 {
-	return &fInfo;
+	return &fTeamInfo;
 }
 
 
@@ -140,14 +158,16 @@ TeamListItem::IsSystemServer()
 		firstCall = false;
 	}
 	
-	if (strncmp(systemServersPath.Path(), fInfo.args,
+	if (strncmp(systemServersPath.Path(), fTeamInfo.args,
 			strlen(systemServersPath.Path())) == 0)
 		return true;
 
-	if (strncmp(trackerPath.Path(), fInfo.args, strlen(trackerPath.Path())) == 0)
+	if (strncmp(trackerPath.Path(), fTeamInfo.args,
+			strlen(trackerPath.Path())) == 0)
 		return true;
 
-	if (strncmp(deskbarPath.Path(), fInfo.args, strlen(deskbarPath.Path())) == 0)
+	if (strncmp(deskbarPath.Path(), fTeamInfo.args,
+			strlen(deskbarPath.Path())) == 0)
 		return true;
 	
 	return false;		
@@ -157,5 +177,5 @@ TeamListItem::IsSystemServer()
 bool
 TeamListItem::IsApplication()
 {
-	return !fAppSignature.IsEmpty();
+	return fAppInfo.signature[0] != '\0';
 }

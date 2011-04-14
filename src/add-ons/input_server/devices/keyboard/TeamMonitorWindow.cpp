@@ -13,10 +13,12 @@
 
 #include <stdio.h>
 
+#include <Application.h>
 #include <CardLayout.h>
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupView.h>
+#include <GroupLayoutBuilder.h>
+#include <IconView.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Roster.h>
@@ -37,14 +39,32 @@
 #define B_TRANSLATE_CONTEXT "Team Monitor"
 
 
-class TeamDescriptionView : public BBox {
+TeamMonitorWindow* gTeamMonitorWindow = NULL;
+
+
+filter_result
+FilterLocaleChanged(BMessage* message, BHandler** target, BMessageFilter *filter)
+{
+	if (message->what == B_LOCALE_CHANGED && gTeamMonitorWindow != NULL)
+		gTeamMonitorWindow->LocaleChanged();
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
+class AllShowingTextView : public BTextView {
+public:
+							AllShowingTextView(const char* name);
+	virtual void			FrameResized(float width, float height);
+};
+
+
+class TeamDescriptionView : public BView {
 public:
 							TeamDescriptionView();
 	virtual					~TeamDescriptionView();
 
 	virtual void			MessageReceived(BMessage* message);
-	virtual void			Draw(BRect bounds);
-	virtual void			GetPreferredSize(float* _width, float* _height);
 
 			void			CtrlAltDelPressed(bool keyDown);
 
@@ -52,10 +72,15 @@ public:
 			TeamListItem*	Item() { return fItem; }
 
 private:
-			const char*		fText[3];
 			TeamListItem*	fItem;
 			int32			fSeconds;
 			BMessageRunner*	fRebootRunner;
+			IconView*		fIconView;
+	const	char*			fInfoString;
+	const	char*			fSysComponentString;
+			BCardLayout*	fLayout;
+			AllShowingTextView*	fIconTextView;
+			AllShowingTextView*	fInfoTextView;
 };
 
 
@@ -73,10 +98,10 @@ static const uint32 kMsgRebootTick = 'TMrt';
 
 TeamMonitorWindow::TeamMonitorWindow()
 	:
-	BWindow(BRect(0, 0, 350, 300), B_TRANSLATE("Team Monitor"),
+	BWindow(BRect(0, 0, 350, 400), B_TRANSLATE("Team Monitor"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
-			| B_CLOSE_ON_ESCAPE,
+			| B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
 	fQuitting(false),
 	fUpdateRunner(NULL)
@@ -161,6 +186,17 @@ TeamMonitorWindow::TeamMonitorWindow()
 	AddShortcut('T', B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kMsgLaunchTerminal));
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+
+	gLocalizedNamePreferred
+		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
+
+	gTeamMonitorWindow = this;
+
+	if (be_app->Lock()) {
+		be_app->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY,
+			B_ANY_SOURCE, B_LOCALE_CHANGED, FilterLocaleChanged));
+		be_app->Unlock();
+	}
 }
 
 
@@ -189,6 +225,10 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 			fDescriptionView->CtrlAltDelPressed(keyDown);
 			break;
 
+		case kMsgDeselectAll:
+			fListView->DeselectAll();
+			break;
+
 		case kMsgLaunchTerminal:
 			be_roster->Launch("application/x-vnd.Haiku-Terminal");
 			break;
@@ -212,7 +252,7 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(
 				fListView->CurrentSelection()));
 			if (item != NULL) {
-				BMessenger messenger(item->AppSignature()->String(),
+				BMessenger messenger(item->AppSignature(),
 					item->GetInfo()->team);
 				messenger.SendMessage(B_QUIT_REQUESTED);
 			}
@@ -348,40 +388,61 @@ TeamMonitorWindow::Disable()
 }
 
 
+void
+TeamMonitorWindow::LocaleChanged()
+{
+	BLocaleRoster::Default()->Refresh();
+	gLocalizedNamePreferred
+		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
+
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
+		TeamListItem* item
+			= dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL)
+			item->CacheLocalizedName();
+	}
+}
+
+
 //	#pragma mark -
 
 
 TeamDescriptionView::TeamDescriptionView()
 	:
-	BBox("description view", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
+	BView("description view", B_WILL_DRAW),
 	fItem(NULL),
 	fSeconds(4),
 	fRebootRunner(NULL)
 {
-/*
-	BTextView* textView = new BTextView("description");
-	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	textView->MakeEditable(false);
-	textView->SetText("Select an application from the list above and click "
-		"the \"Kill Application\" button in order to close it.\n\n"
-		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
-	view->AddChild(textView);
-	((BCardLayout*)view->GetLayout())->SetVisibleItem((int32)0);
-*/
-	SetFont(be_plain_font);
-
-	fText[0] = B_TRANSLATE(
-		"Select an application from the list above and click the");
-	fText[1] = B_TRANSLATE(
-		"\"Kill Application\" button in order to close it.");
-	fText[2] = B_TRANSLATE(
+	fInfoString = B_TRANSLATE(
+		"Select an application from the list above and click one of "
+		"the buttons 'Kill Application' and 'Quit Application' "
+		"in order to close it.\n\n"
 		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
 
-	float width, height;
-	GetPreferredSize(&width, &height);
-	SetExplicitMinSize(BSize(width, -1));
-	SetExplicitPreferredSize(BSize(width, height));
-	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, height));
+	fSysComponentString = B_TRANSLATE("(This team is a system component)");
+
+	fInfoTextView = new AllShowingTextView("info text");
+	fIconTextView = new AllShowingTextView("icon text");
+
+	fIconView = new IconView();
+	fIconView->SetExplicitAlignment(
+		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_TOP));
+
+	BView* teamPropertiesView = new BView("team properties", B_WILL_DRAW);
+	teamPropertiesView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
+	teamPropertiesView->SetLayout(layout);
+	BGroupLayoutBuilder(layout)
+		.Add(fIconView)
+		.Add(fIconTextView);
+
+	fLayout = new BCardLayout();
+	SetLayout(fLayout);
+	fLayout->AddView(fInfoTextView);
+	fLayout->AddView(teamPropertiesView);
+
+	SetItem(NULL);
 }
 
 
@@ -400,11 +461,11 @@ TeamDescriptionView::MessageReceived(BMessage* message)
 			if (fSeconds == 0)
 				Window()->PostMessage(TM_FORCE_REBOOT);
 			else
-				Invalidate();
+				SetItem(fItem);
 			break;
 
 		default:
-			BBox::MessageReceived(message);
+			BView::MessageReceived(message);
 	}
 }
 
@@ -420,96 +481,12 @@ TeamDescriptionView::CtrlAltDelPressed(bool keyDown)
 	fSeconds = 4;
 
 	if (keyDown) {
+		Window()->PostMessage(kMsgDeselectAll);
 		BMessage tick(kMsgRebootTick);
 		fRebootRunner = new BMessageRunner(this, &tick, 1000000LL);
-	} else
-		Invalidate();
-}
-
-
-void
-TeamDescriptionView::Draw(BRect rect)
-{
-	rect = Bounds();
-
-	font_height	fontInfo;
-	GetFontHeight(&fontInfo);
-	float height
-		= ceil(fontInfo.ascent + fontInfo.descent + fontInfo.leading + 2);
-
-	if (fItem) {
-		// draw icon and application path
-		BRect frame(rect);
-		frame.Set(frame.left, frame.top, frame.left + 31, frame.top + 31);
-		SetDrawingMode(B_OP_ALPHA);
-		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-		DrawBitmap(fItem->LargeIcon(), frame);
-		SetDrawingMode(B_OP_COPY);
-
-		BPoint line(frame.right + 9, frame.top + fontInfo.ascent);
-		if (!fItem->IsSystemServer())
-			line.y += (frame.Height() - height) / 2;
-		else
-			line.y += (frame.Height() - 2 * height) / 2;
-
-		BString path = fItem->Path()->Path();
-		TruncateString(&path, B_TRUNCATE_MIDDLE, rect.right - line.x);
-		DrawString(path.String(), line);
-
-		if (fItem->IsSystemServer()) {
-			line.y += height;
-			//SetFont(be_bold_font);
-			DrawString(B_TRANSLATE("(This team is a system component)"), line);
-			//SetFont(be_plain_font);
-		}
-	} else {
-		BPoint line(rect.left, rect.top + fontInfo.ascent);
-
-		for (int32 i = 0; i < 2; i++) {
-			DrawString(fText[i], line);
-			line.y += height;
-		}
-
-		char text[256];
-		if (fSeconds >= 0)
-			snprintf(text, sizeof(text), fText[2], fSeconds);
-		else
-			strlcpy(text, B_TRANSLATE("Booom!"), sizeof(text));
-
-		line.y += height;
-		DrawString(text, line);
-	}
-}
-
-
-void
-TeamDescriptionView::GetPreferredSize(float* _width, float* _height)
-{
-	if (_width != NULL) {
-		float width = 0;
-		for (int32 i = 0; i < 3; i++) {
-			float stringWidth = ceilf(StringWidth(fText[i]));
-			if (stringWidth > width)
-				width = stringWidth;
-		}
-
-		if (width < 330)
-			width = 330;
-
-		*_width = width;
 	}
 
-	if (_height != NULL) {
-		font_height	fontInfo;
-		GetFontHeight(&fontInfo);
-
-		float height = 4 * ceil(fontInfo.ascent + fontInfo.descent
-			+ fontInfo.leading + 2);
-		if (height < 32)
-			height = 32;
-
-		*_height = height;
-	}
+	SetItem(NULL);
 }
 
 
@@ -517,5 +494,57 @@ void
 TeamDescriptionView::SetItem(TeamListItem* item)
 {
 	fItem = item;
+
+	if (item == NULL) {
+		BString text;
+		text.SetToFormat(fInfoString, fSeconds);
+		fInfoTextView->SetText(text);
+
+		if (fRebootRunner != NULL && fSeconds < 4) {
+			BFont font;
+			fInfoTextView->GetFont(&font);
+			font.SetFace(B_BOLD_FACE);
+			fInfoTextView->SetStylable(true);
+			fInfoTextView->SetFontAndColor(text.FindLast('\n'),
+				text.Length() - 1, &font);
+		}
+	} else {
+		BString text = item->Path()->Path();
+		if (item->IsSystemServer())
+			text << "\n" << fSysComponentString;
+		fIconTextView->SetText(text);
+		fIconView->SetIcon(item->Path()->Path());
+	}
+
+	if (fLayout == NULL)
+		return;
+
+	if (item == NULL)
+		fLayout->SetVisibleItem((int32)0);
+	else
+		fLayout->SetVisibleItem((int32)1);
+
 	Invalidate();
+}
+
+
+//	#pragma mark -
+
+
+AllShowingTextView::AllShowingTextView(const char* name)
+	:
+	BTextView(name, B_WILL_DRAW)
+{
+	MakeEditable(false);
+	MakeSelectable(false);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+void
+AllShowingTextView::FrameResized(float width, float height)
+{
+	float minHeight = TextHeight(0, CountLines() - 1);
+	SetExplicitMinSize(BSize(B_SIZE_UNSET, minHeight));
+	BTextView::FrameResized(width, minHeight);
 }
