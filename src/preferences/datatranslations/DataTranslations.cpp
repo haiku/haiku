@@ -45,27 +45,6 @@ DataTranslationsApplication::~DataTranslationsApplication()
 
 
 void
-DataTranslationsApplication::AboutRequested()
-{
-	BAlert* alert = new BAlert(B_TRANSLATE("About"),
-		B_TRANSLATE("DataTranslations\n\twritten by Oliver Siebenmarck and"
-		" others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n"),
-		B_TRANSLATE("OK"));
-
-	BTextView* view = alert->TextView();
-	view->SetStylable(true);
-
-	BFont font;
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 16, &font);
-
-	alert->Go();
-}
-
-
-void
 DataTranslationsApplication::_InstallError(const char* name, status_t status)
 {
 	BString text;

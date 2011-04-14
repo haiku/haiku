@@ -22,6 +22,7 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Entry.h>
+#include <GroupView.h>
 #include <IconView.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
@@ -138,10 +139,11 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
 
-	// fConfigView is NULL the first time this function
-	// is called, prevent a segment fault
-	if (fConfigView)
+	if (fConfigView) {
 		fRightBox->RemoveChild(fConfigView);
+		delete fConfigView;
+		fConfigView = NULL;
+	}
 
 	BMessage emptyMsg;
 	BRect rect(0, 0, 200, 233);
@@ -156,6 +158,33 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 	fRightBox->AddChild(fConfigView);
 
 	return B_OK;
+}
+
+
+void
+DataTranslationsWindow::_ShowInfoView()
+{
+	if (fConfigView) {
+		fRightBox->RemoveChild(fConfigView);
+		delete fConfigView;
+		fConfigView = NULL;
+	}
+
+	BTextView* view = new BTextView("info text");
+	view->MakeEditable(false);
+	view->MakeSelectable(false);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetText(B_TRANSLATE(
+		"Use this control panel to set default values for translators, "
+		"to be used when no other settings are specified by an application."));
+
+	BGroupView* group = new BGroupView(B_VERTICAL);
+	group->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	group->AddChild(view);
+	float spacing = be_control_look->DefaultItemSpacing();
+	group->GroupLayout()->SetInsets(spacing, spacing, spacing, spacing);
+	fRightBox->AddChild(group);
+	fConfigView = group;
 }
 
 
@@ -186,6 +215,7 @@ DataTranslationsWindow::_SetupViews()
 	// Add the translator info button
 	fButton = new BButton("info", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+	fButton->SetEnabled(false);
 
 	// Populate the translators list view
 	_PopulateListView();
@@ -202,7 +232,7 @@ DataTranslationsWindow::_SetupViews()
 			.Add(fButton, 2, 1);
 
 	fTranslatorListView->MakeFocus();
-	fTranslatorListView->Select(0);
+	_ShowInfoView();
 }
 
 
@@ -228,10 +258,11 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	BString message;
 	// Convert the version number into a readable format
 	snprintf(message.LockBuffer(2048), 2048,
-		B_TRANSLATE("Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n"),
-			name, B_TRANSLATION_MAJOR_VERSION(version),
-			B_TRANSLATION_MINOR_VERSION(version),
-			B_TRANSLATION_REVISION_VERSION(version), info, path.Path());
+		B_TRANSLATE("Name: %s \nVersion: %ld.%ld.%ld\n\n"
+			"Info:\n%s\n\nPath:\n%s\n"),
+		name, B_TRANSLATION_MAJOR_VERSION(version),
+		B_TRANSLATION_MINOR_VERSION(version),
+		B_TRANSLATION_REVISION_VERSION(version), info, path.Path());
 	message.UnlockBuffer();
 
 	BAlert* alert = new BAlert(B_TRANSLATE("Info"), message.String(),
@@ -262,17 +293,8 @@ DataTranslationsWindow::MessageReceived(BMessage* message)
 		case kMsgTranslatorInfo:
 		{
 			int32 selected = fTranslatorListView->CurrentSelection(0);
-			if (selected < 0) {
-				// If no translator is selected, show a message explaining
-				// what the config panel is for
-				(new BAlert(B_TRANSLATE("Panel Info"),
-					B_TRANSLATE("Translation Settings\n\n"
-					"Use this control panel to set values that various\n"
-					"translators use when no other settings are specified\n"
-					"in the application."),
-					B_TRANSLATE("OK")))->Go();
+			if (selected < 0)
 				break;
-			}
 
 			TranslatorItem* item = fTranslatorListView->TranslatorAt(selected);
 			if (item != NULL)
@@ -291,6 +313,7 @@ DataTranslationsWindow::MessageReceived(BMessage* message)
 				fIconView->DrawIcon(false);
 				fButton->SetEnabled(false);
 				fRightBox->RemoveChild(fConfigView);
+				_ShowInfoView();
 				break;
 			}
 
@@ -351,4 +374,3 @@ DataTranslationsWindow::MessageReceived(BMessage* message)
 			break;
 	}
 }
-

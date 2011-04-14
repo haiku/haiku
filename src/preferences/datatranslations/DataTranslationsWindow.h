@@ -30,6 +30,7 @@ public:
 	virtual	void			MessageReceived(BMessage* message);
 
 private:
+			void			_ShowInfoView();
 			status_t		_GetTranslatorInfo(int32 id, const char*& name,
 								const char*& info, int32& version, BPath& path);
 			void			_ShowInfoAlert(int32 id);

@@ -22,7 +22,6 @@ public:
 	virtual						~DataTranslationsApplication();
 
 	virtual void				RefsReceived(BMessage* message);
-	virtual void				AboutRequested();
 
 private:
 			void				_InstallError(const char* name, status_t status);
