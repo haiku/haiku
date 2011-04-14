@@ -213,7 +213,7 @@ DataTranslationsWindow::_SetupViews()
 	fIconView = new IconView();
 
 	// Add the translator info button
-	fButton = new BButton("info", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
+	fButton = new BButton("info", B_TRANSLATE("Info"),
 		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 	fButton->SetEnabled(false);
 
