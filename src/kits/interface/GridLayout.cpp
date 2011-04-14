@@ -90,7 +90,7 @@ public:
 	{
 		if (Info* info = _InfoAt(index))
 			return info->minSize;
-		return -1;
+		return B_SIZE_UNSET;
 	}
 
 	void SetMinSize(int32 index, float size)
@@ -103,7 +103,7 @@ public:
 	{
 		if (Info* info = _InfoAt(index))
 			return info->maxSize;
-		return B_SIZE_UNLIMITED;
+		return B_SIZE_UNSET;
 	}
 
 	void SetMaxSize(int32 index, float size)
@@ -138,8 +138,8 @@ private:
 			for (int32 i = count; i <= index; i++) {
 				Info* info = new Info;
 				info->weight = 1;
-				info->minSize = 0;
-				info->maxSize = B_SIZE_UNLIMITED;
+				info->minSize = B_SIZE_UNSET;
+				info->maxSize = B_SIZE_UNSET;
 				fInfos.AddItem(info);
 			}
 		}

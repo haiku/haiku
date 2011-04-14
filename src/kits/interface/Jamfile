@@ -133,6 +133,7 @@ MergeObject <libbe>interface_kit.o :
 	WidthBuffer.cpp
 
 	# layouter
+	CollapsingLayouter.cpp
 	ComplexLayouter.cpp
 	Layouter.cpp
 	LayoutOptimizer.cpp

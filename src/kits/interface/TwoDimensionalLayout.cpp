@@ -18,9 +18,7 @@
 
 #include <Referenceable.h>
 
-#include "ComplexLayouter.h"
-#include "OneElementLayouter.h"
-#include "SimpleLayouter.h"
+#include "CollapsingLayouter.h"
 
 
 
@@ -706,12 +704,7 @@ BTwoDimensionalLayout::CompoundLayouter::ValidateMinMax()
 
 	int elementCount = _CountElements();
 
-	if (elementCount <= 1)
-		fLayouter = new OneElementLayouter();
-	else if (_HasMultiElementItems())
-		fLayouter = new ComplexLayouter(elementCount, _Spacing());
-	else
-		fLayouter = new SimpleLayouter(elementCount, _Spacing());
+	fLayouter = new CollapsingLayouter(elementCount, _Spacing());
 
 	// tell the layouter about our constraints
 	// TODO: We should probably ignore local layouters whose view is hidden.
