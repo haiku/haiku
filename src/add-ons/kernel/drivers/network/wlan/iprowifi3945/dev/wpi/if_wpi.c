@@ -1600,8 +1600,10 @@ wpi_tx_intr(struct wpi_softc *sc, struct wpi_rx_desc *desc)
 		DPRINTFN(WPI_DEBUG_TX, ("%d retries\n", stat->ntries));
 		retrycnt = 1;
 	}
+#ifndef __HAIKU__
 	ieee80211_ratectl_tx_complete(vap, ni, IEEE80211_RATECTL_TX_SUCCESS,
 	    &retrycnt, NULL);
+#endif
 
 	/* XXX oerrors should only count errors !maxtries */
 	if ((le32toh(stat->status) & 0xff) != 1)
@@ -1947,7 +1949,9 @@ wpi_tx_data(struct wpi_softc *sc, struct mbuf *m0, struct ieee80211_node *ni,
 	} else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE) {
 		rate = tp->ucastrate;
 	} else {
+#ifndef __HAIKU__
 		(void) ieee80211_ratectl_rate(ni, NULL, 0);
+#endif
 		rate = ni->ni_txrate;
 	}
 	tx->rate = wpi_plcp_signal(rate);

@@ -2982,7 +2982,9 @@ bwi_encap(struct bwi_softc *sc, int idx, struct mbuf *m,
 	} else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE) {
 		rate = rate_fb = tp->ucastrate;
 	} else {
+#ifndef __HAIKU__
 		rix = ieee80211_ratectl_rate(ni, NULL, pkt_len);
+#endif
 		rate = ni->ni_txrate;
 
 		if (rix > 0) {
@@ -3378,9 +3380,11 @@ _bwi_txeof(struct bwi_softc *sc, uint16_t tx_id, int acked, int data_txcnt)
 			 * well so to avoid over-aggressive downshifting we
 			 * treat any number of retries as "1".
 			 */
+#ifndef __HAIKU__
 			ieee80211_ratectl_tx_complete(vap, ni,
 			    (data_txcnt > 1) ? IEEE80211_RATECTL_TX_SUCCESS :
 			        IEEE80211_RATECTL_TX_FAILURE, &acked, NULL);
+#endif
 		}
 
 		/*

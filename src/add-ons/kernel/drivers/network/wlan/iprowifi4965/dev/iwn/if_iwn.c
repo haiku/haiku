@@ -826,9 +826,7 @@ iwn_vap_create(struct ieee80211com *ic,
 	ivp->iv_newstate = vap->iv_newstate;
 	vap->iv_newstate = iwn_newstate;
 
-#ifndef __HAIKU__
 	ieee80211_ratectl_init(vap);
-#endif
 	/* Complete setup. */
 	ieee80211_vap_attach(vap, iwn_media_change, ieee80211_media_status);
 	ic->ic_opmode = opmode;
@@ -840,9 +838,7 @@ iwn_vap_delete(struct ieee80211vap *vap)
 {
 	struct iwn_vap *ivp = IWN_VAP(vap);
 
-#ifndef __HAIKU__
 	ieee80211_ratectl_deinit(vap);
-#endif
 	ieee80211_vap_detach(vap);
 	free(ivp, M_80211_VAP);
 }

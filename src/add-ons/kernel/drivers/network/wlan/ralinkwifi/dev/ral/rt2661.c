@@ -904,10 +904,12 @@ rt2661_tx_intr(struct rt2661_softc *sc)
 
 			DPRINTFN(sc, 10, "data frame sent successfully after "
 			    "%d retries\n", retrycnt);
+#ifndef __HAIKU__
 			if (data->rix != IEEE80211_FIXED_RATE_NONE)
 				ieee80211_ratectl_tx_complete(vap, ni,
 				    IEEE80211_RATECTL_TX_SUCCESS,
 				    &retrycnt, NULL);
+#endif
 			ifp->if_opackets++;
 			break;
 
@@ -916,10 +918,12 @@ rt2661_tx_intr(struct rt2661_softc *sc)
 
 			DPRINTFN(sc, 9, "%s\n",
 			    "sending data frame failed (too much retries)");
+#ifndef __HAIKU__
 			if (data->rix != IEEE80211_FIXED_RATE_NONE)
 				ieee80211_ratectl_tx_complete(vap, ni,
 				    IEEE80211_RATECTL_TX_FAILURE,
 				    &retrycnt, NULL);
+#endif
 			ifp->if_oerrors++;
 			break;
 
@@ -1485,7 +1489,9 @@ rt2661_tx_data(struct rt2661_softc *sc, struct mbuf *m0,
 	} else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE) {
 		rate = tp->ucastrate;
 	} else {
+#ifndef __HAIKU__
 		(void) ieee80211_ratectl_rate(ni, NULL, 0);
+#endif
 		rate = ni->ni_txrate;
 	}
 	rate &= IEEE80211_RATE_VAL;
