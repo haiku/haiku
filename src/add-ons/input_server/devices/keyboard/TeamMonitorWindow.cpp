@@ -36,7 +36,7 @@
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Team Monitor"
+#define B_TRANSLATE_CONTEXT "Team monitor"
 
 
 TeamMonitorWindow* gTeamMonitorWindow = NULL;
@@ -98,7 +98,7 @@ static const uint32 kMsgRebootTick = 'TMrt';
 
 TeamMonitorWindow::TeamMonitorWindow()
 	:
-	BWindow(BRect(0, 0, 350, 400), B_TRANSLATE("Team Monitor"),
+	BWindow(BRect(0, 0, 350, 400), B_TRANSLATE("Team monitor"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS,
@@ -124,12 +124,12 @@ TeamMonitorWindow::TeamMonitorWindow()
 	BGroupView* groupView = new BGroupView(B_HORIZONTAL);
 	layout->AddView(groupView);
 
-	fKillButton = new BButton("kill", B_TRANSLATE("Kill Application"),
+	fKillButton = new BButton("kill", B_TRANSLATE("Kill application"),
 		new BMessage(TM_KILL_APPLICATION));
 	groupView->AddChild(fKillButton);
 	fKillButton->SetEnabled(false);
 	
-	fQuitButton = new BButton("quit", B_TRANSLATE("Quit Application"),
+	fQuitButton = new BButton("quit", B_TRANSLATE("Quit application"),
 		new BMessage(TM_QUIT_APPLICATION));
 	groupView->AddChild(fQuitButton);
 	fQuitButton->SetEnabled(false);
@@ -142,7 +142,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	groupView = new BGroupView(B_HORIZONTAL);
 	layout->AddView(groupView);
 
-	BButton* forceReboot = new BButton("force", B_TRANSLATE("Force Reboot"),
+	BButton* forceReboot = new BButton("force", B_TRANSLATE("Force reboot"),
 		new BMessage(TM_FORCE_REBOOT));
 	groupView->GroupLayout()->AddView(forceReboot);
 
@@ -150,7 +150,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	glue->SetExplicitMinSize(BSize(inset, -1));
 	groupView->GroupLayout()->AddItem(glue);
 
-	fRestartButton = new BButton("restart", B_TRANSLATE("Restart the Desktop"),
+	fRestartButton = new BButton("restart", B_TRANSLATE("Restart the desktop"),
 		new BMessage(TM_RESTART_DESKTOP));
 	SetDefaultButton(fRestartButton);
 	groupView->GroupLayout()->AddView(fRestartButton);
@@ -416,7 +416,7 @@ TeamDescriptionView::TeamDescriptionView()
 {
 	fInfoString = B_TRANSLATE(
 		"Select an application from the list above and click one of "
-		"the buttons 'Kill Application' and 'Quit Application' "
+		"the buttons 'Kill application' and 'Quit application' "
 		"in order to close it.\n\n"
 		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
 
