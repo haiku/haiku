@@ -195,7 +195,7 @@ float
 CollapsingLayouter::MinSize()
 {
 	_ValidateLayouter();
-	return fLayouter->MinSize();
+	return fLayouter ? fLayouter->MinSize() : 0;
 }
 
 
@@ -203,7 +203,7 @@ float
 CollapsingLayouter::MaxSize()
 {
 	_ValidateLayouter();
-	return fLayouter->MaxSize();
+	return fLayouter ? fLayouter->MaxSize() : B_SIZE_UNLIMITED;
 }
 
 
@@ -211,7 +211,7 @@ float
 CollapsingLayouter::PreferredSize()
 {
 	_ValidateLayouter();
-	return fLayouter->PreferredSize();
+	return fLayouter ? fLayouter->PreferredSize() : 0;
 }
 
 
@@ -220,7 +220,8 @@ CollapsingLayouter::CreateLayoutInfo()
 {
 	_ValidateLayouter();
 
-	return new ProxyLayoutInfo(fLayouter->CreateLayoutInfo(), fElementCount);
+	LayoutInfo* info = fLayouter ? fLayouter->CreateLayoutInfo() : NULL;
+	return new ProxyLayoutInfo(info, fElementCount);
 }
 
 
@@ -328,6 +329,9 @@ CollapsingLayouter::_AddConstraints(int32 position, const Constraint* c)
 void
 CollapsingLayouter::_SetWeights()
 {
+	if (!fLayouter)
+		return;
+
 	for (int32 i = 0; i < fElementCount; i++) {
 		fLayouter->SetWeight(fElements[i].position, fElements[i].weight);
 	}
