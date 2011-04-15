@@ -82,9 +82,11 @@ CapabilitiesView::CapabilitiesView()
 	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, layout->CountRows(),
 		layout->CountColumns(), 1);
 
-	float spacing = be_control_look->DefaultItemSpacing();
-	layout->SetHorizontalSpacing(spacing / 2.0f);
-		// divide by two to compensate for empty column 1
+	// Set horizontal spacing to 0, and use the middle column as
+	// variable-width spacing (like layout 'glue').
+	layout->SetHorizontalSpacing(0);
+	layout->SetMinColumnWidth(1, be_control_look->DefaultLabelSpacing());
+	layout->SetMaxColumnWidth(1, B_SIZE_UNLIMITED);
 }
 
 
