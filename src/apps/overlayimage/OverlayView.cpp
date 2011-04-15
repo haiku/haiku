@@ -49,6 +49,7 @@ OverlayView::OverlayView(BRect frame)
 		"Drag the replicant to the Desktop.");
 	fText->SetText(text);
 	fText->SetAlignment(B_ALIGN_CENTER);
+	fText->MakeEditable(false);
 	fText->MakeSelectable(false);
 	fText->MoveBy(0, (Bounds().bottom - fText->TextRect().bottom) / 2);
 }
