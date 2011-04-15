@@ -414,7 +414,7 @@ initialiseFuseOps(struct fuse_operations* fuseOps)
 
 
 static int
-fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName)
+mount_volume(const char* device, const char* mntPoint, const char* fsName)
 {
 	// Mount the volume in the root FS.
 	fssh_dev_t fsDev = _kern_mount(kMountPoint, device, fsName, 0, NULL, 0);
@@ -440,37 +440,92 @@ fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName)
 			isErr ? "unknown" : info.volume_name,
 			mntPoint);
 	}
+	
+	return 0;
+}
 
-	// Run the fuse_main() loop.
-	const char* argv[13];
-	int fuseArgCount = 0;
 
-	argv[fuseArgCount++] = (const char*)"bfs_fuse";
-	argv[fuseArgCount++] = mntPoint;
-	argv[fuseArgCount++] = (const char*)"-s";
-	if (gIsDebug)
-		argv[fuseArgCount++] = (const char*)"-d";
-
-	initialiseFuseOps(&gFUSEOperations);
-
-	int ret = fuse_main(fuseArgCount, (char**)argv, &gFUSEOperations, NULL);
-
+static int
+unmount_volume(const char* device, const char* mntPoint)
+{
 	// Unmount the volume again.
 	// Avoid a "busy" vnode.
 	_kern_setcwd(-1, "/");
 	fssh_status_t error = _kern_unmount(kMountPoint, 0);
 	if (error != FSSH_B_OK) {
 		if (gIsDebug)
-			fprintf(stderr, "Error: Unmounting FS failed: %s\n", fssh_strerror(error));
+			fprintf(stderr, "Error: Unmounting FS failed: %s\n",
+				fssh_strerror(error));
 		else
-			syslog(LOG_INFO, "Error: Unmounting FS failed: %s", fssh_strerror(error));
+			syslog(LOG_INFO, "Error: Unmounting FS failed: %s",
+				fssh_strerror(error));
 		return 1;
 	}
 
 	if (!gIsDebug)
 		syslog(LOG_INFO, "UnMounted %s from %s", device, mntPoint);
+	
+	return 0;
+}
 
-	return ret;
+
+static int
+fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName,
+	struct fuse_args& fuseArgs)
+{
+	int ret;
+	
+	ret = mount_volume(device, mntPoint, fsName);
+	if (ret != 0)
+		return ret;
+	
+	char* fuseOptions = NULL;
+
+	// default FUSE options
+	char* fsNameOption = NULL;
+	if (fuse_opt_add_opt(&fuseOptions, "allow_other") < 0
+		|| asprintf(&fsNameOption, "fsname=%s", device) < 0
+		|| fuse_opt_add_opt(&fuseOptions, fsNameOption) < 0) {
+		unmount_volume(device, mntPoint);
+		return 1;
+	}
+
+	struct stat sbuf;
+	if ((stat(device, &sbuf) == 0) && S_ISBLK(sbuf.st_mode)) {
+		int blkSize = 512;
+		fssh_dev_t volumeID = get_volume_id();
+		if (volumeID >= 0) {
+			fssh_fs_info info;
+			if (_kern_read_fs_info(volumeID, &info) == FSSH_B_OK)
+				blkSize = info.block_size;
+		}
+
+		char* blkSizeOption = NULL;
+		if (fuse_opt_add_opt(&fuseOptions, "blkdev") < 0
+			|| asprintf(&blkSizeOption, "blksize=%i", blkSize) < 0
+			|| fuse_opt_add_opt(&fuseOptions, blkSizeOption) < 0) {
+			unmount_volume(device, mntPoint);
+			return 1;
+		}
+	}
+
+ 	// Run the fuse_main() loop.
+	if (fuse_opt_add_arg(&fuseArgs, "-s") < 0
+		|| fuse_opt_add_arg(&fuseArgs, "-o") < 0
+		|| fuse_opt_add_arg(&fuseArgs, fuseOptions) < 0) {
+		unmount_volume(device, mntPoint);
+		return 1;
+	}
+
+	initialiseFuseOps(&gFUSEOperations);
+
+	int res = fuse_main(fuseArgs.argc, fuseArgs.argv, &gFUSEOperations, NULL);
+
+	ret = unmount_volume(device, mntPoint);
+	if (ret != 0)
+		return ret;
+
+	return res;
 }
 
 
@@ -488,33 +543,64 @@ print_usage_and_exit(const char* binName)
 }
 
 
-int
-main(int argc, const char* const* argv)
+struct FsConfig {
+	const char* device;
+	const char* mntPoint;
+};
+
+
+enum {
+	KEY_DEBUG,
+	KEY_HELP
+};
+
+
+static int
+process_options(void* data, const char* arg, int key, struct fuse_args* outArgs)
 {
-	// eat options
-	int argi = 1;
-	while (argi < argc && argv[argi][0] == '-') {
-		const char* arg = argv[argi++];
-		if (strcmp(arg, "--help") == 0) {
-			print_usage_and_exit(argv[0]);
-		} else if (strcmp(arg, "-d") == 0) {
+	struct FsConfig* config = (FsConfig*) data;
+
+	switch (key) {
+		case FUSE_OPT_KEY_NONOPT:
+			if (!config->device) {
+				config->device = arg;
+				return 0;
+					// don't pass the device path to fuse_main()
+			} else if (!config->mntPoint)
+				config->mntPoint = arg;
+			else
+				print_usage_and_exit(outArgs->argv[0]);
+			break;
+		case KEY_DEBUG:
 			gIsDebug = true;
-		} else {
-			print_usage_and_exit(argv[0]);
-		}
+			break;
+		case KEY_HELP:
+			print_usage_and_exit(outArgs->argv[0]);
 	}
 
-	// get device
-	if (argi >= argc)
-		print_usage_and_exit(argv[0]);
-	const char* device = argv[argi++];
-	// get mountpoint
-	if (argi >= argc)
-		print_usage_and_exit(argv[0]);
-	const char* mntPoint = argv[argi++];
-	// more parameters are excess
-	if (argi < argc)
-		print_usage_and_exit(argv[0]);
+	return 1;
+}
+
+
+int
+main(int argc, char* argv[])
+{
+	struct fuse_args fuseArgs = FUSE_ARGS_INIT(argc, argv);
+	struct FsConfig config;
+	memset(&config, 0, sizeof(config));
+	const struct fuse_opt fsOptions[] = {
+		FUSE_OPT_KEY("uhelper=",	FUSE_OPT_KEY_DISCARD),
+			// fuse_main() throws an error about this unknown option
+			// TODO: do not use fuse_main to mount filesystem, instead use
+			// fuse_mount, fuse_new, fuse_set_signal_handlers and fuse_loop
+		FUSE_OPT_KEY("-d",			KEY_DEBUG),
+		FUSE_OPT_KEY("-h",			KEY_HELP),
+		FUSE_OPT_KEY("--help",		KEY_HELP),
+		FUSE_OPT_END
+	};
+
+	if (fuse_opt_parse(&fuseArgs, &config, fsOptions, process_options) < 0)
+		return 1;
 
 	if (!modules[0]) {
 		fprintf(stderr, "Error: Couldn't find FS module!\n");
@@ -527,7 +613,8 @@ main(int argc, const char* const* argv)
 			fssh_strerror(error));
 		return error;
 	}
+
 	const char* fsName = modules[0]->name;
-	return fssh_fuse_session(device, mntPoint, fsName);
+	return fssh_fuse_session(config.device, config.mntPoint, fsName, fuseArgs);
 }
 
