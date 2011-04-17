@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	4154780568
+1	polish	x-vnd.haiku-icon_o_matic	727699051
 <modify path>	Icon-O-Matic-PathCmd		<modyfikacja ścieżki>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nie ma czego powtórzyć>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nie ma czego cofnąć>
@@ -34,7 +34,6 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atrybut BEOS:ICON
 Bleep!	Exporter - Continue in error dialog		Ojej!
 Bummer	Cancel button - error alert		Klops
 Cancel	Icon-O-Matic-ColorPicker		Anuluj
-Cancel	Icon-O-Matic-Main		Anuluj
 Cancel	Icon-O-Matic-SVGExport		Anuluj
 Caps	Icon-O-Matic-PropertyNames		Nasadka
 Change Color	Icon-O-Matic-SetColorCmd		Zmianę koloru
@@ -51,7 +50,6 @@ Conic	Icon-O-Matic-StyleTypes		Stożkowy
 Copy	Icon-O-Matic-Properties		Kopiuj
 Detect Orient.	Icon-O-Matic-PropertyNames		Wykrywanie orientacji
 Diamond	Icon-O-Matic-StyleTypes		Diament
-Discard	Icon-O-Matic-Main		Nie zapisuj
 Duplicate	Icon-O-Matic-PathsList		Duplikuj
 Duplicate	Icon-O-Matic-ShapesList		Duplikuj
 Duplicate	Icon-O-Matic-StylesList		Duplikuj
@@ -147,11 +145,9 @@ Rotate	Icon-O-Matic-TransformationBoxStates		Obracanie
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Obrócenie wskaźników ścieżki
 Rotation	Icon-O-Matic-PropertyNames		Obrót
 Rounding	Icon-O-Matic-PropertyNames		Zaokrąglenie
-Save	Icon-O-Matic-Main		Zapisz
 Save	Icon-O-Matic-Menu-File		Zapisz
 Save Icon	Dialog title		Zapisz ikonę
 Save as…	Icon-O-Matic-Menu-File		Zapisz jako…
-Save changes to current icon?	Icon-O-Matic-Main		Zapisać zmiany w obecnej ikonie?
 Saving your document failed!	Icon-O-Matic-Exporter		Zapisywanie dokumentu nie powiodło się!
 Scale	Icon-O-Matic-TransformationBoxStates		Skalowanie
 Scale X	Icon-O-Matic-PropertyNames		Skala X

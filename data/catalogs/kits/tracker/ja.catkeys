@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1428931639
+1	japanese	x-vnd.Haiku-libtracker	1298084824
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒
 %Ld B	WidgetAttributeText		%Ld バイト
 %Ld bytes	WidgetAttributeText		%Ld バイト
@@ -22,7 +22,7 @@
 64 x 64	DeskWindow		64 × 64
 <No recent items>	FavoritesMenu		<最近使った項目はありません>
 Add	FindPanel		追加
-Add current folder	FilePanelPriv		このフォルダーを追加
+Add current folder	FilePanelPriv		このフォルダを追加
 Add printer…	ContainerWindow		プリンターの追加…
 Add-ons	ContainerWindow		アドオン
 Add-ons	DeskWindow		アドオン
@@ -31,8 +31,8 @@ Add-ons	VolumeWindow		アドオン
 All BeOS disks	AutoMounterSettings		全 BFS パーティション
 All disks	AutoMounterSettings		全パーティション
 All disks	FindPanel		全パーティション
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダーに「%name」という項目が既に存在して、中に同じ名前の項目が入っている可能性もあります。%verbしょうとしている項目と置き換えますか？
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーに既に「%name」という項目があります。作成しょうとしているシンボリックリンクと置き換えますか？
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダに「%name」という項目が既に存在して、中に同じ名前の項目が入っている可能性もあります。%verbしょうとしている項目と置き換えますか？
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダに既に「%name」という項目があります。作成しょうとしているシンボリックリンクと置き換えますか？
 And	FindPanel		かつ
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダーに移動またはコピーしてよろしいですか？
@@ -58,7 +58,7 @@ Close	ContainerWindow		閉じる
 Close	QueryContainerWindow		閉じる
 Close	VolumeWindow		閉じる
 Close all	ContainerWindow		全て閉じる
-Close all in workspace	ContainerWindow		ワークスペース内の全てを閉じる
+Close all in workspace	ContainerWindow		ワークスペース内のすべてを閉じる
 Copy	ContainerWindow		コピー
 Copy	FilePanelPriv		コピー
 Copy here	ContainerWindow		ここにコピー
@@ -94,6 +94,7 @@ Delete	FilePanelPriv		削除
 Delete	PoseView		削除
 Deleting: 	StatusWindow		削除中：
 Description:	InfoWindow		説明：
+Desktop	B_DESKTOP_DIRECTORY		デスクトップ
 Desktop	Model		デスクトップ
 Desktop	TrackerSettingsWindow		デスクトップ
 Disk mount settings	AutoMounterSettings		ディスクマウント設定
@@ -108,6 +109,7 @@ Done	AutoMounterSettings		完了
 Duplicate	ContainerWindow		複製
 Edit Query template	FindPanel		クエリー雛形を編集
 Edit favorites…	FilePanelPriv		お気に入りの編集…
+Edit name	ContainerWindow		名前の変更
 Edit name	FilePanelPriv		名前の変更
 Edit name	InfoWindow		名前の変更
 Edit name	VolumeWindow		名前の変更
@@ -116,7 +118,7 @@ Edit templates…	TemplatesMenu		雛形を編集…
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Empty Trash	ContainerWindow		ごみ箱を空にする
 Empty Trash	InfoWindow		ごみ箱を空にする
-Empty folder	NavMenu		空フォルダー
+Empty folder	NavMenu		空フォルダ
 Empty folder	SlowContextPopup		空フォルダー
 Emptying Trash… 	StatusWindow		ごみ箱を空にしています…
 Enable type-ahead filtering	SettingsView		Type ahead フィルターを有効にする
@@ -143,7 +145,7 @@ Get info	ContainerWindow		詳細情報…
 Get info	FilePanelPriv		詳細情報…
 Get info	VolumeWindow		詳細情報…
 GiB	WidgetAttributeText		GiB
-Go to parent	FilePanelPriv		親フォルダーへ移動
+Go to parent	FilePanelPriv		親フォルダへ移動
 Group	FilePermissionsView		グループ
 Handles %type	OpenWithWindow		%type に対応
 Icon view	ContainerWindow		アイコン表示
@@ -186,7 +188,7 @@ Modified:	InfoWindow		更新日時：
 Mount	ContainerWindow		マウント
 Mount	DeskWindow		マウント
 Mount	VolumeWindow		マウント
-Mount all disks now	AutoMounterSettings		全てのディスクを直ちにマウント
+Mount all disks now	AutoMounterSettings		すべてのディスクを直ちにマウント
 Mount server error	AutoMounterSettings		マウントサーバーエラー
 Mount settings…	SettingsView		マウント設定…
 Mount settings…	VolumeWindow		マウント設定…
@@ -254,13 +256,15 @@ Proceed	FSUtils		続行
 Query name:	FindPanel		クエリー名：
 Query template	FindPanel		クエリー雛形
 Read	FilePermissionsView		読み取り
-Recalculate folder size	InfoWindow		フォルダーサイズを再度計算
+Real name	ContainerWindow		実名
+Recalculate folder size	InfoWindow		フォルダサイズを再度計算
 Recent documents	FavoritesMenu		最近開いたドキュメント
 Recent folders	ContainerWindow		最近開いたフォルダー
 Recent folders	FavoritesMenu		最近開いたフォルダー
 Relation	OpenWithWindow		関連
 Remove	FindPanel		削除
 Replace	FSUtils		置き換える
+Replace all	FSUtils		すべて置き換え
 Replace other file	WidgetAttributeText		既存の項目を置き換える
 Resize to fit	ContainerWindow		最適な表示サイズに変更
 Resize to fit	QueryContainerWindow		最適な表示サイズに変更
@@ -311,14 +315,15 @@ That name is already taken. Please type another one.	InfoWindow		指定された
 That name is already taken. Please type another one.	WidgetAttributeText		指定された名前は既に使用されています。別の名前を指定してください。
 That name is too long. Please type another one.	InfoWindow		名前が長すぎます。もっと短い名前にしてください。
 The Tracker must be running to see Info windows.	PoseView		情報ウィンドウを表示するには、Trackerが実行されている必要があります。
-The Tracker must be running to see set the default printer.	PoseView		デフォルトプリンターを設定するには、 Tracker が実行されている必要があります。
+The Tracker must be running to see set the default printer.	PoseView		デフォルトプリンタを設定するには、 Tracker が実行されている必要があります。
 The mount server could not be contacted.	AutoMounterSettings		マウントサーバーが応答しません。
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てることはできません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
+
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定された名前は既にフォルダー名として使用されています。別の名前を指定してください。
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
 The target disk does not support creating links.	FSUtils		指定されたディスクはリンクをサポートしていません。
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		「%name」を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。
-There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		指定されたフォルダーへの保存に失敗しました。別のフォルダーを指定してみてください。
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		指定されたフォルダへの保存に失敗しました。別のフォルダーを指定してみてください。
 There was an error deleting \"%name\":\n\t%error	FSUtils		「%name」の移動中にエラーが発生：\n\t%error
 There was an error resolving the link.	Tracker		リンクの解釈に失敗しました。
 There was an error writing the attribute.	WidgetAttributeText		属性の書き込み中にエラーが発生しました。
@@ -343,14 +348,14 @@ Windows	TrackerSettingsWindow		ウィンドウ
 Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか？
 Would you like to find some other suitable application?	FSUtils		他に適切なアプリケーションを検索しますか？
 Write	FilePermissionsView		書き込み
-You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやサブフォルダーに移動することはできません。
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダを同じフォルダやサブフォルダに移動することはできません。
 You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。
-You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えることはできません。
+You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダを同名のフォルダと置き換えることはできません。
 You cannot copy or move the root directory.	FSUtils		ルートフォルダーをコピーまたは移動はできません。
-You cannot create a link to the root directory.	FSUtils		ルートフォルダーにはリンクを作成できません。
+You cannot create a link to the root directory.	FSUtils		ルートフォルダにはリンクを作成できません。
 You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		「Trash」、「home」および「Desktop」フォルダーをごみ箱に捨てることはできません。
-You cannot replace a file with a folder or a symbolic link.	FSUtils		ファイルをフォルダーまたはリンクと置き換えることはできません。
+You cannot replace a file with a folder or a symbolic link.	FSUtils		ファイルをフォルダまたはリンクと置き換えることはできません。
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		「Disks」ウィンドウ内のディスクアイコンの上に項目をドラグ＆ドロップしてください。
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		「Disks」ウィンドウ内のディスクアイコンの上に項目をドラグ＆ドロップしてください。
@@ -358,6 +363,7 @@ You must have at least one attribute showing.	PoseView		最低一つの属性を
 \nShould this be fixed?	FSUtils		\n修復しますか？
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld バイト、
 after	FindPanel		以降
+apps	B_APPS_DIRECTORY		アプリケーション
 before	FindPanel		以前
 by attribute	FindPanel		属性で検索
 by formula	FindPanel		条件で検索
@@ -370,6 +376,7 @@ copying	FSUtils		コピー中
 ends with	FindPanel		指定文字列で終わる
 ends with	SelectionWindow		指定文字列で終わる
 for %num files	InfoWindow		合計 %num 項目
+home	B_USER_DIRECTORY		ホームフォルダ
 is not	FindPanel		除く
 label too long	PoseView		ラベルが長すぎます
 link	FSUtils	filename link	リンク
@@ -381,7 +388,9 @@ moving	FSUtils		移動中
 multiple disks	FindPanel		複数ディスク
 no items	CountView		0 項目
 no supporting apps	OpenWithWindow		対応するアプリケーションはありません
-parent folder	NavMenu		上位フォルダー
+optional	/boot/optional		追加項目
+parent folder	NavMenu		上位フォルダ
+preferences	B_PREFERENCES_DIRECTORY		環境設定
 rename	InfoWindow	As in 'If you rename ...'	名前の変更
 rename	InfoWindow	As in 'To rename ...'	名前の変更
 rename	TextWidget	As in 'If you rename ...'	名前の変更
@@ -389,3 +398,5 @@ rename	TextWidget	As in 'To rename ...'	名前の変更
 save text	FilePanelPriv		テキストを保存
 starts with	FindPanel		指定文字列ではじまる
 starts with	SelectionWindow		指定文字列で始まる
+system	B_SYSTEM_DIRECTORY		システムフォルダ
+trash	B_TRASH_DIRECTORY		ごみ箱

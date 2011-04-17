@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-icon_o_matic	3809094595
+1	czech	x-vnd.haiku-icon_o_matic	382013078
 <modify path>	Icon-O-Matic-PathCmd		<změnit cestu>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<není co udělat znovu>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nic, co by šlo vrátit>
@@ -34,7 +34,6 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Atribut
 Bleep!	Exporter - Continue in error dialog		Píp!
 Bummer	Cancel button - error alert		OK
 Cancel	Icon-O-Matic-ColorPicker		Zrušit
-Cancel	Icon-O-Matic-Main		Zrušit
 Cancel	Icon-O-Matic-SVGExport		Zrušit
 Caps	Icon-O-Matic-PropertyNames		Verzálky
 Change Color	Icon-O-Matic-SetColorCmd		Změnit barvu
@@ -52,7 +51,6 @@ Contour	Transformation		Obrys
 Copy	Icon-O-Matic-Properties		Kopírovat
 Detect Orient.	Icon-O-Matic-PropertyNames		Detekovat Orientaci
 Diamond	Icon-O-Matic-StyleTypes		Kosočtverec
-Discard	Icon-O-Matic-Main		Zahodit
 Duplicate	Icon-O-Matic-PathsList		Duplikovat
 Duplicate	Icon-O-Matic-ShapesList		Duplikovat
 Duplicate	Icon-O-Matic-StylesList		Duplikovat
@@ -152,11 +150,9 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Otočit ukazatele zpět
 Rotate indices forwards	Icon-O-Matic-PathsList		Otočit ukazatele dopředu
 Rotation	Icon-O-Matic-PropertyNames		Otočení
 Rounding	Icon-O-Matic-PropertyNames		Zaokrouhlování
-Save	Icon-O-Matic-Main		Uložit
 Save	Icon-O-Matic-Menu-File		Uložit
 Save Icon	Dialog title		Uložit ikonu
 Save as…	Icon-O-Matic-Menu-File		Uložit jako...
-Save changes to current icon?	Icon-O-Matic-Main		Uložit změny do aktuální ikony?
 Saving your document failed!	Icon-O-Matic-Exporter		Uložení vašeho dokumentu selhalo!
 Scale	Icon-O-Matic-TransformationBoxStates		Změnit velikost
 Scale X	Icon-O-Matic-PropertyNames		Změnit šířku

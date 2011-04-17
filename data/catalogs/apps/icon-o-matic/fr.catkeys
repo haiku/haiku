@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	979273836
+1	french	x-vnd.haiku-icon_o_matic	2721164210
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
 <unkown property>	Icon-O-Matic-PropertyNames		<propriétés inconnue>
@@ -12,7 +12,6 @@ Add circle	Icon-O-Matic-PathsList		Ajouter un cercle
 All	Icon-O-Matic-Properties		Tout
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
 Cancel	Icon-O-Matic-ColorPicker		Annuler
-Cancel	Icon-O-Matic-Main		Annuler
 Cancel	Icon-O-Matic-SVGExport		Annuler
 Change Color	Icon-O-Matic-SetColorCmd		Changer la couleur
 Clean up	Icon-O-Matic-PathsList		Nettoyer
@@ -26,7 +25,6 @@ Contour	Transformation		Contour
 Copy	Icon-O-Matic-Properties		Copier
 Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation
 Diamond	Icon-O-Matic-StyleTypes		Diamant
-Discard	Icon-O-Matic-Main		Jeter
 Duplicate	Icon-O-Matic-PathsList		Dupliquer
 Duplicate	Icon-O-Matic-ShapesList		Dupliquer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
@@ -91,7 +89,6 @@ Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Réinitialiser la tran
 Reset transformation	Icon-O-Matic-ShapesList		Annuler la transformation
 Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
 Rotation	Icon-O-Matic-PropertyNames		Rotation
-Save	Icon-O-Matic-Main		Enregistrer
 Save	Icon-O-Matic-Menu-File		Enregistrer
 Save Icon	Dialog title		Enregistrer icône
 Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…

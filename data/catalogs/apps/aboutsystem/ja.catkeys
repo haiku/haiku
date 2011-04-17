@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	2350236915
+1	japanese	x-vnd.Haiku-About	3149623567
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		合計 %d MiB
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
@@ -25,7 +25,6 @@ The Haiku-Ports team\n	AboutView		Haiku-Ports チーム\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 と Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haiku 特有のコード、特にカーネルとカーネルにリンクするアプリケーションのコードは、%MIT licence%で公開しています。一部のシステムライブラリが LPGL ライセンスで公開されている第三者が作のコードを含めています。第三者の著作権情報は下記に記載されています。\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku コードの著作権は Haiku, Inc. もしくはコード内に記載されている作者にあります。Haiku および Haiku ロゴは Haiku, Inc. のトレードマークです。\n\n
 Time running:	AboutView		稼動時間：
 Translations:\n	AboutView		各国語翻訳：\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n

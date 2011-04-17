@@ -1,0 +1,9 @@
+1	german	x-vnd.Haiku-KeyboardInputServerDevice	2270014966
+(This team is a system component)	Team monitor		(Dieses Team ist eine Systemkomponente)
+Cancel	Team monitor		Abbrechen
+Force reboot	Team monitor		Neustart erzwingen
+Kill application	Team monitor		Team liquidieren
+Quit application	Team monitor		Team beenden
+Restart the desktop	Team monitor		Desktop neu starten
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Um ein Team zu beenden, den Namen in der Liste markieren und "Team liquidieren" oder "Team beenden" klicken.\n\nSTRG+ALT+ENTF für %ld Sekunden halten, um einen Neustart zu erzwingen.
+Team monitor	Team monitor		Teammonitor

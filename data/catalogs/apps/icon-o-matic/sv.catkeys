@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	2332620696
+1	swedish	x-vnd.haiku-icon_o_matic	2326864078
 <modify path>	Icon-O-Matic-PathCmd		<modifiera bana>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<inget att göra om>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<inget att ångra>
@@ -34,7 +34,7 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribut
 Bleep!	Exporter - Continue in error dialog		Pip!
 Bummer	Cancel button - error alert		Kasst
 Cancel	Icon-O-Matic-ColorPicker		Avbryt
-Cancel	Icon-O-Matic-Main		Avbryt
+Cancel	Icon-O-Matic-Menu-Settings		Avbryt
 Cancel	Icon-O-Matic-SVGExport		Avbryt
 Caps	Icon-O-Matic-PropertyNames		Versaler
 Change Color	Icon-O-Matic-SetColorCmd		Byt färg
@@ -42,6 +42,7 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Rensa upp bana
 Clean up	Icon-O-Matic-PathsList		Rensa upp
 Click on a shape above	Empty transformers list - 1st line		Klicka på en figur ovan
 Click on an object in	Empty property list - 1st line		Klicka på ett objekt i
+Close	Icon-O-Matic-Menu-File		Stäng
 Closed	Icon-O-Matic-PropertyNames		Stängd
 Color	Icon-O-Matic-PropertyNames		Färg
 Color	Icon-O-Matic-StyleTypes		Färg
@@ -52,7 +53,7 @@ Contour	Transformation		Kontur
 Copy	Icon-O-Matic-Properties		Kopiera
 Detect Orient.	Icon-O-Matic-PropertyNames		Finn orientering.
 Diamond	Icon-O-Matic-StyleTypes		Diamant
-Discard	Icon-O-Matic-Main		Kasta
+Discard	Icon-O-Matic-Menu-Settings		Förkasta
 Duplicate	Icon-O-Matic-PathsList		Duplicera
 Duplicate	Icon-O-Matic-ShapesList		Duplicera
 Duplicate	Icon-O-Matic-StylesList		Duplicera
@@ -153,11 +154,11 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Rotera indexpunkter moturs
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotera indexpunkter medurs
 Rotation	Icon-O-Matic-PropertyNames		Rotation
 Rounding	Icon-O-Matic-PropertyNames		Avrunda
-Save	Icon-O-Matic-Main		Spara
 Save	Icon-O-Matic-Menu-File		Spara
+Save	Icon-O-Matic-Menu-Settings		Spara
 Save Icon	Dialog title		Spara ikon
 Save as…	Icon-O-Matic-Menu-File		Spara som...
-Save changes to current icon?	Icon-O-Matic-Main		Spara ändringarna i nuvarande ikon?
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Spara ändringarna för aktuell ikon?
 Saving your document failed!	Icon-O-Matic-Exporter		Misslyckades att spara dokumentet!
 Scale	Icon-O-Matic-TransformationBoxStates		Skala
 Scale X	Icon-O-Matic-PropertyNames		Skala X
@@ -186,6 +187,7 @@ Translation X	Icon-O-Matic-PropertyNames		Förflyttning X
 Translation Y	Icon-O-Matic-PropertyNames		Förflyttning Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Avtilldela bana
 Undo	Icon-O-Matic-Main		Ångra
+Untitled	Icon-O-Matic-Main		Namnlös
 Width	Icon-O-Matic-PropertyNames		Bredd
 Yes	Icon-O-Matic-StyledTextImport		Ja
 any of the other lists to	Empty property list - 2nd line		någon av dom andra listorna till

@@ -1,23 +1,18 @@
-1	finnish	x-vnd.Haiku-DataTranslations	758278388
-About	DataTranslations		Ohjelmasta
+1	finnish	x-vnd.Haiku-DataTranslations	3820343452
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translator-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
 Cancel	DataTranslations		Peru
 Could not install %s:\n%s	DataTranslations		Ei voitu asentaa %s:\n%s
 DataTranslations	System name		Tietomuunnosasetukset
 DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
 DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Tietomuunnosasetukset\n\ttekijät: Oliver Siebenmarck ja muut\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
-Icon	DataTranslations		Kuvake
 Info	DataTranslations		tiedot
 Info:	DataTranslations		Tiedot:
-Info…	DataTranslations		Tiedot...
 Name:	DataTranslations		Nimi:
-Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Nimi:\t%s \nVersio:\t%ld.%ld.%ld\nTiedot:\t%s\n\nPolku:\n%s\n
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nimi: %s \nVersio: %ld.%ld.%ld\n\nTiedot:\n%s\n\nPolku:\n%s\n
 OK	DataTranslations		Valmis
 Overwrite	DataTranslations		Korvaa
-Panel Info	DataTranslations		Paneelitiedot
 Path:	DataTranslations		Polku:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Kohde ’%name’ ei näytä olevan tietomuunnin ja sitä ei asenneta.
 The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
-Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Tietomuunnosasetukset\n\nKäytä tätä ohjauspaneelia eri tietomuuntimien\narvojen asettamiseksi kun sovellukselle ei ole\nmääritelty muita asetuksia.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Käytä tätä ohjauspaneelia niiden oletusasetusten asettamiseksi, joita käytetään kun sovellus ei ole määritellyt muita asetuksia.
 Version:	DataTranslations		Versio:

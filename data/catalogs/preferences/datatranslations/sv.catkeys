@@ -1,23 +1,16 @@
-1	swedish	x-vnd.Haiku-DataTranslations	758278388
-About	DataTranslations		om
+1	swedish	x-vnd.Haiku-DataTranslations	764083640
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ett objekt döpt '%name' finns redan i översättningsmappen! Skall den befintliga översättaren skrivas över?
 Cancel	DataTranslations		Avbryt
 Could not install %s:\n%s	DataTranslations		Kunde inte installera %s:\n%s
 DataTranslations	System name		FormatÖversättare
 DataTranslations - Error	DataTranslations		FormatÖversättare - Fel
 DataTranslations - Note	DataTranslations		FormatÖversättare - Anteckning
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		FormatÖversättare\n\tskrivet av Oliver Siebenmarck med flera\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
-Icon	DataTranslations		Ikon
 Info	DataTranslations		Info
 Info:	DataTranslations		Information:
-Info…	DataTranslations		Information...
 Name:	DataTranslations		Namn:
-Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Namn:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nSökväg:\n%s\n
 OK	DataTranslations		OK
 Overwrite	DataTranslations		Skriv över
-Panel Info	DataTranslations		Panelinfo
 Path:	DataTranslations		Sökväg:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Objektet '%name' verkar inte vara en Översättare och kommer därför inte att installeras.
 The new translator has been installed successfully.	DataTranslations		Den nya formatöversättaren har installerats.
-Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Tilläggsinställningar\n\nAnvänd denna kontrollpanel för att ändra värden som olika\ntillägg använder när inga inställningar finns\nför applikationen.
 Version:	DataTranslations		Version:

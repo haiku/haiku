@@ -1,4 +1,4 @@
-1	japanese	system	3492689314
+1	japanese	system	2013278701
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
@@ -7,9 +7,11 @@
 <empty>	Menu		<空>
 About %app%	AboutMenuItem		%app%について
 About %app…	Dragger		%appについて…
+About…	AboutWindow		このソフトウエアについて…
 Blue:	ColorControl		青：
 Close	AboutWindow		閉じる
 Copy	TextView		コピー
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc. 	
 Cut	TextView		切り取り
 Error	PrintJob		エラー
 Error	ZombieReplicantView		エラー

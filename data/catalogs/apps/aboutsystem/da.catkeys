@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-About	326778460
+1	danish	x-vnd.Haiku-About	1126165112
 %.2f GHz	AboutView		%.2f GHz
 %ld MHz	AboutView		%ld MHz
 %ld Processors:	AboutView		%ld Processorer:
@@ -19,7 +19,6 @@ Source Code: 	AboutView		Kildekode:
 The BeGeistert team\n	AboutView		BeGeistert holdet\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports holdet\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware holdet og deres dusør program\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Ophavsretten til Haiku koden er ejet af Haiku, Inc. eller af den respektive forfatter, hvis udtrykkeligt skrevet i koden. Haiku og Haiku logoet er trademarks ejet af Haiku, Inc.\n\n
 Time running:	AboutView		Tid kørt:
 Translations:\n	AboutView		Oversættelser:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS kerne)\n

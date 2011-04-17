@@ -28,7 +28,7 @@ Mini icon	DisplayView		Petite icône
 No	NotificationView		Non
 Notifications	GeneralView		Notifications
 Notifications	NotificationView		Notifications
-Notifications	System name		Notifications 
+Notifications	System name		Notifications
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
 OK	DisplayView		OK
 OK	GeneralView		OK

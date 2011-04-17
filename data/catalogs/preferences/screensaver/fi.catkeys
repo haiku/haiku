@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ScreenSaver	1401896374
+1	finnish	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 sekuntia
 Add…	ScreenSaver		Lisää...
 Blackness	ScreenSaver		Mustuus
@@ -8,7 +8,9 @@ Could not load screen saver	ScreenSaver		Ei voitu ladata näytönsäästäjää
 Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole saatavilla
 Don't fade when	ScreenSaver		Älä häivytä kun
 Done	ScreenSaver		Valmis
+Enable screensaver	ScreenSaver		Ota käyttöön näytönsäästäjä
 Fade now when	ScreenSaver		Häivytä nyt kun
+General	ScreenSaver		Yleinen
 No options available	ScreenSaver		Valitsimia ei ole käytettävissä
 OK	ScreenSaver		Valmis
 Password Window	ScreenSaver		Salasanaikkuna
@@ -17,6 +19,9 @@ Password:	ScreenSaver		Salasana:
 Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
 Password…	ScreenSaver		Salasana...
 ScreenSaver	System name		Näytönsäästäjäasetukset
+Screensaver settings	ScreenSaver		Näytönsäästäjän asetukset
+Screensavers	ScreenSaver		Näytönsäästäjät
+Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
 Test	ScreenSaver		Testi
 Turn off screen	ScreenSaver		Käännä näyttö pois päältä
 Use custom password	ScreenSaver		Käytä räätälöityä salasanaa

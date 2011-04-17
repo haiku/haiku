@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-About	2350236915
+1	esperanto	x-vnd.Haiku-About	3149623567
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiBajtoj ĉiomaj
 %d MiB used (%d%%)	AboutView		%d MiBajtoj uzataj (%d%%)
@@ -25,7 +25,6 @@ The Haiku-Ports team\n	AboutView		La Hajku-Portantaro\n
 The Haikuware team and their bounty program\n	AboutView		La Haikuware grupo kaj ilia premia programo\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		la Universitato de Aŭklando kaj Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		La fontkodo unika je Haiku, speciale la kerno kaj la binditaj aplikaĵoj, disiĝas laŭ la termoj de la %permesilo MIT%. Certaj sistemaj bibliotekoj enhavas eksterpartian fontkodon disiĝintan laŭ la permesilo LGPL. Vi trovos la aŭtorrajtojn pro la eksterpartia fontkodo pieden.\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		La aŭtorrajto de la Haiku fontkodo apartenas al Haiku, Inc. aŭ la respektivaj aŭtoroj, kie oni malimplice notis en la fontkodo. Haiku kaj la Haiku emblemo estas komercaj markoj de Haiku, Inc.\n\n
 Time running:	AboutView		Ruldaŭro:
 Translations:\n	AboutView		Tradukoj:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (kaj lia NewOS kerno)\n

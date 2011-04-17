@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	3019397582
+1	swedish	x-vnd.Haiku-About	3417369432
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totalt
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
@@ -10,6 +10,22 @@ About this system	AboutWindow		Om det här systemet
 AboutSystem	System name		OmHaiku
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. och deras utvecklarteam, för att ha skapat BeOS!\n\n
 Contributors:\n	AboutView		Medarbetare:\n
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo	AboutView		Upphovsrätt © 1990-2003 Wada Laboratory, Universitetet i Tokyo.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Upphovsrätt © 1994-1997 Mark Kilard. Med ensamrätt.
+Copyright © 1995, 1998, 1999, 2000, 2001 by Jef Poskanzer. All rights reserved.	AboutView		Upphovsrätt © 1995, 1998, 1999-2001 Jef Poskanzer. Med ensamrätt.
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Upphovsrätt © 1996-1997 Jeff Prosise. Med ensamrätt.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Upphovsrätt © 1996-2005 Julian R Seward. Med ensamrätt.
+Copyright © 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Upphovsrätt © 1998-2000 Thai Open Source Software Center Ltd och Clark Cooper.
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Upphovsrätt © 1998-2003 Daniel Veillard. Med ensamrätt.
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Upphovsrätt © 1999-2000 Y. Takagi. Med ensamrätt.
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre	AboutView		Upphovsrätt © 2000 Jean-Pierre Lefebvre och Remi Lefebvre.
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Upphovsrätt © 2000-2007 Fabrice Bellard, et al.
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard.  All rights reserved.	AboutView		Upphovsrätt © 2001-2002 Thomas Broyer, Charlie Bozeman och Daniel Veillard. Med ensamrätt.
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Upphovsrätt © 2002-2005 Industrial Light & Magic, en avdelning inom Lucas Digital Ltd. LLC.
+Copyright © 2003 Peter Hanappe and others.	AboutView		Upphovsrätt © 2003 Peter Hanappe och andra.
+Copyright © 2003-2006 by Intel Corporation. All rights reserved.	AboutView		Upphovsrätt © 2003-2006 Intel Corporation. Med ensamrätt.
+Copyright © 2004-2005 by Intel Corporation. All rights reserved.	AboutView		Upphovsrätt © 2004-2005 Intel Corporation. Med ensamrätt.
+Copyright © 2006-2007 by Intel Corporation. All rights reserved.	AboutView		Upphovsrätt © 2006-2007 Intel Corporation. Med ensamrätt.
 Current maintainers:\n	AboutView		Nuvarande projektledare:\n
 GCC %d Hybrid	AboutView		GCC %d-hybrid
 Google & their Google Summer of Code program\n	AboutView		Google och deras program Google Summer of Code\n
@@ -19,6 +35,7 @@ Licenses: 	AboutView		Licenser:
 Memory:	AboutView		Minne:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundare)\n\n
 Past maintainers:\n	AboutView		Tidigare projektledare:\n
+Portions of this software are copyright Copyright © 1996-2006 The FreeType Project.  All rights reserved.	AboutView		Delar av denna programvara har upphovsrätt. Upphovsrätt © 1996-2006 FreeType projektet. Med ensamrätt.
 Processor:	AboutView		Processor:
 Revision	AboutView		Utgåva
 Source Code: 	AboutView		Källkod: 
@@ -27,7 +44,6 @@ The Haiku-Ports team\n	AboutView		Haiku Ports-teamet\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland och Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Koden som är unik för Haiku, speciellt kärnan och all kod som applikationer kan länka till, är distribuerad under villkoren av %MIT licence%. Vissa systembibliotek kan innehålla kod från tredjepart distribuerad under LGPL licensen. Här under kan du finna upphovsrätten till kod från tredjepart.\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten för Haikus olika delar ägs av Haiku, Inc och de upphovsmän som anges i källkoden. Namnet Haiku och dess logotyp är varumärken som ägs av Haiku, Inc.\n\n
 Time running:	AboutView		Tid sedan uppstart:
 Translations:\n	AboutView		Översättningar:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n

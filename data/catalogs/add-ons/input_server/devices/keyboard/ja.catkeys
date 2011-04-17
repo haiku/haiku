@@ -1,0 +1,9 @@
+1	japanese	x-vnd.Haiku-KeyboardInputServerDevice	2270014966
+(This team is a system component)	Team monitor		(このチームはシステムの構成要素です)
+Cancel	Team monitor		中止
+Force reboot	Team monitor		強制再起動
+Kill application	Team monitor		アプリケーションの強制終了
+Quit application	Team monitor		アプリケーションの終了
+Restart the desktop	Team monitor		デスクトップの再起動
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		アプリケーションを選んで、「アプリケーションの強制終了」および「アプリケーションの終了」のどちらかひとつのボタンを押して閉じてください。\n\nCONTROL+ALT+DELETE を %ld 秒間押して再起動してください。
+Team monitor	Team monitor		チームモニタ

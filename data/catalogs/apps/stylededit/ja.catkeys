@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	2399393207
+1	japanese	x-vnd.Haiku-StyledEdit	3620825125
 ???	LoadAlert		???
 Align	Menus		配置
 Black	Menus		黒
@@ -55,6 +55,7 @@ Redo typing	QuitAlert		やり直し
 Replace	FindandReplaceWindow		置換
 Replace all	FindandReplaceWindow		全て置換
 Replace in all windows	FindandReplaceWindow		全てのウィンドウで置換
+Replace next	Menus		次を置換
 Replace with:	FindandReplaceWindow		置換：
 Replace…	Menus		置換…
 Revert to saved…	Menus		最新保存版に戻す…

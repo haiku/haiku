@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-About	3193114030
+1	korean	x-vnd.Haiku-About	3992500682
 %.2f GHz	AboutView		%.2f GHz
 %ld MHz	AboutView		%ld MHz
 %ld Processors:	AboutView		%ld 프로세서:
@@ -17,7 +17,6 @@ Revision	AboutView		리비젼
 Source Code: 	AboutView		소스 코드: 
 The BeGeistert team\n	AboutView		BeGeistert 팀\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports 팀\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku 코드의 저작권은 Haiku 주식회사나 각각의 소스에 기록된 만든 이에게 있습니다. Haiku 와 Haiku 로고는 Haiku 주식회사의 등록 상표입니다.\n\n
 Time running:	AboutView		실행 시간:
 Translations:\n	AboutView		번역자:\n
 Unknown	AboutView		알수 없음

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.haiku-icon_o_matic	3636943750
+1	norwegian_bokmål	x-vnd.haiku-icon_o_matic	209862233
 <modify path>	Icon-O-Matic-PathCmd		<endre sti>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ingenting å omgjøre>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ingenting å angre på>
@@ -33,7 +33,6 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON-atributt
 Bleep!	Exporter - Continue in error dialog		Bip!
 Bummer	Cancel button - error alert		Synd
 Cancel	Icon-O-Matic-ColorPicker		Avbryt
-Cancel	Icon-O-Matic-Main		Avbryt
 Cancel	Icon-O-Matic-SVGExport		Avbryt
 Change Color	Icon-O-Matic-SetColorCmd		Endre farge
 Clean up	Icon-O-Matic-PathsList		Rydd opp
@@ -48,7 +47,6 @@ Conic	Icon-O-Matic-StyleTypes		Kjeglesnitt
 Contour	Transformation		Kontur
 Copy	Icon-O-Matic-Properties		Kopier
 Diamond	Icon-O-Matic-StyleTypes		Diamant
-Discard	Icon-O-Matic-Main		Forkast
 Duplicate	Icon-O-Matic-PathsList		Dupliser
 Duplicate	Icon-O-Matic-ShapesList		Dupliser
 Duplicate	Icon-O-Matic-StylesList		Dupliser
@@ -133,11 +131,9 @@ Reverse	Icon-O-Matic-PathsList		Reverser
 Rotate	Icon-O-Matic-TransformationBoxStates		Roter
 Rotation	Icon-O-Matic-PropertyNames		Rotasjon
 Rounding	Icon-O-Matic-PropertyNames		Runding
-Save	Icon-O-Matic-Main		Lagre
 Save	Icon-O-Matic-Menu-File		Lagre
 Save Icon	Dialog title		Lagre ikon
 Save as…	Icon-O-Matic-Menu-File		Lagre som...
-Save changes to current icon?	Icon-O-Matic-Main		Lagre endringene til gjeldende ikon?
 Saving your document failed!	Icon-O-Matic-Exporter		Lagring av dokumentet mislyktes!
 Scale	Icon-O-Matic-TransformationBoxStates		Skaler
 Scale X	Icon-O-Matic-PropertyNames		Skaler X

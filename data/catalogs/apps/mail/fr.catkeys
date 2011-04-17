@@ -1,7 +1,11 @@
-1	french	x-vnd.Be-MAIL	3744015583
+1	french	x-vnd.Be-MAIL	2388476802
 %d - Date	Mail		%d - Date
 %e - E-mail address	Mail		%e - Adresse mail
+%e wrote:\\n	Mail		%e a écrit :\\n
 %n - Full name	Mail		%n - Nom complet
+(Address unavailable)	Mail		(Adresse non disponible)
+(Date unavailable)	Mail		(Date non disponible)
+(Name unavailable)	Mail		(Nom non disponible)
 Account from mail	Mail		Compte de courrier
 Account:	Mail		Compte :
 Accounts…	Mail		Comptes…
@@ -148,6 +152,7 @@ Your main text contains %ld unencodable characters. Perhaps a different characte
 draft	B_USER_DIRECTORY/mail/draft		brouillons
 helpful message	Mail		message utile
 in	B_USER_DIRECTORY/mail/in		reçus
+mail	B_USER_DIRECTORY/mail		mail
 out	B_USER_DIRECTORY/mail/out		boite d'envoi
 queries	B_USER_DIRECTORY/mail/queries		requêtes
 sent	B_USER_DIRECTORY/mail/sent		envoyés

@@ -1,4 +1,4 @@
-1	dutch	x-vnd.haiku-icon_o_matic	2834764750
+1	dutch	x-vnd.haiku-icon_o_matic	3702650529
 <modify path>	Icon-O-Matic-PathCmd		<pad aanpassen>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<niets om opnieuw te doen>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<niets om ongedaan te maken>
@@ -31,7 +31,6 @@ Assign Style	Icon-O-Matic-AssignStyleCmd		Stijl toekennen
 Bleep!	Exporter - Continue in error dialog		Bliep!
 Bummer	Cancel button - error alert		Pech hebben
 Cancel	Icon-O-Matic-ColorPicker		Annuleren
-Cancel	Icon-O-Matic-Main		Annuleren
 Cancel	Icon-O-Matic-SVGExport		Annuleren
 Caps	Icon-O-Matic-PropertyNames		Hoofdletters
 Change Color	Icon-O-Matic-SetColorCmd		Kleur veranderen
@@ -46,7 +45,6 @@ Conic	Icon-O-Matic-StyleTypes		Kegelvormig
 Copy	Icon-O-Matic-Properties		Kopiëren
 Detect Orient.	Icon-O-Matic-PropertyNames		Oriëntatie opmerken.
 Diamond	Icon-O-Matic-StyleTypes		Diamantvormig
-Discard	Icon-O-Matic-Main		Verwerpen
 Duplicate	Icon-O-Matic-PathsList		Dupliceren
 Duplicate	Icon-O-Matic-ShapesList		Dupliceren
 Duplicate	Icon-O-Matic-StylesList		Dupliceren
@@ -118,11 +116,9 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Pad omkeren
 Rotate	Icon-O-Matic-TransformationBoxStates		Roteren
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
 Rotation	Icon-O-Matic-PropertyNames		Rotatie
-Save	Icon-O-Matic-Main		Opslaan
 Save	Icon-O-Matic-Menu-File		Opslaan
 Save Icon	Dialog title		Icoon opslaan
 Save as…	Icon-O-Matic-Menu-File		Opslaan als...
-Save changes to current icon?	Icon-O-Matic-Main		Veranderingen aan huidig icoon opslaan?
 Saving your document failed!	Icon-O-Matic-Exporter		Opslaan van uw document is mislukt!
 Scale	Icon-O-Matic-TransformationBoxStates		Schaal veranderen
 Select	Icon-O-Matic-Properties		Selecteren

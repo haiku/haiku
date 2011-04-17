@@ -1,22 +1,15 @@
-1	slovak	x-vnd.Haiku-DataTranslations	2849987867
-About	DataTranslations		O aplikácii
+1	slovak	x-vnd.Haiku-DataTranslations	2855793119
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Položka „%name“ už existuje v priečinku Translators! Má sa existujúci prekladač prepísať?
 Cancel	DataTranslations		Zrušiť
 Could not install %s:\n%s	DataTranslations		Nebolo možné nainštalovať %s:\n%s
 DataTranslations - Error	DataTranslations		Preklad dát - chyba
 DataTranslations - Note	DataTranslations		Preklad dát - poznámka
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnapísal Oliver Siebenmarck a ďalší\n\tCopyright 2002-2010, Haiku Inc. Všetky práva vyhradené.\n
-Icon	DataTranslations		Ikona
 Info	DataTranslations		Info
 Info:	DataTranslations		Info:
-Info…	DataTranslations		Info...
 Name:	DataTranslations		Názov:
-Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Názov:\t%s \nVerzia:\t%ld.%ld.%ld\nInfo:\t%s\n\nCesta:\n%s\n
 OK	DataTranslations		OK
 Overwrite	DataTranslations		Prepísať
-Panel Info	DataTranslations		Info panelu
 Path:	DataTranslations		Cesta:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Zdá sa, že položka „%name“ nie je prekladač a nebude nainštalovaná.
 The new translator has been installed successfully.	DataTranslations		Nový prekladač bol úspešne nainštalovaný.
-Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Nastavenia prekladu\n\nTento ovládací panel používajte na nastavenie hodnôt, ktoré\nrozličné prekladače používajú, keď v tejto aplikácii\nnie sú uvedené žiadne ďalšie nastavenia.
 Version:	DataTranslations		Verzia:

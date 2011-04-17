@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	2332620696
+1	german	x-vnd.haiku-icon_o_matic	2326864078
 <modify path>	Icon-O-Matic-PathCmd		<Pfad ändern>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nichts zu wiederholen>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nichts rückgängig zu machen>
@@ -34,7 +34,7 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Attribut
 Bleep!	Exporter - Continue in error dialog		Piep!
 Bummer	Cancel button - error alert		Herrje!
 Cancel	Icon-O-Matic-ColorPicker		Abbrechen
-Cancel	Icon-O-Matic-Main		Abbrechen
+Cancel	Icon-O-Matic-Menu-Settings		Abbrechen
 Cancel	Icon-O-Matic-SVGExport		Abbrechen
 Caps	Icon-O-Matic-PropertyNames		Enden
 Change Color	Icon-O-Matic-SetColorCmd		Farbe ändern
@@ -42,6 +42,7 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pfad aufräumen
 Clean up	Icon-O-Matic-PathsList		Aufräumen
 Click on a shape above	Empty transformers list - 1st line		Erst eine Form oben auswählen,
 Click on an object in	Empty property list - 1st line		Auf ein Objekt klicken in
+Close	Icon-O-Matic-Menu-File		Schließen
 Closed	Icon-O-Matic-PropertyNames		Geschlossen
 Color	Icon-O-Matic-PropertyNames		Farbe
 Color	Icon-O-Matic-StyleTypes		Farbe
@@ -52,7 +53,7 @@ Contour	Transformation		Kontur
 Copy	Icon-O-Matic-Properties		Kopieren
 Detect Orient.	Icon-O-Matic-PropertyNames		Ausrichtung erk.
 Diamond	Icon-O-Matic-StyleTypes		Raute
-Discard	Icon-O-Matic-Main		Verwerfen
+Discard	Icon-O-Matic-Menu-Settings		Verwerfen
 Duplicate	Icon-O-Matic-PathsList		Duplizieren
 Duplicate	Icon-O-Matic-ShapesList		Duplizieren
 Duplicate	Icon-O-Matic-StylesList		Duplizieren
@@ -153,11 +154,11 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Indizes rückwärts rotieren
 Rotate indices forwards	Icon-O-Matic-PathsList		Indizes vorwärts rotieren
 Rotation	Icon-O-Matic-PropertyNames		Rotation
 Rounding	Icon-O-Matic-PropertyNames		Rundung
-Save	Icon-O-Matic-Main		Speichern
 Save	Icon-O-Matic-Menu-File		Speichern
+Save	Icon-O-Matic-Menu-Settings		Speichern
 Save Icon	Dialog title		Icon speichern
 Save as…	Icon-O-Matic-Menu-File		Speichern als...
-Save changes to current icon?	Icon-O-Matic-Main		Änderungen am aktuellen Icon speichern?
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Änderungen am aktuellen Icon speichern?
 Saving your document failed!	Icon-O-Matic-Exporter		Speichern des Dokuments fehlgeschlagen!
 Scale	Icon-O-Matic-TransformationBoxStates		Skalieren
 Scale X	Icon-O-Matic-PropertyNames		Skalieren in X-Richtung
@@ -186,6 +187,7 @@ Translation X	Icon-O-Matic-PropertyNames		Verschiebung X
 Translation Y	Icon-O-Matic-PropertyNames		Verschiebung Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Pfad lösen
 Undo	Icon-O-Matic-Main		Rückgängig
+Untitled	Icon-O-Matic-Main		Unbenannt
 Width	Icon-O-Matic-PropertyNames		Strichstärke
 Yes	Icon-O-Matic-StyledTextImport		Ja
 any of the other lists to	Empty property list - 2nd line		einer der anderen Listen, um

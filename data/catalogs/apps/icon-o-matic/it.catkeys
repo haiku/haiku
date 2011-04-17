@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-icon_o_matic	3809094595
+1	italian	x-vnd.haiku-icon_o_matic	382013078
 <modify path>	Icon-O-Matic-PathCmd		<modifica percorso>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<niente da annullare>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<niente da annullare>
@@ -34,7 +34,6 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attributo BEOS:ICON
 Bleep!	Exporter - Continue in error dialog		Bip!
 Bummer	Cancel button - error alert		Bummer
 Cancel	Icon-O-Matic-ColorPicker		Cancella
-Cancel	Icon-O-Matic-Main		Cancella
 Cancel	Icon-O-Matic-SVGExport		Cancella
 Caps	Icon-O-Matic-PropertyNames		Caps
 Change Color	Icon-O-Matic-SetColorCmd		Cambia Colore
@@ -52,7 +51,6 @@ Contour	Transformation		Contorno
 Copy	Icon-O-Matic-Properties		Copia
 Detect Orient.	Icon-O-Matic-PropertyNames		Individua Orient.
 Diamond	Icon-O-Matic-StyleTypes		Diamante
-Discard	Icon-O-Matic-Main		Annulla
 Duplicate	Icon-O-Matic-PathsList		Duplica
 Duplicate	Icon-O-Matic-ShapesList		Duplica
 Duplicate	Icon-O-Matic-StylesList		Duplica
@@ -152,11 +150,9 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Ruotare gli indici indietro
 Rotate indices forwards	Icon-O-Matic-PathsList		Ruotare gli indici in avanti
 Rotation	Icon-O-Matic-PropertyNames		Rotazione
 Rounding	Icon-O-Matic-PropertyNames		Arrotondamento
-Save	Icon-O-Matic-Main		Salva
 Save	Icon-O-Matic-Menu-File		Salva
 Save Icon	Dialog title		Salva Icona
 Save as…	Icon-O-Matic-Menu-File		Salva come...
-Save changes to current icon?	Icon-O-Matic-Main		Salvare i cambiamenti all'icona corrente?
 Saving your document failed!	Icon-O-Matic-Exporter		Fallito il salvataggio del documento!
 Scale	Icon-O-Matic-TransformationBoxStates		Scala
 Scale X	Icon-O-Matic-PropertyNames		Scala X

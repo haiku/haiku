@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	2332620696
+1	finnish	x-vnd.haiku-icon_o_matic	2326864078
 <modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
@@ -34,7 +34,7 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON -attribuutti
 Bleep!	Exporter - Continue in error dialog		Sensuroi!
 Bummer	Cancel button - error alert		Valmis
 Cancel	Icon-O-Matic-ColorPicker		Peru
-Cancel	Icon-O-Matic-Main		Peru
+Cancel	Icon-O-Matic-Menu-Settings		Peru
 Cancel	Icon-O-Matic-SVGExport		Peru
 Caps	Icon-O-Matic-PropertyNames		Isot kirjaimet
 Change Color	Icon-O-Matic-SetColorCmd		Vaihda väriä
@@ -42,6 +42,7 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
 Clean up	Icon-O-Matic-PathsList		Puhdista
 Click on a shape above	Empty transformers list - 1st line		Napsauta yllä olevaa hahmoa
 Click on an object in	Empty property list - 1st line		Napsauta objektia kohteessa
+Close	Icon-O-Matic-Menu-File		Sulje
 Closed	Icon-O-Matic-PropertyNames		Suljettu
 Color	Icon-O-Matic-PropertyNames		Väri
 Color	Icon-O-Matic-StyleTypes		Väri
@@ -52,7 +53,7 @@ Contour	Transformation		Ääriviiva
 Copy	Icon-O-Matic-Properties		Kopioi
 Detect Orient.	Icon-O-Matic-PropertyNames		Havaitse suunta.
 Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
-Discard	Icon-O-Matic-Main		Hylkää
+Discard	Icon-O-Matic-Menu-Settings		Hylkää
 Duplicate	Icon-O-Matic-PathsList		Kaksoiskappele
 Duplicate	Icon-O-Matic-ShapesList		Kaksoiskappale
 Duplicate	Icon-O-Matic-StylesList		Kaksoiskappale
@@ -153,11 +154,11 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Pyöritä osoittimia taaksepäi
 Rotate indices forwards	Icon-O-Matic-PathsList		Pyöritä osoittimia eteenpäin
 Rotation	Icon-O-Matic-PropertyNames		Kierto
 Rounding	Icon-O-Matic-PropertyNames		Pyöristetään
-Save	Icon-O-Matic-Main		Tallenna
 Save	Icon-O-Matic-Menu-File		Tallenna
+Save	Icon-O-Matic-Menu-Settings		Tallenna
 Save Icon	Dialog title		Tallenna kuvake
 Save as…	Icon-O-Matic-Menu-File		Tallenna nimellä...
-Save changes to current icon?	Icon-O-Matic-Main		Tallenna muutokset nykyiseen kuvakkeeseen?
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Tallenna muutokset nykyiseen kuvakkeeseen?
 Saving your document failed!	Icon-O-Matic-Exporter		Asiakirjan tallentaminen epäonnistui!
 Scale	Icon-O-Matic-TransformationBoxStates		Skaalaa
 Scale X	Icon-O-Matic-PropertyNames		Skaalaa X
@@ -186,6 +187,7 @@ Translation X	Icon-O-Matic-PropertyNames		Muunnos X
 Translation Y	Icon-O-Matic-PropertyNames		Muunnos Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Liittämätön polku
 Undo	Icon-O-Matic-Main		Peru
+Untitled	Icon-O-Matic-Main		Otsikoton
 Width	Icon-O-Matic-PropertyNames		Leveys
 Yes	Icon-O-Matic-StyledTextImport		Kyllä
 any of the other lists to	Empty property list - 2nd line		mikä tahansa toisista luetteloista kohteeseen

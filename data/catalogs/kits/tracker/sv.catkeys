@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	442776252
+1	swedish	x-vnd.Haiku-libtracker	2699246155
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld byte
@@ -285,6 +285,7 @@ Prompt	FSUtils		Prompt
 Query name:	FindPanel		Sökningsnamn:
 Query template	FindPanel		Sökmall
 Read	FilePermissionsView		Läsa
+Real name	ContainerWindow		Verkligt namn
 Recalculate folder size	InfoWindow		Beräkna katalogstorlek
 Recent documents	FavoritesMenu		Senaste dokumenten
 Recent folders	ContainerWindow		Senaste mapparna

@@ -1,0 +1,9 @@
+1	finnish	x-vnd.Haiku-KeyboardInputServerDevice	2270014966
+(This team is a system component)	Team monitor		(Tämä ryhmä on järjestelmäkomponentti)
+Cancel	Team monitor		Peru
+Force reboot	Team monitor		Pakota uudelleenkäynnistys
+Kill application	Team monitor		Lopeta sovellus
+Quit application	Team monitor		Poistu sovelluksesta
+Restart the desktop	Team monitor		Käynnistä työpöytä uudelleen
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Valitse sovellus yllä olevasta luettelosta ja napsauta yhtä painikkeista ’Lopeta sovellus’ ja ’Poistu sovelluksesta’ sen sulkemiseksi.\n\nAlkulatauksen suorittamiseksi uudelleen pidä alhaalla Ctrl+Alt+Del -näppäimiä %ld sekuntia.
+Team monitor	Team monitor		Ryhmävalvonta

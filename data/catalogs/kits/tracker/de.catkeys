@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	442776252
+1	german	x-vnd.Haiku-libtracker	2699246155
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld Bytes
@@ -259,7 +259,7 @@ Open selection with:	OpenWithWindow		Auswahl öffnen mit:
 Open with…	ContainerWindow		Öffnen mit...
 Opens with:	InfoWindow		Wird geöffnet mit:
 Or	FindPanel		Oder
-Original name	ContainerWindow		Originalname
+Original name	ContainerWindow		Ursprung
 Other	FilePermissionsView		Andere
 Outline selection rectangle only	SettingsView		Auswahlrahmen als Kontur
 Owner	FilePermissionsView		Besitzer
@@ -285,6 +285,7 @@ Prompt	FSUtils		Nachfragen
 Query name:	FindPanel		Query-Name:
 Query template	FindPanel		Query-Vorlage
 Read	FilePermissionsView		Lesen
+Real name	ContainerWindow		Systemname
 Recalculate folder size	InfoWindow		Neuberechnung der Ordnergröße
 Recent documents	FavoritesMenu		Letzte Dokumente
 Recent folders	ContainerWindow		Letzte Ordner
