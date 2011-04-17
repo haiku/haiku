@@ -204,8 +204,20 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case B_REFS_RECEIVED:
 		case B_SIMPLE_DATA:
+			// If our icon is empty, open the file in this window,
+			// otherwise forward to the application which will open
+			// it in another window, unless we append.
 			message->what = B_REFS_RECEIVED;
+			if (fDocument->Icon()->Styles()->CountStyles() == 0
+				&& fDocument->Icon()->Paths()->CountPaths() == 0
+				&& fDocument->Icon()->Shapes()->CountShapes() == 0) {
+				entry_ref ref;
+				if (message->FindRef("refs", &ref) == B_OK)
+					Open(ref);
+				break;
+			}
 			if (modifiers() & B_SHIFT_KEY) {
+				// We want the icon appended to this window.
 				message->AddBool("append", true);
 				message->AddPointer("window", this);
 			}
@@ -255,6 +267,17 @@ MainWindow::MessageReceived(BMessage* message)
 				be_clipboard->Unlock();
 			break;
 		}
+
+		case MSG_OPEN:
+			// If our icon is empty, we want the icon to open in this
+			// window.
+			if (fDocument->Icon()->Styles()->CountStyles() == 0
+				&& fDocument->Icon()->Paths()->CountPaths() == 0
+				&& fDocument->Icon()->Shapes()->CountShapes() == 0) {
+				message->AddPointer("window", this);
+			}
+			be_app->PostMessage(message);
+			break;
 
 		case MSG_SAVE:
 		case MSG_EXPORT:
@@ -1142,7 +1165,6 @@ MainWindow::_CreateMenuBar()
 	item = new BMenuItem(B_TRANSLATE("Open"B_UTF8_ELLIPSIS),
 		new BMessage(MSG_OPEN), 'O');
 	fileMenu->AddItem(item);
-	item->SetTarget(be_app);
 	BMessage* appendMessage = new BMessage(MSG_APPEND);
 	appendMessage->AddPointer("window", this);
 	item = new BMenuItem(B_TRANSLATE("Append"B_UTF8_ELLIPSIS),

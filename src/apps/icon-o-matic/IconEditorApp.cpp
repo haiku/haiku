@@ -34,6 +34,8 @@ using std::nothrow;
 
 static const char* kAppSig = "application/x-vnd.haiku-icon_o_matic";
 
+static const float kWindowOffset = 20;
+
 
 IconEditorApp::IconEditorApp()
 	:
@@ -113,13 +115,18 @@ IconEditorApp::MessageReceived(BMessage* message)
 		case MSG_NEW:
 			_NewWindow()->Show();
 			break;
-		case MSG_OPEN: {
+		case MSG_OPEN:
+		{
 			BMessage openMessage(B_REFS_RECEIVED);
+			MainWindow* window;
+			if (message->FindPointer("window", (void**)&window) == B_OK)
+				openMessage.AddPointer("window", window);
 			fOpenPanel->SetMessage(&openMessage);
 			fOpenPanel->Show();
 			break;
 		}
-		case MSG_APPEND: {
+		case MSG_APPEND:
+		{
 			MainWindow* window;
 			if (message->FindPointer("window", (void**)&window) != B_OK)
 				break;
@@ -178,7 +185,7 @@ IconEditorApp::MessageReceived(BMessage* message)
 			BRect frame;
 			if (message->FindRect("window frame", &frame) == B_OK) {
 				fLastWindowFrame = frame;
-				fLastWindowFrame.OffsetBy(-10, -10);
+				fLastWindowFrame.OffsetBy(-kWindowOffset, -kWindowOffset);
 			}
 			break;
 		}
@@ -205,13 +212,16 @@ void
 IconEditorApp::RefsReceived(BMessage* message)
 {
 	bool append;
-	if (message->FindBool("append", &append) < B_OK)
+	if (message->FindBool("append", &append) != B_OK)
 		append = false;
+	MainWindow* window;
+	if (message->FindPointer("window", (void**)&window) != B_OK)
+		window = NULL;
+	// When appending, we need to know a window.
+	if (append && window == NULL)
+		return;
 	entry_ref ref;
 	if (append) {
-		MainWindow* window;
-		if (message->FindPointer("window", (void**)&window) != B_OK)
-			return;
 		if (!window->Lock())
 			return;
 		for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++)
@@ -219,9 +229,15 @@ IconEditorApp::RefsReceived(BMessage* message)
 		window->Unlock();
 	} else {
 		for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
-			MainWindow* window = _NewWindow();
-			window->Open(ref, false);
-			window->Show();
+			if (window != NULL && i == 0) {
+				window->Lock();
+				window->Open(ref, false);
+				window->Unlock();
+			} else {
+				window = _NewWindow();
+				window->Open(ref, false);
+				window->Show();
+			}
 		}
 	}
 
@@ -254,7 +270,7 @@ IconEditorApp::ArgvReceived(int32 argc, char** argv)
 MainWindow*
 IconEditorApp::_NewWindow()
 {
-	fLastWindowFrame.OffsetBy(10, 10);
+	fLastWindowFrame.OffsetBy(kWindowOffset, kWindowOffset);
 	MainWindow* window = new MainWindow(fLastWindowFrame, this,
 		&fLastWindowSettings);
 	fWindowCount++;
@@ -346,7 +362,7 @@ IconEditorApp::_RestoreSettings()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		fLastWindowFrame = frame;
 		// Compensate offset for next window...
-		fLastWindowFrame.OffsetBy(-10, -10);
+		fLastWindowFrame.OffsetBy(-kWindowOffset, -kWindowOffset);
 	}
 	settings.FindMessage("window settings", &fLastWindowSettings);
 
