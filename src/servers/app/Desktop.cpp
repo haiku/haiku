@@ -1866,14 +1866,14 @@ Desktop::SetFocusWindow(Window* focus)
 		return;
 	}
 
-	uint32 list = fCurrentWorkspace;
+	uint32 list = /*fCurrentWorkspace;
 	if (fSettings->FocusFollowsMouse())
-		list = kFocusList;
+		list = */kFocusList;
 
 	if (focus == NULL || hasModal || hasWindowScreen) {
-		if (!fSettings->FocusFollowsMouse())
+		/*if (!fSettings->FocusFollowsMouse())
 			focus = CurrentWindows().LastWindow();
-		else
+		else*/
 			focus = fFocusList.LastWindow();
 	}
 
