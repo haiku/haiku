@@ -42,8 +42,49 @@
 TeamMonitorWindow* gTeamMonitorWindow = NULL;
 
 
+struct TeamQuitter {
+	team_id team;
+	thread_id thread;
+	BLooper* window;
+};
+
+
+status_t
+QuitTeamThreadFunction(void* data)
+{
+	TeamQuitter* teamQuitter = reinterpret_cast<TeamQuitter*>(data);
+	if (teamQuitter == NULL)
+		return B_ERROR;
+
+	status_t status;	
+	BMessenger messenger(NULL, teamQuitter->team, &status);
+	if (status != B_OK)
+		return status;
+
+	BMessage message(B_QUIT_REQUESTED);
+	BMessage reply;
+
+	messenger.SendMessage(&message, &reply, 3000000, 3000000);
+
+	bool result;
+	if (reply.what != B_REPLY
+		|| reply.FindBool("result", &result) != B_OK
+		|| result == false) {
+		message.what = kMsgQuitFailed;
+		message.AddPointer("TeamQuitter", teamQuitter);
+		message.AddInt32("error", reply.what);
+		if (teamQuitter->window != NULL)
+			teamQuitter->window->PostMessage(&message);
+		return reply.what;
+	}
+
+	return B_OK;
+}
+
+
 filter_result
-FilterLocaleChanged(BMessage* message, BHandler** target, BMessageFilter *filter)
+FilterLocaleChanged(BMessage* message, BHandler** target,
+	BMessageFilter *filter)
 {
 	if (message->what == B_LOCALE_CHANGED && gTeamMonitorWindow != NULL)
 		gTeamMonitorWindow->LocaleChanged();
@@ -78,6 +119,7 @@ private:
 			IconView*		fIconView;
 	const	char*			fInfoString;
 	const	char*			fSysComponentString;
+	const	char*			fQuitOverdueString;
 			BCardLayout*	fLayout;
 			AllShowingTextView*	fIconTextView;
 			AllShowingTextView*	fInfoTextView;
@@ -202,6 +244,15 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 TeamMonitorWindow::~TeamMonitorWindow()
 {
+	while (fTeamQuitterList.ItemAt(0) != NULL) {
+		TeamQuitter* teamQuitter = reinterpret_cast<TeamQuitter*>
+			(fTeamQuitterList.RemoveItem((int32) 0));
+		if (teamQuitter != NULL) {
+			status_t status;
+			wait_for_thread(teamQuitter->thread, &status);
+			delete teamQuitter;
+		}
+	}
 }
 
 
@@ -252,12 +303,14 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(
 				fListView->CurrentSelection()));
 			if (item != NULL) {
-				BMessenger messenger(item->AppSignature(),
-					item->GetInfo()->team);
-				messenger.SendMessage(B_QUIT_REQUESTED);
+				QuitTeam(item);
 			}
 			break;
 		}
+		case kMsgQuitFailed:
+			MarkUnquittableTeam(msg);
+			break;
+
 		case TM_RESTART_DESKTOP:
 		{
 			if (!be_roster->IsRunning(kTrackerSignature))
@@ -381,10 +434,15 @@ TeamMonitorWindow::Enable()
 void
 TeamMonitorWindow::Disable()
 {
-	fListView->DeselectAll();
 	delete fUpdateRunner;
 	fUpdateRunner = NULL;
 	Hide();
+	fListView->DeselectAll();
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
+		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL)
+			item->SetRefusingToQuit(false);
+	}
 }
 
 
@@ -401,6 +459,64 @@ TeamMonitorWindow::LocaleChanged()
 		if (item != NULL)
 			item->CacheLocalizedName();
 	}
+}
+
+
+void
+TeamMonitorWindow::QuitTeam(TeamListItem* item)
+{
+	if (item == NULL)
+		return;
+
+	TeamQuitter* teamQuitter = new TeamQuitter;
+	teamQuitter->team = item->GetInfo()->team;
+	teamQuitter->window = this;
+	teamQuitter->thread = spawn_thread(QuitTeamThreadFunction,
+		"team quitter", B_DISPLAY_PRIORITY, teamQuitter);
+
+	if (teamQuitter->thread < 0) {
+		delete teamQuitter;
+		return;
+	}
+
+	fTeamQuitterList.AddItem(teamQuitter);
+
+	if (resume_thread(teamQuitter->thread) != B_OK) {
+		fTeamQuitterList.RemoveItem(teamQuitter);
+		delete teamQuitter;
+	}
+}
+
+
+void
+TeamMonitorWindow::MarkUnquittableTeam(BMessage* message)
+{
+	if (message == NULL)
+		return;
+
+	int32 reply;
+	if (message->FindInt32("error", &reply) != B_OK)
+		return;
+
+	TeamQuitter* teamQuitter;
+	if (message->FindPointer("TeamQuitter",
+		reinterpret_cast<void**>(&teamQuitter)) != B_OK)
+		return;
+
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
+		TeamListItem* item
+			= dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL && item->GetInfo()->team == teamQuitter->team) {
+			item->SetRefusingToQuit(true);
+			fListView->Select(i);
+			fListView->InvalidateItem(i);
+			fDescriptionView->SetItem(item);
+			break;
+		}
+	}
+
+	fTeamQuitterList.RemoveItem(teamQuitter);
+	delete teamQuitter;
 }
 
 
@@ -421,6 +537,8 @@ TeamDescriptionView::TeamDescriptionView()
 		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
 
 	fSysComponentString = B_TRANSLATE("(This team is a system component)");
+	fQuitOverdueString = B_TRANSLATE("If the application will not quit "
+		"you may have to kill it.");
 
 	fInfoTextView = new AllShowingTextView("info text");
 	fIconTextView = new AllShowingTextView("icon text");
@@ -494,26 +612,39 @@ void
 TeamDescriptionView::SetItem(TeamListItem* item)
 {
 	fItem = item;
+	int32 styleStart = 0;
+	int32 styleEnd = 0;
+	BTextView* view = NULL;
 
 	if (item == NULL) {
 		BString text;
 		text.SetToFormat(fInfoString, fSeconds);
 		fInfoTextView->SetText(text);
-
 		if (fRebootRunner != NULL && fSeconds < 4) {
-			BFont font;
-			fInfoTextView->GetFont(&font);
-			font.SetFace(B_BOLD_FACE);
-			fInfoTextView->SetStylable(true);
-			fInfoTextView->SetFontAndColor(text.FindLast('\n'),
-				text.Length() - 1, &font);
+			styleStart = text.FindLast('\n');
+			styleEnd = text.Length();
 		}
+		view = fInfoTextView;
 	} else {
 		BString text = item->Path()->Path();
 		if (item->IsSystemServer())
 			text << "\n" << fSysComponentString;
+		if (item->IsRefusingToQuit()) {
+			text << "\n\n" << fQuitOverdueString;
+			styleStart = text.FindLast('\n');
+			styleEnd = text.Length();
+		}
+		view = fIconTextView;
 		fIconTextView->SetText(text);
 		fIconView->SetIcon(item->Path()->Path());
+	}
+
+	if (styleStart != styleEnd && view != NULL) {
+		BFont font;
+		view->GetFont(&font);
+		font.SetFace(B_BOLD_FACE);
+		view->SetStylable(true);
+		view->SetFontAndColor(styleStart, styleEnd, &font);
 	}
 
 	if (fLayout == NULL)

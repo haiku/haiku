@@ -36,10 +36,13 @@ public:
 	const	char*				AppSignature() { return fAppInfo.signature; };
 
 			bool				IsSystemServer();
-			bool				IsApplication();
+			bool				IsApplication() const;
 
 			bool				Found() const { return fFound; }
 			void				SetFound(bool found) { fFound = found; }
+
+			void				SetRefusingToQuit(bool refusing);
+			bool				IsRefusingToQuit();
 
 	static	int32				MinimalHeight();
 
@@ -51,6 +54,7 @@ private:
 			BPath				fPath;
 			BString				fLocalizedName;
 			bool				fFound;
+			bool				fRefusingToQuit;
 };
 
 

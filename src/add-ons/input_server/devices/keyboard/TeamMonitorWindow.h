@@ -33,6 +33,8 @@ public:
 			void			Disable();
 			void			DeselectAll();
 			void			LocaleChanged();
+			void			QuitTeam(TeamListItem* item);
+			void			MarkUnquittableTeam(BMessage* message);
 
 private:
 			void			UpdateList();
@@ -45,9 +47,11 @@ private:
 			BButton*		fQuitButton;
 			BButton*		fRestartButton;
 			TeamDescriptionView*	fDescriptionView;
+			BList			fTeamQuitterList;
 };
 
 static const uint32 kMsgCtrlAltDelPressed = 'TMcp';
 static const uint32 kMsgDeselectAll = 'TMds';
+static const uint32 kMsgQuitFailed = 'TMqf';
 
 #endif	// TEAM_MONITOR_WINDOW_H

@@ -29,7 +29,8 @@ TeamListItem::TeamListItem(team_info &teamInfo)
 	fAppInfo(),
 	fMiniIcon(BRect(0, 0, 15, 15), B_RGBA32),
 	fLargeIcon(BRect(0, 0, 31, 31), B_RGBA32),
-	fFound(false)
+	fFound(false),
+	fRefusingToQuit(false)
 {
 	int32 cookie = 0;
 	image_info info;
@@ -68,6 +69,7 @@ TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	rgb_color kHighlight = { 140, 140, 140, 0 };
 	rgb_color kBlack = { 0, 0, 0, 0 };
 	rgb_color kBlue = { 0, 0, 255, 0 };
+	rgb_color kRed = { 255, 0, 0, 0 };
 
 	BRect r(frame);
 
@@ -96,7 +98,10 @@ TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->SetDrawingMode(B_OP_COPY);
 
 	frame.left += 16;
-	owner->SetHighColor(IsSystemServer() ? kBlue : kBlack);
+	if (fRefusingToQuit)
+		owner->SetHighColor(kRed);
+	else
+		owner->SetHighColor(IsSystemServer() ? kBlue : kBlack);
 
 	BFont font = be_plain_font;
 	font_height	finfo;
@@ -175,7 +180,21 @@ TeamListItem::IsSystemServer()
 
 
 bool
-TeamListItem::IsApplication()
+TeamListItem::IsApplication() const
 {
 	return fAppInfo.signature[0] != '\0';
+}
+
+
+void
+TeamListItem::SetRefusingToQuit(bool refusing)
+{
+	fRefusingToQuit = refusing;
+}
+
+
+bool
+TeamListItem::IsRefusingToQuit()
+{
+	return fRefusingToQuit;
 }
