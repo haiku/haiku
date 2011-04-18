@@ -643,7 +643,7 @@ BEntry::GetParent(BDirectory* dir) const
 	- "error code" - Failure
 */
 status_t
-BEntry::GetName(char *buffer) const
+BEntry::GetName(char* buffer) const
 {
 	status_t result = B_ERROR;
 
@@ -681,7 +681,7 @@ BEntry::GetName(char *buffer) const
 
 */
 status_t
-BEntry::Rename(const char *path, bool clobber)
+BEntry::Rename(const char* path, bool clobber)
 {
 	// check parameter and initialization
 	if (path == NULL)
@@ -780,7 +780,7 @@ BEntry::Remove()
 		\c false - The BEntry objects refer to different entries
  */
 bool
-BEntry::operator==(const BEntry &item) const
+BEntry::operator==(const BEntry& item) const
 {
 	// First check statuses
 	if (this->InitCheck() != B_OK && item.InitCheck() != B_OK) {
@@ -951,7 +951,7 @@ BEntry::_SetTo(int dirFD, const char* path, bool traverse)
 				// if no directory was given, we need to open the current dir
 				// now
 				if (dirFD < 0) {
-					char *cwd = getcwd(tmpPath, B_PATH_NAME_LENGTH);
+					char* cwd = getcwd(tmpPath, B_PATH_NAME_LENGTH);
 					if (!cwd)
 						return B_ERROR;
 					dirFD = _kern_open_dir(-1, cwd);

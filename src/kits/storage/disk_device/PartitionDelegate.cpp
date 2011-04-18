@@ -21,10 +21,11 @@
 
 // constructor
 BPartition::Delegate::Delegate(BPartition* partition)
-	: fPartition(partition),
-	  fMutablePartition(this),
-	  fDiskSystem(NULL),
-	  fPartitionHandle(NULL)
+	:
+	fPartition(partition),
+	fMutablePartition(this),
+	fDiskSystem(NULL),
+	fPartitionHandle(NULL)
 {
 }
 
@@ -359,8 +360,8 @@ BPartition::Delegate::SetParameters(Delegate* child, const char* parameters)
 
 // GetNextSupportedChildType
 status_t
-BPartition::Delegate::GetNextSupportedChildType(Delegate* child, int32 *cookie,
-	BString* type) const
+BPartition::Delegate::GetNextSupportedChildType(Delegate* child,
+	int32* cookie, BString* type) const
 {
 	TRACE("%p->BPartition::Delegate::GetNextSupportedChildType(child: %p, "
 		"cookie: %ld)\n", this, child, *cookie);
@@ -377,7 +378,8 @@ BPartition::Delegate::GetNextSupportedChildType(Delegate* child, int32 *cookie,
 
 // IsSubSystem
 bool
-BPartition::Delegate::IsSubSystem(Delegate* child, const char* diskSystem) const
+BPartition::Delegate::IsSubSystem(Delegate* child,
+	const char* diskSystem) const
 {
 	// get the disk system add-on
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();

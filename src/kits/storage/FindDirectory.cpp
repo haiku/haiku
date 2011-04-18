@@ -25,8 +25,8 @@
 	- another error code
 */
 status_t
-find_directory(directory_which which, BPath *path, bool createIt,
-			   BVolume *volume)
+find_directory(directory_which which, BPath* path, bool createIt,
+			   BVolume* volume)
 {
 	if (path == NULL)
 		return B_BAD_VALUE;

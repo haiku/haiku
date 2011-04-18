@@ -5,11 +5,13 @@
 
 #include "AddOnImage.h"
 
+
 // constructor
 AddOnImage::AddOnImage()
 	: fID(-1)
 {
 }
+
 
 // destructor
 AddOnImage::~AddOnImage()
@@ -17,9 +19,10 @@ AddOnImage::~AddOnImage()
 	Unload();
 }
 
+
 // Load
 status_t
-AddOnImage::Load(const char *path)
+AddOnImage::Load(const char* path)
 {
 	Unload();
 	status_t error = (path ? B_OK : B_BAD_VALUE);
@@ -33,6 +36,7 @@ AddOnImage::Load(const char *path)
 	return error;
 }
 
+
 // Unload
 void
 AddOnImage::Unload()
@@ -43,6 +47,7 @@ AddOnImage::Unload()
 	}
 }
 
+
 // SetID
 void
 AddOnImage::SetID(image_id id)
@@ -51,4 +56,3 @@ AddOnImage::SetID(image_id id)
 	if (id >= 0)
 		fID = id;
 }
-

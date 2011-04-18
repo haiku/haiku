@@ -15,6 +15,7 @@ BDiskScannerPartitionAddOn::BDiskScannerPartitionAddOn()
 {
 }
 
+
 // destructor
 /*!	\brief Frees all resources associated with this object.
 */
@@ -70,6 +71,7 @@ void BDiskScannerPartitionAddOn::_ReservedDiskScannerPartitionAddOn5() {}
 BDiskScannerFSAddOn::BDiskScannerFSAddOn()
 {
 }
+
 
 // destructor
 /*!	\brief Frees all resources associated with this object.
@@ -128,12 +130,14 @@ BDiskScannerParameterEditor::BDiskScannerParameterEditor()
 {
 }
 
+
 // destructor
 /*!	\brief Frees all resources associated with this object.
 */
 BDiskScannerParameterEditor::~BDiskScannerParameterEditor()
 {
 }
+
 
 /*!	\brief Returns a view containing the controls needed for editing the
 		   parameters.
@@ -155,6 +159,7 @@ BDiskScannerParameterEditor::View()
 	return NULL;
 }
 
+
 // EditingDone
 /*!	\brief Called when the user finishes editing the parameters.
 
@@ -173,6 +178,7 @@ BDiskScannerParameterEditor::EditingDone()
 {
 	return true;
 }
+
 
 /*!	\brief Returns the edited parameters.
 

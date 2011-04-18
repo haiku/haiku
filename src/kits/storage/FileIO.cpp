@@ -26,7 +26,7 @@ BFileIO::~BFileIO()
 
 
 ssize_t
-BFileIO::Read(void *buffer, size_t size)
+BFileIO::Read(void* buffer, size_t size)
 {
 	errno = B_OK;
 	ssize_t bytesRead = fread(buffer, 1, size, fFile);
@@ -35,7 +35,7 @@ BFileIO::Read(void *buffer, size_t size)
 
 
 ssize_t
-BFileIO::Write(const void *buffer, size_t size)
+BFileIO::Write(const void* buffer, size_t size)
 {
 	errno = B_OK;
 	ssize_t bytesRead = fwrite(buffer, 1, size, fFile);
@@ -44,7 +44,7 @@ BFileIO::Write(const void *buffer, size_t size)
 
 
 ssize_t
-BFileIO::ReadAt(off_t position, void *buffer, size_t size)
+BFileIO::ReadAt(off_t position, void* buffer, size_t size)
 {
 	// save the old position and seek to the requested one
 	off_t oldPosition = _Seek(position, SEEK_SET);
@@ -62,7 +62,7 @@ BFileIO::ReadAt(off_t position, void *buffer, size_t size)
 
 
 ssize_t
-BFileIO::WriteAt(off_t position, const void *buffer, size_t size)
+BFileIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
 	// save the old position and seek to the requested one
 	off_t oldPosition = _Seek(position, SEEK_SET);

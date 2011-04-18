@@ -12,8 +12,9 @@
 
 // constructor
 RepairJob::RepairJob(PartitionReference* partition, bool checkOnly)
-	: DiskDeviceJob(partition),
-	  fCheckOnly(checkOnly)
+	:
+	DiskDeviceJob(partition),
+	fCheckOnly(checkOnly)
 {
 }
 

@@ -34,7 +34,7 @@ BFile::BFile()
 /*! If \a file is uninitialized, the newly constructed BFile will be, too.
 	\param file the BFile object to be copied
 */
-BFile::BFile(const BFile &file)
+BFile::BFile(const BFile& file)
 	:
 	fMode(0)
 {
@@ -48,7 +48,7 @@ BFile::BFile(const BFile &file)
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
-BFile::BFile(const entry_ref *ref, uint32 openMode)
+BFile::BFile(const entry_ref* ref, uint32 openMode)
 	:
 	fMode(0)
 {
@@ -62,7 +62,7 @@ BFile::BFile(const entry_ref *ref, uint32 openMode)
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
-BFile::BFile(const BEntry *entry, uint32 openMode)
+BFile::BFile(const BEntry* entry, uint32 openMode)
 	:
 	fMode(0)
 {
@@ -76,7 +76,7 @@ BFile::BFile(const BEntry *entry, uint32 openMode)
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
-BFile::BFile(const char *path, uint32 openMode)
+BFile::BFile(const char* path, uint32 openMode)
 	:
 	fMode(0)
 {
@@ -93,7 +93,7 @@ BFile::BFile(const char *path, uint32 openMode)
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
-BFile::BFile(const BDirectory *dir, const char *path, uint32 openMode)
+BFile::BFile(const BDirectory *dir, const char* path, uint32 openMode)
 	:
 	fMode(0)
 {
@@ -143,7 +143,7 @@ BFile::~BFile()
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BFile::SetTo(const entry_ref *ref, uint32 openMode)
+BFile::SetTo(const entry_ref* ref, uint32 openMode)
 {
 	Unset();
 
@@ -188,7 +188,7 @@ BFile::SetTo(const entry_ref *ref, uint32 openMode)
 		  to reimplement!
 */
 status_t
-BFile::SetTo(const BEntry *entry, uint32 openMode)
+BFile::SetTo(const BEntry* entry, uint32 openMode)
 {
 	Unset();
 
@@ -229,7 +229,7 @@ BFile::SetTo(const BEntry *entry, uint32 openMode)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BFile::SetTo(const char *path, uint32 openMode)
+BFile::SetTo(const char* path, uint32 openMode)
 {
 	Unset();
 
@@ -271,7 +271,7 @@ BFile::SetTo(const char *path, uint32 openMode)
 		  to reimplement!
 */
 status_t
-BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
+BFile::SetTo(const BDirectory* dir, const char* path, uint32 openMode)
 {
 	Unset();
 
@@ -326,7 +326,7 @@ BFile::IsWritable() const
 	\return the number of bytes actually read or an error code
 */
 ssize_t
-BFile::Read(void *buffer, size_t size)
+BFile::Read(void* buffer, size_t size)
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();
@@ -343,7 +343,7 @@ BFile::Read(void *buffer, size_t size)
 	\return the number of bytes actually read or an error code
 */
 ssize_t
-BFile::ReadAt(off_t location, void *buffer, size_t size)
+BFile::ReadAt(off_t location, void* buffer, size_t size)
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();
@@ -360,7 +360,7 @@ BFile::ReadAt(off_t location, void *buffer, size_t size)
 	\return the number of bytes actually written or an error code
 */
 ssize_t
-BFile::Write(const void *buffer, size_t size)
+BFile::Write(const void* buffer, size_t size)
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();
@@ -377,7 +377,7 @@ BFile::Write(const void *buffer, size_t size)
 	\return the number of bytes actually written or an error code
 */
 ssize_t
-BFile::WriteAt(off_t location, const void *buffer, size_t size)
+BFile::WriteAt(off_t location, const void* buffer, size_t size)
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();

@@ -11,8 +11,9 @@
 // constructor
 DiskDeviceJob::DiskDeviceJob(PartitionReference* partition,
 		PartitionReference* child)
-	: fPartition(partition),
-	  fChild(child)
+	:
+	fPartition(partition),
+	fChild(child)
 {
 	if (fPartition)
 		fPartition->AcquireReference();

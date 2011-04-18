@@ -75,7 +75,7 @@ public:
 									B_PARAMETER_EDITOR_TYPE type,
 									BPartitionParameterEditor** editor) const;
 			status_t			GetNextSupportedChildType(Delegate* child,
-									int32 *cookie, BString* type) const;
+									int32* cookie, BString* type) const;
 			bool				IsSubSystem(Delegate* child,
 									const char* diskSystem) const;
 

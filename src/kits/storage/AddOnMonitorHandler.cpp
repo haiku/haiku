@@ -213,7 +213,7 @@ AddOnMonitorHandler::EntryRemoved(const char* name, ino_t directory,
 
 
 void
-AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
+AddOnMonitorHandler::EntryMoved(const char* name, const char* fromName,
 	ino_t fromDirectory, ino_t toDirectory, dev_t device, ino_t node,
 	dev_t nodeDevice)
 {

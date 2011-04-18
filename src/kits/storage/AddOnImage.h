@@ -15,7 +15,7 @@ public:
 	AddOnImage();
 	~AddOnImage();
 
-	status_t Load(const char *path);
+	status_t Load(const char* path);
 	void Unload();
 
 	void SetID(image_id id);

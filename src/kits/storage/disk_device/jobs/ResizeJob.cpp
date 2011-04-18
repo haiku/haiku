@@ -14,9 +14,10 @@
 // constructor
 ResizeJob::ResizeJob(PartitionReference* partition, PartitionReference* child,
 		off_t size, off_t contentSize)
-	: DiskDeviceJob(partition, child),
-	  fSize(size),
-	  fContentSize(contentSize)
+	:
+	DiskDeviceJob(partition, child),
+	fSize(size),
+	fContentSize(contentSize)
 {
 }
 

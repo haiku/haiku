@@ -28,10 +28,11 @@ using namespace std;
 
 // constructor
 BPartitioningInfo::BPartitioningInfo()
-	: fPartitionID(-1),
-	  fSpaces(NULL),
-	  fCount(0),
-	  fCapacity(0)
+	:
+	fPartitionID(-1),
+	fSpaces(NULL),
+	fCount(0),
+	fCapacity(0)
 {
 }
 
@@ -188,7 +189,7 @@ BPartitioningInfo::PartitionID() const
 
 // GetPartitionableSpaceAt
 status_t
-BPartitioningInfo::GetPartitionableSpaceAt(int32 index, off_t *offset,
+BPartitioningInfo::GetPartitionableSpaceAt(int32 index, off_t* offset,
 										   off_t *size) const
 {
 	if (!fSpaces)

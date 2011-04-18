@@ -14,8 +14,9 @@
 
 // constructor
 BDiskSystemAddOn::BDiskSystemAddOn(const char* name, uint32 flags)
-	: fName(name),
-	  fFlags(flags)
+	:
+	fName(name),
+	fFlags(flags)
 {
 }
 
@@ -98,7 +99,8 @@ BDiskSystemAddOn::IsSubSystemFor(const BMutablePartition* child)
 
 // constructor
 BPartitionHandle::BPartitionHandle(BMutablePartition* partition)
-	: fPartition(partition)
+	:
+	fPartition(partition)
 {
 }
 

@@ -28,7 +28,7 @@ BFileDescriptorIO::~BFileDescriptorIO()
 
 
 ssize_t
-BFileDescriptorIO::Read(void *buffer, size_t size)
+BFileDescriptorIO::Read(void* buffer, size_t size)
 {
 	ssize_t bytesRead = read(fFD, buffer, size);
 	return bytesRead >= 0 ? bytesRead : errno;
@@ -36,7 +36,7 @@ BFileDescriptorIO::Read(void *buffer, size_t size)
 
 
 ssize_t
-BFileDescriptorIO::Write(const void *buffer, size_t size)
+BFileDescriptorIO::Write(const void* buffer, size_t size)
 {
 	ssize_t bytesWritten = write(fFD, buffer, size);
 	return bytesWritten >= 0 ? bytesWritten : errno;
@@ -44,7 +44,7 @@ BFileDescriptorIO::Write(const void *buffer, size_t size)
 
 
 ssize_t
-BFileDescriptorIO::ReadAt(off_t position, void *buffer, size_t size)
+BFileDescriptorIO::ReadAt(off_t position, void* buffer, size_t size)
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, position);
 	return bytesRead >= 0 ? bytesRead : errno;
@@ -52,7 +52,7 @@ BFileDescriptorIO::ReadAt(off_t position, void *buffer, size_t size)
 
 
 ssize_t
-BFileDescriptorIO::WriteAt(off_t position, const void *buffer, size_t size)
+BFileDescriptorIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
 	ssize_t bytesWritten = pwrite(fFD, buffer, size, position);
 	return bytesWritten >= 0 ? bytesWritten : errno;

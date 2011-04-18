@@ -9,6 +9,7 @@
 
 #include <EntryList.h>
 
+
 // constructor
 //!	Creates a BEntryList.
 /*!	Does nothing at this time.
@@ -17,6 +18,7 @@ BEntryList::BEntryList()
 {
 }
 
+
 // destructor
 //!	Frees all resources associated with this BEntryList.
 /*!	Does nothing at this time.
@@ -24,6 +26,7 @@ BEntryList::BEntryList()
 BEntryList::~BEntryList()
 {
 }
+
 
 // GetNextEntry
 /*!	\fn status_t BEntryList::GetNextEntry(BEntry *entry, bool traverse)
@@ -104,7 +107,3 @@ void BEntryList::_ReservedEntryList5() {}
 void BEntryList::_ReservedEntryList6() {}
 void BEntryList::_ReservedEntryList7() {}
 void BEntryList::_ReservedEntryList8() {}
-
-
-
-

@@ -47,7 +47,8 @@
 /*!	\brief Creates an uninitialized BDiskDevice object.
 */
 BDiskDevice::BDiskDevice()
-	: fDeviceData(NULL)
+	:
+	fDeviceData(NULL)
 {
 }
 
@@ -223,12 +224,12 @@ BDiskDevice::IsModified() const
 		return false;
 
 	struct IsModifiedVisitor : public BDiskDeviceVisitor {
-		virtual bool Visit(BDiskDevice *device)
+		virtual bool Visit(BDiskDevice* device)
 		{
 			return Visit(device, 0);
 		}
 
-		virtual bool Visit(BPartition *partition, int32 level)
+		virtual bool Visit(BPartition* partition, int32 level)
 		{
 			return partition->_IsModified();
 		}
