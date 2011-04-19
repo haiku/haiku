@@ -640,6 +640,13 @@ THeaderView::MessageReceived(BMessage *msg)
 			int32 account;
 			if (msg->FindInt32("id",(int32 *)&account) >= B_OK)
 				fAccountID = account;
+			
+			BMessage message(FIELD_CHANGED);
+			// field doesn't matter; no special processing for this field
+			// it's just to turn on the save button
+			message.AddInt32("bitmask", 0);
+			Window()->PostMessage(&message, Window());
+			
 			break;
 		}
 
@@ -654,6 +661,13 @@ THeaderView::MessageReceived(BMessage *msg)
 			message.what = CHARSET_CHOICE_MADE;
 			message.AddInt32 ("charset", fCharacterSetUserSees);
 			Window()->PostMessage (&message, Window());
+			
+			BMessage message2(FIELD_CHANGED);
+			// field doesn't matter; no special processing for this field
+			// it's just to turn on the save button
+			message2.AddInt32("bitmask", 0);
+			Window()->PostMessage(&message2, Window());
+			
 			break;
 		}
 	}

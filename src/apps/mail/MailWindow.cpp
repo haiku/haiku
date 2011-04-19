@@ -2545,6 +2545,18 @@ TMailWindow::SaveAsDraft()
 		WriteAttrString(&draft, B_MAIL_ATTR_CC, fHeaderView->fCc->Text());
 	if (fHeaderView->fBcc != NULL)
 		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->fBcc->Text());
+	
+	// Add account
+	//BMenuItem* accountItem = fHeaderView->fAccountMenu->FindMarked();
+	//WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT, accountItem->Label());
+	WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT,
+		fHeaderView->fAccountMenu->FindMarked()->Label());
+	
+	// Add encoding
+	//BMenuItem* encodingItem = fHeaderView->fEncodingMenu->FindMarked();
+	//WriteAttrString(&draft, "MAIL:encoding", encodingItem->Label());
+	WriteAttrString(&draft, "MAIL:encoding",
+		fHeaderView->fEncodingMenu->FindMarked()->Label());
 
 	// Add the draft attribute for indexing
 	uint32 draftAttr = true;
@@ -2785,7 +2797,21 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 			fHeaderView->fCc->SetText(string.String());
 		if (node.ReadAttrString(B_MAIL_ATTR_BCC, &string) == B_OK)
 			fHeaderView->fBcc->SetText(string.String());
-
+		
+		// Restore account
+		if (node.ReadAttrString(B_MAIL_ATTR_ACCOUNT, &string) == B_OK) {
+			BMenuItem* accountItem = fHeaderView->fAccountMenu->FindItem(string.String());
+			if (accountItem != NULL)
+				accountItem->SetMarked(true);
+		}
+		
+		// Restore encoding
+		if (node.ReadAttrString("MAIL:encoding", &string) == B_OK) {
+			BMenuItem* encodingItem = fHeaderView->fEncodingMenu->FindItem(string.String());
+			if (encodingItem != NULL)
+				encodingItem->SetMarked(true);
+		}
+		
 		// Restore attachments
 		if (node.ReadAttrString("MAIL:attachments", &string) == B_OK) {
 			BMessage msg(REFS_RECEIVED);
