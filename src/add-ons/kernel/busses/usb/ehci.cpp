@@ -215,10 +215,10 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 				fPCIInfo->function, extendedCapPointer + 4, 4, 0);
 		} else {
-			TRACE("extended capability is not a legacy support register\n");
+			TRACE_ALWAYS("extended capability is not a legacy support register\n");
 		}
 	} else {
-		TRACE("no extended capabilities register\n");
+		TRACE_ALWAYS("no extended capabilities register\n");
 	}
 
 	// disable interrupts
