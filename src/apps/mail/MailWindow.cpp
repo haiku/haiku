@@ -2547,16 +2547,14 @@ TMailWindow::SaveAsDraft()
 		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->fBcc->Text());
 	
 	// Add account
-	//BMenuItem* accountItem = fHeaderView->fAccountMenu->FindMarked();
-	//WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT, accountItem->Label());
-	WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT,
-		fHeaderView->fAccountMenu->FindMarked()->Label());
+	BMenuItem* menuItem = fHeaderView->fAccountMenu->FindMarked();
+	if (menuItem != NULL)
+		WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT, menuItem->Label());
 	
 	// Add encoding
-	//BMenuItem* encodingItem = fHeaderView->fEncodingMenu->FindMarked();
-	//WriteAttrString(&draft, "MAIL:encoding", encodingItem->Label());
-	WriteAttrString(&draft, "MAIL:encoding",
-		fHeaderView->fEncodingMenu->FindMarked()->Label());
+	menuItem = fHeaderView->fEncodingMenu->FindMarked();
+	if (menuItem != NULL)
+		WriteAttrString(&draft, "MAIL:encoding", menuItem->Label());
 
 	// Add the draft attribute for indexing
 	uint32 draftAttr = true;
