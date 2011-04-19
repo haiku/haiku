@@ -345,7 +345,8 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 				item->SetMarked(true);
 				fAccountID = item->Message()->FindInt32("id");
 			} else {
-				fAccountMenu->AddItem(item = new BMenuItem("<none>",NULL));
+				fAccountMenu->AddItem(
+					item = new BMenuItem(B_TRANSLATE("<none>"), NULL));
 				item->SetEnabled(false);
 				fAccountID = ~0UL;
 			}

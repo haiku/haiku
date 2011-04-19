@@ -143,7 +143,7 @@ MainWindow::MessageReceived(BMessage* message)
 					status_t ret = be_roster->Launch(button->Ref());
 					if (ret < B_OK && ret != B_ALREADY_RUNNING) {
 						BString errStr(B_TRANSLATE("Failed to launch '%1'.\n"
-							"\nError:"));
+							"\nError: "));
 						BPath path(button->Ref());
 						if (path.InitCheck() >= B_OK)
 							errStr.ReplaceFirst("%1", path.Path());
@@ -159,7 +159,7 @@ MainWindow::MessageReceived(BMessage* message)
 				status_t ret = be_roster->Launch(button->AppSignature());
 				if (ret != B_OK && ret != B_ALREADY_RUNNING) {
 					BString errStr(B_TRANSLATE("Failed to launch application "
-						"with signature '%2'.\n\nError:"));
+						"with signature '%2'.\n\nError: "));
 					errStr.ReplaceFirst("%2", button->AppSignature());
 					errorMessage << errStr.String() << " ";
 					errorMessage << strerror(ret);
