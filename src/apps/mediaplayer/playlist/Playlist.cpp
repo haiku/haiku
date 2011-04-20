@@ -456,8 +456,11 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 		} else {
 			if (_IsQuery(type))
 				AppendQueryToPlaylist(ref, &subPlaylist);
-			else
-				AppendToPlaylistRecursive(ref, &subPlaylist);
+			else {
+				if ( !ExtraMediaExists(this, ref) ) {
+					AppendToPlaylistRecursive(ref, &subPlaylist);
+				}
+			}
 
 			// At least sort this subsection of the playlist
 			// if the whole playlist is not sorted anymore.
@@ -510,7 +513,11 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		BString mimeString = _MIMEString(&ref);
 		if (_IsMediaFile(mimeString)) {
 			PlaylistItem* item = new (std::nothrow) FilePlaylistItem(ref);
-			if (item != NULL && !playlist->AddItem(item))
+			if (!ExtraMediaExists(playlist, ref)) {
+				_BindExtraMedia(item);
+				if (item != NULL && !playlist->AddItem(item))
+					delete item;
+			} else
 				delete item;
 		} else
 			printf("MIME Type = %s\n", mimeString.String());
@@ -584,7 +591,40 @@ Playlist::NotifyImportFailed()
 }
 
 
+/*static*/ bool
+Playlist::ExtraMediaExists(Playlist* playlist, const entry_ref& ref)
+{
+	BString exceptExtension = _GetExceptExtension(BPath(&ref).Path());
+	
+	for (int32 i = 0; i < playlist->CountItems(); i++) {
+		FilePlaylistItem* compare = dynamic_cast<FilePlaylistItem*>(playlist->ItemAt(i));
+		if (compare == NULL)
+			continue;
+		if (compare->Ref() != ref
+				&& _GetExceptExtension(BPath(&compare->Ref()).Path()) == exceptExtension )
+			return true;
+	}
+	return false;
+}
+
+
 // #pragma mark - private
+
+
+/*static*/ bool
+Playlist::_IsImageFile(const BString& mimeString)
+{
+	BMimeType superType;
+	BMimeType fileType(mimeString.String());
+
+	if (fileType.GetSupertype(&superType) != B_OK)
+		return false;
+
+	if (superType == "image")
+		return true;
+
+	return false;
+}
 
 
 /*static*/ bool
@@ -665,6 +705,62 @@ Playlist::_MIMEString(const entry_ref* ref)
 		nodeInfo.SetType(type.Type());
 	}
 	return BString(mimeString);
+}
+
+
+// _BindExtraMedia() searches additional videos and audios
+// and addes them as extra medias.
+/*static*/ void
+Playlist::_BindExtraMedia(PlaylistItem* item)
+{
+	FilePlaylistItem* fileItem = dynamic_cast<FilePlaylistItem*>(item);
+	if (!item)
+		return;
+	
+	// If the media file is foo.mp3, _BindExtraMedia() searches foo.avi.
+	BPath mediaFilePath(&fileItem->Ref());
+	BString mediaFilePathString = mediaFilePath.Path();
+	BPath dirPath;
+	mediaFilePath.GetParent(&dirPath);
+	BDirectory dir(dirPath.Path());
+	if (dir.InitCheck() != B_OK)
+		return;
+	
+	BEntry entry;
+	BString entryPathString;
+	while (dir.GetNextEntry(&entry, true) == B_OK) {
+		if (!entry.IsFile())
+			continue;
+		entryPathString = BPath(&entry).Path();
+		if (entryPathString != mediaFilePathString
+				&& _GetExceptExtension(entryPathString) == _GetExceptExtension(mediaFilePathString)) {
+			_BindExtraMedia(fileItem, entry);
+		}
+	}
+}
+
+
+/*static*/ void
+Playlist::_BindExtraMedia(FilePlaylistItem* fileItem, const BEntry& entry)
+{
+	entry_ref ref;
+	entry.GetRef(&ref);
+	BString mimeString = _MIMEString(&ref);
+	if (_IsMediaFile(mimeString)) {
+		fileItem->AddRef(ref);
+	} else if (_IsImageFile(mimeString)) {
+		fileItem->AddImageRef(ref);
+	}
+}
+
+
+/*static*/ BString
+Playlist::_GetExceptExtension(const BString& path)
+{
+	int32 periodPos = path.FindLast('.');
+	if (periodPos <= path.FindLast('/'))
+		return path;
+	return BString(path.String(), periodPos);
 }
 
 

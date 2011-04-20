@@ -25,6 +25,7 @@
 #include <List.h>
 #include <Locker.h>
 
+#include "FilePlaylistItem.h"
 #include "PlaylistItem.h"
 
 class BDataIO;
@@ -113,17 +114,23 @@ public:
 
 			void				NotifyImportFailed();
 
+	static	bool				ExtraMediaExists(Playlist* playlist, const entry_ref& ref);
+
 private:
 								Playlist(const Playlist& other);
 			Playlist&			operator=(const Playlist& other);
 									// unimplemented
 
+	static	bool 				_IsImageFile(const BString& mimeString);
 	static	bool 				_IsMediaFile(const BString& mimeString);
 	static	bool				_IsTextPlaylist(const BString& mimeString);
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
 	static	bool				_IsPlaylist(const BString& mimeString);
 	static	bool				_IsQuery(const BString& mimeString);
 	static	BString				_MIMEString(const entry_ref* ref);
+	static	void				_BindExtraMedia(PlaylistItem* item);
+	static	void				_BindExtraMedia(FilePlaylistItem* fileItem, const BEntry& entry);
+	static	BString				_GetExceptExtension(const BString& path);
 
 			void				_NotifyItemAdded(PlaylistItem*,
 									int32 index) const;

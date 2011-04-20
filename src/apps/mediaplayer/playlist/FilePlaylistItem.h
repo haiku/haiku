@@ -7,7 +7,12 @@
 
 #include "PlaylistItem.h"
 
+#include <vector>
+
 #include <Entry.h>
+
+using std::vector;
+
 
 class FilePlaylistItem : public PlaylistItem {
 public:
@@ -50,7 +55,11 @@ public:
 	// playback
 	virtual	TrackSupplier*		CreateTrackSupplier() const;
 
-			const entry_ref&	Ref() const { return fRef; }
+			status_t			AddRef(const entry_ref& ref);
+			const entry_ref&	Ref() const { return fRefs[0]; }
+
+			status_t			AddImageRef(const entry_ref& ref);
+			const entry_ref&	ImageRef() const;
 
 private:
 			status_t			_SetAttribute(const char* attrName,
@@ -59,10 +68,18 @@ private:
 			status_t			_GetAttribute(const char* attrName,
 									type_code type, void* data,
 									size_t size);
+			status_t			_MoveIntoTrash(vector<entry_ref>* refs,
+									vector<BString>* namesInTrash);
+			status_t			_RestoreFromTrash(vector<entry_ref>* refs,
+									vector<BString>* namesInTrash);
 
 private:
-			entry_ref			fRef;
-			BString				fNameInTrash;
+	// always fRefs.size() == fNamesInTrash.size()
+			vector<entry_ref>	fRefs;
+			vector<BString>		fNamesInTrash;
+	// always fImageRefs.size() == fImageNamesInTrash.size()
+			vector<entry_ref>	fImageRefs;
+			vector<BString>		fImageNamesInTrash;
 };
 
 #endif // FILE_PLAYLIST_ITEM_H

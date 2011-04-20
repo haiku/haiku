@@ -5,18 +5,21 @@
 #ifndef MEDIA_FILE_TRACK_SUPPLIER_H
 #define MEDIA_FILE_TRACK_SUPPLIER_H
 
+#include <vector>
 
+#include <Bitmap.h>
 #include <List.h>
 
 #include "TrackSupplier.h"
 
 
 class BMediaFile;
+using std::vector;
 
 
 class MediaFileTrackSupplier : public TrackSupplier {
 public:
-								MediaFileTrackSupplier(BMediaFile* mediaFile);
+								MediaFileTrackSupplier();
 	virtual						~MediaFileTrackSupplier();
 
 	virtual	status_t			InitCheck();
@@ -41,8 +44,13 @@ public:
 
 			bool				AddSubTitles(SubTitles* subTitles);
 
+			status_t			AddMediaFile(BMediaFile* mediaFile);
+
+			status_t			AddBitmap(BBitmap* bitmap);
+
 private:
-			BMediaFile*			fMediaFile;
+			vector<BMediaFile*>	fMediaFiles;
+			vector<BBitmap*>	fBitmaps;
 			BList				fAudioTracks;
 			BList				fVideoTracks;
 			BList				fSubTitleTracks;

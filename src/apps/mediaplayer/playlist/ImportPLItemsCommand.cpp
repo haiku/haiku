@@ -57,14 +57,20 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 	memset(fNewItems, 0, fNewCount * sizeof(PlaylistItem*));
 
 	// init new entries
+	int32 added = 0;
 	for (int32 i = 0; i < fNewCount; i++) {
-		fNewItems[i] = temp.ItemAtFast(i)->Clone();
-		if (fNewItems[i] == NULL) {
-			// indicate bad object init
-			_CleanUp(fNewItems, fNewCount, true);
-			return;
+		FilePlaylistItem* fileItem = dynamic_cast<FilePlaylistItem*>(temp.ItemAtFast(i));
+		if (fileItem && !Playlist::ExtraMediaExists(playlist, fileItem->Ref())) {
+			fNewItems[added] = temp.ItemAtFast(i)->Clone();
+			if (fNewItems[added] == NULL) {
+				// indicate bad object init
+				_CleanUp(fNewItems, fNewCount, true);
+				return;
+			}
+			added++;
 		}
 	}
+	fNewCount = added;
 
 	fPlaylingIndex = fPlaylist->CurrentItemIndex();
 

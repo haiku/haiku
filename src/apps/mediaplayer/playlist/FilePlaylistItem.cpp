@@ -14,39 +14,48 @@
 #include <FindDirectory.h>
 #include <MediaFile.h>
 #include <Path.h>
+#include <TranslationUtils.h>
 
 #include "MediaFileTrackSupplier.h"
 #include "SubTitlesSRT.h"
 
-
 static const char* kPathKey = "path";
 
-
 FilePlaylistItem::FilePlaylistItem(const entry_ref& ref)
-	:
-	fRef(ref),
-	fNameInTrash("")
 {
+	fRefs.push_back(ref);
+	fNamesInTrash.push_back("");
 }
 
 
 FilePlaylistItem::FilePlaylistItem(const FilePlaylistItem& other)
 	:
-	fRef(other.fRef),
-	fNameInTrash(other.fNameInTrash)
+	fRefs(other.fRefs),
+	fNamesInTrash(other.fNamesInTrash),
+	fImageRefs(other.fImageRefs),
+	fImageNamesInTrash(other.fImageNamesInTrash)
 {
 }
 
 
 FilePlaylistItem::FilePlaylistItem(const BMessage* archive)
-	:
-	fRef(),
-	fNameInTrash("")
 {
 	const char* path;
-	if (archive != NULL && archive->FindString(kPathKey, &path) == B_OK) {
-		if (get_ref_for_path(path, &fRef) != B_OK)
-			fRef = entry_ref();
+	entry_ref	ref;
+	if (archive != NULL) {
+		int32 i = 0;
+		while (archive->FindString(kPathKey, i, &path) == B_OK) {
+			if (get_ref_for_path(path, &ref) == B_OK) {
+				fRefs.push_back(ref);
+			}
+			i++;
+		}
+	}
+	if (fRefs.empty()) {
+		fRefs.push_back(entry_ref());
+	}
+	for (vector<entry_ref>::size_type i = 0; i < fRefs.size(); i++) {
+		fNamesInTrash.push_back("");
 	}
 }
 
@@ -82,11 +91,16 @@ FilePlaylistItem::Archive(BMessage* into, bool deep) const
 	status_t ret = BArchivable::Archive(into, deep);
 	if (ret != B_OK)
 		return ret;
-	BPath path(&fRef);
-	ret = path.InitCheck();
-	if (ret == B_OK)
+	for (vector<entry_ref>::size_type i = 0; i < fRefs.size(); i++) {
+		BPath path(&fRefs[i]);
+		ret = path.InitCheck();
+		if (ret != B_OK)
+			return ret;
 		ret = into->AddString(kPathKey, path.Path());
-	return ret;
+		if (ret != B_OK)
+			return ret;
+	}
+	return B_OK;
 }
 
 
@@ -97,7 +111,7 @@ FilePlaylistItem::SetAttribute(const Attribute& attribute,
 	switch (attribute) {
 		case ATTR_STRING_NAME:
 		{
-			BEntry entry(&fRef, false);
+			BEntry entry(&fRefs[0], false);
 			return entry.Rename(string.String(), false);
 		}
 	
@@ -135,7 +149,7 @@ FilePlaylistItem::GetAttribute(const Attribute& attribute,
 	BString& string) const
 {
 	if (attribute == ATTR_STRING_NAME) {
-		string = fRef.name;
+		string = fRefs[0].name;
 		return B_OK;
 	}
 
@@ -194,7 +208,7 @@ FilePlaylistItem::GetAttribute(const Attribute& attribute,
 BString
 FilePlaylistItem::LocationURI() const
 {
-	BPath path(&fRef);
+	BPath path(&fRefs[0]);
 	BString locationURI("file://");
 	locationURI << path.Path();
 	return locationURI;
@@ -204,7 +218,7 @@ FilePlaylistItem::LocationURI() const
 status_t
 FilePlaylistItem::GetIcon(BBitmap* bitmap, icon_size iconSize) const
 {
-	BNode node(&fRef);
+	BNode node(&fRefs[0]);
 	BNodeInfo info(&node);
 	return info.GetTrackerIcon(bitmap, iconSize);
 }
@@ -213,150 +227,82 @@ FilePlaylistItem::GetIcon(BBitmap* bitmap, icon_size iconSize) const
 status_t
 FilePlaylistItem::MoveIntoTrash()
 {
-	if (fNameInTrash.Length() != 0) {
+	if (fNamesInTrash[0].Length() != 0) {
 		// Already in the trash!
 		return B_ERROR;
 	}
 
-	char trashPath[B_PATH_NAME_LENGTH];
-	status_t err = find_directory(B_TRASH_DIRECTORY, fRef.device,
-		true /*create it*/, trashPath, B_PATH_NAME_LENGTH);
-	if (err != B_OK) {
-		fprintf(stderr, "failed to find Trash: %s\n", strerror(err));
+	status_t err;
+	err = _MoveIntoTrash(&fRefs, &fNamesInTrash);
+	if (err != B_OK)
 		return err;
-	}
+	
+	if (fImageRefs.empty())
+		return B_OK;
 
-	BEntry entry(&fRef);
-	err = entry.InitCheck();
-	if (err != B_OK) {
-		fprintf(stderr, "failed to init BEntry for %s: %s\n",
-			fRef.name, strerror(err));
+	err = _MoveIntoTrash(&fImageRefs, &fImageNamesInTrash);
+	if (err != B_OK)
 		return err;
-	}
-	BDirectory trashDir(trashPath);
-	if (err != B_OK) {
-		fprintf(stderr, "failed to init BDirectory for %s: %s\n",
-			trashPath, strerror(err));
-		return err;
-	}
 
-	// Find a unique name for the entry in the trash
-	fNameInTrash = fRef.name;
-	int32 uniqueNameIndex = 1;
-	while (true) {
-		BEntry test(&trashDir, fNameInTrash.String());
-		if (!test.Exists())
-			break;
-		fNameInTrash = fRef.name;
-		fNameInTrash << ' ' << uniqueNameIndex;
-		uniqueNameIndex++;
-	}
-
-	// Remember the original path
-	BPath originalPath;
-	entry.GetPath(&originalPath);
-
-	// Finally, move the entry into the trash
-	err = entry.MoveTo(&trashDir, fNameInTrash.String());
-	if (err != B_OK) {
-		fprintf(stderr, "failed to move entry into trash %s: %s\n",
-			trashPath, strerror(err));
-		return err;
-	}
-
-	// Allow Tracker to restore this entry
-	BNode node(&entry);
-	BString originalPathString(originalPath.Path());
-	node.WriteAttrString("_trk/original_path", &originalPathString);
-
-	return err;
+	return B_OK;
 }
-
 
 
 status_t
 FilePlaylistItem::RestoreFromTrash()
 {
-	if (fNameInTrash.Length() <= 0) {
+	if (fNamesInTrash[0].Length() <= 0) {
 		// Not in the trash!
 		return B_ERROR;
 	}
 
-	char trashPath[B_PATH_NAME_LENGTH];
-	status_t err = find_directory(B_TRASH_DIRECTORY, fRef.device,
-		false /*create it*/, trashPath, B_PATH_NAME_LENGTH);
-	if (err != B_OK) {
-		fprintf(stderr, "failed to find Trash: %s\n", strerror(err));
+	status_t err;
+	err = _RestoreFromTrash(&fRefs, &fNamesInTrash);
+	if (err != B_OK)
 		return err;
-	}
-	// construct the entry to the file in the trash
-// TODO: BEntry(const BDirectory* directory, const char* path) is broken!
-//	BEntry entry(trashPath, fNamesInTrash[i].String());
-BPath path(trashPath, fNameInTrash.String());
-BEntry entry(path.Path());
-	err = entry.InitCheck();
-	if (err != B_OK) {
-		fprintf(stderr, "failed to init BEntry for %s: %s\n",
-			fNameInTrash.String(), strerror(err));
+	
+	if (fImageRefs.empty())
+		return B_OK;
+
+	err = _RestoreFromTrash(&fImageRefs, &fImageNamesInTrash);
+	if (err != B_OK)
 		return err;
-	}
-//entry.GetPath(&path);
-//printf("moving '%s'\n", path.Path());
 
-	// construct the folder of the original entry_ref
-	node_ref nodeRef;
-	nodeRef.device = fRef.device;
-	nodeRef.node = fRef.directory;
-	BDirectory originalDir(&nodeRef);
-	err = originalDir.InitCheck();
-	if (err != B_OK) {
-		fprintf(stderr, "failed to init original BDirectory for "
-			"%s: %s\n", fRef.name, strerror(err));
-		return err;
-	}
-
-//path.SetTo(&originalDir, fItems[i].name);
-//printf("as '%s'\n", path.Path());
-
-	// Reset the name here, the user may have already moved the entry
-	// out of the trash via Tracker for example.
-	fNameInTrash = "";
-
-	// Finally, move the entry back into the original folder
-	err = entry.MoveTo(&originalDir, fRef.name);
-	if (err != B_OK) {
-		fprintf(stderr, "failed to restore entry from trash "
-			"%s: %s\n", fRef.name, strerror(err));
-		return err;
-	}
-
-	// Remove the attribute that helps Tracker restore the entry.
-	BNode node(&entry);
-	node.RemoveAttr("_trk/original_path");
-
-	return err;
+	return B_OK;
 }
 
 
 // #pragma mark -
 
-
 TrackSupplier*
 FilePlaylistItem::CreateTrackSupplier() const
 {
-	BMediaFile* mediaFile = new(std::nothrow) BMediaFile(&fRef);
-	if (mediaFile == NULL)
-		return NULL;
 	MediaFileTrackSupplier* supplier
-		= new(std::nothrow) MediaFileTrackSupplier(mediaFile);
-	if (supplier == NULL) {
-		delete mediaFile;
+		= new(std::nothrow) MediaFileTrackSupplier();
+	if (supplier == NULL)
 		return NULL;
+
+	for (vector<entry_ref>::size_type i = 0; i < fRefs.size(); i++) {
+		BMediaFile* mediaFile = new(std::nothrow) BMediaFile(&fRefs[i]);
+		if (mediaFile == NULL) {
+			delete supplier;
+			return NULL;
+		}
+		if (supplier->AddMediaFile(mediaFile) != B_OK)
+			delete mediaFile;
+	}
+
+	for (vector<entry_ref>::size_type i = 0; i < fImageRefs.size(); i++) {
+		BBitmap* bitmap = BTranslationUtils::GetBitmap(&fImageRefs[i]);
+		if (bitmap == NULL)
+			continue;
+		if (supplier->AddBitmap(bitmap) != B_OK)
+			delete bitmap;
 	}
 
 	// Search for subtitle files in the same folder
 	// TODO: Error checking
-	BEntry entry(&fRef, true);
+	BEntry entry(&fRefs[0], true);
 
 	char originalName[B_FILE_NAME_LENGTH];
 	entry.GetName(originalName);
@@ -411,10 +357,40 @@ FilePlaylistItem::CreateTrackSupplier() const
 
 
 status_t
+FilePlaylistItem::AddRef(const entry_ref& ref)
+{
+	fRefs.push_back(ref);
+	fNamesInTrash.push_back("");
+	return B_OK;
+}
+
+
+status_t
+FilePlaylistItem::AddImageRef(const entry_ref& ref)
+{
+	fImageRefs.push_back(ref);
+	fImageNamesInTrash.push_back("");
+	return B_OK;
+}
+
+
+const entry_ref&
+FilePlaylistItem::ImageRef() const
+{
+	static entry_ref ref;
+
+	if (fImageRefs.empty())
+		return ref;
+	
+	return fImageRefs[0];
+}
+
+
+status_t
 FilePlaylistItem::_SetAttribute(const char* attrName, type_code type,
 	const void* data, size_t size)
 {
-	BEntry entry(&fRef, true);
+	BEntry entry(&fRefs[0], true);
 	BNode node(&entry);
 	if (node.InitCheck() != B_OK)
 		return node.InitCheck();
@@ -433,7 +409,7 @@ status_t
 FilePlaylistItem::_GetAttribute(const char* attrName, type_code type,
 	void* data, size_t size)
 {
-	BEntry entry(&fRef, true);
+	BEntry entry(&fRefs[0], true);
 	BNode node(&entry);
 	if (node.InitCheck() != B_OK)
 		return node.InitCheck();
@@ -444,6 +420,131 @@ FilePlaylistItem::_GetAttribute(const char* attrName, type_code type,
 			return (status_t)read;
 		return B_IO_ERROR;
 	}
+	return B_OK;
+}
+
+
+status_t
+FilePlaylistItem::_MoveIntoTrash(vector<entry_ref>* refs,
+	vector<BString>* namesInTrash)
+{
+	char trashPath[B_PATH_NAME_LENGTH];
+	status_t err = find_directory(B_TRASH_DIRECTORY, (*refs)[0].device,
+		true /*create it*/, trashPath, B_PATH_NAME_LENGTH);
+	if (err != B_OK) {
+		fprintf(stderr, "failed to find Trash: %s\n", strerror(err));
+		return err;
+	}
+
+	BDirectory trashDir(trashPath);
+	if (err != B_OK) {
+		fprintf(stderr, "failed to init BDirectory for %s: %s\n",
+			trashPath, strerror(err));
+		return err;
+	}
+
+	for (vector<entry_ref>::size_type i = 0; i < refs->size(); i++) {
+		BEntry entry(&(*refs)[i]);
+		err = entry.InitCheck();
+		if (err != B_OK) {
+			fprintf(stderr, "failed to init BEntry for %s: %s\n",
+				(*refs)[i].name, strerror(err));
+			return err;
+		}
+	
+		// Find a unique name for the entry in the trash
+		(*namesInTrash)[i] = (*refs)[i].name;
+		int32 uniqueNameIndex = 1;
+		while (true) {
+			BEntry test(&trashDir, (*namesInTrash)[i].String());
+			if (!test.Exists())
+				break;
+			(*namesInTrash)[i] = (*refs)[i].name;
+			(*namesInTrash)[i] << ' ' << uniqueNameIndex;
+			uniqueNameIndex++;
+		}
+	
+		// Remember the original path
+		BPath originalPath;
+		entry.GetPath(&originalPath);
+	
+		// Finally, move the entry into the trash
+		err = entry.MoveTo(&trashDir, (*namesInTrash)[i].String());
+		if (err != B_OK) {
+			fprintf(stderr, "failed to move entry into trash %s: %s\n",
+				trashPath, strerror(err));
+			return err;
+		}
+	
+		// Allow Tracker to restore this entry
+		BNode node(&entry);
+		BString originalPathString(originalPath.Path());
+		node.WriteAttrString("_trk/original_path", &originalPathString);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FilePlaylistItem::_RestoreFromTrash(vector<entry_ref>* refs,
+	vector<BString>* namesInTrash)
+{
+	char trashPath[B_PATH_NAME_LENGTH];
+	status_t err = find_directory(B_TRASH_DIRECTORY, (*refs)[0].device,
+		false /*create it*/, trashPath, B_PATH_NAME_LENGTH);
+	if (err != B_OK) {
+		fprintf(stderr, "failed to find Trash: %s\n", strerror(err));
+		return err;
+	}
+	
+	for (vector<entry_ref>::size_type i = 0; i < refs->size(); i++) {
+		// construct the entry to the file in the trash
+		// TODO: BEntry(const BDirectory* directory, const char* path) is broken!
+		//	BEntry entry(trashPath, (*namesInTrash)[i].String());
+		BPath path(trashPath, (*namesInTrash)[i].String());
+		BEntry entry(path.Path());
+		err = entry.InitCheck();
+		if (err != B_OK) {
+			fprintf(stderr, "failed to init BEntry for %s: %s\n",
+				(*namesInTrash)[i].String(), strerror(err));
+			return err;
+		}
+		//entry.GetPath(&path);
+		//printf("moving '%s'\n", path.Path());
+	
+		// construct the folder of the original entry_ref
+		node_ref nodeRef;
+		nodeRef.device = (*refs)[i].device;
+		nodeRef.node = (*refs)[i].directory;
+		BDirectory originalDir(&nodeRef);
+		err = originalDir.InitCheck();
+		if (err != B_OK) {
+			fprintf(stderr, "failed to init original BDirectory for "
+				"%s: %s\n", (*refs)[i].name, strerror(err));
+			return err;
+		}
+	
+		//path.SetTo(&originalDir, fItems[i].name);
+		//printf("as '%s'\n", path.Path());
+	
+		// Reset the name here, the user may have already moved the entry
+		// out of the trash via Tracker for example.
+		(*namesInTrash)[i] = "";
+	
+		// Finally, move the entry back into the original folder
+		err = entry.MoveTo(&originalDir, (*refs)[i].name);
+		if (err != B_OK) {
+			fprintf(stderr, "failed to restore entry from trash "
+				"%s: %s\n", (*refs)[i].name, strerror(err));
+			return err;
+		}
+	
+		// Remove the attribute that helps Tracker restore the entry.
+		BNode node(&entry);
+		node.RemoveAttr("_trk/original_path");
+	}
+
 	return B_OK;
 }
 
