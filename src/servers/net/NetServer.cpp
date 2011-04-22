@@ -81,7 +81,7 @@ private:
 									BMessage* _missingDevice = NULL);
 			void				_BringUpInterfaces();
 			void				_StartServices();
-			void				_HandleDeviceMonitor(BMessage* message);
+			status_t			_HandleDeviceMonitor(BMessage* message);
 
 			status_t			_AutoJoinNetwork(const char* name);
 			status_t			_JoinNetwork(const BMessage& message,
@@ -808,24 +808,27 @@ NetServer::_StartServices()
 }
 
 
-void
+status_t
 NetServer::_HandleDeviceMonitor(BMessage* message)
 {
 	int32 opcode;
-	if (message->FindInt32("opcode", &opcode) != B_OK
-		|| (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED))
-		return;
-
 	const char* path;
-	const char* watchedPath;
-	if (message->FindString("watched_path", &watchedPath) != B_OK
+	if (message->FindInt32("opcode", &opcode) != B_OK
+		|| (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
 		|| message->FindString("path", &path) != B_OK)
-		return;
+		return B_BAD_VALUE;
 
+	if (strncmp(path, "/dev/net", 9)) {
+		// not a device entry, ignore
+		return B_NAME_NOT_FOUND;
+	}
+			
 	if (opcode == B_ENTRY_CREATED)
 		_ConfigureDevice(path);
 	else
 		_RemoveInterface(path);
+		
+	return B_OK;
 }
 
 

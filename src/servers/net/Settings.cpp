@@ -356,6 +356,13 @@ Settings::Update(BMessage* message)
 		|| message->FindString("path", &pathName) < B_OK)
 		return B_BAD_VALUE;
 
+	BPath settingsFolderPath;
+	_GetPath(NULL, 	settingsFolderPath);
+	if (strncmp(pathName, settingsFolderPath.Path(),
+		strlen(settingsFolderPath.Path()))) {
+		return B_NAME_NOT_FOUND;
+	}
+
 	if (message->FindBool("removed")) {
 		// for now, we only consider existing settings files
 		// (ie. deleting "services" won't stop any)
