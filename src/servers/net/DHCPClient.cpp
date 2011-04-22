@@ -132,8 +132,9 @@ struct dhcp_message {
 	bool HasOptions() const;
 	bool NextOption(dhcp_option_cookie& cookie, message_option& option,
 		const uint8*& data, size_t& size) const;
-	message_type Type() const;
+	const uint8* FindOption(message_option which) const;
 	const uint8* LastOption() const;
+	message_type Type() const;
 
 	uint8* PrepareMessage(uint8 type);
 	uint8* PutOption(uint8* options, message_option option);
@@ -272,8 +273,8 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 }
 
 
-message_type
-dhcp_message::Type() const
+const uint8*
+dhcp_message::FindOption(message_option which) const
 {
 	dhcp_option_cookie cookie;
 	message_option option;
@@ -281,11 +282,11 @@ dhcp_message::Type() const
 	size_t size;
 	while (NextOption(cookie, option, data, size)) {
 		// iterate through all options
-		if (option == OPTION_MESSAGE_TYPE)
-			return (message_type)data[0];
+		if (option == which)
+			return data;
 	}
 
-	return DHCP_NONE;
+	return NULL;
 }
 
 
@@ -301,6 +302,17 @@ dhcp_message::LastOption() const
 	}
 
 	return cookie.next;
+}
+
+
+message_type
+dhcp_message::Type() const
+{
+	const uint8* data = FindOption(OPTION_MESSAGE_TYPE);
+	if (data)
+		return (message_type)data[0];
+
+	return DHCP_NONE;
 }
 
 
