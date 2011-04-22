@@ -11,7 +11,7 @@
 #	define INFO(x...)
 #endif
 
-#define TRACE_MOVEMENT_MAKER
+//#define TRACE_MOVEMENT_MAKER
 #ifdef TRACE_MOVEMENT_MAKER
 #	define TRACE(x...) dprintf(x)
 #else
@@ -388,7 +388,7 @@ TouchpadMovement::EventToMovement(touch_event *event, mouse_movement *movement)
 	movement->timestamp = system_time();
 
 	if ((movement->timestamp - fTapTime) > fTapTimeOUT) {
-		TRACE("ALPS: tap gesture timed out\n");
+		TRACE("TouchpadMovement: tap gesture timed out\n");
 		fTapStarted = false;
 		if (!fDoubleClick
 			|| (movement->timestamp - fTapTime) > 2 * fTapTimeOUT) {
@@ -508,7 +508,7 @@ TouchpadMovement::_NoTouchToMovement(touch_event *event,
 {
 	uint32 buttons = event->buttons;
 
-	TRACE("ALPS: no touch event\n");
+	TRACE("TouchpadMovement: no touch event\n");
 
 	fScrollingStarted = false;
 	fMovementStarted = false;
@@ -523,7 +523,7 @@ TouchpadMovement::_NoTouchToMovement(touch_event *event,
 	if ((movement->timestamp - fTapTime) > fTapTimeOUT) {
 		fTapdragStarted = false;
 		fValidEdgeMotion = false;
-		TRACE("ALPS: tap drag gesture timed out\n");
+		TRACE("TouchpadMovement: tap drag gesture timed out\n");
 	}
 
 	if (abs(fTapDeltaX) > 15 || abs(fTapDeltaY) > 15) {
@@ -532,11 +532,11 @@ TouchpadMovement::_NoTouchToMovement(touch_event *event,
 	}
 
 	if (fTapStarted || fDoubleClick) {
-		TRACE("ALPS: tap gesture\n");
+		TRACE("TouchpadMovement: tap gesture\n");
 		fTapClicks++;
 
 		if (fTapClicks > 1) {
-			TRACE("ALPS: empty click\n");
+			TRACE("TouchpadMovement: empty click\n");
 			buttons = kNoButton;
 			fTapClicks = 0;
 			fDoubleClick = true;
@@ -559,7 +559,7 @@ TouchpadMovement::_MoveToMovement(touch_event *event, mouse_movement *movement)
 	bool isStartOfMovement = false;
 	float pressure = 0;
 
-	TRACE("ALPS: movement event\n");
+	TRACE("TouchpadMovement: movement event\n");
 	if (!fMovementStarted) {
 		isStartOfMovement = true;
 		fMovementStarted = true;
@@ -580,9 +580,9 @@ TouchpadMovement::_MoveToMovement(touch_event *event, mouse_movement *movement)
 		movement->clicks = 0;
 
 		fValidEdgeMotion = _EdgeMotion(movement, event, fValidEdgeMotion);
-		TRACE("ALPS: tap drag\n");
+		TRACE("TouchpadMovement: tap drag\n");
 	} else {
-		TRACE("ALPS: movement set buttons\n");
+		TRACE("TouchpadMovement: movement set buttons\n");
 		movement->buttons = event->buttons;
 	}
 
@@ -594,7 +594,7 @@ TouchpadMovement::_MoveToMovement(touch_event *event, mouse_movement *movement)
 		&& isStartOfMovement
 		&& fSettings->tapgesture_sensibility > 0.
 		&& fSettings->tapgesture_sensibility > (20 - pressure)) {
-		TRACE("ALPS: tap started\n");
+		TRACE("TouchpadMovement: tap started\n");
 		fTapStarted = true;
 		fTapTime = system_time();
 		fTapDeltaX = 0;
@@ -646,7 +646,7 @@ TouchpadMovement::_CheckScrollingToMovement(touch_event *event,
 		return false;
 	}
 
-	TRACE("ALPS: scroll event\n");
+	TRACE("TouchpadMovement: scroll event\n");
 
 	fTapStarted = false;
 	fTapClicks = 0;
