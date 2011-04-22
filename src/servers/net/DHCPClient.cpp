@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <syslog.h>
 #include <sys/sockio.h>
 #include <sys/time.h>
@@ -838,7 +839,7 @@ DHCPClient::_ResetTimeout(int socket, time_t& timeout, uint32& tries)
 
 	struct timeval value;
 	value.tv_sec = timeout;
-	value.tv_usec = 0;
+	value.tv_usec = rand() % 1000000;
 	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
 }
 
@@ -858,7 +859,7 @@ DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 
 	struct timeval value;
 	value.tv_sec = timeout;
-	value.tv_usec = 0;
+	value.tv_usec = rand() % 1000000;
 	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
 
 	return true;
