@@ -533,10 +533,12 @@ NetServer::_ConfigureInterface(BMessage& message)
 				parse_address(family, string, broadcast);
 		}
 
-		if (autoConfig) {
+		if (!autoConfigured || autoConfig)
 			_QuitLooperForDevice(name);
-			startAutoConfig = true;
-		} else if (addressMessage.FindString("gateway", &string) == B_OK
+			
+		startAutoConfig = autoConfig;
+		
+		if (addressMessage.FindString("gateway", &string) == B_OK
 			&& parse_address(family, string, gateway)) {
 			// add gateway route, if we're asked for it
 			interface.RemoveDefaultRoute(family);
