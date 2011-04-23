@@ -878,16 +878,16 @@ DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 }
 
 
-BString
-DHCPClient::_AddressToString(const uint8* data) const
+/*static*/ BString
+DHCPClient::_AddressToString(const uint8* data)
 {
 	BString target = inet_ntoa(*(in_addr*)data);
 	return target;
 }
 
 
-BString
-DHCPClient::_AddressToString(in_addr_t address) const
+/*static*/ BString
+DHCPClient::_AddressToString(in_addr_t address)
 {
 	BString target = inet_ntoa(*(in_addr*)&address);
 	return target;

@@ -55,8 +55,9 @@ private:
 			bool				_TimeoutShift(int socket, time_t& timeout,
 									uint32& tries);
 			void				_RestartLease(bigtime_t lease);
-			BString				_AddressToString(const uint8* data) const;
-			BString				_AddressToString(in_addr_t address) const;
+			
+	static	BString				_AddressToString(const uint8* data);
+	static	BString				_AddressToString(in_addr_t address);
 
 private:
 			BMessage			fConfiguration;
