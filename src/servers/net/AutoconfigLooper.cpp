@@ -58,18 +58,20 @@ AutoconfigLooper::_RemoveClient()
 void
 AutoconfigLooper::_Configure()
 {
-	// start with DHCP
-	
-	if (fCurrentClient == NULL) {
-		fCurrentClient = new DHCPClient(fTarget, fDevice.String());
-		AddHandler(fCurrentClient);
-	}
-	
 	// set IFF_CONFIGURING flag on interface
 
 	BNetworkInterface interface(fDevice.String());
 	int32 flags = interface.Flags() & ~IFF_AUTO_CONFIGURED;
 	interface.SetFlags(flags | IFF_CONFIGURING);
+
+	// remove current handler
+
+	_RemoveClient();
+
+	// start with DHCP
+
+	fCurrentClient = new DHCPClient(fTarget, fDevice.String());
+	AddHandler(fCurrentClient);
 
 	if (fCurrentClient->Initialize() == B_OK)
 		return;
@@ -89,7 +91,7 @@ AutoconfigLooper::_Configure()
 
 	BMessage message(kMsgConfigureInterface);
 	message.AddString("device", fDevice.String());
-	message.AddBool("auto_configured", true);
+	message.AddBool("auto", true);
 
 	BNetworkAddress link;
 	uint8 last = 56;

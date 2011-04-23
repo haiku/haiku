@@ -422,7 +422,6 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fConfiguration(kMsgConfigureInterface),
 	fResolverConfiguration(kMsgConfigureResolver),
 	fRunner(NULL),
-	fAssignedAddress(0),
 	fServer(AF_INET, NULL, DHCP_SERVER_PORT),
 	fLeaseTime(0)
 {
@@ -436,18 +435,6 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 		return;
 
 	memcpy(fMAC, link.LinkLevelAddress(), sizeof(fMAC));
-
-	if ((interface.Flags() & IFF_AUTO_CONFIGURED) != 0) {
-		// Check for interface previous auto-configured address, if any.
-		BNetworkInterfaceAddress interfaceAddress;
-		int index = interface.FindFirstAddress(AF_INET);
-		if (index >= 0
-			&& interface.GetAddressAt(index, interfaceAddress) == B_OK) {
-			BNetworkAddress address = interfaceAddress.Address();
-			const sockaddr_in& addr = (sockaddr_in&)address.SockAddr();
-			fAssignedAddress = addr.sin_addr.s_addr;
-		}
-	}
 
 	openlog_thread("DHCP", 0, LOG_DAEMON);
 }
@@ -479,8 +466,8 @@ DHCPClient::~DHCPClient()
 status_t
 DHCPClient::Initialize()
 {
-	fStatus = _Negotiate(fAssignedAddress == 0 ? INIT : INIT_REBOOT);
-	syslog(LOG_DEBUG, "%s: DHCP status = %s\n", Device(), strerror(fStatus));
+	fStatus = _Negotiate(INIT);
+	syslog(LOG_DEBUG, "DHCP for %s, status: %s\n", Device(), strerror(fStatus));
 	return fStatus;
 }
 
@@ -540,15 +527,13 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 	// send discover/request message
 	_SendMessage(socket, state == INIT ? discover : request,
-		state != RENEWING ? broadcast : fServer);
+		state != RENEWAL ? broadcast : fServer);
 		// no need to check the status; in case of an error we'll just send
 		// the message again
 
 	// receive loop until we've got an offer and acknowledged it
 
-	while (state != BOUND) {
-		printf("DHCPClient::_Negotiate(%d)\n", (int)state);
-
+	while (state != ACKNOWLEDGED) {
 		char buffer[2048];
 		struct sockaddr_in from;
 		socklen_t fromLength = sizeof(from);
@@ -561,8 +546,12 @@ DHCPClient::_Negotiate(dhcp_state state)
 				return B_TIMED_OUT;
 			}
 
-			_SendMessage(socket, state == INIT ? discover : request,
-				state != RENEWING ? broadcast : fServer);
+			if (state == INIT)
+				_SendMessage(socket, discover, broadcast);
+			else {
+				_SendMessage(socket, request,
+					state != RENEWAL ? broadcast : fServer);
+			}
 
 			continue;
 		} else if (bytesReceived < 0)
@@ -577,15 +566,9 @@ DHCPClient::_Negotiate(dhcp_state state)
 			continue;
 		}
 
-		// advance from startup state
-		if (state == INIT)
-			state = SELECTING;
-		else if (state == INIT_REBOOT)
-			state = REBOOTING;
-
-		syslog(LOG_DEBUG, "%s: Received %s from %s\n",
-			Device(), dhcp_message::TypeToString(message->Type()),
-			_AddressToString(from.sin_addr.s_addr).String());
+		syslog(LOG_DEBUG, "Received %s from %s for %s\n",
+			dhcp_message::TypeToString(message->Type()),
+				_AddressToString(from.sin_addr.s_addr).String(), Device());
 
 		switch (message->Type()) {
 			case DHCP_NONE:
@@ -596,7 +579,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 			case DHCP_OFFER:
 			{
 				// first offer wins
-				if (state != SELECTING)
+				if (state != INIT)
 					break;
 
 				// collect interface options
@@ -607,7 +590,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 				fConfiguration.MakeEmpty();
 				fConfiguration.AddString("device", Device());
-				fConfiguration.AddBool("auto_configured", true);
+				fConfiguration.AddBool("auto", true);
 
 				BMessage address;
 				address.AddString("family", "inet");
@@ -631,10 +614,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			case DHCP_ACK:
 			{
-				if (state != REQUESTING
-					&& state != REBOOTING
-					&& state != REBINDING
-					&& state != RENEWING)
+				if (state != REQUESTING && state != REBINDING
+					&& state != RENEWAL)
 					continue;
 
 				// TODO: we might want to configure the stuff, don't we?
@@ -645,7 +626,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 					// way
 
 				// our address request has been acknowledged
-				state = BOUND;
+				state = ACKNOWLEDGED;
 
 				// configure interface
 				BMessage reply;
@@ -663,17 +644,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 			}
 
 			case DHCP_NACK:
-				if (state != REQUESTING
-					&& state != REBOOTING
-					&& state != REBINDING
-					&& state != RENEWING)
+				if (state != REQUESTING)
 					continue;
-
-				if (state == REBOOTING) {
-					// server reject our request on previous assigned address
-					// back to square one...
-					fAssignedAddress = 0;
-				}
 
 				// try again (maybe we should prefer other servers if this
 				// happens more than once)
@@ -847,8 +819,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 					(uint32)server.sin_addr.s_addr);
 			}
 
-			if (state == INIT || state == INIT_REBOOT 
-				|| state == REQUESTING) {
+			if (state == INIT || state == REQUESTING) {
 				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS,
 					(uint32)fAssignedAddress);
 			} else
@@ -895,7 +866,7 @@ DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 		if (++tries > 2)
 			return false;
 	}
-	syslog(LOG_DEBUG, "%s: Timeout shift: %lu secs (try %lu)\n",
+	syslog(LOG_DEBUG, "Timeout shift for %s: %lu secs (try %lu)\n",
 		Device(), timeout, tries);
 
 	struct timeval value;
@@ -927,16 +898,9 @@ status_t
 DHCPClient::_SendMessage(int socket, dhcp_message& message,
 	const BNetworkAddress& address) const
 {
-	message_type type = message.Type();
-	BString text;
-	text << dhcp_message::TypeToString(type);
- 
-	const uint8* requestAddress = message.FindOption(OPTION_REQUEST_IP_ADDRESS);
-	if (type == DHCP_REQUEST && requestAddress != NULL)
-		text << " for " << _AddressToString(requestAddress).String();
-	
-	syslog(LOG_DEBUG, "%s: Send %s to %s\n", Device(), text.String(), 
-		address.ToString().String());
+	syslog(LOG_DEBUG, "Send %s to %s on %s\n",
+		dhcp_message::TypeToString(message.Type()),
+			address.ToString().String(), Device());
 
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
 		address.IsBroadcast() ? MSG_BCAST : 0, address, address.Length());
@@ -957,7 +921,7 @@ DHCPClient::_CurrentState() const
 	if (now >= fRebindingTime)
 		return REBINDING;
 	if (now >= fRenewalTime)
-		return RENEWING;
+		return RENEWAL;
 
 	return BOUND;
 }
@@ -974,7 +938,7 @@ DHCPClient::MessageReceived(BMessage* message)
 			bigtime_t next;
 			if (_Negotiate(state) == B_OK) {
 				switch (state) {
-					case RENEWING:
+					case RENEWAL:
 						next = fRebindingTime;
 						break;
 					case REBINDING:
@@ -984,7 +948,7 @@ DHCPClient::MessageReceived(BMessage* message)
 				}
 			} else {
 				switch (state) {
-					case RENEWING:
+					case RENEWAL:
 						next = (fLeaseTime - fRebindingTime) / 4 + system_time();
 						break;
 					case REBINDING:
