@@ -533,12 +533,10 @@ NetServer::_ConfigureInterface(BMessage& message)
 				parse_address(family, string, broadcast);
 		}
 
-		if (!autoConfigured || autoConfig)
+		if (autoConfig) {
 			_QuitLooperForDevice(name);
-			
-		startAutoConfig = autoConfig;
-		
-		if (addressMessage.FindString("gateway", &string) == B_OK
+			startAutoConfig = true;
+		} else if (addressMessage.FindString("gateway", &string) == B_OK
 			&& parse_address(family, string, gateway)) {
 			// add gateway route, if we're asked for it
 			interface.RemoveDefaultRoute(family);
@@ -611,7 +609,8 @@ NetServer::_ConfigureInterface(BMessage& message)
 		looper->Run();
 
 		fDeviceMap[name] = looper;
-	}
+	} else if (!autoConfigured)
+		_QuitLooperForDevice(name);
 
 	return B_OK;
 }

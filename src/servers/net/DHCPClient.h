@@ -22,11 +22,13 @@ class dhcp_message;
 
 enum dhcp_state {
 	INIT,
+	SELECTING,
+	INIT_REBOOT,
+	REBOOTING,
 	REQUESTING,
 	BOUND,
-	RENEWAL,
+	RENEWING,
 	REBINDING,
-	ACKNOWLEDGED,
 };
 
 
@@ -55,9 +57,9 @@ private:
 			bool				_TimeoutShift(int socket, time_t& timeout,
 									uint32& tries);
 			void				_RestartLease(bigtime_t lease);
-			
+
 	static	BString				_AddressToString(const uint8* data);
-	static	BString				_AddressToString(in_addr_t address);
+	static 	BString				_AddressToString(in_addr_t address);
 
 private:
 			BMessage			fConfiguration;
