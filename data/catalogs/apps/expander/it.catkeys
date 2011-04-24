@@ -11,7 +11,7 @@ Creating listing for '%s'	ExpanderWindow		Creazione lista per '%s'
 Destination	ExpanderWindow		Destinazione
 Destination folder:	ExpanderPreferences		Cartella di destinazione
 Error when expanding archive	ExpanderWindow		Errore durante la decompressione dell'archivio
-Expand	ExpanderMenu		Decomprimi
+Expand	ExpanderMenu		Espandi
 Expand	ExpanderWindow		Decomprimi
 Expander settings	ExpanderPreferences		Impostazioni Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Scegli la destinazione
@@ -36,7 +36,7 @@ Settings	ExpanderMenu		Impostazioni
 Settings…	ExpanderMenu		Impostazioni…
 Show contents	ExpanderMenu		Mostra il contenuto
 Show contents	ExpanderWindow		Mostra contenuto
-Source	ExpanderWindow		Sorgente
+Source	ExpanderWindow		Origine
 Stop	ExpanderMenu		Arresta
 Stop	ExpanderWindow		Arresta
 The destination folder does not exist.	ExpanderWindow		La cartella di destinazione non esiste.

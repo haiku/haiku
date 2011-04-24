@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DiskProbe	1844123050
+1	russian	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (родной)
 (native)	ProbeView		 (нативный)
 15 bit	TypeEditors		15 бит
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8 битная палитра
 8 bit signed value:	TypeEditors		8-ми битное знаковое значение:
 8 bit unsigned value:	TypeEditors		8-ми битное беззнаковое значение:
-About DiskProbe…	FileWindow		О программе…
 Add	ProbeView		Добавить
 Attribute	AttributeWindow		Атрибут
 Attribute	ProbeView		Атрибут

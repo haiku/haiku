@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-LaunchBox	1244694305
-About	LaunchBox		О программе
-Add button here	LaunchBox		Добавить сюда кнопку
+1	russian	x-vnd.Haiku-LaunchBox	1440389990
+Add button here	LaunchBox		Добавить кнопку
 Auto-raise	LaunchBox		Всплывать автоматически
 Bummer	LaunchBox		Облом
 Cancel	LaunchBox		Отмена
@@ -8,11 +7,11 @@ Clear button	LaunchBox		Очистить кнопку
 Clone	LaunchBox		Дублировать
 Close	LaunchBox		Закрыть
 Description for '%3'	LaunchBox		Описание для '%3'
-Failed to launch '%1'.\n\nError:	LaunchBox		Не удалось запустить '%1'.\n\nОшибка:
+Failed to launch '%1'.\n\nError: 	LaunchBox		Не удалось запустить '%1'.\n\nОшибка: 
 Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
-Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Не удалось запустить приложение с сигнатурой '%2'.\n\nОшибка:
+Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Не удалось запустить приложение с сигнатурой '%2'.\n\nОшибка: 
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка:
-Horizontal layout	LaunchBox		Горизонтальное расположение
+Horizontal layout	LaunchBox		Расположить горизонтально
 Icon size	LaunchBox		Размер значков
 Ignore double-click	LaunchBox		Игнорировать двойной щелчок
 LaunchBox	System name		Панель запуска
@@ -29,8 +28,7 @@ Set description…	LaunchBox		Изменить описание…
 Settings	LaunchBox		Настройки
 Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
 Show window border	LaunchBox		Показать рамку окна
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (stippi)
-Vertical layout	LaunchBox		Вертикальное расположение
+Vertical layout	LaunchBox		Расположить вертикально
 You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
 last chance	LaunchBox		последний шанс
 launch popup	LaunchBox		launch popup

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	3266900319
+1	ukrainian	x-vnd.Haiku-MediaPlayer	612300642
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Сінемаскоп)
@@ -23,8 +23,6 @@ Bottom of video	MediaPlayer-SettingsWindow		Нижня частина відео
 Cancel	MediaPlayer-SettingsWindow		Відмінити
 Close	MediaPlayer-Main		Закрити
 Close	MediaPlayer-PlaylistWindow		Закрити
-Close window when done playing movies	MediaPlayer-SettingsWindow		Закрити вікно після закінчення перегляду
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Закрити вікно після закінчення відтворення
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Копіювати записи
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копіювати запис
 Drop files to play	MediaPlayer-Main		Скинути файли для відтворення
@@ -40,8 +38,6 @@ Internal error (malformed message). Saving the playlist failed.	MediaPlayer-Play
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (закінчилась память). Збереження списку відтворення призупинено.
 Large	MediaPlayer-SettingsWindow		Великий
 Lock Peaks	MediaPlayer-PeakView		Блокувати Піки
-Loop movies by default	MediaPlayer-SettingsWindow		Закільцювати зображення по замовчуванню
-Loop sounds by default	MediaPlayer-SettingsWindow		Закольцювати звуки по стандартному
 Low volume	MediaPlayer-SettingsWindow		Мала гучність
 MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіа Плейера
 Medium	MediaPlayer-SettingsWindow		Середній
@@ -73,13 +69,10 @@ Randomize	MediaPlayer-PlaylistWindow		Випадковий
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Випадкові записи
 Rating	MediaPlayer-Main		Рейтинг
 Redo	MediaPlayer-PlaylistWindow		Переробити
-Remove (Del)	MediaPlayer-PlaylistWindow		Видалити (Del)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Видалити записи
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Знищити записи в кошику
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Видалити запис
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити  запис в корзині
-Remove all	MediaPlayer-PlaylistWindow		Видалити все
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Видалити  і перемістити  в кошик
 Revert	MediaPlayer-SettingsWindow		Повернути
 Save	MediaPlayer-Main		Зберегти
 Save	MediaPlayer-PlaylistWindow		Зберегти
@@ -87,7 +80,6 @@ Save Playlist	MediaPlayer-PlaylistWindow		Зберегти список відт
 Save as…	MediaPlayer-PlaylistWindow		Зберегти як…
 Save error	MediaPlayer-PlaylistWindow		Помилка збереження
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено.\n\nПомилка:
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Шкала управління в повноекраному режимі
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштаб зображення зглажений (без режиму накладання)
 Skip to the next track.	MediaPlayer-Main		Пропустити до наступного треку
 Skip to the previous track.	MediaPlayer-Main		Повернутися до попереднього треку
@@ -98,7 +90,6 @@ Stop	MediaPlayer-Main		Зупинити
 Stop playing.	MediaPlayer-Main		Зупинити відтворення
 Stream settings	MediaPlayer-Main		Настройки потоку
 Subtitles	MediaPlayer-Main		Субтитри
-Thanks	MediaPlayer-Main		Подяки
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Немає встановленого декодера щоб підтримував файл цього формату, або у декодера є проблема з спеціальною версією формату.
 Toggle mute.	MediaPlayer-Main		Вимкнути звук.
 Toggle pause/play.	MediaPlayer-Main		Перемикання пауза/відтворення

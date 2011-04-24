@@ -1,4 +1,4 @@
-1	spanish	x-vnd.mmu_man.filepanel	3850931840
+1	spanish	x-vnd.mmu_man.filepanel	1802971238
 %s not a valid option\n	FilePanelApp		%s opción inválida\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: SIN IMPLEMENTAR\n
 %s: this option requires a parameter\n	FilePanelApp		%s: esta opción requiere un parámetro\n
@@ -11,7 +11,6 @@
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-1\t--load\t(cargar) usar un panel cargar del tipo FilePanel (predeterminado)\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\thace modal al FilePanel
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t(nombre) fija el nombre predeterminado para guardar\n
-
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\t(guardar) usar usa un panel guardar del tipo FilePanel\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t(titulo) establece el título de la ventana FilePanel
 display a load/save file panel\n	FilePanelApp		Despliega un panel Cargar/Guardar archivo\n

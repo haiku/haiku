@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Magnify	1182120930
+1	ukrainian	x-vnd.Haiku-Magnify	1821981944
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
 Add a crosshair	Magnify-Main		Додати перехрестя
 Copy image	Magnify-Main		Копіювати зображення
@@ -16,7 +16,6 @@ Info:\n  hide/show info - hides/shows all these new features\n    note: when sho
 Magnify help	Magnify-Help		Допомога Magnify
 Make square	Magnify-Main		Задати площу
 Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навігація:\n стрілочки - переміщують курсор вибору (rgb індикатора або перехрестя)\n довкола 1 пікселя за раз\n опція стрілочки - переміщає курсор 1 піксель за раз\n x зробіть вибір - поточний вибір має 'x' в собі\n
-OK	Magnify-Main		Гаразд
 Remove a crosshair	Magnify-Main		Зняти перехрестя
 Save image	Magnify-Main		Зберегти зображення
 Stick coordinates	Magnify-Main		Вісь кординат

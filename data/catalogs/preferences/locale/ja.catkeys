@@ -1,20 +1,24 @@
-1	japanese	x-vnd.Haiku-Locale	3296228921
+1	japanese	x-vnd.Haiku-Locale	403285821
 12 hour	TimeFormatSettings		12 時間
 24 hour	TimeFormatSettings		24時間
 Available languages	Locale Preflet Window		使用可能な言語
+Cancel	Locale Preflet Window		中止
 Currency	TimeFormatSettings		通貨
 Date	TimeFormatSettings		日付
 Defaults	Locale Preflet Window		デフォルト
-Full format:	TimeFormatSettings		全て:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		変更を有効にするためには、DeskbarとTrackerは再起動される必要があります。今すぐ再起動してよいですか?
 Language	Locale Preflet Window		言語
 Long format:	TimeFormatSettings		長い形式：
 Medium format:	TimeFormatSettings		中位の形式:
 Negative:	TimeFormatSettings		負表記:
 Numbers	TimeFormatSettings		数字
 OK	Locale Preflet Window		Ok
+Options	Locale Preflet Window		オプション
 Positive:	TimeFormatSettings		正表記:
 Preferred languages	Locale Preflet Window		言語の優先順位
+Restart	Locale Preflet Window		再起動
 Revert	Locale Preflet Window		元に戻す
 Short format:	TimeFormatSettings		短い形式：
 Time	TimeFormatSettings		時刻
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		DeskbarとTracker中のアプリケーション名とフォルダ名を翻訳する。
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		使用できる言語が見つかりません！このプレフレットは使用できません！

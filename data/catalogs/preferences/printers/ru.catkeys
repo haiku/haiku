@@ -26,8 +26,8 @@ Print test page	PrintersWindow		Пробная страница
 Printer name:	AddPrinterDialog		Название принтера:
 Printer type:	AddPrinterDialog		Тип принтера:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
-Printers	System name		Принтеры
 Printers	PrintersWindow		Принтеры
+Printers	System name		Принтеры
 Processing	JobListView		Обрабатывается
 Red	TestPageView		Красный
 Remove	PrintersWindow		Удалить

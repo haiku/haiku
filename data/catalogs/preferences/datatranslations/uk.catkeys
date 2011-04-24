@@ -1,21 +1,14 @@
-1	ukrainian	x-vnd.Haiku-DataTranslations	3452290445
-About	DataTranslations		про
+1	ukrainian	x-vnd.Haiku-DataTranslations	3458095697
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		 Елемент з назвою '%name' повністю присутній у папці Перетворювачів! Переписати існуючий Перетворювач?
 Cancel	DataTranslations		Відміна
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
 DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Перетворення даних\n\автори Oliver Siebenmarck і інші\n\tCopyright 2002–2010, Haiku Inc. All rights reserved.\n
-Icon	DataTranslations		Іконка
 Info	DataTranslations		інформація
 Info:	DataTranslations		Інформація:
-Info…	DataTranslations		Інформація…
 Name:	DataTranslations		І’мя:
-Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Ім'я:\t%s \nВерсія:\t%ld.%ld.%ld\nІнфо:\t%s\n\nШлях:\n%s\n
 OK	DataTranslations		Гаразд
 Overwrite	DataTranslations		Перезаписати
-Panel Info	DataTranslations		Інформаційна Панель
 Path:	DataTranslations		Шлях:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є перетворювачем і його не буде встановлено.
 The new translator has been installed successfully.	DataTranslations		Новий транслятор був успішно встановлений.
-Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Настройка перетворень\n\nВикористовуйте цю панель для встановлення величин, що різні\nтранслятори використовують, коли невизначено інших настройок\nв додатку.
 Version:	DataTranslations		Версія:

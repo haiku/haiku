@@ -1,11 +1,10 @@
-1	russian	x-vnd.Haiku-FileTypes	1055306485
+1	russian	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		Тип приложения %1
 %ld Application type%s could be removed.	Application Types Window		Удалось очистить типов приложений: %ld.
 %s file type	FileType Window		Тип файла %s
 (from application)	FileTypes Window		(из приложения)
 (from super type)	FileTypes Window		(из супертипа)
 Abort	Application Types Window		Прервать
-About FileTypes…	FileTypes Window		О программе…
 Add	Attribute Window		Добавить
 Add	Extension Window		Добавить
 Add group	New File Type Window		Добавить группу
@@ -70,8 +69,8 @@ File	FileTypes Window		Файл
 File could not be opened	Preferred App Menu		Невозможно открыть файл
 File recognition	FileTypes Window		Распознавание файла
 File type	FileType Window		Тип файла
-FileTypes	System name		Типы файлов
 FileTypes	FileTypes		FileTypes
+FileTypes	System name		Типы файлов
 FileTypes request	FileTypes		Запрос типа файла
 FileTypes request	FileTypes Window		Запрос типа файла
 FileTypes request	Preferred App Menu		Запрос типа файла
@@ -155,5 +154,4 @@ Version:	Application Types Window		Версия:
 Visible	Attribute Window		Видимый
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Ширина:
 [Multiple files] file types	FileType Window		[Несколько файлов] типы файлов
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tРазработал Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		нет значка

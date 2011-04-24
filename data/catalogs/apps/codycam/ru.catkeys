@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku.CodyCam	2416864674
+1	russian	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
 Cannot connect the video source to the video window	CodyCam		Невозможно подключить видео источник к видео окну
 Cannot create a video window	CodyCam		Невозможно создать видео окно
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Меню периодичности захвата
 Capture controls	CodyCam		Настройки захвата
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Closing the window\n	VideoConsumer.cpp		Закрытие окна\n
-CodyCam	System name		Вебкамера
+CodyCam	Application name		Вебкамера
 Connected…	VideoConsumer.cpp		Подключен…
 Couldn't find requested directory on server	VideoConsumer.cpp		Невозможно найти запрашиваемый каталог на сервере
 Directory:	CodyCam		Каталог:

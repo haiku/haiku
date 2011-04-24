@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku.TV	2475181563
+1	ukrainian	x-vnd.Haiku.TV	4095203425
 Always on top	MainWin		Завжди поверх усіх
 Channel	MainWin		Канали
 Debug	MainWin		Налагоджуваня
@@ -18,7 +18,6 @@ Scale to native size	MainWin		Маштабувати до вихідного р�
 Settings	MainWin		Налаштування
 Settings…	MainWin		Налаштування…
 TV	MainWin		ТБ
-\nVersion 	MainWin		\nВерсія 
 force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення дисплею 4:3
 force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення дисплею 4:3
 force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення дисплею 4:3

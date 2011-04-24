@@ -44,7 +44,6 @@ Save KeySet as…	ShortcutsWindow		Toetsencombinatie opslaan als...
 Select	ShortcutsWindow		Selecteren
 SendMessage	ShortcutsSpec		VerzendBericht
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatie-bestand niet openen!
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatiebestand niet openen!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand te lezen!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!

@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-KeyboardInputServerDevice	2270014966
+1	french	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 (This team is a system component)	Team monitor		(Ce processus est un composant du système)
 Cancel	Team monitor		Annuler
 Force reboot	Team monitor		Forcer le redémarrage
+If the application will not quit you may have to kill it.	Team monitor		Si l'application ne se ferme pas, vous pourriez avoir à la tuer.
 Kill application	Team monitor		Tuer l'application
 Quit application	Team monitor		Quitter l'application
 Restart the desktop	Team monitor		Redémarrer le Bureau

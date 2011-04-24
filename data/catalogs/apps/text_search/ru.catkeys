@@ -1,14 +1,12 @@
-1	russian	x-vnd.Haiku.TextSearch	3449010850
+1	russian	x-vnd.Haiku.TextSearch	1180598828
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не смог открыть одну папку или более
 %s: Not enough room to escape the filename.	Grepper		%s: Недостаточно места для экранирования имени файла.
 %s: There was a problem running grep.	Grepper		%s: Возникла ошибка при работе grep.
-About TextSearch…	GrepWindow		О программе…
 Actions	GrepWindow		Действия
 Cancel	GrepWindow		Стоп
 Case-sensitive	GrepWindow		Учитывать регистр
 Close	GrepWindow		Закрыть
 Copy text to clipboard	GrepWindow		Скопировать текст в буфер
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Разработал Matthijs Hollemans.\n\nВнесли вклад Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers и momoziro.\n
 Encoding	GrepWindow		Кодировка
 Escape search text	GrepWindow		Экранировать текст поиска
 File	GrepWindow		Файл

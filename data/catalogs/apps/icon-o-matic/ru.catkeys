@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	2332620696
+1	russian	x-vnd.haiku-icon_o_matic	3200506475
 <modify path>	Icon-O-Matic-PathCmd		<изменить путь>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нечего возвращать>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нечего отменять>
@@ -34,7 +34,6 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
 Bleep!	Exporter - Continue in error dialog		Уже!
 Bummer	Cancel button - error alert		Облом
 Cancel	Icon-O-Matic-ColorPicker		Отмена
-Cancel	Icon-O-Matic-Main		Отмена
 Cancel	Icon-O-Matic-SVGExport		Отмена
 Caps	Icon-O-Matic-PropertyNames		Шапки
 Change Color	Icon-O-Matic-SetColorCmd		Изменить цвет
@@ -52,7 +51,6 @@ Contour	Transformation		Обводка
 Copy	Icon-O-Matic-Properties		Копировать
 Detect Orient.	Icon-O-Matic-PropertyNames		Определить ориентацию
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидный
-Discard	Icon-O-Matic-Main		Не сохранять
 Duplicate	Icon-O-Matic-PathsList		Дублировать
 Duplicate	Icon-O-Matic-ShapesList		Дублировать
 Duplicate	Icon-O-Matic-StylesList		Дублировать
@@ -153,11 +151,9 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Переместить нача
 Rotate indices forwards	Icon-O-Matic-PathsList		Переместить начало контура вперед
 Rotation	Icon-O-Matic-PropertyNames		Поворот
 Rounding	Icon-O-Matic-PropertyNames		Скругление
-Save	Icon-O-Matic-Main		Сохранить
 Save	Icon-O-Matic-Menu-File		Сохранить
 Save Icon	Dialog title		Сохранить значок
 Save as…	Icon-O-Matic-Menu-File		Сохранить как…
-Save changes to current icon?	Icon-O-Matic-Main		Сохранить изменения в текущем значке?
 Saving your document failed!	Icon-O-Matic-Exporter		Не удалось сохранить документ!
 Scale	Icon-O-Matic-TransformationBoxStates		Масштабировать
 Scale X	Icon-O-Matic-PropertyNames		Масштабировать по X

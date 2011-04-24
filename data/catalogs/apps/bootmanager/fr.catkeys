@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	883162038
+1	french	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Le programme est sur le point d'écrire le menu suivant sur le disque de démarrage (%s). Veuillez vérifier les informations ci-dessous avant de continuer.
@@ -48,8 +48,7 @@ The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to dis
 The Master Boot Record could not be restored!	BootManagerController		Le MBR n'a pas pu être restauré !
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Le MBR du périphérique de démarrage (%DISK) a été récupéré avec succès depuis %FILE.
 The boot manager has been successfully installed on your system.	BootManagerController		Le gestionnaire d'amorçage a été installé avec succès sur votre système.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d'amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d'amorçage
-pour chacune partitions.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d'amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d'amorçage pour chacune partitions.
 The old Master Boot Record could not be saved to %s	BootManagerController		L'ancien MBR n'a pas pu être sauvegardé vers %s
 The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été correctement sauvegardé dans le fichier %s.
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		La table de partitions du premier disque dur n'est pas compatible avec le gestionnaire de démarrage.\nLe gestionnaire de démarrage a besoin de 2 Kilo-octets d'espace disque vide situé avant la première partition.

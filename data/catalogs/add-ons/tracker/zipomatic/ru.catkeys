@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku.zip-o-matic	274748138
+1	russian	x-vnd.haiku.zip-o-matic	2207848100
 %ld files added.	file:ZipOMaticWindow.cpp		Добавлено файлов: %ld
 1 file added.	file:ZipOMaticWindow.cpp		1 файл добавлен.
 Archive	file:ZipperThread.cpp		Архив
@@ -7,7 +7,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Continue	file:ZipOMaticWindow.cpp		Продолжить
 Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
-Drop files to zip.	file:ZipOMaticWindow.cpp		Переместите файлы для создания zip-архива.
+Drop files here.	file:ZipOMaticWindow.cpp		Переместите файлы сюда.
 Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
 Filename: %s	file:ZipOMaticWindow.cpp		Имя архива: %s
 Let them continue	file:ZipOMatic.cpp		Позволить им продолжить

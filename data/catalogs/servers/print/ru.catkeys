@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PSRV	2998115175
+1	russian	x-vnd.Be-PSRV	3659516843
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
 All pages	ConfigWindow		Все страницы
@@ -18,6 +18,7 @@ Portrait	ConfigWindow		Портрет
 Print setup	ConfigWindow		Настройка печати
 Printer:	ConfigWindow		Принтер:
 Select a printer	ConfigWindow		Выберите принтер
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоид
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
 There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
 Undefined	ConfigWindow		не определены

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	2388476802
+1	finnish	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - Päivämäärä
 %e - E-mail address	Mail		%e - Sähköpostiosoite
 %e wrote:\\n	Mail		%e kirjoitti:\\n
@@ -6,6 +6,7 @@
 (Address unavailable)	Mail		(Ei osoitetta)
 (Date unavailable)	Mail		(Ei päivämäärää)
 (Name unavailable)	Mail		(Ei nimeä)
+<none>	Mail		<ei mitään>
 Account from mail	Mail		Tili sähköpostiviestistä
 Account:	Mail		Tili:
 Accounts…	Mail		Tilit…

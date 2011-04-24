@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-ShowImage	581710495
+1	russian	x-vnd.Haiku-ShowImage	886873119
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунды
-About ShowImage…	Menus		О программе…
 Browse	Menus		Просмотр
 Cancel	ClosePrompt		Отмена
 Clear selection	Menus		Очистить выделение
@@ -14,7 +13,7 @@ Edit	Menus		Изменить
 File	Menus		Файл
 First page	Menus		Первая страница
 Fit image to page	PrintOptionsWindow		Подогнать размер изображения под страницу
-Fit to window	Menus		Подогонять под размер окна
+Fit to window	Menus		Подогнать под размер окна
 Flip left to right	Menus		Повернуть слева направо
 Flip top to bottom	Menus		Повернуть сверху вниз
 Full screen	Menus		На весь экран
@@ -24,6 +23,7 @@ High-quality zooming	Menus		Высококачественное масштаб�
 Image	Menus		Изображение
 Job setup	PrintOptionsWindow		Печать
 Last page	Menus		Последняя страница
+Leave full screen	Menus		Выйти из полного экрана
 Next file	Menus		Следующий файл
 Next page	Menus		Следующая страница
 OK	Alerts		ОК
@@ -43,14 +43,15 @@ Rotate clockwise	Menus		Повернуть по часовой стрелке
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 Save as…	Menus		Сохранить как…
 Select all	Menus		Выделить всё
-Selection Mode	Menus		Режим выделения
+Selection mode	Menus		Режим выделения
 Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
+Show tool bar	Menus		Показать панель иструментов
 ShowImage	System name		Просмотр изображений
 Slide delay	Menus		Задержка слайд шоу
 Slide show	Menus		Слайд шоу
-Stretch to window	Menus		Растягивать до размеров окна
+Stretch to window	Menus		Растянуть до размеров окна
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его без сохраниения?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его без сохранения?
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Undo	Menus		Вернуть
 Use as background…	Menus		Сделать фоном рабочего стола…

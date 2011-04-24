@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	4047940366
+1	ukrainian	x-vnd.Haiku-Shortcuts	566164556
 (Choose application with file requester)	ShortcutsWindow		(Виберіть програму з файлами запису)
 *Beep	ShortcutsWindow		*Сигнал
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити Рядок \"Ваш текст тут\"
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Відправити повідомлення додатку/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		Про Shortcuts
-About Shortcuts	ShortcutsWindow		Про Shortcuts
 Add new shortcut	ShortcutsWindow		Додати нову горячу клавішу
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Сумістити
@@ -31,7 +29,6 @@ MouseUp	ShortcutsSpec		Мишку вгору
 MoveMouse	ShortcutsSpec		Переміщення мишки
 MoveMouseTo	ShortcutsSpec		Перемістити мишку до
 Multi	ShortcutsSpec		Багато
-OK	ShortcutsApp		Гаразд
 OK	ShortcutsWindow		Гаразд
 Oh no	ShortcutsWindow		О ні
 Open	ShortcutsWindow		Відкрити
@@ -49,5 +46,4 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ярлику невдалось розібрати ваш файл Ключів!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти ваш файл список горячих клавіш!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		не вдалося створити список горячих клавіш.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nБазований на SpicyKeys для BeOS розробленій  Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Win Key

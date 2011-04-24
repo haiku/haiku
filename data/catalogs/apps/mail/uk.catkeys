@@ -1,8 +1,7 @@
-1	ukrainian	x-vnd.Be-MAIL	903155403
+1	ukrainian	x-vnd.Be-MAIL	3539940090
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - поштова адреса
 %n - Full name	Mail		%n - Повне ім'я
-About Mail…	Mail		Про Пошту…
 Account from mail	Mail		Аккаунт для пошти
 Account:	Mail		Аккаунт:
 Accounts…	Mail		Аккаунти…
@@ -57,7 +56,6 @@ Leave as New	Mail		Зберегти як новий
 Leave same	Mail		Зберегти саме це
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
 Mail preferences	Mail		Настройки пошти
-Mail\n\n	Mail		Пошта\n\n
 Mailing	Mail		Відправлення
 Message	Mail		Повідомлення
 Move to trash	Mail		Видалити
@@ -132,6 +130,5 @@ Use default account	Mail		Використовувати аккаунт по з�
 User interface	Mail		Інтерфейс користувача
 View	Mail		Вигляд
 Warn unencodable:	Mail		Увага нерозкодоване:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Автор Robert Polic.\nПокращення команди Dr. Zoidberg .\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію.
 \\n - Newline	Mail		\\n - Нова стрічка

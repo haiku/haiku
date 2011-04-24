@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	2709824708
+1	italian	x-vnd.Haiku-Installer	4212670326
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) L'installer renderà la partizione Haiku avviabile, ma non esegue nessun passo per integrare Haiku in un menu di avvio esistente. Se avete GRUB già installato, potete aggiungere Haiku al suo menu d'avvio. Ciò ouò essere fatto in maniera differente, dipende da quale versione di GRUB utilizzate.\n\n\n 
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
@@ -29,8 +29,7 @@ Collecting copy information.	InstallProgress		Raccolta informazioni di copia.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Configurate il vostro /boot/grub/menu.lst  lanciando il vostro editor preferito da Terminale così:\n\n
 Continue	InstallerApp		Continua
 Continue	InstallerWindow	In alert after pressing Stop	Continua
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impossibile lanciare DriveSetup,
-l'applicazione per configurare le partizioni dei dischi.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impossibile lanciare DriveSetup, l'applicazione per configurare le partizioni dei dischi.
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Infine, è necessario aggiornare il menu di avvio inserendo:\n\n
 Finishing Installation.	InstallProgress		Conclusione installazione.
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Lo schema di denominazione di GRUB è ancora: (hdN,n)\n\n

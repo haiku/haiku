@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	498395429
+1	russian	x-vnd.Haiku-libtracker	2699246155
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/с
 %Ld B	WidgetAttributeText		%Ld байт
 %Ld bytes	WidgetAttributeText		%Ld байт
@@ -103,6 +103,7 @@ Delete	FilePanelPriv		Удалить
 Delete	PoseView		Удалить
 Deleting: 	StatusWindow		Удаление: 
 Description:	InfoWindow		Описание:
+Desktop	B_DESKTOP_DIRECTORY		Рабочий стол
 Desktop	Model		Рабочий стол
 Desktop	TrackerSettingsWindow		Рабочий стол
 Disk mount settings	AutoMounterSettings		Настройка подключения дисков
@@ -168,11 +169,12 @@ Icon view	DeskWindow		Большие значки
 Icon view	VolumeWindow		Большие значки
 Identify	ContainerWindow		Опознать
 Identify	InfoWindow		Опознать
-If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку config, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %toDoAction папку config нажмите \"Сделать это\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку home, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %toDoAction папку home нажмите \"Сделать это\".
-If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction настройки mime, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %toDoAction настройки mime нажмите \"Сделать это\".
-If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку settings, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %toDoAction папку settings нажмите \"Сделать это\".
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку system или её содержимое, Haiku больше не сможет загружаться! \nВы уверены, что хотите сделать это? Чтобы %toDoAction папку system или её содержимое, зажмите клавишу Shift и нажмите \"Сделать это\".
+If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку common, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку common, зажмите клавишу Shift и нажмите \"Сделать это\".
+If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку config, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку config нажмите \"Сделать это\".
+If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку home, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку home, зажмите клавишу Shift и нажмите \"Сделать это\".
+If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction настройки mime, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction настройки mime нажмите \"Сделать это\".
+If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку settings, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку settings нажмите \"Сделать это\".
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку system или её содержимое, Haiku больше не сможет загружаться! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку system или её содержимое, зажмите клавишу Shift и нажмите \"Сделать это\".
 Ignore case	SelectionWindow		Игнорировать регистр
 Include trash	FindPanel		Включая корзину
 Increase size	ContainerWindow		Увеличить размер
@@ -265,7 +267,7 @@ Paste	ContainerWindow		Вставить
 Paste	FilePanelPriv		Вставить
 Paste layout	ContainerWindow		Вставить вид папки
 Paste links	ContainerWindow		Вставить ссылки
-Paused: click to resume or stop	StatusWindow		Пауза: нажмите для продолжения или остановки
+Paused: click to resume or stop	StatusWindow		Пауза: нажмите повторно для продолжения
 Permissions	ContainerWindow		Права
 Permissions	InfoWindow		Права
 Preferences…	ContainerWindow		Настройки…
@@ -283,6 +285,7 @@ Prompt	FSUtils		Спрашивать
 Query name:	FindPanel		Имя запроса:
 Query template	FindPanel		Шаблон запроса
 Read	FilePermissionsView		Чтение
+Real name	ContainerWindow		Реальное имя
 Recalculate folder size	InfoWindow		Пересчитать размер папки
 Recent documents	FavoritesMenu		Недавние документы
 Recent folders	ContainerWindow		Недавнюю папку
@@ -344,7 +347,7 @@ Sorry, you can't create links in the Trash.	PoseView		Извините, но в�
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Извините, но вы не можете изменить этот атрибут.
 Temporary	FindPanel		Временный запрос
-That name is already taken. Please type another one.	InfoWindow		Это имя уже занято. Пожалуйста, введите другое имя.
+That name is already taken. Please type another one.	InfoWindow		Это имя уже занято. Пожалуйста, введите другое.
 That name is already taken. Please type another one.	WidgetAttributeText		Это имя уже занято. Пожалуйста, введите другое имя.
 That name is too long. Please type another one.	InfoWindow		Это имя слишком длинное. Пожалуйста, введите другое имя.
 The Tracker must be running to see Info windows.	PoseView		Для просмотра окна \"Информация\" должен быть запущен Tracker.
@@ -363,6 +366,7 @@ There was an error resolving the link.	Tracker		Возникла ошибка п
 There was an error writing the attribute.	WidgetAttributeText		Произошла ошибка при записи атрибута.
 TiB	WidgetAttributeText		Тбайт
 To: %dir	StatusWindow		В: %dir
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		шаблоны
 Tracker preferences	TrackerSettingsWindow		Настройки Tracker
 Tracker status	StatusWindow		Статус Tracker
 Trash	Model		Корзина
@@ -401,19 +405,24 @@ You must have at least one attribute showing.	PoseView		Вы должны ост
 \nShould this be fixed?	FSUtils		\nВы хотите это исправить?
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld байт, 
 after	FindPanel		после
+apps	B_APPS_DIRECTORY		приложения
 before	FindPanel		до
 by attribute	FindPanel		по атрибуту
 by formula	FindPanel		по формуле
 by name	FindPanel		по имени
 calculating…	InfoWindow		подсчёт…
+common	B_COMMON_DIRECTORY		общие
+config	B_USER_CONFIG_DIRECTORY		конфигурация
 contains	FindPanel		содержит
 contains	SelectionWindow		содержит
 copy	FSUtils	filename copy	копия
 copying	FSUtils		копируемый
+develop	B_COMMON_DEVELOP_DIRECTORY		разработка
 ends with	FindPanel		заканчивается на
 ends with	SelectionWindow		заканчивается на
 for %num files	InfoWindow		в %num файлах
 greater than	FindPanel		больше чем
+home	B_USER_DIRECTORY		домашняя папка
 is	FindPanel		равен
 is not	FindPanel		не равен
 label too long	PoseView		слишком длинное имя
@@ -428,7 +437,9 @@ multiple disks	FindPanel		нескольких дисках
 no items	CountView		нет объектов
 no supporting apps	OpenWithWindow		нет поддерживающих программ
 of %items	StatusWindow		из %items
+optional	/boot/optional		опциональные
 parent folder	NavMenu		родительский каталог
+preferences	B_PREFERENCES_DIRECTORY		настройки
 rename	InfoWindow	As in 'If you rename ...'	переименуете
 rename	InfoWindow	As in 'To rename ...'	переименовать
 rename	TextWidget	As in 'If you rename ...'	переименуете
@@ -436,3 +447,5 @@ rename	TextWidget	As in 'To rename ...'	переименовать
 save text	FilePanelPriv		сохранить текст
 starts with	FindPanel		начинается на
 starts with	SelectionWindow		начинается на
+system	B_SYSTEM_DIRECTORY		система
+trash	B_TRASH_DIRECTORY		корзина

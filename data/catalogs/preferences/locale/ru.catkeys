@@ -6,13 +6,13 @@ Cancel	Locale Preflet Window		Отмена
 Currency	TimeFormatSettings		Валюта
 Date	TimeFormatSettings		Дата
 Defaults	Locale Preflet Window		По умолчанию
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Необходимо перезапустить Deskbar и Tracker, чтобы изменения вступили в силу. Перезапустить их сейчас? 
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Чтобы изменения вступили в силу необходимо перезапустить Deskbar и Tracker. Перезапустить их сейчас?
 Formatting	Locale Preflet Window		Форматирование
 Full format:	TimeFormatSettings		Полный формат:
 Language	Locale Preflet Window		Язык
-Locale	System name		Локаль
 Locale	Locale Preflet		Локаль
 Locale	Locale Preflet Window		Локаль
+Locale	System name		Локаль
 Long format:	TimeFormatSettings		Длинный формат:
 Medium format:	TimeFormatSettings		Средний формат:
 Negative:	TimeFormatSettings		Отрицательные:

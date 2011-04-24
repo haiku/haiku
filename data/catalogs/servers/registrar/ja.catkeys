@@ -5,14 +5,14 @@ Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求�
 Asking background applications to quit.	ShutdownProcess		バックグランドアプリケーションに終了を要求しています。
 Asking other processes to quit.	ShutdownProcess		プロセスに終了を要求しています。
 Cancel	ShutdownProcess		キャンセル
-Cancel shutdown	ShutdownProcess		シャットダウンのキャンセル
+Cancel shutdown	ShutdownProcess		シャットダウンを中止
 Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動してよいですか?
 Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしてよいですか?
 It's now safe to turn off the computer.	ShutdownProcess		コンピュータの電源を切断しても安全です。 
 Kill application	ShutdownProcess		強制終了
 OK	ShutdownProcess		OK
 Restart	ShutdownProcess		再起動
-Restart system	ShutdownProcess		システムの再起動
+Restart system	ShutdownProcess		システムを再起動
 Shut down	ShutdownProcess		シャットダウン
 Shutdown aborted	ShutdownProcess		シャットダウンが中断されました。
 Shutdown status	ShutdownProcess		シャットダウンの状態

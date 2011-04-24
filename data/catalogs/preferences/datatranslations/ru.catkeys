@@ -1,23 +1,17 @@
-1	russian	x-vnd.Haiku-DataTranslations	758278388
-About	DataTranslations		подробнее
+1	russian	x-vnd.Haiku-DataTranslations	427795950
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Файл с именем '%name' уже существует в папке Translators! Заменить существующий транслятор?
 Cancel	DataTranslations		Отмена
 Could not install %s:\n%s	DataTranslations		Невозможно установить %s:\n%s
 DataTranslations	System name		Трансляция данных
 DataTranslations - Error	DataTranslations		Трансляция данных - ошибка
 DataTranslations - Note	DataTranslations		Трансляция данных - Заметка
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnразработал Oliver Siebenmarck и дригие\n\tCopyright 2002-2010, Haiku Inc. Все права защищены.\n
-Icon	DataTranslations		Значок
 Info	DataTranslations		Инфо
 Info:	DataTranslations		Инфо:
-Info…	DataTranslations		Информация…
 Name:	DataTranslations		Имя:
-Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Имя:\t%s \nВерсия:\t%ld.%ld.%ld\nИнфо:\t%s\n\nПуть:\n%s\n
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Имя: %s \nВерсия: %ld.%ld.%ld\n\nИнфо:\n%s\n\nПуть:\n%s\n
 OK	DataTranslations		ОК
 Overwrite	DataTranslations		Перезаписать
-Panel Info	DataTranslations		Панель информации
 Path:	DataTranslations		Путь:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Похоже, что файл '%name' не является транслятором и не будет установлен.
 The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
-Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Настройки трансляции\n\nИспользуйте эту панель настроек, чтобы установить \nзначения, которые различные\nтрансляторы используют когда никакие другие настройки не \nуказаны приложением.
 Version:	DataTranslations		Версия:

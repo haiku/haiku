@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ScreenSaver	2049719641
+1	russian	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 секунд
 Add…	ScreenSaver		Добавить…
 Blackness	ScreenSaver		Пустой экран
@@ -8,11 +8,9 @@ Could not load screen saver	ScreenSaver		Не удалось загрузить 
 Display Power Management Signaling not available	ScreenSaver		Недоступна DPMS (система сигналов управления энергопотреблением монитора)
 Don't fade when	ScreenSaver		Не включать заставку, когда
 Done	ScreenSaver		Готово
-Enable screen saver	ScreenSaver		Включить хранитель экрана
-Fade	ScreenSaver		Настройки
+Enable screensaver	ScreenSaver		Включить хранитель экрана
 Fade now when	ScreenSaver		Включать заставку, когда
-Module settings	ScreenSaver		Настройки заставки
-Modules	ScreenSaver		Заставки
+General	ScreenSaver		Общие
 No options available	ScreenSaver		Нет доступных настроек
 OK	ScreenSaver		ОК
 Password Window	ScreenSaver		Окно пароля
@@ -20,9 +18,11 @@ Password lock	ScreenSaver		Требовать пароль через
 Password:	ScreenSaver		Пароль:
 Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
 Password…	ScreenSaver		Пароль…
-Run module	ScreenSaver		Запускать заставку через 
 ScreenSaver	System name		Хранитель экрана
-Test	ScreenSaver		Проверить
+Screensaver settings	ScreenSaver		Настройки заставки
+Screensavers	ScreenSaver		Заставки
+Start screensaver	ScreenSaver		Запускать заставку через
+Test	ScreenSaver		Просмотр
 Turn off screen	ScreenSaver		Выключать экран через 
 Use custom password	ScreenSaver		Использовать выбранный пароль
 Use network password	ScreenSaver		Использовать сетевой пароль

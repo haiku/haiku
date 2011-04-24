@@ -1,7 +1,5 @@
-1	russian	x-vnd.Haiku-Shortcuts	2415218668
+1	russian	x-vnd.Haiku-Shortcuts	3228410154
 (Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
-About Shortcuts	ShortcutsApp		О программе…
-About Shortcuts	ShortcutsWindow		О программе…
 Add new shortcut	ShortcutsWindow		Добавить горячую клавишу
 Append	ShortcutsWindow		Совместить
 Append KeySet…	ShortcutsWindow		Добавить список горячих клавиш…
@@ -10,7 +8,6 @@ Cancel	ShortcutsWindow		Отмена
 Don't save	ShortcutsWindow		Не сохранять
 File	ShortcutsWindow		Файл
 Key	ShortcutsWindow		Клавиша
-OK	ShortcutsApp		ОК
 OK	ShortcutsWindow		ОК
 Oh no	ShortcutsWindow		О нет
 Open	ShortcutsWindow		Открыть
@@ -28,4 +25,3 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалос
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удалось прочитать файл списка горячих клавиш!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить ваш файл список горячих клавиш!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nОсновано на утилите SpicyKeys для BeOS, разработанной Jeremy Friesner.

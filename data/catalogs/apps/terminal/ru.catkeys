@@ -1,8 +1,7 @@
-1	russian	x-vnd.Haiku-Terminal	1010009081
+1	russian	x-vnd.Haiku-Terminal	2225488941
 %app% settings	Terminal PrefWindow	window title	Настройки терминала
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
 Abort	Terminal Shell		Отменить
-About Terminal…	Terminal TermWindow		О программе…
 Appearance	Terminal PrefWindow		Внешний вид
 Background	Terminal AppearancePrefView		Фона
 Black on White	Terminal colors schema		Черный текст на белом фоне
@@ -51,7 +50,6 @@ Nothing is selected.	Terminal TermWindow		Ничего не выделено
 OK	Terminal PrefWindow		ОК
 OK	Terminal SetTitleWindow		ОК
 OK	Terminal TermApp		ОК
-OK	Terminal TermView		ОК
 OK	Terminal TermWindow		ОК
 Page setup…	Terminal TermWindow		Настройка печати…
 Paste	Terminal TermWindow		Вставить
@@ -78,7 +76,6 @@ Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Tab title:	Terminal TermWindow		Заголовок вкладки
 Terminal	System name		Терминал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Текста
 Text encoding	Terminal TermWindow		Кодировка
 Text not found.	Terminal TermWindow		Текст не найден

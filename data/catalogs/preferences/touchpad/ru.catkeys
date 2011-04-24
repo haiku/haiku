@@ -1,20 +1,20 @@
-1	russian	x-vnd.Haiku-Touchpad	2113285797
+1	russian	x-vnd.Haiku-Touchpad	607725922
+Acceleration	TouchpadPrefView		Ускорение
 Cancel	TouchpadPrefView		Отмена
 Defaults	TouchpadPrefView		По умолчанию
 Fast	TouchpadPrefView		Быстро
 High	TouchpadPrefView		Высокая
-Horizontal scroll speed	TouchpadPrefView		Скорость горизонтальной прокрутки
+Horizontal	TouchpadPrefView		Горизонтальная
 Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
 OK	TouchpadPrefView		ОК
 Off	TouchpadPrefView		Выключить
 Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
 Revert	TouchpadPrefView		Вернуть
-Scroll acceleration	TouchpadPrefView		Ускорение прокрутки
 Scrolling	TouchpadPrefView		Прокрутка
+Sensitivity	TouchpadPrefView		Чувствительность
 Slow	TouchpadPrefView		Медленно
-Tap click sensitivity	TouchpadPrefView		Чувствительность к прикосновению
-Tap gesture	TouchpadPrefView		Касание легким ударом с перетаскиванием
+Tapping	TouchpadPrefView		Касание легким нажатием
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить ее?
-Touchpad	System name		Тачпад
+Touchpad	System name		Сенсорная панель
 Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
-Vertical scroll speed	TouchpadPrefView		Скорость вертикальной прокрутки
+Vertical	TouchpadPrefView		Вертикальная

@@ -26,9 +26,9 @@ Large icon	DisplayView		Большие значки
 Last Received	NotificationView		Последнее полученное
 Mini icon	DisplayView		Мелкие значки
 No	NotificationView		Нет
-Notifications	System name		Уведомления
 Notifications	GeneralView		Уведомления
 Notifications	NotificationView		Уведомления
+Notifications	System name		Уведомления
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Невозможно остановить уведомления, потому что сервер уведомлений недоступен.
 OK	DisplayView		ОК
 OK	GeneralView		ОК

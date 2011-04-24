@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	597220249
+1	ukrainian	x-vnd.Haiku-FileTypes	15913470
 %1 application type	Application Type Window		%1 тип додатку
 %ld Application type%s could be removed.	Application Types Window		%ld Додаток type%s Неможливо видалити.
 %s file type	FileType Window		%s тип файлу
 (from application)	FileTypes Window		(з додатку)
 (from super type)	FileTypes Window		(для головного типу)
 Abort	Application Types Window		Відмінити
-About FileTypes…	FileTypes Window		Про Типи Файлів…
 Add	Attribute Window		Додати
 Add	Extension Window		Додати
 Add group	New File Type Window		Додати групу
@@ -146,5 +145,4 @@ Version:	Application Types Window		Версія:
 Visible	Attribute Window		Видимий
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Ширина:
 [Multiple files] file types	FileType Window		[Множинні файли] типи файлів
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tАвтор Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		іконка відсутня

@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1172481650
+1	russian	x-vnd.Haiku-MediaPlayer	138551800
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% обнаружил внутреннюю ошибку. Файл не может быть открыт.
-%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nРазработал Marcus Overhagen, Stephan Aßmus и Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Синемаскоп)
@@ -26,8 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 Cancel	MediaPlayer-SettingsWindow		Отмена
 Close	MediaPlayer-Main		Закрыть
 Close	MediaPlayer-PlaylistWindow		Закрыть
-Close window when done playing movies	MediaPlayer-SettingsWindow		Закрыть окно по завершении проигрывания видео
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Закрыть окно по завершении проигрывания музыки
+Close window after playing audio	MediaPlayer-SettingsWindow		Закрыть окно после проигрывания музыки
+Close window after playing video	MediaPlayer-SettingsWindow		Закрыть окно после проигрывания видео
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Копировать записи
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копировать запись
 Drop files to play	MediaPlayer-Main		Перетащите файлы для проигрывания
@@ -43,14 +42,14 @@ Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Получить/устано�
 Hide interface	MediaPlayer-Main		Спрятать интерфейс
 Import Entries	MediaPlayer-ImportPLItemsCmd		Импорт записей
 Import Entry	MediaPlayer-ImportPLItemsCmd		Импортировать запись
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (не сработала блокировка). Сохранение плей-листа невозможно.
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (плохо сформированное сообщение). Не удалось сохранить плэй-лист.
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (кончилась память). Не удалось сохранить плей-лист.
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (не сработала блокировка). Не удалось сохранить плейлист.
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (плохо сформированное сообщение). Не удалось сохранить плейлист.
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (кончилась память). Не удалось сохранить плейлист.
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Похоже, что медиа сервер не запущен\nВы хотите его запустить?
 Large	MediaPlayer-SettingsWindow		крупный
 Lock Peaks	MediaPlayer-PeakView		Зафиксировать пики
-Loop movies by default	MediaPlayer-SettingsWindow		Зацикливать видео по умолчанию
-Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать музыку по умолчанию
+Loop audio	MediaPlayer-SettingsWindow		Зацикливать аудио
+Loop video	MediaPlayer-SettingsWindow		Зацикливать видео
 Low volume	MediaPlayer-SettingsWindow		На низкой громкости
 MediaPlayer	System name		Медиаплеер
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
@@ -58,6 +57,7 @@ Medium	MediaPlayer-SettingsWindow		cредний
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Ошибка перемещения в корзину
+Move file to Trash	MediaPlayer-PlaylistWindow		Переместить в корзину
 Mute	MediaPlayer-Main		Выключить звук
 Muted	MediaPlayer-SettingsWindow		Без звука
 New player…	MediaPlayer-Main		Новый плеер…
@@ -73,38 +73,37 @@ Off	Subtitles menu		Выключить
 Open	MediaPlayer-Main		Открыть
 Open	MediaPlayer-PlaylistWindow		Открыть
 Open Clips	MediaPlayer-Main		Открыть клипы
-Open Playlist	MediaPlayer-PlaylistWindow		Открыть плэй-лист
+Open Playlist	MediaPlayer-PlaylistWindow		Открыть плейлист
 Open file…	MediaPlayer-Main		Открыть файл…
 Open…	MediaPlayer-PlaylistWindow		Открыть…
 Pause	MediaPlayer-Main		Пауза
 Pause playback.	MediaPlayer-Main		Приостановить проигрывание.
 Play	MediaPlayer-Main		Играть
 Play mode	MediaPlayer-SettingsWindow		Режим проигрывания
-Playlist	MediaPlayer-PlaylistWindow		Плей-лист
-Playlist…	MediaPlayer-Main		Плей-лист…
+Playlist	MediaPlayer-PlaylistWindow		Плейлист
+Playlist…	MediaPlayer-Main		Плейлист…
 Prev	MediaPlayer-Main		Предыдущий
 Quit	MediaPlayer-Main		Выход
 Randomize	MediaPlayer-PlaylistWindow		Перемешать
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Перемешать записи
 Rating	MediaPlayer-Main		Рейтинг
 Redo	MediaPlayer-PlaylistWindow		Повторить
-Remove (Del)	MediaPlayer-PlaylistWindow		Удалить (Del)
+Remove	MediaPlayer-PlaylistWindow		Удалить
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Удалить записи
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Удалить записи в корзину
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Удалить запись
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
-Remove all	MediaPlayer-PlaylistWindow		Удалить все
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Удалить и переместить в корзину
 Revert	MediaPlayer-SettingsWindow		Вернуть
 Save	MediaPlayer-Main		Сохранить
 Save	MediaPlayer-PlaylistWindow		Сохранить
-Save Playlist	MediaPlayer-PlaylistWindow		Сохранить плей-лист
+Save Playlist	MediaPlayer-PlaylistWindow		Сохранить плейлист
 Save as…	MediaPlayer-PlaylistWindow		Сохранить как…
 Save error	MediaPlayer-PlaylistWindow		Ошибка сохранения
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка сохранения плэй-листа.\n\nОшибка: 
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка при сохранени плэй-листа:\n\nОшибка: 
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления при работе во весь экран
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка сохранения плейлиста.\n\nОшибка: 
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка при сохранени плейлиста:\n\nОшибка: 
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления при работе во весь экран
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштабировать видео плавно (режим без оверлея)
+Select all	MediaPlayer-PlaylistWindow		Выделить все
 Settings…	MediaPlayer-Main		Настройки…
 Skip to the next track.	MediaPlayer-Main		Прыгнуть к следующему треку
 Skip to the previous track.	MediaPlayer-Main		Прыгнуть к предыдущему треку.
@@ -118,7 +117,6 @@ Stream settings	MediaPlayer-Main		Настройки потока
 Subtitle placement:	MediaPlayer-SettingsWindow		Расположение субтитров:
 Subtitle size:	MediaPlayer-SettingsWindow		Размер субтитров:
 Subtitles	MediaPlayer-Main		Субтитры
-Thanks	MediaPlayer-Main		Спасибо
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не может быть открыт.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не установлен декодер, необходимый для работы с этим форматом файлов или у декодера возникли проблемы с указанной версией этого формата.
 Toggle mute.	MediaPlayer-Main		Включить/выключить звук.

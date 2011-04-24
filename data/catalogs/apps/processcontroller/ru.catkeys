@@ -7,7 +7,7 @@ Damned!	ProcessController		Проклятье!
 Debug this thread!	ProcessController		Отладить этот поток!
 Debug thread	ProcessController		Отладить поток
 Display priority	ProcessController		Приоритет отображения
-Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить приложение \"%s\"?
+Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить \"%s\"?
 Error saving file	ProcessController		Ошибка при сохранении файла
 Gone teams…	ProcessController		Завершённые приложения
 Idle priority	ProcessController		Приоритет покоя

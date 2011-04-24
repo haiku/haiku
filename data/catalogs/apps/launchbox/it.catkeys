@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-LaunchBox	3267282249
+1	italian	x-vnd.Haiku-LaunchBox	2364133517
 Add button here	LaunchBox		Aggiungi un bottone qui
 Auto-raise	LaunchBox		Auto sollevamento
 Bummer	LaunchBox		Errore
@@ -7,9 +7,9 @@ Clear button	LaunchBox		Cancella bottone
 Clone	LaunchBox		Clona
 Close	LaunchBox		Chiudi
 Description for '%3'	LaunchBox		Descrizione per '%3' 
-Failed to launch '%1'.\n\nError:	LaunchBox		Fallito il lancio '%1'.\n\nError:
+Failed to launch '%1'.\n\nError: 	LaunchBox		Fallito il lancio '%1'.\n\nError:
 Failed to launch 'something',error in Pad data.	LaunchBox		Fallito l'avvio di \"qualcosa\", errore nei dati del Pad.
-Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Fallito il lancio dell'applicazione con la firma '%2'.\n\nErrore:
+Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Fallito il lancio dell'applicazione con la firma '%2'.\n\nErrore:
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Fallito l'invio del comando 'open folder' al Tracker.\n\nErrore:
 Horizontal layout	LaunchBox		Disposizione orizzontale
 Icon size	LaunchBox		Dimensione icone

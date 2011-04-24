@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	2388476802
+1	german	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-Mail-Adresse
 %e wrote:\\n	Mail		%e schrieb:\\n
@@ -6,6 +6,7 @@
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
 (Date unavailable)	Mail		(Datum nicht verfügbar)
 (Name unavailable)	Mail		(Name nicht verfügbar)
+<none>	Mail		<kein>
 Account from mail	Mail		Konto der Nachricht
 Account:	Mail		Konto:
 Accounts…	Mail		Konten…

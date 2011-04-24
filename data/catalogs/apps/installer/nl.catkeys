@@ -36,7 +36,6 @@ Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Ten slo
 Finishing Installation.	InstallProgress		Installatie wordt beëindigd.
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB's schema voor naamgeving is nog steeds: (hdN,n)\n\n
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Veel plezier en erg bedankt om Haiku te proberen! We hopen dat u het leuk vindt!
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Veel plezier en erg bedankt voor het uitproberen van Haiku! We hopen dat u het leuk vindt!
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Hier moet u de regel \"GRUB_HIDDEN_TIMEOUT=0\"deactiveren door er een \"#\" voor te plaatsen, zodat het bootmenu ook echt getoond wordt. 
 Hide optional packages	InstallerWindow		Optionele paketten niet tonen
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		BELANGRIJKE INFORMATIE VOORDAT HAIKU GEÏNSTALLEERD WORDT\n\n

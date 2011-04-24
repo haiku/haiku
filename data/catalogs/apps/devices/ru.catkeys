@@ -28,8 +28,8 @@ Device name	DevicePCI		Название устройства
 Device name:	Device		Название устройства:
 Device paths	Device		Путь к устройству
 Device paths	DevicePCI		Пути устройства
-Devices	System name		Устройства
 Devices	DevicesView		Устройства
+Devices	System name		Устройства
 Display controller	Device		Контроллер дисплея
 Docking station	Device		Кредл
 Driver used	Device		Используемый драйвер

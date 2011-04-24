@@ -1,8 +1,12 @@
-1	russian	x-vnd.Be-MAIL	3225774574
+1	russian	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - E-mail адрес
+%e wrote:\\n	Mail		%e написал:\\n
 %n - Full name	Mail		%n - Полное имя
-About Mail…	Mail		О программе…
+(Address unavailable)	Mail		(Адрес недоступен)
+(Date unavailable)	Mail		(Дата недоступна)
+(Name unavailable)	Mail		(Имя недоступно)
+<none>	Mail		<пусто>
 Account from mail	Mail		Использовать аккаунт из письма
 Account:	Mail		Аккаунт:
 Accounts…	Mail		Аккаунты…
@@ -63,7 +67,6 @@ Leave same	Mail		Оставить
 Mail	System name		Почта
 Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
 Mail preferences	Mail		Настройки почты
-Mail\n\n	Mail		Mail\n
 Mailing	Mail		Отправка
 Message	Mail		Сообщение
 Move to trash	Mail		Переместить в корзину
@@ -129,7 +132,7 @@ Signature:	Mail		Подпись:
 Signatures	Mail		Подписи
 Size:	Mail		Размер:
 Sorry	Mail		Извините
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Person'.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
 Start now	Mail		Запустить сейчас
 Subject:	Mail		Тема:
 Text wrapping:	Mail		Перенос строк:
@@ -145,7 +148,13 @@ Use default account	Mail		Использовать аккаунт по умол�
 User interface	Mail		Интерфейс пользователя
 View	Mail		Вид
 Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработал Robert Polic.\nУлучшено командой Доктора Зойдберга.\n\nCopyright 1991-2001, Be, Inc.\nCopyright 2005-2010, Haiku, Inc.\n 
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /\"Отправить/\" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /\"Отмена/\" и попробуйте исправить их вручную.
 \\n - Newline	Mail		\\n - Новая строка
+draft	B_USER_DIRECTORY/mail/draft		черновики
 helpful message	Mail		полезное сообщение
+in	B_USER_DIRECTORY/mail/in		входящие
+mail	B_USER_DIRECTORY/mail		почта
+out	B_USER_DIRECTORY/mail/out		исходящие
+queries	B_USER_DIRECTORY/mail/queries		запросы
+sent	B_USER_DIRECTORY/mail/sent		отправленные
+spam	B_USER_DIRECTORY/mail/spam		спам

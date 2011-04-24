@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Haiku-KeyboardInputServerDevice	2270014966
+1	finnish	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 (This team is a system component)	Team monitor		(Tämä ryhmä on järjestelmäkomponentti)
 Cancel	Team monitor		Peru
 Force reboot	Team monitor		Pakota uudelleenkäynnistys
+If the application will not quit you may have to kill it.	Team monitor		Jos sovellus ei sulkeudu, se on ehkä lopetettava se kill-komennolla.
 Kill application	Team monitor		Lopeta sovellus
 Quit application	Team monitor		Poistu sovelluksesta
 Restart the desktop	Team monitor		Käynnistä työpöytä uudelleen

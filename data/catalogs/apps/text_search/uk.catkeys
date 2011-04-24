@@ -1,13 +1,11 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	2849441576
+1	ukrainian	x-vnd.Haiku.TextSearch	581029554
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME невдалося відкрити одну або більше директорій.
 %s: There was a problem running grep.	Grepper		%s: проблема запуску grep.
-About TextSearch…	GrepWindow		Про TextSearch…
 Actions	GrepWindow		Дії
 Cancel	GrepWindow		Відмінити
 Case-sensitive	GrepWindow		З урахуванням регістру
 Close	GrepWindow		Закрити
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Автор Matthijs Hollemans.\n\n Брали участь Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers і momoziro.\n
 Encoding	GrepWindow		Кодування
 Escape search text	GrepWindow		Відмінити пошук туксту
 File	GrepWindow		Файл

@@ -1,5 +1,4 @@
-1	russian	x-vnd.Haiku.TV	2815571176
-About %1…	MainWin	Parameter %1 is the name of the application.	О программе…
+1	russian	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		Всегда сверху
 Channel	MainWin		Канал
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Цифровое Видео Вещание
@@ -19,11 +18,8 @@ Quit	MainWin		Выход
 Scale to native size	MainWin		Оригинальный размер
 Settings	MainWin		Настройки
 Settings…	MainWin		Настройки…
-TV	System name		Телевидение
 TV	MainWin		Телевидение
-\nBuild 	MainWin		\nСборка 
-\nRevision 	MainWin		\nРевизия 
-\nVersion 	MainWin		\nВерсия 
+TV	System name		Телевидение
 force 544 x 576, display aspect 4:3	MainWin		Форсировать 544 x 576, соотношение 4:3
 force 704 x 576, display aspect 4:3	MainWin		Форсировать 704 x 576, соотношение 4:3
 force 720 x 576, display aspect 4:3	MainWin		Форсировать 720 x 576, соотношение 4:3

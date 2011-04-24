@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	2994145175
+1	russian	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f Кбайт/с
 %.1f MB	DataSource		%.1f Мбайт
 %.1f faults/s	DataSource		%.1f ошибок/с
@@ -27,7 +27,7 @@ Page faults	DataSource		Ошибки страниц
 Ports	DataSource		Порты
 Quit	ActivityWindow		Выход
 RX	DataSource	Shorter version for Receiving.	Прием
-Raw clipboard size	DataSource		Полный размер буфера обмена
+Raw clipboard	DataSource		Полный буфер обмена
 Receiving	DataSource		Прием
 Remove graph	ActivityView		Удалить график
 Running applications	DataSource		Запущенные приложения
@@ -41,8 +41,8 @@ Swap	DataSource		Файл подкачки
 Swap space	DataSource		Размер файла подкачки
 TX	DataSource	Shorter version for Sending	Передача
 Teams	DataSource		Процессы
-Text clipboard size	DataSource		Размер текстового буфера обмена
+Text clipboard	DataSource		Текстовый буфер обмена
 Threads	DataSource		Потоки
-Update time interval:	SettingsWindow		Временной интервал обновления:
+Update time interval:	SettingsWindow		Интервал обновления:
 Used memory	DataSource		Использовано памяти
 usage	DataSource		(загрузка)

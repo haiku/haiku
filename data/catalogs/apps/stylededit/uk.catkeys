@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	1405665265
+1	ukrainian	x-vnd.Haiku-StyledEdit	27646739
 ???	LoadAlert		???
 Align	Menus		Вирівняти
 Black	Menus		Чорний
@@ -13,7 +13,6 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо п
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Center	Menus		Центр
 Characters:	Statistics		Символи:
-Clear	Menus		Очистити
 Close	Menus		Закрити
 Color	Menus		Колір
 Copy	Menus		Копіювати
