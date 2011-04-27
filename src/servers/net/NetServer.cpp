@@ -443,7 +443,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 		flags = IFF_UP;
 
 	bool autoConfigured;
-	if (message.FindBool("auto", &autoConfigured) == B_OK && autoConfigured)
+	if (message.FindBool("auto_configured", &autoConfigured) == B_OK && autoConfigured)
 		flags |= IFF_AUTO_CONFIGURED;
 
 	int32 mtu;
@@ -532,7 +532,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 			if (addressMessage.FindString("broadcast", &string) == B_OK)
 				parse_address(family, string, broadcast);
 		}
-
+		
 		if (autoConfig) {
 			_QuitLooperForDevice(name);
 			startAutoConfig = true;
