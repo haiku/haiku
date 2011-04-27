@@ -1016,7 +1016,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	// The overhead is not worthy.
 	uint16 bandwidth = transfer->Bandwidth() / isochronousData->packet_count;
 
-	TRACE("isochronous transfer descriptor bandwdith %d\n", bandwidth);
+	TRACE("isochronous transfer descriptor bandwidth %d\n", bandwidth);
 
 	// The following holds the list of transfer descriptor of the
 	// isochronous request. It is used to quickly remove all the isochronous
@@ -1543,9 +1543,11 @@ UHCI::FinishIsochronousTransfers()
 
 					// Remove the transfer
 					if (LockIsochronous()) {
-						if (transfer == fFirstIsochronousTransfer)
+						if (transfer == fFirstIsochronousTransfer) {
 							fFirstIsochronousTransfer = transfer->link;
-						else {
+							if (transfer == fLastIsochronousTransfer)
+								fLastIsochronousTransfer = NULL;
+						} else {
 							isochronous_transfer_data *temp
 								= fFirstIsochronousTransfer;
 							while (transfer != temp->link)
