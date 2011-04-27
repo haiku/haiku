@@ -33,7 +33,7 @@ RowColumnManager::~RowColumnManager()
 		delete fColumns.ItemAt(i)->fPrefSizeConstraint;
 }
 
-								
+					
 void
 RowColumnManager::AddArea(Area* area)
 {
@@ -41,16 +41,16 @@ RowColumnManager::AddArea(Area* area)
 	if (row == NULL) {
 		row = new Row(fLinearSpec, area->Top(), area->Bottom());
 		fRows.AddItem(row);
-		area->fRow = row;
 	}
+	area->fRow = row;
 	row->fAreas.AddItem(area);
 
 	Column* column = _FindColumnFor(area);
 	if (column == NULL) {
 		column = new Column(fLinearSpec, area->Left(), area->Right());
 		fColumns.AddItem(column);
-		area->fColumn = column;
 	}
+	area->fColumn = column;
 	column->fAreas.AddItem(area);
 
 	_UpdateConstraints(row);
@@ -61,24 +61,26 @@ RowColumnManager::AddArea(Area* area)
 void
 RowColumnManager::RemoveArea(Area* area)
 {
-	Row* row = _FindRowFor(area);
+	Row* row = area->fRow;
 	if (row) {
 		row->fAreas.RemoveItem(area);
+		area->fRow = NULL;
 		if (row->fAreas.CountItems() == 0) {
 			fRows.RemoveItem(row);
 			delete row;
-		} else
-			_UpdateConstraints(row);
+		}
+		_UpdateConstraints(row);
 	}
 
-	Column* column = _FindColumnFor(area);
+	Column* column = area->fColumn;
 	if (column) {
 		column->fAreas.RemoveItem(area);
+		area->fColumn = NULL;
 		if (column->fAreas.CountItems() == 0) {
 			fColumns.RemoveItem(column);
 			delete column;
-		} else
-			_UpdateConstraints(column);
+		}
+		_UpdateConstraints(column);
 	}
 }
 

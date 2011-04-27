@@ -173,8 +173,6 @@ Area::SetLeft(XTab* left)
 {
 	fLeft = left;
 
-	fColumn = NULL;
-
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
@@ -194,8 +192,6 @@ Area::SetRight(XTab* right)
 {
 	fRight = right;
 
-	fColumn = NULL;
-
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
@@ -213,8 +209,6 @@ Area::SetTop(YTab* top)
 {
 	fTop = top;
 
-	fRow = NULL;
-
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
@@ -231,8 +225,6 @@ void
 Area::SetBottom(YTab* bottom)
 {
 	fBottom = bottom;
-
-	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 	if (fMaxContentHeight != NULL)
