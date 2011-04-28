@@ -653,10 +653,10 @@ Volume::Mount(const char* device)
 		// We do not seem to have an attribute file so this is probably the
 		// first time this CD is inserted. In this case, try to read CD-Text
 		// data.
-		if (read_cdtext(fDevice, text) != B_OK)
-			dprintf("CDDA: no CD-Text found.\n");
-		else
+		if (read_cdtext(fDevice, text) == B_OK)
 			doLookup = false;
+		else
+			TRACE(("CDDA: no CD-Text found.\n"));
 	} else {
 		doLookup = false;
 	}
@@ -676,6 +676,12 @@ Volume::Mount(const char* device)
 		uint64 frames = next.minute * kFramesPerMinute
 			+ next.second * kFramesPerSecond + next.frame
 			- startFrame;
+
+		// Adjust length of the last audio track according to the Blue Book
+		// specification in case of an Enhanced CD
+		if (i + 1 < trackCount && is_data_track(toc->tracks[i + 1])
+			&& !is_data_track(toc->tracks[i]))
+			frames -= kDataTrackLeadGap;
 
 		totalFrames += frames;
 

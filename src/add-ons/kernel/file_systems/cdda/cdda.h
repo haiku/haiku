@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CDDA_H
@@ -12,6 +12,7 @@
 static const uint32 kFramesPerSecond = 75;
 static const uint32 kFramesPerMinute = kFramesPerSecond * 60;
 static const uint32 kFrameSize = 2352;
+static const uint32 kDataTrackLeadGap = 11400;
 static const uint8 kMaxTracks = 0x63;
 
 struct cdtext {
