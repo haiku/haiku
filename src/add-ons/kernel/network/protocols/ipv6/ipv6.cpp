@@ -173,7 +173,7 @@ size_t
 MulticastStateHash::HashKey(const KeyType &key) const
 {
 	size_t result = 0;
-	result = jenkins_hashword((const uint32*)&key.first, 
+	result = jenkins_hashword((const uint32*)&key.first,
 		sizeof(in6_addr) / sizeof(uint32), result);
 	result = jenkins_hashword(&key.second, 1, result);
 	return result;
@@ -717,7 +717,7 @@ ip6_select_hoplimit(net_protocol* _protocol, net_buffer* buffer)
 	// 2. (If the outgoing interface is detected) the current
 	//     hop limit of the interface specified by router advertisement.
 	// 3. The system default hoplimit.
-	
+
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 	const bool isMulticast = buffer->flags & MSG_MCAST;
 
@@ -790,7 +790,7 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	// write the checksum for ICMPv6 sockets
 	if (protocolNumber == IPPROTO_ICMPV6
 		&& dataLength >= sizeof(struct icmp6_hdr)) {
-		NetBufferField<uint16, 
+		NetBufferField<uint16,
 			sizeof(ip6_hdr) + offsetof(icmp6_hdr, icmp6_cksum)>
 			icmpChecksum(buffer);
 		// first make sure the existing checksum is zero
@@ -954,7 +954,7 @@ ipv6_receive_data(net_buffer* buffer)
 			TRACE("  ipv4_receive_data(): packet was not for us %s -> %s",
 				ip6_sprintf(&header.Src(), srcbuf),
 				ip6_sprintf(&header.Dst(), dstbuf));
-	
+
 			// TODO: Send ICMPv6 error: Host unreachable
 			return B_ERROR;
 		}
@@ -1139,7 +1139,7 @@ init_ipv6()
 	if (status != B_OK)
 		goto err;
 
-	TRACE("init_ipv6: OK\n");
+	TRACE("init_ipv6: OK");
 	return B_OK;
 
 err:
@@ -1147,7 +1147,7 @@ err:
 	mutex_destroy(&sReceivingProtocolLock);
 	mutex_destroy(&sMulticastGroupsLock);
 	mutex_destroy(&sRawSocketsLock);
-	TRACE("init_ipv6: error %s\n", strerror(status));
+	TRACE("init_ipv6: error %s", strerror(status));
 	return status;
 }
 
