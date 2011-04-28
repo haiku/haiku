@@ -102,6 +102,13 @@ struct address_family {
 };
 
 
+// AF_INET6 family
+#if INET6
+static bool inet6_parse_address(const char* string, sockaddr* address);
+static void inet6_set_any_address(sockaddr* address);
+static void inet6_set_port(sockaddr* address, int32 port);
+#endif
+
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
@@ -213,6 +220,44 @@ parse_address(int32& family, const char* argument, BNetworkAddress& address)
 
 	return true;
 }
+
+
+#if INET6
+static bool
+inet6_parse_address(const char* string, sockaddr* _address)
+{
+	sockaddr_in6& address = *(sockaddr_in6*)_address;
+
+	if (inet_pton(AF_INET6, string, &address.sin6_addr) != 1)
+		return false;
+
+	address.sin6_family = AF_INET6;
+	address.sin6_len = sizeof(sockaddr_in6);
+	address.sin6_port = 0;
+	address.sin6_flowinfo = 0;
+	address.sin6_scope_id = 0;
+
+	return true;
+}
+
+
+void
+inet6_set_any_address(sockaddr* _address)
+{
+	sockaddr_in6& address = *(sockaddr_in6*)_address;
+	memset(&address, 0, sizeof(sockaddr_in6));
+	address.sin6_family = AF_INET6;
+	address.sin6_len = sizeof(struct sockaddr_in6);
+}
+
+
+void
+inet6_set_port(sockaddr* _address, int32 port)
+{
+	sockaddr_in6& address = *(sockaddr_in6*)_address;
+	address.sin6_port = port;
+}
+#endif
 
 
 //	#pragma mark -

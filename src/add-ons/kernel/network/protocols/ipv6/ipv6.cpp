@@ -24,6 +24,7 @@
 #include <KernelExport.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
+#include <util/khash.h>
 #include <util/DoublyLinkedList.h>
 #include <util/MultiHashTable.h>
 
@@ -50,6 +51,12 @@
 #endif
 
 
+#define MAX_HASH_FRAGMENTS 		64
+	// slots in the fragment packet's hash
+#define FRAGMENT_TIMEOUT		60000000LL
+	// discard fragment after 60 seconds [RFC 2460]
+
+
 struct IPv6Header {
 	struct ip6_hdr header;
 
@@ -58,8 +65,52 @@ struct IPv6Header {
  	uint16 PayloadLength() const { return ntohs(header.ip6_plen); }
 	const in6_addr& Dst() const { return header.ip6_dst; }
 	const in6_addr& Src() const { return header.ip6_src; }
-	uint16 GetTransportHeaderOffset(net_buffer* buffer) const;
+	uint8 NextHeader() const { return header.ip6_nxt; }
+	uint16 GetHeaderOffset(net_buffer* buffer, uint32 headerCode = ~0u) const;
 };
+
+
+typedef DoublyLinkedList<struct net_buffer,
+	DoublyLinkedListCLink<struct net_buffer> > FragmentList;
+
+// TODO: make common fragmentation interface for both address families
+struct ipv6_packet_key {
+	in6_addr	source;
+	in6_addr	destination;
+	uint32		id;
+	// using u32 for the field allows to feed the whole structure in hash func.
+	uint32		protocol;
+};
+
+class FragmentPacket {
+public:
+								FragmentPacket(const ipv6_packet_key& key);
+								~FragmentPacket();
+
+			status_t			AddFragment(uint16 start, uint16 end,
+									net_buffer* buffer, bool lastFragment);
+			status_t			Reassemble(net_buffer* to);
+
+			bool				IsComplete() const
+									{ return fReceivedLastFragment
+										&& fBytesLeft == 0; }
+
+	static	uint32				Hash(void* _packet, const void* _key,
+									uint32 range);
+	static	int					Compare(void* _packet, const void* _key);
+	static	int32				NextOffset()
+									{ return offsetof(FragmentPacket, fNext); }
+	static	void				StaleTimer(struct net_timer* timer, void* data);
+
+private:
+			FragmentPacket*		fNext;
+			struct ipv6_packet_key fKey;
+			bool				fReceivedLastFragment;
+			int32				fBytesLeft;
+			FragmentList		fFragments;
+			net_timer			fTimer;
+};
+
 
 class RawSocket
 	: public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
@@ -110,12 +161,12 @@ struct ipv6_protocol : net_protocol {
 };
 
 
-static const int kDefaultTTL = 254;
+static const int kDefaultTTL = IPV6_DEFHLIM;
 static const int kDefaultMulticastTTL = 1;
 
 
 extern net_protocol_module_info gIPv6Module;
-	// we need this in ipv6_std_ops() for registering the AF_INET domain
+	// we need this in ipv6_std_ops() for registering the AF_INET6 domain
 
 net_stack_module_info* gStackModule;
 net_buffer_module_info* gBufferModule;
@@ -125,6 +176,9 @@ static net_datalink_module_info* sDatalinkModule;
 static net_socket_module_info* sSocketModule;
 static RawSocketList sRawSockets;
 static mutex sRawSocketsLock;
+static mutex sFragmentLock;
+static hash_table* sFragmentHash;
+static int32 sFragmentID;
 static mutex sMulticastGroupsLock;
 
 typedef MultiHashTable<MulticastStateHash> MulticastState;
@@ -135,18 +189,19 @@ static mutex sReceivingProtocolLock;
 
 
 uint16
-IPv6Header::GetTransportHeaderOffset(net_buffer* buffer) const
+IPv6Header::GetHeaderOffset(net_buffer* buffer, uint32 headerCode) const
 {
 	uint16 offset = sizeof(struct ip6_hdr);
 	uint8 next = header.ip6_nxt;
 
 	// these are the extension headers that might be supported one day
-	while (next == IPPROTO_HOPOPTS
-		|| next == IPPROTO_ROUTING
-		|| next == IPPROTO_FRAGMENT
-		|| next == IPPROTO_ESP
-		|| next == IPPROTO_AH
-		|| next == IPPROTO_DSTOPTS) {
+	while (next != headerCode
+		&& (next == IPPROTO_HOPOPTS
+			|| next == IPPROTO_ROUTING
+			|| next == IPPROTO_FRAGMENT
+			|| next == IPPROTO_ESP
+			|| next == IPPROTO_AH
+			|| next == IPPROTO_DSTOPTS)) {
 		struct ip6_ext extensionHeader;
 		status_t status = gBufferModule->read(buffer, offset,
 			&extensionHeader, sizeof(ip6_ext));
@@ -157,6 +212,17 @@ IPv6Header::GetTransportHeaderOffset(net_buffer* buffer) const
 		offset += extensionHeader.ip6e_len;
 	}
 
+	// were we looking for a specific header?
+	if (headerCode != ~0u) {
+		if (next == headerCode) {
+			// found the specific header
+			return offset;
+		}
+		// return 0 if fragement header is not present
+		return 0;
+	}
+
+	// the general transport layer header case 
 	buffer->protocol = next;
 	return offset;
 }
@@ -167,6 +233,244 @@ RawSocket::RawSocket(net_socket* socket)
 	DatagramSocket<>("ipv6 raw socket", socket)
 {
 }
+
+
+//	#pragma mark -
+
+
+FragmentPacket::FragmentPacket(const ipv6_packet_key &key)
+	:
+	fKey(key),
+	fReceivedLastFragment(false),
+	fBytesLeft(IPV6_MAXPACKET)
+{
+	gStackModule->init_timer(&fTimer, FragmentPacket::StaleTimer, this);
+}
+
+
+FragmentPacket::~FragmentPacket()
+{
+	// cancel the kill timer
+	gStackModule->set_timer(&fTimer, -1);
+
+	// delete all fragments
+	net_buffer* buffer;
+	while ((buffer = fFragments.RemoveHead()) != NULL) {
+		gBufferModule->free(buffer);
+	}
+}
+
+
+status_t
+FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
+	bool lastFragment)
+{
+	// restart the timer
+	gStackModule->set_timer(&fTimer, FRAGMENT_TIMEOUT);
+
+	if (start >= end) {
+		// invalid fragment
+		return B_BAD_DATA;
+	}
+
+	// Search for a position in the list to insert the fragment
+
+	FragmentList::ReverseIterator iterator = fFragments.GetReverseIterator();
+	net_buffer* previous = NULL;
+	net_buffer* next = NULL;
+	while ((previous = iterator.Next()) != NULL) {
+		if (previous->fragment.start <= start) {
+			// The new fragment can be inserted after this one
+			break;
+		}
+
+		next = previous;
+	}
+
+	// See if we already have the fragment's data
+
+	if (previous != NULL && previous->fragment.start <= start
+		&& previous->fragment.end >= end) {
+		// we do, so we can just drop this fragment
+		gBufferModule->free(buffer);
+		return B_OK;
+	}
+
+	TRACE("    previous: %p, next: %p", previous, next);
+
+	// If we have parts of the data already, truncate as needed
+
+	if (previous != NULL && previous->fragment.end > start) {
+		TRACE("    remove header %d bytes", previous->fragment.end - start);
+		gBufferModule->remove_header(buffer, previous->fragment.end - start);
+		start = previous->fragment.end;
+	}
+	if (next != NULL && next->fragment.start < end) {
+		TRACE("    remove trailer %d bytes", next->fragment.start - end);
+		gBufferModule->remove_trailer(buffer, next->fragment.start - end);
+		end = next->fragment.start;
+	}
+
+	// Now try if we can already merge the fragments together
+
+	// We will always keep the last buffer received, so that we can still
+	// report an error (in which case we're not responsible for freeing it)
+
+	if (previous != NULL && previous->fragment.end == start) {
+		fFragments.Remove(previous);
+
+		buffer->fragment.start = previous->fragment.start;
+		buffer->fragment.end = end;
+
+		status_t status = gBufferModule->merge(buffer, previous, false);
+		TRACE("    merge previous: %s", strerror(status));
+		if (status != B_OK) {
+			fFragments.Insert(next, previous);
+			return status;
+		}
+
+		fFragments.Insert(next, buffer);
+
+		// cut down existing hole
+		fBytesLeft -= end - start;
+
+		if (lastFragment && !fReceivedLastFragment) {
+			fReceivedLastFragment = true;
+			fBytesLeft -= IPV6_MAXPACKET - end;
+		}
+
+		TRACE("    hole length: %d", (int)fBytesLeft);
+
+		return B_OK;
+	} else if (next != NULL && next->fragment.start == end) {
+		net_buffer* afterNext = (net_buffer*)next->link.next;
+		fFragments.Remove(next);
+
+		buffer->fragment.start = start;
+		buffer->fragment.end = next->fragment.end;
+
+		status_t status = gBufferModule->merge(buffer, next, true);
+		TRACE("    merge next: %s", strerror(status));
+		if (status != B_OK) {
+			// Insert "next" at its previous position
+			fFragments.Insert(afterNext, next);
+			return status;
+		}
+
+		fFragments.Insert(afterNext, buffer);
+
+		// cut down existing hole
+		fBytesLeft -= end - start;
+
+		if (lastFragment && !fReceivedLastFragment) {
+			fReceivedLastFragment = true;
+			fBytesLeft -= IPV6_MAXPACKET - end;
+		}
+
+		TRACE("    hole length: %d", (int)fBytesLeft);
+
+		return B_OK;
+	}
+
+	// We couldn't merge the fragments, so we need to add it as is
+
+	TRACE("    new fragment: %p, bytes %d-%d", buffer, start, end);
+
+	buffer->fragment.start = start;
+	buffer->fragment.end = end;
+	fFragments.Insert(next, buffer);
+
+	// update length of the hole, if any
+	fBytesLeft -= end - start;
+
+	if (lastFragment && !fReceivedLastFragment) {
+		fReceivedLastFragment = true;
+		fBytesLeft -= IPV6_MAXPACKET - end;
+	}
+
+	TRACE("    hole length: %d", (int)fBytesLeft);
+
+	return B_OK;
+}
+
+
+/*!	Reassembles the fragments to the specified buffer \a to.
+	This buffer must have been added via AddFragment() before.
+*/
+status_t
+FragmentPacket::Reassemble(net_buffer* to)
+{
+	if (!IsComplete())
+		return B_ERROR;
+
+	net_buffer* buffer = NULL;
+
+	net_buffer* fragment;
+	while ((fragment = fFragments.RemoveHead()) != NULL) {
+		if (buffer != NULL) {
+			status_t status;
+			if (to == fragment) {
+				status = gBufferModule->merge(fragment, buffer, false);
+				buffer = fragment;
+			} else
+				status = gBufferModule->merge(buffer, fragment, true);
+			if (status != B_OK)
+				return status;
+		} else
+			buffer = fragment;
+	}
+
+	if (buffer != to)
+		panic("ipv6 packet reassembly did not work correctly.");
+
+	return B_OK;
+}
+
+
+int
+FragmentPacket::Compare(void* _packet, const void* _key)
+{
+	const ipv6_packet_key* key = (ipv6_packet_key*)_key;
+	ipv6_packet_key* packetKey = &((FragmentPacket*)_packet)->fKey;
+
+	return memcmp(packetKey, key, sizeof(ipv6_packet_key));
+}
+
+
+uint32
+FragmentPacket::Hash(void* _packet, const void* _key, uint32 range)
+{
+	const struct ipv6_packet_key* key = (struct ipv6_packet_key*)_key;
+	FragmentPacket* packet = (FragmentPacket*)_packet;
+	if (packet != NULL)
+		key = &packet->fKey;
+
+	return jenkins_hashword((const uint32*)key,
+		sizeof(ipv6_packet_key) / sizeof(uint32), 0);
+}
+
+
+/*static*/ void
+FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
+{
+	FragmentPacket* packet = (FragmentPacket*)data;
+	TRACE("Assembling FragmentPacket %p timed out!", packet);
+
+	MutexLocker locker(&sFragmentLock);
+	hash_remove(sFragmentHash, packet);
+	locker.Unlock();
+
+	if (!packet->fFragments.IsEmpty()) {
+		// Send error: fragment reassembly time exceeded
+		sDomain->module->error_reply(NULL, packet->fFragments.First(),
+			B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED, NULL);
+	}
+
+	delete packet;
+}
+
+
+//	#pragma mark -
 
 
 size_t
@@ -191,12 +495,197 @@ dump_ipv6_header(IPv6Header &header)
 	dprintf("  version: %d\n", header.ProtocolVersion() >> 4);
 	dprintf("  service_type: %d\n", header.ServiceType());
 	dprintf("  payload_length: %d\n", header.PayloadLength());
-	dprintf("  next_header: %d\n", header.header.ip6_nxt);
+	dprintf("  next_header: %d\n", header.NextHeader());
 	dprintf("  hop_limit: %d\n", header.header.ip6_hops);
 	dprintf("  source: %s\n", ip6_sprintf(&header.header.ip6_src, addrbuf));
 	dprintf("  destination: %s\n",
 		ip6_sprintf(&header.header.ip6_dst, addrbuf));
 #endif
+}
+
+
+/*!	Attempts to re-assemble fragmented packets.
+	\return B_OK if everything went well; if it could reassemble the packet, \a _buffer
+		will point to its buffer, otherwise, it will be \c NULL.
+	\return various error codes if something went wrong (mostly B_NO_MEMORY)
+*/
+static status_t
+reassemble_fragments(const IPv6Header &header, net_buffer** _buffer, uint16 offset)
+{
+	net_buffer* buffer = *_buffer;
+	status_t status;
+
+	ip6_frag fragmentHeader;
+	status = gBufferModule->read(buffer, offset, &fragmentHeader, sizeof(ip6_frag));
+	if (status != B_OK)
+		return status;
+
+	struct ipv6_packet_key key;
+	memcpy(&key.source, &header.Src(), sizeof(in6_addr));
+	memcpy(&key.destination, &header.Dst(), sizeof(in6_addr));
+	key.id = fragmentHeader.ip6f_ident;
+	key.protocol = fragmentHeader.ip6f_nxt;
+
+	// TODO: Make locking finer grained.
+	MutexLocker locker(&sFragmentLock);
+
+	FragmentPacket* packet = (FragmentPacket*)hash_lookup(sFragmentHash, &key);
+	if (packet == NULL) {
+		// New fragment packet
+		packet = new (std::nothrow) FragmentPacket(key);
+		if (packet == NULL)
+			return B_NO_MEMORY;
+
+		// add packet to hash
+		status = hash_insert(sFragmentHash, packet);
+		if (status != B_OK) {
+			delete packet;
+			return status;
+		}
+	}
+
+	uint16 start = ntohs(fragmentHeader.ip6f_offlg & IP6F_OFF_MASK);
+	uint16 end = start + header.PayloadLength();
+	bool lastFragment = (fragmentHeader.ip6f_offlg & IP6F_MORE_FRAG) == 0;
+
+	TRACE("   Received IPv6 %sfragment of size %d, offset %d.",
+		lastFragment ? "last ": "", end - start, start);
+
+	// Remove header unless this is the first fragment
+	if (start != 0)
+		gBufferModule->remove_header(buffer, offset);
+
+	status = packet->AddFragment(start, end, buffer, lastFragment);
+	if (status != B_OK)
+		return status;
+
+	if (packet->IsComplete()) {
+		hash_remove(sFragmentHash, packet);
+			// no matter if reassembling succeeds, we won't need this packet
+			// anymore
+
+		status = packet->Reassemble(buffer);
+		delete packet;
+
+		// _buffer does not change
+		return status;
+	}
+
+	// This indicates that the packet is not yet complete
+	*_buffer = NULL;
+	return B_OK;
+}
+
+
+/*!	Fragments the incoming buffer and send all fragments via the specified
+	\a route.
+*/
+static status_t
+send_fragments(ipv6_protocol* protocol, struct net_route* route,
+	net_buffer* buffer, uint32 mtu)
+{
+	TRACE_SK(protocol, "SendFragments(%lu bytes, mtu %lu)", buffer->size, mtu);
+
+	NetBufferHeaderReader<IPv6Header> originalHeader(buffer);
+	if (originalHeader.Status() != B_OK)
+		return originalHeader.Status();
+
+	// TODO: currently FragHeader goes always as the last one, but in theory
+	// ext. headers like AuthHeader and DestOptions should go after it.
+	uint16 headersLength = originalHeader->GetHeaderOffset(buffer);
+	uint16 extensionHeadersLength = headersLength
+		- sizeof(ip6_hdr) + sizeof(ip6_frag);
+	uint32 bytesLeft = buffer->size - headersLength;
+	uint32 fragmentOffset = 0;
+	status_t status = B_OK;
+
+	// TODO: this is rather inefficient
+	net_buffer* headerBuffer = gBufferModule->clone(buffer, false);
+	if (headerBuffer == NULL)
+		return B_NO_MEMORY;
+
+	status = gBufferModule->remove_trailer(headerBuffer, bytesLeft);
+	if (status != B_OK)
+		return status;
+
+	uint8 data[bytesLeft];
+	status = gBufferModule->read(buffer, headersLength, data, bytesLeft);
+	if (status != B_OK)
+		return status;
+
+	// TODO (from ipv4): we need to make sure all header space is contiguous or
+	// use another construct.
+	NetBufferHeaderReader<IPv6Header> bufferHeader(headerBuffer);
+
+	// Adapt MTU to be a multiple of 8 (fragment offsets can only be specified
+	// this way)
+	mtu -= headersLength + sizeof(ip6_frag);
+	mtu &= ~7;
+	TRACE("  adjusted MTU to %ld, bytesLeft %ld", mtu, bytesLeft);
+
+	while (bytesLeft > 0) {
+		uint32 fragmentLength = min_c(bytesLeft, mtu);
+		bytesLeft -= fragmentLength;
+		bool lastFragment = bytesLeft == 0;
+
+		bufferHeader->header.ip6_nxt = IPPROTO_FRAGMENT;
+		bufferHeader->header.ip6_plen = 
+			htons(fragmentLength + extensionHeadersLength);
+		bufferHeader.Sync();
+
+		ip6_frag fragmentHeader;
+		fragmentHeader.ip6f_nxt = originalHeader->NextHeader();
+		fragmentHeader.ip6f_reserved = 0;
+		fragmentHeader.ip6f_offlg = htons(fragmentOffset) & IP6F_OFF_MASK;
+		if (!lastFragment)
+			fragmentHeader.ip6f_offlg |= IP6F_MORE_FRAG;
+		fragmentHeader.ip6f_ident = htonl(atomic_add(&sFragmentID, 1));
+
+		TRACE("  send fragment of %ld bytes (%ld bytes left)", fragmentLength,
+			bytesLeft);
+
+		net_buffer* fragmentBuffer;
+		if (!lastFragment)
+			fragmentBuffer = gBufferModule->clone(headerBuffer, false);
+		else
+			fragmentBuffer = buffer;
+
+		if (fragmentBuffer == NULL) {
+			status = B_NO_MEMORY;
+			break;
+		}
+
+		// copy data to fragment
+		do {
+			status = gBufferModule->append(
+				fragmentBuffer, &fragmentHeader, sizeof(ip6_frag));
+			if (status != B_OK)
+				break;
+
+			status = gBufferModule->append(
+				fragmentBuffer, &data[fragmentOffset], fragmentLength);
+			if (status != B_OK)
+				break;
+
+			// send fragment
+			status = sDatalinkModule->send_routed_data(route, fragmentBuffer);
+		} while (false);
+
+		if (lastFragment) {
+			// we don't own the last buffer, so we don't have to free it
+			break;
+		}
+
+		if (status != B_OK) {
+			gBufferModule->free(fragmentBuffer);
+			break;
+		}
+
+		fragmentOffset += fragmentLength;
+	}
+
+	gBufferModule->free(headerBuffer);
+	return status;
 }
 
 
@@ -811,8 +1300,8 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
-		// TODO: we need to fragment the packet
-		return EMSGSIZE;
+		// we need to fragment the packet
+		return send_fragments(protocol, route, buffer, mtu);
 	}
 
 	return sDatalinkModule->send_routed_data(route, buffer);
@@ -951,7 +1440,7 @@ ipv6_receive_data(net_buffer* buffer)
 				buffer->destination, &buffer->interface_address)) {
 			char srcbuf[INET6_ADDRSTRLEN];
 			char dstbuf[INET6_ADDRSTRLEN];
-			TRACE("  ipv4_receive_data(): packet was not for us %s -> %s",
+			TRACE("  ipv6_receive_data(): packet was not for us %s -> %s",
 				ip6_sprintf(&header.Src(), srcbuf),
 				ip6_sprintf(&header.Dst(), dstbuf));
 
@@ -968,7 +1457,7 @@ ipv6_receive_data(net_buffer* buffer)
 	memcpy(buffer->destination, &destination, sizeof(sockaddr_in6));
 
 	// get the transport protocol and transport header offset
-	uint16 transportHeaderOffset = header.GetTransportHeaderOffset(buffer);
+	uint16 transportHeaderOffset = header.GetHeaderOffset(buffer);
 	uint8 protocol = buffer->protocol;
 
 	// remove any trailing/padding data
@@ -976,9 +1465,22 @@ ipv6_receive_data(net_buffer* buffer)
 	if (status != B_OK)
 		return status;
 
-	//
-	// TODO: check for fragmentation
-	//
+	// check for fragmentation
+	uint16 fragmentHeaderOffset = header.GetHeaderOffset(buffer, IPPROTO_FRAGMENT);
+	if (fragmentHeaderOffset != 0) {
+		// this is a fragment
+		TRACE("  ipv6_receive_data(): Found a Fragment!");
+		status = reassemble_fragments(header, &buffer, fragmentHeaderOffset);
+		TRACE("  ipv6_receive_data():  -> %s", strerror(status));
+		if (status != B_OK)
+			return status;
+
+		if (buffer == NULL) {
+			// buffer was put into fragment packet
+			TRACE("  ipv6_receive_data(): Not yet assembled.");
+			return B_OK;
+		}
+	}
 
 	// tell the buffer to preserve removed ipv6 header - may need it later
 	gBufferModule->store_header(buffer);
@@ -1047,8 +1549,8 @@ ipv6_process_ancillary_data_no_container(net_protocol* _protocol,
 		if (msgControlLen < CMSG_SPACE(sizeof(int)))
 			return B_NO_MEMORY;
 
-		// '255' is the default value to use when extracting the real one fails
-		int hopLimit = 255;
+		// use some default value (64 at the moment) when extracting the real one fails
+		int hopLimit = IPV6_DEFHLIM;
 
 		if (gBufferModule->stored_header_length(buffer)
 				>= (int)sizeof(ip6_hdr)) {
