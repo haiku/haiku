@@ -544,9 +544,9 @@ is_data_track(const scsi_toc_track& track)
 uint32
 count_audio_tracks(scsi_toc_toc* toc)
 {
-	uint32 lastTrack = toc->last_track + 1 - toc->first_track;
+	uint32 trackCount = toc->last_track + 1 - toc->first_track;
 	uint32 count = 0;
-	for (uint32 i = 0; i < lastTrack; i++) {
+	for (uint32 i = 0; i < trackCount; i++) {
 		if (!is_data_track(toc->tracks[i]))
 			count++;
 	}
@@ -1330,8 +1330,10 @@ Inode::RemoveAttribute(const char* name, bool checkNamespace)
 			AttrCookieList::Iterator i = fAttrCookies.GetIterator();
 			while (i.HasNext()) {
 				attr_cookie* cookie = i.Next();
-				if (cookie->current == attribute)
-					cookie->current = attribute->GetDoublyLinkedListLink()->next;
+				if (cookie->current == attribute) {
+					cookie->current
+						= attribute->GetDoublyLinkedListLink()->next;
+				}
 			}
 
 			iterator.Remove();
@@ -1378,11 +1380,41 @@ cdda_identify_partition(int fd, partition_data* partition, void** _cookie)
 
 	status_t status = read_table_of_contents(fd, toc, 2048);
 
-	// there has to be at least a single audio track
-	if (status == B_OK && count_audio_tracks(toc) == 0)
-		status = B_BAD_TYPE;
+	// If we succeeded in reading the toc, check the tracks in the
+	// partition, which may not be the whole CD, and if any are audio,
+	// claim the partition.
+	if (status == B_OK) {
+		uint32 trackCount = toc->last_track + (uint32)1 - toc->first_track;
+		uint64 sessionStartLBA = partition->offset / partition->block_size;
+		uint64 sessionEndLBA	= sessionStartLBA
+			+ (partition->size / partition->block_size);
+		TRACE(("cdda_identify_partition: session at %lld-%lld\n",
+			sessionStartLBA, sessionEndLBA));
+		status = B_ENTRY_NOT_FOUND;
+		for (uint32 i = 0; i < trackCount; i++) {
+			// We have to get trackLBA from track.start.time since
+			// track.start.lba is useless for this.
+			// This is how session gets it.
+			uint64 trackLBA
+				= ((toc->tracks[i].start.time.minute * kFramesPerMinute)
+					+ (toc->tracks[i].start.time.second * kFramesPerSecond)
+					+ toc->tracks[i].start.time.frame - 150);
+			if (trackLBA >= sessionStartLBA && trackLBA < sessionEndLBA) {
+				if (is_data_track(toc->tracks[i])) {
+					TRACE(("cdda_identify_partition: track %ld at %lld is "
+						"data\n", i + 1, trackLBA));
+					status = B_BAD_TYPE;
+				} else {
+					TRACE(("cdda_identify_partition: track %ld at %lld is "
+						"audio\n", i + 1, trackLBA));
+					status = B_OK;
+					break;
+				}
+			}
+		}
+	}
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		free(toc);
 		return status;
 	}
@@ -1740,7 +1772,8 @@ cdda_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	TRACE(("cdda_read_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
+	TRACE(("cdda_read_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(),
+		stat));
 
 	fill_stat_buffer(volume, inode, NULL, *stat);
 
@@ -1819,7 +1852,8 @@ cdda_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	TRACE(("cdda_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _node, _cookie, dirent, bufferSize,_num));
+	TRACE(("cdda_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld,"
+		" num = %p\n", _node, _cookie, buffer, bufferSize,_num));
 
 	if ((Inode*)_node->private_node != &volume->RootNode())
 		return B_BAD_VALUE;
@@ -1915,7 +1949,7 @@ cdda_free_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	dir_cookie* cookie = (dir_cookie*)_cookie;
 
-	TRACE(("cdda_freecookie: entry vnode %p, cookie %p\n", _vnode, cookie));
+	TRACE(("cdda_freecookie: entry vnode %p, cookie %p\n", _node, cookie));
 
 	free(cookie);
 	return 0;

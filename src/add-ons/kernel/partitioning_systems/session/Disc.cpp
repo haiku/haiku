@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -86,9 +86,9 @@ public:
 
 	off_t	start_lba;
 	uint8	control;
-		//!< only used to give what are probably useless warnings
+		// Used to check for Yellow/Red Book mixed-mode CDs.
 	uint8	adr;
-		//!< only used to give what are probably useless warnings
+		// only used to give what are probably useless warnings
 };
 
 
@@ -548,12 +548,13 @@ Disc::Disc(int fd)
 		int count;
 
 		header = (cdrom_table_of_contents_header*)data;
-		entries = (cdrom_full_table_of_contents_entry*)(data+4);
+		entries = (cdrom_full_table_of_contents_entry*)(data + 4);
 		header->length = B_BENDIAN_TO_HOST_INT16(header->length);
 
 		count = (header->length - 2)
 			/ sizeof(cdrom_full_table_of_contents_entry);
 
+		count = _AdjustForYellowBook(entries, count);
 		error = _ParseTableOfContents(entries, count);
 //		Dump();
 		if (!error) {
@@ -696,6 +697,92 @@ Disc::Dump()
 }
 
 
+/*! \brief Checks for Yellow Book data tracks in audio sessions and if found
+	inserts them as a new data session.
+*/
+uint32
+Disc::_AdjustForYellowBook(cdrom_full_table_of_contents_entry entries[],
+	uint32 count)
+{
+	uint8 foundCount = 0;
+	uint8 endLBAEntry = 0;
+	uint8 trackTwo = 0;
+
+	// Make sure TOC has only one session and that it is audio.
+	bool sessionIsAudio = true;
+	for (uint32 i = 0; i < count; i++) {
+		if (entries[i].point == 0xa2) {
+			if ((entries[i].control & kControlDataTrack) != 0) {
+				sessionIsAudio = false;
+				break;
+			}
+			foundCount++;
+			endLBAEntry = i;
+		}
+	}
+	if (!sessionIsAudio || foundCount != 1)
+		return count;
+
+	TRACE(("%s: Single audio session, checking for data track\n",
+		kModuleDebugName));
+
+	// See if there are any data tracks.
+	for (uint32 i = 0; i < count; i++) {
+		if (entries[i].point > 0 && entries[i].point < 100
+			&& (entries[i].control & kControlDataTrack) != 0) {
+			if (entries[i].point == 1) {
+				// Create a new endLBA point for session one.
+				entries[count] = entries[endLBAEntry];
+				entries[count].control = entries[i].control;
+
+				// Get track two and use it's start as
+				// the end of our new session.
+				for (uint8 j = 0; j < count; j++) {
+					if (entries[j].point == 2) {
+						trackTwo = j;
+						break;
+					}
+				}
+				entries[count].pminutes = entries[trackTwo].pminutes;
+				entries[count].pseconds = entries[trackTwo].pseconds;
+				entries[count].pframes = entries[trackTwo].pframes;
+
+				// Change the other points to session two.
+				for (uint32 j = 0; j < count; j++) {
+					entries[j].session = 2;
+				}
+				entries[i].session = 1;
+
+				count++;
+				TRACE(("%s: first track is data, adjusted TOC\n",
+					kModuleDebugName));
+				break;
+			} else {
+				// Change the track to session two.
+				entries[i].session = 2;
+
+				// Create a new endLBA point for session two.
+				entries[count] = entries[endLBAEntry];
+				entries[count].session = 2;
+				entries[count].control = entries[i].control;
+
+				// Use the beginning of the data track as the
+				// end of the previous session.
+				entries[endLBAEntry].pminutes = entries[i].pminutes;
+				entries[endLBAEntry].pseconds = entries[i].pseconds;
+				entries[endLBAEntry].pframes = entries[i].pframes;
+
+				count++;
+				TRACE(("%s: last track is data, adjusted TOC\n",
+					kModuleDebugName));
+				break;
+			}
+		}
+	}
+	return count;
+}
+
+
 /*! \brief Reads through the given table of contents data and creates an
 	unsorted, unverified (i.e. non-error-checked) list of sessions and tracks.
 */
@@ -813,7 +900,7 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[],
 					session->track_list.Add(track);
 				} else {
 					WARN(("%s: warning: illegal point 0x%2x found in table of "
-						"contents\n", kModuleDebugName, entries[i].point));
+						"contents\n", kModuleDebugName, point));
 				}
 				break;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -32,27 +32,33 @@ class Session;
 */
 class Disc {
 public:
-							Disc(int fd);
-							~Disc();
+								Disc(int fd);
+								~Disc();
 
-			status_t		InitCheck();
-			Session*		GetSession(int32 index);
+			status_t			InitCheck();
+			Session*			GetSession(int32 index);
 
-			void			Dump();
+			void				Dump();
 
 	// CDs and DVDs are required to have a block size of 2K by
 	// the SCSI-3 standard
-	static	const int		kBlockSize = 2048;
+	static	const int			kBlockSize = 2048;
 
 private:
-			status_t		_ParseTableOfContents(
-								cdrom_full_table_of_contents_entry entries[],
-								uint32 count);
-			void			_SortAndRemoveDuplicates();
-			status_t		_CheckForErrorsAndWarnings();
+			uint32				_AdjustForYellowBook(
+									cdrom_full_table_of_contents_entry
+										entries[],
+									uint32 count);
+			status_t			_ParseTableOfContents(
+									cdrom_full_table_of_contents_entry
+										entries[],
+									uint32 count);
+			void				_SortAndRemoveDuplicates();
+			status_t			_CheckForErrorsAndWarnings();
 
-			status_t		fInitStatus;
-			List*			fSessionList;
+private:
+			status_t			fInitStatus;
+			List*				fSessionList;
 };
 
 
@@ -61,32 +67,35 @@ private:
 */
 class Session {
 public:
-							~Session();
+								~Session();
 
-			off_t			Offset() { return fOffset; }
-			off_t			Size() { return fSize; }
-			uint32			BlockSize() { return fBlockSize; }
-			int32			Index() { return fIndex; }
-			uint32			Flags() { return fFlags; }
-			const char*		Type() { return fType; }
+			off_t				Offset() { return fOffset; }
+			off_t				Size() { return fSize; }
+			uint32				BlockSize() { return fBlockSize; }
+			int32				Index() { return fIndex; }
+			uint32				Flags() { return fFlags; }
+			const char*			Type() { return fType; }
 
 private:
 	friend class Disc;
 
-							Session(off_t offset, off_t size, uint32 blockSize,
-								int32 index, uint32 flags, const char* type);
+								Session(off_t offset, off_t size,
+									uint32 blockSize, int32 index, uint32 flags,
+									const char* type);
 
-							Session(const Session& ref);
-								// not implemented
-			Session&		operator=(const Session& ref);
-								// not implemented
+								Session(const Session& other);
+									// not implemented
+			Session&			operator=(const Session& other);
+									// not implemented
 
-			off_t			fOffset;
-			off_t			fSize;
-			uint32			fBlockSize;
-			int32			fIndex;
-			uint32			fFlags;
-			char*			fType;
+private:
+			off_t				fOffset;
+			off_t				fSize;
+			uint32				fBlockSize;
+			int32				fIndex;
+			uint32				fFlags;
+			char*				fType;
 };
+
 
 #endif	// _DISC_H

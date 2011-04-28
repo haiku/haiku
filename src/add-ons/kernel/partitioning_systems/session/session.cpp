@@ -52,12 +52,17 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 		&& geometry.device_type == B_CD) {
 		Disc *disc = new(std::nothrow) Disc(fd);
 		if (disc != NULL && disc->InitCheck() == B_OK) {
+			// If we have only a single session then we can let the file system
+			// drivers play directly with the device.
+			if (disc->GetSession(1) != NULL)
+				result = 0.9f;
+			else
+				result = 0.1f;
 			*cookie = static_cast<void*>(disc);
-			result = 0.7;
 		} else
 			delete disc;
 	}
-	PRINT(("returning %ld\n", int32(result * 10000)));
+	PRINT(("returning %g\n", result));
 	return result;
 }
 
