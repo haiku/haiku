@@ -45,9 +45,14 @@
 
 #define VENDOR_ID_ATI			0x1002
 
+// TODO : Remove masks as they don't apply to radeon
 #define RADEON_TYPE_FAMILY_MASK	0xf000
 #define RADEON_TYPE_GROUP_MASK	0xfff0
 #define RADEON_TYPE_MODEL_MASK	0xffff
+
+#define RADEON_R600	0x0600
+#define RADEON_R700	0x0700
+#define RADEON_R800	0x0800
 
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"

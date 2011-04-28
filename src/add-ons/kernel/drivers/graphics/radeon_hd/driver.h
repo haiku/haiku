@@ -16,6 +16,7 @@
 #include <kernel/lock.h>
 
 
+#include "radeon_hd.h"
 #include "radeon_hd_private.h"
 
 
