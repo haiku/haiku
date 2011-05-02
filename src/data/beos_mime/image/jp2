@@ -8,5 +8,6 @@ resource(2, "META:S:DESC") #'MSDC' "JPEG2000 image";
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "jp2",
 	"extensions" = "jpg2",
+	"extensions" = "j2k",
 	"type" = "image/jp2"
 };
