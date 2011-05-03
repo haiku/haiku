@@ -33,7 +33,6 @@ irq_descriptor::irq_descriptor()
 	polarity(B_HIGH_ACTIVE_POLARITY),
 	interrupt_mode(B_EDGE_TRIGGERED)
 {
-
 }
 
 
@@ -44,14 +43,14 @@ print_irq_descriptor(irq_descriptor* descriptor)
 		if (descriptor->irq >> i & 0x01)
 			dprintf("interrupt: %i\n", i);
 	}
-	
+
 	const char* activeHighString = "active high";
 	const char* activeLowString = " active low";
 	const char* levelTriggeredString = "level triggered";
 	const char* edgeTriggeredString = " edge triggered";
 
 	dprintf("irq: %i, shareable: %i, polarity: %s, interrupt_mode: %s\n",
-		descriptor->irq, descriptor->shareable, 
+		descriptor->irq, descriptor->shareable,
 		descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? activeHighString
 			: activeLowString,
 		descriptor->interrupt_mode == B_LEVEL_TRIGGERED	? levelTriggeredString
@@ -78,7 +77,7 @@ read_device_irq_routing_table(acpi_module_info* acpi, acpi_handle device,
 	IRQRoutingTable* table)
 {
 	acpi_data buffer;
-	buffer.pointer = 0;
+	buffer.pointer = NULL;
 	buffer.length = ACPI_ALLOCATE_BUFFER;
 	status_t status = acpi->get_irq_routing_table(device, &buffer);
 	if (status != B_OK)
@@ -93,8 +92,9 @@ read_device_irq_routing_table(acpi_module_info* acpi, acpi_handle device,
 			irqEntry.pin = acpiTable->pin;
 			irqEntry.source = source;
 			irqEntry.source_index = acpiTable->sourceIndex;
-			table->PushBack(irqEntry);			
+			table->PushBack(irqEntry);
 		}
+
 		acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
 			+ acpiTable->length);
 	}
@@ -127,8 +127,8 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 	char name[255];
 	name[0] = 0;
 	void *counter = NULL;
-	while (acpi->get_next_entry(ACPI_TYPE_DEVICE, rootPciName, name, 255,
-		&counter) == B_OK) {
+	while (acpi->get_next_entry(ACPI_TYPE_DEVICE, rootPciName, name,
+		sizeof(name), &counter) == B_OK) {
 		acpi_handle brigde;
 		status = acpi->get_handle(NULL, name, &brigde);
 		if (status != B_OK)
@@ -136,7 +136,7 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 
 		status = read_device_irq_routing_table(acpi, brigde, table);
 		if (status == B_OK)
-			TRACE("routing table found %s\n", name);			
+			TRACE("routing table found %s\n", name);
 	}
 
 	return table->Count() > 0 ? B_OK : B_ERROR;
@@ -170,7 +170,7 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 
 			free(buffer.pointer);
 			return B_OK;
-		} 
+		}
 		resource = (acpi_resource*)((uint8*)resource + resource->length);
 	}
 	free(buffer.pointer);

@@ -14,14 +14,14 @@
 
 struct irq_routing_entry {
 	int			device_address;
-	int8			pin;
+	int8		pin;
 
-	acpi_handle		source;
+	acpi_handle	source;
 	int			source_index;
 
 	// pci busmanager connection
-	uchar			pci_bus;
-	uchar			pci_device;
+	uchar		pci_bus;
+	uchar		pci_device;
 };
 
 
@@ -55,7 +55,7 @@ typedef struct acpi_prt {
 struct acpi_resource {
     uint32          type;
     uint32			length;
-    
+
     uint8			descriptorLength;
     uint8			triggering;
     uint8			polarity;
