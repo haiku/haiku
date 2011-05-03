@@ -1730,6 +1730,6 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			yasm-1.1.0-x86-gcc2-2011-03-14.zip
-			: $(baseURL)/yasm-1.1.0-x86-gcc2-2011-03-14.zip ;
+			: $(baseURL)/yasm-1.1.0-x86-gcc2-2011-04-29.zip ;
 	}
 }
