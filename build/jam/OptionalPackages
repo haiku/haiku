@@ -366,11 +366,11 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage cdrtools-3.01a01-x86-gcc4-2011-03-16.zip
-			: $(baseURL)/cdrtools-3.01a01-x86-gcc4-2011-03-16.zip ;
+		InstallOptionalHaikuImagePackage cdrtools-3.01a01-x86-gcc4-2011-05-03.zip
+			: $(baseURL)/cdrtools-3.01a01-x86-gcc4-2011-05-03.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage cdrtools-3.01a01-x86-gcc2-2011-03-16.zip
-			: $(baseURL)/cdrtools-3.01a01-x86-gcc2-2011-03-16.zip ;
+		InstallOptionalHaikuImagePackage cdrtools-3.01a01-x86-gcc2-2011-04-30.zip
+			: $(baseURL)/cdrtools-3.01a01-x86-gcc2-2011-04-30.zip ;
 	}
 }
 
