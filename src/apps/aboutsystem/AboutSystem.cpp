@@ -603,7 +603,8 @@ AboutView::AboutView()
 	if (clockSpeed < 1000)
 		snprintf(string, sizeof(string), B_TRANSLATE("%ld MHz"), clockSpeed);
 	else
-		snprintf(string, sizeof(string), B_TRANSLATE("%.2f GHz"), clockSpeed / 1000.0f);
+		snprintf(string, sizeof(string), B_TRANSLATE("%.2f GHz"),
+			clockSpeed / 1000.0f);
 
 	BStringView* frequencyView = new BStringView("frequencytext", string);
 	frequencyView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
@@ -1285,7 +1286,7 @@ AboutView::_CreateCreditsView()
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
-		B_TRANSLATE("Contains software developed by the NetBSD, "
+		B_TRANSLATE("Contains software developed by the NetBSD "
 		"Foundation, Inc. and its contributors:\n"
 		"ftp, tput\n"
 		COPYRIGHT_STRING "1996-2008 The NetBSD Foundation, Inc. "
@@ -1333,8 +1334,9 @@ AboutView::_CreateCreditsView()
 
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 Silicon Graphics, "
-			"Inc. SGI's Software FreeB license. All rights reserved."))
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 "
+			"Silicon Graphics, Inc. SGI's Software FreeB license. "
+			"All rights reserved."))
 		.SetLicense("SGI Free B")
 		.SetURL("http://www.sgi.com/products/software/opengl"));
 
