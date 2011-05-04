@@ -60,7 +60,7 @@ ReadBatteryStatus(battery_driver_cookie* cookie, acpi_battery_info* batteryStatu
 
 	pointer = object->data.package.objects;
 	batteryStatus->state = (pointer->object_type == ACPI_TYPE_INTEGER)
-		? pointer->data.integer : BATTERY_CRITICAL_STATE; 
+		? pointer->data.integer : BATTERY_CRITICAL_STATE;
 
 	pointer++;
 	batteryStatus->current_rate = (pointer->object_type == ACPI_TYPE_INTEGER)
@@ -75,18 +75,20 @@ ReadBatteryStatus(battery_driver_cookie* cookie, acpi_battery_info* batteryStatu
 		? pointer->data.integer : -1;
 
 	/* If key values are all < 0, it is likely that the battery slot is empty
-	   or the battery is damaged.  Set BATTERY_CRITICAL_STATE */
+	 * or the battery is damaged.  Set BATTERY_CRITICAL_STATE
+	 */
 	if (batteryStatus->voltage < 0
 		&& batteryStatus->current_rate < 0
 		&& batteryStatus->capacity < 0) {
 		batteryStatus->state = BATTERY_CRITICAL_STATE;
 	}
-	
+
 
 exit:
 	free(buffer.pointer);
 	return status;
 }
+
 
 status_t
 ReadBatteryInfo(battery_driver_cookie* cookie,
