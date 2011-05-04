@@ -3,7 +3,7 @@
 /*
  * haiku.php - an online Haiku demo using qemu and vnc.
  *
- * Copyright 2007-2010, Francois Revol, revol@free.fr.
+ * Copyright 2007-2011, Francois Revol, revol@free.fr.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,6 +32,9 @@ define("PAGE_TITLE", "Haiku Online Demo");
 // to use the tightvnc applet instead (supports > 8bpp):
 // on debian, apt-get install tightvnc-java will put them in
 // /usr/share/tightvnc-java
+// else you can get it from http://www.tightvnc.com/download-old.php :
+// wget http://www.tightvnc.com/download/1.3.10/tightvnc-1.3.10_javabin.zip
+// (you will have to move the VncViewer.jar file around)
 define("VNCJAVA_PATH", "tightvnc-java");
 define("VNCJAR", "VncViewer.jar");
 define("VNCCLASS", "VncViewer.class");
@@ -58,6 +61,9 @@ define("VNCPORTBASE", 5900);
 //define("AUDIOPORTBASE", 8080);
 define("AUDIOPORTBASE", (VNCPORTBASE + MAX_QEMUS));
 
+// if audio is enabled
+define("AUDIOENABLED", false);
+
 // base port for serial output
 //define("SERIALPORTBASE", 9000);
 define("SERIALPORTBASE", (VNCPORTBASE + MAX_QEMUS * 2));
@@ -74,7 +80,7 @@ define("QEMU_ARGS", ""
 	."-daemonize " /* detach from stdin */
 	."-localtime " /* not UTC */
 	."-name '" . addslashes(PAGE_TITLE) . "' "
-	."-monitor /dev/null "
+	."-monitor null " /* disable the monitor */
 	."-serial none "
 	."-parallel none "
 	."-net none "
@@ -87,7 +93,7 @@ define("QEMU_IMAGE_PATH", "/home/revol/haiku.image");
 // BAD: let's one download the image
 //define("QEMU_IMAGE_PATH", dirname($_SERVER['SCRIPT_FILENAME']) . "/haiku.image");
 
-// max number of cpus for the VM, not more than 8
+// max number of cpus for the VM, no more than 8
 define("QEMU_MAX_CPUS", 1);
 
 // qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
@@ -96,6 +102,7 @@ define("QEMU_VNC_PREFIX", ":");
 // name of session and pid files in /tmp
 define("QEMU_SESSFILE_TMPL", "qemu-haiku-session-");
 define("QEMU_PIDFILE_TMPL", "qemu-haiku-pid-");
+define("QEMU_LOGFILE_TMPL", "qemu-haiku-log-");
 // name of session variable holding the qemu slot; not yet used correctly
 define("QEMU_IDX_VAR", "QEMU_HAIKU_SESSION_VAR");
 
@@ -151,6 +158,11 @@ function make_qemu_sessionfile_name($idx)
 function make_qemu_pidfile_name($idx)
 {
 	return "/tmp/" . QEMU_PIDFILE_TMPL . $idx;
+}
+
+function make_qemu_logfile_name($idx)
+{
+	return "/tmp/" . QEMU_LOGFILE_TMPL . $idx;
 }
 
 function find_qemu_slot()
@@ -379,9 +391,8 @@ function output_options_form()
 	echo "</td>\n</tr>\n";
 
 	
-	$enable_sound = 1;
 	echo "<tr ";
-	if (!$enable_sound)
+	if (!AUDIOENABLED)
 		echo "class=\"haiku_online_disabled\"";
 	echo ">\n";
 	echo "<td align=\"right\">\n";
@@ -389,7 +400,7 @@ function output_options_form()
 	echo "</td>\n<td>\n";
 	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\" ";
 	echo "value=\"1\" ";
-	if ($enable_sound) {
+	if (AUDIOENABLED) {
 		//echo "checked=\"checked\" /";
 	} else
 		echo "disabled=\"disabled\" /";
@@ -452,8 +463,8 @@ function output_options_form()
 	echo "</table>\n";
 	echo "</form>\n";
 	out("NOTE: You will need a Java-enabled browser to display the VNC " .
-	    "Applet needed by this demo.");
-	out("You can however use instead an external <a " .
+	    "Applet used by this demo. " .
+	    "You can however use instead an external <a " .
 	    "href=\"http://fr.wikipedia.org/wiki/Virtual_Network_Computing\"" .
 	    ">VNC viewer</a>.");
 	ob_flush();
@@ -490,6 +501,7 @@ function start_qemu()
 		return $idx;
 	}
 	$pidfile = make_qemu_pidfile_name($idx);
+	$logfile = make_qemu_logfile_name($idx);
 	$cmd = '';
 	if (isset($_GET['sound'])) {
 		$cmd .= "QEMU_AUDIO_DRV=twolame ";
@@ -514,6 +526,9 @@ function start_qemu()
 		" -vnc " . QEMU_VNC_PREFIX . vnc_display() .
 		" -pidfile " . $pidfile .
 		" " . QEMU_IMAGE_PATH;
+	//$cmd .= " || echo $? && echo done )";
+	// redirect output to log file
+	//$cmd .= " >$logfile 2>&1";
 
 	if (file_exists($pidfile))
 		unlink($pidfile);
@@ -703,6 +718,8 @@ function output_applet_code($external_only=false)
 	$class = VNCCLASS;
 	if ($external_only)
 		return;
+	if (!VNC_HIDE_CONTROLS)
+		$h += 32;
 	echo "<a name=\"haiku_online_applet\"></a>";
 	echo "<center>";
 	echo "<applet code=$class codebase=\"$vncjpath/\" ";
@@ -715,7 +732,7 @@ function output_applet_code($external_only=false)
 	if (defined('VNC_USE_PASS') && VNC_USE_PASS)
 		$pass = $_SESSION['VNC_PASS'];
 	echo "<param name=\"PASSWORD\" value=\"" . $pass . "\">\n";
-	if (defined("VNC_HIDE_CONTROLS") && VNC_HIDE_CONTROLS)
+	if (VNC_HIDE_CONTROLS)
 		echo "<param name=\"Show controls\" value=\"No\">\n";
 	//echo "<param name=\"share desktop\" value=\"no\" />";
 	echo "<param name=\"background-color\" value=\"#336698\">\n";
