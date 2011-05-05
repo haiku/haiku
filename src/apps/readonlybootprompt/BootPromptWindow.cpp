@@ -286,10 +286,6 @@ BootPromptWindow::_UpdateStrings()
 void
 BootPromptWindow::_PopulateLanguages()
 {
-	// Get the list of all known languages
-	BMessage installedLanguages;
-	BLocaleRoster::Default()->GetAvailableLanguages(&installedLanguages);
-
 	// TODO: detect language/country from IP address
 
 	// Get current first preferred language of the user
