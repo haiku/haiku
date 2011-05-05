@@ -5,6 +5,8 @@
  * Authors:
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
+#ifndef RADEON_HD_MODE_H
+#define RADEON_HD_MODE_H
 
 
 #include <create_display_modes.h>
@@ -15,3 +17,5 @@
 status_t create_mode_list(void);
 status_t mode_sanity_check(display_mode *mode);
 
+
+#endif /*RADEON_HD_MODE_H*/
