@@ -107,6 +107,14 @@ typedef struct {
 } mail_notification;
 
 
+// #pragma mark - global functions
+
+int32 count_pop_accounts(void);
+status_t get_pop_account(mail_pop_account*, int32 index = 0);
+status_t set_pop_account(mail_pop_account*, int32 index = 0,
+	bool save = tru);
+
+
 // #pragma mark - BMailMessage
 
 class BMailMessage {
