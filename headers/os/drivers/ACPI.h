@@ -239,6 +239,8 @@ struct acpi_module_info {
 					acpi_data *retBuffer);
 	status_t	(*get_current_resources)(acpi_handle busDeviceHandle,
 					acpi_data *retBuffer);
+	status_t	(*get_possible_resources)(acpi_handle busDeviceHandle,
+					acpi_data *retBuffer);
 
 	/* Power state setting */
 

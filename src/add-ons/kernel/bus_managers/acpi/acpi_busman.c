@@ -84,7 +84,7 @@ static void dump_madt() {
 	while (true) {
 		status = AcpiGetTable (ACPI_SIG_MADT, ++madtCount, &madt);
 		if (status != AE_OK) break;
-/*		
+/*
 		dprintf("acpi: MADT TABLE:\n");
 		AcpiDmDumpDataTable( madt );
 		entry = madt + 44;
@@ -212,7 +212,7 @@ acpi_std_ops(int32 op,...)
 
 			parameter.Count = 1;
 			parameter.Pointer = &arg;
-	
+
 			AcpiEvaluateObject(NULL, "\\_PIC", &parameter, NULL);
 
 			flags = acpiAvoidFullInit ?
@@ -618,6 +618,14 @@ get_current_resources(acpi_handle busDeviceHandle, acpi_data *retBuffer)
 
 
 status_t
+get_possible_resources(acpi_handle busDeviceHandle, acpi_data *retBuffer)
+{
+	return AcpiGetPossibleResources(busDeviceHandle, (ACPI_BUFFER*)retBuffer)
+		== AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
 prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
 	ACPI_STATUS acpiStatus;
@@ -732,6 +740,7 @@ struct acpi_module_info gACPIModule = {
 	evaluate_method,
 	get_irq_routing_table,
 	get_current_resources,
+	get_possible_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot

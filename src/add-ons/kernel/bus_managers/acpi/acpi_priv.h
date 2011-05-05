@@ -123,6 +123,8 @@ typedef struct acpi_root_info {
 					acpi_data *retBuffer);
 	status_t	(*get_current_resources)(acpi_handle busDeviceHandle,
 					acpi_data *retBuffer);
+	status_t	(*get_possible_resources)(acpi_handle busDeviceHandle,
+					acpi_data *retBuffer);
 
 	/* Power state setting */
 
@@ -195,6 +197,8 @@ status_t evaluate_method(acpi_handle handle, const char* method,
 status_t get_irq_routing_table(acpi_handle busDeviceHandle,
 	acpi_data* returnValue);
 status_t get_current_resources(acpi_handle busDeviceHandle,
+	acpi_data* returnValue);
+status_t get_possible_resources(acpi_handle busDeviceHandle,
 	acpi_data* returnValue);
 
 status_t prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size);
