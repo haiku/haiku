@@ -112,7 +112,7 @@ typedef struct {
 int32 count_pop_accounts(void);
 status_t get_pop_account(mail_pop_account*, int32 index = 0);
 status_t set_pop_account(mail_pop_account*, int32 index = 0,
-	bool save = tru);
+	bool save = true);
 
 
 // #pragma mark - BMailMessage
