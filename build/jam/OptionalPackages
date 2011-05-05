@@ -1721,7 +1721,7 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			yasm-1.1.0-x86-gcc2-2011-03-14.zip
+			yasm-1.1.0-x86-gcc2-2011-04-29.zip
 			: $(baseURL)/yasm-1.1.0-x86-gcc2-2011-04-29.zip ;
 	}
 }
