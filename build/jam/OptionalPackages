@@ -1416,13 +1416,13 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				subversion-1.6.13-x86-gcc4-2010-11-12.zip
-				: $(baseURL)/subversion-1.6.13-x86-gcc4-2010-11-12.zip
+				subversion-1.6.15-x86-gcc4-2011-05-04.zip
+				: $(baseURL)/subversion-1.6.15-x86-gcc4-2011-05-04.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				subversion-1.6.13-x86-gcc2-2010-10-13.zip
-				: $(baseURL)/subversion-1.6.13-x86-gcc2-2010-10-13.zip
+				subversion-1.6.15-x86-gcc2-2011-05-05.zip
+				: $(baseURL)/subversion-1.6.15-x86-gcc2-2011-05-05.zip
 				: : true ;
 		}
 	}
