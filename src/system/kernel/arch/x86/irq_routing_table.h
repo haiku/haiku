@@ -31,37 +31,55 @@ typedef Vector<irq_routing_entry> IRQRoutingTable;
 struct irq_descriptor {
 	irq_descriptor();
 	// bit 0 is interrupt 0, bit 2 is interrupt 2, and so on
-	int16			irq;
+	uint8			irq;
 	bool			shareable;
 	// B_LOW_ACTIVE_POLARITY or B_HIGH_ACTIVE_POLARITY
-	int8			polarity;
+	uint8			polarity;
 	// B_LEVEL_TRIGGERED or B_EDGE_TRIGGERED
-	int8			interrupt_mode;
+	uint8			interrupt_mode;
 };
 
 
-// Similar to bus_managers/acpi/include/acrestyp.h definition
-typedef struct acpi_prt {
-	uint32			length;
-	uint32			pin;
-	uint64			address;	// here for 64-bit alignment
-	uint32			sourceIndex;
-	char			source[4];	// pad to 64 bits so sizeof()
-						// works in all cases
-} acpi_pci_routing_table;
+// TODO: Hack until we expose ACPI structs better; these are duplicates of
+// the types in acrestype.h
+struct acpi_pci_routing_table {
+	uint32	length;
+	uint32	pin;
+	uint64	address;
+	uint32	source_index;
+	char	source[4];
+};
 
-//TODO: Hack until we expose ACPI structs better, currently hardcoded to
-// ACPI_RESOURCE_IRQ
 struct acpi_resource {
-    uint32          type;
-    uint32			length;
+	uint32	type;
+	uint32	length;
+};
 
-    uint8			descriptorLength;
-    uint8			triggering;
-    uint8			polarity;
-    uint8			sharable;
-    uint8			interruptCount;
-    uint8			interrupts[];
+struct acpi_resource_source {
+	uint8	index;
+	uint16	string_length;
+	char*	string_pointer;
+};
+
+struct acpi_resource_irq {
+	acpi_resource header;
+	uint8	descriptor_ength;
+	uint8	triggering;
+	uint8	polarity;
+	uint8	sharable;
+	uint8	interrupt_count;
+	uint8	interrupts[];
+};
+
+struct acpi_resource_extended_irq {
+	acpi_resource header;
+	uint8	producer_consumer;
+	uint8	triggering;
+	uint8	polarity;
+	uint8	sharable;
+	uint8	interrupt_count;
+	acpi_resource_source source;
+	uint32	interrupts[];
 };
 
 
@@ -70,8 +88,6 @@ void print_irq_routing_table(IRQRoutingTable* table);
 
 
 status_t read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table);
-status_t read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
-			const char* method, irq_descriptor* descriptor);
 
 status_t read_current_irq(acpi_module_info* acpi, acpi_handle device,
 			irq_descriptor* descriptor);

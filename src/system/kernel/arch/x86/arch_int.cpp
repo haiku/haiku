@@ -415,6 +415,15 @@ pic_init(void)
 }
 
 
+static void
+pic_disable()
+{
+	// Mask off all interrupts on master and slave
+	out8(0xff, PIC_MASTER_MASK);
+	out8(0xff, PIC_SLAVE_MASK);
+}
+
+
 // #pragma mark - I/O APIC
 
 
@@ -615,6 +624,8 @@ ioapic_init(kernel_args* args)
 		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
 			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
 
+	TRACE(("ioapic has %lu entries\n", sIOAPICMaxRedirectionEntry + 1));
+
 	// use the boot CPU as the target for all interrupts
 	uint64 targetAPIC = args->arch_args.cpu_apic_id[0];
 
@@ -652,25 +663,34 @@ ioapic_init(kernel_args* args)
 	for (uint32 i = 0; i < 256; i++)
 		sIRQToIOAPICPin[i] = i;
 
-	// configure apic interrupts assume 1:1 mapping
+	// configure io apic interrupts from pci routing table
 	for (int i = 0; i < table.Count(); i++) {
-		irq_routing_entry& entry = table.ElementAt(i);
-		irq_descriptor irqDescriptor;
-		read_current_irq(acpiModule, entry.source, &irqDescriptor);
+		uint8 irq = 0;
 		uint32 config = 0;
-		config |= irqDescriptor.polarity;
-		config |= irqDescriptor.interrupt_mode;
 
-		int32 num = entry.source_index;
-		for (int a = 0; a < 16 && num == 0; a++) {
-			if (irqDescriptor.irq >> i & 0x01) {
-				num = a;
-				break;
+		irq_routing_entry& entry = table.ElementAt(i);
+		if (entry.source == 0) {
+			// fixed irq configuration
+			irq = entry.source_index;
+			config = B_LEVEL_TRIGGERED | B_LOW_ACTIVE_POLARITY;
+		} else {
+			// irq comes from the link device and is configurable
+			irq_descriptor irqDescriptor;
+			status = read_current_irq(acpiModule, entry.source, &irqDescriptor);
+			if (status != B_OK) {
+				dprintf("failed to read current irq config of link device\n");
+				continue;
 			}
+
+			irq = irqDescriptor.irq;
+			config = irqDescriptor.polarity | irqDescriptor.interrupt_mode;
 		}
 
-		ioapic_configure_io_interrupt(num, config);
+		ioapic_configure_io_interrupt(irq, config);
 	}
+
+	// disable the legacy PIC
+	pic_disable();
 
 	// prefer the ioapic over the normal pic
 	dprintf("using ioapic for interrupt routing\n");

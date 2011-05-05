@@ -49,7 +49,7 @@ print_irq_descriptor(irq_descriptor* descriptor)
 	const char* levelTriggeredString = "level triggered";
 	const char* edgeTriggeredString = " edge triggered";
 
-	dprintf("irq: %i, shareable: %i, polarity: %s, interrupt_mode: %s\n",
+	dprintf("irq: %u, shareable: %u, polarity: %s, interrupt_mode: %s\n",
 		descriptor->irq, descriptor->shareable,
 		descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? activeHighString
 			: activeLowString,
@@ -87,11 +87,14 @@ read_device_irq_routing_table(acpi_module_info* acpi, acpi_handle device,
 	acpi_pci_routing_table* acpiTable = (acpi_pci_routing_table*)buffer.pointer;
 	while (acpiTable->length) {
 		acpi_handle source;
-		if (acpi->get_handle(NULL, acpiTable->source, &source) == B_OK) {
+		bool noSource = acpiTable->source == NULL || acpiTable->source[0] == 0;
+		if (noSource
+			|| acpi->get_handle(NULL, acpiTable->source, &source) == B_OK) {
+
 			irqEntry.device_address = acpiTable->address;
 			irqEntry.pin = acpiTable->pin;
-			irqEntry.source = source;
-			irqEntry.source_index = acpiTable->sourceIndex;
+			irqEntry.source = noSource ? 0 : source;
+			irqEntry.source_index = acpiTable->source_index;
 			table->PushBack(irqEntry);
 		}
 
@@ -143,38 +146,113 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 }
 
 
-status_t
+static status_t
 read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
-	const char* method, irq_descriptor* descriptor)
+	bool readCurrent, irq_descriptor* descriptor)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
 	buffer.length = ACPI_ALLOCATE_BUFFER;
-	status_t status = acpi->get_current_resources(device, &buffer);
+
+	status_t status;
+	if (readCurrent)
+		status = acpi->get_current_resources(device, &buffer);
+	else
+		status = acpi->get_possible_resources(device, &buffer);
+
 	if (status != B_OK) {
+		dprintf("failed to read %s resources for irq\n",
+			readCurrent ? "current" : "possible");
 		free(buffer.pointer);
 		return status;
 	}
 
+	descriptor->irq = 0;
 	acpi_resource* resource = (acpi_resource*)buffer.pointer;
-	//TODO Don't hardcode END TAG
+	// TODO: Don't hardcode END TAG
 	while (resource->type != 7) {
-		//TODO: Don't hardcode IRQ or Extended IRQ
-		if (resource->type == 0 || resource->type == 15) {
-			descriptor->irq = resource->interrupts[0];
-			descriptor->shareable = resource->sharable != 0;
-			descriptor->interrupt_mode = resource->triggering == 0 ?
-				B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
-			descriptor->polarity = resource->polarity == 0 ?
-				B_HIGH_ACTIVE_POLARITY : B_LOW_ACTIVE_POLARITY;
+		// TODO: Don't hardcode IRQ and Extended IRQ
+		switch (resource->type) {
+			case 0: // IRQ
+			{
+				acpi_resource_irq* irq = (acpi_resource_irq*)resource;
+				if (irq->interrupt_count < 1) {
+					dprintf("acpi irq resource with no interrupts\n");
+					break;
+				}
 
-			free(buffer.pointer);
-			return B_OK;
+				descriptor->irq = irq->interrupts[0];
+				descriptor->shareable = irq->sharable != 0;
+				descriptor->interrupt_mode = irq->triggering == 0
+					? B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
+				descriptor->polarity = irq->polarity == 0
+					? B_HIGH_ACTIVE_POLARITY : B_LOW_ACTIVE_POLARITY;
+
+#ifdef TRACE_PRT
+				dprintf("acpi irq resource (%s):\n",
+					readCurrent ? "current" : "possible");
+				dprintf("\ttriggering: %s\n",
+					irq->triggering == 0 ? "level" : "edge");
+				dprintf("\tpolarity: %s active\n",
+					irq->polarity == 0 ? "high" : "low");
+				dprintf("\tsharable: %s\n", irq->sharable != 0 ? "yes" : "no");
+				dprintf("\tcount: %u\n", irq->interrupt_count);
+				if (irq->interrupt_count > 0) {
+					dprintf("\tinterrupts:");
+					for (uint16 i = 0; i < irq->interrupt_count; i++)
+						dprintf(" %u", irq->interrupts[i]);
+					dprintf("\n");
+				}
+#endif
+				break;
+			}
+
+			case 15: // Extended IRQ
+			{
+				acpi_resource_extended_irq* irq
+					= (acpi_resource_extended_irq*)resource;
+				if (irq->interrupt_count < 1) {
+					dprintf("acpi extended irq resource with no interrupts\n");
+					break;
+				}
+
+				descriptor->irq = irq->interrupts[0];
+				descriptor->shareable = irq->sharable != 0;
+				descriptor->interrupt_mode = irq->triggering == 0
+					? B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
+				descriptor->polarity = irq->polarity == 0
+					? B_HIGH_ACTIVE_POLARITY : B_LOW_ACTIVE_POLARITY;
+
+#ifdef TRACE_PRT
+				dprintf("acpi extended irq resource (%s):\n",
+					readCurrent ? "current" : "possible");
+				dprintf("\tproducer: %s\n",
+					irq->producer_consumer ? "yes" : "no");
+				dprintf("\ttriggering: %s\n",
+					irq->triggering == 0 ? "level" : "edge");
+				dprintf("\tpolarity: %s active\n",
+					irq->polarity == 0 ? "high" : "low");
+				dprintf("\tsharable: %s\n", irq->sharable != 0 ? "yes" : "no");
+				dprintf("\tcount: %u\n", irq->interrupt_count);
+				if (irq->interrupt_count > 0) {
+					dprintf("\tinterrupts:");
+					for (uint16 i = 0; i < irq->interrupt_count; i++)
+						dprintf(" %lu", irq->interrupts[i]);
+					dprintf("\n");
+				}
+#endif
+				break;
+			}
 		}
+
+		if (descriptor->irq != 0)
+			break;
+
 		resource = (acpi_resource*)((uint8*)resource + resource->length);
 	}
+
 	free(buffer.pointer);
-	return B_ERROR;
+	return descriptor->irq != 0 ? B_OK : B_ERROR;
 }
 
 
@@ -182,7 +260,7 @@ status_t
 read_current_irq(acpi_module_info* acpi, acpi_handle device,
 	irq_descriptor* descriptor)
 {
-	return read_irq_descriptor(acpi, device, "_CRS", descriptor);
+	return read_irq_descriptor(acpi, device, true, descriptor);
 }
 
 
@@ -190,7 +268,7 @@ status_t
 read_possible_irq(acpi_module_info* acpi, acpi_handle device,
 	irq_descriptor* descriptor)
 {
-	return read_irq_descriptor(acpi, device, "_PRS", descriptor);
+	return read_irq_descriptor(acpi, device, false, descriptor);
 }
 
 
