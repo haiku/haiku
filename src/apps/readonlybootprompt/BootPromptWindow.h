@@ -5,12 +5,14 @@
 #ifndef BOOT_PROMPT_WINDOW_H
 #define BOOT_PROMPT_WINDOW_H
 
-#include <Catalog.h>
-#include <Message.h>
+
 #include <Window.h>
+
 
 class BButton;
 class BListView;
+class BMenuItem;
+class BMenuField;
 class BStringView;
 class BTextView;
 
@@ -26,19 +28,17 @@ private:
 			void				_UpdateStrings();
 			void				_PopulateLanguages();
 			void				_PopulateKeymaps();
-			void				_StoreKeymap() const;
+			void				_StoreKeymap(const entry_ref& ref) const;
 			status_t			_GetCurrentKeymapRef(entry_ref& ref) const;
 
 private:
-			BView*				fInfoTextView;
+			BTextView*			fInfoTextView;
 			BStringView*		fLanguagesLabelView;
 			BListView*			fLanguagesListView;
-			BStringView*		fKeymapsLabelView;
-			BListView*			fKeymapsListView;
+			BMenuField*			fKeymapsMenuField;
 			BButton*			fDesktopButton;
 			BButton*			fInstallerButton;
-
-			BMessage			fInstalledLanguages;
 };
+
 
 #endif // BOOT_PROMPT_WINDOW_H

@@ -1,6 +1,7 @@
 /*
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2010, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +13,7 @@
 
 #include <Bitmap.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -19,9 +21,10 @@
 #include <FindDirectory.h>
 #include <File.h>
 #include <FormattingConventions.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
+#include <Menu.h>
 #include <MutableLocaleRoster.h>
 #include <ObjectList.h>
 #include <Path.h>
@@ -30,13 +33,10 @@
 #include <StringItem.h>
 #include <StringView.h>
 #include <TextView.h>
-#include <TranslationUtils.h>
-#include <TranslatorFormats.h>
 #include <UnicodeChar.h>
 
 #include "BootPrompt.h"
 #include "Keymap.h"
-#include "KeymapListItem.h"
 
 
 using BPrivate::MutableLocaleRoster;
@@ -51,6 +51,11 @@ enum {
 #define B_TRANSLATE_CONTEXT "BootPromptWindow"
 
 
+namespace BPrivate {
+	void ForceUnloadCatalog();
+};
+
+
 class LanguageItem : public BStringItem {
 public:
 	LanguageItem(const char* label, const char* language)
@@ -59,32 +64,31 @@ public:
 		fLanguage(language)
 	{
 		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-		if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(
-				fIcon, language) != B_OK) {
+		if (fIcon != NULL
+			&& (!fIcon->IsValid()
+				|| BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
+					language) != B_OK)) {
 			delete fIcon;
 			fIcon = NULL;
 		}
 	}
-
 
 	~LanguageItem()
 	{
 		delete fIcon;
 	}
 
-
 	const char* Language() const
 	{
 		return fLanguage.String();
 	}
 
-
 	void DrawItem(BView* owner, BRect frame, bool complete)
 	{
-		BStringItem::DrawItem(owner, frame, complete);
+		BStringItem::DrawItem(owner, frame, true/*complete*/);
 
 		// Draw the icon
-		if (fIcon != NULL && fIcon->IsValid()) {
+		if (fIcon != NULL) {
 			frame.left = frame.right - kFlagWidth;
 			BRect iconFrame(frame);
 			iconFrame.Set(iconFrame.left, iconFrame.top + 1,
@@ -95,13 +99,13 @@ public:
 			owner->DrawBitmap(fIcon, iconFrame);
 			owner->SetDrawingMode(B_OP_COPY);
 		}
-
 	}
 
 private:
-	BString fLanguage;
-	BBitmap* fIcon;
-	static const int kFlagWidth = 16;
+	static	const int			kFlagWidth = 16;
+
+			BString				fLanguage;
+			BBitmap*			fIcon;
 };
 
 
@@ -117,140 +121,20 @@ compare_void_list_items(const void* _a, const void* _b)
 }
 
 
-// This class provides a view with text overlayed on a bitmap background.
-// The text is split on whitespaces in a way that no line is longer than
-// the view itself.
-// However, this splitting is done only when the text is set, so this view
-// cannot be resized.
-class TextBitmapView : public BView
-{
-	public:
-		TextBitmapView(BSize size) : BView("info", B_WILL_DRAW)
-		{
-			fBackground = BTranslationUtils::GetBitmap(B_PNG_FORMAT,
-				"leaf.png");
-			SetExplicitMinSize(size);
-			SetExplicitMaxSize(size);
-			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		}
-
-		~TextBitmapView()
-		{
-			delete fBackground;
-		}
-
-		void SetText(const char* text)
-		{
-			fTextLines.MakeEmpty(); // remove the old text
-
-			const char* currentChar = text;
-				// points to the character we are examining
-			const char* lastWord = text;
-				// points to the start of the last word we encountered in the
-				// text (right after the last space we saw).
-
-			while (*currentChar != '\0') {
-				if (BUnicodeChar::IsWhitespace(BUnicodeChar::FromUTF8(
-						currentChar))) {
-					// TODO : we should also handle other kinds of whitespace.
-					// Chinese seems to use a different one. ICU has proper
-					// support for it.
-					if (StringWidth(text, currentChar - text)
-						>= MinSize().Width() - fLeftBorder - fRightBorder)
-					{
-						if (text != lastWord) {
-							fTextLines.AddItem(new BString(text,
-								lastWord - text));
-
-							text = lastWord;
-							currentChar = text;
-						} else {
-							// We have a very long line without any spaces in
-							// it. For now, just break on the first space we
-							// find. This results in an ugly layout for the
-							// chinese message, but at least it doesn't enter
-							// an infinite loop.
-							fTextLines.AddItem(new BString(text,
-								currentChar - text));
-							++currentChar;
-							lastWord = currentChar;
-							text = currentChar;
-						}
-					} else
-						lastWord = currentChar + 1;
-				} else if (*currentChar == '\n') {
-					// A line break forces starting a new line.
-					if (StringWidth(text, currentChar - text)
-							>= MinSize().Width() - fLeftBorder - fRightBorder) {
-						// This is the case where the newline hapenned just
-						// after the word that makes the line too long to fit
-						// the view. So we split this extra word to a line more.
-						fTextLines.AddItem(new BString(text, lastWord - text));
-						text = lastWord;
-					}
-					fTextLines.AddItem(new BString(text, currentChar - text));
-					text = currentChar + 1;
-					lastWord = text;
-				}
-
-				++currentChar;
-			}
-
-			// The end of text can happen just after the word that makes the
-			// line too long. Here again, we may have to move this last word to
-			// a separate line.
-			if (StringWidth(text) >= MinSize().Width() - fLeftBorder
-					- fRightBorder) {
-				fTextLines.AddItem(new BString(text, lastWord - text));
-				text = lastWord;
-			}
-			fTextLines.AddItem(new BString(text));
-
-			Invalidate();
-				// The text changed, we have to update the on-screen drawing.
-		}
-
-		void Draw(BRect r)
-		{
-			// TODO : take r into account
-			SetDrawingMode(B_OP_OVER);
-			DrawBitmap(fBackground, BPoint(fLeftBorder, fTopBorder));
-
-			for (int i = 0; i < fTextLines.CountItems(); i++) {
-				DrawString(*fTextLines.ItemAt(i), BPoint(fLeftBorder,
-					fTopBorder + 10 + i * 14));
-			}
-		}
-
-		void SetInsets(int left, int top, int right, int bottom)
-		{
-			fLeftBorder = left;
-			fRightBorder = right;
-			fTopBorder = top;
-			fBottomBorder = bottom;
-		}
-
-	private:
-		BBitmap* fBackground;
-		BObjectList<BString> fTextLines;
-		int fLeftBorder;
-		int fRightBorder;
-		int fTopBorder;
-		int fBottomBorder;
-};
+// #pragma mark -
 
 
 BootPromptWindow::BootPromptWindow()
 	:
-	BWindow(BRect(0, 0, 480, 400), "",
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(0, 0, 530, 400), "",
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE)
 {
-	// Get the list of all known languages (suffice to do it only once)
-	BLocaleRoster::Default()->GetAvailableLanguages(&fInstalledLanguages);
+	SetSizeLimits(450, 16384, 350, 16384);
 
-	fInfoTextView = new TextBitmapView(BSize(480, 140));
-	static_cast<TextBitmapView*>(fInfoTextView)->SetInsets(5, 5, 5, 5);
+	fInfoTextView = new BTextView("");
+	fInfoTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fInfoTextView->MakeEditable(false);
+	fInfoTextView->MakeSelectable(false);
 
 	fDesktopButton = new BButton("", new BMessage(MSG_BOOT_DESKTOP));
 	fDesktopButton->SetTarget(be_app);
@@ -264,61 +148,52 @@ BootPromptWindow::BootPromptWindow()
 	fLanguagesLabelView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
 
-	fKeymapsLabelView = new BStringView("keymapsLabel", "");
-	fKeymapsLabelView->SetFont(be_bold_font);
-	fKeymapsLabelView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNSET));
-
 	fLanguagesListView = new BListView();
+	fLanguagesListView->SetFlags(
+		fLanguagesListView->Flags() | B_FULL_UPDATE_ON_RESIZE);
+		// Our ListItem rendering depends on the width of the view, so
+		// we need a full update
 	BScrollView* languagesScrollView = new BScrollView("languagesScroll",
 		fLanguagesListView, B_WILL_DRAW, false, true);
 
-	fKeymapsListView = new BListView();
-	BScrollView* keymapsScrollView = new BScrollView("keymapsScroll",
-		fKeymapsListView, B_WILL_DRAW, false, true);
+	fKeymapsMenuField = new BMenuField("", "", new BMenu(""));
+	fKeymapsMenuField->Menu()->SetLabelFromMarked(true);
 
 	_InitCatalog(false);
-	_UpdateStrings();
+	_PopulateLanguages();
+	_PopulateKeymaps();
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
-			.Add(fInfoTextView)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
-				.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.AddGroup(B_VERTICAL, spacing)
+				.AddGroup(B_VERTICAL, spacing)
 					.Add(fLanguagesLabelView)
 					.Add(languagesScrollView)
-					.SetInsets(spacing, 0, 0, 0)
-				)
-				.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
-					.Add(fKeymapsLabelView)
-					.Add(keymapsScrollView)
-					.SetInsets(0, 0, spacing, 0)
-				)
-			)
-		)
+				.End()
+				.AddGrid(0.f)
+					.AddMenuField(fKeymapsMenuField, 0, 0)
+				.End()
+			.End()
+			.Add(fInfoTextView)
+			.SetInsets(spacing, spacing, spacing, spacing)
+		.End()
 		.Add(new BSeparatorView(B_HORIZONTAL))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+		.AddGroup(B_HORIZONTAL, spacing)
 			.AddGlue()
 			.Add(fInstallerButton)
 			.Add(fDesktopButton)
 			.SetInsets(spacing, spacing, spacing, spacing)
-		)
+		.End()
+		.View()
 	);
 
+	_UpdateStrings();
 	CenterOnScreen();
 	Show();
-	Lock();
-
-	// This call in the first _PopulateLanguages/Keymaps had no effect yet,
-	// since the list wasn't attached to the window yet.
-	fLanguagesListView->ScrollToSelection();
-	fKeymapsListView->ScrollToSelection();
-
-	Unlock();
 }
 
 
@@ -327,15 +202,15 @@ BootPromptWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_LANGUAGE_SELECTED:
-			if (BListItem* item = fLanguagesListView->ItemAt(
-				fLanguagesListView->CurrentSelection(0))) {
-				LanguageItem* languageItem = static_cast<LanguageItem*>(item);
+			if (LanguageItem* item = static_cast<LanguageItem*>(
+					fLanguagesListView->ItemAt(
+						fLanguagesListView->CurrentSelection(0)))) {
 				BMessage preferredLanguages;
-				preferredLanguages.AddString("language",
-					languageItem->Language());
+				preferredLanguages.AddString("language", item->Language());
 				MutableLocaleRoster::Default()->SetPreferredLanguages(
 					&preferredLanguages);
 				_InitCatalog(true);
+				// TODO: select default keymap by language
 			}
 			// Calling it here is a cheap way of preventing the user to have
 			// no item selected. Always the current item will be selected.
@@ -343,18 +218,17 @@ BootPromptWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_KEYMAP_SELECTED:
-			_StoreKeymap();
+		{
+			entry_ref ref;
+			if (message->FindRef("ref", &ref) == B_OK)
+				_StoreKeymap(ref);
 			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
 	}
 }
-
-
-namespace BPrivate {
-	void ForceUnloadCatalog();
-};
 
 
 void
@@ -384,41 +258,39 @@ BootPromptWindow::_UpdateStrings()
 {
 	SetTitle(B_TRANSLATE("Welcome to Haiku!"));
 
-	const char* infoText = B_TRANSLATE(
-		"Do you wish to run the Installer or continue booting to the "
-		"Desktop? You can also select your preferred language and keyboard "
-		"layout from the list below.\n\n"
+	fInfoTextView->SetText(B_TRANSLATE_COMMENT(
+		"Thank you for trying out Haiku! We hope you'll like it!\n\n"
+		"You can select your preferred language and keyboard "
+		"layout from the list on the left which will then be used instantly. "
+		"You can easily change both settings from the Desktop later on on "
+		"the fly.\n\n"
 
+		"Do you wish to run the Installer or continue booting to the "
+		"Desktop?\n",
+
+		"For other languages, a test like the following could be added: \""
 		"Note: Localization of Haiku applications and other components is "
 		"an on-going effort. You will frequently encounter untranslated "
 		"strings, but if you like, you can join in the work at "
-		"<www.haiku-os.org>."
-	);
-
-	static_cast<TextBitmapView*>(fInfoTextView)->SetText(infoText);
+		"<www.haiku-os.org>.\""));
 
 	fDesktopButton->SetLabel(B_TRANSLATE("Desktop (Live-CD)"));
 	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));
 
 	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
-	fKeymapsLabelView->SetText(B_TRANSLATE("Keymap"));
-
-	_PopulateLanguages();
-	_PopulateKeymaps();
+	fKeymapsMenuField->SetLabel(B_TRANSLATE("Keymap"));
+	fKeymapsMenuField->MenuItem()->SetLabel(B_TRANSLATE("Custom"));
 }
 
 
 void
 BootPromptWindow::_PopulateLanguages()
 {
-	// Disable sending the selection message while we change the selection.
-	fLanguagesListView->SetSelectionMessage(NULL);
+	// Get the list of all known languages
+	BMessage installedLanguages;
+	BLocaleRoster::Default()->GetAvailableLanguages(&installedLanguages);
 
-	// Clear the list view first
-	while (BListItem* item = fLanguagesListView->RemoveItem(
-			fLanguagesListView->CountItems() - 1)) {
-		delete item;
-	}
+	// TODO: detect language/country from IP address
 
 	// Get current first preferred language of the user
 	BMessage preferredLanguages;
@@ -489,22 +361,13 @@ BootPromptWindow::_PopulateLanguages()
 void
 BootPromptWindow::_PopulateKeymaps()
 {
-	// Disable sending the selection message while we change the selection.
-	fKeymapsListView->SetSelectionMessage(NULL);
-
-	// Clean the list view first
-	while (BListItem* item = fKeymapsListView->RemoveItem(
-			fKeymapsListView->CountItems() - 1)) {
-		delete item;
-	}
-
 	// Get the name of the current keymap, so we can mark the correct entry
 	// in the list view.
-	BString currentKeymapName;
-	entry_ref ref;
-	if (_GetCurrentKeymapRef(ref) == B_OK) {
-		BNode node(&ref);
-		node.ReadAttrString("keymap:name", &currentKeymapName);
+	BString currentName;
+	entry_ref currentRef;
+	if (_GetCurrentKeymapRef(currentRef) == B_OK) {
+		BNode node(&currentRef);
+		node.ReadAttrString("keymap:name", &currentName);
 	}
 
 	// TODO: common keymaps!
@@ -514,50 +377,42 @@ BootPromptWindow::_PopulateKeymaps()
 		return;
 	}
 
-	// Populate the list
+	// Populate the menu
 	BDirectory directory;
 	if (directory.SetTo(path.Path()) == B_OK) {
+		entry_ref ref;
 		while (directory.GetNextRef(&ref) == B_OK) {
-			fKeymapsListView->AddItem(new KeymapListItem(ref));
-			if (currentKeymapName == ref.name)
-				fKeymapsListView->Select(fKeymapsListView->CountItems() - 1);
+			BMessage* message = new BMessage(MSG_KEYMAP_SELECTED);
+			message->AddRef("ref", &ref);
+			BMenuItem* item = new BMenuItem(ref.name, message);
+			fKeymapsMenuField->Menu()->AddItem(item);
+
+			if (currentName == ref.name)
+				item->SetMarked(true);
 		}
 	}
-
-	fKeymapsListView->ScrollToSelection();
-
-	// Re-enable sending the selection message.
-	fKeymapsListView->SetSelectionMessage(
-		new BMessage(MSG_KEYMAP_SELECTED));
 }
 
 
 void
-BootPromptWindow::_StoreKeymap() const
+BootPromptWindow::_StoreKeymap(const entry_ref& ref) const
 {
-	KeymapListItem* item = dynamic_cast<KeymapListItem*>(
-		fKeymapsListView->ItemAt(fKeymapsListView->CurrentSelection(0)));
-	if (item == NULL)
-		return;
-
 	// Load and use the new keymap
 	Keymap keymap;
-	if (keymap.Load(item->EntryRef()) != B_OK) {
-		fprintf(stderr, "Failed to load new keymap file (%s).\n",
-			item->EntryRef().name);
+	if (keymap.Load(ref) != B_OK) {
+		fprintf(stderr, "Failed to load new keymap file (%s).\n", ref.name);
 		return;
 	}
 
 	// Get entry_ref to the Key_map file in the user settings.
-	entry_ref ref;
-	if (_GetCurrentKeymapRef(ref) != B_OK) {
+	entry_ref currentRef;
+	if (_GetCurrentKeymapRef(currentRef) != B_OK) {
 		fprintf(stderr, "Failed to get ref to user keymap file.\n");
 		return;
 	}
 
-	if (keymap.Save(ref) != B_OK) {
-		fprintf(stderr, "Failed to save new keymap file (%s).\n",
-			item->EntryRef().name);
+	if (keymap.Save(currentRef) != B_OK) {
+		fprintf(stderr, "Failed to save new keymap file (%s).\n", ref.name);
 		return;
 	}
 
@@ -576,4 +431,3 @@ BootPromptWindow::_GetCurrentKeymapRef(entry_ref& ref) const
 
 	return get_ref_for_path(path.Path(), &ref);
 }
-

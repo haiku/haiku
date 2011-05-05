@@ -12,10 +12,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "ReadOnlyBootPrompt",
-	long_info  = "ReadOnlyBootPrompt ©2010 The Haiku Project"
+	long_info  = "ReadOnlyBootPrompt ©2011 The Haiku Project"
 };
 
-resource(1, "leaf.png") #'PNG ' import "../../../data/artwork/HAIKU Background Leaf - outline.png";
-
 resource app_flags B_EXCLUSIVE_LAUNCH;
-
