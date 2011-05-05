@@ -19,9 +19,9 @@
 
 #define TRACE_ATOM
 #ifdef TRACE_ATOM
-#   define TRACE(x) _sPrintf x
+#   define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
-#   define TRACE(x) ;
+#   define TRACE(x...) ;
 #endif
 
 
@@ -37,19 +37,19 @@ AtomParser(void *parameterSpace, uint8_t index, void *handle, void *biosBase)
 
 	switch (ParseTable(&deviceData, index)) {
 		case CD_SUCCESS:
-			TRACE(("%s: CD_SUCCESS : success\n", __FUNCTION__));
+			TRACE("%s: CD_SUCCESS : success\n", __func__);
 			return B_OK;
 			break;
 		case CD_CALL_TABLE:
-			TRACE(("%s: CD_CALL_TABLE : success\n", __FUNCTION__));
+			TRACE("%s: CD_CALL_TABLE : success\n", __func__);
 			return B_OK;
 			break;
 		case CD_COMPLETED:
-			TRACE(("%s: CD_COMPLETED : success\n", __FUNCTION__));
+			TRACE("%s: CD_COMPLETED : success\n", __func__);
 			return B_OK;
 			break;
 		default:
-			TRACE(("%s: UNKNOWN ERROR\n", __FUNCTION__));
+			TRACE("%s: UNKNOWN ERROR\n", __func__);
 	}
 	return B_ERROR;
 }
@@ -65,6 +65,7 @@ extern "C" {
 VOID*
 CailAllocateMemory(VOID *CAIL, UINT16 size)
 {
+	TRACE("AtomBios callback %s, size = %d\n", __func__, size);
 	return malloc(size);
 }
 
@@ -72,6 +73,7 @@ CailAllocateMemory(VOID *CAIL, UINT16 size)
 VOID
 CailReleaseMemory(VOID *CAIL, VOID *addr)
 {
+	TRACE("AtomBios callback %s\n", __func__);
 	free(addr);
 }
 
@@ -86,7 +88,7 @@ CailDelayMicroSeconds(VOID *CAIL, UINT32 delay)
 UINT32
 CailReadATIRegister(VOID* CAIL, UINT32 idx)
 {
-	TRACE(("%s(0x%X)\n", __func__, idx << 2));
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx << 2);
 	return read32(idx << 2);
 }
 
@@ -94,7 +96,7 @@ CailReadATIRegister(VOID* CAIL, UINT32 idx)
 VOID
 CailWriteATIRegister(VOID *CAIL, UINT32 idx, UINT32 data)
 {
-	TRACE(("%s(0x%X)\n", __func__, idx << 2));
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx << 2);
 
 	// TODO : save MMIO via atomSaveRegisters in CailWriteATIRegister
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMMIO, idx << 2);
@@ -105,6 +107,7 @@ CailWriteATIRegister(VOID *CAIL, UINT32 idx, UINT32 data)
 VOID
 CailReadPCIConfigData(VOID *CAIL, VOID* ret, UINT32 idx, UINT16 size)
 {
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
 	// TODO : CailReadPCIConfigData
 
 	// pci_device_cfg_read(RHDPTRI((atomBiosHandlePtr)CAIL)->PciInfo,
@@ -115,6 +118,7 @@ CailReadPCIConfigData(VOID *CAIL, VOID* ret, UINT32 idx, UINT16 size)
 VOID
 CailWritePCIConfigData(VOID *CAIL, VOID *src, UINT32 idx, UINT16 size)
 {
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
 	// TODO : CailWritePCIConfigData
 
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPCICFG, idx << 2);
@@ -126,7 +130,7 @@ CailWritePCIConfigData(VOID *CAIL, VOID *src, UINT32 idx, UINT16 size)
 ULONG
 CailReadPLL(VOID *CAIL, ULONG Address)
 {
-	TRACE(("%s(0x%X)\n", __func__, Address));
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
 	// TODO : Assumed screen index 0
 	return ReadPLL(0, Address);
 }
@@ -135,7 +139,7 @@ CailReadPLL(VOID *CAIL, ULONG Address)
 VOID
 CailWritePLL(VOID *CAIL, ULONG Address, ULONG Data)
 {
-	TRACE(("%s(0x%X)\n", __func__, Address));
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
 
 	// TODO : save PLL registers
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPLL, Address);
@@ -147,6 +151,7 @@ CailWritePLL(VOID *CAIL, ULONG Address, ULONG Data)
 ULONG
 CailReadMC(VOID *CAIL, ULONG Address)
 {
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
 	// TODO : CailReadMC
 
 	ULONG ret = 0;
@@ -159,6 +164,7 @@ CailReadMC(VOID *CAIL, ULONG Address)
 VOID
 CailWriteMC(VOID *CAIL, ULONG Address, ULONG data)
 {
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
 	// TODO : CailWriteMC
 
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMC, Address);
@@ -170,6 +176,7 @@ CailWriteMC(VOID *CAIL, ULONG Address, ULONG data)
 UINT32
 CailReadFBData(VOID* CAIL, UINT32 idx)
 {
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
 	// TODO : CailReadFBData
 
 	UINT32 ret = 0;
@@ -196,9 +203,9 @@ CailReadFBData(VOID* CAIL, UINT32 idx)
 VOID
 CailWriteFBData(VOID *CAIL, UINT32 idx, UINT32 data)
 {
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
 	// TODO : CailReadFBData
 
-	TRACE(("%s(%x) = %x\n", __func__, idx, data));
 	/*
 	if (((atomBiosHandlePtr)CAIL)->fbBase) {
 		CARD8 *FBBase = (CARD8*)
