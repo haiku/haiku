@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -7,32 +7,30 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "utility.h"
+#include "mode.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-#include <create_display_modes.h>
-#include <ddc.h>
-#include <edid.h>
-
 
 #define TRACE_MODE
 #ifdef TRACE_MODE
 extern "C" void _sPrintf(const char *format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
-static display_mode gDisplayMode;
+static display_mode *gDisplayMode;
 
 
 status_t
@@ -41,25 +39,27 @@ create_mode_list(void)
 	// TODO : Read active monitor EDID
 
 	/* Populate modeline with temporary example */
-	gDisplayMode.timing.pixel_clock = 71500;
-	gDisplayMode.timing.h_display = 1366;	// In Pixels
-	gDisplayMode.timing.h_sync_start = 1406;
-	gDisplayMode.timing.h_sync_end = 1438;
-	gDisplayMode.timing.h_total = 1510;
-	gDisplayMode.timing.v_display = 768;	// In Pixels
-	gDisplayMode.timing.v_sync_start = 771;
-	gDisplayMode.timing.v_sync_end = 777;
-	gDisplayMode.timing.v_total = 789;
-	gDisplayMode.timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
+	gDisplayMode->timing.pixel_clock = 71500;
+	gDisplayMode->timing.h_display = 1366;	// In Pixels
+	gDisplayMode->timing.h_sync_start = 1406;
+	gDisplayMode->timing.h_sync_end = 1438;
+	gDisplayMode->timing.h_total = 1510;
+	gDisplayMode->timing.v_display = 768;	// In Pixels
+	gDisplayMode->timing.v_sync_start = 771;
+	gDisplayMode->timing.v_sync_end = 777;
+	gDisplayMode->timing.v_total = 789;
+	gDisplayMode->timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
 
-	gDisplayMode.space = B_RGB32_LITTLE;	// Pixel configuration
-	gDisplayMode.virtual_width = 1366;		// In Pixels
-	gDisplayMode.virtual_height = 768;		// In Pixels
-	gDisplayMode.h_display_start = 0;
-	gDisplayMode.v_display_start = 0;
-	gDisplayMode.flags = 0;					// Mode flags (Some drivers use this
+	gDisplayMode->space = B_RGB32_LITTLE;	// Pixel configuration
+	gDisplayMode->virtual_width = 1366;		// In Pixels
+	gDisplayMode->virtual_height = 768;		// In Pixels
+	gDisplayMode->h_display_start = 0;
+	gDisplayMode->v_display_start = 0;
+	gDisplayMode->flags = 0;				// Mode flags (Some drivers use this
 
-	gInfo->mode_list = &gDisplayMode;
+	mode_sanity_check(gDisplayMode);
+
+	gInfo->mode_list = gDisplayMode;
 	gInfo->shared_info->mode_count = 1;
 	return B_OK;
 }
@@ -71,7 +71,7 @@ create_mode_list(void)
 uint32
 radeon_accelerant_mode_count(void)
 {
-	TRACE(("radeon_accelerant_mode_count()\n"));
+	TRACE("%d\n", __func__);
 
 	return gInfo->shared_info->mode_count;
 }
@@ -80,7 +80,7 @@ radeon_accelerant_mode_count(void)
 status_t
 radeon_get_mode_list(display_mode *modeList)
 {
-	TRACE(("radeon_get_mode_info()\n"));
+	TRACE("%d\n", __func__);
 	memcpy(modeList, gInfo->mode_list,
 		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
@@ -350,9 +350,9 @@ radeon_set_display_mode(display_mode *mode)
 status_t
 radeon_get_display_mode(display_mode *_currentMode)
 {
-	TRACE(("radeon_get_display_mode()\n"));
+	TRACE("%s\n", __func__);
 
-	*_currentMode = gDisplayMode;
+	_currentMode = gDisplayMode;
 	return B_OK;
 }
 
@@ -360,7 +360,7 @@ radeon_get_display_mode(display_mode *_currentMode)
 status_t
 radeon_get_frame_buffer_config(frame_buffer_config *config)
 {
-	TRACE(("radeon_get_frame_buffer_config()\n"));
+	TRACE("%s\n", __func__);
 
 	uint32 offset = gInfo->shared_info->frame_buffer_offset;
 
@@ -376,7 +376,7 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 status_t
 radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 {
-	TRACE(("radeon_get_pixel_clock_limits()\n"));
+	TRACE("%s\n", __func__);
 /*
 	if (_low != NULL) {
 		// lower limit of about 48Hz vertical refresh
@@ -398,4 +398,37 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 	return B_OK;
 }
 
+
+/*
+ * A quick sanity check of the provided display_mode
+ */
+status_t
+mode_sanity_check(display_mode *mode)
+{
+	if (mode->timing.h_display <= 0
+		|| mode->timing.h_sync_start <= 0
+		|| mode->timing.h_sync_end <= 0
+		|| mode->timing.h_total <= 0) {
+		TRACE("Invalid horizontal mode timing received for %dx%d\n",
+			mode->timing.h_display, mode->timing.v_display);
+		return B_ERROR;
+	}
+
+	if (mode->timing.v_display <= 0
+		|| mode->timing.v_sync_start <= 0
+		|| mode->timing.v_sync_end <= 0
+		|| mode->timing.v_total <= 0) {
+		TRACE("Invalid vertical mode timing received for %dx%d\n",
+			mode->timing.h_display, mode->timing.v_display);
+		return B_ERROR;
+	}
+
+	if (mode->flags <= 0) {
+		TRACE("Invalid mode timing flag received for %dx%d\n",
+			mode->timing.h_display, mode->timing.v_display);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
 

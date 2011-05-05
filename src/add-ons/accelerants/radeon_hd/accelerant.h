@@ -9,6 +9,7 @@
 #define RADEON_HD_ACCELERANT_H
 
 
+#include "mode.h"
 #include "radeon_hd.h"
 
 
@@ -88,8 +89,5 @@ WritePLL(int screenIndex, uint16_t offset, uint32_t data)
 	write32(CLOCK_CNTL_DATA, data);
 }
 
-
-// modes.cpp
-extern status_t create_mode_list(void);
 
 #endif	/* RADEON_HD_ACCELERANT_H */
