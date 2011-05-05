@@ -30,7 +30,7 @@ typedef Vector<irq_routing_entry> IRQRoutingTable;
 
 struct irq_descriptor {
 	irq_descriptor();
-	// bit 0 is interrupt 0, bit 2 is interrupt 2, and so on
+
 	uint8			irq;
 	bool			shareable;
 	// B_LOW_ACTIVE_POLARITY or B_HIGH_ACTIVE_POLARITY
