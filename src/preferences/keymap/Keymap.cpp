@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All rights reserved.
+ * Copyright 2004-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -115,7 +115,7 @@ Keymap::DumpKeymap()
 
 //!	Load a map from a file
 status_t
-Keymap::Load(entry_ref &ref)
+Keymap::Load(const entry_ref& ref)
 {
 	BEntry entry;
 	status_t status = entry.SetTo(&ref, true);
@@ -128,7 +128,7 @@ Keymap::Load(entry_ref &ref)
 		return status;
 
 	// fetch name from attribute and fall back to filename
-	
+
 	ssize_t bytesRead = file.ReadAttr("keymap:name", B_STRING_TYPE, 0, fName,
 		sizeof(fName));
 	if (bytesRead > 0)
@@ -142,7 +142,7 @@ Keymap::Load(entry_ref &ref)
 
 //!	We save a map to a file
 status_t
-Keymap::Save(entry_ref& ref)
+Keymap::Save(const entry_ref& ref)
 {
 	BFile file;
 	status_t status = file.SetTo(&ref,
