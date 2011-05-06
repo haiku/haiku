@@ -132,17 +132,17 @@ BatteryInfoView::_FillStringList()
 	fStringList.AddItem(fontString);
 	fontString->font = be_bold_font;
 
-	if (fBatteryInfo.state & BATTERY_CHARGING)
+	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
 		fontString->string = B_TRANSLATE("Battery charging");
-	else if (fBatteryInfo.state & BATTERY_DISCHARGING)
+	else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
 		fontString->string = B_TRANSLATE("Battery discharging");
-	else if (fBatteryInfo.state & BATTERY_CRITICAL_STATE
+	else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0
 		&& fBatteryExtendedInfo.model_number[0] == '\0'
 		&& fBatteryExtendedInfo.serial_number[0] == '\0'
 		&& fBatteryExtendedInfo.type[0] == '\0'
 		&& fBatteryExtendedInfo.oem_info[0] == '\0')
 		fontString->string = B_TRANSLATE("Empty battery slot");
-	else if (fBatteryInfo.state & BATTERY_CRITICAL_STATE)
+	else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0)
 		fontString->string = B_TRANSLATE("Damaged battery");
 	else
 		fontString->string = B_TRANSLATE("Battery unused");
