@@ -397,9 +397,57 @@ static inline int Bconputs(int16 handle, const char *string)
 
 #define VM_INQUIRE	-1
 
+/* Milan specific video constants */
 #define MI_MAGIC	0x4d49
+#define CMD_GETMODE		0
+#define CMD_SETMODE		1
+#define CMD_GETINFO		2
+#define CMD_ALLOCPAGE	3
+#define CMD_FREEPAGE	4
+#define CMD_FLIPPAGE	5
+#define CMD_ALLOCMEM	6
+#define CMD_FREEMEM		7
+#define CMD_SETADR		8
+#define CMD_ENUMMODES	9
+#define ENUMMODE_EXIT	0
+#define ENUMMODE_CONT	1
+/* scrFlags */
+#define SCRINFO_OK	1
+/* scrFormat */
+#define INTERLEAVE_PLANES	0
+#define STANDARD_PLANES		1
+#define PACKEDPIX_PLANES	2
+/* bitFlags */
+#define STANDARD_BITS	1
+#define FALCON_BITS		2
+#define INTEL_BITS		8
+
 
 #ifndef __ASSEMBLER__
+
+/* Milan specific video stuff */
+typedef struct screeninfo {
+	int32	size;
+	int32	devID;
+	char	name[64];
+	int32	scrFlags;
+	int32	frameadr;
+	int32	scrHeight;
+	int32	scrWidth;
+	int32	virtHeight;
+	int32	virtWidth;
+	int32	scrPlanes;
+	int32	scrColors;
+	int32	lineWrap;
+	int32	planeWrap;
+	int32	scrFormat;
+	int32	scrClut;
+	/*
+	int32	redBits;
+	...
+	*/
+} SCREENINFO;
+
 
 //extern int32 xbios(uint16 nr, ...);
 
