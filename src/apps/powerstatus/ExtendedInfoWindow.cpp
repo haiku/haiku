@@ -137,14 +137,10 @@ BatteryInfoView::_FillStringList()
 	else if (fBatteryInfo.state & BATTERY_DISCHARGING)
 		fontString->string = B_TRANSLATE("Battery discharging");
 	else if (fBatteryInfo.state & BATTERY_CRITICAL_STATE
-		&& (!fBatteryExtendedInfo.model_number
-			|| !strlen(fBatteryExtendedInfo.model_number))
-		&& (!fBatteryExtendedInfo.serial_number
-			|| !strlen(fBatteryExtendedInfo.serial_number))
-		&& (!fBatteryExtendedInfo.type
-			|| !strlen(fBatteryExtendedInfo.type))
-		&& (!fBatteryExtendedInfo.oem_info
-			|| !strlen(fBatteryExtendedInfo.oem_info)))
+		&& fBatteryExtendedInfo.model_number[0] == '\0'
+		&& fBatteryExtendedInfo.serial_number[0] == '\0'
+		&& fBatteryExtendedInfo.type[0] == '\0'
+		&& fBatteryExtendedInfo.oem_info[0] == '\0')
 		fontString->string = B_TRANSLATE("Empty battery slot");
 	else if (fBatteryInfo.state & BATTERY_CRITICAL_STATE)
 		fontString->string = B_TRANSLATE("Damaged battery");
