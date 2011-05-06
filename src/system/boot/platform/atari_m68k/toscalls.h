@@ -397,6 +397,8 @@ static inline int Bconputs(int16 handle, const char *string)
 
 #define VM_INQUIRE	-1
 
+#define MI_MAGIC	0x4d49
+
 #ifndef __ASSEMBLER__
 
 //extern int32 xbios(uint16 nr, ...);
@@ -405,8 +407,9 @@ static inline int Bconputs(int16 handle, const char *string)
 #define Initmous(mode, param, vec) toscallWPP(XBIOS_TRAP, 0, (int16)mode, (void *)param, (void *)vec)
 #define Physbase() (void *)toscallV(XBIOS_TRAP, 2)
 #define Logbase() (void *)toscallV(XBIOS_TRAP, 3)
-//#define Getrez() toscallV(XBIOS_TRAP, 4)
-#define Setscreen(log, phys, mode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
+#define Getrez() toscallV(XBIOS_TRAP, 4)
+#define Setscreen(log, phys, mode) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode, (int16)0)
+#define SetscreenM(log, phys, command) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)MI_MAGIC, (int16)command)
 #define VsetScreen(log, phys, mode, modecode) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode, (int16)modecode)
 #define Floprd(buf, dummy, dev, sect, track, side, count) toscallPLWWWWW(XBIOS_TRAP, 8, (void *)buf, (int32)dummy, (int16)dev, (int16)sect, (int16)track, (int16)side, (int16)count)
 //#define Mfpint() toscallV(XBIOS_TRAP, 13, )
