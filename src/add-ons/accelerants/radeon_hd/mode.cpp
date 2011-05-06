@@ -293,7 +293,7 @@ radeon_get_display_mode(display_mode *_currentMode)
 {
 	TRACE("%s\n", __func__);
 
-	_currentMode = &sDisplayMode;
+	*_currentMode = sDisplayMode;
 	return B_OK;
 }
 
