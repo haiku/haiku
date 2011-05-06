@@ -83,6 +83,12 @@
 #define PIC_NUM_INTS			0x0f
 
 
+// ACPI interrupt models
+#define ACPI_INTERRUPT_MODEL_PIC	0
+#define ACPI_INTERRUPT_MODEL_APIC	1
+#define ACPI_INTERRUPT_MODEL_SAPIC	2
+
+
 // Definitions for a 82093AA IO APIC controller
 #define IO_APIC_IDENTIFICATION				0x00
 #define IO_APIC_VERSION						0x01
@@ -571,6 +577,21 @@ ioapic_map(kernel_args* args)
 }
 
 
+static status_t
+acpi_set_interrupt_model(acpi_module_info* acpiModule, uint32 interruptModel)
+{
+	acpi_object_type model;
+	model.object_type = ACPI_TYPE_INTEGER;
+	model.data.integer = interruptModel;
+
+	acpi_objects parameter;
+	parameter.count = 1;
+	parameter.pointer = &model;
+
+	return acpiModule->evaluate_method(NULL, "\\_PIC", &parameter, NULL);
+}
+
+
 static void
 ioapic_init(kernel_args* args)
 {
@@ -609,13 +630,21 @@ ioapic_init(kernel_args* args)
 	BPrivate::CObjectDeleter<const char, status_t>
 		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
 
-	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
-	// routing.
+	// switch to the APIC interrupt model before retrieving the irq routing
+	// table as it will return different settings depending on the model
+	status = acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_APIC);
+	if (status != B_OK) {
+		dprintf("failed to put ACPI into APIC interrupt model, ignoring\n");
+		// don't abort, as the _PIC method is optional and as long as there
+		// aren't different routings based on it this is non-fatal
+	}
 
 	IRQRoutingTable table;
 	status = read_irq_routing_table(acpiModule, &table);
 	if (status != B_OK) {
 		dprintf("reading IRQ routing table failed, not configuring ioapic.\n");
+		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
+			// revert to PIC interrupt model just in case
 		return;
 	}
 
@@ -662,6 +691,10 @@ ioapic_init(kernel_args* args)
 	// setup default 1:1 mapping
 	for (uint32 i = 0; i < 256; i++)
 		sIRQToIOAPICPin[i] = i;
+
+#ifdef TRACE_ARCH_INT
+	print_irq_routing_table(&table);
+#endif
 
 	// configure io apic interrupts from pci routing table
 	for (int i = 0; i < table.Count(); i++) {
