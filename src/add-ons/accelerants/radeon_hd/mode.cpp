@@ -349,15 +349,15 @@ mode_sanity_check(display_mode *mode)
 	// horizontal timing
 	// validate h_sync_start is less then h_sync_end
 	if (mode->timing.h_sync_start > mode->timing.h_sync_end) {
-		TRACE("%s: ERROR: "
-			"(%dx%d) received h_sync_start greater then h_sync_end!\n",
+		TRACE("%s: ERROR: (%dx%d) "
+			"received h_sync_start greater then h_sync_end!\n",
 			__func__, mode->timing.h_display, mode->timing.v_display);
 		return B_ERROR;
 	}
 	// validate h_total is greater then h_display
 	if (mode->timing.h_total < mode->timing.h_display) {
-		TRACE("%s: ERROR: "
-			"(%dx%d) received h_total greater then h_display!\n",
+		TRACE("%s: ERROR: (%dx%d) "
+			"received h_total greater then h_display!\n",
 			__func__, mode->timing.h_display, mode->timing.v_display);
 		return B_ERROR;
 	}
@@ -365,16 +365,27 @@ mode_sanity_check(display_mode *mode)
 	// vertical timing
 	// validate v_start is less then v_end
 	if (mode->timing.v_sync_start > mode->timing.v_sync_end) {
-		TRACE("%s: ERROR: "
-			"(%dx%d) received v_sync_start greater then v_sync_end!\n",
+		TRACE("%s: ERROR: (%dx%d) "
+			"received v_sync_start greater then v_sync_end!\n",
 			__func__, mode->timing.h_display, mode->timing.v_display);
 		return B_ERROR;
 	}
 	// validate v_total is greater then v_display
 	if (mode->timing.v_total < mode->timing.v_display) {
-		TRACE("%s: ERROR: "
-			"(%dx%d) received v_total greater then v_display!\n",
+		TRACE("%s: ERROR: (%dx%d) "
+			"received v_total greater then v_display!\n",
 			__func__, mode->timing.h_display, mode->timing.v_display);
+		return B_ERROR;
+	}
+
+	// calculate refresh rate for given timings to whole int (in Hz)
+	int refresh = mode->timing.pixel_clock * 1000
+		/ (mode->timing.h_total * mode->timing.v_total);
+
+	if (refresh < 30 || refresh > 250) {
+		TRACE("%s: ERROR: (%dx%d) "
+			"refresh rate of %dHz is unlikely for any kind of monitor!\n",
+			__func__, mode->timing.h_display, mode->timing.v_display, refresh);
 		return B_ERROR;
 	}
 
