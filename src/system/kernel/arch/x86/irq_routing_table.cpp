@@ -39,15 +39,10 @@ irq_descriptor::irq_descriptor()
 void
 print_irq_descriptor(irq_descriptor* descriptor)
 {
-	for (int i = 0; i < 16; i++) {
-		if (descriptor->irq >> i & 0x01)
-			dprintf("interrupt: %i\n", i);
-	}
-
 	const char* activeHighString = "active high";
 	const char* activeLowString = " active low";
 	const char* levelTriggeredString = "level triggered";
-	const char* edgeTriggeredString = " edge triggered";
+	const char* edgeTriggeredString = "edge triggered";
 
 	dprintf("irq: %u, shareable: %u, polarity: %s, interrupt_mode: %s\n",
 		descriptor->irq, descriptor->shareable,
@@ -61,13 +56,14 @@ print_irq_descriptor(irq_descriptor* descriptor)
 void
 print_irq_routing_table(IRQRoutingTable* table)
 {
-	dprintf("Print table %i entries\n", (int)table->Count());
+	dprintf("IRQ routing table with %i entries\n", (int)table->Count());
 	for (int i = 0; i < table->Count(); i++) {
 		irq_routing_entry& entry = table->ElementAt(i);
-		dprintf("address: %x\n", entry.device_address);
-		dprintf("pin: %i\n", entry.pin);
-		dprintf("source: %x\n", int(entry.source));
-		dprintf("source index: %i\n", entry.source_index);
+		dprintf("\tentry %i\n", i);
+		dprintf("\t\taddress: %x\n", entry.device_address);
+		dprintf("\t\tpin: %i\n", entry.pin);
+		dprintf("\t\tsource: 0x%x\n", int(entry.source));
+		dprintf("\t\tsource index: %i\n", entry.source_index);
 	}
 }
 
