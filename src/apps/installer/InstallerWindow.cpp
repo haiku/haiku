@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "InstallerWindow.h"
 
 #include <stdio.h>
@@ -183,11 +184,11 @@ InstallerWindow::InstallerWindow()
 		true, false);
 
 	fSrcMenuField = new BMenuField("srcMenuField",
-		B_TRANSLATE("Install from:"), fSrcMenu, NULL);
+		B_TRANSLATE("Install from:"), fSrcMenu);
 	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fDestMenuField = new BMenuField("destMenuField", B_TRANSLATE("Onto:"),
-		fDestMenu, NULL);
+		fDestMenu);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fPackagesSwitch = new PaneSwitch("options_button");

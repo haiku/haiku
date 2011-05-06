@@ -81,7 +81,7 @@ add_menu_item(BMenu* menu,
 //
 // Returns:
 // ---------------------------------------------------------------
-TIFFView::TIFFView(const char *name, uint32 flags, 
+TIFFView::TIFFView(const char *name, uint32 flags,
 	TranslatorSettings *settings)
 	:	BView(name, flags)
 {
@@ -115,14 +115,14 @@ TIFFView::TIFFView(const char *name, uint32 flags,
 
 	uint32 currentCompression = fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION);
 	// create the menu items with the various compression methods
-	add_menu_item(menu, COMPRESSION_NONE, B_TRANSLATE("None"), 
+	add_menu_item(menu, COMPRESSION_NONE, B_TRANSLATE("None"),
 		currentCompression);
 	menu->AddSeparatorItem();
-	add_menu_item(menu, COMPRESSION_PACKBITS, B_TRANSLATE("RLE (Packbits)"), 
+	add_menu_item(menu, COMPRESSION_PACKBITS, B_TRANSLATE("RLE (Packbits)"),
 		currentCompression);
-	add_menu_item(menu, COMPRESSION_DEFLATE, B_TRANSLATE("ZIP (Deflate)"), 
+	add_menu_item(menu, COMPRESSION_DEFLATE, B_TRANSLATE("ZIP (Deflate)"),
 		currentCompression);
-	add_menu_item(menu, COMPRESSION_LZW, B_TRANSLATE("LZW"), 
+	add_menu_item(menu, COMPRESSION_LZW, B_TRANSLATE("LZW"),
 		currentCompression);
 
 // TODO: the disabled compression modes are not configured in libTIFF
@@ -131,12 +131,11 @@ TIFFView::TIFFView(const char *name, uint32 flags,
 // TODO ? - strip encoding is not implemented in libTIFF for this compression
 //	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
- 	fCompressionMF = new BMenuField(B_TRANSLATE("Use Compression:"), menu,
-		NULL);
- 
+ 	fCompressionMF = new BMenuField(B_TRANSLATE("Use Compression:"), menu);
+
  	// Build the layout
  	SetLayout(new BGroupLayout(B_VERTICAL));
- 
+
  	i = 0;
  	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
  		.Add(fTitle)
@@ -153,7 +152,7 @@ TIFFView::TIFFView(const char *name, uint32 flags,
  		.AddGlue()
  		.SetInsets(5, 5, 5, 5)
  	);
- 
+
  	BFont font;
  	GetFont(&font);
  	SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));

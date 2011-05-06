@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Andrew McCall (mccall@digitalparadise.co.uk)
  *		Brecht Machiels (brecht@mos6581.org)
  */
+
 
 #include "SettingsView.h"
 
@@ -81,7 +82,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 		new BMessage(kMsgMouseType)));
 
 	BMenuField *fTypeField = new BMenuField(B_TRANSLATE("Mouse type:"),
-		fTypeMenu, NULL);
+		fTypeMenu);
 	fTypeField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Create the "Double-click speed slider...
@@ -136,7 +137,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 	}
 
 	BMenuField *fFocusField = new BMenuField(B_TRANSLATE("Focus mode:"),
-		fFocusMenu, NULL);
+		fFocusMenu);
 	fFocusField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Add the "Focus follows mouse mode" pop up menu
@@ -158,7 +159,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 	}
 
 	BMenuField *fFocusFollowsMouseField = new BMenuField(
-		"Focus follows mouse mode:", fFocusFollowsMouseMenu, NULL);
+		"Focus follows mouse mode:", fFocusFollowsMouseMenu);
 	fFocusFollowsMouseField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Add the "Click-through" check box

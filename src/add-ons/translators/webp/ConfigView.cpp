@@ -34,6 +34,7 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ConfigView"
 
+
 static const uint32 kMsgQuality	= 'qlty';
 static const uint32 kMsgPreset	= 'prst';
 static const uint32 kMsgMethod	= 'metd';
@@ -97,7 +98,7 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 		preset++;
 	}
 	BMenuField* presetsField = new BMenuField(B_TRANSLATE("Output preset:"),
-		fPresetsMenu, NULL);
+		fPresetsMenu);
 
 	fQualitySlider = new BSlider("quality", B_TRANSLATE("Output quality:"),
 		new BMessage(kMsgQuality), 0, 100, B_HORIZONTAL, B_BLOCK_THUMB);

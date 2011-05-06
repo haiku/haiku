@@ -1,6 +1,6 @@
 /*
  * Copyright 2009 Ankur Sethi <get.me.ankur@gmail.com>
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2011, Axel Dörfler, axeld@pinc-software.de.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -42,23 +42,22 @@ OpenWindow::OpenWindow()
 	if (BMenuItem *item = fDevicesMenu->ItemAt(0))
 		item->SetMarked(true);
 
-	BMenuField *field = new BMenuField(B_TRANSLATE("Examine device:"), fDevicesMenu, 
-		NULL);
+	BMenuField *field = new BMenuField(B_TRANSLATE("Examine device:"),
+		fDevicesMenu);
 
-	BButton *probeDeviceButton = new BButton("device", B_TRANSLATE("Probe device"),
-		new BMessage(kMsgProbeDevice));
+	BButton *probeDeviceButton = new BButton("device",
+		B_TRANSLATE("Probe device"), new BMessage(kMsgProbeDevice));
 	probeDeviceButton->MakeDefault(true);
 
-	BButton *probeFileButton = new BButton("file", 
+	BButton *probeFileButton = new BButton("file",
 		B_TRANSLATE("Probe file" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgProbeFile));
 
 	BButton *cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	
+
 	AddChild(BGridLayoutBuilder(8, 8)
 		.Add(field, 0, 0, 3)
 		.Add(cancelButton, 0, 1)
@@ -76,7 +75,7 @@ OpenWindow::~OpenWindow()
 }
 
 
-void 
+void
 OpenWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -115,7 +114,7 @@ OpenWindow::MessageReceived(BMessage *message)
 }
 
 
-bool 
+bool
 OpenWindow::QuitRequested()
 {
 	be_app_messenger.SendMessage(kMsgOpenWindowClosed);
@@ -123,7 +122,7 @@ OpenWindow::QuitRequested()
 }
 
 
-void 
+void
 OpenWindow::CollectDevices(BMenu *menu, BEntry *startEntry)
 {
 	BDirectory directory;

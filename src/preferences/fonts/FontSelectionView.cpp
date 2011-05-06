@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -99,12 +99,11 @@ FontSelectionView::FontSelectionView(const char* name,
 	fFontsMenu = new BPopUpMenu("font menu");
 
 	// font menu
-	fFontsMenuField = new BMenuField("fonts", label, fFontsMenu, NULL);
+	fFontsMenuField = new BMenuField("fonts", label, fFontsMenu);
 	fFontsMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// size menu
-	fSizesMenuField = new BMenuField("size", B_TRANSLATE("Size:"),
-		fSizesMenu, NULL);
+	fSizesMenuField = new BMenuField("size", B_TRANSLATE("Size:"), fSizesMenu);
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// preview

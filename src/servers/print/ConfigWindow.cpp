@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku. All rights reserved.
+ * Copyright 2002-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -153,7 +153,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Select a printer"));
 	SetupPrintersMenu(menu);
 
-	fPrinters = new BMenuField(B_TRANSLATE("Printer:"), menu, NULL);
+	fPrinters = new BMenuField(B_TRANSLATE("Printer:"), menu);
 
 	// page format button
 	fPageSetup = AddPictureButton(panel, dummyRect, "Paper setup",

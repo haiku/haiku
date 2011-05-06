@@ -688,7 +688,7 @@ VideoWindow::_BuildCaptureControls()
 		fImageFormatMenu->ItemAt(0)->SetMarked(true);
 
 	fImageFormatSelector = new BMenuField("Format", B_TRANSLATE("Format:"),
-		fImageFormatMenu, NULL);
+		fImageFormatMenu);
 
 	// capture rate
 	fCaptureRateMenu = new BPopUpMenu(B_TRANSLATE("Capture Rate Menu"));
@@ -701,7 +701,7 @@ VideoWindow::_BuildCaptureControls()
 	fCaptureRateMenu->SetTargetForItems(this);
 	fCaptureRateMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
 	fCaptureRateSelector = new BMenuField("Rate", B_TRANSLATE("Rate:"),
-		fCaptureRateMenu, NULL);
+		fCaptureRateMenu);
 
 	BLayoutBuilder::Grid<>(controlsLayout)
 		.AddTextControl(fFileName, 0, 0)
@@ -721,7 +721,7 @@ VideoWindow::_BuildCaptureControls()
 	fUploadClientMenu->SetTargetForItems(this);
 	fUploadClientMenu->FindItem(fUploadClientSetting->Value())->SetMarked(true);
 	fUploadClientSelector = new BMenuField("UploadClient", NULL,
-		fUploadClientMenu, NULL);
+		fUploadClientMenu);
 
 	fFtpSetupBox->SetLabel(B_TRANSLATE("Output"));
 	// this doesn't work with the layout manager

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -200,7 +200,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fAllWorkspacesItem->SetMarked(true);
 
 	BMenuField* workspaceMenuField = new BMenuField("WorkspaceMenu", NULL,
-		popUpMenu, NULL);
+		popUpMenu);
 	workspaceMenuField->ResizeToPreferred();
 
 	// box on the left with workspace count and monitor view
@@ -283,7 +283,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fMonitorView->SetMaxResolution(maxWidth, maxHeight);
 
 	fResolutionField = new BMenuField("ResolutionMenu",
-		B_TRANSLATE("Resolution:"), fResolutionMenu, NULL);
+		B_TRANSLATE("Resolution:"), fResolutionMenu);
 
 	fColorsMenu = new BPopUpMenu("colors", true, false);
 
@@ -303,7 +303,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	}
 
 	fColorsField = new BMenuField("ColorsMenu", B_TRANSLATE("Colors:"),
-		fColorsMenu, NULL);
+		fColorsMenu);
 
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
@@ -349,7 +349,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	}
 
 	fRefreshField = new BMenuField("RefreshMenu", B_TRANSLATE("Refresh rate:"),
-		fRefreshMenu, NULL);
+		fRefreshMenu);
 
 	if (_IsVesa())
 		fRefreshField->Hide();
@@ -381,7 +381,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		}
 
 		fCombineField = new BMenuField("CombineMenu",
-			B_TRANSLATE("Combine displays:"), fCombineMenu, NULL);
+			B_TRANSLATE("Combine displays:"), fCombineMenu);
 
 		if (!multiMonSupport)
 			fCombineField->Hide();
@@ -399,7 +399,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		fSwapDisplaysMenu->AddItem(new BMenuItem(B_TRANSLATE("yes"), message));
 
 		fSwapDisplaysField = new BMenuField("SwapMenu",
-			B_TRANSLATE("Swap displays:"), fSwapDisplaysMenu, NULL);
+			B_TRANSLATE("Swap displays:"), fSwapDisplaysMenu);
 
 		if (!multiMonSupport)
 			fSwapDisplaysField->Hide();
@@ -419,7 +419,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			message));
 
 		fUseLaptopPanelField = new BMenuField("UseLaptopPanel",
-			B_TRANSLATE("Use laptop panel:"), fUseLaptopPanelMenu, NULL);
+			B_TRANSLATE("Use laptop panel:"), fUseLaptopPanelMenu);
 
 		if (!useLaptopPanelSupport)
 			fUseLaptopPanelField->Hide();
@@ -442,7 +442,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		}
 
 		fTVStandardField = new BMenuField("tv standard",
-			B_TRANSLATE("Video format:"), fTVStandardMenu, NULL);
+			B_TRANSLATE("Video format:"), fTVStandardMenu);
 		fTVStandardField->SetAlignment(B_ALIGN_RIGHT);
 
 		if (!tvStandardSupport || i == 0)

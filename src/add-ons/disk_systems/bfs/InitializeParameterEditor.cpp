@@ -23,8 +23,10 @@
 #include <View.h>
 #include <Window.h>
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "BFS_Initialize_Parameter"
+
 
 static uint32 MSG_BLOCK_SIZE = 'blsz';
 static uint32 MSG_NAME_CHANGED = 'nmch';
@@ -121,8 +123,7 @@ InitializeBFSEditor::_CreateViewControls()
 	blocksizeMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("8192 (Mostly large files)"), message));
 
-	fBlockSizeMF = new BMenuField(B_TRANSLATE("Blocksize:"), blocksizeMenu,
-		NULL);
+	fBlockSizeMF = new BMenuField(B_TRANSLATE("Blocksize:"), blocksizeMenu);
 	defaultItem->SetMarked(true);
 
 	fUseIndicesCB = new BCheckBox(B_TRANSLATE("Enable query support"), NULL);

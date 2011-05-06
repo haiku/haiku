@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "AntialiasingSettingsView.h"
 
 #include <stdio.h>
@@ -87,7 +88,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// antialiasing menu
 	_BuildAntialiasingMenu();
 	fAntialiasingMenuField = new BMenuField("antialiasing",
-		B_TRANSLATE("Antialiasing type:"), fAntialiasingMenu, NULL);
+		B_TRANSLATE("Antialiasing type:"), fAntialiasingMenu);
 
 	// "average weight" in subpixel filtering
 	fAverageWeightControl = new BSlider("averageWeightControl",
@@ -102,7 +103,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// hinting menu
 	_BuildHintingMenu();
 	fHintingMenuField = new BMenuField("hinting", B_TRANSLATE("Glyph hinting:"),
-		fHintingMenu, NULL);
+		fHintingMenu);
 
 #ifdef DISABLE_HINTING_CONTROL
 	fHintingMenuField->SetEnabled(false);

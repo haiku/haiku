@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-20010 Haiku Inc. All rights reserved.
+ * Copyright 2008-20011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -247,7 +247,7 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	}
 
 	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),
-		fTypePopUpMenu, NULL);
+		fTypePopUpMenu);
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, spacing);

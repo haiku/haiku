@@ -163,7 +163,7 @@ public:
 									ptr++;
 								}
 								ptr++;
-								if (sscanf(ptr, "%d", 
+								if (sscanf(ptr, "%d",
 									(int*)&g_settings.out_space) != 1) {
 									syslog(LOG_ERR, "illegal color space "
 										"in PPMTranslator settings: %s", ptr);
@@ -174,8 +174,8 @@ public:
 									ptr++;
 								}
 								ptr++;
-								if (sscanf(ptr, "%f,%f", 
-									&g_settings.window_pos.x, 
+								if (sscanf(ptr, "%f,%f",
+									&g_settings.window_pos.x,
 									&g_settings.window_pos.y) != 2) {
 									syslog(LOG_ERR, "illegal window position "
 										"in PPMTranslator settings: %s", ptr);
@@ -455,13 +455,13 @@ public:
 				SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 				SetLowColor(ViewColor());
 
-				mTitle = new BStringView("title", 
+				mTitle = new BStringView("title",
 					B_TRANSLATE("PPM Image Translator"));
 				mTitle->SetFont(be_bold_font);
 
 				char detail[100];
 				int ver = static_cast<int>(translatorVersion);
-				sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"), ver >> 8, 
+				sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"), ver >> 8,
 					((ver >> 4) & 0xf),
 					(ver & 0xf), __DATE__);
 				mDetail = new BStringView("detail", detail);
@@ -473,26 +473,26 @@ public:
 					B_TRANSLATE("Sample code copyright 1999, Be Incorporated"));
 
 				mMenu = new BPopUpMenu("Color Space");
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("None"),
 					CSMessage(B_NO_COLOR_SPACE)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits"),
 					CSMessage(B_RGB32)));
 				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
 					"bits"), CSMessage(B_RGBA32)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits"),
 					CSMessage(B_RGB15)));
 				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
 					"bits"), CSMessage(B_RGBA15)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits"),
 					CSMessage(B_RGB16)));
 				mMenu->AddItem(new BMenuItem(B_TRANSLATE("System palette 8 "
 					"bits"), CSMessage(B_CMAP8)));
 				mMenu->AddSeparatorItem();
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Grayscale 8 bits"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Grayscale 8 bits"),
 					CSMessage(B_GRAY8)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Bitmap 1 bit"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Bitmap 1 bit"),
 					CSMessage(B_GRAY1)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMY 8:8:8 32 bits"), 
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMY 8:8:8 32 bits"),
 					CSMessage(B_CMY32)));
 				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYA 8:8:8:8 32 "
 					"bits"), CSMessage(B_CMYA32)));
@@ -509,8 +509,8 @@ public:
 					"bits big-endian"), CSMessage(B_RGBA15_BIG)));
 				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits "
 					"big-endian"), CSMessage(B_RGB16)));
- 				mField = new BMenuField(B_TRANSLATE("Input Color Space"), 
- 					mMenu, NULL);
+ 				mField = new BMenuField(B_TRANSLATE("Input Color Space"),
+					mMenu);
  				mField->SetViewColor(ViewColor());
  				SelectColorSpace(g_settings.out_space);
  				BMessage * msg = new BMessage(CHANGE_ASCII);
@@ -649,7 +649,7 @@ MakeConfig(	/*	optional	*/
 	BView * * outView,
 	BRect * outExtent)
 {
-	PPMView * v = new PPMView(B_TRANSLATE("PPMTranslator Settings"), 
+	PPMView * v = new PPMView(B_TRANSLATE("PPMTranslator Settings"),
 		B_WILL_DRAW);
 	*outView = v;
 	v->ResizeTo(v->ExplicitPreferredSize());;

@@ -1,17 +1,13 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered
-//  by the OpenBeOS license.
-//
-//
-//  File:        MediaViews.cpp
-//  Author:      Sikosis, Jérôme Duval
-//  Description: Media Preferences
-//  Created :    June 25, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2011, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Sikosis
+ *		Jérôme Duval
+ */
+
+
 #include "MediaViews.h"
 
 #include <AutoDeleter.h>
@@ -266,12 +262,12 @@ AudioSettingsView::AudioSettingsView()
 	BBox* defaultsBox = new BBox("defaults");
 	defaultsBox->SetLabel(B_TRANSLATE("Defaults"));
 	BGridView* defaultsGridView = new BGridView();
-	
+
 	BMenuField* inputMenuField = new BMenuField("inputMenuField",
-		B_TRANSLATE("Audio input:"), InputMenu(), NULL);
+		B_TRANSLATE("Audio input:"), InputMenu());
 
 	BMenuField* outputMenuField = new BMenuField("outputMenuField",
-		B_TRANSLATE("Audio output:"), OutputMenu(), NULL);
+		B_TRANSLATE("Audio output:"), OutputMenu());
 
 	BLayoutBuilder::Grid<>(defaultsGridView)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
@@ -372,7 +368,7 @@ AudioSettingsView::_MakeChannelMenu()
 	fChannelMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fChannelMenu->SetLabelFromMarked(true);
 	BMenuField* channelMenuField = new BMenuField("channelMenuField",
-		B_TRANSLATE("Channel:"), fChannelMenu, NULL);
+		B_TRANSLATE("Channel:"), fChannelMenu);
 	return channelMenuField;
 }
 
@@ -493,12 +489,12 @@ VideoSettingsView::VideoSettingsView()
 	BBox* defaultsBox = new BBox("defaults");
 	defaultsBox->SetLabel(B_TRANSLATE("Defaults"));
 	BGridView* defaultsGridView = new BGridView();
-	
+
 	BMenuField* inputMenuField = new BMenuField("inputMenuField",
-		B_TRANSLATE("Video input:"), InputMenu(), NULL);
+		B_TRANSLATE("Video input:"), InputMenu());
 
 	BMenuField* outputMenuField = new BMenuField("outputMenuField",
-		B_TRANSLATE("Video output:"), OutputMenu(), NULL);
+		B_TRANSLATE("Video output:"), OutputMenu());
 
 	BLayoutBuilder::Grid<>(defaultsGridView)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,

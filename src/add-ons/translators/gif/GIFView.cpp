@@ -48,8 +48,8 @@ GIFView::GIFView(const char *name)
 	title->SetFont(be_bold_font);
 
 	char version_string[100];
-	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8), 
-		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf), 
+	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8),
+		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf),
 		__DATE__);
 	BStringView *version = new BStringView("Version", version_string);
 
@@ -57,13 +57,13 @@ GIFView::GIFView(const char *name)
 	BStringView *copyright = new BStringView("Copyright", copyrightString);
 
 	// menu fields (Palette & Colors)
-	fWebSafeMI = new BMenuItem(B_TRANSLATE("Websafe"), 
+	fWebSafeMI = new BMenuItem(B_TRANSLATE("Websafe"),
 		new BMessage(GV_WEB_SAFE), 0, 0);
-	fBeOSSystemMI = new BMenuItem(B_TRANSLATE("BeOS system"), 
+	fBeOSSystemMI = new BMenuItem(B_TRANSLATE("BeOS system"),
 		new BMessage(GV_BEOS_SYSTEM), 0, 0);
-	fGreyScaleMI = new BMenuItem(B_TRANSLATE("Greyscale"), 
+	fGreyScaleMI = new BMenuItem(B_TRANSLATE("Greyscale"),
 		new BMessage(GV_GREYSCALE), 0, 0);
-	fOptimalMI = new BMenuItem(B_TRANSLATE("Optimal"), 
+	fOptimalMI = new BMenuItem(B_TRANSLATE("Optimal"),
 		new BMessage(GV_OPTIMAL), 0, 0);
 	fPaletteM = new BPopUpMenu("PalettePopUpMenu", true, true, B_ITEMS_IN_COLUMN);
 	fPaletteM->AddItem(fWebSafeMI);
@@ -71,7 +71,7 @@ GIFView::GIFView(const char *name)
 	fPaletteM->AddItem(fGreyScaleMI);
 	fPaletteM->AddItem(fOptimalMI);
 
-	fColorCountM = new BPopUpMenu("ColorCountPopUpMenu", true, true, 
+	fColorCountM = new BPopUpMenu("ColorCountPopUpMenu", true, true,
 		B_ITEMS_IN_COLUMN);
 	int32 count = 2;
 	for (int32 i = 0; i < 8; i++) {
@@ -85,34 +85,33 @@ GIFView::GIFView(const char *name)
 	}
 	fColorCount256MI = fColorCountMI[7];
 
- 	fPaletteMF = new BMenuField(B_TRANSLATE("Palette"), fPaletteM, NULL);
- 
- 	fColorCountMF = new BMenuField(B_TRANSLATE("Colors"), fColorCountM, NULL);
- 
+ 	fPaletteMF = new BMenuField(B_TRANSLATE("Palette"), fPaletteM);
+ 	fColorCountMF = new BMenuField(B_TRANSLATE("Colors"), fColorCountM);
+
  	// check boxes
  	fUseDitheringCB = new BCheckBox(B_TRANSLATE("Use dithering"),
  		new BMessage(GV_USE_DITHERING));
- 
+
  	fInterlacedCB = new BCheckBox(B_TRANSLATE("Write interlaced images"),
  		new BMessage(GV_INTERLACED));
- 
+
  	fUseTransparentCB = new BCheckBox(B_TRANSLATE("Write transparent images"),
  		new BMessage(GV_USE_TRANSPARENT));
- 
+
  	// radio buttons
  	fUseTransparentAutoRB = new BRadioButton(
  		B_TRANSLATE("Automatic (from alpha channel)"),
  		new BMessage(GV_USE_TRANSPARENT_AUTO));
- 
+
  	fUseTransparentColorRB = new BRadioButton(B_TRANSLATE("Use RGB color"),
  		new BMessage(GV_USE_TRANSPARENT_COLOR));
- 
+
  	fTransparentRedTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_RED));
- 
+
  	fTransparentGreenTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_GREEN));
- 
+
  	fTransparentBlueTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_BLUE));
- 
+
 	BTextView *tr = fTransparentRedTC->TextView();
 	BTextView *tg = fTransparentGreenTC->TextView();
 	BTextView *tb = fTransparentBlueTC->TextView();
@@ -178,7 +177,7 @@ GIFView::RestorePrefs()
 {
 	fPrefs = new Prefs();
 
-	fColorCountMF->SetEnabled(false);	
+	fColorCountMF->SetEnabled(false);
 	fUseDitheringCB->SetEnabled(true);
 
 	switch (fPrefs->palettemode) {
@@ -194,7 +193,7 @@ GIFView::RestorePrefs()
 			break;
 		case OPTIMAL_PALETTE:
 			fOptimalMI->SetMarked(true);
-			fColorCountMF->SetEnabled(true);	
+			fColorCountMF->SetEnabled(true);
 			break;
 		default:
 			fPrefs->palettemode = WEB_SAFE_PALETTE;
@@ -214,7 +213,7 @@ GIFView::RestorePrefs()
 	}
 
 	fInterlacedCB->SetValue(fPrefs->interlaced);
-	
+
 	if (fGreyScaleMI->IsMarked()) fUseDitheringCB->SetValue(false);
 	else fUseDitheringCB->SetValue(fPrefs->usedithering);
 	fUseTransparentCB->SetValue(fPrefs->usetransparent);
@@ -233,7 +232,7 @@ GIFView::RestorePrefs()
 		fTransparentGreenTC->SetEnabled(false);
 		fTransparentBlueTC->SetEnabled(false);
 	}
-	
+
 	char temp[4];
 	sprintf(temp, "%d", fPrefs->transparentred);
 	fTransparentRedTC->SetText(temp);
