@@ -30,7 +30,7 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
-static display_mode gDisplayMode;
+static display_mode sDisplayMode;
 
 
 status_t
@@ -39,31 +39,31 @@ create_mode_list(void)
 	// TODO : Read active monitor EDID
 
 	/* Populate modeline with temporary example */
-	gDisplayMode.timing.pixel_clock = 71500;
-	gDisplayMode.timing.h_display = 1366;	// In Pixels
-	gDisplayMode.timing.h_sync_start = 1406;
-	gDisplayMode.timing.h_sync_end = 1438;
-	gDisplayMode.timing.h_total = 1510;
-	gDisplayMode.timing.v_display = 768;	// In Pixels
-	gDisplayMode.timing.v_sync_start = 771;
-	gDisplayMode.timing.v_sync_end = 777;
-	gDisplayMode.timing.v_total = 789;
-	gDisplayMode.timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
+	sDisplayMode.timing.pixel_clock = 71500;
+	sDisplayMode.timing.h_display = 1366;	// In Pixels
+	sDisplayMode.timing.h_sync_start = 1406;
+	sDisplayMode.timing.h_sync_end = 1438;
+	sDisplayMode.timing.h_total = 1510;
+	sDisplayMode.timing.v_display = 768;	// In Pixels
+	sDisplayMode.timing.v_sync_start = 771;
+	sDisplayMode.timing.v_sync_end = 777;
+	sDisplayMode.timing.v_total = 789;
+	sDisplayMode.timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
 
-	gDisplayMode.space = B_RGB32_LITTLE;	// Pixel configuration
-	gDisplayMode.virtual_width = 1366;		// In Pixels
-	gDisplayMode.virtual_height = 768;		// In Pixels
-	gDisplayMode.h_display_start = 0;
-	gDisplayMode.v_display_start = 0;
-	gDisplayMode.flags = 0;				// Mode flags (Some drivers use this
+	sDisplayMode.space = B_RGB32_LITTLE;	// Pixel configuration
+	sDisplayMode.virtual_width = 1366;		// In Pixels
+	sDisplayMode.virtual_height = 768;		// In Pixels
+	sDisplayMode.h_display_start = 0;
+	sDisplayMode.v_display_start = 0;
+	sDisplayMode.flags = 0;				// Mode flags (Some drivers use this
 
 	// TODO : loop over found modelines and add them to valid mode list
-	if (mode_sanity_check(&gDisplayMode) != B_OK) {
+	if (mode_sanity_check(&sDisplayMode) != B_OK) {
 		TRACE("Invalid modeline was found, aborting\n");
 		return B_ERROR;
 	}
 
-	gInfo->mode_list = &gDisplayMode;
+	gInfo->mode_list = &sDisplayMode;
 	gInfo->shared_info->mode_count = 1;
 	return B_OK;
 }
@@ -75,7 +75,7 @@ create_mode_list(void)
 uint32
 radeon_accelerant_mode_count(void)
 {
-	TRACE("%d\n", __func__);
+	TRACE("%s\n", __func__);
 
 	return gInfo->shared_info->mode_count;
 }
@@ -84,7 +84,7 @@ radeon_accelerant_mode_count(void)
 status_t
 radeon_get_mode_list(display_mode *modeList)
 {
-	TRACE("%d\n", __func__);
+	TRACE("%s\n", __func__);
 	memcpy(modeList, gInfo->mode_list,
 		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
@@ -293,7 +293,7 @@ radeon_get_display_mode(display_mode *_currentMode)
 {
 	TRACE("%s\n", __func__);
 
-	*_currentMode = gDisplayMode;
+	_currentMode = &sDisplayMode;
 	return B_OK;
 }
 
@@ -346,27 +346,35 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 status_t
 mode_sanity_check(display_mode *mode)
 {
-	if (mode->timing.h_display <= 0
-		|| mode->timing.h_sync_start <= 0
-		|| mode->timing.h_sync_end <= 0
-		|| mode->timing.h_total <= 0) {
-		TRACE("Invalid horizontal mode timing received for %dx%d\n",
-			mode->timing.h_display, mode->timing.v_display);
+	// horizontal timing
+	// validate h_sync_start is less then h_sync_end
+	if (mode->timing.h_sync_start > mode->timing.h_sync_end) {
+		TRACE("%s: ERROR: "
+			"(%dx%d) received h_sync_start greater then h_sync_end!\n",
+			__func__, mode->timing.h_display, mode->timing.v_display);
+		return B_ERROR;
+	}
+	// validate h_total is greater then h_display
+	if (mode->timing.h_total < mode->timing.h_display) {
+		TRACE("%s: ERROR: "
+			"(%dx%d) received h_total greater then h_display!\n",
+			__func__, mode->timing.h_display, mode->timing.v_display);
 		return B_ERROR;
 	}
 
-	if (mode->timing.v_display <= 0
-		|| mode->timing.v_sync_start <= 0
-		|| mode->timing.v_sync_end <= 0
-		|| mode->timing.v_total <= 0) {
-		TRACE("Invalid vertical mode timing received for %dx%d\n",
-			mode->timing.h_display, mode->timing.v_display);
+	// vertical timing
+	// validate v_start is less then v_end
+	if (mode->timing.v_sync_start > mode->timing.v_sync_end) {
+		TRACE("%s: ERROR: "
+			"(%dx%d) received v_sync_start greater then v_sync_end!\n",
+			__func__, mode->timing.h_display, mode->timing.v_display);
 		return B_ERROR;
 	}
-
-	if (mode->flags <= 0) {
-		TRACE("Invalid mode timing flag received for %dx%d\n",
-			mode->timing.h_display, mode->timing.v_display);
+	// validate v_total is greater then v_display
+	if (mode->timing.v_total < mode->timing.v_display) {
+		TRACE("%s: ERROR: "
+			"(%dx%d) received v_total greater then v_display!\n",
+			__func__, mode->timing.h_display, mode->timing.v_display);
 		return B_ERROR;
 	}
 
