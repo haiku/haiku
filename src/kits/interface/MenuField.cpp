@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -168,6 +168,32 @@ BMenuField::BMenuField(BRect frame, const char* name, const char* label,
 
 
 BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
+		uint32 flags)
+	:
+	BView(name, flags | B_FRAME_EVENTS)
+{
+	InitObject(label);
+
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), true);
+
+	InitObject2();
+}
+
+
+BMenuField::BMenuField(const char* label, BMenu* menu, uint32 flags)
+	:
+	BView(NULL, flags | B_FRAME_EVENTS)
+{
+	InitObject(label);
+
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), true);
+
+	InitObject2();
+}
+
+
+//! Copy&Paste error, should be removed at some point (already private)
+BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 		BMessage* message, uint32 flags)
 	:
 	BView(name, flags | B_FRAME_EVENTS)
@@ -180,6 +206,7 @@ BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 }
 
 
+//! Copy&Paste error, should be removed at some point (already private)
 BMenuField::BMenuField(const char* label, BMenu* menu, BMessage* message)
 	:
 	BView(NULL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
@@ -207,7 +234,7 @@ BMenuField::BMenuField(BMessage* data)
 	int32 align;
 	if (data->FindInt32("_align", &align) == B_OK)
 		SetAlignment((alignment)align);
-	
+
 	if (!BUnarchiver::IsArchiveManaged(data))
 		_InitMenuBar(data);
 	unarchiver.Finish();

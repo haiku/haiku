@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_FIELD_H
@@ -25,10 +25,9 @@ public:
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(const char* name,
 									const char* label, BMenu* menu,
-									BMessage* message = NULL,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-								BMenuField(const char* label,
-									BMenu* menu, BMessage* message = NULL);
+								BMenuField(const char* label, BMenu* menu,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(BMessage* data);
 	virtual						~BMenuField();
 
@@ -112,6 +111,13 @@ private:
 	friend class LabelLayoutItem;
 	friend class MenuBarLayoutItem;
 	friend class LayoutData;
+
+								BMenuField(const char* name,
+									const char* label, BMenu* menu,
+									BMessage* message,
+									uint32 flags);
+								BMenuField(const char* label,
+									BMenu* menu, BMessage* message);
 
 			void				InitObject(const char* label);
 			void				InitObject2();
