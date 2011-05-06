@@ -27,9 +27,9 @@
 
 #define TRACE_DRIVER
 #ifdef TRACE_DRIVER
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("radeon_hd: " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 #define MAX_CARDS 1
@@ -140,7 +140,7 @@ get_next_radeon_hd(int32 *_cookie, pci_info &info, uint32 &type)
 extern "C" const char **
 publish_devices(void)
 {
-	TRACE((DEVICE_NAME ": publish_devices()\n"));
+	TRACE("%s\n", __func__);
 	return (const char **)gDeviceNames;
 }
 
@@ -148,11 +148,11 @@ publish_devices(void)
 extern "C" status_t
 init_hardware(void)
 {
-	TRACE((DEVICE_NAME ": init_hardware()\n"));
+	TRACE("%s\n", __func__);
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCI);
 	if (status != B_OK) {
-		TRACE((DEVICE_NAME ": pci module unavailable\n"));
+		dprintf(DEVICE_NAME ": ERROR: pci module unavailable\n");
 		return status;
 	}
 
@@ -169,11 +169,11 @@ init_hardware(void)
 extern "C" status_t
 init_driver(void)
 {
-	TRACE((DEVICE_NAME ": init_driver()\n"));
+	TRACE("%s\n", __func__);
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
-		TRACE((DEVICE_NAME ": pci module unavailable\n"));
+		dprintf(DEVICE_NAME ": ERROR: pci module unavailable\n");
 		return status;
 	}
 
@@ -222,7 +222,7 @@ init_driver(void)
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
 
-		dprintf(DEVICE_NAME ": (%ld) %s, revision = 0x%x\n", found,
+		dprintf(DEVICE_NAME ": GPU(%ld) %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);
 
 		found++;
@@ -244,7 +244,7 @@ init_driver(void)
 extern "C" void
 uninit_driver(void)
 {
-	TRACE((DEVICE_NAME ": uninit_driver()\n"));
+	TRACE("%s\n", __func__);
 
 	mutex_destroy(&gLock);
 
@@ -264,7 +264,7 @@ find_device(const char* name)
 {
 	int index;
 
-	TRACE((DEVICE_NAME ": find_device()\n"));
+	TRACE("%s\n", __func__);
 
 	for (index = 0; gDeviceNames[index] != NULL; index++) {
 		if (!strcmp(name, gDeviceNames[index]))
