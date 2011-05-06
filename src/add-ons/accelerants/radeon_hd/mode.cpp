@@ -30,7 +30,7 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
-static display_mode *gDisplayMode;
+static display_mode gDisplayMode;
 
 
 status_t
@@ -39,27 +39,31 @@ create_mode_list(void)
 	// TODO : Read active monitor EDID
 
 	/* Populate modeline with temporary example */
-	gDisplayMode->timing.pixel_clock = 71500;
-	gDisplayMode->timing.h_display = 1366;	// In Pixels
-	gDisplayMode->timing.h_sync_start = 1406;
-	gDisplayMode->timing.h_sync_end = 1438;
-	gDisplayMode->timing.h_total = 1510;
-	gDisplayMode->timing.v_display = 768;	// In Pixels
-	gDisplayMode->timing.v_sync_start = 771;
-	gDisplayMode->timing.v_sync_end = 777;
-	gDisplayMode->timing.v_total = 789;
-	gDisplayMode->timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
+	gDisplayMode.timing.pixel_clock = 71500;
+	gDisplayMode.timing.h_display = 1366;	// In Pixels
+	gDisplayMode.timing.h_sync_start = 1406;
+	gDisplayMode.timing.h_sync_end = 1438;
+	gDisplayMode.timing.h_total = 1510;
+	gDisplayMode.timing.v_display = 768;	// In Pixels
+	gDisplayMode.timing.v_sync_start = 771;
+	gDisplayMode.timing.v_sync_end = 777;
+	gDisplayMode.timing.v_total = 789;
+	gDisplayMode.timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
 
-	gDisplayMode->space = B_RGB32_LITTLE;	// Pixel configuration
-	gDisplayMode->virtual_width = 1366;		// In Pixels
-	gDisplayMode->virtual_height = 768;		// In Pixels
-	gDisplayMode->h_display_start = 0;
-	gDisplayMode->v_display_start = 0;
-	gDisplayMode->flags = 0;				// Mode flags (Some drivers use this
+	gDisplayMode.space = B_RGB32_LITTLE;	// Pixel configuration
+	gDisplayMode.virtual_width = 1366;		// In Pixels
+	gDisplayMode.virtual_height = 768;		// In Pixels
+	gDisplayMode.h_display_start = 0;
+	gDisplayMode.v_display_start = 0;
+	gDisplayMode.flags = 0;				// Mode flags (Some drivers use this
 
-	mode_sanity_check(gDisplayMode);
+	// TODO : loop over found modelines and add them to valid mode list
+	if (mode_sanity_check(&gDisplayMode) != B_OK) {
+		TRACE("Invalid modeline was found, aborting\n");
+		return B_ERROR;
+	}
 
-	gInfo->mode_list = gDisplayMode;
+	gInfo->mode_list = &gDisplayMode;
 	gInfo->shared_info->mode_count = 1;
 	return B_OK;
 }
@@ -289,7 +293,7 @@ radeon_get_display_mode(display_mode *_currentMode)
 {
 	TRACE("%s\n", __func__);
 
-	_currentMode = gDisplayMode;
+	*_currentMode = gDisplayMode;
 	return B_OK;
 }
 
