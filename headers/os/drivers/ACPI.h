@@ -32,7 +32,7 @@ typedef void *				acpi_handle;
 #define ACPI_MAX_NOTIFY_HANDLER_TYPE	0x3
 
 #define ACPI_MAX_SYS_NOTIFY				0x7f
-    
+
 /* Address Space (Operation Region) Types */
 
 enum {
@@ -86,7 +86,7 @@ enum {
 struct acpi_object_type {
 	uint32 object_type;
 	union {
-		uint32 integer;
+		uint64 integer;
 		struct {
 			uint32 len;
 			char *string; /* You have to allocate string space yourself */
@@ -137,7 +137,7 @@ enum {
 
 /*
  * acpi_status should return ACPI specific error codes, not BeOS ones.
- */ 
+ */
 typedef uint32 acpi_status;
 
 #endif	// __ACTYPES_H__
