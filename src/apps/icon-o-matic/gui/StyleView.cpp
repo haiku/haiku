@@ -1,21 +1,19 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include "StyleView.h"
 
 #include <new>
 
-#if __HAIKU__
-# include "GridLayout.h"
-# include "GroupLayout.h"
-# include "SpaceLayoutItem.h"
-#endif
 #include <Catalog.h>
+#include <GridLayout.h>
+#include <GroupLayout.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -23,6 +21,7 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <PopUpMenu.h>
+#include <SpaceLayoutItem.h>
 #include <Window.h>
 
 #include "CommandStack.h"
@@ -52,14 +51,10 @@ enum {
 	STYLE_TYPE_GRADIENT,
 };
 
-// constructor
+
 StyleView::StyleView(BRect frame)
 	:
-#ifdef __HAIKU__
 	BView("style view", 0),
-#else
-	BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_FRAME_EVENTS),
-#endif
 	fCommandStack(NULL),
 	fCurrentColor(NULL),
 	fStyle(NULL),
@@ -79,29 +74,10 @@ StyleView::StyleView(BRect frame)
 	message->AddInt32("type", STYLE_TYPE_GRADIENT);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Gradient"), message));
 
-#ifdef __HAIKU__
 	BGridLayout* layout = new BGridLayout(5, 5);
 	SetLayout(layout);
 
-	fStyleType = new BMenuField(B_TRANSLATE("Style type"), menu, NULL);
-
-#else
-	frame.OffsetTo(B_ORIGIN);
-	frame.InsetBy(5, 5);
-	frame.bottom = frame.top + 15;
-
-	fStyleType = new BMenuField(frame, "style type", B_TRANSLATE("Style type"),
-		menu, true);
-	AddChild(fStyleType);
-
-	float width;
-	float height;
-	fStyleType->MenuBar()->GetPreferredSize(&width, &height);
-	fStyleType->MenuBar()->ResizeTo(width, height);
-	fStyleType->ResizeTo(frame.Width(), height + 6);
-	fStyleType->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-	fStyleType->MenuBar()->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-#endif // __HAIKU__
+	fStyleType = new BMenuField(B_TRANSLATE("Style type"), menu);
 
 	// gradient type
 	menu = new BPopUpMenu(B_TRANSLATE("<unavailable>"));
@@ -118,8 +94,7 @@ StyleView::StyleView(BRect frame)
 	message->AddInt32("type", GRADIENT_CONIC);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Conic"), message));
 
-#if __HAIKU__
-	fGradientType = new BMenuField(B_TRANSLATE("Gradient type"), menu, NULL);
+	fGradientType = new BMenuField(B_TRANSLATE("Gradient type"), menu);
 	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR), this);
 
 	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 0, 4);
@@ -136,49 +111,13 @@ StyleView::StyleView(BRect frame)
 	layout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(3), 3, 1, 1, 3);
 	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 4, 4);
 
-#else // !__HAIKU__
-	frame.OffsetBy(0, fStyleType->Frame().Height() + 6);
-	fGradientType = new BMenuField(frame, "gradient type", 
-		B_TRANSLATE("Gradient type"), menu, true);
-	AddChild(fGradientType);
-
-	fGradientType->MenuBar()->GetPreferredSize(&width, &height);
-	fGradientType->MenuBar()->ResizeTo(width, height);
-	fGradientType->ResizeTo(frame.Width(), height + 6);
-	fGradientType->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-	fGradientType->MenuBar()->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-
-	// create gradient control
-	frame.top = fGradientType->Frame().bottom + 8;
-	frame.right = Bounds().right - 5;
-	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR),
-										   this);
-
-	width = frame.Width();
-	height = max_c(fGradientControl->Frame().Height(), 30);
-
-	fGradientControl->ResizeTo(width, height);
-	fGradientControl->FrameResized(width, height);
-	fGradientControl->MoveTo(frame.left, frame.top);
-	fGradientControl->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-
-	AddChild(fGradientControl);
-
-	// align label divider
-	float divider = fGradientType->StringWidth(fGradientType->Label());
-	divider = max_c(divider, fStyleType->StringWidth(fStyleType->Label()));
-	fGradientType->SetDivider(divider + 8);
-	fStyleType->SetDivider(divider + 8);
-
-#endif // __HAIKU__
-
 	fStyleType->SetEnabled(false);
 	fGradientType->SetEnabled(false);
 	fGradientControl->SetEnabled(false);
 	fGradientControl->Gradient()->AddObserver(this);
 }
 
-// destructor
+
 StyleView::~StyleView()
 {
 	SetStyle(NULL);
@@ -186,7 +125,7 @@ StyleView::~StyleView()
 	fGradientControl->Gradient()->RemoveObserver(this);
 }
 
-// AttachedToWindow
+
 void
 StyleView::AttachedToWindow()
 {
@@ -194,37 +133,27 @@ StyleView::AttachedToWindow()
 	fGradientType->Menu()->SetTargetForItems(this);
 }
 
-// FrameResized
+
 void
 StyleView::FrameResized(float width, float height)
 {
-	BRect bounds = Bounds();
-
-#ifndef __HAIKU__
-	// Grrr, babysit the menubars...
-	BRect dirty = bounds;
-	dirty.left = min_c(bounds.right, fPreviousBounds.right) - 25;
-	fStyleType->ConvertFromParent(&dirty);
-	fStyleType->MenuBar()->ConvertFromParent(&dirty);
-	fStyleType->MenuBar()->Invalidate(dirty);
-	fGradientType->MenuBar()->Invalidate(dirty);
-#endif // !__HAIKU__
-
-	fPreviousBounds = bounds;
+	fPreviousBounds = Bounds();
 }
 
-// MessageReceived
+
 void
 StyleView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_SET_STYLE_TYPE: {
+		case MSG_SET_STYLE_TYPE:
+		{
 			int32 type;
 			if (message->FindInt32("type", &type) == B_OK)
 				_SetStyleType(type);
 			break;
 		}
-		case MSG_SET_GRADIENT_TYPE: {
+		case MSG_SET_GRADIENT_TYPE:
+		{
 			int32 type;
 			if (message->FindInt32("type", &type) == B_OK)
 				_SetGradientType(type);
@@ -241,9 +170,7 @@ StyleView::MessageReceived(BMessage* message)
 	}
 }
 
-#if __HAIKU__
 
-// MinSize
 BSize
 StyleView::MinSize()
 {
@@ -252,11 +179,10 @@ StyleView::MinSize()
 	return minSize;
 }
 
-#endif // __HAIKU__
 
 // #pragma mark -
 
-// ObjectChanged
+
 void
 StyleView::ObjectChanged(const Observable* object)
 {
@@ -316,9 +242,10 @@ StyleView::ObjectChanged(const Observable* object)
 	}
 }
 
+
 // #pragma mark -
 
-// StyleView
+
 void
 StyleView::SetStyle(Style* style)
 {
@@ -348,14 +275,14 @@ StyleView::SetStyle(Style* style)
 	_SetGradient(gradient, true);
 }
 
-// SetCommandStack
+
 void
 StyleView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
 }
 
-// SetCurrentColor
+
 void
 StyleView::SetCurrentColor(CurrentColor* color)
 {
@@ -371,11 +298,13 @@ StyleView::SetCurrentColor(CurrentColor* color)
 		fCurrentColor->AddObserver(this);
 }
 
+
 // #pragma mark -
 
-// _SetGradient
+
 void
-StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate, bool sendMessage)
+StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate,
+	bool sendMessage)
 {
 	if (!forceControlUpdate && fGradient == gradient)
 		return;
@@ -408,7 +337,7 @@ StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate, bool sendMe
 	}
 }
 
-// _MarkType
+
 void
 StyleView::_MarkType(BMenu* menu, int32 type) const
 {
@@ -423,7 +352,7 @@ StyleView::_MarkType(BMenu* menu, int32 type) const
 	}
 }
 
-// _SetStyleType
+
 void
 StyleView::_SetStyleType(int32 type)
 {
@@ -450,14 +379,14 @@ StyleView::_SetStyleType(int32 type)
 	}
 }
 
-// _SetGradientType
+
 void
 StyleView::_SetGradientType(int32 type)
 {
 	fGradientControl->Gradient()->SetType((gradients_type)type);
 }
 
-// _AdoptCurrentColor
+
 void
 StyleView::_AdoptCurrentColor(rgb_color color)
 {
@@ -479,7 +408,7 @@ StyleView::_AdoptCurrentColor(rgb_color color)
 	}
 }
 
-// _TransferGradientStopColor
+
 void
 StyleView::_TransferGradientStopColor()
 {
@@ -492,4 +421,3 @@ StyleView::_TransferGradientStopColor()
 		}
 	}
 }
-

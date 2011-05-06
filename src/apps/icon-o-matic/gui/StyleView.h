@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,9 +35,8 @@ enum {
 	MSG_STYLE_TYPE_CHANGED	= 'stch',
 };
 
-class StyleView : public BView,
-				  public Observer {
- public:
+class StyleView : public BView, public Observer {
+public:
 								StyleView(BRect frame);
 	virtual						~StyleView();
 
@@ -46,9 +45,7 @@ class StyleView : public BView,
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* message);
 
-#if __HAIKU__
 	virtual	BSize				MinSize();
-#endif
 
 	// Observer interface
 	virtual	void				ObjectChanged(const Observable* object);
@@ -58,18 +55,17 @@ class StyleView : public BView,
 			void				SetCommandStack(CommandStack* stack);
 			void				SetCurrentColor(CurrentColor* color);
 
- private:
+private:
 			void				_SetGradient(Gradient* gradient,
-											 bool forceControlUpdate = false,
-											 bool sendMessage = false);
-			void				_MarkType(BMenu* menu,
-										  int32 type) const;
+									bool forceControlUpdate = false,
+									bool sendMessage = false);
+			void				_MarkType(BMenu* menu, int32 type) const;
 			void				_SetStyleType(int32 type);
 			void				_SetGradientType(int32 type);
 			void				_AdoptCurrentColor(rgb_color color);
 			void				_TransferGradientStopColor();
 
-
+private:
 			CommandStack*		fCommandStack;
 			CurrentColor*		fCurrentColor;
 
@@ -84,5 +80,6 @@ class StyleView : public BView,
 
 			BRect				fPreviousBounds;
 };
+
 
 #endif // STYLE_VIEW_H
