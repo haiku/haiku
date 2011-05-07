@@ -135,6 +135,15 @@ enum {
 	ACPI_ALLOCATE_BUFFER = -1,
 };
 
+
+typedef struct acpi_pci_info {
+	uint16	segment;
+	uint16	bus;
+	uint16	device;
+	uint16	function;
+} acpi_pci_info;
+
+
 /*
  * acpi_status should return ACPI specific error codes, not BeOS ones.
  */
@@ -248,6 +257,10 @@ struct acpi_module_info {
 					size_t size);
 	status_t	(*enter_sleep_state)(uint8 state);
 	status_t	(*reboot)(void);
+
+	/* PCI specific info */
+	status_t	(*get_pci_info)(acpi_handle pciRootBridge, acpi_handle device,
+					acpi_pci_info *info);
 };
 
 

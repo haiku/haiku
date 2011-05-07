@@ -77,8 +77,8 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 static void dump_madt() {
 	ACPI_STATUS status;
 	ACPI_TABLE_HEADER *madt = NULL;
-	ACPI_SUBTABLE_HEADER *entry;
-	void *end;
+/*	ACPI_SUBTABLE_HEADER *entry;
+	void *end; */
 	int madtCount = -1;
 
 	while (true) {
@@ -481,14 +481,14 @@ get_device_hid(const char *path, char *hid, size_t bufferLength)
 	if (info.Type == ACPI_TYPE_INTEGER) {
 		uint32 eisaId = AcpiUtDwordByteSwap(info.Integer.Value);
 
-	    hid[0] = (char) ('@' + ((eisaId >> 26) & 0x1f));
-	    hid[1] = (char) ('@' + ((eisaId >> 21) & 0x1f));
-	    hid[2] = (char) ('@' + ((eisaId >> 16) & 0x1f));
-	    hid[3] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 12);
-	    hid[4] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 8);
-	    hid[5] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 4);
-	    hid[6] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 0);
-	    hid[7] = 0;
+		hid[0] = (char) ('@' + ((eisaId >> 26) & 0x1f));
+		hid[1] = (char) ('@' + ((eisaId >> 21) & 0x1f));
+		hid[2] = (char) ('@' + ((eisaId >> 16) & 0x1f));
+		hid[3] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 12);
+		hid[4] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 8);
+		hid[5] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 4);
+		hid[6] = AcpiUtHexToAsciiChar((ACPI_INTEGER)eisaId, 0);
+		hid[7] = 0;
 	}
 
 	hid[ACPI_DEVICE_ID_LENGTH] = '\0';
@@ -705,6 +705,48 @@ reboot(void)
 }
 
 
+status_t
+get_pci_info(acpi_handle pciRootBridge, acpi_handle device, acpi_pci_info *info)
+{
+	ACPI_STATUS status;
+	ACPI_HANDLE childNode;
+	uint64 deviceAddress = 0;
+	uint64 segment = 0;
+	uint64 busNumber = 0;
+
+	// We reset the structure to 0 here. Any failed evaluation means default
+	// values, so we don't have to do anything in the error case.
+	memset(info, 0, sizeof(acpi_pci_info));
+
+	status = AcpiUtEvaluateNumericObject(METHOD_NAME__ADR, device,
+		&deviceAddress);
+	if (status == AE_OK) {
+		info->device = (uint8)(deviceAddress >> 16);
+		info->function = (uint8)deviceAddress;
+	}
+
+	status = AcpiUtEvaluateNumericObject(METHOD_NAME__SEG, pciRootBridge,
+		&segment);
+	if (status == AE_OK)
+		info->segment = (uint8)segment;
+
+	status = AcpiUtEvaluateNumericObject(METHOD_NAME__BBN, pciRootBridge,
+		&busNumber);
+	if (status == AE_OK)
+		info->bus = (uint8)busNumber;
+
+	// since AcpiHwDerivePciId assumes getting a child object of the device
+	// it iterates one step less than we need - get any child node to work
+	// around that
+	status = AcpiGetNextObject(ACPI_TYPE_METHOD, device, NULL, &childNode);
+	if (status != AE_OK)
+		return B_ERROR;
+
+	status = AcpiHwDerivePciId((ACPI_PCI_ID*)info, pciRootBridge, childNode);
+	return status == AE_OK ? B_OK : B_ERROR;
+}
+
+
 struct acpi_module_info gACPIModule = {
 	{
 		B_ACPI_MODULE_NAME,
@@ -743,5 +785,6 @@ struct acpi_module_info gACPIModule = {
 	get_possible_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
-	reboot
+	reboot,
+	get_pci_info
 };
