@@ -1366,11 +1366,17 @@ if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Rsync available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			rsync-3.0.7-r1a2-x86-gcc2-2010-04-22-a.zip
-			: $(baseURL)/rsync-3.0.7-r1a2-x86-gcc2-2010-04-22-a.zip ;
-		InstallSourceArchive rsync-3.0.7_haiku-2010-04-29.tar.xz
-			: $(baseSourceURL)/2010/rsync-3.0.7_haiku-2010-04-29.tar.xz ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				rsync-3.0.7-x86-gcc4-2011-05-06.zip
+				: $(baseURL)/rsync-3.0.7-x86-gcc4-2011-05-06.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				rsync-3.0.7-x86-gcc2-2011-05-06.zip
+				: $(baseURL)/rsync-3.0.7-x86-gcc2-2011-05-06.zip
+				: : true ;
+		}
 	}
 }
 
