@@ -1416,8 +1416,8 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 				: $(baseURL)/sqlite-3.7.5-x86-gcc4-2011-03-16.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-x86-gcc2-2011-03-16.zip
-				: $(baseURL)/sqlite-3.7.5-x86-gcc2-2011-03-16.zip ;
+				sqlite-3.7.5-x86-gcc2-2011-05-06.zip
+				: $(baseURL)/sqlite-3.7.5-x86-gcc2-2011-05-06.zip ;
 		}
 	}
 }
