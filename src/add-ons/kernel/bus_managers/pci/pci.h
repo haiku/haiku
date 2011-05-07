@@ -103,6 +103,8 @@ public:
 
 			void			ClearDeviceStatus(PCIBus *bus, bool dumpStatus);
 
+			void			RefreshDeviceInfo();
+
 private:
 			void			_EnumerateBus(int domain, uint8 bus,
 								uint8 *subordinateBus = NULL);

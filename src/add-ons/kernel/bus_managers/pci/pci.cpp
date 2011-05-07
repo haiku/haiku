@@ -13,6 +13,7 @@
 
 #include "util/kernel_cpp.h"
 #include "pci_fixup.h"
+#include "pci_info.h"
 #include "pci_private.h"
 #include "pci.h"
 
@@ -414,6 +415,15 @@ pcistatus(int argc, char **argv)
 }
 
 
+static int
+pcirefresh(int argc, char **argv)
+{
+	gPCI->RefreshDeviceInfo();
+	pci_print_info();
+	return 0;
+}
+
+
 // #pragma mark bus manager init/uninit
 
 
@@ -450,6 +460,7 @@ pci_init(void)
 	gPCI->InitBus();
 
 	add_debugger_command("pcistatus", &pcistatus, "dump and clear pci device status registers");
+	add_debugger_command("pcirefresh", &pcirefresh, "refresh and print all pci_info");
 
 	return B_OK;
 }
@@ -1316,6 +1327,16 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			TRACE(("PCI: Header type unknown (0x%02x)\n", dev->info.header_type));
 			break;
 	}
+}
+
+
+void
+PCI::RefreshDeviceInfo()
+{
+	if (fRootBus == NULL)
+		return;
+
+	_RefreshDeviceInfo(fRootBus);
 }
 
 
