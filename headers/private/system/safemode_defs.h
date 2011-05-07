@@ -21,5 +21,7 @@
 #	define B_SAFEMODE_DISABLE_LATENCY_CHECK	"disable_latency_check"
 #endif
 
+#define B_SAFEMODE_ENABLE_IOAPIC			"enable_ioapic"
+	// TODO: temprary opt-in, can be removed once IO-APIC code is broadly tested
 
 #endif	/* _SYSTEM_SAFEMODE_DEFS_H */

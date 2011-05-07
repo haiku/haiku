@@ -614,11 +614,20 @@ ioapic_init(kernel_args* args)
 	if (sIOAPIC == NULL)
 		return;
 
-	if (get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, true)) {
+#if 0
+	if (get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, false)) {
 		dprintf("ioapic explicitly disabled, not using ioapics for interrupt "
 			"routing\n");
 		return;
 	}
+#else
+	// TODO: This can be removed once IO-APIC code is broadly tested
+	if (!get_safemode_boolean(B_SAFEMODE_ENABLE_IOAPIC, false)) {
+		dprintf("ioapic not enabled, not using ioapics for interrupt "
+			"routing\n");
+		return;
+	}
+#endif
 
 	uint32 version = ioapic_read_32(IO_APIC_VERSION);
 	if (version == 0xffffffff) {

@@ -580,13 +580,19 @@ smp_add_safemode_menus(Menu *menu)
 	MenuItem *item;
 
 	if (gKernelArgs.arch_args.ioapic_phys != 0) {
+#if 0
 		menu->AddItem(item = new(nothrow) MenuItem("Disable IO-APIC"));
 		item->SetType(MENU_ITEM_MARKABLE);
-		item->SetMarked(true);
-			// TODO: disabled by default for now
 		item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
-		item->SetHelpText("Disables using the IO APIC for interrupt handling, "
-			"forcing instead the use of the PIC.");
+		item->SetHelpText("Disables using the IO APIC for interrupt routing, "
+			"forcing the use of the legacy PIC instead.");
+#else
+		// TODO: This can be removed once IO-APIC code is broadly tested
+		menu->AddItem(item = new(nothrow) MenuItem("Enable IO-APIC"));
+		item->SetType(MENU_ITEM_MARKABLE);
+		item->SetData(B_SAFEMODE_ENABLE_IOAPIC);
+		item->SetHelpText("Enables using the IO APIC for interrupt routing.");
+#endif
 	}
 
 	if (gKernelArgs.arch_args.apic_phys != 0) {
