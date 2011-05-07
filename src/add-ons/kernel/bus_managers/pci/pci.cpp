@@ -277,6 +277,20 @@ err0:
 }
 
 
+status_t
+pci_update_interrupt_line(uchar virtualBus, uchar device, uchar function,
+	uchar newInterruptLineValue)
+{
+	uint8 bus;
+	int domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->UpdateInterruptLine(domain, bus, device, function,
+		newInterruptLineValue);
+}
+
+
 // used by pci_info.cpp print_info_basic()
 void
 __pci_resolve_virtual_bus(uint8 virtualBus, int *domain, uint8 *bus)
@@ -1539,4 +1553,30 @@ PCI::_FindDevice(PCIBus *current, int domain, uint8 bus, uint8 device,
 		return _FindDevice(current->next, domain, bus, device, function);
 
 	return NULL;
+}
+
+
+status_t
+PCI::UpdateInterruptLine(int domain, uint8 bus, uint8 _device, uint8 function,
+	uint8 newInterruptLineValue)
+{
+	PCIDev *device = FindDevice(domain, bus, _device, function);
+	if (device == NULL)
+		return B_ERROR;
+
+	pci_info &info = device->info;
+	switch (info.header_type & PCI_header_type_mask) {
+		case PCI_header_type_generic:
+			info.u.h0.interrupt_line = newInterruptLineValue;
+			break;
+
+		case PCI_header_type_PCI_to_PCI_bridge:
+			info.u.h1.interrupt_line = newInterruptLineValue;
+			break;
+
+		default:
+			return B_ERROR;
+	}
+
+	return WriteConfig(device, PCI_interrupt_line, 1, newInterruptLineValue);
 }

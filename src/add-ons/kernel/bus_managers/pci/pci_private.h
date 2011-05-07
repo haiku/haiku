@@ -53,6 +53,9 @@ status_t	pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 status_t	pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 			const char *driverName, void *nodeCookie);
 
+status_t	pci_update_interrupt_line(uchar virtualBus, uchar device,
+				uchar function, uchar newInterruptLineValue);
+
 status_t 	pci_io_init(void);
 uint8		pci_read_io_8(int mapped_io_addr);
 void		pci_write_io_8(int mapped_io_addr, uint8 value);

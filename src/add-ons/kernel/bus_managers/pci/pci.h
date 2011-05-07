@@ -105,6 +105,10 @@ public:
 
 			void			RefreshDeviceInfo();
 
+			status_t		UpdateInterruptLine(int domain, uint8 bus,
+								uint8 device, uint8 function,
+								uint8 newInterruptLineValue);
+
 private:
 			void			_EnumerateBus(int domain, uint8 bus,
 								uint8 *subordinateBus = NULL);

@@ -66,7 +66,8 @@ static struct pci_module_info sOldPCIModule = {
 	&pci_ram_address,
 	&pci_find_capability,
 	&pci_reserve_device,
-	&pci_unreserve_device
+	&pci_unreserve_device,
+	&pci_update_interrupt_line
 };
 
 module_dependency module_dependencies[] = {
