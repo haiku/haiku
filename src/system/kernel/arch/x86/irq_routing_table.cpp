@@ -27,6 +27,10 @@ const int kIRQDescriptor = 0x04;
 
 
 const char* kACPIPciRootName = "PNP0A03";
+const char* kACPIPciExpressRootName = "PNP0A08";
+	// Note that some configurations will still return the PCI express root
+	// when querying for the standard PCI root. This is due to the compatible ID
+	// fields in ACPI. TODO: Query both/the correct root device.
 
 
 irq_descriptor::irq_descriptor()
