@@ -829,9 +829,17 @@ if [ IsOptionalHaikuImagePackageAdded Groff ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Groff available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			 groff-1.20.1-x86-gcc2-2010-08-31.zip
-			: $(baseURL)/groff-1.20.1-x86-gcc2-2010-08-31.zip ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				groff-1.20.1-x86-gcc4-2011-05-06.zip
+				: $(baseURL)/groff-1.20.1-x86-gcc4-2011-05-06.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				 groff-1.20.1-x86-gcc2-2011-05-06.zip
+				: $(baseURL)/groff-1.20.1-x86-gcc2-2011-05-06.zip
+				: : true ;
+		}
 	}
 }
 
