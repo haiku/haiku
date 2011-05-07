@@ -493,8 +493,8 @@ This method calls operator+=(const char *str).
 /*!
 \fn BString& BString::Truncate(int32 newLength, bool lazy)
 \brief Truncate the string to the new length.
-\param newLength The new lenght of the string.
-\param lazy If true, the memory-optimisation is postponed to later
+\param newLength The new length of the string.
+\param lazy If true, the memory-optimization is postponed to later
 \return This method always returns \c *this .
 */
 
@@ -926,7 +926,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::ReplaceFirst(char replaceThis, char withThis)
-\brief Replace the first occurance of a character with another character.
+\brief Replace the first occurrence of a character with another character.
 \param replaceThis The character to replace.
 \param withThis The character to put in that place
 \return This method always returns \c *this.
@@ -935,7 +935,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::ReplaceLast(char replaceThis, char withThis)
-\brief Replace the last occurance of a character with another character.
+\brief Replace the last occurrence of a character with another character.
 \param replaceThis The character to replace.
 \param withThis The character to put in that place
 \return This method always returns \c *this.
@@ -944,7 +944,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
-\brief Replace all occurances of a character with another character.
+\brief Replace all occurrences of a character with another character.
 \param replaceThis The character to replace.
 \param withThis The character to put in that place
 \param fromOffset The offset where to start looking for the character
@@ -954,7 +954,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
-\brief Replace a number of occurances of a character with another character.
+\brief Replace a number of occurrences of a character with another character.
 \param replaceThis The character to replace.
 \param withThis The character to put in that place
 \param maxReplaceCount The maximum number of characters that should be replaced.
@@ -965,7 +965,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::ReplaceFirst(const char *replaceThis, const char *withThis)
-\brief Replace the first occurance of a string with another string.
+\brief Replace the first occurrence of a string with another string.
 \param replaceThis The C-string to replace.
 \param withThis The C-string to put in that place
 \return This method always returns \c *this.
@@ -974,7 +974,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::ReplaceLast(const char *replaceThis, const char *withThis)
-\brief Replace the last occurance of a string with another string.
+\brief Replace the last occurrence of a string with another string.
 \param replaceThis The C-string to replace.
 \param withThis The C-string to put in that place
 \return This method always returns \c *this.
@@ -983,7 +983,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
-\brief Replace all occurances of a string with another string.
+\brief Replace all occurrences of a string with another string.
 \param replaceThis The string to replace.
 \param withThis The string to put in that place
 \param fromOffset The offset where to start looking for the string.
@@ -993,7 +993,7 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
-\brief Replace a number of occurances of a string with another string.
+\brief Replace a number of occurrences of a string with another string.
 \param replaceThis The string to replace.
 \param withThis The string to put in that place
 \param maxReplaceCount The maximum number of occurences that should be replaced.
@@ -1004,55 +1004,55 @@ there are the same as implemented in this class.
 
 /*!
 \fn BString& BString::IReplaceFirst(char replaceThis, char withThis)
-\brief Replace the first occurance of a character with another character. Case insensitive.
+\brief Replace the first occurrence of a character with another character. Case insensitive.
 \sa ReplaceFirst(char replaceThis, char withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceLast(char replaceThis, char withThis)
-\brief Replace the last occurance of a character with another character. Case-insensitive.
+\brief Replace the last occurrence of a character with another character. Case-insensitive.
 
 \sa ReplaceLast(char replaceThis, char withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset) 
-\brief Replace all occurances of a character with another character. Case-insensitive.
+\brief Replace all occurrences of a character with another character. Case-insensitive.
 
 \sa ReplaceAll(char replaceThis, char withThis, int32 fromOffset) 
 */
 
 /*!
 \fn BString& BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
-\brief Replace a number of occurances of a character with another character. Case-insensive.
+\brief Replace a number of occurrences of a character with another character. Case-insensive.
 
 \sa Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::IReplaceFirst(const char *replaceThis, const char *withThis)
-\brief Replace the first occurance of a string with another string. Case-insensitive.
+\brief Replace the first occurrence of a string with another string. Case-insensitive.
 
 \sa ReplaceFirst(const char *replaceThis, const char *withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceLast(const char *replaceThis, const char *withThis)
-\brief Replace the last occurance of a string with another string. Case-insensitive.
+\brief Replace the last occurrence of a string with another string. Case-insensitive.
 
 \sa ReplaceLast(const char *replaceThis, const char *withThis)
 */
 
 /*!
 \fn BString& BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
-\brief Replace all occurances of a string with another string. Case-insensitive.
+\brief Replace all occurrences of a string with another string. Case-insensitive.
 
 \sa ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 */
 
 /*!
 \fn BString& BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
-\brief Replace a number of occurances of a string with another string. Case-insensitive.
+\brief Replace a number of occurrences of a string with another string. Case-insensitive.
 
 \sa Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 */
@@ -1181,7 +1181,7 @@ Make sure you call UnlockBuffer() when you're done with the manipulation.
 \fn BString& BString::CapitalizeEachWord()
 \brief Convert the first character of every word to uppercase, rest to lowercase.
 
-Converts the first character of every "word" (series of alpabetical characters
+Converts the first character of every "word" (series of alphabetical characters
 separated by non alphabetical characters) to uppercase, and the rest to lowercase.
 \return This method always returns \c *this .
 */
