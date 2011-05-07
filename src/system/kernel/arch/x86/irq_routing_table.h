@@ -13,15 +13,21 @@
 
 
 struct irq_routing_entry {
-	int			device_address;
-	int8		pin;
+	// ACPI specifics
+	uint64		device_address;
+	uint8		pin;
 
 	acpi_handle	source;
-	int			source_index;
+	uint32		source_index;
 
-	// pci busmanager connection
-	uchar		pci_bus;
-	uchar		pci_device;
+	// PCI bus_manager connection
+	uint8		pci_bus;
+	uint8		pci_device;
+
+	// Distilled configuration info
+	uint8		irq;			// Global System Interrupt (GSI)
+	uint8		polarity;		// B_{HIGH|LOW}_ACTIVE_POLARITY
+	uint8		trigger_mode;	// B_{LEVEL|EDGE}_TRIGGERED
 };
 
 
@@ -36,7 +42,7 @@ struct irq_descriptor {
 	// B_LOW_ACTIVE_POLARITY or B_HIGH_ACTIVE_POLARITY
 	uint8			polarity;
 	// B_LEVEL_TRIGGERED or B_EDGE_TRIGGERED
-	uint8			interrupt_mode;
+	uint8			trigger_mode;
 };
 
 

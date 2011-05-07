@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008-2011, Michael Lotz, mmlr@mlotz.ch.
  * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
@@ -588,6 +589,12 @@ acpi_set_interrupt_model(acpi_module_info* acpiModule, uint32 interruptModel)
 	parameter.count = 1;
 	parameter.pointer = &model;
 
+	dprintf("setting ACPI interrupt model to %s\n",
+		interruptModel == 0 ? "PIC"
+		: (interruptModel == 1 ? "APIC"
+		: (interruptModel == 2 ? "SAPIC"
+		: "unknown")));
+
 	return acpiModule->evaluate_method(NULL, "\\_PIC", &parameter, NULL);
 }
 
@@ -696,30 +703,11 @@ ioapic_init(kernel_args* args)
 	print_irq_routing_table(&table);
 #endif
 
-	// configure io apic interrupts from pci routing table
+	// configure io apic interrupts from PCI routing table
 	for (int i = 0; i < table.Count(); i++) {
-		uint8 irq = 0;
-		uint32 config = 0;
-
 		irq_routing_entry& entry = table.ElementAt(i);
-		if (entry.source == 0) {
-			// fixed irq configuration
-			irq = entry.source_index;
-			config = B_LEVEL_TRIGGERED | B_LOW_ACTIVE_POLARITY;
-		} else {
-			// irq comes from the link device and is configurable
-			irq_descriptor irqDescriptor;
-			status = read_current_irq(acpiModule, entry.source, &irqDescriptor);
-			if (status != B_OK) {
-				dprintf("failed to read current irq config of link device\n");
-				continue;
-			}
-
-			irq = irqDescriptor.irq;
-			config = irqDescriptor.polarity | irqDescriptor.interrupt_mode;
-		}
-
-		ioapic_configure_io_interrupt(irq, config);
+		ioapic_configure_io_interrupt(entry.irq,
+			entry.polarity | entry.trigger_mode);
 	}
 
 	// disable the legacy PIC
