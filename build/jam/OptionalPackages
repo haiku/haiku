@@ -811,13 +811,13 @@ if [ IsOptionalHaikuImagePackageAdded GPerf ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				gperf-3.0.4-x86-gcc4-2010-06-15.zip
-				: $(baseURL)/gperf-3.0.4-x86-gcc4-2010-06-15.zip
+				gperf-3.0.4-x86-gcc4-2011-05-06.zip
+				: $(baseURL)/gperf-3.0.4-x86-gcc4-2011-05-06.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				gperf-3.0.4-x86-gcc2-2010-06-15.zip
-				: $(baseURL)/gperf-3.0.4-x86-gcc2-2010-06-15.zip
+				gperf-3.0.4-x86-gcc2-2011-05-06.zip
+				: $(baseURL)/gperf-3.0.4-x86-gcc2-2011-05-06.zip
 				: : true ;
 		}
 	}
