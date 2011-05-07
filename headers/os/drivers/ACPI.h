@@ -100,9 +100,9 @@ struct acpi_object_type {
 			acpi_object_type *objects;
 		} package;
 		struct {
-	        uint32 actual_type;
-	        acpi_handle handle;
-	    } reference;
+			uint32 actual_type;
+			acpi_handle handle;
+		} reference;
 		struct {
 			uint32 cpu_id;
 			int pblk_address;
@@ -120,14 +120,14 @@ struct acpi_object_type {
  * List of objects, used as a parameter list for control method evaluation
  */
 typedef struct acpi_objects {
-    uint32				count;
-    acpi_object_type	*pointer;
+	uint32				count;
+	acpi_object_type	*pointer;
 } acpi_objects;
 
 
 typedef struct acpi_data {
-    acpi_size			length;         /* Length in bytes of the buffer */
-    void				*pointer;       /* pointer to buffer */
+	acpi_size			length;		/* Length in bytes of the buffer */
+	void				*pointer;	/* pointer to buffer */
 } acpi_data;
 
 
@@ -178,11 +178,11 @@ struct acpi_module_info {
 
 	/* Notify Handler */
 
-    status_t	(*install_notify_handler)(acpi_handle device,
-    				uint32 handlerType, acpi_notify_handler handler,
-    				void *context);
+	status_t	(*install_notify_handler)(acpi_handle device,
+					uint32 handlerType, acpi_notify_handler handler,
+					void *context);
 	status_t	(*remove_notify_handler)(acpi_handle device,
-    				uint32 handlerType, acpi_notify_handler handler);
+					uint32 handlerType, acpi_notify_handler handler);
 
 	/* GPE Handler */
 
@@ -290,10 +290,10 @@ typedef struct acpi_device_module_info {
 	/* Notify Handler */
 
 	status_t	(*install_notify_handler)(acpi_device device,
-    				uint32 handlerType, acpi_notify_handler handler,
-    				void *context);
+					uint32 handlerType, acpi_notify_handler handler,
+					void *context);
 	status_t	(*remove_notify_handler)(acpi_device device,
-    				uint32 handlerType, acpi_notify_handler handler);
+					uint32 handlerType, acpi_notify_handler handler);
 
 	/* Address Space Handler */
 	status_t	(*install_address_space_handler)(acpi_device device,
