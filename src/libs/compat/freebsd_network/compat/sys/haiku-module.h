@@ -197,7 +197,7 @@ extern const char* __haiku_firmware_name_map[][2];
 
 #define NO_HAIKU_FIRMWARE_NAME_MAP() \
 	const uint __haiku_firmware_parts_count = 0; \
-	const char* __haiku_firmware_name_map[0][2] = {{NULL}}
+	const char* __haiku_firmware_name_map[0][2] = {}
 
 
 /* #pragma mark - synchronization */
