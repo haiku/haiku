@@ -60,7 +60,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 {
 	_BuildConnectionPolicy();
 	fPolicyMenuField = new BMenuField("policy",
-		B_TRANSLATE("Incoming connections policy:"), fPolicyMenu, NULL);
+		B_TRANSLATE("Incoming connections policy:"), fPolicyMenu);
 
 	fInquiryTimeControl = new BSlider("time",
 		B_TRANSLATE("Default inquiry time:"), new BMessage(kMsgSetInquiryTime),
@@ -74,13 +74,13 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	// hinting menu
 	_BuildClassMenu();
 	fClassMenuField = new BMenuField("class", B_TRANSLATE("Identify host as:"),
-		fClassMenu, NULL);
+		fClassMenu);
 
 	// localdevices menu
 	_BuildLocalDevicesMenu();
 	fLocalDevicesMenuField = new BMenuField("devices",
 		B_TRANSLATE("Local devices found on system:"),
-		fLocalDevicesMenu, NULL);
+		fLocalDevicesMenu);
 
 	fExtDeviceView = new ExtendedLocalDeviceView(BRect(0, 0, 5, 5), NULL);
 
