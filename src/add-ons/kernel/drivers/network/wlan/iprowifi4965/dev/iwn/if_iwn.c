@@ -2357,13 +2357,11 @@ iwn_tx_done(struct iwn_softc *sc, struct iwn_rx_desc *desc, int ackfailcnt,
 	 */
 	if (status & 0x80) {
 		ifp->if_oerrors++;
-#ifndef __HAIKU__
 		ieee80211_ratectl_tx_complete(vap, ni,
 		    IEEE80211_RATECTL_TX_FAILURE, &ackfailcnt, NULL);
 	} else {
 		ieee80211_ratectl_tx_complete(vap, ni,
 		    IEEE80211_RATECTL_TX_SUCCESS, &ackfailcnt, NULL);
-#endif
 	}
 	m_freem(m);
 	ieee80211_free_node(ni);
@@ -2888,10 +2886,8 @@ iwn_tx_data(struct iwn_softc *sc, struct mbuf *m, struct ieee80211_node *ni,
 	else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE)
 		rate = tp->ucastrate;
 	else {
-#ifndef __HAIKU__
 		/* XXX pass pktlen */
 		(void) ieee80211_ratectl_rate(ni, NULL, 0);
-#endif
 		rate = ni->ni_txrate;
 	}
 	ridx = iwn_plcp_signal(rate);
