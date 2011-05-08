@@ -366,7 +366,7 @@ my_device_added(usb_device newDevice, void **cookie)
 		return B_ERROR;
 	}
 
-		for (size_t i = 0; i < configuration->interface_count; i++) {
+	for (size_t i = 0; i < configuration->interface_count; i++) {
 		usb_interface_info *interface = configuration->interface[i].active;
 		if (interface == NULL)
 			continue;
