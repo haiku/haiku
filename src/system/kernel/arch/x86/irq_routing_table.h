@@ -108,7 +108,7 @@ status_t read_current_irq(acpi_module_info* acpi, acpi_handle device,
 status_t read_possible_irq(acpi_module_info* acpi, acpi_handle device,
 			irq_descriptor* descriptor);
 
-status_t set_acpi_irq(acpi_module_info* acpi, acpi_handle device,
-			irq_descriptor* descriptor);
+status_t set_current_irq(acpi_module_info* acpi, acpi_handle device,
+			const irq_descriptor* descriptor);
 
 #endif	// IRQ_ROUTING_TABLE_H

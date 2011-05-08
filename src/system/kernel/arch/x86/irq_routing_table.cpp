@@ -467,33 +467,82 @@ read_possible_irq(acpi_module_info* acpi, acpi_handle device,
 
 
 status_t
-set_acpi_irq(acpi_module_info* acpi, acpi_handle device,
-	irq_descriptor* descriptor)
+set_current_irq(acpi_module_info* acpi, acpi_handle device,
+	const irq_descriptor* descriptor)
 {
-	acpi_object_type outBuffer;
-	outBuffer.object_type = ACPI_TYPE_BUFFER;
+	acpi_data buffer;
+	buffer.pointer = NULL;
+	buffer.length = ACPI_ALLOCATE_BUFFER;
 
-	int8 data[4];
-	data[0] = 0x23;
-	data[1] = descriptor->irq & 0xFF;
-	data[2] = descriptor->irq >> 8;
+	status_t status = acpi->get_current_resources(device, &buffer);
+	if (status != B_OK) {
+		dprintf("failed to read current resources for irq\n");
+		return status;
+	}
 
-	data[3] = 0;
-	int8 bit;
-	bit = (descriptor->trigger_mode == B_HIGH_ACTIVE_POLARITY) ? 0 : 1;
-	data[3] |= bit;
-	bit = (descriptor->polarity == B_LEVEL_TRIGGERED) ? 0 : 1;
-	data[3] |= bit << 3;
-	bit = descriptor->shareable ? 1 : 0;
-	data[3] |= bit << 4;
+	bool irqWritten = false;
+	acpi_resource* resource = (acpi_resource*)buffer.pointer;
+	// TODO: Don't hardcode END TAG
+	while (resource->type != 7) {
+		// TODO: Don't hardcode IRQ and Extended IRQ
+		switch (resource->type) {
+			case 0: // IRQ
+			{
+				acpi_resource_irq* irq = (acpi_resource_irq*)resource;
+				if (irq->interrupt_count < 1) {
+					dprintf("acpi irq resource with no interrupts\n");
+					break;
+				}
 
-	outBuffer.data.buffer.length = sizeof(data);
-	outBuffer.data.buffer.buffer = data;
+				irq->triggering
+					= descriptor->trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
+				irq->polarity
+					= descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
+				irq->sharable = descriptor->shareable ? 0 : 1;
+				irq->interrupt_count = 1;
+				irq->interrupts[0] = descriptor->irq;
 
-	acpi_objects parameter;
-	parameter.count = 1;
-	parameter.pointer = &outBuffer;
-	status_t status = acpi->evaluate_method(device, "_SRS", &parameter, NULL);
+				irqWritten = true;
+				break;
+			}
 
+			case 15: // Extended IRQ
+			{
+				acpi_resource_extended_irq* irq
+					= (acpi_resource_extended_irq*)resource;
+				if (irq->interrupt_count < 1) {
+					dprintf("acpi extended irq resource with no interrupts\n");
+					break;
+				}
+
+				irq->triggering
+					= descriptor->trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
+				irq->polarity
+					= descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
+				irq->sharable = descriptor->shareable ? 0 : 1;
+				irq->interrupt_count = 1;
+				irq->interrupts[0] = descriptor->irq;
+
+				irqWritten = true;
+				break;
+			}
+		}
+
+		if (irqWritten)
+			break;
+
+		resource = (acpi_resource*)((uint8*)resource + resource->length);
+	}
+
+	if (irqWritten) {
+		status = acpi->set_current_resources(device, &buffer);
+		if (status != B_OK)
+			dprintf("failed to set irq resources\n");
+	} else {
+		dprintf("failed to write requested irq into resources\n");
+		status = B_ERROR;
+	}
+
+	free(buffer.pointer);
 	return status;
 }
