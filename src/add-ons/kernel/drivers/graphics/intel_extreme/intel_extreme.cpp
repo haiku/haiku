@@ -339,7 +339,7 @@ intel_extreme_init(intel_info &info)
 
 	init_interrupt_handler(info);
 
-	TRACE((DEVICE_NAME "intel_extreme_init() completed successfully!\n"));
+	TRACE((DEVICE_NAME "_init() completed successfully!\n"));
 	return B_OK;
 }
 
