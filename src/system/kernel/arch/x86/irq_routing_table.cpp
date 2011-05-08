@@ -135,6 +135,27 @@ update_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 
 static status_t
+configure_link_device(acpi_module_info* acpi, acpi_handle handle,
+	irq_descriptor& result)
+{
+	status_t status = read_possible_irq(acpi, handle, &result);
+	if (status != B_OK) {
+		dprintf("failed to read possible IRQ configuration of link device\n");
+
+		// We could try returning the current config as a fallback, but it most
+		// probably is invalid as it points to the legacy config the BIOS has
+		// done in PIC mode.
+		return status;
+	}
+
+	// TODO: Blindly set the first possible configuration (obviously not what we
+	// want to do as it will most probably result in a "everything to single
+	// IRQ" config; anyway just to get things going...)
+	return set_current_irq(acpi, handle, &result);
+}
+
+
+static status_t
 evaluate_integer(acpi_module_info* acpi, acpi_handle handle,
 	const char* method, uint64& value)
 {
@@ -234,9 +255,9 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 				irqEntry.trigger_mode = B_LEVEL_TRIGGERED;
 			} else {
 				irq_descriptor irqDescriptor;
-				status = read_current_irq(acpi, source, &irqDescriptor);
+				status = configure_link_device(acpi, source, irqDescriptor);
 				if (status != B_OK) {
-					dprintf("failed to read current IRQ of link device\n");
+					dprintf("failed to configure link device\n");
 					irqEntry.irq = 0;
 				} else {
 					irqEntry.irq = irqDescriptor.irq;
