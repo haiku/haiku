@@ -705,48 +705,6 @@ reboot(void)
 }
 
 
-status_t
-get_pci_info(acpi_handle pciRootBridge, acpi_handle device, acpi_pci_info *info)
-{
-	ACPI_STATUS status;
-	ACPI_HANDLE childNode;
-	uint64 deviceAddress = 0;
-	uint64 segment = 0;
-	uint64 busNumber = 0;
-
-	// We reset the structure to 0 here. Any failed evaluation means default
-	// values, so we don't have to do anything in the error case.
-	memset(info, 0, sizeof(acpi_pci_info));
-
-	status = AcpiUtEvaluateNumericObject(METHOD_NAME__ADR, device,
-		&deviceAddress);
-	if (status == AE_OK) {
-		info->device = (uint8)(deviceAddress >> 16);
-		info->function = (uint8)deviceAddress;
-	}
-
-	status = AcpiUtEvaluateNumericObject(METHOD_NAME__SEG, pciRootBridge,
-		&segment);
-	if (status == AE_OK)
-		info->segment = (uint8)segment;
-
-	status = AcpiUtEvaluateNumericObject(METHOD_NAME__BBN, pciRootBridge,
-		&busNumber);
-	if (status == AE_OK)
-		info->bus = (uint8)busNumber;
-
-	// since AcpiHwDerivePciId assumes getting a child object of the device
-	// it iterates one step less than we need - get any child node to work
-	// around that
-	status = AcpiGetNextObject(ACPI_TYPE_METHOD, device, NULL, &childNode);
-	if (status != AE_OK)
-		return B_ERROR;
-
-	status = AcpiHwDerivePciId((ACPI_PCI_ID*)info, pciRootBridge, childNode);
-	return status == AE_OK ? B_OK : B_ERROR;
-}
-
-
 struct acpi_module_info gACPIModule = {
 	{
 		B_ACPI_MODULE_NAME,
@@ -785,6 +743,5 @@ struct acpi_module_info gACPIModule = {
 	get_possible_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
-	reboot,
-	get_pci_info
+	reboot
 };

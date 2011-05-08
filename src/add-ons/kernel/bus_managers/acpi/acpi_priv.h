@@ -132,10 +132,6 @@ typedef struct acpi_root_info {
 					size_t size);
 	status_t	(*enter_sleep_state)(uint8 state);
 	status_t	(*reboot)(void);
-
-	/* PCI specific info */
-	status_t	(*get_pci_info)(acpi_handle pciRootBridge, acpi_handle device,
-					acpi_pci_info *info);
 } acpi_root_info;
 
 
@@ -209,9 +205,6 @@ status_t prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size);
 status_t enter_sleep_state(uint8 state);
 
 status_t reboot(void);
-
-status_t get_pci_info(acpi_handle pciRootBridge, acpi_handle device,
-	acpi_pci_info *info);
 
 __END_DECLS
 
