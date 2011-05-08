@@ -626,6 +626,14 @@ get_possible_resources(acpi_handle busDeviceHandle, acpi_data *retBuffer)
 
 
 status_t
+set_current_resources(acpi_handle busDeviceHandle, acpi_data *buffer)
+{
+	return AcpiSetCurrentResources(busDeviceHandle, (ACPI_BUFFER*)buffer)
+		== AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
 prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
 	ACPI_STATUS acpiStatus;
@@ -741,6 +749,7 @@ struct acpi_module_info gACPIModule = {
 	get_irq_routing_table,
 	get_current_resources,
 	get_possible_resources,
+	set_current_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot

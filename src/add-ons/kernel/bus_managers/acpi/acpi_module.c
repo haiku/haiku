@@ -216,6 +216,7 @@ static struct acpi_root_info sACPIRootModule = {
 	get_irq_routing_table,
 	get_current_resources,
 	get_possible_resources,
+	set_current_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot
