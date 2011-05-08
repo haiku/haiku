@@ -6,7 +6,7 @@
 #define _SYS_UTSNAME_H
 
 
-#define _SYS_NAMELEN 128
+#define _SYS_NAMELEN 32
 
 struct utsname {
 	char sysname[_SYS_NAMELEN];		/* Name of the OS */
