@@ -708,9 +708,7 @@ ioapic_init(kernel_args* args)
 	for (uint32 i = 0; i < 256; i++)
 		sIRQToIOAPICPin[i] = i;
 
-#ifdef TRACE_ARCH_INT
 	print_irq_routing_table(&table);
-#endif
 
 	// configure io apic interrupts from PCI routing table
 	for (int i = 0; i < table.Count(); i++) {
