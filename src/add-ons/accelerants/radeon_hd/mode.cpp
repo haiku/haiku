@@ -20,6 +20,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <create_display_modes.h>
+
 
 #define TRACE_MODE
 #ifdef TRACE_MODE
@@ -30,41 +32,47 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
-static display_mode sDisplayMode;
-
-
 status_t
 create_mode_list(void)
 {
-	// TODO : Read active monitor EDID
+	// TODO : Read active monitor EDID for create_display_modes
 
-	/* Populate modeline with temporary example */
-	sDisplayMode.timing.pixel_clock = 71500;
-	sDisplayMode.timing.h_display = 1366;	// In Pixels
-	sDisplayMode.timing.h_sync_start = 1406;
-	sDisplayMode.timing.h_sync_end = 1438;
-	sDisplayMode.timing.h_total = 1510;
-	sDisplayMode.timing.v_display = 768;	// In Pixels
-	sDisplayMode.timing.v_sync_start = 771;
-	sDisplayMode.timing.v_sync_end = 777;
-	sDisplayMode.timing.v_total = 789;
-	sDisplayMode.timing.flags = 0;			// Polarity, ex: B_POSITIVE_HSYNC
+	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
+		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
-	sDisplayMode.space = B_RGB32_LITTLE;	// Pixel configuration
-	sDisplayMode.virtual_width = 1366;		// In Pixels
-	sDisplayMode.virtual_height = 768;		// In Pixels
-	sDisplayMode.h_display_start = 0;
-	sDisplayMode.v_display_start = 0;
-	sDisplayMode.flags = 0;				// Mode flags (Some drivers use this
+	gInfo->mode_list_area = create_display_modes("radeon HD modes",
+		NULL, NULL, 0, kRadeonHDSpaces,
+		sizeof(kRadeonHDSpaces) / sizeof(kRadeonHDSpaces[0]),
+		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
+	if (gInfo->mode_list_area < B_OK)
+		return gInfo->mode_list_area;
 
-	// TODO : loop over found modelines and add them to valid mode list
-	if (mode_sanity_check(&sDisplayMode) != B_OK) {
-		TRACE("Invalid modeline was found, aborting\n");
-		return B_ERROR;
-	}
+	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
 
-	gInfo->mode_list = &sDisplayMode;
-	gInfo->shared_info->mode_count = 1;
+	/* Example nonstandard mode line (1600x900@60) */
+
+	//static display_mode sDisplayMode;
+	//sDisplayMode.timing.pixel_clock =  97750;
+	//sDisplayMode.timing.h_display = 1600;
+	//sDisplayMode.timing.h_sync_start = 1648;
+	//sDisplayMode.timing.h_sync_end = 1680;
+	//sDisplayMode.timing.h_total = 1760;
+	//sDisplayMode.timing.v_display = 900;
+	//sDisplayMode.timing.v_sync_start = 903;
+	//sDisplayMode.timing.v_sync_end = 908;
+	//sDisplayMode.timing.v_total = 926;
+	//sDisplayMode.timing.flags = B_POSITIVE_HSYNC;
+		// Polarity
+
+	//sDisplayMode.space = B_RGB32_LITTLE;
+		// Pixel configuration
+	//sDisplayMode.virtual_width = 1600;
+	//sDisplayMode.virtual_height = 900;
+	//sDisplayMode.h_display_start = 0;
+	//sDisplayMode.v_display_start = 0;
+	//sDisplayMode.flags = 0;
+		// Mode flags (Some drivers use this)
+
 	return B_OK;
 }
 
@@ -88,17 +96,6 @@ radeon_get_mode_list(display_mode *modeList)
 	memcpy(modeList, gInfo->mode_list,
 		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
-}
-
-
-inline void
-write32AtMask(uint32 adress, uint32 value, uint32 mask)
-{
-	uint32 temp;
-	temp = read32(adress);
-	temp &= ~mask;
-	temp |= value & mask;
-	write32(adress, temp);
 }
 
 
@@ -141,45 +138,48 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 }
 
 
-#define D1_REG_OFFSET 0x0000
-#define D2_REG_OFFSET 0x0800
-
-
 static void
-DxModeSet(display_mode *mode)
+CardModeSet(display_mode *mode)
 {
+	// For now we assume D1
 	uint32 regOffset = D1_REG_OFFSET;
 
 	display_timing& displayTiming = mode->timing;
 
+	TRACE("%s called to do %dx%d\n",
+		__func__, displayTiming.h_display, displayTiming.v_display);
 
-	/* enable read requests */
+	// enable read requests
 	write32AtMask(regOffset + D1CRTC_CONTROL, 0, 0x01000000);
 
-	/* Horizontal */
+	// *** Horizontal
 	write32(regOffset + D1CRTC_H_TOTAL, displayTiming.h_total - 1);
 
-	uint16 blankStart = displayTiming.h_display;	// displayTiming.h_sync_end;
-	uint16 blankEnd = displayTiming.h_sync_start;	// displayTiming.h_total;
-//	write32(regOffset + D1CRTC_H_BLANK_START_END,
-//		blankStart | (blankEnd << 16));
+	// determine blanking based on passed modeline
+	uint16 blankStart = displayTiming.h_display;
+	uint16 blankEnd = displayTiming.h_total;
+
+	write32(regOffset + D1CRTC_H_BLANK_START_END,
+		blankStart | (blankEnd << 16));
 
 	write32(regOffset + D1CRTC_H_SYNC_A,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
-//	write32(regOffset + D1CRTC_H_SYNC_A_CNTL, Mode->Flags & V_NHSYNC);
-//!	write32(regOffset + D1CRTC_H_SYNC_A_CNTL, V_NHSYNC);
 
-	/* Vertical */
+	// set flag for neg. H sync
+	if (displayTiming.flags & ~B_POSITIVE_HSYNC)
+		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x01);
+
+	// *** Vertical
 	write32(regOffset + D1CRTC_V_TOTAL, displayTiming.v_total - 1);
 
-	blankStart = displayTiming.v_display;	// displayTiming.v_sync_end;
-	blankEnd = displayTiming.v_sync_start;	// displayTiming.v_total;
-//  write32(regOffset + D1CRTC_V_BLANK_START_END,
-//		blankStart | (blankEnd << 16));
+	blankStart = displayTiming.v_display;
+	blankEnd = displayTiming.v_total;
 
-	/* set interlaced */
-//	if (Mode->Flags & V_INTERLACE) {
-	if (0) {
+	write32(regOffset + D1CRTC_V_BLANK_START_END,
+		blankStart | (blankEnd << 16));
+
+	// Set Interlace if specified within mode line
+	if (displayTiming.flags & B_TIMING_INTERLACED) {
 		write32(regOffset + D1CRTC_INTERLACE_CONTROL, 0x1);
 		write32(regOffset + D1MODE_DATA_FORMAT, 0x1);
 	} else {
@@ -189,8 +189,10 @@ DxModeSet(display_mode *mode)
 
 	write32(regOffset + D1CRTC_V_SYNC_A,
 		(displayTiming.v_sync_end - displayTiming.v_sync_start) << 16);
-//	write32(regOffset + D1CRTC_V_SYNC_A_CNTL, Mode->Flags & V_NVSYNC);
-//!	write32(regOffset + D1CRTC_V_SYNC_A_CNTL, V_NVSYNC);
+
+	// set flag for neg. V sync
+	if (displayTiming.flags & ~B_POSITIVE_VSYNC)
+		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x02);
 
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
 		should only be set to 1 on 30bpp DVI modes
@@ -201,7 +203,7 @@ DxModeSet(display_mode *mode)
 
 
 static void
-DxModeScale(display_mode *mode)
+CardModeScale(display_mode *mode)
 {
 	uint32 regOffset = D1_REG_OFFSET;
 
@@ -217,16 +219,15 @@ DxModeScale(display_mode *mode)
 */
 	write32(regOffset + D1SCL_ENABLE, 0);
 	write32(regOffset + D1SCL_TAP_CONTROL, 0);
-	write32(regOffset + D1MODE_CENTER, 0);
+	write32(regOffset + D1MODE_CENTER, 2);
 }
 
 
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	DxModeSet(mode);
-
-	DxModeScale(mode);
+	CardModeSet(mode);
+	CardModeScale(mode);
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
@@ -253,15 +254,10 @@ radeon_set_display_mode(display_mode *mode)
 	default:
 		write32AtMask(regOffset + D1GRPH_CONTROL, 0x000002, 0x00000703);
 		break;
-	/* TODO: 64bpp ;p */
 	}
 
-	/* Make sure that we are not swapping colours around */
-//	if (rhdPtr->ChipSet > RHD_R600)
+	/* Make sure that we are not swapping colours around on r600+*/
 	write32(regOffset + D1GRPH_SWAP_CNTL, 0);
-	/* R5xx - RS690 case is GRPH_CONTROL bit 16 */
-
-#define R6XX_CONFIG_FB_BASE 0x542C /* AKA CONFIG_F0_BASE */
 
 	uint32 fbIntAddress = read32(R6XX_CONFIG_FB_BASE);
 
@@ -293,7 +289,7 @@ radeon_get_display_mode(display_mode *_currentMode)
 {
 	TRACE("%s\n", __func__);
 
-	*_currentMode = sDisplayMode;
+	*_currentMode = gInfo->shared_info->current_mode;
 	return B_OK;
 }
 
@@ -340,11 +336,23 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 }
 
 
+bool
+is_mode_supported(display_mode *mode)
+{
+	if (is_mode_sane(mode) != B_OK)
+		return false;
+
+	// TODO : Check if mode is supported on monitor
+
+	return true;
+}
+
+
 /*
  * A quick sanity check of the provided display_mode
  */
 status_t
-mode_sanity_check(display_mode *mode)
+is_mode_sane(display_mode *mode)
 {
 	// horizontal timing
 	// validate h_sync_start is less then h_sync_end

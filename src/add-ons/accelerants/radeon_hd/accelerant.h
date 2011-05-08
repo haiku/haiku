@@ -59,6 +59,17 @@ write32(uint32 offset, uint32 value)
 }
 
 
+inline void
+write32AtMask(uint32 adress, uint32 value, uint32 mask)
+{
+	uint32 temp;
+	temp = read32(adress);
+	temp &= ~mask;
+	temp |= value & mask;
+	write32(adress, temp);
+}
+
+
 inline uint32_t
 ReadMC(int screenIndex, uint32_t addr)
 {

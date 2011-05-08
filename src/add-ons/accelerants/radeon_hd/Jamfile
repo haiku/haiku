@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src add-ons accelerants radeon_hd ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -13,6 +14,7 @@ Addon radeon_hd.accelerant :
 	hooks.cpp
 	mode.cpp
 	bios.cpp
+	create_display_modes.cpp
 	: be libaccelerantscommon.a atombios.a
 ;
 

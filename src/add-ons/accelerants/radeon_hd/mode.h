@@ -16,9 +16,17 @@
 
 #define T_POSITIVE_SYNC (B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 
+#define D1_REG_OFFSET 0x0000
+#define D2_REG_OFFSET 0x0800
+#define FMT1_REG_OFFSET 0x0000
+#define FMT2_REG_OFFSET 0x800
+
+#define R6XX_CONFIG_FB_BASE 0x542C /* AKA CONFIG_F0_BASE */
+
 
 status_t create_mode_list(void);
-status_t mode_sanity_check(display_mode *mode);
+bool is_mode_supported(display_mode* mode);
+status_t is_mode_sane(display_mode *mode);
 
 
 enum {
@@ -80,25 +88,6 @@ enum {
 	D1SCL_UPDATE                   = 0x65CC,
 	D1SCL_DITHER                   = 0x65D4, /* guess */
 	D1SCL_FLIP_CONTROL             = 0x65D8 /* guess */
-};
-
-
-// A collection of the more common timings
-const display_timing kStdModeTimings[] = {
-	{25180, 640, 656, 752, 800, 480, 490, 492, 525, 0},
-		// 640x480@60
-	{40000, 800, 840, 968, 1056, 600, 601, 605, 628, T_POSITIVE_SYNC},
-		// 800x600@60
-	{50000, 800, 856, 976, 1040, 600, 637, 643, 666, T_POSITIVE_SYNC},
-		// 800x600@72
-	{65000, 1024, 1048, 1184, 1344, 768, 771, 777, 806, 0},
-		// 1024x768@60
-	{75000, 1024, 1048, 1184, 1328, 768, 771, 777, 806, 0},
-		// 1024x768@70
-	{108000, 1280, 1328, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC},
-		// 1280x1024@60
-	{135000, 1280, 1296, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}
-		// 1280x1024@75
 };
 
 
