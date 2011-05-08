@@ -19,7 +19,7 @@ extern "C" {
 
 status_t system_info_init(struct kernel_args *args);
 status_t system_notifications_init();
-uint32 get_haiku_revision(void);
+const char* get_haiku_revision(void);
 
 status_t _user_get_system_info(system_info *userInfo, size_t size);
 status_t _user_get_system_info_etc(int32 id, void *buffer,

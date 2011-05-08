@@ -31,6 +31,7 @@
 #include <real_time_clock.h>
 #include <sem.h>
 #include <smp.h>
+#include <sys/utsname.h>
 #include <team.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -44,7 +45,8 @@ const static char *kKernelName = "kernel_" HAIKU_ARCH;
 
 // Haiku SVN revision. Will be set when copying the kernel to the image.
 // Lives in a separate section so that it can easily be found.
-static uint32 sHaikuRevision __attribute__((section("_haiku_revision")));
+static char sHaikuRevision[_SYS_NAMELEN]
+	__attribute__((section("_haiku_revision")));
 
 
 static int
@@ -52,7 +54,7 @@ dump_info(int argc, char **argv)
 {
 	kprintf("kernel build: %s %s (gcc%d %s)\n", __DATE__, __TIME__, __GNUC__,
 		__VERSION__);
-	kprintf("SVN revision: %lu\n\n", sHaikuRevision);
+	kprintf("SVN revision: %s\n\n", sHaikuRevision);
 
 	kprintf("cpu count: %ld, active times:\n", smp_get_num_cpus());
 
@@ -466,7 +468,7 @@ system_notifications_init()
 }
 
 
-uint32
+const char*
 get_haiku_revision(void)
 {
 	return sHaikuRevision;

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/utsname.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -304,11 +305,11 @@ public:
 		fFileSize = FileSize();
 		if (fFileSize < 0)
 			throw Exception("Failed to get the file size.");
-	
+
 		// read ELF header
 		Elf32_Ehdr fileHeader;
 		Read(0, &fileHeader, sizeof(Elf32_Ehdr), "Failed to read ELF header.");
-	
+
 		// check data encoding (endianess)
 		switch (fileHeader.e_ident[EI_DATA]) {
 			case ELFDATA2LSB:
@@ -322,14 +323,14 @@ public:
 				throw Exception(EIO, "Unsupported ELF data encoding.");
 				break;
 		}
-	
+
 		// get the header values
 		fELFHeaderSize	= GetUInt16(fileHeader.e_ehsize);
 		fSectionHeaderTableOffset = GetUInt32(fileHeader.e_shoff);
 		fSectionHeaderSize	= GetUInt16(fileHeader.e_shentsize);
 		fSectionHeaderCount = GetUInt16(fileHeader.e_shnum);
 		bool hasSectionHeaderTable = (fSectionHeaderTableOffset != 0);
-	
+
 		// check the sanity of the header values
 		// ELF header size
 		if (fELFHeaderSize < sizeof(Elf32_Ehdr) || fELFHeaderSize > kMaxELFHeaderSize) {
@@ -570,7 +571,6 @@ main(int argc, const char* const* argv)
 	// parameters
 	const char* fileName = argv[1];
 	const char* revisionString = argv[2];
-	uint32_t revision = atol(revisionString);
 
 	try {
 		ELFObject elfObject;
@@ -583,9 +583,9 @@ main(int argc, const char* const* argv)
 			exit(1);
 		}
 
-		// convert revision number to object endianess and write to section
-		uint32_t revisionBuffer = elfObject.GetUInt32(revision);
-		elfObject.Write(info.offset, &revisionBuffer, sizeof(revisionBuffer),
+		// write revision string to section
+		elfObject.Write(info.offset, revisionString,
+			std::min(sizeof(utsname::version), strlen(revisionString) + 1),
 			"Failed to write revision.");
 
 	} catch (Exception exception) {
@@ -596,7 +596,7 @@ main(int argc, const char* const* argv)
 				strerror(exception.Error()));
 		}
 		exit(1);
-	}	
+	}
 
 	return 0;
 }
