@@ -1,5 +1,5 @@
 /*
- * "$Id: escp2-channels.c,v 1.90 2010/08/04 00:33:56 rlk Exp $"
+ * "$Id: escp2-channels.c,v 1.91 2010/12/19 02:51:37 rlk Exp $"
  *
  *   Print plug-in EPSON ESC/P2 driver for the GIMP.
  *
@@ -155,7 +155,8 @@ load_channel(stp_mxml_node_t *node, stp_mxml_node_t *root, ink_channel_t *icl)
 }
 
 static void
-load_inkname(stp_mxml_node_t *node, stp_mxml_node_t *root, inkname_t *inl)
+load_inkname(stp_mxml_node_t *node, stp_mxml_node_t *root, inkname_t *inl,
+	     inklist_t *ikl)
 {
   const char *name;
   stp_mxml_node_t *child = node->child;
@@ -283,6 +284,12 @@ load_inkname(stp_mxml_node_t *node, stp_mxml_node_t *root, inkname_t *inl)
 		  cchild = cchild->next;
 		}
 	    }
+	  else if (!strcmp(child->value.element.name, "initSequence") &&
+		   child->child && child->child->type == STP_MXML_TEXT)
+	    ikl->init_sequence = stp_xmlstrtoraw(child->child->value.text.string);
+	  else if (!strcmp(child->value.element.name, "deinitSequence") &&
+		   child->child && child->child->type == STP_MXML_TEXT)
+	    ikl->deinit_sequence = stp_xmlstrtoraw(child->child->value.text.string);
 	}
       child = child->next;
     }
@@ -349,9 +356,17 @@ load_inklist(stp_mxml_node_t *node, stp_mxml_node_t *root, inklist_t *ikl)
 
   while (child)
     {
-      if (child->type == STP_MXML_ELEMENT &&
-	  !strcmp(child->value.element.name, "InkName"))
-	count++;
+      if (child->type == STP_MXML_ELEMENT)
+	{
+	  if (!strcmp(child->value.element.name, "InkName"))
+	    count++;
+	  else if (!strcmp(child->value.element.name, "initSequence") &&
+		   child->child && child->child->type == STP_MXML_TEXT)
+	    ikl->init_sequence = stp_xmlstrtoraw(child->child->value.text.string);
+	  else if (!strcmp(child->value.element.name, "deinitSequence") &&
+		   child->child && child->child->type == STP_MXML_TEXT)
+	    ikl->deinit_sequence = stp_xmlstrtoraw(child->child->value.text.string);
+	}
       child = child->next;
     }
   name = stp_mxmlElementGetAttr(node, "name");
@@ -369,7 +384,12 @@ load_inklist(stp_mxml_node_t *node, stp_mxml_node_t *root, inklist_t *ikl)
       if (child->type == STP_MXML_ELEMENT)
 	{
 	  if (!strcmp(child->value.element.name, "InkName"))
-	    load_inkname(child, root, &(ikl->inknames[count++]));
+	    {
+	      inkname_t *inl = &(ikl->inknames[count++]);
+	      inl->init_sequence = ikl->init_sequence;
+	      inl->deinit_sequence = ikl->deinit_sequence;
+	      load_inkname(child, root, inl, ikl);
+	    }
 	  else if (!strcmp(child->value.element.name, "Shades"))
 	    load_shades(child, root, ikl);
 	}

@@ -1,5 +1,5 @@
 
-/* Generated data (by glib-mkenums) */
+
 
 #include <gutenprintui2/gutenprintui.h>
 
@@ -54,5 +54,5 @@ stpui_curve_type_get_type (void)
   return etype;
 }
 
-/* Generated data ends here */
+
 

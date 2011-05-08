@@ -1,4 +1,4 @@
-Welcome to Gutenprint 5.2.6, a stable release of Gutenprint 5.2.  This
+Welcome to Gutenprint 5.2.7, a stable release of Gutenprint 5.2.  This
 release has bug fixes, support for some new printers, and a few new
 features over 5.2.5.  Please read these release notes carefully.
 
@@ -21,6 +21,7 @@ These release notes contain the following sections:
 I)    General Requirements
 II)   Critical Upgrade Note
 III)  Changes from Previous Releases
+        * Changes from 5.2.6
         * Changes from 5.2.5
         * Changes from 5.2.4
         * Changes from 5.2.3
@@ -105,9 +106,9 @@ for building and installing Gutenprint.
 II) CRITICAL UPGRADE NOTE
 
 If you are using CUPS with Gutenprint on a non-Macintosh system, and
-are upgrading from a version of Gutenprint prior to 5.2 or Gimp-Print,
-please read this note carefully as there are special procedures that
-you should follow in addition to the normal procedure of running
+are upgrading from Gimp-Print 4.2 or a version of Gutenprint prior to
+5.2, please read this note carefully as there are special procedures
+that you should follow in addition to the normal procedure of running
 cups-genppdupdate.
 
 Background: older versions of Gutenprint distributed CUPS backends,
@@ -250,6 +251,169 @@ device.  We have determined that the data is in fact written by the
 
 III) MAJOR CHANGES FROM PREVIOUS RELEASES
 
+* Changes from 5.2.6
+
+  1) New printers supported in this release:
+
+     Note that support for all printers marked "EXPERIMENTAL"
+     (untested) or "PRELIMINARY" (minimally tested but untuned) is
+     subject to change without notice.  Printers not marked
+     "EXPERIMENTAL" generally will not change between releases, but
+     notice will be given and if possible back compatibility will be
+     provided.
+
+     - Canon inkjet printers:
+
+       Canon PIXMA iP1000 (EXPERIMENTAL)
+       Canon PIXMA iP1200 (EXPERIMENTAL)
+       Canon PIXMA iP1300 (EXPERIMENTAL)
+       Canon PIXMA iP1500 (EXPERIMENTAL)
+       Canon PIXMA iP1600 (EXPERIMENTAL)
+       Canon PIXMA iP1700 (EXPERIMENTAL)
+       Canon PIXMA iP1800 (EXPERIMENTAL)
+       Canon PIXMA iP1900 (EXPERIMENTAL)
+       Canon PIXMA iP2000 (EXPERIMENTAL)
+       Canon PIXMA iP2200 (EXPERIMENTAL)
+       Canon PIXMA iP2500 (EXPERIMENTAL)
+       Canon PIXMA iP2600 (EXPERIMENTAL)
+       Canon PIXMA iP2700
+       Canon PIXMA iP3100 (EXPERIMENTAL)
+       Canon PIXMA iP4700
+       Canon PIXMA iP4800 (EXPERIMENTAL)
+       Canon PIXMA iP6100D
+       Canon PIXMA iP6600D
+       Canon PIXMA iX6500 (EXPERIMENTAL)
+       Canon PIXMA iX7000 (EXPERIMENTAL)
+       Canon PIXMA MG5100
+       Canon PIXMA MG5200
+       Canon PIXMA MG6100
+       Canon PIXMA MG8100
+       Canon PIXMA MP250
+       Canon PIXMA MP270
+       Canon PIXMA MP280
+       Canon PIXMA MP450
+       Canon PIXMA MP460
+       Canon PIXMA MP480
+       Canon PIXMA MP493 (EXPERIMENTAL)
+       Canon PIXMA MP495
+       Canon PIXMA MP520
+       Canon PIXMA MP540
+       Canon PIXMA MP550
+       Canon PIXMA MP600
+       Canon PIXMA MP620
+       Canon PIXMA MP630
+       Canon PIXMA MP640
+       Canon PIXMA MP800 (EXPERIMENTAL)
+       Canon PIXMA MP810 (EXPERIMENTAL)
+       Canon PIXMA MP950
+       Canon PIXMA MP960
+       Canon PIXMA MP980 (EXPERIMENTAL)
+       Canon PIXMA MP990
+       Canon PIXMA MX300 (EXPERIMENTAL)
+       Canon PIXMA MX310 (EXPERIMENTAL)
+       Canon PIXMA MX330 (EXPERIMENTAL)
+       Canon PIXMA MX340 (EXPERIMENTAL)
+       Canon PIXMA MX350 (EXPERIMENTAL)
+       Canon PIXMA MX360 (EXPERIMENTAL)
+       Canon PIXMA MX410 (EXPERIMENTAL)
+       Canon PIXMA MX420 (EXPERIMENTAL)
+       Canon PIXMA MX700 (EXPERIMENTAL)
+       Canon PIXMA MX850 (EXPERIMENTAL)
+       Canon PIXMA MX860 (EXPERIMENTAL)
+       Canon PIXMA MX870 (EXPERIMENTAL)
+       Canon PIXMA MX880 (EXPERIMENTAL)
+       Canon PIXMA MX7600 (EXPERIMENTAL)
+       Canon PIXMA Pro9000 (EXPERIMENTAL)
+       Canon PIXMA Pro9000 Mk.II (EXPERIMENTAL)
+       Canon PIXMA Pro9500 (EXPERIMENTAL)
+       Canon PIXMA Pro9500 Mk.II (EXPERIMENTAL)
+
+     - Epson inkjet printers:
+
+       EPSON B-310
+       EPSON B-310N
+       EPSON B-510DN
+       EPSON ME Office 600F
+       EPSON ME Office 620F
+       Epson Stylus Photo R3000 (EXPERIMENTAL)
+       Epson Stylus Pro 3885
+       Epson Stylus Pro 4000 (EXPERIMENTAL)
+       Epson Stylus Pro 4450 (EXPERIMENTAL)
+       Epson Stylus Pro 7700 (EXPERIMENTAL)
+       Epson Stylus Pro 7890 (EXPERIMENTAL)
+       Epson Stylus Pro 9700 (EXPERIMENTAL)
+       Epson Stylus Pro 9890 (EXPERIMENTAL)
+
+     - Dye sublimation printers:
+
+       Kodak EasyShare G600 Printer Dock
+       Kodak PD-4000
+       Kodak PD-6000
+       Kodak Photo Printer
+       Kodak Photo Printer 500
+       Kodak Printer Dock Plus
+       Kodak Printer Dock Plus S3
+
+  2) Corrected color matching profile used for Mac OS X 10.5.x.
+     sRGB will now be used instead of Generic RGB.  Users with work-
+     flows dependant on the previously used Generic RGB can select
+     this color profile in the print window by using ColorSync to
+     choose the profile rather than using VendorMatching.
+
+  3) Add additional photo modes to Canon inkjet printers.
+
+  4) Correct page size limit for EPSON Stylus Pro 7600, 7800, 7880,
+     9600, 9800, and 9880 (previously these printers had overly
+     restrictive page limits).
+
+  5) Correct printing to the EPSON Stylus NX200, NX215, SX200, SX205,
+     SX210, and SX215.
+
+  6) Corrected basic printer definitions of EPSON Stylus Pro 3800,
+     3880, 7800, and 9800.
+
+  7) Corrected media definitions and improve printing quality for
+     EPSON Stylus Pro 3800, 3880, 4800, 4880, 7800, 7880, 9800, 9880,
+     11800, and 11880.  This will result in substantial changes in
+     output; if this is an issue, please use the EPSON Stylus Pro 7600
+     or 9600 driver as appropriate.  There are new printer definitions
+     named "EPSON Stylus Pro 4800/4880 Back Compatible" and "EPSON
+     Stylus Pro 11800/11880 Back Compatible" available for people with
+     existing tuned workflows for those printers.
+
+     There are no back compatibility modes for the EPSON Stylus Pro
+     3800 and 3880 as those printers were previously marked
+     experimental with a note that their output was expected to change
+     substantially.
+
+  8) Allow EPSON Stylus Pro 3800 and 3880 to select matte and photo
+     black ink automatically based on ink set choice (it is no longer
+     necessary to set this on the front panel).
+
+  9) Corrected base density for Photo Paper on printers using Claria
+     ink (use 20% less ink).  The default results in heavy ink
+     puddling in some cases.
+
+ 10) Improved reliability of escputil.
+
+ 11) CUPS PPD files now correctly identify which options affect
+     color, for the Common Printer Dialog.
+
+ 12) A problem whereby certain malformed PPD files would cause the
+     PostScript driver to crash has been fixed.  In addition, the
+     PostScript driver now runs considerably faster.
+
+ 13) A build problem on Solaris has been fixed.
+
+ 14) A problem whereby an attempt to use the the optional ink map
+     curves (e. g. Cyan Hue Map) with the EPSON Stylus Photo R800,
+     R1800, and R1900 would cause an error has been fixed.
+
+ 15) The Dutch and Italian translations have been updated.
+
+ 16) A Slovenian translation has been added.
+
+
 * Changes from 5.2.5
 
    1) New printers supported in this release:
@@ -273,6 +437,9 @@ III) MAJOR CHANGES FROM PREVIOUS RELEASES
 	EPSON Stylus Pro 4800
 	EPSON Stylus Pro 4880
 	EPSON Stylus Pro 11800
+	EPSON Stylus T13
+	EPSON Stylus T22
+	EPSON Stylus T22E
 	EPSON Stylus T59
 	EPSON Stylus T60
 	EPSON Stylus TX659
@@ -430,7 +597,7 @@ III) MAJOR CHANGES FROM PREVIOUS RELEASES
       small images at their correct sizes.
 
    11) A Finnish translation has been added.
-   
+
 
 * Changes from 5.2.4
 

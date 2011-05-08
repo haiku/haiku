@@ -1,5 +1,5 @@
 /*
- * "$Id: print-ps.c,v 1.102 2009/09/03 00:33:52 rlk Exp $"
+ * "$Id: print-ps.c,v 1.104 2011/03/04 13:05:08 rlk Exp $"
  *
  *   Print plug-in Adobe PostScript driver for the GIMP.
  *
@@ -65,25 +65,25 @@ static void	ps_ascii85(const stp_vars_t *, unsigned short *, int, int);
 static const stp_parameter_t the_parameters[] =
 {
   {
-    "PPDFile", N_("PPDFile"), N_("Basic Printer Setup"),
+    "PPDFile", N_("PPDFile"), "Color=Yes,Category=Basic Printer Setup",
     N_("PPD File"),
     STP_PARAMETER_TYPE_FILE, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "PageSize", N_("Page Size"), N_("Basic Printer Setup"),
+    "PageSize", N_("Page Size"), "Color=No,Category=Basic Printer Setup",
     N_("Size of the paper being printed to"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "ModelName", N_("Model Name"), N_("Basic Printer Setup"),
+    "ModelName", N_("Model Name"), "Color=Yes,Category=Basic Printer Setup",
     N_("PPD File Model Name"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_INTERNAL, 0, 0, STP_CHANNEL_NONE, 0, 0
   },
   {
-    "PrintingMode", N_("Printing Mode"), N_("Core Parameter"),
+    "PrintingMode", N_("Printing Mode"), "Color=Yes,Category=Core Parameter",
     N_("Printing Output Mode"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
@@ -1201,7 +1201,6 @@ ps_hex(const stp_vars_t *v,	/* I - File to print to */
   int		col;		/* Current column */
   static const char	*hex = "0123456789ABCDEF";
 
-
   col = 0;
   while (length > 0)
   {
@@ -1245,6 +1244,9 @@ ps_ascii85(const stp_vars_t *v,	/* I - File to print to */
   unsigned char	c[5];			/* ASCII85 encoded chars */
   static int	column = 0;		/* Current column */
 
+#define OUTBUF_SIZE 4096
+  unsigned char outbuffer[OUTBUF_SIZE+10];
+  int outp=0;
 
   while (length > 3)
   {
@@ -1256,34 +1258,43 @@ ps_ascii85(const stp_vars_t *v,	/* I - File to print to */
 
     if (b == 0)
     {
-      stp_putc('z', v);
+      outbuffer[outp++]='z';
       column ++;
     }
     else
     {
-      c[4] = (b % 85) + '!';
+      outbuffer[outp+4] = (b % 85) + '!';
       b /= 85;
-      c[3] = (b % 85) + '!';
+      outbuffer[outp+3] = (b % 85) + '!';
       b /= 85;
-      c[2] = (b % 85) + '!';
+      outbuffer[outp+2] = (b % 85) + '!';
       b /= 85;
-      c[1] = (b % 85) + '!';
+      outbuffer[outp+1] = (b % 85) + '!';
       b /= 85;
-      c[0] = b + '!';
+      outbuffer[outp] = b + '!';
 
-      stp_zfwrite((const char *)c, 5, 1, v);
+      outp+=5;
       column += 5;
     }
 
     if (column > 72)
     {
-      stp_putc('\n', v);
+      outbuffer[outp++]='\n';
       column = 0;
     }
+
+    if(outp>=OUTBUF_SIZE)
+	{
+		stp_zfwrite((const char *)outbuffer, outp, 1, v);
+		outp=0;
+	}
 
     data += 4;
     length -= 4;
   }
+
+  if(outp)
+    stp_zfwrite((const char *)outbuffer, outp, 1, v);
 
   if (last_line)
   {

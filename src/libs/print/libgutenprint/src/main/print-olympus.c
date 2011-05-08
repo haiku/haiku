@@ -1,5 +1,5 @@
 /*
- * "$Id: print-olympus.c,v 1.96 2010/06/26 20:02:02 rlk Exp $"
+ * "$Id: print-olympus.c,v 1.97 2010/12/05 21:38:15 rlk Exp $"
  *
  *   Print plug-in DyeSub driver (formerly Olympus driver) for the GIMP.
  *
@@ -1860,53 +1860,53 @@ static const dyesub_cap_t dyesub_model_capabilities[] =
 static const stp_parameter_t the_parameters[] =
 {
   {
-    "PageSize", N_("Page Size"), N_("Basic Printer Setup"),
+    "PageSize", N_("Page Size"), "Color=No,Category=Basic Printer Setup",
     N_("Size of the paper being printed to"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "MediaType", N_("Media Type"), N_("Basic Printer Setup"),
+    "MediaType", N_("Media Type"), "Color=Yes,Category=Basic Printer Setup",
     N_("Type of media (plain paper, photo paper, etc.)"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "InputSlot", N_("Media Source"), N_("Basic Printer Setup"),
+    "InputSlot", N_("Media Source"), "Color=No,Category=Basic Printer Setup",
     N_("Source (input slot) of the media"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "Resolution", N_("Resolution"), N_("Basic Printer Setup"),
+    "Resolution", N_("Resolution"), "Color=Yes,Category=Basic Printer Setup",
     N_("Resolution and quality of the print"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "InkType", N_("Ink Type"), N_("Advanced Printer Setup"),
+    "InkType", N_("Ink Type"), "Color=Yes,Category=Advanced Printer Setup",
     N_("Type of ink in the printer"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    /* TRANSLATORS: Some dye sublimation printers are able achieve */
+    /* TRANSLATORS: Some dye sublimation printers are able to achieve */
     /* better durability of output by covering it with transparent */
     /* laminate surface. This surface can be of different patterns: */
     /* common are matte, glossy or texture. */
-    "Laminate", N_("Laminate Pattern"), N_("Advanced Printer Setup"),
+    "Laminate", N_("Laminate Pattern"), "Color=Yes,Category=Advanced Printer Setup",
     N_("Laminate Pattern"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 0, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "Borderless", N_("Borderless"), N_("Advanced Printer Setup"),
+    "Borderless", N_("Borderless"), "Color=No,Category=Advanced Printer Setup",
     N_("Print without borders"),
     STP_PARAMETER_TYPE_BOOLEAN, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 0, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "PrintingMode", N_("Printing Mode"), N_("Core Parameter"),
+    "PrintingMode", N_("Printing Mode"), "Color=Yes,Category=Core Parameter",
     N_("Printing Output Mode"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0

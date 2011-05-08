@@ -1,5 +1,5 @@
 /*
- * "$Id: dither-main.c,v 1.62 2010/08/04 00:33:56 rlk Exp $"
+ * "$Id: dither-main.c,v 1.63 2010/12/05 21:38:14 rlk Exp $"
  *
  *   Dither routine entrypoints
  *
@@ -41,9 +41,9 @@
 
 static const stpi_dither_algorithm_t dither_algos[] =
 {
+  { "None",           N_ ("Default"),                -1 },
   /* TRANSLATORS: "EvenTone" is the proper name, rather than a */
   /* descriptive name, of this algorithm. */
-  { "None",           N_ ("Default"),                -1 },
   { "EvenTone",       N_ ("EvenTone"),               D_EVENTONE },
   { "HybridEvenTone", N_ ("Hybrid EvenTone"),        D_HYBRID_EVENTONE },
   /* Placeholders for future implementation of EvenBetter Screening */
@@ -88,7 +88,7 @@ static const unsigned sq2[] =
 static const stp_parameter_t dither_parameters[] =
 {
   {
-    "Density", N_("Density"), N_("Output Level Adjustment"),
+    "Density", N_("Density"), "Color=Yes,Category=Output Level Adjustment",
     N_("Adjust the density (amount of ink) of the print. "
        "Reduce the density if the ink bleeds through the "
        "paper or smears; increase the density if black "
@@ -97,7 +97,7 @@ static const stp_parameter_t dither_parameters[] =
     STP_PARAMETER_LEVEL_ADVANCED, 0, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "DitherAlgorithm", N_("Dither Algorithm"), N_("Screening Adjustment"),
+    "DitherAlgorithm", N_("Dither Algorithm"), "Color=Yes,Category=Screening Adjustment",
     N_("Choose the dither algorithm to be used.\n"
        "Adaptive Hybrid usually produces the best all-around quality.\n"
        "EvenTone is a new, experimental algorithm that often produces excellent results.\n"

@@ -1,5 +1,5 @@
 /*
- * "$Id: print-escp2.h,v 1.138 2010/06/20 21:24:10 rlk Exp $"
+ * "$Id: print-escp2.h,v 1.139 2010/12/19 02:51:37 rlk Exp $"
  *
  *   Print plug-in EPSON ESC/P2 driver for the GIMP.
  *
@@ -194,6 +194,8 @@ typedef struct
   short channel_count;
   short aux_channel_count;
   inkset_id_t inkset;
+  const stp_raw_t *init_sequence;
+  const stp_raw_t *deinit_sequence;
   ink_channel_t *channels;
   ink_channel_t *aux_channels;
 } inkname_t;
@@ -210,6 +212,8 @@ typedef struct
   const char *text;
   short n_shades;
   short n_inks;
+  const stp_raw_t *init_sequence;
+  const stp_raw_t *deinit_sequence;
   shade_t *shades;
   inkname_t *inknames;
 } inklist_t;
@@ -620,5 +624,5 @@ extern void stpi_escp2_terminate_page(stp_vars_t *v);
 
 #endif /* GUTENPRINT_INTERNAL_ESCP2_H */
 /*
- * End of "$Id: print-escp2.h,v 1.138 2010/06/20 21:24:10 rlk Exp $".
+ * End of "$Id: print-escp2.h,v 1.139 2010/12/19 02:51:37 rlk Exp $".
  */

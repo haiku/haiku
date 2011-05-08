@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   "$Id: printers.xml,v 1.58 2010/08/11 00:26:09 rlk Exp $"
+   "$Id: printers.xml,v 1.126 2011/05/01 15:36:25 gernot2270 Exp $"
 
    XML description of printers known to libgutenprint
    You can add additional printers here, but the underlying driver has
@@ -9,6 +9,10 @@
    with the same model number but different parameters; this means
    printers that are functionally identical but have different ink
    characteristics.
+
+   Each printer must have a unique driver name (even if the underlying
+   driver is identical) to allow a unique mapping between driver
+   name and printer name (the mapping is done both ways).
 
    NOTE TO TRANSLATORS: Printer names should not be translated into
    their equivalents (the same printer sold under a different name) 
@@ -126,7 +130,19 @@
       <printer translate="name" name="Canon S630" driver="bjc-s630" manufacturer="Canon" model="8200" parameters="density_800_params" foomaticid="Canon-S630" />
       <printer translate="name" name="Canon S800" driver="bjc-s800" manufacturer="Canon" model="8200" parameters="density_800_params" foomaticid="Canon-S800" />
       <printer translate="name" name="Canon S4500" driver="bjc-s4500" manufacturer="Canon" model="6500" parameters="gamma_750_params" foomaticid="Canon-S4500" />
+      <printer translate="name" name="Canon PIXMA iP1000" driver="bjc-PIXMA-iP1000" manufacturer="Canon" model="3001000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1000" />
+      <printer translate="name" name="Canon PIXMA iP1200" driver="bjc-PIXMA-iP1200" manufacturer="Canon" model="3001200" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1200" />
+      <printer translate="name" name="Canon PIXMA iP1300" driver="bjc-PIXMA-iP1200" manufacturer="Canon" model="3001200" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1300" />
+      <printer translate="name" name="Canon PIXMA iP1500" driver="bjc-PIXMA-iP1500" manufacturer="Canon" model="3001500" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1500" />
+      <printer translate="name" name="Canon PIXMA iP1600" driver="bjc-PIXMA-iP1600" manufacturer="Canon" model="3001600" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1600" />
+      <printer translate="name" name="Canon PIXMA iP1700" driver="bjc-PIXMA-iP1600" manufacturer="Canon" model="3001600" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1700" />
+      <printer translate="name" name="Canon PIXMA iP1800" driver="bjc-PIXMA-iP1600" manufacturer="Canon" model="3001600" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1800" />
+      <printer translate="name" name="Canon PIXMA iP1900" driver="bjc-PIXMA-iP1900" manufacturer="Canon" model="3001900" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP1900" />
       <printer translate="name" name="Canon PIXMA iP2000" driver="bjc-PIXMA-iP2000" manufacturer="Canon" model="3002000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP2000" />
+      <printer translate="name" name="Canon PIXMA iP2200" driver="bjc-PIXMA-iP2200" manufacturer="Canon" model="3002200" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP2200" />
+      <printer translate="name" name="Canon PIXMA iP2500" driver="bjc-PIXMA-iP2500" manufacturer="Canon" model="3002500" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP2500" />
+      <printer translate="name" name="Canon PIXMA iP2600" driver="bjc-PIXMA-iP2600" manufacturer="Canon" model="3002600" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP2600" />
+      <printer translate="name" name="Canon PIXUS iP2700" driver="bjc-PIXUS-iP2700" manufacturer="Canon" model="3002700" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXUS-iP2700" />
       <printer translate="name" name="Canon PIXMA iP3000" driver="bjc-PIXMA-iP3000" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP3000" />
       <printer translate="name" name="Canon PIXMA iP3100" driver="bjc-PIXMA-iP3100" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP3100" />
       <printer translate="name" name="Canon PIXMA iP4000" driver="bjc-iP4000" manufacturer="Canon" model="3004000" parameters="PIXMA_iP4000_params" foomaticid="Canon-iP4000" />
@@ -135,27 +151,50 @@
       <printer translate="name" name="Canon PIXMA iP4300" driver="bjc-PIXMA-iP4300" manufacturer="Canon" model="3004200" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-iP4300" />
       <printer translate="name" name="Canon PIXMA iP4500" driver="bjc-PIXMA-iP4500" manufacturer="Canon" model="3004500" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-iP4500" />
       <printer translate="name" name="Canon PIXMA iP4600" driver="bjc-PIXMA-iP4600" manufacturer="Canon" model="3004600" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-iP4600" />
+      <printer translate="name" name="Canon PIXMA iP4700" driver="bjc-PIXMA-iP4700" manufacturer="Canon" model="3004700" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-iP4700" />
+      <printer translate="name" name="Canon PIXMA iP4800" driver="bjc-PIXMA-iP4800" manufacturer="Canon" model="3004800" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-iP4800" />
       <printer translate="name" name="Canon PIXMA iP5000" driver="bjc-PIXMA-iP5000" manufacturer="Canon" model="3004000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP5000" />
       <printer translate="name" name="Canon PIXMA iP5200" driver="bjc-PIXMA-iP5200" manufacturer="Canon" model="3004200" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP5200" />
       <printer translate="name" name="Canon PIXMA iP5300" driver="bjc-PIXMA-iP5300" manufacturer="Canon" model="3005300" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP5300" />
       <printer translate="name" name="Canon PIXMA iP6000D" driver="bjc-PIXMA-iP6000D" manufacturer="Canon" model="3006000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP6000D" />
+      <printer translate="name" name="Canon PIXMA iP6100D" driver="bjc-PIXMA-iP6100D" manufacturer="Canon" model="3006100" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP6100D" />
+      <printer translate="name" name="Canon PIXMA iP6600D" driver="bjc-PIXMA-iP6600D" manufacturer="Canon" model="3006600" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP6600D" />
       <printer translate="name" name="Canon PIXMA iP6700" driver="bjc-PIXMA-iP6700" manufacturer="Canon" model="3006700" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP6700" />
       <printer translate="name" name="Canon PIXMA iP8500" driver="bjc-PIXMA-iP8500" manufacturer="Canon" model="3008500" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-iP8500" />
       <printer translate="name" name="Canon PIXMA iX4000" driver="bjc-PIXMA-iX4000" manufacturer="Canon" model="4005000" parameters="PIXMA_iX5000_params" foomaticid="Canon-PIXMA-iX4000" />
       <printer translate="name" name="Canon PIXMA iX5000" driver="bjc-PIXMA-iX5000" manufacturer="Canon" model="4005000" parameters="PIXMA_iX5000_params" foomaticid="Canon-PIXMA-iX5000" />
+      <printer translate="name" name="Canon PIXMA iX6500" driver="bjc-PIXMA-iX6500" manufacturer="Canon" model="4006500" parameters="PIXMA_iX5000_params" foomaticid="Canon-PIXMA-iX6500" />
+      <printer translate="name" name="Canon PIXMA iX7000" driver="bjc-PIXMA-iX7000" manufacturer="Canon" model="4007000" parameters="PIXMA_iX5000_params" foomaticid="Canon-PIXMA-iX7000" />
+      <printer translate="name" name="Canon PIXMA Pro9000" driver="bjc-PIXMA-Pro9000" manufacturer="Canon" model="7009000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-Pro9000" />
+      <printer translate="name" name="Canon PIXMA Pro9000mk2" driver="bjc-PIXMA-Pro9000mk2" manufacturer="Canon" model="7009002" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-Pro9000-Mk2" />
       <printer translate="name" name="Canon PIXMA Pro9500" driver="bjc-PIXMA-Pro9500" manufacturer="Canon" model="7009500" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-Pro9500" />
+      <printer translate="name" name="Canon PIXMA Pro9500mk2" driver="bjc-PIXMA-Pro9500mk2" manufacturer="Canon" model="7009502" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXMA-Pro9500-Mk2" />
       <printer translate="name" name="Canon PIXMA MP150" driver="bjc-MULTIPASS-MP150" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP150" />
       <printer translate="name" name="Canon PIXMA MP160" driver="bjc-MULTIPASS-MP160" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP160" />
-      <printer translate="name" name="Canon PIXMA MP170" driver="bjc-MULTIPASS-MP170" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP170" />
+      <printer translate="name" name="Canon PIXMA MP170" driver="bjc-MULTIPASS-MP170" manufacturer="Canon" model="5000170" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP170" />
       <printer translate="name" name="Canon PIXMA MP180" driver="bjc-MULTIPASS-MP180" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP180" />
       <printer translate="name" name="Canon PIXMA MP220" driver="bjc-MULTIPASS-MP220" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP220" />
+      <printer translate="name" name="Canon PIXMA MP250" driver="bjc-MULTIPASS-MP250" manufacturer="Canon" model="5000250" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP250" />
+      <printer translate="name" name="Canon PIXMA MP270" driver="bjc-MULTIPASS-MP270" manufacturer="Canon" model="5000270" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP270" />
+      <printer translate="name" name="Canon PIXMA MP280" driver="bjc-MULTIPASS-MP280" manufacturer="Canon" model="5000280" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP280" />
       <printer translate="name" name="Canon PIXMA MP360" driver="bjc-MULTIPASS-MP360" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP360" />
       <printer translate="name" name="Canon PIXMA MP370" driver="bjc-MULTIPASS-MP370" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP370" />
       <printer translate="name" name="Canon PIXMA MP390" driver="bjc-MULTIPASS-MP390" manufacturer="Canon" model="5000150" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP390" />
+      <printer translate="name" name="Canon PIXMA MP450" driver="bjc-MULTIPASS-MP450" manufacturer="Canon" model="5000450" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP450" />
+      <printer translate="name" name="Canon PIXMA MP460" driver="bjc-MULTIPASS-MP460" manufacturer="Canon" model="5000450" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP460" />
+      <printer translate="name" name="Canon PIXMA MP480" driver="bjc-MULTIPASS-MP480" manufacturer="Canon" model="5000480" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP480" />
+      <printer translate="name" name="Canon PIXMA MP493" driver="bjc-MULTIPASS-MP493" manufacturer="Canon" model="5000493" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP493" />
+      <printer translate="name" name="Canon PIXMA MP495" driver="bjc-MULTIPASS-MP495" manufacturer="Canon" model="5000495" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP495" />
       <printer translate="name" name="Canon PIXMA MP500" driver="bjc-MULTIPASS-MP500" manufacturer="Canon" model="3004200" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP500" />
-      <printer translate="name" name="Canon PIXMA MP510" driver="bjc-MULTIPASS-MP510" manufacturer="Canon" model="5000520" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP510" />
+      <printer translate="name" name="Canon PIXMA MP510" driver="bjc-MULTIPASS-MP510" manufacturer="Canon" model="5000510" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP510" />
       <printer translate="name" name="Canon PIXMA MP520" driver="bjc-MULTIPASS-MP520" manufacturer="Canon" model="5000520" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP520" />
+      <printer translate="name" name="Canon PIXMA MP540" driver="bjc-MULTIPASS-MP540" manufacturer="Canon" model="5000540" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP540" />
+      <printer translate="name" name="Canon PIXMA MP550" driver="bjc-MULTIPASS-MP550" manufacturer="Canon" model="5000550" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP550" />
+      <printer translate="name" name="Canon PIXMA MP600" driver="bjc-MULTIPASS-MP600" manufacturer="Canon" model="5000600" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP600" />
       <printer translate="name" name="Canon PIXMA MP610" driver="bjc-MULTIPASS-MP610" manufacturer="Canon" model="3005300" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP610" />
+      <printer translate="name" name="Canon PIXMA MP620" driver="bjc-MULTIPASS-MP620" manufacturer="Canon" model="5000540" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP620" />
+      <printer translate="name" name="Canon PIXMA MP630" driver="bjc-MULTIPASS-MP630" manufacturer="Canon" model="5000630" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP630" />
+      <printer translate="name" name="Canon PIXMA MP640" driver="bjc-MULTIPASS-MP640" manufacturer="Canon" model="5000640" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP640" />
       <printer translate="name" name="Canon PIXMA MP700" driver="bjc-MULTIPASS-MP700" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP700" />
       <printer translate="name" name="Canon PIXMA MP710" driver="bjc-MULTIPASS-MP710" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP710" />
       <printer translate="name" name="Canon PIXMA MP730" driver="bjc-MULTIPASS-MP730" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP730" />
@@ -165,10 +204,34 @@
       <printer translate="name" name="Canon PIXMA MP770" driver="bjc-MULTIPASS-MP770" manufacturer="Canon" model="3004000" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP770" />
       <printer translate="name" name="Canon PIXMA MP780" driver="bjc-MULTIPASS-MP780" manufacturer="Canon" model="3004000" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP780" />
       <printer translate="name" name="Canon PIXMA MP790" driver="bjc-MULTIPASS-MP790" manufacturer="Canon" model="3004000" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP790" />
+      <printer translate="name" name="Canon PIXMA MP800" driver="bjc-MULTIPASS-MP800" manufacturer="Canon" model="5000800" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP800" />
+      <printer translate="name" name="Canon PIXMA MP810" driver="bjc-MULTIPASS-MP810" manufacturer="Canon" model="5000810" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP810" />
       <printer translate="name" name="Canon PIXMA MP830" driver="bjc-MULTIPASS-MP830" manufacturer="Canon" model="5000830" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP830" />
+      <printer translate="name" name="Canon PIXMA MP950" driver="bjc-MULTIPASS-MP950" manufacturer="Canon" model="5000950" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP950" />
+      <printer translate="name" name="Canon PIXMA MP960" driver="bjc-MULTIPASS-MP960" manufacturer="Canon" model="5000960" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP960" />
       <printer translate="name" name="Canon PIXMA MP970" driver="bjc-MULTIPASS-MP970" manufacturer="Canon" model="5000970" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP970" />
+      <printer translate="name" name="Canon PIXMA MP980" driver="bjc-MULTIPASS-MP980" manufacturer="Canon" model="5000980" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP980" />
+      <printer translate="name" name="Canon PIXMA MP990" driver="bjc-MULTIPASS-MP990" manufacturer="Canon" model="5000990" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MP990" />
       <printer translate="name" name="Canon PIXUS iP3100" driver="bjc-PIXUS-iP3100" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXUS-iP3100" />
       <printer translate="name" name="Canon PIXUS iP4100" driver="bjc-PIXUS-iP4100" manufacturer="Canon" model="3004000" parameters="PIXMA_iP4000_params" foomaticid="Canon-PIXUS-iP4100" />
+      <printer translate="name" name="Canon PIXMA MG5100" driver="bjc-PIXMA-MG5100" manufacturer="Canon" model="8005100" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-MG5100" />
+      <printer translate="name" name="Canon PIXMA MG5200" driver="bjc-PIXMA-MG5200" manufacturer="Canon" model="8005200" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-MG5200" />
+      <printer translate="name" name="Canon PIXMA MG6100" driver="bjc-PIXMA-MG6100" manufacturer="Canon" model="8006100" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-MG6100" />
+      <printer translate="name" name="Canon PIXMA MG8100" driver="bjc-PIXMA-MG8100" manufacturer="Canon" model="8008100" parameters="PIXMA_iP4300_params" foomaticid="Canon-PIXMA-MG8100" />
+      <printer translate="name" name="Canon PIXMA MX300" driver="bjc-MULTIPASS-MX300" manufacturer="Canon" model="9000300" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX300" />
+      <printer translate="name" name="Canon PIXMA MX310" driver="bjc-MULTIPASS-MX300" manufacturer="Canon" model="9000300" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX310" />
+      <printer translate="name" name="Canon PIXMA MX330" driver="bjc-MULTIPASS-MX330" manufacturer="Canon" model="9000330" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX330" />
+      <printer translate="name" name="Canon PIXMA MX340" driver="bjc-MULTIPASS-MX340" manufacturer="Canon" model="9000340" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX340" />
+      <printer translate="name" name="Canon PIXMA MX350" driver="bjc-MULTIPASS-MX340" manufacturer="Canon" model="9000340" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX350" />
+      <printer translate="name" name="Canon PIXMA MX360" driver="bjc-MULTIPASS-MX360" manufacturer="Canon" model="9000360" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX360" />
+      <printer translate="name" name="Canon PIXMA MX410" driver="bjc-MULTIPASS-MX410" manufacturer="Canon" model="9000360" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX410" />
+      <printer translate="name" name="Canon PIXMA MX420" driver="bjc-MULTIPASS-MX420" manufacturer="Canon" model="9000420" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX420" />
+      <printer translate="name" name="Canon PIXMA MX700" driver="bjc-MULTIPASS-MX700" manufacturer="Canon" model="9000700" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX700" />
+       <printer translate="name" name="Canon PIXMA MX850" driver="bjc-MULTIPASS-MX850" manufacturer="Canon" model="9000850" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX850" />
+       <printer translate="name" name="Canon PIXMA MX860" driver="bjc-MULTIPASS-MX860" manufacturer="Canon" model="9000860" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX860" />
+       <printer translate="name" name="Canon PIXMA MX870" driver="bjc-MULTIPASS-MX870" manufacturer="Canon" model="9000870" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX870" />
+       <printer translate="name" name="Canon PIXMA MX880" driver="bjc-MULTIPASS-MX880" manufacturer="Canon" model="9000880" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX880" />
+       <printer translate="name" name="Canon PIXMA MX7600" driver="bjc-MULTIPASS-MX7600" manufacturer="Canon" model="9007600" parameters="PIXMA_iP4000_params" foomaticid="Canon-MULTIPASS-MX7600" />
       <printer translate="name" name="Canon i80" driver="bjc-i80"   manufacturer="Canon" model="2000080" parameters="density_800_params" foomaticid="Canon-i80" />
       <printer translate="name" name="Canon i560" driver="bjc-i560" manufacturer="Canon" model="2000560" parameters="gamma_6_density_800_params" foomaticid="Canon-i560" />
       <printer translate="name" name="Canon i850" driver="bjc-i850" manufacturer="Canon" model="3003000" parameters="PIXMA_iP4000_params" foomaticid="Canon-i850" />
@@ -205,8 +268,11 @@
       <printer translate="name" name="Epson Artisan 810" driver="escp2-artisan810" manufacturer="Epson" model="96" parameters="claria_params" foomaticid="Epson-Artisan_810" />
       <printer translate="name" name="Epson B-300" driver="escp2-b300" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B300" />
       <printer translate="name" name="Epson B-308" driver="escp2-b308" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B308" />
+      <printer translate="name" name="Epson B-310" driver="escp2-b310" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B310" />
+      <printer translate="name" name="Epson B-310N" driver="escp2-b310n" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B310N" />
       <printer translate="name" name="Epson B-500DN" driver="escp2-b500dn" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B500DN" />
       <printer translate="name" name="Epson B-508DN" driver="escp2-b508dn" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B508DN" />
+      <printer translate="name" name="Epson B-510DN" driver="escp2-b510dn" manufacturer="Epson" model="87" parameters="standard_params" foomaticid="Epson-B510DN" />
       <printer translate="name" name="Epson Stylus C20" deviceid="MFG:EPSON;MDL:Stylus C20;DES:EPSON Stylus C20;CMD:ESCPL2,BDC,D4;" driver="escp2-c20" manufacturer="Epson" model="42" parameters="480_params" foomaticid="Epson-Stylus_C20" />
       <printer translate="name" name="Epson Stylus C20SX" driver="escp2-c20sx" manufacturer="Epson" model="42" parameters="480_params" foomaticid="Epson-Stylus_C20SX" />
       <printer translate="name" name="Epson Stylus C20UX" deviceid="MFG:EPSON;MDL:Stylus C20;DES:EPSON Stylus C20;CMD:ESCPL2,BDC,D4;" driver="escp2-c20ux" manufacturer="Epson" model="42" parameters="480_params" foomaticid="Epson-Stylus_C20UX" />
@@ -311,7 +377,7 @@
       <printer translate="name" name="Epson Stylus Photo 820" deviceid="MFG:EPSON;MDL:Stylus Photo 820;DES:EPSON Stylus Photo 820;CMD:ESCPL2,BDC,D4;" driver="escp2-820" manufacturer="Epson" model="78" parameters="standard_params" foomaticid="Epson-Stylus_Photo_820" />
       <printer translate="name" name="Epson Stylus Photo 825" deviceid="MFG:EPSON;MDL:Stylus Photo 825;DES:EPSON Stylus Photo 825;CMD:ESCPL2,BDC,D4;" driver="escp2-825" manufacturer="Epson" model="50" parameters="standard_params" foomaticid="Epson-Stylus_Photo_825" />
       <printer translate="name" name="Epson Stylus Photo 830" deviceid="MFG:EPSON;MDL:Stylus Photo 830U;DES:EPSON Stylus Photo 830U;CMD:ESCPL2,BDC,D4;" driver="escp2-830" manufacturer="Epson" model="50" parameters="standard_params" foomaticid="Epson-Stylus_Photo_830" />
-      <printer translate="name" name="Epson Stylus Photo 830U" driver="escp2-830u" manufacturer="Epson" model="50" parameters="standard_params" foomaticid="Epson-Stylus_Photo_830U" />
+      <printer translate="name" name="Epson Stylus Photo 830U" deviceid="MFG:EPSON;MDL:Stylus Photo 830U;DES:EPSON Stylus Photo 830U;CMD:ESCPL2,BDC,D4;" driver="escp2-830u" manufacturer="Epson" model="50" parameters="standard_params" foomaticid="Epson-Stylus_Photo_830U" />
       <printer translate="name" name="Epson Stylus Photo 870" deviceid="MFG:EPSON;MDL:Stylus Photo 870;DES:EPSON Stylus Photo 870;CMD:ESCPL2,BDC,D4;" driver="escp2-870" manufacturer="Epson" model="22" parameters="standard_params" foomaticid="Epson-Stylus_Photo_870" />
       <printer translate="name" name="Epson Stylus Photo 875" driver="escp2-875" manufacturer="Epson" model="22" parameters="standard_params" foomaticid="Epson-Stylus_Photo_875" />
       <printer translate="name" name="Epson Stylus Photo 890" deviceid="MFG:EPSON;MDL:Stylus Photo 890;DES:EPSON Stylus Photo 890;CMD:ESCPL2,BDC,D4;" driver="escp2-890" manufacturer="Epson" model="36" parameters="standard_params" foomaticid="Epson-Stylus_Photo_890" />
@@ -327,17 +393,16 @@
       <printer translate="name" name="Epson Stylus Photo 1280" driver="escp2-1280" manufacturer="Epson" model="37" parameters="standard_params" foomaticid="Epson-Stylus_Photo_1280" />
       <printer translate="name" name="Epson Stylus Photo 1290" driver="escp2-1290" manufacturer="Epson" model="37" parameters="standard_params" foomaticid="Epson-Stylus_Photo_1290" />
       <printer translate="name" name="Epson Stylus Photo 1290s" driver="escp2-1290s" manufacturer="Epson" model="37" parameters="standard_params" foomaticid="Epson-Stylus_Photo_1290s" />
-      <printer translate="name" name="Epson Stylus Photo 1400" driver="escp2-1400" manufacturer="Epson" model="82" parameters="claria_params" foomaticid="Epson-Stylus_Photo_1400" />
+      <printer translate="name" name="Epson Stylus Photo 1400" deviceid="MFG:EPSON;MDL:Stylus Photo 1400;DES:EPSON Stylus Photo 1400;CMD:ESCPL2,BDC,D4,D4PX,ESCPR1;" driver="escp2-1400" manufacturer="Epson" model="82" parameters="claria_params" foomaticid="Epson-Stylus_Photo_1400" />
       <printer translate="name" name="Epson Stylus Photo 1410" driver="escp2-1410" manufacturer="Epson" model="82" parameters="claria_params" foomaticid="Epson-Stylus_Photo_1410" />
       <printer translate="name" name="Epson Stylus Photo 2000P" driver="escp2-2000" manufacturer="Epson" model="26" parameters="standard_params" foomaticid="Epson-Stylus_Photo_2000P" />
       <printer translate="name" name="Epson Stylus Photo 2100" driver="escp2-2100" manufacturer="Epson" model="47" parameters="standard_params" foomaticid="Epson-Stylus_Photo_2100" />
       <printer translate="name" name="Epson Stylus Photo 2200" driver="escp2-2200" manufacturer="Epson" model="47" parameters="standard_params" foomaticid="Epson-Stylus_Photo_2200" />
       <printer translate="name" name="Epson Stylus Photo P50" driver="escp2-p50" manufacturer="Epson" model="97" parameters="claria_params" foomaticid="Epson-Stylus_Photo_P50" />
-      <printer translate="name" name="Epson Stylus Photo PX650" driver="escp2-px650" manufacturer="Epson" model="97" parameters="claria_params" foomaticid="Epson-Stylus_Photo_PX650" />
       <printer translate="name" name="Epson Stylus Photo R200" deviceid="MFG:EPSON;MDL:Stylus Photo R200;DES:EPSON Stylus Photo R200;CMD:ESCPL2,BDC,D4;" driver="escp2-r200" manufacturer="Epson" model="63" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R200" />
       <printer translate="name" name="Epson Stylus Photo R210" deviceid="MFG:EPSON;MDL:Stylus Photo R210;DES:EPSON Stylus Photo R210;CMD:ESCPL2,BDC,D4;" driver="escp2-r210" manufacturer="Epson" model="63" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R210" />
       <printer translate="name" name="Epson Stylus Photo R220" deviceid="MFG:EPSON;MDL:Stylus Photo R220;DES:EPSON Stylus Photo R220;CMD:ESCPL2,BDC,D4;" driver="escp2-r220" manufacturer="Epson" model="84" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R220" />
-      <printer translate="name" name="Epson Stylus Photo R230" driver="escp2-r230" manufacturer="Epson" model="84" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R230" />
+      <printer translate="name" name="Epson Stylus Photo R230" deviceid="MFG:EPSON;MDL:Stylus Photo R230;" driver="escp2-r230" manufacturer="Epson" model="84" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R230" />
       <printer translate="name" name="Epson Stylus Photo R240" driver="escp2-r240" manufacturer="Epson" model="83" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R240" />
       <printer translate="name" name="Epson Stylus Photo R245" driver="escp2-r245" manufacturer="Epson" model="83" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R245" />
       <printer translate="name" name="Epson Stylus Photo R260" driver="escp2-r260" manufacturer="Epson" model="81" parameters="claria_params" foomaticid="Epson-Stylus_Photo_R260" />
@@ -359,6 +424,7 @@
       <printer translate="name" name="Epson Stylus Photo R1900" driver="escp2-r1900" manufacturer="Epson" model="91" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R1900" />
       <printer translate="name" name="Epson Stylus Photo R2400" driver="escp2-r2400" manufacturer="Epson" model="71" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R2400" />
       <printer translate="name" name="Epson Stylus Photo R2880" driver="escp2-r2880" manufacturer="Epson" model="98" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R2880" />
+      <printer translate="name" name="Epson Stylus Photo R3000" driver="escp2-r3000" manufacturer="Epson" model="115" parameters="standard_params" foomaticid="Epson-Stylus_Photo_R3000" />
       <printer translate="name" name="Epson Stylus Photo RX400" deviceid="MFG:EPSON;MDL:Stylus Photo RX400;DES:EPSON Stylus Photo RX400;CMD:ESCPL2,BDC,D4;" driver="escp2-rx400" manufacturer="Epson" model="84" parameters="standard_params" foomaticid="Epson-Stylus_Photo_RX400" />
       <printer translate="name" name="Epson Stylus Photo RX420" deviceid="MFG:EPSON;MDL:Stylus Photo RX420;DES:EPSON Stylus Photo RX420;CMD:ESCPL2,BDC,D4;" driver="escp2-rx420" manufacturer="Epson" model="84" parameters="standard_params" foomaticid="Epson-Stylus_Photo_RX420" />
       <printer translate="name" name="Epson Stylus Photo RX425" deviceid="MFG:EPSON;MDL:Stylus Photo RX425;DES:EPSON Stylus Photo RX425;CMD:ESCPL2,BDC,D4;" driver="escp2-rx425" manufacturer="Epson" model="84" parameters="standard_params" foomaticid="Epson-Stylus_Photo_RX425" />
@@ -383,8 +449,11 @@
       <printer translate="name" name="Epson Stylus Photo TX710W" driver="escp2-tx710w" manufacturer="Epson" model="96" parameters="claria_params" foomaticid="Epson-Stylus_Photo_TX710W" />
       <printer translate="name" name="Epson Stylus Photo TX800FW" driver="escp2-tx800w" manufacturer="Epson" model="96" parameters="claria_params" foomaticid="Epson-Stylus_Photo_TX800FW" />
       <printer translate="name" name="Epson Stylus Photo TX810FW" driver="escp2-tx810fw" manufacturer="Epson" model="96" parameters="claria_params" foomaticid="Epson-Stylus_Photo_TX810FW" />
-      <printer translate="name" name="Epson Stylus Pro 3800" driver="escp2-3800" manufacturer="Epson" model="107" parameters="standard_params" foomaticid="Epson-Stylus_Pro_3800" />
+      <printer translate="name" name="Epson Stylus Pro 3800" driver="escp2-3800" manufacturer="Epson" model="108" parameters="standard_params" foomaticid="Epson-Stylus_Pro_3800" />
       <printer translate="name" name="Epson Stylus Pro 3880" driver="escp2-3880" manufacturer="Epson" model="107" parameters="standard_params" foomaticid="Epson-Stylus_Pro_3880" />
+      <printer translate="name" name="Epson Stylus Pro 3885" driver="escp2-3885" manufacturer="Epson" model="107" parameters="standard_params" foomaticid="Epson-Stylus_Pro_3885" />
+      <printer translate="name" name="Epson Stylus Pro 4000" driver="escp2-4000" manufacturer="Epson" model="114" parameters="standard_params" foomaticid="Epson-Stylus_Pro_4000" />
+      <printer translate="name" name="Epson Stylus Pro 4800/4880 Back Compatible" driver="escp2-4600" manufacturer="Epson" model="112" parameters="standard_params" foomaticid="Epson-Stylus_Pro_4600" />
       <printer translate="name" name="Epson Stylus Pro 4800" driver="escp2-4800" manufacturer="Epson" model="106" parameters="standard_params" foomaticid="Epson-Stylus_Pro_4800" />
       <printer translate="name" name="Epson Stylus Pro 4880" driver="escp2-4880" manufacturer="Epson" model="102" parameters="standard_params" foomaticid="Epson-Stylus_Pro_4880" />
       <printer translate="name" name="Epson Stylus Pro 5000" driver="escp2-5000" manufacturer="Epson" model="27" parameters="standard_params" foomaticid="Epson-Stylus_Pro_5000" />
@@ -392,14 +461,19 @@
       <printer translate="name" name="Epson Stylus Pro 7000" driver="escp2-7000" manufacturer="Epson" model="28" parameters="standard_params" foomaticid="Epson-Stylus_Pro_7000" />
       <printer translate="name" name="Epson Stylus Pro 7500" driver="escp2-7500" manufacturer="Epson" model="29" parameters="pro_5500_params" foomaticid="Epson-Stylus_Pro_7500" />
       <printer translate="name" name="Epson Stylus Pro 7600" driver="escp2-7600" manufacturer="Epson" model="48" parameters="standard_params" foomaticid="Epson-Stylus_Pro_7600" />
+      <printer translate="name" name="Epson Stylus Pro 7700" driver="escp2-7700" manufacturer="Epson" model="109" parameters="standard_params" foomaticid="Epson-Stylus_Pro_7700" />
       <printer translate="name" name="Epson Stylus Pro 7800" driver="escp2-7800" manufacturer="Epson" model="103" parameters="standard_params" foomaticid="Epson-Stylus_Pro_7800" />
       <printer translate="name" name="Epson Stylus Pro 7880" driver="escp2-7880" manufacturer="Epson" model="89" parameters="standard_params" foomaticid="Epson-Stylus_Pro_7880" />
+      <printer translate="name" name="Epson Stylus Pro 7890" driver="escp2-7890" manufacturer="Epson" model="89" parameters="standard_params" foomaticid="Epson-Stylus_Pro_7890" />
       <printer translate="name" name="Epson Stylus Pro 9000" driver="escp2-9000" manufacturer="Epson" model="30" parameters="standard_params" foomaticid="Epson-Stylus_Pro_9000" />
       <printer translate="name" name="Epson Stylus Pro 9500" driver="escp2-9500" manufacturer="Epson" model="31" parameters="pro_5500_params" foomaticid="Epson-Stylus_Pro_9500" />
       <printer translate="name" name="Epson Stylus Pro 9600" driver="escp2-9600" manufacturer="Epson" model="49" parameters="standard_params" foomaticid="Epson-Stylus_Pro_9600" />
+      <printer translate="name" name="Epson Stylus Pro 9700" driver="escp2-9700" manufacturer="Epson" model="110" parameters="standard_params" foomaticid="Epson-Stylus_Pro_9700" />
       <printer translate="name" name="Epson Stylus Pro 9800" driver="escp2-9800" manufacturer="Epson" model="104" parameters="standard_params" foomaticid="Epson-Stylus_Pro_9800" />
       <printer translate="name" name="Epson Stylus Pro 9880" driver="escp2-9880" manufacturer="Epson" model="90" parameters="standard_params" foomaticid="Epson-Stylus_Pro_9880" />
+      <printer translate="name" name="Epson Stylus Pro 9890" driver="escp2-9890" manufacturer="Epson" model="90" parameters="standard_params" foomaticid="Epson-Stylus_Pro_9890" />
       <printer translate="name" name="Epson Stylus Pro 10000" driver="escp2-10000" manufacturer="Epson" model="41" parameters="standard_params" foomaticid="Epson-Stylus_Pro_10000" />
+      <printer translate="name" name="Epson Stylus Pro 11800/11880 Back Compatible" driver="escp2-11600" manufacturer="Epson" model="113" parameters="standard_params" foomaticid="Epson-Stylus_Pro_11600" />
       <printer translate="name" name="Epson Stylus Pro 11800" driver="escp2-11800" manufacturer="Epson" model="105" parameters="standard_params" foomaticid="Epson-Stylus_Pro_11800" />
       <printer translate="name" name="Epson Stylus Pro 11880" driver="escp2-11880" manufacturer="Epson" model="88" parameters="standard_params" foomaticid="Epson-Stylus_Pro_11880" />
       <printer translate="name" name="Epson Stylus Scan 2000" driver="escp2-scan2000" manufacturer="Epson" model="12" parameters="standard_params" foomaticid="Epson-Stylus_Scan_2000" />
@@ -449,7 +523,7 @@
       <printer translate="name" name="Epson Stylus CX9475F" driver="escp2-cx9475f" manufacturer="Epson" model="65" parameters="cx3500_params" foomaticid="Epson-Stylus_CX9475F" />
       <printer translate="name" name="Epson Stylus D68" deviceid="MFG:EPSON;MDL:Stylus D68;DES:EPSON Stylus D68;CMD:ESCPL2,BDC,D4;" driver="escp2-d68" manufacturer="Epson" model="66" parameters="standard_params" foomaticid="Epson-Stylus_D68" />
       <printer translate="name" name="Epson Stylus D88" deviceid="MFG:EPSON;MDL:Stylus D88;DES:EPSON Stylus D88;CMD:ESCPL2,BDC,D4;" driver="escp2-d88" manufacturer="Epson" model="69" parameters="standard_params" foomaticid="Epson-Stylus_D88" />
-      <printer translate="name" name="Epson Stylus D92" driver="escp2-d92" manufacturer="Epson" model="66" parameters="standard_params" foomaticid="Epson-Stylus_D92" />
+      <printer translate="name" name="Epson Stylus D92" deviceid="MFG:EPSON;CMD:ESCPL2,BDC,D4,D4PX;MDL:Stylus D92;DES:EPSON Stylus D92;" driver="escp2-d92" manufacturer="Epson" model="66" parameters="standard_params" foomaticid="Epson-Stylus_D92" />
       <printer translate="name" name="Epson Stylus D120" driver="escp2-d120" manufacturer="Epson" model="85" parameters="standard_params" foomaticid="Epson-Stylus_D120" />
       <printer translate="name" name="Epson Stylus DX3800" deviceid="MFG:EPSON;MDL:Stylus DX3800;DES:EPSON Stylus DX3800;CMD:ESCPL2,BDC,D4;" driver="escp2-dx3800" manufacturer="Epson" model="72" parameters="standard_params" foomaticid="Epson-Stylus_DX3800" />
       <printer translate="name" name="Epson Stylus DX3850" deviceid="MFG:EPSON;MDL:Stylus DX3850;DES:EPSON Stylus DX3850;CMD:ESCPL2,BDC,D4;" driver="escp2-dx3850" manufacturer="Epson" model="72" parameters="standard_params" foomaticid="Epson-Stylus_DX3850" />
@@ -470,8 +544,8 @@
       <printer translate="name" name="Epson Stylus NX100" driver="escp2-nx100" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_NX100" />
       <printer translate="name" name="Epson Stylus NX105" driver="escp2-nx105" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_NX105" />
       <printer translate="name" name="Epson Stylus NX115" driver="escp2-nx115" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_NX115" />
-      <printer translate="name" name="Epson Stylus NX200" driver="escp2-nx200" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_NX200" />
-      <printer translate="name" name="Epson Stylus NX215" driver="escp2-nx215" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_NX215" />
+      <printer translate="name" name="Epson Stylus NX200" driver="escp2-nx200" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_NX200" />
+      <printer translate="name" name="Epson Stylus NX215" driver="escp2-nx215" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_NX215" />
       <printer translate="name" name="Epson Stylus NX300" driver="escp2-nx300" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_NX300" />
       <printer translate="name" name="Epson Stylus NX400" driver="escp2-nx400" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_NX400" />
       <printer translate="name" name="Epson Stylus NX415" driver="escp2-nx415" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_NX415" />
@@ -488,10 +562,10 @@
       <printer translate="name" name="Epson Stylus SX105" driver="escp2-sx105" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX105" />
       <printer translate="name" name="Epson Stylus SX110" driver="escp2-sx110" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX110" />
       <printer translate="name" name="Epson Stylus SX115" driver="escp2-sx115" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX115" />
-      <printer translate="name" name="Epson Stylus SX200" driver="escp2-sx200" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX200" />
-      <printer translate="name" name="Epson Stylus SX205" driver="escp2-sx205" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX205" />
-      <printer translate="name" name="Epson Stylus SX210" driver="escp2-sx210" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX210" />
-      <printer translate="name" name="Epson Stylus SX215" driver="escp2-sx215" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX215" />
+      <printer translate="name" name="Epson Stylus SX200" driver="escp2-sx200" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX200" />
+      <printer translate="name" name="Epson Stylus SX205" driver="escp2-sx205" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX205" />
+      <printer translate="name" name="Epson Stylus SX210" driver="escp2-sx210" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX210" />
+      <printer translate="name" name="Epson Stylus SX215" driver="escp2-sx215" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_SX215" />
       <printer translate="name" name="Epson Stylus SX400" driver="escp2-sx400" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX400" />
       <printer translate="name" name="Epson Stylus SX405" driver="escp2-sx405" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX405" />
       <printer translate="name" name="Epson Stylus SX410" driver="escp2-sx410" manufacturer="Epson" model="93" parameters="standard_params" foomaticid="Epson-Stylus_SX410" />
@@ -502,8 +576,11 @@
       <printer translate="name" name="Epson Stylus SX610FW" driver="escp2-sx610fw" manufacturer="Epson" model="92" parameters="standard_params" foomaticid="Epson-Stylus_SX610FW" />
       <printer translate="name" name="Epson Stylus SX615" driver="escp2-sx615" manufacturer="Epson" model="92" parameters="standard_params" foomaticid="Epson-Stylus_SX615" />
       <printer translate="name" name="Epson Stylus SX650" driver="escp2-sx650" manufacturer="Epson" model="97" parameters="standard_params" foomaticid="Epson-Stylus_SX650" />
+      <printer translate="name" name="Epson Stylus T13" driver="escp2-t13" manufacturer="Epson" model="101" parameters="standard_params" foomaticid="Epson-Stylus_T13" />
       <printer translate="name" name="Epson Stylus T20" driver="escp2-t20" manufacturer="Epson" model="101" parameters="standard_params" foomaticid="Epson-Stylus_T20" />
       <printer translate="name" name="Epson Stylus T21" driver="escp2-t21" manufacturer="Epson" model="101" parameters="standard_params" foomaticid="Epson-Stylus_T21" />
+      <printer translate="name" name="Epson Stylus T22" driver="escp2-t22" manufacturer="Epson" model="101" parameters="standard_params" foomaticid="Epson-Stylus_T22" />
+      <printer translate="name" name="Epson Stylus T22E" driver="escp2-t22e" manufacturer="Epson" model="101" parameters="standard_params" foomaticid="Epson-Stylus_T22E" />
       <printer translate="name" name="Epson Stylus T26" driver="escp2-t26" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-Stylus_T26" />
       <printer translate="name" name="Epson Stylus T30" driver="escp2-t30" manufacturer="Epson" model="92" parameters="standard_params" foomaticid="Epson-Stylus_T30" />
       <printer translate="name" name="Epson Stylus T40W" driver="escp2-t40w" manufacturer="Epson" model="85" parameters="standard_params" foomaticid="Epson-Stylus_T40W" />
@@ -582,9 +659,12 @@
       <printer translate="name" name="Epson MC 9000" driver="escp2-mc9000" manufacturer="Epson" model="31" parameters="pro_5500_params" foomaticid="Epson-MC_9000" />
       <printer translate="name" name="Epson MC 10000" driver="escp2-mc10000" manufacturer="Epson" model="41" parameters="standard_params" foomaticid="Epson-MC_10000" />
       <printer translate="name" name="Epson ME 300" driver="escp2-me300" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-ME_300" />
+      <printer translate="name" name="Epson ME 320" driver="escp2-me320" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-ME_320" />
       <printer translate="name" name="Epson ME Office 70" driver="escp2-meof70" manufacturer="Epson" model="85" parameters="standard_params" foomaticid="Epson-ME_Office_70" />
       <printer translate="name" name="Epson ME Office 80W" driver="escp2-meof80w" manufacturer="Epson" model="92" parameters="standard_params" foomaticid="Epson-ME_Office_80W" />
       <printer translate="name" name="Epson ME Office 360" driver="escp2-meof360" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-ME_Office_360" />
+      <printer translate="name" name="Epson ME Office 600F" driver="escp2-meof600f" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-ME_Office_600F" />
+      <printer translate="name" name="Epson ME Office 620F" driver="escp2-meof620f" manufacturer="Epson" model="94" parameters="standard_params" foomaticid="Epson-ME_Office_620F" />
       <printer translate="name" name="Epson ME Office 700FW" driver="escp2-meof700fw" manufacturer="Epson" model="92" parameters="standard_params" foomaticid="Epson-ME_Office_700FW" />
       <printer translate="name" name="Epson ME Office 1100" driver="escp2-meof1100" manufacturer="Epson" model="99" parameters="standard_params" foomaticid="Epson-ME_Office_1100" />
       <printer translate="name" name="Epson MJ 930C" driver="escp2-mj930c" manufacturer="Epson" model="4" parameters="standard_params" foomaticid="Epson-MJ_930C" />
@@ -706,7 +786,7 @@
       <printer translate="name" name="Brother HL-1870N" driver="brother-hl-1870n" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-1870N" />
       <printer translate="name" name="Brother HL-2030" driver="brother-hl-2030" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-2030" />
       <printer translate="name" name="Brother HL-2035" driver="brother-hl-2035" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-2035" />
-      <printer translate="name" name="Brother HL-2060" deviceid="MFG:Brother;MDL:HL-2040 series;DES:None;CMD:PJL,HBP;" driver="brother-hl-2060" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-2060" />
+      <printer translate="name" name="Brother HL-2060" driver="brother-hl-2060" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-2060" />
       <printer translate="name" name="Brother HL-2460" deviceid="MFG:Brother;MDL:Brother HL-2460 series;" driver="brother-hl-2460" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-2460" />
       <printer translate="name" name="Brother HL-2460N" driver="brother-hl-2460n" manufacturer="Brother" model="6" parameters="pcl_laser_params" foomaticid="Brother-HL-2460N" />
       <printer translate="name" name="Brother HL-4Ve" driver="brother-hl-4ve" manufacturer="Brother" model="2" parameters="pcl_laser_params" foomaticid="Brother-HL-4Ve" />
@@ -740,12 +820,12 @@
       <printer translate="name" name="DEC LN17" driver="dec-ln17" manufacturer="DEC" model="6" parameters="pcl_laser_params" foomaticid="DEC-LN17" />
       <printer translate="name" name="Epson ActionLaser 1100" driver="epson-actl_1100" manufacturer="Epson" model="3" parameters="pcl_laser_params" foomaticid="Epson-ActionLaser_1100" />
       <printer translate="name" name="Epson ActionLaser II" driver="epson-actl_ii" manufacturer="Epson" model="2" parameters="pcl_laser_params" foomaticid="Epson-ActionLaser_II" />
-      <printer translate="name" name="Epson AcuLaser C2000" driver="epson-acl_c2000" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AcuLaser_C2000" />
-      <printer translate="name" name="Epson AcuLaser C2000PS" deviceid="MFG:Epson;MDL:AL-C2000 PS3;" driver="epson-acl_c2000ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AcuLaser_C2000PS" />
-      <printer translate="name" name="Epson AcuLaser C8500" driver="epson-acl_c8500" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AcuLaser_C8500" />
-      <printer translate="name" name="Epson AcuLaser C8500PS" driver="epson-acl_c8500ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AcuLaser_C8500PS" />
-      <printer translate="name" name="Epson AcuLaser C8600" driver="epson-acl_c8600" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AcuLaser_C8600" />
-      <printer translate="name" name="Epson AcuLaser C8600PS" deviceid="MFG:Epson;MDL:AL-C8600 PS3;" driver="epson-acl_c8600ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AcuLaser_C8600PS" />
+      <printer translate="name" name="Epson AL-C2000" driver="epson-acl_c2000" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AL-C2000" />
+      <printer translate="name" name="Epson AL-C2000 PS3" deviceid="MFG:Epson;MDL:AL-C2000 PS3;" driver="epson-acl_c2000ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AL-C2000_PS3" />
+      <printer translate="name" name="Epson AL-C8500" driver="epson-acl_c8500" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AL-C8500" />
+      <printer translate="name" name="Epson AL-C8500PS" driver="epson-acl_c8500ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AL-C8500PS" />
+      <printer translate="name" name="Epson AL-C8600" driver="epson-acl_c8600" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AL-C8600" />
+      <printer translate="name" name="Epson AL-C8600 PS3" deviceid="MFG:Epson;MDL:AL-C8600 PS3;" driver="epson-acl_c8600ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-AL-C8600_PS3" />
       <printer translate="name" name="Epson EPL-5200" driver="epson-epl-5200" manufacturer="Epson" model="3" parameters="pcl_laser_params" foomaticid="Epson-EPL-5200" />
       <printer translate="name" name="Epson EPL-5200+" driver="epson-epl-5200plus" manufacturer="Epson" model="3" parameters="pcl_laser_params" foomaticid="Epson-EPL-5200plus" />
       <printer translate="name" name="Epson EPL-5700" deviceid="MFG:EPSON;MDL:EPL-5700;DES:EPSON EPL-5700;CMD:PJL,EJL,ESCPL2-00,ESCP9-84,PRPXL24-01,HP ENHANCED PCL5,HPGL2-01,;" driver="epson-epl-5700" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-5700" />
@@ -753,9 +833,9 @@
       <printer translate="name" name="Epson EPL-5800" driver="epson-epl-5800" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-5800" />
       <printer translate="name" name="Epson EPL-5800PS" driver="epson-epl-5800ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-5800PS" />
       <printer translate="name" name="Epson EPL-5900" driver="epson-epl-5900" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-5900" />
-      <printer translate="name" name="Epson EPL-5900PS" deviceid="MFG:Epson;MDL:EPL-5900 PS3;" driver="epson-epl-5900ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-5900PS" />
+      <printer translate="name" name="Epson EPL-5900 PS3" deviceid="MFG:Epson;MDL:EPL-5900 PS3;" driver="epson-epl-5900ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-5900_PS3" />
       <printer translate="name" name="Epson EPL-6100" driver="epson-epl-6100" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-6100" />
-      <printer translate="name" name="Epson EPL-6100PS" deviceid="MFG:Epson;MDL:EPL-6100 PS3;" driver="epson-epl-6100ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-6100PS" />
+      <printer translate="name" name="Epson EPL-6100 PS3" deviceid="MFG:Epson;MDL:EPL-6100 PS3;" driver="epson-epl-6100ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-6100_PS3" />
       <printer translate="name" name="Epson EPL-7100" driver="epson-epl-7100" manufacturer="Epson" model="2" parameters="pcl_laser_params" foomaticid="Epson-EPL-7100" />
       <printer translate="name" name="Epson EPL-N2050" driver="epson-epl-n2050" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2050" />
       <printer translate="name" name="Epson EPL-N2050+" driver="epson-epl-n2050plus" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2050plus" />
@@ -763,7 +843,7 @@
       <printer translate="name" name="Epson EPL-N2050PS+" driver="epson-epl-n2050psplus" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2050PSplus" />
       <printer translate="name" name="Epson EPL-N2120" driver="epson-epl-n2120" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2120" />
       <printer translate="name" name="Epson EPL-N2500" driver="epson-epl-n2500" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2500" />
-      <printer translate="name" name="Epson EPL-N2500PS" driver="epson-epl-n2500ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2500PS" />
+      <printer translate="name" name="Epson EPL-N2500 PS3" deviceid="MFG:Epson;MDL:EPL-N2500 PS3;" driver="epson-epl-n2500ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2500_PS3" />
       <printer translate="name" name="Epson EPL-N2750" driver="epson-epl-n2750" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2750" />
       <printer translate="name" name="Epson EPL-N2750PS" driver="epson-epl-n2750ps" manufacturer="Epson" model="6" parameters="pcl_laser_params" foomaticid="Epson-EPL-N2750PS" />
       <printer translate="name" name="Fujitsu PrintPartner 10V" driver="fujitsu-pp_10v" manufacturer="Fujitsu" model="6" parameters="pcl_laser_params" foomaticid="Fujitsu-PrintPartner_10V" />
@@ -925,7 +1005,7 @@
       <printer translate="name" name="HP DeskJet 952C" driver="hp-dj_952c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_952C" />
       <printer translate="name" name="HP DeskJet 955C" driver="hp-dj_955c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_955C" />
       <printer translate="name" name="HP DeskJet 957C" driver="hp-dj_957c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_957C" />
-      <printer translate="name" name="HP DeskJet 959C" driver="hp-dj_959c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_959C" />
+      <printer translate="name" name="HP DeskJet 959C" deviceid="MFG:HEWLETT-PACKARD;MDL:DESKJET 950C;DES:Hewlett-Packard DeskJet 950C;CMD:MLC,PCL,PML;" driver="hp-dj_959c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_959C" />
       <printer translate="name" name="HP DeskJet 960C" deviceid="MFG:HEWLETT-PACKARD;MDL:DESKJET 960C;DES:Hewlett-Packard DeskJet 960C;CMD:MLC,PCL,PML;" driver="hp-dj_960c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_960C" />
       <printer translate="name" name="HP DeskJet 970C" deviceid="MFG:HEWLETT-PACKARD;MDL:DESKJET 970C;DES:Hewlett-Packard DeskJet 970C;CMD:MLC,PCL,PML;" driver="hp-dj_970c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_970C" />
       <printer translate="name" name="HP DeskJet 975C" driver="hp-dj_975c" manufacturer="HP" model="900" parameters="pcl_inkjet_params" foomaticid="HP-DeskJet_975C" />
@@ -1018,8 +1098,8 @@
       <printer translate="name" name="HP LaserJet 4300" deviceid="MFG:Hewlett-Packard;MDL:hp LaserJet 4300;CMD:PJL,MLC,POSTSCRIPT,PJL,PCLXL,PCL;" driver="hp-lj_4300" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_4300" />
       <printer translate="name" name="HP LaserJet 4345 mfp" driver="hp-lj_4345_mfp" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_4345_mfp" />
       <printer translate="name" name="HP LaserJet 4350" deviceid="MFG:HP;MDL:hp LaserJet 4350L;" driver="hp-lj_4350" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_4350" />
-      <printer translate="name" name="HP LaserJet 5000" deviceid="MFG:Hewlett-Packard;MDL:HP LaserJet 5000 Series;DES:Hewlett-Packard LaserJet 5000 Series;CMD:PJL,MLC,PCL,PCLXL,POSTSCRIPT;" driver="hp-lj_5000" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_5000" />
-      <printer translate="name" name="HP LaserJet 5100" driver="hp-lj_5100" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_5100" />
+      <printer translate="name" name="HP LaserJet 5000" deviceid="MFG:Hewlett-Packard;MDL:HP LaserJet 5000 Series;DES:Hewlett-Packard LaserJet 5000 Series;CMD:PJL,MLC,PCL,PCLXL,POSTSCRIPT;" driver="hp-lj_5000" manufacturer="HP" model="63" parameters="pcl_laser_params" foomaticid="HP-LaserJet_5000" />
+      <printer translate="name" name="HP LaserJet 5100" driver="hp-lj_5100" manufacturer="HP" model="63" parameters="pcl_laser_params" foomaticid="HP-LaserJet_5100" />
       <printer translate="name" name="HP LaserJet 5200" driver="hp-lj_5200" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_5200" />
       <printer translate="name" name="HP LaserJet 5200L" driver="hp-lj_5200l" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_5200L" />
       <printer translate="name" name="HP LaserJet 8000" driver="hp-lj_8000" manufacturer="HP" model="6" parameters="pcl_laser_params" foomaticid="HP-LaserJet_8000" />
@@ -1665,11 +1745,12 @@
       <printer translate="name" name="Canon SELPHY-CP-730" driver="canon-cp730" manufacturer="Canon" model="1001" foomaticid="Canon-SELPHY-CP-730" />
       <printer translate="name" name="Canon SELPHY-CP-740" driver="canon-cp740" manufacturer="Canon" model="1001" foomaticid="Canon-SELPHY-CP-740" />
       <printer translate="name" name="Canon SELPHY-CP-750" driver="canon-cp750" manufacturer="Canon" model="1001" foomaticid="Canon-SELPHY-CP-750" />
+      <printer translate="name" name="Canon SELPHY-CP-800" driver="canon-cp800" manufacturer="Canon" model="1001" foomaticid="Canon-SELPHY-CP-800" />
       <printer translate="name" name="Canon SELPHY ES1" driver="canon-es1" manufacturer="Canon" model="1003" foomaticid="Canon-SELPHY-ES1" />
       <printer translate="name" name="Canon SELPHY ES2" driver="canon-es2" manufacturer="Canon" model="1003" foomaticid="Canon-SELPHY-ES2" />
       <printer translate="name" name="Canon SELPHY ES20" driver="canon-es20" manufacturer="Canon" model="1003" foomaticid="Canon-SELPHY-ES20" />
       <printer translate="name" name="Sony DPP-EX5" driver="sony-dppex5" manufacturer="Sony" model="2002" foomaticid="Sony-DPP-EX5" />
-      <printer translate="name" name="Sony DPP-EX7" driver="sony-dppex5" manufacturer="Sony" model="2002" foomaticid="Sony-DPP-EX5" />
+      <printer translate="name" name="Sony DPP-EX7" driver="sony-dppex7" manufacturer="Sony" model="2002" foomaticid="Sony-DPP-EX7" />
       <printer translate="name" name="Sony UP-DP10" driver="sony-updp10" manufacturer="Sony" model="2000" foomaticid="Sony-UP-DP10" />
       <printer translate="name" name="Sony UP-DR100" driver="sony-updr100" manufacturer="Sony" model="2003" foomaticid="Sony-UP-DR100" />
       <printer translate="name" name="Sony UP-DR150" driver="sony-updr150" manufacturer="Sony" model="2001" foomaticid="Sony-UP-DR150" />
@@ -1677,6 +1758,13 @@
       <printer translate="name" name="Fujifilm Printpix-CX-550" driver="fujifilm-cx550" manufacturer="Fujifilm" model="3001" foomaticid="Fujifilm-Printpix-CX-550" />
       <printer translate="name" name="Fujifilm FinePix-NX-500" driver="fujifilm-nx500" manufacturer="Fujifilm" model="3002" foomaticid="Fujifilm-FinePix-NX-500" />
       <printer translate="name" name="Kodak Easyshare-Printer-Dock" driver="kodak-dock" manufacturer="Kodak" model="4000" foomaticid="Kodak-Easyshare-Printer-Dock" />
+      <printer translate="name" name="Kodak EasyShare-G600-Printer-Dock" driver="kodak-g600-dock" manufacturer="Kodak" model="4000" foomaticid="Kodak-EasyShare-G600-Printer-Dock" />
+      <printer translate="name" name="Kodak PD-4000" driver="kodak-pd-4000" manufacturer="Kodak" model="4000" foomaticid="Kodak-PD-4000" />
+      <printer translate="name" name="Kodak PD-6000" driver="kodak-pd-6000" manufacturer="Kodak" model="4000" foomaticid="Kodak-PD-6000" />
+      <printer translate="name" name="Kodak Photo-Printer" driver="kodak-photo-printer" manufacturer="Kodak" model="4000" foomaticid="Kodak-Photo-Printer" />
+      <printer translate="name" name="Kodak Photo-Printer-500" driver="kodak-photo-printer-500" manufacturer="Kodak" model="4000" foomaticid="Kodak-Photo-Printer-500" />
+      <printer translate="name" name="Kodak Printer-Dock-Plus" driver="kodak-dock-plus" manufacturer="Kodak" model="4000" foomaticid="Kodak-Printer-Dock-Plus" />
+      <printer translate="name" name="Kodak Printer-Dock-Plus-S3" driver="kodak-dock-plus-s3" manufacturer="Kodak" model="4000" foomaticid="Kodak-Printer-Dock-Plus-S3" />
       <printer translate="name" name="Shinko CHC-S9045" driver="shinko-chcs9045" manufacturer="Shinko" model="5000" foomaticid="Shinko-CHC-S9045" />
       <printer translate="name" name="Dai Nippon Printing DS40" driver="dnp-ds40" manufacturer="DNP" model="6000" foomaticid="DNP-DS40" />
       <printer translate="name" name="Dai Nippon Printing DS80" driver="dnp-ds80" manufacturer="DNP" model="6001" foomaticid="DNP-DS80" />

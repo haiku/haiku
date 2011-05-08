@@ -1,5 +1,5 @@
 /*
- * "$Id: testpattern.c,v 1.57 2009/06/14 17:12:44 rlk Exp $"
+ * "$Id: testpattern.c,v 1.59 2011/04/01 01:21:12 rlk Exp $"
  *
  *   Test pattern generator for Gimp-Print
  *
@@ -81,6 +81,7 @@ char *global_printer = NULL;
 double global_density;
 double global_xtop;
 double global_xleft;
+size_mode_t global_size_mode;
 double global_hsize;
 double global_vsize;
 const char *global_image_type;
@@ -406,22 +407,50 @@ do_print(void)
 
   width = right - left;
   height = bottom - top;
-  top += height * global_xtop;
-  left += width * global_xleft;
-  if (global_steps > width)
-    global_steps = width;
 
+  switch (global_size_mode)
+    {
+    case SIZE_PT:
+      top += (int) (global_xtop + .5);
+      left += (int) (global_xleft + .5);
+      width = (int) (global_hsize + .5);
+      height = (int) (global_vsize + .5);
+      break;
+    case SIZE_IN:
+      top += (int) ((global_xtop * 72) + .5);
+      left += (int) ((global_xleft * 72) + .5);
+      width = (int) ((global_hsize * 72) + .5);
+      height = (int) ((global_vsize * 72) + .5);
+      break;
+    case SIZE_MM:
+      top += (int) ((global_xtop * 72 / 25.4) + .5);
+      left += (int) ((global_xleft * 72 / 25.4) + .5);
+      width = (int) ((global_hsize * 72 / 25.4) + .5);
+      height = (int) ((global_vsize * 72 / 25.4) + .5);
+      break;
+    case SIZE_RELATIVE:
+    default:
+      top += height * global_xtop;
+      left += width * global_xleft;
+      width *= global_hsize;
+      height *= global_vsize;
+      break;
+    }
+  stp_set_width(v, width);
+  stp_set_height(v, height);
 #if 0
   width = (width / global_steps) * global_steps;
   height = (height / global_n_testpatterns) * global_n_testpatterns;
 #endif
-  stp_set_width(v, width * global_hsize);
-  stp_set_height(v, height * global_vsize);
+  if (global_steps > width)
+    global_steps = width;
 
   global_printer_width = width * x / 72;
   global_printer_height = height * y / 72;
 
   global_band_height = global_printer_height / global_n_testpatterns;
+  if (global_band_height == 0)
+    global_band_height = 1;
   stp_set_left(v, left);
   stp_set_top(v, top);
 
@@ -436,7 +465,7 @@ do_print(void)
       if (stp_print(v, &theImage) != 1)
 	{
 	  if (!global_quiet)
-	    fprintf(stderr, "FAILED!");
+	    fputs("FAILED", stderr);
 	  failures++;
 	  status = 2;
 	}
@@ -453,7 +482,7 @@ do_print(void)
       if (! global_fail_verify_ok)
 	{
 	  if (!global_quiet)
-	    fprintf(stderr, "FAILED!");
+	    fputs("FAILED", stderr);
 	  failures++;
 	  status = 2;
 	}
@@ -465,7 +494,7 @@ do_print(void)
 	}
     }
   if (!global_quiet)
-    fprintf(stderr, "\n");
+    fputc('\n', stderr);
   stp_vars_destroy(v);
   stp_free(static_testpatterns);
   static_testpatterns = NULL;
@@ -744,6 +773,8 @@ fill_grid_##bits(unsigned char *data, size_t len, size_t scount,	\
 	  errlast = errline;						\
 	  s_data[0] = multiplier;					\
 	}								\
+      else								\
+	s_data[0] = 0;							\
       errval += errmod;							\
       errline += errdiv;						\
       if (errval >= xlen - 1)						\
@@ -1060,7 +1091,7 @@ Image_get_row(stp_image_t *image, unsigned char *data,
   int depth = global_channel_depth;
   if (! Image_is_valid)
     {
-      fprintf(stderr, "Calling Image_get_row with invalid image!\n");
+      fputs("Calling Image_get_row with invalid image!\n", stderr);
       abort();
     }
   if (static_testpatterns[0].type == E_IMAGE)
@@ -1070,44 +1101,46 @@ Image_get_row(stp_image_t *image, unsigned char *data,
 			     yyin);
       if (total_read != t->d.image.x * depth * global_bit_depth / 8)
 	{
-	  fprintf(stderr, "Read failed!\n");
+	  fputs("Read failed!\n", stderr);
 	  return STP_IMAGE_STATUS_ABORT;
 	}
       if (!global_quiet)
-	fprintf(stderr, ".");
+	fputc('.', stderr);
     }
   else
     {
       static int previous_band = -1;
+      static int printed_blackline = 0;
       int band = row / global_band_height;
-      if (previous_band == -1)
-	{
-	  fill_pattern(&(static_testpatterns[band]), data,
-		       global_printer_width, global_steps, depth,
-		       global_bit_depth / 8);
-	  previous_band = band;
-	  if (!global_quiet)
-	    fprintf(stderr, ".");
-	}
-      else if (row == global_printer_height - 1)
+      if (row == global_printer_height - 1 && ! global_noblackline)
 	fill_black(data, global_printer_width, global_steps,
 		   global_bit_depth / 8);
       else if (band >= global_n_testpatterns)
 	fill_white(data, global_printer_width, global_steps,
 		   global_bit_depth / 8);
-      else if (band != previous_band && band >= 0)
+      else
 	{
+	  if (band != previous_band)
+	    {
+	      if (! global_noblackline && printed_blackline == 0)
+		{
+		  fill_black(data, global_printer_width, global_steps,
+			     global_bit_depth / 8);
+		  printed_blackline = 1;
+		  return STP_IMAGE_STATUS_OK;
+		}
+	      else
+		{
+		  previous_band = band;
+		  printed_blackline = 0;
+		  if (! global_quiet)
+		    fputc('.', stderr);
+		}
+	    }
 	  fill_pattern(&(static_testpatterns[band]), data,
 		       global_printer_width, global_steps, depth,
 		       global_bit_depth / 8);
-	  previous_band = band;
-	  if (!global_quiet)
-	    fprintf(stderr, ".");
 	}
-      else
-	fill_pattern(&(static_testpatterns[band]), data,
-		     global_printer_width, global_steps, depth,
-		     global_bit_depth / 8);
     }
   return STP_IMAGE_STATUS_OK;
 }
@@ -1117,7 +1150,7 @@ Image_width(stp_image_t *image)
 {
   if (! Image_is_valid)
     {
-      fprintf(stderr, "Calling Image_width with invalid image!\n");
+      fputs("Calling Image_width with invalid image!\n", stderr);
       abort();
     }
   if (static_testpatterns[0].type == E_IMAGE)
@@ -1131,7 +1164,7 @@ Image_height(stp_image_t *image)
 {
   if (! Image_is_valid)
     {
-      fprintf(stderr, "Calling Image_height with invalid image!\n");
+      fputs("Calling Image_height with invalid image!\n", stderr);
       abort();
     }
   if (static_testpatterns[0].type == E_IMAGE)
@@ -1145,7 +1178,7 @@ Image_init(stp_image_t *image)
 {
   if (Image_is_valid)
     {
-      fprintf(stderr, "Calling Image_init with already valid image!\n");
+      fputs("Calling Image_init with already valid image!\n", stderr);
       abort();
     }
   Image_is_valid = 1;
@@ -1157,7 +1190,7 @@ Image_reset(stp_image_t *image)
 {
   if (!Image_is_valid)
     {
-      fprintf(stderr, "Calling Image_reset with invalid image!\n");
+      fputs("Calling Image_reset with invalid image!\n", stderr);
       abort();
     }
  /* dummy function */
@@ -1168,7 +1201,7 @@ Image_conclude(stp_image_t *image)
 {
   if (! Image_is_valid)
     {
-      fprintf(stderr, "Calling Image_conclude with invalid image!\n");
+      fputs("Calling Image_conclude with invalid image!\n", stderr);
       abort();
     }
   Image_is_valid = 0;

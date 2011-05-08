@@ -225,13 +225,14 @@ typedef struct rasterline_s {
 
 
 typedef struct color_s {
-	char name;          /* name (one of CMYKcmyk) */
+	char name;          /* name (one of CMYKcmykRGH) */
 	int bpp;            /* number of bits */
 	int level;          /* number of levels */
         int density;     /* relative density to the other colors*/
 	unsigned int  value;/* last used dot value */
 	unsigned int* dots;  /* number of dots for every level */
-	int compression;    /* bits are compressed */
+        unsigned int* usedlevels; /* actual levels used. Array of length 2^bpp */
+        int compression;    /* bits are compressed */
 	rasterline_t* head; /* end of linked list */
 	rasterline_t* tail; /* start of linked list */
 	rasterline_t* pos;  /* iterator position */
@@ -258,7 +259,8 @@ typedef struct image_s {
 } image_t;
 
 /* FIXME what are the 0xa3 and 0xad for? they are used in the PIXMA iP4200 CD mode */
-static const unsigned char valid_colors[] = {'C','M','Y','K','c','m','y','k',0xa3,0xad}; 
+/*static const unsigned char valid_colors[] = {'C','M','Y','K','c','m','y','k',0xa3,0xad}; */
+static const unsigned char valid_colors[] = {'C','M','Y','K','c','m','y','k','R','G','H','A','B','D','E','F','I','J','L','M','N','O','P','Q','S','T','U','V','W','X','Z','a','b','d','e','f'}; 
 #endif
 
 

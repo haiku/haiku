@@ -22,6 +22,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
 </copyright>
 <escp2:InkGroup name="pro_ultrachrome_k3v">
 <InkList translate="text" name="ultra3photo" text="Photo Black">
+ <initSequence>IK\002\000\000\061</initSequence>
  <Shades>
   <shade count="3">1.000000 0.480000 0.160000</shade>
   <shade count="2">1.000000 0.340000</shade>
@@ -314,6 +315,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
 </InkList>
 
 <InkList translate="text" name="ultra3matte" text="Matte Black">
+ <initSequence>IK\002\000\000\121</initSequence>
  <Shades>
   <shade count="3">1.000000 0.278000 0.093000</shade>
   <shade count="2">1.000000 0.340000</shade>

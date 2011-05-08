@@ -21,6 +21,11 @@ my $run_installed = 0;
 my $use_min_res = 0;
 my $help = 0;
 my $output = undef;
+my $hsize = 0.1;
+my $vsize = 0.1;
+my $left = 0.15;
+my $top = 0.15;
+my $geometry = "";
 
 my @extras = ();
 my @job_extras = ();
@@ -46,11 +51,13 @@ my %param_types;
 my %param_classes;
 my %param_levels;
 my %stp_float_values;
+my %stp_int_values;
 my %rerun_cases;
 
 GetOptions("v+"  => \$valgrind,
 	   "c"   => \$callgrind,
 	   "g"   => \$gdb_attach,
+	   "G=s" => \$geometry,
 	   "n"   => \$dontrun,
 	   "p:i" => \$std_pages,
 	   "P:i" => \$duplex_pages,
@@ -80,6 +87,7 @@ Usage: run-testpattern-2 [opts] [model ...]
                     families may be tested.  By default, all printer families
 		    are tested.
     -g              Attach testpattern job to gdb
+    -G geometry     Specify geometry (=(HxV)(+L+T))
     -i              Use the installed Gutenprint libraries rather than
                     source tree
     -m md5_dir      Generate MD5 checksums and place them in the specified
@@ -157,6 +165,38 @@ chomp $pwd;
 my $srcdir = $ENV{"srcdir"};
 my $sdir;
 
+$geometry =~ s/^=*//;
+if ($geometry =~ /^(([01]?(\.[0-9]*)?)x([01]?(\.[0-9]*)?))?(\+([01]?(\.[0-9]*)?)\+([01]?(\.[0-9]*)?))?$/) {
+    my ($H) = $2;
+    my ($V) = $4;
+    my ($L) = $7;
+    my ($T) = $9;
+    if ($H) {
+	$hsize = $H;
+	if ($hsize > 1) {
+	    $hsize = 1;
+	}
+    }
+    if ($V) {
+	$vsize = $V;
+	if ($vsize > 1) {
+	    $vsize = 1;
+	}
+    }
+    if ($L) {
+	$left = $L;
+    }
+    if ($T) {
+	$top = $T;
+    }
+    if ($left + $hsize > 1) {
+	$left = 1 - $hsize;
+    }
+    if ($top + $vsize > 1) {
+	$top = 1 - $vsize;
+    }
+}
+
 if ("$srcdir" eq "" || "$srcdir" eq ".") {
     $sdir = $pwd;
 } elsif ($srcdir =~ /^\//) {
@@ -191,7 +231,12 @@ sub set_opt($$$) {
     } elsif ($type == 4) {
 	push @extras, "parameter_curve \"$opt\" \"$val\";\n";
     } else {
-	push @extras, "parameter \"$opt\" \"$val\";\n";
+	if ($opt eq "PageSize" && $val =~ /^([^.]+)\.([0-9]+)x([0-9]+)$/) {
+	    push @extras, "parameter \"PageSize\" \"$1\";\n";
+	    push @extras, "page_size $2 $3;\n";
+	} else {
+	    push @extras, "parameter \"$opt\" \"$val\";\n";
+	}
     }
 }
 
@@ -223,14 +268,12 @@ sub print_one_testpattern($;$) {
 	if ($page == $pages - 1) {
 	    $stuff .= "end_job;\n";
 	}
-	$stuff .= << 'EOF';
-hsize 0.1;
-vsize 0.1;
-left 0.15;
-top 0.15;
-blackline 0;
-steps 16;
-EOF
+	$stuff .= sprintf("hsize %f;\n", $hsize);
+	$stuff .= sprintf("vsize %f;\n", $vsize);
+	$stuff .= sprintf("left %f;\n", $left);
+	$stuff .= sprintf("top %f;\n", $top);
+	$stuff .= "blackline 0;\n";
+	$stuff .= "steps 16;\n";
 	if ($raw > 0) {
 	    $stuff .= "mode extended $raw 16;\n";
 	    $stuff .= "xpattern ";
@@ -391,6 +434,13 @@ sub build_list($$) {
 	push @tmp, $defv;
 	push @tmp, ($defv + $maxv) / 2.0;
 	push @tmp, $maxv;
+    } elsif ($param_types{$printer}{$key} == 1) {
+	my ($minv) = $stp_int_values{$printer}{'MINVAL'}{$key};
+	my ($maxv) = $stp_int_values{$printer}{'MAXVAL'}{$key};
+	push @tmp, ($minv..$maxv);
+    } elsif ($param_types{$printer}{$key} == 2) {
+	push @tmp, 0;
+	push @tmp, 1;
     } elsif (defined($param_types{$printer}{$key})) {
 	@tmp = keys %{$stpdata{$printer}{$key}};
     }
@@ -495,6 +545,7 @@ sub do_printer($$) {
 		my (@opts) = @$tmp;
 		my $opt;
 		my $rawval;
+		my $set_resolution = 0;
 		foreach $opt (@opts) {
 		    my (@subopts) = split (/,/, $opt);
 		    @extras = ();
@@ -528,7 +579,12 @@ sub do_printer($$) {
 			$pages = $std_pages;
 			if ($key ne $_) {
 			    set_opt($_, $base_settings{$_}, $printer);
-			    if ($key eq "Duplex") {
+			    push @mvals, "${_}_$base_settings{$_}";
+			    push @ovals, "${_}=$base_settings{$_}";
+			    if ($_ eq "Resolution") {
+				$set_resolution = 1;
+			    }
+			    if ($_ eq "Duplex") {
 				set_opt("JobMode", "Job", $printer);
 				$pages = $duplex_pages;
 			    }
@@ -537,14 +593,14 @@ sub do_printer($$) {
 		    my ($mstring) = join "_", @mvals;
 		    my ($ostring) = join "+", @ovals;
 		    my $case;
-		    if ($use_min_res) {
+		    if ($use_min_res && ! $set_resolution) {
 			$case = "${printer}_PrintingMode_${pmode}_Resolution_${min_res_name}_${mstring}";
 		    } else {
 			$case = "${printer}_PrintingMode_${pmode}_${mstring}";
 		    }
 		    if (! $rerun || $rerun_cases{$case}) {
 			do_output($case);
-			if ($use_min_res) {
+			if ($use_min_res && ! $set_resolution) {
 			    set_message("    ${ostring}+${pmode}+${min_res_name}");
 			} else {
 			    set_message("    ${ostring}+${pmode}");
@@ -596,11 +652,11 @@ if ($dontrun) {
 	$valopts .= ' --db-attach=yes';
     }
     if ($valgrind == 1) {
-	$valgrind_command = "valgrind $valopts -q --num-callers=100 --error-limit=no --leak-check=yes";
+	$valgrind_command = "valgrind $valopts -q --num-callers=50 --error-limit=no --leak-check=yes";
     } elsif ($valgrind == 2) {
-	$valgrind_command = "valgrind $valopts --num-callers=100 --error-limit=no --leak-resolution=high --leak-check=yes";
+	$valgrind_command = "valgrind $valopts --num-callers=50 --error-limit=no --leak-resolution=high --leak-check=yes";
     } elsif ($valgrind == 3) {
-	$valgrind_command = "valgrind $valopts --error-limit=no --num-callers=100 --show-reachable=yes --leak-resolution=high --leak-check=yes";
+	$valgrind_command = "valgrind $valopts --error-limit=no --num-callers=50 --show-reachable=yes --leak-resolution=high --leak-check=yes";
     } elsif ($valgrind == 4) {
 	$valgrind_command = "valgrind $valopts";
     }

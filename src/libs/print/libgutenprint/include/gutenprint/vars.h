@@ -1459,6 +1459,42 @@ extern int stp_verify(stp_vars_t *v);
  */
 extern const stp_vars_t *stp_default_settings(void);
 
+/**
+ * Get the value of a specified category for the specified parameter.
+ * @param v the vars to use.
+ * @param desc the parameter description to use (must already be described)
+ * @param category the name of the category to search for.
+ * @returns the value of the category or NULL.  String must be freed by caller.
+ */
+extern char *stp_parameter_get_category(const stp_vars_t *v,
+					const stp_parameter_t *desc,
+					const char *category);
+
+/**
+ * Determine whether a parameter has a category with the specified value.
+ * If a null value is passed in, return whether the parameter has
+ * the category at all.  Return -1 if any other error condition (null
+ * vars, desc, or category).
+ * @param v the vars to use.
+ * @param desc the parameter description to use (must already be described)
+ * @param category the name of the category to search for.
+ * @param value the value of the category to search for.
+ * @returns whether the parameter has the category with the specified value. 
+ */
+extern int stp_parameter_has_category_value(const stp_vars_t *v,
+					    const stp_parameter_t *desc,
+					    const char *category,
+					    const char *value);
+
+/**
+ * Get the list of categories and their values for the specified parameter.
+ * @param v the vars to use.
+ * @param desc the parameter description to use (must already be described)
+ * @returns the list of categories.
+ */
+extern stp_string_list_t *stp_parameter_get_categories(const stp_vars_t *v,
+						       const stp_parameter_t *desc);
+
 typedef void *(*stp_copy_data_func_t)(void *);
 typedef void (*stp_free_data_func_t)(void *);
 
@@ -1501,5 +1537,5 @@ stp_fill_parameter_settings(stp_parameter_t *desc,
 
 #endif /* GUTENPRINT_VARS_H */
 /*
- * End of "$Id: vars.h,v 1.7 2008/07/04 14:29:27 rlk Exp $".
+ * End of "$Id: vars.h,v 1.8 2010/12/05 21:38:14 rlk Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: escputil.c,v 1.102 2009/12/23 20:13:54 rlk Exp $"
+ * "$Id: escputil.c,v 1.104 2010/12/11 22:04:07 rlk Exp $"
  *
  *   Printer maintenance utility for EPSON Stylus (R) printers
  *
@@ -264,7 +264,7 @@ exit_packet_mode_old(int do_init)
 {
   static char hdr[] = "\000\000\000\033\001@EJL 1284.4\n@EJL     \n\033@";
   memcpy(printer_cmd + bufpos, hdr, sizeof(hdr) - 1); /* DON'T include null! */
-  STP_DEBUG(fprintf(stderr, "Exit packet mode (%d)\n", do_init));
+  STP_DEBUG(printf("Exit packet mode (%d)\n", do_init));
   bufpos += sizeof(hdr) - 1;
   if (!do_init)
     bufpos -= 2;
@@ -274,7 +274,7 @@ static void
 initialize_print_cmd(int do_init)
 {
   bufpos = 0;
-  STP_DEBUG(fprintf(stderr, "Initialize print command\n"));
+  STP_DEBUG(printf("Initialize print command\n"));
   if (isnew)
     exit_packet_mode_old(do_init);
 }
@@ -283,7 +283,7 @@ static void
 initialize_print_cmd_new(int do_init)
 {
   bufpos = 0;
-  STP_DEBUG(fprintf(stderr, "Initialize print command (force new)\n"));
+  STP_DEBUG(printf("Initialize print command (force new)\n"));
   exit_packet_mode_old(do_init);
 }
 
@@ -445,15 +445,15 @@ print_debug_data(const char *buf, size_t count)
   for (i = 0; i < count; i++)
     {
       if (i % 16 == 0)
-	fprintf(stderr, "\n%4d: ", i);
+	printf("\n%4d: ", i);
       else if (i % 4 == 0)
-	fprintf(stderr, " ");
+	printf(" ");
       if (isgraph(buf[i]))
-	fprintf(stderr, "  %c", (unsigned) ((unsigned char) buf[i]));
+	printf("  %c", (unsigned) ((unsigned char) buf[i]));
       else
-	fprintf(stderr, " %02x", (unsigned) ((unsigned char) buf[i]));
+	printf(" %02x", (unsigned) ((unsigned char) buf[i]));
     }
-  fprintf(stderr, "\n");
+  printf("\n");
 }
 
 int
@@ -498,7 +498,7 @@ do_print_cmd(void)
 	  return 1;
 	}
     }
-  STP_DEBUG(fprintf(stderr, "Sending print command to %s:",
+  STP_DEBUG(printf("Sending print command to %s:",
 		    raw_device ? raw_device : command));
   STP_DEBUG(print_debug_data(printer_cmd, bufpos));
   while (bytes < bufpos)
@@ -573,7 +573,7 @@ read_from_printer(int fd, char *buf, int bufsize, int quiet)
 
   if (status > 0)
     {
-      STP_DEBUG(fprintf(stderr, "read_from_printer returns %d\n", status));
+      STP_DEBUG(printf("read_from_printer returns %d\n", status));
       STP_DEBUG(print_debug_data(buf, status));
     }
   else if (status == 0 && retry == 0)
@@ -596,7 +596,7 @@ start_remote_sequence(void)
   static char remote_hdr[] = "\033@\033(R\010\000\000REMOTE1";
   memcpy(printer_cmd + bufpos, remote_hdr, sizeof(remote_hdr) - 1);
   bufpos += sizeof(remote_hdr) - 1;
-  STP_DEBUG(fprintf(stderr, "Start remote sequence\n"));
+  STP_DEBUG(printf("Start remote sequence\n"));
 }
 
 static void
@@ -605,7 +605,7 @@ end_remote_sequence(void)
   static char remote_trailer[] = "\033\000\000\000\033\000";
   memcpy(printer_cmd + bufpos, remote_trailer, sizeof(remote_trailer) - 1);
   bufpos += sizeof(remote_trailer) - 1;
-  STP_DEBUG(fprintf(stderr, "End remote sequence\n"));
+  STP_DEBUG(printf("End remote sequence\n"));
 }
 
 static void
@@ -617,21 +617,21 @@ do_remote_cmd(const char *cmd, int nargs, ...)
 
   start_remote_sequence();
   memcpy(printer_cmd + bufpos, cmd, 2);
-  STP_DEBUG(fprintf(stderr, "Remote command: %s", cmd));
+  STP_DEBUG(printf("Remote command: %s", cmd));
   bufpos += 2;
   printer_cmd[bufpos] = nargs % 256;
   printer_cmd[bufpos + 1] = (nargs >> 8) % 256;
-  STP_DEBUG(fprintf(stderr, " %02x %02x",
+  STP_DEBUG(printf(" %02x %02x",
 		    (unsigned) printer_cmd[bufpos],
 		    (unsigned) printer_cmd[bufpos + 1]));
   if (nargs > 0)
     for (i = 0; i < nargs; i++)
       {
 	printer_cmd[bufpos + 2 + i] = va_arg(args, int);
-	STP_DEBUG(fprintf(stderr, " %02x",
+	STP_DEBUG(printf(" %02x",
 			  (unsigned) printer_cmd[bufpos + 2 + i]));
       }
-  STP_DEBUG(fprintf(stderr, "\n"));
+  STP_DEBUG(printf("\n"));
   bufpos += 2 + nargs;
   end_remote_sequence();
 }
@@ -644,21 +644,21 @@ do_remote_cmd_only(const char *cmd, int nargs, ...)
   va_start(args, nargs);
 
   memcpy(printer_cmd + bufpos, cmd, 2);
-  STP_DEBUG(fprintf(stderr, "Remote command: %s", cmd));
+  STP_DEBUG(printf("Remote command: %s", cmd));
   bufpos += 2;
   printer_cmd[bufpos] = nargs % 256;
   printer_cmd[bufpos + 1] = (nargs >> 8) % 256;
-  STP_DEBUG(fprintf(stderr, " %02x %02x",
+  STP_DEBUG(printf(" %02x %02x",
 		    (unsigned) printer_cmd[bufpos],
 		    (unsigned) printer_cmd[bufpos + 1]));
   if (nargs > 0)
     for (i = 0; i < nargs; i++)
       {
 	printer_cmd[bufpos + 2 + i] = va_arg(args, int);
-	STP_DEBUG(fprintf(stderr, " %02x",
+	STP_DEBUG(printf(" %02x",
 			  (unsigned) printer_cmd[bufpos + 2 + i]));
       }
-  STP_DEBUG(fprintf(stderr, "\n"));
+  STP_DEBUG(printf("\n"));
   bufpos += 2 + nargs;
 }
 
@@ -666,7 +666,7 @@ static void
 add_resets(int count)
 {
   int i;
-  STP_DEBUG(fprintf(stderr, "Add %d resets\n", count));
+  STP_DEBUG(printf("Add %d resets\n", count));
   for (i = 0; i < count; i++)
     {
       printer_cmd[bufpos++] = '\033';
@@ -675,48 +675,76 @@ add_resets(int count)
 }
 
 static int
+send_nulls(int fd)
+{
+  char buf[16384];
+  (void) memset(buf, 0, sizeof(buf));
+  (void) write(fd, buf, sizeof(buf));
+}
+
+static int
 init_packet(int fd, int force)
 {
   int status;
+  int tries = 0;
+  STP_DEBUG(printf("Init packet mode %d\n", force));
 
+ Loop:
   if (!force)
     {
-      STP_DEBUG(fprintf(stderr, "Flushing data...\n"));
+      STP_DEBUG(printf("Flushing early data...\n"));
       flushData(fd, (unsigned char) -1);
     }
 
-  STP_DEBUG(fprintf(stderr, "EnterIEEE...\n"));
+  STP_DEBUG(printf("EnterIEEE...\n"));
   if (!EnterIEEE(fd))
     {
+      STP_DEBUG(printf("EnterIEEE failed!\n"));
+      if (tries++ < 5)
+	{
+	  STP_DEBUG(printf("Retrying\n"));
+	  send_nulls(fd);
+	  flushData(fd, (unsigned char) -1);
+	  goto Loop;
+	}
       return 1;
     }
-  STP_DEBUG(fprintf(stderr, "Init...\n"));
+  STP_DEBUG(printf("Init...\n"));
   if (!Init(fd))
     {
+      STP_DEBUG(printf("Init failed!\n"));
+      if (tries++ < 5)
+	{
+	  STP_DEBUG(printf("Retrying\n"));
+	  send_nulls(fd);
+	  flushData(fd, (unsigned char) -1);
+	  goto Loop;
+	}
       return 1;
     }
 
-  STP_DEBUG(fprintf(stderr, "GetSocket...\n"));
+  STP_DEBUG(printf("GetSocket...\n"));
   socket_id = GetSocketID(fd, "EPSON-CTRL");
   if (!socket_id)
     {
+      STP_DEBUG(printf("GetSocket failed!\n"));
       return 1;
     }
-  STP_DEBUG(fprintf(stderr, "OpenChannel...\n"));
+  STP_DEBUG(printf("OpenChannel...\n"));
   switch ( OpenChannel(fd, socket_id, &send_size, &receive_size) )
     {
     case -1:
-      STP_DEBUG(fprintf(stderr,"Fatal Error return 1\n"));
+      STP_DEBUG(printf("Fatal Error return 1\n"));
       return 1; /* unrecoverable error */
       break;
     case  0:
-      STP_DEBUG(fprintf(stderr, "Error\n")); /* recoverable error ? */
+      STP_DEBUG(printf("Error\n")); /* recoverable error ? */
       return 1;
       break;
     }
 
   status = 1;
-  STP_DEBUG(fprintf(stderr, "Flushing data...\n"));
+  STP_DEBUG(printf("Flushing data...\n"));
   flushData(fd, socket_id);
   return 0;
 }
@@ -785,7 +813,7 @@ set_printer_model(void)
 	      if (desc.p_type == STP_PARAMETER_TYPE_BOOLEAN)
 		interchangeable_inks = desc.deflt.boolean;
 	      stp_parameter_description_destroy(&desc);
-	      STP_DEBUG(fprintf(stderr, "Found it! %s\n", printer_model));
+	      STP_DEBUG(printf("Found it! %s\n", printer_model));
 	      return;
 	    }
 	}
@@ -842,14 +870,14 @@ initialize_printer(int quiet, int fail_if_not_found)
 	  status = SafeWrite(fd, init_str, sizeof(init_str) - 1);
 	  alarm(0);
 	  signal(SIGALRM, SIG_DFL);
-	  STP_DEBUG(fprintf(stderr, "status %d alarm %d\n", status, alarm_interrupt));
+	  STP_DEBUG(printf("status %d alarm %d\n", status, alarm_interrupt));
 	  if (status != sizeof(init_str) - 1 && (status != -1 || !alarm_interrupt))
 	    {
 	      fprintf(stderr, _("Cannot write to %s: %s\n"), raw_device,
 		      strerror(errno));
 	      exit(1);
 	    }
-	  STP_DEBUG(fprintf(stderr, "Try old command %d alarm %d\n",
+	  STP_DEBUG(printf("Try old command %d alarm %d\n",
 			    tries, alarm_interrupt));
 	  status = read_from_printer(fd, (char*)buf, 1024, 1);
 	  if (status <= 0 && tries > 0)
@@ -860,7 +888,7 @@ initialize_printer(int quiet, int fail_if_not_found)
 	  if (!forced_packet_mode &&
 	      status > 0 && !strstr((char *) buf, "@EJL ID") && tries < 3)
 	    {
-	      STP_DEBUG(fprintf(stderr, "Found bad data: %s\n", buf));
+	      STP_DEBUG(printf("Found bad data: %s\n", buf));
 	      /*
 	       * We know the printer's not dead.  Try to turn off status
 	       * and try again.
@@ -886,7 +914,7 @@ initialize_printer(int quiet, int fail_if_not_found)
 	  (void) SafeWrite(fd, printer_cmd, bufpos);
 	  flushData(fd, (unsigned char) -1);
 	  forced_packet_mode = !init_packet(fd, 1);
-	  STP_DEBUG(fprintf(stderr, "Printer in packet mode....\n"));
+	  STP_DEBUG(printf("Printer in packet mode....\n"));
 	  packet_initialized = 1;
 	  isnew = 1;
 	  /* request status command */
@@ -902,21 +930,21 @@ initialize_printer(int quiet, int fail_if_not_found)
 	      return NULL;
 	    }
 	}
-      STP_DEBUG(fprintf(stderr, "status: %i\n", status));
-      STP_DEBUG(fprintf(stderr, "Buf: %s\n", buf));
+      STP_DEBUG(printf("status: %i\n", status));
+      STP_DEBUG(printf("Buf: %s\n", buf));
       if (status > 0)
 	{
 	  pos = strstr((char*)buf, "@EJL ID");
-	  STP_DEBUG(fprintf(stderr, "pos: %s\n", pos ? pos : "(null)"));
+	  STP_DEBUG(printf("pos: %s\n", pos ? pos : "(null)"));
 	  if (pos)
 	    pos = strchr(pos, (int) ';');
-	  STP_DEBUG(fprintf(stderr, "pos: %s\n", pos ? pos : "(null)"));
+	  STP_DEBUG(printf("pos: %s\n", pos ? pos : "(null)"));
 	  if (pos)
 	    pos = strchr(pos + 1, (int) ';');
-	  STP_DEBUG(fprintf(stderr, "pos: %s\n", pos ? pos : "(null)"));
+	  STP_DEBUG(printf("pos: %s\n", pos ? pos : "(null)"));
 	  if (pos)
 	    pos = strchr(pos, (int) ':');
-	  STP_DEBUG(fprintf(stderr, "pos: %s\n", pos ? pos : "(null)"));
+	  STP_DEBUG(printf("pos: %s\n", pos ? pos : "(null)"));
 	  if (pos)
 	    {
 	      spos = strchr(pos, (int) ';');
@@ -944,12 +972,12 @@ initialize_printer(int quiet, int fail_if_not_found)
 		   * However, make it clear that this is a dummy,
 		   * so we don't actually try to print it out.
 		   */
-		  STP_DEBUG(fprintf(stderr, "Can't find printer name, assuming Stylus Photo\n"));
+		  STP_DEBUG(printf("Can't find printer name, assuming Stylus Photo\n"));
 		  printer_model = c_strdup("escp2-photo");
 		}
 	      else
 		{
-		  STP_DEBUG(fprintf(stderr, "Can't get response to @EJL ID\n"));
+		  STP_DEBUG(printf("Can't get response to @EJL ID\n"));
 		  close(fd);
 		  return NULL;
 		}
@@ -959,7 +987,7 @@ initialize_printer(int quiet, int fail_if_not_found)
 	      if (spos)
 		*spos = '\000';
 	      printer_model = pos + 1;
-	      STP_DEBUG(fprintf(stderr, "printer model: %s\n", printer_model));
+	      STP_DEBUG(printf("printer model: %s\n", printer_model));
 	    }
 	}
     }
@@ -972,7 +1000,7 @@ initialize_printer(int quiet, int fail_if_not_found)
     }
 
   close(fd);
-  STP_DEBUG(fprintf(stderr, "new? %s\n", isnew ? "yes" : "no"));
+  STP_DEBUG(printf("new? %s\n", isnew ? "yes" : "no"));
   return the_printer_t;
 }
 
@@ -985,7 +1013,7 @@ get_printer(int quiet, int fail_if_not_found)
     {
       const stp_printer_t *printer =
 	initialize_printer(quiet, fail_if_not_found);
-      STP_DEBUG(fprintf(stderr, "init done, printer found? %s...\n",
+      STP_DEBUG(printf("init done, printer found? %s...\n",
 			printer ? "yes" : "no"));
       return printer;
     }
@@ -1275,10 +1303,9 @@ do_old_status(status_cmd_t cmd, const char *buf, const stp_printer_t *printer)
 	      if (desc.p_type == STP_PARAMETER_TYPE_STRING_LIST)
 		{
 		  color_list = stp_string_list_create_copy(desc.bounds.str);
-		  STP_DEBUG(fprintf(stderr,
-				    "Using color list from driver (%ld %ld)\n",
-				    (long)stp_string_list_count(desc.bounds.str),
-				    (long)stp_string_list_count(color_list)));
+		  STP_DEBUG(printf("Using color list from driver (%ld %ld)\n",
+				   (long)stp_string_list_count(desc.bounds.str),
+				   (long)stp_string_list_count(color_list)));
 		  stp_parameter_description_destroy(&desc);
 		}
 	    }
@@ -1300,7 +1327,7 @@ do_old_status(status_cmd_t cmd, const char *buf, const stp_printer_t *printer)
 	  if (cmd == CMD_STATUS)
 	    printf("\n");
 	}
-      STP_DEBUG(fprintf(stderr, "looking at %s\n", buf));
+      STP_DEBUG(printf("looking at %s\n", buf));
     } while ((buf = find_group(buf)) != NULL);
 }  
 
@@ -1317,7 +1344,7 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
   stp_describe_parameter(printvars, "ChannelNames", &desc);
   if (desc.p_type == STP_PARAMETER_TYPE_STRING_LIST)
     color_list = desc.bounds.str;
-  STP_DEBUG(fprintf(stderr, "New format bytes: %d bytes\n", bytes));
+  STP_DEBUG(printf("New format bytes: %d bytes\n", bytes));
   if (cmd == CMD_STATUS)
     printf(_("Printer Name: %s\n"),
 	    printer ? stp_printer_get_long_name(printer) : _("Unknown"));
@@ -1326,7 +1353,7 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
       unsigned hdr = buf[i];
       unsigned total_param_count = buf[i + 1];
       unsigned param = buf[i + 2];
-      STP_DEBUG(fprintf(stderr, "Header: %x param count: %d\n", hdr, total_param_count));
+      STP_DEBUG(printf("Header: %x param count: %d\n", hdr, total_param_count));
       if (hdr == 0x0f)	/* Always report ink */
 	{
 	  size_t count = (total_param_count - 1) / param;
@@ -1336,21 +1363,30 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
 	  printf("%20s    %20s\n", _("Ink color"), _("Percent remaining"));
 	  for (j = 0; j < count; j++)
 	    {
-	      STP_DEBUG(fprintf(stderr, "    Ink %d: ind[0] %d ind[1] %d ind[2] %d interchangeable %d param %d count %d aux %d\n",
+	      STP_DEBUG(printf("    Ink %d: ind[0] %d ind[1] %d ind[2] %d interchangeable %d param %d count %d aux %d\n",
 				j, ind[0], ind[1], ind[2], interchangeable_inks,
 				param, color_count, aux_color_count));
-	      if (ind[0] < color_count && param == 3 &&
+	      if (ind[0] < color_count && param == 3 /* &&
 		  (interchangeable_inks || ind[1] >= aux_color_count ||
-		   ! aux_colors[(int) ind[1]]))
-		printf("%20s    %20d\n",
-		       gettext(colors_new[(int) ind[0]]), ind[2]);
+		   ! aux_colors[(int) ind[1]]) */)
+		{
+		  STP_DEBUG(printf("Case 0\n"));
+		  printf("%20s    %20d\n",
+			 gettext(colors_new[(int) ind[0]]), ind[2]);
+		}
 	      else if (ind[1] < aux_color_count && aux_colors[(int) ind[1]])
-		printf("%20s    %20d\n",
-		       gettext(aux_colors[(int) ind[1]]), ind[2]);
+		{
+		  STP_DEBUG(printf("Case 1\n"));
+		  printf("%20s    %20d\n",
+			 gettext(aux_colors[(int) ind[1]]), ind[2]);
+		}
 	      else
-		printf("%8s 0x%02x 0x%02x    %20d\n",
-		       _("Unknown"), (unsigned char) ind[0],
-		       (unsigned char) ind[1], ind[2]);
+		{
+		  STP_DEBUG(printf("Case 2\n"));
+		  printf("%8s 0x%02x 0x%02x    %20d\n",
+			 _("Unknown"), (unsigned char) ind[0],
+			 (unsigned char) ind[1], ind[2]);
+		}
 	      ind += param;
 	    }
 	  if (cmd == CMD_STATUS)
@@ -1421,10 +1457,10 @@ do_status_command_internal(status_cmd_t cmd)
       exit(1);
     }
 
-  STP_DEBUG(fprintf(stderr, "%s...\n", cmd_name));
+  STP_DEBUG(printf("%s...\n", cmd_name));
   printer = get_printer(1, 0);
   if (!found_unknown_old_printer)
-    STP_DEBUG(fprintf(stderr, "%s found %s%s\n", gettext(cmd_name),
+    STP_DEBUG(printf("%s found %s%s\n", gettext(cmd_name),
 		      printer ? stp_printer_get_long_name(printer) :
 		      printer_model ? printer_model : "(null)",
 		      printer ? "" : "(Unknown model)"));
@@ -1523,12 +1559,12 @@ do_extended_ink_info(int extended_output)
     {
       stp_string_list_t *color_list = stp_string_list_create();
 
-      if (printer)
+      if (printer && desc.p_type == STP_PARAMETER_TYPE_STRING_LIST)
 	{
-	  color_list = stp_string_list_create_copy(desc.bounds.str);
-	  STP_DEBUG(fprintf(stderr, "Using color list from driver (%ld %ld)\n",
+	  STP_DEBUG(printf("Using color list from driver (%ld %ld)\n",
 			    (long)stp_string_list_count(desc.bounds.str),
 			    (long)stp_string_list_count(color_list)));
+	  color_list = stp_string_list_create_copy(desc.bounds.str);
 	  stp_parameter_description_destroy(&desc);
 	}
       else
@@ -1554,7 +1590,7 @@ do_extended_ink_info(int extended_output)
 	  buf[status] = '\0';
 	  if ( buf[7] == '2' )
 	    {
-	      STP_DEBUG(fprintf(stderr, "New format ink!\n"));
+	      STP_DEBUG(printf("New format ink!\n"));
 	      /* new binary format ! */
 	      i = 10;
 	      while (buf[i] != 0x0f && i < status)
@@ -1564,20 +1600,31 @@ do_extended_ink_info(int extended_output)
 	      while (i < ind[1])
 		{
 		  if (ind[i] < color_count)
-		    stp_string_list_add_string(color_list,
-					       colors_new[(int) ind[i]],
-					       colors_new[(int) ind[i]]);
+		    {
+		      STP_DEBUG(printf("   Case 0: Ink %d %d (%s)\n",
+				       i, ind[i], colors_new[(int) ind[i]]));
+		      stp_string_list_add_string(color_list,
+						 colors_new[(int) ind[i]],
+						 colors_new[(int) ind[i]]);
+		    }
 		  else if (ind[i] == 0x40 && ind[i + 1] < aux_color_count)
-		    stp_string_list_add_string(color_list,
-					       aux_colors[(int) ind[i + 1]],
-					       aux_colors[(int) ind[i + 1]]);
+		    {
+		      STP_DEBUG(printf("   Case 1: Ink %d %d (%s)\n",
+				       i, ind[i+1], aux_colors[(int) ind[i+1]]));
+		      stp_string_list_add_string(color_list,
+						 aux_colors[(int) ind[i + 1]],
+						 aux_colors[(int) ind[i + 1]]);
+		    }
 		  else
-		    stp_string_list_add_string(color_list, "Unknown",
-					       "Unknown");
+		    {
+		      STP_DEBUG(printf("   Case 2: Unknown\n"));
+		      stp_string_list_add_string(color_list, "Unknown",
+						 "Unknown");
+		    }
 		  i+=3;
 		}
 	    }
-	  STP_DEBUG(fprintf(stderr, "Using color list from status message\n"));
+	  STP_DEBUG(printf("Using color list from status message\n"));
 	}
 
       for (i = 0; i < stp_string_list_count(color_list); i++)
@@ -1595,7 +1642,10 @@ do_extended_ink_info(int extended_output)
 	    }
 	  ind = strchr(buf, 'I');
 	  if (!ind)
-	    printf("Cannot identify cartridge in slot %d\n", i);
+	    {
+	      STP_DEBUG(printf("Case 0: failure %i (%s)\n", i, buf));
+	      printf("Cannot identify cartridge in slot %d\n", i);
+	    }
 	  else if (sscanf(ind,
 			  "II:01;IQT:%x;TSH:%*4s;PDY:%x;PDM:%x;IC1:%x;IC2:%*x;IK1:%*x;IK2:%*x;TOV:%*x;TVU:%*x;LOG:EPSON;IQT:%x,%x,%x,%x,%x;TSH:%*4s;PDY:%x;PDM:%x;IC1:%x;IC2:%*xIK1:%*x;IK2;%*x;TOV:%*x;TVU:%*x;LOG:EPSON;",
 			  &iv[0], &year, &month, &id,
@@ -1608,6 +1658,9 @@ do_extended_ink_info(int extended_output)
 			  &year2, &month2, &id2) == 12)
 	    {
 	      int j;
+	      STP_DEBUG(printf("Case 1: i %i iv %ud %ud %ud %ud %ud %ud year %ud %ud mo %ud %ud id %ud %ud\n",
+				i, iv[0], iv[1], iv[2], iv[3], iv[4], iv[5],
+				year, year2, month, month2, id, id2));
 	      printf("%20s    %20s   %12s   %7s\n",
 		     _("Ink cartridge"), _("Percent remaining"), _("Part number"),
 		     _("Date"));
@@ -1632,6 +1685,9 @@ do_extended_ink_info(int extended_output)
 			  &year2, &month2, &id2) == 10)
 	    {
 	      int j;
+	      STP_DEBUG(printf("Case 2: i %i iv %ud %ud %ud %ud year %ud %ud mo %ud %ud id %ud %ud\n",
+				i, iv[0], iv[1], iv[2], iv[3],
+				year, year2, month, month2, id, id2));
 	      printf("%20s    %20s   %12s   %7s\n",
 		     _("Ink cartridge"), _("Percent remaining"), _("Part number"),
 		     _("Date"));
@@ -1651,6 +1707,25 @@ do_extended_ink_info(int extended_output)
 			  "II:01;IQT:%x;TSH:%*4s;PDY:%x;PDM:%x;IC1:%x;IC2:%*x;IK1:%*x;IK2:%*x;TOV:%*x;TVU:%*x;LOG:INKbyEPSON;",
 			  &val, &year, &month, &id ) == 4)
 	    {
+	      STP_DEBUG(printf("Case 3: i %i val %ud year %ud mo %ud id %ud\n",
+				i, val, year, month, id));
+	      if (i == 0)
+		printf("%20s    %20s   %12s   %7s\n",
+		       _("Ink cartridge"), _("Percent remaining"), _("Part number"),
+		       _("Date"));
+	      printf("%20s    %20d    T0%03d            %2d%02d-%02d\n",
+		     gettext(stp_string_list_param(color_list, i)->text),
+		     val, id, (year > 80 ? 19 : 20), year, month);
+	    }
+	  else if (sscanf(ind,
+			  "IQT:%x;TSH:%*4s;PDY:%x;PDM:%x;IC1:%x;IC2:%*x;IK1:%*x;IK2:%*x;TOV:%*x;TVU:%*x;LOG:EPSON;",
+			  &val, &year, &month, &id ) == 4 ||
+		   sscanf(ind,
+			  "IQT:%x;TSH:%*4s;PDY:%x;PDM:%x;IC1:%x;IC2:%*x;IK1:%*x;IK2:%*x;TOV:%*x;TVU:%*x;LOG:INKbyEPSON;",
+			  &val, &year, &month, &id ) == 4)
+	    {
+	      STP_DEBUG(printf("Case 4: i %i val %ud year %ud mo %ud id %ud\n",
+				i, val, year, month, id));
 	      if (i == 0)
 		printf("%20s    %20s   %12s   %7s\n",
 		       _("Ink cartridge"), _("Percent remaining"), _("Part number"),
@@ -1661,6 +1736,7 @@ do_extended_ink_info(int extended_output)
 	    }
 	  else
 	    {
+	      STP_DEBUG(printf("Case 5: failure %i (%s)\n", i, ind));
 	      printf("Cannot identify cartridge in slot %d\n", i);
 	    }
 	}
@@ -2103,7 +2179,7 @@ do_get_input (const char *prompt)
 	fgets_status = fgets (input, BUFSIZ, stdin);
 	if (fgets_status == NULL)
 	{
-		fprintf (stderr, _("Error in input\n"));
+		fprintf (stdout, _("Error in input\n"));
 		return (NULL);
 	}
 	else if (strlen (input) == 1 && input[0] == '\n')

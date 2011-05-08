@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.119 2009/04/11 16:16:20 rlk Exp $
+## $Id: Makefile.am,v 1.120 2011/01/17 23:20:51 rlk Exp $
 ## Copyright (C) 2000 Roger Leigh
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,9 @@ endif
 
 LOCAL_CPPFLAGS = $(GUTENPRINT_CFLAGS) $(CUPS_CFLAGS)
 
-STP_ENV= STP_MODULE_PATH=$(top_builddir)/src/main/.libs:$(top_builddir)/src/main STP_DATA_PATH=$(top_srcdir)/src/xml STP_LOCALEDIR=$(top_srcdir)/src/cups/catalog
+STP_NONLS_ENV= STP_MODULE_PATH=$(top_builddir)/src/main/.libs:$(top_builddir)/src/main STP_DATA_PATH=$(top_srcdir)/src/xml
+
+STP_ENV= $(STP_NONLS_ENV) STP_LOCALEDIR=$(top_srcdir)/src/cups/catalog
 
 ## Programs
 
@@ -175,7 +177,7 @@ install-data-hook:
 	-rmdir `dirname $(DESTDIR)$(pkglibdir)`
 	-rmdir `dirname $(DESTDIR)$(pkgsysconfdir)`
 
-.PHONY: ppd ppd-stamp-pre ppd-stamp-nonls ppd-stamp-nls ppd-stamp-phony
+.PHONY: ppd ppd-stamp-pre ppd-stamp-nonls ppd-stamp-nls ppd-stamp-phony ppd-catalog-clean ppd-clean
 
 all-local: $(INSTALL_DATA_LOCAL_DEPS)
 
@@ -188,10 +190,15 @@ ppd-stamp: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ $(t
 
 ppd-stamp-phony: $(PPD)
 
-ppd-stamp-pre:
+ppd-catalog-clean:
+	-$(RM) -r catalog
+
+ppd-clean:
 	-$(RM) -r ppd
 
-ppd-catalog:
+ppd-stamp-pre: ppd-catalog-clean ppd-clean
+
+ppd-catalog: ppd-catalog-clean
 	$(mkdir_p) catalog
 	for file in $(srcdir)/../../po/*.po; do \
 	  lang=`basename $$file .po`; \
@@ -201,28 +208,32 @@ ppd-catalog:
 
 ppd-nonls: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@
 	$(mkdir_p) ppd/C
-	LC_ALL= LANG= LANGUAGE= $(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -l C -p ppd/C
+	$(MAKE) ppd-catalog-clean
+	LC_ALL= LANG= LANGUAGE= $(STP_NONLS_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -l C -p ppd/C
 
-ppd-global: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ ppd-catalog
-	$(mkdir_p) ppd/Global
+ppd-global: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@
 	@echo "Global PPDs:"
-	LC_ALL= LANG= LANGUAGE= $(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -p ppd/Global
-	-$(RM) -r catalog
-
-ppd-global-ln: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ ppd-catalog
 	$(mkdir_p) ppd/Global
-	@echo "Global PPDs (localized numbers for testing):"
-	LC_ALL= LANG= LANGUAGE= $(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -p ppd/Global -N
-	-$(RM) -r catalog
+	$(MAKE) ppd-catalog
+	LC_ALL= LANG= LANGUAGE= $(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -p ppd/Global
+	$(MAKE) ppd-catalog-clean
 
-ppd-nls: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ ppd-catalog ppd-nonls
+ppd-global-ln: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@
+	@echo "Global PPDs (localized numbers for testing):"
+	$(mkdir_p) ppd/Global
+	$(MAKE) ppd-catalog
+	LC_ALL= LANG= LANGUAGE= $(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -p ppd/Global -N
+	$(MAKE) ppd-catalog-clean
+
+ppd-nls: cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ ppd-nonls
 	$(mkdir_p) ppd
+	$(MAKE) ppd-catalog
 	for language in `$(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ -L` ; do \
 	  mkdir ppd/$$language ; \
 	  echo "$$language:" ; \
 	  LC_ALL=$$language LANG=$$language LANGUAGE=$$language $(STP_ENV) ./cups-genppd.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@ @WHICH_PPDS@ -l $$language -p ppd/$$language; \
 	done
-	-$(RM) -r catalog
+	$(MAKE) ppd-catalog-clean
 
 dist-hook:
 	for dir in commands ; do \
@@ -236,8 +247,7 @@ dist-hook:
 	  fi \
 	done
 
-clean-local:
-	-$(RM) -r ppd
+clean-local: ppd-catalog-clean ppd-clean
 
 
 ## Clean
@@ -253,6 +263,3 @@ EXTRA_DIST = \
 	command.txt \
 	command.types \
 	test-ppds
-
-
-

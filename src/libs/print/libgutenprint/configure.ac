@@ -1,4 +1,4 @@
-dnl $Id: configure.ac,v 1.220 2010/08/09 10:53:33 rlk Exp $
+dnl $Id: configure.ac,v 1.224 2011/05/02 01:20:49 rlk Exp $
 dnl Copyright (C) 2001-2004 Roger Leigh
 dnl 
 dnl This program is free software; you can redistribute it and/or modify
@@ -37,10 +37,10 @@ dnl
 pushdef([GUTENPRINT_NAME],              [gutenprint])
 pushdef([GUTENPRINT_MAJOR_VERSION],     [5])
 pushdef([GUTENPRINT_MINOR_VERSION],     [2])
-pushdef([GUTENPRINT_MICRO_VERSION],     [6])
+pushdef([GUTENPRINT_MICRO_VERSION],     [7])
 pushdef([GUTENPRINT_EXTRA_VERSION],     [])
 pushdef([GUTENPRINT_CURRENT_INTERFACE], [2])
-pushdef([GUTENPRINT_INTERFACE_AGE],     [7])
+pushdef([GUTENPRINT_INTERFACE_AGE],     [8])
 pushdef([GUTENPRINT_BINARY_AGE],        [0])
 pushdef([GUTENPRINTUI2_CURRENT_INTERFACE], [1])
 pushdef([GUTENPRINTUI2_INTERFACE_AGE],     [0])
@@ -49,7 +49,7 @@ pushdef([GUTENPRINT_VERSION], GUTENPRINT_MAJOR_VERSION.GUTENPRINT_MINOR_VERSION.
 
 AC_INIT(GUTENPRINT_NAME, GUTENPRINT_VERSION, [gimp-print-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.220 $)
+AC_REVISION($Revision: 1.224 $)
 AC_CONFIG_SRCDIR(src/main/print-vars.c)
 AC_CONFIG_AUX_DIR(scripts)
 STP_INIT
@@ -139,7 +139,7 @@ dnl Specify a configuration file.
 AM_CONFIG_HEADER([config.h])
 
 dnl Available languages (translations)
-ALL_LINGUAS="cs da de el en_GB es fi fr hu it ja nb nl pl pt ru sk sv zh_TW"
+ALL_LINGUAS="cs da de el en_GB es fi fr hu it ja nb nl pl pt ru sk sl sv zh_TW"
 AC_SUBST(ALL_LINGUAS)
 
 dnl Set up libtool scripts.

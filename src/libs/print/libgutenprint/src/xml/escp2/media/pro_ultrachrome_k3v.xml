@@ -20,7 +20,8 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 </copyright>
-<escp2:papers name="pro_ultrachrome">
+<escp2:papers name="pro_ultrachrome_k3v">
+<feature name="PlatenGap"/>
 <feature name="PaperThickness"/>
 <feature name="VacuumIntensity"/>
 <feature name="FeedAdjustment"/>
@@ -35,20 +36,20 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
 	-0.18	-0.21	-0.22	-0.22	-0.22	-0.22	-0.22	-0.22
 	-0.22	-0.28	-0.34	-0.4	-0.5	-0.4	-0.3	-0.2
 	-0.12	-0.07	-0.04	-0.02	0	0	0	0
-	0	0	-0.03	-0.07	-0.11	-0.15	-0.19	-0.22
-	-0.25	-0.22	-0.19	-0.15	-0.12	-0.1	-0.06	-0.03
+	0	0	-0.03	-0.07	-0.11	-0.15	-0.17	-0.18
+	-0.19	-0.2	-0.19	-0.18	-0.16	-0.12	-0.08	-0.04
    </sequence>
   </curve>
  </namedParam>
  <namedParam name="lum_map">
   <curve wrap="wrap" type="linear" gamma="0" piecewise="false">
    <sequence count="48" lower-bound="0" upper-bound="4">
-	0.49	0.51	0.55	0.61	0.67	0.71	0.76	0.79
+	0.55	0.57	0.61	0.64	0.67	0.69	0.72	0.75
 	0.83	0.8	0.76	0.76	0.78	0.79	0.83	0.86
 	0.93	0.95	0.97	0.97	0.97	0.97	0.96	0.96
 	0.96	0.97	0.97	0.98	0.99	1	1	1
-	1	0.98	0.97	0.95	0.94	0.93	0.9	0.86
-	0.82	0.69	0.6	0.54	0.52	0.51	0.5	0.49
+	1	0.98	0.97	0.95	0.93	0.91	0.88	0.83
+	0.83	0.71	0.65	0.61	0.58	0.56	0.55	0.55
    </sequence>
   </curve>
  </namedParam>
@@ -79,12 +80,12 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
  <namedParam name="premium_lum_map">
   <curve wrap="wrap" type="linear" gamma="0" piecewise="false">
    <sequence count="48" lower-bound="0" upper-bound="4">
-	0.49	0.53	0.6	0.64	0.69	0.73	0.77	0.8
-	0.84	0.81	0.77	0.77	0.78	0.8	0.84	0.87
+	0.55	0.57	0.61	0.64	0.67	0.69	0.72	0.75
+	0.75	0.71	0.7	0.7	0.72	0.76	0.81	0.87
 	0.93	0.95	0.97	0.98	0.98	0.97	0.96	0.96
 	0.96	0.97	0.98	0.98	0.99	1	1	1
 	1	0.98	0.97	0.96	0.95	0.93	0.9	0.87
-	0.83	0.69	0.61	0.55	0.53	0.52	0.5	0.49
+	0.83	0.71	0.65	0.61	0.58	0.56	0.55	0.55
    </sequence>
   </curve>
  </namedParam>
@@ -102,17 +103,18 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
  </namedParam>
 </Curves>
 <paper translate="text" name="Plain" text="Plain Paper" class="plain" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">0</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">26</parameter>
  <parameter type="integer" name="FeedAdjustment">107</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -128,32 +130,8 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
   <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
   <parameter type="float" name="GCRLower">0.000000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
-  <parameter type="float" name="MagentaBalance">1.000000</parameter>
-  <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
-  <parameter type="float" name="Saturation">1.000000</parameter>
-  <parameter type="float" name="Gamma">1.000000</parameter>
-  <parameter type="curve" name="HueMap" ref="hue_map"/>
-  <parameter type="curve" name="LumMap" ref="lum_map"/>
-  <parameter type="curve" name="SatMap" ref="sat_map"/>
- </ink>
-</paper>
-
-<paper translate="text" name="PlainFast" text="Plain Paper Fast Load" class="plain"
-PreferredInkset="Ultra3matte">
- <parameter type="integer" name="PaperThickness">1</parameter>
- <parameter type="integer" name="VacuumIntensity">26</parameter>
- <parameter type="integer" name="FeedAdjustment">107</parameter>
-
- <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
-  <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
-  <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -163,37 +141,21 @@ PreferredInkset="Ultra3matte">
   <parameter type="curve" name="LumMap" ref="lum_map"/>
   <parameter type="curve" name="SatMap" ref="sat_map"/>
  </ink>
-
- <ink translate="text" name="ultra3matte" text="UltraChrome Matte Black">
-  <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
-  <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.000000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
-  <parameter type="float" name="MagentaBalance">1.000000</parameter>
-  <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
-  <parameter type="float" name="Saturation">1.000000</parameter>
-  <parameter type="float" name="Gamma">1.000000</parameter>
-  <parameter type="curve" name="HueMap" ref="hue_map"/>
-  <parameter type="curve" name="LumMap" ref="lum_map"/>
-  <parameter type="curve" name="SatMap" ref="sat_map"/>
- </ink>
 </paper>
 
-<paper translate="text" name="Postcard" text="Postcard" class="plain" PreferredInkset="Ultra3matte">
+<paper translate="text" name="Postcard" text="Postcard" class="plain" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">1</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">0</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -209,11 +171,11 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
   <parameter type="float" name="GCRLower">0.000000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -222,18 +184,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="GlossyFilm" text="Glossy Film" class="photo" PreferredInkset="Ultra3photo">
+<paper translate="text" name="GlossyFilm" text="Glossy Film" class="photo" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">7</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">109</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.830000</parameter>
-  <parameter type="float" name="SubchannelCutoff">1.000000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -248,12 +211,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -262,7 +225,8 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Transparency" text="Transparencies" class="transparency" PreferredInkset="Ultra3photo">
+<paper translate="text" name="Transparency" text="Transparencies" class="transparency" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">9</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">109</parameter>
@@ -271,9 +235,9 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.750000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -288,12 +252,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -302,18 +266,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Envelope" text="Envelopes" class="plain" PreferredInkset="Ultra3matte">
+<paper translate="text" name="Envelope" text="Envelopes" class="plain" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">1</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">26</parameter>
  <parameter type="integer" name="FeedAdjustment">107</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -329,11 +294,11 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
   <parameter type="float" name="GCRLower">0.000000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -342,7 +307,8 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="BackFilm" text="Back Light Film" class="transparency" PreferredInkset="Ultra3photo">
+<paper translate="text" name="BackFilm" text="Back Light Film" class="transparency" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">10</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">109</parameter>
@@ -351,9 +317,9 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.750000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -368,32 +334,9 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
-  <parameter type="float" name="MagentaBalance">1.000000</parameter>
-  <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
-  <parameter type="float" name="Saturation">1.000000</parameter>
-  <parameter type="float" name="Gamma">1.000000</parameter>
-  <parameter type="curve" name="HueMap" ref="hue_map"/>
-  <parameter type="curve" name="LumMap" ref="lum_map"/>
-  <parameter type="curve" name="SatMap" ref="sat_map"/>
- </ink>
-</paper>
-
-<paper translate="text" name="Matte" text="Matte Paper" class="good" PreferredInkset="Ultra3matte">
- <parameter type="integer" name="PaperThickness">2</parameter>
- <parameter type="integer" name="VacuumIntensity">0</parameter>
- <parameter type="integer" name="FeedAdjustment">0</parameter>
-
- <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
-  <parameter type="float" name="Density">0.920000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
-  <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -403,37 +346,21 @@ PreferredInkset="Ultra3matte">
   <parameter type="curve" name="LumMap" ref="lum_map"/>
   <parameter type="curve" name="SatMap" ref="sat_map"/>
  </ink>
+</paper>
 
- <ink translate="text" name="ultra3matte" text="UltraChrome Matte Black">
+<paper translate="text" name="Matte" text="Matte Paper" class="good" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">3</parameter>
+ <parameter type="integer" name="PaperThickness">2</parameter>
+ <parameter type="integer" name="VacuumIntensity">0</parameter>
+ <parameter type="integer" name="FeedAdjustment">0</parameter>
+
+ <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.920000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
   <parameter type="float" name="GCRLower">0.000000</parameter>
-  <parameter type="float" name="GCRUpper">1.250000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
-  <parameter type="float" name="MagentaBalance">1.000000</parameter>
-  <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
-  <parameter type="float" name="Saturation">1.000000</parameter>
-  <parameter type="float" name="Gamma">1.000000</parameter>
-  <parameter type="curve" name="HueMap" ref="hue_map"/>
-  <parameter type="curve" name="LumMap" ref="lum_map"/>
-  <parameter type="curve" name="SatMap" ref="sat_map"/>
- </ink>
-</paper>
-
-<paper translate="text" name="MatteHeavy" text="Matte Paper Heavyweight" class="good" PreferredInkset="Ultra3matte">
- <parameter type="integer" name="PaperThickness">2</parameter>
- <parameter type="integer" name="VacuumIntensity">0</parameter>
- <parameter type="integer" name="FeedAdjustment">0</parameter>
-
- <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
-  <parameter type="float" name="Density">0.920000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
-  <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -446,14 +373,14 @@ PreferredInkset="Ultra3matte">
 
  <ink translate="text" name="ultra3matte" text="UltraChrome Matte Black">
   <parameter type="float" name="Density">0.920000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
-  <parameter type="float" name="BlackTrans">0.400000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
+  <parameter type="float" name="BlackTrans">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -462,7 +389,49 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Inkjet" text="Inkjet Paper" class="good" PreferredInkset="Ultra3matte">
+<paper translate="text" name="MatteHeavy" text="Matte Paper Heavyweight" class="good" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">5</parameter>
+ <parameter type="integer" name="PaperThickness">2</parameter>
+ <parameter type="integer" name="VacuumIntensity">0</parameter>
+ <parameter type="integer" name="FeedAdjustment">0</parameter>
+
+ <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
+  <parameter type="float" name="Density">0.920000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
+  <parameter type="float" name="BlackTrans">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
+  <parameter type="float" name="MagentaBalance">1.000000</parameter>
+  <parameter type="float" name="YellowBalance">1.000000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
+  <parameter type="float" name="Saturation">1.000000</parameter>
+  <parameter type="float" name="Gamma">1.000000</parameter>
+  <parameter type="curve" name="HueMap" ref="hue_map"/>
+  <parameter type="curve" name="LumMap" ref="lum_map"/>
+  <parameter type="curve" name="SatMap" ref="sat_map"/>
+ </ink>
+
+ <ink translate="text" name="ultra3matte" text="UltraChrome Matte Black">
+  <parameter type="float" name="Density">0.920000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
+  <parameter type="float" name="BlackTrans">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
+  <parameter type="float" name="MagentaBalance">1.000000</parameter>
+  <parameter type="float" name="YellowBalance">1.000000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
+  <parameter type="float" name="Saturation">1.000000</parameter>
+  <parameter type="float" name="Gamma">1.000000</parameter>
+  <parameter type="curve" name="HueMap" ref="hue_map"/>
+  <parameter type="curve" name="LumMap" ref="lum_map"/>
+  <parameter type="curve" name="SatMap" ref="sat_map"/>
+ </ink>
+</paper>
+
+<paper translate="text" name="Inkjet" text="Inkjet Paper" class="good" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">1</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">26</parameter>
  <parameter type="integer" name="FeedAdjustment">107</parameter>
@@ -471,9 +440,9 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.720000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -488,12 +457,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.720000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.300000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -502,7 +471,8 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Coated" text="Photo Quality Inkjet Paper" class="good" PreferredInkset="Ultra3photo">
+<paper translate="text" name="Coated" text="Photo Quality Inkjet Paper" class="good" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">3</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">26</parameter>
  <parameter type="integer" name="FeedAdjustment">107</parameter>
@@ -511,9 +481,9 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -528,12 +498,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -542,18 +512,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Photo" text="Photo Paper" class="photo" PreferredInkset="Ultra3photo">
+<paper translate="text" name="Photo" text="Photo Paper" class="photo" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">6</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">103</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">1.000000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.750000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -568,12 +539,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">1.000000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -582,18 +553,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="GlossyPhoto" text="Premium Glossy Photo Paper" class="premium" PreferredInkset="Ultra3photo">
+<paper translate="text" name="GlossyPhoto" text="Premium Glossy Photo Paper" class="premium" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">11</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">128</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">1.000000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.800000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -608,12 +580,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.720000</parameter>
   <parameter type="float" name="SubchannelCutoff">1.000000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">0.920000</parameter>
   <parameter type="curve" name="HueMap" ref="premium_hue_map"/>
@@ -622,18 +594,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Semigloss" text="Premium Semigloss Photo Paper" class="premium" PreferredInkset="Ultra3photo">
+<paper translate="text" name="Semigloss" text="Premium Semigloss Photo Paper" class="premium" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">12</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">128</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.800000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.800000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -648,12 +621,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.720000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.800000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">0.920000</parameter>
   <parameter type="curve" name="HueMap" ref="premium_hue_map"/>
@@ -662,18 +635,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Luster" text="Premium Luster Photo Paper" class="premium" PreferredInkset="Ultra3photo">
+<paper translate="text" name="Luster" text="Premium Luster Photo Paper" class="premium" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">13</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">128</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.800000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.800000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -688,9 +662,9 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.720000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.800000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -702,18 +676,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="ArchivalMatte" text="Archival Matte Paper" class="premium" PreferredInkset="Ultra3matte">
+<paper translate="text" name="ArchivalMatte" text="Archival Matte Paper" class="premium" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">15</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">0</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.920000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -728,12 +703,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.920000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">1.000000</parameter>
+  <parameter type="float" name="BlackDensity">0.600000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -742,18 +717,19 @@ PreferredInkset="Ultra3matte">
  </ink>
  </paper>
 
- <paper translate="text" name="WaterColorRadiant" text="Watercolor Paper - Radiant White" class="premium" PreferredInkset="Ultra3matte">
+<paper translate="text" name="WaterColorRadiant" text="Watercolor Paper - Radiant White" class="premium" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">15</parameter>
   <parameter type="integer" name="PaperThickness">2</parameter>
   <parameter type="integer" name="VacuumIntensity">0</parameter>
   <parameter type="integer" name="FeedAdjustment">0</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.920000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.800000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -768,12 +744,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.920000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.400000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -782,18 +758,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="GlossyPaper" text="Photo Quality Glossy Paper" class="photo" PreferredInkset="Ultra3photo">
+<paper translate="text" name="GlossyPaper" text="Photo Quality Glossy Paper" class="photo" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">19</parameter>
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">26</parameter>
  <parameter type="integer" name="FeedAdjustment">107</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.830000</parameter>
-  <parameter type="float" name="SubchannelCutoff">1.000000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -808,12 +785,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -822,18 +799,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Ilford" text="Ilford Heavy Paper" class="premium" PreferredInkset="Ultra3matte">
+<paper translate="text" name="Ilford" text="Ilford Heavy Paper" class="premium" PreferredInkset="ultra3matte">
+ <parameter type="integer" name="PaperMedia">15</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">128</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.830000</parameter>
-  <parameter type="float" name="SubchannelCutoff">1.000000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -848,12 +826,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -862,18 +840,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="ColorLife" text="ColorLife Paper" class="premium" PreferredInkset="Ultra3photo">
+<paper translate="text" name="ColorLife" text="ColorLife Paper" class="premium" PreferredInkset="ultra3photo">
+ <parameter type="integer" name="PaperMedia">23</parameter>
  <parameter type="integer" name="PaperThickness">2</parameter>
  <parameter type="integer" name="VacuumIntensity">0</parameter>
  <parameter type="integer" name="FeedAdjustment">103</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.830000</parameter>
-  <parameter type="float" name="SubchannelCutoff">1.000000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -888,12 +867,12 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="Density">0.830000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>
@@ -902,18 +881,19 @@ PreferredInkset="Ultra3matte">
  </ink>
 </paper>
 
-<paper translate="text" name="Other" text="Other" class="plain" PreferredInkset="Ultra3matte">
+<paper translate="text" name="Other" text="Other" class="plain"
+PreferredInkset="ultra3matte">
  <parameter type="integer" name="PaperThickness">1</parameter>
  <parameter type="integer" name="VacuumIntensity">26</parameter>
  <parameter type="integer" name="FeedAdjustment">107</parameter>
 
  <ink translate="text" name="ultra3photo" text="UltraChrome Photo Black">
   <parameter type="float" name="Density">0.720000</parameter>
-  <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
+  <parameter type="float" name="SubchannelCutoff">0.500000</parameter>
   <parameter type="float" name="BlackTrans">1.000000</parameter>
-  <parameter type="float" name="GCRLower">0.010000</parameter>
-  <parameter type="float" name="GCRUpper">1.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRLower">0.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
   <parameter type="float" name="BlackDensity">1.000000</parameter>
@@ -929,11 +909,11 @@ PreferredInkset="Ultra3matte">
   <parameter type="float" name="SubchannelCutoff">0.100000</parameter>
   <parameter type="float" name="BlackTrans">0.400000</parameter>
   <parameter type="float" name="GCRLower">0.000000</parameter>
-  <parameter type="float" name="GCRUpper">0.500000</parameter>
-  <parameter type="float" name="CyanBalance">1.000000</parameter>
+  <parameter type="float" name="GCRUpper">0.000000</parameter>
+  <parameter type="float" name="CyanBalance">0.900000</parameter>
   <parameter type="float" name="MagentaBalance">1.000000</parameter>
   <parameter type="float" name="YellowBalance">1.000000</parameter>
-  <parameter type="float" name="BlackDensity">0.600000</parameter>
+  <parameter type="float" name="BlackDensity">1.000000</parameter>
   <parameter type="float" name="Saturation">1.000000</parameter>
   <parameter type="float" name="Gamma">1.000000</parameter>
   <parameter type="curve" name="HueMap" ref="hue_map"/>

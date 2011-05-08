@@ -135,4 +135,8 @@ static const unsigned char tentoeight[] =
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 };
 
+const char* prexml_iP2700 ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><cmd xmlns:ivec=\"http://www.canon.com/ns/cmd/2008/07/common/\"><ivec:contents><ivec:operation>StartJob</ivec:operation><ivec:param_set servicetype=\"print\"><ivec:jobID>00000001</ivec:jobID><ivec:bidi>0</ivec:bidi></ivec:param_set></ivec:contents></cmd><?xml version=\"1.0\" encoding=\"utf-8\" ?><cmd xmlns:ivec=\"http://www.canon.com/ns/cmd/2008/07/common/\" xmlns:vcn=\"http://www.canon.com/ns/cmd/2008/07/canon/\"><ivec:contents><ivec:operation>VendorCmd</ivec:operation><ivec:param_set servicetype=\"print\"><vcn:ijoperation>ModeShift</vcn:ijoperation><vcn:ijmode>1</vcn:ijmode><ivec:jobID>00000001</ivec:jobID></ivec:param_set></ivec:contents></cmd>";
+
+const char* postxml_iP2700 ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><cmd xmlns:ivec=\"http://www.canon.com/ns/cmd/2008/07/common/\"><ivec:contents><ivec:operation>EndJob</ivec:operation><ivec:param_set servicetype=\"print\"><ivec:jobID>00000001</ivec:jobID></ivec:param_set></ivec:contents></cmd>";
+
 #endif

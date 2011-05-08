@@ -162,13 +162,13 @@
 #define PACKAGE_NAME "gutenprint"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "gutenprint 5.2.6"
+#define PACKAGE_STRING "gutenprint 5.2.7"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gutenprint"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.2.6"
+#define PACKAGE_VERSION "5.2.7"
 
 /* */
 #define PKGMODULEDIR "/boot/common/lib/gutenprint/5.2/modules"
@@ -177,7 +177,7 @@
 #define PKGXMLDATADIR "/boot/common/data/gutenprint"
 
 /* Package release date. */
-#define RELEASE_DATE "10 Aug 2010"
+#define RELEASE_DATE "01 May 2011"
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #define RETSIGTYPE void
@@ -192,7 +192,7 @@
 /* #undef USE_LTDL */
 
 /* Version number of package */
-#define VERSION "5.2.6"
+#define VERSION "5.2.7"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */

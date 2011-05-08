@@ -22,14 +22,10 @@ libtool_minor=`echo $libtoolv | awk -F. '{print $2}'`
 libtool_point=`echo $libtoolv | awk -F. '{print $3}'`
 
 test "$libtool_major" -le 1 && {
-  test "$libtool_minor" -lt 4 || {
-    test "$libtool_minor" -eq 4 && {
-      test "$libtool_point" -lt 3
-    }
-  }
+  test "$libtool_minor" -lt 5
 } && {
   echo
-  echo "**Warning**: You should have \`libtool' 1.4.3 or newer installed to"
+  echo "**Warning**: You should have \`libtool' 1.5 or newer installed to"
   echo "create a gutenprint distribution.  Earlier versions of libtool do"
   echo "not generate correct code for all platforms."
   echo "Get ftp://ftp.gnu.org/pub/gnu/libtool/libtool-1.5.tar.gz"
@@ -53,7 +49,7 @@ test -f $srcdir/ChangeLog || echo > $srcdir/ChangeLog
   (libtool --version) < /dev/null > /dev/null 2>&1 || {
     echo
     echo "**Error**: You must have \`libtool' installed to compile gutenprint."
-    echo "Get ftp://ftp.gnu.org/pub/gnu/libtool/libtool-1.4.3.tar.gz"
+    echo "Get ftp://ftp.gnu.org/pub/gnu/libtool/libtool-1.5.tar.gz"
     echo "(or a newer version if it is available)"
     DIE=1
   }

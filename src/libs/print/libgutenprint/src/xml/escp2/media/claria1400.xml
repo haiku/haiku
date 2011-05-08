@@ -1349,7 +1349,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
  </resolution>
 
  <ink translate="text" name="None" text="EPSON Standard Inks">
-  <parameter type="float" name="Density">0.833000</parameter>
+  <parameter type="float" name="Density">0.667000</parameter>
   <parameter type="float" name="SubchannelCutoff">0.250000</parameter>
   <parameter type="float" name="BlackTrans">0.500000</parameter>
   <parameter type="float" name="GCRLower">0.250000</parameter>

@@ -1,5 +1,5 @@
 /*
- * "$Id: generic-options.c,v 1.11 2008/07/04 14:29:29 rlk Exp $"
+ * "$Id: generic-options.c,v 1.12 2010/12/05 21:38:14 rlk Exp $"
  *
  *   Copyright 2003 Robert Krawitz (rlk@alum.mit.edu)
  *
@@ -59,25 +59,25 @@ static const stpi_job_mode_t standard_job_modes[] =
 static const stp_parameter_t the_parameters[] =
 {
   {
-    "Quality", N_("Print Quality"), N_("Basic Output Adjustment"),
+    "Quality", N_("Print Quality"), "Color=Yes,Category=Basic Output Adjustment",
     N_("Print Quality"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 0, 0
   },
   {
-    "ImageType", N_("Image Type"), N_("Basic Image Adjustment"),
+    "ImageType", N_("Image Type"), "Color=Yes,Category=Basic Image Adjustment",
     N_("Type of image being printed"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_OUTPUT,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 0, 0
   },
   {
-    "JobMode", N_("Job Mode"), N_("Job Mode"),
+    "JobMode", N_("Job Mode"), "Color=No,Category=Job Mode",
     N_("Job vs. page mode"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 0, 0
   },
   {
-    "PageNumber", N_("Page Number"), N_("Job Mode"),
+    "PageNumber", N_("Page Number"), "Color=No,Category=Job Mode",
     N_("Page number"),
     STP_PARAMETER_TYPE_INT, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 0, 1, STP_CHANNEL_NONE, 1, 0

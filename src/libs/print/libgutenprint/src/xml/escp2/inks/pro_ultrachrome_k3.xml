@@ -22,6 +22,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
 </copyright>
 <escp2:InkGroup name="pro_ultrachrome_k3">
 <InkList translate="text" name="ultra3photo" text="Photo Black">
+ <initSequence>IK\002\000\000\061</initSequence>
  <Shades>
   <shade count="3">1.000000 0.480000 0.160000</shade>
   <shade count="2">1.000000 0.350000</shade>
@@ -46,7 +47,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
      <SubchannelValueParam name="DarkGrayValue"/>
      <SubchannelScaleParam name="DarkGrayScale"/>
     </subchannel>
-    <subchannel color="0" subchannel="2" name="LightLightBlack" text="Light Light Black" translate="text">
+    <subchannel color="0" subchannel="3" name="LightLightBlack" text="Light Light Black" translate="text">
      <ChannelDensityParam name="BlackDensity"/>
      <SubchannelTransitionParam name="LightGrayTrans"/>
      <SubchannelValueParam name="LightGrayValue"/>
@@ -314,6 +315,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
 </InkList>
 
 <InkList translate="text" name="ultra3matte" text="Matte Black">
+ <initSequence>IK\002\000\000\121</initSequence>
  <Shades>
   <shade count="3">1.000000 0.278000 0.093000</shade>
   <shade count="2">1.000000 0.350000</shade>

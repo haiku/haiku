@@ -1,5 +1,5 @@
 /*
- * "$Id: testpatterny.y,v 1.39 2009/06/14 19:38:08 rlk Exp $"
+ * "$Id: testpatterny.y,v 1.40 2010/09/06 17:08:39 rlk Exp $"
  *
  *   Test pattern generator for Gimp-Print
  *
@@ -105,6 +105,11 @@ find_color(const char *name)
 %token DENSITY
 %token TOP
 %token LEFT
+%token SIZE_MODE
+%token RELATIVE
+%token PT
+%token IN
+%token MM
 %token HSIZE
 %token VSIZE
 %token BLACKLINE
@@ -391,6 +396,38 @@ left: LEFT NUMBER
 	  global_xleft = $2;
 	}
 ;
+size_relative: RELATIVE
+	{
+	  if (getenv("STP_TESTPATTERN_DEBUG"))
+ 	    fprintf(stderr, ">>>relative size\n");
+	  global_size_mode = SIZE_RELATIVE;
+	}
+;
+size_in: IN
+	{
+	  if (getenv("STP_TESTPATTERN_DEBUG"))
+ 	    fprintf(stderr, ">>>size inches\n");
+	  global_size_mode = SIZE_IN;
+	}
+;
+size_pt: PT
+	{
+	  if (getenv("STP_TESTPATTERN_DEBUG"))
+ 	    fprintf(stderr, ">>>size pt\n");
+	  global_size_mode = SIZE_PT;
+	}
+;
+size_mm: MM
+	{
+	  if (getenv("STP_TESTPATTERN_DEBUG"))
+ 	    fprintf(stderr, ">>>size mm\n");
+	  global_size_mode = SIZE_MM;
+	}
+;
+size_mode_1: size_relative | size_pt | size_in | size_mm
+;
+size_mode: SIZE_MODE size_mode_1
+;
 hsize: HSIZE NUMBER
 	{
 	  if (getenv("STP_TESTPATTERN_DEBUG"))
@@ -588,7 +625,7 @@ end_job: END_JOB
 A_Rule: gamma | channel_gamma | level | channel_level | global_gamma | steps
 	| ink_limit | printer | parameter | density | top | left | hsize
 	| vsize | blackline | noscale | inputspec | page_size | message
-	| output | start_job | end_job
+	| output | start_job | end_job | size_mode
 ;
 
 Rule: A_Rule SEMI

@@ -1,5 +1,5 @@
 /*
- * "$Id: testpatternl.l,v 1.25 2009/06/14 17:12:44 rlk Exp $"
+ * "$Id: testpatternl.l,v 1.26 2010/09/06 17:08:39 rlk Exp $"
  *
  *   Test pattern generator for Gimp-Print
  *
@@ -90,6 +90,11 @@ parameter_curve		DBG(PARAMETER_CURVE); return PARAMETER_CURVE;
 density			DBG(DENSITY); return DENSITY;
 top			DBG(TOP); return TOP;
 left			DBG(LEFT); return LEFT;
+size_mode		DBG(SIZE_MODE); return SIZE_MODE;
+relative		DBG(RELATIVE); return RELATIVE;
+pt			DBG(PT); return PT;
+in			DBG(IN); return IN;
+mm			DBG(MM); return MM;
 hsize			DBG(HSIZE); return HSIZE;
 vsize			DBG(VSIZE); return VSIZE;
 blackline		DBG(BLACKLINE); return BLACKLINE;

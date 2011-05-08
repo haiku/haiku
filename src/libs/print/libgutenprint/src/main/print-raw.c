@@ -1,5 +1,5 @@
 /*
- * "$Id: print-raw.c,v 1.41 2008/07/18 10:57:24 rlk Exp $"
+ * "$Id: print-raw.c,v 1.42 2010/12/05 21:38:15 rlk Exp $"
  *
  *   Print plug-in RAW driver for the GIMP.
  *
@@ -77,13 +77,13 @@ static const int ink_count = sizeof(inks) / sizeof(ink_t);
 static const stp_parameter_t the_parameters[] =
 {
   {
-    "InkType", N_("Ink Type"), N_("Advanced Printer Setup"),
+    "InkType", N_("Ink Type"), "Color=Yes,Category=Advanced Printer Setup",
     N_("Type of ink in the printer"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "PrintingMode", N_("Printing Mode"), N_("Core Parameter"),
+    "PrintingMode", N_("Printing Mode"), "Color=Yes,Category=Core Parameter",
     N_("Printing Output Mode"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0

@@ -1,5 +1,5 @@
 /*
- * "$Id: testpattern.h,v 1.19 2008/06/28 15:05:28 rlk Exp $"
+ * "$Id: testpattern.h,v 1.20 2010/09/06 17:08:39 rlk Exp $"
  *
  *   Test pattern generator for Gimp-Print
  *
@@ -62,6 +62,13 @@ typedef struct
  */
 #define YY_ALWAYS_INTERACTIVE 1
 
+typedef enum {
+  SIZE_RELATIVE,
+  SIZE_PT,
+  SIZE_IN,
+  SIZE_MM
+} size_mode_t;
+
 extern stp_vars_t *global_vars;
 extern double global_levels[];
 extern double global_gammas[];
@@ -72,6 +79,7 @@ extern char *global_printer;
 extern double global_density;
 extern double global_xtop;
 extern double global_xleft;
+extern size_mode_t global_size_mode;
 extern double global_hsize;
 extern double global_vsize;
 extern int global_noblackline;

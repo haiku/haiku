@@ -1,24 +1,23 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton interface for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,9 +28,10 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
+
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -56,30 +56,35 @@
      DENSITY = 272,
      TOP = 273,
      LEFT = 274,
-     HSIZE = 275,
-     VSIZE = 276,
-     BLACKLINE = 277,
-     NOSCALE = 278,
-     PATTERN = 279,
-     XPATTERN = 280,
-     EXTENDED = 281,
-     IMAGE = 282,
-     GRID = 283,
-     SEMI = 284,
-     CHANNEL = 285,
-     CMYK = 286,
-     KCMY = 287,
-     RGB = 288,
-     CMY = 289,
-     GRAY = 290,
-     WHITE = 291,
-     MODE = 292,
-     PAGESIZE = 293,
-     MESSAGE = 294,
-     OUTPUT = 295,
-     START_JOB = 296,
-     END_JOB = 297,
-     END = 298
+     SIZE_MODE = 275,
+     RELATIVE = 276,
+     PT = 277,
+     IN = 278,
+     MM = 279,
+     HSIZE = 280,
+     VSIZE = 281,
+     BLACKLINE = 282,
+     NOSCALE = 283,
+     PATTERN = 284,
+     XPATTERN = 285,
+     EXTENDED = 286,
+     IMAGE = 287,
+     GRID = 288,
+     SEMI = 289,
+     CHANNEL = 290,
+     CMYK = 291,
+     KCMY = 292,
+     RGB = 293,
+     CMY = 294,
+     GRAY = 295,
+     WHITE = 296,
+     MODE = 297,
+     PAGESIZE = 298,
+     MESSAGE = 299,
+     OUTPUT = 300,
+     START_JOB = 301,
+     END_JOB = 302,
+     END = 303
    };
 #endif
 /* Tokens.  */
@@ -100,40 +105,45 @@
 #define DENSITY 272
 #define TOP 273
 #define LEFT 274
-#define HSIZE 275
-#define VSIZE 276
-#define BLACKLINE 277
-#define NOSCALE 278
-#define PATTERN 279
-#define XPATTERN 280
-#define EXTENDED 281
-#define IMAGE 282
-#define GRID 283
-#define SEMI 284
-#define CHANNEL 285
-#define CMYK 286
-#define KCMY 287
-#define RGB 288
-#define CMY 289
-#define GRAY 290
-#define WHITE 291
-#define MODE 292
-#define PAGESIZE 293
-#define MESSAGE 294
-#define OUTPUT 295
-#define START_JOB 296
-#define END_JOB 297
-#define END 298
+#define SIZE_MODE 275
+#define RELATIVE 276
+#define PT 277
+#define IN 278
+#define MM 279
+#define HSIZE 280
+#define VSIZE 281
+#define BLACKLINE 282
+#define NOSCALE 283
+#define PATTERN 284
+#define XPATTERN 285
+#define EXTENDED 286
+#define IMAGE 287
+#define GRID 288
+#define SEMI 289
+#define CHANNEL 290
+#define CMYK 291
+#define KCMY 292
+#define RGB 293
+#define CMY 294
+#define GRAY 295
+#define WHITE 296
+#define MODE 297
+#define PAGESIZE 298
+#define MESSAGE 299
+#define OUTPUT 300
+#define START_JOB 301
+#define END_JOB 302
+#define END 303
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
+
 

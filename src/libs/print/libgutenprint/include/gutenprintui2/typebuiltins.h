@@ -1,5 +1,5 @@
 
-/* Generated data (by glib-mkenums) */
+
 
 #ifndef GUTENPRINTUI_TYPE_BUILTINS_H
 #define GUTENPRINTUI_TYPE_BUILTINS_H
@@ -19,5 +19,5 @@ G_END_DECLS
 
 #endif /* GUTENPRINTUI_TYPE_BUILTINS_H */
 
-/* Generated data ends here */
+
 

@@ -276,6 +276,12 @@ while (<>) {
 	    $logmsgs{$datetimeauthor} = $body;
 	    if ($plus eq "") {
 		$plus{$datetimeauthor} = "added";
+		if (-f $currentfile) {
+		    my ($lines) = `wc -l \"$currentfile\" | awk '{print \$1}'`;
+		    chomp $lines;
+		    $plus{$datetimeauthor} .= " +$lines";
+		    $minus{$datetimeauthor} = "-0";
+		}
 	    } elsif ($state eq "dead;") {
 		$plus{$datetimeauthor} = "removed";
 	    } else {

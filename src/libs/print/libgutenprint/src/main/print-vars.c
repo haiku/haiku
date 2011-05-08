@@ -1,5 +1,5 @@
 /*
- * "$Id: print-vars.c,v 1.90 2010/08/04 00:33:57 rlk Exp $"
+ * "$Id: print-vars.c,v 1.91 2010/12/05 21:38:15 rlk Exp $"
  *
  *   Print plug-in driver utility functions for the GIMP.
  *
@@ -84,6 +84,31 @@ struct stp_vars			/* Plug-in variables */
 
 static int standard_vars_initialized = 0;
 
+
+void
+stp_parameter_description_destroy(stp_parameter_t *desc)
+{
+  switch (desc->p_type)
+    {
+    case STP_PARAMETER_TYPE_CURVE:
+      if (desc->bounds.curve)
+	stp_curve_destroy(desc->bounds.curve);
+      desc->bounds.curve = NULL;
+      break;
+    case STP_PARAMETER_TYPE_ARRAY:
+      if (desc->bounds.array)
+	stp_array_destroy(desc->bounds.array);
+      desc->bounds.array = NULL;
+      break;
+    case STP_PARAMETER_TYPE_STRING_LIST:
+      if (desc->bounds.str)
+	stp_string_list_destroy(desc->bounds.str);
+      desc->bounds.str = NULL;
+      break;
+    default:
+      break;
+    }
+}
 static stp_vars_t default_vars;
 
 #define CHECK_VARS(v) STPI_ASSERT(v, NULL)
@@ -1602,29 +1627,103 @@ stp_describe_parameter(const stp_vars_t *v, const char *name,
     stp_deprintf(STP_DBG_VARS, "Describing invalid parameter %s\n", name);
 }
 
-void
-stp_parameter_description_destroy(stp_parameter_t *desc)
+stp_string_list_t *
+stp_parameter_get_categories(const stp_vars_t *v, const stp_parameter_t *desc)
 {
-  switch (desc->p_type)
+  const char *dptr;
+  stp_string_list_t *answer;
+  int count = 0;
+  if (!v || !desc || !(desc->category))
+    return NULL;
+  answer = stp_string_list_create();
+  dptr = desc->category;
+  while (dptr)
     {
-    case STP_PARAMETER_TYPE_CURVE:
-      if (desc->bounds.curve)
-	stp_curve_destroy(desc->bounds.curve);
-      desc->bounds.curve = NULL;
-      break;
-    case STP_PARAMETER_TYPE_ARRAY:
-      if (desc->bounds.array)
-	stp_array_destroy(desc->bounds.array);
-      desc->bounds.array = NULL;
-      break;
-    case STP_PARAMETER_TYPE_STRING_LIST:
-      if (desc->bounds.str)
-	stp_string_list_destroy(desc->bounds.str);
-      desc->bounds.str = NULL;
-      break;
-    default:
-      break;
+      const char *xptr = strchr(dptr, '=');
+      if (xptr)
+	{
+	  char *name = stp_strndup(dptr, xptr - dptr);
+	  char *text;
+	  dptr = xptr + 1;
+	  xptr = strchr(dptr, ',');
+	  if (xptr)
+	    {
+	      text = stp_strndup(dptr, xptr - dptr);
+	      dptr = xptr + 1;
+	    }
+	  else
+	    {
+	      text = stp_strdup(dptr);
+	      dptr = NULL;
+	    }
+	  stp_string_list_add_string(answer, name, text);
+	  stp_free(name);
+	  stp_free(text);
+	  count++;
+	}
+      else
+	dptr = NULL;
     }
+  if (count == 0)
+    {
+      stp_string_list_destroy(answer);
+      return NULL;
+    }
+  else
+    return answer;
+}
+
+char *
+stp_parameter_get_category(const stp_vars_t *v, const stp_parameter_t *desc,
+			   const char *category)
+{
+  const char *dptr;
+  char *cptr;
+  int len;
+  if (!v || !desc || !(desc->category) || !category)
+    return NULL;
+  dptr = desc->category;
+  stp_asprintf(&cptr, "%s=", category);
+  len = stp_strlen(cptr);
+  while (dptr)
+    {
+      if (strncmp(dptr, cptr, len) == 0)
+	{
+	  const char *xptr;
+	  char *answer;
+	  dptr += len;
+	  xptr = strchr(dptr, ',');
+	  if (xptr)
+	    answer = stp_strndup(dptr, xptr - dptr);
+	  else
+	    answer = stp_strdup(dptr);
+	  stp_free(cptr);
+	  return answer;
+	}
+      dptr = strchr(dptr, ',');
+      if (dptr)
+	dptr++;
+    }
+  return NULL;
+}
+
+int
+stp_parameter_has_category_value(const stp_vars_t *v,
+				 const stp_parameter_t *desc,
+				 const char *category, const char *value)
+{
+  const char *dptr;
+  char *cptr;
+  int answer = 0;
+  if (!v || !desc || !category)
+    return -1;
+  cptr = stp_parameter_get_category(v, desc, category);
+  if (cptr == NULL)
+    return 0;
+  if (value == NULL || strcmp(value, cptr) == 0)
+    answer = 1;
+  stp_free(cptr);
+  return answer;
 }
 
 const stp_parameter_t *

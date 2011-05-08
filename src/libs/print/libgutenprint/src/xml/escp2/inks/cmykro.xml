@@ -23,7 +23,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
 <escp2:InkGroup name="cmykro">
 <Curves>
  <curve name="cmykroCyan" wrap="wrap" type="linear" gamma="0" piecewise="false">
-  <sequence count="48" lower-bound="0" upper-bound="4">
+  <sequence count="48" lower-bound="0" upper-bound="1">
 	1	1	1	1	1	1	1	1
 	1	0.95	0.89	0.83	0.75	0.6	0.4	0.2
 	0	0	0	0	0	0	0	0
@@ -33,7 +33,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
   </sequence>
  </curve>
  <curve name="cmykroMagenta" wrap="wrap" type="linear" gamma="0" piecewise="false">
-  <sequence count="48" lower-bound="0" upper-bound="4">
+  <sequence count="48" lower-bound="0" upper-bound="1">
 	0	0.2	0.4	0.6	0.75	0.83	0.89	0.95
 	1	1	1	1	1	1	1	1
 	1	1	0.85	0.7	0.6	0.5	0.4	0.3
@@ -43,7 +43,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
   </sequence>
  </curve>
  <curve name="cmykroYellow" wrap="wrap" type="linear" gamma="0" piecewise="false">
-  <sequence count="48" lower-bound="0" upper-bound="4">
+  <sequence count="48" lower-bound="0" upper-bound="1">
 	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0
@@ -53,7 +53,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
   </sequence>
  </curve>
  <curve name="cmykroRed" wrap="wrap" type="linear" gamma="0" piecewise="false">
-  <sequence count="48" lower-bound="0" upper-bound="4">
+  <sequence count="48" lower-bound="0" upper-bound="1">
 	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0
 	0	0.2	0.4	0.6	0.8	1	1	1
@@ -63,7 +63,7 @@ xsi:schemaLocation="http://gimp-print.sourceforge.net/xsd/gp.xsd-1.0 gutenprint.
   </sequence>
  </curve>
  <curve name="cmykroOrange" wrap="wrap" type="linear" gamma="0" piecewise="false">
-  <sequence count="48" lower-bound="0" upper-bound="4">
+  <sequence count="48" lower-bound="0" upper-bound="1">
 	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0

@@ -1,12 +1,1449 @@
+2011-05-02	<rlk@sourceforge.net>
+
+	Files:	po/cs.po (1.60) (+3276 -3090)
+		po/da.po (1.103) (+1901 -1657)
+		po/de.po (1.75) (+3280 -3091)
+		po/el.po (1.75) (+3280 -3091)
+		po/en_GB.po (1.168) (+3288 -3093)
+		po/es.po (1.73) (+3284 -3095)
+		po/fi.po (1.5) (+3288 -3093)
+		po/fr.po (1.101) (+3303 -3108)
+		po/hu.po (1.33) (+3288 -3093)
+		po/it.po (1.13) (+1923 -1666)
+		po/ja.po (1.69) (+3280 -3091)
+		po/nb.po (1.34) (+3280 -3091)
+		po/nl.po (1.85) (+3288 -3093)
+		po/pl.po (1.79) (+3280 -3091)
+		po/pt.po (1.74) (+3280 -3091)
+		po/ru.po (1.7) (+3284 -3092)
+		po/sk.po (1.78) (+3280 -3091)
+		po/sl.po (1.2) (+1918 -1665)
+		po/sv.po (1.104) (+3304 -3109)
+		po/zh_TW.po (1.34) (+3288 -3105)
+
+	Update i18n for release
+
+2011-05-02	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.465) (+1 -1)
+		configure.ac (1.224) (+3 -3)
+
+	Disable Ukrainian translation
+
+2011-05-01	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.464) (+1 -1)
+		configure.ac (1.223) (+3 -3)
+		po/uk.po (1.2) (+14031 -0)
+
+	Add Ukrainian translation
+
+2011-05-01	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.463) (+1 -0)
+		src/main/canon-media.h (1.47) (+20 -0)
+		src/main/canon-printers.h (1.111) (+14 -0)
+		src/xml/printers.xml (1.126) (+2 -1)
+
+	add support for Canon MP630
+
+2011-05-01	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.462) (+1 -0)
+		src/main/canon-modes.h (1.85) (+3 -1)
+		src/xml/printers.xml (1.125) (+2 -1)
+
+	add Canon MP620 (same as MP540)
+
+2011-05-01	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.461) (+1 -0)
+		src/main/canon-media.h (1.46) (+22 -0)
+		src/main/canon-modes.h (1.84) (+23 -0)
+		src/main/canon-printers.h (1.110) (+14 -0)
+		src/main/print-canon.c (1.249) (+3 -2)
+		src/xml/printers.xml (1.124) (+2 -1)
+		test/pixma_parse.c (1.23) (+2 -2)
+
+	add support for Canon MP640
+
+2011-05-01	<gernot2270@sourceforge.net>
+
+	Files:	test/pixma_parse.c (1.22) (+6 -6)
+
+	corrected pixma_parse to find more encoded inks
+
+2011-05-01	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.460) (+3 -0)
+		src/main/canon-media.h (1.45) (+38 -0)
+		src/main/canon-modes.h (1.83) (+3 -3)
+		src/main/canon-printers.h (1.109) (+28 -3)
+		src/xml/printers.xml (1.123) (+3 -1)
+
+	adding support for Canon iP6100D, iP6600D
+
+2011-05-01	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.57) (+116 -0)
+		src/main/canon-media.h (1.44) (+22 -0)
+		src/main/canon-modes.h (1.82) (+20 -0)
+		src/main/canon-printers.h (1.108) (+14 -0)
+		src/xml/printers.xml (1.122) (+2 -1)
+
+	adding experimental support for Canon MP980
+
+2011-04-29	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.459) (+2 -1)
+		src/main/canon-modes.h (1.81) (+22 -0)
+		src/main/canon-printers.h (1.107) (+14 -0)
+		src/xml/printers.xml (1.121) (+2 -1)
+
+	add experimental support for Canon MP810
+
+2011-04-29	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.458) (+1 -0)
+		src/main/canon-modes.h (1.80) (+14 -0)
+		src/main/canon-printers.h (1.106) (+14 -0)
+		src/xml/printers.xml (1.120) (+2 -1)
+		test/pixma_parse.c (1.21) (+2 -2)
+
+	add experimental support for Canon MP800
+
+2011-04-27	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.457) (+1 -0)
+		src/main/canon-inks.h (1.56) (+23 -4)
+		src/main/canon-media.h (1.43) (+23 -0)
+		src/main/canon-modes.h (1.79) (+13 -0)
+		src/main/canon-printers.h (1.105) (+14 -0)
+		src/main/print-canon.c (1.248) (+3 -2)
+		src/xml/printers.xml (1.119) (+2 -1)
+
+	added experimental support for Canon iX7000, corrected one inkset also used on MX7600
+
+2011-04-26	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.456) (+5 -0)
+		src/foomatic/foomatic-generator.in (1.76) (+6 -0)
+		src/main/canon-inks.h (1.55) (+86 -11)
+		src/main/canon-media.h (1.42) (+119 -0)
+		src/main/canon-modes.h (1.78) (+101 -2)
+		src/main/canon-printers.h (1.104) (+46 -4)
+		src/main/print-canon.c (1.247) (+2 -2)
+		src/xml/printers.xml (1.118) (+4 -1)
+		test/pixma_parse.c (1.20) (+7 -1)
+
+	revised experimental Canon Pro9500 and added experimental support Pro9000, Pro9000 Mk.II, Pro9500 Mk.II
+
+2011-04-24	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.455) (+14 -14)
+
+	Change the ordering in the release notes to emphasize the significant
+	OS X 10.5 change.
+
+2011-04-20	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.54) (+6 -1)
+		src/main/canon-modes.h (1.77) (+2 -3)
+		src/main/canon-printers.h (1.103) (+14 -0)
+		src/main/print-canon.c (1.246) (+2 -2)
+		src/xml/printers.xml (1.117) (+2 -1)
+
+	add support for Canon iP4800 family
+
+2011-04-16	<rlk@sourceforge.net>
+
+	Files:	src/testpattern/run-testpattern-2.in (1.41) (+51 -9)
+
+	Allow specification of geometry and custom page size.
+
+2011-04-16	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.116) (+3 -3)
+
+	LaserJet 5000 and 5100 are large format.
+
+2011-04-16	<rlk@sourceforge.net>
+
+	Files:	src/main/channel.c (1.34) (+92 -72)
+
+	Avoid some null pointer derefs.
+
+2011-04-13	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.53) (+1 -1)
+		src/main/canon-modes.h (1.76) (+1 -1)
+		src/main/canon-printers.h (1.102) (+1 -1)
+
+	fixing some inksets, modes, printer definitions to remove testpattern errors
+
+2011-04-12	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.52) (+4 -1)
+		src/main/canon-printers.h (1.101) (+2 -2)
+
+	fixed K intensity in a few inksets, and added CMYK ink order to iP6000D, iP6700D
+
+2011-04-11	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.51) (+4 -7)
+
+	fixed some Canon inksets by swapping y and k
+
+2011-04-11	<gernot2270@sourceforge.net>
+
+	Files:	src/main/print-canon.c (1.245) (+5 -2)
+
+	patched print-canon.c to not call stp_channel_set_black_channel before calling stp_dither_set_inks
+
+2011-04-10	<rlk@sourceforge.net>
+
+	Files:	src/main/channel.c (1.33) (+9 -1)
+
+	Add some additional debugging.
+
+2011-04-09	<rlk@sourceforge.net>
+
+	Files:	src/cups/rastertoprinter.c (1.137) (+3 -3)
+
+	Print PPD version error message correctly.
+
+2011-04-08	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.75) (+11 -5)
+		src/main/canon-printers.h (1.100) (+2 -1)
+
+	updated iP4200 printer definition and some modes
+
+2011-04-07	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.50) (+31 -0)
+		src/main/canon-modes.h (1.74) (+12 -2)
+		src/main/canon-printers.h (1.99) (+2 -1)
+
+	adding experimental inksets and plain modes for Canon iP8500
+
+2011-04-07	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.49) (+140 -2)
+		src/main/canon-media.h (1.41) (+30 -8)
+		src/main/canon-modes.h (1.73) (+18 -0)
+		src/main/canon-printers.h (1.98) (+3 -2)
+
+	added experimental support for more Canon iP6700D media, inksets and modes
+
+2011-04-06	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.48) (+36 -0)
+		src/main/canon-modes.h (1.72) (+16 -2)
+
+	adding modes for Canon iP6000D
+
+2011-04-06	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.47) (+18 -0)
+		src/main/canon-modes.h (1.71) (+16 -1)
+		src/main/canon-printers.h (1.97) (+2 -1)
+
+	adding modes for Canon iP5300
+
+2011-04-06	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.46) (+26 -1)
+		src/main/canon-modes.h (1.70) (+2 -0)
+
+	add fast photo mode to Canon MP830 as test
+
+2011-04-06	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.454) (+3 -0)
+		src/xml/printers.xml (1.115) (+4 -1)
+
+	Add support for Epson T13, T22, and T22E
+
+2011-04-05	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.45) (+26 -0)
+		src/main/canon-modes.h (1.69) (+8 -1)
+		src/main/canon-printers.h (1.96) (+4 -2)
+
+	updated Canon MP830 printer definition, added more modes
+
+2011-04-04	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.44) (+1 -1)
+		src/main/canon-modes.h (1.68) (+5 -1)
+		src/main/canon-printers.h (1.95) (+6 -3)
+
+	updated Canon iX5000 printer definition, media types, sources, and added more working modes
+
+2011-04-03	<rlk@sourceforge.net>
+
+	Files:	src/testpattern/run-testpattern-2.in (1.40) (+9 -3)
+
+	Record -d options on the output line.
+
+2011-04-03	<rlk@sourceforge.net>
+
+	Files:	src/testpattern/run-testpattern-2.in (1.39) (+8 -0)
+
+	Add integer and boolean types to permissible options.
+
+2011-04-01	<rlk@sourceforge.net>
+
+	Files:	test/unprint.c (1.46) (+12 -1)
+
+	Add help message
+
+2011-04-01	<rlk@sourceforge.net>
+
+	Files:	src/testpattern/testpattern.c (1.59) (+3 -1)
+
+	Avoid a divide by zero when printing a lot of bands to a very small page.
+
+2011-04-01	<rlk@sourceforge.net>
+
+	Files:	src/testpattern/run-testpattern-2.in (1.38) (+3 -3)
+
+	Latest version of valgrind only allows --num-callers up to 50.
+
+2011-03-31	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.67) (+12 -5)
+
+	added Canon iP4000 modes, and B/W to existing modes
+
+2011-03-31	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.75) (+3 -1)
+		src/main/canon-media.h (1.40) (+1 -1)
+		src/main/canon-modes.h (1.66) (+7 -2)
+		src/main/canon-printers.h (1.94) (+1 -1)
+
+	corrected Canon iP3000 printer definition, added modes
+
+2011-03-31	<gernot2270@sourceforge.net>
+
+	Files:	src/main/print-canon.c (1.244) (+2 -2)
+
+	swapping two lines in print-canon.c canon_end_job function to avoid compiler warning
+
+2011-03-30	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.39) (+18 -0)
+		src/main/canon-modes.h (1.65) (+16 -0)
+		src/main/canon-printers.h (1.93) (+18 -15)
+
+	added modes and media for Canon MP150 and corrected its printer properites
+
+2011-03-30	<gernot2270@sourceforge.net>
+
+	Files:	src/main/print-canon.c (1.243) (+2 -1)
+
+	undoing change to print-canon.c in revision 1.241
+
+2011-03-30	<gernot2270@sourceforge.net>
+
+	Files:	src/main/print-canon.c (1.242) (+1 -2)
+
+	patch applied to canon_end_job to prevent unnecessary warning
+
+2011-03-30	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.453) (+12 -8)
+		src/xml/escp2/media/claria.xml (1.11) (+1 -1)
+		src/xml/escp2/media/claria1400.xml (1.9) (+1 -1)
+
+	Retune Photo Paper on Claria printers
+
+2011-03-29	<rlk@sourceforge.net>
+
+	Files:	src/xml/Makefile.am (1.6) (+2 -1)
+
+	Ensure that there's no temporary file left around.
+
+2011-03-28	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.452) (+2 -0)
+		src/main/canon-media.h (1.38) (+19 -0)
+		src/main/canon-modes.h (1.64) (+28 -0)
+		src/main/canon-printers.h (1.92) (+15 -1)
+		src/main/print-canon.c (1.241) (+4 -2)
+		src/xml/printers.xml (1.114) (+3 -1)
+
+	added experimental support for Canon MX360, MX410
+
+2011-03-24	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.451) (+4 -0)
+		src/main/canon-printers.h (1.91) (+2 -2)
+
+	updated NEWS file with Canon MP493, MX420, MX880, iX6500
+
+2011-03-24	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.37) (+18 -0)
+		src/main/canon-printers.h (1.90) (+29 -1)
+		src/xml/printers.xml (1.113) (+3 -1)
+
+	add experimental support for Canon MX880, iX6500
+
+2011-03-24	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.36) (+18 -0)
+		src/main/canon-printers.h (1.89) (+21 -7)
+		src/main/print-canon.c (1.240) (+6 -2)
+		src/xml/printers.xml (1.112) (+2 -1)
+
+	add experimental support for Canon MX420, correct missing CAP_T in some Canon printers
+
+2011-03-24	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.35) (+20 -0)
+		src/main/canon-printers.h (1.88) (+14 -0)
+		src/xml/printers.xml (1.111) (+2 -1)
+
+	Add experimental support for Canon MP493
+
+2011-03-24	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.450) (+1 -1)
+		po/it.po (1.12) (+3500 -3760)
+
+	Update Italian translation
+
+2011-03-21	<gernot2270@sourceforge.net>
+
+	Files:	NEWS (1.449) (+12 -0)
+
+	added newly supported [experimental] Canon printers to NEWS file
+
+2011-03-21	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.43) (+49 -13)
+		src/main/canon-media.h (1.34) (+39 -9)
+		src/main/canon-modes.h (1.63) (+20 -6)
+		src/main/canon-printers.h (1.87) (+14 -0)
+
+	add experimental Canon iP3100 support
+
+2011-03-21	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.33) (+17 -0)
+		src/main/canon-printers.h (1.86) (+14 -0)
+		src/xml/printers.xml (1.110) (+2 -1)
+
+	experimental Canon iP2600 support added
+
+2011-03-21	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.85) (+14 -0)
+		src/xml/printers.xml (1.109) (+2 -1)
+
+	experimental Canon iP2500 support added
+
+2011-03-21	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.42) (+40 -0)
+		src/main/canon-media.h (1.32) (+19 -2)
+		src/main/canon-modes.h (1.62) (+19 -2)
+		src/main/canon-printers.h (1.84) (+14 -0)
+		src/xml/printers.xml (1.108) (+2 -1)
+
+	experimental Canon iP2200 support added, and modes for iP2000.
+
+2011-03-14	<rlk@sourceforge.net>
+
+	Files:	po/.cvsignore (1.12) (+1 -0)
+
+	Add stamp-po to ignored files
+
+2011-03-14	<rlk@sourceforge.net>
+
+	Files:	scripts/mkchlog (1.19) (+6 -0)
+
+	Record number of lines in added files.
+
+2011-03-13	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.448) (+4 -0)
+		configure.ac (1.222) (+3 -3)
+		po/sl.po (1.1) (added +14546 -0)
+
+	Add Slovenian translation
+
+2011-03-13	<rlk@sourceforge.net>
+
+	Files:	src/cups/genppd.c (1.186) (+8 -3)
+
+	Restrict ShortNickName to the limit specified in the PPD spec
+
+2011-03-13	<rlk@sourceforge.net>
+
+	Files:	po/da.po (1.102) (+3417 -3665)
+
+	Updated Danish translation
+
+2011-03-10	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.107) (+2 -1)
+
+	add experimental support for Canon iP1800
+
+2011-03-10	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.106) (+2 -1)
+
+	add experimental support for Canon iP1700
+
+2011-03-10	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.61) (+6 -5)
+		src/main/canon-printers.h (1.83) (+14 -0)
+		src/xml/printers.xml (1.105) (+3 -2)
+
+	add experimental support for Canon iP1600
+
+2011-03-10	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.41) (+49 -11)
+		src/main/canon-media.h (1.31) (+17 -0)
+		src/main/canon-modes.h (1.60) (+17 -0)
+		src/main/canon-printers.h (1.82) (+14 -0)
+		src/xml/printers.xml (1.104) (+2 -1)
+
+	add experimental support for Canon iP1500
+
+2011-03-08	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.74) (+5 -1)
+		src/main/canon-inks.h (1.40) (+16 -0)
+		src/main/canon-media.h (1.30) (+17 -0)
+		src/main/canon-modes.h (1.59) (+32 -2)
+		src/main/canon-printers.h (1.81) (+15 -1)
+		src/xml/printers.xml (1.103) (+3 -1)
+
+	Added experimental support for Canon iP1200, iP1300. Correction to iP1000 definition.
+
+2011-03-08	<rlk@sourceforge.net>
+
+	Files:	src/main/print-color.c (1.143) (+41 -41)
+
+	Unmark category strings.
+
+2011-03-07	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.39) (+35 -0)
+		src/main/canon-media.h (1.29) (+16 -0)
+		src/main/canon-modes.h (1.58) (+15 -0)
+		src/main/canon-printers.h (1.80) (+15 -1)
+		src/xml/printers.xml (1.102) (+2 -1)
+
+	added Canon iP1000 (experimental), updated Canon MX870 printer definition with XML capability.
+
+2011-03-05	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.447) (+8 -0)
+		src/xml/escp2/inks/Makefile.am (1.13) (+2 -1)
+		src/xml/escp2/inks/f360_ultrachrome_k3v_2.xml (1.1) (added +610 -0)
+		src/xml/escp2/model/Makefile.am (1.27) (+3 -2)
+		src/xml/escp2/model/model_115.xml (1.1) (added +164 -0)
+		src/xml/printers.xml (1.101) (+3 -1)
+
+	Experimental support for Epson Stylus Photo R3000
+
+2011-03-05	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.446) (+9 -0)
+		po/cs.po (1.59) (+4683 -4466)
+		po/da.po (1.101) (+4747 -4462)
+		po/de.po (1.74) (+4728 -4464)
+		po/el.po (1.74) (+4683 -4465)
+		po/en_GB.po (1.167) (+4749 -4464)
+		po/es.po (1.72) (+4683 -4465)
+		po/fi.po (1.4) (+4742 -4460)
+		po/fr.po (1.100) (+4738 -4462)
+		po/hu.po (1.32) (+4748 -4463)
+		po/it.po (1.11) (+4748 -4462)
+		po/ja.po (1.68) (+4683 -4465)
+		po/nb.po (1.33) (+4708 -4466)
+		po/nl.po (1.84) (+4744 -4459)
+		po/pl.po (1.78) (+4683 -4465)
+		po/pt.po (1.73) (+4683 -4465)
+		po/ru.po (1.6) (+4733 -4461)
+		po/sk.po (1.77) (+4685 -4467)
+		po/sv.po (1.103) (+4736 -4466)
+		po/zh_TW.po (1.33) (+4699 -4461)
+		src/xml/escp2/model/Makefile.am (1.26) (+3 -2)
+		src/xml/escp2/model/model_114.xml (1.1) (added +139 -0)
+
+	Add support for Epson Stylus Pro 4000
+
+2011-03-05	<rlk@sourceforge.net>
+
+	Files:	src/main/xmlppd.c (1.5) (+9 -0)
+
+	Handle missing *CloseUI at the end of the PPD file.
+
+2011-03-05	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/inks/cmykrb.xml (1.10) (+5 -5)
+		src/xml/escp2/inks/cmykro.xml (1.8) (+5 -5)
+
+	Fix curve bounds for CMYKRB/O curves (from Simon Shapiro)
+
+2011-03-04	<rlk@sourceforge.net>
+
+	Files:	src/main/print-ps.c (1.104) (+21 -10)
+
+	Speed up PostScript output (from Alastair Robinson)
+
+2011-03-04	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.445) (+2 -2)
+
+	Minor cleanup
+
+2011-03-03	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.444) (+29 -8)
+		README (1.209) (+11 -11)
+		configure.ac (1.221) (+4 -4)
+		src/xml/escp2/model/Makefile.am (1.25) (+4 -2)
+		src/xml/escp2/model/model_112.xml (1.1) (added +139 -0)
+		src/xml/escp2/model/model_113.xml (1.1) (added +139 -0)
+		src/xml/escp2/model/model_48.xml (1.11) (+1 -1)
+		src/xml/escp2/model/model_49.xml (1.11) (+1 -1)
+		src/xml/printers.xml (1.100) (+3 -1)
+
+	Add back compatibility definitions for Epson 4800, 4880, 11800, 11880.
+
+	Prep for 5.2.7.
+
+2011-02-23	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.79) (+1 -1)
+
+	changed Canon MX870 control command set
+
+2011-02-22	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.99) (+5 -1)
+
+	Note that driver names must be identical.
+
+2011-02-22	<m0m@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.98) (+2 -1)
+
+	Canon SELPHY CP-800 was reported as working
+
+	http://sourceforge.net/mailarchive/message.php?msg_id=27097152
+
+2011-02-21	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.97) (+8 -8)
+
+	Make driver names for all Kodak Dock-compatible printers unique.
+
+2011-02-21	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.96) (+2 -2)
+
+	corrected family for MP600
+
+2011-02-21	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.443) (+29 -13)
+		src/xml/escp2/model/model_103.xml (1.3) (+42 -33)
+		src/xml/escp2/model/model_104.xml (1.3) (+42 -33)
+		src/xml/escp2/model/model_105.xml (1.2) (+43 -34)
+		src/xml/escp2/model/model_106.xml (1.2) (+43 -32)
+		src/xml/escp2/model/model_108.xml (1.2) (+38 -18)
+
+	Improve tunings of Epson x800 inks.
+
+2011-02-17	<rlk@sourceforge.net>
+
+	Files:	src/main/sequence.c (1.29) (+11 -9)
+
+	Fix issue with misuse of isfinite on Solaris.
+
+2011-02-16	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.28) (+20 -0)
+		src/main/canon-modes.h (1.57) (+1 -1)
+		src/main/canon-printers.h (1.78) (+14 -0)
+		src/xml/printers.xml (1.95) (+2 -1)
+
+	Added Canon MP600
+
+2011-02-16	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.77) (+4 -4)
+		src/xml/printers.xml (1.94) (+2 -2)
+
+	Improve support for Canon MP510
+
+2011-02-16	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.76) (+15 -1)
+		src/main/print-canon.c (1.239) (+3 -2)
+		src/xml/printers.xml (1.93) (+2 -1)
+
+	Add support for Canon MP550
+
+2011-02-15	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.38) (+3 -3)
+		src/main/canon-modes.h (1.56) (+23 -0)
+		src/main/canon-printers.h (1.75) (+14 -0)
+		src/xml/printers.xml (1.92) (+2 -1)
+
+	support added for Canon MP540
+
+2011-02-15	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.91) (+1 -2)
+
+	removed extra MX700 line in printers.xml
+
+2011-02-15	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.55) (+41 -1)
+
+	support for MP970
+
+2011-02-12	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/model/model_102.xml (1.5) (+1 -2)
+		src/xml/escp2/model/model_88.xml (1.11) (+1 -2)
+		src/xml/escp2/model/model_89.xml (1.11) (+1 -2)
+		src/xml/escp2/model/model_90.xml (1.11) (+1 -2)
+
+	Back out borderless change that did not work
+
+2011-02-12	<rlk@sourceforge.net>
+
+	Files:	scripts/autogen.sh (1.38) (+3 -7)
+
+	Fix libtool requirement.
+
+2011-02-11	<m0m@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.90) (+8 -1)
+
+	added more printers compatible with Kodak Easyshare Printer Dock
+
+2011-02-11	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/model/model_102.xml (1.4) (+2 -1)
+		src/xml/escp2/model/model_88.xml (1.10) (+2 -1)
+		src/xml/escp2/model/model_89.xml (1.10) (+2 -1)
+		src/xml/escp2/model/model_90.xml (1.10) (+2 -1)
+
+	Try to enable vertical borderless on {4,7,9,11}880.
+
+2011-02-11	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/inks/pro_ultrachrome_k3.xml (1.11) (+1 -1)
+
+	Correct definition of light light black in photo inkset.
+
+2011-02-11	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.89) (+3 -3)
+
+	Correct definitions of Epson 9700 and 9900.
+
+2011-01-26	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.27) (+54 -0)
+		src/main/canon-modes.h (1.54) (+58 -1)
+		src/main/canon-printers.h (1.74) (+56 -0)
+		src/main/print-canon.c (1.238) (+3 -2)
+		src/xml/printers.xml (1.88) (+6 -1)
+
+	adding experimental support for Canon MX850, MX860, MX870, MX7600
+
+2011-01-26	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.87) (+2 -3)
+
+	Fix the Sony DPP-EX7 and Epson PX650.
+
+2011-01-25	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.37) (+54 -29)
+		src/main/canon-media.h (1.26) (+2 -2)
+		src/main/canon-printers.h (1.73) (+14 -1)
+		src/xml/printers.xml (1.86) (+2 -1)
+
+	Adding support for Canon MX700.
+
+2011-01-25	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.73) (+2 -0)
+		src/main/canon-inks.h (1.36) (+17 -0)
+		src/main/canon-media.h (1.25) (+57 -1)
+		src/main/canon-modes.h (1.53) (+86 -1)
+		src/main/canon-printers.h (1.72) (+44 -0)
+		src/main/print-canon.c (1.237) (+9 -3)
+		src/xml/printers.xml (1.85) (+6 -1)
+
+	add support for Canon MX300, MX310, MX330, MX340, MX350. Some of the photo modes are bound to be buggy, but most modes use only CMYK or CMY and should work.
+
+2011-01-18	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.35) (+37 -0)
+		src/main/canon-media.h (1.24) (+19 -0)
+		src/main/canon-modes.h (1.52) (+29 -0)
+		src/main/canon-printers.h (1.71) (+14 -0)
+		src/xml/printers.xml (1.84) (+2 -1)
+		test/pixma_parse.c (1.19) (+2 -2)
+
+	Added test support for Canon iP1900
+
+2011-01-17	<rlk@sourceforge.net>
+
+	Files:	src/cups/Makefile.am (1.120) (+26 -19)
+		src/cups/test-ppds (1.6) (+12 -9)
+
+	Re-enable test-ppds, which works with the current release of CUPS.
+	Disable a few errors that either don't matter (missing profiles that
+	are OS-X specific) or that we'll ignore for now (malformed page size
+	tags) pending further information.
+
+	Reorganize the various ppd targets so that they can be run in any order.
+
+2011-01-17	<rlk@sourceforge.net>
+
+	Files:	src/cups/genppd.c (1.185) (+34 -8)
+
+	Generate *ColorKeywords tags.
+
+2011-01-17	<rlk@sourceforge.net>
+
+	Files:	po/fi.po (1.3) (+2 -2)
+
+	EMERGENCY translation to fix malformed translation string that's
+	illegal in a PPD file.
+
+2011-01-17	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.72) (+2 -0)
+		src/main/canon-inks.h (1.34) (+258 -57)
+		src/main/canon-media.h (1.23) (+39 -12)
+		src/main/canon-modes.h (1.51) (+61 -13)
+		src/main/canon-printers.h (1.70) (+24 -12)
+		src/main/print-canon.c (1.236) (+92 -27)
+		src/xml/printers.xml (1.83) (+2 -3)
+		test/pixma_parse.c (1.18) (+148 -54)
+		test/pixma_parse.h (1.7) (+5 -3)
+
+	updated tested modes for MP960, removed non-working modes. added MP510 and MP520 support, updated iP2700, smalll correction to other Canon printers. Added Cartridge selection (partial implementation) to driver. Updated pixma_parse to handle more inks, and output more debug info.
+
+2011-01-13	<mbroughtn@sourceforge.net>
+
+	Files:	NEWS (1.442) (+2 -2)
+
+	Clean up wording for ColorSync use.
+
+2011-01-13	<mbroughtn@sourceforge.net>
+
+	Files:	NEWS (1.441) (+6 -0)
+		src/cups/genppd.c (1.184) (+3 -2)
+
+	Added *APDefaultCustomColorMatching: sRGB statement to PPDs.  Needed by
+	Mac OS X 10.5 and 10.6 in addition to *APCustomColorMatching: sRGB statement.
+
+2011-01-12	<rlk@sourceforge.net>
+
+	Files:	src/cups/genppd.c (1.183) (+3 -5)
+
+	Fix uninitialized stack variable.
+
+2011-01-06	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/inks/pro_ultrachrome_k34.xml (1.2) (+3 -3)
+
+	Fix incorrect shade description.
+
+2011-01-06	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.440) (+1 -0)
+
+	Preliminary support for Epson Stylus Pro 4450.
+
+	Preliminary support for Epson Stylus Pro 7890 and 9890.  These appear
+	to be faster versions of the 7880 and 9880 (double the nozzle count).
+
+2011-01-06	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.439) (+2 -0)
+		src/xml/escp2/inks/Makefile.am (1.12) (+2 -1)
+		src/xml/escp2/inks/pro_ultrachrome_k34.xml (1.1) (added +204 -0)
+		src/xml/escp2/model/Makefile.am (1.24) (+3 -2)
+		src/xml/escp2/model/model_111.xml (1.1) (added +137 -0)
+		src/xml/printers.xml (1.82) (+3 -1)
+
+	Preliminary support for Epson Stylus Pro 4450
+
+2011-01-06	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.438) (+2 -0)
+		src/xml/escp2/inks/Makefile.am (1.11) (+2 -1)
+		src/xml/escp2/inks/pro_ultrachrome_k3v4.xml (1.1) (added +181 -0)
+		src/xml/escp2/model/Makefile.am (1.23) (+4 -2)
+		src/xml/escp2/model/model_109.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_110.xml (1.1) (added +150 -0)
+		src/xml/printers.xml (1.81) (+3 -1)
+
+	Preliminary support for Epson 7700/9700
+
+2011-01-05	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.437) (+1 -0)
+		src/xml/printers.xml (1.80) (+2 -1)
+
+	Add Epson Stylus Pro 3885 (Asia name for 3880)
+
+2010-12-20	<twaugh@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.79) (+6 -6)
+
+	Added IEEE 1284 Device IDs for:
+	  Epson Stylus Photo 1400 (RH bug #577299)
+	  Epson Stylus Photo 830U (RH bug #577307)
+	  HP DeskJet 959C (RH bug #577291).
+	  Epson Stylus Photo R230 (Ubuntu #520466)
+	  Epson Stylus D92 (RH bug #570888)
+
+2010-12-20	<twaugh@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.78) (+2 -2)
+
+	Removed incorrect Device ID for Brother HL-2060 (RH bug #531370).
+
+2010-12-19	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.436) (+2 -0)
+
+	More release note updates.
+
+2010-12-19	<rlk@sourceforge.net>
+
+	Files:	NEWS (1.435) (+56 -0)
+
+	Update news.
+
+2010-12-19	<rlk@sourceforge.net>
+
+	Files:	src/main/escp2-channels.c (1.91) (+26 -6)
+		src/main/escp2-driver.c (1.57) (+5 -1)
+		src/main/print-escp2.h (1.139) (+6 -2)
+		src/xml/escp2/inks/pro_ultrachrome_k3.xml (1.10) (+2 -0)
+		src/xml/escp2/inks/pro_ultrachrome_k3v.xml (1.3) (+2 -0)
+		src/xml/escp2/media/f360_ultrachrome_k3.xml (1.10) (+60 -60)
+		src/xml/escp2/media/f360_ultrachrome_k3v.xml (1.4) (+61 -61)
+		src/xml/escp2/media/pro_ultrachrome_k3.xml (1.4) (+194 -215)
+		src/xml/escp2/media/pro_ultrachrome_k3v.xml (1.2) (+201 -221)
+		src/xml/escp2/model/model_102.xml (1.3) (+8 -18)
+		src/xml/escp2/model/model_107.xml (1.5) (+8 -8)
+		src/xml/escp2/model/model_88.xml (1.9) (+8 -18)
+		src/xml/escp2/model/model_89.xml (1.9) (+8 -18)
+		src/xml/escp2/model/model_90.xml (1.9) (+8 -18)
+
+	Improve tunings of Epson x880 inks.
+
+	Correct media definitions for Epson x800 and x880.
+
+	Allow inks to specify init sequence (for e. g. 3880 switching between
+	matte black and photo black).
+
+2010-12-19	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.77) (+2 -1)
+
+	Add Epson B-510N
+
+2010-12-12	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/model/model_102.xml (1.2) (+37 -17)
+		src/xml/escp2/model/model_107.xml (1.4) (+37 -19)
+		src/xml/escp2/model/model_88.xml (1.8) (+38 -18)
+		src/xml/escp2/model/model_89.xml (1.8) (+37 -17)
+		src/xml/escp2/model/model_90.xml (1.8) (+37 -17)
+
+	Retune drop sizes and densities for Epson Stylus Pro x880 printers
+
+2010-12-11	<rlk@sourceforge.net>
+
+	Files:	src/escputil/d4lib.c (1.13) (+20 -10)
+		src/escputil/escputil.c (1.104) (+91 -22)
+		src/main/print-escp2.c (1.433) (+3 -1)
+		src/xml/escp2/model/model_107.xml (1.3) (+1 -11)
+
+	Make escputil work with Stylus Pro 3880.
+
+	Allow escputil -e to get inks from the printer.
+
+2010-12-09	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.33) (+4 -4)
+		src/main/print-canon.c (1.235) (+5 -5)
+
+	corrected exception for iP2700. ESC (P exception was oppositely defined
+
+2010-12-06	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.76) (+6 -1)
+
+	Add Epson B-310, B-510DN, ME 320, ME Office 600F, and ME Office 620F.
+
+2010-12-05	<rlk@sourceforge.net>
+
+	Files:	include/gutenprint/vars.h (1.8) (+37 -1)
+		src/cups/genppd.c (1.182) (+197 -79)
+		src/main/dither-main.c (1.63) (+4 -4)
+		src/main/generic-options.c (1.12) (+5 -5)
+		src/main/print-canon.c (1.234) (+22 -22)
+		src/main/print-color.c (1.142) (+56 -55)
+		src/main/print-escp2.c (1.432) (+127 -124)
+		src/main/print-lexmark.c (1.160) (+14 -14)
+		src/main/print-olympus.c (1.97) (+10 -10)
+		src/main/print-pcl.c (1.160) (+16 -16)
+		src/main/print-ps.c (1.103) (+5 -5)
+		src/main/print-raw.c (1.42) (+3 -3)
+		src/main/print-vars.c (1.91) (+120 -21)
+
+	Preliminary code to create PPD files without color options
+
+2010-12-05	<rlk@sourceforge.net>
+
+	Files:	src/escputil/d4lib.c (1.12) (+59 -59)
+		src/escputil/escputil.c (1.103) (+67 -60)
+
+	Print debug information to stdout rather than stderr to see relative timing
+
+2010-12-05	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/model/Makefile.am (1.22) (+3 -2)
+		src/xml/escp2/model/model_103.xml (1.2) (+5 -3)
+		src/xml/escp2/model/model_104.xml (1.2) (+5 -3)
+		src/xml/escp2/model/model_107.xml (1.2) (+50 -43)
+		src/xml/escp2/model/model_108.xml (1.1) (added +163 -0)
+		src/xml/printers.xml (1.75) (+2 -2)
+
+	Correct definitions of Epson 3800, 3880, 7800, 9800
+
+2010-12-03	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.32) (+6 -5)
+
+	modify inks for Canon MP990: swap k and K  for 600dpi modes.
+
+2010-12-02	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.31) (+4 -4)
+		src/main/canon-modes.h (1.50) (+2 -2)
+
+	modify inks and modes for Canon MP990: 1. Removed draft modes not accepted by printer; 2. set k density to 0 for 600dpi modes to output only CMYK for plain media.
+
+2010-11-29	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.30) (+29 -20)
+		src/main/canon-modes.h (1.49) (+27 -17)
+		src/main/canon-printers.h (1.69) (+5 -5)
+
+	corrected inksets and modes for Canon MP990, MG6100 series, and MG8100 series
+
+2010-11-25	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.68) (+2 -2)
+
+	removing incorrectly submitted XML addition from MP960, MP970
+
+2010-11-25	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.74) (+3 -1)
+
+	added Canon MP990 to printer list
+
+2010-11-25	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.22) (+25 -0)
+		src/main/canon-modes.h (1.48) (+8 -0)
+		src/main/canon-printers.h (1.67) (+17 -2)
+
+	adding experimental support for Canon MP990
+
+2010-11-25	<tillkamppeter@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.73) (+10 -10)
+
+	Updated printer model names to match the changes in the Foomatic database.
+
+2010-11-25	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.72) (+2 -1)
+
+	adding Canon MP495 to list of printers
+
+2010-11-25	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.66) (+14 -0)
+
+	added printer definition for Canon MP495. Appears to be like MP280.
+
+2010-11-24	<rlk@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.71) (+7 -7)
+
+	Correct definition of Epson NX200/215, SX200/205/210/215
+
+2010-11-24	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.70) (+2 -1)
+
+	added Canon MP480 to printer list
+
+2010-11-24	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.21) (+18 -0)
+		src/main/canon-modes.h (1.47) (+29 -0)
+		src/main/canon-printers.h (1.65) (+14 -0)
+
+	added modes, media and printer definition for Canon MP480
+
+2010-11-23	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.20) (+31 -0)
+		src/main/canon-modes.h (1.46) (+26 -0)
+		src/main/canon-printers.h (1.64) (+5 -5)
+
+	added further modes for iP4500. Fixed ESC ( r command
+
+2010-11-20	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.69) (+2 -1)
+
+	added Canon MP270 to list of printers
+
+2010-11-20	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.63) (+14 -0)
+
+	added support for Canon MP270
+
+2010-11-20	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.68) (+2 -1)
+
+	added Canon MP280 to list of supported printers
+
+2010-11-20	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.19) (+20 -0)
+		src/main/canon-modes.h (1.45) (+29 -0)
+		src/main/canon-printers.h (1.62) (+14 -0)
+
+	added support for Canon MP280 printer
+
+2010-11-20	<gernot2270@sourceforge.net>
+
+	Files:	test/pixma_parse.c (1.17) (+24 -3)
+
+	added printjob start & end basic XML read ability to pixma_parse.c
+
+2010-11-16	<gernot2270@sourceforge.net>
+
+	Files:	src/main/print-canon.c (1.233) (+23 -8)
+
+	Added codes for several paper sizes for Canon driver. Note: this and lexmark driver still refer to unknown/unused paper sizes.
+
+2010-11-16	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/papers.xml (1.9) (+61 -1)
+
+	added paper sizes: A3+, L, 2L, KG, 4x8, HanKire YonKire, RokuKire, Wide101.6x180.6
+
+2010-11-15	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.44) (+5 -9)
+
+	modified supported modes for Canon iP2700. Removed quality 0 modes, and 1200dpi mode which is not yet working.
+
+2010-11-14	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.43) (+3 -1)
+
+	added 1200dpi user-defined high-resolution mode for Canon iP2700
+
+2010-11-14	<gernot2270@sourceforge.net>
+
+	Files:	test/pixma_parse.c (1.16) (+11 -4)
+
+	modified pixma_parse to recognize inks where 0x60 is added to the character code. Apparently noted with iP4000 driver.
+
+2010-11-13	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.71) (+1 -0)
+
+	added draftmono2 to list of supported Canon foomatic mode tags
+
+2010-11-13	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.42) (+6 -5)
+
+	modified 2 incorrect Canon iP2700 modes (flag setting), added 0-quality test mode to discover if iP2700 supports this quality setting.
+
+2010-11-13	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.67) (+2 -1)
+
+	added MG8100 to printer list.
+
+2010-11-13	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.41) (+14 -0)
+		src/main/canon-printers.h (1.61) (+20 -5)
+
+	added XML to printjobs for MP250, iP4700, and the MG series. Also added experimental MG8100 support.
+
+2010-11-11	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.60) (+1 -1)
+		src/main/print-canon.c (1.232) (+41 -4)
+		src/main/print-canon.h (1.4) (+4 -0)
+
+	added pre-job, post-job XML functionality. Extended ESC (P command to 6 bytes where needed. Implemented cartridge selection command ESC (T. Modified Canon iP2700 to use these commands.
+
+2010-11-10	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.59) (+7 -1)
+
+	changed control command for Canon iP2700
+
+2010-11-09	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.66) (+4 -4)
+
+	modified Canon PIXMA MG5100, 5200, 6100 modelnumbers
+
+2010-11-09	<gernot2270@sourceforge.net>
+
+	Files:	src/main/print-canon.c (1.231) (+3 -2)
+
+	added PIXMA MG to list of families recognized by print-canon.c
+
+2010-11-09	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-printers.h (1.58) (+2 -2)
+
+	changed printer definition for Canon iP2700: channels reordered, duplex capability removed.
+
+2010-11-09	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-modes.h (1.40) (+3 -3)
+
+	rearranged print modes for Canon iP2700 so that a color mode is last in list. Else CUPS options only give mono colorspace choices.
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.65) (+2 -1)
+
+	added Canon iP2700 too printer list.
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.29) (+51 -0)
+		src/main/canon-media.h (1.18) (+20 -0)
+		src/main/canon-modes.h (1.39) (+29 -0)
+		src/main/canon-printers.h (1.57) (+15 -1)
+
+	added untested support for Canon iP2700 printer. All modes except one user-defined one are supported.
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.70) (+2 -0)
+
+	added 2nd standard and draft suffix to foomatic print mode name possibilities for Canon printers.
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.64) (+2 -1)
+
+	added Canon PIXMA MG6100 to XML printer list.
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.28) (+138 -0)
+		src/main/canon-media.h (1.17) (+24 -0)
+		src/main/canon-modes.h (1.38) (+18 -0)
+		src/main/canon-printers.h (1.56) (+14 -0)
+
+	added media, inks, modes, printer support for Canon PIXMA MG6100. Only partial since unknown inks exist for photo modes. Only plain, non-photo hagaki, and CDs supported now.
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.63) (+2 -1)
+
+	added Canon PIXMA MG5200
+
+2010-11-07	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.16) (+33 -0)
+		src/main/canon-modes.h (1.37) (+26 -1)
+		src/main/canon-printers.h (1.55) (+14 -0)
+
+	added slots, media, modes, printer definitions for Canon PIXMA MG5200. No ink additions needed.
+
+2010-11-02	<rlk@sourceforge.net>
+
+	Files:	src/xml/escp2/model/model_89.xml (1.7) (+2 -2)
+		src/xml/escp2/model/model_90.xml (1.7) (+2 -2)
+
+	3096351 Too small page sizes to Epson Stylus PRO 7800/7880/9800/9880
+
+2010-10-31	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-media.h (1.15) (+31 -0)
+		src/main/canon-modes.h (1.36) (+30 -0)
+		src/main/canon-printers.h (1.54) (+14 -0)
+
+	add Canon MG5100 media, slots, printer definition. Same inksets as iP4700. No CD. No ESC ( r commands.
+
+2010-10-31	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.62) (+2 -1)
+
+	add Canon MG5100 to XML printer list
+
+2010-10-30	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.27) (+80 -14)
+		src/main/canon-media.h (1.14) (+23 -0)
+		src/main/canon-modes.h (1.35) (+30 -0)
+		src/main/canon-printers.h (1.53) (+14 -0)
+
+	added iP4700 printer, inks, modes, media
+
+2010-10-30	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.61) (+2 -1)
+
+	added iP4700 printer to selection
+
+2010-10-30	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.69) (+7 -1)
+
+	added supported formore photo modes for Canon printers
+
+2010-10-09	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.60) (+4 -1)
+
+	adding MP450, MP460, MP250. Modified MP170.
+
+2010-10-09	<gernot2270@sourceforge.net>
+
+	Files:	src/foomatic/foomatic-generator.in (1.68) (+9 -1)
+
+	adding Canon mode options for mono, photo to foomatic generator
+
+2010-10-09	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.26) (+190 -0)
+		src/main/canon-media.h (1.13) (+90 -7)
+		src/main/canon-modes.h (1.34) (+50 -2)
+		src/main/canon-printers.h (1.52) (+46 -3)
+
+	adding Canon MP250 support, revised media for MP170, MP450, MP460 based on US English driver paper option text.
+
+2010-10-04	<gernot2270@sourceforge.net>
+
+	Files:	src/xml/printers.xml (1.59) (+3 -1)
+
+	adding MP950, MP960 to printer list
+
+2010-10-04	<gernot2270@sourceforge.net>
+
+	Files:	src/main/canon-inks.h (1.25) (+88 -1)
+		src/main/canon-modes.h (1.33) (+16 -0)
+		src/main/canon-printers.h (1.51) (+29 -1)
+
+	Canon MP950, MP960 printers, inks, modes added
+
+2010-09-19	<rlk@sourceforge.net>
+
+	Files:	src/cups/genppd.c (1.181) (+984 -930)
+
+	Start to break up write_ppd
+
+2010-09-11	<rlk@sourceforge.net>
+
+	Files:	src/cups/genppd.c (1.180) (+4 -4)
+
+	Minor fixup to be consistent with spacing in other places.
+
+2010-09-06	<rlk@sourceforge.net>
+
+	Files:	src/testpattern/testpattern.c (1.58) (+67 -36)
+		src/testpattern/testpattern.h (1.20) (+9 -1)
+		src/testpattern/testpatternl.l (1.26) (+6 -1)
+		src/testpattern/testpatterny.y (1.40) (+39 -2)
+
+	Allow specification of origin and size in points, inches, or mm
+	in addition to relative.
+
+	Compute number of dots after calculating image size.  This reduces the
+	number of pixels computed, which improves performance, and also corrects
+	printing of scales if width is less than the full page.
+
+	Print black lines correctly.
+
+===============================================================================
+Name: gutenprint-5_2_6
+
+2010-08-11	<rlk@sourceforge.net>
+
+	Files:	po/cs.po (1.58) (+4832 -4137)
+		po/da.po (1.100) (+4798 -4047)
+		po/de.po (1.73) (+4796 -4047)
+		po/el.po (1.73) (+4831 -4138)
+		po/en_GB.po (1.166) (+4798 -4047)
+		po/es.po (1.71) (+4831 -4138)
+		po/fi.po (1.2) (+6052 -5074)
+		po/fr.po (1.99) (+4798 -4047)
+		po/hu.po (1.31) (+6120 -4911)
+		po/it.po (1.10) (+4798 -4047)
+		po/ja.po (1.67) (+4831 -4138)
+		po/nb.po (1.32) (+4838 -4139)
+		po/nl.po (1.83) (+4798 -4047)
+		po/pl.po (1.77) (+4831 -4138)
+		po/pt.po (1.72) (+4831 -4138)
+		po/ru.po (1.5) (+4796 -4047)
+		po/sk.po (1.76) (+4831 -4138)
+		po/sv.po (1.102) (+4797 -4048)
+		po/zh_TW.po (1.32) (+4746 -4047)
+
+	Gutenprint 5.2.6 release
+
 2010-08-11	<rlk@sourceforge.net>
 
 	Files:	NEWS (1.434) (+7 -0)
 		src/xml/escp2/inputslots/Makefile.am (1.10) (+2 -1)
-		src/xml/escp2/inputslots/pro3880.xml (1.1) (added)
+		src/xml/escp2/inputslots/pro3880.xml (1.1) (added +42 -0)
 		src/xml/escp2/media/Makefile.am (1.15) (+2 -1)
-		src/xml/escp2/media/pro3880_ultrachrome_k3v.xml (1.1) (added)
+		src/xml/escp2/media/pro3880_ultrachrome_k3v.xml (1.1) (added +1458 -0)
 		src/xml/escp2/model/Makefile.am (1.21) (+3 -2)
-		src/xml/escp2/model/model_107.xml (1.1) (added)
+		src/xml/escp2/model/model_107.xml (1.1) (added +152 -0)
 		src/xml/printers.xml (1.58) (+3 -1)
 
 	Preliminary support for Epson 3800 and 3880
@@ -173,18 +1610,18 @@
 	Files:	NEWS (1.425) (+10 -0)
 		src/foomatic/foomatic-printermap (1.198) (+3 -0)
 		src/xml/escp2/inks/Makefile.am (1.10) (+2 -1)
-		src/xml/escp2/inks/pro_ultrachrome_k3v.xml (1.1) (added)
+		src/xml/escp2/inks/pro_ultrachrome_k3v.xml (1.1) (added +610 -0)
 		src/xml/escp2/inputslots/Makefile.am (1.9) (+2 -1)
-		src/xml/escp2/inputslots/pro_cutter_roll_feed.xml (1.1) (added)
+		src/xml/escp2/inputslots/pro_cutter_roll_feed.xml (1.1) (added +59 -0)
 		src/xml/escp2/media/Makefile.am (1.14) (+2 -1)
 		src/xml/escp2/media/pro_ultrachrome_k3.xml (1.3) (+3 -0)
-		src/xml/escp2/media/pro_ultrachrome_k3v.xml (1.1) (added)
+		src/xml/escp2/media/pro_ultrachrome_k3v.xml (1.1) (added +925 -0)
 		src/xml/escp2/model/Makefile.am (1.20) (+7 -2)
-		src/xml/escp2/model/model_102.xml (1.1) (added)
-		src/xml/escp2/model/model_103.xml (1.1) (added)
-		src/xml/escp2/model/model_104.xml (1.1) (added)
-		src/xml/escp2/model/model_105.xml (1.1) (added)
-		src/xml/escp2/model/model_106.xml (1.1) (added)
+		src/xml/escp2/model/model_102.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_103.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_104.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_105.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_106.xml (1.1) (added +150 -0)
 		src/xml/escp2/model/model_88.xml (1.7) (+9 -10)
 		src/xml/escp2/model/model_89.xml (1.6) (+12 -13)
 		src/xml/escp2/model/model_90.xml (1.6) (+12 -13)
@@ -300,7 +1737,7 @@
 2010-06-14	<rlk@sourceforge.net>
 
 	Files:	src/xml/escp2/model/Makefile.am (1.19) (+2 -1)
-		src/xml/escp2/model/model_101.xml (1.1) (added)
+		src/xml/escp2/model/model_101.xml (1.1) (added +183 -0)
 		src/xml/printers.xml (1.48) (+5 -5)
 
 	Fix Epson S20, S21, T20, T21
@@ -321,7 +1758,7 @@
 2010-04-19	<rlk@sourceforge.net>
 
 	Files:	configure.ac (1.217) (+3 -3)
-		po/fi.po (1.1) (added)
+		po/fi.po (1.1) (added +14461 -0)
 
 	Add Finnish translation
 
@@ -405,9 +1842,9 @@ Name: gutenprint-5_2_5
 2010-01-16	<rlk@sourceforge.net>
 
 	Files:	src/xml/escp2/inputslots/Makefile.am (1.8) (+2 -1)
-		src/xml/escp2/inputslots/cd.xml (1.1) (added)
+		src/xml/escp2/inputslots/cd.xml (1.1) (added +34 -0)
 		src/xml/escp2/model/Makefile.am (1.18) (+3 -2)
-		src/xml/escp2/model/model_100.xml (1.1) (added)
+		src/xml/escp2/model/model_100.xml (1.1) (added +217 -0)
 		src/xml/escp2/model/model_99.xml (1.2) (+0 -20)
 		src/xml/printers.xml (1.44) (+2 -2)
 
@@ -493,7 +1930,7 @@ Name: gutenprint-5_2_5
 		src/foomatic/foomatic-printermap (1.195) (+50 -2)
 		src/xml/escp2/model/Makefile.am (1.17) (+3 -2)
 		src/xml/escp2/model/model_96.xml (1.6) (+3 -3)
-		src/xml/escp2/model/model_99.xml (1.1) (added)
+		src/xml/escp2/model/model_99.xml (1.1) (added +215 -0)
 		src/xml/printers.xml (1.42) (+53 -5)
 
 	Add a bunch more Epson printers.
@@ -659,7 +2096,7 @@ Name: gutenprint-5_2_4
 2009-06-24	<rlk@sourceforge.net>
 
 	Files:	configure.ac (1.213) (+3 -3)
-		po/ru.po (1.1) (added)
+		po/ru.po (1.1) (added +14488 -0)
 
 	Add Russian translation
 
@@ -1022,7 +2459,7 @@ Name: gutenprint-5_2_4_rc1
 
 	Files:	src/foomatic/foomatic-printermap (1.189) (+1 -0)
 		src/xml/escp2/inputslots/Makefile.am (1.6) (+2 -1)
-		src/xml/escp2/inputslots/r2880.xml (1.1) (added)
+		src/xml/escp2/inputslots/r2880.xml (1.1) (added +52 -0)
 		src/xml/escp2/model/model_98.xml (1.2) (+14 -14)
 		src/xml/printers.xml (1.33) (+2 -1)
 
@@ -1040,11 +2477,11 @@ Name: gutenprint-5_2_4_rc1
 
 	Files:	src/foomatic/foomatic-printermap (1.188) (+1 -0)
 		src/xml/escp2/inks/Makefile.am (1.8) (+2 -1)
-		src/xml/escp2/inks/f360_ultrachrome_k3v.xml (1.1) (added)
+		src/xml/escp2/inks/f360_ultrachrome_k3v.xml (1.1) (added +608 -0)
 		src/xml/escp2/media/Makefile.am (1.12) (+2 -1)
-		src/xml/escp2/media/f360_ultrachrome_k3v.xml (1.1) (added)
+		src/xml/escp2/media/f360_ultrachrome_k3v.xml (1.1) (added +1468 -0)
 		src/xml/escp2/model/Makefile.am (1.15) (+3 -2)
-		src/xml/escp2/model/model_98.xml (1.1) (added)
+		src/xml/escp2/model/model_98.xml (1.1) (added +172 -0)
 		src/xml/printers.xml (1.32) (+2 -1)
 
 	Preliminary support for Epson Stylus Photo R2880
@@ -1083,7 +2520,7 @@ Name: gutenprint-5_2_4_rc1
 
 2009-03-14	<rlk@sourceforge.net>
 
-	Files:	src/xml/escp2/media/artisan.xml (1.1) (added)
+	Files:	src/xml/escp2/media/artisan.xml (1.1) (added +1317 -0)
 		src/xml/escp2/model/model_96.xml (1.4) (+1 -1)
 
 	Correct paper definitions for Artisan printers
@@ -1401,7 +2838,7 @@ Name: gutenprint-5_2_3
 
 	Files:	NEWS (1.407) (+7 -4)
 		src/xml/escp2/media/Makefile.am (1.10) (+2 -1)
-		src/xml/escp2/media/nx100.xml (1.1) (added)
+		src/xml/escp2/media/nx100.xml (1.1) (added +980 -0)
 		src/xml/escp2/model/model_94.xml (1.3) (+17 -17)
 
 	Fix Epson NX100 and related printers
@@ -1454,9 +2891,9 @@ Name: gutenprint-5_2_3
 2008-12-10	<rlk@sourceforge.net>
 
 	Files:	src/xml/escp2/inputslots/Makefile.am (1.5) (+2 -1)
-		src/xml/escp2/inputslots/rx680.xml (1.1) (added)
+		src/xml/escp2/inputslots/rx680.xml (1.1) (added +40 -0)
 		src/xml/escp2/model/Makefile.am (1.14) (+3 -2)
-		src/xml/escp2/model/model_97.xml (1.1) (added)
+		src/xml/escp2/model/model_97.xml (1.1) (added +188 -0)
 
 	First cut at RX680
 
@@ -1469,7 +2906,7 @@ Name: gutenprint-5_2_3
 2008-12-09	<rlk@sourceforge.net>
 
 	Files:	src/xml/escp2/inputslots/Makefile.am (1.4) (+2 -1)
-		src/xml/escp2/inputslots/artisan.xml (1.1) (added)
+		src/xml/escp2/inputslots/artisan.xml (1.1) (added +40 -0)
 		src/xml/escp2/model/model_96.xml (1.3) (+3 -3)
 
 	Make duplex and print to CD work on Artisan printers
@@ -1478,7 +2915,7 @@ Name: gutenprint-5_2_3
 
 	Files:	src/testpattern/testpatterny.y (1.33) (+2 -1)
 		src/xml/escp2/inks/Makefile.am (1.7) (+2 -1)
-		src/xml/escp2/inks/artisan.xml (1.1) (added)
+		src/xml/escp2/inks/artisan.xml (1.1) (added +285 -0)
 		src/xml/escp2/model/model_96.xml (1.2) (+26 -35)
 
 	Initial tuning for Artisan printers
@@ -1544,7 +2981,7 @@ Name: gutenprint-5_2_2
 	Files:	NEWS (1.401) (+8 -2)
 		src/foomatic/foomatic-printermap (1.181) (+3 -0)
 		src/xml/escp2/model/Makefile.am (1.13) (+3 -2)
-		src/xml/escp2/model/model_96.xml (1.1) (added)
+		src/xml/escp2/model/model_96.xml (1.1) (added +178 -0)
 		src/xml/printers.xml (1.22) (+10 -7)
 
 	Fix definition of Artisan printers based on specs
@@ -1609,7 +3046,7 @@ Name: gutenprint-5_2_2
 2008-11-11	<rlk@sourceforge.net>
 
 	Files:	configure.ac (1.207) (+3 -3)
-		po/it.po (1.1) (added)
+		po/it.po (1.1) (added +14855 -0)
 
 	Add Italian translation
 
@@ -1624,7 +3061,7 @@ Name: gutenprint-5_2_2
 	Files:	src/foomatic/foomatic-printermap (1.180) (+1 -0)
 		src/xml/escp2/model/Makefile.am (1.11) (+2 -1)
 		src/xml/escp2/model/model_65.xml (1.13) (+4 -4)
-		src/xml/escp2/model/model_95.xml (1.1) (added)
+		src/xml/escp2/model/model_95.xml (1.1) (added +160 -0)
 		src/xml/printers.xml (1.21) (+14 -13)
 
 	Correct printer definition for a number of Epson MFP devices
@@ -1758,18 +3195,18 @@ Name: gutenprint-5_2_1
 		src/foomatic/foomatic-printermap (1.179) (+49 -0)
 		src/foomatic/printers.c (1.13) (+3 -1)
 		src/xml/escp2/inks/Makefile.am (1.5) (+4 -1)
-		src/xml/escp2/inks/nx100.xml (1.1) (added)
-		src/xml/escp2/inks/wf40.xml (1.1) (added)
-		src/xml/escp2/inks/wf500.xml (1.1) (added)
+		src/xml/escp2/inks/nx100.xml (1.1) (added +139 -0)
+		src/xml/escp2/inks/wf40.xml (1.1) (added +142 -0)
+		src/xml/escp2/inks/wf500.xml (1.1) (added +139 -0)
 		src/xml/escp2/media/Makefile.am (1.8) (+2 -1)
 		src/xml/escp2/media/c120.xml (1.12) (+48 -0)
-		src/xml/escp2/media/wf500.xml (1.1) (added)
+		src/xml/escp2/media/wf500.xml (1.1) (added +1142 -0)
 		src/xml/escp2/model/Makefile.am (1.9) (+4 -2)
 		src/xml/escp2/model/model_92.xml (1.2) (+108 -44)
-		src/xml/escp2/model/model_93.xml (1.1) (added)
-		src/xml/escp2/model/model_94.xml (1.1) (added)
+		src/xml/escp2/model/model_93.xml (1.1) (added +204 -0)
+		src/xml/escp2/model/model_94.xml (1.1) (added +183 -0)
 		src/xml/escp2/qualitypresets/Makefile.am (1.2) (+3 -2)
-		src/xml/escp2/qualitypresets/wf40.xml (1.1) (added)
+		src/xml/escp2/qualitypresets/wf40.xml (1.1) (added +65 -0)
 		src/xml/printers.xml (1.19) (+51 -1)
 		test/run-weavetest (1.27) (+3 -3)
 
@@ -2245,8 +3682,8 @@ Name: gutenprint-5_2_0-beta4
 		po/Makevars (1.4) (+0 -12)
 		src/cups/Makefile.am (1.111) (+28 -72)
 		src/cups/genppd.c (1.165) (+70 -180)
-		src/cups/i18n.c (1.1) (added)
-		src/cups/i18n.h (1.1) (added)
+		src/cups/i18n.c (1.1) (added +483 -0)
+		src/cups/i18n.h (1.1) (added +47 -0)
 		src/cups/po2strings.c (1.3) (removed)
 		src/cups/rastertoprinter.c (1.130) (+39 -44)
 		src/main/Makefile.am (1.103) (+1 -2)
@@ -2353,7 +3790,7 @@ Name: gutenprint-5_2_0-beta4
 
 	Files:	NEWS (1.383) (+4 -0)
 		src/xml/escp2/model/model_65.xml (1.11) (+12 -4)
-		src/xml/escp2/model/model_92.xml (1.1) (added)
+		src/xml/escp2/model/model_92.xml (1.1) (added +216 -0)
 		src/xml/printers.xml (1.11) (+4 -4)
 
 	2034454 Epson DX7400 colours wrong below 1440dpi
@@ -2778,7 +4215,7 @@ Name: gutenprint-5_2_0-beta4
 
 	Files:	configure.ac (1.197) (+3 -2)
 		src/cups/Info.plist (1.2) (removed)
-		src/cups/Info.plist.in (1.1) (added)
+		src/cups/Info.plist.in (1.1) (added +28 -0)
 		src/main/intl.c (1.8) (+9 -4)
 
 	Create Info.plist with proper Gutenprint version numbers.
@@ -3184,7 +4621,7 @@ Name: gutenprint-5_2_0-beta4
 		include/gutenprint/gutenprint-intl.h (1.3) (+16 -2)
 		m4/stp_cups.m4 (1.10) (+8 -0)
 		po/Makevars (1.2) (+9 -0)
-		src/cups/Info.plist (1.1) (added)
+		src/cups/Info.plist (1.1) (added +28 -0)
 		src/cups/Makefile.am (1.98) (+57 -2)
 		src/cups/genppd.c (1.146) (+22 -106)
 		src/cups/po2strings.c (1.1) (added)
@@ -3383,7 +4820,7 @@ Name: gutenprint-5_2_0-beta4
 		src/main/print-escp2-data.c (1.266) (+6 -3)
 		src/xml/escp2/media/Makefile.am (1.7) (+2 -1)
 		src/xml/escp2/media/pro_ultrachrome.xml (1.7) (+21 -41)
-		src/xml/escp2/media/pro_ultrachrome_k3.xml (1.1) (added)
+		src/xml/escp2/media/pro_ultrachrome_k3.xml (1.1) (added +924 -0)
 		src/xml/escp2/model/model_88.xml (1.6) (+1 -1)
 		src/xml/escp2/model/model_89.xml (1.5) (+1 -1)
 		src/xml/escp2/model/model_90.xml (1.5) (+1 -1)
@@ -3446,7 +4883,7 @@ Name: gutenprint-5_2_0-beta4
 		src/xml/escp2/media/pro_gen2.xml (1.6) (+912 -456)
 		src/xml/escp2/media/pro_pigment.xml (1.6) (+504 -294)
 		src/xml/escp2/media/pro_ultrachrome.xml (1.6) (+984 -574)
-		src/xml/escp2/media/r800.xml (1.1) (added)
+		src/xml/escp2/media/r800.xml (1.1) (added +837 -0)
 		src/xml/escp2/media/standard.xml (1.6) (+912 -456)
 		src/xml/escp2/media/standard_gen0.xml (1.6) (+912 -456)
 		src/xml/escp2/media/ultrachrome.xml (1.6) (+984 -574)
@@ -3651,12 +5088,12 @@ Name: gutenprint-5_2_0-beta4
 		src/main/print-escp2.h (1.130) (+3 -3)
 		src/xml/escp2/inks/Makefile.am (1.4) (+2 -1)
 		src/xml/escp2/inks/cmykrb.xml (1.4) (+4 -4)
-		src/xml/escp2/inks/cmykro.xml (1.1) (added)
+		src/xml/escp2/inks/cmykro.xml (1.1) (added +663 -0)
 		src/xml/escp2/inks/picturemate_6.xml (1.4) (+1 -1)
 		src/xml/escp2/media/Makefile.am (1.5) (+2 -1)
-		src/xml/escp2/media/cmykro.xml (1.1) (added)
+		src/xml/escp2/media/cmykro.xml (1.1) (added +1468 -0)
 		src/xml/escp2/model/Makefile.am (1.5) (+3 -2)
-		src/xml/escp2/model/model_91.xml (1.1) (added)
+		src/xml/escp2/model/model_91.xml (1.1) (added +182 -0)
 		src/xml/printers.xml (1.8) (+2 -1)
 
 	Add nominal support for R1900 (CMYKRO and CMYRO not enabled yet)
@@ -3665,7 +5102,7 @@ Name: gutenprint-5_2_0-beta4
 
 	Files:	NEWS (1.370) (+45 -20)
 		README (1.189) (+12 -51)
-		README.package (1.1) (added)
+		README.package (1.1) (added +258 -0)
 
 	Update documentation for next release
 
@@ -3893,11 +5330,11 @@ Name: gutenprint-5_2_0-beta4
 2008-06-29	<rlk@sourceforge.net>
 
 	Files:	src/xml/escp2/inks/Makefile.am (1.3) (+2 -1)
-		src/xml/escp2/inks/pro_ultrachrome_k3.xml (1.1) (added)
+		src/xml/escp2/inks/pro_ultrachrome_k3.xml (1.1) (added +610 -0)
 		src/xml/escp2/model/Makefile.am (1.4) (+4 -2)
 		src/xml/escp2/model/model_88.xml (1.2) (+1 -1)
-		src/xml/escp2/model/model_89.xml (1.1) (added)
-		src/xml/escp2/model/model_90.xml (1.1) (added)
+		src/xml/escp2/model/model_89.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_90.xml (1.1) (added +150 -0)
 		src/xml/printers.xml (1.7) (+3 -3)
 
 	7880, 9880, and 11880 are 8-color Ultrachrome K3 printers
@@ -3924,7 +5361,7 @@ Name: gutenprint-5_2_0-beta4
 
 	Files:	src/foomatic/foomatic-printermap (1.172) (+6 -1)
 		src/xml/escp2/model/Makefile.am (1.3) (+3 -2)
-		src/xml/escp2/model/model_88.xml (1.1) (added)
+		src/xml/escp2/model/model_88.xml (1.1) (added +150 -0)
 		src/xml/papers.xml (1.4) (+19 -1)
 		src/xml/printers.xml (1.6) (+6 -1)
 
@@ -3969,7 +5406,7 @@ Name: gutenprint-5_2_0-beta4
 		src/xml/escp2/inks/cmy.xml (1.2) (+12 -6)
 		src/xml/escp2/inks/cmykrb.xml (1.2) (+217 -171)
 		src/xml/escp2/inks/cx3650.xml (1.2) (+60 -51)
-		src/xml/escp2/inks/defaultblack.xml (1.1) (added)
+		src/xml/escp2/inks/defaultblack.xml (1.1) (added +40 -0)
 		src/xml/escp2/inks/f360.xml (1.2) (+60 -51)
 		src/xml/escp2/inks/f360_photo.xml (1.2) (+102 -102)
 		src/xml/escp2/inks/f360_photo7_japan.xml (1.2) (+173 -179)
@@ -4055,39 +5492,39 @@ Name: gutenprint-5_2_0-beta4
 	Files:	configure.ac (1.188) (+4 -2)
 		src/main/print-escp2-data.c (1.259) (+1 -3)
 		src/xml/escp2/Makefile.am (1.6) (+7 -1)
-		src/xml/escp2/inks/.cvsignore (1.1) (added)
-		src/xml/escp2/inks/Makefile.am (1.1) (added)
-		src/xml/escp2/inks/b500.xml (1.1) (added)
-		src/xml/escp2/inks/c120.xml (1.1) (added)
-		src/xml/escp2/inks/c64.xml (1.1) (added)
-		src/xml/escp2/inks/c80.xml (1.1) (added)
-		src/xml/escp2/inks/c82.xml (1.1) (added)
-		src/xml/escp2/inks/claria.xml (1.1) (added)
-		src/xml/escp2/inks/cmy.xml (1.1) (added)
-		src/xml/escp2/inks/cmykrb.xml (1.1) (added)
-		src/xml/escp2/inks/cx3650.xml (1.1) (added)
-		src/xml/escp2/inks/f360.xml (1.1) (added)
-		src/xml/escp2/inks/f360_photo.xml (1.1) (added)
-		src/xml/escp2/inks/f360_photo7_japan.xml (1.1) (added)
-		src/xml/escp2/inks/f360_ultrachrome.xml (1.1) (added)
-		src/xml/escp2/inks/f360_ultrachrome_k3.xml (1.1) (added)
-		src/xml/escp2/inks/photo_gen0.xml (1.1) (added)
-		src/xml/escp2/inks/photo_gen1.xml (1.1) (added)
-		src/xml/escp2/inks/photo_gen2.xml (1.1) (added)
-		src/xml/escp2/inks/photo_gen3.xml (1.1) (added)
-		src/xml/escp2/inks/photo_gen3_4.xml (1.1) (added)
-		src/xml/escp2/inks/photo_gen4.xml (1.1) (added)
-		src/xml/escp2/inks/photo_pigment.xml (1.1) (added)
-		src/xml/escp2/inks/picturemate_4.xml (1.1) (added)
-		src/xml/escp2/inks/picturemate_6.xml (1.1) (added)
-		src/xml/escp2/inks/pro_gen1.xml (1.1) (added)
-		src/xml/escp2/inks/pro_gen2.xml (1.1) (added)
-		src/xml/escp2/inks/pro_pigment.xml (1.1) (added)
-		src/xml/escp2/inks/pro_ultrachrome.xml (1.1) (added)
-		src/xml/escp2/inks/standard.xml (1.1) (added)
-		src/xml/escp2/inks/standard_gen0.xml (1.1) (added)
-		src/xml/escp2/inks/ultrachrome.xml (1.1) (added)
-		src/xml/escp2/inks/x80.xml (1.1) (added)
+		src/xml/escp2/inks/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/inks/Makefile.am (1.1) (added +84 -0)
+		src/xml/escp2/inks/b500.xml (1.1) (added +154 -0)
+		src/xml/escp2/inks/c120.xml (1.1) (added +142 -0)
+		src/xml/escp2/inks/c64.xml (1.1) (added +208 -0)
+		src/xml/escp2/inks/c80.xml (1.1) (added +209 -0)
+		src/xml/escp2/inks/c82.xml (1.1) (added +209 -0)
+		src/xml/escp2/inks/claria.xml (1.1) (added +403 -0)
+		src/xml/escp2/inks/cmy.xml (1.1) (added +56 -0)
+		src/xml/escp2/inks/cmykrb.xml (1.1) (added +664 -0)
+		src/xml/escp2/inks/cx3650.xml (1.1) (added +208 -0)
+		src/xml/escp2/inks/f360.xml (1.1) (added +209 -0)
+		src/xml/escp2/inks/f360_photo.xml (1.1) (added +285 -0)
+		src/xml/escp2/inks/f360_photo7_japan.xml (1.1) (added +419 -0)
+		src/xml/escp2/inks/f360_ultrachrome.xml (1.1) (added +790 -0)
+		src/xml/escp2/inks/f360_ultrachrome_k3.xml (1.1) (added +608 -0)
+		src/xml/escp2/inks/photo_gen0.xml (1.1) (added +402 -0)
+		src/xml/escp2/inks/photo_gen1.xml (1.1) (added +402 -0)
+		src/xml/escp2/inks/photo_gen2.xml (1.1) (added +402 -0)
+		src/xml/escp2/inks/photo_gen3.xml (1.1) (added +402 -0)
+		src/xml/escp2/inks/photo_gen3_4.xml (1.1) (added +209 -0)
+		src/xml/escp2/inks/photo_gen4.xml (1.1) (added +285 -0)
+		src/xml/escp2/inks/photo_pigment.xml (1.1) (added +285 -0)
+		src/xml/escp2/inks/picturemate_4.xml (1.1) (added +86 -0)
+		src/xml/escp2/inks/picturemate_6.xml (1.1) (added +220 -0)
+		src/xml/escp2/inks/pro_gen1.xml (1.1) (added +402 -0)
+		src/xml/escp2/inks/pro_gen2.xml (1.1) (added +402 -0)
+		src/xml/escp2/inks/pro_pigment.xml (1.1) (added +285 -0)
+		src/xml/escp2/inks/pro_ultrachrome.xml (1.1) (added +790 -0)
+		src/xml/escp2/inks/standard.xml (1.1) (added +209 -0)
+		src/xml/escp2/inks/standard_gen0.xml (1.1) (added +209 -0)
+		src/xml/escp2/inks/ultrachrome.xml (1.1) (added +790 -0)
+		src/xml/escp2/inks/x80.xml (1.1) (added +139 -0)
 		src/xml/escp2/model/model_0.xml (1.6) (+2 -0)
 		src/xml/escp2/model/model_1.xml (1.6) (+2 -0)
 		src/xml/escp2/model/model_10.xml (1.7) (+2 -0)
@@ -4294,18 +5731,18 @@ Name: gutenprint-5_2_0-beta4
 		src/xml/escp2/model/model_86.xml (1.6) (+1 -0)
 		src/xml/escp2/model/model_87.xml (1.6) (+1 -0)
 		src/xml/escp2/model/model_9.xml (1.5) (+1 -0)
-		src/xml/escp2/qualitypresets/.cvsignore (1.1) (added)
-		src/xml/escp2/qualitypresets/Makefile.am (1.1) (added)
-		src/xml/escp2/qualitypresets/p1_5.xml (1.1) (added)
-		src/xml/escp2/qualitypresets/picturemate.xml (1.1) (added)
-		src/xml/escp2/qualitypresets/standard.xml (1.1) (added)
-		src/xml/escp2/qualitypresets/v2880.xml (1.1) (added)
-		src/xml/escp2/weaves/.cvsignore (1.1) (added)
-		src/xml/escp2/weaves/Makefile.am (1.1) (added)
-		src/xml/escp2/weaves/pro7000.xml (1.1) (added)
-		src/xml/escp2/weaves/pro7500.xml (1.1) (added)
-		src/xml/escp2/weaves/pro7600.xml (1.1) (added)
-		src/xml/escp2/weaves/standard.xml (1.1) (added)
+		src/xml/escp2/qualitypresets/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/qualitypresets/Makefile.am (1.1) (added +46 -0)
+		src/xml/escp2/qualitypresets/p1_5.xml (1.1) (added +70 -0)
+		src/xml/escp2/qualitypresets/picturemate.xml (1.1) (added +60 -0)
+		src/xml/escp2/qualitypresets/standard.xml (1.1) (added +70 -0)
+		src/xml/escp2/qualitypresets/v2880.xml (1.1) (added +70 -0)
+		src/xml/escp2/weaves/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/weaves/Makefile.am (1.1) (added +45 -0)
+		src/xml/escp2/weaves/pro7000.xml (1.1) (added +30 -0)
+		src/xml/escp2/weaves/pro7500.xml (1.1) (added +31 -0)
+		src/xml/escp2/weaves/pro7600.xml (1.1) (added +32 -0)
+		src/xml/escp2/weaves/standard.xml (1.1) (added +27 -0)
 
 	Convert quality presets and printer weave settings to XML.
 
@@ -4672,7 +6109,7 @@ Name: gutenprint-5_2_0-beta3
 		src/xml/escp2/media/x80.xml (1.4) (+38 -38)
 		src/xml/escp2/mediasizes/Makefile.am (1.2) (+4 -2)
 		src/xml/escp2/model/Makefile.am (1.2) (+4 -2)
-		src/xml/extract-strings.c (1.1) (added)
+		src/xml/extract-strings.c (1.1) (added +63 -0)
 		src/xml/papers.xml (1.2) (+165 -165)
 		src/xml/printers.xml (1.3) (+1366 -1356)
 
@@ -4689,9 +6126,9 @@ Name: gutenprint-5_2_0-beta3
 		src/main/print-escp2.h (1.123) (+18 -11)
 		src/testpattern/run-testpattern-2.in (1.18) (+1 -1)
 		src/xml/escp2/Makefile.am (1.3) (+4 -3)
-		src/xml/escp2/mediasizes/.cvsignore (1.1) (added)
-		src/xml/escp2/mediasizes/Makefile.am (1.1) (added)
-		src/xml/escp2/mediasizes/standard.xml (1.1) (added)
+		src/xml/escp2/mediasizes/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/mediasizes/Makefile.am (1.1) (added +42 -0)
+		src/xml/escp2/mediasizes/standard.xml (1.1) (added +118 -0)
 		src/xml/escp2/model/model_10.xml (1.3) (+1 -0)
 		src/xml/escp2/model/model_11.xml (1.3) (+1 -0)
 		src/xml/escp2/model/model_12.xml (1.3) (+1 -0)
@@ -4788,19 +6225,19 @@ Name: gutenprint-5_2_0-beta3
 		src/main/print-escp2.h (1.121) (+29 -20)
 		src/main/xml.c (1.42) (+8 -4)
 		src/xml/escp2/Makefile.am (1.2) (+3 -2)
-		src/xml/escp2/inputslots/.cvsignore (1.1) (added)
-		src/xml/escp2/inputslots/Makefile.am (1.1) (added)
-		src/xml/escp2/inputslots/b500.xml (1.1) (added)
-		src/xml/escp2/inputslots/cd_cutter_roll_feed.xml (1.1) (added)
-		src/xml/escp2/inputslots/cd_roll_feed.xml (1.1) (added)
-		src/xml/escp2/inputslots/cutter_roll_feed.xml (1.1) (added)
-		src/xml/escp2/inputslots/default.xml (1.1) (added)
-		src/xml/escp2/inputslots/pro_roll_feed.xml (1.1) (added)
-		src/xml/escp2/inputslots/r1800.xml (1.1) (added)
-		src/xml/escp2/inputslots/r2400.xml (1.1) (added)
-		src/xml/escp2/inputslots/rx700.xml (1.1) (added)
-		src/xml/escp2/inputslots/spro5000.xml (1.1) (added)
-		src/xml/escp2/inputslots/standard_roll_feed.xml (1.1) (added)
+		src/xml/escp2/inputslots/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/inputslots/Makefile.am (1.1) (added +58 -0)
+		src/xml/escp2/inputslots/b500.xml (1.1) (added +35 -0)
+		src/xml/escp2/inputslots/cd_cutter_roll_feed.xml (1.1) (added +53 -0)
+		src/xml/escp2/inputslots/cd_roll_feed.xml (1.1) (added +47 -0)
+		src/xml/escp2/inputslots/cutter_roll_feed.xml (1.1) (added +42 -0)
+		src/xml/escp2/inputslots/default.xml (1.1) (added +24 -0)
+		src/xml/escp2/inputslots/pro_roll_feed.xml (1.1) (added +34 -0)
+		src/xml/escp2/inputslots/r1800.xml (1.1) (added +52 -0)
+		src/xml/escp2/inputslots/r2400.xml (1.1) (added +47 -0)
+		src/xml/escp2/inputslots/rx700.xml (1.1) (added +46 -0)
+		src/xml/escp2/inputslots/spro5000.xml (1.1) (added +41 -0)
+		src/xml/escp2/inputslots/standard_roll_feed.xml (1.1) (added +36 -0)
 		src/xml/escp2/media/b500.xml (1.6) (+2 -2)
 		src/xml/escp2/media/c120.xml (1.4) (+2 -2)
 		src/xml/escp2/media/c64.xml (1.3) (+2 -2)
@@ -5018,7 +6455,7 @@ Name: gutenprint-5_2_0-beta3
 	Files:	src/xml/escp2/media/Makefile.am (1.3) (+2 -1)
 		src/xml/escp2/media/b500.xml (1.4) (+452 -0)
 		src/xml/escp2/media/claria.xml (1.3) (+925 -27)
-		src/xml/escp2/media/claria1400.xml (1.1) (added)
+		src/xml/escp2/media/claria1400.xml (1.1) (added +2316 -0)
 		src/xml/escp2/model/model_82.xml (1.2) (+1 -1)
 
 	Add additional paper types for B500.
@@ -5071,7 +6508,7 @@ Name: gutenprint-5_2_0-beta3
 		src/main/xml.c (1.41) (+3 -3)
 		src/xml/escp2/media/Makefile.am (1.2) (+2 -1)
 		src/xml/escp2/media/b500.xml (1.2) (+790 -1469)
-		src/xml/escp2/media/photo_gen4.xml (1.1) (added)
+		src/xml/escp2/media/photo_gen4.xml (1.1) (added +1003 -0)
 		src/xml/escp2/model/model_70.xml (1.2) (+1 -1)
 		src/xml/escp2/model/model_76.xml (1.2) (+1 -1)
 
@@ -5115,137 +6552,137 @@ Name: gutenprint-5_2_0-beta3
 		src/testpattern/run-testpattern (1.24) (+1 -1)
 		src/testpattern/run-testpattern-1 (1.10) (+1 -1)
 		src/testpattern/run-testpattern-2.in (1.14) (+4 -2)
-		src/xml/.cvsignore (1.1) (added)
-		src/xml/Makefile.am (1.1) (added)
-		src/xml/dither-matrix-1x1.xml (1.1) (added)
-		src/xml/dither-matrix-2x1.xml (1.1) (added)
-		src/xml/dither-matrix-4x1.xml (1.1) (added)
-		src/xml/escp2/.cvsignore (1.1) (added)
-		src/xml/escp2/Makefile.am (1.1) (added)
-		src/xml/escp2/media/.cvsignore (1.1) (added)
-		src/xml/escp2/media/Makefile.am (1.1) (added)
-		src/xml/escp2/media/b500.xml (1.1) (added)
-		src/xml/escp2/media/c120.xml (1.1) (added)
-		src/xml/escp2/media/c64.xml (1.1) (added)
-		src/xml/escp2/media/c80.xml (1.1) (added)
-		src/xml/escp2/media/c82.xml (1.1) (added)
-		src/xml/escp2/media/claria.xml (1.1) (added)
-		src/xml/escp2/media/cmy.xml (1.1) (added)
-		src/xml/escp2/media/cmykrb.xml (1.1) (added)
-		src/xml/escp2/media/cx3650.xml (1.1) (added)
-		src/xml/escp2/media/f360.xml (1.1) (added)
-		src/xml/escp2/media/f360_photo.xml (1.1) (added)
-		src/xml/escp2/media/f360_photo7_japan.xml (1.1) (added)
-		src/xml/escp2/media/f360_ultrachrome.xml (1.1) (added)
-		src/xml/escp2/media/f360_ultrachrome_k3.xml (1.1) (added)
-		src/xml/escp2/media/photo_gen0.xml (1.1) (added)
-		src/xml/escp2/media/photo_gen1.xml (1.1) (added)
-		src/xml/escp2/media/photo_gen2.xml (1.1) (added)
-		src/xml/escp2/media/photo_gen3.xml (1.1) (added)
-		src/xml/escp2/media/photo_gen3_4.xml (1.1) (added)
-		src/xml/escp2/media/photo_pigment.xml (1.1) (added)
-		src/xml/escp2/media/picturemate_4.xml (1.1) (added)
-		src/xml/escp2/media/picturemate_6.xml (1.1) (added)
-		src/xml/escp2/media/pro_gen1.xml (1.1) (added)
-		src/xml/escp2/media/pro_gen2.xml (1.1) (added)
-		src/xml/escp2/media/pro_pigment.xml (1.1) (added)
-		src/xml/escp2/media/pro_ultrachrome.xml (1.1) (added)
-		src/xml/escp2/media/standard.xml (1.1) (added)
-		src/xml/escp2/media/standard_gen0.xml (1.1) (added)
-		src/xml/escp2/media/ultrachrome.xml (1.1) (added)
-		src/xml/escp2/media/x80.xml (1.1) (added)
-		src/xml/escp2/model/.cvsignore (1.1) (added)
-		src/xml/escp2/model/Makefile.am (1.1) (added)
-		src/xml/escp2/model/model_0.xml (1.1) (added)
-		src/xml/escp2/model/model_1.xml (1.1) (added)
-		src/xml/escp2/model/model_10.xml (1.1) (added)
-		src/xml/escp2/model/model_11.xml (1.1) (added)
-		src/xml/escp2/model/model_12.xml (1.1) (added)
-		src/xml/escp2/model/model_13.xml (1.1) (added)
-		src/xml/escp2/model/model_14.xml (1.1) (added)
-		src/xml/escp2/model/model_15.xml (1.1) (added)
-		src/xml/escp2/model/model_16.xml (1.1) (added)
-		src/xml/escp2/model/model_17.xml (1.1) (added)
-		src/xml/escp2/model/model_18.xml (1.1) (added)
-		src/xml/escp2/model/model_19.xml (1.1) (added)
-		src/xml/escp2/model/model_2.xml (1.1) (added)
-		src/xml/escp2/model/model_20.xml (1.1) (added)
-		src/xml/escp2/model/model_21.xml (1.1) (added)
-		src/xml/escp2/model/model_22.xml (1.1) (added)
-		src/xml/escp2/model/model_23.xml (1.1) (added)
-		src/xml/escp2/model/model_24.xml (1.1) (added)
-		src/xml/escp2/model/model_25.xml (1.1) (added)
-		src/xml/escp2/model/model_26.xml (1.1) (added)
-		src/xml/escp2/model/model_27.xml (1.1) (added)
-		src/xml/escp2/model/model_28.xml (1.1) (added)
-		src/xml/escp2/model/model_29.xml (1.1) (added)
-		src/xml/escp2/model/model_3.xml (1.1) (added)
-		src/xml/escp2/model/model_30.xml (1.1) (added)
-		src/xml/escp2/model/model_31.xml (1.1) (added)
-		src/xml/escp2/model/model_32.xml (1.1) (added)
-		src/xml/escp2/model/model_33.xml (1.1) (added)
-		src/xml/escp2/model/model_34.xml (1.1) (added)
-		src/xml/escp2/model/model_35.xml (1.1) (added)
-		src/xml/escp2/model/model_36.xml (1.1) (added)
-		src/xml/escp2/model/model_37.xml (1.1) (added)
-		src/xml/escp2/model/model_38.xml (1.1) (added)
-		src/xml/escp2/model/model_39.xml (1.1) (added)
-		src/xml/escp2/model/model_4.xml (1.1) (added)
-		src/xml/escp2/model/model_40.xml (1.1) (added)
-		src/xml/escp2/model/model_41.xml (1.1) (added)
-		src/xml/escp2/model/model_42.xml (1.1) (added)
-		src/xml/escp2/model/model_43.xml (1.1) (added)
-		src/xml/escp2/model/model_44.xml (1.1) (added)
-		src/xml/escp2/model/model_45.xml (1.1) (added)
-		src/xml/escp2/model/model_46.xml (1.1) (added)
-		src/xml/escp2/model/model_47.xml (1.1) (added)
-		src/xml/escp2/model/model_48.xml (1.1) (added)
-		src/xml/escp2/model/model_49.xml (1.1) (added)
-		src/xml/escp2/model/model_5.xml (1.1) (added)
-		src/xml/escp2/model/model_50.xml (1.1) (added)
-		src/xml/escp2/model/model_51.xml (1.1) (added)
-		src/xml/escp2/model/model_52.xml (1.1) (added)
-		src/xml/escp2/model/model_53.xml (1.1) (added)
-		src/xml/escp2/model/model_54.xml (1.1) (added)
-		src/xml/escp2/model/model_55.xml (1.1) (added)
-		src/xml/escp2/model/model_56.xml (1.1) (added)
-		src/xml/escp2/model/model_57.xml (1.1) (added)
-		src/xml/escp2/model/model_58.xml (1.1) (added)
-		src/xml/escp2/model/model_59.xml (1.1) (added)
-		src/xml/escp2/model/model_6.xml (1.1) (added)
-		src/xml/escp2/model/model_60.xml (1.1) (added)
-		src/xml/escp2/model/model_61.xml (1.1) (added)
-		src/xml/escp2/model/model_62.xml (1.1) (added)
-		src/xml/escp2/model/model_63.xml (1.1) (added)
-		src/xml/escp2/model/model_64.xml (1.1) (added)
-		src/xml/escp2/model/model_65.xml (1.1) (added)
-		src/xml/escp2/model/model_66.xml (1.1) (added)
-		src/xml/escp2/model/model_67.xml (1.1) (added)
-		src/xml/escp2/model/model_68.xml (1.1) (added)
-		src/xml/escp2/model/model_69.xml (1.1) (added)
-		src/xml/escp2/model/model_7.xml (1.1) (added)
-		src/xml/escp2/model/model_70.xml (1.1) (added)
-		src/xml/escp2/model/model_71.xml (1.1) (added)
-		src/xml/escp2/model/model_72.xml (1.1) (added)
-		src/xml/escp2/model/model_73.xml (1.1) (added)
-		src/xml/escp2/model/model_74.xml (1.1) (added)
-		src/xml/escp2/model/model_75.xml (1.1) (added)
-		src/xml/escp2/model/model_76.xml (1.1) (added)
-		src/xml/escp2/model/model_77.xml (1.1) (added)
-		src/xml/escp2/model/model_78.xml (1.1) (added)
-		src/xml/escp2/model/model_79.xml (1.1) (added)
-		src/xml/escp2/model/model_8.xml (1.1) (added)
-		src/xml/escp2/model/model_80.xml (1.1) (added)
-		src/xml/escp2/model/model_81.xml (1.1) (added)
-		src/xml/escp2/model/model_82.xml (1.1) (added)
-		src/xml/escp2/model/model_83.xml (1.1) (added)
-		src/xml/escp2/model/model_84.xml (1.1) (added)
-		src/xml/escp2/model/model_85.xml (1.1) (added)
-		src/xml/escp2/model/model_86.xml (1.1) (added)
-		src/xml/escp2/model/model_87.xml (1.1) (added)
-		src/xml/escp2/model/model_9.xml (1.1) (added)
-		src/xml/papers.xml (1.1) (added)
-		src/xml/printers.xml (1.1) (added)
+		src/xml/.cvsignore (1.1) (added +7 -0)
+		src/xml/Makefile.am (1.1) (added +69 -0)
+		src/xml/dither-matrix-1x1.xml (1.1) (added +5553 -0)
+		src/xml/dither-matrix-2x1.xml (1.1) (added +5505 -0)
+		src/xml/dither-matrix-4x1.xml (1.1) (added +5569 -0)
+		src/xml/escp2/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/Makefile.am (1.1) (added +59 -0)
+		src/xml/escp2/media/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/media/Makefile.am (1.1) (added +82 -0)
+		src/xml/escp2/media/b500.xml (1.1) (added +895 -0)
+		src/xml/escp2/media/c120.xml (1.1) (added +1142 -0)
+		src/xml/escp2/media/c64.xml (1.1) (added +1111 -0)
+		src/xml/escp2/media/c80.xml (1.1) (added +1113 -0)
+		src/xml/escp2/media/c82.xml (1.1) (added +1111 -0)
+		src/xml/escp2/media/claria.xml (1.1) (added +2317 -0)
+		src/xml/escp2/media/cmy.xml (1.1) (added +446 -0)
+		src/xml/escp2/media/cmykrb.xml (1.1) (added +1466 -0)
+		src/xml/escp2/media/cx3650.xml (1.1) (added +1111 -0)
+		src/xml/escp2/media/f360.xml (1.1) (added +1111 -0)
+		src/xml/escp2/media/f360_photo.xml (1.1) (added +501 -0)
+		src/xml/escp2/media/f360_photo7_japan.xml (1.1) (added +501 -0)
+		src/xml/escp2/media/f360_ultrachrome.xml (1.1) (added +918 -0)
+		src/xml/escp2/media/f360_ultrachrome_k3.xml (1.1) (added +1468 -0)
+		src/xml/escp2/media/photo_gen0.xml (1.1) (added +1415 -0)
+		src/xml/escp2/media/photo_gen1.xml (1.1) (added +1434 -0)
+		src/xml/escp2/media/photo_gen2.xml (1.1) (added +1434 -0)
+		src/xml/escp2/media/photo_gen3.xml (1.1) (added +1757 -0)
+		src/xml/escp2/media/photo_gen3_4.xml (1.1) (added +1434 -0)
+		src/xml/escp2/media/photo_pigment.xml (1.1) (added +547 -0)
+		src/xml/escp2/media/picturemate_4.xml (1.1) (added +107 -0)
+		src/xml/escp2/media/picturemate_6.xml (1.1) (added +107 -0)
+		src/xml/escp2/media/pro_gen1.xml (1.1) (added +1455 -0)
+		src/xml/escp2/media/pro_gen2.xml (1.1) (added +1474 -0)
+		src/xml/escp2/media/pro_pigment.xml (1.1) (added +588 -0)
+		src/xml/escp2/media/pro_ultrachrome.xml (1.1) (added +941 -0)
+		src/xml/escp2/media/standard.xml (1.1) (added +1111 -0)
+		src/xml/escp2/media/standard_gen0.xml (1.1) (added +1092 -0)
+		src/xml/escp2/media/ultrachrome.xml (1.1) (added +918 -0)
+		src/xml/escp2/media/x80.xml (1.1) (added +465 -0)
+		src/xml/escp2/model/.cvsignore (1.1) (added +3 -0)
+		src/xml/escp2/model/Makefile.am (1.1) (added +157 -0)
+		src/xml/escp2/model/model_0.xml (1.1) (added +126 -0)
+		src/xml/escp2/model/model_1.xml (1.1) (added +144 -0)
+		src/xml/escp2/model/model_10.xml (1.1) (added +146 -0)
+		src/xml/escp2/model/model_11.xml (1.1) (added +145 -0)
+		src/xml/escp2/model/model_12.xml (1.1) (added +159 -0)
+		src/xml/escp2/model/model_13.xml (1.1) (added +162 -0)
+		src/xml/escp2/model/model_14.xml (1.1) (added +151 -0)
+		src/xml/escp2/model/model_15.xml (1.1) (added +151 -0)
+		src/xml/escp2/model/model_16.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_17.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_18.xml (1.1) (added +148 -0)
+		src/xml/escp2/model/model_19.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_2.xml (1.1) (added +144 -0)
+		src/xml/escp2/model/model_20.xml (1.1) (added +161 -0)
+		src/xml/escp2/model/model_21.xml (1.1) (added +157 -0)
+		src/xml/escp2/model/model_22.xml (1.1) (added +155 -0)
+		src/xml/escp2/model/model_23.xml (1.1) (added +155 -0)
+		src/xml/escp2/model/model_24.xml (1.1) (added +143 -0)
+		src/xml/escp2/model/model_25.xml (1.1) (added +172 -0)
+		src/xml/escp2/model/model_26.xml (1.1) (added +157 -0)
+		src/xml/escp2/model/model_27.xml (1.1) (added +132 -0)
+		src/xml/escp2/model/model_28.xml (1.1) (added +130 -0)
+		src/xml/escp2/model/model_29.xml (1.1) (added +130 -0)
+		src/xml/escp2/model/model_3.xml (1.1) (added +151 -0)
+		src/xml/escp2/model/model_30.xml (1.1) (added +130 -0)
+		src/xml/escp2/model/model_31.xml (1.1) (added +130 -0)
+		src/xml/escp2/model/model_32.xml (1.1) (added +170 -0)
+		src/xml/escp2/model/model_33.xml (1.1) (added +170 -0)
+		src/xml/escp2/model/model_34.xml (1.1) (added +169 -0)
+		src/xml/escp2/model/model_35.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_36.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_37.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_38.xml (1.1) (added +165 -0)
+		src/xml/escp2/model/model_39.xml (1.1) (added +125 -0)
+		src/xml/escp2/model/model_4.xml (1.1) (added +142 -0)
+		src/xml/escp2/model/model_40.xml (1.1) (added +130 -0)
+		src/xml/escp2/model/model_41.xml (1.1) (added +137 -0)
+		src/xml/escp2/model/model_42.xml (1.1) (added +156 -0)
+		src/xml/escp2/model/model_43.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_44.xml (1.1) (added +159 -0)
+		src/xml/escp2/model/model_45.xml (1.1) (added +125 -0)
+		src/xml/escp2/model/model_46.xml (1.1) (added +142 -0)
+		src/xml/escp2/model/model_47.xml (1.1) (added +151 -0)
+		src/xml/escp2/model/model_48.xml (1.1) (added +139 -0)
+		src/xml/escp2/model/model_49.xml (1.1) (added +139 -0)
+		src/xml/escp2/model/model_5.xml (1.1) (added +142 -0)
+		src/xml/escp2/model/model_50.xml (1.1) (added +160 -0)
+		src/xml/escp2/model/model_51.xml (1.1) (added +160 -0)
+		src/xml/escp2/model/model_52.xml (1.1) (added +166 -0)
+		src/xml/escp2/model/model_53.xml (1.1) (added +141 -0)
+		src/xml/escp2/model/model_54.xml (1.1) (added +161 -0)
+		src/xml/escp2/model/model_55.xml (1.1) (added +159 -0)
+		src/xml/escp2/model/model_56.xml (1.1) (added +163 -0)
+		src/xml/escp2/model/model_57.xml (1.1) (added +143 -0)
+		src/xml/escp2/model/model_58.xml (1.1) (added +129 -0)
+		src/xml/escp2/model/model_59.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_6.xml (1.1) (added +142 -0)
+		src/xml/escp2/model/model_60.xml (1.1) (added +163 -0)
+		src/xml/escp2/model/model_61.xml (1.1) (added +173 -0)
+		src/xml/escp2/model/model_62.xml (1.1) (added +166 -0)
+		src/xml/escp2/model/model_63.xml (1.1) (added +156 -0)
+		src/xml/escp2/model/model_64.xml (1.1) (added +174 -0)
+		src/xml/escp2/model/model_65.xml (1.1) (added +152 -0)
+		src/xml/escp2/model/model_66.xml (1.1) (added +173 -0)
+		src/xml/escp2/model/model_67.xml (1.1) (added +175 -0)
+		src/xml/escp2/model/model_68.xml (1.1) (added +174 -0)
+		src/xml/escp2/model/model_69.xml (1.1) (added +171 -0)
+		src/xml/escp2/model/model_7.xml (1.1) (added +153 -0)
+		src/xml/escp2/model/model_70.xml (1.1) (added +172 -0)
+		src/xml/escp2/model/model_71.xml (1.1) (added +172 -0)
+		src/xml/escp2/model/model_72.xml (1.1) (added +171 -0)
+		src/xml/escp2/model/model_73.xml (1.1) (added +124 -0)
+		src/xml/escp2/model/model_74.xml (1.1) (added +159 -0)
+		src/xml/escp2/model/model_75.xml (1.1) (added +148 -0)
+		src/xml/escp2/model/model_76.xml (1.1) (added +150 -0)
+		src/xml/escp2/model/model_77.xml (1.1) (added +162 -0)
+		src/xml/escp2/model/model_78.xml (1.1) (added +164 -0)
+		src/xml/escp2/model/model_79.xml (1.1) (added +163 -0)
+		src/xml/escp2/model/model_8.xml (1.1) (added +152 -0)
+		src/xml/escp2/model/model_80.xml (1.1) (added +171 -0)
+		src/xml/escp2/model/model_81.xml (1.1) (added +187 -0)
+		src/xml/escp2/model/model_82.xml (1.1) (added +207 -0)
+		src/xml/escp2/model/model_83.xml (1.1) (added +162 -0)
+		src/xml/escp2/model/model_84.xml (1.1) (added +156 -0)
+		src/xml/escp2/model/model_85.xml (1.1) (added +215 -0)
+		src/xml/escp2/model/model_86.xml (1.1) (added +122 -0)
+		src/xml/escp2/model/model_87.xml (1.1) (added +193 -0)
+		src/xml/escp2/model/model_9.xml (1.1) (added +145 -0)
+		src/xml/papers.xml (1.1) (added +1368 -0)
+		src/xml/printers.xml (1.1) (added +1777 -0)
 		test/run-testdither (1.13) (+1 -1)
 		test/run-weavetest (1.25) (+1 -1)
 
@@ -6460,8 +7897,8 @@ Name: gutenprint-5_1_5
 
 2007-12-24	<rlk@sourceforge.net>
 
-	Files:	src/main/xmlppd.c (1.1) (added)
-		src/main/xmlppd.h (1.1) (added)
+	Files:	src/main/xmlppd.c (1.1) (added +576 -0)
+		src/main/xmlppd.h (1.1) (added +46 -0)
 
 	First checkin of replacement PPD code (compiles, does not run successfully)
 
@@ -6535,7 +7972,7 @@ Name: gutenprint-5_1_5
 		src/cups/Makefile.am (1.94) (+4 -3)
 		src/cups/genppd.c (1.139) (+7 -2)
 		src/cups/rastertoprinter.c (1.114) (+162 -91)
-		src/cups/test-rastertogutenprint.in (1.1) (added)
+		src/cups/test-rastertogutenprint.in (1.1) (added +247 -0)
 
 	Add test for CUPS driver
 
@@ -8250,7 +9687,7 @@ Name: gutenprint-5_1_0
 2007-02-24	<faust3@sourceforge.net>
 
 	Files:	src/main/Makefile.am (1.97) (+2 -1)
-		src/main/buffer-image.c (1.1) (added)
+		src/main/buffer-image.c (1.1) (added +156 -0)
 		src/main/util.h (1.34) (+5 -2)
 
 	add an internal function to buffer and rotate stp_images
@@ -8787,8 +10224,8 @@ Name: gutenprint-5_1_0
 2006-09-30	<faust3@sourceforge.net>
 
 	Files:	test/Makefile.am (1.47) (+4 -2)
-		test/pixma_parse.c (1.1) (added)
-		test/pixma_parse.h (1.1) (added)
+		test/pixma_parse.c (1.1) (added +816 -0)
+		test/pixma_parse.h (1.1) (added +266 -0)
 
 	add pixma_parse a parser for canon bjl printjobs that can also generate ppm images from the raster data
 
@@ -9481,13 +10918,13 @@ Name: gutenprint-5_0-bp
 
 2006-08-28	<faust3@sourceforge.net>
 
-	Files:	src/main/canon-modes.h (1.1) (added)
+	Files:	src/main/canon-modes.h (1.1) (added +1382 -0)
 
 	file canon-modes.h was initially added on branch canon_experimental.
 
 2006-08-07	<faust3@sourceforge.net>
 
-	Files:	src/main/canon-inks.h (1.1) (added)
+	Files:	src/main/canon-inks.h (1.1) (added +2148 -0)
 
 	file canon-inks.h was initially added on branch canon_experimental.
 
@@ -9543,15 +10980,15 @@ Name: gutenprint-5_0_0
 
 2006-07-23	<faust3@sourceforge.net>
 
-	Files:	src/main/canon-printers.h (1.1) (added)
+	Files:	src/main/canon-printers.h (1.1) (added +1589 -0)
 
 	file canon-printers.h was initially added on branch canon_experimental.
 
 2006-07-22	<faust3@sourceforge.net>
 
-	Files:	src/main/canon-media.h (1.1) (added)
+	Files:	src/main/canon-media.h (1.1) (added +1129 -0)
 		src/main/print-canon.c (1.175) (+43 -121)
-		src/main/print-canon.h (1.1) (added)
+		src/main/print-canon.h (1.1) (added +142 -0)
 
 	Cleanup Step 1
 	create a header for the canon driver
@@ -9619,8 +11056,8 @@ Name: gutenprint-5_0_0
 		README (1.164) (+12 -306)
 		configure.ac (1.143) (+2 -3)
 		doc/Makefile.am (1.47) (+10 -11)
-		doc/gutenprint-users-manual.odt (1.1) (added)
-		doc/gutenprint-users-manual.pdf (1.1) (added)
+		doc/gutenprint-users-manual.odt (1.1) (added +648 -0)
+		doc/gutenprint-users-manual.pdf (1.1) (added +6019 -0)
 
 	1260142 User documentation needs updating for 5.0.0
 
@@ -9728,8 +11165,8 @@ Name: gutenprint-5_0_0
 		README (1.162) (+76 -58)
 		configure.ac (1.142) (+36 -11)
 		src/gimp2/Makefile.am (1.7) (+14 -3)
-		src/gimp2/print-gutenprint.c (1.1) (added)
-		src/gimp2/print-print.c (1.1) (added)
+		src/gimp2/print-gutenprint.c (1.1) (added +63 -0)
+		src/gimp2/print-print.c (1.1) (added +52 -0)
 		src/gimp2/print.c (1.8) (+6 -24)
 		src/gimp2/print_gimp.h (1.5) (+14 -1)
 
@@ -9875,7 +11312,7 @@ Name: gutenprint-5_0_0
 
 2006-05-29	<rleigh@sourceforge.net>
 
-	Files:	m4extra/pkg.m4 (1.1) (added)
+	Files:	m4extra/pkg.m4 (1.1) (added +156 -0)
 
 	m4extra/pkg.m4: Add pkg-config macros.
 
@@ -10106,7 +11543,7 @@ Name: gutenprint-5_0_0-rc3
 2006-05-14	<rlk@sourceforge.net>
 
 	Files:	src/cups/Makefile.am (1.86) (+3 -1)
-		src/cups/test-ppds (1.1) (added)
+		src/cups/test-ppds (1.1) (added +32 -0)
 
 	Check PPD files for conformance in make check
 
@@ -10141,8 +11578,8 @@ Name: gutenprint-5_0_0-rc3
 
 	Files:	configure.ac (1.139) (+4 -2)
 		src/testpattern/Makefile.am (1.24) (+4 -3)
-		src/testpattern/printer_options.c (1.1) (added)
-		src/testpattern/run-testpattern-2.in (1.1) (added)
+		src/testpattern/printer_options.c (1.1) (added +262 -0)
+		src/testpattern/run-testpattern-2.in (1.1) (added +705 -0)
 		test/Makefile.am (1.46) (+1 -5)
 
 	Add improved test based on testpattern generator.
@@ -10845,7 +12282,7 @@ Name: gutenprint-5_0_0-rc3
 
 2006-01-29	<rleigh@sourceforge.net>
 
-	Files:	m4extra/glib.m4 (1.1) (added)
+	Files:	m4extra/glib.m4 (1.1) (added +196 -0)
 
 	Add glib-1.2 m4 macros.
 
@@ -10983,7 +12420,7 @@ Name: gutenprint-5_0_0-rc2
 2006-01-09	<rleigh@sourceforge.net>
 
 	Files:	m4extra/gettext.m4 (1.2) (+510 -276)
-		m4extra/gtk.m4 (1.1) (added)
+		m4extra/gtk.m4 (1.1) (added +194 -0)
 		m4extra/lcmessage.m4 (1.2) (+28 -17)
 		m4extra/libtool.m4 (1.2) (+6333 -338)
 		m4extra/progtest.m4 (1.2) (+71 -26)
@@ -11638,8 +13075,8 @@ Name: gutenprint-5_0_0-rc2
 2005-08-27	<tillkamppeter@sourceforge.net>
 
 	Files:	NEWS (1.232) (+10 -6)
-		src/foomatic/foomatic-templates-ijs/STP_InputSlot.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/STP_MediaType.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/STP_InputSlot.xml (1.1) (added +20 -0)
+		src/foomatic/foomatic-templates-ijs/STP_MediaType.xml (1.1) (added +20 -0)
 
 	Added template files to rename "STP_InputSlot" and "STP_MediaType" to
 	"InputSlot" and "Mediatype", removed duplicate Canon Pixma item from
@@ -11774,7 +13211,7 @@ Name: gutenprint-5_0_0-rc2
 2005-08-10	<rlk@sourceforge.net>
 
 	Files:	configure.ac (1.129) (+3 -3)
-		po/zh_TW.po (1.1) (added)
+		po/zh_TW.po (1.1) (added +15565 -0)
 
 	Add zh_TW support
 
@@ -12560,7 +13997,7 @@ Name: gutenprint-5_0_0_beta4
 		doc/.cvsignore (1.10) (+1 -0)
 		doc/Makefile.am (1.39) (+6 -2)
 		doc/gutenprint.dox.in (1.3) (+1 -1)
-		doc/gutenprintui2.dox.in (1.1) (added)
+		doc/gutenprintui2.dox.in (1.1) (added +1294 -0)
 
 	Documentation updates
 
@@ -12862,8 +14299,8 @@ Name: gutenprint-5_0_0_beta4
 2005-04-09	<rlk@sourceforge.net>
 
 	Files:	src/escputil/Makefile.am (1.18) (+2 -0)
-		src/escputil/d4lib.c (1.1) (added)
-		src/escputil/d4lib.h (1.1) (added)
+		src/escputil/d4lib.c (1.1) (added +1510 -0)
+		src/escputil/d4lib.h (1.1) (added +55 -0)
 		src/escputil/escputil.c (1.67) (+547 -259)
 
 	Further improvements to printer detection: now works even if a new
@@ -13553,14 +14990,14 @@ Name: gutenprint-5_0_0-beta3
 		doc/developer/copying.xml (1.2) (+8 -8)
 		doc/developer/escp2.xml (1.2) (+1 -1)
 		doc/developer/gimpprint.xml (1.2) (removed)
-		doc/developer/gutenprint.xml (1.1) (added)
+		doc/developer/gutenprint.xml (1.1) (added +59 -0)
 		doc/developer/introduction.xml (1.2) (+18 -18)
 		doc/developer/new-printer.xml (1.2) (+1 -1)
 		doc/developer/problems.xml (1.2) (+4 -4)
 		doc/developer/using.xml (1.2) (+34 -34)
 		doc/developer/weave.xml (1.2) (+1 -1)
 		doc/gimpprint.dox.in (1.6) (removed)
-		doc/gutenprint.dox.in (1.1) (added)
+		doc/gutenprint.dox.in (1.1) (added +1294 -0)
 		doc/users_guide/README (1.7) (+1 -1)
 		doc/users_guide/cups-edition.sgml (1.2) (+5 -5)
 		doc/users_guide/cups.sgml (1.4) (+15 -15)
@@ -13606,41 +15043,41 @@ Name: gutenprint-5_0_0-beta3
 		include/gimp-print/vars.h (1.16) (removed)
 		include/gimp-print/weave.h (1.4) (removed)
 		include/gimp-print/xml.h (1.8) (removed)
-		include/gutenprint/.cvsignore (1.1) (added)
-		include/gutenprint/Makefile.am (1.1) (added)
-		include/gutenprint/array.h (1.1) (added)
-		include/gutenprint/bit-ops.h (1.1) (added)
-		include/gutenprint/channel.h (1.1) (added)
-		include/gutenprint/color.h (1.1) (added)
-		include/gutenprint/curve-cache.h (1.1) (added)
-		include/gutenprint/curve.h (1.1) (added)
-		include/gutenprint/dither.h (1.1) (added)
-		include/gutenprint/gutenprint-intl-internal.h (1.1) (added)
-		include/gutenprint/gutenprint-intl.h (1.1) (added)
-		include/gutenprint/gutenprint-module.h (1.1) (added)
-		include/gutenprint/gutenprint-version.h.in (1.1) (added)
-		include/gutenprint/gutenprint.h (1.1) (added)
-		include/gutenprint/image.h (1.1) (added)
-		include/gutenprint/list.h (1.1) (added)
-		include/gutenprint/module.h (1.1) (added)
-		include/gutenprint/mxml.h (1.1) (added)
-		include/gutenprint/paper.h (1.1) (added)
-		include/gutenprint/path.h (1.1) (added)
-		include/gutenprint/printers.h (1.1) (added)
-		include/gutenprint/sequence.h (1.1) (added)
-		include/gutenprint/string-list.h (1.1) (added)
-		include/gutenprint/util.h (1.1) (added)
-		include/gutenprint/vars.h (1.1) (added)
-		include/gutenprint/weave.h (1.1) (added)
-		include/gutenprint/xml.h (1.1) (added)
+		include/gutenprint/.cvsignore (1.1) (added +3 -0)
+		include/gutenprint/Makefile.am (1.1) (added +63 -0)
+		include/gutenprint/array.h (1.1) (added +169 -0)
+		include/gutenprint/bit-ops.h (1.1) (added +164 -0)
+		include/gutenprint/channel.h (1.1) (added +91 -0)
+		include/gutenprint/color.h (1.1) (added +143 -0)
+		include/gutenprint/curve-cache.h (1.1) (added +82 -0)
+		include/gutenprint/curve.h (1.1) (added +705 -0)
+		include/gutenprint/dither.h (1.1) (added +204 -0)
+		include/gutenprint/gutenprint-intl-internal.h (1.1) (added +88 -0)
+		include/gutenprint/gutenprint-intl.h (1.1) (added +89 -0)
+		include/gutenprint/gutenprint-module.h (1.1) (added +67 -0)
+		include/gutenprint/gutenprint-version.h.in (1.1) (added +90 -0)
+		include/gutenprint/gutenprint.h (1.1) (added +67 -0)
+		include/gutenprint/image.h (1.1) (added +146 -0)
+		include/gutenprint/list.h (1.1) (added +337 -0)
+		include/gutenprint/module.h (1.1) (added +111 -0)
+		include/gutenprint/mxml.h (1.1) (added +182 -0)
+		include/gutenprint/paper.h (1.1) (added +159 -0)
+		include/gutenprint/path.h (1.1) (added +63 -0)
+		include/gutenprint/printers.h (1.1) (added +289 -0)
+		include/gutenprint/sequence.h (1.1) (added +409 -0)
+		include/gutenprint/string-list.h (1.1) (added +100 -0)
+		include/gutenprint/util.h (1.1) (added +187 -0)
+		include/gutenprint/vars.h (1.1) (added +1541 -0)
+		include/gutenprint/weave.h (1.1) (added +180 -0)
+		include/gutenprint/xml.h (1.1) (added +93 -0)
 		include/gutenprintui/.cvsignore (1.1) (added)
 		include/gutenprintui/Makefile.am (1.1) (added)
 		include/gutenprintui/gutenprintui.h (1.1) (added)
-		include/gutenprintui2/.cvsignore (1.1) (added)
-		include/gutenprintui2/Makefile.am (1.1) (added)
-		include/gutenprintui2/curve.h (1.1) (added)
-		include/gutenprintui2/gammacurve.h (1.1) (added)
-		include/gutenprintui2/gutenprintui.h (1.1) (added)
+		include/gutenprintui2/.cvsignore (1.1) (added +3 -0)
+		include/gutenprintui2/Makefile.am (1.1) (added +62 -0)
+		include/gutenprintui2/curve.h (1.1) (added +127 -0)
+		include/gutenprintui2/gammacurve.h (1.1) (added +85 -0)
+		include/gutenprintui2/gutenprintui.h (1.1) (added +182 -0)
 		m4/stp.m4 (1.6) (+3 -3)
 		m4/stp_cups.m4 (1.9) (+1 -1)
 		m4/stp_gimp.m4 (1.9) (+1 -1)
@@ -13676,7 +15113,7 @@ Name: gutenprint-5_0_0-beta3
 		man/gutenprint-resolutions.7.in (1.1) (added)
 		man/gutenprint.3.in (1.1) (added)
 		man/ijsgimpprint.1.in (1.8) (removed)
-		man/ijsgutenprint.1.in (1.1) (added)
+		man/ijsgutenprint.1.in (1.1) (added +105 -0)
 		po/.cvsignore (1.10) (+2 -2)
 		po/POTFILES.in (1.20) (+10 -5)
 		po/cs.po (1.23) (+359 -333)
@@ -13712,9 +15149,9 @@ Name: gutenprint-5_0_0-beta3
 		src/foomatic/Makefile.am (1.44) (+10 -10)
 		src/foomatic/foomatic-generator.in (1.50) (+112 -112)
 		src/foomatic/foomatic-templates-ijs/gimp-print.xml (1.5) (removed)
-		src/foomatic/foomatic-templates-ijs/gutenprint.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/gutenprint.xml (1.1) (added +45 -0)
 		src/foomatic/gimp-print-version.c (1.4) (removed)
-		src/foomatic/gutenprint-version.c (1.1) (added)
+		src/foomatic/gutenprint-version.c (1.1) (added +42 -0)
 		src/foomatic/paper_sizes.c (1.8) (+2 -6)
 		src/foomatic/printer_margins.c (1.15) (+2 -6)
 		src/foomatic/printer_options.c (1.44) (+3 -7)
@@ -13723,7 +15160,7 @@ Name: gutenprint-5_0_0-beta3
 		src/ghost/Makefile.am (1.35) (+4 -4)
 		src/ghost/README (1.93) (+21 -21)
 		src/ghost/ijsgimpprint.c (1.55) (removed)
-		src/ghost/ijsgutenprint.c (1.1) (added)
+		src/ghost/ijsgutenprint.c (1.1) (added +1571 -0)
 		src/gimp/Makefile.am (1.35) (+4 -4)
 		src/gimp/print-intl.h (1.6) (+7 -6)
 		src/gimp/print.c (1.64) (+3 -3)
@@ -13743,19 +15180,19 @@ Name: gutenprint-5_0_0-beta3
 		src/gutenprintui/printrcl.l (1.1) (added)
 		src/gutenprintui/printrcy.y (1.1) (added)
 		src/gutenprintui/ui-utils.c (1.1) (added)
-		src/gutenprintui2/.cvsignore (1.1) (added)
-		src/gutenprintui2/Makefile.am (1.1) (added)
-		src/gutenprintui2/curve.c (1.1) (added)
-		src/gutenprintui2/gammacurve.c (1.1) (added)
-		src/gutenprintui2/gutenprintui-internal.h (1.1) (added)
-		src/gutenprintui2/gutenprintui2.pc.in (1.1) (added)
-		src/gutenprintui2/panel.c (1.1) (added)
-		src/gutenprintui2/plist.c (1.1) (added)
-		src/gutenprintui2/print-image-thumbnail.c (1.1) (added)
-		src/gutenprintui2/printrc.h (1.1) (added)
-		src/gutenprintui2/printrcl.l (1.1) (added)
-		src/gutenprintui2/printrcy.y (1.1) (added)
-		src/gutenprintui2/ui-utils.c (1.1) (added)
+		src/gutenprintui2/.cvsignore (1.1) (added +12 -0)
+		src/gutenprintui2/Makefile.am (1.1) (added +100 -0)
+		src/gutenprintui2/curve.c (1.1) (added +1055 -0)
+		src/gutenprintui2/gammacurve.c (1.1) (added +495 -0)
+		src/gutenprintui2/gutenprintui-internal.h (1.1) (added +253 -0)
+		src/gutenprintui2/gutenprintui2.pc.in (1.1) (added +12 -0)
+		src/gutenprintui2/panel.c (1.1) (added +5543 -0)
+		src/gutenprintui2/plist.c (1.1) (added +1838 -0)
+		src/gutenprintui2/print-image-thumbnail.c (1.1) (added +130 -0)
+		src/gutenprintui2/printrc.h (1.1) (added +44 -0)
+		src/gutenprintui2/printrcl.l (1.1) (added +115 -0)
+		src/gutenprintui2/printrcy.y (1.1) (added +447 -0)
+		src/gutenprintui2/ui-utils.c (1.1) (added +874 -0)
 		src/libgimpprintui/.cvsignore (1.5) (removed)
 		src/libgimpprintui/Makefile.am (1.12) (removed)
 		src/libgimpprintui/gimp-print-ui-internal.h (1.17) (removed)
@@ -13813,13 +15250,13 @@ Name: gutenprint-5_0_0-beta3
 		src/main/gimpprint.dtd (1.7) (removed)
 		src/main/gimpprint.pc.in (1.4) (removed)
 		src/main/gimpprint.xsd (1.8) (removed)
-		src/main/gutenprint-internal.h (1.1) (added)
-		src/main/gutenprint.dtd (1.1) (added)
-		src/main/gutenprint.pc.in (1.1) (added)
-		src/main/gutenprint.xsd (1.1) (added)
+		src/main/gutenprint-internal.h (1.1) (added +85 -0)
+		src/main/gutenprint.dtd (1.1) (added +224 -0)
+		src/main/gutenprint.pc.in (1.1) (added +11 -0)
+		src/main/gutenprint.xsd (1.1) (added +370 -0)
 		src/main/image.c (1.6) (+3 -3)
 		src/main/libgimpprint.sym (1.6) (removed)
-		src/main/libgutenprint.sym (1.1) (added)
+		src/main/libgutenprint.sym (1.1) (added +440 -0)
 		src/main/module.c (1.25) (+5 -5)
 		src/main/mxml-attr.c (1.7) (+3 -3)
 		src/main/mxml-file.c (1.7) (+3 -3)
@@ -14373,7 +15810,7 @@ Name: gimp-print-5_0_0-beta2
 	Files:	src/main/Makefile.am (1.86) (+2 -1)
 		src/main/dither-impl.h (1.23) (+4 -2)
 		src/main/dither-main.c (1.47) (+14 -5)
-		src/main/dither-predithered.c (1.1) (added)
+		src/main/dither-predithered.c (1.1) (added +128 -0)
 		src/testpattern/run-testpattern (1.16) (+1 -1)
 
 	Add "predithered" dither algorithm
@@ -14591,7 +16028,7 @@ Name: gimp-print-5_0_0-beta1
 		include/gimp-print-ui2/gimp-print-ui.h (1.2) (+175 -0)
 		scripts/global.mk (1.7) (+5 -0)
 		src/Makefile.am (1.17) (+3 -1)
-		src/gimp2/.cvsignore (1.1) (added)
+		src/gimp2/.cvsignore (1.1) (added +5 -0)
 		src/gimp2/Makefile.am (1.2) (+52 -0)
 		src/gimp2/print-image-gimp.c (1.2) (+447 -0)
 		src/gimp2/print-intl.h (1.2) (+38 -0)
@@ -14715,19 +16152,19 @@ Name: gimp-print-5_0_0-beta1
 
 2004-06-15	<rleigh@sourceforge.net>
 
-	Files:	src/gimp2/print_gimp.h (1.1) (added)
+	Files:	src/gimp2/print_gimp.h (1.1) (added +59 -0)
 
 	file print_gimp.h was initially added on branch gtk2-20040615-branch.
 
 2004-06-15	<rleigh@sourceforge.net>
 
-	Files:	src/gimp2/print.c (1.1) (added)
+	Files:	src/gimp2/print.c (1.1) (added +445 -0)
 
 	file print.c was initially added on branch gtk2-20040615-branch.
 
 2004-06-15	<rleigh@sourceforge.net>
 
-	Files:	src/gimp2/print-intl.h (1.1) (added)
+	Files:	src/gimp2/print-intl.h (1.1) (added +38 -0)
 
 	file print-intl.h was initially added on branch gtk2-20040615-branch.
 
@@ -14739,7 +16176,7 @@ Name: gimp-print-5_0_0-beta1
 
 2004-06-15	<rleigh@sourceforge.net>
 
-	Files:	src/gimp2/print-image-gimp.c (1.1) (added)
+	Files:	src/gimp2/print-image-gimp.c (1.1) (added +447 -0)
 
 	file print-image-gimp.c was initially added on branch gtk2-20040615-branch.
 
@@ -14769,7 +16206,7 @@ Name: gimp-print-5_0_0-beta1
 
 2004-06-15	<rleigh@sourceforge.net>
 
-	Files:	src/gimp2/Makefile.am (1.1) (added)
+	Files:	src/gimp2/Makefile.am (1.1) (added +59 -0)
 		src/libgimpprintui2/Makefile.am (1.1) (added)
 
 	file Makefile.am was initially added on branch gtk2-20040615-branch.
@@ -14905,7 +16342,7 @@ Name: gimp-print-5_0_0-beta1
 	Files:	src/main/color-conversions.c (1.7) (+101 -80)
 		src/main/print-color.c (1.119) (+3 -2)
 		src/testpattern/Makefile.am (1.20) (+3 -3)
-		src/testpattern/run-testpattern-1 (1.1) (added)
+		src/testpattern/run-testpattern-1 (1.1) (added +318 -0)
 		src/testpattern/testpattern.c (1.41) (+3 -3)
 
 	Fix up a few uses of lut->steps vs. 1 << bits.  They aren't always
@@ -15387,7 +16824,7 @@ Name: gimp-print-5_0_0-alpha3
 
 2004-05-01	<rlk@sourceforge.net>
 
-	Files:	po/hu.po (1.1) (added)
+	Files:	po/hu.po (1.1) (added +14560 -0)
 
 	file hu.po was initially added on branch gimp-print-4_2_branch.
 
@@ -15595,13 +17032,13 @@ Name: gimp-print-5_0_0-alpha3
 
 2004-04-17	<rlk@sourceforge.net>
 
-	Files:	po/uk.po (1.1) (added)
+	Files:	po/uk.po (1.1) (added +14031 -0)
 
 	file uk.po was initially added on branch gimp-print-4_2_branch.
 
 2004-04-17	<rlk@sourceforge.net>
 
-	Files:	po/nb.po (1.1) (added)
+	Files:	po/nb.po (1.1) (added +15822 -0)
 
 	file nb.po was initially added on branch gimp-print-4_2_branch.
 
@@ -15632,7 +17069,7 @@ Name: gimp-print-5_0_0-alpha3
 
 2004-04-13	<rlk@sourceforge.net>
 
-	Files:	doc/5.0-release-plan.txt (1.1) (added)
+	Files:	doc/5.0-release-plan.txt (1.1) (added +1074 -0)
 
 	Check in initial 5.0 release plan.
 
@@ -15774,9 +17211,9 @@ Name: gimp-print-5_0_0-alpha2
 
 	Files:	src/main/.cvsignore (1.20) (+2 -0)
 		src/main/Makefile.am (1.82) (+8 -2)
-		src/main/color-conversion.h (1.1) (added)
-		src/main/color-conversions.c (1.1) (added)
-		src/main/curve-cache.c (1.1) (added)
+		src/main/color-conversion.h (1.1) (added +187 -0)
+		src/main/color-conversions.c (1.1) (added +2106 -0)
+		src/main/curve-cache.c (1.1) (added +141 -0)
 		src/main/curve-cache.h (1.1) (added)
 		src/main/print-color.c (1.111) (+31 -2577)
 
@@ -15896,7 +17333,7 @@ Name: gimp-print-5_0_0-alpha2
 2004-04-07	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-generator.in (1.47) (+21 -11)
-		src/foomatic/foomatic-templates-ijs/RenderResolution.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/RenderResolution.xml (1.1) (added +20 -0)
 		src/foomatic/foomatic-templates-ijs/Resolution.xml (1.4) (+6 -6)
 
 	Added option for the printer resolution, made rendering resolution the
@@ -16268,8 +17705,8 @@ Name: gimp-print-5_0_0-alpha2
 2004-03-14	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-generator.in (1.40) (+104 -14)
-		src/foomatic/foomatic-templates-ijs/NumericalOptions.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/OtherOptions.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/NumericalOptions.xml (1.1) (added +21 -0)
+		src/foomatic/foomatic-templates-ijs/OtherOptions.xml (1.1) (added +20 -0)
 		src/foomatic/printer_margins.c (1.10) (+5 -1)
 		src/foomatic/printer_options.c (1.29) (+7 -5)
 
@@ -16403,29 +17840,29 @@ Name: gimp-print-5_0_0-alpha2
 	Files:	doc/developer/.cvsignore (1.4) (+2 -9)
 		doc/developer/Makefile.am (1.10) (+99 -99)
 		doc/developer/copying.texi (1.3) (removed)
-		doc/developer/copying.xml (1.1) (added)
+		doc/developer/copying.xml (1.1) (added +40 -0)
 		doc/developer/dither.texi (1.2) (removed)
-		doc/developer/dither.xml (1.1) (added)
+		doc/developer/dither.xml (1.1) (added +679 -0)
 		doc/developer/escp2.texi (1.5) (removed)
-		doc/developer/escp2.xml (1.1) (added)
+		doc/developer/escp2.xml (1.1) (added +1843 -0)
 		doc/developer/functions.texi (1.6) (removed)
 		doc/developer/gimpprint.texi (1.3) (removed)
 		doc/developer/gimpprint.xml (1.1) (added)
-		doc/developer/gpl-appendix.xml (1.1) (added)
+		doc/developer/gpl-appendix.xml (1.1) (added +502 -0)
 		doc/developer/gpl.texi (1.2) (removed)
 		doc/developer/indices.texi (1.2) (removed)
 		doc/developer/integrating.texi (1.5) (removed)
 		doc/developer/introduction.texi (1.3) (removed)
-		doc/developer/introduction.xml (1.1) (added)
+		doc/developer/introduction.xml (1.1) (added +62 -0)
 		doc/developer/new-printer.texi (1.4) (removed)
-		doc/developer/new-printer.xml (1.1) (added)
+		doc/developer/new-printer.xml (1.1) (added +882 -0)
 		doc/developer/overview.texi (1.3) (removed)
 		doc/developer/problems.texi (1.3) (removed)
-		doc/developer/problems.xml (1.1) (added)
+		doc/developer/problems.xml (1.1) (added +21 -0)
 		doc/developer/using.texi (1.3) (removed)
-		doc/developer/using.xml (1.1) (added)
+		doc/developer/using.xml (1.1) (added +235 -0)
 		doc/developer/weave.texi (1.4) (removed)
-		doc/developer/weave.xml (1.1) (added)
+		doc/developer/weave.xml (1.1) (added +1409 -0)
 
 	Replace the Texinfo developer's reference with a new DocBook/XML version.
 	Currently HTML and PDF output is available in the Makefile, HTML being
@@ -19276,8 +20713,8 @@ Name: gimp-print-4_3_19
 		src/main/Makefile.am (1.79) (+47 -42)
 		src/main/dither-main.c (1.25) (+85 -18)
 		src/main/escp2-resolutions.c (1.17) (+1 -5)
-		src/main/generic-options.c (1.1) (added)
-		src/main/generic-options.h (1.1) (added)
+		src/main/generic-options.c (1.1) (added +257 -0)
+		src/main/generic-options.h (1.1) (added +67 -0)
 		src/main/print-color.c (1.87) (+65 -37)
 		src/main/print-escp2.c (1.279) (+4 -4)
 		src/main/print-vars.c (1.57) (+18 -6)
@@ -19712,25 +21149,25 @@ Name: gimp-print-4_3_17
 
 2003-06-19	<rlk@sourceforge.net>
 
-	Files:	src/main/mxml-search.c (1.1) (added)
+	Files:	src/main/mxml-search.c (1.1) (added +199 -0)
 
 	file mxml-search.c was initially added on branch mxml-branch.
 
 2003-06-19	<rlk@sourceforge.net>
 
-	Files:	src/main/mxml-node.c (1.1) (added)
+	Files:	src/main/mxml-node.c (1.1) (added +494 -0)
 
 	file mxml-node.c was initially added on branch mxml-branch.
 
 2003-06-19	<rlk@sourceforge.net>
 
-	Files:	src/main/mxml-file.c (1.1) (added)
+	Files:	src/main/mxml-file.c (1.1) (added +1481 -0)
 
 	file mxml-file.c was initially added on branch mxml-branch.
 
 2003-06-19	<rlk@sourceforge.net>
 
-	Files:	src/main/mxml-attr.c (1.1) (added)
+	Files:	src/main/mxml-attr.c (1.1) (added +160 -0)
 
 	file mxml-attr.c was initially added on branch mxml-branch.
 
@@ -20170,7 +21607,7 @@ Name: gimp-print-4_3_16
 	Files:	include/gimp-print/color.h (1.1) (added)
 		include/gimp-print/gimp-print.h (1.36) (+10 -2)
 		src/main/Makefile.am (1.75) (+40 -26)
-		src/main/color.c (1.1) (added)
+		src/main/color.c (1.1) (added +276 -0)
 		src/main/color.h (1.11) (+37 -1)
 		src/main/module.c (1.16) (+8 -2)
 		src/main/module.h (1.4) (+3 -2)
@@ -20633,7 +22070,7 @@ Name: gimp-print-4_3_15
 
 2003-05-21	<m0m@sourceforge.net>
 
-	Files:	src/main/print-olympus.c (1.1) (added)
+	Files:	src/main/print-olympus.c (1.1) (added +2881 -0)
 
 	file print-olympus.c was initially added on branch olympus-driver-branch.
 
@@ -20663,7 +22100,7 @@ Name: gimp-print-4_3_15
 
 2003-05-15	<rlk@sourceforge.net>
 
-	Files:	src/main/channel.c (1.1) (added)
+	Files:	src/main/channel.c (1.1) (added +1174 -0)
 
 	file channel.c was initially added on branch channel-20030511-branch.
 
@@ -20900,7 +22337,7 @@ Name: gimp-print-4_3_14
 2003-05-06	<rlk@sourceforge.net>
 
 	Files:	src/main/Makefile.am (1.68) (+2 -1)
-		src/main/escp2-driver.c (1.1) (added)
+		src/main/escp2-driver.c (1.1) (added +764 -0)
 		src/main/print-escp2.c (1.257) (+57 -672)
 		src/main/print-escp2.h (1.45) (+101 -2)
 
@@ -20978,7 +22415,7 @@ Name: gimp-print-4_3_14
 
 2003-05-04	<rlk@sourceforge.net>
 
-	Files:	po/cs.po (1.1) (added)
+	Files:	po/cs.po (1.1) (added +16112 -0)
 
 	file cs.po was initially added on branch gimp-print-4_2_branch.
 
@@ -21551,7 +22988,7 @@ Name: gimp-print-4_3_13
 		src/printdef/Makefile.am (1.14) (+2 -2)
 		test/Makefile.am (1.39) (+5 -3)
 		test/curve.c (1.11) (+379 -174)
-		test/xml-curve.c (1.1) (added)
+		test/xml-curve.c (1.1) (added +71 -0)
 
 	Change curve data format to XML.
 	Use new array and sequence data types.
@@ -21752,9 +23189,9 @@ Name: gimp-print-4_3_12
 2003-03-19	<rleigh@sourceforge.net>
 
 	Files:	include/gimp-print/sequence.h (1.1) (added)
-		src/main/array.c (1.1) (added)
+		src/main/array.c (1.1) (added +272 -0)
 		src/main/array.h (1.1) (added)
-		src/main/sequence.c (1.1) (added)
+		src/main/sequence.c (1.1) (added +557 -0)
 		src/main/sequence.h (1.1) (added)
 
 	Add sequence and array (derived from sequence) objects.
@@ -22405,10 +23842,10 @@ Name: gimp-print-4_3_9
 
 	Files:	src/main/.cvsignore (1.15) (+4 -0)
 		src/main/Makefile.am (1.63) (+15 -14)
-		src/main/escp2-channels.c (1.1) (added)
+		src/main/escp2-channels.c (1.1) (added +477 -0)
 		src/main/escp2-inks.c (1.1) (added)
-		src/main/escp2-papers.c (1.1) (added)
-		src/main/escp2-resolutions.c (1.1) (added)
+		src/main/escp2-papers.c (1.1) (added +518 -0)
+		src/main/escp2-resolutions.c (1.1) (added +323 -0)
 		src/main/print-escp2-data.c (1.94) (+169 -4687)
 		src/main/print-escp2.h (1.31) (+35 -3)
 
@@ -22759,7 +24196,7 @@ Name: gimp-print-4_3_9
 
 	Files:	src/main/.cvsignore (1.14) (+1 -0)
 		src/main/Makefile.am (1.61) (+2 -1)
-		src/main/bit-ops.c (1.1) (added)
+		src/main/bit-ops.c (1.1) (added +1185 -0)
 		src/main/print-escp2.c (1.223) (+24 -10)
 		src/main/print-lexmark.c (1.103) (+24 -14)
 		src/main/print-weave.c (1.47) (+18 -914)
@@ -22834,15 +24271,15 @@ Name: gimp-print-4_3_9
 
 	Files:	src/main/.cvsignore (1.13) (+21 -10)
 		src/main/Makefile.am (1.60) (+10 -2)
-		src/main/dither-ed.c (1.1) (added)
-		src/main/dither-eventone.c (1.1) (added)
+		src/main/dither-ed.c (1.1) (added +466 -0)
+		src/main/dither-eventone.c (1.1) (added +757 -0)
 		src/main/dither-fast.c (1.1) (added)
-		src/main/dither-impl.h (1.1) (added)
-		src/main/dither-inks.c (1.1) (added)
-		src/main/dither-inlined-functions.h (1.1) (added)
-		src/main/dither-main.c (1.1) (added)
-		src/main/dither-ordered.c (1.1) (added)
-		src/main/dither-very-fast.c (1.1) (added)
+		src/main/dither-impl.h (1.1) (added +264 -0)
+		src/main/dither-inks.c (1.1) (added +421 -0)
+		src/main/dither-inlined-functions.h (1.1) (added +85 -0)
+		src/main/dither-main.c (1.1) (added +492 -0)
+		src/main/dither-ordered.c (1.1) (added +470 -0)
+		src/main/dither-very-fast.c (1.1) (added +135 -0)
 		src/main/print-dither-matrices.c (1.11) (+112 -4)
 		src/main/print-dither.c (1.120) (removed)
 
@@ -23115,9 +24552,9 @@ Name: gimp-print-4_3_9
 	Files:	configure.ac (1.46) (+5 -2)
 		man/Makefile.am (1.17) (+7 -2)
 		man/cups-genppdconfig.8.in (1.3) (+6 -5)
-		man/cups-genppdupdate.8.in (1.1) (added)
+		man/cups-genppdupdate.8.in (1.1) (added +94 -0)
 		src/cups/Makefile.am (1.62) (+3 -3)
-		src/cups/cups-genppdupdate.in (1.1) (added)
+		src/cups/cups-genppdupdate.in (1.1) (added +874 -0)
 
 	Add cups-genppdupdate, for upgrading PPDs between Gimp-Print revisions
 
@@ -23390,11 +24827,11 @@ Name: gimp-print-4_3_9
 		src/main/gimp-print-internal.h (1.64) (+2 -3)
 		src/main/gimpprint.xsd (1.3) (+2 -8)
 		src/main/libgimpprint.sym (1.1) (added)
-		src/main/module.c (1.1) (added)
+		src/main/module.c (1.1) (added +415 -0)
 		src/main/module.h (1.1) (added)
 		src/main/papers.h (1.5) (+27 -2)
 		src/main/papers.xml (1.4) (+8 -1)
-		src/main/path.c (1.1) (added)
+		src/main/path.c (1.1) (added +340 -0)
 		src/main/path.h (1.1) (added)
 		src/main/print-canon.c (1.97) (+45 -2)
 		src/main/print-escp2.c (1.215) (+45 -3)
@@ -23406,7 +24843,7 @@ Name: gimp-print-4_3_9
 		src/main/print-util.c (1.85) (+24 -5)
 		src/main/printers.c (1.22) (+114 -72)
 		src/main/printers.h (1.6) (+29 -2)
-		src/main/xml.c (1.1) (added)
+		src/main/xml.c (1.1) (added +552 -0)
 		src/main/xml.h (1.1) (added)
 		src/printdef/printdef.c (1.7) (+1 -13)
 
@@ -23529,7 +24966,7 @@ Name: gimp-print-4_3_9
 
 2003-01-05	<tillkamppeter@sourceforge.net>
 
-	Files:	src/foomatic/printer_margins.c (1.1) (added)
+	Files:	src/foomatic/printer_margins.c (1.1) (added +126 -0)
 
 	file printer_margins.c was initially added on branch gimp-print-4_2_branch.
 
@@ -23688,7 +25125,7 @@ Name: gimp-print-4_3_9
 		man/Makefile.am (1.16) (+3 -1)
 		samples/Makefile.am (1.5) (+3 -1)
 		scripts/Makefile.am (1.2) (+4 -1)
-		scripts/global.mk (1.1) (added)
+		scripts/global.mk (1.1) (added +31 -0)
 		src/Makefile.am (1.14) (+6 -1)
 		src/cups/Makefile.am (1.61) (+6 -14)
 		src/escputil/Makefile.am (1.14) (+1 -7)
@@ -23748,8 +25185,8 @@ Name: gimp-print-4_3_9
 		src/main/util.h (1.10) (+3 -4)
 		src/testpattern/.cvsignore (1.3) (+3 -0)
 		src/testpattern/Makefile.am (1.12) (+8 -1)
-		src/testpattern/printers.c (1.1) (added)
-		src/testpattern/run-testpattern (1.1) (added)
+		src/testpattern/printers.c (1.1) (added +44 -0)
+		src/testpattern/run-testpattern (1.1) (added +196 -0)
 		src/testpattern/testpattern.c (1.19) (+4 -5)
 
 	Actually set parameters in variables, rather than using fixed fields
@@ -23863,7 +25300,7 @@ Name: gimp-print-4_3_9
 		src/gimp/print.c (1.41) (+14 -157)
 		src/gimp/print_gimp.h (1.40) (+1 -9)
 		src/main/Makefile.am (1.49) (+2 -1)
-		src/main/image.c (1.1) (added)
+		src/main/image.c (1.1) (added +77 -0)
 		src/main/print-canon.c (1.92) (+10 -9)
 		src/main/print-escp2.c (1.209) (+4 -2)
 		src/main/print-lexmark.c (1.90) (+10 -9)
@@ -24069,7 +25506,7 @@ Name: gimp-print-4_3_9
 		src/gimp/gimp_main_window.c (1.96) (+3 -2)
 		src/main/Makefile.am (1.48) (+2 -1)
 		src/main/print-escp2.c (1.204) (+3 -3)
-		src/main/print-raw.c (1.1) (added)
+		src/main/print-raw.c (1.1) (added +383 -0)
 		src/main/printers.c (1.14) (+10 -1)
 		src/main/printers.xml (1.64) (+7 -1)
 		src/main/printlist.h (1.2) (+3 -2)
@@ -24288,7 +25725,7 @@ Name: gimp-print-4_3_6
 2002-12-18	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-templates-gs/PrintoutMode.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/PrintoutMode.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/PrintoutMode.xml (1.1) (added +19 -0)
 
 	file PrintoutMode.xml was initially added on branch gimp-print-4_2_branch.
 
@@ -24700,7 +26137,7 @@ Name: gimp-print-4_3_6
 	Files:	include/gimp-print/gimp-print.h.in (1.24) (+4 -3)
 		src/main/curve.c (1.7) (+156 -86)
 		test/Makefile.am (1.36) (+5 -2)
-		test/curve.c (1.1) (added)
+		test/curve.c (1.1) (added +1220 -0)
 
 	First testing of the curve code
 
@@ -24791,7 +26228,7 @@ Name: gimp-print-4_3_6
 
 2002-11-23	<rlk@sourceforge.net>
 
-	Files:	src/main/curve.c (1.1) (added)
+	Files:	src/main/curve.c (1.1) (added +1936 -0)
 
 	Check in initial curve code (not compiled in just yet).
 
@@ -25030,7 +26467,7 @@ Name: gimp-print-4_3_6
 
 2002-11-16	<rlk@sourceforge.net>
 
-	Files:	src/main/string-list.c (1.1) (added)
+	Files:	src/main/string-list.c (1.1) (added +157 -0)
 
 	file string-list.c was initially added on branch parameter-reorg-20021109-branch.
 
@@ -25073,7 +26510,7 @@ Name: gimp-print-4_3_6
 	Files:	include/gimp-print/gimp-print.h.in (1.17) (+36 -2)
 		src/main/Makefile.am (1.37) (+3 -1)
 		src/main/list.h (1.1) (added)
-		src/main/print-list.c (1.1) (added)
+		src/main/print-list.c (1.1) (added +710 -0)
 
 	Add a doubly-linked list implementation, with optional callbacks to
 	free nodes, sort nodes and find nodes by name and/or long name.
@@ -25713,7 +27150,7 @@ Name: gimp-print-4_3_6
 
 2002-10-21	<rlk@sourceforge.net>
 
-	Files:	src/main/printers.c (1.1) (added)
+	Files:	src/main/printers.c (1.1) (added +1234 -0)
 
 	file printers.c was initially added on branch reorg-20021020-branch.
 
@@ -25725,13 +27162,13 @@ Name: gimp-print-4_3_6
 
 2002-10-21	<rlk@sourceforge.net>
 
-	Files:	src/main/print-vars.c (1.1) (added)
+	Files:	src/main/print-vars.c (1.1) (added +2141 -0)
 
 	file print-vars.c was initially added on branch reorg-20021020-branch.
 
 2002-10-21	<rlk@sourceforge.net>
 
-	Files:	src/main/print-papers.c (1.1) (added)
+	Files:	src/main/print-papers.c (1.1) (added +440 -0)
 
 	file print-papers.c was initially added on branch reorg-20021020-branch.
 
@@ -25888,7 +27325,7 @@ Name: gimp-print-4_3_6
 	Files:	Makefile.am (1.131) (+2 -1)
 		configure.ac (1.26) (+3 -2)
 		man/Makefile.am (1.12) (+7 -2)
-		man/ijsgimpprint.1 (1.1) (added)
+		man/ijsgimpprint.1 (1.1) (added +319 -0)
 		man/ijsgimpprint.1.in (1.2) (+1332 -0)
 
 	Add ijsgimpprint.1.in manual page
@@ -25941,7 +27378,7 @@ Name: gimp-print-4_3_6
 
 2002-10-07	<rlk@sourceforge.net>
 
-	Files:	po/ja.po (1.1) (added)
+	Files:	po/ja.po (1.1) (added +16149 -0)
 
 	file ja.po was initially added on branch gimp-print-4_2_branch.
 
@@ -26093,7 +27530,7 @@ Name: gimp-print-4_3_5
 	Files:	Makefile.am (1.130) (+64 -16)
 		configure.ac (1.24) (+15 -37)
 		debian/Makefile.am (1.1) (added)
-		scripts/Makefile.am (1.1) (added)
+		scripts/Makefile.am (1.1) (added +39 -0)
 		src/foomatic/Makefile.am (1.29) (+15 -5)
 		src/testpattern/Makefile.am (1.10) (+7 -6)
 
@@ -26105,7 +27542,7 @@ Name: gimp-print-4_3_5
 
 2002-09-21	<rleigh@sourceforge.net>
 
-	Files:	po/Makevars (1.1) (added)
+	Files:	po/Makevars (1.1) (added +25 -0)
 
 	po/Makevars is needed by gettext 0.11.x
 
@@ -26180,7 +27617,7 @@ Name: gimp-print-4_3_5
 
 	Files:	configure.ac (1.20) (+3 -2)
 		src/foomatic/Makefile.am (1.28) (+2 -2)
-		src/foomatic/mk_printerlist.in (1.1) (added)
+		src/foomatic/mk_printerlist.in (1.1) (added +30 -0)
 
 	Add new mk_printerlist program to generate verbose list of supported printers
 
@@ -26261,7 +27698,7 @@ Name: gimp-print-4_3_5
 	Files:	configure.ac (1.19) (+3 -2)
 		debian/cupsys-driver-gimpprint.files (1.6) (+2 -0)
 		man/Makefile.am (1.9) (+3 -3)
-		man/cups-genppd.8.in (1.1) (added)
+		man/cups-genppd.8.in (1.1) (added +119 -0)
 		src/cups/Makefile.am (1.57) (+11 -14)
 		src/cups/genppd.c (1.40) (+368 -68)
 
@@ -26449,7 +27886,7 @@ Name: gimp-print-4_3_4
 
 2002-07-21	<rlk@sourceforge.net>
 
-	Files:	src/testpattern/extended.sample (1.1) (added)
+	Files:	src/testpattern/extended.sample (1.1) (added +117 -0)
 
 	file extended.sample was initially added on branch generic_color_branch.
 
@@ -27067,7 +28504,7 @@ Name: gimp-print-4_3_1
 
 2002-06-01	<rlk@sourceforge.net>
 
-	Files:	po/de.po (1.1) (added)
+	Files:	po/de.po (1.1) (added +15522 -0)
 
 	file de.po was initially added on branch gimp-print-4_2_branch.
 
@@ -27156,7 +28593,7 @@ Name: gimp-print-4_3_1
 
 2002-05-11	<rlk@sourceforge.net>
 
-	Files:	po/pt.po (1.1) (added)
+	Files:	po/pt.po (1.1) (added +16223 -0)
 
 	file pt.po was initially added on branch gimp-print-4_2_branch.
 
@@ -27253,7 +28690,7 @@ Name: gimp-print-4_3_1
 
 2002-04-28	<rlk@sourceforge.net>
 
-	Files:	po/es.po (1.1) (added)
+	Files:	po/es.po (1.1) (added +16264 -0)
 
 	Spanish translation
 
@@ -27401,12 +28838,12 @@ Name: gimp-print-4_3_0
 2002-04-08	<andystewart@sourceforge.net>
 
 	Files:	doc/users_guide/Makefile.am (1.34) (+256 -9)
-		doc/users_guide/cups-edition.sgml (1.1) (added)
+		doc/users_guide/cups-edition.sgml (1.1) (added +58 -0)
 		doc/users_guide/cups.sgml (1.2) (+6 -2)
-		doc/users_guide/gimp-edition.sgml (1.1) (added)
+		doc/users_guide/gimp-edition.sgml (1.1) (added +58 -0)
 		doc/users_guide/title.sgml (1.2) (+0 -16)
 		doc/users_guide/users-guide.sgml (1.7) (+18 -0)
-		doc/users_guide/util-edition.sgml (1.1) (added)
+		doc/users_guide/util-edition.sgml (1.1) (added +57 -0)
 
 
 
@@ -27472,12 +28909,12 @@ Name: gimp-print-4_3_0
 		doc/users_guide/ch_2.sgml (1.2) (removed)
 		doc/users_guide/ch_3.sgml (1.2) (removed)
 		doc/users_guide/ch_4.sgml (1.3) (removed)
-		doc/users_guide/cups.sgml (1.1) (added)
-		doc/users_guide/gimp.sgml (1.1) (added)
-		doc/users_guide/history.sgml (1.1) (added)
-		doc/users_guide/title.sgml (1.1) (added)
+		doc/users_guide/cups.sgml (1.1) (added +320 -0)
+		doc/users_guide/gimp.sgml (1.1) (added +886 -0)
+		doc/users_guide/history.sgml (1.1) (added +108 -0)
+		doc/users_guide/title.sgml (1.1) (added +64 -0)
 		doc/users_guide/users-guide.sgml (1.6) (+10 -10)
-		doc/users_guide/utils.sgml (1.1) (added)
+		doc/users_guide/utils.sgml (1.1) (added +421 -0)
 
 
 
@@ -27530,7 +28967,7 @@ Name: gimp-print-4_3_0
 		doc/users_guide/ch_2.sgml (1.1) (added)
 		doc/users_guide/ch_3.sgml (1.1) (added)
 		doc/users_guide/ch_4.sgml (1.1) (added)
-		doc/users_guide/gfdl.sgml (1.1) (added)
+		doc/users_guide/gfdl.sgml (1.1) (added +466 -0)
 		doc/users_guide/users-guide.sgml (1.5) (+15 -1869)
 
 
@@ -27541,7 +28978,7 @@ Name: gimp-print-4_3_0
 
 2002-04-06	<rlk@sourceforge.net>
 
-	Files:	m4/.cvsignore (1.1) (added)
+	Files:	m4/.cvsignore (1.1) (added +1 -0)
 
 	Cleanup cvsignore
 
@@ -27773,7 +29210,7 @@ Name: gimp-print-4_3_0
 2002-03-30	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-templates-gs/Resolution.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/Resolution.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/Resolution.xml (1.1) (added +20 -0)
 
 	file Resolution.xml was initially added on branch gimp-print-4_2_branch.
 
@@ -27787,14 +29224,14 @@ Name: gimp-print-4_3_0
 2002-03-30	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-templates-gs/PageSize.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/PageSize.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/PageSize.xml (1.1) (added +20 -0)
 
 	file PageSize.xml was initially added on branch gimp-print-4_2_branch.
 
 2002-03-30	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-templates-gs/Model.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/Model.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/Model.xml (1.1) (added +21 -0)
 
 	file Model.xml was initially added on branch gimp-print-4_2_branch.
 
@@ -27871,7 +29308,7 @@ Name: gimp-print-4_3_0
 2002-03-30	<tillkamppeter@sourceforge.net>
 
 	Files:	src/foomatic/foomatic-templates-gs/Color.xml (1.1) (added)
-		src/foomatic/foomatic-templates-ijs/Color.xml (1.1) (added)
+		src/foomatic/foomatic-templates-ijs/Color.xml (1.1) (added +20 -0)
 
 	file Color.xml was initially added on branch gimp-print-4_2_branch.
 
@@ -27986,7 +29423,7 @@ Name: gimp-print-4_3_0
 
 	Files:	acconfig.h (1.17) (removed)
 		autogen.sh (1.4) (+1 -1)
-		configure.ac (1.1) (added)
+		configure.ac (1.1) (added +1122 -0)
 		configure.in.in (1.121) (removed)
 		debian/rules (1.35) (+2 -2)
 		doc/README.maintaining (1.12) (+16 -22)
@@ -28043,19 +29480,19 @@ Name: gimp-print-4_3_0
 		m4/lcmessage.m4 (1.2) (removed)
 		m4/libtool.m4 (1.2) (removed)
 		m4/progtest.m4 (1.2) (removed)
-		m4/stp.m4 (1.1) (added)
-		m4/stp_cups.m4 (1.1) (added)
-		m4/stp_gimp.m4 (1.1) (added)
+		m4/stp.m4 (1.1) (added +35 -0)
+		m4/stp_cups.m4 (1.1) (added +177 -0)
+		m4/stp_gimp.m4 (1.1) (added +65 -0)
 		m4/stp_libconfig.m4 (1.1) (added)
-		m4/stp_option.m4 (1.1) (added)
+		m4/stp_option.m4 (1.1) (added +173 -0)
 		m4/stp_path_lib.m4 (1.1) (added)
 		m4/stp_pkgconfig.m4 (1.1) (added)
-		m4extra/gettext.m4 (1.1) (added)
+		m4extra/gettext.m4 (1.1) (added +549 -0)
 		m4extra/gimp.m4 (1.1) (added)
-		m4extra/lcmessage.m4 (1.1) (added)
-		m4extra/libtool.m4 (1.1) (added)
-		m4extra/progtest.m4 (1.1) (added)
-		m4extra/stp_release.m4.in (1.1) (added)
+		m4extra/lcmessage.m4 (1.1) (added +30 -0)
+		m4extra/libtool.m4 (1.1) (added +6425 -0)
+		m4extra/progtest.m4 (1.1) (added +92 -0)
+		m4extra/stp_release.m4.in (1.1) (added +29 -0)
 
 	Update build: add new m4 macros
 
@@ -28153,7 +29590,7 @@ Name: gimp-print-4_3_0
 
 2002-03-16	<rlk@sourceforge.net>
 
-	Files:	po/nl.po (1.1) (added)
+	Files:	po/nl.po (1.1) (added +14756 -0)
 
 	file nl.po was initially added on branch gimp-print-4_2_branch.
 
@@ -28386,7 +29823,7 @@ Name: gimp-print-4_3_0
 
 2002-02-16	<rlk@sourceforge.net>
 
-	Files:	po/el.po (1.1) (added)
+	Files:	po/el.po (1.1) (added +15846 -0)
 
 	file el.po was initially added on branch gimp-print-4_2_branch.
 
@@ -28486,7 +29923,7 @@ Name: gimp-print-4_3_0
 
 2002-02-14	<rlk@sourceforge.net>
 
-	Files:	po/sk.po (1.1) (added)
+	Files:	po/sk.po (1.1) (added +16208 -0)
 
 	file sk.po was initially added on branch gimp-print-4_2_branch.
 
@@ -28859,11 +30296,11 @@ Name: gimp-print-4_3_0
 
 	Files:	Makefile.am (1.121) (+2 -2)
 		gimp.m4 (1.5) (removed)
-		m4/gettext.m4 (1.1) (added)
-		m4/gimp.m4 (1.1) (added)
-		m4/lcmessage.m4 (1.1) (added)
-		m4/libtool.m4 (1.1) (added)
-		m4/progtest.m4 (1.1) (added)
+		m4/gettext.m4 (1.1) (added +417 -0)
+		m4/gimp.m4 (1.1) (added +211 -0)
+		m4/lcmessage.m4 (1.1) (added +30 -0)
+		m4/libtool.m4 (1.1) (added +7356 -0)
+		m4/progtest.m4 (1.1) (added +92 -0)
 		scripts/autogen.sh (1.17) (+12 -0)
 		scripts/gettext.m4 (1.2) (removed)
 		scripts/gimp.m4 (1.3) (removed)
@@ -28955,7 +30392,7 @@ Name: gimp-print-4_3_0
 		src/main/print-pcl.c (1.49) (+18 -9)
 		src/main/print-util.c (1.54) (+14 -1)
 		test/Makefile.am (1.31) (+3 -3)
-		test/run-testdither (1.1) (added)
+		test/run-testdither (1.1) (added +56 -0)
 		test/testdither.c (1.12) (+208 -83)
 
 	Generalize the dither code somewhat.
@@ -29105,8 +30542,8 @@ Name: gimp-print-4_3_0
 		doc/Makefile.am (1.28) (+12 -148)
 		doc/appendices.texi (1.5) (removed)
 		doc/copying.texi (1.2) (removed)
-		doc/developer/.cvsignore (1.1) (added)
-		doc/developer/Makefile.am (1.1) (added)
+		doc/developer/.cvsignore (1.1) (added +22 -0)
+		doc/developer/Makefile.am (1.1) (added +193 -0)
 		doc/developer/copying.texi (1.1) (added)
 		doc/developer/dither.texi (1.1) (added)
 		doc/developer/escp2.texi (1.1) (added)
@@ -29579,7 +31016,7 @@ Name: gimp-print-4_1_99-rc1
 2001-11-08	<rlk@sourceforge.net>
 
 	Files:	configure.in.in (1.94) (+2 -2)
-		po/pl.po (1.1) (added)
+		po/pl.po (1.1) (added +15471 -0)
 
 	Add Polish translation
 
@@ -29815,7 +31252,7 @@ Name: gimp-print-4_1_99-rc1
 
 	Files:	doc/users_guide/.cvsignore (1.4) (+8 -8)
 		doc/users_guide/Makefile.am (1.26) (+6 -6)
-		doc/users_guide/users-guide.sgml (1.1) (added)
+		doc/users_guide/users-guide.sgml (1.1) (added +37 -0)
 		doc/users_guide/users_guide.sgml (1.11) (removed)
 
 	Removed underscores from linkend, ids, and filename per Eric
@@ -30129,7 +31566,7 @@ Name: gimp-print-4_1_99-b4
 2001-10-21	<rlk@sourceforge.net>
 
 	Files:	configure.in.in (1.87) (+2 -2)
-		po/da.po (1.1) (added)
+		po/da.po (1.1) (added +14538 -0)
 		po/en_GB.po (1.65) (+2 -2)
 		po/fr.po (1.8) (+1 -1)
 		po/no.po (1.8) (+1 -1)
@@ -30295,13 +31732,13 @@ Name: gimp-print-4_1_99-b4
 
 2001-10-17	<rlk@sourceforge.net>
 
-	Files:	src/main/print-escp2.h (1.1) (added)
+	Files:	src/main/print-escp2.h (1.1) (added +628 -0)
 
 	file print-escp2.h was initially added on branch split-escp2-branch.
 
 2001-10-17	<rlk@sourceforge.net>
 
-	Files:	src/main/print-escp2-data.c (1.1) (added)
+	Files:	src/main/print-escp2-data.c (1.1) (added +483 -0)
 
 	file print-escp2-data.c was initially added on branch split-escp2-branch.
 
@@ -30428,7 +31865,7 @@ Name: gimp-print-4_1_99-b4
 
 	Files:	configure.in.in (1.84) (+3 -3)
 		po/en_GB.po (1.57) (+335 -348)
-		po/fr.po (1.1) (added)
+		po/fr.po (1.1) (added +15679 -0)
 		po/no.po (1.1) (added)
 		po/sv.po (1.10) (+161 -554)
 		src/cups/Makefile.am (1.37) (+2 -2)
@@ -30689,9 +32126,9 @@ Name: gimp-print-4_1_99-b3
 
 2001-10-06	<rlk@sourceforge.net>
 
-	Files:	doc/users_guide/.cvsignore (1.1) (added)
+	Files:	doc/users_guide/.cvsignore (1.1) (added +12 -0)
 		doc/users_guide/Makefile.am (1.13) (+6 -1)
-		doc/users_guide/figures/.cvsignore (1.1) (added)
+		doc/users_guide/figures/.cvsignore (1.1) (added +1 -0)
 
 	Updates
 
@@ -30893,7 +32330,7 @@ Name: gimp-print-4_1_99-b3
 2001-10-02	<rleigh@sourceforge.net>
 
 	Files:	configure.in.in (1.78) (+7 -2)
-		doc/users_guide/Makefile.am (1.1) (added)
+		doc/users_guide/Makefile.am (1.1) (added +543 -0)
 
 	Add preliminary support for the new SGML user guide
 
@@ -30906,40 +32343,40 @@ Name: gimp-print-4_1_99-b3
 2001-10-02	<andystewart@sourceforge.net>
 
 	Files:	doc/users_guide/Makefile (1.1) (added)
-		doc/users_guide/README (1.1) (added)
-		doc/users_guide/figures/README (1.1) (added)
+		doc/users_guide/README (1.1) (added +39 -0)
+		doc/users_guide/figures/README (1.1) (added +24 -0)
 		doc/users_guide/figures/cups_admin.eps (1.1) (added)
-		doc/users_guide/figures/cups_admin.png (1.1) (added)
+		doc/users_guide/figures/cups_admin.png (1.1) (added +53 -0)
 		doc/users_guide/figures/cups_admin_device.eps (1.1) (added)
-		doc/users_guide/figures/cups_admin_device.png (1.1) (added)
+		doc/users_guide/figures/cups_admin_device.png (1.1) (added +79 -0)
 		doc/users_guide/figures/cups_admin_make.eps (1.1) (added)
-		doc/users_guide/figures/cups_admin_make.png (1.1) (added)
+		doc/users_guide/figures/cups_admin_make.png (1.1) (added +87 -0)
 		doc/users_guide/figures/cups_admin_model.eps (1.1) (added)
-		doc/users_guide/figures/cups_admin_model.png (1.1) (added)
+		doc/users_guide/figures/cups_admin_model.png (1.1) (added +50 -0)
 		doc/users_guide/figures/cups_admin_success.eps (1.1) (added)
-		doc/users_guide/figures/cups_admin_success.png (1.1) (added)
+		doc/users_guide/figures/cups_admin_success.png (1.1) (added +27 -0)
 		doc/users_guide/figures/cups_config_printer.eps (1.1) (added)
-		doc/users_guide/figures/cups_config_printer.png (1.1) (added)
+		doc/users_guide/figures/cups_config_printer.png (1.1) (added +32 -0)
 		doc/users_guide/figures/cups_my_printer.eps (1.1) (added)
-		doc/users_guide/figures/cups_my_printer.png (1.1) (added)
+		doc/users_guide/figures/cups_my_printer.png (1.1) (added +34 -0)
 		doc/users_guide/figures/cups_printers.eps (1.1) (added)
-		doc/users_guide/figures/cups_printers.png (1.1) (added)
+		doc/users_guide/figures/cups_printers.png (1.1) (added +20 -0)
 		doc/users_guide/figures/cups_startup.eps (1.1) (added)
-		doc/users_guide/figures/cups_startup.png (1.1) (added)
+		doc/users_guide/figures/cups_startup.png (1.1) (added +50 -0)
 		doc/users_guide/figures/gimp-print-gui-1.eps (1.1) (added)
-		doc/users_guide/figures/gimp-print-gui-1.png (1.1) (added)
+		doc/users_guide/figures/gimp-print-gui-1.png (1.1) (added +119 -0)
 		doc/users_guide/figures/gimp-print-gui.eps (1.1) (added)
-		doc/users_guide/figures/gimp-print-gui.png (1.1) (added)
+		doc/users_guide/figures/gimp-print-gui.png (1.1) (added +79 -0)
 		doc/users_guide/figures/gimp-print-new-printer.eps (1.1) (added)
-		doc/users_guide/figures/gimp-print-new-printer.png (1.1) (added)
+		doc/users_guide/figures/gimp-print-new-printer.png (1.1) (added +5 -0)
 		doc/users_guide/figures/gimp-print-print-color-adjust.eps (1.1) (added)
-		doc/users_guide/figures/gimp-print-print-color-adjust.png (1.1) (added)
+		doc/users_guide/figures/gimp-print-print-color-adjust.png (1.1) (added +52 -0)
 		doc/users_guide/figures/gimp-print-setup.eps (1.1) (added)
-		doc/users_guide/figures/gimp-print-setup.png (1.1) (added)
+		doc/users_guide/figures/gimp-print-setup.png (1.1) (added +15 -0)
 		doc/users_guide/figures/gimp_image.eps (1.1) (added)
-		doc/users_guide/figures/gimp_image.png (1.1) (added)
+		doc/users_guide/figures/gimp_image.png (1.1) (added +151 -0)
 		doc/users_guide/figures/gimp_startup.eps (1.1) (added)
-		doc/users_guide/figures/gimp_startup.png (1.1) (added)
+		doc/users_guide/figures/gimp_startup.png (1.1) (added +11 -0)
 		doc/users_guide/gimp-print-users-guide-4.1.99-b3.sgml (1.1) (added)
 
 	Initial checkin of user's guide
@@ -31129,7 +32566,7 @@ Name: gimp-print-4_1_99-b3
 
 	Files:	NEWS.4.2 (1.5) (+33 -24)
 		configure.in.in (1.76) (+2 -2)
-		po/sv.po (1.1) (added)
+		po/sv.po (1.1) (added +16458 -0)
 		src/foomatic/foomatic-printermap (1.13) (+1 -0)
 		src/ghost/gdevstp.c (1.13) (+70 -33)
 		src/main/print-escp2.c (1.121) (+168 -6)
@@ -31319,7 +32756,7 @@ Name: gimp-print-4_1_99-b2
 	Files:	configure.in.in (1.75) (+2 -1)
 		doc/Makefile.am (1.14) (+8 -0)
 		doc/programs.texi (1.3) (+27 -20)
-		scripts/epsf.tex (1.1) (added)
+		scripts/epsf.tex (1.1) (added +546 -0)
 		scripts/texinfo.tex (1.1) (added)
 
 	Added images to texinfo documentation (dvi/ps format only at this time)
@@ -31714,8 +33151,8 @@ Name: gimp-print-4_1_99-b1
 
 	Files:	Makefile.am (1.108) (+2 -2)
 		configure.in.in (1.68) (+9 -9)
-		include/.cvsignore (1.1) (added)
-		include/Makefile.am (1.1) (added)
+		include/.cvsignore (1.1) (added +7 -0)
+		include/Makefile.am (1.1) (added +29 -0)
 		include/gimp-print/.cvsignore (1.1) (added)
 		include/gimp-print/Makefile.am (1.1) (added)
 		include/gimp-print/gimp-print-intl.h (1.1) (added)
@@ -31925,7 +33362,7 @@ Name: gimp-print-4_1_99-b1
 	Files:	src/foomatic/Makefile.am (1.12) (+9 -3)
 		src/foomatic/foomatic-generator.in (1.12) (+22 -10)
 		src/foomatic/printer_options.c (1.7) (+7 -5)
-		src/foomatic/printers.c (1.1) (added)
+		src/foomatic/printers.c (1.1) (added +68 -0)
 
 	Cleanup from namestring changes in alpha-3.
 
@@ -32216,13 +33653,13 @@ Name: gimp-print-4_1_99-a3
 		po/en_TEST.po (1.39) (+99 -94)
 		src/Makefile.am (1.5) (+2 -2)
 		src/printdef/Makefile.am (1.7) (+2 -1)
-		src/testpattern/.cvsignore (1.1) (added)
-		src/testpattern/Makefile.am (1.1) (added)
-		src/testpattern/testpattern.c (1.1) (added)
-		src/testpattern/testpattern.h (1.1) (added)
-		src/testpattern/testpattern.sample (1.1) (added)
-		src/testpattern/testpatternl.l (1.1) (added)
-		src/testpattern/testpatterny.y (1.1) (added)
+		src/testpattern/.cvsignore (1.1) (added +13 -0)
+		src/testpattern/Makefile.am (1.1) (added +65 -0)
+		src/testpattern/testpattern.c (1.1) (added +1219 -0)
+		src/testpattern/testpattern.h (1.1) (added +113 -0)
+		src/testpattern/testpattern.sample (1.1) (added +171 -0)
+		src/testpattern/testpatternl.l (1.1) (added +130 -0)
+		src/testpattern/testpatterny.y (1.1) (added +666 -0)
 		test/Makefile.am (1.24) (+4 -14)
 		test/testpattern.c (1.9) (removed)
 		test/testpattern.h (1.2) (removed)
@@ -32692,7 +34129,7 @@ Name: gimp-print-4_1_99-a3
 
 2001-07-22	<rlk@sourceforge.net>
 
-	Files:	samples/.cvsignore (1.1) (added)
+	Files:	samples/.cvsignore (1.1) (added +1 -0)
 
 	.cvsignore
 
@@ -32749,10 +34186,10 @@ Name: gimp-print-4_1_99-a2
 		configure.in.in (1.58) (+19 -2)
 		po/en_GB.po (1.31) (+90 -98)
 		po/en_TEST.po (1.31) (+98 -100)
-		samples/Makefile.am (1.1) (added)
-		samples/colorbars4.png (1.1) (added)
-		samples/colorsweep.png (1.1) (added)
-		samples/profile.jpg (1.1) (added)
+		samples/Makefile.am (1.1) (added +41 -0)
+		samples/colorbars4.png (1.1) (added +12 -0)
+		samples/colorsweep.png (1.1) (added +123 -0)
+		samples/profile.jpg (1.1) (added +1252 -0)
 		src/cups/Makefile.am (1.28) (+2 -2)
 		src/cups/profile.jpg (1.2) (removed)
 
@@ -33989,7 +35426,7 @@ Name: gimp-print-4_1_8
 
 2001-05-29	<rlk@sourceforge.net>
 
-	Files:	src/main/print-dither-matrices.c (1.1) (added)
+	Files:	src/main/print-dither-matrices.c (1.1) (added +709 -0)
 
 	file print-dither-matrices.c was initially added on branch stylus-pro-branch.
 
@@ -34328,8 +35765,8 @@ Name: gimp-print-4_1_7
 
 	Files:	Makefile.am (1.94) (+2 -2)
 		configure.in.in (1.34) (+8 -7)
-		doc/.cvsignore (1.1) (added)
-		doc/Makefile.am (1.1) (added)
+		doc/.cvsignore (1.1) (added +9 -0)
+		doc/Makefile.am (1.1) (added +92 -0)
 		doc/gimpprint.texi (1.1) (added)
 		doc/gpl.texi (1.1) (added)
 		src/foomatic/.cvsignore (1.2) (+2 -0)
@@ -34543,7 +35980,7 @@ Name: gimp-print-4_1_7
 	Files:	src/foomatic/Makefile.am (1.4) (+11 -3)
 		src/foomatic/foomatic-generator.in (1.3) (+10 -10)
 		src/foomatic/gimp-print-version.c (1.1) (added)
-		src/foomatic/paper_sizes.c (1.1) (added)
+		src/foomatic/paper_sizes.c (1.1) (added +41 -0)
 
 	Extract data correctly from the library rather than trying to parse
 	source files.
@@ -34924,9 +36361,9 @@ Name: gimp-print-4_1_6
 
 	Files:	configure.in.in (1.26) (+16 -1)
 		src/Makefile.am (1.2) (+2 -2)
-		src/foomatic/.cvsignore (1.1) (added)
-		src/foomatic/Makefile.am (1.1) (added)
-		src/foomatic/foomatic-generator.in (1.1) (added)
+		src/foomatic/.cvsignore (1.1) (added +13 -0)
+		src/foomatic/Makefile.am (1.1) (added +122 -0)
+		src/foomatic/foomatic-generator.in (1.1) (added +1813 -0)
 		src/foomatic/foomatic-printermap (1.1) (added)
 		src/foomatic/foomatic-templates/Brightness.xml (1.1) (added)
 		src/foomatic/foomatic-templates/Contrast.xml (1.1) (added)
@@ -34947,7 +36384,7 @@ Name: gimp-print-4_1_6
 		src/foomatic/foomatic-templates/Saturation.xml (1.1) (added)
 		src/foomatic/foomatic-templates/Yellow.xml (1.1) (added)
 		src/foomatic/foomatic-templates/stp.xml (1.1) (added)
-		src/foomatic/printer_options.c (1.1) (added)
+		src/foomatic/printer_options.c (1.1) (added +319 -0)
 		test/Makefile.am (1.13) (+2 -6)
 		test/printer_options.c (1.7) (removed)
 
@@ -35324,7 +36761,7 @@ Name: gimp-print-4_1_5
 
 	Files:	configure.in.in (1.24) (+2 -2)
 		test/Makefile.am (1.12) (+4 -2)
-		test/bjc-unprint.c (1.1) (added)
+		test/bjc-unprint.c (1.1) (added +486 -0)
 
 	Added bjc-unprint.c to convert Canon-BJC printjobs to one xbm per color channel
 
@@ -35361,7 +36798,7 @@ Name: gimp-print-4_1_5
 
 2001-02-28	<gandy@sourceforge.net>
 
-	Files:	test/parse-bjc (1.1) (added)
+	Files:	test/parse-bjc (1.1) (added +145 -0)
 
 	* Added parse-bjc (a modified parse-escp) to view Canon-BJC print files
 	  As default, only the header and the footer of the printjob are printed,
@@ -35701,7 +37138,7 @@ Name: gimp-print-4_1_4b
 		autogen.sh (1.3) (+1 -1)
 		configure.in.in (1.19) (+28 -13)
 		debian/rules (1.3) (+8 -3)
-		doc/README.maintaining (1.1) (added)
+		doc/README.maintaining (1.1) (added +564 -0)
 		src/cups/Makefile.am (1.18) (+2 -2)
 		src/cups/genppd.c (1.8) (+6 -2)
 		src/cups/rastertoprinter.c (1.9) (+6 -2)
@@ -35966,7 +37403,7 @@ Name: gimp-print-4_1_4
 		debian/prerm.ex (1.2) (removed)
 		debian/rules (1.2) (+1 -0)
 		man/Makefile.am (1.4) (+3 -3)
-		man/cups-calibrate.8.in (1.1) (added)
+		man/cups-calibrate.8.in (1.1) (added +53 -0)
 
 	Debian build is lintian-clean and uses the right library versioning scheme.
 	Added cups-calibrate man page.
@@ -36211,7 +37648,7 @@ Name: gimp-print-4_1_4
 		src/main/print-lexmark.c (1.13) (+13 -12)
 		src/main/print-pcl.c (1.7) (+4 -4)
 		src/main/print-util.c (1.7) (+5 -5)
-		src/main/print-version.c (1.1) (added)
+		src/main/print-version.c (1.1) (added +76 -0)
 
 	Translated most of src/main
 	Added gimpprint.m4 and gimpprint-config
@@ -36221,7 +37658,7 @@ Name: gimp-print-4_1_4
 2001-02-08	<rleigh@sourceforge.net>
 
 	Files:	configure.in.in (1.5) (+2 -2)
-		po/en_GB.po (1.1) (added)
+		po/en_GB.po (1.1) (added +15136 -0)
 		po/en_TEST.po (1.1) (added)
 
 	Add en_GB and en_TEST translations
@@ -36706,7 +38143,7 @@ Name: print-4_1_3
 
 	Files:	configure.in (1.54) (+2 -2)
 		src/cups/Makefile.am (1.6) (+3 -3)
-		src/cups/cups-calibrate.c (1.1) (added)
+		src/cups/cups-calibrate.c (1.1) (added +834 -0)
 		src/cups/cups_calibrate.c (1.2) (removed)
 
 	Rename cups_calibrate to cups-calibrate.
@@ -36809,18 +38246,18 @@ Name: print-4_1_3
 	Files:	.cvsignore (1.12) (+3 -0)
 		configure.in (1.50) (+4 -4)
 		lib/.cvsignore (1.1) (added)
-		man/.cvsignore (1.1) (added)
-		po/.cvsignore (1.1) (added)
-		scripts/.cvsignore (1.1) (added)
-		src/.cvsignore (1.1) (added)
-		src/cups/.cvsignore (1.1) (added)
-		src/escputil/.cvsignore (1.1) (added)
-		src/ghost/.cvsignore (1.1) (added)
-		src/gimp/.cvsignore (1.1) (added)
+		man/.cvsignore (1.1) (added +18 -0)
+		po/.cvsignore (1.1) (added +16 -0)
+		scripts/.cvsignore (1.1) (added +15 -0)
+		src/.cvsignore (1.1) (added +2 -0)
+		src/cups/.cvsignore (1.1) (added +18 -0)
+		src/escputil/.cvsignore (1.1) (added +5 -0)
+		src/ghost/.cvsignore (1.1) (added +5 -0)
+		src/gimp/.cvsignore (1.1) (added +5 -0)
 		src/include/.cvsignore (1.1) (added)
-		src/main/.cvsignore (1.1) (added)
+		src/main/.cvsignore (1.1) (added +7 -0)
 		src/printdef/.cvsignore (1.1) (added)
-		test/.cvsignore (1.1) (added)
+		test/.cvsignore (1.1) (added +15 -0)
 
 	Added .cvsignore
 
@@ -36923,7 +38360,7 @@ Name: print-4_1_3
 		Ghost/debian-patch-stp (1.2) (removed)
 		Ghost/devs.mak.addon-5.10 (1.8) (removed)
 		Ghost/gdevstp.c (1.52) (removed)
-		po/POTFILES.in (1.1) (added)
+		po/POTFILES.in (1.1) (added +80 -0)
 		src/ghost/COPYING (1.1) (added)
 		src/ghost/ChangeLog (1.1) (added)
 		src/ghost/Makefile.am (1.2) (+1 -3)
@@ -36960,24 +38397,24 @@ Name: print-4_1_3
 		cups/epson.c (1.8) (removed)
 		cups/genppd.c (1.23) (removed)
 		cups/rastertoprinter.c (1.17) (removed)
-		src/cups/COPYING (1.1) (added)
+		src/cups/COPYING (1.1) (added +280 -0)
 		src/cups/ChangeLog (1.1) (added)
-		src/cups/README (1.1) (added)
+		src/cups/README (1.1) (added +116 -0)
 		src/cups/calibrate.c (1.1) (added)
-		src/cups/calibrate.ppm (1.1) (added)
+		src/cups/calibrate.ppm (1.1) (added +375 -0)
 		src/cups/canon.c (1.1) (added)
-		src/cups/command.txt (1.1) (added)
-		src/cups/command.types (1.1) (added)
-		src/cups/commands/CleanAll.cmd (1.1) (added)
-		src/cups/commands/PrintAligmentPage.cmd (1.1) (added)
-		src/cups/commands/PrintSelfTestPage.cmd (1.1) (added)
-		src/cups/commands/ReportLevels.cmd (1.1) (added)
-		src/cups/commands/SetAlignment.cmd (1.1) (added)
-		src/cups/commandtocanon.c (1.1) (added)
-		src/cups/commandtoepson.c (1.1) (added)
+		src/cups/command.txt (1.1) (added +76 -0)
+		src/cups/command.types (1.1) (added +28 -0)
+		src/cups/commands/CleanAll.cmd (1.1) (added +6 -0)
+		src/cups/commands/PrintAligmentPage.cmd (1.1) (added +6 -0)
+		src/cups/commands/PrintSelfTestPage.cmd (1.1) (added +6 -0)
+		src/cups/commands/ReportLevels.cmd (1.1) (added +6 -0)
+		src/cups/commands/SetAlignment.cmd (1.1) (added +7 -0)
+		src/cups/commandtocanon.c (1.1) (added +196 -0)
+		src/cups/commandtoepson.c (1.1) (added +233 -0)
 		src/cups/epson.c (1.1) (added)
-		src/cups/genppd.c (1.1) (added)
-		src/cups/rastertoprinter.c (1.1) (added)
+		src/cups/genppd.c (1.1) (added +2567 -0)
+		src/cups/rastertoprinter.c (1.1) (added +1449 -0)
 
 	Moved cups/* under src/cups
 
@@ -36999,7 +38436,7 @@ Name: print-4_1_3
 		README.new-printer (1.5) (removed)
 		README.weave (1.3) (removed)
 		RELNOTES (1.39) (removed)
-		doc/FAQ.html (1.1) (added)
+		doc/FAQ.html (1.1) (added +286 -0)
 		doc/README.dither (1.1) (added)
 		doc/README.escp2 (1.1) (added)
 		doc/README.new-printer (1.1) (added)
@@ -37018,13 +38455,13 @@ Name: print-4_1_3
 	Files:	acconfig.h (1.2) (+3 -0)
 		make-deb.sh (1.5) (removed)
 		mkchlog (1.5) (removed)
-		scripts/autogen.sh (1.1) (added)
+		scripts/autogen.sh (1.1) (added +377 -0)
 		scripts/gettext.m4 (1.1) (added)
 		scripts/gimp.m4 (1.1) (added)
 		scripts/lcmessage.m4 (1.1) (added)
 		scripts/libtool.m4 (1.1) (added)
 		scripts/make-deb.sh (1.1) (added)
-		scripts/mkchlog (1.1) (added)
+		scripts/mkchlog (1.1) (added +380 -0)
 		scripts/progtest.m4 (1.1) (added)
 
 	Move scripts under scripts. Add m4 macros (may be outdated)
@@ -37071,15 +38508,15 @@ Name: print-4_1_3
 		quickmatrix257.h (1.5) (removed)
 		ran.367.179.h (1.4) (removed)
 		ran.509.131.h (1.4) (removed)
-		src/main/print-canon.c (1.1) (added)
-		src/main/print-color.c (1.1) (added)
+		src/main/print-canon.c (1.1) (added +2702 -0)
+		src/main/print-color.c (1.1) (added +1775 -0)
 		src/main/print-dither.c (1.1) (added)
-		src/main/print-escp2.c (1.1) (added)
-		src/main/print-lexmark.c (1.1) (added)
-		src/main/print-pcl.c (1.1) (added)
-		src/main/print-ps.c (1.1) (added)
-		src/main/print-util.c (1.1) (added)
-		src/main/print-weave.c (1.1) (added)
+		src/main/print-escp2.c (1.1) (added +4569 -0)
+		src/main/print-lexmark.c (1.1) (added +3025 -0)
+		src/main/print-pcl.c (1.1) (added +3085 -0)
+		src/main/print-ps.c (1.1) (added +1380 -0)
+		src/main/print-util.c (1.1) (added +668 -0)
+		src/main/print-weave.c (1.1) (added +2006 -0)
 		src/main/printers.xml (1.1) (added)
 		src/main/quickmatrix257.h (1.1) (added)
 		src/main/ran.367.179.h (1.1) (added)
@@ -37096,15 +38533,15 @@ Name: print-4_1_3
 		pcl-unprint.c (1.19) (removed)
 		printer_options.c (1.8) (removed)
 		run-weavetest (1.20) (removed)
-		test/cyan-sweep.tif (1.1) (added)
+		test/cyan-sweep.tif (1.1) (added +24 -0)
 		test/escp2-unprint.c (1.1) (added)
-		test/escp2-weavetest.c (1.1) (added)
-		test/parse-escp2 (1.1) (added)
-		test/pcl-unprint.c (1.1) (added)
+		test/escp2-weavetest.c (1.1) (added +489 -0)
+		test/parse-escp2 (1.1) (added +590 -0)
+		test/pcl-unprint.c (1.1) (added +1760 -0)
 		test/printer_options.c (1.1) (added)
-		test/run-weavetest (1.1) (added)
-		test/testdither.c (1.1) (added)
-		test/unprint.c (1.1) (added)
+		test/run-weavetest (1.1) (added +107 -0)
+		test/testdither.c (1.1) (added +1013 -0)
+		test/unprint.c (1.1) (added +1768 -0)
 		testdither.c (1.6) (removed)
 		unprint.c (1.45) (removed)
 
@@ -37114,8 +38551,8 @@ Name: print-4_1_3
 
 	Files:	escputil.1.in (1.2) (removed)
 		escputil.c (1.27) (removed)
-		man/escputil.1.in (1.1) (added)
-		src/escputil/escputil.c (1.1) (added)
+		man/escputil.1.in (1.1) (added +128 -0)
+		src/escputil/escputil.c (1.1) (added +2198 -0)
 
 	Moved escputil to src/escputil and man
 
@@ -37143,7 +38580,7 @@ Name: print-4_1_3
 2001-01-22	<rleigh@sourceforge.net>
 
 	Files:	Makefile.am (1.84) (+63 -226)
-		autogen.sh (1.1) (added)
+		autogen.sh (1.1) (added +25 -0)
 		configure.in (1.46) (+312 -77)
 		lib/Makefile.am (1.1) (added)
 		lib/alloca.c (1.1) (added)
@@ -37156,17 +38593,17 @@ Name: print-4_1_3
 		lib/xgetcwd.c (1.1) (added)
 		lib/xmalloc.c (1.1) (added)
 		lib/xmalloc.h (1.1) (added)
-		man/Makefile.am (1.1) (added)
-		po/ChangeLog (1.1) (added)
-		src/Makefile.am (1.1) (added)
-		src/cups/Makefile.am (1.1) (added)
-		src/escputil/Makefile.am (1.1) (added)
-		src/ghost/Makefile.am (1.1) (added)
+		man/Makefile.am (1.1) (added +58 -0)
+		po/ChangeLog (1.1) (added +3 -0)
+		src/Makefile.am (1.1) (added +38 -0)
+		src/cups/Makefile.am (1.1) (added +265 -0)
+		src/escputil/Makefile.am (1.1) (added +38 -0)
+		src/ghost/Makefile.am (1.1) (added +41 -0)
 		src/gimp/Makefile.am (1.1) (added)
 		src/include/Makefile.am (1.1) (added)
-		src/main/Makefile.am (1.1) (added)
+		src/main/Makefile.am (1.1) (added +170 -0)
 		src/printdef/Makefile.am (1.1) (added)
-		test/Makefile.am (1.1) (added)
+		test/Makefile.am (1.1) (added +70 -0)
 
 	Added build scripts and new directories
 
@@ -37432,7 +38869,7 @@ Name: print-4_1_2
 
 2001-01-05	<rlk@sourceforge.net>
 
-	Files:	config.h.in (1.1) (added)
+	Files:	config.h.in (1.1) (added +213 -0)
 		configure.in (1.45) (+3 -1)
 		escputil.c (1.25) (+3 -3)
 
@@ -38825,7 +40262,7 @@ Name: print-4_0_b1-gimpcvs
 
 2000-09-22	<ttonino@sourceforge.net>
 
-	Files:	Matgen/quickaspect.c (1.1) (added)
+	Files:	Matgen/quickaspect.c (1.1) (added +179 -0)
 
 	Allows generation of matrices for non-square pixels
 
@@ -42589,7 +44026,7 @@ Name: print-3_1_6
 
 2000-05-17	<ttonino@sourceforge.net>
 
-	Files:	Matgen/quickdistance.c (1.1) (added)
+	Files:	Matgen/quickdistance.c (1.1) (added +165 -0)
 
 	New version of dither generation program. Unrelated to patented software.
 	First 4 points for a matrix are set by hand - these 4 do not conflict when
@@ -42885,7 +44322,7 @@ Name: print-3_1_6
 
 2000-05-01	<ttonino@sourceforge.net>
 
-	Files:	Matgen/dither-distance.c (1.1) (added)
+	Files:	Matgen/dither-distance.c (1.1) (added +99 -0)
 
 	Code used to create 73dither-distance.i. Initial 3 dots may need improvement.
 	A new version with some randomization is on its way.
@@ -45168,7 +46605,7 @@ Name: print-3_1_6
 
 2000-02-03	<sharkey@sourceforge.net>
 
-	Files:	configure.in (1.1) (added)
+	Files:	configure.in (1.1) (added +1122 -0)
 
 	This is my first attempt at a configuration input file for autoconf.  It's
 	got some cheesy inelegant bits, but, it seems to work for me.  I'll try
@@ -45179,14 +46616,14 @@ Name: print-3_1_6
 
 2000-02-03	<sharkey@sourceforge.net>
 
-	Files:	AUTHORS (1.1) (added)
-		COPYING (1.1) (added)
-		ChangeLog (1.1) (added)
-		INSTALL (1.1) (added)
+	Files:	AUTHORS (1.1) (added +124 -0)
+		COPYING (1.1) (added +340 -0)
+		ChangeLog (1.1) (added +47653 -0)
+		INSTALL (1.1) (added +365 -0)
 		Makefile (1.12) (+196 -240)
 		Makefile.am (1.3) (+11 -5)
 		Makefile.in (1.2) (+174 -189)
-		NEWS (1.1) (added)
+		NEWS (1.1) (added +2118 -0)
 
 	These files are required documentation files for applications using
 	autoconf for configuration.  The current versions of these files
@@ -45265,7 +46702,7 @@ Name: print-3_1_6
 
 2000-02-01	<nicholas@sourceforge.net>
 
-	Files:	.cvsignore (1.1) (added)
+	Files:	.cvsignore (1.1) (added +33 -0)
 
 	Added a .cvsignore file
 
@@ -45817,7 +47254,7 @@ Name: print-3_1_6
 
 1999-11-14	<rlk@sourceforge.net>
 
-	Files:	README (1.1) (added)
+	Files:	README (1.1) (added +821 -0)
 		print-escp2.c (1.26) (+32 -12)
 		print-util.c (1.28) (+59 -41)
 		print.c (1.23) (+5 -2)
@@ -46216,7 +47653,7 @@ Name: print-3_1_6
 
 1999-09-12	<rlk@sourceforge.net>
 
-	Files:	Makefile (1.1) (added)
+	Files:	Makefile (1.1) (added +1023 -0)
 		print-escp2.c (1.2) (+259 -24)
 		print-pcl.c (1.2) (+3 -2)
 		print-ps.c (1.2) (+3 -2)
@@ -46228,8 +47665,8 @@ Name: print-3_1_6
 
 1999-09-12	<rlk@sourceforge.net>
 
-	Files:	Makefile.am (1.1) (added)
-		Makefile.in (1.1) (added)
+	Files:	Makefile.am (1.1) (added +214 -0)
+		Makefile.in (1.1) (added +1023 -0)
 		print-escp2.c (1.1) (added)
 		print-pcl.c (1.1) (added)
 		print-ps.c (1.1) (added)

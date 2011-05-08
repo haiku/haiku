@@ -52,12 +52,16 @@
 
 
 #ifndef RDTIMEOUT
-#define RDTIMEOUT 10000
-#define WRTIMEOUT 10000
+#define RDTIMEOUT     10000
+#define WRTIMEOUT     10000
+#define RDDATATIMEOUT 1000
+#define MICROTIMEOUT  1
 #endif
 
-int d4WrTimeout = WRTIMEOUT;
-int d4RdTimeout = RDTIMEOUT;
+int d4WrTimeout     = WRTIMEOUT;
+int d4RdTimeout     = RDTIMEOUT;
+int d4RdDataTimeout = RDDATATIMEOUT;
+int d4MicroTimeout  = 1;
 int ppid        = 0;
 
 int debugD4     = 1;
@@ -197,7 +201,7 @@ static void printHexValues(const char *dir, const unsigned char *buf, int len)
 #if 0
    len = len > 30 ? 30 : len;
 #endif
-   fprintf(stderr,"%s\n",dir);
+   printf("%s\n",dir);
    for (i = 0; i < len; i++)
      {
        if (isprint(buf[i]))
@@ -221,11 +225,11 @@ static void printHexValues(const char *dir, const unsigned char *buf, int len)
      {
        for (i = 0; i < len; i++)
 	 {
-	   fprintf(stderr,"%c",isprint(buf[i])||isspace(buf[i])?buf[i]:'*');
+	   printf("%c",isprint(buf[i])||isspace(buf[i])?buf[i]:'*');
 	   if (buf[i] == ';' && i < len - 1)
-	     fprintf(stderr, "\n");
+	     printf("\n");
 	 }
-       fprintf(stderr, "\n");
+       printf("\n");
      }
    for (j = 0; j < blocks; j++)
      {
@@ -233,25 +237,25 @@ static void printHexValues(const char *dir, const unsigned char *buf, int len)
        int count = len;
        if (count > baseidx + 16)
 	 count =  baseidx + 16;
-       fprintf(stderr, "%4d: ", baseidx);
+       printf("%4d: ", baseidx);
        for ( i = baseidx; i < count;i++)
 	 {
 	   if (i % 4 == 0)
-	     fprintf(stderr, " ");
-	   fprintf(stderr," %02x",buf[i]);
+	     printf(" ");
+	   printf(" %02x",buf[i]);
 	 }
        if (print_strings)
 	 {
-	   fprintf(stderr,"\n      ");
+	   printf("\n      ");
 	   for ( i = baseidx; i < count;i++)
 	     {
 	       if (i % 4 == 0)
-		 fprintf(stderr, " ");
-	       fprintf(stderr,"  %c",
+		 printf(" ");
+	       printf("  %c",
 		       isprint(buf[i]) && !isspace(buf[i]) ? buf[i] : ' ');
 	     }
 	 }
-       fprintf(stderr, "\n");
+       printf("\n");
      }
 }
 
@@ -288,7 +292,7 @@ static void sigAlarm(int code)
 
 /*******************************************************************/
 /* Function printError()                                           */
-/*    print an error message on stderr                             */
+/*    print an error message on stdout                             */
 /*                                                                 */
 /* Input:  unsigned char errorNb the error number                  */
 /*                                                                 */
@@ -308,19 +312,19 @@ static int printError(unsigned char errorNb)
       if ( msg->result == errorNb )
       {
 	 if (debugD4)
-	   fprintf(stderr,"%s\n", msg->message);
+	   printf("%s\n", msg->message);
          return msg->errorClass;
       }
       msg++;
    }
-   fprintf(stderr,"Unknown IEEE 1284.4 error number %d\n",errorNb);
+   printf("Unknown IEEE 1284.4 error number %d\n",errorNb);
    return 0;
 }
 
 
 /*******************************************************************/
 /* Function printCmdType()                                         */
-/*        print on stderr the command name                         */
+/*        print on stdout the command name                         */
 /* Input:  unsigned char *cmd   the data are to be put here        */
 /*                                                                 */
 /* Return: -                                                       */
@@ -330,27 +334,27 @@ static int printError(unsigned char errorNb)
 static void printCmdType(unsigned char *cmd)
 {
    if (cmd[6] & 0x80)
-     fprintf(stderr, ">>>");
+     printf(">>>");
    if ( cmd[0] == 0 && cmd[1] == 0 )
    {
       switch(cmd[6] & 0x7f)
       {
-         case    0: fprintf(stderr,"--- Init           ---\n");break;
-         case    1: fprintf(stderr,"--- OpenChannel    ---\n");break;
-         case    2: fprintf(stderr,"--- CloseChannel   ---\n");break;
-         case    3: fprintf(stderr,"--- Credit         ---\n");break;
-         case    4: fprintf(stderr,"--- CreditRequest  ---\n");break;
-         case    8: fprintf(stderr,"--- Exit           ---\n");break;
-         case    9: fprintf(stderr,"--- GetSocketID    ---\n");break;
-         case   10: fprintf(stderr,"--- GetServiceName ---\n");break;
-         case 0x45: fprintf(stderr,"--- EnterD4Mode    ---\n");break;
-         case 0x7f: fprintf(stderr,"--- Error          ---\n");break;
-         default:   fprintf(stderr,"--- ?????????????? ---\n");break;
+         case    0: printf("--- Init           ---\n");break;
+         case    1: printf("--- OpenChannel    ---\n");break;
+         case    2: printf("--- CloseChannel   ---\n");break;
+         case    3: printf("--- Credit         ---\n");break;
+         case    4: printf("--- CreditRequest  ---\n");break;
+         case    8: printf("--- Exit           ---\n");break;
+         case    9: printf("--- GetSocketID    ---\n");break;
+         case   10: printf("--- GetServiceName ---\n");break;
+         case 0x45: printf("--- EnterD4Mode    ---\n");break;
+         case 0x7f: printf("--- Error          ---\n");break;
+         default:   printf("--- ?????????????? ---\n");break;
       }
    }
    else
    {
-      fprintf(stderr,"--- Send Data      ---\n");
+      printf("--- Send Data      ---\n");
    }
 }
 
@@ -392,8 +396,9 @@ static int writeCmd(int fd, unsigned char *cmd, int len)
       }
    }
 
-   usleep(1); /* according to Glen Steward, this will solve problems  */
-              /* for the cartridge exchange with the Stylus Color 580 */
+   /* according to Glen Steward, this will solve problems  */
+   /* for the cartridge exchange with the Stylus Color 580 */
+   usleep(d4MicroTimeout);
 
    timeoutGot = 0;
    errno = 0;
@@ -421,7 +426,7 @@ static int writeCmd(int fd, unsigned char *cmd, int len)
       gettimeofday(&end, NULL);
       dt = (end.tv_sec  - beg.tv_sec) * 1000000;
       dt += end.tv_usec - beg.tv_usec;
-      fprintf(stderr,"Write time %5.3f s\n",(double)dt/1000000);
+      printf("Write time %5.3f s\n",(double)dt/1000000);
 # endif
    }
 
@@ -464,7 +469,7 @@ int readAnswer(int fd, unsigned char *buf, int len, int allowExtra)
    gettimeofday(&beg, NULL);
 
    if (debugD4)
-     fprintf(stderr, "length: %i\n", len);
+     printf("length: %i\n", len);
    while ( total < len )
    {
       SET_TIMER(ti,oti, d4RdTimeout);
@@ -473,16 +478,16 @@ int readAnswer(int fd, unsigned char *buf, int len, int allowExtra)
 	{
 	  if (first_read)
 	    {
-	      fprintf(stderr, "read: ");
+	      printf("read: ");
 	      first_read = 0;
 	    }
 	  if (rd < 0)
 	    {
-	      fprintf(stderr, "%i %s\n", rd, errno != 0 ?strerror(errno) : "");
+	      printf("%i %s\n", rd, errno != 0 ?strerror(errno) : "");
 	      first_read = 1;
 	    }
 	  else
-	    fprintf(stderr, "%i ", rd);
+	    printf("%i ", rd);
 	}
       RESET_TIMER(ti,oti);
       if ( rd <= 0 )
@@ -493,7 +498,7 @@ int readAnswer(int fd, unsigned char *buf, int len, int allowExtra)
          if ( dt > d4RdTimeout * 2 )
          {
             if ( debugD4 )
-               fprintf(stderr,"Timeout 1 at readAnswer() rcv %d bytes\n",total);
+               printf("Timeout 1 at readAnswer() rcv %d bytes\n",total);
             timeoutGot = 1;
             break;
          }
@@ -518,14 +523,14 @@ int readAnswer(int fd, unsigned char *buf, int len, int allowExtra)
 	    if (len > newlen)
 	      {
 		if (debugD4)
-		  fprintf(stderr, "Changing len from %d to %d\n", len, newlen);
+		  printf("Changing len from %d to %d\n", len, newlen);
 		len = newlen;
 	      }
 	    else if (len < newlen)
 	      {
 		excess = newlen - len;
 		if (debugD4)
-		  fprintf(stderr, "Expected %d, getting %d, %sflushing %d\n",
+		  printf("Expected %d, getting %d, %sflushing %d\n",
 			  len, newlen, allowExtra ? "not " : "", excess);
 	      }
          }
@@ -550,7 +555,8 @@ int readAnswer(int fd, unsigned char *buf, int len, int allowExtra)
 	     retry_count = 0;
 	   if (status < bytes)
 	     usleep(d4RdTimeout);
-	   printHexValues("waste", (const unsigned char *) wastebuf, status);
+	   if (debugD4)
+	     printHexValues("waste", (const unsigned char *) wastebuf, status);
 	   excess -= status;
 	 }
      }
@@ -561,18 +567,18 @@ int readAnswer(int fd, unsigned char *buf, int len, int allowExtra)
 #  if PTIME
       gettimeofday(&end, NULL);
 #  endif
-      fprintf(stderr, "total: %i\n", total);
+      printf("total: %i\n", total);
       printHexValues("Recv: ",buf,total);
 #  if PTIME
       dt = (end.tv_sec  - beg.tv_sec) * 1000000;
       dt += end.tv_usec - beg.tv_usec;
-      fprintf(stderr,"Read time %5.3f s\n",(double)dt/1000000);
+      printf("Read time %5.3f s\n",(double)dt/1000000);
 #  endif
    }
    if ( timeoutGot )
    {
       if ( debugD4 )
-         fprintf(stderr,"Timeout 2 at readAnswer()\n");
+         printf("Timeout 2 at readAnswer()\n");
       return -1;
    }
    return total;
@@ -595,14 +601,14 @@ static void _flushData(int fd)
    errno = 0;
 
    if (debugD4)
-     fprintf(stderr, "flush data: length: %i\n", len);
+     printf("flush data: length: %i\n", len);
    do
      {
        usleep(d4RdTimeout);
        SET_TIMER(ti,oti, d4RdTimeout);
        rd = read(fd, buf, len);
        if (debugD4)
-	 fprintf(stderr, "flush: read: %i %s\n", rd,
+	 printf("flush: read: %i %s\n", rd,
 		 rd < 0 && errno != 0 ?strerror(errno) : "");
        RESET_TIMER(ti,oti);
        count--;
@@ -649,7 +655,7 @@ static int _readData(int fd, unsigned char *buf, int len)
          if ( dt > d4RdTimeout*3 )
          {
             if ( debugD4 )
-               fprintf(stderr,"Timeout at _readData(), dt = %ld ms\n", dt);
+               printf("Timeout at _readData(), dt = %ld ms\n", dt);
             return -1;
             break;
          }
@@ -668,7 +674,7 @@ static int _readData(int fd, unsigned char *buf, int len)
    {
       toGet = (header[2] >> 8) + header[3] - 6;
       if (debugD4)
-	fprintf(stderr, "toGet: %i\n", toGet);
+	printf("toGet: %i\n", toGet);
       total = 0;
       gettimeofday(&beg, NULL);
       while ( total < toGet )
@@ -684,7 +690,7 @@ static int _readData(int fd, unsigned char *buf, int len)
             if ( dt > d4RdTimeout*3 )
             {
                if ( debugD4 )
-                  fprintf(stderr,"Timeout at _readData(), dt = %ld ms\n",dt);
+                  printf("Timeout at _readData(), dt = %ld ms\n",dt);
                return -1;
                break;
             }
@@ -733,7 +739,7 @@ static int sendReceiveCmd(int fd, unsigned char *cmd, int len, unsigned char *an
    {
       /* interrupted write call */
       if ( debugD4 )
-         fprintf(stderr,"interrupt received\n");
+         printf("interrupt received\n");
       return -1;
    }
    else
@@ -790,10 +796,14 @@ Loop:
    if ( rd == 0 )
    {
       /* no answer from device */
+      if (debugD4)
+        printf(">>>No answer from printer\n");
       return 0;
    }
    else if ( rd < 0 )
    {
+      if (debugD4)
+        printf(">>>Interrupted write\n");
       /* interrupted write call */
       return 0;
    }
@@ -943,11 +953,11 @@ int OpenChannel(int fd, unsigned char sockId, int *sndSz, int *rcvSz)
       if ( rd == -1 )
       {
 	if (debugD4)
-	  fprintf(stderr, "OpenChannel %d fails, error %d\n", sockId, d4Errno);
+	  printf("OpenChannel %d fails, error %d\n", sockId, d4Errno);
 	if (d4Errno == 6)	/* channel already open */
 	  {
 	    if ( debugD4 )
-	      fprintf(stderr, "Channel %d already open, closing\n", sockId);
+	      printf("Channel %d already open, closing\n", sockId);
 	    CloseChannel(fd, sockId);
 	    continue;
 	  }
@@ -964,7 +974,7 @@ int OpenChannel(int fd, unsigned char sockId, int *sndSz, int *rcvSz)
          else if ( buf[7] != 0 )
          {
 	   if (debugD4)
-	     fprintf(stderr, "OpenChannel %d fails, hard error\n", sockId);
+	     printf("OpenChannel %d fails, hard error\n", sockId);
             /* hard error */
             return -1;
          }
@@ -977,13 +987,13 @@ int OpenChannel(int fd, unsigned char sockId, int *sndSz, int *rcvSz)
 	if (d4Errno == 6)	/* channel already open */
 	  {
 	    if ( debugD4 )
-	      fprintf(stderr, "Channel %d already open, closing\n", sockId);
+	      printf("Channel %d already open, closing\n", sockId);
 	    CloseChannel(fd, sockId);
 	    continue;
 	  }
          /* at this stage we can only have an error */
 	if (debugD4)
-	  fprintf(stderr, "OpenChannel %d fails, wrong count %d\n", sockId, rd);
+	  printf("OpenChannel %d fails, wrong count %d\n", sockId, rd);
          return -1;
       }
    }
@@ -1140,7 +1150,7 @@ int askForCredit(int fd, unsigned char socketID, int *sndSize, int *rcvSize)
          if ( Init(fd) )
          {
 	   if (debugD4)
-	     fprintf(stderr, "askForCredit init succeeded, now try to open\n");
+	     printf("askForCredit init succeeded, now try to open\n");
             OpenChannel(fd, socketID, sndSize, rcvSize);
          }
       }
@@ -1177,7 +1187,7 @@ int writeData(int fd, unsigned char socketID, const unsigned char *buf, int len,
    static int bLen   = 0;
    if ( debugD4 )
    {
-      fprintf(stderr,"--- Send Data      ---\n");
+      printf("--- Send Data      ---\n");
       gettimeofday(&beg, NULL);
    }
    len += 6;
@@ -1222,15 +1232,15 @@ int writeData(int fd, unsigned char socketID, const unsigned char *buf, int len,
       dt = (end.tv_sec  - beg.tv_sec) * 1000000;
       dt += end.tv_usec - beg.tv_usec;
 # endif  
-      fprintf(stderr,"Send: ");
+      printf("Send: ");
       for ( ret = 0; (wr > 0) && (ret < ((wr > 20) ? 20 : wr)) ; ret++ )
-         fprintf(stderr,"%02x ", buffer[ret]);
-      fprintf(stderr,"\n      ");
+         printf("%02x ", buffer[ret]);
+      printf("\n      ");
       for ( ret = 0; (wr > 0) && (ret < ((wr > 20) ? 20 : wr)) ; ret++ )
-         fprintf(stderr,"%c  ", isprint(buffer[ret])&&!isspace(buffer[ret])?buffer[ret]:' ');
-      fprintf(stderr,"\n");
+         printf("%c  ", isprint(buffer[ret])&&!isspace(buffer[ret])?buffer[ret]:' ');
+      printf("\n");
 # if PTIME
-       fprintf(stderr,"Write time %5.3f s\n",(double)dt/1000000);
+       printf("Write time %5.3f s\n",(double)dt/1000000);
 # endif
    }
 
@@ -1262,7 +1272,7 @@ int readData(int fd, unsigned char socketID, unsigned char *buf, int len)
    if ( Credit(fd, socketID, 1) == 1 )
    {
       /* wait a little bit */
-      usleep(1000);
+      usleep(d4RdDataTimeout);
       ret = _readData(fd, buf, len);
       return ret; 
    }
@@ -1313,7 +1323,7 @@ int writeAndReadData(int fd, unsigned char socketID,
        /* wait a little bit */
        do
 	 {
-	   usleep(1000);
+	   usleep(d4RdDataTimeout);
 	   ret = _readData(fd, buf, len);
 	   if (ret < 0)
 	     return ret;
@@ -1340,14 +1350,14 @@ int writeAndReadData(int fd, unsigned char socketID,
 void flushData(int fd, unsigned char socketID)
 {
   if (debugD4)
-    fprintf(stderr, "flushData %d\n", socketID);
+    printf("flushData %d\n", socketID);
    /* give credit */
    if (socketID != (unsigned char) -1)
      {
        if ( Credit(fd, socketID, 1) == 1 )
 	 {
 	   /* wait a little bit */
-	   usleep(1000);
+	   usleep(d4RdDataTimeout);
 	   _flushData(fd);
 	 }
      }

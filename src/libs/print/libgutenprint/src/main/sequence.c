@@ -1,5 +1,5 @@
 /*
- * "$Id: sequence.c,v 1.28 2010/08/04 00:33:57 rlk Exp $"
+ * "$Id: sequence.c,v 1.29 2011/02/17 02:15:18 rlk Exp $"
  *
  *   Sequence data type.  This type is designed to be derived from by
  *   the curve and dither matrix types.
@@ -491,6 +491,8 @@ stp_xmltree_create_from_sequence(const stp_sequence_t *seq)   /* The sequence */
 }
 
 
+#define isfinite_null(x) (1)
+
 /* "Overloaded" functions */
 
 #define DEFINE_DATA_SETTER(t, name, checkfinite)		\
@@ -505,7 +507,7 @@ stp_sequence_set_##name##_data(stp_sequence_t *sequence,	\
 								\
   /* Validate the data before we commit to it. */		\
   for (i = 0; i < count; i++)					\
-    if (((checkfinite) && ! isfinite(data[i])) ||		\
+    if ((! checkfinite(data[i])) ||				\
 	data[i] < sequence->blo ||				\
         data[i] > sequence->bhi)				\
       return 0;							\
@@ -515,13 +517,13 @@ stp_sequence_set_##name##_data(stp_sequence_t *sequence,	\
   return 1;							\
 }
 
-DEFINE_DATA_SETTER(float, float, 1)
-DEFINE_DATA_SETTER(long, long, 0)
-DEFINE_DATA_SETTER(unsigned long, ulong, 0)
-DEFINE_DATA_SETTER(int, int, 0)
-DEFINE_DATA_SETTER(unsigned int, uint, 0)
-DEFINE_DATA_SETTER(short, short, 0)
-DEFINE_DATA_SETTER(unsigned short, ushort, 0)
+DEFINE_DATA_SETTER(float, float, isfinite)
+DEFINE_DATA_SETTER(long, long, isfinite_null)
+DEFINE_DATA_SETTER(unsigned long, ulong, isfinite_null)
+DEFINE_DATA_SETTER(int, int, isfinite_null)
+DEFINE_DATA_SETTER(unsigned int, uint, isfinite_null)
+DEFINE_DATA_SETTER(short, short, isfinite_null)
+DEFINE_DATA_SETTER(unsigned short, ushort, isfinite_null)
 
 #define DEFINE_DATA_ACCESSOR(t, lb, ub, name)				      \
 const t *								      \

@@ -1,4 +1,4 @@
-Welcome to Gutenprint 5.2.6!  Please read these notes carefully.
+Welcome to Gutenprint 5.2.7!  Please read these notes carefully.
 
 *** NOTE TO PACKAGERS: Please read the file README.package for issues
     that are of interest to distributors and packagers of Gutenprint.
@@ -8,7 +8,7 @@ Welcome to Gutenprint 5.2.6!  Please read these notes carefully.
 
 I) INTRODUCTION
 
-    This is Gutenprint version 5.2.6, a stable release of Gutenprint
+    This is Gutenprint version 5.2.7, a stable release of Gutenprint
     5.2.  Gutenprint, formerly named Gimp-Print, is a suite of printer
     drivers that may be used with most common UNIX print spooling
     systems, including CUPS, lpr, LPRng, or others.  These drivers
@@ -120,7 +120,7 @@ A) OVERVIEW
 	gimp-print-devel@lists.sourceforge.net
 
 	================================================================
-	  Release: gutenprint 5.2.6 generated on 18 Jul 2010
+	  Release: gutenprint 5.2.7 generated on 02 Mar 2011
 
 	  Features:
 	    Build CUPS:                                 yes, installing in /usr
@@ -229,7 +229,7 @@ C) CUPS
     directory" (other ".h" files may also be missing, depending upon
     the missing packages):
 
-	make[3]: Entering directory `/opt/gutenprint/gutenprint-5.2.6/src/cups'
+	make[3]: Entering directory `/opt/gutenprint/gutenprint-5.2.7/src/cups'
 	gcc -DHAVE_CONFIG_H -I. -I../..  -I../../include -I../../include
 	   -Wall -Wcast-align -Wstrict-prototypes -Wmissing-prototypes
 	   -Wmissing-declarations -Wnested-externs -Wwrite-strings
@@ -242,11 +242,11 @@ C) CUPS
 	genppd.c:79:23: error: cups/cups.h: No such file or directory
 	genppd.c:80:25: error: cups/raster.h: No such file or directory
 	make[3]: *** [gutenprint_5_2-genppd.o] Error 1
-	make[3]: Leaving directory `/opt/gutenprint/gutenprint-5.2.6/src/cups'
+	make[3]: Leaving directory `/opt/gutenprint/gutenprint-5.2.7/src/cups'
 	make[2]: *** [all-recursive] Error 1
-	make[2]: Leaving directory `/opt/gutenprint/gutenprint-5.2.6/src'
+	make[2]: Leaving directory `/opt/gutenprint/gutenprint-5.2.7/src'
 	make[1]: *** [all-recursive] Error 1
-	make[1]: Leaving directory `/opt/gutenprint/gutenprint-5.2.6'
+	make[1]: Leaving directory `/opt/gutenprint/gutenprint-5.2.7'
 	make: *** [all] Error 2
 
     Installing the CUPS driver for Gutenprint 5.2 will not interfere
@@ -596,7 +596,7 @@ E) GIMP
     The errors will typically look like this; the important errors are
     the ones "No such file or directory".
 
-	make[3]: Entering directory `/opt/gutenprint/gutenprint-5.2.6/src/gimp2'
+	make[3]: Entering directory `/opt/gutenprint/gutenprint-5.2.7/src/gimp2'
 	gcc -DHAVE_CONFIG_H -I. -I../..  -I../../include -I../../include
 	   -Wall -Wcast-align -Wstrict-prototypes -Wmissing-prototypes
 	   -Wmissing-declarations -Wnested-externs -Wwrite-strings
@@ -609,11 +609,11 @@ E) GIMP
 	print_gimp.h:37:26: error: libgimp/gimp.h: No such file or directory
 	print_gimp.h:38:28: error: libgimp/gimpui.h: No such file or directory
 	make[3]: *** [print-image-gimp.o] Error 1
-	make[3]: Leaving directory `/opt/gutenprint/gutenprint-5.2.6/src/gimp2'
+	make[3]: Leaving directory `/opt/gutenprint/gutenprint-5.2.7/src/gimp2'
 	make[2]: *** [all-recursive] Error 1
-	make[2]: Leaving directory `/opt/gutenprint/gutenprint-5.2.6/src'
+	make[2]: Leaving directory `/opt/gutenprint/gutenprint-5.2.7/src'
 	make[1]: *** [all-recursive] Error 1
-	make[1]: Leaving directory `/opt/gutenprint/gutenprint-5.2.6'
+	make[1]: Leaving directory `/opt/gutenprint/gutenprint-5.2.7'
 	make: *** [all] Error 2
 
     Normally, the Gutenprint configure script detects which version,

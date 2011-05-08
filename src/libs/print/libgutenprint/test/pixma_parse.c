@@ -24,10 +24,14 @@
 #include <inttypes.h>
 
 
-#define MAX_COLORS 8  /* maximum number of Colors: CMYKcmyk */
+#define MAX_COLORS 36  /* was: 8 maximum number of Colors: CMYKcmyk */
 
 #include "pixma_parse.h"
 
+/*TODO: 
+  1. change color loops to search for each named color rather than using a predefined order.
+  2. keep iP6700 workaround, but check what happens with the real printer.
+*/
 
 
 
@@ -41,20 +45,38 @@
  *  cnt: len of the arguments
  *
  * return values:
- *   0 when a command has been succesfully read
+ *   0 when a command has been successfully read
  *   1 when EOF has been reached
- *  -1 when an error occureed
+ *  -1 when an error occurred
  */
-static int nextcmd( FILE *infile,unsigned char* cmd,unsigned char *buf, unsigned int *cnt)
+static int nextcmd( FILE *infile,unsigned char* cmd,unsigned char *buf, unsigned int *cnt, unsigned int *xml_read)
 {
 	unsigned char c1,c2;
+	unsigned int startxml, endxml;
+	unsigned int xmldata;
 	if (feof(infile))
 		return -1;
 	while (!feof(infile)){
 		c1 = fgetc(infile);
 		if(feof(infile)) /* NORMAL EOF */
 			return 1;
-		if (c1 == 27 ){  /* A new ESC command */
+		/* add skip for XML header and footer */
+		if (c1 == 60 ){  /* "<" for XML start */
+		  if (*xml_read==0){
+		    /* start: */
+		    startxml=680;
+		    xmldata=fread(buf,1,679,infile); /* 1 less than 680 */
+		    printf("nextcmd: read starting XML %d %d\n", *xml_read, startxml);
+		    *xml_read=1;
+		  }else if (*xml_read==1) {
+		    /* end */
+		    endxml=263;
+		    xmldata=fread(buf,1,262,infile); /* 1 less than 263*/
+		    printf("nextcmd: read ending XML %d %d\n", *xml_read, endxml);
+		    *xml_read=2;
+		  }
+		  /* no alternatives yet */
+		}else if (c1 == 27 ){  /* A new ESC command */
 			c2 = fgetc(infile);
 			if(feof(infile))
 				return 1;
@@ -133,7 +155,7 @@ static int Raster(image_t* img,unsigned char* buffer,unsigned int len,unsigned c
 	unsigned char* dst=malloc(len*256); /* the destination buffer */
 	unsigned char* dstr=dst;
 	if(!color){
-		printf("no matching color for %c (0x%x) in the database => ignoring %i bytes\n",color_name,color_name,len);
+          printf("no matching color for %c (0x%x, %i) in the database => ignoring %i bytes\n",color_name,color_name,color_name, len);
 	}
 
 	/* decode pack bits */
@@ -154,7 +176,7 @@ static int Raster(image_t* img,unsigned char* buffer,unsigned int len,unsigned c
 				}
 				color->head->line = img->height + cur_line;
 				if(!color->compression){
-					color->head->buf=calloc(1,size+8); /* allocat slightly bigger buffer for get_bits */
+					color->head->buf=calloc(1,size+8); /* allocate slightly bigger buffer for get_bits */
 					memcpy(color->head->buf,dstr,size);
 					color->head->len=size;
 				}else{ /* handle 5pixel in 8 bits compression */
@@ -224,14 +246,41 @@ static void write_line(image_t*img,FILE* fp,int pos_y){
 	unsigned int x;
 	unsigned int written;
 	unsigned char* line=malloc(img->width*3);
-	color_t* Y=get_color(img,'Y');
 	color_t* C=get_color(img,'C');
 	color_t* M=get_color(img,'M');
+	color_t* Y=get_color(img,'Y');
 	color_t* K=get_color(img,'K');
-	color_t* k=get_color(img,'k');
 	color_t* c=get_color(img,'c');
 	color_t* m=get_color(img,'m');
 	color_t* y=get_color(img,'y');
+	color_t* k=get_color(img,'k');
+	color_t* H=get_color(img,'H');
+	color_t* R=get_color(img,'R');
+	color_t* G=get_color(img,'G');
+	/* color_t* A=get_color(img,'A'); */
+	/* color_t* B=get_color(img,'B'); */
+	/* color_t* D=get_color(img,'D'); */
+	/* color_t* E=get_color(img,'E'); */
+	/* color_t* F=get_color(img,'F'); */
+	/* color_t* I=get_color(img,'I'); */
+	/* color_t* J=get_color(img,'J'); */
+	/* color_t* L=get_color(img,'L'); */
+	/* color_t* N=get_color(img,'N'); */
+	/* color_t* O=get_color(img,'O'); */
+	/* color_t* P=get_color(img,'P'); */
+	/* color_t* Q=get_color(img,'Q'); */
+	/* color_t* S=get_color(img,'S'); */
+	/* color_t* T=get_color(img,'T'); */
+	/* color_t* U=get_color(img,'U'); */
+	/* color_t* V=get_color(img,'V'); */
+	/* color_t* W=get_color(img,'W'); */
+	/* color_t* X=get_color(img,'X'); */
+	/* color_t* Z=get_color(img,'Z'); */
+	/* color_t* a=get_color(img,'a'); */
+	/* color_t* b=get_color(img,'b'); */
+	/* color_t* d=get_color(img,'d'); */
+	/* color_t* e=get_color(img,'e'); */
+	/* color_t* f=get_color(img,'f'); */
 	GetBitContext gb[MAX_COLORS];
 	/* move iterator */
 	advance(img,pos_y);
@@ -245,12 +294,14 @@ static void write_line(image_t*img,FILE* fp,int pos_y){
 		int lK=0,lM=0,lY=0,lC=0;
 		/* get pixel values */
 		for(i=0;i<MAX_COLORS;i++){
-			if(inside_range(&img->color[i],x,pos_y))
-				img->color[i].value = get_bits(&gb[i],img->color[i].bpp);
-			else
-				img->color[i].value = 0;
-			/* update statistics */
-			(img->color[i].dots)[img->color[i].value] += 1;
+		  if(inside_range(&img->color[i],x,pos_y))
+		    img->color[i].value = get_bits(&gb[i],img->color[i].bpp);
+		  else
+		    img->color[i].value = 0;
+		  /* update statistics */
+		  (img->color[i].dots)[img->color[i].value] += 1;
+		  /* set to 1 if the level is used */	
+		  (img->color[i].usedlevels)[img->color[i].value]=1;
 		}
 		/* calculate CMYK values */
 		lK=K->density * K->value/(K->level-1) + k->density * k->value/(k->level-1);
@@ -298,7 +349,12 @@ static void write_ppm(image_t* img,FILE* fp){
 	int i;
 	/* allocate buffers for dot statistics */
         for(i=0;i<MAX_COLORS;i++){
-		img->color[i].dots=calloc(1,sizeof(int)*(img->color[i].level+1));
+	  /*img->color[i].dots=calloc(1,sizeof(int)*(img->color[i].level+1));*/
+	  img->color[i].dots=calloc(1,sizeof(int)*(1<<(img->color[i].bpp)+1));
+	}	
+	/* allocate buffers for levels used*/
+        for(i=0;i<MAX_COLORS;i++){
+	  img->color[i].usedlevels=calloc(1,sizeof(int)*(1<<(img->color[i].bpp)+1));
 	}	
 
 	/* write header */
@@ -316,9 +372,22 @@ static void write_ppm(image_t* img,FILE* fp){
 	/* output some statistics */
 	printf("statistics:\n");
 	for(i=0;i<MAX_COLORS;i++){
-		int level;
-		for(level=0;level < img->color[i].level;level++)
-			printf("color %c level %i dots %i\n",img->color[i].name,level,img->color[i].dots[level]);
+	  int level;
+	  if (img->color[i].bpp > 0) {
+	    /*for(level=0;level < img->color[i].level;level++)*/
+	    for(level=0;level < 1<<(img->color[i].bpp);level++)
+	      printf("color %c level %i dots %i\n",img->color[i].name,level,img->color[i].dots[level]);
+	  }
+	}
+	printf("Level values actually used:\n");
+	for(i=0;i<MAX_COLORS;i++){
+	  int level;
+	  if (img->color[i].bpp > 0) {
+	    printf("color %c bpp %i available levels %i declared levels %i --- actual level values used:\n",img->color[i].name,img->color[i].bpp,1<<(img->color[i].bpp),img->color[i].level);
+	    for(level=0;level < 1<<(img->color[i].bpp);level++)
+	      printf("%i",img->color[i].usedlevels[level]);
+	    printf("\n");
+	  }
 	}
 	/* translate area coordinates to 1/72 in (the gutenprint unit)*/
 	img->image_top = img->image_top * 72.0 / img->yres ;
@@ -348,11 +417,14 @@ static int process(FILE* in, FILE* out,int verbose,unsigned int maxw,unsigned in
 	unsigned char* buf=malloc(0xFFFF);
 	int returnv=0;
 	int i;
+	unsigned int xml_read;
+	xml_read=0;
+
 	printf("------- parsing the printjob -------\n");
 	while(!returnv && !feof(in)){
 		unsigned char cmd;
 		unsigned int cnt = 0;
-		if((returnv = nextcmd(in,&cmd,buf,&cnt)))
+		if((returnv = nextcmd(in,&cmd,buf,&cnt,&xml_read)))
 			break;
 		switch(cmd){
 			case 'c':
@@ -382,7 +454,7 @@ static int process(FILE* in, FILE* out,int verbose,unsigned int maxw,unsigned in
 				printf("ESC (I select data transmission (len=%i): ",cnt);
 				if(buf[0]==0)printf("default");
 				else if(buf[0]==1)printf("multi raster");
-				else printf("unknown 0x%x",buf[0]);
+				else printf("unknown 0x%x %i",buf[0],buf[0]);
 				printf("\n");
 				break;
 			case 'l':
@@ -400,64 +472,111 @@ static int process(FILE* in, FILE* out,int verbose,unsigned int maxw,unsigned in
 			case 't':
 				printf("ESC (t set image cnt %i\n",cnt);
 				if(buf[0]>>7){
-				        char order[]="CMYKcmyk";
+				        /* usual order */
+				        char order[]="CMYKcmykHRGABDEFIJLMNOPQSTUVWXZabdef";
+				        /* MP960 photo modes: k instead of K */
+					/* char order[]="CMYkcmyKHRGABDEFIJLMNOPQSTUVWXZabdef";*/
+					/* T-shirt transfer mode: y changed to k --- no y, no K */
+					/*char order[]="CMYKcmkyHRGABDEFIJLMNOPQSTUVWXZabdef";*/
+					/* MP990, MG6100, MG8100 plain modes */
+				        /*char order[]="KCcMmYykRHGABDEFIJLMNOPQSTUVWXZabdef";*/
+					/* MP990 etc. photo modes */
+				        /* char order[]="KCcMmYykRHGABDEFIJLMNOPQSTUVWXZabdef"; */
 					int black_found = 0;
 					int num_colors = (cnt - 3)/3;
 					printf(" bit_info: using detailed color settings for max %i colors\n",num_colors);
 					if(buf[1]==0x80)
 						printf(" format: BJ indexed color image format\n");
+                                        else if(buf[1]==0x00)
+						printf(" format: iP8500 flag set, BJ indexed color image format\n");
+                                        else if(buf[1]==0x90)
+						printf(" format: Pro9500 flag set, BJ indexed color image format\n");
 					else{
 						printf(" format: settings not supported 0x%x\n",buf[1]);
-						returnv = -2;
+						/* returnv = -2; */
 					}
-					if(buf[2] != 0x1){
+					if(buf[2]==0x1)
+					        printf(" ink: BJ indexed setting, also for iP8500 flag\n");
+					else if(buf[2]==0x4)
+					        printf(" ink: Pro series setting \n");
+					else{
 						printf(" ink: settings not supported 0x%x\n",buf[2]);
-						returnv = -2;
+						/* returnv = -2; */
 					}
 
 					for(i=0;i<num_colors;i++){
-					        if(i<MAX_COLORS){	
-						    img->color[i].name=order[i];
-						    img->color[i].compression=buf[3+i*3] >> 5;
-						    img->color[i].bpp=buf[3+i*3] & 31;
-						    img->color[i].level=(buf[3+i*3+1] << 8) + buf[3+i*3+2];
-                                                    /* this is not supposed to give accurate images */
-                                                    if(i<4)
-                                                         img->color[i].density = 255;
-                                                    else
-                                                         img->color[i].density = 128;
-						    if((order[i] == 'K' || order[i] =='k') && img->color[i].bpp)
-						         black_found = 1;
-                                                    if(order[i] == 'y' && !black_found && img->color[i].level){
-                                                        printf("iP6700 hack: treating colordefinition at the y position as k\n");
-                                                        img->color[i].name = 'k';
-                                                        order[i] = 'k';
-                                                        order[i+1] = 'y';
-							black_found = 1;
-                                                        img->color[i].density = 255;
-                                                    }
-						    printf(" Color %c Compression: %i bpp %i level %i\n",img->color[i].name,
-							img->color[i].compression,img->color[i].bpp,img->color[i].level);
-                                                }else{
-						    printf(" Color ignoring setting %x %x %x\n",buf[3+i*3],buf[3+i*3+1],buf[3+i*3+2]);
-						}
-
+					  if(i<MAX_COLORS){	
+					    img->color[i].name=order[i];
+					    img->color[i].compression=buf[3+i*3] >> 5;
+					    img->color[i].bpp=buf[3+i*3] & 31;
+					    img->color[i].level=(buf[3+i*3+1] << 8) + buf[3+i*3+2];/* check this carefully */
+					    
+					    /* work around for levels not matching (bpp gives more) */
+					    /*if ((img->color[i].level == 3) && (img->color[i].bpp == 2)) {
+					      printf("WARNING: color %c bpp %i declared levels %i, setting to 4 for testing \n",img->color[i].name,img->color[i].bpp,img->color[i].level);
+					      img->color[i].level = 4;
+					      } */
+					    /*else if ((img->color[i].level == 4) && (img->color[i].bpp == 4)) {*/
+					    /* levels is 16 but only each 2nd level is used */
+					    /*  printf("WARNING: color %c bpp %i declared levels %i, setting to 16 for testing \n",img->color[i].name,img->color[i].bpp,img->color[i].level);
+						img->color[i].level = 16;
+						} */
+					    
+					    /* this is not supposed to give accurate images */
+					    /* if(i<4) */ /* set to actual colors CMYK */
+					    if((img->color[i].name =='K')||(img->color[i].name =='C')||(img->color[i].name =='M')||(img->color[i].name =='Y') ) 
+					      img->color[i].density = 255;
+					    else
+					      img->color[i].density = 128; /*128+96;*/ /* try to add 0x80 to sub-channels for MP450 hi-quality mode */
+					    if((order[i] == 'K' || order[i] == 'k') && img->color[i].bpp)
+					      black_found = 1;
+					    if(order[i] == 'y' && !black_found && img->color[i].level){
+					      printf("iP6700 hack: treating color definition at the y position as k\n");
+					      img->color[i].name = 'k';
+					      order[i] = 'k';
+					      order[i+1] = 'y';
+					      black_found = 1;
+					      img->color[i].density = 255;
+					    } /* %c*/
+					    printf(" Color %c Compression: %i bpp %i level %i\n",img->color[i].name,
+						   img->color[i].compression,img->color[i].bpp,img->color[i].level);
+					  }else{
+					    printf(" Color %c Compression: %i bpp %i level %i\n",img->color[i].name,
+						   img->color[i].compression,img->color[i].bpp,img->color[i].level);
+					    /*printf(" Color ignoring setting %x %x %x\n",buf[3+i*3],buf[3+i*3+1],buf[3+i*3+2]);*/
+					  }
+					  
 					}
-
-
+					
+					
 				}else if(buf[0]==0x1 && buf[1]==0x0 && buf[2]==0x1){
 					printf(" 1bit-per pixel\n");
-					for(i=0;i<MAX_COLORS;i++){
-						const char order[]="CMYKcmyk";
+					int num_colors = cnt*3; /*no idea yet! 3 for iP4000 */
+					/*num_colors=9;*/
+					/*for(i=0;i<MAX_COLORS;i++){*/
+					for(i=0;i<num_colors;i++){
+					  if(i<MAX_COLORS){	
+					        /* usual */
+					        const char order[]="CMYKcmykHRGABDEFIJLMNOPQSTUVWXZabdef";
+						/* MP990, MG6100, MG8100 plain modes */
+						/*const char order[]="KCcMmYykRHGABDEFIJLMNOPQSTUVWXZabdef";*/
 						img->color[i].name=order[i];
 						img->color[i].compression=0;
 						img->color[i].bpp=1;
 						img->color[i].level=2;
 						img->color[i].density = 255;
+						/*add color printout for this type also %c */
+						printf(" Color %c Compression: %i bpp %i level %i\n",img->color[i].name,
+						       img->color[i].compression,img->color[i].bpp,img->color[i].level);
+					  }else{
+					    printf(" Color %c Compression: %i bpp %i level %i\n",img->color[i].name,
+						       img->color[i].compression,img->color[i].bpp,img->color[i].level);
+						/*printf(" Color ignoring setting %x %x %x\n",buf[3+i*3],buf[3+i*3+1],buf[3+i*3+2]);*/
+					  }
 					}
 				}else{
 					printf(" bit_info: unknown settings 0x%x 0x%x 0x%x\n",buf[0],buf[1],buf[2]);
-					returnv=-2;
+					/* returnv=-2; */
 				}
 				break;
 			case 'L':
@@ -465,8 +584,17 @@ static int process(FILE* in, FILE* out,int verbose,unsigned int maxw,unsigned in
 				img->color_order=calloc(1,cnt+1);
 				/* check if the colors are sane => the iP4000 driver appends invalid bytes in the highest resolution mode */
 				for(i=0;i<cnt;i++){
-					if(!valid_color(buf[i]))
-						break;
+				  if (!valid_color(buf[i]))
+				    if (!(valid_color(buf[i]-0x80))) {
+				      printf("invalid color char [failed on initial]\n");
+				      break;
+				    }
+				    else {
+				      buf[i]=buf[i]-0x80;
+				      printf("subtracting 0x80 to give [corrected]: %c\n", buf[i]);
+				    }
+				  else
+				    printf("found valid color char: %c\n",buf[i]);
 				}
 				cnt = i;
 				memcpy(img->color_order,buf,cnt);
@@ -563,7 +691,7 @@ static int process(FILE* in, FILE* out,int verbose,unsigned int maxw,unsigned in
 	}
 
 	printf("-------- finished parsing   --------\n");
-	if(returnv < 0){
+	if(returnv < -2){ /* was < 0 :  work around to see what we get */
 		printf("error: parsing the printjob failed error %i\n",returnv);
 	} else {
 	

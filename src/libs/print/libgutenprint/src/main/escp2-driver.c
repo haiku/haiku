@@ -1,5 +1,5 @@
 /*
- * "$Id: escp2-driver.c,v 1.56 2010/06/26 20:02:02 rlk Exp $"
+ * "$Id: escp2-driver.c,v 1.57 2010/12/19 02:51:37 rlk Exp $"
  *
  *   Print plug-in EPSON ESC/P2 driver for the GIMP.
  *
@@ -294,6 +294,8 @@ escp2_set_remote_sequence(stp_vars_t *v)
 	  if (pd->borderless_sequence)
 	    stp_write_raw(pd->borderless_sequence, v);
 	}
+      if (pd->inkname->init_sequence)
+	stp_write_raw(pd->inkname->init_sequence, v);
       /* Exit remote mode */
 
       stp_send_command(v, "\033", "ccc", 0, 0, 0);
@@ -627,6 +629,8 @@ stpi_escp2_deinit_printer(stp_vars_t *v)
   if (pd->advanced_command_set || pd->input_slot)
     {
       stp_send_command(v, "\033(R", "bcs", 0, "REMOTE1");
+      if (pd->inkname->deinit_sequence)
+	stp_write_raw(pd->inkname->deinit_sequence, v);
       if (pd->input_slot && pd->input_slot->deinit_sequence)
 	stp_write_raw(pd->input_slot->deinit_sequence, v);
       /* Load settings from NVRAM */

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   "$Id: papers.xml,v 1.8 2009/08/25 12:54:57 rlk Exp $"
+   "$Id: papers.xml,v 1.9 2010/11/16 13:51:55 gernot2270 Exp $"
 
    XML description of papers known to libgutenprint.
    You can add additional paper sizes here.
@@ -122,8 +122,20 @@
       <height value="360"/>
       <unit value="english-extended"/>
     </paper>
+    <paper name="w252h360J">
+      <description translate="value" value="L"/>
+      <width value="252"/>
+      <height value="360"/>
+      <unit value="english-extended"/>
+    </paper>
     <paper name="w288h432">
       <description translate="value" value="4x6"/>
+      <width value="288"/>
+      <height value="432"/>
+      <unit value="english"/>
+    </paper>
+    <paper name="w288h432J">
+      <description translate="value" value="KG"/>
       <width value="288"/>
       <height value="432"/>
       <unit value="english"/>
@@ -148,8 +160,20 @@
       <right value="22"/>
       <bottom value="43"/>
     </paper>
+    <paper name="w288h576">
+      <description translate="value" value="4x8"/>
+      <width value="288"/>
+      <height value="576"/>
+      <unit value="english-extended"/>
+    </paper>
     <paper name="w360h504">
       <description translate="value" value="5x7"/>
+      <width value="360"/>
+      <height value="504"/>
+      <unit value="english-extended"/>
+    </paper>
+    <paper name="w360h504J">
+      <description translate="value" value="2L"/>
       <width value="360"/>
       <height value="504"/>
       <unit value="english-extended"/>
@@ -168,6 +192,13 @@
     </paper>
     <paper name="c8x10">
       <description translate="value" value="8x10"/>
+      <width value="576"/>
+      <height value="720"/>
+      <unit value="english-extended"/>
+    </paper>
+    <paper name="c8x10J">
+      <description translate="value" value="Rokukire"/>
+      <comment value="Same size as 8x10"/>
       <width value="576"/>
       <height value="720"/>
       <unit value="english-extended"/>
@@ -208,10 +239,24 @@
       <height value="864"/>
       <unit value="english-extended"/>
     </paper>
+    <paper name="w720h864J">
+      <description translate="value" value="YonKire"/>
+      <comment value="10in x 12in"/>
+      <width value="720"/>
+      <height value="864"/>
+      <unit value="english-extended"/>
+    </paper>
     <paper name="w792h1008">
       <description translate="value" value="11x14"/>
       <width value="792"/>
       <height value="1008"/>
+      <unit value="english-extended"/>
+    </paper>
+    <paper name="w1008h1224J">
+      <description translate="value" value="HanKire"/>
+      <comment value="14in x 17in"/>
+      <width value="1008"/>
+      <height value="1224"/>
       <unit value="english-extended"/>
     </paper>
     <paper name="w1152h1440">
@@ -1179,6 +1224,13 @@
       <height value="504"/>
       <unit value="english-extended"/>
     </paper>
+    <paper name="w288h512">
+      <description translate="value" value="Wide 101.6x180.6"/>
+      <comment value="Wide 101.6mm x 180.6mm (4in x 7.11in)"/>
+      <width value="288"/>
+      <height value="512"/>
+      <unit value="english-extended"/>
+    </paper>
     <paper name="w253h337">
       <description translate="value" value="CP_L"/>
       <comment value="89mm x 119mm"/>
@@ -1221,6 +1273,14 @@
       <height value="1871"/>
       <unit value="english-extended"/>
     </paper>
+    <paper name="A3plus">
+      <description translate="value" value="A3+"/>
+      <comment value="329mm x 483mm"/>
+      <width value="932"/>
+      <height value="1369"/>
+      <unit value="metric-extended"/>
+    </paper>
+
 <!--
     Custom
 -->

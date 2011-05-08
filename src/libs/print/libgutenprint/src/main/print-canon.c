@@ -1,5 +1,5 @@
 /*
- * "$Id: print-canon.c,v 1.230 2008/12/21 10:49:50 faust3 Exp $"
+ * "$Id: print-canon.c,v 1.249 2011/05/01 07:40:55 gernot2270 Exp $"
  *
  *   Print plug-in CANON BJL driver for the GIMP.
  *
@@ -120,8 +120,11 @@ pack_pixels(unsigned char* buf,int len)
 #define CANON_CAP_px        0x2000ul
 #define CANON_CAP_rr        0x4000ul
 #define CANON_CAP_I         0x8000ul
+#define CANON_CAP_T         0x10000ul /* not sure of this yet! */
 #define CANON_CAP_P         0x20000ul
 #define CANON_CAP_DUPLEX    0x40000ul
+#define CANON_CAP_XML       0x80000ul /* not sure of this yet */
+#define CANON_CAP_CARTRIDGE 0x100000ul /* not sure of this yet */
 
 #define CANON_CAP_STD0 (CANON_CAP_b|CANON_CAP_c|CANON_CAP_d|\
                         CANON_CAP_l|CANON_CAP_q|CANON_CAP_t)
@@ -196,85 +199,85 @@ static void canon_write_multiraster(stp_vars_t *v,canon_privdata_t* pd,int y);
 static const stp_parameter_t the_parameters[] =
 {
   {
-    "PageSize", N_("Page Size"), N_("Basic Printer Setup"),
+    "PageSize", N_("Page Size"), "Color=No,Category=Basic Printer Setup",
     N_("Size of the paper being printed to"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "MediaType", N_("Media Type"), N_("Basic Printer Setup"),
+    "MediaType", N_("Media Type"), "Color=Yes,Category=Basic Printer Setup",
     N_("Type of media (plain paper, photo paper, etc.)"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "InputSlot", N_("Media Source"), N_("Basic Printer Setup"),
+    "InputSlot", N_("Media Source"), "Color=No,Category=Basic Printer Setup",
     N_("Source (input slot) of the media"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "CDInnerRadius", N_("CD Hub Size"), N_("Basic Printer Setup"),
+    "CDInnerRadius", N_("CD Hub Size"), "Color=No,Category=Basic Printer Setup",
     N_("Print only outside of the hub of the CD, or all the way to the hole"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "CDOuterDiameter", N_("CD Size (Custom)"), N_("Basic Printer Setup"),
+    "CDOuterDiameter", N_("CD Size (Custom)"), "Color=No,Category=Basic Printer Setup",
     N_("Variable adjustment for the outer diameter of CD"),
     STP_PARAMETER_TYPE_DIMENSION, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_ADVANCED, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "CDInnerDiameter", N_("CD Hub Size (Custom)"), N_("Basic Printer Setup"),
+    "CDInnerDiameter", N_("CD Hub Size (Custom)"), "Color=No,Category=Basic Printer Setup",
     N_("Variable adjustment to the inner hub of the CD"),
     STP_PARAMETER_TYPE_DIMENSION, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_ADVANCED, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "CDXAdjustment", N_("CD Horizontal Fine Adjustment"), N_("Advanced Printer Setup"),
+    "CDXAdjustment", N_("CD Horizontal Fine Adjustment"), "Color=No,Category=Advanced Printer Setup",
     N_("Fine adjustment to horizontal position for CD printing"),
     STP_PARAMETER_TYPE_DIMENSION, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_ADVANCED, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "CDYAdjustment", N_("CD Vertical Fine Adjustment"), N_("Advanced Printer Setup"),
+    "CDYAdjustment", N_("CD Vertical Fine Adjustment"), "Color=No,Category=Advanced Printer Setup",
     N_("Fine adjustment to horizontal position for CD printing"),
     STP_PARAMETER_TYPE_DIMENSION, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_ADVANCED, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "Resolution", N_("Resolution"), N_("Basic Printer Setup"),
+    "Resolution", N_("Resolution"), "Color=Yes,Category=Basic Printer Setup",
     N_("Resolution and quality of the print"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "InkType", N_("Ink Type"), N_("Advanced Printer Setup"),
+    "InkType", N_("Ink Type"), "Color=Yes,Category=Advanced Printer Setup",
     N_("Type of ink in the printer"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "InkChannels", N_("Ink Channels"), N_("Advanced Printer Functionality"),
+    "InkChannels", N_("Ink Channels"), "Color=Yes,Category=Advanced Printer Functionality",
     N_("Ink Channels"),
     STP_PARAMETER_TYPE_INT, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_INTERNAL, 0, 0, STP_CHANNEL_NONE, 0, 0
   },
   {
-    "PrintingMode", N_("Printing Mode"), N_("Core Parameter"),
+    "PrintingMode", N_("Printing Mode"), "Color=Yes,Category=Core Parameter",
     N_("Printing Output Mode"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_CORE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "Duplex", N_("Double-Sided Printing"), N_("Basic Printer Setup"),
+    "Duplex", N_("Double-Sided Printing"), "Color=No,Category=Basic Printer Setup",
     N_("Duplex/Tumble Setting"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 1, 0
   },
   {
-    "Quality", N_("Print Quality"), N_("Basic Output Adjustment"),
+    "Quality", N_("Print Quality"), "Color=Yes,Category=Basic Output Adjustment",
     N_("Print Quality"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
     STP_PARAMETER_LEVEL_BASIC, 1, 1, STP_CHANNEL_NONE, 0, 0
@@ -297,7 +300,7 @@ static const float_param_t float_parameters[] =
 {
   {
     {
-      "CyanDensity", N_("Cyan Density"), N_("Output Level Adjustment"),
+      "CyanDensity", N_("Cyan Density"), "Color=Yes,Category=Output Level Adjustment",
       N_("Adjust the cyan density"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED, 0, 1, 1, 1, 0
@@ -305,7 +308,7 @@ static const float_param_t float_parameters[] =
   },
   {
     {
-      "MagentaDensity", N_("Magenta Density"), N_("Output Level Adjustment"),
+      "MagentaDensity", N_("Magenta Density"), "Color=Yes,Category=Output Level Adjustment",
       N_("Adjust the magenta density"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED, 0, 1, 2, 1, 0
@@ -313,7 +316,7 @@ static const float_param_t float_parameters[] =
   },
   {
     {
-      "YellowDensity", N_("Yellow Density"), N_("Output Level Adjustment"),
+      "YellowDensity", N_("Yellow Density"), "Color=Yes,Category=Output Level Adjustment",
       N_("Adjust the yellow density"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED, 0, 1, 3, 1, 0
@@ -321,7 +324,7 @@ static const float_param_t float_parameters[] =
   },
   {
     {
-      "BlackDensity", N_("Black Density"), N_("Output Level Adjustment"),
+      "BlackDensity", N_("Black Density"), "Color=Yes,Category=Output Level Adjustment",
       N_("Adjust the black density"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED, 0, 1, 0, 1, 0
@@ -329,7 +332,7 @@ static const float_param_t float_parameters[] =
   },
   {
     {
-      "LightCyanTrans", N_("Light Cyan Transition"), N_("Advanced Ink Adjustment"),
+      "LightCyanTrans", N_("Light Cyan Transition"), "Color=Yes,Category=Advanced Ink Adjustment",
       N_("Light Cyan Transition"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED4, 0, 1, STP_CHANNEL_NONE, 1, 0
@@ -337,7 +340,7 @@ static const float_param_t float_parameters[] =
   },
   {
     {
-      "LightMagentaTrans", N_("Light Magenta Transition"), N_("Advanced Ink Adjustment"),
+      "LightMagentaTrans", N_("Light Magenta Transition"), "Color=Yes,Category=Advanced Ink Adjustment",
       N_("Light Magenta Transition"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED4, 0, 1, STP_CHANNEL_NONE, 1, 0
@@ -345,7 +348,7 @@ static const float_param_t float_parameters[] =
   },
  {
     {
-      "LightYellowTrans", N_("Light Yellow Transition"), N_("Advanced Ink Adjustment"),
+      "LightYellowTrans", N_("Light Yellow Transition"), "Color=Yes,Category=Advanced Ink Adjustment",
       N_("Light Yellow Transition"),
       STP_PARAMETER_TYPE_DOUBLE, STP_PARAMETER_CLASS_OUTPUT,
       STP_PARAMETER_LEVEL_ADVANCED4, 0, 1, STP_CHANNEL_NONE, 1, 0
@@ -396,7 +399,9 @@ static const char* canon_families[] = {
  "PIXMA iX",
  "PIXMA MP",
  "PIXUS",
- "PIXMA Pro"
+ "PIXMA Pro",
+ "PIXMA MG",
+ "PIXMA MX",
 };
 
 /* canon model ids look like the following
@@ -538,17 +543,32 @@ canon_size_type(const stp_vars_t *v, const canon_cap_t * caps)
     {
       const char *name = pp->name;
       /* used internally: do not translate */
-      /* built ins: */
+      /* built ins:                                  Japanese driver notation */
       if (!strcmp(name,"A5"))          return 0x01;
       if (!strcmp(name,"A4"))          return 0x03;
-      if (!strcmp(name,"B5"))          return 0x08;
+      if (!strcmp(name,"A3"))          return 0x05;
+      if (!strcmp(name,"B5"))          return 0x08; 
+      if (!strcmp(name,"B4"))          return 0x0a;
       if (!strcmp(name,"Letter"))      return 0x0d;
       if (!strcmp(name,"Legal"))       return 0x0f;
-      if (!strcmp(name,"COM10")) return 0x16;
-      if (!strcmp(name,"DL")) return 0x17;
-      if (!strcmp(name,"LetterExtra"))     return 0x2a;
-      if (!strcmp(name,"A4Extra"))         return 0x2b;
-      if (!strcmp(name,"w288h144"))   return 0x2d;
+      if (!strcmp(name,"Tabloid"))     return 0x11; /* 11x17 */
+      if (!strcmp(name,"w283h420"))    return 0x14; /* Hagaki */
+      if (!strcmp(name,"COM10"))       return 0x16;
+      if (!strcmp(name,"DL"))          return 0x17;
+      if (!strcmp(name,"LetterExtra")) return 0x2a;
+      if (!strcmp(name,"A4Extra"))     return 0x2b;
+      if (!strcmp(name,"A3plus"))      return 0x2c; /* A3navi --- A3+ */
+      if (!strcmp(name,"w288h144"))    return 0x2d;
+      if (!strcmp(name,"w252h360J"))   return 0x32; /* L --- similar to US 3.5x5 size */
+      if (!strcmp(name,"w360h504J"))   return 0x33; /* 2L --- similar to US5x7 */
+      if (!strcmp(name,"w288h432J"))   return 0x34; /* KG --- same size as US 4x6 */
+      if (!strcmp(name,"w360h504"))    return 0x37; /* US5x7 */
+      if (!strcmp(name,"w420h567"))    return 0x39; /* Ofuku Hagaki */
+      if (!strcmp(name,"w288h576"))    return 0x46; /* US4x8 */
+      if (!strcmp(name,"w1008h1224J")) return 0x47; /* HanKire --- 14in x 17in */
+      if (!strcmp(name,"720h864J"))    return 0x48; /* YonKire --- 10in x 12 in*/
+      if (!strcmp(name,"c8x10J"))      return 0x49; /* RokuKire --- same size as 8x10 */
+      if (!strcmp(name,"w288h512"))    return 0x52; /* Wide101.6x180.6 */
       /* custom */
 
       stp_deprintf(STP_DBG_CANON,"canon: Unknown paper size '%s' - using custom\n",name);
@@ -833,6 +853,30 @@ canon_parameters(const stp_vars_t *v, const char *name,
 			       _("Standard"));
     description->deflt.str = "Standard";
   }
+  /* Cartridge selection for those printers that have it */
+  else if (strcmp(name, "Cartridge") == 0)
+  {
+    int offer_cartridge_selection = 0;
+    description->bounds.str = stp_string_list_create();
+    stp_string_list_add_string(description->bounds.str, "Both",
+			       _("Both"));
+    stp_string_list_add_string(description->bounds.str, "Color",
+			       _("Color"));
+    stp_string_list_add_string(description->bounds.str, "Black",
+			       _("Black"));
+
+    /* description->deflt.str = "Both"; */
+    /* Note: not necessary set cartridge if Mono mode */
+
+    if (caps->features & CANON_CAP_CARTRIDGE)
+      {
+	description->deflt.str =
+	  stp_string_list_param(description->bounds.str, 0)->name;
+      }
+    else
+      description->is_active = 0;
+  }
+
 }
 
 
@@ -1248,13 +1292,53 @@ canon_init_setPageMargins2(const stp_vars_t *v, const canon_privdata_t *init)
 }
 
 /* ESC (P -- 0x50 -- unknown -- :
- */
+   seems to set media and page information. Different byte lengths depending on printer model. */
 static void
 canon_init_setESC_P(const stp_vars_t *v, const canon_privdata_t *init)
 {
-	if(!(init->caps->features & CANON_CAP_P))
-		return;
-	canon_cmd( v,ESC28,0x50,4,0x00,0x03,0x00,0x00 );
+  unsigned char arg_ESCP_2;
+  if(!(init->caps->features & CANON_CAP_P))
+    return;
+
+  arg_ESCP_2 = (init->pt) ? init->pt->media_code_P: 0x00;
+
+  /* models that add two more bytes "1 0" to the end of the usual 4-byte sequence: */
+  /* iP2700 */
+  /* MX340 */
+  /* MX350 --- same driver as MX340 */
+  /* MX360 */
+  /* MX410 --- same driver as MX360 */
+  /* MX420 */
+  /* MX870 */
+  /* MX880 */
+  /* MP493 */
+  /* MP550 */
+  /* MP640 */
+  /* iX6500 */
+  /* iX7000 */
+  if ( (!strcmp(init->caps->name,"iP2700")) || (!strcmp(init->caps->name,"MX340")) || (!strcmp(init->caps->name,"MX360")) || (!strcmp(init->caps->name,"MX410")) || (!strcmp(init->caps->name,"MX420")) || (!strcmp(init->caps->name,"MX870"))  || (!strcmp(init->caps->name,"MX880"))  || (!strcmp(init->caps->name,"MP550")) || (!strcmp(init->caps->name,"MP493")) || (!strcmp(init->caps->name,"MP640")) || (!strcmp(init->caps->name,"iX6500")) || (!strcmp(init->caps->name,"iX7000")) || (!strcmp(init->caps->name,"iP4700")) || (!strcmp(init->caps->name,"iP4800")) )
+ /* add a lot more here: try if(init->caps->model_id >= 3) how to guess for 4 bytes or more */
+    {/* the 4th of the 6 bytes is the media type. 2nd byte is media size. Both read from canon-media array. */
+
+      /* arg_ESCP_1 = 0x03; */ /* A4 size */
+      /* arg_ESCP_2 = 0x00; */ /* plain media */
+      /*                             size      media                */
+      canon_cmd( v,ESC28,0x50,6,0x00,0x03,0x00,arg_ESCP_2,0x01,0x00);
+    }
+  else 
+    /*                             size      media       */
+    canon_cmd( v,ESC28,0x50,4,0x00,0x03,0x00,arg_ESCP_2 );
+}
+
+/* ESC (T -- 0x54 -- setCartridge -- :
+ */
+static void
+canon_init_setCartridge(const stp_vars_t *v, const canon_privdata_t *init)
+{
+  if (!(init->caps->features & CANON_CAP_T))
+    return;
+
+  canon_cmd(v,ESC28,0x54,3,0x03,0x04,0x04); /* default: both cartridges */
 }
 
 /* ESC (q -- 0x71 -- setPageID -- :
@@ -1313,7 +1397,7 @@ canon_init_setImage(const stp_vars_t *v, const canon_privdata_t *init)
     unsigned char* buf = stp_zalloc(length);
     buf[0]=0x80;
     if(init->mode->flags & MODE_FLAG_PRO){
-    	buf[1]=0x10;
+        buf[1]=0x90; /* was 0x10, but this should probably be 0x90 */
     	buf[2]=0x4;
     }else if(init->mode->flags & MODE_FLAG_IP8500){
     	buf[1]=0x00;
@@ -1326,9 +1410,25 @@ canon_init_setImage(const stp_vars_t *v, const canon_privdata_t *init)
         if(init->mode->inks[i].ink){
           if(init->mode->inks[i].ink->flags & INK_FLAG_5pixel_in_1byte)
             buf[3+i*3+0]=(1<<5)|init->mode->inks[i].ink->bits; /*info*/
+           /*else if(init->mode->inks[i].ink->flags & INK_FLAG_lowresmode)
+             {
+               buf[3+i*3+1]=0x01;
+               buf[3+i*3+0]=init->mode->inks[i].ink->bits;
+             }*/
           else
             buf[3+i*3+0]=init->mode->inks[i].ink->bits;
+
+          /* workaround for now on the 4-4 inkset and others */
+          /*if (init->mode->inks[i].ink->bits == 4)
+            buf[3+i*3+2] = 0x04;*/
+          /*else if (init->mode->inks[i].ink->bits == 2)
+            buf[3+i*3+2] = 0x04;*/
+          /*else if (init->mode->inks[i].ink->bits == 1)
+            buf[3+i*3+2] = 0x02;*/
           buf[3+i*3+2]= init->mode->inks[i].ink->numsizes+1;/*level*/
+          /*else
+            buf[3+i*3+2] = 0x00;*/
+          /* this should show that there is an error */
        }
     }
     stp_zfwrite(ESC28,2,1,v);
@@ -1383,6 +1483,9 @@ canon_init_setImage(const stp_vars_t *v, const canon_privdata_t *init)
 static void
 canon_init_setMultiRaster(const stp_vars_t *v, const canon_privdata_t *init){
   
+  int i; /* introduced for channel counting */
+  char* raster_channel_order; /* introduced for channel counting */
+
   if(!(init->caps->features & CANON_CAP_I))
 	return;
 
@@ -1392,7 +1495,26 @@ canon_init_setMultiRaster(const stp_vars_t *v, const canon_privdata_t *init){
   /* set the color sequence */ 
   stp_zfwrite("\033(L", 3, 1, v);
   stp_put16_le(init->num_channels, v);
-  stp_zfwrite((const char *)init->channel_order,init->num_channels, 1, v);
+  /* add an exception here to add 0x60 of cmy channels for those printers/modes that require it */
+  raster_channel_order=init->channel_order;
+  /*  if (!strcmp(init->caps->name,"MP450"))*/
+    {
+      /* if cmy there, add 0x60 to each --- this is not yet correct, some modes do not require it! */
+      /*      if (init->num_channels==7) {*/
+	for(i=0;i<init->num_channels;i++){
+	  switch(init->channel_order[i]){
+	    /* case 'c':raster_channel_order[i]+=0x60; break;;*/
+	    /* case 'm':raster_channel_order[i]+=0x60; break;;*/
+	    /* case 'y':raster_channel_order[i]+=0x60; break;;*/
+	  }
+	}
+	/*}*/
+      stp_zfwrite((const char *)raster_channel_order,init->num_channels, 1, v);
+    }
+    /*  else
+    {
+      stp_zfwrite((const char *)init->channel_order,init->num_channels, 1, v);
+      }*/
 }
 
 
@@ -1416,7 +1538,8 @@ canon_init_printer(const stp_vars_t *v, const canon_privdata_t *init)
   canon_init_setColor(v,init);           /* ESC (c */
   canon_init_setPageMargins(v,init);     /* ESC (g */
   canon_init_setPageMargins2(v,init);    /* ESC (p */
-  canon_init_setESC_P(v,init);           /* ESD (P */
+  canon_init_setESC_P(v,init);           /* ESC (P */
+  canon_init_setCartridge(v,init);       /* ESC (T */
   canon_init_setTray(v,init);            /* ESC (l */
   canon_init_setX72(v,init);             /* ESC (r */
   canon_init_setMultiRaster(v,init);     /* ESC (I (J (L */
@@ -1447,13 +1570,25 @@ canon_deinit_printer(const stp_vars_t *v, const canon_privdata_t *init)
 static int
 canon_start_job(const stp_vars_t *v, stp_image_t *image)
 {
+  const canon_cap_t * caps = canon_get_model_capabilities(v);
+  /* output XML for iP2700 and other devices */
+  if (caps->features & CANON_CAP_XML) {
+    int length=strlen(prexml_iP2700); /* 680 */
+    stp_zfwrite((const char*)prexml_iP2700,length,1,v);
+  }
   return 1;
 }
 
 static int
 canon_end_job(const stp_vars_t *v, stp_image_t *image)
 {
+  const canon_cap_t * caps = canon_get_model_capabilities(v);
   canon_cmd(v,ESC40,0,0);
+  /* output XML for iP2700 and other devices */
+  if (caps->features & CANON_CAP_XML) {
+    int length=strlen(postxml_iP2700); /* 263 */
+    stp_zfwrite((const char*)postxml_iP2700,length,1,v);
+  }
   return 1;
 }
 
@@ -1578,7 +1713,7 @@ static int canon_setup_channel(stp_vars_t *v,canon_privdata_t* privdata,int chan
         current->props = ink->ink;
         current->delay = delay;
         /* calculate buffer length */
-        current->buf_length = ((privdata->length * current->props->bits)+1)*(delay + 1);      
+        current->buf_length = ((privdata->length * current->props->bits)+1)*(delay + 1);
         /* update maximum buffer length */
         if(current->buf_length > privdata->buf_length_max)
              privdata->buf_length_max = current->buf_length;
@@ -1633,6 +1768,7 @@ static void canon_setup_channels(stp_vars_t *v,canon_privdata_t* privdata){
         int i;
         unsigned int subchannel = 0;
         stp_shade_t* shades = NULL;
+	int is_black_channel = 0;
         channel = channel_order[channel_idx];
         if(channel == STP_ECOLOR_K && privdata->used_inks & CANON_INK_K_MASK){ /* black channel */
             /* find K and k inks */
@@ -1641,7 +1777,7 @@ static void canon_setup_channels(stp_vars_t *v,canon_privdata_t* privdata){
                 if(ink->channel == primary[channel] || ink->channel == secondary[channel])
                     subchannel += canon_setup_channel(v,privdata,channel,subchannel,ink,&shades);
             }
-            stp_channel_set_black_channel(v, STP_ECOLOR_K);
+	    is_black_channel = 1;
         }else if(channel != STP_ECOLOR_K && privdata->used_inks & CANON_INK_CMY_MASK){  /* color channels */
             for(i=0;i<privdata->mode->num_inks;i++){
                 const canon_inkset_t* ink = &privdata->mode->inks[i];
@@ -1652,17 +1788,18 @@ static void canon_setup_channels(stp_vars_t *v,canon_privdata_t* privdata){
 
         /* set inks and density */
         if(shades){
-            stp_dither_set_inks_full(v,channel, subchannel, shades, 1.0,ink_darkness[channel]);
-            for(i=0;i<subchannel;i++){
-                double density = get_double_param(v, primary_density_control[channel]) * get_double_param(v, "Density");
-                if(i > 0 && secondary_density_control[channel])
-                    density *= get_double_param(v, secondary_density_control[channel]);
-                stp_channel_set_density_adjustment(v,channel,subchannel,density);
-            }
-            stp_free(shades);
-        } 
+          stp_dither_set_inks_full(v,channel, subchannel, shades, 1.0, ink_darkness[channel]);
+          for(i=0;i<subchannel;i++){
+            double density = get_double_param(v, primary_density_control[channel]) * get_double_param(v, "Density");
+            if(i > 0 && secondary_density_control[channel])
+              density *= get_double_param(v, secondary_density_control[channel]);
+            stp_channel_set_density_adjustment(v,channel,subchannel,density);
+          }
+	  if (is_black_channel)
+	    stp_channel_set_black_channel(v, channel);
+          stp_free(shades);
+        }
     }
-
 }
 
 

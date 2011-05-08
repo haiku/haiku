@@ -684,7 +684,6 @@ _LT_CONFIG_SAVE_COMMANDS([
 
 # `$ECHO "$ofile" | sed 's%^.*/%%'` - Provide generalized library-building support services.
 # Generated automatically by $as_me ($PACKAGE$TIMESTAMP) $VERSION
-# Libtool was configured on host `(hostname || uname -n) 2>/dev/null | sed 1q`:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
 _LT_COPYING

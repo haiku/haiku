@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.5 2009/05/30 14:10:31 rlk Exp $
+## $Id: Makefile.am,v 1.6 2011/03/29 22:58:12 rlk Exp $
 ## Copyright (C) 2008 Robert Krawitz
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -52,6 +52,7 @@ all-local: xmli18n-tmp.h xml-stamp
 
 
 xmli18n-tmp.h: xml-stamp extract-strings
+	-rm -f $@ $@.tmp
 	./extract-strings `cat xml-stamp | sed -e 's;^;$(srcdir)/;'` > $@.tmp
 	mv $@.tmp $@
 
