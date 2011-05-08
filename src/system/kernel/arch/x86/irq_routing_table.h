@@ -46,6 +46,14 @@ struct irq_descriptor {
 };
 
 
+struct pci_address {
+	uint8	segment;
+	uint8	bus;
+	uint8	device;
+	uint8	function;
+};
+
+
 // TODO: Hack until we expose ACPI structs better; these are duplicates of
 // the types in acrestype.h
 struct acpi_pci_routing_table {
