@@ -728,17 +728,15 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				expat-2.0.1-x86-gcc4-2010-11-12.zip
-				: $(baseURL)/expat-2.0.1-x86-gcc4-2010-11-12.zip
+				expat-2.0.1-x86-gcc4-2011-05-08.zip
+				: $(baseURL)/expat-2.0.1-x86-gcc4-2011-05-08.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				expat-2.0.1-r1a2-x86-gcc2-2010-04-22-a.zip
-				: $(baseURL)/expat-2.0.1-r1a2-x86-gcc2-2010-04-22-a.zip
+				expat-2.0.1-r1a2-x86-gcc2-2011-05-08.zip
+				: $(baseURL)/expat-2.0.1-x86-gcc2-2011-05-08.zip
 				: : true ;
 		}
-		InstallSourceArchive expat-2.0.1_haiku-2010-04-29.tar.xz
-			: $(baseSourceURL)/2010/expat-2.0.1_haiku-2010-04-29.tar.xz ;
 	}
 }
 
