@@ -272,7 +272,7 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
 		// pick that one and update the counts
 		irq_descriptor& chosenDescriptor
 			= link->possible_irqs.ElementAt(bestIRQIndex);
-		irqUsage[chosenDescriptor.irq]++;
+		irqUsage[chosenDescriptor.irq] += link->used_by.Count();
 
 		status_t status = set_current_irq(acpi, link->handle, chosenDescriptor);
 		if (status != B_OK) {
