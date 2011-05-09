@@ -54,7 +54,7 @@ dump_info(int argc, char **argv)
 {
 	kprintf("kernel build: %s %s (gcc%d %s)\n", __DATE__, __TIME__, __GNUC__,
 		__VERSION__);
-	kprintf("SVN revision: %s\n\n", sHaikuRevision);
+	kprintf("revision: %s\n\n", sHaikuRevision);
 
 	kprintf("cpu count: %ld, active times:\n", smp_get_num_cpus());
 
