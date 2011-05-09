@@ -160,7 +160,7 @@ typedef void (*acpi_notify_handler)(acpi_handle device, uint32 value,
 struct acpi_module_info {
 	module_info info;
 
-	status_t	(*get_handle)(acpi_handle parent, char *pathname,
+	status_t	(*get_handle)(acpi_handle parent, const char *pathname,
 					acpi_handle *retHandle);
 
 	/* Global Lock */

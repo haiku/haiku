@@ -43,7 +43,7 @@ typedef struct acpi_device_cookie {
 typedef struct acpi_root_info {
 	driver_module_info info;
 
-	status_t	(*get_handle)(acpi_handle parent, char *pathname,
+	status_t	(*get_handle)(acpi_handle parent, const char *pathname,
 					acpi_handle *retHandle);
 
 	/* Global Lock */
@@ -147,7 +147,8 @@ extern struct device_module_info embedded_controller_device_module;
 extern acpi_device_module_info gACPIDeviceModule;
 
 
-status_t get_handle(acpi_handle parent, char* pathname, acpi_handle* retHandle);
+status_t get_handle(acpi_handle parent, const char* pathname,
+	acpi_handle* retHandle);
 
 status_t acquire_global_lock(uint16 timeout, uint32* handle);
 status_t release_global_lock(uint32 handle);

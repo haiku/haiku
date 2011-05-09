@@ -262,9 +262,9 @@ acpi_std_ops(int32 op,...)
 
 
 status_t
-get_handle(acpi_handle parent, char *pathname, acpi_handle *retHandle)
+get_handle(acpi_handle parent, const char *pathname, acpi_handle *retHandle)
 {
-	return AcpiGetHandle(parent, pathname, retHandle) == AE_OK
+	return AcpiGetHandle(parent, (ACPI_STRING)pathname, retHandle) == AE_OK
 		? B_OK : B_ERROR;
 }
 
