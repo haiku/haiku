@@ -162,23 +162,92 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 
 static status_t
-configure_link_device(acpi_module_info* acpi, acpi_handle handle,
-	irq_descriptor& result)
+configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 {
-	status_t status = read_possible_irq(acpi, handle, &result);
-	if (status != B_OK) {
-		dprintf("failed to read possible IRQ configuration of link device\n");
+	/*
+		Before configuring the link devices we have to take a few things into
+		consideration:
+		* Multiple PCI devices / functions may link to the same PCI link
+		  device, so we must ensure that we don't try to configure different
+		  IRQs for each device, overwriting the previous config of the
+		  respective link device.
+		* If we can't use non-ISA IRQs then we must ensure that we don't
+		  configure any IRQs that overlaps with ISA devices (as they use
+		  different triggering modes and polarity they aren't compatible).
+		  Since the ISA bus isn't enumerable we don't have any clues as to
+		  where an ISA device might be connected. The only safe assumption
+		  therefore is to only use IRQs that are known to be usable for PCI
+		  devices. In our case we can use all the previously assigned PCI
+		  interrupt_line IRQs as stored in the bios_irq field.
+	*/
 
-		// We could try returning the current config as a fallback, but it most
-		// probably is invalid as it points to the legacy config the BIOS has
-		// done in PIC mode.
-		return status;
+	// find all unique link devices and resolve their possible IRQs
+	Vector<link_device*> links;
+	for (int i = 0; i < routingTable.Count(); i++) {
+		irq_routing_entry& irqEntry = routingTable.ElementAt(i);
+		if (irqEntry.source == NULL)
+			continue;
+
+		link_device* link = NULL;
+		for (int j = 0; j < links.Count(); j++) {
+			link_device* existing = links.ElementAt(j);
+			if (existing->handle == irqEntry.source) {
+				link = existing;
+				break;
+			}
+		}
+
+		if (link != NULL) {
+			link->used_by.PushBack(&irqEntry);
+			continue;
+		}
+
+		// A new link device, read possible IRQs and fill them in.
+		link = new(std::nothrow) link_device;
+		if (link == NULL) {
+			panic("ran out of memory while configuring irq link devices");
+			return B_NO_MEMORY;
+		}
+
+		link->handle = irqEntry.source;
+		status_t status = read_possible_irqs(acpi, link->handle,
+			link->possible_irqs);
+		if (status != B_OK) {
+			panic("failed to read possible irqs of link device");
+			return status;
+		}
+
+		link->used_by.PushBack(&irqEntry);
+		links.PushBack(link);
 	}
 
 	// TODO: Blindly set the first possible configuration (obviously not what we
 	// want to do as it will most probably result in a "everything to single
 	// IRQ" config; anyway just to get things going...)
-	return set_current_irq(acpi, handle, &result);
+	for (int i = 0; i < links.Count(); i++) {
+		link_device* link = links.ElementAt(i);
+
+		link->chosen_irq_index = 0;
+		irq_descriptor& irqDescriptor
+			= link->possible_irqs.ElementAt(link->chosen_irq_index);
+
+		status_t status = set_current_irq(acpi, link->handle, &irqDescriptor);
+		if (status != B_OK) {
+			panic("failed to set irq on link device");
+			return status;
+		}
+
+		for (int j = 0; j < link->used_by.Count(); j++) {
+			irq_routing_entry* irqEntry = link->used_by.ElementAt(j);
+			irqEntry->irq = irqDescriptor.irq;
+			irqEntry->polarity = irqDescriptor.polarity;
+			irqEntry->trigger_mode = irqDescriptor.trigger_mode;
+		}
+
+		delete link;
+	}
+
+	return B_OK;
 }
 
 
@@ -247,32 +316,12 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 		return status;
 	}
 
-	// resolve any link device so we get a straight GSI in all cases
 	if (noSource) {
-		// fixed GSI already
+		// fill in the GSI and config; link based entries will be resolved at
+		// link configuration time
 		irqEntry.irq = irqEntry.source_index;
 		irqEntry.polarity = B_LOW_ACTIVE_POLARITY;
 		irqEntry.trigger_mode = B_LEVEL_TRIGGERED;
-	} else {
-		irq_descriptor irqDescriptor;
-		status = configure_link_device(acpi, source, irqDescriptor);
-		if (status != B_OK) {
-			dprintf("failed to configure link device\n");
-			return status;
-		}
-
-		irqEntry.irq = irqDescriptor.irq;
-		irqEntry.polarity = irqDescriptor.polarity;
-		irqEntry.trigger_mode = irqDescriptor.trigger_mode;
-	}
-
-	status = update_pci_info_for_entry(pci, irqEntry);
-	if (status != B_OK) {
-#ifdef TRACE_PRT
-		dprintf("failed to update interrupt_line info for entry:\n");
-		print_irq_routing_entry(irqEntry);
-#endif
-		return status;
 	}
 
 	return B_OK;
@@ -413,9 +462,47 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 }
 
 
+status_t
+enable_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable)
+{
+	// configure the link devices; also resolves GSIs for link based entries
+	status_t status = configure_link_devices(acpi, routingTable);
+	if (status != B_OK) {
+		panic("failed to configure link devices");
+		return status;
+	}
+
+	pci_module_info* pci;
+	status = get_module(B_PCI_MODULE_NAME, (module_info**)&pci);
+	if (status != B_OK) {
+		// shouldn't happen, since the PCI module is a dependency of the
+		// ACPI module and we shouldn't be here at all if it wasn't loaded
+		dprintf("failed to get PCI module!\n");
+		return status;
+	}
+
+	// update the PCI info now that all GSIs are known
+	for (int i = 0; i < routingTable.Count(); i++) {
+		irq_routing_entry& irqEntry = routingTable.ElementAt(i);
+
+		status = update_pci_info_for_entry(pci, irqEntry);
+		if (status != B_OK) {
+#ifdef TRACE_PRT
+			dprintf("failed to update interrupt_line info for entry:\n");
+			print_irq_routing_entry(irqEntry);
+#endif
+		}
+	}
+
+	put_module(B_PCI_MODULE_NAME);
+	return B_OK;
+}
+
+
 static status_t
 read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
-	bool readCurrent, irq_descriptor* descriptor)
+	bool readCurrent, irq_descriptor* _descriptor,
+	irq_descriptor_list* descriptorList)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
@@ -434,7 +521,9 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 		return status;
 	}
 
-	descriptor->irq = 0;
+	irq_descriptor descriptor;
+	descriptor.irq = 255;
+
 	acpi_resource* resource = (acpi_resource*)buffer.pointer;
 	while (resource->Type != ACPI_RESOURCE_TYPE_END_TAG) {
 		switch (resource->Type) {
@@ -446,12 +535,20 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 					break;
 				}
 
-				descriptor->irq = irq.Interrupts[0];
-				descriptor->shareable = irq.Sharable != 0;
-				descriptor->trigger_mode = irq.Triggering == 0
+				descriptor.shareable = irq.Sharable != 0;
+				descriptor.trigger_mode = irq.Triggering == 0
 					? B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
-				descriptor->polarity = irq.Polarity == 0
+				descriptor.polarity = irq.Polarity == 0
 					? B_HIGH_ACTIVE_POLARITY : B_LOW_ACTIVE_POLARITY;
+
+				if (readCurrent)
+					descriptor.irq = irq.Interrupts[0];
+				else {
+					for (uint16 i = 0; i < irq.InterruptCount; i++) {
+						descriptor.irq = irq.Interrupts[i];
+						descriptorList->PushBack(descriptor);
+					}
+				}
 
 #ifdef TRACE_PRT
 				dprintf("acpi irq resource (%s):\n",
@@ -480,12 +577,20 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 					break;
 				}
 
-				descriptor->irq = irq.Interrupts[0];
-				descriptor->shareable = irq.Sharable != 0;
-				descriptor->trigger_mode = irq.Triggering == 0
+				descriptor.shareable = irq.Sharable != 0;
+				descriptor.trigger_mode = irq.Triggering == 0
 					? B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
-				descriptor->polarity = irq.Polarity == 0
+				descriptor.polarity = irq.Polarity == 0
 					? B_HIGH_ACTIVE_POLARITY : B_LOW_ACTIVE_POLARITY;
+
+				if (readCurrent)
+					descriptor.irq = irq.Interrupts[0];
+				else {
+					for (uint16 i = 0; i < irq.InterruptCount; i++) {
+						descriptor.irq = irq.Interrupts[i];
+						descriptorList->PushBack(descriptor);
+					}
+				}
 
 #ifdef TRACE_PRT
 				dprintf("acpi extended irq resource (%s):\n",
@@ -509,14 +614,21 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 			}
 		}
 
-		if (descriptor->irq != 0)
+		if (descriptor.irq != 255)
 			break;
 
 		resource = (acpi_resource*)((uint8*)resource + resource->Length);
 	}
 
 	free(buffer.pointer);
-	return descriptor->irq != 0 ? B_OK : B_ERROR;
+
+	if (descriptor.irq == 255)
+		return B_ERROR;
+
+	if (readCurrent)
+		*_descriptor = descriptor;
+
+	return B_OK;
 }
 
 
@@ -524,15 +636,15 @@ status_t
 read_current_irq(acpi_module_info* acpi, acpi_handle device,
 	irq_descriptor* descriptor)
 {
-	return read_irq_descriptor(acpi, device, true, descriptor);
+	return read_irq_descriptor(acpi, device, true, descriptor, NULL);
 }
 
 
 status_t
-read_possible_irq(acpi_module_info* acpi, acpi_handle device,
-	irq_descriptor* descriptor)
+read_possible_irqs(acpi_module_info* acpi, acpi_handle device,
+	irq_descriptor_list& descriptorList)
 {
-	return read_irq_descriptor(acpi, device, false, descriptor);
+	return read_irq_descriptor(acpi, device, false, NULL, &descriptorList);
 }
 
 

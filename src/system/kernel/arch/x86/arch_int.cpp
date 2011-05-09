@@ -664,6 +664,14 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
+	status = enable_irq_routing(acpiModule, table);
+	if (status != B_OK) {
+		panic("failed to enable IRQ routing");
+		// if it failed early on it might still work in PIC mode
+		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
+		return;
+	}
+
 	sLevelTriggeredInterrupts = 0;
 	sIOAPICMaxRedirectionEntry
 		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
