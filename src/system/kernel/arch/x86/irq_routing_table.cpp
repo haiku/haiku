@@ -30,6 +30,8 @@ const char* kACPIPciExpressRootName = "PNP0A08";
 	// when querying for the standard PCI root. This is due to the compatible ID
 	// fields in ACPI. TODO: Query both/the correct root device.
 
+// TODO: as per PCI 3.0, the PCI module hardcodes it in various places as well.
+static const uint8 kMaxPCIFunctionCount = 8;
 
 irq_descriptor::irq_descriptor()
 	:
@@ -68,9 +70,10 @@ print_irq_routing_entry(const irq_routing_entry& entry)
 	else
 		dprintf(" source %p %lu;", entry.source, entry.source_index);
 
-	dprintf(" pci %u:%u pin %u; bios irq: %u; gsi %u; config 0x%02x\n",
-		entry.pci_bus, entry.pci_device, entry.pin + 1, entry.bios_irq,
-		entry.irq, entry.polarity | entry.trigger_mode);
+	dprintf(" pci %u:%u pin %u func mask %lx; bios irq: %u; gsi %u;"
+		" config 0x%02x\n", entry.pci_bus, entry.pci_device, entry.pin + 1,
+		entry.pci_function_mask, entry.bios_irq, entry.irq,
+		entry.polarity | entry.trigger_mode);
 }
 
 
@@ -84,7 +87,25 @@ print_irq_routing_table(IRQRoutingTable* table)
 
 
 static status_t
-update_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
+update_pci_info_for_entry(pci_module_info* pci, const irq_routing_entry& entry)
+{
+	uint32 updateCount = 0;
+	for (uint8 function = 0; function < kMaxPCIFunctionCount; function++) {
+		if ((entry.pci_function_mask & (1 << function)) == 0)
+			continue;
+
+		if (pci->update_interrupt_line(entry.pci_bus, entry.pci_device,
+			function, entry.irq) == B_OK) {
+			updateCount++;
+		}
+	}
+
+	return updateCount > 0 ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 {
 	// check the base device at function 0
 	uint8 headerType = pci->read_pci_config(entry.pci_bus, entry.pci_device, 0,
@@ -104,13 +125,9 @@ update_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 	// we have a device, check how many functions we need to iterate
 	uint8 functionCount = 1;
-	if ((headerType & PCI_multifunction) != 0) {
-		functionCount = 8;
-			// TODO: as per PCI 3.0, the PCI module hardcodes it in various
-			// places as well...
-	}
+	if ((headerType & PCI_multifunction) != 0)
+		functionCount = kMaxPCIFunctionCount;
 
-	uint32 updateCount = 0;
 	for (uint8 function = 0; function < functionCount; function++) {
 		// check for device presence by looking for a valid vendor
 		uint16 vendorId = pci->read_pci_config(entry.pci_bus, entry.pci_device,
@@ -137,13 +154,10 @@ update_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 				entry.pci_device, function, PCI_interrupt_line, 1);
 		}
 
-		if (pci->update_interrupt_line(entry.pci_bus, entry.pci_device,
-			function, entry.irq) == B_OK) {
-			updateCount++;
-		}
+		entry.pci_function_mask |= 1 << function;
 	}
 
-	return updateCount > 0 ? B_OK : B_ENTRY_NOT_FOUND;
+	return entry.pci_function_mask != 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
@@ -186,6 +200,81 @@ evaluate_integer(acpi_module_info* acpi, acpi_handle handle,
 		return B_BAD_TYPE;
 
 	value = result.data.integer;
+	return B_OK;
+}
+
+
+static status_t
+handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
+	const acpi_pci_routing_table* acpiTable, const pci_address& pciAddress,
+	irq_routing_entry& irqEntry)
+{
+	bool noSource = acpiTable->Source[0] == '\0';
+		// The above line would be correct according to specs...
+	noSource = acpiTable->SourceIndex != 0;
+		// ... but we use this one as there seem to be quirks where
+		// a source is indicated but not actually present. With a source
+		// index != 0 a GSI is generally indicated.
+
+	status_t status;
+	acpi_handle source;
+	if (!noSource) {
+		status = acpi->get_handle(NULL, acpiTable->Source, &source);
+		if (status != B_OK) {
+			dprintf("failed to get handle to link device\n");
+			return status;
+		}
+	}
+
+	memset(&irqEntry, 0, sizeof(irq_routing_entry));
+	irqEntry.device_address = acpiTable->Address;
+	irqEntry.pin = acpiTable->Pin;
+	irqEntry.source = noSource ? NULL : source;
+	irqEntry.source_index = acpiTable->SourceIndex;
+	irqEntry.pci_bus = pciAddress.bus;
+	irqEntry.pci_device = (uint8)(acpiTable->Address >> 16);
+
+	status = fill_pci_info_for_entry(pci, irqEntry);
+	if (status != B_OK) {
+		// Note: This isn't necesarily fatal, as there can be many entries in
+		// the table pointing to disabled/optional devices. Also they can be
+		// used to describe the full actual wireing regardless of the presence
+		// of devices, in which case many entries won't have a match.
+#ifdef TRACE_PRT
+		dprintf("didn't find a matching PCI device for irq entry:\n");
+		print_irq_routing_entry(irqEntry);
+#endif
+		return status;
+	}
+
+	// resolve any link device so we get a straight GSI in all cases
+	if (noSource) {
+		// fixed GSI already
+		irqEntry.irq = irqEntry.source_index;
+		irqEntry.polarity = B_LOW_ACTIVE_POLARITY;
+		irqEntry.trigger_mode = B_LEVEL_TRIGGERED;
+	} else {
+		irq_descriptor irqDescriptor;
+		status = configure_link_device(acpi, source, irqDescriptor);
+		if (status != B_OK) {
+			dprintf("failed to configure link device\n");
+			return status;
+		}
+
+		irqEntry.irq = irqDescriptor.irq;
+		irqEntry.polarity = irqDescriptor.polarity;
+		irqEntry.trigger_mode = irqDescriptor.trigger_mode;
+	}
+
+	status = update_pci_info_for_entry(pci, irqEntry);
+	if (status != B_OK) {
+#ifdef TRACE_PRT
+		dprintf("failed to update interrupt_line info for entry:\n");
+		print_irq_routing_entry(irqEntry);
+#endif
+		return status;
+	}
+
 	return B_OK;
 }
 
@@ -238,64 +327,13 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		pciAddress.bus = secondaryBus;
 	}
 
-	irq_routing_entry irqEntry;
 	acpi_pci_routing_table* acpiTable = (acpi_pci_routing_table*)buffer.pointer;
 	while (acpiTable->Length) {
-		acpi_handle source;
-
-		bool noSource = acpiTable->Source[0] == '\0';
-			// The above line would be correct according to specs...
-		noSource = acpiTable->SourceIndex != 0;
-			// ... but we use this one as there seem to be quirks where
-			// a source is indicated but not actually present. With a source
-			// index != 0 a GSI is generally indicated.
-
-		if (noSource
-			|| acpi->get_handle(NULL, acpiTable->Source, &source) == B_OK) {
-
-			irqEntry.device_address = acpiTable->Address;
-			irqEntry.pin = acpiTable->Pin;
-			irqEntry.source = noSource ? NULL : source;
-			irqEntry.source_index = acpiTable->SourceIndex;
-			irqEntry.pci_bus = pciAddress.bus;
-			irqEntry.pci_device = (uint8)(acpiTable->Address >> 16);
-			irqEntry.bios_irq = 0;
-
-			// resolve any link device so we get a straight GSI in all cases
-			if (noSource) {
-				// fixed GSI already
-				irqEntry.irq = irqEntry.source_index;
-				irqEntry.polarity = B_LOW_ACTIVE_POLARITY;
-				irqEntry.trigger_mode = B_LEVEL_TRIGGERED;
-			} else {
-				irq_descriptor irqDescriptor;
-				status = configure_link_device(acpi, source, irqDescriptor);
-				if (status != B_OK) {
-					dprintf("failed to configure link device\n");
-					irqEntry.irq = 0;
-				} else {
-					irqEntry.irq = irqDescriptor.irq;
-					irqEntry.polarity = irqDescriptor.polarity;
-					irqEntry.trigger_mode = irqDescriptor.trigger_mode;
-				}
-			}
-
-			if (irqEntry.irq != 0) {
-				if (update_pci_info_for_entry(pci, irqEntry) != B_OK) {
-					// Note: This isn't necesarily fatal, as there can be many
-					// entries in the table pointing to disabled/optional
-					// devices. Also they can be used to describe the full
-					// actual wireing regardless of the presence of devices, in
-					// which case many entries won't have a match.
-#ifdef TRACE_PRT
-					dprintf("didn't find a matching PCI device for irq entry,"
-						" can't update interrupt_line info:\n");
-					print_irq_routing_entry(irqEntry);
-#endif
-				} else
-					table->PushBack(irqEntry);
-			}
-		}
+		irq_routing_entry irqEntry;
+		status = handle_routing_table_entry(acpi, pci, acpiTable, pciAddress,
+			irqEntry);
+		if (status == B_OK)
+			table->PushBack(irqEntry);
 
 		acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
 			+ acpiTable->Length);

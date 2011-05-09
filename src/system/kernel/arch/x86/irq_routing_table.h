@@ -23,6 +23,7 @@ struct irq_routing_entry {
 	// PCI bus_manager connection
 	uint8		pci_bus;
 	uint8		pci_device;
+	uint32		pci_function_mask;
 
 	// Distilled configuration info
 	uint8		irq;			// Global System Interrupt (GSI)
