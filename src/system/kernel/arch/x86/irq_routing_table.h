@@ -26,6 +26,7 @@ struct irq_routing_entry {
 
 	// Distilled configuration info
 	uint8		irq;			// Global System Interrupt (GSI)
+	uint8		bios_irq;		// BIOS assigned original IRQ
 	uint8		polarity;		// B_{HIGH|LOW}_ACTIVE_POLARITY
 	uint8		trigger_mode;	// B_{LEVEL|EDGE}_TRIGGERED
 };

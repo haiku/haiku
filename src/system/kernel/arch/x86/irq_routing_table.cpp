@@ -68,9 +68,9 @@ print_irq_routing_entry(const irq_routing_entry& entry)
 	else
 		dprintf(" source %p %lu;", entry.source, entry.source_index);
 
-	dprintf(" pci %u:%u pin %u; gsi %u; config 0x%02x\n", entry.pci_bus,
-		entry.pci_device, entry.pin + 1, entry.irq,
-		entry.polarity | entry.trigger_mode);
+	dprintf(" pci %u:%u pin %u; bios irq: %u; gsi %u; config 0x%02x\n",
+		entry.pci_bus, entry.pci_device, entry.pin + 1, entry.bios_irq,
+		entry.irq, entry.polarity | entry.trigger_mode);
 }
 
 
@@ -123,11 +123,23 @@ update_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 		// Finally match the pin with the entry, note that PCI pins are 1 based
 		// while ACPI ones are 0 based.
-		if (interruptPin == entry.pin + 1) {
-			if (pci->update_interrupt_line(entry.pci_bus, entry.pci_device,
-				function, entry.irq) == B_OK) {
-				updateCount++;
-			}
+		if (interruptPin != entry.pin + 1)
+			continue;
+
+		if (entry.bios_irq == 0) {
+			// Keep the originally assigned IRQ around so we can use it for
+			// white listing PCI IRQs in the ISA space as those are basically
+			// guaranteed not to overlap with ISA devices. Those white listed
+			// entries can then be used if we only have a 16 pin IO-APIC or if
+			// there are only legacy IRQ resources available for configuration
+			// (with bitmasks of 16 bits, limiting their range to ISA IRQs).
+			entry.bios_irq = pci->read_pci_config(entry.pci_bus,
+				entry.pci_device, function, PCI_interrupt_line, 1);
+		}
+
+		if (pci->update_interrupt_line(entry.pci_bus, entry.pci_device,
+			function, entry.irq) == B_OK) {
+			updateCount++;
 		}
 	}
 
@@ -247,6 +259,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 			irqEntry.source_index = acpiTable->SourceIndex;
 			irqEntry.pci_bus = pciAddress.bus;
 			irqEntry.pci_device = (uint8)(acpiTable->Address >> 16);
+			irqEntry.bios_irq = 0;
 
 			// resolve any link device so we get a straight GSI in all cases
 			if (noSource) {
