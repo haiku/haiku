@@ -61,7 +61,7 @@ struct pci_address {
 
 struct link_device {
 	acpi_handle					handle;
-	uint32						chosen_irq_index;
+	irq_descriptor				current_irq;
 	Vector<irq_descriptor>		possible_irqs;
 	Vector<irq_routing_entry*>	used_by;
 };
@@ -73,14 +73,14 @@ void print_irq_routing_table(IRQRoutingTable* table);
 
 status_t read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table);
 status_t enable_irq_routing(acpi_module_info* acpi,
-			IRQRoutingTable& routingTable);
+			IRQRoutingTable& routingTable, uint32 maxIRQCount);
 
 status_t read_current_irq(acpi_module_info* acpi, acpi_handle device,
-			irq_descriptor* descriptor);
+			irq_descriptor& descriptor);
 status_t read_possible_irqs(acpi_module_info* acpi, acpi_handle device,
 			irq_descriptor_list& descriptorList);
 
 status_t set_current_irq(acpi_module_info* acpi, acpi_handle device,
-			const irq_descriptor* descriptor);
+			const irq_descriptor& descriptor);
 
 #endif	// IRQ_ROUTING_TABLE_H

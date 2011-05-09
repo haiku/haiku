@@ -32,6 +32,7 @@ const char* kACPIPciExpressRootName = "PNP0A08";
 
 // TODO: as per PCI 3.0, the PCI module hardcodes it in various places as well.
 static const uint8 kMaxPCIFunctionCount = 8;
+static const uint8 kMaxISAInterrupts = 16;
 
 irq_descriptor::irq_descriptor()
 	:
@@ -162,7 +163,8 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 
 static status_t
-configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
+configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
+	uint32 maxIRQCount)
 {
 	/*
 		Before configuring the link devices we have to take a few things into
@@ -181,12 +183,27 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 		  interrupt_line IRQs as stored in the bios_irq field.
 	*/
 
+	uint16 validForPCI = 0; // only applies to the ISA IRQs
+	uint16 irqUsage[maxIRQCount];
+	memset(irqUsage, 0, sizeof(irqUsage));
+
 	// find all unique link devices and resolve their possible IRQs
 	Vector<link_device*> links;
 	for (int i = 0; i < routingTable.Count(); i++) {
 		irq_routing_entry& irqEntry = routingTable.ElementAt(i);
-		if (irqEntry.source == NULL)
+
+		if (irqEntry.bios_irq != 0 && irqEntry.bios_irq != 255) {
+			if (irqEntry.bios_irq < kMaxISAInterrupts)
+				validForPCI |= (1 << irqEntry.bios_irq);
+		}
+
+		if (irqEntry.source == NULL) {
+			// populate all hardwired GSI entries into our map
+			irqUsage[irqEntry.irq]++;
+			if (irqEntry.irq < kMaxISAInterrupts)
+				validForPCI |= (1 << irqEntry.irq);
 			continue;
+		}
 
 		link_device* link = NULL;
 		for (int j = 0; j < links.Count(); j++) {
@@ -217,6 +234,15 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 			return status;
 		}
 
+		status = read_current_irq(acpi, link->handle, link->current_irq);
+		if (status != B_OK) {
+			panic("failed to read current irq of link device");
+			return status;
+		}
+
+		if (link->current_irq.irq < kMaxISAInterrupts)
+			validForPCI |= (1 << link->current_irq.irq);
+
 		link->used_by.PushBack(&irqEntry);
 		links.PushBack(link);
 	}
@@ -227,11 +253,28 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 	for (int i = 0; i < links.Count(); i++) {
 		link_device* link = links.ElementAt(i);
 
-		link->chosen_irq_index = 0;
-		irq_descriptor& irqDescriptor
-			= link->possible_irqs.ElementAt(link->chosen_irq_index);
+		int bestIRQIndex = 0;
+		uint16 bestIRQUsage = UINT16_MAX;
+		for (int j = 0; j < link->possible_irqs.Count(); j++) {
+			irq_descriptor& possibleIRQ = link->possible_irqs.ElementAt(j);
+			if (possibleIRQ.irq < kMaxISAInterrupts
+				&& (validForPCI & (1 << possibleIRQ.irq)) == 0) {
+				// better avoid that if possible
+				continue;
+			}
 
-		status_t status = set_current_irq(acpi, link->handle, &irqDescriptor);
+			if (irqUsage[possibleIRQ.irq] < bestIRQUsage) {
+				bestIRQIndex = j;
+				bestIRQUsage = irqUsage[possibleIRQ.irq];
+			}
+		}
+
+		// pick that one and update the counts
+		irq_descriptor& chosenDescriptor
+			= link->possible_irqs.ElementAt(bestIRQIndex);
+		irqUsage[chosenDescriptor.irq]++;
+
+		status_t status = set_current_irq(acpi, link->handle, chosenDescriptor);
 		if (status != B_OK) {
 			panic("failed to set irq on link device");
 			return status;
@@ -239,9 +282,9 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 
 		for (int j = 0; j < link->used_by.Count(); j++) {
 			irq_routing_entry* irqEntry = link->used_by.ElementAt(j);
-			irqEntry->irq = irqDescriptor.irq;
-			irqEntry->polarity = irqDescriptor.polarity;
-			irqEntry->trigger_mode = irqDescriptor.trigger_mode;
+			irqEntry->irq = chosenDescriptor.irq;
+			irqEntry->polarity = chosenDescriptor.polarity;
+			irqEntry->trigger_mode = chosenDescriptor.trigger_mode;
 		}
 
 		delete link;
@@ -463,10 +506,11 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 
 
 status_t
-enable_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable)
+enable_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable,
+	uint32 maxIRQCount)
 {
 	// configure the link devices; also resolves GSIs for link based entries
-	status_t status = configure_link_devices(acpi, routingTable);
+	status_t status = configure_link_devices(acpi, routingTable, maxIRQCount);
 	if (status != B_OK) {
 		panic("failed to configure link devices");
 		return status;
@@ -634,9 +678,9 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 
 status_t
 read_current_irq(acpi_module_info* acpi, acpi_handle device,
-	irq_descriptor* descriptor)
+	irq_descriptor& descriptor)
 {
-	return read_irq_descriptor(acpi, device, true, descriptor, NULL);
+	return read_irq_descriptor(acpi, device, true, &descriptor, NULL);
 }
 
 
@@ -650,7 +694,7 @@ read_possible_irqs(acpi_module_info* acpi, acpi_handle device,
 
 status_t
 set_current_irq(acpi_module_info* acpi, acpi_handle device,
-	const irq_descriptor* descriptor)
+	const irq_descriptor& descriptor)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
@@ -675,12 +719,12 @@ set_current_irq(acpi_module_info* acpi, acpi_handle device,
 				}
 
 				irq.Triggering
-					= descriptor->trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
+					= descriptor.trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
 				irq.Polarity
-					= descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
-				irq.Sharable = descriptor->shareable ? 0 : 1;
+					= descriptor.polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
+				irq.Sharable = descriptor.shareable ? 0 : 1;
 				irq.InterruptCount = 1;
-				irq.Interrupts[0] = descriptor->irq;
+				irq.Interrupts[0] = descriptor.irq;
 
 				irqWritten = true;
 				break;
@@ -695,12 +739,12 @@ set_current_irq(acpi_module_info* acpi, acpi_handle device,
 				}
 
 				irq.Triggering
-					= descriptor->trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
+					= descriptor.trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
 				irq.Polarity
-					= descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
-				irq.Sharable = descriptor->shareable ? 0 : 1;
+					= descriptor.polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
+				irq.Sharable = descriptor.shareable ? 0 : 1;
 				irq.InterruptCount = 1;
-				irq.Interrupts[0] = descriptor->irq;
+				irq.Interrupts[0] = descriptor.irq;
 
 				irqWritten = true;
 				break;
