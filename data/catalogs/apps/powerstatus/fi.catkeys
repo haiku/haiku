@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	4269725527
+1	finnish	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		Ohjelmasta
 About…	PowerStatus		Ohjelmasta...
 Battery charging	PowerStatus		Akkulataus
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1:
 Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2:
 Capacity: 	PowerStatus		Kapasiteetti:
 Current rate: 	PowerStatus		Virtamäärä:
+Damaged battery	PowerStatus		Vaurioitunut akku
 Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus
 Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
 Design capacity: 	PowerStatus		Suunnittelukapasiteetti:

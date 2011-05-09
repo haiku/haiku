@@ -1,6 +1,6 @@
-1	finnish	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
+1	finnish	x-vnd.Haiku-ReadOnlyBootPrompt	2686989872
+Custom	BootPromptWindow		Oma
 Desktop (Live-CD)	BootPromptWindow		Työpöytä (Live-CD)
-Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Haluatko suorittaa asennusohjelman vai jatkaa alkulatausta työpöydälle? Voit myös valita ensisijaisen kielen ja näppäimistöasettelun alla olevasta luettelosta.\n\nHuomaa: Haiku-sovellusten ja muiden komponenttien paikallistaminen on meneillään oleva ponnistelu. Kohtaat usein suomentamattomia merkkijonoja, mutta jos haluat, voit liittyä työhön osoitteessa <www.haiku-os.org>.
 Keymap	BootPromptWindow		Näppäinkartta
 Language	BootPromptWindow		Kieli
 Run Installer	BootPromptWindow		Suorita asennusohjelma
