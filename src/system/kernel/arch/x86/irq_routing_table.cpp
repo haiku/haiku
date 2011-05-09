@@ -86,46 +86,49 @@ print_irq_routing_table(IRQRoutingTable* table)
 static status_t
 update_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 {
-	pci_info info;
-	long index = 0;
+	// check the base device at function 0
+	uint8 headerType = pci->read_pci_config(entry.pci_bus, entry.pci_device, 0,
+		PCI_header_type, 1);
+	switch (headerType & PCI_header_type_mask) {
+		case PCI_header_type_generic:
+		case PCI_header_type_PCI_to_PCI_bridge:
+			// We don't really care about bridges as we won't install
+			// interrupt handlers for them, but we can still map them and
+			// update their info for completeness.
+			break;
+
+		default:
+			// either an unsupported or a non-present device (0xff)
+			return B_ENTRY_NOT_FOUND;
+	}
+
+	// we have a device, check how many functions we need to iterate
+	uint8 functionCount = 1;
+	if ((headerType & PCI_multifunction) != 0) {
+		functionCount = 8;
+			// TODO: as per PCI 3.0, the PCI module hardcodes it in various
+			// places as well...
+	}
+
 	uint32 updateCount = 0;
-	while (pci->get_nth_pci_info(index++, &info) >= 0) {
-		if (info.bus != entry.pci_bus || info.device != entry.pci_device)
+	for (uint8 function = 0; function < functionCount; function++) {
+		// check for device presence by looking for a valid vendor
+		uint16 vendorId = pci->read_pci_config(entry.pci_bus, entry.pci_device,
+			function, PCI_vendor_id, 2);
+		if (vendorId == 0xffff)
 			continue;
 
-		uint8 pin = 0;
-		switch (info.header_type & PCI_header_type_mask) {
-			case PCI_header_type_generic:
-				pin = info.u.h0.interrupt_pin;
-				break;
+		uint8 interruptPin = pci->read_pci_config(entry.pci_bus,
+			entry.pci_device, function, PCI_interrupt_pin, 1);
 
-			case PCI_header_type_PCI_to_PCI_bridge:
-				// We don't really care about bridges as we won't install
-				// interrupt handlers for them, but we can still map them and
-				// update their info for completeness.
-				pin = info.u.h1.interrupt_pin;
-				break;
-
-			default:
-				// Skip anything unknown as we wouldn't know how to update the
-				// info anyway.
-				continue;
-		}
-
-		if (pin == 0)
-			continue; // no interrupts are used
-
-		// Now match the pin to find the corresponding function, note that PCI
-		// pins are 1 based while ACPI ones are 0 based.
-		if (pin == entry.pin + 1) {
-			if (pci->update_interrupt_line(info.bus, info.device, info.function,
-				entry.irq) == B_OK) {
+		// Finally match the pin with the entry, note that PCI pins are 1 based
+		// while ACPI ones are 0 based.
+		if (interruptPin == entry.pin + 1) {
+			if (pci->update_interrupt_line(entry.pci_bus, entry.pci_device,
+				function, entry.irq) == B_OK) {
 				updateCount++;
 			}
 		}
-
-		// Sadly multiple functions can share the same interrupt pin so we
-		// have to run through the whole list each time...
 	}
 
 	return updateCount > 0 ? B_OK : B_ENTRY_NOT_FOUND;
