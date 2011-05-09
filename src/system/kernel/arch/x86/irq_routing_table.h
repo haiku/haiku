@@ -54,49 +54,6 @@ struct pci_address {
 };
 
 
-// TODO: Hack until we expose ACPI structs better; these are duplicates of
-// the types in acrestype.h
-struct acpi_pci_routing_table {
-	uint32	length;
-	uint32	pin;
-	uint64	address;
-	uint32	source_index;
-	char	source[4];
-};
-
-struct acpi_resource {
-	uint32	type;
-	uint32	length;
-};
-
-struct acpi_resource_source {
-	uint8	index;
-	uint16	string_length;
-	char*	string_pointer;
-};
-
-struct acpi_resource_irq {
-	acpi_resource header;
-	uint8	descriptor_ength;
-	uint8	triggering;
-	uint8	polarity;
-	uint8	sharable;
-	uint8	interrupt_count;
-	uint8	interrupts[];
-};
-
-struct acpi_resource_extended_irq {
-	acpi_resource header;
-	uint8	producer_consumer;
-	uint8	triggering;
-	uint8	polarity;
-	uint8	sharable;
-	uint8	interrupt_count;
-	acpi_resource_source source;
-	uint32	interrupts[];
-};
-
-
 void print_irq_descriptor(irq_descriptor* descriptor);
 void print_irq_routing_table(IRQRoutingTable* table);
 
