@@ -271,9 +271,9 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 				if (update_pci_info_for_entry(pci, irqEntry) != B_OK) {
 					// Note: This isn't necesarily fatal, as there can be many
 					// entries in the table pointing to disabled/optional
-					// devices. Also they can be used to describe the full actual
-					// wireing regardless of the presence of devices, in which
-					// case many entries won't have matches.
+					// devices. Also they can be used to describe the full
+					// actual wireing regardless of the presence of devices, in
+					// which case many entries won't have a match.
 #ifdef TRACE_PRT
 					dprintf("didn't find a matching PCI device for irq entry,"
 						" can't update interrupt_line info:\n");
