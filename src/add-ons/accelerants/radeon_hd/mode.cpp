@@ -35,13 +35,14 @@ extern "C" void _sPrintf(const char *format, ...);
 status_t
 create_mode_list(void)
 {
-	// TODO : Read active monitor EDID for create_display_modes
-
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
+	// TODO : Read EDID for create_display_modes via AtomBios as well
+
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
-		NULL, NULL, 0, kRadeonHDSpaces,
+		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
+		NULL, 0, kRadeonHDSpaces,
 		sizeof(kRadeonHDSpaces) / sizeof(kRadeonHDSpaces[0]),
 		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
 	if (gInfo->mode_list_area < B_OK)
@@ -50,7 +51,6 @@ create_mode_list(void)
 	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
 
 	/* Example nonstandard mode line (1600x900@60) */
-
 	//static display_mode sDisplayMode;
 	//sDisplayMode.timing.pixel_clock =  97750;
 	//sDisplayMode.timing.h_display = 1600;

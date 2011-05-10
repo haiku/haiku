@@ -19,6 +19,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include <boot_item.h>
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>
 #include <vm/vm.h>
@@ -89,6 +90,21 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->frame_buffer_offset = 0;
 	info.shared_info->physical_graphics_memory
 		= info.pci->u.h0.base_registers[RHD_FB_BAR];
+
+	// Pull active monitor VESA EDID from boot loader
+	edid1_info* edidInfo = (edid1_info*)get_boot_item(EDID_BOOT_INFO,
+		NULL);
+	if (edidInfo != NULL) {
+		TRACE((DEVICE_NAME ": %s found VESA EDID modes.\n", __func__));
+		info.shared_info->has_edid = true;
+		memcpy(&info.shared_info->edid_info, edidInfo, sizeof(edid1_info));
+	} else {
+		TRACE((DEVICE_NAME ": %s didn't find VESA EDID modes.\n", __func__));
+		info.shared_info->has_edid = false;
+	}
+
+	// Read R6XX memory size into shared info
+	//info.shared_info->graphics_memory_size = (uint32)read32(R6XX_CONFIG_MEMSIZE);
 
 	TRACE((DEVICE_NAME ": radeon_hd_init() completed successfully!\n"));
 	return B_OK;
