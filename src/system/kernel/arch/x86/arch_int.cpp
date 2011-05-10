@@ -651,7 +651,8 @@ ioapic_init(kernel_args* args)
 	}
 
 	IRQRoutingTable table;
-	status = read_irq_routing_table(acpiModule, &table);
+	status = read_irq_routing_table(acpiModule, &table,
+		sIOAPICMaxRedirectionEntry + 1);
 	if (status != B_OK) {
 		dprintf("reading IRQ routing table failed, not configuring ioapic.\n");
 		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);

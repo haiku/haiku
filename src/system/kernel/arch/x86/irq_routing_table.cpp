@@ -254,6 +254,11 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
 		uint16 bestIRQUsage = UINT16_MAX;
 		for (int j = 0; j < link->possible_irqs.Count(); j++) {
 			irq_descriptor& possibleIRQ = link->possible_irqs.ElementAt(j);
+			if (possibleIRQ.irq >= maxIRQCount) {
+				// we can't address this pin
+				continue;
+			}
+
 			if (possibleIRQ.irq < kMaxISAInterrupts
 				&& (validForPCI & (1 << possibleIRQ.irq)) == 0) {
 				// better avoid that if possible
@@ -269,6 +274,12 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
 		// pick that one and update the counts
 		irq_descriptor& chosenDescriptor
 			= link->possible_irqs.ElementAt(bestIRQIndex);
+		if (chosenDescriptor.irq >= maxIRQCount) {
+			panic("chosen irq %u is not addressable (max %lu)",
+				chosenDescriptor.irq, maxIRQCount);
+			return B_ERROR;
+		}
+
 		irqUsage[chosenDescriptor.irq] += link->used_by.Count();
 
 		status_t status = set_current_irq(acpi, link->handle, chosenDescriptor);
@@ -368,10 +379,10 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 }
 
 
-static void
+static status_t
 read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 	acpi_handle device, const pci_address& parentAddress,
-	IRQRoutingTable* table, bool rootBridge)
+	IRQRoutingTable* table, bool rootBridge, uint32 maxIRQCount)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
@@ -379,7 +390,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 	status_t status = acpi->get_irq_routing_table(device, &buffer);
 	if (status != B_OK) {
 		// simply not a bridge
-		return;
+		return B_OK;
 	}
 
 	TRACE("found irq routing table\n");
@@ -401,7 +412,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 			pciAddress.device, pciAddress.function, PCI_secondary_bus, 1);
 		if (secondaryBus == 255) {
 			// The bus below this bridge is inactive, nothing to do.
-			return;
+			return B_OK;
 		}
 
 		// The secondary bus cannot be the same as the current one.
@@ -409,7 +420,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 			dprintf("invalid secondary bus %u on primary bus %u,"
 				" can't configure irq routing of devices below\n",
 				secondaryBus, parentAddress.bus);
-			return;
+			return B_ERROR;
 		}
 
 		// Everything below is now on the secondary bus.
@@ -421,8 +432,16 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		irq_routing_entry irqEntry;
 		status = handle_routing_table_entry(acpi, pci, acpiTable, pciAddress,
 			irqEntry);
-		if (status == B_OK)
+		if (status == B_OK) {
+			if (irqEntry.source == NULL && irqEntry.irq >= maxIRQCount) {
+				dprintf("hardwired irq %u not addressable (max %lu)\n",
+					irqEntry.irq, maxIRQCount);
+				free(buffer.pointer);
+				return B_ERROR;
+			}
+
 			table->PushBack(irqEntry);
+		}
 
 		acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
 			+ acpiTable->Length);
@@ -434,9 +453,10 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 	acpi_data pathBuffer;
 	pathBuffer.pointer = NULL;
 	pathBuffer.length = ACPI_ALLOCATE_BUFFER;
-	if (acpi->ns_handle_to_pathname(device, &pathBuffer) != B_OK) {
+	status = acpi->ns_handle_to_pathname(device, &pathBuffer);
+	if (status != B_OK) {
 		dprintf("failed to resolve handle to path\n");
-		return;
+		return status;
 	}
 
 	char childName[255];
@@ -448,20 +468,24 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		status = acpi->get_handle(NULL, childName, &childHandle);
 		if (status != B_OK) {
 			dprintf("failed to get handle to child \"%s\"\n", childName);
-			continue;
+			break;
 		}
 
 		TRACE("recursing down to child \"%s\"\n", childName);
-		read_irq_routing_table_recursive(acpi, pci, childHandle, pciAddress,
-			table, false);
+		status = read_irq_routing_table_recursive(acpi, pci, childHandle,
+			pciAddress, table, false, maxIRQCount);
+		if (status != B_OK)
+			break;
 	}
 
 	free(pathBuffer.pointer);
+	return status;
 }
 
 
 status_t
-read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
+read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table,
+	uint32 maxIRQCount)
 {
 	char rootPciName[255];
 	acpi_handle rootPciHandle;
@@ -494,10 +518,14 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 		return status;
 	}
 
-	read_irq_routing_table_recursive(acpi, pci, rootPciHandle, rootPciAddress,
-		table, true);
+	status = read_irq_routing_table_recursive(acpi, pci, rootPciHandle,
+		rootPciAddress, table, true, maxIRQCount);
 
 	put_module(B_PCI_MODULE_NAME);
+
+	if (status != B_OK)
+		return status;
+
 	return table->Count() > 0 ? B_OK : B_ERROR;
 }
 
