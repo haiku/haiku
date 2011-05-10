@@ -10,11 +10,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/utsname.h>
 #include <unistd.h>
 
 #include <algorithm>
 #include <string>
+
+#include <system_revision.h>
 
 // We use htonl(), which is defined in <ByteOrder.h> on BeOS R5.
 #ifdef HAIKU_HOST_PLATFORM_BEOS
@@ -585,7 +586,7 @@ main(int argc, const char* const* argv)
 
 		// write revision string to section
 		elfObject.Write(info.offset, revisionString,
-			std::min(sizeof(utsname::version), strlen(revisionString) + 1),
+			min((size_t)SYSTEM_REVISION_LENGTH, strlen(revisionString) + 1),
 			"Failed to write revision.");
 
 	} catch (Exception exception) {

@@ -13,10 +13,12 @@
 
 #include <OS.h>
 
+#include <system_revision.h>
+
 
 // Haiku SVN revision. Will be set when copying libroot.so to the image.
 // Lives in a separate section so that it can easily be found.
-static char sHaikuRevision[_SYS_NAMELEN]
+static char sHaikuRevision[SYSTEM_REVISION_LENGTH]
 	__attribute__((section("_haiku_revision")));
 
 

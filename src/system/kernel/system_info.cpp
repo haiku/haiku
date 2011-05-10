@@ -11,6 +11,7 @@
 
 #include <ksystem_info.h>
 #include <system_info.h>
+#include <system_revision.h>
 #include <arch/system_info.h>
 
 #include <string.h>
@@ -31,7 +32,6 @@
 #include <real_time_clock.h>
 #include <sem.h>
 #include <smp.h>
-#include <sys/utsname.h>
 #include <team.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -45,7 +45,7 @@ const static char *kKernelName = "kernel_" HAIKU_ARCH;
 
 // Haiku SVN revision. Will be set when copying the kernel to the image.
 // Lives in a separate section so that it can easily be found.
-static char sHaikuRevision[_SYS_NAMELEN]
+static char sHaikuRevision[SYSTEM_REVISION_LENGTH]
 	__attribute__((section("_haiku_revision")));
 
 
