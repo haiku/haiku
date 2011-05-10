@@ -16,7 +16,6 @@
 #define EHCI_HCCPARAMS			0x08		// Capability Parameters
 #define EHCI_HCSP_PORTROUTE		0x0c		// Companion Port Route Description
 
-
 // Host Controller Operational Registers (EHCI Spec 2.3)
 #define EHCI_USBCMD				0x00		// USB Command
 #define EHCI_USBSTS				0x04		// USB Status
@@ -105,22 +104,89 @@
 #define EHCI_LEGSUP_OSOWNED		(1 << 24)	// OS Owned Semaphore
 #define EHCI_LEGSUP_BIOSOWNED	(1 << 16)	// BIOS Owned Semaphore
 
+#define EHCI_HCCPARAMS_IPT_SHIFT	4		// Isochronous Periodic Threshold
+#define EHCI_HCCPARAMS_IPT_MASK	0xf
+
 
 // Data Structures (EHCI Spec 3)
 
-// Periodic Frame List Element Flags (EHCI Spec 3.1)
-#define EHCI_PFRAMELIST_TERM	(1 << 0)	// Terminate
-#define EHCI_PFRAMELIST_ITD		(0 << 1)	// Isochronous Transfer Descriptor
-#define EHCI_PFRAMELIST_QH		(1 << 1)	// Queue Head
-#define EHCI_PFRAMELIST_SITD	(2 << 1)	// Split Transaction Isochronous TD
-#define EHCI_PFRAMELIST_FSTN	(3 << 1)	// Frame Span Traversal Node
+
+// Applies to ehci_qh.next_phy, ehci_sitd.next_phy, ehci_itd.next_phy
+#define EHCI_ITEM_TYPE_ITD		(0 << 1)	// Isochronous Transfer Descriptor
+#define EHCI_ITEM_TYPE_QH		(1 << 1)	// Queue Head
+#define EHCI_ITEM_TYPE_SITD		(2 << 1)	// Split Transaction Isochronous TD
+#define EHCI_ITEM_TYPE_FSTN		(3 << 1)	// Frame Span Traversal Node
+#define EHCI_ITEM_TERMINATE		(1 << 0)	// Terminate
 
 
-// ToDo: Isochronous (High-Speed) Transfer Descriptors (iTD, EHCI Spec 3.2)
-// ToDo: Split Transaction Isochronous Transfer Descriptors (siTD, EHCI Spec 3.3)
+// Isochronous (High-Speed) Transfer Descriptors (iTD, EHCI Spec 3.2)
+typedef struct ehci_itd {
+	// Hardware Part
+	addr_t		next_phy;
+	uint32		token[8];
+	addr_t		buffer_phy[7];
+	addr_t		ext_buffer_phy[7];
+
+	// Software Part
+	addr_t		this_phy;
+	struct ehci_itd	*next;
+	struct ehci_itd	*prev;
+	uint32		last_token;
+} ehci_itd;
+
+#define EHCI_ITD_TOFFSET_SHIFT	0
+#define EHCI_ITD_TOFFSET_MASK	0x0fff
+#define EHCI_ITD_IOC			(1 << 15)
+#define EHCI_ITD_PG_SHIFT		12
+#define EHCI_ITD_PG_MASK		0x07
+#define EHCI_ITD_TLENGTH_SHIFT	16
+#define EHCI_ITD_TLENGTH_MASK	0x0fff
+#define EHCI_ITD_STATUS_SHIFT	28
+#define EHCI_ITD_STATUS_MASK	0xf
+#define EHCI_ITD_STATUS_ACTIVE	(1 << 3)	// Active
+#define EHCI_ITD_STATUS_BUFFER	(1 << 2)	// Data Buffer Error
+#define EHCI_ITD_STATUS_BABBLE	(1 << 1)	// Babble Detected
+#define EHCI_ITD_STATUS_TERROR	(1 << 0)	// Transaction Error
+#define EHCI_ITD_ADDRESS_SHIFT	0
+#define EHCI_ITD_ADDRESS_MASK	0x7f
+#define EHCI_ITD_ENDPOINT_SHIFT	8
+#define EHCI_ITD_ENDPOINT_MASK	0xf
+#define EHCI_ITD_DIR_SHIFT	11
+#define EHCI_ITD_MUL_SHIFT	0
+#define EHCI_ITD_BUFFERPOINTER_SHIFT	12
+#define EHCI_ITD_BUFFERPOINTER_MASK	0xfffff
+#define EHCI_ITD_MAXPACKETSIZE_SHIFT	0
+#define EHCI_ITD_MAXPACKETSIZE_MASK	0x7ff
+
+
+// Split Transaction Isochronous Transfer Descriptors (siTD, EHCI Spec 3.3)
+typedef struct ehci_sitd {
+	// Hardware Part
+	addr_t		next_phy;
+	uint8		port_number;
+	uint8		hub_address;
+	uint8		endpoint;
+	uint8		device_address;
+	uint16		reserved1;
+	uint8		cmask;
+	uint8		smask;
+	uint16		transfer_length;
+	uint8		cprogmask;
+	uint8		status;
+	addr_t		buffer_phy[2];
+	addr_t		back_phy;
+	addr_t		ext_buffer_phy[2];
+
+	// Software Part
+	addr_t		this_phy;
+	struct ehci_sitd *next;
+	struct ehci_sitd *prev;
+	size_t		buffer_size;
+	void		*buffer_log;
+} ehci_sitd;
 
 // Queue Element Transfer Descriptors (qTD, EHCI Spec 3.5)
-typedef struct {
+typedef struct ehci_qtd {
 	// Hardware Part
 	addr_t		next_phy;
 	addr_t		alt_next_phy;
@@ -130,14 +196,13 @@ typedef struct {
 
 	// Software Part
 	addr_t		this_phy;
-	void		*next_log;
+	struct ehci_qtd	*next_log;
 	void		*alt_next_log;
 	size_t		buffer_size;
 	void		*buffer_log;
 } ehci_qtd;
 
 
-#define EHCI_QTD_TERMINATE		(1 << 0)
 #define EHCI_QTD_DATA_TOGGLE	(1 << 31)
 #define EHCI_QTD_BYTES_SHIFT	16
 #define EHCI_QTD_BYTES_MASK		0x7fff
@@ -166,7 +231,7 @@ typedef struct {
 
 
 // Queue Head (QH, EHCI Spec 3.6)
-typedef struct {
+typedef struct ehci_qh {
 	// Hardware Part
 	addr_t		next_phy;
 	uint32		endpoint_chars;
@@ -183,10 +248,10 @@ typedef struct {
 
 	// Software Part
 	addr_t		this_phy;
-	void		*next_log;
-	void		*prev_log;
-	void		*stray_log;
-	void		*element_log;
+	struct ehci_qh *next_log;
+	struct ehci_qh *prev_log;
+	ehci_qtd	*stray_log;
+	ehci_qtd	*element_log;
 } ehci_qh;
 
 
@@ -195,13 +260,22 @@ typedef struct {
 	uint32		padding[2];
 } interrupt_entry;
 
+typedef struct {
+	ehci_itd	itd;
+	uint32		padding[5]; // align on 128
+} itd_entry;
 
-// Applies to ehci_qh.link_phy
-#define EHCI_QH_TYPE_ITD		(0 << 1)
-#define EHCI_QH_TYPE_QH			(1 << 1)
-#define EHCI_QH_TYPE_SITD		(2 << 1)
-#define EHCI_QH_TYPE_FSTN		(3 << 1)
-#define EHCI_QH_TERMINATE		(1 << 0)
+typedef struct {
+	ehci_sitd	sitd;
+	uint32		padding[2]; // align on 64
+} sitd_entry;
+
+#define EHCI_INTERRUPT_ENTRIES_COUNT	(7 + 1)		// (log 128 / log 2) + 1
+#define EHCI_VFRAMELIST_ENTRIES_COUNT	128
+#define EHCI_FRAMELIST_ENTRIES_COUNT	1024
+
+#define MAX_AVAILABLE_BANDWIDTH	125	// Microseconds
+
 
 // Applies to ehci_qh.endpoint_chars
 #define EHCI_QH_CHARS_RL_SHIFT	28			// NAK Count Reload

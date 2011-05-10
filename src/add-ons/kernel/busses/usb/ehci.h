@@ -27,6 +27,26 @@ typedef struct transfer_data {
 } transfer_data;
 
 
+// This structure is used to create a list of
+// descriptors per isochronous transfer
+typedef struct isochronous_transfer_data {
+	Transfer *					transfer;
+	// The next field is used to keep track
+	// of every isochronous descriptor as they are NOT
+	// linked to each other in a queue like in every other
+	// transfer type
+	ehci_itd **					descriptors;
+	uint16						last_to_process;
+	bool						incoming;
+	bool						is_active;
+	isochronous_transfer_data *	link;
+
+	size_t						buffer_size;
+	void *						buffer_log;
+	addr_t						buffer_phy;
+} isochronous_transfer_data;
+
+
 class EHCI : public BusManager {
 public:
 									EHCI(pci_info *info, Stack *stack);
@@ -35,7 +55,9 @@ public:
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
-
+		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe, bool force);
+		status_t					SubmitIsochronous(Transfer *transfer);
+		
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
 
@@ -66,12 +88,31 @@ static	int32						InterruptHandler(void *data);
 										ehci_qh *queueHead,
 										ehci_qtd *dataDescriptor,
 										bool directionIn);
+		status_t					AddPendingIsochronousTransfer(
+										Transfer *transfer,
+										ehci_itd **isoRequest, uint32 lastIndex,
+										bool directionIn, addr_t bufferPhy,
+										void *bufferLog, size_t bufferSize);
 		status_t					CancelAllPendingTransfers();
+
 
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
 static	int32						CleanupThread(void *data);
 		void						Cleanup();
+
+		// Isochronous transfer functions
+static int32						FinishIsochronousThread(void *data);
+		void						FinishIsochronousTransfers();
+		isochronous_transfer_data *	FindIsochronousTransfer(ehci_itd *itd);
+		void						LinkITDescriptors(ehci_itd *itd,
+										ehci_itd **last);
+		void						LinkSITDescriptors(ehci_sitd *sitd,
+										ehci_sitd **last);
+		void						UnlinkITDescriptors(ehci_itd *itd,
+										ehci_itd **last);
+		void						UnlinkSITDescriptors(ehci_sitd *sitd,
+										ehci_sitd **last);
 
 		// Queue Head functions
 		ehci_qh *					CreateQueueHead();
@@ -95,6 +136,9 @@ static	int32						CleanupThread(void *data);
 										ehci_qtd **dataDescriptor,
 										bool *directionIn);
 
+		bool						LockIsochronous();
+		void						UnlockIsochronous();
+
 		// Descriptor functions
 		ehci_qtd *					CreateDescriptor(
 										size_t bufferSizeToAllocate,
@@ -105,9 +149,15 @@ static	int32						CleanupThread(void *data);
 										ehci_qtd *strayDescriptor,
 										size_t bufferSizeToAllocate,
 										uint8 pid);
+		ehci_itd*					CreateItdDescriptor();
+		ehci_sitd*					CreateSitdDescriptor();
 
 		void						FreeDescriptor(ehci_qtd *descriptor);
 		void						FreeDescriptorChain(ehci_qtd *topDescriptor);
+		void						FreeDescriptor(ehci_itd *descriptor);
+		void						FreeDescriptor(ehci_sitd *descriptor);
+		void						FreeIsochronousData(
+										isochronous_transfer_data *data);
 
 		void						LinkDescriptors(ehci_qtd *first,
 										ehci_qtd *last, ehci_qtd *alt);
@@ -120,6 +170,12 @@ static	int32						CleanupThread(void *data);
 										bool *nextDataToggle);
 		size_t						ReadActualLength(ehci_qtd *topDescriptor,
 										bool *nextDataToggle);
+		size_t						WriteIsochronousDescriptorChain(
+										isochronous_transfer_data *transfer,
+										uint32 packetCount,
+										iovec *vector);
+		size_t						ReadIsochronousDescriptorChain(
+										isochronous_transfer_data *transfer);
 
 		// Operational register functions
 inline	void						WriteOpReg(uint32 reg, uint32 value);
@@ -143,6 +199,8 @@ static	pci_module_info *			sPCIModule;
 		area_id						fPeriodicFrameListArea;
 		addr_t *					fPeriodicFrameList;
 		interrupt_entry *			fInterruptEntries;
+		ehci_itd **					fItdEntries;
+		ehci_sitd **				fSitdEntries;
 
 		// Async transfer queue management
 		ehci_qh *					fAsyncQueueHead;
@@ -153,12 +211,24 @@ static	pci_module_info *			sPCIModule;
 		transfer_data *				fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
+		Pipe *						fProcessingPipe;
+
+		ehci_qh *					fFreeListHead;
 		sem_id						fCleanupSem;
 		thread_id					fCleanupThread;
 		bool						fStopThreads;
-		ehci_qh *					fFreeListHead;
-		Pipe *						fProcessingPipe;
 
+		// fFrameBandwidth[n] holds the available bandwidth
+		// of the nth frame in microseconds
+		uint16 *					fFrameBandwidth;
+
+		// Maintain a linked list of isochronous transfers
+		isochronous_transfer_data *	fFirstIsochronousTransfer;
+		isochronous_transfer_data *	fLastIsochronousTransfer;
+		sem_id						fFinishIsochronousTransfersSem;
+		thread_id					fFinishIsochronousThread;
+		mutex						fIsochronousLock;
+		
 		// Root Hub
 		EHCIRootHub *				fRootHub;
 		uint8						fRootHubAddress;
