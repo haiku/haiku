@@ -247,9 +247,6 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
 		links.PushBack(link);
 	}
 
-	// TODO: Blindly set the first possible configuration (obviously not what we
-	// want to do as it will most probably result in a "everything to single
-	// IRQ" config; anyway just to get things going...)
 	for (int i = 0; i < links.Count(); i++) {
 		link_device* link = links.ElementAt(i);
 
