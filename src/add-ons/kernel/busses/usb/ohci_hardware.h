@@ -383,7 +383,7 @@ typedef struct {
 #define OHCI_GENERAL_TD_ALIGN 16
 
 // --------------------------------
-//	Isonchronous transfer descriptor structure (section 4.3.2)
+//	Isochronous transfer descriptor structure (section 4.3.2)
 // --------------------------------
 
 #define OHCI_ITD_NOFFSET 8
