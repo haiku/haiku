@@ -163,8 +163,8 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 
 static status_t
-configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
-	uint32 maxIRQCount)
+choose_link_device_configurations(acpi_module_info* acpi,
+	IRQRoutingTable& routingTable, uint32 maxIRQCount)
 {
 	/*
 		Before configuring the link devices we have to take a few things into
@@ -275,27 +275,48 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable,
 		irq_descriptor& chosenDescriptor
 			= link->possible_irqs.ElementAt(bestIRQIndex);
 		if (chosenDescriptor.irq >= maxIRQCount) {
-			panic("chosen irq %u is not addressable (max %lu)",
+			dprintf("chosen irq %u is not addressable (max %lu)\n",
 				chosenDescriptor.irq, maxIRQCount);
 			return B_ERROR;
 		}
 
 		irqUsage[chosenDescriptor.irq] += link->used_by.Count();
 
-		status_t status = set_current_irq(acpi, link->handle, chosenDescriptor);
-		if (status != B_OK) {
-			panic("failed to set irq on link device");
-			return status;
-		}
-
 		for (int j = 0; j < link->used_by.Count(); j++) {
 			irq_routing_entry* irqEntry = link->used_by.ElementAt(j);
+			irqEntry->needs_configuration = j == 0; // only configure once
 			irqEntry->irq = chosenDescriptor.irq;
 			irqEntry->polarity = chosenDescriptor.polarity;
 			irqEntry->trigger_mode = chosenDescriptor.trigger_mode;
 		}
 
 		delete link;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
+{
+	for (int i = 0; i < routingTable.Count(); i++) {
+		irq_routing_entry& irqEntry = routingTable.ElementAt(i);
+		if (!irqEntry.needs_configuration)
+			continue;
+
+		irq_descriptor configuration;
+		configuration.irq = irqEntry.irq;
+		configuration.polarity = irqEntry.polarity;
+		configuration.trigger_mode = irqEntry.trigger_mode;
+
+		status_t status = set_current_irq(acpi, irqEntry.source, configuration);
+		if (status != B_OK) {
+			panic("failed to set irq on link device");
+			return status;
+		}
+
+		irqEntry.needs_configuration = false;
 	}
 
 	return B_OK;
@@ -368,8 +389,8 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 	}
 
 	if (noSource) {
-		// fill in the GSI and config; link based entries will be resolved at
-		// link configuration time
+		// fill in the GSI and config
+		irqEntry.needs_configuration = false;
 		irqEntry.irq = irqEntry.source_index;
 		irqEntry.polarity = B_LOW_ACTIVE_POLARITY;
 		irqEntry.trigger_mode = B_LEVEL_TRIGGERED;
@@ -382,7 +403,7 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 static status_t
 read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 	acpi_handle device, const pci_address& parentAddress,
-	IRQRoutingTable* table, bool rootBridge, uint32 maxIRQCount)
+	IRQRoutingTable& table, bool rootBridge, uint32 maxIRQCount)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
@@ -440,7 +461,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 				return B_ERROR;
 			}
 
-			table->PushBack(irqEntry);
+			table.PushBack(irqEntry);
 		}
 
 		acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
@@ -483,8 +504,8 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 }
 
 
-status_t
-read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table,
+static status_t
+read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 	uint32 maxIRQCount)
 {
 	char rootPciName[255];
@@ -526,16 +547,28 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table,
 	if (status != B_OK)
 		return status;
 
-	return table->Count() > 0 ? B_OK : B_ERROR;
+	return table.Count() > 0 ? B_OK : B_ERROR;
 }
 
 
 status_t
-enable_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable,
+prepare_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable,
 	uint32 maxIRQCount)
 {
+	status_t status = read_irq_routing_table(acpi, routingTable, maxIRQCount);
+	if (status != B_OK)
+		return status;
+
+	// resolve desired configuration of link devices
+	return choose_link_device_configurations(acpi, routingTable, maxIRQCount);
+}
+
+
+status_t
+enable_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable)
+{
 	// configure the link devices; also resolves GSIs for link based entries
-	status_t status = configure_link_devices(acpi, routingTable, maxIRQCount);
+	status_t status = configure_link_devices(acpi, routingTable);
 	if (status != B_OK) {
 		panic("failed to configure link devices");
 		return status;

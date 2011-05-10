@@ -19,6 +19,7 @@ struct irq_routing_entry {
 
 	acpi_handle	source;
 	uint32		source_index;
+	bool		needs_configuration;
 
 	// PCI bus_manager connection
 	uint8		pci_bus;
@@ -71,10 +72,10 @@ void print_irq_descriptor(irq_descriptor* descriptor);
 void print_irq_routing_table(IRQRoutingTable* table);
 
 
-status_t read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table,
+status_t prepare_irq_routing(acpi_module_info* acpi, IRQRoutingTable& table,
 			uint32 maxIRQCount);
 status_t enable_irq_routing(acpi_module_info* acpi,
-			IRQRoutingTable& routingTable, uint32 maxIRQCount);
+			IRQRoutingTable& routingTable);
 
 status_t read_current_irq(acpi_module_info* acpi, acpi_handle device,
 			irq_descriptor& descriptor);

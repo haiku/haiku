@@ -650,16 +650,6 @@ ioapic_init(kernel_args* args)
 		// aren't different routings based on it this is non-fatal
 	}
 
-	IRQRoutingTable table;
-	status = read_irq_routing_table(acpiModule, &table,
-		sIOAPICMaxRedirectionEntry + 1);
-	if (status != B_OK) {
-		dprintf("reading IRQ routing table failed, not configuring ioapic.\n");
-		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
-			// revert to PIC interrupt model just in case
-		return;
-	}
-
 	sLevelTriggeredInterrupts = 0;
 	sIOAPICMaxRedirectionEntry
 		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
@@ -667,8 +657,19 @@ ioapic_init(kernel_args* args)
 
 	TRACE(("ioapic has %lu entries\n", sIOAPICMaxRedirectionEntry + 1));
 
-	status = enable_irq_routing(acpiModule, table,
+	IRQRoutingTable table;
+	status = prepare_irq_routing(acpiModule, table,
 		sIOAPICMaxRedirectionEntry + 1);
+	if (status != B_OK) {
+		dprintf("IRQ routing preparation failed, not configuring ioapic.\n");
+		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
+			// revert to PIC interrupt model just in case
+		return;
+	}
+
+	print_irq_routing_table(&table);
+
+	status = enable_irq_routing(acpiModule, table);
 	if (status != B_OK) {
 		panic("failed to enable IRQ routing");
 		// if it failed early on it might still work in PIC mode
@@ -708,8 +709,6 @@ ioapic_init(kernel_args* args)
 
 		ioapic_write_64(IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
 	}
-
-	print_irq_routing_table(&table);
 
 	// configure io apic interrupts from PCI routing table
 	for (int i = 0; i < table.Count(); i++) {
