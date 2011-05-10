@@ -141,8 +141,6 @@ typedef struct ioapic_s {
 static ioapic *sIOAPIC = NULL;
 static uint32 sIOAPICMaxRedirectionEntry = 23;
 
-static uint32 sIRQToIOAPICPin[256];
-
 typedef struct interrupt_controller_s {
 	const char *name;
 	void	(*enable_io_interrupt)(int32 num);
@@ -489,9 +487,8 @@ ioapic_end_of_interrupt(int32 num)
 
 
 static void
-ioapic_enable_io_interrupt(int32 num)
+ioapic_enable_io_interrupt(int32 pin)
 {
-	int32 pin = sIRQToIOAPICPin[num];
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
@@ -505,9 +502,8 @@ ioapic_enable_io_interrupt(int32 num)
 
 
 static void
-ioapic_disable_io_interrupt(int32 num)
+ioapic_disable_io_interrupt(int32 pin)
 {
-	int32 pin = sIRQToIOAPICPin[num];
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
@@ -521,9 +517,8 @@ ioapic_disable_io_interrupt(int32 num)
 
 
 static void
-ioapic_configure_io_interrupt(int32 num, uint32 config)
+ioapic_configure_io_interrupt(int32 pin, uint32 config)
 {
-	int32 pin = sIRQToIOAPICPin[num];
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
@@ -537,10 +532,10 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 
 	if (config & B_LEVEL_TRIGGERED) {
 		entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT);
-		sLevelTriggeredInterrupts |= (1 << num);
+		sLevelTriggeredInterrupts |= (1 << pin);
 	} else {
 		entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT);
-		sLevelTriggeredInterrupts &= ~(1 << num);
+		sLevelTriggeredInterrupts &= ~(1 << pin);
 	}
 
 	if (config & B_LOW_ACTIVE_POLARITY)
@@ -548,7 +543,7 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 	else
 		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
 
-	entry |= (num + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
+	entry |= (pin + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
 	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
 }
 
@@ -712,10 +707,6 @@ ioapic_init(kernel_args* args)
 
 		ioapic_write_64(IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
 	}
-
-	// setup default 1:1 mapping
-	for (uint32 i = 0; i < 256; i++)
-		sIRQToIOAPICPin[i] = i;
 
 	print_irq_routing_table(&table);
 
