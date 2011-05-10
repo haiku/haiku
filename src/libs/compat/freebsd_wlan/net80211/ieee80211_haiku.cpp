@@ -147,7 +147,7 @@ start_wlan(device_t device)
 
 	// ic_vap_create() established that gDevices[i] links to vap->iv_ifp now
 	KASSERT(gDevices[i] == vap->iv_ifp,
-		"start_wlan: gDevices[i] != vap->iv_ifp");
+		("start_wlan: gDevices[i] != vap->iv_ifp"));
 
 	vap->iv_ifp->scan_done_sem = create_sem(0, "wlan scan done");
 
@@ -182,7 +182,7 @@ stop_wlan(device_t device)
 	ic->ic_vap_delete(vap);
 
 	// ic_vap_delete freed gDevices[i]
-	KASSERT(gDevices[i] == NULL, "stop_wlan: gDevices[i] != NULL");
+	KASSERT(gDevices[i] == NULL, ("stop_wlan: gDevices[i] != NULL"));
 
 	// assign the base device ifp again
 	gDevices[i] = ic->ic_ifp;
