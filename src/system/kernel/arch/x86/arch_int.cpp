@@ -492,7 +492,7 @@ ioapic_enable_io_interrupt(int32 pin)
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
-	TRACE(("ioapic_enable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
+	TRACE(("ioapic_enable_io_interrupt: pin %ld\n", pin));
 
 	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
@@ -507,7 +507,7 @@ ioapic_disable_io_interrupt(int32 pin)
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
-	TRACE(("ioapic_disable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
+	TRACE(("ioapic_disable_io_interrupt: pin %ld\n", pin));
 
 	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
@@ -522,8 +522,8 @@ ioapic_configure_io_interrupt(int32 pin, uint32 config)
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
-	TRACE(("ioapic_configure_io_interrupt: IRQ %ld -> pin %ld; config 0x%08lx\n",
-		num, pin, config));
+	TRACE(("ioapic_configure_io_interrupt: pin %ld; config 0x%08lx\n", pin,
+		config));
 
 	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
