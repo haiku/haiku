@@ -45,7 +45,7 @@ irq_descriptor::irq_descriptor()
 
 
 void
-print_irq_descriptor(irq_descriptor* descriptor)
+print_irq_descriptor(const irq_descriptor& descriptor)
 {
 	const char* activeHighString = "active high";
 	const char* activeLowString = " active low";
@@ -53,10 +53,10 @@ print_irq_descriptor(irq_descriptor* descriptor)
 	const char* edgeTriggeredString = "edge triggered";
 
 	dprintf("irq: %u, shareable: %u, polarity: %s, trigger_mode: %s\n",
-		descriptor->irq, descriptor->shareable,
-		descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? activeHighString
+		descriptor.irq, descriptor.shareable,
+		descriptor.polarity == B_HIGH_ACTIVE_POLARITY ? activeHighString
 			: activeLowString,
-		descriptor->trigger_mode == B_LEVEL_TRIGGERED ? levelTriggeredString
+		descriptor.trigger_mode == B_LEVEL_TRIGGERED ? levelTriggeredString
 			: edgeTriggeredString);
 }
 
@@ -79,11 +79,11 @@ print_irq_routing_entry(const irq_routing_entry& entry)
 
 
 void
-print_irq_routing_table(IRQRoutingTable* table)
+print_irq_routing_table(const IRQRoutingTable& table)
 {
-	dprintf("IRQ routing table with %i entries\n", (int)table->Count());
-	for (int i = 0; i < table->Count(); i++)
-		print_irq_routing_entry(table->ElementAt(i));
+	dprintf("IRQ routing table with %i entries\n", (int)table.Count());
+	for (int i = 0; i < table.Count(); i++)
+		print_irq_routing_entry(table.ElementAt(i));
 }
 
 

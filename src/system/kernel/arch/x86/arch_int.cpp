@@ -667,7 +667,7 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
-	print_irq_routing_table(&table);
+	print_irq_routing_table(table);
 
 	status = enable_irq_routing(acpiModule, table);
 	if (status != B_OK) {

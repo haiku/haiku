@@ -68,8 +68,8 @@ struct link_device {
 };
 
 
-void print_irq_descriptor(irq_descriptor* descriptor);
-void print_irq_routing_table(IRQRoutingTable* table);
+void print_irq_descriptor(const irq_descriptor& descriptor);
+void print_irq_routing_table(const IRQRoutingTable& table);
 
 
 status_t prepare_irq_routing(acpi_module_info* acpi, IRQRoutingTable& table,
