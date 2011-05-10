@@ -236,7 +236,8 @@ EthernetSettingsView::AttachedToWindow()
 	fTypeMenuField->Menu()->SetTargetForItems(this);
 
 	// display settigs of first adapter on startup
-	_ShowConfiguration(fSettings.ItemAt(0));
+	if (fSettings.ItemAt(0))
+		_ShowConfiguration(fSettings.ItemAt(0));
 }
 
 
