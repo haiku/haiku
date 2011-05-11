@@ -57,6 +57,8 @@ arch_int_are_interrupts_enabled_inline(void)
 	arch_int_are_interrupts_enabled_inline()
 
 
+#ifdef __cplusplus
+
 typedef struct interrupt_controller_s {
 	const char *name;
 	void	(*enable_io_interrupt)(int32 num);
@@ -69,5 +71,7 @@ typedef struct interrupt_controller_s {
 
 
 void arch_int_set_interrupt_controller(const interrupt_controller &controller);
+
+#endif // __cplusplus
 
 #endif /* _KERNEL_ARCH_x86_INT_H */
