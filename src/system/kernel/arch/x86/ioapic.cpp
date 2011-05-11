@@ -39,10 +39,14 @@
 
 
 // Definitions for a 82093AA IO APIC controller
-#define IO_APIC_IDENTIFICATION				0x00
+#define IO_APIC_ID							0x00
 #define IO_APIC_VERSION						0x01
 #define IO_APIC_ARBITRATION					0x02
 #define IO_APIC_REDIRECTION_TABLE			0x10 // entry = base + 2 * index
+
+// Fields for the id register
+#define IO_APIC_ID_SHIFT					24
+#define IO_APIC_ID_MASK						0x0f
 
 // Fields for the version register
 #define IO_APIC_VERSION_SHIFT				0
@@ -306,10 +310,13 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 	ioapic.global_interrupt_last
 		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
 
-	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08lx\n",
-		ioapic.number, ioapic.global_interrupt_base,
+	uint8 id = (ioapic_read_32(ioapic, IO_APIC_ID) >> IO_APIC_ID_SHIFT)
+		& IO_APIC_ID_MASK;
+
+	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08lx, "
+		"apic-id %u\n", ioapic.number, ioapic.global_interrupt_base,
 		ioapic.global_interrupt_last, ioapic.max_redirection_entry + 1,
-		version);
+		version, id);
 
 	return B_OK;
 }
@@ -382,13 +389,15 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				if (alreadyMapped != NULL) {
 					// we've already mapped this IO-APIC (at boot)
 					dprintf("io-apic %u, already mapped at %p, range %u-%u, "
-						"%u entries, version 0x%08lx, apic-id %u\n",
+						"%u entries, version 0x%08lx, apic-id %lu\n",
 						alreadyMapped->number,
 						alreadyMapped->registers,
 						alreadyMapped->global_interrupt_base,
 						alreadyMapped->global_interrupt_last,
 						alreadyMapped->max_redirection_entry + 1,
-						ioapic_read_32(*alreadyMapped, IO_APIC_VERSION));
+						ioapic_read_32(*alreadyMapped, IO_APIC_VERSION),
+						(ioapic_read_32(*alreadyMapped, IO_APIC_ID)
+							>> IO_APIC_ID_SHIFT) & IO_APIC_ID_MASK);
 					break;
 				}
 
