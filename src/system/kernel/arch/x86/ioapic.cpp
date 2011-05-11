@@ -279,7 +279,7 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 	else
 		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
 
-	entry |= (pin + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
+	entry |= (gsi + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
 	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
 }
 
