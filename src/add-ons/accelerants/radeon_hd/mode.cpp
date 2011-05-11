@@ -50,29 +50,6 @@ create_mode_list(void)
 
 	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
 
-	/* Example nonstandard mode line (1600x900@60) */
-	//static display_mode sDisplayMode;
-	//sDisplayMode.timing.pixel_clock =  97750;
-	//sDisplayMode.timing.h_display = 1600;
-	//sDisplayMode.timing.h_sync_start = 1648;
-	//sDisplayMode.timing.h_sync_end = 1680;
-	//sDisplayMode.timing.h_total = 1760;
-	//sDisplayMode.timing.v_display = 900;
-	//sDisplayMode.timing.v_sync_start = 903;
-	//sDisplayMode.timing.v_sync_end = 908;
-	//sDisplayMode.timing.v_total = 926;
-	//sDisplayMode.timing.flags = B_POSITIVE_HSYNC;
-		// Polarity
-
-	//sDisplayMode.space = B_RGB32_LITTLE;
-		// Pixel configuration
-	//sDisplayMode.virtual_width = 1600;
-	//sDisplayMode.virtual_height = 900;
-	//sDisplayMode.h_display_start = 0;
-	//sDisplayMode.v_display_start = 0;
-	//sDisplayMode.flags = 0;
-		// Mode flags (Some drivers use this)
-
 	return B_OK;
 }
 
