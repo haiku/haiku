@@ -425,6 +425,66 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				lastIOAPIC = ioapic;
 				break;
 			}
+
+#ifdef TRACE_IOAPIC
+			case ACPI_MADT_TYPE_LOCAL_APIC:
+			{
+				// purely informational
+				acpi_madt_local_apic* info = (acpi_madt_local_apic*)apicEntry;
+				dprintf("found local apic with id %u, processor id %u, "
+					"flags 0x%08lx\n", info->Id, info->ProcessorId,
+					(uint32)info->LapicFlags);
+				break;
+			}
+
+			case ACPI_MADT_TYPE_INTERRUPT_OVERRIDE:
+			{
+				// TODO: take these into account
+				acpi_madt_interrupt_override* info
+					= (acpi_madt_interrupt_override*)apicEntry;
+				dprintf("found interrupt override for bus %u, source irq %u, "
+					"global irq %lu, flags 0x%08lx\n", info->Bus,
+					info->SourceIrq, (uint32)info->GlobalIrq,
+					(uint32)info->IntiFlags);
+				break;
+			}
+
+			case ACPI_MADT_TYPE_NMI_SOURCE:
+			{
+				// TODO: take these into account
+				acpi_madt_nmi_source* info
+					= (acpi_madt_nmi_source*)apicEntry;
+				dprintf("found nmi source global irq %lu, flags 0x%04x\n",
+					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
+				break;
+			}
+
+			case ACPI_MADT_TYPE_LOCAL_APIC_NMI:
+			{
+				// TODO: take these into account, but at apic.cpp
+				acpi_madt_local_apic_nmi* info
+					= (acpi_madt_local_apic_nmi*)apicEntry;
+				dprintf("found local apic nmi source for processor %u, "
+					"flags 0x%04x, local int %u\n", info->ProcessorId,
+					(uint16)info->IntiFlags, info->Lint);
+				break;
+			}
+
+			case ACPI_MADT_TYPE_LOCAL_APIC_OVERRIDE:
+			{
+				// TODO: take these into account, but at apic.cpp
+				acpi_madt_local_apic_override* info
+					= (acpi_madt_local_apic_override*)apicEntry;
+				dprintf("found local apic override with address 0x%016llx\n",
+					(uint64)info->Address);
+				break;
+			}
+
+			default:
+				dprintf("found unhandled subtable of type %u length %u\n",
+					apicEntry->Type, apicEntry->Length);
+				break;
+#endif
 		}
 
 		apicEntry
