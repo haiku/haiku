@@ -319,7 +319,8 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint64 targetAPIC)
 {
 	// program the interrupt vectors of the io-apic
 	ioapic.level_triggered_mask = 0;
-	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++) {
+	uint8 gsi = ioapic.global_interrupt_base;
+	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++, gsi++) {
 		// initialize everything to deliver to the boot CPU in physical mode
 		// and masked until explicitly enabled through enable_io_interrupt()
 		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
@@ -327,13 +328,13 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint64 targetAPIC)
 			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
 			| ((i + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
 
-		if (i == 0) {
-			// make redirection entry 0 into an external interrupt
+		if (gsi == 0) {
+			// make GSI 0 into an external interrupt
 			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
 				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
 				| (IO_APIC_DELIVERY_MODE_EXT_INT << IO_APIC_DELIVERY_MODE_SHIFT);
-		} else if (i < 16) {
-			// make 1-15 ISA interrupts
+		} else if (gsi < 16) {
+			// make GSIs 1-15 ISA interrupts
 			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
 				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
 				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
