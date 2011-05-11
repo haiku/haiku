@@ -115,6 +115,8 @@ void		apic_write(uint32 offset, uint32 data);
 uint32		apic_local_id();
 void		apic_end_of_interrupt();
 
+void		apic_disable_local_ints();
+
 status_t	apic_init(kernel_args *args);
 status_t	apic_per_cpu_init(kernel_args *args, int32 cpu);
 

@@ -5,14 +5,17 @@
 
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_int.h>
+#include <arch/x86/ioapic.h>
 #include <arch/x86/msi.h>
 
 #include <debug.h>
 #include <lock.h>
 
 
-static bool sMSISupported = false;
 static const uint32 kVectorCount = 256 - ARCH_INTERRUPT_BASE;
+static const uint8 kNumISAVectors = 16;
+
+static bool sMSISupported = false;
 static bool sAllocatedVectors[kVectorCount];
 static mutex sMSIAllocationLock = MUTEX_INITIALIZER("msi_allocation");
 
@@ -25,12 +28,18 @@ msi_init()
 		return;
 	}
 
-	for (uint16 i = 0; i < kVectorCount; i++)
-		sAllocatedVectors[i] = false;
+	// TODO: less hardcoding!
 
-	// the first 24 vectors are addressable with a single ioapic config
-	for (uint16 i = 0; i < 24; i++)
+	// the first 16 vectors are legacy ISA in all cases
+	for (uint16 i = 0; i < kNumISAVectors; i++)
 		sAllocatedVectors[i] = true;
+
+	for (uint16 i = kNumISAVectors; i < kVectorCount; i++) {
+		// if ioapics aren't in use this will always return false, leaving
+		// the vectors free for us; otherwise we'll avoid any vector that
+		// can be addressed by an IO-APIC
+		sAllocatedVectors[i] = ioapic_is_interrupt_available(i);
+	}
 
 	// performance testing and syscall interrupts
 	sAllocatedVectors[98 - ARCH_INTERRUPT_BASE] = true;

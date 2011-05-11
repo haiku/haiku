@@ -28,6 +28,7 @@
 
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
+#include <arch/x86/msi.h>
 #include <arch/x86/vm86.h>
 
 #include "interrupts.h"
@@ -866,6 +867,7 @@ status_t
 arch_int_init_io(kernel_args* args)
 {
 	ioapic_init(args);
+	msi_init();
 	return B_OK;
 }
 

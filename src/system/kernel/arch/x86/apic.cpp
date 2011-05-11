@@ -56,6 +56,15 @@ apic_end_of_interrupt()
 }
 
 
+void
+apic_disable_local_ints()
+{
+	// just clear them out completely
+	apic_write(APIC_LVT_LINT0, APIC_LVT_MASKED);
+	apic_write(APIC_LVT_LINT1, APIC_LVT_MASKED);
+}
+
+
 status_t
 apic_init(kernel_args *args)
 {
@@ -72,7 +81,6 @@ apic_init(kernel_args *args)
 		return B_ERROR;
 	}
 
-	msi_init();
 	return B_OK;
 }
 

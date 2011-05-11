@@ -171,13 +171,6 @@ ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value)
 
 
 static bool
-ioapic_is_interrupt_available(int32 gsi)
-{
-	return find_ioapic(gsi) != NULL;
-}
-
-
-static bool
 ioapic_is_spurious_interrupt(int32 gsi)
 {
 	// the spurious interrupt vector is initialized to the max value in smp
@@ -456,6 +449,13 @@ acpi_set_interrupt_model(acpi_module_info* acpiModule, uint32 interruptModel)
 }
 
 
+bool
+ioapic_is_interrupt_available(int32 gsi)
+{
+	return find_ioapic(gsi) != NULL;
+}
+
+
 void
 ioapic_map(kernel_args* args)
 {
@@ -576,6 +576,14 @@ ioapic_init(kernel_args* args)
 		ioapic_configure_io_interrupt(entry.irq,
 			entry.polarity | entry.trigger_mode);
 	}
+
+	// kill the local ints on the local APIC
+	apic_disable_local_ints();
+		// TODO: This uses the assumption that our init is running on the
+		// boot CPU and only the boot CPU has the local ints configured
+		// because it was running in legacy PIC mode. Possibly the other
+		// local APICs of the other CPUs have them configured as well. It
+		// shouldn't really harm, but should eventually be corrected.
 
 	// disable the legacy PIC
 	pic_disable();
