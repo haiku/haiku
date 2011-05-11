@@ -57,4 +57,17 @@ arch_int_are_interrupts_enabled_inline(void)
 	arch_int_are_interrupts_enabled_inline()
 
 
+typedef struct interrupt_controller_s {
+	const char *name;
+	void	(*enable_io_interrupt)(int32 num);
+	void	(*disable_io_interrupt)(int32 num);
+	void	(*configure_io_interrupt)(int32 num, uint32 config);
+	bool	(*is_spurious_interrupt)(int32 num);
+	bool	(*is_level_triggered_interrupt)(int32 num);
+	bool	(*end_of_interrupt)(int32 num);
+} interrupt_controller;
+
+
+void arch_int_set_interrupt_controller(const interrupt_controller &controller);
+
 #endif /* _KERNEL_ARCH_x86_INT_H */
