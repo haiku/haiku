@@ -46,7 +46,7 @@
 
 // Fields for the id register
 #define IO_APIC_ID_SHIFT					24
-#define IO_APIC_ID_MASK						0x0f
+#define IO_APIC_ID_MASK						0xff
 
 // Fields for the version register
 #define IO_APIC_VERSION_SHIFT				0
@@ -94,6 +94,8 @@ struct ioapic_registers {
 
 struct ioapic {
 	uint8				number;
+	uint8				apic_id;
+	uint32				version;
 	uint8				max_redirection_entry;
 	uint8				global_interrupt_base;
 	uint8				global_interrupt_last;
@@ -106,10 +108,20 @@ struct ioapic {
 };
 
 
-static ioapic sIOAPICs = { 0, 0, 0, 0, 0, -1, NULL, NULL };
+static ioapic sIOAPICs = { 0, 0, 0, 0, 0, 0, 0, -1, NULL, NULL };
 
 
 // #pragma mark - I/O APIC
+
+
+static void
+print_ioapic(struct ioapic& ioapic)
+{
+	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08lx, "
+		"apic-id %u\n", ioapic.number, ioapic.global_interrupt_base,
+		ioapic.global_interrupt_last, ioapic.max_redirection_entry + 1,
+		ioapic.version, ioapic.apic_id);
+}
 
 
 static inline struct ioapic*
@@ -286,8 +298,8 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 
 	dprintf("mapped io-apic %u to %p\n", ioapic.number, ioapic.registers);
 
-	uint32 version = ioapic_read_32(ioapic, IO_APIC_VERSION);
-	if (version == 0xffffffff) {
+	ioapic.version = ioapic_read_32(ioapic, IO_APIC_VERSION);
+	if (ioapic.version == 0xffffffff) {
 		dprintf("io-apic %u seems inaccessible, not using it\n",
 			ioapic.number);
 		vm_delete_area(B_SYSTEM_TEAM, ioapic.register_area, true);
@@ -297,34 +309,29 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 	}
 
 	ioapic.max_redirection_entry
-		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
+		= ((ioapic.version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
 			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
 
 	ioapic.global_interrupt_last
 		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
-
-	uint8 id = (ioapic_read_32(ioapic, IO_APIC_ID) >> IO_APIC_ID_SHIFT)
-		& IO_APIC_ID_MASK;
-
-	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08lx, "
-		"apic-id %u\n", ioapic.number, ioapic.global_interrupt_base,
-		ioapic.global_interrupt_last, ioapic.max_redirection_entry + 1,
-		version, id);
 
 	return B_OK;
 }
 
 
 static status_t
-ioapic_initialize_ioapic(struct ioapic& ioapic, uint64 targetAPIC)
+ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 {
+	// program the APIC ID
+	ioapic_write_32(ioapic, IO_APIC_ID, ioapic.apic_id << IO_APIC_ID_SHIFT);
+
 	// program the interrupt vectors of the io-apic
 	ioapic.level_triggered_mask = 0;
 	uint8 gsi = ioapic.global_interrupt_base;
 	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++, gsi++) {
 		// initialize everything to deliver to the boot CPU in physical mode
 		// and masked until explicitly enabled through enable_io_interrupt()
-		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
+		uint64 entry = ((uint64)targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
 			| (IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT)
 			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
 			| ((gsi + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
@@ -373,24 +380,21 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 			case ACPI_MADT_TYPE_IO_APIC:
 			{
 				acpi_madt_io_apic* info = (acpi_madt_io_apic*)apicEntry;
-				dprintf("found io-apic with address 0x%08lx and global "
-					"interrupt base %lu\n", (uint32)info->Address,
-					(uint32)info->GlobalIrqBase);
+				dprintf("found io-apic with address 0x%08lx, global "
+					"interrupt base %lu, apic-id %u\n", (uint32)info->Address,
+					(uint32)info->GlobalIrqBase, info->Id);
 
 				struct ioapic* alreadyMapped
 					= find_ioapic((int32)info->GlobalIrqBase);
 				if (alreadyMapped != NULL) {
-					// we've already mapped this IO-APIC (at boot)
-					dprintf("io-apic %u, already mapped at %p, range %u-%u, "
-						"%u entries, version 0x%08lx, apic-id %lu\n",
-						alreadyMapped->number,
-						alreadyMapped->registers,
-						alreadyMapped->global_interrupt_base,
-						alreadyMapped->global_interrupt_last,
-						alreadyMapped->max_redirection_entry + 1,
-						ioapic_read_32(*alreadyMapped, IO_APIC_VERSION),
-						(ioapic_read_32(*alreadyMapped, IO_APIC_ID)
-							>> IO_APIC_ID_SHIFT) & IO_APIC_ID_MASK);
+					// We've already mapped this IO-APIC (at boot), but we
+					// need to fill in the APIC ID. TODO: We might not
+					// actually get the IO-APIC with base 0 as first entry!
+					alreadyMapped->apic_id = info->Id;
+					alreadyMapped->global_interrupt_base = info->GlobalIrqBase;
+					alreadyMapped->global_interrupt_last = info->GlobalIrqBase
+						+ alreadyMapped->max_redirection_entry;
+					print_ioapic(*alreadyMapped);
 					break;
 				}
 
@@ -403,6 +407,7 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				}
 
 				ioapic->number = lastIOAPIC->number + 1;
+				ioapic->apic_id = info->Id;
 				ioapic->global_interrupt_base = info->GlobalIrqBase;
 				ioapic->registers = NULL;
 				ioapic->next = NULL;
@@ -410,12 +415,14 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				dprintf("mapping io-apic %u at physical address %p\n",
 					ioapic->number, (void*)info->Address);
 				status_t status = ioapic_map_ioapic(*ioapic, info->Address);
-				if (status == B_OK) {
-					lastIOAPIC->next = ioapic;
-					lastIOAPIC = ioapic;
-				} else
+				if (status != B_OK) {
 					free(ioapic);
+					break;
+				}
 
+				print_ioapic(*ioapic);
+				lastIOAPIC->next = ioapic;
+				lastIOAPIC = ioapic;
 				break;
 			}
 		}
@@ -548,7 +555,7 @@ ioapic_init(kernel_args* args)
 	print_irq_routing_table(table);
 
 	// use the boot CPU as the target for all interrupts
-	uint64 targetAPIC = args->arch_args.cpu_apic_id[0];
+	uint8 targetAPIC = args->arch_args.cpu_apic_id[0];
 
 	struct ioapic* current = &sIOAPICs;
 	while (current != NULL) {
