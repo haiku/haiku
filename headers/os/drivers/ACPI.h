@@ -234,7 +234,7 @@ struct acpi_module_info {
 	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
 
-	/* Resource info */
+	/* Resource Management */
 
 	status_t	(*get_irq_routing_table)(acpi_handle busDeviceHandle,
 					acpi_data *retBuffer);
@@ -251,6 +251,10 @@ struct acpi_module_info {
 					size_t size);
 	status_t	(*enter_sleep_state)(uint8 state);
 	status_t	(*reboot)(void);
+
+	/* Table Access */
+	status_t	(*get_table)(char *signature, uint32 instance,
+					void **tableHeader);
 };
 
 

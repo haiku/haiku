@@ -713,6 +713,14 @@ reboot(void)
 }
 
 
+status_t
+get_table(char* signature, uint32 instance, void** tableHeader)
+{
+	return AcpiGetTable(signature, instance, (ACPI_TABLE_HEADER**)tableHeader)
+		== AE_OK ? B_OK : B_ERROR;
+}
+
+
 struct acpi_module_info gACPIModule = {
 	{
 		B_ACPI_MODULE_NAME,
@@ -752,5 +760,6 @@ struct acpi_module_info gACPIModule = {
 	set_current_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
-	reboot
+	reboot,
+	get_table
 };

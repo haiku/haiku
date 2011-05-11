@@ -219,7 +219,8 @@ static struct acpi_root_info sACPIRootModule = {
 	set_current_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
-	reboot
+	reboot,
+	get_table
 };
 
 
