@@ -326,7 +326,7 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint64 targetAPIC)
 		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
 			| (IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT)
 			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
-			| ((i + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
+			| ((gsi + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
 
 		if (gsi == 0) {
 			// make GSI 0 into an external interrupt
