@@ -167,10 +167,17 @@ ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value)
 
 
 static bool
-ioapic_is_spurious_interrupt(int32 num)
+ioapic_is_interrupt_available(int32 gsi)
+{
+	return find_ioapic(gsi) != NULL;
+}
+
+
+static bool
+ioapic_is_spurious_interrupt(int32 gsi)
 {
 	// the spurious interrupt vector is initialized to the max value in smp
-	return num == 0xff - ARCH_INTERRUPT_BASE;
+	return gsi == 0xff - ARCH_INTERRUPT_BASE;
 }
 
 
@@ -507,15 +514,9 @@ ioapic_init(kernel_args* args)
 		// aren't different routings based on it this is non-fatal
 	}
 
-	// TODO: this isn't necessarily correct, as they may not be listed in order
-	// of global interrupt base and there may even be gaps!
-	struct ioapic* lastIOAPIC = &sIOAPICs;
-	while (lastIOAPIC->next != NULL)
-		lastIOAPIC = lastIOAPIC->next;
-
 	IRQRoutingTable table;
 	status = prepare_irq_routing(acpiModule, table,
-		lastIOAPIC->global_interrupt_last + 1);
+		&ioapic_is_interrupt_available);
 	if (status != B_OK) {
 		dprintf("IRQ routing preparation failed, not configuring io-apics\n");
 		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);

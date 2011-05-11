@@ -68,12 +68,15 @@ struct link_device {
 };
 
 
+typedef bool (*interrupt_available_check_function)(int32 globalSystemInterrupt);
+
+
 void print_irq_descriptor(const irq_descriptor& descriptor);
 void print_irq_routing_table(const IRQRoutingTable& table);
 
 
 status_t prepare_irq_routing(acpi_module_info* acpi, IRQRoutingTable& table,
-			uint32 maxIRQCount);
+			interrupt_available_check_function checkFunction);
 status_t enable_irq_routing(acpi_module_info* acpi,
 			IRQRoutingTable& routingTable);
 

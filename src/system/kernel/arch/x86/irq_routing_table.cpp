@@ -164,7 +164,8 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 
 static status_t
 choose_link_device_configurations(acpi_module_info* acpi,
-	IRQRoutingTable& routingTable, uint32 maxIRQCount)
+	IRQRoutingTable& routingTable,
+	interrupt_available_check_function checkFunction)
 {
 	/*
 		Before configuring the link devices we have to take a few things into
@@ -184,7 +185,7 @@ choose_link_device_configurations(acpi_module_info* acpi,
 	*/
 
 	uint16 validForPCI = 0; // only applies to the ISA IRQs
-	uint16 irqUsage[maxIRQCount];
+	uint16 irqUsage[256];
 	memset(irqUsage, 0, sizeof(irqUsage));
 
 	// find all unique link devices and resolve their possible IRQs
@@ -254,7 +255,7 @@ choose_link_device_configurations(acpi_module_info* acpi,
 		uint16 bestIRQUsage = UINT16_MAX;
 		for (int j = 0; j < link->possible_irqs.Count(); j++) {
 			irq_descriptor& possibleIRQ = link->possible_irqs.ElementAt(j);
-			if (possibleIRQ.irq >= maxIRQCount) {
+			if (!checkFunction(possibleIRQ.irq)) {
 				// we can't address this pin
 				continue;
 			}
@@ -274,9 +275,8 @@ choose_link_device_configurations(acpi_module_info* acpi,
 		// pick that one and update the counts
 		irq_descriptor& chosenDescriptor
 			= link->possible_irqs.ElementAt(bestIRQIndex);
-		if (chosenDescriptor.irq >= maxIRQCount) {
-			dprintf("chosen irq %u is not addressable (max %lu)\n",
-				chosenDescriptor.irq, maxIRQCount);
+		if (!checkFunction(chosenDescriptor.irq)) {
+			dprintf("chosen irq %u is not addressable\n", chosenDescriptor.irq);
 			return B_ERROR;
 		}
 
@@ -403,7 +403,8 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 static status_t
 read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 	acpi_handle device, const pci_address& parentAddress,
-	IRQRoutingTable& table, bool rootBridge, uint32 maxIRQCount)
+	IRQRoutingTable& table, bool rootBridge,
+	interrupt_available_check_function checkFunction)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
@@ -454,9 +455,8 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		status = handle_routing_table_entry(acpi, pci, acpiTable, pciAddress,
 			irqEntry);
 		if (status == B_OK) {
-			if (irqEntry.source == NULL && irqEntry.irq >= maxIRQCount) {
-				dprintf("hardwired irq %u not addressable (max %lu)\n",
-					irqEntry.irq, maxIRQCount);
+			if (irqEntry.source == NULL && !checkFunction(irqEntry.irq)) {
+				dprintf("hardwired irq %u not addressable\n", irqEntry.irq);
 				free(buffer.pointer);
 				return B_ERROR;
 			}
@@ -494,7 +494,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 
 		TRACE("recursing down to child \"%s\"\n", childName);
 		status = read_irq_routing_table_recursive(acpi, pci, childHandle,
-			pciAddress, table, false, maxIRQCount);
+			pciAddress, table, false, checkFunction);
 		if (status != B_OK)
 			break;
 	}
@@ -506,7 +506,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 
 static status_t
 read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
-	uint32 maxIRQCount)
+	interrupt_available_check_function checkFunction)
 {
 	char rootPciName[255];
 	acpi_handle rootPciHandle;
@@ -540,7 +540,7 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 	}
 
 	status = read_irq_routing_table_recursive(acpi, pci, rootPciHandle,
-		rootPciAddress, table, true, maxIRQCount);
+		rootPciAddress, table, true, checkFunction);
 
 	put_module(B_PCI_MODULE_NAME);
 
@@ -553,14 +553,14 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 
 status_t
 prepare_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable,
-	uint32 maxIRQCount)
+	interrupt_available_check_function checkFunction)
 {
-	status_t status = read_irq_routing_table(acpi, routingTable, maxIRQCount);
+	status_t status = read_irq_routing_table(acpi, routingTable, checkFunction);
 	if (status != B_OK)
 		return status;
 
 	// resolve desired configuration of link devices
-	return choose_link_device_configurations(acpi, routingTable, maxIRQCount);
+	return choose_link_device_configurations(acpi, routingTable, checkFunction);
 }
 
 
