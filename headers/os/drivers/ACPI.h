@@ -253,7 +253,7 @@ struct acpi_module_info {
 	status_t	(*reboot)(void);
 
 	/* Table Access */
-	status_t	(*get_table)(char *signature, uint32 instance,
+	status_t	(*get_table)(const char *signature, uint32 instance,
 					void **tableHeader);
 };
 

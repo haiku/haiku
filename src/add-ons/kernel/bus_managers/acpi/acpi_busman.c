@@ -714,10 +714,10 @@ reboot(void)
 
 
 status_t
-get_table(char* signature, uint32 instance, void** tableHeader)
+get_table(const char* signature, uint32 instance, void** tableHeader)
 {
-	return AcpiGetTable(signature, instance, (ACPI_TABLE_HEADER**)tableHeader)
-		== AE_OK ? B_OK : B_ERROR;
+	return AcpiGetTable((char*)signature, instance,
+		(ACPI_TABLE_HEADER**)tableHeader) == AE_OK ? B_OK : B_ERROR;
 }
 
 

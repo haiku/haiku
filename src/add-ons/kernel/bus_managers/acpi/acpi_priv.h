@@ -136,7 +136,7 @@ typedef struct acpi_root_info {
 	status_t	(*reboot)(void);
 
 	/* Table Access */
-	status_t	(*get_table)(char *signature, uint32 instance,
+	status_t	(*get_table)(const char *signature, uint32 instance,
 					void **tableHeader);
 } acpi_root_info;
 
@@ -215,7 +215,7 @@ status_t enter_sleep_state(uint8 state);
 
 status_t reboot(void);
 
-status_t get_table(char* signature, uint32 instance, void** tableHeader);
+status_t get_table(const char* signature, uint32 instance, void** tableHeader);
 
 __END_DECLS
 
