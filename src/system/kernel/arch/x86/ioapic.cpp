@@ -396,13 +396,12 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				dprintf("mapping io-apic %u at physical address %p\n",
 					ioapic->number, (void*)info->Address);
 				status_t status = ioapic_map_ioapic(*ioapic, info->Address);
-				if (status != B_OK) {
+				if (status == B_OK) {
+					lastIOAPIC->next = ioapic;
+					lastIOAPIC = ioapic;
+				} else
 					free(ioapic);
-					return status;
-				}
 
-				lastIOAPIC->next = ioapic;
-				lastIOAPIC = ioapic;
 				break;
 			}
 		}
@@ -500,9 +499,10 @@ ioapic_init(kernel_args* args)
 
 	status = acpi_enumerate_ioapics(acpiModule);
 	if (status != B_OK) {
-		dprintf("failed to enumerate all io-apics, not using io-apics for "
-			"interrupt routing\n");
-		return;
+		// We don't treat this case as fatal just yet. If we are able to
+		// route everything with the available IO-APICs we're fine, if not
+		// we will fail at the routing preparation stage further down.
+		dprintf("failed to enumerate all io-apics, working with what we got\n");
 	}
 
 	// switch to the APIC interrupt model before retrieving the IRQ routing
