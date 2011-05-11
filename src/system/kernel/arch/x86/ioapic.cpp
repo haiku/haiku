@@ -78,57 +78,88 @@
 #define IO_APIC_INTERRUPT_VECTOR_MASK		0xff
 
 
-typedef struct ioapic_s {
+struct ioapic_registers {
 	volatile uint32	io_register_select;
 	uint32			reserved[3];
 	volatile uint32	io_window_register;
-} ioapic;
+};
 
-static ioapic *sIOAPIC = NULL;
-static uint32 sIOAPICMaxRedirectionEntry = 23;
 
-static uint64 sLevelTriggeredInterrupts = 0;
-	// binary mask: 1 level, 0 edge
+struct ioapic {
+	uint8				number;
+	uint8				max_redirection_entry;
+	uint8				global_interrupt_base;
+	uint8				global_interrupt_last;
+	uint64				level_triggered_mask;
+
+	area_id				register_area;
+	ioapic_registers*	registers;
+
+	ioapic*				next;
+};
+
+
+static ioapic sIOAPICs = { 0, 0, 0, 0, 0, -1, NULL, NULL };
 
 
 // #pragma mark - I/O APIC
 
 
-static inline uint32
-ioapic_read_32(uint8 registerSelect)
+static inline struct ioapic*
+find_ioapic(int32 gsi)
 {
-	sIOAPIC->io_register_select = registerSelect;
-	return sIOAPIC->io_window_register;
+	if (gsi < 0)
+		return NULL;
+
+	struct ioapic* current = &sIOAPICs;
+	while (current != NULL) {
+		if (gsi >= current->global_interrupt_base
+			&& gsi <= current->global_interrupt_last) {
+			return current;
+		}
+
+		current = current->next;
+	}
+
+	return NULL;
+}
+
+
+static inline uint32
+ioapic_read_32(struct ioapic& ioapic, uint8 registerSelect)
+{
+	ioapic.registers->io_register_select = registerSelect;
+	return ioapic.registers->io_window_register;
 }
 
 
 static inline void
-ioapic_write_32(uint8 registerSelect, uint32 value)
+ioapic_write_32(struct ioapic& ioapic, uint8 registerSelect, uint32 value)
 {
-	sIOAPIC->io_register_select = registerSelect;
-	sIOAPIC->io_window_register = value;
+	ioapic.registers->io_register_select = registerSelect;
+	ioapic.registers->io_window_register = value;
 }
 
 
 static inline uint64
-ioapic_read_64(uint8 registerSelect)
+ioapic_read_64(struct ioapic& ioapic, uint8 registerSelect)
 {
-	sIOAPIC->io_register_select = registerSelect + 1;
-	uint64 result = sIOAPIC->io_window_register;
+	ioapic.registers->io_register_select = registerSelect + 1;
+	uint64 result = ioapic.registers->io_window_register;
 	result <<= 32;
-	sIOAPIC->io_register_select = registerSelect;
-	result |= sIOAPIC->io_window_register;
+	ioapic.registers->io_register_select = registerSelect;
+	result |= ioapic.registers->io_window_register;
 	return result;
 }
 
 
 static inline void
-ioapic_write_64(uint8 registerSelect, uint64 value)
+ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value)
 {
-	sIOAPIC->io_register_select = registerSelect;
-	sIOAPIC->io_window_register = (uint32)value;
-	sIOAPIC->io_register_select = registerSelect + 1;
-	sIOAPIC->io_window_register = (uint32)(value >> 32);
+	ioapic.registers->io_register_select = registerSelect;
+	ioapic.registers->io_window_register = (uint32)value;
+	ioapic.registers->io_register_select = registerSelect + 1;
+	ioapic.registers->io_window_register = (uint32)(value >> 32);
 }
 
 
@@ -141,12 +172,14 @@ ioapic_is_spurious_interrupt(int32 num)
 
 
 static bool
-ioapic_is_level_triggered_interrupt(int32 pin)
+ioapic_is_level_triggered_interrupt(int32 gsi)
 {
-	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
+	struct ioapic* ioapic = find_ioapic(gsi);
+	if (ioapic == NULL)
 		return false;
 
-	return (sLevelTriggeredInterrupts & (1 << pin)) != 0;
+	uint8 pin = gsi - ioapic->global_interrupt_base;
+	return (ioapic->level_triggered_mask & (1 << pin)) != 0;
 }
 
 
@@ -159,55 +192,67 @@ ioapic_end_of_interrupt(int32 num)
 
 
 static void
-ioapic_enable_io_interrupt(int32 pin)
+ioapic_enable_io_interrupt(int32 gsi)
 {
-	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
+	struct ioapic* ioapic = find_ioapic(gsi);
+	if (ioapic == NULL)
 		return;
 
-	TRACE(("ioapic_enable_io_interrupt: pin %ld\n", pin));
+	uint8 pin = gsi - ioapic->global_interrupt_base;
+	TRACE(("ioapic_enable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
+		gsi, ioapic->number, pin));
 
-	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
 	entry |= IO_APIC_INTERRUPT_UNMASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
-	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+		// TODO: Take writing order into account! We must not unmask the entry
+		// before the other half is valid.
 }
 
 
 static void
-ioapic_disable_io_interrupt(int32 pin)
+ioapic_disable_io_interrupt(int32 gsi)
 {
-	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
+	struct ioapic* ioapic = find_ioapic(gsi);
+	if (ioapic == NULL)
 		return;
 
-	TRACE(("ioapic_disable_io_interrupt: pin %ld\n", pin));
+	uint8 pin = gsi - ioapic->global_interrupt_base;
+	TRACE(("ioapic_disable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
+		gsi, ioapic->number, pin));
 
-	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
 	entry |= IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
-	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+		// TODO: Take writing order into account! We must not modify the entry
+		// before it is masked.
 }
 
 
 static void
-ioapic_configure_io_interrupt(int32 pin, uint32 config)
+ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 {
-	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
+	struct ioapic* ioapic = find_ioapic(gsi);
+	if (ioapic == NULL)
 		return;
 
-	TRACE(("ioapic_configure_io_interrupt: pin %ld; config 0x%08lx\n", pin,
-		config));
+	uint8 pin = gsi - ioapic->global_interrupt_base;
+	TRACE(("ioapic_configure_io_interrupt: gsi %ld -> io-apic %u pin %u; "
+		"config 0x%08lx\n", gsi, ioapic->number, pin, config));
 
-	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
 		| (1 << IO_APIC_PIN_POLARITY_SHIFT)
 		| (IO_APIC_INTERRUPT_VECTOR_MASK << IO_APIC_INTERRUPT_VECTOR_SHIFT));
 
 	if (config & B_LEVEL_TRIGGERED) {
 		entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT);
-		sLevelTriggeredInterrupts |= (1 << pin);
+		ioapic->level_triggered_mask |= (1 << pin);
 	} else {
 		entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT);
-		sLevelTriggeredInterrupts &= ~(1 << pin);
+		ioapic->level_triggered_mask &= ~(1 << pin);
 	}
 
 	if (config & B_LOW_ACTIVE_POLARITY)
@@ -216,7 +261,82 @@ ioapic_configure_io_interrupt(int32 pin, uint32 config)
 		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
 
 	entry |= (pin + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
-	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+}
+
+
+static status_t
+ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
+{
+	ioapic.register_area = vm_map_physical_memory(B_SYSTEM_TEAM, "io-apic",
+		(void**)&ioapic.registers, ioapic.registers != NULL ? B_EXACT_ADDRESS
+		: B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_KERNEL_READ_AREA
+		| B_KERNEL_WRITE_AREA, physicalAddress, true);
+	if (ioapic.register_area < 0) {
+		panic("mapping io-apic %u failed", ioapic.number);
+		return ioapic.register_area;
+	}
+
+	uint32 version = ioapic_read_32(ioapic, IO_APIC_VERSION);
+	if (version == 0xffffffff) {
+		dprintf("io-apic %u seems inaccessible, not using it\n",
+			ioapic.number);
+		vm_delete_area(B_SYSTEM_TEAM, ioapic.register_area, true);
+		ioapic.register_area = -1;
+		ioapic.registers = NULL;
+		return B_ERROR;
+	}
+
+	ioapic.max_redirection_entry
+		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
+			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
+
+	ioapic.global_interrupt_last
+		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
+
+	dprintf("io-apic %u has range %u-%u, %u entries\n", ioapic.number,
+		ioapic.global_interrupt_base, ioapic.global_interrupt_last,
+		ioapic.max_redirection_entry + 1);
+
+	return B_OK;
+}
+
+
+static status_t
+ioapic_initialize_ioapic(struct ioapic& ioapic, uint64 targetAPIC)
+{
+	// program the interrupt vectors of the io-apic
+	ioapic.level_triggered_mask = 0;
+	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++) {
+		// initialize everything to deliver to the boot CPU in physical mode
+		// and masked until explicitly enabled through enable_io_interrupt()
+		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
+			| (IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT)
+			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
+			| ((i + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
+
+		if (i == 0) {
+			// make redirection entry 0 into an external interrupt
+			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
+				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
+				| (IO_APIC_DELIVERY_MODE_EXT_INT << IO_APIC_DELIVERY_MODE_SHIFT);
+		} else if (i < 16) {
+			// make 1-15 ISA interrupts
+			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
+				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
+				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
+		} else {
+			// and the rest are PCI interrupts
+			entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT)
+				| (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
+				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
+			ioapic.level_triggered_mask |= (1 << i);
+		}
+
+		ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
+	}
+
+	return B_OK;
 }
 
 
@@ -250,19 +370,14 @@ ioapic_map(kernel_args* args)
 	}
 
 	if (args->arch_args.ioapic == NULL) {
-		dprintf("no ioapic available, not using ioapics for interrupt routing\n");
+		dprintf("no io-apic available, not using io-apics for interrupt "
+			"routing\n");
 		return;
 	}
 
-	// map in the (first) IO-APIC
-	sIOAPIC = (ioapic *)args->arch_args.ioapic;
-	if (vm_map_physical_memory(B_SYSTEM_TEAM, "ioapic", (void**)&sIOAPIC,
-			B_EXACT_ADDRESS, B_PAGE_SIZE,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			args->arch_args.ioapic_phys, true) < 0) {
-		panic("mapping the ioapic failed");
-		return;
-	}
+	// map in the first IO-APIC
+	sIOAPICs.registers = (ioapic_registers*)args->arch_args.ioapic;
+	ioapic_map_ioapic(sIOAPICs, args->arch_args.ioapic_phys);
 }
 
 
@@ -279,36 +394,30 @@ ioapic_init(kernel_args* args)
 		&ioapic_end_of_interrupt
 	};
 
-	if (sIOAPIC == NULL)
+	if (sIOAPICs.register_area < 0 || sIOAPICs.registers == NULL)
 		return;
 
 #if 0
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, false)) {
-		dprintf("ioapic explicitly disabled, not using ioapics for interrupt "
-			"routing\n");
+		dprintf("io-apics explicitly disabled, not using io-apics for "
+			"interrupt routing\n");
 		return;
 	}
 #else
 	// TODO: This can be removed once IO-APIC code is broadly tested
 	if (!get_safemode_boolean(B_SAFEMODE_ENABLE_IOAPIC, false)) {
-		dprintf("ioapic not enabled, not using ioapics for interrupt "
+		dprintf("io-apics not enabled, not using io-apics for interrupt "
 			"routing\n");
 		return;
 	}
 #endif
-
-	uint32 version = ioapic_read_32(IO_APIC_VERSION);
-	if (version == 0xffffffff) {
-		dprintf("ioapic seems inaccessible, not using it\n");
-		return;
-	}
 
 	// load acpi module
 	status_t status;
 	acpi_module_info* acpiModule;
 	status = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
 	if (status != B_OK) {
-		dprintf("acpi module not available, not configuring ioapic\n");
+		dprintf("acpi module not available, not configuring io-apics\n");
 		return;
 	}
 	BPrivate::CObjectDeleter<const char, status_t>
@@ -323,24 +432,34 @@ ioapic_init(kernel_args* args)
 		// aren't different routings based on it this is non-fatal
 	}
 
-	sLevelTriggeredInterrupts = 0;
-	sIOAPICMaxRedirectionEntry
-		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
-			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
-
-	TRACE(("ioapic has %lu entries\n", sIOAPICMaxRedirectionEntry + 1));
+	// TODO: read out all IO-APICs from ACPI and set them up
 
 	IRQRoutingTable table;
 	status = prepare_irq_routing(acpiModule, table,
-		sIOAPICMaxRedirectionEntry + 1);
+		sIOAPICs.max_redirection_entry + 1);
 	if (status != B_OK) {
-		dprintf("IRQ routing preparation failed, not configuring ioapic.\n");
+		dprintf("IRQ routing preparation failed, not configuring io-apics\n");
 		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
 			// revert to PIC interrupt model just in case
 		return;
 	}
 
 	print_irq_routing_table(table);
+
+	// use the boot CPU as the target for all interrupts
+	uint64 targetAPIC = args->arch_args.cpu_apic_id[0];
+
+	struct ioapic* current = &sIOAPICs;
+	while (current != NULL) {
+		status = ioapic_initialize_ioapic(*current, targetAPIC);
+		if (status != B_OK) {
+			panic("failed to initialize io-apic %u", current->number);
+			acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
+			return;
+		}
+
+		current = current->next;
+	}
 
 	status = enable_irq_routing(acpiModule, table);
 	if (status != B_OK) {
@@ -350,40 +469,7 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
-	// use the boot CPU as the target for all interrupts
-	uint64 targetAPIC = args->arch_args.cpu_apic_id[0];
-
-	// program the interrupt vectors of the ioapic
-	for (uint32 i = 0; i <= sIOAPICMaxRedirectionEntry; i++) {
-		// initialize everything to deliver to the boot CPU in physical mode
-		// and masked until explicitly enabled through enable_io_interrupt()
-		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
-			| (IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT)
-			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
-			| ((i + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
-
-		if (i == 0) {
-			// make redirection entry 0 into an external interrupt
-			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
-				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
-				| (IO_APIC_DELIVERY_MODE_EXT_INT << IO_APIC_DELIVERY_MODE_SHIFT);
-		} else if (i < 16) {
-			// make 1-15 ISA interrupts
-			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
-				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
-				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
-		} else {
-			// and the rest are PCI interrupts
-			entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT)
-				| (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
-				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
-			sLevelTriggeredInterrupts |= (1 << i);
-		}
-
-		ioapic_write_64(IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
-	}
-
-	// configure io apic interrupts from PCI routing table
+	// configure IO-APIC interrupts from PCI routing table
 	for (int i = 0; i < table.Count(); i++) {
 		irq_routing_entry& entry = table.ElementAt(i);
 		ioapic_configure_io_interrupt(entry.irq,
@@ -394,6 +480,6 @@ ioapic_init(kernel_args* args)
 	pic_disable();
 
 	// prefer the ioapic over the normal pic
-	dprintf("using ioapic for interrupt routing\n");
+	dprintf("using io-apics for interrupt routing\n");
 	arch_int_set_interrupt_controller(ioapicController);
 }
