@@ -437,8 +437,8 @@ mmu_allocate_physical(addr_t base, size_t size)
 	// check whether the physical range is still free
 	phys_addr_t foundBase;
 	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
-			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
-			size, &foundBase) || foundBase != base) {
+			gKernelArgs.num_physical_allocated_ranges, base, size, &foundBase)
+		|| foundBase != base) {
 		return false;
 	}
 
