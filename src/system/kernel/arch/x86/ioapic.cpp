@@ -306,9 +306,10 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 	ioapic.global_interrupt_last
 		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
 
-	dprintf("io-apic %u has range %u-%u, %u entries\n", ioapic.number,
-		ioapic.global_interrupt_base, ioapic.global_interrupt_last,
-		ioapic.max_redirection_entry + 1);
+	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08lx\n",
+		ioapic.number, ioapic.global_interrupt_base,
+		ioapic.global_interrupt_last, ioapic.max_redirection_entry + 1,
+		version);
 
 	return B_OK;
 }
@@ -372,12 +373,22 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 			case ACPI_MADT_TYPE_IO_APIC:
 			{
 				acpi_madt_io_apic* info = (acpi_madt_io_apic*)apicEntry;
-				dprintf("found io-apic with address %lu and global interrupt "
-					"base %lu\n", (uint32)info->Address,
+				dprintf("found io-apic with address 0x%08lx and global "
+					"interrupt base %lu\n", (uint32)info->Address,
 					(uint32)info->GlobalIrqBase);
 
-				if (find_ioapic((int32)info->GlobalIrqBase) != NULL) {
+				struct ioapic* alreadyMapped
+					= find_ioapic((int32)info->GlobalIrqBase);
+				if (alreadyMapped != NULL) {
 					// we've already mapped this IO-APIC (at boot)
+					dprintf("io-apic %u, already mapped at %p, range %u-%u, "
+						"%u entries, version 0x%08lx, apic-id %u\n",
+						alreadyMapped->number,
+						alreadyMapped->registers,
+						alreadyMapped->global_interrupt_base,
+						alreadyMapped->global_interrupt_last,
+						alreadyMapped->max_redirection_entry + 1,
+						ioapic_read_32(*alreadyMapped, IO_APIC_VERSION));
 					break;
 				}
 
