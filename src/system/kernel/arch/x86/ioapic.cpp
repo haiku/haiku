@@ -20,6 +20,9 @@
 #include <arch/x86/arch_int.h>
 #include <arch/x86/pic.h>
 
+// to gain access to the ACPICA types
+#include "acpi.h"
+
 
 //#define TRACE_IOAPIC
 #ifdef TRACE_IOAPIC
@@ -271,11 +274,13 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 	ioapic.register_area = vm_map_physical_memory(B_SYSTEM_TEAM, "io-apic",
 		(void**)&ioapic.registers, ioapic.registers != NULL ? B_EXACT_ADDRESS
 		: B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_KERNEL_READ_AREA
-		| B_KERNEL_WRITE_AREA, physicalAddress, true);
+		| B_KERNEL_WRITE_AREA, physicalAddress, ioapic.registers != NULL);
 	if (ioapic.register_area < 0) {
 		panic("mapping io-apic %u failed", ioapic.number);
 		return ioapic.register_area;
 	}
+
+	dprintf("mapped io-apic %u to %p\n", ioapic.number, ioapic.registers);
 
 	uint32 version = ioapic_read_32(ioapic, IO_APIC_VERSION);
 	if (version == 0xffffffff) {
@@ -334,6 +339,69 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint64 targetAPIC)
 		}
 
 		ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+acpi_enumerate_ioapics(acpi_module_info* acpi)
+{
+	acpi_table_madt* madt = NULL;
+	if (acpi->get_table(ACPI_SIG_MADT, 0, (void**)&madt) != B_OK) {
+		dprintf("failed to get MADT from ACPI, not configuring io-apics\n");
+		return B_ERROR;
+	}
+
+	struct ioapic* lastIOAPIC = &sIOAPICs;
+
+	acpi_subtable_header* apicEntry
+		= (acpi_subtable_header*)((uint8*)madt + sizeof(acpi_table_madt));
+	void* end = ((uint8*)madt + madt->Header.Length);
+	while (apicEntry < end) {
+		switch (apicEntry->Type) {
+			case ACPI_MADT_TYPE_IO_APIC:
+			{
+				acpi_madt_io_apic* info = (acpi_madt_io_apic*)apicEntry;
+				dprintf("found io-apic with address %lu and global interrupt "
+					"base %lu\n", (uint32)info->Address,
+					(uint32)info->GlobalIrqBase);
+
+				if (find_ioapic((int32)info->GlobalIrqBase) != NULL) {
+					// we've already mapped this IO-APIC (at boot)
+					break;
+				}
+
+				struct ioapic* ioapic
+					= (struct ioapic*)malloc(sizeof(struct ioapic));
+				if (ioapic == NULL) {
+					dprintf("ran out of memory while allocating io-apic "
+						"structure\n");
+					return B_NO_MEMORY;
+				}
+
+				ioapic->number = lastIOAPIC->number + 1;
+				ioapic->global_interrupt_base = info->GlobalIrqBase;
+				ioapic->registers = NULL;
+				ioapic->next = NULL;
+
+				dprintf("mapping io-apic %u at physical address %p\n",
+					ioapic->number, (void*)info->Address);
+				status_t status = ioapic_map_ioapic(*ioapic, info->Address);
+				if (status != B_OK) {
+					free(ioapic);
+					return status;
+				}
+
+				lastIOAPIC->next = ioapic;
+				lastIOAPIC = ioapic;
+				break;
+			}
+		}
+
+		apicEntry
+			= (acpi_subtable_header*)((uint8*)apicEntry + apicEntry->Length);
 	}
 
 	return B_OK;
@@ -423,7 +491,14 @@ ioapic_init(kernel_args* args)
 	BPrivate::CObjectDeleter<const char, status_t>
 		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
 
-	// switch to the APIC interrupt model before retrieving the irq routing
+	status = acpi_enumerate_ioapics(acpiModule);
+	if (status != B_OK) {
+		dprintf("failed to enumerate all io-apics, not using io-apics for "
+			"interrupt routing\n");
+		return;
+	}
+
+	// switch to the APIC interrupt model before retrieving the IRQ routing
 	// table as it will return different settings depending on the model
 	status = acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_APIC);
 	if (status != B_OK) {
@@ -432,11 +507,15 @@ ioapic_init(kernel_args* args)
 		// aren't different routings based on it this is non-fatal
 	}
 
-	// TODO: read out all IO-APICs from ACPI and set them up
+	// TODO: this isn't necessarily correct, as they may not be listed in order
+	// of global interrupt base and there may even be gaps!
+	struct ioapic* lastIOAPIC = &sIOAPICs;
+	while (lastIOAPIC->next != NULL)
+		lastIOAPIC = lastIOAPIC->next;
 
 	IRQRoutingTable table;
 	status = prepare_irq_routing(acpiModule, table,
-		sIOAPICs.max_redirection_entry + 1);
+		lastIOAPIC->global_interrupt_last + 1);
 	if (status != B_OK) {
 		dprintf("IRQ routing preparation failed, not configuring io-apics\n");
 		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
