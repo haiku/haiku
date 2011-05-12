@@ -173,12 +173,17 @@ ioapic_read_64(struct ioapic& ioapic, uint8 registerSelect)
 
 
 static inline void
-ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value)
+ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value,
+	bool maskFirst)
 {
-	ioapic.registers->io_register_select = registerSelect;
-	ioapic.registers->io_window_register = (uint32)value;
-	ioapic.registers->io_register_select = registerSelect + 1;
-	ioapic.registers->io_window_register = (uint32)(value >> 32);
+	ioapic.registers->io_register_select
+		= registerSelect + (maskFirst ? 0 : 1);
+	ioapic.registers->io_window_register
+		= (uint32)(value >> (maskFirst ? 0 : 32));
+	ioapic.registers->io_register_select
+		= registerSelect + (maskFirst ? 1 : 0);
+	ioapic.registers->io_window_register
+		= (uint32)(value >> (maskFirst ? 32 : 0));
 }
 
 
@@ -224,9 +229,7 @@ ioapic_enable_io_interrupt(int32 gsi)
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
 	entry |= IO_APIC_INTERRUPT_UNMASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
-	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
-		// TODO: Take writing order into account! We must not unmask the entry
-		// before the other half is valid.
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, false);
 }
 
 
@@ -244,9 +247,7 @@ ioapic_disable_io_interrupt(int32 gsi)
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
 	entry |= IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
-	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
-		// TODO: Take writing order into account! We must not modify the entry
-		// before it is masked.
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, true);
 }
 
 
@@ -280,7 +281,7 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
 
 	entry |= (gsi + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
-	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, true);
 }
 
 
@@ -354,7 +355,7 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 			ioapic.level_triggered_mask |= ((uint64)1 << i);
 		}
 
-		ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
+		ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + 2 * i, entry, true);
 	}
 
 	return B_OK;
