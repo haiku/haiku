@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -27,7 +28,7 @@
 
 #define TRACE_DEVICE
 #ifdef TRACE_DEVICE
-#	define TRACE(x) dprintf x
+#   define TRACE(x...) dprintf("radeon_hd: " x)
 #else
 #	define TRACE(x) ;
 #endif
@@ -43,7 +44,7 @@
 status_t
 radeon_hd_init(radeon_info &info)
 {
-	TRACE((DEVICE_NAME ": radeon_hd_init() called\n"));
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
 	// memory mapped I/O
 	AreaKeeper sharedCreator;
@@ -56,6 +57,7 @@ radeon_hd_init(radeon_info &info)
 
 	memset((void *)info.shared_info, 0, sizeof(radeon_shared_info));
 
+	// R6xx_R7xx_3D.pdf, 5.3.3.1 SET_CONFIG_REG
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
 		(void *)info.pci->u.h0.base_registers[RHD_MMIO_BAR],
@@ -63,7 +65,8 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
+		dprintf(DEVICE_NAME ": card (%ld): could not map memory I/O!\n",
+			info.id);
 		return info.registers_area;
 	}
 
@@ -74,7 +77,8 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void **)&info.shared_info->graphics_memory);
 	if (frambufferMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": could not map framebuffer!\n");
+		dprintf(DEVICE_NAME ": card(%ld): could not map framebuffer!\n",
+			info.id);
 		return info.framebuffer_area;
 	}
 
@@ -95,18 +99,24 @@ radeon_hd_init(radeon_info &info)
 	edid1_info* edidInfo = (edid1_info*)get_boot_item(EDID_BOOT_INFO,
 		NULL);
 	if (edidInfo != NULL) {
-		TRACE((DEVICE_NAME ": %s found VESA EDID modes.\n", __func__));
+		TRACE("card(%ld): %s found BIOS EDID information.\n", info.id,
+			__func__);
 		info.shared_info->has_edid = true;
 		memcpy(&info.shared_info->edid_info, edidInfo, sizeof(edid1_info));
 	} else {
-		TRACE((DEVICE_NAME ": %s didn't find VESA EDID modes.\n", __func__));
+		TRACE("card(%ld): %s didn't find BIOS EDID modes.\n", info.id,
+			__func__);
 		info.shared_info->has_edid = false;
 	}
 
 	// Read R6XX memory size into shared info
-	//info.shared_info->graphics_memory_size = (uint32)read32(R6XX_CONFIG_MEMSIZE);
+	info.shared_info->graphics_memory_size
+		= read32(info.registers + R6XX_CONFIG_MEMSIZE);
 
-	TRACE((DEVICE_NAME ": radeon_hd_init() completed successfully!\n"));
+	TRACE("card(%ld): found %ld MB memory on card.\n", info.id,
+		info.shared_info->graphics_memory_size);
+
+	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
 	return B_OK;
 }
 
@@ -114,7 +124,7 @@ radeon_hd_init(radeon_info &info)
 void
 radeon_hd_uninit(radeon_info &info)
 {
-	TRACE((DEVICE_NAME ": radeon_hd_uninit()\n"));
+	TRACE("card(%ld): %s called\n", info.id, __func__);
 
 	delete_area(info.shared_area);
 	delete_area(info.registers_area);
