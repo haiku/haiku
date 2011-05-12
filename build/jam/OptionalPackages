@@ -435,11 +435,11 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc4-2011-03-14.zip
-			: $(baseURL)/curl-7.21.4-x86-gcc4-2011-03-14.zip ;
+		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc4-2011-05-10.zip
+			: $(baseURL)/curl-7.21.6-x86-gcc4-2011-05-10.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc2-2011-03-14.zip
-			: $(baseURL)/curl-7.21.4-x86-gcc2-2011-03-14.zip ;
+		InstallOptionalHaikuImagePackage curl-7.21.6-x86-gcc2-2011-05-10.zip
+			: $(baseURL)/curl-7.21.6-x86-gcc2-2011-05-10.zip ;
 	}
 }
 
@@ -733,7 +733,7 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				expat-2.0.1-r1a2-x86-gcc2-2011-05-08.zip
+				expat-2.0.1-x86-gcc2-2011-05-08.zip
 				: $(baseURL)/expat-2.0.1-x86-gcc2-2011-05-08.zip
 				: : true ;
 		}
@@ -795,8 +795,8 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 		Echo "No optional package Git available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			git-1.7.3.5-x86-gcc2-2011-03-15.zip
-			: $(baseURL)/git-1.7.3.5-x86-gcc2-2011-03-15.zip
+			git-1.7.5-x86-gcc2-2011-05-10.zip
+			: $(baseURL)/git-1.7.5-x86-gcc2-2011-05-10.zip
 			: : true ;
 	}
 }
@@ -1070,13 +1070,13 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				mercurial-1.6-x86-gcc4-2010-11-12.zip
-				: $(baseURL)/mercurial-1.6-x86-gcc4-2010-11-12.zip
+				mercurial-1.8.3-x86-gcc4-2011-05-10.zip
+				: $(baseURL)/mercurial-1.8.3-x86-gcc4-2011-05-10.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				mercurial-1.6-x86-gcc2-2010-07-01.zip
-				: $(baseURL)/mercurial-1.6-x86-gcc2-2010-07-01.zip
+				mercurial-1.8.3-x86-gcc2-2011-05-10.zip
+				: $(baseURL)/mercurial-1.8.3-x86-gcc2-2011-05-10.zip
 				: : true ;
 		}
 	}
@@ -1112,8 +1112,8 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 				: $(baseURL)/neon-0.29.5-x86-gcc4-2011-03-16.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				neon-0.29.5-x86-gcc2-2011-03-16.zip
-				: $(baseURL)/neon-0.29.5-x86-gcc2-2011-03-16.zip ;
+				neon-0.29.6-x86-gcc2-2011-05-10.zip
+				: $(baseURL)/neon-0.29.6-x86-gcc2-2011-05-10.zip ;
 		}
 	}
 }
@@ -1204,12 +1204,12 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				openssh-5.8p1-x86-gcc4-2011-02-28.zip
-				: $(baseURL)/openssh-5.8p1-x86-gcc4-2011-02-28.zip ;
+				openssh-5.8p2-x86-gcc4-2011-05-11.zip
+				: $(baseURL)/openssh-5.8p2-x86-gcc4-2011-05-11.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				openssh-5.8p1-x86-gcc2-2011-03-01.zip
-				: $(baseURL)/openssh-5.8p1-x86-gcc2-2011-03-01.zip ;
+				openssh-5.8p2-x86-gcc2-2011-05-10.zip
+				: $(baseURL)/openssh-5.8p2-x86-gcc2-2011-05-10.zip ;
 		}
 
 		AddUserToHaikuImage sshd : 1001 : 100 : /var/empty : /bin/true
