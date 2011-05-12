@@ -28,7 +28,7 @@
 
 #define TRACE_DEVICE
 #ifdef TRACE_DEVICE
-#   define TRACE(x...) dprintf("radeon_hd: " x)
+#	define TRACE(x...) dprintf("radeon_hd: " x)
 #else
 #	define TRACE(x) ;
 #endif
