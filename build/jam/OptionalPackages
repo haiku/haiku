@@ -794,10 +794,17 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Git available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			git-1.7.5-x86-gcc2-2011-05-10.zip
-			: $(baseURL)/git-1.7.5-x86-gcc2-2011-05-10.zip
-			: : true ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				git-1.7.5-x86-gcc4-2011-05-10.zip
+				: $(baseURL)/git-1.7.5-x86-gcc4-2011-05-10.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				git-1.7.5-x86-gcc2-2011-05-10.zip
+				: $(baseURL)/git-1.7.5-x86-gcc2-2011-05-10.zip
+				: : true ;
+		}
 	}
 }
 
