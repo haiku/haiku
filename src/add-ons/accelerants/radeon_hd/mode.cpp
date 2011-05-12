@@ -159,7 +159,7 @@ CardModeSet(display_mode *mode)
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
 
 	// set flag for neg. H sync
-	if (displayTiming.flags & ~B_POSITIVE_HSYNC)
+	if (!(displayTiming.flags & B_POSITIVE_HSYNC))
 		write32(regOffset + D1CRTC_H_SYNC_A_CNTL, 0x01);
 
 	// *** Vertical
@@ -184,7 +184,7 @@ CardModeSet(display_mode *mode)
 		(displayTiming.v_sync_end - displayTiming.v_sync_start) << 16);
 
 	// set flag for neg. V sync
-	if (displayTiming.flags & ~B_POSITIVE_VSYNC)
+	if (!(displayTiming.flags & B_POSITIVE_VSYNC))
 		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x01);
 
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
