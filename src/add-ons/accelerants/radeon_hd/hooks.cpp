@@ -40,6 +40,8 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)radeon_set_display_mode;
 		case B_GET_DISPLAY_MODE:
 			return (void*)radeon_get_display_mode;
+		case B_GET_EDID_INFO:
+			return (void*)radeon_get_edid_info;
 
 		case B_GET_FRAME_BUFFER_CONFIG:
 			return (void*)radeon_get_frame_buffer_config;

@@ -76,6 +76,22 @@ radeon_get_mode_list(display_mode *modeList)
 }
 
 
+status_t
+radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
+{
+	TRACE("%s\n", __func__);
+	if (!gInfo->shared_info->has_edid)
+		return B_ERROR;
+	if (size < sizeof(struct edid1_info))
+		return B_BUFFER_OVERFLOW;
+
+	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
+	*edid_version = EDID_VERSION_1;
+
+	return B_OK;
+}
+
+
 static void
 get_color_space_format(const display_mode &mode, uint32 &colorMode,
 	uint32 &bytesPerRow, uint32 &bitsPerPixel)
@@ -133,7 +149,7 @@ CardModeSet(display_mode *mode)
 	write32(regOffset + D1CRTC_H_TOTAL, displayTiming.h_total - 1);
 
 	// determine blanking based on passed modeline
-	uint16 blankStart = displayTiming.h_display;
+	uint16 blankStart = displayTiming.h_display + 1;
 	uint16 blankEnd = displayTiming.h_total;
 
 	write32(regOffset + D1CRTC_H_BLANK_START_END,
@@ -144,7 +160,7 @@ CardModeSet(display_mode *mode)
 
 	// set flag for neg. H sync
 	if (displayTiming.flags & ~B_POSITIVE_HSYNC)
-		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x01);
+		write32(regOffset + D1CRTC_H_SYNC_A_CNTL, 0x01);
 
 	// *** Vertical
 	write32(regOffset + D1CRTC_V_TOTAL, displayTiming.v_total - 1);
@@ -169,7 +185,7 @@ CardModeSet(display_mode *mode)
 
 	// set flag for neg. V sync
 	if (displayTiming.flags & ~B_POSITIVE_VSYNC)
-		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x02);
+		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x01);
 
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
 		should only be set to 1 on 30bpp DVI modes
