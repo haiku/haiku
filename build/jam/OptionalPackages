@@ -1755,6 +1755,10 @@ if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
 if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			yasm-1.1.0-x86-gcc4-2011-05-13.zip
+			: $(baseURL)/yasm-1.1.0-x86-gcc4-2011-05-13.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			yasm-1.1.0-x86-gcc2-2011-04-29.zip
