@@ -1421,8 +1421,8 @@ if [ IsOptionalHaikuImagePackageAdded Sed ] {
 		Echo "No optional package Sed available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			sed-4.2.1-x86-gcc4-2011-05-12.zip
-			: $(baseURL)/sed-4.2.1-x86-gcc4-2011-05-12.zip ;
+			sed-4.2.1-x86-gcc4-2011-05-13.zip
+			: $(baseURL)/sed-4.2.1-x86-gcc4-2011-05-13.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			sed-4.2.1-x86-gcc2-2011-03-14.zip
