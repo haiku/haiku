@@ -334,21 +334,56 @@ rule CopySetHaikuRevision target : source
 actions CopySetHaikuRevision1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	# Try svn or git-svn
-	# Extract from "Revision: 12345" line
-	revision=`(LC_ALL=C LANG=C svn info $(HAIKU_TOP) ||
-		(cd $(HAIKU_TOP) && [ -d .git/svn ] && LC_ALL=C LANG=C git svn info)) 2> /dev/null |
-			grep Revision | awk '{printf $2}'`
-	if [ "$revision" = 0 -o "$revision" = "" ]; then
-		# git-svn not present or not configured for this repository
-		# Try searching git logs for last git-svn commit
-		# Extract from " git-svn-id: .../haiku/trunk@12345 ..." line
-		revision=`cd $(HAIKU_TOP) &&
-			git log --max-count=1 --grep="git-svn-id:" 2> /dev/null |
-				grep "git-svn-id:" | cut -d '@' -f 2 |
-					awk '{printf $1}'`
-	fi
-	if [ "$revision" = 0 -o "$revision" = "" ]; then
+
+	originalDir=`pwd`
+	cd $(HAIKU_TOP)
+	export LC_ALL=C
+	if [ -d .svn ]; then
+		revision=`svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
+	elif [ -d .git/svn ]; then
+		revision=`git svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
+	elif [ -d .git ]; then
+		revision=`cat $(HAIKU_BUILD_OUTPUT_DIR)/haiku-revision 2>/dev/null`
+		lastBuiltRevision=`cat $(HAIKU_BUILD_OUTPUT_DIR)/last-built-revision \
+			2>/dev/null`
+		localRev=`git rev-list -n1 HEAD`
+
+		# only determine the haiku-revision if anything has changed from
+		# last build
+		if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
+			currentBranch=`git branch --contains HEAD | awk '{printf $2}'`
+			haikuTip=`git rev-list -n1 haiku/${currentBranch}.tip`
+
+			# make sure that haiku-tip matches the remote tracking branch,
+			# otherwise the tag hasn't been fetched/updated and we should
+			# print a warning
+			trackingBranch=`git branch -r --contains $haikuTip \
+				| grep -v -- '->' | tr -d ' '`
+			haikuTipLag=`git rev-list --count ${haikuTip}..$trackingBranch`
+			if [ "$haikuTipLag" != "0" ]; then
+				echo "*********************************************************"
+				echo "!!! haiku/${currentBranch}.tip is $haikuTipLag behind \
+					remote tracking branch"
+				echo "!!! you may want to 'git fetch --tags' to update the tag"
+				echo "*********************************************************"
+			fi
+
+			# the haiku revision the HEAD is based on is the nearest common ancestor
+			# of these two (i.e. the merge base)
+			haikuBaseRev=`git merge-base $localRev $haikuTip`
+
+			# the revision we use is the description of HEAD with
+			# respect to the root of the current branch
+			revision=`git describe --dirty --long --match=haiku/$currentBranch`
+			if [ "$localRev" != "$haikuBaseRev" ]; then
+				# HEAD is not a changeset from Haiku's central repo, so we add
+				# a description of the changeset in Haiku's repo HEAD is based on
+				haikuBaseRevDescr=`git describe --long --match=haiku/$currentBranch $haikuBaseRev`
+				revision="$revision [$haikuBaseRevDescr]"
+			fi
+			echo $localRev >$(HAIKU_BUILD_OUTPUT_DIR)/last-built-revision
+		fi
+	elif [ -d .hg ]; then
 		# Try searching hg log for last svn commit
 		# Extract from "(svn r12345) ..." line
 		revision=`(cd $(HAIKU_TOP) &&
@@ -359,6 +394,8 @@ actions CopySetHaikuRevision1
 	if [ "$revision" = "" ]; then
 		revision=0
 	fi
+	echo $revision >$(HAIKU_BUILD_OUTPUT_DIR)/haiku-revision
+	cd $originalDir
 	$(2[1]) --data $(2[3]) $(1) &&
 	$(2[2]) $(1) ${revision}
 }
