@@ -25,6 +25,7 @@ MergeObject os_main.o :
 	scheduler.c
 	sem.c
 	system_info.c
+	system_revision.c
 	team.c
 	thread.c
 	time.cpp

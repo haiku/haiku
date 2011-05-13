@@ -11,4 +11,18 @@
 #define SYSTEM_REVISION_LENGTH 128
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/** returns the system revision */
+const char* get_system_revision();
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif	/* _SYSTEM_SYSTEM_REVISION_H */
