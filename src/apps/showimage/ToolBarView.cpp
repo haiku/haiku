@@ -36,8 +36,8 @@ void
 ToolBarView::Hide()
 {
 	BView::Hide();
-	// TODO: This could be fixed in BView instead. Looking from the BIconButtons, they
-	// are not hidden, though, only their parent is...
+	// TODO: This could be fixed in BView instead. Looking from the 
+	// BIconButtons, they are not hidden though, only their parent is...
 	_HideToolTips();
 }
 
