@@ -89,7 +89,7 @@ inline uint32_t
 ReadPLL(int screenIndex, uint16_t offset)
 {
 	write32(CLOCK_CNTL_INDEX, offset & PLL_ADDR);
-	return read32(CLOCK_CNTL_INDEX);
+	return read32(CLOCK_CNTL_DATA);
 }
 
 
