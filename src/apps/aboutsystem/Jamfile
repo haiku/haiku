@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps aboutsystem ;
 
-UsePrivateHeaders app shared ;
+UsePrivateHeaders app shared system ;
 
 Application AboutSystem :
 	AboutSystem.cpp

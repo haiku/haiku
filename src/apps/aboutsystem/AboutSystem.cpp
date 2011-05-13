@@ -11,7 +11,6 @@
 
 #include <ctype.h>
 #include <stdio.h>
-#include <sys/utsname.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -47,6 +46,7 @@
 #include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <cpu_type.h>
+#include <system_revision.h>
 
 #include <Catalog.h>
 #include <Language.h>
@@ -541,19 +541,14 @@ AboutView::AboutView()
 			strlcpy(string, versionInfo.short_info, sizeof(string));
 	}
 
-	// Add revision from uname() info
-	utsname unameInfo;
-	if (uname(&unameInfo) == 0) {
-		long revision;
-		if (sscanf(unameInfo.version, "r%ld", &revision) == 1) {
-			char version[16];
-			snprintf(version, sizeof(version), "%ld", revision);
-			strlcat(string, " (", sizeof(string));
-			strlcat(string, B_TRANSLATE("Revision"), sizeof(string));
-			strlcat(string, " ", sizeof(string));
-			strlcat(string, version, sizeof(string));
-			strlcat(string, ")", sizeof(string));
-		}
+	// Add system revision
+	const char* haikuRevision = get_system_revision();
+	if (haikuRevision != NULL) {
+		strlcat(string, " (", sizeof(string));
+		strlcat(string, B_TRANSLATE("Revision"), sizeof(string));
+		strlcat(string, " ", sizeof(string));
+		strlcat(string, haikuRevision, sizeof(string));
+		strlcat(string, ")", sizeof(string));
 	}
 
 	BStringView* versionView = new BStringView("ostext", string);
