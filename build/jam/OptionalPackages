@@ -754,6 +754,10 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 if [ IsOptionalHaikuImagePackageAdded Fastdep ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Fastdep available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			fastdep-0.16-x86-gcc4-2011-05-12.zip
+			: $(baseURL)/fastdep-0.16-x86-gcc4-2011-05-12.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			fastdep-0.16-x86-gcc2-2010-09-02.zip
