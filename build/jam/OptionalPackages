@@ -358,6 +358,10 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 if [ IsOptionalHaikuImagePackageAdded CCache ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CCache available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			ccache-3.1.4-x86-gcc4-2011-05-12.zip
+			: $(baseURL)/ccache-3.1.4-x86-gcc4-2011-05-12.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			ccache-3.0.1-x86-gcc2-2010-08-30.zip
