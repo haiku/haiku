@@ -825,10 +825,6 @@ arch_int_init_post_vm(struct kernel_args *args)
 	// don't end up using the io apic
 	apic_init(args);
 
-	// We need to map in the I/O APIC here, since we would lose the already
-	// wired mapping before arch_int_init_io() is called.
-	ioapic_map(args);
-
 	// create IDT area for the boot CPU
 	area_id area = create_area("idt", (void**)&sIDTs[0], B_EXACT_ADDRESS,
 		B_PAGE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);

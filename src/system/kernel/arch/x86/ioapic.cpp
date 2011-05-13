@@ -108,7 +108,7 @@ struct ioapic {
 };
 
 
-static ioapic sIOAPICs = { 0, 0, 0, 0, 0, 0, 0, -1, NULL, NULL };
+static ioapic* sIOAPICs = NULL;
 
 
 // #pragma mark - I/O APIC
@@ -130,7 +130,7 @@ find_ioapic(int32 gsi)
 	if (gsi < 0)
 		return NULL;
 
-	struct ioapic* current = &sIOAPICs;
+	struct ioapic* current = sIOAPICs;
 	while (current != NULL) {
 		if (gsi >= current->global_interrupt_base
 			&& gsi <= current->global_interrupt_last) {
@@ -371,7 +371,7 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 		return B_ERROR;
 	}
 
-	struct ioapic* lastIOAPIC = &sIOAPICs;
+	struct ioapic* lastIOAPIC = sIOAPICs;
 
 	acpi_subtable_header* apicEntry
 		= (acpi_subtable_header*)((uint8*)madt + sizeof(acpi_table_madt));
@@ -385,20 +385,6 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 					"interrupt base %lu, apic-id %u\n", (uint32)info->Address,
 					(uint32)info->GlobalIrqBase, info->Id);
 
-				struct ioapic* alreadyMapped
-					= find_ioapic((int32)info->GlobalIrqBase);
-				if (alreadyMapped != NULL) {
-					// We've already mapped this IO-APIC (at boot), but we
-					// need to fill in the APIC ID. TODO: We might not
-					// actually get the IO-APIC with base 0 as first entry!
-					alreadyMapped->apic_id = info->Id;
-					alreadyMapped->global_interrupt_base = info->GlobalIrqBase;
-					alreadyMapped->global_interrupt_last = info->GlobalIrqBase
-						+ alreadyMapped->max_redirection_entry;
-					print_ioapic(*alreadyMapped);
-					break;
-				}
-
 				struct ioapic* ioapic
 					= (struct ioapic*)malloc(sizeof(struct ioapic));
 				if (ioapic == NULL) {
@@ -407,7 +393,8 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 					return B_NO_MEMORY;
 				}
 
-				ioapic->number = lastIOAPIC->number + 1;
+				ioapic->number
+					= lastIOAPIC != NULL ? lastIOAPIC->number + 1 : 0;
 				ioapic->apic_id = info->Id;
 				ioapic->global_interrupt_base = info->GlobalIrqBase;
 				ioapic->registers = NULL;
@@ -422,7 +409,12 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				}
 
 				print_ioapic(*ioapic);
-				lastIOAPIC->next = ioapic;
+
+				if (lastIOAPIC == NULL)
+					sIOAPICs = ioapic;
+				else
+					lastIOAPIC->next = ioapic;
+
 				lastIOAPIC = ioapic;
 				break;
 			}
@@ -525,26 +517,6 @@ ioapic_is_interrupt_available(int32 gsi)
 
 
 void
-ioapic_map(kernel_args* args)
-{
-	if (args->arch_args.apic == NULL) {
-		dprintf("no local apic available\n");
-		return;
-	}
-
-	if (args->arch_args.ioapic == NULL) {
-		dprintf("no io-apic available, not using io-apics for interrupt "
-			"routing\n");
-		return;
-	}
-
-	// map in the first IO-APIC
-	sIOAPICs.registers = (ioapic_registers*)args->arch_args.ioapic;
-	ioapic_map_ioapic(sIOAPICs, args->arch_args.ioapic_phys);
-}
-
-
-void
 ioapic_init(kernel_args* args)
 {
 	static const interrupt_controller ioapicController = {
@@ -557,8 +529,14 @@ ioapic_init(kernel_args* args)
 		&ioapic_end_of_interrupt
 	};
 
-	if (sIOAPICs.register_area < 0 || sIOAPICs.registers == NULL)
+	if (args->arch_args.apic == NULL)
 		return;
+
+	if (args->arch_args.ioapic_phys == 0) {
+		dprintf("no io-apics available, not using io-apics for interrupt "
+			"routing\n");
+		return;
+	}
 
 #if 0
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, false)) {
@@ -618,7 +596,7 @@ ioapic_init(kernel_args* args)
 	// use the boot CPU as the target for all interrupts
 	uint8 targetAPIC = args->arch_args.cpu_apic_id[0];
 
-	struct ioapic* current = &sIOAPICs;
+	struct ioapic* current = sIOAPICs;
 	while (current != NULL) {
 		status = ioapic_initialize_ioapic(*current, targetAPIC);
 		if (status != B_OK) {

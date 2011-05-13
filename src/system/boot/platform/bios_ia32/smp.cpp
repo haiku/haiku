@@ -204,7 +204,8 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 				struct mp_base_ioapic *io = (struct mp_base_ioapic *)pointer;
 				pointer += sizeof(struct mp_base_ioapic);
 
-				gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
+				if (gKernelArgs.arch_args.ioapic_phys != 0)
+					gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
@@ -290,7 +291,8 @@ smp_do_acpi_config(void)
 				acpi_io_apic *ioApic = (acpi_io_apic *)apic;
 				TRACE(("smp: found io APIC with id %u and address 0x%lx\n",
 					ioApic->io_apic_id, ioApic->io_apic_address));
-				gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
+				if (gKernelArgs.arch_args.ioapic_phys == 0)
+					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
 				break;
 			}
 		}
@@ -410,16 +412,11 @@ smp_init_other_cpus(void)
 	TRACE(("smp: ioapic_phys = %p\n",
 		(void *)gKernelArgs.arch_args.ioapic_phys));
 
-	// map in the apic & ioapic (if available)
+	// map in the apic
 	gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
 		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
-	if (gKernelArgs.arch_args.ioapic_phys != 0) {
-		gKernelArgs.arch_args.ioapic = (uint32 *)mmu_map_physical_memory(
-			gKernelArgs.arch_args.ioapic_phys, B_PAGE_SIZE, kDefaultPageFlags);
-	}
 
-	TRACE(("smp: apic = %p\n", gKernelArgs.arch_args.apic));
-	TRACE(("smp: ioapic = %p\n", gKernelArgs.arch_args.ioapic));
+	TRACE(("smp: apic (mapped) = %p\n", gKernelArgs.arch_args.apic));
 
 	// calculate how fast the apic timer is
 	calculate_apic_timer_conversion_factor();
