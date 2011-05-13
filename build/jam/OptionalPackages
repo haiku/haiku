@@ -1069,6 +1069,10 @@ if [ IsOptionalHaikuImagePackageAdded Lua ] {
 if [ IsOptionalHaikuImagePackageAdded Man ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Man available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			 man-1.6f-x86-gcc4-2011-05-12.zip
+			: $(baseURL)/man-1.6f-x86-gcc4-2011-05-12.zip ;		
 	} else {
 		InstallOptionalHaikuImagePackage
 			 man-1.6f-x86-gcc2-2010-09-01.zip
