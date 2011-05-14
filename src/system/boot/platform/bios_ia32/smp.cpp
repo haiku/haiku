@@ -399,8 +399,9 @@ smp_init_other_cpus(void)
 	}
 
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_APIC, false)) {
-		TRACE(("local apic disabled per safemode setting\n"));
+		TRACE(("local apic disabled per safemode setting, disabling smp\n"));
 		gKernelArgs.arch_args.apic_phys = 0;
+		gKernelArgs.num_cpus = 1;
 	}
 
 	if (gKernelArgs.arch_args.apic_phys == 0)
@@ -593,10 +594,10 @@ smp_add_safemode_menus(Menu *menu)
 	}
 
 	if (gKernelArgs.arch_args.apic_phys != 0) {
-		menu->AddItem(item = new(nothrow) MenuItem("Disable LOCAL APIC"));
+		menu->AddItem(item = new(nothrow) MenuItem("Disable local APIC"));
 		item->SetType(MENU_ITEM_MARKABLE);
 		item->SetData(B_SAFEMODE_DISABLE_APIC);
-		item->SetHelpText("Disables using the LOCAL APIC for timekeeping.");
+		item->SetHelpText("Disables using the local APIC, also disables SMP.");
 	}
 
 	if (gKernelArgs.num_cpus < 2)
