@@ -1,0 +1,29 @@
+SubDir HAIKU_TOP src apps musiccollection ;
+
+UsePrivateHeaders storage shared ;
+UseLibraryHeaders lp_solve linprog alm ;
+
+
+Application MusicCollection :
+	FileMonitor.cpp
+	main.cpp
+	MusicCollectionWindow.cpp
+	QueryMonitor.cpp
+
+	NodeMonitorHandler.cpp
+	:
+	be liblpsolve55.so libalm.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	$(TARGET_LIBSTDC++) libshared.a
+	:
+	MusicCollection.rdef
+	;
+
+DoCatalogs MusicCollection :
+	x-vnd.MusicCollection
+	:
+	main.cpp
+;
+
+
+SEARCH on [ FGristFiles NodeMonitorHandler.cpp ] 
+	+= [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
