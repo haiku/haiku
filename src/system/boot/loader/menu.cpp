@@ -837,12 +837,9 @@ add_debug_menu()
 
 
 static void
-apply_safe_mode_options(Menu* menu)
+apply_safe_mode_options(Menu* menu, char *buffer, size_t bufferSize)
 {
-	char buffer[2048];
-	int32 pos = 0;
-
-	buffer[0] = '\0';
+	int32 pos = strlen(buffer);
 
 	MenuItemIterator iterator = menu->ItemIterator();
 	while (MenuItem* item = iterator.Next()) {
@@ -850,12 +847,10 @@ apply_safe_mode_options(Menu* menu)
 			|| item->Data() == NULL || (uint32)pos > sizeof(buffer))
 			continue;
 
-		size_t totalBytes = snprintf(buffer + pos, sizeof(buffer) - pos,
+		size_t totalBytes = snprintf(buffer + pos, bufferSize - pos,
 			"%s true\n", (const char*)item->Data());
 		pos += std::min(totalBytes, sizeof(buffer) - pos - 1);
 	}
-
-	add_safe_mode_settings(buffer);
 }
 
 
@@ -911,9 +906,15 @@ user_menu(Directory** _bootVolume)
 	if (item->Data() != NULL)
 		*_bootVolume = (Directory*)item->Data();
 
-	apply_safe_mode_options(safeModeMenu);
-	apply_safe_mode_options(debugMenu);
+	char buffer[2048];
+
+	memset(buffer, 0, sizeof(buffer));
+
+	apply_safe_mode_options(safeModeMenu, buffer, sizeof(buffer));
+	apply_safe_mode_options(debugMenu, buffer, sizeof(buffer));
+	add_safe_mode_settings(buffer);
 	delete menu;
+
 
 	TRACE(("user_menu: leave\n"));
 
