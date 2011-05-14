@@ -131,11 +131,96 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 }
 
 
+// Blacks the screen out, useful for mode setting
 static void
-CardModeSet(display_mode *mode)
+CardBlankSet(int crtNumber, bool blank)
 {
-	// For now we assume D1
-	uint32 regOffset = D1_REG_OFFSET;
+	int blackColorReg;
+	int blankControlReg;
+
+	if (crtNumber == 2) {
+		blackColorReg = D2CRTC_BLACK_COLOR;
+		blankControlReg = D2CRTC_BLANK_CONTROL;
+	} else {
+		blackColorReg = D1CRTC_BLACK_COLOR;
+		blankControlReg = D1CRTC_BLANK_CONTROL;
+	}
+
+	write32(blackColorReg, 0);
+	if (blank == true)
+		write32AtMask(blankControlReg, 0x00000100, 0x00000100);
+	else
+		write32AtMask(blankControlReg, 0, 0x00000100);
+}
+
+
+static void
+CardFBSet(int crtNumber, display_mode *mode)
+{
+	uint16_t regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+
+	uint32 colorMode;
+	uint32 bytesPerRow;
+	uint32 bitsPerPixel;
+
+	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
+
+	write32AtMask(regOffset + D1GRPH_ENABLE, 1, 0x00000001);
+
+	write32(regOffset + D1GRPH_CONTROL, 0);
+		// disable R/B swap, disable tiling, disable 16bit alpha, etc.
+
+	switch (mode->space) {
+		case B_CMAP8:
+			write32AtMask(regOffset + D1GRPH_CONTROL, 0, 0x00000703);
+			break;
+		case B_RGB15_LITTLE:
+			write32AtMask(regOffset + D1GRPH_CONTROL, 0x000001, 0x00000703);
+			break;
+		case B_RGB16_LITTLE:
+			write32AtMask(regOffset + D1GRPH_CONTROL, 0x000101, 0x00000703);
+			break;
+		case B_RGB24_LITTLE:
+		case B_RGB32_LITTLE:
+		default:
+			write32AtMask(regOffset + D1GRPH_CONTROL, 0x000002, 0x00000703);
+			break;
+	}
+
+	write32(regOffset + D1GRPH_SWAP_CNTL, 0);
+		// only for chipsets > r600
+		// R5xx - RS690 case is GRPH_CONTROL bit 16
+
+	uint32 fbIntAddress = read32(R6XX_CONFIG_FB_BASE);
+	uint32 fbOffset = gInfo->shared_info->frame_buffer_offset;
+
+	write32(regOffset + D1GRPH_PRIMARY_SURFACE_ADDRESS,
+		fbOffset + fbIntAddress);
+
+	write32(regOffset + D1GRPH_PITCH, bytesPerRow / 4);
+	write32(regOffset + D1GRPH_SURFACE_OFFSET_X, 0);
+	write32(regOffset + D1GRPH_SURFACE_OFFSET_Y, 0);
+	write32(regOffset + D1GRPH_X_START, 0);
+	write32(regOffset + D1GRPH_Y_START, 0);
+	write32(regOffset + D1GRPH_X_END, mode->virtual_width);
+	write32(regOffset + D1GRPH_Y_END, mode->virtual_height);
+
+	/* D1Mode registers */
+	write32(regOffset + D1MODE_DESKTOP_HEIGHT, mode->virtual_height);
+
+	// update shared info
+	gInfo->shared_info->bytes_per_row = bytesPerRow;
+	gInfo->shared_info->current_mode = *mode;
+	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
+}
+
+
+static void
+CardModeSet(int crtNumber, display_mode *mode)
+{
+	uint16_t regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+
+	CardBlankSet(crtNumber, true);
 
 	display_timing& displayTiming = mode->timing;
 
@@ -192,13 +277,14 @@ CardModeSet(display_mode *mode)
 	*/
 	write32AtMask(regOffset + D1CRTC_COUNT_CONTROL, 0x0, 0x1);
 
+	CardBlankSet(crtNumber, false);
 }
 
 
 static void
-CardModeScale(display_mode *mode)
+CardModeScale(int crtNumber, display_mode *mode)
 {
-	uint32 regOffset = D1_REG_OFFSET;
+	uint16_t regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
 
 	/* D1Mode registers */
 	write32(regOffset + D1MODE_VIEWPORT_SIZE,
@@ -219,59 +305,11 @@ CardModeScale(display_mode *mode)
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	CardModeSet(mode);
-	CardModeScale(mode);
+	int crtNumber = 1;
 
-	uint32 colorMode, bytesPerRow, bitsPerPixel;
-	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
-
-	uint32 regOffset = D1_REG_OFFSET;
-
-	write32AtMask(regOffset + D1GRPH_ENABLE, 1, 0x00000001);
-
-	/* disable R/B swap, disable tiling, disable 16bit alpha, etc. */
-	write32(regOffset + D1GRPH_CONTROL, 0);
-
-	switch (mode->space) {
-	case B_CMAP8:
-		write32AtMask(regOffset + D1GRPH_CONTROL, 0, 0x00000703);
-		break;
-	case B_RGB15_LITTLE:
-		write32AtMask(regOffset + D1GRPH_CONTROL, 0x000001, 0x00000703);
-		break;
-	case B_RGB16_LITTLE:
-		write32AtMask(regOffset + D1GRPH_CONTROL, 0x000101, 0x00000703);
-		break;
-	case B_RGB24_LITTLE:
-	case B_RGB32_LITTLE:
-	default:
-		write32AtMask(regOffset + D1GRPH_CONTROL, 0x000002, 0x00000703);
-		break;
-	}
-
-	/* Make sure that we are not swapping colours around on r600+*/
-	write32(regOffset + D1GRPH_SWAP_CNTL, 0);
-
-	uint32 fbIntAddress = read32(R6XX_CONFIG_FB_BASE);
-
-	uint32 offset = gInfo->shared_info->frame_buffer_offset;
-	write32(regOffset + D1GRPH_PRIMARY_SURFACE_ADDRESS,
-		fbIntAddress + offset);
-	write32(regOffset + D1GRPH_PITCH, bytesPerRow / 4);
-	write32(regOffset + D1GRPH_SURFACE_OFFSET_X, 0);
-	write32(regOffset + D1GRPH_SURFACE_OFFSET_Y, 0);
-	write32(regOffset + D1GRPH_X_START, 0);
-	write32(regOffset + D1GRPH_Y_START, 0);
-	write32(regOffset + D1GRPH_X_END, mode->virtual_width);
-	write32(regOffset + D1GRPH_Y_END, mode->virtual_height);
-
-	/* D1Mode registers */
-	write32(regOffset + D1MODE_DESKTOP_HEIGHT, mode->virtual_height);
-
-	// update shared info
-	gInfo->shared_info->bytes_per_row = bytesPerRow;
-	gInfo->shared_info->current_mode = *mode;
-	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
+	CardFBSet(crtNumber, mode);
+	CardModeSet(crtNumber, mode);
+	CardModeScale(crtNumber, mode);
 
 	return B_OK;
 }
