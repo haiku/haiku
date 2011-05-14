@@ -204,7 +204,7 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 				struct mp_base_ioapic *io = (struct mp_base_ioapic *)pointer;
 				pointer += sizeof(struct mp_base_ioapic);
 
-				if (gKernelArgs.arch_args.ioapic_phys != 0)
+				if (gKernelArgs.arch_args.ioapic_phys == 0)
 					gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
