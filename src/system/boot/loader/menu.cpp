@@ -849,7 +849,7 @@ apply_safe_mode_options(Menu* menu, char *buffer, size_t bufferSize)
 
 		size_t totalBytes = snprintf(buffer + pos, bufferSize - pos,
 			"%s true\n", (const char*)item->Data());
-		pos += std::min(totalBytes, sizeof(buffer) - pos - 1);
+		pos += std::min(totalBytes, bufferSize - pos - 1);
 	}
 }
 
