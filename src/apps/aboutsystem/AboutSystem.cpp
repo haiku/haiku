@@ -1131,6 +1131,7 @@ AboutView::_CreateCreditsView()
 		"Atsushi Takamatsu\n"
 		"James Urquhart\n"
 		"Jason Vandermark\n"
+		"Alexander von Gluck IV\n"
 		"Sandor Vroemisse\n"
 		"Denis Washington\n"
 		"Ulrich Wimboeck\n"
