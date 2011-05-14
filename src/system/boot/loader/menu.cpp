@@ -844,7 +844,7 @@ apply_safe_mode_options(Menu* menu, char *buffer, size_t bufferSize)
 	MenuItemIterator iterator = menu->ItemIterator();
 	while (MenuItem* item = iterator.Next()) {
 		if (item->Type() == MENU_ITEM_SEPARATOR || !item->IsMarked()
-			|| item->Data() == NULL || (uint32)pos > sizeof(buffer))
+			|| item->Data() == NULL || (uint32)pos >= bufferSize)
 			continue;
 
 		size_t totalBytes = snprintf(buffer + pos, bufferSize - pos,
