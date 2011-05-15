@@ -97,7 +97,7 @@ main(int argc, const char* const* argv)
 	}
 
 	// start watching
-	status_t error = start_watching_system(watchTeam, watchEvents, port, 0);
+	status_t error = __start_watching_system(watchTeam, watchEvents, port, 0);
 	if (error != B_OK) {
 		fprintf(stderr, "Failed to start watching: %s\n", strerror(error));
 		exit(1);

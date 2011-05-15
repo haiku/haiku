@@ -24,7 +24,7 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 	fMediaBuffers(0)
 {
 	get_system_info(&fSystemInfo);
-	get_system_info_etc(B_MEMORY_INFO, &fMemoryInfo,
+	__get_system_info_etc(B_MEMORY_INFO, &fMemoryInfo,
 		sizeof(system_memory_info));
 
 	if (handler != NULL) {

@@ -276,7 +276,7 @@ DebuggerInterface::Init()
 	if (fNubPort < 0)
 		return fNubPort;
 
-	error = start_watching_system(fTeamID, B_WATCH_SYSTEM_THREAD_PROPERTIES,
+	error = __start_watching_system(fTeamID, B_WATCH_SYSTEM_THREAD_PROPERTIES,
 		fDebuggerPort, 0);
 	if (error != B_OK)
 		return error;

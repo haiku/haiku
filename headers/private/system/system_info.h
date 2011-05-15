@@ -63,11 +63,11 @@ extern "C" {
 #endif
 
 
-status_t get_system_info_etc(int32 id, void* buffer, size_t bufferSize);
+status_t __get_system_info_etc(int32 id, void* buffer, size_t bufferSize);
 
-status_t start_watching_system(int32 object, uint32 flags, port_id port,
+status_t __start_watching_system(int32 object, uint32 flags, port_id port,
 			int32 token);
-status_t stop_watching_system(int32 object, uint32 flags, port_id port,
+status_t __stop_watching_system(int32 object, uint32 flags, port_id port,
 			int32 token);
 
 

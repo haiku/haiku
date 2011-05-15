@@ -498,7 +498,7 @@ int64
 BlockCacheDataSource::NextValue(SystemInfo& info)
 {
 	system_memory_info memoryInfo;
-	status_t status = get_system_info_etc(B_MEMORY_INFO, &memoryInfo,
+	status_t status = __get_system_info_etc(B_MEMORY_INFO, &memoryInfo,
 		sizeof(system_memory_info));
 	if (status != B_OK)
 		return 0;
@@ -946,7 +946,7 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 	if (SystemInfo().CPUCount() > 1)
 		fLabel << " " << cpu + 1;
 	fShortLabel = fLabel;
-	
+
 	fLabel << " " << B_TRANSLATE("usage");
 
 	const rgb_color kColors[B_MAX_CPU_COUNT] = {
@@ -1262,7 +1262,7 @@ NetworkUsageDataSource::Label() const
 const char*
 NetworkUsageDataSource::ShortLabel() const
 {
-	return fIn ? B_TRANSLATE_COMMENT("RX", "Shorter version for Receiving.") : 
+	return fIn ? B_TRANSLATE_COMMENT("RX", "Shorter version for Receiving.") :
 		B_TRANSLATE_COMMENT("TX", "Shorter version for Sending");
 }
 

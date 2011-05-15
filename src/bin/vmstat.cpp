@@ -67,7 +67,7 @@ main(int argc, char** argv)
 		}
 	}
 	system_memory_info info;
-	status_t status = get_system_info_etc(B_MEMORY_INFO, &info,
+	status_t status = __get_system_info_etc(B_MEMORY_INFO, &info,
 		sizeof(system_memory_info));
 	if (status != B_OK) {
 		fprintf(stderr, "%s: cannot get system info: %s\n", kProgramName,
@@ -90,7 +90,7 @@ main(int argc, char** argv)
 		while (true) {
 			snooze(rate);
 
-			get_system_info_etc(B_MEMORY_INFO, &info,
+			__get_system_info_etc(B_MEMORY_INFO, &info,
 				sizeof(system_memory_info));
 
 			printf("%11ld  %11Ld  %11Ld  %11Ld\n",
