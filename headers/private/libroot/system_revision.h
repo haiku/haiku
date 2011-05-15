@@ -2,8 +2,8 @@
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _SYSTEM_SYSTEM_REVISION_H
-#define _SYSTEM_SYSTEM_REVISION_H
+#ifndef _LIBROOT_SYSTEM_REVISION_H
+#define _LIBROOT_SYSTEM_REVISION_H
 
 
 /** The length of the system revision character array symbol living in libroot
@@ -17,7 +17,11 @@ extern "C" {
 
 
 /** returns the system revision */
-const char* get_system_revision();
+#ifdef _KERNEL_MODE
+const char* get_haiku_revision(void);
+#else
+const char* __get_haiku_revision(void);
+#endif
 
 
 #ifdef __cplusplus
@@ -25,4 +29,4 @@ const char* get_system_revision();
 #endif
 
 
-#endif	/* _SYSTEM_SYSTEM_REVISION_H */
+#endif	/* _LIBROOT_SYSTEM_REVISION_H */

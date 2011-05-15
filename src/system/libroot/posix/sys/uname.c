@@ -32,7 +32,7 @@ uname(struct utsname *info)
 
 	strlcpy(info->sysname, "Haiku", sizeof(info->sysname));
 
-	haikuRevision = get_system_revision();
+	haikuRevision = __get_haiku_revision();
 	if (haikuRevision[0] != '\0')
 		snprintf(info->version, sizeof(info->version), "%s ", haikuRevision);
 	else

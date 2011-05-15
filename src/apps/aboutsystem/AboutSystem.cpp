@@ -542,7 +542,7 @@ AboutView::AboutView()
 	}
 
 	// Add system revision
-	const char* haikuRevision = get_system_revision();
+	const char* haikuRevision = __get_haiku_revision();
 	if (haikuRevision != NULL) {
 		strlcat(string, " (", sizeof(string));
 		strlcat(string, B_TRANSLATE("Revision"), sizeof(string));

@@ -9,6 +9,7 @@ KernelMergeObject kernel_os_main.o :
 	driver_settings.cpp
 	find_directory.cpp
 	fs_info.c
+	system_revision.c
 	wait_for_objects.cpp
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
@@ -17,6 +18,7 @@ SEARCH on [ FGristFiles
 	driver_settings.cpp
 	find_directory.cpp
 	fs_info.c
+	system_revision.c
 	wait_for_objects.cpp
 	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 

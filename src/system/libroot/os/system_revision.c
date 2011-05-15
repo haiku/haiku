@@ -14,7 +14,11 @@ static char sHaikuRevision[SYSTEM_REVISION_LENGTH]
 
 
 const char*
-get_system_revision()
+#ifdef _KERNEL_MODE
+get_haiku_revision(void)
+#else
+__get_haiku_revision(void)
+#endif
 {
 	return sHaikuRevision;
 }
