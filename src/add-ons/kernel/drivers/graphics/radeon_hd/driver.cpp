@@ -77,6 +77,7 @@ const struct supported_device {
 	//	Radeon 4570		- RV710
 	//	Radeon 4650		- RV730
 	//	Radeon 4670		- RV730
+	{0x94b3, RADEON_R700 | 0x40, "Radeon HD 4770"},	/*RV740*/
 	//	Radeon 4830		- RV740
 	//	Radeon 4850		- RV770
 	//	Radeon 4860		- RV740
@@ -90,6 +91,7 @@ const struct supported_device {
 	{0x68da, RADEON_R800 | 0x0, "Radeon HD 5500"},	/*RV8XX*/
 	{0x68d9, RADEON_R800 | 0x0, "Radeon HD 5570"},	/*RV8XX*/
 	{0x68b9, RADEON_R800 | 0x0, "Radeon HD 5600"},	/*RV8XX*/
+	{0x68c1, RADEON_R800 | 0x0, "Radeon HD 5650"},	/*RV8XX*/
 	{0x68d8, RADEON_R800 | 0x0, "Radeon HD 5670"},	/*RV8XX*/
 	{0x68be, RADEON_R800 | 0x0, "Radeon HD 5700"},	/*RV8XX*/
 	{0x68b8, RADEON_R800 | 0x0, "Radeon HD 5770"},	/*RV8XX*/
