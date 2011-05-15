@@ -335,4 +335,13 @@ typedef struct {
 // ToDo: Periodic Frame Span Traversal Node (FSTN, EHCI Spec 3.7)
 
 
+// Quirk registers and values
+#define	AMD_SBX00_VENDOR				0x1002
+#define	AMD_SBX00_SMBUS_CONTROLLER		0x4385
+#define	AMD_SB600_EHCI_CONTROLLER		0x4386
+#define	AMD_SB700_SB800_EHCI_CONTROLLER	0x4396
+
+#define	AMD_SBX00_EHCI_MISC_REGISTER	0x50	// Advanced config register
+#define	AMD_SBX00_EHCI_MISC_DISABLE_PERIODIC_LIST_CACHE		(1 << 27)
+
 #endif // !EHCI_HARDWARE_H

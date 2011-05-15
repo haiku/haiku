@@ -141,6 +141,48 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	TRACE("constructing new EHCI host controller driver\n");
 	fInitOK = false;
 
+	// ATI/AMD SB600/SB700 periodic list cache workaround
+	// Logic kindly borrowed from NetBSD PR 40056
+	if (fPCIInfo->vendor_id == AMD_SBX00_VENDOR) {
+		bool applyWorkaround = false;
+
+		if (fPCIInfo->device_id == AMD_SB600_EHCI_CONTROLLER) {
+			// always apply on SB600
+			applyWorkaround = true;
+		} else if (fPCIInfo->device_id == AMD_SB700_SB800_EHCI_CONTROLLER) {
+			// only apply on certain chipsets, determined by SMBus revision
+			pci_info smbus;
+			int32 index = 0;
+			while (sPCIModule->get_nth_pci_info(index++, &smbus) >= B_OK) {
+				if (smbus.vendor_id == AMD_SBX00_VENDOR
+					&& smbus.device_id == AMD_SBX00_SMBUS_CONTROLLER) {
+
+					// Only applies to chipsets < SB710 (rev A14)
+					if (smbus.revision == 0x3a || smbus.revision == 0x3b)
+						applyWorkaround = true;
+
+					break;
+				}
+			}
+		}
+
+		if (applyWorkaround) {
+			// According to AMD errata of SB700 and SB600 register documentation
+			// this disables the Periodic List Cache on SB600 and the Advanced
+			// Periodic List Cache on early SB700. Both the BSDs and Linux use
+			// this workaround.
+
+			TRACE_ALWAYS("disabling SB600/SB700 periodic list cache\n");
+			uint32 workaround = sPCIModule->read_pci_config(fPCIInfo->bus,
+				fPCIInfo->device, fPCIInfo->function,
+				AMD_SBX00_EHCI_MISC_REGISTER, 4);
+
+			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function, AMD_SBX00_EHCI_MISC_REGISTER, 4,
+				workaround | AMD_SBX00_EHCI_MISC_DISABLE_PERIODIC_LIST_CACHE);
+		}
+	}
+
 	// enable busmaster and memory mapped access
 	uint16 command = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_command, 2);
@@ -285,7 +327,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	WriteOpReg(EHCI_USBINTR, fEnabledInterrupts);
 
 	// structures don't span page boundaries
-	size_t itdListSize = EHCI_VFRAMELIST_ENTRIES_COUNT 
+	size_t itdListSize = EHCI_VFRAMELIST_ENTRIES_COUNT
 		/ (B_PAGE_SIZE / sizeof(itd_entry)) * B_PAGE_SIZE;
 	size_t sitdListSize = EHCI_VFRAMELIST_ENTRIES_COUNT
 		/ (B_PAGE_SIZE / sizeof(sitd_entry)) * B_PAGE_SIZE;
@@ -351,13 +393,13 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		sitd->back_phy = EHCI_ITEM_TERMINATE;
 		fSitdEntries[i] = sitd;
 		TRACE("sitd entry %ld %p 0x%lx\n", i, sitd, sitd->this_phy);
-			
+
 		ehci_itd *itd = &itds[i].itd;
 		itd->this_phy = itdPhysicalBase | EHCI_ITEM_TYPE_ITD;
 		itd->next_phy = sitd->this_phy;
 		fItdEntries[i] = itd;
 		TRACE("itd entry %ld %p 0x%lx\n", i, itd, itd->this_phy);
-		
+
 		sitdPhysicalBase += sizeof(sitd_entry);
 		itdPhysicalBase += sizeof(itd_entry);
 		if ((sitdPhysicalBase & 0x10) != 0 || (itdPhysicalBase & 0x10) != 0)
@@ -399,7 +441,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			fItdEntries[i & (EHCI_VFRAMELIST_ENTRIES_COUNT - 1)]->this_phy;
 		TRACE("periodic entry %ld linked to 0x%lx\n", i, fPeriodicFrameList[i]);
 	}
-	
+
 	// Create the array that will keep bandwidth information
 	fFrameBandwidth = new(std::nothrow) uint16[EHCI_VFRAMELIST_ENTRIES_COUNT];
 	for (int32 i = 0; i < EHCI_VFRAMELIST_ENTRIES_COUNT; i++) {
@@ -642,7 +684,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	// Find the entry where to start inserting the first Isochronous descriptor
 	if (isochronousData->flags & USB_ISO_ASAP ||
 		isochronousData->starting_frame_number == NULL) {
-			
+
 		uint32 threshold = (ReadCapReg32(EHCI_HCCPARAMS)
 			>> EHCI_HCCPARAMS_IPT_SHIFT) & EHCI_HCCPARAMS_IPT_MASK;
 		TRACE("threshold: %ld\n", threshold);
@@ -677,7 +719,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		TRACE_ERROR("unable to allocate itd buffer\n");
 		return B_NO_MEMORY;
 	}
-	
+
 	memset(bufferLog, 0, dataLength);
 
 	addr_t currentPhy = bufferPhy;
@@ -713,16 +755,16 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		itd->buffer_phy[1] |= (pipe->MaxPacketSize() & EHCI_ITD_MAXPACKETSIZE_MASK)
 			| (directionIn << EHCI_ITD_DIR_SHIFT);
 		itd->buffer_phy[2] |= (1 << EHCI_ITD_MUL_SHIFT);
-			
+
 		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%lx, 0x%lx 0x%lx\n",
-			itd->buffer_phy[0], itd->buffer_phy[1], itd->buffer_phy[2]);	
+			itd->buffer_phy[0], itd->buffer_phy[1], itd->buffer_phy[2]);
 
 		LinkITDescriptors(itd, &fItdEntries[currentFrame]);
 		fFrameBandwidth[currentFrame] -= bandwidth;
 		currentFrame = (currentFrame + 1) & (EHCI_VFRAMELIST_ENTRIES_COUNT - 1);
 		frameCount++;
 	}
-	
+
 	TRACE("isochronous filled itds count %d\n", itdIndex);
 
 	// Add transfer to the list
@@ -1190,7 +1232,7 @@ EHCI::AddPendingIsochronousTransfer(Transfer *transfer, ehci_itd **isoRequest,
 	data->buffer_phy = bufferPhy;
 	data->buffer_log = bufferLog;
 	data->buffer_size = bufferSize;
-	
+
 	// Put in the isochronous transfer list
 	if (!LockIsochronous()) {
 		delete data;
@@ -1561,7 +1603,7 @@ EHCI::FinishIsochronousTransfers()
 			return;
 
 		bool transferDone = false;
-		
+
 		uint32 frame = (ReadOpReg(EHCI_FRINDEX) / 8 )
 			& (EHCI_FRAMELIST_ENTRIES_COUNT - 1);
 		uint32 currentFrame = (frame + EHCI_VFRAMELIST_ENTRIES_COUNT - 5)
@@ -1578,7 +1620,7 @@ EHCI::FinishIsochronousTransfers()
 			}
 
 			ehci_itd *itd = fItdEntries[currentFrame];
-			
+
 			TRACE("FinishIsochronousTransfers itd %p phy 0x%lx prev (%p/0x%lx)"
 				" at frame %ld\n", itd, itd->this_phy, itd->prev,
 				itd->prev != NULL ? itd->prev->this_phy : 0, currentFrame);
@@ -1596,7 +1638,7 @@ EHCI::FinishIsochronousTransfers()
 					TRACE("FinishIsochronousTransfers unprocessed active itd\n");
 				}
 				UnlinkITDescriptors(itd, &fItdEntries[currentFrame]);
-				
+
 				// Process the transfer if we found the last descriptor
 				isochronous_transfer_data *transfer
 					= FindIsochronousTransfer(itd);
@@ -1639,7 +1681,7 @@ EHCI::FinishIsochronousTransfers()
 						FreeDescriptor(transfer->descriptors[i]);
 
 					TRACE("FinishIsochronousTransfers descriptors freed\n");
-					
+
 					delete [] transfer->descriptors;
 					delete transfer->transfer;
 					fStack->FreeChunk(transfer->buffer_log,
@@ -1651,13 +1693,12 @@ EHCI::FinishIsochronousTransfers()
 				}
 				itd = itd->prev;
 			}
-			
+
 			TRACE("FinishIsochronousTransfers next frame\n");
 
 			// Make sure to reset the frame bandwidth
 			fFrameBandwidth[currentFrame] = MAX_AVAILABLE_BANDWIDTH;
 			currentFrame = (currentFrame + 1) % EHCI_VFRAMELIST_ENTRIES_COUNT;
-			
 		}
 	}
 }
@@ -2070,7 +2111,7 @@ EHCI::CreateItdDescriptor()
 		TRACE_ERROR("failed to allocate a itd\n");
 		return NULL;
 	}
-	
+
 	memset(result, 0, sizeof(ehci_itd));
 	result->this_phy = (addr_t)physicalAddress;
 	result->next_phy = EHCI_ITEM_TERMINATE;
@@ -2093,7 +2134,7 @@ EHCI::CreateSitdDescriptor()
 	memset(result, 0, sizeof(ehci_sitd));
 	result->this_phy = (addr_t)physicalAddress | EHCI_ITEM_TYPE_SITD;
 	result->next_phy = EHCI_ITEM_TERMINATE;
-	
+
 	return result;
 }
 
@@ -2178,7 +2219,7 @@ EHCI::UnlinkSITDescriptors(ehci_sitd *sitd, ehci_sitd **last)
 	sitd->prev->next = sitd->next;
 	if (sitd->next != NULL)
 		sitd->next->prev = sitd->prev;
-	if (sitd == *last)	
+	if (sitd == *last)
 		*last = sitd->prev;
 }
 
@@ -2333,7 +2374,7 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 {
 	iovec *vector = transfer->transfer->Vector();
 	size_t vectorCount = transfer->transfer->VectorCount();
-						
+
 	size_t vectorOffset = 0;
 	size_t vectorIndex = 0;
 	usb_isochronous_data *isochronousData
@@ -2341,7 +2382,7 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 	uint32 packet = 0;
 	size_t totalLength = 0;
 	size_t bufferOffset = 0;
-	
+
 	size_t packetSize = transfer->transfer->DataLength();
 	packetSize /= isochronousData->packet_count;
 
@@ -2349,19 +2390,19 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 		ehci_itd *itd = transfer->descriptors[i];
 		for (uint32 j = 0; j <= itd->last_token
 			&& packet < isochronousData->packet_count; j++) {
-				
+
 			size_t bufferSize = (itd->token[j] >> EHCI_ITD_TLENGTH_SHIFT)
 				& EHCI_ITD_TLENGTH_MASK;
 			isochronousData->packet_descriptors[packet].actual_length =
 				bufferSize;
-			
+
 			if (bufferSize > 0)
 				isochronousData->packet_descriptors[packet].status = B_OK;
 			else
 				isochronousData->packet_descriptors[packet].status = B_ERROR;
-			
+
 			totalLength += bufferSize;
-			
+
 			size_t offset = bufferOffset;
 			while (bufferSize > 0) {
 				size_t length = min_c(bufferSize,
@@ -2371,7 +2412,7 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 				offset += length;
 				vectorOffset += length;
 				bufferSize -= length;
-				
+
 				if (vectorOffset >= vector[vectorIndex].iov_len) {
 					if (++vectorIndex >= vectorCount) {
 						TRACE("read isodescriptor chain (%ld bytes, no more "
@@ -2382,17 +2423,17 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 					vectorOffset = 0;
 				}
 			}
-			
-			bufferOffset += packetSize;			
+
+			bufferOffset += packetSize;
 			if (bufferOffset >= transfer->buffer_size)
 				return totalLength;
-			
+
 			packet++;
 		}
 	}
-	
+
 	TRACE("ReadIsochronousDescriptorChain packet count %ld\n", packet);
-	
+
 	return totalLength;
 }
 
