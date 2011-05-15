@@ -204,6 +204,9 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fInterruptEndpoints[0]->next_physical_endpoint
 		= fDummyIsochronous->physical_address;
 
+	// Disable all interrupts before handoff/reset
+	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS);
+
 	// Determine in what context we are running (Kindly copied from FreeBSD)
 	uint32 control = _ReadReg(OHCI_CONTROL);
 	if (control & OHCI_INTERRUPT_ROUTING) {
@@ -235,7 +238,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 frameInterval = _ReadReg(OHCI_FRAME_INTERVAL);
 	uint32 intervalValue = OHCI_GET_INTERVAL_VALUE(frameInterval);
 
-	// Disable interrupts right before we reset
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
 	// Nominal time for a reset is 10 us
 	uint32 reset = 0;
@@ -252,14 +254,11 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 
 	// The controller is now in SUSPEND state, we have 2ms to go OPERATIONAL.
-	// Interrupts are disabled.
 
 	// Set up host controller register
 	_WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
 	_WriteReg(OHCI_CONTROL_HEAD_ED, (uint32)fDummyControl->physical_address);
 	_WriteReg(OHCI_BULK_HEAD_ED, (uint32)fDummyBulk->physical_address);
-	// Disable all interrupts
-	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS);
 	// Switch on desired functional features
 	control = _ReadReg(OHCI_CONTROL);
 	control &= ~(OHCI_CONTROL_BULK_SERVICE_RATIO_MASK | OHCI_ENABLE_LIST
