@@ -1,5 +1,5 @@
-1	swedish	x-vnd.Haiku-PowerStatus	4269725527
-About	PowerStatus		om
+1	swedish	x-vnd.Haiku-PowerStatus	2178654445
+About	PowerStatus		Om
 About…	PowerStatus		Om...
 Battery charging	PowerStatus		Laddar batteri
 Battery discharging	PowerStatus		Laddar ur batteriet
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
 Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
 Capacity: 	PowerStatus		Kapacitet:
 Current rate: 	PowerStatus		Nuvarande värde:
+Damaged battery	PowerStatus		Skadat batteri
 Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Design capacity: 	PowerStatus		Tillverkningskapacitet:

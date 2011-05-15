@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	303149893
+1	swedish	x-vnd.Haiku-MediaPlayer	138551800
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel inträffade i %app%. Filen kunde inte öppnas.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
 100% scale	MediaPlayer-Main		Skala till 100%
@@ -25,6 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		Botten av videon
 Cancel	MediaPlayer-SettingsWindow		Avbryt
 Close	MediaPlayer-Main		Stäng
 Close	MediaPlayer-PlaylistWindow		Stäng
+Close window after playing audio	MediaPlayer-SettingsWindow		Stäng fönstret efter att ljud har spelats upp
+Close window after playing video	MediaPlayer-SettingsWindow		Stäng fönstret efter att video har spelats upp
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiera poster
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiera post
 Drop files to play	MediaPlayer-Main		Släpp filer för att spela upp
@@ -46,6 +48,8 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det verkar som att mediaservern inte körs.\nVill du starta den?
 Large	MediaPlayer-SettingsWindow		Stor
 Lock Peaks	MediaPlayer-PeakView		Markera toppvärden
+Loop audio	MediaPlayer-SettingsWindow		Spela upp ljud som slinga
+Loop video	MediaPlayer-SettingsWindow		Spela upp video som slinga
 Low volume	MediaPlayer-SettingsWindow		Låg volym
 MediaPlayer	System name		MediaSpelare
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
@@ -97,6 +101,7 @@ Save as…	MediaPlayer-PlaylistWindow		Spara som...
 Save error	MediaPlayer-PlaylistWindow		Sparningsfel
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Kunde inte spara spellistan.\n\nFel:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Misslyckades att spara spellistan:\n\nFel:
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skala kontroller i fullskärmsläge
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skala filmer mjukt (icketäckande läge)
 Select all	MediaPlayer-PlaylistWindow		Markera alla
 Settings…	MediaPlayer-Main		Inställningar...

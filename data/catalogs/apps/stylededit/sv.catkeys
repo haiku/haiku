@@ -1,9 +1,9 @@
-1	swedish	x-vnd.Haiku-StyledEdit	286935939
+1	swedish	x-vnd.Haiku-StyledEdit	1508367857
 ???	LoadAlert		???
 Align	Menus		Justera
 Black	Menus		Svart
 Blue	Menus		Blå
-Bold	Menus		Fet stil
+Bold	Menus		Fet
 Can't undo	Menus		Kan inte ångra
 Cancel	FindandReplaceWindow		Avbryt
 Cancel	QuitAlert		Avbryt
@@ -55,6 +55,7 @@ Redo typing	QuitAlert		Gör om inmatning
 Replace	FindandReplaceWindow		Ersätt
 Replace all	FindandReplaceWindow		Ersätt alla
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
+Replace next	Menus		Ersätt nästa
 Replace with:	FindandReplaceWindow		Ersätt med:
 Replace…	Menus		Ersätt…
 Revert to saved…	Menus		Återgå till sparad…

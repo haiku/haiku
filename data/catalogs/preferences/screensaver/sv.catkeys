@@ -1,14 +1,16 @@
-1	swedish	x-vnd.Haiku-ScreenSaver	1401896374
+1	swedish	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 sekunder
 Add…	ScreenSaver		Lägg till...
 Blackness	ScreenSaver		Svärta
 Cancel	ScreenSaver		Avbryt
 Confirm password:	ScreenSaver		Bekräfta lösenord:
-Could not load screen saver	ScreenSaver		Kunde inte ladda skärmsläckaren
+Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
 Display Power Management Signaling not available	ScreenSaver		Stöd för att sätta skärm i strömsparläge saknas
 Don't fade when	ScreenSaver		Tona inte ner när
 Done	ScreenSaver		Klar
+Enable screensaver	ScreenSaver		Aktivera skärmsläckare
 Fade now when	ScreenSaver		Tona ner när
+General	ScreenSaver		Allmänt
 No options available	ScreenSaver		Inga alternativ tillgängliga
 OK	ScreenSaver		OK
 Password Window	ScreenSaver		Lösenordsfönster
@@ -16,7 +18,10 @@ Password lock	ScreenSaver		Lösenordsskydd
 Password:	ScreenSaver		Lösenord:
 Passwords don't match. Please try again.	ScreenSaver		Lösenorden stämmer inte överens. Vänligen försök igen.
 Password…	ScreenSaver		Lösenord...
-ScreenSaver	System name		SkärmSläckare
+ScreenSaver	System name		Skärmsläckare
+Screensaver settings	ScreenSaver		Inställningar
+Screensavers	ScreenSaver		Skrämsläckare
+Start screensaver	ScreenSaver		Starta skärmsläckare
 Test	ScreenSaver		Testa
 Turn off screen	ScreenSaver		Stäng av skärmen
 Use custom password	ScreenSaver		Använd anpassat lösenord
