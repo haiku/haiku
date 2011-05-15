@@ -96,7 +96,7 @@ MODE on <build>rm_attrs = 755 ;
 
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
 
-UsePrivateObjectHeaders set_haiku_revision : system : : true ;
+UsePrivateObjectHeaders set_haiku_revision : system libroot : : true ;
 BuildPlatformMain <build>set_haiku_revision : set_haiku_revision.cpp
 	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
