@@ -147,10 +147,7 @@ CardBlankSet(int crtNumber, bool blank)
 	}
 
 	write32(blackColorReg, 0);
-	if (blank == true)
-		write32AtMask(blankControlReg, 0x00000100, 0x00000100);
-	else
-		write32AtMask(blankControlReg, 0, 0x00000100);
+	write32AtMask(blankControlReg, blank ? 0x00000100 : 0, 0x00000100);
 }
 
 
