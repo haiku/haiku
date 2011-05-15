@@ -326,6 +326,16 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		| EHCI_USBINTR_USBINT | EHCI_USBINTR_INTONAA;
 	WriteOpReg(EHCI_USBINTR, fEnabledInterrupts);
 
+	// ensure that interrupts are enabled on the PCI device as well
+	command = sPCIModule->read_pci_config(fPCIInfo->bus, fPCIInfo->device,
+		fPCIInfo->function, PCI_command, 2);
+	if ((command & PCI_command_int_disable) != 0) {
+		TRACE_ALWAYS("PCI interrupts were disabled, enabling\n");
+		command &= ~PCI_command_int_disable;
+		sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+			fPCIInfo->function, PCI_command, 2, command);
+	}
+
 	// structures don't span page boundaries
 	size_t itdListSize = EHCI_VFRAMELIST_ENTRIES_COUNT
 		/ (B_PAGE_SIZE / sizeof(itd_entry)) * B_PAGE_SIZE;
