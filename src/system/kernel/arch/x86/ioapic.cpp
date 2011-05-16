@@ -483,7 +483,7 @@ acpi_madt_convert_inti_flags(uint16 flags)
 			config |= B_LEVEL_TRIGGERED;
 			break;
 		default:
-			dprintf("invalid trigger mode in source override\n");
+			dprintf("invalid trigger mode in inti flags\n");
 			// fall through and assume edge triggered
 		case ACPI_MADT_TRIGGER_CONFORMS:
 		case ACPI_MADT_TRIGGER_EDGE:
