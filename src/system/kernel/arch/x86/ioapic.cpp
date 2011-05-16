@@ -84,6 +84,8 @@
 #define IO_APIC_INTERRUPT_VECTOR_SHIFT		0
 #define IO_APIC_INTERRUPT_VECTOR_MASK		0xff
 
+#define ISA_INTERRUPT_COUNT					16
+
 
 struct ioapic_registers {
 	volatile uint32	io_register_select;
@@ -109,6 +111,7 @@ struct ioapic {
 
 
 static ioapic* sIOAPICs = NULL;
+static int32 sSourceOverrides[ISA_INTERRUPT_COUNT];
 
 
 // #pragma mark - I/O APIC
@@ -218,6 +221,12 @@ ioapic_end_of_interrupt(int32 num)
 static void
 ioapic_enable_io_interrupt(int32 gsi)
 {
+	// If enabling an overriden source is attempted, enable the override entry
+	// instead. An interrupt handler was installed at the override GSI to rely
+	// interrupts to the overriden source.
+	if (gsi < ISA_INTERRUPT_COUNT && sSourceOverrides[gsi] != 0)
+		gsi = sSourceOverrides[gsi];
+
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
 		return;
@@ -342,8 +351,8 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
 				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
 				| (IO_APIC_DELIVERY_MODE_EXT_INT << IO_APIC_DELIVERY_MODE_SHIFT);
-		} else if (gsi < 16) {
-			// make GSIs 1-15 ISA interrupts
+		} else if (gsi < ISA_INTERRUPT_COUNT) {
+			// identity map the legacy ISA interrupts
 			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
 				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
 				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
@@ -362,15 +371,18 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 }
 
 
-static status_t
-acpi_enumerate_ioapics(acpi_module_info* acpi)
+static int32
+ioapic_source_override_handler(void* data)
 {
-	acpi_table_madt* madt = NULL;
-	if (acpi->get_table(ACPI_SIG_MADT, 0, (void**)&madt) != B_OK) {
-		dprintf("failed to get MADT from ACPI, not configuring io-apics\n");
-		return B_ERROR;
-	}
+	int32 vector = (int32)data;
+	bool levelTriggered = ioapic_is_level_triggered_interrupt(vector);
+	return int_io_interrupt_handler(vector, levelTriggered);
+}
 
+
+static status_t
+acpi_enumerate_ioapics(acpi_table_madt* madt)
+{
 	struct ioapic* lastIOAPIC = sIOAPICs;
 
 	acpi_subtable_header* apicEntry
@@ -418,6 +430,78 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				lastIOAPIC = ioapic;
 				break;
 			}
+		}
+
+		apicEntry
+			= (acpi_subtable_header*)((uint8*)apicEntry + apicEntry->Length);
+	}
+
+	return B_OK;
+}
+
+
+static void
+acpi_configure_source_overrides(acpi_table_madt* madt)
+{
+	acpi_subtable_header* apicEntry
+		= (acpi_subtable_header*)((uint8*)madt + sizeof(acpi_table_madt));
+	void* end = ((uint8*)madt + madt->Header.Length);
+	while (apicEntry < end) {
+		switch (apicEntry->Type) {
+			case ACPI_MADT_TYPE_INTERRUPT_OVERRIDE:
+			{
+				acpi_madt_interrupt_override* info
+					= (acpi_madt_interrupt_override*)apicEntry;
+				dprintf("found interrupt override for bus %u, source irq %u, "
+					"global irq %lu, flags 0x%08lx\n", info->Bus,
+					info->SourceIrq, (uint32)info->GlobalIrq,
+					(uint32)info->IntiFlags);
+
+				if (info->SourceIrq >= ISA_INTERRUPT_COUNT) {
+					dprintf("source override exceeds isa interrupt count\n");
+					break;
+				}
+
+				if (info->SourceIrq != info->GlobalIrq) {
+					// we need a vector mapping
+					install_io_interrupt_handler(info->GlobalIrq,
+						&ioapic_source_override_handler, (void*)info->SourceIrq,
+						B_NO_ENABLE_COUNTER);
+
+					sSourceOverrides[info->SourceIrq] = info->GlobalIrq;
+				}
+
+				// configure non-standard polarity/trigger modes
+				uint32 config = 0;
+				switch (info->IntiFlags & ACPI_MADT_POLARITY_MASK) {
+					case ACPI_MADT_POLARITY_ACTIVE_LOW:
+						config = B_LOW_ACTIVE_POLARITY;
+						break;
+					default:
+						dprintf("invalid polarity in source override\n");
+						// fall through and assume active high
+					case ACPI_MADT_POLARITY_ACTIVE_HIGH:
+					case ACPI_MADT_POLARITY_CONFORMS:
+						config = B_HIGH_ACTIVE_POLARITY;
+						break;
+				}
+
+				switch (info->IntiFlags & ACPI_MADT_TRIGGER_MASK) {
+					case ACPI_MADT_TRIGGER_LEVEL:
+						config |= B_LEVEL_TRIGGERED;
+						break;
+					default:
+						dprintf("invalid trigger mode in source override\n");
+						// fall through and assume edge triggered
+					case ACPI_MADT_TRIGGER_CONFORMS:
+					case ACPI_MADT_TRIGGER_EDGE:
+						config |= B_EDGE_TRIGGERED;
+						break;
+				}
+
+				ioapic_configure_io_interrupt(info->GlobalIrq, config);
+				break;
+			}
 
 #ifdef TRACE_IOAPIC
 			case ACPI_MADT_TYPE_LOCAL_APIC:
@@ -427,18 +511,6 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 				dprintf("found local apic with id %u, processor id %u, "
 					"flags 0x%08lx\n", info->Id, info->ProcessorId,
 					(uint32)info->LapicFlags);
-				break;
-			}
-
-			case ACPI_MADT_TYPE_INTERRUPT_OVERRIDE:
-			{
-				// TODO: take these into account
-				acpi_madt_interrupt_override* info
-					= (acpi_madt_interrupt_override*)apicEntry;
-				dprintf("found interrupt override for bus %u, source irq %u, "
-					"global irq %lu, flags 0x%08lx\n", info->Bus,
-					info->SourceIrq, (uint32)info->GlobalIrq,
-					(uint32)info->IntiFlags);
 				break;
 			}
 
@@ -483,8 +555,6 @@ acpi_enumerate_ioapics(acpi_module_info* acpi)
 		apicEntry
 			= (acpi_subtable_header*)((uint8*)apicEntry + apicEntry->Length);
 	}
-
-	return B_OK;
 }
 
 
@@ -555,7 +625,13 @@ ioapic_init(kernel_args* args)
 	BPrivate::CObjectDeleter<const char, status_t>
 		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
 
-	status = acpi_enumerate_ioapics(acpiModule);
+	acpi_table_madt* madt = NULL;
+	if (acpiModule->get_table(ACPI_SIG_MADT, 0, (void**)&madt) != B_OK) {
+		dprintf("failed to get MADT from ACPI, not configuring io-apics\n");
+		return;
+	}
+
+	status = acpi_enumerate_ioapics(madt);
 	if (status != B_OK) {
 		// We don't treat this case as fatal just yet. If we are able to
 		// route everything with the available IO-APICs we're fine, if not
@@ -607,6 +683,9 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
+	// configure the source overrides, but let the PCI config below override it
+	acpi_configure_source_overrides(madt);
+
 	// configure IO-APIC interrupts from PCI routing table
 	for (int i = 0; i < table.Count(); i++) {
 		irq_routing_entry& entry = table.ElementAt(i);
@@ -623,7 +702,14 @@ ioapic_init(kernel_args* args)
 		// shouldn't really harm, but should eventually be corrected.
 
 	// disable the legacy PIC
-	pic_disable();
+	uint16 legacyInterrupts;
+	pic_disable(legacyInterrupts);
+
+	// enable previsouly enabled legacy interrupts
+	for (uint8 i = 0; i < 16; i++) {
+		if ((legacyInterrupts & (1 << i)) != 0)
+			ioapic_enable_io_interrupt(i);
+	}
 
 	// prefer the ioapic over the normal pic
 	dprintf("using io-apics for interrupt routing\n");

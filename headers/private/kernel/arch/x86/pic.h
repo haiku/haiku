@@ -5,7 +5,9 @@
 #ifndef _KERNEL_ARCH_x86_PIC_H
 #define _KERNEL_ARCH_x86_PIC_H
 
+#include <SupportDefs.h>
+
 void pic_init();
-void pic_disable();
+void pic_disable(uint16& enabledInterrupts);
 
 #endif // _KERNEL_ARCH_x86_PIC_H
