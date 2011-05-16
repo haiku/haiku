@@ -81,8 +81,10 @@ const struct supported_device {
 	//	Radeon 4830		- RV740
 	//	Radeon 4850		- RV770
 	//	Radeon 4860		- RV740
-	//	Radeon 4870		- RV770
-	//	Radeon 4870	x2	- RV770
+	{0x9440, RADEON_R700 | 0x70, "Radeon HD 4870"}, 		/*RV770*/
+	{0x9441, RADEON_R700 | 0x70, "Radeon HD 4870 X2"}, 		/*RV770*/
+	{0x9442, RADEON_R700 | 0x70, "Radeon HD 4800 Series"},  /*RV770*/
+	{0x9443, RADEON_R700 | 0x70, "Radeon HD 4850 X2"}, 		/*RV770*/
 
 	// R800 series (HD54xx - HD59xx)
 	// Codename: Evergreen
