@@ -5,8 +5,9 @@ resource app_version {
 
 	variety = B_APPV_ALPHA,
 
-	internal = 5,
+	internal = 6,
 
-	short_info = "Walter",
-	long_info = "©2001-2010 Haiku Inc."
+	short_info = "R1/alpha3",
+	long_info = "©2001-201 Haiku Inc."
 };
+
