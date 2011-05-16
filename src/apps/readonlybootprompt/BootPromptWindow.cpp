@@ -268,7 +268,7 @@ BootPromptWindow::_UpdateStrings()
 		"Do you wish to run the Installer or continue booting to the "
 		"Desktop?\n",
 
-		"For other languages, a test like the following could be added: \""
+		"For other languages, a note could be added: \""
 		"Note: Localization of Haiku applications and other components is "
 		"an on-going effort. You will frequently encounter untranslated "
 		"strings, but if you like, you can join in the work at "
