@@ -192,6 +192,35 @@ ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value,
 }
 
 
+static void
+ioapic_configure_pin(struct ioapic& ioapic, uint8 pin, uint8 vector,
+	uint8 triggerPolarity, uint8 deliveryMode)
+{
+	uint64 entry = ioapic_read_64(ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
+	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
+		| (1 << IO_APIC_PIN_POLARITY_SHIFT)
+		| (IO_APIC_INTERRUPT_VECTOR_MASK << IO_APIC_INTERRUPT_VECTOR_SHIFT))
+		| (IO_APIC_DELIVERY_MODE_MASK << IO_APIC_DELIVERY_MODE_SHIFT);
+
+	if (triggerPolarity & B_LEVEL_TRIGGERED) {
+		entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT);
+		ioapic.level_triggered_mask |= ((uint64)1 << pin);
+	} else {
+		entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT);
+		ioapic.level_triggered_mask &= ~((uint64)1 << pin);
+	}
+
+	if (triggerPolarity & B_LOW_ACTIVE_POLARITY)
+		entry |= (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
+	else
+		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
+
+	entry |= (uint64)deliveryMode << IO_APIC_DELIVERY_MODE_SHIFT;
+	entry |= (vector + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
+	ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, true);
+}
+
+
 static bool
 ioapic_is_spurious_interrupt(int32 gsi)
 {
@@ -273,26 +302,8 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 	TRACE(("ioapic_configure_io_interrupt: gsi %ld -> io-apic %u pin %u; "
 		"config 0x%08lx\n", gsi, ioapic->number, pin, config));
 
-	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
-	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
-		| (1 << IO_APIC_PIN_POLARITY_SHIFT)
-		| (IO_APIC_INTERRUPT_VECTOR_MASK << IO_APIC_INTERRUPT_VECTOR_SHIFT));
-
-	if (config & B_LEVEL_TRIGGERED) {
-		entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT);
-		ioapic->level_triggered_mask |= ((uint64)1 << pin);
-	} else {
-		entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT);
-		ioapic->level_triggered_mask &= ~((uint64)1 << pin);
-	}
-
-	if (config & B_LOW_ACTIVE_POLARITY)
-		entry |= (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
-	else
-		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
-
-	entry |= (gsi + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
-	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, true);
+	ioapic_configure_pin(*ioapic, pin, gsi, config,
+		IO_APIC_DELIVERY_MODE_FIXED);
 }
 
 
@@ -450,6 +461,40 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 }
 
 
+static inline uint32
+acpi_madt_convert_inti_flags(uint16 flags)
+{
+	uint32 config = 0;
+	switch (flags & ACPI_MADT_POLARITY_MASK) {
+		case ACPI_MADT_POLARITY_ACTIVE_LOW:
+			config = B_LOW_ACTIVE_POLARITY;
+			break;
+		default:
+			dprintf("invalid polarity in inti flags\n");
+			// fall through and assume active high
+		case ACPI_MADT_POLARITY_ACTIVE_HIGH:
+		case ACPI_MADT_POLARITY_CONFORMS:
+			config = B_HIGH_ACTIVE_POLARITY;
+			break;
+	}
+
+	switch (flags & ACPI_MADT_TRIGGER_MASK) {
+		case ACPI_MADT_TRIGGER_LEVEL:
+			config |= B_LEVEL_TRIGGERED;
+			break;
+		default:
+			dprintf("invalid trigger mode in source override\n");
+			// fall through and assume edge triggered
+		case ACPI_MADT_TRIGGER_CONFORMS:
+		case ACPI_MADT_TRIGGER_EDGE:
+			config |= B_EDGE_TRIGGERED;
+			break;
+	}
+
+	return config;
+}
+
+
 static void
 acpi_configure_source_overrides(acpi_table_madt* madt)
 {
@@ -482,33 +527,7 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				}
 
 				// configure non-standard polarity/trigger modes
-				uint32 config = 0;
-				switch (info->IntiFlags & ACPI_MADT_POLARITY_MASK) {
-					case ACPI_MADT_POLARITY_ACTIVE_LOW:
-						config = B_LOW_ACTIVE_POLARITY;
-						break;
-					default:
-						dprintf("invalid polarity in source override\n");
-						// fall through and assume active high
-					case ACPI_MADT_POLARITY_ACTIVE_HIGH:
-					case ACPI_MADT_POLARITY_CONFORMS:
-						config = B_HIGH_ACTIVE_POLARITY;
-						break;
-				}
-
-				switch (info->IntiFlags & ACPI_MADT_TRIGGER_MASK) {
-					case ACPI_MADT_TRIGGER_LEVEL:
-						config |= B_LEVEL_TRIGGERED;
-						break;
-					default:
-						dprintf("invalid trigger mode in source override\n");
-						// fall through and assume edge triggered
-					case ACPI_MADT_TRIGGER_CONFORMS:
-					case ACPI_MADT_TRIGGER_EDGE:
-						config |= B_EDGE_TRIGGERED;
-						break;
-				}
-
+				uint32 config = acpi_madt_convert_inti_flags(info->IntiFlags);
 				ioapic_configure_io_interrupt(info->GlobalIrq, config);
 				break;
 			}
@@ -529,6 +548,10 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 
 				uint8 pin = info->GlobalIrq - ioapic->global_interrupt_base;
 				ioapic->nmi_mask |= (uint64)1 << pin;
+
+				uint32 config = acpi_madt_convert_inti_flags(info->IntiFlags);
+				ioapic_configure_pin(*ioapic, pin, info->GlobalIrq, config,
+					IO_APIC_DELIVERY_MODE_NMI);
 				break;
 			}
 
