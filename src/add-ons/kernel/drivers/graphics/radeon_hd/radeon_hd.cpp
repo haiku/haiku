@@ -113,7 +113,7 @@ radeon_hd_init(radeon_info &info)
 	if (info.shared_info->device_chipset >= RADEON_R800) {
 		// R800+ has memory stored in MB
 		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;
+			= read32(info.registers + R6XX_CONFIG_MEMSIZE) << 10;
 	} else {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
