@@ -963,8 +963,8 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 				: $(baseURL)/libiconv-1.13.1-x86-gcc4-2011-05-13.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libiconv-1.13.1-x86-gcc2-2011-03-14.zip
-				: $(baseURL)/libiconv-1.13.1-x86-gcc2-2011-03-14.zip ;
+				libiconv-1.13.1-x86-gcc2-2011-05-15.zip
+				: $(baseURL)/libiconv-1.13.1-x86-gcc2-2011-05-15.zip ;
 		}
 	}
 }
