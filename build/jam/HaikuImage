@@ -153,7 +153,8 @@ SYSTEM_ADD_ONS_PRINT =
 	PS\ Compatible
 	Preview
 ;
-SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
+SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR 
+	# Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
 SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow Flurry
