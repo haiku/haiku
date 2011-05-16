@@ -8,6 +8,6 @@ resource app_version {
 	internal = 6,
 
 	short_info = "R1/alpha3",
-	long_info = "©2001-2001 Haiku Inc."
+	long_info = "©2001-2011 Haiku Inc."
 };
 
