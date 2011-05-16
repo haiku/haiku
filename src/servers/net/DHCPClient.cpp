@@ -446,6 +446,13 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 			BNetworkAddress address = interfaceAddress.Address();
 			const sockaddr_in& addr = (sockaddr_in&)address.SockAddr();
 			fAssignedAddress = addr.sin_addr.s_addr;
+
+			if ((ntohl(fAssignedAddress) & IN_CLASSB_NET) == 0xa9fe0000) {
+				// previous auto-configured address is a link-local one:
+				// there is no point asking a DHCP server to renew such
+				// server-less assigned address...
+				fAssignedAddress = 0;
+			}
 		}
 	}
 
@@ -561,8 +568,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			_SendMessage(socket, state == INIT ? discover : request,
 				state != RENEWING ? broadcast : fServer);
-
 			continue;
+
 		} else if (bytesReceived < 0)
 			break;
 
@@ -845,7 +852,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 					(uint32)server.sin_addr.s_addr);
 			}
 
-			if (state == INIT || state == INIT_REBOOT 
+			if (state == INIT || state == INIT_REBOOT
 				|| state == REQUESTING) {
 				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS,
 					(uint32)fAssignedAddress);
@@ -928,12 +935,12 @@ DHCPClient::_SendMessage(int socket, dhcp_message& message,
 	message_type type = message.Type();
 	BString text;
 	text << dhcp_message::TypeToString(type);
- 
+
 	const uint8* requestAddress = message.FindOption(OPTION_REQUEST_IP_ADDRESS);
 	if (type == DHCP_REQUEST && requestAddress != NULL)
 		text << " for " << _AddressToString(requestAddress).String();
-	
-	syslog(LOG_DEBUG, "%s: Send %s to %s\n", Device(), text.String(), 
+
+	syslog(LOG_DEBUG, "%s: Send %s to %s\n", Device(), text.String(),
 		address.ToString().String());
 
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
