@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 
+#include "CamStreamingDeframer.h"
+
 
 usb_webcam_support_descriptor kSupportedDevices[] = {
 	// ofcourse we support a generic UVC device...
@@ -58,9 +60,29 @@ print_guid(const usbvc_guid guid)
 }
 
 
+// TODO dumb sof_marks and eof_marks
+static const uint8 sof_mark_1[] = { 0xff, 0xff, 0x00, 0xc4, 0xc4, 0x96, 0x00 };
+static const uint8 sof_mark_2[] = { 0xff, 0xff, 0x00, 0xc4, 0xc4, 0x96, 0x01 };
+static const uint8 *sof_marks[] = { sof_mark_1, sof_mark_2 };
+
+static const uint8 eof_mark_1[] = { 0x00, 0x00, 0x00, 0x00 };
+static const uint8 eof_mark_2[] = { 0x40, 0x00, 0x00, 0x00 };
+static const uint8 eof_mark_3[] = { 0x80, 0x00, 0x00, 0x00 };
+static const uint8 eof_mark_4[] = { 0xc0, 0x00, 0x00, 0x00 };
+static const uint8 *eof_marks[] = { eof_mark_1, eof_mark_2, eof_mark_3, eof_mark_4 };
+
+
+
 UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
-	: CamDevice(_addon, _device)
+	: CamDevice(_addon, _device),
+	fHeaderDescriptor(NULL),
+	fInterruptIn(NULL)
 {
+	fDeframer = new CamStreamingDeframer(this);
+	fDeframer->RegisterSOFTags(sof_marks, 2, sizeof(sof_mark_1), 12);
+	fDeframer->RegisterEOFTags(eof_marks, 4, sizeof(eof_mark_1), sizeof(eof_mark_1));
+	SetDataInput(fDeframer);
+	
 	const BUSBConfiguration* config;
 	const BUSBInterface* interface;
 	usb_descriptor* generic;
@@ -519,6 +541,7 @@ UVCCamDevice::StartTransfer()
 status_t
 UVCCamDevice::StopTransfer()
 {
+	_SelectIdleAlternate();
 	return CamDevice::StopTransfer();
 }
 
@@ -644,6 +667,23 @@ UVCCamDevice::_SelectBestAlternate()
 	}
 	
 	fIsoIn = streaming->EndpointAt(endpointIndex);
+	
+	return B_OK;
+}
+
+
+status_t
+UVCCamDevice::_SelectIdleAlternate()
+{
+	const BUSBConfiguration *config = fDevice->ActiveConfiguration();
+	const BUSBInterface *streaming = config->InterfaceAt(fStreamingIndex);
+	if (((BUSBInterface *)streaming)->SetAlternate(0) != B_OK) {
+		fprintf(stderr, "UVCCamDevice::_SelectIdleAlternate()"
+			" selecting alternate failed\n");
+		return B_ERROR;
+	}
+	
+	fIsoIn = NULL;
 	
 	return B_OK;
 }

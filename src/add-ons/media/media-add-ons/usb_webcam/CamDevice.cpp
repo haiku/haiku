@@ -589,7 +589,7 @@ CamDevice::DataPumpThread()
 
 			if (len <= 0) {
 				PRINT((CH ": IsoIn: %s" CT, strerror(len)));
-				break;
+				continue;
 			}
 
 #ifndef DEBUG_DISCARD_DATA

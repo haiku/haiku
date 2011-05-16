@@ -34,6 +34,7 @@ private:
 									size_t len);
 			status_t			_ProbeCommitFormat();
 			status_t			_SelectBestAlternate();
+			status_t			_SelectIdleAlternate();
 
 			usbvc_interface_header_descriptor *fHeaderDescriptor;
 			
