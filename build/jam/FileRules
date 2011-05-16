@@ -335,8 +335,9 @@ actions CopySetHaikuRevision1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
-	. $(HAIKU_TOP)/build/scripts/determine_haiku_revision $(HAIKU_TOP) \
-		$(HAIKU_BUILD_OUTPUT_DIR)
+	. $(HAIKU_TOP)/build/scripts/determine_haiku_revision
+	determineHaikuRevision $(HAIKU_TOP) $(HAIKU_BUILD_OUTPUT_DIR)
+
 	$(2[1]) --data $(2[3]) $(1) &&
 	$(2[2]) $(1) ${revision}
 }

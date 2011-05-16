@@ -1,19 +1,12 @@
 #!/bin/sh
 
-# get and check the parameters
-if [ $# -lt 2 ]; then
-	echo Usage: $0 '<haiku top> <haiku build output dir>' >&2
-	exit 1
-fi
-
-HAIKU_TOP=$1
-HAIKU_BUILD_OUTPUT_DIR=$2
-
-
 determineGitRevision()
 {
-	revision=`cat ${HAIKU_BUILD_OUTPUT_DIR}/haiku-revision 2>/dev/null`
-	lastBuiltRevision=`cat ${HAIKU_BUILD_OUTPUT_DIR}/last-built-revision \
+	haikuTop=$1
+	haikuBuildOutputDir=$2
+
+	revision=`cat ${haikuBuildOutputDir}/haiku-revision 2>/dev/null`
+	lastBuiltRevision=`cat ${haikuBuildOutputDir}/last-built-revision \
 		2>/dev/null`
 	localRev=`git rev-list -n1 HEAD`
 
@@ -68,30 +61,36 @@ determineGitRevision()
 				$haikuBaseRev`
 			revision="$revision [$haikuBaseRevDescr]"
 		fi
-		echo $localRev >${HAIKU_BUILD_OUTPUT_DIR}/last-built-revision
+		echo $localRev >${haikuBuildOutputDir}/last-built-revision
 	fi
 }
 
 
-originalDir=`pwd`
-cd ${HAIKU_TOP}
-export LC_ALL=C
-if [ -d .svn ]; then
-	revision=`svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
-elif [ -d .git/svn ]; then
-	revision=`git svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
-elif [ -d .git ]; then
-	determineGitRevision
-elif [ -d .hg ]; then
-	# Try searching hg log for last svn commit
-	# Extract from "(svn r12345) ..." line
-	revision=`(cd ${HAIKU_TOP} &&
-		hg log --no-merges --template "{desc|firstline}\n") 2> /dev/null |
-		grep --max-count=1 "(svn r" |
-		sed -n -e 's,(svn r\(.*\)).*,\1,p'`
-fi
-if [ "$revision" = "" ]; then
-	revision=0
-fi
-echo $revision >${HAIKU_BUILD_OUTPUT_DIR}/haiku-revision
-cd $originalDir
+determineHaikuRevision()
+{
+	haikuTop=$1
+	haikuBuildOutputDir=$2
+
+	originalDir=`pwd`
+	cd ${haikuTop}
+	export LC_ALL=C
+	if [ -d .svn ]; then
+		revision=`svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
+	elif [ -d .git/svn ]; then
+		revision=`git svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
+	elif [ -d .git ]; then
+		determineGitRevision $haikuTop $haikuBuildOutputDir
+	elif [ -d .hg ]; then
+		# Try searching hg log for last svn commit
+		# Extract from "(svn r12345) ..." line
+		revision=`(cd ${haikuTop} &&
+			hg log --no-merges --template "{desc|firstline}\n") 2> /dev/null |
+			grep --max-count=1 "(svn r" |
+			sed -n -e 's,(svn r\(.*\)).*,\1,p'`
+	fi
+	if [ "$revision" = "" ]; then
+		revision=0
+	fi
+	echo $revision >${haikuBuildOutputDir}/haiku-revision
+	cd $originalDir
+}
