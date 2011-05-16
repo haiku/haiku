@@ -38,7 +38,7 @@
 // list of supported devices
 const struct supported_device {
 	uint32		device_id;
-	int32		type;
+	int32		chipset;
 	const char*	name;
 } kSupportedDevices[] = {
 	// R600 series	(HD24xx - HD42xx)
@@ -223,7 +223,7 @@ init_driver(void)
 		gDeviceInfo[found]->pci = info;
 		gDeviceInfo[found]->registers = (uint8 *)info->u.h0.base_registers[0];
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
-		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
+		gDeviceInfo[found]->device_chipset = kSupportedDevices[type].chipset;
 
 		dprintf(DEVICE_NAME ": GPU(%ld) %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);

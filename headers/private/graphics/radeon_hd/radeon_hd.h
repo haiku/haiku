@@ -24,11 +24,6 @@
 
 #define VENDOR_ID_ATI			0x1002
 
-// TODO : Remove masks as they don't apply to radeon
-#define RADEON_TYPE_FAMILY_MASK	0xf000
-#define RADEON_TYPE_GROUP_MASK	0xfff0
-#define RADEON_TYPE_MODEL_MASK	0xffff
-
 #define RADEON_R600	0x0600
 #define RADEON_R700	0x0700
 #define RADEON_R800	0x0800
@@ -41,37 +36,6 @@
 // Used to collect EDID from boot loader
 #define EDID_BOOT_INFO "vesa_edid/v1"
 #define MODES_BOOT_INFO "vesa_modes/v1"
-
-
-struct DeviceType {
-	uint32			type;
-
-	DeviceType(int t)
-	{
-		type = t;
-	}
-
-	DeviceType& operator=(int t)
-	{
-		type = t;
-		return *this;
-	}
-
-	bool InFamily(uint32 family) const
-	{
-		return (type & RADEON_TYPE_FAMILY_MASK) == family;
-	}
-
-	bool InGroup(uint32 group) const
-	{
-		return (type & RADEON_TYPE_GROUP_MASK) == group;
-	}
-
-	bool IsModel(uint32 model) const
-	{
-		return (type & RADEON_TYPE_MODEL_MASK) == model;
-	}
-};
 
 
 // info about PLL on graphics card
@@ -141,7 +105,7 @@ struct radeon_shared_info {
 	uint16			cursor_hot_x;
 	uint16			cursor_hot_y;
 
-	DeviceType		device_type;
+	uint32			device_chipset;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
 };

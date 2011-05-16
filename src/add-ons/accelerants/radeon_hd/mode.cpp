@@ -154,56 +154,104 @@ CardBlankSet(int crtNumber, bool blank)
 static void
 CardFBSet(int crtNumber, display_mode *mode)
 {
-	uint16_t regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+	uint16_t chipset = gInfo->shared_info->device_chipset;
 
 	uint32 colorMode;
 	uint32 bytesPerRow;
 	uint32 bitsPerPixel;
 
+	// Our registers
+	// (set to 0 to avoid reading/writing random memory if not set)
+	uint16_t regOffset = 0;
+	uint16_t grphEnable = 0;
+	uint16_t grphControl = 0;
+	uint16_t grphSwapControl = 0;
+	uint16_t grphPrimarySurfaceAddr = 0;
+	uint16_t grphPitch = 0;
+	uint16_t grphSurfaceOffsetX = 0;
+	uint16_t grphSurfaceOffsetY = 0;
+	uint16_t grphXStart = 0;
+	uint16_t grphYStart = 0;
+	uint16_t grphXEnd = 0;
+	uint16_t grphYEnd = 0;
+	uint16_t grphDesktopHeight = 0;
+
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
-	write32AtMask(regOffset + D1GRPH_ENABLE, 1, 0x00000001);
+	if (chipset >= RADEON_R800) {
+		// Evergreen registers differ from r600-r700
+		regOffset = (crtNumber == 2)
+			? EVERGREEN_CRTC1_REGISTER_OFFSET : EVERGREEN_CRTC0_REGISTER_OFFSET;
+		grphEnable = EVERGREEN_GRPH_ENABLE;
+		grphControl = EVERGREEN_GRPH_CONTROL;
+		grphSwapControl = EVERGREEN_GRPH_SWAP_CONTROL;
+		grphPrimarySurfaceAddr = EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
+		grphPitch = EVERGREEN_GRPH_PITCH;
+		grphSurfaceOffsetX = EVERGREEN_GRPH_SURFACE_OFFSET_X;
+		grphSurfaceOffsetY = EVERGREEN_GRPH_SURFACE_OFFSET_Y;
+		grphXStart = EVERGREEN_GRPH_X_START;
+		grphYStart = EVERGREEN_GRPH_Y_START;
+		grphXEnd = EVERGREEN_GRPH_X_END;
+		grphYEnd = EVERGREEN_GRPH_Y_END;
+		grphDesktopHeight = EVERGREEN_DESKTOP_HEIGHT;
+	} else {
+		// r600-r700 registers
+		regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+		grphEnable = D1GRPH_ENABLE;
+		grphControl = D1GRPH_CONTROL;
+		grphSwapControl = D1GRPH_SWAP_CNTL;
+		grphPrimarySurfaceAddr = D1GRPH_PRIMARY_SURFACE_ADDRESS;
+		grphPitch = D1GRPH_PITCH;
+		grphSurfaceOffsetX = D1GRPH_SURFACE_OFFSET_X;
+		grphSurfaceOffsetY = D1GRPH_SURFACE_OFFSET_Y;
+		grphXStart = D1GRPH_X_START;
+		grphYStart = D1GRPH_Y_START;
+		grphXEnd = D1GRPH_X_END;
+		grphYEnd = D1GRPH_Y_END;
+		grphDesktopHeight = D1MODE_DESKTOP_HEIGHT;
+	}
 
-	write32(regOffset + D1GRPH_CONTROL, 0);
-		// disable R/B swap, disable tiling, disable 16bit alpha, etc.
+	// disable R/B swap, disable tiling, disable 16bit alpha, etc.
+	write32AtMask(regOffset + grphEnable, 1, 0x00000001);
+	write32(regOffset + grphControl, 0);
 
 	switch (mode->space) {
 		case B_CMAP8:
-			write32AtMask(regOffset + D1GRPH_CONTROL, 0, 0x00000703);
+			write32AtMask(regOffset + grphControl, 0, 0x00000703);
 			break;
 		case B_RGB15_LITTLE:
-			write32AtMask(regOffset + D1GRPH_CONTROL, 0x000001, 0x00000703);
+			write32AtMask(regOffset + grphControl, 0x000001, 0x00000703);
 			break;
 		case B_RGB16_LITTLE:
-			write32AtMask(regOffset + D1GRPH_CONTROL, 0x000101, 0x00000703);
+			write32AtMask(regOffset + grphControl, 0x000101, 0x00000703);
 			break;
 		case B_RGB24_LITTLE:
 		case B_RGB32_LITTLE:
 		default:
-			write32AtMask(regOffset + D1GRPH_CONTROL, 0x000002, 0x00000703);
+			write32AtMask(regOffset + grphControl, 0x000002, 0x00000703);
 			break;
 	}
 
-	write32(regOffset + D1GRPH_SWAP_CNTL, 0);
+	write32(regOffset + grphSwapControl, 0);
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
 
 	uint32 fbIntAddress = read32(R6XX_CONFIG_FB_BASE);
 	uint32 fbOffset = gInfo->shared_info->frame_buffer_offset;
 
-	write32(regOffset + D1GRPH_PRIMARY_SURFACE_ADDRESS,
+	write32(regOffset + grphPrimarySurfaceAddr,
 		fbOffset + fbIntAddress);
 
-	write32(regOffset + D1GRPH_PITCH, bytesPerRow / 4);
-	write32(regOffset + D1GRPH_SURFACE_OFFSET_X, 0);
-	write32(regOffset + D1GRPH_SURFACE_OFFSET_Y, 0);
-	write32(regOffset + D1GRPH_X_START, 0);
-	write32(regOffset + D1GRPH_Y_START, 0);
-	write32(regOffset + D1GRPH_X_END, mode->virtual_width);
-	write32(regOffset + D1GRPH_Y_END, mode->virtual_height);
+	write32(regOffset + grphPitch, bytesPerRow / 4);
+	write32(regOffset + grphSurfaceOffsetX, 0);
+	write32(regOffset + grphSurfaceOffsetY, 0);
+	write32(regOffset + grphXStart, 0);
+	write32(regOffset + grphYStart, 0);
+	write32(regOffset + grphXEnd, mode->virtual_width);
+	write32(regOffset + grphYEnd, mode->virtual_height);
 
 	/* D1Mode registers */
-	write32(regOffset + D1MODE_DESKTOP_HEIGHT, mode->virtual_height);
+	write32(regOffset + grphDesktopHeight, mode->virtual_height);
 
 	// update shared info
 	gInfo->shared_info->bytes_per_row = bytesPerRow;
@@ -215,7 +263,21 @@ CardFBSet(int crtNumber, display_mode *mode)
 static void
 CardModeSet(int crtNumber, display_mode *mode)
 {
-	uint16_t regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+	uint16_t chipset = gInfo->shared_info->device_chipset;
+
+	uint16_t regOffset = 0;
+	uint16_t grphControl = 0;
+
+	if (chipset >= RADEON_R800) {
+		// Evergreen registers differ from r600-r700
+		regOffset = (crtNumber == 2)
+			? EVERGREEN_CRTC1_REGISTER_OFFSET : EVERGREEN_CRTC0_REGISTER_OFFSET;
+		grphControl = EVERGREEN_GRPH_CONTROL;
+	} else {
+		// r600-r700 registers
+		regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+		grphControl = D1GRPH_CONTROL;
+	}
 
 	CardBlankSet(crtNumber, true);
 
@@ -225,7 +287,7 @@ CardModeSet(int crtNumber, display_mode *mode)
 		__func__, displayTiming.h_display, displayTiming.v_display);
 
 	// enable read requests
-	write32AtMask(regOffset + D1CRTC_CONTROL, 0, 0x01000000);
+	write32AtMask(regOffset + grphControl, 0, 0x01000000);
 
 	// *** Horizontal
 	write32(regOffset + D1CRTC_H_TOTAL, displayTiming.h_total - 1);

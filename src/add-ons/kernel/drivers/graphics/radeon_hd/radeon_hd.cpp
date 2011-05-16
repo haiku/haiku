@@ -111,9 +111,9 @@ radeon_hd_init(radeon_info &info)
 
 	// Read R6XX memory size into shared info
 	info.shared_info->graphics_memory_size
-		= read32(info.registers + R6XX_CONFIG_MEMSIZE);
+		= read32(info.registers + R6XX_CONFIG_MEMSIZE) >> 10;
 
-	TRACE("card(%ld): found %ld MB memory on card.\n", info.id,
+	TRACE("card(%ld): found %ld KB memory on card.\n", info.id,
 		info.shared_info->graphics_memory_size);
 
 	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
