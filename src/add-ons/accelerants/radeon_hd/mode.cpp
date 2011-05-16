@@ -38,8 +38,6 @@ create_mode_list(void)
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
-	// TODO : Read EDID for create_display_modes via AtomBios as well
-
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
 		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
 		NULL, 0, kRadeonHDSpaces,

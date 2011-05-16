@@ -109,19 +109,31 @@ radeon_hd_init(radeon_info &info)
 		info.shared_info->has_edid = false;
 	}
 
-	// Populate graphics_memory_size with graphics memory size in KB
+	// Populate graphics_memory/aperture_size with KB
 	if (info.shared_info->device_chipset >= RADEON_R800) {
 		// R800+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + R6XX_CONFIG_MEMSIZE) << 10;
+		info.shared_info->graphics_aperture_size
+			= read32(info.registers + R6XX_CONFIG_APER_SIZE) << 10;
 	} else {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + R6XX_CONFIG_MEMSIZE) >> 10;
+		info.shared_info->graphics_aperture_size
+			= read32(info.registers + R6XX_CONFIG_APER_SIZE) >> 10;
 	}
 
 	TRACE("card(%ld): found %ld MB memory on card.\n", info.id,
-		info.shared_info->graphics_memory_size / 1024);
+		info.shared_info->graphics_memory_size >> 10);
+	TRACE("card(%ld): found %ld MB aperture on card.\n", info.id,
+		info.shared_info->graphics_aperture_size >> 10);
+
+	// if there are more then 512MB memory on the card, only map
+	// the aperture size to prevent overflow of gart
+	if (info.shared_info->graphics_memory_size > 524288)
+		info.shared_info->graphics_memory_size
+			= info.shared_info->graphics_aperture_size;
 
 	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
 	return B_OK;

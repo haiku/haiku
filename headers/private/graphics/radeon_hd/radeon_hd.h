@@ -76,6 +76,7 @@ struct radeon_shared_info {
 	uint8*			graphics_memory;
 	addr_t			physical_graphics_memory;
 	uint32			graphics_memory_size;
+	uint32			graphics_aperture_size;
 
 	bool			has_edid;
 	edid1_info		edid_info;
@@ -145,6 +146,9 @@ struct radeon_free_graphics_memory {
 	uint32	buffer_base;
 };
 
+// registers
+#define R6XX_CONFIG_APER_SIZE			0x5430	// r600>
+#define OLD_CONFIG_APER_SIZE			0x0108	// <r600
 
 // cursor
 #define RADEON_CURSOR_CONTROL			0x70080
