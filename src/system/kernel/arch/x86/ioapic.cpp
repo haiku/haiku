@@ -538,20 +538,11 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
-#if 0
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, false)) {
 		dprintf("io-apics explicitly disabled, not using io-apics for "
 			"interrupt routing\n");
 		return;
 	}
-#else
-	// TODO: This can be removed once IO-APIC code is broadly tested
-	if (!get_safemode_boolean(B_SAFEMODE_ENABLE_IOAPIC, false)) {
-		dprintf("io-apics not enabled, not using io-apics for interrupt "
-			"routing\n");
-		return;
-	}
-#endif
 
 	// load acpi module
 	status_t status;
