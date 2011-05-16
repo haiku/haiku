@@ -103,6 +103,7 @@ struct ioapic {
 	uint8				global_interrupt_base;
 	uint8				global_interrupt_last;
 	uint64				level_triggered_mask;
+	uint64				nmi_mask;
 
 	area_id				register_area;
 	ioapic_registers*	registers;
@@ -342,8 +343,10 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 	// program the APIC ID
 	ioapic_write_32(ioapic, IO_APIC_ID, ioapic.apic_id << IO_APIC_ID_SHIFT);
 
-	// program the interrupt vectors of the io-apic
 	ioapic.level_triggered_mask = 0;
+	ioapic.nmi_mask = 0;
+
+	// program the interrupt vectors of the io-apic
 	uint8 gsi = ioapic.global_interrupt_base;
 	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++, gsi++) {
 		// initialize everything to deliver to the boot CPU in physical mode
@@ -510,6 +513,25 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				break;
 			}
 
+			case ACPI_MADT_TYPE_NMI_SOURCE:
+			{
+				acpi_madt_nmi_source* info
+					= (acpi_madt_nmi_source*)apicEntry;
+				dprintf("found nmi source global irq %lu, flags 0x%04x\n",
+					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
+
+				struct ioapic* ioapic = find_ioapic(info->GlobalIrq);
+				if (ioapic == NULL) {
+					dprintf("nmi source for gsi that is not mapped to any "
+						" io-apic\n");
+					break;
+				}
+
+				uint8 pin = info->GlobalIrq - ioapic->global_interrupt_base;
+				ioapic->nmi_mask |= (uint64)1 << pin;
+				break;
+			}
+
 #ifdef TRACE_IOAPIC
 			case ACPI_MADT_TYPE_LOCAL_APIC:
 			{
@@ -518,16 +540,6 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				dprintf("found local apic with id %u, processor id %u, "
 					"flags 0x%08lx\n", info->Id, info->ProcessorId,
 					(uint32)info->LapicFlags);
-				break;
-			}
-
-			case ACPI_MADT_TYPE_NMI_SOURCE:
-			{
-				// TODO: take these into account
-				acpi_madt_nmi_source* info
-					= (acpi_madt_nmi_source*)apicEntry;
-				dprintf("found nmi source global irq %lu, flags 0x%04x\n",
-					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
 				break;
 			}
 
@@ -589,7 +601,12 @@ acpi_set_interrupt_model(acpi_module_info* acpiModule, uint32 interruptModel)
 bool
 ioapic_is_interrupt_available(int32 gsi)
 {
-	return find_ioapic(gsi) != NULL;
+	struct ioapic* ioapic = find_ioapic(gsi);
+	if (ioapic == NULL)
+		return false;
+
+	uint8 pin = gsi - ioapic->global_interrupt_base;
+	return (ioapic->nmi_mask & ((uint64)1 << pin)) == 0;
 }
 
 
