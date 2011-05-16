@@ -84,6 +84,7 @@
 #define IO_APIC_INTERRUPT_VECTOR_SHIFT		0
 #define IO_APIC_INTERRUPT_VECTOR_MASK		0xff
 
+#define MAX_SUPPORTED_REDIRECTION_ENTRIES	64
 #define ISA_INTERRUPT_COUNT					16
 
 
@@ -306,7 +307,7 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 		return ioapic.register_area;
 	}
 
-	dprintf("mapped io-apic %u to %p\n", ioapic.number, ioapic.registers);
+	TRACE(("mapped io-apic %u to %p\n", ioapic.number, ioapic.registers));
 
 	ioapic.version = ioapic_read_32(ioapic, IO_APIC_VERSION);
 	if (ioapic.version == 0xffffffff) {
@@ -321,6 +322,12 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 	ioapic.max_redirection_entry
 		= ((ioapic.version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
 			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
+	if (ioapic.max_redirection_entry >= MAX_SUPPORTED_REDIRECTION_ENTRIES) {
+		dprintf("io-apic %u entry count exceeds max supported, only using the "
+			"first %u entries", ioapic.number,
+			(uint8)MAX_SUPPORTED_REDIRECTION_ENTRIES);
+		ioapic.max_redirection_entry = MAX_SUPPORTED_REDIRECTION_ENTRIES - 1;
+	}
 
 	ioapic.global_interrupt_last
 		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
