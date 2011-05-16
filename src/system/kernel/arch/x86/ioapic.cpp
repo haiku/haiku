@@ -335,6 +335,8 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 	ioapic.global_interrupt_last
 		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
 
+	ioapic.nmi_mask = 0;
+
 	return B_OK;
 }
 
@@ -345,10 +347,8 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 	// program the APIC ID
 	ioapic_write_32(ioapic, IO_APIC_ID, ioapic.apic_id << IO_APIC_ID_SHIFT);
 
-	ioapic.level_triggered_mask = 0;
-	ioapic.nmi_mask = 0;
-
 	// program the interrupt vectors of the io-apic
+	ioapic.level_triggered_mask = 0;
 	uint8 gsi = ioapic.global_interrupt_base;
 	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++, gsi++) {
 		// initialize everything to deliver to the boot CPU in physical mode
@@ -441,6 +441,25 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 				lastIOAPIC = ioapic;
 				break;
 			}
+
+			case ACPI_MADT_TYPE_NMI_SOURCE:
+			{
+				acpi_madt_nmi_source* info
+					= (acpi_madt_nmi_source*)apicEntry;
+				dprintf("found nmi source global irq %lu, flags 0x%04x\n",
+					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
+
+				struct ioapic* ioapic = find_ioapic(info->GlobalIrq);
+				if (ioapic == NULL) {
+					dprintf("nmi source for gsi that is not mapped to any "
+						" io-apic\n");
+					break;
+				}
+
+				uint8 pin = info->GlobalIrq - ioapic->global_interrupt_base;
+				ioapic->nmi_mask |= (uint64)1 << pin;
+				break;
+			}
 		}
 
 		apicEntry
@@ -530,15 +549,10 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
 
 				struct ioapic* ioapic = find_ioapic(info->GlobalIrq);
-				if (ioapic == NULL) {
-					dprintf("nmi source for gsi that is not mapped to any "
-						" io-apic\n");
+				if (ioapic == NULL)
 					break;
-				}
 
 				uint8 pin = info->GlobalIrq - ioapic->global_interrupt_base;
-				ioapic->nmi_mask |= (uint64)1 << pin;
-
 				uint32 config = acpi_madt_convert_inti_flags(info->IntiFlags);
 				ioapic_configure_pin(*ioapic, pin, info->GlobalIrq, config,
 					IO_APIC_DELIVERY_MODE_NMI);
