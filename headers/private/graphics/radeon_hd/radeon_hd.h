@@ -14,6 +14,7 @@
 
 #include "rhd_regs.h"
 #include "r600_reg.h"
+#include "r800_reg.h"
 
 #include <Accelerant.h>
 #include <Drivers.h>
