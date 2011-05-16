@@ -57,30 +57,25 @@
 // Fields of each redirection table entry
 #define IO_APIC_DESTINATION_FIELD_SHIFT		56
 #define IO_APIC_DESTINATION_FIELD_MASK		0xff
-#define IO_APIC_INTERRUPT_MASK_SHIFT		16
-#define IO_APIC_INTERRUPT_MASKED			1
-#define IO_APIC_INTERRUPT_UNMASKED			0
-#define IO_APIC_TRIGGER_MODE_SHIFT			15
-#define IO_APIC_TRIGGER_MODE_EDGE			0
-#define IO_APIC_TRIGGER_MODE_LEVEL			1
-#define IO_APIC_REMOTE_IRR_SHIFT			14
-#define IO_APIC_PIN_POLARITY_SHIFT			13
-#define IO_APIC_PIN_POLARITY_HIGH_ACTIVE	0
-#define IO_APIC_PIN_POLARITY_LOW_ACTIVE		1
-#define IO_APIC_DELIVERY_STATUS_SHIFT		12
-#define IO_APIC_DELIVERY_STATUS_IDLE		0
-#define IO_APIC_DELIVERY_STATUS_PENDING		1
-#define IO_APIC_DESTINATION_MODE_SHIFT		11
-#define IO_APIC_DESTINATION_MODE_PHYSICAL	0
-#define IO_APIC_DESTINATION_MODE_LOGICAL	1
-#define IO_APIC_DELIVERY_MODE_SHIFT			8
-#define IO_APIC_DELIVERY_MODE_MASK			0x07
-#define IO_APIC_DELIVERY_MODE_FIXED			0
-#define IO_APIC_DELIVERY_MODE_LOWEST_PRIO	1
-#define IO_APIC_DELIVERY_MODE_SMI			2
-#define IO_APIC_DELIVERY_MODE_NMI			4
-#define IO_APIC_DELIVERY_MODE_INIT			5
-#define IO_APIC_DELIVERY_MODE_EXT_INT		7
+#define IO_APIC_INTERRUPT_MASKED			(1 << 16)
+#define IO_APIC_TRIGGER_MODE_EDGE			(0 << 16)
+#define IO_APIC_TRIGGER_MODE_LEVEL			(1 << 15)
+#define IO_APIC_TRIGGER_MODE_MASK			(1 << 15)
+#define IO_APIC_REMOTE_IRR					(1 << 14)
+#define IO_APIC_PIN_POLARITY_HIGH_ACTIVE	(0 << 13)
+#define IO_APIC_PIN_POLARITY_LOW_ACTIVE		(1 << 13)
+#define IO_APIC_PIN_POLARITY_MASK			(1 << 13)
+#define IO_APIC_DELIVERY_STATUS_PENDING		(1 << 12)
+#define IO_APIC_DESTINATION_MODE_PHYSICAL	(0 << 11)
+#define IO_APIC_DESTINATION_MODE_LOGICAL	(1 << 11)
+#define IO_APIC_DESTINATION_MODE_MASK		(1 << 11)
+#define IO_APIC_DELIVERY_MODE_MASK			(7 << 8)
+#define IO_APIC_DELIVERY_MODE_FIXED			(0 << 8)
+#define IO_APIC_DELIVERY_MODE_LOWEST_PRIO	(1 << 8)
+#define IO_APIC_DELIVERY_MODE_SMI			(2 << 8)
+#define IO_APIC_DELIVERY_MODE_NMI			(4 << 8)
+#define IO_APIC_DELIVERY_MODE_INIT			(5 << 8)
+#define IO_APIC_DELIVERY_MODE_EXT_INT		(7 << 8)
 #define IO_APIC_INTERRUPT_VECTOR_SHIFT		0
 #define IO_APIC_INTERRUPT_VECTOR_MASK		0xff
 
@@ -194,28 +189,26 @@ ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value,
 
 static void
 ioapic_configure_pin(struct ioapic& ioapic, uint8 pin, uint8 vector,
-	uint8 triggerPolarity, uint8 deliveryMode)
+	uint8 triggerPolarity, uint16 deliveryMode)
 {
 	uint64 entry = ioapic_read_64(ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
-	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
-		| (1 << IO_APIC_PIN_POLARITY_SHIFT)
-		| (IO_APIC_INTERRUPT_VECTOR_MASK << IO_APIC_INTERRUPT_VECTOR_SHIFT))
-		| (IO_APIC_DELIVERY_MODE_MASK << IO_APIC_DELIVERY_MODE_SHIFT);
+	entry &= ~(IO_APIC_TRIGGER_MODE_MASK | IO_APIC_PIN_POLARITY_MASK
+		| IO_APIC_INTERRUPT_VECTOR_MASK | IO_APIC_DELIVERY_MODE_MASK);
 
 	if (triggerPolarity & B_LEVEL_TRIGGERED) {
-		entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT);
+		entry |= IO_APIC_TRIGGER_MODE_LEVEL;
 		ioapic.level_triggered_mask |= ((uint64)1 << pin);
 	} else {
-		entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT);
+		entry |= IO_APIC_TRIGGER_MODE_EDGE;
 		ioapic.level_triggered_mask &= ~((uint64)1 << pin);
 	}
 
 	if (triggerPolarity & B_LOW_ACTIVE_POLARITY)
-		entry |= (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
+		entry |= IO_APIC_PIN_POLARITY_LOW_ACTIVE;
 	else
-		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
+		entry |= IO_APIC_PIN_POLARITY_HIGH_ACTIVE;
 
-	entry |= (uint64)deliveryMode << IO_APIC_DELIVERY_MODE_SHIFT;
+	entry |= deliveryMode;
 	entry |= (vector + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
 	ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, true);
 }
@@ -267,8 +260,7 @@ ioapic_enable_io_interrupt(int32 gsi)
 		gsi, ioapic->number, pin));
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
-	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
-	entry |= IO_APIC_INTERRUPT_UNMASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
+	entry &= ~IO_APIC_INTERRUPT_MASKED;
 	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, false);
 }
 
@@ -285,8 +277,7 @@ ioapic_disable_io_interrupt(int32 gsi)
 		gsi, ioapic->number, pin));
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
-	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
-	entry |= IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
+	entry |= IO_APIC_INTERRUPT_MASKED;
 	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, true);
 }
 
@@ -363,25 +354,24 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 		// initialize everything to deliver to the boot CPU in physical mode
 		// and masked until explicitly enabled through enable_io_interrupt()
 		uint64 entry = ((uint64)targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
-			| (IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT)
-			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
+			| IO_APIC_INTERRUPT_MASKED | IO_APIC_DESTINATION_MODE_PHYSICAL
 			| ((gsi + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
 
 		if (gsi == 0) {
 			// make GSI 0 into an external interrupt
-			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
-				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
-				| (IO_APIC_DELIVERY_MODE_EXT_INT << IO_APIC_DELIVERY_MODE_SHIFT);
+			entry |= IO_APIC_TRIGGER_MODE_EDGE
+				| IO_APIC_PIN_POLARITY_HIGH_ACTIVE
+				| IO_APIC_DELIVERY_MODE_EXT_INT;
 		} else if (gsi < ISA_INTERRUPT_COUNT) {
 			// identity map the legacy ISA interrupts
-			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
-				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
-				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
+			entry |= IO_APIC_TRIGGER_MODE_EDGE
+				| IO_APIC_PIN_POLARITY_HIGH_ACTIVE
+				| IO_APIC_DELIVERY_MODE_FIXED;
 		} else {
 			// and the rest are PCI interrupts
-			entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT)
-				| (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
-				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
+			entry |= IO_APIC_TRIGGER_MODE_LEVEL
+				| IO_APIC_PIN_POLARITY_LOW_ACTIVE
+				| IO_APIC_DELIVERY_MODE_FIXED;
 			ioapic.level_triggered_mask |= ((uint64)1 << i);
 		}
 
