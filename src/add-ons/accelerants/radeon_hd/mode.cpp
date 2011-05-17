@@ -205,7 +205,7 @@ CardFBSet(int crtNumber, display_mode *mode)
 	write32(regOffset + gRegister->grphYEnd, mode->virtual_height);
 
 	/* D1Mode registers */
-	write32(regOffset + gRegister->grphDesktopHeight, mode->virtual_height);
+	write32(regOffset + gRegister->modeDesktopHeight, mode->virtual_height);
 
 	// update shared info
 	gInfo->shared_info->bytes_per_row = bytesPerRow;
@@ -284,12 +284,13 @@ CardModeSet(int crtNumber, display_mode *mode)
 static void
 CardModeScale(int crtNumber, display_mode *mode)
 {
-	uint16_t regOffset = (crtNumber == 2) ? D2_REG_OFFSET : D1_REG_OFFSET;
+	uint16_t regOffset = (crtNumber == 0)
+		? gRegister->regOffsetCRT0 : gRegister->regOffsetCRT1;
 
 	/* D1Mode registers */
-	write32(regOffset + D1MODE_VIEWPORT_SIZE,
+	write32(regOffset + gRegister->viewportSize,
 		mode->timing.v_display | (mode->timing.h_display << 16));
-	write32(regOffset + D1MODE_VIEWPORT_START, 0);
+	write32(regOffset + gRegister->viewportStart, 0);
 
 /*  write32(regOffset + D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
 		(Overscan.OverscanLeft << 16) | Overscan.OverscanRight);

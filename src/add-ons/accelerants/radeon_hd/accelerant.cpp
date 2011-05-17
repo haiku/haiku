@@ -188,7 +188,9 @@ init_registers()
 		gRegister->grphYStart = EVERGREEN_GRPH_Y_START;
 		gRegister->grphXEnd = EVERGREEN_GRPH_X_END;
 		gRegister->grphYEnd = EVERGREEN_GRPH_Y_END;
-		gRegister->grphDesktopHeight = EVERGREEN_DESKTOP_HEIGHT;
+		gRegister->modeDesktopHeight = EVERGREEN_DESKTOP_HEIGHT;
+		gRegister->viewportStart = EVERGREEN_VIEWPORT_START;
+		gRegister->viewportSize = EVERGREEN_VIEWPORT_SIZE;
 	} else if (chipset >= RADEON_R600 && chipset < RADEON_R800) {
 		gRegister->regOffsetCRT0 = D1_REG_OFFSET;
 		gRegister->regOffsetCRT1 = D2_REG_OFFSET;
@@ -203,14 +205,16 @@ init_registers()
 		gRegister->grphYStart = D1GRPH_Y_START;
 		gRegister->grphXEnd = D1GRPH_X_END;
 		gRegister->grphYEnd = D1GRPH_Y_END;
-		gRegister->grphDesktopHeight = D1MODE_DESKTOP_HEIGHT;
+		gRegister->modeDesktopHeight = D1MODE_DESKTOP_HEIGHT;
+		gRegister->viewportStart = D1MODE_VIEWPORT_START;
+		gRegister->viewportSize = D1MODE_VIEWPORT_SIZE;
 	} else {
 		// this really shouldn't happen unless a driver PCIID chipset is wrong
 		TRACE("%s, unknown Radeon chipset: r%X\n", __func__, chipset);
 		return B_ERROR;
 	}
 
-	TRACE("%s, registers for ATI chipset r%X initilized\n", __func__, chipset);
+	TRACE("%s, registers for ATI chipset r%X initialized\n", __func__, chipset);
 
 	return B_OK;
 }

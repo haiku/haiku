@@ -51,7 +51,9 @@ struct register_info {
 	uint16_t	grphYStart;
 	uint16_t	grphXEnd;
 	uint16_t	grphYEnd;
-	uint16_t	grphDesktopHeight;
+	uint16_t	modeDesktopHeight;
+	uint16_t	viewportStart;
+	uint16_t	viewportSize;
 };
 
 
