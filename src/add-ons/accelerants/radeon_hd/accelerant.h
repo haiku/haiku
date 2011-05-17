@@ -36,12 +36,32 @@ struct accelerant_info {
 	display_mode	lvds_panel_mode;
 };
 
+
+struct register_info {
+	uint16_t	regOffsetCRT0;
+	uint16_t	regOffsetCRT1;
+	uint16_t	grphEnable;
+	uint16_t	grphControl;
+	uint16_t	grphSwapControl;
+	uint16_t	grphPrimarySurfaceAddr;
+	uint16_t	grphPitch;
+	uint16_t	grphSurfaceOffsetX;
+	uint16_t	grphSurfaceOffsetY;
+	uint16_t	grphXStart;
+	uint16_t	grphYStart;
+	uint16_t	grphXEnd;
+	uint16_t	grphYEnd;
+	uint16_t	grphDesktopHeight;
+};
+
+
 #define HEAD_MODE_A_ANALOG		0x01
 #define HEAD_MODE_B_DIGITAL		0x02
 #define HEAD_MODE_CLONE			0x03
 #define HEAD_MODE_LVDS_PANEL	0x08
 
 extern accelerant_info *gInfo;
+extern register_info *gRegister;
 
 // register access
 

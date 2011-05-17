@@ -104,6 +104,7 @@ const struct supported_device {
 
 	// R800 series (HD54xx - HD59xx)
 	// Codename: Evergreen
+	{0x68e1, RADEON_R800 | 0x0, "Radeon HD 5430"},	/*RV8XX*/
 	{0x68f9, RADEON_R800 | 0x0, "Radeon HD 5450"},	/*RV8XX*/
 	{0x68e0, RADEON_R800 | 0x0, "Radeon HD 5470"},	/*RV8XX*/
 	{0x68da, RADEON_R800 | 0x0, "Radeon HD 5500"},	/*RV8XX*/

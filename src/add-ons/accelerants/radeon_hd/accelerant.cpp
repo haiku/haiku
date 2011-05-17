@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -24,13 +25,14 @@
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
 extern "C" void _sPrintf(const char *format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
 struct accelerant_info *gInfo;
+struct register_info *gRegister;
 
 
 class AreaCloner {
@@ -92,10 +94,13 @@ init_common(int device, bool isClone)
 	// initialize global accelerant info structure
 
 	gInfo = (accelerant_info *)malloc(sizeof(accelerant_info));
-	if (gInfo == NULL)
+	gRegister = (register_info *)malloc(sizeof(register_info));
+
+	if (gInfo == NULL || gRegister == NULL)
 		return B_NO_MEMORY;
 
 	memset(gInfo, 0, sizeof(accelerant_info));
+	memset(gRegister, 0, sizeof(register_info));
 
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
@@ -118,8 +123,8 @@ init_common(int device, bool isClone)
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
-		TRACE(("radeon_init_accelerant() failed shared area%i, %i\n",
-			data.shared_info_area, gInfo->shared_info_area));
+		TRACE("%s, failed shared area%i, %i\n",
+			__func__, data.shared_info_area, gInfo->shared_info_area);
 		return status;
 	}
 
@@ -154,6 +159,60 @@ uninit_common(void)
 		close(gInfo->device);
 
 	free(gInfo);
+	free(gRegister);
+}
+
+
+/*! Populate gRegister with device dependant register locations */
+static status_t
+init_registers()
+{
+	// gInfo should always be populated before running this
+	if (gInfo == NULL)
+		return B_ERROR;
+
+	uint16_t chipset = gInfo->shared_info->device_chipset;
+
+	if (chipset >= RADEON_R800) {
+		gRegister->regOffsetCRT0 = EVERGREEN_CRTC0_REGISTER_OFFSET;
+		gRegister->regOffsetCRT1 = EVERGREEN_CRTC1_REGISTER_OFFSET;
+		gRegister->grphEnable = EVERGREEN_GRPH_ENABLE;
+		gRegister->grphControl = EVERGREEN_GRPH_CONTROL;
+		gRegister->grphSwapControl = EVERGREEN_GRPH_SWAP_CONTROL;
+		gRegister->grphPrimarySurfaceAddr
+			= EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
+		gRegister->grphPitch = EVERGREEN_GRPH_PITCH;
+		gRegister->grphSurfaceOffsetX = EVERGREEN_GRPH_SURFACE_OFFSET_X;
+		gRegister->grphSurfaceOffsetY = EVERGREEN_GRPH_SURFACE_OFFSET_Y;
+		gRegister->grphXStart = EVERGREEN_GRPH_X_START;
+		gRegister->grphYStart = EVERGREEN_GRPH_Y_START;
+		gRegister->grphXEnd = EVERGREEN_GRPH_X_END;
+		gRegister->grphYEnd = EVERGREEN_GRPH_Y_END;
+		gRegister->grphDesktopHeight = EVERGREEN_DESKTOP_HEIGHT;
+	} else if (chipset >= RADEON_R600 && chipset < RADEON_R800) {
+		gRegister->regOffsetCRT0 = D1_REG_OFFSET;
+		gRegister->regOffsetCRT1 = D2_REG_OFFSET;
+		gRegister->grphEnable = D1GRPH_ENABLE;
+		gRegister->grphControl = D1GRPH_CONTROL;
+		gRegister->grphSwapControl = D1GRPH_SWAP_CNTL;
+		gRegister->grphPrimarySurfaceAddr = D1GRPH_PRIMARY_SURFACE_ADDRESS;
+		gRegister->grphPitch = D1GRPH_PITCH;
+		gRegister->grphSurfaceOffsetX = D1GRPH_SURFACE_OFFSET_X;
+		gRegister->grphSurfaceOffsetY = D1GRPH_SURFACE_OFFSET_Y;
+		gRegister->grphXStart = D1GRPH_X_START;
+		gRegister->grphYStart = D1GRPH_Y_START;
+		gRegister->grphXEnd = D1GRPH_X_END;
+		gRegister->grphYEnd = D1GRPH_Y_END;
+		gRegister->grphDesktopHeight = D1MODE_DESKTOP_HEIGHT;
+	} else {
+		// this really shouldn't happen unless a driver PCIID chipset is wrong
+		TRACE("%s, unknown Radeon chipset: r%X\n", __func__, chipset);
+		return B_ERROR;
+	}
+
+	TRACE("%s, registers for ATI chipset r%X initilized\n", __func__, chipset);
+
+	return B_OK;
 }
 
 
@@ -164,9 +223,13 @@ uninit_common(void)
 status_t
 radeon_init_accelerant(int device)
 {
-	TRACE(("radeon_init_accelerant()\n"));
+	TRACE("%s enter\n", __func__);
 
 	status_t status = init_common(device, false);
+	if (status != B_OK)
+		return status;
+
+	status = init_registers();
 	if (status != B_OK)
 		return status;
 
@@ -182,7 +245,7 @@ radeon_init_accelerant(int device)
 		return status;
 	}
 
-	TRACE(("radeon_init_accelerant() done\n"));
+	TRACE("%s done\n", __func__);
 	return B_OK;
 }
 
@@ -193,7 +256,7 @@ radeon_init_accelerant(int device)
 void
 radeon_uninit_accelerant(void)
 {
-	TRACE(("radeon_uninit_accelerant()\n"));
+	TRACE("%s enter\n", __func__);
 
 	gInfo->mode_list = NULL;
 
@@ -203,5 +266,6 @@ radeon_uninit_accelerant(void)
 	uninit_lock(&info.engine_lock);
 
 	uninit_common();
+	TRACE("%s done\n", __func__);
 }
 
