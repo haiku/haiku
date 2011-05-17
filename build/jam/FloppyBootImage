@@ -46,7 +46,7 @@ if $(NET_BOOT) = 1 {
 	;
 }
 
-SYSTEM_ADD_ONS_BUS_MANAGERS = $(ATA_ONLY)ata config_manager pci
+SYSTEM_ADD_ONS_BUS_MANAGERS = acpi $(ATA_ONLY)ata config_manager dpc pci
 	$(IDE_ONLY)ide $(X86_ONLY)isa scsi $(USB_ONLY)usb
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
