@@ -305,7 +305,7 @@ CardModeScale(int crtNumber, display_mode *mode)
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	int crtNumber = 1;
+	int crtNumber = 0;
 
 	CardFBSet(crtNumber, mode);
 	CardModeSet(crtNumber, mode);
