@@ -83,9 +83,8 @@ static void __inline
 ieee80211_ratectl_node_init(struct ieee80211_node *ni)
 {
 	const struct ieee80211vap *vap = ni->ni_vap;
-	kernel_debugger("ieee80211_ratectl_node_init\n");
+
 	vap->iv_rate->ir_node_init(ni);
-	kernel_debugger("ieee80211_ratectl_node_init exit\n");
 }
 
 static void __inline
@@ -101,20 +100,14 @@ ieee80211_ratectl_rate(struct ieee80211_node *ni, void *arg, uint32_t iarg)
 {
 	const struct ieee80211vap *vap = ni->ni_vap;
 
-#ifndef __HAIKU__
 	return vap->iv_rate->ir_rate(ni, arg, iarg);
-#else
-	return 0;
-#endif
 }
 
 static void __inline
 ieee80211_ratectl_tx_complete(const struct ieee80211vap *vap,
     const struct ieee80211_node *ni, int status, void *arg1, void *arg2)
 {
-#ifndef __HAIKU__
 	vap->iv_rate->ir_tx_complete(vap, ni, status, arg1, arg2);
-#endif
 }
 
 static void __inline
