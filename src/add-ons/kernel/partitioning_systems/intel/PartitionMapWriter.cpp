@@ -10,10 +10,13 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <new>
+
+#include <debug.h>
+
 
 #ifndef _USER_MODE
 #	include <KernelExport.h>
@@ -134,13 +137,14 @@ PartitionMapWriter::WriteMBR(const PartitionMap* map, bool writeBootCode)
 		return B_BAD_VALUE;
 
 	partition_table partitionTable;
+	status_t error = _ReadBlock(0, partitionTable);
+	if (error != B_OK)
+		return error;
 	if (writeBootCode) {
+		// the boot code must be small enough to fit in the code area
+		STATIC_ASSERT(sizeof(kBootCode) <= sizeof(partitionTable.code_area));
 		partitionTable.clear_code_area();
 		partitionTable.fill_code_area(kBootCode, sizeof(kBootCode));
-	} else {
-		status_t error = _ReadBlock(0, partitionTable);
-		if (error != B_OK)
-			return error;
 	}
 
 	partitionTable.signature = kPartitionTableSectorSignature;
@@ -152,7 +156,7 @@ PartitionMapWriter::WriteMBR(const PartitionMap* map, bool writeBootCode)
 		partition->GetPartitionDescriptor(descriptor);
 	}
 
-	status_t error = _WriteBlock(0, partitionTable);
+	error = _WriteBlock(0, partitionTable);
 	return error;
 }
 

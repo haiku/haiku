@@ -75,7 +75,9 @@ struct partition_descriptor {
 
 // partition_table
 struct partition_table {
-	char					code_area[446];
+	char					code_area[440];
+	uint32					disk_id;
+	uint16					reserved;
 	partition_descriptor	table[4];
 	uint16					signature;
 
