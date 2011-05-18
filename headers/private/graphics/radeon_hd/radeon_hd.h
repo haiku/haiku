@@ -106,7 +106,7 @@ struct radeon_shared_info {
 	uint16			cursor_hot_x;
 	uint16			cursor_hot_y;
 
-	uint32			device_chipset;
+	uint16			device_chipset;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
 };

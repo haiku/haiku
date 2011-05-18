@@ -38,7 +38,7 @@
 // list of supported devices
 const struct supported_device {
 	uint32		device_id;
-	int32		chipset;
+	uint16		chipset;
 	const char*	name;
 } kSupportedDevices[] = {
 	// R600 series	(HD24xx - HD42xx)

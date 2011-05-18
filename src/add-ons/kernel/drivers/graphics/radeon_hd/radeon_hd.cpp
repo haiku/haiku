@@ -113,21 +113,23 @@ radeon_hd_init(radeon_info &info)
 	if (info.shared_info->device_chipset >= RADEON_R800) {
 		// R800+ has memory stored in MB
 		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) << 10;
+			= read32(info.registers + R6XX_CONFIG_MEMSIZE) / 1024;
 		info.shared_info->graphics_aperture_size
-			= read32(info.registers + R6XX_CONFIG_APER_SIZE) << 10;
+			= read32(info.registers + R6XX_CONFIG_APER_SIZE) / 1024;
 	} else {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) >> 10;
+			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;
 		info.shared_info->graphics_aperture_size
-			= read32(info.registers + R6XX_CONFIG_APER_SIZE) >> 10;
+			= read32(info.registers + R6XX_CONFIG_APER_SIZE) * 1024;
 	}
 
+	int32 memory_size = info.shared_info->graphics_memory_size * 1024;
+	int32 aperture_size = info.shared_info->graphics_aperture_size * 1024;
 	TRACE("card(%ld): found %ld MB memory on card.\n", info.id,
-		info.shared_info->graphics_memory_size >> 10);
+		memory_size);
 	TRACE("card(%ld): found %ld MB aperture on card.\n", info.id,
-		info.shared_info->graphics_aperture_size >> 10);
+		aperture_size);
 
 	// if there are more then 512MB memory on the card, only map
 	// the aperture size to prevent overflow of gart

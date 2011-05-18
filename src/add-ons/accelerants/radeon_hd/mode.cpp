@@ -136,7 +136,7 @@ CardBlankSet(int crtNumber, bool blank)
 	int blackColorReg;
 	int blankControlReg;
 
-	if (crtNumber == 2) {
+	if (crtNumber == 1) {
 		blackColorReg = D2CRTC_BLACK_COLOR;
 		blankControlReg = D2CRTC_BLANK_CONTROL;
 	} else {
@@ -287,7 +287,6 @@ CardModeScale(int crtNumber, display_mode *mode)
 	uint16_t regOffset = (crtNumber == 0)
 		? gRegister->regOffsetCRT0 : gRegister->regOffsetCRT1;
 
-	/* D1Mode registers */
 	write32(regOffset + gRegister->viewportSize,
 		mode->timing.v_display | (mode->timing.h_display << 16));
 	write32(regOffset + gRegister->viewportStart, 0);
@@ -300,6 +299,19 @@ CardModeScale(int crtNumber, display_mode *mode)
 	write32(regOffset + D1SCL_ENABLE, 0);
 	write32(regOffset + D1SCL_TAP_CONTROL, 0);
 	write32(regOffset + D1MODE_CENTER, 2);
+
+	write32(regOffset + D1SCL_UPDATE, 0);
+	write32(regOffset + D1SCL_FLIP_CONTROL, 0);
+
+	write32(regOffset + D1SCL_ENABLE, 1);
+	write32(regOffset + D1SCL_HVSCALE, 0x00010001);
+
+	write32(regOffset + D1SCL_TAP_CONTROL, 0x00000101);
+
+	write32(regOffset + D1SCL_HFILTER, 0x00030100);
+	write32(regOffset + D1SCL_VFILTER, 0x00030100);
+
+	write32(regOffset + D1SCL_DITHER, 0x00001010);
 }
 
 

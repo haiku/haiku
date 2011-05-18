@@ -165,14 +165,8 @@ uninit_common(void)
 
 /*! Populate gRegister with device dependant register locations */
 static status_t
-init_registers()
+init_registers(uint16 chipset)
 {
-	// gInfo should always be populated before running this
-	if (gInfo == NULL)
-		return B_ERROR;
-
-	uint16_t chipset = gInfo->shared_info->device_chipset;
-
 	if (chipset >= RADEON_R800) {
 		gRegister->regOffsetCRT0 = EVERGREEN_CRTC0_REGISTER_OFFSET;
 		gRegister->regOffsetCRT1 = EVERGREEN_CRTC1_REGISTER_OFFSET;
@@ -233,15 +227,14 @@ radeon_init_accelerant(int device)
 	if (status != B_OK)
 		return status;
 
-	status = init_registers();
-	if (status != B_OK)
-		return status;
-
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
+	status = init_registers(info.device_chipset);
+	if (status != B_OK)
+		return status;
 
 	status = create_mode_list();
 	if (status != B_OK) {
