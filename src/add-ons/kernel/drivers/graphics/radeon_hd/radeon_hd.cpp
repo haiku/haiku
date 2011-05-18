@@ -90,10 +90,11 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
 
+	info.shared_info->device_chipset = info.device_chipset;
 	info.shared_info->registers_area = info.registers_area;
-	info.shared_info->frame_buffer_offset = 0;
-	info.shared_info->physical_graphics_memory
+	info.shared_info->frame_buffer_phys
 		= info.pci->u.h0.base_registers[RHD_FB_BAR];
+	info.shared_info->frame_buffer_offset = 0;
 
 	// Pull active monitor VESA EDID from boot loader
 	edid1_info* edidInfo = (edid1_info*)get_boot_item(EDID_BOOT_INFO,
@@ -109,33 +110,35 @@ radeon_hd_init(radeon_info &info)
 		info.shared_info->has_edid = false;
 	}
 
+	info.shared_info->frame_buffer_int
+		= read32(info.registers + R6XX_CONFIG_FB_BASE);
+
 	// Populate graphics_memory/aperture_size with KB
 	if (info.shared_info->device_chipset >= RADEON_R800) {
 		// R800+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;
-		info.shared_info->graphics_aperture_size
+		info.shared_info->frame_buffer_size
 			= read32(info.registers + R6XX_CONFIG_APER_SIZE) * 1024;
 	} else {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + R6XX_CONFIG_MEMSIZE) / 1024;
-		info.shared_info->graphics_aperture_size
+		info.shared_info->frame_buffer_size
 			= read32(info.registers + R6XX_CONFIG_APER_SIZE) / 1024;
 	}
 
 	int32 memory_size = info.shared_info->graphics_memory_size / 1024;
-	int32 aperture_size = info.shared_info->graphics_aperture_size / 1024;
-	TRACE("card(%ld): found %ld MB memory on card.\n", info.id,
-		memory_size);
-	TRACE("card(%ld): found %ld MB aperture on card.\n", info.id,
-		aperture_size);
+	int32 frame_buffer_size = info.shared_info->frame_buffer_size / 1024;
 
-	// if there are more then 512MB memory on the card, only map
-	// the aperture size to prevent overflow of gart
-	if (info.shared_info->graphics_memory_size > 524288)
-		info.shared_info->graphics_memory_size
-			= info.shared_info->graphics_aperture_size;
+	TRACE("card(%ld): Found %ld MB memory on card\n", info.id,
+		memory_size);
+
+	TRACE("card(%ld): Frame buffer aperture internal location is %08x\n",
+		info.id, (unsigned int)info.shared_info->frame_buffer_int);
+
+	TRACE("card(%ld): Frame buffer aperture size is %ld MB\n", info.id,
+		frame_buffer_size);
 
 	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
 	return B_OK;

@@ -190,11 +190,11 @@ CardFBSet(int crtNumber, display_mode *mode)
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
 
-	uint32 fbIntAddress = read32(R6XX_CONFIG_FB_BASE);
+	uint32 fbIntAddress = gInfo->shared_info->frame_buffer_int;
 	uint32 fbOffset = gInfo->shared_info->frame_buffer_offset;
 
 	write32(regOffset + gRegister->grphPrimarySurfaceAddr,
-		fbOffset + fbIntAddress);
+		fbIntAddress + fbOffset);
 
 	write32(regOffset + gRegister->grphPitch, bytesPerRow / 4);
 	write32(regOffset + gRegister->grphSurfaceOffsetX, 0);
@@ -347,7 +347,7 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 
 	config->frame_buffer = gInfo->shared_info->graphics_memory + offset;
 	config->frame_buffer_dma
-		= (uint8 *)gInfo->shared_info->physical_graphics_memory + offset;
+		= (uint8 *)gInfo->shared_info->frame_buffer_phys + offset;
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	return B_OK;
