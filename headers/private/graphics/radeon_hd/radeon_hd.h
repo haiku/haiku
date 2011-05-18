@@ -76,12 +76,9 @@ struct radeon_shared_info {
 	uint8*			graphics_memory;
 	uint32			graphics_memory_size;
 
-	addr_t			frame_buffer_base;		// map base of frame buffer
 	addr_t			frame_buffer_phys;		// card PCI BAR address of FB
 	uint32			frame_buffer_int;		// card internal offset of FB
 	uint32			frame_buffer_size;		// card internal FB aperture size
-	uint32			frame_buffer_pci;		// physical PCI address of FB
-
 	uint32			frame_buffer_offset;	// offset within FB (pri vs sec)
 
 	bool			has_edid;
