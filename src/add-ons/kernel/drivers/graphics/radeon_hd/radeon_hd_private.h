@@ -32,7 +32,7 @@ struct radeon_info {
 	area_id			shared_area;
 
 	const char*		device_identifier;
-	uint32			device_chipset;
+	uint16			device_chipset;
 };
 
 
