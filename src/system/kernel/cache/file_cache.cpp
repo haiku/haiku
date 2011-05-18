@@ -780,7 +780,10 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			if (status != B_OK)
 				return status;
 
-			if (page->busy) {
+			// Since satisfy_cache_io() unlocks the cache, we need to look up
+			// the page again.
+			page = cache->LookupPage(offset);
+			if (page != NULL && page->busy) {
 				cache->WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 				continue;
 			}
