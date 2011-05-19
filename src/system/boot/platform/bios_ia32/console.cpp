@@ -1,11 +1,13 @@
 /*
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2011, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "console.h"
 #include "keyboard.h"
+#include "video.h"
 
 #include <SupportDefs.h>
 #include <util/kernel_cpp.h>
@@ -116,7 +118,7 @@ console_height(void)
 }
 
 
-void 
+void
 console_set_cursor(int32 x, int32 y)
 {
 	if (y >= (int32)sScreenHeight)
@@ -129,10 +131,25 @@ console_set_cursor(int32 x, int32 y)
 		x = 0;
 
 	sScreenOffset = x + y * sScreenWidth;
+	video_move_text_cursor(x, y);
 }
 
 
-void 
+void
+console_show_cursor(void)
+{
+	video_show_text_cursor();
+}
+
+
+void
+console_hide_cursor(void)
+{
+	video_hide_text_cursor();
+}
+
+
+void
 console_set_color(int32 foreground, int32 background)
 {
 	sColor = (background & 0xf) << 12 | (foreground & 0xf) << 8;
@@ -150,6 +167,10 @@ console_wait_for_key(void)
 				return TEXT_CONSOLE_KEY_UP;
 			case BIOS_KEY_DOWN:
 				return TEXT_CONSOLE_KEY_DOWN;
+			case BIOS_KEY_LEFT:
+				return TEXT_CONSOLE_KEY_LEFT;
+			case BIOS_KEY_RIGHT:
+				return TEXT_CONSOLE_KEY_RIGHT;
 			case BIOS_KEY_PAGE_UP:
 				return TEXT_CONSOLE_KEY_PAGE_UP;
 			case BIOS_KEY_PAGE_DOWN:

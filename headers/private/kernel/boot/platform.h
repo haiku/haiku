@@ -68,6 +68,8 @@ class MenuItem;
 extern void platform_add_menus(Menu *menu);
 extern void platform_update_menu_item(Menu *menu, MenuItem *item);
 extern void platform_run_menu(Menu *menu);
+extern size_t platform_get_user_input_text(Menu *menu, const char *prompt,
+	char *buffer, size_t bufferSize);
 
 #endif
 

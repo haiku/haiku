@@ -36,6 +36,7 @@ enum {
 	// ASCII
 	TEXT_CONSOLE_NO_KEY				= '\0',
 	TEXT_CONSOLE_KEY_RETURN			= '\r',
+	TEXT_CONSOLE_KEY_BACKSPACE		= '\b',
 	TEXT_CONSOLE_KEY_ESCAPE			= 0x1b,
 	TEXT_CONSOLE_KEY_SPACE			= ' ',
 
@@ -64,6 +65,8 @@ extern void console_clear_screen(void);
 extern int32 console_width(void);
 extern int32 console_height(void);
 extern void console_set_cursor(int32 x, int32 y);
+extern void console_show_cursor(void);
+extern void console_hide_cursor(void);
 extern void console_set_color(int32 foreground, int32 background);
 
 extern int console_wait_for_key(void);

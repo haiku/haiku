@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,6 +38,9 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+static char sSafeModeOptionsBuffer[2048];
 
 
 MenuItem::MenuItem(const char *label, Menu *subMenu)
@@ -516,6 +520,26 @@ debug_menu_display_syslog(Menu* menu, MenuItem* item)
 }
 
 
+static bool
+debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
+{
+	char buffer[128];
+	const char* prompt = "Option: ";
+
+	size_t size = platform_get_user_input_text(menu, prompt, buffer,
+		sizeof(buffer) - 1);
+
+	if (size > 0) {
+		buffer[size] = '\n';
+		uint32 pos = strlen(sSafeModeOptionsBuffer);
+		if (pos + size < sizeof(sSafeModeOptionsBuffer))
+			strlcat(sSafeModeOptionsBuffer, buffer,
+				sizeof(sSafeModeOptionsBuffer));
+	}
+
+	return true;
+}
+
 static status_t
 save_syslog_to_volume(Directory* directory)
 {
@@ -830,6 +854,14 @@ add_debug_menu()
 	}
 
 	menu->AddSeparatorItem();
+	menu->AddItem(item = new(nothrow) MenuItem(
+		"Add advanced debug option"));
+	item->SetType(MENU_ITEM_NO_CHOICE);
+	item->SetTarget(&debug_menu_add_advanced_option);
+	item->SetHelpText(
+		"Allows advanced debugging options to be entered directly.");
+
+	menu->AddSeparatorItem();
 	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 
 	return menu;
@@ -837,9 +869,10 @@ add_debug_menu()
 
 
 static void
-apply_safe_mode_options(Menu* menu, char *buffer, size_t bufferSize)
+apply_safe_mode_options(Menu* menu)
 {
-	int32 pos = strlen(buffer);
+	int32 pos = strlen(sSafeModeOptionsBuffer);
+	size_t bufferSize = sizeof(sSafeModeOptionsBuffer);
 
 	MenuItemIterator iterator = menu->ItemIterator();
 	while (MenuItem* item = iterator.Next()) {
@@ -847,8 +880,8 @@ apply_safe_mode_options(Menu* menu, char *buffer, size_t bufferSize)
 			|| item->Data() == NULL || (uint32)pos >= bufferSize)
 			continue;
 
-		size_t totalBytes = snprintf(buffer + pos, bufferSize - pos,
-			"%s true\n", (const char*)item->Data());
+		size_t totalBytes = snprintf(sSafeModeOptionsBuffer + pos,
+			bufferSize - pos, "%s true\n", (const char*)item->Data());
 		pos += std::min(totalBytes, bufferSize - pos - 1);
 	}
 }
@@ -871,6 +904,8 @@ user_menu(Directory** _bootVolume)
 	MenuItem* item;
 
 	TRACE(("user_menu: enter\n"));
+
+	memset(sSafeModeOptionsBuffer, 0, sizeof(sSafeModeOptionsBuffer));
 
 	// Add boot volume
 	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume",
@@ -906,13 +941,9 @@ user_menu(Directory** _bootVolume)
 	if (item->Data() != NULL)
 		*_bootVolume = (Directory*)item->Data();
 
-	char buffer[2048];
-
-	memset(buffer, 0, sizeof(buffer));
-
-	apply_safe_mode_options(safeModeMenu, buffer, sizeof(buffer));
-	apply_safe_mode_options(debugMenu, buffer, sizeof(buffer));
-	add_safe_mode_settings(buffer);
+	apply_safe_mode_options(safeModeMenu);
+	apply_safe_mode_options(debugMenu);
+	add_safe_mode_settings(sSafeModeOptionsBuffer);
 	delete menu;
 
 

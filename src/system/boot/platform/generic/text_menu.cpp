@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -57,13 +58,15 @@ print_spacing(int32 count)
 
 
 static void
-print_centered(int32 line, const char *text)
+print_centered(int32 line, const char *text, bool resetPosition = true)
 {
 	console_set_cursor(console_width() / 2 - strlen(text) / 2, line);
 	printf("%s", text);
 
-	console_set_cursor(0, 0);
-		// this avoids unwanted line feeds
+	if (resetPosition) {
+		console_set_cursor(0, 0);
+			// this avoids unwanted line feeds
+	}
 }
 
 
@@ -508,3 +511,75 @@ platform_generic_run_text_menu(Menu *menu)
 //	platform_switch_to_logo();
 }
 
+
+size_t
+platform_generic_get_user_input_text(Menu* menu, const char* prompt,
+	char* buffer, size_t bufferSize)
+{
+	size_t pos = 0;
+
+	memset(buffer, 0, bufferSize);
+
+	int32 promptLength = strlen(prompt);
+	int32 line = console_height() / 2;
+	int32 x = kOffsetX + 1;
+	console_set_cursor(0, line);
+	console_set_color(kSelectedItemColor, kSelectedItemBackgroundColor);
+	print_spacing(console_width());
+	console_set_color(kTextColor, kBackgroundColor);
+	console_set_cursor(0, line);
+	print_spacing(x);
+	printf(prompt);
+	x += promptLength;
+	console_set_color(kSelectedItemColor, kSelectedItemBackgroundColor);
+	console_show_cursor();
+	console_set_cursor(x, line);
+
+	int key = 0;
+	size_t dataLength = 0;
+	while (true) {
+		key = console_wait_for_key();
+		if (key == TEXT_CONSOLE_KEY_RETURN || key == TEXT_CONSOLE_KEY_ESCAPE)
+			break;
+		else if (key >= TEXT_CONSOLE_CURSOR_KEYS_START
+			&& key < TEXT_CONSOLE_CURSOR_KEYS_END)
+		{
+			switch (key)	{
+				case TEXT_CONSOLE_KEY_LEFT:
+					if (pos != 0)
+						pos--;
+					break;
+				case TEXT_CONSOLE_KEY_RIGHT:
+					if (pos < dataLength)
+						pos++;
+					break;
+				default:
+					break;
+			}
+		} else if (key == TEXT_CONSOLE_KEY_BACKSPACE) {
+			if (pos != 0) {
+				pos--;
+				dataLength--;
+				buffer[pos] = '\0';
+				console_set_cursor(x + pos, line);
+				printf(" ");
+			}
+			// only accept printable ascii characters
+		} else if (key > 32 || key == TEXT_CONSOLE_KEY_SPACE) {
+			// don't allow the input to exceed either the buffer size
+			// or screen width
+			// TODO: support scrolling the line to allow larger inputs
+			if (x < (console_width() - 1) && pos < (bufferSize - 1)) {
+				buffer[pos++] = key;
+				printf("%c", key);
+				dataLength++;
+			}
+		}
+		console_set_cursor(x + pos, line);
+	}
+
+	console_hide_cursor();
+	draw_menu(menu);
+
+	return key == TEXT_CONSOLE_KEY_RETURN ? pos : 0;
+}

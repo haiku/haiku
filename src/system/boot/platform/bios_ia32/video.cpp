@@ -2,6 +2,7 @@
  * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2008, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2008, Philippe Saint-Pierre <stpere@gmail.com>
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -696,7 +697,35 @@ set_text_mode(void)
 	regs.eax = 0x0003;
 	call_bios(0x10, &regs);
 
-	// turns off text cursor
+	video_hide_text_cursor();
+}
+
+
+void
+video_move_text_cursor(int x, int y)
+{
+	bios_regs regs;
+	regs.eax = 0x0200;
+	regs.ebx = 0;
+	regs.edx = (y << 8) | x;
+	call_bios(0x10, &regs);
+}
+
+
+void
+video_show_text_cursor(void)
+{
+	bios_regs regs;
+	regs.eax = 0x0100;
+	regs.ecx = 0x0607;
+	call_bios(0x10, &regs);
+}
+
+
+void
+video_hide_text_cursor(void)
+{
+	bios_regs regs;
 	regs.eax = 0x0100;
 	regs.ecx = 0x2000;
 	call_bios(0x10, &regs);
