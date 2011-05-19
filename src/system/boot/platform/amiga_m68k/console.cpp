@@ -772,6 +772,18 @@ console_set_color(int32 foreground, int32 background)
 }
 
 
+void
+console_show_cursor(void)
+{
+}
+
+
+void
+console_hide_cursor(void)
+{
+}
+
+
 int
 console_wait_for_key(void)
 {
