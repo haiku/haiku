@@ -114,7 +114,7 @@ platform_run_menu(Menu* menu)
 
 
 size_t
-platform_get_user_input_text(Menu* menu, const char* prompt, char *buffer,
+platform_get_user_input_text(Menu* menu, const char* prompt, char* buffer,
 	size_t bufferSize)
 {
 	return platform_generic_get_user_input_text(menu, prompt, buffer,

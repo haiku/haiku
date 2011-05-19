@@ -65,7 +65,7 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferS
 void
 console_clear_screen(void)
 {
-	
+
 }
 
 
@@ -83,17 +83,29 @@ console_height(void)
 }
 
 
-void 
+void
 console_set_cursor(int32 x, int32 y)
 {
-	
+
 }
 
 
-void 
+void
+console_show_cursor(void)
+{
+}
+
+
+void
+console_hide_cursor(void)
+{
+}
+
+
+void
 console_set_color(int32 foreground, int32 background)
 {
-	
+
 }
 
 

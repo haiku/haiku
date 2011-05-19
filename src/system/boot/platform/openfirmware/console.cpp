@@ -171,7 +171,7 @@ InputConsoleHandle::PutChars(const char *buffer, int count)
 		PutChar(buffer[i]);
 }
 
-		
+
 char
 InputConsoleHandle::GetChar()
 {
@@ -249,6 +249,18 @@ console_set_cursor(int32 x, int32 y)
 		" toggle-cursor",
 		2, 0, y, x);
 
+}
+
+
+void
+console_show_cursor(void)
+{
+}
+
+
+void
+console_hide_cursor(void)
+{
 }
 
 

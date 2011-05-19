@@ -146,7 +146,7 @@ InputConsoleHandle::PutChars(const char *buffer, int count)
 		PutChar(buffer[i]);
 }
 
-		
+
 char
 InputConsoleHandle::GetChar()
 {
@@ -238,10 +238,10 @@ translate_color(int32 color)
 		f:	ff	ff	ff		// white
 	*/
 	// cf. http://www.fortunecity.com/skyscraper/apple/308/html/chap4.htm
-	static const char cmap[] = { 
-		15, 4, 2, 6, 1, 5, 3, 7, 
+	static const char cmap[] = {
+		15, 4, 2, 6, 1, 5, 3, 7,
 		8, 12, 10, 14, 9, 13, 11, 0 };
-	
+
 	if (color < 0 && color >= 16)
 		return 0;
 	return cmap[color];
@@ -256,6 +256,18 @@ console_set_color(int32 foreground, int32 background)
 	buff[2] += (char)translate_color(foreground);
 	buff[5] += (char)translate_color(background);
 	sInput.WriteAt(NULL, 0LL, buff, 6);
+}
+
+
+void
+console_show_cursor(void)
+{
+}
+
+
+void
+console_hide_cursor(void)
+{
 }
 
 
