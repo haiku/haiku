@@ -3,8 +3,15 @@ SubDir HAIKU_TOP src apps mandelbrot ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-Application Mandelbrot : 
+Application Mandelbrot :
 	Mandelbrot.cpp
 	tsb.cpp
-	: be $(TARGET_LIBSUPC++)
-	: Mandelbrot.rdef ;
+	: be locale $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: Mandelbrot.rdef
+	;
+
+DoCatalogs Mandelbrot :
+    x-vnd.Haiku-Mandelbrot
+    :
+	Mandelbrot.cpp
+;
