@@ -129,6 +129,34 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 }
 
 
+uint32
+AllocateFB(uint32 size, const char *description)
+{
+	uint32 chunk;
+
+	// TODO : Kernel AreaMapper?
+
+	// Is there any framebuffer left to allocate?
+	if (gInfo->shared_info->frame_buffer_free < size) {
+		TRACE("%s was unable to allocate a framebuffer - memory shortage\n",
+			__func__);
+		return 0;
+	}
+
+	// assign requested "chunk" of framebuffer memory
+	chunk = gInfo->shared_info->frame_buffer_offset;
+
+	// retally framebuffer memory status
+	gInfo->shared_info->frame_buffer_offset += size;
+	gInfo->shared_info->frame_buffer_free -= size;
+
+	TRACE("%s allocated framebuffer %s at offset 0x%08X (size: 0x%08X)\n",
+		__func__, description, chunk, size);
+
+	return chunk;
+}
+
+
 // Blacks the screen out, useful for mode setting
 static void
 CardBlankSet(int crtNumber, bool blank)
@@ -165,6 +193,7 @@ CardFBSet(int crtNumber, display_mode *mode)
 	write32AtMask(regOffset + gRegister->grphEnable, 1, 0x00000001);
 	write32(regOffset + gRegister->grphControl, 0);
 
+	// set color mode on video card
 	switch (mode->space) {
 		case B_CMAP8:
 			write32AtMask(regOffset + gRegister->grphControl,
@@ -190,8 +219,11 @@ CardFBSet(int crtNumber, display_mode *mode)
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
 
+	uint32 neededFrameBuffer = mode->timing.h_display
+		* bitsPerPixel * mode->virtual_height / 8;
+
 	uint32 fbIntAddress = gInfo->shared_info->frame_buffer_int;
-	uint32 fbOffset = gInfo->shared_info->frame_buffer_offset;
+	uint32 fbOffset = AllocateFB(neededFrameBuffer, "DisplayFramebuffer");
 
 	write32(regOffset + gRegister->grphPrimarySurfaceAddr,
 		fbIntAddress + fbOffset);
@@ -343,11 +375,15 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 offset = gInfo->shared_info->frame_buffer_offset;
+	// TODO : This returns the location of the last allocated fb
 
-	config->frame_buffer = gInfo->shared_info->graphics_memory + offset;
-	config->frame_buffer_dma
-		= (uint8 *)gInfo->shared_info->frame_buffer_phys + offset;
+	config->frame_buffer = gInfo->shared_info->graphics_memory
+		+ gInfo->shared_info->frame_buffer_int
+		+ gInfo->shared_info->frame_buffer_offset;
+
+	config->frame_buffer_dma = (uint8 *)gInfo->shared_info->frame_buffer_phys
+		+ gInfo->shared_info->frame_buffer_offset;
+
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	return B_OK;

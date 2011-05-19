@@ -128,6 +128,15 @@ radeon_hd_init(radeon_info &info)
 			= read32(info.registers + R6XX_CONFIG_APER_SIZE) / 1024;
 	}
 
+	uint32 barSize = info.pci->u.h0.base_register_sizes[RHD_FB_BAR] / 1024;
+
+	// if graphics memory is larger then PCI bar, just map bar
+	if (info.shared_info->graphics_memory_size > barSize)
+		info.shared_info->frame_buffer_size = barSize;
+	else
+		info.shared_info->frame_buffer_size
+			= info.shared_info->graphics_memory_size;
+
 	int32 memory_size = info.shared_info->graphics_memory_size / 1024;
 	int32 frame_buffer_size = info.shared_info->frame_buffer_size / 1024;
 

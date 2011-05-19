@@ -15,7 +15,7 @@
 
 #undef TRACE
 
-//#define TRACE_ENGINE
+#define TRACE_ENGINE
 #ifdef TRACE_ENGINE
 #	define TRACE(x) _sPrintf x
 #else
