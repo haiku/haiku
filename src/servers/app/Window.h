@@ -375,6 +375,8 @@ protected:
 			int32				fMaxHeight;
 
 			int32				fWorkspacesViewCount;
+
+		friend class DecorManager;
 };
 
 #endif // WINDOW_H

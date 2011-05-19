@@ -7,6 +7,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
 
+AddResources MacDecorator : resources.rdef ;
+
 Addon MacDecorator :
 	MacDecorator.cpp
 	: be <nogrist>app_server $(TARGET_LIBSTDC++)

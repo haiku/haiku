@@ -38,13 +38,6 @@ MacDecorAddOn::MacDecorAddOn(image_id id, const char* name)
 }
 
 
-float
-MacDecorAddOn::Version()
-{
-	return 1.00;
-}
-
-
 Decorator*
 MacDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
 	window_look look, uint32 flags)

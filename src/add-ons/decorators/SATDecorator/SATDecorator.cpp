@@ -66,13 +66,6 @@ SATDecorAddOn::InitCheck() const
 }
 
 
-float
-SATDecorAddOn::Version()
-{
-	return 0.1;
-}
-
-
 Decorator*
 SATDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
 	window_look look, uint32 flags)

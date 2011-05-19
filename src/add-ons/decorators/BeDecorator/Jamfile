@@ -7,7 +7,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
 
+AddResources ClassicBe : resources.rdef ;
+
 Addon ClassicBe :
 	BeDecorator.cpp
 	: be <nogrist>app_server $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: resources.rdef
 ;

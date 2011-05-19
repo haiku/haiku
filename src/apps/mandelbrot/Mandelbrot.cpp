@@ -10,6 +10,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -19,6 +20,9 @@
 
 #include <math.h>
 #include <stdio.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Mandelbrot"
 
 
 /* Those are the menu item id's of the main window */
@@ -52,21 +56,23 @@ TMainWindow::TMainWindow(BRect bound, const char* name, window_type type,
 	BMenuItem* item;
 	BMenu* menu;
 
-	menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menu = new BMenu(B_TRANSLATE("File"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("Palette");
-	menu->AddItem(new BMenuItem("Palette 1", new BMessage(P1)));
-	menu->AddItem(new BMenuItem("Palette 2", new BMessage(P2)));
-	menu->AddItem(item = new BMenuItem("Palette 3", new BMessage(P3)));
-	menu->AddItem(new BMenuItem("Palette 4", new BMessage(P4)));
+	menu = new BMenu(B_TRANSLATE("Palette"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Palette 1"), new BMessage(P1)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Palette 2"), new BMessage(P2)));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Palette 3"),
+		new BMessage(P3)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Palette 4"), new BMessage(P4)));
 	menuBar->AddItem(menu);
 
 	item->SetMarked(true);
 	menu->SetRadioMode(true);
 
-	menu = new BMenu("Iterations");
+	menu = new BMenu(B_TRANSLATE("Iterations"));
 	menu->AddItem(new BMenuItem("128", new BMessage(128)));
 	menu->AddItem(item = new BMenuItem("256", new BMessage(256)));
 	menu->AddItem(new BMenuItem("384", new BMessage(384)));
@@ -198,8 +204,9 @@ main(int, char**)
 {
 	BApplication* app = new BApplication("application/x-vnd.Haiku-Mandelbrot");
 
-	BWindow* window = new TMainWindow(BRect(100, 100, 288, 288), "Mandelbrot",
-		B_DOCUMENT_WINDOW, B_WILL_ACCEPT_FIRST_CLICK);
+	BWindow* window = new TMainWindow(BRect(100, 100, 288, 288),
+		B_TRANSLATE_SYSTEM_NAME("Mandelbrot"), B_DOCUMENT_WINDOW,
+		B_WILL_ACCEPT_FIRST_CLICK);
 	window->Show();
 
 	app->Run();

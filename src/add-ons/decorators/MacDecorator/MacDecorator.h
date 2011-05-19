@@ -14,8 +14,6 @@ class MacDecorAddOn : public DecorAddOn {
 public:
 								MacDecorAddOn(image_id id, const char* name);
 
-			float				Version();
-
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
 									BRect rect, window_look look, uint32 flags);

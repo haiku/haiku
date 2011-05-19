@@ -14,7 +14,6 @@ class WinDecorAddOn : public DecorAddOn {
 public:
 								WinDecorAddOn(image_id id, const char* name);
 
-			float				Version();
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
