@@ -93,13 +93,6 @@ BeDecorAddOn::BeDecorAddOn(image_id id, const char* name)
 }
 
 
-float
-BeDecorAddOn::Version()
-{
-	return 1.00;
-}
-
-
 Decorator*
 BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
 	window_look look, uint32 flags)

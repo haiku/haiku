@@ -14,10 +14,11 @@
 #include <String.h>
 #include <Locker.h>
 #include <ObjectList.h>
+#include <Entry.h>
+#include <DecorInfo.h>
 
 #include "Decorator.h"
 
-class DecorInfo;
 class Desktop;
 class DesktopListener;
 class DrawingEngine;
@@ -28,6 +29,9 @@ class WindowBehaviour;
 typedef BObjectList<DesktopListener> DesktopListenerList;
 
 
+// special name to test for use of non-fs-tied default decorator
+// this just keeps things clean and simple is all
+
 class DecorAddOn {
 public:
 								DecorAddOn(image_id id, const char* name);
@@ -35,68 +39,57 @@ public:
 
 	virtual status_t			InitCheck() const;
 
-		image_id				ImageID() const { return fImageID; }
-		BString					Name() const { return fName; }
+			image_id			ImageID() const { return fImageID; }
 
-		Decorator*				AllocateDecorator(Desktop* desktop,
+			Decorator*			AllocateDecorator(Desktop* desktop,
 									DrawingEngine* engine, BRect rect,
 									const char* title, window_look look,
 									uint32 flags);
 
-	virtual float				Version() { return 1.0; }
-	virtual WindowBehaviour*	AllocateWindowBehaviour(Window* window);
+	virtual	WindowBehaviour*	AllocateWindowBehaviour(Window* window);
 
-	virtual const DesktopListenerList&	GetDesktopListeners();
+	virtual const DesktopListenerList& GetDesktopListeners();
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
 									BRect rect, window_look look, uint32 flags);
 
-		DesktopListenerList		fDesktopListeners;
+			DesktopListenerList	fDesktopListeners;
 
 private:
-		image_id				fImageID;
-		BString 				fName;
+			image_id			fImageID;
+			BString 			fName;
 };
 
 
-class DecorManager
-{
+class DecorManager {
 public:
-					DecorManager();
-					~DecorManager();
+								DecorManager();
+								~DecorManager();
 
-		void		RescanDecorators();
+			Decorator*			AllocateDecorator(Window *window);
+			WindowBehaviour*	AllocateWindowBehaviour(Window *window);
+			void				CleanupForWindow(Window *window);
 
-		Decorator*	AllocateDecorator(Desktop* desktop,
-						DrawingEngine* engine,
-						BRect rect,
-						const char* title, window_look look,
-						uint32 flags);
-		WindowBehaviour*			AllocateWindowBehaviour(Window* window);
-		const DesktopListenerList&	GetDesktopListeners();
+			status_t			PreviewDecorator(BString path, Window *window);
 
-		int32		CountDecorators() const;
+			const DesktopListenerList& GetDesktopListeners();
 
-		int32		GetDecorator() const;
-		bool		SetDecorator(int32 index, Desktop* desktop);
-		bool		SetR5Decorator(int32 value);
-		BString		GetDecoratorName(int32 index);
-
-		// TODO: Implement this method once the rest of the necessary infrastructure
-		// is in place
-		//status_t	GetPreview(int32 index, ServerBitmap *bitmap);
+			BString 			GetCurrentDecorator() const;
+			status_t			SetDecorator(BString path, Desktop *desktop);
 
 private:
-		void		_EmptyList();
-		DecorAddOn*	_FindDecor(BString name);
+			DecorAddOn*			_LoadDecor(BString path, status_t &error);
+			bool				_LoadSettingsFromDisk();
+			bool				_SaveSettingsToDisk();
 
-		bool		_LoadSettingsFromDisk();
-		bool		_SaveSettingsToDisk();
+private:
+			DecorAddOn			fDefaultDecor;
+			DecorAddOn*			fCurrentDecor;
+			DecorAddOn*			fPreviewDecor;
 
-		BObjectList<DecorAddOn> fDecorList;
-		DecorAddOn	fDefaultDecorAddOn;
-		DecorAddOn*	fCurrentDecor;
+			Window*				fPreviewWindow;
+			BString				fCurrentDecorPath;
 };
 
 extern DecorManager gDecorManager;

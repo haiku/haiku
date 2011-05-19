@@ -102,7 +102,6 @@ StdBinCommands
 	play.cpp
 	quit.cpp
 	roster.cpp
-	setdecor.cpp
 	setversion.cpp
 	trash.cpp
 	version.cpp
@@ -123,6 +122,7 @@ StdBinCommands
 	hey.cpp
 	reindex.cpp
 	resattr.cpp
+	setdecor.cpp
 	settype.cpp
 	spybmessage.cpp
 	urlwrapper.cpp

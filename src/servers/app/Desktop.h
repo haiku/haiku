@@ -221,7 +221,7 @@ public:
 			void				Redraw();
 			void				RedrawBackground();
 
-			void				ReloadDecor();
+			bool				ReloadDecor();
 
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }

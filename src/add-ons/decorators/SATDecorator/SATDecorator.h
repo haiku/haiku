@@ -19,7 +19,6 @@ public:
 								SATDecorAddOn(image_id id, const char* name);
 
 	virtual status_t			InitCheck() const;
-			float				Version();
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,

@@ -17,7 +17,6 @@
 
 
 #include "Desktop.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
@@ -2044,10 +2043,12 @@ Desktop::RedrawBackground()
 }
 
 
-void
+bool
 Desktop::ReloadDecor()
 {
 	AutoWriteLocker _(fWindowLock);
+
+	bool returnValue = true;
 
 	// TODO it is assumed all listeners are registered by one decor
 	// unregister old listeners
@@ -2058,16 +2059,19 @@ Desktop::ReloadDecor()
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
-			BRegion oldBorder;
-			window->GetBorderRegion(&oldBorder);
+		BRegion oldBorder;
+		window->GetBorderRegion(&oldBorder);
 
-			window->ReloadDecor();
+		if (!window->ReloadDecor()) {
+			// prevent unloading previous add-on
+			returnValue = false;
+		}
 
-			BRegion border;
-			window->GetBorderRegion(&border);
+		BRegion border;
+		window->GetBorderRegion(&border);
 
-			border.Include(&oldBorder);
-			RebuildAndRedrawAfterWindowChange(window, border);
+		border.Include(&oldBorder);
+		RebuildAndRedrawAfterWindowChange(window, border);
 	}
 
 	// register new listeners
@@ -2075,6 +2079,8 @@ Desktop::ReloadDecor()
 		= gDecorManager.GetDesktopListeners();
 	for (int i = 0; i < newListeners.CountItems(); i++)
  		RegisterListener(newListeners.ItemAt(i));
+
+ 	return returnValue;
 }
 
 

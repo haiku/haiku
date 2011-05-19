@@ -129,8 +129,7 @@ Window::Window(const BRect& frame, const char *name,
 	SetFlags(flags, NULL);
 
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
-		fDecorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
-			frame, name, fLook, fFlags);
+		fDecorator = gDecorManager.AllocateDecorator(this);
 		if (fDecorator) {
 			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight,
 				&fMaxWidth, &fMaxHeight);
@@ -172,8 +171,9 @@ Window::~Window()
 
 	delete fWindowBehaviour;
 	delete fDecorator;
-
 	delete fDrawingEngine;
+
+	gDecorManager.CleanupForWindow(this);
 }
 
 
@@ -549,18 +549,18 @@ Window::ReloadDecor()
 	::Decorator* decorator = NULL;
 	WindowBehaviour* windowBehaviour = NULL;
 
+
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
-		decorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
-			Frame(), Title(), fLook, fFlags);
-		if (!decorator)
+		decorator = gDecorManager.AllocateDecorator(this);
+		if (decorator == NULL)
 			return false;
 		if (IsFocus())
 			decorator->SetFocus(true);
 	}
 
 	windowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
-	if (!windowBehaviour) {
+	if (windowBehaviour == NULL) {
 		delete decorator;
 		return false;
 	}
@@ -1108,6 +1108,14 @@ Window::TabLocation() const
 bool
 Window::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
 {
+	if (settings.what == 'prVu') {
+		// 'prVu' == preview a decorator!
+		BString path;
+		if (settings.FindString("preview", &path) == B_OK)
+			return gDecorManager.PreviewDecorator(path, this) == B_OK;
+		return false;
+	}
+
 	if (fDecorator)
 		return fDecorator->SetSettings(settings, &dirty);
 	return false;
@@ -1142,8 +1150,7 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 {
 	if (fDecorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
-		fDecorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
-			Frame(), Title(), fLook, fFlags);
+		fDecorator = gDecorManager.AllocateDecorator(this);
 		if (IsFocus())
 			fDecorator->SetFocus(true);
 	}

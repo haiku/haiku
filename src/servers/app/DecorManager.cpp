@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2001-2010, Haiku, Inc.
+ * Copyright (c) 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Joseph Groover <looncraz@satx.rr.com>
  */
 
 #include "DecorManager.h"
@@ -44,7 +45,6 @@ DecorAddOn::DecorAddOn(image_id id, const char* name)
 
 DecorAddOn::~DecorAddOn()
 {
-
 }
 
 
@@ -70,6 +70,7 @@ DecorAddOn::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
 
 	if (!decorator)
 		return NULL;
+
 	decorator->SetDrawingEngine(engine);
 	decorator->SetTitle(title);
 
@@ -104,87 +105,23 @@ DecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
 
 DecorManager::DecorManager()
 	:
-	fDefaultDecorAddOn(-1, "Default"),
-	fCurrentDecor(NULL)
+	fDefaultDecor(-1, "Default"),
+	fCurrentDecor(&fDefaultDecor),
+	fPreviewDecor(NULL),
+	fPreviewWindow(NULL),
+	fCurrentDecorPath("Default")
 {
-	// Start with the default decorator - index is always 0
-	fDecorList.AddItem(&fDefaultDecorAddOn);
-
-	// Add any on disk
-	RescanDecorators();
-
 	_LoadSettingsFromDisk();
-
-	if (!fCurrentDecor)
-		fCurrentDecor = fDecorList.ItemAt(0L);
 }
 
 
 DecorManager::~DecorManager()
 {
-	_EmptyList();
 }
 
 
-void
-DecorManager::RescanDecorators()
-{
-	BDirectory dir(DECORATORS_DIR);
-
-	if (dir.InitCheck() != B_OK)
-		return;
-
-	entry_ref ref;
-	while (dir.GetNextRef(&ref) == B_OK) {
-		BPath path;
-		path.SetTo(DECORATORS_DIR);
-		path.Append(ref.name);
-
-		// Because this function is used for both initialization and for keeping
-		// the list up to date, check for existence in the list. Note that we
-		// do not check to see if a decorator has been removed. This is for
-		// stability. If there is a decorator in memory already whose file has
-		// been deleted, it is still available until the next boot, at which point
-		// it will obviously not be loaded.
-
-		if (_FindDecor(ref.name))
-			continue;
-
-		image_id image = load_add_on(path.Path());
-		if (image < 0)
-			continue;
-
-		// As of now, we do nothing with decorator versions, but the possibility
-		// exists that the API will change even though I cannot forsee any reason
-		// to do so. If we *did* do anything with decorator versions, the 
-		// assignment would go here.
-
-		create_decor_addon* createFunc;
-
-		// Get the instantiation function
-		status_t status = get_image_symbol(image, "instantiate_decor_addon",
-								B_SYMBOL_TYPE_TEXT, (void**)&createFunc);
-		if (status != B_OK) {
-			unload_add_on(image);
-			continue;
-		}
-
-		DecorAddOn* addon = createFunc(image, ref.name);
-
-		// TODO: unload images until they are actually used!
-		if (!addon || addon->InitCheck() != B_OK
-			|| !fDecorList.AddItem(addon)) {
-			unload_add_on(image);
-			delete addon;
-			continue;
-		}
-	}
-}
-
-
-Decorator *
-DecorManager::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
-	BRect rect, const char* title, window_look look, uint32 flags)
+Decorator*
+DecorManager::AllocateDecorator(Window* window)
 {
 	// Create a new instance of the current decorator.
 	// Ownership is that of the caller
@@ -195,8 +132,20 @@ DecorManager::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
 		return NULL;
 	}
 
-	return fCurrentDecor->AllocateDecorator(desktop, engine, rect, title,
-		look, flags);
+	// Are we previewing a specific decorator?
+	if (window == fPreviewWindow) {
+		if (fPreviewDecor != NULL) {
+			return fPreviewDecor->AllocateDecorator(window->Desktop(),
+				window->GetDrawingEngine(), window->Frame(), window->Title(),
+				window->Look(), window->Flags());
+		} else {
+			fPreviewWindow = NULL;
+		}
+	}
+
+	return fCurrentDecor->AllocateDecorator(window->Desktop(),
+		window->GetDrawingEngine(), window->Frame(), window->Title(),
+		window->Look(), window->Flags());
 }
 
 
@@ -213,6 +162,63 @@ DecorManager::AllocateWindowBehaviour(Window* window)
 }
 
 
+void
+DecorManager::CleanupForWindow(Window* window)
+{
+	// Given window is being deleted, do any cleanup needed
+	if (fPreviewWindow == window && window != NULL){
+		fPreviewWindow = NULL;
+
+		if (fPreviewDecor != NULL)
+			unload_add_on(fPreviewDecor->ImageID());
+
+		fPreviewDecor = NULL;
+	}
+}
+
+
+status_t
+DecorManager::PreviewDecorator(BString path, Window* window)
+{
+	if (fPreviewWindow != NULL && fPreviewWindow != window){
+		// Reset other window to current decorator - only one can preview
+		Window* oldPreviewWindow = fPreviewWindow;
+		fPreviewWindow = NULL;
+		oldPreviewWindow->ReloadDecor();
+	}
+
+	if (window == NULL)
+		return B_BAD_VALUE;
+
+	// We have to jump some hoops because the window must be able to
+	// delete its decorator before we unload the add-on
+	status_t error = B_OK;
+	DecorAddOn* decorPtr = _LoadDecor(path, error);
+	if (decorPtr == NULL)
+		return error == B_OK ? B_ERROR : error;
+
+	BRegion border;
+	window->GetBorderRegion(&border);
+
+	DecorAddOn* oldDecor = fPreviewDecor;
+	fPreviewDecor = decorPtr;
+	fPreviewWindow = window;
+	// After this call, the window has deleted its decorator.
+	fPreviewWindow->ReloadDecor();
+
+	BRegion newBorder;
+	window->GetBorderRegion(&newBorder);
+
+	border.Include(&newBorder);
+	window->Desktop()->RebuildAndRedrawAfterWindowChange(window, border);
+
+	if (oldDecor != NULL)
+		unload_add_on(oldDecor->ImageID());
+
+	return B_OK;
+}
+
+
 const DesktopListenerList&
 DecorManager::GetDesktopListeners()
 {
@@ -220,100 +226,87 @@ DecorManager::GetDesktopListeners()
 }
 
 
-int32
-DecorManager::CountDecorators() const
-{
-	return fDecorList.CountItems();
-}
-
-
-int32
-DecorManager::GetDecorator() const
-{
-	return fDecorList.IndexOf(fCurrentDecor);
-}
-
-
-bool
-DecorManager::SetDecorator(int32 index, Desktop* desktop)
-{
-	DecorAddOn* newDecor = fDecorList.ItemAt(index);
-
-	if (newDecor) {
-		fCurrentDecor = newDecor;
-		desktop->ReloadDecor();
-		_SaveSettingsToDisk();
-		return true;
-	}
-
-	return false;
-}
-
-
-bool
-DecorManager::SetR5Decorator(int32 value)
-{
-	BString string;
-
-	switch (value) {
-		case 0: string = "BeOS"; break;
-		case 1: string = "AmigaOS"; break;
-		case 2: string = "Windows"; break;
-		case 3: string = "MacOS"; break;
-		default:
-			return false;
-	}
-
-	DecorAddOn *newDecor = _FindDecor(string);
-	if (newDecor) {
-		fCurrentDecor = newDecor;
-		return true;
-	}
-
-	return false;
-}
-
-
 BString
-DecorManager::GetDecoratorName(int32 index)
+DecorManager::GetCurrentDecorator() const
 {
-	DecorAddOn *decor = fDecorList.ItemAt(index);
-	if (decor)
-		return decor->Name();
-
-	return BString("");
+	return fCurrentDecorPath.String();
 }
 
 
-void
-DecorManager::_EmptyList()
+status_t
+DecorManager::SetDecorator(BString path, Desktop* desktop)
 {
-	for (int32 i = 1; i < fDecorList.CountItems(); i++) {
-		unload_add_on(fDecorList.ItemAt(i)->ImageID());
-		delete fDecorList.ItemAt(i);
+	status_t error = B_OK;
+	DecorAddOn* newDecor = _LoadDecor(path, error);
+	if (newDecor == NULL)
+		return error == B_OK ? B_ERROR : error;
+
+	DecorAddOn* oldDecor = fCurrentDecor;
+	BString oldPath = fCurrentDecorPath;
+	image_id oldImage = fCurrentDecor->ImageID();
+
+	fCurrentDecor = newDecor;
+	fCurrentDecorPath = path.String();
+
+	if (desktop->ReloadDecor()) {
+		// now safe to unload all old decorator data
+		// saves us from deleting oldDecor...
+		unload_add_on(oldImage);
+		_SaveSettingsToDisk();
+		return B_OK;
 	}
 
-	fDecorList.MakeEmpty();
-	fDecorList.AddItem(&fDefaultDecorAddOn);
+	// TODO: unloading the newDecor and its image
+	// problem is we don't know how many windows failed... or why they failed...
+	syslog(LOG_WARNING,
+		"app_server:DecorManager:SetDecorator:\"%s\" *partly* failed\n",
+		fCurrentDecorPath.String());
 
-	fCurrentDecor = &fDefaultDecorAddOn;
+	fCurrentDecor = oldDecor;
+	fCurrentDecorPath = oldPath;
+	return B_ERROR;
 }
 
 
 DecorAddOn*
-DecorManager::_FindDecor(BString name)
+DecorManager::_LoadDecor(BString _path, status_t& error )
 {
-	if (!name)
-		return NULL;
-
-	for (int32 i = 0; i < fDecorList.CountItems(); i++) {
-		DecorAddOn* decor = fDecorList.ItemAt(i);
-
-		if (decor->Name() == name)
-			return decor;
+	if (_path == "Default") {
+		error = B_OK;
+		return &fDefaultDecor;
 	}
 
-	return NULL;
+	BEntry entry(_path.String(), true);
+	if (!entry.Exists()) {
+		error = B_ENTRY_NOT_FOUND;
+		return NULL;
+	}
+
+	BPath path(&entry);
+	image_id image = load_add_on(path.Path());
+	if (image < 0) {
+		error = B_BAD_IMAGE_ID;
+		return NULL;
+	}
+
+	create_decor_addon*	createFunc;
+	if (get_image_symbol(image, "instantiate_decor_addon", B_SYMBOL_TYPE_TEXT,
+			(void**)&createFunc) != B_OK) {
+		unload_add_on(image);
+		error = B_MISSING_SYMBOL;
+		return NULL;
+	}
+
+	char name[B_FILE_NAME_LENGTH];
+	entry.GetName(name);
+	DecorAddOn* newDecor = createFunc(image, name);
+	if (newDecor == NULL || newDecor->InitCheck() != B_OK) {
+		unload_add_on(image);
+		error = B_ERROR;
+		return NULL;
+	}
+
+	return newDecor;
 }
 
 
@@ -338,12 +331,15 @@ DecorManager::_LoadSettingsFromDisk()
 
 	BMessage settings;
 	if (settings.Unflatten(&file) == B_OK) {
-		BString itemtext;
-		if (settings.FindString("decorator", &itemtext) == B_OK) {
-			DecorAddOn* decor = _FindDecor(itemtext);
-			if (decor) {
+		BString itemPath;
+		if (settings.FindString("decorator", &itemPath) == B_OK) {
+			status_t error = B_OK;
+			DecorAddOn* decor = _LoadDecor(itemPath, error);
+			if (decor != NULL) {
 				fCurrentDecor = decor;
 				return true;
+			} else {
+				//TODO: do something with the reported error
 			}
 		}
 	}
@@ -371,7 +367,7 @@ DecorManager::_SaveSettingsToDisk()
 		return false;
 
 	BMessage settings;
-	if (settings.AddString("decorator", fCurrentDecor->Name()) != B_OK)
+	if (settings.AddString("decorator", fCurrentDecorPath.String()) != B_OK)
 		return false;
 	if (settings.Flatten(&file) != B_OK)
 		return false;

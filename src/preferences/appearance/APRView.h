@@ -28,6 +28,7 @@
 #include "ColorSet.h"
 
 class ColorWell;
+class DecorInfoUtility;
 class APRWindow;
 
 class APRView : public BView
@@ -62,6 +63,7 @@ protected:
 	ColorSet		fDefaultSet;
 	
 	BMenu			*fDecorMenu;
+	DecorInfoUtility*fDecorUtil;
 };
 
 #endif

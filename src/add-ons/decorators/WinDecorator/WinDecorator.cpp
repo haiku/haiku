@@ -37,13 +37,6 @@ WinDecorAddOn::WinDecorAddOn(image_id id, const char* name)
 }
 
 
-float
-WinDecorAddOn::Version()
-{
-	return 1.00;
-}
-
-
 Decorator*
 WinDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
 	window_look look, uint32 flags)

@@ -8,6 +8,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseFreeTypeHeaders ;
 
+AddResources SATDecorator : resources.rdef ;
+
 Addon SATDecorator :
 	SATDecorator.cpp
 	SATGroup.cpp

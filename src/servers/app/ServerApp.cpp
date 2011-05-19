@@ -648,65 +648,26 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SET_DECORATOR:
 		{
 			// Attached Data:
-			// int32 the index of the decorator to use
+			// path to decorator add-on
 
-			int32 index;
-			link.Read<int32>(&index);
-			if (gDecorManager.SetDecorator(index, fDesktop))
-				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
-			break;
-		}
+			BString path;
+			link.ReadString(path);
 
-		case AS_COUNT_DECORATORS:
-		{
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(gDecorManager.CountDecorators());
+			status_t error = gDecorManager.SetDecorator(path, fDesktop);
+
+			fLink.Attach<status_t>(error);
 			fLink.Flush();
+
+			if (error == B_OK)
+				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
 			break;
 		}
 
 		case AS_GET_DECORATOR:
 		{
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(gDecorManager.GetDecorator());
+			fLink.AttachString(gDecorManager.GetCurrentDecorator().String());
 			fLink.Flush();
-			break;
-		}
-
-		case AS_GET_DECORATOR_NAME:
-		{
-			int32 index;
-			link.Read<int32>(&index);
-
-			BString str(gDecorManager.GetDecoratorName(index));
-			if (str.CountChars() > 0) {
-				fLink.StartMessage(B_OK);
-				fLink.AttachString(str.String());
-			} else
-				fLink.StartMessage(B_ERROR);
-
-			fLink.Flush();
-			break;
-		}
-
-		case AS_R5_SET_DECORATOR:
-		{
-			// Sort of supports Tracker's nifty Easter Egg. It was easy to do
-			// and it's kind of neat, so why not?
-
-			// Attached Data:
-			// int32 value of the decorator to use
-			// 0: BeOS
-			// 1: Amiga
-			// 2: Windows
-			// 3: MacOS
-
-			int32 decindex = 0;
-			link.Read<int32>(&decindex);
-
-			if (gDecorManager.SetR5Decorator(decindex))
-				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
-
 			break;
 		}
 
