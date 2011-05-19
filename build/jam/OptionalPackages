@@ -1374,8 +1374,8 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				python-2.6.6-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/python-2.6.6-r1a3-x86-gcc2-2011-05-18.zip
+				python-2.6.6-r1a3-x86-gcc2-2011-05-19.zip
+				: $(baseURL)/python-2.6.6-r1a3-x86-gcc2-2011-05-19.zip
 				: : true ;
 		}
 	}
