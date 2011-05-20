@@ -185,9 +185,9 @@ ImageCache::_QueueWorkerThread(void* _self)
 
 		self->fLocker.Lock();
 		self->fQueueMap.erase(std::make_pair(entry->ref, entry->page));
+		self->_NotifyListeners(cacheEntry, entry);
 		self->fLocker.Unlock();
 
-		self->_NotifyListeners(cacheEntry, entry);
 		delete entry;
 	}
 
