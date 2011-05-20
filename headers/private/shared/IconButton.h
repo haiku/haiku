@@ -11,12 +11,9 @@
 
 //! GUI class that loads an image from disk and shows it as clickable button.
 
-// TODO: inherit from BControl
 
-
-#include <Invoker.h>
+#include <Control.h>
 #include <String.h>
-#include <View.h>
 
 
 class BBitmap;
@@ -26,13 +23,12 @@ class BMimeType;
 namespace BPrivate {
 
 
-class BIconButton : public BView, public BInvoker {
+class BIconButton : public BControl {
 public:
 								BIconButton(const char* name,
-										   uint32 id,
-										   const char* label = NULL,
-										   BMessage* message = NULL,
-										   BHandler* target = NULL);
+									const char* label = NULL,
+									BMessage* message = NULL,
+									BHandler* target = NULL);
 	virtual						~BIconButton();
 
 	// BView interface
@@ -63,49 +59,34 @@ public:
 	// BInvoker interface
 	virtual	status_t			Invoke(BMessage* message = NULL);
 
+	// BControl interface
+	virtual	void				SetValue(int32 value);
+	virtual	void				SetEnabled(bool enable);
+
 	// BIconButton
 			bool				IsValid() const;
 
-	virtual	int32				Value() const;
-	virtual	void				SetValue(int32 value);
-
-			bool				IsEnabled() const;
-			void				SetEnabled(bool enable);
-
 			void				SetPressed(bool pressed);
 			bool				IsPressed() const;
-			uint32				ID() const
-									{ return fID; }
 
 			status_t			SetIcon(int32 resourceID);
 			status_t			SetIcon(const char* pathToBitmap);
 			status_t			SetIcon(const BBitmap* bitmap);
 			status_t			SetIcon(const BMimeType* fileType,
-										bool small = true);
+									bool small = true);
 			status_t			SetIcon(const unsigned char* bitsFromQuickRes,
-										uint32 width, uint32 height,
-										color_space format,
-										bool convertToBW = false);
+									uint32 width, uint32 height,
+									color_space format,
+									bool convertToBW = false);
 			void				ClearIcon();
 			void				TrimIcon(bool keepAspect = true);
 
 			BBitmap*			Bitmap() const;
 									// caller has to delete the returned bitmap
-			const BString&		Label() const;
 
 protected:
-			enum {
-				STATE_NONE			= 0x0000,
-				STATE_TRACKING		= 0x0001,
-				STATE_PRESSED		= 0x0002,
-				STATE_ENABLED		= 0x0004,
-				STATE_INSIDE		= 0x0008,
-				STATE_FORCE_PRESSED	= 0x0010,
-			};
-
-			void				_AddFlags(uint32 flags);
-			void				_ClearFlags(uint32 flags);
-			bool				_HasFlags(uint32 flags) const;
+			bool				IsInside() const;
+			void				SetInside(bool inside);
 
 private:
 			BBitmap*			_ConvertToRGB32(const BBitmap* bitmap) const;
@@ -113,15 +94,16 @@ private:
 			void				_DeleteBitmaps();
 			void				_SendMessage() const;
 			void				_Update();
+			void				_SetTracking(bool state);
+			void				_SetFlags(uint32 flags, bool set);
+			bool				_HasFlags(uint32 flags) const;
 
 private:
 			uint32				fButtonState;
-			int32				fID;
 			BBitmap*			fNormalBitmap;
 			BBitmap*			fDisabledBitmap;
 			BBitmap*			fClickedBitmap;
 			BBitmap*			fDisabledClickedBitmap;
-			BString				fLabel;
 
 			BHandler*			fTargetCache;
 };

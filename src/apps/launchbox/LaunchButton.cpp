@@ -3,15 +3,16 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "LaunchButton.h"
 
-#include <malloc.h> // string.h is not enough on Haiku?!?
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <Application.h>
 #include <AppDefs.h>
 #include <AppFileInfo.h>
+#include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <File.h>
@@ -24,25 +25,24 @@
 #include "PadView.h"
 #include "MainWindow.h"
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "LaunchBox"
+
 
 static const float kDragStartDist = 10.0;
 static const float kDragBitmapAlphaScale = 0.6;
 static const char* kEmptyHelpString = B_TRANSLATE("You can drag an icon here.");
 
 
-bigtime_t
-LaunchButton::sClickSpeed = 0;
-
-bool
-LaunchButton::sIgnoreDoubleClick = true;
+bigtime_t LaunchButton::sClickSpeed = 0;
+bool LaunchButton::sIgnoreDoubleClick = true;
 
 
-LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
+LaunchButton::LaunchButton(const char* name, const char* label,
 		BMessage* message, BHandler* target)
 	:
-	BIconButton(name, id, label, message, target),
+	BIconButton(name, label, message, target),
 	fRef(NULL),
 	fAppSig(NULL),
 	fDescription(""),
@@ -107,7 +107,7 @@ LaunchButton::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED: {
-			entry_ref ref; 
+			entry_ref ref;
 			if (message->FindRef("refs", &ref) == B_OK) {
 				if (fRef) {
 					if (ref != *fRef) {
@@ -166,10 +166,10 @@ LaunchButton::MouseDown(BPoint where)
 	if (BMessage* message = Window()->CurrentMessage()) {
 		uint32 buttons;
 		message->FindInt32("buttons", (int32*)&buttons);
-		if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0 && IsInside()) {
 			if (PadView* parent = dynamic_cast<PadView*>(Parent())) {
 				parent->DisplayMenu(ConvertToParent(where), this);
-				_ClearFlags(STATE_INSIDE);
+				SetInside(false);
 				callInherited = false;
 			}
 		} else {
@@ -211,12 +211,15 @@ LaunchButton::MouseMoved(BPoint where, uint32 transit,
 		}
 	}
 	// see if we should create a drag message
-	if (_HasFlags(STATE_TRACKING) && fRef) {
+	if (IsTracking() && fRef != NULL) {
 		BPoint diff = where - fDragStart;
 		float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
 		if (dist >= kDragStartDist) {
 			// stop tracking
-			_ClearFlags(STATE_PRESSED | STATE_TRACKING | STATE_INSIDE);
+			SetTracking(false);
+			SetPressed(false);
+			SetInside(false);
+
 			// create drag bitmap and message
 			if (BBitmap* bitmap = Bitmap()) {
 				if (bitmap->ColorSpace() == B_RGB32) {
@@ -263,11 +266,11 @@ LaunchButton::PreferredSize()
 	float hPadding = max_c(6.0, ceilf(minHeight / 3.0));
 	float vPadding = max_c(6.0, ceilf(minWidth / 3.0));
 
-	if (Label().CountChars() > 0) {
+	if (Label() != NULL && Label()[0] != '\0') {
 		font_height fh;
 		GetFontHeight(&fh);
 		minHeight += ceilf(fh.ascent + fh.descent) + vPadding;
-		minWidth += StringWidth(Label().String()) + vPadding;
+		minWidth += StringWidth(Label()) + vPadding;
 	}
 
 	return BSize(minWidth + hPadding, minHeight + vPadding);
@@ -389,7 +392,7 @@ LaunchButton::_UpdateToolTip()
 		BString helper(fRef->name);
 		if (fDescription.CountChars() > 0) {
 			if (fDescription != helper)
-				helper << "\n\n" << fDescription.String();		
+				helper << "\n\n" << fDescription.String();
 		} else {
 			BFile file(fRef, B_READ_ONLY);
 			BAppFileInfo appFileInfo;

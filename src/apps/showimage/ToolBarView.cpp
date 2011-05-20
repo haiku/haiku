@@ -54,7 +54,7 @@ void
 ToolBarView::AddAction(BMessage* message, BHandler* target, const BBitmap* icon,
 	const char* toolTipText)
 {
-	BIconButton* button = new BIconButton(NULL, 0, NULL, message, target);
+	BIconButton* button = new BIconButton(NULL, NULL, message, target);
 	button->SetIcon(icon);
 	if (toolTipText != NULL)
 		button->SetToolTip(toolTipText);

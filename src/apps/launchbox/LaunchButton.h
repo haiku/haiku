@@ -21,7 +21,7 @@ enum {
 
 class LaunchButton : public BIconButton {
 public:
-								LaunchButton(const char* name, uint32 id,
+								LaunchButton(const char* name,
 									const char* label = NULL,
 									BMessage* message = NULL,
 									BHandler* target = NULL);
@@ -73,12 +73,12 @@ private:
 private:
 			entry_ref*			fRef;
 			char*				fAppSig;
-			BString				fDescription;	
-		
+			BString				fDescription;
+
 			bool				fAnticipatingDrop;
 			bigtime_t			fLastClickTime;
 			BPoint				fDragStart;
-		
+
 			uint32				fIconSize;
 
 	static	bigtime_t			sClickSpeed;

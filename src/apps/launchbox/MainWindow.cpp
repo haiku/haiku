@@ -36,7 +36,6 @@ MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 		B_ALL_WORKSPACES),
 	fSettings(new BMessage('sett')),
 	fPadView(new PadView("pad view")),
-	fLastID(0),
 	fNamePanelFrame(-1000.0, -1000.0, -800.0, -900.0),
 	fAutoRaise(false),
 	fShowOnAllWorkspaces(true)
@@ -66,7 +65,6 @@ MainWindow::MainWindow(const char* name, BRect frame, BMessage* settings)
 		B_ALL_WORKSPACES),
 	fSettings(settings),
 	fPadView(new PadView("pad view")),
-	fLastID(0),
 	fNamePanelFrame(-1000.0, -1000.0, -900.0, -900.0),
 	fAutoRaise(false),
 	fShowOnAllWorkspaces(true)
@@ -182,7 +180,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_ADD_SLOT: {
 			LaunchButton* button;
 			if (message->FindPointer("be:source", (void**)&button) >= B_OK) {
-				fPadView->AddButton(new LaunchButton("launch button", fLastID++,
+				fPadView->AddButton(new LaunchButton("launch button",
 					NULL, new BMessage(MSG_LAUNCH)), button);
 			}
 			break;
@@ -378,7 +376,7 @@ MainWindow::LoadSettings(const BMessage* message)
 	const char* path;
 	bool buttonAdded = false;
 	for (int32 i = 0; message->FindString("path", i, &path) >= B_OK; i++) {
-		LaunchButton* button = new LaunchButton("launch button", fLastID++,
+		LaunchButton* button = new LaunchButton("launch button",
 			NULL, new BMessage(MSG_LAUNCH));
 		fPadView->AddButton(button);
 		BString signature;
@@ -555,38 +553,33 @@ void
 MainWindow::_AddDefaultButtons()
 {
 	// Mail
-	LaunchButton* button = new LaunchButton("launch button", fLastID++, NULL,
+	LaunchButton* button = new LaunchButton("launch button", NULL,
 		new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Be-MAIL", true);
 
 	// StyledEdit
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Haiku-StyledEdit", true);
 
 	// ShowImage
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Haiku-ShowImage", true);
 
 	// MediaPlayer
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Haiku-MediaPlayer", true);
 
 	// DeskCalc
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Haiku-DeskCalc", true);
 
 	// Terminal
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Haiku-Terminal", true);
 }
@@ -595,16 +588,14 @@ MainWindow::_AddDefaultButtons()
 void
 MainWindow::_AddEmptyButtons()
 {
-	LaunchButton* button = new LaunchButton("launch button", fLastID++, NULL,
+	LaunchButton* button = new LaunchButton("launch button", NULL,
 		new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 
-	button = new LaunchButton("launch button", fLastID++, NULL,
-		new BMessage(MSG_LAUNCH));
+	button = new LaunchButton("launch button", NULL, new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 }
 

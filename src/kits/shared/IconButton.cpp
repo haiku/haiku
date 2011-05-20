@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
 
 
@@ -29,20 +30,30 @@
 #include <Window.h>
 
 
-BIconButton::BIconButton(const char* name, uint32 id, const char* label,
-		BMessage* message, BHandler* target)
+namespace BPrivate {
+
+
+enum {
+	STATE_NONE			= 0x0000,
+	STATE_PRESSED		= 0x0002,
+	STATE_INSIDE		= 0x0008,
+	STATE_FORCE_PRESSED	= 0x0010,
+};
+
+
+
+BIconButton::BIconButton(const char* name, const char* label,
+	BMessage* message, BHandler* target)
 	:
-	BView(name, B_WILL_DRAW),
-	BInvoker(message, target),
-	fButtonState(STATE_ENABLED),
-	fID(id),
+	BControl(name, label, message, B_WILL_DRAW),
+	fButtonState(0),
 	fNormalBitmap(NULL),
 	fDisabledBitmap(NULL),
 	fClickedBitmap(NULL),
 	fDisabledClickedBitmap(NULL),
-	fLabel(label),
 	fTargetCache(target)
 {
+	SetTarget(target);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetViewColor(B_TRANSPARENT_32_BIT);
 }
@@ -126,8 +137,8 @@ BIconButton::Draw(BRect updateRect)
 bool
 BIconButton::ShouldDrawBorder() const
 {
-	return ((IsEnabled() && (_HasFlags(STATE_INSIDE)
-		|| _HasFlags(STATE_TRACKING))) || _HasFlags(STATE_FORCE_PRESSED));
+	return (IsEnabled() && (IsInside() || IsTracking()))
+		|| _HasFlags(STATE_FORCE_PRESSED);
 }
 
 
@@ -155,12 +166,14 @@ BIconButton::MouseDown(BPoint where)
 	if (!IsValid())
 		return;
 
-	if (_HasFlags(STATE_ENABLED)) {
+	if (IsEnabled()) {
 		if (Bounds().Contains(where)) {
 			SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-			_AddFlags(STATE_PRESSED | STATE_TRACKING);
+			_SetFlags(STATE_PRESSED, true);
+			_SetTracking(true);
 		} else {
-			_ClearFlags(STATE_PRESSED | STATE_TRACKING);
+			_SetFlags(STATE_PRESSED, false);
+			_SetTracking(false);
 		}
 	}
 }
@@ -172,12 +185,14 @@ BIconButton::MouseUp(BPoint where)
 	if (!IsValid())
 		return;
 
-	if (_HasFlags(STATE_ENABLED) && _HasFlags(STATE_PRESSED)
+	if (IsEnabled() && _HasFlags(STATE_PRESSED)
 		&& Bounds().Contains(where)) {
 		Invoke();
 	} else if (Bounds().Contains(where))
-		_AddFlags(STATE_INSIDE);
-	_ClearFlags(STATE_PRESSED | STATE_TRACKING);
+		SetInside(true);
+
+	_SetFlags(STATE_PRESSED, false);
+	_SetTracking(false);
 }
 
 
@@ -194,19 +209,13 @@ BIconButton::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 		MouseUp(where);
 		return;
 	}
-	if (buttons && !_HasFlags(STATE_TRACKING))
+	if (buttons != 0 && !IsTracking())
 		return;
-	if ((transit == B_INSIDE_VIEW || transit == B_ENTERED_VIEW)
-		&& _HasFlags(STATE_ENABLED))
-		_AddFlags(STATE_INSIDE);
-	else 
-		_ClearFlags(STATE_INSIDE);
-	if (_HasFlags(STATE_TRACKING)) {
-		if (Bounds().Contains(where))
-			_AddFlags(STATE_PRESSED);
-		else
-			_ClearFlags(STATE_PRESSED);
-	}
+
+	SetInside((transit == B_INSIDE_VIEW || transit == B_ENTERED_VIEW)
+		&& IsEnabled());
+	if (IsTracking())
+		_SetFlags(STATE_PRESSED, Bounds().Contains(where));
 }
 
 
@@ -229,11 +238,11 @@ BIconButton::GetPreferredSize(float* width, float* height)
 	float hPadding = max_c(6.0f, ceilf(minHeight / 4.0f));
 	float vPadding = max_c(6.0f, ceilf(minWidth / 4.0f));
 
-	if (fLabel.CountChars() > 0) {
+	if (Label() != NULL && Label()[0] != '\0') {
 		font_height fh;
 		GetFontHeight(&fh);
 		minHeight += ceilf(fh.ascent + fh.descent) + vPadding;
-		minWidth += StringWidth(fLabel.String()) + vPadding;
+		minWidth += StringWidth(Label()) + vPadding;
 	}
 
 	if (width)
@@ -269,7 +278,6 @@ BIconButton::Invoke(BMessage* message)
 		clone.AddInt64("be:when", system_time());
 		clone.AddPointer("be:source", (BView*)this);
 		clone.AddInt32("be:value", Value());
-		clone.AddInt32("id", ID());
 		return BInvoker::Invoke(&clone);
 	}
 	return BInvoker::Invoke(message);
@@ -279,10 +287,7 @@ BIconButton::Invoke(BMessage* message)
 void
 BIconButton::SetPressed(bool pressed)
 {
-	if (pressed)
-		_AddFlags(STATE_FORCE_PRESSED);
-	else
-		_ClearFlags(STATE_FORCE_PRESSED);
+	_SetFlags(STATE_FORCE_PRESSED, pressed);
 }
 
 
@@ -618,44 +623,39 @@ BIconButton::Bitmap() const
 }
 
 
-const BString&
-BIconButton::Label() const
-{
-	return fLabel;
-}
-
-
-int32
-BIconButton::Value() const
-{
-	return _HasFlags(STATE_PRESSED) ? B_CONTROL_ON : B_CONTROL_OFF;
-}
-
-
 void
 BIconButton::SetValue(int32 value)
 {
-	if (value)
-		_AddFlags(STATE_PRESSED);
-	else
-		_ClearFlags(STATE_PRESSED);
-}
-
-
-bool
-BIconButton::IsEnabled() const
-{
-	return _HasFlags(STATE_ENABLED) ? B_CONTROL_ON : B_CONTROL_OFF;
+	BControl::SetValue(value);
+	_SetFlags(STATE_PRESSED, value != 0);
 }
 
 
 void
 BIconButton::SetEnabled(bool enabled)
 {
-	if (enabled)
-		_AddFlags(STATE_ENABLED);
-	else
-		_ClearFlags(STATE_ENABLED | STATE_TRACKING | STATE_INSIDE);
+	BControl::SetEnabled(enabled);
+	if (!enabled) {
+		SetInside(false);
+		_SetTracking(false);
+	}
+}
+
+
+// #pragma mark - protected
+
+
+bool
+BIconButton::IsInside() const
+{
+	return _HasFlags(STATE_INSIDE);
+}
+
+
+void
+BIconButton::SetInside(bool inside)
+{
+	_SetFlags(STATE_INSIDE, inside);
 }
 
 
@@ -690,7 +690,7 @@ status_t
 BIconButton::_MakeBitmaps(const BBitmap* bitmap)
 {
 	status_t status = bitmap ? bitmap->InitCheck() : B_BAD_VALUE;
-	if (status >= B_OK) {
+	if (status == B_OK) {
 		// make our own versions of the bitmap
 		BRect b(bitmap->Bounds());
 		_DeleteBitmaps();
@@ -838,20 +838,16 @@ BIconButton::_Update()
 
 
 void
-BIconButton::_AddFlags(uint32 flags)
+BIconButton::_SetFlags(uint32 flags, bool set)
 {
-	if (!_HasFlags(flags)) {
-		fButtonState |= flags;
-		_Update();
-	}
-}
+	if (_HasFlags(flags) != set) {
+		if (set)
+			fButtonState |= flags;
+		else
+			fButtonState &= ~flags;
 
-
-void
-BIconButton::_ClearFlags(uint32 flags)
-{
-	if (_HasFlags(flags)) {
-		fButtonState &= ~flags;
+		if ((flags & STATE_PRESSED) != 0)
+			SetValueNoUpdate(set ? B_CONTROL_ON : B_CONTROL_OFF);
 		_Update();
 	}
 }
@@ -863,3 +859,17 @@ BIconButton::_HasFlags(uint32 flags) const
 	return (fButtonState & flags) != 0;
 }
 
+
+//!	This one calls _Update() if needed; BControl::SetTracking() isn't virtual.
+void
+BIconButton::_SetTracking(bool tracking)
+{
+	if (IsTracking() == tracking)
+		return;
+
+	SetTracking(tracking);
+	_Update();
+}
+
+
+}	// namespace BPrivate

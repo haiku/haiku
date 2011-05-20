@@ -27,9 +27,9 @@ enum {
 class MainWindow : public BWindow {
 public:
 								MainWindow(const char* name, BRect frame,
-									bool addDefaultButtons = false); 
+									bool addDefaultButtons = false);
 								MainWindow(const char* name, BRect frame,
-									BMessage* settings); 
+									BMessage* settings);
 	virtual						~MainWindow();
 
 	// BWindow interface
@@ -65,9 +65,9 @@ private:
 
 			void				_NotifySettingsChanged();
 
+private:
 			BMessage*			fSettings;
 			PadView*			fPadView;
-			int32				fLastID;
 
 			float				fBorderDist;
 			BPoint				fScreenPosition;
