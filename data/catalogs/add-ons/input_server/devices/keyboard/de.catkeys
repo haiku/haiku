@@ -6,5 +6,5 @@ If the application will not quit you may have to kill it.	Team monitor		Falls si
 Kill application	Team monitor		Beenden erzwingen
 Quit application	Team monitor		Beenden
 Restart the desktop	Team monitor		Desktop neu starten
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Um ein Team zu beenden, den Namen in der Liste markieren und "Team liquidieren" oder "Team beenden" klicken.\n\nSTRG+ALT+ENTF für %ld Sekunden halten, um einen Neustart zu erzwingen.
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Um ein Team zu beenden, den Eintrag in der Liste markieren und "Beenden" oder "Beenden erzwingen" klicken.\n\nSTRG+ALT+ENTF für %ld Sekunden halten, um einen Neustart zu erzwingen.
 Team monitor	Team monitor		Teammonitor

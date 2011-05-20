@@ -742,8 +742,8 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				expat-2.0.1-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/expat-2.0.1-r1a3-x86-gcc2-2011-05-18.zip
+				expat-2.0.1-r1a3-x86-gcc2-2011-05-20.zip
+				: $(baseURL)/expat-2.0.1-r1a3-x86-gcc2-2011-05-20.zip
 				: : true ;
 		}
 	}
@@ -1460,8 +1460,8 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				subversion-1.6.15-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/subversion-1.6.15-r1a3-x86-gcc2-2011-05-18.zip
+				subversion-1.6.15-r1a3-x86-gcc2-2011-05-20.zip
+				: $(baseURL)/subversion-1.6.15-r1a3-x86-gcc2-2011-05-20.zip
 				: : true ;
 		}
 	}

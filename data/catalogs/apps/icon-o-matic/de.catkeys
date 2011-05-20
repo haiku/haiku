@@ -127,7 +127,7 @@ Pick a color	Icon-O-Matic-ColorPicker		Farbe aussuchen
 Properties	Icon-O-Matic-Menus		Eigenschaften
 Quit	Icon-O-Matic-Menu-File		Beenden
 Radial	Icon-O-Matic-StyleTypes		Radial
-Redo	Icon-O-Matic-Main		Wiederholen
+Redo	Icon-O-Matic-Main		Wiederholen:
 Remove	Icon-O-Matic-PathManipulator		Entfernen
 Remove	Icon-O-Matic-PathsList		Entfernen
 Remove	Icon-O-Matic-ShapesList		Entfernen
@@ -186,7 +186,7 @@ Transformer	Icon-O-Matic-Menus		Transformator
 Translation X	Icon-O-Matic-PropertyNames		Verschiebung X
 Translation Y	Icon-O-Matic-PropertyNames		Verschiebung Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Pfad lösen
-Undo	Icon-O-Matic-Main		Rückgängig
+Undo	Icon-O-Matic-Main		Rückgängig:
 Untitled	Icon-O-Matic-Main		Unbenannt
 Width	Icon-O-Matic-PropertyNames		Strichstärke
 Yes	Icon-O-Matic-StyledTextImport		Ja

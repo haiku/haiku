@@ -8,10 +8,10 @@ Auto-raise	PreferencesWindow		Höj fönstret vid närkontakt
 Change time…	TimeView		Ställ in tid...
 Clock	PreferencesWindow		Klocka
 Close all	WindowMenu		Stäng alla
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstreringar
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
 Deskbar	System name		Deskbar
 Deskbar preferences	PreferencesWindow		Deskbar inställningar
-Deskbar preferences…	BeMenu		Deskbar inställningar...
+Deskbar preferences…	BeMenu		Inställningar för Deskbar...
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram
 Edit menu…	PreferencesWindow		Redigera meny...
 Expand new applications	PreferencesWindow		Expandera nya program
@@ -25,7 +25,7 @@ Power off	BeMenu		Stäng av
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
 Quit application	WindowMenu		Avsluta program
 Recent applications	BeMenu		Senaste programmen
-Recent applications:	PreferencesWindow		Senaste programmen:
+Recent applications:	PreferencesWindow		Senaste program:
 Recent documents	BeMenu		Senaste dokumenten
 Recent documents:	PreferencesWindow		Senaste dokument:
 Recent folders	BeMenu		Senaste mapparna
@@ -34,7 +34,7 @@ Restart Tracker	BeMenu		Starta om Tracker
 Restart system	BeMenu		Starta om
 Show Time	Tray		Visa tid
 Show all	WindowMenu		Visa alla
-Show application expander	PreferencesWindow		Visa program expanderare
+Show application expander	PreferencesWindow		Visa program-expanderare
 Show calendar…	TimeView		Visa kalender...
 Show replicants	BeMenu		Visa replikanter
 Show seconds	PreferencesWindow		Visa sekunder

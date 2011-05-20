@@ -437,7 +437,7 @@ multiple disks	FindPanel		flera diskar
 no items	CountView		inga objekt
 no supporting apps	OpenWithWindow		program saknas
 of %items	StatusWindow		av %items
-optional	/boot/optional		valfria
+optional	/boot/optional		valfri
 parent folder	NavMenu		föräldrakatalog
 preferences	B_PREFERENCES_DIRECTORY		inställningar
 rename	InfoWindow	As in 'If you rename ...'	byter namn

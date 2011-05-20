@@ -67,8 +67,6 @@ DecorInfo::SetTo(const entry_ref& ref)
 
 	BPath path(&ref);
 	fPath = path.Path();
-	path.Unset();
-
 	fRef = ref;
 	_Init();
 
@@ -79,10 +77,9 @@ DecorInfo::SetTo(const entry_ref& ref)
 status_t
 DecorInfo::SetTo(BString path)
 {
-	entry_ref ref;
 	BEntry entry(path.String(), true);
+	entry_ref ref;
 	entry.GetRef(&ref);
-	entry.Unset();
 	return SetTo(ref);
 }
 
@@ -121,7 +118,7 @@ DecorInfo::IsDefault() const
 BString
 DecorInfo::Path() const
 {
-	return fPath.String();
+	return fPath;
 }
 
 
@@ -281,7 +278,6 @@ DecorInfo::_Init(bool isUpdate)
 		}
 
 		entry.GetModificationTime(&fModificationTime);
-		entry.Unset();
 		return;
 	}
 
@@ -334,7 +330,6 @@ DecorInfo::_Init(bool isUpdate)
 		infoMessage.FindFloat ("version", &fVersion);
 	}
 
-	resources.Unset();
 	fInitStatus = B_OK;
 	fName = fRef.name;
 }
@@ -362,7 +357,7 @@ DecorInfoUtility::DecorInfoUtility(bool scanNow)
 	if (info == NULL || info->InitCheck() != B_OK)	{
 		delete info;
 		fprintf(stderr, "DecorInfoUtility::constructor\tdefault decorator's "
-				"DecorInfo failed InitCheck()\n");
+			"DecorInfo failed InitCheck()\n");
 		return;
 	}
 
@@ -481,11 +476,13 @@ DecorInfoUtility::FindDecorator(const BString& string)
 	if (decor != NULL)
 		return decor;
 
-	// search by cached name
+	// search by name or short cut name
 	for (int i = 1; i < fList.CountItems(); ++i) {
 		decor = fList.ItemAt(i);
-		if (string.ICompare(decor->Name()) == 0)
+		if (string.ICompare(decor->ShortcutName()) == 0
+			|| string.ICompare(decor->Name()) == 0) {
 			return decor;
+		}
 	}
 
 	return NULL;

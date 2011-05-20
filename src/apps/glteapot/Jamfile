@@ -17,4 +17,5 @@ DoCatalogs GLTeapot :
 	x-vnd.Haiku-GLTeapot
 	:
 	TeapotApp.cpp
+	TeapotWindow.cpp
 ;
