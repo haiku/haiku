@@ -251,7 +251,6 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 
 	// Update minimum window size
 	float toolBarMinWidth = fToolBarView->MinSize().width;
-	printf("menu min size: %.1f, tool bar: %.1f\n", menuBarMinWidth, toolBarMinWidth);
 	SetSizeLimits(std::max(menuBarMinWidth, toolBarMinWidth), 100000, 100,
 		100000);
 
