@@ -1495,8 +1495,8 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 				: $(baseURL)/tar-1.25-x86-gcc4-2011-03-14.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				tar-1.25-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/tar-1.25-r1a3-x86-gcc2-2011-05-18.zip ;
+				tar-1.25-r1a3-x86-gcc2-2011-05-20.zip
+				: $(baseURL)/tar-1.25-r1a3-x86-gcc2-2011-05-20.zip ;
 		}
 	}
 }
