@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PowerStatus	4269725527
+1	german	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		über
 About…	PowerStatus		Über…
 Battery charging	PowerStatus		Akku wird geladen
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
 Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
 Capacity: 	PowerStatus		Kapazität:
 Current rate: 	PowerStatus		Aktueller Wert:
+Damaged battery	PowerStatus		Akku defekt
 Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
 Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
 Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
