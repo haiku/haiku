@@ -444,8 +444,8 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc4-2011-05-10.zip
-			: $(baseURL)/curl-7.21.6-x86-gcc4-2011-05-10.zip ;
+		InstallOptionalHaikuImagePackage curl-7.21.6-r1a3-x86-gcc4-2011-05-20.zip
+			: $(baseURL)/curl-7.21.6-r1a3-x86-gcc4-2011-05-20.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage curl-7.21.6-r1a3-x86-gcc2-2011-05-17.zip
 			: $(baseURL)/curl-7.21.6-r1a3-x86-gcc2-2011-05-17.zip ;
@@ -460,8 +460,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				cvs-1.12.13.1-x86-gcc4-2011-03-14.zip
-				: $(baseURL)/cvs-1.12.13.1-x86-gcc4-2011-03-14.zip
+				cvs-1.12.13.1-r1a3-x86-gcc4-2011-05-20.zip
+				: $(baseURL)/cvs-1.12.13.1-r1a3-x86-gcc4-2011-05-20.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -1130,8 +1130,8 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				neon-0.29.6-x86-gcc4-2011-05-14.zip
-				: $(baseURL)/neon-0.29.6-x86-gcc4-2011-05-14.zip ;
+				neon-0.29.6-x86-r1a3-gcc4-2011-05-20.zip
+				: $(baseURL)/neon-0.29.6-r1a3-x86-gcc4-2011-05-20.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				neon-0.29.6-r1a3-x86-gcc2-2011-05-18.zip

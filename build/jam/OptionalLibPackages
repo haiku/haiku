@@ -67,8 +67,8 @@ if [ IsOptionalHaikuImagePackageAdded box2d ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 			InstallOptionalHaikuImagePackage
-				box2d-2.1.2-x86-gcc4-2010-10-30.zip
-				: $(baseURL)/lib/box2d-2.1.2-x86-gcc4-2010-10-30.zip
+				box2d-2.1.2-r1a3-x86-gcc4-2011-05-20.zip
+				: $(baseURL)/lib/box2d-2.1.2-r1a3-x86-gcc4-2011-05-20.zip
 				: : true ;
 		} else {
 			Echo "No optional package box2d available for $(TARGET_ARCH)-gcc2" ;
