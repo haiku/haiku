@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src preferences appearance ;
 
-UsePrivateHeaders app [ FDirName servers app ] ;
+UsePrivateHeaders app interface [ FDirName servers app ] ;
 UseFreeTypeHeaders ;
 
 Preference Appearance :
@@ -11,17 +11,17 @@ Preference Appearance :
 	ColorSet.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
-	
+
 	# These are currently disabled while everything else is being worked on
 	#CurView.cpp
 	#CursorWhichItem.cpp
 	#DecView.cpp
 	#SysCursorAPI.cpp
-	
+
 	# These exist for post-R1, so they are disabled for now
 	#FontMenu.cpp
 	#MenuView.cpp
-	
+
 	: be $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Appearance.rdef
 	;

@@ -4,17 +4,20 @@
  * Author:
  *		Joseph "looncraz" Groover <looncraz@satx.rr.com>
  */
-
-
 #ifndef DECOR_INFO_H
 #define DECOR_INFO_H
 
 
 #include <Entry.h>
-#include <Bitmap.h>
-#include <String.h>
 #include <Locker.h>
 #include <ObjectList.h>
+#include <String.h>
+
+
+class BWindow;
+
+
+namespace BPrivate {
 
 
 // NOTE: DecorInfo itself is not thread-safe
@@ -78,7 +81,7 @@ private:
 };
 
 
-class DecorInfoUtility{
+class DecorInfoUtility {
 public:
 								DecorInfoUtility(bool scanNow = true);
 									// NOTE: When scanNow is passed false,
@@ -108,9 +111,9 @@ public:
 			DecorInfo*			CurrentDecorator();
 			DecorInfo*			DefaultDecorator();
 
-			bool				IsCurrentDecorator(DecorInfo*);
+			bool				IsCurrentDecorator(DecorInfo* decor);
 
-			status_t			SetDecorator(DecorInfo*);
+			status_t			SetDecorator(DecorInfo* decor);
 			status_t			SetDecorator(int32);
 
 			status_t			Preview(DecorInfo* decor, BWindow* window);
@@ -119,11 +122,17 @@ private:
 			DecorInfo*			_FindDecor(const BString& path);
 
 private:
-			BObjectList<DecorInfo>	fList;
-			BLocker					fLock;
-			bool					fHasScanned;
-
+			BObjectList<DecorInfo> fList;
+			BLocker				fLock;
+			bool				fHasScanned;
 };
 
 
-#endif
+}	// namespace BPrivate
+
+
+using BPrivate::DecorInfo;
+using BPrivate::DecorInfoUtility;
+
+
+#endif	// DECOR_INFO_H
