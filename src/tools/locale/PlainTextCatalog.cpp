@@ -228,6 +228,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	catalogFile.close();
 
+#if 0
 	uint32 checkFP = ComputeFingerprint();
 	if (fFingerprint != checkFP) {
 		fprintf(stderr, "plaintext-catalog(sig=%s, lang=%s) "
@@ -238,6 +239,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 			fFingerprint);
 		return B_BAD_DATA;
 	}
+#endif
 
 	// some information living in member variables needs to be copied
 	// to attributes. Although these attributes should have been written
