@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku. All rights reserved.
+ * Copyright 2002-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,10 @@
  *		Rene Gollent (rene@gollent.com)
  */
 
+
 #include "APRView.h"
+
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Catalog.h>
@@ -20,10 +23,7 @@
 #include <Path.h>
 #include <SpaceLayoutItem.h>
 
-#include <private/interface/DecorInfo.h>
-
-#include <stdio.h>
-
+#include <DecorInfo.h>
 
 #include "APRWindow.h"
 #include "defs.h"
