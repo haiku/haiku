@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.CodyCam	441085909
+1	finnish	x-vnd.Haiku.CodyCam	2416864674
 Can't find an available connection to the video window	CodyCam		Ei voida löytää saatavilla olevaa yhteyttä videoikkunaan
 Cannot connect the video source to the video window	CodyCam		Ei voida yhdistää videolähdettä videoikkunaan
 Cannot create a video window	CodyCam		Ei voida luoda videoikkunaa
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Kaappaustaajusvalikko
 Capture controls	CodyCam		Kaappausohjaimet
 Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
 Closing the window\n	VideoConsumer.cpp		Suljetaan ikkuna\n
-CodyCam	Application name		Cody-kamera
+CodyCam	System name		Cody-kamera
 Connected…	VideoConsumer.cpp		Yhdistetty…
 Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
 Directory:	CodyCam		Hakemisto:
