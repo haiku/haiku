@@ -206,13 +206,19 @@ BHashMapCatalog::SetString(const char *string, const char *translated,
 	const char *context, const char *comment)
 {
 	BString stringCopy(string);
-	BString translatedCopy(translated);
 	status_t result = parseQuotedChars(stringCopy);
 	if (result != B_OK)
 		return result;
+
+	BString translatedCopy(translated);
 	if ((result = parseQuotedChars(translatedCopy)) != B_OK)
 		return result;
-	CatKey key(stringCopy.String(), context, comment);
+
+	BString commentCopy(comment);
+	if ((result = parseQuotedChars(commentCopy)) != B_OK)
+		return result;
+
+	CatKey key(stringCopy.String(), context, commentCopy.String());
 	return fCatMap.Put(key, translatedCopy.String());
 		// overwrite existing element
 }
