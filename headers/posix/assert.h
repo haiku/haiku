@@ -16,10 +16,12 @@ extern "C" {
 #endif
 
 extern void __assert_fail(const char *assertion, const char *file,
-				unsigned int line, const char *function);
+				unsigned int line, const char *function)
+	__attribute__ ((noreturn));
 
 extern void __assert_perror_fail(int error, const char *file,
-				unsigned int line, const char *function);
+				unsigned int line, const char *function)
+	__attribute__ ((noreturn));
 
 #ifdef __cplusplus
 }
