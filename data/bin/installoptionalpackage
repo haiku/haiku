@@ -401,7 +401,7 @@ function GetBuildFile()
 		cd ${baseDir}
 		local baseURL=http://dev.haiku-os.org/export/
 		local revision=`uname -v | awk '{print $1}' | sed -e 's/r//'`
-		local url="${baseURL}${revision}/haiku/trunk/build/jam/${buildfile}"
+		local url="${baseURL}${revision}/haiku/branches/releases/r1alpha3/build/jam/${buildfile}"
 		wget -q ${url} || ErrorExit "...failed to download $buildfile"
 	fi
 }
