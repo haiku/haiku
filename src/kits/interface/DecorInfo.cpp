@@ -17,6 +17,11 @@
 #include <Path.h>
 #include <Resources.h>
 
+#include <DecoratorPrivate.h>
+
+
+namespace BPrivate {
+
 
 DecorInfo::DecorInfo()
 	:
@@ -338,16 +343,6 @@ DecorInfo::_Init(bool isUpdate)
 // #pragma mark - DecorInfoUtility
 
 
-namespace BPrivate {
-	// kits/interface/InterfaceDefs.cpp
-	bool get_decorator(BString&);
-	status_t set_decorator(const BString&);
-	status_t preview_decorator(const BString&, BWindow*);
-};
-
-using namespace BPrivate;
-
-
 DecorInfoUtility::DecorInfoUtility(bool scanNow)
 	:
 	fHasScanned(false)
@@ -589,3 +584,6 @@ DecorInfoUtility::_FindDecor(const BString& pathString)
 
 	return NULL;
 }
+
+
+}	// namespace BPrivate
