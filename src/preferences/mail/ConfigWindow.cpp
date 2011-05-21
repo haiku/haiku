@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2011, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -7,6 +7,10 @@
 
 
 //! main E-Mail config window
+
+
+#include "ConfigWindow.h"
+
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -46,8 +50,8 @@
 #include <MailSettings.h>
 
 #include "AutoConfigWindow.h"
-#include "ConfigWindow.h"
 #include "CenterContainer.h"
+
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Config Window"
@@ -57,13 +61,6 @@ using std::nothrow;
 
 // define if you want to have an apply button
 //#define HAVE_APPLY_BUTTON
-
-const char *kEMail = "bemaildaemon-talk@bug-br.org.br";
-const char *kMailto = "mailto:bemaildaemon-talk@bug-br.org.br";
-const char *kBugsitePretty = "Bug-Tracker at SourceForge.net";
-const char *kBugsite = "http://sourceforge.net/tracker/?func=add&group_id=26926&atid=388726";
-const char *kWebsite = "http://www.haiku-os.org";
-const rgb_color kLinkColor = { 40, 40, 180, 255 };
 
 
 const uint32 kMsgAccountsRightClicked = 'arcl';
@@ -182,11 +179,11 @@ private:
 };
 
 
-class BitmapView : public BView
-{
+class BitmapView : public BView {
 	public:
-		BitmapView(BBitmap *bitmap) : BView(bitmap->Bounds(), NULL,
-			B_FOLLOW_NONE, B_WILL_DRAW)
+		BitmapView(BBitmap *bitmap)
+			:
+			BView(bitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW)
 		{
 			fBitmap = bitmap;
 
@@ -217,133 +214,14 @@ class BitmapView : public BView
 };
 
 
-class AboutTextView : public BTextView
-{
-	public:
-		AboutTextView(BRect rect) : BTextView(rect, NULL,
-			rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_NONE, B_WILL_DRAW)
-		{
-			int32 major = 0,middle = 0,minor = 0,variety = 0,internal = 1;
-
-			// get version information for app
-
-			app_info appInfo;
-			if (be_app->GetAppInfo(&appInfo) == B_OK) {
-				BFile file(&appInfo.ref, B_READ_ONLY);
-				if (file.InitCheck() == B_OK) {
-					BAppFileInfo info(&file);
-					if (info.InitCheck() == B_OK) {
-						version_info versionInfo;
-						if (info.GetVersionInfo(&versionInfo,
-							B_APP_VERSION_KIND) == B_OK) {
-							major = versionInfo.major;
-							middle = versionInfo.middle;
-							minor = versionInfo.minor;
-							variety = versionInfo.variety;
-							internal = versionInfo.internal;
-						}
-					}
-				}
-			}
-			// prepare version variety string
-			const char *varietyStrings[] = {B_TRANSLATE("Development"),
-				B_TRANSLATE("Alpha"),B_TRANSLATE("Beta"),B_TRANSLATE("Gamma"),
-				B_TRANSLATE("Golden master"),B_TRANSLATE("Final")};
-			char varietyString[32];
-			strcpy(varietyString,varietyStrings[variety % 6]);
-			if (variety < 5)
-				sprintf(varietyString + strlen(varietyString),"/%li",internal);
-
-			char s[512];
-			sprintf(s,	B_TRANSLATE("Mail Daemon Replacement\n\n"
-						"by Haiku, Inc. All rights reserved.\n\n"
-						"Version %ld.%ld.%ld %s\n\n"
-						"See LICENSE file included in the installation package "
-						"for more information.\n\n\n\n"
-						"You can contact us at:\n"
-						"%s\n\n"
-						"Please submit bug reports using the %s\n\n"
-						"Project homepage at:\n%s"),
-						major,middle,minor,varietyString,
-						kEMail,kBugsitePretty,kWebsite);
-
-			SetText(s);
-			MakeEditable(false);
-			MakeSelectable(false);
-
-			SetAlignment(B_ALIGN_CENTER);
-			SetStylable(true);
-
-			// aethetical changes
-			BFont font;
-			GetFont(&font);
-			font.SetSize(24);
-			SetFontAndColor(0,23,&font,B_FONT_SIZE);
-
-			// center the view vertically
-			rect = TextRect();
-			rect.OffsetTo(0,(Bounds().Height() - TextHeight(0,42)) / 2);
-			SetTextRect(rect);
-
-			// set the link regions
-			int start = strstr(s,kEMail) - s;
-			int finish = start + strlen(kEMail);
-			GetTextRegion(start,finish,&fMail);
-			SetFontAndColor(start,finish,NULL,0,&kLinkColor);
-
-			start = strstr(s,kBugsitePretty) - s;
-			finish = start + strlen(kBugsitePretty);
-			GetTextRegion(start,finish,&fBugsite);
-			SetFontAndColor(start,finish,NULL,0,&kLinkColor);
-
-			start = strstr(s,kWebsite) - s;
-			finish = start + strlen(kWebsite);
-			GetTextRegion(start,finish,&fWebsite);
-			SetFontAndColor(start,finish,NULL,0,&kLinkColor);
-		}
-
-		virtual void Draw(BRect updateRect)
-		{
-			BTextView::Draw(updateRect);
-
-			BRect rect(fMail.Frame());
-			StrokeLine(BPoint(rect.left,rect.bottom-2),
-				BPoint(rect.right,rect.bottom-2));
-			rect = fBugsite.Frame();
-			StrokeLine(BPoint(rect.left,rect.bottom-2),
-				BPoint(rect.right,rect.bottom-2));
-			rect = fWebsite.Frame();
-			StrokeLine(BPoint(rect.left,rect.bottom-2),
-				BPoint(rect.right,rect.bottom-2));
-		}
-
-		virtual void MouseDown(BPoint point)
-		{
-			if (fMail.Contains(point)) {
-				char *arg[] = {(char *)kMailto,NULL};
-				be_roster->Launch("text/x-email",1,arg);
-			} else if (fBugsite.Contains(point)) {
-				char *arg[] = {(char *)kBugsite,NULL};
-				be_roster->Launch("text/html",1,arg);
-			} else if (fWebsite.Contains(point)) {
-				char *arg[] = {(char *)kWebsite, NULL};
-				be_roster->Launch("text/html", 1, arg);
-			}
-		}
-
-	private:
-		BRegion	fWebsite,fMail,fBugsite;
-};
-
-
 //	#pragma mark -
 
 
 ConfigWindow::ConfigWindow()
 	:
-	BWindow(BRect(100.0, 100.0, 580.0, 540.0), B_TRANSLATE_SYSTEM_NAME("E-mail"),
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-		| B_NOT_RESIZABLE),
+	BWindow(BRect(100, 100, 600, 540), B_TRANSLATE_SYSTEM_NAME("E-mail"),
+		B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fLastSelectedAccount(NULL),
 	fSaveSettings(false)
 {
@@ -359,7 +237,8 @@ ConfigWindow::ConfigWindow()
 	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
 		+ fontHeight.leading) + 5;
 
-	rect.InsetBy(5, 5);	rect.bottom -= 11 + height;
+	rect.InsetBy(10, 10);
+	rect.bottom -= 18 + height;
 	BTabView *tabView = new BTabView(rect, NULL);
 
 	BView *view;
@@ -371,22 +250,24 @@ ConfigWindow::ConfigWindow()
 
 	// accounts listview
 
-	rect = view->Bounds().InsetByCopy(8, 8);
-	rect.right = 140 - B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= height + 12;
+	rect = view->Bounds().InsetByCopy(10, 10);
+	rect.right = 190 - B_V_SCROLL_BAR_WIDTH;
+	rect.bottom -= height + 18;
 	fAccountsListView = new AccountsListView(rect, this);
 	view->AddChild(new BScrollView(NULL, fAccountsListView, B_FOLLOW_ALL, 0,
 		false, true));
 	rect.right += B_V_SCROLL_BAR_WIDTH;
 
-	rect.top = rect.bottom + 8;  rect.bottom = rect.top + height;
+	rect.left -= 2;
+	rect.top = rect.bottom + 10;
+	rect.bottom = rect.top + height;
 	BRect sizeRect = rect;
 	sizeRect.right = sizeRect.left + 30 + view->StringWidth(
 		B_TRANSLATE("Add"));
 	view->AddChild(new BButton(sizeRect, NULL, B_TRANSLATE("Add"),
 		new BMessage(kMsgAddAccount), B_FOLLOW_BOTTOM));
 
-	sizeRect.left = sizeRect.right+3;
+	sizeRect.left = sizeRect.right + 5;
 	sizeRect.right = sizeRect.left + 30 + view->StringWidth(
 		B_TRANSLATE("Remove"));
 	view->AddChild(fRemoveButton = new BButton(
@@ -404,21 +285,19 @@ ConfigWindow::ConfigWindow()
 
 	// general settings
 
-	rect = tabView->Bounds();
-	rect.bottom -= tabView->TabHeight() + 4;
+	rect = tabView->ContainerView()->Bounds();
 	tabView->AddTab(view = new CenterContainer(rect));
 	tabView->TabAt(1)->SetLabel(B_TRANSLATE("Settings"));
 
-	rect = view->Bounds().InsetByCopy(8, 8);
-	rect.right -= 1;
+	rect = view->Bounds().InsetByCopy(10, 10);
 	rect.bottom = rect.top + height * 5 + 15;
 	BBox *box = new BBox(rect);
 	box->SetLabel(B_TRANSLATE("Mail checking"));
 	view->AddChild(box);
 
-	rect = box->Bounds().InsetByCopy(8, 8);
+	rect = box->Bounds().InsetByCopy(10, 10);
 	rect.top += 7;
-	rect.bottom = rect.top + height + 5;
+	rect.bottom = rect.top + height;
 	BRect tile = rect.OffsetByCopy(0, 1);
 	int32 labelWidth = (int32)view->StringWidth(B_TRANSLATE("Check every")) + 6;
 	tile.right = 80 + labelWidth;
@@ -462,7 +341,7 @@ ConfigWindow::ConfigWindow()
 
 	// Miscellaneous settings box
 
-	rect = box->Frame();  rect.bottom = rect.top + 3 * height + 30;
+	rect = box->Frame();  rect.bottom = rect.top + 3 * height + 33;
 	box = new BBox(rect);
 	box->SetLabel(B_TRANSLATE("Miscellaneous"));
 	view->AddChild(box);
@@ -479,7 +358,7 @@ ConfigWindow::ConfigWindow()
 		statusPopUp->AddItem(item);
 		msg->AddInt32("ShowStatusWindow", i);
 	}
-	rect = box->Bounds().InsetByCopy(8,8);
+	rect = box->Bounds().InsetByCopy(10, 10);
 	rect.top += 7;
 	rect.bottom = rect.top + height + 5;
 	labelWidth = (int32)view->StringWidth(
@@ -522,7 +401,7 @@ ConfigWindow::ConfigWindow()
 	top->AddChild(tabView);
 
 	rect = tabView->Frame();
-	rect.top = rect.bottom + 5;
+	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + height + 5;
 	BButton *saveButton = new BButton(rect, "apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgSaveSettings));
@@ -536,7 +415,7 @@ ConfigWindow::ConfigWindow()
 		new BMessage(kMsgRevertSettings));
 	revertButton->GetPreferredSize(&w, &h);
 	revertButton->ResizeTo(w,h);
-	revertButton->MoveTo(saveButton->Frame().left - 25 - w, rect.top);
+	revertButton->MoveTo(saveButton->Frame().left - 10 - w, rect.top);
 	top->AddChild(revertButton);
 
 	_LoadSettings();
