@@ -63,6 +63,9 @@ public:
 		BStringItem(label),
 		fLanguage(language)
 	{
+// Don't use *country* flags for *languages*. Can be re-enabled and adjusted
+// accordingly once we have language icons.
+#if 0
 		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
 		if (fIcon != NULL
 			&& (!fIcon->IsValid()
@@ -71,6 +74,9 @@ public:
 			delete fIcon;
 			fIcon = NULL;
 		}
+#else
+		fIcon = NULL;
+#endif
 	}
 
 	~LanguageItem()
