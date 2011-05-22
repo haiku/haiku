@@ -108,14 +108,6 @@ struct CollapsingLayouter::ElementInfo {
 		for (int32 i = other.constraints.CountItems() - 1; i >= 0; i--)
 			constraints.AddItem(new Constraint(*other.constraints.ItemAt(i)));
 	}
-
-	int32 LengthOfLongestConstraint()
-	{
-		int32 length = 0;
-		for (int32 i = constraints.CountItems() - 1; i >= 0; i--)
-			length = max_c(length, constraints.ItemAt(i)->length);
-		return length;
-	}
 };
 
 
