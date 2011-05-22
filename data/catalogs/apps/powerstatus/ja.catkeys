@@ -1,0 +1,28 @@
+1	japanese	x-vnd.Haiku-PowerStatus	3365708977
+Battery charging	PowerStatus		バッテリー充電中
+Battery discharging	PowerStatus		バッテリーを放電中
+Battery info	PowerStatus		バッテリー情報
+Battery info…	PowerStatus		バッテリー情報...
+Capacity granularity 2: 	PowerStatus		容量精度 2:
+Capacity: 	PowerStatus		容量:
+Design capacity: 	PowerStatus		定格容量:
+Design voltage: 	PowerStatus		定格電圧:
+Empty battery slot	PowerStatus		バッテリースロットが空です
+Extended battery info	PowerStatus		拡張バッテリー情報
+Install in Deskbar	PowerStatus		Deskbarにインストール
+Last full charge: 	PowerStatus		現在の最大容量
+Model number: 	PowerStatus		モデルナンバー:
+OEM info: 	PowerStatus		OEM情報:
+OK	PowerStatus		OK
+Quit	PowerStatus		終了
+Serial number: 	PowerStatus		シリアルナンバー:
+Show percent	PowerStatus		パーセントを表示
+Technology: 	PowerStatus		テクノロジー:
+charging	PowerStatus		充電中
+discharging	PowerStatus		放電中
+mA	PowerStatus		mA
+mAh	PowerStatus		mAh
+mW	PowerStatus		mW
+mWh	PowerStatus		mWh
+no battery	PowerStatus		バッテリーが有りません
+rechargeable	PowerStatus		再充電する

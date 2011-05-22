@@ -1,20 +1,26 @@
-1	brazilian_portuguese	x-vnd.Haiku-screenshot-cli	307310233
-Desktop	ScreenshotWindow		Área de Trabalho
-Include window border	ScreenshotWindow		Incluir borda da janela
-Back to saving	ScreenshotWindow		Voltar para salvar
-Select	ScreenshotWindow		Selecionar
+1	brazilian_portuguese	x-vnd.haiku-screenshot	1697748405
+Artwork folder	ScreenshotWindow		Pasta de Artes
+Cancel	ScreenshotWindow		Cancelar
 Capture active window	ScreenshotWindow		Capturar janela ativa
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	Captura de tela
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	caputuradetela1
-SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	AlgumaCoisaLongaAqui
-Save screenshot	ScreenshotWindow		Salvar captura de tela
-Capture entire screen	ScreenshotWindow		Capturar tela inteira
-Take screenshot	ScreenshotWindow		Capturar tela
+Choose folder	ScreenshotWindow		Escolher pasta
+Choose folder...	ScreenshotWindow		Escolher pasta...
+Copy to clipboard	ScreenshotWindow		Copiar para área de transferência
+Delay:	ScreenshotWindow		Atraso:
+Desktop	ScreenshotWindow		Desktop
+Home folder	ScreenshotWindow		Pasta Home
+Include mouse pointer	ScreenshotWindow		Incluir ponteiro do mouse
+Include window border	ScreenshotWindow		Incluir borda da janela
+Name:	ScreenshotWindow		Nome:
+New screenshot	ScreenshotWindow		Nova captura
+Please select	ScreenshotWindow		Por favor escolha
 Save	ScreenshotWindow		Salvar
-Please select	ScreenshotWindow		Por favor selecione
 Save as:	ScreenshotWindow		Salvar como:
 Save in:	ScreenshotWindow		Salvar em:
-Take screenshot after a delay of	ScreenshotWindow		Capturar tela depois de
-Artwork folder	ScreenshotWindow		Pasta de Artes
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Este arquivo já existe.\n Você tem certeza que deseja sobrescrevê-lo?
-Include mouse pointer	ScreenshotWindow		Incluir seta do mouse
+Screenshot	System name		Captura de Tela
+Select	ScreenshotWindow		Escolher
+Settings…	ScreenshotWindow		Configurações...
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Este arquivo já existe.\n Tem certeza de que deseja sobrescrevê-lo?
+Translator Settings	ScreenshotWindow		Configurações do tradutor
+overwrite	ScreenshotWindow		sobrescrever
+screenshot	Screenshot	Base filename of screenshot files	captura
+seconds	ScreenshotWindow		segundos

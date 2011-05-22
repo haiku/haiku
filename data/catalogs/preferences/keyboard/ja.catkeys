@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-Keyboard	1078858058
+1	japanese	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		デフォルト
 Delay until key repeat	KeyboardView		キーリピートの開始までの時間
 Fast	KeyboardView		速い
 Key repeat rate	KeyboardView		キーリピートの速度
+Keyboard	System name		キーボード
 Long	KeyboardView		長い
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		元に戻す

@@ -1,28 +1,26 @@
-1	japanese	x-vnd.Haiku-screenshot-cli	1342822790
-seconds	ScreenshotWindow		秒
-Options	ScreenshotWindow		キャプチャーの設定
-Desktop	ScreenshotWindow		デスクトップ
-Include window border	ScreenshotWindow		ウィンドウ境界線も取り込む
-Back to saving	ScreenshotWindow		保存画面に戻る
-Select	ScreenshotWindow		選択
-Capture active window	ScreenshotWindow		アクティブウィンドウのみ
+1	japanese	x-vnd.haiku-screenshot	1697748405
+Artwork folder	ScreenshotWindow		アートワークフォルダ
 Cancel	ScreenshotWindow		中止
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	スクリーンショット
+Capture active window	ScreenshotWindow		アクティブウインドウのみ
+Choose folder	ScreenshotWindow		フォルダを選択
+Choose folder...	ScreenshotWindow		フォルダを選択...
+Copy to clipboard	ScreenshotWindow		クリップボードにコピー
+Delay:	ScreenshotWindow		遅延時間
+Desktop	ScreenshotWindow		デスクトップ
+Home folder	ScreenshotWindow		ホームフォルダ
+Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む
+Include window border	ScreenshotWindow		ウインドウ境界線も取り込む
 Name:	ScreenshotWindow		ファイル名：
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	スクリーンショット1
-Save screenshot	ScreenshotWindow		スクリーンショットの保存
-Capture entire screen	ScreenshotWindow		画面全体
-Choose folder	ScreenshotWindow		フォルダーを選択
-Take screenshot	ScreenshotWindow		スクリーンショットを取得
-Save	ScreenshotWindow		保存
-Overwrite	ScreenshotWindow		上書き
-Retake screenshot	ScreenshotWindow		スクリーンショットを再取得
-Choose folder...	ScreenshotWindow		フォルダーを選択...
+New screenshot	ScreenshotWindow		新しいスクリーンショット
 Please select	ScreenshotWindow		選択してください
+Save	ScreenshotWindow		保存
 Save as:	ScreenshotWindow		ファイル形式：
 Save in:	ScreenshotWindow		保存場所：
-Take screenshot after a delay of	ScreenshotWindow		スクリーンショットを取得するまでの待ち時間
-Artwork folder	ScreenshotWindow		アートワークフォルダー
-Home folder	ScreenshotWindow		ホームフォルダー
+Screenshot	System name		スクリーンショット
+Select	ScreenshotWindow		選択
+Settings…	ScreenshotWindow		設定...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルは既に存在します。\n上書きしますか？
-Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む
+Translator Settings	ScreenshotWindow		Translator設定
+overwrite	ScreenshotWindow		上書き
+screenshot	Screenshot	Base filename of screenshot files	スクリーンショット
+seconds	ScreenshotWindow		秒

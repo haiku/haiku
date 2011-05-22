@@ -1,22 +1,15 @@
-1	finnish	x-vnd.Haiku-Mail	2472596775
+1	finnish	x-vnd.Haiku-Mail	2389972088
 Account name:	Config Views		Tilin nimi:
 Account settings	Config Views		Tiliasetukset
 Accounts	Config Window		Tilit
 Add	Config Window		Lisää
-Alpha	Config Window		Alfa
 Always	Config Window		Aina
 Apply	Config Window		Sovella
-Beta	Config Window		Beeta
 Check every	Config Window		Tarkista joka
-Development	Config Window		Kehitys
 E-mail	System name		Sähköpostiasetukset
 Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
 Error	Config Window		Virhe
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
-Final	Config Window		Lopullinen
-Gamma	Config Window		Gamma
-Golden master	Config Window		Golden master
-Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Sähköpostitaustaohjelmakorvaus\n\ntekijä: Haiku, Inc. All rights reserved.\n\nVersio %ld.%ld.%ld %s\n\nLisätietoja varten katso LICENSE-tiedostoa, joka on asennuspakkauksessa.\n\n\n\nVoit ottaa meihin yhteyttä osoitteessa:\n%s\n\nLähetä vikailmoitukset käyttäen osoitetta %s\n\nHankkeen kotisivu on osoitteessa:\n%s
 Mail checking	Config Window		Sähköpostin tarkistus
 Miscellaneous	Config Window		Sekalaiset
 OK	Config Window		Valmis

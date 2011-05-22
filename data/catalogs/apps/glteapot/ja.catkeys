@@ -1,0 +1,18 @@
+1	japanese	x-vnd.Haiku-GLTeapot	2742134539
+Add a teapot	TeapotWindow		ティーポットを追加
+Blue	TeapotWindow		青
+FPS display	TeapotWindow		FPSを表示
+File	TeapotWindow		ファイル
+Fog	TeapotWindow		霧
+Gouraud shading	TeapotWindow		グローシェーディング
+Green	TeapotWindow		緑
+Lighting	TeapotWindow		Lighting
+Lower left	TeapotWindow		左隅
+Off	TeapotWindow		オフ
+Options	TeapotWindow		オプション
+Quit	TeapotWindow		終了
+Red	TeapotWindow		赤
+Right	TeapotWindow		右
+Upper center	TeapotWindow		上中央
+White	TeapotWindow		白
+Yellow	TeapotWindow		黄

@@ -4,10 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Gerard Stanczak (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
@@ -33,7 +34,7 @@
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/midiplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/midiplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/midiplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/midiplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -57,7 +58,13 @@
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Ce document est manquant. Si vous voulez travailler à sa rédaction, veuillez en faire l'annonce dans <a href="http://www.freelists.org/list/haiku-doc">liste de diffusion consacrée à la documentation</a> pour éviter les doublons.</p>
+<p>Comme son nom l'indique, MidiPlayer est utilisé pour la lecture des fichiers de musique MIDI. Les fichiers Midi sont spéciaux, car ils ne contiennent pas réellement la musique numérisées et encodées, mais seulement sa description : telle note avec tel instrument,  avec telle force et telle durée.<br />
+Si cela assure de petites tailles aux fichiers, cela nécessite en contrepartie une bibliothèque d'instruments (que l'on appelle "SoundFont" ou "police de sons") qui peuvent varier énormément. En outre, ces bibliothèques sont d'autant plus volumineuses que leur qualité est bonne et leurs instruments variés.</p>
+<div class="box-info"><p>Haiku est vivré sans polices de sons (SoundFont) car elles prennent beaucoup de places alors que peu de gens en ont besoin. La plupart de ceux qui en utilisent, disposent déjà des leurs en haute qualité. Pour pouvoir entendre un minimum de <i>choses</i>,  vous pouvez en installer une gratuite à partir d'un paquet optionnel. Dans le Terminal, entrez : <tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>Pour utiliser une autre police de sons, créer un lien vers elle dans <tt>/boot/system/data/synth</tt> et vous le nommerez <tt>big_synth.sy</tt>.</p></div>
+<img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
+<p>L'interface de MidiPlayer est très simple. Il suffit de déposer un fichier MIDI dessus ou de double-cliquer sur ce dernier pour que la lecture commence. Vous pouvez contrôler le volume avec le curseur et ajouter des effets de réverbération à partir de la liste déroulante <span class="menu">Reverb</span>. En activant 
+<span class="menu">Scope</span> vous visualiserez l'écoute en cours sous la forme d'un oscilloscope.</p>
 
 </div>
 </div>

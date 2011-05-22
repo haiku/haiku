@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-ActivityMonitor	1889452354
+1	norwegian_bokmål	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f feil/s
@@ -27,19 +27,21 @@ Page faults	DataSource		Sidefeil
 Ports	DataSource		Porter
 Quit	ActivityWindow		Avslutt
 RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard	DataSource		Data på utklippstavle
 Receiving	DataSource		Mottar
 Remove graph	ActivityView		Fjern graf
-Running applications	DataSource		Kjørende applikasjoner
-Semaphores	DataSource		Armsignal
+Running applications	DataSource		Kjørende programmer
+Semaphores	DataSource		Semaforer
 Sems	DataSource		Semaforer
 Sending	DataSource		Sender
 Settings	ActivityWindow		Innstillinger
 Settings…	ActivityWindow		Innstillinger...
 Show legend	ActivityView		Vis forklaring
 Swap	DataSource		Utveksling
-Swap space	DataSource		Utvekslingsminne
+Swap space	DataSource		Veksleminne
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		Lag
+Text clipboard	DataSource		Tekst på utklippstavle
 Threads	DataSource		Tråder
 Update time interval:	SettingsWindow		Oppdateringsintervall:
 Used memory	DataSource		Brukt minne

@@ -246,7 +246,7 @@ static void
 ioapic_enable_io_interrupt(int32 gsi)
 {
 	// If enabling an overriden source is attempted, enable the override entry
-	// instead. An interrupt handler was installed at the override GSI to rely
+	// instead. An interrupt handler was installed at the override GSI to relay
 	// interrupts to the overriden source.
 	if (gsi < ISA_INTERRUPT_COUNT && sSourceOverrides[gsi] != 0)
 		gsi = sSourceOverrides[gsi];
@@ -709,8 +709,6 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
-	print_irq_routing_table(table);
-
 	// use the boot CPU as the target for all interrupts
 	uint8 targetAPIC = args->arch_args.cpu_apic_id[0];
 
@@ -726,6 +724,11 @@ ioapic_init(kernel_args* args)
 		current = current->next;
 	}
 
+#ifdef TRACE_IOAPIC
+	dprintf("trying interrupt routing:\n");
+	print_irq_routing_table(table);
+#endif
+
 	status = enable_irq_routing(acpiModule, table);
 	if (status != B_OK) {
 		panic("failed to enable IRQ routing");
@@ -733,6 +736,8 @@ ioapic_init(kernel_args* args)
 		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
 		return;
 	}
+
+	print_irq_routing_table(table);
 
 	// configure the source overrides, but let the PCI config below override it
 	acpi_configure_source_overrides(madt);

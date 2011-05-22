@@ -1,0 +1,15 @@
+1	japanese	x-vnd.Haiku-Magnify	1590350329
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize ピクセル/ピクセル
+Add a crosshair	Magnify-Main		十字カーソルを追加
+Copy image	Magnify-Main		イメージをコピー
+Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
+Decrease window size	Magnify-Main		ウインドウを小さく
+Help	Magnify-Main		ヘルプ
+Hide/Show grid	Magnify-Main		グリッドの表示/非表示
+Hide/Show info	Magnify-Main		情報の表示/非表示
+Increase pixel size	Magnify-Main		ピクセルサイズを大きく
+Increase window size	Magnify-Main		ウインドウを大きく
+Info	Magnify-Main		情報
+Remove a crosshair	Magnify-Main		十字カーソルを削除
+Save image	Magnify-Main		イメージの保存
+usage: magnify [size] (magnify size * size pixels)\n	Console		usage: magnify [size] (magnify size * size pixels)\n

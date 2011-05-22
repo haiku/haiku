@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	2388476802
+1	belarusian	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - адрас электроннай пошты
 %e wrote:\\n	Mail		%e напісаў:\\n
@@ -6,6 +6,7 @@
 (Address unavailable)	Mail		(Адрэс невядомы)
 (Date unavailable)	Mail		(Дата невядома)
 (Name unavailable)	Mail		(Імя невядома)
+<none>	Mail		<няма>
 Account from mail	Mail		Акаунт з паведамлення
 Account:	Mail		Акаунт:
 Accounts…	Mail		Акаунты…

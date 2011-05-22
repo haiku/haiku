@@ -34,7 +34,7 @@
 <li><a href="../../it/applications/terminal.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/terminal.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/terminal.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/terminal.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/terminal.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/terminal.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/terminal.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/applications/terminal.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -55,8 +55,8 @@
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>设置：</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - 添加或者覆盖默认的 <span class="path">/boot/system/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - 添加或者覆盖默认的 <span class="path">/boot/system/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - 添加或者覆盖默认的 <span class="path">/boot/common/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - 添加或者覆盖默认的 <span class="path">/boot/common/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>终端是Haiku中具有用户界面的bash，即 Bourne Again Shell。</p>
@@ -98,9 +98,9 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Bash的定制</a></h2>
-<p>由于bash来自于Unix，它具有无数的可定制的方式。对于用户，有两个文件至关重要： <span class="cli">.profile</span> 和 <span class="cli">.inputrc</span> 。
+<p>bash来自于Unix，它具有无数的可定制的方式。对于用户来讲，有两个文件至关重要： <span class="cli">.profile</span> 和 <span class="cli">.inputrc</span> 。
 <br />
-这两个文件可以在 <span class="path">home/</span> 文件夹中予以创建， 然后将会添加到或者覆盖系统默认在 <span class="path">/boot/system/etc/</span> 中定义的配置文件。</p>
+这两个文件可以在 <span class="path">home/</span> 文件夹中予以创建， 然后将会添加到或者覆盖在 <span class="path">/boot/common/etc/</span> 中系统默认定义的配置文件。</p>
 
 <h3>.profile</h3>
 <p>在您每次打开新的终端时， <span class="cli">.profile</span> 都会被载入程序。在该文件中，设置了所有影响到bash行为和外观的各种类型的设备接口和变量。你可以在网络上找到许多资源，它们将会给出所有可能性的详细介绍。</p>

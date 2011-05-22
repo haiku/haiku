@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PEPL	1100975459
+1	japanese	x-vnd.Be-PEPL	3274983047
 Address	People		住所
 Cancel	People		キャンセル
 City	People		市町村
@@ -7,7 +7,9 @@ Company	People		会社
 Copy	People		コピー
 Country	People		国
 Cut	People		切り取り
+E-mail	People		E-mail
 Edit	People		編集
+Fax	People		ファックス
 File	People		ファイル
 Group	People		グループ
 Home phone	People		自宅の電話番号
@@ -20,7 +22,7 @@ Quit	People		終了
 Redo	People		やり直し
 Save	People		保存
 Save as…	People		名前を付けて保存...
-Select all	People		全て選択
+Select all	People		すべて選択
 URL	People		URL
 Undo	People		元に戻す
 Work phone	People		会社の電話番号

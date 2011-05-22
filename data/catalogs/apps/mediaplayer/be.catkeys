@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	303149893
+1	belarusian	x-vnd.Haiku-MediaPlayer	138551800
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася ўнутраная памылка %app%. Файл не можа быць адкрыты.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
 100% scale	MediaPlayer-Main		Маштаб 100%
@@ -25,6 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		Ніз відэа
 Cancel	MediaPlayer-SettingsWindow		Адмена
 Close	MediaPlayer-Main		Закрыць
 Close	MediaPlayer-PlaylistWindow		Закрыць
+Close window after playing audio	MediaPlayer-SettingsWindow		Закрыць вакно пасля заканчэння аўдыё-праігравання
+Close window after playing video	MediaPlayer-SettingsWindow		Закрыць вакно пасля заканчэння прагляду выдэа
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Капіяваць Элементы
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Капіяваць элемент
 Drop files to play	MediaPlayer-Main		Перацягніце файлы, якія жадаеце прайграць
@@ -46,6 +48,8 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Медыясервер, відаць, не запушчаны.\nЗапусціць яго?
 Large	MediaPlayer-SettingsWindow		Буйны
 Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
+Loop audio	MediaPlayer-SettingsWindow		Закальцаваць аўдыё
+Loop video	MediaPlayer-SettingsWindow		Закальцаваць відэа
 Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
 MediaPlayer	System name		Праігравальнік Медыя
 MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
@@ -97,6 +101,7 @@ Save as…	MediaPlayer-PlaylistWindow		Захаваць як...
 Save error	MediaPlayer-PlaylistWindow		Памылка захавання
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст.\n\nПамылка:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст:\n\nПамылка:
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Паказваць рэгулятары ў рэжыме поўнага экрану
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Маштабаваць фільмы плаўна (рэжым без накладання)
 Select all	MediaPlayer-PlaylistWindow		Пазначыць усе
 Settings…	MediaPlayer-Main		Наладкі...

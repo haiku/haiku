@@ -2,12 +2,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
-<!-- 
+<!--
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Humdinger <humdingerb@gmail.com>
  *		Szymon Barczak (Google Code-In student)
  * Translators:
  *		Pengphei Han
@@ -34,7 +35,7 @@
 <li><a href="../../it/applications/mediaplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/mediaplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/mediaplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/mediaplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/mediaplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/mediaplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/mediaplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -49,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />媒体播放器</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -58,50 +58,72 @@
 <tr><td>设置：</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>MediaPlayer is an application used for viewing multimedia files such as music or video files. It supports different formats.</p>
-
-<p><b>Interface</b></p>
-
-<p>MediaPlayer is easy-to-use because of its interface. There's no difference in interface while playing music or video.</p>
-
+<p>媒体播放器是所有音频和视频文件的默认播放器。由于使用 <a href="">ffmpeg</a> 作为后端，因此支持广泛使用的多种媒体格式。它简洁的接口提供了您所期望的所有控制：</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
+<p>进度栏允许您快速的跳转到某个位置，将鼠标停放在其上将弹出显示当前和剩余时间。点击右边的时间显示，将会在总时间，当前时间和剩余时间之间切换。<br />
+在其下方，您可以看到常用的控件，下一个，播放/暂停，停止以及下一个。之后时声音控制（点击音响符号在静音之间切换）和音量计。</p>
 
-<p>You can control playing media using a set of buttons - previous, play/pause, stop, next. Also, there is a progress bar, a volume controler and even an oscilloscope.</p>
+<h2>音频和视频播放</h2>
+<p>因为音频播放没有任何特殊的效果，我们将直接介绍视频和通用特性。</p>
+<img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
+<p>对所有媒体都可用的是 <span class="menu">文件信息...</span> (<span class="key">ALT</span><span class="key">I</span>)。它显示有关当前载入文件的信息，如播放时间或音频/视频轨道细节和它的编码。</p>
+<p>菜单中大部分的常用命令也可以通过屏幕区域的右键菜单使用。在全屏模式中尤其方便。<br />
+在 <span class="menu">视频</span> 菜单下，您可以看到用于缩放窗口或强制使用纵横比。保持纵横比为默认的 <span class="menu">流设置</span> 非常适用于正确的编码文件。</p>
+<p>媒体播放器支持 <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> 格式中的子标题。为了让其显示于 <span class="menu">子标题</span> 之下，它们的文件名必须与其视频文件相同，但其后缀必须为 ".srt" ，而不是视频扩展。例如：</p>
+<pre>MyMovie.avi
+MyMovie.Deutsch.srt
+MyMovie.English.srt
+MyMovie.Français.srt</pre>
+<p>多声道音频，通常用于具有多语言的视频文件，并且在 <span class="menu">音频轨道</span> 子菜单中可用。当有可用的多声道视频时，<span class="menu">视频 | 轨道</span> 子菜单提供了同样的内容。</p>
+<p>您可以切换为 <span class="menu">全屏</span> 模式（<span class="key">ALT</span> <span class="key">ENTER</span> 或 <span class="key">F</span> 或双击左键），使用 <span class="menu">隐藏界面</span> 隐藏媒体播放器的窗口边框和控件（<span class="key">ALT</span> <span class="key">H</span> 或双击右键）或者可以让其 <span class="menu">置顶</span>（<span class="key">ALT</span> <span class="key">A</span>）。</p>
 
-<div class="box-info">Once you play a video file, you can double right-click on the display to hide interface. Double left-click instead causes displaying video in full-screen mode.</div>
+<h2>播放列表</h2>
+<p><span class="menu">媒体播放器 | 播放列表...</span> (<span class="key">ALT</span> <span class="key">P</span>) 打开窗口显示当前播放队列中的文件。双击条目将会开始播放。</p>
+<img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
+<p>您可以通过拖拽将更多文件添加到列表，也可以通过拖拽重新排序。通过 <span class="menu">编辑</span> 菜单您可以 <span class="menu">随机播放</span>、<span class="menu">移除</span>、(<span class="key">删除</span>) 列表中的条目，或通过 <span class="menu">删除到垃圾箱</span> 删除磁盘文件（<span class="key">ALT</span> <span class="key">T</span>）。</p>
+<p>当然，您也可以 <span class="menu">保存</span> 播放列表以便之后 <span class="menu">打开</span>，或这双击播放列表文件打开。</p>
 
-<p><b>Playing media</b></p>
+<h2>设置</h2>
+<p>有几个设置可以更好地控制媒体播放器的行为：</p>
+<img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
+<p>第一组，<span class="menu">播放模式</span> 非常容易理解。自动启动播放，当完成时关闭窗口，以及循环播放。</p>
+<p>接下来为不同的 <span class="menu">视图模式</span>。<br />
+您可以选择 <span class="menu">如果可用启用硬件加速</span>，它可以减小处理器负载，但是仅对单个窗口有效，并且需要支持的视频卡驱动。<br />
 
-<p>There are options especially useful while watching DVD video or other files which include different audio/video tracks or have subtitles included. You can change audio tracks from <span class="menu">Audio | Track</span> just as <span class="menu">Video | Track</span> for various video tracks. You can also make use of subtitles, MediaPlayer supports .srt format. All available subtitles are showed as options in <span class="menu">Video | Subtitles</span> menu. The player gets names for this positions from the filename, eg. videoclip.english.srt shows as "english" in the menu.</p>
+您也可以选择 <span class="menu">缩放平滑播放</span>（当不处于加速模式时），它可以使用快速滤镜实现平滑播放，但是当缩放视频或者全屏播放时，会出现像素混乱。 <br />
 
-<img src="../images/apps-images/mediplayer-video_menu.png" alt="video-menu" />
+如果您喜欢简单的大控件，或者当您在远处以全屏模式播放时，可以选择 <span class="menu">全屏模式时缩放控件</span>。<br />
 
-<p>You can change the scale by resizing the window or simply from the <span class="menu">Video</span> menu. There are 50%, 100%, 200%, 300% and 400% options. There is an option to change the player to full-screen mode or to change ratio of the display.</p>
+还有一些用于 <span class="menu">子标题大小</span> 和 <span class="menu">子标题位置</span> 的设置。它们可以显示于 <span class="menu">视频底部</span>，这样可以使其总是覆盖于图像之上。或者可以处于 <span class="menu">窗口底部</span>，如此允许您自定义窗口，使子标题处于底部的黑色栏之内。 </p>
+<p>最后的设置用于决定未激活窗口的片段的音量。您可以将其设置为 <span class="menu">全音量</span>，至少为 <span class="menu">低音量</span> 或者直接 <span class="menu">静音</span>。</p>
 
-<p><b>Playlists</b></p>
+<h2>键盘控制</h2>
+<p>媒体播放器提供了简便的快捷键以控制媒体的播放。</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>跳转到上一个。</td></tr>
+<tr><td><span class="key">X</span></td><td></td><td>播放</td></tr>
+<tr><td><span class="key">C</span></td><td></td><td>暂停</td></tr>
+<tr><td><span class="key">V</span></td><td></td><td>停止</td></tr>
+<tr><td><span class="key">B</span></td><td></td><td>跳转到下一个</td></tr>
+</table>
+<p>这些快捷键和控制按键的功能相绑定。它们通常是键盘左下边的按键，也就是说，它们和您的当前键盘使用相独立。上述按键与标准美式键盘相对应。</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>向前查找</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>前进 10 秒</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>前进 30 秒</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>向后查找</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>后退 10 秒</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>后退 30 秒</td></tr>
 
-<p>MediaPlayer supports playlists. You can either select a few files in Tracker using <span class="key">ALT</span> and launched the application or add other files after launching the one using the drag and drop method. You can get to the playlist from menu - choose <span class="menu">MediaPlayer | Playlist</span> and the playlist window will pop-up.</p>
+<tr><td align="right"><span class="key">↑</span></td><td></td><td>增加音量</td></tr>
+<tr><td align="right"><span class="key">↓</span></td><td></td><td>减小音量</td></tr>
 
-<img src="../images/apps-images/mediaplayer-playlist.png" alt="playlist" />
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>跳转到上一个</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>跳转到下一个</td></tr>
 
-<p>You can save the current playlist or open one from the playlist window, of course. There is also a function that lets you to randomize your playlist. Use either <span class="menu">Edit | Randomize</span> menu position or <span class="key">ALT</span> <span class="key">R</span> shortcut. You can also both remove any file from playlist and remove it from playlist and put into Trash. This functions are available from <span class="menu">Edit</span> menu, too.</p>
-
-<p><b>Other options</b></p>
-
-<p>If you would like to rate a file, you can do this directly from MediaPlayer, too! Choose a rate from 1 to 10 from <span class="menu">Attributes | Rating</span> menu.</p>
-
-<p>MediaPlayer is also able to show you some information about the file you play. It is available from <span class="menu">MediaPlayer | File info... </span> menu.</p>
-
-<img src="../images/apps-images/mediplayer-settings.png" alt="settings" />
-
-<p>You can configure the application from <span class="menu">MediaPlayer | Settings</span>. There are some interesting options concerning looping playback, closing window when playback finishes, size and placement of subtitles or volume level while playing in the background.</p>
-
-<p><b>Shortcuts</b></p>
-
-<p>There are plenty of shortcuts for this application. <span class="key">SPACEBAR</span> is used to play/pause the playback. You can control the whole playback with one hand, because alternate keys are used - <span class="key">Z</span> to go to the previous track, <span class="key">X</span> to play, <span class="key">C</span> to pause and <span class="key">V</span> to go to the next track. Left/Right cursors are used to seek, they cause 10 seconds seeking while <span class="key">ALT</span> is pressed at the same time. Up and down cursors controls the volume and cause going to the previous/next track while <span class="key">ALT</span> is pressed.</p>
-
-<p><span class="key">ALT</span> <span class="key">F</span> activates full-screen mode, <span class="key">ALT</span> <span class="key">P</span> pops-up playlist window, <span class="key">ALT</span> <span class="key">I</span> shows file information, <span class="key">ALT</span> <span class="key">H</span> hides interface, <span class="key">ALT</span> <span class="key">A</span> causes MediaPlayer is always on top, <span class="key">ALT</span> <span class="key">S</span> moves you to the settings window and <span class="key">ALT</span> <span class="key">Q</span> quits the application.</p>
-
+<tr><td align="right"><span class="key">空格键</span></td><td></td><td>切换 播放/暂停</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>切换全屏模式（也可以通过双击屏幕区域完成）</td></tr>
+</table>
 
 </div>
 </div>

@@ -1,0 +1,27 @@
+1	japanese	x-vnd.Haiku-Notifications	2990687382
+Above icon	DisplayView		アイコンの上
+Allowed	NotificationView		許可された
+Application	NotificationView		アプリケーション
+Applications	NotificationView		アプリケーション
+Disable notifications	GeneralView		通知を無効にする
+Display	PrefletView		表示設定
+Enable notifications	GeneralView		通知を有効にする
+Enable notifications at startup	GeneralView		起動時に通知を有効にする
+Enabled	NotificationView		有効
+Error	NotificationView		エラー
+General	PrefletView		一般設定
+Icon size:	DisplayView		アイコンサイズ：
+Information	NotificationView		情報
+Large icon	DisplayView		大きいアイコン
+Mini icon	DisplayView		小さいアイコン
+No	NotificationView		いいえ
+OK	DisplayView		OK
+OK	GeneralView		OK
+Revert	PrefletWin		元に戻す
+Right of icon	DisplayView		アイコンの右側
+Save	PrefletWin		保存
+Title	NotificationView		タイトル
+Title position:	DisplayView		タイトルの位置：
+Unknown	NotificationView		不明
+Window width:	DisplayView		ウインドウの幅：
+Yes	NotificationView		はい

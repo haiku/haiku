@@ -12,6 +12,7 @@
  * Translators:
  *		Andrea
  *		Barrett
+ *		MichaelPeppers
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -34,7 +35,7 @@
 <li><a href="../de/filesystem-layout.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../ru/filesystem-layout.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/filesystem-layout.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -68,7 +69,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">La cartella system - <span class="path">/boot/system/</span></a></h2>
 <p>Su BeOS, il predecessore di Haiku, questa cartella era chiamata <span class="path">/boot/beos/</span>. È possibile incontrarla leggendo della vecchia documetazione (ad esempio quella originale come il BeBook).<br />
-Non bisogna alterare il suo contenuto, qualunque sia il suo nome poiché ogni aggiornamento di Haiku potrebbe aggiungere, rimuovere o sovrascrivere qualsiasi cosa all'interno della cartella. Se si vogliono aggiungere funzionalità, magari altri Add-On del Tracker o dei Translator oppure un altro driver, bisognerà installare i file nella cartella <span class="path">/boot/home/</span> altrimenti se si vuole rendere disponibile il componente a tutti gli utenti, in <span class="path">/boot/common/</span>. Finché Haiku non sarà multi-utente, questa distinzione non avrà alcun effetto apparente, in quanto non c'è nessun utente con la cartella <i>home</i>. E' sensato invece imparare la via corretta fin dall'inizio nell'eventualità che ci sia il supporto per più utenti.</p>
+Qualunque sia il suo nome, non bisogna alterare ciò che contiene, poiché ogni aggiornamento di Haiku potrebbe aggiungere, rimuovere o sovrascrivere qualsiasi cosa all'interno della cartella. Se si vogliono aggiungere funzionalità, magari altri Add-On del Tracker o dei Translator oppure un altro driver, bisognerà installare i file nella cartella <span class="path">/boot/home/</span> altrimenti se si vuole rendere disponibile il componente a tutti gli utenti, in <span class="path">/boot/common/</span>. Finché Haiku non sarà multi-utente, questa distinzione non avrà alcun effetto apparente, in quanto non c'è nessun utente con la cartella <i>home</i>. E' sensato invece imparare la via corretta fin dall'inizio nell'eventualità che ci sia il supporto per più utenti.</p>
 <p>Dunque, diciamo che se si volesse installare un nuovo translator per l'ultimo formato immagine, <b>non bisognerà </b> semplicemente copiarlo nella rispettiva cartella di sistema. Si faccia presente che non bisogna modificarla.<br />
 Invece, è consigliato collocarlo nella directory speculare sotto <span class="path">/boot/common/</span> oppure <span class="path">/boot/home/config/</span>.</p>
 <p>Nel nostro caso la posizione per i translator nella cartella di sistema è:</p>
@@ -100,7 +101,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <p>Oltre alla directory <span class="path">~/config/add-ons/</span>,  che rispecchia la cartella add-on del sistema per i componenti aggiuntivi come descritto sopra, ci sono altre cartelle di interesse. (A proposito, la tilde ("<tt>~</tt>") è una scorciatoia per la cartella home, così non bisogna sempre scrivere "<span class="path">/boot/home/</span>" nel terminale.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>Qui vengono tenute di default le mail dell'utente.</td></tr>
+<td>Dove vengono tenute di default le mail dell'utente.</td></tr>
 
 <tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
 <td>Le <a href="queries.html">Query</a>, di default, sono tempraneamente memorizzate in questa cartella per 7 giorni.</td></tr>
@@ -117,7 +118,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
 <td>I link a programmi o documenti in questa cartella partono automaticamente ad ogni avvio del sistema.</td></tr>
 
-<tr><td><span class="path">~/config/fonts/</span></td><td> </td>
+<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
 <td>Basta copiare un font TrueType o Postscript dentro questa cartella per poterlo utilizzare.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>

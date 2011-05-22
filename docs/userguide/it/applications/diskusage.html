@@ -33,7 +33,7 @@
 <li><a href="../../de/applications/diskusage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../ru/applications/diskusage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/diskusage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/diskusage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/diskusage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/diskusage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -49,30 +49,29 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Posizione:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applicazioni</span></td></tr>
+<tr><td>Locazione:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
 <p>DiskUsage si occupa di mostrare graficamente come è utilizzato lo spazio sui volumi.<br />
-Un'applicazione piuttosto utile per ripondere alla domanda, "<i>Che fine ha fatto tutto lo spazio libero sul disco?</i>".</p>
+Un'applicazione piuttosto utile per rispondere alla domanda, "<i>Che fine ha fatto tutto lo spazio libero sul disco?</i>".</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>I cerchi concentrici rappresentano i diversi livelli nella gerarchia del filesystem. Sopra, il cerchio centrale rappresenta la cartella <span class="path">/boot/home/</span>. Ogni segmento dell'anello immediatamente successivo a quello centrale è un file o una cartella presente sotto <span class="path">/boot/home/</span>. Ogni segmento sempre più esterno rappresenta un livello inferiore nella gerarchia dei file. È possibile ridimensionare la finestra in modo che vengano mostrate anche le cartelle dei livelli più bassi.</p>
-<p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
+<p>I cerchi concentrici rappresentano i diversi livelli nella gerarchia del filesystem. Nell'immagine qui sopra, il cerchio centrale rappresenta la cartella <span class="path">/boot/home/</span>. Ogni segmento dell'anello immediatamente successivo a quello centrale è un file o una cartella presente sotto <span class="path">/boot/home/</span>. Ogni segmento sempre più esterno rappresenta un livello inferiore nella gerarchia dei file. È possibile ridimensionare la finestra in modo che vengano mostrate anche le cartelle dei livelli più bassi.</p>
+<p>Sopra il grafico è visibile un menù a tendina che permette di spostarsi tra i vari volumi montati. È necessario scansionare un volume prima di poterne visualizzare l'utilizzo. Dal momento che questa procedura è più lunga per i dischi più capienti, è possibile analizzare un altro volume mentre ne viene effettuata la scansione.</p>
 <div class="box-info"><ul>
-<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
-<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
-<li>DiskUsage ignores symbolic links.</li>
+<li>Se la rappresentazione grafica di un file o cartella è resa con meno di 2° circa, sarà tralasciata nella visualizzazione.</li>
+<li>Il numero dei file che sono riportati all'interno di una cartella, include anche i file nelle sottocartelle. Le cartelle contano come file.</li>
+<li>DiskUsage ignora i link simbolici.</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
+<p>Spostando il mouse su un segmento, è possibile visualizzare nella barra di stato in basso informazioni su quel file o cartella.</p>
+<p>Cliccando col tasto destro su un segmento, apparirà un menù contestuale con <span class="menu">Get Info</span>, <span class="menu">Open</span> (col Tracker), <span class="menu">Open With</span> un'altra applicazione adatta o <span class="menu">Rescan</span> quella cartella in particolare.<br />
+Cliccando col tasto sinistro su un segmento, il cerchio centrale sarà dato da quel file o cartella.<br />
+Cliccando col tasto sinistro il cerchio centrale, si passerà al livello superiore.</p>
+<p>È possibile trascinare file e cartelle da DiskUsage su altre applicazioni o sul Desktop o in altre finestre del Tracker per copiarle. Al contrario, trascinando volumi e cartelle nella finestra di DiskUsage si passerà direttamente a loro rendendoli il cerchio centrale.</p>
 
 </div>
 </div>

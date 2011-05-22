@@ -1,8 +1,16 @@
-1	japanese	x-vnd.Be-PSRV	4039458322
+1	japanese	x-vnd.Be-PSRV	3475473381
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		その名前のプリンターは既に存在しますが、利用できません。置き換えますか?
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		その名前のプリンターは既に存在しますが、ドライバーが見付かりません。置き換えますか?
+A0	ConfigWindow	ISO 216 paper size	A0 (841 x 1189 mm)
+A1	ConfigWindow	ISO 216 paper size	A1 (594 x 841 mm)
+A2	ConfigWindow	ISO 216 paper size	A2 (420 x 594 mm)
+A3	ConfigWindow	ISO 216 paper size	A3 (297 x 420 mm)
+A4	ConfigWindow	ISO 216 paper size	A4 (210 x 297 mm)
+A5	ConfigWindow	ISO 216 paper size	A5 (148 x 210 mm)
+A6	ConfigWindow	ISO 216 paper size	A6 (105 x 148 mm)
 All pages	ConfigWindow		全ページ
-All pages, %1 copies	ConfigWindow		全てのページを %1 部
+All pages, %1 copies	ConfigWindow		すべてのページを %1 部
+B5	ConfigWindow	ISO 216 paper size	ISO B5 (176 x 250 mm)
 Cancel	ConfigWindow		中止
 Cancel	PrintServerApp		中止
 Create a new printer	PrintServerApp Scripting		新しいプリンターをインストール
@@ -15,9 +23,12 @@ Get name of the transport add-on used for this printer	Printer Scripting		この
 Get name of transport	Transport Scripting		トランスポートの名前を取得
 Get the transport configuration for this printer	Printer Scripting		このプリンターのトランスポート設定を取得
 Landscape	ConfigWindow		横
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger (432 x 279 mm)
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal (216 x 356 mm)
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter (216 x 279 mm)
 No	PrintServerApp		いいえ
-OK	ConfigWindow		Ok
-OK	PrintServerApp		Ok
+OK	ConfigWindow		OK
+OK	PrintServerApp		OK
 Page %1 to %2	ConfigWindow		ページ %1 からページ %2 まで
 Page %1 to %2, %3 copies	ConfigWindow		ページ %1 からページ %2 まで %3 部
 Page setup	ConfigWindow		ページ設定
@@ -33,7 +44,8 @@ Retrieve or select the active printer	PrintServerApp Scripting		アクティブ�
 Return the number of available printers	PrintServerApp Scripting		プリンターの数を取得
 Return the number of available transports	PrintServerApp Scripting		トランスポートの数を取得
 Select a printer	ConfigWindow		プリンターを選択
-There are no printers set up.	PrintServerApp		プリンターはインストールされてません。
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid (279 x 432 mm)
+There are no printers set up.	PrintServerApp		プリンターはインストールされていません。
 There is no default printer set up.	PrintServerApp		デフォルトプリンターが設定されていません。
 Undefined	ConfigWindow		未定義
 Would you like to make @ the default printer?	PrintServerApp		@ をデフォルトプリンターに設定しますか？

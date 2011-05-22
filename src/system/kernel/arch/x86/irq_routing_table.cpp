@@ -312,8 +312,19 @@ configure_link_devices(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 
 		status_t status = set_current_irq(acpi, irqEntry.source, configuration);
 		if (status != B_OK) {
-			panic("failed to set irq on link device");
-			return status;
+			dprintf("failed to set irq on link device, keeping current\n");
+			print_irq_descriptor(configuration);
+
+			// we failed to set the resource, fall back to current
+			read_current_irq(acpi, irqEntry.source, configuration);
+			for (int j = i; j < routingTable.Count(); j++) {
+				irq_routing_entry& other = routingTable.ElementAt(j);
+				if (other.source == irqEntry.source) {
+					other.irq = configuration.irq;
+					other.polarity = configuration.polarity;
+					other.trigger_mode = configuration.trigger_mode;
+				}
+			}
 		}
 
 		irqEntry.needs_configuration = false;

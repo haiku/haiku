@@ -4,11 +4,10 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Omar Rizwan (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
@@ -35,7 +34,7 @@
 <li><a href="../../it/applications/webpositive.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/webpositive.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/webpositive.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/webpositive.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/webpositive.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/webpositive.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/webpositive.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/applications/webpositive.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -50,82 +49,76 @@
 <div id="content">
 <div>
 <div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
-
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
 <tr><td>设置：</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - 配置文件，Cookies，缓存文件和浏览历史</td></tr>
-<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - 以文件的形式存储每个书签</td></tr>
+<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - 所有的书签都是单个的文件。</td></tr>
 </table>
 <p><br /></p>
-<p>WebPositive，简称Web+，是Haiku的原生网络浏览器。它的命名一半来源于BeOS的简洁浏览器 - Netpositive，而另一半则源于它的现代浏览器核心：WebKit。WebKit的开源HTML渲染库也是其他主流浏览器的核心，例如，Mac OS X的Safari和Google的Chrome。随着WebKit的不断发展， Web+ 将能够很快的赶上最新的网络应用技术。</p>
-
+<p>WebPositive，简称 Web+，是 Haiku 的原生网络浏览器。它的命名一半来源于 BeOS 的简洁浏览器 - Netpositive，而另一半则源于它的现代浏览器核心：WebKit。WebKit 的开源 HTML 渲染库也是其他主流浏览器的核心，例如，Mac OS X 的 Safari 和 Google 的 Chrome。随着 WebKit 的不断发展， Web+ 将能够很快的赶上最新的网络应用技术。</p>
 <img src="../images/apps-images/webpositive.png" alt="webpositive.png" />
-<br />
-<p>您可以使用 <em>地址栏</em> 控制您的网络浏览。在地址栏中输入网址（URL），然后按下 <span class="key">RETURN</span> 或者点击地址栏右侧的 <span class="button">Go</span> 按钮进入新的 Web 页面。当您输入时，Web+ 将会建议先前的网址供选择；您可以使用 <span class="key">UP</span> 和 <span class="key">DOWN</span> 按键浏览先前输入的网址。<em>地址栏</em> 上的图标会为您提供控制当前页面的功能，允许您返回，前进，停止载入，或者返回您的 <em>启动页面</em>。</p>
-
-<p>如果您需要快速定位页面内容，Web+ 包含了页面内搜索功能。使用 <span class="menu">Edit | Find</span> 或者 <span class="key">ALT</span> <span class="key">F</span> 调用 Find 栏，然后输入您搜索的语句，之后按下 <span class="key">RETURN</span>。继续按下<span class="key">RETURN</span> 或者 <span class="key">ALT</span> <span class="key">G</span> 将会查找整个页面寻找匹配的内容。 The <em>Match case</em> option restricts matches to those with the same spelling as your search phrase. Besides in-page search, the <span class="menu">Edit</span> menu also includes clipboard functions: cut, copy, and paste.</p>
-
-<p>The <span class="menu">View</span> menu offers several functions to set the display of Web pages. First, <span class="menu">View | Reload</span> refreshes the Web page so you can see any changes. You set the font size and zoom level of the Web page here as well; you can also choose whether to apply zoom to images as well as text. If you need more room to view the page, you can move into fullscreen mode with <span class="menu">View | Fullscreen</span>. Finally, if you want to view the HTML source code of the current page, <span class="menu">View | Page source</span> opens up an external editor to edit the source.</p>
-
-<p>In case you need to find a page you've already accessed, Web+ has the <span class="menu">History</span> menu. This menu contains the <span class="menu">Back</span> and <span class="menu">Forward</span> commands which are in the <em>Locator bar</em>, but it also has a list of all pages in your browsing history, organized by day.</p>
-
-<p>Last, the <span class="menu">Bookmarks</span> menu lets you add the current page as a bookmark and manage your bookmarks in Tracker. It also lets you see all the bookmarks themselves.</p>
-
-<p>Right-clicking on your Web page or on elements in the page brings up a context menu. In this menu, you can <span class="menu">Stop</span> page loading. If you right-click a link, you can <span class="menu">Download link to disk</span>, <span class="menu">Open</span>, or <span class="menu">Open in new tab</span>. You can also <span class="menu">Copy link to clipboard</span> for use elsewhere. You can take similar actions with right-clicked images embedded in Web pages: <span class="menu">Download image to disk</span>, <span class="menu">Copy image to clipboard</span>, or <span class="menu">Open image in new window</span>. Right-clicking selected text allows you to <span class="menu">Copy</span> to the clipboard. </p>
-
-<p>In the <em>Status bar</em> at the bottom of WebPositive's interface, you can preview where links will take you. Hover over a link in a Web page and its destination URL will appear in the <em>Status bar</em>. This bar will also show you progress as Web+ loads a new Web page.</p>
-
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">设置</a></h2>
-<p>You can access the Web+ settings dialog from <span class="menu">Window | Settings</span>.</p>
-<img src="../images/apps-images/web+settings.png" alt="web+settings.png" />
-<br />
-<p>Many of the options are self-explanatory. The WebPositive <em>Start page</em> and <em>Search page</em> can be set here. You can also change which pages appear in new windows and tabs. Finally, you can change the default fonts and add a proxy server in this dialog.</p>
-<p>The <em>Auto-hide interface in fullscreen mode</em> option will cause the interface to roll out of view if you don't use it for a short time while in fullscreen mode. Likewise, the <em>Auto-hide mouse pointer</em> option removes the mouse pointer from view when you are scrolling through a Web page.</p>
-
-<div class="box-info">Web+ currently only uses the <em>Search page</em> as a possible default page for new tabs and windows. It doesn't have built-in Web search; you have to go to your search engine and type in your query there.</div>
-
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
-<p>These are some commonly used keyboard shortcuts in WebPositive:</p>
+<p>WebPositive 的界面非常直观：在菜单栏之下是常用按钮栏，其中包括可用于导航至浏览历史的上一页和下一页，停止载入页面，以及（可选的）跳转至主页的按钮。<br />
+之后就是用于输入站点网址的文本域。<br />
+在导航栏之下就是网页区域。您可以同时打开多个页面，并将其载入各自的标签。<br />
+在窗口的底部是状态栏，其中将会显示正在载入的站点或者鼠标指针所指向链接的地址。当页面载入时，在右端将会显示一个进度条。 </p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>设置</h2>
+<p>您可以从 <span class="menu">窗口</span> 菜单中打开 <span class="menu">设置</span> 面板以配置 WebPositive 的一些组件。</p>
+<img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
+<p>第一个标签用于常规设置：作为 <span class="menu">起始页面</span> 的文件或网址， <span class="menu">搜索页面</span>， 用于放置网络下载文件的 <span class="menu">Download 目录</span>。<br />
+两个弹出菜单可用于设置载入页面 - 当打开新窗口或标签时。<br />
+通过下面的选择框，您可以避免在打开单个页面时显示标签栏。 WebPositive 的界面在全屏模式时可以自动隐藏，并且在停止移动一段时间后，鼠标也会自动隐藏。<br />
+最后，您可以决定是否在导航栏中包含 “Home” 按钮，并且可以设置浏览器记录的访问历史保存时间。</p>
+<p>在第二个标签中，您可以选择标准，加粗，未加粗以及等宽字体，并且设置它们的默认尺寸。</p>
+<p>最后一个标签用于配置代理服务器。</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>浏览</h2>
+<p>如果您曾经使用过其他的浏览器，WebPositive 将不会有很大不同。无需查看它的每个菜单项和特性，让我们注意一下几点：</p>
+<ul>
+<li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
+<p>New tabs are created with the <span class="key">+</span> button to the right in the tab bar or, if there's still enough space, by double-clicking into an empty area of it. If there are more tabs open than fit into the bar, the <span class="key">&lt;</span> <span class="key">&gt;</span> scroll-buttons become active, allowing you to scroll the tab bar left and right. The <span class="key">∨</span> button to the far right hosts a pop-up menu with all open tabs for even quicker navigation.</p></li>
+<li><p>使用鼠标中键点击链接将会在后台新标签中打开页面。</p></li>
+<li><p>您可以从 <span class="menu">视图</span> 菜单中 <span class="menu">放大</span> 和 <span class="menu">缩小</span> 页面。还有一个选项用于 <span class="menu">只缩放文本</span> ，而所有的图像都保持原始尺寸。</p></li>
+<li><p>如果您切换到了全屏模式，并且激活了隐藏界面的设置，在一秒钟之后，界面将自动隐藏。为了将其暂时显示，您只需要移动鼠标指针到屏幕顶部即可。</p></li>
+<li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with Google, so the locator field doubles as quick shortcut to web searches.</p></li>
+<li><p>右键点击打开菜单，根据所点击对象的不同，其可以选择在新窗口或标签中打开链接，或者下载对象等。</p></li>
+<li><p><span class="menu">编辑 | 查找</span> 在底部显示一个查找栏用于启动页内搜索。匹配项将会在页面内高亮显示。</p></li>
+</ul>
+<div class="box-info">After a while you may experience web pages being loaded slower and slower. Not really a bug in the truest sense, it's more an effect of a deficient handling of cookies. Either way, until that is fixed you'll have to manually intervene: Have a look at <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. This file stores cookies from webpages and slowly grows while surfing the web. Once it's a few dozen kilobytes in size, it starts to slow down browsing. Just delete the file at that point to start with a clean slate.</div>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>书签</h2>
+<p>WebPositive 的书签以文件和目录的形式存在于  <tt>~/config/settings/WebPositive/Bookmarks/</tt> 中。添加书签将会在此创建一个新文件。  您可以通过 <span class="menu">管理书签...</span> 快速的打开该文件夹。</p>
+<img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
+<p>You can change a bookmark's URL, name, title and enter keywords just like with any other file with attributes. Just make sure you have all their columns displayed via Tracker's <span class="menu">Attributes</span> menu, then select a file, press <span class="key">ALT</span> <span class="key">E</span> and start editing the attribute; change attribute columns with <span class="key">TAB</span>.<br />You can sort bookmarks into different folders you create yourself.</p>
+<p>By using Tracker to manage and navigate bookmarks you can lift its unique features to quickly find what you're looking for.<br />
+Activating <span class="menu">Type-ahead filtering</span> in <a href="../tracker.html#tracker-preferences">Tracker's preferences</a>, you can instantly trim down your list of bookmarks to matches of your filter-string. A few more <span class="key">↑</span> or <span class="key">↓</span> to move the selection and pressing <span class="key">ENTER</span> opens the site. Make sure to display all attribute columns to have the filter applied to name, title, URL and keywords.</p>
+<p>For this to work, all bookmarks should be kept in the <tt>~/config/settings/WebPositive/Bookmarks/</tt> folder and only copies should be sorted into custom subfolders for usage in WebPositive's <span class="menu">Bookmarks</span> menu (if at all). Also, actually filling the keywords attribute helps...</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>下载</h2>
+<p><span class="menu">窗口 | 下载</span> 将打开一个窗口，其中列出所有已完成的和正下载的内容：</p>
+<img src="../images/apps-images/webpositive-downloads.png" alt="webpositive-downloads.png" />
+<p>Currently downloading files are shown with a growing progress bar and, similar to copying files in Tracker, information on the download speed, file size and expected finishing time. Buttons to the right let you <span class="button">Cancel</span> and <span class="button">Restart</span> a download, or  <span class="button">Open</span> the file, or <span class="button">Remove</span> its entry from the list. The <span class="button">Remove missing</span> and <span class="button">Remove finished</span> buttons at the bottom do this for all entries in this list. "Missing" are files that were deleted in the meantime.</p>
+<p>Moving a file that is currently being downloaded to Trash will stop the download. You'll also notice, that its icon becomes "ghosted".<br />
+Generally, WebPositive is very tolerant when it comes to managing files with Tracker. Files can be renamed or moved even while they are being downloaded and even after the download is finished, these changes are reflected in the Downloads window.</p>
+<div class="box-info"><p>Ever wondered from what site you downloaded a particular package, image or any other file? You can track that down by opening the file with <a href="diskprobe.html">DiskProbe</a> and have a look at its <tt>META:url</tt> attribute.</p>
+<p>Want to have the URL permanently shown in your downloads folder? Just copy a bookmark into it, have the bookmark's URL attribute column displayed and remove the bookmark again.</p></div>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>快捷键</h2>
+<p>下面是一些有用的快捷键：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Opens a new tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window.</td></tr>
-<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current window.</td></tr>
-<tr><td><span class="key">CMD</span> click</td><td> </td><td>Opens the clicked link in a new background tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">R</span></td><td> </td><td>Refreshes the current page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks this page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">LEFT</span></td><td> </td><td>Goes back to the last Web page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Opens the Find bar for in-page searching.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td style="width:15px;"></td><td>打开新的标签。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>关闭当前标签。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>打开新窗口。</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>关闭当前窗口。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td> </td><td>切换全屏模式。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">R</span> 或 <span class="key">F5</span></td><td> </td><td>刷新当前页面。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>打开主页。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>显示/隐藏下载窗口。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>显示页内搜索的进度条（可以通过 <span class="key">ESC</span> 隐藏）。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>添加页面为书签。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>管理书签，打开书签目录。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>浏览历史中的前一页。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>浏览历史中的后一页。</td></tr>
 </table>
-
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bookmarks" name="bookmarks">Bookmarks</a></h2>
-<p>One of WebPositive's unique features is its handling of bookmarks.</p>
-<img src="../images/apps-images/web+bookmarks.png" alt="web+bookmarks.png" />
-<br />
-<p>Web+ stores your bookmarks as files in Haiku's file system, and you can manage them with Tracker: <span class="key">ALT</span> <span class="key">M</span> will bring up your Bookmarks folder in Tracker. The files themselves are blank. Instead, Web+ stores each bookmark's URL and page title as <a href="../attributes.html">attributes</a>.</p>
-<p>There are a number of advantages to this format; attribute storage is easy to filter and edit. Make sure that you first make the bookmark attributes visible from the <span class="menu">Attributes</span> menu in Tracker first. To add keywords to a bookmark, just right-click the bookmark in Tracker and choose <span class="menu">Edit name</span>, then use <span class="key">TAB</span> to navigate to the keywords field. Once you're editing that field, type in your new keywords and press <span class="key">RETURN</span>. You can edit the names, page titles and URLs of existing bookmarks with the same process.</p>
-
-<div class="box-info">WebPositive's approach toward bookmarks allows for quick searching. In <span class="menu">Window | Preferences</span> in Tracker, go to the <span class="menu">Windows</span> tab and choose <em>Enable type-ahead filtering</em>. Now, whenever you are in a bookmark-filled folder in Tracker, you can type phrases from the title, URL, or keywords of the bookmark you want and filter through the results. This tip is especially helpful if you fill in keywords beforehand. Note that it only works for flat folders and not hierarchies, so you will need to copy your bookmarks into one folder to use this.</div>
-
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="downloads" name="downloads">Downloads</a></h2>
-<p>Web+ also supports managing your downloads in a similar way. The <em>Downloads</em> window appears when you begin a download; you can call it up manually from the <span class="menu">Windows</span> menu. From here, you can open, restart, or remove previous downloads.</p>
-<img src="../images/apps-images/web+downloads-window.png" alt="web+downloads-window.png" />
-<br />
-<p>Much like it does with bookmarks, Web+ stores information about each download as an attribute. The original URL of the download remains an attribute of the file, so you can always return to the source of the file.</p>
-<p>Web+ will update and adjust to changes to the downloaded files. Notice that <span class="path">sunday.pdf</span> was deleted, so its icon was ghosted out in the <em>Downloads</em> window. <span class="path">documents.html</span> was renamed from its original name of <span class="path">documents</span>, and the Downloads window updated accordingly. </p>
-<img src="../images/apps-images/web+downloads-folder.png" alt="web+downloads-folder.png" />
-<br />
-<div class="box-info">In the Web+ Settings, you can choose a default folder for downloads. However, if you need a download in a different place, just move it while downloading, and Web+ will continue to download. Moving the file to the Trash will cancel the download.</div>
-<div class="box-warning">Closing Web+ will cancel your current downloads! Web+ will pop up a warning dialog if you have an ongoing download and try to quit.</div>
 
 </div>
 </div>

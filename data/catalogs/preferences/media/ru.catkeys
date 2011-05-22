@@ -24,7 +24,7 @@ Starting media server…	Media Window		Запуск медиасервера…
 Stopping media server…	Media Window		Остановка медиасервера…
 Telling media_addon_server to quit.	Media Window		Запрос завершения работы media_addon_server.
 This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
-Video input:	Media views		Видеовход:
-Video output:	Media views		Видеовыход:
+Video input:	Media views		Видео вход:
+Video output:	Media views		Видео выход:
 Video settings	Media Window		Настройки видео
 Waiting for media_server to quit.	Media Window		Ожидание выключения медиасервера.

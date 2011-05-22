@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	3200506475
+1	belarusian	x-vnd.haiku-icon_o_matic	2326864078
 <modify path>	Icon-O-Matic-PathCmd		<змяніць пуць>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<няма чаго перарабляць>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<няма чаго адмяняць>
@@ -34,6 +34,7 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрыбут BEOS:ICON
 Bleep!	Exporter - Continue in error dialog		Ведаем!
 Bummer	Cancel button - error alert		Якая дасада!
 Cancel	Icon-O-Matic-ColorPicker		Адмена
+Cancel	Icon-O-Matic-Menu-Settings		Скасаваць
 Cancel	Icon-O-Matic-SVGExport		Адмена
 Caps	Icon-O-Matic-PropertyNames		Шапкі
 Change Color	Icon-O-Matic-SetColorCmd		Змяніць колер
@@ -41,6 +42,7 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Ачысціць Шлях
 Clean up	Icon-O-Matic-PathsList		Прыбраць
 Click on a shape above	Empty transformers list - 1st line		Клікніце па фігуры вышэй
 Click on an object in	Empty property list - 1st line		Клікніце па аб'екце у
+Close	Icon-O-Matic-Menu-File		Закрыць
 Closed	Icon-O-Matic-PropertyNames		Закрыты
 Color	Icon-O-Matic-PropertyNames		Колер
 Color	Icon-O-Matic-StyleTypes		Колер
@@ -51,6 +53,7 @@ Contour	Transformation		Контур
 Copy	Icon-O-Matic-Properties		Капіяваць
 Detect Orient.	Icon-O-Matic-PropertyNames		Выявіць Арыент.
 Diamond	Icon-O-Matic-StyleTypes		Ромб
+Discard	Icon-O-Matic-Menu-Settings		Адкінуць
 Duplicate	Icon-O-Matic-PathsList		Дуплікаваць
 Duplicate	Icon-O-Matic-ShapesList		Дуплікаваць
 Duplicate	Icon-O-Matic-StylesList		Дуплікаваць
@@ -152,8 +155,10 @@ Rotate indices forwards	Icon-O-Matic-PathsList		Павярнуць індэкс�
 Rotation	Icon-O-Matic-PropertyNames		Паварот
 Rounding	Icon-O-Matic-PropertyNames		Акругленне
 Save	Icon-O-Matic-Menu-File		Захаваць
+Save	Icon-O-Matic-Menu-Settings		Захаваць
 Save Icon	Dialog title		Захаваць Іконку
 Save as…	Icon-O-Matic-Menu-File		Захаваць як...
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Захаваць змены ў цякучы значак?
 Saving your document failed!	Icon-O-Matic-Exporter		Не ўдалося захаваць ваш дакумент!
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 Scale X	Icon-O-Matic-PropertyNames		Шкала X
@@ -182,6 +187,7 @@ Translation X	Icon-O-Matic-PropertyNames		Канвертацыя X
 Translation Y	Icon-O-Matic-PropertyNames		Канвертацыя Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Адвязаць шлях
 Undo	Icon-O-Matic-Main		Вярнуць
+Untitled	Icon-O-Matic-Main		Неназваны
 Width	Icon-O-Matic-PropertyNames		Шырыня
 Yes	Icon-O-Matic-StyledTextImport		Так
 any of the other lists to	Empty property list - 2nd line		любым з іншых спісаў каб

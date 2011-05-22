@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -34,7 +35,7 @@
 <li><a href="../it/wifi.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/wifi.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/wifi.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -65,14 +66,14 @@ Aironet PCI4800<br />
 <li><p><i>broadcom43xx</i> unterstützt<br />
 BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 und BCM4318</p>
 </li>
-<li><p><i>iprowifi2100</i> unterstützt 2100 Chips</p></li>
-<li><p><i>iprowifi2200</i> unterstützt<br />
+<li><p><i>ipw2100</i> unterstützt Intel Pro Wireless 2100 Chips</p></li>
+<li><p><i>iprowifi2200</i> unterstützt Intel Pro Wireless<br />
 2200BG<br />
 2225BG<br />
 2915ABG</p>
 </li>
-<li><p><i>iprowifi3945</i> unterstützt 3945 Chips</p></li>
-<li><p><i>iprowifi4965</i> unterstützt 4965 Chips</p></li>
+<li><p><i>iprowifi3945</i> unterstützt Intel Pro Wireless Chips 3945</p></li>
+<li><p><i>iprowifi4965</i> unterstützt Intel Pro Wireless 4965 Chips</p></li>
 <li><p><i>marvell88w8335</i> unterstützt<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335</p></li>
@@ -83,6 +84,7 @@ RT2561S<br />
 RT2561<br />
 RT2661</p>
 </li>
+<li><p>ralink2860 unterstützt Ralink RT2860</p></li>
 <li><p><i>wavelanwifi</i> unterstützt zumindest<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
@@ -97,33 +99,45 @@ Us Robotics 2415<br />
 Addtron AWA-100 PCI</p></li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wep" rel="nofollow" id="wep">WEP Verschlüsselung</a></h3>
-<p>WEP Verschlüsselung ist durch das Kommandozeilen-Programm <span class="cli">setwep</span> verfügbar. Es ist ein Provisorium, um sich in ein nicht oder per WEP verschlüsseltes Netzwerk einzuklinken. <span class="cli">setwep</span> funktioniert mit 64- und 128-bit WEP und unterstützt Passwörter als Text und Hex-Werte (siehe <a href="#wep-notes" rel="nofollow">WEP Info</a> weiter unten).</p>
-<p>Der Gebrauch ist: <span class="cli">setwep Geräte_Pfad [ssid] [key]</span>.</p>
-<p>In nachfolgenden Beispielen gehen wir von einer Netzwerkkarte "/dev/net/iprowifi3945/0" und einem Funknetzwerk mit dem Namen "haikuwifi" aus.</p>
-<h4>Beispiel 1: Verbindung mit einer 64-bit WEP Verschlüsselung und einem Hex-Passwort</h4>
-<pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
-</pre><h4>Beispiel 2: Verbindung mit einem unverschlüsselten Funknetzwerk</h4>
-<pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
-</pre><div class="box-info">
-<li>Den Pfad zu seinem Gerät findet man unter Preferences -&gt; Network.</li>
-<li>Um sich bei jedem Hochfahren mit dem Netzwerk unter dieser SSID zu verbinden, schreibt man den <tt>setwep</tt> Befehl ins <tt>home/config/boot/UserBootscript</tt>.</li>
-</div>
+<a name="connect" rel="nofollow" id="connect">Verbindung zum Funknetzwerk</a></h3>
+<p>Neben unverschlüsselten Netzwerken unterstützt Haiku auch mittels <a href="#wep-notes" rel="nofollow">WEP Schlüssel</a> verschlüsselte Netze. WEP ist allerdings eine bereits veraltete Verschlüsselungsmethode, also nicht wirklich sicher.</p>
+<p>Vom Terminal aus lassen sich mit dem Befehl <span class="cli">ifconfig</span> vorhandene Funknetze auflisten und mit einem Verbindung aufnehmen ("join") oder wieder trennen ("leave"):</p>
+<pre class="terminal">ifconfig [Wifi_Geräte_Pfad] [list|join|leave] (Schlüssel)</pre>
+<p>Der <tt>Wifi_Geräte_Pfad</tt> wird in den <span class="app">Netzwerk</span> Einstellungen angezeigt oder mit dem Befehl <span class="cli">ifconfig -a</span> im Terminal.</p>
+<p>Nachfolgend einige Beispiele wie mit einem Funknetzwerk namens <i>wifitopia</i> eine Verbindung hergestellt wird. Als Netzwerkkarte wird <tt>/dev/net/iprowifi3945/0</tt> angenommen.</p>
+<h4>Alle Funknetzwerke auflisten:</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 list</pre>
+<h4>Verbindung mit einem unverschlüsselten Funknetzwerk:</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia</pre>
+<h4>Verbindung mit einem <a href="#wep-notes">WEP verschlüsselten </a> Funknetzwerk: (ASCII Passwort)</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia DasPasswort</pre>
+<h4>Verbindung mit einem <a href="#wep-notes">WEP verschlüsselten </a> Funknetzwerk: (64 Bit Hex-Passwort)</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia 0x4010FABEEF</pre>
+<h4>Verbindung zum Funknetzwerk trennen:</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 leave wifitopia</pre>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="auto-connect" rel="nofollow" id="auto-connect">Automatische Verbindung zu einem Funknetzwerk</a></h3>
+<p>Nach dem Hochfahren kann man sich auch automatisch mit einem durch seine SSID benannten Netzwerk verbinden. Dazu müssen Funknetzwerke und die entsprechenden Passwörter in der Datei <tt>/boot/common/settings/network/wireless_networks</tt> in folgendem Format abgelegt werden:</p>
+<pre>network wifitopia {
+   password DasPasswort
+}</pre>
+<p>Legt man diese Konfigurationsdatei nicht an, verbindet sich das System automatisch mit dem ersten unverschlüsselten Netzwerk, das es findet.</p>
 <p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP Info</strong></a></p>
 <ul>
 <li>64-bit WEP benutzt ein 40-bit Passwort, das sind 5 Buchstaben oder 10 Hex-Werte</li>
 <li>128-bit WEP benutzt ein 104-bit Passwort, das sind 13 Buchstaben oder 26 Hex-Werte</li>
-<li>Hex-Werte sind die Zahlen 0-9 und Buchstaben A bis F (in <tt>setwep</tt> mit einem vorangestellten '0x')</li>
+<li>Hex-Werte sind die Zahlen 0-9 und Buchstaben A bis F (in <tt>ifconfig</tt> mit einem vorangestellten '0x')</li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="wpa" rel="nofollow" id="wpa">WPA Verschlüsselung</a></h3>
-<p>Momentan gibt es noch keine WPA Verschlüsselung unter Haiku. Es existiert allerdings <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">vorläufiger und unvollständiger Code für eine WPA Implementierung</a>. Um weiter zu kommen, müsste er in den wpa_supplicant Build-Prozess integriert und Kompilier- und Laufzeitfehler behoben werden.</p>
+<p>Momentan gibt es noch keine WPA Verschlüsselung unter Haiku. <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">Ein großer Schritt</a> in diese Richtung wurde allerdings bereits unternommen.</p>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>Um die Firmware für Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335 zu installieren, started man</p>
+<p>Um die Firmware für Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335 zu installieren, startet man</p>
 <pre class="terminal">~&gt; install-wifi-firmwares.sh
 </pre>
-<p>Die Intel ipw2100/2200 benötigen zur Installation keine Internetverbindung, da es die Lizenzbestimmungen erlauben die Original-Firmware gleich mitzuliefern. Sie verlangen jedoch eine Zustimmung des Benutzer vor ihrer Installtion. Für Broadcom 43xx &amp; Marvell 88W8335 ist hingegen eine funktionierende Internetverbindung nötig, da die entsprechenden Dateien mit der Firmware Haiku nicht beiliegen dürfen.</p>
+<p>Die Intel ipw2100 und iprowifi22xx benötigen zur Installation keine Internetverbindung, da es die Lizenzbestimmungen erlauben, die Original-Firmware gleich mitzuliefern. Sie verlangen jedoch eine Zustimmung des Benutzers vor ihrer Installtion. Für Broadcom 43xx &amp; Marvell 88W8335 ist hingegen eine funktionierende Internetverbindung nötig, da die entsprechenden Dateien mit der Firmware Haiku nicht beiliegen dürfen.</p>
 <p>Leute, die ihr eigenes Haiku Image bauen, können ihre <span class="cli">build/jam/UserBuildConfig</span> entsprechend anpassen. Details dazu und eventuelle Updates zum WLAN-Thema finden sich in der <a href="">Online-Version dieses Dokuments</a> (Englisch).</p>
 <p>Wer die Firmware runterladen muss, aber unter Haiku keine Internetverbindung hat, kann das in diesem Online Dokument angebotene <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">Shell Skript</a> benutzen. Damit werden alle nötigen Dateien heruntergeladen und in ein Zip gepackt, das man unter Haiku in <tt>/boot</tt> entpacken kann. Dann stehen alle Dateien zur Verfügung, die von install-wifi-firmwares.sh benötigt werden.</p>
 </div>

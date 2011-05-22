@@ -33,7 +33,7 @@
 <li><a href="../de/attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../ru/attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/attributes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -43,17 +43,16 @@
 <span>
  «  <a href="filetypes.html">Tipi di File</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
-::  <a href="index.html">Indice</a>  »
+::  <a href="index.html">L'indice del filesystem</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h1>Attributi</h1>
 
-<p>Gli attributi sono campi di dati che appartengono ad un file ma non ne fanno parte : non sono calcolati nella dimensione del file e possono essere copiati e modificati senza senza che il loro contenuto venga modificato. Il sistema ad esempio utilizza questi attributi per memorizzare la dimensione del file, il tipo di file o la data dell'ultima modifica. Tutto questo è analogo ad altri sistemi operativi ed ai loro file system.</p>
+<p>Gli attributi sono campi di dati che appartengono ad un file ma non ne fanno parte: non sono calcolati nella dimensione del file e possono essere copiati e modificati senza senza che il loro contenuto venga modificato. Il sistema ad esempio utilizza questi attributi per memorizzare la dimensione del file, il tipo di file o la data dell'ultima modifica. Tutto questo è analogo ad altri sistemi operativi ed ai loro file system.</p>
 <p>La principale differenza è la possibilità di aggiungere qualsiasi tipo di attributo a qualsiasi file, visualizzarlo o renderlo modificabile in una finestra del Tracker. E' sufficiente definire il tipo di attributo che si vuole aggiungere ad un tipo di file (e.g. una stringa, un numero o il tempo) dandogli un un nome ed una descrizione.</p>
 <p>Il file stesso non ha nemmeno bisogno di contenere qualcosa. Diamo un'occhiata a questi file People:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
@@ -66,8 +65,8 @@
 <a id="attributes-tracker" name="attributes-tracker">Gli attributi nel Tracker</a></h2>
 <p>Gli attributi sono visualizzati in modo simile ad un database o ad un foglio di calcolo. Usando il Tracker si può scegliere quali attributi visualizzare (colonne) ed ordinare di conseguenza la lista dei file (righe).</p>
 <p>Per poterlo fare bisogna aprire una finestra del Tracker, cliccare sul menu <span class="menu">Attributi</span> e scegliere l'attributo che si desidera visualizzare. Altrimenti, si può semplicemente cliccare con il tasto destro su una colonna e segnare le voci nel menu contestuale, è possibile riordinare le colonne facendo un semplice drag&amp;drop sulla testa della colonna. Un modo veloce per eliminare le colonne indesiderate è spostare una colonna al di fuori della finestra.</p>
-<p>Per ridimensionare automaticamente una colonna nella sua larghezza ottimale, è sufficiente fare un doppio click nella linea tra due attributi.</p>
-<p>Per cambiare l'ordinamento da crescente a decrescente, si può cliccare sulla testa della colonna desiderata. Mentre si clicca su una colonna si potrà scegliere un ordinamento alternativo premendo il tasto <span class="key">SHIFT</span>. E' possibile ad esempio ordinare i file People "per compagnia" ed all'interno dello stesso ordine disporli per il nome del contatto. Un esempio è lo screenshot precedente. La modalità di ordinamento secondaria è marcata da un indicatore leggermente colorato dietro la testa della colonna.</p>
+<p>Per ridimensionare automaticamente una colonna alla sua larghezza ottimale, è sufficiente fare un doppio click nella linea tra due attributi.</p>
+<p>Per cambiare l'ordinamento da crescente a decrescente, si può cliccare sulla testa della colonna desiderata, in alternativa mentre si clicca su una colonna si potrà scegliere un ordinamento alternativo premendo il tasto <span class="key">SHIFT</span>. E' possibile ad esempio ordinare i file People "per compagnia" ed all'interno dello stesso ordine disporli per il nome del contatto, un esempio è lo screenshot precedente. La modalità di ordinamento secondaria è marcata da un indicatore leggermente colorato dietro la testa della colonna.</p>
 <p>Modificare questi attributi è semplice come rinominare un file: Ad esempio cliccando su una voce, o premendo <span class="key">ALT</span> <span class="key">E</span> muovendosi attraverso gli attributi con <span class="key">TAB</span> e <span class="key">SHIFT</span> <span class="key">TAB</span>. Premendo <span class="key">ESC</span> si abbandona la modalità di modifica senza applicare alcun cambiamento.</p>
 
 <h2>
@@ -153,7 +152,7 @@ Clara Botters : string : Whelton</pre>
 <p><span class="cli">copyattr</span> copia gli attributi da uno o più file ad un altro. Di default, il contenuto del file <b>non</b> viene copiato.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-<p>Se si vogliono copiare gli attributi del file più i contenuti del file stesso, è necessario aggiungere l'opzione "<span class="cli">-d</span>" o "<span class="cli">--data</span>".</p>
+<p>Per copiare gli attributi del file più i contenuti del file stesso, è necessario aggiungere l'opzione "<span class="cli">-d</span>" o "<span class="cli">--data</span>".</p>
 
 <p><br /></p>
 <p>
@@ -166,7 +165,7 @@ Ulteriori informazioni su questi comandi e sulle loro opzioni possono essere tro
 <div class="inner"><span>
  «  <a href="filetypes.html">Tipi di File</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
-::  <a href="index.html">Indice</a>  »
+::  <a href="index.html">L'indice del filesystem</a>  »
 </span></div>
 </div>
 

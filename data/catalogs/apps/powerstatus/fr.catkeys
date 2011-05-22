@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	572802462
+1	french	x-vnd.Haiku-PowerStatus	2776698676
 About	PowerStatus		À propos
 About…	PowerStatus		À propos…
 Battery charging	PowerStatus		Batterie en charge
@@ -9,6 +9,7 @@ Capacity granularity 1: 	PowerStatus		Granularité de charge 1 :
 Capacity granularity 2: 	PowerStatus		Granularité de charge 2 :
 Capacity: 	PowerStatus		Capacité :
 Current rate: 	PowerStatus		Consomation actuelle
+Damaged battery	PowerStatus		Batterie endommagée
 Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible :
 Design capacity warning: 	PowerStatus		Avertissement de capacité nominale :
 Design capacity: 	PowerStatus		Capacité nominale :

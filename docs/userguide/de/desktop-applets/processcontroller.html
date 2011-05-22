@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,7 +34,7 @@
 <li><a href="../../it/desktop-applets/processcontroller.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/desktop-applets/processcontroller.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/desktop-applets/processcontroller.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/desktop-applets/processcontroller.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/desktop-applets/processcontroller.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/desktop-applets/processcontroller.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -44,13 +44,12 @@
 <span>
  «  <a href="powerstatus.html">PowerStatus</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="../workspaces.html#applet.html">Workspaces</a>  »
+::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -59,39 +58,36 @@
 <tr><td>Einstellungen:</td><td></td><td><i>keine</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />Hauptaufgabe von ProcessController ist die Anzeige von Prozessorauslastung und Speichernutzung. Außerdem können einzelne Teams überwacht und ihre Priorität geändert, oder auch zum Beenden gezwungen werden, falls ein Programm hängt. Bei Multiprozessorsystemen können sogar einzelne CPUs/Cores abgeschaltet werden. Zusätzlich können Tracker und Deskbar aus dem Menü komfortabel neu gestartet werden, sollten sie mal abgestürtzt sein.</p>
+<p>Die Balken links zeigen die Auslastung jeder CPU, rechts befindet sich ein Balken zur Speicherauslastung. Die Zahl der Balken hängt natürlich von der Anzahl an CPUs/Cores des Rechners ab.</p>
+<p>Wenn das Programm nicht schon läuft, kann man beim Start entscheiden, ob das Applet in einem Fenster laufen oder in die Deskbar installiert werden soll. Im Fenstermodus kann die Balkengröße geändert werden, indem man die Fenstergröße anpasst, bevor man es am <a href="../gui.html#replicants">Replikanten</a>-Symbol packt und auf den Desktop zieht.<br />
+Wo das Applet auch installiert ist, bedient wird es per Rechtsklick über ein Kontextmenü.<br />
+Um es wieder aus der Deskbar zu entfernen, deaktiviert man mit dem Kontextmenü die Option <span class="menu">In der Deskbar laufen</span>.</p>
+<h2>Anwendungen beenden</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Um eine Anwendung zu beenden, wählt man einfach deren Namen aus dem Menü <span class="menu">Anwendung beenden</span>. Dadurch wird eine Anwendung sauber geschlossen, genauso als hätte man den Schließen-Button des Fensters geklickt. Besonders vorsichtig sollte man allerdings mit Systemprozessen wie Server und Daemons sein. Werden sie beendet, läuft das System eventuell nicht mehr stabil oder zumindest nicht mehr wie gewohnt.</p>
+<h2>Speichernutzung</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the used part of memory.</p>
+<p>Die Überwachung der Speichernutzung kann ziemlich ungenau sein.</p>
+<p>Das Menü ermöglicht die Überwachung der Speichernutzung der diversen Teams im System. Neben dem Team-Name befinden sich zwei Spalten: die erste enthält den Speicher, der schreibend reserviert wurde, während die zweite den Gesamtspeicherbedarf zeigt, also inklusive nur lesend genutzten Speicher (von gemeinsam genutzte Bibliotheken, beispielsweise).</p>
+<p>Die oberste Zeile <i>Systemressourcen &amp; Cache</i> zeigt die gesamte Speichernutzung von System und allen Anwendungen. Die Länge des blauen Balkens repräsentiert dden physikalisch im Rechner vorhandenen Speicher. Die folgenden Reihen zeigen den benutzten Speicher für jedes Team. Die Länge der Balken entspricht nur dem tatsächlich benutzten Teil des Speichers.</p>
 <table>
-	<tbody>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
-	</tbody>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Speichernutzung einer Anwendung (beschreibbar)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Speichernutzung, inklusive nur lesend (geteilt mit anderen Anwendungen)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>Threads und CPU-Last</h2>
+<p>Mit diesem Menü lassen sich Thread-Prioritäten ändern und Teams zum Beenden zwingen oder debuggen.</p>
+<div class="box-stop">Änderungen durch Befehle aus diesem Menü greifen tief in das System ein und können zu Datenverlust und einem instabilen System führen. Hier ist eine ruhige Maushand gefragt!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel-Code</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User-Code</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Leerlauf-Thread</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
-</p>
+<p>Auf der ersten Ebene befinden sich die Team-Namen. Klickt man auf einen, kann das gesamte Team zum Beenden gezwungen werden. Der dunkelblaue Teil des Balkens entspricht der Zeit, die in Kernel-Code verbracht wird, der hellblaue Teil in User-Code, und der grüne Teil in den Leerlauf-Thread(s). Ein komplett blauer Balken bedeutet, dass dieses Team die gesamte Rechenleistung beansprucht.</p>
+<p>Die zweite Ebene zeigt alle Threads eines Teams. Klickt man auf einen, kann er debugged oder zum Beenden gezwungen werden. Ein komplett blauer Balken bedeutet, dass dieser Thread einen Prozessor/Kern vollständig auslastet.</p>
+<p>In der letzten Ebene des Menüs lässt sie die Priorität eines Threads ändern. Hier ist Vorsicht angesagt! In der Regel sollte die Priorität eines Threads umgekehrt zu seiner CPU-Auslastung sein. Das heißt, je mehr er versucht Rechenzeit zu bekommen, desto niedriger sollte seine Priorität sein. Am besten man spielt gar nicht erst mit Thread-Prioritäten einer Anwendung herum, sondern kontaktiert statt dessen deren Autoren; das ist deren Aufgabe.</p>
 
 </div>
 </div>
@@ -100,7 +96,7 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 <div class="inner"><span>
 «  <a href="powerstatus.html">PowerStatus</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="../workspaces.html#applet.html">Workspaces</a>  »
+::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 

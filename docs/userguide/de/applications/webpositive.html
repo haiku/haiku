@@ -4,15 +4,15 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Omar Rizwan (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
  *		Vincent Duvert
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -35,7 +35,7 @@
 <li><a href="../../it/applications/webpositive.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/webpositive.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/webpositive.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/webpositive.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/webpositive.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/webpositive.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/webpositive.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/webpositive.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -50,83 +50,76 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
-
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Konfigurationsdateien, Cookies, Cache und Surf-Historie</td></tr>
-<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - Speicherort für Lesezeichen</td></tr>
+<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - Alle Lesezeichen als einzelne Dateien</td></tr>
 </table>
 <p><br /></p>
 <p>WebPositive, oder kurz Web+, ist Haikus eigener Webbrowser. Ein Teil des Namens ist eine kleine Hommage an BeOS' einfachen NetPositive, der andere bezieht sich auf das moderne Fundament des Browsers: das WebKit. Diese open source HTML Render-Bibliothek ist auch das Herzstück einiger anderer Mainstream Browser, wie Safari unter Mac OS X und Googles Chrome. Die Nutzung des sich ständig weiter entwickelnden WebKits ermöglicht, dass Web+ auch den zukünftigen Web-Technologien gewappnet sein wird.</p>
-
 <img src="../images/apps-images/webpositive.png" alt="webpositive.png" />
-<br />
-<p>You'll control your Web browsing with the <em>Locator bar</em>. To go to a Web page, type the URL into the Locator box and either press <span class="key">RETURN</span> or click the <span class="button">Go</span> button to the right of the Locator box. Web+ will suggest previous URLs as you type; you can go through previously typed URL with the <span class="key">UP</span> and <span class="key">DOWN</span> arrow keys. The icons on the <em>Locator bar</em> give you control over the current page, allowing you to go back, forward, stop loading, or return to your <em>Start page</em>.</p>
-
-<p>If you need to quickly locate content in a page, Web+ includes in-page search. Use <span class="menu">Edit | Find</span> or <span class="key">ALT</span> <span class="key">F</span> to call up the Find bar, then type your search phrase and press <span class="key">RETURN</span>. Further presses of <span class="key">RETURN</span> or <span class="key">ALT</span> <span class="key">G</span> will go through the matches on the page. The <em>Match case</em> option restricts matches to those with the same spelling as your search phrase. Besides in-page search, the <span class="menu">Edit</span> menu also includes clipboard functions: cut, copy, and paste.</p>
-
-<p>The <span class="menu">View</span> menu offers several functions to set the display of Web pages. First, <span class="menu">View | Reload</span> refreshes the Web page so you can see any changes. You set the font size and zoom level of the Web page here as well; you can also choose whether to apply zoom to images as well as text. If you need more room to view the page, you can move into fullscreen mode with <span class="menu">View | Fullscreen</span>. Finally, if you want to view the HTML source code of the current page, <span class="menu">View | Page source</span> opens up an external editor to edit the source.</p>
-
-<p>In case you need to find a page you've already accessed, Web+ has the <span class="menu">History</span> menu. This menu contains the <span class="menu">Back</span> and <span class="menu">Forward</span> commands which are in the <em>Locator bar</em>, but it also has a list of all pages in your browsing history, organized by day.</p>
-
-<p>Last, the <span class="menu">Bookmarks</span> menu lets you add the current page as a bookmark and manage your bookmarks in Tracker. It also lets you see all the bookmarks themselves.</p>
-
-<p>Right-clicking on your Web page or on elements in the page brings up a context menu. In this menu, you can <span class="menu">Stop</span> page loading. If you right-click a link, you can <span class="menu">Download link to disk</span>, <span class="menu">Open</span>, or <span class="menu">Open in new tab</span>. You can also <span class="menu">Copy link to clipboard</span> for use elsewhere. You can take similar actions with right-clicked images embedded in Web pages: <span class="menu">Download image to disk</span>, <span class="menu">Copy image to clipboard</span>, or <span class="menu">Open image in new window</span>. Right-clicking selected text allows you to <span class="menu">Copy</span> to the clipboard. </p>
-
-<p>In the <em>Status bar</em> at the bottom of WebPositive's interface, you can preview where links will take you. Hover over a link in a Web page and its destination URL will appear in the <em>Status bar</em>. This bar will also show you progress as Web+ loads a new Web page.</p>
-
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Settings</a></h2>
-<p>You can access the Web+ settings dialog from <span class="menu">Window | Settings</span>.</p>
-<img src="../images/apps-images/web+settings.png" alt="web+settings.png" />
-<br />
-<p>Many of the options are self-explanatory. The WebPositive <em>Start page</em> and <em>Search page</em> can be set here. You can also change which pages appear in new windows and tabs. Finally, you can change the default fonts and add a proxy server in this dialog.</p>
-<p>The <em>Auto-hide interface in fullscreen mode</em> option will cause the interface to roll out of view if you don't use it for a short time while in fullscreen mode. Likewise, the <em>Auto-hide mouse pointer</em> option removes the mouse pointer from view when you are scrolling through a Web page.</p>
-
-<div class="box-info">Web+ currently only uses the <em>Search page</em> as a possible default page for new tabs and windows. It doesn't have built-in Web search; you have to go to your search engine and type in your query there.</div>
-
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
-<p>These are some commonly used keyboard shortcuts in WebPositive:</p>
+<p>WebPositives Oberfläche ist recht übersichtlich: Unter der Menüleiste befindet sich eine weitere Leiste mit Symbolen, um in der Historie der angesurften Seiten zurück und vorzuspringen, das Laden einer Seite abzubrechen und (optional) um zur Startseite zu springen.<br />
+Daneben folgt ein Textfeld zur Eingabe einer Zieladresse (URL).<br />
+Unter dieser Navigationsleiste werden die Webseiten angezeigt. Es lassen sich mehrere Seiten parallel öffnen, indem man sie in eigene Reiter lädt.<br />
+Ganz unten im Fenster befindet sie eine Statusleiste, in der die URL der gerade ladenden Seite angezeigt wird, oder auch die Zieladresse eines Links, über dem sich der Mauszeiger gerade befindet. Während eine Seite geladen wird, erscheint rechts ein Fortschrittsbalken.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Einstellungen</h2>
+<p>Aus dem <span class="menu">Window</span> Menü lässt sich ein Panel <span class="menu">Settings</span> öffnen, um einige Konfigurationen für WebPositive vorzunehmen.</p>
+<img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
+<p>Der erste Reiter, <span class="menu">General</span>, betrifft allgemeine Einstellungen: Welche Datei oder URL dient als Startseite (<span class="menu">Start page</span>), welche als Suchseite (<span class="menu">Search page</span>), in welchem Ordner (<span class="menu">Downloads folder</span>) sollen Downloads aus dem Netz gespeichert werden.<br />
+Mittels zweier Menüs lässt sich entscheiden welche Seite mit neuen Fenstern oder Reitern geladen oder ob eine leere Seite angezeigt werden soll.<br />
+Die Reiterleiste lässt sich ausblenden wenn sowieso nur eine einzelne Seite geöffnet ist. Die gesamte Oberfläche kann im Vollbildmodus automatisch ausgeblendet werden, und der Mauszeiger kann automatisch verschwinden nachdem die Maus für kurze Zeit nicht bewegt wird.<br />
+Schließlich lässt sich das Symbol für die Startseite in der Navigationsleiste ein- und ausblenden und die Anzahl der Tage einstellen, die sich der Browser die angesurften Orte in der Historie merkt.</p>
+<p>Im zweiten Reiter können Schriftarten für Standard, Serifen, Non-Serifen und Schriften mit fester Breite und deren Größen ausgewählt werden.</p>
+<p>Der letzte Reiter zur Konfiguration eines Proxyservers.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bilder durchsehen</h2>
+<p>Wer schon mal einen Browser benutzt hat, dürfte mit WebPositive keine großen Überraschungen erleben. Anstatt jedes Menü und Feature durchzugehen, hier nur einige der interessanteren Punkte.</p>
+<ul>
+<li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
+<p>Neue Reiter können mit dem <span class="key">+</span> Symbol rechts in der Reiterleiste geöffnet werden oder durch einen Doppelklick auf eine freie Fläche neben den Reitern, falls dafür noch Platz ist. Sind mehr Reiter geöffnet als in die Leiste passen, werden die <span class="key">&lt;</span> <span class="key">&gt;</span> Symbole aktiv, mit denen die Reiterleiste nach rechts und links gescrollt werden kann. Zur noch schnelleren Navigation dient das <span class="key">∨</span> Symbol ganz rechts, das ein Menü mit allen vorhandenen Reitern öffnet.</p></li>
+<li><p>Ein Klick mit der mittleren Maustaste öffnet einen Link in einem neuen Reiter, ohne den aktuellen Reiter zu verlassen.</p></li>
+<li><p>Mit <span class="menu">Zoom in</span> und <span class="menu">Zoom out</span> aus dem <span class="menu">View</span> Menü kann der Inhalt einer Seite vergrößert und verkleinert werden.  Bei aktivem <span class="menu">Zoom text only</span> wird nur der Text vergrößert, alle Bilder bleiben in Originalgröße.</p></li>
+<li><p>Ist die Einstellung zum Ausblenden der Oberfläche aktiviert, verschwindet beim Wechsel in den Vollbildmodus nach kurzer Zeit. Um sie kurzzeitig wieder einzublenden, muss man nur mit der Maus zum oberen Bildschirmrand fahren.</p></li>
+<li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
+<p>Während man eine Adresse in das Textfeld eingibt, sucht der Browser dazu passende URLs von Webseiten, die früher schon mal besucht wurden und listet sie unter dem Textfeld auf. Entweder man fügt weitere Buchstaben hinzu, um die Liste zu verkürzen oder wählt einen Eintrag mit <span class="key">↑</span> oder <span class="key">↓</span> aus. <span class="key">RETURN</span> lädt die Seite. Oder man klickt das Symbol ganz rechts in der Leiste, das auch zum Aktualisieren der Seite dient.<br />
+Eingaben, die nicht als URL erkannt werden, dienen als Suchbegriff für eine Google-Suche. Das Textfeld kann also auch für eine schnelle Websuche genutzt werden.</p></li>
+<li><p>Ein Rechtsklick öffnet ein Kontextmenü, mit dem, abhängig vom angeklickten Objekt, beispielsweise ein Link in einem neuen Fenster oder Reiter geöffnet, oder das Objekt runtergeladen werden kann etc.</p></li>
+<li><p><span class="menu">Edit | Find</span> öffnet eine Suchleiste unten im Fenster, um Begriffe auf der aktuellen Seite zu suchen. Die Fundstellen werden farbig hinterlegt.</p></li>
+</ul>
+<div class="box-info">Nach einer Weile kann es vorkommen, dass Webseiten immer langsamer geladen werden. Das ist nicht wirklich ein Bug, eher liegt das an einer ineffektiven Verwaltung von Cookies. Wie auch immer, bis dieses Problem gelöst ist, muss man selbst Hand anlegen. Und zwar an der Datei <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. Sie speichert die Cookies von Webseiten und wächst beim Surfen langsam an. Erreicht sie eine Größe von ein paar dutzend Kilobytes, wird das Surfen immer schwerfälliger. An dieser Stelle kann man die Datei einfach löschen, und alles läuft wieder fix, wie gewohnt.</div>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Lesezeichen</h2>
+<p>WebPositives Lesezeichen werden als einzelne Dateien und Ordner in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> verwaltet. Fügt man ein neues Lesezeichen hinzu, wird dort eine neue Datei erstellt. Dieser Ordner lässt sich bequem mit <span class="menu">Manage Bookmarks...</span> öffnen.</p>
+<img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
+<p>Man kann URL, Name und Titel eines Lesezeichens ändern und Begriffe als "Keywords" eingeben, wie bei jeder Datei mit Attributen. Dazu müssen in Trackers <span class="menu">Attribute</span> Menü nur all diese Spalten angezeigt werden. Dann markiert man eine Datei, drückt ALT E und editiert das Attribut. Spalten werden mittels TAB gewechselt. Lesezeichen lassen sich in selbst angelegte Ordner einsortieren.</p>
+<p>Weil der Tracker zur Verwaltung von Lesezeichen verwendet wird, lassen sich seine einzigartigen Features nutzen, um schnell zu finden was man sucht.<br />
+Ist das <span class="menu">Filtern während der Eingabe</span> in den <a href="../tracker.html#tracker-preferences">Trackereinstellungen</a> aktiviert, lässt sich die Liste der Lesezeichen im Handumdrehen so verkürzen, dass nur noch die gezeigt werden, die die eingegebene Zeichenkette enthalten. Noch ein paarmal <span class="key">↑</span> oder <span class="key">↓</span> drücken, um das entsprechende Lesezeichen zu markieren und ein <span class="key">RETURN</span> öffnet die Seite. Dabei sollte man alle Attributspalten eingeblendet haben, damit der Filter auch auf Name, Titel, URL und Keywords angewendet wird.</p>
+<p>Damit das gut funktioniert, sollten alle Lesezeichen direkt in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> abgelegt und nur Kopien in Unterordner einsortiert werden, um sie in WebPositives <span class="menu">Bookmarks</span> Menü zu nutzen (wenn überhaupt). Befüllte "Keywords" Attribute helfen übrigens auch...</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Downloads</h2>
+<p><span class="menu">Window | Downloads</span> öffnet ein Fenster mit allen vergangenen und laufenden Downloads:
+</p>
+<img src="../images/apps-images/webpositive-downloads.png" alt="webpositive-downloads.png" />
+<p>Gerade laufende Downloads werden mit einem Fortschrittsbalken dargestellt und zeigen, wie bei Kopieraktionen in Tracker, Informationen zu Downloadgeschwindigkeit, Dateigröße und voraussichtliche Endzeit. Rechts davon sind Buttons, um den Download abzubrechen (<span class="button">Cancel</span>) oder neu zu starten (<span class="button">Restart</span>) oder die Datei zu öffnen (<span class="button">Open</span>) und ihren Eintrag von der Liste zu entfernen (<span class="button">Remove</span>). <span class="button">Remove missing</span> und <span class="button">Remove finished</span> unter der Liste tun dies für alle Einträge. "Missing" sind Dateien, die in der Zwischenzeit gelöscht wurden.</p>
+<p>Wird eine Datei in den Papierkorb verschoben noch während sie heruntergeladen wird, wird der Download abgebrochen. Außerdem erscheint ihr Icon halb-transparent.<br />
+Sowieso ist WebPositive sehr tolerant, wenn es um Dateioperationen in Tracker geht. Dateien können umbenannt und verschoben werden, noch während sie heruntergeladen werden, und auch nachdem der Download abgeschlossen ist, werden solche Änderungen in den Einträgen im Downloads-Fenster weiter berücksichtigt.</p>
+<div class="box-info"><p>Wer wollte nicht schon mal wissen, von welcher Webseite ein bestimmtes Paket, Bild oder sonst eine Datei heruntergeladen wurde? Das lässt sich herausfinden, indem man die Datei in <a href="diskprobe.html">DiskProbe</a> öffnet und einen Blick in ihr META:url Attribute wirft.</p></div>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tastaturkürzel</h2>
+<p>Hier einige der wichtigsten Tastaturkürzel:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Opens a new tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window.</td></tr>
-<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current window.</td></tr>
-<tr><td><span class="key">CMD</span> click</td><td> </td><td>Opens the clicked link in a new background tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">R</span></td><td> </td><td>Refreshes the current page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks this page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">LEFT</span></td><td> </td><td>Goes back to the last Web page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Opens the Find bar for in-page searching.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td style="width:15px;"></td><td>Öffnet einen neuen Reiter.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Schließt den aktuellen Reiter.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Öffnet ein neues Fenster.</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Schließt das aktuelle Fenster.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">RETURN</span></td><td> </td><td>Wechselt in/aus Vollbildmodus</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">R</span> or  <span class="key">F5</span></td><td> </td><td>Aktualisiert die aktuelle Seite.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Öffnet die Startseite.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Blendet das Downloads-Fenster ein und aus.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Blendet die Suchleiste ein (Ausblenden mit <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Legt ein Lesezeichen an.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>Öffnet den Bookmarks-Ordner zum Verwalten von Lesezeichen.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Vorherige Seite aus der Historie.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Nächste Seite aus der Historie.</td></tr>
 </table>
-
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bookmarks" name="bookmarks">Bookmarks</a></h2>
-<p>One of WebPositive's unique features is its handling of bookmarks.</p>
-<img src="../images/apps-images/web+bookmarks.png" alt="web+bookmarks.png" />
-<br />
-<p>Web+ stores your bookmarks as files in Haiku's file system, and you can manage them with Tracker: <span class="key">ALT</span> <span class="key">M</span> will bring up your Bookmarks folder in Tracker. The files themselves are blank. Instead, Web+ stores each bookmark's URL and page title as <a href="../attributes.html">attributes</a>.</p>
-<p>There are a number of advantages to this format; attribute storage is easy to filter and edit. Make sure that you first make the bookmark attributes visible from the <span class="menu">Attributes</span> menu in Tracker first. To add keywords to a bookmark, just right-click the bookmark in Tracker and choose <span class="menu">Edit name</span>, then use <span class="key">TAB</span> to navigate to the keywords field. Once you're editing that field, type in your new keywords and press <span class="key">RETURN</span>. You can edit the names, page titles and URLs of existing bookmarks with the same process.</p>
-
-<div class="box-info">WebPositive's approach toward bookmarks allows for quick searching. In <span class="menu">Window | Preferences</span> in Tracker, go to the <span class="menu">Windows</span> tab and choose <em>Enable type-ahead filtering</em>. Now, whenever you are in a bookmark-filled folder in Tracker, you can type phrases from the title, URL, or keywords of the bookmark you want and filter through the results. This tip is especially helpful if you fill in keywords beforehand. Note that it only works for flat folders and not hierarchies, so you will need to copy your bookmarks into one folder to use this.</div>
-
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="downloads" name="downloads">Downloads</a></h2>
-<p>Web+ also supports managing your downloads in a similar way. The <em>Downloads</em> window appears when you begin a download; you can call it up manually from the <span class="menu">Windows</span> menu. From here, you can open, restart, or remove previous downloads.</p>
-<img src="../images/apps-images/web+downloads-window.png" alt="web+downloads-window.png" />
-<br />
-<p>Much like it does with bookmarks, Web+ stores information about each download as an attribute. The original URL of the download remains an attribute of the file, so you can always return to the source of the file.</p>
-<p>Web+ will update and adjust to changes to the downloaded files. Notice that <span class="path">sunday.pdf</span> was deleted, so its icon was ghosted out in the <em>Downloads</em> window. <span class="path">documents.html</span> was renamed from its original name of <span class="path">documents</span>, and the Downloads window updated accordingly. </p>
-<img src="../images/apps-images/web+downloads-folder.png" alt="web+downloads-folder.png" />
-<br />
-<div class="box-info">In the Web+ Settings, you can choose a default folder for downloads. However, if you need a download in a different place, just move it while downloading, and Web+ will continue to download. Moving the file to the Trash will cancel the download.</div>
-<div class="box-warning">Closing Web+ will cancel your current downloads! Web+ will pop up a warning dialog if you have an ongoing download and try to quit.</div>
 
 </div>
 </div>

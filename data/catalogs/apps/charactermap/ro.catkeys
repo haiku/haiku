@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	225914867
+1	romanian	x-vnd.Haiku-CharacterMap	1000631522
 Aegean numbers	UnicodeBlocks		Numere egeene
 Alphabetic presentation forms	UnicodeBlocks		Forme de prezentare alfabetică
 Ancient Greek musical notation	UnicodeBlocks		Notație muzicală greaca veche
@@ -33,8 +33,10 @@ CJK unified ideographs extension A	UnicodeBlocks		Ideografuri unificate CJK exte
 CJK unified ideographs extension B	UnicodeBlocks		Ideografuri unificate CJK extensie B
 Carian	UnicodeBlocks		Carian
 Cham	UnicodeBlocks		Cham
+CharacterMap	System name		HartăCaractere
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Eliberează
+Code	CharacterWindow		Cod
 Combining diacritical marks	UnicodeBlocks		Combinare semne diacritice
 Combining diacritical marks for symbols	UnicodeBlocks		Combinare semne diacritice pentru simboluri
 Combining diacritical marks supplement	UnicodeBlocks		Supliment de combinare semne diacritice
@@ -55,13 +57,17 @@ Devanagari	UnicodeBlocks		Devanagari
 Dingbats	UnicodeBlocks		Simboluri grafice
 Domino tiles	UnicodeBlocks		Mozaic Domino
 Enclosed CJK letters and months	UnicodeBlocks		Litere și luni CJK încercuite
+Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Ethiopic	UnicodeBlocks		Etiopic
 Ethiopic extended	UnicodeBlocks		Etiopic extins
+File	CharacterWindow		Fișier
 Filter:	CharacterWindow		Filtru:
+Font	CharacterWindow		Font
 Font size:	CharacterWindow		Mărime font:
 General punctuation	UnicodeBlocks		Punctuație generală
 Geometric shapes	UnicodeBlocks		Forme geometrice
 Georgian	UnicodeBlocks		Georgian
+Georgian supplement	UnicodeBlocks		Supliment georgian
 Glagotic	UnicodeBlocks		Glagotic
 Gothic	UnicodeBlocks		Gotic
 Greek and Coptic	UnicodeBlocks		Greacă și coptic
@@ -116,6 +122,7 @@ Myanmar	UnicodeBlocks		Myanmar
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Tai Lue nou
 Number forms	UnicodeBlocks		Forme de numere
+Ogham	UnicodeBlocks		Ogam
 Ol Chiki	UnicodeBlocks		Ol Chiki
 Old Persian	UnicodeBlocks		Persiană veche
 Old italic	UnicodeBlocks		Italic vechi
@@ -165,6 +172,7 @@ Vai	UnicodeBlocks		Vai
 Variation selectors	UnicodeBlocks		Selectori de variație
 Variation selectors supplement	UnicodeBlocks		Supliment selectori de variație
 Vertical forms	UnicodeBlocks		Forme verticale
+View	CharacterWindow		Vizualizare
 Yi Radicals	UnicodeBlocks		Radicali Yi
 Yi syllables	UnicodeBlocks		Silabe Yi
 Yijing hexagram symbols	UnicodeBlocks		Simboluri hexagram Yijing

@@ -1,0 +1,32 @@
+1	japanese	x-vnd.Haiku-LaunchBox	3807026689
+Add button here	LaunchBox		ここにボタンを追加
+Auto-raise	LaunchBox		自動的に前面へ
+Bummer	LaunchBox		失敗
+Cancel	LaunchBox		キャンセル
+Clear button	LaunchBox		ボタンを消去
+Clone	LaunchBox		複製
+Close	LaunchBox		閉じる
+Description for '%3'	LaunchBox		'%3' の説明
+Failed to launch '%1'.\n\nError: 	LaunchBox		'%1' の起動に失敗しました。\n\nエラー:
+Failed to launch 'something',error in Pad data.	LaunchBox		起動に失敗しました
+Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		アプリケーション(シグネチャ '%2')の起動に失敗しました。\n\nエラー:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Tracker への 'open folder' コマンドの送信に失敗しました。\n\nError:
+Horizontal layout	LaunchBox		水平配置
+Icon size	LaunchBox		アイコンサイズ
+Ignore double-click	LaunchBox		ダブルクリックを無視する
+New	LaunchBox		新規作成
+OK	LaunchBox		OK
+Pad	LaunchBox		パッド
+Pad %1	LaunchBox		パッド %1
+Pad 1	LaunchBox		パッド 1
+Quit	LaunchBox		終了
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		このパッドを閉じてよろしいですか?\n(パッドは記憶されません。)
+Remove button	LaunchBox		ボタンを削除
+Set description…	LaunchBox		説明の作成…
+Settings	LaunchBox		設定
+Show on all workspaces	LaunchBox		すべてのワークスペースに表示
+Show window border	LaunchBox		ウィンドウ枠を表示
+Vertical layout	LaunchBox		垂直配置
+You can drag an icon here.	LaunchBox		ここにアイコンをドラッグしてください
+last chance	LaunchBox		最後のチャンス
+launch popup	LaunchBox		ポップアップを起動

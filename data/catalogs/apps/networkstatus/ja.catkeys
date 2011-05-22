@@ -1,0 +1,21 @@
+1	japanese	x-vnd.Haiku-NetworkStatus	3946594365
+%ifaceName information:\n	NetworkStatusView		%ifaceName 情報:\n
+<no wireless networks found>	NetworkStatusView		<無線ネットワークが見つかりません>
+Address	NetworkStatusView		アドレス
+Broadcast	NetworkStatusView		ブロードキャスト
+Configuring	NetworkStatusView		設定中
+Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できませんでした。
+Install in Deskbar	NetworkStatus		Deskbarにインストール
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		ネットワーク設定の起動に失敗しました。\n\nエラー:
+Netmask	NetworkStatusView		ネットマスク
+NetworkStatus	System name		ネットワーク状況
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n
+No link	NetworkStatusView		リンク無し
+No stateful configuration	NetworkStatusView		ステートフル設定がありません
+OK	NetworkStatusView		OK
+Open network preferences…	NetworkStatusView		ネットワーク設定を開く...
+Quit	NetworkStatusView		終了
+Ready	NetworkStatusView		完了
+Run in window	NetworkStatus		ウィンドウで実行
+Unknown	NetworkStatusView		不明
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		NetworkStatusをウィンドウで動かしたり、Deskbarにインストールできます。

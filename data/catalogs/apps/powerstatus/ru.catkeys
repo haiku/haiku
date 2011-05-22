@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	4269725527
+1	russian	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		О программе
 About…	PowerStatus		О программе…
 Battery charging	PowerStatus		Батарея заряжается
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1:
 Capacity granularity 2: 	PowerStatus		Детализация ёмкости 2: 
 Capacity: 	PowerStatus		Емкость: 
 Current rate: 	PowerStatus		Текущее значение: 
+Damaged battery	PowerStatus		Поврежденная батарея
 Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
 Design capacity warning: 	PowerStatus		Уровень низкого заряда: 
 Design capacity: 	PowerStatus		Штатная емкость: 

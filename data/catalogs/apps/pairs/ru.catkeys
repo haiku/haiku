@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-Pairs	1981673050
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		Pairs\n\tразработал Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nВы прошли игру за %s кликов.\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tВсе права защищены © 2008-2010 Haiku, Inc.\n\nВы прошли игру за %num% кликов.\n
 Beginner (4x4)	PairsWindow		Новичок (4x4)
 Expert (8x8)	PairsWindow		Эксперт (8x8)
 Game	PairsWindow		Игра

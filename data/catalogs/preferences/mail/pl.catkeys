@@ -1,17 +1,14 @@
-1	polish	x-vnd.Haiku-Mail	3462213940
+1	polish	x-vnd.Haiku-Mail	2325945990
 Account name:	Config Views		Nazwa konta:
 Account settings	Config Views		Ustawienia konta
 Accounts	Config Window		Konta
 Add	Config Window		Dodaj
-Alpha	Config Window		Alpha
 Always	Config Window		Zawsze
 Apply	Config Window		Zastosuj
-Beta	Config Window		Beta
 Check every	Config Window		Sprawdzaj co
 Edit mailbox menu…	Config Window		Edytuj menu skrzynki pocztowej
 Error	Config Window		Błąd
 Error retrieving general settings: %s\n	Config Window		Błąd podczas odbierania globalnych ustawień: %s\n
-Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Zamiennik Daemona Poczty\n\nprzez Haiku, Inc. Wszelkie prawa zastrzeżone.\n\nWersja %ld.%ld.%ld %s\n\nŻeby uzyskać więcej informacji, zobacz plik LICENSE zawarty w paczce instalacyjnej.\n\n\n\nMożesz się z nami skontaktować pod:\n%s\n\nRaporty błędów prosimy wysyłać używając %s\n\nStrona domowa projektu:\n%s
 Mail checking	Config Window		Sprawdzanie wiadomości
 Miscellaneous	Config Window		Inne
 OK	Config Window		OK

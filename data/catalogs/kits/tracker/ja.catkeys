@@ -66,7 +66,7 @@ Copy	FilePanelPriv		コピー
 Copy here	ContainerWindow		ここにコピー
 Copy layout	ContainerWindow		レイアウトをコピー
 Copy more	ContainerWindow		さらにコピー
-Copy to	ContainerWindow		指定フォルダにコピー
+Copy to	ContainerWindow		指定先にコピー
 Copying: 	StatusWindow		コピー中：
 Could not find an application to open \"%name\" (%error). 	FSUtils		%errorエラーが発生したため、\"%name\" を開くアプリケーションが見つかりませんでした。
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
@@ -82,7 +82,7 @@ Could not update permissions of file \"%name\". %error	FSUtils		\"%name\"の権�
 Create %s clipping	PoseView		%s クリップを作成
 Create a Query	FindPanel		クエリーを作成
 Create a Query template	FindPanel		クエリ雛型の作成
-Create link	ContainerWindow		リンクを作成
+Create link	ContainerWindow		指定先にリンクを作成
 Create link here	ContainerWindow		ここにリンクを作成
 Create relative link	ContainerWindow		相対リンクを作成
 Create relative link here	ContainerWindow		ここに相対リンクを作成
@@ -214,7 +214,7 @@ Mount settings…	SettingsView		マウント設定…
 Mount settings…	VolumeWindow		マウント設定…
 Move	PoseView		移動
 Move here	ContainerWindow		ここに移動
-Move to	ContainerWindow		指定フォルダに移動
+Move to	ContainerWindow		指定先に移動
 Move to Trash	ContainerWindow		ごみ箱に捨てる
 Move to Trash	FSUtils		ごみ箱に移動
 Move to Trash	FilePanelPriv		ごみ箱に捨てる
@@ -255,7 +255,7 @@ Open and make preferred	OpenWithWindow		関連づけて開く
 Open parent	ContainerWindow		親フォルダを開く
 Open selection with:	OpenWithWindow		選択ファイルをアプリケーションで開く：
 Open with…	ContainerWindow		指定アプリケーションで開く…
-Opens with:	InfoWindow		このアプリケーションで開く：
+Opens with:	InfoWindow		アプリケーション：
 Or	FindPanel		または
 Original name	ContainerWindow		元の名前
 Other	FilePermissionsView		その他

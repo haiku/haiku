@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.CodyCam	2416864674
+1	swedish	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Kan inte hitta en tillgänglig anslutning till videofönstret
 Cannot connect the video source to the video window	CodyCam		Kan inte ansluta videkällan till videofönstret
 Cannot create a video window	CodyCam		Kan inte skapa ett videofönster
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Bildfrekvensmeny
 Capture controls	CodyCam		Inhämtningsinställningar
 Capturing Image…	VideoConsumer.cpp		Fångar bild…
 Closing the window\n	VideoConsumer.cpp		Stänger fönstret\n
-CodyCam	System name		CodyKamera
+CodyCam	Application name		CodyKamera
 Connected…	VideoConsumer.cpp		Ansluen...
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunde inte hitta den begärda katalogen på servern
 Directory:	CodyCam		Katalog:

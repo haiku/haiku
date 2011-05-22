@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku.CodyCam	3353004969
+1	romanian	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Nu se poate găsi o conexiune disponibilă la fereastra video
 Cannot connect the video source to the video window	CodyCam		Nu se poate conecta sursa video la fereastra video
 Cannot create a video window	CodyCam		Nu se poate crea o fereastră video
@@ -17,6 +17,7 @@ Capture Rate Menu	CodyCam		Meniul cotei de capturare
 Capture controls	CodyCam		Controale de captură
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea...
 Closing the window\n	VideoConsumer.cpp		Se închide fereastra\n
+CodyCam	Application name		CodyCam
 Connected…	VideoConsumer.cpp		Conectat...
 Couldn't find requested directory on server	VideoConsumer.cpp		Nu s-a putut găsi dosarul cerut pe server
 Directory:	CodyCam		Dosar:

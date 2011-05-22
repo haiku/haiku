@@ -1,15 +1,18 @@
-1	belarusian	x-vnd.Be-TSKB	767695960
+1	belarusian	x-vnd.Be-TSKB	1962084612
 <Be folder is empty>	BeMenu		<Be каталёг пусты>
 About Haiku	BeMenu		Пра Haiku
 Always on top	PreferencesWindow		Заўсёды наверсе
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
 Applications	PreferencesWindow		Праграмы
 Auto-raise	PreferencesWindow		Узнікаць аўтаматычна
 Change time…	TimeView		Змяніць час...
 Clock	PreferencesWindow		Гадзіннік
 Close all	WindowMenu		Закрыць усё
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Прыклады
 Deskbar	System name		Дэскбар
 Deskbar preferences	PreferencesWindow		Наладкі Deskbar
 Deskbar preferences…	BeMenu		Наладкі Deskbar...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Праграмкі Дэсктопу
 Edit menu…	PreferencesWindow		Змяніць меню...
 Expand new applications	PreferencesWindow		Разгарнуць новыя праграмы
 Find…	BeMenu		Знайсці...
@@ -19,6 +22,7 @@ Menu	PreferencesWindow		Меню
 Mount	BeMenu		Змантаваць
 No windows	WindowMenu		Без вокнаў
 Power off	BeMenu		Выключыць
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Наладкі
 Quit application	WindowMenu		Выйсці з праграмы
 Recent applications	BeMenu		Нядаўнія праграмы
 Recent applications:	PreferencesWindow		Нядаўнія праграмы

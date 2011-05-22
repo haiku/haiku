@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ScreenSaver	1401896374
+1	belarusian	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 секунд
 Add…	ScreenSaver		Дадаць...
 Blackness	ScreenSaver		Чарната
@@ -8,7 +8,9 @@ Could not load screen saver	ScreenSaver		Не ўдалося загрузіць 
 Display Power Management Signaling not available	ScreenSaver		Кіраванне сілкаваннем дысплэя (DPMS) не падтрымліваецца
 Don't fade when	ScreenSaver		Не марнець, калі
 Done	ScreenSaver		Гатова
+Enable screensaver	ScreenSaver		Уключыць захавальнік
 Fade now when	ScreenSaver		Марнець адразу ж, калі
+General	ScreenSaver		Агульныя
 No options available	ScreenSaver		Ніякія опцыі недаступныя
 OK	ScreenSaver		ОК
 Password Window	ScreenSaver		Вакно Пароля
@@ -17,6 +19,9 @@ Password:	ScreenSaver		Пароль:
 Passwords don't match. Please try again.	ScreenSaver		Паролі не супадаюць
 Password…	ScreenSaver		Пароль...
 ScreenSaver	System name		Захавальнік Экрана
+Screensaver settings	ScreenSaver		Наладкі захавальніка
+Screensavers	ScreenSaver		Захавальнікі экрана
+Start screensaver	ScreenSaver		Запусціць захавальнік
 Test	ScreenSaver		Тэст
 Turn off screen	ScreenSaver		Выключыць экран
 Use custom password	ScreenSaver		Карыстацца асаблівым паролем

@@ -1,7 +1,12 @@
-1	japanese	x-vnd.Be-MAIL	1307235645
+1	japanese	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - 日付
 %e - E-mail address	Mail		%e - メールアドレス
+%e wrote:\\n	Mail		%e は書きました:\\n
 %n - Full name	Mail		%n - 名前
+(Address unavailable)	Mail		(アドレスが利用できません)
+(Date unavailable)	Mail		(日付が利用できません)
+(Name unavailable)	Mail		(名前が利用できません)
+<none>	Mail		<無し>
 Account from mail	Mail		メッセージを受信したアカウント
 Account:	Mail		アカウント：
 Accounts…	Mail		アカウントの設定…
@@ -14,6 +19,7 @@ An error occurred trying to save this signature.	Mail		署名を保存しよう�
 Attach attributes:	Mail		属性の添付：
 Attachments:	Mail		添付ファイル：
 Auto signature:	Mail		署名の自動的追加：
+Automatic	Mail		自動
 Automatically mark mail as read:	Mail		メールを自動的に既読に設定：
 Bcc:	Mail		Bcc:
 Beginner	Mail		初心者
@@ -29,6 +35,7 @@ Copy link location	Mail		このリンクのアドレスをコピー
 Copy to new	Mail		新規メッセージにコピー
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
 Cut	Mail		切り取り
+Date:	Mail		日付：
 Decoding:	Mail		文字コード：
 Default account:	Mail		標準アカウント：
 Delete	Mail		削除
@@ -57,6 +64,7 @@ Initial spell check mode:	Mail		スペルチェックモード：
 Leave as '%s'	Mail		「%s」のままにする
 Leave as New	Mail		「新着」のままにする
 Leave same	Mail		変更しません
+Mail	System name		メール
 Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
 Mail preferences	Mail		Mail の設定
 Mailing	Mail		メールの設定
@@ -68,7 +76,11 @@ New mail message	Mail		新規メッセージ
 Next	Mail		次へ
 Next message	Mail		次のメッセージ
 No file attributes, just plain data	Mail		ファイル属性を付けない（データのみ）
+No matches	Mail		一致しません
 None	Mail		無し
+OK	Mail		OK
+Off	Mail		オフ
+On	Mail		オン
 Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
 Open	Mail		開く
 Open attachment	Mail		添付ファイルを開く
@@ -81,6 +93,7 @@ Previous	Mail		前
 Previous message	Mail		前のメッセージ
 Print	Mail		印刷
 Print…	Mail		印刷…
+Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリーテンプレートをこのフォルダに入れてください。
 Queries	Mail		クエリ
 Quit	Mail		終了
 Quote	Mail		引用符をつける
@@ -137,3 +150,11 @@ View	Mail		表示
 Warn unencodable:	Mail		文字コード不一致通知：
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください（代用文字が Unicode 化可能な文字に代わって使われます）。文字セットを変更する場合、「中止」ボタンを押して下さい。
 \\n - Newline	Mail		\\n - 改行
+draft	B_USER_DIRECTORY/mail/draft		下書き
+helpful message	Mail		有益なメッセージ
+in	B_USER_DIRECTORY/mail/in		受信トレイ
+mail	B_USER_DIRECTORY/mail		メール
+out	B_USER_DIRECTORY/mail/out		送信トレイ
+queries	B_USER_DIRECTORY/mail/queries		クエリ
+sent	B_USER_DIRECTORY/mail/sent		送信済みメール
+spam	B_USER_DIRECTORY/mail/spam		スパム

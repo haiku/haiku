@@ -1,0 +1,12 @@
+1	japanese	x-vnd.Be-WORK	932379173
+About Workspaces…	Workspaces		Workspaces について…
+Always on top	Workspaces		常に最前面に
+Auto-raise	Workspaces		自動的に表示
+Change workspace count…	Workspaces		ワークスペースの数を変更…
+Invalid argument: %s\n	Workspaces		無効な引数: %s\n
+OK	Workspaces		OK
+Quit	Workspaces		終了
+Show window border	Workspaces		ウインドウ枠を表示
+Show window tab	Workspaces		ウインドウタブを表示
+Workspaces	System name		ワークスペース
+Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n %1 および %2 作\n\nCopyright %3, Haiku.\n\nオプションキーでウインドウを後方に送れます。\nコントロールキーでウインドウを前面に移動できます。\n
