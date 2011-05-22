@@ -426,8 +426,8 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.4-x86-gcc4-2011-05-03.zip
-				: $(baseURL)/cmake-2.8.4-x86-gcc4-2011-05-03.zip
+				cmake-2.8.4-r1a3-x86-gcc4-2011-05-21.zip
+				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc4-2011-05-21.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -807,8 +807,8 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				git-1.7.5-x86-gcc4-2011-05-10.zip
-				: $(baseURL)/git-1.7.5-x86-gcc4-2011-05-10.zip
+				git-1.7.5-r1a3-x86-gcc4-2011-05-21.zip
+				: $(baseURL)/git-1.7.5-r1a3-x86-gcc4-2011-05-21.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
