@@ -319,18 +319,23 @@ PlainTextCatalog::WriteToFile(const char *path)
 	CatMap::Iterator iter = fCatMap.GetIterator();
 	CatMap::Entry entry;
 	BString original;
+	BString comment;
 	BString translated;
 
 	while (iter.HasNext()) {
 		entry = iter.Next();
 		original = entry.key.fString;
+		comment = entry.key.fComment;
 		translated = entry.value;
+
 		escapeQuotedChars(original);
+		escapeQuotedChars(comment);
 		escapeQuotedChars(translated);
+
 		textContent.Truncate(0);
 		textContent << original.String() << "\t"
 			<< entry.key.fContext.String() << "\t"
-			<< entry.key.fComment.String() << "\t"
+			<< comment << "\t"
 			<< translated.String() << "\n";
 		res = catalogFile.Write(textContent.String(),textContent.Length());
 		if (res != textContent.Length())
