@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku.CodyCam	441085909
+1	czech	x-vnd.Haiku.CodyCam	2416864674
 Can't find an available connection to the video window	CodyCam		Nemohu najít žádné dostupné připojení k oknu videa
 Cannot connect the video source to the video window	CodyCam		Nemohu připojit zdroj videa k oknu videa
 Cannot create a video window	CodyCam		Nemohu vytvořit okno videa
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Menu četnosti zachycení
 Capture controls	CodyCam		Ovládání zachycení
 Capturing Image…	VideoConsumer.cpp		Zachycení obrázku...
 Closing the window\n	VideoConsumer.cpp		Zavírám okno\n
-CodyCam	Application name		CodyCam
+CodyCam	System name		CodyCam
 Connected…	VideoConsumer.cpp		Připojeno...
 Couldn't find requested directory on server	VideoConsumer.cpp		Nebylo možné na serveru najít požadovaný adresář 
 Directory:	CodyCam		Adresář:

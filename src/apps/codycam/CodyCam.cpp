@@ -6,6 +6,7 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
