@@ -24,7 +24,7 @@ ConnectionReader::ConnectionReader(ServerConnection* connection)
 
 status_t
 ConnectionReader::GetNextLine(BString& line, bigtime_t timeout,
-	uint32 minUnfinishedLine)
+	int32 maxUnfinishedLine)
 {
 	line.SetTo((const char*)NULL, 0);
 
@@ -33,7 +33,7 @@ ConnectionReader::GetNextLine(BString& line, bigtime_t timeout,
 		if (status == B_OK)
 			return status;
 		if (status == B_NAME_NOT_FOUND) {
-			if (line.Length() < (int32)minUnfinishedLine)
+			if (maxUnfinishedLine < 0 || line.Length() < maxUnfinishedLine)
 				continue;
 			else
 				return status;

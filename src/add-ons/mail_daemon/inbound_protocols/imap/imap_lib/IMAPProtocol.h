@@ -32,7 +32,7 @@ public:
 			minUnfinishedLine characters are returned. */
 			status_t			GetNextLine(BString& line,
 									bigtime_t timeout = kIMAP4ClientTimeout,
-									uint32 minUnfinishedLine = 128);
+									int32 maxUnfinishedLine = -1);
 			/*! Read data and append it to line till the end of file is
 			reached. */
 			status_t			FinishLine(BString& line);
