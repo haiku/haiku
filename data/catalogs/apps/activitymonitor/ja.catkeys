@@ -1,4 +1,9 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	92864221
+1	japanese	x-vnd.Haiku-ActivityMonitor	1595339349
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+%.1f faults/s	DataSource		%.1f フォールト/s
+%lld ms	SettingsWindow		%lld マイクロ秒
+%lld sec.	SettingsWindow		%lld 秒
 Add graph	ActivityWindow		グラフの追加
 Additional items	ActivityView		追加項目
 Apps	DataSource		アプリ
@@ -11,6 +16,7 @@ Cache	DataSource		キャッシュ
 Cached memory	DataSource		キャッシュメモリー
 File	ActivityWindow		ファイル
 Hide legend	ActivityView		文字を隠す
+MB	DataSource		MB
 Media nodes	DataSource		メディアノード数
 Memory	DataSource		メモリー
 Network receive	DataSource		ネットワーク受信バイト数
@@ -19,6 +25,7 @@ P-faults	DataSource		ページフォルト
 Page faults	DataSource		ページフォルト数
 Ports	DataSource		ポート数
 Quit	ActivityWindow		終了
+RX	DataSource	Shorter version for Receiving.	受信
 Receiving	DataSource		受信バイト数
 Remove graph	ActivityView		グラフの削除
 Running applications	DataSource		実行中のアプリケーション数
@@ -26,9 +33,11 @@ Semaphores	DataSource		セマフォ数
 Sems	DataSource		セマフォ
 Sending	DataSource		送信バイト数
 Settings	ActivityWindow		設定
+Settings…	ActivityWindow		設定…
 Show legend	ActivityView		文字を表示
 Swap	DataSource		スワップ
 Swap space	DataSource		スワップサイズ
+TX	DataSource	Shorter version for Sending	送信
 Teams	DataSource		チーム数
 Threads	DataSource		スレッド数
 Update time interval:	SettingsWindow		更新間隔：

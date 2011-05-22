@@ -1,21 +1,14 @@
-1	italian	x-vnd.Haiku-Mail	3932988575
+1	italian	x-vnd.Haiku-Mail	3850363888
 Account name:	Config Views		Nome account:
 Account settings	Config Views		Impostazioni account
 Accounts	Config Window		Account
 Add	Config Window		Aggiungi
-Alpha	Config Window		Alfa
 Always	Config Window		Sempre
 Apply	Config Window		Applica
-Beta	Config Window		Beta
 Check every	Config Window		Controlla ogni
-Development	Config Window		Sviluppo
 Edit mailbox menu…	Config Window		Modifica menu della casella di posta...
 Error	Config Window		Errore
 Error retrieving general settings: %s\n	Config Window		Errore nel recupero delle impostazioni generali: %s\n
-Final	Config Window		Finale
-Gamma	Config Window		Gamma
-Golden master	Config Window		Golden master
-Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nda Haiku, Inc. Tutti i diritti riservati.\n\nVersione %ld.%ls.%ls %s\n\nVedi il file LICENSE inclusi nel pacchetto di installazione per altre informazioni.\n\n\n\nÈ possibile contattarci a:\n%s\n\nInvia il rapporto di un bug usando il %s\n\nHomepage del progetto a:\n%s
 Mail checking	Config Window		Controllo posta
 Miscellaneous	Config Window		Altro
 OK	Config Window		OK

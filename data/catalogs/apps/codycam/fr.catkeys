@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku.CodyCam	2416864674
+1	french	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Impossible de trouver une connexion avec la fenêtre vidéo
 Cannot connect the video source to the video window	CodyCam		Impossible de connecter la source vidéo à la fenêtre vidéo
 Cannot create a video window	CodyCam		Impossible de créer une fenêtre vidéo
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Menu de vitesse de capture
 Capture controls	CodyCam		Contrôles de capture
 Capturing Image…	VideoConsumer.cpp		Capture d'une image…
 Closing the window\n	VideoConsumer.cpp		Fermeture de la fenêtre\n
-CodyCam	System name		CodyCam
+CodyCam	Application name		CodyCam
 Connected…	VideoConsumer.cpp		Connecté...
 Couldn't find requested directory on server	VideoConsumer.cpp		Impossible de trouver le dossier demandé sur le serveur
 Directory:	CodyCam		Dossier :

@@ -1,4 +1,5 @@
-1	french	x-vnd.haiku-icon_o_matic	2721164210
+1	french	x-vnd.haiku-icon_o_matic	492420399
+<modify path>	Icon-O-Matic-PathCmd		<modifier le chemin>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
 <unkown property>	Icon-O-Matic-PropertyNames		<propriétés inconnue>
@@ -6,15 +7,20 @@ Add	Icon-O-Matic-PathsList		Ajouter
 Add	Icon-O-Matic-StylesList		Ajouter
 Add	Icon-O-Matic-TransformersList		Ajouter
 Add Control Point	Icon-O-Matic-AddPointCmd		Ajouter un point de contrôle
+Add Shape	Icon-O-Matic-AddShapesCmd		Ajouter une forme
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Add Styles	Icon-O-Matic-AddStylesCmd		Ajouter des styles
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Ajouter une transformation
 Add circle	Icon-O-Matic-PathsList		Ajouter un cercle
+Add shape with style	Icon-O-Matic-Menu-Shape		Ajouter une forme avec un style
 All	Icon-O-Matic-Properties		Tout
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
 Cancel	Icon-O-Matic-ColorPicker		Annuler
+Cancel	Icon-O-Matic-Menu-Settings		Annuler
 Cancel	Icon-O-Matic-SVGExport		Annuler
 Change Color	Icon-O-Matic-SetColorCmd		Changer la couleur
 Clean up	Icon-O-Matic-PathsList		Nettoyer
+Close	Icon-O-Matic-Menu-File		Fermer
 Closed	Icon-O-Matic-PropertyNames		Fermé
 Color	Icon-O-Matic-PropertyNames		Couleur
 Color	Icon-O-Matic-StyleTypes		Couleur
@@ -25,6 +31,7 @@ Contour	Transformation		Contour
 Copy	Icon-O-Matic-Properties		Copier
 Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation
 Diamond	Icon-O-Matic-StyleTypes		Diamant
+Discard	Icon-O-Matic-Menu-Settings		Abandonner
 Duplicate	Icon-O-Matic-PathsList		Dupliquer
 Duplicate	Icon-O-Matic-ShapesList		Dupliquer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
@@ -35,6 +42,7 @@ Error: 	Icon-O-Matic-Main		Erreur :
 Export	Icon-O-Matic-Menu-File		Exporter
 Export Icon	Dialog title		Exporter l'icône
 Export as…	Icon-O-Matic-Menu-File		Exporter sous…
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Impossible d'ouvrir le fichier « %s » en tant que document SVG.\n\nError : %s
 File	Icon-O-Matic-Menus		Fichier
 Format	Icon-O-Matic-SavePanel		Format
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Figer la forme
@@ -44,6 +52,7 @@ Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
 HVIF Source Code	Icon-O-Matic-SavePanel		Code source HVIF
 Height	Icon-O-Matic-PropertyNames		Hauteur
 Icon-O-Matic	System name		Icon-O-Matic
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic peut ne pas avoir interprété toutes les données du fichier SVG lors de son importation. En sauvegardant par-dessus le fichier original, ces informations seront perdues.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Insérer un point de contrôle
 Linear	Icon-O-Matic-StyleTypes		Linéaire
 META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
@@ -54,6 +63,7 @@ Move Shape	Icon-O-Matic-MoveShapesCommand		Déplacer la forme
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Déplacer les formes
 Move Style	Icon-O-Matic-MoveStylesCmd		Déplacer le style
 Name	Icon-O-Matic-PropertyNames		Nom
+New	Icon-O-Matic-Menu-File		Nouveau
 No	Icon-O-Matic-StyledTextImport		Non
 None	Icon-O-Matic-Properties		Aucun
 OK	Icon-O-Matic-ColorPicker		OK
@@ -81,6 +91,8 @@ Remove	Icon-O-Matic-ShapesList		Enlever
 Remove	Icon-O-Matic-StylesList		Enlever
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Enlever le point de contrôle
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Enlever les points de contrôle
+Remove Path	Icon-O-Matic-RemovePathsCmd		Enlever le chemin
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Enlever les chemins
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Enlever la forme
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Enlever les formes
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Enlever le style
@@ -90,9 +102,11 @@ Reset transformation	Icon-O-Matic-ShapesList		Annuler la transformation
 Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
 Rotation	Icon-O-Matic-PropertyNames		Rotation
 Save	Icon-O-Matic-Menu-File		Enregistrer
+Save	Icon-O-Matic-Menu-Settings		Sauvegarder
 Save Icon	Dialog title		Enregistrer icône
 Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…
 Saving your document failed!	Icon-O-Matic-Exporter		L'enregistrement du document a échoué !
+Scale	Icon-O-Matic-TransformationBoxStates		Échelle
 Select	Icon-O-Matic-Properties		Sélectionner
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Settings…	Icon-O-Matic-SavePanel		Réglages…

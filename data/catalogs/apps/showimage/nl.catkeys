@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-ShowImage	3102627336
+1	dutch	x-vnd.Haiku-ShowImage	2456309520
 Browse	Menus		Doorzoeken
 Cancel	ClosePrompt		Annuleren
 Clear selection	Menus		Selectie wissen
@@ -29,6 +29,7 @@ OK	SaveToFile		Oké
 Open…	Menus		Openen...
 Original size	Menus		Oorspronkelijke maat
 Page setup…	Menus		Paginaconfiguratie...
+Previous file	Menus		Vorig bestand
 Previous file	Menus		Vorige bestand
 Previous page	Menus		Vorige pagina
 Print options	PrintOptionsWindow		Afdrukopties

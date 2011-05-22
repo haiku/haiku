@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Mouse	3904912604
+1	japanese	x-vnd.Haiku-Mouse	1033564338
 ...by Andrew Edward McCall	MouseApplication		...by Andrew Edward McCall
 1-Button	SettingsView		1 ボタン
 2-Button	SettingsView		2 ボタン
@@ -14,6 +14,7 @@ Fast	SettingsView		速い (大)
 Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
 Focus mode:	SettingsView		フォーカスモード：
 Instant warp	SettingsView		簡易ワープ
+Mouse	System name		マウス
 Mouse acceleration	SettingsView		マウスの加速度
 Mouse speed	SettingsView		マウスの速度
 Mouse type:	SettingsView		マウスの種類：

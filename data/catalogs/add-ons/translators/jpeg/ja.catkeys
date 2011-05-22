@@ -1,0 +1,12 @@
+1	japanese	x-vnd.Haiku-JPEGTranslator	3849438920
+About	JPEGTranslator		JPEG Translatorについて
+High	JPEGTranslator		高い
+ISO	exit_parser		ISO
+JPEG images	JPEGTranslator		JPEGイメージ
+Low	JPEGTranslator		低い
+Orientation	exit_parser		向き
+Output quality	JPEGTranslator		出力品質
+Read greyscale images as RGB32	JPEGTranslator		グレイスケールイメージをRGB32として読み込む
+Use progressive compression	JPEGTranslator		プログレッシブ圧縮を使用する
+Write	JPEGTranslator		書き出し
+Write black-and-white images as RGB24	JPEGTranslator		モノクロイメージをRGB24として書き出す

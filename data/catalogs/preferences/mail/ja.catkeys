@@ -1,0 +1,31 @@
+1	japanese	x-vnd.Haiku-Mail	1251962090
+Account name:	Config Views		アカウント名:
+Account settings	Config Views		アカウント設定
+Accounts	Config Window		アカウント
+Add	Config Window		追加
+Always	Config Window		常に
+Apply	Config Window		適用
+Check every	Config Window		 
+E-mail	System name		メール
+Edit mailbox menu…	Config Window		メールボックスメニューの編集…
+Error	Config Window		エラー
+Mail checking	Config Window		メールチェック
+Miscellaneous	Config Window		その他
+OK	Config Window		OK
+Only when dial-up is connected	Config Window		ダイアルアップ接続のときのみ
+Real name:	Config Views		本名：
+Remove	Config Window		削除
+Return address:	Config Views		返信先アドレス：
+Revert	Config Window		元に戻す
+Settings	Config Window		設定
+Show connection status window:	Config Window		通信状況ウインドウを表示
+Start mail services on startup	Config Window		スタートアップ時にメールサービスを開始する
+While sending	Config Window		送信中に
+While sending and receiving	Config Window		送受信中に
+days	Config Window		日
+hours	Config Window		時間毎にチェック
+minutes	Config Window		分毎にチェック
+never	Config Window		手動でチェック
+· E-mail filters	Config Window		· メールフィルタ
+· Incoming	Config Window		· 受信
+· Outgoing	Config Window		· 送信

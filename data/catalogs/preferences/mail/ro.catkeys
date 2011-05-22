@@ -1,20 +1,14 @@
-1	romanian	x-vnd.Haiku-Mail	964584951
+1	romanian	x-vnd.Haiku-Mail	240422834
 Account name:	Config Views		Nume cont:
 Account settings	Config Views		Configurări cont
 Accounts	Config Window		Conturi
 Add	Config Window		Adaugă
-Alpha	Config Window		Alfa
 Always	Config Window		Întotdeauna
 Apply	Config Window		Aplică
-Beta	Config Window		Beta
 Check every	Config Window		Verifică la fiecare
-Development	Config Window		Dezvoltare
 Edit mailbox menu…	Config Window		Editează meniul cutiei cu mail
 Error	Config Window		Eroare
 Error retrieving general settings: %s\n	Config Window		Eroare la obținerea configurărilor generale: %s\n
-Final	Config Window		Final
-Gamma	Config Window		Gama
-Golden master	Config Window		Principal golden
 Mail checking	Config Window		Verificare mail
 Miscellaneous	Config Window		Diverse
 OK	Config Window		Bine

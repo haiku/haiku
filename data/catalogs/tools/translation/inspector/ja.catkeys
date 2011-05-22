@@ -1,0 +1,28 @@
+1	japanese	x.vnd.OBOS-Inspector	1088677555
+Active Translators	ImageWindow		有効なトランスレータ
+Active Translators	InspectorApp		有効なトランスレータ
+Bummer	ImageWindow		失敗
+File	ImageWindow		ファイル
+First Page	ImageWindow		最初のページ
+Info	ImageWindow		情報
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	情報
+Last Page	ImageWindow		最後のページ
+Next Page	ImageWindow		次のページ
+No image available to save.	ImageWindow		保存できるイメージがありません。
+OK	ImageView		OK
+OK	ImageWindow		OK
+Open...	ImageWindow		開く…
+Previous Page	ImageWindow		前のページ
+Quit	ImageWindow		終了
+Save feature not implemented yet.	ImageWindow		保存機能はまだ実装されていません。
+Save...	ImageWindow		保存…
+Sorry, unable to load the image.	ImageView		すみませんが、イメージを読み込めません。
+Sorry, unable to write the image file.	ImageView		すみませんが、イメージの書き出しができません。
+System Translators	ActiveTranslatorsWindow		システムトランスレータ
+Unknown	ImageView		不明
+User Translators	ActiveTranslatorsWindow		ユーザートランスレータ
+View	ImageWindow		ビュー
+Window	ImageWindow		ウインドウ
+\nInput Formats:	ImageView		\n入力フォーマット:
+\nOutput Formats:	ImageView		\n出力フォーマット:
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n使用されたトランスレータ:\n名前: %1\nInfo: %2\nバージョン: %3\n

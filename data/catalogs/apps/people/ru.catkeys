@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PEPL	382829331
+1	russian	x-vnd.Be-PEPL	2993050801
 %name% picture	People		Изображение для %name%
 Address	People		Адрес
 Cancel	People		Отмена
@@ -28,6 +28,7 @@ New person…	People		Новая персона…
 Nickname	People		Прозвище
 OK	People		ОК
 Paste	People		Вставить
+People	System name		Персоны 
 Person	Short mimetype description		Персона
 Quit	People		Выход
 Redo	People		Отменить

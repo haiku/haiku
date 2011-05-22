@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Keymap	3858687220
+1	japanese	x-vnd.Haiku-Keymap	1259868356
 (Current)	Keymap window		(使用中キーマップ)
 Acute trigger	Keymap window		アキュートアクセントのトリガー
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー
@@ -6,6 +6,7 @@ Diaeresis trigger	Keymap window		ウムラウトのトリガー
 File	Keymap window		ファイル
 Font	Keymap window		フォント
 Grave trigger	Keymap window		グレイヴアクセントのトリガー
+Keymap	System name		キーマップ
 Layout	Keymap window		レイアウト
 Open…	Keymap window		開く…
 Quit	Keymap window		終了

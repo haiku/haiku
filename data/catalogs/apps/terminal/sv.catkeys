@@ -1,5 +1,5 @@
 1	swedish	x-vnd.Haiku-Terminal	2225488941
-%app% settings	Terminal PrefWindow	window title	%app% settings
+%app% settings	Terminal PrefWindow	window title	%app% inställningar
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help visa denna hjälp\n -t, --title ange fönstertitel\n -f, --fullscreen starta helskärmsläge\n
 Abort	Terminal Shell		Avbryt
 Appearance	Terminal PrefWindow		Utseende
@@ -14,7 +14,7 @@ Change directory	Terminal TermView		Byt katalog
 Clear all	Terminal TermWindow		Rensa allt
 Close	Terminal TermWindow		Stäng
 Close active tab	Terminal TermWindow		Stäng aktiv flik
-Close other tabs	Terminal TermWindow		Stäng andra flikar
+Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Close tab	Terminal TermWindow		Stäng flik
 Close window	Terminal TermWindow		Stäng fönster
 Color schema:	Terminal AppearancePrefView		Färgschema:
@@ -36,10 +36,10 @@ Find previous	Terminal TermWindow		Sök föregående
 Find…	Terminal TermWindow		Sök...
 Font:	Terminal AppearancePrefView		Typsnitt:
 Full screen	Terminal TermWindow		Helskärm
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nHantering: %s [OPTION] [SHELL]\n
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nUpphovsrätt 2001-2009 Haiku, Inc.\nUpphovsrätt (C) 1999 Kazuho Okui and Takashi Murai.\n\nHantering: %s [OPTION] [SHELL]\n
 Increase	Terminal TermWindow		Öka
 Insert path	Terminal TermView		Lägg till sökväg
-Match case	Terminal FindWindow		Matcha versaler/gemener
+Match case	Terminal FindWindow		Matcha gemener/versaler
 Match word	Terminal FindWindow		Matcha ord
 Move here	Terminal TermView		Flytta hit
 New Terminal	Terminal TermWindow		Ny terminal
@@ -47,10 +47,10 @@ New tab	Terminal TermWindow		Ny flik
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
 Not found.	Terminal TermWindow		Hittades ej.
 Nothing is selected.	Terminal TermWindow		Ingenting markerat.
-OK	Terminal PrefWindow		Okej
+OK	Terminal PrefWindow		OK
 OK	Terminal SetTitleWindow		OK
 OK	Terminal TermApp		OK
-OK	Terminal TermWindow		Okej
+OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Sidinställningar...
 Paste	Terminal TermWindow		Klistra in
 Print	Terminal TermWindow		Skriv ut
@@ -71,22 +71,22 @@ Settings	Terminal TermWindow		Inställningar
 Settings…	Terminal TermWindow		Inställningar...
 Shell 	Terminal TermWindow		Skal
 Size:	Terminal AppearancePrefView		Storlek:
-Switch Terminals	Terminal TermWindow		Växla terminal.
+Switch Terminals	Terminal TermWindow		Växla terminal
 Tab title:	Terminal AppearancePrefView		Fliktitel:
 Tab title:	Terminal TermWindow		Fliktitel:
 Terminal	System name		Terminal
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunde inte starta skalet.
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
 Text	Terminal AppearancePrefView		Text
 Text encoding	Terminal TermWindow		Teckenuppsättning
 Text not found.	Terminal TermWindow		Text hittades inte.
 Text size	Terminal TermWindow		Teckenstorlek
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer kör fortfarande:\n\n\t%1\n\nOm du stänger fönstret kommer processerna termineras.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger Terminalen kommer processerna att termineras.
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer namn på den aktiva fliken. Följande alternativ finns:\n
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mönstret bestämmer namn på flikar. Följande alternativ finns:\n
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer fönstrets namn. Följande alternativ finns:\n
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mönstret bestämmer namn på fönster. Följande alternativ finns:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" kör fortfarande.\nOm du stänger fönstret kommer processen termineras.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" kör fortfarande.\nOm du stänger fliken kommer processen termineras.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger Terminalen kommer processen att termineras.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger fliken kommer processen att termineras.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Okänt alternativ \"%s\"\n
 Use default	Terminal SetTitleWindow		Använd förvald
 Use default shell	Terminal Shell		Använd standardskal

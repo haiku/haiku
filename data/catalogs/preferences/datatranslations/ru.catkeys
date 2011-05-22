@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DataTranslations	427795950
+1	russian	x-vnd.Haiku-DataTranslations	3820343452
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Файл с именем '%name' уже существует в папке Translators! Заменить существующий транслятор?
 Cancel	DataTranslations		Отмена
 Could not install %s:\n%s	DataTranslations		Невозможно установить %s:\n%s
@@ -14,4 +14,5 @@ Overwrite	DataTranslations		Перезаписать
 Path:	DataTranslations		Путь:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Похоже, что файл '%name' не является транслятором и не будет установлен.
 The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		С помощью этой панели можно изменить настройки трансляторов. Эти настройки по умолчанию будут использоваться в приложениях, которые не предоставляют возможности изменять их самостоятельно.
 Version:	DataTranslations		Версия:

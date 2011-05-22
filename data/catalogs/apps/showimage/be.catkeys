@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ShowImage	1687870740
+1	belarusian	x-vnd.Haiku-ShowImage	886873119
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS сэкунд
 Browse	Menus		Праглядзець
 Cancel	ClosePrompt		Адмена
@@ -23,6 +23,7 @@ High-quality zooming	Menus		Высокаякаснае павелічэнне
 Image	Menus		Выява
 Job setup	PrintOptionsWindow		Наладка заданняў
 Last page	Menus		Апошняя старонка
+Leave full screen	Menus		Пакінуць рэжым поўнага экрана
 Next file	Menus		Наступны файл
 Next page	Menus		Наступная старонка
 OK	Alerts		ОК

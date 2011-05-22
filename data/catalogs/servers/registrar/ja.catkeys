@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Haiku-Registrar	2292978560
+1	japanese	application/x-vnd.Haiku-Registrar	2599857937
 %action%?	ShutdownProcess		%action%?
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" がシャットダウンプロセスを中断しました。
 Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。
@@ -13,6 +13,7 @@ Kill application	ShutdownProcess		強制終了
 OK	ShutdownProcess		OK
 Restart	ShutdownProcess		再起動
 Restart system	ShutdownProcess		システムを再起動
+Restarting…	ShutdownProcess		再起動中…
 Shut down	ShutdownProcess		シャットダウン
 Shutdown aborted	ShutdownProcess		シャットダウンが中断されました。
 Shutdown status	ShutdownProcess		シャットダウンの状態

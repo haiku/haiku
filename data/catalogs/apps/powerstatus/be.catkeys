@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PowerStatus	4269725527
+1	belarusian	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		пра праграму
 About…	PowerStatus		Пра праграму...
 Battery charging	PowerStatus		Акумулятар зараджаецца
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Дэталізацыя ёмістасці 
 Capacity granularity 2: 	PowerStatus		Дэталізацыя ёмістасці 2
 Capacity: 	PowerStatus		Ёмістасць
 Current rate: 	PowerStatus		Зараз:
+Damaged battery	PowerStatus		Пашкоджаны акумулятар
 Design capacity low warning: 	PowerStatus		Паведамленне аб нізкай зыходнай ёмістасці
 Design capacity warning: 	PowerStatus		Паведамленне пра зыходную ёмістасць
 Design capacity: 	PowerStatus		Зыходная ёмістасць

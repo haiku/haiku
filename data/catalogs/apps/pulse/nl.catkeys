@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-Pulse	628764229
+1	dutch	x-vnd.Haiku-Pulse	2224813661
 About Pulse…	CPUButton		Over Pulse...
 About Pulse…	PulseView		Over Pulse...
 Active color	ConfigView		Actief-kleur
@@ -34,5 +34,6 @@ Remove replicant	CPUButton		Replicant verwijderen
 Settings…	PulseView		Instellingen...
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Gebruik: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Breedte van het icoon:
+Width of icon:	ConfigView		Icoonbreedte:
 You can't disable the last active CPU.	CPUButton		U kunt de laatste actieve CPU niet uitschakelen.
 You can't disable the last active CPU.	PulseView		U kunt de laatste actieve CPU niet uitschakelen.

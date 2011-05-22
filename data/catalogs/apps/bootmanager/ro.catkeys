@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BootManager	1530204547
+1	romanian	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Pe punctul de a restaura înregistrarea de boot principală (MBR) de %disk de la %file. Doriți să continuați?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Pe cale de a scrie meniul de boot pe disc. Sigur doriți să continuați?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Pe cale de a scrie următorul meniu de boot pe discul de boot (%s). Verificați informațiile de mai jos înainte de a continua.
@@ -13,6 +13,8 @@ At least one partition must be selected!	BootManagerController		Cel puțin o par
 Back	BootManagerController	Button	Înapoi
 Backup Master Boot Record	BootManagerController	Title	Copie de rezervă a Înregistrării de boot principală (MBR)
 Boot Manager is unable to read the partition table!	BootManagerController		Administratorul de Boot nu a putut citi tabelul de patiție!
+BootManager	System name		AdministratorPornire
+Cannot access!	DrivesPage	Cannot install	Nu se poate accesa!
 Default Partition	DefaultPartitionPage	Title	Partiție implicită
 Default Partition:	DefaultPartitionPage	Menu field label	Partiție implicită:
 Done	BootManagerController	Button	Gata
@@ -26,6 +28,7 @@ Installation of boot menu completed	BootManagerController	Title	Instalarea meniu
 Installation of boot menu failed	BootManagerController	Title	Instalarea meniului de boot a eșuat
 Never	DefaultPartitionPage		Niciodată
 Next	WizardView	Button	Următor
+No space available!	DrivesPage	Cannot install	Nu este spațiu disponibil!
 OK	BootManagerController	Button	Bine
 Old Master Boot Record Saved failure	BootManagerController	Title	Eșec la salvarea înregistrării de boot principală veche
 Old Master Boot Record saved	BootManagerController	Title	Înregistrarea de boot principală veche a fost salvată
@@ -50,6 +53,7 @@ The old Master Boot Record could not be saved to %s	BootManagerController		Înre
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Înregistrarea de boot principală (MBR) veche a fost salvată cu succes la %s.
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tabela de partiții al primului hard disc nu este compatibilă cu Administratorul de boot.\nAdministratorul de boot necesită un spațiu disponibil de 2 KiB înainte de prima partiție.
 Timeout: %s	DefaultPartitionPage		Timp alocat expirat: %s
+USB Drive	DrivesPage	Default disk name	Unitate USB
 Uninstall	DrivesPage	Button	Dezinstalează
 Uninstall Boot Manager	UninstallPage	Title	Dezinstalează Administrator de boot
 Uninstall boot manager	BootManagerController	Title	Dezinstalează administratorul de boot

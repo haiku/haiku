@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku.PoorMan	3143901754
+1	norwegian_bokmål	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		En standard nettsidemappe har blitt opprettet ved \"/boot/home/public_html.\"\nForviss deg om at det er en HTML-fil kalt \"index.html\" i den mappen.
 About PoorMan…	PoorMan		Om PoorMan...
 Advanced	PoorMan		Avansert
@@ -34,7 +34,7 @@ Logging view	PoorMan		Loggvisning
 Max. simultaneous connections:	PoorMan		Maks. samtidige tilkoblinger
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vennligst velg mappen du ønsker å publisere på nettet.\n\nDu kan la PoorMan opprette en standard \"public_html\" i din hjemmemappe.\nEller du kan velge én av dine egne mapper i stedet.
-PoorMan	System name		PoorMan
+PoorMan	Application name		PoorMan
 PoorMan settings	PoorMan		PoorMan-innstillinger
 Quit	PoorMan		Avslutt
 Run server	PoorMan		Kjør server

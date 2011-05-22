@@ -79,7 +79,7 @@ Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol)
 Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \"%name\" (%error). 
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Невозможно открыть \"%name\". Файл ошибочно помечен как исполняемый. 
 Could not update permissions of file \"%name\". %error	FSUtils		Невозможно обновить права файла \"%name\". %error
-Create %s clipping	PoseView		Создать %s выборку
+Create %s clipping	PoseView		Сохранить как %s
 Create a Query	FindPanel		Создать запрос
 Create a Query template	FindPanel		Создать шаблон запроса
 Create link	ContainerWindow		Создать ссылку в
@@ -366,7 +366,7 @@ There was an error resolving the link.	Tracker		Возникла ошибка п
 There was an error writing the attribute.	WidgetAttributeText		Произошла ошибка при записи атрибута.
 TiB	WidgetAttributeText		Тбайт
 To: %dir	StatusWindow		В: %dir
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		шаблоны
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Шаблоны
 Tracker preferences	TrackerSettingsWindow		Настройки Tracker
 Tracker status	StatusWindow		Статус Tracker
 Trash	Model		Корзина
@@ -405,24 +405,24 @@ You must have at least one attribute showing.	PoseView		Вы должны ост
 \nShould this be fixed?	FSUtils		\nВы хотите это исправить?
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld байт, 
 after	FindPanel		после
-apps	B_APPS_DIRECTORY		приложения
+apps	B_APPS_DIRECTORY		Приложения
 before	FindPanel		до
 by attribute	FindPanel		по атрибуту
 by formula	FindPanel		по формуле
 by name	FindPanel		по имени
 calculating…	InfoWindow		подсчёт…
-common	B_COMMON_DIRECTORY		общие
-config	B_USER_CONFIG_DIRECTORY		конфигурация
+common	B_COMMON_DIRECTORY		Общие
+config	B_USER_CONFIG_DIRECTORY		Конфигурация
 contains	FindPanel		содержит
 contains	SelectionWindow		содержит
 copy	FSUtils	filename copy	копия
 copying	FSUtils		копируемый
-develop	B_COMMON_DEVELOP_DIRECTORY		разработка
+develop	B_COMMON_DEVELOP_DIRECTORY		Разработка
 ends with	FindPanel		заканчивается на
 ends with	SelectionWindow		заканчивается на
 for %num files	InfoWindow		в %num файлах
 greater than	FindPanel		больше чем
-home	B_USER_DIRECTORY		домашняя папка
+home	B_USER_DIRECTORY		Домашняя
 is	FindPanel		равен
 is not	FindPanel		не равен
 label too long	PoseView		слишком длинное имя
@@ -437,9 +437,9 @@ multiple disks	FindPanel		нескольких дисках
 no items	CountView		нет объектов
 no supporting apps	OpenWithWindow		нет поддерживающих программ
 of %items	StatusWindow		из %items
-optional	/boot/optional		опциональные
+optional	/boot/optional		Опциональные
 parent folder	NavMenu		родительский каталог
-preferences	B_PREFERENCES_DIRECTORY		настройки
+preferences	B_PREFERENCES_DIRECTORY		Настройки
 rename	InfoWindow	As in 'If you rename ...'	переименуете
 rename	InfoWindow	As in 'To rename ...'	переименовать
 rename	TextWidget	As in 'If you rename ...'	переименуете
@@ -447,5 +447,5 @@ rename	TextWidget	As in 'To rename ...'	переименовать
 save text	FilePanelPriv		сохранить текст
 starts with	FindPanel		начинается на
 starts with	SelectionWindow		начинается на
-system	B_SYSTEM_DIRECTORY		система
-trash	B_TRASH_DIRECTORY		корзина
+system	B_SYSTEM_DIRECTORY		Система
+trash	B_TRASH_DIRECTORY		Корзина

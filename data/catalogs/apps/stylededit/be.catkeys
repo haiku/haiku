@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	286935939
+1	belarusian	x-vnd.Haiku-StyledEdit	1508367857
 ???	LoadAlert		???
 Align	Menus		Раўнаванне
 Black	Menus		Чорны
@@ -55,6 +55,7 @@ Redo typing	QuitAlert		Паўтарыць увод
 Replace	FindandReplaceWindow		Замяніць
 Replace all	FindandReplaceWindow		Замяняць усё
 Replace in all windows	FindandReplaceWindow		Замяняць ва ўсіх вокнах
+Replace next	Menus		Замяніць наступны
 Replace with:	FindandReplaceWindow		Змяніць на:
 Replace…	Menus		Замяняць…
 Revert to saved…	Menus		Вярнуцца да захаванага…

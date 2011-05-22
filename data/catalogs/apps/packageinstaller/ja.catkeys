@@ -1,0 +1,26 @@
+1	japanese	x-vnd.Haiku-PackageInstaller	3886319181
+%.1f GiB	PackageView		%.1f GiB
+%.1f KiB	PackageView		%.1f KiB
+%.1f MiB	PackageView		%.1f MiB
+%llu bytes	PackageView		%llu bytes
+(%s free)	PackageView		(%s 空き)
+Abort	PackageInfo		中断
+Abort	PackageInstall		中断
+Abort	PackageView		中断
+Accept	PackageTextViewer		承認
+Continue	PackageInfo		続ける
+Continue	PackageInstall		続ける
+Continue	PackageTextViewer		続ける
+Disclaimer	PackageTextViewer		免責条項
+Done	PackageInstall		完了
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		エラー (%s)! \"%s\" を開けませんでした。\n
+Finishing installation	PackageInstall		インストールを終了中
+Install	PackageView		インストール
+Install to:	PackageView		インストール先：
+Installation progress	PackageView		インストール状況
+Installing package	PackageStatus		パッケージをインストール中
+No package available.	PackageInfo		利用できるパッケージがありません。
+No package selected.	PackageInfo		パッケージが選択されていません。
+OK	PackageView		OK
+Skip	PackageView		スキップ
+Stop	PackageStatus		中止
