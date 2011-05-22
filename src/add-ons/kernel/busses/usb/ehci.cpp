@@ -1043,8 +1043,9 @@ EHCI::ResetPort(uint8 index)
 	}
 
 	// enable reset signaling
-	WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTRESET);
-	snooze(250000);
+	WriteOpReg(portRegister, (portStatus & ~EHCI_PORTSC_ENABLE)
+		| EHCI_PORTSC_PORTRESET);
+	snooze(50000);
 
 	// disable reset signaling
 	portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
