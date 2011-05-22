@@ -181,7 +181,7 @@ MediaWindow::~MediaWindow()
 	char buffer[512];
 	BRect rect = Frame();
 	PRINT_OBJECT(rect);
-	sprintf(buffer, "# MediaPrefs Settings\n rect = %i,%i,%i,%i\n",
+	snprintf(buffer, 512, "# MediaPrefs Settings\n rect = %i,%i,%i,%i\n",
 		int(rect.left), int(rect.top), int(rect.right), int(rect.bottom));
 
 	BPath path;
