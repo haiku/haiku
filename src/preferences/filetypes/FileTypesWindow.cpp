@@ -253,7 +253,7 @@ ExtensionListView::~ExtensionListView()
 BSize
 ExtensionListView::MinSize()
 {
-	if (!fMinSize.IsWidthSet() || fMinSize.IsHeightSet()) {
+	if (!fMinSize.IsWidthSet()) {
 		BFont font;
 		GetFont(&font);
 		fMinSize.width = font.StringWidth(".mmmmm");
