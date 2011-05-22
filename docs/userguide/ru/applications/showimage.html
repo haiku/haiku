@@ -4,11 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Szymon Barczak (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rodastahm Islamov
  *
@@ -33,7 +33,7 @@
 <li><a href="../../de/applications/showimage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../it/applications/showimage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../es/applications/showimage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/showimage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/showimage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/showimage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/showimage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/showimage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -58,43 +58,54 @@
 <tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>ShowImage is an application used for viewing images in various formats. Its funcionality is not limited only to viewing photos, it can also crop images, show slideshows, rotate and flip images.</p>
-
-<p>If you want to launch this application, simply double-click on some image on your computer.</p>
-
-<p><b>Browse photos</b></p>
-
-<p>You are not limited to viewing only the image you used to launch application. You can go both to previous or to next image from the folder using arrows on keybord. You can also zoom using either mouse scroll or shortcuts - <span class="key">ALT</span> <span class="key">+</span> for zooming in and <span class="key">ALT</span> <span class="key">-</span> for zooming out. High-quality zooming is set by default, but you can disable this function unchecking <span class="menu">View | High-quality zooming</span>. This function does very fast bilinear filtering.</p>
-
-<p>There is a possibility to simply zoom picture to the original size or to fit to the window size. Use <span class="menu">View</span> menu or shortcuts - <span class="key">ALT</span> <span class="key">1</span> to get back to the original size or <span class="key">ALT</span> <span class="key">0</span> to fit to the window size. From the same menu you can also enable stretching an image to the window.</p>
-
-<img src="../images/apps-images/showimage-tiff.png" alt="tiff" />
-
-<p>ShowImage does support multiple-page files, such as TIFF. It means you can turn pages while browsing any multiple-page image. Make use of <span class="menu">Browse</span> menu or use shortcuts (see screenshot above) for this function.</p>
-
-<p>To change mode to full-screen, simply choose <span class="key">ALT</span> <span class="key">ENTER</span> shortcut.</p>
-
-<p><b>Slide show</b></p>
-
-<p>You can run slideshow using menu, simply choose <span class="menu">View | Slide show</span>. There is an option for changing slide delay from 3 to 20 seconds. Default value is a 3 second delay, but you can change it from <span class="menu">View | Slide delay</span> menu.</p>
-
-<p><b>Flip and rotate images</b></p>
-
-<p>This function is also built-in. If you would like to rotate some image, choose proper position from <span class="menu">Image</span> menu or use shortcuts - <span class="key">ALT</span> <span class="key">R</span> will rorate your image clockwise and <span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span> counterclockwise.</p>
-
-<p>You can also flip images. <span class="menu">Image | Flip left to right</span> will flip your image horizontally and <span class="menu">Image | Flip top to bottom</span> vertically.</p>
-
-<p><b>Set background</b></p>
-
-<p>You can set your desktop background directly from ShowImage. Just choose <span class="menu">Image | Use as background...</span> and Backgrounds preflet will pop-up.</p>
-
-<p><b>Drag and drop</b></p>
-
-<p>There is an option to select a piece of an image and create new image file from the selection. Simply press <span class="key">CTRL</span> or <span class="key">ALT</span> and select a fragment you would like to use as a new file and drag the selection to desktop. Also, you can change mode to selection mode, so you will be able to select parts of images using just a left mouse button. This option is available from <span class="menu">Edit | Selection Mode</span></p>
-
-<img src="../images/apps-images/showimage-drag_and_drop_selection.png" alt="showimage-drag_and_drop" />
-
-<div class="box-info">Once you use right mouse button to drag the selection, an image-format menu pops-up.</div>
+<p>ShowImage allows you to view images in all formats that are supported through <a href="../preferences/datatranslation.html">DataTranslators</a>. New formats are automatically recognized when their translator is added to the system. This has been done for Haiku's vector icon files, WonderBrush images or when WebM images became available, for example.<br />
+ShowImage provides minimal editing features to crop, rotate and flip images and to save them in another format.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Отображение</h2>
+<img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
+<p>The <span class="menu">View</span> menu offers to start a <span class="menu">Slide show</span> of all images in a folder (or query result window) and set a <span class="menu">Slide delay</span> from 2 to 20 seconds.</p>
+<p>Other commands apply to the currently displayed image (without changing the size of the window):<br />
+<span class="menu">Original size</span> shows the image with a 100% zoom factor.<br />
+<span class="menu">Fit to window</span> shrinks the image back into the window fame, e.g. after having zoomed into it or after resizing the window.<br />
+<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> move into and out of the image in 10% steps. Zooming is also done with the mouse wheel; to pan an image bigger than the window, simply left-click and drag your mouse around.</p>
+<p>Two settings don't just apply to the currently displayed image and are remembered when browsing from one image to the next:<br />
+<span class="menu">High quality zooming</span> applies a very fast filter when zooming to reduce jagged lines and produce a smoother result.<br />
+<span class="menu">Stretch to window</span> will stretch smaller images to fill the current window frame.</p>
+<p>Then there's a <span class="menu">Full screen</span> mode with an option to <span class="menu">Show caption in full screen mode</span> which overlays the file name at the bottom of the image.</p>
+<p>Lastly, <span class="menu">Show tool bar</span> will show/hide the graphical controls:</p>
+<img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
+<p>From left to right: Previous image, next image, start slide show (in full screen mode), selection mode, original size, fit to window, zoom in, zoom out.</p>
+<p>Most of the more often used commands are also available from a right-click context menu on the image. Convenient when in full-screen mode.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Просмотр</h2>
+<img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
+<p>After opening an image you can quickly browse through all the other images in its folder (or query result window) by pressing <span class="key">↑</span>/<span class="key">↓</span> or <span class="key">←</span>/<span class="key">→</span>. You can see the selection change accordingly in the Tracker window.</p>
+<p>There is a quick way to open the folder of the current image and even navigate to its parent and subfolders. It works just like with <a href="../tracker.html#drill-down">drill-down navigating</a> in Tracker by clicking in the info area in the status bar that shows size and format of the current image.</p>
+<p>Looking at the <span class="menu">Browse</span> menu, shows another type of browsing: Some image formats, like TIFF, can contain several pages in one file. Commands like <span class="menu">First page</span> and <span class="menu">Next page</span> let you navigate those pages.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Редактирование</h2>
+<img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
+<p>The <span class="menu">Image</span> menu offers the few image manipulations necessary for an image viewer: rotating and flipping the image. Note however, that the actual image data won't be changed. Only an attribute is added to the file so it'll be shown rotated or flipped the next time you open it.</p>
+<p><span class="menu">Use as backgroud...</span> will open the <a href="../preferences/backgrounds.html">Backgrounds</a> preferences to set the current picture as image for your workspaces.</p>
+<p>Cropping is another feature that's needed sometimes. To define the frame to cut to, you can switch to <span class="menu">Selection mode</span> from the <span class="menu">Edit</span> menu and drag out a box with your left mouse button. If you don't want to change modes first, you can create this box in "normal mode" by simply holding <span class="key">CTRL</span> while left-click-dragging, which otherwise would just pan the image around.<br />
+<span class="menu">Clear selection</span> or <span class="key">ESC</span> will remove the selection box.</p>
+<p>The following chapter shows how to actually save the cropped area.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Сохранение и конвертация</h2>
+<p>To save or convert an image into any available format, you can invoke the normal <span class="menu">Save as...</span> item from the <span class="menu">File</span> menu, select the format and choose a file name.<br />
+Often quicker, especially when the Tracker window with the destination folder is already open, is using drag &amp; drop.</p>
+<img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
+<p>This is also how the above mentioned cropping is finalized. Either select a frame as described above, or choose <span class="menu">Edit | Select all</span> for the whole image. Then drag &amp; drop the selection onto the Desktop or any Tracker window to create a new image clipping in the same format of the original image.</p>
+<p>To save in another file format, do the dragging with the right mouse button and choose a format from the context menu when dropping the image.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Горячие клавиши</h2>
+<p>Ниже представлен список наиболее полезных сочетаний клавиш:</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Предыдущее изображение</td></tr>
+<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Следующее изображение</td></tr>
+<tr><td><span class="key">DEL</span></td><td></td><td>Удалить в корзину</td></tr>
+<tr><td><span class="key">+</span></td><td></td><td>Увеличить</td></tr>
+<tr><td><span class="key">-</span></td><td></td><td>Уменьшить</td></tr>
+<tr><td><span class="key">0</span></td><td></td><td>Оригинальный размер (масштаб 1:1)</td></tr>
+<tr><td><span class="key">1</span></td><td></td><td>Подогнать под замеры окна</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Включить/выключить полноэкранный режим (также активируется при помощи двойного щелчка левой клавишей мыши)</td></tr>
+<tr><td><span class="key">CTRL</span></td><td></td><td>While holding <span class="key">CTRL</span> you can create a selection frame without explicitly switching to selection mode.</td></tr>
+</table>
 
 </div>
 </div>

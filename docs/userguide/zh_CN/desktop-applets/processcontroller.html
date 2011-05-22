@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,7 +35,7 @@
 <li><a href="../../it/desktop-applets/processcontroller.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/desktop-applets/processcontroller.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/desktop-applets/processcontroller.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/desktop-applets/processcontroller.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/desktop-applets/processcontroller.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/desktop-applets/processcontroller.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -44,13 +44,12 @@
 <span>
  «  <a href="powerstatus.html">电源状态</a> 
 ::  <a href="../desktop-applets.html" class="uplink">桌面小程序</a> 
-::  <a href="../workspaces.html#applet.html">Workspaces（工作区）</a>  »
+::  <a href="workspaces.html">Workspaces（工作区）</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />进程控制器</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -59,39 +58,38 @@
 <tr><td>设置：</td><td></td><td><i>none</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />进程控制器的主要任务是显示您的 CPU 的动态以及已用内存的情况。它允许对单独组的管理，其优先级的修改，并且当程序冻结时可以将其杀死。在多处理器的环境中，它也允许对某个处理器的禁用。当 Tracker 或者桌面栏崩溃时，您也可以从进程控制器中进行重启。</p>
+<p>左边的指示器显示了每个CPU的使用情况，而右边的进度条显示了内存的消耗情况。需要牢记的是，指示器的数量依赖于计算机中处理器/内核的数量。</p>
+<p>如果为运行时，启动进程控制器将会询问以窗口模式打开或驻留于桌面栏中。窗口模式中，您可以通过定义窗口来重定义显示条，然后使用 <a href="../gui.html#replicants">Replicant</a> 将其拖动到桌面。<br />
+
+无论何时安装，它都可以通过右键菜单进行操作。<br />
+
+为了从桌面栏中将其删除，可以在其右键菜单中取消对  <span class="menu">停靠于桌面栏</span> 的勾选。</p>
 <h2>退出应用程序</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>内存使用情况</h2>
+<p>为退出该应用，仅需从 <span class="menu">Quit an application</span> 菜单中选择器名称即可。还有一种关闭应用的较为简洁的方式，如点击其关闭按钮。需要注意的是，不要退出系统进程，如系统服务或后台进程。否则，您的系统将会停止运行。</p>
+<h2>内存使用</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the used part of memory.</p>
+<p>对内存使用的管理可能相对不够精确。</p>
+<p>该菜单允许您管理系统中不同组的内存使用情况。组名称旁边有两列：第一个显示了预留的可写入内存，而第二个显示了所有内存，包括只读空间（例如共享库）。</p>
+<p>第一行 <i>System resources &amp; caches...</i> 显示了系统和所有应用所用的内存总量。蓝色进度条的长度基于您的计算机的所有物理内存。下一行显示了每个进程的内存使用。需要注意的是，进度条的长度仅基于内存实际已用的部分。 </p>
 <table>
-	<tbody>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
-	</tbody>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>给定程序（具有可写权限）的内存使用情况</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>包含只读空间（可以和其他应用共享）的内存使用情况</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>线程和 CPU 使用</h2>
+<p>该菜单允许您修改线程的优先级，杀死组以及进行相关的调试。</p>
+<div class="box-stop">通过菜单中命令所做的修改将会深入系统，并且会导致数据的丢失以及系统的不稳定。请保证鼠标把持稳定。</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>内核代码</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>用户代码</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>空闲线程</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
-</p>
+<p>首个级别中，您能够看到组名称。通过点击，您可以杀死整个组。进度条深蓝色的部分是内核代码的时间，浅蓝色的部分为用户代码，而绿色的部分则为空闲线程。完全显示为蓝色的进度条意味着该组正在使用所有的线程资源。</p>
+<p>第二个级别显示了组的特定线程。通过点击，您可以调试或者杀死它。完全显示为蓝色的进度条意味着该线程在占用一个处理器/内核。</p>
+<p>菜单中的最后一个级别允许您修改线程的优先级。请谨慎使用！一般来说，线程的优先级与其 CPU 使用情况相反。因此，其尝试申请的 CPU 时间越多，其优先级将越低。通常，不要对应用的优先级做改动；请联系其编写者，这是他的事。</p>
 
 </div>
 </div>
@@ -100,7 +98,7 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 <div class="inner"><span>
 «  <a href="powerstatus.html">电源状态</a> 
 ::  <a href="../desktop-applets.html" class="uplink">桌面小程序</a> 
-::  <a href="../workspaces.html#applet.html">Workspaces（工作区）</a>  »
+::  <a href="workspaces.html">Workspaces（工作区）</a>  »
 </span></div>
 </div>
 

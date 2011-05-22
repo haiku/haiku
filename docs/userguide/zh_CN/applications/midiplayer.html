@@ -4,10 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Gerard Stanczak (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
@@ -34,7 +35,7 @@
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/midiplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/midiplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/midiplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/applications/midiplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -57,7 +58,12 @@
 <tr><td>设置：</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>暂时没有相关文档可供参考。如果您愿意编写相关文档，您可以在 <a href="http://www.freelists.org/list/haiku-doc">文档邮件列表</a>中发布公告来避免工作的重复。</p>
+<p>如其名称所说，Midi播放器用于播放 midi 音乐文件。Midi 文件比较特别，它们实际的数字化和其他编码方式的音乐，但是仅为它的一个描述： Hold this note for that long with this volume and use instrument X for it.<br />
+这样可以使文件非常小，而且根据乐器库的不同（所谓的“声音字体”），其结果相差很大。并且，随着乐器样本的数量的增加和质量的提升，声音字体可能会变得非常之大。</p>
+<div class="box-info"><p>Haiku 并没有安装声音字体，这是因为它们都非常大，而且很少人会用到。大部分用到的用户，已经有了高质量或自定义的声音字体。为了能够听听<i>某些东西</i>，您可以通过附加包安装自由的声音字体。进入终端，输入：<tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>为了使用任何其他声音字体，在 <tt>/boot/system/data/synth</tt> 中为其创建一个链接，然后将其命名为 <tt>big_synth.sy</tt>。</p></div>
+<img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
+<p>Midi播放器的界面非常简单。仅需双击或者拖拽 midi 文件，即可启动播放。您可以使用滑块控制音量，并且从 <span class="menu">混响效果</span> 弹出菜单中添加混响效果。激活滚动将会在顶端显示示波器样式的虚拟效果。</p>
 
 </div>
 </div>

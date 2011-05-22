@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,7 +34,7 @@
 <li><a href="../../it/desktop-applets/processcontroller.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/desktop-applets/processcontroller.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/desktop-applets/processcontroller.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/desktop-applets/processcontroller.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/desktop-applets/processcontroller.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/desktop-applets/processcontroller.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -44,13 +44,12 @@
 <span>
  «  <a href="powerstatus.html">PowerStatus</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Appliquettes du bureau</a> 
-::  <a href="../workspaces.html#applet.html">Espaces de travail</a>  »
+::  <a href="workspaces.html">Espaces de travail</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -59,13 +58,14 @@
 <tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />La principale fonction de ProcessController est de visualiser l'activité processeur et la quantité de mémoire utilisée. Il permet de suivre des différents processus, de changer leurs priorités, et de les tuer en cas de blocage. Dans les environnements multiprocesseurs, il vous permet de désactiver les différents processeurs/cœurs. Lorsque le Tracker ou la Deskbar plantent, vous pouvez les redémarrer à partir du menu de ProcessController.</p>
 <p>Les indicateurs de gauche montrent l'activité de chaque processeur, alors que la jauge de droite montre la consommation mémoire.
 Souvenez vous que le nombre d'indicateurs
 dépend du nombre de processeur/cœurs de l'ordinateur.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
+<p>A moins d'être déjà en cours d'exécution, ProcessController demandera à son lancement si il doit s'ouvrir en mode fenêtre ou si il doit s'insérer dans le cartouche de la Desbar.
+En mode fenêtre, vous pouvez redimensionner l'icône en retaillant la fenêtre, et faire glisser la poignée du <a href="../gui.html#replicants">Replicant</a> vers le bureau.<br />
+Partout où il est installé, vous pouvez agir sur ProcessController par l'intermédiaire d'un clic droit qui ouvrira un menu contextuel.<br />
+Pour supprimer l'appliquette du cartouche, décocher <span class="menu">Live in the Deskbar</span> dans le menu contextuel.</p>
 <h2>Quitter une application (Quit an application)</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
 <p>Pour quitter une application il suffit de choisir son nom dans le menu <span class="menu">Quit an application</span>.
@@ -73,13 +73,11 @@ C'est une méthode propre pour fermer un application, tout comme de cliquer sur 
 <h2>Consommation mémoire (Memory usage)</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
 <p>Le suivit de la consommation de mémoire peut être assez imprécis.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the used part of memory.</p>
+<p>Ce menu vous permet de surveiller l'utilisation de la mémoire par les différents processus de votre système. À côté du nom du processus, vous trouverez deux colonnes : la première correspond à la quantité de mémoire réservée pour l'écriture, tandis que la seconde montre toute la mémoire, y compris l'espace en lecture seule (comme par exemple les bibliothèques partagées).</p>
+<p>La première ligne <i>System resources &amp; caches…</i> montre la quantité totale de mémoire utilisée par le système et toutes les applications. La largeur de la jauge bleue est basée sur la mémoire physique totale de votre ordinateur. Les lignes suivantes montrent la mémoire consommée par chaque processus. Veuillez noter que la largeur de la jauge est calculée à partir de la quantité de mémoire utilisée.</p>
 <table>
-	<tbody>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
-	</tbody>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>La mémoire utilisée exclusivement par l'application (avec un accès en écriture)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Mémoire incluant l'espace en lecture seule (peut être partagée avec d'autres applications)</td></tr>
 </table>
 
 <h2>Tâche et charge du processeur (Threads and CPU usage)</h2>
@@ -91,10 +89,10 @@ C'est une méthode propre pour fermer un application, tout comme de cliquer sur 
 	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Code utilisateur</td></tr>
 	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Tâche oisive</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
-</p>
+<p>Au premier niveau vous voyez des noms des processus. En cliquant sur l'un d'eux, vous pouvez tuer tout le processus. La partie bleue foncée de la jauge correspond au temps passé dans le code du noyau, la partie bleue claire à celui passé dans le code utilisateur, la partie verte dans la tâche oisive. Une jauge entièrement rempli de bleu signifie que le processus monopolise toute la puissance de traitement du système.</p>
+<p>Le deuxième niveau montre le détail des tâches d'un processus. En cliquant sur l'une d'elle, vous pouvez la déboguer ou la tuer.
+Une jauge entièrement remplie de bleu signifie que la tâche monopolise une unité de traitement (processeur/cœur).</p>
+<p>Le dernier niveau du menu vous permet de changer la priorité d'une tâche. Soyez prudent avec ça ! En règle générale, la priorité d'une tâche devrait être inversement proportionnelle à l'utilisation qu'elle fait du processeur. plus elle tente de réclamer du temps CPU, plus sa priorité devrait être faible. En général, ne vous embrouillez pas avec les priorités des applications. Contactez son auteur, c'est son boulot.</p>
 
 </div>
 </div>
@@ -103,7 +101,7 @@ C'est une méthode propre pour fermer un application, tout comme de cliquer sur 
 <div class="inner"><span>
 «  <a href="powerstatus.html">PowerStatus</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Appliquettes du bureau</a> 
-::  <a href="../workspaces.html#applet.html">Espaces de travail</a>  »
+::  <a href="workspaces.html">Espaces de travail</a>  »
 </span></div>
 </div>
 

@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
+ *		dgy18787
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tracker </title>
+	<title>文件浏览器 </title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -34,7 +35,7 @@
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/tracker.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/tracker.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/tracker.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/tracker.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -49,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 
 <table class="index" id="index" summary="index">
@@ -64,17 +64,17 @@
 </td></tr>
 </table>
 
-<h1>Tracker </h1>
+<h1>文件浏览器 </h1>
 
-<p>Tracker是所有文件的图形界面显示工具。它允许您新建文件和文件夹，复制和删除文件，并且还可以对文件进行查询，启动和重命名等操作。</p>
-<p>同其他的应用程序一样 (桌面及其上图标的后台仅仅是一个具有全屏窗)，Tracker与它的窗口出现在桌面栏，并且可以关闭和重启。 The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
+<p>文件浏览器是所有文件的图形界面显示工具。它允许您新建文件和文件夹，复制和删除文件，并且还可以对文件进行查询，启动和重命名等操作。</p>
+<p>同其他的应用程序一样 (桌面及其上的图标本质上仅是一个全屏窗口)，文件浏览器与其窗口出现在桌面栏，并且可以关闭和重启。 退出并重新启动崩溃或未响应的文件浏览器（或者暂停的桌面栏）的最好方法就是调用  <a href="teammonitor.html">程序监控器</a>。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">挂载磁卷</a></h2>
-<p>为了能够访问硬盘，CD，USB磁盘等，您首先需要挂载这些磁卷，也就是告诉系统，它们存在。 右键点击桌面，或者已经挂载的刺卷（如启动盘），然后从 <span class="menu">Mount</span> 子菜单中选择磁卷。您也可以在桌面栏中找到相同的 <span class="menu">Mount</span> 菜单。</p>
+<p>为了能够访问硬盘，CD，USB磁盘等，您首先需要挂载这些磁卷，也就是告诉系统，它们存在。 右键点击桌面，或者已经挂载的刺卷（如启动盘），然后从 <span class="menu">挂载</span> 子菜单中选择磁卷。您也可以在桌面栏中找到相同的 <span class="menu">挂载</span> 菜单。</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>还有一个 <span class="menu">Mount Settings</span> ，因此你不需要每次启动时都手动挂载所有磁卷。
+<p>还有一个 <span class="menu">挂载设置</span> ，因此你不需要每次启动时都手动挂载所有磁卷。
 <br />
 上述的设置将会自动挂载您所连接/插入的所有存储设备，然后在启动时挂载所有曾经挂载过的磁盘。</p>
 <div class="box-warning">在您断开硬件设备或者USB磁盘的连接时，一定要保证您已经成功的卸载了该磁卷。这样可以保证所有的数据传输已经结束，否则可能会导致数据的丢失或者损坏磁盘。</div>
@@ -82,112 +82,112 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="navigating" name="navigating">文件导航</a></h2>
-<p>默认情况下，双击文件夹，Tracker打开新窗口，并且保持先前的打开窗口。这将会很快导致桌面的拥挤。<br />
+<p>默认情况下，双击文件夹，文件浏览器打开新窗口，并且保持先前的打开窗口。这将会很快导致桌面的拥挤。<br />
 您可以使用 <span class="key">OPT</span> 键来阻止这种情况发生，它将会自动关闭先前的窗口。<br />
 这也同样适用于键盘导航，更多的信息可以参阅主题 <a href="keyboard-shortcuts.html">快捷键和组合键</a>。</p>
-<p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+<p>和其他系统中的文件管理器相似，在文件夹中移动是文件浏览器的主要用途之一。Haiku 中的文件浏览器具有一些特别的功能，可以帮助您更有效地完成此操作。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">进入子菜单</a></h3>
-<p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
+<p>出了不断地双击文件夹，还有一种更好的方法可以进行文件导航：</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/home/config/</span>.<br />
-If you do the above while dragging a file with you, it will be moved to where you eventually drop it.</p>
-<p>A similar method can be used from any Tracker window:</p>
+<p>右键点击文件夹，在右键菜单的顶部，您会找到当前文件夹的子菜单，可以通过它们进行文件的导航。您仅需不断地向前导航，直到找打了所需的文件夹或者文件，然后点击打开即可。上图显示了 <span class="path">/boot/home/config/</span> 文件夹中的内容。<br />
+如果您在执行上述操作时，还拖动着文件，那么它将被移动到您最终到达的位置。</p>
+<p>在文件浏览器窗口中还有一个相似的方法可供使用：</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
-<p>Click on the area in the lower left, where the number of items is listed, and you'll get submenus for every level above your current location. From there you can drill down through the folders as usual.</p>
-<p>Note, that the Desktop is always the topmost level as that is where Tracker shows mounted volumes. So, if you want to go to another disk, you first have to navigate to the top (Desktop) and cross over to your other disk from there.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+<p>点击左下角的区域，即项目数量所处的位置，您可以获取您所处位置之上的所有子菜单。这样您可以方便的浏览各级文件夹。</p>
+<p>注意，桌面总是顶级的目录，这里也是文件浏览器显示所有挂载卷的地方。因此，如果您希望进入其他磁盘，首先需要导航到顶级目录（桌面），然后在进入其他磁盘。</p><br />
+<p>当您拖动文件到文件夹时，您会获取同样的子菜单导航。在悬停之后，将会弹出一个子菜单，您可以将其放置到目标位置。如果你使用右键开始，当松开按键之后，你可以选择复制，移动或者链接文件。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead" name="type-ahead">Jumping to files with type-ahead</a></h3>
-<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<a id="type-ahead" name="type-ahead">实时跳转</a></h3>
+<p>您可能比较熟悉其他操作系统文件管理器的内容：输入文件名的一些字符，然后跳转到匹配这些字符的首个文件。在这个特性上，Haiku 可能走的更远。如果没有文件以这些字符开头，它将会跳转到首个包含这些字符的文件。并且如果两种情况都不匹配，那么接下来将搜索属性。</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
+<p>在上述例子中，有许多文件以 “Haiku logo” 为起始，直接向前输入可能毫无用处。在 Haiku 中，输入 "web" 将直接跳转到它首次出现的地方 "Haiku logo - website"。您输入的字符将会出现在右下角，也就是文件夹中文件数量出现的地方。当再次输入字符后，显示将会返回正常，而且您可以再次输入搜索字符。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead-filter" name="type-ahead-filter">Type-ahead filtering</a></h3>
-<p>Instead of jumping to a file while typing, there's also the option to filter out all files not matching your type-ahead string. This can improve clarity dramatically, especially when dealing with crowded folders. By using <span class="key">SHIFT</span> <span class="key">SPACE</span> as delimiter, you can even filter on multiple strings.<br />
-Contrary to type-ahead jumping, the filtering will stick until you press <span class="key">ESC</span> or close the window (or leave the folder if you're using Single Window Navigation).<br />
-This type-ahead filtering is set in the <a href="#tracker-preferences.html">Tracker preferences</a>.</p>
+<a id="type-ahead-filter" name="type-ahead-filter">实时筛选</a></h3>
+<p>除了可以实现实时跳转，还有选项可用于过滤不匹配输入字符的所有文件。这样可以显著的提高清晰性，尤其是在处理大量的文件夹时。 通过使用 <span class="key">SHIFT</span> <span class="key">SPACE</span> 界定符，您甚至可以过滤多个字符串。<br />
+和实时跳转相反，过滤将会保持，直到您按下 <span class="key">ESC</span> 或者关闭窗口（或者单窗口使用时离开当前文件夹）。<br />
+实时过滤可以在 <a href="#tracker-preferences.html">文件浏览器首选项</a> 中进行设置。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="appearance" name="appearance">外观设置</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
+<p>文件浏览器窗口在 <span class="menu">窗口</span> 菜单中提供了三种不同的视图模式：</p>
 <ul>
-<li><p><b>Icon View</b> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
-<li><p><b>Mini Icon View</b> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><b>List View</b> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><b>图标视图</b> (<span class="key">ALT</span> <span class="key">1</span>) - 大图标，您可以从子菜单，或者使用 <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span> 来放大/缩小图标尺寸。</p></li>
+<li><p><b>迷你视图</b> (<span class="key">ALT</span> <span class="key">2</span>) - 小图标。</p></li>
+<li><p><b>列表视图</b> (<span class="key">ALT</span> <span class="key">3</span>) - 文件的详细列表，并且允许您显示/隐藏可用的 <i>属性</i>。（详情查阅 <a href="attributes.html">属性</a>。）</p></li>
 </ul>
-<p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
+<p> <span class="menu">窗口</span>  菜单还提供了很多其他的功能：</p>
 <ul>
-<li><p><b>Resize Window</b> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
-<li><p><b>Clean Up</b> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean Up All</span> which additionally sorts all icons alphabetically.</p></li>
-<li><p><b>Select...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><b>Close</b> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close All</span> which closes every Tracker window.</p></li>
-<li><p><b>Close All in Workspace</b> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><b>定义窗口</b> (<span class="key">ALT</span> <span class="key">Y</span>) - 调整窗口到合适尺寸。</p></li>
+<li><p><b>清除</b> (<span class="key">ALT</span> <span class="key">K</span>) - 所有图标对其到不可见网格。同时按下 <span class="key">SHIFT</span> ，菜单变为 <span class="menu">清除所有</span>，它将会按照字母顺序排列所有图标。</p></li>
+<li><p><b>选择...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - 根据 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">正则表达式</a> 选择文件。</p></li>
+<li><p><b>关闭</b> (<span class="key">ALT</span> <span class="key">W</span>) - 关闭窗口。同时按下  <span class="key">SHIFT</span> ，菜单将会变为 <span class="menu">关闭所有</span> ，将会关闭所有文件浏览器窗口。</p></li>
+<li><p><b>在工作区中关闭所有</b> (<span class="key">ALT</span> <span class="key">Q</span>) ， 关闭当前工作区中的所有文件浏览器窗口。 如果通过文件夹点击时没有按下<span class="key">OPT</span> 按键，所有这些已打开的文件浏览器窗口将会混乱散布在工作区之中。</p></li>
 </ul>
-<p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean Up</span> (<span class="key">ALT</span> <span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
-<p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
+<p>有时候您可能希望重新排列图标，而不是使用 <span class="menu">保持对齐</span> 来排列所有（<span class="key">ALT</span> <span class="key">K</span>）。在这种情形下，您可以选中图标，然后将其拖拽到新的位置即可。在拖拽之时，需要按下 <span class="key">ALT</span> 按键。这样将会对其图标到隐藏网格。</p>
+<p>除了文件浏览器首选项，其他的功能都是不言自明的。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tracker-preferences" name="tracker-preferences">首选项</a></h3>
-<p><span class="menu">Window | Preferences...</span> opens a panel that offers a number of settings that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
-<br />So, in short, the not so obvious settings:</p>
+<p><span class="menu">窗口 | 首选项...</span> 打开一个提供多个设置的窗口，可能它们都不够明确，但是尝试之后将非常明朗。由于所有的设置都会实时生效，您能够即刻看到这些修改。
+<br />因此，以下将简明介绍这些不直白的设置：</p>
 <ul>
-<li><p><b>Desktop</b> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
-<li><p><b>Windows</b> - You can set <span class="menu">Single Window Navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
+<li><p><b>桌面</b> - 决定是否所有的挂载磁盘直接在显示于桌面或点击桌面上的磁盘图标之后的窗口中。</p></li>
+<li><p><b>窗口</b> - 您可以设置 <span class="menu">单窗口导航</span>，即双击文件夹之后不在新窗口中打开，而是在原窗口中显示内容，并替换其视图方式。如果点击时按下 <span class="key">OPT</span> 按键则与其不尽相同。如上所述，这是因为您将丢失每个窗口的位置和大小。 
 <br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy&amp;paste a path name and use back, forward and up buttons.</p> 
-<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
-<li><p><b>Date and Time</b> - Set date and time formats.</p></li>
-<li><p><b>Trash</b> - Set the behavior when deleting a file.</p></li>
-<li><p><b>Volume Icons</b> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
+<p>在切换到文件浏览器的单窗口模式之前，由于您对这种方式可能比较熟悉，因此我们建议您首先尝试基于菜单的浏览，如果您习惯了这种方式，它可能会更有效率。另一方面，单窗口浏览提供了一个 <i>导航器</i> ，通过它，您可以输入，复制粘贴路径，并且使用返回，向前，向上等按钮。</p> 
+<p>当您希望输入时仅显示和输入字符串相匹配的文件或当前显示属性时，激活 <span class="menu">实时过滤</span> 将会过滤文件浏览器窗口中的内容。详情查阅 <a href="#type-ahead-filter">上述内容</a>。</p></li>
+<li><p><b>日期时间</b> - 设置日期和时间格式。</p></li>
+<li><p><b>垃圾箱</b> - 设置删除文件时的行为。</p></li>
+<li><p><b>容量图标</b> - 设置磁盘图标上剩余空间显示器的颜色。</p></li>
 </ul>
-<p>This panel, by the way, is also available as <span class="app">Tracker</span> from Deskbar's <span class="menu">Preferences</span>.</p>
+<p>并且，该面板和 <span class="app">文件浏览器</span> 一样可以从桌面栏的 <span class="menu">首选项</span> 中启动。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="working-with-files" name="working-with-files">文件处理</a></h2>
-<p>When invoked on a selected file, most of the <span class="menu">File</span> menu commands are also offered in the context menu by right-clicking that file.</p>
-<p>As usual the commands are pretty clear.</p>
+<p>在处理选中文件时，大部分的 <span class="menu">File</span> 菜单命令也可以通过右键菜单来提供。</p>
+<p>通常，这些命令是非常清晰的。</p>
 <ul>
-<li><p><b>Find...</b> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
-<li><p><b>New</b> - Create a new folder or any other file based on a <i>template</i>.
+<li><p><b>查找...</b> - 查询文件或文件夹。详情查阅 <a href="queries.html">查询</a> 。</p></li>
+<li><p><b>新建</b> - 基于 <i>模板</i> 新建文件夹或其他文件。
 <br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-<p>Choosing <span class="menu">Edit Templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
-<li><p><b>Open With...</b> - A submenu offers all applications that can handle this filetype.
+<p>选择 <span class="menu">编辑模板...</span> 将打开 <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> 文件夹。在其中创建文件将会在 <span class="menu">新建</span> 菜单中提供以该文件的其他属性为模板，其文件名为类型名的类型。这里，有一个文件类型为 <tt>text/plain</tt> 的 “Text” 文件。详情查阅 <a href="filetypes.html">文件类型</a> 。</p></li>
+<li><p><b>打开方式...</b> - 提供所有可以打开该类型文件的应用程序的子菜单。
 <br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open With...</span> entry instead, a panel opens:</p>
+<p>首选程序会做出标记，双击时将会使用它打开该文件。子菜单将首先列出那些可以处理该文件类型的应用，在本示例中，其为文本文件，类型为 <tt>text/plain</tt> 。接下来是通常可以处理超级类型的所有应用，此处为 <tt>text/*</tt>。 最后是那些可以处理所有文件的应用。如果您没有点击该菜单中的任何应用，而是 <span class="menu">打开方式...</span> ，这将会打开一个面板：</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and Make Preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
-<li><b>Get Info</b>
+<p>在这里，您将会再次找出子菜单中的所用程序。通过选中其中之一，然后点击 <span class="button">打开并设为首选</span> 按钮，您将会修改该类型文件的首选程序，在这里为 <tt>text/plain</tt>。</p></li>
+<li><b>获取信息</b>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</p></li>
-<li><p><b>Edit Name</b>, <b>Duplicate</b> and <b>Move to Trash</b> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
-<li><p><b>Move to</b>, <b>Copy to</b> and <b>Create Link</b> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><b>Cut</b>, <b>Copy</b> and <b>Paste</b> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <b>Copy/Cut more</b> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><b>Identify</b> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <b>Force Identify</b> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><b>Add-Ons</b> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<p>该面板显示选中文件的信息，而可以让您设置其默认应用，在展开部分面板后，为权限和拥有者。点击路径将会在文件浏览器中将其打开。</p></li>
+<li><p><b>重命名</b>，<b>复制</b>和<b>移动到垃圾箱</b> - 重命名，复制文件，或者将选中文件移动到垃圾箱。</p></li>
+<li><p><b>移动到</b>，<b>复制到</b>和<b>创建链接</b> - 让您使用子菜单导航方法移动，复制或者链接选中文件。调用菜单时，同时按下<span class="key">SHIFT</span> 键，将会提供一个选项已创建相对链接。</p></li>
+<li><p><b>剪切</b>，<b>复制</b>和<b>粘贴</b> - 让您使用剪贴板剪切，复制以及粘贴文件。在调用可以用于<b>复制/剪切更多</b>文件的菜单时，按下 <span class="key">SHIFT</span> 键，可能从其他目录中，您可以粘贴文件到其他地方。而且，按下 <span class="key">SHIFT</span> 键，您可以以链接的形式粘贴剪贴板中复制的文件。</p></li>
+<li><p><b>标识</b> - 将会找出之前没有文件类型的文件，并且为其设置类型，例如，使用 <span class="cli">wget</span> 获取了一些没有类型的文件。在调用菜单修改项目为 <b>强制标识</b> 时，按下 <span class="key">SHIFT</span> 键将会标识文件类型，并且修改之前错误的类型。</p></li>
+<li><p><b>附加组件</b> - 提供文件浏览器通用的和那些可以处理选中文件的附加组件。详情查阅 <a href="tracker-add-ons.html">文件浏览器附加组件</a> 。</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="transaction-status" name="transaction-status">传输状态</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<p>当您复制，移动或者删除文件时，文件浏览器使用状态窗口显示其进程。如果您启动了多个会话，每个任务都将显示其进程状态。</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
+<p>右侧两个按钮用于暂停或者停止整个任务。有时，它可以用于临时暂停较大的任务。例如，您可能需要快速启动一个大的应用，而复制大量的数据可能会堵塞硬盘的 IO 带宽，因此耽搁您的任务进程。</p>
 
 </div>
 </div>

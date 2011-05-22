@@ -34,7 +34,7 @@
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../ru/queries.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/queries.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/queries.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/queries.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/queries.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/queries.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -42,7 +42,7 @@
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="index.html">Indice</a> 
+ «  <a href="index.html">L'indice del filesystem</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
 ::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
 </span></div>
@@ -53,7 +53,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Indice</td></tr>
+<tr class="heading"><td>L'indice del filesystem</td></tr>
 <tr class="index"><td>
 	<a href="#find-window">La finestra di ricerca</a><br />
 	<a href="#basic-query">Query di base - "per Nome"</a><br />
@@ -124,7 +124,7 @@ Questo è un buon modo per ridurre il numero di risultati di ricerca.</p>
 <ul>
 <li><p>E' possibile copiare la stringa e incollarla ad altre persone in un'email, su un forum o su IRC per essere usata da altri oppure per un debug.</p></li>
 <li><p>E' possibile usare questo metodo per costruire una query in modalità <span class="menu">Attribute</span> e quindi passare alla modalità <span class="menu">Formula</span>, per generare comodamente una stringa di ricerca da utilizzare per una query nel terminale o in uno script.</p></li>
-<li><p>Le query possono essere raffinate inserendo parentesi dove necessario, per rendere ad esempio alcune parti case-sensitive o annulare combinazioni logiche cambiando "<tt>==</tt>" a "<tt>!=</tt>" per NOT AND. Tutto quello che serve è una conoscenza basilare delle <a href="http://it.wikipedia.org/wiki/Espressione_regolare" class="external free" title="Wikipedia: Espressione regolare">espressioni regolari</a> e forse alcune nozioni di base sullo scripting.</p></li>
+<li><p>Le query possono essere raffinate inserendo delle parentesi dove necessario, per rendere ad esempio alcune parti case-sensitive o annulare combinazioni logiche cambiando "<tt>==</tt>" con "<tt>!=</tt>" per un NOT AND. Tutto quello che serve è una conoscenza basilare delle <a href="http://it.wikipedia.org/wiki/Espressione_regolare" class="external free" title="Wikipedia: Espressione regolare">espressioni regolari</a> e forse alcune nozioni di base sullo scripting.</p></li>
 </ul>
 
 <h2>
@@ -132,7 +132,7 @@ Questo è un buon modo per ridurre il numero di risultati di ricerca.</p>
 <a id="result-window" name="result-window">La finestra dei risultati</a></h2>
 <p>Dopo aver avviato una ricerca, la finestra Find sarà sostituita da una finestra di risultati. Ecco un esempio di query per la stringa "server":</p>
 <img src="images/queries-images/result-window.png" alt="result-window.png" />
-<p>Oltre allo sfondo grigio, le finestre dei risultati funzionano esattamente come qualsiasi altra finestra del Tracker. Ma alcune cose hanno bisogno di una spiegazione più dettagliata :</p>
+<p>Oltre allo sfondo grigio, le finestre dei risultati funzionano esattamente come qualsiasi altra finestra del Tracker. Alcune cose hanno bisogno di una spiegazione più dettagliata :</p>
 <ul>
 <li><p>È possibile aprire la posizione di un file o una cartella con un doppio clic sul percorso del suo attributo.</p></li>
 <li><p>Con <span class="menu">File | Edit Query</span> o <span class="key">ALT</span> <span class="key">G</span> si può ritornare alla finestra di ricerca per ridefinire la query.</p></li>
@@ -140,22 +140,22 @@ Questo è un buon modo per ridurre il numero di risultati di ricerca.</p>
 </ul>
 <p>Si può assegnare il layout di un attributo al risultato di una query per un tipo di file specifico aprendo una cartella contenente il file con l'estensione di cui si vuole creare un modello per organizzare gli attributi che sarebbe comodo avere nei risultati della query.
 E' possibile copiare questo layout con <span class="menu">Attributes | Copy Layout</span>.</p>
-<p>Si apra <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, e successivamente si crei una nuova cartella chiamata <i>group/filetype</i>, sostituendo gli slash con un underscore, esempio "audio_x-mp3". Successivamente si apra la nuova cartella e si incolli il layout precedentemente copiato con <span class="menu">Attributes | Paste Layout</span>.</p>
+<p>Bisogna aprire <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, e successivamente creare una nuova cartella chiamata <i>group/filetype</i>, sostituendo gli slash con un underscore, esempio "audio_x-mp3". Successivamente aprendo la nuova cartella incollare il layout precedentemente copiato con <span class="menu">Attributes | Paste Layout</span>.</p>
 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-template" name="query-template">Modelli di Query</a></h2>
 <p>Facendo doppio clic su una query salvata verrà avviata la ricerca dei file e si aprirà immediatamente la finestra dei risultati.
-Tuttavia, è possibile che non si desidera effettuare una ricerca con questi <i>esatti</i> parametri, ma è comunque possibile usarli come punto di partenza per modificare la formula.<br />
-Si può creare un modello usando la voce del menu <span class="menu">Save Query as Template</span> (si guardi <a href="#find-window">(1) nello screenshot</a> in cima) o trascinando e rilasciando  l'icona con il tasto destro del mouse(10) in qualsiasi punto. Facendo doppio clic non si aprirà la finestra dei risultati, ma il pannello di ricerca, che darà la possibilità di cambiare velocemente le stringhe di ricerca o aggiungere e rimuovere gli attributi.</p>
+Tuttavia, è possibile non desiderare di  effettuare una ricerca con questi <i>esatti</i> parametri, ma è comunque possibile usarli come punto di partenza per modificare la formula.<br />
+Si può creare un modello usando la voce del menu <span class="menu">Save Query as Template</span> (si guardi <a href="#find-window"> nello screenshot (1)</a> in cima) o trascinando e rilasciando  l'icona con il tasto destro del mouse(10) in qualsiasi punto. Facendo doppio clic non si aprirà la finestra dei risultati, ma il pannello di ricerca, che darà la possibilità di cambiare velocemente le stringhe di ricerca o aggiungere e rimuovere gli attributi.</p>
 <p>Ogni volta che si sceglierà di salvare i modelli di query, essi verranno elencati nel menu "query più recenti" del pannello Find.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="index.html">Indice</a> 
+ «  <a href="index.html">L'indice del filesystem</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
 ::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
 </span></div>

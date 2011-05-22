@@ -4,11 +4,12 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ *		Gerard Stanczak (Google Code-In student)
  * Translators:
  *		Pengphei Han
  *
@@ -34,7 +35,7 @@
 <li><a href="../../it/preferences/locale.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/preferences/locale.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/preferences/locale.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/preferences/locale.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/preferences/locale.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/preferences/locale.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/locale.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/preferences/locale.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -51,8 +52,6 @@
 <div id="content">
 <div>
 
-<h2>本地化</h2>
-
 <h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />本地化</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">首选项</span></td></tr>
@@ -60,11 +59,34 @@
 <tr><td>设置：</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>暂时没有相关文档可供参考。如果您愿意编写相关文档，您可以在 <a href="http://www.freelists.org/list/haiku-doc">文档邮件列表</a>中发布公告来避免工作的重复。</p>
+<p>Haiku 的本地化系统不仅包括替代文本为翻译文字，还包括更复杂的任务，如和您本地本地习惯相匹配的格式化数字，日期，以及时间等。</p>
+<div class="box-info">如果您愿意为翻译提供帮助或者开始当前缺失语言的翻译，您可以联系 <a href="http://www.freelists.org/list/haiku-i18n">Haiku-i18n 邮件列表</a> 。</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>语言</h2>
+<p>Haiku 已经被翻译为了多种语言，无奈有些翻译还有待完成。因此，您可以选择多个语言作为 “首选语言”。如果某些翻译出现丢失，它将会替换为下一个首选语言。英语是默认的候选（即使没有列出）。</p>
+<img src="../images/prefs-images/locale-language.png" alt="locale-language.png" />
+<p>在这个图例中，首选语言设置为西班牙语。首个候选语言是意大利语，并且如果它的文本也缺失了，那么将会默认显示为英语。<br />
+如您所见，在左边展开语言条目将会在子条目中显示该语言的变种或方言（如果可用）。</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>格式</h2>
+<p>在 <span class="menu">格式</span>标签中，您可以设置格式化的日期，时间，数字，并且这些格式与您的首选语言设置相独立。</p>
+<img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
+<p>您可能时定居于意大利的西班牙人，说一部分的瑞士语。因此，您可能在系统中首选西班牙语，但是可以设置数字格式为：瑞士/意大利。<br />
+如果您更倾向于使用西班牙的日期和月份名称（例如，可以考虑修改日期设置文件），您可以在顶部选中<span class="menu">使用首选语言的月份/日期名称</span>以覆盖给定的时间格式。</p>
+<p>即便如此，上述图例可能不是最常见的情况，但是它也说明了系统过渡的平滑。</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>选项</h2>
+<p>最后的标签提供了 <span class="menu">翻译桌面栏和文件浏览器中的应用和目录</span> 选项。如果您希望使用本地化的图形界面，但是保留首选项面板，应用程序，及标准目录的原始英文名称，请禁用该选项。</p>
+<p><br /> </p>
+<p>所做修改即刻应用，尽管当前运行的应用程序可能需要关闭重启才可以显示新的设置。</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">默认</span></td><td> </td><td>设置所有内容为默认值。</td></tr>
+<tr><td><span class="button">取消</span></td><td> </td><td>恢复为启动本地化首选项之前的设置。</td></tr>
+</table>
 
 </div>
 </div>
-<!--
+
 <div class="nav">
 <div class="inner"><span>
  «  <a href="keymap.html">键盘映射</a> 
@@ -72,6 +94,6 @@
 ::  <a href="media.html">媒体</a>  »
 </span></div>
 </div>
--->
+
 </body>
 </html>

@@ -9,6 +9,9 @@
  *
  * Authors:
  *              Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Francesco Franchina
+ *		Barrett
  *
 -->
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -31,7 +34,7 @@
 <li><a href="../../de/applications/icon-o-matic.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../ru/applications/icon-o-matic.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/icon-o-matic.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/icon-o-matic.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/icon-o-matic.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/icon-o-matic.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/icon-o-matic.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/icon-o-matic.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -41,7 +44,7 @@
 <span>
  «  <a href="expander.html">Expander</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applicazioni</a> 
-::  <a href="installer.html">Installer</a>  »
+::  <a href="installer.html">L'Installer</a>  »
 </span></div>
 </div>
 
@@ -50,7 +53,7 @@
 <div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Indice</td></tr>
+<tr class="heading"><td>L'indice del filesystem</td></tr>
 <tr class="index"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
                 <a href="#icons-attributes">Icons are attributes</a><br />
                 <a href="#i-o-m">Creating icons with Icon-O-Matic</a><br />
@@ -65,27 +68,27 @@
 <h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Posizione:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applicazioni</span></td></tr>
+<tr><td>Locazione:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
 </table>
 
 <p><br /></p>
 
-<p>Before we come to the actual creating of icons in Icon-O-Matic, a few words on Haiku's icons in general.</p>
+<p>Prima di passare alla effettiva creazione di icone in Icon-O-Matic, ecco un paio di parole sulle icone di Haiku in generale.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bitmap-vector" name="bitmap-vector">BeOS bitmap vs. Haiku vector icons</a></h2>
-<p>Contrary to the BeOS, Haiku uses vector icons instead of bitmap icons. A special Haiku Vector Icon Format (HVIF) was developed that is highly optimized for small file sizes and fast rendering. That's why our icons are for the most part <i>much</i> smaller than either a bitmap or the widely used SVG format. Also, unlike BeOS' bitmap icons, Haiku isn't limited to an 8bit palette (256 colors).<br />
-Take this icon of the Terminal, for example:</p>
+<a id="bitmap-vector" name="bitmap-vector">Le bitmap di BeOS vs. le icone vettoriali di Haiku</a></h2>
+<p>Contrariamente a BeOS, Haiku utilizza icone vettoriali al posto delle icone bitmap. È stato sviluppato uno speciale Formato di Icone Vettoriali per Haiku (HVIF) che è altamente ottimizzato per file di piccole dimensioni e per un rendering veloce. Ecco perché la maggior parte delle nostre icone sono <i>molto</i> più piccole di una bitmap o del più ampiamente usato formato SVG. Inoltre, a differenza delle icone bitmap di BeOS, Haiku non si limita a una tavolozza 8 bit (256 colori).<br />
+Prendete questa icona del terminale, ad esempio:</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td><b>Bitmap</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
         <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
         <tr align="center"><td>1,024 byte<br />+ 256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
 </table>
-<p>Note that the BeOS used two versions of an icon, one 16x16 and one 32x32, to achieve good visuals in List and Icon View mode.</p>
-<p>This trick isn't needed with vector icons. Besides only taking up a few hundred bytes in a file, vector icons also scale much better than bitmaps. (Note: BeOS offered only a 16x16 and 32x32 display.)</p>
+<p>Notare che BeOS ha usato due versioni della stessa icona, una di 16x16 e l'altra di 32x32, per ottenere buone visualizzazioni in modalità lista e in modalità visuale icone.</p>
+<p>Questo trucco non è necessario con icone vettoriali. Oltre ad occupare solo poche centinaia di byte in un file, le icone vettoriali scalano molto meglio di quelle bitmap. (Nota: BeOS offre solo una visualizzazione 16x16 e una 32x32.)</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
         <tr align="center"><td><b>Bitmap</b></td>
@@ -103,29 +106,29 @@ Take this icon of the Terminal, for example:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icons-attributes" name="icons-attributes">Icons are attributes</a></h2>
-<p>Icons are stored as an attribute with their file. However, that doesn't mean that every file has to have this attribute to appear with an icon in a Tracker window: data files inherit their icon from their filetype. To globally change the filetype's icon you use the <span class="app">FileTypes</span> preferences. If you only want to add a special icon to an individual file, you use the <span class="app">FileType Add-On</span> on it instead. See topic <a href="../filetypes.html">Filetypes</a> for more information.</p>
-<div class="box-info">Being an attribute, it follows that only filesystems supporting metadata can retain a file's individual icon. So, if you move files off your BFS volume, consider zipping them up so you don't lose icons or other attributes.</div>
+<a id="icons-attributes" name="icons-attributes">Le icone sono attributi</a></h2>
+<p>Le icone sono archiviate come un attributo con i loro file. Tuttavia, ciò non significa che ogni file deve avere questo attributo per apparire con un'icona in una finestra del Tracker: i file di dati ereditano la loro icona dal loro tipo di file. Per cambiare globalmente l'icona del tipo di file utilizzazre le preferenze dei <span class="app">FileType</span>. Se si vuole aggiungere soltanto un'icona speciale per un singolo file, si utilizza invece il <span class="app">FileType Add-On</span> su di essa. Vedere il documento <a href="../filetypes.html">Filetypes</a> per maggiori informazioni.</p>
+<div class="box-info">Essendo un attributo, ne consegue che solo i filesystem che supportano i metadati possono conservare singola icona di un file. Quindi, se si spostano i file da un volume BFS, si consigli di comprimerli in modo da non perdere gli attributi delle icone o di altro tipo.</div>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m" name="i-o-m">Creating icons with Icon-O-Matic</a></h2>
-<p>Icon-O-Matic is Haiku's icon editor that can save your work as HVIF, SVG or PNG. The icon can also be directly attached as attribute to an existing file or exported as a resource or source file used by developers. Since the application was tailored to the optimized HVIF format, its usage reflects the inner workings of this format.</p>
+<a id="i-o-m" name="i-o-m">Creare icone con Icon-O-Matic</a></h2>
+<p>Icon-O-Matic è l'editor di icone di Haiku che può salvare il fle come HVIF, SVG o PNG. L'icona può anche essere collegata direttamente come attributo a un file esistente o esportata come file di risorse o come sorgente utilizzato dagli sviluppatori. Dato che l'applicazione è stata ottimizzata su misura per il formato HVIF, il suo uso riflette il funzionamento interno di questo formato.</p>
 <p>Other than your normal vector graphics software, you don't deal with separate objects that each include all their specific properties like path, stroke width, stroke and fill color etc. Rather, you assemble your objects ("shapes") from shared paths and colors ("styles") and set certain properties. This re-using of elements is one secret of HVIF's efficiency. Although that imposes some constraints on the icon designer, there are a few advantages, too.<br />
 For example, by re-using a path, several objects can be modified together by manipulating this one path. Think of an object and its shadow. Modifying their shared path will change the object itself and automatically its (maybe slightly distorted/translated) shadow.</p>
 
-<p>Here's a quick overview of Icon-O-Matic's window:</p>
+<p>Ecco una rapida panoramica della finestra di Icon-O-Matic:</p>
 <img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
-<p>To create any visible object on the canvas, you need a shape with a path and a style. Conveniently, you can create one, two or all three of those together from the <span class="menu">Shape</span> menu. Every kind of object (Paths, Shapes, Transformers, and Styles) has a menu above its list of elements, offering various commands. Every element has certain options that are set in the <span class="menu">Properties</span> view.</p>
+<p>Per creare qualsiasi oggetto visibile nella finestra di disegno, è necessaria una forma con un percorso e uno stile. È possibile crearli comodamente tutti insieme o anche uno per volta dal menù <span class="menu">Shape</span>. Ogni tipo di oggetto (Percorso, Forma, Transformatore, e Stile) ha un menù sopra la propria lista degli elementi, che offrono vari comandi. Ogni elemento ha alcune opzioni che vengono impostate dal menù <span class="menu">Properties</span>.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-path" name="i-o-m-path">Path</a></h3>
-<p>A path consists of several points which are connected with lines or Bezier curves. To add or change points, make sure the path is selected in the path list.</p>
+<a id="i-o-m-path" name="i-o-m-path">Percorso</a></h3>
+<p>Un percorso è costituito da diversi punti che sono collegati con linee e curve di Bezier. Per aggiungere o modificare i punti, assicurarsi che il percorso sia selezionato nella lista dei percorsi.</p>
 
-<p>Simply clicking in the canvas will set the first point. While setting a point, you decide if the resulting line will be straight or curved: a simple click and release produces a straight line, holding down the mouse button and moving the mouse will drag out the handles for a Bezier curve. Of course, you can also change it all later on.</p>
+<p>Basta cliccare sulla finestra di disegno per posizionare il primo punto. Nell'atto di posizionare un punto, si decide se la linea risultante sarà dritta o curva: basta cliccare una volta e rilasciare per una linea retta, oppure tenere premuto il tasto del mouse e muoverlo per trascinare le maniglie di una curva di Bezier. Naturalmente, sarà possibile effettuare modifiche in seguito.</p>
 
 <img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
 
@@ -136,7 +139,7 @@ Vice versa, to go from Bezier to a corner-point, hold <span class="key">ALT</spa
 To insert a point into a path you click on the connecting line between two points.<br />
 Selected points are deleted by pressing <span class="key">DEL</span> or by clicking on any point while holding <span class="key">CTRL</span>.</p>
 
-<p>The mouse pointer indicates the current mode:</p>
+<p>Il puntatore del mouse indica le seguenti modalità:</p>
 <table summary="Mouse pointer states, Path" border="0" cellpadding="10">
         <tr align="center">
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-path" width="16" height="16" /></td>
@@ -155,27 +158,27 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
                 <td>Select points<br /><span class="key">SHIFT</span></td>
         </tr>
 </table>
-<p>You can invoke a context menu by right-clicking a point or a selection of points:</p>
+<p>È possibile richiamare un menu contestuale cliccando col tasto destro su un punto o una selezione di punti:</p>
 <table summary="Path context" border="0" cellspacing="0" cellpadding="2">
-<tr><td class="onelinetop"><span class="menu">Select all</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Selects all points of the current path.</td></tr>
-<tr><td><span class="menu">Transform</span></td><td><span class="key">T</span></td><td>Puts all selected points in a transformation box, so you can move, resize and rotate them together. It works just like with shapes, described a bit further down.</td></tr>
-<tr><td><span class="menu">Split</span></td><td></td><td>Splits selected points into two, one sitting on top of the other.</td></tr>
-<tr><td><span class="menu">Flip</span></td><td></td><td>Rotates selected points by 180°. Only has an effect on Bezier points.</td></tr>
-<tr><td><span class="menu">Remove</span></td><td><span class="key">DEL</span></td><td>Deletes selected points.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Select all</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Seleziona tutti i punti del percorso corrente.</td></tr>
+<tr><td><span class="menu">Transform</span></td><td><span class="key">T</span></td><td>Pone tutti i punti selezionati in una casella di trasformazione in modo da poterli muovere, ridimensionare o ruotare contemporaneamente. Funziona come per le forme, descritte più avanti.</td></tr>
+<tr><td><span class="menu">Split</span></td><td></td><td>Divide i punti selezionati in due, uno sopra all'altro.</td></tr>
+<tr><td><span class="menu">Flip</span></td><td></td><td>Ruota i punti selezionati di 180°. Applicabile solamente ai punti Bezier.</td></tr>
+<tr><td><span class="menu">Remove</span></td><td><span class="key">DEL</span></td><td>Elimina i punti selezionati.</td></tr>
 </table>
 
-<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Path Menu</a></h4>
-<p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add Rectangle</span> and <span class="menu">Add Circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
+<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Menù percorso</a></h4>
+<p>Il menù <span class="menu">Path</span> offre poche ovvie voci per <span class="menu">Add Rectangle</span> e <span class="menu">Add Circle</span> o per <span class="menu">Duplicate</span> o <span class="menu">Remove</span> un percorso. Qui di seguito sono riportate quelle voci che potrebbero necessitare di qualche spiegazione in più:</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Reverse</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
 <tr><td><span class="menu">Clean Up</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Rotate Indices Right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a ⊂ it will rotate like this: ⊂ ∩ ⊃ ∪.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate Indices Left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate Indices Left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Fa la stessa cosa nell'altra direzione.</td></tr>
 </table>
 
-<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Path Properties</a></h4>
-<p><span class="menu">Properties</span> at the bottom left of the window offers all available settings of the currently selected object. A path only has two: a <span class="menu">Name</span> and if it's <span class="menu">Closed</span> or not.</p>
+<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Proprietà del percorso</a></h4>
+<p>Le <span class="menu">Properties</span> in basso a sinistra della finestra mostrano tutte le impostazioni disponibili per gli oggetti correntemente selezionati. Un percorso ne ha solo due: un <span class="menu">Name</span> e se è <span class="menu">Closed</span> o meno.</p>
 
 
 <h3>
@@ -212,15 +215,15 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
 If not, "Freeze Transformation" will apply the current shape transformation to the assigned path(s). A future "Reset Transformation" will then return to this new state.</td></tr>
 </table>
 
-<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Shape Properties</a></h4>
-<p>Besides a <span class="menu">Name</span>, the <span class="menu">Properties</span> view for a shape has these options:</p>
+<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Proprietà delle forme</a></h4>
+<p>Accanto al <span class="menu">Name</span>, la visuale  <span class="menu">Properties</span> per le forme ha le seguenti opzioni:</p>
 
 <table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Min LOD</span></td><td></td><td>Minimum Level of Detail</td></tr>
-<tr><td><span class="menu">Max LOD</span></td><td></td><td>Maximum Level of Detail</td></tr>
+<tr><td><span class="menu">Min LOD</span></td><td></td><td>Livello minimo di dettaglio</td></tr>
+<tr><td><span class="menu">Max LOD</span></td><td></td><td>Livello massimo di dettaglio</td></tr>
 </table>
 
-<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Level of Detail (LOD)</a></h5>
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Livello di Dettaglio (LOD)</a></h5>
 <table summary="LOD example" border="0" cellpadding="10">
         <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
         <tr align="center">
@@ -236,36 +239,36 @@ With the LOD you control the visibility of a shape depending on its size. That w
 For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward (LOD: 48/64 = 0.75):</p>
 
 <table summary="LOD values example" border="0" cellpadding="5">
-<tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Not OK!</b></td></tr>
-<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Shape 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
+<tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Non OK!</b></td></tr>
+<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
 <tr style="background-color:#F1F1F1"><td>Max LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
 <tr><td colspan="6"></td></tr>
-<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Shape 2</b></td><td>Min LOD</td><td>0.75</td><td>Min LOD</td><td>0.75</td></tr>
+<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 2</b></td><td>Min LOD</td><td>0.75</td><td>Min LOD</td><td>0.75</td></tr>
 <tr style="background-color:#F8F8F8"><td>Max LOD</td><td>4.00</td><td>Max LOD</td><td>4.00</td></tr>
 </table>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-style" name="i-o-m-style">Style</a></h3>
-<p>A style can either be a solid color or some type of gradient.<br />
-Besides the predefined colors under <span class="menu">Swatches</span>, you can mix your own by clicking on the current color. Also, note the slider under the color spectrum which sets the alpha-channel (transparency).</p>
+<a id="i-o-m-style" name="i-o-m-style">Stile</a></h3>
+<p>Uno stile può essere dato un colore pieno oppure da alcuni tipi di gradiente. <br />
+Oltre ai colori predefiniti sotto <span class="menu">Swatches</span>, è possibile crearne di propri facendo clic sul colore corrente. Inoltre, si faccia caso al cursore sotto lo spettro di colori, questo serve per impostare il canale alfa (trasparenza).</p>
 <img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
-<p>You quickly create a new style by mixing your color and simply drag&amp;dropping it into the list of styles.</p>
+<p>È possibile creare rapidamente un nuovo stile semplicemente mescolando il colore e trascinandolo all'interno della lista degli stili.</p>
 <p>If you go for a gradient, you set the type (<span class="menu">Linear</span>, <span class="menu">Radial</span>, <span class="menu">Diamond</span>, <span class="menu">Cone</span>) and then define the start and end colors. This is done with a drag&amp;drop from a color bucket into the respective color indicator under the gradient.<br />
 Of course you can move these indicators to change the gradient to your liking. You can also insert more indicators to add more colors by double-clicking into the gradient. Pressing <span class="key">DEL</span> removes the selected indicator.</p>
 <p>You can move, resize and rotate the representing box of a gradient on the canvas until it fits your needs. This works just like with shapes.</p>
 
-<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Style Menu</a></h4>
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Menù Stile</a></h4>
 <p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset Transformation</span>.</p>
 
-<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Style Properties</a></h4>
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Proprietà dello Stile</a></h4>
 <p>The <span class="menu">Name</span> is the only <span class="menu">Properties</span> of a style.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-transformer" name="i-o-m-transformer">Transformer</a></h3>
+<a id="i-o-m-transformer" name="i-o-m-transformer">Trasformatori</a></h3>
 <p>A shape can have Transformers which change its appearance. The effects, however, are more subtle than a truck turning into a battle robot...</p>
 
 <h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer Add Menu</a></h4>
@@ -288,18 +291,18 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-save" name="i-o-m-save">Saving an icon</a></h3>
-<p>There's your usual menu bar at the top, <span class="menu">File</span>, <span class="menu">Edit</span>, <span class="menu">Options</span>. The usage is pretty much self-explaining, so we'll only look at how to save your work.</p>
+<a id="i-o-m-save" name="i-o-m-save">Salvare un'icona</a></h3>
+<p>Anche qui in alto c'è la solita barra con <span class="menu">File</span>, <span class="menu">Edit</span>, <span class="menu">Options</span>. L'utilizzo è piuttosto intuitivo, pertanto si presterà attenzione soltanto a come salvare un lavoro.</p>
 <p><span class="menu">File | Save As...</span> will save in a special Icon-O-Matic format that retains additional information like the names of paths, shapes and styles. These will be stripped from the actual icon once you export it to save space. It's a good idea to back-up your work like this, because without named objects everything's named "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;" which makes specific changes tedious.</p>
 
 <p><span class="menu">File | Export As...</span> opens a familiar save panel with a file format pop-up menu at the bottom, offering these choices:</p>
 <table summary="file formats" border="0" cellspacing="0" cellpadding="2">
 <tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Format</td></tr>
-<tr><td>HVIF RDef</td><td></td><td>Saves as resource used by programmers</td></tr>
-<tr><td>HVIF Source Code</td><td></td><td>Saves as source code used by programmers</td></tr>
-<tr><td>SVG</td><td></td><td>Saves as SVG</td></tr>
-<tr><td>PNG</td><td></td><td>Saves as a 64px sized PNG</td></tr>
-<tr><td>PNG Set</td><td></td><td>Saves as 16, 32 and 64px sized PNGs</td></tr>
+<tr><td>HVIF RDef</td><td></td><td>Salva come risorsa utilizzata dai programmatori</td></tr>
+<tr><td>Codice sorgente HVIF</td><td></td><td>Salva come codice sorgente utilizzato dai programmatori</td></tr>
+<tr><td>SVG</td><td></td><td>Salva come SVG</td></tr>
+<tr><td>PNG</td><td></td><td>Salva come PNG di 64px di dimensioni</td></tr>
+<tr><td>Set di PNG</td><td></td><td>Salva come PNG di 16, 32 e 64px di dimensioni</td></tr>
 <tr><td>BEOS:ICON Attribute</td><td></td><td>Choose a file and set its icon attribute directly</td></tr>
 <tr><td>META:ICON Attribute</td><td></td><td>Choose a file and attach the icon as mere meta data</td></tr>
 </table>
@@ -307,13 +310,13 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-tips" name="i-o-m-tips">Tips &amp; Tricks</a></h3>
-<p>A few things you should keep in mind when working with Icon-O-Matic and some general tips for its usage:</p>
+<a id="i-o-m-tips" name="i-o-m-tips">Consigli e trucchetti</a></h3>
+<p>Di seguito alcune cose che bisognerebbe tenere a mente quando si lavora con Icon-O-Matic e alcuni consigli per il suo utilizzo:</p>
 <ul>
-<li><p>Read the <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Icon Guidelines</a> to learn about important characteristics of Haiku icons, e.g. perspective, colors and shadows.</p></li>
-<li><p>You should always try to minimize your use of paths, those are the most expensive, file size wise. Re-use paths wherever possible and work with manipulated shapes and their transformers instead. Smart use of gradients can also save space.</p></li>
+<li><p>Leggere le <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Linee guida per le icone</a> per imparare quali sono le caratteristiche importanti per un'icona di Haiku, ad esempio la prospettiva, i colori e le ombre.</p></li>
+<li><p>Bisognerebbe sempre tentare di non abusare dell'utilizzo dei percorsi che risultano essere piuttosto costosi in termini di dimensione dei file. Riutilizzare i percorsi ove possibile e lavorare con forme manipolate o con i loro trasformatori. Si può risparmiare spazio con un uso adeguato dei gradienti.</p></li>
 <li><p>Wherever possible, you should activate Snap-to-Grid from the <span class="menu">Options</span> menu when editing paths. Path points that align with the 64x64 pixel grid use less storage space. You'll also get the crispest look if points are set on exact pixel borders. For example, it is important to align the most prominent outlines with the 16x16 grid.</p></li>
-<li><p>Check the preview to see if your icon still looks good in 16x16. You may want to use the <a href="#i-o-m-shape-lod">Level Of Detail</a> settings described in the Shapes section.</p></li>
+<li><p>Controllare l'anteprima per verificare che l'icona 16x16 si veda ancora bene. Volendo, è possibile utilizzare le impostazioni del <a href="#i-o-m-shape-lod">Livello di dettaglio</a> descritte nella sezione delle Forme.</p></li>
 <li><p>There's an easy way to produce letters, even if Icon-O-Matic doesn't provide such a tool. Just enter the text in a text editor such as StyledEdit, adjust font type and style, and drag&amp;drop or copy&amp;paste the selected text into Icon-O-Matic. This will create the according paths and shapes.</p></li>
 <li><p>If you assign more than one path to a shape, their overlapping areas will cancel each other out. When one path is completely inside another, it practically creates a hole in the resulting shape.</p></li>
 <li><p>You can zoom in and out of the canvas with the mouse wheel. Panning is done either by click&amp;drag with the middle mouse button or with a normal left-click&amp;drag while holding <span class="key">SPACE</span>.</p></li>
@@ -342,7 +345,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <div class="inner"><span>
  «  <a href="expander.html">Expander</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applicazioni</a> 
-::  <a href="installer.html">Installer</a>  »
+::  <a href="installer.html">L'Installer</a>  »
 </span></div>
 </div>
 

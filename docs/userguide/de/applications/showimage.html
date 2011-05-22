@@ -4,11 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Szymon Barczak (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
  *
@@ -33,7 +33,7 @@
 <li><a href="../../it/applications/showimage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/showimage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/showimage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/showimage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/showimage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/showimage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/showimage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/showimage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -49,7 +49,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -58,43 +57,54 @@
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>ShowImage is an application used for viewing images in various formats. Its funcionality is not limited only to viewing photos, it can also crop images, show slideshows, rotate and flip images.</p>
-
-<p>If you want to launch this application, simply double-click on some image on your computer.</p>
-
-<p><b>Browse photos</b></p>
-
-<p>You are not limited to viewing only the image you used to launch application. You can go both to previous or to next image from the folder using arrows on keybord. You can also zoom using either mouse scroll or shortcuts - <span class="key">ALT</span> <span class="key">+</span> for zooming in and <span class="key">ALT</span> <span class="key">-</span> for zooming out. High-quality zooming is set by default, but you can disable this function unchecking <span class="menu">View | High-quality zooming</span>. This function does very fast bilinear filtering.</p>
-
-<p>There is a possibility to simply zoom picture to the original size or to fit to the window size. Use <span class="menu">View</span> menu or shortcuts - <span class="key">ALT</span> <span class="key">1</span> to get back to the original size or <span class="key">ALT</span> <span class="key">0</span> to fit to the window size. From the same menu you can also enable stretching an image to the window.</p>
-
-<img src="../images/apps-images/showimage-tiff.png" alt="tiff" />
-
-<p>ShowImage does support multiple-page files, such as TIFF. It means you can turn pages while browsing any multiple-page image. Make use of <span class="menu">Browse</span> menu or use shortcuts (see screenshot above) for this function.</p>
-
-<p>To change mode to full-screen, simply choose <span class="key">ALT</span> <span class="key">ENTER</span> shortcut.</p>
-
-<p><b>Slide show</b></p>
-
-<p>You can run slideshow using menu, simply choose <span class="menu">View | Slide show</span>. There is an option for changing slide delay from 3 to 20 seconds. Default value is a 3 second delay, but you can change it from <span class="menu">View | Slide delay</span> menu.</p>
-
-<p><b>Flip and rotate images</b></p>
-
-<p>This function is also built-in. If you would like to rotate some image, choose proper position from <span class="menu">Image</span> menu or use shortcuts - <span class="key">ALT</span> <span class="key">R</span> will rorate your image clockwise and <span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span> counterclockwise.</p>
-
-<p>You can also flip images. <span class="menu">Image | Flip left to right</span> will flip your image horizontally and <span class="menu">Image | Flip top to bottom</span> vertically.</p>
-
-<p><b>Set background</b></p>
-
-<p>You can set your desktop background directly from ShowImage. Just choose <span class="menu">Image | Use as background...</span> and Backgrounds preflet will pop-up.</p>
-
-<p><b>Drag and drop</b></p>
-
-<p>There is an option to select a piece of an image and create new image file from the selection. Simply press <span class="key">CTRL</span> or <span class="key">ALT</span> and select a fragment you would like to use as a new file and drag the selection to desktop. Also, you can change mode to selection mode, so you will be able to select parts of images using just a left mouse button. This option is available from <span class="menu">Edit | Selection Mode</span></p>
-
-<img src="../images/apps-images/showimage-drag_and_drop_selection.png" alt="showimage-drag_and_drop" />
-
-<div class="box-info">Once you use right mouse button to drag the selection, an image-format menu pops-up.</div>
+<p>Mit ShowImage lassen sich Bilder in allen Formaten anzeigen, die durch <a href="../preferences/datatranslation.html">Translatoren</a> unterstützt werden. Neue Formate werden automatisch erkannt, sobald ihr Translator installiert wurde. So geschah das zum Beispiel für Haikus Vektoricon-Dateien, WonderBrush-Dateien oder als WebM-Bilder weitere Verbreitung fanden.<br />
+ShowImage bietet einige der wichtigsten Bearbeitungsmöglichkeiten, wie das Beschneiden, Drehen oder Spiegeln von Bildern und das Speichern in verschiedenen Formaten.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bilder anzeigen</h2>
+<img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
+<p>Unter <span class="menu">Ansichty</span> sich eine <span class="menu">Diashow</span> aller Bilder eines Ordners (oder dem Ergebnisfenster einer Query) starten und dafür eine <span class="menu">Verzögerung</span> zwischen 2 und 20 Sekunden einstellen.</p>
+<p>Andere Befehle beziehen sich immer auf das aktuell dargestellte Bild (ohne die Fenstergröße zu ändern):<br />
+<span class="menu">Originalgröße</span> zeigt das Bild mit einem Vergrößerungsfaktor von 100%.<br />
+<span class="menu">An Fenstergröße anpassen</span> passt das Bild ins Fenster ein, z.B. nachdem das Bild gezoomt oder die Fenstergröße geändert wurde.<br />
+<span class="menu">Vergrößern</span> und <span class="menu">Verkleinern</span> ändert die Ansicht in 10%-Schritten. Auch mit dem Mausrad lässt sich zoomen; ist ein Bild größer als das Fenster, lässt sich der Bildausschnitt mit der linken Maustaste verschieben.</p>
+<p>Zwei Einstellungen gelten nicht nur für das aktuell dargestellte Bild, sondern bleiben auch erhalten wenn man mehrere Bilder durchsieht:<br />
+<span class="menu">Zoomen mit hoher Qualität</span> wendet zur Bildverbesserung einen schnellen Filter an, um Stufeneffekte beim Zoom abzuschwächen.<br />
+<span class="menu">Auf Fenstergröße vergrößern</span> zieht kleinere Bilder auf Fenstergröße auf.</p>
+<p>Bilder lassen sich im <span class="menu">Vollbild</span>Modus darstellen, mit der Option <span class="menu">Im Vollbild-Modus Dateinamen zu zeigen</span>, wodurch der Dateiname immer unten im Bild eingeblendet wird.</p>
+<p>Mittels <span class="menu">Werkzeugleiste zeigen</span> werden die Bedienelemente aus- und eingeblendet:</p>
+<img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
+<p>Von links nach rechts: Vorheriges Bild, nächstes Bild, Diashow (im Vollbildmodus), Auswahlmodus, Originalgröße, an Fenstergröße anpassen, vergrößern, verkleinern.</p>
+<p>Die meisten der oft benutzten Befehle erscheinen beim Rechtsklick auf ein Bild auch in einem Kontextmenü. Das ist besonders praktisch im Vollbildmodus.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bilder durchsehen</h2>
+<img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
+<p>Nachdem ein Bild geöffnet wurde, kann man schnell alle anderen Bilder in dessen Ordner (oder Ergebnisfenster einer Query) durchsehen, indem man <span class="key">↑</span>/<span class="key">↓</span> oder <span class="key">←</span>/<span class="key">→</span> drückt. Dabei sieht man wie sich die markierte Datei im Tracker-Fenster mit verändert.</p>
+<p>Es besteht die Möglichkeit schnell den Ordner des aktuellen Bilds zu öffnen und sogar zu dessen übergeordneten Ordner oder Unterordnern zu navigieren. Das funktioniert genauso wie das <a href="../tracker.html#drill-down">Navigieren per Untermenüs</a> im Tracker, indem man auf den Info-Teil in der Statusleiste klickt, in dem Größe und Dateiformat des aktuellen Bilds angezeigt werden.</p>
+<p>Unter <span class="menu">Blättern</span> findet sich eine andere Art von Bilder-durchsehen: Einige Dateiformate, beispielweise TIFF, können mehrere Seiten in einer Datei unterbringen. Mit Befehlen wie <span class="menu">Erste Seite</span> und <span class="menu">Letzte Seite</span> lassen sich diese Seiten anspringen.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bilder bearbeiten</h2>
+<img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
+<p>Unter <span class="menu">Bild</span> finden sich einige für Bildbetrachter nötige Befehle zur Bildbearbeitung: Rotieren und Spiegeln von Bildern. Dabei werden die eigentlichen Bilddaten jedoch nicht verändert. Es wird lediglich ein Attribut an die Datei gehängt, damit sie beim nächsten Öffnen gleich automatisch gedreht oder gespiegelt angezeigt wird.</p>
+<p><span class="menu">Als Hintergrund verwenden...</span> öffnet das Einstellungsfenster für <a href="../preferences/backgrounds.html">Hintergründe</a>, um das aktuelle Bild als Hintergrund für Arbeitsflächen zu verwenden.</p>
+<p>Manchmal möchte man ein Bild auch auf einen Ausschnitt beschneiden. Um den Schnittrahmen zu setzen, kann man unter <span class="menu">Bearbeiten</span> in den <span class="menu">Auswahlmodus</span> wechseln und mit der linken Maustaste einen Rahmen aufziehen. Den Wechsel in den Auswahlmodus kann man sich sparen, indem man einfach <span class="key">STRG</span> gedrückt hält bevor man den Rahmen aufzieht (sonst würde man ja maximal den Bildausschnitt verschieben).<br />
+<span class="menu">Auswahl aufheben</span> oder <span class="key">ESC</span> lässt den Rahmen wieder verschwinden.</p>
+<p>Das nächste Kapitel beschreibt wie man den so abgesteckten Bildausschnitt abspeichert.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bilder speichern und konvertieren</h2>
+<p>Mittels <span class="menu">Speichern unter...</span> aus dem <span class="menu">Datei</span> Menü, lässt sich ein Bild in einem beliebigen Format speichern, indem man das entsprechende Format aus dem Untermenü wählt und anschließend einen Namen vergibt.<br />
+Besonders wenn das Tracker-Fenster mit dem Speicherziel bereits geöffnet ist, geht das meist noch schneller per Drag &amp; Drop.</p>
+<img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
+<p>Auf diese Weise bringt man auch das oben beschriebene Beschneiden zum Abschluss. Entweder man zieht wie dort beschrieben einen Rahmen auf, oder benutzt <span class="menu">Bearbeiten | Alles auswählen</span> für das gesamte Bild. Dann klickt man in den Auswahlrahmen und zieht ihn auf den Desktop oder irgendein anderes Tracker-Fenster, um einen neuen Bildausschnitt im selben Format wie das Originalbild zu erstellen.</p>
+<p>Das Speichern in einem anderen Format funktioniert genauso, nur verwendet man stattdessen die rechte Maustaste, wodurch beim Fallenlassen der Auswahl ein Kontextmenü erscheint aus dem das gewünschte Format zu wählen ist.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tastaturkürzel</h2>
+<p>Hier einige der nützlichsten Tastenkürzel:</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Vorheriges Bild</td></tr>
+<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Nächstes Bild</td></tr>
+<tr><td><span class="key">ENTF</span></td><td></td><td>In den Papierkorb verschieben</td></tr>
+<tr><td><span class="key">+</span></td><td></td><td>Vergrößern</td></tr>
+<tr><td><span class="key">-</span></td><td></td><td>Verkleinern</td></tr>
+<tr><td><span class="key">0</span></td><td></td><td>Originalgröße (100% Zoom)</td></tr>
+<tr><td><span class="key">1</span></td><td></td><td>An Fenstergröße anpassen</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">RETURN</span></td><td></td><td>Wechsel in/aus Vollbildmodus (auch per Doppelklick)</td></tr>
+<tr><td><span class="key">STRG</span></td><td></td><td>Bei gedrückter <span class="key">STRG</span> Taste lässt sich ein Auswahlrahmen aufziehen, ohne extra in den Auswahlmodus wechseln zu müssen.</td></tr>
+</table>
 
 </div>
 </div>

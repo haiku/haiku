@@ -34,7 +34,7 @@
 <li><a href="../../it/preferences/e-mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/preferences/e-mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/preferences/e-mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/preferences/e-mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -49,7 +49,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
@@ -88,94 +87,100 @@
 <p>点击您的账户名下的 <span class="menu">Incoming</span> 设置如何进行邮件的接收。</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
 <p>从弹出菜单中，选择您的提供商所使用的协议。目前支持的协议有 <span class="menu">IMAP</span> 和 <span class="menu">POP3</span> 。</p>
-<p>Next is the <span class="menu">Mail Server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
-<p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login Type</i> from the default <span class="menu">Plain Text</span> to <span class="menu">APOP</span> for authentication.</p>
-<p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify a <span class="menu">Top Mailbox Folder</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>The <span class="menu">New Mail Notification</span> offers different methods to announce the arrival of new mail. Try different settings to see what works best for you.</p>
-<p>You can change the <i>Location</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
-<p>Last on this page, you can opt to only <span class="menu">Partially download messages</span> that are larger than a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
+<p>接下来是接收邮件的 <span class="menu">Mail Server</span> 地址。如果您的邮箱供应商需要登录特别端口，您需要将其添加到这里，并使用冒号隔开。例如：<tt>pop.your-provider.org:1400</tt> 。</p>
+<p>然后输入您的登录信息，<i>用户名</i> 及 <i>密码</i>，并且如果有必要，需要修改 <i>登录类型</i> ，从默认的 <span class="menu">Plain Text</span> 到 <span class="menu">APOP</span> 以便于认证。</p>
+<p>如果您使用 <i>POP3</i> 并且从不同的计算机上检索邮件，您可能需要激活 <span class="menu">Leave mail on server</span> 选项及本地的 <span class="menu">Remove mail from server when deleted</span> 。</p>
+<p>如果你你使用的是 <i>IMAP</i> ，您已经具有了本地的 <span class="menu">Remove mail from server when deleted</span> 选项。您可以指定 <span class="menu">Top Mailbox Folder</span> 和指定目录及其子目录同步。</p>
+<p> <span class="menu">New Mail Notification</span> 选项提供了不同方法来通知新邮件。您可以尝试不同的设置，找出最佳的选择。</p>
+<p>您可以修改收件箱的 <i>位置</i> （默认为：<span class="path">/boot/home/mail/in/</span>），如果您希望将不同账户的邮件放到各自的目录，它将非常有用。但是，查询也可以帮您处理的很好。</p>
+<p>在本页最后，您可以选择仅 <span class="menu">下载部分消息</span> ，即某些较大的消息的一部分。它将仅获取消息的头文，并且在查看部分消息及发件人之后，您可以选择是否要下载消息的其余部分及可能的附带文件。如果您的网速比较慢，它将非常有用。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="outgoing" name="outgoing">发件箱的设置</a></h2>
-<p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
+<p>点击您的账户名下面的 <span class="menu">Outgoing</span> 以设置邮件发送方式。</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>As with incoming mail, you can also change the <i>Location</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
-<p>Next is the <i>SMTP Server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
-<p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
+<p>与接收邮件类似，您可以修改您的发件箱的 <i>位置</i> （默认为：<span class="path">/boot/home/mail/out/</span>）。</p>
+<p>接下来是发送邮件的 <i>SMTP Server</i> 地址。与前面的接收服务器类似，如果需要，您可以使用指定端口，如：<tt>mail.your-provider.org:1200</tt> 。</p>
+<p>如果您需要登录，您可以修改 <i>登录类型</i> 为 <span class="menu">ESMTP</span> ，然后输入上述的用户名和密码。其他类型用于需要您检查 <span class="menu">POP3 before SMTP</span> 邮件认证的供应商。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filters" name="filters">过滤器的设置</a></h2>
-<p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
-Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
+<p>如果您希望过滤接收邮件，您需要点击账户名下的 <span class="menu">E-Mail Filters</span> 以设置自动排序。您可以添加任意数量的过滤器并加以应用。您也可以将其拖动重新排列位置。<br />
+
+除了用于向后兼容的 <span class="menu">R5 后台过滤器</span> ，还有两个其他的 <span class="menu">接收邮件过滤器</span> 可供添加。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam Filter</h3>
+垃圾邮件过滤器</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
-You can have that spam rating added to the start of the subject.<br />
-Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
-<p>Together with the following <span class="menu">Match Header</span> filter, you're able to automatically sort out detected spam mails.</p>
+<p>垃圾邮件过滤器使用了统计的方法来识别邮件为不需要的垃圾邮件。它将会赋予 0-1 之间的值给邮件，并且您可以决定有用和垃圾邮件的范围。<br />
+
+您可以查看添加到邮件头部的排名。<br />
+
+同时，垃圾过滤器可以从所有的接收邮件中学习。当然，您必须检出被误认为垃圾邮件的负面邮件。您将会发现更多关于我们正在讨论的 <span class="app">Mail</span> 的信息。</p>
+<p>与下述的 <span class="menu">Match Header</span> 过滤器相结合，您将能够自动检出删除的垃圾邮件。 </p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Match Header</h3>
+邮件头匹配</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>This filter compares a header to a search pattern and performs some action when it matches.<br />
-With the first text field you specify which header to check against. These are available:</p>
+<p>过滤器将邮件头与搜索模式相匹配，并且当匹配时执行某些动作。<br />
+
+通过首个文本框，您可以指定所要校核的邮件头。有下列可选项：</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
-		<td>the name of the sender</td></tr>
+		<td>发件人的名称</td></tr>
 	<tr><td><span class="menu">From</span></td><td> </td>
-		<td>the e-mail address of the sender</td></tr>
+		<td>发件人邮箱地址</td></tr>
 	<tr><td><span class="menu">To</span></td><td> </td>
-		<td>your e-mail address (different for each e-mail account)</td></tr>
+		<td>您的邮箱地址（由邮箱账户不同而不同）</td></tr>
 	<tr><td><span class="menu">Reply To</span></td><td> </td>
-		<td>the e-mail address replies are sent to</td></tr>
+		<td>将要回复到的邮箱地址。</td></tr>
 	<tr><td><span class="menu">When</span></td><td> </td>
-		<td>the date and time the mail was received</td></tr>
+		<td>邮件接收的日期和时间。</td></tr>
 	<tr><td><span class="menu">Subject</span></td><td> </td>
-		<td>the subject line</td></tr>
+		<td>主题</td></tr>
 	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
+		<td>抄送地址（Cc）</td></tr>
 	<tr><td><span class="menu">Account</span></td><td> </td>
-		<td>the name of the e-mail's account</td></tr>
+		<td>邮箱账户名</td></tr>
 	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have defined yourself. However, unless you change it yourself in a filter, it will always be "New" after the Mail Service fetched the mail.</td></tr>
+		<td>当前邮箱状态。通常为 "Read"，"Replied"，"Sent"，"Forwarded"，"New"，或者其他自定义的内容。但是，除非您在过滤器中做了修改，否则，当 Mail 服务获取邮件之后，它总是为 "New" 。</td></tr>
 	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
+		<td>由发件人的邮件程序设置（如，"urgent"）</td></tr>
 	<tr><td><span class="menu">Thread</span></td><td> </td>
-		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
+		<td>实质上与 "Subject" 相同，但是不附带如 "Re:" 或者  "Fwd:" 等内容。</td></tr>
 	<tr><td><span class="menu">Classification Group</span></td><td> </td>
-		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
+		<td>根据 垃圾邮件过滤器 对它的分类，可以为空（如果不确定）或者包含 "Genuine" 或 "Spam" 等。</td></tr>
 	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
-		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
+		<td>这是 垃圾邮件过滤器 赋给邮箱的估算数值。它们以科学记数法的形式表示，如 1.065e-12，其表达的意思为，1.065 除以 10 的 12次方，大小为 0.000000000001065 。</td></tr>
 </table>
-<p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
-<p>With the pop-up menu below it, you assign an action when the pattern matches. You can move or delete a mail, set the status to "Read" or anything else or set the e-mail account you'll reply with.</p>
+<p>第二个文本框放置您的搜索方式。它可以接受 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">正则表达式</a> ，这给了它巨大的灵活性，虽然可能会让事情变得复杂。仔细阅读有关内容，它非常值得，并且简单的搜索模式并没有 <i>那么</i> 复杂。</p>
+<p>通过其下的弹出菜单，您可以设置模式匹配时的动作。您可以移动或者删除邮件，设置 "Read" 或其他状态，或者设置执行回复的邮箱账户。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
-<p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
-<br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
+发送邮件过滤器</h3>
+<p>现在，仅有一个过滤器用于处理发送邮件：<span class="cli">fortune</span> 。<br />
+
+在邮件送出之前，它将会在每个邮件末尾添加一个随机选择的趣味或智慧的 "fortune cookie" 。您可以在终端中执行 <span class="cli">fortune</span> 命令来执行一次示范演练。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">邮箱服务设置</a></h2>
-<p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
+<p>现在，您的接收和发送邮件服务器（可能还有某些过滤器）都完成了配置，那么您需要告诉实际执行检查和接收的 Mail 服务 如何完成它的任务。</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
-If you're on a dial-up connection, you may want to do that <span class="menu">Only When Dial-Up is Connected</span> and also <span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
-<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While Sending</span>, <span class="menu">While Sending and Receiving</span> or <span class="menu">Always</span>.</p>
-<p>Make sure to <span class="menu">Start Mail Services on Startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<p>在 <i>Mail Checking</i> 中，您可以配置检查账户的邮件服务器中新邮件的时间间隔。<br />
+
+如果您使用拨号连接，您可能需要 <span class="menu">Only When Dial-Up is Connected</span> 以及 <span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span> 以避免自动拨号激动检查邮件。</p>
+<p> Mail 服务具有一个状态窗口，您可以将其设置为显示  <span class="menu">Never</span>，<span class="menu">While Sending</span>，<span class="menu">While Sending and Receiving</span> 或者 <span class="menu">Always</span> 。</p>
+<p>确保启用 <span class="menu">Start Mail Services on Startup</span> ，否则将会没有运行的 mail_daemon 来执行您的命令。</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit Mailbox Menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
-<p>From that menu, you can also <span class="menu">Create New Message...</span>, <span class="menu">Check For Mail Now</span> or <span class="menu">Edit Preferences...</span>.</p>
-<p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
+<p><span class="menu">Edit Mailbox Menu...</span> 将会打开 <span class="path">/boot/home/config/Mail/Menu Links/</span> 目录。所有的目录或查询，以及放置于该目录中的链接将会呈现在 桌面栏托盘 中 Mail 服务 的邮箱图标的右键菜单中。 </p>
+<p>从该菜单中，您也可以 <span class="menu">Create New Message...</span>，<span class="menu">Check For Mail Now</span> 或者<span class="menu">Edit Preferences...</span> 。</p>
+<p>当其中有信封时，邮箱图标本身显示了是否有未读的消息（状态 "New"）。</p>
 
 </div>
 </div>

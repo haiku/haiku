@@ -4,13 +4,15 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Gerard Stanczak (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Matthias
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -33,7 +35,7 @@
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/midiplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../jp/applications/midiplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/midiplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/midiplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -41,7 +43,7 @@
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="mediaplayer.html">MediaPlayer</a> 
+ «  <a href="mediaplayer.html">Media-Player</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
 ::  <a href="packageinstaller.html">PackageInstaller</a>  »
 </span></div>
@@ -57,14 +59,19 @@
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Dieses Thema wurde noch nicht beschrieben. Wer daran arbeiten möchte, meldet sich bitte auf der <a href="http://www.freelists.org/list/haiku-doc">Documentation Mailingliste</a>.</p>
+<p>Wie der Name schon verrät, dient der MidiPlayer zum Abspielen von Midi-Dateien. Midi-Dateien sind insofern besonders, als sie nicht digitalisierte und irgendwie kodierte Musik enthalten, sondern nur eine Beschreibung von ihr: Halte diese Note für soundso lang mit dieser Lautstärke und benutze Dafür Instrument X.<br />
+Während die so zustande kommenden Dateien sehr klein sind, folgt daraus auch, dass sich das Ergebnis je nach verwendeter Instrumentenbibliothek (der "SoundFont") stark unterscheidet. Diese SoundFont-Dateien sind meistens recht groß; um so größer, je höher die Qualität und Anzahl der Instrumenten-Samples ist.</p>
+<div class="box-info"><p>Haiku kommt ohne vorinstallierte SoundFonts, weil sie so groß sind und sie nur relativ wenige Leute wirklich brauchen. Und die, die tatsächlich welche einsetzen, besitzen meist schon einen eigenen SoundFont hochwertiger Instrumente. Um aber zumindest <i>irgendwas</i> zu hören, kann ein frei verfügbarer mit einem optionalen Paket installiert werden. Im Terminal schreibt man dazu: <tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>Um einen anderen SoundFont zu benutzen, legt man eine Verknüpfung auf ihn in <tt>/boot/system/data/synth</tt> an und nennt sie <tt>big_synth.sy</tt>.</p></div>
+<img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
+<p>Die Oberfläche des MidiPlayers ist sehr einfach gehalten. Wird eine Midi-Datei doppelgeklickt oder auf dem Fenster fallen gelassen, beginnt automatisch die Wiedergabe. Mit einem Regler wird die Lautstärke geändert und aus einem <span class="menu">Hall</span> Menü lassen sich Effekte zuschalten. Zur Visualisierung kann eine Wellenform oben im Fenster angezeigt werden.</p>
 
 </div>
 </div>
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="mediaplayer.html">MediaPlayer</a> 
+ «  <a href="mediaplayer.html">Media-Player</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
 ::  <a href="packageinstaller.html">PackageInstaller</a>  »
 </span></div>

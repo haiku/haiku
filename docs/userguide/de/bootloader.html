@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -34,7 +35,7 @@
 <li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/bootloader.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -55,7 +56,7 @@
 <h1>Boot Loader</h1>
 
 <p>Mit dem "Haiku Boot Loader" kann man zum einen unterschiedliche Haiku-Installationen starten, zum anderen hardware-spezifische Probleme umgehen. <br />Ebenso ist es damit möglich, während einer Software-Installation hinzugefügte Systemerweiterungen vorübergehend zu deaktivieren (über den unten bezeichneten Punkt <i>Disable user add-ons</i>), um eventuell aufgetretene Fehler zu beheben.</p>
-<p>Um zum Bildschirm der Boot Loader Optionen zu gelangen, muss man noch vor Beginn des Boot-Prozesses <span class="key">SHIFT</span> gedrückt halten. Ist ein Bootmanager installiert, kann man das bereits tun bevor man dort den Haiku-Eintrag auswählt. Ist Haiku das einzige Betriebssystem auf dem Rechner, kann die Taste schon gehalten werden während noch die BIOS Meldungen zu sehen sind.</p>
+<p>Um zum Bildschirm der Boot Loader Optionen zu gelangen, muss man noch vor Beginn des Boot-Prozesses <span class="key">SHIFT</span> gedrückt halten. Ist ein Bootmanager installiert, kann man das bereits tun, bevor man dort den Haiku-Eintrag auswählt. Ist Haiku das einzige Betriebssystem auf dem Rechner, kann die Taste schon gehalten werden, während noch die BIOS Meldungen zu sehen sind.</p>
 <p><br /></p>
 <p>Im Boot Loader hat man vier Auswahlmöglichkeiten:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
@@ -88,16 +89,16 @@
 <p>Nach der Auswahl einer oder mehrerer Optionen kann man über das Hauptmenü den eigentlichen Boot-Vorgang starten. Es erscheint daraufhin folgender Bildschirm:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>Wenn Haiku ordnungsgemäß bootet, leuchten nacheinander alle Icons auf und das System wechselt zum Desktop.<br />
+<p>Wenn Haiku ordnungsgemäß bootet, leuchten nacheinander alle Icons auf, und das System wechselt zum Desktop.<br />
 Die unterschiedlichen Symbole repräsentieren die verschiedenen Phasen des Boot-Vorganges:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Die einzelnen Kernel-Module werden geladen.</td></tr>
 	<tr><td><b>Laufwerk + Lupe</b></td><td> </td><td>Die Boot-Partition wird gesucht und spezielle Dateisysteme angelegt (rootfs: <span class="path">/</span> und <span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Steckkarte</b></td><td> </td><td>Der Geräte-Manager, der sich um die Zuteilung von Systemressourcen an die einzelnen Hardware-Komponenten kümmert wird geladen.</td></tr>
+	<tr><td><b>Steckkarte</b></td><td> </td><td>Der Geräte-Manager, der sich um die Zuteilung von Systemressourcen an die einzelnen Hardware-Komponenten kümmert, wird geladen.</td></tr>
 	<tr><td><b>Boot-Laufwerk</b></td><td> </td><td>Die vorher gefundene Boot-Partition wird in das Dateisystem eingebunden.</td></tr>
 	<tr><td><b>Chip</b></td><td> </td><td>Spezielle Hauptprozessor-Module werden geladen.</td></tr>
 	<tr><td><b>Ordner</b></td><td> </td><td>Alle Subsysteme werden aktiviert.</td></tr>
-	<tr><td><b>Rakete</b></td><td> </td><td>Die Boot-Skripte werden abgearbeitet und anschließend der Desktop gestartet.</td></tr>
+	<tr><td><b>Rakete</b></td><td> </td><td>Die Boot-Skripte werden abgearbeitet, anschließend wird der Desktop gestartet.</td></tr>
 </table>
 
 </div>

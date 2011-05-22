@@ -34,7 +34,7 @@
 <li><a href="../de/applications.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../ru/applications.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/applications.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
@@ -60,8 +60,8 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Installare le applicazioni</a></h2>
-<p>Il software per Haiku, è sempre distribuito sotto forma di archivio, la maggior parte delle volte si tratta di un file ZIP, mentre alcuni vecchi pacchetti per BeOS sono nel formato PKG di Sofware Valet, quindi dopo un doppio click sul file bisogna semplicemente scegliere una cartella di installazione ed il programma si preoccuperà di fare tutto il lavoro poiché Software Valet era in grado di eseguire automaticamente degli script di installazione.<br />
-Se si tratta di un archivio in formato ZIP, effettuando un doppio click si aprirà <span class="app">Expander</span> dove è possibile impostare la destinazione ed infine estrarlo. Come spiegato nel capitolo <a href="filesystem-layout.html">Filesystem layout</a>, questa destinazione può essere :</p>
+<p>Il software per Haiku, è sempre distribuito sotto forma di archivio, la maggior parte delle volte si tratta di un file ZIP, invece alcuni vecchi pacchetti per BeOS sono nel formato PKG di Sofware Valet che era in grado di eseguire automaticamente degli script di installazione. Quindi dopo un doppio click sul file, bisogna semplicemente scegliere una cartella di installazione e il programma si preoccuperà di fare tutto il lavoro.<br />
+Se si tratta di un archivio in formato ZIP, effettuando un doppio click si aprirà <span class="app">Expander</span> dove sarà possibile impostare la destinazione ed infine estrarlo. Come spiegato nel capitolo <a href="filesystem-layout.html">Filesystem layout</a>, questa destinazione può essere :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td> per le applicazioni disponibili a tutti gli utenti</td></tr>
 <tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td> per applicazioni disponibili solo all'utente</td></tr>
@@ -70,8 +70,8 @@ Se si tratta di un archivio in formato ZIP, effettuando un doppio click si aprir
 
 </p>
 <p>Quando l'archivio è stato estratto, si consiglia di guardare all'interno della cartella appena creata, è possibile trovare dei file ReadMe ed altra documentazione utile.</p>
-<p>Alcuni programmi hanno bisogno di una successiva configurazione, i componenti utili ad estendere il sistema come <a href="tracker-add-ons.html"> gli Add-On del Tracker</a> ed <a href="preferences/datatranslations.html">i Translator</a>, devono essere inseriti nelle cartelle corrette. In alternativa è possibile trovare uno script (spesso con estensione<span class="cli">.sh</span>, per esempio <span class="cli">install</span>) che con un semplice doppio click si preoccupa di di installare il programma.<br />
-E' anche possibile trovare delle cartelle che puntano alla destinazione corretta, come "<span class="cli">drag [filename] here...</span>". In questo caso basta semplicemente trascinare il file nella cartella.</p>
+<p>Alcuni programmi hanno bisogno di una successiva configurazione, i componenti utili ad estendere il sistema come <a href="tracker-add-ons.html"> gli Add-On del Tracker</a> e <a href="preferences/datatranslations.html">i Translator</a>, devono essere inseriti nelle cartelle corrette. In alternativa è possibile trovare uno script (spesso con estensione<span class="cli">.sh</span>, per esempio <span class="cli">install</span>) che con un semplice doppio click si occupa di di installare il programma.<br />
+E' anche possibile trovare delle cartelle che puntano alla destinazione corretta, come "<span class="cli">drag [filename] here...</span>". In questo caso basta semplicemente trascinare il file indicato nella cartella.</p>
 <p>Naturalmente, estraendo l'archivio la maggior parte delle volte non è necessario niente di tutto questo.
 <br />
 I Capitoli <a href="deskbar.html">La Deskbar</a> oppure <a href="desktop-applets/launchbox.html">LaunchBox</a> spiegano come aggiungere dei comandi rapidi alla nuova applicazione.</p>
@@ -83,12 +83,12 @@ I Capitoli <a href="deskbar.html">La Deskbar</a> oppure <a href="desktop-applets
 <br />
 Altrimenti, è possibile disinstallare un'applicazione, rimuovendo la sua cartella di installazione.</p>
 <p>Ovviamente, in questo modo le possibili configurazioni presenti in <span class="path">~/config/settings</span> non vengono cancellate. Può essere utile se l'utente vuole mantenere la configurazione in vista di una possibile reinstallazione del programma. Inoltre, (quando l'installazione li fornisce) i file presenti nelle cartelle del tipo "<span class="cli">drag [filename] here...</span>" non vengono eliminati.</p>
-<p>Un metodo per ottenere velocemente tutti i file di un'applicazione, è quello di fare una veloce ricerca usando una parte rilevante del suo nome. La query mostrerà il binario dell'applicazione, la sua cartella di installazione, le sue impostazioni e se possibile i collegamenti nella Deskbar ecc. Sarà sufficiente selezionare tutti i file rilevanti ed eliminarli.</p>
+<p>Un metodo per ottenere velocemente tutti i file di un'applicazione, è quello di fare una ricerca veloce usando una parte rilevante del suo nome. La query mostrerà il binario dell'applicazione, la sua cartella di installazione, le sue impostazioni e se possibile i collegamenti nella Deskbar ecc. Sarà sufficiente selezionare tutti i file rilevanti ed eliminarli.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Applicazioni fornite da Haiku</a></h2>
-<p>Haiku viene fornito con un set di applicazioni per lo più piccole ed essenziali. Puoi trovarle in <span class="path">/boot/system/apps/</span> oppure in <span class="path">/boot/common/apps/</span>.  Possono essere trovate nel menu <span class="menu">Applicazioni</span> della Deskbar le applicazioni che solitamente non vengono avviate tramite il doppio click su di un file (ad esempio ShowImage per i file di immagini).</p>
+<p>Haiku viene fornito con un set di applicazioni per lo più piccole ed essenziali. Si possono trovare in <span class="path">/boot/system/apps/</span> oppure in <span class="path">/boot/common/apps/</span>. Le applicazioni che di solito non vengono lanciate tramite un doppio click sul file (ad esempio ShowImage per i file immagine) possono essere trovate nel menu della Deskbar <span class="menu">Applicazioni</span>.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
 		<td valign="top">Strumento per tenere sotto controllo risorse come CPU ed uso della memoria.</td></tr>
@@ -117,7 +117,7 @@ Altrimenti, è possibile disinstallare un'applicazione, rimuovendo la sua cartel
 	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
 		<td valign="top"><span style="color:silver"> Client email. [<i>mancante</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
-		<td valign="top"><span style="color:silver">Riproduttore per tutti i formati audio/video supportati. [<i>mancante</i>]</span></td></tr>
+		<td valign="top">A player for all supported audio/video files.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Player per file MIDI. [<i>mancante</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
@@ -129,7 +129,7 @@ Altrimenti, è possibile disinstallare un'applicazione, rimuovendo la sua cartel
 	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
 		<td valign="top">Strumento per fare screenshot.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
-		<td valign="top"><span style="color:silver">Semplice visualizzatore di immagini [<i>mancante</i>]</span></td></tr>
+		<td valign="top">A simple image viewer.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Strumento per registrare audio dalla line-in o dal microfono. [<i>mancante</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>

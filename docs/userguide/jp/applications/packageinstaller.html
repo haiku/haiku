@@ -4,11 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Humdinger <humdingerb@gmail.com>
+ *		Gerard Stanczak (Google Code-In student)
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -32,7 +32,7 @@
 <li><a href="../../it/applications/packageinstaller.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../ru/applications/packageinstaller.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../es/applications/packageinstaller.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/packageinstaller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../sv_SE/applications/packageinstaller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
 <li><a href="../../uk/applications/packageinstaller.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/packageinstaller.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/packageinstaller.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -54,14 +54,26 @@
 <tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><i>No entry, normally launched via
 double-clicking a supported file.</i></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/PackageInstaller</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><i>none</i></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><i>なし</i></td></tr>
 </table>
 <p><br /></p>
-<p>ドキュメントはまだ存在しません。ドキュメントについて作業を行いたいときは、重複を避けるため<a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a>でお知らせください。</p>
+<div class="box-info">This page is currently only a first draft. Please check back later for a refined version.</div>
+<p>PackageInstaller is a software installer for BeOS packages in PKG format. It provides an easy-to-use GUI that helps in fast package installation in Haiku.</p>
+<p>It is being executed automatically when you try to open files with .pkg extension.</p>
+<img src="../images/apps-images/packageinstaller.png" alt="packageinstaller.png" />
+<p>The main window gives access to two configurations:</p>
+<ul>
+<li>type of installation (depending on the developer there might be more than one (standard) installation option).</li>
+<li>Installation location (only entire partitions/hard disks can be chosen, not custom paths)</li>
+</ul>
+<p>After clicking Install the extraction and installation process will begin.</p>
+<img src="../images/apps-images/packageinstaller-installer.png" alt="packageinstaller-installer.png" />
+<p>At this point warnings and errors can appear saying which libraries and dependencies are missing in order to run the program. It might be required to install these packages before attempting to install desired program.</p>
+<p>When the installation is complete, package should appear in the Deskbar applications menu.</p>
 
 </div>
 </div>
-<!--
+
 <div class="nav">
 <div class="inner"><span>
  «  <a href="midiplayer.html">MidiPlayer</a> 
@@ -69,6 +81,6 @@ double-clicking a supported file.</i></td></tr>
 ::  <a href="people.html">People</a>  »
 </span></div>
 </div>
--->
+
 </body>
 </html>

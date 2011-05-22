@@ -31,7 +31,7 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../images/flags/sv_SE.png" alt="" /> Svensk</li>
+<li class="now"><img src="../images/flags/sv_SE.png" alt="" /> Svenska</li>
 <li><a href="../fr/applications.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
 <li><a href="../de/applications.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../it/applications.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
@@ -52,28 +52,27 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Applikationer</h1>
 
-<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs you downloaded somewhere, for example from a site mentioned on the <a href="../../welcome/welcome_sv_SE.html#software">Welcome</a> page.</p>
-<div class="box-info">You should only unpack/install archives within Haiku. If you extract a package under Linux or Windows, for example, and just copy the folder over to Haiku later, all the vital attributes are stripped, because those operating systems don't normally handle meta data.</div>
+<p>Innan vi dyker ner i alla applikationer som följer med Haiku, låt oss se på hur du installerar och avinstallerar program du laddat ner någonstans, t.ex. från någon av webbplatserna som nämns på <a href="../../welcome/welcome_sv_SE.html#software">Välkommen</a>-sidan.</p>
+<div class="box-info">Du bör endast packa upp eller installera arkiv inuti Haiku. Om du öppnar en packad fil i t.ex. Linux eller Windows och bara kopierar innehållet till Haiku senare raderas alla viktiga attribut, eftersom de operativsystemen inte normalt hanterar metadata.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Att installera applikationer</a></h2>
-<p>Haiku software always comes as an archive. Most of the time it's a ZIP, some old BeOS packages come in Software Valet's PKG format. Software Valet was able to automatically execute installation scripts, so after double-clicking you just select a destination folder and everything's taken care of.<br />
-If it's a ZIP archive, double-clicking opens <span class="app">Expander</span> where you also set the destination and unpack it. As explained in the topic <a href="filesystem-layout.html">Filesystem layout</a>, that destination is either</p>
+<p>Mjukvara till Haiku kommer alltid i en packad fil. För det mesta är det en ZIP-fil, men en del gamla BeOS-paket kommer i Software Valets PKG-format. Software Valet kunde automatiskt köra installationsskript, så efter att du dubbelklickat, välj bara en mapp att installera i så sköts allt automatiskt.<br />
+Om det är en ZIP-fil öppnas den med ett dubbelklick i <span class="app">Expander</span>, där du också väljer en plats att packa upp den till. Som det förklaras i kapitlet <a href="filesystem-layout.html">Filesystem layout</a>, är den platsen någon av</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td> for applications available to every user</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td> for applications only available to yourself</td></tr>
+<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>för applikationer tillgängliga för alla användare</td></tr>
+<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>för applikationer tillgängliga bara för dig själv</td></tr>
 </table>
-<p>This distinction will only become relevant once Haiku gets multi-user support, of course.</p>
-<p>Once the archive is unpacked, you should have a look into the newly created folder. Often you find ReadMe files or other documentation of interest.</p>
-<p>Some programs need further configurations. For example, <a href="tracker-add-ons.html">Tracker Add-Ons</a>, <a href="preferences/datatranslations.html">Translators</a> or other system enhancing components have to be put into the right folders. Either you'll find a little script file (often with the suffix <span class="cli">.sh</span>) like <span class="cli">install</span> that you simply double click to have all taken care of.<br />
-Sometimes you'll find folders that link to the correct destination named "<span class="cli">drag [filename] here...</span>". So, you simply follow that instruction and you're done.</p>
-<p>Most of the time, however, nothing of the sort is necessary and you're done after unpacking.<br />
-Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
+<p>Denna särskiljning kommer bil meningsfull först när Haiku får stöd för flera användare.</p>
+<p>När filen packats upp bör du ta en titt i den nya mappen som skapats. Ofta hittar du en ReadMe-fil, eller annan intressant dokumentation.</p>
+<p>Några program kräver ytterligare konfigurering. Exempelvis <a href="tracker-add-ons.html">Tracker-tillägg</a>, <a href="preferences/datatranslations.html">Translators</a> och andra systemförbättrande komponenter behöver läggas i de rätta mapparna. Antingen hittar du en liten skript-fil (ofta med ändelsen <span class="cli">.sh</span>) t.ex. <span class="cli">install</span> som du helt enkelt dubbelklickar på för att sköta allt sådant.<br />
+Ibland hittar du en mapp med namnet "<span class="cli">drag [filename] here...</span>", som länkar till den korrekta platsen. Följ bara instruktionen så är det klart.</p>
+<p>För det mesta är det dock inte nödvändigt att göra något extra, och du är klar när filen packats upp.<br />
+Kapitlen <a href="deskbar.html">Deskbar</a> och <a href="desktop-applets/launchbox.html">LaunchBox</a> beskriver hur du skapar genvägar till dina nyinstallerade applikationer.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -81,7 +80,7 @@ Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.
 <p>Om installationen sköttes av ett installationsskript finns det troligtvis ett avinstallationsskript också. I så fall, dubbelklicka på det så är det klart.<br />
 Annars avinstalleras applikationen enkelt genom att radera dess mapp.</p>
 <p>Detta kan eventuellt lämna kvar konfigurations filer i din <span class="path">~/config/settings</span> mapp. Detta kan vara med avsikt, ifall du vill spara inställningarna om en framtida installation av programmet önskas. Även när installationen visar dessa "<span class="cli">drag [filename] here...</span>" mappar, lämnas dessa filer kvar.</p>
-<p>One method to quickly get to all the app's files is to do a quick query for a significant part of the application's name. This will reveal the app's binary, its installation folder and its settings as well as possible links in the Deskbar etc. Simply select all relevant files and delete them.</p>
+<p>Ett sätt att snabbt hitta alla applikationens filer är att göra en snabb sökning efter en större del av applikationens namn. Då hittar du applikationens binärfil, mappen där den installerats, dess inställningar och eventuella länkar i Deskbar etc. Välj helt enkelt alla relevanta filer och radera dem.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,7 +114,7 @@ Annars avinstalleras applikationen enkelt genom att radera dess mapp.</p>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
 		<td valign="top"><span style="color:silver">En epostklient. [<i>saknas fortfarande</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
-		<td valign="top"><span style="color:silver">En spelare för alla audio/video filer som stöds. [<i>saknas fortfarande</i>]</span></td></tr>
+		<td valign="top">En spelare för alla audio/video-filer som stöds.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
 		<td valign="top"><span style="color:silver">En spelare för MIDI-filer. [<i>saknas fortfarande</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
@@ -127,7 +126,7 @@ Annars avinstalleras applikationen enkelt genom att radera dess mapp.</p>
 	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
 		<td valign="top">Ett verktyg för att ta skärmbilder.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
-		<td valign="top"><span style="color:silver">En enkel bildvisare. [<i>saknas fortfarande</i>]</span></td></tr>
+		<td valign="top">En enkel bildvisare.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Ett verktyg för att spela in ljud från linje- eller microfoningången. [<i>saknas fortfarande</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
@@ -139,16 +138,16 @@ Annars avinstalleras applikationen enkelt genom att radera dess mapp.</p>
 	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
 		<td valign="top"><span style="color:silver">En visare för analog TV. [<i>saknas fortfarande</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
-		<td valign="top">A native web browser</td></tr>
+		<td valign="top">En medföljande webbläsare</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-apps" name="cli-apps">Haiku's commandline applications</a></h2>
-<p>Besides the normal commandline tools coming with the bash shell or are necessary to be POSIX compliant, there are a few Haiku-specific commandline applications worth mentioning. These commands are often useful for scripting purposes, see also topic <a href="bash-scripting.html">Bash and Scripting</a>.</p>
+<a id="cli-apps" name="cli-apps">Haikus kommandoradsapplikationer</a></h2>
+<p>Förutom de vanliga kommandoradsverktygen som följer med bash, eller krävs för att vara POSIX-kompatibel, finns det  några Haiku-specifika kommandoradsapplikationer värda att nämnas. Dessa kommandon är ofta användbara till skriptning, se kapitlet <a href="bash-scripting.html">Bash and Scripting</a>.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">List of all commandline applications</a></td><td> </td></tr>
-		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku-specific commandline applications</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">Lista över alla kommandoradsapplikationer</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Kommandoradsapplikationer</a></td><td> </td></tr>
 </table>
 
 <h2>
