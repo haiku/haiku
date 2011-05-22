@@ -116,6 +116,8 @@ class ExtensionListView : public DropTargetListView {
 			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 		virtual ~ExtensionListView();
 
+		virtual	BSize MinSize();
+
 		virtual void MessageReceived(BMessage* message);
 		virtual bool AcceptsDrag(const BMessage* message);
 
@@ -123,6 +125,7 @@ class ExtensionListView : public DropTargetListView {
 
 	private:
 		BMimeType	fType;
+		BSize		fMinSize;
 };
 
 
@@ -244,6 +247,23 @@ ExtensionListView::ExtensionListView(const char* name,
 
 ExtensionListView::~ExtensionListView()
 {
+}
+
+
+BSize
+ExtensionListView::MinSize()
+{
+	if (!fMinSize.IsWidthSet() || fMinSize.IsHeightSet()) {
+		BFont font;
+		GetFont(&font);
+		fMinSize.width = font.StringWidth(".mmmmm");
+
+		font_height height;
+		font.GetHeight(&height);
+		fMinSize.height = (height.ascent + height.descent + height.leading) * 3;
+	}
+
+	return fMinSize;
 }
 
 
@@ -432,7 +452,6 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.Add(fRuleControl, 0, 4, 3, 1)
 		.SetInsets(padding, padding, padding, padding);
 
-	recognitionBoxGrid->SetExplicitAlignment(fullAlignment);
 	fRecognitionBox->AddChild(recognitionBoxGrid);
 
 	// "Description" group
