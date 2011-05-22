@@ -31,11 +31,15 @@
 // USB Command Register (EHCI Spec 2.3.1)
 #define EHCI_USBCMD_ITC_SHIFT	16			// Interrupt Threshold Control
 #define EHCI_USBCMD_ITC_MASK	0xff
+#define EHCI_USBCMD_PPCEE		(1 << 15)	// Per-Port Change Events Enable
+#define EHCI_USBCMD_FSP			(1 << 14)	// Fully Synchronized Prefetch
+#define EHCI_USBCMD_ASPE		(1 << 13)	// Async Schedule Prefetch Enable
+#define EHCI_USBCMD_PSPE		(1 << 12)	// Periodic Schedule Prefetch Enable
 #define EHCI_USBCMD_ASPME		(1 << 11)	// Async Schedule Park Mode Enable
 #define EHCI_USBCMD_ASPMC_SHIFT	8			// Async Schedule Park Mode Count
 #define EHCI_USBCMD_ASPMC_MASK	0x03
 #define EHCI_USBCMD_LHCRESET	(1 << 7)	// Light Host Controller Reset
-#define EHCI_USBCMD_INTONAAD	(1 << 6)	// Interrupt on Async Advance Dorbell
+#define EHCI_USBCMD_INTONAAD	(1 << 6)	// Interrupt on Async Advance Doorbell
 #define EHCI_USBCMD_ASENABLE	(1 << 5)	// Asynchronous Schedule Enable
 #define EHCI_USBCMD_PSENABLE	(1 << 4)	// Periodic Schedule Enable
 #define EHCI_USBCMD_FLS_SHIFT	2			// Frame List Size
@@ -104,6 +108,10 @@
 #define EHCI_LEGSUP_OSOWNED		(1 << 24)	// OS Owned Semaphore
 #define EHCI_LEGSUP_BIOSOWNED	(1 << 16)	// BIOS Owned Semaphore
 
+#define EHCI_HCCPARAMS_FPLC		(1 << 19)	// 32 Frames Period List
+#define EHCI_HCCPARAMS_PPCEC	(1 << 18)	// Per-Port Change Event
+#define EHCI_HCCPARAMS_LPM		(1 << 17)	// Link Power Management
+#define EHCI_HCCPARAMS_HP		(1 << 16)	// Hardware Prefetch
 #define EHCI_HCCPARAMS_IPT_SHIFT	4		// Isochronous Periodic Threshold
 #define EHCI_HCCPARAMS_IPT_MASK	0xf
 

@@ -522,11 +522,15 @@ status_t
 EHCI::Start()
 {
 	TRACE("starting EHCI host controller\n");
-	TRACE("usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS));
+	TRACE("usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD),
+		ReadOpReg(EHCI_USBSTS));
 
+	bool hasPerPortChangeEvent = (ReadCapReg32(EHCI_HCCPARAMS)
+		& EHCI_HCCPARAMS_PPCEC) != 0;
 	uint32 frameListSize = (ReadOpReg(EHCI_USBCMD) >> EHCI_USBCMD_FLS_SHIFT)
 		& EHCI_USBCMD_FLS_MASK;
 	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP
+		| (hasPerPortChangeEvent ? EHCI_USBCMD_PPCEE : 0)
 		| EHCI_USBCMD_ASENABLE | EHCI_USBCMD_PSENABLE
 		| (frameListSize << EHCI_USBCMD_FLS_SHIFT)
 		| (1 << EHCI_USBCMD_ITC_SHIFT));
