@@ -852,8 +852,8 @@ if [ IsOptionalHaikuImagePackageAdded GPerf ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				gperf-3.0.4-x86-gcc4-2011-05-06.zip
-				: $(baseURL)/gperf-3.0.4-x86-gcc4-2011-05-06.zip
+				gperf-3.0.4-r1a3-x86-gcc4-2011-05-21.zip
+				: $(baseURL)/gperf-3.0.4-r1a3-x86-gcc4-2011-05-21.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -872,8 +872,8 @@ if [ IsOptionalHaikuImagePackageAdded Groff ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				groff-1.20.1-x86-gcc4-2011-05-06.zip
-				: $(baseURL)/groff-1.20.1-x86-gcc4-2011-05-06.zip
+				groff-1.20.1-r1a3-x86-gcc4-2011-05-21.zip
+				: $(baseURL)/groff-1.20.1-r1a3-x86-gcc4-2011-05-21.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
