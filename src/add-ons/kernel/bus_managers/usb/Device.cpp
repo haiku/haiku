@@ -144,7 +144,7 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 					TRACE("\tinterface:..........%d\n", interfaceDescriptor->interface);
 
 					if (interfaceDescriptor->interface_number >= fConfigurations[i].interface_count) {
-						interfaceDescriptor->interface_number = fConfigurations[i].interface_count -1;
+						interfaceDescriptor->interface_number = fConfigurations[i].interface_count - 1;
 						TRACE_ERROR("Corrected invalid interface_number!\n");
 					}
 
