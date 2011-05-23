@@ -185,9 +185,22 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	double& conversionFactor, uint16& expired)
 {
 	uint8 select = channel << PIT_SELECT_CHANNEL_SHIFT;
-	uint8 channelPort = PIT_CHANNEL_PORT_BASE + channel;
+	out8(select | PIT_ACCESS_LOW_THEN_HIGH_BYTE | PIT_MODE_RATE_GENERATOR
+		| PIT_BINARY_MODE, PIT_CONTROL);
 
-	// Wait for the PIT to arrive at our starting position (high byte == 0xff)
+	// Fill in count of 0xffff, low then high byte
+	uint8 channelPort = PIT_CHANNEL_PORT_BASE + channel;
+	out8(0xff, channelPort);
+	out8(0xff, channelPort);
+
+	// Read the count back once to delay the start. This ensures that we've
+	// waited long enough for the counter to actually start counting down, as
+	// this only happens on the next clock cycle after reload.
+	in8(channelPort);
+	in8(channelPort);
+
+	// We're expecting the PIT to be at the starting position (high byte 0xff)
+	// as we just programmed it, but if it isn't we wait for it to wrap.
 	uint8 startLow;
 	uint8 startHigh;
 	do {
@@ -221,25 +234,14 @@ static void
 calculate_cpu_conversion_factor()
 {
 	uint8 channel = 0;
-	uint8 channelPort = PIT_CHANNEL_PORT_BASE + channel;
-	uint8 control;
 
 	// When using channel 2, enable the input and disable the speaker.
 	if (channel == 2) {
-		control = in8(PIT_CHANNEL_2_CONTROL);
+		uint8 control = in8(PIT_CHANNEL_2_CONTROL);
 		control &= PIT_CHANNEL_2_SPEAKER_OFF_MASK;
 		control |= PIT_CHANNEL_2_GATE_HIGH;
 		out8(control, PIT_CHANNEL_2_CONTROL);
 	}
-
-	uint8 select = channel << PIT_SELECT_CHANNEL_SHIFT;
-	control = select | PIT_ACCESS_LOW_THEN_HIGH_BYTE | PIT_MODE_RATE_GENERATOR
-		| PIT_BINARY_MODE;
-	out8(control, PIT_CONTROL);
-
-	// Fill in count of 0xffff, low then high byte
-	out8(0xff, channelPort);
-	out8(0xff, channelPort);
 
 	uint64 tscDeltaQuick, tscDeltaSlower, tscDeltaSlow;
 	double conversionFactorQuick, conversionFactorSlower, conversionFactorSlow;
