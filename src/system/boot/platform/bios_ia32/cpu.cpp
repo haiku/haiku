@@ -68,6 +68,13 @@ uint32 gTimeConversionFactor;
 #define PIT_CHANNEL_2_SPEAKER_OFF_MASK	~0x02
 
 
+// Maximum values
+#define MAX_QUICK_SAMPLES				20
+#define MAX_SLOW_SAMPLES				20
+	// TODO: These are arbitrary. They are here to avoid spinning indefinitely
+	// if the TSC just isn't stable and we can't get our desired error range.
+
+
 #define CPUID_EFLAGS	(1UL << 21)
 #define RDTSC_FEATURE	(1UL << 4)
 
@@ -238,6 +245,9 @@ calculate_cpu_conversion_factor()
 	double conversionFactorQuick, conversionFactorSlower, conversionFactorSlow;
 	uint16 expired;
 
+	uint32 quickSampleCount = 1;
+	uint32 slowSampleCount = 1;
+
 quick_sample:
 	calibration_loop(224, channel, tscDeltaQuick, conversionFactorQuick,
 		expired);
@@ -249,7 +259,8 @@ slower_sample:
 	double deviation = conversionFactorQuick / conversionFactorSlower;
 	if (deviation < 0.99 || deviation > 1.01) {
 		// We might have been hit by a SMI or were otherwise stalled
-		goto quick_sample;
+		if (quickSampleCount++ < MAX_QUICK_SAMPLES)
+			goto quick_sample;
 	}
 
 	// Slow sample
@@ -259,7 +270,8 @@ slower_sample:
 	deviation = conversionFactorSlower / conversionFactorSlow;
 	if (deviation < 0.99 || deviation > 1.01) {
 		// We might have been hit by a SMI or were otherwise stalled
-		goto slower_sample;
+		if (slowSampleCount++ < MAX_SLOW_SAMPLES)
+			goto slower_sample;
 	}
 
 	// Scale the TSC delta to timer units
@@ -282,6 +294,22 @@ slower_sample:
 	gKernelArgs.arch_args.system_time_cv_factor = gTimeConversionFactor;
 	gKernelArgs.arch_args.cpu_clock_speed = clockSpeed;
 	//dprintf("factors: %lu %llu\n", gTimeConversionFactor, clockSpeed);
+
+	if (quickSampleCount > 1) {
+		dprintf("needed %lu quick samples for TSC calibration\n",
+			quickSampleCount);
+	}
+
+	if (slowSampleCount > 1) {
+		dprintf("needed %lu slow samples for TSC calibration\n",
+			slowSampleCount);
+	}
+
+	if (channel == 2) {
+		// Set the gate low again
+		out8(in8(PIT_CHANNEL_2_CONTROL) & ~PIT_CHANNEL_2_GATE_HIGH,
+			PIT_CHANNEL_2_CONTROL);
+	}
 }
 
 
