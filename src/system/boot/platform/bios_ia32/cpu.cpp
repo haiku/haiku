@@ -173,16 +173,46 @@ private:
 };
 
 
+static inline void
+calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
+	double& conversionFactor, uint16& expired)
+{
+	uint8 select = channel << PIT_SELECT_CHANNEL_SHIFT;
+	uint8 channelPort = PIT_CHANNEL_PORT_BASE + channel;
+
+	// Wait for the PIT to arrive at our starting position (high byte == 0xff)
+	uint8 startLow;
+	uint8 startHigh;
+	do {
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		startLow = in8(channelPort);
+		startHigh = in8(channelPort);
+	} while (startHigh != 255);
+
+	// Read in the first TSC value
+	uint64 startTSC = rdtsc();
+
+	// Wait for the PIT to count down to our desired value
+	uint8 endLow;
+	uint8 endHigh;
+	do {
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		endLow = in8(channelPort);
+		endHigh = in8(channelPort);
+	} while (endHigh > desiredHighByte);
+
+	// And read the second TSC value
+	uint64 endTSC = rdtsc();
+
+	tscDelta = endTSC - startTSC;
+	expired = ((startHigh << 8) | startLow) - ((endHigh << 8) | endLow);
+	conversionFactor = (double)tscDelta / (double)expired;
+}
+
+
 static void
 calculate_cpu_conversion_factor()
 {
-	uint32 s_low, s_high;
-	uint32 low, high;
-	uint32 expired;
-	uint64 t1, t2;
-	uint64 p1, p2, p3;
-	double r1, r2, r3;
-
 	uint8 channel = 0;
 	uint8 channelPort = PIT_CHANNEL_PORT_BASE + channel;
 	uint8 control;
@@ -204,90 +234,54 @@ calculate_cpu_conversion_factor()
 	out8(0xff, channelPort);
 	out8(0xff, channelPort);
 
-	/* quick sample */
+	uint64 tscDeltaQuick, tscDeltaSlower, tscDeltaSlow;
+	double conversionFactorQuick, conversionFactorSlower, conversionFactorSlow;
+	uint16 expired;
+
 quick_sample:
-	do {
-		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
-		s_low = in8(channelPort);
-		s_high = in8(channelPort);
-	} while (s_high != 255);
-	t1 = rdtsc();
-	do {
-		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
-		low = in8(channelPort);
-		high = in8(channelPort);
-	} while (high > 224);
-	t2 = rdtsc();
+	calibration_loop(224, channel, tscDeltaQuick, conversionFactorQuick,
+		expired);
 
-	p1 = t2-t1;
-	r1 = (double)(p1) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
+slower_sample:
+	calibration_loop(192, channel, tscDeltaSlower, conversionFactorSlower,
+		expired);
 
-	/* not so quick sample */
-not_so_quick_sample:
-	do {
-		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
-		s_low = in8(channelPort);
-		s_high = in8(channelPort);
-	} while (s_high != 255);
-	t1 = rdtsc();
-	do {
-		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
-		low = in8(channelPort);
-		high = in8(channelPort);
-	} while (high > 192);
-	t2 = rdtsc();
-	p2 = t2-t1;
-	r2 = (double)(p2) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
-	if ((r1/r2) > 1.01) {
-		//dprintf("Tuning loop(1)\n");
-		goto quick_sample;
-	}
-	if ((r1/r2) < 0.99) {
-		//dprintf("Tuning loop(1)\n");
+	double deviation = conversionFactorQuick / conversionFactorSlower;
+	if (deviation < 0.99 || deviation > 1.01) {
+		// We might have been hit by a SMI or were otherwise stalled
 		goto quick_sample;
 	}
 
-	/* slow sample */
-	do {
-		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
-		s_low = in8(channelPort);
-		s_high = in8(channelPort);
-	} while (s_high != 255);
-	t1 = rdtsc();
-	do {
-		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
-		low = in8(channelPort);
-		high = in8(channelPort);
-	} while (high > 128);
-	t2 = rdtsc();
+	// Slow sample
+	calibration_loop(128, channel, tscDeltaSlow, conversionFactorSlow,
+		expired);
 
-	p3 = t2-t1;
-	r3 = (double)(p3) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
-	if ((r2/r3) > 1.01) {
-		TRACE(("Tuning loop(2)\n"));
-		goto not_so_quick_sample;
-	}
-	if ((r2/r3) < 0.99) {
-		TRACE(("Tuning loop(2)\n"));
-		goto not_so_quick_sample;
+	deviation = conversionFactorSlower / conversionFactorSlow;
+	if (deviation < 0.99 || deviation > 1.01) {
+		// We might have been hit by a SMI or were otherwise stalled
+		goto slower_sample;
 	}
 
-	expired = ((s_high << 8) | s_low) - ((high << 8) | low);
-	p3 *= TIMER_CLKNUM_HZ;
+	// Scale the TSC delta to timer units
+	tscDeltaSlow *= TIMER_CLKNUM_HZ;
 
+	uint64 clockSpeed = tscDeltaSlow / expired;
 	gTimeConversionFactor = ((uint128(expired) * uint32(1000000)) << 32)
-		/ uint128(p3);
+		/ uint128(tscDeltaSlow);
 
 #ifdef TRACE_CPU
-	if (p3 / expired / 1000000000LL)
-		dprintf("CPU at %Ld.%03Ld GHz\n", p3/expired/1000000000LL, ((p3/expired)%1000000000LL)/1000000LL);
-	else
-		dprintf("CPU at %Ld.%03Ld MHz\n", p3/expired/1000000LL, ((p3/expired)%1000000LL)/1000LL);
+	if (clockSpeed > 1000000000LL) {
+		dprintf("CPU at %Ld.%03Ld GHz\n", clockSpeed / 1000000000LL,
+			(clockSpeed % 1000000000LL) / 1000000LL);
+	} else {
+		dprintf("CPU at %Ld.%03Ld MHz\n", clockSpeed / 1000000LL,
+			(clockSpeed % 1000000LL) / 1000LL);
+	}
 #endif
 
 	gKernelArgs.arch_args.system_time_cv_factor = gTimeConversionFactor;
-	gKernelArgs.arch_args.cpu_clock_speed = p3 / expired;
-	//dprintf("factors: %lu %llu\n", gTimeConversionFactor, p3 / expired);
+	gKernelArgs.arch_args.cpu_clock_speed = clockSpeed;
+	//dprintf("factors: %lu %llu\n", gTimeConversionFactor, clockSpeed);
 }
 
 
