@@ -142,7 +142,6 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fInfoBox = new BBox(B_FANCY_BORDER, fInfoView);
 	fInfoBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_USE_FULL_HEIGHT));
-	fInfoBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	float padding = be_control_look->DefaultItemSpacing();
 
@@ -232,6 +231,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 			.SetInsets(padding, 0, padding, padding)
 			.Add(fStatus, 0, 0)
 			.Add(fFileStatus, 0, 1)
+			.Add(BSpaceLayoutItem::CreateGlue(), 1, 0)
 			.Add(fPreviewButton, 2, 0)
 			.Add(fConvertButton, 3, 0)
 		.End()
