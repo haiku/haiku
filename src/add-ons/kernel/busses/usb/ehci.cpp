@@ -524,9 +524,12 @@ EHCI::Start()
 	TRACE("starting EHCI host controller\n");
 	TRACE("usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS));
 
-	uint32 frameListSize = (ReadOpReg(EHCI_USBCMD) >> EHCI_USBCMD_FLS_SHIFT)
+	uint32 config = ReadOpReg(EHCI_USBCMD);
+	config &= ~(EHCI_USBCMD_ITC_MASK << EHCI_USBCMD_ITC_SHIFT);
+	uint32 frameListSize = (config >> EHCI_USBCMD_FLS_SHIFT)
 		& EHCI_USBCMD_FLS_MASK;
-	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP
+
+	WriteOpReg(EHCI_USBCMD, config | EHCI_USBCMD_RUNSTOP
 		| EHCI_USBCMD_ASENABLE | EHCI_USBCMD_PSENABLE
 		| (frameListSize << EHCI_USBCMD_FLS_SHIFT)
 		| (1 << EHCI_USBCMD_ITC_SHIFT));
