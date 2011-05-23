@@ -60,15 +60,14 @@ static int smp_get_current_cpu(void);
 static uint32
 apic_read(uint32 offset)
 {
-	return *(uint32 *)((uint32)gKernelArgs.arch_args.apic + offset);
+	return *(volatile uint32 *)((uint32)gKernelArgs.arch_args.apic + offset);
 }
 
 
 static void
 apic_write(uint32 offset, uint32 data)
 {
-	uint32 *addr = (uint32 *)((uint32)gKernelArgs.arch_args.apic + offset);
-	*addr = data;
+	*(volatile uint32 *)((uint32)gKernelArgs.arch_args.apic + offset) = data;
 }
 
 
@@ -78,9 +77,9 @@ smp_get_current_cpu(void)
 	if (gKernelArgs.arch_args.apic == NULL)
 		return 0;
 
-	uint8_t apic_id = (apic_read(APIC_ID) & 0xffffffff) >> 24;
+	uint8 apicID = apic_read(APIC_ID) >> 24;
 	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
-		if (gKernelArgs.arch_args.cpu_apic_id[i] == apic_id)
+		if (gKernelArgs.arch_args.cpu_apic_id[i] == apicID)
 			return i;
 	}
 
