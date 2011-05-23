@@ -185,7 +185,7 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	double& conversionFactor, uint16& expired)
 {
 	uint8 select = channel << PIT_SELECT_CHANNEL_SHIFT;
-	out8(select | PIT_ACCESS_LOW_THEN_HIGH_BYTE | PIT_MODE_RATE_GENERATOR
+	out8(select | PIT_ACCESS_LOW_THEN_HIGH_BYTE | PIT_MODE_INTERRUPT_ON_0
 		| PIT_BINARY_MODE, PIT_CONTROL);
 
 	// Fill in count of 0xffff, low then high byte
