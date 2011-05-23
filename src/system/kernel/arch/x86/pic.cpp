@@ -237,7 +237,7 @@ pic_init()
 void
 pic_disable(uint16& enabledInterrupts)
 {
-	enabledInterrupts = in8(PIC_MASTER_MASK) | in8(PIC_SLAVE_MASK) << 8;
+	enabledInterrupts = ~(in8(PIC_MASTER_MASK) | in8(PIC_SLAVE_MASK) << 8);
 	enabledInterrupts &= 0xfffb; // remove slave PIC from the mask
 
 	// Mask off all interrupts on master and slave
