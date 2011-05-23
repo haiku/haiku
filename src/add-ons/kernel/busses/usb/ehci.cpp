@@ -552,9 +552,14 @@ EHCI::Start()
 
 	bool hasPerPortChangeEvent = (ReadCapReg32(EHCI_HCCPARAMS)
 		& EHCI_HCCPARAMS_PPCEC) != 0;
-	uint32 frameListSize = (ReadOpReg(EHCI_USBCMD) >> EHCI_USBCMD_FLS_SHIFT)
+
+	uint32 config = ReadOpReg(EHCI_USBCMD);
+	config &= ~((EHCI_USBCMD_ITC_MASK << EHCI_USBCMD_ITC_SHIFT)
+		| EHCI_USBCMD_PPCEE);
+	uint32 frameListSize = (config >> EHCI_USBCMD_FLS_SHIFT)
 		& EHCI_USBCMD_FLS_MASK;
-	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP
+
+	WriteOpReg(EHCI_USBCMD, config | EHCI_USBCMD_RUNSTOP
 		| (hasPerPortChangeEvent ? EHCI_USBCMD_PPCEE : 0)
 		| EHCI_USBCMD_ASENABLE | EHCI_USBCMD_PSENABLE
 		| (frameListSize << EHCI_USBCMD_FLS_SHIFT)
