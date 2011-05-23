@@ -8,6 +8,7 @@
  */
 
 
+#include <driver_settings.h>
 #include <module.h>
 #include <PCI.h>
 #include <USB3.h>
@@ -131,7 +132,8 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fRootHubAddress(0),
 		fPortCount(0),
 		fPortResetChange(0),
-		fPortSuspendChange(0)
+		fPortSuspendChange(0),
+		fInterruptPollThread(-1)
 {
 	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR("bus manager failed to init\n");
@@ -319,22 +321,43 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fCleanupThread);
 
-	// install the interrupt handler and enable interrupts
-	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
-		InterruptHandler, (void *)this, 0);
-	fEnabledInterrupts = EHCI_USBINTR_HOSTSYSERR | EHCI_USBINTR_USBERRINT
-		| EHCI_USBINTR_USBINT | EHCI_USBINTR_INTONAA;
-	WriteOpReg(EHCI_USBINTR, fEnabledInterrupts);
+	// set up interrupts or interrupt polling now that the controller is ready
+	bool polling = false;
+	void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (settings != NULL) {
+		polling = get_driver_boolean_parameter(settings, "ehci_polling", false,
+			false);
+		unload_driver_settings(settings);
+	}
 
-	// ensure that interrupts are enabled on the PCI device as well
+	if (polling) {
+		// create and run the polling thread
+		TRACE_ALWAYS("enabling ehci polling\n");
+		fInterruptPollThread = spawn_kernel_thread(InterruptPollThread,
+			"ehci interrupt poll thread", B_NORMAL_PRIORITY, (void *)this);
+		resume_thread(fInterruptPollThread);
+	} else {
+		// install the interrupt handler and enable interrupts
+		install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
+			InterruptHandler, (void *)this, 0);
+	}
+
+	// ensure that interrupts are en-/disabled on the PCI device
 	command = sPCIModule->read_pci_config(fPCIInfo->bus, fPCIInfo->device,
 		fPCIInfo->function, PCI_command, 2);
-	if ((command & PCI_command_int_disable) != 0) {
-		TRACE_ALWAYS("PCI interrupts were disabled, enabling\n");
-		command &= ~PCI_command_int_disable;
+	if (polling == ((command & PCI_command_int_disable) == 0)) {
+		if (polling)
+			command &= ~PCI_command_int_disable;
+		else
+			command |= PCI_command_int_disable;
+
 		sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 			fPCIInfo->function, PCI_command, 2, command);
 	}
+
+	fEnabledInterrupts = EHCI_USBINTR_HOSTSYSERR | EHCI_USBINTR_USBERRINT
+		| EHCI_USBINTR_USBINT | EHCI_USBINTR_INTONAA;
+	WriteOpReg(EHCI_USBINTR, fEnabledInterrupts);
 
 	// structures don't span page boundaries
 	size_t itdListSize = EHCI_VFRAMELIST_ENTRIES_COUNT
@@ -458,7 +481,6 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fFrameBandwidth[i] = MAX_AVAILABLE_BANDWIDTH;
 	}
 
-
 	// allocate a queue head that will always stay in the async frame list
 	fAsyncQueueHead = CreateQueueHead();
 	if (!fAsyncQueueHead) {
@@ -498,6 +520,9 @@ EHCI::~EHCI()
 	wait_for_thread(fFinishThread, &result);
 	wait_for_thread(fCleanupThread, &result);
 	wait_for_thread(fFinishIsochronousThread, &result);
+
+	if (fInterruptPollThread >= 0)
+		wait_for_thread(fInterruptPollThread, &result);
 
 	LockIsochronous();
 	isochronous_transfer_data *isoTransfer = fFirstIsochronousTransfer;
@@ -584,6 +609,7 @@ EHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
+
 	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();
 }
@@ -1178,6 +1204,25 @@ EHCI::Interrupt()
 		release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 
 	return result;
+}
+
+
+int32
+EHCI::InterruptPollThread(void *data)
+{
+	EHCI *ehci = (EHCI *)data;
+
+	while (!ehci->fStopThreads) {
+		// TODO: this could be handled much better by only polling when there
+		// are actual transfers going on...
+		snooze(1000);
+
+		cpu_status status = disable_interrupts();
+		ehci->Interrupt();
+		restore_interrupts(status);
+	}
+
+	return 0;
 }
 
 

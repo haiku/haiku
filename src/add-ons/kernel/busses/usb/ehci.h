@@ -57,7 +57,7 @@ virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe, bool force);
 		status_t					SubmitIsochronous(Transfer *transfer);
-		
+
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
 
@@ -82,6 +82,7 @@ private:
 		// Interrupt functions
 static	int32						InterruptHandler(void *data);
 		int32						Interrupt();
+static	int32						InterruptPollThread(void *data);
 
 		// Transfer management
 		status_t					AddPendingTransfer(Transfer *transfer,
@@ -228,7 +229,7 @@ static	pci_module_info *			sPCIModule;
 		sem_id						fFinishIsochronousTransfersSem;
 		thread_id					fFinishIsochronousThread;
 		mutex						fIsochronousLock;
-		
+
 		// Root Hub
 		EHCIRootHub *				fRootHub;
 		uint8						fRootHubAddress;
@@ -237,6 +238,9 @@ static	pci_module_info *			sPCIModule;
 		uint8						fPortCount;
 		uint16						fPortResetChange;
 		uint16						fPortSuspendChange;
+
+		// Interrupt polling
+		thread_id					fInterruptPollThread;
 };
 
 
