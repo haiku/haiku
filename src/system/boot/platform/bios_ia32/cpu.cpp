@@ -34,7 +34,39 @@ extern "C" uint64 rdtsc();
 
 uint32 gTimeConversionFactor;
 
-#define TIMER_CLKNUM_HZ (14318180/12)
+// PIT definitions
+#define TIMER_CLKNUM_HZ					(14318180 / 12)
+
+// PIT IO Ports
+#define PIT_CHANNEL_PORT_BASE			0x40
+#define PIT_CONTROL						0x43
+
+// Channel selection
+#define PIT_SELECT_CHANNEL_SHIFT		6
+
+// Access mode
+#define PIT_ACCESS_LATCH_COUNTER		(0 << 4)
+#define PIT_ACCESS_LOW_BYTE_ONLY		(1 << 4)
+#define PIT_ACCESS_HIGH_BYTE_ONLY		(2 << 4)
+#define PIT_ACCESS_LOW_THEN_HIGH_BYTE	(3 << 4)
+
+// Operating modes
+#define PIT_MODE_INTERRUPT_ON_0			(0 << 1)
+#define PIT_MODE_HARDWARE_COUNTDOWN		(1 << 1)
+#define PIT_MODE_RATE_GENERATOR			(2 << 1)
+#define PIT_MODE_SQUARE_WAVE_GENERATOR	(3 << 1)
+#define PIT_MODE_SOFTWARE_STROBE		(4 << 1)
+#define PIT_MODE_HARDWARE_STROBE		(5 << 1)
+
+// BCD/Binary mode
+#define PIT_BINARY_MODE					0
+#define PIT_BCD_MODE					1
+
+// Channel 2 control (speaker)
+#define PIT_CHANNEL_2_CONTROL			0x61
+#define PIT_CHANNEL_2_GATE_HIGH			0x01
+#define PIT_CHANNEL_2_SPEAKER_OFF_MASK	~0x02
+
 
 #define CPUID_EFLAGS	(1UL << 21)
 #define RDTSC_FEATURE	(1UL << 4)
@@ -151,22 +183,39 @@ calculate_cpu_conversion_factor()
 	uint64 p1, p2, p3;
 	double r1, r2, r3;
 
-	out8(0x34, 0x43);	/* program the timer to count down mode */
-	out8(0xff, 0x40);	/* low and then high */
-	out8(0xff, 0x40);
+	uint8 channel = 0;
+	uint8 channelPort = PIT_CHANNEL_PORT_BASE + channel;
+	uint8 control;
+
+	// When using channel 2, enable the input and disable the speaker.
+	if (channel == 2) {
+		control = in8(PIT_CHANNEL_2_CONTROL);
+		control &= PIT_CHANNEL_2_SPEAKER_OFF_MASK;
+		control |= PIT_CHANNEL_2_GATE_HIGH;
+		out8(control, PIT_CHANNEL_2_CONTROL);
+	}
+
+	uint8 select = channel << PIT_SELECT_CHANNEL_SHIFT;
+	control = select | PIT_ACCESS_LOW_THEN_HIGH_BYTE | PIT_MODE_RATE_GENERATOR
+		| PIT_BINARY_MODE;
+	out8(control, PIT_CONTROL);
+
+	// Fill in count of 0xffff, low then high byte
+	out8(0xff, channelPort);
+	out8(0xff, channelPort);
 
 	/* quick sample */
 quick_sample:
 	do {
-		out8(0x00, 0x43); /* latch counter value */
-		s_low = in8(0x40);
-		s_high = in8(0x40);
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		s_low = in8(channelPort);
+		s_high = in8(channelPort);
 	} while (s_high != 255);
 	t1 = rdtsc();
 	do {
-		out8(0x00, 0x43); /* latch counter value */
-		low = in8(0x40);
-		high = in8(0x40);
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		low = in8(channelPort);
+		high = in8(channelPort);
 	} while (high > 224);
 	t2 = rdtsc();
 
@@ -176,15 +225,15 @@ quick_sample:
 	/* not so quick sample */
 not_so_quick_sample:
 	do {
-		out8(0x00, 0x43); /* latch counter value */
-		s_low = in8(0x40);
-		s_high = in8(0x40);
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		s_low = in8(channelPort);
+		s_high = in8(channelPort);
 	} while (s_high != 255);
 	t1 = rdtsc();
 	do {
-		out8(0x00, 0x43); /* latch counter value */
-		low = in8(0x40);
-		high = in8(0x40);
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		low = in8(channelPort);
+		high = in8(channelPort);
 	} while (high > 192);
 	t2 = rdtsc();
 	p2 = t2-t1;
@@ -200,15 +249,15 @@ not_so_quick_sample:
 
 	/* slow sample */
 	do {
-		out8(0x00, 0x43); /* latch counter value */
-		s_low = in8(0x40);
-		s_high = in8(0x40);
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		s_low = in8(channelPort);
+		s_high = in8(channelPort);
 	} while (s_high != 255);
 	t1 = rdtsc();
 	do {
-		out8(0x00, 0x43); /* latch counter value */
-		low = in8(0x40);
-		high = in8(0x40);
+		out8(select | PIT_ACCESS_LATCH_COUNTER, PIT_CONTROL);
+		low = in8(channelPort);
+		high = in8(channelPort);
 	} while (high > 128);
 	t2 = rdtsc();
 
@@ -238,6 +287,7 @@ not_so_quick_sample:
 
 	gKernelArgs.arch_args.system_time_cv_factor = gTimeConversionFactor;
 	gKernelArgs.arch_args.cpu_clock_speed = p3 / expired;
+	//dprintf("factors: %lu %llu\n", gTimeConversionFactor, p3 / expired);
 }
 
 
