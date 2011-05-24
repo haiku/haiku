@@ -36,6 +36,10 @@ BMidiSynth::BMidiSynth()
 BMidiSynth::~BMidiSynth()
 {
 	be_synth->fClientCount--;
+	if (be_synth->fClientCount == 0) {
+		delete be_synth;
+		be_synth = NULL;
+	}
 }
 
 
