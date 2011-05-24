@@ -12,7 +12,7 @@ class MenuItem;
 
 void platform_generic_update_text_menu_item(Menu* menu, MenuItem* item);
 void platform_generic_run_text_menu(Menu* menu);
-size_t platform_generic_get_user_input_text(Menu* menu, const char* prompt,
+size_t platform_generic_get_user_input_text(Menu* menu, MenuItem* item,
 	char* buffer, size_t bufferSize);
 
 #endif	/* GENERIC_TEXT_MENU_H */

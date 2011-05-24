@@ -523,18 +523,35 @@ debug_menu_display_syslog(Menu* menu, MenuItem* item)
 static bool
 debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
 {
-	char buffer[128];
-	const char* prompt = "Option: ";
+	char buffer[256];
 
-	size_t size = platform_get_user_input_text(menu, prompt, buffer,
+	size_t size = platform_get_user_input_text(menu, item, buffer,
 		sizeof(buffer) - 1);
 
 	if (size > 0) {
-		buffer[size] = '\n';
+		char* token = NULL;
+		char *bufferOffset = buffer;
+		char *separator = NULL;
 		uint32 pos = strlen(sSafeModeOptionsBuffer);
-		if (pos + size < sizeof(sSafeModeOptionsBuffer))
-			strlcat(sSafeModeOptionsBuffer, buffer,
-				sizeof(sSafeModeOptionsBuffer));
+		do {
+			token = bufferOffset;
+			separator = strchr(bufferOffset, ',');
+			if (separator != NULL) {
+				*separator = '\0';
+				bufferOffset = separator + 1;
+			} else {
+				token = bufferOffset;
+				bufferOffset = NULL;
+			}
+			uint32 length = strlen(token) + 1;
+			if (pos + length < sizeof(sSafeModeOptionsBuffer)) {
+				strlcat(sSafeModeOptionsBuffer, token,
+					sizeof(sSafeModeOptionsBuffer));
+				sSafeModeOptionsBuffer[pos + length - 1] = '\n';
+				pos += length;
+			} else
+				break;
+		} while (token != NULL);
 	}
 
 	return true;

@@ -513,15 +513,20 @@ platform_generic_run_text_menu(Menu *menu)
 
 
 size_t
-platform_generic_get_user_input_text(Menu* menu, const char* prompt,
-	char* buffer, size_t bufferSize)
+platform_generic_get_user_input_text(Menu* menu, MenuItem* item, char* buffer,
+	size_t bufferSize)
 {
 	size_t pos = 0;
 
 	memset(buffer, 0, bufferSize);
 
-	int32 promptLength = strlen(prompt);
-	int32 line = console_height() / 2;
+	int32 promptLength = strlen(item->Label()) + 2;
+	int32 line = menu->IndexOf(item) - sMenuOffset;
+	if (line < 0 || line >= menu_height())
+		return 0;
+
+	line += kFirstLine;
+	console_set_cursor(kOffsetX, line);
 	int32 x = kOffsetX + 1;
 	console_set_cursor(0, line);
 	console_set_color(kSelectedItemColor, kSelectedItemBackgroundColor);
@@ -529,12 +534,15 @@ platform_generic_get_user_input_text(Menu* menu, const char* prompt,
 	console_set_color(kTextColor, kBackgroundColor);
 	console_set_cursor(0, line);
 	print_spacing(x);
-	printf(prompt);
+	printf(item->Label());
+	printf(": ");
 	x += promptLength;
 	console_set_color(kSelectedItemColor, kSelectedItemBackgroundColor);
 	console_show_cursor();
 	console_set_cursor(x, line);
 
+	int32 scrollOffset = 0;
+	bool doScroll = false;
 	int key = 0;
 	size_t dataLength = 0;
 	while (true) {
@@ -546,34 +554,61 @@ platform_generic_get_user_input_text(Menu* menu, const char* prompt,
 		{
 			switch (key)	{
 				case TEXT_CONSOLE_KEY_LEFT:
-					if (pos != 0)
+					if (pos > 0)
 						pos--;
+					else if (scrollOffset > 0) {
+						scrollOffset--;
+						doScroll = true;
+					}
 					break;
 				case TEXT_CONSOLE_KEY_RIGHT:
-					if (pos < dataLength)
-						pos++;
+					if (pos < dataLength) {
+						if (x + (int32)pos == console_width() - 1) {
+							scrollOffset++;
+							doScroll = true;
+						} else
+							pos++;
+					}
 					break;
 				default:
 					break;
 			}
 		} else if (key == TEXT_CONSOLE_KEY_BACKSPACE) {
-			if (pos != 0) {
-				pos--;
+			if (pos != 0 || scrollOffset > 0) {
+				if (pos > 0)
+					pos--;
+				else if (scrollOffset > 0)
+					scrollOffset--;
 				dataLength--;
-				buffer[pos] = '\0';
+				int32 offset = pos + scrollOffset;
+				memmove(buffer + offset, buffer + offset + 1, dataLength - offset);
 				console_set_cursor(x + pos, line);
-				printf(" ");
+				putchar(' ');
+				// if this was a mid-line backspace, the line will need to be redrawn
+				if (pos + scrollOffset < dataLength)
+					doScroll = true;
 			}
 			// only accept printable ascii characters
 		} else if (key > 32 || key == TEXT_CONSOLE_KEY_SPACE) {
-			// don't allow the input to exceed either the buffer size
-			// or screen width
-			// TODO: support scrolling the line to allow larger inputs
-			if (x < (console_width() - 1) && pos < (bufferSize - 1)) {
-				buffer[pos++] = key;
-				printf("%c", key);
+			if (pos < (bufferSize - 1)) {
+				buffer[pos + scrollOffset] = key;
+				if (x + (int32)pos < console_width() - 1) {
+					putchar(key);
+					pos++;
+				} else {
+					scrollOffset++;
+					doScroll = true;
+				}
+
 				dataLength++;
 			}
+		}
+
+		if (doScroll) {
+			console_set_cursor(x, line);
+			for (int32 i = x; i < console_width() - 1; i++)
+				putchar(buffer[scrollOffset + i - x]);
+			doScroll = false;
 		}
 		console_set_cursor(x + pos, line);
 	}

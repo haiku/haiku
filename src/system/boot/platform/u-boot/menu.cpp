@@ -75,8 +75,8 @@ platform_run_menu(Menu *menu)
 
 
 void
-platform_get_user_input_text(Menu *menu, const char *prompt, char *buffer,
+platform_get_user_input_text(Menu *menu, MenuItem *item, char *buffer,
 	size_t bufferSize)
 {
-	platform_generic_get_user_input_text(menu, prompt, buffer, bufferSize);
+	platform_generic_get_user_input_text(menu, item, buffer, bufferSize);
 }

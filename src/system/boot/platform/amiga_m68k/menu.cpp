@@ -51,7 +51,7 @@ platform_add_menus(Menu *menu)
 }
 
 
-void 
+void
 platform_update_menu_item(Menu *menu, MenuItem *item)
 {
 	platform_generic_update_text_menu_item(menu, item);
@@ -65,9 +65,9 @@ platform_run_menu(Menu *menu)
 }
 
 size_t
-platform_get_user_input_text(Menu* menu, const char* prompt, char *buffer,
+platform_get_user_input_text(Menu *menu, MenuItem *item, char *buffer,
 	size_t bufferSize)
 {
-	return platform_generic_get_user_input_text(menu, prompt, buffer,
+	return platform_generic_get_user_input_text(menu, item, buffer,
 		bufferSize);
 }
