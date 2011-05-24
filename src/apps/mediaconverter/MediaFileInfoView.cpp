@@ -90,7 +90,7 @@ MediaFileInfoView::MinSize()
 BSize
 MediaFileInfoView::MaxSize()
 {
-	return fMinSize;
+	return BSize(B_SIZE_UNLIMITED, fMinSize.height);
 }
 
 
