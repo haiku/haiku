@@ -529,33 +529,15 @@ debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
 		sizeof(buffer) - 1);
 
 	if (size > 0) {
-		char* token = NULL;
-		char *bufferOffset = buffer;
-		char *separator = NULL;
-		uint32 pos = strlen(sSafeModeOptionsBuffer);
-		do {
-			token = bufferOffset;
-			separator = strchr(bufferOffset, ',');
-			if (separator != NULL) {
-				*separator = '\0';
-				bufferOffset = separator + 1;
-			} else {
-				token = bufferOffset;
-				bufferOffset = NULL;
-			}
-			uint32 length = strlen(token) + 1;
-			if (pos + length < sizeof(sSafeModeOptionsBuffer)) {
-				strlcat(sSafeModeOptionsBuffer, token,
-					sizeof(sSafeModeOptionsBuffer));
-				sSafeModeOptionsBuffer[pos + length - 1] = '\n';
-				pos += length;
-			} else
-				break;
-		} while (token != NULL);
+		buffer[size] = '\n';
+		if (pos + size + 1 < sizeof(sSafeModeOptionsBuffer))
+			strlcat(sSafeModeOptionsBuffer, buffer,
+				sizeof(sSafeModeOptionsBuffer));
 	}
 
 	return true;
 }
+
 
 static status_t
 save_syslog_to_volume(Directory* directory)
