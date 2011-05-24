@@ -16,7 +16,7 @@ haikuOutputDir=$4
 shift 4
 additionalMakeArgs=$*
 
-case $(uname) in
+case `uname` in
 FreeBSD|OpenBSD)
 	MAKE=gmake
 	;;

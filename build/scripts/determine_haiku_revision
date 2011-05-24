@@ -71,7 +71,7 @@ determineHaikuRevision()
 	haikuTop=$1
 	haikuBuildOutputDir=$2
 
-	case $(uname) in
+	case `uname` in
 	Darwin)
 		SED=gsed
 		;;
