@@ -530,6 +530,7 @@ debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
 
 	if (size > 0) {
 		buffer[size] = '\n';
+		size_t pos = strlen(sSafeModeOptionsBuffer);
 		if (pos + size + 1 < sizeof(sSafeModeOptionsBuffer))
 			strlcat(sSafeModeOptionsBuffer, buffer,
 				sizeof(sSafeModeOptionsBuffer));
