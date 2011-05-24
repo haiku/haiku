@@ -14,7 +14,7 @@ determineGitRevision()
 	# last build
 	if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
 		haikuBranch=`git describe --abbrev=0 --match 'haiku/*.base' \
-			| sed -re 's/haiku\/(.*)\.base/\1/'`
+			| $SED -re 's/haiku\/(.*)\.base/\1/'`
 		if [ -z "$haikuBranch" ]; then
 			echo "*** unable to find haiku branch the build is based on"
 			exit 1;
@@ -71,6 +71,16 @@ determineHaikuRevision()
 	haikuTop=$1
 	haikuBuildOutputDir=$2
 
+	case $(uname) in
+	Darwin)
+		SED=gsed
+		;;
+	*)
+		SED=sed
+		;;
+	esac
+	export SED
+
 	originalDir=`pwd`
 	cd ${haikuTop}
 	export LC_ALL=C
@@ -86,7 +96,7 @@ determineHaikuRevision()
 		revision=`(cd ${haikuTop} &&
 			hg log --no-merges --template "{desc|firstline}\n") 2> /dev/null |
 			grep --max-count=1 "(svn r" |
-			sed -n -e 's,(svn r\(.*\)).*,\1,p'`
+			$SED -n -e 's,(svn r\(.*\)).*,\1,p'`
 	fi
 	if [ "$revision" = "" ]; then
 		revision=0
