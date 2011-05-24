@@ -46,7 +46,7 @@ radeon_hd_init(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
-	// memory mapped I/O
+	// *** Map shared info
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("radeon hd shared info",
 		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
@@ -57,6 +57,7 @@ radeon_hd_init(radeon_info &info)
 
 	memset((void *)info.shared_info, 0, sizeof(radeon_shared_info));
 
+	// *** Map Memory mapped IO
 	// R6xx_R7xx_3D.pdf, 5.3.3.1 SET_CONFIG_REG
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
@@ -70,12 +71,13 @@ radeon_hd_init(radeon_info &info)
 		return info.registers_area;
 	}
 
+	// *** Framebuffer mapping
 	AreaKeeper frambufferMapper;
 	info.framebuffer_area = frambufferMapper.Map("radeon hd framebuffer",
 		(void *)info.pci->u.h0.base_registers[RHD_FB_BAR],
 		info.pci->u.h0.base_register_sizes[RHD_FB_BAR],
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-		(void **)&info.shared_info->graphics_memory);
+		(void **)&info.shared_info->frame_buffer);
 	if (frambufferMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": card(%ld): could not map framebuffer!\n",
 			info.id);
@@ -90,11 +92,12 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
 
+	// Pass common information to accelerant
 	info.shared_info->device_chipset = info.device_chipset;
 	info.shared_info->registers_area = info.registers_area;
+	info.shared_info->frame_buffer_area = info.framebuffer_area;
 	info.shared_info->frame_buffer_phys
 		= info.pci->u.h0.base_registers[RHD_FB_BAR];
-	info.shared_info->frame_buffer_offset = 0;
 
 	// Pull active monitor VESA EDID from boot loader
 	edid1_info* edidInfo = (edid1_info*)get_boot_item(EDID_BOOT_INFO,
@@ -109,9 +112,6 @@ radeon_hd_init(radeon_info &info)
 			__func__);
 		info.shared_info->has_edid = false;
 	}
-
-	info.shared_info->frame_buffer_int
-		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
 	// Populate graphics_memory/aperture_size with KB
 	if (info.shared_info->device_chipset >= RADEON_R800) {
@@ -142,9 +142,6 @@ radeon_hd_init(radeon_info &info)
 
 	TRACE("card(%ld): Found %ld MB memory on card\n", info.id,
 		memory_size);
-
-	TRACE("card(%ld): Frame buffer aperture internal location is %08x\n",
-		info.id, (unsigned int)info.shared_info->frame_buffer_int);
 
 	TRACE("card(%ld): Frame buffer aperture size is %ld MB\n", info.id,
 		frame_buffer_size);

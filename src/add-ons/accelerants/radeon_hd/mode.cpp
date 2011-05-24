@@ -129,34 +129,6 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 }
 
 
-uint32
-AllocateFB(uint32 size, const char *description)
-{
-	uint32 chunk;
-
-	// TODO : Kernel AreaMapper?
-
-	// Is there any framebuffer left to allocate?
-	if (gInfo->shared_info->frame_buffer_free < size) {
-		TRACE("%s was unable to allocate a framebuffer - memory shortage\n",
-			__func__);
-		return 0;
-	}
-
-	// assign requested "chunk" of framebuffer memory
-	chunk = gInfo->shared_info->frame_buffer_offset;
-
-	// retally framebuffer memory status
-	gInfo->shared_info->frame_buffer_offset += size;
-	gInfo->shared_info->frame_buffer_free -= size;
-
-	TRACE("%s allocated framebuffer %s at offset 0x%08X (size: 0x%08X)\n",
-		__func__, description, chunk, size);
-
-	return chunk;
-}
-
-
 // Blacks the screen out, useful for mode setting
 static void
 CardBlankSet(int crtNumber, bool blank)
@@ -173,7 +145,7 @@ CardBlankSet(int crtNumber, bool blank)
 	}
 
 	write32(blackColorReg, 0);
-	write32AtMask(blankControlReg, blank ? 0x00000100 : 0, 0x00000100);
+	write32AtMask(blankControlReg, blank ? 1 << 8 : 0, 1 << 8);
 }
 
 
@@ -219,14 +191,13 @@ CardFBSet(int crtNumber, display_mode *mode)
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
 
-	uint32 neededFrameBuffer = mode->timing.h_display
-		* bitsPerPixel * mode->virtual_height / 8;
 
-	uint32 fbIntAddress = gInfo->shared_info->frame_buffer_int;
-	uint32 fbOffset = AllocateFB(neededFrameBuffer, "DisplayFramebuffer");
+	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
+
+	uint32 fbAddress = gInfo->shared_info->frame_buffer_phys;
 
 	write32(regOffset + gRegister->grphPrimarySurfaceAddr,
-		fbIntAddress + fbOffset);
+		fbAddress);
 
 	write32(regOffset + gRegister->grphPitch, bytesPerRow / 4);
 	write32(regOffset + gRegister->grphSurfaceOffsetX, 0);
@@ -275,9 +246,9 @@ CardModeSet(int crtNumber, display_mode *mode)
 	write32(regOffset + D1CRTC_H_SYNC_A,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
 
-	// set flag for neg. H sync
-	if (!(displayTiming.flags & B_POSITIVE_HSYNC))
-		write32(regOffset + D1CRTC_H_SYNC_A_CNTL, 0x01);
+	// set flag for neg. H sync. M76 Register Reference Guide 2-256
+	write32AtMask(regOffset + D1CRTC_H_SYNC_A_CNTL,
+		displayTiming.flags & B_POSITIVE_HSYNC ? 0 : 1, 0x1);
 
 	// *** Vertical
 	write32(regOffset + D1CRTC_V_TOTAL, displayTiming.v_total - 1);
@@ -300,9 +271,10 @@ CardModeSet(int crtNumber, display_mode *mode)
 	write32(regOffset + D1CRTC_V_SYNC_A,
 		(displayTiming.v_sync_end - displayTiming.v_sync_start) << 16);
 
-	// set flag for neg. V sync
-	if (!(displayTiming.flags & B_POSITIVE_VSYNC))
-		write32(regOffset + D1CRTC_V_SYNC_A_CNTL, 0x01);
+	// set flag for neg. V sync. M76 Register Reference Guide 2-258
+	// we don't need a mask here as this is the only param for Vertical
+	write32(regOffset + D1CRTC_V_SYNC_A_CNTL,
+		displayTiming.flags & B_POSITIVE_VSYNC ? 0 : 1);
 
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
 		should only be set to 1 on 30bpp DVI modes
@@ -356,6 +328,13 @@ radeon_set_display_mode(display_mode *mode)
 	CardModeSet(crtNumber, mode);
 	CardModeScale(crtNumber, mode);
 
+	uint16_t regOffset = (crtNumber == 0)
+		? gRegister->regOffsetCRT0 : gRegister->regOffsetCRT1;
+
+	int32 cardstatus = read32(regOffset + D1CRTC_STATUS);
+
+	TRACE("Card Status: 0x%X\n", cardstatus);
+
 	return B_OK;
 }
 
@@ -375,14 +354,8 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 {
 	TRACE("%s\n", __func__);
 
-	// TODO : This returns the location of the last allocated fb
-
-	config->frame_buffer = gInfo->shared_info->graphics_memory
-		+ gInfo->shared_info->frame_buffer_int
-		+ gInfo->shared_info->frame_buffer_offset;
-
-	config->frame_buffer_dma = (uint8 *)gInfo->shared_info->frame_buffer_phys
-		+ gInfo->shared_info->frame_buffer_offset;
+	config->frame_buffer = gInfo->shared_info->frame_buffer;
+	config->frame_buffer_dma = (uint8 *)gInfo->shared_info->frame_buffer_phys;
 
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
