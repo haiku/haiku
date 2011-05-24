@@ -185,7 +185,7 @@ ATADevice::ReadCapacity(ATARequest *request)
 	} else
 		data.lba = UINT_MAX;
 	TRACE("returning last block: %lu\n", B_BENDIAN_TO_HOST_INT32(data.lba));
-	
+
 	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);
 	ccb->data_resid = MAX(ccb->data_length - sizeof(data), 0);
 	return B_OK;
@@ -196,7 +196,7 @@ status_t
 ATADevice::ReadCapacity16(ATARequest *request)
 {
 	TRACE_FUNCTION("%p\n", request);
-	
+
 	scsi_ccb *ccb = request->CCB();
 	scsi_res_read_capacity_long data;
 	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
@@ -501,7 +501,7 @@ ATADevice::ConfigureDMA()
 	#undef CHECK_DMA_MODE
 
 	if (modeCount != 1) {
-		TRACE_ERROR("more than on DMA mode selected, not using DMA\n");
+		TRACE_ERROR("more than one DMA mode selected, not using DMA\n");
 		fUseDMA = false;
 		return B_OK;
 	}
