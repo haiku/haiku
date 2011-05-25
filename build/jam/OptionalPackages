@@ -1122,7 +1122,7 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				mercurial-1.8.3-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/mercurial-1.8.3-x86-r1a3-x86-gcc4-2011-05-24.zip
+				: $(baseURL)/mercurial-1.8.3-r1a3-x86-gcc4-2011-05-24.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -1507,8 +1507,8 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 		Echo "No optional package TagLib available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			taglib-1.6.3-x86-gcc4-2011-05-13.zip
-			: $(baseURL)/taglib-1.6.3-x86-gcc4-2011-05-13.zip ;		
+			taglib-1.6.3-r1r3-x86-gcc4-2011-05-24.zip
+			: $(baseURL)/taglib-1.6.3-r1r3-x86-gcc4-2011-05-24.zip ;		
 	} else {
 		InstallOptionalHaikuImagePackage
 			taglib-1.6.3-r1a3-x86-gcc2-2011-05-20.zip
