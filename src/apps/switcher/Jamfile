@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps switcher ;
+
+UsePrivateHeaders app interface shared ;
+
+Application Switcher :
+	ApplicationsView.cpp
+	CaptureWindow.cpp
+	GroupListView.cpp
+	LaunchButton.cpp
+	PanelWindow.cpp
+	Switcher.cpp
+	WindowsView.cpp
+
+	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) libshared.a
+	: Switcher.rdef
+;

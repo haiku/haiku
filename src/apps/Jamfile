@@ -55,6 +55,7 @@ HaikuSubInclude showimage ;
 HaikuSubInclude soundrecorder ;
 HaikuSubInclude stylededit ;
 HaikuSubInclude sudoku ;
+HaikuSubInclude switcher ;
 HaikuSubInclude terminal ;
 HaikuSubInclude text_search ;
 HaikuSubInclude tracker ;
