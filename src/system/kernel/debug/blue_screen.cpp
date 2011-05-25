@@ -14,6 +14,7 @@
 #include <console.h>
 #include <debug.h>
 #include <arch/debug_console.h>
+#include <safemode.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -603,7 +604,8 @@ blue_screen_init(void)
 		return B_ERROR;
 
 	sModule = &gFrameBufferConsoleModule;
-	sScreen.paging = true;
+	sScreen.paging = !get_safemode_boolean(
+		"disable_onscreen_paging", false);
 	sScreen.paging_timeout = false;
 
 	add_debugger_command("paging", set_paging, "Enable or disable paging");

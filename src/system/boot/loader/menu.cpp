@@ -819,15 +819,22 @@ add_debug_menu()
 		= new(nothrow) MenuItem("Enable serial debug output"));
 	item->SetData("serial_debug_output");
 	item->SetType(MENU_ITEM_MARKABLE);
-    item->SetHelpText("Turns on forwarding the syslog output to the serial "
+	item->SetHelpText("Turns on forwarding the syslog output to the serial "
 		"interface.");
 
 	menu->AddItem(item
 		= new(nothrow) MenuItem("Enable on screen debug output"));
 	item->SetData("debug_screen");
 	item->SetType(MENU_ITEM_MARKABLE);
-    item->SetHelpText("Displays debug output on screen while the system "
+	item->SetHelpText("Displays debug output on screen while the system "
 		"is booting, instead of the normal boot logo.");
+
+	menu->AddItem(item
+		= new(nothrow) MenuItem("Disable on screen paging"));
+	item->SetData("disable_onscreen_paging");
+	item->SetType(MENU_ITEM_MARKABLE);
+	item->SetHelpText("Disables paging when on screen debug output is "
+		"enabled.");
 
 	menu->AddItem(item = new(nothrow) MenuItem("Enable debug syslog"));
 	item->SetType(MENU_ITEM_MARKABLE);
