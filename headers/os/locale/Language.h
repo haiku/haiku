@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc.
+ * Copyright 2003-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LANGUAGE_H_
@@ -10,6 +10,8 @@
 #include <String.h>
 #include <SupportDefs.h>
 
+
+class BBitmap;
 
 // We must not include the icu headers in there as it could mess up binary
 // compatibility.
@@ -32,12 +34,14 @@ public:
 								BLanguage(const BLanguage& other);
 								~BLanguage();
 
-			BLanguage&			operator=(const BLanguage& source);
+			status_t			SetTo(const char* language);
 
 			status_t			GetNativeName(BString& name) const;
 			status_t			GetName(BString& name,
 									const BLanguage* displayLanguage = NULL
 									) const;
+			const char*			GetString(uint32 id) const;
+			status_t			GetIcon(BBitmap* result) const;
 
 			const char*			Code() const;
 									// ISO-639-1
@@ -53,15 +57,12 @@ public:
 
 			uint8				Direction() const;
 
-			status_t			SetTo(const char* language);
-
-			const char*			GetString(uint32 id) const;
+			BLanguage&			operator=(const BLanguage& source);
 
 			class Private;
 private:
 	friend	class Private;
 
-//			BString				fStrings[B_NUM_LANGUAGE_STRINGS];
 			uint8				fDirection;
 			icu_44::Locale*		fICULocale;
 };

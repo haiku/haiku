@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku. All rights reserved.
+ * Copyright 2003-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _LOCALE_ROSTER_H_
@@ -51,6 +51,8 @@ public:
 
 			status_t			GetFlagIconForCountry(BBitmap* flagIcon,
 									const char* countryCode);
+			status_t			GetFlagIconForLanguage(BBitmap* flagIcon,
+									const char* languageCode);
 
 			status_t			GetAvailableCatalogs(BMessage* message,
 									const char* sigPattern = NULL,
