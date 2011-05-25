@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009-2010, Adrien Destugues, pulkomandy@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -114,10 +114,7 @@ BCountry::Code() const
 status_t
 BCountry::GetIcon(BBitmap* result) const
 {
-	const char* code = fICULocale->getCountry();
-	if (code == NULL)
-		return  B_ERROR;
-	return BLocaleRoster::Default()->GetFlagIconForCountry(result, code);
+	return BLocaleRoster::Default()->GetFlagIconForCountry(result, Code());
 }
 
 
