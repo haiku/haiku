@@ -130,23 +130,23 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 
 
 // Blacks the screen out, useful for mode setting
-static void
-CardBlankSet(int crtNumber, bool blank)
-{
-	int blackColorReg;
-	int blankControlReg;
-
-	if (crtNumber == 1) {
-		blackColorReg = D2CRTC_BLACK_COLOR;
-		blankControlReg = D2CRTC_BLANK_CONTROL;
-	} else {
-		blackColorReg = D1CRTC_BLACK_COLOR;
-		blankControlReg = D1CRTC_BLANK_CONTROL;
-	}
-
-	write32(blackColorReg, 0);
-	write32AtMask(blankControlReg, blank ? 1 << 8 : 0, 1 << 8);
-}
+//static void
+//CardBlankSet(int crtNumber, bool blank)
+//{
+//	int blackColorReg;
+//	int blankControlReg;
+//
+//	if (crtNumber == 1) {
+//		blackColorReg = D2CRTC_BLACK_COLOR;
+//		blankControlReg = D2CRTC_BLANK_CONTROL;
+//	} else {
+//		blackColorReg = D1CRTC_BLACK_COLOR;
+//		blankControlReg = D1CRTC_BLANK_CONTROL;
+//	}
+//
+//	write32(blackColorReg, 0);
+//	write32AtMask(blankControlReg, blank ? 1 << 8 : 0, 1 << 8);
+//}
 
 
 static void
@@ -223,7 +223,7 @@ CardModeSet(int crtNumber, display_mode *mode)
 	uint16_t regOffset = (crtNumber == 0)
 		? gRegister->regOffsetCRT0 : gRegister->regOffsetCRT1;
 
-	CardBlankSet(crtNumber, true);
+	//CardBlankSet(crtNumber, true);
 
 	display_timing& displayTiming = mode->timing;
 
@@ -237,11 +237,11 @@ CardModeSet(int crtNumber, display_mode *mode)
 	write32(regOffset + D1CRTC_H_TOTAL, displayTiming.h_total - 1);
 
 	// determine blanking based on passed modeline
-	uint16 blankStart = displayTiming.h_display + 1;
-	uint16 blankEnd = displayTiming.h_total;
+	//uint16 blankStart = displayTiming.h_display;
+	//uint16 blankEnd = displayTiming.h_total;
 
-	write32(regOffset + D1CRTC_H_BLANK_START_END,
-		blankStart | (blankEnd << 16));
+	//write32(regOffset + D1CRTC_H_BLANK_START_END,
+	//	blankStart | (blankEnd << 16));
 
 	write32(regOffset + D1CRTC_H_SYNC_A,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
@@ -253,11 +253,11 @@ CardModeSet(int crtNumber, display_mode *mode)
 	// *** Vertical
 	write32(regOffset + D1CRTC_V_TOTAL, displayTiming.v_total - 1);
 
-	blankStart = displayTiming.v_display;
-	blankEnd = displayTiming.v_total;
+	//blankStart = displayTiming.v_display;
+	//blankEnd = displayTiming.v_total;
 
-	write32(regOffset + D1CRTC_V_BLANK_START_END,
-		blankStart | (blankEnd << 16));
+	//write32(regOffset + D1CRTC_V_BLANK_START_END,
+	//	blankStart | (blankEnd << 16));
 
 	// Set Interlace if specified within mode line
 	if (displayTiming.flags & B_TIMING_INTERLACED) {
@@ -281,7 +281,7 @@ CardModeSet(int crtNumber, display_mode *mode)
 	*/
 	write32AtMask(regOffset + D1CRTC_COUNT_CONTROL, 0x0, 0x1);
 
-	CardBlankSet(crtNumber, false);
+	//CardBlankSet(crtNumber, false);
 }
 
 
@@ -300,9 +300,15 @@ CardModeScale(int crtNumber, display_mode *mode)
 	write32(regOffset + D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
 		(Overscan.OverscanTop << 16) | Overscan.OverscanBottom);
 */
+
+	// No scaling
 	write32(regOffset + D1SCL_ENABLE, 0);
 	write32(regOffset + D1SCL_TAP_CONTROL, 0);
-	write32(regOffset + D1MODE_CENTER, 2);
+	write32(regOffset + D1MODE_CENTER, 0);
+
+	#if 0
+	// Auto scale keeping aspect ratio
+	write32(regOffset + D1MODE_CENTER, 1);
 
 	write32(regOffset + D1SCL_UPDATE, 0);
 	write32(regOffset + D1SCL_FLIP_CONTROL, 0);
@@ -316,6 +322,7 @@ CardModeScale(int crtNumber, display_mode *mode)
 	write32(regOffset + D1SCL_VFILTER, 0x00030100);
 
 	write32(regOffset + D1SCL_DITHER, 0x00001010);
+	#endif
 }
 
 
