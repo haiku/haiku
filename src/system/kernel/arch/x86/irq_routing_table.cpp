@@ -111,17 +111,9 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 	// check the base device at function 0
 	uint8 headerType = pci->read_pci_config(entry.pci_bus, entry.pci_device, 0,
 		PCI_header_type, 1);
-	switch (headerType & PCI_header_type_mask) {
-		case PCI_header_type_generic:
-		case PCI_header_type_PCI_to_PCI_bridge:
-			// We don't really care about bridges as we won't install
-			// interrupt handlers for them, but we can still map them and
-			// update their info for completeness.
-			break;
-
-		default:
-			// either an unsupported or a non-present device (0xff)
-			return B_ENTRY_NOT_FOUND;
+	if (headerType == 0xff) {
+		// the device is not present
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	// we have a device, check how many functions we need to iterate
@@ -358,7 +350,7 @@ evaluate_integer(acpi_module_info* acpi, acpi_handle handle,
 
 static status_t
 handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
-	const acpi_pci_routing_table* acpiTable, const pci_address& pciAddress,
+	const acpi_pci_routing_table* acpiTable, uint8 currentBus,
 	irq_routing_entry& irqEntry)
 {
 	bool noSource = acpiTable->Source[0] == '\0';
@@ -383,7 +375,7 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 	irqEntry.pin = acpiTable->Pin;
 	irqEntry.source = noSource ? NULL : source;
 	irqEntry.source_index = acpiTable->SourceIndex;
-	irqEntry.pci_bus = pciAddress.bus;
+	irqEntry.pci_bus = currentBus;
 	irqEntry.pci_device = (uint8)(acpiTable->Address >> 16);
 
 	status = fill_pci_info_for_entry(pci, irqEntry);
@@ -393,10 +385,15 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 		// used to describe the full actual wireing regardless of the presence
 		// of devices, in which case many entries won't have a match.
 #ifdef TRACE_PRT
-		dprintf("didn't find a matching PCI device for irq entry:\n");
+		dprintf("no matching PCI device for irq entry: ");
 		print_irq_routing_entry(irqEntry);
 #endif
 		return status;
+	} else {
+#ifdef TRACE_PRT
+		dprintf("found matching PCI device for irq entry: ");
+		print_irq_routing_entry(irqEntry);
+#endif
 	}
 
 	if (noSource) {
@@ -413,73 +410,91 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 
 static status_t
 read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
-	acpi_handle device, const pci_address& parentAddress,
-	IRQRoutingTable& table, bool rootBridge,
-	interrupt_available_check_function checkFunction)
+	acpi_handle device, uint8 currentBus, IRQRoutingTable& table,
+	bool rootBridge, interrupt_available_check_function checkFunction)
 {
-	acpi_data buffer;
-	buffer.pointer = NULL;
-	buffer.length = ACPI_ALLOCATE_BUFFER;
-	status_t status = acpi->get_irq_routing_table(device, &buffer);
-	if (status != B_OK) {
-		// simply not a bridge
-		return B_OK;
-	}
-
-	TRACE("found irq routing table\n");
-
-	uint64 value;
-	pci_address pciAddress = parentAddress;
-	if (evaluate_integer(acpi, device, "_ADR", value) == B_OK) {
-		pciAddress.device = (uint8)(value >> 16);
-		pciAddress.function = (uint8)value;
-	} else {
-		pciAddress.device = 0;
-		pciAddress.function = 0;
-	}
-
 	if (!rootBridge) {
+		// check if this actually is a bridge
+		uint64 value;
+		pci_address pciAddress;
+		pciAddress.bus = currentBus;
+		if (evaluate_integer(acpi, device, "_ADR", value) == B_OK) {
+			pciAddress.device = (uint8)(value >> 16);
+			pciAddress.function = (uint8)value;
+		} else {
+			pciAddress.device = 0;
+			pciAddress.function = 0;
+		}
+
+		uint8 headerType = pci->read_pci_config(pciAddress.bus,
+			pciAddress.device, pciAddress.function, PCI_header_type, 1);
+
+		switch (headerType & PCI_header_type_mask) {
+			case PCI_header_type_PCI_to_PCI_bridge:
+			case PCI_header_type_cardbus:
+				TRACE("found a PCI bridge (0x%02x)\n", headerType);
+				break;
+
+			default:
+				// Simply not a bridge or not present at all.
+				TRACE("not a PCI bridge (0x%02x)\n", headerType);
+				return B_OK;
+		}
+
 		// Find the secondary bus number (the "downstream" bus number for the
 		// attached devices) in the bridge configuration.
 		uint8 secondaryBus = pci->read_pci_config(pciAddress.bus,
 			pciAddress.device, pciAddress.function, PCI_secondary_bus, 1);
 		if (secondaryBus == 255) {
 			// The bus below this bridge is inactive, nothing to do.
+			TRACE("secondary bus is inactive\n");
 			return B_OK;
 		}
 
 		// The secondary bus cannot be the same as the current one.
-		if (secondaryBus == parentAddress.bus) {
+		if (secondaryBus == currentBus) {
 			dprintf("invalid secondary bus %u on primary bus %u,"
 				" can't configure irq routing of devices below\n",
-				secondaryBus, parentAddress.bus);
+				secondaryBus, currentBus);
 			return B_ERROR;
 		}
 
 		// Everything below is now on the secondary bus.
-		pciAddress.bus = secondaryBus;
+		TRACE("now scanning bus %u\n", secondaryBus);
+		currentBus = secondaryBus;
 	}
 
-	acpi_pci_routing_table* acpiTable = (acpi_pci_routing_table*)buffer.pointer;
-	while (acpiTable->Length) {
-		irq_routing_entry irqEntry;
-		status = handle_routing_table_entry(acpi, pci, acpiTable, pciAddress,
-			irqEntry);
-		if (status == B_OK) {
-			if (irqEntry.source == NULL && !checkFunction(irqEntry.irq)) {
-				dprintf("hardwired irq %u not addressable\n", irqEntry.irq);
-				free(buffer.pointer);
-				return B_ERROR;
+	acpi_data buffer;
+	buffer.pointer = NULL;
+	buffer.length = ACPI_ALLOCATE_BUFFER;
+	status_t status = acpi->get_irq_routing_table(device, &buffer);
+	if (status == B_OK) {
+		TRACE("found irq routing table\n");
+
+		acpi_pci_routing_table* acpiTable
+			= (acpi_pci_routing_table*)buffer.pointer;
+		while (acpiTable->Length) {
+			irq_routing_entry irqEntry;
+			status = handle_routing_table_entry(acpi, pci, acpiTable,
+				currentBus, irqEntry);
+			if (status == B_OK) {
+				if (irqEntry.source == NULL && !checkFunction(irqEntry.irq)) {
+					dprintf("hardwired irq %u not addressable\n", irqEntry.irq);
+					free(buffer.pointer);
+					return B_ERROR;
+				}
+
+				table.PushBack(irqEntry);
 			}
 
-			table.PushBack(irqEntry);
+			acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
+				+ acpiTable->Length);
 		}
 
-		acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
-			+ acpiTable->Length);
+		free(buffer.pointer);
+	} else {
+		TRACE("no irq routing table present\n");
 	}
-
-	free(buffer.pointer);
 
 	// recurse down to the child devices
 	acpi_data pathBuffer;
@@ -505,7 +520,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 
 		TRACE("recursing down to child \"%s\"\n", childName);
 		status = read_irq_routing_table_recursive(acpi, pci, childHandle,
-			pciAddress, table, false, checkFunction);
+			currentBus, table, false, checkFunction);
 		if (status != B_OK)
 			break;
 	}
@@ -530,16 +545,19 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 	if (status != B_OK)
 		return status;
 
-	// We reset the structure to 0 here. Any failed evaluation means default
+	// We reset the root bus to 0 here. Any failed evaluation means default
 	// values, so we don't have to do anything in the error case.
-	pci_address rootPciAddress;
-	memset(&rootPciAddress, 0, sizeof(pci_address));
+	uint8 rootBus = 0;
 
 	uint64 value;
+	if (evaluate_integer(acpi, rootPciHandle, "_BBN", value) == B_OK)
+		rootBus = (uint8)value;
+
+#if 0
+	// TODO: handle
 	if (evaluate_integer(acpi, rootPciHandle, "_SEG", value) == B_OK)
 		rootPciAddress.segment = (uint8)value;
-	if (evaluate_integer(acpi, rootPciHandle, "_BBN", value) == B_OK)
-		rootPciAddress.bus = (uint8)value;
+#endif
 
 	pci_module_info* pci;
 	status = get_module(B_PCI_MODULE_NAME, (module_info**)&pci);
@@ -550,8 +568,8 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 		return status;
 	}
 
-	status = read_irq_routing_table_recursive(acpi, pci, rootPciHandle,
-		rootPciAddress, table, true, checkFunction);
+	status = read_irq_routing_table_recursive(acpi, pci, rootPciHandle, rootBus,
+		table, true, checkFunction);
 
 	put_module(B_PCI_MODULE_NAME);
 
