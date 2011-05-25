@@ -63,20 +63,14 @@ public:
 		BStringItem(label),
 		fLanguage(language)
 	{
-// Don't use *country* flags for *languages*. Can be re-enabled and adjusted
-// accordingly once we have language icons.
-#if 0
 		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
 		if (fIcon != NULL
 			&& (!fIcon->IsValid()
-				|| BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
+				|| BLocaleRoster::Default()->GetFlagIconForLanguage(fIcon,
 					language) != B_OK)) {
 			delete fIcon;
 			fIcon = NULL;
 		}
-#else
-		fIcon = NULL;
-#endif
 	}
 
 	~LanguageItem()
@@ -313,7 +307,7 @@ BootPromptWindow::_PopulateLanguages()
 
 	// Try to instantiate a BCatalog for each language, it will only work
 	// for translations of this application. So the list of languages will be
-	//  limited to catalogs written for this application, which is on purpose!
+	// limited to catalogs written for this application, which is on purpose!
 
 	const char* languageID;
 	LanguageItem* currentItem = NULL;
