@@ -462,6 +462,7 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 				== PCI_header_type_PCI_to_PCI_bridge) {
 
 				pci_address pciAddress;
+				pciAddress.segment = 0;
 				pciAddress.bus = bus;
 				pciAddress.device = device;
 				pciAddress.function = function;
@@ -577,6 +578,13 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		} else {
 			pciAddress.device = 0;
 			pciAddress.function = 0;
+		}
+
+		if (pciAddress.device >= kMaxPCIDeviceCount
+			|| pciAddress.function >= kMaxPCIFunctionCount) {
+			// we don't seem to be on the PCI bus anymore
+			// (just a different type of device)
+			return B_OK;
 		}
 
 		uint8 headerType = pci->read_pci_config(pciAddress.bus,
