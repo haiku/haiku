@@ -119,8 +119,8 @@ if [ IsOptionalHaikuImagePackageAdded libart_lgpl ] {
 		Echo "No optional package libart_lgpl available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			libart_lgpl-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/libart_lgpl-r1a3-x86-gcc4-2011-05-26.zip
+			libart_lgpl-2.3.21-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/libart_lgpl-2.3.21-r1a3-x86-gcc4-2011-05-26.zip
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
