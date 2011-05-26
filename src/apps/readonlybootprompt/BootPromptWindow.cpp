@@ -279,7 +279,8 @@ BootPromptWindow::_UpdateStrings()
 
 	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
 	fKeymapsMenuField->SetLabel(B_TRANSLATE("Keymap"));
-	fKeymapsMenuField->MenuItem()->SetLabel(B_TRANSLATE("Custom"));
+	if (fKeymapsMenuField->Menu()->FindMarked() == NULL)
+		fKeymapsMenuField->MenuItem()->SetLabel(B_TRANSLATE("Custom"));
 }
 
 
