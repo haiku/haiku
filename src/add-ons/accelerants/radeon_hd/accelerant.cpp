@@ -164,51 +164,121 @@ uninit_common(void)
 
 
 /*! Populate gRegister with device dependant register locations */
-static status_t
-init_registers(uint16 chipset)
+status_t
+init_registers(uint8 crtid)
 {
-	if (chipset >= RADEON_R800) {
-		gRegister->regOffsetCRT0 = EVERGREEN_CRTC0_REGISTER_OFFSET;
-		gRegister->regOffsetCRT1 = EVERGREEN_CRTC1_REGISTER_OFFSET;
-		gRegister->grphEnable = EVERGREEN_GRPH_ENABLE;
-		gRegister->grphControl = EVERGREEN_GRPH_CONTROL;
-		gRegister->grphSwapControl = EVERGREEN_GRPH_SWAP_CONTROL;
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset >= RADEON_R800) {
+		uint16_t offset = 0;
+
+		// AMD Eyefinity on Evergreen GPUs
+		if (crtid == 1)
+			offset = EVERGREEN_CRTC1_REGISTER_OFFSET;
+		else if (crtid == 2)
+			offset = EVERGREEN_CRTC2_REGISTER_OFFSET;
+		else if (crtid == 3)
+			offset = EVERGREEN_CRTC3_REGISTER_OFFSET;
+		else if (crtid == 4)
+			offset = EVERGREEN_CRTC4_REGISTER_OFFSET;
+		else if (crtid == 5)
+			offset = EVERGREEN_CRTC5_REGISTER_OFFSET;
+		else
+			offset = EVERGREEN_CRTC0_REGISTER_OFFSET;
+
+		// Evergreen+ is crtoffset + register
+		gRegister->grphEnable = offset + EVERGREEN_GRPH_ENABLE;
+		gRegister->grphControl = offset + EVERGREEN_GRPH_CONTROL;
+		gRegister->grphSwapControl = offset + EVERGREEN_GRPH_SWAP_CONTROL;
 		gRegister->grphPrimarySurfaceAddr
-			= EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
-		gRegister->grphPitch = EVERGREEN_GRPH_PITCH;
-		gRegister->grphSurfaceOffsetX = EVERGREEN_GRPH_SURFACE_OFFSET_X;
-		gRegister->grphSurfaceOffsetY = EVERGREEN_GRPH_SURFACE_OFFSET_Y;
-		gRegister->grphXStart = EVERGREEN_GRPH_X_START;
-		gRegister->grphYStart = EVERGREEN_GRPH_Y_START;
-		gRegister->grphXEnd = EVERGREEN_GRPH_X_END;
-		gRegister->grphYEnd = EVERGREEN_GRPH_Y_END;
-		gRegister->modeDesktopHeight = EVERGREEN_DESKTOP_HEIGHT;
-		gRegister->viewportStart = EVERGREEN_VIEWPORT_START;
-		gRegister->viewportSize = EVERGREEN_VIEWPORT_SIZE;
-	} else if (chipset >= RADEON_R600 && chipset < RADEON_R800) {
-		gRegister->regOffsetCRT0 = D1_REG_OFFSET;
-		gRegister->regOffsetCRT1 = D2_REG_OFFSET;
-		gRegister->grphEnable = D1GRPH_ENABLE;
-		gRegister->grphControl = D1GRPH_CONTROL;
-		gRegister->grphSwapControl = D1GRPH_SWAP_CNTL;
-		gRegister->grphPrimarySurfaceAddr = D1GRPH_PRIMARY_SURFACE_ADDRESS;
-		gRegister->grphPitch = D1GRPH_PITCH;
-		gRegister->grphSurfaceOffsetX = D1GRPH_SURFACE_OFFSET_X;
-		gRegister->grphSurfaceOffsetY = D1GRPH_SURFACE_OFFSET_Y;
-		gRegister->grphXStart = D1GRPH_X_START;
-		gRegister->grphYStart = D1GRPH_Y_START;
-		gRegister->grphXEnd = D1GRPH_X_END;
-		gRegister->grphYEnd = D1GRPH_Y_END;
-		gRegister->modeDesktopHeight = D1MODE_DESKTOP_HEIGHT;
-		gRegister->viewportStart = D1MODE_VIEWPORT_START;
-		gRegister->viewportSize = D1MODE_VIEWPORT_SIZE;
+			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
+		gRegister->grphPitch = offset + EVERGREEN_GRPH_PITCH;
+		gRegister->grphSurfaceOffsetX
+			= offset + EVERGREEN_GRPH_SURFACE_OFFSET_X;
+		gRegister->grphSurfaceOffsetY
+			= offset + EVERGREEN_GRPH_SURFACE_OFFSET_Y;
+		gRegister->grphXStart = offset + EVERGREEN_GRPH_X_START;
+		gRegister->grphYStart = offset + EVERGREEN_GRPH_Y_START;
+		gRegister->grphXEnd = offset + EVERGREEN_GRPH_X_END;
+		gRegister->grphYEnd = offset + EVERGREEN_GRPH_Y_END;
+		gRegister->modeDesktopHeight = offset + EVERGREEN_DESKTOP_HEIGHT;
+		gRegister->modeDataFormat = offset + EVERGREEN_DATA_FORMAT;
+		gRegister->viewportStart = offset + EVERGREEN_VIEWPORT_START;
+		gRegister->viewportSize = offset + EVERGREEN_VIEWPORT_SIZE;
+
+	} else if (info.device_chipset >= RADEON_R600
+		&& info.device_chipset < RADEON_R800) {
+
+		// r600 - r700 are D1 or D2 based on primary / secondary crt
+		gRegister->grphEnable
+			= (crtid == 1) ? D2GRPH_ENABLE : D1GRPH_ENABLE;
+		gRegister->grphControl
+			= (crtid == 1) ? D2GRPH_CONTROL : D1GRPH_CONTROL;
+		gRegister->grphSwapControl
+			= (crtid == 1) ? D2GRPH_SWAP_CNTL : D1GRPH_SWAP_CNTL;
+		gRegister->grphPrimarySurfaceAddr
+			= (crtid == 1) ? D2GRPH_PRIMARY_SURFACE_ADDRESS
+				: D1GRPH_PRIMARY_SURFACE_ADDRESS;
+		gRegister->grphPitch
+			= (crtid == 1) ? D2GRPH_PITCH : D1GRPH_PITCH;
+		gRegister->grphSurfaceOffsetX
+			= (crtid == 1) ? D2GRPH_SURFACE_OFFSET_X : D1GRPH_SURFACE_OFFSET_X;
+		gRegister->grphSurfaceOffsetY
+			= (crtid == 1) ? D2GRPH_SURFACE_OFFSET_Y : D1GRPH_SURFACE_OFFSET_Y;
+		gRegister->grphXStart
+			= (crtid == 1) ? D2GRPH_X_START : D1GRPH_X_START;
+		gRegister->grphYStart
+			= (crtid == 1) ? D2GRPH_Y_START : D1GRPH_Y_START;
+		gRegister->grphXEnd
+			= (crtid == 1) ? D2GRPH_X_END : D1GRPH_X_END;
+		gRegister->grphYEnd
+			= (crtid == 1) ? D2GRPH_Y_END : D1GRPH_Y_END;
+		gRegister->modeDesktopHeight
+			= (crtid == 1) ? D2MODE_DESKTOP_HEIGHT : D1MODE_DESKTOP_HEIGHT;
+		gRegister->modeDataFormat
+			= (crtid == 1) ? D2MODE_DATA_FORMAT : D1MODE_DATA_FORMAT;
+		gRegister->viewportStart
+			= (crtid == 1) ? D2MODE_VIEWPORT_START : D1MODE_VIEWPORT_START;
+		gRegister->viewportSize
+			= (crtid == 1) ? D2MODE_VIEWPORT_SIZE : D1MODE_VIEWPORT_SIZE;
 	} else {
 		// this really shouldn't happen unless a driver PCIID chipset is wrong
-		TRACE("%s, unknown Radeon chipset: r%X\n", __func__, chipset);
+		TRACE("%s, unknown Radeon chipset: r%X\n", __func__,
+			info.device_chipset);
 		return B_ERROR;
 	}
 
-	TRACE("%s, registers for ATI chipset r%X initialized\n", __func__, chipset);
+	// Populate common registers
+	// TODO : Wait.. this doesn't work with Eyefinity > crt 1.
+	gRegister->modeCenter
+		= (crtid == 1) ? D2MODE_CENTER : D1MODE_CENTER;
+	gRegister->crtHPolarity
+		= (crtid == 1) ? D2CRTC_H_SYNC_A_CNTL : D1CRTC_H_SYNC_A_CNTL;
+	gRegister->crtVPolarity
+		= (crtid == 1) ? D2CRTC_V_SYNC_A_CNTL : D1CRTC_V_SYNC_A_CNTL;
+	gRegister->crtHTotal
+		= (crtid == 1) ? D2CRTC_H_TOTAL : D1CRTC_H_TOTAL;
+	gRegister->crtVTotal
+		= (crtid == 1) ? D2CRTC_V_TOTAL : D1CRTC_V_TOTAL;
+	gRegister->crtHSync
+		= (crtid == 1) ? D2CRTC_H_SYNC_A : D1CRTC_H_SYNC_A;
+	gRegister->crtVSync
+		= (crtid == 1) ? D2CRTC_V_SYNC_A : D1CRTC_V_SYNC_A;
+	gRegister->crtHBlank
+		= (crtid == 1) ? D2CRTC_H_BLANK_START_END : D1CRTC_H_BLANK_START_END;
+	gRegister->crtVBlank
+		= (crtid == 1) ? D2CRTC_V_BLANK_START_END : D1CRTC_V_BLANK_START_END;
+	gRegister->crtInterlace
+		= (crtid == 1) ? D2CRTC_INTERLACE_CONTROL : D1CRTC_INTERLACE_CONTROL;
+	gRegister->crtCountControl
+		= (crtid == 1) ? D2CRTC_COUNT_CONTROL : D1CRTC_COUNT_CONTROL;
+	gRegister->sclEnable
+		= (crtid == 1) ? D2SCL_ENABLE : D1SCL_ENABLE;
+	gRegister->sclTapControl
+		= (crtid == 1) ? D2SCL_TAP_CONTROL : D1SCL_TAP_CONTROL;
+
+	TRACE("%s, registers for ATI chipset r%X crt #%d loaded\n", __func__,
+		info.device_chipset, crtid);
 
 	return B_OK;
 }
@@ -232,7 +302,9 @@ radeon_init_accelerant(int device)
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
-	status = init_registers(info.device_chipset);
+	status = init_registers(0);
+		// Initilize registers for crt0 to begin
+
 	if (status != B_OK)
 		return status;
 

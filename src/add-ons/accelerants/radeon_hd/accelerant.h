@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 #ifndef RADEON_HD_ACCELERANT_H
 #define RADEON_HD_ACCELERANT_H
@@ -38,8 +39,6 @@ struct accelerant_info {
 
 
 struct register_info {
-	uint16_t	regOffsetCRT0;
-	uint16_t	regOffsetCRT1;
 	uint16_t	grphEnable;
 	uint16_t	grphControl;
 	uint16_t	grphSwapControl;
@@ -51,9 +50,23 @@ struct register_info {
 	uint16_t	grphYStart;
 	uint16_t	grphXEnd;
 	uint16_t	grphYEnd;
+	uint16_t	crtCountControl;
+	uint16_t	crtInterlace;
+	uint16_t	crtHPolarity;
+	uint16_t	crtVPolarity;
+	uint16_t	crtHSync;
+	uint16_t	crtVSync;
+	uint16_t	crtHBlank;
+	uint16_t	crtVBlank;
+	uint16_t	crtHTotal;
+	uint16_t	crtVTotal;
 	uint16_t	modeDesktopHeight;
+	uint16_t	modeDataFormat;
+	uint16_t	modeCenter;
 	uint16_t	viewportStart;
 	uint16_t	viewportSize;
+	uint16_t	sclEnable;
+	uint16_t	sclTapControl;
 };
 
 
@@ -64,6 +77,10 @@ struct register_info {
 
 extern accelerant_info *gInfo;
 extern register_info *gRegister;
+
+
+status_t init_registers(uint8 crtid);
+
 
 // register access
 
