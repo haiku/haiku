@@ -32,6 +32,8 @@ const char* kACPIPciExpressRootName = "PNP0A08";
 
 // TODO: as per PCI 3.0, the PCI module hardcodes it in various places as well.
 static const uint8 kMaxPCIFunctionCount = 8;
+static const uint8 kMaxPCIDeviceCount = 32;
+	// TODO: actually this is mechanism dependent
 static const uint8 kMaxISAInterrupts = 16;
 
 irq_descriptor::irq_descriptor()
@@ -388,7 +390,6 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 		dprintf("no matching PCI device for irq entry: ");
 		print_irq_routing_entry(irqEntry);
 #endif
-		return status;
 	} else {
 #ifdef TRACE_PRT
 		dprintf("found matching PCI device for irq entry: ");
@@ -408,10 +409,162 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 }
 
 
+irq_routing_entry*
+find_routing_table_entry(IRQRoutingTable& table, uint8 bus, uint8 device,
+	uint8 pin)
+{
+	for (int i = 0; i < table.Count(); i++) {
+		irq_routing_entry& irqEntry = table.ElementAt(i);
+		if (irqEntry.pci_bus != bus || irqEntry.pci_device != device)
+			continue;
+
+		if (irqEntry.pin + 1 == pin)
+			return &irqEntry;
+	}
+
+	return NULL;
+}
+
+
+static status_t
+ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
+	IRQRoutingTable& matchedTable, IRQRoutingTable& unmatchedTable,
+	Vector<pci_address>& parents)
+{
+	for (uint8 device = 0; device < kMaxPCIDeviceCount; device++) {
+		if (pci->read_pci_config(bus, device, 0, PCI_vendor_id, 2) == 0xffff) {
+			// not present
+			continue;
+		}
+
+		uint8 headerType = pci->read_pci_config(bus, device, 0,
+			PCI_header_type, 1);
+
+		uint8 functionCount = 1;
+		if ((headerType & PCI_multifunction) != 0)
+			functionCount = kMaxPCIFunctionCount;
+
+		for (uint8 function = 0; function < functionCount; function++) {
+			// check for device presence by looking for a valid vendor
+			if (pci->read_pci_config(bus, device, function, PCI_vendor_id, 2)
+				== 0xffff) {
+				// not present
+				continue;
+			}
+
+			if (function > 0) {
+				headerType = pci->read_pci_config(bus, device, function,
+					PCI_header_type, 1);
+			}
+
+			// if this is a bridge, recurse down
+			if ((headerType & PCI_header_type_mask)
+				== PCI_header_type_PCI_to_PCI_bridge) {
+
+				pci_address pciAddress;
+				pciAddress.bus = bus;
+				pciAddress.device = device;
+				pciAddress.function = function;
+
+				parents.PushBack(pciAddress);
+
+				uint8 secondaryBus = pci->read_pci_config(bus, device, function,
+					PCI_secondary_bus, 1);
+				if (secondaryBus != 0xff) {
+					ensure_all_functions_matched(pci, secondaryBus,
+						matchedTable, unmatchedTable, parents);
+				}
+
+				parents.PopBack();
+			}
+
+			uint8 interruptPin = pci->read_pci_config(bus, device, function,
+				PCI_interrupt_pin, 1);
+			if (interruptPin == 0 || interruptPin > 4) {
+				// not routed
+				continue;
+			}
+
+			irq_routing_entry* irqEntry = find_routing_table_entry(matchedTable,
+				bus, device, interruptPin);
+			if (irqEntry != NULL) {
+				// we already have a matching entry for that device/pin, make
+				// sure the function mask includes us
+				irqEntry->pci_function_mask |= 1 << function;
+				continue;
+			}
+
+			// This function has no matching routing table entry yet. Try to
+			// figure one out in the parent, based on the device number and
+			// interrupt pin.
+			bool matched = false;
+			uint8 parentPin = ((device + interruptPin - 1) % 4) + 1;
+			for (int i = parents.Count() - 1; i >= 0; i--) {
+				pci_address& parent = parents.ElementAt(i);
+				irqEntry = find_routing_table_entry(matchedTable, parent.bus,
+					parent.device, parentPin);
+				if (irqEntry == NULL) {
+					// try the unmatched table as well
+					irqEntry = find_routing_table_entry(unmatchedTable,
+						parent.bus, parent.device, parentPin);
+				}
+
+				if (irqEntry == NULL) {
+					// no match in that parent, go further up
+					parentPin = ((parent.device + parentPin - 1) % 4) + 1;
+					continue;
+				}
+
+				// found a match, make a copy and add it to the table
+				irq_routing_entry newEntry = *irqEntry;
+				newEntry.device_address = (device << 16) | 0xffff;
+				newEntry.pin = interruptPin - 1;
+				newEntry.pci_bus = bus;
+				newEntry.pci_device = device;
+				newEntry.pci_function_mask = 1 << function;
+
+				uint8 biosIRQ = pci->read_pci_config(bus, device, function,
+					PCI_interrupt_line, 1);
+				if (biosIRQ != 0 && biosIRQ != 255) {
+					if (newEntry.bios_irq != 0 && newEntry.bios_irq != 255
+						&& newEntry.bios_irq != biosIRQ) {
+						// If the function was actually routed to that pin,
+						// the two bios irqs should match. If they don't
+						// that means we're not correct in our routing
+						// assumption.
+						panic("calculated irq routing doesn't match bios for "
+							"PCI %u:%u:%u", bus, device, function);
+						return B_ERROR;
+					}
+
+					newEntry.bios_irq = biosIRQ;
+				}
+
+				dprintf("calculated irq routing entry: ");
+				print_irq_routing_entry(newEntry);
+
+				matchedTable.PushBack(newEntry);
+				matched = true;
+				break;
+			}
+
+			if (!matched) {
+				panic("unable to find irq routing for PCI %u:%u:%u", bus,
+					device, function);
+				return B_ERROR;
+			}
+		}
+	}
+
+	return B_OK;
+}
+
+
 static status_t
 read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 	acpi_handle device, uint8 currentBus, IRQRoutingTable& table,
-	bool rootBridge, interrupt_available_check_function checkFunction)
+	IRQRoutingTable& unmatchedTable, bool rootBridge,
+	interrupt_available_check_function checkFunction)
 {
 	if (!rootBridge) {
 		// check if this actually is a bridge
@@ -484,7 +637,10 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 					return B_ERROR;
 				}
 
-				table.PushBack(irqEntry);
+				if (irqEntry.pci_function_mask != 0)
+					table.PushBack(irqEntry);
+				else
+					unmatchedTable.PushBack(irqEntry);
 			}
 
 			acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
@@ -496,7 +652,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		TRACE("no irq routing table present\n");
 	}
 
-	// recurse down to the child devices
+	// recurse down the ACPI child devices
 	acpi_data pathBuffer;
 	pathBuffer.pointer = NULL;
 	pathBuffer.length = ACPI_ALLOCATE_BUFFER;
@@ -520,7 +676,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 
 		TRACE("recursing down to child \"%s\"\n", childName);
 		status = read_irq_routing_table_recursive(acpi, pci, childHandle,
-			currentBus, table, false, checkFunction);
+			currentBus, table, unmatchedTable, false, checkFunction);
 		if (status != B_OK)
 			break;
 	}
@@ -568,15 +724,30 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 		return status;
 	}
 
+	IRQRoutingTable unmatchedTable;
 	status = read_irq_routing_table_recursive(acpi, pci, rootPciHandle, rootBus,
-		table, true, checkFunction);
+		table, unmatchedTable, true, checkFunction);
+	if (status != B_OK) {
+		put_module(B_PCI_MODULE_NAME);
+		return status;
+	}
+
+	if (table.Count() == 0) {
+		put_module(B_PCI_MODULE_NAME);
+		return B_ERROR;
+	}
+
+	// Now go through all the PCI devices and verify that they have a routing
+	// table entry. For the devices without a match, we calculate their pins
+	// on the bridges and try to match these in the parent routing table. We
+	// do this recursively going up the tree until we find a match or arrive
+	// at the top.
+	Vector<pci_address> parents;
+	status = ensure_all_functions_matched(pci, rootBus, table, unmatchedTable,
+		parents);
 
 	put_module(B_PCI_MODULE_NAME);
-
-	if (status != B_OK)
-		return status;
-
-	return table.Count() > 0 ? B_OK : B_ERROR;
+	return status;
 }
 
 
@@ -618,10 +789,9 @@ enable_irq_routing(acpi_module_info* acpi, IRQRoutingTable& routingTable)
 
 		status = update_pci_info_for_entry(pci, irqEntry);
 		if (status != B_OK) {
-#ifdef TRACE_PRT
-			dprintf("failed to update interrupt_line info for entry:\n");
-			print_irq_routing_entry(irqEntry);
-#endif
+			dprintf("failed to update interrupt_line for PCI %u:%u mask %lx\n",
+				irqEntry.pci_bus, irqEntry.pci_device,
+				irqEntry.pci_function_mask);
 		}
 	}
 
