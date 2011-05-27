@@ -356,7 +356,8 @@ BSoftSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
 		// fluid_synth only accepts an int
-		fluid_synth_pitch_bend(fSynth, channel - 1, ((uint32)(msb & 0x7f) << 8) | (lsb & 0x7f));
+		fluid_synth_pitch_bend(fSynth, channel - 1,
+			((uint32)(msb & 0x7f) << 7) | (lsb & 0x7f));
 	}
 }
 
