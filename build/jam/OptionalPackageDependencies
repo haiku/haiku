@@ -30,7 +30,7 @@ OptionalPackageDependencies Paladin : CCache Fastdep ;
 OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies SDLLibs : XiphLibs libmad libmikmod Libmng libmodplug physfs ;
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
-OptionalPackageDependencies Transmission : LibEvent GetText Curl OpenSSL LibIconv ;
+OptionalPackageDependencies Transmission : LibEvent Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Vim : GetText LibIconv ;
 OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
 OptionalPackageDependencies XZ-Utils : Tar ;
