@@ -38,14 +38,14 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 		Echo "No optional package AllegroLibs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			allegro-4.4.1.1-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/allegro-4.4.1.1-x86-gcc4-2010-10-30.zip ;
+			allegro-4.4.1.1-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/allegro-4.4.1.1-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
-			dumb-0.9.3-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/dumb-0.9.3-x86-gcc4-2010-10-30.zip ;
+			dumb-0.9.3-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/dumb-0.9.3-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
-			jgmod-0.99-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/jgmod-0.99-x86-gcc4-2010-10-30.zip ;
+			jgmod-0.99-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/jgmod-0.99-r1a3-x86-gcc4-2011-05-26.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			allegro-4.4.1.1-r1a3-x86-gcc2-2011-05-19.zip
@@ -54,8 +54,8 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 			dumb-0.9.3-x86-r1a3-x86-gcc2-2011-05-19.zip
 			: $(baseURL)/lib/dumb-0.9.3-r1a3-x86-gcc2-2011-05-19.zip ;
 		InstallOptionalHaikuImagePackage
-			jgmod-0.99-x86-gcc2-2010-10-30.zip
-			: $(baseURL)/lib/jgmod-0.99-x86-gcc2-2010-10-30.zip ;
+			jgmod-0.99-r1a3-x86-gcc2-2011-05-26.zip
+			: $(baseURL)/lib/jgmod-0.99-r1a3-x86-gcc2-2011-05-26.zip ;
 	}
 }
 
@@ -67,8 +67,8 @@ if [ IsOptionalHaikuImagePackageAdded box2d ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 			InstallOptionalHaikuImagePackage
-				box2d-2.1.2-r1a3-x86-gcc4-2011-05-20.zip
-				: $(baseURL)/lib/box2d-2.1.2-r1a3-x86-gcc4-2011-05-20.zip
+				box2d-2.1.2-r1a3-r1a3-x86-gcc4-2011-05-26.zip
+				: $(baseURL)/lib/box2d-2.1.2-r1a3-x86-gcc4-2011-05-26.zip
 				: : true ;
 		} else {
 			Echo "No optional package box2d available for $(TARGET_ARCH)-gcc2" ;
@@ -209,8 +209,8 @@ if [ IsOptionalHaikuImagePackageAdded physfs ] {
 		Echo "No optional package physfs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			physfs-2.0.1-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/physfs-2.0.1-x86-gcc4-2010-10-30.zip
+			physfs-2.0.1-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/physfs-2.0.1-r1a3-x86-gcc4-2011-05-26.zip
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
@@ -324,8 +324,8 @@ if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 			libvorbis-1.3.2-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/libvorbis-1.3.2-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
-			speex-1.2-git-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/speex-1.2-git-x86-gcc4-2010-10-30.zip ;
+			speex-1.2-git-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/speex-1.2-git-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
 			vorbis-tools-1.4.0-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/vorbis-tools-1.4.0-r1a3-x86-gcc4-2011-05-26.zip ;
@@ -346,8 +346,8 @@ if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 			libvorbis-1.3.2-r1a3-x86-gcc2-2011-05-19.zip
 			: $(baseURL)/lib/libvorbis-1.3.2-r1a3-x86-gcc2-2011-05-19.zip ;
 		InstallOptionalHaikuImagePackage
-			speex-1.2-git-x86-gcc2-2010-10-29.zip
-			: $(baseURL)/lib/speex-1.2-git-x86-gcc2-2010-10-29.zip ;
+			speex-1.2-git-r1a3-x86-gcc2-2011-05-26.zip
+			: $(baseURL)/lib/speex-1.2-git-r1a3-x86-gcc2-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
 			vorbis-tools-1.4.0-r1a3-x86-gcc2-2011-05-19.zip
 			: $(baseURL)/lib/vorbis-tools-1.4.0-r1a3-x86-gcc2-2011-05-19.zip ;
