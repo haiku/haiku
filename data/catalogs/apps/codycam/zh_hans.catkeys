@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku.CodyCam	2416864674
+1	simplified_chinese	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		未发现用于视频窗口的可用连接。
 Cannot connect the video source to the video window	CodyCam		无法连接视频源至视频窗口
 Cannot create a video window	CodyCam		无法创建录像窗口
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		捕获比率菜单
 Capture controls	CodyCam		捕获控制
 Capturing Image…	VideoConsumer.cpp		捕获图像…
 Closing the window\n	VideoConsumer.cpp		关闭窗口\n
-CodyCam	System name		摄像头
+CodyCam	Application name		摄像头
 Connected…	VideoConsumer.cpp		连接中...
 Couldn't find requested directory on server	VideoConsumer.cpp		在服务器上未发现需求的目录
 Directory:	CodyCam		目录：

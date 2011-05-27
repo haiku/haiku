@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-Terminal	2177288425
+1	japanese	x-vnd.Haiku-Terminal	3599480030
+%app% settings	Terminal PrefWindow	window title	%app% 設定
 Appearance	Terminal PrefWindow		外観
 Background	Terminal AppearancePrefView		背景
 Black on White	Terminal colors schema		白地に黒
@@ -13,7 +14,7 @@ Close active tab	Terminal TermWindow		アクティブタブを閉じる
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Close tab	Terminal TermWindow		タブを閉じる
 Close window	Terminal TermWindow		ウィンドウを閉じる
-Color schema:	Terminal AppearancePrefView		配色：
+Color schema:	Terminal AppearancePrefView		配色:
 Color:	Terminal AppearancePrefView		色:
 Copy	Terminal TermWindow		コピー
 Copy here	Terminal TermView		カレントディレクトリへコピー
@@ -56,11 +57,13 @@ Search forward	Terminal FindWindow		順方向検索
 Select all	Terminal TermWindow		すべて選択
 Selected background	Terminal AppearancePrefView		選択されたテキストの背景
 Selected text	Terminal AppearancePrefView		選択されたテキスト
+Set tab title	Terminal TermWindow		タブのタイトルを設定
 Settings	Terminal TermWindow		設定
 Settings…	Terminal TermWindow		設定...
+Shell 	Terminal TermWindow		シェル
 Size:	Terminal AppearancePrefView		サイズ:
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
-Tab title:	Terminal AppearancePrefView		タブタイトル：
+Tab title:	Terminal AppearancePrefView		タブタイトル:
 Tab title:	Terminal TermWindow		タブタイトル:
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
 Text	Terminal AppearancePrefView		テキスト
@@ -73,7 +76,7 @@ Use selection	Terminal FindWindow		選択部で検索
 Use text:	Terminal FindWindow		テキスト指定：
 White on Black	Terminal colors schema		黒字に白
 Window size	Terminal TermWindow		ウィンドウサイズ
-Window title:	Terminal AppearancePrefView		ウィンドウタイトル：
-Window title:	Terminal TermWindow		ウィンドウタイトル：
+Window title:	Terminal AppearancePrefView		ウィンドウタイトル:
+Window title:	Terminal TermWindow		ウィンドウタイトル:
 Window title…	Terminal TermWindow		ウィンドウタイトル...
 size	Terminal TermView		サイズ

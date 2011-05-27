@@ -1,21 +1,14 @@
-1	simplified_chinese	x-vnd.Haiku-Mail	1372873153
+1	simplified_chinese	x-vnd.Haiku-Mail	2985311650
 Account name:	Config Views		用户名：
 Account settings	Config Views		用户设置
 Accounts	Config Window		帐户
 Add	Config Window		添加
-Alpha	Config Window		内测版本
 Always	Config Window		总是
 Apply	Config Window		应用
-Beta	Config Window		公测版本
 Check every	Config Window		检查每封邮件
-Development	Config Window		开发版本
 Edit mailbox menu…	Config Window		编辑邮箱菜单...
 Error	Config Window		出错
 Error retrieving general settings: %s\n	Config Window		恢复常用设置出错：%s\n
-Final	Config Window		最终版本
-Gamma	Config Window		候选版本
-Golden master	Config Window		预览版本
-Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		邮件后台\n\n 版权所有 Haiku, Inc. \n\n版本 %ld.%ld.%ld %s\n\n更多信息，请查阅安装包中附带的 LICENSE 文件。\n\n\n\n您也可以联系我们：\n%s\n\n请使用 %s 提交错误反馈。\n\n项目主页：\n%s
 Mail checking	Config Window		检查邮件
 Mail checking	Config Window		邮件检查
 Miscellaneous	Config Window		其他

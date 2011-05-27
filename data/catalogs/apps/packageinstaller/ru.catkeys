@@ -1,2 +1,6 @@
-1	russian	x-vnd.Haiku-PackageInstaller	182177895
+1	russian	x-vnd.Haiku-PackageInstaller	1987852070
+Accept	PackageTextViewer		Принять
+Continue	PackageInstall		Продолжить
+Install to:	PackageView		Установить в:
+OK	PackageView		ОК
 PackageInstaller	System name		Установщик пакетов

@@ -1,3 +1,20 @@
-1	japanese	x-vnd.Haiku-WebPTranslator	3527403510
+1	japanese	x-vnd.Haiku-WebPTranslator	701246983
+Compression method:	ConfigView		圧縮方法：
+Default	ConfigView		デフォルト
+Drawing	ConfigView		図面
+Fast	ConfigView		速い
+High	ConfigView		高い
+Icon	ConfigView		アイコン
+Low	ConfigView		低い
+Output preset:	ConfigView		出力プリセット：
+Output quality:	ConfigView		出力品質：
+Photo	ConfigView		写真
+Picture	ConfigView		ピクチャ
+Preset	ConfigView		プリセット：
+Slower but better	ConfigView		遅いが高圧縮
+Text	ConfigView		テキスト
+WebP Images	ConfigView		WebP イメージ
 WebP Settings	main		WebP 設定
+WebP image	WebPTranslator		WebP イメージ
 WebP images	WebPTranslator		WebP イメージ
+WebPTranslator Settings	ConfigView		WebPTranslator 設定

@@ -1,9 +1,0 @@
-1	simplified_chinese	system	2677153267
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d bytes
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f MiB	StringForSize		%3.2f MiB
-Green:	ColorControl		绿色:
-Red:	ColorControl		红色:
-Blue:	ColorControl		蓝色:

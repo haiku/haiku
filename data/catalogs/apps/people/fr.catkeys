@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PEPL	382829331
+1	french	x-vnd.Be-PEPL	2993050801
 %name% picture	People		Photo de 
 Address	People		Adresse
 Cancel	People		Annuler
@@ -28,6 +28,7 @@ New person…	People		Nouvelle personne…
 Nickname	People		Surnom
 OK	People		OK
 Paste	People		Coller
+People	System name		Personnes
 Person	Short mimetype description		Personne
 Quit	People		Quitter
 Redo	People		Rétablir

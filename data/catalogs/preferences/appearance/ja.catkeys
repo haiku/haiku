@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-Appearance	1227622574
+1	japanese	x-vnd.Haiku-Appearance	3187486915
 Antialiasing	APRWindow		アンチエイリアス
 Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
 Antialiasing type:	AntialiasingSettingsView		アンチエイリアスのタイプ：
+Appearance	System name		外観
 Colors	APRWindow		色
 Control background	Colors tab		コントロールの背景
 Control border	Colors tab		コントロールの境界

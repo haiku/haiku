@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-TSKB	3916580447
+1	japanese	x-vnd.Be-TSKB	1962084612
 <Be folder is empty>	BeMenu		<Haiku メニューフォルダは空です>
 About Haiku	BeMenu		Haiku について
 Always on top	PreferencesWindow		常に手前に
@@ -9,6 +9,7 @@ Change time…	TimeView		日付と時刻の設定…
 Clock	PreferencesWindow		日付と時刻
 Close all	WindowMenu		すべて閉じる
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
+Deskbar	System name		Deskbar
 Deskbar preferences	PreferencesWindow		Deskbar の設定
 Deskbar preferences…	BeMenu		Deskbar の設定…
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-About	3019397582
+1	simplified_chinese	x-vnd.Haiku-About	3940365520
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		总计%d MiB
 %d MiB used (%d%%)	AboutView		已用 %d MiB (%d%%)
@@ -10,12 +10,17 @@ About this system	AboutWindow		关于系统
 AboutSystem	System name		关于系统
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. 及其开发团队，孕育了 BeOS！\n\n
 Contributors:\n	AboutView		贡献者：\n
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		版权 © 1994-1997 Mark Kilgard 版权所有。
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		版权 © 1998-2003 Daniel Veillard 版权所有。
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		版权 © 2002-2005 Industrial Light & Magic，a division of Lucas Digital Ltd. LLC。
+Copyright © 2003 Peter Hanappe and others.	AboutView		版权 © 2003 Peter Hanappe 及其他人员。
 Current maintainers:\n	AboutView		维护人员：\n
 GCC %d Hybrid	AboutView		GCC %d Hybird
 Google & their Google Summer of Code program\n	AboutView		谷歌与它们的谷歌编程之夏项目\n
 Kernel:	AboutView		内核：
 License: 	AboutView		协议: 
 Licenses: 	AboutView		协议：
+MIT (no promotion)	AboutView		MIT（无附加条款）
 Memory:	AboutView		内存状态：
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (项目创始人)\n\n
 Past maintainers:\n	AboutView		先前维护人员：\n
@@ -27,7 +32,6 @@ The Haiku-Ports team\n	AboutView		 Haiku-Ports 小组\n
 The Haikuware team and their bounty program\n	AboutView		 Haikuware 小组及其维护程序\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		奥克兰大学与 Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		专用于 Haiku 的代码在 %MIT协议% 下发布，特别是内核与所有应用程序可能链接使用的代码。某些系统库可能包含在 LGPL协议 下发布的第三方代码。在下面的介绍中，您可以找到第三方代码所使用的授权协议。\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku源码版权归 Haiku Inc. 或源代码中声明的作者所有。Haiku 和 Haiku logo 是 Haiku Inc. 注册商标。\n\n
 Time running:	AboutView		运行时间：
 Translations:\n	AboutView		翻译人员：\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (和他的 NewOS 内核)\n
@@ -36,5 +40,5 @@ Version:	AboutView		版本：
 Website, marketing & documentation:\n	AboutView		网站管理，商业宣传以及文档编写：\n
 [Click a license name to read the respective license.]\n\n	AboutView		[点击阅读下述协议。]\n\n
 \nCopyrights\n\n	AboutView		\n版权所有\n\n
-\n\nSpecial thanks to:\n	AboutView		\n\n特别感谢:\n
+\n\nSpecial thanks to:\n	AboutView		\n\n特别感谢：\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n...而且可能还有一些我们未提及的开发人员（非常抱歉）！\n\n

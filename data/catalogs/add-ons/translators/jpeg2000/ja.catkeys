@@ -5,7 +5,7 @@ JPEG2000 images	JPEG2000Translator		JPEG2000イメージ
 Low	JPEG2000Translator		低い
 Output only codestream (.jpc)	JPEG2000Translator		Codestreamのみ出力 (.jpc)
 Output quality	JPEG2000Translator		出力品質
-Read	JPEG2000Translator		読み出し
+Read	JPEG2000Translator		読み取り
 Read greyscale images as RGB32	JPEG2000Translator		グレイスケールイメージをRGB32として読み込む
 Write	JPEG2000Translator		書き出し
 Write black-and-white images as RGB24	JPEG2000Translator		モノクロイメージをRGB24として書き出す

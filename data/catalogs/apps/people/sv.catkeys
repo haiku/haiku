@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-PEPL	382829331
+1	swedish	x-vnd.Be-PEPL	2993050801
 %name% picture	People		%name% bild
 Address	People		Adress
 Cancel	People		Avbryt
@@ -28,6 +28,7 @@ New person…	People		Ny person...
 Nickname	People		Smeknamn
 OK	People		OK
 Paste	People		Klistra in
+People	System name		Personer
 Person	Short mimetype description		Person
 Quit	People		Avsluta
 Redo	People		Gör om

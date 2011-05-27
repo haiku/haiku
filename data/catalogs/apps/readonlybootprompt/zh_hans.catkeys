@@ -1,6 +1,5 @@
-1	simplified_chinese	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
+1	simplified_chinese	x-vnd.Haiku-ReadOnlyBootPrompt	1972532432
 Desktop (Live-CD)	BootPromptWindow		桌面系统 (Live-CD)
-Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		运行系统安装器或者继续启动桌面系统? 您可以从下面的列表中选择自己偏好的语言和键盘。\n\n注意：Haiku 程序以及其他组件的本地化工作正在完善之中。您可能会经常碰到未翻译的字符，如果您对翻译工作非常感兴趣，您可以访问 <www.haiku-os.org> 参与该项目。
 Keymap	BootPromptWindow		键盘映射
 Language	BootPromptWindow		语言
 Run Installer	BootPromptWindow		运行系统安装器

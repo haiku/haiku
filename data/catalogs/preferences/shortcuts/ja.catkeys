@@ -1,18 +1,21 @@
-1	japanese	x-vnd.Haiku-Shortcuts	3413363769
-Add new shortcut	ShortcutsWindow		新規ショートカットを追加
+1	japanese	x-vnd.Haiku-Shortcuts	2868428159
+Add new shortcut	ShortcutsWindow		新規作成
 Append	ShortcutsWindow		追加
 Append KeySet…	ShortcutsWindow		キーセットの追加…
+Application	ShortcutsWindow		アプリケーション
 Cancel	ShortcutsWindow		中止
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Don't save	ShortcutsWindow		保存しない
 Error, NULL state description?\n	ShortcutsSpec		エラー, NULL state description?\n
 File	ShortcutsWindow		ファイル
+Key	ShortcutsWindow		Key
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		おお、
 Open	ShortcutsWindow		開く
 Open KeySet…	ShortcutsWindow		キーセットを開く…
 Quit	ShortcutsWindow		終了
 Really quit without saving your changes?	ShortcutsWindow		本当に変更を保存せずに終了してよいですか?
-Remove selected shortcut	ShortcutsWindow		選択したショートカットを削除
+Remove selected shortcut	ShortcutsWindow		選択部を削除
 Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
 Save	ShortcutsWindow		保存
 Save & apply	ShortcutsWindow		保存して適用
@@ -20,6 +23,7 @@ Save KeySet as…	ShortcutsWindow		キーセットを名前をつけて保存…
 Select	ShortcutsWindow		選択
 Shortcuts	System name		キーボードショートカット
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんできた。
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
-Window	ShortcutsSpec	Name for modifier on keyboard	ウインドウ
+Window	ShortcutsSpec	Name for modifier on keyboard	Window

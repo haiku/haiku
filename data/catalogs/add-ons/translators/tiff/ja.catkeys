@@ -1,6 +1,12 @@
-1	japanese	x-vnd.Haiku-TIFFTranslator	1623669116
+1	japanese	x-vnd.Haiku-TIFFTranslator	3753804006
+LZW	TIFFView		LZW
+None	TIFFView		無し
 RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Library:	TIFFView		TIFFライブラリ:
 TIFF Settings	TIFFMain		TIFF設定
+TIFF image	TIFFTranslator		TIFF イメージ
 TIFF images	TIFFTranslator		TIFFイメージ
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator 設定
+Use Compression:	TIFFView		圧縮方法：
 Version %d.%d.%d %s	TIFFView		バージョン %d.%d.%d %s
 ZIP (Deflate)	TIFFView		ZIP (Deflate)

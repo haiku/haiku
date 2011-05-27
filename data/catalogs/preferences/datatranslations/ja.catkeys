@@ -1,15 +1,18 @@
-1	japanese	x-vnd.Haiku-DataTranslations	2855793119
+1	japanese	x-vnd.Haiku-DataTranslations	3820343452
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		「%name」という名前の項目が既にTranslatorsフォルダーにあります。既存のtranslatorを上書きしてよいでしょうか。
 Cancel	DataTranslations		取り消し
 Could not install %s:\n%s	DataTranslations		インストールできませんでした %s:\n%s
+DataTranslations	System name		DataTranslations
 DataTranslations - Error	DataTranslations		DataTranslations - エラー
 DataTranslations - Note	DataTranslations		DataTranslations - 注意
 Info	DataTranslations		情報
 Info:	DataTranslations		情報:
 Name:	DataTranslations		名前:
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		名称: %s \nバージョン:  %ld.%ld.%ld\n\n情報: \n%s\n\nパス: \n%s\n
 OK	DataTranslations		OK
 Overwrite	DataTranslations		上書き
 Path:	DataTranslations		パス:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		「%name」はTranslatorではないようなのでインストールされません。
 The new translator has been installed successfully.	DataTranslations		新しいTranslatorは無事にインストールされました。
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		このコントロールパネルを使って、translatorのデフォルト値を設定してください。アプリケーションで設定できる設定はありません。
 Version:	DataTranslations		バージョン:

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Devices	1176141157
+1	japanese	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		ACPI情報
 ACPI Processor Namespace '%2'	DeviceACPI		ACPIプロセッサーネームスペース '%2'
 ACPI System Bus	DeviceACPI		ACPIシステムバス
@@ -7,7 +7,7 @@ ACPI Thermal Zone	DeviceACPI		ACPIサーマルゾーン
 ACPI bus	Device		ACPIバス
 ACPI bus	DevicesView		ACPIバス
 ACPI controller	Device		ACPIコントローラー
-ACPI node '%1'	DeviceACPI		ACPIノード「%1」
+ACPI node '%1'	DeviceACPI		ACPIノード '%1'
 Basic information	DevicesView		基本情報
 Bridge	Device		ブリッジ
 Bus	DevicesView		バス
@@ -29,6 +29,7 @@ Device name:	Device		デバイス名：
 Device paths	Device		デバイスパス
 Device paths	DevicePCI		デバイスパス
 Devices	DevicesView		デバイス
+Devices	System name		デバイス
 Display controller	Device		ディスプレイコントローラー
 Docking station	Device		ドッキングステーション
 Driver used	Device		使用ドライバー

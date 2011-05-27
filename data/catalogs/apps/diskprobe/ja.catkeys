@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	3136031909
+1	japanese	x-vnd.Haiku-DiskProbe	1699566469
 %ld (native)	ProbeView		%ld (ネイティブ)
 (native)	ProbeView		(ネイティブ)
 15 bit	TypeEditors		15ビット
@@ -25,15 +25,19 @@ Attribute type: 	ProbeView		属性タイプ：
 Attribute: 	ProbeView		属性：
 Attributes	ProbeView		属性
 Back	ProbeView		戻る
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	基数
 Block	ProbeView		ブロック
 Block %Ld (0x%Lx)	ProbeView		ブロック %Ld (0x%Lx)
 Block 0x%Lx	ProbeView		ブロック 0x%Lx
 Block: 	ProbeView		ブロック：
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	ブロックサイズ
 Bookmarks	ProbeView		ブックマーク
 Boolean	TypeEditors	This is the type of editor	ブール値
 Boolean editor	TypeEditors		ブール値エディタ
 Boolean value:	TypeEditors		ブール値：
+Cancel	AttributeWindow		中止
 Cancel	OpenWindow		中止
+Cancel	ProbeView		中止
 Case sensitive	FindWindow		大文字小文字を区別
 Close	AttributeWindow		閉じる
 Close	FileWindow		閉じる
@@ -48,9 +52,11 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		デバイス
 Device offset: 	ProbeView		デバイスオフセット：
 Device: 	ProbeView		デバイス：
+DiskProbe	System name		DiskProbe
 DiskProbe request	AttributeWindow		DiskProbeリクエスト
 DiskProbe request	DiskProbe		DiskProbeリクエスト
 DiskProbe request	ProbeView		DiskProbeリクエスト
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		本当に属性 \"%s\" をファイル \"%s\"から削除してよろしいですか?\n\nこの動作は元に戻せません。
 Don't save	ProbeView		保存しない
 Double precision floating-point value:	TypeEditors		倍精度浮動小数点値：
 Edit	ProbeView		編集
@@ -70,7 +76,10 @@ Grayscale	TypeEditors		グレースケール
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16進
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16進
 Icon	TypeEditors		アイコン
+Icon view	TypeEditors		アイコン表示
 Image	TypeEditors	This is the type of view	イメージ
+Image view	TypeEditors	Image means here a picture file, not a disk image.	イメージ表示
+MIME type editor	TypeEditors		MIMEタイプエディター
 MIME type:	TypeEditors		MIME タイプ：
 Message	TypeEditors	This is the type of view	メッセージ
 Message View	TypeEditors		メッセージビュー
@@ -79,8 +88,12 @@ Native: %Ld (0x%0*Lx)	ProbeView		ネイティブ： %Ld (0x%0*Lx)
 Native: 0x%0*Lx	ProbeView		ネイティブ： 0x%0*Lx
 New…	FileWindow		新規…
 Next	ProbeView		次
+No type editor available	AttributeWindow		タイプエディターはありません
 Number	TypeEditors	This is the type of editor	数値
+Number editor	TypeEditors		数値エディター
 Number:	TypeEditors		数値：
+OK	DiskProbe		OK
+OK	ProbeView		OK
 Offset: 	ProbeView		オフセット：
 Open device	FileWindow		デバイスを開く
 Open file…	FileWindow		ファイルを開く…
@@ -92,6 +105,7 @@ Print…	ProbeView		印刷…
 Probe device	OpenWindow		デバイスを調べる
 Probe file…	OpenWindow		ファイルを調べる…
 Quit	FileWindow		終了
+Raw editor	AttributeWindow		Rawエディター
 Redo	ProbeView		やり直し
 Remove	AttributeWindow		削除
 Remove from file	AttributeWindow		ファイルから削除
@@ -99,15 +113,20 @@ Save	ProbeView		保存
 Save changes before closing?	ProbeView		閉じる前に保存しますか?
 Select all	ProbeView		すべて選択
 Selection	ProbeView		選択値へ移動
+Stop	ProbeView		中断
 String editor	TypeEditors		文字列エディタ
 Swapped: %Ld (0x%0*Lx)	ProbeView		スワップ： %Ld (0x%0*Lx)
 Swapped: 0x%0*Lx	ProbeView		スワップ： 0x%0*Lx
 Text	FindWindow		テキスト
 Text	TypeEditors	This is the type of editor	テキスト
+Type editor	ProbeView		タイプエディター
+Type editor not supported	ProbeView		タイプエディターはサポートされていません。
 Undo	ProbeView		元に戻す
 Unknown format	TypeEditors		不明なフォーマット
 Unknown type	TypeEditors		不明なタイプ
+View	ProbeView	This is the last menubar item 'File Edit Block View'	表示
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		ファイルへの書き込みに失敗しました：\n%s\n\n終了するとすべての変更が失われます。
 none	ProbeView	No attributes	属性なし
 of 	ProbeView		/ 
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n

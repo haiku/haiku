@@ -5,7 +5,7 @@ Accounts	Config Window		アカウント
 Add	Config Window		追加
 Always	Config Window		常に
 Apply	Config Window		適用
-Check every	Config Window		 
+Check every	Config Window		メールを
 E-mail	System name		メール
 Edit mailbox menu…	Config Window		メールボックスメニューの編集…
 Error	Config Window		エラー
@@ -19,10 +19,10 @@ Return address:	Config Views		返信先アドレス：
 Revert	Config Window		元に戻す
 Settings	Config Window		設定
 Show connection status window:	Config Window		通信状況ウインドウを表示
-Start mail services on startup	Config Window		スタートアップ時にメールサービスを開始する
+Start mail services on startup	Config Window		起動時にメールサービスを開始する
 While sending	Config Window		送信中に
 While sending and receiving	Config Window		送受信中に
-days	Config Window		日
+days	Config Window		日毎にチェック
 hours	Config Window		時間毎にチェック
 minutes	Config Window		分毎にチェック
 never	Config Window		手動でチェック

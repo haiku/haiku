@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PEPL	382829331
+1	german	x-vnd.Be-PEPL	2993050801
 %name% picture	People		%name% Bild
 Address	People		Adresse
 Cancel	People		Abbrechen
@@ -28,6 +28,7 @@ New person…	People		Neue Person...
 Nickname	People		Spitzname
 OK	People		OK
 Paste	People		Einfügen
+People	System name		Kontakte
 Person	Short mimetype description		Person
 Quit	People		Beenden
 Redo	People		Wiederholen

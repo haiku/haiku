@@ -8,13 +8,13 @@ ActivityMonitor	System name		AktivitetsÖvervakare
 Add graph	ActivityWindow		Lägg till graf
 Additional items	ActivityView		Ytterligare mätvärden
 Apps	DataSource		Program
-Block cache	DataSource		Block cache
+Block cache	DataSource		Blockbuffert
 Block cache memory	DataSource		Block cacheminne
 CPU	DataSource		CPU
 CPU usage	DataSource		CPU användning
 CPU usage (combined)	DataSource		CPU användning (kombinerad)
-Cache	DataSource		Cache
-Cached memory	DataSource		Cachat minne
+Cache	DataSource		Buffert
+Cached memory	DataSource		Buffertminne
 File	ActivityWindow		Arkiv
 Hide legend	ActivityView		Göm graftext
 MB	DataSource		MB
@@ -45,4 +45,4 @@ Text clipboard	DataSource		Text urklipp
 Threads	DataSource		Trådar
 Update time interval:	SettingsWindow		Uppdateringsintervall:
 Used memory	DataSource		Använt minne
-usage	DataSource		använt
+usage	DataSource		användning

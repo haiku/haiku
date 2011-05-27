@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BootManager	734273860
+1	japanese	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk にある %file でマスターブートレコード (MBR) を修復します。よろしいですか？
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		ブートメニューをディスクに書き込みます。続けてよろしいですか？
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		以下のブートメニューを起動ディスク (%s) に書き込みます。続ける前に以下の情報が正しいか確認してください。
@@ -13,6 +13,7 @@ At least one partition must be selected!	BootManagerController		少なくとも�
 Back	BootManagerController	Button	戻る
 Backup Master Boot Record	BootManagerController	Title	マスターブートレコードのバックアップ
 Boot Manager is unable to read the partition table!	BootManagerController		ブートマネージャーはパーティションテーブルを読み込めません。
+BootManager	System name		ブートマネージャー
 Cannot access!	DrivesPage	Cannot install	アクセスできません
 Default Partition	DefaultPartitionPage	Title	デフォルトパーティション
 Default Partition:	DefaultPartitionPage	Menu field label	デフォルトパーティション：

@@ -1,19 +1,21 @@
-1	japanese	x-vnd.Haiku-ProcessController	1451643990
+1	japanese	x-vnd.Haiku-ProcessController	4025547569
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		ProcessControllerについて...
 Cancel	ProcessController		取り消し
-Debug this thread!	ProcessController		threadをデバッグ
+Debug this thread!	ProcessController		Threadをデバッグ
+Debug thread	ProcessController		スレッドをデバッグ
 Do you really want to kill the team \"%s\"?	ProcessController		本当にteam \"%s\" を強制終了してよいですか?
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Gone teams…	ProcessController		終了したteam…
 Info	ProcessController		情報
 Install in Deskbar	ProcessController		Deskbarにインストール
-Kill this thread!	ProcessController		threadを強制終了
+Kill this thread!	ProcessController		Threadを強制終了
 Live in the Deskbar	ProcessController		Deskbar中で動作
 Memory usage	ProcessController		メモリー使用量
 New Terminal	ProcessController		ターミナルを起動
 OK	ProcessController		OK
 Ok!	ProcessController		Ok!
+Please confirm	ProcessController		確認してください。
 ProcessController is already installed in Deskbar.	ProcessController		ProcessControllerは既にDeskbarにインストールされています
 Processor %d	ProcessController		プロセッサ %d
 Quit an application	ProcessController		アプリケーションを終了
@@ -23,7 +25,11 @@ Restart Tracker	ProcessController		Trackerを再起動
 Run in window	ProcessController		ウインドウモードで起動
 System resources & caches…	ProcessController		システムリソースとキャッシュ…
 This is the last active processor...\nYou can't turn it off!	ProcessController		このプロセッサは最後の一個です。\n止める事は出来ません！
+This team is already gone…	ProcessController		Team はすでに終了しています…
+This thread is already gone…	ProcessController		Thread はすでに終了しています…
 Threads and CPU usage	ProcessController		スレッドとCPUの使用量
+Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		次の thread に対してなにを行いますか\"%s\"?
+Yes, kill this team!	ProcessController		はい、team を強制終了します !
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		ProcessControllerをウインドウモードで起動するか、または Deskbarにインストールできます。
 Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)

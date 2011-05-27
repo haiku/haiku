@@ -1,15 +1,15 @@
 1	japanese	x-vnd.Haiku-ScreenSaver	215605989
 30 seconds	ScreenSaver		30 秒
 Add…	ScreenSaver		追加...
-Blackness	ScreenSaver		黒
+Blackness	ScreenSaver		Blackness
 Cancel	ScreenSaver		取り消し
 Confirm password:	ScreenSaver		パスワード(再度):
 Could not load screen saver	ScreenSaver		スクリーンセーバーを実行出来ません
 Display Power Management Signaling not available	ScreenSaver		DPMS (Display Power Management Signaling) は利用できません
-Don't fade when	ScreenSaver		次の場合フェードしない
+Don't fade when	ScreenSaver		フェードしない
 Done	ScreenSaver		完了
 Enable screensaver	ScreenSaver		スクリーンセーバーを有効にする
-Fade now when	ScreenSaver		次の場合にフェードする
+Fade now when	ScreenSaver		フェードする
 General	ScreenSaver		一般
 No options available	ScreenSaver		設定がありません
 OK	ScreenSaver		Ok
@@ -26,4 +26,4 @@ Test	ScreenSaver		テスト
 Turn off screen	ScreenSaver		画面を消す
 Use custom password	ScreenSaver		独自のパスワードを使う
 Use network password	ScreenSaver		ネットワークパスワードを使用
-mouse is here	ScreenSaver		マウスはここです
+mouse is here	ScreenSaver		マウスの位置

@@ -1,0 +1,9 @@
+1	japanese	x-vnd.Haiku-SGITranslator	3536205253
+None	SGIView		無し
+RLE	SGIView		RLE
+SGI Settings	SGIMain		SGI 設定
+SGI image	SGITranslator		SGI イメージ
+SGI images	SGITranslator		SGI イメージ
+SGITranslator Settings	SGITranslator		SGITranslator 設定
+Use compression:	SGIView		圧縮方法：
+Version %d.%d.%d %s	SGIView		バージョン %d.%d.%d %s

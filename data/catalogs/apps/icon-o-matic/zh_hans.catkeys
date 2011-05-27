@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.haiku-icon_o_matic	3809094595
+1	simplified_chinese	x-vnd.haiku-icon_o_matic	2326864078
 <modify path>	Icon-O-Matic-PathCmd		<修改路径>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<无恢复内容>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<无撤销任务>
@@ -34,7 +34,7 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
 Bleep!	Exporter - Continue in error dialog		警告!
 Bummer	Cancel button - error alert		Bummer
 Cancel	Icon-O-Matic-ColorPicker		取消
-Cancel	Icon-O-Matic-Main		取消
+Cancel	Icon-O-Matic-Menu-Settings		取消
 Cancel	Icon-O-Matic-SVGExport		取消
 Caps	Icon-O-Matic-PropertyNames		大写
 Change Color	Icon-O-Matic-SetColorCmd		修改颜色
@@ -42,6 +42,7 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		清理路径
 Clean up	Icon-O-Matic-PathsList		清理
 Click on a shape above	Empty transformers list - 1st line		点击上述模型
 Click on an object in	Empty property list - 1st line		点击对象
+Close	Icon-O-Matic-Menu-File		关闭
 Closed	Icon-O-Matic-PropertyNames		关闭
 Color	Icon-O-Matic-PropertyNames		颜色
 Color	Icon-O-Matic-StyleTypes		颜色
@@ -52,7 +53,7 @@ Contour	Transformation		轮廓
 Copy	Icon-O-Matic-Properties		复制
 Detect Orient.	Icon-O-Matic-PropertyNames		删除格式
 Diamond	Icon-O-Matic-StyleTypes		菱形
-Discard	Icon-O-Matic-Main		忽略
+Discard	Icon-O-Matic-Menu-Settings		放弃
 Duplicate	Icon-O-Matic-PathsList		副本
 Duplicate	Icon-O-Matic-ShapesList		副本
 Duplicate	Icon-O-Matic-StylesList		副本
@@ -76,6 +77,7 @@ Gradient	Icon-O-Matic-StyleTypes		渐变
 Gradient type	Icon-O-Matic-StyleTypes		渐变类型
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF 源码
 Height	Icon-O-Matic-PropertyNames		高度
+Icon-O-Matic	System name		图标套件
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		数据加载时，图标套件 并未从 SVG 中解析所有数据。覆盖原文件，将不会再显示该信息。
 Insert Control Point	Icon-O-Matic-InsertPointCmd		插入控制点
 Invert selection	Icon-O-Matic-Properties		反向选择
@@ -152,11 +154,11 @@ Rotate indices backwards	Icon-O-Matic-PathsList		逆时针旋转
 Rotate indices forwards	Icon-O-Matic-PathsList		顺时针旋转
 Rotation	Icon-O-Matic-PropertyNames		旋转
 Rounding	Icon-O-Matic-PropertyNames		倒角
-Save	Icon-O-Matic-Main		保存
 Save	Icon-O-Matic-Menu-File		保存
+Save	Icon-O-Matic-Menu-Settings		保存
 Save Icon	Dialog title		保存图标
 Save as…	Icon-O-Matic-Menu-File		保存为...
-Save changes to current icon?	Icon-O-Matic-Main		是否保存当前图标更改？
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		保存修改到当前图标？
 Saving your document failed!	Icon-O-Matic-Exporter		文档保存失败！
 Scale	Icon-O-Matic-TransformationBoxStates		比例
 Scale X	Icon-O-Matic-PropertyNames		比例 X
@@ -185,6 +187,7 @@ Translation X	Icon-O-Matic-PropertyNames		平移 X
 Translation Y	Icon-O-Matic-PropertyNames		平移 Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		取消路径
 Undo	Icon-O-Matic-Main		撤销
+Untitled	Icon-O-Matic-Main		未命名
 Width	Icon-O-Matic-PropertyNames		宽度
 Yes	Icon-O-Matic-StyledTextImport		是
 any of the other lists to	Empty property list - 2nd line		任何其他列表为

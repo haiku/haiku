@@ -1,9 +1,10 @@
-1	simplified_chinese	x-vnd.Haiku-ActivityMonitor	3373427116
+1	simplified_chinese	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f faults/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sec.
+ActivityMonitor	System name		系统监视器
 Add graph	ActivityWindow		添加图示
 Additional items	ActivityView		附加项
 Apps	DataSource		应用程序
@@ -26,6 +27,7 @@ Page faults	DataSource		页面错误
 Ports	DataSource		端口
 Quit	ActivityWindow		退出
 RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard	DataSource		原始剪贴板
 Receiving	DataSource		接收
 Remove graph	ActivityView		删除图示
 Running applications	DataSource		运行程序
@@ -39,6 +41,7 @@ Swap	DataSource		Swap
 Swap space	DataSource		交换空间
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		团队
+Text clipboard	DataSource		文本剪贴板
 Threads	DataSource		线程
 Update time interval:	SettingsWindow		更新频率：
 Used memory	DataSource		已用内存
