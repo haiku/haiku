@@ -37,7 +37,7 @@ void midi_interrupt_op(int32 op, void * data)
 //		set_indirect(port->card, 0x2A, 0x04, 0xff);
 //		release_spinlock(&port->card->hardware);
 		restore_interrupts(cp);
-		
+
 		//real code
 		cp = lock();
 //		emuxki_reg_write_32(&(port->card->config), EMU_INTE,
@@ -58,7 +58,7 @@ void midi_interrupt_op(int32 op, void * data)
 //		decrement_interrupt_handler(port->card);
 //		release_spinlock(&port->card->hardware);
 		restore_interrupts(cp);
-		
+
 		//real code
 //		cpu_status status;
 		cp = lock();
@@ -74,8 +74,8 @@ static status_t midi_close(void *cookie);
 static status_t midi_free(void *cookie);
 static status_t midi_control(void *cookie, uint32 op, void *data, size_t len);
 static status_t midi_read(void *cookie, off_t pos, void *data, size_t *len);
-static status_t midi_write(void *cookie, off_t pos, const void *data, size_t *len);
-
+static status_t midi_write(void *cookie, off_t pos, const void *data,
+                        size_t *len);
 
 device_hooks midi_hooks = {
     &midi_open,
@@ -89,7 +89,6 @@ device_hooks midi_hooks = {
     NULL,		/* readv */
     NULL		/* writev */
 };
-
 
 static status_t midi_open(const char * name, uint32 flags, void ** cookie)
 {
@@ -106,14 +105,16 @@ static status_t midi_open(const char * name, uint32 flags, void ** cookie)
 				break;
 			}
 	}
-	
+
 	if (ix >= num_cards) {
 		TRACE("bad device\n");
 		return ENODEV;
 	}
 
-	TRACE("mpu401: %p  open(): %p  driver: %p\n", mpu401, mpu401->open_hook, cards[ix].midi_interf[used_midi].driver);
-	ret = (*mpu401->open_hook)(cards[ix].midi_interf[used_midi].driver, flags, cookie);
+	TRACE("mpu401: %p  open(): %p  driver: %p\n", mpu401,
+            mpu401->open_hook, cards[ix].midi_interf[used_midi].driver);
+	ret = (*mpu401->open_hook)(cards[ix].midi_interf[used_midi].driver,
+            flags, cookie);
 	if (ret >= B_OK) {
 		cards[ix].midi_interf[used_midi].cookie = *cookie;
 		atomic_add(&cards[ix].midi_interf[used_midi].count, 1);
@@ -164,7 +165,8 @@ static status_t midi_read(void * cookie, off_t pos, void * ptr, size_t * nread)
 }
 
 
-static status_t midi_write(void * cookie, off_t pos, const void * ptr, size_t * nwritten)
+static status_t midi_write(void * cookie, off_t pos, const void * ptr,
+        size_t * nwritten)
 {
 	return (*mpu401->write_hook)(cookie, pos, ptr, nwritten);
 }

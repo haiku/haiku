@@ -11,8 +11,6 @@
 #ifndef _DEBUG_ICE1712_H_
 #define _DEBUG_ICE1712_H_
 
-#include <Debug.h>
-
 #ifdef TRACE
 #	undef TRACE
 #endif
@@ -24,6 +22,11 @@
 #	define TRACE(a...) ;
 #endif
 
-#define ICE1712_VERY_VERBOSE 0
+//#define ICE1712_VERY_VERBOSE
+#ifdef ICE1712_VERY_VERBOSE
+#	define TRACE_VV(a...) dprintf("\33[34mice1712:\33[0m " a)
+#else
+#	define TRACE_VV(a...) ;
+#endif
 
 #endif // _DEBUG_ICE1712_H_

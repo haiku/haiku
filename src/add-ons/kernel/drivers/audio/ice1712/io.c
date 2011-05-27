@@ -15,16 +15,16 @@
 
 extern pci_module_info *pci;
 
-static void ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, 
+static void ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr,
 							uint8 data, uint8 chip_select);
 
-static void cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr, 
+static void cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr,
 							uint8 data, uint8 chip_select);
 
-static uint8 ak45xx_read_gpio(ice1712 *ice, uint8 reg_addr, 
+static uint8 ak45xx_read_gpio(ice1712 *ice, uint8 reg_addr,
 							uint8 chip_select) {return 0;} //Unimplemented
 
-static uint8 cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, 
+static uint8 cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr,
 							uint8 chip_select);
 
 static void write_gpio_byte(ice1712 *ice, uint8 data, uint8 gpio_data);
@@ -42,7 +42,7 @@ read_ccs_uint8(ice1712 *ice, int8 regno)
 
 uint16
 read_ccs_uint16(ice1712 *ice, int8 regno)
-{	
+{
 	return pci->read_io_16(ice->Controller + regno);
 };
 
@@ -103,7 +103,7 @@ read_ddma_uint8(ice1712 *ice, int8 regno)
 
 uint16
 read_ddma_uint16(ice1712 *ice, int8 regno)
-{	
+{
 	return pci->read_io_16(ice->DDMA + regno);
 };
 
@@ -192,7 +192,8 @@ read_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index)
 
 
 void
-write_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index, uint32 data)
+write_ds_channel_data(ice1712 *ice, uint8 channel,
+        ds8_register index, uint32 data)
 {
 	uint8 ds8_channel_index = channel << 4 | index;
 
@@ -225,7 +226,6 @@ read_mt_uint32(ice1712 *ice,	int8 regno)
 	return pci->read_io_32(ice->Multi_Track + regno);
 };
 
-
 void
 write_mt_uint8(ice1712 *ice,	int8 regno,	uint8 value)
 {
@@ -247,7 +247,7 @@ write_mt_uint32(ice1712 *ice,	int8 regno,	uint32 value)
 };
 
 
-int16 
+int16
 read_i2c(ice1712 *ice, uint8 dev_addr, uint8 byte_addr)
 {//return -1 if error else return an uint8
 
@@ -260,7 +260,7 @@ read_i2c(ice1712 *ice, uint8 dev_addr, uint8 byte_addr)
 }
 
 
-int16 
+int16
 write_i2c(ice1712 *ice, uint8 dev_addr, uint8 byte_addr, uint8 value)
 {//return -1 if error else return 0
 	if (read_ccs_uint8(ice, CCS_I2C_CONTROL_STATUS) != 0x80)
@@ -298,9 +298,9 @@ int16 read_eeprom(ice1712 *ice, uint8 eeprom[32])
 }
 
 
-void 
+void
 codec_write(ice1712 *ice, uint8 reg_addr, uint8 data)
-{	
+{
 	switch (ice->product) {
 		case ICE1712_SUBDEVICE_DELTA66:
 		case ICE1712_SUBDEVICE_DELTA44:
@@ -327,7 +327,7 @@ codec_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 }
 
 
-void 
+void
 spdif_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 {
 	switch (ice->product) {
@@ -354,10 +354,10 @@ spdif_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 }
 
 
-uint8 
+uint8
 codec_read(ice1712 *ice, uint8 reg_addr)
 {
-	uint8 val = 0xff;
+	uint8 val = 0xFF;
 	switch (ice->product) {
 		case ICE1712_SUBDEVICE_DELTA66:
 		case ICE1712_SUBDEVICE_DELTA44:
@@ -376,7 +376,7 @@ codec_read(ice1712 *ice, uint8 reg_addr)
 			val = ak45xx_read_gpio(ice, reg_addr, VX442_CODEC_CS_0);
 			break;
 	}
-	
+
 	return val;
 }
 
@@ -384,7 +384,7 @@ codec_read(ice1712 *ice, uint8 reg_addr)
 uint8
 spdif_read(ice1712 *ice, uint8 reg_addr)
 {
-	uint8 val = 0xff;
+	uint8 val = 0xFF;
 	switch (ice->product) {
 		case ICE1712_SUBDEVICE_DELTA1010:
 			break;
@@ -406,34 +406,32 @@ spdif_read(ice1712 *ice, uint8 reg_addr)
 			val = cs84xx_read_gpio(ice, reg_addr, VX442_SPDIF_CS);
 			break;
 	}
-	
+
 	return val;
 }
 
-
-void 
+void
 write_gpio_byte(ice1712 *ice, uint8 data, uint8 gpio_data)
 {
 	int i;
 
 	for (i = 7; i >= 0; i--) {
 		// drop clock and data bits
-		gpio_data &= ~(ice->commlines.clock | ice->commlines.data_out);
+		gpio_data &= ~(ice->CommLines.clock | ice->CommLines.data_out);
 
 		// set data bit if needed
 		if (data & (1 << i))
-			gpio_data |= ice->commlines.data_out;
+			gpio_data |= ice->CommLines.data_out;
 
 		write_gpio(ice, gpio_data);
 		snooze(GPIO_I2C_DELAY);
 
 		// raise clock
-		gpio_data |= ice->commlines.clock;
+		gpio_data |= ice->CommLines.clock;
 		write_gpio(ice, gpio_data);
 		snooze(GPIO_I2C_DELAY);
 	}
 }
-
 
 uint8
 read_gpio_byte(ice1712 *ice, uint8 gpio_data)
@@ -443,36 +441,36 @@ read_gpio_byte(ice1712 *ice, uint8 gpio_data)
 
 	for (i = 7; i >= 0; i--) {
 		// drop clock
-		gpio_data &= ~(ice->commlines.clock);
+		gpio_data &= ~(ice->CommLines.clock);
 		write_gpio(ice, gpio_data);
 		snooze(GPIO_I2C_DELAY);
 
-		if (read_gpio(ice) &  ice->commlines.data_in)
+		if (read_gpio(ice) &  ice->CommLines.data_in)
 			data |= 1 << i;
 
-		gpio_data |= ice->commlines.clock;
+		gpio_data |= ice->CommLines.clock;
 
 		write_gpio(ice, gpio_data);
 		snooze(GPIO_I2C_DELAY);
 	}
-	
+
 	return data;
 }
 
-
-void 
+void
 ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 {
 	uint8 tmp;
 
 	tmp = read_gpio(ice);
-	tmp |= ice->commlines.cs_mask;
+	tmp |= ice->CommLines.cs_mask;
 	tmp &= ~(chip_select);
 
 	write_gpio(ice, tmp);
 	snooze(GPIO_I2C_DELAY);
-	
-	write_gpio_byte(ice, ((AK45xx_CHIP_ADDRESS & 0x03) << 6) | 0x20 | (reg_addr & 0x1f), tmp);
+
+	write_gpio_byte(ice, ((AK45xx_CHIP_ADDRESS & 0x03) << 6) | 0x20
+                    | (reg_addr & 0x1F), tmp);
 	write_gpio_byte(ice, data, tmp);
 
 	tmp |= chip_select;
@@ -480,28 +478,26 @@ ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 	snooze(GPIO_I2C_DELAY);
 }
 
-
-void 
+void
 cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 {
 	uint8 tmp;
 
 	tmp = read_gpio(ice);
-	tmp |= ice->commlines.cs_mask;
+	tmp |= ice->CommLines.cs_mask;
 	tmp &= ~(chip_select);
 
 	write_gpio(ice, tmp);
 	snooze(GPIO_I2C_DELAY);
-	
-	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7f) << 1, tmp);
-	write_gpio_byte(ice, reg_addr & 0x7f, tmp); //Do not Increment
+
+	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7F) << 1, tmp);
+	write_gpio_byte(ice, reg_addr & 0x7F, tmp); //Do not Increment
 	write_gpio_byte(ice, data, tmp);
 
 	tmp |= chip_select;
 	write_gpio(ice, tmp);
 	snooze(GPIO_I2C_DELAY);
 }
-
 
 uint8
 cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select)
@@ -509,13 +505,14 @@ cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select)
 	uint8 tmp, data;
 
 	tmp = read_gpio(ice);
-	tmp |= ice->commlines.cs_mask;
+	tmp |= ice->CommLines.cs_mask;
 	tmp &= ~(chip_select);
 
 	write_gpio(ice, tmp);
 	snooze(GPIO_I2C_DELAY);
-	
-	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7f) << 1, tmp); //For writing the MAP
+
+	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7F) << 1,
+                tmp); //For writing the MAP
 	write_gpio_byte(ice, reg_addr & 0x7F, tmp); //Do not Increment
 
 	tmp |= chip_select; //Deselect the chip
@@ -526,7 +523,8 @@ cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select)
 	write_gpio(ice, tmp);
 	snooze(GPIO_I2C_DELAY);
 
-	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7f) << 1 | 1, tmp); //For writing the MAP
+	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7F) << 1 | 1,
+                tmp); //For writing the MAP
 	data = read_gpio_byte(ice, tmp); //For reading
 
 	tmp |= chip_select; //Deselect the chip
@@ -536,14 +534,14 @@ cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select)
 }
 
 
-uint8 
+uint8
 read_gpio(ice1712 *ice)
 {//return -1 if error else return an uint8
 	return read_cci_uint8(ice, CCI_GPIO_DATA);
 }
 
 
-void 
+void
 write_gpio(ice1712 *ice, uint8 value)
 {//return -1 if error else return 0
 	write_cci_uint8(ice, CCI_GPIO_DATA, value);

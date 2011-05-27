@@ -76,7 +76,8 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 		*log = logadr;
 	if (phy)
 		*phy = (void*)(addr_t)pe.address;
-	TRACE("area = %d, size = %#08X, log = %#08X, phy = %#08X\n", (int)areaid, (int)size, (int)logadr, (int)pe.address);
+	TRACE("area = %d, size = %#08X, log = %#08X, phy = %#08X\n",
+        (int)areaid, (int)size, (int)logadr, (int)pe.address);
 	return areaid;
 }
 

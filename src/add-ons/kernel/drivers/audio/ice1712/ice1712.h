@@ -13,6 +13,7 @@
 #define _ICE1712_H_
 
 #include <PCI.h>
+#include "hmulti_audio.h"
 
 #define DRIVER_NAME "ice1712"
 #define VERSION "0.4"
@@ -36,8 +37,10 @@ typedef enum product_t {
 #define MAX_DAC						10
 #define SWAPPING_BUFFERS			2
 #define SAMPLE_SIZE					4
-#define MIN_BUFFER_FRAMES			256
+#define MIN_BUFFER_FRAMES			64
 #define MAX_BUFFER_FRAMES			2048
+
+#define MAX_HARDWARE_VOLUME			10
 
 #define PLAYBACK_BUFFER_SIZE		(MAX_BUFFER_FRAMES * MAX_DAC * SAMPLE_SIZE)
 #define RECORD_BUFFER_SIZE			(MAX_BUFFER_FRAMES * MAX_ADC * SAMPLE_SIZE)
@@ -50,14 +53,12 @@ typedef enum product_t {
 #define MIXER_OUT_LEFT				10
 #define MIXER_OUT_RIGHT				11
 
-
 typedef enum {
 	NO_IN_NO_OUT = 0,
 	NO_IN_YES_OUT = 1,
 	YES_IN_NO_OUT = 2,
 	YES_IN_YES_OUT = 3,
 } _spdif_config_ ;
-
 
 typedef struct _midi_dev {
 	struct _ice1712_	*card;
@@ -67,52 +68,50 @@ typedef struct _midi_dev {
 	char				name[64];
 } midi_dev;
 
-
-typedef struct _codec_commlines
+typedef struct _codecCommLines
 {
 	uint8	clock;
 	uint8	data_in;
 	uint8	data_out;
 	uint8	cs_mask; //a Mask for removing all Chip select
 	uint8	reserved[4];
-} codec_comm_lines;
+} codecCommLines;
 
-
-typedef struct channel_volume
+typedef struct ChannelVolume
 {
-	float volume;
-	bool mute;
-} channel_volume;
+	float Volume;
+	bool Mute;
+} ChannelVolume;
 
-
-typedef struct ice1712_settings
+typedef struct Ice1712_Settings
 {
-	channel_volume playback[10]; //Can't change the volume of the digital mixer
-	channel_volume record[10];
+	ChannelVolume Playback[MAX_HARDWARE_VOLUME];
+	ChannelVolume Record[MAX_HARDWARE_VOLUME];
 
 	//General Settings
-	uint8 clock; //an index
-	uint8 sample_rate; //an index
-	uint8 buffer_size; //an index
-	uint8 debug_mode; //an index for debugging
-	
-	//S/PDif Settings
-	uint8 out_format; //an index
-	uint8 emphasis; //an index
-	uint8 copy_mode; //an index
-	
-	uint8 reserved[32];
-} ice1712_settings;
+	uint8 Clock; //an index
+	uint8 BufferSize; //an index
+	uint8 DebugMode; //an index for debugging
 
+	//S/PDif Settings
+	uint8 OutFormat; //an index
+	uint8 Emphasis; //an index
+	uint8 CopyMode; //an index
+
+	//Output settings
+	uint8 Output[5]; //an index
+
+	uint8 Reserved[32];
+} Ice1712_Settings;
 
 typedef struct ice1712
 {
 	uint32 irq;
 	pci_info info;
 	char name[128];
-	
+
 	midi_dev midi_interf[2];
-	
+
 	uint32 Controller;	//PCI_10
 	uint32 DDMA;		//PCI_14
 	uint32 DMA_Path;	//PCI_18
@@ -127,8 +126,9 @@ typedef struct ice1712
 
 	product_t product;
 
-	//We hope all manufacturers will use same communication lines for speaking with codec
-	codec_comm_lines commlines;
+	//We hope all manufacturers will use same
+	//communication lines for speaking with codec
+	codecCommLines CommLines;
 
 	uint32 buffer;
 	bigtime_t played_time;
@@ -144,18 +144,16 @@ typedef struct ice1712
 	area_id mem_id_rec;
 	void *phys_addr_rec, *log_addr_rec;
 	uint8 total_input_channels;
-	
+
 	sem_id buffer_ready_sem;
-	
+
 	uint8 sampling_rate; //in the format of the register
 	uint32 lock_source;
-	
-	ice1712_settings settings;
+
+	Ice1712_Settings settings;
 } ice1712;
 
-
-status_t apply_settings(ice1712 *card);
-
+status_t applySettings(ice1712 *card);
 
 //For midi.c
 extern int32 num_cards;
@@ -198,7 +196,8 @@ extern ice1712 cards[NUM_CARDS];
 #define VX442_CODEC_CS_0				0x20	// ?? #0
 #define VX442_CODEC_CS_1				0x40	// ?? #1
 
-#define GPIO_I2C_DELAY					5		//Clock Delay for writing I2C data throw GPIO
+#define GPIO_I2C_DELAY					5		//Clock Delay for writing
+                                                //I2C data throw GPIO
 
 //Register definition for the AK45xx codec (xx = 24 or 28)
 #define AK45xx_CHIP_ADDRESS				0x02	//Chip address of the codec
