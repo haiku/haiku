@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_WINDOW_H
@@ -9,6 +9,7 @@
 #include <Looper.h>
 #include <StorageDefs.h>
 #include <View.h>
+
 
 class BButton;
 class BMenuBar;
@@ -260,6 +261,7 @@ public:
 			BLayout*			GetLayout() const;
 
 			void				InvalidateLayout(bool descendants = false);
+			void				Layout(bool force);
 
 private:
 	// FBC padding and forbidden methods
@@ -393,5 +395,6 @@ private:
 
 			uint32				_reserved[9];
 };
+
 
 #endif // _WINDOW_H

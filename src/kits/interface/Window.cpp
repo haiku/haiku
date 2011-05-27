@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1445,11 +1445,7 @@ FrameMoved(origin);
 
 		case B_LAYOUT_WINDOW:
 		{
-			UpdateSizeLimits();
-
-			// do the actual layout
-			fTopView->Layout(false);
-
+			Layout(false);
 			break;
 		}
 
@@ -2629,6 +2625,16 @@ void
 BWindow::InvalidateLayout(bool descendants)
 {
 	fTopView->InvalidateLayout(descendants);
+}
+
+
+void
+BWindow::Layout(bool force)
+{
+	UpdateSizeLimits();
+
+	// Do the actual layout
+	fTopView->Layout(force);
 }
 
 
