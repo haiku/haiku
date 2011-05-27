@@ -1294,6 +1294,10 @@ ShowImageWindow::_ToggleFullScreen()
 
 	fImageView->SetHideIdlingCursor(fFullScreen);
 	fImageView->SetShowCaption(fFullScreen && fShowCaption);
+
+	GetLayout()->Relayout(true);
+		// We need to manually relayout here, as the views would be relayouted
+		// later, and FitToBounds() would still have the wrong size
 	fImageView->FitToBounds();
 }
 
