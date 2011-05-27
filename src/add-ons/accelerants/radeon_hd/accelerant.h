@@ -43,6 +43,9 @@ struct register_info {
 	uint16_t	grphControl;
 	uint16_t	grphSwapControl;
 	uint16_t	grphPrimarySurfaceAddr;
+	uint16_t	grphPrimarySurfaceAddrHigh;
+	uint16_t	grphSecondarySurfaceAddr;
+	uint16_t	grphSecondarySurfaceAddrHigh;
 	uint16_t	grphPitch;
 	uint16_t	grphSurfaceOffsetX;
 	uint16_t	grphSurfaceOffsetY;

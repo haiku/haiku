@@ -192,6 +192,14 @@ init_registers(uint8 crtid)
 		gRegister->grphSwapControl = offset + EVERGREEN_GRPH_SWAP_CONTROL;
 		gRegister->grphPrimarySurfaceAddr
 			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
+		gRegister->grphSecondarySurfaceAddr
+			= offset + EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS;
+
+		gRegister->grphPrimarySurfaceAddrHigh
+			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+		gRegister->grphSecondarySurfaceAddrHigh
+			= offset + EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
+
 		gRegister->grphPitch = offset + EVERGREEN_GRPH_PITCH;
 		gRegister->grphSurfaceOffsetX
 			= offset + EVERGREEN_GRPH_SURFACE_OFFSET_X;
@@ -219,6 +227,18 @@ init_registers(uint8 crtid)
 		gRegister->grphPrimarySurfaceAddr
 			= (crtid == 1) ? D2GRPH_PRIMARY_SURFACE_ADDRESS
 				: D1GRPH_PRIMARY_SURFACE_ADDRESS;
+		gRegister->grphSecondarySurfaceAddr
+			= (crtid == 1) ? D2GRPH_SECONDARY_SURFACE_ADDRESS
+				: D1GRPH_SECONDARY_SURFACE_ADDRESS;
+
+		// Surface Address high only used on r770+
+		gRegister->grphPrimarySurfaceAddrHigh
+			= (crtid == 1) ? R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH
+				: R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+		gRegister->grphSecondarySurfaceAddrHigh
+			= (crtid == 1) ? R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH
+				: R700_D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
+
 		gRegister->grphPitch
 			= (crtid == 1) ? D2GRPH_PITCH : D1GRPH_PITCH;
 		gRegister->grphSurfaceOffsetX

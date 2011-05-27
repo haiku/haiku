@@ -186,10 +186,20 @@ CardFBSet(display_mode *mode)
 
 	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
 
-	uint32 fbAddress = gInfo->shared_info->frame_buffer_phys;
+	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys ;
+
+	// Tell GPU which frame buffer address to draw from
+	if (gInfo->shared_info->device_chipset >= (RADEON_R700 & 0x70)) {
+		write32(gRegister->grphPrimarySurfaceAddrHigh,
+			(fbAddress >> 32) & 0xf);
+		write32(gRegister->grphSecondarySurfaceAddrHigh,
+			(fbAddress >> 32) & 0xf);
+	}
 
 	write32(gRegister->grphPrimarySurfaceAddr,
-		fbAddress);
+		fbAddress & 0xffffffff);
+	write32(gRegister->grphSecondarySurfaceAddr,
+		fbAddress & 0xffffffff);
 
 	write32(gRegister->grphPitch, bytesPerRow / 4);
 	write32(gRegister->grphSurfaceOffsetX, 0);
