@@ -1,6 +1,7 @@
 // SMTarget.cpp
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 
 #include <OS.h>
@@ -12,6 +13,10 @@
 #include "SMTarget.h"
 #include "SMLooper.h"
 #include "SMRemoteTargetApp.h"
+
+
+using namespace std;
+
 
 // SMTarget
 

@@ -65,7 +65,7 @@ typedef TMessageItemTest
 >
 TMessageBPointItemTest;
 
-ostream& operator<<(ostream& os, const BPoint& point)
+std::ostream& operator<<(std::ostream& os, const BPoint& point)
 {
 	int precision = os.precision();
 	os << "point(x:" << point.x << ", y:" << point.y;

@@ -65,7 +65,7 @@ typedef TMessageItemTest
 >
 TMessageBRectItemTest;
 
-ostream& operator<<(ostream& os, const BRect& rect)
+std::ostream& operator<<(std::ostream& os, const BRect& rect)
 {
 	int precision = os.precision();
 	os.precision(1);

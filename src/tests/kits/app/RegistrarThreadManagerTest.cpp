@@ -7,8 +7,8 @@
 #include <TestUtils.h>
 
 #ifndef TEST_R5
-#include <RegistrarThread.h>
-#include <RegistrarThreadManager.h>
+#include "RegistrarThread.h"
+#include "RegistrarThreadManager.h"
 #endif	// !TEST_R5
 
 #include <stdio.h>

@@ -17,10 +17,14 @@
 	*/
 
 
-#include "ThreadedTestCaller.h"
 #include "AddMessageTest1.h"
+
+#include <assert.h>
+
 #include <Message.h>
 #include <MessageQueue.h>
+
+#include "ThreadedTestCaller.h"
 
 
 /*

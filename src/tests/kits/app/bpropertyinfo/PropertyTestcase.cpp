@@ -8,6 +8,10 @@
 
 
 #include "PropertyTestcase.h"
+
+#include <assert.h>
+#include <stdlib.h>
+
 #include <AppDefs.h>
 #include <Message.h>
 

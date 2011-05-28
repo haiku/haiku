@@ -13,6 +13,9 @@
 
 
 #include "PropertyFlattenTest.h"
+
+#include <assert.h>
+
 #include <ByteOrder.h>
 
 

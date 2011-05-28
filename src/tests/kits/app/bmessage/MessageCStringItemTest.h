@@ -74,7 +74,8 @@ struct TCStringComparePolicy
 {
 	static bool Compare(const char* lhs, const char* rhs);
 };
-bool TCStringComparePolicy::Compare(const char* lhs, const char* rhs)
+bool TCStringCtypedef const char* TypePtr;
+	omparePolicy::Compare(const char* lhs, const char* rhs)
 {
 	if (!lhs)
 		return rhs;

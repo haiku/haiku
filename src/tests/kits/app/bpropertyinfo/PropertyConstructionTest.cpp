@@ -16,6 +16,8 @@
 
 #include "PropertyConstructionTest.h"
 
+#include <assert.h>
+
 
 /*
  *  Method:  PropertyConstructionTest::PropertyConstructionTest()

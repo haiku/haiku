@@ -5,6 +5,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
+#include <stdlib.h>
 #include <utime.h>
 
 // System Includes -------------------------------------------------------------

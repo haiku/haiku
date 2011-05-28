@@ -9,6 +9,9 @@
 
 
 #include "PropertyFindMatchTest.h"
+
+#include <assert.h>
+
 #include <Message.h>
 
 

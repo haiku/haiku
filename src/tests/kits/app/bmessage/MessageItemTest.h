@@ -64,13 +64,12 @@ struct ArrayTypeBase
 template<class Type>
 struct TypePolicy
 {
-	typedef Type* TypePtr;
 	enum { FixedSize = true };
-	inline Type& Dereference(TypePtr p)
+	inline Type& Dereference(Type* p)
 	{
 		return *p;
 	}
-	inline TypePtr AddressOf(Type& t) { return &t; }
+	inline Type* AddressOf(Type& t) { return &t; }
 };
 //------------------------------------------------------------------------------
 template
@@ -94,9 +93,9 @@ struct TMessageItemFuncPolicy : public TypePolicy<Type>
 		return (msg.*AddFunc)(name, val);
 	}
 	static status_t AddData(BMessage& msg, const char* name, type_code type,
-							TypePtr val, ssize_t size, bool fixedSize = true)
+		Type* val, ssize_t size, bool fixedSize = true)
 	{
-		return (msg.*AddDataFunc)(name, type, (const void*)val, size, fixedSize);
+		return (msg.*AddDataFunc)(name, type, (const void*)val, size, fixedSize, 1);
 	}
 	static status_t Find(BMessage& msg, const char* name, int32 index, Type* val)
 	{
@@ -245,7 +244,7 @@ MessageItemTest2()
 	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in));
-	TypePtr pout = NULL;
+	Type* pout = NULL;
 	ssize_t size;
 	status_t err = FuncPolicy::FindData(msg, "item", TypeCode, 0, 
 										(const void**)&pout, &size);
@@ -279,7 +278,7 @@ MessageItemTest3()
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in2));
 	out = InitPolicy::Zero();
-	TypePtr pout;
+	Type* pout;
 	ssize_t size;
 	CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, 0, 
 										(const void**)&pout, &size) == B_OK);
@@ -330,7 +329,7 @@ MessageItemTest5()
 	BMessage msg;
 	ArrayType in = InitPolicy::Array();
 	Type out = InitPolicy::Zero();
-	TypePtr pout;
+	Type* pout;
 	ssize_t size;
 	
 	for (uint32 ii = 0; ii < InitPolicy::Size(in); ++ii)
@@ -383,7 +382,7 @@ MessageItemTest6()
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", rIndex, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in2));
 	out = InitPolicy::Zero();
-	TypePtr pout;
+	Type* pout;
 	ssize_t size;
 	CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, rIndex,
 										(const void**)&pout, &size) == B_OK);
@@ -416,7 +415,7 @@ MessageItemTest7()
 	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in));
-	TypePtr pout = NULL;
+	Type* pout = NULL;
 	ssize_t size;
 	CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, 0, 
 										(const void**)&pout, &size) == B_OK);
@@ -441,7 +440,7 @@ MessageItemTest8()
 	BMessage msg;
 	ArrayType in = InitPolicy::Array();
 	Type out = InitPolicy::Zero();
-	TypePtr pout;
+	Type* pout;
 	ssize_t size;
 	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
@@ -504,7 +503,7 @@ MessageItemTest10()
 										  AssertPolicy::Invalid()));
 	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, NULL, &out) == B_BAD_VALUE);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, NULL, 0, &out) == B_BAD_VALUE);
-	TypePtr pout = NULL;
+	Type* pout = NULL;
 	ssize_t size;
 	status_t err = FuncPolicy::FindData(msg, NULL, TypeCode, 0, 
 										(const void**)&pout, &size);
@@ -529,7 +528,7 @@ MessageItemTest11()
 	CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in) == B_OK);
 	
 	ssize_t flatSize = msg.FlattenedSize();
-	char* buf = new(nothrow) char[flatSize];
+	char* buf = new char[flatSize];
 	CPPUNIT_ASSERT(buf);
 
 	CPPUNIT_ASSERT(msg.Flatten(buf, flatSize) == B_OK);
@@ -565,14 +564,14 @@ MessageItemTest12()
 	}
 	
 	ssize_t flatSize = msg.FlattenedSize();
-	char* buf = new(nothrow) char[flatSize];
+	char* buf = new char[flatSize];
 	CPPUNIT_ASSERT(buf);
 
 	CPPUNIT_ASSERT(msg.Flatten(buf, flatSize) == B_OK);
 	
 	BMessage msg2;
 	Type out = InitPolicy::Zero();
-	TypePtr pout;
+	Type* pout;
 	ssize_t size;
 	CPPUNIT_ASSERT(msg2.Unflatten(buf) == B_OK);
 

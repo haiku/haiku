@@ -8,6 +8,8 @@
  */
 
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include <Entry.h>
@@ -16,6 +18,10 @@
 #include <String.h>
 
 #include "MessageSpeedTest.h"
+
+
+using namespace std;
+
 
 #define LOG_TO_FILE
 #ifdef LOG_TO_FILE

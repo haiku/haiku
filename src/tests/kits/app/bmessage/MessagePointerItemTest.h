@@ -50,8 +50,8 @@ struct TPointerFuncPolicy
 struct TPointerInitPolicy : public ArrayTypeBase<const void*>
 {
 	inline static const void* Zero()	{ return NULL; }
-	inline static const void* Test1()	{ return &Test1; }
-	inline static const void* Test2()	{ return &Test2; }
+	inline static const void* Test1()	{ return (const void*)&Test1; }
+	inline static const void* Test2()	{ return (const void*)&Test2; }
 	inline static size_t SizeOf(const void*)	{ return sizeof (const void*); }
 	inline static ArrayType Array()
 	{

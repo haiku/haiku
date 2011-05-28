@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders app ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bapplication ] ;
@@ -33,6 +34,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 #	: be $(TARGET_LIBSTDC++)
 #;
 
+
 UnitTestLib libapptest.so
 	: AppKitTestAddon.cpp
 
@@ -51,8 +53,8 @@ UnitTestLib libapptest.so
 		ReadWriteTester.cpp
 
 		# BCursor
-		BCursorTester.cpp
-		CursorTest.cpp
+#		BCursorTester.cpp
+#		CursorTest.cpp
 
 		# BHandler
 		HandlerTest.cpp
@@ -87,12 +89,12 @@ UnitTestLib libapptest.so
 		QuitTest.cpp
 
 		# BMessage
-		MessageTest.cpp
-		MessageConstructTest.cpp
-		MessageDestructTest.cpp
-		MessageOpAssignTest.cpp
-		MessageEasyFindTest.cpp
-		MessageSpeedTest.cpp
+#		MessageTest.cpp
+#		MessageConstructTest.cpp
+#		MessageDestructTest.cpp
+#		MessageOpAssignTest.cpp
+#		MessageEasyFindTest.cpp
+#		MessageSpeedTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp
@@ -147,6 +149,8 @@ UnitTestLib libapptest.so
 		TeamForTester.cpp
 		
 		# RegistrarThreadManager
+		RegistrarThread.cpp
+		RegistrarThreadManager.cpp
 		RegistrarThreadManagerTest.cpp
 
 		# common
@@ -169,6 +173,11 @@ SimpleTest DanoMessageTest :
 SEARCH on [ FGristFiles
 		dano_message.cpp
 	] = [ FDirName $(HAIKU_TOP) src kits app ] ;
+
+SEARCH on [ FGristFiles
+		RegistrarThread.cpp
+		RegistrarThreadManager.cpp
+	] = [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
 SubInclude HAIKU_TOP src tests kits app bapplication ;
 SubInclude HAIKU_TOP src tests kits app bclipboard ;

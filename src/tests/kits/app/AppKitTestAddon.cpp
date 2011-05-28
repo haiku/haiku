@@ -21,10 +21,10 @@ BTestSuite* getTestSuite2() {
 	// ##### Add test suites here #####
 	suite->addTest("BApplication", ApplicationTestSuite());
 	suite->addTest("BClipboard", ClipboardTestSuite());
-	suite->addTest("BCursor", CursorTestSuite());
+//	suite->addTest("BCursor", CursorTestSuite());
 	suite->addTest("BHandler", HandlerTestSuite());
 	suite->addTest("BLooper", LooperTestSuite());
-	suite->addTest("BMessage", MessageTestSuite());
+//	suite->addTest("BMessage", MessageTestSuite());
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
 	suite->addTest("BMessageRunner", MessageRunnerTestSuite());
 	suite->addTest("BMessenger", MessengerTestSuite());
