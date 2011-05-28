@@ -1,7 +1,8 @@
-1	simplified_chinese	x-vnd.Haiku-Appearance	1227622574
+1	simplified_chinese	x-vnd.Haiku-Appearance	3187486915
 Antialiasing	APRWindow		抗锯齿
 Antialiasing menu	AntialiasingSettingsView		抗锯齿菜单
 Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
+Appearance	System name		外观
 Colors	APRWindow		颜色
 Control background	Colors tab		控件背景
 Control border	Colors tab		控件边界

@@ -1,15 +1,19 @@
-1	japanese	x-vnd.Haiku-Network	2513327377
+1	japanese	x-vnd.Haiku-Network	3810742593
+<no wireless networks found>	EthernetSettingsView		<ワイヤレスネットワークが見つかりません>
 Adapter:	EthernetSettingsView		ネットワークアダプター：
 Apply	EthernetSettingsView		適用
 Auto-configuring failed: 	EthernetSettingsView		自動設定に失敗しました：
+Choose automatically	EthernetSettingsView		自動選択
 DHCP	EthernetSettingsView		自動 (DHCP)
 DNS #1:	EthernetSettingsView		プライマリ DNS サーバー：
 DNS #2:	EthernetSettingsView		セカンダリ DNS サーバー：
+Disabled	EthernetSettingsView		無効
 Domain:	EthernetSettingsView		ドメイン：
 Gateway:	EthernetSettingsView		ゲートウェイ：
 IP address:	EthernetSettingsView		IP アドレス：
 Mode:	EthernetSettingsView		モード：
 Netmask:	EthernetSettingsView		サブネットマスク：
+Network:	EthernetSettingsView		ネットワーク:
 OK	EthernetSettingsView		Ok
 Revert	EthernetSettingsView		元に戻す
 Static	EthernetSettingsView		固定 IP

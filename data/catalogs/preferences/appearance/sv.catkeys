@@ -12,15 +12,15 @@ Defaults	APRWindow		Förval
 Document background	Colors tab		Dokument bakgrund
 Document text	Colors tab		Dokument text
 Failure	Colors tab		Misslyckande
-Glyph hinting:	AntialiasingSettingsView		Glyfhinting:
+Glyph hinting:	AntialiasingSettingsView		Betona typsnitt:
 Grayscale	AntialiasingSettingsView		Gråskala
-Hinting menu	AntialiasingSettingsView		Hinting-meny
+Hinting menu	AntialiasingSettingsView		Betoningsmeny
 Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
 Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
 LCD subpixel	AntialiasingSettingsView		LCD-subpixel
 Menu background	Colors tab		Menybakgrund
 Menu item text	Colors tab		Menyalternativstext
-Monospaced fonts only	AntialiasingSettingsView		Endast teckensnitt med fast bredd
+Monospaced fonts only	AntialiasingSettingsView		Endast typsnitt med fast bredd
 Navigation base	Colors tab		Navigeringsbas
 Navigation pulse	Colors tab		Navigeringspuls
 Off	AntialiasingSettingsView		Av
@@ -35,7 +35,7 @@ Selected menu item text	Colors tab		Textfärg för valt menyalternativ
 Shadow	Colors tab		Skugga
 Shine	Colors tab		Ljusstyrka
 Strong	AntialiasingSettingsView		Framhävd
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-baserad kantutjämning i kombination med glyfhinting är inte tillgängligt i färdigbyggda Haiku för att undvika patentproblem. För att aktivera denna funktionalitet, måste du själv kompilera Haiku och välja särskilda val i libfreetypes konfigurationshuvud.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-baserad kantutjämning i kombination med betoning av typsnitt är inte tillgängligt i färdigbyggda Haiku för att undvika patentproblem. För att aktivera denna funktionalitet, måste du själv kompilera Haiku och välja särskilda val i libfreetypes konfigurationshuvud.
 Success	Colors tab		Framgång
 Tooltip background	Colors tab		Hjälprutsbakgrund
 Tooltip text	Colors tab		Hjälprutstext

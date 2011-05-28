@@ -28,6 +28,6 @@ Show files in Tracker	GrepWindow		Visa filer i Tracker
 Show lines	GrepWindow		Visa rader
 Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
 Text files only	GrepWindow		Endast textfiler
-TextSearch	GrepWindow		Textsök
+TextSearch	GrepWindow		TextSök
 The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
 Trim to selection	GrepWindow		Avgränsa sökning till markerade filer

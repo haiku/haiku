@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	2764309618
+1	japanese	x-vnd.Haiku-CharacterMap	2137207616
 Aegean numbers	UnicodeBlocks		エーゲ数字
 Alphabetic presentation forms	UnicodeBlocks		アルファベット表示形
 Ancient Greek musical notation	UnicodeBlocks		古代ギリシャ記譜法
@@ -33,8 +33,10 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK統合漢字拡張A
 CJK unified ideographs extension B	UnicodeBlocks		CJK統合漢字拡張B
 Carian	UnicodeBlocks		カリア文字
 Cham	UnicodeBlocks		チャム文字
+CharacterMap	System name		文字表
 Cherokee	UnicodeBlocks		チェロキー文字
 Clear	CharacterWindow		クリアー
+Code	CharacterWindow		コード
 Combining diacritical marks	UnicodeBlocks		ダイアクリティカルマーク(合成可能)
 Combining diacritical marks for symbols	UnicodeBlocks		記号用結合分音記号
 Combining diacritical marks supplement	UnicodeBlocks		結合分音記号補助
@@ -59,7 +61,9 @@ Enclosed alphanumerics	UnicodeBlocks		囲み英数字
 Ethiopic	UnicodeBlocks		エチオピア文字
 Ethiopic extended	UnicodeBlocks		エチオピア文字
 Ethiopic supplement	UnicodeBlocks		エチオピア文字補足
+File	CharacterWindow		ファイル
 Filter:	CharacterWindow		フィルター:
+Font	CharacterWindow		フォント
 Font size:	CharacterWindow		フォントサイズ:
 General punctuation	UnicodeBlocks		一般句読点
 Geometric shapes	UnicodeBlocks		幾何学模様
@@ -166,8 +170,10 @@ Tifinagh	UnicodeBlocks		ティフナグ文字
 Ugaritic	UnicodeBlocks		ウガリト文字
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		統合カナダ先住民音節
 Vai	UnicodeBlocks		ヴァイ文字
+Variation selectors	UnicodeBlocks		異体字セレクター
 Variation selectors supplement	UnicodeBlocks		異体字セレクタ補助
 Vertical forms	UnicodeBlocks		縦書き用句読点
+View	CharacterWindow		表示
 Yi Radicals	UnicodeBlocks		イ文字部首
 Yi syllables	UnicodeBlocks		イ文字
 Yijing hexagram symbols	UnicodeBlocks		易経記号

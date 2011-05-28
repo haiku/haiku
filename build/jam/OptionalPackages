@@ -153,8 +153,8 @@ if [ IsOptionalHaikuImagePackageAdded ArmyKnife ] {
 		Echo "No optional package ArmyKnife for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage 
-			armyknife-61-r1a3-x86-gcc2-2011-05-20.zip
-			: $(baseURL)/armyknife-61-r1a3-x86-gcc2-2011-05-20.zip ;
+			armyknife-61-r1a3-x86-gcc2-2011-05-27.zip
+			: $(baseURL)/armyknife-61-r1a3-x86-gcc2-2011-05-27.zip ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/ArmyKnife/ArmyKnife ;
 	}
@@ -1556,13 +1556,16 @@ if [ IsOptionalHaikuImagePackageAdded Transmission ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Transmission available for $(TARGET_ARCH)" ;
 	} else {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				transmission-2.01-x86-gcc4-2010-07-10.zip
-				: $(baseURL)/transmission-2.01-x86-gcc4-2010-07-10.zip
+				transmission-2.21-r1a3-x86-gcc4-2011-05-27.zip
+				: $(baseURL)/transmission-2.21-r1a3-x86-gcc4-2011-05-27.zip
 				: : true ;
 		} else {
-			Echo "No optional package Transmission available for $(TARGET_ARCH)-gcc2" ;
+			InstallOptionalHaikuImagePackage
+				transmission-2.21-r1a3-x86-gcc2-2011-05-27.zip
+				: $(baseURL)/transmission-2.21-r1a3-x86-gcc2-2011-05-27.zip
+				: : true ;
 		}
 	}
 }
@@ -1627,12 +1630,12 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage vim-7.3-r1a3-x86-gcc4-2011-05-24.zip
-				:  $(baseURL)/vim-7.3-r1a3-x86-gcc4-2011-05-24.zip
+			InstallOptionalHaikuImagePackage vim-7.3-r1a3-x86-gcc4-2011-05-26.zip
+				:  $(baseURL)/vim-7.3-r1a3-x86-gcc4-2011-05-26.zip
 				: : true ;
 		} else {
-			InstallOptionalHaikuImagePackage vim-7.3-x86-gcc2-2010-08-22.zip
-				:  $(baseURL)/vim-7.3-x86-gcc2-2010-08-22.zip
+			InstallOptionalHaikuImagePackage vim-7.3-r1a3-x86-gcc2-2011-05-26.zip
+				:  $(baseURL)/vim-7.3-r1a3-x86-gcc2-2011-05-26.zip
 				: : true ;
 		}
 		AddSymlinkToHaikuImage home config be Applications

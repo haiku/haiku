@@ -1,6 +1,6 @@
 1	finnish	x-vnd.Haiku-GLTeapot	2890609668
 Add a teapot	TeapotWindow		Lisää teekannu
-Backface culling	TeapotWindow		Takasivulahti
+Backface culling	TeapotWindow		Taustakulman häivytys
 Blue	TeapotWindow		Sininen
 FPS display	TeapotWindow		FPS-näyttö
 File	TeapotWindow		Tiedosto

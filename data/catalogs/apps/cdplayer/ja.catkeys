@@ -1,6 +1,14 @@
-1	japanese	x-vnd.Haiku-CDPlayer	1227184485
+1	japanese	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		オーディオCD
+CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CDが入っていません
 CDPlayer	System name		CDプレーヤー
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		ディスク: %ld:%.2ld / %ld:%.2ld
+Disc: --:-- / --:--	CDPlayer		ディスク：　--:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		ディスク: 88:88 / 88:88
 It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		CDドライブが無いか、システムのCDドライブをサポートするためのソフトウエアがありません。
 OK	CDPlayer		OK
+Track %whichTrack%: %trackAt%	CDPlayer		トラック %whichTrack%: %trackAt%
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		トラック: %ld:%.2ld / %ld:%.2ld
+Track: --:-- / --:--	CDPlayer		トラック：　--:-- / --:--
+Track: 88:88 / 88:88	CDPlayer		トラック: 88:88 / 88:88

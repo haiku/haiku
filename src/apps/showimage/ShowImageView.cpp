@@ -491,7 +491,6 @@ void
 ShowImageView::SetHideIdlingCursor(bool hide)
 {
 	fHideCursor = hide;
-	FitToBounds();
 }
 
 

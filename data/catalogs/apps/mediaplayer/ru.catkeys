@@ -18,7 +18,7 @@ Always on top	MediaPlayer-Main		Всегда сверху
 Aspect ratio	MediaPlayer-Main		Соотношение сторон
 Attributes	MediaPlayer-Main		Атрибуты
 Audio	MediaPlayer-Main		Аудио
-Audio track	MediaPlayer-Main		Аудиотрек
+Audio track	MediaPlayer-Main		Аудио дорожка
 Automatically start playing	MediaPlayer-SettingsWindow		Начинать проигрывать файлы автоматически
 Bottom of screen	MediaPlayer-SettingsWindow		нижняя часть экрана
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
@@ -39,7 +39,7 @@ Full screen	MediaPlayer-Main		На весь экран
 Full volume	MediaPlayer-SettingsWindow		На полной громкости
 Gets the URI of the currently playing item.	MediaPlayer-Main		Получает URI текущей проигрываемой записи.
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Получить/установить громкость (0.0-2.0).
-Hide interface	MediaPlayer-Main		Спрятать интерфейс
+Hide interface	MediaPlayer-Main		Скрыть интерфейс
 Import Entries	MediaPlayer-ImportPLItemsCmd		Импорт записей
 Import Entry	MediaPlayer-ImportPLItemsCmd		Импортировать запись
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (не сработала блокировка). Не удалось сохранить плейлист.
@@ -62,7 +62,7 @@ Mute	MediaPlayer-Main		Выключить звук
 Muted	MediaPlayer-SettingsWindow		Без звука
 New player…	MediaPlayer-Main		Новый плеер…
 Next	MediaPlayer-Main		Следующий
-No aspect correction	MediaPlayer-Main		Без коррекции соотношения сторон
+No aspect correction	MediaPlayer-Main		Без коррекции
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ни один из файлов, которые вы хотели проиграть, не является медиа файлом.
 Nothing to Play	MediaPlayer-Main		Нечего проигрывать
 OK	MediaPlayer-Main		ОК
@@ -122,14 +122,14 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Toggle mute.	MediaPlayer-Main		Включить/выключить звук.
 Toggle pause/play.	MediaPlayer-Main		Переключить паузу/проигрывание.
 TogglePlaying	MediaPlayer-Main		Переключить воспроизведение
-Track	Audio Track Menu		Трек
-Track	Video Track Menu		Трек
-Track %d	MediaPlayer-Main		Трек %d
+Track	Audio Track Menu		Дорожка
+Track	Video Track Menu		Дорожка
+Track %d	MediaPlayer-Main		Дорожка %d
 URI	MediaPlayer-Main		URI
 Undo	MediaPlayer-PlaylistWindow		Отменить
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Использовать аппаратный видеооверлей если возможно
 Video	MediaPlayer-Main		Видео
-Video track	MediaPlayer-Main		Видеотрек
+Video track	MediaPlayer-Main		Видео дорожка
 View options	MediaPlayer-SettingsWindow		Настройки вида
 Volume	MediaPlayer-Main		Громкость
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы

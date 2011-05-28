@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-HPGSTranslator	1818083634
+1	japanese	x-vnd.Haiku-HPGSTranslator	505465775
 HPGS image	HPGSTranslator		HPGS イメージ
-HPGS images	ConfigView		HPGS images
-HPGS images	HPGSTranslator		HPGSイメージ
+HPGS images	ConfigView		HPGS イメージ
+HPGS images	HPGSTranslator		HPGS イメージ
+HPGSTranslator Settings	ConfigView		HPGSTranslator 設定
 Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
 Write error %s\n	HPGSTranslator		書き込みエラー %s\n

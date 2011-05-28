@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-CPUFrequencyPref	3974849433
+1	japanese	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		CPU 周波数ビュー
+CPUFrequency	System name		CPUFrequency
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tClemens Zeidler 作\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		デフォルト
 Dynamic performance	Status view		ダイナミックパッフォーマンス

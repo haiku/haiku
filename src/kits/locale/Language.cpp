@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -72,43 +72,6 @@ BLanguage::SetTo(const char* language)
 }
 
 
-BLanguage& BLanguage::operator=(const BLanguage& source)
-{
-	if (&source != this) {
-		delete fICULocale;
-
-		fICULocale = source.fICULocale != NULL
-			? source.fICULocale->clone()
-			: NULL;
-		fDirection = source.fDirection;
-	}
-
-	return *this;
-}
-
-
-uint8
-BLanguage::Direction() const
-{
-	return fDirection;
-}
-
-
-const char*
-BLanguage::GetString(uint32 id) const
-{
-	if (id < B_LANGUAGE_STRINGS_BASE
-		|| id >= B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
-		return NULL;
-
-	return NULL;
-
-	// TODO: fetch string from ICU
-
-//	return fStrings[id - B_LANGUAGE_STRINGS_BASE];
-}
-
-
 status_t
 BLanguage::GetNativeName(BString& name) const
 {
@@ -150,6 +113,28 @@ BLanguage::GetName(BString& name, const BLanguage* displayLanguage) const
 	}
 
 	return status;
+}
+
+
+status_t
+BLanguage::GetIcon(BBitmap* result) const
+{
+	return BLocaleRoster::Default()->GetFlagIconForCountry(result, Code());
+}
+
+
+const char*
+BLanguage::GetString(uint32 id) const
+{
+	if (id < B_LANGUAGE_STRINGS_BASE
+		|| id >= B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
+		return NULL;
+
+	return NULL;
+
+	// TODO: fetch string from ICU
+
+//	return fStrings[id - B_LANGUAGE_STRINGS_BASE];
 }
 
 
@@ -211,4 +196,27 @@ bool
 BLanguage::IsVariant() const
 {
 	return Variant() != NULL;
+}
+
+
+uint8
+BLanguage::Direction() const
+{
+	return fDirection;
+}
+
+
+BLanguage&
+BLanguage::operator=(const BLanguage& source)
+{
+	if (&source != this) {
+		delete fICULocale;
+
+		fICULocale = source.fICULocale != NULL
+			? source.fICULocale->clone()
+			: NULL;
+		fDirection = source.fDirection;
+	}
+
+	return *this;
 }

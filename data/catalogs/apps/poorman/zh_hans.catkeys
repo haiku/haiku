@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku.PoorMan	3143901754
+1	simplified_chinese	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		默认 web 目录创建于\"/boot/home/public_html。\"\n请确保该目录中存在名称为 \"index.html\" 的 HTML 文件 。
 About PoorMan…	PoorMan		关于 PoorMan...
 Advanced	PoorMan		高级
@@ -34,7 +34,7 @@ Logging view	PoorMan		日志视图
 Max. simultaneous connections:	PoorMan		最大同步连接：
 OK	PoorMan		确定
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择j将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
-PoorMan	System name		PoorMan
+PoorMan	Application name		PoorMan
 PoorMan settings	PoorMan		PoorMan 设置
 Quit	PoorMan		退出
 Run server	PoorMan		运行服务器

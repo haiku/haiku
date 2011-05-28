@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PEPL	382829331
+1	belarusian	x-vnd.Be-PEPL	2993050801
 %name% picture	People		Выява %name%
 Address	People		Адрас
 Cancel	People		Адмена
@@ -28,6 +28,7 @@ New person…	People		Новая персона
 Nickname	People		Нік
 OK	People		ОК
 Paste	People		Уставіць
+People	System name		Персоны
 Person	Short mimetype description		Персона
 Quit	People		Выйсці
 Redo	People		Перарабіць

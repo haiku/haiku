@@ -1,4 +1,6 @@
-1	japanese	x-vnd.Haiku-Pulse	628764229
+1	japanese	x-vnd.Haiku-Pulse	2452153519
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
 About Pulse…	CPUButton		Pulse について…
 About Pulse…	PulseView		Pulse について…
 Active color	ConfigView		アクティブ色
@@ -10,11 +12,15 @@ Deskbar menu	CPUButton		Deskbar メニュー
 Deskbar mode	MiniPulseView		Deskbar モード
 Deskbar mode	NormalPulseView		Deskbar モード
 Deskbar mode	PrefsWindow		Deskbar モード
+Error	PulseApp		エラー
 Fade colors	ConfigView		フェード色
 Frame color	ConfigView		フレーム色
 Idle color	ConfigView		アイドル色
 Info	CPUButton		情報
 Info	DeskbarPulseView		情報
+Info	PulseApp		情報
+Info	PulseView		情報
+Installing in Deskbar failed\n%s	PulseApp		Deskbar へのインストールに失敗しました\n%s
 Mini mode	DeskbarPulseView		ミニモード
 Mini mode	NormalPulseView		ミニモード
 Mini mode	PrefsWindow		ミニモード
@@ -30,7 +36,8 @@ Pulse	NormalPulseView		Pulse
 Pulse settings	PulseWindow		Pulse の設定
 Quit	DeskbarPulseView		終了
 Quit	MiniPulseView		終了
-Remove replicant	CPUButton		レプリカントを 外す
+Remove replicant	CPUButton		レプリカントを外す
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました.\n%s
 Settings…	PulseView		設定…
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usage: [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		アイコンの幅

@@ -150,11 +150,11 @@ View	Mail		Вид
 Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /\"Отправить/\" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /\"Отмена/\" и попробуйте исправить их вручную.
 \\n - Newline	Mail		\\n - Новая строка
-draft	B_USER_DIRECTORY/mail/draft		черновики
+draft	B_USER_DIRECTORY/mail/draft		Черновики
 helpful message	Mail		полезное сообщение
-in	B_USER_DIRECTORY/mail/in		входящие
-mail	B_USER_DIRECTORY/mail		почта
-out	B_USER_DIRECTORY/mail/out		исходящие
-queries	B_USER_DIRECTORY/mail/queries		запросы
-sent	B_USER_DIRECTORY/mail/sent		отправленные
-spam	B_USER_DIRECTORY/mail/spam		спам
+in	B_USER_DIRECTORY/mail/in		Входящие
+mail	B_USER_DIRECTORY/mail		Почта
+out	B_USER_DIRECTORY/mail/out		Исходящие
+queries	B_USER_DIRECTORY/mail/queries		Запросы
+sent	B_USER_DIRECTORY/mail/sent		Отправленные
+spam	B_USER_DIRECTORY/mail/spam		Спам

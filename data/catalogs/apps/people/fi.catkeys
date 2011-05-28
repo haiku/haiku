@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PEPL	382829331
+1	finnish	x-vnd.Be-PEPL	2993050801
 %name% picture	People		%name%-kuva
 Address	People		Osoite
 Cancel	People		Peru
@@ -28,6 +28,7 @@ New person…	People		Uusi henkilö...
 Nickname	People		Lempinimi
 OK	People		Valmis
 Paste	People		Liitä
+People	System name		Ihmiset
 Person	Short mimetype description		Henkilö
 Quit	People		Poistu
 Redo	People		Tee uudelleen

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	568426562
+1	japanese	x-vnd.Haiku-DriveSetup	1209826930
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<空>
 <empty>	PartitionList		<空>
@@ -29,6 +29,7 @@ Device	DiskView		デバイス
 Device	PartitionList		デバイス
 Disk	MainWindow		ディスク
 Disk system \"%s\"\" not found!	MainWindow		「%s\"」ディスクシステムがみつかりません!
+DriveSetup	System name		DriveSetup
 Eject	MainWindow		取り出す
 End: %ld MB	Support		末端： %ld MB
 Error: 	MainWindow	in any error alert	エラー : 

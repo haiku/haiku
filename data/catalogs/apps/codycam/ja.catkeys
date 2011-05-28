@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku.CodyCam	3353004969
+1	japanese	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		有効な接続がビデオウィンドウ上に見つかりません
 Cannot connect the video source to the video window	CodyCam		ビデオソースをビデオウィンドウに接続できません
 Cannot create a video window	CodyCam		ビデオウィンドウを作成できません
@@ -17,6 +17,7 @@ Capture Rate Menu	CodyCam		キャプチャレートメニュー
 Capture controls	CodyCam		キャプチャ制御
 Capturing Image…	VideoConsumer.cpp		画像を取得中...
 Closing the window\n	VideoConsumer.cpp		ウィンドウを閉じる\n
+CodyCam	Application name		CodyCam
 Connected…	VideoConsumer.cpp		接続しました...
 Couldn't find requested directory on server	VideoConsumer.cpp		指定されたディレクトリがサーバー上にみつかりませんでした
 Directory:	CodyCam		ディレクトリ:

@@ -19,6 +19,6 @@ RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 ビット ビッグエ�
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 ビット
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 ビット ビッグエンディアン
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 ビット
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 ビット ビッグエンディアンbig-endian
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 ビット ビッグエンディアン
 System palette 8 bits	PPMTranslator		システムパレット 8 ビット
 Version %d.%d.%d %s	PPMTranslator		バージョン %d.%d.%d %s

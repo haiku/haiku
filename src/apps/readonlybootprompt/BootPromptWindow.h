@@ -10,6 +10,7 @@
 
 
 class BButton;
+class BLanguage;
 class BListView;
 class BMenuItem;
 class BMenuField;
@@ -28,14 +29,17 @@ private:
 			void				_UpdateStrings();
 			void				_PopulateLanguages();
 			void				_PopulateKeymaps();
-			void				_StoreKeymap(const entry_ref& ref) const;
+			void				_ActivateKeymap(const BMessage* message) const;
 			status_t			_GetCurrentKeymapRef(entry_ref& ref) const;
+			BMenuItem*			_KeymapItemForLanguage(
+									BLanguage& language) const;
 
 private:
 			BTextView*			fInfoTextView;
 			BStringView*		fLanguagesLabelView;
 			BListView*			fLanguagesListView;
 			BMenuField*			fKeymapsMenuField;
+			BMenuItem*			fDefaultKeymapItem;
 			BButton*			fDesktopButton;
 			BButton*			fInstallerButton;
 };

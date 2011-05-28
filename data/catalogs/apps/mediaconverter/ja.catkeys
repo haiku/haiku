@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaConverter	1647571347
+1	japanese	x-vnd.Haiku-MediaConverter	2495000110
 %d bit 	MediaFileInfo		%d ビット
 %d byte 	MediaFileInfo		%d バイト
 Audio encoding:	MediaConverter		オーディオエンコーディング
@@ -24,6 +24,7 @@ File	Menu		ファイル
 File Error	MediaConverter-FileInfo		ファイルエラー
 File details	MediaConverter		ファイルの詳細
 File format:	MediaConverter		ファイルフォーマット：
+High	MediaConverter		高い
 Low	MediaConverter		低い
 No audio	Audio codecs list		オーディオ無し
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Expander	3000790344
+1	japanese	x-vnd.Haiku-Expander	187676748
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		倉庫ファイルの解凍はまだ完了していません。それでも中止しますか？
 Automatically expand files	ExpanderPreferences		自動的にファイルを解凍する
 Automatically show contents listing	ExpanderPreferences		内容リストを自動的に表示
@@ -13,6 +13,7 @@ Destination folder:	ExpanderPreferences		解凍先フォルダ：
 Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
 Expand	ExpanderMenu		解凍
 Expand	ExpanderWindow		解凍
+Expander	System name		Expander
 Expander settings	ExpanderPreferences		Expander設定
 Expander: Choose destination	DirectoryFilePanel		Expander: 解凍先の選択
 Expander: Open	ExpanderWindow		Expander: 開く

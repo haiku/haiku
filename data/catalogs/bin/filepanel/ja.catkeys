@@ -1,0 +1,20 @@
+1	japanese	x-vnd.mmu_man.filepanel	1802971238
+%s not a valid option\n	FilePanelApp		%s は正しいオプションではありません\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: 未実装\n
+%s: this option requires a parameter\n	FilePanelApp		%s: このオプションにはパラメータが必要です\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t1つのファイルのみ選択を許可する\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\t未実装\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t<folder> にて開く\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\t未実装\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tヘルプを表示する\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\t開くエントリーの種類: f, d, s (ファイル (デフォルト), ディレクトリ, シンボリックリンク)の組み合わせ\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tFilePanel (デフォルト)を読み込みに使用する\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tFilePanel の形式を作る\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t保存するデフォルトの名前を指定する
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\t保存に FilePanel を使用する\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tFilePanel ウィンドウのタイトルを指定する\n
+display a load/save file panel\n	FilePanelApp		読込・保存パネルを表示する\n
+options:\n	FilePanelApp		オプション:\n
+short\tlong\tdescription\n	FilePanelApp		短い\t長い\t概要\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		使い方: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		使い方:  %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n

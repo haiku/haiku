@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku.zip-o-matic	829498916
+1	japanese	x-vnd.haiku.zip-o-matic	2207848100
 %ld files added.	file:ZipOMaticWindow.cpp		%ld 個のファイルを追加しました。
 1 file added.	file:ZipOMaticWindow.cpp		ファイルを追加しました。
 Archive	file:ZipperThread.cpp		アーカイブ
@@ -7,6 +7,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Continue	file:ZipOMaticWindow.cpp		続ける
 Creating archive: %s	file:ZipOMaticWindow.cpp		アーカイブ %s を作成中
 Do you want to stop them?	file:ZipOMatic.cpp		中止してよろしいですか？
+Drop files here.	file:ZipOMaticWindow.cpp		ここにファイルをドロップしてください。
 Error creating archive	file:ZipOMaticWindow.cpp		アーカイブの作成中にエラーが発生しました。
 Filename: %s	file:ZipOMaticWindow.cpp		ファイル名： %s
 Let them continue	file:ZipOMatic.cpp		これらを続ける

@@ -1,2 +1,34 @@
-1	russian	x-vnd.Haiku-Sudoku	1078166960
+1	russian	x-vnd.Haiku-Sudoku	2463385585
+Abort	ProgressWindow		Прервать
+Advanced	SudokuWindow		Опытная 
+Blank	SudokuWindow		Пустая
+Copy	SudokuWindow		Копировать
+Could not open \"%s\":\n%s\n	SudokuWindow		Невозможно открыть \"%s\":\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Не удалось установить Судоку:\n%s\n
+Creating solvable field	SudokuGenerator		Создание решаемого поля
+Easy	SudokuWindow		Простая
+Export as…	SudokuWindow		Экспортировать как…
+File	SudokuWindow		Файл
+HTML	SudokuWindow		HTML 
+Hard	SudokuWindow		Сложная
+Help	SudokuWindow		Помощь
+Mark invalid values	SudokuWindow		Пометить неверные значения
+Mark valid hints	SudokuWindow		Пометить верные подсказки
+New	SudokuWindow		Новая игра
+OK	SudokuWindow		ОК
+Open file…	SudokuWindow		Открыть файл…
+Progress monitor	ProgressWindow		Монитор состояния 
+Quit	SudokuWindow		Выход
+Redo	SudokuWindow		Повторить
+Restore snapshot	SudokuWindow		Восстановить состояние
+Searching for removable values	SudokuGenerator		Поиск удаляемых значений
+Snapshot current	SudokuWindow		Сохранить состояние
+Solve	SudokuWindow		Решить
+Solve single field	SudokuWindow		Решить одиночное поле
+Start again	SudokuWindow		Начать снова
 Sudoku	System name		Судоку
+Sudoku request	SudokuWindow		Запрос судоку
+Sudoku solved - congratulations!\n	SudokuWindow		Судоку решен - поздравляем!\n
+Text	SudokuWindow		Текст
+Undo	SudokuWindow		Вернуть
+View	SudokuWindow		Вид

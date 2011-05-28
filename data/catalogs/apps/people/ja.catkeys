@@ -1,29 +1,42 @@
-1	japanese	x-vnd.Be-PEPL	3274983047
+1	japanese	x-vnd.Be-PEPL	445835317
+%name% picture	People		%name% の画像
 Address	People		住所
 Cancel	People		キャンセル
 City	People		市町村
 Close	People		閉じる
 Company	People		会社
+Configure attributes	People		属性を編集
+Contact information for a person.	Long mimetype description		連絡先情報
+Contact name	People		担当者名
 Copy	People		コピー
+Could not create %s.	People		%s を作成できませんでした。
 Country	People		国
 Cut	People		切り取り
+Drop an image here,\nor use the contextual menu.	People		画像をここにドロップしてください。\nまたは、コンテクストメニューを使ってください。
 E-mail	People		E-mail
 Edit	People		編集
+Error	People		エラー
 Fax	People		ファックス
 File	People		ファイル
 Group	People		グループ
 Home phone	People		自宅の電話番号
+Load image…	People		イメージを読み込む…
 Name	People		名前
+New person	People		新規作成
 New person…	People		新規作成...
 Nickname	People		ニックネーム
 OK	People		OK
 Paste	People		貼り付け
 Quit	People		終了
 Redo	People		やり直し
+Remove image	People		イメージを削除する
+Revert	People		元に戻す
 Save	People		保存
 Save as…	People		名前を付けて保存...
 Select all	People		すべて選択
+Sorry	People		すみません
 URL	People		URL
 Undo	People		元に戻す
 Work phone	People		会社の電話番号
 Zip	People		郵便番号
+none	Groups list		無し

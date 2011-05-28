@@ -1,7 +1,0 @@
-1	simplified_chinese	x-vnd.Haiku-cmd-dstconfig	2552303152
-Ask me later	dstcheck		稍后询问
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		注意！\n\n由于夏令时的切换，您的计算机时钟可能会有一个小时的延迟。\n您的计算机时间显示为
-No	dstcheck		否
-Yes	dstcheck		是
-Would you like to set the clock?	dstcheck		是否设置时钟？
-.\n\nIs this the correct time?	dstcheck		.\n\n当前时间是否正确？

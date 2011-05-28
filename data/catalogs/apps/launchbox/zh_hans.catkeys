@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-LaunchBox	3267282249
+1	simplified_chinese	x-vnd.Haiku-LaunchBox	2364133517
 Add button here	LaunchBox		在此处添加按钮
 Auto-raise	LaunchBox		自动提升
 Bummer	LaunchBox		无效
@@ -7,9 +7,9 @@ Clear button	LaunchBox		清除按钮
 Clone	LaunchBox		复制
 Close	LaunchBox		关闭
 Description for '%3'	LaunchBox		描述 '%3'
-Failed to launch '%1'.\n\nError:	LaunchBox		启动 '%1' 失败。\n\n错误：
+Failed to launch '%1'.\n\nError: 	LaunchBox		启动 '%1' 失败。\n\n错误：
 Failed to launch 'something',error in Pad data.	LaunchBox		载入 'something' 失败，面板数据错误。
-Failed to launch application with signature '%2'.\n\nError:	LaunchBox		使用署名 '%2' 启用应用程序失败。\n\n错误：
+Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		使用署名 '%2' 启用应用程序失败。\n\n错误：
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 'open folder' 命令到 Tracker 失败。\n\n错误：
 Horizontal layout	LaunchBox		水平层
 Icon size	LaunchBox		图标尺寸

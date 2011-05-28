@@ -403,10 +403,11 @@ MediaWindow::InitWindow()
 
 	// Layout all views
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.SetInsets(14, 14, 14, 14)
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 		.Add(scrollView)
 		.AddGroup(B_VERTICAL)
-			.SetInsets(14, 0, 0, 0)
+			.SetInsets(0, 0, 0, 0)
 			.Add(fTitleView)
 			.Add(fContentLayout);
 

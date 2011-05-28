@@ -1,7 +1,0 @@
-1	simplified_chinese	x-vnd.Haiku-cmd-dstconfig	1690254090
-Would you like to set the clock using the Time and\nDate preference utility?	dstcheck		您希望使用时间和日期设定\n工具设定当前时间吗？
-Ask me later	dstcheck		稍后询问
-No	dstcheck		否
-Yes	dstcheck		是
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off. Currently, your computer thinks it is 	dstcheck		注意！\n\n由于夏令时的转换，您的计算机时钟可能会有一个小时的延迟。当前，您的计算机时间显示为
-.\n\nIs this the correct time?	dstcheck		.\n\n时间是否正确吗？

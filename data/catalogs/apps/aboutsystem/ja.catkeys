@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	3149623567
+1	japanese	x-vnd.Haiku-About	128117018
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		合計 %d MiB
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
@@ -7,16 +7,62 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		合計 %total MiB / %inaccessible MiB アクセス不可
 ... and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n
 About this system	AboutWindow		このシステムについて
+AboutSystem	System name		このシステムについて
+BSD (2-clause)	AboutView		BSD (第2条)
+BSD (3-clause)	AboutView		BSD (第3条)
+BSD (4-clause)	AboutView		BSD (第4条)
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. およびその開発チーム: 彼らはBeOSを創造してくれました!
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		次のソフトウェアはNetBSD Foundation, Inc.およびその貢献者らにより開発されたソフトウェアを含みます:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.
+Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		次のソフトウェアはFreeBSD Projectで開発され、BSDライセンスで公開されているソフトウェアを含みます:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		次のソフトウェアはGNU Projectによるものであり、GPLおよびLGPLライセンスの下で公開されています:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
 Contributors:\n	AboutView		その他の貢献者：\n
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. All rights reserved.
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 東京大学和田研究室.
+Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. SGI Software FreeBライセンス. All rights reserved.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. All rights reserved.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. このソフトウェアの一部はIndependent JPEG Groupの著作物に基づいています.
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. All rights reserved.
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup GaillyおよびMark Adler.
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. All rights reserved.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. All rights reserved.
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbHおよびThomas Merz. All rights reserved.\nPDFlibおよびPDFlibロゴはPDFlib GmbHの登録商標です.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center LtdおよびClark Cooper.
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. All rights reserved.
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. All rights reserved.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprintの著者たち. All rights reserved.
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeLおよびRemi Lefebvre.
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard他.
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie BozemanおよびDaniel Veillard. All rights reserved.
+Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expatのメンテナたち.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. All rights reserved.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. All rights reserved.
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.
+Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe他.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. All rights reserved.
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. All rights reserved.
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. All rights reserved.
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. All rights reserved.
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. All rights reserved.
 Current maintainers:\n	AboutView		現在のメンテナー\n
 GCC %d Hybrid	AboutView		GCC %d ハイブリッド
 Google & their Google Summer of Code program\n	AboutView		Google と Google Summer of Code プログラム\n
 Kernel:	AboutView		カーネル：
 License: 	AboutView		ライセンス：
 Licenses: 	AboutView		ライセンス：
+MIT (no promotion)	AboutView		MIT (非商用利用)
+MIT license. All rights reserved.	AboutView		MITライセンス. All rights reserved.
 Memory:	AboutView		メモリー：
 Michael Phipps (project founder)\n\n	AboutView		プロジェクト創立者 Michael Phipps\n\n
 Past maintainers:\n	AboutView		過去のメンテナー\n
+Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		このソフトウェアの一部は著作権により保護されています. Copyright © 1996-2006 The FreeType Project. All rights reserved.
 Processor:	AboutView		プロセッサー：
 Revision	AboutView		リビジョン
 Source Code: 	AboutView		ソースコード：
@@ -25,6 +71,7 @@ The Haiku-Ports team\n	AboutView		Haiku-Ports チーム\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 と Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haiku 特有のコード、特にカーネルとカーネルにリンクするアプリケーションのコードは、%MIT licence%で公開しています。一部のシステムライブラリが LPGL ライセンスで公開されている第三者が作のコードを含めています。第三者の著作権情報は下記に記載されています。\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku™およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。
 Time running:	AboutView		稼動時間：
 Translations:\n	AboutView		各国語翻訳：\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n

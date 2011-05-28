@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Time	4105436521
+1	japanese	x-vnd.Haiku-Time	3505745870
 <Other>	Time		<その他>
 Clock set to:	Time		時刻の設定：
 Current time:	Time		現在時刻：
@@ -9,5 +9,7 @@ OK	Time		OK
 Preview time:	Time		プレビュー：
 Revert	Time		元に戻す
 Set time zone	Time		タイムゾーンを設定
+Time	System name		日付と時間
 Time zone	Time		タイムゾーン
 \nNow: 	Time		 \n現在：
+about	Time		このソフトウェアについて
