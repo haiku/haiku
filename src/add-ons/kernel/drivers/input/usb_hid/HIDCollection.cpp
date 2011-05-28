@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #endif
 
 #include "HIDCollection.h"
+#include "HIDReport.h"
 #include "HIDReportItem.h"
 
 #include <new>
@@ -36,7 +37,10 @@ HIDCollection::HIDCollection(HIDCollection *parent, uint8 type,
 		usageValue.u.extended = localState.usage_minimum.u.extended;
 	else if (localState.usage_maximum_set)
 		usageValue.u.extended = localState.usage_maximum.u.extended;
-	else {
+	else if (type == COLLECTION_LOGICAL) {
+		// this is just a logical grouping collection
+		usageValue.u.extended = 0;
+	} else {
 		TRACE_ALWAYS("non of the possible usages for the collection are set\n");
 	}
 
@@ -50,6 +54,24 @@ HIDCollection::~HIDCollection()
 		delete fChildren[i];
 	free(fChildren);
 	free(fItems);
+}
+
+
+uint16
+HIDCollection::UsagePage()
+{
+	usage_value value;
+	value.u.extended = fUsage;
+	return value.u.s.usage_page;
+}
+
+
+uint16
+HIDCollection::UsageID()
+{
+	usage_value value;
+	value.u.extended = fUsage;
+	return value.u.s.usage_id;
 }
 
 
@@ -76,6 +98,32 @@ HIDCollection::ChildAt(uint32 index)
 		return NULL;
 
 	return fChildren[index];
+}
+
+
+uint32
+HIDCollection::CountChildrenFlat(uint8 type)
+{
+	uint32 count = 0;
+	if (type == COLLECTION_ALL || fType == type)
+		count++;
+
+	for (uint32 i = 0; i < fChildCount; i++) {
+		HIDCollection *child = fChildren[i];
+		if (child == NULL)
+			continue;
+
+		count += child->CountChildrenFlat(type);
+	}
+
+	return count;
+}
+
+
+HIDCollection *
+HIDCollection::ChildAtFlat(uint8 type, uint32 index)
+{
+	return _ChildAtFlat(type, index);
 }
 
 
@@ -106,6 +154,28 @@ HIDCollection::ItemAt(uint32 index)
 		return NULL;
 
 	return fItems[index];
+}
+
+
+uint32
+HIDCollection::CountItemsFlat()
+{
+	uint32 count = fItemCount;
+
+	for (uint32 i = 0; i < fChildCount; i++) {
+		HIDCollection *child = fChildren[i];
+		if (child != NULL)
+			count += child->CountItemsFlat();
+	}
+
+	return count;
+}
+
+
+HIDReportItem *
+HIDCollection::ItemAtFlat(uint32 index)
+{
+	return _ItemAtFlat(index);
 }
 
 
@@ -159,5 +229,89 @@ HIDCollection::PrintToStream(uint32 indentLevel)
 		HIDCollection *child = fChildren[i];
 		if (child != NULL)
 			child->PrintToStream(indentLevel + 1);
+	}
+}
+
+
+HIDCollection *
+HIDCollection::_ChildAtFlat(uint8 type, uint32 &index)
+{
+	if (type == COLLECTION_ALL || fType == type) {
+		if (index == 0)
+			return this;
+
+		index--;
+	}
+
+	for (uint32 i = 0; i < fChildCount; i++) {
+		HIDCollection *child = fChildren[i];
+		if (child == NULL)
+			continue;
+
+		HIDCollection *result = child->_ChildAtFlat(type, index);
+		if (result != NULL)
+			return result;
+	}
+
+	return NULL;
+}
+
+
+HIDReportItem *
+HIDCollection::_ItemAtFlat(uint32 &index)
+{
+	if (index < fItemCount)
+		return fItems[index];
+
+	index -= fItemCount;
+
+	for (uint32 i = 0; i < fChildCount; i++) {
+		HIDCollection *child = fChildren[i];
+		if (child == NULL)
+			continue;
+
+		HIDReportItem *result = child->_ItemAtFlat(index);
+		if (result != NULL)
+			return result;
+	}
+
+	return NULL;
+}
+
+
+void
+HIDCollection::BuildReportList(uint8 reportType,
+	HIDReport **reportList, uint32 &reportCount)
+{
+
+	for (uint32 i = 0; i < fItemCount; i++) {
+		HIDReportItem *item = fItems[i];
+		if (item == NULL)
+			continue;
+
+		HIDReport *report = item->Report();
+		if (reportType != HID_REPORT_TYPE_ANY && report->Type() != reportType)
+			continue;
+
+		bool found = false;
+		for (uint32 j = 0; j < reportCount; j++) {
+			if (reportList[j] == report) {
+				found = true;
+				break;
+			}
+		}
+
+		if (found)
+			continue;
+
+		reportList[reportCount++] = report;
+	}
+
+	for (uint32 i = 0; i < fChildCount; i++) {
+		HIDCollection *child = fChildren[i];
+		if (child == NULL)
+			continue;
+
+		child->BuildReportList(reportType, reportList, reportCount);
 	}
 }

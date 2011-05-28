@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
 
@@ -14,8 +14,9 @@
 #include <debug.h>
 
 #include "Driver.h"
-#include "KeyboardDevice.h"
+#include "KeyboardProtocolHandler.h"
 
+#include "HIDCollection.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
 #include "HIDReportItem.h"
@@ -48,9 +49,10 @@ debug_get_keyboard_config(int argc, char **argv)
 //	#pragma mark -
 
 
-KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
+KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
+	HIDReport *outputReport)
 	:
-	ProtocolHandler(inputReport->Device(), "input/keyboard/usb/", 512),
+	ProtocolHandler(inputReport.Device(), "input/keyboard/usb/", 512),
 	fInputReport(inputReport),
 	fOutputReport(outputReport),
 	fRepeatDelay(300000),
@@ -68,8 +70,8 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	mutex_init(&fLock, "usb keyboard");
 
 	// find modifiers and keys
-	for (uint32 i = 0; i < inputReport->CountItems(); i++) {
-		HIDReportItem *item = inputReport->ItemAt(i);
+	for (uint32 i = 0; i < inputReport.CountItems(); i++) {
+		HIDReportItem *item = inputReport.ItemAt(i);
 		if (!item->HasData())
 			continue;
 
@@ -96,7 +98,7 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 
 	TRACE("keyboard device with %lu keys and %lu modifiers\n", fKeyCount,
 		fModifierCount);
-	TRACE("input report: %u; output report: %u\n", inputReport->ID(),
+	TRACE("input report: %u; output report: %u\n", inputReport.ID(),
 		outputReport != NULL ? outputReport->ID() : 255);
 
 	fLastKeys = (uint16 *)malloc(fKeyCount * 2 * sizeof(uint16));
@@ -142,7 +144,7 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 }
 
 
-KeyboardDevice::~KeyboardDevice()
+KeyboardProtocolHandler::~KeyboardProtocolHandler()
 {
 	free(fLastKeys);
 
@@ -155,59 +157,122 @@ KeyboardDevice::~KeyboardDevice()
 }
 
 
-ProtocolHandler *
-KeyboardDevice::AddHandler(HIDDevice *device, HIDReport *input)
+void
+KeyboardProtocolHandler::AddHandlers(HIDDevice &device,
+	HIDCollection &collection, ProtocolHandler *&handlerList)
 {
-	bool mayHaveOutput = false;
-	bool foundKeyboardUsage = false;
-	for (uint32 i = 0; i < input->CountItems(); i++) {
-		HIDReportItem *item = input->ItemAt(i);
-		if (!item->HasData())
-			continue;
+	bool handled = false;
+	switch (collection.UsagePage()) {
+		case B_HID_USAGE_PAGE_GENERIC_DESKTOP:
+		{
+			switch (collection.UsageID()) {
+				case B_HID_UID_GD_KEYBOARD:
+				case B_HID_UID_GD_KEYPAD:
+				case B_HID_UID_GD_SYSTEM_CONTROL:
+					handled = true;
+			}
 
-		if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
-			|| (item->UsagePage() == B_HID_USAGE_PAGE_CONSUMER && item->Array())
-			|| (item->UsagePage() == B_HID_USAGE_PAGE_BUTTON && item->Array())) {
-			// found at least one item with a keyboard usage or with
-			// a consumer/button usage that is handled like a key
-			mayHaveOutput = item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD;
-			foundKeyboardUsage = true;
+			break;
+		}
+
+		case B_HID_USAGE_PAGE_CONSUMER:
+		{
+			switch (collection.UsageID()) {
+				case B_HID_UID_CON_CONSUMER_CONTROL:
+					handled = true;
+			}
+
 			break;
 		}
 	}
 
-	if (!foundKeyboardUsage)
-		return NULL;
-
-	HIDReport *output = NULL;
-	bool foundOutputReport = false;
-	if (mayHaveOutput) {
-		// try to find the led output report
-		HIDParser *parser = device->Parser();
-		uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_OUTPUT);
-		for (uint32  i = 0; i < reportCount; i++) {
-			output = parser->ReportAt(HID_REPORT_TYPE_OUTPUT, i);
-
-			for (uint32 j = 0; j < output->CountItems(); j++) {
-				HIDReportItem *item = output->ItemAt(j);
-				if (item->UsagePage() == B_HID_USAGE_PAGE_LED) {
-					foundOutputReport = true;
-					break;
-				}
-			}
-
-			if (foundOutputReport)
-				break;
-		}
+	if (!handled) {
+		TRACE("collection not a supported keyboard subset\n");
+		return;
 	}
 
-	return new(std::nothrow) KeyboardDevice(input,
-		foundOutputReport ? output : NULL);
+	HIDParser &parser = device.Parser();
+	uint32 maxReportCount = parser.CountReports(HID_REPORT_TYPE_INPUT);
+	if (maxReportCount == 0)
+		return;
+
+	uint32 inputReportCount = 0;
+	HIDReport *inputReports[maxReportCount];
+	collection.BuildReportList(HID_REPORT_TYPE_INPUT, inputReports,
+		inputReportCount);
+
+	TRACE("input report count: %lu\n", inputReportCount);
+
+	for (uint32 i = 0; i < inputReportCount; i++) {
+		HIDReport *inputReport = inputReports[i];
+
+		bool mayHaveOutput = false;
+		bool foundKeyboardUsage = false;
+		for (uint32 j = 0; j < inputReport->CountItems(); j++) {
+			HIDReportItem *item = inputReport->ItemAt(j);
+			if (!item->HasData())
+				continue;
+
+			if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
+				|| (item->UsagePage() == B_HID_USAGE_PAGE_CONSUMER
+					&& item->Array())
+				|| (item->UsagePage() == B_HID_USAGE_PAGE_BUTTON
+					&& item->Array())) {
+				// found at least one item with a keyboard usage or with
+				// a consumer/button usage that is handled like a key
+				mayHaveOutput = item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD;
+				foundKeyboardUsage = true;
+				break;
+			}
+		}
+
+		if (!foundKeyboardUsage)
+			continue;
+
+		bool foundOutputReport = false;
+		HIDReport *outputReport = NULL;
+		do {
+			// try to find the led output report
+			maxReportCount =  parser.CountReports(HID_REPORT_TYPE_OUTPUT);
+			if (maxReportCount == 0)
+				break;
+
+			uint32 outputReportCount = 0;
+			HIDReport *outputReports[maxReportCount];
+			collection.BuildReportList(HID_REPORT_TYPE_OUTPUT,
+				outputReports, outputReportCount);
+
+			for (uint32  j = 0; j < outputReportCount; j++) {
+				outputReport = outputReports[j];
+
+				for (uint32 k = 0; k < outputReport->CountItems(); k++) {
+					HIDReportItem *item = outputReport->ItemAt(k);
+					if (item->UsagePage() == B_HID_USAGE_PAGE_LED) {
+						foundOutputReport = true;
+						break;
+					}
+				}
+
+				if (foundOutputReport)
+					break;
+			}
+		} while (false);
+
+		ProtocolHandler *newHandler = new(std::nothrow) KeyboardProtocolHandler(
+			*inputReport, foundOutputReport ? outputReport : NULL);
+		if (newHandler == NULL) {
+			TRACE("failed to allocated keyboard protocol handler\n");
+			continue;
+		}
+
+		newHandler->SetNextHandler(handlerList);
+		handlerList = newHandler;
+	}
 }
 
 
 status_t
-KeyboardDevice::Open(uint32 flags, uint32 *cookie)
+KeyboardProtocolHandler::Open(uint32 flags, uint32 *cookie)
 {
 	status_t status = ProtocolHandler::Open(flags, cookie);
 	if (status != B_OK) {
@@ -226,7 +291,7 @@ KeyboardDevice::Open(uint32 flags, uint32 *cookie)
 
 
 status_t
-KeyboardDevice::Close(uint32 *cookie)
+KeyboardProtocolHandler::Close(uint32 *cookie)
 {
 	if ((*cookie & KEYBOARD_FLAG_DEBUGGER) != 0)
 		fHasDebugReader = false;
@@ -238,7 +303,8 @@ KeyboardDevice::Close(uint32 *cookie)
 
 
 status_t
-KeyboardDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
+KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
+	size_t length)
 {
 	switch (op) {
 		case KB_READ:
@@ -347,7 +413,7 @@ KeyboardDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 
 
 void
-KeyboardDevice::_WriteKey(uint32 key, bool down)
+KeyboardProtocolHandler::_WriteKey(uint32 key, bool down)
 {
 	raw_key_info info;
 	info.keycode = key;
@@ -358,7 +424,7 @@ KeyboardDevice::_WriteKey(uint32 key, bool down)
 
 
 status_t
-KeyboardDevice::_SetLEDs(uint8 *data)
+KeyboardProtocolHandler::_SetLEDs(uint8 *data)
 {
 	if (fOutputReport == NULL || fOutputReport->Device()->IsRemoved())
 		return B_ERROR;
@@ -375,11 +441,11 @@ KeyboardDevice::_SetLEDs(uint8 *data)
 
 
 status_t
-KeyboardDevice::_ReadReport(bigtime_t timeout)
+KeyboardProtocolHandler::_ReadReport(bigtime_t timeout)
 {
-	status_t result = fInputReport->WaitForReport(timeout);
+	status_t result = fInputReport.WaitForReport(timeout);
 	if (result != B_OK) {
-		if (fInputReport->Device()->IsRemoved()) {
+		if (fInputReport.Device()->IsRemoved()) {
 			TRACE("device has been removed\n");
 			return B_ERROR;
 		}
@@ -420,7 +486,7 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 			fCurrentKeys[i] = 0;
 	}
 
-	fInputReport->DoneProcessing();
+	fInputReport.DoneProcessing();
 
 	static const uint32 kModifierTable[] = {
 		KEY_ControlL,
@@ -643,9 +709,9 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 					&& (fLastModifiers & ALT_KEYS) != 0) {
 					// Alt-SysReq+letter was pressed
 					sDebugKeyboardPipe
-						= fInputReport->Device()->InterruptPipe();
+						= fInputReport.Device()->InterruptPipe();
 					sDebugKeyboardReportSize
-						= fInputReport->Parser()->MaxReportSize();
+						= fInputReport.Parser()->MaxReportSize();
 
 					char letter = current[i] - 4 + 'a';
 

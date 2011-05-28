@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,14 +8,15 @@
 #include <ring_buffer.h>
 
 #include "Driver.h"
+#include "HIDCollection.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
 #include "ProtocolHandler.h"
 
 // includes for the different protocol handlers
-#include "KeyboardDevice.h"
-#include "MouseDevice.h"
-//#include "GenericDevice.h"
+#include "KeyboardProtocolHandler.h"
+#include "MouseProtocolHandler.h"
+//#include "JoystickProtocolHandler.h"
 
 
 ProtocolHandler::ProtocolHandler(HIDDevice *device, const char *basePath,
@@ -24,7 +25,8 @@ ProtocolHandler::ProtocolHandler(HIDDevice *device, const char *basePath,
 		fDevice(device),
 		fBasePath(basePath),
 		fPublishPath(NULL),
-		fRingBuffer(NULL)
+		fRingBuffer(NULL),
+		fNextHandler(NULL)
 {
 	if (ringBufferSize > 0) {
 		fRingBuffer = create_ring_buffer(ringBufferSize);
@@ -59,47 +61,48 @@ ProtocolHandler::SetPublishPath(char *publishPath)
 
 
 void
-ProtocolHandler::AddHandlers(HIDDevice *device, ProtocolHandler ***handlerList,
-	uint32 *handlerCount)
+ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
+	uint32 &handlerCount)
 {
 	TRACE("adding protocol handlers\n");
 
-	HIDParser *parser = device->Parser();
-	uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_INPUT);
-
-	*handlerCount = 0;
-	*handlerList = (ProtocolHandler **)malloc(sizeof(ProtocolHandler *)
-		* reportCount * 2 /* handler type count */);
-	if (*handlerList == NULL) {
-		TRACE_ALWAYS("out of memory allocating handler list\n");
+	HIDParser &parser = device.Parser();
+	HIDCollection *rootCollection = parser.RootCollection();
+	if (rootCollection == NULL)
 		return;
+
+	uint32 appCollectionCount = rootCollection->CountChildrenFlat(
+		COLLECTION_APPLICATION);
+	TRACE("root collection holds %lu application collection%s\n",
+		appCollectionCount, appCollectionCount != 1 ? "s" : "");
+
+	handlerCount = 0;
+	for (uint32  i = 0; i < appCollectionCount; i++) {
+		HIDCollection *collection = rootCollection->ChildAtFlat(
+			COLLECTION_APPLICATION, i);
+		if (collection == NULL)
+			continue;
+
+		TRACE("collection usage page %u usage id %u\n",
+			collection->UsagePage(), collection->UsageID());
+
+		KeyboardProtocolHandler::AddHandlers(device, *collection, handlerList);
+		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
+		//JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
 	}
 
-	uint32 usedCount = 0;
-	ProtocolHandler *handler = NULL;
-	for (uint32  i = 0; i < reportCount; i++) {
-		HIDReport *report = parser->ReportAt(HID_REPORT_TYPE_INPUT, i);
-
-		handler = KeyboardDevice::AddHandler(device, report);
-		if (handler != NULL)
-			(*handlerList)[usedCount++] = handler;
-		handler = MouseDevice::AddHandler(device, report);
-		if (handler != NULL)
-			(*handlerList)[usedCount++] = handler;
+	ProtocolHandler *handler = handlerList;
+	while (handler != NULL) {
+		handler = handler->NextHandler();
+		handlerCount++;
 	}
 
-	if (usedCount == 0) {
+	if (handlerCount == 0) {
 		TRACE_ALWAYS("no handlers for hid device\n");
 		return;
 	}
 
-	*handlerCount = usedCount;
-	ProtocolHandler **shrunkList = (ProtocolHandler **)realloc(
-		*handlerList, sizeof(ProtocolHandler *) * usedCount);
-	if (shrunkList != NULL)
-		*handlerList = shrunkList;
-
-	TRACE("added %ld handlers for hid device\n", *handlerCount);
+	TRACE("added %ld handlers for hid device\n", handlerCount);
 }
 
 
@@ -145,4 +148,11 @@ ProtocolHandler::RingBufferWrite(const void *buffer, size_t length)
 {
 	ring_buffer_write(fRingBuffer, (const uint8 *)buffer, length);
 	return B_OK;
+}
+
+
+void
+ProtocolHandler::SetNextHandler(ProtocolHandler *nextHandler)
+{
+	fNextHandler = nextHandler;
 }

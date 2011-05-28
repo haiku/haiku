@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 
@@ -62,7 +62,14 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 		return B_NO_MEMORY;
 	}
 
-	HIDCollection *collection = NULL;
+	fRootCollection = new(std::nothrow) HIDCollection(NULL, COLLECTION_LOGICAL,
+		localState);
+	if (fRootCollection == NULL) {
+		TRACE_ALWAYS("no memory to allocate root collection\n");
+		return B_NO_MEMORY;
+	}
+
+	HIDCollection *collection = fRootCollection;
 	const uint8 *pointer = reportDescriptor;
 	const uint8 *end = pointer + descriptorLength;
 
@@ -138,14 +145,10 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						break;
 					}
 
-					if (collection == NULL)
-						fRootCollection = newCollection;
-					else
-						collection->AddChild(newCollection);
-
+					collection->AddChild(newCollection);
 					collection = newCollection;
 				} else if (item->tag == ITEM_TAG_MAIN_END_COLLECTION) {
-					if (collection == NULL) {
+					if (collection == fRootCollection) {
 						TRACE_ALWAYS("end collection with no open one\n");
 						break;
 					}

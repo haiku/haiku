@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PROTOCOL_HANDLER_H
@@ -28,9 +28,9 @@ public:
 			void				SetPublishPath(char *publishPath);
 			const char *		PublishPath() { return fPublishPath; }
 
-	static	void				AddHandlers(HIDDevice *device,
-									ProtocolHandler ***handlerList,
-									uint32 *handlerCount);
+	static	void				AddHandlers(HIDDevice &device,
+									ProtocolHandler *&handlerList,
+									uint32 &handlerCount);
 
 	virtual	status_t			Open(uint32 flags, uint32 *cookie);
 	virtual	status_t			Close(uint32 *cookie);
@@ -43,6 +43,9 @@ public:
 			status_t			RingBufferWrite(const void *buffer,
 									size_t length);
 
+			void				SetNextHandler(ProtocolHandler *next);
+			ProtocolHandler *	NextHandler() { return fNextHandler; };
+
 protected:
 			status_t			fStatus;
 
@@ -51,6 +54,8 @@ private:
 			const char *		fBasePath;
 			char *				fPublishPath;
 			struct ring_buffer *fRingBuffer;
+
+			ProtocolHandler *	fNextHandler;
 };
 
 

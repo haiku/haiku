@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011, Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
 #ifndef USB_HID_DEVICE_H
@@ -38,7 +38,7 @@ public:
 
 			status_t			SendReport(HIDReport *report);
 
-			HIDParser *			Parser() { return &fParser; }
+			HIDParser &			Parser() { return fParser; }
 			ProtocolHandler *	ProtocolHandlerAt(uint32 index) const;
 
 			// only to be used for the kernel debugger information
@@ -66,7 +66,7 @@ private:
 			HIDParser			fParser;
 
 			uint32				fProtocolHandlerCount;
-			ProtocolHandler **	fProtocolHandlers;
+			ProtocolHandler *	fProtocolHandlerList;
 };
 
 

@@ -1,9 +1,9 @@
 /*
- * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
-#ifndef USB_MOUSE_DEVICE_H
-#define USB_MOUSE_DEVICE_H
+#ifndef USB_MOUSE_PROTOCOL_HANDLER_H
+#define USB_MOUSE_PROTOCOL_HANDLER_H
 
 
 #include <InterfaceDefs.h>
@@ -11,6 +11,7 @@
 #include "ProtocolHandler.h"
 
 
+class HIDCollection;
 class HIDReportItem;
 
 
@@ -19,13 +20,14 @@ class HIDReportItem;
 #endif
 
 
-class MouseDevice : public ProtocolHandler {
+class MouseProtocolHandler : public ProtocolHandler {
 public:
-								MouseDevice(HIDReport *report,
-									HIDReportItem *xAxis, HIDReportItem *yAxis);
+								MouseProtocolHandler(HIDReport &report,
+									HIDReportItem &xAxis, HIDReportItem &yAxis);
 
-	static	ProtocolHandler *	AddHandler(HIDDevice *device,
-									HIDReport *report);
+	static	void				AddHandlers(HIDDevice &device,
+									HIDCollection &collection,
+									ProtocolHandler *&handlerList);
 
 	virtual	status_t			Control(uint32 *cookie, uint32 op, void *buffer,
 									size_t length);
@@ -34,10 +36,10 @@ private:
 			status_t			_ReadReport();
 
 private:
-			HIDReport *			fReport;
+			HIDReport &			fReport;
 
-			HIDReportItem *		fXAxis;
-			HIDReportItem *		fYAxis;
+			HIDReportItem &		fXAxis;
+			HIDReportItem &		fYAxis;
 			HIDReportItem *		fWheel;
 			HIDReportItem *		fButtons[B_MAX_MOUSE_BUTTONS];
 
@@ -47,4 +49,4 @@ private:
 			bigtime_t			fClickSpeed;
 };
 
-#endif // USB_MOUSE_DEVICE_H
+#endif // USB_MOUSE_PROTOCOL_HANDLER_H

@@ -10,12 +10,13 @@ KernelAddon usb_hid :
 	DeviceList.cpp
 	Driver.cpp
 	HIDDevice.cpp
-	KeyboardDevice.cpp
-	MouseDevice.cpp
-	ProtocolHandler.cpp
 
 	HIDCollection.cpp
 	HIDParser.cpp
 	HIDReport.cpp
 	HIDReportItem.cpp
+
+	ProtocolHandler.cpp
+	KeyboardProtocolHandler.cpp
+	MouseProtocolHandler.cpp
 ;

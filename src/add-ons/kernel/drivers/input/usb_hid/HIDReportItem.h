@@ -17,6 +17,8 @@ public:
 									uint32 minimum, uint32 maximum,
 									uint32 usageMinimum, uint32 usageMaximum);
 
+		HIDReport *				Report() { return fReport; };
+
 		bool					HasData() { return fHasData; };
 		bool					Relative() { return fRelative; };
 		bool					Array() { return fArray; };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HID_DATA_TYPES_H
@@ -51,6 +51,7 @@
 #define COLLECTION_NAMED_ARRAY				0x04
 #define COLLECTION_USAGE_SWITCH				0x05
 #define COLLECTION_USAGE_MODIFIER			0x06
+#define COLLECTION_ALL						0xff
 
 #define UNIT_SYSTEM							0x0
 #define UNIT_LENGTH							0x1

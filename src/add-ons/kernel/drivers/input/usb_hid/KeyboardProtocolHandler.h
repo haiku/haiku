@@ -1,9 +1,9 @@
 /*
- * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
-#ifndef USB_KEYBOARD_DEVICE_H
-#define USB_KEYBOARD_DEVICE_H
+#ifndef USB_KEYBOARD_PROTOCOL_HANDLER_H
+#define USB_KEYBOARD_PROTOCOL_HANDLER_H
 
 
 #include "ProtocolHandler.h"
@@ -12,6 +12,7 @@
 
 
 class HIDReportItem;
+class HIDCollection;
 
 
 #define MAX_MODIFIERS	16
@@ -19,14 +20,15 @@ class HIDReportItem;
 #define MAX_LEDS		3
 
 
-class KeyboardDevice : public ProtocolHandler {
+class KeyboardProtocolHandler : public ProtocolHandler {
 public:
-								KeyboardDevice(HIDReport *inputReport,
+								KeyboardProtocolHandler(HIDReport &inputReport,
 									HIDReport *outputReport);
-	virtual						~KeyboardDevice();
+	virtual						~KeyboardProtocolHandler();
 
-	static	ProtocolHandler *	AddHandler(HIDDevice *device,
-									HIDReport *input);
+	static	void				AddHandlers(HIDDevice &device,
+									HIDCollection &collection,
+									ProtocolHandler *&handlerList);
 
 	virtual	status_t			Open(uint32 flags, uint32 *cookie);
 	virtual	status_t			Close(uint32 *cookie);
@@ -42,7 +44,7 @@ private:
 private:
 			mutex				fLock;
 
-			HIDReport *			fInputReport;
+			HIDReport &			fInputReport;
 			HIDReport *			fOutputReport;
 
 			HIDReportItem *		fModifiers[MAX_MODIFIERS];
@@ -66,4 +68,4 @@ private:
 };
 
 
-#endif // USB_KEYBOARD_DEVICE_H
+#endif // USB_KEYBOARD_PROTOCOL_HANDLER_H

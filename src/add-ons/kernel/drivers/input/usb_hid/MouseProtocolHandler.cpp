@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
 
@@ -8,8 +8,9 @@
 
 
 #include "Driver.h"
-#include "MouseDevice.h"
+#include "MouseProtocolHandler.h"
 
+#include "HIDCollection.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
 #include "HIDReportItem.h"
@@ -21,10 +22,10 @@
 #include <keyboard_mouse_driver.h>
 
 
-MouseDevice::MouseDevice(HIDReport *report, HIDReportItem *xAxis,
-	HIDReportItem *yAxis)
+MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
+	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report->Device(), "input/mouse/usb/", 512),
+	ProtocolHandler(report.Device(), "input/mouse/usb/", 512),
 	fReport(report),
 	fXAxis(xAxis),
 	fYAxis(yAxis),
@@ -35,47 +36,77 @@ MouseDevice::MouseDevice(HIDReport *report, HIDReportItem *xAxis,
 	fClickSpeed(250000)
 {
 	uint32 buttonCount = 0;
-	for (uint32 i = 0; i < report->CountItems(); i++) {
-		HIDReportItem *item = report->ItemAt(i);
+	for (uint32 i = 0; i < report.CountItems(); i++) {
+		HIDReportItem *item = report.ItemAt(i);
 		if (!item->HasData())
 			continue;
 
 		if (item->UsagePage() == B_HID_USAGE_PAGE_BUTTON
-			&& item->UsageID() - 1 < B_MAX_MOUSE_BUTTONS)
+			&& item->UsageID() - 1 < B_MAX_MOUSE_BUTTONS) {
 			fButtons[buttonCount++] = item;
+		}
 	}
 
 	fButtons[buttonCount] = NULL;
 
-	fWheel = report->FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
+	fWheel = report.FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
 		B_HID_UID_GD_WHEEL);
 
 	TRACE("mouse device with %lu buttons and %swheel\n", buttonCount,
 		fWheel == NULL ? "no " : "");
-	TRACE("report id: %u\n", report->ID());
+	TRACE("report id: %u\n", report.ID());
 }
 
 
-ProtocolHandler *
-MouseDevice::AddHandler(HIDDevice *device, HIDReport *report)
+void
+MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
+	ProtocolHandler *&handlerList)
 {
-	// try to find at least an x and y axis
-	HIDReportItem *xAxis = report->FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
-		B_HID_UID_GD_X);
-	if (xAxis == NULL)
-		return NULL;
+	if (collection.UsagePage() != B_HID_USAGE_PAGE_GENERIC_DESKTOP
+		|| collection.UsageID() != B_HID_UID_GD_MOUSE) {
+		TRACE("collection not a mouse\n");
+		return;
+	}
 
-	HIDReportItem *yAxis = report->FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
-		B_HID_UID_GD_Y);
-	if (yAxis == NULL)
-		return NULL;
+	HIDParser &parser = device.Parser();
+	uint32 maxReportCount = parser.CountReports(HID_REPORT_TYPE_INPUT);
+	if (maxReportCount == 0)
+		return;
 
-	return new(std::nothrow) MouseDevice(report, xAxis, yAxis);
+	uint32 inputReportCount = 0;
+	HIDReport *inputReports[maxReportCount];
+	collection.BuildReportList(HID_REPORT_TYPE_INPUT, inputReports,
+		inputReportCount);
+
+	for (uint32 i = 0; i < inputReportCount; i++) {
+		HIDReport *inputReport = inputReports[i];
+
+		// try to find at least an x and y axis
+		HIDReportItem *xAxis = inputReport->FindItem(
+			B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
+		if (xAxis == NULL)
+			continue;
+
+		HIDReportItem *yAxis = inputReport->FindItem(
+			B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_Y);
+		if (yAxis == NULL)
+			continue;
+
+		ProtocolHandler *newHandler = new(std::nothrow) MouseProtocolHandler(
+			*inputReport, *xAxis, *yAxis);
+		if (newHandler == NULL) {
+			TRACE("failed to allocated mouse protocol handler\n");
+			continue;
+		}
+
+		newHandler->SetNextHandler(handlerList);
+		handlerList = newHandler;
+	}
 }
 
 
 status_t
-MouseDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
+MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
 		case MS_READ:
@@ -90,7 +121,7 @@ MouseDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 		case MS_NUM_EVENTS:
 		{
 			int32 count = RingBufferReadable() / sizeof(mouse_movement);
-			if (count == 0 && fReport->Device()->IsRemoved())
+			if (count == 0 && fReport.Device()->IsRemoved())
 				return B_DEV_NOT_READY;
 			return count;
 		}
@@ -109,11 +140,11 @@ MouseDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 
 
 status_t
-MouseDevice::_ReadReport()
+MouseProtocolHandler::_ReadReport()
 {
-	status_t result = fReport->WaitForReport(B_INFINITE_TIMEOUT);
+	status_t result = fReport.WaitForReport(B_INFINITE_TIMEOUT);
 	if (result != B_OK) {
-		if (fReport->Device()->IsRemoved()) {
+		if (fReport.Device()->IsRemoved()) {
 			TRACE("device has been removed\n");
 			return B_DEV_NOT_READY;
 		}
@@ -131,10 +162,10 @@ MouseDevice::_ReadReport()
 	mouse_movement info;
 	memset(&info, 0, sizeof(info));
 
-	if (fXAxis->Extract() == B_OK && fXAxis->Valid())
-		info.xdelta = fXAxis->Data();
-	if (fYAxis->Extract() == B_OK && fYAxis->Valid())
-		info.ydelta = -fYAxis->Data();
+	if (fXAxis.Extract() == B_OK && fXAxis.Valid())
+		info.xdelta = fXAxis.Data();
+	if (fYAxis.Extract() == B_OK && fYAxis.Valid())
+		info.ydelta = -fYAxis.Data();
 
 	if (fWheel != NULL && fWheel->Extract() == B_OK && fWheel->Valid())
 		info.wheel_ydelta = -fWheel->Data();
@@ -148,7 +179,7 @@ MouseDevice::_ReadReport()
 			info.buttons |= (button->Data() & 1) << (button->UsageID() - 1);
 	}
 
-	fReport->DoneProcessing();
+	fReport.DoneProcessing();
 	TRACE("got mouse report\n");
 
 	bigtime_t timestamp = system_time();

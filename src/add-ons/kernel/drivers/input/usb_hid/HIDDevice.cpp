@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011, Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
 
@@ -35,7 +35,7 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		fRemoved(false),
 		fParser(this),
 		fProtocolHandlerCount(0),
-		fProtocolHandlers(NULL)
+		fProtocolHandlerList(NULL)
 {
 	uint8 *reportDescriptor = NULL;
 	size_t descriptorLength = 0;
@@ -166,18 +166,21 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		return;
 	}
 
-	ProtocolHandler::AddHandlers(this, &fProtocolHandlers,
-		&fProtocolHandlerCount);
+	ProtocolHandler::AddHandlers(*this, fProtocolHandlerList,
+		fProtocolHandlerCount);
 	fStatus = B_OK;
 }
 
 
 HIDDevice::~HIDDevice()
 {
-	for (uint32 i = 0; i < fProtocolHandlerCount; i++)
-		delete fProtocolHandlers[i];
+	ProtocolHandler *handler = fProtocolHandlerList;
+	while (handler != NULL) {
+		ProtocolHandler *next = handler->NextHandler();
+		delete handler;
+		handler = next;
+	}
 
-	free(fProtocolHandlers);
 	free(fTransferBuffer);
 }
 
@@ -250,9 +253,16 @@ HIDDevice::SendReport(HIDReport *report)
 ProtocolHandler *
 HIDDevice::ProtocolHandlerAt(uint32 index) const
 {
-	if (index >= fProtocolHandlerCount)
-		return NULL;
-	return fProtocolHandlers[index];
+	ProtocolHandler *handler = fProtocolHandlerList;
+	while (handler != NULL) {
+		if (index == 0)
+			return handler;
+
+		handler = handler->NextHandler();
+		index--;
+	}
+
+	return NULL;
 }
 
 
