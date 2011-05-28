@@ -47,6 +47,7 @@ const struct supported_device {
 	{0x94c1, RADEON_R600 | 0x10, "Radeon HD 2400"},	/*RV610, IGP*/
 	{0x94c3, RADEON_R600 | 0x10, "Radeon HD 2400"},	/*RV610*/
 	{0x94cc, RADEON_R600 | 0x10, "Radeon HD 2400"},	/*RV610*/
+	{0x9586, RADEON_R600 | 0x30, "Radeon HD 2600"},	/*RV630*/
 	{0x9588, RADEON_R600 | 0x30, "Radeon HD 2600"},	/*RV630*/
 	{0x958a, RADEON_R600 | 0x30, "Radeon HD 2600 X2"}, /*RV630*/
 	//	Radeon 2700		- RV630
