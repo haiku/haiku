@@ -26,6 +26,7 @@ class TQuitTest : public TestCase
 		TQuitTest(std::string name) : TestCase(name) {;}
 
 		void QuitTest1();
+		void QuitTest2();
 
 		static TestSuite* Suite();
 };
