@@ -188,7 +188,7 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	if [ "$stripOptionalPackageDebugSymbols" == "1" ]; then
+	if [ "$stripOptionalPackageDebugSymbols" = "1" ]; then
 		# strip executables in common/bin
 		if [ -d $extractDir/common/bin ]; then
 			for file in `find $extractDir/common/bin -type f -a -perm +100 \
