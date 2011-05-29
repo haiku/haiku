@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2008, Intel Corporation 
+  Copyright (c) 2001-2010, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/e1000_api.h,v 1.1.2.2 2008/12/01 07:13:52 jfv Exp $*/
+/*$FreeBSD$*/
 
 #ifndef _E1000_API_H_
 #define _E1000_API_H_
@@ -47,6 +47,7 @@ extern void    e1000_init_function_pointers_ich8lan(struct e1000_hw *hw);
 extern void    e1000_init_function_pointers_82575(struct e1000_hw *hw);
 extern void    e1000_rx_fifo_flush_82575(struct e1000_hw *hw);
 extern void    e1000_init_function_pointers_vf(struct e1000_hw *hw);
+extern void    e1000_power_up_fiber_serdes_link(struct e1000_hw *hw);
 extern void    e1000_shutdown_fiber_serdes_link(struct e1000_hw *hw);
 
 s32  e1000_set_mac_type(struct e1000_hw *hw);
@@ -54,6 +55,7 @@ s32  e1000_setup_init_funcs(struct e1000_hw *hw, bool init_device);
 s32  e1000_init_mac_params(struct e1000_hw *hw);
 s32  e1000_init_nvm_params(struct e1000_hw *hw);
 s32  e1000_init_phy_params(struct e1000_hw *hw);
+s32  e1000_init_mbx_params(struct e1000_hw *hw);
 s32  e1000_get_bus_info(struct e1000_hw *hw);
 void e1000_clear_vfta(struct e1000_hw *hw);
 void e1000_write_vfta(struct e1000_hw *hw, u32 offset, u32 value);
@@ -67,17 +69,16 @@ s32  e1000_get_speed_and_duplex(struct e1000_hw *hw, u16 *speed,
 s32  e1000_disable_pcie_master(struct e1000_hw *hw);
 void e1000_config_collision_dist(struct e1000_hw *hw);
 void e1000_rar_set(struct e1000_hw *hw, u8 *addr, u32 index);
-void e1000_mta_set(struct e1000_hw *hw, u32 hash_value);
 u32  e1000_hash_mc_addr(struct e1000_hw *hw, u8 *mc_addr);
 void e1000_update_mc_addr_list(struct e1000_hw *hw,
-                               u8 *mc_addr_list, u32 mc_addr_count,
-                               u32 rar_used_count, u32 rar_count);
+                               u8 *mc_addr_list, u32 mc_addr_count);
 s32  e1000_setup_led(struct e1000_hw *hw);
 s32  e1000_cleanup_led(struct e1000_hw *hw);
 s32  e1000_check_reset_block(struct e1000_hw *hw);
 s32  e1000_blink_led(struct e1000_hw *hw);
 s32  e1000_led_on(struct e1000_hw *hw);
 s32  e1000_led_off(struct e1000_hw *hw);
+s32 e1000_id_led_init(struct e1000_hw *hw);
 void e1000_reset_adaptive(struct e1000_hw *hw);
 void e1000_update_adaptive(struct e1000_hw *hw);
 s32  e1000_get_cable_length(struct e1000_hw *hw);
@@ -95,7 +96,9 @@ s32  e1000_phy_commit(struct e1000_hw *hw);
 void e1000_power_up_phy(struct e1000_hw *hw);
 void e1000_power_down_phy(struct e1000_hw *hw);
 s32  e1000_read_mac_addr(struct e1000_hw *hw);
-s32  e1000_read_pba_num(struct e1000_hw *hw, u32 *part_num);
+s32  e1000_read_pba_string(struct e1000_hw *hw, u8 *pba_num, 
+                           u32 pba_num_size);
+s32  e1000_read_pba_length(struct e1000_hw *hw, u32 *pba_num_size);
 void e1000_reload_nvm(struct e1000_hw *hw);
 s32  e1000_update_nvm_checksum(struct e1000_hw *hw);
 s32  e1000_validate_nvm_checksum(struct e1000_hw *hw);

@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2008, Intel Corporation 
+  Copyright (c) 2001-2010, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/e1000_nvm.h,v 1.1.2.1 2008/08/11 18:33:10 jfv Exp $*/
+/*$FreeBSD$*/
 
 #ifndef _E1000_NVM_H_
 #define _E1000_NVM_H_
@@ -44,7 +44,9 @@ s32  e1000_acquire_nvm_generic(struct e1000_hw *hw);
 
 s32  e1000_poll_eerd_eewr_done(struct e1000_hw *hw, int ee_reg);
 s32  e1000_read_mac_addr_generic(struct e1000_hw *hw);
-s32  e1000_read_pba_num_generic(struct e1000_hw *hw, u32 *pba_num);
+s32  e1000_read_pba_string_generic(struct e1000_hw *hw, u8 *pba_num,
+                                   u32 pba_num_size);
+s32  e1000_read_pba_length_generic(struct e1000_hw *hw, u32 *pba_num_size);
 s32  e1000_read_nvm_spi(struct e1000_hw *hw, u16 offset, u16 words, u16 *data);
 s32  e1000_read_nvm_microwire(struct e1000_hw *hw, u16 offset,
                               u16 words, u16 *data);
@@ -61,7 +63,6 @@ s32  e1000_write_nvm_spi(struct e1000_hw *hw, u16 offset, u16 words,
 s32  e1000_update_nvm_checksum_generic(struct e1000_hw *hw);
 void e1000_stop_nvm(struct e1000_hw *hw);
 void e1000_release_nvm_generic(struct e1000_hw *hw);
-void e1000_reload_nvm_generic(struct e1000_hw *hw);
 
 #define E1000_STM_OPCODE  0xDB00
 
