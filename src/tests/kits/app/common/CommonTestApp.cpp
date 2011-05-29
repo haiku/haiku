@@ -1,6 +1,7 @@
 // CommonTestApp.cpp
 
 #include <stdio.h>
+#include <cstring>
 
 #include <OS.h>
 

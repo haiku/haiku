@@ -41,7 +41,7 @@ PipedAppRunner::Run(const char *command, const char *args, bool findCommand)
 	if (findCommand) {
 		appPath = BTestShell::GlobalTestDir();
 		appPath.CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
-		appPath += "/../kits/app/";
+		appPath += "/";
 		appPath += command;
 		#ifdef TEST_R5
 			appPath += "_r5";

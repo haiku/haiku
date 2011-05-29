@@ -288,7 +288,7 @@ find_test_app(const char *testApp, BString *path)
 	if (error == B_OK) {
 		*path = BTestShell::GlobalTestDir();
 		path->CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
-		*path += "/../kits/app/";
+		*path += "/";
 		*path += testApp;
 		#ifdef TEST_R5
 			*path += "_r5";
