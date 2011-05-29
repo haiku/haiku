@@ -1206,6 +1206,10 @@ void
 BLooper::_QuitRequested(BMessage* message)
 {
 	bool isQuitting = QuitRequested();
+	int32 thread = fThread;
+
+	if (isQuitting)
+		Quit();
 
 	// We send a reply to the sender, when they're waiting for a reply or
 	// if the request message contains a boolean "_shutdown_" field with value
@@ -1216,12 +1220,9 @@ BLooper::_QuitRequested(BMessage* message)
 		|| (message->FindBool("_shutdown_", &shutdown) == B_OK && shutdown)) {
 		BMessage replyMsg(B_REPLY);
 		replyMsg.AddBool("result", isQuitting);
-		replyMsg.AddInt32("thread", fThread);
+		replyMsg.AddInt32("thread", thread);
 		message->SendReply(&replyMsg);
 	}
-
-	if (isQuitting)
-		Quit();
 }
 
 
