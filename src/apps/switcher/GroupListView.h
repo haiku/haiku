@@ -21,16 +21,6 @@ public:
 };
 
 
-template<typename ItemType, typename GroupType>
-class TypedGroupListModel : public GroupListModel {
-public:
-	virtual ItemType*			ItemAt(int32 index) = 0;
-
-	virtual GroupType*			GroupAt(int32 index) = 0;
-	virtual GroupType*			GroupForItemAt(int32 index) = 0;
-};
-
-
 class ListItemRenderer {
 public:
 	virtual void				SetTo(BView* owner, void* item) = 0;

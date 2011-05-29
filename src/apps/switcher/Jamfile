@@ -11,6 +11,7 @@ Application Switcher :
 	Switcher.cpp
 	WindowsView.cpp
 
-	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) libshared.a
+	: be translation $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+		$(HAIKU_LOCALE_LIBS) libshared.a
 	: Switcher.rdef
 ;

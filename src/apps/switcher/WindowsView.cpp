@@ -24,7 +24,7 @@
 static const uint32 kMsgActivateWindow = 'AcWn';
 
 
-class WindowModel : public TypedGroupListModel<client_window_info, void> {
+class WindowModel : public GroupListModel {
 public:
 	WindowModel(team_id team)
 		:
@@ -86,7 +86,7 @@ public:
 		return fWindows.CountItems();
 	}
 
-	virtual client_window_info* ItemAt(int32 index)
+	virtual void* ItemAt(int32 index)
 	{
 		return fWindows.ItemAt(index);
 	}
@@ -103,7 +103,7 @@ public:
 
 	virtual void* GroupForItemAt(int32 index)
 	{
-		client_window_info* info = ItemAt(index);
+		client_window_info* info = fWindows.ItemAt(index);
 		return (void*)(_NthSetBit(0, info->workspaces) + 1);
 	}
 
