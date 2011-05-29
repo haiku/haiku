@@ -55,8 +55,8 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 # ICU
 
 # Note ICU isn't actually optional, but is still an external package
-HAIKU_ICU_GCC_2_PACKAGE = icu-4.4.1-x86-gcc2-2010-07-26.zip ;
-HAIKU_ICU_GCC_4_PACKAGE = icu-4.4.1-x86-gcc4-2010-07-26.zip ;
+HAIKU_ICU_GCC_2_PACKAGE = icu-4.4.1-r1a3-x86-gcc2-2011-05-29.zip ;
+HAIKU_ICU_GCC_4_PACKAGE = icu-4.4.1-r1a3-x86-gcc4-2011-05-29.zip ;
 HAIKU_ICU_PPC_PACKAGE = icu-4.4.1-ppc-2010-08-17.zip ;
 HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.4.1-2010-07-26.zip ;
 
