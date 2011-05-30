@@ -16,7 +16,8 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
 		AddGroupToHaikuImage party : 101 : user sshd ;
 		HAIKU_IMAGE_HOST_NAME = shredder ;
-		HAIKU_IMAGE_SIZE = 790 ;
+		HAIKU_IMAGE_SIZE = 690 ;
+		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
 
 		AddOptionalHaikuImagePackages TimGMSoundFont TrackerNewTemplates
 			WQY-MicroHei ;
@@ -38,6 +39,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		AddGroupToHaikuImage party : 101 : user sshd ;
 		HAIKU_IMAGE_HOST_NAME = shredder ;
 		HAIKU_IMAGE_SIZE = 500 ;
+		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
 
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip XZ-Utils ;
 		AddOptionalHaikuImagePackages Development Subversion OpenSSH OpenSSL ;

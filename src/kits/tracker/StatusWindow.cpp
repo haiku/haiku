@@ -681,11 +681,16 @@ BStatusView::Draw(BRect updateRect)
 BString
 BStatusView::_DestinationString(float* _width)
 {
-	BString buffer(B_TRANSLATE("To: %dir"));
-	buffer.ReplaceFirst("%dir", fDestDir);
+	if (fDestDir.Length() > 0) {
+		BString buffer(B_TRANSLATE("To: %dir"));
+		buffer.ReplaceFirst("%dir", fDestDir);
 
-	*_width = ceilf(StringWidth(buffer.String()));
-	return buffer;
+		*_width = ceilf(StringWidth(buffer.String()));
+		return buffer;
+	} else {
+		*_width = 0;
+		return BString();	
+	}
 }
 
 

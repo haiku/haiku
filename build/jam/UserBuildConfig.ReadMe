@@ -62,6 +62,9 @@ HAIKU_IMAGE_NAME	= walter.image ;
 HAIKU_IMAGE_DIR		= /tmp ;
 HAIKU_IMAGE_SIZE	= 100 ;
 
+# Enable stripping the debug symbols from optional packages.
+HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
+
 # Set image volume label to "Walter". Default label is "Haiku".
 HAIKU_IMAGE_LABEL	= Walter ;
 

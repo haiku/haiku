@@ -44,6 +44,38 @@ protected:
 
 
 #ifdef USE_SSL
+class InitSSL {
+public:
+	InitSSL()
+	{
+		if (SSL_library_init() != 1) {
+			fInit = false;
+			return;
+		}
+
+		RAND_seed(this, sizeof(InitSSL));
+		/*--- Because we're an add-on loaded at an unpredictable time, all the
+		memory addresses and things contained in ourself are esssentially
+		random. */
+		fInit = true;
+		return;
+	};
+
+
+	status_t
+	InitCheck()
+	{
+		return fInit ? B_OK : B_ERROR;
+	}
+
+private:
+			bool				fInit;
+};
+
+
+static InitSSL gInitSSL;
+
+
 class SSLConnection : public SocketConnection {
 public:
 								SSLConnection();
@@ -60,9 +92,6 @@ private:
 			SSL_CTX*			fCTX;
 			SSL*				fSSL;
 			BIO*				fBIO;
-
-			// ssl seems to be not thread save
-			BLocker				fLocker;
 };
 #endif
 
@@ -255,19 +284,12 @@ SSLConnection::Connect(const char* server, uint32 port)
 	if (fSSL != NULL)
 		Disconnect();
 
-	BAutolock _(fLocker);
+	if (gInitSSL.InitCheck() != B_OK)
+		return B_ERROR;
 
 	status_t status = SocketConnection::Connect(server, port);
 	if (status != B_OK)
 		return status;
-
-	if (SSL_library_init() != 1)
-		return B_ERROR;
-	SSL_load_error_strings();
-	RAND_seed(this, sizeof(SSLConnection));
-	/*--- Because we're an add-on loaded at an unpredictable time, all
-	the memory addresses and things contained in ourself are
-	esssentially random. */
 
 	fCTX = SSL_CTX_new(SSLv23_method());
 	fSSL = SSL_new(fCTX);
@@ -289,7 +311,6 @@ status_t
 SSLConnection::Disconnect()
 {
 	TRACE("SSLConnection::Disconnect()\n");
-	BAutolock _(fLocker);
 
 	if (fSSL)
 		SSL_shutdown(fSSL);
@@ -308,14 +329,11 @@ SSLConnection::Disconnect()
 status_t
 SSLConnection::WaitForData(bigtime_t timeout)
 {
-	fLocker.Lock();
 	if (!fSSL)
 		return B_ERROR;
 	if (SSL_pending(fSSL) > 0) {
-		fLocker.Unlock();
 		return B_OK;
 	}
-	fLocker.Unlock();
 	return SocketConnection::WaitForData(timeout);
 }
 
@@ -323,7 +341,6 @@ SSLConnection::WaitForData(bigtime_t timeout)
 int32
 SSLConnection::Read(char* buffer, uint32 nBytes)
 {
-	BAutolock _(fLocker);
 	if (!fSSL)
 		return B_ERROR;
 	return SSL_read(fSSL, buffer, nBytes);
@@ -333,7 +350,6 @@ SSLConnection::Read(char* buffer, uint32 nBytes)
 int32
 SSLConnection::Write(const char* buffer, uint32 nBytes)
 {
-	BAutolock _(fLocker);
 	if (!fSSL)
 		return B_ERROR;
 	return SSL_write(fSSL, buffer, nBytes);
