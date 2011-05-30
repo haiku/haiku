@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 Haiku Inc. All Rights Reserved.
+ * Copyright 2008-2011 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _WCHAR_H
@@ -59,19 +59,6 @@ extern int		fwscanf(FILE *, const wchar_t *, ...);
 extern wint_t	getwc(FILE *);
 extern wint_t	getwchar(void);
 
-extern int		iswalnum(wint_t);
-extern int		iswalpha(wint_t);
-extern int		iswcntrl(wint_t);
-extern int		iswctype(wint_t, wctype_t);
-extern int		iswdigit(wint_t);
-extern int		iswgraph(wint_t);
-extern int		iswlower(wint_t);
-extern int		iswprint(wint_t);
-extern int		iswpunct(wint_t);
-extern int		iswspace(wint_t);
-extern int		iswupper(wint_t);
-extern int		iswxdigit(wint_t);
-
 extern size_t 	mbrlen(const char *s, size_t n, mbstate_t *ps);
 extern size_t 	mbrtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *ps);
 extern int		mbsinit(const mbstate_t *);
@@ -84,8 +71,6 @@ extern wint_t	putwchar(wchar_t);
 extern int		swprintf(wchar_t *, size_t, const wchar_t *, ...);
 extern int		swscanf(const wchar_t *, const wchar_t *, ...);
 
-extern wint_t	towlower(wint_t);
-extern wint_t	towupper(wint_t);
 extern wint_t	ungetwc(wint_t, FILE *);
 
 extern int		vfwprintf(FILE *, const wchar_t *, va_list);
@@ -126,7 +111,6 @@ extern wchar_t	*wcswcs(const wchar_t *, const wchar_t *);
 extern int		wcswidth(const wchar_t *, size_t);
 extern size_t	wcsxfrm(wchar_t *, const wchar_t *, size_t);
 extern int		wctob(wint_t);
-extern wctype_t	wctype(const char *);
 extern int		wcwidth(wchar_t);
 extern wchar_t	*wmemchr(const wchar_t *, wchar_t, size_t);
 extern int		wmemcmp(const wchar_t *, const wchar_t *, size_t);
