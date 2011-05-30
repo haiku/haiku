@@ -1382,7 +1382,11 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 
 actions BuildFloppyBootImage1
 {
-	haiku_loader_size=`stat -c %s $(>[1])`
+	haiku_loader_size=`stat -c %s "$(>[1])"`
+	if [ $? -ne 0 ] ; then
+		# FreeBSD's stat command don't support -c/--format option
+		haiku_loader_size=`stat -f %s "$(>[1])"`
+	fi
 	archive_image_offset=`echo "$(ARCHIVE_IMAGE_OFFSET) * 1024" | bc`
 	if [ $haiku_loader_size -gt $archive_image_offset ] ; then
 		echo "Error: $(>[1]) is too big ($haiku_loader_size) to fit "
