@@ -380,11 +380,14 @@ IOCache::_TransferRequestLine(IORequest* request, off_t lineOffset,
 			status_t error = _TransferPages(firstMissing - firstPageOffset,
 				missingPages, false, isVIP);
 			if (error != B_OK) {
-				_DiscardPages(firstMissing - firstPageOffset, missingPages);
-
-				dprintf("IOCache: falling back to uncached transfer, offset %"
-					B_PRIiOFF ", length %" B_PRIuSIZE "\n", requestOffset,
+				dprintf("IOCache::_TransferRequestLine(): Failed to read into "
+					"cache (offset: %" B_PRIdOFF ", length: %" B_PRIuSIZE "), "
+					"trying uncached read (offset: %" B_PRIdOFF ", length: %"
+					B_PRIuSIZE ")\n", (off_t)firstMissing * B_PAGE_SIZE,
+					(size_t)missingPages * B_PAGE_SIZE, requestOffset,
 					requestLength);
+
+				_DiscardPages(firstMissing - firstPageOffset, missingPages);
 
 				// Try again using an uncached transfer
 				return _TransferRequestLineUncached(request, lineOffset,
