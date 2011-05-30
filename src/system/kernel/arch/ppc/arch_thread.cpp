@@ -11,9 +11,7 @@
  */
 
 
-#include <arch_thread.h>
-
-#include <arch_cpu.h>
+#include <arch/cpu.h>
 #include <arch/thread.h>
 #include <boot/stage2.h>
 #include <kernel.h>

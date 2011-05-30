@@ -10,8 +10,8 @@
 #include <KernelExport.h>
 
 #include <arch_platform.h>
-#include <arch_thread.h>
 #include <arch/cpu.h>
+#include <arch/thread.h>
 #include <boot/kernel_args.h>
 
 static bool sHasTlbia;

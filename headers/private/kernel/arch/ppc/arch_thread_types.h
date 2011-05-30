@@ -6,7 +6,7 @@
 #define KERNEL_ARCH_PPC_THREAD_TYPES_H
 
 
-#include <SupportDefs.h>
+#include <arch_cpu.h>
 
 
 #define	IFRAME_TRACE_DEPTH 4
