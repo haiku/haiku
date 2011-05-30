@@ -35,6 +35,11 @@ public:
 	virtual	status_t			Open(uint32 flags, uint32 *cookie);
 	virtual	status_t			Close(uint32 *cookie);
 
+	virtual	status_t			Read(uint32 *cookie, off_t position,
+									void *buffer, size_t *numBytes);
+	virtual	status_t			Write(uint32 *cookie, off_t position,
+									const void *buffer, size_t *numBytes);
+
 	virtual	status_t			Control(uint32 *cookie, uint32 op, void *buffer,
 									size_t length);
 

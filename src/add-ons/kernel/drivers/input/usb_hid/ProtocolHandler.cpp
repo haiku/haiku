@@ -121,9 +121,29 @@ ProtocolHandler::Close(uint32 *cookie)
 
 
 status_t
+ProtocolHandler::Read(uint32 *cookie, off_t position, void *buffer,
+	size_t *numBytes)
+{
+	TRACE_ALWAYS("unhandled read on protocol handler\n");
+	*numBytes = 0;
+	return B_ERROR;
+}
+
+
+status_t
+ProtocolHandler::Write(uint32 *cookie, off_t position, const void *buffer,
+	size_t *numBytes)
+{
+	TRACE_ALWAYS("unhandled write on protocol handler\n");
+	*numBytes = 0;
+	return B_ERROR;
+}
+
+
+status_t
 ProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 {
-	TRACE_ALWAYS("control on base class\n");
+	TRACE_ALWAYS("unhandled control on protocol handler\n");
 	return B_ERROR;
 }
 

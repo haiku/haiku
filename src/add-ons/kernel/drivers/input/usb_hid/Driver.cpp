@@ -177,7 +177,7 @@ static status_t
 usb_hid_open(const char *name, uint32 flags, void **_cookie)
 {
 	TRACE("open(%s, %lu, %p)\n", name, flags, _cookie);
-	
+
 	device_cookie *cookie = new(std::nothrow) device_cookie();
 	if (cookie == NULL)
 		return B_NO_MEMORY;
@@ -206,21 +206,25 @@ usb_hid_open(const char *name, uint32 flags, void **_cookie)
 
 
 static status_t
-usb_hid_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
+usb_hid_read(void *_cookie, off_t position, void *buffer, size_t *numBytes)
 {
-	TRACE_ALWAYS("read on hid device\n");
-	*numBytes = 0;
-	return B_ERROR;
+	device_cookie *cookie = (device_cookie *)_cookie;
+
+	TRACE("read(%p, %llu, %p, %p (%lu)\n", cookie, position, buffer, numBytes,
+		numBytes != NULL ? *numBytes : 0);
+	return cookie->handler->Read(&cookie->cookie, position, buffer, numBytes);
 }
 
 
 static status_t
-usb_hid_write(void *cookie, off_t position, const void *buffer,
+usb_hid_write(void *_cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	TRACE_ALWAYS("write on hid device\n");
-	*numBytes = 0;
-	return B_ERROR;
+	device_cookie *cookie = (device_cookie *)_cookie;
+
+	TRACE("write(%p, %llu, %p, %p (%lu)\n", cookie, position, buffer, numBytes,
+		numBytes != NULL ? *numBytes : 0);
+	return cookie->handler->Write(&cookie->cookie, position, buffer, numBytes);
 }
 
 
