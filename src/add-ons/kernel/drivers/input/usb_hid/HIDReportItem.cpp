@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,7 @@ HIDReportItem::HIDReportItem(HIDReport *report, uint32 bitOffset,
 		fByteOffset(bitOffset / 8),
 		fShift(bitOffset % 8),
 		fMask(~(0xffffffff << bitLength)),
+		fBitCount(bitLength),
 		fHasData(hasData),
 		fArray(isArray),
 		fRelative(isRelative),
@@ -111,6 +112,32 @@ HIDReportItem::SetData(uint32 data)
 		fValid = fData >= fMinimum && fData <= fMaximum;
 
 	return fValid ? B_OK : B_BAD_VALUE;
+}
+
+
+uint32
+HIDReportItem::ScaledData(uint8 scaleToBits, bool toBeSigned)
+{
+	uint32 source = fData;
+	if (Signed() && !toBeSigned)
+		source = (uint32)((int32)fData - (int32)fMinimum);
+
+	if (fBitCount == scaleToBits)
+		return source;
+
+	int8 shift;
+	uint32 result = 0;
+	do {
+		shift = scaleToBits - fBitCount;
+		if (shift > 0) {
+			result |= source << shift;
+			scaleToBits = shift;
+		} else
+			result |= source >> -shift;
+
+	} while (shift > 0);
+
+	return result;
 }
 
 

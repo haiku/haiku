@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2009-2011, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HID_REPORT_ITEM_H
@@ -36,6 +36,8 @@ public:
 		status_t				SetData(uint32 data);
 		uint32					Data() { return fData; };
 
+		uint32					ScaledData(uint8 scaleToBits, bool toBeSigned);
+
 		bool					Valid() { return fValid; };
 
 		void					PrintToStream(uint32 indentLevel = 0);
@@ -44,6 +46,7 @@ private:
 		uint32					fByteOffset;
 		uint8					fShift;
 		uint32					fMask;
+		uint8					fBitCount;
 		bool					fHasData;
 		bool					fArray;
 		bool					fRelative;
