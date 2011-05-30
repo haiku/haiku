@@ -118,9 +118,14 @@ HIDReportItem::SetData(uint32 data)
 uint32
 HIDReportItem::ScaledData(uint8 scaleToBits, bool toBeSigned)
 {
-	uint32 source = fData;
-	if (Signed() && !toBeSigned)
-		source = (uint32)((int32)fData - (int32)fMinimum);
+	uint32 source;
+	if (Signed() != toBeSigned) {
+		if (toBeSigned)
+			source = (uint32)((int32)fData - (fMaximum + 1) / 2) & fMask;
+		else
+			source = (uint32)((int32)fData - (int32)fMinimum);
+	} else
+		source = fData;
 
 	if (fBitCount == scaleToBits)
 		return source;
