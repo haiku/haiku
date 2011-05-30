@@ -1288,6 +1288,11 @@ _EXPORT void SubjectToThread (BString &string)
 
 			string.Remove(start,regs.end[0]-start);
 			if (start) string.Insert(' ',1,start);
+
+			// TODO: for some subjects this results in an endless loop, check
+			// why this happen.
+			if (regs.end[0] - start <= 1)
+				break;
 		}
 
 		free(regs.start);
