@@ -11,7 +11,8 @@ SubDirC++Flags -D_BUILDING_mail=1 ;
 
 UsePrivateHeaders textencoding ;
 
-SharedLibrary libmail.so :
+
+local sources =
 	c_mail_api.cpp
 	crypt.cpp
 	des.c
@@ -29,7 +30,26 @@ SharedLibrary libmail.so :
 	NodeMessage.cpp
 	numailkit.cpp
 	ProtocolConfigView.cpp
+	ServerConnection.cpp
 	StringList.cpp
+;
+
+
+# use OpenSSL, if enabled
+if $(HAIKU_OPENSSL_ENABLED) {
+	SubDirC++Flags -DUSE_SSL ;
+	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
+}
+
+
+SharedLibrary libmail.so :
+	$(sources)
 	:
 	be
 	libtextencoding.so
@@ -37,4 +57,5 @@ SharedLibrary libmail.so :
 	$(TARGET_LIBSTDC++)
 	$(TARGET_NETWORK_LIBS)
 	$(TARGET_SELECT_UNAME_ETC_LIB)
+	$(HAIKU_OPENSSL_LIBS)
 ;
