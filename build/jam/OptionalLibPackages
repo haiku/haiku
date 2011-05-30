@@ -227,8 +227,8 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 		Echo "No optional package SDLLibs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			libsdl-1.2.14-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/libsdl-1.2.14-r1a3-x86-gcc4-2011-05-26.zip ;
+			libsdl-1.2-hg-r1a3-x86-gcc4-2011-05-29.zip
+			: $(baseURL)/lib/libsdl-1.2-hg-r1a3-x86-gcc4-2011-05-29.zip ;
 		InstallOptionalHaikuImagePackage
 			guilib-1.2.1-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/guilib-1.2.1-r1a3-x86-gcc4-2011-05-26.zip ;
@@ -264,8 +264,8 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 			: $(baseURL)/lib/smpeg-0.4.5-r1a3-x86-gcc4-2011-05-26.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			libsdl-1.2.14-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/libsdl-1.2.14-r1a3-x86-gcc2-2011-05-19.zip ;
+			libsdl-1.2-hg-r1a3-x86-gcc2-2011-05-29.zip
+			: $(baseURL)/lib/libsdl-1.2-hg-r1a3-x86-gcc2-2011-05-29.zip ;
 		InstallOptionalHaikuImagePackage
 			guilib-1.2.1-r1a3-x86-gcc2-2011-05-19.zip
 			: $(baseURL)/lib/guilib-1.2.1-r1a3-x86-gcc2-2011-05-19.zip ;
