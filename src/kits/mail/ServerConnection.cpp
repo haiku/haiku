@@ -53,10 +53,10 @@ public:
 			return;
 		}
 
-		RAND_seed(this, sizeof(InitSSL));
-		/*--- Because we're an add-on loaded at an unpredictable time, all the
-		memory addresses and things contained in ourself are esssentially
-		random. */
+		// use combination of more or less random this pointer and system time
+		int64 seed = (int64)this + system_time();
+		RAND_seed(&seed, sizeof(seed));
+
 		fInit = true;
 		return;
 	};
