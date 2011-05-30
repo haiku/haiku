@@ -1385,7 +1385,8 @@ actions BuildFloppyBootImage1
 	haiku_loader_size=`stat -c %s "$(>[1])"`
 	if [ $? -ne 0 ] ; then
 		# FreeBSD's stat command don't support -c/--format option
-		haiku_loader_size=`stat -f %s "$(>[1])"`
+		# and use %z specifier for file size
+		haiku_loader_size=`stat -f %z "$(>[1])"`
 	fi
 	archive_image_offset=`echo "$(ARCHIVE_IMAGE_OFFSET) * 1024" | bc`
 	if [ $haiku_loader_size -gt $archive_image_offset ] ; then
