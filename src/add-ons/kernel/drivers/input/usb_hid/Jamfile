@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers input usb_hid ;
 SubDirC++Flags -fno-rtti ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
-UsePrivateHeaders [ FDirName kernel util ] input drivers ;
+UsePrivateHeaders [ FDirName kernel util ] input drivers device ;
 UsePrivateKernelHeaders ;
 
 KernelAddon usb_hid :
@@ -17,6 +17,8 @@ KernelAddon usb_hid :
 	HIDReportItem.cpp
 
 	ProtocolHandler.cpp
+
+	JoystickProtocolHandler.cpp
 	KeyboardProtocolHandler.cpp
 	MouseProtocolHandler.cpp
 ;

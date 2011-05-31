@@ -16,7 +16,7 @@
 // includes for the different protocol handlers
 #include "KeyboardProtocolHandler.h"
 #include "MouseProtocolHandler.h"
-//#include "JoystickProtocolHandler.h"
+#include "JoystickProtocolHandler.h"
 
 
 ProtocolHandler::ProtocolHandler(HIDDevice *device, const char *basePath,
@@ -88,7 +88,7 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 
 		KeyboardProtocolHandler::AddHandlers(device, *collection, handlerList);
 		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
-		//JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
+		JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
 	}
 
 	ProtocolHandler *handler = handlerList;
