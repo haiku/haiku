@@ -264,17 +264,10 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 		Echo "No optional package BePDF available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-28.zip
-			: $(baseURL)/bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-28.zip
-			: apps ;
+			bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-30.zip
+			: $(baseURL)/bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-30.zip ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BePDF/BePDF ;
-		AddSymlinkToHaikuImage common data licenses
-			: "/boot/apps/BePDF/license/locale DevKit/Open Tracker License"
-			: "Open Tracker" ;
-		AddSymlinkToHaikuImage common data licenses
-			: "/boot/apps/BePDF/license/locale DevKit/LICENSE"
-			: "48HRS Public License" ;
 	}
 }
 
@@ -1439,8 +1432,8 @@ if [ IsOptionalHaikuImagePackageAdded Ruby ] {
 			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc4-2011-05-24.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			ruby-1.9.1-x86-gcc2-2010-05-20.zip
-			: $(baseURL)/ruby-1.9.1-x86-gcc2-2010-05-20.zip ;
+			ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip
+			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip ;
 	}
 }
 

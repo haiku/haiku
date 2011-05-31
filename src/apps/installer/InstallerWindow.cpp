@@ -49,9 +49,10 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "InstallerWindow"
 
-#define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
-#define BOOTMAN_SIG "application/x-vnd.Haiku-BootManager"
 
+static const char* kDriveSetupSignature = "application/x-vnd.Haiku-DriveSetup";
+static const char* kBootManagerSignature
+	= "application/x-vnd.Haiku-BootManager";
 
 const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
@@ -160,7 +161,7 @@ InstallerWindow::InstallerWindow()
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
-	fBootmanLaunched(false),
+	fBootManagerLaunched(false),
 	fInstallStatus(kReadyForInstall),
 	fWorkerThread(new WorkerThread(this)),
 	fCopyEngineCancelSemaphore(-1)
@@ -225,16 +226,16 @@ InstallerWindow::InstallerWindow()
 		B_TRANSLATE("Set up partitions" B_UTF8_ELLIPSIS),
 		new BMessage(LAUNCH_DRIVE_SETUP));
 
-	fLaunchBootmanItem = new BMenuItem(B_TRANSLATE("Set up boot menu"),
+	fLaunchBootManagerItem = new BMenuItem(B_TRANSLATE("Set up boot menu"),
 		new BMessage(LAUNCH_BOOTMAN));
-	fLaunchBootmanItem->SetEnabled(false);
+	fLaunchBootManagerItem->SetEnabled(false);
 
 	fMakeBootableItem = new BMenuItem(B_TRANSLATE("Write boot sector"),
 		new BMessage(MSG_WRITE_BOOT_SECTOR));
 	fMakeBootableItem->SetEnabled(false);
 	BMenuBar* mainMenu = new BMenuBar("main menu");
 	BMenu* toolsMenu = new BMenu(B_TRANSLATE("Tools"));
-	toolsMenu->AddItem(fLaunchBootmanItem);
+	toolsMenu->AddItem(fLaunchBootManagerItem);
 	toolsMenu->AddItem(fMakeBootableItem);
 	mainMenu->AddItem(toolsMenu);
 
@@ -289,7 +290,7 @@ InstallerWindow::InstallerWindow()
 		"Partitions can be initialized with the\n"
 		"Be File System needed for a Haiku boot\n"
 		"partition."));
-//	fLaunchBootmanItem->SetToolTip(
+//	fLaunchBootManagerItem->SetToolTip(
 //		B_TRANSLATE("Install or uninstall the Haiku boot menu, which allows "
 //		"to choose an operating system to boot when the computer starts.\n"
 //		"If this computer already has a boot manager such as GRUB installed, "
@@ -311,12 +312,12 @@ InstallerWindow::InstallerWindow()
 	// Register to receive notifications when apps launch or quit...
 	be_roster->StartWatching(this);
 	// ... and check the two we are interested in.
-	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
-	fBootmanLaunched = be_roster->IsRunning(BOOTMAN_SIG);
+	fDriveSetupLaunched = be_roster->IsRunning(kDriveSetupSignature);
+	fBootManagerLaunched = be_roster->IsRunning(kBootManagerSignature);
 
 	if (Lock()) {
 		fLaunchDriveSetupButton->SetEnabled(!fDriveSetupLaunched);
-		fLaunchBootmanItem->SetEnabled(!fBootmanLaunched);
+		fLaunchBootManagerItem->SetEnabled(!fBootManagerLaunched);
 		Unlock();
 	}
 
@@ -412,7 +413,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			_LaunchDriveSetup();
 			break;
 		case LAUNCH_BOOTMAN:
-			_LaunchBootman();
+			_LaunchBootManager();
 			break;
 		case PACKAGE_CHECKBOX:
 		{
@@ -512,9 +513,9 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			const char *signature;
 			if (msg->FindString("be:signature", &signature) != B_OK)
 				break;
-			bool isDriveSetup = strcasecmp(signature, DRIVESETUP_SIG) == 0;
-			bool isBootman = strcasecmp(signature, BOOTMAN_SIG) == 0;
-			if (isDriveSetup || isBootman) {
+			bool isDriveSetup = !strcasecmp(signature, kDriveSetupSignature);
+			bool isBootManager = !strcasecmp(signature, kBootManagerSignature);
+			if (isDriveSetup || isBootManager) {
 				bool scanPartitions = false;
 				if (isDriveSetup) {
 					bool launched = msg->what == B_SOME_APP_LAUNCHED;
@@ -522,13 +523,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					scanPartitions = fDriveSetupLaunched && !launched;
 					fDriveSetupLaunched = launched;
 				}
-				if (isBootman)
-					fBootmanLaunched = msg->what == B_SOME_APP_LAUNCHED;
+				if (isBootManager)
+					fBootManagerLaunched = msg->what == B_SOME_APP_LAUNCHED;
 
 				fBeginButton->SetEnabled(
-					!fDriveSetupLaunched && !fBootmanLaunched);
-				_DisableInterface(fDriveSetupLaunched || fBootmanLaunched);
-				if (fDriveSetupLaunched && fBootmanLaunched) {
+					!fDriveSetupLaunched && !fBootManagerLaunched);
+				_DisableInterface(fDriveSetupLaunched || fBootManagerLaunched);
+				if (fDriveSetupLaunched && fBootManagerLaunched) {
 					_SetStatusMessage(B_TRANSLATE("Running Boot Manager and "
 						"DriveSetup" B_UTF8_ELLIPSIS
 						"\n\nClose both applications to continue with the "
@@ -538,7 +539,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 						B_UTF8_ELLIPSIS
 						"\n\nClose DriveSetup to continue with the "
 						"installation."));
-				} else if (fBootmanLaunched) {
+				} else if (fBootManagerLaunched) {
 					_SetStatusMessage(B_TRANSLATE("Running Boot Manager"
 						B_UTF8_ELLIPSIS
 						"\n\nClose Boot Manager to continue with the "
@@ -573,38 +574,40 @@ InstallerWindow::QuitRequested()
 		// This means Deskbar is not running, i.e. Installer is the only
 		// thing on the screen and we will reboot the machine once it quits.
 
-		if (fDriveSetupLaunched && fBootmanLaunched) {
+		if (fDriveSetupLaunched && fBootManagerLaunched) {
 			(new BAlert(B_TRANSLATE("Quit Boot Manager and DriveSetup"),
 				B_TRANSLATE("Please close the Boot Manager and DriveSetup "
 					"windows before closing the Installer window."),
 				B_TRANSLATE("OK")))->Go();
 			return false;
-		} else if (fDriveSetupLaunched) {
+		}
+		if (fDriveSetupLaunched) {
 			(new BAlert(B_TRANSLATE("Quit DriveSetup"),
 				B_TRANSLATE("Please close the DriveSetup window before closing "
 					"the Installer window."), B_TRANSLATE("OK")))->Go();
 			return false;
-		} else if (fBootmanLaunched) {
+		}
+		if (fBootManagerLaunched) {
 			(new BAlert(B_TRANSLATE("Quit Boot Manager"),
 				B_TRANSLATE("Please close the Boot Manager window before "
 					"closing the Installer window."), B_TRANSLATE("OK")))->Go();
 			return false;
 		}
 
-		if (fInstallStatus != kFinished)
-			if ((new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
-				B_TRANSLATE("Are you sure you want to abort the installation "
-					"and restart the system?"),
-				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0)
-				return false;
-
-	} else if (fInstallStatus == kInstalling) {
-		if ((new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
+		if (fInstallStatus != kFinished
+			&& (new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
+					B_TRANSLATE("Are you sure you want to abort the "
+						"installation and restart the system?"),
+					B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
+					B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0) {
+			return false;
+		}
+	} else if (fInstallStatus == kInstalling
+		&& (new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
 			B_TRANSLATE("Are you sure you want to abort the installation?"),
 			B_TRANSLATE("Cancel"), B_TRANSLATE("Abort"), NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0)
-			return false;
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0) {
+		return false;
 	}
 
 	_QuitCopyEngine(false);
@@ -630,7 +633,7 @@ InstallerWindow::_ShowOptionalPackages()
 void
 InstallerWindow::_LaunchDriveSetup()
 {
-	if (be_roster->Launch(DRIVESETUP_SIG) != B_OK) {
+	if (be_roster->Launch(kDriveSetupSignature) != B_OK) {
 		// Try really hard to launch it. It's very likely that this fails,
 		// when we run from the CD and there is only an incomplete mime
 		// database for example...
@@ -652,24 +655,25 @@ InstallerWindow::_LaunchDriveSetup()
 
 
 void
-InstallerWindow::_LaunchBootman()
+InstallerWindow::_LaunchBootManager()
 {
-	// TODO: Currently bootman always tries to install to the "first" harddisk.
-	// If/when it later supports being installed to a certain harddisk, we
-	// would have to pass it the disk that contains the target partition here.
-	if (be_roster->Launch(BOOTMAN_SIG) != B_OK) {
+	// TODO: Currently BootManager always tries to install to the "first"
+	// harddisk. If/when it later supports being installed to a certain
+	// harddisk, we would have to pass it the disk that contains the target
+	// partition here.
+	if (be_roster->Launch(kBootManagerSignature) != B_OK) {
 		// Try really hard to launch it. It's very likely that this fails,
 		// when we run from the CD and there is only an incomplete mime
 		// database for example...
 		BPath path;
-		if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
-			|| path.Append("bootman") != B_OK) {
-			path.SetTo("/boot/system/bin/bootman");
+		if (find_directory(B_SYSTEM_APPS_DIRECTORY, &path) != B_OK
+			|| path.Append("BootManager") != B_OK) {
+			path.SetTo("/boot/system/apps/BootManager");
 		}
 		BEntry entry(path.Path());
 		entry_ref ref;
 		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
-			BAlert* alert = new BAlert("error", B_TRANSLATE("Bootman, the "
+			BAlert* alert = new BAlert("error", B_TRANSLATE("BootManager, the "
 				"application to configure the Haiku boot menu, could not be "
 				"launched."), B_TRANSLATE("OK"));
 			alert->Go();
@@ -682,7 +686,7 @@ void
 InstallerWindow::_DisableInterface(bool disable)
 {
 	fLaunchDriveSetupButton->SetEnabled(!disable);
-	fLaunchBootmanItem->SetEnabled(!disable);
+	fLaunchBootManagerItem->SetEnabled(!disable);
 	fMakeBootableItem->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
@@ -785,7 +789,7 @@ InstallerWindow::_UpdateControls()
 	fMakeBootableItem->SetLabel(label.String());
 // TODO: Once bootman support writing to specific disks, enable this, since
 // we would pass it the disk which contains the target partition.
-//	fLaunchBootmanItem->SetEnabled(dstItem != NULL);
+//	fLaunchBootManagerItem->SetEnabled(dstItem != NULL);
 
 	if (!fEncouragedToSetupPartitions && !foundOneSuitableTarget) {
 		// Focus the users attention on the DriveSetup button

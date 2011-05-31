@@ -6,8 +6,10 @@
 #ifndef INSTALLER_WINDOW_H
 #define INSTALLER_WINDOW_H
 
+
 #include <String.h>
 #include <Window.h>
+
 
 namespace BPrivate {
 	class PaneSwitch;
@@ -55,7 +57,7 @@ public:
 private:
 			void				_ShowOptionalPackages();
 			void				_LaunchDriveSetup();
-			void				_LaunchBootman();
+			void				_LaunchBootManager();
 			void				_DisableInterface(bool disable);
 			void				_ScanPartitions();
 			void				_UpdateControls();
@@ -88,18 +90,19 @@ private:
 
 			BButton*			fBeginButton;
 			BButton*			fLaunchDriveSetupButton;
-			BMenuItem*			fLaunchBootmanItem;
+			BMenuItem*			fLaunchBootManagerItem;
 			BMenuItem*			fMakeBootableItem;
 
 			bool				fEncouragedToSetupPartitions;
 
 			bool				fDriveSetupLaunched;
-			bool				fBootmanLaunched;
+			bool				fBootManagerLaunched;
 			InstallStatus		fInstallStatus;
 
 			WorkerThread*		fWorkerThread;
 			BString				fLastStatus;
 			sem_id				fCopyEngineCancelSemaphore;
 };
+
 
 #endif // INSTALLER_WINDOW_H
