@@ -1432,8 +1432,8 @@ if [ IsOptionalHaikuImagePackageAdded Ruby ] {
 			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc4-2011-05-24.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			ruby-1.9.1-x86-gcc2-2010-05-20.zip
-			: $(baseURL)/ruby-1.9.1-x86-gcc2-2010-05-20.zip ;
+			ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip
+			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip ;
 	}
 }
 
