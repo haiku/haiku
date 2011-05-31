@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src tests kits device stickit_BJoystick ;
+
+SimpleTest stickit :
+	JoystickWindow.cpp
+	StickItApp.cpp
+	StickItWindow.cpp
+	: be device ;

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests kits ;
 
 SubInclude HAIKU_TOP src tests kits app ;
+SubInclude HAIKU_TOP src tests kits device ;
 SubInclude HAIKU_TOP src tests kits game ;
 SubInclude HAIKU_TOP src tests kits interface ;
 SubInclude HAIKU_TOP src tests kits locale ;
