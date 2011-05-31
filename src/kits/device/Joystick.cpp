@@ -5,8 +5,10 @@
  */
 
 
-#include <List.h>
-#include "Joystick.h"
+#include <Joystick.h>
+#include <JoystickTweaker.h>
+
+#include <new>
 
 #include <errno.h>
 #include <fcntl.h>
@@ -14,10 +16,11 @@
 
 #include <sys/ioctl.h>
 
-#include <Path.h>
-#include <Directory.h>
-#include <String.h>
 #include <Debug.h>
+#include <Directory.h>
+#include <List.h>
+#include <Path.h>
+#include <String.h>
 
 
 #if DEBUG
@@ -43,34 +46,51 @@ LOG(const char *fmt, ...)
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
-#include "JoystickTweaker.h"
-
 
 BJoystick::BJoystick()
 	:
+	// legacy members for standard mode
+	timestamp(0),
+	horizontal(0),
+	vertical(0),
+	button1(0),
+	button2(0),
+
 	fBeBoxMode(false),
-	ffd(-1),
-	fDevices(new BList),
-	fJoystickInfo(new _joystick_info())
+	fFD(-1),
+	fDevices(new(std::nothrow) BList),
+	fJoystickInfo(new(std::nothrow) joystick_info),
+	fExtendedJoystick(new(std::nothrow) BList)
 {
 #if DEBUG
-	sLogFile = fopen("/var/log/libdevice.log", "a");
+	sLogFile = fopen("/var/log/joystick.log", "a");
 #endif
-	//ScanDevices();
+
+	if (fJoystickInfo != NULL)
+		memset(fJoystickInfo, 0, sizeof(joystick_info));
 }
 
 
 BJoystick::~BJoystick()
 {
-	if (ffd >= 0)
-		close(ffd);
+	if (fFD >= 0)
+		close(fFD);
 
-	for (int32 count = fDevices->CountItems() - 1; count >= 0; count--) {
-		free(fDevices->RemoveItem(count));
+	if (fDevices != NULL) {
+		for (int32 i = 0; i < fDevices->CountItems(); i++)
+			delete (BString *)fDevices->ItemAt(i);
+
+		delete fDevices;
 	}
 
-	delete fDevices;
 	delete fJoystickInfo;
+
+	if (fExtendedJoystick != NULL) {
+		for (int32 i = 0; i < fExtendedJoystick->CountItems(); i++)
+			delete (extended_joystick *)fExtendedJoystick->ItemAt(i);
+
+		delete fExtendedJoystick;
+	}
 }
 
 
@@ -83,47 +103,70 @@ BJoystick::Open(const char *portName)
 
 
 status_t
-BJoystick::Open(const char *portName, bool enter_enhanced)
+BJoystick::Open(const char *portName, bool enhanced)
 {
 	CALLED();
-	char buf[64];
-
-	if(!enter_enhanced)
-		fBeBoxMode = !enter_enhanced;
 
 	if (portName == NULL)
 		return B_BAD_VALUE;
 
-	if (portName[0] != '/')
-		snprintf(buf, 64, DEVICEPATH"/%s", portName);
-	else
-		snprintf(buf, 64, "%s", portName);
+	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+		return B_NO_INIT;
 
-	if (ffd >= 0)
-		close(ffd);
+	fBeBoxMode = !enhanced;
+
+	char nameBuffer[64];
+	if (portName[0] != '/')
+		snprintf(nameBuffer, sizeof(nameBuffer), DEVICEPATH"/%s", portName);
+	else
+		snprintf(nameBuffer, sizeof(nameBuffer), "%s", portName);
+
+	if (fFD >= 0)
+		close(fFD);
 
 	// TODO: BeOS don't use O_EXCL, and this seems to lead to some issues. I
 	// added this flag having read some comments by Marco Nelissen on the
 	// annotated BeBook. I think BeOS uses O_RDWR|O_NONBLOCK here.
-	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL);
+	fFD = open(nameBuffer, O_RDWR | O_NONBLOCK | O_EXCL);
 
-	if (ffd >= 0) {
+	if (fFD >= 0) {
 		// we used open() with O_NONBLOCK flag to let it return immediately,
 		// but we want read/write operations to block if needed, so we clear
 		// that bit here.
-		int flags = fcntl(ffd, F_GETFL);
-		fcntl(ffd, F_SETFL, flags & ~O_NONBLOCK);
+		int flags = fcntl(fFD, F_GETFL);
+		fcntl(fFD, F_SETFL, flags & ~O_NONBLOCK);
 
-		//Read the Joystick Description file for this port/joystick
-		_BJoystickTweaker jt(*this);
-		jt.GetInfo(fJoystickInfo, portName);
+		// read the Joystick Description file for this port/joystick
+		_BJoystickTweaker joystickTweaker(*this);
+		joystickTweaker.GetInfo(fJoystickInfo, portName);
 
-		LOG("ioctl - %d\n", fJoystickInfo->num_buttons);
-		ioctl(ffd, B_JOYSTICK_SET_DEVICE_MODULE, fJoystickInfo);
-		ioctl(ffd, B_JOYSTICK_GET_DEVICE_MODULE, fJoystickInfo);
-		LOG("ioctl - %d\n", fJoystickInfo->num_buttons);
+		LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
+		ioctl(fFD, B_JOYSTICK_SET_DEVICE_MODULE, &fJoystickInfo->module_info,
+			sizeof(joystick_module_info));
+		ioctl(fFD, B_JOYSTICK_GET_DEVICE_MODULE, &fJoystickInfo->module_info,
+			sizeof(joystick_module_info));
+		LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
 
-		return ffd;
+		// Allocate the extended_joystick structures to hold the info for each
+		// "stick". Note that the whole num_sticks thing seems a bit bogus, as
+		// all sticks would be required to have exactly the same attributes,
+		// i.e. axis, hat and button counts, since there is only one global
+		// joystick_info for the whole device. What's implemented here is a
+		// "best guess", using the read position in Update() to select the
+		// stick for which an extended_joystick structure shall be returned.
+		for (uint16 i = 0; i < fJoystickInfo->module_info.num_sticks; i++) {
+			extended_joystick *extendedJoystick
+				= new(std::nothrow) extended_joystick;
+			if (extendedJoystick == NULL)
+				return B_NO_MEMORY;
+
+			if (!fExtendedJoystick->AddItem(extendedJoystick)) {
+				delete extendedJoystick;
+				return B_NO_MEMORY;
+			}
+		}
+
+		return fFD;
 	} else
 		return errno;
 }
@@ -133,9 +176,9 @@ void
 BJoystick::Close(void)
 {
 	CALLED();
-	if (ffd >= 0) {
-		close(ffd);
-		ffd = -1;
+	if (fFD >= 0) {
+		close(fFD);
+		fFD = -1;
 	}
 }
 
@@ -145,8 +188,8 @@ BJoystick::ScanDevices(bool useDisabled)
 {
 	CALLED();
 	if (useDisabled) {
-		_BJoystickTweaker temp(*this);
-		temp.scan_including_disabled();
+		_BJoystickTweaker joystickTweaker(*this);
+		joystickTweaker.scan_including_disabled();
 	}
 }
 
@@ -169,24 +212,25 @@ BJoystick::CountDevices()
 
 
 status_t
-BJoystick::GetDeviceName(int32 n, char *name, size_t bufSize)
+BJoystick::GetDeviceName(int32 index, char *name, size_t bufSize)
 {
 	CALLED();
-	BString *temp = NULL;
-	if (fDevices != NULL && fDevices->CountItems() > n)
-		temp = static_cast<BString*>(fDevices->ItemAt(n));
-	else
+	if (fDevices == NULL)
+		return B_NO_INIT;
+
+	if (index >= fDevices->CountItems())
 		return B_BAD_INDEX;
 
-	if (temp != NULL && name != NULL) {
-		if(temp->Length() > (int32)bufSize)
-			return B_NAME_TOO_LONG;
-		strncpy(name, temp->String(), bufSize);
-		name[bufSize - 1] = '\0';
-		LOG("Device Name = %s\n", name);
-		return B_OK;
-	}
-	return B_ERROR;
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	BString *deviceName = (BString *)fDevices->ItemAt(index);
+	if (deviceName->Length() > (int32)bufSize)
+		return B_NAME_TOO_LONG;
+
+	strlcpy(name, deviceName->String(), bufSize);
+	LOG("Device Name = %s\n", name);
+	return B_OK;
 }
 
 
@@ -203,7 +247,10 @@ int32
 BJoystick::CountSticks()
 {
 	CALLED();
-	return fJoystickInfo->num_sticks;
+	if (fJoystickInfo == NULL)
+		return 0;
+
+	return fJoystickInfo->module_info.num_sticks;
 }
 
 
@@ -211,7 +258,10 @@ int32
 BJoystick::CountAxes()
 {
 	CALLED();
-	return fJoystickInfo->num_axes;
+	if (fJoystickInfo == NULL)
+		return 0;
+
+	return fJoystickInfo->module_info.num_axes;
 }
 
 
@@ -219,7 +269,10 @@ int32
 BJoystick::CountHats()
 {
 	CALLED();
-	return fJoystickInfo->num_hats;
+	if (fJoystickInfo == NULL)
+		return 0;
+
+	return fJoystickInfo->module_info.num_hats;
 }
 
 
@@ -227,32 +280,40 @@ int32
 BJoystick::CountButtons()
 {
 	CALLED();
-	return fJoystickInfo->num_buttons;
+	if (fJoystickInfo == NULL)
+		return 0;
+
+	return fJoystickInfo->module_info.num_buttons;
 }
 
 
 status_t
-BJoystick::GetControllerModule(BString *out_name)
+BJoystick::GetControllerModule(BString *outName)
 {
 	CALLED();
-	if (fJoystickInfo != NULL && ffd >= 0) {
-		out_name->SetTo(fJoystickInfo->module_name);
-		return B_OK;
-	} else
-		return B_ERROR;
+	if (fJoystickInfo == NULL || fFD < 0)
+		return B_NO_INIT;
 
+	if (outName == NULL)
+		return B_BAD_VALUE;
+
+	outName->SetTo(fJoystickInfo->module_info.module_name);
+	return B_OK;
 }
 
 
 status_t
-BJoystick::GetControllerName(BString *out_name)
+BJoystick::GetControllerName(BString *outName)
 {
 	CALLED();
-	if (fJoystickInfo != NULL && ffd >= 0) {
-		out_name->SetTo(fJoystickInfo->controller_name);
-		return B_OK;
-	} else
-		return B_ERROR;
+	if (fJoystickInfo == NULL || fFD < 0)
+		return B_NO_INIT;
+
+	if (outName == NULL)
+		return B_BAD_VALUE;
+
+	outName->SetTo(fJoystickInfo->module_info.device_name);
+	return B_OK;
 }
 
 
@@ -260,6 +321,9 @@ bool
 BJoystick::IsCalibrationEnabled()
 {
 	CALLED();
+	if (fJoystickInfo == NULL)
+		return false;
+
 	return fJoystickInfo->calibration_enable;
 }
 
@@ -268,81 +332,189 @@ status_t
 BJoystick::EnableCalibration(bool calibrates)
 {
 	CALLED();
-	if (ffd >= 0) {
-		fJoystickInfo->calibration_enable = calibrates;
-		return B_OK;
-	} else
+	if (fJoystickInfo == NULL || fFD < 0)
 		return B_NO_INIT;
+
+	status_t result = ioctl(fFD, B_JOYSTICK_SET_RAW_MODE, &calibrates,
+		sizeof(calibrates));
+	if (result == B_OK)
+		fJoystickInfo->calibration_enable = calibrates;
+
+	return result;
 }
 
 
 status_t
-BJoystick::SetMaxLatency(bigtime_t max_latency)
+BJoystick::SetMaxLatency(bigtime_t maxLatency)
 {
 	CALLED();
-	fJoystickInfo->max_latency = max_latency;
-	 //else B_ERROR (when?)
+	if (fJoystickInfo == NULL || fFD < 0)
+		return B_NO_INIT;
+
+	status_t result = ioctl(fFD, B_JOYSTICK_SET_MAX_LATENCY, &maxLatency,
+		sizeof(maxLatency));
+	if (result == B_OK)
+		fJoystickInfo->max_latency = maxLatency;
+
+	return result;
+}
+
+
+status_t
+BJoystick::GetAxisNameAt(int32 index, BString *outName)
+{
+	CALLED();
+
+	if (index >= CountAxes())
+		return B_BAD_INDEX;
+
+	if (outName == NULL)
+		return B_BAD_VALUE;
+
+	// TODO: actually retrieve the name from the driver (via a new ioctl)
+	*outName = "Axis ";
+	*outName << index;
 	return B_OK;
 }
 
-//--------- not done -------------------
 
 status_t
-BJoystick::GetAxisNameAt(int32 index, BString *out_name)
+BJoystick::GetHatNameAt(int32 index, BString *outName)
 {
 	CALLED();
-	return B_BAD_INDEX;
+
+	if (index >= CountHats())
+		return B_BAD_INDEX;
+
+	if (outName == NULL)
+		return B_BAD_VALUE;
+
+	// TODO: actually retrieve the name from the driver (via a new ioctl)
+	*outName = "Hat ";
+	*outName << index;
+	return B_OK;
 }
 
 
 status_t
-BJoystick::GetHatNameAt(int32 index, BString *out_name)
+BJoystick::GetButtonNameAt(int32 index, BString *outName)
 {
 	CALLED();
-	return B_BAD_INDEX;
+
+	if (index >= CountButtons())
+		return B_BAD_INDEX;
+
+	if (outName == NULL)
+		return B_BAD_VALUE;
+
+	// TODO: actually retrieve the name from the driver (via a new ioctl)
+	*outName = "Button ";
+	*outName << index;
+	return B_OK;
 }
 
 
 status_t
-BJoystick::GetButtonNameAt(int32 index, BString *out_name)
+BJoystick::GetAxisValues(int16 *outValues, int32 forStick)
 {
 	CALLED();
-	return B_BAD_INDEX;
+
+	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+		return B_NO_INIT;
+
+	if (forStick < 0
+		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
+		return B_BAD_INDEX;
+
+	extended_joystick *extendedJoystick
+		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
+	if (extendedJoystick == NULL)
+		return B_NO_INIT;
+
+	memcpy(outValues, extendedJoystick->axes,
+		fJoystickInfo->module_info.num_axes * sizeof(uint16));
+	return B_OK;
 }
 
 
 status_t
-BJoystick::GetAxisValues(int16 *out_values, int32 for_stick)
+BJoystick::GetHatValues(uint8 *outHats, int32 forStick)
 {
 	CALLED();
-	return B_BAD_VALUE;
-}
 
+	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+		return B_NO_INIT;
 
-status_t
-BJoystick::GetHatValues(uint8 *out_hats, int32 for_stick)
-{
-	CALLED();
-	return B_BAD_VALUE;
+	if (forStick < 0
+		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
+		return B_BAD_INDEX;
+
+	extended_joystick *extendedJoystick
+		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
+	if (extendedJoystick == NULL)
+		return B_NO_INIT;
+
+	memcpy(outHats, extendedJoystick->hats,
+		fJoystickInfo->module_info.num_hats);
+	return B_OK;
 }
 
 
 uint32
-BJoystick::ButtonValues(int32 for_stick)
+BJoystick::ButtonValues(int32 forStick)
 {
 	CALLED();
-	return 0;
+
+	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+		return 0;
+
+	if (forStick < 0
+		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
+		return 0;
+
+	extended_joystick *extendedJoystick
+		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
+	if (extendedJoystick == NULL)
+		return 0;
+
+	return extendedJoystick->buttons;
 }
 
 
 status_t
-BJoystick::Update(void)
+BJoystick::Update()
 {
 	CALLED();
-	if (ffd >= 0) {
-		return B_OK;
-	} else
-		return B_ERROR;
+	if (fJoystickInfo == NULL || fExtendedJoystick == NULL || fFD < 0)
+		return B_NO_INIT;
+
+	for (uint16 i = 0; i < fJoystickInfo->module_info.num_sticks; i++) {
+		extended_joystick *extendedJoystick
+			= (extended_joystick *)fExtendedJoystick->ItemAt(i);
+		if (extendedJoystick == NULL)
+			return B_NO_INIT;
+
+		ssize_t result = read_pos(fFD, i, extendedJoystick,
+			sizeof(extended_joystick));
+		if (result < 0)
+			return result;
+
+		if (result != sizeof(extended_joystick))
+			return B_ERROR;
+
+		if (i > 0)
+			continue;
+
+		// fill in the legacy values for the first stick
+		timestamp = extendedJoystick->timestamp;
+		horizontal = (uint32)((int32)extendedJoystick->axes[0] + 32768);
+		vertical = (uint32)((int32)extendedJoystick->axes[1] + 32768);
+			// TODO: if we really want to go that far: scale the value correctly
+		button1 = (extendedJoystick->buttons & 1) == 0;
+		button2 = (extendedJoystick->buttons & 2) == 0;
+	}
+
+	return B_OK;
 }
 
 

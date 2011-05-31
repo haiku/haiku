@@ -167,22 +167,24 @@ _BJoystickTweaker::_BuildFromJoystickDesc(char *string, _joystick_info* info)
 
 	if (str.IFindFirst("module") != -1) {
 		str.RemoveFirst("module = ");
-		strlcpy(info->module_name, str.String(), STRINGLENGTHCPY);
+		strlcpy(info->module_info.module_name, str.String(),
+			STRINGLENGTHCPY);
 	} else if (str.IFindFirst("gadget") != -1) {
 		str.RemoveFirst("gadget = ");
-		strlcpy(info->controller_name, str.String(), STRINGLENGTHCPY);
+		strlcpy(info->module_info.device_name, str.String(),
+			STRINGLENGTHCPY);
 	} else if (str.IFindFirst("num_axes") != -1) {
 		str.RemoveFirst("num_axes = ");
-		info->num_axes = atoi(str.String());		
+		info->module_info.num_axes = atoi(str.String());
 	} else if (str.IFindFirst("num_hats") != -1) {
 		str.RemoveFirst("num_hats = ");
-		info->num_hats = atoi(str.String());
+		info->module_info.num_hats = atoi(str.String());
 	} else if (str.IFindFirst("num_buttons") != -1) {
 		str.RemoveFirst("num_buttons = ");
-		info->num_buttons = atoi(str.String());
+		info->module_info.num_buttons = atoi(str.String());
 	} else if (str.IFindFirst("num_sticks") != -1) {
 		str.RemoveFirst("num_sticks = ");
-		info->num_sticks = atoi(str.String());
+		info->module_info.num_sticks = atoi(str.String());
 	} else {
 		LOG("Path = %s\n", str.String());
 	}

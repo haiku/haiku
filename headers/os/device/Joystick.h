@@ -87,10 +87,10 @@ friend class _BJoystickTweaker;
 
 			bool			fBeBoxMode;
 			bool			fReservedBool;
-			int				ffd;
+			int				fFD;
 			BList*			fDevices;
 			_joystick_info*	fJoystickInfo;
-			char*			fDevName;
+			BList*			fExtendedJoystick;
 			uint32          _reserved_Joystick_[10];
 };
 

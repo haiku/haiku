@@ -79,7 +79,7 @@ typedef struct _joystick_module {
 	int _reserved_;
 } joystick_module;
 
-/** Doing force feedback means writing an extended_joystick to the device with force values. 
+/** Doing force feedback means writing an extended_joystick to the device with force values.
     The "timestamp" should be the duration of the feedback. Successive writes will be queued
     by the device module. */
 enum { /* Joystick driver ioctl() opcodes */
