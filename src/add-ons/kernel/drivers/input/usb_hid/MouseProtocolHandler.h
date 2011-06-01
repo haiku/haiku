@@ -33,9 +33,8 @@ public:
 									size_t length);
 
 private:
-			status_t			_ReadReport();
+			status_t			_ReadReport(void *buffer);
 
-private:
 			HIDReport &			fReport;
 
 			HIDReportItem &		fXAxis;

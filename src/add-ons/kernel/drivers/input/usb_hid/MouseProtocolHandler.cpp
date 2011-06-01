@@ -25,7 +25,7 @@
 MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(), "input/mouse/usb/", 512),
+	ProtocolHandler(report.Device(), "input/mouse/usb/", 0),
 	fReport(report),
 	fXAxis(xAxis),
 	fYAxis(yAxis),
@@ -106,24 +106,29 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 
 
 status_t
-MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
+MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
+	size_t length)
 {
 	switch (op) {
 		case MS_READ:
-			while (RingBufferReadable() == 0) {
-				status_t result = _ReadReport();
-				if (result != B_OK)
+		{
+			if (length < sizeof(mouse_movement))
+				return B_BUFFER_OVERFLOW;
+
+			while (true) {
+				status_t result = _ReadReport(buffer);
+				if (result != B_INTERRUPTED)
 					return result;
 			}
-
-			return RingBufferRead(buffer, sizeof(mouse_movement));
+		}
 
 		case MS_NUM_EVENTS:
 		{
-			int32 count = RingBufferReadable() / sizeof(mouse_movement);
-			if (count == 0 && fReport.Device()->IsRemoved())
+			if (fReport.Device()->IsRemoved())
 				return B_DEV_NOT_READY;
-			return count;
+
+			// we are always on demand, so 0 queued events
+			return 0;
 		}
 
 		case MS_SET_CLICKSPEED:
@@ -140,7 +145,7 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer, size_t le
 
 
 status_t
-MouseProtocolHandler::_ReadReport()
+MouseProtocolHandler::_ReadReport(void *buffer)
 {
 	status_t result = fReport.WaitForReport(B_INFINITE_TIMEOUT);
 	if (result != B_OK) {
@@ -156,19 +161,19 @@ MouseProtocolHandler::_ReadReport()
 		}
 
 		// signal that we simply want to try again
-		return B_OK;
+		return B_INTERRUPTED;
 	}
 
-	mouse_movement info;
-	memset(&info, 0, sizeof(info));
+	mouse_movement *info = (mouse_movement *)buffer;
+	memset(info, 0, sizeof(mouse_movement));
 
 	if (fXAxis.Extract() == B_OK && fXAxis.Valid())
-		info.xdelta = fXAxis.Data();
+		info->xdelta = fXAxis.Data();
 	if (fYAxis.Extract() == B_OK && fYAxis.Valid())
-		info.ydelta = -fYAxis.Data();
+		info->ydelta = -fYAxis.Data();
 
 	if (fWheel != NULL && fWheel->Extract() == B_OK && fWheel->Valid())
-		info.wheel_ydelta = -fWheel->Data();
+		info->wheel_ydelta = -fWheel->Data();
 
 	for (uint32 i = 0; i < B_MAX_MOUSE_BUTTONS; i++) {
 		HIDReportItem *button = fButtons[i];
@@ -176,14 +181,14 @@ MouseProtocolHandler::_ReadReport()
 			break;
 
 		if (button->Extract() == B_OK && button->Valid())
-			info.buttons |= (button->Data() & 1) << (button->UsageID() - 1);
+			info->buttons |= (button->Data() & 1) << (button->UsageID() - 1);
 	}
 
 	fReport.DoneProcessing();
 	TRACE("got mouse report\n");
 
 	bigtime_t timestamp = system_time();
-	if (info.buttons != 0) {
+	if (info->buttons != 0) {
 		if (fLastButtons == 0) {
 			if (fLastClickTime + fClickSpeed > timestamp)
 				fClickCount++;
@@ -192,10 +197,10 @@ MouseProtocolHandler::_ReadReport()
 		}
 
 		fLastClickTime = timestamp;
-		info.clicks = fClickCount;
+		info->clicks = fClickCount;
 	}
 
-	fLastButtons = info.buttons;
-	info.timestamp = timestamp;
-	return RingBufferWrite(&info, sizeof(mouse_movement));
+	fLastButtons = info->buttons;
+	info->timestamp = timestamp;
+	return B_OK;
 }
