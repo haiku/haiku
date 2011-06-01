@@ -176,26 +176,24 @@ CailWriteMC(VOID *CAIL, ULONG Address, ULONG data)
 UINT32
 CailReadFBData(VOID* CAIL, UINT32 idx)
 {
+	// TODO : This should work only in theory and needs tested
+
 	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
-	// TODO : CailReadFBData
 
 	UINT32 ret = 0;
-	/*
-	if (((atomBiosHandlePtr)CAIL)->fbBase) {
-		CARD8 *FBBase = (CARD8*)
-			RHDPTRI((atomBiosHandlePtr)CAIL)->FbBase;
-		ret = *((CARD32*)(FBBase + (((atomBiosHandlePtr)CAIL)->fbBase)
-			+ idx));
-		TRACE(("%s(%x) = %x\n", __func__, idx, ret));
-	} else if (((atomBiosHandlePtr)CAIL)->scratchBase) {
-		ret = *(CARD32*)((CARD8*)(((atomBiosHandlePtr)CAIL)->scratchBase)
-			+ idx);
-		TRACE(("%s(%x) = %x\n", __func__, idx, ret));
-	} else {
-		TRACE(("%s: no fbbase set\n", __func__));
+
+	uint32_t fbLocation
+		= gInfo->shared_info->frame_buffer_phys & 0xffffffff;
+
+	// If we have a physical offset for our frame buffer, use it
+	if (fbLocation > 0)
+		ret = read32(fbLocation + idx);
+	else {
+		TRACE("%s: ERROR: Frame Buffer offset not defined\n",
+			__func__);
 		return 0;
 	}
-	*/
+
 	return ret;
 }
 
@@ -203,19 +201,19 @@ CailReadFBData(VOID* CAIL, UINT32 idx)
 VOID
 CailWriteFBData(VOID *CAIL, UINT32 idx, UINT32 data)
 {
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
-	// TODO : CailReadFBData
+	// TODO : This should work only in theory and needs tested
 
-	/*
-	if (((atomBiosHandlePtr)CAIL)->fbBase) {
-		CARD8 *FBBase = (CARD8*)
-			RHDPTRI((atomBiosHandlePtr)CAIL)->FbBase;
-		*((CARD32*)(FBBase + (((atomBiosHandlePtr)CAIL)->fbBase) + idx)) = data;
-	} else if (((atomBiosHandlePtr)CAIL)->scratchBase) {
-		*(CARD32*)((CARD8*)(((atomBiosHandlePtr)CAIL)->scratchBase) + idx) = data;
-	} else
-		TRACE(("%s: no fbbase set\n", __func__));
-	*/
+	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
+
+	uint32_t fbLocation
+		= gInfo->shared_info->frame_buffer_phys & 0xffffffff;
+
+	// If we have a physical offset for our frame buffer, use it
+	if (fbLocation > 0)
+		write32(fbLocation + idx, data);
+	else
+		TRACE("%s: ERROR: Frame Buffer offset not defined\n",
+			__func__);
 }
 
 
