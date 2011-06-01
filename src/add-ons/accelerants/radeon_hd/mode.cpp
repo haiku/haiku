@@ -189,7 +189,7 @@ CardFBSet(display_mode *mode)
 	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
 
 	// Tell GPU which frame buffer address to draw from
-	if (gInfo->shared_info->device_chipset >= (RADEON_R700 & 0x70)) {
+	if (gInfo->shared_info->device_chipset >= (uint16)RADEON_R700 & 0x70) {
 		write32(gRegister->grphPrimarySurfaceAddrHigh,
 			(fbAddress >> 32) & 0xf);
 		write32(gRegister->grphSecondarySurfaceAddrHigh,

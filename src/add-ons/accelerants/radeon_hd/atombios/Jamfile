@@ -12,7 +12,10 @@ DEFINES += ENABLE_ALL_SERVICE_FUNCTIONS ;
 # To avoid changing AMD vendor sources
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wcast-align ] ;
-TARGET_WARNING_CCFLAGS += -Wno-pointer-to-int-cast ;
+
+if $(HAIKU_GCC_VERSION[1]) = 4 {
+	TARGET_WARNING_CCFLAGS += -Wno-pointer-to-int-cast ;
+}
 
 StaticLibrary atombios.a :
 	Decoder.c
