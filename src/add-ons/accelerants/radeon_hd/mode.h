@@ -25,7 +25,6 @@
 status_t create_mode_list(void);
 bool is_mode_supported(display_mode* mode);
 status_t is_mode_sane(display_mode *mode);
-uint32 AllocateFB(uint32 size, const char *description);
 
 
 #endif /*RADEON_HD_MODE_H*/
