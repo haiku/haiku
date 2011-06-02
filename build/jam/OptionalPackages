@@ -796,8 +796,8 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 				friss-24-r1a3-x86-gcc2-2011-05-31.zip
 				: $(baseURL)/friss-24-r1a3-x86-gcc2-2011-05-31.zip ;
 		}
-		AddSymlinkToHaikuImage home config be Desktop\ applets
-			: /boot/apps/FRiSS/FRiSS ;
+#		AddSymlinkToHaikuImage home config be Desktop\ applets
+#			: /boot/apps/FRiSS/FRiSS ;
 	}
 }
 
@@ -1439,7 +1439,7 @@ if [ IsOptionalHaikuImagePackageAdded Ruby ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip
-			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip ;
+			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc2-2011-06-01.zip ;
 	}
 }
 
