@@ -1670,8 +1670,8 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 		Echo "No optional package WebPositive available for gcc2" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			WebPositive-gcc4-x86-r577-2011-03-13.zip
-			: $(baseURL)/WebPositive-gcc4-x86-r577-2011-03-13.zip ;
+			WebPositive-r1a3-gcc4-x86-r580-2011-06-02.zip
+			: $(baseURL)/WebPositive-r1a3-gcc4-x86-r580-2011-06-02.zip ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/WebPositive/WebPositive ;
 	}
