@@ -116,9 +116,10 @@ BJoystick::Open(const char *portName, bool enhanced)
 	fBeBoxMode = !enhanced;
 
 	char nameBuffer[64];
-	if (portName[0] != '/')
-		snprintf(nameBuffer, sizeof(nameBuffer), DEVICEPATH"/%s", portName);
-	else
+	if (portName[0] != '/') {
+		snprintf(nameBuffer, sizeof(nameBuffer), DEVICE_BASE_PATH"/%s",
+			portName);
+	} else
 		snprintf(nameBuffer, sizeof(nameBuffer), "%s", portName);
 
 	if (fFD >= 0)
