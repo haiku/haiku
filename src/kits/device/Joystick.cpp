@@ -68,6 +68,8 @@ BJoystick::BJoystick()
 
 	if (fJoystickInfo != NULL)
 		memset(fJoystickInfo, 0, sizeof(joystick_info));
+
+	RescanDevices();
 }
 
 
@@ -200,12 +202,10 @@ BJoystick::CountDevices()
 {
 	CALLED();
 
-	// Refresh devices list
-	ScanDevices(true);
+	if (fDevices == NULL)
+		return 0;
 
-	int32 count = 0;
-	if (fDevices != NULL)
-		count = fDevices->CountItems();
+	int32 count = fDevices->CountItems();
 
 	LOG("Count = %d\n", count);
 	return count;
@@ -219,8 +219,7 @@ BJoystick::GetDeviceName(int32 index, char *name, size_t bufSize)
 	if (fDevices == NULL)
 		return B_NO_INIT;
 
-	// CountDevices() also calls ScanDevices() and therefore updates our list.
-	if (index >= CountDevices())
+	if (index >= fDevices->CountItems())
 		return B_BAD_INDEX;
 
 	if (name == NULL)
@@ -232,6 +231,19 @@ BJoystick::GetDeviceName(int32 index, char *name, size_t bufSize)
 
 	strlcpy(name, deviceName->String(), bufSize);
 	LOG("Device Name = %s\n", name);
+	return B_OK;
+}
+
+
+status_t
+BJoystick::RescanDevices()
+{
+	CALLED();
+
+	if (fDevices == NULL)
+		return B_NO_INIT;
+
+	ScanDevices(true);
 	return B_OK;
 }
 

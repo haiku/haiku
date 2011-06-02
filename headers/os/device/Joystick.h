@@ -41,6 +41,12 @@ public:
 			status_t		GetDeviceName(int32 index, char* name,
 								size_t bufSize = B_OS_NAME_LENGTH);
 
+			status_t		RescanDevices();
+								// Haiku extension. Updates the list of devices
+								// as enumerated by CountDevices() and
+								// GetDeviceName() with possibly newly plugged
+								// in devices.
+
 			bool			EnterEnhancedMode(const entry_ref* ref = NULL);
 
 			int32			CountSticks();
