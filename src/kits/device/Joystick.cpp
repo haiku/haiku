@@ -219,7 +219,8 @@ BJoystick::GetDeviceName(int32 index, char *name, size_t bufSize)
 	if (fDevices == NULL)
 		return B_NO_INIT;
 
-	if (index >= fDevices->CountItems())
+	// CountDevices() also calls ScanDevices() and therefore updates our list.
+	if (index >= CountDevices())
 		return B_BAD_INDEX;
 
 	if (name == NULL)
