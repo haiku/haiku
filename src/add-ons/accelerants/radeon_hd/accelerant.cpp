@@ -292,6 +292,8 @@ init_registers(uint8 crtid)
 		= (crtid == 1) ? D2CRTC_INTERLACE_CONTROL : D1CRTC_INTERLACE_CONTROL;
 	gRegister->crtCountControl
 		= (crtid == 1) ? D2CRTC_COUNT_CONTROL : D1CRTC_COUNT_CONTROL;
+	gRegister->sclUpdate
+		= (crtid == 1) ? D2SCL_UPDATE : D1SCL_UPDATE;
 	gRegister->sclEnable
 		= (crtid == 1) ? D2SCL_ENABLE : D1SCL_ENABLE;
 	gRegister->sclTapControl

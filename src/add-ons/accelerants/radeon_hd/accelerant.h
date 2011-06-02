@@ -68,6 +68,7 @@ struct register_info {
 	uint16_t	modeCenter;
 	uint16_t	viewportStart;
 	uint16_t	viewportSize;
+	uint16_t	sclUpdate;
 	uint16_t	sclEnable;
 	uint16_t	sclTapControl;
 };

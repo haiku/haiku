@@ -121,11 +121,6 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 	}
 
 	bytesPerRow = mode.virtual_width * bytesPerPixel;
-
-	// Make sure bytesPerRow is a multiple of 64
-	// TODO: check if the older chips have the same restriction!
-	if ((bytesPerRow & 63) != 0)
-		bytesPerRow = (bytesPerRow + 63) & ~63;
 }
 
 
@@ -189,7 +184,7 @@ CardFBSet(display_mode *mode)
 	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
 
 	// Tell GPU which frame buffer address to draw from
-	if (gInfo->shared_info->device_chipset >= (uint16)RADEON_R700 & 0x70) {
+	if (gInfo->shared_info->device_chipset >= (uint16)(RADEON_R700 & 0x70)) {
 		write32(gRegister->grphPrimarySurfaceAddrHigh,
 			(fbAddress >> 32) & 0xf);
 		write32(gRegister->grphSecondarySurfaceAddrHigh,
@@ -237,8 +232,8 @@ CardModeSet(display_mode *mode)
 		displayTiming.h_total - 1);
 
 	// determine blanking based on passed modeline
-	//uint16 blankStart = displayTiming.h_display;
-	//uint16 blankEnd = displayTiming.h_total;
+	//uint16 blankStart = displayTiming.h_display + 1;
+	//uint16 blankEnd = displayTiming.h_total - 1;
 
 	//write32(gRegister->crtHBlank,
 	//	blankStart | (blankEnd << 16));
@@ -254,8 +249,8 @@ CardModeSet(display_mode *mode)
 	write32(gRegister->crtVTotal,
 		displayTiming.v_total - 1);
 
-	//blankStart = displayTiming.v_display;
-	//blankEnd = displayTiming.v_total;
+	//blankStart = displayTiming.v_display + 1;
+	//blankEnd = displayTiming.v_total - 1;
 
 	//write32(gRegister->crtVBlank,
 	//	blankStart | (blankEnd << 16));
@@ -293,6 +288,12 @@ CardModeScale(display_mode *mode)
 		mode->timing.v_display | (mode->timing.h_display << 16));
 	write32(gRegister->viewportStart, 0);
 
+	// For now, no overscan support
+	write32(D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
+		(0 << 16) | 0);
+	write32(D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
+		(0 << 16) | 0);
+
 /*  write32(regOffset + D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
 		(Overscan.OverscanLeft << 16) | Overscan.OverscanRight);
 	write32(regOffset + D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
@@ -300,9 +301,11 @@ CardModeScale(display_mode *mode)
 */
 
 	// No scaling
+	write32(gRegister->sclUpdate, (1<<16));	// Lock
 	write32(gRegister->sclEnable, 0);
 	write32(gRegister->sclTapControl, 0);
 	write32(gRegister->modeCenter, 0);
+	write32(gRegister->sclUpdate, 0);		// Unlock
 
 	#if 0
 	// Auto scale keeping aspect ratio
@@ -395,10 +398,22 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 bool
 is_mode_supported(display_mode *mode)
 {
+	// Validate modeline is within a sane range
 	if (is_mode_sane(mode) != B_OK)
 		return false;
 
-	// TODO : Check if mode is supported on monitor
+	// TODO : Look at min and max monitor freqs and verify selected
+	// mode is within tolerances.
+	#if 0
+	int crtid = 0;
+
+	edid1_detailed_monitor *monitor
+		= &gInfo->shared_info->edid_info.detailed_monitor[crtid + 1];
+	edid1_monitor_range& range = monitor->data.monitor_range;
+
+	TRACE("%s CRT Min/Max H %d/%d; CRT Min/Max V %d/%d\n", __func__,
+		range.min_h, range.max_h, range.min_v, range.max_v);
+	#endif
 
 	return true;
 }
