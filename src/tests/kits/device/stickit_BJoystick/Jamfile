@@ -4,4 +4,4 @@ SimpleTest stickit :
 	JoystickWindow.cpp
 	StickItApp.cpp
 	StickItWindow.cpp
-	: be device ;
+	: be device $(TARGET_LIBSTDC++) ;
