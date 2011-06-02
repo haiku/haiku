@@ -22,9 +22,13 @@
 
 JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 	:
-	ProtocolHandler(report.Device(), "joystick/usb/", 512),
-	fReport(report)
+	ProtocolHandler(report.Device(), "joystick/usb/", 0),
+	fReport(report),
+	fUpdateThread(-1)
 {
+	mutex_init(&fUpdateLock, "joystick update lock");
+	memset(&fCurrentValues, 0, sizeof(extended_joystick));
+
 	for (uint32 i = 0; i < MAX_AXES; i++)
 		fAxis[i] = NULL;
 
@@ -130,21 +134,60 @@ JoystickProtocolHandler::AddHandlers(HIDDevice &device,
 
 
 status_t
+JoystickProtocolHandler::Open(uint32 flags, uint32 *cookie)
+{
+	status_t result = mutex_lock(&fUpdateLock);
+	if (result != B_OK)
+		return result;
+
+	if (fUpdateThread < 0) {
+		fUpdateThread = spawn_kernel_thread(_UpdateThread, "joystick update",
+			B_NORMAL_PRIORITY, (void *)this);
+
+		if (fUpdateThread < 0)
+			result = fUpdateThread;
+		else
+			resume_thread(fUpdateThread);
+	}
+
+	mutex_unlock(&fUpdateLock);
+	if (result != B_OK)
+		return result;
+
+	return ProtocolHandler::Open(flags, cookie);
+}
+
+
+status_t
+JoystickProtocolHandler::Close(uint32 *cookie)
+{
+	status_t result = mutex_lock(&fUpdateLock);
+	if (result == B_OK) {
+		fUpdateThread = -1;
+		mutex_unlock(&fUpdateLock);
+	}
+
+	return ProtocolHandler::Close(cookie);
+}
+
+
+
+status_t
 JoystickProtocolHandler::Read(uint32 *cookie, off_t position, void *buffer,
 	size_t *numBytes)
 {
 	if (*numBytes < sizeof(extended_joystick))
 		return B_BUFFER_OVERFLOW;
 
-	while (RingBufferReadable() == 0) {
-		status_t result = _ReadReport();
-		if (result != B_OK)
-			return result;
+	// this is a polling interface, we just return the current value
+	status_t result = mutex_lock(&fUpdateLock);
+	if (result != B_OK) {
+		*numBytes = 0;
+		return result;
 	}
 
-	status_t result = RingBufferRead(buffer, sizeof(extended_joystick));
-	if (result != B_OK)
-		return result;
+	memcpy(buffer, &fCurrentValues, sizeof(extended_joystick));
+	mutex_unlock(&fUpdateLock);
 
 	*numBytes = sizeof(extended_joystick);
 	return B_OK;
@@ -206,8 +249,22 @@ JoystickProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 }
 
 
+int32
+JoystickProtocolHandler::_UpdateThread(void *data)
+{
+	JoystickProtocolHandler *handler = (JoystickProtocolHandler *)data;
+	while (handler->fUpdateThread == find_thread(NULL)) {
+		status_t result = handler->_Update();
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
+}
+
+
 status_t
-JoystickProtocolHandler::_ReadReport()
+JoystickProtocolHandler::_Update()
 {
 	status_t result = fReport.WaitForReport(B_INFINITE_TIMEOUT);
 	if (result != B_OK) {
@@ -226,15 +283,20 @@ JoystickProtocolHandler::_ReadReport()
 		return B_OK;
 	}
 
-	extended_joystick info;
-	memset(&info, 0, sizeof(info));
+	result = mutex_lock(&fUpdateLock);
+	if (result != B_OK) {
+		fReport.DoneProcessing();
+		return result;
+	}
+
+	memset(&fCurrentValues, 0, sizeof(extended_joystick));
 
 	for (uint32 i = 0; i < MAX_AXES; i++) {
 		if (fAxis[i] == NULL)
 			continue;
 
 		if (fAxis[i]->Extract() == B_OK && fAxis[i]->Valid())
-			info.axes[i] = (int16)fAxis[i]->ScaledData(16, true);
+			fCurrentValues.axes[i] = (int16)fAxis[i]->ScaledData(16, true);
 	}
 
 	for (uint32 i = 0; i < MAX_BUTTONS; i++) {
@@ -242,13 +304,16 @@ JoystickProtocolHandler::_ReadReport()
 		if (button == NULL)
 			break;
 
-		if (button->Extract() == B_OK && button->Valid())
-			info.buttons |= (button->Data() & 1) << (button->UsageID() - 1);
+		if (button->Extract() == B_OK && button->Valid()) {
+			fCurrentValues.buttons
+				|= (button->Data() & 1) << (button->UsageID() - 1);
+		}
 	}
 
 	fReport.DoneProcessing();
 	TRACE("got joystick report\n");
 
-	info.timestamp = system_time();
-	return RingBufferWrite(&info, sizeof(info));
+	fCurrentValues.timestamp = system_time();
+	mutex_unlock(&fUpdateLock);
+	return B_OK;
 }

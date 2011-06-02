@@ -11,6 +11,7 @@
 #include "ProtocolHandler.h"
 
 #include <joystick_driver.h>
+#include <lock.h>
 
 
 class HIDCollection;
@@ -25,6 +26,9 @@ public:
 										HIDCollection &collection,
 										ProtocolHandler *&handlerList);
 
+	virtual	status_t				Open(uint32 flags, uint32 *cookie);
+	virtual	status_t				Close(uint32 *cookie);
+
 	virtual	status_t				Read(uint32 *cookie, off_t position,
 										void *buffer, size_t *numBytes);
 	virtual	status_t				Write(uint32 *cookie, off_t position,
@@ -34,15 +38,19 @@ public:
 										void *buffer, size_t length);
 
 private:
-			status_t				_ReadReport();
+	static	int32					_UpdateThread(void *data);
+			status_t				_Update();
 
-private:
 			HIDReport &				fReport;
 
 			HIDReportItem *			fAxis[MAX_AXES];
 			HIDReportItem *			fButtons[MAX_BUTTONS];
 
 			joystick_module_info 	fJoystickModuleInfo;
+
+			extended_joystick		fCurrentValues;
+			mutex					fUpdateLock;
+			thread_id				fUpdateThread;
 };
 
 #endif // USB_JOYSTICK_PROTOCOL_HANDLER_H
