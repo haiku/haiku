@@ -26,13 +26,6 @@
 
 
 status_t
-AtomInit(uint8_t crtIndex)
-{
-
-}
-
-
-status_t
 AtomParser(void *parameterSpace, uint8_t index, void *handle, void *biosBase)
 {
 	DEVICE_DATA deviceData;
