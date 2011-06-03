@@ -6,6 +6,7 @@
 
 
 #include <Joystick.h>
+#include <JoystickPrivate.h>
 #include <JoystickTweaker.h>
 
 #include <new>
@@ -56,7 +57,7 @@ BJoystick::BJoystick()
 	fFD(-1),
 	fDevices(new(std::nothrow) BList),
 	fJoystickInfo(new(std::nothrow) joystick_info),
-	fExtendedJoystick(new(std::nothrow) BList)
+	fJoystickData(new(std::nothrow) BList)
 {
 #if DEBUG
 	sLogFile = fopen("/var/log/joystick.log", "a");
@@ -83,11 +84,18 @@ BJoystick::~BJoystick()
 
 	delete fJoystickInfo;
 
-	if (fExtendedJoystick != NULL) {
-		for (int32 i = 0; i < fExtendedJoystick->CountItems(); i++)
-			delete (extended_joystick *)fExtendedJoystick->ItemAt(i);
+	if (fJoystickData != NULL) {
+		for (int32 i = 0; i < fJoystickData->CountItems(); i++) {
+			variable_joystick *variableJoystick
+				= (variable_joystick *)fJoystickData->ItemAt(i);
+			if (variableJoystick == NULL)
+				continue;
 
-		delete fExtendedJoystick;
+			free(variableJoystick->data);
+			delete variableJoystick;
+		}
+
+		delete fJoystickData;
 	}
 }
 
@@ -108,7 +116,7 @@ BJoystick::Open(const char *portName, bool enhanced)
 	if (portName == NULL)
 		return B_BAD_VALUE;
 
-	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+	if (fJoystickInfo == NULL || fJoystickData == NULL)
 		return B_NO_INIT;
 
 	fBeBoxMode = !enhanced;
@@ -141,21 +149,68 @@ BJoystick::Open(const char *portName, bool enhanced)
 		sizeof(joystick_module_info));
 	LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
 
-	// Allocate the extended_joystick structures to hold the info for each
+	// Allocate the variable_joystick structures to hold the info for each
 	// "stick". Note that the whole num_sticks thing seems a bit bogus, as
 	// all sticks would be required to have exactly the same attributes,
 	// i.e. axis, hat and button counts, since there is only one global
 	// joystick_info for the whole device. What's implemented here is a
 	// "best guess", using the read position in Update() to select the
-	// stick for which an extended_joystick structure shall be returned.
+	// stick for which data shall be returned.
+	bool supportsVariable
+		= (fJoystickInfo->module_info.flags & js_flag_variable_size_reads) != 0;
 	for (uint16 i = 0; i < fJoystickInfo->module_info.num_sticks; i++) {
-		extended_joystick *extendedJoystick
-			= new(std::nothrow) extended_joystick;
-		if (extendedJoystick == NULL)
+		variable_joystick *variableJoystick
+			= new(std::nothrow) variable_joystick;
+		if (variableJoystick == NULL)
 			return B_NO_MEMORY;
 
-		if (!fExtendedJoystick->AddItem(extendedJoystick)) {
-			delete extendedJoystick;
+		if (supportsVariable) {
+			// The driver supports arbitrary controls.
+			variableJoystick->axis_count = fJoystickInfo->module_info.num_axes;
+			variableJoystick->hat_count = fJoystickInfo->module_info.num_hats;
+			variableJoystick->button_blocks
+				= (fJoystickInfo->module_info.num_buttons + 31) / 32;
+		} else {
+			// The driver doesn't support our variable requests so we construct
+			// a data structure that is compatible with extended_joystick and
+			// just use that in reads. This allows us to use a single data
+			// format internally but be compatible with both inputs.
+			variableJoystick->axis_count = MAX_AXES;
+			variableJoystick->hat_count = MAX_HATS;
+			variableJoystick->button_blocks = (MAX_BUTTONS + 31) / 32;
+
+			// Also ensure that we don't read over those boundaries.
+			if (fJoystickInfo->module_info.num_axes > MAX_AXES)
+				fJoystickInfo->module_info.num_axes = MAX_AXES;
+			if (fJoystickInfo->module_info.num_hats > MAX_HATS)
+				fJoystickInfo->module_info.num_hats = MAX_HATS;
+			if (fJoystickInfo->module_info.num_buttons > MAX_BUTTONS)
+				fJoystickInfo->module_info.num_buttons = MAX_BUTTONS;
+		}
+
+		variableJoystick->data_size = sizeof(bigtime_t)			// timestamp
+			+ variableJoystick->button_blocks * sizeof(uint32)	// bitmaps
+			+ variableJoystick->axis_count * sizeof(int16)		// axis values
+			+ variableJoystick->hat_count * sizeof(uint8);		// hat values
+
+		variableJoystick->data
+			= (uint8 *)malloc(variableJoystick->data_size);
+		if (variableJoystick->data == NULL) {
+			delete variableJoystick;
+			return B_NO_MEMORY;
+		}
+
+		// fill in the convenience pointers
+		variableJoystick->timestamp = (bigtime_t *)variableJoystick->data;
+		variableJoystick->buttons = (uint32 *)(&variableJoystick->timestamp[1]);
+		variableJoystick->axes = (int16 *)(&variableJoystick->buttons[
+			variableJoystick->button_blocks]);
+		variableJoystick->hats = (uint8 *)(&variableJoystick->axes[
+			variableJoystick->axis_count]);
+
+		if (!fJoystickData->AddItem(variableJoystick)) {
+			free(variableJoystick->data);
+			delete variableJoystick;
 			return B_NO_MEMORY;
 		}
 	}
@@ -179,32 +234,46 @@ status_t
 BJoystick::Update()
 {
 	CALLED();
-	if (fJoystickInfo == NULL || fExtendedJoystick == NULL || fFD < 0)
+	if (fJoystickInfo == NULL || fJoystickData == NULL || fFD < 0)
 		return B_NO_INIT;
 
 	for (uint16 i = 0; i < fJoystickInfo->module_info.num_sticks; i++) {
-		extended_joystick *extendedJoystick
-			= (extended_joystick *)fExtendedJoystick->ItemAt(i);
-		if (extendedJoystick == NULL)
+		variable_joystick *values
+			= (variable_joystick *)fJoystickData->ItemAt(i);
+		if (values == NULL)
 			return B_NO_INIT;
 
-		ssize_t result = read_pos(fFD, i, extendedJoystick,
-			sizeof(extended_joystick));
+		ssize_t result = read_pos(fFD, i, values->data,
+			values->data_size);
 		if (result < 0)
 			return result;
 
-		if (result != sizeof(extended_joystick))
+		if ((size_t)result != values->data_size)
 			return B_ERROR;
 
 		if (i > 0)
 			continue;
 
 		// fill in the legacy values for the first stick
-		timestamp = extendedJoystick->timestamp;
-		horizontal = extendedJoystick->axes[0];
-		vertical = extendedJoystick->axes[1];
-		button1 = (extendedJoystick->buttons & 1) == 0;
-		button2 = (extendedJoystick->buttons & 2) == 0;
+		timestamp = *values->timestamp;
+
+		if (values->axis_count >= 1)
+			horizontal = values->axes[0];
+		else
+			horizontal = 0;
+
+		if (values->axis_count >= 2)
+			vertical = values->axes[1];
+		else
+			vertical = 0;
+
+		if (values->button_blocks > 0) {
+			button1 = (*values->buttons & 1) == 0;
+			button2 = (*values->buttons & 2) == 0;
+		} else {
+			button1 = true;
+			button2 = true;
+		}
 	}
 
 	return B_OK;
@@ -314,19 +383,19 @@ BJoystick::GetAxisValues(int16 *outValues, int32 forStick)
 {
 	CALLED();
 
-	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+	if (fJoystickInfo == NULL || fJoystickData == NULL)
 		return B_NO_INIT;
 
 	if (forStick < 0
 		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
 		return B_BAD_INDEX;
 
-	extended_joystick *extendedJoystick
-		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
-	if (extendedJoystick == NULL)
+	variable_joystick *variableJoystick
+		= (variable_joystick *)fJoystickData->ItemAt(forStick);
+	if (variableJoystick == NULL)
 		return B_NO_INIT;
 
-	memcpy(outValues, extendedJoystick->axes,
+	memcpy(outValues, variableJoystick->axes,
 		fJoystickInfo->module_info.num_axes * sizeof(uint16));
 	return B_OK;
 }
@@ -366,19 +435,19 @@ BJoystick::GetHatValues(uint8 *outHats, int32 forStick)
 {
 	CALLED();
 
-	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+	if (fJoystickInfo == NULL || fJoystickData == NULL)
 		return B_NO_INIT;
 
 	if (forStick < 0
 		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
 		return B_BAD_INDEX;
 
-	extended_joystick *extendedJoystick
-		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
-	if (extendedJoystick == NULL)
+	variable_joystick *variableJoystick
+		= (variable_joystick *)fJoystickData->ItemAt(forStick);
+	if (variableJoystick == NULL)
 		return B_NO_INIT;
 
-	memcpy(outHats, extendedJoystick->hats,
+	memcpy(outHats, variableJoystick->hats,
 		fJoystickInfo->module_info.num_hats);
 	return B_OK;
 }
@@ -418,19 +487,19 @@ BJoystick::ButtonValues(int32 forStick)
 {
 	CALLED();
 
-	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+	if (fJoystickInfo == NULL || fJoystickData == NULL)
 		return 0;
 
 	if (forStick < 0
 		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
 		return 0;
 
-	extended_joystick *extendedJoystick
-		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
-	if (extendedJoystick == NULL)
+	variable_joystick *variableJoystick
+		= (variable_joystick *)fJoystickData->ItemAt(forStick);
+	if (variableJoystick == NULL || variableJoystick->button_blocks == 0)
 		return 0;
 
-	return extendedJoystick->buttons;
+	return *variableJoystick->buttons;
 }
 
 
@@ -439,24 +508,22 @@ BJoystick::GetButtonValues(bool *outButtons, int32 forStick)
 {
 	CALLED();
 
-	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+	if (fJoystickInfo == NULL || fJoystickData == NULL)
 		return B_NO_INIT;
 
 	if (forStick < 0
 		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
 		return B_BAD_INDEX;
 
-	extended_joystick *extendedJoystick
-		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
-	if (extendedJoystick == NULL)
+	variable_joystick *variableJoystick
+		= (variable_joystick *)fJoystickData->ItemAt(forStick);
+	if (variableJoystick == NULL)
 		return B_NO_INIT;
 
 	int16 buttonCount = fJoystickInfo->module_info.num_buttons;
 	for (int16 i = 0; i < buttonCount; i++) {
-		if (buttonCount >= 32)
-			outButtons[i] = false;
-		else
-			outButtons[i] = (extendedJoystick->buttons & (1 << i)) != 0;
+		outButtons[i]
+			= (variableJoystick->buttons[i / 32] & (1 << (i % 32))) != 0;
 	}
 
 	return B_OK;

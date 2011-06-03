@@ -39,13 +39,14 @@ typedef struct _extended_joystick {
 	uint32		buttons;		/* lsb to msb, 1 == on */
 	int16		axes[MAX_AXES];	/* -32768 to 32767, X, Y, Z, U, V, W */
 	uint8		hats[MAX_HATS];	/* 0 through 8 (1 == N, 3 == E, 5 == S, 7 == W) */
-} extended_joystick;
+} _PACKED extended_joystick;
 
 #define MAX_CONFIG_SIZE 100
 
 enum {	/* flags for joystick module info */
 	js_flag_force_feedback = 0x1,
-	js_flag_force_feedback_directional = 0x2
+	js_flag_force_feedback_directional = 0x2,
+	js_flag_variable_size_reads = 0x4
 };
 
 typedef struct _joystick_module_info {

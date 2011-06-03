@@ -103,7 +103,8 @@ friend class _BJoystickTweaker;
 			int				fFD;
 			BList*			fDevices;
 			_joystick_info*	fJoystickInfo;
-			BList*			fExtendedJoystick;
+			BList*			fJoystickData;
+
 			uint32          _reserved_Joystick_[10];
 };
 
