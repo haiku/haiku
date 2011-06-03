@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2011, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,15 +15,11 @@
 #include <InterfaceDefs.h>
 #include <String.h>
 
-namespace BPrivate {
-int32 count_decorators(void);
-int32 get_decorator(void);
-status_t get_decorator_name(const int32 &index, BString &name);
-status_t get_decorator_preview(const int32 &index, BBitmap *bitmap);
-status_t set_decorator(const int32 &index);
-}
+#include <private/interface/DecoratorPrivate.h>
+
 
 using namespace BPrivate;
+
 
 static int sColorWhich = -1;
 static struct option const kLongOptions[] = {
@@ -39,40 +35,40 @@ static struct option const kLongOptions[] = {
 	{ #l, required_argument, &sColorWhich, v }, \
 	{ #v, required_argument, &sColorWhich, v }
 
-I(panel_background_color, B_PANEL_BACKGROUND_COLOR),
-I(panel_text_color, B_PANEL_TEXT_COLOR),
-I(document_background_color, B_DOCUMENT_BACKGROUND_COLOR),
-I(document_text_color, B_DOCUMENT_TEXT_COLOR),
-I(control_background_color, B_CONTROL_BACKGROUND_COLOR),
-I(control_text_color, B_CONTROL_TEXT_COLOR),
-I(control_border_color, B_CONTROL_BORDER_COLOR),
-I(control_highlight_color, B_CONTROL_HIGHLIGHT_COLOR),
-I(navigation_base_color, B_NAVIGATION_BASE_COLOR),
-I(navigation_pulse_color, B_NAVIGATION_PULSE_COLOR),
-I(shine_color, B_SHINE_COLOR),
-I(shadow_color, B_SHADOW_COLOR),
-I(menu_background_color, B_MENU_BACKGROUND_COLOR),
-I(menu_selected_background_color, B_MENU_SELECTED_BACKGROUND_COLOR),
-I(menu_item_text_color, B_MENU_ITEM_TEXT_COLOR),
-I(menu_selected_item_text_color, B_MENU_SELECTED_ITEM_TEXT_COLOR),
-I(menu_selected_border_color, B_MENU_SELECTED_BORDER_COLOR),
-I(tooltip_background_color, B_TOOL_TIP_BACKGROUND_COLOR),
-I(tooltip_text_color, B_TOOL_TIP_TEXT_COLOR),
-I(success_color, B_SUCCESS_COLOR),
-I(failure_color, B_FAILURE_COLOR),
-I(keyboard_navigation_color, B_KEYBOARD_NAVIGATION_COLOR),
-I(menu_selection_background_color, B_MENU_SELECTION_BACKGROUND_COLOR),
-I(desktop_color, B_DESKTOP_COLOR),
-I(window_tab_color, B_WINDOW_TAB_COLOR),
-I(window_text_color, B_WINDOW_TEXT_COLOR),
-I(window_inactive_tab_color, B_WINDOW_INACTIVE_TAB_COLOR),
-I(window_inactive_text_color, B_WINDOW_INACTIVE_TEXT_COLOR),
-
+	I(panel_background_color, B_PANEL_BACKGROUND_COLOR),
+	I(panel_text_color, B_PANEL_TEXT_COLOR),
+	I(document_background_color, B_DOCUMENT_BACKGROUND_COLOR),
+	I(document_text_color, B_DOCUMENT_TEXT_COLOR),
+	I(control_background_color, B_CONTROL_BACKGROUND_COLOR),
+	I(control_text_color, B_CONTROL_TEXT_COLOR),
+	I(control_border_color, B_CONTROL_BORDER_COLOR),
+	I(control_highlight_color, B_CONTROL_HIGHLIGHT_COLOR),
+	I(navigation_base_color, B_NAVIGATION_BASE_COLOR),
+	I(navigation_pulse_color, B_NAVIGATION_PULSE_COLOR),
+	I(shine_color, B_SHINE_COLOR),
+	I(shadow_color, B_SHADOW_COLOR),
+	I(menu_background_color, B_MENU_BACKGROUND_COLOR),
+	I(menu_selected_background_color, B_MENU_SELECTED_BACKGROUND_COLOR),
+	I(menu_item_text_color, B_MENU_ITEM_TEXT_COLOR),
+	I(menu_selected_item_text_color, B_MENU_SELECTED_ITEM_TEXT_COLOR),
+	I(menu_selected_border_color, B_MENU_SELECTED_BORDER_COLOR),
+	I(tooltip_background_color, B_TOOL_TIP_BACKGROUND_COLOR),
+	I(tooltip_text_color, B_TOOL_TIP_TEXT_COLOR),
+	I(success_color, B_SUCCESS_COLOR),
+	I(failure_color, B_FAILURE_COLOR),
+	I(keyboard_navigation_color, B_KEYBOARD_NAVIGATION_COLOR),
+	I(menu_selection_background_color, B_MENU_SELECTION_BACKGROUND_COLOR),
+	I(desktop_color, B_DESKTOP_COLOR),
+	I(window_tab_color, B_WINDOW_TAB_COLOR),
+	I(window_text_color, B_WINDOW_TEXT_COLOR),
+	I(window_inactive_tab_color, B_WINDOW_INACTIVE_TAB_COLOR),
+	I(window_inactive_text_color, B_WINDOW_INACTIVE_TEXT_COLOR),
 	{"sum", required_argument, 0, 's'},
 	{"refresh", no_argument, 0, 'r'},
 	{"help", no_argument, 0, 'h'},
 	{NULL}
 };
+
 
 extern const char *__progname;
 static const char *sProgramName = __progname;
@@ -141,9 +137,14 @@ main(int argc, char **argv)
 				return 1;
 
 			case 'r':
+			{
 				// TODO: refresh (but shouldn't be needed)
-				set_decorator(get_decorator());
+				BString name;
+				if (get_decorator(name))
+					set_decorator(name);
 				break;
+			}
+
 			case 's':
 				// IGNORED, for compatibility with original app
 				break;
