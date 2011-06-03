@@ -13,10 +13,11 @@
 #ifndef _JOYSTICK_DRIVER_H
 #define _JOYSTICK_DRIVER_H
 
+#include <stdlib.h>
+
 #include <SupportDefs.h>
 #include <Drivers.h>
 #include <module.h>
-#include <stdlib.h>
 
 typedef struct _joystick {
 	bigtime_t	timestamp;
@@ -47,7 +48,8 @@ typedef struct _extended_joystick {
 // make storing and accessing the flat data in the "data" member easier. When
 // transferring data via read/write/ioctl only the flat data in "data" is ever
 // transmitted, not the whole structure.
-typedef struct variable_joystick {
+typedef struct _variable_joystick {
+#ifdef __cplusplus
 	status_t initialize(uint32 axisCount, uint32 hatCount, uint32 buttonCount)
 	{
 		axis_count = axisCount;
@@ -75,6 +77,7 @@ typedef struct variable_joystick {
 	{
 		return initialize(MAX_AXES, MAX_HATS, MAX_BUTTONS);
 	}
+#endif
 
 	uint32		axis_count;
 	uint32		hat_count;
