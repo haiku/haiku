@@ -32,6 +32,7 @@
 #define KEYBOARD_FLAG_DEBUGGER	0x02
 
 
+static bool sDebugKeyboardFound = false;
 static usb_id sDebugKeyboardPipe = 0;
 static size_t sDebugKeyboardReportSize = 0;
 static int32 sDebuggerCommandAdded = 0;
@@ -70,6 +71,7 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 	mutex_init(&fLock, "usb keyboard");
 
 	// find modifiers and keys
+	bool debugUsable = false;
 	for (uint32 i = 0; i < inputReport.CountItems(); i++) {
 		HIDReportItem *item = inputReport.ItemAt(i);
 		if (!item->HasData())
@@ -84,6 +86,9 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 				// normal or "consumer"/button keys handled as array items
 				if (fKeyCount < MAX_KEYS)
 					fKeys[fKeyCount++] = item;
+
+				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD)
+					debugUsable = true;
 			} else {
 				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
 					&& item->UsageID() >= B_HID_UID_KB_LEFT_CONTROL
@@ -91,9 +96,22 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 					// modifiers are generally implemented as bitmaps
 					if (fModifierCount < MAX_MODIFIERS)
 						fModifiers[fModifierCount++] = item;
+
+					debugUsable = true;
 				}
 			}
 		}
+	}
+
+	if (!sDebugKeyboardFound && debugUsable) {
+		// It's a keyboard, not just some additional buttons, set up the kernel
+		// debugger info here so that it is ready on panics or crashes that
+		// don't go through the emergency keys. If we also found LEDs we assume
+		// it is a full sized keyboard and discourage further setting the info.
+		sDebugKeyboardPipe = fInputReport.Device()->InterruptPipe();
+		sDebugKeyboardReportSize = fInputReport.Parser()->MaxReportSize();
+		if (outputReport != NULL)
+			sDebugKeyboardFound = true;
 	}
 
 	TRACE("keyboard device with %lu keys and %lu modifiers\n", fKeyCount,
