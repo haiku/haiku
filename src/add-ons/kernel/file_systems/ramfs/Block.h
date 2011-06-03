@@ -134,7 +134,7 @@ void
 BlockHeader::SetPreviousBlock(Block *block)
 {
 	size_t offset = (block ? (char*)this - (char*)block : 0);
-	fBackSkip = fBackSkip & FREE_FLAG | offset;
+	fBackSkip = (fBackSkip & FREE_FLAG) | offset;
 }
 
 // GetPreviousBlock

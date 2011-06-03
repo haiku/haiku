@@ -28,7 +28,7 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <new.h>
+#include <new>
 #include <stdlib.h>
 #include <string.h>
 
