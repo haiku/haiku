@@ -168,6 +168,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Screen"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
+	fIsVesa(false),
 	fBootWorkspaceApplied(false),
 	fScreenMode(this),
 	fUndoScreenMode(this),
