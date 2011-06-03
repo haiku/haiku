@@ -521,9 +521,8 @@ BJoystick::Update()
 
 		// fill in the legacy values for the first stick
 		timestamp = extendedJoystick->timestamp;
-		horizontal = (uint32)((int32)extendedJoystick->axes[0] + 32768);
-		vertical = (uint32)((int32)extendedJoystick->axes[1] + 32768);
-			// TODO: if we really want to go that far: scale the value correctly
+		horizontal = extendedJoystick->axes[0];
+		vertical = extendedJoystick->axes[1];
 		button1 = (extendedJoystick->buttons & 1) == 0;
 		button2 = (extendedJoystick->buttons & 2) == 0;
 	}
