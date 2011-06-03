@@ -80,8 +80,6 @@ private:
 friend class _BJoystickTweaker;
 
 			void			ScanDevices(bool useDisabled = false);
-			status_t		GatherEnhanced_info(const entry_ref* ref = NULL);
-			status_t		SaveConfig(const entry_ref* ref = NULL);
 
 			void            _ReservedJoystick1();
 	virtual void            _ReservedJoystick2();

@@ -526,22 +526,6 @@ BJoystick::ScanDevices(bool useDisabled)
 }
 
 
-status_t
-BJoystick::GatherEnhanced_info(const entry_ref *ref)
-{
-	CALLED();
-	return B_ERROR;
-}
-
-
-status_t
-BJoystick::SaveConfig(const entry_ref *ref)
-{
-	CALLED();
-	return B_ERROR;
-}
-
-
 //	#pragma mark - FBC protection
 
 
