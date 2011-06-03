@@ -4,16 +4,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <Joystick.h>
 #include <JoystickTweaker.h>
 
 #include <new>
-
-#include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
-
 #include <sys/ioctl.h>
 
 #include <Debug.h>
@@ -53,8 +48,8 @@ BJoystick::BJoystick()
 	timestamp(0),
 	horizontal(0),
 	vertical(0),
-	button1(0),
-	button2(0),
+	button1(true),
+	button2(true),
 
 	fBeBoxMode(false),
 	fFD(-1),
@@ -129,49 +124,42 @@ BJoystick::Open(const char *portName, bool enhanced)
 
 	// TODO: BeOS don't use O_EXCL, and this seems to lead to some issues. I
 	// added this flag having read some comments by Marco Nelissen on the
-	// annotated BeBook. I think BeOS uses O_RDWR|O_NONBLOCK here.
+	// annotated BeBook. I think BeOS uses O_RDWR | O_NONBLOCK here.
 	fFD = open(nameBuffer, O_RDWR | O_NONBLOCK | O_EXCL);
+	if (fFD < 0)
+		return B_ERROR;
 
-	if (fFD >= 0) {
-		// we used open() with O_NONBLOCK flag to let it return immediately,
-		// but we want read/write operations to block if needed, so we clear
-		// that bit here.
-		int flags = fcntl(fFD, F_GETFL);
-		fcntl(fFD, F_SETFL, flags & ~O_NONBLOCK);
+	// read the Joystick Description file for this port/joystick
+	_BJoystickTweaker joystickTweaker(*this);
+	joystickTweaker.GetInfo(fJoystickInfo, portName);
 
-		// read the Joystick Description file for this port/joystick
-		_BJoystickTweaker joystickTweaker(*this);
-		joystickTweaker.GetInfo(fJoystickInfo, portName);
+	LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
+	ioctl(fFD, B_JOYSTICK_SET_DEVICE_MODULE, &fJoystickInfo->module_info,
+		sizeof(joystick_module_info));
+	ioctl(fFD, B_JOYSTICK_GET_DEVICE_MODULE, &fJoystickInfo->module_info,
+		sizeof(joystick_module_info));
+	LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
 
-		LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
-		ioctl(fFD, B_JOYSTICK_SET_DEVICE_MODULE, &fJoystickInfo->module_info,
-			sizeof(joystick_module_info));
-		ioctl(fFD, B_JOYSTICK_GET_DEVICE_MODULE, &fJoystickInfo->module_info,
-			sizeof(joystick_module_info));
-		LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
+	// Allocate the extended_joystick structures to hold the info for each
+	// "stick". Note that the whole num_sticks thing seems a bit bogus, as
+	// all sticks would be required to have exactly the same attributes,
+	// i.e. axis, hat and button counts, since there is only one global
+	// joystick_info for the whole device. What's implemented here is a
+	// "best guess", using the read position in Update() to select the
+	// stick for which an extended_joystick structure shall be returned.
+	for (uint16 i = 0; i < fJoystickInfo->module_info.num_sticks; i++) {
+		extended_joystick *extendedJoystick
+			= new(std::nothrow) extended_joystick;
+		if (extendedJoystick == NULL)
+			return B_NO_MEMORY;
 
-		// Allocate the extended_joystick structures to hold the info for each
-		// "stick". Note that the whole num_sticks thing seems a bit bogus, as
-		// all sticks would be required to have exactly the same attributes,
-		// i.e. axis, hat and button counts, since there is only one global
-		// joystick_info for the whole device. What's implemented here is a
-		// "best guess", using the read position in Update() to select the
-		// stick for which an extended_joystick structure shall be returned.
-		for (uint16 i = 0; i < fJoystickInfo->module_info.num_sticks; i++) {
-			extended_joystick *extendedJoystick
-				= new(std::nothrow) extended_joystick;
-			if (extendedJoystick == NULL)
-				return B_NO_MEMORY;
-
-			if (!fExtendedJoystick->AddItem(extendedJoystick)) {
-				delete extendedJoystick;
-				return B_NO_MEMORY;
-			}
+		if (!fExtendedJoystick->AddItem(extendedJoystick)) {
+			delete extendedJoystick;
+			return B_NO_MEMORY;
 		}
+	}
 
-		return fFD;
-	} else
-		return errno;
+	return fFD;
 }
 
 
