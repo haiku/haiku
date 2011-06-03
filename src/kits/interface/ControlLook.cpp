@@ -889,10 +889,11 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		leftBarSide.right = sliderPosition - 1;
 		rightBarSide.left = sliderPosition;
 	} else {
+		// NOTE: position is reverse of coords
 		sliderPosition = floorf(rect.top + 2 + (rect.Height() - 2)
-			* sliderScale);
-		leftBarSide.bottom = sliderPosition - 1;
-		rightBarSide.top = sliderPosition;
+			* (1.0 - sliderScale));
+		leftBarSide.top = sliderPosition;
+		rightBarSide.bottom = sliderPosition - 1;
 	}
 
 	// fill the background for the corners, exclude the middle bar for now
@@ -1223,14 +1224,23 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
 	view->SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
 
-	float center = (rect.left + rect.right) / 2;
+	float centerh = (rect.left + rect.right) / 2;
+	float centerv = (rect.top + rect.bottom) / 2;
 
 	BShape shape;
-	shape.MoveTo(BPoint(rect.left + 0.5, rect.bottom + 0.5));
-	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom + 0.5));
-	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom - 1 + 0.5));
-	shape.LineTo(BPoint(center + 0.5, rect.top + 0.5));
-	shape.LineTo(BPoint(rect.left + 0.5, rect.bottom - 1 + 0.5));
+	if (orientation == B_HORIZONTAL) {
+		shape.MoveTo(BPoint(rect.left + 0.5, rect.bottom + 0.5));
+		shape.LineTo(BPoint(rect.right + 0.5, rect.bottom + 0.5));
+		shape.LineTo(BPoint(rect.right + 0.5, rect.bottom - 1 + 0.5));
+		shape.LineTo(BPoint(centerh + 0.5, rect.top + 0.5));
+		shape.LineTo(BPoint(rect.left + 0.5, rect.bottom - 1 + 0.5));
+	} else {
+		shape.MoveTo(BPoint(rect.right + 0.5, rect.top + 0.5));
+		shape.LineTo(BPoint(rect.right + 0.5, rect.bottom + 0.5));
+		shape.LineTo(BPoint(rect.right - 1 + 0.5, rect.bottom + 0.5));
+		shape.LineTo(BPoint(rect.left + 0.5, centerv + 0.5));
+		shape.LineTo(BPoint(rect.right - 1 + 0.5, rect.top + 0.5));
+	}
 	shape.Close();
 
 	view->MovePenTo(BPoint(1, 1));
@@ -1247,9 +1257,15 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 
 	rect.InsetBy(1, 1);
 	shape.Clear();
-	shape.MoveTo(BPoint(rect.left, rect.bottom + 1));
-	shape.LineTo(BPoint(rect.right + 1, rect.bottom + 1));
-	shape.LineTo(BPoint(center + 0.5, rect.top));
+	if (orientation == B_HORIZONTAL) {
+		shape.MoveTo(BPoint(rect.left, rect.bottom + 1));
+		shape.LineTo(BPoint(rect.right + 1, rect.bottom + 1));
+		shape.LineTo(BPoint(centerh + 0.5, rect.top));
+	} else {
+		shape.MoveTo(BPoint(rect.right + 1, rect.top));
+		shape.LineTo(BPoint(rect.right + 1, rect.bottom + 1));
+		shape.LineTo(BPoint(rect.left, centerv + 0.5));
+	}
 	shape.Close();
 
 	BGradientLinear gradient;

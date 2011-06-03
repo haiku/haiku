@@ -703,16 +703,15 @@ BSlider::SetValue(int32 value)
 	if (fOrientation == B_HORIZONTAL)
 		oldThumbFrame.top = BarFrame().top;
 	else
-		oldThumbFrame.right = BarFrame().right;
+		oldThumbFrame.left = BarFrame().left;
 
 	BControl::SetValueNoUpdate(value);
 	BRect invalid = oldThumbFrame | ThumbFrame();
 
 	if (Style() == B_TRIANGLE_THUMB) {
-		// 1) we need to take care of pixels touched because of
-		//    anti-aliasing
-		// 2) we need to update the region with the focus mark as well
-		//    (a method BSlider::FocusMarkFrame() would be nice as well)
+		// 1) We need to take care of pixels touched because of anti-aliasing.
+		// 2) We need to update the region with the focus mark as well. (A
+		// method BSlider::FocusMarkFrame() would be nice as well.)
 		if (fOrientation == B_HORIZONTAL) {
 			if (IsFocus())
 				invalid.bottom += 2;
@@ -1445,16 +1444,27 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 {
 	BSize preferredSize = PreferredSize();
 
-	if (_width) {
-//		*_width = preferredSize.width;
-		// NOTE: For compatibility reasons, the BSlider never shrinks
-		// horizontally. This only affects applications which do not
-		// use the new layout system.
-		*_width = max_c(Bounds().Width(), preferredSize.width);
-	}
+	if (Orientation() == B_HORIZONTAL) {
+		if (_width != NULL) {
+			// NOTE: For compatibility reasons, a horizontal BSlider
+			// never shrinks horizontally. This only affects applications
+			// which do not use the new layout system.
+			*_width = max_c(Bounds().Width(), preferredSize.width);
+		}
 
-	if (_height)
-		*_height = preferredSize.height;
+		if (_height != NULL)
+			*_height = preferredSize.height;
+	} else {
+		if (_width != NULL)
+			*_width = preferredSize.width;
+
+		if (_height != NULL) {
+			// NOTE: Similarly, a vertical BSlider never shrinks
+			// vertically. This only affects applications which do not
+			// use the new layout system.
+			*_height = max_c(Bounds().Height(), preferredSize.height);
+		}
+	}
 }
 
 
