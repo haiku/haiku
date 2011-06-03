@@ -24,15 +24,19 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 	:
 	ProtocolHandler(report.Device(), "joystick/usb/", 0),
 	fReport(report),
+	fAxisCount(0),
+	fAxis(NULL),
+	fHatCount(0),
+	fHats(NULL),
+	fButtonCount(0),
+	fMaxButton(0),
+	fButtons(NULL),
 	fUpdateThread(-1)
 {
 	mutex_init(&fUpdateLock, "joystick update lock");
-	memset(&fCurrentValues, 0, sizeof(extended_joystick));
+	memset(&fJoystickModuleInfo, 0, sizeof(joystick_module_info));
+	memset(&fCurrentValues, 0, sizeof(variable_joystick));
 
-	for (uint32 i = 0; i < MAX_AXES; i++)
-		fAxis[i] = NULL;
-
-	uint32 buttonCount = 0;
 	for (uint32 i = 0; i < report.CountItems(); i++) {
 		HIDReportItem *item = report.ItemAt(i);
 		if (!item->HasData())
@@ -41,8 +45,21 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 		switch (item->UsagePage()) {
 			case B_HID_USAGE_PAGE_BUTTON:
 			{
-				if (item->UsageID() - 1 < MAX_BUTTONS)
-					fButtons[buttonCount++] = item;
+				if (item->UsageID() > INT16_MAX)
+					break;
+
+				HIDReportItem **newButtons = (HIDReportItem **)realloc(fButtons,
+					++fButtonCount * sizeof(HIDReportItem *));
+				if (newButtons == NULL) {
+					fButtonCount--;
+					break;
+				}
+
+				fButtons = newButtons;
+				fButtons[fButtonCount - 1] = item;
+
+				if (fMaxButton < item->UsageID())
+					fMaxButton = item->UsageID();
 				break;
 			}
 
@@ -55,11 +72,24 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 					case B_HID_UID_GD_RX:
 					case B_HID_UID_GD_RY:
 					case B_HID_UID_GD_RZ:
-						uint16 axis = item->UsageID() - B_HID_UID_GD_X;
-						if (axis >= MAX_AXES)
+						uint16 axis = item->UsageID() - B_HID_UID_GD_X + 1;
+						if (axis > INT16_MAX)
 							break;
 
-						fAxis[axis] = item;
+						if (fAxisCount < axis) {
+							HIDReportItem **newAxis = (HIDReportItem **)realloc(
+								fAxis, axis * sizeof(HIDReportItem *));
+							if (newAxis == NULL)
+								break;
+
+							for (uint16 i = fAxisCount; i < axis; i++)
+								newAxis[i] = NULL;
+
+							fAxis = newAxis;
+							fAxisCount = axis;
+						}
+
+						fAxis[axis - 1] = item;
 						break;
 				}
 
@@ -68,10 +98,17 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 		}
 	}
 
-	fButtons[buttonCount] = NULL;
+
+	fCurrentValues.initialize(fAxisCount, 0, fMaxButton);
 
 	TRACE("joystick device with %lu buttons\n", buttonCount);
 	TRACE("report id: %u\n", report.ID());
+}
+
+
+JoystickProtocolHandler::~JoystickProtocolHandler()
+{
+	free(fCurrentValues.data);
 }
 
 
@@ -136,6 +173,9 @@ JoystickProtocolHandler::AddHandlers(HIDDevice &device,
 status_t
 JoystickProtocolHandler::Open(uint32 flags, uint32 *cookie)
 {
+	if (fCurrentValues.data == NULL)
+		return B_NO_INIT;
+
 	status_t result = mutex_lock(&fUpdateLock);
 	if (result != B_OK)
 		return result;
@@ -176,7 +216,7 @@ status_t
 JoystickProtocolHandler::Read(uint32 *cookie, off_t position, void *buffer,
 	size_t *numBytes)
 {
-	if (*numBytes < sizeof(extended_joystick))
+	if (*numBytes < fCurrentValues.data_size)
 		return B_BUFFER_OVERFLOW;
 
 	// this is a polling interface, we just return the current value
@@ -186,10 +226,10 @@ JoystickProtocolHandler::Read(uint32 *cookie, off_t position, void *buffer,
 		return result;
 	}
 
-	memcpy(buffer, &fCurrentValues, sizeof(extended_joystick));
+	memcpy(buffer, fCurrentValues.data, fCurrentValues.data_size);
 	mutex_unlock(&fUpdateLock);
 
-	*numBytes = sizeof(extended_joystick);
+	*numBytes = fCurrentValues.data_size;
 	return B_OK;
 }
 
@@ -213,27 +253,37 @@ JoystickProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			if (length < sizeof(joystick_module_info))
 				return B_BAD_VALUE;
 
+			status_t result = mutex_lock(&fUpdateLock);
+			if (result != B_OK)
+				return result;
+
 			fJoystickModuleInfo = *(joystick_module_info *)buffer;
 
-			fJoystickModuleInfo.num_axes = 0;
-			for (uint32 i = 0; i < MAX_AXES; i++) {
-				if (fAxis[i] != NULL)
-					fJoystickModuleInfo.num_axes = i + 1;
+			bool supportsVariable = (fJoystickModuleInfo.flags
+				& js_flag_variable_size_reads) != 0;
+			if (!supportsVariable) {
+				// We revert to a structure that we can support using only
+				// the data available in an extended_joystick structure.
+				free(fCurrentValues.data);
+				fCurrentValues.initialize_to_extended_joystick();
+				if (fAxisCount > MAX_AXES)
+					fAxisCount = MAX_AXES;
+				if (fHatCount > MAX_HATS)
+					fHatCount = MAX_HATS;
+				if (fMaxButton > MAX_BUTTONS)
+					fMaxButton = MAX_BUTTONS;
+
+				TRACE_ALWAYS("using joystick in extended_joystick mode\n");
+			} else {
+				TRACE_ALWAYS("using joystick in variable mode\n");
 			}
 
-			fJoystickModuleInfo.num_buttons = 0;
-			for (uint32 i = 0; i < MAX_BUTTONS; i++) {
-				if (fButtons[i] == NULL)
-					break;
-
-				uint8 button = fButtons[i]->UsageID();
-				if (button > fJoystickModuleInfo.num_buttons)
-					fJoystickModuleInfo.num_buttons = button;
-			}
-
-			fJoystickModuleInfo.num_hats = 0;
+			fJoystickModuleInfo.num_axes = fAxisCount;
+			fJoystickModuleInfo.num_buttons = fMaxButton;
+			fJoystickModuleInfo.num_hats = fHatCount;
 			fJoystickModuleInfo.num_sticks = 1;
 			fJoystickModuleInfo.config_size = 0;
+			mutex_unlock(&fUpdateLock);
 			break;
 		}
 
@@ -289,9 +339,9 @@ JoystickProtocolHandler::_Update()
 		return result;
 	}
 
-	memset(&fCurrentValues, 0, sizeof(extended_joystick));
+	memset(fCurrentValues.data, 0, fCurrentValues.data_size);
 
-	for (uint32 i = 0; i < MAX_AXES; i++) {
+	for (uint32 i = 0; i < fAxisCount; i++) {
 		if (fAxis[i] == NULL)
 			continue;
 
@@ -299,21 +349,25 @@ JoystickProtocolHandler::_Update()
 			fCurrentValues.axes[i] = (int16)fAxis[i]->ScaledData(16, true);
 	}
 
-	for (uint32 i = 0; i < MAX_BUTTONS; i++) {
+	for (uint32 i = 0; i < fButtonCount; i++) {
 		HIDReportItem *button = fButtons[i];
 		if (button == NULL)
 			break;
 
+		uint16 index = button->UsageID() - 1;
+		if (index >= fMaxButton)
+			continue;
+
 		if (button->Extract() == B_OK && button->Valid()) {
-			fCurrentValues.buttons
-				|= (button->Data() & 1) << (button->UsageID() - 1);
+			fCurrentValues.buttons[index / 32]
+				|= (button->Data() & 1) << (index % 32);
 		}
 	}
 
 	fReport.DoneProcessing();
 	TRACE("got joystick report\n");
 
-	fCurrentValues.timestamp = system_time();
+	*fCurrentValues.timestamp = system_time();
 	mutex_unlock(&fUpdateLock);
 	return B_OK;
 }

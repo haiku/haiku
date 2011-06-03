@@ -21,6 +21,7 @@ class HIDReportItem;
 class JoystickProtocolHandler : public ProtocolHandler {
 public:
 									JoystickProtocolHandler(HIDReport &report);
+	virtual							~JoystickProtocolHandler();
 
 	static	void					AddHandlers(HIDDevice &device,
 										HIDCollection &collection,
@@ -43,12 +44,17 @@ private:
 
 			HIDReport &				fReport;
 
-			HIDReportItem *			fAxis[MAX_AXES];
-			HIDReportItem *			fButtons[MAX_BUTTONS];
+			uint32					fAxisCount;
+			HIDReportItem **		fAxis;
+			uint32					fHatCount;
+			HIDReportItem **		fHats;
+			uint32					fButtonCount;
+			uint32					fMaxButton;
+			HIDReportItem **		fButtons;
 
 			joystick_module_info 	fJoystickModuleInfo;
+			variable_joystick		fCurrentValues;
 
-			extended_joystick		fCurrentValues;
 			mutex					fUpdateLock;
 			thread_id				fUpdateThread;
 };
