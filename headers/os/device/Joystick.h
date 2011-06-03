@@ -64,6 +64,16 @@ public:
 
 			int32			CountButtons();
 			uint32			ButtonValues(int32 forStick = 0);
+								// Allows access to the first 32 buttons where
+								// each set bit indicates a pressed button.
+			status_t		GetButtonValues(bool* outButtons,
+								int32 forStick = 0);
+								// Haiku extension. Allows to retrieve the state
+								// of an arbitrary count of buttons. The
+								// outButtons argument is an array of boolean
+								// values with at least CountButtons() elements.
+								// True means the button is pressed and false
+								// means it is released.
 			status_t		GetButtonNameAt(int32 index,
 								BString* outName);
 

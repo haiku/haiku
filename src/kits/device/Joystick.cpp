@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <Joystick.h>
 #include <JoystickTweaker.h>
 
@@ -430,6 +431,35 @@ BJoystick::ButtonValues(int32 forStick)
 		return 0;
 
 	return extendedJoystick->buttons;
+}
+
+
+status_t
+BJoystick::GetButtonValues(bool *outButtons, int32 forStick)
+{
+	CALLED();
+
+	if (fJoystickInfo == NULL || fExtendedJoystick == NULL)
+		return B_NO_INIT;
+
+	if (forStick < 0
+		|| forStick >= (int32)fJoystickInfo->module_info.num_sticks)
+		return B_BAD_INDEX;
+
+	extended_joystick *extendedJoystick
+		= (extended_joystick *)fExtendedJoystick->ItemAt(forStick);
+	if (extendedJoystick == NULL)
+		return B_NO_INIT;
+
+	int16 buttonCount = fJoystickInfo->module_info.num_buttons;
+	for (int16 i = 0; i < buttonCount; i++) {
+		if (buttonCount >= 32)
+			outButtons[i] = false;
+		else
+			outButtons[i] = (extendedJoystick->buttons & (1 << i)) != 0;
+	}
+
+	return B_OK;
 }
 
 
