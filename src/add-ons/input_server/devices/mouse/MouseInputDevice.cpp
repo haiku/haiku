@@ -393,7 +393,8 @@ MouseDevice::_ControlThread()
 		nextTransferTime += kTransferDelay;
 #endif
 
-		if (ioctl(fDevice, MS_READ, &movements) != B_OK) {
+		if (ioctl(fDevice, MS_READ, &movements, sizeof(movements)) != B_OK) {
+			LOG_ERR("Mouse device exiting, %s\n", strerror(errno));
 			_ControlThreadCleanup();
 			// TOAST!
 			return;
