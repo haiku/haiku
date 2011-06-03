@@ -16,6 +16,7 @@
 #include <SupportDefs.h>
 #include <Drivers.h>
 #include <module.h>
+#include <stdlib.h>
 
 typedef struct _joystick {
 	bigtime_t	timestamp;
@@ -46,7 +47,35 @@ typedef struct _extended_joystick {
 // make storing and accessing the flat data in the "data" member easier. When
 // transferring data via read/write/ioctl only the flat data in "data" is ever
 // transmitted, not the whole structure.
-typedef struct _variable_joystick {
+typedef struct variable_joystick {
+	status_t initialize(uint32 axisCount, uint32 hatCount, uint32 buttonCount)
+	{
+		axis_count = axisCount;
+		hat_count = hatCount;
+		button_blocks = (buttonCount + 31) / 32;
+
+		data_size = sizeof(bigtime_t)			// timestamp
+			+ button_blocks * sizeof(uint32)	// bitmaps
+			+ axis_count * sizeof(int16)		// axis values
+			+ hat_count * sizeof(uint8);		// hat values
+
+		data = (uint8 *)malloc(data_size);
+		if (data == NULL)
+			return B_NO_MEMORY;
+
+		// fill in the convenience pointers
+		timestamp = (bigtime_t *)data;
+		buttons = (uint32 *)&timestamp[1];
+		axes = (int16 *)&buttons[button_blocks];
+		hats = (uint8 *)&axes[axis_count];
+		return B_OK;
+	}
+
+	status_t initialize_to_extended_joystick()
+	{
+		return initialize(MAX_AXES, MAX_HATS, MAX_BUTTONS);
+	}
+
 	uint32		axis_count;
 	uint32		hat_count;
 	uint32		button_blocks;
@@ -54,7 +83,7 @@ typedef struct _variable_joystick {
 
 	// These pointers all point into the data section and are here for
 	// convenience. They need to be set up manually by the one who creates this
-	// structure.
+	// structure or by using the initialize() method.
 	bigtime_t *	timestamp;
 	uint32 *	buttons;
 	int16 *		axes;
