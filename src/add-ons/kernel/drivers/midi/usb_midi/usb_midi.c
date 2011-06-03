@@ -199,12 +199,13 @@ interpret_midi_buffer(usbmidi_device_info* midiDevice)
 	size_t bytes_left = midiDevice->actual_length;
 	while (bytes_left) {	/* buffer may have several packets */
 		int pktlen = CINbytes[packet->cin];
+		usbmidi_port_info* port = midiDevice->ports[packet->cn];
+
 		DPRINTF_DEBUG((MY_ID "received packet %x:%d %x %x %x\n",
 			packet->cin, packet->cn,
 			packet->midi[0], packet->midi[1], packet->midi[2]));
 
-		usbmidi_port_info* port = midiDevice->ports[packet->cn];
-			/* port matching 'cable' */
+		/* port matching 'cable number' */
 		if (port == NULL) {
 			DPRINTF_ERR((MY_ID "no port matching cable number %d!\n",
 				packet->cn));

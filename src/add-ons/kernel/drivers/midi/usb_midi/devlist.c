@@ -51,7 +51,7 @@ remove_port_info(usbmidi_port_info* port)
 	if (usbmidi_port_list == port) {
 		usbmidi_port_list = port->next;
 		--usbmidi_port_count;
-		usbmidi_port_list_changed = true;		
+		usbmidi_port_list_changed = true;
 	} else {
 		usbmidi_port_info* d;
 		for (d = usbmidi_port_list; d != NULL; d = d->next) {
@@ -81,6 +81,7 @@ search_port_info(const char* name)
 	release_sem(usbmidi_port_list_lock);
 	return port;
 }
+
 
 int
 find_free_device_number(void)
