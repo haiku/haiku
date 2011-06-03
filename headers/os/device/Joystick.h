@@ -51,12 +51,6 @@ public:
 
 			int32			CountSticks();
 
-			status_t		GetControllerModule(BString* outName);
-			status_t		GetControllerName(BString* outName);
-
-			bool			IsCalibrationEnabled();
-			status_t		EnableCalibration(bool calibrates = true);
-
 			int32			CountAxes();
 			status_t		GetAxisValues(int16* outValues,
 								int32 forStick = 0);
@@ -69,10 +63,15 @@ public:
 			status_t		GetHatNameAt(int32 index, BString* outName);
 
 			int32			CountButtons();
-
 			uint32			ButtonValues(int32 forStick = 0);
 			status_t		GetButtonNameAt(int32 index,
 								BString* outName);
+
+			status_t		GetControllerModule(BString* outName);
+			status_t		GetControllerName(BString* outName);
+
+			bool			IsCalibrationEnabled();
+			status_t		EnableCalibration(bool calibrates = true);
 
 protected:
 	virtual	void			Calibrate(struct _extended_joystick*);
