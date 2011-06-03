@@ -141,6 +141,9 @@ BJoystick::Open(const char *portName, bool enhanced)
 	_BJoystickTweaker joystickTweaker(*this);
 	joystickTweaker.GetInfo(fJoystickInfo, portName);
 
+	// signal that we support variable reads
+	fJoystickInfo->module_info.flags |= js_flag_variable_size_reads;
+
 	LOG("ioctl - %d\n", fJoystickInfo->module_info.num_buttons);
 	ioctl(fFD, B_JOYSTICK_SET_DEVICE_MODULE, &fJoystickInfo->module_info,
 		sizeof(joystick_module_info));
