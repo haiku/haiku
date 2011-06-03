@@ -282,7 +282,7 @@ KeyboardDevice::_ControlThread()
 	memset(states, 0, sizeof(states));
 
 	while (fActive) {
-		if (ioctl(fFD, KB_READ, &keyInfo) != B_OK) {
+		if (ioctl(fFD, KB_READ, &keyInfo, sizeof(keyInfo)) != B_OK) {
 			_ControlThreadCleanup();
 			// TOAST!
 			return 0;
