@@ -16,6 +16,7 @@
 
 #include <ByteOrder.h>
 
+#include <arch/debug.h>
 #include <arch/debug_console.h>
 #include <debug.h>
 #include <elf.h>
@@ -107,23 +108,34 @@ gdb_reply(char const* format, ...)
 
 
 static void
-gdb_regreply(int const* regs, int numregs)
+gdb_regreply()
 {
-	int i;
-	int len;
-	int sum;
-
 	sReply[0] = '$';
-	for (i = 0; i < numregs; i++)
-		sprintf(sReply + 1 + 8 * i, "%08lx", B_HOST_TO_BENDIAN_INT32(regs[i]));
 
-	len = strlen(sReply);
-	sum = 0;
-	for (i = 1; i < len; i++)
+	// get registers (architecture specific)
+	ssize_t bytesWritten = arch_debug_gdb_get_registers(sReply + 1,
+		sizeof(sReply) - 1);
+	if (bytesWritten < 0) {
+		gdb_reply("E01");
+		return;
+	}
+
+	// add 1 for the leading '$'
+	bytesWritten++;
+
+	// compute check sum
+	int sum = 0;
+	for (int32 i = 1; i < bytesWritten; i++)
 		sum += sReply[i];
 	sum %= 256;
 
-	sprintf(sReply + len, "#%02x", sum);
+	// print check sum
+	int result = snprintf(sReply + bytesWritten, sizeof(sReply) - bytesWritten,
+		"#%02x", sum);
+	if (result >= (ssize_t)sizeof(sReply) - bytesWritten) {
+		gdb_reply("E01");
+		return;
+	}
 
 	gdb_resend_reply();
 }
@@ -227,34 +239,8 @@ gdb_parse_command(void)
 			return QUIT;
 
 		case 'g':
-		{
-#if 0
-			int cpu;
-
-			// command 'g' is used for reading the register
-			// file. Faked by now.
-			//
-			// For x86 the register order is:
-			//
-			//    eax, ebx, ecx, edx,
-			//    esp, ebp, esi, edi,
-			//    eip, eflags,
-			//    cs, ss, ds, es
-			//
-			// Note that even thought the segment descriptors
-			// are actually 16 bits wide, gdb requires them
-			// as 32 bit integers. Note also that for some
-			// reason (unknown to me) gdb wants the register
-			// dump in *big endian* format.
-			cpu = smp_get_current_cpu();
-			gdb_regreply(dbg_register_file[cpu], 14);
-#else
-			(void)gdb_regreply;
-			gdb_reply("E01");
-#endif
-
+			gdb_regreply();
 			break;
-		}
 
 		case 'G':
 			// write registers

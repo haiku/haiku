@@ -334,3 +334,9 @@ arch_debug_unset_current_thread(void)
 }
 
 
+ssize_t
+arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}

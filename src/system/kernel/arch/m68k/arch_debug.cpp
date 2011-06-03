@@ -398,6 +398,14 @@ arch_get_debug_variable(const char* variableName, uint64* value)
 }
 
 
+ssize_t
+arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {

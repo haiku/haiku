@@ -50,6 +50,8 @@ bool arch_is_debug_variable_defined(const char* variableName);
 status_t arch_set_debug_variable(const char* variableName, uint64 value);
 status_t arch_get_debug_variable(const char* variableName, uint64* value);
 
+ssize_t arch_debug_gdb_get_registers(char* buffer, size_t bufferSize);
+
 #ifdef __cplusplus
 }
 #endif
