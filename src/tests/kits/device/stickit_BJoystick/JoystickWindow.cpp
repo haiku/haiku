@@ -25,7 +25,7 @@ int32 hatX[9] = {10, 10, 20, 20, 20, 10, 0, 0, 0};
 int32 hatY[9] = {10, 0, 0, 10, 20, 20, 20, 10, 0};
 
 JoystickWindow::JoystickWindow(BJoystick *stick, BRect rect)
-	: BWindow(rect, "StickIt", B_TITLED_WINDOW, 
+	: BWindow(rect, "StickIt", B_TITLED_WINDOW,
 	B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
 {
 	fView = new JoystickView(Bounds(), stick);
@@ -55,7 +55,7 @@ JoystickView::JoystickView(BRect frame, BJoystick *stick)
 	BStringView *stickName = new BStringView(rect, "stickname", name.String());
 	stickName->SetFontSize(18);
 	AddChild(stickName);
-	
+
 	rect = _BuildButtons(stick);
 	rect.top += 15;
 	rect.bottom += 15;
@@ -78,15 +78,16 @@ JoystickView::Draw(BRect updateRect)
 	int32 numButtons = fStick->CountButtons();
 	int32 numHats = fStick->CountHats();
 	int32 numAxes = fStick->CountAxes();
+	bool *buttons = (bool *) malloc(sizeof(bool) * numButtons);
 	int16 *axes = (int16 *) malloc(sizeof(int16) * numAxes);
 	uint8 *hats = (uint8 *) malloc(numHats);
 	fStick->Update();
-	
+
 	// Buttons first
 	BRect r(105, 50, 115, 60);
-	uint32 buttons = fStick->ButtonValues();
+	fStick->GetButtonValues(buttons);
 	for (int32 i = 0; i < numButtons; i++) {
-		if (buttons & (1 << i)) {
+		if (buttons[i]) {
 			FillRect(r, B_SOLID_HIGH);
 		} else {
 			r.InsetBy(1, 1);
@@ -111,13 +112,13 @@ JoystickView::Draw(BRect updateRect)
 		AddLine(r.LeftTop(), r.LeftBottom(), rgb_black);
 		AddLine(r.RightTop(), r.RightBottom(), rgb_black);
 		AddLine(r.LeftBottom(), r.RightBottom(), rgb_black);
-		AddLine(BPoint(r.left+10, r.top), BPoint(r.left+10, r.bottom), 
+		AddLine(BPoint(r.left+10, r.top), BPoint(r.left+10, r.bottom),
 			rgb_black);
-		AddLine(BPoint(r.left+20, r.top), BPoint(r.left+20, r.bottom), 
+		AddLine(BPoint(r.left+20, r.top), BPoint(r.left+20, r.bottom),
 			rgb_black);
-		AddLine(BPoint(r.left, r.top+10), BPoint(r.right, r.top+10), 
+		AddLine(BPoint(r.left, r.top+10), BPoint(r.right, r.top+10),
 			rgb_black);
-		AddLine(BPoint(r.left, r.top+20), BPoint(r.right, r.top+20), 
+		AddLine(BPoint(r.left, r.top+20), BPoint(r.right, r.top+20),
 			rgb_black);
 		EndLineArray();
 		curHatRect.Set(r.left, r.top, r.left+10, r.top+10);
@@ -131,8 +132,8 @@ JoystickView::Draw(BRect updateRect)
 		r.top += 20;
 		r.bottom += 20;
 	}
-	
-	// Now the joystick	
+
+	// Now the joystick
 	r.Set(200, 50, 350, 200);
 	FillRect(r, B_SOLID_HIGH);
 	fStick->GetAxisValues(axes);
@@ -147,10 +148,10 @@ JoystickView::Draw(BRect updateRect)
 	y += 195;
 	FillEllipse(BPoint(x,y), 5, 5);
 	SetHighColor(rgb_black);
-	
+
 	// Finally, other axes
 	r.Set(200, 220, 350, 234);
-	for (int32 i = 2; i < numAxes; i++) {		
+	for (int32 i = 2; i < numAxes; i++) {
 		FillRect(r, B_SOLID_HIGH);
 		x = axes[i];
 		x += 32768;
@@ -163,6 +164,7 @@ JoystickView::Draw(BRect updateRect)
 		r.top += 20;
 		r.bottom += 20;
 	}
+	free(buttons);
 	free(axes);
 	free(hats);
 }
@@ -197,7 +199,7 @@ JoystickView::_BuildHats(BJoystick *stick, BRect rect)
 
 
 BRect
-JoystickView::_BuildString(BString name, const char* strName, int number, 
+JoystickView::_BuildString(BString name, const char* strName, int number,
 	BRect rect)
 {
 	name.Append(":");
@@ -215,17 +217,17 @@ void
 JoystickView::_BuildAxes(BJoystick *stick, BRect rect)
 {
 	float col1bot = rect.bottom - 30;
-	int32 numAxes = stick->CountAxes();	
-	// We assume that the first two axes are the x and y axes.	
+	int32 numAxes = stick->CountAxes();
+	// We assume that the first two axes are the x and y axes.
 	rect.Set(130, 50, 195, 64);
 	BStringView *sview = new BStringView(rect, "sticklabel", "Stick:");
 	sview->SetFont(be_bold_font);
 	sview->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(sview);
-	
+
 	BString name;
 	int32 i;
-	// Now make labels for all the solitary axes	
+	// Now make labels for all the solitary axes
 	rect.Set(130, 200, 195, 234);
 	for (i = 2; i < numAxes; i++) {
 		stick->GetAxisNameAt(i, &name);
