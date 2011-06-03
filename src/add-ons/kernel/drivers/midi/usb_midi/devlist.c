@@ -2,7 +2,7 @@
  * midi usb driver
  * devlist.c
  *
- * Copyright 2006-2009 Haiku Inc.  All rights reserved.
+ * Copyright 2006-2011 Haiku Inc.  All rights reserved.
  * Distributed under the terms of the MIT Licence.
  *
  * Authors:
@@ -23,64 +23,84 @@
 #include <string.h>
 
 
-sem_id			usbmidi_device_list_lock = -1;
-bool			usbmidi_device_list_changed = true;	/* added or removed */
+sem_id			usbmidi_port_list_lock = -1;
+bool			usbmidi_port_list_changed = true;	/* added or removed */
 
-static usbmidi_device_info*	usbmidi_device_list = NULL;
-static int		usbmidi_device_count = 0;
+static usbmidi_port_info*	usbmidi_port_list = NULL;
+static int		usbmidi_port_count = 0;
 
 
 void
-add_device_info(usbmidi_device_info* my_dev)
+add_port_info(usbmidi_port_info* port)
 {
-	assert(my_dev != NULL);
-	acquire_sem(usbmidi_device_list_lock);
-	my_dev->next = usbmidi_device_list;
-	usbmidi_device_list = my_dev;
-	usbmidi_device_count++;
-	usbmidi_device_list_changed = true;
-	release_sem(usbmidi_device_list_lock);
+	assert(port != NULL);
+	acquire_sem(usbmidi_port_list_lock);
+	port->next = usbmidi_port_list;
+	usbmidi_port_list = port;
+	usbmidi_port_count++;
+	usbmidi_port_list_changed = true;
+	release_sem(usbmidi_port_list_lock);
 }
 
 
 void
-remove_device_info(usbmidi_device_info* my_dev)
+remove_port_info(usbmidi_port_info* port)
 {
-	assert(my_dev != NULL);
-	acquire_sem(usbmidi_device_list_lock);
-	if (usbmidi_device_list == my_dev) {
-		usbmidi_device_list = my_dev->next;
-		--usbmidi_device_count;
-		usbmidi_device_list_changed = true;		
+	assert(port != NULL);
+	acquire_sem(usbmidi_port_list_lock);
+	if (usbmidi_port_list == port) {
+		usbmidi_port_list = port->next;
+		--usbmidi_port_count;
+		usbmidi_port_list_changed = true;		
 	} else {
-		usbmidi_device_info* d;
-		for (d = usbmidi_device_list; d != NULL; d = d->next) {
-			if (d->next == my_dev) {
-				d->next = my_dev->next;
-				--usbmidi_device_count;
-				usbmidi_device_list_changed = true;
+		usbmidi_port_info* d;
+		for (d = usbmidi_port_list; d != NULL; d = d->next) {
+			if (d->next == port) {
+				d->next = port->next;
+				--usbmidi_port_count;
+				usbmidi_port_list_changed = true;
 				break;
 			}
 		}
 		assert(d != NULL);
 	}
-	release_sem(usbmidi_device_list_lock);
+	release_sem(usbmidi_port_list_lock);
 }
 
 
-usbmidi_device_info*
-search_device_info(const char* name)
+usbmidi_port_info*
+search_port_info(const char* name)
 {
-	usbmidi_device_info* my_dev;
+	usbmidi_port_info* port;
 
-	acquire_sem(usbmidi_device_list_lock);
-	for (my_dev = usbmidi_device_list; my_dev != NULL; my_dev = my_dev->next) {
-		if (strcmp(my_dev->name, name) == 0)
+	acquire_sem(usbmidi_port_list_lock);
+	for (port = usbmidi_port_list; port != NULL; port = port->next) {
+		if (strcmp(port->name, name) == 0)
 			break;
 	}
-	release_sem(usbmidi_device_list_lock);
-	return my_dev;
+	release_sem(usbmidi_port_list_lock);
+	return port;
 }
+
+int
+find_free_device_number(void)
+{
+	usbmidi_port_info* port;
+	int number = 0;
+
+	acquire_sem(usbmidi_port_list_lock);
+	do {
+		for (port = usbmidi_port_list; port != NULL; port = port->next) {
+			if (port->device->devnum == number) {
+				number++;
+				break;	/* try next higher */
+			}
+		}
+	} while (port);
+	release_sem(usbmidi_port_list_lock);
+	return number;
+}
+
 
 
 /*
@@ -88,42 +108,42 @@ search_device_info(const char* name)
 */
 
 /* dynamically generated */
-char** usbmidi_device_names = NULL;
+char** usbmidi_port_names = NULL;
 
 
 void
-alloc_device_names(void)
+alloc_port_names(void)
 {
-	assert(usbmidi_device_names == NULL);
-	usbmidi_device_names = malloc(sizeof(char*) * (usbmidi_device_count + 1));
+	assert(usbmidi_port_names == NULL);
+	usbmidi_port_names = malloc(sizeof(char*) * (usbmidi_port_count + 1));
 }
 
 
 void
-free_device_names(void)
+free_port_names(void)
 {
-	if (usbmidi_device_names != NULL) {
+	if (usbmidi_port_names != NULL) {
 		int i;
-		for (i = 0; usbmidi_device_names[i] != NULL; i++)
-			free(usbmidi_device_names[i]);
-		free(usbmidi_device_names);
-		usbmidi_device_names = NULL;
+		for (i = 0; usbmidi_port_names[i] != NULL; i++)
+			free(usbmidi_port_names[i]);
+		free(usbmidi_port_names);
+		usbmidi_port_names = NULL;
 	}
 }
 
 
 void
-rebuild_device_names(void)
+rebuild_port_names(void)
 {
 	int i;
-	usbmidi_device_info* my_dev;
+	usbmidi_port_info* port;
 
-	assert(usbmidi_device_names != NULL);
-	acquire_sem(usbmidi_device_list_lock);
-	for (i = 0, my_dev = usbmidi_device_list; my_dev != NULL; my_dev = my_dev->next) {
-		usbmidi_device_names[i++] = strdup(my_dev->name);
-		DPRINTF_INFO((MY_ID "publishing %s\n", my_dev->name));
+	assert(usbmidi_port_names != NULL);
+	acquire_sem(usbmidi_port_list_lock);
+	for (i = 0, port = usbmidi_port_list; port != NULL; port = port->next) {
+		usbmidi_port_names[i++] = strdup(port->name);
+		DPRINTF_INFO((MY_ID "publishing %s\n", port->name));
 	}
-	usbmidi_device_names[i] = NULL;
-	release_sem(usbmidi_device_list_lock);
+	usbmidi_port_names[i] = NULL;
+	release_sem(usbmidi_port_list_lock);
 }

@@ -2,7 +2,7 @@
  * midi usb driver
  * usb_midi.h
  *
- * Copyright 2006-2009 Haiku Inc.  All rights reserved.
+ * Copyright 2006-2011 Haiku Inc.  All rights reserved.
  * Distributed under the terms of the MIT Licence.
  *
  * Authors:
@@ -23,23 +23,32 @@
 
 #include "ring_buffer.h"
 
+/* Three levels of printout for convenience: */
 /* #define DEBUG 1 -- more convenient to define in the code file when needed */
+#define DEBUG_INFO 1
 #define DEBUG_ERR 1
 
-#if DEBUG
-	#define	DPRINTF_INFO(x)	dprintf x
-#else
-	#define DPRINTF_INFO(x) 
-#endif
+/* Normally leave this enabled to leave a record in syslog */
 #if DEBUG_ERR
 	#define	DPRINTF_ERR(x)	dprintf x
 #else
 	#define DPRINTF_ERR(x)
 #endif
 
-/* For local finer debugging control: */
-#define	DPRINTF_INFOX(x)	dprintf x
-#define DPRINTF_INFOZ(x) 
+/* Use this for initialization etc. messages -- nothing repetitive: */
+#if DEBUG_INFO
+	#define	DPRINTF_INFO(x)	dprintf x
+#else
+	#define DPRINTF_INFO(x)
+#endif
+
+/* Enable this to record detailed stuff: */
+#if DEBUG
+	#define	DPRINTF_DEBUG(x)	dprintf x
+#else
+	#define DPRINTF_DEBUG(x)
+#endif
+
 
 /* driver specific definitions */
 
@@ -49,7 +58,8 @@
 #define	MY_ERR	"\033[31merror:\033[m "
 #define	MY_WARN	"\033[31mwarning:\033[m "
 #define	assert(x) \
-	((x) ? 0 : dprintf(MY_ID "assertion failed at " __FILE__ ", line %d\n", __LINE__))
+	((x) ? 0 : dprintf(MY_ID "assertion failed at " \
+	 __FILE__ ", line %d\n", __LINE__))
 
 #define	DEFAULT_CONFIGURATION	0
 
@@ -58,61 +68,91 @@ struct driver_cookie;
 
 typedef struct usbmidi_device_info
 {
-	/* list structure */
+	/* list structure */ /* should not be needed eventually */
 	struct usbmidi_device_info* next;
 
-	/* maintain device */
+	/* Set of actual ports ("cables" -- one or more) */
+	struct usbmidi_port_info* ports[16];
+
+	/* maintain device  (common for all ports) */
 	sem_id sem_lock;
 	sem_id sem_send;
 	area_id buffer_area;
 	usb_midi_event_packet* buffer;	/* input buffer & base of area */
-	usb_midi_event_packet* out_buffer;	/* above input buff */
-	
+	usb_midi_event_packet* out_buffer;	/* above input buffer */
+	size_t buffer_size;		/* for each of in and out buffers */
+
 	const usb_device* dev;
 	uint16 ifno;
-	char name[30];
-	
-	struct ring_buffer* rbuf;
+	int devnum;	/* unique device number */
+	char name[20];
+		/* = "/dev/midi/usb/n" --port number will be appended to this */
 
 	bool active;
-	int open;
-	struct driver_cookie* open_fd;
 
 	/* work area for transfer */
-	int usbd_status, bus_status, cmd_status;
+	int bus_status;
 	int actual_length;
 	const usb_endpoint_info* ept_in;
 	const usb_endpoint_info* ept_out;
 
-	size_t buffer_size;
-	bigtime_t timestamp;
-	uint flags;
+	bigtime_t timestamp;	/* Is this needed? Currently set but never read */
+	uint flags;				/* set to 0 but never used */
 } usbmidi_device_info;
 
 
-/* usb_midi.c */
+typedef struct usbmidi_port_info
+{
+	/* list structure for manager */
+	struct usbmidi_port_info* next;
+
+	/* Common device that does the work */
+	usbmidi_device_info* device;
+
+	/* Port-specific variables */
+	char name[40];	/* complete pathname of this port */
+	struct ring_buffer* rbuf;
+
+	int cable;	/* index of this port */
+	bool has_in, has_out;
+
+	int open;
+	struct driver_cookie* open_fd;
+
+} usbmidi_port_info;
+
+
+/*
+ usb_midi.c
+*/
 
 extern usb_module_info* usb;
 extern const char* usb_midi_base_name;
 
-usbmidi_device_info* 
-create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno);
+extern usbmidi_port_info* create_usbmidi_port(usbmidi_device_info* devinfo,
+	int cable, bool has_in, bool has_out);
+extern void remove_port(usbmidi_port_info* port);
 
-void 
-remove_device(usbmidi_device_info* my_dev);
+extern usbmidi_device_info* create_device(const usb_device* dev, uint16 ifno);
+extern void remove_device(usbmidi_device_info* my_dev);
 
 
-/* devlist.c */
+/*
+ devlist.c
+*/
 
-extern sem_id usbmidi_device_list_lock;
-extern bool usbmidi_device_list_changed;
+extern sem_id usbmidi_port_list_lock;
+extern bool usbmidi_port_list_changed;
 
-void add_device_info(usbmidi_device_info* my_dev);
-void remove_device_info(usbmidi_device_info* my_dev);
-usbmidi_device_info* search_device_info(const char* name);
+extern void add_port_info(usbmidi_port_info* port);
+extern void remove_port_info(usbmidi_port_info* port);
 
-extern char** usbmidi_device_names;
+extern usbmidi_port_info* search_port_info(const char* name);
 
-void alloc_device_names(void);
-void free_device_names(void);
-void rebuild_device_names(void);
+extern int find_free_device_number(void);
+
+extern char** usbmidi_port_names;
+
+extern void alloc_port_names(void);
+extern void free_port_names(void);
+extern void rebuild_port_names(void);
