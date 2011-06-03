@@ -161,10 +161,14 @@ class BPoseView : public BView {
 		virtual	void AttachedToWindow();
 		virtual void WindowActivated(bool);
 		virtual void MakeFocus(bool = true);
-		virtual void MouseMoved(BPoint, uint32, const BMessage *);
 		virtual	void Draw(BRect update_rect);
 		virtual	void DrawAfterChildren(BRect update_rect);
+		virtual void MouseMoved(BPoint, uint32, const BMessage *);
 		virtual	void MouseDown(BPoint where);
+		virtual	void MouseUp(BPoint where);
+		virtual	void MouseDragged(const BMessage *);
+		virtual	void MouseLongDown(const BMessage *);
+		virtual void MouseIdle(const BMessage *);
 		virtual	void KeyDown(const char *, int32);
 		virtual void Pulse();
 		virtual void MoveBy(float, float);
@@ -355,7 +359,6 @@ class BPoseView : public BView {
 		static bool CanHandleDragSelection(const Model *target,
 			const BMessage *dragMessage, bool ignoreTypes);
 		virtual	void DragSelectedPoses(const BPose *clickedPose, BPoint);
-		virtual	void DragSelectionRect(BPoint, bool extendSelection);
 
 		void MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false);
@@ -574,12 +577,15 @@ class BPoseView : public BView {
 		// click handling
 		bool WasDoubleClick(const BPose *, BPoint);
 		bool WasClickInPath(const BPose *, int32 index, BPoint) const;
-		int32 WaitForMouseUpOrDrag(BPoint start);
 
 		// selection
 		void SelectPosesListMode(BRect, BList **);
 		void SelectPosesIconMode(BRect, BList **);
 		void AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose *);
+
+		void _BeginSelectionRect(const BPoint& point, bool extendSelection);
+		void _UpdateSelectionRect(const BPoint& point);
+		void _EndSelectionRect();
 
 		// view drawing
 		void SynchronousUpdate(BRect, bool clip = false);
@@ -685,6 +691,18 @@ class BPoseView : public BView {
 		const BPose *fRealPivotPose;
 		BMessageRunner *fKeyRunner;
 
+		struct SelectionRectInfo {
+					SelectionRectInfo()
+						:	isDragging(false), selection(NULL) {};
+			bool	isDragging;
+			BRect	rect;
+			BRect	lastRect;
+			BPoint	startPoint;
+			BPoint	lastPoint;
+			BList*	selection;
+		};
+		SelectionRectInfo fSelectionRectInfo;
+
 		bool fSelectionVisible : 1;
 		bool fMultipleSelection : 1;
 		bool fDragEnabled : 1;
@@ -709,7 +727,6 @@ class BPoseView : public BView {
 		int32 fLastFilterStringLength;
 
 		BRect fStartFrame;
-		BRect fSelectionRect;
 
 		static float sFontHeight;
 		static font_height sFontInfo;

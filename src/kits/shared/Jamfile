@@ -23,6 +23,7 @@ StaticLibrary libshared.a :
 	IconButton.cpp
 	IconView.cpp
 	Keymap.cpp
+	LongAndDragTrackingFilter.cpp
 	NaturalCompare.cpp
 	QueryFile.cpp
 	RWLockManager.cpp

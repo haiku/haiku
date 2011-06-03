@@ -58,6 +58,7 @@ All rights reserved.
 #include <Query.h>
 #include <List.h>
 #include <Locale.h>
+#include <LongAndDragTrackingFilter.h>
 #include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -113,6 +114,8 @@ const float kCountViewWidth = 76;
 const uint32 kAddNewPoses = 'Tanp';
 const uint32 kAddPosesCompleted = 'Tapc';
 const int32 kMaxAddPosesChunk = 50;
+const uint32 kMsgMouseDragged = 'Mdrg';
+const uint32 kMsgMouseLongDown = 'Mold';
 
 
 namespace BPrivate {
@@ -921,6 +924,8 @@ BPoseView::AttachedToWindow()
 		// Escape key, used to abort an on-going clipboard cut or filtering
 	AddFilter(new ShortcutFilter(B_ESCAPE, B_SHIFT_KEY, kCancelSelectionToClipboard, this));
 		// Escape + SHIFT will remove current selection from clipboard, or all poses from current folder if 0 selected
+
+	AddFilter(new LongAndDragTrackingFilter(kMsgMouseLongDown, kMsgMouseDragged));
 
 	fLastLeftTop = LeftTop();
 	BFont font(be_plain_font);
@@ -2153,6 +2158,18 @@ BPoseView::MessageReceived(BMessage *message)
 		case kListMode:
 		case kMiniIconMode:
 			SetViewMode(message->what);
+			break;
+		
+		case kMsgMouseDragged:
+			MouseDragged(message);
+			break;
+			
+		case kMsgMouseLongDown:
+			MouseLongDown(message);
+			break;
+			
+		case B_MOUSE_IDLE:
+			MouseIdle(message);			
 			break;
 
 		case B_SELECT_ALL:
@@ -6545,10 +6562,237 @@ BPoseView::ShowContextMenu(BPoint where)
 
 
 void
+BPoseView::_BeginSelectionRect(const BPoint& point, bool shouldExtend)
+{
+	// set initial empty selection rectangle
+	fSelectionRectInfo.rect = BRect(point, point - BPoint(1, 1));
+
+	if (!fTransparentSelection) {
+		SetDrawingMode(B_OP_INVERT);
+		StrokeRect(fSelectionRectInfo.rect, B_MIXED_COLORS);
+		SetDrawingMode(B_OP_OVER);
+	}
+
+	fSelectionRectInfo.lastRect = fSelectionRectInfo.rect;
+	fSelectionRectInfo.selection = new BList;
+	fSelectionRectInfo.startPoint = point;
+	fSelectionRectInfo.lastPoint = point;
+	fSelectionRectInfo.isDragging = true;
+}
+
+
+static void
+AddIfPoseSelected(BPose *pose, PoseList *list)
+{
+	if (pose->IsSelected())
+		list->AddItem(pose);
+}
+
+
+void
+BPoseView::_UpdateSelectionRect(const BPoint& point)
+{
+	if (point != fSelectionRectInfo.lastPoint) {
+
+		fSelectionRectInfo.lastPoint = point;
+
+		// erase last rect
+		if (!fTransparentSelection) {
+			SetDrawingMode(B_OP_INVERT);
+			StrokeRect(fSelectionRectInfo.rect, B_MIXED_COLORS);
+			SetDrawingMode(B_OP_OVER);
+		}
+
+		fSelectionRectInfo.rect.top = std::min(point.y,
+			fSelectionRectInfo.startPoint.y);
+		fSelectionRectInfo.rect.left = std::min(point.x,
+			fSelectionRectInfo.startPoint.x);
+		fSelectionRectInfo.rect.bottom = std::max(point.y,
+			fSelectionRectInfo.startPoint.y);
+		fSelectionRectInfo.rect.right = std::max(point.x,
+			fSelectionRectInfo.startPoint.x);
+
+		fIsDrawingSelectionRect = true;
+
+		CheckAutoScroll(point, true, true);
+
+		// use current selection rectangle to scan poses
+		if (ViewMode() == kListMode) {
+			SelectPosesListMode(fSelectionRectInfo.rect,
+				&fSelectionRectInfo.selection);
+		} else {
+			SelectPosesIconMode(fSelectionRectInfo.rect,
+				&fSelectionRectInfo.selection);
+		}
+
+		Window()->UpdateIfNeeded();
+
+		// draw new rect
+		if (!fTransparentSelection) {
+			SetDrawingMode(B_OP_INVERT);
+			StrokeRect(fSelectionRectInfo.rect, B_MIXED_COLORS);
+			SetDrawingMode(B_OP_OVER);
+		} else {
+			BRegion updateRegion1;
+			BRegion updateRegion2;
+
+			bool sameWidth = fSelectionRectInfo.rect.Width()
+				== fSelectionRectInfo.lastRect.Width();
+			bool sameHeight = fSelectionRectInfo.rect.Height()
+				== fSelectionRectInfo.lastRect.Height();
+
+			updateRegion1.Include(fSelectionRectInfo.rect);
+			updateRegion1.Exclude(fSelectionRectInfo.lastRect.InsetByCopy(
+				sameWidth ? 0 : 1, sameHeight ? 0 : 1));
+			updateRegion2.Include(fSelectionRectInfo.lastRect);
+			updateRegion2.Exclude(fSelectionRectInfo.rect.InsetByCopy(
+				sameWidth ? 0 : 1, sameHeight ? 0 : 1));
+			updateRegion1.Include(&updateRegion2);
+			BRect unionRect = fSelectionRectInfo.rect
+				& fSelectionRectInfo.lastRect;
+			updateRegion1.Exclude(unionRect
+				& BRect(-2000, fSelectionRectInfo.startPoint.y, 2000,
+				fSelectionRectInfo.startPoint.y));
+			updateRegion1.Exclude(unionRect
+				& BRect(fSelectionRectInfo.startPoint.x, -2000,
+				fSelectionRectInfo.startPoint.x, 2000));
+
+			fSelectionRectInfo.lastRect = fSelectionRectInfo.rect;
+
+			Invalidate(&updateRegion1);
+			Window()->UpdateIfNeeded();
+		}
+		Flush();
+	}
+}
+
+
+void
+BPoseView::_EndSelectionRect()
+{
+	delete fSelectionRectInfo.selection;
+	fSelectionRectInfo.selection = NULL;
+
+	fSelectionRectInfo.isDragging = false;
+	fIsDrawingSelectionRect = false; // TODO: remove BPose dependency?
+
+	// do final erase of selection rect
+	if (!fTransparentSelection) {
+		SetDrawingMode(B_OP_INVERT);
+		StrokeRect(fSelectionRectInfo.rect, B_MIXED_COLORS);
+		SetDrawingMode(B_OP_COPY);
+	} else {
+		Invalidate(fSelectionRectInfo.rect);
+		fSelectionRectInfo.rect.Set(0, 0, -1, -1);
+		Window()->UpdateIfNeeded();
+	}
+
+	// we now need to update the pose view's selection list by clearing it
+	// and then polling each pose for selection state and rebuilding list
+	fSelectionList->MakeEmpty();
+	fMimeTypesInSelectionCache.MakeEmpty();
+
+	EachListItem(fPoseList, AddIfPoseSelected, fSelectionList);
+
+	// and now make sure that the pivot point is in sync
+	if (fSelectionPivotPose && !fSelectionList->HasItem(fSelectionPivotPose))
+		fSelectionPivotPose = NULL;
+	if (fRealPivotPose && !fSelectionList->HasItem(fRealPivotPose))
+		fRealPivotPose = NULL;
+}
+
+
+void
+BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
+{
+	if (fSelectionRectInfo.isDragging)
+		_UpdateSelectionRect(mouseLoc);
+	
+	if (!fDropEnabled || !message)
+		return;
+
+	BContainerWindow* window = ContainerWindow();
+	if (!window)
+		return;
+
+	switch (moveCode) {
+		case B_INSIDE_VIEW:
+		case B_ENTERED_VIEW:
+			UpdateDropTarget(mouseLoc, message, window->ContextMenu());
+			if (fAutoScrollState == kAutoScrollOff) {
+				// turn on auto scrolling if it's not yet on
+				fAutoScrollState = kWaitForTransition;
+				window->SetPulseRate(100000);
+			}
+			break;
+
+		case B_EXITED_VIEW:
+			// reset cursor in case we set it to the copy cursor
+			// in UpdateDropTarget
+			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
+			fCursorCheck = false;
+			// TODO: autoscroll here
+			if (!window->ContextMenu()) {
+				HiliteDropTarget(false);
+				fDropTarget = NULL;
+			}
+			break;
+	}	
+}
+
+
+void
+BPoseView::MouseDragged(const BMessage *message)
+{
+	BPoint where;
+	if (message->FindPoint("be:view_where", &where) != B_OK)
+		return;
+
+	bool extendSelection = (modifiers() & B_COMMAND_KEY) && fMultipleSelection;
+
+	int32 index;
+	BPose* pose = FindPose(where, &index);
+	if (pose != NULL)
+		DragSelectedPoses(pose, where);
+	else
+		_BeginSelectionRect(where, extendSelection);	
+}
+
+
+void
+BPoseView::MouseLongDown(const BMessage *message)
+{
+	BPoint where;
+	if (message->FindPoint("where", &where) != B_OK)
+		return;
+
+	ShowContextMenu(where);
+}
+
+
+void
+BPoseView::MouseIdle(const BMessage *message)
+{
+	BPoint where;
+	uint32 buttons = 0;
+	GetMouse(&where, &buttons);
+	BContainerWindow* window = ContainerWindow();
+
+	if (buttons == 0 || window == NULL)
+		return;
+		 	
+	if (fDropTarget != NULL) {
+		window->DragStart(message);
+		FrameForPose(fDropTarget, true, &fStartFrame);
+		ShowContextMenu(where);
+	} else
+		window->Activate();
+}
+
+
+void
 BPoseView::MouseDown(BPoint where)
 {
-	// TODO: add asynch mouse tracking
-
 	// handle disposing of drag data lazily
 	DragStop();
 	BContainerWindow *window = ContainerWindow();
@@ -6572,7 +6816,6 @@ BPoseView::MouseDown(BPoint where)
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
 		showContext = (modifs & B_CONTROL_KEY) != 0;
 
-	// if a pose was hit, delay context menu for a bit to see if user dragged
 	if (showContext) {
 		int32 index;
 		BPose *pose = FindPose(where, &index);
@@ -6586,24 +6829,7 @@ BPoseView::MouseDown(BPoint where)
 			fSelectionList->AddItem(pose);
 			DrawPose(pose, index, false);
 		}
-
-		bigtime_t clickTime = system_time();
-		BPoint loc;
-		GetMouse(&loc, &buttons);
-		for (;;) {
-			if (fabs(loc.x - where.x) > 4 || fabs(loc.y - where.y) > 4)
-				// moved the mouse, cancel showing the context menu
-				break;
-
-			if (!buttons || (system_time() - clickTime) > 200000) {
-				// let go of button or pressing for a while, show menu now
-				ShowContextMenu(where);
-				return;
-			}
-
-			snooze(10000);
-			GetMouse(&loc, &buttons);
-		}
+		ShowContextMenu(where);
 	}
 
 	bool extendSelection = (modifs & B_COMMAND_KEY) && fMultipleSelection;
@@ -6616,26 +6842,10 @@ BPoseView::MouseDown(BPoint where)
 	if (pose) {
 		AddRemoveSelectionRange(where, extendSelection, pose);
 
-		switch (WaitForMouseUpOrDrag(where)) {
-			case kWasDragged:
-				DragSelectedPoses(pose, where);
-				break;
-
-			case kNotDragged:
-				if (!extendSelection && WasDoubleClick(pose, where)) {
-					// special handling for Path field double-clicks
-					if (!WasClickInPath(pose, index, where))
-						OpenSelection(pose, &index);
-
-				} else if (fAllowPoseEditing)
-					// mouse is up but no drag or double-click occurred
-					pose->MouseUp(BPoint(0, index * fListElemHeight), this, where, index);
-
-				break;
-
-			default:
-				// this is the CONTEXT_MENU case
-				break;
+		if (!extendSelection && WasDoubleClick(pose, where)) {
+			// special handling for Path field double-clicks
+			if (!WasClickInPath(pose, index, where))
+				OpenSelection(pose, &index);
 		}
 	} else {
 		// click was not in any pose
@@ -6643,11 +6853,27 @@ BPoseView::MouseDown(BPoint where)
 
 		window->Activate();
 		window->UpdateIfNeeded();
-		DragSelectionRect(where, extendSelection);
+		
+		// only clear selection if we are not extending it
+		if (!extendSelection || !fSelectionRectEnabled || !fMultipleSelection)
+			ClearSelection();
 	}
 
 	if (fSelectionChangedHook)
 		window->SelectionChanged();
+}
+
+
+void
+BPoseView::MouseUp(BPoint where)
+{
+	if (fSelectionRectInfo.isDragging)
+		_EndSelectionRect();
+
+	int32 index;
+	BPose* pose = FindPose(where, &index);
+	if (pose != NULL && fAllowPoseEditing)
+		pose->MouseUp(BPoint(0, index * fListElemHeight), this, where, index);
 }
 
 
@@ -6971,149 +7197,8 @@ BPoseView::GetDragRect(int32 clickedPoseIndex)
 }
 
 
-static void
-AddIfPoseSelected(BPose *pose, PoseList *list)
-{
-	if (pose->IsSelected())
-		list->AddItem(pose);
-}
-
-
-void
-BPoseView::DragSelectionRect(BPoint startPoint, bool shouldExtend)
-{
-	// only clear selection if we are not extending it
-	if (!shouldExtend)
-		ClearSelection();
-
-	if (WaitForMouseUpOrDrag(startPoint) != kWasDragged) {
-		if (!shouldExtend)
-			ClearSelection();
-		return;
-	}
-
-	if (!fSelectionRectEnabled || !fMultipleSelection) {
-		ClearSelection();
-		return;
-	}
-
-	// clearing the selection could take a while so poll the mouse again
-	BPoint newMousePoint;
-	uint32 button;
-	GetMouse(&newMousePoint, &button);
-
-	// draw initial empty selection rectangle
-	BRect lastSelectionRect;
-	fSelectionRect = lastSelectionRect = BRect(startPoint, startPoint - BPoint(1, 1));
-
-	if (!fTransparentSelection) {
-		SetDrawingMode(B_OP_INVERT);
-		StrokeRect(fSelectionRect, B_MIXED_COLORS);
-		SetDrawingMode(B_OP_OVER);
-	}
-
-	BList *selectionList = new BList;
-
-	BPoint oldMousePoint(startPoint);
-	while (button) {
-		GetMouse(&newMousePoint, &button, false);
-
-		if (newMousePoint != oldMousePoint) {
-			oldMousePoint = newMousePoint;
-			BRect oldRect = fSelectionRect;
-			fSelectionRect.top = std::min(newMousePoint.y, startPoint.y);
-			fSelectionRect.left = std::min(newMousePoint.x, startPoint.x);
-			fSelectionRect.bottom = std::max(newMousePoint.y, startPoint.y);
-			fSelectionRect.right = std::max(newMousePoint.x, startPoint.x);
-
-			// erase old rect
-			if (!fTransparentSelection) {
-				SetDrawingMode(B_OP_INVERT);
-				StrokeRect(oldRect, B_MIXED_COLORS);
-				SetDrawingMode(B_OP_OVER);
-			}
-
-			fIsDrawingSelectionRect = true;
-
-			CheckAutoScroll(newMousePoint, true, true);
-
-			// use current selection rectangle to scan poses
-			if (ViewMode() == kListMode)
-				SelectPosesListMode(fSelectionRect, &selectionList);
-			else
-				SelectPosesIconMode(fSelectionRect, &selectionList);
-
-			Window()->UpdateIfNeeded();
-
-			// draw new selected rect
-			if (!fTransparentSelection) {
-				SetDrawingMode(B_OP_INVERT);
-				StrokeRect(fSelectionRect, B_MIXED_COLORS);
-				SetDrawingMode(B_OP_OVER);
-			} else {
-				BRegion updateRegion1;
-				BRegion updateRegion2;
-
-				bool sameWidth = fSelectionRect.Width() == lastSelectionRect.Width();
-				bool sameHeight = fSelectionRect.Height() == lastSelectionRect.Height();
-
-				updateRegion1.Include(fSelectionRect);
-				updateRegion1.Exclude(lastSelectionRect.InsetByCopy(
-					sameWidth ? 0 : 1, sameHeight ? 0 : 1));
-				updateRegion2.Include(lastSelectionRect);
-				updateRegion2.Exclude(fSelectionRect.InsetByCopy(
-					sameWidth ? 0 : 1, sameHeight ? 0 : 1));
-				updateRegion1.Include(&updateRegion2);
-				BRect unionRect = fSelectionRect & lastSelectionRect;
-				updateRegion1.Exclude(unionRect
-					& BRect(-2000, startPoint.y, 2000, startPoint.y));
-				updateRegion1.Exclude(unionRect
-					& BRect(startPoint.x, -2000, startPoint.x, 2000));
-
-				lastSelectionRect = fSelectionRect;
-
-				Invalidate(&updateRegion1);
-				Window()->UpdateIfNeeded();
-			}
-
-			Flush();
-		}
-
-		snooze(20000);
-	}
-
-	delete selectionList;
-
-	fIsDrawingSelectionRect = false;
-
-	// do final erase of selection rect
-	if (!fTransparentSelection) {
-		SetDrawingMode(B_OP_INVERT);
-		StrokeRect(fSelectionRect, B_MIXED_COLORS);
-		SetDrawingMode(B_OP_COPY);
-	} else {
-		Invalidate(fSelectionRect);
-		fSelectionRect.Set(0, 0, -1, -1);
-		Window()->UpdateIfNeeded();
-	}
-
-	// we now need to update the pose view's selection list by clearing it
-	// and then polling each pose for selection state and rebuilding list
-	fSelectionList->MakeEmpty();
-	fMimeTypesInSelectionCache.MakeEmpty();
-
-	EachListItem(fPoseList, AddIfPoseSelected, fSelectionList);
-
-	// and now make sure that the pivot point is in sync
-	if (fSelectionPivotPose && !fSelectionList->HasItem(fSelectionPivotPose))
-		fSelectionPivotPose = NULL;
-	if (fRealPivotPose && !fSelectionList->HasItem(fRealPivotPose))
-		fRealPivotPose = NULL;
-}
-
 // TODO: SelectPosesListMode and SelectPosesIconMode are terrible and share
 // most code
-
 void
 BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 {
@@ -7344,41 +7429,6 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose *po
 		fSelectionPivotPose = pose;
 		fRealPivotPose = pose;
 	}
-}
-
-
-int32
-BPoseView::WaitForMouseUpOrDrag(BPoint start)
-{
-	bigtime_t start_time = system_time();
-	bigtime_t doubleClickSpeed;
-	get_click_speed(&doubleClickSpeed);
-
-	// use double the doubleClickSpeed as a treshold
-	doubleClickSpeed *= 2;
-
-	// loop until mouse has been dragged at least 2 pixels
-	uint32 button;
-	BPoint loc;
-	GetMouse(&loc, &button, false);
-
-	while (button) {
-		GetMouse(&loc, &button, false);
-		if (fabs(loc.x - start.x) > 2 || fabs(loc.y - start.y) > 2)
-			return kWasDragged;
-
-		if ((system_time() - start_time) > doubleClickSpeed) {
-			ShowContextMenu(start);
-			return kContextMenuShown;
-		}
-
-		snooze(15000);
-	}
-
-	// user let up on mouse button without dragging
-	Window()->Activate();
-	Window()->UpdateIfNeeded();
-	return kNotDragged;
 }
 
 
@@ -8391,14 +8441,16 @@ BPoseView::Draw(BRect updateRect)
 void
 BPoseView::DrawAfterChildren(BRect updateRect)
 {
-	if (fTransparentSelection && fSelectionRect.IsValid()) {
+	if (fTransparentSelection && fSelectionRectInfo.rect.IsValid()) {
 		SetDrawingMode(B_OP_ALPHA);
 		SetHighColor(255, 255, 255, 128);
-		if (fSelectionRect.Width() == 0 || fSelectionRect.Height() == 0)
-			StrokeLine(fSelectionRect.LeftTop(), fSelectionRect.RightBottom());
-		else {
-			StrokeRect(fSelectionRect);
-			BRect interior = fSelectionRect;
+		if (fSelectionRectInfo.rect.Width() == 0
+			|| fSelectionRectInfo.rect.Height() == 0) {
+			StrokeLine(fSelectionRectInfo.rect.LeftTop(),
+				fSelectionRectInfo.rect.RightBottom());
+		} else {
+			StrokeRect(fSelectionRectInfo.rect);
+			BRect interior = fSelectionRectInfo.rect;
 			interior.InsetBy(1, 1);
 			if (interior.IsValid()) {
 				SetHighColor(80, 80, 80, 90);
@@ -8944,82 +8996,6 @@ BPoseView::MoveColumnTo(BColumn *src, BColumn *dest)
 	Invalidate(bounds);
 
 	fStateNeedsSaving =  true;
-}
-
-
-void
-BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
-{
-	if (!fDropEnabled || !message)
-		return;
-
-	BContainerWindow* window = ContainerWindow();
-	if (!window)
-		return;
-
-	switch (moveCode) {
-		case B_INSIDE_VIEW:
-		case B_ENTERED_VIEW:
-		{
-			UpdateDropTarget(mouseLoc, message, window->ContextMenu());
-			if (fAutoScrollState == kAutoScrollOff) {
-				// turn on auto scrolling if it's not yet on
-				fAutoScrollState = kWaitForTransition;
-				window->SetPulseRate(100000);
-			}
-
-			bigtime_t dropActionDelay;
-			get_click_speed(&dropActionDelay);
-			dropActionDelay *= 3;
-
-			if (window->ContextMenu())
-				break;
-
-			bigtime_t clickTime = system_time();
-			BPoint loc;
-			uint32 buttons;
-			GetMouse(&loc, &buttons);
-			for (;;) {
-				if (buttons == 0
-					|| fabs(loc.x - mouseLoc.x) > 4 || fabs(loc.y - mouseLoc.y) > 4) {
-					// only loop if mouse buttons are down
-					// moved the mouse, cancel showing the context menu
-					break;
-				}
-
-				// handle drag and drop
-				bigtime_t now = system_time();
-				// use shift key to get around over-loading of Control key
-				// for context menus and auto-dnd menu
-				if (((modifiers() & B_SHIFT_KEY) && (now - clickTime) > 200000)
-					|| now - clickTime > dropActionDelay) {
-					// let go of button or pressing for a while, show menu now
-					if (fDropTarget) {
-						window->DragStart(message);
-						FrameForPose(fDropTarget, true, &fStartFrame);
-						ShowContextMenu(mouseLoc);
-					} else
-						window->Activate();
-					break;
-				}
-
-				snooze(10000);
-				GetMouse(&loc, &buttons);
-			}
-			break;
-		}
-
-		case B_EXITED_VIEW:
-			// reset cursor in case we set it to the copy cursor in UpdateDropTarget
-			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
-			fCursorCheck = false;
-			// TODO: autoscroll here
-			if (!window->ContextMenu()) {
-				HiliteDropTarget(false);
-				fDropTarget = NULL;
-			}
-			break;
-	}
 }
 
 
