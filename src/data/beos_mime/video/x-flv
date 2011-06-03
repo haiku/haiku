@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "video/x-flv";
 
-resource(5, "META:SNIFF_RULE") "0.50 (\"FLV\")";
+resource(2, "META:S:DESC") #'MSDC' "Flash video";
 
-resource(3, "META:S:DESC") #'MSDC' "FLV movie";
+resource(3, "META:SNIFF_RULE") "0.50 (\"FLV\")";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "flv",
