@@ -163,20 +163,19 @@ BJoystick::Open(const char *portName, bool enhanced)
 		if (variableJoystick == NULL)
 			return B_NO_MEMORY;
 
+		status_t result;
 		if (supportsVariable) {
 			// The driver supports arbitrary controls.
-			variableJoystick->axis_count = fJoystickInfo->module_info.num_axes;
-			variableJoystick->hat_count = fJoystickInfo->module_info.num_hats;
-			variableJoystick->button_blocks
-				= (fJoystickInfo->module_info.num_buttons + 31) / 32;
+			result = variableJoystick->initialize(
+				fJoystickInfo->module_info.num_axes,
+				fJoystickInfo->module_info.num_hats,
+				fJoystickInfo->module_info.num_buttons);
 		} else {
 			// The driver doesn't support our variable requests so we construct
 			// a data structure that is compatible with extended_joystick and
 			// just use that in reads. This allows us to use a single data
 			// format internally but be compatible with both inputs.
-			variableJoystick->axis_count = MAX_AXES;
-			variableJoystick->hat_count = MAX_HATS;
-			variableJoystick->button_blocks = (MAX_BUTTONS + 31) / 32;
+			result = variableJoystick->initialize_to_extended_joystick();
 
 			// Also ensure that we don't read over those boundaries.
 			if (fJoystickInfo->module_info.num_axes > MAX_AXES)
@@ -187,25 +186,10 @@ BJoystick::Open(const char *portName, bool enhanced)
 				fJoystickInfo->module_info.num_buttons = MAX_BUTTONS;
 		}
 
-		variableJoystick->data_size = sizeof(bigtime_t)			// timestamp
-			+ variableJoystick->button_blocks * sizeof(uint32)	// bitmaps
-			+ variableJoystick->axis_count * sizeof(int16)		// axis values
-			+ variableJoystick->hat_count * sizeof(uint8);		// hat values
-
-		variableJoystick->data
-			= (uint8 *)malloc(variableJoystick->data_size);
-		if (variableJoystick->data == NULL) {
+		if (result != B_OK) {
 			delete variableJoystick;
-			return B_NO_MEMORY;
+			return result;
 		}
-
-		// fill in the convenience pointers
-		variableJoystick->timestamp = (bigtime_t *)variableJoystick->data;
-		variableJoystick->buttons = (uint32 *)(&variableJoystick->timestamp[1]);
-		variableJoystick->axes = (int16 *)(&variableJoystick->buttons[
-			variableJoystick->button_blocks]);
-		variableJoystick->hats = (uint8 *)(&variableJoystick->axes[
-			variableJoystick->axis_count]);
 
 		if (!fJoystickData->AddItem(variableJoystick)) {
 			free(variableJoystick->data);
