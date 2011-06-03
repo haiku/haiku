@@ -41,6 +41,36 @@ typedef struct _extended_joystick {
 	uint8		hats[MAX_HATS];	/* 0 through 8 (1 == N, 3 == E, 5 == S, 7 == W) */
 } _PACKED extended_joystick;
 
+
+// This is a helper structure to manage variably sized data. It is here to
+// make storing and accessing the flat data in the "data" member easier. When
+// transferring data via read/write/ioctl only the flat data in "data" is ever
+// transmitted, not the whole structure.
+typedef struct _variable_joystick {
+	uint32		axis_count;
+	uint32		hat_count;
+	uint32		button_blocks;
+		// count of 32 bit button bitmap blocks == (button_count + 31) / 32
+
+	// These pointers all point into the data section and are here for
+	// convenience. They need to be set up manually by the one who creates this
+	// structure.
+	bigtime_t *	timestamp;
+	uint32 *	buttons;
+	int16 *		axes;
+	uint8 *		hats;
+
+	// The data is always structured in the following way (see extended_joystick
+	// for data interpretation):
+	//		bigtime_t	timestamp;
+	//		uint32		button_bitmap_blocks[button_block];
+	//		int16		axes[axis_count];
+	//		uint8		hats[hat_count];
+	size_t		data_size;
+	uint8 *		data;
+} variable_joystick;
+
+
 #define MAX_CONFIG_SIZE 100
 
 enum {	/* flags for joystick module info */

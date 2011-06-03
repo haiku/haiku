@@ -6,7 +6,6 @@
 
 
 #include <Joystick.h>
-#include <JoystickPrivate.h>
 #include <JoystickTweaker.h>
 
 #include <new>
