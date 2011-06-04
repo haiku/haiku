@@ -153,8 +153,8 @@ if [ IsOptionalHaikuImagePackageAdded ArmyKnife ] {
 		Echo "No optional package ArmyKnife for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage 
-			armyknife-61-r1a3-x86-gcc2-2011-05-27.zip
-			: $(baseURL)/armyknife-61-r1a3-x86-gcc2-2011-05-27.zip ;
+			armyknife-63-r1a3-x86-gcc2-2011-06-04.zip
+			: $(baseURL)/armyknife-63-r1a3-x86-gcc2-2011-06-04.zip ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/ArmyKnife/ArmyKnife ;
 	}
