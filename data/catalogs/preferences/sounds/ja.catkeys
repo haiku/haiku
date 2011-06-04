@@ -1,9 +1,9 @@
-1	japanese	x-vnd.Haiku-Sounds	145262565
+1	japanese	x-vnd.Haiku-Sounds	3924145958
 <none>	HEventList		<サウンド無し>
 <none>	HWindow		<サウンド無し>
 About Sounds	SoundsHApp		Soundsについて
 Event	HEventList		イベント
-No such file or directory	HEventList		ファイルまたはフォルダがありません
+No such file or directory	HEventList		ファイルまたはフォルダーがありません
 OK	HEventList		OK
 OK	HWindow		OK
 OK	SoundsHApp		OK
@@ -11,6 +11,7 @@ Other…	HWindow		その他…
 Play	HWindow		再生
 Sound	HEventList		サウンド
 Sound File:	HWindow		サウンドファイル：
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
+Sounds	System name		サウンド
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n次の作者が提供します：\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL\n 原作： Atsushi Takamatsu\nCopyright ©2003-2006 Haiku
 Stop	HWindow		停止
 This is not an audio file.	HWindow		オーディオファイルではありません。

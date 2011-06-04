@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Installer	3098641769
+1	korean	x-vnd.Haiku-Installer	837975173
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld 의 %2ld
 <none>	InstallerWindow	No partition available	<없음>
 ?? of ??	InstallerWindow	Unknown progress	?? 의 ??
@@ -11,7 +11,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Are you sure you want to to stop the installation?	InstallerWindow		당신은 정말로 설치를 중단하시겠습니까?
 Begin	InstallerWindow		시작
 Boot sector successfully written.	InstallProgress		부트 섹터가 성공적으로 기록되었습니다.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haiku 부트 메뉴를 설정하는 어플리케이션,Bootman,을 실행할 수 없습니다.
 Cancel	InstallProgress		취소
 Cancel	InstallerWindow		취소
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 설치할 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오

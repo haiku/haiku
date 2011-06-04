@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	2528334782
+1	belarusian	x-vnd.Haiku-Installer	3669711461
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Калі вы ўсталёўваеце Haiku на рэальнае жалеза (не на эмулятар), мы рэкамендуем загадзя падрыхтаваць падзел на дыску.Усталёўшчык і утыліта DriveSetup дапамогуць усталяваць на падзеле родную для Haiku файлавую сістэму, але опыці па змене цякучай табліцы падзелаў яшчэ недадакова пратэсціраваныя, таму іх ужыванне не рэкамендуецца.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)Усталёўшчык зробіць падзел Haiku загрузачным, але не дадасць Haiku да вашага меню загрузкі. Калі у вас ужо ўсталяваны GRUB, вы можаце самастойна дадаць Haiku да яго меню. Гэта робіцца па-рознаму у залежнасці ад вашай версіі загрузчыка.\n\n\n
@@ -22,7 +22,7 @@ Are you sure you want to to stop the installation?	InstallerWindow		Сапраў
 Begin	InstallerWindow		Пачаць
 Boot sector not written because of an internal error.	InstallProgress		Загрузачны сектар не запісаны з-за ўнутранай памылкі.
 Boot sector successfully written.	InstallProgress		Загрузачны сектар паспяхова запісаны.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Не ўдалося запусціць Bootman, менеджэр меню запуску Haiku.
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Мэнэджэр загрузкі, праграма якая канфігуруе загрузачнае меню Haiku, ня можа быць запушчана.
 Cancel	InstallProgress		Адмена
 Cancel	InstallerWindow		Адмена
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце пажаданы дыск з выплывальнага меню. Потым клікніце \"Пачаць\"

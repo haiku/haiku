@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	997349807
+1	slovak	x-vnd.Haiku-Installer	3031650507
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Ak inštalujete Haiku na skutočný hardvér (nie v emulátore), odporúča sa, aby ste mali vopred pripravenú diskovú oblasť. Inštalátor a nástroj DriveSetup vám ponúknu inicializovať existujúce oblasti natívnym súborovým systémom Haiku, ale voľby na zmenu vlastného rozloženia oblastí neboli otestované na dostatočne rozličných konfiguráciách počítačov, preto neodporúčame ich používať.
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Inštalátor označí samotnú oblasť s Haiku ako zavádzaciu, ale nevykoná potrebné kroky na to, aby integroval Haiku do existujúceho menu zavádzača. Ak máte GRUB už nainštalovaný, môžete Haiku pridať do jeho menu. V závislosti na tom, ktorú verziu GRUB používate je postup odlišný.\n\n\n
@@ -22,7 +22,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		Ste si istý
 Begin	InstallerWindow		Začať
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.
 Boot sector successfully written.	InstallProgress		Zavádzací sektor úspešne zapísaný.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, aplikáciu na konfiguráciu menu zavádzača Haiku, nebolo možné spustiť.
 Cancel	InstallProgress		Zrušiť
 Cancel	InstallerWindow		Zrušiť
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte z roletového menu disk, na ktorý sa má vykonať inštalácia. Potom kliknite na „Začať“.

@@ -1,5 +1,7 @@
-1	japanese	x-vnd.Haiku-STXTTranslator	143723404
+1	japanese	x-vnd.Haiku-STXTTranslator	4053395273
+Be styled text file	STXTTranslator		Be styled テキストファイル
 Plain text file	STXTTranslator		テキストファイル
 STXT Settings	STXTMain		STXT 設定
 STXTTranslator Settings	STXTTranslator		STXTTranslator 設定
 StyledEdit files	STXTTranslator		StyledEdit ファイル
+StyledEdit files translator	STXTTranslator		StyledEdit ファイルトランスレーター

@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-notification_server	3151702990
+1	japanese	x-vnd.Haiku-notification_server	906000487
 Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		表示設定モニターを開始できませんでした。\nフィルタのライブ変更は無効です。
-Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		フィルターモニターを開始できませんでした。フィルタのライブ変更は無効です。
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		フィルターモニターを開始できませんでした。フィルターのライブ変更は無効です。
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		一般設定モニターを開始できませんでした。\nフィルタのライブ変更は無効です。
+Darn.	NotificationWindow		 くそっ。
 Notification	NotificationWindow		通知
 OK	NotificationWindow		OK
 Warning	NotificationWindow		警告

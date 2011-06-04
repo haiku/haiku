@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	4212670326
+1	italian	x-vnd.Haiku-Installer	1952003730
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) L'installer renderà la partizione Haiku avviabile, ma non esegue nessun passo per integrare Haiku in un menu di avvio esistente. Se avete GRUB già installato, potete aggiungere Haiku al suo menu d'avvio. Ciò ouò essere fatto in maniera differente, dipende da quale versione di GRUB utilizzate.\n\n\n 
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
@@ -19,7 +19,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		Sei sicuro d
 Begin	InstallerWindow		Inizia
 Boot sector not written because of an internal error.	InstallProgress		Settore d'avvio non scritto a causa di un errore interno.
 Boot sector successfully written.	InstallProgress		Settore d'avvio scritto con successo.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, l'applicazione per configurare il menu d'avvio di Haiku, non può essere avviata.
 Cancel	InstallProgress		Annulla
 Cancel	InstallerWindow		Annulla
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Scegli il disco sul quale vuoi installare tramite il menu a pop-up. Quindi fai click su \"Inizia\"

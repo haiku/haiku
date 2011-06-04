@@ -1,13 +1,14 @@
-1	japanese	x-vnd.Haiku-MidiPlayer	3885957623
+1	japanese	x-vnd.Haiku-MidiPlayer	4180509704
 Cavern	Main Window		Cavern (洞くつ)
 Closet	Main Window		Closet (クローゼット)
 Could not load song	Main Window		ファイルの読み込みに失敗
-Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップしてください
+Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップ
 Dungeon	Main Window		Dungeon (地下牢)
 Garage	Main Window		Garage (ガレージ)
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 ベータ版\n\n幾千の\n曲を奏でる\nきりぎりす
 Igor's lab	Main Window		Igor's lab (実験室)
 Live input:	Main Window		ライブ入力：
+MidiPlayer	System name		MIDIプレーヤー
 None	Main Window		無し
 OK	Main Window		Ok
 Off	Main Window		無効

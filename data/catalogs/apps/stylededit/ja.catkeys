@@ -53,8 +53,8 @@ Quit	Menus		終了
 Red	Menus		赤
 Redo typing	QuitAlert		やり直し
 Replace	FindandReplaceWindow		置換
-Replace all	FindandReplaceWindow		全て置換
-Replace in all windows	FindandReplaceWindow		全てのウィンドウで置換
+Replace all	FindandReplaceWindow		すべて置換
+Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
 Replace next	Menus		次を置換
 Replace with:	FindandReplaceWindow		置換：
 Replace…	Menus		置換…
@@ -67,7 +67,7 @@ Save	SaveAlert		保存
 Save as…	Menus		名前をつけて保存…
 Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
 Search backwards	FindandReplaceWindow		逆方向検索
-Select all	Menus		全て選択
+Select all	Menus		すべて選択
 Size	Menus		サイズ
 Statistics…	Menus		統計...
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？

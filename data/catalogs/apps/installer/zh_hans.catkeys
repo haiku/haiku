@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Installer	997349807
+1	simplified_chinese	x-vnd.Haiku-Installer	3031650507
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld来源于%2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1）如果您将安装 Haiku 到真实硬件（而不是虚拟机），强烈建议您预备一个硬盘分区。系统安装器和磁盘管理器将初始化已有分区为 Haiku 原生文件系统，但是修改实际分区布局的选项还未在各种配置的计算机上进行大规模的测试，因此我们建议您不要使用它。
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2）系统安装器能够实现 Haiku 分区的启动，但是并不能够将 Haiku 集成到已有的引导菜单。如果您安装了 GRUB，您可以添加 Haiku 到其引导菜单。对于不同的 GRUB 版本，所要执行的操作将不尽相同。
@@ -22,7 +22,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		您是否确
 Begin	InstallerWindow		开始
 Boot sector not written because of an internal error.	InstallProgress		由于内部错误，引导扇区未写入。
 Boot sector successfully written.	InstallProgress		引导扇区写入成功。
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器用于配置 Haiku 引导菜单，当前其无法启动。
 Cancel	InstallProgress		取消
 Cancel	InstallerWindow		取消
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择希望安装的磁盘。然后点击\"开始\"。

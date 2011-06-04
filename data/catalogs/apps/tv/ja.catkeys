@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku.TV	2971561976
+1	japanese	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		常に最前面にする
 Channel	MainWin		チャンネル
 DVB - Digital Video Broadcasting TV	MainWin		DVB - デジタルビデオ放送 TV
@@ -19,6 +19,7 @@ Scale to native size	MainWin		本来のサイズに戻す
 Settings	MainWin		設定
 Settings…	MainWin		設定...
 TV	MainWin		TV
+TV	System name		TV
 force 544 x 576, display aspect 4:3	MainWin		544 x 576,ディスプレイアスペクト比 4:3
 force 704 x 576, display aspect 4:3	MainWin		704 x 576,ディスプレイアスペクト比 4:3
 force 720 x 576, display aspect 4:3	MainWin		720 x 576,ディスプレイアスペクト比 4:3

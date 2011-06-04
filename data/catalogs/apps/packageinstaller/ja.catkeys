@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	3886319181
+1	japanese	x-vnd.Haiku-PackageInstaller	2979335347
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 %.1f MiB	PackageView		%.1f MiB
@@ -8,19 +8,47 @@ Abort	PackageInfo		中断
 Abort	PackageInstall		中断
 Abort	PackageView		中断
 Accept	PackageTextViewer		承認
+All existing files will be replaced?	PackageView		既存のファイルをすべて置き換えますか?
+All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?
+Ask again	PackageView		再び尋ねる
 Continue	PackageInfo		続ける
 Continue	PackageInstall		続ける
 Continue	PackageTextViewer		続ける
+Decline	PackageTextViewer		断る
 Disclaimer	PackageTextViewer		免責条項
+Do you want to remember this decision for the rest of this installation?\n	PackageView		この決定を残りのインストール作業のために記憶しますか?\n
 Done	PackageInstall		完了
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		エラー (%s)! \"%s\" を開けませんでした。\n
+Error while installing the package\n	PackageView		パッケージをインストール中にエラーが発生しました\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		エラー! \"%s\" は正しいパスではありません。\n
 Finishing installation	PackageInstall		インストールを終了中
+Image not loaded correctly	PackageImageViewer		イメージが正しくロードされていません
 Install	PackageView		インストール
 Install to:	PackageView		インストール先：
 Installation progress	PackageView		インストール状況
+Installation type:	PackageView		インストールタイプ:
+Installing files and folders	PackageInstall		ファイルとフォルダーをインストールしています
 Installing package	PackageStatus		パッケージをインストール中
+No installation type selected	PackageView		インストールタイプが選択されていません
 No package available.	PackageInfo		利用できるパッケージがありません。
 No package selected.	PackageInfo		パッケージが選択されていません。
 OK	PackageView		OK
+Other…	PackageView		他の場所…
+Package installer	PackageView		パッケージインストーラー
+PackageInstaller	System name		PackageInstaller
+Preparing package	PackageInstall		パッケージを準備しています
+Replace	PackageView		置き換える
+Running post-installation scripts	PackageInstall		インストールの後始末をしています
 Skip	PackageView		スキップ
 Stop	PackageStatus		中止
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ディレクトリ '%s' がすでにパスに存在します。\nディレクトリをパッケージの物と置き換えますか、またはスキップしますか?
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置き換えますか、またはスキップしますか?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		与えられたパッケージはすでにインストールされているようです。既存のものをアンインストールしてインストールを続けますか?
+The installation of the package has been aborted.	PackageView		パッケージのインストールは中止されました。
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		項目 '%s' がすでにパスに存在します。\n項目をパッケージの物と置き換えますか、またはスキップしますか?
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		パッケージファイルを読めません。\n考えられる原因のひとつとして、要求されたファイルが正しい BeOS .pkg パッケージで無いことが考えられます。
+The package you requested has been successfully installed on your system.	PackageView		要求されたパッケージはシステムに正しくインストールされました。
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		要求されたパッケージはシステムにインストールできません。パッケージに問題があるかもしれません。 パッケージの配布元に相談してみてください。
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		スクリプト '%s' がすでにパスに存在します。\nスクリプトをパッケージの物と置き換えますか、またはスキップしますか?
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		シンボリックリンク '%s' がすでにパスに存在します。\nリンクををパッケージの物と置き換えますか、またはスキップしますか?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールをまだ続けますか?

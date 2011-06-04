@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	2585577103
+1	japanese	x-vnd.Haiku-ShowImage	1784579482
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
 Browse	Menus		閲覧
 Cancel	ClosePrompt		中止
@@ -23,6 +23,7 @@ High-quality zooming	Menus		高画質ズーム
 Image	Menus		画像
 Job setup	PrintOptionsWindow		ジョブ設定
 Last page	Menus		最後のページ
+Leave full screen	Menus		全画面表示から戻る
 Next file	Menus		次のファイル
 Next page	Menus		次のページ
 OK	Alerts		OK
@@ -49,7 +50,7 @@ Slide delay	Menus		スライド間隔
 Slide show	Menus		スライドショー
 Stretch to window	Menus		ウィンドウの大きさに広げる
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		「%s」の %d ページが変更されました。それでもファイルを閉じますか？
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		画像ファイル「%s」が変更されています。保存せずに閉じますか？
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		画像ファイル '%s' が変更されています。保存せずに閉じますか？
 The file '%s' could not be written.	SaveToFile		画像ファイル「%s」を保存できませんでした。
 Undo	Menus		元に戻す
 Use as background…	Menus		デスクトップの背景にする…

@@ -1,0 +1,51 @@
+1	brazilian_portuguese	x-vnd.Haiku-Screen	2768425786
+%.1f Hz	Screen		%.1f Hz
+%sSerial no.: %s	Screen		%sSerial nº: %s
+/other…	Screen		/outra...
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 cores
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 colors
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Million colors
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 colors
+About	Screen		Sobre
+All workspaces	Screen		Todas as workspaces
+Apply	Screen		Aplicar
+Cancel	Screen		Cancelar
+Colors:	Screen		Cores:
+Columns:	Screen		Colunas:
+Combine displays:	Screen		Combinar monitores:
+Could not write VESA mode settings file:\n\t	Screen		Não foi possível escrever as configurações do arquivo do modo Vesa:\n\t
+Current workspace	Screen		Workspace atual
+Do you wish to keep these settings?	Screen		Você deseja manter essas configurações?
+Done	Screen		Pronto
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frequência horizonal:\t%lu - %lu kHz\nFrequência vertical:\t%lu - %lu Hz\n\nRelógio máximo de pixel:\t%g MHz
+Hz	Screen		Hz
+Keep	Screen		Manter
+OK	Screen		OK
+Other…	Screen		Outro...
+Refresh rate	Screen		Taxa de atualização
+Refresh rate:	Screen		Taxa de atualizão:
+Resolution:	Screen		Resolução:
+Revert	Screen		Reverter
+Rows:	Screen		Linhas:
+Screen	Screen		Monitor
+Screen	System name		Monitor
+Screen preferences by the Haiku team	Screen		Preferências de Tela pelo time do Haiku
+Set background…	Screen		Mudar plano de fundo...
+Settings will revert in %seconds seconds.	Screen		As configurações serão revertidas em %seconds segundos.
+Swap displays:	Screen		Mudar monitores:
+The screen mode could not be set:\n\t%s\n	Screen		O modo de tela não pode ser aceito\n\t%s\n
+Type or use the left and right arrow keys.	Screen		Escreva ou use as teclas de seta
+Undo	Screen		Desfazer
+Unknown mode	Screen		Modo desconhecido
+Use laptop panel:	Screen		Usar o painel do laptop:
+Video format:	Screen		Formato de vídeo:
+Warning	Screen		Aviso
+Workspaces	Screen		Workspaces
+always	Screen		sempre
+bits/pixel	Screen		bits/pixel
+disable	Screen		desabilitar
+horizontally	Screen		horizontalmente
+if needed	Screen		se necessário
+no	Screen		não
+vertically	Screen		verticalmente
+yes	Screen		sim

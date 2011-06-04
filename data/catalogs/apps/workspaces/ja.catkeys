@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-WORK	932379173
+1	japanese	x-vnd.Be-WORK	3592128290
 About Workspaces…	Workspaces		Workspaces について…
 Always on top	Workspaces		常に最前面に
 Auto-raise	Workspaces		自動的に表示
@@ -8,5 +8,6 @@ OK	Workspaces		OK
 Quit	Workspaces		終了
 Show window border	Workspaces		ウインドウ枠を表示
 Show window tab	Workspaces		ウインドウタブを表示
+Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n --notitle\t\ttitle bar removed. border and resize kept.\n --noborder\t\ttitle, border, and resize removed.\n --avoidfocus\t\tprevents the window from being the target of keyboard events.\n --alwaysontop\t\tkeeps window on top\n --notmovable\t\twindow can't be moved around\n --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n
 Workspaces	System name		ワークスペース
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n %1 および %2 作\n\nCopyright %3, Haiku.\n\nオプションキーでウインドウを後方に送れます。\nコントロールキーでウインドウを前面に移動できます。\n

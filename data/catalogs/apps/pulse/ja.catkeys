@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Pulse	2452153519
+1	japanese	x-vnd.Haiku-Pulse	2753760391
 %.2f GHz	NormalPulseView		%.2f GHz
 %ld MHz	NormalPulseView		%ld MHz
 About Pulse…	CPUButton		Pulse について…
@@ -33,6 +33,8 @@ OK	PrefsWindow		Ok
 OK	PulseApp		Ok
 OK	PulseView		Ok
 Pulse	NormalPulseView		Pulse
+Pulse	PulseApp		Pulse
+Pulse	System name		Pulse
 Pulse settings	PulseWindow		Pulse の設定
 Quit	DeskbarPulseView		終了
 Quit	MiniPulseView		終了

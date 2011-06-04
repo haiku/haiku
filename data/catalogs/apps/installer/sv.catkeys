@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	2528334782
+1	swedish	x-vnd.Haiku-Installer	3669711461
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Om du installerar Haiku på riktigt hårdvara (inte i en emulator) så rekommenderar vi att har förberett en partiton för ändamålet. Programmen Installeraren och DiskHantering kan skapa nya partitioner för Haiku men funktionerna att ändra på befintliga partitoner har ännu inte testats tillräckligt för att anses som tillförlitligt. Vi rekommenderar därför att du inte ändrar på befintliga partitioner.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Installeraren kommer att göra Haikus partition startbar. Däremot kommer inte Haiku att göra några ändringar i befintliga starthanterare. Om du har GRUB installerat så bör du lägga till Haiku till startmenyn. Det görs på olika sätt beroende på vilken version av GRUB som används.\n\n\n
@@ -22,7 +22,7 @@ Are you sure you want to to stop the installation?	InstallerWindow		Är du säke
 Begin	InstallerWindow		Starta
 Boot sector not written because of an internal error.	InstallProgress		Startsektorn kunde inte skrivas på grund av ett internt fel.
 Boot sector successfully written.	InstallProgress		Skrivning av startsektorn lyckades.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Starthanteraren, applikationen för inställning av Haikus startmeny kunde inte startas.
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Starthanteraren, konfigurationsprogrammet för Haikus startmeny, kunde inte startas.
 Cancel	InstallProgress		Avbryt
 Cancel	InstallerWindow		Avbryt
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj den disk du vill installera till från menyn. Klicka sedan på \"Starta\".

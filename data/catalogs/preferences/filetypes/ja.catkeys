@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-FileTypes	3252741362
+1	japanese	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1のアプリケーションタイプ
+%ld Application type%s could be removed.	Application Types Window		%ld 個のアプリケーションタイプ %s が削除できませんでした。
 %s file type	FileType Window		%sのファイルタイプ
 (from application)	FileTypes Window		(アプリケーションから)
 (from super type)	FileTypes Window		(スーパータイプから)
@@ -68,6 +69,8 @@ File	FileTypes Window		ファイル
 File could not be opened	Preferred App Menu		ファイルを開けませんでした
 File recognition	FileTypes Window		ファイルの認識
 File type	FileType Window		ファイルタイプ
+FileTypes	FileTypes		FileTypes
+FileTypes	System name		FileTypes
 FileTypes request	FileTypes		ファイルタイプの登録
 FileTypes request	FileTypes Window		ファイルタイプの登録
 FileTypes request	Preferred App Menu		ファイルタイプの登録
@@ -83,14 +86,15 @@ Icon	Application Type Window		アイコン
 Icon	FileType Window		アイコン
 Icon	FileTypes Window		アイコン
 Information	Application Types Window		情報
-Internal name:	Attribute Window		内部的な名前：
+Internal name:	Attribute Window		内部名：
 Internal name:	FileTypes Window		内部的な名前：
-Internal name:	New File Type Window		内部的な名前：
+Internal name:	New File Type Window		内部名：
 Launch	Application Types Window		起動
 Left	Attribute Window	Attribute column alignment in Tracker	左揃え
 Long description:	Application Type Window		詳細説明：
 Move down	FileTypes Window		下へ移動
 Move up	FileTypes Window		上へ移動
+Multiple files from \"%s\" file type	FileType Window		\"%s\"というファイルタイプで始まる複数ファイル
 Multiple launch	Application Type Window		複数起動可能
 Name:	Application Types Window		名前：
 New file type	New File Type Window		新規ファイルタイプ
@@ -102,14 +106,17 @@ Open…	FileTypes Window		開く...
 Path:	Application Types Window		パス：
 Preferred application	FileType Window		優先アプリケーション
 Preferred application	FileTypes Window		優先アプリケーション
+Progress	Application Types Window		進行状況
 Quit	FileTypes Window		終了
 Quit, don't save	Application Type Window		保存せずに終了する
 Recognition rule is not valid:\n\n	FileTypes Window		認識ルールが無効です：\n\n
 Remove	Application Type Window		削除
 Remove	FileTypes Window		削除
 Remove icon	Icon View		アイコンを削除
+Remove uninstalled	Application Types Window		アンインストール済を削除
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		ファイルタイプの削除は撤回できません。\nそれでも削除を実行しますか？
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		スーパータイプの削除は撤回できません。\n削除されるスーパータイプに属するファイルタイプはすべて削除されます！\n\nそれでも削除を実行しますか？グループ全体を削除するには、シフトキーを押しながら\"削除\"を押してください。
+Removing uninstalled application types	Application Types Window		アンイントール済アプリケーションのタイプを削除します
 Right	Attribute Window	Attribute column alignment in Tracker	右揃え
 Rule:	FileTypes Window		ルール：
 Same as…	FileType Window	The same APPLICATION as ...	このアプリケーションと同様…
@@ -146,4 +153,5 @@ Version:	Application Type Window		バージョン：
 Version:	Application Types Window		バージョン：
 Visible	Attribute Window		表示する
 Width:	Attribute Window	Default column width in Tracker for this attribute.	幅：
+[Multiple files] file types	FileType Window		[複数ファイル] ファイルタイプ
 no icon	FileTypes Window		アイコン無し

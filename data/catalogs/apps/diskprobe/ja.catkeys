@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	1699566469
+1	japanese	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (ネイティブ)
 (native)	ProbeView		(ネイティブ)
 15 bit	TypeEditors		15ビット
@@ -119,6 +119,7 @@ Swapped: %Ld (0x%0*Lx)	ProbeView		スワップ： %Ld (0x%0*Lx)
 Swapped: 0x%0*Lx	ProbeView		スワップ： 0x%0*Lx
 Text	FindWindow		テキスト
 Text	TypeEditors	This is the type of editor	テキスト
+Type editor	AttributeWindow		タイプエディター
 Type editor	ProbeView		タイプエディター
 Type editor not supported	ProbeView		タイプエディターはサポートされていません。
 Undo	ProbeView		元に戻す

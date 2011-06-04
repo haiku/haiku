@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-InstalledPackages	148986533
+1	japanese	x-vnd.Haiku-InstalledPackages	4131220089
+InstalledPackages	System name		インストール済みパッケージ
 No package selected.	UninstallView		パッケージが選択されていません。
 OK	UninstallView		OK
 Package description	UninstallView		パッケージの説明
 Remove	UninstallView		削除
 The package you selected has been successfully removed from your system.	UninstallView		選択されたパッケージは無事にシステムから削除されました。
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		選択されたパッケージはシステムから削除されていません。インストール済のパッケージ情報ファイルが壊れているかもしれません。
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		選択されたパッケージはシステムから削除されていません。インストール済みのパッケージ情報ファイルが壊れているかもしれません。

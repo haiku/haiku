@@ -7,7 +7,7 @@ Intermediate (6x6)	PairsWindow		中級 (6x6)
 New	PairsWindow		新規
 New game	PairsWindow		新規ゲーム
 OK	PairsView		Ok
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs は最低限必要とすれ %d 個のベクターアイコンは、このシステムには見つかりませんでした。
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs が最低限必要とする %d 個のベクターアイコンは、このシステムには見つかりませんでした。
 Quit	PairsWindow		終了
 Quit game	PairsWindow		ゲームを終了
 Size	PairsWindow		サイズ

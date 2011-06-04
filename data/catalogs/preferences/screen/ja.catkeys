@@ -1,11 +1,11 @@
-1	japanese	x-vnd.Haiku-Screen	891044713
+1	japanese	x-vnd.Haiku-Screen	2033930135
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sシリアルナンバー： %s
 /other…	Screen		その他…
 15 bits/pixel, 32768 colors	Screen		15ビット/画素, 32768色
 16 bits/pixel, 65536 colors	Screen		16ビット/画素, 65536色
-24 bits/pixel, 16 Million colors	Screen		24ビット/画素, 16,384色
-32 bits/pixel, 16 Million colors	Screen		32ビット/画素, 16,384色
+24 bits/pixel, 16 Million colors	Screen		24ビット/画素, 1600万色
+32 bits/pixel, 16 Million colors	Screen		32ビット/画素, 1600万色
 8 bits/pixel, 256 colors	Screen		8ビット/画素, 256色
 About	Screen		約
 All workspaces	Screen		すべてのワークスペース
@@ -28,6 +28,9 @@ Refresh rate:	Screen		リフレッシュレート:
 Resolution:	Screen		解像度:
 Revert	Screen		元に戻す
 Rows:	Screen		行:
+Screen	Screen		画面
+Screen	System name		画面
+Screen preferences by the Haiku team	Screen		Haikuチームによる画面設定
 Set background…	Screen		背景を設定...
 Settings will revert in %seconds seconds.	Screen		設定は %seconds 秒以内に元に戻ります。
 Swap displays:	Screen		ディスプレイを交換：
@@ -46,4 +49,4 @@ horizontally	Screen		水平に
 if needed	Screen		必要ならば
 no	Screen		いいえ
 vertically	Screen		垂直に
-yes	Screen		yes
+yes	Screen		はい
