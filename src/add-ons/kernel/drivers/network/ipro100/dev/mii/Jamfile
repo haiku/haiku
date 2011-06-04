@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ipro100 dev mii ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelStaticLibrary ipro100_mii.a
+	:
+	inphy.c
+	;
+
+ObjectHdrs [ FGristFiles inphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles inphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
