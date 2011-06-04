@@ -16,6 +16,8 @@ KernelAddon usb_hid :
 	HIDReport.cpp
 	HIDReportItem.cpp
 
+	QuirkyDevices.cpp
+
 	ProtocolHandler.cpp
 
 	JoystickProtocolHandler.cpp

@@ -39,24 +39,29 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 {
 	uint8 *reportDescriptor = NULL;
 	size_t descriptorLength = 0;
-	bool isQuirky = false;
+	quirky_init_function quirkyInit = NULL;
+	bool hasFixedDescriptor = false;
 
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
 
 	// check for quirky devices first and don't bother in that case
-	for (int32 i = 0; i < sQuirkyDeviceCount; i++) {
-		usb_hid_quirky_device &quirky = sQuirkyDevices[i];
+	for (int32 i = 0; i < gQuirkyDeviceCount; i++) {
+		usb_hid_quirky_device &quirky = gQuirkyDevices[i];
 		if (deviceDescriptor->vendor_id == quirky.vendor_id
 			&& deviceDescriptor->product_id == quirky.product_id) {
-			reportDescriptor = (uint8 *)quirky.fixed_descriptor;
-			descriptorLength = quirky.descriptor_length;
-			isQuirky = true;
-			break;
+
+			quirkyInit = quirky.init_function;
+			if (quirky.fixed_descriptor != NULL) {
+				reportDescriptor = (uint8 *)quirky.fixed_descriptor;
+				descriptorLength = quirky.descriptor_length;
+				hasFixedDescriptor = true;
+				break;
+			}
 		}
 	}
 
-	if (!isQuirky) {
+	if (!hasFixedDescriptor) {
 		// conforming device, read HID and report descriptors
 		descriptorLength = sizeof(usb_hid_descriptor);
 		usb_hid_descriptor *hidDescriptor
@@ -122,7 +127,7 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 
 	status_t result = fParser.ParseReportDescriptor(reportDescriptor,
 		descriptorLength);
-	if (!isQuirky)
+	if (!hasFixedDescriptor)
 		free(reportDescriptor);
 
 	if (result != B_OK) {
@@ -164,6 +169,12 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		TRACE_ALWAYS("failed to allocate transfer buffer\n");
 		fStatus = B_NO_MEMORY;
 		return;
+	}
+
+	if (quirkyInit != NULL) {
+		fStatus = quirkyInit(device, config, interfaceIndex);
+		if (fStatus != B_OK)
+			return;
 	}
 
 	ProtocolHandler::AddHandlers(*this, fProtocolHandlerList,
