@@ -31,6 +31,7 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 	fButtonCount(0),
 	fMaxButton(0),
 	fButtons(NULL),
+	fOpenCount(0),
 	fUpdateThread(-1)
 {
 	mutex_init(&fUpdateLock, "joystick update lock");
@@ -101,7 +102,7 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 
 	fCurrentValues.initialize(fAxisCount, 0, fMaxButton);
 
-	TRACE("joystick device with %lu buttons\n", buttonCount);
+	TRACE("joystick device with %lu buttons\n", fButtonCount);
 	TRACE("report id: %u\n", report.ID());
 }
 
@@ -190,6 +191,9 @@ JoystickProtocolHandler::Open(uint32 flags, uint32 *cookie)
 			resume_thread(fUpdateThread);
 	}
 
+	if (result == B_OK)
+		fOpenCount++;
+
 	mutex_unlock(&fUpdateLock);
 	if (result != B_OK)
 		return result;
@@ -203,7 +207,8 @@ JoystickProtocolHandler::Close(uint32 *cookie)
 {
 	status_t result = mutex_lock(&fUpdateLock);
 	if (result == B_OK) {
-		fUpdateThread = -1;
+		if (--fOpenCount == 0)
+			fUpdateThread = -1;
 		mutex_unlock(&fUpdateLock);
 	}
 

@@ -55,6 +55,7 @@ private:
 			joystick_module_info 	fJoystickModuleInfo;
 			variable_joystick		fCurrentValues;
 
+			uint32					fOpenCount;
 			mutex					fUpdateLock;
 			thread_id				fUpdateThread;
 };
