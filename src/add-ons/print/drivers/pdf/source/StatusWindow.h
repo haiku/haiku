@@ -53,6 +53,7 @@ private:
 	PrinterDriver *fPrinterDriver;
 	int32      fReportIndex;
 	BTextView* fReport;
+	BScrollView* fReportScrollView;
 	sem_id     fCloseSem;
 	CloseOption fCloseOption;
 
