@@ -1203,10 +1203,11 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package NetSurf available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage netsurf-2.6-x86.gcc2-2010-09-26.zip
-			: $(baseURL)/netsurf-2.6-x86-gcc2-2010-09-26.zip ;
+		InstallOptionalHaikuImagePackage 
+			netsurf-2.7-r1a3-x86-gcc2-2011-06-04.zip
+			: $(baseURL)/netsurf-2.7-r1a3-x86-gcc2-2011-06-04.zip ;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/netsurf/NetSurf ;
+			: /boot/apps/NetSurf/NetSurf ;
 	}
 }
 
