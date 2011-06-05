@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	2528334782
+1	finnish	x-vnd.Haiku-Installer	3669711461
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Jos asennat Haikun oikealle laitteistolle (etkä emulaattorin sisälle) on suositeltavaa, että valmistelet ennakolta kiintolevyn osioinnin. Asennusohjelma ja Levyasema-asetukset -työkalu tarjoutuvat alustamaan olemassaolevat osiot Haikun kotoperäiseen tiedostojärjestelmään, mutta valitsimien muuttamista todellisilla osiointikokoonpanoilla ei ehkä ole testattu riittävän monella tietokonekokoonpanolla, jotta voisimme suositella sen käyttämistä.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Asennusohjelma tekee Haiku-osion itse alkukäynnistettäväksi, mutta ei suorita mitään toimia Haikun lisäämiseksi olemassaolevaan alkulatausvalikkoon. Jos sinulla on jo GRUB asennettuna, voit lisätä Haikun sen alkulatausvalikkoon. Tämä tehdään eri tavoin riippuen siitä mikä GRUB-versio sinulla on käytössä.\n\n\n
@@ -22,7 +22,7 @@ Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma
 Begin	InstallerWindow		Aloita
 Boot sector not written because of an internal error.	InstallProgress		Alkulataussektoria ei kirjoitettu sisäisen virheen vuoksi.
 Boot sector successfully written.	InstallProgress		Alkulataussektori kirjoitettiin onnistuneesti.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager-ohjelmaa, Haikun alkulatausvalikon asetussovellusta, ei voitu käynnistää.
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Alkulataushallinta, sovellus Haiku-alkulatausvalikon asettamiseen, ei voitu käynnistää.
 Cancel	InstallProgress		Peru
 Cancel	InstallerWindow		Peru
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse ponnahdusvalikosta levy, jolle haluat asentaa. Napsauta sitten ”Aloita”.

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Time	3505745870
+1	japanese	x-vnd.Haiku-Time	844587475
 <Other>	Time		<その他>
 Clock set to:	Time		時刻の設定：
 Current time:	Time		現在時刻：
@@ -10,6 +10,7 @@ Preview time:	Time		プレビュー：
 Revert	Time		元に戻す
 Set time zone	Time		タイムゾーンを設定
 Time	System name		日付と時間
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		タイムゾーン
 \nNow: 	Time		 \n現在：
 about	Time		このソフトウェアについて

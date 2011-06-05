@@ -1,4 +1,7 @@
-1	japanese	x-vnd.Haiku-OpenGL	3804003711
+1	japanese	x-vnd.Haiku-OpenGL	209187778
+Attributes stack size:	Capabilities		属性スタックサイズ:
+Auxiliary buffer(s):	Capabilities		補助バッファ数:
+Available	Extensions		利用可能
 Capabilities	Capabilities		性能
 Extensions	Extensions		拡張機能
 GLU version:	InfoView		GLU バージョン:
@@ -8,12 +11,17 @@ List stack size:	Capabilities		リストスタックサイズ:
 Max. 2D texture size:	Capabilities		最大 2D テクスチャサイズ:
 Max. 3D texture size:	Capabilities		最大 3D テクスチャサイズ:
 Max. clipping planes:	Capabilities		最大クリッププレーン数:
+Max. convolution:	Capabilities		最大コンボリューション:
+Max. evaluators equation order:	Capabilities		最大評価関数オーダー:
 Max. lights:	Capabilities		最大ライト数:
+Max. recommended index elements:	Capabilities		最大推奨インデックス要素:
+Max. recommended vertex elements:	Capabilities		最大推奨頂点要素数:
 Max. texture units:	Capabilities		最大テクスチャユニット数:
 Model stack size:	Capabilities		モデルスタックサイズ:
 Name stack size:	Capabilities		ネームスタックサイズ:
 OpenGL	System name		OpenGL
 OpenGL version:	InfoView		OpenGL バージョン:
+Projection stack size:	Capabilities		投影変換スタックサイズ:
 Renderer name:	InfoView		レンダラ名:
 Texture stack size:	Capabilities		テクスチャスタックサイズ:
 Vendor name:	InfoView		ベンダー名:

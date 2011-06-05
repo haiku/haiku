@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-Installer	887870009
+1	dutch	x-vnd.Haiku-Installer	2922170709
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld van %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Als u Haiku gaat installeren op echte hardware (dat wil zeggen: niet in een emulator), is het aan te raden om alvast een hardeschijf-partitie te hebben voorbereid. Installer en DriveSetup zijn geschikt om bestaande partities te initialiseren met Haiku's eigen bestandssysteem, maar het kan zijn dat de opties waarmee de daadwerkelijke partitie-lay-out gewijzigd kunnen worden nog niet getest zijn op een groot en gevarieerd genoeg aantal computerconfiguraties, en daarom raden we u niet aan dit te gebruiken.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Installer zal de Haiku-partitie het vermogen geven om zelf op te starten, maar neemt geen stappen om Haiku in een bestaand opstartmenu te integreren. Als u GRUB al hebt geïnstalleerd, kunt u Haiku aan diens opstartmenu toevoegen. Hoe u dit doet, hangt af van welke GRUB-versie u gebruikt; dit verschilt.\n\n\n
@@ -21,7 +21,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		Bent u zeker
 Begin	InstallerWindow		Begin
 Boot sector not written because of an internal error.	InstallProgress		De Boot sector werd niet geschreven vanwege een interne fout.
 Boot sector successfully written.	InstallProgress		Schrijven opstartsector geslaagd.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, de applicatie om het Haiku boot menu in te stellen, kon niet worden gestart.
 Cancel	InstallProgress		Annuleren
 Cancel	InstallerWindow		Annuleren
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de schijf waarop u wilt installeren uit het pop-up-menu. Klik daarna op \"Begin\".

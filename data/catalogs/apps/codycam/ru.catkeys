@@ -59,7 +59,7 @@ PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт> (
 Passive FTP	CodyCam		Пасивный FTP
 Password:	CodyCam		Пароль:
 Quit	CodyCam		Выход
-Rate:	CodyCam		Периодичность:
+Rate:	CodyCam		Период:
 Remote host has closed the connection.\n	FtpClient		Сервер закрыл соединение.\n
 Rename failed	VideoConsumer.cpp		Не удалось переименовать
 Renaming…	VideoConsumer.cpp		Переименование…

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PPMTranslator	1140367180
+1	japanese	x-vnd.Haiku-PPMTranslator	4285459467
 Bitmap 1 bit	PPMTranslator		ビットマップ 1 ビット
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 ビット
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 ビット
@@ -9,7 +9,7 @@ None	PPMTranslator		無し
 OK	PPMMain		OK
 PPM Settings	PPMMain		PPM 設定
 PPM image	PPMTranslator		PPM イメージ
-PPMTranslator Settings	PPMTranslator		PPMTranslator 設定
+PPMTranslator Settings	PPMTranslator		PPMトランスレーター設定
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 ビット
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 ビット ビッグエンディアン
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 ビット
@@ -20,5 +20,9 @@ RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 ビット
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 ビット ビッグエンディアン
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 ビット
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 ビット ビッグエンディアン
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		PPMトランスレーターに問題があります!
 System palette 8 bits	PPMTranslator		システムパレット 8 ビット
 Version %d.%d.%d %s	PPMTranslator		バージョン %d.%d.%d %s
+Write ASCII	PPMTranslator		ASCII形式で書きだす
+bits/space	PPMTranslator		bits/space

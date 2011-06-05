@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-LaunchBox	3807026689
+1	japanese	x-vnd.Haiku-LaunchBox	1440389990
 Add button here	LaunchBox		ここにボタンを追加
 Auto-raise	LaunchBox		自動的に前面へ
 Bummer	LaunchBox		失敗
@@ -8,12 +8,14 @@ Clone	LaunchBox		複製
 Close	LaunchBox		閉じる
 Description for '%3'	LaunchBox		'%3' の説明
 Failed to launch '%1'.\n\nError: 	LaunchBox		'%1' の起動に失敗しました。\n\nエラー:
-Failed to launch 'something',error in Pad data.	LaunchBox		起動に失敗しました
+Failed to launch 'something',error in Pad data.	LaunchBox		Padデータ中にエラーがあります。'something'の起動に失敗しました。
 Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		アプリケーション(シグネチャ '%2')の起動に失敗しました。\n\nエラー:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Tracker への 'open folder' コマンドの送信に失敗しました。\n\nError:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Tracker への 'open folder' コマンドの送信に失敗しました。\n\nエラー:
 Horizontal layout	LaunchBox		水平配置
 Icon size	LaunchBox		アイコンサイズ
 Ignore double-click	LaunchBox		ダブルクリックを無視する
+LaunchBox	System name		LaunchBox
+Name Panel	LaunchBox		名前パネル
 New	LaunchBox		新規作成
 OK	LaunchBox		OK
 Pad	LaunchBox		パッド

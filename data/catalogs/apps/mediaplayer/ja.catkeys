@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	807629145
+1	japanese	x-vnd.Haiku-MediaPlayer	2801509135
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% の内部エラーです。ファイルは開けませんでした。
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 100% scale	MediaPlayer-Main		100% 表示
@@ -38,6 +38,7 @@ File info…	MediaPlayer-Main		ファイルの情報...
 Full screen	MediaPlayer-Main		フルスクリーン表示
 Full volume	MediaPlayer-SettingsWindow		最大音量
 Gets the URI of the currently playing item.	MediaPlayer-Main		現在再生中項目の URI を取得します。
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		ボリュームの取得および設定 (0.0-2.0) 。
 Hide interface	MediaPlayer-Main		インターフェースを隠す
 Import Entries	MediaPlayer-ImportPLItemsCmd		項目のインポート
 Import Entry	MediaPlayer-ImportPLItemsCmd		項目のインポート
@@ -46,6 +47,7 @@ Internal error (malformed message). Saving the playlist failed.	MediaPlayer-Play
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		メディアサーバーが動いていないようです。\n起動してもよろしいですか ?
 Large	MediaPlayer-SettingsWindow		大
+Lock Peaks	MediaPlayer-PeakView		ピークを固定
 Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
 Loop video	MediaPlayer-SettingsWindow		ビデオを繰り返し再生
 Low volume	MediaPlayer-SettingsWindow		低音量
@@ -71,6 +73,7 @@ OK	MediaPlayer-SettingsWindow		OK
 Off	Subtitles menu		オフ
 Open	MediaPlayer-Main		開く
 Open	MediaPlayer-PlaylistWindow		開く
+Open Clips	MediaPlayer-Main		クリップを開く
 Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
 Open file…	MediaPlayer-Main		ファイルを開く...
 Open…	MediaPlayer-PlaylistWindow		開く...
@@ -116,8 +119,10 @@ Subtitle placement:	MediaPlayer-SettingsWindow		サブタイトルの位置：
 Subtitle size:	MediaPlayer-SettingsWindow		サブタイトルのサイズ：
 Subtitles	MediaPlayer-Main		サブタイトル
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けません\n\n
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
 Toggle mute.	MediaPlayer-Main		ミュートの切替え
 Toggle pause/play.	MediaPlayer-Main		一時停止と再生の切替え
+TogglePlaying	MediaPlayer-Main		再生のオン/オフ
 Track	Audio Track Menu		トラック
 Track	Video Track Menu		トラック
 Track %d	MediaPlayer-Main		トラック %d
@@ -128,5 +133,6 @@ Video	MediaPlayer-Main		ビデオ
 Video track	MediaPlayer-Main		映像トラック
 View options	MediaPlayer-SettingsWindow		表示オプション
 Volume	MediaPlayer-Main		ボリューム
+Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 none	Audio track menu		無し
 none	Subtitles menu		無し

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Media	293613603
+1	japanese	x-vnd.Haiku-Media	1473363280
 <none>	Media views		<無し>
 Audio input:	Media views		オーディオ入力：
 Audio mixer	Media Window		オーディオミキサー
@@ -11,7 +11,8 @@ Couldn't add volume control in Deskbar: %s\n	Media views		音量コントロー�
 Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした： %s\n
 Defaults	Media views		デフォルト
 Done shutting down.	Media Window		シャットダウン完了。
-OK	Media Window		Ok
+Media	System name		メディア
+OK	Media Window		OK
 Quit	Media Window		終了
 Ready for use…	Media Window		使用可能…
 Restart media services	Media views		メディアサービスを再起動

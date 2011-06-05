@@ -14,5 +14,5 @@ Overwrite	DataTranslations		Перезаписать
 Path:	DataTranslations		Путь:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Похоже, что файл '%name' не является транслятором и не будет установлен.
 The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		С помощью этой панели можно изменить настройки трансляторов по умолчанию. Эти настройки будут использоваться в приложениях, которые не предоставляют возможности изменять их самостоятельно.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		С помощью этой панели можно изменить настройки трансляторов по умолчанию. Эти настройки также будут использоваться в приложениях, которые не предоставляют возможности изменять их самостоятельно.
 Version:	DataTranslations		Версия:

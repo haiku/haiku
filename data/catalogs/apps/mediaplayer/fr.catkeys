@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	1493380061
+1	french	x-vnd.Haiku-MediaPlayer	3168263096
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a rencontré une erreur interne. Le fichier n'a pas pu être ouvert.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 100% scale	MediaPlayer-Main		Échelle 100%
@@ -75,7 +75,7 @@ Playlist	MediaPlayer-PlaylistWindow		Liste de lecture
 Playlist…	MediaPlayer-Main		Liste de lecture…
 Prev	MediaPlayer-Main		Précédent
 Quit	MediaPlayer-Main		Quitter
-Randomize	MediaPlayer-PlaylistWindow		Aléatoire
+Randomize	MediaPlayer-PlaylistWindow		Mélanger
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Classer les entrées aléatoirement
 Rating	MediaPlayer-Main		Évaluation
 Redo	MediaPlayer-PlaylistWindow		Rétablir
@@ -83,6 +83,7 @@ Remove	MediaPlayer-PlaylistWindow		Retirer
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Retirer les entrées
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer les entrées à la corbeille
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Retirer l'entrée
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer l'entrée à la corbeille
 Revert	MediaPlayer-SettingsWindow		Rétablir
 Save	MediaPlayer-Main		Enregistrer 
 Save	MediaPlayer-PlaylistWindow		Enregistrer 
@@ -91,6 +92,7 @@ Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…
 Save error	MediaPlayer-PlaylistWindow		Enregistrer l'erreur
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur :
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Redimensionner le film harmonieusement (mode sans-recouvrements)
 Select all	MediaPlayer-PlaylistWindow		Sélectionner tout
 Settings…	MediaPlayer-Main		Réglages…
 Skip to the next track.	MediaPlayer-Main		Passer à la piste suivante
@@ -117,5 +119,6 @@ Video	MediaPlayer-Main		Vidéo
 Video track	MediaPlayer-Main		Piste vidéo
 View options	MediaPlayer-SettingsWindow		Options d'affichage
 Volume	MediaPlayer-Main		Volume
+Volume of background clips	MediaPlayer-SettingsWindow		Volume en arrière-plan
 none	Audio track menu		aucun
 none	Subtitles menu		aucun

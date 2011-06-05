@@ -51,7 +51,7 @@ Slide delay	Menus		Задержка слайд шоу
 Slide show	Menus		Слайд шоу
 Stretch to window	Menus		Растянуть до размеров окна
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Рисунок '%s' был изменен. Вы хотите закрыть его без сохранения?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Изображение '%s' было изменено. Вы хотите закрыть его без сохранения?
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Undo	Menus		Вернуть
 Use as background…	Menus		Сделать фоном рабочего стола…

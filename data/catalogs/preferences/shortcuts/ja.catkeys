@@ -1,16 +1,37 @@
-1	japanese	x-vnd.Haiku-Shortcuts	2868428159
+1	japanese	x-vnd.Haiku-Shortcuts	621368175
+(Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)
+*Beep	ShortcutsWindow		*Beep
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MouseDown	ShortcutsWindow		*MouseDown
+*MouseUp	ShortcutsWindow		*MouseUp
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Add new shortcut	ShortcutsWindow		新規作成
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		追加
 Append KeySet…	ShortcutsWindow		キーセットの追加…
 Application	ShortcutsWindow		アプリケーション
+Beep	ShortcutsSpec		Beep
 Cancel	ShortcutsWindow		中止
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Don't save	ShortcutsWindow		保存しない
-Error, NULL state description?\n	ShortcutsSpec		エラー, NULL state description?\n
+Error, NULL state description?\n	ShortcutsSpec		エラー, 記述がありません?\n
 File	ShortcutsWindow		ファイル
+InsertString	ShortcutsSpec		InsertString
 Key	ShortcutsWindow		Key
+LaunchHandler	ShortcutsSpec		LaunchHandler
+MouseButton	ShortcutsSpec		MouseButton
+MouseDown	ShortcutsSpec		MouseDown
+MouseUp	ShortcutsSpec		MouseUp
+MoveMouse	ShortcutsSpec		MoveMouse
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		おお、
+Oh no	ShortcutsWindow		Oh no
 Open	ShortcutsWindow		開く
 Open KeySet…	ShortcutsWindow		キーセットを開く…
 Quit	ShortcutsWindow		終了
@@ -21,9 +42,11 @@ Save	ShortcutsWindow		保存
 Save & apply	ShortcutsWindow		保存して適用
 Save KeySet as…	ShortcutsWindow		キーセットを名前をつけて保存…
 Select	ShortcutsWindow		選択
+SendMessage	ShortcutsSpec		SendMessage
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Shortcuts	System name		キーボードショートカット
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんできた。
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
 Window	ShortcutsSpec	Name for modifier on keyboard	Window

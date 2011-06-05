@@ -31,8 +31,10 @@ THE SOFTWARE.
 
 #include "StatusWindow.h"
 #include "Report.h"
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <Message.h>
-#include <Box.h>
 
 
 static const uint32 kCancelMsg = 'cncl';
@@ -41,9 +43,10 @@ static const uint32 kProgressMsg = 'prgs';
 
 StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd) 
 	:
-	HWindow(BRect(100, 100, 700, 600), "PDF Writer", 
+	HWindow(BRect(100, 100, 200, 200), "PDF Writer",
 	B_TITLED_WINDOW, 
-	B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_NOT_CLOSABLE|B_FRAME_EVENTS,
+	B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_FRAME_EVENTS
+	| B_AUTO_UPDATE_SIZE_LIMITS,
 	B_CURRENT_WORKSPACE, kCancelMsg) 
 {
 	fPass = 0;
@@ -58,41 +61,36 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 		closeOption = kNever;
 	fCloseOption = (CloseOption)closeOption;
 	
-	BRect r(0, 0, Frame().Width(), Frame().Height());
 
-	// view for the background color
-	BView *fPanel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
-	AddChild(fPanel);
+	fPageLabel = new BStringView("page_text", "Page");
 
-	r.Set(10, 12, Frame().Width()-5, 22);
-	fPageLabel = new BStringView(r, "page_text", "Page",
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fPanel->AddChild(fPageLabel);
-
-	r.Set(10, 15, 300-10, 10);
-	fPageStatus = new BStatusBar(r, "pageStatus");
+	fPageStatus = new BStatusBar("pageStatus");
 	fPageStatus->SetMaxValue(pages * passes);
 	fPageStatus->SetBarHeight(12);
-	fPanel->AddChild(fPageStatus);
 
-	// add a "Cancel" button
-	int32 x = 110;
-	int32 y = 55;
-	fCancel	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", 
-		new BMessage(kCancelMsg), B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
-	fCancel->ResizeToPreferred();
-	fPanel->AddChild(fCancel);
+	fCancel	= new BButton("cancel", "Cancel", new BMessage(kCancelMsg));
 
-	BRect b(0, 90, Bounds().right-B_V_SCROLL_BAR_WIDTH, Bounds().bottom);
-	BRect t(b);
-	t.OffsetTo(0, 0);
-	fReport = new BTextView(b, "", t, B_FOLLOW_TOP_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+	fReport = new BTextView("report");
 	fReport->SetStylable(true);
 	fReport->MakeEditable(false);
-	fPanel->AddChild(new BScrollView("", fReport, B_FOLLOW_ALL, 0, false, true));
+	fReportScrollView = new BScrollView("report_scroll_viewer",
+		fReport, 0, false, true);
+	fReportScrollView->Hide();
 
-	ResizeTo(300, 85);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fPageLabel)
+			.AddGlue()
+		.End()
+		.Add(fPageStatus)
+		.Add(fReportScrollView)
+		.AddStrut(5)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.Add(fCancel)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	Show();
 }
@@ -141,9 +139,10 @@ StatusWindow::UpdateReport()
 	const int32 n = r->CountItems();
 	const bool update = fReportIndex < n;
 	if (update && fReportIndex == 0) {
-		SetFlags(Flags() & ~(B_NOT_RESIZABLE));
-		ResizeTo(600, 500);
+		fReportScrollView->SetExplicitMinSize(BSize(600, 400));
+		fReportScrollView->Show();
 	}
+
 	while (fReportIndex < n) {
 		ReportRecord* rr = r->ItemAt(fReportIndex ++);
 		const char* label = NULL;

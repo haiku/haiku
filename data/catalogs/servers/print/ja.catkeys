@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PSRV	3475473381
+1	japanese	x-vnd.Be-PSRV	1761631281
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		その名前のプリンターは既に存在しますが、利用できません。置き換えますか?
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		その名前のプリンターは既に存在しますが、ドライバーが見付かりません。置き換えますか?
 A0	ConfigWindow	ISO 216 paper size	A0 (841 x 1189 mm)
@@ -44,6 +44,7 @@ Retrieve or select the active printer	PrintServerApp Scripting		アクティブ�
 Return the number of available printers	PrintServerApp Scripting		プリンターの数を取得
 Return the number of available transports	PrintServerApp Scripting		トランスポートの数を取得
 Select a printer	ConfigWindow		プリンターを選択
+Show configuration window	PrintServerApp Scripting		設定ウインドウを表示
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid (279 x 432 mm)
 There are no printers set up.	PrintServerApp		プリンターはインストールされていません。
 There is no default printer set up.	PrintServerApp		デフォルトプリンターが設定されていません。

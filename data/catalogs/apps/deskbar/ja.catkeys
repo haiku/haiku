@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Be-TSKB	1962084612
-<Be folder is empty>	BeMenu		<Haiku メニューフォルダは空です>
+<Be folder is empty>	BeMenu		<Haiku メニューフォルダーは空です>
 About Haiku	BeMenu		Haiku について
 Always on top	PreferencesWindow		常に手前に
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
@@ -28,8 +28,8 @@ Recent applications	BeMenu		最近使ったアプリケーション
 Recent applications:	PreferencesWindow		最近使ったアプリケーション
 Recent documents	BeMenu		最近使ったドキュメント
 Recent documents:	PreferencesWindow		最近使ったドキュメント
-Recent folders	BeMenu		最近開いたフォルダ
-Recent folders:	PreferencesWindow		最近開いたフォルダ：
+Recent folders	BeMenu		最近開いたフォルダー
+Recent folders:	PreferencesWindow		最近開いたフォルダー：
 Restart Tracker	BeMenu		Tracker を実行
 Restart system	BeMenu		再起動
 Show Time	Tray		時刻を表示する
@@ -39,6 +39,6 @@ Show calendar…	TimeView		カレンダーの表示…
 Show replicants	BeMenu		レプリカントを表示
 Show seconds	PreferencesWindow		時刻に秒を表示
 Shutdown…	BeMenu		システムの終了…
-Sort running applications	PreferencesWindow		アルファベット順に並び換える
+Sort running applications	PreferencesWindow		名前順に並び換える
 Tracker always first	PreferencesWindow		Trackerを先頭に表示
 Window	PreferencesWindow		ウィンドウ

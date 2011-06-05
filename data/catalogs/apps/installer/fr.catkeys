@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	2528334782
+1	french	x-vnd.Haiku-Installer	267668186
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld sur %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Si vous installez Haiku sur du matériel réel (pas dans un émulateur) il vous est recommandé de préparer au préalable une partition sur votre disque dur. L'installeur et le gestionnaire de disques permettent d'initialiser des partitions existantes au système de fichier natif de Haiku, mais les options pour changer la disposition actuelle des partitions peuvent ne pas avoir été testées sur un assez grand nombre d'ordinateurs donc il n'est pas conseillé de les utiliser.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) L'installeur va rendre la partition Haiku amorçable, mais ne s'occupera pas d'intégrer Haiku à un menu de démarrage existant. Si vous avez déjà installé GRUB, vous pouvez ajouter Haiku à son menu de démarrage. Cela se fait différemment en fonction de la version de GRUB que vous utilisez.\n\n\n
@@ -22,7 +22,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		Êtes vous s
 Begin	InstallerWindow		Commencer
 Boot sector not written because of an internal error.	InstallProgress		Le secteur d'amorçage n'a pas été écrit à cause d'une erreur interne.
 Boot sector successfully written.	InstallProgress		Écriture du secteur d'amorce réussie.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Le Gestionnaire d'amorçage, l'application de configuration du menu de démarrage de Haiku, n'a pas pu être lancé.
 Cancel	InstallProgress		Annuler
 Cancel	InstallerWindow		Annuler
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sélectionner le disque de destination dans la liste déroulante, puis cliquer sur « Commencer ».

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PEPL	445835317
+1	japanese	x-vnd.Be-PEPL	2443878629
 %name% picture	People		%name% の画像
 Address	People		住所
 Cancel	People		キャンセル
@@ -33,8 +33,11 @@ Remove image	People		イメージを削除する
 Revert	People		元に戻す
 Save	People		保存
 Save as…	People		名前を付けて保存...
+Save changes before quitting?	People		終了前に保存しますか?
 Select all	People		すべて選択
 Sorry	People		すみません
+State	People		都道府県
+The file '%name%' could not be written.	People		ファイル '%name%' を書き込めませんでした。
 URL	People		URL
 Undo	People		元に戻す
 Work phone	People		会社の電話番号

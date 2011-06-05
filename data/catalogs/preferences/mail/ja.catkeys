@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Mail	1251962090
+1	japanese	x-vnd.Haiku-Mail	2389972088
 Account name:	Config Views		アカウント名:
 Account settings	Config Views		アカウント設定
 Accounts	Config Window		アカウント
@@ -9,6 +9,7 @@ Check every	Config Window		メールを
 E-mail	System name		メール
 Edit mailbox menu…	Config Window		メールボックスメニューの編集…
 Error	Config Window		エラー
+Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
 Mail checking	Config Window		メールチェック
 Miscellaneous	Config Window		その他
 OK	Config Window		OK
@@ -17,11 +18,14 @@ Real name:	Config Views		本名：
 Remove	Config Window		削除
 Return address:	Config Views		返信先アドレス：
 Revert	Config Window		元に戻す
+Schedule outgoing mail when dial-up is disconnected	Config Window		ダイアルアップ接続が切断した時に送信メールを予約する
 Settings	Config Window		設定
 Show connection status window:	Config Window		通信状況ウインドウを表示
 Start mail services on startup	Config Window		起動時にメールサービスを開始する
 While sending	Config Window		送信中に
 While sending and receiving	Config Window		送受信中に
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定をもとに戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成します。\n\n削除ボタンで選択したアカウントを削除します。\n\nリストの項目を選択して、設定を変更します。
 days	Config Window		日毎にチェック
 hours	Config Window		時間毎にチェック
 minutes	Config Window		分毎にチェック

@@ -1,9 +1,13 @@
-1	japanese	x-vnd.Haiku-SGITranslator	3536205253
+1	japanese	x-vnd.Haiku-SGITranslator	2222378389
 None	SGIView		無し
 RLE	SGIView		RLE
 SGI Settings	SGIMain		SGI 設定
 SGI image	SGITranslator		SGI イメージ
+SGI image translator	SGITranslator		SGI イメージトランスレーター
+SGI image translator	SGIView		SGI イメージトランスレーター
 SGI images	SGITranslator		SGI イメージ
-SGITranslator Settings	SGITranslator		SGITranslator 設定
+SGITranslator Settings	SGITranslator		SGI トランスレーター設定
 Use compression:	SGIView		圧縮方法：
 Version %d.%d.%d %s	SGIView		バージョン %d.%d.%d %s
+\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nGIMP SGI プラグイン v1.5 に基づく:\n
+written by:\n	SGIView		作者:\n

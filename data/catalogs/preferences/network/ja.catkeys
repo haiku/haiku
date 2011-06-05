@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	3810742593
+1	japanese	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<ワイヤレスネットワークが見つかりません>
 Adapter:	EthernetSettingsView		ネットワークアダプター：
 Apply	EthernetSettingsView		適用
@@ -13,6 +13,7 @@ Gateway:	EthernetSettingsView		ゲートウェイ：
 IP address:	EthernetSettingsView		IP アドレス：
 Mode:	EthernetSettingsView		モード：
 Netmask:	EthernetSettingsView		サブネットマスク：
+Network	System name		ネットワーク
 Network:	EthernetSettingsView		ネットワーク:
 OK	EthernetSettingsView		Ok
 Revert	EthernetSettingsView		元に戻す

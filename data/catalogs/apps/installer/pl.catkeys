@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	3586371697
+1	polish	x-vnd.Haiku-Installer	1325705101
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Jeśli instalujesz Haiku na prawdziwej maszynie (nie przez emulator), zaleca się wcześniejsze przygotowanie partycji na dysku. Instalator i narzędzie DriveSetup potrafią zainicjalizować istniejące partycje natywnym systeme plików Haiku, ale operacje zmieniania struktury dysku nie zostały przetestowane na wystarczającej ilości komputerów, więc nie zalecamy korzystania z nich.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Instalator sprawi, że partycja Haiku stanie się partycją rozruchową, ale nie podejmie działań, aby zintegrować Haiku z aktualnie istniejącym menu rozruchu. Jeśli posiadasz zainstalowanego GRUBa, możesz dodać Haiku do jego menu rozruchu. W zależności od Twojej wersji GRUBa, robi się to w różny sposób.\n\n\n
@@ -20,7 +20,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		Na pewno zak
 Begin	InstallerWindow		Instaluj
 Boot sector not written because of an internal error.	InstallProgress		Nie można zapisać bootsektora z powodu wewnętrznego błędu.
 Boot sector successfully written.	InstallProgress		Sektor rozruchowy został pomyślnie zapisany.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, aplikacja służąca do konfigurowania menu rozruchu Haiku nie mogła zostać uruchomiona.
 Cancel	InstallProgress		Anuluj
 Cancel	InstallerWindow		Anuluj
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Proszę wybrać dysk, na którym ma zostać zainstalowany system z menu podręcznego i nacisnąć \"Instaluj\".

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2165212720
+1	japanese	x-vnd.Haiku-libtracker	3078889708
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒
 %Ld B	WidgetAttributeText		%Ld バイト
 %Ld bytes	WidgetAttributeText		%Ld バイト
@@ -23,7 +23,7 @@
 64 x 64	DeskWindow		64 × 64
 <No recent items>	FavoritesMenu		<最近使った項目はありません>
 Add	FindPanel		追加
-Add current folder	FilePanelPriv		このフォルダを追加
+Add current folder	FilePanelPriv		このフォルダーを追加
 Add printer…	ContainerWindow		プリンターの追加…
 Add-ons	ContainerWindow		アドオン
 Add-ons	DeskWindow		アドオン
@@ -32,12 +32,12 @@ Add-ons	VolumeWindow		アドオン
 All BeOS disks	AutoMounterSettings		全 BFS パーティション
 All disks	AutoMounterSettings		全パーティション
 All disks	FindPanel		全パーティション
-All files and folders	FindPanel		すべてのファイルとフォルダ
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダに \"%name\" という項目が既に存在して、中に同じ名前の項目が入っている可能性もあります。%verbしょうとしている項目と置き換えますか？
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダに既に \"%name\" という項目があります。作成しょうとしているシンボリックリンクと置き換えますか？
+All files and folders	FindPanel		すべてのファイルとフォルダー
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダーに \"%name\" という項目が既に存在して、中に同じ名前の項目が入っている可能性もあります。%verbしょうとしている項目と置き換えますか？
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーに既に \"%name\" という項目があります。作成しょうとしているシンボリックリンクと置き換えますか？
 And	FindPanel		かつ
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダに移動またはコピーしてよろしいですか？
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダーに移動またはコピーしてよろしいですか？
 Ask before delete	SettingsView		削除前に確認する
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		%func にて\nfind_directory() が失敗。\nエラー: %error
 Attributes	ContainerWindow		属性
@@ -89,7 +89,7 @@ Create relative link here	ContainerWindow		ここに相対リンクを作成
 Created	ContainerWindow		作成日時
 Created:	InfoWindow		作成日時：
 Creating links: 	StatusWindow		作成中リンク：
-Current folder	ContainerWindow		現在のフォルダ
+Current folder	ContainerWindow		現在のフォルダー
 Cut	ContainerWindow		切り取り
 Cut	FilePanelPriv		切り取り
 Cut more	ContainerWindow		さらに切り取る
@@ -127,14 +127,14 @@ Edit templates…	TemplatesMenu		雛形を編集…
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Empty Trash	ContainerWindow		ごみ箱を空にする
 Empty Trash	InfoWindow		ごみ箱を空にする
-Empty folder	NavMenu		空フォルダ
-Empty folder	SlowContextPopup		空フォルダ
+Empty folder	NavMenu		空フォルダー
+Empty folder	SlowContextPopup		空フォルダー
 Emptying Trash… 	StatusWindow		ごみ箱を空にしています…
 Enable type-ahead filtering	SettingsView		先行入力フィルターを有効にする
 Error %error loading Add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
-Error calculating folder size.	InfoWindow		フォルダサイズの計算中にエラー発生。
+Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました：\n\t%error\n\nそれでも続けますか？
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" フォルダの移動中にエラーが発生:\n\t%error\n\nそれでも続けますか？
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" フォルダーの移動中にエラーが発生:\n\t%error\n\nそれでも続けますか？
 Error creating link to \"%name\".	FSUtils		\"%name\"へのリンクの作成時にエラーが発生しました。
 Error deleting items	FSUtils		ファイル削除中にエラーが発生しました
 Error emptying Trash!	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
@@ -159,20 +159,22 @@ Get info	ContainerWindow		詳細情報…
 Get info	FilePanelPriv		詳細情報…
 Get info	VolumeWindow		詳細情報…
 GiB	WidgetAttributeText		GiB
-Go to parent	FilePanelPriv		親フォルダへ移動
+Go to parent	FilePanelPriv		親フォルダーへ移動
 Group	FilePermissionsView		グループ
 Handles %type	OpenWithWindow		%type に対応
 Handles any %type	OpenWithWindow		すべての%typeに対応
+Handles any file	OpenWithWindow		すべてのファイルに対応
 Icon view	ContainerWindow		アイコン表示
 Icon view	DeskWindow		アイコン表示
 Icon view	VolumeWindow		アイコン表示
 Identify	ContainerWindow		ファイル形式を判別
 Identify	InfoWindow		ファイル形式を判別
-If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		「config」フォルダを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでも「config」フォルダの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		ホームフォルダを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでもホームフォルダの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
+If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		共通フォルダーを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでも共通フォルダーの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
+If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		「config」フォルダーを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでも「config」フォルダーの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
+If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		ホームフォルダーを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでもホームフォルダーの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		MIME設定を%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでもMIME設定の%toDoActionを実行する際、「強行」ボタンをクリックしてください。
-If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		「settings」フォルダを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでも「settings」フォルダの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		システムフォルダおよびその中身を%ifYouDoActionした場合、Haikuが起動しなくなりますが、続けますか？それでもシステムフォルダまたはその中身の%toDoActionを実行する際、Shiftキーを押したまま「強行」ボタンをクリックしてください。
+If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		「settings」フォルダーを%ifYouDoActionした場合、Haikuが正常に動作しなくなる可能性はありますが、続けますか？それでも「settings」フォルダーの%toDoActionを実行する際、「強行」ボタンをクリックしてください。
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		システムフォルダーおよびその中身を%ifYouDoActionした場合、Haikuが起動しなくなりますが、続けますか？それでもシステムフォルダーまたはその中身の%toDoActionを実行する際、Shiftキーを押したまま「強行」ボタンをクリックしてください。
 Ignore case	SelectionWindow		大文字/小文字を区別しない
 Include trash	FindPanel		ごみ箱を含む
 Increase size	ContainerWindow		サイズを拡大
@@ -187,7 +189,7 @@ Kind	ContainerWindow		種類
 Kind:	InfoWindow		種類：
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	\"%name\" のリンク先：
 Link to:	InfoWindow		リンク先：
-List folders first	SettingsView		フォルダを先頭に表示
+List folders first	SettingsView		フォルダーを先頭に表示
 List view	ContainerWindow		一覧表示
 List view	VolumeWindow		一覧表示
 Location	ContainerWindow		場所
@@ -230,12 +232,12 @@ Name matches wildcard expression:###	SelectionWindow		ファイル名がワイ�
 New	ContainerWindow		新規
 New	DeskWindow		新規作成
 New Query	FindPanel		新規クエリ
-New folder	ContainerWindow		新規フォルダ
-New folder	FSUtils		新規フォルダ
-New folder	FilePanelPriv		新規フォルダ
-New folder	TemplatesMenu		新規フォルダ
-New folder %ld	FSUtils		新規フォルダ %ld 
-New folder%ld	FSUtils		新規フォルダ %ld 
+New folder	ContainerWindow		新規フォルダー
+New folder	FSUtils		新規フォルダー
+New folder	FilePanelPriv		新規フォルダー
+New folder	TemplatesMenu		新規フォルダー
+New folder %ld	FSUtils		新規フォルダー %ld 
+New folder%ld	FSUtils		新規フォルダー %ld 
 OK	AutoMounterSettings		OK
 OK	FSUtils		OK
 OK	InfoWindow		OK
@@ -252,14 +254,14 @@ Open	OpenWithWindow		開く
 Open	VolumeWindow		開く
 Open %name with:	OpenWithWindow		%nameを指定アプリで開く：
 Open and make preferred	OpenWithWindow		関連づけて開く
-Open parent	ContainerWindow		親フォルダを開く
+Open parent	ContainerWindow		親フォルダーを開く
 Open selection with:	OpenWithWindow		選択ファイルをアプリケーションで開く：
 Open with…	ContainerWindow		指定アプリケーションで開く…
 Opens with:	InfoWindow		アプリケーション：
 Or	FindPanel		または
 Original name	ContainerWindow		元の名前
 Other	FilePermissionsView		その他
-Outline selection rectangle only	SettingsView		マウスドラグ選択時アウトラインのみ表示
+Outline selection rectangle only	SettingsView		マウスドラッグ選択時アウトラインのみ表示
 Owner	FilePermissionsView		所有者
 Paste	ContainerWindow		貼り付け
 Paste	FilePanelPriv		貼り付け
@@ -284,10 +286,10 @@ Query name:	FindPanel		クエリー名：
 Query template	FindPanel		クエリー雛形
 Read	FilePermissionsView		読み取り
 Real name	ContainerWindow		実名
-Recalculate folder size	InfoWindow		フォルダサイズを再計算
+Recalculate folder size	InfoWindow		フォルダーサイズを再計算
 Recent documents	FavoritesMenu		最近開いたドキュメント
-Recent folders	ContainerWindow		最近開いたフォルダ
-Recent folders	FavoritesMenu		最近開いたフォルダ
+Recent folders	ContainerWindow		最近開いたフォルダー
+Recent folders	FavoritesMenu		最近開いたフォルダー
 Relation	OpenWithWindow		関連
 Remove	FindPanel		削除
 Replace	FSUtils		置換
@@ -321,7 +323,7 @@ Select…	VolumeWindow		選択…
 Set new link target	InfoWindow		リンク先を変更
 Settings…	MountMenu		設定…
 Show Disks icon	SettingsView		ディスクアイコンを表示
-Show folder location in title tab	SettingsView		タイトルタブにフォルダ位置を表示
+Show folder location in title tab	SettingsView		タイトルタブにフォルダー位置を表示
 Show navigator	SettingsView		ツールバーを表示
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
 Show space bars on volumes	SettingsView		ディスクの容量グラフを表示する
@@ -333,16 +335,16 @@ Size	PoseView		サイズ
 Size	QueryPoseView		サイズ
 Size:	InfoWindow		サイズ： 
 Skip	FSUtils		スキップ
-Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目が既にフォルダの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目が既にフォルダーの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか？元に戻せませんので、ご注意ください。
-Sorry, could not create a new folder.	FSUtils		新規フォルダを作成できませんでした。
+Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		「Character」属性にはマルチバイト文字を保存できません。
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
 Sorry, you can't copy items to the Trash.	FSClipBoard		ごみ箱にコピーすることはできません。
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 Sorry, you can't create links in the Trash.	PoseView		ごみ箱にリンクを作ることはできません。
-Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダに保存は許可されていません。
+Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダーに保存は許可されていません。
 Sorry, you cannot edit that attribute.	WidgetAttributeText		この属性は編集できません。
 Temporary	FindPanel		一時的
 That name is already taken. Please type another one.	InfoWindow		指定された名前は既に使用されています。別の名前を指定してください。
@@ -351,20 +353,20 @@ That name is too long. Please type another one.	InfoWindow		名前が長すぎ�
 The Tracker must be running to see Info windows.	PoseView		情報ウィンドウを表示するには、Trackerが実行されている必要があります。
 The Tracker must be running to see set the default printer.	PoseView		デフォルトプリンタを設定するには、 Tracker が実行されている必要があります。
 The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\" は開こうとしているドキュメントの形式をサポートしていません。進めても良いですか? アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダに\"%name\"というファイルが既に存在します。置き換えますか？
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに\"%name\"というファイルが既に存在します。置き換えますか？
 The mount server could not be contacted.	AutoMounterSettings		マウントサーバーが応答しません。
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てることはできません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
-The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定された名前は既にフォルダ名として使用されています。別の名前を指定してください。
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定された名前は既にフォルダー名として使用されています。別の名前を指定してください。
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
 The target disk does not support creating links.	FSUtils		指定されたディスクはリンクをサポートしていません。
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\"を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。
-There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		指定されたフォルダへの保存に失敗しました。別のフォルダを指定してみてください。
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		指定されたフォルダーへの保存に失敗しました。別のフォルダーを指定してみてください。
 There was an error deleting \"%name\":\n\t%error	FSUtils		\"%name\" の移動中にエラーが発生しました：\n\t%error
 There was an error resolving the link.	Tracker		リンクの解釈に失敗しました。
 There was an error writing the attribute.	WidgetAttributeText		属性の書き込み中にエラーが発生しました。
 TiB	WidgetAttributeText		TiB
 To: %dir	StatusWindow		%dir
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker New Templates
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		新規 Tracker テンプレート
 Tracker preferences	TrackerSettingsWindow		Trackerの設定
 Tracker status	StatusWindow		Trackerの動作状況
 Trash	Model		ごみ箱
@@ -388,17 +390,17 @@ Would you like to find a suitable application to open the file?	FSUtils		この�
 Would you like to find some other suitable application?	FSUtils		他に適切なアプリケーションを検索しますか？
 Write	FilePermissionsView		書き込み
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		下記の項目：\n\t%name%src\n\nを\n\t%name%dest\n\nと置き換えようとしています。\n\n%movemodeの項目と置き換えますか？
-You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダを同じフォルダやサブフォルダに移動できません。
-You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダを移動やコピーはできません。
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやサブフォルダーに移動できません。
+You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。
-You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダを同名のフォルダと置き換えられません。
-You cannot copy or move the root directory.	FSUtils		ルートフォルダをコピーまたは移動はできません。
-You cannot create a link to the root directory.	FSUtils		ルートフォルダにはリンクを作成できません。
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		「Trash」、ホームおよびデスクトップフォルダをごみ箱に捨てることはできません。
-You cannot replace a file with a folder or a symbolic link.	FSUtils		ファイルをフォルダまたはリンクと置き換えることはできません。
-You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダをリンクまたはファイルと置き換えることはできません。
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		「Disks」ウィンドウ内のディスクアイコンの上に項目をドラグ＆ドロップしてください。
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラグ＆ドロップしてください。
+You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
+You cannot copy or move the root directory.	FSUtils		ルートフォルダーをコピーまたは移動はできません。
+You cannot create a link to the root directory.	FSUtils		ルートフォルダーにはリンクを作成できません。
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		ごみ箱、ホームおよびデスクトップフォルダーをごみ箱に捨てることはできません。
+You cannot replace a file with a folder or a symbolic link.	FSUtils		ファイルをフォルダーまたはリンクと置き換えることはできません。
+You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 You must have at least one attribute showing.	PoseView		最低一つの属性を表示する必要があります。
 \nShould this be fixed?	FSUtils		\n修復しますか？
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld バイト、
@@ -417,7 +419,7 @@ ends with	FindPanel		指定文字列で終わる
 ends with	SelectionWindow		指定文字列で終わる
 for %num files	InfoWindow		合計 %num 項目
 greater than	FindPanel		より大きい
-home	B_USER_DIRECTORY		ホームフォルダ
+home	B_USER_DIRECTORY		ホーム
 is	FindPanel		と等しい
 is not	FindPanel		除く
 label too long	PoseView		ラベルが長すぎます
@@ -432,15 +434,13 @@ multiple disks	FindPanel		複数ディスク
 no items	CountView		0 項目
 no supporting apps	OpenWithWindow		対応するアプリケーションはありません
 of %items	StatusWindow		/ %items
-optional	/boot/optional		追加項目
-parent folder	NavMenu		親フォルダ
-preferences	B_PREFERENCES_DIRECTORY		環境設定
+parent folder	NavMenu		親フォルダー
 rename	InfoWindow	As in 'If you rename ...'	名前の変更
 rename	InfoWindow	As in 'To rename ...'	名前の変更
 rename	TextWidget	As in 'If you rename ...'	名前の変更
 rename	TextWidget	As in 'To rename ...'	名前の変更
 save text	FilePanelPriv		テキストを保存
-starts with	FindPanel		指定文字列ではじまる
+starts with	FindPanel		指定文字列で始まる
 starts with	SelectionWindow		指定文字列で始まる
-system	B_SYSTEM_DIRECTORY		システムフォルダ
+system	B_SYSTEM_DIRECTORY		システム
 trash	B_TRASH_DIRECTORY		ごみ箱

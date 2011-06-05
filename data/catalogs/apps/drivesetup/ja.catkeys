@@ -7,7 +7,7 @@ Are you sure you want to delete the selected partition?\n\nAll data on the parti
 Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		本当にパーティション \"%s\" を初期化して良いですか? 変更をディスクに書き込む直前に再度確認します。
 Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		本当にパーティションを初期化して良いですか? 変更をディスクに書き込む直前に再度確認します。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスク %s のデータが全て失われますので、ご注意ください。
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、「%s」パーティション のすべてのデータが失われますので、ご注意ください。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、%s パーティション のすべてのデータが失われますので、ご注意ください。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスクの全てのデータが失われますので、ご注意ください。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、選択されたディスクのデータが全て失われますので、ご注意ください。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更を本当にディスクに保存しますか？\n\nその場合、選択されたパーティションの全てのデータが失われますので、ご注意ください。
@@ -19,7 +19,7 @@ Continue	MainWindow		続ける
 Could not aquire partitioning information.	MainWindow		パーティション情報の取得に失敗しました。
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
 Could not mount partition %s.	MainWindow		パーティション「%s」をマウントできませんでした。
-Could not unmount partition %s.	MainWindow		「%s」パーティションをマウント解除できませんでした。
+Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Create	CreateParamsPanel		新規作成
 Create…	MainWindow		新規作成…
 Creation of the partition has failed.	MainWindow		パーティションの作成に失敗しました。
@@ -28,17 +28,17 @@ Delete partition	MainWindow		パーティションを削除
 Device	DiskView		デバイス
 Device	PartitionList		デバイス
 Disk	MainWindow		ディスク
-Disk system \"%s\"\" not found!	MainWindow		「%s\"」ディスクシステムがみつかりません!
+Disk system \"%s\"\" not found!	MainWindow		\"%s\"\" ディスクシステムがみつかりません!
 DriveSetup	System name		DriveSetup
 Eject	MainWindow		取り出す
 End: %ld MB	Support		末端： %ld MB
 Error: 	MainWindow	in any error alert	エラー : 
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
-Failed to initialize the partition %s!\n	MainWindow		パーティション「%s」の初期化に失敗しました！\n
+Failed to initialize the partition %s!\n	MainWindow		パーティション %s の初期化に失敗しました！\n
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		パーティションの初期化に失敗しました。変更は保存されていません。
 File system	PartitionList		ファイルシステム
 Format (not implemented)	MainWindow		フォーマット（実装されていません）
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		「%s」パーティションの初期化に失敗しました。（ディスクに何も書き込まれていません）
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s パーティションの初期化に失敗しました。（ディスクに何も書き込まれていません）
 Initialize	InitParamsPanel		初期化
 Initialize	MainWindow		初期化
 Mount	MainWindow		マウント
@@ -59,10 +59,10 @@ Size	PartitionList		サイズ
 Surface test (not implemented)	MainWindow		表面チェック（実装されていません）
 The currently selected partition does not have a parent partition.	MainWindow		選択されたパーティションには親パーティションがありません。
 The currently selected partition is not empty.	MainWindow		選択されたパーティションにデータがあります。
-The partition %s has been successfully initialized.\n	MainWindow		「%s」パーティションの初期化に成功しました。\n
-The partition %s is already mounted.	MainWindow		パーティション「%s」は既にマウントされています。
+The partition %s has been successfully initialized.\n	MainWindow		%s パーティションの初期化に成功しました。\n
+The partition %s is already mounted.	MainWindow		パーティション %s は既にマウントされています。
 The partition %s is already unmounted.	MainWindow		パーティション「%s」は既にマウント解除されています。
-The partition %s is currently mounted.	MainWindow		「%s」パーティションが現在マウントされています。
+The partition %s is currently mounted.	MainWindow		%s パーティションが現在マウントされています。
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
 The selected partition does not contain a partitioning system.	MainWindow		選択されたパーティションにパーティションシステムはありません。
 There was an error acquiring the partition row.	MainWindow		パーティション情報を取得の際、エラーが発生しました。

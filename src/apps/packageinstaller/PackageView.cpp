@@ -375,10 +375,10 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 				BString actionString;
 				if (choice == P_EXISTS_OVERWRITE) {
 					alertString << B_TRANSLATE("All existing files will be replaced?");
-					actionString = "Replace all";
+					actionString = B_TRANSLATE("Replace all");
 				} else {
 					alertString << B_TRANSLATE("All existing files will be skipped?");
-					actionString = "Skip all";
+					actionString = B_TRANSLATE("Skip all");
 				}
 				alert = new BAlert("policy_decision", alertString.String(),
 					actionString.String(), B_TRANSLATE("Ask again"));
@@ -410,7 +410,7 @@ PackageView::_InitView()
 	description->MakeEditable(false);
 	description->MakeSelectable(false);
 
-	fInstallTypes = new BPopUpMenu("none");
+	fInstallTypes = new BPopUpMenu(B_TRANSLATE("none"));
 
 	BMenuField *installType = new BMenuField("install_type",
 		B_TRANSLATE("Installation type:"), fInstallTypes, 0);
@@ -487,7 +487,7 @@ PackageView::_InitView()
 	rect.bottom += 100;
 	BBox *installBox = new BBox(rect.InsetByCopy(2, 2), "install_box");
 
-	fInstallTypes = new BPopUpMenu("none");
+	fInstallTypes = new BPopUpMenu(B_TRANSLATE("none"));
 
 	BMenuField *installType = new BMenuField(BRect(2, 2, 100, 50),
 		"install_type", B_TRANSLATE("Installation type:"),
@@ -519,7 +519,7 @@ PackageView::_InitView()
 
 	AddChild(installBox);
 
-	fDestination = new BPopUpMenu("none");
+	fDestination = new BPopUpMenu(B_TRANSLATE("none"));
 
 	rect = installBox->Frame();
 	rect.top = rect.bottom + 5;

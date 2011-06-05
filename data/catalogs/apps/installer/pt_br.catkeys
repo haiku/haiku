@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-Installer	3591494925
+1	brazilian_portuguese	x-vnd.Haiku-Installer	1330828329
 ???	InstallerWindow	Unknown currently copied item	???
 Additional disk space required: %s	InstallerWindow		Espaço adicional necessário em disco: %s
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Um erro foi encontrado e a instalação não foi completado:\n\nErro:  %s
@@ -7,7 +7,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Are you sure you want to to stop the installation?	InstallerWindow		Você tem certeza que deseja parar a instalação?
 Boot sector not written because of an internal error.	InstallProgress		O setor de inicialização não foi escrito por causa de um erro interno.
 Boot sector successfully written.	InstallProgress		O setor de inicialização foi escrito com sucesso.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		O Gerenciador de inicialização, o aplicativo para configurar o menu de inicialização do Haiku, não pode ser aberto.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco que você quer instalar no menu pop-up. Então clique em \"Iniciar\".
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem e o disco de destinação nos menus pop-ups. Então clique em \"Iniciar\".
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".

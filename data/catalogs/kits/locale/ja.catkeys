@@ -1,4 +1,4 @@
-1	japanese	system	2013278701
+1	japanese	system	180647795
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
@@ -9,6 +9,9 @@ About %app%	AboutMenuItem		%app%について
 About %app…	Dragger		%appについて…
 About…	AboutWindow		このソフトウエアについて…
 Blue:	ColorControl		青：
+Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\"用のレプリカントを作成できません。\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
 Close	AboutWindow		閉じる
 Copy	TextView		コピー
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc. 	

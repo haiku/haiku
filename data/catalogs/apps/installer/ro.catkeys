@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	614764841
+1	romanian	x-vnd.Haiku-Installer	2649065541
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld din %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Dacă instalați Haiku pe hardware real (nu într-un emulator) este recomandat să aveți deja pregătită o partiție pe hard disc. Programul de instalare și unealta ConfigurareDriver asigură intițializarea partițiilor existente cu sistemul nativ de fișiere Haiku, dar opțiunile de a schimba aranjamentul partiției actuale s-ar putea să nu fie testate pe o varietate destul de mare de configurări ale calculatorului, prin urmare nu recomandăm să le utilizați.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Programul de instalare va face partiția Haiku bootabilă, dar nu va integra Haiku într-un meniul de boot existent. Dacă aveți deja instalat GRUB, puteți adăuga Haiku la meniul de boot al acestuia. În funcție de versiunea de GRUB pe care o utilizați, acest lucru este realizat diferit.\n\n\n
@@ -17,7 +17,6 @@ Are you sure you want to to stop the installation?	InstallerWindow		Sigur doriț
 Begin	InstallerWindow		Începe
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.
 Boot sector successfully written.	InstallProgress		Sector de boot scris cu succes.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, aplicația pentru configurarea meniului de boot Haiku, nu a putut fi pornită.
 Cancel	InstallProgress		Anulează
 Cancel	InstallerWindow		Anulează
 Collecting copy information.	InstallProgress		Se colectează informațiile de copiere.
