@@ -60,8 +60,8 @@ ide1:1.present = "false"
 
 tools.remindInstall = "false"
 
-# If you have a dual core (or more), you might want to use both cores in the
-# emulation as well. VMware Player only supports 2, otherwise 4 are possible.
+# If you have a dual core (or more), you might want to use those cores in the
+# emulation as well.
 #numvcpus = "2"
 
 # This gets rid of the annoying serial debug output requester - although it
