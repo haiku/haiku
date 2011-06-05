@@ -115,6 +115,12 @@ typedef struct main_item_data {
 } _PACKED main_item_data;
 
 
+typedef union main_item_data_converter {
+	main_item_data	main_data;
+	uint16			flat_data;
+} main_item_data_converter;
+
+
 typedef struct usage_value {
 	union {
 		struct {

@@ -15,6 +15,7 @@ KernelAddon usb_hid :
 	HIDParser.cpp
 	HIDReport.cpp
 	HIDReportItem.cpp
+	HIDWriter.cpp
 
 	QuirkyDevices.cpp
 
