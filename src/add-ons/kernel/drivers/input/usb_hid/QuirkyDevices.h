@@ -7,15 +7,17 @@
 
 #include "Driver.h"
 
+class HIDWriter;
+
 typedef status_t (*quirky_init_function)(usb_device device,
 	const usb_configuration_info *config, size_t interfaceIndex);
+typedef status_t (*quirky_build_descriptor)(HIDWriter &writer);
 
 struct usb_hid_quirky_device {
 	uint16					vendor_id;
 	uint16					product_id;
-	size_t					descriptor_length;
-	const uint8 *			fixed_descriptor;
 	quirky_init_function	init_function;
+	quirky_build_descriptor	build_descriptor;
 };
 
 extern usb_hid_quirky_device gQuirkyDevices[];

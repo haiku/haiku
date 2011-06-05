@@ -10,6 +10,7 @@
 #include "Driver.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
+#include "HIDWriter.h"
 #include "ProtocolHandler.h"
 #include "QuirkyDevices.h"
 
@@ -39,25 +40,29 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 {
 	uint8 *reportDescriptor = NULL;
 	size_t descriptorLength = 0;
-	quirky_init_function quirkyInit = NULL;
-	bool hasFixedDescriptor = false;
 
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
 
 	// check for quirky devices first and don't bother in that case
+	HIDWriter descriptorWriter;
+	bool hasFixedDescriptor = false;
+	quirky_init_function quirkyInit = NULL;
 	for (int32 i = 0; i < gQuirkyDeviceCount; i++) {
 		usb_hid_quirky_device &quirky = gQuirkyDevices[i];
 		if (deviceDescriptor->vendor_id == quirky.vendor_id
 			&& deviceDescriptor->product_id == quirky.product_id) {
 
 			quirkyInit = quirky.init_function;
-			if (quirky.fixed_descriptor != NULL) {
-				reportDescriptor = (uint8 *)quirky.fixed_descriptor;
-				descriptorLength = quirky.descriptor_length;
+			if (quirky.build_descriptor != NULL
+				&& quirky.build_descriptor(descriptorWriter) == B_OK) {
+
+				reportDescriptor = (uint8 *)descriptorWriter.Buffer();
+				descriptorLength = descriptorWriter.BufferLength();
 				hasFixedDescriptor = true;
-				break;
 			}
+
+			break;
 		}
 	}
 
