@@ -14,10 +14,11 @@ BinCommand hid_decode :
 	HIDParser.cpp
 	HIDReport.cpp
 	HIDReportItem.cpp
+	HIDWriter.cpp
 
 	hid_decode.cpp
 	: be $(TARGET_LIBSUPC++)
 ;
 
 SEARCH on [ FGristFiles HIDCollection.cpp HIDParser.cpp HIDReport.cpp
-	HIDReportItem.cpp ] = $(driverDir) ;
+	HIDReportItem.cpp HIDWriter.cpp ] = $(driverDir) ;
