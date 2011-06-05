@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku.
+ * Copyright 2004-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -218,7 +218,7 @@ MouseDevice::Start()
 		kMouseThreadPriority, (void*)this);
 
 	status_t status;
-	if (fThread < B_OK)
+	if (fThread < 0)
 		status = fThread;
 	else {
 		fActive = true;
@@ -228,7 +228,7 @@ MouseDevice::Start()
 	if (status < B_OK) {
 		LOG_ERR("%s: can't spawn/resume watching thread: %s\n",
 			fDeviceRef.name, strerror(status));
-		if (fDevice >= B_OK)
+		if (fDevice >= 0)
 			close(fDevice);
 
 		return status;
@@ -249,7 +249,7 @@ MouseDevice::Stop()
 	close(fDevice);
 	fDevice = -1;
 
-	if (fThread >= B_OK) {
+	if (fThread >= 0) {
 		// unblock the thread, which might wait on a semaphore.
 		suspend_thread(fThread);
 		resume_thread(fThread);
@@ -290,6 +290,8 @@ MouseDevice::UpdateTouchpadSettings(const BMessage* message)
 
 	delete fTouchpadSettingsMessage;
 	fTouchpadSettingsMessage = new BMessage(*message);
+	if (fTouchpadSettingsMessage == NULL)
+		return B_NO_MEMORY;
 
 	return B_OK;
 }
@@ -457,7 +459,7 @@ MouseDevice::_ControlThread()
 				fTarget.EnqueueMessage(message);
 		}
 
-		if ((movements.wheel_ydelta != 0) || (movements.wheel_xdelta != 0)) {
+		if (movements.wheel_ydelta != 0 || movements.wheel_xdelta != 0) {
 			BMessage* message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message == NULL)
 				continue;
@@ -491,7 +493,7 @@ MouseDevice::_ControlThreadCleanup()
 	} else {
 		// In case active is already false, another thread
 		// waits for this thread to quit, and may already hold
-		// locks that _RemoveDevice() wants to acquire. In another
+		// locks that _RemoveDevice() wants to acquire. In other
 		// words, the device is already being removed, so we simply
 		// quit here.
 	}
@@ -820,7 +822,7 @@ MouseInputDevice::_AddDevice(const char* path)
 	_RemoveDevice(path);
 
 	MouseDevice* device = new(std::nothrow) MouseDevice(*this, path);
-	if (!device) {
+	if (device == NULL) {
 		TRACE("No memory\n");
 		return B_NO_MEMORY;
 	}
