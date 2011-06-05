@@ -34,6 +34,8 @@ public:
 		void					SetReport(status_t status, uint8 *report,
 									size_t length);
 
+		void					PrintToStream();
+
 private:
 		HIDReport *				_FindOrCreateReport(uint8 type, uint8 id);
 		float					_CalculateResolution(global_item_state *state);

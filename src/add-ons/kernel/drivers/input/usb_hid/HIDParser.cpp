@@ -492,6 +492,21 @@ HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 }
 
 
+void
+HIDParser::PrintToStream()
+{
+	for (uint8 i = 0; i < fReportCount; i++) {
+		HIDReport *report = fReports[i];
+		if (report == NULL)
+			continue;
+
+		report->PrintToStream();
+	}
+
+	fRootCollection->PrintToStream();
+}
+
+
 HIDReport *
 HIDParser::_FindOrCreateReport(uint8 type, uint8 id)
 {
