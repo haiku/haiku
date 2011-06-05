@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders screen_saver ;
 	# For BuildScreenSaverDefaultSettingsView
 
-AddResources Butterfly : DebugNow.rdef ;
+AddResources DebugNow : DebugNow.rdef ;
 
 ScreenSaver DebugNow :
 	DebugNow.cpp : 
