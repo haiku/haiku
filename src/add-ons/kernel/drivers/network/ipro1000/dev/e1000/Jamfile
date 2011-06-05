@@ -21,13 +21,11 @@ KernelAddon ipro1000 :
 	e1000_ich8lan.c
 	e1000_mac.c
 	e1000_manage.c
-	e1000_mbx.c
 	e1000_nvm.c
 	e1000_osdep.c
 	e1000_phy.c
-	e1000_vf.c
 	if_em.c
-	
+
 	glue.c
 	: libfreebsd_network.a
 	;

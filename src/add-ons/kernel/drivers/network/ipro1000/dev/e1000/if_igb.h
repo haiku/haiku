@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2011, Intel Corporation 
+  Copyright (c) 2001-2008, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD$*/
+/*$FreeBSD: src/sys/dev/e1000/if_igb.h,v 1.1.2.2 2008/12/01 07:13:52 jfv Exp $*/
 
 #ifndef _IGB_H_DEFINED_
 #define _IGB_H_DEFINED_
@@ -47,8 +47,8 @@
  *   desscriptors should meet the following condition.
  *      (num_tx_desc * sizeof(struct e1000_tx_desc)) % 128 == 0
  */
-#define IGB_MIN_TXD		256
-#define IGB_DEFAULT_TXD		1024
+#define IGB_MIN_TXD		80
+#define IGB_DEFAULT_TXD		256
 #define IGB_MAX_TXD		4096
 
 /*
@@ -62,8 +62,8 @@
  *   desscriptors should meet the following condition.
  *      (num_tx_desc * sizeof(struct e1000_tx_desc)) % 128 == 0
  */
-#define IGB_MIN_RXD		256
-#define IGB_DEFAULT_RXD		1024
+#define IGB_MIN_RXD		80
+#define IGB_DEFAULT_RXD		256
 #define IGB_MAX_RXD		4096
 
 /*
@@ -128,13 +128,14 @@
 /*
  * This parameter controls the duration of transmit watchdog timer.
  */
-#define IGB_WATCHDOG                   (10 * hz)
+#define IGB_TX_TIMEOUT                   5    /* set to 5 seconds */
 
 /*
  * This parameter controls when the driver calls the routine to reclaim
- * transmit descriptors. Cleaning earlier seems a win.
+ * transmit descriptors.
  */
-#define IGB_TX_CLEANUP_THRESHOLD	(adapter->num_tx_desc / 2)
+#define IGB_TX_CLEANUP_THRESHOLD	(adapter->num_tx_desc / 8)
+#define IGB_TX_OP_THRESHOLD	(adapter->num_tx_desc / 32)
 
 /*
  * This parameter controls whether or not autonegotation is enabled.
@@ -171,16 +172,10 @@
 #define IGB_DEFAULT_PBA			0x00000030
 #define IGB_SMARTSPEED_DOWNSHIFT	3
 #define IGB_SMARTSPEED_MAX		15
-#define IGB_MAX_LOOP			10
-
-#define IGB_RX_PTHRESH			(hw->mac.type <= e1000_82576 ? 16 : 8)
+#define IGB_MAX_INTR			10
+#define IGB_RX_PTHRESH			16
 #define IGB_RX_HTHRESH			8
 #define IGB_RX_WTHRESH			1
-
-#define IGB_TX_PTHRESH			8
-#define IGB_TX_HTHRESH			1
-#define IGB_TX_WTHRESH			((hw->mac.type != e1000_82575 && \
-                                          adapter->msix_mem) ? 1 : 16)
 
 #define MAX_NUM_MULTICAST_ADDRESSES     128
 #define PCI_ANY_ID                      (~0U)
@@ -188,9 +183,14 @@
 #define IGB_TX_BUFFER_SIZE		((uint32_t) 1514)
 #define IGB_FC_PAUSE_TIME		0x0680
 #define IGB_EEPROM_APME			0x400;
-#define IGB_QUEUE_IDLE			0
-#define IGB_QUEUE_WORKING		1
-#define IGB_QUEUE_HUNG			2
+
+#define MAX_INTS_PER_SEC	8000
+#define DEFAULT_ITR		1000000000/(MAX_INTS_PER_SEC * 256)
+
+/* Code compatilbility between 6 and 7 */
+#ifndef ETHER_BPF_MTAP
+#define ETHER_BPF_MTAP			BPF_MTAP
+#endif
 
 /*
  * TDBA/RDBA should be aligned on 16 byte boundary. But TDLEN/RDLEN should be
@@ -203,6 +203,14 @@
 
 /* PCI Config defines */
 #define IGB_MSIX_BAR		3
+
+/*
+** This is the total number of MSIX vectors you wish
+** to use, it also controls the size of resources.
+** The 82575 has a total of 10, 82576 has 25. Set this
+** to the real amount you need to streamline data storage.
+*/
+#define IGB_MSIX_VEC		6	/* MSIX vectors configured */
 
 /* Defines for printing debug information */
 #define DEBUG_INIT  0
@@ -220,32 +228,52 @@
 #define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) printf(S "\n", A, B)
 
 #define IGB_MAX_SCATTER		64
-#define IGB_VFTA_SIZE		128
-#define IGB_BR_SIZE		4096	/* ring buf size */
 #define IGB_TSO_SIZE		(65535 + sizeof(struct ether_vlan_header))
 #define IGB_TSO_SEG_SIZE	4096	/* Max dma segment size */
-#define IGB_HDR_BUF		128
-#define IGB_PKTTYPE_MASK	0x0000FFF0
 #define ETH_ZLEN		60
 #define ETH_ADDR_LEN		6
+#define CSUM_OFFLOAD		7	/* Offload bits in mbuf flag */
 
-/* Offload bits in mbuf flag */
-#if __FreeBSD_version >= 800000
-#define CSUM_OFFLOAD		(CSUM_IP|CSUM_TCP|CSUM_UDP|CSUM_SCTP)
-#else
-#define CSUM_OFFLOAD		(CSUM_IP|CSUM_TCP|CSUM_UDP)
-#endif
-
-/* Define the starting Interrupt rate per Queue */
-#define IGB_INTS_PER_SEC        8000
-#define IGB_DEFAULT_ITR         ((1000000/IGB_INTS_PER_SEC) << 2)
-
+/*
+ * Interrupt Moderation parameters
+ */
+#define IGB_LOW_LATENCY         128
+#define IGB_AVE_LATENCY         450
+#define IGB_BULK_LATENCY        1200
 #define IGB_LINK_ITR            2000
 
+#ifdef IGB_TIMESYNC
 /* Precision Time Sync (IEEE 1588) defines */
 #define ETHERTYPE_IEEE1588	0x88F7
 #define PICOSECS_PER_TICK	20833
 #define TSYNC_PORT		319 /* UDP port for the protocol */
+
+/* TIMESYNC IOCTL defines */
+#define IGB_TIMESYNC_READTS	_IOWR('i', 127, struct igb_tsync_read)
+#define IGB_TIMESTAMP		5	/* A unique return value */
+
+/* Used in the READTS IOCTL */
+struct igb_tsync_read {
+	int read_current_time;
+	struct timespec system_time;
+	u64 network_time;
+	u64 rx_stamp;
+	u64 tx_stamp;
+	u16 seqid;
+	unsigned char srcid[6];
+	int rx_valid;
+	int tx_valid;
+};
+
+#endif /* IGB_TIMESYNC */
+
+struct adapter; /* forward reference */
+
+struct igb_int_delay_info {
+	struct adapter *adapter;	/* Back-pointer to the adapter struct */
+	int offset;			/* Register offset to read/write */
+	int value;			/* Current value in usecs */
+};
 
 /*
  * Bus dma allocation structure used by
@@ -262,72 +290,48 @@ struct igb_dma_alloc {
 
 
 /*
-** Driver queue struct: this is the interrupt container
-**  for the associated tx and rx ring.
-*/
-struct igb_queue {
-	struct adapter		*adapter;
-	u32			msix;		/* This queue's MSIX vector */
-	u32			eims;		/* This queue's EIMS bit */
-	u32			eitr_setting;
-	struct resource		*res;
-	void			*tag;
-	struct tx_ring		*txr;
-	struct rx_ring		*rxr;
-	struct task		que_task;
-	struct taskqueue	*tq;
-	u64			irqs;
-};
-
-/*
- * Transmit ring: one per queue
+ * Transmit ring: one per tx queue
  */
 struct tx_ring {
 	struct adapter		*adapter;
 	u32			me;
+	u32			msix;		/* This ring's MSIX vector */
+	u32			eims;		/* This ring's EIMS bit */
 	struct mtx		tx_mtx;
 	char			mtx_name[16];
-	struct igb_dma_alloc	txdma;
+	struct igb_dma_alloc	txdma;		/* bus_dma glue for tx desc */
 	struct e1000_tx_desc	*tx_base;
+	struct task		tx_task;	/* cleanup tasklet */
 	u32			next_avail_desc;
 	u32			next_to_clean;
 	volatile u16		tx_avail;
-	struct igb_tx_buffer	*tx_buffers;
-#if __FreeBSD_version >= 800000
-	struct buf_ring		*br;
-#endif
-	bus_dma_tag_t		txtag;
-
-	u32			bytes;
-	u32			packets;
-
-	int			queue_status;
-	int			watchdog_time;
-	int			tdt;
-	int			tdh;
+	struct igb_buffer	*tx_buffers;
+	bus_dma_tag_t		txtag;		/* dma tag for tx */
+	u32			watchdog_timer;
 	u64			no_desc_avail;
+	u64			tx_irq;
 	u64			tx_packets;
 };
 
 /*
- * Receive ring: one per queue
+ * Receive ring: one per rx queue
  */
 struct rx_ring {
 	struct adapter		*adapter;
 	u32			me;
-	struct igb_dma_alloc	rxdma;
+	u32			msix;		/* This ring's MSIX vector */
+	u32			eims;		/* This ring's EIMS bit */
+	struct igb_dma_alloc	rxdma;		/* bus_dma glue for tx desc */
 	union e1000_adv_rx_desc	*rx_base;
 	struct lro_ctrl		lro;
-	bool			lro_enabled;
-	bool			hdr_split;
-	bool			discard;
+	struct task		rx_task;	/* cleanup tasklet */
 	struct mtx		rx_mtx;
 	char			mtx_name[16];
-	u32			next_to_refresh;
+	u32			last_cleaned;
 	u32			next_to_check;
-	struct igb_rx_buf	*rx_buffers;
-	bus_dma_tag_t		htag;		/* dma tag for rx head */
-	bus_dma_tag_t		ptag;		/* dma tag for rx packet */
+	struct igb_buffer	*rx_buffers;
+	bus_dma_tag_t		rxtag;		/* dma tag for tx */
+	bus_dmamap_t		rx_spare_map;
 	/*
 	 * First/last mbuf pointers, for
 	 * collecting multisegment RX packets.
@@ -336,13 +340,10 @@ struct rx_ring {
 	struct mbuf	       *lmp;
 
 	u32			bytes;
-	u32			packets;
-	int			rdt;
-	int			rdh;
+	u32			eitr_setting;
 
 	/* Soft stats */
-	u64			rx_split_packets;
-	u64			rx_discarded;
+	u64			rx_irq;
 	u64			rx_packets;
 	u64			rx_bytes;
 };
@@ -351,19 +352,19 @@ struct adapter {
 	struct ifnet	*ifp;
 	struct e1000_hw	hw;
 
+	/* FreeBSD operating-system-specific structures. */
 	struct e1000_osdep osdep;
 	struct device	*dev;
-	struct cdev	*led_dev;
 
 	struct resource *pci_mem;
 	struct resource *msix_mem;
-	struct resource	*res;
-	void		*tag;
-	u32		que_mask;
+	struct resource	*res[IGB_MSIX_VEC];
+	void		*tag[IGB_MSIX_VEC];
+	int		rid[IGB_MSIX_VEC];
+	u32		eims_mask;
 
 	int		linkvec;
 	int		link_mask;
-	struct task	link_task;
 	int		link_irq;
 
 	struct ifmedia	media;
@@ -372,84 +373,62 @@ struct adapter {
 	int		if_flags;
 	int		max_frame_size;
 	int		min_frame_size;
-	int		pause_frames;
 	struct mtx	core_mtx;
 	int		igb_insert_vlan_header;
-        u16		num_queues;
-	u16		vf_ifp;  /* a VF interface */
+	struct task     link_task;
+	struct task     rxtx_task;
+	struct taskqueue *tq;           /* private task queue */
 
+#ifdef IGB_HW_VLAN_SUPPORT
 	eventhandler_tag vlan_attach;
 	eventhandler_tag vlan_detach;
-	u32		num_vlans;
+#endif
 
 	/* Management and WOL features */
 	int		wol;
 	int		has_manage;
 
-	/*
-	** Shadow VFTA table, this is needed because
-	** the real vlan filter table gets cleared during
-	** a soft reset and the driver needs to be able
-	** to repopulate it.
-	*/
-	u32		shadow_vfta[IGB_VFTA_SIZE];
-
-	/* Info about the interface */
+	/* Info about the board itself */
 	u8		link_active;
 	u16		link_speed;
 	u16		link_duplex;
 	u32		smartspeed;
-	u32		dma_coalesce;
-
-	/* Interface queues */
-	struct igb_queue	*queues;
 
 	/*
 	 * Transmit rings
 	 */
 	struct tx_ring		*tx_rings;
         u16			num_tx_desc;
-
-	/* Multicast array pointer */
-	u8			*mta;
+        u16			num_tx_queues;
+        u32			txd_cmd;
 
 	/* 
 	 * Receive rings
 	 */
 	struct rx_ring		*rx_rings;
-	bool			rx_hdr_split;
         u16			num_rx_desc;
+        u16			num_rx_queues;
 	int			rx_process_limit;
-	u32			rx_mbuf_sz;
-	u32			rx_mask;
+	u32			rx_buffer_len;
 
 	/* Misc stats maintained by the driver */
 	unsigned long	dropped_pkts;
-	unsigned long	mbuf_defrag_failed;
-	unsigned long	mbuf_header_failed;
-	unsigned long	mbuf_packet_failed;
+	unsigned long	mbuf_alloc_failed;
+	unsigned long	mbuf_cluster_failed;
 	unsigned long	no_tx_map_avail;
         unsigned long	no_tx_dma_setup;
 	unsigned long	watchdog_events;
 	unsigned long	rx_overruns;
-	unsigned long	device_control;
-	unsigned long	rx_control;
-	unsigned long	int_mask;
-	unsigned long	eint_mask;
-	unsigned long	packet_buf_alloc_rx;
-	unsigned long	packet_buf_alloc_tx;
 
 	boolean_t       in_detach;
 
-#ifdef IGB_IEEE1588
-	/* IEEE 1588 precision time support */
-	struct cyclecounter     cycles;
-	struct nettimer         clock;
-	struct nettime_compare  compare;
-	struct hwtstamp_ctrl    hwtstamp;
+#ifdef IGB_TIMESYNC
+	u64		last_stamp;
+	u64		last_sec;
+	u32		last_ns;
 #endif
 
-	void 			*stats;
+	struct e1000_hw_stats stats;
 };
 
 /* ******************************************************************************
@@ -468,73 +447,25 @@ typedef struct _igb_vendor_info_t {
 } igb_vendor_info_t;
 
 
-struct igb_tx_buffer {
+struct igb_buffer {
 	int		next_eop;  /* Index of the desc to watch */
         struct mbuf    *m_head;
         bus_dmamap_t    map;         /* bus_dma map for packet */
 };
 
-struct igb_rx_buf {
-        struct mbuf    *m_head;
-        struct mbuf    *m_pack;
-	bus_dmamap_t	hmap;	/* bus_dma map for header */
-	bus_dmamap_t	pmap;	/* bus_dma map for packet */
-};
-
-/*
-** Find the number of unrefreshed RX descriptors
-*/
-static inline u16
-igb_rx_unrefreshed(struct rx_ring *rxr)
-{
-	struct adapter  *adapter = rxr->adapter;
- 
-	if (rxr->next_to_check > rxr->next_to_refresh)
-		return (rxr->next_to_check - rxr->next_to_refresh - 1);
-	else
-		return ((adapter->num_rx_desc + rxr->next_to_check) -
-		    rxr->next_to_refresh - 1);
-}
-
 #define	IGB_CORE_LOCK_INIT(_sc, _name) \
 	mtx_init(&(_sc)->core_mtx, _name, "IGB Core Lock", MTX_DEF)
 #define	IGB_CORE_LOCK_DESTROY(_sc)	mtx_destroy(&(_sc)->core_mtx)
+#define	IGB_TX_LOCK_DESTROY(_sc)		mtx_destroy(&(_sc)->tx_mtx)
+#define	IGB_RX_LOCK_DESTROY(_sc)		mtx_destroy(&(_sc)->rx_mtx)
 #define	IGB_CORE_LOCK(_sc)		mtx_lock(&(_sc)->core_mtx)
+#define	IGB_TX_LOCK(_sc)			mtx_lock(&(_sc)->tx_mtx)
+#define	IGB_RX_LOCK(_sc)			mtx_lock(&(_sc)->rx_mtx)
 #define	IGB_CORE_UNLOCK(_sc)		mtx_unlock(&(_sc)->core_mtx)
-#define	IGB_CORE_LOCK_ASSERT(_sc)	mtx_assert(&(_sc)->core_mtx, MA_OWNED)
-
-#define	IGB_TX_LOCK_DESTROY(_sc)	mtx_destroy(&(_sc)->tx_mtx)
-#define	IGB_TX_LOCK(_sc)		mtx_lock(&(_sc)->tx_mtx)
 #define	IGB_TX_UNLOCK(_sc)		mtx_unlock(&(_sc)->tx_mtx)
-#define	IGB_TX_TRYLOCK(_sc)		mtx_trylock(&(_sc)->tx_mtx)
-#define	IGB_TX_LOCK_ASSERT(_sc)		mtx_assert(&(_sc)->tx_mtx, MA_OWNED)
-
-#define	IGB_RX_LOCK_DESTROY(_sc)	mtx_destroy(&(_sc)->rx_mtx)
-#define	IGB_RX_LOCK(_sc)		mtx_lock(&(_sc)->rx_mtx)
 #define	IGB_RX_UNLOCK(_sc)		mtx_unlock(&(_sc)->rx_mtx)
-#define	IGB_RX_LOCK_ASSERT(_sc)		mtx_assert(&(_sc)->rx_mtx, MA_OWNED)
-
-#define UPDATE_VF_REG(reg, last, cur)		\
-{						\
-	u32 new = E1000_READ_REG(hw, reg);	\
-	if (new < last)				\
-		cur += 0x100000000LL;		\
-	last = new;				\
-	cur &= 0xFFFFFFFF00000000LL;		\
-	cur |= new;				\
-}
-
-#if __FreeBSD_version >= 800000 && __FreeBSD_version < 800504
-static __inline int
-drbr_needs_enqueue(struct ifnet *ifp, struct buf_ring *br)
-{
-#ifdef ALTQ
-	if (ALTQ_IS_ENABLED(&ifp->if_snd))
-		return (1);
-#endif
-	return (!buf_ring_empty(br));
-}
-#endif
+#define	IGB_CORE_LOCK_ASSERT(_sc)	mtx_assert(&(_sc)->core_mtx, MA_OWNED)
+#define	IGB_TX_LOCK_ASSERT(_sc)		mtx_assert(&(_sc)->tx_mtx, MA_OWNED)
 
 #endif /* _IGB_H_DEFINED_ */
 
