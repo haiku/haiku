@@ -66,34 +66,25 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 
 			case B_HID_USAGE_PAGE_GENERIC_DESKTOP:
 			{
-				switch (item->UsageID()) {
-					case B_HID_UID_GD_X:
-					case B_HID_UID_GD_Y:
-					case B_HID_UID_GD_Z:
-					case B_HID_UID_GD_RX:
-					case B_HID_UID_GD_RY:
-					case B_HID_UID_GD_RZ:
-						uint16 axis = item->UsageID() - B_HID_UID_GD_X + 1;
-						if (axis > INT16_MAX)
-							break;
+				uint16 axis = 0;
+				if (item->UsageID() >= B_HID_UID_GD_X
+					&& item->UsageID() <= B_HID_UID_GD_WHEEL) {
+					axis = item->UsageID() - B_HID_UID_GD_X;
+				} else if (item->UsageID() >= B_HID_UID_GD_VX
+					&& item->UsageID() <= B_HID_UID_GD_VNO) {
+					axis = item->UsageID() - B_HID_UID_GD_VX;
+				} else
+					break;
 
-						if (fAxisCount < axis) {
-							HIDReportItem **newAxis = (HIDReportItem **)realloc(
-								fAxis, axis * sizeof(HIDReportItem *));
-							if (newAxis == NULL)
-								break;
-
-							for (uint16 i = fAxisCount; i < axis; i++)
-								newAxis[i] = NULL;
-
-							fAxis = newAxis;
-							fAxisCount = axis;
-						}
-
-						fAxis[axis - 1] = item;
-						break;
+				HIDReportItem **newAxis = (HIDReportItem **)realloc(fAxis,
+					++fAxisCount * sizeof(HIDReportItem *));
+				if (newAxis == NULL) {
+					fAxisCount--;
+					break;
 				}
 
+				fAxis = newAxis;
+				fAxis[fAxisCount - 1] = item;
 				break;
 			}
 		}
@@ -102,7 +93,8 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 
 	fCurrentValues.initialize(fAxisCount, 0, fMaxButton);
 
-	TRACE("joystick device with %lu buttons\n", fButtonCount);
+	TRACE("joystick device with %lu buttons and %lu axes\n", fButtonCount,
+		fAxisCount);
 	TRACE("report id: %u\n", report.ID());
 }
 
