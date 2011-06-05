@@ -545,7 +545,7 @@ AddSymlinkToHaikuImage system add-ons Tracker
 AddSymlinkToHaikuImage system add-ons Tracker
 	: /boot/system/apps/DiskUsage : DiskUsage-I ;
 AddFilesToHaikuImage system add-ons input_server devices
-	: <input>keyboard <input>mouse <input>wacom ;
+	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToHaikuImage system add-ons input_server filters
 	: screen_saver shortcut_catcher ;
 AddFilesToHaikuImage system add-ons kernel network
