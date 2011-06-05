@@ -36,6 +36,9 @@ class BCalendarView : public BView, public BInvoker {
 								BCalendarView(BRect frame, const char *name, week_start start,
 									uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+								
+								BCalendarView(const char* name,
+									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
 		virtual					~BCalendarView();
 
@@ -88,6 +91,10 @@ class BCalendarView : public BView, public BInvoker {
 
 		virtual void			ResizeToPreferred();
 		virtual void			GetPreferredSize(float *width, float *height);
+		
+		virtual	BSize			MaxSize();
+		virtual	BSize			MinSize();
+		virtual	BSize			PreferredSize();
 
 		int32					Day() const;
 		int32					Year() const;

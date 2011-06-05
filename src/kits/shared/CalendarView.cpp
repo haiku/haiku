@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 
+#include <LayoutUtils.h>
 #include <Window.h>
 
 
@@ -65,6 +66,24 @@ BCalendarView::BCalendarView(BRect frame, const char *name, week_start start,
 	fFocusChanged(false),
 	fSelectionChanged(false),
 	fWeekStart(start),
+	fDayNameHeaderVisible(true),
+	fWeekNumberHeaderVisible(true)
+{
+	_InitObject();
+}
+
+
+BCalendarView::BCalendarView(const char* name, uint32 flags)
+	:
+	BView(name, flags),
+	BInvoker(),
+	fSelectionMessage(NULL),
+	fDay(0),
+	fYear(0),
+	fMonth(0),
+	fFocusChanged(false),
+	fSelectionChanged(false),
+	fWeekStart(B_WEEK_START_SUNDAY),
 	fDayNameHeaderVisible(true),
 	fWeekNumberHeaderVisible(true)
 {
@@ -556,6 +575,32 @@ void
 BCalendarView::GetPreferredSize(float *width, float *height)
 {
 	_GetPreferredSize(width, height);
+}
+
+
+BSize
+BCalendarView::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+}
+
+
+BSize
+BCalendarView::MinSize()
+{
+	float width, height;
+	_GetPreferredSize(&width, &height);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		BSize(width, height));
+}
+
+
+BSize
+BCalendarView::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		MinSize());
 }
 
 
