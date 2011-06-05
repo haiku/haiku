@@ -2159,17 +2159,17 @@ BPoseView::MessageReceived(BMessage *message)
 		case kMiniIconMode:
 			SetViewMode(message->what);
 			break;
-		
+
 		case kMsgMouseDragged:
 			MouseDragged(message);
 			break;
-			
+
 		case kMsgMouseLongDown:
 			MouseLongDown(message);
 			break;
-			
+
 		case B_MOUSE_IDLE:
-			MouseIdle(message);			
+			MouseIdle(message);
 			break;
 
 		case B_SELECT_ALL:
@@ -6707,7 +6707,7 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 {
 	if (fSelectionRectInfo.isDragging)
 		_UpdateSelectionRect(mouseLoc);
-	
+
 	if (!fDropEnabled || !message)
 		return;
 
@@ -6737,7 +6737,7 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 				fDropTarget = NULL;
 			}
 			break;
-	}	
+	}
 }
 
 
@@ -6745,7 +6745,9 @@ void
 BPoseView::MouseDragged(const BMessage *message)
 {
 	BPoint where;
-	if (message->FindPoint("be:view_where", &where) != B_OK)
+	uint32 buttons = 0;
+	if (message->FindPoint("be:view_where", &where) != B_OK
+		|| message->FindInt32("buttons", (int32*)&buttons) != B_OK)
 		return;
 
 	bool extendSelection = (modifiers() & B_COMMAND_KEY) && fMultipleSelection;
@@ -6754,8 +6756,8 @@ BPoseView::MouseDragged(const BMessage *message)
 	BPose* pose = FindPose(where, &index);
 	if (pose != NULL)
 		DragSelectedPoses(pose, where);
-	else
-		_BeginSelectionRect(where, extendSelection);	
+	else if (buttons == B_PRIMARY_MOUSE_BUTTON)
+		_BeginSelectionRect(where, extendSelection);
 }
 
 
@@ -6780,7 +6782,7 @@ BPoseView::MouseIdle(const BMessage *message)
 
 	if (buttons == 0 || window == NULL)
 		return;
-		 	
+
 	if (fDropTarget != NULL) {
 		window->DragStart(message);
 		FrameForPose(fDropTarget, true, &fStartFrame);
@@ -6808,35 +6810,13 @@ BPoseView::MouseDown(BPoint where)
 
 	MakeFocus();
 
-	// "right" mouse button handling for context-sensitive menus
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
 	uint32 modifs = modifiers();
-
-	bool showContext = true;
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
-		showContext = (modifs & B_CONTROL_KEY) != 0;
-
-	if (showContext) {
-		int32 index;
-		BPose *pose = FindPose(where, &index);
-		if (!pose) {
-			ShowContextMenu(where);
-			return;
-		}
-		if (!pose->IsSelected()) {
-			ClearSelection();
-			pose->Select(true);
-			fSelectionList->AddItem(pose);
-			DrawPose(pose, index, false);
-		}
-		ShowContextMenu(where);
-	}
 
 	bool extendSelection = (modifs & B_COMMAND_KEY) && fMultipleSelection;
 
 	CommitActivePose();
 
-	// see if mouse down occurred within a pose
 	int32 index;
 	BPose *pose = FindPose(where, &index);
 	if (pose) {
@@ -6853,10 +6833,16 @@ BPoseView::MouseDown(BPoint where)
 
 		window->Activate();
 		window->UpdateIfNeeded();
-		
+
 		// only clear selection if we are not extending it
 		if (!extendSelection || !fSelectionRectEnabled || !fMultipleSelection)
 			ClearSelection();
+
+		// show desktop context menu
+		if (buttons == B_SECONDARY_MOUSE_BUTTON
+			|| (modifs & B_CONTROL_KEY) != 0) {
+			ShowContextMenu(where);
+		}
 	}
 
 	if (fSelectionChangedHook)
@@ -6874,6 +6860,26 @@ BPoseView::MouseUp(BPoint where)
 	BPose* pose = FindPose(where, &index);
 	if (pose != NULL && fAllowPoseEditing)
 		pose->MouseUp(BPoint(0, index * fListElemHeight), this, where, index);
+
+	uint32 lastButtons = Window()->CurrentMessage()->FindInt32("last_buttons");
+		// this handy field has been added by the tracking filter.
+		// we need lastButtons for right button mouse-up tracking,
+		// because there's currently no way to know wich buttons were
+		// released in BView::MouseUp (unlike BView::KeyUp)
+
+	// Showing the pose context menu is done on mouse up (or long click)
+	// to make right button dragging possible
+	if (pose != NULL && pose == fLastClickedPose
+		&& (lastButtons == B_SECONDARY_MOUSE_BUTTON
+			|| (modifiers() & B_CONTROL_KEY) != 0)) {
+		if (!pose->IsSelected()) {
+			ClearSelection();
+			pose->Select(true);
+			fSelectionList->AddItem(pose);
+			DrawPose(pose, index, false);
+		}
+		ShowContextMenu(where);
+	}
 }
 
 

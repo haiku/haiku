@@ -6,7 +6,7 @@
 /*!
 	\class LongAndDragTrackingFilter
 	\brief A simple long mouse down and drag detection filter
-	* 
+	*
 	* A simple mouse filter that detects long clicks and pointer drags.
 	* A long click message is sent when the mouse button is kept down
 	* for a duration longer than a given threshold while the pointer stays
@@ -18,8 +18,8 @@
 	* the moment of the click. The drag message is ready to use with the
 	* be/haiku drag and drop API cf. comment in code.
 	*
-	* Note: for simplicity and current needs (Tracker), only the left mouse
-	* button is tracked. 
+	* Current limitation: A long mouse down or a drag can be detected for
+	* any mouse button, but any released button cancels the tracking.
 	*
 */
 
@@ -77,8 +77,7 @@ LongAndDragTrackingFilter::Filter(BMessage* message, BHandler** target)
 
 			message->FindInt32("buttons", (int32*)&fClickButtons);
 
-			if ((fClickButtons & B_PRIMARY_MOUSE_BUTTON)
-				== B_PRIMARY_MOUSE_BUTTON) {
+			if (fClickButtons != 0) {
 
 				BView* targetView = dynamic_cast<BView*>(*target);
 				if (targetView != NULL)
@@ -97,14 +96,15 @@ LongAndDragTrackingFilter::Filter(BMessage* message, BHandler** target)
 
 		case B_MOUSE_UP:
 			_StopTracking();
+			message->AddInt32("last_buttons", (int32)fClickButtons);
 			return B_DISPATCH_MESSAGE;
 
 		case B_MOUSE_MOVED:
 		{
-			if (fMessageRunner != NULL) { 
+			if (fMessageRunner != NULL) {
 				BPoint where;
 				message->FindPoint("be:view_where", &where);
-			
+
 				BPoint delta(fClickPoint - where);
 				float squaredDelta = (delta.x * delta.x) + (delta.y * delta.y);
 
@@ -114,7 +114,7 @@ LongAndDragTrackingFilter::Filter(BMessage* message, BHandler** target)
 						// name it "be:view_where" since BView::DragMessage
 						// positions the dragging frame/bitmap by retrieving
 						// the current message and reading that field
-					dragMessage.AddInt32("buttons", fClickButtons);
+					dragMessage.AddInt32("buttons", (int32)fClickButtons);
 					BMessenger messenger(*target);
 					messenger.SendMessage(&dragMessage);
 
