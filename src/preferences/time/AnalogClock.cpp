@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,14 +7,16 @@
  *		Julun <host.haiku@gmx.de>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Clemens <mail@Clemens-Zeidler.de>
+ *		Hamish Morrison <hamish@lavabit.com>
  */
+
 
 #include "AnalogClock.h"
 
 #include <math.h>
 #include <stdio.h>
 
-#include <Bitmap.h>
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <Window.h>
 
@@ -24,83 +26,183 @@
 #define DRAG_DELTA_PHI 0.2
 
 
-class OffscreenClock : public BView {
-public:
-							OffscreenClock(BRect frame, const char* name,
-								bool drawSecondHand = true);
-	virtual					~OffscreenClock();
-
-			void		 	SetTime(int32 hour, int32 minute, int32 second);
-			void 			GetTime(int32* hour, int32* minute, int32* second);
-			bool			IsDirty() const	{	return fDirty;	}
-			void 			DrawClock();
-
-			bool			InHourHand(BPoint point);
-			bool			InMinuteHand(BPoint point);
-
-			void			SetHourHand(BPoint point);
-			void			SetMinuteHand(BPoint point);
-
-			void			SetHourDragging(bool dragging);
-			void			SetMinuteDragging(bool dragging);
-
-private:
-			float			_GetPhi(BPoint point);
-			bool			_InHand(BPoint point, int32 ticks, float radius);
-			void			_DrawHands(float x, float y, float radius,
-								rgb_color hourHourColor,
-								rgb_color hourMinuteColor,
-								rgb_color secondsColor, rgb_color knobColor);
-
-			int32			fHours;
-			int32			fMinutes;
-			int32			fSeconds;
-			bool			fDirty;
-
-			float			fCenterX;
-			float			fCenterY;
-			float			fRadius;
-
-			bool			fHourDragging;
-			bool			fMinuteDragging;
-			
-			bool			fDrawSecondHand;
-};
-
-
-OffscreenClock::OffscreenClock(BRect frame, const char* name,
-	bool drawSecondHand)
+TAnalogClock::TAnalogClock(const char* name, bool drawSecondHand,
+	bool interactive)
 	:
-	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+	BView(name, B_WILL_DRAW | B_DRAW_ON_CHILDREN | B_FRAME_EVENTS),
 	fHours(0),
 	fMinutes(0),
 	fSeconds(0),
 	fDirty(true),
+	fCenterX(0.0),
+	fCenterY(0.0),
+	fRadius(0.0),
 	fHourDragging(false),
 	fMinuteDragging(false),
-	fDrawSecondHand(drawSecondHand)
+	fDrawSecondHand(drawSecondHand),
+	fInteractive(interactive),
+	fTimeChangeIsOngoing(false)
 {
 	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
-
-	BRect bounds = Bounds();
-	fCenterX = floorf((bounds.left + bounds.right) / 2 + 0.5) + 0.5;
-	fCenterY = floorf((bounds.top + bounds.bottom) / 2 + 0.5) + 0.5;
-		// + 0.5 is for the offset to pixel centers
-		// (important when drawing with B_SUBPIXEL_PRECISE)
-
-	fRadius = floorf((MIN(bounds.Width(), bounds.Height()) / 2.0)) - 2.5;
-	fRadius -= 3;
 }
 
 
-OffscreenClock::~OffscreenClock()
+TAnalogClock::~TAnalogClock()
 {
 }
 
 
 void
-OffscreenClock::SetTime(int32 hour, int32 minute, int32 second)
+TAnalogClock::Draw(BRect /*updateRect*/)
 {
+	if (fDirty)
+		DrawClock();
+}
+
+
+void
+TAnalogClock::MessageReceived(BMessage* message)
+{
+	int32 change;
+	switch (message->what) {
+		case B_OBSERVER_NOTICE_CHANGE:
+			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
+			switch (change) {
+				case H_TM_CHANGED:
+				{
+					int32 hour = 0;
+					int32 minute = 0;
+					int32 second = 0;
+					if (message->FindInt32("hour", &hour) == B_OK
+					 && message->FindInt32("minute", &minute) == B_OK
+					 && message->FindInt32("second", &second) == B_OK)
+						SetTime(hour, minute, second);
+					break;
+				}
+				default:
+					BView::MessageReceived(message);
+					break;
+			}
+		break;
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+TAnalogClock::MouseDown(BPoint point)
+{
+	if (!fInteractive) {
+		BView::MouseDown(point);
+		return;
+	}
+	
+	if (InMinuteHand(point)) {
+		fMinuteDragging = true;
+		fDirty = true;
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+		Invalidate();
+		return;
+	}
+
+	if (InHourHand(point)) {
+		fHourDragging = true;
+		fDirty = true;
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+		Invalidate();
+		return;
+	}
+}
+
+
+void
+TAnalogClock::MouseUp(BPoint point)
+{
+	if (!fInteractive) {
+		BView::MouseUp(point);
+		return;
+	}
+	
+	if (fHourDragging || fMinuteDragging) {
+		int32 hour, minute, second;
+		GetTime(&hour, &minute, &second);
+		BMessage message(H_USER_CHANGE);
+		message.AddBool("time", true);
+		message.AddInt32("hour", hour);
+		message.AddInt32("minute", minute);
+		Window()->PostMessage(&message);
+		fTimeChangeIsOngoing = true;
+	}
+	fHourDragging = false;
+	fDirty = true;
+	fMinuteDragging = false;
+	fDirty = true;
+}
+
+
+void
+TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+{
+	if (!fInteractive) {
+		BView::MouseMoved(point, transit, message);
+		return;
+	}
+
+	if (fMinuteDragging)
+		SetMinuteHand(point);
+	if (fHourDragging)
+		SetHourHand(point);
+
+	Invalidate();
+}
+
+
+void
+TAnalogClock::FrameResized(float, float)
+{
+	BRect bounds = Bounds();
+
+	// + 0.5 is for the offset to pixel centers
+	// (important when drawing with B_SUBPIXEL_PRECISE)
+	fCenterX = floorf((bounds.left + bounds.right) / 2 + 0.5) + 0.5;
+	fCenterY = floorf((bounds.top + bounds.bottom) / 2 + 0.5) + 0.5;
+	fRadius = floorf((MIN(bounds.Width(), bounds.Height()) / 2.0)) - 2.5;
+	fRadius -= 3;
+}
+
+
+BSize
+TAnalogClock::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+}
+
+
+BSize
+TAnalogClock::MinSize()
+{
+	return BSize(0, 0);
+}
+
+
+BSize
+TAnalogClock::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+}
+
+
+void
+TAnalogClock::SetTime(int32 hour, int32 minute, int32 second)
+{
+	// don't set the time if the hands are in a drag action
+	if (fHourDragging || fMinuteDragging || fTimeChangeIsOngoing)
+		return;
+	
 	if (fHours == hour && fMinutes == minute && fSeconds == second)
 		return;
 
@@ -109,11 +211,31 @@ OffscreenClock::SetTime(int32 hour, int32 minute, int32 second)
 	fSeconds = second;
 
 	fDirty = true;
+
+	BWindow* window = Window();
+	if (window && window->Lock()) {
+		Invalidate();
+		Window()->Unlock();
+	}
+}
+
+
+bool
+TAnalogClock::IsChangingTime()
+{
+	return fTimeChangeIsOngoing;
 }
 
 
 void
-OffscreenClock::GetTime(int32* hour, int32* minute, int32* second)
+TAnalogClock::ChangeTimeFinished()
+{
+	fTimeChangeIsOngoing = false;
+}
+
+
+void
+TAnalogClock::GetTime(int32* hour, int32* minute, int32* second)
 {
 	*hour = fHours;
 	*minute = fMinutes;
@@ -122,7 +244,7 @@ OffscreenClock::GetTime(int32* hour, int32* minute, int32* second)
 
 
 void
-OffscreenClock::DrawClock()
+TAnalogClock::DrawClock()
 {
 	if (!LockLooper())
 		return;
@@ -132,8 +254,7 @@ OffscreenClock::DrawClock()
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 	SetHighColor(background);
 	FillRect(bounds);
-
-
+	
 	bounds.Set(fCenterX - fRadius, fCenterY - fRadius,
 		fCenterX + fRadius, fCenterY + fRadius);
 
@@ -208,7 +329,7 @@ OffscreenClock::DrawClock()
 
 
 bool
-OffscreenClock::InHourHand(BPoint point)
+TAnalogClock::InHourHand(BPoint point)
 {
 	int32 ticks = fHours;
 	if (ticks > 12)
@@ -222,14 +343,14 @@ OffscreenClock::InHourHand(BPoint point)
 
 
 bool
-OffscreenClock::InMinuteHand(BPoint point)
+TAnalogClock::InMinuteHand(BPoint point)
 {
 	return _InHand(point, fMinutes, fRadius * 0.9);
 }
 
 
 void
-OffscreenClock::SetHourHand(BPoint point)
+TAnalogClock::SetHourHand(BPoint point)
 {
 	point.x -= fCenterX;
 	point.y -= fCenterY;
@@ -247,7 +368,7 @@ OffscreenClock::SetHourHand(BPoint point)
 
 
 void
-OffscreenClock::SetMinuteHand(BPoint point)
+TAnalogClock::SetMinuteHand(BPoint point)
 {
 	point.x -= fCenterX;
 	point.y -= fCenterY;
@@ -260,24 +381,8 @@ OffscreenClock::SetMinuteHand(BPoint point)
 }
 
 
-void
-OffscreenClock::SetHourDragging(bool dragging)
-{
-	fHourDragging = dragging;
-	fDirty = true;
-}
-
-
-void
-OffscreenClock::SetMinuteDragging(bool dragging)
-{
-	fMinuteDragging = dragging;
-	fDirty = true;
-}
-
-
 float
-OffscreenClock::_GetPhi(BPoint point)
+TAnalogClock::_GetPhi(BPoint point)
 {
 	if (point.x == 0 && point.y < 0)
 		return 2 * M_PI;
@@ -302,7 +407,7 @@ OffscreenClock::_GetPhi(BPoint point)
 
 
 bool
-OffscreenClock::_InHand(BPoint point, int32 ticks, float radius)
+TAnalogClock::_InHand(BPoint point, int32 ticks, float radius)
 {
 	point.x -= fCenterX;
 	point.y -= fCenterY;
@@ -323,11 +428,9 @@ OffscreenClock::_InHand(BPoint point, int32 ticks, float radius)
 
 
 void
-OffscreenClock::_DrawHands(float x, float y, float radius,
-	rgb_color hourColor,
-	rgb_color minuteColor,
-	rgb_color secondsColor,
-	rgb_color knobColor)
+TAnalogClock::_DrawHands(float x, float y, float radius,
+	rgb_color hourColor, rgb_color minuteColor,
+	rgb_color secondsColor, rgb_color knobColor)
 {
 	float offsetX;
 	float offsetY;
@@ -360,181 +463,4 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 	// draw the center knob
 	SetHighColor(knobColor);
 	FillEllipse(BPoint(x, y), radius * 0.06, radius * 0.06);
-}
-
-
-//	#pragma mark -
-
-
-TAnalogClock::TAnalogClock(BRect frame, const char* name,
-	bool drawSecondHand, bool interactive)
-	:
-	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
-	fBitmap(NULL),
-	fClock(NULL),
-	fDrawSecondHand(drawSecondHand),
-	fInteractive(interactive),
-	fDraggingHourHand(false),
-	fDraggingMinuteHand(false),
-	fTimeChangeIsOngoing(false)
-{
-	_InitView(frame);
-}
-
-
-TAnalogClock::~TAnalogClock()
-{
-	delete fBitmap;
-}
-
-
-void
-TAnalogClock::_InitView(BRect rect)
-{
-	fClock = new OffscreenClock(Bounds(), "offscreen", fDrawSecondHand);
-	fBitmap = new BBitmap(Bounds(), B_RGB32, true);
-	fBitmap->Lock();
-	fBitmap->AddChild(fClock);
-	fBitmap->Unlock();
-}
-
-
-void
-TAnalogClock::AttachedToWindow()
-{
-	SetViewColor(B_TRANSPARENT_COLOR);
-}
-
-
-void
-TAnalogClock::MessageReceived(BMessage* message)
-{
-	int32 change;
-	switch (message->what) {
-		case B_OBSERVER_NOTICE_CHANGE:
-			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
-			switch (change) {
-				case H_TM_CHANGED:
-				{
-					int32 hour = 0;
-					int32 minute = 0;
-					int32 second = 0;
-					if (message->FindInt32("hour", &hour) == B_OK
-					 && message->FindInt32("minute", &minute) == B_OK
-					 && message->FindInt32("second", &second) == B_OK)
-						SetTime(hour, minute, second);
-					break;
-				}
-				default:
-					BView::MessageReceived(message);
-					break;
-			}
-		break;
-		default:
-			BView::MessageReceived(message);
-			break;
-	}
-}
-
-
-void
-TAnalogClock::MouseDown(BPoint point)
-{
-	if(!fInteractive) {
-		BView::MouseDown(point);
-		return;
-	}
-	
-	fDraggingMinuteHand = fClock->InMinuteHand(point);
-	if (fDraggingMinuteHand) {
-		fClock->SetMinuteDragging(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-		Invalidate();
-		return;
-	}
-	fDraggingHourHand = fClock->InHourHand(point);
-	if (fDraggingHourHand) {
-		fClock->SetHourDragging(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-		Invalidate();
-		return;
-	}
-}
-
-
-void
-TAnalogClock::MouseUp(BPoint point)
-{
-	if(!fInteractive) {
-		BView::MouseUp(point);
-		return;
-	}
-	
-	if (fDraggingHourHand || fDraggingMinuteHand) {
-		int32 hour, minute, second;
-		fClock->GetTime(&hour, &minute, &second);
-		BMessage message(H_USER_CHANGE);
-		message.AddBool("time", true);
-		message.AddInt32("hour", hour);
-		message.AddInt32("minute", minute);
-		Window()->PostMessage(&message);
-		fTimeChangeIsOngoing = true;
-	}
-	fDraggingHourHand = false;
-	fDraggingMinuteHand = false;
-	fClock->SetMinuteDragging(false);
-	fClock->SetHourDragging(false);
-}
-
-
-void
-TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
-{
-	if(!fInteractive) {
-		BView::MouseMoved(point, transit, message);
-		return;
-	}
-
-	if (fDraggingMinuteHand)
-		fClock->SetMinuteHand(point);
-	if (fDraggingHourHand)
-		fClock->SetHourHand(point);
-
-	Invalidate();
-}
-
-
-void
-TAnalogClock::Draw(BRect /*updateRect*/)
-{
-	if (fBitmap) {
-		if (fClock->IsDirty())
-			fClock->DrawClock();
-		DrawBitmap(fBitmap, BPoint(0, 0));
-	}
-}
-
-
-void
-TAnalogClock::SetTime(int32 hour, int32 minute, int32 second)
-{
-	// don't set the time if the hands are in a drag action
-	if (fDraggingHourHand || fDraggingMinuteHand || fTimeChangeIsOngoing)
-		return;
-
-	if (fClock)
-		fClock->SetTime(hour, minute, second);
-
-	BWindow* window = Window();
-	if (window && window->Lock()) {
-		Invalidate();
-		Window()->Unlock();
-	}
-}
-
-
-void
-TAnalogClock::ChangeTimeFinished()
-{
-	fTimeChangeIsOngoing = false;
 }

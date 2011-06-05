@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Julun <host.haiku@gmx.de>
  *		Clemens <mail@Clemens-Zeidler.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.cx>
+ *		Hamish Morrison <hamish@lavabit.com>
  */
 
 
@@ -24,9 +25,9 @@
 using BPrivate::B_LOCAL_TIME;
 
 
-TTimeEdit::TTimeEdit(BRect frame, const char* name, uint32 sections)
+TTimeEdit::TTimeEdit(const char* name, uint32 sections)
 	:
-	TSectionEdit(frame, name, sections),
+	TSectionEdit(name, sections),
 	fLastKeyDownTime(0),
 	fFields(NULL),
 	fFieldCount(0),
@@ -57,7 +58,6 @@ TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
 	int32 section = FocusIndex();
 	if (section < 0 || section > 2)
 		return;
-
 	bigtime_t currentTime = system_time();
 	if (currentTime - fLastKeyDownTime < 1000000) {
 		int32 doubleDigit = number + fLastKeyDownInt * 10;
@@ -84,27 +84,16 @@ TTimeEdit::InitView()
 {
 	// make sure we call the base class method, as it
 	// will create the arrow bitmaps and the section list
-	TSectionEdit::InitView();
-
 	fTime = BDateTime::CurrentDateTime(B_LOCAL_TIME);
 	_UpdateFields();
-
-	SetSections(fSectionArea);
 }
 
 
 void
-TTimeEdit::DrawSection(uint32 index, bool hasFocus)
+TTimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 {
-	TSection* section = static_cast<TSection*>(fSectionList->ItemAt(index));
-	if (!section)
-		return;
-
 	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
-
-	BRect bounds = section->Frame();
-
 	SetLowColor(ViewColor());
 	if (hasFocus)
 		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
@@ -113,25 +102,18 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	fText.CopyCharsInto(field, fFieldPositions[index * 2],
 		fFieldPositions[index * 2 + 1] - fFieldPositions[index * 2]);
 
-	// calc and center text in section rect
-	float width = be_plain_font->StringWidth(field);
-
-	BPoint offset(-((bounds.Width()- width) / 2.0) - 1.0,
-		bounds.Height() / 2.0 - 6.0);
-
+	BPoint point(bounds.LeftBottom());
+	point.y -= bounds.Height() / 2.0 - 6.0;
+	point.x += (bounds.Width() - StringWidth(field)) / 2;
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(field, bounds.LeftBottom() - offset);
+	DrawString(field, point);
 }
 
 
 void
-TTimeEdit::DrawSeparator(uint32 index)
+TTimeEdit::DrawSeparator(uint32 index, BRect bounds)
 {
-	TSection* section = static_cast<TSection*>(fSectionList->ItemAt(index));
-	if (!section)
-		return;
-
 	if (fFieldPositions == NULL || index * 2 + 2 >= (uint32)fFieldPosCount)
 		return;
 
@@ -139,43 +121,25 @@ TTimeEdit::DrawSeparator(uint32 index)
 	fText.CopyCharsInto(field, fFieldPositions[index * 2 + 1],
 		fFieldPositions[index * 2 + 2] - fFieldPositions[index * 2 + 1]);
 
-	float sepWidth = SeparatorWidth();
-	BRect bounds = section->Frame();
-	float width = be_plain_font->StringWidth(field);
-	BPoint offset(-((sepWidth - width) / 2.0) - 1.0,
-		bounds.Height() / 2.0 - 6.0);
-	DrawString(field, bounds.RightBottom() - offset);
-}
-
-
-void
-TTimeEdit::SetSections(BRect area)
-{
-	// by default divide up the sections evenly
-	BRect bounds(area);
-
-	float sepWidth = SeparatorWidth();
-
-	float sep_2 = ceil(sepWidth / fSectionCount + 1);
-	float width = bounds.Width() / fSectionCount - sep_2;
-	bounds.right = bounds.left + (width - sepWidth / fSectionCount);
-
-	for (uint32 idx = 0; idx < fSectionCount; idx++) {
-		fSectionList->AddItem(new TSection(bounds));
-
-		bounds.left = bounds.right + sepWidth;
-		if (idx == fSectionCount - 2)
-			bounds.right = area.right - 1;
-		else
-			bounds.right = bounds.left + (width - sep_2);
-	}
+	BPoint point(bounds.LeftBottom());
+	point.y -= bounds.Height() / 2.0 - 6.0;
+	point.x += (bounds.Width() - StringWidth(field)) / 2;
+	SetHighColor(0, 0, 0, 255);
+	DrawString(field, point);
 }
 
 
 float
-TTimeEdit::SeparatorWidth() const
+TTimeEdit::SeparatorWidth()
 {
 	return 10.0f;
+}
+
+
+float
+TTimeEdit::MinSectionWidth()
+{
+	return be_plain_font->StringWidth("00");
 }
 
 
@@ -236,6 +200,7 @@ TTimeEdit::DoDownPress()
 
 	// send message to change time
 	DispatchMessage();
+	
 }
 
 
@@ -247,7 +212,7 @@ TTimeEdit::BuildDispatch(BMessage* message)
 
 	message->AddBool("time", true);
 
-	for (int32 index = 0; index < fSectionList->CountItems() - 1; ++index) {
+	for (int32 index = 0; index < (int)fSectionCount; ++index) {
 		uint32 data = _SectionValue(index);
 
 		if (fFocus == index)
@@ -277,13 +242,13 @@ void
 TTimeEdit::_UpdateFields()
 {
 	time_t time = fTime.Time_t();
-
+	
 	if (fFieldPositions != NULL) {
 		free(fFieldPositions);
 		fFieldPositions = NULL;
 	}
-	BLocale::Default()->FormatTime(&fText, fFieldPositions, fFieldPosCount,
-		time, B_MEDIUM_TIME_FORMAT);
+	BLocale::Default()->FormatTime(&fText, fFieldPositions,
+		fFieldPosCount, time, B_MEDIUM_TIME_FORMAT);
 
 	if (fFields != NULL) {
 		free(fFields);
@@ -415,12 +380,21 @@ TTimeEdit::_SectionValue(int32 index) const
 }
 
 
+float
+TTimeEdit::PreferredHeight()
+{
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	return ceilf((fontHeight.ascent + fontHeight.descent) * 1.4);
+}
+
+
 //	#pragma mark -
 
 
-TDateEdit::TDateEdit(BRect frame, const char* name, uint32 sections)
+TDateEdit::TDateEdit(const char* name, uint32 sections)
 	:
-	TSectionEdit(frame, name, sections),
+	TSectionEdit(name, sections),
 	fFields(NULL),
 	fFieldCount(0),
 	fFieldPositions(NULL),
@@ -486,22 +460,14 @@ TDateEdit::InitView()
 {
 	// make sure we call the base class method, as it
 	// will create the arrow bitmaps and the section list
-	TSectionEdit::InitView();
-
 	fDate = BDate::CurrentDate(B_LOCAL_TIME);
 	_UpdateFields();
-
-	SetSections(fSectionArea);
 }
 
 
 void
-TDateEdit::DrawSection(uint32 index, bool hasFocus)
+TDateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 {
-	TSection* section = static_cast<TSection*>(fSectionList->ItemAt(index));
-	if (!section)
-		return;
-
 	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
 
@@ -513,26 +479,19 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 	fText.CopyCharsInto(field, fFieldPositions[index * 2],
 		fFieldPositions[index * 2 + 1] - fFieldPositions[index * 2]);
 
-	// calc and center text in section rect
-	BRect bounds = section->Frame();
-	float width = StringWidth(field);
-	BPoint offset(-(bounds.Width() - width) / 2.0 - 1.0,
-		(bounds.Height() / 2.0 - 6.0));
-
+	BPoint point(bounds.LeftBottom());
+	point.y -= bounds.Height() / 2.0 - 6.0;
+	point.x += (bounds.Width() - StringWidth(field)) / 2;
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(field, bounds.LeftBottom() - offset);
+	DrawString(field, point);
 }
 
 
 void
-TDateEdit::DrawSeparator(uint32 index)
+TDateEdit::DrawSeparator(uint32 index, BRect bounds)
 {
 	if (index >= 2)
-		return;
-
-	TSection* section = static_cast<TSection*>(fSectionList->ItemAt(index));
-	if (!section)
 		return;
 
 	if (fFieldPositions == NULL || index * 2 + 2 >= (uint32)fFieldPosCount)
@@ -542,54 +501,11 @@ TDateEdit::DrawSeparator(uint32 index)
 	fText.CopyCharsInto(field, fFieldPositions[index * 2 + 1],
 		fFieldPositions[index * 2 + 2] - fFieldPositions[index * 2 + 1]);
 
-	BRect bounds = section->Frame();
-	float width = be_plain_font->StringWidth(field);
-	float sepWidth = SeparatorWidth();
-	BPoint offset(-((sepWidth - width) / 2.0) - 1.0,
-		bounds.Height() / 2.0 - 6.0);
-
+	BPoint point(bounds.LeftBottom());
+	point.y -= bounds.Height() / 2.0 - 6.0;
+	point.x += (bounds.Width() - StringWidth(field)) / 2;
 	SetHighColor(0, 0, 0, 255);
-	DrawString(field, bounds.RightBottom() - offset);
-}
-
-
-void
-TDateEdit::SetSections(BRect area)
-{
-	// TODO : we have to be more clever here, as the fields can move and have
-	// different sizes depending on the locale
-
-	// create sections
-	for (uint32 idx = 0; idx < fSectionCount; idx++)
-		fSectionList->AddItem(new TSection(area));
-
-	BRect bounds(area);
-	float sepWidth = SeparatorWidth();
-
-	TSection* section = static_cast<TSection*>(fSectionList->ItemAt(0));
-	float width = be_plain_font->StringWidth("0000") + 10;
-	bounds.left = area.left;
-	bounds.right = bounds.left + width;
-	section->SetFrame(bounds);
-
-	section = static_cast<TSection*>(fSectionList->ItemAt(1));
-	width = be_plain_font->StringWidth("0000") + 10;
-	bounds.left = bounds.right + sepWidth;
-	bounds.right = bounds.left + width;
-	section->SetFrame(bounds);
-
-	section = static_cast<TSection*>(fSectionList->ItemAt(2));
-	width = be_plain_font->StringWidth("0000") + 10;
-	bounds.left = bounds.right + sepWidth;
-	bounds.right = bounds.left + width;
-	section->SetFrame(bounds);
-}
-
-
-float
-TDateEdit::SeparatorWidth() const
-{
-	return 10.0f;
+	DrawString(field, point);
 }
 
 
@@ -600,6 +516,20 @@ TDateEdit::SectionFocus(uint32 index)
 	fFocus = index;
 	fHoldValue = _SectionValue(index);
 	Draw(Bounds());
+}
+
+
+float
+TDateEdit::MinSectionWidth()
+{
+	return be_plain_font->StringWidth("00");
+}
+
+
+float
+TDateEdit::SeparatorWidth()
+{
+	return 10.0f;
 }
 
 
@@ -657,7 +587,7 @@ TDateEdit::BuildDispatch(BMessage* message)
 
 	message->AddBool("time", false);
 
-	for (int32 index = 0; index < fSectionList->CountItems(); ++index) {
+	for (int32 index = 0; index < (int)fSectionCount; ++index) {
 		uint32 data = _SectionValue(index);
 
 		if (fFocus == index)
@@ -817,3 +747,13 @@ TDateEdit::_SectionValue(int32 index) const
 
 	return value;
 }
+
+
+float
+TDateEdit::PreferredHeight()
+{
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	return ceilf((fontHeight.ascent + fontHeight.descent) * 1.4);
+}
+

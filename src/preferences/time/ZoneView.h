@@ -1,17 +1,18 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *		Hamish Morrison <hamish@lavabit.com>
  */
 #ifndef ZONE_VIEW_H
 #define ZONE_VIEW_H
 
 
+#include <LayoutBuilder.h>
 #include <TimeZone.h>
-#include <View.h>
 
 
 class BButton;
@@ -24,9 +25,9 @@ class TimeZoneListItem;
 class TTZDisplay;
 
 
-class TimeZoneView : public BView {
+class TimeZoneView : public BGroupView {
 public:
-								TimeZoneView(BRect frame);
+								TimeZoneView(const char* name);
 	virtual						~TimeZoneView();
 
 	virtual	void				AttachedToWindow();
@@ -51,7 +52,6 @@ private:
 
 			void				_Revert();
 
-private:
 			BOutlineListView*	fZoneList;
 			BButton*			fSetZone;
 			TTZDisplay*			fCurrent;

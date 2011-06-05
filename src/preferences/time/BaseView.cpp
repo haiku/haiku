@@ -7,18 +7,21 @@
  *		Julun <host.haiku@gmx.de>
  */
 
-#include "BaseView.h"
-#include "TimeMessages.h"
 
+#include "BaseView.h"
 
 #include <DateTime.h>
 #include <OS.h>
 
+#include "TimeMessages.h"
 
-TTimeBaseView::TTimeBaseView(BRect frame, const char* name)
-	: BView(frame, name, B_FOLLOW_NONE, B_PULSE_NEEDED),
-	  fMessage(H_TIME_UPDATE)
+
+TTimeBaseView::TTimeBaseView(const char* name)
+	:
+	BGroupView(name, B_VERTICAL, 0),
+	fMessage(H_TIME_UPDATE)
 {
+	SetFlags(Flags() | B_PULSE_NEEDED);
 }
 
 

@@ -19,7 +19,8 @@
 
 
 TimeSettings::TimeSettings()
-	: fSettingsFile("Time_preflet_window")
+	:
+	fSettingsFile("Time_preflet_window")
 {
 }
 

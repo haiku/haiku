@@ -10,13 +10,13 @@
 #define _BASE_VIEW_H
 
 
+#include <LayoutBuilder.h>
 #include <Message.h>
-#include <View.h>
 
 
-class TTimeBaseView: public BView {
+class TTimeBaseView : public BGroupView {
 public:
-								TTimeBaseView(BRect frame, const char* name);
+								TTimeBaseView(const char* name);
 	virtual						~TTimeBaseView();
 
 	virtual	void			 	Pulse();
@@ -26,8 +26,7 @@ public:
 
 private:
 			void				_SendNotices();
-
-private:
+			
 			BMessage			fMessage;
 };
 

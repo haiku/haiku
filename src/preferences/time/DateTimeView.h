@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,12 +7,13 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *		Philippe Saint-Pierre <stpere@gmail.com>
+ *		Hamish Morrison <hamish@lavabit.com>
  */
 #ifndef _DATE_TIME_VIEW_H
 #define _DATE_TIME_VIEW_H
 
 
-#include <View.h>
+#include <LayoutBuilder.h>
 
 
 class TDateEdit;
@@ -27,9 +28,9 @@ namespace BPrivate {
 using BPrivate::BCalendarView;
 
 
-class DateTimeView : public BView {
+class DateTimeView : public BGroupView {
 public:
-								DateTimeView(BRect frame);
+								DateTimeView(const char* name);
 	virtual 					~DateTimeView();
 
 	virtual	void			 	AttachedToWindow();
@@ -48,7 +49,6 @@ private:
 			void				_Revert();
 			time_t				_PrefletUptime() const;
 
-private:
 			BRadioButton*		fLocalTime;
 			BRadioButton*		fGmtTime;
 			TDateEdit*			fDateEdit;

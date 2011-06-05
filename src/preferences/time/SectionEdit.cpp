@@ -1,11 +1,11 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
- *
+ *		Hamish Morrison <hamish@lavabit.com>
  */
 
 
@@ -13,64 +13,28 @@
 
 #include <Bitmap.h>
 #include <ControlLook.h>
+#include <LayoutUtils.h>
 #include <List.h>
 #include <Window.h>
 
 #include "TimeMessages.h"
 
 
-TSection::TSection(BRect frame)
-	:
-	fFrame(frame)
-{
-}
-
-
-BRect
-TSection::Bounds() const
-{
-	BRect frame(fFrame);
-	return frame.OffsetByCopy(B_ORIGIN);
-}
-
-
-void
-TSection::SetFrame(BRect frame)
-{
-	fFrame = frame;
-}
-
-
-BRect
-TSection::Frame() const
-{
-	return fFrame;
-}
-
-
 const uint32 kArrowAreaWidth = 16;
 
 
-TSectionEdit::TSectionEdit(BRect frame, const char* name, uint32 sections)
+TSectionEdit::TSectionEdit(const char* name, uint32 sections)
 	:
-	BControl(frame, name, NULL, NULL, B_FOLLOW_NONE, B_NAVIGABLE | B_WILL_DRAW),
-	fSectionList(NULL),
+	BControl(name, NULL, NULL, B_WILL_DRAW | B_NAVIGABLE),
 	fFocus(-1),
 	fSectionCount(sections),
 	fHoldValue(0)
 {
-	InitView();
 }
 
 
 TSectionEdit::~TSectionEdit()
 {
-	int32 count = fSectionList->CountItems();
-	if (count > 0) {
-		for (int32 index = 0; index < count; index++)
-			delete (TSection*)fSectionList->ItemAt(index);
-	}
-	delete fSectionList;
 }
 
 
@@ -88,9 +52,10 @@ TSectionEdit::Draw(BRect updateRect)
 	DrawBorder(updateRect);
 
 	for (uint32 idx = 0; idx < fSectionCount; idx++) {
-		DrawSection(idx, ((uint32)fFocus == idx) && IsFocus());
+		DrawSection(idx, FrameForSection(idx),
+			((uint32)fFocus == idx) && IsFocus());
 		if (idx < fSectionCount - 1)
-			DrawSeparator(idx);
+			DrawSeparator(idx, FrameForSeparator(idx));
 	}
 }
 
@@ -104,16 +69,74 @@ TSectionEdit::MouseDown(BPoint where)
 		DoUpPress();
 	else if (fDownRect.Contains(where))
 		DoDownPress();
-	else if (fSectionList->CountItems() > 0) {
-		TSection* section;
+	else if (fSectionCount > 0) {
 		for (uint32 idx = 0; idx < fSectionCount; idx++) {
-			section = (TSection*)fSectionList->ItemAt(idx);
-			if (section->Frame().Contains(where)) {
+			if (FrameForSection(idx).Contains(where)) {
 				SectionFocus(idx);
 				return;
 			}
 		}
 	}
+}
+
+
+BSize
+TSectionEdit::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, PreferredHeight()));
+}
+
+
+BSize
+TSectionEdit::MinSize()
+{
+	BSize minSize;
+	minSize.height = PreferredHeight();
+	minSize.width = (SeparatorWidth() + MinSectionWidth())
+		* fSectionCount;
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		minSize);
+}
+
+
+BSize
+TSectionEdit::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		MinSize());
+}
+
+
+BRect
+TSectionEdit::FrameForSection(uint32 index)
+{
+	BRect area = SectionArea();
+	float sepWidth = SeparatorWidth();
+	
+	float width = (area.Width() -
+		sepWidth * (fSectionCount - 1))
+		/ fSectionCount;
+	area.left += index * (width + sepWidth);
+	area.right = area.left + width;
+
+	return area;
+}
+
+
+BRect
+TSectionEdit::FrameForSeparator(uint32 index)
+{
+	BRect area = SectionArea();
+	float sepWidth = SeparatorWidth();
+
+	float width = (area.Width() -
+		sepWidth * (fSectionCount - 1))
+		/ fSectionCount;
+	area.left += (index + 1) * width + index * sepWidth;
+	area.right = area.left + sepWidth;
+
+	return area;
 }
 
 
@@ -181,7 +204,7 @@ TSectionEdit::DispatchMessage()
 uint32
 TSectionEdit::CountSections() const
 {
-	return fSectionList->CountItems();
+	return fSectionCount;
 }
 
 
@@ -192,13 +215,12 @@ TSectionEdit::FocusIndex() const
 }
 
 
-void
-TSectionEdit::InitView()
+BRect
+TSectionEdit::SectionArea() const
 {
-	// setup sections
-	fSectionList = new BList(fSectionCount);
-	fSectionArea = Bounds().InsetByCopy(2, 2);
-	fSectionArea.right -= kArrowAreaWidth;
+	BRect sectionArea = Bounds().InsetByCopy(2, 2);
+	sectionArea.right -= kArrowAreaWidth;
+	return sectionArea;
 }
 
 
@@ -219,11 +241,13 @@ TSectionEdit::DrawBorder(const BRect& updateRect)
 		bounds.bottom / 2.0);
 	fDownRect = fUpRect.OffsetByCopy(0, fUpRect.Height() + 2);
 
-	BPoint middle(floorf(fUpRect.left + fUpRect.Width() / 2), fUpRect.top + 1);
+	BPoint middle(floorf(fUpRect.left + fUpRect.Width() / 2),
+		fUpRect.top + 1);
 	BPoint left(fUpRect.left + 3, fUpRect.bottom - 1);
 	BPoint right(left.x + 2 * (middle.x - left.x), fUpRect.bottom - 1);
 
 	SetPenSize(2);
+	SetLowColor(ViewColor());
 
 	if (updateRect.Intersects(fUpRect)) {
 		FillRect(fUpRect, B_SOLID_LOW);
@@ -244,11 +268,4 @@ TSectionEdit::DrawBorder(const BRect& updateRect)
 	}
 
 	SetPenSize(1);
-}
-
-
-float
-TSectionEdit::SeparatorWidth() const
-{
-	return 0.0f;
 }

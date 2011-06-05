@@ -1,36 +1,28 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
- *
+ *		Hamish Morrison <hamish@lavabit.com>
  */
-
-#include <stdio.h>
 
 #include "TZDisplay.h"
 
+#include <stdio.h>
 
-namespace {
-	float _FontHeight()
-	{
-		font_height fontHeight;
-		be_plain_font->GetHeight(&fontHeight);
-		float height = ceil(fontHeight.descent + fontHeight.ascent
-			+ fontHeight.leading);
-		return height;
-	}
-}
+#include <LayoutUtils.h>
 
 
-TTZDisplay::TTZDisplay(BRect frame, const char* name, const char* label)
-	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
-	  fLabel(label),
-	  fText(""),
-	  fTime("")
+
+TTZDisplay::TTZDisplay(const char* name, const char* label)
+	:
+	BView(name, B_WILL_DRAW),
+	fLabel(label),
+	fText(""),
+	fTime("")
 {
 }
 
@@ -51,28 +43,32 @@ TTZDisplay::AttachedToWindow()
 void
 TTZDisplay::ResizeToPreferred()
 {
-	ResizeTo(Bounds().Width(), _FontHeight() * 2.0 + 4.0);
+	BSize size = _CalcPrefSize();
+	ResizeTo(size.width, size.height);
 }
 
 
 void
-TTZDisplay::Draw(BRect /* updateRect */)
+TTZDisplay::Draw(BRect)
 {
 	SetLowColor(ViewColor());
 
 	BRect bounds = Bounds();
 	FillRect(Bounds(), B_SOLID_LOW);
+	
+	font_height height;
+	GetFontHeight(&height);
+	float fontHeight = ceilf(height.descent + height.ascent +
+		height.leading);
 
-	float fontHeight = _FontHeight();
-
-	BPoint pt(bounds.left + 2.0, fontHeight / 2.0 + 2.0);
+	BPoint pt(bounds.left, ceilf(bounds.top + height.ascent));
 	DrawString(fLabel.String(), pt);
 
 	pt.y += fontHeight;
 	DrawString(fText.String(), pt);
 
 	pt.y -= fontHeight;
-	pt.x = bounds.right - StringWidth(fTime.String()) - 2.0;
+	pt.x = bounds.right - StringWidth(fTime.String());
 	DrawString(fTime.String(), pt);
 }
 
@@ -89,6 +85,7 @@ TTZDisplay::SetLabel(const char* label)
 {
 	fLabel.SetTo(label);
 	Invalidate();
+	InvalidateLayout();
 }
 
 
@@ -104,6 +101,7 @@ TTZDisplay::SetText(const char* text)
 {
 	fText.SetTo(text);
 	Invalidate();
+	InvalidateLayout();
 }
 
 
@@ -119,5 +117,50 @@ TTZDisplay::SetTime(const char* time)
 {
 	fTime.SetTo(time);
 	Invalidate();
+	InvalidateLayout();
 }
 
+
+BSize
+TTZDisplay::MaxSize()
+{
+	BSize size = _CalcPrefSize();
+	size.width = B_SIZE_UNLIMITED;
+	
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		size);
+}
+
+
+BSize
+TTZDisplay::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		_CalcPrefSize());
+}
+
+
+BSize
+TTZDisplay::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		_CalcPrefSize());
+}
+
+
+BSize
+TTZDisplay::_CalcPrefSize()
+{
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	
+	BSize size;
+	size.height = 2 * ceilf(fontHeight.ascent + fontHeight.descent +
+		fontHeight.leading);
+	
+	float firstLine = ceilf(StringWidth(fLabel.String()) +
+		StringWidth(" ") + StringWidth(fTime.String()));
+	float secondLine = ceilf(StringWidth(fText.String()));
+	size.width = firstLine > secondLine ? firstLine : secondLine;
+	return size;
+}

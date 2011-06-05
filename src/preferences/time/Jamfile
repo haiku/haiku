@@ -12,6 +12,8 @@ local sources =
 	DateTimeEdit.cpp
 	SectionEdit.cpp
 	DateTimeView.cpp
+	NetworkTimeView.cpp
+	ntp.cpp
 	Time.cpp
 	TimeSettings.cpp
 	TimeWindow.cpp
@@ -28,7 +30,7 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
 
 Preference Time
 	: $(sources)
-	: be libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) $(HAIKU_NETWORK_LIBS)
 	: Time.rdef
 	;
 

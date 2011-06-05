@@ -5,7 +5,6 @@
  * Authors:
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  */
-
 #ifndef _TIME_ZONE_LIST_ITEM_H
 #define _TIME_ZONE_LIST_ITEM_H
 

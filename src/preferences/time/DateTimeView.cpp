@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,14 +7,15 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *		Philippe Saint-Pierre <stpere@gmail.com>
+ *		Hamish Morrison <hamish@lavabit.com>
  */
 
 #include "DateTimeView.h"
-#include "AnalogClock.h"
-#include "DateTimeEdit.h"
-#include "TimeMessages.h"
-#include "TimeWindow.h"
 
+#include <time.h>
+#include <syscalls.h>
+
+#include <Box.h>
 #include <CalendarView.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -25,13 +26,14 @@
 #include <Message.h>
 #include <Path.h>
 #include <RadioButton.h>
-#include <String.h>
 #include <StringView.h>
 #include <Window.h>
 
-#include <time.h>
+#include "AnalogClock.h"
+#include "DateTimeEdit.h"
+#include "TimeMessages.h"
+#include "TimeWindow.h"
 
-#include <syscalls.h>
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Time"
@@ -42,9 +44,9 @@ using BPrivate::BDateTime;
 using BPrivate::B_LOCAL_TIME;
 
 
-DateTimeView::DateTimeView(BRect frame)
-	: BView(frame, "dateTimeView", B_FOLLOW_NONE, B_WILL_DRAW
-		| B_NAVIGABLE_JUMP),
+DateTimeView::DateTimeView(const char* name)
+	: 
+	BGroupView(name, B_HORIZONTAL, 5),
 	fGmtTime(NULL),
 	fUseGmtTime(false),
 	fInitialized(false),
@@ -208,71 +210,52 @@ DateTimeView::_PrefletUptime() const
 void
 DateTimeView::_InitView()
 {
-	font_height fontHeight;
-	be_plain_font->GetHeight(&fontHeight);
-	float textHeight = fontHeight.descent + fontHeight.ascent
-		+ fontHeight.leading + 6.0;	// 6px border
-
-	// left side
-	BRect bounds = Bounds();
-	bounds.InsetBy(10.0, 10.0);
-	bounds.top += textHeight + 10.0;
-
-	fCalendarView = new BCalendarView(bounds, "calendar");
+	fCalendarView = new BCalendarView("calendar");
 	fCalendarView->SetWeekNumberHeaderVisible(false);
-	fCalendarView->ResizeToPreferred();
 	fCalendarView->SetSelectionMessage(new BMessage(kDayChanged));
 	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
 
-	bounds.top -= textHeight + 10.0;
-	bounds.bottom = bounds.top + textHeight;
-	bounds.right = fCalendarView->Frame().right;
-
-	fDateEdit = new TDateEdit(bounds, "dateEdit", 3);
-	AddChild(fDateEdit);
-	AddChild(fCalendarView);
-
-	// right side, 2px extra for separator
-	bounds.OffsetBy(bounds.Width() + 22.0, 0.0);
-	fTimeEdit = new TTimeEdit(bounds, "timeEdit", 4);
-	AddChild(fTimeEdit);
-
-	bounds = fCalendarView->Frame();
-	bounds.OffsetBy(bounds.Width() + 22.0, 0.0);
-
-	fClock = new TAnalogClock(bounds, "analogClock");
-	AddChild(fClock);
+	fDateEdit = new TDateEdit("dateEdit", 3);
+	fTimeEdit = new TTimeEdit("timeEdit", 4);
+	fClock = new TAnalogClock("analogClock");
+	
 	BTime time(BTime::CurrentTime(B_LOCAL_TIME));
 	fClock->SetTime(time.Hour(), time.Minute(), time.Second());
 
-	// clock radio buttons
-	bounds.top = fClock->Frame().bottom + 10.0;
-	BStringView* text = new BStringView(bounds, "clockSetTo",
+	BStringView* text = new BStringView("clockSetTo",
 		B_TRANSLATE("Clock set to:"));
-	AddChild(text);
-	text->ResizeToPreferred();
-
-	bounds.left += 10.0f;
-	bounds.top = text->Frame().bottom;
-	fLocalTime = new BRadioButton(bounds, "localTime",
+	fLocalTime = new BRadioButton("localTime",
 		B_TRANSLATE("Local time"), new BMessage(kRTCUpdate));
-	AddChild(fLocalTime);
-	fLocalTime->ResizeToPreferred();
-
-	bounds.left = fLocalTime->Frame().right + 10.0;
-	fGmtTime = new BRadioButton(bounds, "greenwichMeanTime",
-		B_TRANSLATE("GMT"),	new BMessage(kRTCUpdate));
-	AddChild(fGmtTime);
-	fGmtTime->ResizeToPreferred();
+	fGmtTime = new BRadioButton("greenwichMeanTime",
+		B_TRANSLATE("GMT"), new BMessage(kRTCUpdate));
 
 	if (fUseGmtTime)
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
 		fLocalTime->SetValue(B_CONTROL_ON);
-
 	fOldUseGmtTime = fUseGmtTime;
 
-	ResizeTo(fClock->Frame().right + 10.0, fGmtTime->Frame().bottom + 10.0);
+	BBox* divider = new BBox(BRect(0, 0, 1, 1),
+		B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
+	divider->SetExplicitMaxSize(BSize(1, B_SIZE_UNLIMITED));
+
+	BLayoutBuilder::Group<>(this)
+		.AddGroup(B_VERTICAL, 5)
+			.Add(fDateEdit)
+			.Add(fCalendarView)
+		.End()
+		.Add(divider)
+		.AddGroup(B_VERTICAL, 5)
+			.Add(fTimeEdit)
+			.Add(fClock)
+			.Add(text)
+			.AddGroup(B_HORIZONTAL, 5)
+				.Add(fLocalTime)
+				.Add(fGmtTime)
+			.End()
+		.End()
+		.SetInsets(5, 5, 5, 5);
 }
 
 
