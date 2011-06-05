@@ -221,6 +221,7 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fSelectionPivotPose(NULL),
 	fRealPivotPose(NULL),
 	fKeyRunner(NULL),
+	fTrackRightMouseUp(false),
 	fSelectionVisible(true),
 	fMultipleSelection(true),
 	fDragEnabled(true),
@@ -6744,6 +6745,8 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 void
 BPoseView::MouseDragged(const BMessage *message)
 {
+	fTrackRightMouseUp = false;
+
 	BPoint where;
 	uint32 buttons = 0;
 	if (message->FindPoint("be:view_where", &where) != B_OK
@@ -6764,6 +6767,8 @@ BPoseView::MouseDragged(const BMessage *message)
 void
 BPoseView::MouseLongDown(const BMessage *message)
 {
+	fTrackRightMouseUp = false;
+
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
 		return;
@@ -6812,6 +6817,9 @@ BPoseView::MouseDown(BPoint where)
 
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
 	uint32 modifs = modifiers();
+
+	if (buttons == B_SECONDARY_MOUSE_BUTTON)
+		fTrackRightMouseUp = true;
 
 	bool extendSelection = (modifs & B_COMMAND_KEY) && fMultipleSelection;
 
@@ -6869,7 +6877,7 @@ BPoseView::MouseUp(BPoint where)
 
 	// Showing the pose context menu is done on mouse up (or long click)
 	// to make right button dragging possible
-	if (pose != NULL && pose == fLastClickedPose
+	if (pose != NULL && fTrackRightMouseUp
 		&& (lastButtons == B_SECONDARY_MOUSE_BUTTON
 			|| (modifiers() & B_CONTROL_KEY) != 0)) {
 		if (!pose->IsSelected()) {
@@ -6880,6 +6888,7 @@ BPoseView::MouseUp(BPoint where)
 		}
 		ShowContextMenu(where);
 	}
+	fTrackRightMouseUp = false;
 }
 
 

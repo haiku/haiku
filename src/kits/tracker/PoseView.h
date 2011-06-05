@@ -690,6 +690,7 @@ class BPoseView : public BView {
 		const BPose *fSelectionPivotPose;
 		const BPose *fRealPivotPose;
 		BMessageRunner *fKeyRunner;
+		bool fTrackRightMouseUp;
 
 		struct SelectionRectInfo {
 					SelectionRectInfo()
