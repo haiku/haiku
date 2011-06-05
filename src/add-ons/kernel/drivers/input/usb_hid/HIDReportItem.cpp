@@ -146,6 +146,18 @@ HIDReportItem::ScaledData(uint8 scaleToBits, bool toBeSigned)
 }
 
 
+float
+HIDReportItem::ScaledFloatData()
+{
+	if (Signed()) {
+		return (double)((int32)fData - (int32)fMinimum)
+			/ (fMaximum - (int32)fMinimum);
+	}
+
+	return (double)(fData - fMinimum) / (fMaximum - fMinimum);
+}
+
+
 void
 HIDReportItem::PrintToStream(uint32 indentLevel)
 {
