@@ -14,7 +14,9 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <ListView.h>
@@ -25,6 +27,9 @@
 #include "ntp.h"
 #include "TimeMessages.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Time"
 
 Settings::Settings()
 	:
@@ -391,10 +396,11 @@ NetworkTimeView::_InitView()
 {
 	fServerTextControl = new BTextControl(NULL, NULL, NULL);
 
-	fAddButton = new BButton("add", "Add", new BMessage(kMsgAddServer));
-	fRemoveButton = new BButton("remove", "Remove",
+	fAddButton = new BButton("add", B_TRANSLATE("Add"),
+		new BMessage(kMsgAddServer));
+	fRemoveButton = new BButton("remove", B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveServer));
-	fResetButton = new BButton("reset", "Reset",
+	fResetButton = new BButton("reset", B_TRANSLATE("Reset"),
 		new BMessage(kMsgResetServerList));
 
 	fServerListView = new BListView("serverList");
@@ -405,24 +411,25 @@ NetworkTimeView::_InitView()
 	_UpdateServerList();
 	
 	fTryAllServersCheckBox = new BCheckBox("tryAllServers",
-		"Try all servers", new BMessage(kMsgTryAllServers));
+		B_TRANSLATE("Try all servers"), new BMessage(kMsgTryAllServers));
 	fTryAllServersCheckBox->SetValue(fSettings.GetTryAllServers());
 	
 	fSynchronizeAtBootCheckBox = new BCheckBox("autoUpdate", 
-		"Synchronize at boot", new BMessage(kMsgSynchronizeAtBoot));
+		B_TRANSLATE("Synchronize at boot"), new BMessage(kMsgSynchronizeAtBoot));
 	fSynchronizeAtBootCheckBox->SetValue(fSettings.GetSynchronizeAtBoot());
-	fSynchronizeButton = new BButton("update", "Synchronize now",
+	fSynchronizeButton = new BButton("update", B_TRANSLATE("Synchronize now"),
 		new BMessage(kMsgSynchronize));
 	fSynchronizeButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 	
+	const float kInset = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fServerTextControl)
 				.Add(scrollView)
 			.End()
-			.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL, kInset / 2)
 				.Add(fAddButton)
 				.Add(fRemoveButton)
 				.Add(fResetButton)
@@ -430,13 +437,13 @@ NetworkTimeView::_InitView()
 			.End()
 		.End()
 		.AddGroup(B_HORIZONTAL)
-			.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fTryAllServersCheckBox)
 				.Add(fSynchronizeAtBootCheckBox)
 			.End()
 			.Add(fSynchronizeButton)
 		.End()
-		.SetInsets(5, 5, 5, 5);
+		.SetInsets(kInset, kInset, kInset, kInset);
 }
 
 
@@ -460,7 +467,7 @@ void
 NetworkTimeView::_DoneSynchronizing()
 {
 	fUpdateThread = -1;
-	fSynchronizeButton->SetLabel("Synchronize");
+	fSynchronizeButton->SetLabel(B_TRANSLATE("Synchronize again"));
 	fSynchronizeButton->Message()->what = kMsgSynchronize;
 }
 

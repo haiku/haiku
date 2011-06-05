@@ -19,6 +19,7 @@
 #include <CalendarView.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <DateTime.h>
 #include <Entry.h>
 #include <File.h>
@@ -240,22 +241,23 @@ DateTimeView::_InitView()
 		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	divider->SetExplicitMaxSize(BSize(1, B_SIZE_UNLIMITED));
 
+	const float kInset = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_VERTICAL, 5)
+		.AddGroup(B_VERTICAL, kInset / 2)
 			.Add(fDateEdit)
 			.Add(fCalendarView)
 		.End()
 		.Add(divider)
-		.AddGroup(B_VERTICAL, 5)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fTimeEdit)
 			.Add(fClock)
 			.Add(text)
-			.AddGroup(B_HORIZONTAL, 5)
+			.AddGroup(B_HORIZONTAL, kInset)
 				.Add(fLocalTime)
 				.Add(fGmtTime)
 			.End()
 		.End()
-		.SetInsets(5, 5, 5, 5);
+		.SetInsets(kInset, kInset, kInset, kInset);
 }
 
 

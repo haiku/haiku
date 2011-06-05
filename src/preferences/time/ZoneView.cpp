@@ -24,6 +24,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Collator.h>
+#include <ControlLook.h>
 #include <Country.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -248,15 +249,16 @@ TimeZoneView::_InitView()
 	fSetZone->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 	
+	const float kInset = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
-		.AddGroup(B_VERTICAL, 5)
+		.AddGroup(B_VERTICAL, kInset)
 			.Add(fCurrent)
 			.Add(fPreview)
 			.AddGlue()
 			.Add(fSetZone)
 		.End()
-		.SetInsets(5, 5, 5, 5);
+		.SetInsets(kInset, kInset, kInset, kInset);
 }
 
 
