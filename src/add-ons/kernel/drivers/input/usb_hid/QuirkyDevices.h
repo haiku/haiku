@@ -16,6 +16,11 @@ typedef status_t (*quirky_build_descriptor)(HIDWriter &writer);
 struct usb_hid_quirky_device {
 	uint16					vendor_id;
 	uint16					product_id;
+
+	uint8					device_class;
+	uint8					device_subclass;
+	uint8					device_protocol;
+
 	quirky_init_function	init_function;
 	quirky_build_descriptor	build_descriptor;
 };

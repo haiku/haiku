@@ -323,11 +323,12 @@ init_driver()
 	if (sSupportDescriptors != NULL) {
 		sSupportDescriptors[0] = genericHIDSupportDescriptor;
 		for (int32 i = 0; i < gQuirkyDeviceCount; i++) {
-			sSupportDescriptors[i + 1].dev_class = 0;
-			sSupportDescriptors[i + 1].dev_subclass = 0;
-			sSupportDescriptors[i + 1].dev_protocol = 0;
-			sSupportDescriptors[i + 1].vendor = gQuirkyDevices[i].vendor_id;
-			sSupportDescriptors[i + 1].product = gQuirkyDevices[i].product_id;
+			usb_support_descriptor &descriptor = sSupportDescriptors[i + 1];
+			descriptor.dev_class = gQuirkyDevices[i].device_class;
+			descriptor.dev_subclass = gQuirkyDevices[i].device_subclass;
+			descriptor.dev_protocol = gQuirkyDevices[i].device_protocol;
+			descriptor.vendor = gQuirkyDevices[i].vendor_id;
+			descriptor.product = gQuirkyDevices[i].product_id;
 		}
 
 		gUSBModule->register_driver(DRIVER_NAME, sSupportDescriptors,

@@ -88,8 +88,15 @@ sixaxis_build_descriptor(HIDWriter &writer)
 
 
 usb_hid_quirky_device gQuirkyDevices[] = {
-	// Sony SIXAXIS controller (PS3) needs a GET_REPORT to become operational
-	{ 0x054c, 0x0268, sixaxis_init, sixaxis_build_descriptor }
+	{
+		// The Sony SIXAXIS controller (PS3) needs a GET_REPORT to become
+		// operational which we do in sixaxis_init. Also the normal report
+		// descriptor doesn't contain items for the motion sensing data
+		// and pressure sensitive buttons, so we constrcut a new report
+		// descriptor that includes those extra items.
+		0x054c, 0x0268, USB_INTERFACE_CLASS_HID, 0, 0,
+		sixaxis_init, sixaxis_build_descriptor
+	}
 };
 
 int32 gQuirkyDeviceCount
