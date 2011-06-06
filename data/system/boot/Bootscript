@@ -164,8 +164,11 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/notification_server ""
 fi
 
-# Check for daily saving time
+# Check for daylight saving time
 launch system/bin/dstcheck
+
+# Synchronize network time
+launch system/preferences/Time "" --update
 
 if [ "$SAFEMODE" != "yes" ]; then
 	# Start user boot script
