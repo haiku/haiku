@@ -15,6 +15,8 @@
  *		All rights reserved
  *
  */
+#ifndef _USB_MIDI_H
+#define _USB_MIDI_H
 
 
 #include <Drivers.h>
@@ -156,3 +158,6 @@ extern char** usbmidi_port_names;
 extern void alloc_port_names(void);
 extern void free_port_names(void);
 extern void rebuild_port_names(void);
+
+#endif
+

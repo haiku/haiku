@@ -148,3 +148,4 @@ rebuild_port_names(void)
 	usbmidi_port_names[i] = NULL;
 	release_sem(usbmidi_port_list_lock);
 }
+
