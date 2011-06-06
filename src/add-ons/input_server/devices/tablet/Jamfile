@@ -4,9 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 
-Addon <input>tablet : 
-	TabletInputDevice.cpp 
-	: be input_server ;
+Addon <input>tablet :
+	TabletInputDevice.cpp
+	: be input_server $(TARGET_LIBSUPC++) ;
 
 Package haiku-inputkit-cvs :
         <input>tablet :
