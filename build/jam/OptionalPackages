@@ -600,7 +600,9 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package DevelopmentJava available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package DevelopmentJava available for gcc2" ;
+	} else {
 		InstallOptionalHaikuImagePackage
 			gnu-classpath-0.98-x86-gcc4-2011-03-01.zip
 			: $(baseURL)/gnu-classpath-0.98-x86-gcc4-2011-03-01.zip ;
@@ -611,8 +613,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 		InstallOptionalHaikuImagePackage
 			ecj-3.6.2-haiku-2011-03-05.zip
 			: $(baseURL)/ecj-3.6.2-haiku-2011-03-05.zip ;
-	} else {
-		Echo "No optional package DevelopmentJava available for gcc2" ;
 	}
 }
 
