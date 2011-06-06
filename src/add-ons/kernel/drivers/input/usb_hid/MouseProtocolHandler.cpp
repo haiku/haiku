@@ -22,11 +22,13 @@
 #include <keyboard_mouse_driver.h>
 
 
-MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
+MouseProtocolHandler::MouseProtocolHandler(HIDReport &report, bool tablet,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(), "input/mouse/usb/", 0),
+	ProtocolHandler(report.Device(),
+		tablet ? "input/tablet/usb" : "input/mouse/usb/", 0),
 	fReport(report),
+	fTablet(tablet),
 	fXAxis(xAxis),
 	fYAxis(yAxis),
 	fWheel(NULL),
@@ -62,9 +64,40 @@ void
 MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 	ProtocolHandler *&handlerList)
 {
-	if (collection.UsagePage() != B_HID_USAGE_PAGE_GENERIC_DESKTOP
-		|| collection.UsageID() != B_HID_UID_GD_MOUSE) {
-		TRACE("collection not a mouse\n");
+	bool tablet = false;
+	bool supported = false;
+	switch (collection.UsagePage()) {
+		case B_HID_USAGE_PAGE_GENERIC_DESKTOP:
+		{
+			switch (collection.UsageID()) {
+				case B_HID_UID_GD_MOUSE:
+				case B_HID_UID_GD_POINTER:
+					supported = true;
+					break;
+			}
+
+			break;
+		}
+
+		case B_HID_USAGE_PAGE_DIGITIZER:
+		{
+			switch (collection.UsageID()) {
+				case B_HID_UID_DIG_DIGITIZER:
+				case B_HID_UID_DIG_PEN:
+				case B_HID_UID_DIG_LIGHT_PEN:
+				case B_HID_UID_DIG_TOUCH_SCREEN:
+				case B_HID_UID_DIG_TOUCH_PAD:
+				case B_HID_UID_DIG_WHITE_BOARD:
+					supported = true;
+					tablet = true;
+			}
+
+			break;
+		}
+	}
+
+	if (!supported) {
+		TRACE("collection not a mouse/tablet/digitizer\n");
 		return;
 	}
 
@@ -92,8 +125,11 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 		if (yAxis == NULL)
 			continue;
 
+		if (!xAxis->Relative() && !yAxis->Relative())
+			tablet = true;
+
 		ProtocolHandler *newHandler = new(std::nothrow) MouseProtocolHandler(
-			*inputReport, *xAxis, *yAxis);
+			*inputReport, tablet, *xAxis, *yAxis);
 		if (newHandler == NULL) {
 			TRACE("failed to allocated mouse protocol handler\n");
 			continue;
@@ -112,8 +148,10 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	switch (op) {
 		case MS_READ:
 		{
-			if (length < sizeof(mouse_movement))
+			if ((!fTablet && length < sizeof(mouse_movement))
+				|| (fTablet && length < sizeof(tablet_movement))) {
 				return B_BUFFER_OVERFLOW;
+			}
 
 			while (true) {
 				status_t result = _ReadReport(buffer);
@@ -164,31 +202,42 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 		return B_INTERRUPTED;
 	}
 
-	mouse_movement *info = (mouse_movement *)buffer;
-	memset(info, 0, sizeof(mouse_movement));
+	float axisAbsoluteData[2];
+	uint32 axisRelativeData[2];
+	if (fXAxis.Extract() == B_OK && fXAxis.Valid()) {
+		if (fXAxis.Relative())
+			axisRelativeData[0] = fXAxis.Data();
+		else
+			axisAbsoluteData[0] = fXAxis.ScaledFloatData();
+	}
 
-	if (fXAxis.Extract() == B_OK && fXAxis.Valid())
-		info->xdelta = fXAxis.Data();
-	if (fYAxis.Extract() == B_OK && fYAxis.Valid())
-		info->ydelta = -fYAxis.Data();
+	if (fYAxis.Extract() == B_OK && fYAxis.Valid()) {
+		if (fYAxis.Relative())
+			axisRelativeData[1] = fYAxis.Data();
+		else
+			axisAbsoluteData[1] = fYAxis.ScaledFloatData();
+	}
 
+	uint32 wheelData = 0;
 	if (fWheel != NULL && fWheel->Extract() == B_OK && fWheel->Valid())
-		info->wheel_ydelta = -fWheel->Data();
+		wheelData = fWheel->Data();
 
+	uint32 buttons = 0;
 	for (uint32 i = 0; i < B_MAX_MOUSE_BUTTONS; i++) {
 		HIDReportItem *button = fButtons[i];
 		if (button == NULL)
 			break;
 
 		if (button->Extract() == B_OK && button->Valid())
-			info->buttons |= (button->Data() & 1) << (button->UsageID() - 1);
+			buttons |= (button->Data() & 1) << (button->UsageID() - 1);
 	}
 
 	fReport.DoneProcessing();
 	TRACE("got mouse report\n");
 
+	int32 clicks = 0;
 	bigtime_t timestamp = system_time();
-	if (info->buttons != 0) {
+	if (buttons != 0) {
 		if (fLastButtons == 0) {
 			if (fLastClickTime + fClickSpeed > timestamp)
 				fClickCount++;
@@ -197,10 +246,38 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 		}
 
 		fLastClickTime = timestamp;
-		info->clicks = fClickCount;
+		clicks = fClickCount;
 	}
 
-	fLastButtons = info->buttons;
-	info->timestamp = timestamp;
+	fLastButtons = buttons;
+
+	if (fTablet) {
+		tablet_movement *info = (tablet_movement *)buffer;
+		memset(info, 0, sizeof(tablet_movement));
+
+		info->xpos = axisAbsoluteData[0];
+		info->ypos = axisAbsoluteData[1];
+		info->has_contact = true;
+		info->pressure = 1.0;
+		info->eraser = false;
+		info->tilt_x = 0.0;
+		info->tilt_y = 0.0;
+
+		info->buttons = buttons;
+		info->clicks = clicks;
+		info->timestamp = timestamp;
+		info->wheel_ydelta = -wheelData;
+	} else {
+		mouse_movement *info = (mouse_movement *)buffer;
+		memset(info, 0, sizeof(mouse_movement));
+
+		info->buttons = buttons;
+		info->xdelta = axisRelativeData[0];
+		info->ydelta = -axisRelativeData[1];
+		info->clicks = clicks;
+		info->timestamp = timestamp;
+		info->wheel_ydelta = -wheelData;
+	}
+
 	return B_OK;
 }
