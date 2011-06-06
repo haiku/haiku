@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -68,7 +68,15 @@
 <li><p>Il bottone "zoom" (o <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Nella maggior parte delle applicazioni, espanderà la finestra alla dimensione massima. Ma questo, tuttavia, non è obbligatorio. Le finestre del Tracker, per esempio, verranno ridimensionate per adattarsi nel miglior modo possibile al contenuto.</p></li>
 <li><p>L'angolo di ridimensionamento. Il trascinamento di una finestra in qualsiasi altro luogo sul confine sposterà la finestra.</p></li>
 </ol>
-<div class="box-info">Tenendo premuti i tasti <span class="key">CTRL</span> <span class="key">ALT</span>, è possibile cliccare su qualsiasi punto della finestra e muoverla con il pulsante sinistro del mouse; il pulsante destro del mouse, invece, riporta la finestra alla posizione iniziale.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
+<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
+<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
+<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -107,10 +115,12 @@ Tutti i favoriti sono conservati nella cartella <span class="path">/boot/home/co
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="replicants" name="replicants">I replicanti</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show Replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<p>I replicanti sono piccole parti di applicazioni che possono essere integrate in altri programmi.
+A patto che l'opzione della Deskbar <span class="menu">Visualizza i Replicanti</span> sia stata attivata, si potrà riconoscere una parte "replicabile" di un'applicazione dalla sua piccola maniglia, normalmente nell'angolo in basso a destra:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag&amp;drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove Replicant</span>.</p>
+<p>Il luogo più significante che accetta i replicanti è il Desktop: basta semplicemente trascinare la piccola maniglia su di esso.
+Da ora in poi è parte del Desktop e l'applicazione principale del replicante non deve essere avviata per farlo funzionare.<br />
+Un tasto destro sull'uncino del replicante permette di visualizzare la finestra <span class="menu">About</span> dell'applicazione principale e rimuovere il replicante.</p>
 <div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
 <p>Esempi di applicazioni replicabili sono i grafici dell'<a href="applications/activitymonitor.html">ActivityMonitor</a>, l'<a href="workspaces.html">applet Workspace</a> o <a href="applications/deskcalc.html">DeskCalc</a>.</p>
 </div>

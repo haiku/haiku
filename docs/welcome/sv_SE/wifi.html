@@ -10,6 +10,8 @@
  * Authors:
 * 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		deejam
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Användarhandbok</span></div>
 </div>
 
 <div class="nav">
@@ -47,46 +49,43 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2>Wifi in Haiku</h2>
+<h2>Wifi i Haiku</h2>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
-<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
-This includes:
-</p>
+<a name="hardware" rel="nofollow" id="hardware">Hårdvara som förväntas fungera</a></h3>
+<p>Haiku har inbyggt stöd för alla trådlösa enheter som finns i FreeBSD 8. PCMCIA, CardBus, ExpressCard, USB eller ISA-baserade kort stöds inte. Endast PCI, miniPCI, PCI-Express, miniPCI-Express och PCI-X skall fungera.<br />Detta inkluderar:</p>
 <ul>
-<li><p><i>aironetwifi</i> supporting at least<br />
+<li><p><i>aironetwifi</i> stöder åtminstone<br />
 Cisco Aironet 350 Series<br />
 Aironet PCI4500<br />
 Aironet PCI4800<br />
 </p></li>
-<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
-<li><p><i>broadcom43xx</i> supporting<br />
-BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
+<li><p><i>atheroswifi</i> stöder nästan alla tillgängliga chipset (dock inte AR9285)</p></li>
+<li><p><i>broadcom43xx</i> stöder<br />
+BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 och BCM4318
 </p></li>
-<li><p><i>ipw2100</i> supporting Intel Pro Wireless 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting Intel Pro Wireless<br />
+<li><p><i>ipw2100</i> stöder Intel Pro Wireless 2100</p></li>
+<li><p><i>iprowifi2200</i> stöder Intel Pro Wireless<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting Intel Pro Wireless 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting Intel Pro Wireless 4965 chips</p></li>
-<li><p><i>marvell88w8335</i> supporting<br />
+<li><p><i>iprowifi3945</i> stöder Intel Pro Wireless 3945</p></li>
+<li><p><i>iprowifi4965</i> stöder Intel Pro Wireless 4965</p></li>
+<li><p><i>marvell88w8335</i> stöder<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
 </p></li>
-<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
-<li><p><i>ralinkwifi</i> supporting<br />
+<li><p><i>marvell88w8363</i> stöder 88W8363</p></li>
+<li><p><i>ralinkwifi</i> stöder<br />
 RT2560<br />
 RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p>ralink2860 supporting Ralink RT2860</p></li>
-<li><p><i>wavelanwifi</i> supporting at least<br />
+<li><p>ralink2860 stöder Ralink RT2860</p></li>
+<li><p><i>wavelanwifi</i> stöder åtminstone<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
 Intersil Prism3<br />
@@ -101,49 +100,49 @@ Addtron AWA-100 PCI
 </p></li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="connect" rel="nofollow" id="connect">Connecting to a wireless network</a></h3>
-<p>Besides of course unencrypted networks, Haiku has preliminary support for accessing wireless networks via <a href="#wep-notes" rel="nofollow">WEP encryption keys</a>. WEP is an early encryption method, although not the most secure.</p>
-<p>You can list available networks, join and leave them with the command <span class="cli">ifconfig</span> from Terminal:</p>
-<pre class="terminal">ifconfig [wifi_device_path] [list|join|leave] (key)</pre>
-<p>You can find your <tt>wifi_device_path</tt> in the <span class="app">Network</span> preferences applet, or by executing <span class="cli">ifconfig -a</span>.</p>
-<p>Below are a few examples of connecting to a wireless network named <i>wifitopia</i>. For these examples we are assuming your wifi network card is <tt>/dev/net/iprowifi3945/0</tt>.</p>
-<h4>Listing wireless networks:</h4>
+<a name="connect" rel="nofollow" id="connect">Ansluta till trådlösa nätverk</a></h3>
+<p>Haiku har - utöver okrypterade nätverk - preliminärt stöd för att ansluta till trådlösa nätverk med  <a href="#wep-notes" rel="nofollow">WEP kryptering</a>. WEP är en tidig krypteringsmetod och därmed inte den säkraste.</p>
+<p>Du kan se tillgängliga nätverk, ansluta och koppla ner med kommandot <span class="cli">ifconfig</span> via Terminalen:</p>
+<pre class="terminal">ifconfig [sökväg_till_wifi_enhet] [list|join|leave] (nyckel)</pre>
+<p>Du kan se din <tt>sökväg_till_wifi_enhet</tt> i inställningar för <span class="app">Nätverk</span>, eller genom att köra <span class="cli">ifconfig -a</span>.</p>
+<p>Nedan finns några exempel för hur man ansluter till ett trådlöst nätverk med namnet <i>wifitopia</i>. För dessa exempel antar vi att ditt trådlösa nätverkskort är <tt>/dev/net/iprowifi3945/0</tt>.</p>
+<h4>Lista trådlösa nätverk:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 list</pre>
-<h4>Joining unsecured wireless network:</h4>
+<h4>Ansluta till ett okrypterat trådlöst nätverk:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia</pre>
-<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (ascii password)</h4>
-<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia mypassword</pre>
-<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (64-bit hex password)</h4>
+<h4>Ansluta till ett <a href="#wep-notes">WEP krypterat</a> trådlöst nätverk: (med ett ascii lösenord)</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia mitt_lösenord</pre>
+<h4>Ansluta till ett <a href="#wep-notes">WEP krypterat</a> trådlöst nätverk: (64-bitars hexadecimalt lösenord)</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia 0x4010FABEEF</pre>
-<h4>Leaving a wireless network:</h4>
+<h4>Koppla ifrån ett trådlöst nätverk:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 leave wifitopia</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="auto-connect" rel="nofollow" id="auto-connect">Automatically connecting to a wireless network</a></h3>
-<p>To make your system connect to a given SSID at each boot automatically, you can specify your wireless networks and passwords in <tt>/boot/common/settings/network/wireless_networks</tt> with the following format:</p>
+<a name="auto-connect" rel="nofollow" id="auto-connect">Ansluta automatiskt till ett trådlöst nätverk</a></h3>
+<p>För att ansluta till ett nätverk vid varje uppstart kan du specifiera namnet på ditt trådlösa nätverk och lösenord i <tt>/boot/common/settings/network/wireless_networks</tt> med följande format:</p>
 <pre>network wifitopia {
-   password mypassword
+   password mitt_lösenord
 }</pre>
-<p>If you don't create this configuration file, the system will connect to the first unencrypted network it finds.</p>
-<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<p>Om du inte skapar denna konfigurationsfil så kommer Haiku att ansluta till det första okrypterade nätverket som hittas.</p>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP kommentarer</strong></a></p>
 <ul>
-<li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
-<li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with "0x" in <tt>ifconfig</tt>)</li>
+<li>64-bitars WEP använder en 40-bitars nyckel, vilket betyder 5 bokstäver eller 10 hexadecimala siffror.</li>
+<li>128-bitars WEP använder en 104-bitars nyckel, vilket betyder 13 bokstäver eller 26 hexadecimala siffror.</li>
+<li>hexadecimala siffror = siffrorna 0-9 samt A till och med F (med "0x" i början)</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
-<p><p>At the moment there is no WPA encryption available in Haiku, though there have been <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">some efforts</a> bringing it significantly closer.</p></p>
+<a name="wpa" rel="nofollow" id="wpa">WPA kryptering</a></h3>
+<p><p>För tillfället finns inte WPA kryptering tillgängligt i Haiku, även om det det har gjorts <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">ansträngningar</a> som har fört det allt närmare.</p></p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<a name="install_script" rel="nofollow" id="install_script">Skriptet install-wifi-firmwares.sh</a></h3>
+<p>För att installera mikroprogramvaran för Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx och Marvell 88W8335 behöver du köra skriptet:</p>
 <pre class="terminal">install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and iprowifi22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
-<p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>
-<p>If you have to download the firmware, but don't have a working internet connection under Haiku, the online version offers a <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell script</a>, which will create a zip file for you to extract to Haiku's <tt>/boot</tt>. After that you'll have all files needed by install-wifi-firmwares.sh.</p>
+<p>Intel ipw2100 och iprowifi22xx kan installeras utan en internetanslutning eftersom licensvilkoren tillåter Haiku att distribuera mikroprogramvaran. Dock krävs det att användaren godkänner licensvilkoren innan installationen. För Broadcom 43xx och Marvell 88W8335 krävs en internetanslutning eftersom respektive mikroprogramvara inte får distribueras med Haiku.</p>
+<p>Personer som bygger egna Haiku avbilder kan modifiera deras <span class="cli">build/jam/UserBuildConfig</span> därefter. Detaljer för detta och generella uppdateringar i ämnet wifi finns på <a href="http://www.haiku-os.org/guides/wifi">detta dokument på internet</a>.</p>
+<p>Om du behöver ladda ner mikroprogramvaran men saknar en fungerande internetanslutning i Haku så erbjuder internetversionen ett  <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">skalskript</a> som hämtar de filer som behövs och sparar det i en komprimerad fil. FIlen skall packas upp till Haiku's <tt>/boot</tt> katalog. Efter det kommer du att ha alla filer som du behöver för att använda install-wifi-firmwares.sh skriptet.</p>
 </div>
 </div>
 

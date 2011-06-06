@@ -18,7 +18,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Locale</title>
+	<title>Интернационализация (Locale)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -52,38 +52,37 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Локализация</h2>
+<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Интернационализация (Locale)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
 <tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku's localization system does not only include replacing texts with their translations, but also more complex tasks such as formatting numbers, dates, and times in a way that matches your Locale preferences.</p>
-<div class="box-info">If you would like to help with translations or start with a language that is currently missing, please get in contact on the <a href="http://www.freelists.org/list/haiku-i18n">Haiku-i18n mainling list</a>.</div>
+<p>Система интернационализации Haiku не только замещает текст на их переведённый, но также выполняет ряд комплексных задач - форматирование чисел, даты, и времени в соответствии с выбранным вами языком.</p>
+<div class="box-info">Если вы хотите помочь с переводом, вам следует обратиться к данному <a href="http://www.freelists.org/list/haiku-i18n">списку почтовых рассылок</a>.</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Язык</h2>
-<p>Haiku has been translated to dozens of languages, unfortunately some translations are not complete yet. For that reason, you can choose more than one language as “Preferred languages”. If some text is missing in a translation, it's replaced with the words of the next preferred language. English is the default fallback (also when not listed).</p>
+<p>Haiku переведена на ряд языков, к сожалению, пока что не полностью. Поэтому, вы можете выбрать более одного языка в качестве “Предпочтительных языков” (Preferred languages). Если перевод какого-либо текста отсутствует в переводе, то он будет замещён переводом из следующего по списку языку в колонке "Предпочитательные языки" (Preferred languages). Английский является языком по умолчанию в таких случаях.</p>
 <img src="../images/prefs-images/locale-language.png" alt="locale-language.png" />
-<p>In this example, the preferred language is set to Spanish. The first fallback is Italian, and if the text is missing there too, it's back to default English.<br />
-As you can see, expanding a language entry on the left side reveals sub-entries for specific variations or dialects of a language (if available).</p>
+<p>На примере выше предпочтительным языком является Испанский. Если будет отсутствовать перевод каких-либо строк, то будет загружен итальянский эквивалент, но если в Итальянском будет отсутствовать перевод, то будет подставлен оригинальный текст на английском.<br />
+Также, как вы можете наблюдать в колонке слева, каждый язык подразделяется на подгруппы, которые соответствуют разным диалектам.</p>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formatting</h2>
-<p>On the <span class="menu">Formatting</span> tab you can set up the formatting of date, time, number and currency formats independently from the settings of your preferred language.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Форматирование</h2>
+<p>На вкладке <span class="menu">Форматирование (Formatting)</span> вы можете задать форматирование даты, времени, чисел. Эти настройки устанавливаются независимо от предпочтительного языка.</p>
 <img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
-<p>You may be a Spanish fellow located in the Italian speaking part of Switzerland. So, you'd prefer your system in Spanish, but numbers and currency formatted like at work: Swiss/Italian.<br />
-If you're more comfortable with your Spanish names for days and months (think of the modified dates of files, for example), you can override this time-specific formatting with the checkbox at the top to <span class="menu">Use month/day-names from preferred language</span>.</p>
-<p>Granted, the above example is maybe not the most common scenario, but it demonstrates the flexibility of the system.</p>
+<p>Рассмотри ситуацию, вы испанец находящийся в итальяно-говорящей части Швейцарии. Таким образом, ваш предпочтительный язык будет Испанский, а форматирование чисел, дат и времени Итальянское.<br />
+Также, если вам более удобно использовать испанские наименования дней недели и месяцев, вы можете переопределить эти значения, отметив флажок <span class="menu">Переводить названия дней недели и месяцев на предпочтительный язык (Use month/day-names from preferred language)</span>, который находится в верхней части окна.</p>
+<p>Конечно же, выше приведённый пример может и не столь часто используемый, но отлично демонстрирует гибкость системы.</p>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Options</h2>
-<p>The last tab provides an option that will <span class="menu">Translate application and folder names in Deskbar and Tracker</span>. Disable the checkbox if you prefer the graphical interface localized, while retaining the original English names for preference panels, applications and standard folder names.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Опции</h2>
+<p>Последняя вкладка Опции содержит флажок <span class="menu">Переводить названия приложений и папок в Deskbar и Tracker (Translate application and folder names in Deskbar and Tracker)</span>. Включите его, если хотите чтобы на равне с графическим интерфейсом были переведы и названия стандартных приложений, панелей настроек, а также стандартных папок. Отключив, его весь графический интерфейс будет переведён на предпочтительный язык, а названия папок и приложений на английском языке.</p>
 <p><br /> </p>
-<p>Changes are applied immediately, though currently running applications may require to be closed and restarted before showing the new setting.</p>
+<p>Изменения применяют на лету, хотя некоторые запущенные приложения потребуется перезапустить для того чтобы увидеть результат.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Locale preferences.</td></tr>
+<tr><td><span class="button">По умолчанию (Defaults)</span></td><td> </td><td>сбросить текущие настройки и установить их на значения по умолчанию.</td></tr>
+<tr><td><span class="button">Вернуть (Revert)</span></td><td> </td><td>вернуть настройки, которые были установлены до запуска панели настройки.</td></tr>
 </table>
 
 </div>

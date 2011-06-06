@@ -12,6 +12,7 @@
  * Translators:
  *		Vincent Duvert
  *		Loïc
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -76,7 +77,7 @@ Hinting de glyphes</h3>
 <p>Si activé, <span class="menu">Hinting de glyphes</span> aligne les lettres de manière à ce que leurs bords horizontaux soient situés entre deux pixels. Ceci permet un meilleur contraste, en particulier pour le texte en noir sur blanc. Ce dernier apparaît plus net. Le réglage "<span class="menu">Fontes en pas fixe seulement</span>" est spécialement utile pour les écrans à base résolution comme ceux des netbooks. Sur ceux ci le hinting peut donner un mauvais résultats avec des polices de petite taille, mais avec ce réglage vous pourrez conserver les avantages du hinting dans les éditeurs de texte et le Terminal.</p>
 <p>Voyez les différences induites par le hinting entre ces deux captures d'écrans agrandies :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting désactivé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting activé</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting désactivé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting activé</td></tr>
 </table>
 <p>Notez que ces captures d'écran de l'application  <span class="app">Magnify</span> sont bien sûr réalisées avec des réglages de hinting différents. Vous pouvez donc voir l'effet du réglage sur le texte de l'onglet jaune et celui de la fenêtre ("35 x 15 @ 8 pixels/pixel").</p>
 
@@ -89,13 +90,13 @@ Il y a deux méthodes:</p>
 <span class="menu">Sous-pixel LCD</span> donnera un meilleur rendu sur les écrans LCD haute résolution. Au lieu de changer l'intensité du pixel, il change sa couleur, ce qui permet de déplacer le bord d'un élément d'une fraction de pixel (car sur les écrans LCD les composantes rouge, vert et bleu sont séparées).</p>
 <p>À nouveau, voici les deux méthodes présentées sur deux captures d'écran :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Niveaux de gris, hinting désactivé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, lissage activé</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Niveaux de gris, hinting désactivé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, lissage activé</td></tr>
 </table>
 <p>Le lissage sous-pixel ajoute une bordure colorées aux objets, que vous pourriez ne pas apprécier. Dans Haiku, vous pouvez mélanger les deux méthodes de lissage et trouver le bon réglage pour vous en déplaçant un curseur.</p>
 <div class="box-info">Le lissage sous-pixel combiné au hinting est soumis à un brevet logiciel et n'est donc pas disponible par défaut. Désolé. En fonction de votre lieu de résidence, vous pourrez peut-être vous procurer une version débridée. Parlez-en à vos représentants.</div>
 <p>Si vous activez le hinting et le lissage sous-pixel en modifiant les sources de Haiku et en recompilant l'ensemble, voici ce que vous obtiendrez par rapport au hinting avec niveaux de gris :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Niveaux de gris, hinting activé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD sous-pixel, hinting activé</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Niveaux de gris, hinting activé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD sous-pixel, hinting activé</td></tr>
 </table>
 <p><br /></p>
 <p>En bas du panneau, vous trouverez deux boutons :</p>

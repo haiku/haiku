@@ -12,18 +12,20 @@
  * Translators:
  *		Victor Widell
  *		Jimmy Olsson
+ *		deejam
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Appearance</title>
+	<title>Utseende</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Användarhandbok</span></div>
 </div>
 
 <div class="nav">
@@ -42,65 +44,65 @@
 <li><a href="../../en/preferences/appearance.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+    <a href="../preferences.html" class="uplink">Inställningar</a> 
+::  <a href="backgrounds.html">Bakgrunder</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance</h2>
+<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Utseende</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Plats:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Inställningar</span></td></tr>
+<tr><td>Plats:</td><td></td><td><span class="path">/boot/system/preferences/Utseende</span></td></tr>
 <tr><td>Inställningar:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
 </table>
-<p>Inställningarna i Appearance låter dig justera några aspekter av Haikus utseende.</p>
+<p>Inställningarna i Utseende låter dig justera några aspekter av Haikus utseende.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Färger</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>I den första fliken, <span class="menu">Colors</span>, kan du ändra färgen på olika delar av användargränssnittet. Färgkällan accepterar att man drar färger från andra program och släpper dem här. Det låter dig dra över färger från t.ex. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> eller <span class="app">Backgrounds</span> -panelen.</p>
+<p>I fliken <span class="menu">Färger</span> kan du ändra färgen på olika delar av användargränssnittet. Färgkällan accepterar att man drar färger från andra program och släpper dem här. Du kan hämta färger från exempelvis <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> eller <span class="app">Bakgrunder</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
+<a id="antialiasing" name="antialiasing">Kantutjämning</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>Den andra fliken, <span class="menu">Antialiasing</span>, erbjuder olika inställningar för hur saker återges på skärmen.</p>
+<p>Den andra fliken, <span class="menu">Kantutjämning</span>, erbjuder olika inställningar för hur typsnitt återges på skärmen.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Glyph hinting</h3>
-<p>När <span class="menu">Glyph hinting</span> är aktiverad justeras alla bokstäver så att deras vertikala och horisontella kanter ligger exakt mellan två pixlar. Resultatet är perfekt kontrast, särkillt när det handlar om svart på vitt. Text ser ut att ha skarpare kanter. Det finns också en inställning kallad <span class="menu">Monospaced Fonts Only</span>. Det är särskilt användbart på  lågupplösta enheter som t.ex. netbooks. Små typsnitt kan se rätt fult ut med hintning påslaget, men med denna inställning har du fortfarande fördelen av hintning i textredigerare och i Terminal.</p>
+Betoning</h3>
+<p>När <span class="menu">Betoning</span> är aktiverad justeras alla bokstäver så att deras vertikala och horisontella kanter ligger exakt mellan två pixlar. Resultatet är perfekt kontrast, särkillt när det handlar om svart på vitt. Text ser ut att ha skarpare kanter. Det finns också en inställning kallad <span class="menu">Endast typsnitt med fast bredd</span>. Det är särskilt användbart på  lågupplösta enheter som exempelvis netbooks. Små typsnitt kan vara svårlästa med betoning påslaget, men med denna inställning har du fortfarande fördelen av hintning i textredigerare och i Terminalen.</p>
 <p>De förstorade skärmbilderna här under visar hur hintning påverkar text:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Betoning av.</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Betoning på.</td></tr>
 </table>
-<p>Notera att alla bilder av programmet <span class="app">Magnify</span> självklart också själva är renderade med de olika valen. Du ser alltså hur inställningarna ser ut i praktiken om du jämför t.ex. titeln i den gula fliken, eller texten "33 x 15 @ 8 pixels/pixel".</p>
+<p>Notera att alla bilder av programmet <span class="app">FörstoringsGlas</span> självklart också själva är renderade med de olika valen. Du ser alltså hur inställningarna ser ut i praktiken om du jämför t.ex. titeln i den gula fliken, eller texten "33 x 15 @ 8 pixels/pixel".</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Antialiasing type</h3>
-<p>En annan teknik som förbättrar renderingen är <i>Antialiasing</i>, som förutom text även stödjer all vektorgrafik. Den mjukar upp kanter genom att justera färgen på vissa pixlar. Det finns två sätt att göra det:</p>
-<p><span class="menu">Grayscale</span> justerar ljusstyrkan på pixlar vid kanten.<br />
+Kantutjämningstyp</h3>
+<p>En annan teknik som förbättrar återgivningen är <i>Kantutjämning</i>, som förutom text även stödjer all vektorgrafik. Den mjukar upp kanter genom att justera färgen på vissa pixlar. Det finns två sätt att göra det:</p>
+<p><span class="menu">Gråskala</span> justerar ljusstyrkan på pixlar vid kanten.<br />
 <span class="menu">LCD subpixel</span> gör ett ännu bättre jobb, särskilt på (högupplösta) LCD-skärmar. Istället för ljusstyrkan justeras pixelns färg, vilket flyttar kanten en bråkdel av en pixel. Det fungerar eftersom varje pixel på en LCD-skärmar har en röd, en grön och en blå yta.</p>
 <p>En jämförelse av de två metoderna med förstorade skärmbilder:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Grayscale, Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: off</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Gråskala med betoning av.</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel med betoning av.</td></tr>
 </table>
 <p>Subpixelbaserad kantutjämning ger en något färgad glöd runt texten, något inte alla tolererar. I Haiku kan du blanda de två kantutjämningsmetoderna och hitta den kombination som passar dig bäst genom att använda ett reglage.</p>
-<div class="box-info">Subpixelbaserad kantutjämning i kombination med glyph hintning är belagd med mjukvarupatent och är därför inte tillgänglig som standard. Beroende på var i världen du bor har du möjlighet att använda en version utan denna begränsning. Vi beklagar detta. Kontakta din representant.</div>
-<p>Såhär ser hintning plus subpixelbaserad rendering ut, jämfört med hintning och gråskala, om du aktiverar det genom att ändra källkoden och kompilera om den.</p>
+<div class="box-info">Subpixelbaserad kantutjämning i kombination med betoning är belagd med mjukvarupatent och är därför inte tillgänglig som standard. Beroende på var i världen du bor har du möjlighet att använda en version utan denna begränsning. Vi beklagar detta.</div>
+<p>Såhär ser betoning med LCD subpixelbaserad rendering ut (om du aktiverar det genom att ändra i källkoden och kompilera om), jämfört med betoning och gråskala).</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Grayscale, Hinting: on</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel, Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Gråskala med betoning på.</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel med betoning på.</td></tr>
 </table>
 <p><br /></p>
 <p>Längst ner i panelen finns två knappar:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>återställer allt till standardinställningarna.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>ställer tillbaka inställningarna som de var när du startade Appearance.</td></tr>
+<tr><td><span class="button">Förval</span></td><td> </td><td>återställer allt till standardinställningarna.</td></tr>
+<tr><td><span class="button">Återställ</span></td><td> </td><td>ställer tillbaka inställningarna som de var när du startade Utseende.</td></tr>
 </table>
 
 </div>
@@ -108,8 +110,8 @@ Antialiasing type</h3>
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+    <a href="../preferences.html" class="uplink">Inställningar</a> 
+::  <a href="backgrounds.html">Bakgrunder</a>  »
 </span></div>
 </div>
 

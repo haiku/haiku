@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rodastahm Islamov
+ *		mrNoisy
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Commandline Applications</title>
+	<title>Haiku-приложения для командной строки</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -49,60 +50,59 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-specific commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-приложения для командной строки</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Tracker:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Все приложения командной строки поставляются вместе с Haiku и находятся в <span class="path">/boot/system/bin</span> или в <span class="path">/boot/common/bin</span>. Приложения, которые вы установили самостоятельно, должны располагаться в <span class="path">~/config/bin</span>. Указанные пути располагаются в переменной PATH, таким образом приложения отыскиваются автоматически.<br />
+Ниже приводится неполный список приложений Haiku для командной строки, служащий в целях ознакомления с некоторыми из наиболее полезных приложений. Изучение остальных программ, находящихся в <span class="path">bin/</span>, возлагается на пользователя. Запуск программы с параметром <tt>--help</tt> выведет справку по её использованию.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-attributes" name="cli-attributes">Relating to attributes: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
-<p>These commands are used to display, read out, add and remove attributes of files. Remember that these meta data are currently only available on BFS formatted volumes. Moving files onto other file systems will strip all attributes!<br />
-All these commands are described in topic <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a>.</p>
+<a id="cli-attributes" name="cli-attributes">Приложения для работы с атрибутами: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Эти команды предназначены для отображения, извлечения, добавления и удаления аттрибутов файлов. Помните, что в данный момент эти мета-данные доступны только на разделах, отформатированных в BFS.  Перемещение файлов на другие файловые системы приведут к потере мета-данных!<br />
+Перечисленные команды описаны в теме <a href="../attributes.html#attributes-terminal">Работа с атрибутами в Терминале</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-index" name="cli-index">Relating to the index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>With these commands you list, make, reindex and remove attributes to BFS' index. Every volume has it's own index, remember that when copying files from one volume to another.<br />
-These commands are described in topic <a href="../index.html">Index</a>.</p>
+<a id="cli-index" name="cli-index">Приложения для работы с индексами: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>С помощью этих команд вы можете получить список аттрибутов BFS, произвести их переиндексацию или удаление. Каждый раздел имеет собственный индекс, сохраняющийся при копировании файлов между разделами.<br />
+Эти команды описаны в теме <a href="../index.html">Индексация</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-scripting" name="cli-scripting">Useful scripting commands</a></h3>
-<p>Here are a few commandline tools that are especially useful for scripting (see also topic <a href="../bash-scripting.html">Bash and Scripting</a>).</p>
+<a id="cli-scripting" name="cli-scripting">Полезные скриптовые команды</a></h3>
+<p>Утилиты командной строки, приведенные ниже, особенно полезны для написания скриптов (смотрите тему <a href="../bash-scripting.html">Bash и скрипты</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+		<td valign="top"><p><span class="cli">alert</span> вызывает обычное окно предупрежния с заранее опеределенными иконкой, пояснительным текстом и кнопками (до трех). Например, следующая строка выведет на экран:</p>
 <pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> отображает диалог загрузки или сохранения файла, позволяя пользователю выбрать файл или путь. В качестве возвращаемой величины будет передано имя файла или путь к папке. Для изменния доступны несколько параметров, таких как начальная папка, заголовок окна, имя для сохраняемого файла по умолчанию и ограничения на разрешенные типы файлов. Приведем пример: </p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span> удобный способ для ожидания запуска или завершения работы какого-либо приложения или нити.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
+		<td valign="top"><p><span class="cli">query</span> является аналогом панели "Найти", выполненным для командной строки. Существует способ быстрого создания правила поиска:  постройте запрос в панели "Найти", переключитесь в режим <span class="menu">по формуле</span>, добавьте двойные кавычки (<tt>"</tt>) в начале и в конце и вставьте строку после комманды <span class="cli">query</span> в Терминале или вашем скрипте.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">Другие команды</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
+		<td><p><span class="cli">checkfs</span>   - очень важный инструмент, используемый для проверки вашей файловой системы на наличие ошибок. Просто добавьте имя раздела или устройства, а утилита проверит каждый файл и по возможности исправит все несоотсветствия.</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+		<td valign="top"><p><span class="cli">open</span> очень полезный инструмент. С его помощью вы сможете открыть любой файл в предпочитаемом приложении, либо запустить приложение по его сигнатуре, не указывая точный путь до него. Это применимо к URL и "виртуальным" папкам <tt>.</tt> для текущей папки и <tt>..</tt> для родительской папки - они откроются в Tracker.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span> помещает иконку для любого файла, папки, запроса или приложения в трей Deskbar, и позволяет назначить контекстное меню, вызываемое правым кликом мыши по иконке для выполнения специальных действий. В качестве примера, попробуйте добавить приложение командной строки <span class="app">screenshot</span> с несколькими параметрами ("<tt>\</tt>" в первой строке используется для разрыва строки в Terminal):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>

@@ -50,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
@@ -59,8 +58,8 @@
                 <a href="#i-o-m">创建图标</a><br />
                   <a href="#i-o-m-path">路径</a><br />
                   <a href="#i-o-m-shape">模型</a><br />
-                  <a href="#i-o-m-style">格式</a><br />
-                  <a href="#i-o-m-transformer">压缩工具</a><br />
+                  <a href="#i-o-m-style">样式</a><br />
+                  <a href="#i-o-m-transformer">变形</a><br />
                   <a href="#i-o-m-save">保存图标</a><br />
                   <a href="#i-o-m-tips">提示与技巧</a></td></tr>
 </table>
@@ -87,7 +86,7 @@
         <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
         <tr align="center"><td>1,024 字节<br />+ 256 字节</td><td> 7,192 字节</td><td> 768 字节</td></tr>
 </table>
-<p>Note that the BeOS used two versions of an icon, one 16x16 and one 32x32, to achieve good visuals in List and Icon View mode.</p>
+<p>注意，BeOS 使用l两种图标尺寸，16x16 和 32x32，分别为了在列表和图标视图模式获得良好的视觉效果。</p>
 <p>矢量图标则无需这种技巧。它们除了仅需使用几百字节的空间，而且缩放效果也要比点阵图标好很多。（注意：BeOS 仅提供了16x16 和 32x32 两种图标。）</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
@@ -113,31 +112,32 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m" name="i-o-m">创建图标</a></h2>
-<p>图标套件是 Haiku 的图标编辑工具，它允许您将作品保存成为 HVIF,SVG 或者 PNG 格式。图标也可以直接附属为某个文件的属性，或者导出为程序员可以使用的资源和源文件。因为应用程序可以剪裁为优化的 HVIF 格式，它的使用也反映了该格式的内部情况。</p>
-<p>Other than your normal vector graphics software, you don't deal with separate objects that each include all their specific properties like path, stroke width, stroke and fill color etc. Rather, you assemble your objects ("shapes") from shared paths and colors ("styles") and set certain properties. This re-using of elements is one secret of HVIF's efficiency. Although that imposes some constraints on the icon designer, there are a few advantages, too.<br />
-For example, by re-using a path, several objects can be modified together by manipulating this one path. Think of an object and its shadow. Modifying their shared path will change the object itself and automatically its (maybe slightly distorted/translated) shadow.</p>
+<p>图标套件是 Haiku 的图标编辑工具，它允许您将作品保存成为 HVIF，SVG 或者 PNG 格式。图标也可以直接用作某个文件的属性，或者导出为开发者可以使用的资源或源文件。因为应用程序可以剪裁为优化的 HVIF 格式，它的用法也反映了该格式的内部结构。</p>
+<p>不同于普通的矢量绘图软件，你不会面对包括着众多属性（如路径、笔画粗细、笔画和填充色等等）的单独的对象。 你要把你共享路径（“模型”）、颜色（“样式”）的对象组合起来，并给他们设置特定的属性。这种元素重复的方法就是HVIF图标高效率的秘诀之一。 尽管这可能让图标设计者受到一定限制, 但这样的方法也有一些优点。<br />
+
+比如，通过重复使用路径，几个对象可以通过修改这一个路径而同时改变。比如一个对象和它的阴影，修改他们共享的路径就会让对象本身和它的阴影（可能会发生轻微的畸变）同时改变。</p>
 
 <p>下面是 图标套件 窗口的预览截图：</p>
 <img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
-<p>To create any visible object on the canvas, you need a shape with a path and a style. Conveniently, you can create one, two or all three of those together from the <span class="menu">Shape</span> menu. Every kind of object (Paths, Shapes, Transformers, and Styles) has a menu above its list of elements, offering various commands. Every element has certain options that are set in the <span class="menu">Properties</span> view.</p>
+<p>要在绘图区创建一个可见对象，你需要创建一个拥有路径和样式（颜色）的模型。你可以很容易地从<span class="menu">模型</span> 菜单中创建一个、两个甚至更多模型。 每类对象 (路径，模型，变换和样式) 在其元素对象列表上都有一个菜单, 其中提供了多种命令。 每个元素在 <span class="menu">属性</span> 视图中都有可以进行设置的特定选项。 </p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-path" name="i-o-m-path">路径</a></h3>
-<p>A path consists of several points which are connected with lines or Bezier curves. To add or change points, make sure the path is selected in the path list.</p>
+<p>路径有多个点组成，这些点通过直线或贝塞尔曲线链接。为了在某个路径上添加或修改点，该路径必须处在选中的路径列表中。</p>
 
-<p>Simply clicking in the canvas will set the first point. While setting a point, you decide if the resulting line will be straight or curved: a simple click and release produces a straight line, holding down the mouse button and moving the mouse will drag out the handles for a Bezier curve. Of course, you can also change it all later on.</p>
+<p>点击绘图区域将会创建首个点。在创建首个点时，您可以决定线条为直线或者曲线：简单的点击和释放将会创建直线，按下鼠标按键并且拖动鼠标将会画出贝赛尔曲线。当然，您也可以之后进行修改。</p>
 
 <img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
 
-<p>To get from "A" to "B", you have to transform some points from corner-points to curve-points. That's done by holding <span class="key">ALT</span> while clicking on a point and dragging out the handles. This results in a symmetrical Bezier: the second handle follows the movement of the other. If you need to move the handles independently, again click&amp;drag on a Bezier handle while holding <span class="key">ALT</span>.<br />
-Vice versa, to go from Bezier to a corner-point, hold <span class="key">ALT</span> and click on a point.</p>
+<p>为了将 A 中的图形修改为 B 中的样式，你需要把一些边角点转换成曲线点。在点击该点后，按下 <span class="key">ALT</span> 键同时拖拽该点即可完成该操作。 该操作可以画出匀称的贝塞尔曲线：点与点之间将随着彼此的移动而改动。如果你只需要移动单个点，则只需要在拖拽时按下 <span class="key">ALT</span> 键。<br />
+反之亦然，把曲线点转换成边角点，则按下 <span class="key">ALT</span> 键，然后点击相应点。</p>
 
-<p>To move a point, simply click&amp;drag it. To select more than one point, hold down <span class="key">SHIFT</span> and draw a selection rectangle. Selected points are marked with a red border instead of the usual black.<br />
-To insert a point into a path you click on the connecting line between two points.<br />
-Selected points are deleted by pressing <span class="key">DEL</span> or by clicking on any point while holding <span class="key">CTRL</span>.</p>
+<p>移动点时，只需要点击该点并拖拽即可。要选中多个点，则需要按下 <span class="key">SHIFT</span> 键并用鼠标圈出所要选定的区域。选中的点将显示为红色边框而不是通常的黑色。<br />
+在路径中插入点，您点击两点之间的连接线。<br />
+按下 <span class="key">DEL</span> 键，或在点击相应点时按下 <span class="key">CTRL</span> 键将会删除选中点。 </p>
 
 <p>鼠标指针指示栏了当前模式：</p>
 <table summary="Mouse pointer states, Path" border="0" cellpadding="10">
@@ -168,28 +168,28 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
 </table>
 
 <h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">路径菜单</a></h4>
-<p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add Rectangle</span> and <span class="menu">Add Circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
+<p><span class="menu">路径</span> 菜单提供了几个选项以 <span class="menu">添加矩形</span> 和 <span class="menu">添加圆形</span> 或 <span class="menu">复制</span> 和 <span class="menu">移除</span> 路径。下面将对某些内容加以详述：</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">撤销</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
-<tr><td><span class="menu">清除</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate Indices Right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a ⊂ it will rotate like this: ⊂ ∩ ⊃ ∪.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate Indices Left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
+<tr><td><span class="menu">撤销</span></td><td style="width:15px;"></td><td>如果你的路径不是“闭合的” (参见下述的路径属性)，点击绘图区将总是创建新点，并且将其与最后一个点连接。“反向”将会和顺序相反，您的新点将会链接到原始的起始点。</td></tr>
+<tr><td><span class="menu">清除</span></td><td></td><td>对于导入的 SVG 图像非常有用，该功能将移除多余点。</td></tr>
+<tr><td class="onelinetop"><span class="menu">顺时针旋转</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>实际上，该功能用于旋转路径的开口。在使用具有类型和描边变换的模型的非闭合路径时最为明显。如果您的路径为 ⊂ ，那么旋转后的结果为：⊂ ∩ ⊃ ∪。</td></tr>
+<tr><td class="onelinetop"><span class="menu">逆时针旋转</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>功能同“顺时针旋转”，但方向相反。</td></tr>
 </table>
 
 <h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">路径属性</a></h4>
-<p><span class="menu">Properties</span> at the bottom left of the window offers all available settings of the currently selected object. A path only has two: a <span class="menu">Name</span> and if it's <span class="menu">Closed</span> or not.</p>
+<p>窗口左下角的<span class="menu">属性</span> 提供了当前选中对象的所有可用设置。路径只有两个设置：<span class="menu">名称</span> 和路径是否 <span class="menu">闭合</span> 。</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-shape" name="i-o-m-shape">模型</a></h3>
-<p>A shape groups together one or more paths with a style. Practically, it's the object that you'll actually see on the canvas. The grouping is done with the checkboxes in front of the paths and styles: Just select your shape and tick off the desired path(s) and a style.</p>
-<p>A shape defines how a path and style is applied, e.g. if the object is filled or only stroked (which is done by using Transformers on the shape, we'll get to that later). Also, a shape can be moved, rotated or resized without touching the used path. That way, you can re-use a single path and get different, but related, shapes.</p>
+<p>一个模型组将具有同一样式的路径组织在一起。实际上，它是您可以在绘图区看到的确切对象。编组可以通过路径和样式前的复选框完成：只要选择模型，标出希望的路径和样式即可。</p>
+<p>模型定义了路径和样式应用的方法，例如，如果某个对象进行了填充或者描边（这可以通过模型转换来完成，我们之后将进行介绍）。并且，在不改变所用路径的情况下，可以移动，翻转或者自定义模型大小。通过这种方式，您可以复用单个路径来获取相关但不同的模型。</p>
 
 <img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
 
-<p>When a shape is selected from the list, a rectangle is drawn around it. Depending on where exactly you grab it, the shape is moved, resized or rotated around a point in its center, which itself can be moved. Holding <span class="key">SHIFT</span> will lock direction when moving, limit rotating to 45° angles and restrict the aspect ratio while resizing. The mouse pointer again indicates the current mode:</p>
+<p>当从列表中选择模型时，其周围将会显示出矩形边框。根据您所选取点的不同，模型将会以其中心为基准进行移动，定义大小及翻转，当然中心本身也会移动。在移动，限制翻转角度为 45° 角，定义大小时限制长宽比时，按下 <span class="key">SHIFT</span> 键将会锁定方位。鼠标指针将会指示当前模式：</p>
 <table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
         <tr align="center">
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-shape.png" alt="i-o-m- move-shape" width="16" height="16" /></td>
@@ -205,25 +205,25 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
         </tr>
 </table>
 
-<p>Shapes lie on top of each other, each is on its own layer, if you will. To reorder them you drag&amp;drop their entry to a different position in the list.</p>
+<p>模型出于所有其他图形内容之上，如果您愿意，你可以将所有的图形都处在独自的层。如果希望重新进行排序，您可以将它们拖动到列表中的其他位置。</p>
 
 <h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">模型菜单</a></h4>
-<p>The <span class="menu">Shape</span> menu offers the before mentioned possibility to <span class="menu">Add Empty, With Path/Style/Path&amp;Style</span> and to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a shape. Then, there is:</p>
+<p><span class="menu">模型</span> 菜单提供上文提到的功能 <span class="menu">添加具有路径/样式/路径和样式的空模型</span>，以及 <span class="menu">复制</span> 或 <span class="menu">移除</span> 模型。除此还有以下功能：</p>
 <table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reset Transformation</span></td><td style="width:15px;"></td><td>Reverts all the move, resize and rotate transformations you have applied to the shape.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Freeze Transformation</span></td><td></td><td>When you transform a shape, its assigned path(s) stay in their original position. This may be intended; maybe more than one shape is using that path, maybe you intentionally used <span class="menu">Options | Snap to Grid</span> to set the points at precise pixel borders.<br />
-If not, "Freeze Transformation" will apply the current shape transformation to the assigned path(s). A future "Reset Transformation" will then return to this new state.</td></tr>
+<tr><td><span class="menu">重置转换</span></td><td style="width:15px;"></td><td>撤销所有应用于模型的移动，定义大小和翻转转换等操作。</td></tr>
+<tr><td class="onelinetop"><span class="menu">冻结转换</span></td><td></td><td>当您变换模型时，其指定路径将保持原位。这可能是有意的；可能多个模型使用那个路径，可能您希望使用 <span class="menu">选项 | Snap to Grid</span> 在像素边界上精确地绘制点。<br />
+不然，“冻结变形”将应用当前模型变形到指定路径。而“重置变形”将返回到该新状态。</td></tr>
 </table>
 
 <h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">模型属性</a></h4>
 <p>除了<span class="menu">名称</span>，模型的<span class="menu">属性</span>视图还有以下选项：</p>
 
 <table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Min LOD</span></td><td></td><td>Minimum Level of Detail</td></tr>
-<tr><td><span class="menu">Max LOD</span></td><td></td><td>Maximum Level of Detail</td></tr>
+<tr><td><span class="menu">Min LOD</span></td><td></td><td>最小细节级别</td></tr>
+<tr><td><span class="menu">Max LOD</span></td><td></td><td>最大细节级别</td></tr>
 </table>
 
-<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Level of Detail (LOD)</a></h5>
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">细节级别（LOD）</a></h5>
 <table summary="LOD example" border="0" cellpadding="10">
         <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
         <tr align="center">
@@ -231,15 +231,15 @@ If not, "Freeze Transformation" will apply the current shape transformation to t
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
 </table>
-<p>See how there are no numbers in the 16px version of the BeVexed icon? That's done with the "Level of Detail" setting of their shapes.<br />
-With the LOD you control the visibility of a shape depending on its size. That way, you can leave away details of an icon that look good on a bigger icon, but maybe not so much on its smaller version.</p>
-<p>This is how it works: A LOD of 1.0 is defined as a 64px icon size. To get the LOD of a particular icon size you simply divide it by 64, e.g. a 16px icon has a LOD of 16/64 = 0.25. A shape won't be visible below its <span class="menu">Min LOD</span> and above its <span class="menu">Max LOD</span>.</p>
-<p>So, if you set a shape's <span class="menu">Min LOD</span> to 0.0 and the <span class="menu">Max LOD</span> to 0.5, this means that the shape will only be visible for icon sizes smaller or <i>equal</i> to 32px. If you wanted to exclude the 32px icon size, you'd have to stay below 0.5, say 0.49.</p>
-<p>The LOD is not only for leaving out detailing shapes, but also to e.g. change the stroke width at different sizes, if you feel that's needed. Simply duplicate a shape, make your changes and set both of their LOD settings to show either one or the other. Here lies the only source of potential confusion, when you unwittingly overlap LODs of shapes, and wonder why at some size both are visible...<br />
-For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward (LOD: 48/64 = 0.75):</p>
+<p>看看为什么 16 像素的 BeVexed 图标上面没有数字？这可以通过模型的 “细节级别” 来完成。<br />
+利用 LOD，您可以根据模型尺寸来控制其可见性。这样，您就可以忽略那些在大图标中有很好感官，但在小图标中不很重要的细节。</p>
+<p>工作原理：1.0 的细节级别定义为 64 像素的图标尺寸。为了获取某个特别图标尺寸的细节级别，您只需要将其除以 64 即可得到，如，16 像素的细节级别为 16/64 = 0.25。细节级别小于 <span class="menu">Min LOD</span> 和大于 <span class="menu">Max LOD</span> 的模型将是不可见的。</p>
+<p>因此，如果您设置模型的 <span class="menu">Min LOD</span> 和 <span class="menu">Max LOD</span> 分别为 0.0 和 0.5 ，那么这也就意味着只有图标尺寸小于或者 <i>等于</i> 32 像素的模型才是可见的。如果您希望排除 32 位像素的图标尺寸，那么您必须使其小于 0.5，比如 0.49。 </p>
+<p>细节级别不仅可用于忽略细节模型，并且如果有需要您可以修改描边宽度为其他尺寸。简单的复制模型，做出修改，并且设置它们的细节级别以显示其中之一。当您无意重叠了模型细节级别，并且奇怪为什么某个尺寸都是可见时，下面就是这些潜在问题的来源...<br />
+例如，如果模型 1 在小于 48 像素时显示，而模型 2 在大于 48 像素时显示（LOD：48/64 = 0.75）： </p>
 
 <table summary="LOD values example" border="0" cellpadding="5">
-<tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Not OK!</b></td></tr>
+<tr align="center"><td></td><td colspan="2"><b>合适</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>不合适！</b></td></tr>
 <tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>模型 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
 <tr style="background-color:#F1F1F1"><td>Max LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
 <tr><td colspan="6"></td></tr>
@@ -250,52 +250,52 @@ For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-style" name="i-o-m-style">类型</a></h3>
-<p>A style can either be a solid color or some type of gradient.<br />
-Besides the predefined colors under <span class="menu">Swatches</span>, you can mix your own by clicking on the current color. Also, note the slider under the color spectrum which sets the alpha-channel (transparency).</p>
+<a id="i-o-m-style" name="i-o-m-style">样式</a></h3>
+<p>样式可以设置为纯色或一些渐变色。<br />
+除了 <span class="menu">调色板</span> 中的预设颜色，您可以通过点击当前颜色来创建新的颜色。并且需要注意，色谱下的滑块可用于设置色板（透明板）。</p>
 <img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
-<p>You quickly create a new style by mixing your color and simply drag&amp;dropping it into the list of styles.</p>
-<p>If you go for a gradient, you set the type (<span class="menu">Linear</span>, <span class="menu">Radial</span>, <span class="menu">Diamond</span>, <span class="menu">Cone</span>) and then define the start and end colors. This is done with a drag&amp;drop from a color bucket into the respective color indicator under the gradient.<br />
-Of course you can move these indicators to change the gradient to your liking. You can also insert more indicators to add more colors by double-clicking into the gradient. Pressing <span class="key">DEL</span> removes the selected indicator.</p>
-<p>You can move, resize and rotate the representing box of a gradient on the canvas until it fits your needs. This works just like with shapes.</p>
+<p>您可以通过混合颜色创建新的样式，并且很容易地将其拖拽到样式列表。</p>
+<p>如果你需要定义渐变色，则需要指定渐变色的类型 （<span class="menu">线性</span>，<span class="menu">射线</span>，<span class="menu">菱形</span>，<span class="menu">锥向</span>）并定义起始色和终止色。这可以通过将颜色从调色板拖拽至渐变色相应的色彩指示区来完成。<br />
+当然，您也可以通过移动这些指示区根据个人爱好来改变渐变色的样式。您也可以通过双击渐变色来插入多个指示区添加多种颜色。按下 <span class="key">DEL</span> 将会删除选中指示区。</p>
+<p>您可以在绘图区移动，自定义大小或者翻转渐变色的表示框直到满足需要。这也同样适用于模型。</p>
 
-<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">类型菜单</a></h4>
-<p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset Transformation</span>.</p>
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">样式菜单</a></h4>
+<p><span class="menu">样式</span> 菜单提供了常用的 <span class="menu">添加</span>，<span class="menu">复制</span> 和 <span class="menu">删除</span> 样式，还有 <span class="menu">重置变换</span> 等操作。</p>
 
-<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">类型属性</a></h4>
-<p><span class="menu">名称</span> 是 类型仅有的一个<span class="menu">属性</span>。</p>
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">样式属性</a></h4>
+<p><span class="menu">名称</span> 是样式仅有的<span class="menu">属性</span>。</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-transformer" name="i-o-m-transformer">压缩工具</a></h3>
-<p>A shape can have Transformers which change its appearance. The effects, however, are more subtle than a truck turning into a battle robot...</p>
+<a id="i-o-m-transformer" name="i-o-m-transformer">变形</a></h3>
+<p>模型可以通过转换来修改其外观。然而，其效果不仅精细，而且还有变形金刚般的魔力...</p>
 
-<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer Add Menu</a></h4>
+<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">变形添加菜单</a></h4>
 <table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Contour</span></td><td></td><td>Adds an outline to a shape.</td></tr>
-<tr><td><span class="menu">Stroke</span></td><td></td><td>Strokes the path of a shape instead of filling it with a style.</td></tr>
+<tr><td><span class="menu">轮廓</span></td><td></td><td>为模型添加轮廓线。</td></tr>
+<tr><td><span class="menu">描边</span></td><td></td><td>为模型路径描边而不是填充为某种样式。</td></tr>
 </table>
 
-<p>Depending on the kind of Transformer, you'll get a different set of properties.</p>
+<p>根据变形种类的不同，您所取得的属性也不相同。</p>
 
-<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformer Properties</a></h4>
-<p>Besides a <span class="menu">Name</span> and the actual <span class="menu">Width</span> for the transformer, the <span class="menu">Properties</span> view has these (depending on its type slightly differing) options:</p>
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">变形属性</a></h4>
+<p>除了变形的 <span class="menu">名称</span> 和实际 <span class="menu">宽度</span> ，<span class="menu">属性</span> 视图具有以下（根据其类别有些微变化）选项：</p>
 <table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Caps</span></td><td style="width:15px;"></td><td><i>Stroke only</i>. Defines the end caps of a line: <span class="menu">Butt</span>, <span class="menu">Square</span> or <span class="menu">Round</span>.</td></tr>
-<tr><td><span class="menu">Detect Orient.</span></td><td></td><td><i>Contour only</i>. Determines if the contour is to the inside or outside the path.</td></tr>
-<tr><td><span class="menu">Joins</span></td><td></td><td>Defines how lines are joint at a point: <span class="menu">Miter</span>, <span class="menu">Round</span> or <span class="menu">Bevel</span>.</td></tr>
-<tr><td><span class="menu">Miter Limit</span></td><td></td><td>Only when the above <span class="menu">Joins</span> is set to "Miter" this setting influences the looks of the miter joint. </td></tr>
+<tr><td><span class="menu">端点形式</span></td><td style="width:15px;"></td><td><i>仅适用于描边</i>。定义线条的结束端点：<span class="menu">楔形</span>，<span class="menu">方形</span> 或 <span class="menu">圆形</span>。</td></tr>
+<tr><td><span class="menu">检测方向</span></td><td></td><td><i>仅适用于轮廓</i>。决定轮廓位于路径之外或之内。 </td></tr>
+<tr><td><span class="menu">连接形式</span></td><td></td><td>定义线与线连接方式：<span class="menu">斜线</span>，<span class="menu">圆弧</span> 或 <span class="menu">倒角</span>。</td></tr>
+<tr><td><span class="menu">联接限制</span></td><td></td><td>仅当上述的 <span class="menu">连接形式</span> 设置为 “斜线” 时，该设置才会作用于斜线连接的外观。  </td></tr>
 </table>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-save" name="i-o-m-save">保存图标</a></h3>
-<p>There's your usual menu bar at the top, <span class="menu">File</span>, <span class="menu">Edit</span>, <span class="menu">Options</span>. The usage is pretty much self-explaining, so we'll only look at how to save your work.</p>
-<p><span class="menu">File | Save As...</span> will save in a special Icon-O-Matic format that retains additional information like the names of paths, shapes and styles. These will be stripped from the actual icon once you export it to save space. It's a good idea to back-up your work like this, because without named objects everything's named "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;" which makes specific changes tedious.</p>
+<p>窗口顶部是常见的菜单栏，<span class="menu">文件</span>，<span class="menu">编辑</span>，<span class="menu">选项</span> 等。它们的用法都非常容易理解，因此我们只需要了解如何保存您的作品。</p>
+<p><span class="menu">文件 | 保存为...</span> 将会保存为特别的图标套件格式，它将保持附加信息，如路径名称，模型和样式。如果您希望到处以节省空间，这些信息都将会从图表中移除。但是使用这种方式备份您的作品比较好，因为如果没有对象的名称，所有的内容都将会命名为 “&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;” ，这样将使修改非常繁杂。</p>
 
-<p><span class="menu">File | Export As...</span> opens a familiar save panel with a file format pop-up menu at the bottom, offering these choices:</p>
+<p><span class="menu">文件 | 导出为...</span> 打开一个类似的文件保存面板，其底部有一个文件格式的弹出菜单，提供了如下选择：</p>
 <table summary="file formats" border="0" cellspacing="0" cellpadding="2">
 <tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku 矢量图标格式</td></tr>
 <tr><td>HVIF RDef</td><td></td><td>保存为程序员使用的资源</td></tr>
@@ -314,12 +314,12 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <p>在使用图标套件时，您需要注意一些东西，还有一些常用的使用提示：</p>
 <ul>
 <li><p>阅读 <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">图标指南</a>，学习 Haiku 图标的重要特性，如，透视，色彩，以及阴影。 </p></li>
-<li><p>您需要总是尽量少使用路径，它们非常占用空间。尽量多的重用路径，并且精巧的处理模型及其变体。合理的利用渐变也可以节省空间。</p></li>
-<li><p>Wherever possible, you should activate Snap-to-Grid from the <span class="menu">Options</span> menu when editing paths. Path points that align with the 64x64 pixel grid use less storage space. You'll also get the crispest look if points are set on exact pixel borders. For example, it is important to align the most prominent outlines with the 16x16 grid.</p></li>
-<li><p>Check the preview to see if your icon still looks good in 16x16. You may want to use the <a href="#i-o-m-shape-lod">Level Of Detail</a> settings described in the Shapes section.</p></li>
-<li><p>There's an easy way to produce letters, even if Icon-O-Matic doesn't provide such a tool. Just enter the text in a text editor such as StyledEdit, adjust font type and style, and drag&amp;drop or copy&amp;paste the selected text into Icon-O-Matic. This will create the according paths and shapes.</p></li>
-<li><p>If you assign more than one path to a shape, their overlapping areas will cancel each other out. When one path is completely inside another, it practically creates a hole in the resulting shape.</p></li>
-<li><p>You can zoom in and out of the canvas with the mouse wheel. Panning is done either by click&amp;drag with the middle mouse button or with a normal left-click&amp;drag while holding <span class="key">SPACE</span>.</p></li>
+<li><p>您需要尽量少的使用路径，因为它们非常占用空间。尽量多的重用路径，并且精巧的处理模型及其变体。合理利用渐变色也可以节省空间。</p></li>
+<li><p>如果有需要，在编辑路径时可以从 <span class="menu">选项</span> 菜单中启用对齐到网格。对齐到 64x64 网格的点会占用更少的储存空间。如果点都精确地定位于像素边界，您的作品将会获得最清爽的观感。例如，将最突出的轮廓对齐到 16x16 网格非常必要。</p></li>
+<li><p>检查预览，查看是否您的图标在 16x16 模式下有好的观感。您可能需要使用模型那一节中所描述到的 <a href="#i-o-m-shape-lod">细节级别</a> 设置。</p></li>
+<li><p>尽管图标套件不提供文字处理工具，但仍有简单的方法用以创建字符。只要在文本编辑器中输入字符，如 StyledEdit，调整字体的类型和样式，然后将其拖拽或者复制粘贴到图标套件中即可。这样将会创建相应的路径和模型。</p></li>
+<li><p>如果您为单个模型定义了多个路径，它们的重叠区域将会互相抵消。当某个路径完全位于其他路径中时，它将在该模型中创建一个空洞。</p></li>
+<li><p>您可以使用鼠标转轮缩放绘图区域。镜头移动可以通过鼠标中键拖拽或按下 <span class="key">SPACE</span> 时拖拽鼠标左键完成。</p></li>
 </ul>
 
 

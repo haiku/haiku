@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -66,7 +66,15 @@
 <li><p>“缩放”按钮（也可以通过<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> 组合键进行缩放）。对于大多数的程序，该按钮将会把窗口最大化。但并不是都如此，例如Tracker窗口，该按钮将会依据其内容将窗口放大至合适大小。</p></li>
 <li><p>可调整的窗口边角。在窗口的边缘拖拽将会移动整个窗口。</p></li>
 </ol>
-<div class="box-info">如果同时按下 <span class="key">CTRL</span> <span class="key">ALT</span> 键，您可以使用左键点击在窗口的任意位置对它进行移动，而右键点击将会使其返回原位。</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">快速移动或调整窗口</a></h2>
+<p>移动和调整窗口时和多个并发运行程序交互的重要部分。除了通过微小的黄色标签和更窄的窗口边框，还有更为方便的方法可供使用。而且，该边角不仅很小，而且还有另外限制：它仅允许在右下角，并且沿右下角方向使用。</p>
+<p>为了定位这些问题，Haiku 提供了使用组合键 <span class="key">CTRL</span> <span class="key">ALT</span> 和鼠标的灵活方法。更多窗口管理快捷键的信息，请查阅 <a href="keyboard-shortcuts.html#general">快捷键和组合键</a> 。</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>按下 <span class="key">CTRL</span> <span class="key">ALT</span> 将会高亮显示最接近鼠标的窗口边界。向另一个边界方向移动将会激活该目标。点击并使用 <i>鼠标右键</i> 拖动将会重定义高亮边界的窗口。</p>
+<p>按下 <span class="key">CTRL</span> <span class="key">ALT</span> 并点击使用 <i>鼠标左键</i> 在窗口中拖动将会移动窗口。快速点击 <i>鼠标右键</i> 会将其置后。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -106,7 +114,7 @@
 <p>接受复制体最突出的地方是桌面：您可以直接将小控件拖到其上。而且从此，它将成为桌面的一部分， 不需要复制体的原程序也可以进行工作。<br />
 右键点击复制体的小控件将会显示一个右键菜单，用于显示原程序的 <span class="menu">About</span> 窗体和 <span class="menu">Remove Replicant</span>。</p>
 <div class="box-info">如果碰巧，您在使用桌面上的复制体时遇到困难，而且无法进行处理，您可以删除 <span class="path">~/config/settings/Tracker/tracker_shelf</span> 。但是，它将会删除桌面上 <i>所有</i> 的复制体。</div>
-<p>可复制程序示例来源于 <a href="applications/activitymonitor.html">ActivityMonitor</a>， <a href="workspaces.html">Workspaces applet</a> 或者 <a href="applications/deskcalc.html">DeskCalc</a> 的图片。</p>
+<p>可复制程序示例来源于 <a href="applications/activitymonitor.html">任务管理器</a>， <a href="workspaces.html">工作区小程序</a> 或者 <a href="applications/deskcalc.html">计算器</a> 的图片。</p>
 </div>
 </div>
 

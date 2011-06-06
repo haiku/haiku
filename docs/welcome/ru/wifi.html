@@ -12,6 +12,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Diver
+ *		Rodastahm Islamov
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -49,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2>Беспроводная сеть Wifi в Haiku</h2>
 <h3>
@@ -69,14 +69,14 @@ Aironet PCI4800<br />
 <li><p><i>broadcom43xx</i> поддерживает:<br />
 BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
 </p></li>
-<li><p><i>ipw2100</i> supporting Intel Pro Wireless 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting Intel Pro Wireless<br />
+<li><p><i>iprowifi2100</i> поддерживает Intel Pro Wireless 2100 чипы</p></li>
+<li><p><i>iprowifi2200</i> поддерживает следующие Intel Pro Wireless чипы:<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting Intel Pro Wireless 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting Intel Pro Wireless 4965 chips</p></li>
+<li><p><i>iprowifi3945</i> поддерживает Intel Pro Wireless 3945 чипы</p></li>
+<li><p><i>iprowifi4965</i> поддерживает Intel Pro Wireless 4965 чипы</p></li>
 <li><p><i>marvell88w8335</i> поддерживает:<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
@@ -88,7 +88,7 @@ RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p>ralink2860 supporting Ralink RT2860</p></li>
+<li><p>ralink2860 поддерживает Ralink RT2860 чипы</p></li>
 <li><p><i>wavelanwifi</i> поддерживает как минимум:<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
@@ -104,47 +104,47 @@ Addtron AWA-100 PCI
 </p></li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="connect" rel="nofollow" id="connect">Connecting to a wireless network</a></h3>
-<p>Besides of course unencrypted networks, Haiku has preliminary support for accessing wireless networks via <a href="#wep-notes" rel="nofollow">WEP encryption keys</a>. WEP is an early encryption method, although not the most secure.</p>
-<p>You can list available networks, join and leave them with the command <span class="cli">ifconfig</span> from Terminal:</p>
+<a name="connect" rel="nofollow" id="connect">Подключение к беспроводной сети</a></h3>
+<p>Помимо открытых беспроводных сетей Haiku поддерживает беспроводные сети с <a href="#wep-notes" rel="nofollow">WEP-шифрованием</a>. WEP является одним из первых методов шифрования для беспроводных сетей, поэтому считается устаревшим т.к. взламывается за пару минут.</p>
+<p>Вы можете получить список доступных сетей, подключиться либо отключиться от сети при помощи команды <span class="cli">ifconfig</span>, используя Терминал:</p>
 <pre class="terminal">ifconfig [wifi_device_path] [list|join|leave] (key)</pre>
-<p>You can find your <tt>wifi_device_path</tt> in the <span class="app">Network</span> preferences applet, or by executing <span class="cli">ifconfig -a</span>.</p>
-<p>Below are a few examples of connecting to a wireless network named <i>wifitopia</i>. For these examples we are assuming your wifi network card is <tt>/dev/net/iprowifi3945/0</tt>.</p>
-<h4>Listing wireless networks:</h4>
+<p>Найти ваш <tt>wifi_device_path</tt> вы можете в окне настроек <span class="app">Сети (Network)</span>, либо выполнив в Терминале команду <span class="cli">ifconfig -a</span>.</p>
+<p>Ниже приведены примеры подключения к сети с названием <i>wifitopia</i>, в которых предполагается, что вашей беспроводной картой является <tt>/dev/net/iprowifi3945/0</tt>.</p>
+<h4>Список беспроводных сетей:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 list</pre>
-<h4>Joining unsecured wireless network:</h4>
+<h4>Подключение к открытой беспроводной сети:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia</pre>
-<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (ascii password)</h4>
+<h4>Подключение к беспроводной сети с <a href="#wep-notes">WEP-шифрованием</a>: (ascii-пароль)</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia mypassword</pre>
-<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (64-bit hex password)</h4>
+<h4>Подключение к беспроводной сети с <a href="#wep-notes">WEP-шифрованием</a>: (64-битный hex-пароль)</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia 0x4010FABEEF</pre>
-<h4>Leaving a wireless network:</h4>
+<h4>Отключение от беспроводной сети:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 leave wifitopia</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="auto-connect" rel="nofollow" id="auto-connect">Automatically connecting to a wireless network</a></h3>
-<p>To make your system connect to a given SSID at each boot automatically, you can specify your wireless networks and passwords in <tt>/boot/common/settings/network/wireless_networks</tt> with the following format:</p>
+<a name="auto-connect" rel="nofollow" id="auto-connect">Автоматическое подключение к беспроводной сети</a></h3>
+<p>Для того, чтобы система после загрузки подключалась к определённой беспроводной сети, следует создать файл по следующему адресу:<tt>/boot/common/settings/network/wireless_networks</tt>, который имеет формат:</p>
 <pre>network wifitopia {
    password mypassword
 }</pre>
-<p>If you don't create this configuration file, the system will connect to the first unencrypted network it finds.</p>
+<p>Если вы не создадите этот файл, то система будет подключаться к первой попавшейся открытой сети.</p>
 <p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>Примечания про WEP</strong></a></p>
 <ul>
 <li>64-битное WEP использует 40-битный ключ, что эквивалентно 5 буквам или 10 цифрам</li>
 <li>128-битное WEP использует 104-битный ключ, что эквивалентно 13 буквам или 26 цифрам</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with "0x" in <tt>ifconfig</tt>)</li>
+<li>шестнадцатеричная система = цифры  0-9 и буквы от A до F (начинающиеся с "0x" в <tt>ifconfig</tt>)</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="wpa" rel="nofollow" id="wpa">WPA шифрование</a></h3>
-<p><p>At the moment there is no WPA encryption available in Haiku, though there have been <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">some efforts</a> bringing it significantly closer.</p></p>
+<p><p>В настоящий момент WPA шифрование не поддерживается в Haiku. Однако сделана <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">попытка</a> добавить поддержку WPA.</p></p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<a name="install_script" rel="nofollow" id="install_script">Сценарий для установки микропрограмм (firmwares).</a></h3>
+<p>Для установки микропрограмм для Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx и Marvell 88W8335 нужно запустить:</p>
 <pre class="terminal">~&gt; install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and iprowifi22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
+<p>Intel ipw2100 и iprowifi22xx установятся без Интернет-соединения, так как лицензионные условия позволяют Haiku распространять архивы с микропрограммой (firmware). Однако они требуют ознакомления конечного пользователя с условиями лицензии перед их установкой. Broadcom 43xx и Marvell 88W8335 требуют работающего Интернет-соединения, так как файлы, содержащие их микропрограммы (firmwares), не могут распространяться с Haiku.</p>
 <p>Те, кто самостоятельно собирают  собственные образы Haiku, могут соответственным образом изменить свой <span class="cli">build/jam/UserBuildConfig</span>. Описание этого процесса, а также обновление информации по поддержке wifi можно найти в <a href="http://www.haiku-os.org/guides/wifi">онлайн-версии</a> этого документа.</p>
 <p>Если вы скачали микропрограмму (firmware), но не имеете работающего Интернет-соединения в Haiku, то онлайн-версия предлагает <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">скрипт</a>, который создаст для Вас zip файл, который нужно будет извлечь в директорию <tt>/boot</tt>. После этого у Вас будут все файлы, необходимые для запуска install-wifi-firmwares.sh.</p>
 </div>

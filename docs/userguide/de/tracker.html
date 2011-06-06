@@ -74,7 +74,7 @@
 <a id="mounting-volumes" name="mounting-volumes">Einbinden von Datenträgern</a></h2>
 <p>Um einen Datenträger (sei es eine Festplatte oder Partition, eine CD oder USB-Stick) unter Haiku verwenden zu können, muss dieser erst in das System eingebunden werden. Über einen Rechtsklick auf den Arbeitsplatz oder einem bereits eingebundenen Datenträger kann der Menüpunkt <span class="menu">Mount</span> aufgerufen werden. Dieser Punkt <span class="menu">Mount</span> findet sich auch in der Deskbar.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>Über die <span class="menu">Mount Settings</span> können Einstellungen vorgenommen werden, ob und welche Datenträger bei einem Systemstart eingebunden werden<br />
+<p>Über <span class="menu">Settings</span> können Einstellungen vorgenommen werden, ob und welche Datenträger bei einem Systemstart eingebunden werden<br />
 Im obigen Bild beispielsweise werden automatisch alle Datenträger eingebunden, die während dem Betrieb hinzugefügt werden (beispielsweise eine CD oder ein USB-Stick) und während dem Systemstart nur die Datenträger, die beim letzten Mal eingebunden waren.</p>
 <div class="box-warning">Bevor man einen Datenträger, wie zum Beispiel einen USB-Stick, vom Computer trennt, sollte man ihn unbedingt vorher über "unmount" im System abmelden. Nur so wird sichergestellt, dass alle Dateioperationen auf diesem Datenträger vollständig abgeschlossen wurden. Anderenfalls ist ein Datenverlust nicht auszuschließen!</div>
 
@@ -139,14 +139,12 @@ Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Trac
 <p>Über <span class="menu">Window | Preferences...</span> wird ein Fenster geöffnet, dessen zahlreiche Einstellungen sich stellenweise nicht sofort erschließen. Da jedoch alle Einstellungen direkt angewendet werden, kann man die Änderungen sofort erkennen.<br />Hier eine kurze Erklärung zu den nicht ganz offensichtlichen Einstellungen:</p>
 <ul>
 <li><p><b>Desktop</b> - Hier kann ausgewählt werden, ob jedes eingebundene Laufwerk für sich am Arbeitsplatz angezeigt wird, oder alle zusammen in einem Tracker-Fenster, das mit dem Icon "Disks" repräsentiert wird.</p></li>
-<li><p><b>Windows</b> - Wenn man <span class="menu">Single Window Navigation</span> markiert, wird jeder geöffnete Ordner im gleichen Fenster, statt in seinem eigenen angezeigt. Diese Einstellung unterscheidet sich zu der oben erwähnten Möglichkeit, einen Ordner bei gedrückter <span class="key">OPT</span>-Taste zu öffnen, da hier die individuellen Einstellungen zu Anzeige und Position des Fensters verloren gehen.
+<li><p><b>Windows</b> - Wenn man <span class="menu">Single window navigation</span> markiert, wird jeder geöffnete Ordner im gleichen Fenster, statt in seinem eigenen angezeigt. Diese Einstellung unterscheidet sich zu der oben erwähnten Möglichkeit, einen Ordner bei gedrückter <span class="key">OPT</span>-Taste zu öffnen, da hier die individuellen Einstellungen zu Anzeige und Position des Fensters verloren gehen.
 <br /><br />
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 </p>
-<p>Auch wenn die Ein-Fenster-Navigation sich vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p>
-<p>Anstatt zu den Dateien zu springen während man lostippt, gibt es auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten. Dadurch werden gerade Verzeichnisse mit Unmengen an Dateien auf einmal sehr übersichtlich.<br />
-Im Gegensatz zum Dateien-anspringen bleibt der Filter aktiv, bis <span class="key">ESC</span> gedrückt wird oder das Fenster geschlossen wird (bzw. bei der Nutzung von Single Window Navigation, der Ordner gewechselt wird.)<br />
-Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Tracker Einstellungen</a> aktiviert.</p></li>
+<p>Auch wenn die Ein-Fenster-Navigation sich vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man per Symbol "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p>
+<p>Anstatt zu den Dateien zu springen während man lostippt, gibt es mit <span class="menu">Type-ahead filtering</span> auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten, siehe <a href="#type-ahead-filter">weiter oben</a>.</p></li>
 <li><p><b>Date and Time</b> - Einstellung des Datumsformats für die Tracker-Fenster.</p></li>
 <li><p><b>Trash</b> - Die Verhaltensweise beim Löschen einer Datei kann hier eingestellt werden.</p></li>
 <li><p><b>Volume Icons</b> - Die Farbe des optionalen Füllstandsanzeigers bei den eingebundenen Datenträger kann hier eingestellt werden.</p></li>

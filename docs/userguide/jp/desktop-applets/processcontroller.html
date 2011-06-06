@@ -12,6 +12,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		pooper
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +51,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -59,27 +59,27 @@
 <tr><td>設定ファイル:</td><td></td><td><i>なし</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />ProcessControllerの目的はCPUと物理メモリの使用率を表示することです。それぞれのチームの観察、優先度の設定、クラッシュの場合に終了もできます。複数のCPUがあると個々のCPUを有効・無効もできます。TrackerとDeskbarのクラッシュの場合にProcessControllerのメニュから再起動することができます。</p>
-<p>左側の計器はそれおれのCPUの使用率を表して右側の計器はメモリ使用量を表します。計器の数はシステムのCPUの数によってあります。</p>
-<p>ProcessControllerはまだ実行していない場合に、起動するときにウィンドウモードまたはDeskbarモードを選択してください。ウィンドウモードで、ウインドウのサイズを変更して、<a href="../gui.html#replicants">Replicant</a>を使ってDesktopにドラッグすることもできます。<br />
-ProcessControllerはコンテキストメニュで使います。<br />
-コンテキストメニューの<span class="menu">Live in the Deskbar</span>のチェックボックスをオフにすると、ProcessControllerはDeskbarから削除します。</p>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />ProcessController の目的は CPU と物理メモリの使用率を表示することです。それぞれのチームの観察、優先度の設定、クラッシュの場合に終了もできます。複数の CPU があると個々の CPU を有効・無効もできます。TrackerとDeskbar のクラッシュの場合に ProcessController のメニュから再起動することができます。</p>
+<p>左側の計器はそれぞれの CPU の使用率を表して右側の計器はメモリ使用量を表します。計器の数はシステムの CPU の数によってあります。</p>
+<p>ProcessController はまだ実行していない場合に、起動するときにウィンドウモードまたは Deskbar モードを選択してください。ウィンドウモードで、ウインドウのサイズを変更して、<a href="../gui.html#replicants">Replicant</a>を使って Desktop にドラッグすることもできます。<br />
+ProcessController はコンテキストメニュで使います。<br />
+コンテキストメニューの <span class="menu">Live in the Deskbar</span> のチェックボックスをオフにすると、ProcessController は Deskbar から削除されます。</p>
 <h2>Quit an application</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>アプリケーションを終了には、<span class="menu">Quit an application</span>メニューでアプリケーション名をクリックしてください。この方法は強制終了ではなくて、「閉じる」ボタンをクリックみたいな方法です。でも、システムのプロセス（サーバーとデーモン）を終了しないように注意してください。その場合にシステム全体の実行の停止の可能性があります。</p>
+<p>アプリケーションを終了するには、<span class="menu">Quit an application</span> メニューでアプリケーション名をクリックしてください。この方法は強制終了ではなくて、「閉じる」ボタンをクリックみたいな方法です。でも、システムのプロセス （サーバーとデーモン） を終了しないように注意してください。その場合にシステム全体の実行の停止の可能性があります。</p>
 <h2>メモリ使用量</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
 <p>メモリ使用量の観察はかなり不正確です。</p>
 <p>このメニューはシステムでのチームのメモリ使用量を観察できます。チーム名のそばに二つの列がある。1番目の列は書き込み可能メモリの量で、2番目は読み込み専用メモリ（例えば共用ライブラリ）込みすべてのメモリ量です。</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>一番目の行、<i>System resources &amp; caches...</i> はシステムおよびすべてのアプリケーションで使用されているメモリの数を表示します。青いバーの長さはコンピュータの物理メモリの数によります。次の行はそれぞれのプロセスを使用しているメモリの数を表示します。注：バーの長さはメモリを使用している部分だけによります。</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>特定のアプリケーションだけが使用しているメモリ (書き込み権限あり)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>読み取り空間のメモリを含む (他のアプリケーションと共有可能)</td></tr>
 </table>
 
-<h2>スレッドとCPU使用率</h2>
+<h2>スレッドと CPU 使用率</h2>
 <p>このメニューでスレッドの優先度の変更、チームの終了、デバッグもできます。</p>
-<div class="box-stop">このメニューのコマンドはでーたー損失とシステムの不安定性の結果の可能性があると注意してください。</div>
+<div class="box-stop">このメニューのコマンドによる変更はシステムの奥深くに届き、データ損失とシステムの不安定性のを引き起こすかもしれません。マウスをしっかり握ってください !</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
 	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>カーネルコード</td></tr>
@@ -87,7 +87,7 @@ ProcessControllerはコンテキストメニュで使います。<br />
 	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>待機スレッド</td></tr>
 </table>
 <p>最初のレベルはチームの名であって、クリックと全体のチームを終了します。ダークブルー部分はカーネルコードがかかった部分で、青の部分は利用者コードがかかった部分で、緑の部分は待機スレッドです。</p>
-<p>第二レベルはチームのスレっづを表示します。クリックして、デバッグまたは強制終了できます。</p>
+<p>第二レベルはチームのスレッドを表示します。クリックして、デバッグまたは強制終了できます。</p>
 <p>最後のレベルはスレットの優先度を変更できます。一般的にアプリケーションの優先度を変更を変更しないほうが良いです。</p>
 
 </div>

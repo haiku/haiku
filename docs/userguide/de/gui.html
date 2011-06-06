@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,13 +60,21 @@
 <li><p>Die Deskbar ist sozusagen Haikus "Start" Menü und Taskbar, siehe <a href="deskbar.html">Deskbar</a>.</p></li>
 <li>Der gelbe Reiter zeigt mehr als den Programm- oder Dateinamen:
 <ul><li>Er lässt sich verschieben, indem man die <span class="key">SHIFT</span> Taste gedrückt hält, während man ihn an eine andere Position zieht. So lassen sich einige Fenster hintereinander anordnen, und bleiben durch ihre beschrifteten Reiter einfach erreichbar.</li>
-<li>Durch einen Doppelklick auf den Reiter werden Fenster minimiert (oder per <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Auf ein so minimiertes Fenster kann über dessen Eintrag in der <a href="deskbar.html">Deskbar</a> oder dem <a href="twitcher.html">Twitcher</a> zugegriffen werden.</li>
+<li>Durch einen Doppelklick auf den Reiter werden Fenster minimiert (oder per <span class="key">STRG</span> <span class="key">ALT</span> <span class="key">M</span>). Auf ein so minimiertes Fenster kann über dessen Eintrag in der <a href="deskbar.html">Deskbar</a> oder dem <a href="twitcher.html">Twitcher</a> zugegriffen werden.</li>
 <li>Ein Rechtsklick auf den Reiter eines Fensters (oder dessen Rahmen) schickt es in der Hierarchie offener Fenster ganz nach hinten.</li></ul></li>
 <li><p>Der Button zum Fenster schließen.</p></li>
 <li><p>Der "Zoom" Button (auch durch <span class="key">STRG</span> <span class="key">ALT</span> <span class="key">Z</span>). Die meisten Anwendungen ziehen damit ihr Fenster auf die Maximalgröße auf. Das muss aber nicht immer sein. Trackerfenster etwa, ändern sich so, dass der Inhalt optimal dargestellt wird.</p></li>
 <li><p>Die Ecke zum Ändern der Fenstergröße. Zieht man irgendwo anders am Rahmen eines Fensters, verschiebt man es stattdessen.</p></li>
 </ol>
-<div class="box-info">Hält man <span class="key">STRG</span> <span class="key">ALT</span> gedrückt, kann man mit der linken Maustaste irgendwo in ein Fenster klicken, um es zu verschieben; die rechte Maustaste schickt es in den Hintergrund.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">Bequem Fenstergröße und -position ändern</a></h2>
+<p>Arbeitet man mit mehreren Anwendungen gleichzeitig müssen oft Fenster verschoben oder in der Größe verändert werden. Es gibt dafür einen bequemeren Weg als auf die kleinen gelben Reiter zu zielen oder auf die noch kleineren Fensterrahmen. Und zu seiner geringen Größe kommt bei der Ecke noch dazu, dass man die Fenstergröße nur hier und auch nur in Richtung rechts und unten ändern kann.</p>
+<p>Haikus Lösung ist die Einführung des Tastenkürzels <span class="key">STRG</span> <span class="key">ALT</span> in Kombination mit der Maus. Siehe dazu auch das Kapitel <a href="keyboard-shortcuts.html#general">Tastaturkürzel und Tastenkombinationen</a> für weitere Kürzel zum Fenstermanagement.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>Wird <span class="key">STRG</span> <span class="key">ALT</span> gehalten, färben sich die dem Mauszeiger nächstgelegenen Fensterrahmen. Bewegt man die Maus in die Nähe eines anderen Rahmens, ändert sich das Ziel der Aktion entsprechend. Klickt und zieht man nun die Maus mit der <i>rechten Maustaste</i>, wird das Fenster entlang der eingefärbten Seite(n) vergrößert oder verkleinert.</p>
+<p>Hält man <span class="key">STRG</span> <span class="key">ALT</span> und klickt mit der <i>linken Maustaste</i> irgendwo in ein Fenster, kann man es verschieben. Ein kurzer Klick mit der <i>rechten Maustaste</i> schickt das Fenster in den Hintergrund.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -85,7 +93,7 @@ Zum übergeordneten Verzeichnis gelangt man mit dem Pop-up Menü über der Datei
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Erstellt einen neuen Ordner.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>Benennt das ausgewählte Objekt um.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Wechselt in das übergeordnete Verzeichnis.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td>Wechselt in das ausgewählte Verzeichnis.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">RETURN</span></td><td></td><td>Wechselt in das ausgewählte Verzeichnis.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Wechselt zum Desktop.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Wechselt zum Home Verzeichnis.</td></tr>
 </table>

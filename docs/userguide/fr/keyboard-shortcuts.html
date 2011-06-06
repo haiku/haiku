@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,17 +64,20 @@
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">CMD</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Passe à l’<a href="workspaces.html">espace de travail</a> X (<span class="key">Fx</span> est la touche de fonction correspondant à cet espace de travail). Pressez en plus <span class="key">MAJ</span> pour y déplacer la fenêtre active.</td></tr>
 <tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Se déplace entre les lignes/colonnes des espaces de travail disponibles. Comme ci-dessus, utilisez <span class="key">MAJ</span> pour déplacer la fenêtre active.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> + left mouse</td><td></td><td>cliquez avec le bouton gauche de la souris et faites glisser pour déplacer une fenêtre (voir le chapitre sur l'<a href="gui.html#move-resize">Interface graphique</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> + right mouse</td><td></td><td>cliquez avec le bouton droit de la souris et faites glisser pour redimensionner une fenêtre (voir le chapitre sur l'<a href="gui.html#move-resize">Interface graphique</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">Z</span></td><td></td><td>Maximise une fenêtre à sa taille alternative (souvent la taille maximale dans la majorité des applications).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">M</span></td><td></td><td>Minimise la fenêtre active.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">H</span></td><td></td><td>Cache (minimise) toutes les fenêtres de l'application active.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">F</span></td><td></td><td>Place la fenêtre active (qui a le focus) au premier plan (utilisable uniquement avec l’option « <a href="preferences/mouse.html">Focus Follows Mouse</a> »).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">B</span></td><td></td><td>Envoie la fenêtre active en arrière-plan.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Pressez cette touche pour activer le <a href="twitcher.html">Twitcher</a>.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">DEL</span></td><td></td><td>Ouvre le <a href="teammonitor.html">Team Monitor</a>.</td></tr>
 <tr><td><span class="key">CMD</span> <span class="key">ESC</span></td><td></td><td>Active la barre de menu (pour en sortir, tapez <span class="key">ESC</span>).</td></tr>
 <tr><td><span class="key">CMD</span> <span class="key">C</span></td><td></td><td>Copie la sélection dans le presse-papier.</td></tr>
 <tr><td><span class="key">CMD</span> <span class="key">X</span></td><td></td><td>Coupe la sélection pour la placer dans le presse-papier.</td></tr>
 <tr><td><span class="key">CMD</span> <span class="key">V</span></td><td></td><td>Colle le contenu du presse-papier.</td></tr>
-<tr><td><span class="key">Alt</span> <span class="key">W</span></td><td></td><td>Ferme la fenêtre active.</td></tr><tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">Z</span></td><td></td><td>Maximise une fenêtre à sa taille alternative (souvent la taille maximale dans la majorité des applications).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">M</span></td><td></td><td>Minimise la fenêtre active.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">H</span></td><td></td><td>Cache (minimise) toutes les fenêtres de l'application active.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">F</span></td><td></td><td>Place la fenêtre active (qui a le focus) au premier plan (utilisable uniquement avec l’option « <a href="preferences/mouse.html">Focus Follows Mouse</a> »).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">B</span></td><td></td><td>Envoie la fenêtre active en arrière-plan.</td></tr>
+<tr><td><span class="key">Alt</span> <span class="key">W</span></td><td></td><td>Ferme la fenêtre active.</td></tr>
 <tr><td><span class="key">CMD</span> <span class="key">Q</span></td><td></td><td>Quitte une application.</td></tr>
 <tr><td><span class="key">IMPR</span></td><td style="width:15px;"></td><td>Capture l'écran sans aucun délai, et affiche la fenêtre <a href="applications/screenshot.html">Screenshot</a>.</td></tr>
 <tr><td class="onelinetop"><span class="key">MAJ</span> <span class="key">IMPR</span></td><td></td><td>Capture l'écran en silence (sans ouvrir de fenêtre), tout en respectant les derniers réglages utilisés.</td></tr>
@@ -124,7 +127,8 @@
 <tr><td><span class="key">CMD</span></td><td></td><td>Ajoute ou retire l'élément sur lequel vous cliquez de la sélection.</td></tr>
 </table>
 <p>Dans une fenêtre Tracker, si vous commencer à taper un nom, le premier fichier correspondant à ce que vous avez tapé sera sélectionné. Si il n’y a pas de fichiers dont le nom commence par votre chaîne de recherche, le premier fichier à contenir cette chaîne dans son nom ou ses attributs sera sélectionné. Cette recherche <i>n’est pas</i> sensible à la casse.<br />
-Les lettres que vous tapez apparaîtront en bas à gauche de la fenêtre, là ou est normalement affiché le nombre d’éléments. Après une seconde, il repassera en mode normal et vous pourrez commencer une nouvelle recherche.</p>
+Les lettres que vous tapez apparaîtront en bas à gauche de la fenêtre, là ou est normalement affiché le nombre d’éléments. Après une seconde, il repassera en mode normal et vous pourrez commencer une nouvelle recherche.<br />
+Au lieu de sauter sur la première occurrence de la chaîne recherchée, Le Tracker peut être configuré pour filtrer tous les fichiers qui n'y correspondent pas (référez vous au filtrage progessif dans les <a href="tracker.html#tracker-preferences">préférences</a> du Tracker).</p>
 
 </div>
 </div>

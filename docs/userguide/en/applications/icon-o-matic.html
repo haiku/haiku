@@ -103,7 +103,7 @@ Take this icon of the Terminal, for example:</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icons-attributes" name="icons-attributes">Icons are attributes</a></h2>
-<p>Icons are stored as an attribute with their file. However, that doesn't mean that every file has to have this attribute to appear with an icon in a Tracker window: data files inherit their icon from their filetype. To globally change the filetype's icon you use the <span class="app">FileTypes</span> preferences. If you only want to add a special icon to an individual file, you use the <span class="app">FileType Add-On</span> on it instead. See topic <a href="../filetypes.html">Filetypes</a> for more information.</p>
+<p>Icons are stored as an attribute with their file. However, that doesn't mean that every file has to have this attribute to appear with an icon in a Tracker window: data files inherit their icon from their filetype. To globally change the filetype's icon you use the <span class="app">FileTypes</span> preferences. If you only want to add a special icon to an individual file, you use the <span class="app">FileType add-on</span> on it instead. See topic <a href="../filetypes.html">Filetypes</a> for more information.</p>
 <div class="box-info">Being an attribute, it follows that only filesystems supporting metadata can retain a file's individual icon. So, if you move files off your BFS volume, consider zipping them up so you don't lose icons or other attributes.</div>
 
 <h2>
@@ -164,13 +164,13 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
 </table>
 
 <h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Path Menu</a></h4>
-<p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add Rectangle</span> and <span class="menu">Add Circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
+<p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add rectangle</span> and <span class="menu">Add circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Reverse</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
-<tr><td><span class="menu">Clean Up</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate Indices Right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a ⊂ it will rotate like this: ⊂ ∩ ⊃ ∪.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate Indices Left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
+<tr><td><span class="menu">Clean up</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate indices right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a ⊂ it will rotate like this: ⊂ ∩ ⊃ ∪.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate indices left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
 </table>
 
 <h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Path Properties</a></h4>
@@ -204,11 +204,11 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
 <p>Shapes lie on top of each other, each is on its own layer, if you will. To reorder them you drag&amp;drop their entry to a different position in the list.</p>
 
 <h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Shape Menu</a></h4>
-<p>The <span class="menu">Shape</span> menu offers the before mentioned possibility to <span class="menu">Add Empty, With Path/Style/Path&amp;Style</span> and to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a shape. Then, there is:</p>
+<p>The <span class="menu">Shape</span> menu offers the before mentioned possibility to <span class="menu">Add empty, with path/style/path &amp; style</span> and to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a shape. Then, there is:</p>
 <table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reset Transformation</span></td><td style="width:15px;"></td><td>Reverts all the move, resize and rotate transformations you have applied to the shape.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Freeze Transformation</span></td><td></td><td>When you transform a shape, its assigned path(s) stay in their original position. This may be intended; maybe more than one shape is using that path, maybe you intentionally used <span class="menu">Options | Snap to Grid</span> to set the points at precise pixel borders.<br />
-If not, "Freeze Transformation" will apply the current shape transformation to the assigned path(s). A future "Reset Transformation" will then return to this new state.</td></tr>
+<tr><td><span class="menu">Reset transformation</span></td><td style="width:15px;"></td><td>Reverts all the move, resize and rotate transformations you have applied to the shape.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Freeze transformation</span></td><td></td><td>When you transform a shape, its assigned path(s) stay in their original position. This may be intended; maybe more than one shape is using that path, maybe you intentionally used <span class="menu">Options | Snap to grid</span> to set the points at precise pixel borders.<br />
+If not, "Freeze transformation" will apply the current shape transformation to the assigned path(s). A future "Reset Transformation" will then return to this new state.</td></tr>
 </table>
 
 <h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Shape Properties</a></h4>
@@ -256,7 +256,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <p>You can move, resize and rotate the representing box of a gradient on the canvas until it fits your needs. This works just like with shapes.</p>
 
 <h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Style Menu</a></h4>
-<p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset Transformation</span>.</p>
+<p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset transformation</span>.</p>
 
 <h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Style Properties</a></h4>
 <p>The <span class="menu">Name</span> is the only <span class="menu">Properties</span> of a style.</p>
@@ -279,9 +279,9 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <p>Besides a <span class="menu">Name</span> and the actual <span class="menu">Width</span> for the transformer, the <span class="menu">Properties</span> view has these (depending on its type slightly differing) options:</p>
 <table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Caps</span></td><td style="width:15px;"></td><td><i>Stroke only</i>. Defines the end caps of a line: <span class="menu">Butt</span>, <span class="menu">Square</span> or <span class="menu">Round</span>.</td></tr>
-<tr><td><span class="menu">Detect Orient.</span></td><td></td><td><i>Contour only</i>. Determines if the contour is to the inside or outside the path.</td></tr>
+<tr><td><span class="menu">Detect orient.</span></td><td></td><td><i>Contour only</i>. Determines if the contour is to the inside or outside the path.</td></tr>
 <tr><td><span class="menu">Joins</span></td><td></td><td>Defines how lines are joint at a point: <span class="menu">Miter</span>, <span class="menu">Round</span> or <span class="menu">Bevel</span>.</td></tr>
-<tr><td><span class="menu">Miter Limit</span></td><td></td><td>Only when the above <span class="menu">Joins</span> is set to "Miter" this setting influences the looks of the miter joint. </td></tr>
+<tr><td><span class="menu">Miter limit</span></td><td></td><td>Only when the above <span class="menu">Joins</span> is set to "Miter" this setting influences the looks of the miter joint. </td></tr>
 </table>
 
 
@@ -289,18 +289,18 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-save" name="i-o-m-save">Saving an icon</a></h3>
 <p>There's your usual menu bar at the top, <span class="menu">File</span>, <span class="menu">Edit</span>, <span class="menu">Options</span>. The usage is pretty much self-explaining, so we'll only look at how to save your work.</p>
-<p><span class="menu">File | Save As...</span> will save in a special Icon-O-Matic format that retains additional information like the names of paths, shapes and styles. These will be stripped from the actual icon once you export it to save space. It's a good idea to back-up your work like this, because without named objects everything's named "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;" which makes specific changes tedious.</p>
+<p><span class="menu">File | Save as...</span> will save in a special Icon-O-Matic format that retains additional information like the names of paths, shapes and styles. These will be stripped from the actual icon once you export it to save space. It's a good idea to back-up your work like this, because without named objects everything's named "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;" which makes specific changes tedious.</p>
 
-<p><span class="menu">File | Export As...</span> opens a familiar save panel with a file format pop-up menu at the bottom, offering these choices:</p>
+<p><span class="menu">File | Export as...</span> opens a familiar save panel with a file format pop-up menu at the bottom, offering these choices:</p>
 <table summary="file formats" border="0" cellspacing="0" cellpadding="2">
 <tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Format</td></tr>
 <tr><td>HVIF RDef</td><td></td><td>Saves as resource used by programmers</td></tr>
-<tr><td>HVIF Source Code</td><td></td><td>Saves as source code used by programmers</td></tr>
+<tr><td>HVIF source code</td><td></td><td>Saves as source code used by programmers</td></tr>
 <tr><td>SVG</td><td></td><td>Saves as SVG</td></tr>
 <tr><td>PNG</td><td></td><td>Saves as a 64px sized PNG</td></tr>
-<tr><td>PNG Set</td><td></td><td>Saves as 16, 32 and 64px sized PNGs</td></tr>
-<tr><td>BEOS:ICON Attribute</td><td></td><td>Choose a file and set its icon attribute directly</td></tr>
-<tr><td>META:ICON Attribute</td><td></td><td>Choose a file and attach the icon as mere meta data</td></tr>
+<tr><td>PNG set</td><td></td><td>Saves as 16, 32 and 64px sized PNGs</td></tr>
+<tr><td>BEOS:ICON attribute</td><td></td><td>Choose a file and set its icon attribute directly</td></tr>
+<tr><td>META:ICON attribute</td><td></td><td>Choose a file and attach the icon as mere meta data</td></tr>
 </table>
 
 

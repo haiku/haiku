@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Kentaro Ozeki
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -49,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />キーマップ</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -63,7 +63,7 @@
 <p>キーマップウィンドウは向かって右側にあなたのキーボードの図を示します。実際のキーを押すと、対応するキーが暗くなり、割り当てられている文字や記号が下の<i>Sample and Clipboard</i>テキストフィールドに入力されます。ここからドキュメントにコピー&amp;ペーストすることもできます。<br />
 従って、キーマップの設定はローカルのキーマップを構成するだけでなく、他の言語で使われる特別な文字や記号を探すのにも役立ちます。例えば、キーマップを"French(フランス語)"に変更し、"ç"を探してFrançoisへのメールにコピーすることができます。(もっとも、他のキーマップでも"セディーユ"は見つかるでしょう)</p>
 <p><span class="key">SHIFT</span>キー、<span class="key">CONTROL</span>キーや<span class="key">OPTION</span>キーといった修飾キーを押すと、表示されるキーボードはそれに応じて変化します。 </p>
-<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
+<p>青い背景でマークされたキーは<i>Dead Keys</i> と呼ばれ、その後に押すキーを変更することができます。マウスでそれらの青いキーをクリックすると、変更できるキーが黄色に照らされます。もう一度クリックすると元に戻ります。これは例えば、é、ñ、óやëといった文字です。</p>
 <p>キーボードの図の下に、さらに2つのオプションがあります: </p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Select Dead Keys</span>(デッドキーを選択)</td><td> </td><td>上で触れた青いキーの設定用です。</td></tr>
@@ -88,7 +88,7 @@
 <p>このキーマップをキーマップパネルにインポートしたい場合は、まずファイルをバイナリ形式に不コンパイルする必要があります: </p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
 <p>これで生成される<span class="cli">keymap.out</span>を<span class="menu">Open...</span>メニューから読込むことができます。ちなみに、次のキーマップコマンドでもこのバイナリ形式を同様に読込むことができます: <span class="cli">keymap -l &lt; keymap.out</span></p>
-<p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
+<p>これはダンプされたファイルです。(整列されているキーの最も右側はこのページの見栄えをよくするために省かれています): </p>
 
 <pre>#!/bin/keymap -s
 #
