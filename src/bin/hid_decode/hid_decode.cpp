@@ -54,11 +54,6 @@ main(int argc, char *argv[])
 		return 5;
 	}
 
-	for (uint32 i = 0; i < parser.CountReports(HID_REPORT_TYPE_ANY); i++)
-		parser.ReportAt(HID_REPORT_TYPE_ANY, i)->PrintToStream();
-
-	if (parser.RootCollection() != NULL)
-		parser.RootCollection()->PrintToStream();
-
+	parser.PrintToStream();
 	return 0;
 }
