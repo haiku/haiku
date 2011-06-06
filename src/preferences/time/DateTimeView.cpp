@@ -224,7 +224,14 @@ DateTimeView::_InitView()
 	fClock->SetTime(time.Hour(), time.Minute(), time.Second());
 
 	BStringView* text = new BStringView("clockSetTo",
-		B_TRANSLATE("Clock set to:"));
+		B_TRANSLATE("Hardware clock set to:"));
+	text->SetToolTip(B_TRANSLATE(
+		"This setting controls how Haiku will display your time based on how\n"
+		"time is measured in the computer's hardware clock. Windows is usually\n"
+		"set to local time, meaning the hardware clock is measured in the same\n"
+		"time as the configured time zone. When this is set to GMT it means the\n"
+		"hardware clock is measured based on GMT and Haiku will adjust the time\n"
+		"it shows based on the configured time zone."));
 	fLocalTime = new BRadioButton("localTime",
 		B_TRANSLATE("Local time"), new BMessage(kRTCUpdate));
 	fGmtTime = new BRadioButton("greenwichMeanTime",
