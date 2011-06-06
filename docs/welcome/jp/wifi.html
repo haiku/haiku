@@ -13,6 +13,7 @@
  * Translators:
  *		Shota Fukumori
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +51,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2>Haiku での Wifi</h2>
 <h3>
@@ -68,14 +68,14 @@ Aironet PCI4800<br />
 <li><p><i>broadcom43xx</i> は以下をサポートします<br />
 BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312, BCM4318
 </p></li>
-<li><p><i>ipw2100</i> supporting Intel Pro Wireless 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting Intel Pro Wireless<br />
+<li><p><i>iprowifi2100</i> は Intel Pro Wireless 2100 チップをサポートします</p></li>
+<li><p><i>iprowifi2200</i> は以下の Intel Pro Wireless をサポートします<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting Intel Pro Wireless 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting Intel Pro Wireless 4965 chips</p></li>
+<li><p><i>iprowifi3945</i> は  Intel Pro Wireless 3945 チップをサポートします</p></li>
+<li><p><i>iprowifi4965</i> は Intel Pro Wireless 4965 チップをサポートします</p></li>
 <li><p><i>marvell88w8335</i> は以下をサポートします<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
@@ -87,7 +87,7 @@ RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p>ralink2860 supporting Ralink RT2860</p></li>
+<li><p>ralink2860 は Ralink RT2860 をサポートします。</p></li>
 <li><p><i>wavelanwifi</i> は少なくとも以下をサポートします<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
@@ -103,49 +103,49 @@ Addtron AWA-100 PCI
 </p></li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="connect" rel="nofollow" id="connect">Connecting to a wireless network</a></h3>
-<p>Besides of course unencrypted networks, Haiku has preliminary support for accessing wireless networks via <a href="#wep-notes" rel="nofollow">WEP encryption keys</a>. WEP is an early encryption method, although not the most secure.</p>
-<p>You can list available networks, join and leave them with the command <span class="cli">ifconfig</span> from Terminal:</p>
+<a name="connect" rel="nofollow" id="connect">ワイヤレスネットワークへの接続</a></h3>
+<p>Haiku は、暗号化されていないネットワークに加えて、<a href="#wep-notes" rel="nofollow">WEP 暗号化キー</a>を用いたネットワークアクセスの予備的なサポートがあります。 WEP は初期の暗号化メソッドで、もっともセキュアということではありません。</p>
+<p>ターミナルからコマンド <span class="cli">ifconfig</span> を使って、利用可能なネットワークの一覧、ネットワーク接続、そしてネットワーク接続を閉じることができます。:</p>
 <pre class="terminal">ifconfig [wifi_device_path] [list|join|leave] (key)</pre>
-<p>You can find your <tt>wifi_device_path</tt> in the <span class="app">Network</span> preferences applet, or by executing <span class="cli">ifconfig -a</span>.</p>
-<p>Below are a few examples of connecting to a wireless network named <i>wifitopia</i>. For these examples we are assuming your wifi network card is <tt>/dev/net/iprowifi3945/0</tt>.</p>
-<h4>Listing wireless networks:</h4>
+<p><tt>wifi_device_path</tt> は、<span class="app">ネットワーク</span> プリファレンスアプレット、または <span class="cli">ifconfig -a</span> を実行することで見つけられます。</p>
+<p>以下は、<i>wifitopia</i> と名付けたワイヤレスネットワークへの接続の例です。これらの例では、wifi ネットワークカードを <tt>/dev/net/iprowifi3945/0</tt> と仮定しています。</p>
+<h4>ワイヤレスネットワークの一覧:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 list</pre>
-<h4>Joining unsecured wireless network:</h4>
+<h4>暗号化されていないワイヤレスネットワークへの接続:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia</pre>
-<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (ascii password)</h4>
+<h4><a href="#wep-notes">WEP 暗号化された</a>ワイヤレスネットワークへの接続: (ascii パスワード)</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia mypassword</pre>
-<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (64-bit hex password)</h4>
+<h4><a href="#wep-notes">WEP 暗号化された</a> ワイヤレスネットワークへの接続: (64-bit 16 進数パスワード)</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia 0x4010FABEEF</pre>
-<h4>Leaving a wireless network:</h4>
+<h4>ワイヤレスネットワーク接続を閉じる:</h4>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 leave wifitopia</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="auto-connect" rel="nofollow" id="auto-connect">Automatically connecting to a wireless network</a></h3>
-<p>To make your system connect to a given SSID at each boot automatically, you can specify your wireless networks and passwords in <tt>/boot/common/settings/network/wireless_networks</tt> with the following format:</p>
+<a name="auto-connect" rel="nofollow" id="auto-connect">自動的にワイヤレスネットワークに接続する</a></h3>
+<p>起動毎にシステムを特定の SSID に自動的に接続させるために、<tt>/boot/common/settings/network/wireless_networks</tt> に次のフォーマットでワイヤレスネットワークとパスワードを記入してもよいです。</p>
 <pre>network wifitopia {
    password mypassword
 }</pre>
-<p>If you don't create this configuration file, the system will connect to the first unencrypted network it finds.</p>
+<p>この設定を作成していない場合、システムは最初に見つけた暗号化されていないネットワークに接続しようとするでしょう。</p>
 <p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP ノート</strong></a></p>
 <ul>
-<li>64-bit WEP 暗号 は 40-bit のキーを使用します。 すなわち 13文字の文字列か、26の16進法キーです。</li>
-<li>128-bit WEP 暗号 は 104-bit のキーを使用します。 すなわち13文字の文字列か、26の16進法キーです。</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with "0x" in <tt>ifconfig</tt>)</li>
+<li>64-bit WEP 暗号 は 40-bit のキーを使用します。 すなわち 13 文字の文字列か、26 桁の 16 進法キーです。</li>
+<li>128-bit WEP 暗号 は 104-bit のキーを使用します。 すなわち 13 文字の文字列か、26 桁の 16 進法キーです。</li>
+<li>16 進法キー = 0 から 9、A から F で構成された文字列 (<tt>ifconfig</tt> では "0x" を頭につける)</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="wpa" rel="nofollow" id="wpa">WPA 暗号化</a></h3>
-<p><p>At the moment there is no WPA encryption available in Haiku, though there have been <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">some efforts</a> bringing it significantly closer.</p></p>
+<p><p>今現在、Haiku では WPA 暗号を利用することができません。しかし、<a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">いくつかの努力</a>によりかなり近づいています。</p></p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<p>Intel ipw2100、Intel iprowifi2200/2225/2915、Broadcom 43xx &amp; Marvell 88W8335 のためのファームウェアをインストールするには、以下を実行する必要があります。</p>
 <pre class="terminal">install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and iprowifi22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
+<p>Haiku にオリジナルのファームウェアアーカイブを配布することをライセンス条項が許可しているため、 Intel ipw2011、iprowifi22xx はエンドユーザー承認があればインターネット接続無しでインストールできます。しかし、 Broadcom 43xx と Marvell 88W8335 は、Haiku と共に個別のファームウェアを配布できないため、アクティブなインターネット接続が必要です。</p>
 <p>自分で Haiku イメージ をビルドしている方は、上述に従い、 <span class="cli">build/jam/UserBuildConfig</span> を編集することができます。 編集についての詳細と wifi の話題に関するとさまざまなアップデートは<a href="http://www.haiku-os.org/guides/wifi">このドキュメントのオンライン版</a>を参照してください。</p>
-<p>もし、ファームウェアをダウンロードする必要があるが、 Haiku 環境にインターネット接続が無い場合は、 Haiku の <tt>/boot</tt> に展開するためのzipファイルを作成する<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">シェルスクリプト</a>がオンライン版にあります。</p>
+<p>もし、ファームウェアをダウンロードする必要があるが、Haiku 環境にインターネット接続が無い場合は、Haiku の <tt>/boot</tt> に展開するための zip ファイルを作成する<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">シェルスクリプト</a>がオンライン版にあります。</p>
 </div>
 </div>
 

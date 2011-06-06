@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -52,7 +52,7 @@
 
 <h1>快捷键和组合键</h1>
 
-<p>默认情况下，Haiku的快捷键，例如从菜单中调用命令，不是通常所用的 <span class="key">CTRL</span> 键，而是 <span class="key">ALT</span> 键。这里存在历史的原因，因为BeOS在某些方面沿用了MacOS的习惯。在您熟悉使用之后，它们就会带来诸多方便，例如， <span class="key">ALT</span> <span class="key">C</span> 和 <span class="key">ALT</span> <span class="key">V</span> 无缝集成到了终端的 <acronym title="Bourne Again Shell">bash</acronym> shell ，而使用 <span class="key">CTRL</span> <span class="key">C</span> 将会结束正在运行的进程。</p>
+<p>默认情况下，Haiku的快捷键，例如从菜单中调用命令，不是通常所用的 <span class="key">CTRL</span> 键，而是 <span class="key">ALT</span> 键。这里存在历史的原因，因为 BeOS 在某些方面沿用了 MacOS 的习惯。在您熟悉使用之后，它们就会带来诸多方便，例如， <span class="key">ALT</span> <span class="key">C</span> 和 <span class="key">ALT</span> <span class="key">V</span> 无缝集成到了终端的 <acronym title="Bourne Again Shell">bash</acronym> shell ，而使用 <span class="key">CTRL</span> <span class="key">C</span> 将会结束正在运行的进程。</p>
 <p>不管怎样，您可以在<a href="preferences/keymap.html">键盘映射</a>首选项中将其切换为您更熟悉的 <span class="key">CTRL</span> 键。而在用户指南中总是使用 <span class="key">ALT</span> 命令键来描述默认配置。</p>
 <p>如果您对自己使用的键盘的 <span class="key">OPT</span> 或者 <span class="key">MENU</span> 键不是很清楚，您也可以使用<a href="preferences/keymap.html">键盘映射</a>首选项。在那里，当您在键盘上按下某个键时，您就可以看到相应的按键显示。</p>
 
@@ -63,17 +63,20 @@
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>切换到 <a href="workspaces.html">工作区</a> X（<span class="key">Fx</span>是关联到该工作区的功能键）。如果同时按下了 <span class="key">SHIFT</span> 键，将会和当前工作窗口一起进行切换。</td></tr>
 <tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>导航至相应的可用工作区。同时按下 <span class="key">SHIFT</span> 将会连同活动窗口一起进行切换。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + 左键</td><td></td><td>点击并使用左键拖动窗口（查阅章节 <a href="gui.html#move-resize">GUI</a>）。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + 右键</td><td></td><td>点击并使用右键拖动窗口（查阅章节 <a href="gui.html#move-resize">GUI</a>）。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>还原窗口大小（对于多数程序，将最大化窗口）。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>最小化当前活动窗口。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>隐藏（最小化）当前活动程序的所有窗口。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>置前活动窗口（仅适用于 <a href="preferences/mouse.html">Focus Follows Mouse</a> 鼠标设置）。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>置后当前活动窗口。 </td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>保持按下将会弹出<a href="twitcher.html">任务切换器</a>。</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>打开<a href="teammonitor.html">程序监视器</a>。</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>进入菜单栏（使用 <span class="key">ESC</span> 键离开菜单栏）</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>复制选中文件到剪切板。</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>剪切选中文件到剪切板。</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>粘贴剪切板中的内容。</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>关闭当前活动窗口。</td></tr><tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>还原窗口大小（对于多数程序，将最大化窗口）。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>最小化当前活动窗口。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>隐藏（最小化）当前活动程序的所有窗口。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>置前活动窗口（仅适用于 <a href="preferences/mouse.html">Focus Follows Mouse</a> 鼠标设置）。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>置后当前活动窗口。 </td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>关闭当前活动窗口。</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>结束程序。</td></tr>
 <tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>实时进行屏幕截图，并且启动<a href="applications/screenshot.html">屏幕截图</a>面板。</td></tr>
 <tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>安静的执行屏幕截图（不打开截图面板），但是使用最近的设置。</td></tr>
@@ -122,8 +125,9 @@
 <tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>按下该键，将会选中第一个选中文件和当前选中文件之间的所有文件。</td></tr>
 <tr><td><span class="key">ALT</span></td><td></td><td>添加选中的项目作为选择项，或者从选择项中移除选中的项目。</td></tr>
 </table>
-<p>在Tracker窗口中，如果您刚开始输入，Tracker将会不断向前滚动，选择最匹配您输入的字符的搜索结果。如果没有文件的开头匹配您输入的字符，那么它将会选择在名字或者其他显示的属性中包含这些字符的文件。 这类搜索 <i>不是</i> 大小写敏感的。<br />
-您输入的字符显示在窗口的左下角，在这里会显示文件的数目。在几秒钟之后，它将会恢复，您就可以开始新的递进式搜索。</p>
+<p>在 Tracker 窗口中，如果您刚开始输入，Tracker 将会不断向前滚动，选择最匹配您输入字符的搜索结果。如果没有文件的开头匹配您输入的字符，那么它将会选择在名字或者其他显示的属性中包含这些字符的文件。 这类搜索 <i>不是</i> 大小写敏感的。<br />
+您输入的字符显示在窗口左下角，在这里会显示文件的数目。在几秒钟之后，它将会恢复，您就可以开始新的递进式搜索。<br />
+Tracker 不仅可以跳转到首个搜索字符串出现的地址，并且可以设置以过滤所有未匹配的文件。请查阅 <a href="tracker.html#tracker-preferences">实时过滤</a>。</p>
 
 </div>
 </div>

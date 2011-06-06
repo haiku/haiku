@@ -13,6 +13,7 @@
  *		mrNoisy
  *		Rodastahm Islamov
  *		Diver
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -78,7 +79,7 @@
 <p>Включенный режим <span class="menu">Уточнение</span> выравнивает символы таким образом, что их вертикальные и горизонтальные границы будут располагаться между двумя пикселями. Результатом чего будет превосходная контрастность символов, особенно в случае черного текста на белом фоне. Текст становится более четким. Так же этот режим можно применить исключительно для <span class="menu">Моноширинных шрифтов</span>, что особенно полезно на устройствах с низким разрешением, таких как нетбуки. Когда уточнение включено, мелкие шрифты могут выглядеть довольно-таки плохо, но этот режим все же позволит получить выгоду от уточнения в текстовых редакторах и в Terminal.</p>
 <p>Заметить разницу, вносимую уточнением, можно, сравнив эти увеличенные снимки экрана:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Уточнение: выключено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Уточнение: включено</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Уточнение: выключено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Уточнение: включено</td></tr>
 </table>
 <p>Следует отметить, что текст во всех окнах <span class="app">Magnify</span> на этой странице, разумеется, отображается с различными параметрами уточнения. То есть Вы можете сравнить результаты настройки на реальном примере: заголовок окна, набранный полужирным шрифтом, или же надпись "33 x 15 @ 8 pixels/pixel".</p>
 
@@ -90,19 +91,19 @@
 <span class="menu">Субпиксельное сглаживание</span>, гораздо более эффективно, особенно на  ЖК-мониторах (высокого разрешения). При таком сглаживании меняется не интенсивность цвета пикселя, а его оттенок, "устанавливающий" границу элемента на доли пикселя, за счет того, что ЖК-мониторы используют красную, зеленую и синюю компоненту для отображения каждого пикселя.</p>
 <p>И снова сравним два этих метода на увеличенных снимках экрана:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Оттенки серого: включено, Уточнение: выключено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Субпиксельное сглаживание: включено, Уточнение: выключено</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Оттенки серого: включено, Уточнение: выключено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Субпиксельное сглаживание: включено, Уточнение: выключено</td></tr>
 </table>
 <p>Субпиксельное сглаживание добавляет цветные артефакты на границах объектов, что врядли кому-то понравится. Haiku позволяет вам одновременно использовать оба метода сглаживания - перемещая бегунок, вы сможете найти их приемлемое соотношение.</p>
 <div class="box-info">Субпиксельное сглаживание в комбинации с уточнением - вопрос патентирования ПО, поэтому такой режим недоступен по умолчанию. В зависимости от законодательства страны, в которой вы проживаете, вы можете получить разблокированную версию. Приносим свои извинения. Свяжитесь с вашим представителем.</div>
 <p>Если вы активируете уточнение с субпиксельным сглаживанием путем модификации и перекомпиляции исходного кода, то сможете сравнить результат со сглаживанием оттенками серого:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Оттенки серого: включено, Уточнение: включено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Субпиксельное сглаживание: включено, Уточнение: включено</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Оттенки серого: включено, Уточнение: включено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Субпиксельное сглаживание: включено, Уточнение: включено</td></tr>
 </table>
 <p><br /></p>
 <p>В нижней части панели располагаются две кнопки:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">По умолчанию</span></td><td> </td><td>сбросить все настройки на значения по умолчанию.</td></tr>
-<tr><td><span class="button">Вернуть</span></td><td> </td><td>вернуть настройки, которые были установлены до запуска панели настройки.</td></tr>
+<tr><td><span class="button">По умолчанию (Defaults)</span></td><td> </td><td>сбросить текущие настройки и установить их на значения по умолчанию.</td></tr>
+<tr><td><span class="button">Вернуть (Revert)</span></td><td> </td><td>вернуть настройки, которые были установлены до запуска панели настройки.</td></tr>
 </table>
 
 </div>

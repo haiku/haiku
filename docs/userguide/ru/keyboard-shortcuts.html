@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,17 +64,20 @@
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Переключиться на <a href="workspaces.html">рабочий стол</a> X (<span class="key">Fx</span>, где x номер рабочего стола). Для перемещения активного окна следует также удерживать клавишу <span class="key">SHIFT</span>.</td></tr>
 <tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Перемещение по рабочим столам. Для перемещения активного окна следует также удерживать клавишу <span class="key">SHIFT</span>.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + левый щелчок мыши</td><td></td><td>Для перемещения окна щёлкните левой кнопкой мыши и потащите его. (более подробно в теме <a href="gui.html#move-resize">Графический интерфейс</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + правый щелчок мыши</td><td></td><td>Для изменения размера окна щёлкните правой кнопкой мыши и потащите его. (более подробно в теме <a href="gui.html#move-resize">Графический интерфейс</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Развернуть активное окно на весь экран.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Свернуть активное окно.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Свернуть все окна активного приложения.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Поднять активное окно на передний план (работает только при включенной опции  <a href="preferences/mouse.html">фокус следует за мышью </a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Отправить активное окно на задний план.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Переключиться между активными приложениями, при удержании вызовется <a href="twitcher.html">Twitcher</a>.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Вызывать <a href="teammonitor.html">Team Monitor</a>.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Вызвать меню приложения (для того, чтобы покинуть, используйте клавишу <span class="key">ESC</span>).</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Скопировать выделение в буфер обмена.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Вырезать выделение в буфер обмена.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Вставить содержимое буфера обмена.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Закрыть активное окно.</td></tr><tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Развернуть активное окно на весь экран.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Свернуть активное окно.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Свернуть все окна активного приложения.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Поднять активное окно на передний план (работает только при включенной опции  <a href="preferences/mouse.html">фокус следует за мышью </a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Отправить активное окно на задний план.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Закрыть активное окно.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Закрыть активное приложение.</td></tr>
 <tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Снять снимок экрана и запустить приложение <a href="applications/screenshot.html">Снимок экрана</a>.</td></tr>
 <tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Снять снимок экрана без запуска приложения "Снимок экрана", используя последние настройки.</td></tr>
@@ -123,9 +126,10 @@
 <tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>Позволяет выделить все элементы между первым выделенным и тем, на который вы нажмете.</td></tr>
 <tr><td><span class="key">ALT</span></td><td></td><td>Позволяет добавить или удалить элемент к уже выделенным, щелкнув по нему мышью.</td></tr>
 </table>
-<p>Если вы начнете набирать текст в окне Tracker, то выделится файл, который больше всего совпадает с набранными символами. Если нет файла, имя которого начинается с набранных вами символов, то будет выделен файл, в имени или атрибуте которого эти символы содержатся  
+<p>Если вы начнете набирать текст в окне Tracker, то выделится файл, название которого больше всего совпадает с набранными символами. Если нет файла, имя которого начинается с набранных вами символов, то будет выделен файл, в имени или атрибуте которого эти символы содержатся  
 (в любой части имени файла). Этот поиск <i>не</i> чувствителен к регистру.<br />
-Символы, которые вы набираете, появляются в левом нижнем углу окна, где обычно указано количество файлов. Через секунду все вернется к исходной позиции, и вы сможете начать новый процесс поиска.</p>
+Символы, которые вы набираете, появляются в левом нижнем углу окна, где обычно указано количество файлов. Через секунду все вернется к исходной позиции, и вы сможете начать новый поиск.
+Помимо этого способа есть ещё один. Он позволяет фильтровать список файлов и папок по названию, путём ввода символов. Более подробно в теме <a href="tracker.html#tracker-preferences">Фильтрация файлов и папок по названию</a>.</p>
 
 </div>
 </div>

@@ -49,7 +49,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,13 +62,16 @@ ShowImage fournit un minimum de fonctionnalités d'édition pour recadrer, faire
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Visualisation</h2>
 <img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
 <p>Le menu <span class="menu">View</span> (Affichage) propose de lancer un diaporama de toutes les images d'un dossier (ou d'un résultat de requête) suivant une vitesse de défilement (<span class="menu">Slide delay</span>) de 2 à 20 secondes.</p>
-<p>Other commands apply to the currently displayed image (without changing the size of the window):<br />
-<span class="menu">Original size</span> shows the image with a 100% zoom factor.<br />
-<span class="menu">Fit to window</span> shrinks the image back into the window fame, e.g. after having zoomed into it or after resizing the window.<br />
-<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> move into and out of the image in 10% steps. Zooming is also done with the mouse wheel; to pan an image bigger than the window, simply left-click and drag your mouse around.</p>
-<p>Two settings don't just apply to the currently displayed image and are remembered when browsing from one image to the next:<br />
-<span class="menu">High quality zooming</span> applies a very fast filter when zooming to reduce jagged lines and produce a smoother result.<br />
-<span class="menu">Stretch to window</span> will stretch smaller images to fill the current window frame.</p>
+<p>D'autres commandes s'appliquent à l'image actuellement affichée (sans changer la taille de la fenêtre) :<br />
+Taille originale (<span class="menu">Original size</span>) affiche l'image à sa taille réelle, sans aucun facteur de zoom.<br />
+Ajuster à la fenêtre (<span class="menu">Fit to window</span>) réduit l'image à l'espace disponible dans la fenêtre, par exemple, après avoir zoomé ou redimensionné la fenêtre.<br /> 
+Zoom avant (<span class="menu">Zoom in</span>) et Zoom arrière (<span class="menu">Zoom out</span>) grossit ou réduit l'image par pas de 10%. Le zoom peut aussi être effectué avec la molette de la souris.<br />
+Pour recadrer une image plus grande que la fenêtre, il suffit maintenir le bouton gauche de la souris pendant que vous la déplacer.</p>
+<p>Deux réglages ne concernent pas uniquement l'image en cours, mais sont mémorisés quand vous naviguer d'une image à l'autre :<br />
+le <span class="menu">Zoom haute qualité
+</span> (<span class="menu">High quality zooming</span>) applique un filtre très rapide pour lisser les effets de crénelage lors d'un zoom important et améliorer ainsi le rendu de l'image<br />.
+<span class="menu">Étirer à la fenêtre</span> (<span class="menu">Stretch to window</span>)
+étendra les images les plus petites pour remplir l'espace disponible dans la fenêtre courante.</p>
 <p>Ensuite, il y a un mode mode plein écran (<span class="menu">Full screen</span>) dans lequel une option <span class="menu">Show caption in full screen mode</span> recouvre l'image d'une légende affichant le nom du fichier.</p>
 <p>Enfin, <span class="menu">Show tool bar</span> (afficher la barre d'outils) affiche ou masque les icônes de commandes :</p>
 <img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
@@ -82,16 +84,17 @@ ShowImage fournit un minimum de fonctionnalités d'édition pour recadrer, faire
 <p>Le menu <span class="menu">Browse</span> (parcourir) propose un autre type de parcours : Certains formats d'image, comme le TIFF, peuvent contenir plusieurs pages dans un fichier. Les commandes comme <span class="menu">First page</span> (Première page) et <span class="menu">Next page</span> (Page suivante) vous permettent de naviguer entre ces pages.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Édition</h2>
 <img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
-<p>The <span class="menu">Image</span> menu offers the few image manipulations necessary for an image viewer: rotating and flipping the image. Note however, that the actual image data won't be changed. Only an attribute is added to the file so it'll be shown rotated or flipped the next time you open it.</p>
+<p>Le menu <span class="menu">Image</span> vous propose les quelques manipulations d'images nécessaires pour une visionneuse : rotation et retournement de l'image. Notez cependant que les données réelle de l'image ne seront pas modifiées. Seul un attribut est ajouté au fichier de sorte qu'il sera affiché de la même manière à la prochaine ouverture.</p>
 <p><span class="menu">Use as backgroud...</span> (utiliser comme fond d'écran…)  ouvrira les préférences du fond d'écran (<a href="../preferences/backgrounds.html">Backgrounds</a>) ce qui vous permettra de redéfinir l'image de fond de vos espaces de travail avec l'image en cours.</p>
-<p>Cropping is another feature that's needed sometimes. To define the frame to cut to, you can switch to <span class="menu">Selection mode</span> from the <span class="menu">Edit</span> menu and drag out a box with your left mouse button. If you don't want to change modes first, you can create this box in "normal mode" by simply holding <span class="key">CTRL</span> while left-click-dragging, which otherwise would just pan the image around.<br />
-<span class="menu">Clear selection</span> or <span class="key">ESC</span> will remove the selection box.</p>
+<p>Le recadrage est une autre fonction qui peut s'avérer nécessaire. Pour définir le recadrage, vous pouvez passer en "Mode de sélection" (<span class="menu">Selection mode</span>) 
+à partir du menu "Éditer" (<span class="menu">Edit</span>), puis faites glisser la souris avec le bouton gauche enfoncé pour dessiner le nouveau cadre. Si vous ne voulez pas changer de mode avant, vous pouvez créer cette boîte en mode "normal", en maintenant simplement la touche <span class="key">Ctrl</span> et le bouton gauche de la souris enfoncés pendant que vous faites glisser la souris pour dessiner le nouveau cadre. Sans quoi, l'image serait simplement déplacée.<br />
+<span class="menu">Clear selection</span> (nettoyer la sélection) or <span class="key">Échap</span> supprimeront la boîte de sélection.</p>
 <p>Le chapitre suivant présente comment sauvegarder cette zone recadrée.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Enregistrement et convertion</h2>
-<p>To save or convert an image into any available format, you can invoke the normal <span class="menu">Save as...</span> item from the <span class="menu">File</span> menu, select the format and choose a file name.<br />
-Often quicker, especially when the Tracker window with the destination folder is already open, is using drag &amp; drop.</p>
+<p>Pour enregistrer ou convertir une image dans l'un des formats disponibles, Il vous suffit d'invoquer l'option "enregistrer sous…"  habituel (<span class="menu">Save as…</span>) à partir du menu Fichier (<span class="menu">File</span>), sélectionnez le format et choisissiez un nom de fichier.<br />
+Vous pouvez aussi faire glisser la sélection et la déposer sur un dossier de destination. Cette dernière méthode est souvent plus rapide, en particulier quand le dossier de destination est déjà ouvert dans une fenêtre du Tracker.</p>
 <img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
-<p>This is also how the above mentioned cropping is finalized. Either select a frame as described above, or choose <span class="menu">Edit | Select all</span> for the whole image. Then drag &amp; drop the selection onto the Desktop or any Tracker window to create a new image clipping in the same format of the original image.</p>
+<p>C'est aussi comme cela que l'on finalise le recadrage mentionné ci-dessus. Sélectionnez un cadre tel que décrit ci-dessus, ou choisissez <span class="menu">Edit | Select all</span> (Modifier | Sélectionner) pour toute l'image, puis faites glisser la sélection et déposez la sur le Bureau ou n'importe quelle fenêtre du Tracker afin de créer un nouvel extrait de image dans le même format que l'original.</p>
 <p>Pour enregistrer le fichier dans un autre format, faites glisser la sélection avec le bouton droit de la souris et choisissez un format dans le menu contextuel qui apparait lorsque vous déposez l'image.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Raccourcis claviers</h2>
 <p>Voici une liste des raccourcis les plus utiles :</p>
@@ -104,7 +107,7 @@ Often quicker, especially when the Tracker window with the destination folder is
 <tr><td><span class="key">0</span></td><td></td><td>Taille originale (100% zoom)</td></tr>
 <tr><td><span class="key">1</span></td><td></td><td>Adapter à la fenêtre</td></tr>
 <tr><td><span class="key">Alt</span> <span class="key">Entrée</span></td><td></td><td>Basculer un plein écran (tout comme un double-clic)</td></tr>
-<tr><td><span class="key">Ctrl</span></td><td></td><td>While holding <span class="key">CTRL</span> you can create a selection frame without explicitly switching to selection mode.</td></tr>
+<tr><td><span class="key">Ctrl</span></td><td></td><td>En maintenant la touche <span class="key">Ctrl</span> enfoncée, vous pouvez créer un cadre de sélection, sans passer explicitement en mode de sélection.</td></tr>
 </table>
 
 </div>

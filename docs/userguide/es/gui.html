@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -50,6 +50,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h1>La interfaz gráfica de usuario de Haiku</h1>
 
@@ -67,7 +68,15 @@
 <li><p>El botón "zoom" (o con <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). En la mayoría de las aplicaciones, esto expandirá una ventana a su tamaño máximo. Sin embargo, no siempre es así. Las ventanas del Tracker, por ejemplo, se retamañarán para ajustar mejor a los contenidos.</p></li>
 <li><p>La esquina de retamañado. Arrastrándola a cualquier otro lugar en un borde de ventana moverá las dimensiones de la ventana.</p></li>
 </ol>
-<div class="box-info">Mientras se sostienen <span class="key">CTRL</span> y <span class="key">ALT</span>, se puede dar clic en cualquier lugar dentro de una ventana para moverla con el botón izquierdo del ratón; el botón derecho la manda al fondo.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
+<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
+<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
+<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

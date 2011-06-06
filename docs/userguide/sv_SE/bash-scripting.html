@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		deejam
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Bash and Scripting</title>
+	<title>Skalet och skript</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Användarhandbok</span></div>
 </div>
 
 <div class="nav">
@@ -39,66 +41,65 @@
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="preferences.html">Inställningar</a> 
+::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
 <!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Bash and Scripting</h1>
+<h1>Skalet och skript</h1>
 
-<p>"Scripting" is the technique of automating procedures by stringing together commands and saving it all as text files, so called "scripts". Every time you run such a script, the commands are processed one after the other just like they would if you entered them into the <a href="applications/terminal.html">Terminal</a> by hand.<br />
-Scripts can range from simply executing a few commands in a specific order to sophisticated pieces of code that solve complex tasks.</p>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bash" name="bash">The Bash</a></h2>
-<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
+<p>Skriptning är en teknik för att automatisera procedurer genom att sammanlänka kommandon och spara det i en textfil, så kallade skript. Varje gång du kör ett sådant skript kommer varje kommando att exekveras det ena efter det andra på samma sätt som om de skulle skrivas i <a href="applications/terminal.html">Terminalen</a> för hand.<br />
+Skript kan variera från att starta några få kommandon i en specifik ordning till sofistikerad samansatt kod som löser komplexa problem.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="scripting-bible" name="scripting-bible">The Scripting Bible</a></h2>
-<p>After you've learned a few basics about working in the shell, it's time to slowly ease yourself into the world of scripting. Again, you'll find loads of tutorials and reference material online as well as in bookstores. A very nice introduction that's practically tailor-made for Haiku is the online available <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) of Scot Hacker's BeOS Bible.</p>
+<a id="bash" name="bash">Skalet</a></h2>
+<p>Eftersom skript är beroende av det skal som de tolkas av, bör du först bekanta dig med Bash, skalet som används i Haiku. Det finns många resurser på internet eftersom det är ett vanligt skal. En bra resurs är Johan Jansson's <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduktion till bash - en guide för bash i BeOS</a> (på engelska).</p>
 
 <h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Scripts in Haiku</a></h2>
-<p>In Haiku, the system makes of course also use of scripting. Booting and shutting down are typical scripting procedures. These defined sequences can be augmented by the user with certain user scripts.<br />
-If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="scripting-bible" name="scripting-bible">Boken The Scripting Bible</a></h2>
+<p>Efter att du har lärt dig grunderna i att använda skalet är det dags att börja titta på skriptning. Återigen, du hittar mängder med guider och referensmaterial på internet och i bokaffärer. En väldigt bra introduktion som praktiskt taget är skräddarsydd för Haiku är  <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">kapitlet om skriptning</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) i Scot Hacker's BeOS Bible.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Skript i Haiku</a></h2>
+<p>Haiku använder sig också av skript. Uppstart och avstängning sköts av olika procedurer i skript. Dessa fördefinerade sekvenser kan utökas av dig genom några specifika skript.<br />
+Om dom inte redan finns så måste du skapa dom själv. Annars behöver du bara lägga till kommandon i den delen av processkedjan där du vill att dom ska bli exekverade.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="userbootscript" name="userbootscript">The UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserBootscript</span> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
-<pre># Start LaunchBox
+<a id="userbootscript" name="userbootscript">Skriptet UserBootscript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserBootscript</span> exekveras efter att Haiku har avslutat sin startprocess. Du skulle exempelvis kunna få några program att automatiskt starta vid varje uppstart.</p>
+<pre># Starta StartBlocket
 /boot/system/apps/LaunchBox &amp;
 
-# Start Workspaces Applet
+# Starta skrivbordsprogrammet Arbetsytor
 /boot/system/apps/Workspaces &amp;</pre>
-<p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed again).</p>
+<p>Kom ihåg att avsluta kommandot med "<tt>&amp;</tt>" för att starta den som en bakgrundsprocess, annars kommer skriptet att vänta tills kommandot har avslutats.</p>
 
-<p>A simple alternative to the above for launching applications at boot up is to put links to them in the <span class="path">/boot/home/config/boot/launch</span> directory. This can be done simply by right-clicking on the application you wish to have started automatically, going to <span class="menu">Create Link</span> and then <a href="tracker.html#navigating">navigating</a> to the above directory.</p>
-
-<h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
+<p>Ett annat enkelt alternativ för att starta program vid uppstart är att länka till dem i  <span class="path">/boot/home/config/boot/launch</span> katalogen. Det åstadkoms genom att höger-klicka på det program som du vill ska starta automatiskt, välja <span class="menu">Skapa länk</span> och <a href="tracker.html#navigating">navigera</a> till ovan nämnda katalog.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
+<a id="usershutdownscript" name="usershutdownscript">Skriptet UserShutdownScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> exekveras som det första steget i avstängningsprocessen. Om skriptet returnerar någon annan status än noll så avbryts avstängningsprocessen.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">Skriptet UserShutdownFinishScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> exekveras som det sista steget i avstängningsprocessen. Tänk på att merparten av Haiku har stängts ner när detta skript startas.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="preferences.html">Inställningar</a> 
+::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
 <!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
 </span></div>
 </div>

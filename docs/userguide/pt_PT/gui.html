@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,7 +65,15 @@
 <li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
 <li><p>The resize corner. Dragging anywhere else on a window's border will move the window.</p></li>
 </ol>
-<div class="box-info">While holding <span class="key">CTRL</span> <span class="key">ALT</span>, you can click anywhere into a window to move it with the left mouse button; the right mouse button sends it to the back.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
+<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
+<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
+<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -94,16 +102,16 @@ You can enter parent folders with the pop-up menu above the file listing.</p>
 <a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
 <p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add Current Folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure Favorites...</span> and delete its entry.<br />
+<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure favorites...</span> and delete its entry.<br />
 All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show Replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag&amp;drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove Replicant</span>.</p>
+<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
+A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
 <div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
 <p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
 </div>

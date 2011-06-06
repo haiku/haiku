@@ -11,6 +11,8 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		log-1
+ *		Humdinger
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -75,7 +77,7 @@ Glyph hinting</h3>
 <p><span class="menu">Glyph hinting</span>を有効にすると、すべての文字の縦方向および横方向両端に、必ず2ピクセルの空白が入るようになります。特に、白い背景で黒文字を扱う場合には、これを有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきりして見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">Monospaced Fonts Only</span>用の設定もあります。Hintingをオンにした場合、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディタやターミナルでHintingの恩恵を受けることができます。</p>
 <p>次の拡大したスクリーンショットは、Hintingを有効にした場合と有効にしない場合とで、どれだけ見た目が変わるのかを示しています:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting 無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting 有効</td></tr>
 </table>
 <p>このページに掲載されているすべての<span class="app">Magnify</span>ウィンドウは、当然のことながらそれぞれ異なるオプションで描画されている点に注意する必要があります。ですので、例えば黄色いタブの太文字タイトルや、
 "33 x 15 @ 8 pixels/pixel"というテキストを比較することで、各設定が実際に作り出す印象を知ることができます。</p>
@@ -89,13 +91,13 @@ Antialiasing type</h3>
 は、特に(高解像度の)LCDディスプレイを使用する場合にGrayscaleよりもさらになめらかに描画します。LCDディスプレイの1つのピクセルは赤、緑、青の要素で構成されているので、この手法では1ピクセルの明るさを変更するかわりに、1ピクセルより小さな分量だけ輪郭を移動させて輪郭の色を変更します。</p>
 <p>先ほどと同様に、次の拡大したスクリーンショットは、この2つの方法の違いを示しています:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Grayscale, Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: off</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />グレイスケール、Hinting 無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD サブピクセル、Hinting 無効</td></tr>
 </table>
 <p>サブピクセル・ベースのアンチエイリアスでは、図形オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きを、誰もが許容するわけではありません。Haikuでは、この2つのアンチエイリアス手法を混ぜて使用することができます。スライダーを使って、あなたにとって最適な混合比を設定することができます。</p>
 <div class="box-info">サブピクセルベースのアンチエイリアスをGlyph Hintingと併せて使用することは、ソフトウェア特許の対象となるため、デフォルトでは両者を同時に使用できないようになっています。あなたの住んでいる地域次第では、このロックを解除したバージョンを入手することが合法である場合があります。その場合は申し訳ありませんが、その地域の配布担当者と交渉してください。</div>
 <p>仮にソースコードを変更して再コンパイルすることで、HintingとLCD subpixelを組み合わせた描画方法を有効にした場合、HintingとGrayscaleを組み合わせたものと見た目を比較すると、次のようになります:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Grayscale, Hinting: on</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel, Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />グレイスケール、Hinting 有効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD サブピクセル、Hinting 有効</td></tr>
 </table>
 <p><br /></p>
 <p>設定パネルの下の部分に、次の2つのボタンがあります:</p>

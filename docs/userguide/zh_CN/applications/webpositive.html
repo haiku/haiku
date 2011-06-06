@@ -48,7 +48,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
@@ -76,32 +75,33 @@
 <p>如果您曾经使用过其他的浏览器，WebPositive 将不会有很大不同。无需查看它的每个菜单项和特性，让我们注意一下几点：</p>
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
-<p>New tabs are created with the <span class="key">+</span> button to the right in the tab bar or, if there's still enough space, by double-clicking into an empty area of it. If there are more tabs open than fit into the bar, the <span class="key">&lt;</span> <span class="key">&gt;</span> scroll-buttons become active, allowing you to scroll the tab bar left and right. The <span class="key">∨</span> button to the far right hosts a pop-up menu with all open tabs for even quicker navigation.</p></li>
+<p>新标签可以通过标签栏右侧的 <span class="key">+</span> 键进行创建，如果有足够空间的话，可以通过双击右侧的空白区域予以创建。如果打开的标签数量出了标签栏区域， <span class="key">&lt;</span> <span class="key">&gt;</span> 滚动键将会激活，允许您左右切换标签。最右侧的 <span class="key">∨</span> 弹出菜单可以对所有的标签进行快速导航。</p></li>
 <li><p>使用鼠标中键点击链接将会在后台新标签中打开页面。</p></li>
 <li><p>您可以从 <span class="menu">视图</span> 菜单中 <span class="menu">放大</span> 和 <span class="menu">缩小</span> 页面。还有一个选项用于 <span class="menu">只缩放文本</span> ，而所有的图像都保持原始尺寸。</p></li>
 <li><p>如果您切换到了全屏模式，并且激活了隐藏界面的设置，在一秒钟之后，界面将自动隐藏。为了将其暂时显示，您只需要移动鼠标指针到屏幕顶部即可。</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
-Strings not recognized as URLs will get looked up with Google, so the locator field doubles as quick shortcut to web searches.</p></li>
+<p>当您地址栏中输入时，浏览器将会在地址栏下显示并列出匹配您曾经输入内容的项目。您可以输入更多字符来缩小匹配站点，或者使用 <span class="key">↑</span> 或 <span class="key">↓</span> 来选中某个站点。按下 <span class="key">ENTER</span> 将会载入该页面。您也可以使用地址栏最右侧的控件重新载入页面。<br />
+未匹配为 URL 的字符串将会在 Google 中进行搜索。因此地址栏还可以作为网络搜索的快捷方式。</p></li>
 <li><p>右键点击打开菜单，根据所点击对象的不同，其可以选择在新窗口或标签中打开链接，或者下载对象等。</p></li>
 <li><p><span class="menu">编辑 | 查找</span> 在底部显示一个查找栏用于启动页内搜索。匹配项将会在页面内高亮显示。</p></li>
 </ul>
-<div class="box-info">After a while you may experience web pages being loaded slower and slower. Not really a bug in the truest sense, it's more an effect of a deficient handling of cookies. Either way, until that is fixed you'll have to manually intervene: Have a look at <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. This file stores cookies from webpages and slowly grows while surfing the web. Once it's a few dozen kilobytes in size, it starts to slow down browsing. Just delete the file at that point to start with a clean slate.</div>
+<div class="box-info">在一段时间之后，您可能会感觉到网页载入速度越来越慢，这是 Cookies 处理缺陷带来的副作用。不管怎样，在这个问题解决之前，您必须手动进行处理：查看 <span class="path">~/config/settings/WebPositive/Cookies.curl</span>。该文件从网页保存 Cookies ，并且在浏览网络时慢慢增长。当达到几千字节时，它开始减慢浏览速度。这时只要删除该文件就可以重新达到正常的浏览速度。</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>书签</h2>
 <p>WebPositive 的书签以文件和目录的形式存在于  <tt>~/config/settings/WebPositive/Bookmarks/</tt> 中。添加书签将会在此创建一个新文件。  您可以通过 <span class="menu">管理书签...</span> 快速的打开该文件夹。</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
-<p>You can change a bookmark's URL, name, title and enter keywords just like with any other file with attributes. Just make sure you have all their columns displayed via Tracker's <span class="menu">Attributes</span> menu, then select a file, press <span class="key">ALT</span> <span class="key">E</span> and start editing the attribute; change attribute columns with <span class="key">TAB</span>.<br />You can sort bookmarks into different folders you create yourself.</p>
-<p>By using Tracker to manage and navigate bookmarks you can lift its unique features to quickly find what you're looking for.<br />
-Activating <span class="menu">Type-ahead filtering</span> in <a href="../tracker.html#tracker-preferences">Tracker's preferences</a>, you can instantly trim down your list of bookmarks to matches of your filter-string. A few more <span class="key">↑</span> or <span class="key">↓</span> to move the selection and pressing <span class="key">ENTER</span> opens the site. Make sure to display all attribute columns to have the filter applied to name, title, URL and keywords.</p>
-<p>For this to work, all bookmarks should be kept in the <tt>~/config/settings/WebPositive/Bookmarks/</tt> folder and only copies should be sorted into custom subfolders for usage in WebPositive's <span class="menu">Bookmarks</span> menu (if at all). Also, actually filling the keywords attribute helps...</p>
+<p>您可以修改书签的 URL，名称，标题，并且可以像处理其他文件的属性那样输入关键字。您只需通过在文件浏览器的 <span class="menu">Attributes</span> 菜单显示所有的内容，然后选中一个文件，按下 <span class="key">ALT</span> <span class="key">E</span> 即可以编辑属性，并且通过 <span class="key">TAB</span> 键切换修改属性。<br />
+您可以将书签整理到自己创建的不同文件夹中。</p>
+<p>通过文件浏览器管理和导航书签的方式，您可以使用它的特性快速的找到自己的目标。<br />
+在<a href="../tracker.html#tracker-preferences">文件浏览器首选项</a>中激活 <span class="menu">实时过滤</span> ，您可以立即缩小匹配过滤字符串的列表范围。同时可以使用 <span class="key">↑</span> 和 <span class="key">↓</span> 移动选中项，按下 <span class="key">ENTER</span> 打开站点。请确保显示所有的属性列以便使过滤器应用于名称，标题，URL及关键字。</p>
+<p>如果希望可以执行此操作，所有的书签需要保存于 <tt>~/config/settings/WebPositive/Bookmarks/</tt> 文件夹，并且所有的副本都需要放入自定义的子文件夹中以便在 WebPositive 的 <span class="menu">书签</span> 菜单中使用（如果这样的话）。同时，实际的填写关键字属性将很有帮助...</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>下载</h2>
 <p><span class="menu">窗口 | 下载</span> 将打开一个窗口，其中列出所有已完成的和正下载的内容：</p>
 <img src="../images/apps-images/webpositive-downloads.png" alt="webpositive-downloads.png" />
-<p>Currently downloading files are shown with a growing progress bar and, similar to copying files in Tracker, information on the download speed, file size and expected finishing time. Buttons to the right let you <span class="button">Cancel</span> and <span class="button">Restart</span> a download, or  <span class="button">Open</span> the file, or <span class="button">Remove</span> its entry from the list. The <span class="button">Remove missing</span> and <span class="button">Remove finished</span> buttons at the bottom do this for all entries in this list. "Missing" are files that were deleted in the meantime.</p>
-<p>Moving a file that is currently being downloaded to Trash will stop the download. You'll also notice, that its icon becomes "ghosted".<br />
-Generally, WebPositive is very tolerant when it comes to managing files with Tracker. Files can be renamed or moved even while they are being downloaded and even after the download is finished, these changes are reflected in the Downloads window.</p>
-<div class="box-info"><p>Ever wondered from what site you downloaded a particular package, image or any other file? You can track that down by opening the file with <a href="diskprobe.html">DiskProbe</a> and have a look at its <tt>META:url</tt> attribute.</p>
-<p>Want to have the URL permanently shown in your downloads folder? Just copy a bookmark into it, have the bookmark's URL attribute column displayed and remove the bookmark again.</p></div>
+<p>当前下载的文件将会显示进度栏，和文件浏览器中的文件复制相似，还会显示下载速度，文件大小和预期完成时间等信息。右边的按钮可用于 <span class="button">取消</span> 和 <span class="button">重启</span> 下载，<span class="button">打开</span> 文件，以及从列表中 <span class="button">删除</span> 条目。位于底部的 <span class="button">删除丢失项</span> 和 <span class="button">删除完成项</span> 作用于列表中的所有项目。"丢失项"是指当时删除的文件。</p>
+<p>将当前下载的文件移动到垃圾箱将会终止下载。您可能也注意到，它的图标将会变成"灰色"的。<br />
+通常，在通过文件浏览器管理文件时，WebPositive 是能够容忍的。在文件下载甚至下载之后，这些文件都是可以重命名或者删除的，并且这些修改将会反馈到下载窗口。</p>
+<div class="box-info"><p>是否曾经想知道您所下载的某个包，图像或任何其他文件出自的站点？您可以使用 <a href="diskprobe.html">磁盘扫描器</a> 打开文件，然后查看它的 <tt>META:url</tt> 属性来获取该信息。</p>
+<p>希望某个 URL 永久的显示在您的下载文件夹中吗？您只需要复制一个书签到其中，然后显示书签的 URL 属性列，之后删除该书签即可。</p></div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>快捷键</h2>
 <p>下面是一些有用的快捷键：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">

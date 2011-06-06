@@ -75,8 +75,8 @@ The configuration is done in the E-Mail preference panel.</p>
 <p>Let's go through the process of setting up an e-mail account.<br />
 You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>First, declare the <i>Account Type</i> which is either <span class="menu">Receive Mail Only</span>, <span class="menu">Send Mail Only</span>, or the most usual type, <span class="menu">Send and Receive Mail</span>. Then you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail Address</i>, <i>Login Name</i> and <i>Password</i>, give an <i>Account Name</i> under which it will be known under Haiku and your <i>Real Name</i>.</p>
+<p>First, declare the <i>Account type</i> which is either <span class="menu">Receive mail only</span>, <span class="menu">Send mail only</span>, or the most usual type, <span class="menu">Send and receive mail</span>. Then you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
+<p>Now you enter your <i>E-mail address</i>, <i>Login name</i> and <i>Password</i>, give an <i>Account name</i> under which it will be known under Haiku and your <i>Real name</i>.</p>
 <p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses and the following information is already filled in automatically. If that is not the case, just follow this guide and fill in the details to your e-mail account accordingly.</p>
 
 <h2>
@@ -85,11 +85,11 @@ You start by clicking the <span class="button">Add</span> button to create a new
 <p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
 <p>From the pop-up menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
-<p>Next is the <span class="menu">Mail Server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
-<p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login Type</i> from the default <span class="menu">Plain Text</span> to <span class="menu">APOP</span> for authentication.</p>
+<p>Next is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
 <p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify a <span class="menu">Top Mailbox Folder</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>The <span class="menu">New Mail Notification</span> offers different methods to announce the arrival of new mail. Try different settings to see what works best for you.</p>
+<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify a <span class="menu">Top mailbox folder</span> to only synchronize with a specific folder and its subfolders.</p>
+<p>The <span class="menu">New mail notification</span> offers different methods to announce the arrival of new mail. Try different settings to see what works best for you.</p>
 <p>You can change the <i>Location</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
 <p>Last on this page, you can opt to only <span class="menu">Partially download messages</span> that are larger than a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
 
@@ -105,8 +105,8 @@ You start by clicking the <span class="button">Add</span> button to create a new
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filters" name="filters">Setting up e-mail filters</a></h2>
-<p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
-Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
+<p>If you want to filter your incoming email, you click on <span class="menu">E-Mail filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
+Besides the <span class="menu">R5 daemon filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming mail filters</span> you can add.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,7 +115,7 @@ Spam Filter</h3>
 <p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
 You can have that spam rating added to the start of the subject.<br />
 Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
-<p>Together with the following <span class="menu">Match Header</span> filter, you're able to automatically sort out detected spam mails.</p>
+<p>Together with the following <span class="menu">Match header</span> filter, you're able to automatically sort out detected spam mails.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -130,7 +130,7 @@ With the first text field you specify which header to check against. These are a
 		<td>the e-mail address of the sender</td></tr>
 	<tr><td><span class="menu">To</span></td><td> </td>
 		<td>your e-mail address (different for each e-mail account)</td></tr>
-	<tr><td><span class="menu">Reply To</span></td><td> </td>
+	<tr><td><span class="menu">Reply to</span></td><td> </td>
 		<td>the e-mail address replies are sent to</td></tr>
 	<tr><td><span class="menu">When</span></td><td> </td>
 		<td>the date and time the mail was received</td></tr>
@@ -146,9 +146,9 @@ With the first text field you specify which header to check against. These are a
 		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
 	<tr><td><span class="menu">Thread</span></td><td> </td>
 		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
-	<tr><td><span class="menu">Classification Group</span></td><td> </td>
+	<tr><td><span class="menu">Classification group</span></td><td> </td>
 		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
-	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
+	<tr><td><span class="menu">Spam/Genuine estimate</span></td><td> </td>
 		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
 </table>
 <p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
@@ -165,13 +165,13 @@ Outgoing Mail Filters</h3>
 <a id="settings" name="settings">Setting up the Mail Service</a></h2>
 <p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
-If you're on a dial-up connection, you may want to do that <span class="menu">Only When Dial-Up is Connected</span> and also <span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
-<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While Sending</span>, <span class="menu">While Sending and Receiving</span> or <span class="menu">Always</span>.</p>
-<p>Make sure to <span class="menu">Start Mail Services on Startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<p>Under <i>Mail checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
+If you're on a dial-up connection, you may want to do that <span class="menu">Only when dial-up is connected</span> and also <span class="menu">Schedule outgoing mail when dial-up is disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
+<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While sending</span>, <span class="menu">While sending and receiving</span> or <span class="menu">Always</span>.</p>
+<p>Make sure to <span class="menu">Start mail services on startup</span> or there will be no mail_daemon running to do your bidding...</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit Mailbox Menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
-<p>From that menu, you can also <span class="menu">Create New Message...</span>, <span class="menu">Check For Mail Now</span> or <span class="menu">Edit Preferences...</span>.</p>
+<p><span class="menu">Edit mailbox menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
+<p>From that menu, you can also <span class="menu">Create new message...</span>, <span class="menu">Check for mail now</span> or <span class="menu">Edit preferences...</span>.</p>
 <p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
 
 </div>

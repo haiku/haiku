@@ -12,6 +12,7 @@
  * Translators:
  *		Victor Widell
  *		Humdinger
+ *		deejam
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Användarhandbok</span></div>
 </div>
 
 <div class="nav">
@@ -43,41 +44,40 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="index.html">Index</a>  »
+::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
+::  <a href="index.html">Innehåll</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Attribut</h1>
 
-<p>Attribut är datafält som tillhör en fil men inte är en del av filen, d.v.s. de räknas inte med i filstorleken, och kan kopieras eller ändras utan att röra själva filen. Systemet använder dessa attribut till att lagra t.ex. filstorlek, filtyp, och datum för senaste ändringen. Detta liknar andra operativsystem och filsystem.</p>
-<p>Det som är annorlunda är att du kan lägga till vilken typ av attribut som helst till vilken fil som helst, och visa det eller göra det redigerbart i ett Tracker-fönster. Du behöver bara definera vilken typ av attribut du vill lägga till till filen (t.ex. sträng, heltal eller klockslag) och ge det ett namn och en beskrivning.</p>
-<p>Filen själv behöver inte ens innehålla något. Se till exempel på de här People-filerna:</p>
+<p>Attribut är datafält som tillhör en fil men inte är en del av filen, de räknas därmed inte med i storleken på filen. Attribut kan kopieras eller ändras utan att röra själva filen. Haiku använder dessa attribut till att lagra bland annat filstorlek, filtyp och datum för senaste ändringen. Detta liknar andra operativsystem och filsystem.</p>
+<p>Det som skiljer Haiku mot andra operativsystem är att du kan lägga till vilken typ av attribut som helst till vilken fil som helst. Dessa kan sedan visas eller göras redigerbart i ett vanligt Tracker-fönster. Du behöver bara definera vilken typ av attribut du vill lägga till filen (exempelvis en sträng, ett heltal eller ett klockslag) och ge det ett namn och en beskrivning.</p>
+<p>Filen själv behöver inte ens innehålla något. Se till exempel på de här Personer-filerna:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
 <p>Som du kan se har alla de här filerna filstorleken 0 och tillhörande attribut. Attributet E-mail, tillhörande "John Nox", redigeras direkt i Tracker.</p>
-<p>Om du låter attributen vara indexerade, som People- Email- och ljudfiler är som standard, kan de också sökas med Haikus snabba söksystem.</p>
+<p>Om du låter attributen vara indexerade, som person- e-post- och ljudfiler är som standard, kan de också hittas med Haiku's snabba söksystem.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-tracker" name="attributes-tracker">Attribut i Tracker</a></h2>
-<p>Attribut visas ganska likt en databas eller ett kalkylark.  Med Tracker kan du välja vilka attribut du vill visa (kolumnerna), och sortera fil-listningen (raderna) därefter.</p>
-<p>För att göra det, öppna ett Tracker-fönster, klicka på menyn <span class="menu">Attributes</span> och välj de attribut du vill visa. Alternativt kan du helt enkelt högerklicka på en kolumnrubrik och markera alternativen i popup-menyn. Du kan flytta runt kolumnerna genom att dra i kolumnrubrilen och släppa den där du vill ha den. Du kan släppa en kolumn utanför fönstret för att ta bort den.</p>
-<p>Dubbelklicka på lnjen mellan två attribut i rubrikraden för att automatisk välja en optimal bredd för kolumnen.</p>
-<p>Klicka på en kolumnrubrik för att växla mellan stigande eller sjunkande sortering. Du kan bestämma en sekundär sortering genom att hålla ner <span class="key">SHIFT</span>-knappen medan du klickar på en kolumnrubrik. Du kan t.ex. sortera dina People-filer efter företag och i andra hand efter namn. Se skärmbilden ovan för ett exempel. Den sekundära sorteringen visas med en ljusare färg bredvid rubriken.</p>
+<p>Attribut visas på samma sätt som en databas eller ett kalkylark. Med Tracker kan du välja vilka attribut du vill visa (kolumnerna), och sortera fil-listningen (raderna) därefter.</p>
+<p>För att göra det, öppna ett Tracker-fönster och klicka på menyn <span class="menu">Attribut</span> och välj de attribut du vill visa. Alternativt kan du helt enkelt höger-klicka på en kolumnrubrik och markera alternativen i menyn. Du kan flytta runt kolumnerna genom att dra i kolumnrubrilen och släppa den där du vill ha den. Du kan släppa en kolumn utanför fönstret för att ta bort den.</p>
+<p>Dubbel-klicka på linjen mellan två attribut i rubrikraden för att automatisk välja en optimal bredd för kolumnen.</p>
+<p>Klicka på en kolumnrubrik för att växla mellan stigande eller sjunkande sortering. Du kan bestämma en sekundär sortering genom att hålla ner <span class="key">SHIFT</span>-knappen medan du klickar på en kolumnrubrik. Du kan exempelvis sortera dina personer-filer efter företag och i andra hand efter namn. Se skärmbilden ovan för ett exempel. Den sekundära sorteringen visas med en ljusare färg bredvid rubriken.</p>
 <p>Att redigera attribut är lika enkelt som att byta namn på en fil: Klicka på ett attributfält eller tryck <span class="key">ALT</span> <span class="key">E</span> och flytta mellan attribut med <span class="key">TAB</span> och <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> lämnar redigeringsläget uttan att spara ändringarna.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-terminal" name="attributes-terminal">Attribut i Terminal</a></h2>
-<p>Om du föredrar att använda kommandoraden eller planerar att arbeta med många filer genom att använda skript finns det flera kommandon för att hantera attribut från Terminal.</p>
+<a id="attributes-terminal" name="attributes-terminal">Attribut i Terminalen</a></h2>
+<p>Om du föredrar att använda kommandotolken eller planerar att arbeta med många filer genom att använda skript finns det flera kommandon för att hantera attribut från Terminalen.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="listattr" name="listattr">listattr</a></h3>
+<a id="listattr" name="listattr">Kommandot listattr</a></h3>
 <p><span class="cli">listattr</span> listar en fils attribut, men visar inte attributens innehåll.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Från exemplet i skärmbilden ovan:</p>
@@ -106,15 +106,15 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Förutom alla "<tt>META:*</tt>"-attribut som innehåller kontaktinformationen finns det två attribut som sköts av systemet:</p>
+<p>Förutom alla "<tt>META:*</tt>"-attribut som innehåller kontaktinformationen finns det två attribut som sköts av Haiku:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> innehåller filtypen som en <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-sträng, i det här fallet "<tt>application/x-person</tt>". Det bestämmer standardikonen och vilken applikation som öppnar filen om du t.ex. dubbelklickar på den.</p></li>
+<li><p><tt>BEOS:TYPE</tt> innehåller filtypen som en <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-sträng, i det här fallet "<tt>application/x-person</tt>". Det bestämmer standardikonen och vilket program som öppnar filen om du dubbel-klickar på den.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" är det attribut Tracker använder för att hålla ordning på filens ikonplacering.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<div class="box-info">Notera snedstrecket efter "Clara". I Terminalen måste specialtecken som <tt>'"*\$?!</tt> och mellanslag föregås av ett snedstreck. Därför kommer snedstrecket egentligen före mellanslaget och inte efter "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="catattr" name="catattr">catattr</a></h3>
+<a id="catattr" name="catattr">Kommandot catattr</a></h3>
 <p><span class="cli">catattr</span> visar innehållet i ett specifikt attribut till en fil.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Ett exempel:</p>
@@ -123,7 +123,7 @@ Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="addattr" name="addattr">addattr</a></h3>
+<a id="addattr" name="addattr">Kommandot addattr</a></h3>
 <p><span class="cli">addattr</span> lägger till ett attribut till en fil och/eller anger dess innehåll.</p>
 <pre>usage: addattr [-t type] attr value file1 [file2...]
     or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
@@ -132,12 +132,12 @@ Clara Botters : string : Whelton</pre>
                  string, mime, int, llong, float, double, bool, icon, raw
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
-<p>Låt säga att vår Clara tog ett jobb i det multinationella företaget Barkelbaer Inc. Du fyller i det hittils tomma attributet "Company" med företagsnamnet (som är av typen "string"):</p>
+<p>Låt säga att vår Clara tog ett jobb i det multinationella företaget Barkelbaer Inc. Du fyller i det hitintills tomma attributet "Company" med företagsnamnet (som är av typen "sträng"):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="rmattr" name="rmattr">rmattr</a></h3>
+<a id="rmattr" name="rmattr">Kommandot rmattr</a></h3>
 <p><span class="cli">rmattr</span> raderar helt ett attribut från en fil.</p>
 
 <pre>usage: rmattr [-p] attr filename1 [filename2...]
@@ -149,14 +149,14 @@ genom att skriva:</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="copyattr" name="copyattr">copyattr</a></h3>
+<a id="copyattr" name="copyattr">Kommandot copyattr</a></h3>
 <p><span class="cli">copyattr</span> kopierar attribut från en eller flera filer till en annan. Som standard kopieras <b>inte</b> filens egentliga innehåll.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
 <p>Om du <i>vill</i> kopiera attributen plus filens innehåll kan du lägga till växeln "<span class="cli">-d</span>" eller "<span class="cli">--data</span>".</p>
 
 <p><br /></p>
-<p>Mer i formation om dessa kommandon och dess funktioner hittar du om du skriver deras namn följt av "<span class="cli">-h</span>" eller "<span class="cli">--help</span>".</p>
+<p>Mer information om dessa kommandon och dess funktioner hittar du om du skriver deras namn följt av "<span class="cli">-h</span>" eller "<span class="cli">--help</span>".</p>
 
 </div>
 </div>
@@ -164,8 +164,8 @@ genom att skriva:</p>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="index.html">Index</a>  »
+::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
+::  <a href="index.html">Innehåll</a>  »
 </span></div>
 </div>
 

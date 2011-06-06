@@ -50,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2>Haiku中的无线网络</h2>
 <h3>
@@ -69,14 +68,14 @@ Aironet PCI4800<br />
 <li><p><i>broadcom43xx</i> 支持：<br />
 BCM4301，BCM4306，BCM4307，BCM4309，BCM4311，BCM4312和 BCM4318
 </p></li>
-<li><p><i>ipw2100</i> supporting Intel Pro Wireless 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting Intel Pro Wireless<br />
+<li><p><i>iprowifi2100</i> 支持英特尔专业无线 2100 芯片</p></li>
+<li><p><i>iprowifi2200</i> 支持英特尔无线卡：<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting Intel Pro Wireless 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting Intel Pro Wireless 4965 chips</p></li>
+<li><p><i>iprowifi3945</i> 支持英特尔 3945 专业无线芯片</p></li>
+<li><p><i>iprowifi4965</i>支持英特尔 4965 专业无线芯片</p></li>
 <li><p><i>marvell88w8335</i> 支持：
 <br />
 Marvell Libertas 88W8310<br />
@@ -90,7 +89,7 @@ RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p>ralink2860 supporting Ralink RT2860</p></li>
+<li><p>ralink2860 支持 Ralink RT2860</p></li>
 <li><p><i>wavelanwifi</i> 目前支持：
 <br />
 3Com Airconnect<br />
@@ -144,10 +143,10 @@ Addtron AWA-100 PCI
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<p>为了安装用于 Intel ipw2100，Intel ipw2200/2225/2915，Broadcom 43xx 和 Marvell 88W8335 等的固件，您需要运行</p>
 <pre class="terminal">install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and iprowifi22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
+<p>Intel ipw2100 和 ipw22xx 无需网络连接也可以进行安装，这是因为它们的许可条款允许 Haiku 发行原始的固件档案。但是在安装之前，它们确实需要用户的确认。Broadcom 43xx 和 Marvell 88W8335 需要活动的网络连接，这是因为包含固件的文件不能够随着 Haiku 一同发布。</p>
 <p>构建自己的Haiku镜像的人们可以在 <span class="cli">build/jam/UserBuildConfig</span> 中进行相应的改动。更多详细信息和关于无线网络的主题更新可以参阅 <a href="http://www.haiku-os.org/guides/wifi">有关的在线文档</a>。</p>
 <p>如果您确实需要下载该固件，而且在 Haiku 下也没有可用的网络连接，在线文档提供了一个<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell 脚本</a>，它将会为你创建用于解压到 Haiku 的 <tt>/boot</tt> 文件夹下的Zip文件。之后，您就具有了所有 install-wifi-firmwares.sh 所需要的所有文件。</p>
 </div>

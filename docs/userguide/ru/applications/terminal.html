@@ -19,7 +19,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Terminal</title>
+	<title>Терминал (Terminal)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -54,17 +54,17 @@
 <div>
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Терминал (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/common/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/common/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - дополняет/переопределяет параметры  указанные в <span class="path">/boot/system/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - дополняет/переопределяет параметры  указанные в <span class="path">/boot/system/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
-<p>Terminal - интерфейс Haiku к командной оболочке bash (Bourne Again Shell)</p>
-<p>Пожалуйста обратитесь к странице <a href="../bash-scripting.html">Scripting</a> для просмотра ссылок на онлайн уроки по работе с командной оболочкой shell, а также обратитесь к теме <a href="cli-apps.html">Haiku-приложения для командной строки</a>. Здесь же мы сконцентрируемся непосредственно на приложении Terminal.</p>
+<p>Терминал (Terminal) - это интерфейс Haiku к командной оболочке bash (Bourne Again Shell)</p>
+<p>Пожалуйста обратитесь к теме <a href="../bash-scripting.html">Bash и скрипты</a> для просмотра ссылок на онлайн уроки по работе с командной оболочкой shell, а также обратитесь к теме <a href="cli-apps.html">Haiku-приложения для командной строки</a>. Здесь же мы сконцентрируемся непосредственно на приложении Терминал (Terminal).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -75,13 +75,13 @@
 <p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
 By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
 Via <span class="menu">Edit | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
-<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
+<p>Правый щелчок мыши по вкладке вызывает контекстное меню, которое содержит следующие пункты: <span class="menu">Закрыть вкладку (Close tab)</span>, <span class="menu">Закрыть остальные вкладки (Close other tabs)</span>, <span class="menu">Изменить название вкладки... (Edit tab title...)</span>.</p>
 <p>У окна Терминала изменяется размер, как и у любого другого приложения, а также имеется возможность использовать пресеты из меню <span class="menu">Настройки | Размер окна (Settings | Window Size)</span>. Комбинация клавиш <span class="key">ALT</span>+<span class="key">ENTER</span> включает полноэкранный режим.</p>
 <p>Измененный размер окна и кодировку текста можно сохранить, выбрав пункт меню <span class="menu">Настройки | Сохранить по умолчанию (Settings | Save as default)</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Настройки</a></h2>
-<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<p>Пункт <span class="menu">Настройки... (Settings...)</span>  в меню <span class="menu">Настройки (Settings)</span> вызывает окно, в котором можно установить базовые настройки Терминала.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
 <p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
@@ -92,13 +92,13 @@ Pressing <span class="button">OK</span> will save the current settings as defaul
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Горячие клавиши</a></h2>
-<p>Вы найдете список полезных горячих клавиш <a href="../keyboard-shortcuts.html#terminal">здесь</a>.</p>
+<p>Список полезных сочетаний клавиш  вы можете найти <a href="../keyboard-shortcuts.html#terminal">в данной теме</a>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Настройка командной оболочки Bash</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/common/etc/</span>.</p>
+<p>Пришедшая из Unix, командная оболочка Bash имеет очень широкие возможности по настройке. Существуют два наиболее важных для пользователя файла: <span class="cli">.profile</span> и <span class="cli">.inputrc</span><br />
+Оба файла могут быть созданы в домашней папке (<span class="path">/boot/home/</span>), где они дополняют или переопределяют (т. к. являются более приоритетными) системные настройки по умолчанию, расположенные по адресу  <span class="path">/boot/common/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p><span class="cli">.profile</span> загружается каждый раз, когда вы открываете новый Терминал. Этот файл устанавливает все виды псевдонимов и переменных, которые затрагивают поведение командной оболочки и её внешнего вида. Существует множество онлайн ресурсов, на которых детально описаны все эти возможности.</p>

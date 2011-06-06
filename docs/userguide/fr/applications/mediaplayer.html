@@ -50,7 +50,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -61,39 +60,42 @@
 <p><br /></p>
 <p>MediaPlayer est le lecteur par défaut pour tous les fichiers audio et vidéo. Grâce à la bibliothèque <a href="http://www.ffmpeg.org/">ffmpeg</a>, une pléthore de formats couramment utilisés sont pris en charge. Son interface simple fournie toutes les commandes que vous attendez :</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
-<p>The slider of the progress bar allows you to quickly skim to a position, resting the mouse over it shows the current and remaining time of the clip. Clicking on the time display to the right of it, toggles between length, current and remaining time.<br />
-Below that you find the usual controls to skip to the previous track, play/pause, stop and jump to the next track. Then comes a volume control (clicking the speaker symbol toggles muting) and a VU meter.</p>
+<p>Le curseur de la barre de progression vous permet de changer rapidement de position, En passant la souris au-dessus il affichera le temps écoulé et restant à lire. un clic sur ​​l'affichage de l'heure à la droite de cet indicateur, basculera entre un affichage  court ou long du temps restant.<br />
+En-dessous vous trouverez les contrôles habituels pour revenir à la piste précédente, suspendre/reprendre la lecture, l'arrêter  et passer à la piste suivante. Vient ensuite le contrôle du volume (en cliquant sur le symbole du haut-parleur vous pourrez basculer en mode sourdine), et un VU-mètre.</p>
 
 <h2>Lecture audio et vidéo</h2>
 <p>Comme il n'y a pas de fonctionnalités spécifiques à la lecture audio, nous allons passer directement aux fonctionnalités vidéo ou générales.</p>
 <img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
 <p>Les informations du fichier <span class="menu">File info...</span> (<span class="key">ALT</span> <span class="key">I</span>) sont disponibles pour tous les médias. Vous accédez ainsi à la durée du fichier, aux détails des pistes Audio/Vidéo et de leurs codecs.</p>
-<p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
-Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
+<p>Les commandes du menus les plus utilisées sont également accessibles dans le menu contextuel d'un clic droit dans ​​la zone vidéo, Cequi est très pratique en mode plein écran. <br />
+Dans <span class="menu">Vidéo</span>, vous trouverez les options pour agrandir l'image et pour forcer ses proportions. Laisser les proportions par défaut dans les réglages du flux (<span class="menu">Stream settings</span>) est ce qui fonctionne le mieux pour les fichiers encodés correctement.</p>
 <p>MediaPlayer supporte les sous-titres au format <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a>. Pour les faire apparaître dans <span class="menu">Subtitles</span> (Sous-titres), leurs noms de fichiers doivent être identiques à celui du fichier vidéo avec à la place de l'extension, le nom de la langue et le suffixe ".srt". Par exemple :</p>
 <pre>MyMovie.avi
 MyMovie.Deutsch.srt
 MyMovie.English.srt
 MyMovie.Français.srt</pre>
-<p>Multiple audio tracks, most often used for several languages inside one video file, are available from the <span class="menu">Audio track</span> submenu. The <span class="menu">Video | Track</span> submenu offers the same when having multiple video streams available.</p>
-<p>Vous pouvez : basculer en mode plein écran (<span class="menu">Full screen</span>) avec <span class="key">Alt</span> <span class="key">Entrée</span>, <span class="key">Alt</span> <span class="key">F</span> ou un double-clic; cacher les bordures de fenètres et les boutons de contrôles du MediaPlayer avec <span class="menu">Hide interface</span>(cacher l'interface), <span class="key">Alt</span> <span class="key">H</span> ou un double-clic droit; ou encore garder la fenètre toujours au dessus avec <span class="menu">Always on top</span> ou <span class="key">Alt</span> <span class="key">A</span>.</p>
+<p>Le sous-menu <span class="menu">Video | Track</span>
+(Vidéo | Piste) vous permet de choisir entre les différentes pistes audio qui peuvent être contenues dans le fichier vidéo quand celui ci contient plusieurs langues.
+Le sous-menu <span class="menu">Video | Track</span> (Vidéo | Piste) vous offre la même chose quand plusieurs vues différentes sont disponibles dans le flux vidéo.</p>
+<p>Vous pouvez : basculer en mode <span class="menu">Plein écran</span> (<span class="menu">Full screen</span>) avec <span class="key">Alt</span> <span class="key">Entrée</span>, <span class="key">Alt</span> <span class="key">F</span> ou un double-clic; cacher les bordures de fenètres et les boutons de contrôles du MediaPlayer avec <span class="menu">Masquer l'interface</span> (<span class="menu">Hide interface</span>), <span class="key">Alt</span> <span class="key">H</span> ou un double-clic droit; ou encore garder la fenètre <span class="menu">Toujours au dessus</span> (<span class="menu">Always on top</span>) ou <span class="key">Alt</span> <span class="key">A</span>.</p>
 
 <h2>Listes de lectures</h2>
 <p><span class="menu">MediaPlayer | Playlist...</span> (<span class="key">ALT</span> <span class="key">P</span>) ouvre la fenêtre de la d'attente. Double-cliquez sur une entrée pour commencer la lecture du fichier associé.</p>
 <img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
-<p>You can add more files by dropping them into the list and rearrange their position via drag &amp; drop. From the <span class="menu">Edit</span> menu you can <span class="menu">Randomize</span> or <span class="menu">Remove</span> (<span class="key">DEL</span>) an entry from the list or delete the actual file with <span class="menu">Move to Trash</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
+<p>Vous pouvez ajouter plus de fichiers en les déposant dans la liste, et modifier leur ordre en les déplaçant à la souris.
+À partir du menu <span class="menu">Edit</span> (<span class="menu">Éditer</span>) vous pouvez <span class="menu">Mélanger</span> (<span class="menu">Randomize</span>) ou <span class="menu">retirer</span> (<span class="menu">Remove</span> / <span class="key">Suppr</span>) une entrée de la liste ou encore <span class="menu">Envoyer le fichier à la corbeille</span> pour le supprimer réellement (<span class="menu">Move to Trash</span> / <span class="key">ALT</span> <span class="key">T</span>).</p>
 <p>Bien sûr, vous pouvez enregistrer (<span class="menu">Save</span>) une liste de lecture pour l'ouvrir de nouveau (<span class="menu">Open</span>) plus tard, ou la lancer en double-cliquant  simplement sur son fichier.</p>
 
 <h2>Réglages</h2>
 <p>Il existe plusieurs paramètres pour affiner le comportement du MediaPlayer.</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining. Start playback automatically, close windows when finished or play clips in a loop.</p>
-<p>Next are different <span class="menu">View options</span>.<br />
-You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
-You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
-<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
-Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of window</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
-<p>The last setting determines the volume of clips whose windows are not currently active. You can have them all blaring at <span class="menu">Full volume</span>, at less confusing <span class="menu">Low volume</span> or quietly <span class="menu">Muted</span>.</p>
+<p>Le premier groupe, "Mode de Lecture" (<span class="menu">Play mode</span>), est assez explicite. Vous pouvez lancer la lecture automatiquement, fermer les fenêtres lorsque la lecture s'achève ou lire des clips en boucle.</p>
+<p>Suivent différentes options de visualisation (<span class="menu">View options</span>).<br />
+Vous pouvez choisir d'utiliser le recouvrement vidéo matériel. Si cette fonction est disponible, ça réduit l'utilisation du processeur mais ça ne fonctionne que pour une seule fenêtre vidéo et requière certaines aptitudes du pilote vidéo.<br />
+Vous pouvez <span class="menu">Redimensionner le film harmonieusement</span> (<span class="menu">Scale movies smoothly</span>) afin d'appliquer un filtre qui lisse l'image en réduisant l'effet de crénelage sur les blocs qui apparaissent quand les pixels sont fortement agrandis.<br />
+Si vous préférez des contrôles un peu plus grand, vous pouvez les redimensionner en mode plein écran (<span class="menu">Scale controls in full-screen mode</span>) quand vous regardez la vidéo d'un peu plus loin<br />
+Puis viennent les réglages de la taille des sous-titres (<span class="menu">Subtitle size</span>) et leur emplacement (<span class="menu">Subtitle placement</span>). Ils peuvent être affichés au bas de la vidéo <span class="menu">Bottom of video</span>, ce qui les fera recouvrir une partie de la vidéo, ou au dessous de la fenêtre (<span class="menu">Bottom of window</span>), ce qui vous permettra de redimensionner la fenêtre afin que les sous-titres apparaissent dans la zone noire en dessous.</p>
+<p>Le dernier réglage détermine le volume des clips dont les fenêtres sont en arrière plan. Vous pouvez les faire toutes hurler à plein volume (<span class="menu">Full volume</span>), réduire leur volume (<span class="menu">Low volume</span>) pour moins de confusion ou les mettre en sourdine (<span class="menu">Muted</span>) pour plus de tranquillité.</p>
 
 <h2>Contrôles au clavier</h2>
 <p>MediaPlayer offre des combinaisons de touches commodes pour contrôler la lecture sans utiliser la souris.</p>
