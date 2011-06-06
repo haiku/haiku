@@ -37,9 +37,8 @@ HIDWriter::~HIDWriter()
 
 
 status_t
-HIDWriter::DefineInputPadding(uint8 reportID, uint8 count, uint8 bitLength)
+HIDWriter::DefineInputPadding(uint8 count, uint8 bitLength)
 {
-	SetReportID(reportID);
 	SetReportSize(bitLength);
 	SetReportCount(count);
 
@@ -50,11 +49,10 @@ HIDWriter::DefineInputPadding(uint8 reportID, uint8 count, uint8 bitLength)
 
 
 status_t
-HIDWriter::DefineInputData(uint8 reportID, uint8 count, uint8 bitLength,
-	main_item_data data, uint32 logicalMinimum, uint32 logicalMaximum,
-	uint16 usagePage, uint16 usageMinimum, uint16 usageMaximum)
+HIDWriter::DefineInputData(uint8 count, uint8 bitLength, main_item_data data,
+	uint32 logicalMinimum, uint32 logicalMaximum, uint16 usagePage,
+	uint16 usageMinimum, uint16 usageMaximum)
 {
-	SetReportID(reportID);
 	SetReportSize(bitLength);
 	SetReportCount(count);
 

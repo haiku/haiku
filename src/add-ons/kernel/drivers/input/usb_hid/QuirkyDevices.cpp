@@ -43,44 +43,46 @@ sixaxis_build_descriptor(HIDWriter &writer)
 	converter.main_data.array_variable = 1;
 	converter.main_data.no_preferred = 1;
 
+	writer.SetReportID(1);
+
 	// unknown / padding
-	writer.DefineInputPadding(1, 1, 8);
+	writer.DefineInputPadding(1, 8);
 
 	// digital button state on/off
-	writer.DefineInputData(1, 19, 1, converter.main_data, 0, 1,
+	writer.DefineInputData(19, 1, converter.main_data, 0, 1,
 		B_HID_USAGE_PAGE_BUTTON, 1);
 
 	// padding to 32 bit boundary
-	writer.DefineInputPadding(1, 13, 1);
+	writer.DefineInputPadding(13, 1);
 
 	// left analog stick
-	writer.DefineInputData(1, 1, 8, converter.main_data, 0, 255,
+	writer.DefineInputData(1, 8, converter.main_data, 0, 255,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
-	writer.DefineInputData(1, 1, 8, converter.main_data, 0, 255,
+	writer.DefineInputData(1, 8, converter.main_data, 0, 255,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_Y);
 
 	// right analog stick
-	writer.DefineInputData(1, 1, 8, converter.main_data, 0, 255,
+	writer.DefineInputData(1, 8, converter.main_data, 0, 255,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
-	writer.DefineInputData(1, 1, 8, converter.main_data, 0, 255,
+	writer.DefineInputData(1, 8, converter.main_data, 0, 255,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_Y);
 
 	// unknown / padding
-	writer.DefineInputPadding(1, 4, 8);
+	writer.DefineInputPadding(4, 8);
 
 	// pressure sensitive button states
-	writer.DefineInputData(1, 12, 8, converter.main_data, 0, 255,
+	writer.DefineInputData(12, 8, converter.main_data, 0, 255,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_VNO, B_HID_UID_GD_VNO);
 
 	// unknown / padding / operation mode / battery status / connection ...
-	writer.DefineInputPadding(1, 15, 8);
+	writer.DefineInputPadding(15, 8);
 
 	// accelerometer x, y and z
-	writer.DefineInputData(1, 3, 16, converter.main_data, 0, UINT16_MAX,
+	writer.DefineInputData(3, 16, converter.main_data, 0, UINT16_MAX,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_VX);
 
 	// gyroscope
-	writer.DefineInputData(1, 1, 16, converter.main_data, 0, UINT16_MAX,
+	writer.DefineInputData(1, 16, converter.main_data, 0, UINT16_MAX,
 		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_VBRZ);
 
 	return writer.EndCollection();
