@@ -31,6 +31,7 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Time"
 
+
 Settings::Settings()
 	:
 	fMessage(kMsgNetworkTimeSettings)
@@ -293,13 +294,13 @@ NetworkTimeView::MessageReceived(BMessage* message)
 			_UpdateServerList();
 			Looper()->PostMessage(new BMessage(kMsgChange));
 			break;
-			
+
 		case kMsgResetServerList:
 			fSettings.ResetServersToDefaults();
 			_UpdateServerList();
 			Looper()->PostMessage(new BMessage(kMsgChange));
 			break;
-		
+
 		case kMsgTryAllServers:
 			fSettings.SetTryAllServers(
 				fTryAllServersCheckBox->Value());
@@ -325,7 +326,7 @@ NetworkTimeView::MessageReceived(BMessage* message)
 
 			BMessenger* messenger = new BMessenger(this);
 			update_time(fSettings, messenger, &fUpdateThread);
-			fSynchronizeButton->SetLabel("Stop");
+			fSynchronizeButton->SetLabel(B_TRANSLATE("Stop"));
 			fSynchronizeButton->Message()->what = kMsgStopSynchronization;
 			break;
 		}
@@ -341,21 +342,22 @@ NetworkTimeView::MessageReceived(BMessage* message)
 				const char* errorString;
 				message->FindString("error string", &errorString);	
 				char buffer[256];
-					
+
 				int32 errorCode;
 				if (message->FindInt32("error code", &errorCode)
 					== B_OK)
 					snprintf(buffer, sizeof(buffer),
-						"The following error occured "
-						"while synchronizing:\r\n%s: %s",
+						B_TRANSLATE("The following error occured "
+						"while synchronizing:\r\n%s: %s"),
 						errorString, strerror(errorCode));
 				else
 					snprintf(buffer, sizeof(buffer),
-						"The following error occured "
-						"while synchronizing:\r\n%s",
+						B_TRANSLATE("The following error occured "
+						"while synchronizing:\r\n%s"),
 						errorString);
 
-				(new BAlert("Time", buffer, "OK"))->Go();
+				(new BAlert(B_TRANSLATE("Time"), buffer, 
+					B_TRANSLATE("OK")))->Go();
 			}
 			break;
 		}
@@ -409,19 +411,20 @@ NetworkTimeView::_InitView()
 	BScrollView* scrollView = new BScrollView("serverScrollView",
 		fServerListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	_UpdateServerList();
-	
+
 	fTryAllServersCheckBox = new BCheckBox("tryAllServers",
 		B_TRANSLATE("Try all servers"), new BMessage(kMsgTryAllServers));
 	fTryAllServersCheckBox->SetValue(fSettings.GetTryAllServers());
-	
-	fSynchronizeAtBootCheckBox = new BCheckBox("autoUpdate", 
-		B_TRANSLATE("Synchronize at boot"), new BMessage(kMsgSynchronizeAtBoot));
+
+	fSynchronizeAtBootCheckBox = new BCheckBox("autoUpdate",
+		B_TRANSLATE("Synchronize at boot"),
+		new BMessage(kMsgSynchronizeAtBoot));
 	fSynchronizeAtBootCheckBox->SetValue(fSettings.GetSynchronizeAtBoot());
-	fSynchronizeButton = new BButton("update", B_TRANSLATE("Synchronize now"),
+	fSynchronizeButton = new BButton("update", B_TRANSLATE("Synchronize"),
 		new BMessage(kMsgSynchronize));
 	fSynchronizeButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
-	
+
 	const float kInset = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL)
@@ -480,7 +483,7 @@ update_time(const Settings& settings, const char** errorString,
 
 	status_t status = B_ENTRY_NOT_FOUND;
 	const char* server = settings.GetServer(defaultServer);
-	
+
 	if (server != NULL)
 		status = ntp_update_time(server, errorString, errorCode);
 
@@ -497,7 +500,7 @@ update_time(const Settings& settings, const char** errorString,
 				break;
 		}
 	}
-	
+
 	return status;
 }
 
@@ -519,7 +522,7 @@ update_thread(void* params)
 	if (errorCode != 0)
 		result.AddInt32("error code", errorCode);
 	messenger->SendMessage(&result);
-	
+
 	delete messenger;
 	return B_OK;
 }

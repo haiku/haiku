@@ -39,6 +39,7 @@ DoCatalogs Time :
 	:
 	DateTimeView.cpp
 	NetworkTimeView.cpp
+	ntp.cpp
 	Time.cpp
 	TimeWindow.cpp
 	ZoneView.cpp

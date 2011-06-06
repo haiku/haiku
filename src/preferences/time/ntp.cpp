@@ -17,6 +17,12 @@
 
 #include <OS.h>
 
+#include <Catalog.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Time"
+
 
 /* This structure and its data fields are described in RFC 1305
  * "Network Time Protocol (Version 3)" in appendix A.
@@ -112,7 +118,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 
 	if (server == NULL) {
 	
-		*errorString = "Could not contact server";
+		*errorString = B_TRANSLATE("Could not contact server");
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -133,7 +139,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 
 	int connection = socket(AF_INET, SOCK_DGRAM, 0);
 	if (connection < 0) {
-		*errorString = "Could not create socket";
+		*errorString = B_TRANSLATE("Could not create socket");
 		*errorCode = errno;
 		return B_ERROR;
 	}
@@ -145,7 +151,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 
 	if (sendto(connection, (char *)&message, sizeof(ntp_data),
 			0, (struct sockaddr *)&address, sizeof(address)) < 0) {
-		*errorString = "Sending request failed";
+		*errorString = B_TRANSLATE("Sending request failed");
 		*errorCode = errno;
 		return B_ERROR;
 	}
@@ -160,7 +166,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 	// we'll wait 3 seconds for the answer
 
 	if (select(connection + 1, &waitForReceived, NULL, NULL, &timeout) <= 0) {
-		*errorString = "Waiting for answer failed";
+		*errorString = B_TRANSLATE("Waiting for answer failed");
 		*errorCode = errno;
 		return B_ERROR;
 	}
@@ -170,7 +176,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 	socklen_t addressSize = sizeof(address);
 	if (recvfrom(connection, (char *)&message, sizeof(ntp_data), 0,
 			(sockaddr *)&address, &addressSize) < (ssize_t)sizeof(ntp_data)) {
-		*errorString = "Message receiving failed";
+		*errorString = B_TRANSLATE("Message receiving failed");
 		*errorCode = errno;
 		close(connection);
 		return B_ERROR;
@@ -179,7 +185,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 	close(connection);
 
 	if (message.transmit_timestamp.Integer() == 0) {
-		*errorString = "Received invalid time";
+		*errorString = B_TRANSLATE("Received invalid time");
 		return B_BAD_VALUE;
 	}
 
