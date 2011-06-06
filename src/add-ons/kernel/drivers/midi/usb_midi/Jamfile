@@ -11,8 +11,8 @@ if $(TARGET_PLATFORM) != haiku {
 UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelAddon usb_midi :
-	usb_midi.c
-	devlist.c
+	usb_midi.cpp
+	devlist.cpp
 	$(buffer_impl)
 ;
 

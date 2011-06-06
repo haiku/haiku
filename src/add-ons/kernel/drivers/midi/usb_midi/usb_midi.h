@@ -60,8 +60,8 @@
 #define	MY_ERR	"\033[31merror:\033[m "
 #define	MY_WARN	"\033[31mwarning:\033[m "
 #define	assert(x) \
-	((x) ? 0 : dprintf(MY_ID "assertion failed at " \
-	 __FILE__ ", line %d\n", __LINE__))
+	do { if (!(x)) { dprintf(MY_ID "assertion failed at " \
+	 __FILE__ ", line %d\n", __LINE__); }} while (0)
 
 #define	DEFAULT_CONFIGURATION	0
 
@@ -125,7 +125,7 @@ typedef struct usbmidi_port_info
 
 
 /*
- usb_midi.c
+ usb_midi.cpp
 */
 
 extern usb_module_info* usb;
@@ -140,7 +140,7 @@ extern void remove_device(usbmidi_device_info* my_dev);
 
 
 /*
- devlist.c
+ devlist.cpp
 */
 
 extern sem_id usbmidi_port_list_lock;

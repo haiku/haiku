@@ -116,7 +116,8 @@ void
 alloc_port_names(void)
 {
 	assert(usbmidi_port_names == NULL);
-	usbmidi_port_names = malloc(sizeof(char*) * (usbmidi_port_count + 1));
+	usbmidi_port_names = (char**)malloc(sizeof(char*)
+		* (usbmidi_port_count + 1));
 }
 
 
