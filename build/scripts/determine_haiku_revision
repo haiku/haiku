@@ -13,53 +13,14 @@ determineGitRevision()
 	# only determine the haiku-revision if anything has changed from
 	# last build
 	if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
-		haikuBranch=`git describe --abbrev=0 --match 'haiku/*.base' \
-			| $SED -re 's/haiku\/(.*)\.base/\1/'`
-		if [ -z "$haikuBranch" ]; then
-			echo "*** unable to find haiku branch the build is based on"
-			exit 1;
-		fi
-		haikuTip=`git rev-list -n1 haiku/${haikuBranch}.tip`
-		if [ -z "$haikuTip" ]; then
-			echo "*** unable to find tip of haiku branch the build is based on"
-			exit 1;
-		fi
-
-		# make sure that haiku-tip matches the remote tracking branch,
-		# otherwise the tag hasn't been fetched/updated and we should
-		# print a warning
-		trackingBranch=`git branch -r --contains $haikuTip \
-			| grep -v -- '->' | tr -d ' '`
-		if [ -z "$trackingBranch" ]; then
-			echo "*** unable to find tracking branch the build is based on"
-			exit 1;
-		fi
-		haikuTipLag=`git rev-list --count ${haikuTip}..$trackingBranch`
-		if [ "$haikuTipLag" != "0" ]; then
-			echo "*********************************************************"
-			echo "!!! haiku/${haikuBranch}.tip is $haikuTipLag behind \
-				remote tracking branch"
-			echo "!!! you may want to 'git fetch --tags' to update the tag"
-			echo "*********************************************************"
-		fi
-
-		# the haiku revision the HEAD is based on is the nearest common ancestor
-		# of these two (i.e. the merge base)
-		haikuBaseRev=`git merge-base $localRev $haikuTip`
-		if [ -z "$haikuTip" ]; then
-			echo "*** unable to find merge-base for haiku tip and build"
-			exit 1;
-		fi
-
-		# the revision we use is the description of HEAD with
-		# respect to the root of the current branch
-		revision=`git describe --dirty --long --match=haiku/$haikuBranch`
-		if [ "$localRev" != "$haikuBaseRev" ]; then
-			# HEAD is not a changeset from Haiku's central repo, so we add
-			# a description of the changeset in Haiku's repo HEAD is based on
-			haikuBaseRevDescr=`git describe --long --match=haiku/$haikuBranch \
-				$haikuBaseRev`
-			revision="$revision [$haikuBaseRevDescr]"
+		# the revision we use is the description of HEAD with respect to the
+		# last reachable hrev-(haiku-revision-)tag
+		revision=`git describe --dirty --tags --match=hrev*`
+		if echo "$revision" | grep -- '-' >/dev/null; then
+			# HEAD is not directly a changeset from Haiku's central repo, so we
+			# add the current branch name as additional info
+			branchName=`git branch | grep '*' | cut -b 3-`
+			revision="$revision [$branchName]"
 		fi
 		echo $localRev >${haikuBuildOutputDir}/last-built-revision
 	fi
