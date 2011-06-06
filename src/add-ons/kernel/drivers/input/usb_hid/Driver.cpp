@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
 
@@ -11,6 +11,7 @@
 #include "Driver.h"
 #include "HIDDevice.h"
 #include "ProtocolHandler.h"
+#include "QuirkyDevices.h"
 
 #include <lock.h>
 #include <util/AutoLock.h>
@@ -31,6 +32,7 @@ usb_module_info *gUSBModule = NULL;
 DeviceList *gDeviceList = NULL;
 static int32 sParentCookie = 0;
 static mutex sDriverLock;
+static usb_support_descriptor *sSupportDescriptors;
 
 
 // #pragma mark - notify hooks
@@ -311,11 +313,31 @@ init_driver()
 		&usb_hid_device_removed
 	};
 
-	static usb_support_descriptor supportDescriptor = {
+	static usb_support_descriptor genericHIDSupportDescriptor = {
 		USB_INTERFACE_CLASS_HID, 0, 0, 0, 0
 	};
 
-	gUSBModule->register_driver(DRIVER_NAME, &supportDescriptor, 1, NULL);
+	int32 supportDescriptorCount = 1 + gQuirkyDeviceCount;
+	sSupportDescriptors
+		= new(std::nothrow) usb_support_descriptor[supportDescriptorCount];
+	if (sSupportDescriptors != NULL) {
+		sSupportDescriptors[0] = genericHIDSupportDescriptor;
+		for (int32 i = 0; i < gQuirkyDeviceCount; i++) {
+			sSupportDescriptors[i + 1].dev_class = 0;
+			sSupportDescriptors[i + 1].dev_subclass = 0;
+			sSupportDescriptors[i + 1].dev_protocol = 0;
+			sSupportDescriptors[i + 1].vendor = gQuirkyDevices[i].vendor_id;
+			sSupportDescriptors[i + 1].product = gQuirkyDevices[i].product_id;
+		}
+
+		gUSBModule->register_driver(DRIVER_NAME, sSupportDescriptors,
+			supportDescriptorCount, NULL);
+	} else {
+		// no memory for quirky devices, at least support proper HID
+		gUSBModule->register_driver(DRIVER_NAME, &genericHIDSupportDescriptor,
+			1, NULL);
+	}
+
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	TRACE("init_driver() OK\n");
 	return B_OK;
@@ -328,6 +350,8 @@ uninit_driver()
 	TRACE("uninit_driver()\n");
 	gUSBModule->uninstall_notify(DRIVER_NAME);
 	put_module(B_USB_MODULE_NAME);
+	delete[] sSupportDescriptors;
+	sSupportDescriptors = NULL;
 	delete gDeviceList;
 	gDeviceList = NULL;
 	mutex_destroy(&sDriverLock);
