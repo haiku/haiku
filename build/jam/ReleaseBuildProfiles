@@ -26,6 +26,11 @@ switch $(HAIKU_BUILD_PROFILE) {
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
 			Python Subversion OpenSSH OpenSSL ;
 		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook XZ-Utils ;
+
+		local releaseNotesURL = http://dev.haiku-os.org/wiki/R1/Alpha3/ReleaseNotes?format=txt ;
+		local releaseNotesName = "Release Notes" ;
+		local releaseNotesFile = [ DownloadFile $(releaseNotesName) : $(releaseNotesURL) ] ;
+		AddFilesToHaikuImage home Desktop : $(releaseNotesFile) ;
 	}
 
 	case "beta-*" : {

@@ -372,7 +372,7 @@ rule DownloadLocatedFile target : url
 
 actions DownloadLocatedFile1
 {
-	wget -O $(1) $(URL)
+	wget -O "$(1)" $(URL)
 }
 
 rule DownloadFile file : url
