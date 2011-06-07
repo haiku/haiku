@@ -223,7 +223,23 @@ enum vertical_alignment {
 	B_ALIGN_USE_FULL_HEIGHT		= -2L
 };
 
-const float B_USE_DEFAULT_SPACING = -2.0f;
+
+// Layout spacing and insets, see BControlLook::ComposeSpacing()
+
+
+enum {
+	B_USE_DEFAULT_SPACING = -2,
+	B_USE_ITEM_SPACING = -2,
+	B_USE_ITEM_INSETS = -2,
+	B_USE_HALF_ITEM_SPACING = -3,
+	B_USE_HALF_ITEM_INSETS = -3,
+	B_USE_WINDOW_INSETS = -4,
+	B_USE_WINDOW_SPACING = -4,
+	B_USE_SMALL_INSETS = -5,
+	B_USE_SMALL_SPACING = -5,
+	B_USE_BIG_INSETS = -6,
+	B_USE_BIG_SPACING = -6
+};
 
 
 // Line join and cap modes

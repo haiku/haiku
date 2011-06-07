@@ -68,7 +68,7 @@ BGroupLayout::Spacing() const
 void
 BGroupLayout::SetSpacing(float spacing)
 {
-	spacing = BControlLook::ComposeItemSpacing(spacing);
+	spacing = BControlLook::ComposeSpacing(spacing);
 	if (spacing != fHSpacing) {
 		fHSpacing = spacing;
 		fVSpacing = spacing;

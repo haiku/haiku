@@ -162,7 +162,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 	fTopInset(0),
 	fBottomInset(0),
 	fSplitterSize(6),
-	fSpacing(BControlLook::ComposeItemSpacing(spacing)),
+	fSpacing(BControlLook::ComposeSpacing(spacing)),
 
 	fSplitterItems(),
 	fVisibleItems(),
@@ -268,10 +268,10 @@ BSplitLayout::~BSplitLayout()
 void
 BSplitLayout::SetInsets(float left, float top, float right, float bottom)
 {
-	fLeftInset = BControlLook::ComposeItemSpacing(left);
-	fTopInset = BControlLook::ComposeItemSpacing(top);
-	fRightInset = BControlLook::ComposeItemSpacing(right);
-	fBottomInset = BControlLook::ComposeItemSpacing(bottom);
+	fLeftInset = BControlLook::ComposeSpacing(left);
+	fTopInset = BControlLook::ComposeSpacing(top);
+	fRightInset = BControlLook::ComposeSpacing(right);
+	fBottomInset = BControlLook::ComposeSpacing(bottom);
 
 	InvalidateLayout();
 }
@@ -302,7 +302,7 @@ BSplitLayout::Spacing() const
 void
 BSplitLayout::SetSpacing(float spacing)
 {
-	spacing = BControlLook::ComposeItemSpacing(spacing);
+	spacing = BControlLook::ComposeSpacing(spacing);
 	if (spacing != fSpacing) {
 		fSpacing = spacing;
 

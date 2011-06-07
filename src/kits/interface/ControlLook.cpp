@@ -51,14 +51,21 @@ BControlLook::DefaultItemSpacing() const
 
 
 float
-BControlLook::ComposeItemSpacing(float spacing)
+BControlLook::ComposeSpacing(float spacing)
 {
-	if (spacing != B_USE_DEFAULT_SPACING)
-		return spacing;
-
-	if (be_control_look)
+	// We only need to check one of each synonym (B_*_SPACING | B_*_INSETS)
+	if (spacing == B_USE_ITEM_SPACING) {
 		return be_control_look->DefaultItemSpacing();
-	return 0;
+	} else if (spacing == B_USE_HALF_ITEM_SPACING) {
+		return be_control_look->DefaultItemSpacing() * 0.5f;
+	} else if (spacing == B_USE_WINDOW_INSETS) {
+		return be_control_look->DefaultItemSpacing();
+	} else if (spacing == B_USE_SMALL_SPACING) {
+		return be_control_look->DefaultItemSpacing() * 0.7f;
+	} else if (spacing == B_USE_BIG_SPACING) {
+		return be_control_look->DefaultItemSpacing() * 1.3f;
+	}
+	return spacing;
 }
 
 

@@ -79,7 +79,8 @@ public:
 
 	/* TODO: virtual*/
 			float				DefaultItemSpacing() const;
-	static	float				ComposeItemSpacing(float spacing);
+
+	static	float				ComposeSpacing(float spacing);
 
 			uint32				Flags(BControl* control) const;
 
