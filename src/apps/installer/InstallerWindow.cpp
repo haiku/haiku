@@ -176,8 +176,15 @@ InstallerWindow::InstallerWindow()
 
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
-	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.66,
+	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.8,
 		B_SIZE_UNSET));
+
+	// Explicitly create group view to set the background white in case
+	// height resizing is needed for the status view
+	BGroupView* logoGroup = new BGroupView(B_HORIZONTAL, 0);
+	logoGroup->SetViewColor(255, 255, 255);
+	logoGroup->AddChild(logoView);
+	logoGroup->AddChild(fStatusView);
 
 	fDestMenu = new BPopUpMenu(B_TRANSLATE("scanning" B_UTF8_ELLIPSIS),
 		true, false);
@@ -244,10 +251,7 @@ InstallerWindow::InstallerWindow()
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(mainMenu)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-			.Add(logoView)
-			.Add(fStatusView)
-		)
+		.Add(logoGroup)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
 			.Add(BGridLayoutBuilder(0, spacing)
@@ -843,6 +847,12 @@ void
 InstallerWindow::_SetStatusMessage(const char *text)
 {
 	fStatusView->SetText(text);
+
+	// Make the status view taller if needed
+	BSize size = fStatusView->ExplicitMinSize();
+	float heightNeeded = fStatusView->TextHeight(0, fStatusView->CountLines()) + 15.0;
+	if (heightNeeded > size.height)
+		fStatusView->SetExplicitMinSize(BSize(size.width, heightNeeded));
 }
 
 
