@@ -89,6 +89,46 @@ sixaxis_build_descriptor(HIDWriter &writer)
 }
 
 
+static status_t
+xbox360_build_descriptor(HIDWriter &writer)
+{
+	writer.BeginCollection(COLLECTION_APPLICATION,
+		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_JOYSTICK);
+
+	main_item_data_converter converter;
+	converter.flat_data = 0; // defaults
+	converter.main_data.array_variable = 1;
+	converter.main_data.no_preferred = 1;
+
+	// unknown / padding / byte count
+	writer.DefineInputPadding(2, 8);
+
+	// dpad / buttons
+	writer.DefineInputData(11, 1, converter.main_data, 0, 1,
+		B_HID_USAGE_PAGE_BUTTON, 1);
+	writer.DefineInputPadding(1, 1);
+	writer.DefineInputData(4, 1, converter.main_data, 0, 1,
+		B_HID_USAGE_PAGE_BUTTON, 12);
+
+	// triggers
+	writer.DefineInputData(1, 8, converter.main_data, 0, 255,
+		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_Z);
+	writer.DefineInputData(1, 8, converter.main_data, 0, 255,
+		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_RZ);
+
+	// sticks
+	writer.DefineInputData(2, 16, converter.main_data, -32768, 32767,
+		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
+	writer.DefineInputData(2, 16, converter.main_data, -32768, 32767,
+		B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
+
+	// unknown / padding
+	writer.DefineInputPadding(6, 8);
+
+	return writer.EndCollection();
+}
+
+
 usb_hid_quirky_device gQuirkyDevices[] = {
 	{
 		// The Sony SIXAXIS controller (PS3) needs a GET_REPORT to become
@@ -98,6 +138,15 @@ usb_hid_quirky_device gQuirkyDevices[] = {
 		// descriptor that includes those extra items.
 		0x054c, 0x0268, USB_INTERFACE_CLASS_HID, 0, 0,
 		sixaxis_init, sixaxis_build_descriptor
+	},
+
+	{
+		// XBOX 360 controllers aren't really HID (marked vendor specific).
+		// They therefore don't provide a HID/report descriptor either. The
+		// input stream is HID-like enough though. We therefore claim support
+		// and build a report descriptor of our own.
+		0, 0, 0xff /* vendor specific */, 0x5d /* XBOX controller */, 0x01,
+		NULL, xbox360_build_descriptor
 	}
 };
 
