@@ -60,31 +60,55 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 	}
 
 	if (!hasFixedDescriptor) {
-		// conforming device, read HID and report descriptors
-		descriptorLength = sizeof(usb_hid_descriptor);
-		usb_hid_descriptor *hidDescriptor
-			= (usb_hid_descriptor *)malloc(descriptorLength);
-		if (hidDescriptor == NULL) {
-			TRACE_ALWAYS("failed to allocate buffer for hid descriptor\n");
-			fStatus = B_NO_MEMORY;
-			return;
+		// Conforming device, find the HID descriptor and get the report
+		// descriptor from the device.
+		usb_hid_descriptor *hidDescriptor = NULL;
+
+		const usb_interface_info *interfaceInfo
+			= config->interface[interfaceIndex].active;
+		for (size_t i = 0; i < interfaceInfo->generic_count; i++) {
+			const usb_generic_descriptor &generic
+				= interfaceInfo->generic[i]->generic;
+			if (generic.descriptor_type == B_USB_HID_DESCRIPTOR_HID) {
+				hidDescriptor = (usb_hid_descriptor *)&generic;
+				descriptorLength
+					= hidDescriptor->descriptor_info[0].descriptor_length;
+				break;
+			}
 		}
 
-		status_t result = gUSBModule->send_request(device,
-			USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
-			USB_REQUEST_GET_DESCRIPTOR,
-			B_USB_HID_DESCRIPTOR_HID << 8, interfaceIndex, descriptorLength,
-			hidDescriptor, &descriptorLength);
+		if (hidDescriptor == NULL) {
+			TRACE_ALWAYS("didn't find a HID descriptor in the configuration, "
+				"trying to retrieve manually\n");
 
-		TRACE("get hid descriptor: result: 0x%08lx; length: %lu\n", result,
-			descriptorLength);
-		if (result == B_OK) {
-			descriptorLength
-				= hidDescriptor->descriptor_info[0].descriptor_length;
-		} else
-			descriptorLength = 256; /* XXX */
+			descriptorLength = sizeof(usb_hid_descriptor);
+			hidDescriptor = (usb_hid_descriptor *)malloc(descriptorLength);
+			if (hidDescriptor == NULL) {
+				TRACE_ALWAYS("failed to allocate buffer for hid descriptor\n");
+				fStatus = B_NO_MEMORY;
+				return;
+			}
 
-		free(hidDescriptor);
+			status_t result = gUSBModule->send_request(device,
+				USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
+				USB_REQUEST_GET_DESCRIPTOR,
+				B_USB_HID_DESCRIPTOR_HID << 8, interfaceIndex, descriptorLength,
+				hidDescriptor, &descriptorLength);
+
+			TRACE("get hid descriptor: result: 0x%08lx; length: %lu\n", result,
+				descriptorLength);
+			if (result == B_OK) {
+				descriptorLength
+					= hidDescriptor->descriptor_info[0].descriptor_length;
+			} else {
+				descriptorLength = 256; /* XXX */
+				TRACE_ALWAYS("failed to get HID descriptor, trying with a "
+					"fallback report descriptor length of %lu\n",
+					descriptorLength);
+			}
+
+			free(hidDescriptor);
+		}
 
 		reportDescriptor = (uint8 *)malloc(descriptorLength);
 		if (reportDescriptor == NULL) {
@@ -93,7 +117,7 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 			return;
 		}
 
-		result = gUSBModule->send_request(device,
+		status_t result = gUSBModule->send_request(device,
 			USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 			USB_REQUEST_GET_DESCRIPTOR,
 			B_USB_HID_DESCRIPTOR_REPORT << 8, interfaceIndex, descriptorLength,
