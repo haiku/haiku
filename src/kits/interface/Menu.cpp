@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -477,6 +477,13 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_DOWN_ARROW:
+			{
+				BMenuBar* bar = dynamic_cast<BMenuBar*>(Supermenu());
+				if (bar != NULL && fState == MENU_STATE_CLOSED) {
+					// tell MenuBar's _Track:
+					bar->fState = MENU_STATE_KEY_TO_SUBMENU;
+				}
+			}
 			if (fLayout == B_ITEMS_IN_COLUMN)
 				_SelectNextItem(fSelected, true);
 			break;
@@ -494,8 +501,10 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 						// another top level menu.
 						BMessenger msgr(Supermenu());
 						msgr.SendMessage(Window()->CurrentMessage());
-					} else
-						_QuitTracking();
+					} else {
+						// tell _Track
+						fState = MENU_STATE_KEY_LEAVE_SUBMENU;
+					}
 				}
 			}
 			break;
@@ -505,10 +514,11 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 				_SelectNextItem(fSelected, true);
 			else {
 				if (fSelected && fSelected->Submenu()) {
-					fSelected->Submenu()->_SetStickyMode(true); 
+					fSelected->Submenu()->_SetStickyMode(true);
 						// fix me: this shouldn't be needed but dynamic menus 
 						// aren't getting it set correctly when keyboard 
 						// navigating, which aborts the attach 
+					fState = MENU_STATE_KEY_TO_SUBMENU;
 					_SelectItem(fSelected, true, true, true);
 				} else if (dynamic_cast<BMenuBar*>(Supermenu())) {
 					// if we have no submenu and we're an
@@ -539,13 +549,20 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 		case B_ENTER:
 		case B_SPACE:
 			if (fSelected) {
-				_InvokeItem(fSelected);
+				// preserve for exit handling
+				fChosenItem = fSelected;
 				_QuitTracking(false);
 			}
 			break;
 
 		case B_ESCAPE:
-			_QuitTracking();
+			_SelectItem(NULL);
+			if (fState == MENU_STATE_CLOSED && dynamic_cast<BMenuBar*>(Supermenu())) {
+				// Keyboard may show menu without tracking it
+				BMessenger msgr(Supermenu());
+				msgr.SendMessage(Window()->CurrentMessage());
+			} else
+				_QuitTracking(false);
 			break;
 
 		default:
@@ -1580,8 +1597,8 @@ BMenu::_Track(int* action, long start)
 	bigtime_t navigationAreaTime = 0;
 
 	fState = MENU_STATE_TRACKING;
-	if (fSuper != NULL)
-		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
+	// we will use this for keyboard selection:
+	fChosenItem = NULL;
 
 	BPoint location;
 	uint32 buttons = 0;
@@ -1608,11 +1625,15 @@ BMenu::_Track(int* action, long start)
 		// The order of the checks is important
 		// to be able to handle overlapping menus:
 		// first we check if mouse is inside a submenu,
-		// then if the menu is inside this menu,
+		// then if the mouse is inside this menu,
 		// then if it's over a super menu.
 		bool overSub = _OverSubmenu(fSelected, screenLocation);
 		item = _HitTestItems(location, B_ORIGIN);
-		if (overSub) {
+		if (overSub || fState == MENU_STATE_KEY_TO_SUBMENU) {
+			if (fState == MENU_STATE_TRACKING) {
+				// not if from R.Arrow
+				fState = MENU_STATE_TRACKING_SUBMENU;
+			}
 			navAreaRectAbove = BRect();
 			navAreaRectBelow = BRect();
 
@@ -1633,7 +1654,19 @@ BMenu::_Track(int* action, long start)
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
 				fState = MENU_STATE_CLOSED;
-			}
+			} else if (submenuAction == MENU_STATE_KEY_LEAVE_SUBMENU) {
+				if (LockLooper()) {
+					BMenuItem *temp = fSelected;
+					// close the submenu:
+					_SelectItem(NULL);
+					// but reselect the item itself for user:
+					_SelectItem(temp, false);
+					UnlockLooper();
+				}
+				// cancel  key-nav state
+				fState = MENU_STATE_TRACKING;
+			} else
+				fState = MENU_STATE_TRACKING;
 			if (!LockLooper())
 				break;
 		} else if (item != NULL) {
@@ -1641,11 +1674,14 @@ BMenu::_Track(int* action, long start)
 				navAreaRectBelow, selectedTime, navigationAreaTime);
 			if (!releasedOnce)
 				releasedOnce = true;
-		} else if (_OverSuper(screenLocation)) {
+		} else if (_OverSuper(screenLocation) && fSuper->fState != MENU_STATE_KEY_TO_SUBMENU) {
 			fState = MENU_STATE_TRACKING;
 			UnlockLooper();
 			break;
-		} else {
+		} else if (fState == MENU_STATE_KEY_LEAVE_SUBMENU) {
+			UnlockLooper();
+			break;
+		} else if (fSuper == NULL || fSuper->fState != MENU_STATE_KEY_TO_SUBMENU) {
 			// Mouse pointer outside menu:
 			// If there's no other submenu opened,
 			// deselect the current selected item
@@ -1676,7 +1712,7 @@ BMenu::_Track(int* action, long start)
 			uint32 newButtons = buttons;
 
 			// If user doesn't move the mouse, loop here,
-			// so we don't interfer with keyboard menu navigation
+			// so we don't interfere with keyboard menu navigation
 			do {
 				snooze(snoozeAmount);
 				if (!LockLooper())
@@ -1684,7 +1720,8 @@ BMenu::_Track(int* action, long start)
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
 			} while (newLocation == location && newButtons == buttons
-				&& !(item && item->Submenu() != NULL));
+				&& !(item && item->Submenu() != NULL)
+				&& fState == MENU_STATE_TRACKING);
 
 			if (newLocation != location || newButtons != buttons) {
 				if (!releasedOnce && newButtons == 0 && buttons != 0)
@@ -1700,12 +1737,19 @@ BMenu::_Track(int* action, long start)
 
 	if (action != NULL)
 		*action = fState;
+		
+	// keyboard Enter will set this
+	if (fChosenItem != NULL)
+		item = fChosenItem;
+	else if (fSelected == NULL)
+		// needed to cover (rare) mouse/ESC combination
+		item = NULL;
 
 	if (fSelected != NULL && LockLooper()) {
 		_SelectItem(NULL);
 		UnlockLooper();
 	}
-
+	
 	// delete the menu window recycled for all the child menus
 	_DeleteMenuWindow();
 
@@ -2829,7 +2873,6 @@ BMenu::_QuitTracking(bool onlyThis)
 	if (BMenuBar* menuBar = dynamic_cast<BMenuBar*>(this))
 		menuBar->_RestoreFocus();
 
-	fChosenItem = NULL;
 	fState = MENU_STATE_CLOSED;
 
 	// Close the whole menu hierarchy

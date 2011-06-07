@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc.
+ * Copyright 2006-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,8 @@
 enum menu_states {
 	MENU_STATE_TRACKING = 0,
 	MENU_STATE_TRACKING_SUBMENU = 1,
+	MENU_STATE_KEY_TO_SUBMENU = 2,
+	MENU_STATE_KEY_LEAVE_SUBMENU = 3,
 	MENU_STATE_CLOSED = 5
 };
 
