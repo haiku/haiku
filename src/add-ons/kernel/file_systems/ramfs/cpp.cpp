@@ -8,7 +8,7 @@
 #include "cpp.h"
 
 
-const struct nothrow_t nothrow = {};
+//const struct nothrow_t nothrow = {};
 
 //extern "C" void __pure_virtual()
 //{
