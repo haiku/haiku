@@ -82,10 +82,33 @@ usb_hid_device_added(usb_device device, void **cookie)
 			i, interfaceClass, interface->descr->interface_subclass,
 			interface->descr->interface_protocol);
 
-		if (interfaceClass == USB_INTERFACE_CLASS_HID) {
+		// check for quirky devices first
+		int32 quirkyIndex = -1;
+		for (int32 j = 0; j < gQuirkyDeviceCount; j++) {
+			usb_hid_quirky_device &quirky = gQuirkyDevices[j];
+			if ((quirky.vendor_id != 0
+					&& deviceDescriptor->vendor_id != quirky.vendor_id)
+				|| (quirky.product_id != 0
+					&& deviceDescriptor->product_id != quirky.product_id)
+				|| (quirky.device_class != 0
+					&& interfaceClass != quirky.device_class)
+				|| (quirky.device_subclass != 0
+					&& interface->descr->interface_subclass
+						!= quirky.device_subclass)
+				|| (quirky.device_protocol != 0
+					&& interface->descr->interface_protocol
+						!= quirky.device_protocol)) {
+				continue;
+			}
+
+			quirkyIndex = j;
+			break;
+		}
+
+		if (quirkyIndex >= 0 || interfaceClass == USB_INTERFACE_CLASS_HID) {
 			mutex_lock(&sDriverLock);
 			HIDDevice *hidDevice
-				= new(std::nothrow) HIDDevice(device, config, i);
+				= new(std::nothrow) HIDDevice(device, config, i, quirkyIndex);
 
 			if (hidDevice != NULL && hidDevice->InitCheck() == B_OK) {
 				hidDevice->SetParentCookie(parentCookie);

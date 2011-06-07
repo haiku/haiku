@@ -24,7 +24,7 @@
 
 
 HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
-	size_t interfaceIndex)
+	size_t interfaceIndex, int32 quirkyIndex)
 	:	fStatus(B_NO_INIT),
 		fDevice(device),
 		fInterfaceIndex(interfaceIndex),
@@ -44,25 +44,18 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
 
-	// check for quirky devices first and don't bother in that case
 	HIDWriter descriptorWriter;
 	bool hasFixedDescriptor = false;
-	quirky_init_function quirkyInit = NULL;
-	for (int32 i = 0; i < gQuirkyDeviceCount; i++) {
-		usb_hid_quirky_device &quirky = gQuirkyDevices[i];
-		if (deviceDescriptor->vendor_id == quirky.vendor_id
-			&& deviceDescriptor->product_id == quirky.product_id) {
+	if (quirkyIndex >= 0) {
+		quirky_build_descriptor quirkyBuildDescriptor
+			= gQuirkyDevices[quirkyIndex].build_descriptor;
 
-			quirkyInit = quirky.init_function;
-			if (quirky.build_descriptor != NULL
-				&& quirky.build_descriptor(descriptorWriter) == B_OK) {
+		if (quirkyBuildDescriptor != NULL
+			&& quirkyBuildDescriptor(descriptorWriter) == B_OK) {
 
-				reportDescriptor = (uint8 *)descriptorWriter.Buffer();
-				descriptorLength = descriptorWriter.BufferLength();
-				hasFixedDescriptor = true;
-			}
-
-			break;
+			reportDescriptor = (uint8 *)descriptorWriter.Buffer();
+			descriptorLength = descriptorWriter.BufferLength();
+			hasFixedDescriptor = true;
 		}
 	}
 
@@ -176,10 +169,15 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		return;
 	}
 
-	if (quirkyInit != NULL) {
-		fStatus = quirkyInit(device, config, interfaceIndex);
-		if (fStatus != B_OK)
-			return;
+	if (quirkyIndex >= 0) {
+		quirky_init_function quirkyInit
+			= gQuirkyDevices[quirkyIndex].init_function;
+
+		if (quirkyInit != NULL) {
+			fStatus = quirkyInit(device, config, interfaceIndex);
+			if (fStatus != B_OK)
+				return;
+		}
 	}
 
 	ProtocolHandler::AddHandlers(*this, fProtocolHandlerList,
