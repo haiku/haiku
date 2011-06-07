@@ -93,8 +93,8 @@ typedef List<EntryListenerValue> EntryListenerList;
 // Volume
 class Volume {
 public:
-	Volume();
-	~Volume();
+							Volume(fs_volume* volume);
+							~Volume();
 
 	status_t Mount(dev_t nsid);
 	status_t Unmount();

@@ -3,6 +3,7 @@
 #ifndef BLOCK_REFERENCE_MANAGER_H
 #define BLOCK_REFERENCE_MANAGER_H
 
+#include <new>
 #include "List.h"
 
 class AllocationInfo;

@@ -119,7 +119,7 @@ BlockReferenceManager::Table::Init(int32 size)
 {
 	status_t error = (size > 0 ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		fReferences = new(nothrow) BlockReference[size];
+		fReferences = new(std::nothrow) BlockReference[size];
 		if (fReferences)
 			fSize = size;
 		else
