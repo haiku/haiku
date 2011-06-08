@@ -55,6 +55,6 @@ MergeObject <libbe>app_kit.o :
 	ServerLink.cpp
 	ServerMemoryAllocator.cpp
 	TokenSpace.cpp
-	TypeConstants.cpp 
+	TypeConstants.cpp
 ;
 

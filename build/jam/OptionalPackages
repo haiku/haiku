@@ -227,10 +227,7 @@ if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package BeHappy available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage BeHappy-1.0.6-x86-gcc2-2008-10-16.zip
-			: $(baseURL)/BeHappy-1.0.6-x86-gcc2-2008-10-16.zip ;
-		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeHappy/BeHappy ;
+		Echo "No optional package BeHappy available for gcc2" ;
 	}
 }
 

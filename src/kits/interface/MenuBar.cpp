@@ -566,7 +566,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 	if (window->Lock()) {
 		if (startIndex != -1) {
 			be_app->ObscureCursor();
-			_SelectItem(ItemAt(startIndex), true, true);
+			_SelectItem(ItemAt(startIndex), true, false);
 		}
 		GetMouse(&where, &buttons);
 		window->Unlock();
@@ -582,7 +582,8 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			menuItem = ItemAt(0);
 		else
 			menuItem = _HitTestItems(where, B_ORIGIN);
-		if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
+		if (_OverSubmenu(fSelected, ConvertToScreen(where))
+			|| fState == MENU_STATE_KEY_TO_SUBMENU) {
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
 			BMenu* menu = fSelected->Submenu();
@@ -645,7 +646,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 
 		if (fState != MENU_STATE_CLOSED) {
 			// If user doesn't move the mouse, loop here,
-			// so we don't interfer with keyboard menu navigation
+			// so we don't interfere with keyboard menu navigation
 			BPoint newLocation = where;
 			uint32 newButtons = buttons;
 			do {
@@ -654,7 +655,8 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 					break;
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
-			} while (newLocation == where && newButtons == buttons);
+			} while (newLocation == where && newButtons == buttons
+				&& fState == MENU_STATE_TRACKING);
 
 			where = newLocation;
 			buttons = newButtons;

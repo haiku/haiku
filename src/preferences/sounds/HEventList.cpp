@@ -60,9 +60,9 @@ HEventList::HEventList(const char* name)
 	BColumnListView(name, 0, B_PLAIN_BORDER, true),
 	fType(NULL)
 {
-	AddColumn(new BStringColumn(B_TRANSLATE("Event"), 150, 50, 500,
+	AddColumn(new BStringColumn(B_TRANSLATE("Event"), 180, 50, 500,
 		B_TRUNCATE_MIDDLE), kEventColumn);
-	AddColumn(new BStringColumn(B_TRANSLATE("Sound"), 150, 50, 500,
+	AddColumn(new BStringColumn(B_TRANSLATE("Sound"), 130, 50, 500,
 		B_TRUNCATE_END), kSoundColumn);
 }
 

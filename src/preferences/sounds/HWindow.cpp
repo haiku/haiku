@@ -20,6 +20,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <FindDirectory.h>
 #include <fs_attr.h>
 #include <GroupLayoutBuilder.h>
@@ -121,29 +122,30 @@ HWindow::InitGUI()
 		new BMessage(M_PLAY_MESSAGE));
 	playbutton->SetEnabled(false);
 
+	const float kInset = be_control_look->DefaultItemSpacing();
 	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
-	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 15)
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, kInset)
 		.AddGroup(B_HORIZONTAL)
 			.Add(menuField)
 			.AddGlue()
 		.End()
-		.AddGroup(B_HORIZONTAL, 15)
+		.AddGroup(B_HORIZONTAL, kInset)
 			.AddGlue()
 			.Add(playbutton)
 			.Add(stopbutton)
 		.End()
-		.SetInsets(15, 15, 15, 15)
+		.SetInsets(kInset, kInset, kInset, kInset)
 	);
 
 	box->AddChild(view);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.AddGroup(B_VERTICAL, 20)
+		.AddGroup(B_VERTICAL, kInset)
 			.Add(fEventList)
 			.Add(box)
 		.End()
-		.SetInsets(12, 28, 12, 12)
+		.SetInsets(kInset, kInset, kInset, kInset)
 	);
 
 	// setup file menu
