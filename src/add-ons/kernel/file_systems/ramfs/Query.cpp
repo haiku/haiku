@@ -1335,7 +1335,7 @@ Operator::Score() const
 status_t 
 Operator::InitCheck()
 {
-	if (fOp != OP_AND && fOp != OP_OR
+	if ((fOp != OP_AND && fOp != OP_OR)
 		|| fLeft == NULL || fLeft->InitCheck() < B_OK
 		|| fRight == NULL || fRight->InitCheck() < B_OK)
 		return B_ERROR;
