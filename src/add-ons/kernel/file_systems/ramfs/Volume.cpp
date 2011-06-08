@@ -130,35 +130,39 @@ class EntryListenerTree : public _EntryListenerTree {};
 */
 
 // constructor
-Volume::Volume()
-	: fID(0),
-	  fNextNodeID(kRootParentID + 1),
-	  fNodeTable(NULL),
-	  fDirectoryEntryTable(NULL),
-	  fNodeAttributeTable(NULL),
-	  fIndexDirectory(NULL),
-	  fRootDirectory(NULL),
-	  fName(kDefaultVolumeName),
-	  fLocker("volume"),
-	  fIteratorLocker("iterators"),
-	  fQueryLocker("queries"),
-	  fNodeListeners(NULL),
-	  fAnyNodeListeners(),
-	  fEntryListeners(NULL),
-	  fAnyEntryListeners(),
-	  fBlockAllocator(NULL),
-	  fBlockSize(kDefaultBlockSize),
-	  fAllocatedBlocks(0),
-	  fAccessTime(0),
-	  fMounted(false)
+Volume::Volume(fs_volume* volume)
+	:
+	fVolume(volume),
+	fID(0),
+	fNextNodeID(kRootParentID + 1),
+	fNodeTable(NULL),
+	fDirectoryEntryTable(NULL),
+	fNodeAttributeTable(NULL),
+	fIndexDirectory(NULL),
+	fRootDirectory(NULL),
+	fName(kDefaultVolumeName),
+	fLocker("volume"),
+	fIteratorLocker("iterators"),
+	fQueryLocker("queries"),
+	fNodeListeners(NULL),
+	fAnyNodeListeners(),
+	fEntryListeners(NULL),
+	fAnyEntryListeners(),
+	fBlockAllocator(NULL),
+	fBlockSize(kDefaultBlockSize),
+	fAllocatedBlocks(0),
+	fAccessTime(0),
+	fMounted(false)
 {
 }
+
 
 // destructor
 Volume::~Volume()
 {
 	Unmount();
 }
+
 
 // Mount
 status_t

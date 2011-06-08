@@ -100,6 +100,7 @@ public:
 	status_t Unmount();
 
 	dev_t GetID() const { return fID; }
+	fs_volume* FSVolume() const { return fVolume; }
 
 	off_t GetBlockSize() const;
 	off_t CountBlocks() const;
@@ -175,6 +176,9 @@ public:
 
 	bool IteratorLock();
 	void IteratorUnlock();
+
+protected:
+	fs_volume*				fVolume;
 
 private:
 	typedef DoublyLinkedList<Query>	QueryList;
