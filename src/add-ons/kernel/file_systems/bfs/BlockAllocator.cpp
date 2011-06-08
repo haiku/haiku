@@ -1575,10 +1575,10 @@ status_t
 BlockAllocator::_RemoveInvalidNode(Inode* parent, BPlusTree* tree, Inode* inode,
 	const char* name)
 {
-	// it's safe to start a transaction, because Inode::Remove()
+	// It's safe to start a transaction, because Inode::Remove()
 	// won't touch the block bitmap (which we hold the lock for)
 	// if we set the INODE_DONT_FREE_SPACE flag - since we fix
-	// the bitmap anyway
+	// the bitmap anyway.
 	Transaction transaction(fVolume, parent->BlockNumber());
 	status_t status;
 
@@ -1596,8 +1596,10 @@ BlockAllocator::_RemoveInvalidNode(Inode* parent, BPlusTree* tree, Inode* inode,
 			status = tree->Remove(transaction, name, id);
 	}
 
-	if (status == B_OK)
+	if (status == B_OK) {
+		entry_cache_remove(fVolume->ID(), parent->ID(), name);
 		transaction.Done();
+	}
 
 	return status;
 }
