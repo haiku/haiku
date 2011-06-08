@@ -791,7 +791,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 			TRACE("usb lun %d inquiry attempt %d failed\n", i, tries);
 
 			uint32 snoozeTime = 1000000 * tries;
-			TRACE("snoozing %u microseconds for usb lun\n", snoozeTime);
+			TRACE("snoozing %lu microseconds for usb lun\n", snoozeTime);
 			snooze(snoozeTime);
 		}
 
