@@ -37,6 +37,7 @@ public:
 		uint32					Data() { return fData; };
 
 		uint32					ScaledData(uint8 scaleToBits, bool toBeSigned);
+		uint32					ScaledRangeData(uint32 minimum, uint32 maximum);
 		float					ScaledFloatData();
 
 		bool					Valid() { return fValid; };

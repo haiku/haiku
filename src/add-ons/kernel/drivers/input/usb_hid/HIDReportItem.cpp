@@ -146,6 +146,20 @@ HIDReportItem::ScaledData(uint8 scaleToBits, bool toBeSigned)
 }
 
 
+uint32
+HIDReportItem::ScaledRangeData(uint32 minimum, uint32 maximum)
+{
+	uint64 zeroBasedData;
+	if (Signed())
+		zeroBasedData = (int32)fData - (int32)fMinimum;
+	else
+		zeroBasedData = fData - fMinimum;
+
+	return zeroBasedData * (maximum - minimum + 1) / (fMaximum - fMinimum + 1)
+		+ minimum;
+}
+
+
 float
 HIDReportItem::ScaledFloatData()
 {
