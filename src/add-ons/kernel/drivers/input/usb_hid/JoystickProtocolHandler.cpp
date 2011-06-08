@@ -66,6 +66,19 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 
 			case B_HID_USAGE_PAGE_GENERIC_DESKTOP:
 			{
+				if (item->UsageID() == B_HID_UID_GD_HAT_SWITCH) {
+					HIDReportItem **newHats = (HIDReportItem **)realloc(fHats,
+						++fHatCount * sizeof(HIDReportItem *));
+					if (newHats == NULL) {
+						fHatCount--;
+						break;
+					}
+
+					fHats = newHats;
+					fHats[fHatCount - 1] = item;
+					break;
+				}
+
 				uint16 axis = 0;
 				if (item->UsageID() >= B_HID_UID_GD_X
 					&& item->UsageID() <= B_HID_UID_GD_WHEEL) {
@@ -344,6 +357,17 @@ JoystickProtocolHandler::_Update()
 
 		if (fAxis[i]->Extract() == B_OK && fAxis[i]->Valid())
 			fCurrentValues.axes[i] = (int16)fAxis[i]->ScaledData(16, true);
+	}
+
+	for (uint32 i = 0; i < fHatCount; i++) {
+		HIDReportItem *hat = fHats[i];
+		if (hat == NULL)
+			continue;
+
+		if (hat->Extract() != B_OK || !hat->Valid())
+			continue;
+
+		fCurrentValues.hats[i] = hat->ScaledRangeData(1, 8);
 	}
 
 	for (uint32 i = 0; i < fButtonCount; i++) {
