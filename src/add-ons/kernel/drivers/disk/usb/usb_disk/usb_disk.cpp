@@ -769,8 +769,9 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 		// initialize this lun
 		result = usb_disk_inquiry(lun);
-		for (uint8 tries = 0; tries < 8; tries++) {
-			TRACE("usb lun %d inquiry attempt %d begin\n", i, tries);
+		for (uint32 tries = 0; tries < 8; tries++) {
+			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" begin\n",
+				i, tries);
 			status_t ready = usb_disk_test_unit_ready(lun);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
 				if (ready == B_OK) {
@@ -781,17 +782,20 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 					else if (/*usb_disk_mode_sense(lun) != B_OK*/true)
 						lun->write_protected = false;
 
-					TRACE("usb lun %d ready. write protected = %c\n", i,
+					TRACE("usb lun %"B_PRIu8" ready. write protected = %c\n", i,
 						lun->write_protected ? 'y' : 'n');
 
 					break;
 				}
-				TRACE("usb lun %d not ready, attempt %d\n", i, tries);
+				TRACE("usb lun %"B_PRIu8" not ready, attempt %"B_PRIu32"\n",
+					i, tries);
 			}
-			TRACE("usb lun %d inquiry attempt %d failed\n", i, tries);
+			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" failed\n", i,
+				tries);
 
-			uint32 snoozeTime = 1000000 * tries;
-			TRACE("snoozing %lu microseconds for usb lun\n", snoozeTime);
+			bigtime_t snoozeTime = 1000000 * tries;
+			TRACE("snoozing %"B_PRIu64" microseconds for usb lun\n",
+				snoozeTime);
 			snooze(snoozeTime);
 		}
 
