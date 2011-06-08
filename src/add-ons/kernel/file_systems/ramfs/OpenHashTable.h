@@ -46,7 +46,7 @@ All rights reserved.
 #define __OPEN_HASH_TABLE__
 
 #include <malloc.h>
-#include <new.h>
+#include <new>
 
 #include "AreaUtils.h"
 #include "Misc.h"
