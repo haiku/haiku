@@ -1396,15 +1396,15 @@ Operator::PrintToStream()
 	D(__out("( "));
 	if (fLeft != NULL)
 		fLeft->PrintToStream();
-	
-	char *op;
+
+	const char* op;
 	switch (fOp) {
 		case OP_OR: op = "OR"; break;
 		case OP_AND: op = "AND"; break;
 		default: op = "?"; break;
 	}
-	D(__out(" %s ",op));
-	
+	D(__out(" %s ", op));
+
 	if (fRight != NULL)
 		fRight->PrintToStream();
 
@@ -1412,20 +1412,22 @@ Operator::PrintToStream()
 }
 
 
-void 
+void
 Equation::PrintToStream()
 {
-	char *symbol = "???";
+	const char* op;
 	switch (fOp) {
-		case OP_EQUAL: symbol = "=="; break;
-		case OP_UNEQUAL: symbol = "!="; break;
-		case OP_GREATER_THAN: symbol = ">"; break;
-		case OP_GREATER_THAN_OR_EQUAL: symbol = ">="; break;
-		case OP_LESS_THAN: symbol = "<"; break;
-		case OP_LESS_THAN_OR_EQUAL: symbol = "<="; break;
+		case OP_EQUAL: op = "=="; break;
+		case OP_UNEQUAL: op = "!="; break;
+		case OP_GREATER_THAN: op = ">"; break;
+		case OP_GREATER_THAN_OR_EQUAL: op = ">="; break;
+		case OP_LESS_THAN: op = "<"; break;
+		case OP_LESS_THAN_OR_EQUAL: op = "<="; break;
+		default: op = "???"; break;
 	}
-	D(__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString));
+	D(__out("[\"%s\" %s \"%s\"]", fAttribute, op, fString));
 }
+
 
 #endif	/* DEBUG */
 
