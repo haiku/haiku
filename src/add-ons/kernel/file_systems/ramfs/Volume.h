@@ -96,7 +96,7 @@ public:
 							Volume(fs_volume* volume);
 							~Volume();
 
-	status_t Mount(dev_t nsid);
+	status_t Mount(uint32 flags);
 	status_t Unmount();
 
 	dev_t GetID() const { return fID; }

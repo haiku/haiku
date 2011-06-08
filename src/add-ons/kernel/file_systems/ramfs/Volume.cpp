@@ -166,7 +166,7 @@ Volume::~Volume()
 
 // Mount
 status_t
-Volume::Mount(dev_t id)
+Volume::Mount(uint32 flags)
 {
 	Unmount();
 
