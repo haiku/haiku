@@ -1,41 +1,51 @@
-/* BMailMessageIO - Glue code for reading/writing messages directly from the
-** protocols but present a BPositionIO interface to the caller, while caching
-** the data read/written in a slave file.
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+/*
+ * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ */
+
+
+/*!
+	Glue code for reading/writing messages directly from the protocols but
+	present a BPositionIO interface to the caller, while caching the data
+	read/written in a slave file.
 */
 
 
-#include <BeBuild.h>
-
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
-
 #include "MessageIO.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-BMailMessageIO::BMailMessageIO(POP3Protocol* protocol, BPositionIO *dump_to,
-	int32 seq_id) :
-	slave(dump_to),
-	message_id(seq_id),
+
+BMailMessageIO::BMailMessageIO(POP3Protocol* protocol, BPositionIO* dumpTo,
+	int32 messageID)
+	:
+	fSlave(dumpTo),
+	fMessageID(messageID),
 	fProtocol(protocol),
-	size(0),
-	state(READ_HEADER_NEXT) {
-		//-----do nothing, and do it well-----
-	}
+	fSize(0),
+	fState(READ_HEADER_NEXT)
+{
+}
+
+
+BMailMessageIO::~BMailMessageIO()
+{
+}
 
 
 ssize_t
-BMailMessageIO::ReadAt(off_t pos, void* buffer, size_t amountToRead) {
-	status_t errorCode;
-	char     lastBytes [5];
-	off_t    old_pos = slave->Position();
+BMailMessageIO::ReadAt(off_t pos, void* buffer, size_t amountToRead)
+{
+	char lastBytes[5];
+	off_t oldPosition = fSlave->Position();
 
-	while ((pos + amountToRead) > size) {
-		if (state >= ALL_READING_DONE)
+	while (pos + amountToRead > fSize) {
+		if (fState >= ALL_READING_DONE)
 			break;
-		switch (state) {
+
+		switch (fState) {
 			// Read (download from the mail server) just the message headers,
 			// and append a blank line if needed (so the header processing code
 			// can tell where the end of the headers is).  Don't append too
@@ -44,24 +54,27 @@ BMailMessageIO::ReadAt(off_t pos, void* buffer, size_t amountToRead) {
 			// filters which discard the message after only reading the header,
 			// thus avoiding the time it takes to download the whole message.
 			case READ_HEADER_NEXT:
-				slave->SetSize(0); // Truncate the file.
-				slave->Seek(0,SEEK_SET);
-				errorCode = fProtocol->GetHeader(message_id, slave);
-				if (errorCode < 0)
-					return errorCode;
+			{
+				fSlave->SetSize(0); // Truncate the file.
+				fSlave->Seek(0,SEEK_SET);
+				status_t status = fProtocol->GetHeader(fMessageID, fSlave);
+				if (status != B_OK)
+					return status;
 				// See if it already ends in a blank line, if not, add enough
 				// end-of-lines to give a blank line.
-				slave->Seek(-4, SEEK_END);
-				strcpy (lastBytes, "xxxx");
-				slave->Read(lastBytes, 4);
-				if (strcmp (lastBytes, "\r\n\r\n") != 0) {
-					if (strcmp (lastBytes + 2, "\r\n") == 0)
-						slave->Write("\r\n", 2);
+				fSlave->Seek(-4, SEEK_END);
+				strcpy(lastBytes, "xxxx");
+				fSlave->Read(lastBytes, 4);
+
+				if (strcmp(lastBytes, "\r\n\r\n") != 0) {
+					if (strcmp(lastBytes + 2, "\r\n") == 0)
+						fSlave->Write("\r\n", 2);
 					else
-						slave->Write("\r\n\r\n", 4);
+						fSlave->Write("\r\n\r\n", 4);
 				}
-				state = READ_BODY_NEXT;
+				fState = READ_BODY_NEXT;
 				break;
+			}
 
 			// OK, they want more than the headers.  Read the whole message,
 			// starting from the beginning (network->Retrieve does a seek to
@@ -71,70 +84,73 @@ BMailMessageIO::ReadAt(off_t pos, void* buffer, size_t amountToRead) {
 			// modem's V.90 data compression will make it very quick to
 			// retransmit the header portion.
 			case READ_BODY_NEXT:
-				slave->SetSize(0); // Truncate the file.
-				slave->Seek(0,SEEK_SET);
-				errorCode = fProtocol->Retrieve(message_id, slave);
-				if (errorCode < 0)
-					return errorCode;
-				state = ALL_READING_DONE;
+			{
+				fSlave->SetSize(0); // Truncate the file.
+				fSlave->Seek(0,SEEK_SET);
+				status_t status = fProtocol->Retrieve(fMessageID, fSlave);
+				if (status < 0)
+					return status;
+				fState = ALL_READING_DONE;
 				break;
+			}
 
 			default: // Shouldn't happen.
 				return -1;
 		}
-		ResetSize();
+		_ResetSize();
 	}
 
 	// Put the file position back at where it was, if possible.  That's because
 	// ReadAt isn't supposed to affect the file position.
-	if (old_pos < size)
-		slave->Seek (old_pos, SEEK_SET);
+	if (oldPosition < fSize)
+		fSlave->Seek (oldPosition, SEEK_SET);
 	else
-		slave->Seek (0, SEEK_END);
+		fSlave->Seek (0, SEEK_END);
 
-	return slave->ReadAt(pos, buffer, amountToRead);
+	return fSlave->ReadAt(pos, buffer, amountToRead);
 }
 
 
-ssize_t	BMailMessageIO::WriteAt(off_t pos, const void* buffer, size_t amountToWrite) {
-	ssize_t return_val;
+ssize_t
+BMailMessageIO::WriteAt(off_t pos, const void* buffer, size_t amountToWrite)
+{
+	ssize_t bytesWritten = fSlave->WriteAt(pos, buffer, amountToWrite);
+	_ResetSize();
 
-	return_val = slave->WriteAt(pos, buffer, amountToWrite);
-	ResetSize();
-
-	return return_val;
+	return bytesWritten;
 }
 
-off_t BMailMessageIO::Seek(off_t position, uint32 seek_mode) {
-	ssize_t errorCode;
-	char    tempBuffer [1];
-	
-	if (seek_mode == SEEK_END) {
-		if (state != ALL_READING_DONE) {
-			// Force it to read the whole message to find the size of it.
-			state = READ_BODY_NEXT; // Skip the header reading step.
-			errorCode = ReadAt (size + 1, tempBuffer, sizeof (tempBuffer));
-			if (errorCode < 0)
-				return errorCode;
-		}
+
+off_t
+BMailMessageIO::Seek(off_t position, uint32 seekMode)
+{
+	if (seekMode == SEEK_END && fState != ALL_READING_DONE) {
+		// Force it to read the whole message to find the size of it.
+		char tempBuffer;
+		fState = READ_BODY_NEXT;
+			// Skip the header reading step.
+		ssize_t bytesRead = ReadAt(fSize + 1, &tempBuffer, sizeof(tempBuffer));
+		if (bytesRead < 0)
+			return bytesRead;
 	}
-	return slave->Seek(position,seek_mode);
+	return fSlave->Seek(position, seekMode);
 }
 
-off_t BMailMessageIO::Position() const {
-	return slave->Position();
+
+off_t
+BMailMessageIO::Position() const
+{
+	return fSlave->Position();
 }
 
-void BMailMessageIO::ResetSize(void) {
-	off_t old = slave->Position();
 
-	slave->Seek(0,SEEK_END);
-	size = slave->Position();
+void
+BMailMessageIO::_ResetSize()
+{
+	off_t old = fSlave->Position();
 
-	slave->Seek(old,SEEK_SET);
+	fSlave->Seek(0,SEEK_END);
+	fSize = fSlave->Position();
+
+	fSlave->Seek(old,SEEK_SET);
 }
-
-BMailMessageIO::~BMailMessageIO() {
-
-}
-

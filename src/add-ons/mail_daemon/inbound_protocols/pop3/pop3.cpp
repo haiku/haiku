@@ -120,11 +120,7 @@ POP3Protocol::Disconnect()
 	}
 #endif
 
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	close(fSocket);
-#else
-	closesocket(fSocket);
-#endif
 	fSocket = -1;
 	return B_OK;
 }
@@ -365,11 +361,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		return B_NAME_NOT_FOUND;
 	}
 
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	fSocket = socket(AF_INET, SOCK_STREAM, 0);
-#else
-	fSocket = socket(AF_INET, 2, 0);
-#endif
 	if (fSocket >= 0) {
 		struct sockaddr_in saAddr;
 		memset(&saAddr, 0, sizeof(saAddr));
@@ -378,11 +370,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		saAddr.sin_addr.s_addr = hostIP;
 		int result = connect(fSocket, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			close(fSocket);
-#else
-			closesocket(fSocket);
-#endif
 			fSocket = -1;
 			error_msg << ": " << strerror(errno);
 			ShowError(error_msg.String());
@@ -417,35 +405,17 @@ POP3Protocol::Open(const char *server, int port, int)
 			error << ". (SSL connection error)";
 			ShowError(error.String());
 			SSL_CTX_free(fSSLContext);
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			close(fSocket);
-#else
-			closesocket(fSocket);
-#endif
 			return B_ERROR;
 		}
 	}
 #endif
 
 	BString line;
-	status_t err;
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
-	err = ReceiveLine(line);
-#else
-	int32 tries = 200000;
-		// no endless loop here
-	while ((err = ReceiveLine(line)) == 0) {
-		if (tries-- < 0)
-			return B_ERROR;
-	}
-#endif
+	status_t err = ReceiveLine(line);
 
 	if (err < 0) {
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
 		close(fSocket);
-#else
-		closesocket(fSocket);
-#endif
 		fSocket = -1;
 		error_msg << ": " << strerror(err);
 		ShowError(error_msg.String());

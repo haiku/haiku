@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons mail_daemon inbound_protocols pop3 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
 }
