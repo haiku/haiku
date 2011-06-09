@@ -14,13 +14,15 @@
 
 GraphicalUserInterface::GraphicalUserInterface()
 	:
-	fTeamWindow(NULL)
+	fTeamWindow(NULL),
+	fTeamWindowMessenger(NULL)
 {
 }
 
 
 GraphicalUserInterface::~GraphicalUserInterface()
 {
+	delete fTeamWindowMessenger;
 }
 
 
@@ -29,6 +31,7 @@ GraphicalUserInterface::Init(Team* team, UserInterfaceListener* listener)
 {
 	try {
 		fTeamWindow = TeamWindow::Create(team, listener);
+		fTeamWindowMessenger = new BMessenger(fTeamWindow);
 	} catch (...) {
 		// TODO: Notify the user!
 		ERROR("Error: Failed to create team window!\n");
@@ -50,11 +53,8 @@ void
 GraphicalUserInterface::Terminate()
 {
 	// quit window
-	if (fTeamWindow != NULL) {
-		BMessenger messenger(fTeamWindow);
-		if (messenger.IsValid() && messenger.LockTarget())
-			fTeamWindow->Quit();
-	}
+	if (fTeamWindowMessenger && fTeamWindowMessenger->LockTarget())
+		fTeamWindow->Quit();
 }
 
 

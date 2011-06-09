@@ -9,6 +9,7 @@
 #include "UserInterface.h"
 
 
+class BMessenger;
 class TeamWindow;
 
 
@@ -33,6 +34,7 @@ public:
 
 private:
 			TeamWindow*			fTeamWindow;
+			BMessenger*			fTeamWindowMessenger;
 };
 
 
