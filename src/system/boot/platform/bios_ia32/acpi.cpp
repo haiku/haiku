@@ -83,6 +83,7 @@ acpi_find_table(const char* signature)
 		+ sizeof(acpi_descriptor_header));
 
 	for (int32 j = 0; j < sNumEntries; j++, pointer++) {
+		// Map B_PAGE_SIZE, since the table is bigger than the acpi_descriptor_header
 		acpi_descriptor_header* header = (acpi_descriptor_header*)
 			mmu_map_physical_memory(*pointer,
 				B_PAGE_SIZE, kDefaultPageFlags);
