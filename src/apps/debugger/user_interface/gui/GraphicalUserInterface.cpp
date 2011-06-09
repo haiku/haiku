@@ -51,9 +51,8 @@ GraphicalUserInterface::Terminate()
 {
 	// quit window
 	if (fTeamWindow != NULL) {
-		// TODO: This is not clean. If the window has been deleted we shouldn't
-		// try to access it!
-		if (fTeamWindow->Lock())
+		BMessenger messenger(fTeamWindow);
+		if (messenger.IsValid() && messenger.LockTarget())
 			fTeamWindow->Quit();
 	}
 }
