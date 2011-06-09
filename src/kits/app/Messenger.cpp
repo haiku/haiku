@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -212,7 +212,16 @@ BMessenger::LockTarget() const
 {
 	BLooper *looper = NULL;
 	Target(&looper);
-	return looper && looper->Lock();
+	if (looper && looper->Lock()) {
+		if (looper->fMsgPort == fPort)
+			return true;
+		else {
+			looper->Unlock();
+			return false;
+		}
+	}
+
+	return false;
 }
 
 
@@ -237,6 +246,9 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 	status_t error = looper ? B_OK : B_BAD_VALUE;
 	if (error == B_OK)
 		error = looper->LockWithTimeout(timeout);
+	
+	if (error == B_OK && looper->fMsgPort != fPort)
+		return B_BAD_PORT_ID;
 
 	return error;
 }
