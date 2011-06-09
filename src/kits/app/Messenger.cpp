@@ -247,8 +247,10 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 	if (error == B_OK)
 		error = looper->LockWithTimeout(timeout);
 	
-	if (error == B_OK && looper->fMsgPort != fPort)
+	if (error == B_OK && looper->fMsgPort != fPort) {
+		looper->Unlock();
 		return B_BAD_PORT_ID;
+	}
 
 	return error;
 }
