@@ -268,10 +268,10 @@ BSplitLayout::~BSplitLayout()
 void
 BSplitLayout::SetInsets(float left, float top, float right, float bottom)
 {
-	fLeftInset = BControlLook::ComposeSpacing(left);
-	fTopInset = BControlLook::ComposeSpacing(top);
-	fRightInset = BControlLook::ComposeSpacing(right);
-	fBottomInset = BControlLook::ComposeSpacing(bottom);
+	fLeftInset = left;
+	fTopInset = top;
+	fRightInset = right;
+	fBottomInset = bottom;
 
 	InvalidateLayout();
 }

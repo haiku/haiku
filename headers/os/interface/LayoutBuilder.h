@@ -102,6 +102,8 @@ public:
 
 	inline	ThisBuilder&		SetInsets(float left, float top, float right,
 									float bottom);
+	inline	ThisBuilder&		SetInsets(float horizontal, float vertical);
+	inline	ThisBuilder&		SetInsets(float insets);
 
 	inline						operator BGroupLayout*();
 
@@ -185,6 +187,8 @@ public:
 
 	inline	ThisBuilder&		SetInsets(float left, float top, float right,
 									float bottom);
+	inline	ThisBuilder&		SetInsets(float horizontal, float vertical);
+	inline	ThisBuilder&		SetInsets(float insets);
 
 	inline						operator BGridLayout*();
 
@@ -246,6 +250,8 @@ public:
 
 	inline	ThisBuilder&		SetInsets(float left, float top, float right,
 									float bottom);
+	inline	ThisBuilder&		SetInsets(float horizontal, float vertical);
+	inline	ThisBuilder&		SetInsets(float insets);
 
 	inline						operator BSplitView*();
 
@@ -563,6 +569,24 @@ Group<ParentBuilder>::SetInsets(float left, float top, float right,
 
 
 template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetInsets(float horizontal, float vertical)
+{
+	fLayout->SetInsets(horizontal, vertical);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetInsets(float insets)
+{
+	fLayout->SetInsets(insets);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
 Group<ParentBuilder>::operator BGroupLayout*()
 {
 	return fLayout;
@@ -808,6 +832,24 @@ Grid<ParentBuilder>::SetInsets(float left, float top, float right,
 
 
 template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetInsets(float horizontal, float vertical)
+{
+	fLayout->SetInsets(horizontal, vertical);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetInsets(float insets)
+{
+	fLayout->SetInsets(insets);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
 Grid<ParentBuilder>::operator BGridLayout*()
 {
 	return fLayout;
@@ -1008,6 +1050,24 @@ Split<ParentBuilder>::SetInsets(float left, float top, float right,
 	float bottom)
 {
 	fView->SetInsets(left, top, right, bottom);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::ThisBuilder&
+Split<ParentBuilder>::SetInsets(float horizontal, float vertical)
+{
+	fView->SetInsets(horizontal, vertical);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::ThisBuilder&
+Split<ParentBuilder>::SetInsets(float insets)
+{
+	fView->SetInsets(insets);
 	return *this;
 }
 

@@ -19,6 +19,8 @@ public:
 
 			void				SetInsets(float left, float top, float right,
 									float bottom);
+			void				SetInsets(float horizontal, float vertical);
+			void				SetInsets(float insets);
 			void				GetInsets(float* left, float* top, float* right,
 									float* bottom) const;
 

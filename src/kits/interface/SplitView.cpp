@@ -41,7 +41,29 @@ BSplitView::~BSplitView()
 void
 BSplitView::SetInsets(float left, float top, float right, float bottom)
 {
+	left = BControlLook::ComposeSpacing(left);
+	top = BControlLook::ComposeSpacing(top);
+	right = BControlLook::ComposeSpacing(right);
+	bottom = BControlLook::ComposeSpacing(bottom);
+
 	fSplitLayout->SetInsets(left, top, right, bottom);
+}
+
+
+void
+BSplitView::SetInsets(float horizontal, float vertical)
+{
+	horizontal = BControlLook::ComposeSpacing(horizontal);
+	vertical = BControlLook::ComposeSpacing(vertical);
+	fSplitLayout->SetInsets(horizontal, vertical, horizontal, vertical);
+}
+
+
+void
+BSplitView::SetInsets(float insets)
+{
+	insets = BControlLook::ComposeSpacing(insets);
+	fSplitLayout->SetInsets(insets, insets, insets, insets);
 }
 
 

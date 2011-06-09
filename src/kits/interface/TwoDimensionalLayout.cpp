@@ -295,6 +295,31 @@ BTwoDimensionalLayout::SetInsets(float left, float top, float right,
 
 
 void
+BTwoDimensionalLayout::SetInsets(float horizontal, float vertical)
+{
+	fLeftInset = BControlLook::ComposeSpacing(horizontal);
+	fRightInset = fLeftInset;
+
+	fTopInset = BControlLook::ComposeSpacing(vertical);
+	fBottomInset = fTopInset;
+
+	InvalidateLayout();
+}
+
+
+void
+BTwoDimensionalLayout::SetInsets(float insets)
+{
+	fLeftInset = BControlLook::ComposeSpacing(insets);
+	fRightInset = fLeftInset;
+	fTopInset = fLeftInset;
+	fBottomInset = fLeftInset;
+
+	InvalidateLayout();
+}
+
+
+void
 BTwoDimensionalLayout::GetInsets(float* left, float* top, float* right,
 	float* bottom) const
 {
