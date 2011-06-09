@@ -182,7 +182,7 @@ BHandler *
 BMessenger::Target(BLooper** _looper) const
 {
 	BHandler *handler = NULL;
-	if (IsTargetLocal() 
+	if (IsTargetLocal()
 		&& (fHandlerToken > B_NULL_TOKEN
 			|| fHandlerToken == B_PREFERRED_TOKEN)) {
 		gDefaultTokens.GetToken(fHandlerToken, B_HANDLER_TOKEN,
@@ -212,13 +212,12 @@ BMessenger::LockTarget() const
 {
 	BLooper *looper = NULL;
 	Target(&looper);
-	if (looper && looper->Lock()) {
+	if (looper != NULL && looper->Lock()) {
 		if (looper->fMsgPort == fPort)
 			return true;
-		else {
-			looper->Unlock();
-			return false;
-		}
+
+		looper->Unlock();
+		return false;
 	}
 
 	return false;
@@ -243,10 +242,11 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 {
 	BLooper *looper = NULL;
 	Target(&looper);
-	status_t error = looper ? B_OK : B_BAD_VALUE;
-	if (error == B_OK)
-		error = looper->LockWithTimeout(timeout);
-	
+	if (looper == NULL)
+		return B_BAD_VALUE;
+
+	status_t error = looper->LockWithTimeout(timeout);
+
 	if (error == B_OK && looper->fMsgPort != fPort) {
 		looper->Unlock();
 		return B_BAD_PORT_ID;
@@ -258,7 +258,7 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 
 //	#pragma mark - Message sending
 
-// SendMessage
+
 /*! \brief Delivers a BMessage synchronously to the messenger's target,
 		   without waiting for a reply.
 
@@ -266,7 +266,7 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 	space becomes available in the port. After delivery the method returns
 	immediately. It does not wait until the target processes the message or
 	even sends a reply.
-	
+
 	\param command The what field of the message to deliver.
 	\param replyTo The handler to which a reply to the message shall be sent.
 		   May be \c NULL.
@@ -282,7 +282,7 @@ BMessenger::SendMessage(uint32 command, BHandler *replyTo) const
 	return SendMessage(&message, replyTo);
 }
 
-// SendMessage
+
 /*! \brief Delivers a BMessage synchronously to the messenger's target,
 		   without waiting for a reply.
 
@@ -309,19 +309,19 @@ BMessenger::SendMessage(uint32 command, BHandler *replyTo) const
 */
 status_t
 BMessenger::SendMessage(BMessage *message, BHandler *replyTo,
-						bigtime_t timeout) const
+	bigtime_t timeout) const
 {
-DBG(OUT("BMessenger::SendMessage2(%.4s)\n", (char*)&message->what));
+	DBG(OUT("BMessenger::SendMessage2(%.4s)\n", (char*)&message->what));
 	status_t error = (message ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		BMessenger replyMessenger(replyTo);
 		error = SendMessage(message, replyMessenger, timeout);
 	}
-DBG(OUT("BMessenger::SendMessage2() done: %lx\n", error));
+	DBG(OUT("BMessenger::SendMessage2() done: %lx\n", error));
 	return error;
 }
 
-// SendMessage
+
 /*! \brief Delivers a BMessage synchronously to the messenger's target,
 		   without waiting for a reply.
 
@@ -347,7 +347,7 @@ DBG(OUT("BMessenger::SendMessage2() done: %lx\n", error));
 */
 status_t
 BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
-						bigtime_t timeout) const
+	bigtime_t timeout) const
 {
 	if (!message)
 		return B_BAD_VALUE;
@@ -356,7 +356,7 @@ BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 		timeout, false, replyTo);
 }
 
-// SendMessage
+
 /*! \brief Delivers a BMessage synchronously to the messenger's target and
 	waits for a reply.
 
@@ -380,7 +380,7 @@ BMessenger::SendMessage(uint32 command, BMessage *reply) const
 	return SendMessage(&message, reply);
 }
 
-// SendMessage
+
 /*! \brief Delivers a BMessage synchronously to the messenger's target and
 	waits for a reply.
 
@@ -606,4 +606,3 @@ operator!=(const BMessenger &a, const BMessenger &b)
 {
 	return !(a == b);
 }
-
