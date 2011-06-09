@@ -294,6 +294,8 @@ smp_do_acpi_config(void)
 					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
 				break;
 			}
+			default:
+				break;
 		}
 
 		apic = (acpi_apic *)((uint8 *)apic + apic->length);
