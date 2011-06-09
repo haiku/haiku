@@ -85,7 +85,7 @@ acpi_find_table(const char* signature)
 	for (int32 j = 0; j < sNumEntries; j++, pointer++) {
 		acpi_descriptor_header* header = (acpi_descriptor_header*)
 			mmu_map_physical_memory(*pointer,
-				sizeof(acpi_descriptor_header), kDefaultPageFlags);
+				B_PAGE_SIZE, kDefaultPageFlags);
 		if (header == NULL
 			|| strncmp(header->signature, signature, 4) != 0) {
 			// not interesting for us
@@ -93,7 +93,7 @@ acpi_find_table(const char* signature)
 				signature, header != NULL ? header->signature : "null"));
 
 			if (header != NULL)
-				mmu_free(header, sizeof(acpi_descriptor_header));
+				mmu_free(header, B_PAGE_SIZE);
 
 			continue;
 		}
