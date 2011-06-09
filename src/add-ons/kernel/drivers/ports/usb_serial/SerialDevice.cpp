@@ -73,7 +73,8 @@ SerialDevice::Init()
 	mutex_init(&fReadLock, "usb_serial:read_lock");
 	mutex_init(&fWriteLock, "usb_serial:write_lock");
 
-	size_t totalBuffers = fReadBufferSize + fWriteBufferSize + fInterruptBufferSize;
+	size_t totalBuffers = fReadBufferSize + fWriteBufferSize
+		+ fInterruptBufferSize;
 	fBufferArea = create_area("usb_serial:buffers_area", (void **)&fReadBuffer,
 		B_ANY_KERNEL_ADDRESS, ROUNDUP(totalBuffers, B_PAGE_SIZE), B_CONTIGUOUS,
 		B_READ_AREA | B_WRITE_AREA);
@@ -201,7 +202,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYISTOP:
 			fInputStopped = *(bool *)buffer;
 			TRACE("TTYISTOP: %sstopped\n", fInputStopped ? "" : "not ");
-			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, !fInputStopped);
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS,
+				!fInputStopped);
 			return true;
 
 		case TTYGETSIGNALS:
@@ -209,7 +211,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDCD,
 				(fControlOut & (USB_CDC_CONTROL_SIGNAL_STATE_DTR
 					| USB_CDC_CONTROL_SIGNAL_STATE_RTS)) != 0);
-			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, !fInputStopped);
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS,
+				!fInputStopped);
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDSR, false);
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWRI, false);
 			return true;
@@ -277,8 +280,8 @@ SerialDevice::Open(uint32 flags)
 
 	ResetDevice();
 
-	fDeviceThread = spawn_kernel_thread(DeviceThread, "usb_serial device thread",
-		B_NORMAL_PRIORITY, this);
+	fDeviceThread = spawn_kernel_thread(DeviceThread,
+		"usb_serial device thread", B_NORMAL_PRIORITY, this);
 
 	if (fDeviceThread < B_OK) {
 		TRACE_ALWAYS("open: failed to spawn kernel thread\n");
@@ -355,7 +358,8 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 
 		status = acquire_sem_etc(fDoneWrite, 1, B_CAN_INTERRUPT, 0);
 		if (status < B_OK) {
-			TRACE_ALWAYS("write: failed to get write done sem 0x%08x\n", status);
+			TRACE_ALWAYS("write: failed to get write done sem 0x%08x\n",
+				status);
 			break;
 		}
 
@@ -526,13 +530,15 @@ SerialDevice::DeviceThread(void *data)
 			device->fReadBuffer, device->fReadBufferSize,
 			device->ReadCallbackFunction, data);
 		if (status < B_OK) {
-			TRACE_ALWAYS("device thread: queueing failed with error: 0x%08x\n", status);
+			TRACE_ALWAYS("device thread: queueing failed with error: 0x%08x\n",
+				status);
 			break;
 		}
 
 		status = acquire_sem_etc(device->fDoneRead, 1, B_CAN_INTERRUPT, 0);
 		if (status < B_OK) {
-			TRACE_ALWAYS("device thread: failed to get read done sem 0x%08x\n", status);
+			TRACE_ALWAYS("device thread: failed to get read done sem 0x%08x\n",
+				status);
 			break;
 		}
 
@@ -566,8 +572,8 @@ void
 SerialDevice::ReadCallbackFunction(void *cookie, int32 status, void *data,
 	uint32 actualLength)
 {
-	TRACE_FUNCALLS("read callback: cookie: 0x%08x status: 0x%08x data: 0x%08x len: %lu\n",
-		cookie, status, data, actualLength);
+	TRACE_FUNCALLS("read callback: cookie: 0x%08x status: 0x%08x data: 0x%08x "
+		"length: %lu\n", cookie, status, data, actualLength);
 
 	SerialDevice *device = (SerialDevice *)cookie;
 	device->fActualLengthRead = actualLength;
@@ -580,8 +586,8 @@ void
 SerialDevice::WriteCallbackFunction(void *cookie, int32 status, void *data,
 	uint32 actualLength)
 {
-	TRACE_FUNCALLS("write callback: cookie: 0x%08x status: 0x%08x data: 0x%08x len: %lu\n",
-		cookie, status, data, actualLength);
+	TRACE_FUNCALLS("write callback: cookie: 0x%08x status: 0x%08x data: 0x%08x "
+		"length: %lu\n", cookie, status, data, actualLength);
 
 	SerialDevice *device = (SerialDevice *)cookie;
 	device->fActualLengthWrite = actualLength;
@@ -594,8 +600,8 @@ void
 SerialDevice::InterruptCallbackFunction(void *cookie, int32 status,
 	void *data, uint32 actualLength)
 {
-	TRACE_FUNCALLS("interrupt callback: cookie: 0x%08x status: 0x%08x data: 0x%08x len: %lu\n",
-		cookie, status, data, actualLength);
+	TRACE_FUNCALLS("interrupt callback: cookie: 0x%08x status: 0x%08x data: "
+		"0x%08x len: %lu\n", cookie, status, data, actualLength);
 
 	SerialDevice *device = (SerialDevice *)cookie;
 	device->fActualLengthInterrupt = actualLength;
@@ -609,7 +615,6 @@ SerialDevice::InterruptCallbackFunction(void *cookie, int32 status,
 			device->InterruptCallbackFunction, device);
 	}
 }
-
 
 
 SerialDevice *
@@ -629,51 +634,83 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 		case VENDOR_HAL:
 		{
 			switch (productID) {
-				case PRODUCT_PROLIFIC_RSAQ2: description = "PL2303 Serial adapter (IODATA USB-RSAQ2)"; break;
-				case PRODUCT_IODATA_USBRSAQ: description = "I/O Data USB serial adapter USB-RSAQ1"; break;
-				case PRODUCT_ATEN_UC232A: description = "Aten Serial adapter"; break;
-				case PRODUCT_TDK_UHA6400: description = "TDK USB-PHS Adapter UHA6400"; break;
-				case PRODUCT_RATOC_REXUSB60: description = "Ratoc USB serial adapter REX-USB60"; break;
-				case PRODUCT_PROLIFIC_PL2303: description = "PL2303 Serial adapter (ATEN/IOGEAR UC232A)"; break;
-				case PRODUCT_ELECOM_UCSGT: description = "Elecom UC-SGT"; break;
-				case PRODUCT_SOURCENEXT_KEIKAI8: description = "SOURCENEXT KeikaiDenwa 8"; break;
-				case PRODUCT_SOURCENEXT_KEIKAI8_CHG: description = "SOURCENEXT KeikaiDenwa 8 with charger"; break;
-				case PRODUCT_HAL_IMR001: description = "HAL Corporation Crossam2+USB"; break;
+				case PRODUCT_PROLIFIC_RSAQ2:
+					description = "PL2303 Serial adapter (IODATA USB-RSAQ2)";
+					break;
+				case PRODUCT_IODATA_USBRSAQ:
+					description = "I/O Data USB serial adapter USB-RSAQ1";
+					break;
+				case PRODUCT_ATEN_UC232A:
+					description = "Aten Serial adapter";
+					break;
+				case PRODUCT_TDK_UHA6400:
+					description = "TDK USB-PHS Adapter UHA6400";
+					break;
+				case PRODUCT_RATOC_REXUSB60:
+					description = "Ratoc USB serial adapter REX-USB60";
+					break;
+				case PRODUCT_PROLIFIC_PL2303:
+					description = "PL2303 Serial adapter (ATEN/IOGEAR UC232A)";
+					break;
+				case PRODUCT_ELECOM_UCSGT:
+					description = "Elecom UC-SGT";
+					break;
+				case PRODUCT_SOURCENEXT_KEIKAI8:
+					description = "SOURCENEXT KeikaiDenwa 8";
+					break;
+				case PRODUCT_SOURCENEXT_KEIKAI8_CHG:
+					description = "SOURCENEXT KeikaiDenwa 8 with charger";
+					break;
+				case PRODUCT_HAL_IMR001:
+					description = "HAL Corporation Crossam2+USB";
+					break;
 			}
 
-			if (!description)
+			if (description == NULL)
 				break;
 
-			return new(std::nothrow) ProlificDevice(device, vendorID, productID, description);
+			return new(std::nothrow) ProlificDevice(device, vendorID, productID,
+				description);
 		}
 
 		case VENDOR_FTDI:
 		{
 			switch (productID) {
-				case PRODUCT_FTDI_8U100AX: description = "FTDI 8U100AX serial converter"; break;
-				case PRODUCT_FTDI_8U232AM: description = "FTDI 8U232AM serial converter"; break;
+				case PRODUCT_FTDI_8U100AX:
+					description = "FTDI 8U100AX serial converter";
+					break;
+				case PRODUCT_FTDI_8U232AM:
+					description = "FTDI 8U232AM serial converter";
+					break;
 			}
 
-			if (!description)
+			if (description == NULL)
 				break;
 
-			return new(std::nothrow) FTDIDevice(device, vendorID, productID, description);
+			return new(std::nothrow) FTDIDevice(device, vendorID, productID,
+				description);
 		}
 
 		case VENDOR_PALM:
 		case VENDOR_KLSI:
 		{
 			switch (productID) {
-				case PRODUCT_PALM_CONNECT: description = "PalmConnect RS232"; break;
-				case PRODUCT_KLSI_KL5KUSB105D: description = "KLSI KL5KUSB105D"; break;
+				case PRODUCT_PALM_CONNECT:
+					description = "PalmConnect RS232";
+					break;
+				case PRODUCT_KLSI_KL5KUSB105D:
+					description = "KLSI KL5KUSB105D";
+					break;
 			}
 
-			if (!description)
+			if (description == NULL)
 				break;
 
-			return new(std::nothrow) KLSIDevice(device, vendorID, productID, description);
+			return new(std::nothrow) KLSIDevice(device, vendorID, productID,
+				description);
 		}
 	}
 
-	return new(std::nothrow) ACMDevice(device, vendorID, productID, "CDC ACM compatible device");
+	return new(std::nothrow) ACMDevice(device, vendorID, productID,
+		"CDC ACM compatible device");
 }
