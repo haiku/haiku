@@ -149,7 +149,10 @@ KLSIDevice::OnRead(char **buffer, size_t *numBytes)
 void
 KLSIDevice::OnWrite(const char *buffer, size_t *numBytes, size_t *packetBytes)
 {
-	if (*numBytes >= WriteBufferSize() - 2)
+	if (*numBytes > KLSI_BUFFER_SIZE)
+		*numBytes = *packetBytes = KLSI_BUFFER_SIZE;
+
+	if (*numBytes > WriteBufferSize() - 2)
 		*numBytes = *packetBytes = WriteBufferSize() - 2;
 
 	char *writeBuffer = WriteBuffer();
