@@ -41,14 +41,14 @@ BReferenceable::AcquireReference()
 }
 
 
-bool
+int32
 BReferenceable::ReleaseReference()
 {
-	bool unreferenced = (atomic_add(&fReferenceCount, -1) == 1);
+	int32 previousReferenceCount = atomic_add(&fReferenceCount, -1);
 	TRACE("%p: release %ld\n", this, fReferenceCount);
-	if (unreferenced)
+	if (previousReferenceCount == 1)
 		LastReferenceReleased();
-	return unreferenced;
+	return previousReferenceCount;
 }
 
 

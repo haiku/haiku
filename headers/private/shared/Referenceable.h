@@ -17,9 +17,10 @@ public:
 								BReferenceable();
 	virtual						~BReferenceable();
 
+								// acquire and release return
+								// the previous ref count
 			int32				AcquireReference();
-			bool				ReleaseReference();
-									// returns true after last
+			int32				ReleaseReference();
 
 			int32				CountReferences() const
 									{ return fReferenceCount; }

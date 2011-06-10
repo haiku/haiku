@@ -253,7 +253,7 @@ NetAddressResolver::~NetAddressResolver()
 {
 	if (fResolver) {
 		_Lock();
-		if (sResolver->ReleaseReference()) {
+		if (sResolver->ReleaseReference() == 1) {
 			delete sResolver;
 			sResolver = NULL;
 		}

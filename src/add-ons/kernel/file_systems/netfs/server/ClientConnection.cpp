@@ -2789,7 +2789,7 @@ ClientConnection::_PutVolume(ClientVolume* volume)
 
 	// decrement reference counter and remove the volume, if 0
 	AutoLocker<VolumeMap> locker(fVolumes);
-	bool removed = (volume->ReleaseReference() && volume->IsRemoved());
+	bool removed = (volume->ReleaseReference() == 1 && volume->IsRemoved());
 	if (removed)
 		fVolumes->Remove(volume->GetID());
 	locker.Unlock();
