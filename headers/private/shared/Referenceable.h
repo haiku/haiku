@@ -17,7 +17,7 @@ public:
 								BReferenceable();
 	virtual						~BReferenceable();
 
-			void				AcquireReference();
+			int32				AcquireReference();
 			bool				ReleaseReference();
 									// returns true after last
 

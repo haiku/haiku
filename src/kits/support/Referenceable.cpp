@@ -28,13 +28,16 @@ BReferenceable::~BReferenceable()
 }
 
 
-void
+int32
 BReferenceable::AcquireReference()
 {
-	if (atomic_add(&fReferenceCount, 1) == 0)
+	int32 previousReferenceCount = atomic_add(&fReferenceCount, 1);
+	if (previousReferenceCount == 0)
 		FirstReferenceAcquired();
 
 	TRACE("%p: acquire %ld\n", this, fReferenceCount);
+
+	return previousReferenceCount;
 }
 
 
