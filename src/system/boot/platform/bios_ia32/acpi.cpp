@@ -39,7 +39,8 @@ static int32 sNumEntries = -1;
 static status_t
 acpi_check_rsdt(acpi_rsdp* rsdp)
 {
-	TRACE(("acpi: found rsdp at %p oem id: %.6s\n", rsdp, rsdp->oem_id));
+	TRACE(("acpi: found rsdp at %p oem id: %.6s\n, rev %d",
+		rsdp, rsdp->oem_id, rsdp->revision));
 	TRACE(("acpi: rsdp points to rsdt at 0x%lx\n", rsdp->rsdt_address));
 
 	// map and validate the root system description table
@@ -55,7 +56,13 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 		return B_ERROR;
 	}
 
-	sAcpiRsdt = rsdt;
+	// Map the whole table, not just the header
+	uint32 length = rsdt->length;
+	mmu_free(rsdt, sizeof(acpi_descriptor_header));
+
+	sAcpiRsdt = (acpi_descriptor_header*)mmu_map_physical_memory(rsdp->rsdt_address,
+		length, kDefaultPageFlags);
+	
 	return B_OK;
 }
 
