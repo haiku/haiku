@@ -41,13 +41,8 @@
 	Locking
 	-------
 
-	There are four locks involved. If more than one needs to be held at a
+	There are three locks involved. If more than one needs to be held at a
 	time, they must be acquired in the order they are listed here.
-
-	gGlobalTTYLock: Guards open/close operations. When held, tty_open(),
-	tty_close(), tty_close_cookie() etc. won't be invoked by other threads,
-	cookies won't be added to/removed from TTYs, and tty::ref_count,
-	tty::open_count, tty_cookie::closed won't change.
 
 	gTTYCookieLock: Guards the access to the fields
 	tty_cookie::{thread_count,closed}, or more precisely makes access to them
@@ -59,9 +54,8 @@
 
 	tty::lock: Guards the access to tty::{input_buffer,settings::{termios,
 	window_size,pgrp_id}}. Moreover when held guarantees that tty::open_count
-	won't drop to zero (both gGlobalTTYLock and tty::lock must be held to
-	decrement it). A tty and the tty connected to it (master and slave) share
-	the same lock.
+	won't drop to zero. A tty and the tty connected to it (master and slave)
+	share the same lock.
 
 	gTTYRequestLock: Guards access to tty::{reader,writer}_queue (most
 	RequestQueue methods do the locking themselves (the lock is a
@@ -863,8 +857,6 @@ tty_input_putc(struct tty* tty, int c)
 #endif // 0
 
 
-/*!	The global lock must be held.
-*/
 tty_cookie*
 tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
 {
@@ -896,8 +888,6 @@ tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
 }
 
 
-/*!	The global lock must be held.
-*/
 void
 tty_destroy_cookie(tty_cookie* cookie)
 {
@@ -917,8 +907,6 @@ tty_destroy_cookie(tty_cookie* cookie)
 }
 
 
-/*!	The global lock must be held.
-*/
 void
 tty_close_cookie(tty_cookie* cookie)
 {
@@ -958,9 +946,7 @@ tty_close_cookie(tty_cookie* cookie)
 
 	// For the removal of the cookie acquire the TTY's lock. This ensures, that
 	// cookies will not be removed from a TTY (or added -- cf. add_tty_cookie())
-	// as long as the TTY's lock is being held. This is required for the select
-	// support, since we need to iterate through the cookies of a TTY without
-	// having to acquire the global lock.
+	// as long as the TTY's lock is being held.
 	MutexLocker ttyLocker(cookie->tty->lock);
 
 	// remove the cookie from the TTY's cookie list

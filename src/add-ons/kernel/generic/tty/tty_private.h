@@ -142,7 +142,6 @@ struct tty {
 };
 
 
-extern struct mutex gGlobalTTYLock;
 extern struct mutex gTTYCookieLock;
 extern struct recursive_lock gTTYRequestLock;
 
