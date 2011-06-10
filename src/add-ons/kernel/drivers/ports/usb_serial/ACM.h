@@ -19,9 +19,6 @@ virtual	status_t				AddDevice(const usb_configuration_info *config);
 
 virtual	status_t				SetLineCoding(usb_cdc_line_coding *coding);
 virtual	status_t				SetControlLineState(uint16 state);
-
-virtual	void					OnWrite(const char *buffer, size_t *numBytes,
-									size_t *packetBytes);
 };
 
 #endif //_USB_ACM_H_

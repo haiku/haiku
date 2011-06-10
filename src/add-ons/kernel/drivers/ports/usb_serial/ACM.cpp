@@ -134,10 +134,3 @@ ACMDevice::SetControlLineState(uint16 state)
 	TRACE_FUNCRET("< ACMDevice::SetControlLineState() returns: 0x%08x\n", status);
 	return status;
 }
-
-
-void
-ACMDevice::OnWrite(const char *buffer, size_t *numBytes, size_t *packetBytes)
-{
-	memcpy(WriteBuffer(), buffer, *numBytes);
-}

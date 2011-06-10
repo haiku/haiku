@@ -76,16 +76,18 @@ protected:
 		void					SetReadBufferSize(size_t size) { fReadBufferSize = size; };
 		void					SetWriteBufferSize(size_t size) { fWriteBufferSize = size; };
 		void					SetInterruptBufferSize(size_t size) { fInterruptBufferSize = size; };
-private:
-static	int32					DeviceThread(void *data);
 
-static	void					ReadCallbackFunction(void *cookie,
+private:
+static	int32					_InputThread(void *data);
+static	int32					_OutputThread(void *data);
+
+static	void					_ReadCallbackFunction(void *cookie,
 									int32 status, void *data,
 									uint32 actualLength);
-static	void					WriteCallbackFunction(void *cookie,
+static	void					_WriteCallbackFunction(void *cookie,
 									int32 status, void *data,
 									uint32 actualLength);
-static	void					InterruptCallbackFunction(void *cookie,
+static	void					_InterruptCallbackFunction(void *cookie,
 									int32 status, void *data,
 									uint32 actualLength);
 
@@ -108,6 +110,8 @@ static	void					InterruptCallbackFunction(void *cookie,
 		area_id					fBufferArea;
 		char *					fReadBuffer;
 		size_t					fReadBufferSize;
+		char *					fOutputBuffer;
+		size_t					fOutputBufferSize;
 		char *					fWriteBuffer;
 		size_t					fWriteBufferSize;
 		char *					fInterruptBuffer;
@@ -129,15 +133,13 @@ static	void					InterruptCallbackFunction(void *cookie,
 		bool					fInputStopped;
 		struct tty *			fMasterTTY;
 		struct tty *			fSlaveTTY;
-		struct tty_cookie *		fTTYCookie;
+		struct tty_cookie *		fSystemTTYCookie;
+		struct tty_cookie *		fDeviceTTYCookie;
 
-		/* device thread management */
-		thread_id				fDeviceThread;
-		bool					fStopDeviceThread;
-
-		/* device locks to ensure no concurent reads/writes */
-		mutex					fReadLock;
-		mutex					fWriteLock;
+		/* input/output thread management */
+		thread_id				fInputThread;
+		thread_id				fOutputThread;
+		bool					fStopThreads;
 };
 
 #endif // _USB_DEVICE_H_
