@@ -44,12 +44,10 @@ struct TeamMemoryBlockManager::MemoryBlockEntry : Key {
 		Key(block->BaseAddress()),
 		block(block)
 	{
-		block->AcquireReference();
 	}
 
 	~MemoryBlockEntry()
 	{
-		block->ReleaseReference();
 	}
 };
 
@@ -109,16 +107,11 @@ TeamMemoryBlockManager::Init()
 	if (result != B_OK)
 		return result;
 
-	fDeadBlocks = new(std::nothrow) MemoryBlockTable();
+	fDeadBlocks = new(std::nothrow) DeadBlockTable();
 	if (fDeadBlocks == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<MemoryBlockTable> deadDeleter(fDeadBlocks);
-	result = fDeadBlocks->Init();
-	if (result != B_OK)
-		return result;
 
 	activeDeleter.Detach();
-	deadDeleter.Detach();
 
 	return B_OK;
 }
@@ -131,28 +124,33 @@ TeamMemoryBlockManager::GetMemoryBlock(target_addr_t address)
 
 	address &= ~B_PAGE_SIZE - 1;
 	MemoryBlockEntry* entry = fActiveBlocks->Lookup(address);
-	if (entry == NULL) {
-		TeamMemoryBlock* block = new(std::nothrow) TeamMemoryBlock(address,
-			this);
-		if (block == NULL)
-			return NULL;
+	if (entry != NULL) {
+		if (entry->block->AcquireReference() != 0)
+			return entry->block;
 
-		entry = new(std::nothrow) MemoryBlockEntry(block);
-		if (entry == NULL) {
-			delete block;
-			return NULL;
-		}
-
-		fActiveBlocks->Insert(entry);
-	}
-
-	int32 refCount = entry->block->AcquireReference();
-	if (refCount == 0) {
 		// this block already had its last reference released,
-		// move it to the dead list and retrieve a new one instead.
+		// move it to the dead list and create a new one instead.
 		_MarkDeadBlock(address);
-		return GetMemoryBlock(address);
 	}
+
+	TeamMemoryBlockOwner* owner = new(std::nothrow) TeamMemoryBlockOwner(this);
+	if (owner == NULL)
+		return NULL;
+	ObjectDeleter<TeamMemoryBlockOwner> ownerDeleter(owner);
+
+	TeamMemoryBlock* block = new(std::nothrow) TeamMemoryBlock(address,
+		owner);
+	if (block == NULL)
+		return NULL;
+	ObjectDeleter<TeamMemoryBlock> blockDeleter(block);
+
+	entry = new(std::nothrow) MemoryBlockEntry(block);
+	if (entry == NULL)
+		return NULL;
+
+	ownerDeleter.Detach();
+	blockDeleter.Detach();
+	fActiveBlocks->Insert(entry);
 
 	return entry->block;
 }
@@ -179,11 +177,11 @@ TeamMemoryBlockManager::_Cleanup()
 void
 TeamMemoryBlockManager::_MarkDeadBlock(target_addr_t address)
 {
-	AutoLocker<BLocker> lock(fLock);
 	MemoryBlockEntry* entry = fActiveBlocks->Lookup(address);
 	if (entry != NULL) {
 		fActiveBlocks->Remove(entry);
-		fDeadBlocks->Insert(entry);
+		fDeadBlocks->Insert(entry->block);
+		delete entry;
 	}
 }
 
@@ -199,10 +197,31 @@ TeamMemoryBlockManager::_RemoveBlock(target_addr_t address)
 		return;
 	}
 
-	entry = fDeadBlocks->Lookup(address);
-	if (entry != NULL) {
-		fDeadBlocks->Remove(entry);
-		delete entry;
+	DeadBlockTable::Iterator iterator = fDeadBlocks->GetIterator();
+	while (iterator.HasNext()) {
+		TeamMemoryBlock* block = iterator.Next();
+		if (block->BaseAddress() == address) {
+			fDeadBlocks->Remove(block);
+			break;
+		}
 	}
 }
 
+
+TeamMemoryBlockOwner::TeamMemoryBlockOwner(TeamMemoryBlockManager* manager)
+	:
+	fBlockManager(manager)
+{
+}
+
+
+TeamMemoryBlockOwner::~TeamMemoryBlockOwner()
+{
+}
+
+
+void
+TeamMemoryBlockOwner::RemoveBlock(TeamMemoryBlock* block)
+{
+	fBlockManager->_RemoveBlock(block->BaseAddress());
+}

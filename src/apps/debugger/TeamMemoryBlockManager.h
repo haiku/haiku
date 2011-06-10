@@ -8,9 +8,11 @@
 
 #include <Locker.h>
 #include <Referenceable.h>
+#include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
 #include "Types.h"
+
 
 struct MemoryBlockHashDefinition;
 class TeamMemoryBlock;
@@ -31,6 +33,7 @@ private:
 		struct MemoryBlockEntry;
 		struct MemoryBlockHashDefinition;
 		typedef BOpenHashTable<MemoryBlockHashDefinition> MemoryBlockTable;
+		typedef DoublyLinkedList<TeamMemoryBlock> DeadBlockTable;
 
 private:
 		void					_Cleanup();
@@ -38,12 +41,26 @@ private:
 		void					_RemoveBlock(target_addr_t address);
 
 private:
-		friend class TeamMemoryBlock;
+		friend class TeamMemoryBlockOwner;
 
 private:
 		BLocker					fLock;
 		MemoryBlockTable*		fActiveBlocks;
-		MemoryBlockTable*		fDeadBlocks;
+		DeadBlockTable*			fDeadBlocks;
+};
+
+
+class TeamMemoryBlockOwner
+{
+public:
+								TeamMemoryBlockOwner(
+									TeamMemoryBlockManager* manager);
+								~TeamMemoryBlockOwner();
+
+		void					RemoveBlock(TeamMemoryBlock* block);
+
+private:
+	TeamMemoryBlockManager* 	fBlockManager;
 };
 
 

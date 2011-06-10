@@ -16,17 +16,18 @@
 
 
 TeamMemoryBlock::TeamMemoryBlock(target_addr_t baseAddress,
-	TeamMemoryBlockManager* manager)
+	TeamMemoryBlockOwner* owner)
 	:
 	fValid(false),
 	fBaseAddress(baseAddress),
-	fBlockManager(manager)
+	fBlockOwner(owner)
 {
 }
 
 
 TeamMemoryBlock::~TeamMemoryBlock()
 {
+	delete fBlockOwner;
 }
 
 
@@ -88,9 +89,9 @@ TeamMemoryBlock::NotifyDataRetrieved()
 void
 TeamMemoryBlock::LastReferenceReleased()
 {
-	fBlockManager->_RemoveBlock(fBaseAddress);
+	fBlockOwner->RemoveBlock(this);
 
-	BReferenceable::LastReferenceReleased();
+	delete this;
 }
 
 

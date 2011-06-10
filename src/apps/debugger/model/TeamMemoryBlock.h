@@ -15,16 +15,17 @@
 #include "Types.h"
 
 
-class TeamMemoryBlockManager;
+class TeamMemoryBlockOwner;
 
 
-class TeamMemoryBlock : public BReferenceable {
+class TeamMemoryBlock : public BReferenceable,
+	public DoublyLinkedListLinkImpl<TeamMemoryBlock> {
 public:
 	class Listener;
 
 public:
 							TeamMemoryBlock(target_addr_t baseAddress,
-								TeamMemoryBlockManager* manager);
+								TeamMemoryBlockOwner* owner);
 							~TeamMemoryBlock();
 
 			void			AddListener(Listener* listener);
@@ -52,8 +53,8 @@ private:
 			target_addr_t	fBaseAddress;
 			uint8			fData[B_PAGE_SIZE];
 			ListenerList	fListeners;
-			TeamMemoryBlockManager*
-							fBlockManager;
+			TeamMemoryBlockOwner*
+							fBlockOwner;
 			BLocker			fLock;
 };
 
