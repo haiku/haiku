@@ -44,7 +44,9 @@ enum {
 	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt',
 	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
 	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
-	MSG_DEBUG_THIS_TEAM							= 'dbtt'
+	MSG_DEBUG_THIS_TEAM							= 'dbtt',
+	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',
+	MSG_INSPECT_ADDRESS							= 'isad'
 };
 
 

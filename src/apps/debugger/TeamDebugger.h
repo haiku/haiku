@@ -22,6 +22,7 @@ class DebuggerInterface;
 class FileManager;
 class SettingsManager;
 class TeamDebugInfo;
+class TeamMemoryBlockManager;
 
 
 class TeamDebugger : public BLooper, private UserInterfaceListener,
@@ -65,6 +66,10 @@ private:
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
+	virtual void				InspectRequested(target_addr_t address,
+									TeamMemoryBlock::Listener* listener);
+	virtual void				InspectRequested(const char* addressExpression,
+									TeamMemoryBlock::Listener* listener);
 	virtual	bool				UserInterfaceQuitRequested();
 
 	// JobListener
@@ -118,6 +123,13 @@ private:
 			void				_HandleClearUserBreakpoint(
 									UserBreakpoint* breakpoint);
 
+			void				_HandleInspectAddress(
+									target_addr_t address,
+									TeamMemoryBlock::Listener* listener);
+			void				_HandleInspectAddress(
+									const char* addressExpression,
+									TeamMemoryBlock::Listener* listener);
+
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
 			status_t			_AddImage(const ImageInfo& imageInfo,
@@ -142,6 +154,8 @@ private:
 			FileManager*		fFileManager;
 			Worker*				fWorker;
 			BreakpointManager*	fBreakpointManager;
+			TeamMemoryBlockManager*
+								fMemoryBlockManager;
 			thread_id			fDebugEventListener;
 			UserInterface*		fUserInterface;
 	volatile bool				fTerminating;

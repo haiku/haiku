@@ -24,6 +24,8 @@
 #include "StackFrameValues.h"
 #include "StackTrace.h"
 #include "Team.h"
+#include "TeamMemory.h"
+#include "TeamMemoryBlock.h"
 #include "TeamDebugInfo.h"
 #include "Thread.h"
 #include "Tracing.h"
@@ -632,4 +634,42 @@ ResolveValueNodeValueJob::_ResolveParentNodeValue(ValueNode* parentNode)
 	nodeResolutionState = parentNode->LocationAndValueResolutionState();
 	return nodeResolutionState != VALUE_NODE_UNRESOLVED
 		? nodeResolutionState : B_ERROR;
+}
+
+
+RetrieveMemoryBlockJob::RetrieveMemoryBlockJob(TeamMemory* teamMemory,
+	TeamMemoryBlock* memoryBlock)
+	:
+	fKey(memoryBlock, JOB_TYPE_GET_MEMORY_BLOCK),
+	fTeamMemory(teamMemory),
+	fMemoryBlock(memoryBlock)
+{
+	fMemoryBlock->AcquireReference();
+}
+
+
+RetrieveMemoryBlockJob::~RetrieveMemoryBlockJob()
+{
+	fMemoryBlock->ReleaseReference();
+}
+
+
+const JobKey&
+RetrieveMemoryBlockJob::Key() const
+{
+	return fKey;
+}
+
+
+status_t
+RetrieveMemoryBlockJob::Do()
+{
+
+	ssize_t result = fTeamMemory->ReadMemory(fMemoryBlock->BaseAddress(),
+		fMemoryBlock->Data(), fMemoryBlock->Size());
+	if (result < 0)
+		return result;
+
+	fMemoryBlock->MarkValid();
+	return B_OK;
 }

@@ -20,6 +20,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
@@ -54,6 +55,7 @@ Application Debugger :
 	BreakpointManager.cpp
 	Debugger.cpp
 	Jobs.cpp
+	TeamMemoryBlockManager.cpp
 	TeamDebugger.cpp
 	ThreadHandler.cpp
 	Worker.cpp
@@ -127,6 +129,7 @@ Application Debugger :
 	UserBreakpoint.cpp
 	Team.cpp
 	TeamMemory.cpp
+	TeamMemoryBlock.cpp
 	Thread.cpp
 	ThreadInfo.cpp
 	Type.cpp
@@ -166,6 +169,10 @@ Application Debugger :
 	# user_interface/gui/model
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
+
+	# user_interface/gui/inspector_window
+	InspectorWindow.cpp
+	MemoryView.cpp
 
 	# user_interface/gui/teams_window
 	TeamsWindow.cpp
@@ -253,7 +260,7 @@ Application Debugger :
 	libshared.a
 
 	$(TARGET_LIBSTDC++)
-	be tracker libdebug.so
+	be tracker libdebug.so libshared.a libexpression_parser.a libmapm.a
 
 	: Debugger.rdef
 ;

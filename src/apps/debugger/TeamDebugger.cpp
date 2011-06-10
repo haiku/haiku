@@ -14,6 +14,7 @@
 
 #include <Message.h>
 
+#include <ExpressionParser.h>
 #include <AutoLocker.h>
 
 #include "debug_utils.h"
@@ -37,6 +38,8 @@
 #include "Statement.h"
 #include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
+#include "TeamMemoryBlock.h"
+#include "TeamMemoryBlockManager.h"
 #include "TeamSettings.h"
 #include "Tracing.h"
 #include "ValueNode.h"
@@ -446,6 +449,26 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_INSPECT_ADDRESS:
+		{
+			TeamMemoryBlock::Listener* listener;
+			if (message->FindPointer("listener",
+				reinterpret_cast<void **>(&listener)) != B_OK) {
+				break;
+			}
+
+			const char* addressExpression;
+			target_addr_t address;
+			if (message->FindString("addressExpression",
+				&addressExpression)	== B_OK) {
+				_HandleInspectAddress(addressExpression, listener);
+			} else if (message->FindUInt64("address",
+				&address) == B_OK) {
+				_HandleInspectAddress(address, listener);
+			}
+			break;
+		}
+
 		case MSG_THREAD_STATE_CHANGED:
 		{
 			int32 threadID;
@@ -658,6 +681,28 @@ TeamDebugger::ClearBreakpointRequested(UserBreakpoint* breakpoint)
 		&& PostMessage(&message) == B_OK) {
 		breakpointReference.Detach();
 	}
+}
+
+
+void
+TeamDebugger::InspectRequested(const char* addressExpression,
+	TeamMemoryBlock::Listener *listener)
+{
+	BMessage message(MSG_INSPECT_ADDRESS);
+	message.AddString("addressExpression", addressExpression);
+	message.AddPointer("listener", listener);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::InspectRequested(target_addr_t address,
+	TeamMemoryBlock::Listener *listener)
+{
+	BMessage message(MSG_INSPECT_ADDRESS);
+	message.AddUInt64("address", address);
+	message.AddPointer("listener", listener);
+	PostMessage(&message);
 }
 
 
@@ -1240,6 +1285,68 @@ void
 TeamDebugger::_HandleClearUserBreakpoint(UserBreakpoint* breakpoint)
 {
 	fBreakpointManager->UninstallUserBreakpoint(breakpoint);
+}
+
+
+void
+TeamDebugger::_HandleInspectAddress(const char* addressExpression,
+	TeamMemoryBlock::Listener* listener)
+{
+	TRACE_CONTROL("TeamDebugger::_HandleInspectAddress(%s, %p)\n",
+		addressExpression, listener);
+
+	ExpressionParser parser;
+	parser.SetSupportHexInput(true);
+	target_addr_t address = 0LL;
+	try {
+		address = parser.EvaluateToInt64(addressExpression);
+	} catch(ParseException parseError) {
+		_NotifyUser("Inspect Address", "Failed to parse address: %s",
+			parseError.message.String());
+		return;
+	} catch(...) {
+		_NotifyUser("Inspect Address", "Unknown error while parsing address");
+		return;
+	}
+
+	_HandleInspectAddress(address, listener);
+}
+
+
+void
+TeamDebugger::_HandleInspectAddress(target_addr_t address,
+	TeamMemoryBlock::Listener* listener)
+{
+	TRACE_CONTROL("TeamDebugger::_HandleInspectAddress(" B_PRIx64 ", %p)\n",
+		addressExpression, listener);
+
+	TeamMemoryBlock* memoryBlock = fMemoryBlockManager
+		->GetMemoryBlock(address);
+
+	if (memoryBlock == NULL) {
+		_NotifyUser("Inspect Address", "Failed to allocate memory block");
+		return;
+	}
+
+	if (!memoryBlock->HasListener(listener))
+		memoryBlock->AddListener(listener);
+
+	if (!memoryBlock->IsValid()) {
+		AutoLocker< ::Team> teamLocker(fTeam);
+
+		TeamMemory* memory = fTeam->GetTeamMemory();
+		// schedule the job
+		status_t result;
+		if ((result = fWorker->ScheduleJob(
+			new(std::nothrow) RetrieveMemoryBlockJob(memory, memoryBlock),
+			this)) != B_OK) {
+			memoryBlock->ReleaseReference();
+			_NotifyUser("Inspect Address", "Failed to retrieve memory data: %s",
+				strerror(result));
+		}
+	} else
+		memoryBlock->NotifyDataRetrieved();
+
 }
 
 
