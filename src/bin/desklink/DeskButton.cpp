@@ -12,6 +12,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Dragger.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -24,6 +25,11 @@
 
 #define OPEN_REF	'opre'
 #define DO_ACTION	'doac'
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DeskButton"
+
 
 extern const char *kAppSignature;
 	// from desklink.cpp
@@ -107,14 +113,10 @@ void
 DeskButton::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case B_ABOUT_REQUESTED:
-			(new BAlert("About Desklink", "Desklink (Replicant)\n"
-				"  Brought to you by Jérôme DUVAL.\n\n"
-				"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku","OK"))->Go();
-			break;
 		case OPEN_REF:
 			be_roster->Launch(&fRef);
 			break;
+
 		case DO_ACTION:
 		{
 			BString action;
@@ -124,6 +126,7 @@ DeskButton::MessageReceived(BMessage *message)
 			}
 			break;
 		}
+
 		default:
 			BView::MessageReceived(message);
 			break;		

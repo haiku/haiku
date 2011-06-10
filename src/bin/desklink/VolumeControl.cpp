@@ -14,9 +14,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Dragger.h>
 #include <MessageRunner.h>
@@ -29,6 +29,12 @@
 #include "VolumeWindow.h"
 
 
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "VolumeControl"
+
+
 static const char* kMediaServerSignature = "application/x-vnd.Be.media-server";
 static const char* kAddOnServerSignature = "application/x-vnd.Be.addon-host";
 
@@ -37,7 +43,8 @@ static const uint32 kMsgReconnectVolume = 'rcms';
 
 VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 	:
-	BSlider("VolumeControl", "Volume", message, 0, 1, B_HORIZONTAL),
+	BSlider("VolumeControl", B_TRANSLATE("Volume"),
+		message, 0, 1, B_HORIZONTAL),
 	fMixerControl(new MixerControl(volumeWhich)),
 	fBeep(beep),
 	fSnapping(false),
@@ -284,13 +291,6 @@ VolumeControl::MessageReceived(BMessage* msg)
 			SetValue((int32)fMixerControl->Volume());
 			break;
 
-		case B_ABOUT_REQUESTED:
-			(new BAlert("About Volume Control", "Volume Control\n"
-					"  Written by Jérôme DUVAL, and Axel Dörfler.\n\n"
-					"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku",
-				"OK"))->Go(NULL);
-			break;
-
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
 		{
@@ -308,7 +308,7 @@ VolumeControl::MessageReceived(BMessage* msg)
            if (isMediaServer || isAddOnServer) {
                 if (!fMediaServerRunning && !fAddOnServerRunning) {
 					// No media server around
-					SetLabel("No media server running");
+					SetLabel(B_TRANSLATE("No media server running"));
 					SetEnabled(false);
                 } else if (fMediaServerRunning && fAddOnServerRunning) {
                     // HACK!
@@ -389,8 +389,8 @@ VolumeControl::UpdateText() const
 	if (!IsEnabled())
 		return NULL;
 
-	snprintf(fText, sizeof(fText), "%ld dB", Value());
-	return fText;
+	fText.SetToFormat(B_TRANSLATE("%ld dB"), Value());
+	return fText.String();
 }
 
 
@@ -418,7 +418,7 @@ VolumeControl::_ConnectVolume()
 		SetLabel(errorString);
 		SetLimits(-60, 18);
 	} else {
-		SetLabel("Volume");
+		SetLabel(B_TRANSLATE("Volume"));
 		SetLimits((int32)floorf(fMixerControl->Minimum()),
 			(int32)ceilf(fMixerControl->Maximum()));
 

@@ -12,6 +12,14 @@ BinCommand desklink :
 	VolumeControl.cpp
 	VolumeWindow.cpp
 
-	: be libmedia.so $(TARGET_LIBSUPC++)
+	: be libmedia.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: desklink.rdef
+;
+
+DoCatalogs Mail :
+	x-vnd.Haiku-desklink
+	:
+	DeskButton.cpp
+	MediaReplicant.cpp
+	VolumeControl.cpp
 ;
