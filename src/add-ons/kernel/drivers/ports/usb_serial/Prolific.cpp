@@ -117,6 +117,9 @@ ProlificDevice::SendRequestList(request_item *list, size_t length)
 			list[i].out ? NULL : buffer,
 			&bufferLength);
 		TRACE(" ProlificDevice::SendRequestList(): request[%d]: 0x%08lx\n", i, status);
+		if (status != B_OK) {
+			TRACE_ALWAYS("sending request list failed:0x%08lx\n", status);
+		}
 	}
 
 	return B_OK;

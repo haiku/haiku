@@ -43,13 +43,14 @@ usb_serial_device_added(usb_device device, void **cookie)
 	const usb_configuration_info *configuration;
 	for (int i = 0; i < descriptor->num_configurations; i++) {
 		configuration = gUSBModule->get_nth_configuration(device, i);
-		if (!configuration)
+		if (configuration == NULL)
 			continue;
 
 		status = serialDevice->AddDevice(configuration);
-		if (status == B_OK)
+		if (status == B_OK) {
 			// Found!
 			break;
+		}
 	}
 
 	if (status < B_OK) {

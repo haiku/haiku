@@ -18,7 +18,7 @@
 #if DEBUG
 bool gLogEnabled = true;
 #else
-bool gLogEnabled = true;
+bool gLogEnabled = false;
 #endif
 
 bool gLogToFile = false;
@@ -108,12 +108,12 @@ trace_termios(struct termios *tios)
 		"\tc_cflag:  0x%08x\n"
 		"\tc_lflag:  0x%08x\n"
 		"\tc_line:   0x%08x\n"
-//		"\tc_ixxxxx: 0x%08x\n"
-//		"\tc_oxxxxx: 0x%08x\n"
+		"\tc_ispeed: 0x%08x\n"
+		"\tc_ospeed: 0x%08x\n"
 		"\tc_cc[0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x]\n",
 		tios->c_iflag, tios->c_oflag, tios->c_cflag, tios->c_lflag,
 		tios->c_line,
-//		tios->c_ixxxxx, tios->c_oxxxxx,
+		tios->c_ispeed, tios->c_ospeed,
 		tios->c_cc[0], tios->c_cc[1], tios->c_cc[2], tios->c_cc[3],
 		tios->c_cc[4], tios->c_cc[5], tios->c_cc[6], tios->c_cc[7],
 		tios->c_cc[8], tios->c_cc[9], tios->c_cc[10]);
