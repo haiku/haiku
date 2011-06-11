@@ -9,6 +9,7 @@
  
 #include "NetworkTimeView.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -280,9 +281,26 @@ NetworkTimeView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case kMsgServerEdited:
+		{
+			rgb_color defaultColor = ui_color(B_CONTROL_TEXT_COLOR);
+			rgb_color red = {255, 0, 0};
+			int32 length = fServerTextControl->TextView()->TextLength();
+
+			if (_IsValidServerName(fServerTextControl->TextView()->Text()))
+				fServerTextControl->TextView()->SetFontAndColor(0, length, NULL, 0, &defaultColor);
+			else
+				fServerTextControl->TextView()->SetFontAndColor(0, length, NULL, 0, &red);
+
+			break;
+		}
 		case kMsgAddServer:
+			if (!_IsValidServerName(fServerTextControl->TextView()->Text()))
+				break;
+				
 			fSettings.AddServer(fServerTextControl->Text());
 			_UpdateServerList();
+			fServerTextControl->SetText("");
 			Looper()->PostMessage(new BMessage(kMsgChange));
 			break;
 
@@ -377,6 +395,7 @@ NetworkTimeView::MessageReceived(BMessage* message)
 void
 NetworkTimeView::AttachedToWindow()
 {
+	fServerTextControl->SetTarget(this);
 	fServerListView->SetTarget(this);
 	fAddButton->SetTarget(this);
 	fRemoveButton->SetTarget(this);
@@ -393,10 +412,12 @@ NetworkTimeView::CheckCanRevert()
 	return fSettings.SettingsChanged();
 }
 
+
 void
 NetworkTimeView::_InitView()
 {
-	fServerTextControl = new BTextControl(NULL, NULL, NULL);
+	fServerTextControl = new BTextControl(NULL, NULL, new BMessage(kMsgAddServer));
+	fServerTextControl->SetModificationMessage(new BMessage(kMsgServerEdited));
 
 	fAddButton = new BButton("add", B_TRANSLATE("Add"),
 		new BMessage(kMsgAddServer));
@@ -472,6 +493,23 @@ NetworkTimeView::_DoneSynchronizing()
 	fUpdateThread = -1;
 	fSynchronizeButton->SetLabel(B_TRANSLATE("Synchronize again"));
 	fSynchronizeButton->Message()->what = kMsgSynchronize;
+}
+
+
+bool
+NetworkTimeView::_IsValidServerName(const char * serverName)
+{
+	if (serverName[0] == '\0')
+		return false;
+
+	for (int32 i = 0; serverName[i] != '\0'; i++) {
+		char c = serverName[i];
+		// Simple URL validation, no scheme should be present
+		if (!(isalnum(c) || c == '.' || c == '-' || c == '_'))
+			return false;
+	}
+
+	return true;
 }
 
 

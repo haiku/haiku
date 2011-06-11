@@ -25,6 +25,7 @@ class Settings;
 
 static const uint32 kMsgNetworkTimeSettings = 'ntst';
 static const uint32 kMsgSetDefaultServer = 'setd';
+static const uint32 kMsgServerEdited = 'nsed';
 static const uint32 kMsgAddServer = 'asrv';
 static const uint32 kMsgRemoveServer = 'rsrv';
 static const uint32 kMsgResetServerList = 'rstl';
@@ -92,6 +93,7 @@ private:
  			void	 		_InitView();
  			void 			_UpdateServerList();
  			void			_DoneSynchronizing();
+			bool			_IsValidServerName(const char * serverName);
 
 			Settings		fSettings;
 
