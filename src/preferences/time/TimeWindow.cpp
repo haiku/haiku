@@ -130,7 +130,6 @@ TTimeWindow::_InitWindow()
 		.Add(fBaseView)
 		.Add(fRevertButton)
 		.SetInsets(5, 5, 5, 5);
-
 }
 
 
