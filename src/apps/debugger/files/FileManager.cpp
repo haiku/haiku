@@ -191,8 +191,10 @@ private:
 		else {
 			DeadEntryList::Iterator iterator = fDeadEntries.GetIterator();
 			while (iterator.HasNext()) {
-				if (iterator.Next() == entry)
+				if (iterator.Next() == entry) {
 					fDeadEntries.Remove(entry);
+					break;
+				}
 			}
 		}
 	}
