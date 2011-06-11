@@ -158,9 +158,11 @@ TTZDisplay::_CalcPrefSize()
 	size.height = 2 * ceilf(fontHeight.ascent + fontHeight.descent +
 		fontHeight.leading);
 	
+	// Add a little padding
+	float padding = 10.0;
 	float firstLine = ceilf(StringWidth(fLabel.String()) +
-		StringWidth(" ") + StringWidth(fTime.String()));
-	float secondLine = ceilf(StringWidth(fText.String()));
+		StringWidth(" ") + StringWidth(fTime.String()) + padding);
+	float secondLine = ceilf(StringWidth(fText.String()) + padding);
 	size.width = firstLine > secondLine ? firstLine : secondLine;
 	return size;
 }
