@@ -14,7 +14,7 @@ rule BuildAnybootMBR binary : source {
 
 actions BuildAnybootMBR1 {
 	$(RM) $(1)
-	$(TARGET_CC) $(MBR_SOURCE) -o $(1) -nostdlib -Xlinker --oformat=binary -Xlinker -S -Xlinker -N -Xlinker "-e start" -Xlinker "-Ttext=0x600"
+	$(HAIKU_YASM) -f bin $(MBR_SOURCE) -O5 -o $(1)
 }
 
 rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {
