@@ -31,12 +31,12 @@ public:
 	virtual						~TimeZoneView();
 
 	virtual	void				AttachedToWindow();
-	virtual	void				AllAttached();
 	virtual	void				MessageReceived(BMessage* message);
 			bool				CheckCanRevert();
 
 protected:
 	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
+	virtual void				DoLayout();
 
 private:
 			void				_UpdateDateTime(BMessage* message);

@@ -116,7 +116,7 @@ TTimeWindow::_InitWindow()
 	tabView->AddTab(fDateTimeView);
 	tabView->AddTab(fTimeZoneView);
 	tabView->AddTab(fNetworkTimeView);
-	
+
 	fBaseView->AddChild(tabView);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
@@ -125,11 +125,12 @@ TTimeWindow::_InitWindow()
 	fRevertButton->SetTarget(this);
 	fRevertButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
-	
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 5)
 		.Add(fBaseView)
 		.Add(fRevertButton)
 		.SetInsets(5, 5, 5, 5);
+
 }
 
 

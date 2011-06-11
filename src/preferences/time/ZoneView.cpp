@@ -109,25 +109,24 @@ TimeZoneView::AttachedToWindow()
 	BView::AttachedToWindow();
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
-}
 
-
-void
-TimeZoneView::AllAttached()
-{
-	BView::AllAttached();
 	if (!fInitialized) {
 		fInitialized = true;
 
 		fSetZone->SetTarget(this);
 		fZoneList->SetTarget(this);
+	}
+}
 
-		// update displays
-		if (fCurrentZoneItem != NULL) {
-			fZoneList->Select(fZoneList->IndexOf(fCurrentZoneItem));
-			fCurrent->SetText(fCurrentZoneItem->Text());
-			fZoneList->ScrollToSelection();
-		}
+
+void
+TimeZoneView::DoLayout()
+{
+	BView::DoLayout();
+	if (fCurrentZoneItem != NULL) {
+		fZoneList->Select(fZoneList->IndexOf(fCurrentZoneItem));
+		fCurrent->SetText(fCurrentZoneItem->Text());
+		fZoneList->ScrollToSelection();
 	}
 }
 
@@ -248,7 +247,7 @@ TimeZoneView::_InitView()
 	fSetZone->SetEnabled(false);
 	fSetZone->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
-	
+
 	const float kInset = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
