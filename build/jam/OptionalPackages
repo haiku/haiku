@@ -601,15 +601,15 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 		Echo "No optional package DevelopmentJava available for gcc2" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			gnu-classpath-0.98-x86-gcc4-2011-03-01.zip
-			: $(baseURL)/gnu-classpath-0.98-x86-gcc4-2011-03-01.zip ;
+			gnu-classpath-0.98-r1a3-x86-gcc4-2011-06-08.zip
+			: $(baseURL)/gnu-classpath-0.98-r1a3-x86-gcc4-2011-06-08.zip ;
 		InstallOptionalHaikuImagePackage
-			jamvm-1.5.4-x86-gcc4-2011-02-13.zip
-			: $(baseURL)/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
+			jamvm-1.5.4-r1a3-x86-gcc4-2011-06-08.zip
+			: $(baseURL)/jamvm-1.5.4-r1a3-x86-gcc4-2011-06-08.zip ;
 		AddSymlinkToHaikuImage common bin : /boot/common/bin/jamvm : java ;
 		InstallOptionalHaikuImagePackage
-			ecj-3.6.2-haiku-2011-03-05.zip
-			: $(baseURL)/ecj-3.6.2-haiku-2011-03-05.zip ;
+			ecj-3.6.2-haiku-2011-06-08.zip
+			: $(baseURL)/ecj-3.6.2-haiku-2011-06-08.zip ;
 	}
 }
 
