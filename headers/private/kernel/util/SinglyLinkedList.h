@@ -142,7 +142,7 @@ class SinglyLinkedList {
 		inline bool IsEmpty() const		{ return (fFirst == NULL); }
 
 		inline void Add(Element* element);
-		inline void Remove(Element* element);
+		inline bool Remove(Element* element);
 		inline void Remove(Element* previous, Element* element);
 
 		inline void MoveFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList);
@@ -184,16 +184,25 @@ SINGLY_LINKED_LIST_CLASS_NAME::Add(Element* element)
 }
 
 
+/*!	Removes \a element from the list.
+	It is safe to call the list with a \c NULL element or an element that isn't
+	in the list.
+	\param element The element to be removed.
+	\return \c true, if the element was in the list and has been removed,
+		\c false otherwise.
+*/
 SINGLY_LINKED_LIST_TEMPLATE_LIST
-void
+bool
 SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 {
 	if (element == NULL)
-		return;
+		return false;
 
 	Element* next = fFirst;
 	Element* last = NULL;
-	while (next != NULL && element != next) {
+	while (element != next) {
+		if (next == NULL)
+			return false;
 		last = next;
 		next = sGetLink(next)->next;
 	}
@@ -205,6 +214,7 @@ SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 		sGetLink(last)->next = elementLink->next;
 
 	elementLink->next = NULL;
+	return true;
 }
 
 
