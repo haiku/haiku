@@ -58,6 +58,7 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 
 	// Map the whole table, not just the header
 	uint32 length = rsdt->length;
+	TRACE(("acpi: rsdt length: %lu\n", length));
 	mmu_free(rsdt, sizeof(acpi_descriptor_header));
 
 	sAcpiRsdt = (acpi_descriptor_header*)mmu_map_physical_memory(rsdp->rsdt_address,
@@ -100,9 +101,10 @@ acpi_find_table(const char* signature)
 			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
 				signature, header != NULL ? header->signature : "null"));
 
-			if (header != NULL)
+			if (header != NULL) {
 				mmu_free(header, sizeof(acpi_descriptor_header));
-
+				header = NULL;
+			}
 			continue;
 		}
 
