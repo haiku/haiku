@@ -293,7 +293,7 @@ private:
 			if (file == NULL)
 				return NULL;
 
-			if (file->AcquireReference() == 1) {
+			if (file->AcquireReference() == 0) {
 				fEntries.Remove(file);
 				fDeadEntries.Insert(file);
 			} else
