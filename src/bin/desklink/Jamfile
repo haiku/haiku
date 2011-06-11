@@ -16,7 +16,7 @@ BinCommand desklink :
 	: desklink.rdef
 ;
 
-DoCatalogs Mail :
+DoCatalogs desklink :
 	x-vnd.Haiku-desklink
 	:
 	DeskButton.cpp
