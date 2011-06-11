@@ -158,11 +158,11 @@ _real_code_segment:
 //--------------------------------------------------------------
 
 
-/*!	void call_bios(uint8 num, struct bios_regs *regs)
+/*!	void call_bios_internal(uint8 num, struct bios_regs *regs)
 	Does a BIOS call by triggering a software interrupt in real
 	mode.
 */
-FUNCTION(call_bios)
+FUNCTION(call_bios_internal)
 	pushal
 	pushfl
 

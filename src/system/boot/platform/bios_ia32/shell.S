@@ -103,7 +103,7 @@ start_loader:
 
 
 /**	Loads %di sectors from floppy disk, starting at head %dh, sector %cx.
- *	The data is loaded to %es:%bx. On exit, %es:%bx will point immediately 
+ *	The data is loaded to %es:%bx. On exit, %es:%bx will point immediately
  *	behind the loaded data, so that you can continue to read in data.
  *	%ax, %cx, %dx, %bp, %di and %si will be clobbered.
  */
@@ -127,7 +127,7 @@ load_sectors:
 	mov		%cx, %si		// and remember it
 	pop		%cx
 	pop		%bx
-	
+
 load_track:
 	mov		%di, %ax		// limit the sector count to track boundaries
 	add		%cl, %al
@@ -292,8 +292,10 @@ _protected_code_segment:
 	mov		%ax, %gs
 	mov		%ax, %ss
 
-	mov		$0x10000, %ebp	// setup new stack
-	mov		%ebp, %esp
+	movl	$0x10000, %esp	// setup new stack
+	pushl	$0				// terminate stack frame chain (next frame and
+	pushl	$0				// return address)
+	mov		%esp, %ebp
 
 	call	_start
 

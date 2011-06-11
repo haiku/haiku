@@ -20,6 +20,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "hpet.h"
+#include "interrupts.h"
 #include "keyboard.h"
 #include "mmu.h"
 #include "multiboot.h"
@@ -84,6 +85,10 @@ platform_start_kernel(void)
 	smp_init_other_cpus();
 	debug_cleanup();
 	mmu_init_for_kernel();
+
+	// We're about to enter the kernel -- disable console output.
+	stdout = NULL;
+
 	smp_boot_other_cpus();
 
 	dprintf("kernel entry at %lx\n",
@@ -128,6 +133,7 @@ _start(void)
 
 	serial_init();
 	serial_enable();
+	interrupts_init();
 	console_init();
 	cpu_init();
 	mmu_init();

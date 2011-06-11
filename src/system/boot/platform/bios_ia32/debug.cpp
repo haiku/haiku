@@ -6,7 +6,6 @@
 
 #include "debug.h"
 
-#include <stdarg.h>
 #include <string.h>
 
 #include <boot/platform.h>
@@ -26,6 +25,33 @@ static char sBuffer[16384];
 static uint32 sBufferPosition;
 
 static ring_buffer* sDebugSyslogBuffer = NULL;
+static bool sPostCleanup = false;
+
+
+static void
+dprintf_args(const char *format, va_list args)
+{
+	char buffer[512];
+	int length = vsnprintf(buffer, sizeof(buffer), format, args);
+
+	if (length >= (int)sizeof(buffer))
+		length = sizeof(buffer) - 1;
+
+	if (sPostCleanup && sDebugSyslogBuffer != NULL) {
+		ring_buffer_write(sDebugSyslogBuffer, (const uint8*)buffer, length);
+	} else if (sBufferPosition + length < sizeof(sBuffer)) {
+		memcpy(sBuffer + sBufferPosition, buffer, length);
+		sBufferPosition += length;
+	}
+
+	serial_puts(buffer, length);
+
+	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
+		fprintf(stderr, "%s", buffer);
+}
+
+
+// #pragma mark -
 
 
 /*!	This works only after console_init() was called.
@@ -54,26 +80,29 @@ panic(const char *format, ...)
 void
 dprintf(const char *format, ...)
 {
-	char buffer[512];
-	va_list list;
-	int length;
+	va_list args;
 
-	va_start(list, format);
-	length = vsnprintf(buffer, sizeof(buffer), format, list);
-	va_end(list);
+	va_start(args, format);
+	dprintf_args(format, args);
+	va_end(args);
+}
 
-	if (length >= (int)sizeof(buffer))
-		length = sizeof(buffer) - 1;
 
-	if (sBufferPosition + length < sizeof(sBuffer)) {
-		memcpy(sBuffer + sBufferPosition, buffer, length);
-		sBufferPosition += length;
-	}
+void
+kprintf(const char *format, ...)
+{
+	va_list args;
 
-	serial_puts(buffer, length);
+	va_start(args, format);
 
-	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
-		fprintf(stderr, "%s", buffer);
+	// print to console, if available
+	if (stdout != NULL)
+		vfprintf(stdout, format, args);
+
+	// always print to serial line
+	dprintf_args(format, args);
+
+	va_end(args);
 }
 
 
@@ -120,7 +149,8 @@ debug_cleanup(void)
 		if (gKernelArgs.keep_debug_output_buffer) {
 			// copy the output gathered so far into the ring buffer
 			ring_buffer_clear(sDebugSyslogBuffer);
-			ring_buffer_write(sDebugSyslogBuffer, (uint8*)sBuffer, sBufferPosition);
+			ring_buffer_write(sDebugSyslogBuffer, (uint8*)sBuffer,
+				sBufferPosition);
 
 			memcpy(buffer, kDebugSyslogSignature, signatureLength);
 		} else {
@@ -137,4 +167,6 @@ debug_cleanup(void)
 			gKernelArgs.debug_size = sBufferPosition;
 		}
 	}
+
+	sPostCleanup = true;
 }

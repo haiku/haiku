@@ -6,6 +6,8 @@
 #define DEBUG_H
 
 
+#include <stdarg.h>
+
 #include <SupportDefs.h>
 
 

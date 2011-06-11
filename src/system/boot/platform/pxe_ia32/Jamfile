@@ -20,7 +20,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 local bios_ia32_src =
 	start.cpp
 	debug.cpp
-	bios.S
+	bios.cpp
+	bios_asm.S
 	console.cpp
 	serial.cpp
 	keyboard.cpp
@@ -34,6 +35,8 @@ local bios_ia32_src =
 	video.cpp
 	hpet.cpp
 	apm.cpp
+	interrupts.cpp
+	interrupts_asm.S
 ;
 
 local bios_ia32_edid_src =

@@ -21,7 +21,8 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	shell.S
 	start.cpp
 	debug.cpp
-	bios.S
+	bios.cpp
+	bios_asm.S
 	console.cpp
 	serial.cpp
 	devices.cpp
@@ -37,6 +38,8 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	video.cpp
 	apm.cpp
 	hpet.cpp
+	interrupts.cpp
+	interrupts_asm.S
 
 	# VESA/DDC EDID
 	decode_edid.c
