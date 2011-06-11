@@ -39,7 +39,8 @@ static int32 sNumEntries = -1;
 static status_t
 acpi_check_rsdt(acpi_rsdp* rsdp)
 {
-	TRACE(("acpi: found rsdp at %p oem id: %.6s\n", rsdp, rsdp->oem_id));
+	TRACE(("acpi: found rsdp at %p oem id: %.6s\n, rev %d",
+		rsdp, rsdp->oem_id, rsdp->revision));
 	TRACE(("acpi: rsdp points to rsdt at 0x%lx\n", rsdp->rsdt_address));
 
 	// map and validate the root system description table
@@ -55,7 +56,14 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 		return B_ERROR;
 	}
 
-	sAcpiRsdt = rsdt;
+	// Map the whole table, not just the header
+	uint32 length = rsdt->length;
+	TRACE(("acpi: rsdt length: %lu\n", length));
+	mmu_free(rsdt, sizeof(acpi_descriptor_header));
+
+	sAcpiRsdt = (acpi_descriptor_header*)mmu_map_physical_memory(rsdp->rsdt_address,
+		length, kDefaultPageFlags);
+	
 	return B_OK;
 }
 
@@ -82,8 +90,9 @@ acpi_find_table(const char* signature)
 	uint32* pointer = (uint32*)((uint8*)sAcpiRsdt
 		+ sizeof(acpi_descriptor_header));
 
+	acpi_descriptor_header* header = NULL;
 	for (int32 j = 0; j < sNumEntries; j++, pointer++) {
-		acpi_descriptor_header* header = (acpi_descriptor_header*)
+		header = (acpi_descriptor_header*)
 			mmu_map_physical_memory(*pointer,
 				sizeof(acpi_descriptor_header), kDefaultPageFlags);
 		if (header == NULL
@@ -92,18 +101,27 @@ acpi_find_table(const char* signature)
 			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
 				signature, header != NULL ? header->signature : "null"));
 
-			if (header != NULL)
+			if (header != NULL) {
 				mmu_free(header, sizeof(acpi_descriptor_header));
-
+				header = NULL;
+			}
 			continue;
 		}
 
 		TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
-		return header;
+		break;
 	}
 
-	// If we didn't find the table, return NULL.
-	return NULL;
+	
+	if (header == NULL)
+		return NULL;
+
+	// Map the whole table, not just the header
+	uint32 length = header->length;
+	mmu_free(header, sizeof(acpi_descriptor_header));
+
+	return (acpi_descriptor_header*)mmu_map_physical_memory(*pointer,
+		length, kDefaultPageFlags);
 }
 
 

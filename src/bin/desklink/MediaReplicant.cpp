@@ -20,6 +20,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -37,6 +38,10 @@
 #include "iconfile.h"
 #include "MixerControl.h"
 #include "VolumeWindow.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaReplicant"
 
 
 static const uint32 kMsgOpenMediaSettings = 'mese';
@@ -88,9 +93,9 @@ public:
 		MixerControl control;
 		control.Connect(fWhich);
 
-		char text[256];
-		snprintf(text, sizeof(text), "%g dB", control.Volume());
-		fView->SetText(text);
+		BString text;
+		text.SetToFormat(B_TRANSLATE("%g dB"), control.Volume());
+		fView->SetText(text.String());
 
 		Unlock();
 	}
@@ -218,34 +223,32 @@ MediaReplicant::MouseDown(BPoint point)
 		BPopUpMenu* menu = new BPopUpMenu("", false, false);
 		menu->SetFont(be_plain_font);
 
-		menu->AddItem(new BMenuItem("Media preferences" B_UTF8_ELLIPSIS,
+		menu->AddItem(new BMenuItem(
+			B_TRANSLATE("Media preferences" B_UTF8_ELLIPSIS),
 			new BMessage(kMsgOpenMediaSettings)));
-		menu->AddItem(new BMenuItem("Sound preferences" B_UTF8_ELLIPSIS,
+		menu->AddItem(new BMenuItem(
+			B_TRANSLATE("Sound preferences" B_UTF8_ELLIPSIS),
 			new BMessage(kMsgOpenSoundSettings)));
 
 		menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem("Open MediaPlayer",
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Open MediaPlayer"),
 			new BMessage(kMsgOpenMediaPlayer)));
 
 		menu->AddSeparatorItem();
 
-		BMenu* subMenu = new BMenu("Options");
+		BMenu* subMenu = new BMenu(B_TRANSLATE("Options"));
 		menu->AddItem(subMenu);
 
-		BMenuItem* item = new BMenuItem("Control physical output",
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Control physical output"),
 			new BMessage(kMsgVolumeWhich));
 		item->SetMarked(fVolumeWhich == VOLUME_USE_PHYS_OUTPUT);
 		subMenu->AddItem(item);
 
-		item = new BMenuItem("Beep", new BMessage(kMsgToggleBeep));
+		item = new BMenuItem(B_TRANSLATE("Beep"),
+			new BMessage(kMsgToggleBeep));
 		item->SetMarked(!fDontBeep);
 		subMenu->AddItem(item);
-
-		menu->AddSeparatorItem();
-
-		menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
-			new BMessage(B_ABOUT_REQUESTED)));
 
 		menu->SetTargetForItems(this);
 		subMenu->SetTargetForItems(this);
@@ -265,13 +268,6 @@ void
 MediaReplicant::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case B_ABOUT_REQUESTED:
-			(new BAlert("About Volume Control", "Volume Control\n"
-					"  Brought to you by Jérôme DUVAL.\n\n"
-					"Copyright " B_UTF8_COPYRIGHT "2003-2010, Haiku",
-				"OK"))->Go(NULL);
-			break;
-
 		case kMsgOpenMediaPlayer:
 			_Launch("MediaPlayer", "application/x-vnd.Haiku-MediaPlayer",
 				B_SYSTEM_APPS_DIRECTORY, "MediaPlayer");
@@ -391,10 +387,11 @@ MediaReplicant::_Launch(const char* prettyName, const char* signature,
 	// launch the application
 	if (_LaunchBySignature(signature) != B_OK
 		&& _LaunchByPath(path.Path()) != B_OK) {
-		BString message = "Couldn't launch ";
+		BString message = B_TRANSLATE("Couldn't launch ");
 		message << prettyName;
 
-		(new BAlert("desklink", message.String(), "OK"))->Go();
+		(new BAlert(B_TRANSLATE("desklink"), message.String(),
+			B_TRANSLATE("OK")))->Go();
 	}
 }
 

@@ -1051,6 +1051,7 @@ AboutView::_CreateCreditsView()
 		"Andre Braga\n"
 		"Michael Bulash\n"
 		"Bruce Cameron\n"
+		"Jean-Loïc Charroud\n"
 		"Greg Crain\n"
 		"Michael Davidson\n"
 		"David Dengg\n"

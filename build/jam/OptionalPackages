@@ -344,7 +344,7 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			bzip2-1.0.6-x86-r1a3-x86-gcc2-2011-05-17.zip
+			bzip2-1.0.6-r1a3-x86-gcc2-2011-05-17.zip
 			: $(baseURL)/bzip2-1.0.6-r1a3-x86-gcc2-2011-05-17.zip
 			: : true ;
 	}
@@ -430,7 +430,7 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.4-x86-r1a3-x86-gcc2-2011-05-19.zip
+				cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
 				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
 				: : true ;
 		}
@@ -783,12 +783,18 @@ if [ IsOptionalHaikuImagePackageAdded Fastdep ] {
 if [ IsOptionalHaikuImagePackageAdded friss ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package friss available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage friss-0.5pre7-x86-gcc4.zip
-			: $(baseURL)/friss-0.5pre7-x86-gcc4.zip
-			: : true ;
 	} else {
-		Echo "No optional package friss available for gcc2" ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage 
+				friss-24-r1a3-x86-gcc4-2011-05-31.zip
+				: $(baseURL)/friss-24-r1a3-x86-gcc4-2011-05-31.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				friss-24-r1a3-x86-gcc2-2011-05-31.zip
+				: $(baseURL)/friss-24-r1a3-x86-gcc2-2011-05-31.zip ;
+		}
+#		AddSymlinkToHaikuImage home config be Desktop\ applets
+#			: /boot/apps/FRiSS/FRiSS ;
 	}
 }
 
@@ -825,7 +831,7 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				git-1.7.5-x86-r1a3-x86-gcc2-2011-05-18.zip
+				git-1.7.5-r1a3-x86-gcc2-2011-05-18.zip
 				: $(baseURL)/git-1.7.5-r1a3-x86-gcc2-2011-05-18.zip
 				: : true ;
 		}
@@ -930,14 +936,14 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.6-x86-gcc4-2011-03-01.zip
-				: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc4-2011-03-01.zip ;
+				KeymapSwitcher-1.2.6-r1a3-x86-gcc4-2011-06-11.zip
+				: $(baseURL)/KeymapSwitcher-1.2.6-r1a3-x86-gcc4-2011-06-11.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.6-x86-gcc2-2011-03-01.zip
-				: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc2-2011-03-01.zip ;
+				KeymapSwitcher-1.2.6-r1a3-x86-gcc2-2011-06-11.zip
+				: $(baseURL)/KeymapSwitcher-1.2.6-r1a3-x86-gcc2-2011-06-11.zip ;
 		}
-		AddSymlinkToHaikuImage home config be Desktop\ applets
+		AddSymlinkToHaikuImage home config be Preferences
 			: /boot/common/bin/KeymapSwitcher ;
 	}
 }
@@ -950,7 +956,7 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libevent-2.0.10-x86-r1a3-x86-gcc4-2011-05-24.zip
+				libevent-2.0.10-r1a3-x86-gcc4-2011-05-24.zip
 				: $(baseURL)/lib/libevent-2.0.10-r1a3-x86-gcc4-2011-05-24.zip
 				: : true ;
 		} else {
@@ -1431,7 +1437,7 @@ if [ IsOptionalHaikuImagePackageAdded Ruby ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip
-			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc2-2011-05-31.zip ;
+			: $(baseURL)/ruby-1.9.1-r1a3-x86-gcc2-2011-06-01.zip ;
 	}
 }
 
@@ -1641,12 +1647,12 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage vision-908-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/vision-908-r1a3-x86-gcc4-2011-05-24.zip ;
+			InstallOptionalHaikuImagePackage vision-908-r1a3-x86-gcc4-2011-06-07.zip
+				: $(baseURL)/vision-908-r1a3-x86-gcc4-2011-06-07.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage 
-				vision-908-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/vision-908-r1a3-x86-gcc2-2011-05-18.zip ;
+				vision-908-r1a3-x86-gcc2-2011-06-07.zip
+				: $(baseURL)/vision-908-r1a3-x86-gcc2-2011-06-07.zip ;
 		}
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Vision/Vision ;

@@ -11,6 +11,7 @@
 #define VOLUME_SLIDER_H
 
 
+#include <String.h>
 #include <Slider.h>
 
 class MixerControl;
@@ -47,7 +48,7 @@ private:
 			bool			_IsReplicant() const;
 			float			_PointForValue(int32 value) const;
 
-			mutable	char	fText[64];
+			mutable BString	fText;
 			MixerControl*	fMixerControl;
 			int32			fOriginalValue;
 			bool			fBeep;
