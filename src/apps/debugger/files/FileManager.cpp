@@ -185,10 +185,16 @@ private:
 
 	virtual void LocatableEntryUnused(LocatableEntry* entry)
 	{
-		fManager->Lock();
+		AutoLocker<FileManager> lock(fManager);
 		if (fEntries.Lookup(EntryPath(entry)) == entry)
 			fEntries.Remove(entry);
-		fManager->Unlock();
+		else {
+			DeadEntryList::Iterator iterator = fDeadEntries.GetIterator();
+			while (iterator.HasNext()) {
+				if (iterator.Next() == entry)
+					fDeadEntries.Remove(entry);
+			}
+		}
 	}
 
 	bool _LocateDirectory(LocatableDirectory* directory,
@@ -285,8 +291,11 @@ private:
 			if (file == NULL)
 				return NULL;
 
-			file->AcquireReference();
-			return file;
+			if (file->AcquireReference() == 1) {
+				fEntries.Remove(file);
+				fDeadEntries.Insert(file);
+			} else
+				return file;
 		}
 
 		// no such file yet -- create it
@@ -452,6 +461,7 @@ private:
 private:
 	FileManager*		fManager;
 	LocatableEntryTable	fEntries;
+	DeadEntryList		fDeadEntries;
 	bool				fIsLocal;
 };
 

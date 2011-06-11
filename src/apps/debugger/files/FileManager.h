@@ -8,9 +8,11 @@
 #include <Locker.h>
 #include <String.h>
 
+#include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
 
+class LocatableEntry;
 class LocatableFile;
 class SourceFile;
 
@@ -53,6 +55,7 @@ private:
 			struct SourceFileHashDefinition;
 
 			typedef BOpenHashTable<EntryHashDefinition> LocatableEntryTable;
+			typedef DoublyLinkedList<LocatableEntry> DeadEntryList;
 			typedef BOpenHashTable<SourceFileHashDefinition> SourceFileTable;
 
 			friend struct SourceFileEntry;
