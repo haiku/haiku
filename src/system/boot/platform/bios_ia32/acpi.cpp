@@ -46,23 +46,17 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 	// map and validate the root system description table
 	acpi_descriptor_header* rsdt
 		= (acpi_descriptor_header*)mmu_map_physical_memory(
-		rsdp->rsdt_address, sizeof(acpi_descriptor_header),
+		rsdp->rsdt_address, rsdp->rsdt_length,
 		kDefaultPageFlags);
 	if (rsdt == NULL
 		|| strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
 		if (rsdt != NULL)
-			mmu_free(rsdt, sizeof(acpi_descriptor_header));
+			mmu_free(rsdt, rsdp->rsdt_length);
 		TRACE(("acpi: invalid root system description table\n"));
 		return B_ERROR;
 	}
 
-	// Map the whole table, not just the header
-	uint32 length = rsdt->length;
-	TRACE(("acpi: rsdt length: %lu\n", length));
-	mmu_free(rsdt, sizeof(acpi_descriptor_header));
-
-	sAcpiRsdt = (acpi_descriptor_header*)mmu_map_physical_memory(rsdp->rsdt_address,
-		length, kDefaultPageFlags);
+	sAcpiRsdt = rsdt;
 	
 	return B_OK;
 }
