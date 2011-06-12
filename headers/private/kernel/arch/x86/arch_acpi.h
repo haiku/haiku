@@ -8,11 +8,20 @@
 
 #define ACPI_RSDP_SIGNATURE		"RSD PTR "
 #define ACPI_RSDT_SIGNATURE		"RSDT"
+#define ACPI_XSDT_SIGNATURE		"XSDT"
 #define ACPI_MADT_SIGNATURE		"APIC"
 
 #define ACPI_LOCAL_APIC_ENABLED	0x01
 
-typedef struct acpi_rsdp {
+typedef struct acpi_rsdp_legacy {
+	char	signature[8];			/* "RSD PTR " including blank */
+	uint8	checksum;				/* checksum of bytes 0-19 (per ACPI 1.0) */
+	char	oem_id[6];				/* not null terminated */
+	uint8	revision;				/* 0 = ACPI 1.0, 2 = ACPI 3.0 */
+	uint32	rsdt_address;			/* physical memory address of RSDT */
+} _PACKED acpi_rsdp_legacy;
+
+typedef struct acpi_rsdp_extended {
 	char	signature[8];			/* "RSD PTR " including blank */
 	uint8	checksum;				/* checksum of bytes 0-19 (per ACPI 1.0) */
 	char	oem_id[6];				/* not null terminated */
@@ -22,7 +31,9 @@ typedef struct acpi_rsdp {
 	uint64	xsdt_address;			/* 64bit physical memory address of XSDT */
 	uint8	extended_checksum;		/* including entire table */
 	uint8	reserved[3];
-} _PACKED acpi_rsdp;
+} _PACKED acpi_rsdp_extended;
+
+typedef acpi_rsdp_extended acpi_rsdp;
 
 typedef struct acpi_descriptor_header {
 	char	signature[4];			/* table identifier as ASCII string */
