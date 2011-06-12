@@ -54,16 +54,16 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Отчёт об ошибках (багах)</td></tr>
-<tr class="index"><td><a href="#account">Getting a Trac account</a><br />
-                <a href="#report">Creating a bug report</a><br />
-                <a href="#app">Application bugs</a><br />
-                  <a href="#server">Server bugs</a><br />
-                  <a href="#kernel">Kernel bugs</a><br />
-                  <a href="#kdl">Kernel Debugging Land - KDL</a><br />
-                  <a href="#syslog">Syslog</a><br />
-                  <a href="#onscreen">On screen debug output</a><br />
-                  <a href="#hardware">Hardware/Driver bugs</a><br />
-                  <a href="#next">What's next?</a></td></tr>
+<tr class="index"><td><a href="#account">Получение аккаунта в Trac</a><br />
+                <a href="#report">Создание отчёта об ошибке</a><br />
+                <a href="#app">Ошибки приложений</a><br />
+                  <a href="#server">Ошибки серверов</a><br />
+                  <a href="#kernel">Ошибки ядра</a><br />
+                  <a href="#kdl">Царство отладки ядра - KDL</a><br />
+                  <a href="#syslog">Системный журнал</a><br />
+                  <a href="#onscreen">Вывод отладочной информации на экран</a><br />
+                  <a href="#hardware">Аппаратные ошибки/Ошибки в драйверах</a><br />
+                  <a href="#next">Что дальше?</a></td></tr>
 </table>
 
 <h1>Отчёт об ошибках (багах)</h1>
@@ -77,81 +77,83 @@
 Создавая новый аккаунт <b>обязательно введите адрес электронной почты</b>, так как на него будут приходить все сведения, связанные с изменением багрепорта. Убедитесь, что приходящие с багтрекера письма <b>не помечаются как спам,</b> так как это вполне возможно.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="report" name="report">Создание отчёта об ошибках</a></h2>
+<a id="report" name="report">Создание отчёта об ошибке</a></h2>
 <p>Прежде чем сообщать об ошибке, пожалуйста, <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Eтекст,+который+вы+ищите&amp;order=priority">убедитесь</a>, что аналогичного багрепорта ещё не существует. Для этого также можно воспользоваться функцией <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">поиска</a>.<br />
 После того как вы установили, что подобных багрепортов не имеется, то оформите вашу информацию как можно точнее:</p>
 <ul>
-	<li><p>Attempt to reproduce your issue on the current revision of Haiku. Pre-built images for testing purposes are  <a href="http://haiku-files.org/">available</a>.</p></li>
+	<li><p>Попытайтесь воспроизвести вашу проблему на текущей ревизии Haiku. Готовые образы для тестирования доступны  <a href="http://haiku-files.org/">здесь</a>.</p></li>
 	<li><p>Включите информацию о том как вы тестируете Haiku (на реальном компьютере, в эмуляторе VMWare, QEMU, и т. д.).</p></li>
-	<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
+	<li><p>Укажите какую <acronym title="Subversion - система управления версиями, которую мы используем">SVN</acronym> ревизию Haiku вы используете. Эту информацию можно найти в окне программы <span class="menu">О системе Haiku...</span> , которая доступна в меню Deskbar-а. Также укажите какой тип сборки Haiku вы тестируете (gcc2, gcc4, gcc2hybrid, gcc4hybrid). Образы для скачивания названы подобным образом, а если вы собрали систему сами, то вы знаете как вы ее собрали.</p></li>
 	<li><p>Опишите проблему, с которой вы столкнулись, попытайтесь описать её наиболее точно: как именно она проявилась, и как правильно должен бы был действовать проблемный объект при её отсутствии.</p></li>
 	<li><p>Расскажите какие шаги нужно выполнить для её возникновения, что поможет разработчикам воспроизвести эту ошибку.</p></li>
-	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to take a screenshot by pressing the <span class="key">PRINT</span> key.</p></li>
+	<li><p>Прикрепите всю имеющуюся информацию. Если это ошибка графического интерфейса или баг в каком-либо приложении, то попытайтесь сделать скриншот клавишей <span class="key">Print Screen</span> key.</p></li>
 </ul>
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="app" name="app">Application bugs</a></h2>
-<p>When an application crashed, you should invoke the debugger from the alert that pops up. This will open a Terminal window with gdb (the GNU debugger) running in it. Entering <span class="cli">bt</span>, you create a "backtrace" that you should copy in its entirety (including the part before you entered the <span class="cli">bt</span> command) and attach it to the ticket.</p>
+<a id="app" name="app">Ошибки приложений</a></h2>
+<p>Когда приложение аварийно завершилось, вы должны запустить отладчик из окна сообщения о падении программы. Откроется окно Терминала с запущенным gdb (the GNU debugger). Введя в окне терминала <span class="cli">bt</span>, вы создадите "трассировку", которую необходимо полностью скопировать (включая текст, который уже был до ввода команды <span class="cli">bt</span>) и прикрепить ее в ваш багрепорт.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="server" name="server">Server bugs</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
-Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.</p>
+<a id="server" name="server">Ошибки серверов</a></h2>
+<p>Когда жизненно важный сервер, такой как app server, registrar или input server падает, вы не увидите обычное сообщение о падении приложения. Вместо этого весь экран станет белым и запустится gdb сессия, ее вывод будет попадать напрямую на экран. Скорее всего вы все еще сможете двигать курсором, что приведет к перезаписи участков белого экрана с выводом. Все еще работающие приложения (например Контроллер процессов или часы в Deskbar) могут также прорисовываться сквозь вывод отладчика на экран.<br />
+Кроме того, что все более выглядит более страшно и неудобно, применимо все то же самое, что и в случае ошибок приложений. Самое важное в данном случае - это выполнение трассировки коммандой (<span class="cli">bt</span>). Скорее всего вам понадобится сфотографировать экран, так как будет невозможно куда либо скопировать текст трассировки.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kernel" name="kernel">Kernel bugs</a></h2>
-<p>Kernel bugs are usual the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
+<a id="kernel" name="kernel">Ошибки ядра</a></h2>
+<p>Ошибки ядра обычно вызывают наиболее серьезные последствия и в тоже время их сложнее отлаживать. Существуют различные типы симптомов, которые скорее всего указывают на ошибку в ядре или на проблему с каким-либо драйвером:</p>
 <ul>
-<li><p>The system enters kernel debugging land (KDL) on its own volition. The upper part of the screen is cleared white and several lines of text are printed on it. The second line says "<i>Welcome to Kernel Debugging Land...</i>", the one above it states the immediate reason for entering KDL.</p></li>
-<li><p>The system reboots spontaneously.</p></li>
-<li><p>The system freezes completely. You can't move the mouse and no application draws anything anymore. An important test in that situation is, whether you still can enter KDL via the shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being <span class="key">PRINT</span> on most keyboards). Wait at least a minute to see, if anything happens.</p></li>
-<li><p>The system doesn't boot up correctly. It may reboot spontaneously or stop at some point (e.g. at some icon of the boot screen). In the latter case also try <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
-<li><p>The whole system or some piece of hardware doesn't behave correctly. For example, it could be very slow, errors occur, or something doesn't work at all. If some hardware doesn't work at all, the first obvious check is whether Haiku supports it at all at the moment (e.g. ask on a mailing list or a forum).</p></li>
+<li><p>Система входит в царство отладки ядра (KDL) по собственному желанию. Верхняя часть экрана станет белой и появятся несколько строчек текста. Во второй стоке будет написано "<i>Welcome to Kernel Debugging Land...</i>", выше этой строки будет указана непосредственная причина входа в KDL.</p></li>
+<li><p>Система спонтанно перезагружается.</p></li>
+<li><p>Система полностью зависает. Курсор не двигается и ни одно приложение не выводит и не прорисовывает ничего на экран. Важный тестом в данном случае является проверка, пожете ли вы все еще войти в KDL через комбинацию клавиш <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (эквивалентом <span class="key">SysReq</span> является <span class="key">PrintScreen</span> на большинстве клавиатур). Подождите несколько минут и посмотрите, произойдет ли что-нибудь.</p></li>
+<li><p>Система не загружается корректно. Она может спонтанно перезагружаться на каком-то моменте или зависать (например на каком-то значке экрана загрузки). В случае зависания попробуйте нажать <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
+<li><p>Система или какое-то устройство не работает нормально. Например если она работает очень медленно, появляются ошибки, или что-то вообще не работает. Если какое-то устройство вообще не работает первое что нужно проверить это поддерживает ли его Haiku в данный момент (например спросить в списке рассылки или на форуме).</p></li>
 </ul>
-<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could remove the responsible Wifi driver from your Haiku installation (in <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
+<p>Заметьте, что хотя только последний пункт указывает на проблему связанную с оборудованием, все остальные симптомы могут также быть вызваны ошибкой в драйвере оборудования. Если вы подозреваете, что какое-то устройство или его драйвер могут быть как-то связаны с наблюдаемой проблемой, то проверьте изменится что-либо после отключения устройства или удаления его драйвера. Например если вы подозреваете Wifi, то вы можете найти опцию в BIOS для его отключения. Если же такой опции нет, то вы можете удалить соответствующий Wifi драйвер (из папки <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kdl" name="kdl">Kernel Debugging Land - KDL</a></h3>
-<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
-Note that in KDL your keyboard may not work. PS/2 keyboards always do, USB keyboards connected via UHCI controllers do only, if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
-<p>KDL itself is a kind of a shell. One can execute commands that print information about the system. The following commands might be of interest:</p>
+<a id="kdl" name="kdl">Царство отладки ядра - KDL</a>
+</h3>
+<p>Когда какой-либо системный низкоуровневый компонент вызывает фатальную ошибку, то вы, с большой долей вероятности, окажетесь в отладчике ядра. Также он может быть вызван намеренно при нажатии на клавиши <span class="key">ALT</span>+<span class="key">SysReq</span>+<span class="key">D</span> (клавиша <span class="key">SysReq</span> называется <span class="key">PrintScreen</span> на большинстве клавиатур).
+Учтите, что ваша клавиатура может не работать в KD. PS/2 клавиатуры работают всегда, USB клавиатуры, подключенные через UHCI контроллер работают, только если вы входили в KDL через клавиатурное сочетание хотя бы раз. USB OHCI не поддерживаются в данный момент.</p>
+<p>Сам по себе KDL является некой оболочкой. Вы можете выполнять команды, которые выводят информацию о системе. Следующие команды могут быть интересны:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka sc)</td><td> </td><td>Prints a back trace. If the system entered KDL on its on volition, always enter that one.</td></tr>
-<tr><td><span class="cli">ints</span></td><td> </td><td>Shows the handled and unhandled hardware interrupts.</td></tr>
-<tr><td class="onelinetop"><span class="cli">co</span> (aka continue)</td><td> </td><td>Leaves the kernel debugger and continues normal operation of the system, if that is possible.</td></tr>
-<tr><td><span class="cli">reboot</span></td><td> </td><td>Reboots the system immediately. You will lose all unsaved data and even those that have been saved, but have not yet been written back to disk.</td></tr>
+<tr><td><span class="cli">bt</span> (синоним sc)</td><td> </td><td><span class="cli">bt</span> - покажет трассировку, уточняющую где именно произошла ошибка.
+Если система вошла в KDL самопроизвольно, всегда используйте эту команду.</td></tr>
+<tr><td><span class="cli">ints</span></td><td> </td><td><span class="cli">int</span> - отобразит обработанные и необработанные прерывания.</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (синоним continue)</td><td> </td><td>выведет систему из отладчика ядра продолжит нормальную работу Haiku, если это возможно.</td></tr>
+<tr><td><span class="cli">reboot</span></td><td> </td><td>Немедленно перезагрузит систему. Вы потеряете все несохраненные данные и те, что были сохранены, но еще не успели записаться из памяти обратно на диск.</td></tr>
 </table>
-<p>For more information, see the article <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a>.</p>
+<p>Для более подробной информации смотрите статью <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Добро пожаловать в Царство Отладки Ядра</a>.</p>
 <p>The KDL output is written to the serial port (if you have one, a respective cable, and a second computer to connect with, you can capture the output there via a terminal program) and to the syslog. If you can't leave KDL it won't be written to the syslog file, though. There's a boot loader debug option that allows you to capture it nonetheless (see below).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="syslog" name="syslog">Syslog</a></h3>
+<a id="syslog" name="syslog">Системный журнал</a></h3>
 <p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
 The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/common/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog somewhat persistent in memory. By default the option is enabled. "Somewhat persistent" means that it survives a reset and will still be accessible when you enter the boot loader menu directly afterwards. Booting an operating system (Haiku definitely, others likely) destroys the information, though. So you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
 In the boot loader's <span class="menu">Debug menu</span> you should now find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. But again: Don't accidentally boot any operating system or the data will be lost.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="onscreen" name="onscreen">On screen debug output</a></h3>
+<a id="onscreen" name="onscreen">Вывод отладочной информации на экран</a></h3>
 <p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
 This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
 Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
 One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../../userguide/ru/bootloader.html">Boot Loader</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hardware" name="hardware">Аппаратные ошибки</a></h2>
-<p>When dealing with a hardware/driver related bug, you should attach the following information as text files:</p>
+<a id="hardware" name="hardware">Аппаратные ошибки/Ошибки в драйверах</a></h2>
+<p>Если вы столкнулись с ошибкой работы оборудования и/или драйвера, то вы должны приложить к вашему багрепорту следующую информацию в виде текстовых файло:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td>- <span class="cli">listdev</span></td><td> </td><td>A detailed listing of your hardware, including vendor and pci id's, similar to Linux' <span class="cli">lshw</span> and <span class="cli">lspci</span>.</td></tr>
-<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Assuming its a USB related issue, similar to <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
-<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Lists all used drivers.</td></tr>
-<tr><td>- <span class="cli">ints</span></td><td> </td><td>Only available within <i>Kernel Debugging Land</i> (see above). Shows interrupt usage. There shouldn't be too many that are shared by different devices.</td></tr>
-<tr><td colspan="3">- On screen debug output (a safe mode boot time option).</td></tr>
+<tr><td>- <span class="cli">listdev</span></td><td> </td><td><span class="cli">listdev</span> - подробный список оборудования, включающий ID производителей и отдельных устройств, схожа с командами Linux <span class="cli">lshw</span> и <span class="cli">lspci</span>.</td></tr>
+<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td><span class="cli">listusb -v</span> - используйте при ошибке, связанной с USB, аналогична команде <span class="cli">lsusb</span>.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td><span class="cli">open /var/log/syslog</span> - основной системный лог, используемый Haiku. С командой <span class="cli">open</span> можно вырезать нужную часть лога в текстовом редакторе.</td></tr>
+<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td><span class="cli">listimage | grep drivers/</span> - список всех загруженных драйверов.</td></tr>
+<tr><td>- <span class="cli">ints</span></td><td> </td><td><span class="cli">ints</span> - доступна только в режиме <i>Царства отладки ядра (Kernel Debugging Land - KDL)</i> (см. выше). Отображает используемые прерывания. Не должно быть слишком много устройств, использующих одно прерывание.</td></tr>
+<tr><td colspan="3">- On screen debug output (опция загрузочного меню).</td></tr>
 </table>
 
-<p>The first four commands are entered into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
+<p>Все эти команды вводятся в терминале, если не указано иное. Если добавить <span class="cli"> &gt; output.txt</span> после команды, то результат её работы сохранится в текстовый файл "output.txt", который можно прикрепить к своему сообщению об ошибке или отправить по электронной почте.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="next" name="next">Что дальше?</a></h2>

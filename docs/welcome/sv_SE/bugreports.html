@@ -11,11 +11,13 @@
  * 		Niels Reedijk, Matt Madia and Ingo Weinhold who wrote
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		deejam
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Reporting bugs</title>
+	<title>Buggrapportering</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -49,7 +51,7 @@
 <div class="box-info">Översättningen av denna sida är inte komplett. Delar av innehållet kommer därför att visas på engelska.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Reporting bugs</td></tr>
+<tr class="heading"><td>Buggrapportering</td></tr>
 <tr class="index"><td><a href="#account">Getting a Trac account</a><br />
                 <a href="#report">Creating a bug report</a><br />
                 <a href="#app">Application bugs</a><br />
@@ -62,18 +64,18 @@
                   <a href="#next">What's next?</a></td></tr>
 </table>
 
-<h1>Reporting bugs</h1>
+<h1>Buggrapportering</h1>
 
 <p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on users to give us some input on how things work at their end. Since Haiku is still quite young, it's very likely that you will encounter bugs. We thank you for taking the time to report these. Together we can improve Haiku, bit by bit.</p>
-<p>To keep our bugtracker effective, it's essential to abide by the <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>.</p>
+<p>För att behålla vårt bugghanteringssystem effektivt är det viktigt att följa vår <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">etikett för buggrapportering</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="accout">Getting a Trac account</a></h2>
+<a id="account" name="accout">Skapa ett Trac-konto</a></h2>
 <p>To file a ticket, you need to have an account at <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku's Bugtracker</a>.<br />
 When creating a new account, be certain to <b>provide your email address</b> as it is necessary to obtain basic ticket modification privileges. Be sure to <b>check your spam folder</b> shortly afterwards, as the all important verification mail often ends up there.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="report" name="report">Creating a bug report</a></h2>
+<a id="report" name="report">Skapa en buggrapport</a></h2>
 <p>Before reporting a bug, please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.<br />
 After you have established that it's a unique bug, make your information as accurate as possible:</p>
 <ul>
@@ -86,16 +88,16 @@ After you have established that it's a unique bug, make your information as accu
 </ul>
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="app" name="app">Application bugs</a></h2>
+<a id="app" name="app">Programbuggar</a></h2>
 <p>When an application crashed, you should invoke the debugger from the alert that pops up. This will open a Terminal window with gdb (the GNU debugger) running in it. Entering <span class="cli">bt</span>, you create a "backtrace" that you should copy in its entirety (including the part before you entered the <span class="cli">bt</span> command) and attach it to the ticket.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="server" name="server">Server bugs</a></h2>
+<a id="server" name="server">Serverbuggar</a></h2>
 <p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
 Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kernel" name="kernel">Kernel bugs</a></h2>
+<a id="kernel" name="kernel">Buggar i kärnan</a></h2>
 <p>Kernel bugs are usual the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
 <ul>
 <li><p>The system enters kernel debugging land (KDL) on its own volition. The upper part of the screen is cleared white and several lines of text are printed on it. The second line says "<i>Welcome to Kernel Debugging Land...</i>", the one above it states the immediate reason for entering KDL.</p></li>
@@ -121,7 +123,7 @@ Note that in KDL your keyboard may not work. PS/2 keyboards always do, USB keybo
 <p>The KDL output is written to the serial port (if you have one, a respective cable, and a second computer to connect with, you can capture the output there via a terminal program) and to the syslog. If you can't leave KDL it won't be written to the syslog file, though. There's a boot loader debug option that allows you to capture it nonetheless (see below).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="syslog" name="syslog">Syslog</a></h3>
+<a id="syslog" name="syslog">Systemloggen</a></h3>
 <p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
 The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/common/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog somewhat persistent in memory. By default the option is enabled. "Somewhat persistent" means that it survives a reset and will still be accessible when you enter the boot loader menu directly afterwards. Booting an operating system (Haiku definitely, others likely) destroys the information, though. So you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
@@ -135,7 +137,7 @@ Finally select <span class="menu">Return to main menu</span> and then <span clas
 One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../../userguide/sv_SE/bootloader.html">Boot Loader</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hardware" name="hardware">Hardware/Driver bugs</a></h2>
+<a id="hardware" name="hardware">Hårdvara/drivrutinsbuggar</a></h2>
 <p>When dealing with a hardware/driver related bug, you should attach the following information as text files:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
@@ -150,7 +152,7 @@ One or more pages of text will display on the screen, only the last few lines ne
 <p>The first four commands are entered into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="next" name="next">What's next?</a></h2>
+<a id="next" name="next">Vad händer sen?</a></h2>
 <p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding
 non-descriptive comments.</p>
 <p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked

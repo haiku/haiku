@@ -46,13 +46,12 @@
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">Текстовый Поиск (TextSearch)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Терминал (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,7 +62,7 @@
 <span class="path">~/.inputrc</span> - дополняет/переопределяет параметры  указанные в <span class="path">/boot/system/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
-<p>Терминал (Terminal) - это интерфейс Haiku к командной оболочке bash (Bourne Again Shell)</p>
+<p>Терминал - это интерфейс Haiku к командной оболочке bash (Bourne Again Shell)</p>
 <p>Пожалуйста обратитесь к теме <a href="../bash-scripting.html">Bash и скрипты</a> для просмотра ссылок на онлайн уроки по работе с командной оболочкой shell, а также обратитесь к теме <a href="cli-apps.html">Haiku-приложения для командной строки</a>. Здесь же мы сконцентрируемся непосредственно на приложении Терминал (Terminal).</p>
 
 <h2>
@@ -72,22 +71,22 @@
 <p>Вы можете открыть столько Терминалов, сколько вам необходимо, каждый в своем собственном окне, просто запуская новые Терминалы, либо нажимая <span class="key">ALT</span>+<span class="key">N</span> в уже работающем Терминале. Также можно использовать вкладки в Терминале, открывая их комбинацией <span class="key">ALT</span>+<span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
-By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
-Via <span class="menu">Edit | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
-<p>Правый щелчок мыши по вкладке вызывает контекстное меню, которое содержит следующие пункты: <span class="menu">Закрыть вкладку (Close tab)</span>, <span class="menu">Закрыть остальные вкладки (Close other tabs)</span>, <span class="menu">Изменить название вкладки... (Edit tab title...)</span>.</p>
-<p>У окна Терминала изменяется размер, как и у любого другого приложения, а также имеется возможность использовать пресеты из меню <span class="menu">Настройки | Размер окна (Settings | Window Size)</span>. Комбинация клавиш <span class="key">ALT</span>+<span class="key">ENTER</span> включает полноэкранный режим.</p>
-<p>Измененный размер окна и кодировку текста можно сохранить, выбрав пункт меню <span class="menu">Настройки | Сохранить по умолчанию (Settings | Save as default)</span>.</p>
+<p>Двойной щелчок левой кнопкой мыши по пустом месту панели вкладок открывает новую вкладку. А если дважды щёлкнуть по самой вкладке, то откроется окно, в котором можно изменить заголовок вкладки. Существует несколько переменных, начинающихся с %, значения которых объясняется в всплывающей подсказке, когда вы наводите на курсором на текстовое поле.<br />
+По умолчанию установлены <tt>%1d: %p</tt>, тем самым в  заголовок вкладки отображает - текущую папку и название запущенного процесса, которые разделены - <tt>:</tt> (если вместо названия процесса отображается <tt>--</tt>, то значит ничего не запущено и оболочка bash ожидает ввода команды). На снимке экрана выше, на первой вкладке отображена FTP-сессия из папки <span class="path">Desktop</span>, а на второй просто открыта папка <span class="path">home</span>.<br />
+Выбрав в меню <span class="menu">Изменить</span> пункт <span class="menu">Заголовок окна...</span> можно изменить заголовок окна Терминала.</p>
+<p>Правый щелчок мыши по вкладке вызывает контекстное меню, которое содержит следующие пункты: <span class="menu">Закрыть вкладку</span>, <span class="menu">Закрыть остальные вкладки</span>, <span class="menu">Переименовать вкладку</span>.</p>
+<p>У окна Терминала изменяется размер, как и у любого другого приложения, а также имеется возможность использовать предустановленные размеры окна, выберите в меню <span class="menu">Настройки</span> пункт <span class="menu">Размер окна</span>. Сочетание клавиш <span class="key">ALT</span>+<span class="key">ENTER</span> включает полноэкранный режим.</p>
+<p>Измененный размер окна и кодировку текста можно сохранить, выбрав в меню <span class="menu">Настройки</span>  пункт <span class="menu">Сохранить</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Настройки</a></h2>
-<p>Пункт <span class="menu">Настройки... (Settings...)</span>  в меню <span class="menu">Настройки (Settings)</span> вызывает окно, в котором можно установить базовые настройки Терминала.</p>
+<p>Выбрав в меню <span class="menu">Настройки</span> пункт <span class="menu">Настройки...</span> откроется окно настроек Терминала.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
-Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.<br />
-You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
-Pressing <span class="button">OK</span> will save the current settings as default.</p>
+<p>Можно установить "формулу" для заголовков терминала и вкладок. Также позволяет настроить шрифт. Вы также можете выбрать одну из предустановленных цветовых схем: <span class="menu">Чёрный текст на белом фоне</span> or <span class="menu">Белый текст на чёрном фоне</span>, либо создать свою <span class="menu">Настроена вручную</span>, используя палитру цветов ниже.<br />
+Активировав пункт <span class="menu">Подтверждать выход если процессы ещё запущены</span>, вы будете информированы, когда попытаетесь закрыть окно Терминала, в котором ещё есть запущенные приложения.<br />
+Вы можете сохранять разные настройки в файлы, для их загрузки в будущем вам просто потребуется дважды щёлкнуть по файлу с настройками, после чего откроется Терминал с соответствующими настройками.<br />
+Нажав кнопку <span class="button">Ок</span> текущие настройки сохранятся как настройки по умолчанию.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -119,11 +118,11 @@ Pressing <span class="button">OK</span> will save the current settings as defaul
 <a id="hints" name="hints">Подсказки для работы с Терминалом</a></h2>
 <ul><li><p>Перетаскивание файла или папки из окна Tracker-а в Терминал подставит путь к нему у курсора. Перетаскивание правой кнопкой мыши вызовет меню для дополнительных действий:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Вставить путь (Insert path)</span></td><td> </td><td>Вставляет путь к файлу так же, как при перетаскивании левой кнопкой мыши.</td></tr>
-<tr><td><span class="menu">Сменить директорию (Change directory)</span></td><td> </td><td>Переводит Терминал в папку перетаскиваемого файла.</td></tr>
-<tr><td><span class="menu">Создать здесь симлинк (Create lnk here)</span></td><td> </td><td>Создает симлинк на перетаскиваемый файл в текущей директории Терминала.</td></tr>
-<tr><td><span class="menu">Переместить сюда (Move here)</span></td><td> </td><td>Перемещает перетаскиваемый файл в текущую директорию Терминала.</td></tr>
-<tr><td><span class="menu">Копировать сюда (Copy here)</span></td><td> </td><td>Копирует перетаскиваемый файл в текущую директорию Терминала.</td></tr>
+<tr><td><span class="menu">Вставить путь</span></td><td> </td><td>Вставляет путь к файлу так же, как при перетаскивании левой кнопкой мыши.</td></tr>
+<tr><td><span class="menu">Сменить каталог</span></td><td> </td><td>Переводит Терминал в папку перетаскиваемого файла.</td></tr>
+<tr><td><span class="menu">Создать ссылку здесь</span></td><td> </td><td>Создает симлинк на перетаскиваемый файл в текущей директории Терминала.</td></tr>
+<tr><td><span class="menu">Переместить сюда</span></td><td> </td><td>Перемещает перетаскиваемый файл в текущую директорию Терминала.</td></tr>
+<tr><td><span class="menu">Копировать сюда</span></td><td> </td><td>Копирует перетаскиваемый файл в текущую директорию Терминала.</td></tr>
 </table></li>
 <li><p>Вы можете открыть любой файл, назначенной ему программой, используя команду <span class="cli">open <i>[имя_файла]</i></span>. Это также сработает для открытия текущей ("<span class="cli">.</span>") и родительской ("<span class="cli">..</span>") папки, которые откроются в окне Tracker-а. Так, чтобы открыть текущую директорию, следует набрать:</p>
 <pre class="terminal">open .</pre>
@@ -137,7 +136,7 @@ Pressing <span class="button">OK</span> will save the current settings as defaul
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">Текстовый Поиск (TextSearch)</a>  »
 </span></div>
 </div>
 

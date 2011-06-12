@@ -13,6 +13,7 @@
  * Translators:
  *		Rodastahm Islamov
  *		mrNoisy
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -51,297 +52,296 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Список всех приложений для командной строки</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Tracker:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>Все приложения командной строки, поставляемые вместе с Haiku располагаются в <span class="path">/boot/system/bin</span> и в <span class="path">/boot/common/bin</span>. Приложения, которые вы установили самостоятельно, должны располагаться в  <span class="path">~/config/bin</span>. Указанные пути располагаются в переменной PATH, таким образом приложения отыскиваются автоматически.<br />
+Ниже приведен список все приложений командной строки, поставляемых вместе с Haiku. Каждому приложение дано краткое описание, что оно делает. Для получения более подробной информации, выполните команду с параметром <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Указатель:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Запускает сервис, отслеживающий используемыеаудио и видео аддоны. </td></tr>
+<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Запускает сервис, отслеживающий используемые аудио и видео аддоны. </td></tr>
 <tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Настройка языка. </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>Возвращает правда/ложь после сравнения элементов.</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A - E</h2></a></td></tr>
-<tr><td><tt>addattr</tt></td><td> </td><td>Writes an attribute to a file, taking the type into account and converting the values accordingly. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>alert</tt></td><td> </td><td>Отображает окно с сообщением. <a href="cli-apps.html">(относится к Haiku)</a></td></tr>
-<tr><td><tt>arp</tt></td><td> </td><td>Манипулирует системным ARP-кешем . </td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>Записывает атрибут файла, приводя записываемое значение к соотвествующему типу <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>Отображает окно с сообщением. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>Манипулирует системным ARP-кешем. </td></tr>
 <tr><td><tt>awk</tt></td><td> </td><td>См. <tt>gawk</tt>.</td></tr>
 <tr><td><tt>base64</tt></td><td> </td><td>Кодирование или декодирование Base64 в стандартный вывод.</td></tr>
 <tr><td><tt>basename</tt></td><td> </td><td>Убирает папку или опционально суффикс из строки /путь/до/имяфайла.</td></tr>
-<tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
-<tr><td><tt>bc</tt></td><td> </td><td>An arbitrary precision calculator language.</td></tr>
-<tr><td><tt>beep</tt></td><td> </td><td>Rings a bell. </td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Installs or uninstalls a boot-menu. </td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td>See <tt>bzip2</tt>.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Displays a calendar. </td></tr>
-<tr><td><tt>cat</tt></td><td> </td><td>Concatenates files and prints to standard output. </td></tr>
-<tr><td><tt>catattr</tt></td><td> </td><td>Prints out the contents of an attribute of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cc</tt></td><td> </td><td>C-Compiler</td></tr>
-<tr><td><tt>checkfs</tt></td><td> </td><td>Checks and repairs the file system. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>checkitout</tt></td><td> </td><td>Checks out sources simply with their repository's URL.</td></tr>
-<tr><td><tt>chgrp</tt></td><td> </td><td>Changes group ownership of files. </td></tr>
-<tr><td><tt>chmod</tt></td><td> </td><td>Changes permissions of files.</td></tr>
-<tr><td><tt>chop</tt></td><td> </td><td>Splits a file into smaller files. </td></tr>
-<tr><td><tt>chown</tt></td><td> </td><td>Changes the owner of files. </td></tr>
-<tr><td><tt>chroot</tt></td><td> </td><td>Runs a command within a specified root directory. </td></tr>
-<tr><td><tt>cksum</tt></td><td> </td><td>Prints out CRC checksum and byte count of files. </td></tr>
-<tr><td><tt>clear</tt></td><td> </td><td>Clears the terminal window. </td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Prints out the clock configuration.</td></tr>
-<tr><td><tt>cmp</tt></td><td> </td><td>Compares files byte by byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Leftover from the move of locale-kit.]</td></tr>
-<tr><td><tt>comm</tt></td><td> </td><td>Compares sorted files line by line. </td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Data compression program</td></tr>
-<tr><td><tt>consoled</tt></td><td> </td><td>Console daemon </td></tr>
-<tr><td><tt>copyattr</tt></td><td> </td><td>Copies all or a subset of attributes from one or more files to another or new file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cp</tt></td><td> </td><td>Copies files and directories. </td></tr>
-<tr><td><tt>csplit</tt></td><td> </td><td>Split a file into pieces separated by a specified pattern.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Generates an index file for a variety of language objects found in files</td></tr>
-<tr><td><tt>cut</tt></td><td> </td><td>Prints out sections from each line of a file.</td></tr>
-<tr><td><tt>date</tt></td><td> </td><td>Displays or sets the current time and date.</td></tr>
-<tr><td><tt>dc</tt></td><td> </td><td>Desk calculator language.</td></tr>
-<tr><td><tt>dd</tt></td><td> </td><td>Copies raw data, converting and formatting according operands. </td></tr>
-<tr><td><tt>desklink</tt></td><td> </td><td>Installs items in Deskbar. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>df</tt></td><td> </td><td>Reports free and used space of mounted volumes.</td></tr>
-<tr><td><tt>diff</tt></td><td> </td><td>Compares files line by line.</td></tr>
-<tr><td><tt>diff3</tt></td><td> </td><td>Compares three files line by line.</td></tr>
-<tr><td><tt>dircolors</tt></td><td> </td><td>Color setup for <tt>ls</tt>. </td></tr>
-<tr><td><tt>dirname</tt></td><td> </td><td>Strips the filename from a /path/to/filename string.</td></tr>
-<tr><td><tt>draggers</tt></td><td> </td><td>Shows/sets the dragger state of Replicants.</td></tr>
-<tr><td><tt>driveinfo</tt></td><td> </td><td>Shows hardware information. </td></tr>
-<tr><td><tt>dstcheck</tt></td><td> </td><td>Shows a message box used when switching to/from daylight saving time.</td></tr>
-<tr><td><tt>du</tt></td><td> </td><td>Summarizes disk usage of each file, recursively for directories. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>echo</tt></td><td> </td><td>Displays a line of text.</td></tr>
-<tr><td><tt>egrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
-<tr><td><tt>eject</tt></td><td> </td><td>Ejects removable media. </td></tr>
-<tr><td><tt>env</tt></td><td> </td><td>Runs a program in a modified environment. </td></tr>
-<tr><td><tt>error</tt></td><td> </td><td>Prints clear text error messages for given error numbers. </td></tr>
-<tr><td><tt>expand</tt></td><td> </td><td>Converts tabs to spaces.</td></tr>
-<tr><td><tt>expr</tt></td><td> </td><td>Prints the value of an expression.</td></tr>
+<tr><td><tt>bash</tt></td><td> </td><td>Оболочка bash</td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>Арифметический язык-калькулятор.</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>Воспроизводит системный сигнал.</td></tr>
+<tr><td><tt>bootman</tt></td><td> </td><td>Устанавливает либо удаляет загрузочное меню.</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>См. <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Сжатие файлов</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>Компиллятор C++</td></tr>
+<tr><td><tt>cal</tt></td><td> </td><td>Отображает календарь.</td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>Объединяет файлы и печатает в стандартный вывод. </td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>Выводит содержимое аттрибутов файла. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
+<tr><td><tt>cc</tt></td><td> </td><td>Компиллятор Си</td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>Проверяет и исправляет файловую систему. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
+<tr><td><tt>checkitout</tt></td><td> </td><td>Получает исходные коды с URL репозитория.</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>Изменяет группу владельцев файлов.</td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>Изменяет разрешения для файлов.</td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>Разбивает файл на несколько файлов меньшего размера.</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>Изменяет владельца файлов.</td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>Выполняет команду с указанным корневым каталогом.</td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>Выводит контрольную сумму CRC и количество байтов для указанных файлов.</td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>Очищает окно терминала.</td></tr>
+<tr><td><tt>clockconfig</tt></td><td> </td><td>Выводит параметры часов.</td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>Производит побайтовое сравнение файлов.</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Осталась после перемещения locale-kit.]</td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>Производит построчное сравнение файлов. </td></tr>
+<tr><td><tt>compress</tt></td><td> </td><td>Программа сжатия данных</td></tr>
+<tr><td><tt>consoled</tt></td><td> </td><td>Консольный демон</td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>Копирует все или некоторый набор атрибутов из одного или нескольких файлов в другой или новый файл. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>Копирует файлы и каталоги.</td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>Разбивает файл на части, разделенные gпо указанному шаблону.</td></tr>
+<tr><td><tt>ctags</tt></td><td> </td><td>Генерирует индексный файл для множества языковых объектов, найденных в файлах.</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>Выводит колонку из каждой строки файла.</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>Выводит текущие дату и время.</td></tr>
+<tr><td><tt>dc</tt></td><td> </td><td>Пакет для арифметических вычислений.</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>Копирует двоичные данные, производит конвертацию и ворматирование указанные в операндах.</td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>Добавляет элемент в Deskbar. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>Выводит объем использованного и свободного пространства подключенных томов.</td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>Сравнивает файлы построчно.</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>Построчно сравнивает три файла.</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td>Настройка цветов для <tt>ls</tt>. </td></tr>
+<tr><td><tt>dirname</tt></td><td> </td><td>Получает имя_файла из строки /путь/до/имя_файла</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>Выводит/устанавливает состояние отображения репликантов.</td></tr>
+<tr><td><tt>driveinfo</tt></td><td> </td><td>Выводит информацию об аппаратных компонентах.</td></tr>
+<tr><td><tt>dstcheck</tt></td><td> </td><td>Выводит окно с сообщением о переходе с летнего / на летнее время.</td></tr>
+<tr><td><tt>du</tt></td><td> </td><td>Обощает использование дискового пространства каждым файлом, рекурсивно для каталогов.</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Осталось после перемещения locale-kit.] </td></tr>
+<tr><td><tt>echo</tt></td><td> </td><td>Выводит строку текста.</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td>См. <tt>grep</tt>.</td></tr>
+<tr><td><tt>eject</tt></td><td> </td><td>Извлекает переносной носитель.</td></tr>
+<tr><td><tt>env</tt></td><td> </td><td>Выполняет программу в измененной среде.</td></tr>
+<tr><td><tt>error</tt></td><td> </td><td>Выводит текстовое описание для передаваемых номеров ошибок.</td></tr>
+<tr><td><tt>expand</tt></td><td> </td><td>Преобразует табуляцию в пробелы.</td></tr>
+<tr><td><tt>expr</tt></td><td> </td><td>Выводит значение выражения.</td></tr>
 <tr><td colspan="3"><a id="F" name="F"><h2>F - J</h2></a></td></tr>
-<tr><td><tt>factor</tt></td><td> </td><td>Prints the prime factors of integer numbers.</td></tr>
-<tr><td><tt>false</tt></td><td> </td><td>Does nothing, indicates "unsuccessful" and returns the value "1".</td></tr>
-<tr><td><tt>fdinfo</tt></td><td> </td><td>Shows info about the used file descriptors in the system. </td></tr>
-<tr><td><tt>ffm</tt></td><td> </td><td>Sets focus follows mouse. </td></tr>
-<tr><td><tt>fgrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
-<tr><td><tt>filepanel</tt></td><td> </td><td>Displays a load/save file panel. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>find</tt></td><td> </td><td>Searches for files in a directory hierarchy.</td></tr>
-<tr><td><tt>finddir</tt></td><td> </td><td>Finds special directories defined by the system.</td></tr>
-<tr><td><tt>fmt</tt></td><td> </td><td>Reformats the paragraphs of a file.</td></tr>
-<tr><td><tt>fold</tt></td><td> </td><td>Wraps input lines of a file.</td></tr>
-<tr><td><tt>fortune</tt></td><td> </td><td>Prints a random, hopefully interesting, adage. </td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Called by updatedb to compress the list of file names.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Shows FreeType compilation and linking information.</td></tr>
+<tr><td><tt>factor</tt></td><td> </td><td>Выводит простые множители целых чисел.</td></tr>
+<tr><td><tt>false</tt></td><td> </td><td>Ничего не делает. Обозначает "неудачу"  и возвращает значение "1".</td></tr>
+<tr><td><tt>fdinfo</tt></td><td> </td><td>Выводит информацию о задействованных файловых дескрипторах в системе.</td></tr>
+<tr><td><tt>ffm</tt></td><td> </td><td>Устанавливает следование фокуса за мышью.</td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td>См. <tt>grep</tt>.</td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>Отображает панель загрузки/сохранения файла. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>Выполняет поиск файлов в структуре каталогов.</td></tr>
+<tr><td><tt>finddir</tt></td><td> </td><td>Выполняет поиск специализированных каталогов, определенных на уровне системы.</td></tr>
+<tr><td><tt>fmt</tt></td><td> </td><td>Переформатирует каждый абзац файла.</td></tr>
+<tr><td><tt>fold</tt></td><td> </td><td>Разбивает строки файла на строки требуемой длины.</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>Выводит случайную, и, надеюсь, интересную пословицу.</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>Вызывается командой updatedb для сжатия списка имен файлов</td></tr>
+<tr><td><tt>freetype-config</tt></td><td> </td><td>Выводит информацию о параметрах компилляции и линковки FreeType.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>FTP клиент</td></tr>
-<tr><td><tt>ftpd</tt></td><td> </td><td>FTP служба</td></tr>
-<tr><td><tt>funzip</tt></td><td> </td><td>Extracts the first item of an archive to standard output.</td></tr>
-<tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire control program</td></tr>
-<tr><td><tt>gawk</tt></td><td> </td><td>Pattern scanning and processing language. </td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>GNU debugger</td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Prints platform dependent limits in a format useful for shell scripts. </td></tr>
-<tr><td><tt>grep</tt></td><td> </td><td>Search for a pattern.</td></tr>
-<tr><td><tt>groups</tt></td><td> </td><td>Prints group memberships for each username. </td></tr>
+<tr><td><tt>ftpd</tt></td><td> </td><td>FTP сервер</td></tr>
+<tr><td><tt>funzip</tt></td><td> </td><td>Распаковывает первый элемент архива в стандартный вывод.</td></tr>
+<tr><td><tt>fwcontrol</tt></td><td> </td><td>Программа управления FireWire</td></tr>
+<tr><td><tt>gawk</tt></td><td> </td><td>Язык построчного разбора и обработки по заданным шаблонам.</td></tr>
+<tr><td><tt>gdb</tt></td><td> </td><td>Отладчик GNU</td></tr>
+<tr><td><tt>getlimits</tt></td><td> </td><td>Выводит платформозависимые ограничения в формате, удобном для использования в скриптинге.</td></tr>
+<tr><td><tt>grep</tt></td><td> </td><td>Поиск по шаблону.</td></tr>
+<tr><td><tt>groups</tt></td><td> </td><td>Выводит членство в группах для каждого имени пользователя.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Тоже самое что и <tt>gzip</tt>.</td></tr>
-<tr><td><tt>gzexe</tt></td><td> </td><td>De/Compresses executables. </td></tr>
-<tr><td><tt>gzip</tt></td><td> </td><td>De/Compresses files. </td></tr>
-<tr><td><tt>hd</tt></td><td> </td><td>Hexdump</td></tr>
-<tr><td><tt>head</tt></td><td> </td><td>Prints the first lines of a file.</td></tr>
-<tr><td><tt>hey</tt></td><td> </td><td>A small tool for scripting GUI apps.</td></tr>
-<tr><td><tt>hostname</tt></td><td> </td><td>Prints or sets the hostname of the system. </td></tr>
-<tr><td><tt>id</tt></td><td> </td><td>Prints user and group information. </td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifies RCS keywords in files. </td></tr>
-<tr><td><tt>ifconfig</tt></td><td> </td><td>Configures a network interface. </td></tr>
-<tr><td><tt>install</tt></td><td> </td><td>Copies files to a destination without disrupting the running system.</td></tr>
-<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Installs firmware for various wireless network cards. </td></tr>
-<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>Temporary solution for installing optional packages. </td></tr>
-<tr><td><tt>installsound</tt></td><td> </td><td>Installs a new sound event in the Sounds preferences panel. </td></tr>
-<tr><td><tt>iroster</tt></td><td> </td><td>Lists input devices. </td></tr>
-<tr><td><tt>isvolume</tt></td><td> </td><td>Gets information about a mounted volume.</td></tr>
-<tr><td><tt>join</tt></td><td> </td><td>For each pair of input lines with identical join fields, write a line to standard output. </td></tr>
+<tr><td><tt>gzexe</tt></td><td> </td><td>Упаковка/распаковка исполнимых файлов.</td></tr>
+<tr><td><tt>gzip</tt></td><td> </td><td>Упаковка/распаковка файлов.</td></tr>
+<tr><td><tt>hd</tt></td><td> </td><td>Дамп в шестнадцатеричных кодах</td></tr>
+<tr><td><tt>head</tt></td><td> </td><td>Выводит первые строки файла.</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>Небольшой инструмент для скриптования GUI-приложений.</td></tr>
+<tr><td><tt>hostname</tt></td><td> </td><td>Выводит список  сетевых имен системы.</td></tr>
+<tr><td><tt>id</tt></td><td> </td><td>Выводит информацию о пользователе и группе.</td></tr>
+<tr><td><tt>ident</tt></td><td> </td><td>Определяет ключевые слова RCS в файлах. </td></tr>
+<tr><td><tt>ifconfig</tt></td><td> </td><td>Настраивает сетевой интерфейс.</td></tr>
+<tr><td><tt>install</tt></td><td> </td><td>Копирует файлы в место назначения без нарушения работы системы.</td></tr>
+<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Устанавливает прошивки для различного набора беспроводных сетевых карт.</td></tr>
+<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>Временное решение для установки опциональных пакетов.</td></tr>
+<tr><td><tt>installsound</tt></td><td> </td><td>Добавляет новое звуковое событие в панели настройки Звуки.</td></tr>
+<tr><td><tt>iroster</tt></td><td> </td><td>Перечисляет устройства ввода.</td></tr>
+<tr><td><tt>isvolume</tt></td><td> </td><td>Получает информацию о монтируемом томе.</td></tr>
+<tr><td><tt>join</tt></td><td> </td><td>Для каждой пары входных строк с одинаковыми общими полями выводит строку на стандартный вывод.</td></tr>
 <tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K - O</h2></a></td></tr>
-<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Enters the kernel debugger.</td></tr>
-<tr><td><tt>keymap</tt></td><td> </td><td>Loads or saves a keymap.</td></tr>
-<tr><td><tt>kill</tt></td><td> </td><td>Sends a signal to quit a process. </td></tr>
-<tr><td><tt>less</tt></td><td> </td><td>Views a file.</td></tr>
-<tr><td><tt>lessecho</tt></td><td> </td><td>Echos its arguments and expands metacharacters, such as * and ? in filenames.</td></tr>
-<tr><td><tt>lesskey</tt></td><td> </td><td>Specifies key binding for less. </td></tr>
-<tr><td><tt>link</tt></td><td> </td><td>Creates a link to a file. </td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>listarea</tt></td><td> </td><td>Lists area info for all currently running teams. </td></tr>
-<tr><td><tt>listattr</tt></td><td> </td><td>Lists the attributes of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>listdev</tt></td><td> </td><td>Lists all hardware devices.</td></tr>
-<tr><td><tt>listimage</tt></td><td> </td><td>Lists image info for all currently running teams. </td></tr>
-<tr><td><tt>listport</tt></td><td> </td><td>Lists all open ports in the system organized by team. </td></tr>
-<tr><td><tt>listres</tt></td><td> </td><td>Lists resources of files. </td></tr>
-<tr><td><tt>listsem</tt></td><td> </td><td>Lists the semaphores allocated by the specified team. </td></tr>
+<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Переход к отладчику ядра.</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>Загружает либо сохраняет раскладку клавиатуры.</td></tr>
+<tr><td><tt>kill</tt></td><td> </td><td>Посылает процессу сигнал выхода.</td></tr>
+<tr><td><tt>less</tt></td><td> </td><td>Просматривает файл.</td></tr>
+<tr><td><tt>lessecho</tt></td><td> </td><td>Выводит свои аргументы и расширяет метасимволы, такие как * и? в именах файлов.</td></tr>
+<tr><td><tt>lesskey</tt></td><td> </td><td>Назначает клавишу для вызова less.</td></tr>
+<tr><td><tt>link</tt></td><td> </td><td>Создает ссылку на файл.</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Осталось после перемещения locale-kit.] </td></tr>
+<tr><td><tt>listarea</tt></td><td> </td><td>Выводит список областей памяти для всех работающих команд.</td></tr>
+<tr><td><tt>listattr</tt></td><td> </td><td>Выводит список атрибутов файла. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>listdev</tt></td><td> </td><td>Выбодит список всех аппаратных устройств.</td></tr>
+<tr><td><tt>listimage</tt></td><td> </td><td>Выводит информацию об образах всех работающих команд.</td></tr>
+<tr><td><tt>listport</tt></td><td> </td><td>Перечисляет все открытые порты в системе, в порядке открывших команд.</td></tr>
+<tr><td><tt>listres</tt></td><td> </td><td>Перечисляет ресурсы, хранящиеся в файле.</td></tr>
+<tr><td><tt>listsem</tt></td><td> </td><td>Перечисляет семафоры, отведенные указанной команде.</td></tr>
 <tr><td><tt>listusb</tt></td><td> </td><td>Выводит список USB устройств. </td></tr>
-<tr><td><tt>ln</tt></td><td> </td><td>Creates a link to a file.</td></tr>
-<tr><td><tt>locate</tt></td><td> </td><td>Locates a file. </td></tr>
-<tr><td><tt>logger</tt></td><td> </td><td>Sends a message to the system log. </td></tr>
-<tr><td><tt>login</tt></td><td> </td><td>Starts a session on the system. </td></tr>
-<tr><td><tt>logname</tt></td><td> </td><td>Prints the name of the current user. </td></tr>
-<tr><td><tt>ls</tt></td><td> </td><td>Lists directory content. </td></tr>
-<tr><td><tt>lsindex</tt></td><td> </td><td>Displays the indexed attributes on the current volume/partition.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mail2mbox</tt></td><td> </td><td>Converts BeOS e-mail files to Unix mailbox files. </td></tr>
-<tr><td><tt>make</tt></td><td> </td><td>GNU make utility</td></tr>
-<tr><td><tt>makebootable</tt></td><td> </td><td>Makes the specified BFS partitions/devices bootable by writing boot code into the first two sectors. </td></tr>
-<tr><td><tt>mbox2mail</tt></td><td> </td><td>Converts Unix mailbox files to BeOS e-mail files.</td></tr>
-<tr><td><tt>md5sum</tt></td><td> </td><td>Prints or checks MD5 checksums.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Three-way file merge. </td></tr>
-<tr><td><tt>message</tt></td><td> </td><td>Prints a flattened BMessage file. </td></tr>
-<tr><td><tt>mimeset</tt></td><td> </td><td>Sets MIME type of a file. </td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator</td></tr>
+<tr><td><tt>ln</tt></td><td> </td><td>Создает ссылку на файл.</td></tr>
+<tr><td><tt>locate</tt></td><td> </td><td>Находит файл.</td></tr>
+<tr><td><tt>logger</tt></td><td> </td><td>Отправляет сообщение в системный лог.</td></tr>
+<tr><td><tt>login</tt></td><td> </td><td>Открывает сессию в системе.</td></tr>
+<tr><td><tt>logname</tt></td><td> </td><td>Выводит имя текущего пользователя.</td></tr>
+<tr><td><tt>ls</tt></td><td> </td><td>Перечисляет содержимое каталога.</td></tr>
+<tr><td><tt>lsindex</tt></td><td> </td><td>Отбражает индексированные атрибуты текущего тома/раздела. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>mail2mbox</tt></td><td> </td><td>Преобразует файлы e-mail BeOS в формат Unix.</td></tr>
+<tr><td><tt>make</tt></td><td> </td><td>Утилита GNU make</td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>Делает указанный BFS раздел/устройство доступным для загрузки, записывая загрузочный код в первые два сектора.</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>Преобразует файы Unix mailbox в файлы e-mail BeOS.</td></tr>
+<tr><td><tt>md5sum</tt></td><td> </td><td>Выводит или проверяет контрольные суммы MD5.</td></tr>
+<tr><td><tt>merge</tt></td><td> </td><td>Трехстороннее слияние файлов.</td></tr>
+<tr><td><tt>message</tt></td><td> </td><td>Выводит содержимое BMessage, записанное в файл.</td></tr>
+<tr><td><tt>mimeset</tt></td><td> </td><td>Устанавливает MIME-тип файла.</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Генератор зависимостей Makefile</td></tr>
 <tr><td><tt>mkdir</tt></td><td> </td><td>Создаёт папку. </td></tr>
-<tr><td><tt>mkdos</tt></td><td> </td><td>Initializes FAT partitions. </td></tr>
-<tr><td><tt>mkfifo</tt></td><td> </td><td>Creates named pipes. </td></tr>
-<tr><td><tt>mkfs</tt></td><td> </td><td>Creates a file system.</td></tr>
-<tr><td><tt>mkindex</tt></td><td> </td><td>Creates a new index for an attribute.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mktemp</tt></td><td> </td><td>Safely creates a temporary file or directory.</td></tr>
-<tr><td><tt>modifiers</tt></td><td> </td><td>Prints currently (un)pressed modifier keys. </td></tr>
-<tr><td><tt>more</tt></td><td> </td><td>See <tt>less</tt>. </td></tr>
-<tr><td><tt>mount</tt></td><td> </td><td>Mounts a file system. </td></tr>
-<tr><td><tt>mount_nfs</tt></td><td> </td><td>Mounts a NFS partition. </td></tr>
-<tr><td><tt>mountvolume</tt></td><td> </td><td>Mounts a volume by name.</td></tr>
-<tr><td><tt>mv</tt></td><td> </td><td>Moves/renames a file. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>TCP and UDP utility.</td></tr>
-<tr><td><tt>netstat</tt></td><td> </td><td>Prints network connections, routing tables, interface statistics, masquerade connections and multicast memberships. </td></tr>
-<tr><td><tt>nl</tt></td><td> </td><td>Prints each file with line numbers added. </td></tr>
-<tr><td><tt>nohup</tt></td><td> </td><td>Runs a command ignoring hangup signals. </td></tr>
-<tr><td><tt>nproc</tt></td><td> </td><td>Prints the number of available processing units.</td></tr>
-<tr><td><tt>od</tt></td><td> </td><td>Writes an unambiguous representation of a file.</td></tr>
-<tr><td><tt>open</tt></td><td> </td><td>Launches an application/document from the shell. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>mkdos</tt></td><td> </td><td>Инициализирует раздел FAT.</td></tr>
+<tr><td><tt>mkfifo</tt></td><td> </td><td>Создает именованный канал.</td></tr>
+<tr><td><tt>mkfs</tt></td><td> </td><td>Создает файловую систему.</td></tr>
+<tr><td><tt>mkindex</tt></td><td> </td><td>Создает новый индекс для атрибута.  <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>mktemp</tt></td><td> </td><td>Безопасно создает временный файл или каталог.</td></tr>
+<tr><td><tt>modifiers</tt></td><td> </td><td>Выводит (не)нажатые в данный момент клавиши-модификаторы.</td></tr>
+<tr><td><tt>more</tt></td><td> </td><td>См. <tt>less</tt>. </td></tr>
+<tr><td><tt>mount</tt></td><td> </td><td>Подключает файловую систему.</td></tr>
+<tr><td><tt>mount_nfs</tt></td><td> </td><td>Подключает NFS раздел. </td></tr>
+<tr><td><tt>mountvolume</tt></td><td> </td><td>Подключает том по имени.</td></tr>
+<tr><td><tt>mv</tt></td><td> </td><td>Перемещает/переименовывает файл.</td></tr>
+<tr><td><tt>netcat</tt></td><td> </td><td>Утилита TCP и UDP.</td></tr>
+<tr><td><tt>netstat</tt></td><td> </td><td>Выводит сетевые подключения, таблицы маршрутизации, статистику интерфейсов, маскированные соединения и участие в групповых передачах.</td></tr>
+<tr><td><tt>nl</tt></td><td> </td><td>Выводит файл с добавлением нумерации строк.</td></tr>
+<tr><td><tt>nohup</tt></td><td> </td><td>Выполняет команду с игнорированием сигналов потери связи.</td></tr>
+<tr><td><tt>nproc</tt></td><td> </td><td>Выводит число доступных процессоров.</td></tr>
+<tr><td><tt>od</tt></td><td> </td><td>Утилита для вывода дампа файла в разных форматах.</td></tr>
+<tr><td><tt>open</tt></td><td> </td><td>Запускает приложение/документ из командной строки. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P - S</h2></a></td></tr>
-<tr><td><tt>passwd</tt></td><td> </td><td>Changes the user password. </td></tr>
-<tr><td><tt>paste</tt></td><td> </td><td>Prints lines consisting of the sequentially corresponding lines from each file, separated by tabs.</td></tr>
-<tr><td><tt>patch</tt></td><td> </td><td>Applies a diff file to an original. </td></tr>
-<tr><td><tt>pathchk</tt></td><td> </td><td>Diagnoses invalid or unportable file names. </td></tr>
-<tr><td><tt>pc</tt></td><td> </td><td>Programmer's calculator</td></tr>
-<tr><td><tt>ping</tt></td><td> </td><td>Sends ICMP-echo-request to network host. </td></tr>
-<tr><td><tt>play</tt></td><td> </td><td>Plays tracks from CD. </td></tr>
-<tr><td><tt>playfile</tt></td><td> </td><td>Plays an audio file. </td></tr>
-<tr><td><tt>playsound</tt></td><td> </td><td>Plays an audio file.</td></tr>
-<tr><td><tt>playwav</tt></td><td> </td><td>Plays a WAV file. </td></tr>
-<tr><td><tt>pr</tt></td><td> </td><td>Paginates or columnates files for printing. </td></tr>
-<tr><td><tt>printenv</tt></td><td> </td><td>Prints the value of an environment variable.</td></tr>
-<tr><td><tt>printf</tt></td><td> </td><td>Formats and prints data. </td></tr>
-<tr><td><tt>prio</tt></td><td> </td><td>Changes priority of a process. </td></tr>
-<tr><td><tt>profile</tt></td><td> </td><td>Profiles threads. </td></tr>
-<tr><td><tt>ps</tt></td><td> </td><td>Lists running processes. </td></tr>
-<tr><td><tt>ptx</tt></td><td> </td><td>Outputs a permuted index, including context, of the words in the input files.</td></tr>
-<tr><td><tt>pwd</tt></td><td> </td><td>Prints current directory. </td></tr>
-<tr><td><tt>query</tt></td><td> </td><td>A shell utility emulating Tracker's "Find by formula" functionality.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>quit</tt></td><td> </td><td>Quits an application. </td></tr>
-<tr><td><tt>rc</tt></td><td> </td><td>Resource compiler</td></tr>
-<tr><td><tt>readlink</tt></td><td> </td><td>Prints the path to the destination of a symbolic link.</td></tr>
-<tr><td><tt>reindex</tt></td><td> </td><td>Puts attributes of existing files into newly created indexes. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>release</tt></td><td> </td><td>Releases a semaphore. </td></tr>
-<tr><td><tt>renice</tt></td><td> </td><td>Alters the priority of a running process. </td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Prints log messages and other information about RCS files.</td></tr>
-<tr><td><tt>rm</tt></td><td> </td><td>Removes files and directories. </td></tr>
-<tr><td><tt>rmattr</tt></td><td> </td><td>Removes an attribute from a file.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>rmdir</tt></td><td> </td><td>Removes directories.</td></tr>
-<tr><td><tt>rmindex</tt></td><td> </td><td>Removes the index for an attribute. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>roster</tt></td><td> </td><td>Prints information about running teams. </td></tr>
-<tr><td><tt>route</tt></td><td> </td><td>Lists and manipulates network routes. </td></tr>
-<tr><td><tt>safemode</tt></td><td> </td><td>Checks if the system is running in safemode. </td></tr>
-<tr><td><tt>screen_blanker</tt></td><td> </td><td>Starts the screen blanker.</td></tr>
-<tr><td><tt>screenmode</tt></td><td> </td><td>Show/sets the screen mode. </td></tr>
-<tr><td><tt>sdiff</tt></td><td> </td><td>Shows or merges differences of two files side-by-side.</td></tr>
-<tr><td><tt>seq</tt></td><td> </td><td>Prints a sequence of numbers.</td></tr>
-<tr><td><tt>setdecor</tt></td><td> </td><td>Shows/sets the decorator. </td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>Shows/sets the used gcc version. </td></tr>
-<tr><td><tt>settype</tt></td><td> </td><td>Sets the MIME type, signature and preferred application of a file. </td></tr>
-<tr><td><tt>setversion</tt></td><td> </td><td>Shows the version of a file.</td></tr>
-<tr><td><tt>setvolume</tt></td><td> </td><td>Sets the system sound volume. </td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
+<tr><td><tt>passwd</tt></td><td> </td><td>Изменяет пароль пользователя.</td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>Печатает строки, состоящие из соответствующих строк из каждого файла, разделенных знаками табуляции.</td></tr>
+<tr><td><tt>patch</tt></td><td> </td><td>Применяет diff файл на оригинал.</td></tr>
+<tr><td><tt>pathchk</tt></td><td> </td><td>Диагностирует неверные или непереносимые имена файлов.</td></tr>
+<tr><td><tt>pc</tt></td><td> </td><td>Калькулятор программиста</td></tr>
+<tr><td><tt>ping</tt></td><td> </td><td>Отправляет ICMP-эхо-запрос сетевому хосту.</td></tr>
+<tr><td><tt>play</tt></td><td> </td><td>Воспроизводит трек с CD.</td></tr>
+<tr><td><tt>playfile</tt></td><td> </td><td>Воспроизводит аудиофайл.</td></tr>
+<tr><td><tt>playsound</tt></td><td> </td><td>Воспроизводит аудиофайл.</td></tr>
+<tr><td><tt>playwav</tt></td><td> </td><td>Воспроизводит WAV-файл.</td></tr>
+<tr><td><tt>pr</tt></td><td> </td><td>Разбивает на страници или колонки файл для печати.</td></tr>
+<tr><td><tt>printenv</tt></td><td> </td><td>Выводит значение переменной среды.</td></tr>
+<tr><td><tt>printf</tt></td><td> </td><td>Форматирует и выводит данные.</td></tr>
+<tr><td><tt>prio</tt></td><td> </td><td>Изменяет приоритет процесса.</td></tr>
+<tr><td><tt>profile</tt></td><td> </td><td>Профилировщик потоков.</td></tr>
+<tr><td><tt>ps</tt></td><td> </td><td>Список запущенных процессов.</td></tr>
+<tr><td><tt>ptx</tt></td><td> </td><td>Выводит упорядоченный предметный указатель.</td></tr>
+<tr><td><tt>pwd</tt></td><td> </td><td>Выводит текущий каталог.</td></tr>
+<tr><td><tt>query</tt></td><td> </td><td>Утилита командной строки эмулирующая функционал Tracker'a "Найти по формуле".  <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>quit</tt></td><td> </td><td>Завершает работу приложения.</td></tr>
+<tr><td><tt>rc</tt></td><td> </td><td>Компиллятор ресурсов</td></tr>
+<tr><td><tt>readlink</tt></td><td> </td><td>Выводит путь до объекта символической ссылки.</td></tr>
+<tr><td><tt>reindex</tt></td><td> </td><td>Помещает атрибуты существующих файлов во вновь созданный индекс. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>release</tt></td><td> </td><td>Освобождает семафор.</td></tr>
+<tr><td><tt>renice</tt></td><td> </td><td>Изменяет приоритер запущенных процессов.</td></tr>
+<tr><td><tt>rlog</tt></td><td> </td><td>Выводит лог-сообщения и другую информацию о файлах RCS.</td></tr>
+<tr><td><tt>rm</tt></td><td> </td><td>Удаляет файлы и директории.</td></tr>
+<tr><td><tt>rmattr</tt></td><td> </td><td>Удаляет атрибут из файла. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>rmdir</tt></td><td> </td><td>Удаляет каталоги.</td></tr>
+<tr><td><tt>rmindex</tt></td><td> </td><td>Удаляет индекс для атрибута. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>roster</tt></td><td> </td><td>Выводит информацию о запущенных командах.</td></tr>
+<tr><td><tt>route</tt></td><td> </td><td>Выводит список сетевых маршрутов и позволяет ими управлять.</td></tr>
+<tr><td><tt>safemode</tt></td><td> </td><td>Проверяет, запущена ли система в безопасном режиме. </td></tr>
+<tr><td><tt>screen_blanker</tt></td><td> </td><td>Запускает очистку экрана.</td></tr>
+<tr><td><tt>screenmode</tt></td><td> </td><td>Показывает/устанавливает режим работы экрана.</td></tr>
+<tr><td><tt>sdiff</tt></td><td> </td><td>Отображает или производит слияние несоответствий в файлах в виде  таблицы построчного сравнения.</td></tr>
+<tr><td><tt>seq</tt></td><td> </td><td>Выводит последовательность чисел.</td></tr>
+<tr><td><tt>setdecor</tt></td><td> </td><td>Отображает/устанавливает декоратор.</td></tr>
+<tr><td><tt>setgcc</tt></td><td> </td><td>Отображает/устанавливает используемую версию gcc.</td></tr>
+<tr><td><tt>settype</tt></td><td> </td><td>Устанавливает MIME-тип, сигнатуру и предпочитаемое приложение для файла.</td></tr>
+<tr><td><tt>setversion</tt></td><td> </td><td>Показывает версию файла.</td></tr>
+<tr><td><tt>setvolume</tt></td><td> </td><td>Устанавливает уровень громкости системы.</td></tr>
+<tr><td><tt>setwep</tt></td><td> </td><td>Обеспечивает WEP шифрование для беспроводных сетей.</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>См. <tt>bash</tt>. </td></tr>
-<tr><td><tt>sha1sum</tt></td><td> </td><td>Prints or checks SHA1 checksums. </td></tr>
-<tr><td><tt>shar</tt></td><td> </td><td>Creates shell archives.</td></tr>
-<tr><td><tt>shred</tt></td><td> </td><td>Overwrites a file repeatedly. </td></tr>
-<tr><td><tt>shuf</tt></td><td> </td><td>Prints a random permutation of the input lines.</td></tr>
+<tr><td><tt>sha1sum</tt></td><td> </td><td>Отображает или проверяет контрольные суммы SHA1.</td></tr>
+<tr><td><tt>shar</tt></td><td> </td><td>Создает архивы Unix.</td></tr>
+<tr><td><tt>shred</tt></td><td> </td><td>Перезаписывает файл несколько раз.</td></tr>
+<tr><td><tt>shuf</tt></td><td> </td><td>Печатает случайную перестановку входных строк.</td></tr>
 <tr><td><tt>shutdown</tt></td><td> </td><td>Выключить компьютер. </td></tr>
-<tr><td><tt>sleep</tt></td><td> </td><td>Pauses for a specified number of seconds. </td></tr>
-<tr><td><tt>sort</tt></td><td> </td><td>Prints a sorted concatenation of all files.</td></tr>
-<tr><td><tt>spamdbm</tt></td><td> </td><td>Classifies e-mail messages as spam or genuine. </td></tr>
-<tr><td><tt>split</tt></td><td> </td><td>Outputs fixed-size pieces of input files to files with prefixes. </td></tr>
-<tr><td><tt>stat</tt></td><td> </td><td>Displays file or file system status. </td></tr>
-<tr><td><tt>strace</tt></td><td> </td><td>Traces the syscalls of a thread or a team. </td></tr>
-<tr><td><tt>stty</tt></td><td> </td><td>Shows/sets terminal characteristics. </td></tr>
-<tr><td><tt>su</tt></td><td> </td><td>Changes the effective user id and group. </td></tr>
-<tr><td><tt>sum</tt></td><td> </td><td>Prints checksum and block counts for each file. </td></tr>
-<tr><td><tt>sync</tt></td><td> </td><td>Forces changed blocks to disk, updates the super block. </td></tr>
-<tr><td><tt>sysinfo</tt></td><td> </td><td>Shows system info. </td></tr>
+<tr><td><tt>sleep</tt></td><td> </td><td>Выполняет остановку на количество указанных секунд.</td></tr>
+<tr><td><tt>sort</tt></td><td> </td><td>Выводит ортированное слияние файлов.</td></tr>
+<tr><td><tt>spamdbm</tt></td><td> </td><td>Классифицирует e-mail сообщение как спам или подлиное.</td></tr>
+<tr><td><tt>split</tt></td><td> </td><td>Разбивает входные файлы на куски фиксированного размера.</td></tr>
+<tr><td><tt>stat</tt></td><td> </td><td>Отображает статут файла либо файловой системы.</td></tr>
+<tr><td><tt>strace</tt></td><td> </td><td>Трассирует системные выозвы потока или команды.</td></tr>
+<tr><td><tt>stty</tt></td><td> </td><td>Отображает/устанавливает параметры терминала.</td></tr>
+<tr><td><tt>su</tt></td><td> </td><td>Смена действующего пользователя и группы.</td></tr>
+<tr><td><tt>sum</tt></td><td> </td><td>Выводит контрольную сумму и количество блоков для каждого файла.</td></tr>
+<tr><td><tt>sync</tt></td><td> </td><td>Форсирует запись измененных блоков на диск, обновляет суперблок.</td></tr>
+<tr><td><tt>sysinfo</tt></td><td> </td><td>Выводит системную информацию.</td></tr>
 <tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T - Z</h2></a></td></tr>
-<tr><td><tt>tac</tt></td><td> </td><td>Concatenates and prints files, last line first. </td></tr>
-<tr><td><tt>tail</tt></td><td> </td><td>Prints the last ten lines of a file.</td></tr>
-<tr><td><tt>tcpdump</tt></td><td> </td><td>Dumps traffic of a network. </td></tr>
-<tr><td><tt>tcptester</tt></td><td> </td><td>[deprecated] </td></tr>
-<tr><td><tt>tee</tt></td><td> </td><td>Writes or appends data from standard input to a file.</td></tr>
-<tr><td><tt>telnet</tt></td><td> </td><td>User interface to the telnet protocol. </td></tr>
-<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet daemon</td></tr>
+<tr><td><tt>tac</tt></td><td> </td><td>Выводит содержимое файлов в обратном порядке.</td></tr>
+<tr><td><tt>tail</tt></td><td> </td><td>Выводит последние 10 линий файла.</td></tr>
+<tr><td><tt>tcpdump</tt></td><td> </td><td>Выводит дамп сетевого трафика.</td></tr>
+<tr><td><tt>tcptester</tt></td><td> </td><td>[устаревшее] </td></tr>
+<tr><td><tt>tee</tt></td><td> </td><td>Пишет или добавляет данные из стандартного ввода в файл.</td></tr>
+<tr><td><tt>telnet</tt></td><td> </td><td>Пользовательский интерфейс для протокола telnet.</td></tr>
+<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet-демон</td></tr>
 <tr><td><tt>test</tt></td><td> </td><td>Возвращает правда/ложь после сравнения элементов.</td></tr>
-<tr><td><tt>timeout</tt></td><td> </td><td>Starts a command and kills it if it's still running after a specified number of seconds. </td></tr>
-<tr><td><tt>top</tt></td><td> </td><td>Displays running threads and CPU usage.</td></tr>
-<tr><td><tt>touch</tt></td><td> </td><td>Changes a file's timestamp. </td></tr>
-<tr><td><tt>tput</tt></td><td> </td><td>Initializes a terminal or query terminfo database. </td></tr>
-<tr><td><tt>tr</tt></td><td> </td><td>Translates, squeezes and/or deletes characters from standard input.</td></tr>
-<tr><td><tt>traceroute</tt></td><td> </td><td>Prints the route packets take through a network.</td></tr>
-<tr><td><tt>translate</tt></td><td> </td><td>Uses DataTranslators to convert file formats.</td></tr>
-<tr><td><tt>trash</tt></td><td> </td><td>Sends files to trash or restores them. </td></tr>
-<tr><td><tt>true</tt></td><td> </td><td>Does nothing, indicates "success" and returns the value "0".</td></tr>
-<tr><td><tt>truncate</tt></td><td> </td><td>Shrinks or extends the size of a file.</td></tr>
-<tr><td><tt>tsort</tt></td><td> </td><td>Does a topological sorting.</td></tr>
-<tr><td><tt>tty</tt></td><td> </td><td>Prints the file name of the terminal connected to standard input.</td></tr>
-<tr><td><tt>uname</tt></td><td> </td><td>Prints out system information. </td></tr>
-<tr><td><tt>unchop</tt></td><td> </td><td>Recreates a file previously split with <tt>chop</tt>. </td></tr>
-<tr><td><tt>unexpand</tt></td><td> </td><td>Converts spaces to tabs.</td></tr>
-<tr><td><tt>uniq</tt></td><td> </td><td>Filters adjacent matching lines from input, writing to output. </td></tr>
-<tr><td><tt>unlink</tt></td><td> </td><td>Calls the unlink function to remove the specified file. </td></tr>
-<tr><td><tt>unmount</tt></td><td> </td><td>Unmounts a volume.</td></tr>
-<tr><td><tt>unrar</tt></td><td> </td><td>Expands a rar archive.</td></tr>
-<tr><td><tt>unshar</tt></td><td> </td><td>Expands a shar archive.</td></tr>
-<tr><td><tt>untrash</tt></td><td> </td><td>See <tt>trash</tt>. </td></tr>
-<tr><td><tt>unzip</tt></td><td> </td><td>Expands a zip archive.</td></tr>
-<tr><td><tt>unzipsfx</tt></td><td> </td><td>Used to make existing zip archives self-extracting.</td></tr>
-<tr><td><tt>updatedb</tt></td><td> </td><td>Updates a localization database.</td></tr>
-<tr><td><tt>uptime</tt></td><td> </td><td>Prints date and time, as well as the time elapsed since the system was started. </td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>Wraps URL MIME types around command line or other apps that don't handle them directly. </td></tr>
+<tr><td><tt>timeout</tt></td><td> </td><td>Запускает команду и принудительно завершает ее, если она продолжает работу после истечения указанного количества секунд.</td></tr>
+<tr><td><tt>top</tt></td><td> </td><td>Отображает запущенные нити и загрузку ЦП.</td></tr>
+<tr><td><tt>touch</tt></td><td> </td><td>Изменяет метку времени файла.</td></tr>
+<tr><td><tt>tput</tt></td><td> </td><td>Инициализирует терминал или запрос в базу данных terminfo.</td></tr>
+<tr><td><tt>tr</tt></td><td> </td><td>Переводит, сжимает и/или удаляет символы со стандартного ввода.</td></tr>
+<tr><td><tt>traceroute</tt></td><td> </td><td>Печатает маршрут пакетов , принятых через сеть.</td></tr>
+<tr><td><tt>translate</tt></td><td> </td><td>Преобразует формат файла, используя DataTranslators.</td></tr>
+<tr><td><tt>trash</tt></td><td> </td><td>Отправляет файлы в корзину или восстанавливает их.</td></tr>
+<tr><td><tt>true</tt></td><td> </td><td>Ничего не делает, обозначает "удачу" и возвращает величину "0".</td></tr>
+<tr><td><tt>truncate</tt></td><td> </td><td>Сжимает или расширяет размер файла.</td></tr>
+<tr><td><tt>tsort</tt></td><td> </td><td>Производит топологическую сортировку.</td></tr>
+<tr><td><tt>tty</tt></td><td> </td><td>Печатает имя файла терминала, подключенного к стандартному вводу.</td></tr>
+<tr><td><tt>uname</tt></td><td> </td><td>Выводит информацио о системе.</td></tr>
+<tr><td><tt>unchop</tt></td><td> </td><td>Воссоздает файлы, разделенные ранее с помощью <tt>chop</tt>. </td></tr>
+<tr><td><tt>unexpand</tt></td><td> </td><td>Преобразует пробелы в табуляцию.</td></tr>
+<tr><td><tt>uniq</tt></td><td> </td><td>Фильтрует соседние совпадающие строки из ввода, записывает в вывод.</td></tr>
+<tr><td><tt>unlink</tt></td><td> </td><td>Вызывает функцию unlink для удаления указанного файла.</td></tr>
+<tr><td><tt>unmount</tt></td><td> </td><td>Отключает том.</td></tr>
+<tr><td><tt>unrar</tt></td><td> </td><td>Распаковывает архив rar.</td></tr>
+<tr><td><tt>unshar</tt></td><td> </td><td>Распаковывает архив shar.</td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td>См. <tt>trash</tt>. </td></tr>
+<tr><td><tt>unzip</tt></td><td> </td><td>Распаковывает архив zip.</td></tr>
+<tr><td><tt>unzipsfx</tt></td><td> </td><td>Используется для преобразования существующего zip-архива в самораспаковывающийся архив.</td></tr>
+<tr><td><tt>updatedb</tt></td><td> </td><td>Обновляет базу данных локализации.</td></tr>
+<tr><td><tt>uptime</tt></td><td> </td><td>Выводит дату и время, а так же время, прошедшее с момента запуска системы.</td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>Обертывает URL и MIME типы для командной строки или других приложение, не поддерживающих их напрямую.</td></tr>
 <tr><td><tt>useradd</tt></td><td> </td><td>Создаёт нового пользователя. </td></tr>
-<tr><td><tt>uudecode</tt></td><td> </td><td>Decodes a uuencoded file.</td></tr>
-<tr><td><tt>uuencode</tt></td><td> </td><td>Uuencodes a file so it can be mailed to a remote system. </td></tr>
-<tr><td><tt>vdir</tt></td><td> </td><td>Lists information about files. </td></tr>
-<tr><td><tt>version</tt></td><td> </td><td>Returns the version of a file. </td></tr>
-<tr><td><tt>vmstat</tt></td><td> </td><td>Prints information about the virtual memory system.</td></tr>
-<tr><td><tt>waitfor</tt></td><td> </td><td>Waits until a certain thread appears. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>watch</tt></td><td> </td><td>Executes a program periodically. </td></tr>
-<tr><td><tt>wc</tt></td><td> </td><td>Prints the number of paragraphs, words and characters (bytes) of a file. </td></tr>
-<tr><td><tt>wget</tt></td><td> </td><td>Tool for downloading via HTTP, HTTPS or FTP</td></tr>
-<tr><td><tt>which</tt></td><td> </td><td>Locates a command. </td></tr>
-<tr><td><tt>whoami</tt></td><td> </td><td>Prints user name associated with the current effective user ID. </td></tr>
-<tr><td><tt>xargs</tt></td><td> </td><td>Builds and executes command lines from standard input. </td></tr>
-<tr><td><tt>xres</tt></td><td> </td><td>Lists and manipulates resources. </td></tr>
-<tr><td><tt>yes</tt></td><td> </td><td>Prints out a string repeatedly until killed. </td></tr>
+<tr><td><tt>uudecode</tt></td><td> </td><td>Раскодирует файл, закодированный uuencode.</td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>Кодирует файл в uuencode для отправки по электронной почте.</td></tr>
+<tr><td><tt>vdir</tt></td><td> </td><td>Выводит информацию о файлах.</td></tr>
+<tr><td><tt>version</tt></td><td> </td><td>Возвращает версию файла.</td></tr>
+<tr><td><tt>vmstat</tt></td><td> </td><td>Выводит информацию о виртуальной файловой системе.</td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>Ждет пояления некотого процесса (нити). <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>watch</tt></td><td> </td><td>Периодически выполяет программу.</td></tr>
+<tr><td><tt>wc</tt></td><td> </td><td>Выводит количество абзацев, слов и символов (байт) в файле.</td></tr>
+<tr><td><tt>wget</tt></td><td> </td><td>Инструмент для скачивания файлов через HTTP, HTTPS или FTP</td></tr>
+<tr><td><tt>which</tt></td><td> </td><td>Находит команду.</td></tr>
+<tr><td><tt>whoami</tt></td><td> </td><td>Выводит имя пользователя, связанного с текущим действующим ID пользователя.</td></tr>
+<tr><td><tt>xargs</tt></td><td> </td><td>Собирает и выполняет командные строки со стандартного ввода.</td></tr>
+<tr><td><tt>xres</tt></td><td> </td><td>Перечисляет и управляет ресурсами.</td></tr>
+<tr><td><tt>yes</tt></td><td> </td><td>Многократно выводит строку, пока не будет принудительно завершена.</td></tr>
 <tr><td><tt>zcat</tt></td><td> </td><td>Тоже самое что и <tt>gzip</tt>.</td></tr>
 <tr><td><tt>zcmp</tt></td><td> </td><td>См. <tt>zdiff</tt>. </td></tr>
-<tr><td><tt>zdiff</tt></td><td> </td><td>Compares compressed files. </td></tr>
-<tr><td><tt>zforce</tt></td><td> </td><td>Forces a '.gz' extension on gzip files. </td></tr>
-<tr><td><tt>zgrep</tt></td><td> </td><td>Scan through possibly compressed files for a regular expression. </td></tr>
-<tr><td><tt>zip</tt></td><td> </td><td>Adds or replaces items in a zip archive.</td></tr>
-<tr><td><tt>zipcloak</tt></td><td> </td><td>Encrypts all unencrypted items in a zip archive. </td></tr>
-<tr><td><tt>zipgrep</tt></td><td> </td><td>Scans the given zip items for a string or pattern. </td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>Сравнивает сжатые файлы.</td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>Форсирует '.gz' расширение для файлов gzip.</td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>Поиск в сжатых файлах с использованием регулярных выражений.</td></tr>
+<tr><td><tt>zip</tt></td><td> </td><td>Добавляет или заменяет элементы в zip-архиве.</td></tr>
+<tr><td><tt>zipcloak</tt></td><td> </td><td>Шифрует все незашифрованные элементы в zip-архиве. </td></tr>
+<tr><td><tt>zipgrep</tt></td><td> </td><td>Ищет в zip-файлах строку или шаблон.</td></tr>
 <tr><td><tt>zipinfo</tt></td><td> </td><td>См. <tt>unzip</tt>.</td></tr>
-<tr><td><tt>zipnote</tt></td><td> </td><td>Prints the comments in a zip archive.</td></tr>
-<tr><td><tt>zipsplit</tt></td><td> </td><td>Splits a zip archive into smaller pieces. </td></tr>
-<tr><td><tt>zmore</tt></td><td> </td><td>Like <tt>more</tt> but operates on the uncompressed contents of any compressed file.</td></tr>
-<tr><td><tt>znew</tt></td><td> </td><td>Recompresses .Z files into .gz (gzip) archives.</td></tr>
+<tr><td><tt>zipnote</tt></td><td> </td><td>Выводит комментарий к zip-файлу.</td></tr>
+<tr><td><tt>zipsplit</tt></td><td> </td><td>Разделяет zip-архив на несколько мелких кусков.</td></tr>
+<tr><td><tt>zmore</tt></td><td> </td><td>Как и  <tt>more</tt> только оперирует несжатым содержимым в любом сжатом файле.</td></tr>
+<tr><td><tt>znew</tt></td><td> </td><td>Перепаковывает файлы .Z в формат архивов .gz (gzip).</td></tr>
 </table>
 </div>
 </div>

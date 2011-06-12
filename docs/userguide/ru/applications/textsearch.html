@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rodastahm Islamov
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>TextSearch</title>
+	<title>Текстовый Поиск (TextSearch)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -43,7 +44,7 @@
 <span>
  «  <a href="terminal.html">Терминал (Terminal)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="tv.html">TV</a>  »
+::  <a href="tv.html">Телевидение (TV)</a>  »
 </span></div>
 </div>
 
@@ -51,38 +52,38 @@
 <div>
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
+<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Текстовый Поиск (TextSearch)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><i>Отсутствует в меню Deskbar, обычно запускается при помощи дополнения для Tracker</i></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>Текстовый Поиск позволяет найти строки в текстовых файлах. Обычно его вызывают из контекстного меню <a href="../tracker-add-ons.html">дополнения</a> в Tracker, выбрав файл или папку.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Введите искомую строку в поле и нажмите клавишу <span class="key">ENTER</span> либо кнопку <span class="button">Искать</span> для того чтобы начать поиск. Если включена опция <span class="menu">Показывать строки</span>, то в области результатов поиск будут автоматически раскрываться списки со строками, в которых найдена искомая строка.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Рассмотрим некоторые пункт меню:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>Меню Файл</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
+<tr><td colspan="5"><h3>Файл</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">Новое окно</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Открыть новое окно, в котором вы можете произвести новый поиск по тем же файлам или папка.
 </td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td><span class="menu">Выбрать цель...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Выбрать другие файлы или папку для поиска.</td></tr>
+<tr><td colspan="5"><h3>Действия</h3></td></tr>
+<tr><td><span class="menu">Искать в выделенных</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Удалить из списка все файлы, которые не выделены.</td></tr>
+<tr><td><span class="menu">Открыть выделенные файлы</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Открыть выделенные файлы при помощи предпочтительных для них приложений. Если это текстовый редактор (например, Pe), то файл откроется на той строчке, в которой найдена искомая строка.</td></tr>
+<tr><td><span class="menu">Открыть файлы в Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Открыть папки, в которых расположены выделенные файлы.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Скопировать текст в буфер</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Скопировать выделенный текст в буфер обмена.</td></tr>
+<tr><td colspan="5"><h3>Настройки</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Не искать в папках, начинающихся с точки</span></td><td> </td><td>Это очень удобно когда вы работаете в unix окружении, где зачастую административные файлы скрыты внутри "<tt>.папок/</tt>". Например, системы контроля версий такие как SVN и CVS используют папки начинающиеся с точек.</td></tr>
+<tr><td colspan="3"><span class="menu">Экранировать текст поиска</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Только текстовые файлы</span></td><td> </td><td>Текстовый Поиск по умолчанию ищет строки только в текстовых файла. Однако, если вы отключите эту опцию, то поиск будет выполняться по всем типам файлов.</td></tr>
+<tr><td colspan="5"><h3>История</h3></td></tr>
+<tr><td colspan="4"></td><td>Содержит список строк, по которым производился поиск.</td></tr>
+<tr><td colspan="5"><h3>Кодировка</h3></td></tr>
+<tr><td colspan="4"></td><td>Можно выбрать другие кодировки, если потребуется.</td></tr>
 </table>
 </div>
 </div>
@@ -91,7 +92,7 @@
 <div class="inner"><span>
  «  <a href="terminal.html">Терминал (Terminal)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="tv.html">TV</a>  »
+::  <a href="tv.html">Телевидение (TV)</a>  »
 </span></div>
 </div>
 

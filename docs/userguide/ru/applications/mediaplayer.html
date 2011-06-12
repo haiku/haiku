@@ -17,7 +17,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Медиа-проигрыватель (MediaPlayer)</title>
+	<title>Медиаплеер (MediaPlayer)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -44,7 +44,7 @@
 <span>
  «  <a href="mail.html">Mail</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="midiplayer.html">MidiPlayer</a>  »
+::  <a href="midiplayer.html">MIDI плеер (MidiPlayer)</a>  »
 </span></div>
 </div>
 
@@ -52,22 +52,23 @@
 <div>
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Медиа-проигрыватель (MediaPlayer)</h2>
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Медиаплеер (MediaPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
 <tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>MediaPlayer is the default player for all audio and video files. Thanks to it's <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
+<p>Медиаплеер - приложение для воспроизведения видео и аудио файлов. Спасибо команде <a href="http://www.ffmpeg.org/">ffmpeg</a>  благодаря им проигрыватель поддерживает большинство форматов . Графический интерфейс медиа- проигрывателя довольно прост:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
-<p>The slider of the progress bar allows you to quickly skim to a position, resting the mouse over it shows the current and remaining time of the clip. Clicking on the time display to the right of it, toggles between length, current and remaining time.<br />
-Below that you find the usual controls to skip to the previous track, play/pause, stop and jump to the next track. Then comes a volume control (clicking the speaker symbol toggles muting) and a VU meter.</p>
+<p>Шкала прогресса позволяет быстро перейти к определённому моменту. Если удерживать некоторе время курсор мыши над этой шкалой, то появится подсказка отображающая сколько времени прошло с начала воспроизведения и сколько осталось до конца. Справа от шкалы находится время оставшееся до 
+конца воспроизведения, однако сделать так чтоб вместо него отображалось время прошедшее с начала проигрывания, или длину клипа. Для этого просто щёлкните по этому месту.<br />
+Нижен вы найдёте привычные элементы управления - предыдущий трек, проиграть/приостановить, остановить, следующий трек. Далее располагается управление громкостью (щёлкните левой кнопкой мыши по значку с динамиком для того чтобы отключить звук) и измеритель уровня громкости (VU meter).</p>
 
 <h2>Воспроизведение аудио и видео</h2>
-<p>Since there aren't any specific features for for audio playback, we'll go straight to video or general features.</p>
+<p>Поскольку нет каких-либо особенностей, которые следовало бы описать, при воспроизведении аудио-файлов. То перейдём к описанию основных особенностей при воспроизведении видео-файлов.</p>
 <img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
-<p>Available to all media is the <span class="menu">File info...</span> (<span class="key">ALT</span> <span class="key">I</span>). It shows information about the currently loaded file, like playing time or details of the audio/video track and its codec.</p>
+<p>Для всех медиа-файлов доступен пункт меню <span class="menu">Информация о файле…</span> (также можно вызвать использовав сочетание клавиш <span class="key">ALT</span> <span class="key">I</span>). В вызываемом этим пунктом меню окне отображается информация о продолжительности и кодеках.</p>
 <p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
 Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
 <p>MediaPlayer supports subtitles in <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> format. To have them show up under <span class="menu">Subtitles</span>, their filenames have to be identical to their video file, with a suffixed language name and ".srt" instead of the video's extension. For example:</p>
@@ -85,7 +86,7 @@ MyMovie.Français.srt</pre>
 <p>Of course, you can <span class="menu">Save</span> a playlist and later <span class="menu">Open</span> it again, or start it with simply double-clicking the playlist file.</p>
 
 <h2>Настройки</h2>
-<p>There are several settings to fine-tune MediaPlayer's behavior:</p>
+<p>Рассмотрим параметры для настройки МедиаПлеера:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
 <p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining. Start playback automatically, close windows when finished or play clips in a loop.</p>
 <p>Next are different <span class="menu">View options</span>.<br />
@@ -96,7 +97,7 @@ Then there are settings for <span class="menu">Subtitle size</span> and <span cl
 <p>The last setting determines the volume of clips whose windows are not currently active. You can have them all blaring at <span class="menu">Full volume</span>, at less confusing <span class="menu">Low volume</span> or quietly <span class="menu">Muted</span>.</p>
 
 <h2>Горячие клавиши</h2>
-<p>MediaPlayer offers convenient key combinations to control playback without using the mouse.</p>
+<p>Медиаплеер предоставляет удобное управление при помощи клавиатуры во время воспроизведения.</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>Перейти к предыдущему файлу</td></tr>
 <tr><td><span class="key">X</span></td><td></td><td>Проиграть</td></tr>
@@ -104,20 +105,20 @@ Then there are settings for <span class="menu">Subtitle size</span> and <span cl
 <tr><td><span class="key">V</span></td><td></td><td>Остановить</td></tr>
 <tr><td><span class="key">B</span></td><td></td><td>Перейти к следующему файлу</td></tr>
 </table>
-<p>These keys are assigned to the functions of the control buttons. They are always the bottom left letter keys on the keyboard, i.e. they are used independently of your current keymapping. The above keys correspond to a standard US-american keymap.</p>
+<p>Эти клавиши соответствуют кнопкам управления. Они всегда находятся слева в нижней части клавиатуры, т.е. не зависят от вашей раскладки.</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Seek forwards</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>Jump forwards 10 seconds</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Jump forwards 30 seconds</td></tr>
-<tr><td align="right"><span class="key">←</span></td><td></td><td>Seek backwards</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>Jump backwards 10 seconds</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Jump backwards 30 seconds</td></tr>
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Перемотать немного вперёд</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>Перемотать вперёд на 10 секунд</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Перемотать вперёд на 30 секунд</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>Перемотать немного назад </td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>Перемотать назад на 10 секунд</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Перемотать назад на 30 секунд</td></tr>
 
 <tr><td align="right"><span class="key">↑</span></td><td></td><td>Повысить громкость</td></tr>
 <tr><td align="right"><span class="key">↓</span></td><td></td><td>Понизить громкость</td></tr>
 
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Skip to previous Track</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Skip to next Track</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Перейти к предыдущему файлу</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Перейти к следующему файлу</td></tr>
 
 <tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>Проиграть/Приостановить</td></tr>
 <tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Включить\выключить полноэкранный режим (также можно влючить\выключить при помощи двойного левого щелчка по видео области)</td></tr>
@@ -130,7 +131,7 @@ Then there are settings for <span class="menu">Subtitle size</span> and <span cl
 <div class="inner"><span>
  «  <a href="mail.html">Mail</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="midiplayer.html">MidiPlayer</a>  »
+::  <a href="midiplayer.html">MIDI плеер (MidiPlayer)</a>  »
 </span></div>
 </div>
 
