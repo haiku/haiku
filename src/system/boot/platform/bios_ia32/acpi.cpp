@@ -37,27 +37,55 @@ static int32 sNumEntries = -1;
 
 
 static status_t
+acpi_validate_rsdt(acpi_descriptor_header* rsdt)
+{
+	const char* data = (const char*)rsdt;
+	unsigned char checksum = 0;
+	for (uint32 i = 0; i < rsdt->length; i++)
+		checksum += data[i];
+
+	return checksum == 0 ? B_OK : B_BAD_DATA;
+}
+
+
+static status_t
 acpi_check_rsdt(acpi_rsdp* rsdp)
 {
-	TRACE(("acpi: found rsdp at %p oem id: %.6s\n, rev %d",
+	TRACE(("acpi: found rsdp at %p oem id: %.6s, rev %d\n",
 		rsdp, rsdp->oem_id, rsdp->revision));
 	TRACE(("acpi: rsdp points to rsdt at 0x%lx\n", rsdp->rsdt_address));
 
 	// map and validate the root system description table
 	acpi_descriptor_header* rsdt
 		= (acpi_descriptor_header*)mmu_map_physical_memory(
-		rsdp->rsdt_address, rsdp->rsdt_length,
+		rsdp->rsdt_address, sizeof(acpi_descriptor_header),
 		kDefaultPageFlags);
 	if (rsdt == NULL
 		|| strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
 		if (rsdt != NULL)
-			mmu_free(rsdt, rsdp->rsdt_length);
+			mmu_free(rsdt, sizeof(acpi_descriptor_header));
 		TRACE(("acpi: invalid root system description table\n"));
 		return B_ERROR;
 	}
 
-	sAcpiRsdt = rsdt;
-	
+	// Map the whole table, not just the header
+	uint32 length = rsdt->length;
+	TRACE(("acpi: rsdt length: %lu\n", length));
+	mmu_free(rsdt, sizeof(acpi_descriptor_header));
+
+	sAcpiRsdt = (acpi_descriptor_header*)mmu_map_physical_memory(rsdp->rsdt_address,
+		length, kDefaultPageFlags);
+
+	if (sAcpiRsdt != NULL) {
+		if (acpi_validate_rsdt(sAcpiRsdt) != B_OK) {
+			TRACE(("acpi: rsdt failed validation\n"));
+			mmu_free(sAcpiRsdt, length);
+			sAcpiRsdt = NULL;
+			return B_ERROR;
+		}
+	} else
+		return B_ERROR;
+
 	return B_OK;
 }
 
