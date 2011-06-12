@@ -166,6 +166,8 @@ status_t _user_set_memory_protection(void* address, size_t size,
 			uint32 protection);
 status_t _user_sync_memory(void *address, size_t size, uint32 flags);
 status_t _user_memory_advice(void* address, size_t size, uint32 advice);
+status_t _user_get_memory_properties(team_id teamID, const void *address,
+			uint32 *_protected, uint32 *_lock);
 
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);
