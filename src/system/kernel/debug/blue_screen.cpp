@@ -659,6 +659,13 @@ blue_screen_clear_screen(void)
 }
 
 
+int
+blue_screen_try_getchar(void)
+{
+	return arch_debug_blue_screen_try_getchar();
+}
+
+
 char
 blue_screen_getchar(void)
 {

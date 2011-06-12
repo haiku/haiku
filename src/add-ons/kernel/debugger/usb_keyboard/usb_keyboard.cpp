@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
+ * Copyright 2009-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -176,6 +176,9 @@ enter_debugger(void)
 static void
 exit_debugger(void)
 {
+	// make sure a possibly pending transfer is canceled
+	evaluate_debug_command("uhci_process_transfer cancel");
+
 	sUseUSBKeyboard = false;
 }
 
@@ -195,11 +198,12 @@ debugger_getchar(void)
 	if (!sUseUSBKeyboard)
 		return -1;
 
-	while (sBufferedCharCount == 0) {
+	if (sBufferedCharCount == 0) {
 		set_debug_variable("_usbPipe", (uint64)sUSBPipe);
 		set_debug_variable("_usbTransferData", (uint64)sUSBTransferData);
 		set_debug_variable("_usbTransferLength", (uint64)sUSBTransferLength);
-		evaluate_debug_command("uhci_process_transfer");
+		if (evaluate_debug_command("uhci_process_transfer") != 0)
+			return -1;
 
 		bool phantomState = true;
 		for (size_t i = 2; i < sUSBTransferLength; i++) {
@@ -210,7 +214,7 @@ debugger_getchar(void)
 		}
 
 		if (phantomState)
-			continue;
+			return -1;
 
 		uint8 modifiers = 0;
 		for (uint32 i = 0; i < 8; i++) {
@@ -272,6 +276,9 @@ debugger_getchar(void)
 			sLastTransferData[i] = sUSBTransferData[i];
 	}
 
+	if (sBufferedCharCount == 0)
+		return -1;
+
 	int result = sBufferedChars[sBufferReadIndex++];
 	sBufferReadIndex %= sBufferSize;
 	sBufferedCharCount--;
@@ -302,7 +309,7 @@ static struct debugger_module_info sModuleInfo = {
 	&debugger_getchar
 };
 
-module_info *modules[] = { 
+module_info *modules[] = {
 	(module_info *)&sModuleInfo,
 	NULL
 };

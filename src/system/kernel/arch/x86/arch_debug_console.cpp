@@ -166,8 +166,8 @@ arch_debug_install_interrupt_handlers(void)
 }
 
 
-char
-arch_debug_blue_screen_getchar(void)
+int
+arch_debug_blue_screen_try_getchar(void)
 {
 	/* polling the keyboard, similar to code in keyboard
 	 * driver, but without using an interrupt
@@ -194,105 +194,126 @@ arch_debug_blue_screen_getchar(void)
 		return key;
 	}
 
-	while (true) {
-		uint8 status = in8(PS2_PORT_CTRL);
+	uint8 status = in8(PS2_PORT_CTRL);
 
-		if ((status & PS2_STATUS_OUTPUT_BUFFER_FULL) == 0) {
-			// no data in keyboard buffer
-			spin(200);
-			continue;
+	if ((status & PS2_STATUS_OUTPUT_BUFFER_FULL) == 0) {
+		// no data in keyboard buffer
+		return -1;
+	}
+
+	key = in8(PS2_PORT_DATA);
+
+	if (status & PS2_STATUS_AUX_DATA) {
+		// we read mouse data, ignore it
+		return -1;
+	}
+
+	if (key & 0x80) {
+		// key up
+		switch (key & ~0x80) {
+			case LEFT_SHIFT:
+			case RIGHT_SHIFT:
+				shiftPressed = false;
+				return -1;
+			case LEFT_CONTROL:
+				controlPressed = false;
+				return -1;
+			case LEFT_ALT:
+				altPressed = false;
+				return -1;
 		}
+	} else {
+		// key down
+		switch (key) {
+			case LEFT_SHIFT:
+			case RIGHT_SHIFT:
+				shiftPressed = true;
+				return -1;
 
-		spin(200);
-		key = in8(PS2_PORT_DATA);
+			case LEFT_CONTROL:
+				controlPressed = true;
+				return -1;
 
-		if (status & PS2_STATUS_AUX_DATA) {
-			// we read mouse data, ignore it
-			continue;
-		}
+			case LEFT_ALT:
+				altPressed = true;
+				return -1;
 
-		if (key & 0x80) {
-			// key up
-			switch (key & ~0x80) {
-				case LEFT_SHIFT:
-				case RIGHT_SHIFT:
-					shiftPressed = false;
-					break;
-				case LEFT_CONTROL:
-					controlPressed = false;
-					break;
-				case LEFT_ALT:
-					altPressed = false;
-					break;
-			}
-		} else {
-			// key down
-			switch (key) {
-				case LEFT_SHIFT:
-				case RIGHT_SHIFT:
-					shiftPressed = true;
-					break;
-
-				case LEFT_CONTROL:
-					controlPressed = true;
-					break;
-
-				case LEFT_ALT:
-					altPressed = true;
-					break;
-
-				// start escape sequence for cursor movement
-				case CURSOR_UP:
-					special = 0x80 | 'A';
-					return '\x1b';
-				case CURSOR_DOWN:
-					special = 0x80 | 'B';
-					return '\x1b';
-				case CURSOR_RIGHT:
-					special = 0x80 | 'C';
-					return '\x1b';
-				case CURSOR_LEFT:
-					special = 0x80 | 'D';
-					return '\x1b';
-				case CURSOR_HOME:
-					special = 0x80 | 'H';
-					return '\x1b';
-				case CURSOR_END:
-					special = 0x80 | 'F';
-					return '\x1b';
-				case PAGE_UP:
-					special = 0x80 | '5';
-					special2 = '~';
-					return '\x1b';
-				case PAGE_DOWN:
-					special = 0x80 | '6';
-					special2 = '~';
-					return '\x1b';
+			// start escape sequence for cursor movement
+			case CURSOR_UP:
+				special = 0x80 | 'A';
+				return '\x1b';
+			case CURSOR_DOWN:
+				special = 0x80 | 'B';
+				return '\x1b';
+			case CURSOR_RIGHT:
+				special = 0x80 | 'C';
+				return '\x1b';
+			case CURSOR_LEFT:
+				special = 0x80 | 'D';
+				return '\x1b';
+			case CURSOR_HOME:
+				special = 0x80 | 'H';
+				return '\x1b';
+			case CURSOR_END:
+				special = 0x80 | 'F';
+				return '\x1b';
+			case PAGE_UP:
+				special = 0x80 | '5';
+				special2 = '~';
+				return '\x1b';
+			case PAGE_DOWN:
+				special = 0x80 | '6';
+				special2 = '~';
+				return '\x1b';
 
 
-				case DELETE:
-					if (controlPressed && altPressed)
-						arch_cpu_shutdown(true);
+			case DELETE:
+				if (controlPressed && altPressed)
+					arch_cpu_shutdown(true);
 
-					special = 0x80 | '3';
-					special2 = '~';
-					return '\x1b';
+				special = 0x80 | '3';
+				special2 = '~';
+				return '\x1b';
 
-				default:
-					if (controlPressed) {
-						char c = kShiftedKeymap[key];
-						if (c >= 'A' && c <= 'Z')
-							return 0x1f & c;
-					}
+			default:
+				if (controlPressed) {
+					char c = kShiftedKeymap[key];
+					if (c >= 'A' && c <= 'Z')
+						return 0x1f & c;
+				}
 
-					if (altPressed)
-						return kAltedKeymap[key];
+				if (altPressed)
+					return kAltedKeymap[key];
 
-					return shiftPressed
-						? kShiftedKeymap[key] : kUnshiftedKeymap[key];
-			}
+				return shiftPressed
+					? kShiftedKeymap[key] : kUnshiftedKeymap[key];
 		}
 	}
+
+	return -1;
+}
+
+
+char
+arch_debug_blue_screen_getchar(void)
+{
+	while (true) {
+		int c = arch_debug_blue_screen_try_getchar();
+		if (c >= 0)
+			return (char)c;
+
+		PAUSE();
+	}
+}
+
+
+int
+arch_debug_serial_try_getchar(void)
+{
+	if ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
+		return -1;
+
+	return in8(sSerialBasePort + SERIAL_RECEIVE_BUFFER);
 }
 
 

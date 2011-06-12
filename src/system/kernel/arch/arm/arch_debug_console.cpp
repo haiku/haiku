@@ -31,9 +31,25 @@ arch_debug_install_interrupt_handlers(void)
 }
 
 
+int
+arch_debug_blue_screen_try_getchar(void)
+{
+	// TODO: Implement correctly!
+	return arch_debug_blue_screen_getchar();
+}
+
+
 char
 arch_debug_blue_screen_getchar(void)
 {
+	return arch_debug_serial_getchar();
+}
+
+
+int
+arch_debug_serial_try_getchar(void)
+{
+	// TODO: Implement correctly!
 	return arch_debug_serial_getchar();
 }
 

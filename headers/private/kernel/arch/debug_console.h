@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
@@ -18,7 +18,9 @@ struct kernel_args;
 extern "C" {
 #endif
 
+int arch_debug_blue_screen_try_getchar(void);
 char arch_debug_blue_screen_getchar(void);
+int arch_debug_serial_try_getchar(void);
 char arch_debug_serial_getchar(void);
 void arch_debug_serial_putchar(char c);
 void arch_debug_serial_puts(const char *s);

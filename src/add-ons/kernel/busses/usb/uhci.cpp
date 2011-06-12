@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku Inc. All rights reserved.
+ * Copyright 2004-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,6 +23,28 @@ static int32 sDebuggerCommandAdded = 0;
 
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
+
+
+class DebugTransfer : public Transfer {
+public:
+	DebugTransfer(Pipe *pipe)
+		:
+		Transfer(pipe)
+	{
+	}
+
+	uhci_td	*firstDescriptor;
+	uhci_qh	*transferQueue;
+};
+
+
+/*!	The function is an evil hack to allow <tt> <kdebug>usb_keyboard </tt> to
+	execute transfers.
+	When invoked the first time, a new transfer is started, each time the
+	function is called afterwards, it is checked whether the transfer is already
+	completed. If called with argv[1] == "cancel" the function cancels a
+	possibly pending transfer.
+*/
 static int
 debug_process_transfer(int argc, char **argv)
 {
@@ -42,9 +64,38 @@ debug_process_transfer(int argc, char **argv)
 	if (length == 0)
 		return 5;
 
-	Transfer transfer(pipe);
-	transfer.SetData(data, length);
-	return ((UHCI *)pipe->GetBusManager())->ProcessDebugTransfer(&transfer);
+	static uint8 transferBuffer[sizeof(DebugTransfer)]
+		__attribute__((aligned(16)));
+	static DebugTransfer* transfer;
+
+	UHCI *bus = (UHCI *)pipe->GetBusManager();
+
+	if (argc > 1 && strcmp(argv[1], "cancel") == 0) {
+		if (transfer != NULL) {
+			bus->CancelDebugTransfer(transfer);
+			transfer = NULL;
+		}
+		return 0;
+	}
+
+	if (transfer != NULL) {
+		bool stillPending;
+		status_t error = bus->CheckDebugTransfer(transfer, stillPending);
+		if (!stillPending)
+			transfer = NULL;
+
+		return error == B_OK ? 0 : 6;
+	}
+
+	transfer = new(transferBuffer) DebugTransfer(pipe);
+	transfer->SetData(data, length);
+
+	if (bus->StartDebugTransfer(transfer) != B_OK) {
+		transfer = NULL;
+		return 7;
+	}
+
+	return 0;
 }
 #endif
 
@@ -672,73 +723,102 @@ UHCI::SubmitTransfer(Transfer *transfer)
 
 
 status_t
-UHCI::ProcessDebugTransfer(Transfer *transfer)
+UHCI::StartDebugTransfer(DebugTransfer *transfer)
 {
-	uhci_td *firstDescriptor = NULL;
-	uhci_qh *transferQueue = NULL;
-	status_t result = CreateFilledTransfer(transfer, &firstDescriptor,
-		&transferQueue);
+	transfer->firstDescriptor = NULL;
+	transfer->transferQueue = NULL;
+	status_t result = CreateFilledTransfer(transfer, &transfer->firstDescriptor,
+		&transfer->transferQueue);
 	if (result < B_OK)
 		return result;
 
-	fQueues[UHCI_DEBUG_QUEUE]->AppendTransfer(transferQueue, false);
+	fQueues[UHCI_DEBUG_QUEUE]->AppendTransfer(transfer->transferQueue, false);
 
-	while (true) {
-		bool transferOK = false;
-		bool transferError = false;
-		uhci_td *descriptor = firstDescriptor;
+	return B_OK;
+}
 
-		while (descriptor) {
-			uint32 status = descriptor->status;
-			if (status & TD_STATUS_ACTIVE)
-				break;
 
-			if (status & TD_ERROR_MASK) {
-				transferError = true;
-				break;
-			}
+status_t
+UHCI::CheckDebugTransfer(DebugTransfer *transfer, bool &_stillPending)
+{
+	bool transferOK = false;
+	bool transferError = false;
+	uhci_td *descriptor = transfer->firstDescriptor;
 
-			if ((descriptor->link_phy & TD_TERMINATE)
-				|| uhci_td_actual_length(descriptor)
-					< uhci_td_maximum_length(descriptor)) {
-				transferOK = true;
-				break;
-			}
+	while (descriptor) {
+		uint32 status = descriptor->status;
+		if (status & TD_STATUS_ACTIVE)
+			break;
 
-			descriptor = (uhci_td *)descriptor->link_log;
+		if (status & TD_ERROR_MASK) {
+			transferError = true;
+			break;
 		}
 
-		if (!transferOK && !transferError) {
-			spin(200);
-			continue;
+		if ((descriptor->link_phy & TD_TERMINATE)
+			|| uhci_td_actual_length(descriptor)
+				< uhci_td_maximum_length(descriptor)) {
+			transferOK = true;
+			break;
 		}
 
-		if (transferOK) {
-			size_t actualLength = 0;
-			uint8 lastDataToggle = 0;
-			if (transfer->TransferPipe()->Direction() == Pipe::In) {
-				// data to read out
-				iovec *vector = transfer->Vector();
-				size_t vectorCount = transfer->VectorCount();
-
-				actualLength = ReadDescriptorChain(firstDescriptor,
-					vector, vectorCount, &lastDataToggle);
-			} else {
-				// read the actual length that was sent
-				actualLength = ReadActualLength(firstDescriptor,
-					&lastDataToggle);
-			}
-
-			transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
-		}
-
-		fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transferQueue, false);
-		FreeDescriptorChain(firstDescriptor);
-		FreeTransferQueue(transferQueue);
-		return transferOK ? B_OK : B_IO_ERROR;
+		descriptor = (uhci_td *)descriptor->link_log;
 	}
 
-	return B_ERROR;
+	if (!transferOK && !transferError) {
+		spin(200);
+		_stillPending = true;
+		return B_OK;
+	}
+
+	if (transferOK) {
+		size_t actualLength = 0;
+		uint8 lastDataToggle = 0;
+		if (transfer->TransferPipe()->Direction() == Pipe::In) {
+			// data to read out
+			iovec *vector = transfer->Vector();
+			size_t vectorCount = transfer->VectorCount();
+
+			actualLength = ReadDescriptorChain(transfer->firstDescriptor,
+				vector, vectorCount, &lastDataToggle);
+		} else {
+			// read the actual length that was sent
+			actualLength = ReadActualLength(transfer->firstDescriptor,
+				&lastDataToggle);
+		}
+
+		transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
+	}
+
+	fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transfer->transferQueue, false);
+	FreeDescriptorChain(transfer->firstDescriptor);
+	FreeTransferQueue(transfer->transferQueue);
+	_stillPending = false;
+	return transferOK ? B_OK : B_IO_ERROR;
+}
+
+
+void
+UHCI::CancelDebugTransfer(DebugTransfer *transfer)
+{
+	// clear the active bit so the descriptors are canceled
+	uhci_td *descriptor = transfer->firstDescriptor;
+	while (descriptor) {
+		descriptor->status &= ~TD_STATUS_ACTIVE;
+		descriptor = (uhci_td *)descriptor->link_log;
+	}
+
+	transfer->Finished(B_CANCELED, 0);
+
+	// dequeue and free resources
+	fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transfer->transferQueue, false);
+	FreeDescriptorChain(transfer->firstDescriptor);
+	FreeTransferQueue(transfer->transferQueue);
+	// TODO: [bonefish] The Free*() calls cause "PMA: provided address resulted
+	// in invalid index" to be printed, so apparently something is not right.
+	// Though I have not clue what. This is the same cleanup code as in
+	// CheckDebugTransfer() that should undo the CreateFilledTransfer() from
+	// StartDebugTransfer().
 }
 
 
@@ -1832,7 +1912,7 @@ status_t
 UHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
-	set_dprintf_enabled(true); 
+	set_dprintf_enabled(true);
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	load_driver_symbols("uhci");
 #endif

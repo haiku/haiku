@@ -31,11 +31,27 @@ arch_debug_install_interrupt_handlers(void)
 }
 
 
+int
+arch_debug_blue_screen_try_getchar(void)
+{
+#warning IMPLEMENT arch_debug_blue_screen_try_getchar
+	return -1;
+}
+
+
 char
 arch_debug_blue_screen_getchar(void)
 {
 #warning IMPLEMENT arch_debug_blue_screen_getchar
 	return 0;
+}
+
+
+int
+arch_debug_serial_try_getchar(void)
+{
+#warning IMPLEMENT arch_debug_serial_try_getchar
+	return -1;
 }
 
 

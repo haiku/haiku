@@ -90,7 +90,6 @@ static bool sSyslogOutputEnabled = true;
 static bool sBlueScreenEnabled = false;
 	// must always be false on startup
 static bool sDebugScreenEnabled = false;
-static bool sSerialInputEnabled = false;
 static bool sBlueScreenOutput = true;
 static bool sEmergencyKeysEnabled = true;
 static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
@@ -474,7 +473,8 @@ read_line(char* buffer, int32 maxLength,
 				}
 				break;
 			}
-			case 8: // backspace
+			case 8:		// backspace (CTRL-H)
+			case 0x7f:	// backspace (xterm)
 				if (position > 0) {
 					kputs("\x1b[1D"); // move to the left one
 					position--;
@@ -681,22 +681,30 @@ read_line(char* buffer, int32 maxLength,
 char
 kgetc(void)
 {
-	if (sSerialInputEnabled)
-		return arch_debug_serial_getchar();
+	while (true) {
+		// check serial input
+		int c = arch_debug_serial_try_getchar();
+		if (c >= 0)
+			return (char)c;
 
-	// give the kernel debugger modules a chance first
-	for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
-		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_getchar) {
-			int getChar = sDebuggerModules[i]->debugger_getchar();
-			if (getChar >= 0)
-				return (char)getChar;
+		// check blue screen input
+		if (sBlueScreenOutput) {
+			c = blue_screen_try_getchar();
+			if (c >= 0)
+				return (char)c;
 		}
+
+		// give the kernel debugger modules a chance
+		for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_getchar) {
+				int getChar = sDebuggerModules[i]->debugger_getchar();
+				if (getChar >= 0)
+					return (char)getChar;
+			}
+		}
+
+		PAUSE();
 	}
-
-	if (sBlueScreenOutput)
-		return blue_screen_getchar();
-
-	return arch_debug_serial_getchar();
 }
 
 
@@ -1137,16 +1145,6 @@ cmd_dump_syslog(int argc, char** argv)
 
 
 static int
-cmd_serial_input(int argc, char** argv)
-{
-	sSerialInputEnabled = !sSerialInputEnabled;
-	kprintf("Serial input is turned %s now.\n",
-		sSerialInputEnabled ? "on" : "off");
-	return 0;
-}
-
-
-static int
 cmd_switch_cpu(int argc, char** argv)
 {
 	if (argc > 2) {
@@ -1412,9 +1410,6 @@ syslog_init_post_vm(struct kernel_args* args)
 		"[ \"-n\" ] [ \"-k\" ]\n"
 		"Dumps the whole syslog buffer, or, if -k is specified, only "
 		"the part that hasn't been sent yet.\n", 0);
-
-	add_debugger_command("serial_input", &cmd_serial_input,
-		"Enable or disable serial input");
 
 	return B_OK;
 

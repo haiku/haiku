@@ -20,6 +20,7 @@ bool blue_screen_paging_enabled(void);
 void blue_screen_set_paging(bool enabled);
 
 void blue_screen_clear_screen(void);
+int blue_screen_try_getchar(void);
 char blue_screen_getchar(void);
 void blue_screen_putchar(char c);
 void blue_screen_puts(const char *text);
