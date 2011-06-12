@@ -578,17 +578,24 @@ mmu_init_for_kernel(void)
 
 		dprintf("phys memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_memory_range[i].start, gKernelArgs.physical_memory_range[i].size);
+			dprintf("    base %#018" B_PRIxPHYSADDR ", length %#018"
+				B_PRIxPHYSADDR "\n", gKernelArgs.physical_memory_range[i].start,
+				gKernelArgs.physical_memory_range[i].size);
 		}
 
 		dprintf("allocated phys memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_allocated_range[i].start, gKernelArgs.physical_allocated_range[i].size);
+			dprintf("    base %#018" B_PRIxPHYSADDR ", length %#018"
+				B_PRIxPHYSADDR "\n",
+				gKernelArgs.physical_allocated_range[i].start,
+				gKernelArgs.physical_allocated_range[i].size);
 		}
 
 		dprintf("allocated virt memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
+			dprintf("    base %#018" B_PRIxADDR ", length %#018" B_PRIxSIZE
+			"\n", gKernelArgs.virtual_allocated_range[i].start,
+			gKernelArgs.virtual_allocated_range[i].size);
 		}
 	}
 #endif

@@ -148,7 +148,7 @@ pager(const PagerTextSource& textSource)
 
 		// print the statistics line at the bottom
 		console_set_cursor(0, height - 1);
-		console_set_color(BLACK, WHITE);
+		console_set_color(BLACK, GRAY);
 		int32 bottomLine = std::min(topLine + height - 2, lineCount - 1);
 		printf("%" B_PRIuSIZE " - %" B_PRIuSIZE "  %" B_PRIuSIZE "%%",
 			topLine, bottomLine, (bottomLine + 1) * 100 / lineCount);
