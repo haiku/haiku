@@ -18,7 +18,7 @@ typedef struct acpi_rsdp {
 	char	oem_id[6];				/* not null terminated */
 	uint8	revision;				/* 0 = ACPI 1.0, 2 = ACPI 3.0 */
 	uint32	rsdt_address;			/* physical memory address of RSDT */
-	uint32	rsdt_length;			/* length in bytes including header */
+	uint32	xsdt_length;			/* length in bytes including header */
 	uint64	xsdt_address;			/* 64bit physical memory address of XSDT */
 	uint8	extended_checksum;		/* including entire table */
 	uint8	reserved[3];
@@ -85,7 +85,7 @@ typedef struct acpi_int_source_override {
 	uint8	source;					/* Bus-relative interrupt source (IRQ) */
 	uint32	interrupt;				/* global system interrupt this
 									   bus-relative source int will signal */
-	uint16	flags;					/* MPS INTI flags. See Table 5-25 in 
+	uint16	flags;					/* MPS INTI flags. See Table 5-25 in
 									   ACPI Spec 4.0a or similar */
 } _PACKED acpi_int_source_override;
 
