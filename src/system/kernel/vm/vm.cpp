@@ -6303,6 +6303,41 @@ _user_memory_advice(void* address, size_t size, uint32 advice)
 }
 
 
+status_t
+_user_get_memory_properties(team_id teamID, const void* address,
+	uint32* _protected, uint32* _lock)
+{
+	if (!IS_USER_ADDRESS(_protected) || !IS_USER_ADDRESS(_lock))
+		return B_BAD_ADDRESS;
+
+	AddressSpaceReadLocker locker;
+	status_t error = locker.SetTo(teamID);
+	if (error != B_OK)
+		return error;
+
+	VMArea* area = locker.AddressSpace()->LookupArea((addr_t)address);
+	if (area == NULL)
+		return B_NO_MEMORY;
+
+
+	uint32 protection = area->protection;
+	if (area->page_protections != NULL)
+		protection = get_area_page_protection(area, (addr_t)address);
+
+	uint32 wiring = area->wiring;
+
+	locker.Unlock();
+
+	error = user_memcpy(_protected, &protection, sizeof(protection));
+	if (error != B_OK)
+		return error;
+
+	error = user_memcpy(_lock, &wiring, sizeof(wiring));
+
+	return error;
+}
+
+
 // #pragma mark -- compatibility
 
 
