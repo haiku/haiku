@@ -16,6 +16,7 @@
 
 
 struct scheduler_ops* gScheduler;
+spinlock gSchedulerLock = B_SPINLOCK_INITIALIZER;
 SchedulerListenerList gSchedulerListeners;
 
 static void (*sRescheduleFunction)(void);
@@ -30,12 +31,15 @@ scheduler_reschedule_no_op(void)
 }
 
 
-// #pragma mark -
+// #pragma mark - SchedulerListener
 
 
 SchedulerListener::~SchedulerListener()
 {
 }
+
+
+// #pragma mark - kernel private
 
 
 /*!	Add the given scheduler listener. Thread lock must be held.
@@ -106,12 +110,19 @@ _user_estimate_max_scheduling_latency(thread_id id)
 {
 	syscall_64_bit_return_value();
 
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	// get the thread
+	Thread* thread;
+	if (id < 0) {
+		thread = thread_get_current_thread();
+		thread->AcquireReference();
+	} else {
+		thread = Thread::Get(id);
+		if (thread == NULL)
+			return 0;
+	}
+	BReference<Thread> threadReference(thread, true);
 
-	Thread* thread = id < 0
-		? thread_get_current_thread() : thread_get_thread_struct_locked(id);
-	if (thread == NULL)
-		return 0;
-
+	// ask the scheduler for the thread's latency
+	InterruptsSpinLocker locker(gSchedulerLock);
 	return gScheduler->estimate_max_scheduling_latency(thread);
 }

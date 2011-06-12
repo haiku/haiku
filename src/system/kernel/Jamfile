@@ -28,6 +28,7 @@ KernelMergeObject kernel_core.o :
 	commpage.cpp
 	condition_variable.cpp
 	cpu.cpp
+	DPC.cpp
 	elf.cpp
 	heap.cpp
 	image.cpp
@@ -50,7 +51,9 @@ KernelMergeObject kernel_core.o :
 	team.cpp
 	thread.cpp
 	timer.cpp
+	UserEvent.cpp
 	usergroup.cpp
+	UserTimer.cpp
 	wait_for_objects.cpp
 
 	# locks

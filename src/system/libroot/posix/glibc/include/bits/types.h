@@ -155,7 +155,7 @@ typedef __KEY_T_TYPE __key_t;	/* Type of an IPC key */
 typedef __CLOCKID_T_TYPE __clockid_t;
 
 /* Timer ID returned by `timer_create'.  */
-typedef __TIMER_T_TYPE __timer_t;
+//typedef __TIMER_T_TYPE __timer_t;
 
 /* Type to represent block size.  */
 typedef __BLKSIZE_T_TYPE __blksize_t;

@@ -12,6 +12,7 @@
 
 #include <errno.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -176,7 +177,8 @@ connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 		addressLength = sizeof(struct sockaddr_in);
 	}
 
-	RETURN_AND_SET_ERRNO(_kern_connect(socket, address, addressLength));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(
+		_kern_connect(socket, address, addressLength));
 }
 
 
@@ -205,6 +207,9 @@ accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 	}
 
 	int acceptSocket = _kern_accept(socket, address, &addressLength);
+
+	pthread_testcancel();
+
 	if (acceptSocket < 0) {
 		errno = acceptSocket;
 		return -1;
@@ -224,7 +229,7 @@ accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 extern "C" ssize_t
 recv(int socket, void *data, size_t length, int flags)
 {
-	RETURN_AND_SET_ERRNO(_kern_recv(socket, data, length, flags));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_recv(socket, data, length, flags));
 }
 
 
@@ -248,6 +253,9 @@ recvfrom(int socket, void *data, size_t length, int flags,
 
 	ssize_t bytesReceived = _kern_recvfrom(socket, data, length, flags,
 		address, &addressLength);
+
+	pthread_testcancel();
+
 	if (bytesReceived < 0) {
 		errno = bytesReceived;
 		return -1;
@@ -267,14 +275,14 @@ recvfrom(int socket, void *data, size_t length, int flags,
 extern "C" ssize_t
 recvmsg(int socket, struct msghdr *message, int flags)
 {
-	RETURN_AND_SET_ERRNO(_kern_recvmsg(socket, message, flags));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_recvmsg(socket, message, flags));
 }
 
 
 extern "C" ssize_t
 send(int socket, const void *data, size_t length, int flags)
 {
-	RETURN_AND_SET_ERRNO(_kern_send(socket, data, length, flags));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_send(socket, data, length, flags));
 }
 
 
@@ -290,15 +298,15 @@ sendto(int socket, const void *data, size_t length, int flags,
 		addressLength = sizeof(struct sockaddr_in);
 	}
 
-	RETURN_AND_SET_ERRNO(_kern_sendto(socket, data, length, flags, address,
-		addressLength));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(
+		_kern_sendto(socket, data, length, flags, address, addressLength));
 }
 
 
 extern "C" ssize_t
 sendmsg(int socket, const struct msghdr *message, int flags)
 {
-	RETURN_AND_SET_ERRNO(_kern_sendmsg(socket, message, flags));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_sendmsg(socket, message, flags));
 }
 
 

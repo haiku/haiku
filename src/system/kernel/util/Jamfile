@@ -5,6 +5,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 KernelMergeObject kernel_util.o :
 	AVLTreeBase.cpp
 	kernel_cpp.cpp
+	KernelReferenceable.cpp
 	khash.cpp
 	list.cpp
 	queue.cpp

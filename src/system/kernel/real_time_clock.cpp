@@ -35,6 +35,14 @@ static bigtime_t sTimezoneOffset = 0;
 static char sTimezoneName[B_FILE_NAME_LENGTH] = "GMT";
 
 
+static void
+real_time_clock_changed()
+{
+	timer_real_time_clock_changed();
+	user_timer_real_time_clock_changed();
+}
+
+
 /*! Write the system time to CMOS. */
 static void
 rtc_system_to_hw(void)
@@ -106,11 +114,18 @@ rtc_init(kernel_args *args)
 
 
 void
+set_real_time_clock_usecs(bigtime_t currentTime)
+{
+	arch_rtc_set_system_time_offset(sRealTimeData, currentTime - system_time());
+	rtc_system_to_hw();
+	real_time_clock_changed();
+}
+
+
+void
 set_real_time_clock(uint32 currentTime)
 {
-	arch_rtc_set_system_time_offset(sRealTimeData,
-		currentTime * 1000000LL - system_time());
-	rtc_system_to_hw();
+	set_real_time_clock_usecs((bigtime_t)currentTime * 1000000);
 }
 
 
@@ -207,12 +222,12 @@ _user_system_time(void)
 
 
 status_t
-_user_set_real_time_clock(uint32 time)
+_user_set_real_time_clock(bigtime_t time)
 {
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	set_real_time_clock(time);
+	set_real_time_clock_usecs(time);
 	return B_OK;
 }
 
@@ -242,6 +257,7 @@ _user_set_timezone(time_t timezoneOffset, const char *name, size_t nameLength)
 		arch_rtc_set_system_time_offset(sRealTimeData,
 			arch_rtc_get_system_time_offset(sRealTimeData) + sTimezoneOffset
 				- offset);
+		real_time_clock_changed();
 	}
 
 	sTimezoneOffset = offset;
@@ -286,6 +302,7 @@ _user_set_real_time_clock_is_gmt(bool isGMT)
 		arch_rtc_set_system_time_offset(sRealTimeData,
 			arch_rtc_get_system_time_offset(sRealTimeData)
 				+ (sIsGMT ? 1 : -1) * sTimezoneOffset);
+		real_time_clock_changed();
 	}
 
 	return B_OK;

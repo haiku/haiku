@@ -17,7 +17,7 @@ Assertion	Covered?
 14		NO** Skipping CPU-time tests for now
 15		YES
 16		YES
-17		YES
+17		NO - impossible to guess an invalid clock ID
 18		YES
 19		YES - FAILing on this implementation (possibly serious)
 20		YES

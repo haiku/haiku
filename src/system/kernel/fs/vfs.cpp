@@ -1764,62 +1764,18 @@ replace_vnode_if_disconnected(struct fs_mount* mount,
 	This is not a cheap function and should be used with care and rarely.
 	TODO: there is currently no means to stop a blocking read/write!
 */
-void
+static void
 disconnect_mount_or_vnode_fds(struct fs_mount* mount,
 	struct vnode* vnodeToDisconnect)
 {
 	// iterate over all teams and peek into their file descriptors
-	int32 nextTeamID = 0;
+	TeamListIterator teamIterator;
+	while (Team* team = teamIterator.Next()) {
+		BReference<Team> teamReference(team, true);
 
-	while (true) {
-		struct io_context* context = NULL;
-		bool contextLocked = false;
-		Team* team = NULL;
-		team_id lastTeamID;
-
-		cpu_status state = disable_interrupts();
-		SpinLocker teamsLock(gTeamSpinlock);
-
-		lastTeamID = peek_next_thread_id();
-		if (nextTeamID < lastTeamID) {
-			// get next valid team
-			while (nextTeamID < lastTeamID
-				&& !(team = team_get_team_struct_locked(nextTeamID))) {
-				nextTeamID++;
-			}
-
-			if (team) {
-				context = (io_context*)team->io_context;
-
-				// Some acrobatics to lock the context in a safe way
-				// (cf. _kern_get_next_fd_info() for details).
-				GRAB_THREAD_LOCK();
-				teamsLock.Unlock();
-				contextLocked = mutex_lock_threads_locked(&context->io_mutex)
-					== B_OK;
-				RELEASE_THREAD_LOCK();
-
-				nextTeamID++;
-			}
-		}
-
-		teamsLock.Unlock();
-		restore_interrupts(state);
-
-		if (context == NULL)
-			break;
-
-		// we now have a context - since we couldn't lock it while having
-		// safe access to the team structure, we now need to lock the mutex
-		// manually
-
-		if (!contextLocked) {
-			// team seems to be gone, go over to the next team
-			continue;
-		}
-
-		// the team cannot be deleted completely while we're owning its
-		// io_context mutex, so we can safely play with it now
+		// lock the I/O context
+		io_context* context = team->io_context;
+		MutexLocker contextLocker(context->io_mutex);
 
 		replace_vnode_if_disconnected(mount, vnodeToDisconnect, context->root,
 			sRoot, true);
@@ -1843,8 +1799,6 @@ disconnect_mount_or_vnode_fds(struct fs_mount* mount,
 				put_fd(descriptor);
 			}
 		}
-
-		mutex_unlock(&context->io_mutex);
 	}
 }
 
@@ -7828,38 +7782,15 @@ _kern_get_next_fd_info(team_id teamID, uint32* _cookie, fd_info* info,
 	if (infoSize != sizeof(fd_info))
 		return B_BAD_VALUE;
 
-	struct io_context* context = NULL;
-	Team* team = NULL;
-
-	cpu_status state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	bool contextLocked = false;
-	team = team_get_team_struct_locked(teamID);
-	if (team) {
-		// We cannot lock the IO context while holding the team lock, nor can
-		// we just drop the team lock, since it might be deleted in the
-		// meantime. team_remove_team() acquires the thread lock when removing
-		// the team from the team hash table, though. Hence we switch to the
-		// thread lock and use mutex_lock_threads_locked().
-		context = (io_context*)team->io_context;
-
-		GRAB_THREAD_LOCK();
-		RELEASE_TEAM_LOCK();
-		contextLocked = mutex_lock_threads_locked(&context->io_mutex) == B_OK;
-		RELEASE_THREAD_LOCK();
-	} else
-		RELEASE_TEAM_LOCK();
-
-	restore_interrupts(state);
-
-	if (!contextLocked) {
-		// team doesn't exit or seems to be gone
+	// get the team
+	Team* team = Team::Get(teamID);
+	if (team == NULL)
 		return B_BAD_TEAM_ID;
-	}
+	BReference<Team> teamReference(team, true);
 
-	// the team cannot be deleted completely while we're owning its
-	// io_context mutex, so we can safely play with it now
+	// now that we have a team reference, its I/O context won't go away
+	io_context* context = team->io_context;
+	MutexLocker contextLocker(context->io_mutex);
 
 	uint32 slot = *_cookie;
 
@@ -7869,10 +7800,8 @@ _kern_get_next_fd_info(team_id teamID, uint32* _cookie, fd_info* info,
 		slot++;
 	}
 
-	if (slot >= context->table_size) {
-		mutex_unlock(&context->io_mutex);
+	if (slot >= context->table_size)
 		return B_ENTRY_NOT_FOUND;
-	}
 
 	info->number = slot;
 	info->open_mode = descriptor->open_mode;
@@ -7885,8 +7814,6 @@ _kern_get_next_fd_info(team_id teamID, uint32* _cookie, fd_info* info,
 		info->device = descriptor->u.mount->id;
 		info->node = -1;
 	}
-
-	mutex_unlock(&context->io_mutex);
 
 	*_cookie = slot + 1;
 	return B_OK;

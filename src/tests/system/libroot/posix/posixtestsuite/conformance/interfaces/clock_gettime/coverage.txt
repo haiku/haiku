@@ -8,7 +8,7 @@ Assertion	Complete?
 5		NO - process clocks not part of implementation under test
 6		YES
 7		YES
-8		YES
+8		NO - impossible to reliably guess invalid clock IDs
 
 *Note:  To run against current implementation, I have to add in a line:
 #include "/usr/src/linux/Documentation/high-res-timers/lib/posix_time.h"

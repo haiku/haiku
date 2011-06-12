@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2002-2006, Haiku Project. All rights reserved.
+ *  Copyright (c) 2002-2011, Haiku Project. All rights reserved.
  *  Distributed under the terms of the Haiku license.
  *
  *  Author(s):
@@ -7,13 +7,18 @@
  */
 
 
-#include <OS.h>
 #include <signal.h>
+
+#include <errno.h>
+
+#include <OS.h>
+
+#include <syscall_utils.h>
 
 
 int
 raise(int sig)
 {
-	return kill(find_thread(NULL), sig);
+	RETURN_AND_SET_ERRNO(send_signal(find_thread(NULL), sig));
 }
 

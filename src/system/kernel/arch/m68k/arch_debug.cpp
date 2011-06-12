@@ -129,7 +129,7 @@ stack_trace(int argc, char **argv)
 	} else {
 // TODO: Add support for stack traces of other threads.
 /*		thread_id id = strtoul(argv[1], NULL, 0);
-		thread = thread_get_thread_struct_locked(id);
+		thread = Thread::GetDebug(id);
 		if (thread == NULL) {
 			kprintf("could not find thread %ld\n", id);
 			return 0;

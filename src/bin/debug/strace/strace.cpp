@@ -1,7 +1,8 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <ctype.h>
 #include <stdio.h>
@@ -25,9 +26,11 @@
 #include "Syscall.h"
 #include "TypeHandler.h"
 
+
 using std::map;
 using std::string;
 using std::vector;
+
 
 extern void get_syscalls0(vector<Syscall*> &syscalls);
 extern void get_syscalls1(vector<Syscall*> &syscalls);
@@ -50,8 +53,10 @@ extern void get_syscalls17(vector<Syscall*> &syscalls);
 extern void get_syscalls18(vector<Syscall*> &syscalls);
 extern void get_syscalls19(vector<Syscall*> &syscalls);
 
+
 extern const char *__progname;
 static const char *kCommandName = __progname;
+
 
 // usage
 static const char *kUsage =
@@ -74,6 +79,8 @@ static const char *kUsage =
 "  -r             - Don't print syscall return values.\n"
 "  -s             - Also trace all threads spawned by the supplied thread,\n"
 "                   respectively the loaded executable's main thread.\n"
+"  -t             - Also recursively trace all teams created by a traced\n"
+"                   thread or team.\n"
 "  -T             - Trace all threads of the supplied or loaded executable's\n"
 "                   team. If an ID is supplied, it is interpreted as a team\n"
 "                   ID.\n"
@@ -82,6 +89,7 @@ static const char *kUsage =
 "  -g             - turns off signal tracing.\n"
 ;
 
+
 // terminal color escape sequences
 // (http://www.dee.ufcg.edu.br/~rrbrandt/tools/ansi.html)
 static const char *kTerminalTextNormal	= "\33[0m";
@@ -89,38 +97,6 @@ static const char *kTerminalTextRed		= "\33[31m";
 static const char *kTerminalTextMagenta	= "\33[35m";
 static const char *kTerminalTextBlue	= "\33[34m";
 
-static const char *kSignalName[] = {
-	/*  0 */ "SIG0",
-	/*  1 */ "SIGHUP",
-	/*  2 */ "SIGINT",
-	/*  3 */ "SIGQUIT",
-	/*  4 */ "SIGILL",
-	/*  5 */ "SIGCHLD",
-	/*  6 */ "SIGABRT",
-	/*  7 */ "SIGPIPE",
-	/*  8 */ "SIGFPE",
-	/*  9 */ "SIGKILL",
-	/* 10 */ "SIGSTOP",
-	/* 11 */ "SIGSEGV",
-	/* 12 */ "SIGCONT",
-	/* 13 */ "SIGTSTP",
-	/* 14 */ "SIGALRM",
-	/* 15 */ "SIGTERM",
-	/* 16 */ "SIGTTIN",
-	/* 17 */ "SIGTTOU",
-	/* 18 */ "SIGUSR1",
-	/* 19 */ "SIGUSR2",
-	/* 20 */ "SIGWINCH",
-	/* 21 */ "SIGKILLTHR",
-	/* 22 */ "SIGTRAP",
-	/* 23 */ "SIGPOLL",
-	/* 24 */ "SIGPROF",
-	/* 25 */ "SIGSYS",
-	/* 26 */ "SIGURG",
-	/* 27 */ "SIGVTALRM",
-	/* 28 */ "SIGXCPU",
-	/* 29 */ "SIGXFSZ",
-};
 
 // command line args
 static int sArgc;
@@ -130,26 +106,73 @@ static const char *const *sArgv;
 static vector<Syscall*>			sSyscallVector;
 static map<string, Syscall*>	sSyscallMap;
 
-// print_usage
-void
+
+struct Team {
+	Team(team_id id)
+		:
+		fID(id),
+		fNubPort(-1)
+	{
+	}
+
+	team_id ID() const
+	{
+		return fID;
+	}
+
+	port_id NubPort() const
+	{
+		return fNubPort;
+	}
+
+	MemoryReader& GetMemoryReader()
+	{
+		return fMemoryReader;
+	}
+
+	status_t InstallDebugger(port_id debuggerPort, bool traceTeam,
+		bool traceChildTeams, bool traceSignal)
+	{
+		fNubPort = install_team_debugger(fID, debuggerPort);
+		if (fNubPort < 0) {
+			fprintf(stderr, "%s: Failed to install team debugger: %s\n",
+				kCommandName, strerror(fNubPort));
+			return fNubPort;
+		}
+
+		// set team debugging flags
+		int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0)
+			| (traceChildTeams ? B_TEAM_DEBUG_TEAM_CREATION : 0)
+			| (traceSignal ? B_TEAM_DEBUG_SIGNALS : 0);
+		set_team_debugging_flags(fNubPort, teamDebugFlags);
+
+		return fMemoryReader.Init(fNubPort);
+	}
+
+private:
+	team_id			fID;
+	port_id			fNubPort;
+	MemoryReader	fMemoryReader;
+};
+
+
+static void
 print_usage(bool error)
 {
 	// print usage
 	fprintf((error ? stderr : stdout), kUsage, kCommandName);
 }
 
-// print_usage_and_exit
-static
-void
+
+static void
 print_usage_and_exit(bool error)
 {
 	print_usage(error);
 	exit(error ? 1 : 0);
 }
 
-// get_id
-static
-bool
+
+static bool
 get_id(const char *str, int32 &id)
 {
 	int32 len = strlen(str);
@@ -162,7 +185,7 @@ get_id(const char *str, int32 &id)
 	return true;
 }
 
-// get_syscall
+
 Syscall *
 get_syscall(const char *name)
 {
@@ -173,7 +196,7 @@ get_syscall(const char *name)
 	return i->second;
 }
 
-// patch_syscalls
+
 static void
 patch_syscalls()
 {
@@ -185,9 +208,8 @@ patch_syscalls()
 	patch_ioctl();
 }
 
-// init_syscalls
-static
-void
+
+static void
 init_syscalls()
 {
 	// init the syscall vector
@@ -222,9 +244,8 @@ init_syscalls()
 	patch_syscalls();
 }
 
-// print_to_string
-static
-void
+
+static void
 print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 {
 	va_list list;
@@ -236,9 +257,8 @@ print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 	*_length -= length;
 }
 
-// print_syscall
-static
-void
+
+static void
 print_syscall(FILE *outputFile, debug_post_syscall &message,
 	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
 	bool printReturnValue, bool colorize, bool decimal)
@@ -324,21 +344,20 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 		_kern_debug_output(buffer);
 }
 
-static
-const char *
+
+static const char *
 signal_name(int signal)
 {
 	if (signal >= 0 && signal < NSIG)
-		return kSignalName[signal];
+		return strsignal(signal);
 
 	static char buffer[32];
 	sprintf(buffer, "%d", signal);
 	return buffer;
 }
 
-// print_signal
-static
-void
+
+static void
 print_signal(FILE *outputFile, debug_signal_received &message,
 	bool colorize)
 {
@@ -364,7 +383,7 @@ print_signal(FILE *outputFile, debug_signal_received &message,
 		_kern_debug_output(buffer);
 }
 
-// main
+
 int
 main(int argc, const char *const *argv)
 {
@@ -383,6 +402,7 @@ main(int argc, const char *const *argv)
 	bool printReturnValues = true;
 	bool traceChildThreads = false;
 	bool traceTeam = false;
+	bool traceChildTeams = false;
 	bool traceSignal = true;
 	bool serialOutput = false;
 	FILE *outputFile = stdout;
@@ -433,6 +453,8 @@ main(int argc, const char *const *argv)
 				printReturnValues = false;
 			} else if (strcmp(arg, "-s") == 0) {
 				traceChildThreads = true;
+			} else if (strcmp(arg, "-t") == 0) {
+				traceChildTeams = true;
 			} else if (strcmp(arg, "-T") == 0) {
 				traceTeam = true;
 			} else if (strcmp(arg, "-g") == 0) {
@@ -488,29 +510,29 @@ main(int argc, const char *const *argv)
 		colorize = false;
 
 	// get thread/team to be debugged
-	thread_id thread = -1;
-	team_id team = -1;
+	thread_id threadID = -1;
+	team_id teamID = -1;
 	if (programArgCount > 1
-		|| !get_id(*programArgs, (traceTeam ? team : thread))) {
+		|| !get_id(*programArgs, (traceTeam ? teamID : threadID))) {
 		// we've been given an executable and need to load it
-		thread = load_program(programArgs, programArgCount, traceLoading);
-		if (thread < 0) {
+		threadID = load_program(programArgs, programArgCount, traceLoading);
+		if (threadID < 0) {
 			fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
-				programArgs[0], strerror(thread));
+				programArgs[0], strerror(threadID));
 			exit(1);
 		}
 	}
 
 	// get the team ID, if we have none yet
-	if (team < 0) {
+	if (teamID < 0) {
 		thread_info threadInfo;
-		status_t error = get_thread_info(thread, &threadInfo);
+		status_t error = get_thread_info(threadID, &threadInfo);
 		if (error != B_OK) {
 			fprintf(stderr, "%s: Failed to get info for thread %ld: %s\n",
-				kCommandName, thread, strerror(error));
+				kCommandName, threadID, strerror(error));
 			exit(1);
 		}
-		team = threadInfo.team;
+		teamID = threadInfo.team;
 	}
 
 	// create a debugger port
@@ -522,33 +544,35 @@ main(int argc, const char *const *argv)
 	}
 
 	// install ourselves as the team debugger
-	port_id nubPort = install_team_debugger(team, debuggerPort);
-	if (nubPort < 0) {
-		fprintf(stderr, "%s: Failed to install team debugger: %s\n",
-			kCommandName, strerror(nubPort));
-		exit(1);
+	typedef map<team_id, Team*> TeamMap;
+	TeamMap debuggedTeams;
+	port_id nubPort;
+
+	{
+		Team* team = new Team(teamID);
+		status_t error = team->InstallDebugger(debuggerPort, traceTeam,
+			traceChildTeams, traceSignal);
+		if (error != B_OK)
+			exit(1);
+
+		debuggedTeams[team->ID()] = team;
+
+		nubPort = team->NubPort();
 	}
 
-	// set team debugging flags
-	int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0)
-		| (traceSignal ? B_TEAM_DEBUG_SIGNALS : 0);
-	set_team_debugging_flags(nubPort, teamDebugFlags);
-
 	// set thread debugging flags
-	if (thread >= 0) {
+	if (threadID >= 0) {
 		int32 threadDebugFlags = 0;
 		if (!traceTeam) {
 			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
 				| (traceChildThreads
 					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
 		}
-		set_thread_debugging_flags(nubPort, thread, threadDebugFlags);
+		set_thread_debugging_flags(nubPort, threadID, threadDebugFlags);
 
 		// resume the target thread to be sure, it's running
-		resume_thread(thread);
+		resume_thread(threadID);
 	}
-
-	MemoryReader memoryReader(nubPort);
 
 	// debug loop
 	while (true) {
@@ -570,6 +594,13 @@ main(int argc, const char *const *argv)
 		switch (code) {
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
+				TeamMap::iterator it = debuggedTeams.find(message.origin.team);
+				if (it == debuggedTeams.end())
+					break;
+
+				Team* team = it->second;
+				MemoryReader& memoryReader = team->GetMemoryReader();
+
 				print_syscall(outputFile, message.post_syscall, memoryReader,
 					printArguments, contentsFlags, printReturnValues,
 					colorize, decimalFormat);
@@ -578,10 +609,8 @@ main(int argc, const char *const *argv)
 
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 			{
-				if (traceSignal) {
-					print_signal(outputFile, message.signal_received,
-						colorize);
-				}
+				if (traceSignal)
+					print_signal(outputFile, message.signal_received, colorize);
 				break;
 			}
 
@@ -592,17 +621,50 @@ main(int argc, const char *const *argv)
 			case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
 				break;
 
-			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
-				// the debugged team is gone
-				quitLoop = true;
+			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
+			{
+				if (!traceChildTeams)
+					break;
+
+				Team* team = new(std::nothrow) Team(
+					message.team_created.new_team);
+				if (team == NULL) {
+					fprintf(stderr, "%s: Out of memory!\n", kCommandName);
+					break;
+				}
+
+				status_t error = team->InstallDebugger(debuggerPort, true, true,
+					traceSignal);
+				if (error != B_OK) {
+					delete team;
+					break;
+				}
+
+				debuggedTeams[team->ID()] = team;
 				break;
+			}
+
+			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
+			{
+				// a debugged team is gone
+				TeamMap::iterator it = debuggedTeams.find(message.origin.team);
+				if (it == debuggedTeams.end())
+					break;
+
+				Team* team = it->second;
+				debuggedTeams.erase(it);
+				delete team;
+
+				// if all debugged teams are gone, we're done
+				quitLoop = debuggedTeams.empty();
+				break;
+			}
 		}
 
 		if (quitLoop)

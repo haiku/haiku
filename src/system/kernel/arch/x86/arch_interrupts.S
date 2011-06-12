@@ -22,6 +22,18 @@
 #include "syscall_table.h"
 
 
+#define LOCK_THREAD_TIME()									\
+	lea		THREAD_time_lock(%edi), %eax;					\
+	pushl	%eax;											\
+	call	acquire_spinlock;
+		/* leave spinlock address on stack for UNLOCK_THREAD_TIME() */
+
+#define UNLOCK_THREAD_TIME()								\
+	/* spinlock address still on stack from */				\
+	/* LOCK_THREAD_TIME() */								\
+	call	release_spinlock;								\
+	addl	$4, %esp;
+
 #define UPDATE_THREAD_USER_TIME_COMMON()					\
 	movl	%eax, %ebx;				/* save for later */	\
 	movl	%edx, %ecx;										\
@@ -37,19 +49,33 @@
 	movl	%ecx, (THREAD_last_time + 4)(%edi);				\
 															\
 	/* thread->in_kernel = true; */							\
-	movb	$1, THREAD_in_kernel(%edi)
+	movb	$1, THREAD_in_kernel(%edi);
 
 #define UPDATE_THREAD_USER_TIME()							\
+	LOCK_THREAD_TIME()										\
 	call	system_time;									\
-	UPDATE_THREAD_USER_TIME_COMMON()
+	UPDATE_THREAD_USER_TIME_COMMON()						\
+	UNLOCK_THREAD_TIME()
 
 #define UPDATE_THREAD_USER_TIME_PUSH_TIME()					\
 	call	system_time;									\
 	push	%edx;											\
 	push	%eax;											\
-	UPDATE_THREAD_USER_TIME_COMMON()
+															\
+	LOCK_THREAD_TIME()										\
+															\
+	/* recover the system time, note that */				\
+	/* LOCK_THREAD_TIME() leaves an address on the stack */	\
+	movl	4(%esp), %eax;									\
+	movl	8(%esp), %edx;									\
+															\
+	UPDATE_THREAD_USER_TIME_COMMON()						\
+															\
+	UNLOCK_THREAD_TIME()
 
 #define UPDATE_THREAD_KERNEL_TIME()							\
+	LOCK_THREAD_TIME()										\
+															\
 	call	system_time;									\
 															\
 	movl	%eax, %ebx;				/* save for later */	\
@@ -66,7 +92,9 @@
 	movl	%ecx, (THREAD_last_time + 4)(%edi);				\
 															\
 	/* thread->in_kernel = false; */						\
-	movb	$0, THREAD_in_kernel(%edi)
+	movb	$0, THREAD_in_kernel(%edi);						\
+															\
+	UNLOCK_THREAD_TIME()									\
 
 #define PUSH_IFRAME_BOTTOM(iframeType)	\
 	pusha;								\
@@ -798,32 +826,22 @@ FUNCTION(x86_sysenter):
 FUNCTION_END(x86_sysenter)
 
 
-/*!	Is copied to the signal stack call to restore the original frame when
-	the signal handler exits.
-	The copying code (in arch_thread.c::arch_setup_signal_frame()) copies
-	everything between the i386_return_from_signal and i386_end_return_from_signal
-	symbols.
-*/
-FUNCTION(i386_return_from_signal):
-	addl	$12, %esp	// Flushes the 3 arguments to sa_handler
-	movl	$SYSCALL_RESTORE_SIGNAL_FRAME, %eax
-		// This syscall will restore the cpu context to the
-		// one existing before calling the signal handler
-	movl	$0, %ecx
-	lea		4(%esp), %edx
-	int		$99
-	ret
-FUNCTION_END(i386_return_from_signal)
-SYMBOL(i386_end_return_from_signal):
+/*!	\fn void x86_return_to_userland(iframe* frame)
+	\brief Returns to the userland environment given by \a frame.
 
+	Before returning to userland all potentially necessary kernel exit work is
+	done.
 
-/*!	void i386_restore_frame_from_syscall(struct iframe iframe);
-	Pops the regs of the iframe from the stack to make it current and then
-	return to userland.
-	Interrupts are disabled.
+	\a frame must point to a location somewhere on the caller's stack (e.g. a
+	local variable).
+	The function must be called with interrupts disabled.
+
+	\param frame The iframe defining the userland environment.
 */
-FUNCTION(i386_restore_frame_from_syscall):
-	lea		4(%esp), %ebp	// iframe to %ebp
+FUNCTION(x86_return_to_userland):
+	// get the iframe* parameter
+	movl	4(%esp), %ebp
+	movl	%ebp, %esp
 
 	// check, if any kernel exit work has to be done
 	movl	%dr3, %edi
@@ -835,7 +853,7 @@ FUNCTION(i386_restore_frame_from_syscall):
 	// update the thread's kernel time and return
 	UPDATE_THREAD_KERNEL_TIME()
 	POP_IFRAME_AND_RETURN()
-FUNCTION_END(i386_restore_frame_from_syscall)
+FUNCTION_END(x86_return_to_userland)
 
 
 /* status_t x86_vm86_enter(struct vm86_iframe *frame) */

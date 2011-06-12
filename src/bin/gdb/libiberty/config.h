@@ -114,7 +114,7 @@
 /* #undef HAVE_ON_EXIT */
 
 /* Define to 1 if you have the `psignal' function. */
-/* #undef HAVE_PSIGNAL */
+#define HAVE_PSIGNAL 1
 
 /* Define to 1 if you have the `pstat_getdynamic' function. */
 /* #undef HAVE_PSTAT_GETDYNAMIC */

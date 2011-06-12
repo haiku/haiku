@@ -6,7 +6,7 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders libroot shared ;
 
 MergeObject posix_pthread.o :
-	pthread.c
+	pthread.cpp
 	pthread_atfork.c
 	pthread_attr.c
 	pthread_cancel.cpp

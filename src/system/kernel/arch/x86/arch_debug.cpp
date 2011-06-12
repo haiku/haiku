@@ -388,7 +388,7 @@ setup_for_thread(char *arg, Thread **_thread, uint32 *_ebp,
 
 	if (arg != NULL) {
 		thread_id id = strtoul(arg, NULL, 0);
-		thread = thread_get_thread_struct_locked(id);
+		thread = Thread::GetDebug(id);
 		if (thread == NULL) {
 			kprintf("could not find thread %ld\n", id);
 			return false;
@@ -855,7 +855,7 @@ dump_iframes(int argc, char **argv)
 		thread = thread_get_current_thread();
 	} else if (argc == 2) {
 		thread_id id = strtoul(argv[1], NULL, 0);
-		thread = thread_get_thread_struct_locked(id);
+		thread = Thread::GetDebug(id);
 		if (thread == NULL) {
 			kprintf("could not find thread %ld\n", id);
 			return 0;
@@ -925,7 +925,7 @@ cmd_in_context(int argc, char** argv)
 		return 0;
 
 	// get the thread
-	Thread* thread = thread_get_thread_struct_locked(threadID);
+	Thread* thread = Thread::GetDebug(threadID);
 	if (thread == NULL) {
 		kprintf("Could not find thread with ID \"%s\".\n", threadIDString);
 		return 0;

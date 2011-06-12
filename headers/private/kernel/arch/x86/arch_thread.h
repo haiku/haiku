@@ -24,9 +24,6 @@ uint32 x86_next_page_directory(Thread *from, Thread *to);
 
 void x86_restart_syscall(struct iframe* frame);
 
-void i386_return_from_signal();
-void i386_end_return_from_signal();
-
 // override empty macro
 #undef arch_syscall_64_bit_return_value
 void arch_syscall_64_bit_return_value(void);

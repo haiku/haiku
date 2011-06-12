@@ -154,7 +154,7 @@ mprotect(void* address, size_t length, int protection)
 int
 msync(void* address, size_t length, int flags)
 {
-	RETURN_AND_SET_ERRNO(_kern_sync_memory(address, length, flags));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_sync_memory(address, length, flags));
 }
 
 

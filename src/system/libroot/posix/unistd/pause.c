@@ -10,6 +10,7 @@
 #include <syscalls.h>
 
 #include <errno.h>
+#include <pthread.h>
 #include <signal.h>
 
 
@@ -20,6 +21,9 @@ pause(void)
 	sigemptyset(&mask);
 
 	errno = _kern_sigsuspend(&mask);
+
+	pthread_testcancel();
+
 	return -1;
 }
 

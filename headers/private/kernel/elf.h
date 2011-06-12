@@ -16,6 +16,12 @@
 struct kernel_args;
 
 
+struct elf_symbol_info {
+	addr_t	address;
+	size_t	size;
+};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,6 +40,7 @@ status_t elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 			addr_t *_baseAddress, const char **_symbolName,
 			const char **_imageName, bool *_exactMatch);
 addr_t elf_debug_lookup_symbol(const char* searchName);
+status_t elf_lookup_kernel_symbol(const char* name, elf_symbol_info* info);
 struct elf_image_info* elf_get_kernel_image();
 status_t elf_get_image_info_for_address(addr_t address, image_info* info);
 image_id elf_create_memory_image(const char* imageName, addr_t text,

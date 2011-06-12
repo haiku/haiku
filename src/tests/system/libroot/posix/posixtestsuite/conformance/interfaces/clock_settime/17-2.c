@@ -8,63 +8,84 @@
  * Error condition API test for the clock_id parameter of the
  * clock_settime() function.
  *
- * Test calling clock_settime() with the following clock_id values:
- *   MIN INT = INT32_MIN
- *   MAX INT = INT32_MAX
- *   MIN INT - 1 = 2147483647  (this is what gcc will set to)
- *   MAX INT + 1 = -2147483647 (this is what gcc will set to)
- *   unassigned value = -1073743192 (ex. of what gcc will set to)
- *   unassigned value = 1073743192 (ex. of what gcc will set to)
- *   -1
- *   17 (currently not = to any clock)
- *
  * The date chosen is Nov 12, 2002 ~11:13am (date when test was first
  * written).
  */
-#include <stdio.h>
-#include <time.h>
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "posixtest.h"
 
 #define TESTTIME 1037128358
 
-#define NUMINVALIDTESTS 8
+static clockid_t get_invalid_clock_id()
+{
+#if _POSIX_CPUTIME == -1
+	printf("clock_getcpuclockid() not supported\n");
+	exit(PTS_UNTESTED);
+#else
+	clockid_t clockID;
+	int error;
 
-static int invalid_tests[NUMINVALIDTESTS] = {
-		INT32_MIN, INT32_MAX, 2147483647, -2147483647, -1073743192, 
-		1073743192, -1, 17
-};
+	if (sysconf(_SC_CPUTIME) == -1) {
+		printf("clock_getcpuclockid() not supported\n");
+		exit(PTS_UNTESTED);
+	}
+
+	int pid = fork();
+	if (pid < 0) {
+		perror("fork() failed");
+		exit(PTS_UNRESOLVED);
+	}
+
+	if (pid == 0) {
+		// child -- just wait a second
+		sleep(1);
+		exit(0);
+	}
+
+	// parent -- get the child's CPU clock ID
+	error = clock_getcpuclockid(pid, &clockID);
+	if (error != 0) {
+		printf("clock_getcpuclockid() failed: %s\n", strerror(error));
+		exit(PTS_UNRESOLVED);
+	}
+
+	// wait for the child
+	if (wait(NULL) != pid) {
+		perror("wait() failed");
+		exit(PTS_UNRESOLVED);
+	}
+
+	return clockID;
+#endif
+}
 
 int main(int argc, char *argv[])
 {
 	struct timespec tpset;
-	int i;
-	int failure = 0;
+	clockid_t invalidClockID;
+
+	invalidClockID = get_invalid_clock_id();
 
 	tpset.tv_sec = TESTTIME;
 	tpset.tv_nsec = 0;
 
-	for (i = 0; i < NUMINVALIDTESTS; i++) {
-		if (clock_settime(invalid_tests[i], &tpset) == -1) {
-			if (EINVAL != errno) {
-				printf("errno != EINVAL\n");
-				failure = 1;
-			}
-		} else {
-			printf("clock_settime() did not return -1\n");
-			failure = 1;
+	if (clock_settime(invalidClockID, &tpset) == -1) {
+		if (EINVAL != errno) {
+			printf("errno != EINVAL\n");
+			return PTS_FAIL;
 		}
-	}
-
-	if (failure) {
-		printf("At least one test FAILED -- see above\n");
-		return PTS_FAIL;
 	} else {
-		printf("All tests PASSED\n");
-		return PTS_PASS;
+		printf("clock_settime() did not return -1\n");
+		return PTS_FAIL;
 	}
 
-	printf("This code should not be executed.\n");
-	return PTS_UNRESOLVED;
+	printf("All tests PASSED\n");
+	return PTS_PASS;
 }

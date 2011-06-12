@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2011 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UNISTD_H_
@@ -45,9 +45,13 @@
 #define _POSIX_THREAD_ATTR_STACKADDR		(-1)	/* currently unsupported */
 #define _POSIX_THREAD_ATTR_STACKSIZE		(200809L)
 #define _POSIX_THREAD_PRIORITY_SCHEDULING	(-1)	/* currently unsupported */
-#define _POSIX_REALTIME_SIGNALS				(-1)	/* currently unsupported */
+#define _POSIX_REALTIME_SIGNALS				(200809L)
 #define _POSIX_MEMORY_PROTECTION			(200809L)
-#define _POSIX_SEM_VALUE_MAX				INT_MAX
+#define _POSIX_MONOTONIC_CLOCK				(200809L)
+#define _POSIX_TIMERS						(200809L)
+#define _POSIX_CPUTIME						(200809L)
+#define _POSIX_THREAD_CPUTIME				(200809L)
+
 
 /* pathconf() constants */
 /* BeOS supported values, do not touch */
@@ -119,6 +123,14 @@
 #define _SC_THREAD_PRIORITY_SCHEDULING	50
 #define _SC_REALTIME_SIGNALS			51
 #define	_SC_MEMORY_PROTECTION			52
+#define _SC_SIGQUEUE_MAX				53
+#define _SC_RTSIG_MAX					54
+#define _SC_MONOTONIC_CLOCK				55
+#define _SC_DELAYTIMER_MAX				56
+#define _SC_TIMER_MAX					57
+#define	_SC_TIMERS						58
+#define	_SC_CPUTIME						59
+#define	_SC_THREAD_CPUTIME				60
 
 
 /* confstr() constants */

@@ -37,11 +37,10 @@ void __init_heap_post_env(void);
 void __init_time(void);
 void __arch_init_time(struct real_time_data *data, bool setDefaults);
 bigtime_t __arch_get_system_time_offset(struct real_time_data *data);
+bigtime_t __get_system_time_offset();
 void __init_pwd_backend(void);
 void __reinit_pwd_backend_after_fork(void);
 void* __arch_get_caller(void);
-
-void __init_pthread(void);
 
 
 #ifdef __cplusplus

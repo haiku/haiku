@@ -311,6 +311,8 @@ typedef struct {
 #define B_REAL_TIME_PRIORITY			120
 
 #define B_SYSTEM_TIMEBASE				0
+	/* time base for snooze_*(), compatible with the clockid_t constants defined
+	   in <time.h> */
 
 #define B_FIRST_REAL_TIME_PRIORITY		B_REAL_TIME_DISPLAY_PRIORITY
 
@@ -737,6 +739,11 @@ extern status_t		_get_system_info(system_info *info, size_t size);
 
 extern int32		is_computer_on(void);
 extern double		is_computer_on_fire(void);
+
+
+/* signal related functions */
+int		send_signal(thread_id threadID, unsigned int signal);
+void	set_signal_stack(void* base, size_t size);
 
 
 /* WARNING: Experimental API! */

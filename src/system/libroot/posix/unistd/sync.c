@@ -1,24 +1,23 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
 
 
 #include <unistd.h>
-#include <syscalls.h>
+
 #include <errno.h>
+#include <pthread.h>
+
+#include <syscall_utils.h>
+
+#include <syscalls.h>
 
 
 int
 fsync(int fd)
 {
-	int status = _kern_fsync(fd);
-	if (status < 0) {
-		errno = status;
-		status = -1;
-	}
-
-	return status;
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_fsync(fd));
 }
 
 

@@ -9,7 +9,7 @@ MergeObject posix_unistd.o :
 	chown.c
 	chroot.cpp
 	close.c
-	conf.c
+	conf.cpp
 	directory.c
 	dup.c
 	exec.cpp

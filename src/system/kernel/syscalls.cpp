@@ -48,6 +48,7 @@
 #include <user_atomic.h>
 #include <user_mutex.h>
 #include <usergroup.h>
+#include <UserTimer.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
 #include <vm/vm.h>
@@ -178,16 +179,6 @@ static inline int
 _user_is_computer_on(void)
 {
 	return 1;
-}
-
-
-//! Map to the arch specific call
-static inline int64
-_user_restore_signal_frame()
-{
-	syscall_64_bit_return_value();
-
-	return arch_restore_signal_frame();
 }
 
 

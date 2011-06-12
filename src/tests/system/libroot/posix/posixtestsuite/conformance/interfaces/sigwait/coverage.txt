@@ -3,7 +3,6 @@ This document defines the coverage for function sigwait().
 Assertion	Covered?
 1		YES
 2		YES
-3		YES
 4		YES
 5		NOT DONE YET
 6		NOT DONE YET

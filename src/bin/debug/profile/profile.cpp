@@ -653,7 +653,7 @@ profile_all(const char* const* programArgs, int programArgCount)
 
 	// install signal handlers so we can exit gracefully
     struct sigaction action;
-    action.sa_handler = (sighandler_t)signal_handler;
+    action.sa_handler = (__sighandler_t)signal_handler;
     sigemptyset(&action.sa_mask);
     action.sa_userdata = NULL;
     if (sigaction(SIGHUP, &action, NULL) < 0

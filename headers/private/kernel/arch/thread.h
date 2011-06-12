@@ -21,16 +21,16 @@ status_t arch_team_init_team_struct(Team *t, bool kernel);
 status_t arch_thread_init_thread_struct(Thread *t);
 status_t arch_thread_init_tls(Thread *thread);
 void arch_thread_context_switch(Thread *t_from, Thread *t_to);
-status_t arch_thread_init_kthread_stack(Thread *t,
-	int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void));
+void arch_thread_init_kthread_stack(Thread *thread, void *stack,
+	void *stackTop, void (*function)(void*), const void *data);
 void arch_thread_dump_info(void *info);
 status_t arch_thread_enter_userspace(Thread *t, addr_t entry,
 	void *args1, void *args2);
 
 bool arch_on_signal_stack(Thread *thread);
-status_t arch_setup_signal_frame(Thread *t, struct sigaction *sa,
-	int signal, int signalMask);
-int64 arch_restore_signal_frame(void);
+status_t arch_setup_signal_frame(Thread *thread, struct sigaction *action,
+	struct signal_frame_data *signalFrameData);
+int64 arch_restore_signal_frame(struct signal_frame_data* signalFrameData);
 
 void arch_store_fork_frame(struct arch_fork_arg *arg);
 void arch_restore_fork_frame(struct arch_fork_arg *arg);

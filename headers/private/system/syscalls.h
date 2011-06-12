@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku Inc. All rights reserved.
+ * Copyright 2004-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYSTEM_SYSCALLS_H
@@ -35,8 +35,10 @@ struct _sem_t;
 struct sembuf;
 union semun;
 struct sigaction;
+struct signal_frame_data;
 struct stat;
 struct system_profiler_parameters;
+struct user_timer_info;
 
 struct disk_device_job_progress_info;
 struct partitionable_space_data;
@@ -134,8 +136,8 @@ extern void __NO_RETURN _kern_exit_team(status_t returnValue);
 extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
 extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
-extern thread_id	_kern_wait_for_child(thread_id child, uint32 flags,
-						int32 *_reason, status_t *_returnCode);
+extern pid_t		_kern_wait_for_child(thread_id child, uint32 flags,
+						siginfo_t* info);
 extern status_t		_kern_exec(const char *path, const char* const* flatArgs,
 						size_t flatArgsSize, int32 argCount, int32 envCount,
 						mode_t umask);
@@ -155,6 +157,8 @@ extern status_t		_kern_set_thread_priority(thread_id thread,
 						int32 newPriority);
 extern status_t		_kern_kill_thread(thread_id thread);
 extern void			_kern_exit_thread(status_t returnValue);
+extern status_t		_kern_cancel_thread(thread_id threadID,
+						void (*cancelFunction)(int));
 extern void			_kern_thread_yield(void);
 extern status_t		_kern_wait_for_thread(thread_id thread,
 						status_t *_returnCode);
@@ -163,7 +167,8 @@ extern status_t		_kern_send_data(thread_id thread, int32 code,
 						const void *buffer, size_t bufferSize);
 extern int32		_kern_receive_data(thread_id *_sender, void *buffer,
 						size_t bufferSize);
-extern int64		_kern_restore_signal_frame();
+extern int64		_kern_restore_signal_frame(
+						struct signal_frame_data* signalFrameData);
 
 extern status_t		_kern_get_thread_info(thread_id id, thread_info *info);
 extern status_t		_kern_get_next_thread_info(team_id team, int32 *cookie,
@@ -198,13 +203,14 @@ extern ssize_t		_kern_getgroups(int groupCount, gid_t* groupList);
 extern status_t		_kern_setgroups(int groupCount, const gid_t* groupList);
 
 // signal functions
-extern status_t		_kern_send_signal(pid_t tid, uint sig);
-extern status_t		_kern_sigprocmask(int how, const sigset_t *set,
+extern status_t		_kern_send_signal(int32 id, uint32 signal,
+						const union sigval* userValue, uint32 flags);
+extern status_t		_kern_set_signal_mask(int how, const sigset_t *set,
 						sigset_t *oldSet);
 extern status_t		_kern_sigaction(int sig, const struct sigaction *action,
 						struct sigaction *oldAction);
-extern bigtime_t	_kern_set_alarm(bigtime_t time, uint32 mode);
-extern status_t		_kern_sigwait(const sigset_t *set, int *_signal);
+extern status_t		_kern_sigwait(const sigset_t *set, siginfo_t *info,
+						uint32 flags, bigtime_t timeout);
 extern status_t		_kern_sigsuspend(const sigset_t *mask);
 extern status_t		_kern_sigpending(sigset_t *set);
 extern status_t		_kern_set_signal_stack(const stack_t *newStack,
@@ -370,7 +376,7 @@ extern status_t		_kern_stop_watching(dev_t device, ino_t node, port_id port,
 						uint32 token);
 
 // time functions
-extern status_t		_kern_set_real_time_clock(uint32 time);
+extern status_t		_kern_set_real_time_clock(bigtime_t time);
 extern status_t		_kern_set_timezone(int32 timezoneOffset, const char *name,
 						size_t nameLength);
 extern status_t		_kern_get_timezone(int32 *_timezoneOffset, char *name,
@@ -378,8 +384,23 @@ extern status_t		_kern_get_timezone(int32 *_timezoneOffset, char *name,
 extern status_t		_kern_set_real_time_clock_is_gmt(bool isGMT);
 extern status_t		_kern_get_real_time_clock_is_gmt(bool *_isGMT);
 
+extern status_t		_kern_get_clock(clockid_t clockID, bigtime_t* _time);
+extern status_t		_kern_set_clock(clockid_t clockID, bigtime_t time);
+
 extern bigtime_t	_kern_system_time();
-extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
+extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags,
+						bigtime_t* _remainingTime);
+
+extern int32		_kern_create_timer(clockid_t clockID, thread_id threadID,
+						uint32 flags, const struct sigevent* event,
+						const struct thread_creation_attributes*
+							threadAttributes);
+extern status_t		_kern_delete_timer(int32 timerID, thread_id threadID);
+extern status_t		_kern_get_timer(int32 timerID, thread_id threadID,
+						struct user_timer_info* info);
+extern status_t		_kern_set_timer(int32 timerID, thread_id threadID,
+						bigtime_t startTime, bigtime_t interval, uint32 flags,
+						struct user_timer_info* oldInfo);
 
 // area functions
 extern area_id		_kern_create_area(const char *name, void **address,

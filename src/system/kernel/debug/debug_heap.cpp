@@ -12,11 +12,11 @@
 #include <vm/vm.h>
 
 
-#define INITIAL_HEAP_SIZE	B_PAGE_SIZE
+#define INITIAL_DEBUG_HEAP_SIZE	B_PAGE_SIZE
 
-static char sInitialHeap[INITIAL_HEAP_SIZE] __attribute__ ((aligned (8)));
+static char sInitialHeap[INITIAL_DEBUG_HEAP_SIZE] __attribute__ ((aligned (8)));
 static void* sHeapBase = sInitialHeap;
-static size_t sHeapSize = INITIAL_HEAP_SIZE;
+static size_t sHeapSize = INITIAL_DEBUG_HEAP_SIZE;
 
 const kdebug_alloc_t kdebug_alloc = {};
 

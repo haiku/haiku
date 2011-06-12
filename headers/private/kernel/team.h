@@ -22,12 +22,11 @@ extern "C" {
 
 status_t team_init(struct kernel_args *args);
 status_t wait_for_team(team_id id, status_t *returnCode);
-void team_remove_team(Team *team);
-port_id team_shutdown_team(Team *team, cpu_status& state);
+
+void team_remove_team(Team *team, pid_t& _signalGroup);
+port_id team_shutdown_team(Team *team);
 void team_delete_team(Team *team, port_id debuggerPort);
-struct process_group *team_get_process_group_locked(
-			struct process_session *session, pid_t id);
-void team_delete_process_group(struct process_group *group);
+
 Team *team_get_kernel_team(void);
 team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
@@ -42,15 +41,11 @@ Team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
 
-typedef bool (*team_iterator_callback)(Team* team, void* cookie);
-Team* team_iterate_through_teams(team_iterator_callback callback,
-	void* cookie);
-
 thread_id load_image_etc(int32 argCount, const char* const* args,
 	const char* const* env, int32 priority, team_id parentID, uint32 flags);
 
 void team_set_job_control_state(Team* team, job_control_state newState,
-			int signal, bool threadsLocked);
+			Signal* signal, bool threadsLocked);
 void team_set_controlling_tty(int32 index);
 int32 team_get_controlling_tty();
 status_t team_set_foreground_process_group(int32 ttyIndex, pid_t processGroup);
@@ -61,7 +56,7 @@ status_t stop_watching_team(team_id team, void (*hook)(team_id, void *),
 			void *data);
 
 struct user_thread* team_allocate_user_thread(Team* team);
-void team_free_user_thread(Thread* thread);
+void team_free_user_thread(Team* team, struct user_thread* userThread);
 
 bool team_associate_data(AssociatedData* data);
 bool team_dissociate_data(AssociatedData* data);
@@ -73,8 +68,7 @@ thread_id _user_load_image(const char* const* flatArgs, size_t flatArgsSize,
 status_t _user_wait_for_team(team_id id, status_t *_returnCode);
 void _user_exit_team(status_t returnValue);
 status_t _user_kill_team(thread_id thread);
-thread_id _user_wait_for_child(thread_id child, uint32 flags, int32 *_reason,
-			status_t *_returnCode);
+pid_t _user_wait_for_child(thread_id child, uint32 flags, siginfo_t* info);
 status_t _user_exec(const char *path, const char* const* flatArgs,
 			size_t flatArgsSize, int32 argCount, int32 envCount, mode_t umask);
 thread_id _user_fork(void);

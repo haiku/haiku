@@ -100,7 +100,7 @@ public:
 		TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
 
 		if (!fNotified) {
-			SpinLocker threadLocker(gThreadSpinlock);
+			SpinLocker schedulerLocker(gSchedulerLock);
 			thread_unblock_locked(fThread, status);
 			fNotified = true;
 		}

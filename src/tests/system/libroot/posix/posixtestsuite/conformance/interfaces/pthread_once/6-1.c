@@ -181,7 +181,6 @@ void initializer( void )
 void * test( void * arg )
 {
 	int ret = 0;
-	pthread_once_t once_ctl = PTHREAD_ONCE_INIT;
 
 	/* We don't block the signals SIGUSR1 and SIGUSR2 for this THREAD */
 	ret = pthread_sigmask( SIG_UNBLOCK, &usersigs, NULL );
@@ -194,6 +193,8 @@ void * test( void * arg )
 
 	while ( do_it )
 	{
+		pthread_once_t once_ctl = PTHREAD_ONCE_INIT;
+
 		count_ope++;
 
 		init_ctl = 0;

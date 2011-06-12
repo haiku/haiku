@@ -52,6 +52,70 @@ typedef char*				caddr_t;
 typedef __haiku_addr_t		addr_t;
 typedef __haiku_int32 		key_t;
 
+typedef __haiku_std_int32	clockid_t;
+typedef struct __timer_t*	timer_t;
+
+
+/* pthread types */
+
+typedef struct	_pthread_thread		*pthread_t;
+typedef struct  _pthread_attr		*pthread_attr_t;
+typedef struct  _pthread_mutex		pthread_mutex_t;
+typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
+typedef struct  _pthread_cond		pthread_cond_t;
+typedef struct  _pthread_condattr	*pthread_condattr_t;
+typedef int							pthread_key_t;
+typedef struct  _pthread_once		pthread_once_t;
+typedef struct  _pthread_rwlock		pthread_rwlock_t;
+typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
+typedef struct  _pthread_spinlock	pthread_spinlock_t;
+/*
+typedef struct  _pthread_barrier	*pthread_barrier_t;
+typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
+*/
+
+struct _pthread_mutex {
+	__haiku_std_uint32	flags;
+	__haiku_std_int32	lock;
+	__haiku_std_int32	unused;
+	__haiku_std_int32	owner;
+	__haiku_std_int32	owner_count;
+};
+
+struct _pthread_cond {
+	__haiku_std_uint32	flags;
+	__haiku_std_int32	unused;
+	pthread_mutex_t*	mutex;
+	__haiku_std_int32	waiter_count;
+	__haiku_std_int32	lock;
+};
+
+struct _pthread_once {
+	__haiku_std_int32	state;
+};
+
+struct _pthread_rwlock {
+	__haiku_std_uint32	flags;
+	__haiku_std_int32	owner;
+	union {
+		struct {
+			__haiku_std_int32	sem;
+		} shared;
+		struct {
+			__haiku_std_int32	lock_sem;
+			__haiku_std_int32	lock_count;
+			__haiku_std_int32	reader_count;
+			__haiku_std_int32	writer_count;
+			void*				waiters[2];
+		} local;
+	};
+};
+
+struct _pthread_spinlock {
+	__haiku_std_int32		lock;
+};
+
+
 #include <null.h>
 #include <size_t.h>
 #include <time.h>

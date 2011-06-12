@@ -781,18 +781,16 @@ x86_init_user_debug_at_kernel_exit(struct iframe *frame)
 	// disable kernel breakpoints
 	disable_breakpoints();
 
-	GRAB_THREAD_LOCK();
+	// install the user breakpoints
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 
 	arch_team_debug_info &teamInfo = thread->team->debug_info.arch_info;
 
-	// install the user breakpoints
 	install_breakpoints(teamInfo);
 
 	atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_INSTALLED);
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-	RELEASE_THREAD_LOCK();
 }
 
 
@@ -815,20 +813,19 @@ x86_exit_user_debug_at_kernel_entry()
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
 		return;
 
-	GRAB_THREAD_LOCK();
-
 	// disable user breakpoints
 	disable_breakpoints();
 
 	// install kernel breakpoints
 	Team* kernelTeam = team_get_kernel_team();
+
 	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+
 	install_breakpoints(kernelTeam->debug_info.arch_info);
-	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
 
 	atomic_and(&thread->flags, ~THREAD_FLAGS_BREAKPOINTS_INSTALLED);
 
-	RELEASE_THREAD_LOCK();
+	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
 }
 
 
@@ -927,7 +924,8 @@ x86_handle_debug_exception(struct iframe *frame)
 				// We need to ignore the exception now and send a single-step
 				// notification later, when the thread wants to return from the
 				// kernel.
-				InterruptsSpinLocker threadLocker(gThreadSpinlock);
+				InterruptsSpinLocker threadDebugInfoLocker(
+					thread->debug_info.lock);
 
 				// Check whether the team is still being debugged and set
 				// the B_THREAD_DEBUG_NOTIFY_SINGLE_STEP and

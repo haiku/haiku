@@ -75,7 +75,7 @@ init_amd_syscall_registers(void* dummy, int cpuNum)
 // #pragma mark -
 
 
-status_t
+void
 x86_initialize_commpage_syscall(void)
 {
 	void* syscallCode = (void *)&_user_syscall_int;
@@ -113,6 +113,4 @@ x86_initialize_commpage_syscall(void)
 	elf_add_memory_image_symbol(image, "commpage_syscall",
 		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_SYSCALL], len,
 		B_SYMBOL_TYPE_TEXT);
-
-	return B_OK;
 }

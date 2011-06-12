@@ -103,7 +103,7 @@ std_ops(int32 op, ...)
 		if (thread < B_OK)
 			return thread;
 
-		send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+		resume_thread(thread);
 
 		add_debugger_command_etc("on_exit", &add_run_on_exit_command,
 			"Adds a command to be run when leaving the kernel debugger",
@@ -136,7 +136,7 @@ static struct debugger_module_info sModuleInfo = {
 	NULL
 };
 
-module_info *modules[] = { 
+module_info *modules[] = {
 	(module_info *)&sModuleInfo,
 	NULL
 };

@@ -86,12 +86,11 @@ arch_thread_init_thread_struct(Thread *thread)
 }
 
 
-status_t
-arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
-	void (*entry_func)(void), void (*exit_func)(void))
+void
+arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
+	void (*function)(void*), const void* data)
 {
 #warning IMPLEMENT arch_thread_init_kthread_stack
-	return B_ERROR;
 }
 
 
@@ -136,8 +135,8 @@ arch_on_signal_stack(Thread *thread)
 
 
 status_t
-arch_setup_signal_frame(Thread *thread, struct sigaction *sa, int sig,
-	int sigMask)
+arch_setup_signal_frame(Thread *thread, struct sigaction *sa,
+	struct signal_frame_data *signalFrameData)
 {
 #warning IMPLEMENT arch_setup_signal_frame
 	return B_ERROR;
@@ -145,7 +144,7 @@ arch_setup_signal_frame(Thread *thread, struct sigaction *sa, int sig,
 
 
 int64
-arch_restore_signal_frame(void)
+arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
 #warning IMPLEMENT arch_restore_signal_frame
 	return 0;

@@ -23,6 +23,7 @@
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
 #include <vm/vm.h>
@@ -296,17 +297,18 @@ dprintf("handling I/O interrupts done\n");
 
 	int state = disable_interrupts();
 	if (thread->cpu->invoke_scheduler) {
-		GRAB_THREAD_LOCK();
+		SpinLocker schedulerLocker(gSchedulerLock);
 		scheduler_reschedule();
-		RELEASE_THREAD_LOCK();
+		schedulerLocker.Unlock();
 		restore_interrupts(state);
 	} else if (hardwareInterrupt && thread->post_interrupt_callback != NULL) {
-		restore_interrupts(state);
 		void (*callback)(void*) = thread->post_interrupt_callback;
 		void* data = thread->post_interrupt_data;
 
 		thread->post_interrupt_callback = NULL;
 		thread->post_interrupt_data = NULL;
+
+		restore_interrupts(state);
 
 		callback(data);
 	}

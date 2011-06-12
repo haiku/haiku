@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -185,7 +185,7 @@ device_write(void* cookie, off_t position, const void* data, size_t* numBytes)
 		return B_NO_MEMORY;
 	MemoryDeleter bufferDeleter(buffer);
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if ((thread->flags & THREAD_FLAGS_SYSCALL) != 0) {
 		if (!IS_USER_ADDRESS(data)
 			|| user_memcpy(buffer, data, *numBytes) != B_OK) {

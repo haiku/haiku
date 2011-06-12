@@ -260,7 +260,7 @@ rw_lock_destroy(rw_lock* lock)
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 #if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
@@ -296,7 +296,7 @@ rw_lock_destroy(rw_lock* lock)
 status_t
 _rw_lock_read_lock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 	// We might be the writer ourselves.
 	if (lock->holder == thread_get_current_thread_id()) {
@@ -328,7 +328,7 @@ status_t
 _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 	bigtime_t timeout)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 	// We might be the writer ourselves.
 	if (lock->holder == thread_get_current_thread_id()) {
@@ -407,9 +407,9 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 
 
 void
-_rw_lock_read_unlock(rw_lock* lock, bool threadsLocked)
+_rw_lock_read_unlock(rw_lock* lock, bool schedulerLocked)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
+	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
 
 	// If we're still holding the write lock or if there are other readers,
 	// no-one can be woken up.
@@ -437,7 +437,7 @@ _rw_lock_read_unlock(rw_lock* lock, bool threadsLocked)
 status_t
 rw_lock_write_lock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 	// If we're already the lock holder, we just need to increment the owner
 	// count.
@@ -473,9 +473,9 @@ rw_lock_write_lock(rw_lock* lock)
 
 
 void
-_rw_lock_write_unlock(rw_lock* lock, bool threadsLocked)
+_rw_lock_write_unlock(rw_lock* lock, bool schedulerLocked)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
+	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
 
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
@@ -600,7 +600,7 @@ mutex_destroy(mutex* lock)
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 #if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
@@ -631,7 +631,7 @@ mutex_destroy(mutex* lock)
 status_t
 mutex_switch_lock(mutex* from, mutex* to)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 #if !KDEBUG
 	if (atomic_add(&from->count, 1) < -1)
@@ -645,7 +645,7 @@ mutex_switch_lock(mutex* from, mutex* to)
 status_t
 mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 #if KDEBUG_RW_LOCK_DEBUG
 	_rw_lock_write_unlock(from, true);
@@ -660,17 +660,17 @@ mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 
 
 status_t
-_mutex_lock(mutex* lock, bool threadsLocked)
+_mutex_lock(mutex* lock, bool schedulerLocked)
 {
 #if KDEBUG
-	if (!gKernelStartup && !threadsLocked && !are_interrupts_enabled()) {
+	if (!gKernelStartup && !schedulerLocked && !are_interrupts_enabled()) {
 		panic("_mutex_lock(): called with interrupts disabled for lock %p",
 			lock);
 	}
 #endif
 
 	// lock only, if !threadsLocked
-	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
+	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
@@ -716,10 +716,10 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 
 
 void
-_mutex_unlock(mutex* lock, bool threadsLocked)
+_mutex_unlock(mutex* lock, bool schedulerLocked)
 {
 	// lock only, if !threadsLocked
-	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
+	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
 
 #if KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {
@@ -768,7 +768,7 @@ status_t
 _mutex_trylock(mutex* lock)
 {
 #if KDEBUG
-	InterruptsSpinLocker _(gThreadSpinlock);
+	InterruptsSpinLocker _(gSchedulerLock);
 
 	if (lock->holder <= 0) {
 		lock->holder = thread_get_current_thread_id();
@@ -789,7 +789,7 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 	}
 #endif
 
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.

@@ -17,6 +17,7 @@
 #include <smp.h>
 #include <team.h>
 #include <thread.h>
+#include <util/AutoLock.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
 
@@ -244,7 +245,10 @@ static void
 unexpected_exception(struct iframe* frame)
 {
 	debug_exception_type type;
-	int signal;
+	uint32 signalNumber;
+	int32 signalCode;
+	addr_t signalAddress = 0;
+	int32 signalError = B_ERROR;
 
 	if (IFRAME_IS_VM86(frame)) {
 		x86_vm86_return((struct vm86_iframe *)frame, (frame->vector == 13) ?
@@ -255,42 +259,62 @@ unexpected_exception(struct iframe* frame)
 	switch (frame->vector) {
 		case 0:		// Divide Error Exception (#DE)
 			type = B_DIVIDE_ERROR;
-			signal = SIGFPE;
+			signalNumber = SIGFPE;
+			signalCode = FPE_INTDIV;
+			signalAddress = frame->eip;
 			break;
 
 		case 4:		// Overflow Exception (#OF)
 			type = B_OVERFLOW_EXCEPTION;
-			signal = SIGTRAP;
+			signalNumber = SIGFPE;
+			signalCode = FPE_INTOVF;
+			signalAddress = frame->eip;
 			break;
 
 		case 5:		// BOUND Range Exceeded Exception (#BR)
 			type = B_BOUNDS_CHECK_EXCEPTION;
-			signal = SIGTRAP;
+			signalNumber = SIGTRAP;
+			signalCode = SI_USER;
 			break;
 
 		case 6:		// Invalid Opcode Exception (#UD)
 			type = B_INVALID_OPCODE_EXCEPTION;
-			signal = SIGILL;
+			signalNumber = SIGILL;
+			signalCode = ILL_ILLOPC;
+			signalAddress = frame->eip;
 			break;
 
 		case 13: 	// General Protection Exception (#GP)
 			type = B_GENERAL_PROTECTION_FAULT;
-			signal = SIGILL;
+			signalNumber = SIGILL;
+			signalCode = ILL_PRVOPC;	// or ILL_PRVREG
+			signalAddress = frame->eip;
 			break;
 
 		case 16: 	// x87 FPU Floating-Point Error (#MF)
 			type = B_FLOATING_POINT_EXCEPTION;
-			signal = SIGFPE;
+			signalNumber = SIGFPE;
+			signalCode = FPE_FLTDIV;
+				// TODO: Determine the correct cause via the FPU status
+				// register!
+			signalAddress = frame->eip;
 			break;
 
 		case 17: 	// Alignment Check Exception (#AC)
 			type = B_ALIGNMENT_EXCEPTION;
-			signal = SIGTRAP;
+			signalNumber = SIGBUS;
+			signalCode = BUS_ADRALN;
+			// TODO: Also get the address (from where?). Since we don't enable
+			// alignment checking this exception should never happen, though.
+			signalError = EFAULT;
 			break;
 
 		case 19: 	// SIMD Floating-Point Exception (#XF)
 			type = B_FLOATING_POINT_EXCEPTION;
-			signal = SIGFPE;
+			signalNumber = SIGFPE;
+			signalCode = FPE_FLTDIV;
+				// TODO: Determine the correct cause via the MXCSR register!
+			signalAddress = frame->eip;
 			break;
 
 		default:
@@ -306,12 +330,15 @@ unexpected_exception(struct iframe* frame)
 
 		// If the thread has a signal handler for the signal, we simply send it
 		// the signal. Otherwise we notify the user debugger first.
-		if (sigaction(signal, NULL, &action) == 0
-			&& action.sa_handler != SIG_DFL
-			&& action.sa_handler != SIG_IGN) {
-			send_signal(thread->id, signal);
-		} else if (user_debug_exception_occurred(type, signal))
-			send_signal(team_get_current_team_id(), signal);
+		if ((sigaction(signalNumber, NULL, &action) == 0
+				&& action.sa_handler != SIG_DFL
+				&& action.sa_handler != SIG_IGN)
+			|| user_debug_exception_occurred(type, signalNumber)) {
+			Signal signal(signalNumber, signalCode, signalError,
+				thread->team->id);
+			signal.SetAddress((void*)signalAddress);
+			send_signal_to_thread(thread, signal, 0);
+		}
 	} else {
 		char name[32];
 		panic("Unexpected exception \"%s\" occurred in kernel mode! "
@@ -500,17 +527,18 @@ hardware_interrupt(struct iframe* frame)
 
 	cpu_status state = disable_interrupts();
 	if (thread->cpu->invoke_scheduler) {
-		GRAB_THREAD_LOCK();
+		SpinLocker schedulerLocker(gSchedulerLock);
 		scheduler_reschedule();
-		RELEASE_THREAD_LOCK();
+		schedulerLocker.Unlock();
 		restore_interrupts(state);
 	} else if (thread->post_interrupt_callback != NULL) {
-		restore_interrupts(state);
 		void (*callback)(void*) = thread->post_interrupt_callback;
 		void* data = thread->post_interrupt_data;
 
 		thread->post_interrupt_callback = NULL;
 		thread->post_interrupt_data = NULL;
+
+		restore_interrupts(state);
 
 		callback(data);
 	}

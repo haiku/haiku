@@ -5,14 +5,17 @@ SubDirCcFlags -DNOID -DTZDIR='get_timezones_directory()' -DUSG_COMPAT
 	-DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DPCTS=1 -DSTD_INSPIRED ;
 
 UsePrivateHeaders
+	libroot
 	[ FDirName libroot locale ]
 	[ FDirName libroot time ]
+	shared
 ;
 UsePrivateSystemHeaders ;
 
 MergeObject posix_time.o :
 	asctime.cpp
-	clock.c
+	clock.cpp
+	clock_support.cpp
 	ctime.c
 	difftime.c
 	localtime_fading_out.c
@@ -23,6 +26,7 @@ MergeObject posix_time.o :
 	strptime.c
 	timelocal.cpp
 	time.c
+	timer_support.cpp
 	wcsftime.c
 ;
 

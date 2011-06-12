@@ -108,10 +108,6 @@ private:
 	inline	void				_MaybeNotifyProfilerThreadLocked();
 	inline	void				_MaybeNotifyProfilerThread();
 
-	static	bool				_InitialTeamIterator(Team* team,
-									void* cookie);
-	static	bool				_InitialThreadIterator(Thread* thread,
-									void* cookie);
 	static	bool				_InitialImageIterator(struct image* image,
 									void* cookie);
 
@@ -189,6 +185,8 @@ private:
 			size_t				fBufferStart;
 			size_t				fBufferSize;
 			uint64				fDroppedEvents;
+			int64				fLastTeamAddedSerialNumber;
+			int64				fLastThreadAddedSerialNumber;
 			bool				fTeamNotificationsRequested;
 			bool				fTeamNotificationsEnabled;
 			bool				fThreadNotificationsRequested;
@@ -203,7 +201,6 @@ private:
 			bool				fProfilingActive;
 			bool				fReentered[B_MAX_CPU_COUNT];
 			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
-			Thread**			fRunningThreads;
 			WaitObject*			fWaitObjectBuffer;
 			int32				fWaitObjectCount;
 			WaitObjectList		fUsedWaitObjects;
@@ -212,6 +209,9 @@ private:
 };
 
 
+/*!	Notifies the profiler thread when the profiling buffer is full enough.
+	The caller must hold the scheduler lock and fLock.
+*/
 inline void
 SystemProfiler::_MaybeNotifyProfilerThreadLocked()
 {
@@ -219,7 +219,9 @@ SystemProfiler::_MaybeNotifyProfilerThreadLocked()
 	if (fWaitingProfilerThread != NULL && fBufferSize > fBufferCapacity / 2) {
 		int cpu = smp_get_current_cpu();
 		fReentered[cpu] = true;
+
 		thread_unblock_locked(fWaitingProfilerThread, B_OK);
+
 		fWaitingProfilerThread = NULL;
 		fReentered[cpu] = false;
 	}
@@ -232,7 +234,7 @@ SystemProfiler::_MaybeNotifyProfilerThread()
 	if (fWaitingProfilerThread == NULL)
 		return;
 
-	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 	SpinLocker locker(fLock);
 
 	_MaybeNotifyProfilerThreadLocked();
@@ -255,6 +257,8 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fBufferStart(0),
 	fBufferSize(0),
 	fDroppedEvents(0),
+	fLastTeamAddedSerialNumber(0),
+	fLastThreadAddedSerialNumber(0),
 	fTeamNotificationsRequested(false),
 	fTeamNotificationsEnabled(false),
 	fThreadNotificationsRequested(false),
@@ -294,6 +298,7 @@ SystemProfiler::~SystemProfiler()
 	// inactive.
 	InterruptsSpinLocker locker(fLock);
 	if (fWaitingProfilerThread != NULL) {
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		thread_unblock_locked(fWaitingProfilerThread, B_OK);
 		fWaitingProfilerThread = NULL;
 	}
@@ -302,7 +307,7 @@ SystemProfiler::~SystemProfiler()
 
 	// stop scheduler listening
 	if (fSchedulerNotificationsRequested) {
-		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		scheduler_remove_listener(this);
 	}
 
@@ -446,11 +451,24 @@ SystemProfiler::Init()
 
 	// teams
 	if ((fFlags & B_SYSTEM_PROFILER_TEAM_EVENTS) != 0) {
-		InterruptsSpinLocker teamsLocker(gTeamSpinlock);
-		if (team_iterate_through_teams(&_InitialTeamIterator, this) != NULL)
-			return B_BUFFER_OVERFLOW;
+		InterruptsSpinLocker locker(fLock);
+
+		TeamListIterator iterator;
+		while (Team* team = iterator.Next()) {
+			locker.Unlock();
+
+			bool added = _TeamAdded(team);
+
+			// release the reference returned by the iterator
+			team->ReleaseReference();
+
+			if (!added)
+				return B_BUFFER_OVERFLOW;
+
+			locker.Lock();
+		}
+
 		fTeamNotificationsEnabled = true;
-		teamsLocker.Unlock();
 	}
 
 	// images
@@ -460,20 +478,28 @@ SystemProfiler::Init()
 	}
 
 	// threads
-	Thread* runningThreads[B_MAX_CPU_COUNT];
-	memset(runningThreads, 0, sizeof(runningThreads));
-	fRunningThreads = runningThreads;
+	if ((fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0) {
+		InterruptsSpinLocker locker(fLock);
 
-	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
-	if ((fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0
-		|| (fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0) {
-		if (thread_iterate_through_threads(&_InitialThreadIterator, this)
-				!= NULL) {
-			return B_BUFFER_OVERFLOW;
+		ThreadListIterator iterator;
+		while (Thread* thread = iterator.Next()) {
+			locker.Unlock();
+
+			bool added = _ThreadAdded(thread);
+
+			// release the reference returned by the iterator
+			thread->ReleaseReference();
+
+			if (!added)
+				return B_BUFFER_OVERFLOW;
+
+			locker.Lock();
 		}
-		fThreadNotificationsEnabled
-			= (fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0;
+
+		fThreadNotificationsEnabled = true;
 	}
+
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 	fProfilingActive = true;
 
@@ -490,12 +516,13 @@ SystemProfiler::Init()
 		// fake schedule events for the initially running threads
 		int32 cpuCount = smp_get_num_cpus();
 		for (int32 i = 0; i < cpuCount; i++) {
-			if (runningThreads[i] != NULL)
-				ThreadScheduled(runningThreads[i], runningThreads[i]);
+			Thread* thread = gCPU[i].running_thread;
+			if (thread != NULL)
+				ThreadScheduled(thread, thread);
 		}
 	}
 
-	threadsLocker.Unlock();
+	schedulerLocker.Unlock();
 
 	// I/O scheduling
 	if ((fFlags & B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS) != 0) {
@@ -545,9 +572,12 @@ SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 		Thread* thread = thread_get_current_thread();
 		fWaitingProfilerThread = thread;
 
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
 			THREAD_BLOCK_TYPE_OTHER, "system profiler buffer");
 
+		schedulerLocker.Unlock();
 		locker.Unlock();
 
 		status_t error = thread_block_with_timeout(B_RELATIVE_TIMEOUT, 1000000);
@@ -587,16 +617,14 @@ SystemProfiler::EventOccurred(NotificationService& service,
 		return;
 
 	if (strcmp(service.Name(), "teams") == 0) {
-		if (!fTeamNotificationsEnabled)
-			return;
-
 		Team* team = (Team*)event->GetPointer("teamStruct", NULL);
 		if (team == NULL)
 			return;
 
 		switch (eventCode) {
 			case TEAM_ADDED:
-				_TeamAdded(team);
+				if (fTeamNotificationsEnabled)
+					_TeamAdded(team);
 				break;
 
 			case TEAM_REMOVED:
@@ -613,28 +641,39 @@ SystemProfiler::EventOccurred(NotificationService& service,
 					return;
 				}
 
-				_TeamRemoved(team);
+				// When we're still doing the initial team list scan, we are
+				// also interested in removals that happened to teams we have
+				// already seen.
+				if (fTeamNotificationsEnabled
+					|| team->serial_number <= fLastTeamAddedSerialNumber) {
+					_TeamRemoved(team);
+				}
 				break;
 
 			case TEAM_EXEC:
-				_TeamExec(team);
+				if (fTeamNotificationsEnabled)
+					_TeamExec(team);
 				break;
 		}
 	} else if (strcmp(service.Name(), "threads") == 0) {
-		if (!fThreadNotificationsEnabled)
-			return;
-
 		Thread* thread = (Thread*)event->GetPointer("threadStruct", NULL);
 		if (thread == NULL)
 			return;
 
 		switch (eventCode) {
 			case THREAD_ADDED:
-				_ThreadAdded(thread);
+				if (fThreadNotificationsEnabled)
+					_ThreadAdded(thread);
 				break;
 
 			case THREAD_REMOVED:
-				_ThreadRemoved(thread);
+				// When we're still doing the initial thread list scan, we are
+				// also interested in removals that happened to threads we have
+				// already seen.
+				if (fThreadNotificationsEnabled
+					|| thread->serial_number <= fLastThreadAddedSerialNumber) {
+					_ThreadRemoved(thread);
+				}
 				break;
 		}
 	} else if (strcmp(service.Name(), "images") == 0) {
@@ -820,10 +859,21 @@ SystemProfiler::RWLockInitialized(rw_lock* lock)
 bool
 SystemProfiler::_TeamAdded(Team* team)
 {
-	size_t nameLen = strlen(team->name);
-	size_t argsLen = strlen(team->args);
+	TeamLocker teamLocker(team);
+
+	size_t nameLen = strlen(team->Name());
+	size_t argsLen = strlen(team->Args());
 
 	InterruptsSpinLocker locker(fLock);
+
+	// During the initial scan check whether the team is already gone again.
+	// Later this cannot happen, since the team creator notifies us before
+	// actually starting the team.
+	if (!fTeamNotificationsEnabled && team->state >= TEAM_STATE_DEATH)
+		return true;
+
+	if (team->serial_number > fLastTeamAddedSerialNumber)
+		fLastTeamAddedSerialNumber = team->serial_number;
 
 	system_profiler_team_added* event = (system_profiler_team_added*)
 		_AllocateBuffer(
@@ -833,9 +883,9 @@ SystemProfiler::_TeamAdded(Team* team)
 		return false;
 
 	event->team = team->id;
-	strcpy(event->name, team->name);
+	strcpy(event->name, team->Name());
 	event->args_offset = nameLen + 1;
-	strcpy(event->name + nameLen + 1, team->args);
+	strcpy(event->name + nameLen + 1, team->Args());
 
 	fHeader->size = fBufferSize;
 
@@ -846,6 +896,12 @@ SystemProfiler::_TeamAdded(Team* team)
 bool
 SystemProfiler::_TeamRemoved(Team* team)
 {
+	// TODO: It is possible that we get remove notifications for teams that
+	// had already been removed from the global team list when we did the
+	// initial scan, but were still in the process of dying. ATM it is not
+	// really possible to identify such a case.
+
+	TeamLocker teamLocker(team);
 	InterruptsSpinLocker locker(fLock);
 
 	system_profiler_team_removed* event = (system_profiler_team_removed*)
@@ -865,7 +921,9 @@ SystemProfiler::_TeamRemoved(Team* team)
 bool
 SystemProfiler::_TeamExec(Team* team)
 {
-	size_t argsLen = strlen(team->args);
+	TeamLocker teamLocker(team);
+
+	size_t argsLen = strlen(team->Args());
 
 	InterruptsSpinLocker locker(fLock);
 
@@ -878,7 +936,7 @@ SystemProfiler::_TeamExec(Team* team)
 	event->team = team->id;
 	strlcpy(event->thread_name, team->main_thread->name,
 		sizeof(event->thread_name));
-	strcpy(event->args, team->args);
+	strcpy(event->args, team->Args());
 
 	fHeader->size = fBufferSize;
 
@@ -889,7 +947,17 @@ SystemProfiler::_TeamExec(Team* team)
 bool
 SystemProfiler::_ThreadAdded(Thread* thread)
 {
+	ThreadLocker threadLocker(thread);
 	InterruptsSpinLocker locker(fLock);
+
+	// During the initial scan check whether the team is already gone again.
+	// Later this cannot happen, since the team creator notifies us before
+	// actually starting the thread.
+	if (!fThreadNotificationsEnabled && !thread->IsAlive())
+		return true;
+
+	if (thread->serial_number > fLastThreadAddedSerialNumber)
+		fLastThreadAddedSerialNumber = thread->serial_number;
 
 	system_profiler_thread_added* event = (system_profiler_thread_added*)
 		_AllocateBuffer(sizeof(system_profiler_thread_added),
@@ -910,6 +978,12 @@ SystemProfiler::_ThreadAdded(Thread* thread)
 bool
 SystemProfiler::_ThreadRemoved(Thread* thread)
 {
+	// TODO: It is possible that we get remove notifications for threads that
+	// had already been removed from the global thread list when we did the
+	// initial scan, but were still in the process of dying. ATM it is not
+	// really possible to identify such a case.
+
+	ThreadLocker threadLocker(thread);
 	InterruptsSpinLocker locker(fLock);
 
 	system_profiler_thread_removed* event
@@ -1233,28 +1307,6 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 	waitObject->type = type;
 	fWaitObjectTable.InsertUnchecked(waitObject);
 	fUsedWaitObjects.Add(waitObject);
-}
-
-
-/*static*/ bool
-SystemProfiler::_InitialTeamIterator(Team* team, void* cookie)
-{
-	SystemProfiler* self = (SystemProfiler*)cookie;
-	return !self->_TeamAdded(team);
-}
-
-
-/*static*/ bool
-SystemProfiler::_InitialThreadIterator(Thread* thread, void* cookie)
-{
-	SystemProfiler* self = (SystemProfiler*)cookie;
-
-	if ((self->fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0
-		&& thread->state == B_THREAD_RUNNING && thread->cpu != NULL) {
-		self->fRunningThreads[thread->cpu->cpu_num] = thread;
-	}
-
-	return !self->_ThreadAdded(thread);
 }
 
 

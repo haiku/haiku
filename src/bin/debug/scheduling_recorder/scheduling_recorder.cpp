@@ -116,7 +116,7 @@ public:
 
 		// install signal handlers so we can exit gracefully
 		struct sigaction action;
-		action.sa_handler = (sighandler_t)_SignalHandler;
+		action.sa_handler = (__sighandler_t)_SignalHandler;
 		sigemptyset(&action.sa_mask);
 		action.sa_userdata = this;
 		if (sigaction(SIGHUP, &action, NULL) < 0

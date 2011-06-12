@@ -3930,9 +3930,9 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			Thread* thread = thread_get_current_thread();
 			dprintf("vm_page_fault: thread \"%s\" (%ld) in team \"%s\" (%ld) "
 				"tried to %s address %#lx, ip %#lx (\"%s\" +%#lx)\n",
-				thread->name, thread->id, thread->team->name, thread->team->id,
-				isWrite ? "write" : "read", address, faultAddress,
-				area ? area->name : "???",
+				thread->name, thread->id, thread->team->Name(),
+				thread->team->id, isWrite ? "write" : "read", address,
+				faultAddress, area ? area->name : "???",
 				faultAddress - (area ? area->Base() : 0x0));
 
 			// We can print a stack trace of the userland thread here.
@@ -3999,13 +3999,17 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				// send it the signal. Otherwise we notify the user debugger
 				// first.
 				struct sigaction action;
-				if (sigaction(SIGSEGV, NULL, &action) == 0
-					&& action.sa_handler != SIG_DFL
-					&& action.sa_handler != SIG_IGN) {
-					send_signal(thread->id, SIGSEGV);
-				} else if (user_debug_exception_occurred(B_SEGMENT_VIOLATION,
+				if ((sigaction(SIGSEGV, NULL, &action) == 0
+						&& action.sa_handler != SIG_DFL
+						&& action.sa_handler != SIG_IGN)
+					|| user_debug_exception_occurred(B_SEGMENT_VIOLATION,
 						SIGSEGV)) {
-					send_signal(thread->id, SIGSEGV);
+					Signal signal(SIGSEGV,
+						status == B_PERMISSION_DENIED
+							? SEGV_ACCERR : SEGV_MAPERR,
+						EFAULT, thread->team->id);
+					signal.SetAddress((void*)address);
+					send_signal_to_thread(thread, signal, 0);
 				}
 			}
 		}

@@ -25,7 +25,6 @@ extern "C" {
 // kernel private functions
 
 void		inherit_parent_user_and_group(Team* team, Team* parent);
-void		inherit_parent_user_and_group_locked(Team* team, Team* parent);
 status_t	update_set_id_user_and_group(Team* team, const char* file);
 
 // syscalls

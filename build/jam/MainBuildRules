@@ -314,6 +314,11 @@ rule CreateAsmStructOffsetsHeader header : source
 		}
 	}
 
+	# Turn off "invalid use of offsetof()" macro warning. We use offsetof() also
+	# for non-PODs. Since we're using the same compiler for the whole kernel and
+	# don't do virtual inheritence, that works well enough.
+	flags += -Wno-invalid-offsetof ;
+
 	# locate object, search for source, and set on target variables
 
 	Depends $(header) : $(source) ;

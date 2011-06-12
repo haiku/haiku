@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <syscall_utils.h>
+
 #include <syscalls.h>
 #include <user_mutex_defs.h>
 
@@ -109,7 +111,7 @@ cond_signal(pthread_cond_t* cond, bool broadcast)
 int
 pthread_cond_wait(pthread_cond_t* cond, pthread_mutex_t* _mutex)
 {
-	return cond_wait(cond, _mutex, B_INFINITE_TIMEOUT);
+	RETURN_AND_TEST_CANCEL(cond_wait(cond, _mutex, B_INFINITE_TIMEOUT));
 }
 
 
@@ -118,10 +120,10 @@ pthread_cond_timedwait(pthread_cond_t* cond, pthread_mutex_t* mutex,
 	const struct timespec* tv)
 {
 	if (tv == NULL || tv->tv_nsec < 0 || tv->tv_nsec >= 1000 * 1000 * 1000)
-		return EINVAL;
+		RETURN_AND_TEST_CANCEL(EINVAL);
 
-	return cond_wait(cond, mutex,
-		tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL);
+	RETURN_AND_TEST_CANCEL(
+		cond_wait(cond, mutex, tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL));
 }
 
 

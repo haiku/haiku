@@ -101,7 +101,8 @@ public:
 	{
 		// For some reason the semaphore is getting destroyed.
 		// Wake up any remaing awaiting threads
-		InterruptsSpinLocker _(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+
 		while (queued_thread *entry = fWaitingToIncreaseQueue.RemoveHead()) {
 			entry->queued = false;
 			thread_unblock_locked(entry->thread, EIDRM);
@@ -143,7 +144,7 @@ public:
 		// Unlock the set before blocking
 		setLocker->Unlock();
 
-		InterruptsSpinLocker _(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 // TODO: We've got a serious race condition: If BlockAndUnlock() returned due to
 // interruption, we will still be queued. A WakeUpThread() at this point will
 // call thread_unblock() and might thus screw with our trying to re-lock the
@@ -217,7 +218,7 @@ public:
 
 	void WakeUpThread(bool waitingForZero)
 	{
-		InterruptsSpinLocker _(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		if (waitingForZero) {
 			// Wake up all threads waiting on zero
 			while (queued_thread *entry = fWaitingToBeZeroQueue.RemoveHead()) {

@@ -177,6 +177,10 @@ public:
 typedef AutoLocker<Thread, ThreadCPUPinLocking> ThreadCPUPinner;
 
 
+typedef AutoLocker<Team> TeamLocker;
+typedef AutoLocker<Thread> ThreadLocker;
+
+
 }	// namespace BPrivate
 
 using BPrivate::AutoLocker;
@@ -188,5 +192,8 @@ using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;
 using BPrivate::ThreadCPUPinner;
+using BPrivate::TeamLocker;
+using BPrivate::ThreadLocker;
+
 
 #endif	// KERNEL_UTIL_AUTO_LOCKER_H

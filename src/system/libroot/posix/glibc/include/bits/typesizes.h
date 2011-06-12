@@ -54,7 +54,7 @@
 #define __SWBLK_T_TYPE		__SLONGWORD_TYPE
 #define __KEY_T_TYPE		__S32_TYPE
 #define __CLOCKID_T_TYPE	__S32_TYPE
-#define __TIMER_T_TYPE		__S32_TYPE
+//#define __TIMER_T_TYPE		__S32_TYPE
 #define __BLKSIZE_T_TYPE	__SLONGWORD_TYPE
 #define __FSID_T_TYPE		struct { int __val[2]; }
 

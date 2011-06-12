@@ -3,6 +3,12 @@ SubDir HAIKU_TOP src system kernel lib ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName libroot locale ] ;
 
+# force inclusion of kernel_lib.h
+local kernelLibHeader = [ FDirName $(SUBDIR) kernel_lib.h ] ;
+CCFLAGS += -include $(kernelLibHeader) ;
+C++FLAGS += -include $(kernelLibHeader) ;
+
+
 # kernel libroot os files
 
 KernelMergeObject kernel_os_main.o :

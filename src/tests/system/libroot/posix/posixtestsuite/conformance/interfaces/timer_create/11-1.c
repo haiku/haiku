@@ -1,7 +1,7 @@
-/*   
+/*
  * Copyright (c) 2002, Intel Corporation. All rights reserved.
  * This file is licensed under the GPL license.  For the full content
- * of this license, see the COPYING file at the top level of this 
+ * of this license, see the COPYING file at the top level of this
  * source tree.
  * adam li
  *
@@ -21,10 +21,72 @@
 #define TIMERSEC 2
 #define SLEEPDELTA 3
 #define ACCEPTABLEDELTA 1
+#define CLOCK_TO_TEST CLOCK_THREAD_CPUTIME_ID
+
+static int handlerInvoked = 0;
+
+static void sub_timespec(const struct timespec *a, const struct timespec *b,
+	struct timespec *result)
+{
+	result->tv_sec = a->tv_sec - b->tv_sec;
+	result->tv_nsec = a->tv_nsec - b->tv_nsec;
+	if (result->tv_nsec < 0 && result->tv_sec > 0) {
+		result->tv_sec--;
+		result->tv_nsec += 1000000000;
+	} else if (result->tv_nsec >= 1000000000) {
+		result->tv_sec++;
+		result->tv_nsec -= 1000000000;
+	}
+}
+
+static int cmp_timespec(const struct timespec *a, const struct timespec *b)
+{
+	if (a->tv_sec < b->tv_sec)
+		return -1;
+	if (a->tv_sec > b->tv_sec)
+		return 1;
+
+	if (a->tv_nsec < b->tv_nsec)
+		return -1;
+	if (a->tv_nsec > b->tv_nsec)
+		return 1;
+
+	return 0;
+}
+
+static int spin(const struct timespec *time, struct timespec *timeLeft)
+{
+	struct timespec startTime;
+
+	if (clock_gettime(CLOCK_TO_TEST, &startTime) != 0) {
+		perror("clock_gettime() failed");
+		exit(PTS_UNRESOLVED);
+	}
+
+	for (;;) {
+		struct timespec tempTime;
+		if (clock_gettime(CLOCK_TO_TEST, &tempTime) != 0) {
+			perror("clock_gettime() failed");
+			exit(PTS_UNRESOLVED);
+		}
+
+
+		sub_timespec(&tempTime, &startTime, &tempTime);
+		if (cmp_timespec(time, &tempTime) <= 0)
+			return 0;
+
+		if (handlerInvoked) {
+			if (timeLeft)
+				sub_timespec(time, &tempTime, timeLeft);
+			return -1;
+		}
+	}
+}
 
 void handler(int signo)
 {
 	printf("Caught signal\n");
+	handlerInvoked = 1;
 }
 
 int main(int argc, char *argv[])
@@ -68,7 +130,7 @@ int main(int argc, char *argv[])
 		return PTS_UNRESOLVED;
 	}
 
-	if (timer_create(CLOCK_THREAD_CPUTIME_ID, &ev, &tid) != 0) {
+	if (timer_create(CLOCK_TO_TEST, &ev, &tid) != 0) {
 		perror("timer_create() did not return success");
 		return PTS_UNRESOLVED;
 	}
@@ -78,7 +140,7 @@ int main(int argc, char *argv[])
 		return PTS_UNRESOLVED;
 	}
 
-	if (nanosleep(&ts, &tsleft) != -1) {
+	if (spin(&ts, &tsleft) != -1) {
 		perror("nanosleep() not interrupted");
 		return PTS_FAIL;
 	}
@@ -88,7 +150,7 @@ int main(int argc, char *argv[])
 		return PTS_PASS;
 	} else {
 		printf("Timer did not last for correct amount of time\n");
-		printf("timer: %d != correct %d\n", 
+		printf("timer: %d != correct %d\n",
 				(int) ts.tv_sec- (int) tsleft.tv_sec,
 				TIMERSEC);
 		return PTS_FAIL;

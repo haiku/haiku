@@ -151,7 +151,7 @@ typedef enum {
 	B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,	// clear a watchpoint
 	B_DEBUG_MESSAGE_SET_SIGNAL_MASKS,	// set/get a thread's masks of signals
 	B_DEBUG_MESSAGE_GET_SIGNAL_MASKS,	//  the debugger is interested in
-	B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER,	// set/get a thread's signal handler for
+	B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER,	// set/get the team's signal handler for
 	B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER,	//  a signal
 
 	B_DEBUG_MESSAGE_PREPARE_HANDOVER,	// prepares the debugged team for being
@@ -356,7 +356,6 @@ typedef struct {
 // B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER
 
 typedef struct {
-	thread_id			thread;		// the thread
 	int					signal;		// the signal
 	struct sigaction	handler;	// the new signal handler
 } debug_nub_set_signal_handler;
@@ -365,7 +364,6 @@ typedef struct {
 
 typedef struct {
 	port_id				reply_port;	// port to send the reply to
-	thread_id			thread;		// the thread
 	int					signal;		// the signal
 } debug_nub_get_signal_handler;
 

@@ -11,6 +11,17 @@
 
 #include <OS.h>
 
+
+// _pthread_thread::flags values
+#define THREAD_DETACHED				0x01
+#define THREAD_DEAD					0x02
+#define THREAD_CANCELED				0x04
+#define THREAD_CANCEL_ENABLED		0x08
+#define THREAD_CANCEL_ASYNCHRONOUS	0x10
+
+
+struct thread_creation_attributes;
+
 // The public *_t types are only pointers to these structures
 // This way, we are completely free to change them, which might be
 // necessary in the future (not only due to the incomplete implementation
@@ -55,9 +66,6 @@ typedef struct _pthread_thread {
 	void		*(*entry)(void*);
 	void		*entry_argument;
 	void		*exit_value;
-	int			cancel_state;
-	int			cancel_type;
-	bool		cancelled;
 	struct pthread_key_data specific[PTHREAD_KEYS_MAX];
 	struct __pthread_cleanup_handler *cleanup_handlers;
 } pthread_thread;
@@ -69,7 +77,13 @@ extern "C" {
 
 void __pthread_key_call_destructors(pthread_thread *thread);
 void __pthread_destroy_thread(void);
-pthread_thread *__allocate_pthread(void *data);
+pthread_thread *__allocate_pthread(void* (*entry)(void*), void *data);
+void __init_pthread(pthread_thread* thread, void* (*entry)(void*), void* data);
+status_t __pthread_init_creation_attributes(
+	const pthread_attr_t* pthreadAttributes, pthread_t thread,
+	status_t (*entryFunction)(void*, void*), void* argument1,
+	void* argument2, const char* name,
+	struct thread_creation_attributes* attributes);
 
 #ifdef __cplusplus
 }

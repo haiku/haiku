@@ -10,11 +10,13 @@
 
 
 #include <cpu.h>
-#include <thread_types.h>
 #include <arch/cpu.h>
-#include <boot/kernel_args.h>
 
 #include <string.h>
+
+#include <boot/kernel_args.h>
+#include <thread_types.h>
+#include <util/AutoLock.h>
 
 
 /* global per-cpu structure */
@@ -30,7 +32,7 @@ cpu_init(kernel_args *args)
 }
 
 
-status_t 
+status_t
 cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
 	return arch_cpu_init_percpu(args, curr_cpu);
@@ -66,24 +68,15 @@ cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 bigtime_t
 cpu_get_active_time(int32 cpu)
 {
-	bigtime_t activeTime;
-	cpu_status state;
-
 	if (cpu < 0 || cpu > smp_get_num_cpus())
 		return 0;
 
-	// We need to grab the thread lock here, because the thread activity
-	// time is not maintained atomically (because there is no need to)
+	// We need to grab the scheduler lock here, because the thread activity
+	// time is not maintained atomically (because there is no need to).
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
-	activeTime = gCPU[cpu].active_time;
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	return activeTime;
+	return gCPU[cpu].active_time;
 }
 
 

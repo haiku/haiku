@@ -15,8 +15,7 @@
 
 typedef struct __jmp_buf_tag {
 	__jmp_buf	regs;		/* saved registers, stack & program pointer */
-	int			mask_was_saved;
-	sigset_t	saved_mask;
+	sigset_t	inverted_signal_mask;
 } jmp_buf[1];
 
 typedef jmp_buf sigjmp_buf;

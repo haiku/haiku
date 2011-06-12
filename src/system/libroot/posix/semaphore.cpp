@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -114,7 +114,8 @@ sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
 	bigtime_t timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
 		+ timeout->tv_nsec / 1000;
 
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_wait(semaphore->id, timeoutMicros));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(
+		_kern_realtime_sem_wait(semaphore->id, timeoutMicros));
 }
 
 
@@ -128,8 +129,8 @@ sem_trywait(sem_t* semaphore)
 int
 sem_wait(sem_t* semaphore)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_wait(semaphore->id,
-		B_INFINITE_TIMEOUT));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(
+		_kern_realtime_sem_wait(semaphore->id, B_INFINITE_TIMEOUT));
 }
 
 

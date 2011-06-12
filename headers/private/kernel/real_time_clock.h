@@ -22,6 +22,8 @@ struct kernel_args;
 extern "C" {
 #endif
 
+void set_real_time_clock_usecs(bigtime_t currentTime);
+
 status_t rtc_init(struct kernel_args *args);
 bigtime_t rtc_boot_time(void);
 	// Returns the time at which the system was booted in microseconds since Jan 1, 1970 UTC.
@@ -34,7 +36,7 @@ void rtc_secs_to_tm(uint32 seconds, struct tm *t);
 uint32 get_timezone_offset(void);
 
 bigtime_t _user_system_time(void);
-status_t _user_set_real_time_clock(uint32 time);
+status_t _user_set_real_time_clock(bigtime_t time);
 status_t _user_set_timezone(int32 timezoneOffset, const char *name,
 			size_t nameLength);
 status_t _user_get_timezone(int32 *_timezoneOffset, char* name,

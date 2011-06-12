@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -144,11 +144,11 @@ extern status_t mutex_switch_from_read_lock(rw_lock* from, mutex* to);
 extern status_t _rw_lock_read_lock(rw_lock* lock);
 extern status_t _rw_lock_read_lock_with_timeout(rw_lock* lock,
 	uint32 timeoutFlags, bigtime_t timeout);
-extern void _rw_lock_read_unlock(rw_lock* lock, bool threadsLocked);
-extern void _rw_lock_write_unlock(rw_lock* lock, bool threadsLocked);
+extern void _rw_lock_read_unlock(rw_lock* lock, bool schedulerLocked);
+extern void _rw_lock_write_unlock(rw_lock* lock, bool schedulerLocked);
 
-extern status_t _mutex_lock(mutex* lock, bool threadsLocked);
-extern void _mutex_unlock(mutex* lock, bool threadsLocked);
+extern status_t _mutex_lock(mutex* lock, bool schedulerLocked);
+extern void _mutex_unlock(mutex* lock, bool schedulerLocked);
 extern status_t _mutex_trylock(mutex* lock);
 extern status_t _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags,
 	bigtime_t timeout);

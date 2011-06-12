@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TIME_H_
@@ -9,16 +9,32 @@
 #include <sys/types.h>
 
 
+struct sigevent;	/* defined in <signal.h> */
+
+
 typedef __haiku_int32 clock_t;
 typedef __haiku_int32 time_t;
 typedef __haiku_int32 suseconds_t;
 typedef __haiku_uint32 useconds_t;
 
-#define CLOCKS_PER_SEC	1000
+
+#define CLOCKS_PER_SEC	1000000
 #define CLK_TCK			CLOCKS_PER_SEC
 
 #define MAX_TIMESTR		70
 	/* maximum length of a string returned by asctime(), and ctime() */
+
+#define CLOCK_MONOTONIC				((clockid_t)0)
+	/* system-wide monotonic clock (aka system time) */
+#define CLOCK_REALTIME				((clockid_t)-1)
+	/* system-wide real time clock */
+#define CLOCK_PROCESS_CPUTIME_ID	((clockid_t)-2)
+	/* clock measuring the used CPU time of the current process */
+#define CLOCK_THREAD_CPUTIME_ID		((clockid_t)-3)
+	/* clock measuring the used CPU time of the current thread */
+
+#define TIMER_ABSTIME				1	/* absolute timer flag */
+
 
 struct timespec {
 	time_t	tv_sec;		/* seconds */
@@ -71,6 +87,23 @@ extern int			nanosleep(const struct timespec *, struct timespec *);
 extern size_t		strftime(char *buffer, size_t maxSize, const char *format,
 						const struct tm *tm);
 extern char 		*strptime(const char *buf, const char *format, struct tm *tm);
+
+/* clock functions */
+int		clock_getres(clockid_t clockID, struct timespec* resolution);
+int		clock_gettime(clockid_t clockID, struct timespec* time);
+int		clock_settime(clockid_t clockID, const struct timespec* time);
+int		clock_nanosleep(clockid_t clockID, int flags,
+			const struct timespec* time, struct timespec* remainingTime);
+int		clock_getcpuclockid(pid_t pid, clockid_t* _clockID);
+
+/* timer functions */
+int		timer_create(clockid_t clockID, struct sigevent* event,
+			timer_t* timerID);
+int		timer_delete(timer_t timerID);
+int		timer_gettime(timer_t timerID, struct itimerspec* value);
+int		timer_settime(timer_t timerID, int flags,
+			const struct itimerspec* value, struct itimerspec* oldValue);
+int		timer_getoverrun(timer_t timerID);
 
 /* special timezone support */
 extern void tzset(void);

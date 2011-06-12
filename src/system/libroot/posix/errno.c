@@ -34,7 +34,7 @@ int
 _to_positive_error(int error)
 {
 	if (error < 0)
-		return error == B_NO_MEMORY ? B_POSIX_ENOMEM : -error;
+		return error == B_NO_MEMORY ? -B_POSIX_ENOMEM : -error;
 	return error;
 }
 

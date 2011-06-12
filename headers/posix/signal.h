@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SIGNAL_H_
@@ -10,48 +10,73 @@
 
 
 typedef int	sig_atomic_t;
-typedef __haiku_int32 sigset_t;
-
-typedef void (*sighandler_t)(int);
-	/* GNU-like signal handler typedef */
-
-typedef void (*__signal_func_ptr)(int);
-	/* deprecated, for compatibility with BeOS only */
+typedef __haiku_uint64 sigset_t;
 
 
 /* macros defining the standard signal handling behavior */
-#define SIG_DFL		((sighandler_t)0)	/* "default" signal behaviour */
-#define SIG_IGN		((sighandler_t)1)	/* ignore signal */
-#define SIG_ERR		((sighandler_t)-1)	/* an error occurred during signal processing */
-#define SIG_HOLD	((sighandler_t)3)	/* the signal was hold */
+#define SIG_DFL		((__sighandler_t)0)		/* "default" signal behaviour */
+#define SIG_IGN		((__sighandler_t)1)		/* ignore signal */
+#define SIG_ERR		((__sighandler_t)-1)	/* an error occurred during signal
+											   processing */
+#define SIG_HOLD	((__sighandler_t)3)		/* the signal was hold */
 
-/* TODO: Support this structure, or more precisely the SA_SIGINFO flag. To do
- * this properly we need real-time signal support. Both are commented out for
- * the time being to not make "configure" scripts think we do support them. */
-#if 0
-typedef struct {
-	int		si_signo;	/* signal number */
-	int		si_code;	/* signal code */
-	int		si_errno;	/* if non zero, an error number associated with this signal */
-	pid_t	si_pid;		/* sending process ID */
-	uid_t	si_uid;		/* real user ID of sending process */
-	void	*si_addr;	/* address of faulting instruction */
-	int		si_status;	/* exit value or signal */
-	long	si_band;	/* band event for SIGPOLL */
+/* macros specifying the event notification type (sigevent::sigev_notify) */
+#define SIGEV_NONE		0	/* no notification */
+#define SIGEV_SIGNAL	1	/* notify via queued signal */
+#define SIGEV_THREAD	2	/* notify via function called in new thread */
+
+
+union sigval {
+	int		sival_int;
+	void*	sival_ptr;
+};
+
+struct sigevent {
+	int				sigev_notify;	/* notification type */
+	int				sigev_signo;	/* signal number */
+	union sigval	sigev_value;	/* user-defined signal value */
+	void			(*sigev_notify_function)(union sigval);
+									/* notification function in case of
+									   SIGEV_THREAD */
+	pthread_attr_t*	sigev_notify_attributes;
+									/* pthread creation attributes in case of
+									   SIGEV_THREAD */
+};
+
+typedef struct __siginfo_t {
+	int				si_signo;	/* signal number */
+	int				si_code;	/* signal code */
+	int				si_errno;	/* if non zero, an error number associated with
+								   this signal */
+	pid_t			si_pid;		/* sending process ID */
+	uid_t			si_uid;		/* real user ID of sending process */
+	void*			si_addr;	/* address of faulting instruction */
+	int				si_status;	/* exit value or signal */
+	long			si_band;	/* band event for SIGPOLL */
+	union sigval	si_value;	/* signal value */
 } siginfo_t;
-#endif	/* 0 */
 
-/*
- * structure used by sigaction()
- *
- * Note: the 'sa_userdata' field is a non-POSIX extension.
- * See the documentation for more info on this.
- */
+
+/* signal handler function types */
+typedef void (*__sighandler_t)(int);
+typedef void  (*__siginfo_handler_t)(int, siginfo_t*, void*);
+
+#ifdef __USE_GNU
+typedef __sighandler_t	sighandler_t;
+	/* GNU-like signal handler typedef */
+#endif
+
+
+/* structure used by sigaction() */
 struct sigaction {
-	sighandler_t sa_handler;
-	sigset_t	sa_mask;
-	int			sa_flags;
-	void		*sa_userdata;  /* will be passed to the signal handler */
+	union {
+		__sighandler_t		sa_handler;
+		__siginfo_handler_t	sa_sigaction;
+	};
+	sigset_t				sa_mask;
+	int						sa_flags;
+	void*					sa_userdata;	/* will be passed to the signal
+											   handler, BeOS extension */
 };
 
 /* values for sa_flags */
@@ -61,7 +86,7 @@ struct sigaction {
 #define SA_NODEFER		0x08
 #define SA_RESTART		0x10
 #define SA_ONSTACK		0x20
-/* #define SA_SIGINFO		0x40 */
+#define SA_SIGINFO		0x40
 #define SA_NOMASK		SA_NODEFER
 #define SA_STACK		SA_ONSTACK
 #define SA_ONESHOT		SA_RESETHAND
@@ -73,19 +98,12 @@ struct sigaction {
 #define MINSIGSTKSZ		4096
 #define SIGSTKSZ		16384
 
-/*
- * for signals using an alternate stack
- */
+/* for signals using an alternate stack */
 typedef struct stack_t {
-	void	*ss_sp;
+	void*	ss_sp;
 	size_t	ss_size;
 	int		ss_flags;
 } stack_t;
-
-typedef struct sigstack {
-	int 	ss_onstack;
-	void	*ss_sp;
-} sigstack;
 
 /* for the 'how' arg of sigprocmask() */
 #define SIG_BLOCK		1
@@ -99,90 +117,165 @@ typedef struct sigstack {
  * some consistency with UN*X conventions so that things
  * like "kill -9" do what you expect.
  */
-#define	SIGHUP		1	/* hangup -- tty is gone! */
-#define SIGINT		2	/* interrupt */
-#define SIGQUIT		3	/* `quit' special character typed in tty  */
-#define SIGILL		4	/* illegal instruction */
-#define SIGCHLD		5	/* child process exited */
-#define SIGABRT		6	/* abort() called, dont' catch */
-#define SIGPIPE		7	/* write to a pipe w/no readers */
-#define SIGFPE		8	/* floating point exception */
-#define SIGKILL		9	/* kill a team (not catchable) */
-#define SIGSTOP		10	/* suspend a thread (not catchable) */
-#define SIGSEGV		11	/* segmentation violation (read: invalid pointer) */
-#define SIGCONT		12	/* continue execution if suspended */
-#define SIGTSTP		13	/* `stop' special character typed in tty */
-#define SIGALRM		14	/* an alarm has gone off (see alarm()) */
-#define SIGTERM		15	/* termination requested */
-#define SIGTTIN		16	/* read of tty from bg process */
-#define SIGTTOU		17	/* write to tty from bg process */
-#define SIGUSR1		18	/* app defined signal 1 */
-#define SIGUSR2		19	/* app defined signal 2 */
-#define SIGWINCH	20	/* tty window size changed */
-#define SIGKILLTHR	21	/* be specific: kill just the thread, not team */
-#define SIGTRAP		22	/* Trace/breakpoint trap */
-#define SIGPOLL		23	/* Pollable event */
-#define SIGPROF		24	/* Profiling timer expired */
-#define SIGSYS		25	/* Bad system call */
-#define SIGURG		26	/* High bandwidth data is available at socket */
-#define SIGVTALRM	27	/* Virtual timer expired */
-#define SIGXCPU		28	/* CPU time limit exceeded */
-#define SIGXFSZ		29	/* File size limit exceeded */
+#define	SIGHUP			1	/* hangup -- tty is gone! */
+#define SIGINT			2	/* interrupt */
+#define SIGQUIT			3	/* `quit' special character typed in tty  */
+#define SIGILL			4	/* illegal instruction */
+#define SIGCHLD			5	/* child process exited */
+#define SIGABRT			6	/* abort() called, dont' catch */
+#define SIGPIPE			7	/* write to a pipe w/no readers */
+#define SIGFPE			8	/* floating point exception */
+#define SIGKILL			9	/* kill a team (not catchable) */
+#define SIGSTOP			10	/* suspend a thread (not catchable) */
+#define SIGSEGV			11	/* segmentation violation (read: invalid pointer) */
+#define SIGCONT			12	/* continue execution if suspended */
+#define SIGTSTP			13	/* `stop' special character typed in tty */
+#define SIGALRM			14	/* an alarm has gone off (see alarm()) */
+#define SIGTERM			15	/* termination requested */
+#define SIGTTIN			16	/* read of tty from bg process */
+#define SIGTTOU			17	/* write to tty from bg process */
+#define SIGUSR1			18	/* app defined signal 1 */
+#define SIGUSR2			19	/* app defined signal 2 */
+#define SIGWINCH		20	/* tty window size changed */
+#define SIGKILLTHR		21	/* be specific: kill just the thread, not team */
+#define SIGTRAP			22	/* Trace/breakpoint trap */
+#define SIGPOLL			23	/* Pollable event */
+#define SIGPROF			24	/* Profiling timer expired */
+#define SIGSYS			25	/* Bad system call */
+#define SIGURG			26	/* High bandwidth data is available at socket */
+#define SIGVTALRM		27	/* Virtual timer expired */
+#define SIGXCPU			28	/* CPU time limit exceeded */
+#define SIGXFSZ			29	/* File size limit exceeded */
+#define SIGBUS			30	/* access to undefined portion of a memory object */
+#define SIGRESERVED1	31	/* reserved for future use */
+#define SIGRESERVED2	32	/* reserved for future use */
 
-#define SIGBUS		SIGSEGV /* for old style code */
+#define SIGRTMIN		(__signal_get_sigrtmin())
+							/* lowest realtime signal number */
+#define SIGRTMAX		(__signal_get_sigrtmax())
+							/* greatest realtime signal number */
 
-/*
- * Signal numbers 30-32 are currently free but may be used in future
- * releases.  Use them at your own peril (if you do use them, at least
- * be smart and use them backwards from signal 32).
- */
-#define MAX_SIGNO		32	/* the most signals that a single thread can reference */
-#define __signal_max	29	/* the largest signal number that is actually defined */
-#define NSIG			(__signal_max+1)
-	/* the number of defined signals */
+#define __MAX_SIGNO		64	/* greatest possible signal number, can be used (+1)
+							   as size of static arrays */
+#define NSIG			(__MAX_SIGNO + 1)
+							/* BSD extension, size of the sys_siglist table,
+							   obsolete */
+
+
+/* Signal code values appropriate for siginfo_t::si_code: */
+/* any signal */
+#define SI_USER			0	/* signal sent by user */
+#define SI_QUEUE		1	/* signal sent by sigqueue() */
+#define SI_TIMER		2	/* signal sent on timer_settime() timeout */
+#define SI_ASYNCIO		3	/* signal sent on asynchronous I/O completion */
+#define SI_MESGQ		4	/* signal sent on arrival of message on empty
+							   message queue */
+/* SIGILL */
+#define ILL_ILLOPC		10	/* illegal opcode */
+#define ILL_ILLOPN		11	/* illegal operand */
+#define ILL_ILLADR		12	/* illegal addressing mode */
+#define ILL_ILLTRP		13	/* illegal trap */
+#define ILL_PRVOPC		14	/* privileged opcode */
+#define ILL_PRVREG		15	/* privileged register */
+#define ILL_COPROC		16	/* coprocessor error */
+#define ILL_BADSTK		17	/* internal stack error */
+/* SIGFPE */
+#define FPE_INTDIV		20	/* integer division by zero */
+#define FPE_INTOVF		21	/* integer overflow */
+#define FPE_FLTDIV		22	/* floating-point division by zero */
+#define FPE_FLTOVF		23	/* floating-point overflow */
+#define FPE_FLTUND		24	/* floating-point underflow */
+#define FPE_FLTRES		25	/* floating-point inexact result */
+#define FPE_FLTINV		26	/* invalid floating-point operation */
+#define FPE_FLTSUB		27	/* subscript out of range */
+/* SIGSEGV */
+#define SEGV_MAPERR		30	/* address not mapped to object */
+#define SEGV_ACCERR		31	/* invalid permissions for mapped object */
+/* SIGBUS */
+#define BUS_ADRALN		40	/* invalid address alignment */
+#define BUS_ADRERR		41	/* nonexistent physical address */
+#define BUS_OBJERR		42	/* object-specific hardware error */
+/* SIGTRAP */
+#define TRAP_BRKPT		50	/* process breakpoint */
+#define TRAP_TRACE		51	/* process trace trap. */
+/* SIGCHLD */
+#define CLD_EXITED		60	/* child exited */
+#define CLD_KILLED		61	/* child terminated abnormally without core dump */
+#define CLD_DUMPED		62	/* child terminated abnormally with core dump */
+#define CLD_TRAPPED		63	/* traced child trapped */
+#define CLD_STOPPED		64	/* child stopped */
+#define CLD_CONTINUED	65	/* stopped child continued */
+/* SIGPOLL */
+#define POLL_IN			70	/* input available */
+#define POLL_OUT		71	/* output available */
+#define POLL_MSG		72	/* input message available */
+#define POLL_ERR		73	/* I/O error */
+#define POLL_PRI		74	/* high priority input available */
+#define POLL_HUP		75	/* device disconnected */
 
 
 /* the global table of text strings containing descriptions for each signal */
-extern const char * const sys_siglist[NSIG];
+extern const char* const sys_siglist[NSIG];
+	/* BSD extension, obsolete, use strsignal() instead */
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-sighandler_t signal(int sig, sighandler_t signalHandler);
-sighandler_t sigset(int sig, sighandler_t signalHandler);
-int     raise(int sig);
-int     kill(pid_t pid, int sig);
-int     send_signal(pid_t tid, unsigned int sig);
-int		killpg(pid_t processGroupID, int sig);
 
-int     sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
-int		siginterrupt(int sig, int flag);
-int     sigprocmask(int how, const sigset_t *set, sigset_t *oset);
-int     sigpending(sigset_t *set);
-int     sigsuspend(const sigset_t *mask);
-int 	sigwait(const sigset_t *set, int *sig);
+/* signal management (actions and block masks) */
+__sighandler_t signal(int signal, __sighandler_t signalHandler);
+int     sigaction(int signal, const struct sigaction* action,
+			struct sigaction* oldAction);
+__sighandler_t sigset(int signal, __sighandler_t signalHandler);
+int		sigignore(int signal);
+int		siginterrupt(int signal, int flag);
 
-int     sigemptyset(sigset_t *set);
-int     sigfillset(sigset_t *set);
-int 	sigaddset(sigset_t *set, int signo);
-int 	sigdelset(sigset_t *set, int signo);
-int 	sigismember(const sigset_t *set, int signo);
-int		sigignore(int signo);
-int		sighold(int signo);
-int		sigrelse(int signo);
-int		sigpause(int signo);
+int     sigprocmask(int how, const sigset_t* set, sigset_t* oldSet);
+int		pthread_sigmask(int how, const sigset_t* set, sigset_t* oldSet);
+int		sighold(int signal);
+int		sigrelse(int signal);
 
-void	set_signal_stack(void *ptr, size_t size);
-int		sigaltstack(const stack_t *ss, stack_t *oss);
+/* sending signals */
+int     raise(int signal);
+int     kill(pid_t pid, int signal);
+int		killpg(pid_t processGroupID, int signal);
+int		sigqueue(pid_t pid, int signal, const union sigval userValue);
+int		pthread_kill(pthread_t thread, int signal);
 
-/* pthread extension : equivalent of sigprocmask()  */
-int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
+/* querying and waiting for signals */
+int     sigpending(sigset_t* set);
+int     sigsuspend(const sigset_t* mask);
+int		sigpause(int signal);
+int 	sigwait(const sigset_t* set, int* _signal);
+int		sigwaitinfo(const sigset_t* set, siginfo_t* info);
+int		sigtimedwait(const sigset_t* set, siginfo_t* info,
+           const struct timespec* timeout);
+
+/* setting the per-thread signal stack */
+int		sigaltstack(const stack_t* stack, stack_t* oldStack);
+
+/* signal set (sigset_t) manipulation */
+int     sigemptyset(sigset_t* set);
+int     sigfillset(sigset_t* set);
+int 	sigaddset(sigset_t* set, int signal);
+int 	sigdelset(sigset_t* set, int signal);
+int 	sigismember(const sigset_t* set, int signal);
+
+/* printing signal names */
+void	psiginfo(const siginfo_t* info, const char* message);
+void	psignal(int signal, const char* message);
+
+/* implementation private */
+int		__signal_get_sigrtmin();
+int		__signal_get_sigrtmax();
+
 
 #ifdef __cplusplus
 }
 #endif
+
 
 /* TODO: move this into the documentation!
  * ==================================================
@@ -205,7 +298,7 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
  * handling. It also allows an opportunity, via the 'sigaction' struct, to
  * enable additional data to be passed to the handler. For example:
  *    void
- *    my_signal_handler(int sig, char *userData, vregs regs)
+ *    my_signal_handler(int sig, char* userData, vregs* regs)
  *    {
  *    . . .
  *    }
@@ -213,7 +306,7 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
  *    struct sigaction sa;
  *    char data_buffer[32];
  *
- *    sa.sa_handler = (sighandler_t)my_signal_handler;
+ *    sa.sa_handler = (__sighandler_t)my_signal_handler;
  *    sigemptyset(&sa.sa_mask);
  *    sa.sa_userdata = userData;
  *
@@ -223,8 +316,9 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
  * The two additional arguments available to the signal handler are extensions
  * to the Posix standard. This feature was introduced by the BeOS and retained
  * by Haiku. However, to remain compatible with Posix and ANSI C, the type
- * of the sa_handler field is defined as 'sighandler_t'. This requires the handler
- * to be cast when assigned to the sa_handler field, as in the example above.
+ * of the sa_handler field is defined as '__sighandler_t'. This requires the
+ * handler to be cast when assigned to the sa_handler field, as in the example
+ * above.
  *
  * The 3 arguments that Haiku provides to signal handlers are as follows:
  * 1) The first argument is the (usual) signal number.
@@ -234,10 +328,14 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
  *
  * 3) The third argument is a pointer to a vregs struct (defined below).
  *    The vregs struct contains the contents of the volatile registers at
- *    the time the signal was delivered to your thread. You can change the fields
- *    of the structure. After your signal handler completes, the OS uses this struct
- *    to reload the registers for your thread (privileged registers are not loaded
- *    of course). The vregs struct is of course terribly machine dependent.
+ *    the time the signal was delivered to your thread. You can change the
+ *    fields of the structure. After your signal handler completes, the OS uses
+ *    this struct to reload the registers for your thread (privileged registers
+ *    are not loaded of course). The vregs struct is of course terribly machine
+ *    dependent.
+ *    Note that in BeOS the vregs argument was passed by value, not by pointer.
+ *    While Haiku retains binary compability with code compiled for BeOS, code
+ *    built under Haiku must use the pointer argument.
  */
 
 /*
@@ -245,11 +343,22 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
  *
  * signal handlers get this as the last argument
  */
-
 typedef struct vregs vregs;
+	/* BeOS extension */
+
 
 /* include architecture specific definitions */
 #include __HAIKU_ARCH_HEADER(signal.h)
+
+
+typedef struct vregs mcontext_t;
+
+typedef struct __ucontext_t {
+	struct __ucontext_t*	uc_link;
+	sigset_t				uc_sigmask;
+	stack_t					uc_stack;
+	mcontext_t				uc_mcontext;
+} ucontext_t;
 
 
 #endif /* _SIGNAL_H_ */

@@ -32,12 +32,11 @@ void _thread_do_exit_notification(void);
 
 
 static status_t
-thread_entry(thread_func entry, void* _thread)
+thread_entry(void* _entry, void* _thread)
 {
+	thread_func entry = (thread_func)_entry;
 	pthread_thread* thread = (pthread_thread*)_thread;
 	status_t returnCode;
-
-	*tls_address(TLS_PTHREAD_SLOT) = thread;
 
 	returnCode = entry(thread->entry_argument);
 
@@ -85,20 +84,17 @@ spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 	pthread_thread* thread;
 	thread_id id;
 
-	thread = __allocate_pthread(data);
+	thread = __allocate_pthread(NULL, data);
 	if (thread == NULL)
 		return B_NO_MEMORY;
 
 	_single_threaded = false;
 		// used for I/O locking - BeOS compatibility issue
 
-	attributes.entry = &thread_entry;
-	attributes.name = name;
+	__pthread_init_creation_attributes(NULL, thread, &thread_entry, entry,
+		thread, name, &attributes);
+
 	attributes.priority = priority;
-	attributes.args1 = entry;
-	attributes.args2 = thread;
-	attributes.stack_address = NULL;
-	attributes.stack_size = 0;
 
 	id = _kern_spawn_thread(&attributes);
 	if (id < 0)
@@ -223,20 +219,21 @@ has_data(thread_id thread)
 status_t
 snooze_etc(bigtime_t timeout, int timeBase, uint32 flags)
 {
-	return _kern_snooze_etc(timeout, timeBase, flags);
+	return _kern_snooze_etc(timeout, timeBase, flags, NULL);
 }
 
 
 status_t
 snooze(bigtime_t timeout)
 {
-	return _kern_snooze_etc(timeout, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+	return _kern_snooze_etc(timeout, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT,
+		NULL);
 }
 
 
 status_t
 snooze_until(bigtime_t timeout, int timeBase)
 {
-	return snooze_etc(timeout, timeBase, B_ABSOLUTE_TIMEOUT);
+	return _kern_snooze_etc(timeout, timeBase, B_ABSOLUTE_TIMEOUT, NULL);
 }
 

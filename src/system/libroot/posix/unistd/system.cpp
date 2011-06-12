@@ -1,14 +1,18 @@
 /*
- * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2004-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 #include <image.h>
 
 #include <errno.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include <syscall_utils.h>
+
 
 
 extern "C" int
@@ -21,10 +25,8 @@ system(const char *command)
 	int argc = 3;
 
 	thread_id thread = load_image(argc, argv, (const char **)environ);
-	if (thread < 0) {
-		errno = thread;
-		return -1;
-	}
+	if (thread < 0)
+		RETURN_AND_SET_ERRNO_TEST_CANCEL(thread);
 
 	resume_thread(thread);
 

@@ -23,6 +23,7 @@
 #include <condition_variable.h>
 #include <cpu.h>
 #include <debug.h>
+#include <DPC.h>
 #include <elf.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
@@ -157,6 +158,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		timer_init(&sKernelArgs);
 		TRACE("init real time clock\n");
 		rtc_init(&sKernelArgs);
+		timer_init_post_rtc();
 
 		TRACE("init condition variables\n");
 		condition_variable_init();
@@ -180,6 +182,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
 		low_resource_manager_init_post_thread();
+		TRACE("init DPC\n");
+		dpc_init();
 		TRACE("init VFS\n");
 		vfs_init(&sKernelArgs);
 #if ENABLE_SWAP_SUPPORT

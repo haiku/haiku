@@ -63,47 +63,11 @@ arch_thread_init_thread_struct(Thread *thread)
 }
 
 
-status_t
-arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
-	void (*entry_func)(void), void (*exit_func)(void))
+void
+arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
+	void (*function)(void*), const void* data)
 {
-/*	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	addr_t *kstackTop = (addr_t *)t->kernel_stack_base;
-
-	// clear the kernel stack
-#ifdef DEBUG_KERNEL_STACKS
-#	ifdef STACK_GROWS_DOWNWARDS
-	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
-		KERNEL_STACK_SIZE);
-#	else
-	memset(kstack, 0, KERNEL_STACK_SIZE);
-#	endif
-#else
-	memset(kstack, 0, KERNEL_STACK_SIZE);
-#endif
-
-	// space for frame pointer and return address, and stack frames must be
-	// 16 byte aligned
-	kstackTop -= 2;
-	kstackTop = (addr_t*)((addr_t)kstackTop & ~0xf);
-
-	// LR, CR, r2, r13-r31, f13-f31, as pushed by m68k_context_switch()
-	kstackTop -= 22 + 2 * 19;
-
-	// let LR point to m68k_kernel_thread_root()
-	kstackTop[0] = (addr_t)&m68k_kernel_thread_root;
-
-	// the arguments of m68k_kernel_thread_root() are the functions to call,
-	// provided in registers r13-r15
-	kstackTop[3] = (addr_t)entry_func;
-	kstackTop[4] = (addr_t)start_func;
-	kstackTop[5] = (addr_t)exit_func;
-
-	// save this stack position
-	t->arch_info.sp = (void *)kstackTop;
-*/
 #warning ARM:WRITEME
-	return B_OK;
 }
 
 
@@ -157,14 +121,15 @@ arch_on_signal_stack(Thread *thread)
 
 
 status_t
-arch_setup_signal_frame(Thread *thread, struct sigaction *sa, int sig, int sigMask)
+arch_setup_signal_frame(Thread *thread, struct sigaction *sa,
+	struct signal_frame_data *signalFrameData)
 {
 	return B_ERROR;
 }
 
 
 int64
-arch_restore_signal_frame(void)
+arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
 	return 0;
 }

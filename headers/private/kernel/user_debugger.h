@@ -36,25 +36,26 @@ using BKernel::Thread;
 //
 // Locking policy:
 // 1) When accessing the structure it must be made sure, that the structure,
-//    (i.e. the struct team it lives in) isn't deleted. Thus one either needs to
-//    acquire the global team lock, or one accesses the structure from a thread
-//    of that team.
+//    (i.e. the struct Team it lives in) isn't deleted. Thus one either needs to
+//    get a team reference, lock the team, or one accesses the structure from a
+//    thread of that team.
 // 2) Access to the `flags' field is atomic. Reading via atomic_get()
 //    requires no further locks (in addition to 1) that is). Writing requires
-//    `lock' being held and must be done atomically, too
+//    `lock' to be held and must be done atomically, too
 //    (atomic_{set,and,or}()). Reading with `lock' being held doesn't need to
 //    be done atomically.
-// 3) Access to all other fields (read or write) requires `lock' being held.
+// 3) Access to all other fields (read or write) requires `lock' to be held.
+// 4) Locking order is scheduler lock -> Team -> Thread -> team_debug_info::lock
+//    -> thread_debug_info::lock.
 //
 struct team_debug_info {
 	spinlock	lock;
 		// Guards the remaining fields. Should always be the innermost lock
-		// to be acquired/released.
+		// to be acquired/released, save for thread_debug_info::lock.
 
 	int32		flags;
-		// Set atomically. So reading atomically is OK, even when the team
-		// lock is not held (at least if it is certain, that the team struct
-		// won't go).
+		// Set atomically. So reading atomically is OK, even when the lock is
+		// not held (at least if it is certain, that the team struct won't go).
 
 	team_id		debugger_team;
 	port_id		debugger_port;
@@ -71,12 +72,13 @@ struct team_debug_info {
 		// counter incremented whenever an image is created/deleted
 
 	struct ConditionVariable* debugger_changed_condition;
-		// Set whenever someone is going (or planning) to change the debugger.
-		// If one wants to do the same, one has to wait for this condition.
-		// Both threads lock (outer) and team debug info lock (inner) have to
-		// be held when accessing this field. After setting to a condition
-		// variable the thread won't be deleted (until unsetting it) -- it might
-		// be removed from the team hash table, though.
+		// Set to a condition variable when going to change the debugger. Anyone
+		// who wants to change the debugger as well, needs to wait until the
+		// condition variable is unset again (waiting for the condition and
+		// rechecking again). The field and the condition variable is protected
+		// by 'lock'. After setting the a condition variable the team is
+		// guaranteed not to be deleted (until it is unset) it might be removed
+		// from the team hash table, though.
 
 	struct BreakpointManager* breakpoint_manager;
 		// manages hard- and software breakpoints
@@ -84,11 +86,31 @@ struct team_debug_info {
 	struct arch_team_debug_info	arch_info;
 };
 
+// Thread related debugging data.
+//
+// Locking policy:
+// 1) When accessing the structure it must be made sure, that the structure,
+//    (i.e. the struct Thread it lives in) isn't deleted. Thus one either needs
+//    to get a thread reference, lock the thread, or one accesses the structure
+//    of the current thread.
+// 2) Access to the `flags' field is atomic. Reading via atomic_get()
+//    requires no further locks (in addition to 1) that is). Writing requires
+//    `lock' to be held and must be done atomically, too
+//    (atomic_{set,and,or}()). Reading with `lock' being held doesn't need to
+//    be done atomically.
+// 3) Access to all other fields (read or write) requires `lock' to be held.
+// 4) Locking order is scheduler lock -> Team -> Thread -> team_debug_info::lock
+//    -> thread_debug_info::lock.
+//
 struct thread_debug_info {
+	spinlock	lock;
+		// Guards the remaining fields. Should always be the innermost lock
+		// to be acquired/released.
+
 	int32		flags;
-		// Set atomically. So reading atomically is OK, even when the thread
-		// lock is not held (at least if it is certain, that the thread struct
-		// won't go).
+		// Set atomically. So reading atomically is OK, even when the lock is
+		// not held (at least if it is certain, that the thread struct won't
+		// go).
 	port_id		debug_port;
 		// the port the thread is waiting on for commands from the nub thread
 
@@ -238,7 +260,7 @@ void user_debug_stop_thread();
 void user_debug_team_created(team_id teamID);
 void user_debug_team_deleted(team_id teamID, port_id debuggerPort);
 void user_debug_team_exec();
-void user_debug_update_new_thread_flags(thread_id threadID);
+void user_debug_update_new_thread_flags(Thread* thread);
 void user_debug_thread_created(thread_id threadID);
 void user_debug_thread_deleted(team_id teamID, thread_id threadID);
 void user_debug_thread_exiting(Thread* thread);

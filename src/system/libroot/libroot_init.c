@@ -4,13 +4,18 @@
  */
 
 
+#include <pthread.h>
 #include <string.h>
 
-#include <fork.h>
 #include <image.h>
-#include <libroot_private.h>
-#include <runtime_loader.h>
+
 #include <user_runtime.h>
+
+#include <runtime_loader.h>
+
+#include <fork.h>
+#include <libroot_private.h>
+#include <pthread_private.h>
 
 
 void initialize_before(image_id imageID);
@@ -55,12 +60,13 @@ initialize_before(image_id imageID)
 	if (__gRuntimeLoader->program_args->umask != (mode_t)-1)
 		umask(__gRuntimeLoader->program_args->umask);
 
+	pthread_self()->id = find_thread(NULL);
+
 	__init_time();
 	__init_heap();
 	__init_env(__gRuntimeLoader->program_args);
 	__init_heap_post_env();
 	__init_pwd_backend();
-	__init_pthread();
 }
 
 

@@ -4,8 +4,9 @@
  */
 
 
+#include <OS.h>
+
 #include <errno.h>
-#include <signal.h>
 
 #include <syscalls.h>
 

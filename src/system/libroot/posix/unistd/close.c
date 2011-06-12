@@ -1,22 +1,21 @@
-/* 
+/*
 ** Copyright 2001, Manuel J. Petit. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
 
 #include <unistd.h>
-#include <syscalls.h>
+
 #include <errno.h>
+#include <pthread.h>
+
+#include <syscall_utils.h>
+
+#include <syscalls.h>
 
 
 int
 close(int fd)
 {
-	int retval = _kern_close(fd);
-	if (retval < 0) {
-		errno = retval;
-		retval = -1;
-	}
-
-	return retval;
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_close(fd));
 }

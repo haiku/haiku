@@ -4,16 +4,21 @@
  */
 
 
-#include <syscalls.h>
-
 #include <sys/file.h>
+
 #include <errno.h>
+#include <pthread.h>
+
+#include <syscalls.h>
 
 
 int
 flock(int fd, int op)
 {
 	status_t status = _kern_flock(fd, op);
+
+	pthread_testcancel();
+
 	if (status < B_OK) {
 		errno = status;
 		return -1;

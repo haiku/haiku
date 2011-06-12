@@ -126,7 +126,7 @@ public:
 		// Unlock the queue before blocking
 		queueLocker->Unlock();
 
-		InterruptsSpinLocker _(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 // TODO: We've got a serious race condition: If BlockAndUnlock() returned due to
 // interruption, we will still be queued. A WakeUpThread() at this point will
 // call thread_unblock() and might thus screw with our trying to re-lock the
@@ -246,7 +246,8 @@ public:
 
 	void WakeUpThread(bool waitForMessage)
 	{
-		InterruptsSpinLocker _(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+
 		if (waitForMessage) {
 			// Wake up all waiting thread for a message
 			// TODO: this can cause starvation for any
@@ -399,7 +400,8 @@ XsiMessageQueue::~XsiMessageQueue()
 
 	// Wake up any threads still waiting
 	if (fThreadsWaitingToSend || fThreadsWaitingToReceive) {
-		InterruptsSpinLocker _(gThreadSpinlock);
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+
 		while (queued_thread *entry = fWaitingToReceive.RemoveHead()) {
 			entry->queued = false;
 			thread_unblock_locked(entry->thread, EIDRM);

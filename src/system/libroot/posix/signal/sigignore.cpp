@@ -6,15 +6,32 @@
 
 #include <signal.h>
 
+#include <symbol_versioning.h>
+
+#include <signal_private.h>
+
 
 int
-sigignore(int signal)
+__sigignore_beos(int signal)
 {
-	struct sigaction ignoreSignalAction;
-		// create an action to ignore the signal
+	// create an action to ignore the signal
+	struct sigaction_beos ignoreSignalAction;
+	ignoreSignalAction.sa_handler = SIG_IGN;
+	ignoreSignalAction.sa_flags = 0;
 
-	// request that the signal will be ignored
-	// by the handler of the action
+	// In case of SIGCHLD the specification requires SA_NOCLDWAIT behavior.
+	if (signal == SIGCHLD)
+		ignoreSignalAction.sa_flags |= SA_NOCLDWAIT;
+
+	return __sigaction_beos(signal, &ignoreSignalAction, NULL);
+}
+
+
+int
+__sigignore(int signal)
+{
+	// create an action to ignore the signal
+	struct sigaction ignoreSignalAction;
 	ignoreSignalAction.sa_handler = SIG_IGN;
 	ignoreSignalAction.sa_flags = 0;
 
@@ -24,3 +41,8 @@ sigignore(int signal)
 
 	return sigaction(signal, &ignoreSignalAction, NULL);
 }
+
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__sigignore_beos", "sigignore@", "BASE");
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__sigignore", "sigignore@@", "1_ALPHA4");

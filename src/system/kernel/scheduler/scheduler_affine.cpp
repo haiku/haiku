@@ -25,8 +25,8 @@
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
-#include <user_debugger.h>
 
+#include "scheduler_common.h"
 #include "scheduler_tracing.h"
 
 
@@ -339,28 +339,6 @@ affine_estimate_max_scheduling_latency(Thread* thread)
 }
 
 
-static void
-context_switch(Thread *fromThread, Thread *toThread)
-{
-	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
-		user_debug_thread_unscheduled(fromThread);
-
-	cpu_ent* cpu = fromThread->cpu;
-	toThread->previous_cpu = toThread->cpu = cpu;
-	fromThread->cpu = NULL;
-	cpu->running_thread = toThread;
-
-	arch_thread_set_current_thread(toThread);
-	arch_thread_context_switch(fromThread, toThread);
-
-	// Looks weird, but is correct. fromThread had been unscheduled earlier,
-	// but is back now. The notification for a thread scheduled the first time
-	// happens in thread.cpp:thread_kthread_entry().
-	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
-		user_debug_thread_scheduled(fromThread);
-}
-
-
 static int32
 reschedule_event(timer *unused)
 {
@@ -486,9 +464,7 @@ affine_reschedule(void)
 	oldThread->was_yielded = false;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
-	bigtime_t now = system_time();
-	oldThread->kernel_time += now - oldThread->last_time;
-	nextThread->last_time = now;
+	scheduler_update_thread_times(oldThread, nextThread);
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
@@ -525,20 +501,27 @@ affine_reschedule(void)
 			quantum = kMaxThreadQuantum;
 
 		add_timer(quantumTimer, &reschedule_event, quantum,
-			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
+			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
 
 		if (nextThread != oldThread)
-			context_switch(oldThread, nextThread);
+			scheduler_switch_thread(oldThread, nextThread);
 	}
 }
 
 
-static void
-affine_on_thread_create(Thread* thread)
+static status_t
+affine_on_thread_create(Thread* thread, bool idleThread)
 {
+	// we don't need a data structure for the idle threads
+	if (idleThread) {
+		thread->scheduler_data = NULL;
+		return B_OK;
+	}
+
 	thread->scheduler_data = new(std::nothrow) scheduler_thread_data();
 	if (thread->scheduler_data == NULL)
-		panic("affine_scheduler: Unable to allocate scheduling data structure for thread %ld\n", thread->id);
+		return B_NO_MEMORY;
+	return B_OK;
 }
 
 
@@ -562,11 +545,9 @@ affine_on_thread_destroy(Thread* thread)
 static void
 affine_start(void)
 {
-	GRAB_THREAD_LOCK();
+	SpinLocker schedulerLocker(gSchedulerLock);
 
 	affine_reschedule();
-
-	RELEASE_THREAD_LOCK();
 }
 
 

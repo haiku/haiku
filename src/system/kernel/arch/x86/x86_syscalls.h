@@ -12,7 +12,7 @@
 extern void (*gX86SetSyscallStack)(addr_t stackTop);
 
 
-status_t	x86_initialize_commpage_syscall();
+void	x86_initialize_commpage_syscall();
 
 
 static inline void

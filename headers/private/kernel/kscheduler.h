@@ -18,27 +18,59 @@ struct SchedulerListener;
 
 
 struct scheduler_ops {
+	/*!	Enqueues the thread in the ready-to-run queue.
+		The caller must hold the scheduler lock (with disabled interrupts).
+	*/
 	void (*enqueue_in_run_queue)(Thread* thread);
+
+	/*!	Selects a thread from the ready-to-run queue and, if that's not the
+		calling thread, switches the current CPU's context to run the selected
+		thread.
+		If it's the same thread, the thread will just continue to run.
+		In either case, unless the thread is dead or is sleeping/waiting
+		indefinitely, the function will eventually return.
+		The caller must hold the scheduler lock (with disabled interrupts).
+	*/
 	void (*reschedule)(void);
+
+	/*!	Sets the given thread's priority.
+		The thread may be running or may be in the ready-to-run queue.
+		The caller must hold the scheduler lock (with disabled interrupts).
+	*/
 	void (*set_thread_priority)(Thread* thread, int32 priority);
 	bigtime_t (*estimate_max_scheduling_latency)(Thread* thread);
 
-	void (*on_thread_create)(Thread* thread);
-		// called when the thread structure is first created -
-		// initialization of per-thread housekeeping data structures should
-		// be done here
-	void (*on_thread_init)(Thread* thread);
-		// called when a thread structure is initialized and made ready for
-		// use - should be used to reset the housekeeping data structures
-		// if needed
-	void (*on_thread_destroy)(Thread* thread);
-		// called when a thread structure is freed - freeing up any allocated
-		// mem on the scheduler's part should be done here
+	/*!	Called when the Thread structure is first created.
+		Per-thread housekeeping resources can be allocated.
+		Interrupts must be enabled.
+	*/
+	status_t (*on_thread_create)(Thread* thread, bool idleThread);
 
+	/*!	Called when a Thread structure is initialized and made ready for
+		use.
+		The per-thread housekeeping data structures are reset, if needed.
+		The caller must hold the scheduler lock (with disabled interrupts).
+	*/
+	void (*on_thread_init)(Thread* thread);
+
+	/*!	Called when a Thread structure is freed.
+		Frees up any per-thread resources allocated on the scheduler's part. The
+		function may be called even if on_thread_create() failed.
+		Interrupts must be enabled.
+	*/
+	void (*on_thread_destroy)(Thread* thread);
+
+	/*!	Called in the early boot process to start thread scheduling on the
+		current CPU.
+		The function is called once for each CPU.
+		Interrupts must be disabled, but the caller must not hold the scheduler
+		lock.
+	*/
 	void (*start)(void);
 };
 
 extern struct scheduler_ops* gScheduler;
+extern spinlock gSchedulerLock;
 
 #define scheduler_enqueue_in_run_queue(thread)	\
 				gScheduler->enqueue_in_run_queue(thread)
@@ -46,8 +78,8 @@ extern struct scheduler_ops* gScheduler;
 				gScheduler->set_thread_priority(thread, priority)
 #define scheduler_reschedule()	gScheduler->reschedule()
 #define scheduler_start()		gScheduler->start()
-#define scheduler_on_thread_create(thread) \
-				gScheduler->on_thread_create(thread)
+#define scheduler_on_thread_create(thread, idleThread) \
+				gScheduler->on_thread_create(thread, idleThread)
 #define scheduler_on_thread_init(thread) \
 				gScheduler->on_thread_init(thread)
 #define scheduler_on_thread_destroy(thread) \
@@ -73,7 +105,7 @@ status_t _user_analyze_scheduling(bigtime_t from, bigtime_t until, void* buffer,
 
 
 /*!	Reschedules, if necessary.
-	The thread spinlock must be held.
+	The caller must hold the scheduler lock (with disabled interrupts).
 */
 static inline void
 scheduler_reschedule_if_necessary_locked()
@@ -91,9 +123,11 @@ scheduler_reschedule_if_necessary()
 {
 	if (are_interrupts_enabled()) {
 		cpu_status state = disable_interrupts();
-		GRAB_THREAD_LOCK();
+		acquire_spinlock(&gSchedulerLock);
+
 		scheduler_reschedule_if_necessary_locked();
-		RELEASE_THREAD_LOCK();
+
+		release_spinlock(&gSchedulerLock);
 		restore_interrupts(state);
 	}
 }

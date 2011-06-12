@@ -810,8 +810,7 @@ IOSchedulerSimple::_GetRequestOwner(team_id team, thread_id thread,
 	RequestOwnerList existingOwners;
 
 	while ((owner = fUnusedRequestOwners.RemoveHead()) != NULL) {
-		if (owner->thread < 0
-			|| thread_get_thread_struct(owner->thread) == NULL) {
+		if (owner->thread < 0 || !Thread::IsAlive(owner->thread)) {
 			if (owner->thread >= 0)
 				fRequestOwners->RemoveUnchecked(owner);
 			owner->team = team;

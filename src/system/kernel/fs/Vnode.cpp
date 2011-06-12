@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -88,6 +88,6 @@ vnode::_WakeUpLocker()
 		atomic_and(&fFlags, ~kFlagsWaitingLocker);
 
 	// and wake it up
-	InterruptsSpinLocker threadLocker(gThreadSpinlock);
+	InterruptsSpinLocker threadLocker(gSchedulerLock);
 	thread_unblock_locked(waiter->thread, B_OK);
 }

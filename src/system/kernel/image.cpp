@@ -145,13 +145,15 @@ unregister_image(Team *team, image_id id)
 
 
 /*!	Counts the registered images from the specified team.
-	The team lock must be held when you call this function.
+	Interrupts must be enabled.
 */
 int32
 count_images(Team *team)
 {
 	struct image *image = NULL;
 	int32 count = 0;
+
+	MutexLocker locker(sImageMutex);
 
 	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
 			!= NULL) {
@@ -215,45 +217,29 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
 	if (size > sizeof(image_info))
 		return B_BAD_VALUE;
 
-	status_t status = B_ENTRY_NOT_FOUND;
-	Team *team;
-	cpu_status state;
+	// get the team
+	Team* team = Team::Get(teamID);
+	if (team == NULL)
+		return B_BAD_TEAM_ID;
+	BReference<Team> teamReference(team, true);
 
-	mutex_lock(&sImageMutex);
+	// iterate through the team's images
+	MutexLocker imageLocker(sImageMutex);
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	struct image* image = NULL;
+	int32 count = 0;
 
-	if (teamID == B_CURRENT_TEAM)
-		team = thread_get_current_thread()->team;
-	else if (teamID == B_SYSTEM_TEAM)
-		team = team_get_kernel_team();
-	else
-		team = team_get_team_struct_locked(teamID);
-
-	if (team) {
-		struct image *image = NULL;
-		int32 count = 0;
-
-		while ((image = (struct image*)list_get_next_item(&team->image_list,
-				image)) != NULL) {
-			if (count == *cookie) {
-				memcpy(info, &image->info, size);
-				status = B_OK;
-				(*cookie)++;
-				break;
-			}
-			count++;
+	while ((image = (struct image*)list_get_next_item(&team->image_list,
+			image)) != NULL) {
+		if (count == *cookie) {
+			memcpy(info, &image->info, size);
+			(*cookie)++;
+			return B_OK;
 		}
-	} else
-		status = B_BAD_TEAM_ID;
+		count++;
+	}
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	mutex_unlock(&sImageMutex);
-
-	return status;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -366,24 +352,21 @@ image_init(void)
 static void
 notify_loading_app(status_t result, bool suspend)
 {
-	cpu_status state;
-	Team *team;
+	Team* team = thread_get_current_thread()->team;
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	TeamLocker teamLocker(team);
 
-	team = thread_get_current_thread()->team;
 	if (team->loading_info) {
 		// there's indeed someone waiting
-		struct team_loading_info *loadingInfo = team->loading_info;
+		struct team_loading_info* loadingInfo = team->loading_info;
 		team->loading_info = NULL;
 
 		loadingInfo->result = result;
 		loadingInfo->done = true;
 
-		// we're done with the team stuff, get the thread lock instead
-		RELEASE_TEAM_LOCK();
-		GRAB_THREAD_LOCK();
+		// we're done with the team stuff, get the scheduler lock instead
+		teamLocker.Unlock();
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 		// wake up the waiting thread
 		if (loadingInfo->thread->state == B_THREAD_SUSPENDED)
@@ -394,14 +377,7 @@ notify_loading_app(status_t result, bool suspend)
 			thread_get_current_thread()->next_state = B_THREAD_SUSPENDED;
 			scheduler_reschedule();
 		}
-
-		RELEASE_THREAD_LOCK();
-	} else {
-		// no-one is waiting
-		RELEASE_TEAM_LOCK();
 	}
-
-	restore_interrupts(state);
 }
 
 

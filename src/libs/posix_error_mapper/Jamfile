@@ -14,4 +14,5 @@ StaticLibrary libposix_error_mapper.a :
 	pthread_spinlock.cpp
 	pthread_thread.cpp
 	signal.cpp
+	time.cpp
 ;

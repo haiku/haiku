@@ -6,20 +6,41 @@
 
 #include <signal.h>
 
-#include <syscalls.h>
+#include <symbol_versioning.h>
+
+#include <signal_private.h>
 
 
-extern "C" int
-siginterrupt(int sig, int flag)
+int
+__siginterrupt_beos(int signal, int flag)
 {
-	struct sigaction action;
-
-	sigaction(sig, NULL, &action);
+	struct sigaction_beos action;
+	__sigaction_beos(signal, NULL, &action);
 	if (flag)
 		action.sa_flags &= ~SA_RESTART;
 	else
 		action.sa_flags |= SA_RESTART;
 
-	return sigaction(sig, &action, NULL);
+	return __sigaction_beos(signal, &action, NULL);
 }
 
+
+int
+__siginterrupt(int signal, int flag)
+{
+	struct sigaction action;
+	sigaction(signal, NULL, &action);
+	if (flag)
+		action.sa_flags &= ~SA_RESTART;
+	else
+		action.sa_flags |= SA_RESTART;
+
+	return sigaction(signal, &action, NULL);
+}
+
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__siginterrupt_beos", "siginterrupt@",
+	"BASE");
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__siginterrupt", "siginterrupt@@",
+	"1_ALPHA4");

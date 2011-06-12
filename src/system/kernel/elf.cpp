@@ -1773,6 +1773,20 @@ elf_debug_lookup_symbol(const char* searchName)
 
 
 status_t
+elf_lookup_kernel_symbol(const char* name, elf_symbol_info* info)
+{
+	// find the symbol
+	Elf32_Sym* foundSymbol = elf_find_symbol(sKernelImage, name, NULL, false);
+	if (foundSymbol == NULL)
+		return B_MISSING_SYMBOL;
+
+	info->address = foundSymbol->st_value + sKernelImage->text_region.delta;
+	info->size = foundSymbol->st_size;
+	return B_OK;
+}
+
+
+status_t
 elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 {
 	struct Elf32_Ehdr elfHeader;

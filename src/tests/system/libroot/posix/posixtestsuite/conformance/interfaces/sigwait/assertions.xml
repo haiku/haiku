@@ -10,12 +10,6 @@ single signal number (and it is implementation-defined that the signal number
 supports queued signals), then the first such queued signal shall cause a 
 return from sigwait() and the remainder shall remain queued.
   </assertion>
-  <assertion id="3" tag="def:S:42627:42632 pt:CX">
-If prior to the call to sigwait() there are multiple pending instances of a 
-single signal number (and it is implementation-defined that the signal number 
-DOES NOT support queued signals), then there should be no remaining pending
-signals for that signal number.
-  </assertion>
   <assertion id="4" tag="def:S:42632:42633 pt:CX">
 If no signal in 'set' is pending at the time of the call, the thread shall
 be suspended until one or more becomes pending.

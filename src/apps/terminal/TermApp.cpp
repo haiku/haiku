@@ -77,7 +77,7 @@ TermApp::ReadyToRun()
 	// a shell exits.
 	struct sigaction action;
 #ifdef __HAIKU__
-	action.sa_handler = (sighandler_t)_SigChildHandler;
+	action.sa_handler = (__sighandler_t)_SigChildHandler;
 #else
 	action.sa_handler = (__signal_func_ptr)_SigChildHandler;
 #endif

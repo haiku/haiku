@@ -22,11 +22,13 @@
 #include <thread.h>
 #include <tls.h>
 #include <tracing.h>
+#include <util/AutoLock.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
 #include "paging/X86PagingStructures.h"
 #include "paging/X86VMTranslationMap.h"
+#include "x86_signals.h"
 #include "x86_syscalls.h"
 
 
@@ -66,7 +68,7 @@ class RestartSyscall : public AbstractTraceEntry {
 
 // from arch_interrupts.S
 extern "C" void i386_stack_init(struct farcall *interrupt_stack_offset);
-extern "C" void i386_restore_frame_from_syscall(struct iframe frame);
+extern "C" void x86_return_to_userland(iframe* frame);
 
 // from arch_cpu.c
 extern void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
@@ -132,6 +134,48 @@ static struct iframe*
 get_current_iframe(void)
 {
 	return find_previous_iframe(thread_get_current_thread(), x86_read_ebp());
+}
+
+
+static inline void
+set_fs_register(uint32 segment)
+{
+	asm("movl %0,%%fs" :: "r" (segment));
+}
+
+
+static void
+set_tls_context(Thread *thread)
+{
+	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
+
+	set_segment_descriptor_base(&gGDT[entry], thread->user_local_storage);
+	set_fs_register((entry << 3) | DPL_USER);
+}
+
+
+/*!	Returns to the userland environment given by \a frame for a thread not
+	having been userland before.
+
+	Before returning to userland all potentially necessary kernel exit work is
+	done.
+
+	\param thread The current thread.
+	\param frame The iframe defining the userland environment. Must point to a
+		location somewhere on the caller's stack (e.g. a local variable).
+*/
+static void
+initial_return_to_userland(Thread* thread, iframe* frame)
+{
+	// disable interrupts and set up CPU specifics for this thread
+	disable_interrupts();
+
+	i386_set_tss_and_kstack(thread->kernel_stack_top);
+	set_tls_context(thread);
+	x86_set_syscall_stack(thread->kernel_stack_top);
+
+	// return to userland
+	x86_return_to_userland(frame);
 }
 
 
@@ -206,23 +250,6 @@ x86_next_page_directory(Thread *from, Thread *to)
 }
 
 
-static inline void
-set_fs_register(uint32 segment)
-{
-	asm("movl %0,%%fs" :: "r" (segment));
-}
-
-
-static void
-set_tls_context(Thread *thread)
-{
-	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
-
-	set_segment_descriptor_base(&gGDT[entry], thread->user_local_storage);
-	set_fs_register((entry << 3) | DPL_USER);
-}
-
-
 void
 x86_restart_syscall(struct iframe* frame)
 {
@@ -241,20 +268,19 @@ x86_restart_syscall(struct iframe* frame)
 }
 
 
-static uint32 *
-get_signal_stack(Thread *thread, struct iframe *frame, int signal)
+static uint8*
+get_signal_stack(Thread* thread, struct iframe* frame, struct sigaction* action)
 {
 	// use the alternate signal stack if we should and can
 	if (thread->signal_stack_enabled
-		&& (thread->sig_action[signal - 1].sa_flags & SA_ONSTACK) != 0
+		&& (action->sa_flags & SA_ONSTACK) != 0
 		&& (frame->user_esp < thread->signal_stack_base
 			|| frame->user_esp >= thread->signal_stack_base
 				+ thread->signal_stack_size)) {
-		return (uint32 *)(thread->signal_stack_base
-			+ thread->signal_stack_size);
+		return (uint8*)(thread->signal_stack_base + thread->signal_stack_size);
 	}
 
-	return (uint32 *)frame->user_esp;
+	return (uint8*)frame->user_esp;
 }
 
 
@@ -277,57 +303,40 @@ arch_thread_init_thread_struct(Thread *thread)
 }
 
 
-status_t
-arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
-	void (*entry_func)(void), void (*exit_func)(void))
+/*!	Prepares the given thread's kernel stack for executing its entry function.
+
+	\param thread The thread.
+	\param stack The usable bottom of the thread's kernel stack.
+	\param stackTop The usable top of the thread's kernel stack.
+	\param function The entry function the thread shall execute.
+	\param data Pointer to be passed to the entry function.
+*/
+void
+arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
+	void (*function)(void*), const void* data)
 {
-	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	addr_t *kstack_top = (addr_t *)t->kernel_stack_top;
-	int i;
+	addr_t* stackTop = (addr_t*)_stackTop;
 
-	TRACE(("arch_thread_initialize_kthread_stack: kstack 0x%p, start_func 0x%p, entry_func 0x%p\n",
-		kstack, start_func, entry_func));
+	TRACE(("arch_thread_init_kthread_stack: stack top %p, function %, data: "
+		"%p\n", stackTop, function, data));
 
-	// clear the kernel stack
-#ifdef DEBUG_KERNEL_STACKS
-#	ifdef STACK_GROWS_DOWNWARDS
-	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
-		KERNEL_STACK_SIZE);
-#	else
-	memset(kstack, 0, KERNEL_STACK_SIZE);
-#	endif
-#else
-	memset(kstack, 0, KERNEL_STACK_SIZE);
-#endif
+	// push the function argument, a pointer to the data
+	*--stackTop = (addr_t)data;
 
-	// set the final return address to be thread_kthread_exit
-	kstack_top--;
-	*kstack_top = (unsigned int)exit_func;
+	// push a dummy return address for the function
+	*--stackTop = 0;
 
-	// set the return address to be the start of the first function
-	kstack_top--;
-	*kstack_top = (unsigned int)start_func;
+	// push the function address -- that's the return address used after the
+	// context switch
+	*--stackTop = (addr_t)function;
 
-	// set the return address to be the start of the entry (thread setup)
-	// function
-	kstack_top--;
-	*kstack_top = (unsigned int)entry_func;
-
-	// simulate pushfl
-//	kstack_top--;
-//	*kstack_top = 0x00; // interrupts still disabled after the switch
-
-	// simulate initial popad
-	for (i = 0; i < 8; i++) {
-		kstack_top--;
-		*kstack_top = 0;
-	}
+	// simulate pushad as done by x86_context_switch()
+	for (int i = 0; i < 8; i++)
+		*--stackTop = 0;
 
 	// save the stack position
-	t->arch_info.current_stack.esp = kstack_top;
-	t->arch_info.current_stack.ss = (addr_t *)KERNEL_DATA_SEG;
-
-	return B_OK;
+	thread->arch_info.current_stack.esp = stackTop;
+	thread->arch_info.current_stack.ss = (addr_t*)KERNEL_DATA_SEG;
 }
 
 
@@ -411,20 +420,19 @@ arch_thread_dump_info(void *info)
 }
 
 
-/** Sets up initial thread context and enters user space
- */
-
+/*!	Sets up initial thread context and enters user space
+*/
 status_t
-arch_thread_enter_userspace(Thread *t, addr_t entry, void *args1,
-	void *args2)
+arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
+	void* args2)
 {
-	addr_t stackTop = t->user_stack_base + t->user_stack_size;
+	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
 	uint32 codeSize = (addr_t)x86_end_userspace_thread_exit
 		- (addr_t)x86_userspace_thread_exit;
 	uint32 args[3];
 
-	TRACE(("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
-		entry, args1, args2, stackTop));
+	TRACE(("arch_thread_enter_userspace: entry 0x%lx, args %p %p, "
+		"ustack_top 0x%lx\n", entry, args1, args2, stackTop));
 
 	// copy the little stub that calls exit_thread() when the thread entry
 	// function returns, as well as the arguments of the entry function
@@ -441,20 +449,22 @@ arch_thread_enter_userspace(Thread *t, addr_t entry, void *args1,
 	if (user_memcpy((void *)stackTop, args, sizeof(args)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	thread_at_kernel_exit();
-		// also disables interrupts
+	// prepare the user iframe
+	iframe frame = {};
+	frame.type = IFRAME_TYPE_SYSCALL;
+	frame.gs = USER_DATA_SEG;
+	// frame.fs not used -- we call set_tls_context() below
+	frame.es = USER_DATA_SEG;
+	frame.ds = USER_DATA_SEG;
+	frame.eip = entry;
+	frame.cs = USER_CODE_SEG;
+	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
+		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
+	frame.user_esp = stackTop;
+	frame.user_ss = USER_DATA_SEG;
 
-	// install user breakpoints, if any
-	if ((t->flags & THREAD_FLAGS_BREAKPOINTS_DEFINED) != 0)
-		x86_init_user_debug_at_kernel_exit(NULL);
-
-	i386_set_tss_and_kstack(t->kernel_stack_top);
-
-	// set the CPU dependent GDT entry for TLS
-	set_tls_context(t);
-
-	x86_set_syscall_stack(t->kernel_stack_top);
-	x86_enter_userspace(entry, stackTop);
+	// return to userland
+	initial_return_to_userland(thread, &frame);
 
 	return B_OK;
 		// never gets here
@@ -472,9 +482,35 @@ arch_on_signal_stack(Thread *thread)
 }
 
 
+/*!	Sets up the user iframe for invoking a signal handler.
+
+	The function fills in the remaining fields of the given \a signalFrameData,
+	copies it to the thread's userland stack (the one on which the signal shall
+	be handled), and sets up the user iframe so that when returning to userland
+	a wrapper function is executed that calls the user-defined signal handler.
+	When the signal handler returns, the wrapper function shall call the
+	"restore signal frame" syscall with the (possibly modified) signal frame
+	data.
+
+	The following fields of the \a signalFrameData structure still need to be
+	filled in:
+	- \c context.uc_stack: The stack currently used by the thread.
+	- \c context.uc_mcontext: The current userland state of the registers.
+	- \c syscall_restart_return_value: Architecture specific use. On x86 the
+		value of eax and edx which are overwritten by the syscall return value.
+
+	Furthermore the function needs to set \c thread->user_signal_context to the
+	userland pointer to the \c ucontext_t on the user stack.
+
+	\param thread The current thread.
+	\param action The signal action specified for the signal to be handled.
+	\param signalFrameData A partially initialized structure of all the data
+		that need to be copied to userland.
+	\return \c B_OK on success, another error code, if something goes wrong.
+*/
 status_t
-arch_setup_signal_frame(Thread *thread, struct sigaction *action,
-	int signal, int signalMask)
+arch_setup_signal_frame(Thread* thread, struct sigaction* action,
+	struct signal_frame_data* signalFrameData)
 {
 	struct iframe *frame = get_current_iframe();
 	if (!IFRAME_IS_USER(frame)) {
@@ -482,136 +518,94 @@ arch_setup_signal_frame(Thread *thread, struct sigaction *action,
 		return B_BAD_VALUE;
 	}
 
-	uint32 *signalCode;
-	uint32 *userRegs;
-	struct vregs regs;
-	uint32 buffer[6];
-	status_t status;
+	// In case of a BeOS compatible handler map SIGBUS to SIGSEGV, since they
+	// had the same signal number.
+	if ((action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0
+		&& signalFrameData->info.si_signo == SIGBUS) {
+		signalFrameData->info.si_signo = SIGSEGV;
+	}
 
-	// start stuffing stuff on the user stack
-	uint32* userStack = get_signal_stack(thread, frame, signal);
+	// store the register state in signalFrameData->context.uc_mcontext
+	signalFrameData->context.uc_mcontext.eip = frame->eip;
+	signalFrameData->context.uc_mcontext.eflags = frame->flags;
+	signalFrameData->context.uc_mcontext.eax = frame->eax;
+	signalFrameData->context.uc_mcontext.ecx = frame->ecx;
+	signalFrameData->context.uc_mcontext.edx = frame->edx;
+	signalFrameData->context.uc_mcontext.ebp = frame->ebp;
+	signalFrameData->context.uc_mcontext.esp = frame->user_esp;
+	signalFrameData->context.uc_mcontext.edi = frame->edi;
+	signalFrameData->context.uc_mcontext.esi = frame->esi;
+	signalFrameData->context.uc_mcontext.ebx = frame->ebx;
+	i386_fnsave((void *)(&signalFrameData->context.uc_mcontext.xregs));
 
-	// copy syscall restart info onto the user stack
-	userStack -= (sizeof(thread->syscall_restart.parameters) + 12 + 3) / 4;
-	uint32 threadFlags = atomic_and(&thread->flags,
-		~(THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
-	if (user_memcpy(userStack, &threadFlags, 4) < B_OK
-		|| user_memcpy(userStack + 1, &frame->orig_eax, 4) < B_OK
-		|| user_memcpy(userStack + 2, &frame->orig_edx, 4) < B_OK)
+	// fill in signalFrameData->context.uc_stack
+	signal_get_user_stack(frame->user_esp, &signalFrameData->context.uc_stack);
+
+	// store orig_eax/orig_edx in syscall_restart_return_value
+	signalFrameData->syscall_restart_return_value
+		= (uint64)frame->orig_edx << 32 | frame->orig_eax;
+
+	// get the stack to use -- that's either the current one or a special signal
+	// stack
+	uint8* userStack = get_signal_stack(thread, frame, action);
+
+	// copy the signal frame data onto the stack
+	userStack -= sizeof(*signalFrameData);
+	signal_frame_data* userSignalFrameData = (signal_frame_data*)userStack;
+	if (user_memcpy(userSignalFrameData, signalFrameData,
+			sizeof(*signalFrameData)) != B_OK) {
 		return B_BAD_ADDRESS;
-	status = user_memcpy(userStack + 3, thread->syscall_restart.parameters,
-		sizeof(thread->syscall_restart.parameters));
-	if (status < B_OK)
-		return status;
+	}
 
-	// store the saved regs onto the user stack
-	regs.eip = frame->eip;
-	regs.eflags = frame->flags;
-	regs.eax = frame->eax;
-	regs.ecx = frame->ecx;
-	regs.edx = frame->edx;
-	regs.ebp = frame->ebp;
-	regs.esp = frame->esp;
-	regs._reserved_1 = frame->user_esp;
-	regs._reserved_2[0] = frame->edi;
-	regs._reserved_2[1] = frame->esi;
-	regs._reserved_2[2] = frame->ebx;
-	i386_fnsave((void *)(&regs.xregs));
+	// prepare the user stack frame for a function call to the signal handler
+	// wrapper function
+	uint32 stackFrame[2] = {
+		frame->eip,		// return address
+		(addr_t)userSignalFrameData, // parameter: pointer to signal frame data
+	};
 
-	userStack -= (sizeof(struct vregs) + 3) / 4;
-	userRegs = userStack;
-	status = user_memcpy(userRegs, &regs, sizeof(regs));
-	if (status < B_OK)
-		return status;
+	userStack -= sizeof(stackFrame);
+	if (user_memcpy(userStack, stackFrame, sizeof(stackFrame)) != B_OK)
+		return B_BAD_ADDRESS;
 
-	// now store a code snippet on the stack
-	userStack -= ((uint32)i386_end_return_from_signal + 3
-		- (uint32)i386_return_from_signal) / 4;
-	signalCode = userStack;
-	status = user_memcpy(signalCode, (const void *)&i386_return_from_signal,
-		((uint32)i386_end_return_from_signal
-			- (uint32)i386_return_from_signal));
-	if (status < B_OK)
-		return status;
+	// Update Thread::user_signal_context, now that everything seems to have
+	// gone fine.
+	thread->user_signal_context = &userSignalFrameData->context;
 
-	// now set up the final part
-	buffer[0] = (uint32)signalCode;	// return address when sa_handler done
-	buffer[1] = signal;				// arguments to sa_handler
-	buffer[2] = (uint32)action->sa_userdata;
-	buffer[3] = (uint32)userRegs;
-
-	buffer[4] = signalMask;			// Old signal mask to restore
-	buffer[5] = (uint32)userRegs;	// Int frame + extra regs to restore
-
-	userStack -= sizeof(buffer) / 4;
-
-	status = user_memcpy(userStack, buffer, sizeof(buffer));
-	if (status < B_OK)
-		return status;
-
-	frame->user_esp = (uint32)userStack;
-	frame->eip = (uint32)action->sa_handler;
+	// Adjust the iframe's esp and eip, so that the thread will continue with
+	// the prepared stack, executing the signal handler wrapper function.
+	frame->user_esp = (addr_t)userStack;
+	frame->eip = x86_get_user_signal_handler_wrapper(
+		(action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0);
 
 	return B_OK;
 }
 
 
 int64
-arch_restore_signal_frame(void)
+arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
-	Thread *thread = thread_get_current_thread();
-	struct iframe *frame = get_current_iframe();
-	int32 signalMask;
-	uint32 *userStack;
-	struct vregs* regsPointer;
-	struct vregs regs;
+	struct iframe* frame = get_current_iframe();
 
 	TRACE(("### arch_restore_signal_frame: entry\n"));
 
-	userStack = (uint32 *)frame->user_esp;
-	if (user_memcpy(&signalMask, &userStack[0], 4) < B_OK
-		|| user_memcpy(&regsPointer, &userStack[1], 4) < B_OK
-		|| user_memcpy(&regs, regsPointer, sizeof(vregs)) < B_OK) {
-		return B_BAD_ADDRESS;
-	}
+	frame->orig_eax = (uint32)signalFrameData->syscall_restart_return_value;
+	frame->orig_edx
+		= (uint32)(signalFrameData->syscall_restart_return_value >> 32);
 
-	uint32* syscallRestartInfo
-		= (uint32*)regsPointer + (sizeof(struct vregs) + 3) / 4;
-	uint32 threadFlags;
-	if (user_memcpy(&threadFlags, syscallRestartInfo, 4) < B_OK
-		|| user_memcpy(&frame->orig_eax, syscallRestartInfo + 1, 4) < B_OK
-		|| user_memcpy(&frame->orig_edx, syscallRestartInfo + 2, 4) < B_OK
-		|| user_memcpy(thread->syscall_restart.parameters,
-			syscallRestartInfo + 3,
-			sizeof(thread->syscall_restart.parameters)) < B_OK) {
-		return B_BAD_ADDRESS;
-	}
+	frame->eip = signalFrameData->context.uc_mcontext.eip;
+	frame->flags = (frame->flags & ~(uint32)X86_EFLAGS_USER_FLAGS)
+		| (signalFrameData->context.uc_mcontext.eflags & X86_EFLAGS_USER_FLAGS);
+	frame->eax = signalFrameData->context.uc_mcontext.eax;
+	frame->ecx = signalFrameData->context.uc_mcontext.ecx;
+	frame->edx = signalFrameData->context.uc_mcontext.edx;
+	frame->ebp = signalFrameData->context.uc_mcontext.ebp;
+	frame->user_esp = signalFrameData->context.uc_mcontext.esp;
+	frame->edi = signalFrameData->context.uc_mcontext.edi;
+	frame->esi = signalFrameData->context.uc_mcontext.esi;
+	frame->ebx = signalFrameData->context.uc_mcontext.ebx;
 
-	// set restart/64bit return value flags from previous syscall
-	atomic_and(&thread->flags,
-		~(THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
-	atomic_or(&thread->flags, threadFlags
-		& (THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
-
-	// TODO: Verify that just restoring the old signal mask is right! Bash for
-	// instance changes the procmask in a signal handler. Those changes are
-	// lost the way we do it.
-	atomic_set(&thread->sig_block_mask, signalMask);
-	update_current_thread_signals_flag();
-
-	frame->eip = regs.eip;
-	frame->flags = regs.eflags;
-	frame->eax = regs.eax;
-	frame->ecx = regs.ecx;
-	frame->edx = regs.edx;
-	frame->ebp = regs.ebp;
-	frame->esp = regs.esp;
-	frame->user_esp = regs._reserved_1;
-	frame->edi = regs._reserved_2[0];
-	frame->esi = regs._reserved_2[1];
-	frame->ebx = regs._reserved_2[2];
-
-	i386_frstor((void *)(&regs.xregs));
+	i386_frstor((void*)(&signalFrameData->context.uc_mcontext.xregs));
 
 	TRACE(("### arch_restore_signal_frame: exit\n"));
 
@@ -637,27 +631,21 @@ arch_store_fork_frame(struct arch_fork_arg *arg)
 }
 
 
-/** Restores the frame from a forked team as specified by the provided
- *	arch_fork_arg structure.
- *	Needs to be called from within the child team, ie. instead of
- *	arch_thread_enter_uspace() as thread "starter".
- *	This function does not return to the caller, but will enter userland
- *	in the child team at the same position where the parent team left of.
- */
+/*!	Restores the frame from a forked team as specified by the provided
+	arch_fork_arg structure.
+	Needs to be called from within the child team, i.e. instead of
+	arch_thread_enter_userspace() as thread "starter".
+	This function does not return to the caller, but will enter userland
+	in the child team at the same position where the parent team left of.
 
+	\param arg The architecture specific fork arguments including the
+		environment to restore. Must point to a location somewhere on the
+		caller's stack.
+*/
 void
-arch_restore_fork_frame(struct arch_fork_arg *arg)
+arch_restore_fork_frame(struct arch_fork_arg* arg)
 {
-	Thread *thread = thread_get_current_thread();
-
-	disable_interrupts();
-
-	i386_set_tss_and_kstack(thread->kernel_stack_top);
-
-	// set the CPU dependent GDT entry for TLS (set the current %fs register)
-	set_tls_context(thread);
-
-	i386_restore_frame_from_syscall(arg->iframe);
+	initial_return_to_userland(thread_get_current_thread(), &arg->iframe);
 }
 
 

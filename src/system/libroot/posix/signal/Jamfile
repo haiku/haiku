@@ -1,26 +1,33 @@
 SubDir HAIKU_TOP src system libroot posix signal ;
 
 UsePrivateSystemHeaders ;
+UsePrivateHeaders libroot shared ;
 
 MergeObject posix_signal.o :
 	kill.c
 	killpg.cpp
+	psiginfo.cpp
+	psignal.cpp
 	raise.c
 	send_signal.c
-	set_signal_disposition.cpp
+	set_signal_mask.cpp
 	set_signal_stack.c
-	sigaction.c
+	sigaction.cpp
 	sigaltstack.c
 	sighold.cpp
 	sigignore.cpp
 	siginterrupt.cpp
-	signal.c
+	signal.cpp
+	signal_limits.cpp
 	sigpause.cpp
-	sigpending.c
-	sigprocmask.c
+	sigpending.cpp
+	sigqueue.cpp
 	sigrelse.cpp
-	sigset.c
-	sigsuspend.c
-	sigwait.c
-	strsignal.c
+	sigset.cpp
+	sigset_accessors.cpp
+	sigsuspend.cpp
+	sigtimedwait.cpp
+	sigwait.cpp
+	sigwaitinfo.cpp
+	strsignal.cpp
 ;

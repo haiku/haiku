@@ -1,17 +1,15 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYSTEM_THREAD_DEFS_H
 #define _SYSTEM_THREAD_DEFS_H
 
+
+#include <pthread.h>
+
 #include <OS.h>
 
-
-#define THREAD_RETURN_EXIT			0x1
-#define THREAD_RETURN_INTERRUPTED	0x2
-#define THREAD_STOPPED				0x3
-#define THREAD_CONTINUED			0x4
 
 /** Size of the stack given to teams in user space */
 #define USER_STACK_GUARD_PAGES		4								// 16 kB
@@ -39,18 +37,21 @@ enum {
 };
 
 
+#define THREAD_CREATION_FLAG_DEFER_SIGNALS	0x01
+	// create the thread with signals deferred, i.e. with
+	// user_thread::defer_signals set to 1
+
+
 struct thread_creation_attributes {
-	int32 (*entry)(thread_func, void *);
+	int32		(*entry)(void*, void*);
 	const char*	name;
 	int32		priority;
 	void*		args1;
 	void*		args2;
 	void*		stack_address;
 	size_t		stack_size;
-
-	// when calling from kernel only
-	team_id		team;
-	thread_id	thread;
+	pthread_t	pthread;
+	uint32		flags;
 };
 
 #endif	/* _SYSTEM_THREAD_DEFS_H */

@@ -1,24 +1,31 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef STRACE_MEMORY_READER_H
 #define STRACE_MEMORY_READER_H
 
+
 #include <OS.h>
+
 
 class MemoryReader {
 public:
-	MemoryReader(port_id nubPort);
-	~MemoryReader();
+								MemoryReader();
+								~MemoryReader();
 
-	status_t Read(void *address, void *buffer, int32 size, int32 &bytesRead);
+			status_t			Init(port_id nubPort);
+
+			status_t			Read(void *address, void *buffer, int32 size,
+									int32 &bytesRead);
 
 private:
-	status_t _Read(void *address, void *buffer, int32 size, int32 &bytesRead);
+			status_t			_Read(void *address, void *buffer, int32 size,
+									int32 &bytesRead);
 
-	port_id	fNubPort;
-	port_id	fReplyPort;
+private:
+			port_id				fNubPort;
+			port_id				fReplyPort;
 };
 
 

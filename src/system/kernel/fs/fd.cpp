@@ -476,17 +476,12 @@ int
 dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 {
 	// get the I/O context for the team in question
-	InterruptsSpinLocker teamsLocker(gTeamSpinlock);
-	Team* team = team_get_team_struct_locked(fromTeam);
+	Team* team = Team::Get(fromTeam);
 	if (team == NULL)
 		return B_BAD_TEAM_ID;
+	BReference<Team> teamReference(team, true);
 
 	io_context* fromContext = team->io_context;
-	vfs_get_io_context(fromContext);
-
-	teamsLocker.Unlock();
-
-	CObjectDeleter<io_context> _(fromContext, vfs_put_io_context);
 
 	// get the file descriptor
 	file_descriptor* descriptor = get_fd(fromContext, fd);

@@ -10,7 +10,7 @@ MergeObject posix_sys.o :
 	ftok.c
 	getrusage.c
  	gettimeofday.c
-	itimer.c
+	itimer.cpp
 	mkdir.c
 	mkfifo.c
 	mman.cpp
@@ -18,12 +18,12 @@ MergeObject posix_sys.o :
  	select.c
 	stat.c
 	statvfs.c
- 	times.c
+ 	times.cpp
  	uio.c
  	umask.c
  	uname.c
  	utimes.c
-	wait.c
+	wait.cpp
 	xsi_msg_queue.cpp
 	xsi_sem.cpp
 ;

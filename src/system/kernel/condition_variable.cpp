@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -134,14 +134,15 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 
 	conditionLocker.Unlock();
 
-	SpinLocker threadLocker(gThreadSpinlock);
+	SpinLocker schedulerLocker(gSchedulerLock);
 
 	status_t error;
 	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
 		error = thread_block_with_timeout_locked(flags, timeout);
 	else
 		error = thread_block_locked(thread_get_current_thread());
-	threadLocker.Unlock();
+
+	schedulerLocker.Unlock();
 
 	conditionLocker.Lock();
 
@@ -220,12 +221,12 @@ ConditionVariable::Publish(const void* object, const char* objectType)
 
 
 void
-ConditionVariable::Unpublish(bool threadsLocked)
+ConditionVariable::Unpublish(bool schedulerLocked)
 {
 	ASSERT(fObject != NULL);
 
 	InterruptsLocker _;
-	SpinLocker threadLocker(threadsLocked ? NULL : &gThreadSpinlock);
+	SpinLocker schedulerLocker(schedulerLocked ? NULL : &gSchedulerLock);
 	SpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
@@ -262,7 +263,7 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 
 
 /*static*/ void
-ConditionVariable::NotifyOne(const void* object, bool threadsLocked,
+ConditionVariable::NotifyOne(const void* object, bool schedulerLocked,
 	status_t result)
 {
 	InterruptsSpinLocker locker(sConditionVariablesLock);
@@ -271,13 +272,13 @@ ConditionVariable::NotifyOne(const void* object, bool threadsLocked,
 	if (variable == NULL)
 		return;
 
-	variable->NotifyOne(threadsLocked, result);
+	variable->NotifyOne(schedulerLocked, result);
 }
 
 
 /*static*/ void
-ConditionVariable::NotifyAll(const void* object,
-	bool threadsLocked, status_t result)
+ConditionVariable::NotifyAll(const void* object, bool schedulerLocked,
+	status_t result)
 {
 	InterruptsSpinLocker locker(sConditionVariablesLock);
 	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
@@ -285,7 +286,7 @@ ConditionVariable::NotifyAll(const void* object,
 	if (variable == NULL)
 		return;
 
-	variable->NotifyAll(threadsLocked, result);
+	variable->NotifyAll(schedulerLocked, result);
 }
 
 
@@ -321,10 +322,10 @@ ConditionVariable::Dump() const
 
 
 void
-ConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
+ConditionVariable::_Notify(bool all, bool schedulerLocked, status_t result)
 {
 	InterruptsLocker _;
-	SpinLocker threadLocker(threadsLocked ? NULL : &gThreadSpinlock);
+	SpinLocker schedulerLocker(schedulerLocked ? NULL : &gSchedulerLock);
 	SpinLocker locker(sConditionVariablesLock);
 
 	if (!fEntries.IsEmpty()) {
@@ -339,7 +340,7 @@ ConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
 
 
 /*! Called with interrupts disabled and the condition variable spinlock and
-	thread lock held.
+	scheduler lock held.
 */
 void
 ConditionVariable::_NotifyLocked(bool all, status_t result)

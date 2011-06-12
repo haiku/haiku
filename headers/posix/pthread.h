@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2011 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the Haiku License.
  */
 #ifndef _PTHREAD_H_
@@ -8,65 +8,9 @@
 
 #include <sched.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include <time.h>
 
-
-typedef struct	_pthread_thread		*pthread_t;
-typedef struct  _pthread_attr		*pthread_attr_t;
-typedef struct  _pthread_mutex		pthread_mutex_t;
-typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
-typedef struct  _pthread_cond		pthread_cond_t;
-typedef struct  _pthread_condattr	*pthread_condattr_t;
-typedef int							pthread_key_t;
-typedef struct  _pthread_once		pthread_once_t;
-typedef struct  _pthread_rwlock		pthread_rwlock_t;
-typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
-typedef struct  _pthread_spinlock	pthread_spinlock_t;
-/*
-typedef struct  _pthread_barrier	*pthread_barrier_t;
-typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
-*/
-
-struct _pthread_mutex {
-	uint32_t	flags;
-	int32_t		lock;
-	int32_t		unused;
-	int32_t		owner;
-	int32_t		owner_count;
-};
-
-struct _pthread_cond {
-	uint32_t		flags;
-	int32_t			unused;
-	pthread_mutex_t	*mutex;
-	int32_t			waiter_count;
-	int32_t			lock;
-};
-
-struct _pthread_once {
-	int32_t		state;
-};
-
-struct _pthread_rwlock {
-	uint32_t	flags;
-	int32_t		owner;
-	union {
-		struct {
-			int32_t		sem;
-		} shared;
-		struct {
-			int32_t		lock_sem;
-			int32_t		lock_count;
-			int32_t		reader_count;
-			int32_t		writer_count;
-			void*		waiters[2];
-		} local;
-	};
-};
-
-struct _pthread_spinlock {
-	int32_t		lock;
-};
 
 #define PTHREAD_MUTEX_DEFAULT		0
 #define PTHREAD_MUTEX_NORMAL		1
@@ -278,7 +222,6 @@ extern int pthread_equal(pthread_t t1, pthread_t t2);
 extern void pthread_exit(void *value_ptr);
 extern int pthread_join(pthread_t thread, void **_value);
 extern pthread_t pthread_self(void);
-extern int pthread_kill(pthread_t thread, int sig);
 extern int pthread_getconcurrency(void);
 extern int pthread_setconcurrency(int newLevel);
 

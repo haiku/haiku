@@ -95,6 +95,32 @@
 #define IA32_MTR_WRITE_BACK				6
 
 
+// EFLAGS register
+#define X86_EFLAGS_CARRY						0x00000001
+#define X86_EFLAGS_RESERVED1					0x00000002
+#define X86_EFLAGS_PARITY						0x00000004
+#define X86_EFLAGS_AUXILIARY_CARRY				0x00000010
+#define X86_EFLAGS_ZERO							0x00000040
+#define X86_EFLAGS_SIGN							0x00000080
+#define X86_EFLAGS_TRAP							0x00000100
+#define X86_EFLAGS_INTERRUPT					0x00000200
+#define X86_EFLAGS_DIRECTION					0x00000400
+#define X86_EFLAGS_OVERFLOW						0x00000800
+#define X86_EFLAGS_IO_PRIVILEG_LEVEL			0x00003000
+#define X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT		12
+#define X86_EFLAGS_NESTED_TASK					0x00004000
+#define X86_EFLAGS_RESUME						0x00010000
+#define X86_EFLAGS_V86_MODE						0x00020000
+#define X86_EFLAGS_ALIGNMENT_CHECK				0x00040000
+#define X86_EFLAGS_VIRTUAL_INTERRUPT			0x00080000
+#define X86_EFLAGS_VIRTUAL_INTERRUPT_PENDING	0x00100000
+#define X86_EFLAGS_ID							0x00200000
+
+#define X86_EFLAGS_USER_FLAGS	(X86_EFLAGS_CARRY | X86_EFLAGS_PARITY \
+	| X86_EFLAGS_AUXILIARY_CARRY | X86_EFLAGS_ZERO | X86_EFLAGS_SIGN \
+	| X86_EFLAGS_DIRECTION | X86_EFLAGS_OVERFLOW)
+
+
 // iframe types
 #define IFRAME_TYPE_SYSCALL				0x1
 #define IFRAME_TYPE_OTHER				0x2
@@ -276,7 +302,6 @@ void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState);
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
-void x86_enter_userspace(addr_t entry, addr_t stackTop);
 void x86_swap_pgdir(uint32 newPageDir);
 void i386_set_tss_and_kstack(addr_t kstack);
 void i386_fnsave(void* fpuState);

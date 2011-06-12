@@ -90,7 +90,7 @@ typedef struct mmx_regs {
 	unsigned char	mm7[10];
 	unsigned char	_reserved_154_159[6];
 } mmx_regs;
-	
+
 typedef struct xmmx_regs {
 	unsigned char	xmm0[16];
 	unsigned char	xmm1[16];
@@ -105,7 +105,7 @@ typedef struct xmmx_regs {
 typedef struct new_extended_regs {
 	unsigned short	fp_control;
 	unsigned short	fp_status;
-	unsigned short	fp_tag;  
+	unsigned short	fp_tag;
 	unsigned short	fp_opcode;
 	unsigned long	fp_eip;
 	unsigned short	fp_cs;
@@ -128,7 +128,7 @@ typedef struct extended_regs {
 		old_extended_regs	old_format;
 		new_extended_regs	new_format;
 	} state;
-	unsigned long	format;  
+	unsigned long	format;
 } extended_regs;
 
 struct vregs {
@@ -141,9 +141,11 @@ struct vregs {
 	unsigned long			ebp;
 	unsigned long			_reserved_1;
 	extended_regs	xregs;
-	unsigned long			_reserved_2[3];
+	unsigned long			edi;
+	unsigned long			esi;
+	unsigned long			ebx;
 };
- 
+
 #endif /* __INTEL__ */
 
 #endif /* _ARCH_SIGNAL_H_ */

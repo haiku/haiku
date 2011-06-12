@@ -9,6 +9,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <stdarg.h>
 #include <unistd.h>
 
@@ -20,14 +21,9 @@
 int
 creat(const char *path, mode_t mode)
 {
-	int status = _kern_open(-1, path, O_CREAT | O_TRUNC | O_WRONLY,
-		mode & ~__gUmask);
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(
+		_kern_open(-1, path, O_CREAT | O_TRUNC | O_WRONLY, mode & ~__gUmask));
 		// adapt the permissions as required by POSIX
-	if (status < 0) {
-		errno = status;
-		return -1;
-	}
-	return status;
 }
 
 
@@ -43,12 +39,7 @@ open(const char *path, int openMode, ...)
 		va_end(args);
 	}
 
-	int status = _kern_open(-1, path, openMode, perms);
-	if (status < 0) {
-		errno = status;
-		return -1;
-	}
-	return status;
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_open(-1, path, openMode, perms));
 }
 
 
@@ -64,12 +55,7 @@ openat(int fd, const char *path, int openMode, ...)
 		va_end(args);
 	}
 
-	int status = _kern_open(fd, path, openMode, perms);
-	if (status < 0) {
-		errno = status;
-		return -1;
-	}
-	return status;
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_open(fd, path, openMode, perms));
 }
 
 
@@ -81,5 +67,10 @@ fcntl(int fd, int op, ...)
 	uint32 argument = va_arg(args, uint32);
 	va_end(args);
 
-	RETURN_AND_SET_ERRNO(_kern_fcntl(fd, op, argument));
+	status_t error = _kern_fcntl(fd, op, argument);
+
+	if (op == F_SETLKW)
+		pthread_testcancel();
+
+	RETURN_AND_SET_ERRNO(error);
 }

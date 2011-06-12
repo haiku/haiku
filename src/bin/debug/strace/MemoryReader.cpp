@@ -1,7 +1,8 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,27 +12,41 @@
 
 #include "MemoryReader.h"
 
-// constructor
-MemoryReader::MemoryReader(port_id nubPort)
-	: fNubPort(nubPort),
-	  fReplyPort(-1)
+
+MemoryReader::MemoryReader()
+	:
+	fNubPort(-1),
+	fReplyPort(-1)
 {
-	fReplyPort = create_port(1, "memory reader reply");
-	if (fReplyPort < 0) {
-		fprintf(stderr, "Failed to create memory reader reply port: %s\n",
-			strerror(fReplyPort));
-		exit(1);
-	}
 }
 
-// constructor
+
 MemoryReader::~MemoryReader()
 {
 	if (fReplyPort >= 0)
 		delete_port(fReplyPort);
 }
 
-// Read
+
+status_t
+MemoryReader::Init(port_id nubPort)
+{
+	if (fReplyPort >= 0)
+		delete_port(fReplyPort);
+
+	fNubPort = nubPort;
+
+	fReplyPort = create_port(1, "memory reader reply");
+	if (fReplyPort < 0) {
+		fprintf(stderr, "Failed to create memory reader reply port: %s\n",
+			strerror(fReplyPort));
+		return fReplyPort;
+	}
+
+	return B_OK;
+}
+
+
 status_t
 MemoryReader::Read(void *_address, void *_buffer, int32 size, int32 &bytesRead)
 {
@@ -63,7 +78,7 @@ MemoryReader::Read(void *_address, void *_buffer, int32 size, int32 &bytesRead)
 	return B_OK;
 }
 
-// _Read
+
 status_t
 MemoryReader::_Read(void *address, void *buffer, int32 size, int32 &bytesRead)
 {
