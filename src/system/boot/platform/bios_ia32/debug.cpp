@@ -170,3 +170,13 @@ debug_cleanup(void)
 
 	sPostCleanup = true;
 }
+
+
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	if (_size != NULL)
+		*_size = sizeof(sBuffer);
+
+	return sBuffer;
+}

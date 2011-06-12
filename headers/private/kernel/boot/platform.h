@@ -70,6 +70,7 @@ extern void platform_update_menu_item(Menu *menu, MenuItem *item);
 extern void platform_run_menu(Menu *menu);
 extern size_t platform_get_user_input_text(Menu *menu, MenuItem *item,
 	char *buffer, size_t bufferSize);
+extern char* platform_debug_get_log_buffer(size_t* _size);
 
 #endif
 

@@ -68,3 +68,8 @@ dprintf(const char *format, ...)
 }
 
 
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	return NULL;
+}

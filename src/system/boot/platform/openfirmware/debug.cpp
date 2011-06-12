@@ -37,3 +37,9 @@ dprintf(const char* format, ...)
 	va_end(list);
 }
 
+
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	return NULL;
+}

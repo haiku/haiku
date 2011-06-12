@@ -54,3 +54,10 @@ dprintf(const char* format, ...)
 	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
 		fprintf(stderr, "%s", buffer);
 }
+
+
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	return NULL;
+}

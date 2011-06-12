@@ -487,7 +487,52 @@ user_menu_boot_volume(Menu* menu, MenuItem* item)
 
 
 static bool
-debug_menu_display_syslog(Menu* menu, MenuItem* item)
+debug_menu_display_current_log(Menu* menu, MenuItem* item)
+{
+	// get the buffer
+	size_t bufferSize;
+	const char* buffer = platform_debug_get_log_buffer(&bufferSize);
+	if (buffer == NULL || bufferSize == 0)
+		return true;
+
+	struct TextSource : PagerTextSource {
+		TextSource(const char* buffer, size_t size)
+			:
+			fBuffer(buffer),
+			fSize(strnlen(buffer, size))
+		{
+		}
+
+		virtual size_t BytesAvailable() const
+		{
+			return fSize;
+		}
+
+		virtual size_t Read(size_t offset, void* buffer, size_t size) const
+		{
+			if (offset >= fSize)
+				return 0;
+
+			if (size > fSize - offset)
+				size = fSize - offset;
+
+			memcpy(buffer, fBuffer + offset, size);
+			return size;
+		}
+
+	private:
+		const char*	fBuffer;
+		size_t		fSize;
+	};
+
+	pager(TextSource(buffer, bufferSize));
+
+	return true;
+}
+
+
+static bool
+debug_menu_display_previous_syslog(Menu* menu, MenuItem* item)
 {
 	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output;
 	if (buffer == NULL)
@@ -520,28 +565,8 @@ debug_menu_display_syslog(Menu* menu, MenuItem* item)
 }
 
 
-static bool
-debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
-{
-	char buffer[256];
-
-	size_t size = platform_get_user_input_text(menu, item, buffer,
-		sizeof(buffer) - 1);
-
-	if (size > 0) {
-		buffer[size] = '\n';
-		size_t pos = strlen(sSafeModeOptionsBuffer);
-		if (pos + size + 1 < sizeof(sSafeModeOptionsBuffer))
-			strlcat(sSafeModeOptionsBuffer, buffer,
-				sizeof(sSafeModeOptionsBuffer));
-	}
-
-	return true;
-}
-
-
 static status_t
-save_syslog_to_volume(Directory* directory)
+save_previous_syslog_to_volume(Directory* directory)
 {
 	// find an unused name
 	char name[16];
@@ -593,6 +618,26 @@ save_syslog_to_volume(Directory* directory)
 
 
 static bool
+debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
+{
+	char buffer[256];
+
+	size_t size = platform_get_user_input_text(menu, item, buffer,
+		sizeof(buffer) - 1);
+
+	if (size > 0) {
+		buffer[size] = '\n';
+		size_t pos = strlen(sSafeModeOptionsBuffer);
+		if (pos + size + 1 < sizeof(sSafeModeOptionsBuffer))
+			strlcat(sSafeModeOptionsBuffer, buffer,
+				sizeof(sSafeModeOptionsBuffer));
+	}
+
+	return true;
+}
+
+
+static bool
 debug_menu_toggle_debug_syslog(Menu* menu, MenuItem* item)
 {
 	gKernelArgs.keep_debug_output_buffer = item->IsMarked();
@@ -601,13 +646,13 @@ debug_menu_toggle_debug_syslog(Menu* menu, MenuItem* item)
 
 
 static bool
-debug_menu_save_syslog(Menu* menu, MenuItem* item)
+debug_menu_save_previous_syslog(Menu* menu, MenuItem* item)
 {
 	Directory* volume = (Directory*)item->Data();
 
 	console_clear_screen();
 
-	save_syslog_to_volume(volume);
+	save_previous_syslog_to_volume(volume);
 
 	printf("\nPress any key to continue\n");
 	console_wait_for_key();
@@ -773,7 +818,7 @@ add_save_debug_syslog_menu()
 
 			item = new(nothrow) MenuItem(name);
 			item->SetData(volume);
-			item->SetTarget(&debug_menu_save_syslog);
+			item->SetTarget(&debug_menu_save_previous_syslog);
 			item->SetType(MENU_ITEM_NO_CHOICE);
 			item->SetHelpText(kHelpText);
 			menu->AddItem(item);
@@ -843,13 +888,25 @@ add_debug_menu()
     item->SetHelpText("Enables a special in-memory syslog buffer for this "
     	"session that the boot loader will be able to access after rebooting.");
 
+	bool currentLogItemVisible = platform_debug_get_log_buffer(NULL) != NULL;
+	if (currentLogItemVisible) {
+		menu->AddSeparatorItem();
+		menu->AddItem(item
+			= new(nothrow) MenuItem("Display current boot loader log"));
+		item->SetTarget(&debug_menu_display_current_log);
+		item->SetType(MENU_ITEM_NO_CHOICE);
+		item->SetHelpText(
+			"Displays the debug info the boot loader has logged.");
+	}
+
 	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
 	if (syslogBuffer != NULL && ring_buffer_readable(syslogBuffer) > 0) {
-		menu->AddSeparatorItem();
+		if (!currentLogItemVisible)
+			menu->AddSeparatorItem();
 
 		menu->AddItem(item
 			= new(nothrow) MenuItem("Display syslog from previous session"));
-		item->SetTarget(&debug_menu_display_syslog);
+		item->SetTarget(&debug_menu_display_previous_syslog);
 		item->SetType(MENU_ITEM_NO_CHOICE);
 		item->SetHelpText(
 			"Displays the syslog from the previous Haiku session.");

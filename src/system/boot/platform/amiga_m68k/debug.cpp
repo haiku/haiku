@@ -33,7 +33,7 @@ panic(const char *format, ...)
 		uint8	line2;
 		char	buffer[512];
 		uint8	end;
-		
+
 	} _PACKED alert = {
 		10, 12,
 		"*** PANIC ***",
@@ -75,9 +75,14 @@ dprintf(const char *format, ...)
 		vfprintf(dbgerr, format, list);
 	//vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
-	
+
 	//if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
 	//	Bconput(DEV_CONSOLE, buffer);
 }
 
 
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	return NULL;
+}

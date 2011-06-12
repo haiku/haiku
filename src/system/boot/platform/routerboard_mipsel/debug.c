@@ -22,3 +22,9 @@ dprintf(const char* format, ...)
 #warning IMPLEMENT dprintf
 }
 
+
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	return NULL;
+}
