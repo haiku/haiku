@@ -1022,7 +1022,10 @@ BListView::ScrollToSelection()
 	if (Bounds().Contains(itemFrame))
 		return;
 
-	ScrollTo(itemFrame.left, itemFrame.top);
+	if (itemFrame.top < Bounds().top)
+		ScrollTo(itemFrame.left, itemFrame.top);
+	else
+		ScrollTo(itemFrame.left, itemFrame.bottom - Bounds().Height());
 }
 
 
