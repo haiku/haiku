@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	2979335347
+1	japanese	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 %.1f MiB	PackageView		%.1f MiB
@@ -38,8 +38,10 @@ Package installer	PackageView		パッケージインストーラー
 PackageInstaller	System name		PackageInstaller
 Preparing package	PackageInstall		パッケージを準備しています
 Replace	PackageView		置き換える
+Replace all	PackageView		すべて置き換え
 Running post-installation scripts	PackageInstall		インストールの後始末をしています
 Skip	PackageView		スキップ
+Skip all	PackageView		すべてスキップ
 Stop	PackageStatus		中止
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ディレクトリ '%s' がすでにパスに存在します。\nディレクトリをパッケージの物と置き換えますか、またはスキップしますか?
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置き換えますか、またはスキップしますか?
@@ -52,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		スクリプト '%s' がすでにパスに存在します。\nスクリプトをパッケージの物と置き換えますか、またはスキップしますか?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		シンボリックリンク '%s' がすでにパスに存在します。\nリンクををパッケージの物と置き換えますか、またはスキップしますか?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールをまだ続けますか?
+none	PackageView		無し

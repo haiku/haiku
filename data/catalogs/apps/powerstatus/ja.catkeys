@@ -1,12 +1,15 @@
-1	japanese	x-vnd.Haiku-PowerStatus	2692842017
+1	japanese	x-vnd.Haiku-PowerStatus	1403993884
+About	PowerStatus		このソフトウェアについて
 About…	PowerStatus		このソフトウェアについて…
 Battery charging	PowerStatus		充電中
 Battery discharging	PowerStatus		放電中
 Battery info	PowerStatus		バッテリー情報
 Battery info…	PowerStatus		バッテリー情報...
 Battery unused	PowerStatus		使用していないバッテリー
+Capacity granularity 1: 	PowerStatus		容量精度 1: 
 Capacity granularity 2: 	PowerStatus		容量精度 2:
 Capacity: 	PowerStatus		容量:
+Current rate: 	PowerStatus		電流:
 Design capacity: 	PowerStatus		定格容量:
 Design voltage: 	PowerStatus		定格電圧:
 Empty battery slot	PowerStatus		バッテリースロットが空です
@@ -16,18 +19,24 @@ Last full charge: 	PowerStatus		現在の最大容量
 Model number: 	PowerStatus		モデルナンバー:
 OEM info: 	PowerStatus		OEM情報:
 OK	PowerStatus		OK
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nAxel Dörfler, Clemens Zeidler作\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		終了
 Run in window	PowerStatus		ウインドウモードで起動
 Serial number: 	PowerStatus		シリアルナンバー:
 Show percent	PowerStatus		パーセントを表示
+Show status icon	PowerStatus		状態アイコンを表示
 Show text label	PowerStatus		テキストラベル表示
 Show time	PowerStatus		時間を表示
 Technology: 	PowerStatus		テクノロジー:
+Type: 	PowerStatus		タイプ:
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウインドウモードで起動するか、または Deskbar 中にインストールできます。
 charging	PowerStatus		充電中
 discharging	PowerStatus		放電中
 mA	PowerStatus		mA
 mAh	PowerStatus		mAh
+mV	PowerStatus		mV
 mW	PowerStatus		mW
 mWh	PowerStatus		mWh
 no battery	PowerStatus		バッテリーが有りません
+non-rechargeable	PowerStatus		再充電不能
 rechargeable	PowerStatus		再充電する

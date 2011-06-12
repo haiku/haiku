@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Be-PRNT	1563474157
+1	simplified_chinese	x-vnd.Be-PRNT	2065133853
 %.2f KB	JobListView		%.2f KB
 1 pending job.	PrinterListView		1个挂起任务
 <pick one>	AddPrinterDialog		<选择一个>
@@ -27,6 +27,7 @@ Printer name:	AddPrinterDialog		打印机名：
 Printer type:	AddPrinterDialog		打印机类型：
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
 Printers	PrintersWindow		打印机
+Printers	System name		打印机
 Processing	JobListView		处理中
 Red	TestPageView		绿
 Remove	PrintersWindow		删除

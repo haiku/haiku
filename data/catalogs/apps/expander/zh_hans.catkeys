@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Expander	3000790344
+1	simplified_chinese	x-vnd.Haiku-Expander	187676748
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		确定停止解压\n该压缩文件? 已完成解压部分可能不完整。
 Automatically expand files	ExpanderPreferences		自动解压文件
 Automatically show contents listing	ExpanderPreferences		自动显示内容列表
@@ -13,9 +13,10 @@ Destination folder:	ExpanderPreferences		目标目录：
 Error when expanding archive	ExpanderWindow		解压缩出错
 Expand	ExpanderMenu		解压缩
 Expand	ExpanderWindow		解压缩
-Expander settings	ExpanderPreferences		Expander 设置
-Expander: Choose destination	DirectoryFilePanel		Expander：选择目标文件
-Expander: Open	ExpanderWindow		Expander：打开
+Expander	System name		归档管理器
+Expander settings	ExpanderPreferences		设置
+Expander: Choose destination	DirectoryFilePanel		归档管理器：选择目标文件
+Expander: Open	ExpanderWindow		归档管理器：打开
 Expanding '%s'	ExpanderWindow		'%s' 解压进行中
 Expansion:	ExpanderPreferences		解压：
 File	ExpanderMenu		文件

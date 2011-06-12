@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-OpenGL	899836772
+1	simplified_chinese	x-vnd.Haiku-OpenGL	209187778
 Attributes stack size:	Capabilities		属性堆栈大小：
 Auxiliary buffer(s):	Capabilities		辅助指令缓冲器：
 Available	Extensions		可用
@@ -19,6 +19,7 @@ Max. recommended vertex elements:	Capabilities		最大推荐顶部单元
 Max. texture units:	Capabilities		最大文字单位
 Model stack size:	Capabilities		模型堆栈大小：
 Name stack size:	Capabilities		名称堆栈大小：
+OpenGL	System name		OpenGL
 OpenGL version:	InfoView		OpenGL 版本：
 Projection stack size:	Capabilities		投影堆栈大小
 Renderer name:	InfoView		渲染器名称：

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	2979335347
+1	finnish	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f gibitavua
 %.1f KiB	PackageView		%.1f kibitavua
 %.1f MiB	PackageView		%.1f mebitavua
@@ -38,8 +38,10 @@ Package installer	PackageView		Paketin asennusohjelma
 PackageInstaller	System name		Pakettiasennus
 Preparing package	PackageInstall		Valmistellaan pakettia
 Replace	PackageView		Korvaa
+Replace all	PackageView		Korvaa kaikki
 Running post-installation scripts	PackageInstall		Suoritetaan jälkiasennusskriptit
 Skip	PackageView		Ohita
+Skip all	PackageView		Ohita kaikki
 Stop	PackageStatus		Pysäytä
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Hakemisto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko hakemisto vastaavalla tästä paketista vai ohitetaanko se?
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
@@ -52,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko se?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
+none	PackageView		ei mitään

@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		キャプチャレートメニュー
 Capture controls	CodyCam		キャプチャ制御
 Capturing Image…	VideoConsumer.cpp		画像を取得中...
 Closing the window\n	VideoConsumer.cpp		ウィンドウを閉じる\n
-CodyCam	Application name		CodyCam
+CodyCam	System name		CodyCam
 Connected…	VideoConsumer.cpp		接続しました...
 Couldn't find requested directory on server	VideoConsumer.cpp		指定されたディレクトリがサーバー上にみつかりませんでした
 Directory:	CodyCam		ディレクトリ:

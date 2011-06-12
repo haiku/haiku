@@ -34,7 +34,7 @@ Logging view	PoorMan		Vue du journal
 Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
-PoorMan	Application name		PoorMan
+PoorMan	System name		PoorMan
 PoorMan settings	PoorMan		Réglages de PoorMan
 Quit	PoorMan		Quitter
 Run server	PoorMan		Mettre le serveur en fonction

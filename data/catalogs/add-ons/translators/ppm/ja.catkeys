@@ -1,4 +1,6 @@
-1	japanese	x-vnd.Haiku-PPMTranslator	4285459467
+1	japanese	x-vnd.Haiku-PPMTranslator	2886727868
+Based on PPMTranslator sample code	PPMTranslator		PPM トランスレーターのサンプルコードに基づく
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be ビットマップフォーマット (PPMトランスレーター)
 Bitmap 1 bit	PPMTranslator		ビットマップ 1 ビット
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 ビット
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 ビット
@@ -7,6 +9,7 @@ Grayscale 8 bits	PPMTranslator		グレイスケール 8 ビット
 Input Color Space	PPMTranslator		入力カラースペース
 None	PPMTranslator		無し
 OK	PPMMain		OK
+PPM Image Translator	PPMTranslator		PPM イメージトランスレーター
 PPM Settings	PPMMain		PPM 設定
 PPM image	PPMTranslator		PPM イメージ
 PPMTranslator Settings	PPMTranslator		PPMトランスレーター設定

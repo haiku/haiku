@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-libtracker	2201969114
+1	simplified_chinese	x-vnd.Haiku-libtracker	2699246155
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld 字节
@@ -103,6 +103,7 @@ Delete	FilePanelPriv		删除
 Delete	PoseView		删除
 Deleting: 	StatusWindow		删除：
 Description:	InfoWindow		描述：
+Desktop	B_DESKTOP_DIRECTORY		桌面
 Desktop	Model		桌面
 Desktop	TrackerSettingsWindow		桌面
 Disk mount settings	AutoMounterSettings		磁盘挂载设置
@@ -168,7 +169,9 @@ Icon view	DeskWindow		图标视图
 Icon view	VolumeWindow		图标视图
 Identify	ContainerWindow		标识
 Identify	InfoWindow		标识
+If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		如果您 %ifYouDoAction 常用文件夹，Haiku 可能无法正常运行！您确定要这么做吗？为了 %ifYouDoAction 常用文件夹，请按下 Shift 键，同时点击 \"执行\"。
 If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		如果您 %ifYouDoAction config 文件夹，Haiku 可能无法正常运行！您确定要这么做吗？为了 %toDoAction config 文件夹，请点击 \"执行\"。
+If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		如果您 %ifYouDoAction 主目录，Haiku 可能无法正常运行！您确定要这么做吗？为了 %ifYouDoAction 主目录，请按下 Shift 键，同时点击 \"执行\"。
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		如果您 %ifYouDoAction mime 设置，Haiku 可能无法正常运行！您确定要这么做吗？为了 %toDoAction settings 设置，请点击 \"执行\"。
 If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		如果您 %ifYouDoAction settings 文件夹，Haiku 可能无法正常运行！您确定要这么做吗？为了 %toDoAction settings 文件夹，请点击 \"执行\"。
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		如果您  %ifYouDoAction 系统文件夹或其内容，您将无法启动 Haiku！您确定要这么做吗？为了 %toDoAction 系统文件夹或其内容，请按下 Shift 键，同时点击 \"执行\"。
@@ -282,6 +285,7 @@ Prompt	FSUtils		提示
 Query name:	FindPanel		查询名称：
 Query template	FindPanel		查询模板
 Read	FilePermissionsView		读取
+Real name	ContainerWindow		真实名称
 Recalculate folder size	InfoWindow		重新计算目录大小
 Recent documents	FavoritesMenu		最近文本
 Recent folders	ContainerWindow		最近目录
@@ -362,6 +366,7 @@ There was an error resolving the link.	Tracker		恢复链接出错。
 There was an error writing the attribute.	WidgetAttributeText		该属性写入出错。
 TiB	WidgetAttributeText		TiB
 To: %dir	StatusWindow		到：%dir
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		文件浏览器新模板
 Tracker preferences	TrackerSettingsWindow		文件浏览器首选项
 Tracker status	StatusWindow		文件浏览器状态
 Trash	Model		垃圾箱
@@ -400,19 +405,24 @@ You must have at least one attribute showing.	PoseView		您必须至少显示一
 \nShould this be fixed?	FSUtils		\n 是否应该进行修复？
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld 字节， 
 after	FindPanel		之后
+apps	B_APPS_DIRECTORY		应用
 before	FindPanel		之前
 by attribute	FindPanel		属性
 by formula	FindPanel		公式
 by name	FindPanel		名称
 calculating…	InfoWindow		计算...
+common	B_COMMON_DIRECTORY		常用
+config	B_USER_CONFIG_DIRECTORY		设置
 contains	FindPanel		包含
 contains	SelectionWindow		包含
 copy	FSUtils	filename copy	复制
 copying	FSUtils		复制中
+develop	B_COMMON_DEVELOP_DIRECTORY		开发
 ends with	FindPanel		结束方式
 ends with	SelectionWindow		结束方式
 for %num files	InfoWindow		给 %num 文件 
 greater than	FindPanel		大于
+home	B_USER_DIRECTORY		主目录
 is	FindPanel		是
 is not	FindPanel		不是
 label too long	PoseView		标签太长
@@ -427,7 +437,9 @@ multiple disks	FindPanel		多轴磁盘
 no items	CountView		无项目
 no supporting apps	OpenWithWindow		无支持应用程序
 of %items	StatusWindow		of %items
+optional	/boot/optional		可选
 parent folder	NavMenu		上级目录
+preferences	B_PREFERENCES_DIRECTORY		系统设置
 rename	InfoWindow	As in 'If you rename ...'	重命名
 rename	InfoWindow	As in 'To rename ...'	重命名
 rename	TextWidget	As in 'If you rename ...'	重命名
@@ -435,3 +447,5 @@ rename	TextWidget	As in 'To rename ...'	重命名
 save text	FilePanelPriv		保存文本
 starts with	FindPanel		启动方式：
 starts with	SelectionWindow		启动方式
+system	B_SYSTEM_DIRECTORY		系统
+trash	B_TRASH_DIRECTORY		垃圾箱

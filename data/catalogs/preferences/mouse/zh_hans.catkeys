@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Mouse	3904912604
+1	simplified_chinese	x-vnd.Haiku-Mouse	1033564338
 ...by Andrew Edward McCall	MouseApplication		...由 Andrew Edward McCall 编写
 1-Button	SettingsView		第一个键
 2-Button	SettingsView		第二个键
@@ -12,11 +12,12 @@ Double-click speed	SettingsView		双击速度
 Double-click test area	SettingsView		双击测试区域
 Fast	SettingsView		快速
 Focus follows mouse	SettingsView		指针踪迹
-Focus mode:	SettingsView		聚焦模式:
+Focus mode:	SettingsView		聚焦模式：
 Instant warp	SettingsView		瞬间弯曲
+Mouse	System name		鼠标
 Mouse acceleration	SettingsView		指针加速
 Mouse speed	SettingsView		速度
-Mouse type:	SettingsView		鼠标类型:
+Mouse type:	SettingsView		鼠标类型：
 Normal	SettingsView		正常
 Revert	MouseWindow		取消
 Slow	SettingsView		慢速

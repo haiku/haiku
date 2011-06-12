@@ -1,6 +1,6 @@
 1	russian	x-vnd.Haiku-LaunchBox	1440389990
 Add button here	LaunchBox		Добавить кнопку
-Auto-raise	LaunchBox		Всплывать автоматически
+Auto-raise	LaunchBox		Всплывать при наведении
 Bummer	LaunchBox		Облом
 Cancel	LaunchBox		Отмена
 Clear button	LaunchBox		Очистить кнопку
@@ -27,7 +27,7 @@ Remove button	LaunchBox		Удалить кнопку
 Set description…	LaunchBox		Изменить описание…
 Settings	LaunchBox		Настройки
 Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
-Show window border	LaunchBox		Показать рамку окна
+Show window border	LaunchBox		Отображать рамку окна
 Vertical layout	LaunchBox		Расположить вертикально
 You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
 last chance	LaunchBox		последний шанс

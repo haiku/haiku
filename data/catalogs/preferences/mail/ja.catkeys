@@ -25,7 +25,7 @@ Start mail services on startup	Config Window		起動時にメールサービス�
 While sending	Config Window		送信中に
 While sending and receiving	Config Window		送受信中に
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定をもとに戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成します。\n\n削除ボタンで選択したアカウントを削除します。\n\nリストの項目を選択して、設定を変更します。
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成してください。\n\n削除ボタンで選択したアカウントを削除してください。\n\nリストのアイテムを選択して、設定を変更してください。
 days	Config Window		日毎にチェック
 hours	Config Window		時間毎にチェック
 minutes	Config Window		分毎にチェック

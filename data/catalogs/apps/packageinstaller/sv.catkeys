@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	2979335347
+1	swedish	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 %.1f MiB	PackageView		%.1f MiB
@@ -38,8 +38,10 @@ Package installer	PackageView		Paket intallerare
 PackageInstaller	System name		PaketInstallerare
 Preparing package	PackageInstall		Förbereder paket
 Replace	PackageView		Ersätt
+Replace all	PackageView		Ersätt alla
 Running post-installation scripts	PackageInstall		Kör efter-installationsskript
 Skip	PackageView		Hoppa över
+Skip all	PackageView		Hoppa över alla
 Stop	PackageStatus		Stoppa
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Mappen '%s' finns redan.\nVill du ersätta den med innehållet ur detta paket eller hoppa över mappen?
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Filen '%s' finns redan i den angivna sökvägen.\nSkall filen skrivas över av filer i detta paket, eller skall den lämnas kvar?
@@ -52,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Ett skript med namnet '%s' finns redan på det aktuella stället.\nVill du ersätta det med ett ur paketet eller vill du hoppa över?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		En länk med namnet '%s' finns redan på det aktuella stället. Vill du ersätta den med en ur det här paketet, eller vill du hoppa över?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Storleken på paketet överensstämmer inte med kontrollsumman. Paketet kan vara korrupt eller kan ha ändrats efter att det skapades. Vill du ändå fortsätta?
+none	PackageView		ingen

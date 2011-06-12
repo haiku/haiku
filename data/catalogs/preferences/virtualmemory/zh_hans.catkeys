@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-VirtualMemory	3541691135
+1	simplified_chinese	x-vnd.Haiku-VirtualMemory	688347876
 %Ld B	SettingsWindow		%Ld B
 Changes will take effect on restart!	SettingsWindow		重启之后，更改将会生效！
 Current swap file size: 	SettingsWindow		当前交换文件大小：
@@ -16,4 +16,5 @@ Requested swap file size:	SettingsWindow		建议交换分区大小：
 Revert	SettingsWindow		取消
 Turn off	SettingsWindow		关闭
 Use volume:	SettingsWindow		已用磁卷：
+VirtualMemory	System name		虚拟内存
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		虚拟内存\n\t由 Axel Dörfler 编写\n\t 版权所有 2005 Haiku Inc.\n

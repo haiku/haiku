@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-SoundRecorder	1948114706
+1	simplified_chinese	x-vnd.Haiku-SoundRecorder	2122042546
 Cannot connect to media server	RecorderWindow		无法连接到媒体服务组件
 Cannot connect to the selected sound input	RecorderWindow		无法连接到选中声音输入
 Cannot find an unused name to use for the new recording	RecorderWindow		未找到用于新记录的未使用文件名。
@@ -32,6 +32,7 @@ Sample size: 	RecorderWindow		大小示例：
 Save	RecorderWindow		保存
 Some of the files don't appear to be audio files	RecorderWindow		其中的一些文件不是音频文件
 Sound List	RecorderWindow		声音列表
+SoundRecorder	System name		录音器
 Stop	RecorderWindow		停止
 bits	RecorderWindow		位
 seconds	RecorderWindow		秒

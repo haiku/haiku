@@ -44,5 +44,5 @@ Teams	DataSource		Процессы
 Text clipboard	DataSource		Текстовый буфер обмена
 Threads	DataSource		Потоки
 Update time interval:	SettingsWindow		Интервал обновления:
-Used memory	DataSource		Использовано памяти
+Used memory	DataSource		Использованная память
 usage	DataSource		(загрузка)

@@ -21,9 +21,9 @@ Revert	Config Window		Вернуть
 Schedule outgoing mail when dial-up is disconnected	Config Window		Ставить в очередь исходящую почту пока отсутствует подключение
 Settings	Config Window		Настройки
 Show connection status window:	Config Window		Отображать окно статуса соединения:
-Start mail services on startup	Config Window		Запускать почтовые службы при старте
+Start mail services on startup	Config Window		Запускать почтовые службы при загрузке
 While sending	Config Window		во время отправки
-While sending and receiving	Config Window		во время отсылки и получения
+While sending and receiving	Config Window		во время отправки и получения
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
 days	Config Window		дней

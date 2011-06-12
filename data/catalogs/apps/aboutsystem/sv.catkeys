@@ -6,7 +6,7 @@
 %ld Processors:	AboutView		%ld Processorer:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB otillgängligt
 ... and the many people making donations!\n\n	AboutView		...och alla de som har skänkt pengar!\n\n
-About this system	AboutWindow		Om det här systemet
+About this system	AboutWindow		Om Haiku
 AboutSystem	System name		OmHaiku
 BSD (2-clause)	AboutView		BSD (2-klausul)
 BSD (3-clause)	AboutView		BSD (3-klausul)

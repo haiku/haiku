@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-LaunchBox	2364133517
+1	simplified_chinese	x-vnd.Haiku-LaunchBox	1440389990
 Add button here	LaunchBox		在此处添加按钮
 Auto-raise	LaunchBox		自动提升
 Bummer	LaunchBox		无效
@@ -14,6 +14,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 'o
 Horizontal layout	LaunchBox		水平层
 Icon size	LaunchBox		图标尺寸
 Ignore double-click	LaunchBox		忽略双击
+LaunchBox	System name		启动栏
 Name Panel	LaunchBox		命名面板
 New	LaunchBox		新建
 OK	LaunchBox		确定

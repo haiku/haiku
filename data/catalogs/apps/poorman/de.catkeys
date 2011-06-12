@@ -34,7 +34,7 @@ Logging view	PoorMan		Log-Ansicht
 Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nDer Webserver kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei zu wählenden Ordner benutzen.
-PoorMan	Application name		Webserver
+PoorMan	System name		Webserver
 PoorMan settings	PoorMan		Webserver-Einstellungen
 Quit	PoorMan		Beenden
 Run server	PoorMan		Server starten

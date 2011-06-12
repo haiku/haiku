@@ -1,5 +1,6 @@
-1	simplified_chinese	x-vnd.Haiku-CPUFrequencyPref	3974849433
+1	simplified_chinese	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		CPU 状态视图
+CPUFrequency	System name		CPU 监视器
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU 监视器\n\t编写者：Clemens Zeidler\n\tCopyright 2009，Haiku .Inc。\n
 Defaults	Pref Window		默认
 Dynamic performance	Status view		动态性能

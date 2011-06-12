@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-BootManager	734273860
+1	simplified_chinese	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	将要从 %file 恢复 %disk 的主引导记录（MBR）。是否继续？
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		将要写入引导菜单到磁盘。是否继续？
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		将要写入下述引导菜单到引导磁盘（%s）。在继续之前，请核对下述信息。
@@ -13,6 +13,7 @@ At least one partition must be selected!	BootManagerController		至少选中一�
 Back	BootManagerController	Button	退后
 Backup Master Boot Record	BootManagerController	Title	备份主引导记录
 Boot Manager is unable to read the partition table!	BootManagerController		引导管理器无法读取分区表！
+BootManager	System name		引导管理器
 Cannot access!	DrivesPage	Cannot install	无法获取！
 Default Partition	DefaultPartitionPage	Title	默认分区
 Default Partition:	DefaultPartitionPage	Menu field label	默认分区：

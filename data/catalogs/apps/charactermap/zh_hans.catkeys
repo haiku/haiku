@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-CharacterMap	1767016704
+1	simplified_chinese	x-vnd.Haiku-CharacterMap	2137207616
 Aegean numbers	UnicodeBlocks		爱琴海数字
 Alphabetic presentation forms	UnicodeBlocks		字母表现形式
 Ancient Greek musical notation	UnicodeBlocks		古希腊音乐符号
@@ -33,6 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK 统一象形文字扩展 A
 CJK unified ideographs extension B	UnicodeBlocks		CJK 统一象形文字扩展 B
 Carian	UnicodeBlocks		卡里亚语
 Cham	UnicodeBlocks		卡姆语
+CharacterMap	System name		字符映射表
 Cherokee	UnicodeBlocks		彻罗基语
 Clear	CharacterWindow		清空
 Code	CharacterWindow		代码

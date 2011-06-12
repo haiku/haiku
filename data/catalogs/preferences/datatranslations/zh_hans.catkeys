@@ -1,15 +1,18 @@
-1	simplified_chinese	x-vnd.Haiku-DataTranslations	2855793119
+1	simplified_chinese	x-vnd.Haiku-DataTranslations	3820343452
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' 已经存在于转换器文件夹！是否覆盖存在的转换器？
 Cancel	DataTranslations		取消
 Could not install %s:\n%s	DataTranslations		无法安装 %s：\n%s
+DataTranslations	System name		数据转换器
 DataTranslations - Error	DataTranslations		数据转换器 - 错误
 DataTranslations - Note	DataTranslations		数据转换器 - 备注
 Info	DataTranslations		信息
 Info:	DataTranslations		信息：
 Name:	DataTranslations		名称：
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		名称：%s \n版本：%ld.%ld.%ld\n\n信息：\n%s\n\n路径：\n%s\n
 OK	DataTranslations		确定
 Overwrite	DataTranslations		覆盖
 Path:	DataTranslations		路径：
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' 可能不是转换器，无法进行安装。
 The new translator has been installed successfully.	DataTranslations		新的转换器已经成功安装。
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		当应用程序没有指定其他设置时，使用本控制面板设置转换器的默认值。
 Version:	DataTranslations		版本：

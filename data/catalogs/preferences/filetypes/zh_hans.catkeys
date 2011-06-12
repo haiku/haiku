@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-FileTypes	4011538288
+1	simplified_chinese	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1 程序类型
 %ld Application type%s could be removed.	Application Types Window		%ld Application type%s 无法删除。
 %s file type	FileType Window		%s 文件类型
@@ -51,7 +51,7 @@ Description:	Application Types Window		描述：
 Description:	FileTypes Window		描述：
 Development	Application Type Window		开发版
 Development	Application Types Window		开发版
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	显示为：
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	显示模式：
 Do you want to save the changes?	Application Type Window		是否保留配置?
 Done	Attribute Window		完成
 Done	Extension Window		完成
@@ -70,6 +70,7 @@ File could not be opened	Preferred App Menu		文件无法打开
 File recognition	FileTypes Window		文件识别
 File type	FileType Window		文件类型
 FileTypes	FileTypes		文件类型
+FileTypes	System name		文件类型
 FileTypes request	FileTypes		需要文件类型
 FileTypes request	FileTypes Window		文件类型要求
 FileTypes request	Preferred App Menu		文件类型要求
@@ -116,7 +117,7 @@ Remove uninstalled	Application Types Window		删除未安装的
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		文件类型的删除无法进行恢复。\n您确定要删除它么？
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		超级类型的删除无法恢复。\n所有处于该超级类型的文件类型将会丢失！\n\n您确定要执行此操作吗？按下Shift键，同时点击\"删除\"，将会删除整个类型组。
 Removing uninstalled application types	Application Types Window		删除未安装应用类型
-Right	Attribute Window	Attribute column alignment in Tracker	正确的
+Right	Attribute Window	Attribute column alignment in Tracker	右对齐
 Rule:	FileTypes Window		规则：
 Same as…	FileType Window	The same APPLICATION as ...	应用程序相同于...
 Same as…	FileType Window	The same TYPE as ...	类型相同于...

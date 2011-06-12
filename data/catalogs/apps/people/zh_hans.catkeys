@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Be-PEPL	382829331
+1	simplified_chinese	x-vnd.Be-PEPL	2993050801
 %name% picture	People		%name% 照片
 Address	People		地址
 Cancel	People		取消
@@ -28,6 +28,7 @@ New person…	People		新建联系人...
 Nickname	People		昵称
 OK	People		确定
 Paste	People		粘贴
+People	System name		联系人
 Person	Short mimetype description		联系人
 Quit	People		退出
 Redo	People		重复

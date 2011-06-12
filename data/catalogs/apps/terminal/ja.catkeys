@@ -81,10 +81,10 @@ Text encoding	Terminal TermWindow		テキストエンコーディング
 Text not found.	Terminal TermWindow		検索テキストが見つかりません。
 Text size	Terminal TermWindow		テキストサイズ
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\nTerminalを閉じると強制終了されます。
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンは現在のタブタイトルを指定します。次のプレースホルダーが\n使用されます:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンはタブタイトルを指定します。次のプレースホルダーが\n使用されます:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウインドウタイトルを指定します。次のプレースホルダーが\n使用されます:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンは現在のウインドウタイトルを指定します。次のプレースホルダーが\n使用されます:\n
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンは現在のタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンはタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウインドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンは現在のウインドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nTerminalを閉じると強制終了されます。
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nタブを閉じると強制終了されます。
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognized option \"%s\"\n

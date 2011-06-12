@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Меню частаты захвату
 Capture controls	CodyCam		Кіраванне захватам
 Capturing Image…	VideoConsumer.cpp		Захват выявы...
 Closing the window\n	VideoConsumer.cpp		Закрываю акно\n
-CodyCam	Application name		Камера
+CodyCam	System name		Камера
 Connected…	VideoConsumer.cpp		Падключаны...
 Couldn't find requested directory on server	VideoConsumer.cpp		Немагчыма знайсці запрошаны каталёг на серверы
 Directory:	CodyCam		Каталёг:

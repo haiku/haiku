@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-DataTranslations	2115809267
+1	romanian	x-vnd.Haiku-DataTranslations	698538556
 Cancel	DataTranslations		Anulează
 DataTranslations - Error	DataTranslations		TraduceriDate - Eroare
 DataTranslations - Note	DataTranslations		TraduceriDate - Notă
 Info	DataTranslations		info
 Info:	DataTranslations		Info:
 Name:	DataTranslations		Nume:
+OK	DataTranslations		OK
 Overwrite	DataTranslations		Suprascrie
 Path:	DataTranslations		Cale:
 The new translator has been installed successfully.	DataTranslations		Traducătorul nou a fost instalat cu succes.

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-ShowImage	2585577103
+1	simplified_chinese	x-vnd.Haiku-ShowImage	886873119
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
 Browse	Menus		浏览
 Cancel	ClosePrompt		取消
@@ -23,6 +23,7 @@ High-quality zooming	Menus		优质缩放
 Image	Menus		图像
 Job setup	PrintOptionsWindow		安装
 Last page	Menus		最后一页
+Leave full screen	Menus		取消全屏
 Next file	Menus		下一个
 Next page	Menus		下一页
 OK	Alerts		确定
@@ -45,6 +46,7 @@ Select all	Menus		全选
 Selection mode	Menus		选择模式
 Show caption in full screen mode	Menus		全屏显示标题
 Show tool bar	Menus		显示工具栏
+ShowImage	System name		图像查看器
 Slide delay	Menus		幻灯片延迟
 Slide show	Menus		幻灯片
 Stretch to window	Menus		伸展到窗口

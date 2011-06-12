@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-MediaPlayer	4238789307
+1	simplified_chinese	x-vnd.Haiku-MediaPlayer	138551800
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% 出现内部错误。文件无法打开。
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 100% scale	MediaPlayer-Main		100％
@@ -25,6 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		视频底部
 Cancel	MediaPlayer-SettingsWindow		取消
 Close	MediaPlayer-Main		关闭
 Close	MediaPlayer-PlaylistWindow		关闭
+Close window after playing audio	MediaPlayer-SettingsWindow		音频播放结束后关闭窗口
+Close window after playing video	MediaPlayer-SettingsWindow		视频播放结束后关闭窗口
 Copy Entries	MediaPlayer-CopyPLItemsCmd		复制条目
 Copy Entry	MediaPlayer-CopyPLItemsCmd		复制条目
 Drop files to play	MediaPlayer-Main		拖放文件以播放
@@ -46,12 +48,16 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		媒体服务器没有运行。\n 你要打开吗？
 Large	MediaPlayer-SettingsWindow		大
 Lock Peaks	MediaPlayer-PeakView		锁定采样
+Loop audio	MediaPlayer-SettingsWindow		音频循环播放
+Loop video	MediaPlayer-SettingsWindow		视频循环播放
 Low volume	MediaPlayer-SettingsWindow		低音量
+MediaPlayer	System name		媒体播放器
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 设置
 Medium	MediaPlayer-SettingsWindow		中等
 Move Entries	MediaPlayer-MovePLItemsCmd		移动条目
 Move Entry	MediaPlayer-MovePLItemsCmd		移动条目
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		移动到垃圾箱出错
+Move file to Trash	MediaPlayer-PlaylistWindow		移动文件到垃圾箱
 Mute	MediaPlayer-Main		静音
 Muted	MediaPlayer-SettingsWindow		静音
 New player…	MediaPlayer-Main		新建播放器...
@@ -82,6 +88,7 @@ Randomize	MediaPlayer-PlaylistWindow		随机
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		随机条目
 Rating	MediaPlayer-Main		评分
 Redo	MediaPlayer-PlaylistWindow		重复
+Remove	MediaPlayer-PlaylistWindow		移除
 Remove Entries	MediaPlayer-RemovePLItemsCmd		删除条目
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		移动项目到垃圾箱
 Remove Entry	MediaPlayer-RemovePLItemsCmd		删除条目
@@ -94,7 +101,9 @@ Save as…	MediaPlayer-PlaylistWindow		保存为...
 Save error	MediaPlayer-PlaylistWindow		保存错误
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败。\n\n 错误：
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败：\n\n错误： 
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式比例控制
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		平滑缩放电影（非叠加模式）
+Select all	MediaPlayer-PlaylistWindow		全选
 Settings…	MediaPlayer-Main		设置...
 Skip to the next track.	MediaPlayer-Main		跳到下一个轨道
 Skip to the previous track.	MediaPlayer-Main		跳到上一个轨道。

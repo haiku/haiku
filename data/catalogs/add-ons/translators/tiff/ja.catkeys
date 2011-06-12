@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
-None	TIFFView		無し
+None	TIFFView		無圧縮
 RLE (Packbits)	TIFFView		RLE (Packbits)
 TIFF Image Translator	TIFFView		TIFF イメージトランスレーター
 TIFF Library:	TIFFView		TIFFライブラリ:

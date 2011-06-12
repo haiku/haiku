@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PackageInstaller	2979335347
+1	german	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 %.1f MiB	PackageView		%.1f MiB
@@ -38,8 +38,10 @@ Package installer	PackageView		PackageInstaller
 PackageInstaller	System name		PackageInstaller
 Preparing package	PackageInstall		Paket wird vorbereitet
 Replace	PackageView		Ersetzen
+Replace all	PackageView		Alles ersetzen
 Running post-installation scripts	PackageInstall		Abschließende Installations-Skripte werden ausgeführt
 Skip	PackageView		Überspringen
+Skip all	PackageView		Alles überspringen
 Stop	PackageStatus		Stopp
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Der Ordner '%s' existiert bereits im Zielort.\nSoll er mit dem aus dem Paket ersetzt, oder übersprungen werden?
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Die Datei '%s' existiert bereits im Zielort.\nSoll sie mit der aus dem Paket ersetzt, oder übersprungen werden?
@@ -52,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Das Skript '%s' existiert bereits im Zielort.\nSoll es mit dem aus dem Paket ersetzt, oder übersprungen werden?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Die Verknüpfung '%s' existiert bereits im Zielort.\nSoll sie mit der aus dem Paket ersetzt, oder übersprungen werden?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		In der Paket-Datei scheinen die Dateigrößen nicht übereinzustimmen. Das Paket könnte beschädigt oder nach seiner Erstellung verändert worden sein. Soll die Installation trotzdem fortgesetzt werden?
+none	PackageView		entfällt

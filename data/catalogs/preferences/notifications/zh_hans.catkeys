@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Notifications	3545587988
+1	simplified_chinese	x-vnd.Haiku-Notifications	3818404871
 Above icon	DisplayView		图标上方
 Allowed	NotificationView		允许
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		首选项保存出错。\n您可能已经用尽了磁盘空间。
@@ -28,6 +28,7 @@ Mini icon	DisplayView		迷你图标
 No	NotificationView		否
 Notifications	GeneralView		通知
 Notifications	NotificationView		通知
+Notifications	System name		通知
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		由于无法获取服务，无法禁用通知。
 OK	DisplayView		确定
 OK	GeneralView		确定

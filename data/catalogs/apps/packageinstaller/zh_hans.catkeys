@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-PackageInstaller	2797157452
+1	simplified_chinese	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 %.1f MiB	PackageView		%1f MiB
@@ -31,14 +31,17 @@ Installing files and folders	PackageInstall		安装文件和目录
 Installing package	PackageStatus		安装包
 No installation type selected	PackageView		未选中安装类型
 No package available.	PackageInfo		无可用包。
-No package selected.	PackageInfo		未选择安装包
+No package selected.	PackageInfo		未选择安装包。
 OK	PackageView		确认
 Other…	PackageView		其他...
 Package installer	PackageView		包安装器
+PackageInstaller	System name		包安装器
 Preparing package	PackageInstall		准备安装包
 Replace	PackageView		替换
+Replace all	PackageView		替换所有
 Running post-installation scripts	PackageInstall		运行预安装脚本
 Skip	PackageView		跳过
+Skip all	PackageView		跳过所有
 Stop	PackageStatus		停止
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		'%s' 项目已经存在于给定路径。\n是替换为包中的目录，还是跳过？
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		'%s' 文件已经存在于给定路径。\n是替换为包中的文件，还是跳过？
@@ -51,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		'%s' 脚本已经存在于给定路径。\n是替换为包中的脚本，还是跳过？
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		'%s' 符号连接已经存在于给定路径。\n是替换为包中的链接，还是跳过？
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		包文件大小不匹配。该包在创建之后可能已经损坏或被修改。是否继续？
+none	PackageView		无

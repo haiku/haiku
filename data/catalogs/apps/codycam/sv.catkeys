@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Bildfrekvensmeny
 Capture controls	CodyCam		Inhämtningsinställningar
 Capturing Image…	VideoConsumer.cpp		Fångar bild…
 Closing the window\n	VideoConsumer.cpp		Stänger fönstret\n
-CodyCam	Application name		CodyKamera
+CodyCam	System name		CodyKamera
 Connected…	VideoConsumer.cpp		Ansluen...
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunde inte hitta den begärda katalogen på servern
 Directory:	CodyCam		Katalog:

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Screen	1658032282
+1	simplified_chinese	x-vnd.Haiku-Screen	2033930135
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%s 无序列号。：%s
 /other…	Screen		/其他...
@@ -29,6 +29,7 @@ Resolution:	Screen		分辨率
 Revert	Screen		还原
 Rows:	Screen		行：
 Screen	Screen		屏幕
+Screen	System name		屏幕
 Screen preferences by the Haiku team	Screen		Screen 首选项编写者 Haiku项目组
 Set background…	Screen		设置背景...
 Settings will revert in %seconds seconds.	Screen		在 %seconds 秒之后，设置将会恢复。

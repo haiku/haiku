@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku.TV	2971561976
+1	simplified_chinese	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		置顶
 Channel	MainWin		频道
 DVB - Digital Video Broadcasting TV	MainWin		DVB -数字视频广播电视  
@@ -19,6 +19,7 @@ Scale to native size	MainWin		恢复原始大小
 Settings	MainWin		设置
 Settings…	MainWin		设置…
 TV	MainWin		电视
+TV	System name		电视
 force 544 x 576, display aspect 4:3	MainWin		强制分辨率 544 x 576，高宽比 4:3
 force 704 x 576, display aspect 4:3	MainWin		强制分辨率 704 x 576，高宽比 4:3
 force 720 x 576, display aspect 4:3	MainWin		强制分辨率 720 x 576,高宽比 4:3

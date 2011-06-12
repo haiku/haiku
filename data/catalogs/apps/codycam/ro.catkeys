@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Meniul cotei de capturare
 Capture controls	CodyCam		Controale de captură
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea...
 Closing the window\n	VideoConsumer.cpp		Se închide fereastra\n
-CodyCam	Application name		CodyCam
+CodyCam	System name		CodyCam
 Connected…	VideoConsumer.cpp		Conectat...
 Couldn't find requested directory on server	VideoConsumer.cpp		Nu s-a putut găsi dosarul cerut pe server
 Directory:	CodyCam		Dosar:

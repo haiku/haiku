@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Aufnahme-Intervall-Menü
 Capture controls	CodyCam		Aufnahme-Einstellungen
 Capturing Image…	VideoConsumer.cpp		Bild wird aufgenommen...
 Closing the window\n	VideoConsumer.cpp		Fenster wird geschlossen
-CodyCam	Application name		Webcam
+CodyCam	System name		Webcam
 Connected…	VideoConsumer.cpp		Verbunden…
 Couldn't find requested directory on server	VideoConsumer.cpp		Das angefragte Verzeichnis konnte auf dem Server nicht gefunden werden.
 Directory:	CodyCam		Ordner:
