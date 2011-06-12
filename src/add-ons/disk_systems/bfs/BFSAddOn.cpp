@@ -20,6 +20,7 @@
 #include <MutablePartition.h>
 
 #include <AutoDeleter.h>
+#include <StringForSize.h>
 
 #ifdef ASSERT
 #	undef ASSERT
@@ -52,6 +53,18 @@ static const uint32 kDiskSystemFlags =
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED
 ;
+
+
+static BString
+size_string(double size)
+{
+	BString string;
+	char* buffer = string.LockBuffer(256);
+	string_for_size(size, buffer, 256);
+
+	string.UnlockBuffer();
+	return string;
+}
 
 
 // #pragma mark - BFSAddOn
@@ -231,9 +244,9 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	if (ioctl(fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result)) < 0)
 	    return errno;
 
-	off_t attributeDirectories = 0, attributes = 0;
-	off_t files = 0, directories = 0, indices = 0;
-	off_t counter = 0;
+	uint64 attributeDirectories = 0, attributes = 0;
+	uint64 files = 0, directories = 0, indices = 0;
+	uint64 counter = 0;
 
 	// check all files and report errors
 	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result,
@@ -277,13 +290,32 @@ BFSPartitionHandle::Repair(bool checkOnly)
 
 	close(fd);
 
-	printf("\t%lld nodes checked,\n\t%lld blocks not allocated,"
-		"\n\t%lld blocks already set,\n\t%lld blocks could be freed\n\n",
-		counter, result.stats.missing, result.stats.already_set,
-		result.stats.freed);
-	printf("\tfiles\t\t%lld\n\tdirectories\t%lld\n\tattributes\t%lld\n\tattr. "
-		"dirs\t%lld\n\tindices\t\t%lld\n", files, directories, attributes,
+	printf("\t%" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
+		"allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64
+		" blocks could be freed\n\n", counter, result.stats.missing,
+		result.stats.already_set, result.stats.freed);
+	printf("\tfiles\t\t%" B_PRIu64 "\n\tdirectories\t%" B_PRIu64 "\n"
+		"\tattributes\t%" B_PRIu64 "\n\tattr. dirs\t%" B_PRIu64 "\n"
+		"\tindices\t\t%" B_PRIu64 "\n", files, directories, attributes,
 		attributeDirectories, indices);
+
+	printf("\n\tdirect block runs\t\t%" B_PRIu64 " (%s)\n",
+		result.stats.direct_block_runs, size_string(1.0
+			* result.stats.blocks_in_direct
+			* result.stats.block_size).String());
+	printf("\tindirect block runs\t\t%" B_PRIu64 " (in %" B_PRIu64
+		" array blocks, %s)\n", result.stats.indirect_block_runs,
+		result.stats.indirect_array_blocks,
+		size_string(1.0 * result.stats.blocks_in_indirect
+			* result.stats.block_size).String());
+	printf("\tdouble indirect block runs\t%" B_PRIu64 " (in %" B_PRIu64
+		" array blocks, %s)\n", result.stats.double_indirect_block_runs,
+		result.stats.double_indirect_array_blocks,
+		size_string(1.0 * result.stats.blocks_in_double_indirect
+			* result.stats.block_size).String());
+	// TODO: this is currently not maintained correctly
+	//printf("\tpartial block runs\t%" B_PRIu64 "\n",
+	//	result.stats.partial_block_runs);
 
 	if (result.status == B_ENTRY_NOT_FOUND)
 		result.status = B_OK;

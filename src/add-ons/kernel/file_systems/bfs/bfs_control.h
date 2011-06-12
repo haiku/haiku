@@ -50,6 +50,17 @@ struct check_control {
 		uint64	missing;
 		uint64	already_set;
 		uint64	freed;
+
+		uint64	direct_block_runs;
+		uint64	indirect_block_runs;
+		uint64	indirect_array_blocks;
+		uint64	double_indirect_block_runs;
+		uint64	double_indirect_array_blocks;
+		uint64	blocks_in_direct;
+		uint64	blocks_in_indirect;
+		uint64	blocks_in_double_indirect;
+		uint64	partial_block_runs;
+		uint32	block_size;
 	} stats;
 	status_t	status;
 };
