@@ -1338,7 +1338,8 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 		// schedule the job
 		status_t result;
 		if ((result = fWorker->ScheduleJob(
-			new(std::nothrow) RetrieveMemoryBlockJob(memory, memoryBlock),
+			new(std::nothrow) RetrieveMemoryBlockJob(fTeam, memory,
+				memoryBlock),
 			this)) != B_OK) {
 			memoryBlock->ReleaseReference();
 			_NotifyUser("Inspect Address", "Failed to retrieve memory data: %s",

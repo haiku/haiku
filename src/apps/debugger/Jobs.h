@@ -184,7 +184,7 @@ private:
 
 class RetrieveMemoryBlockJob : public Job {
 public:
-								RetrieveMemoryBlockJob(
+								RetrieveMemoryBlockJob(Team* team,
 									TeamMemory* teamMemory,
 									TeamMemoryBlock* memoryBlock);
 	virtual						~RetrieveMemoryBlockJob();
@@ -194,6 +194,7 @@ public:
 
 private:
 			SimpleJobKey		fKey;
+			Team*				fTeam;
 			TeamMemory*			fTeamMemory;
 			TeamMemoryBlock*	fMemoryBlock;
 };

@@ -19,6 +19,7 @@ TeamMemoryBlock::TeamMemoryBlock(target_addr_t baseAddress,
 	TeamMemoryBlockOwner* owner)
 	:
 	fValid(false),
+	fWritable(false),
 	fBaseAddress(baseAddress),
 	fBlockOwner(owner)
 {
@@ -73,6 +74,13 @@ void
 TeamMemoryBlock::Invalidate()
 {
 	fValid = false;
+}
+
+
+void
+TeamMemoryBlock::SetWritable(bool writable)
+{
+	fWritable = writable;
 }
 
 

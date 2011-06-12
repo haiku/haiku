@@ -40,6 +40,9 @@ public:
 			uint8*			Data() 					{ return fData; };
 			size_t			Size() const			{ return sizeof(fData); };
 
+			bool			IsWritable() const		{ return fWritable; }
+			void			SetWritable(bool writable);
+
 			void			NotifyDataRetrieved();
 
 protected:
@@ -50,6 +53,7 @@ private:
 
 private:
 			bool			fValid;
+			bool			fWritable;
 			target_addr_t	fBaseAddress;
 			uint8			fData[B_PAGE_SIZE];
 			ListenerList	fListeners;
