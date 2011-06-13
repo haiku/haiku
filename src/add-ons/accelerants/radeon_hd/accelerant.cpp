@@ -180,18 +180,25 @@ init_registers(uint8 crtid)
 		uint16_t offset = 0;
 
 		// AMD Eyefinity on Evergreen GPUs
-		if (crtid == 1)
+		if (crtid == 1) {
 			offset = EVERGREEN_CRTC1_REGISTER_OFFSET;
-		else if (crtid == 2)
+			gRegister->vgaControl = D2VGA_CONTROL;
+		} else if (crtid == 2) {
 			offset = EVERGREEN_CRTC2_REGISTER_OFFSET;
-		else if (crtid == 3)
+			gRegister->vgaControl = EVERGREEN_D3VGA_CONTROL;
+		} else if (crtid == 3) {
 			offset = EVERGREEN_CRTC3_REGISTER_OFFSET;
-		else if (crtid == 4)
+			gRegister->vgaControl = EVERGREEN_D4VGA_CONTROL;
+		} else if (crtid == 4) {
 			offset = EVERGREEN_CRTC4_REGISTER_OFFSET;
-		else if (crtid == 5)
+			gRegister->vgaControl = EVERGREEN_D5VGA_CONTROL;
+		} else if (crtid == 5) {
 			offset = EVERGREEN_CRTC5_REGISTER_OFFSET;
-		else
+			gRegister->vgaControl = EVERGREEN_D6VGA_CONTROL;
+		} else {
 			offset = EVERGREEN_CRTC0_REGISTER_OFFSET;
+			gRegister->vgaControl = D1VGA_CONTROL;
+		}
 
 		// Evergreen+ is crtoffset + register
 		gRegister->grphEnable = offset + EVERGREEN_GRPH_ENABLE;
@@ -225,6 +232,8 @@ init_registers(uint8 crtid)
 		&& info.device_chipset < RADEON_R800) {
 
 		// r600 - r700 are D1 or D2 based on primary / secondary crt
+		gRegister->vgaControl
+			= (crtid == 1) ? D2VGA_CONTROL : D1VGA_CONTROL;
 		gRegister->grphEnable
 			= (crtid == 1) ? D2GRPH_ENABLE : D1GRPH_ENABLE;
 		gRegister->grphControl

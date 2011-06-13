@@ -13,7 +13,8 @@
 #define RHD_PLL_MAX_DEFAULT 400000
 #define RHD_PLL_REFERENCE_DEFAULT 27000
 
-#define PLL_CALIBRATE_WAIT 0x100000
+// xorg default is 0x100000 which seems a little much.
+#define PLL_CALIBRATE_WAIT 0x010000
 
 /* limited by the number of bits available */
 #define FB_DIV_LIMIT 2048

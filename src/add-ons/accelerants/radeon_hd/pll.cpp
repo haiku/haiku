@@ -135,7 +135,7 @@ status_t
 PLLPower(uint8 pllIndex, int command)
 {
 
-	uint16 pllControlReg = (pllIndex == 2) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
 
 	bool hasDccg = DCCGCLKAvailable(pllIndex);
 
@@ -229,23 +229,23 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_RESET);
 
 	uint16 pllLockReg
-		= (pllIndex == 2) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
-	uint16 pllControlReg = (pllIndex == 2) ? P2PLL_CNTL : P1PLL_CNTL;
-	uint16 pllExtControlReg = (pllIndex == 2) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
+		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
+	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllExtControlReg = (pllIndex == 1) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
 	uint16 pllDisplayClockControlReg
-		= (pllIndex == 2) ? P2PLL_DISP_CLK_CNTL : P1PLL_DISP_CLK_CNTL;
+		= (pllIndex == 1) ? P2PLL_DISP_CLK_CNTL : P1PLL_DISP_CLK_CNTL;
 	uint16 pllIntSSControlReg
-		= (pllIndex == 2) ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
+		= (pllIndex == 1) ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
 	uint16 pllReferenceDividerReg
-		= (pllIndex == 2) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
+		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
 	uint16 pllFeedbackDividerReg
-		= (pllIndex == 2) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
+		= (pllIndex == 1) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
 	uint16 pllPostDividerReg
-		= (pllIndex == 2) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
+		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
 	uint16 pplPostDividerSymReg
-		= (pllIndex == 2) ? EXT2_SYM_PPLL_POST_DIV : EXT1_SYM_PPLL_POST_DIV;
+		= (pllIndex == 1) ? EXT2_SYM_PPLL_POST_DIV : EXT1_SYM_PPLL_POST_DIV;
 	uint16 pllPostDividerSrcReg
-		= (pllIndex == 2) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
+		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
 
 	write32PLLAtMask(pllIntSSControlReg, 0, 0x00000001);
 		// Disable Spread Spectrum
@@ -332,7 +332,7 @@ status_t
 PLLCalibrate(uint8 pllIndex)
 {
 
-	uint16 pllControlReg = (pllIndex == 2) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
 
 	write32PLLAtMask(pllControlReg, 1, 0x01);
 		// PLL Reset
@@ -348,11 +348,13 @@ PLLCalibrate(uint8 pllIndex)
 		if (((read32PLL(pllControlReg) >> 20) & 0x03) == 0x03)
 			break;
 
-	if (i == PLL_CALIBRATE_WAIT) {
+	if (i >= PLL_CALIBRATE_WAIT) {
 		if (read32PLL(pllControlReg) & 0x00100000) /* Calibration done? */
-			TRACE("%s: Calibration Failed\n");
+			TRACE("%s: Calibration Failed\n", __func__);
 		if (read32PLL(pllControlReg) & 0x00200000) /* PLL locked? */
-			TRACE("%s: Locking Failed\n");
+			TRACE("%s: Locking Failed\n", __func__);
+		TRACE("%s: We encountered a problem calibrating the PLL.\n", __func__);
+		return B_ERROR;
 	} else
 		TRACE("%s: pll calibrated and locked in %d loops\n", __func__, i);
 
@@ -368,12 +370,12 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 	if (!crt2) {
 		pll2IsCurrent = read32PLL(PCLK_CRTC1_CNTL) & 0x00010000;
 
-		write32PLLAtMask(PCLK_CRTC1_CNTL, (pllIndex == 2) ? 0x00010000 : 0,
+		write32PLLAtMask(PCLK_CRTC1_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
 			0x00010000);
 	} else {
 		pll2IsCurrent = read32PLL(PCLK_CRTC2_CNTL) & 0x00010000;
 
-		write32PLLAtMask(PCLK_CRTC2_CNTL, (pllIndex == 2) ? 0x00010000 : 0,
+		write32PLLAtMask(PCLK_CRTC2_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
 			0x00010000);
 	}
 
@@ -410,9 +412,9 @@ DCCGCLKAvailable(uint8 pllIndex)
 	if (dccg & 0x02)
 		return true;
 
-	if ((pllIndex == 1) && (dccg == 0))
+	if ((pllIndex == 0) && (dccg == 0))
 		return true;
-	if ((pllIndex == 2) && (dccg == 1))
+	if ((pllIndex == 1) && (dccg == 1))
 		return true;
 
 	return false;
@@ -426,9 +428,9 @@ DCCGCLKSet(uint8 pllIndex, int set)
 
 	switch(set) {
 		case RV620_DCCGCLK_GRAB:
-			if (pllIndex == 1)
+			if (pllIndex == 0)
 				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 0, 0x00000003);
-			else if (pllIndex == 2)
+			else if (pllIndex == 1)
 				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 1, 0x00000003);
 			else
 				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
@@ -436,7 +438,7 @@ DCCGCLKSet(uint8 pllIndex, int set)
 		case RV620_DCCGCLK_RELEASE:
 			buffer = read32PLL(DCCG_DISP_CLK_SRCSEL) & 0x03;
 
-			if ((pllIndex == 1) && (buffer == 0)) {
+			if ((pllIndex == 0) && (buffer == 0)) {
 				/* set to other PLL or external */
 				buffer = read32PLL(P2PLL_CNTL);
 				// if powered and not in reset, and calibrated and locked
@@ -445,7 +447,7 @@ DCCGCLKSet(uint8 pllIndex, int set)
 				else
 					write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
 
-			} else if ((pllIndex == 2) && (buffer == 1)) {
+			} else if ((pllIndex == 1) && (buffer == 1)) {
 				/* set to other PLL or external */
 				buffer = read32PLL(P1PLL_CNTL);
 				// if powered and not in reset, and calibrated and locked
@@ -459,8 +461,8 @@ DCCGCLKSet(uint8 pllIndex, int set)
 		case RV620_DCCGCLK_RESET:
 			buffer = read32PLL(DCCG_DISP_CLK_SRCSEL) & 0x03;
 
-			if (((pllIndex == 1) && (buffer == 0))
-				|| ((pllIndex == 2) && (buffer == 1)))
+			if (((pllIndex == 0) && (buffer == 0))
+				|| ((pllIndex == 1) && (buffer == 1)))
 				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
 			break;
 		default:
@@ -472,7 +474,7 @@ DCCGCLKSet(uint8 pllIndex, int set)
 void
 DACPower(uint8 dacIndex, int mode)
 {
-	uint32 dacOffset = (dacIndex == 2) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
+	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
 	uint32 powerdown;
 
 	switch (mode) {

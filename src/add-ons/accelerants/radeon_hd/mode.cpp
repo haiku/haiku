@@ -152,10 +152,8 @@ CardFBSet(display_mode *mode)
 	write32AtMask(VGA_RENDER_CONTROL, 0, 0x00030000);
 	write32AtMask(VGA_MODE_CONTROL, 0, 0x00000030);
 	write32AtMask(VGA_HDP_CONTROL, 0x00010010, 0x00010010);
-	write32AtMask(D1VGA_CONTROL, 0, D1VGA_MODE_ENABLE
+	write32AtMask(gRegister->vgaControl, 0, D1VGA_MODE_ENABLE
 		| D1VGA_TIMING_SELECT | D1VGA_SYNC_POLARITY_SELECT);
-	write32AtMask(D2VGA_CONTROL, 0, D2VGA_MODE_ENABLE
-		| D2VGA_TIMING_SELECT | D1VGA_SYNC_POLARITY_SELECT);
 
 	// disable R/B swap, disable tiling, disable 16bit alpha, etc.
 	write32AtMask(gRegister->grphEnable, 1, 0x00000001);
@@ -186,7 +184,6 @@ CardFBSet(display_mode *mode)
 	write32(gRegister->grphSwapControl, 0);
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
-
 
 	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
 
@@ -341,9 +338,9 @@ radeon_set_display_mode(display_mode *mode)
 	CardFBSet(mode);
 	CardModeSet(mode);
 	CardModeScale(mode);
-	PLLSet(1, mode->timing.pixel_clock);
-	PLLPower(1, RHD_POWER_ON);
-	DACPower(1, RHD_POWER_ON);
+	PLLSet(0, mode->timing.pixel_clock);
+	PLLPower(0, RHD_POWER_ON);
+	DACPower(0, RHD_POWER_ON);
 	CardBlankSet(false);
 
 	int32 crtstatus = read32(D1CRTC_STATUS);
