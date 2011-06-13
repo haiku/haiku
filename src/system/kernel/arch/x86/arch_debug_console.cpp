@@ -324,7 +324,14 @@ arch_debug_blue_screen_getchar(void)
 int
 arch_debug_serial_try_getchar(void)
 {
-	if ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
+	uint8 lineStatus = in8(sSerialBasePort + SERIAL_LINE_STATUS);
+	if (lineStatus == 0xff) {
+		// The "data available" bit is set, but also all error bits. Likely we
+		// don't have a valid I/O port.
+		return -1;
+	}
+
+	if ((lineStatus & 0x1) == 0)
 		return -1;
 
 	return in8(sSerialBasePort + SERIAL_RECEIVE_BUFFER);
@@ -334,8 +341,19 @@ arch_debug_serial_try_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
-		asm volatile ("pause;");
+	while (true) {
+		uint8 lineStatus = in8(sSerialBasePort + SERIAL_LINE_STATUS);
+		if (lineStatus == 0xff) {
+			// The "data available" bit is set, but also all error bits. Likely
+			// we don't have a valid I/O port.
+			return 0;
+		}
+
+		if ((lineStatus & 0x1) != 0)
+			break;
+
+		PAUSE();
+	}
 
 	return in8(sSerialBasePort + SERIAL_RECEIVE_BUFFER);
 }
