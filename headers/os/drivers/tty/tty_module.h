@@ -51,6 +51,7 @@ struct tty_module_info {
 	struct tty_cookie *
 				(*tty_create_cookie)(struct tty *masterTTY, struct tty *slaveTTY,
 					uint32 openMode);
+	void		(*tty_close_cookie)(struct tty_cookie *cookie);
 	void		(*tty_destroy_cookie)(struct tty_cookie *cookie);
 
 	status_t	(*tty_read)(struct tty_cookie *cookie, void *_buffer,

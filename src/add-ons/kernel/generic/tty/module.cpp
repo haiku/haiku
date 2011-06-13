@@ -72,6 +72,7 @@ static struct tty_module_info sTTYModule = {
 	&tty_create,
 	&tty_destroy,
 	&tty_create_cookie,
+	&tty_close_cookie,
 	&tty_destroy_cookie,
 	&tty_read,
 	&tty_write,

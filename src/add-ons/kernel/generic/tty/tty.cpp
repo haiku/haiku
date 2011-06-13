@@ -726,7 +726,7 @@ reset_termios(struct termios& termios)
 }
 
 
-void
+static void
 reset_tty_settings(tty_settings& settings)
 {
 	reset_termios(settings.termios);
@@ -740,13 +740,6 @@ reset_tty_settings(tty_settings& settings)
 	settings.window_size.ws_row = 25;
 	settings.window_size.ws_xpixel = settings.window_size.ws_col * 8;
 	settings.window_size.ws_ypixel = settings.window_size.ws_row * 8;
-}
-
-
-status_t
-tty_output_getc(struct tty* tty, int* _c)
-{
-	return B_ERROR;
 }
 
 
@@ -824,185 +817,6 @@ tty_input_putc_locked(struct tty* tty, int c)
 	// point can directly be written to the line buffer.
 
 	line_buffer_putc(tty->input_buffer, c);
-}
-
-
-#if 0
-status_t
-tty_input_putc(struct tty* tty, int c)
-{
-	status_t status = acquire_sem_etc(tty->write_sem, 1, B_CAN_INTERRUPT, 0);
-	if (status != B_OK)
-		return status;
-
-	MutexLocker locker(&tty->lock);
-
-	bool wasEmpty = line_buffer_readable(tty->input_buffer) == 0;
-
-	tty_input_putc_locked(tty, c);
-
-	// If the buffer was empty before, we can now start other readers on it.
-	// We assume that most of the time more than one character will be written
-	// using this function, so we don't want to reschedule after every character
-	if (wasEmpty)
-		release_sem_etc(tty->read_sem, 1, B_DO_NOT_RESCHEDULE);
-
-	// We only wrote one char - we give others the opportunity
-	// to write if there is still space left in the buffer
-	if (line_buffer_writable(tty->input_buffer))
-		release_sem_etc(tty->write_sem, 1, B_DO_NOT_RESCHEDULE);
-
-	return B_OK;
-}
-#endif // 0
-
-
-tty_cookie*
-tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
-{
-	tty_cookie* cookie = new(std::nothrow) tty_cookie;
-	if (cookie == NULL)
-		return NULL;
-
-	cookie->blocking_semaphore = create_sem(0, "wait for tty close");
-	if (cookie->blocking_semaphore < 0) {
-		delete cookie;
-		return NULL;
-	}
-
-	cookie->tty = tty;
-	cookie->other_tty = otherTTY;
-	cookie->open_mode = openMode;
-	cookie->thread_count = 0;
-	cookie->closed = false;
-
-
-	MutexLocker locker(cookie->tty->lock);
-
-	// add to the TTY's cookie list
-	tty->cookies.Add(cookie);
-	tty->open_count++;
-	tty->ref_count++;
-
-	return cookie;
-}
-
-
-void
-tty_destroy_cookie(tty_cookie* cookie)
-{
-	tty_close_cookie(cookie);
-
-	cookie->tty->ref_count--;
-
-	if (cookie->blocking_semaphore >= 0) {
-		delete_sem(cookie->blocking_semaphore);
-		cookie->blocking_semaphore = -1;
-	}
-
-	cookie->tty = NULL;
-	cookie->thread_count = 0;
-	cookie->closed = false;
-	delete cookie;
-}
-
-
-void
-tty_close_cookie(tty_cookie* cookie)
-{
-	MutexLocker locker(gTTYCookieLock);
-
-	// Already closed? This can happen for slaves that have been closed when
-	// the master was closed.
-	if (cookie->closed)
-		return;
-
-	// set the cookie's `closed' flag
-	cookie->closed = true;
-	bool unblock = (cookie->thread_count > 0);
-
-	// unblock blocking threads
-	if (unblock) {
-		cookie->tty->reader_queue.NotifyError(cookie, B_FILE_ERROR);
-		cookie->tty->writer_queue.NotifyError(cookie, B_FILE_ERROR);
-
-		if (cookie->other_tty->open_count > 0) {
-			cookie->other_tty->reader_queue.NotifyError(cookie, B_FILE_ERROR);
-			cookie->other_tty->writer_queue.NotifyError(cookie, B_FILE_ERROR);
-		}
-	}
-
-	locker.Unlock();
-
-	// wait till all blocking (and now unblocked) threads have left the
-	// critical code
-	if (unblock) {
-		TRACE(("tty_close_cookie(): cookie %p, there're still pending "
-			"operations, acquire blocking sem %ld\n", cookie,
-			cookie->blocking_semaphore));
-
-		acquire_sem(cookie->blocking_semaphore);
-	}
-
-	// For the removal of the cookie acquire the TTY's lock. This ensures, that
-	// cookies will not be removed from a TTY (or added -- cf. add_tty_cookie())
-	// as long as the TTY's lock is being held.
-	MutexLocker ttyLocker(cookie->tty->lock);
-
-	// remove the cookie from the TTY's cookie list
-	cookie->tty->cookies.Remove(cookie);
-
-	// close the tty, if no longer used
-	if (--cookie->tty->open_count == 0) {
-		// The last cookie of this tty has been closed. We're going to close
-		// the TTY and need to unblock all write requests before. There should
-		// be no read requests, since only a cookie of this TTY issues those.
-		// We do this by first notifying all queued requests of the error
-		// condition. We then clear the line buffer for the TTY and queue
-		// an own request.
-
-		// Notify the other TTY first; it doesn't accept any read/writes
-		// while there is only one end.
-		cookie->other_tty->reader_queue.NotifyError(B_FILE_ERROR);
-		cookie->other_tty->writer_queue.NotifyError(B_FILE_ERROR);
-
-		RecursiveLocker requestLocker(gTTYRequestLock);
-
-		// we only need to do all this, if the writer queue is not empty
-		if (!cookie->tty->writer_queue.IsEmpty()) {
-	 		// notify the blocking writers
-			cookie->tty->writer_queue.NotifyError(B_FILE_ERROR);
-
-			// enqueue our request
-			RequestOwner requestOwner;
-			requestOwner.Enqueue(cookie, &cookie->tty->writer_queue);
-
-			requestLocker.Unlock();
-
-			// clear the line buffer
-			clear_line_buffer(cookie->tty->input_buffer);
-
-			ttyLocker.Unlock();
-
-			// wait for our turn
-			requestOwner.Wait(false);
-
-			// re-lock
-			ttyLocker.Lock();
-			requestLocker.Lock();
-
-			// dequeue our request
-			requestOwner.Dequeue();
-		}
-
-		requestLocker.Unlock();
-	}
-
-	// notify pending select()s and cleanup the select sync pool
-
-	// notify a select write event on the other tty, if we've closed this tty
-	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
-		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 }
 
 
@@ -1376,6 +1190,77 @@ tty_write_to_tty_slave_unsafe(tty_cookie* sourceCookie, const char* data,
 	return B_OK;
 }
 
+
+static status_t
+tty_write_to_tty_master(tty_cookie* sourceCookie, const void* _buffer,
+	size_t* _length)
+{
+	const char* buffer = (const char*)_buffer;
+	size_t bytesRemaining = *_length;
+	*_length = 0;
+
+	while (bytesRemaining > 0) {
+		// copy data to stack
+		char safeBuffer[256];
+		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
+		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
+		if (error != B_OK)
+			return error;
+
+		// write them
+		size_t written = toWrite;
+		error = tty_write_to_tty_master_unsafe(sourceCookie, safeBuffer,
+			&written);
+		if (error != B_OK)
+			return error;
+
+		buffer += written;
+		bytesRemaining -= written;
+		*_length += written;
+
+		if (written < toWrite)
+			return B_OK;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
+	size_t* _length)
+{
+	const char* buffer = (const char*)_buffer;
+	size_t bytesRemaining = *_length;
+	*_length = 0;
+
+	while (bytesRemaining > 0) {
+		// copy data to stack
+		char safeBuffer[256];
+		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
+		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
+		if (error != B_OK)
+			return error;
+
+		// write them
+		size_t written = toWrite;
+		error = tty_write_to_tty_slave_unsafe(sourceCookie, safeBuffer,
+			&written);
+		if (error != B_OK)
+			return error;
+
+		buffer += written;
+		bytesRemaining -= written;
+		*_length += written;
+
+		if (written < toWrite)
+			return B_OK;
+	}
+
+	return B_OK;
+}
+
+
 #if 0
 static void
 dump_tty_settings(struct tty_settings& settings)
@@ -1428,7 +1313,8 @@ dump_tty_struct(struct tty& tty)
 }
 #endif
 
-// #pragma mark - device functions
+
+// #pragma mark - public API
 
 
 struct tty*
@@ -1476,6 +1362,265 @@ tty_destroy(struct tty* tty)
 	uninit_line_buffer(tty->input_buffer);
 
 	delete tty;
+}
+
+
+tty_cookie*
+tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
+{
+	tty_cookie* cookie = new(std::nothrow) tty_cookie;
+	if (cookie == NULL)
+		return NULL;
+
+	cookie->blocking_semaphore = create_sem(0, "wait for tty close");
+	if (cookie->blocking_semaphore < 0) {
+		delete cookie;
+		return NULL;
+	}
+
+	cookie->tty = tty;
+	cookie->other_tty = otherTTY;
+	cookie->open_mode = openMode;
+	cookie->thread_count = 0;
+	cookie->closed = false;
+
+
+	MutexLocker locker(cookie->tty->lock);
+
+	// add to the TTY's cookie list
+	tty->cookies.Add(cookie);
+	tty->open_count++;
+	tty->ref_count++;
+
+	return cookie;
+}
+
+
+void
+tty_close_cookie(tty_cookie* cookie)
+{
+	MutexLocker locker(gTTYCookieLock);
+
+	// Already closed? This can happen for slaves that have been closed when
+	// the master was closed.
+	if (cookie->closed)
+		return;
+
+	// set the cookie's `closed' flag
+	cookie->closed = true;
+	bool unblock = (cookie->thread_count > 0);
+
+	// unblock blocking threads
+	if (unblock) {
+		cookie->tty->reader_queue.NotifyError(cookie, B_FILE_ERROR);
+		cookie->tty->writer_queue.NotifyError(cookie, B_FILE_ERROR);
+
+		if (cookie->other_tty->open_count > 0) {
+			cookie->other_tty->reader_queue.NotifyError(cookie, B_FILE_ERROR);
+			cookie->other_tty->writer_queue.NotifyError(cookie, B_FILE_ERROR);
+		}
+	}
+
+	locker.Unlock();
+
+	// wait till all blocking (and now unblocked) threads have left the
+	// critical code
+	if (unblock) {
+		TRACE(("tty_close_cookie(): cookie %p, there're still pending "
+			"operations, acquire blocking sem %ld\n", cookie,
+			cookie->blocking_semaphore));
+
+		acquire_sem(cookie->blocking_semaphore);
+	}
+
+	// For the removal of the cookie acquire the TTY's lock. This ensures, that
+	// cookies will not be removed from a TTY (or added -- cf. add_tty_cookie())
+	// as long as the TTY's lock is being held.
+	MutexLocker ttyLocker(cookie->tty->lock);
+
+	// remove the cookie from the TTY's cookie list
+	cookie->tty->cookies.Remove(cookie);
+
+	// close the tty, if no longer used
+	if (--cookie->tty->open_count == 0) {
+		// The last cookie of this tty has been closed. We're going to close
+		// the TTY and need to unblock all write requests before. There should
+		// be no read requests, since only a cookie of this TTY issues those.
+		// We do this by first notifying all queued requests of the error
+		// condition. We then clear the line buffer for the TTY and queue
+		// an own request.
+
+		// Notify the other TTY first; it doesn't accept any read/writes
+		// while there is only one end.
+		cookie->other_tty->reader_queue.NotifyError(B_FILE_ERROR);
+		cookie->other_tty->writer_queue.NotifyError(B_FILE_ERROR);
+
+		RecursiveLocker requestLocker(gTTYRequestLock);
+
+		// we only need to do all this, if the writer queue is not empty
+		if (!cookie->tty->writer_queue.IsEmpty()) {
+	 		// notify the blocking writers
+			cookie->tty->writer_queue.NotifyError(B_FILE_ERROR);
+
+			// enqueue our request
+			RequestOwner requestOwner;
+			requestOwner.Enqueue(cookie, &cookie->tty->writer_queue);
+
+			requestLocker.Unlock();
+
+			// clear the line buffer
+			clear_line_buffer(cookie->tty->input_buffer);
+
+			ttyLocker.Unlock();
+
+			// wait for our turn
+			requestOwner.Wait(false);
+
+			// re-lock
+			ttyLocker.Lock();
+			requestLocker.Lock();
+
+			// dequeue our request
+			requestOwner.Dequeue();
+		}
+
+		requestLocker.Unlock();
+	}
+
+	// notify pending select()s and cleanup the select sync pool
+
+	// notify a select write event on the other tty, if we've closed this tty
+	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
+		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
+}
+
+
+void
+tty_destroy_cookie(tty_cookie* cookie)
+{
+	MutexLocker locker(cookie->tty->lock);
+	cookie->tty->ref_count--;
+	locker.Unlock();
+
+	if (cookie->blocking_semaphore >= 0)
+		delete_sem(cookie->blocking_semaphore);
+
+	delete cookie;
+}
+
+
+status_t
+tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
+{
+	char* buffer = (char*)_buffer;
+	struct tty* tty = cookie->tty;
+	uint32 mode = cookie->open_mode;
+	bool dontBlock = (mode & O_NONBLOCK) != 0;
+	size_t length = *_length;
+	bool canon = true;
+	bigtime_t timeout = dontBlock ? 0 : B_INFINITE_TIMEOUT;
+	bigtime_t interCharTimeout = 0;
+	size_t bytesNeeded = 1;
+
+	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
+
+	if (length == 0)
+		return B_OK;
+
+	// bail out, if the TTY is already closed
+	TTYReference ttyReference(cookie);
+	if (!ttyReference.IsLocked())
+		return B_FILE_ERROR;
+
+	ReaderLocker locker(cookie);
+
+	// handle raw mode
+	if ((!tty->is_master) && ((tty->settings.termios.c_lflag & ICANON) == 0)) {
+		canon = false;
+		if (!dontBlock) {
+			// Non-blocking mode. Handle VMIN and VTIME.
+			bytesNeeded = tty->settings.termios.c_cc[VMIN];
+			bigtime_t vtime = tty->settings.termios.c_cc[VTIME] * 100000;
+			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", bytesNeeded,
+				vtime));
+
+			if (bytesNeeded == 0) {
+				// In this case VTIME specifies a relative total timeout. We
+				// have no inter-char timeout, though.
+				timeout = vtime;
+			} else {
+				// VTIME specifies the inter-char timeout. 0 is indefinitely.
+				if (vtime == 0)
+					interCharTimeout = B_INFINITE_TIMEOUT;
+				else
+					interCharTimeout = vtime;
+
+				if (bytesNeeded > length)
+					bytesNeeded = length;
+			}
+		}
+	}
+
+	status_t status;
+	*_length = 0;
+
+	do {
+		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout,
+			bytesNeeded));
+		status = locker.AcquireReader(timeout, bytesNeeded);
+		if (status != B_OK)
+			break;
+
+		size_t toRead = locker.AvailableBytes();
+		if (toRead > length)
+			toRead = length;
+
+		bool _hitEOF = false;
+		bool* hitEOF = canon && tty->pending_eof > 0 ? &_hitEOF : NULL;
+
+		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, buffer,
+			toRead, tty->settings.termios.c_cc[VEOF], hitEOF);
+		if (bytesRead < 0) {
+			status = bytesRead;
+			break;
+		}
+
+		buffer += bytesRead;
+		length -= bytesRead;
+		*_length += bytesRead;
+		bytesNeeded = (size_t)bytesRead > bytesNeeded
+			? 0 : bytesNeeded - bytesRead;
+
+		// we hit an EOF char -- bail out, whatever amount of data we have
+		if (hitEOF && *hitEOF) {
+			tty->pending_eof--;
+			break;
+		}
+
+		// Once we have read something reset the timeout to the inter-char
+		// timeout, if applicable.
+		if (!dontBlock && !canon && *_length > 0)
+			timeout = interCharTimeout;
+	} while (bytesNeeded > 0);
+
+	if (status == B_WOULD_BLOCK || status == B_TIMED_OUT) {
+		// In non-blocking non-canonical-input-processing mode never return
+		// timeout errors. Just return 0, if nothing has been read.
+		if (!dontBlock && !canon)
+			status = B_OK;
+	}
+
+	return *_length == 0 ? status : B_OK;
+}
+
+
+status_t
+tty_write(tty_cookie* sourceCookie, const void* _buffer, size_t* _length)
+{
+	if (sourceCookie->tty->is_master)
+		return tty_write_to_tty_master(sourceCookie, _buffer, _length);
+
+	return tty_write_to_tty_slave(sourceCookie, _buffer, _length);
 }
 
 
@@ -1637,191 +1782,6 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 	TRACE(("tty: unsupported opcode %lu\n", op));
 	return B_BAD_VALUE;
-}
-
-
-status_t
-tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
-{
-	char* buffer = (char*)_buffer;
-	struct tty* tty = cookie->tty;
-	uint32 mode = cookie->open_mode;
-	bool dontBlock = (mode & O_NONBLOCK) != 0;
-	size_t length = *_length;
-	bool canon = true;
-	bigtime_t timeout = dontBlock ? 0 : B_INFINITE_TIMEOUT;
-	bigtime_t interCharTimeout = 0;
-	size_t bytesNeeded = 1;
-
-	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
-
-	if (length == 0)
-		return B_OK;
-
-	// bail out, if the TTY is already closed
-	TTYReference ttyReference(cookie);
-	if (!ttyReference.IsLocked())
-		return B_FILE_ERROR;
-
-	ReaderLocker locker(cookie);
-
-	// handle raw mode
-	if ((!tty->is_master) && ((tty->settings.termios.c_lflag & ICANON) == 0)) {
-		canon = false;
-		if (!dontBlock) {
-			// Non-blocking mode. Handle VMIN and VTIME.
-			bytesNeeded = tty->settings.termios.c_cc[VMIN];
-			bigtime_t vtime = tty->settings.termios.c_cc[VTIME] * 100000;
-			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", bytesNeeded,
-				vtime));
-
-			if (bytesNeeded == 0) {
-				// In this case VTIME specifies a relative total timeout. We
-				// have no inter-char timeout, though.
-				timeout = vtime;
-			} else {
-				// VTIME specifies the inter-char timeout. 0 is indefinitely.
-				if (vtime == 0)
-					interCharTimeout = B_INFINITE_TIMEOUT;
-				else
-					interCharTimeout = vtime;
-
-				if (bytesNeeded > length)
-					bytesNeeded = length;
-			}
-		}
-	}
-
-	status_t status;
-	*_length = 0;
-
-	do {
-		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout,
-			bytesNeeded));
-		status = locker.AcquireReader(timeout, bytesNeeded);
-		if (status != B_OK)
-			break;
-
-		size_t toRead = locker.AvailableBytes();
-		if (toRead > length)
-			toRead = length;
-
-		bool _hitEOF = false;
-		bool* hitEOF = canon && tty->pending_eof > 0 ? &_hitEOF : NULL;
-
-		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, buffer,
-			toRead, tty->settings.termios.c_cc[VEOF], hitEOF);
-		if (bytesRead < 0) {
-			status = bytesRead;
-			break;
-		}
-
-		buffer += bytesRead;
-		length -= bytesRead;
-		*_length += bytesRead;
-		bytesNeeded = (size_t)bytesRead > bytesNeeded
-			? 0 : bytesNeeded - bytesRead;
-
-		// we hit an EOF char -- bail out, whatever amount of data we have
-		if (hitEOF && *hitEOF) {
-			tty->pending_eof--;
-			break;
-		}
-
-		// Once we have read something reset the timeout to the inter-char
-		// timeout, if applicable.
-		if (!dontBlock && !canon && *_length > 0)
-			timeout = interCharTimeout;
-	} while (bytesNeeded > 0);
-
-	if (status == B_WOULD_BLOCK || status == B_TIMED_OUT) {
-		// In non-blocking non-canonical-input-processing mode never return
-		// timeout errors. Just return 0, if nothing has been read.
-		if (!dontBlock && !canon)
-			status = B_OK;
-	}
-
-	return *_length == 0 ? status : B_OK;
-}
-
-
-status_t
-tty_write_to_tty_master(tty_cookie* sourceCookie, const void* _buffer,
-	size_t* _length)
-{
-	const char* buffer = (const char*)_buffer;
-	size_t bytesRemaining = *_length;
-	*_length = 0;
-
-	while (bytesRemaining > 0) {
-		// copy data to stack
-		char safeBuffer[256];
-		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
-		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
-		if (error != B_OK)
-			return error;
-
-		// write them
-		size_t written = toWrite;
-		error = tty_write_to_tty_master_unsafe(sourceCookie, safeBuffer,
-			&written);
-		if (error != B_OK)
-			return error;
-
-		buffer += written;
-		bytesRemaining -= written;
-		*_length += written;
-
-		if (written < toWrite)
-			return B_OK;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
-	size_t* _length)
-{
-	const char* buffer = (const char*)_buffer;
-	size_t bytesRemaining = *_length;
-	*_length = 0;
-
-	while (bytesRemaining > 0) {
-		// copy data to stack
-		char safeBuffer[256];
-		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
-		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
-		if (error != B_OK)
-			return error;
-
-		// write them
-		size_t written = toWrite;
-		error = tty_write_to_tty_slave_unsafe(sourceCookie, safeBuffer,
-			&written);
-		if (error != B_OK)
-			return error;
-
-		buffer += written;
-		bytesRemaining -= written;
-		*_length += written;
-
-		if (written < toWrite)
-			return B_OK;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-tty_write(tty_cookie* sourceCookie, const void* _buffer, size_t* _length)
-{
-	if (sourceCookie->tty->is_master)
-		return tty_write_to_tty_master(sourceCookie, _buffer, _length);
-
-	return tty_write_to_tty_slave(sourceCookie, _buffer, _length);
 }
 
 
