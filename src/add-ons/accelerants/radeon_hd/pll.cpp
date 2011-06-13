@@ -89,8 +89,6 @@ PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 
 
 		for (referenceDiv = 1; referenceDiv <= REF_DIV_LIMIT; referenceDiv++) {
-			uint32 diff;
-
 			feedbackDiv = (uint32)((ratio * postDiv * referenceDiv) + 0.5);
 
 			if (feedbackDiv >= FB_DIV_LIMIT)
@@ -98,7 +96,7 @@ PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 			if (feedbackDiv > (500 + (13 * referenceDiv))) // rv6x0 limit
 				break;
 
-			diff = abs(pixelClock - (feedbackDiv
+			uint32 diff = abs(pixelClock - (feedbackDiv
 					* gInfo->shared_info->pll_info.reference_frequency)
 						/ (postDiv * referenceDiv));
 
@@ -323,7 +321,7 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 	PLLCRTCGrab(pllIndex, false);
 
 	if (hasDccg)
-		DCCGCLKSet(pllIndex, RV620_DCCGCLK_RELEASE);
+		DCCGCLKSet(pllIndex, RV620_DCCGCLK_GRAB);
 
 	TRACE("%s: PLLSet exit\n", __func__);
 	return B_OK;
@@ -365,8 +363,6 @@ PLLCalibrate(uint8 pllIndex)
 void
 PLLCRTCGrab(uint8 pllIndex, bool crt2)
 {
-
-	uint32 stored;
 	bool pll2IsCurrent;
 
 	if (!crt2) {
@@ -384,7 +380,7 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 	/* if the current pll is not active, then poke it just enough to flip
 	* owners */
 	if (!pll2IsCurrent) {
-		stored = read32PLL(P1PLL_CNTL);
+		uint32 stored = read32PLL(P1PLL_CNTL);
 
 		if (stored & 0x03) {
 			write32PLLAtMask(P1PLL_CNTL, 0, 0x03);
@@ -393,7 +389,7 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 		}
 
 	} else {
-		stored = read32PLL(P2PLL_CNTL);
+		uint32 stored = read32PLL(P2PLL_CNTL);
 
 		if (stored & 0x03) {
 			write32PLLAtMask(P2PLL_CNTL, 0, 0x03);
@@ -404,6 +400,8 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 }
 
 
+// See if card has a DCCG available that we need to lock to
+// the PLL clock. No one seems really sure what DCCG is.
 bool
 DCCGCLKAvailable(uint8 pllIndex)
 {
