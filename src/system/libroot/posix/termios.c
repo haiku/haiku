@@ -103,7 +103,7 @@ tcsendbreak(int fd, int duration)
 speed_t
 cfgetispeed(const struct termios *termios)
 {
-	return termios->c_ispeed;
+	return termios->c_cflag & CBAUD;
 }
 
 
@@ -115,12 +115,13 @@ cfsetispeed(struct termios *termios, speed_t speed)
 	the maximum value defined in termios.h
 	Note that errors from hardware device are detected only
 	until the tcsetattr() function is called */
-	if (speed > B230400) {
+	if (speed > B230400 || (speed & CBAUD) != speed) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	termios->c_ispeed = speed;
+	termios->c_cflag &= ~CBAUD;
+	termios->c_cflag |= speed;
 	return 0;
 }
 
@@ -128,7 +129,7 @@ cfsetispeed(struct termios *termios, speed_t speed)
 speed_t
 cfgetospeed(const struct termios *termios)
 {
-	return termios->c_ospeed;
+	return termios->c_cflag & CBAUD;
 }
 
 
@@ -136,11 +137,12 @@ int
 cfsetospeed(struct termios *termios, speed_t speed)
 {
 	/* Check for unaccepted speed values (see above) */
-	if (speed > B230400) {
+	if (speed > B230400 || (speed & CBAUD) != speed) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	termios->c_ospeed = speed;
+	termios->c_cflag &= ~CBAUD;
+	termios->c_cflag |= speed;
 	return 0;
 }
