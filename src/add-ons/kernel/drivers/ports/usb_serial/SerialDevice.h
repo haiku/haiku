@@ -79,7 +79,7 @@ protected:
 
 private:
 static	int32					_InputThread(void *data);
-static	int32					_OutputThread(void *data);
+		status_t				_WriteToDevice();
 
 static	void					_ReadCallbackFunction(void *cookie,
 									int32 status, void *data,
@@ -119,11 +119,11 @@ static	void					_InterruptCallbackFunction(void *cookie,
 
 		/* variables used in callback functionality */
 		size_t					fActualLengthRead;
-		uint32					fStatusRead;
+		status_t				fStatusRead;
 		size_t					fActualLengthWrite;
-		uint32					fStatusWrite;
+		status_t				fStatusWrite;
 		size_t					fActualLengthInterrupt;
-		uint32					fStatusInterrupt;
+		status_t				fStatusInterrupt;
 
 		/* semaphores used in callbacks */
 		sem_id					fDoneRead;
@@ -136,9 +136,8 @@ static	void					_InterruptCallbackFunction(void *cookie,
 		struct tty_cookie *		fSystemTTYCookie;
 		struct tty_cookie *		fDeviceTTYCookie;
 
-		/* input/output thread management */
+		/* input thread management */
 		thread_id				fInputThread;
-		thread_id				fOutputThread;
 		bool					fStopThreads;
 };
 

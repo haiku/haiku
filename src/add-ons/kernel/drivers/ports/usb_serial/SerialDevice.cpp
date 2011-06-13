@@ -15,6 +15,9 @@
 #include "KLSI.h"
 #include "Prolific.h"
 
+#include <sys/ioctl.h>
+
+
 SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 	uint16 productID, const char *description)
 	:	fDevice(device),
@@ -44,7 +47,6 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 		fSystemTTYCookie(NULL),
 		fDeviceTTYCookie(NULL),
 		fInputThread(-1),
-		fOutputThread(-1),
 		fStopThreads(false)
 {
 }
@@ -282,7 +284,7 @@ SerialDevice::Open(uint32 flags)
 	}
 
 	fSystemTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY,
-		flags);
+		O_RDWR);
 	if (fSystemTTYCookie == NULL) {
 		TRACE_ALWAYS("open: failed to init system tty cookie\n");
 		gTTYModule->tty_destroy(fMasterTTY);
@@ -291,7 +293,7 @@ SerialDevice::Open(uint32 flags)
 	}
 
 	fDeviceTTYCookie = gTTYModule->tty_create_cookie(fSlaveTTY, fMasterTTY,
-		flags);
+		O_RDWR);
 	if (fDeviceTTYCookie == NULL) {
 		TRACE_ALWAYS("open: failed to init device tty cookie\n");
 		gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
@@ -312,15 +314,6 @@ SerialDevice::Open(uint32 flags)
 	}
 
 	resume_thread(fInputThread);
-
-	fOutputThread = spawn_kernel_thread(_OutputThread,
-		"usb_serial output thread", B_NORMAL_PRIORITY, this);
-	if (fOutputThread < 0) {
-		TRACE_ALWAYS("open: failed to spawn output thread\n");
-		return fOutputThread;
-	}
-
-	resume_thread(fOutputThread);
 
 	fControlOut = USB_CDC_CONTROL_SIGNAL_STATE_DTR
 		| USB_CDC_CONTROL_SIGNAL_STATE_RTS;
@@ -357,7 +350,47 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 		return B_DEV_NOT_READY;
 	}
 
-	return gTTYModule->tty_write(fSystemTTYCookie, buffer, numBytes);
+	size_t bytesLeft = *numBytes;
+	*numBytes = 0;
+
+	while (bytesLeft > 0) {
+		size_t length = MIN(bytesLeft, 256);
+			// TODO: This is an ugly hack; We use a small buffer size so that
+			// we don't overrun the tty line buffer and cause it to block. While
+			// that isn't a problem, we shouldn't just hardcode the value here.
+
+		status_t result = gTTYModule->tty_write(fSystemTTYCookie, buffer,
+			&length);
+		if (result != B_OK) {
+			TRACE_ALWAYS("failed to write to tty: %s\n", strerror(result));
+			return result;
+		}
+
+		buffer += length;
+		*numBytes += length;
+		bytesLeft -= length;
+
+		while (true) {
+			// Write to the device as long as there's anything in the tty buffer
+			int readable = 0;
+			gTTYModule->tty_control(fDeviceTTYCookie, FIONREAD, &readable,
+				sizeof(readable));
+			if (readable == 0)
+				break;
+
+			result = _WriteToDevice();
+			if (result != B_OK) {
+				TRACE_ALWAYS("failed to write to device: %s\n",
+					strerror(result));
+				return result;
+			}
+		}
+	}
+
+	if (*numBytes > 0)
+		return B_OK;
+
+	return B_ERROR;
 }
 
 
@@ -398,8 +431,6 @@ SerialDevice::Close()
 {
 	OnClose();
 
-	// TODO: wait for the output buffer to be flushed?
-
 	fStopThreads = true;
 	fInputStopped = false;
 
@@ -409,12 +440,12 @@ SerialDevice::Close()
 		gUSBModule->cancel_queued_transfers(fControlPipe);
 	}
 
+	gTTYModule->tty_close_cookie(fSystemTTYCookie);
+	gTTYModule->tty_close_cookie(fDeviceTTYCookie);
+
 	int32 result = B_OK;
 	wait_for_thread(fInputThread, &result);
 	fInputThread = -1;
-
-	wait_for_thread(fOutputThread, &result);
-	fOutputThread = -1;
 
 	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
@@ -449,13 +480,6 @@ SerialDevice::Removed()
 	gUSBModule->cancel_queued_transfers(fReadPipe);
 	gUSBModule->cancel_queued_transfers(fWritePipe);
 	gUSBModule->cancel_queued_transfers(fControlPipe);
-
-	int32 result = B_OK;
-	wait_for_thread(fInputThread, &result);
-	fInputThread = -1;
-
-	wait_for_thread(fOutputThread, &result);
-	fOutputThread = -1;
 }
 
 
@@ -537,8 +561,9 @@ SerialDevice::_InputThread(void *data)
 		if (device->fStatusRead != B_OK) {
 			TRACE("input thread: device status error 0x%08x\n",
 				device->fStatusRead);
-			if (gUSBModule->clear_feature(device->fReadPipe,
-				USB_FEATURE_ENDPOINT_HALT) != B_OK) {
+			if (device->fStatusRead == B_DEV_STALLED
+				&& gUSBModule->clear_feature(device->fReadPipe,
+					USB_FEATURE_ENDPOINT_HALT) != B_OK) {
 				TRACE_ALWAYS("input thread: failed to clear halt feature\n");
 				return B_ERROR;
 			}
@@ -567,59 +592,57 @@ SerialDevice::_InputThread(void *data)
 }
 
 
-int32
-SerialDevice::_OutputThread(void *data)
+status_t
+SerialDevice::_WriteToDevice()
 {
-	SerialDevice *device = (SerialDevice *)data;
+	char *buffer = fOutputBuffer;
+	size_t bytesLeft = fOutputBufferSize;
+	status_t status = gTTYModule->tty_read(fDeviceTTYCookie, buffer,
+		&bytesLeft);
+	if (status != B_OK) {
+		TRACE_ALWAYS("write to device: failed to read from TTY: %s\n",
+			strerror(status));
+		return status;
+	}
 
-	while (!device->fStopThreads) {
-		char *buffer = device->fOutputBuffer;
-		size_t bytesLeft = device->fOutputBufferSize;
-		status_t status = gTTYModule->tty_read(device->fDeviceTTYCookie, buffer,
-			&bytesLeft);
+	while (!fDeviceRemoved && bytesLeft > 0) {
+		size_t length = MIN(bytesLeft, fWriteBufferSize);
+		size_t packetLength = length;
+		OnWrite(buffer, &length, &packetLength);
+
+		status = gUSBModule->queue_bulk(fWritePipe, fWriteBuffer, packetLength,
+			_WriteCallbackFunction, this);
 		if (status != B_OK) {
-			TRACE_ALWAYS("output thread: failed to read from TTY\n");
+			TRACE_ALWAYS("write to device: queueing failed with status "
+				"0x%08x\n", status);
 			return status;
 		}
 
-		while (bytesLeft > 0) {
-			size_t length = MIN(bytesLeft, device->fWriteBufferSize);
-			size_t packetLength = length;
-			device->OnWrite(buffer, &length, &packetLength);
+		status = acquire_sem_etc(fDoneWrite, 1, B_CAN_INTERRUPT, 0);
+		if (status != B_OK) {
+			TRACE_ALWAYS("write to device: failed to get write done sem "
+				"0x%08x\n", status);
+			return status;
+		}
 
-			status = gUSBModule->queue_bulk(device->fWritePipe,
-				device->fWriteBuffer, packetLength, _WriteCallbackFunction,
-				device);
-			if (status < B_OK) {
-				TRACE_ALWAYS("output thread: queueing failed with status "
-					"0x%08x\n", status);
-				return status;
-			}
-
-			status = acquire_sem_etc(device->fDoneWrite, 1, B_CAN_INTERRUPT, 0);
-			if (status != B_OK) {
-				TRACE_ALWAYS("output thread: failed to get write done sem "
-					"0x%08x\n", status);
-				return status;
-			}
-
-			if (device->fStatusWrite != B_OK) {
-				TRACE("output thread: device status error 0x%08x\n",
-					device->fStatusWrite);
-				status = gUSBModule->clear_feature(device->fWritePipe,
+		if (fStatusWrite != B_OK) {
+			TRACE("write to device: device status error 0x%08x\n",
+				fStatusWrite);
+			if (fStatusWrite == B_DEV_STALLED) {
+				status = gUSBModule->clear_feature(fWritePipe,
 					USB_FEATURE_ENDPOINT_HALT);
-				if (status < B_OK) {
-					TRACE_ALWAYS("output thread: failed to clear device "
+				if (status != B_OK) {
+					TRACE_ALWAYS("write to device: failed to clear device "
 						"halt\n");
 					return B_ERROR;
 				}
-
-				continue;
 			}
 
-			buffer += length;
-			bytesLeft -= length;
+			continue;
 		}
+
+		buffer += length;
+		bytesLeft -= length;
 	}
 
 	return B_OK;
@@ -627,7 +650,7 @@ SerialDevice::_OutputThread(void *data)
 
 
 void
-SerialDevice::_ReadCallbackFunction(void *cookie, int32 status, void *data,
+SerialDevice::_ReadCallbackFunction(void *cookie, status_t status, void *data,
 	uint32 actualLength)
 {
 	TRACE_FUNCALLS("read callback: cookie: 0x%08x status: 0x%08x data: 0x%08x "
@@ -641,7 +664,7 @@ SerialDevice::_ReadCallbackFunction(void *cookie, int32 status, void *data,
 
 
 void
-SerialDevice::_WriteCallbackFunction(void *cookie, int32 status, void *data,
+SerialDevice::_WriteCallbackFunction(void *cookie, status_t status, void *data,
 	uint32 actualLength)
 {
 	TRACE_FUNCALLS("write callback: cookie: 0x%08x status: 0x%08x data: 0x%08x "
@@ -655,7 +678,7 @@ SerialDevice::_WriteCallbackFunction(void *cookie, int32 status, void *data,
 
 
 void
-SerialDevice::_InterruptCallbackFunction(void *cookie, int32 status,
+SerialDevice::_InterruptCallbackFunction(void *cookie, status_t status,
 	void *data, uint32 actualLength)
 {
 	TRACE_FUNCALLS("interrupt callback: cookie: 0x%08x status: 0x%08x data: "
