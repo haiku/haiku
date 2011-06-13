@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
@@ -1251,7 +1251,18 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 
 	// TODO: We should also check, if any partition is mounted!
 
-	// uninitialize
+	KDiskSystem* diskSystem = partition->DiskSystem();
+
+	locker.Unlock();
+
+	// Let the disk system uninitialize the partition. This operation is not
+	// mandatory. If implemented, it will destroy the on-disk structures, so
+	// that the disk system cannot accidentally identify the partition later on.
+	if (diskSystem != NULL)
+		diskSystem->Uninitialize(partition, DUMMY_JOB_ID);
+
+	// re-lock and uninitialize the partition object
+	locker.Lock();
 	error = partition->UninitializeContents(true);
 
 	partition->UnmarkBusy(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -461,47 +461,7 @@ static partition_module_info vmdk_partition_module =
 	vmdk_free_partition_cookie,				// free_partition_cookie
 	vmdk_free_partition_content_cookie,		// free_partition_content_cookie
 
-#ifndef _BOOT_MODE
-	// querying (obsolete)
-	NULL,								// get_supported_operations
-	NULL,								// get_supported_child_operations
-	NULL,								// supports_initializing_child
-	NULL,								// is_sub_system_for
-
-	// validation hooks (obsolete)
-	NULL,								// validate_resize
-	NULL,								// validate_resize_child
-	NULL,								// validate_move
-	NULL,								// validate_move_child
-	NULL,								// validate_set_name
-	NULL,								// validate_set_content_name
-	NULL,								// validate_set_type
-	NULL,								// validate_set_parameters
-	NULL,								// validate_set_content_parameters
-	NULL,								// validate_initialize
-	NULL,								// validate_create_child
-	NULL,								// get_partitionable_spaces
-	NULL,								// get_next_supported_type
-	NULL,								// get_type_for_content_type
-
-	// shadow partition modification (obsolete)
-	NULL,								// shadow_changed
-
-	// writing
-	NULL,								// repair
-	NULL,								// resize
-	NULL,								// resize_child
-	NULL,								// move
-	NULL,								// move_child
-	NULL,								// set_name
-	NULL,								// set_content_name
-	NULL,								// set_type
-	NULL,								// set_parameters
-	NULL,								// set_content_parameters
-	NULL,								// initialize
-	NULL,								// create_child
-	NULL,								// delete_child
-#else
+#ifdef _BOOT_MODE
 	NULL
 #endif	// _BOOT_MODE
 };

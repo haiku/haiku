@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -63,6 +63,8 @@ public:
 									const char* parameters, disk_job_id job);
 	virtual	status_t			Initialize(KPartition* partition,
 									const char* name, const char* parameters,
+									disk_job_id job);
+	virtual	status_t			Uninitialize(KPartition* partition,
 									disk_job_id job);
 	virtual	status_t			CreateChild(KPartition* partition, off_t offset,
 									off_t size, const char* type,

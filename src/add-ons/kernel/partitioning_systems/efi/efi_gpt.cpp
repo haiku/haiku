@@ -1283,6 +1283,7 @@ partition_module_info gEFIPartitionModule = {
 	NULL, // set_parameters
 	NULL, // set_content_parameters
 	efi_gpt_initialize,
+	NULL, // uninitialize
 	efi_gpt_create_child,
 	efi_gpt_delete_child
 #else
