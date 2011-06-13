@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PackageInstaller	2979335347
+1	french	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f Gio
 %.1f KiB	PackageView		%.1f Kio
 %.1f MiB	PackageView		%.1f Mio
@@ -38,8 +38,10 @@ Package installer	PackageView		Installeur de paquets
 PackageInstaller	System name		Installeur de paquets
 Preparing package	PackageInstall		Préparation du paquet
 Replace	PackageView		Remplacer
+Replace all	PackageView		Remplacer tout
 Running post-installation scripts	PackageInstall		Exécution des scripts post-installation
 Skip	PackageView		passer
+Skip all	PackageView		Passer tout
 Stop	PackageStatus		Arrêter
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Le dossier nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le dossier par celui de ce paquet ?
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Le fichier nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le fichier par celui de ce paquet ?
@@ -52,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Le script nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le script par celui de ce paquet ?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Le lien symbolique nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le lien par celui de ce paquet ?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Un fichier du paquet semble ne pas avoir la bonne taille. Le paquet est peut-être corrompu, ou bien il a pu être modifié depuis sa création. Voulez-vous quand-même continuer ?
+none	PackageView		aucun

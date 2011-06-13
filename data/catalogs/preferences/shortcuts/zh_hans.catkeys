@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Shortcuts	2965605727
+1	simplified_chinese	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		（使用文件查询选取应用程序）
 *Beep	ShortcutsWindow		*提示音
 *InsertString \"Your Text Here\"	ShortcutsWindow		*插入字符串 \"在此处写入文本\"
@@ -17,7 +17,7 @@ Append KeySet…	ShortcutsWindow		添加按键设置...
 Application	ShortcutsWindow		应用程序
 Beep	ShortcutsSpec		提示音
 Cancel	ShortcutsWindow		取消
-Control	ShortcutsSpec	Name for modifier on keyboard	Contorl 
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Don't save	ShortcutsWindow		不保存
 Error, NULL state description?\n	ShortcutsSpec		错误，无效状态描述？\n
 File	ShortcutsWindow		文件
@@ -44,6 +44,7 @@ Save KeySet as…	ShortcutsWindow		保存按键设置…
 Select	ShortcutsWindow		选择
 SendMessage	ShortcutsSpec		SendMessage
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift 
+Shortcuts	System name		快捷键
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		无法打开您的按键设置文件！
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		无法解析您的按键设置文件！
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		无法保存您的按键设置文件！

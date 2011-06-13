@@ -34,7 +34,7 @@ Logging view	PoorMan		Kirjaamisnäkymä
 Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
 OK	PoorMan		Valmis
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voi sen sijaan valita yhden omista kansioistasi.
-PoorMan	Application name		Köyhis
+PoorMan	System name		Köyhis
 PoorMan settings	PoorMan		Köyhisasetukset
 Quit	PoorMan		Poistu
 Run server	PoorMan		Käynnistä palvelin

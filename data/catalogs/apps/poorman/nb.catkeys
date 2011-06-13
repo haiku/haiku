@@ -34,7 +34,7 @@ Logging view	PoorMan		Loggvisning
 Max. simultaneous connections:	PoorMan		Maks. samtidige tilkoblinger
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vennligst velg mappen du ønsker å publisere på nettet.\n\nDu kan la PoorMan opprette en standard \"public_html\" i din hjemmemappe.\nEller du kan velge én av dine egne mapper i stedet.
-PoorMan	Application name		PoorMan
+PoorMan	System name		PoorMan
 PoorMan settings	PoorMan		PoorMan-innstillinger
 Quit	PoorMan		Avslutt
 Run server	PoorMan		Kjør server

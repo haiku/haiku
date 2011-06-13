@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-DriveSetup	568426562
+1	simplified_chinese	x-vnd.Haiku-DriveSetup	1209826930
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<空白>
 <empty>	PartitionList		<空白>
@@ -29,6 +29,7 @@ Device	DiskView		设备
 Device	PartitionList		设备
 Disk	MainWindow		磁盘
 Disk system \"%s\"\" not found!	MainWindow		磁盘系统 \"%s\"\"不存在！
+DriveSetup	System name		磁盘管理器
 Eject	MainWindow		弹出
 End: %ld MB	Support		结束：%ld MB
 Error: 	MainWindow	in any error alert	错误：

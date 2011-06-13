@@ -34,7 +34,7 @@ Logging view	PoorMan		Від пратакаліравання
 Max. simultaneous connections:	PoorMan		Макс. колькасць адначасовых спалучэнняў:
 OK	PoorMan		ОК
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Калі ласка, выберыце каталог, які трэба апублікаваць.\n\nPoorMan можа стварыць для вас стандартны каталог \"public_html\" у хатнім каталозе.\nАбо вы можаце самі выбраць пажаданы каталог.
-PoorMan	Application name		Валацуга (Web-сервер)
+PoorMan	System name		Валацуга (Web-сервер)
 PoorMan settings	PoorMan		Наладкі PoorMan
 Quit	PoorMan		Выйсці
 Run server	PoorMan		Запусціць сервер

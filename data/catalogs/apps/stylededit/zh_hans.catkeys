@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-StyledEdit	2399393207
+1	simplified_chinese	x-vnd.Haiku-StyledEdit	1508367857
 ???	LoadAlert		???
 Align	Menus		对齐
 Black	Menus		黑色
@@ -55,6 +55,7 @@ Redo typing	QuitAlert		重复输入
 Replace	FindandReplaceWindow		替换
 Replace all	FindandReplaceWindow		全部替换
 Replace in all windows	FindandReplaceWindow		在所有窗口进行替换
+Replace next	Menus		替换文本
 Replace with:	FindandReplaceWindow		替换为：
 Replace…	Menus		替换…
 Revert to saved…	Menus		恢复保存为...
@@ -69,6 +70,7 @@ Search backwards	FindandReplaceWindow		后台搜索
 Select all	Menus		全选
 Size	Menus		大小
 Statistics…	Menus		统计...
+StyledEdit	System name		StyledEdit
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		文件为只读。将所做更改保存到文档\"%s\"吗?
 Undo typing	QuitAlert		取消输入
 Untitled 	StyledEditWindow		未命名

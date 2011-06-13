@@ -1,38 +1,43 @@
-1	simplified_chinese	x-vnd.Be-MAIL	148190189
+1	simplified_chinese	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - 日期
 %e - E-mail address	Mail		%e - 邮箱
+%e wrote:\\n	Mail		%e 写：\\n
 %n - Full name	Mail		%n - 全名
+(Address unavailable)	Mail		（地址不可用）
+(Date unavailable)	Mail		（日期不可用）
+(Name unavailable)	Mail		（名称不可用）
+<none>	Mail		<无>
 Account from mail	Mail		邮件账户
-Account:	Mail		账户:
+Account:	Mail		账户：
 Accounts…	Mail		账户…
 Add	Mail		添加
 Add enclosure…	Mail		添加附件中…
 Add signature	Mail		添加署名
 An error occurred trying to open this signature.	Mail		试图打开标识出错。
-An error occurred trying to save the attachment.	Mail		出现错误，保存为复件。
+An error occurred trying to save the attachment.	Mail		出现错误，保存为副件。
 An error occurred trying to save this signature.	Mail		保存标签发生错误。
-Attach attributes:	Mail		附加属性:
-Attachments:	Mail		附件: 
+Attach attributes:	Mail		附加属性：
+Attachments:	Mail		附件：
 Auto signature:	Mail		自动署名：
 Automatic	Mail		自动
-Automatically mark mail as read:	Mail		邮件自动标记为“已读”:
+Automatically mark mail as read:	Mail		邮件自动标记为“已读”：
 Bcc:	Mail		邮件副本：
 Beginner	Mail		新手
-Button bar:	Mail		按钮栏:
+Button bar:	Mail		按钮栏：
 Cancel	Mail		取消
-Cc:	Mail		副本:
+Cc:	Mail		副本：
 Check spelling	Mail		检查拼写
 Close	Mail		关闭
 Close and 	Mail		关闭并且
-Colored quotes:	Mail		彩色:
+Colored quotes:	Mail		彩色：
 Copy	Mail		复制
 Copy link location	Mail		复制链接
 Copy to new	Mail		转发
 Couldn't open this signature. Sorry.	Mail		署名无法打开，对不起。
 Cut	Mail		剪切
 Date:	Mail		日期：
-Decoding:	Mail		解码:
-Default account:	Mail		默认账户:
+Decoding:	Mail		解码：
+Default account:	Mail		默认账户：
 Delete	Mail		删除
 Discard	Mail		忽略
 Do you wish to save this message as a draft before closing?	Mail		关闭之前，是否把邮件保存为草稿?
@@ -42,29 +47,30 @@ E-mail draft could not be saved!	Mail		邮件草稿无法保存!
 Edit	Mail		编辑
 Edit queries…	Mail		编辑查询…
 Edit signatures…	Mail		编辑署名…
-Encoding:	Mail		编码:
+Encoding:	Mail		编码：
 Expert	Mail		专家
 File	Mail		文件
 Find	Mail		搜索
 Find again	Mail		重新搜索
 Find…	Mail		查询...
-Font:	Mail		字体:
+Font:	Mail		字体：
 Forward	Mail		下一封
 Forward without attachments	Mail		不添加附件，继续
-From:	Mail		从:
+From:	Mail		从：
 Hide	Mail		隐藏
 Include file attributes in attachments	Mail		在附件中包含文件属性
-Inconsistency occurred in the undo/redo buffer.	Mail		缓冲区发生错误，撤销/重复操作无法执行.
-Initial spell check mode:	Mail		拼写检查模式:
+Inconsistency occurred in the undo/redo buffer.	Mail		缓冲区发生错误，撤销/重复操作无法执行。
+Initial spell check mode:	Mail		拼写检查模式：
 Leave as '%s'	Mail		标记为 '%s'
 Leave as New	Mail		标记为“未读”
 Leave same	Mail		忽略
-Mail couldn't find its dictionary.	Mail		Mail 无法找到字典。
+Mail	System name		电子邮件
+Mail couldn't find its dictionary.	Mail		电子邮件无法找到字典。
 Mail preferences	Mail		邮箱首选项
 Mailing	Mail		发送中
 Message	Mail		邮件
 Move to trash	Mail		移动到垃圾箱
-Need Tracker to move items to trash	Mail		需要使用 Tracker 将其移动到垃圾箱
+Need Tracker to move items to trash	Mail		需要使用文件浏览器将其移动到垃圾箱
 New	Mail		新建
 New mail message	Mail		新建邮件
 Next	Mail		下一个
@@ -93,15 +99,15 @@ Quit	Mail		退出
 Quote	Mail		转发
 Random	Mail		随机
 Read 	Mail		阅读
-Really delete this signature? This cannot be undone.	Mail		确定删除标识? 删除的标识将无法被恢复.
+Really delete this signature? This cannot be undone.	Mail		确定删除标识? 删除的标识将无法被恢复。
 Redo	Mail		重复
 Remove attachment	Mail		删除附件
 Remove enclosure	Mail		删除格式
 Remove quote	Mail		删除引用
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		从邮件中删除附件的功能暂时还未实现！\n可能无法正常运行！
 Reply	Mail		回复
-Reply account:	Mail		回复:
-Reply preamble:	Mail		回复主题:
+Reply account:	Mail		回复：
+Reply preamble:	Mail		回复主题：
 Reply to all	Mail		全部回复
 Reply to sender	Mail		回复发件人
 Resend	Mail		重新发送
@@ -122,19 +128,19 @@ Show icons & labels	Mail		显示图标和标签
 Show icons only	Mail		只显示图标
 Show raw message	Mail		显示原始信息
 Signature	Mail		样式
-Signature:	Mail		样式:
+Signature:	Mail		样式：
 Signatures	Mail		署名
-Size:	Mail		大小:
+Size:	Mail		大小：
 Sorry	Mail		对不起
 Sorry, could not find an application that supports the 'Person' data type.	Mail		对不起，无法找到支持‘个人’数据类型的程序。
 Start now	Mail		开始
-Subject:	Mail		主题:
+Subject:	Mail		主题：
 Text wrapping:	Mail		文本加密：
 The mail_daemon could not be started:\n\t	Mail		 mail_daemon 无法启动：\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon 没有运行。邮件将会被打包，在mail_daemon启动时将会发送
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon 没有运行。邮件将会被打包，在mail_daemon启动时将会发送。
 There is no installed handler for URL links.	Mail		 URL 链接无法处理。
-Title:	Mail		标题:
-To:	Mail		发送到:
+Title:	Mail		标题：
+To:	Mail		发送到：
 Trash	Mail		垃圾箱
 Undo	Mail		撤销
 Unread	Mail		无法读取
@@ -144,4 +150,11 @@ View	Mail		查看
 Warn unencodable:	Mail		无法识别的编码类型警告:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		你的正文中包含的 %ld 属于无法识别的编码类型。 可能改变编码类型之后会更好的运行？ 点击“发送”继续(系统将会选择一种合适的类型来代替无法编码的类型)，或者点击“取消”，进行修复。
 \\n - Newline	Mail		\\n - 插入空行
+draft	B_USER_DIRECTORY/mail/draft		草稿箱
 helpful message	Mail		帮助消息
+in	B_USER_DIRECTORY/mail/in		收件箱
+mail	B_USER_DIRECTORY/mail		邮件
+out	B_USER_DIRECTORY/mail/out		发件箱
+queries	B_USER_DIRECTORY/mail/queries		查询
+sent	B_USER_DIRECTORY/mail/sent		已发送
+spam	B_USER_DIRECTORY/mail/spam		垃圾邮件

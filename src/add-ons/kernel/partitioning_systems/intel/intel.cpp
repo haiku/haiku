@@ -509,6 +509,7 @@ static partition_module_info intel_partition_map_module =
 	NULL,								// set_parameters
 	NULL,								// set_content_parameters
 	pm_initialize,						// initialize
+	pm_uninitialize,					// uninitialize
 	pm_create_child,					// create_child
 	pm_delete_child,					// delete_child
 #else
@@ -596,6 +597,7 @@ static partition_module_info intel_extended_partition_module =
 	NULL,								// set_parameters
 	NULL,								// set_content_parameters
 	ep_initialize,						// initialize
+	NULL,								// uninitialize
 	ep_create_child,					// create_child
 	ep_delete_child,					// delete_child
 #else	// _BOOT_MODE

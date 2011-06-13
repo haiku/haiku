@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-ProcessController	526557007
+1	simplified_chinese	x-vnd.Haiku-ProcessController	2887520383
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		版权所有 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		关于进程控制器…
 Cancel	ProcessController		取消
@@ -23,6 +23,7 @@ Normal priority	ProcessController		常规优先级
 OK	ProcessController		确定
 Ok!	ProcessController		确定！
 Please confirm	ProcessController		请确认
+ProcessController	System name		进程控制器
 ProcessController is already installed in Deskbar.	ProcessController		进程控制器已安装至桌面栏.
 Processor %d	ProcessController		处理器 %d
 Quit an application	ProcessController		退出程序

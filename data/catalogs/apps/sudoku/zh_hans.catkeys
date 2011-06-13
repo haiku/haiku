@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Sudoku	1385218625
+1	simplified_chinese	x-vnd.Haiku-Sudoku	2463385585
 Abort	ProgressWindow		关于
 Advanced	SudokuWindow		高级
 Blank	SudokuWindow		空白
@@ -26,6 +26,7 @@ Snapshot current	SudokuWindow		当前快照
 Solve	SudokuWindow		解决
 Solve single field	SudokuWindow		保存单个区域
 Start again	SudokuWindow		重启
+Sudoku	System name		数独
 Sudoku request	SudokuWindow		数独要求
 Sudoku solved - congratulations!\n	SudokuWindow		数独已完成 - 祝贺您取得成功！\n 
 Text	SudokuWindow		文本

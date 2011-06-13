@@ -48,6 +48,8 @@ status_t	pm_set_type(int fd, partition_id partitionID, const char* type,
 				disk_job_id job);
 status_t	pm_initialize(int fd, partition_id partitionID, const char* name,
 				const char* parameters, off_t partitionSize, disk_job_id job);
+status_t	pm_uninitialize(int fd, partition_id partitionID,
+				off_t partitionSize, uint32 blockSize, disk_job_id job);
 status_t	pm_create_child(int fd, partition_id partitionID, off_t offset,
 				off_t size, const char* type, const char* name,
 				const char* parameters, disk_job_id job,

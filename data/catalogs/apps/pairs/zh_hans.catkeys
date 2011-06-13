@@ -1,5 +1,5 @@
-1	simplified_chinese	x-vnd.Haiku-Pairs	129365914
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\t由 
+1	simplified_chinese	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\t由 Ralf Schülke 编写\n\t版权 2008-2010, Haiku Inc。\n\n您完成游戏总计经过了 %num% 次点击。\n
 Beginner (4x4)	PairsWindow		菜鸟级 (4x4)
 Expert (8x8)	PairsWindow		骨灰级(8x8)
 Game	PairsWindow		游戏
@@ -7,7 +7,8 @@ Intermediate (6x6)	PairsWindow		中鸟级 (6x6)
 New	PairsWindow		新建
 New game	PairsWindow		新游戏
 OK	PairsView		确定
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		对对碰在系统中没有找到足够的矢量图标；它至少需要%d个可用图标。
+Pairs	System name		对对碰
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		对对碰在系统中没有找到足够的矢量图标；它至少需要 %d 个可用图标。
 Quit	PairsWindow		退出
 Quit game	PairsWindow		退出游戏
 Size	PairsWindow		大小

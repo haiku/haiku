@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Menu de vitesse de capture
 Capture controls	CodyCam		Contrôles de capture
 Capturing Image…	VideoConsumer.cpp		Capture d'une image…
 Closing the window\n	VideoConsumer.cpp		Fermeture de la fenêtre\n
-CodyCam	Application name		CodyCam
+CodyCam	System name		CodyCam
 Connected…	VideoConsumer.cpp		Connecté...
 Couldn't find requested directory on server	VideoConsumer.cpp		Impossible de trouver le dossier demandé sur le serveur
 Directory:	CodyCam		Dossier :

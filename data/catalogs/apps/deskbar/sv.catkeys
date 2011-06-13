@@ -36,7 +36,7 @@ Show Time	Tray		Visa tid
 Show all	WindowMenu		Visa alla
 Show application expander	PreferencesWindow		Visa program-expanderare
 Show calendar…	TimeView		Visa kalender...
-Show replicants	BeMenu		Visa replikanter
+Show replicants	BeMenu		Visa replikanthandtag
 Show seconds	PreferencesWindow		Visa sekunder
 Shutdown…	BeMenu		Avsluta Haiku...
 Sort running applications	PreferencesWindow		Sortera aktiva program

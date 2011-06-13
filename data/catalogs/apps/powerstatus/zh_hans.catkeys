@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-PowerStatus	51899741
+1	simplified_chinese	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		关于
 About…	PowerStatus		关于...
 Battery charging	PowerStatus		电池充电
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		容量粒度1：
 Capacity granularity 2: 	PowerStatus		容量粒度2：
 Capacity: 	PowerStatus		容量：
 Current rate: 	PowerStatus		当前速度：
+Damaged battery	PowerStatus		电池损坏
 Design capacity low warning: 	PowerStatus		设计低容量警告：
 Design capacity warning: 	PowerStatus		设计低容量警告：
 Design capacity: 	PowerStatus		设计容量：
@@ -23,6 +24,7 @@ OEM info: 	PowerStatus		OEM 信息：
 OK	PowerStatus		确定
 Power status box	PowerStatus		电源状态栏
 PowerStatus	PowerStatus		电源状态
+PowerStatus	System name		电源状态
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\n编写者：Axel Dörfler，Clemens Zeidler\n版权所有 2006, Haiku, Inc.\n
 Quit	PowerStatus		退出
 Run in window	PowerStatus		在窗口中运行

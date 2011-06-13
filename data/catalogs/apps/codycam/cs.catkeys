@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Menu četnosti zachycení
 Capture controls	CodyCam		Ovládání zachycení
 Capturing Image…	VideoConsumer.cpp		Zachycení obrázku...
 Closing the window\n	VideoConsumer.cpp		Zavírám okno\n
-CodyCam	Application name		CodyCam
+CodyCam	System name		CodyCam
 Connected…	VideoConsumer.cpp		Připojeno...
 Couldn't find requested directory on server	VideoConsumer.cpp		Nebylo možné na serveru najít požadovaný adresář 
 Directory:	CodyCam		Adresář:

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Pulse	2596799409
+1	simplified_chinese	x-vnd.Haiku-Pulse	2324471783
 %.2f GHz	NormalPulseView		%.2f GHz
 %ld MHz	NormalPulseView		%ld MHz
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\n由 David Ramsey 和 Arve Hjønnevåg 编写\n由 Daniel Switkin 修改\n
@@ -35,6 +35,7 @@ OK	PulseApp		确定
 OK	PulseView		确定
 Pulse	NormalPulseView		系统脉搏
 Pulse	PulseApp		系统脉搏
+Pulse	System name		系统脉搏
 Pulse settings	PulseWindow		系统脉搏设置
 Quit	DeskbarPulseView		退出
 Quit	MiniPulseView		退出

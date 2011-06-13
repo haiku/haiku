@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PackageInstaller	2979335347
+1	belarusian	x-vnd.Haiku-PackageInstaller	2709408798
 %.1f GiB	PackageView		%.1f ГіБ
 %.1f KiB	PackageView		%.1f КіБ
 %.1f MiB	PackageView		%.1f МіБ
@@ -38,8 +38,10 @@ Package installer	PackageView		Усталёўшчык Пакункаў
 PackageInstaller	System name		Усталёўшчык пакункаў
 Preparing package	PackageInstall		Прыгатаванне пакунку
 Replace	PackageView		Замяніць
+Replace all	PackageView		Замяніць ўсе
 Running post-installation scripts	PackageInstall		Запускаюцца усталёўныя скрыпты
 Skip	PackageView		Абыйсці
+Skip all	PackageView		Абыйсці ўсе
 Stop	PackageStatus		Спыніць
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
@@ -52,3 +54,4 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрыпт '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Спасылка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Падобна, што памер файлу пакунка не адпавядае. Верагодна, што вы маеце пашкоджаны ці наўмысна мадыфікаваны пакунак. Жадаеце працягнуць усталёўку?
+none	PackageView		няма

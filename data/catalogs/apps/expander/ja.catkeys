@@ -9,7 +9,7 @@ Close window when done expanding	ExpanderPreferences		解凍終了後ウイン�
 Continue	ExpanderWindow		続ける
 Creating listing for '%s'	ExpanderWindow		'%s'のリストを作成中
 Destination	ExpanderWindow		解凍先
-Destination folder:	ExpanderPreferences		解凍先フォルダ：
+Destination folder:	ExpanderPreferences		解凍先フォルダー：
 Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
 Expand	ExpanderMenu		解凍
 Expand	ExpanderWindow		解凍
@@ -24,7 +24,7 @@ File expanded	ExpanderWindow		ファイル解凍が完了しました
 Hide contents	ExpanderWindow		内容を隠す
 Leave destination folder path empty	ExpanderPreferences		パスを空にしておく
 OK	ExpanderPreferences		OK
-Open destination folder after extraction	ExpanderPreferences		解凍後に解凍先フォルダを開く
+Open destination folder after extraction	ExpanderPreferences		解凍後に解凍先フォルダーを開く
 Other:	ExpanderPreferences		その他：
 Same directory as source (archive) file	ExpanderPreferences		元ファイル(アーカイブ)と同じ
 Select	DirectoryFilePanel		選択
@@ -44,6 +44,6 @@ The destination folder does not exist.	ExpanderWindow		解凍先フォルダー�
 The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
 The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
 The file doesn't exist	ExpanderWindow		ファイルは存在しません
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダー移動されたか、名前が変更されたか、\nサポートされていません。
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダーが移動されたか、名前が変更されたか、\nサポートされていません。
 Use:	ExpanderPreferences		パスを指定：
 is not supported	ExpanderWindow		はサポートされてません

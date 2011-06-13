@@ -34,7 +34,7 @@ Logging view	PoorMan		Loggningsvy
 Max. simultaneous connections:	PoorMan		Maximalt antal samtidiga anslutningar:
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp eller välja en egen map.
-PoorMan	Application name		FattigMan
+PoorMan	System name		FattigMan
 PoorMan settings	PoorMan		Fattigmans inställningar
 Quit	PoorMan		Avsluta
 Run server	PoorMan		Kör server

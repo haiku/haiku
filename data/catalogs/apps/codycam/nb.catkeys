@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Opptaksratiomeny
 Capture controls	CodyCam		Opptakskontroll
 Capturing Image…	VideoConsumer.cpp		Tar bilde...
 Closing the window\n	VideoConsumer.cpp		Lukker vinduet\n
-CodyCam	Application name		CodyCam
+CodyCam	System name		CodyCam
 Connected…	VideoConsumer.cpp		Tilkoblet...
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finne angitt mappe på serveren
 Directory:	CodyCam		Mappe:

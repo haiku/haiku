@@ -9,7 +9,7 @@ Freeze/Unfreeze image	Magnify-Main		Заморозить/разморозить 
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Основное:\n 32 x 32 - числа в верхнем левом углу отображают\n число видимых пикселей (ширина x высота)\n 8 пикселей на пиксель - отображает число\n пикселей используемых для увеличения пикселя\n R:152 G:52 B:10 - значения RGB для \n пикселя под красной клеткой\n
 Help	Magnify-Main		Помощь
 Hide/Show grid	Magnify-Main		Скрыть/показать сетку
-Hide/Show info	Magnify-Main		Скрыть\показать информацию
+Hide/Show info	Magnify-Main		Скрыть/показать информацию
 Increase pixel size	Magnify-Main		Увеличить размер пикселя
 Increase window size	Magnify-Main		Увеличить размер окна
 Info	Magnify-Main		Информация

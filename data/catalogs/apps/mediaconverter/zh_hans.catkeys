@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-MediaConverter	611032470
+1	simplified_chinese	x-vnd.Haiku-MediaConverter	424866547
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld 通道 / %lld 帧
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz 单声道 / %lld 帧
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz 立体声 / %lld 帧
@@ -38,6 +38,7 @@ File details	MediaConverter		文件详情
 File format:	MediaConverter		文件格式：
 High	MediaConverter		高
 Low	MediaConverter		低
+MediaConverter	System name		媒体转换器
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 No audio	Audio codecs list		无音频
 No file selected	MediaConverter-FileInfo		无选中文件

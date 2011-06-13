@@ -34,7 +34,7 @@ Logging view	PoorMan		ロギングビュー
 Max. simultaneous connections:	PoorMan		最大同時接続数：
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダー中に作成させることもできます。\nまたは、代わりにユーザーのフォルダーを指定することもできます。
-PoorMan	Application name		PoorMan
+PoorMan	System name		PoorMan
 PoorMan settings	PoorMan		PoorMan 設定
 Quit	PoorMan		終了
 Run server	PoorMan		サーバーを起動

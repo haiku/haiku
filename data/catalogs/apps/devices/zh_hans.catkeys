@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Devices	1176141157
+1	simplified_chinese	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		ACPI信息
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI 处理器命名空间 '%2'
 ACPI System Bus	DeviceACPI		ACPI 系统总线
@@ -29,6 +29,7 @@ Device name:	Device		设备名称：
 Device paths	Device		设备路径
 Device paths	DevicePCI		设备路径
 Devices	DevicesView		设备管理器
+Devices	System name		硬件设备
 Display controller	Device		显示控制器
 Docking station	Device		扩展接口
 Driver used	Device		已用驱动

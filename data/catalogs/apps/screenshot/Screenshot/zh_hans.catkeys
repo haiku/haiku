@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.haiku-screenshot	731699482
+1	simplified_chinese	x-vnd.haiku-screenshot	1697748405
 Artwork folder	ScreenshotWindow		插图文件夹
 Cancel	ScreenshotWindow		取消
 Capture active window	ScreenshotWindow		捕捉活动窗口
@@ -16,6 +16,7 @@ Please select	ScreenshotWindow		请选择
 Save	ScreenshotWindow		保存
 Save as:	ScreenshotWindow		保存为：
 Save in:	ScreenshotWindow		保存到：
+Screenshot	System name		屏幕截图
 Select	ScreenshotWindow		选择
 Settings…	ScreenshotWindow		设置...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		该文件已经存在。\n您确定希望覆盖它吗？

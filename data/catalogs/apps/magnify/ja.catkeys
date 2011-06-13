@@ -1,12 +1,11 @@
-1	japanese	x-vnd.Haiku-Magnify	2461364489
+1	japanese	x-vnd.Haiku-Magnify	1706330138
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize ピクセル/ピクセル
 Add a crosshair	Magnify-Main		十字カーソルを追加
 Copy image	Magnify-Main		イメージをコピー
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		コピー/保存:\n コピー - 現在の画像をクリップボードに保存します\n 保存 - 保存先のファイルダイアログを出して\n 画像のビット列を書き込みます\n
 Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
 Decrease window size	Magnify-Main		ウインドウを小さく
-Freeze/Unfreeze image	Magnify-Main		Freeze/Unfreeze image
-Freeze/Unfreeze image	Magnify-Main		イメージを固定/固定解除する
+Freeze/Unfreeze image	Magnify-Main		イメージを固定/固定解除
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		一般:\n 32 x 32 – 左上の数値は見えているピクセルの数です。\n(幅 x 高さ)\n 8 ピクセル/ピクセル – 1つのピクセルを拡大するのに\n使用する ピクセル数を示します。\n R:152 G:52 B:10 – 赤い四角のところにあるピクセルの\n RGB 値です。\n
 Help	Magnify-Main		ヘルプ
 Hide/Show grid	Magnify-Main		グリッドの表示/非表示

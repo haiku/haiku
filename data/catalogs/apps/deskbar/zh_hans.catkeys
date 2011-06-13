@@ -1,14 +1,18 @@
-1	simplified_chinese	x-vnd.Be-TSKB	2722191795
+1	simplified_chinese	x-vnd.Be-TSKB	1962084612
 <Be folder is empty>	BeMenu		<Be 文件夹为空>
 About Haiku	BeMenu		关于 Haiku
 Always on top	PreferencesWindow		置顶
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		应用程序
 Applications	PreferencesWindow		应用程序
 Auto-raise	PreferencesWindow		自动
 Change time…	TimeView		修改时间...
 Clock	PreferencesWindow		时钟
 Close all	WindowMenu		关闭所有
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		演示程序
+Deskbar	System name		桌面栏
 Deskbar preferences	PreferencesWindow		桌面栏首选项
 Deskbar preferences…	BeMenu		桌面栏首选项...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		桌面插件
 Edit menu…	PreferencesWindow		编辑菜单
 Expand new applications	PreferencesWindow		展开新程序
 Find…	BeMenu		查询...
@@ -18,6 +22,7 @@ Menu	PreferencesWindow		菜单
 Mount	BeMenu		挂载
 No windows	WindowMenu		无窗口
 Power off	BeMenu		关闭电源
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		系统设置
 Quit application	WindowMenu		退出程序
 Recent applications	BeMenu		最近程序
 Recent applications:	PreferencesWindow		最近程序：
@@ -25,7 +30,7 @@ Recent documents	BeMenu		最近文档
 Recent documents:	PreferencesWindow		最近文档：
 Recent folders	BeMenu		最近文件夹：
 Recent folders:	PreferencesWindow		最近文件夹：
-Restart Tracker	BeMenu		重启 Tracker
+Restart Tracker	BeMenu		重启文件浏览器
 Restart system	BeMenu		重启
 Show Time	Tray		显示时间
 Show all	WindowMenu		显示所有
@@ -35,5 +40,5 @@ Show replicants	BeMenu		显示replicant
 Show seconds	PreferencesWindow		显示秒钟
 Shutdown…	BeMenu		关闭...
 Sort running applications	PreferencesWindow		运行程序排序
-Tracker always first	PreferencesWindow		Tracker置顶
+Tracker always first	PreferencesWindow		文件浏览器置顶
 Window	PreferencesWindow		窗口

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-BluetoothPrefs	4253957200
+1	simplified_chinese	x-vnd.Haiku-BluetoothPrefs	4055730587
 15 secs	Settings view		15秒
 61 secs	Settings view		61秒
 About Bluetooth…	Window		关于蓝牙...
@@ -7,6 +7,7 @@ Add…	Remote devices		添加...
 Always ask	Settings view		总是询问
 As blocked	Remote devices		阻塞状态
 Authenticate	Extended local device view		验证
+Bluetooth	System name		蓝牙
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		检查您的远程设备的蓝牙功能是否开启。按下“查询”开启扫描。尽管每个设备都不会多于3秒的时间，但是设备名检索所需要的时间是未知的。之后，您可能需要把它们添加到您的主列表中，您可以在主列表中对它们进行校核。
 Connections & channels…	Window		连接频道...
 Default inquiry time:	Settings view		默认查询时间：

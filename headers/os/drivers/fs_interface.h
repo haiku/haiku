@@ -294,6 +294,8 @@ struct file_system_module_info {
 				const char* parameters, disk_job_id job);
 	status_t (*initialize)(int fd, partition_id partition, const char* name,
 				const char* parameters, off_t partitionSize, disk_job_id job);
+	status_t (*uninitialize)(int fd, partition_id partition,
+				off_t partitionSize, uint32 blockSize, disk_job_id job);
 };
 
 

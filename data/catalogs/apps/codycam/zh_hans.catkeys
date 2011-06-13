@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		捕获比率菜单
 Capture controls	CodyCam		捕获控制
 Capturing Image…	VideoConsumer.cpp		捕获图像…
 Closing the window\n	VideoConsumer.cpp		关闭窗口\n
-CodyCam	Application name		摄像头
+CodyCam	System name		摄像头
 Connected…	VideoConsumer.cpp		连接中...
 Couldn't find requested directory on server	VideoConsumer.cpp		在服务器上未发现需求的目录
 Directory:	CodyCam		目录：

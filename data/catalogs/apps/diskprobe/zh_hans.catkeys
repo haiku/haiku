@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-DiskProbe	4190255633
+1	simplified_chinese	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld（本地）
 (native)	ProbeView		（原生的）
 15 bit	TypeEditors		15 位
@@ -52,6 +52,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		硬件设备
 Device offset: 	ProbeView		硬件偏移量：
 Device: 	ProbeView		硬件设备：
+DiskProbe	System name		磁盘扫描器
 DiskProbe request	AttributeWindow		磁盘扫描器要求
 DiskProbe request	DiskProbe		DiskProbe 要求
 DiskProbe request	ProbeView		磁盘扫描器要求

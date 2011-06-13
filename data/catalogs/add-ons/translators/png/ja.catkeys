@@ -1,10 +1,11 @@
-1	japanese	x-vnd.Haiku-PNGTranslator	3302699177
+1	japanese	x-vnd.Haiku-PNGTranslator	2504765797
 Interlace Option	PNGTranslator		インタレースオプション
 Interlacing type:	PNGTranslator		インターレース：
 None	PNGTranslator		無し
 PNG Interlace Menu	PNGTranslator		PNG インターレースメニュー
 PNG Settings	PNGTranslator		PNG設定
 PNG image	PNGTranslator		PNG イメージ
+PNG image translator	PNGTranslator		PNG イメージトランスレーター
 PNG images	PNGTranslator		PNG イメージ
 PNGTranslator Settings	PNGTranslator		PNG トランスレーター設定
 Version %d.%d.%d, %s	PNGTranslator		バージョン %d.%d.%d, %s

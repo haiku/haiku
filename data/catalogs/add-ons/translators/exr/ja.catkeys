@@ -1,9 +1,9 @@
 1	japanese	x-vnd.Haiku-EXRTranslator	3390292316
 Based on OpenEXR (http://www.openexr.com)	ConfigView		OpenEXRをベースにしています (http://www.openexr.com)
-EXR Images	ConfigView		EXR画像
-EXR Images	EXRTranslator		EXR画像
+EXR Images	ConfigView		EXR イメージ
+EXR Images	EXRTranslator		EXR イメージ
 EXR Settings	main		EXR設定
-EXR image	EXRTranslator		EXR画像
-EXR image translator	EXRTranslator		EXR画像トランスレーター
+EXR image	EXRTranslator		EXR イメージ
+EXR image translator	EXRTranslator		EXR イメージトランスレーター
 Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		Lucasfilm Entertainment Company Ltd の事業部

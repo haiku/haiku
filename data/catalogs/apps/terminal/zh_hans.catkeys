@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Terminal	1355498436
+1	simplified_chinese	x-vnd.Haiku-Terminal	2225488941
 %app% settings	Terminal PrefWindow	window title	%app% 设置
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h，--help 显示帮助\n -t，--title 设置窗口标题\n -f，--fullscreen 启动全屏显示\n
 Abort	Terminal Shell		放弃
@@ -74,6 +74,7 @@ Size:	Terminal AppearancePrefView		大小：
 Switch Terminals	Terminal TermWindow		切换终端
 Tab title:	Terminal AppearancePrefView		标签标题：
 Tab title:	Terminal TermWindow		标签标题：
+Terminal	System name		终端
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
 Text	Terminal AppearancePrefView		文本
 Text encoding	Terminal TermWindow		文字编码
@@ -87,7 +88,7 @@ The pattern specifying the window titles. The following placeholders\ncan be use
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭终端，该进程将被杀死。
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
 Unrecognized option \"%s\"\n	Terminal arguments parsing		无法识别的选项\"%s\"\n
-Use default	Terminal SetTitleWindow		启用默认
+Use default	Terminal SetTitleWindow		使用默认
 Use default shell	Terminal Shell		使用默认shell  
 Use selection	Terminal FindWindow		使用选择
 Use text:	Terminal FindWindow		使用文本：

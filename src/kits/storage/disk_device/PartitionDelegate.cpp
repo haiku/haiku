@@ -400,12 +400,6 @@ BPartition::Delegate::IsSubSystem(Delegate* child,
 bool
 BPartition::Delegate::CanInitialize(const char* diskSystem) const
 {
-	// HACK TO HELP BLANK PARTITION'S BECOME INITIALIZED.
-	if (diskSystem == NULL)
-		return true;
-	if (strlen(diskSystem) < 1)
-		return true;
-
 	// get the disk system add-on
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
 	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);

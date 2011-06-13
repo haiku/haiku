@@ -1,7 +1,8 @@
-1	simplified_chinese	x-vnd.Haiku-CDPlayer	523884218
+1	simplified_chinese	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		音频 CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CD 驱动为空
+CDPlayer	System name		CD 播放器
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		磁盘： %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		磁盘: --:--/ --:--
 Disc: 88:88 / 88:88	CDPlayer		磁盘：88:88 / 88:88

@@ -1,8 +1,9 @@
-1	simplified_chinese	x-vnd.Haiku-Fonts	2475492793
+1	simplified_chinese	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		粗体：
 Defaults	Main window		默认
 Fixed font:	Font view		倾斜字体：
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		字体首选项\n\t版权所有 2004-2005 Haiku .Inc\n\n
+Fonts	System name		字体
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		字体\n\t版权所有 2004-2005 Haiku .Inc\n\n
 Menu font:	Font view		菜单字体：
 OK	main		确定
 Plain font:	Font view		等宽字体：

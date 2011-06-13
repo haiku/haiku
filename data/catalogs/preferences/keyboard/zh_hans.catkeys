@@ -1,8 +1,9 @@
-1	simplified_chinese	x-vnd.Haiku-Keyboard	1078858058
+1	simplified_chinese	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		默认
 Delay until key repeat	KeyboardView		重复延迟
 Fast	KeyboardView		快
 Key repeat rate	KeyboardView		重复率
+Keyboard	System name		键盘
 Long	KeyboardView		长
 OK	KeyboardApplication		确定
 Revert	KeyboardWindow		恢复

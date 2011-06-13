@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Tomas Kucera, kucerat@centrum.cz
  */
 
@@ -1280,6 +1280,31 @@ pm_initialize(int fd, partition_id partitionID, const char* name,
 	// all changes applied
 	update_disk_device_job_progress(job, 1.0);
 	partition_modified(partitionID);
+
+	return B_OK;
+}
+
+
+status_t
+pm_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
+	uint32 blockSize, disk_job_id job)
+{
+	if (blockSize == 0)
+		return B_BAD_VALUE;
+
+	// We overwrite the first block, which contains the partition table.
+	// Allocate a buffer, we can clear and write.
+	void* block = malloc(blockSize);
+	if (block == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter blockDeleter(block);
+
+	memset(block, 0, blockSize);
+
+	if (write_pos(fd, 0, block, blockSize) < 0)
+		return errno;
+
+	update_disk_device_job_progress(job, 1.0);
 
 	return B_OK;
 }

@@ -2293,6 +2293,28 @@ bfs_initialize(int fd, partition_id partitionID, const char* name,
 }
 
 
+static status_t
+bfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
+	uint32 blockSize, disk_job_id job)
+{
+	if (blockSize == 0)
+		return B_BAD_VALUE;
+
+	update_disk_device_job_progress(job, 0.0);
+
+	// just overwrite the superblock
+	disk_super_block superBlock;
+	memset(&superBlock, 0, sizeof(superBlock));
+
+	if (write_pos(fd, 512, &superBlock, sizeof(superBlock)) < 0)
+		return errno;
+
+	update_disk_device_job_progress(job, 1.0);
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -2477,6 +2499,7 @@ static file_system_module_info sBeFileSystem = {
 	NULL,	// set_content_name
 	NULL,	// set_content_parameters
 	bfs_initialize,
+	bfs_uninitialize
 };
 
 module_info* modules[] = {

@@ -1,4 +1,8 @@
-// KDiskSystem.cpp
+/*
+ * Copyright 2003-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -315,6 +319,14 @@ KDiskSystem::Initialize(KPartition* partition, const char* name,
 {
 	// to be implemented by derived classes
 	return B_ERROR;
+}
+
+
+status_t
+KDiskSystem::Uninitialize(KPartition* partition, disk_job_id job)
+{
+	// to be implemented by derived classes
+	return B_NOT_SUPPORTED;
 }
 
 

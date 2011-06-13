@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	3168263096
+1	french	x-vnd.Haiku-MediaPlayer	1952560558
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a rencontré une erreur interne. Le fichier n'a pas pu être ouvert.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 100% scale	MediaPlayer-Main		Échelle 100%
@@ -25,6 +25,8 @@ Bottom of video	MediaPlayer-SettingsWindow		Au bas de la vidéo
 Cancel	MediaPlayer-SettingsWindow		Annuler
 Close	MediaPlayer-Main		Fermer
 Close	MediaPlayer-PlaylistWindow		Fermer
+Close window after playing audio	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des pistes audios
+Close window after playing video	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des vidéos
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Copier les entrées
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copier l'entrée
 Drop files to play	MediaPlayer-Main		Déposez les fichiers à lire
@@ -43,7 +45,9 @@ Internal error (malformed message). Saving the playlist failed.	MediaPlayer-Play
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n'a pas pu être sauvegardée.
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Il semble que le serveur de médias ne soit pas en fonction.\nVoulez-vous le démarrer maintenant ?
 Large	MediaPlayer-SettingsWindow		Large
-Low volume	MediaPlayer-SettingsWindow		Volume faible
+Loop audio	MediaPlayer-SettingsWindow		Lire les pistes audios en boucle
+Loop video	MediaPlayer-SettingsWindow		Lire les vidéos en boucle
+Low volume	MediaPlayer-SettingsWindow		Volume atténué
 MediaPlayer	System name		Lecteur Média
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
 Medium	MediaPlayer-SettingsWindow		Intermédiaire
@@ -64,12 +68,13 @@ OK	MediaPlayer-SettingsWindow		OK
 Off	Subtitles menu		Désactivé
 Open	MediaPlayer-Main		Ouvrir
 Open	MediaPlayer-PlaylistWindow		Ouvrir
+Open Clips	MediaPlayer-Main		Ouvrir des clips
 Open Playlist	MediaPlayer-PlaylistWindow		Ouvrir une liste de lecture
 Open file…	MediaPlayer-Main		Ouvrir un fichier…
 Open…	MediaPlayer-PlaylistWindow		Ouvrir…
 Pause	MediaPlayer-Main		Pause
 Pause playback.	MediaPlayer-Main		Suspendre la lecture
-Play	MediaPlayer-Main		Jouer
+Play	MediaPlayer-Main		Lire
 Play mode	MediaPlayer-SettingsWindow		Mode de lecture
 Playlist	MediaPlayer-PlaylistWindow		Liste de lecture
 Playlist…	MediaPlayer-Main		Liste de lecture…
@@ -92,6 +97,7 @@ Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…
 Save error	MediaPlayer-PlaylistWindow		Enregistrer l'erreur
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur :
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Agrandir les commandes en mode plein écran
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Redimensionner le film harmonieusement (mode sans-recouvrements)
 Select all	MediaPlayer-PlaylistWindow		Sélectionner tout
 Settings…	MediaPlayer-Main		Réglages…

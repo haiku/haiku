@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Locale	250177593
+1	simplified_chinese	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		十二小时
 24 hour	TimeFormatSettings		二十四小时
 Available languages	Locale Preflet Window		可选语言
@@ -6,12 +6,13 @@ Cancel	Locale Preflet Window		取消
 Currency	TimeFormatSettings		通用
 Date	TimeFormatSettings		日期
 Defaults	Locale Preflet Window		默认
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		需要重新启动桌面栏和 Tracker ，这些修改才会生效。您希望重新启动它们吗？
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		需要重新启动桌面栏和文件浏览器，这些修改才会生效。您希望重新启动它们吗？
 Formatting	Locale Preflet Window		格式
 Full format:	TimeFormatSettings		完全格式：
 Language	Locale Preflet Window		语言
 Locale	Locale Preflet		本地化
 Locale	Locale Preflet Window		本地化
+Locale	System name		本地化
 Long format:	TimeFormatSettings		较长格式：
 Medium format:	TimeFormatSettings		中等格式：
 Negative:	TimeFormatSettings		负数：
@@ -24,7 +25,7 @@ Restart	Locale Preflet Window		重新启动
 Revert	Locale Preflet Window		取消
 Short format:	TimeFormatSettings		极短格式：
 Time	TimeFormatSettings		时间
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		在桌面栏和 Tracker 中显示应用程序和目录的本地化名称。
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		在桌面栏和文件浏览器中显示应用程序和目录的本地化名称。
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		没有可用语言！ 你无法使用！
 Use month/day-names from preferred language	TimeFormatSettings		使用首选语言中的 月份/日期 名称。
 already chosen	LanguageListView		已经选择

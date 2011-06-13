@@ -1,0 +1,14 @@
+1	swedish	x-vnd.Haiku-desklink	3053930521
+%g dB	MediaReplicant		%g dB
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Pip
+Control physical output	MediaReplicant		Kontrollera fysisk utsignal
+Couldn't launch 	MediaReplicant		Kunde inte starta
+Media preferences…	MediaReplicant		Mediainställningar...
+No media server running	VolumeControl		Ingen aktiv mediaserver
+OK	MediaReplicant		OK
+Open MediaPlayer	MediaReplicant		Öppna MediaSpelare
+Options	MediaReplicant		Alternativ
+Sound preferences…	MediaReplicant		Ljudinställningar...
+Volume	VolumeControl		Volym
+desklink	MediaReplicant		desklink
