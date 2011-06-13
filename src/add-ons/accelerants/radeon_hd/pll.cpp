@@ -149,7 +149,7 @@ PLLPower(uint8 pllIndex, int command)
 			if (hasDccg)
 				DCCGCLKSet(pllIndex, RV620_DCCGCLK_RESET);
 
-			write32PLLAtMask(pllControlReg, 0, 0x02);
+			Write32Mask(PLL, pllControlReg, 0, 0x02);
 				// Power On
 			snooze(2);
 			PLLCalibrate(pllIndex);
@@ -166,10 +166,10 @@ PLLPower(uint8 pllIndex, int command)
 			if (hasDccg)
 				DCCGCLKSet(pllIndex, RV620_DCCGCLK_RELEASE);
 
-			write32PLLAtMask(pllControlReg, 0x01, 0x01);
+			Write32Mask(PLL, pllControlReg, 0x01, 0x01);
 				// Reset
 			snooze(2);
-			write32PLLAtMask(pllControlReg, 0, 0x02);
+			Write32Mask(PLL, pllControlReg, 0, 0x02);
 				// Power On
 			snooze(2);
 			return B_OK;
@@ -182,14 +182,14 @@ PLLPower(uint8 pllIndex, int command)
 			if (hasDccg)
 				DCCGCLKSet(pllIndex, RV620_DCCGCLK_RELEASE);
 
-			write32PLLAtMask(pllControlReg, 0x01, 0x01);
+			Write32Mask(PLL, pllControlReg, 0x01, 0x01);
 				// Reset
 			snooze(2);
 
 			// Sometimes we have to keep an unused PLL running. Xorg Bug #18016
-			if ((read32PLL(RV620_EXT1_DIFF_POST_DIV_CNTL)
+			if ((Read32(PLL, RV620_EXT1_DIFF_POST_DIV_CNTL)
 				& RV62_EXT1_DIFF_DRIVER_ENABLE) == 0) {
-				write32PLLAtMask(pllControlReg, 0x02, 0x02);
+				Write32Mask(PLL, pllControlReg, 0x02, 0x02);
 					// Power Down
 			} else {
 				TRACE("%s: PHYA differential clock driver not disabled\n",
@@ -198,7 +198,7 @@ PLLPower(uint8 pllIndex, int command)
 
 			snooze(200);
 
-			write32PLLAtMask(pllControlReg,  0x2000, 0x2000);
+			Write32Mask(PLL, pllControlReg,  0x2000, 0x2000);
 				// Reset anti-glitch?
 	}
 
@@ -247,15 +247,15 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 	uint16 pllPostDividerSrcReg
 		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
 
-	write32PLLAtMask(pllIntSSControlReg, 0, 0x00000001);
+	Write32Mask(PLL, pllIntSSControlReg, 0, 0x00000001);
 		// Disable Spread Spectrum
 
 	uint32 referenceDivider = reference;
 
-	uint32 feedbackDivider = read32PLL(pllFeedbackDividerReg) & ~0x07FF003F;
+	uint32 feedbackDivider = Read32(PLL, pllFeedbackDividerReg) & ~0x07FF003F;
 	feedbackDivider |= ((feedback << 16) | 0x0030) & 0x07FF003F;
 
-	uint32 postDivider = read32PLL(pllPostDividerReg) & ~0x0000007F;
+	uint32 postDivider = Read32(PLL, pllPostDividerReg) & ~0x0000007F;
 	postDivider |= post & 0x0000007F;
 
 	uint32 control;
@@ -267,54 +267,54 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 	uint8 symPostDiv = post & 0x0000007F;
 
 	/* switch to external */
-	write32PLL(pllPostDividerSrcReg, 0);
-	write32PLLAtMask(pllDisplayClockControlReg, 0x00000200, 0x00000300);
-	write32PLLAtMask(pllPostDividerReg, 0, 0x00000100);
+	Write32(PLL, pllPostDividerSrcReg, 0);
+	Write32Mask(PLL, pllDisplayClockControlReg, 0x00000200, 0x00000300);
+	Write32Mask(PLL, pllPostDividerReg, 0, 0x00000100);
 
-	write32PLLAtMask(pllControlReg, 0x00000001, 0x00000001);
+	Write32Mask(PLL, pllControlReg, 0x00000001, 0x00000001);
 		// reset
 	snooze(2);
-	write32PLLAtMask(pllControlReg, 0x00000002, 0x00000002);
+	Write32Mask(PLL, pllControlReg, 0x00000002, 0x00000002);
 		// power down
 	snooze(10);
-	write32PLLAtMask(pllControlReg, 0x00002000, 0x00002000);
+	Write32Mask(PLL, pllControlReg, 0x00002000, 0x00002000);
 		// reset antiglitch
 
-	write32PLL(pllExtControlReg, control);
+	Write32(PLL, pllExtControlReg, control);
 
-	write32PLLAtMask(pllDisplayClockControlReg, 2, 0x0000003F);
+	Write32Mask(PLL, pllDisplayClockControlReg, 2, 0x0000003F);
 		// Scalar Divider 2
 
-	write32PLL(pllLockReg, 1);
+	Write32(PLL, pllLockReg, 1);
 		// Lock PLL
 
 	/* Write PLL clocks */
-	write32PLL(pllPostDividerSrcReg, 0x00000001);
-	write32PLL(pllReferenceDividerReg, referenceDivider);
-	write32PLL(pllFeedbackDividerReg, feedbackDivider);
-	write32PLLAtMask(pllPostDividerReg, postDivider, 0x0000007F);
-	write32PLLAtMask(pplPostDividerSymReg, symPostDiv, 0x0000007F);
+	Write32(PLL, pllPostDividerSrcReg, 0x00000001);
+	Write32(PLL, pllReferenceDividerReg, referenceDivider);
+	Write32(PLL, pllFeedbackDividerReg, feedbackDivider);
+	Write32Mask(PLL, pllPostDividerReg, postDivider, 0x0000007F);
+	Write32Mask(PLL, pplPostDividerSymReg, symPostDiv, 0x0000007F);
 
 	snooze(10);
 
-	write32PLL(pllLockReg, 0);
+	Write32(PLL, pllLockReg, 0);
 		// Unlock PLL
 
-	write32PLLAtMask(pllControlReg, 0, 0x00000002);
+	Write32Mask(PLL, pllControlReg, 0, 0x00000002);
 		// power up
 	snooze(10);
 
-	write32PLLAtMask(pllControlReg, 0, 0x00002000);
+	Write32Mask(PLL, pllControlReg, 0, 0x00002000);
 		// undo reset antiglitch
 
 	PLLCalibrate(pllIndex);
 
 	/* Switch back to PLL */
-	write32PLLAtMask(pllDisplayClockControlReg, 0, 0x00000300);
-	write32PLLAtMask(pplPostDividerSymReg, 0x00000100, 0x00000100);
-	write32PLL(pllPostDividerSrcReg, 0x00000001);
+	Write32Mask(PLL, pllDisplayClockControlReg, 0, 0x00000300);
+	Write32Mask(PLL, pplPostDividerSymReg, 0x00000100, 0x00000100);
+	Write32(PLL, pllPostDividerSrcReg, 0x00000001);
 
-	write32PLLAtMask(pllControlReg, 0, 0x80000000);
+	Write32Mask(PLL, pllControlReg, 0, 0x80000000);
 		// needed and undocumented
 
 	// TODO : If CRT2 ah-la R500PLLCRTCGrab
@@ -334,24 +334,24 @@ PLLCalibrate(uint8 pllIndex)
 
 	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
 
-	write32PLLAtMask(pllControlReg, 1, 0x01);
+	Write32Mask(PLL, pllControlReg, 1, 0x01);
 		// PLL Reset
 
 	snooze(2);
 
-	write32PLLAtMask(pllControlReg, 0, 0x01);
+	Write32Mask(PLL, pllControlReg, 0, 0x01);
 		// PLL Set
 
 	int i;
 
 	for (i = 0; i < PLL_CALIBRATE_WAIT; i++)
-		if (((read32PLL(pllControlReg) >> 20) & 0x03) == 0x03)
+		if (((Read32(PLL, pllControlReg) >> 20) & 0x03) == 0x03)
 			break;
 
 	if (i >= PLL_CALIBRATE_WAIT) {
-		if (read32PLL(pllControlReg) & 0x00100000) /* Calibration done? */
+		if (Read32(PLL, pllControlReg) & 0x00100000) /* Calibration done? */
 			TRACE("%s: Calibration Failed\n", __func__);
-		if (read32PLL(pllControlReg) & 0x00200000) /* PLL locked? */
+		if (Read32(PLL, pllControlReg) & 0x00200000) /* PLL locked? */
 			TRACE("%s: Locking Failed\n", __func__);
 		TRACE("%s: We encountered a problem calibrating the PLL.\n", __func__);
 		return B_ERROR;
@@ -368,35 +368,35 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 	bool pll2IsCurrent;
 
 	if (!crt2) {
-		pll2IsCurrent = read32PLL(PCLK_CRTC1_CNTL) & 0x00010000;
+		pll2IsCurrent = Read32(PLL, PCLK_CRTC1_CNTL) & 0x00010000;
 
-		write32PLLAtMask(PCLK_CRTC1_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
+		Write32Mask(PLL, PCLK_CRTC1_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
 			0x00010000);
 	} else {
-		pll2IsCurrent = read32PLL(PCLK_CRTC2_CNTL) & 0x00010000;
+		pll2IsCurrent = Read32(PLL, PCLK_CRTC2_CNTL) & 0x00010000;
 
-		write32PLLAtMask(PCLK_CRTC2_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
+		Write32Mask(PLL, PCLK_CRTC2_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
 			0x00010000);
 	}
 
 	/* if the current pll is not active, then poke it just enough to flip
 	* owners */
 	if (!pll2IsCurrent) {
-		uint32 stored = read32PLL(P1PLL_CNTL);
+		uint32 stored = Read32(PLL, P1PLL_CNTL);
 
 		if (stored & 0x03) {
-			write32PLLAtMask(P1PLL_CNTL, 0, 0x03);
+			Write32Mask(PLL, P1PLL_CNTL, 0, 0x03);
 			snooze(10);
-			write32PLLAtMask(P1PLL_CNTL, stored, 0x03);
+			Write32Mask(PLL, P1PLL_CNTL, stored, 0x03);
 		}
 
 	} else {
-		uint32 stored = read32PLL(P2PLL_CNTL);
+		uint32 stored = Read32(PLL, P2PLL_CNTL);
 
 		if (stored & 0x03) {
-			write32PLLAtMask(P2PLL_CNTL, 0, 0x03);
+			Write32Mask(PLL, P2PLL_CNTL, 0, 0x03);
 			snooze(10);
-			write32PLLAtMask(P2PLL_CNTL, stored, 0x03);
+			Write32Mask(PLL, P2PLL_CNTL, stored, 0x03);
 		}
 	}
 }
@@ -407,7 +407,7 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 bool
 DCCGCLKAvailable(uint8 pllIndex)
 {
-	uint32 dccg = read32PLL(DCCG_DISP_CLK_SRCSEL) & 0x03;
+	uint32 dccg = Read32(PLL, DCCG_DISP_CLK_SRCSEL) & 0x03;
 
 	if (dccg & 0x02)
 		return true;
@@ -429,41 +429,41 @@ DCCGCLKSet(uint8 pllIndex, int set)
 	switch(set) {
 		case RV620_DCCGCLK_GRAB:
 			if (pllIndex == 0)
-				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 0, 0x00000003);
+				Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 0, 0x00000003);
 			else if (pllIndex == 1)
-				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 1, 0x00000003);
+				Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 1, 0x00000003);
 			else
-				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
+				Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
 			break;
 		case RV620_DCCGCLK_RELEASE:
-			buffer = read32PLL(DCCG_DISP_CLK_SRCSEL) & 0x03;
+			buffer = Read32(PLL, DCCG_DISP_CLK_SRCSEL) & 0x03;
 
 			if ((pllIndex == 0) && (buffer == 0)) {
 				/* set to other PLL or external */
-				buffer = read32PLL(P2PLL_CNTL);
+				buffer = Read32(PLL, P2PLL_CNTL);
 				// if powered and not in reset, and calibrated and locked
 				if (!(buffer & 0x03) && ((buffer & 0x00300000) == 0x00300000))
-					write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 1, 0x00000003);
+					Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 1, 0x00000003);
 				else
-					write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
+					Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
 
 			} else if ((pllIndex == 1) && (buffer == 1)) {
 				/* set to other PLL or external */
-				buffer = read32PLL(P1PLL_CNTL);
+				buffer = Read32(PLL, P1PLL_CNTL);
 				// if powered and not in reset, and calibrated and locked
 				if (!(buffer & 0x03) && ((buffer & 0x00300000) == 0x00300000))
-					write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 0, 0x00000003);
+					Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 0, 0x00000003);
 				else
-					write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
+					Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
 
 			} // no other action needed
 			break;
 		case RV620_DCCGCLK_RESET:
-			buffer = read32PLL(DCCG_DISP_CLK_SRCSEL) & 0x03;
+			buffer = Read32(PLL, DCCG_DISP_CLK_SRCSEL) & 0x03;
 
 			if (((pllIndex == 0) && (buffer == 0))
 				|| ((pllIndex == 1) && (buffer == 1)))
-				write32PLLAtMask(DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
+				Write32Mask(PLL, DCCG_DISP_CLK_SRCSEL, 3, 0x00000003);
 			break;
 		default:
 			break;
@@ -481,14 +481,14 @@ DACPower(uint8 dacIndex, int mode)
 		case RHD_POWER_ON:
 			// TODO : SensedType Detection?
 			powerdown = 0;
-			write32(dacOffset + DACA_ENABLE, 1);
-			write32(dacOffset + DACA_POWERDOWN, 0);
+			Write32(OUT, dacOffset + DACA_ENABLE, 1);
+			Write32(OUT, dacOffset + DACA_POWERDOWN, 0);
 			snooze(14);
-			write32AtMask(dacOffset + DACA_POWERDOWN, powerdown, 0xFFFFFF00);
+			Write32Mask(OUT, dacOffset + DACA_POWERDOWN, powerdown, 0xFFFFFF00);
 			snooze(2);
-			write32(dacOffset + DACA_FORCE_OUTPUT_CNTL, 0);
-			write32AtMask(dacOffset + DACA_SYNC_SELECT, 0, 0x00000101);
-			write32(dacOffset + DACA_SYNC_TRISTATE_CONTROL, 0);
+			Write32(OUT, dacOffset + DACA_FORCE_OUTPUT_CNTL, 0);
+			Write32Mask(OUT, dacOffset + DACA_SYNC_SELECT, 0, 0x00000101);
+			Write32(OUT, dacOffset + DACA_SYNC_TRISTATE_CONTROL, 0);
 			return;
 	}
 }

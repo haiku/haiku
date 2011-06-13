@@ -82,6 +82,13 @@ struct register_info {
 #define HEAD_MODE_CLONE			0x03
 #define HEAD_MODE_LVDS_PANEL	0x08
 
+// register MMIO modes
+#define OUT 0x1	// direct MMIO calls
+#define CRT 0x2	// crt controler calls
+#define VGA 0x3 // vga calls
+#define PLL 0x4 // PLL calls
+#define MC	0x5 // Memory Controler calls
+
 extern accelerant_info *gInfo;
 extern register_info *gRegister;
 
@@ -92,100 +99,164 @@ status_t init_registers(uint8 crtid);
 // register access
 
 inline uint32
-read32(uint32 offset)
+_read32(uint32 offset)
 {
 	return *(volatile uint32 *)(gInfo->regs + offset);
 }
 
 
 inline void
-write32(uint32 offset, uint32 value)
+_write32(uint32 offset, uint32 value)
 {
 	*(volatile uint32 *)(gInfo->regs + offset) = value;
 }
 
 
-inline void
-write32AtMask(uint32 offset, uint32 value, uint32 mask)
-{
-	uint32 temp = read32(offset);
-	temp &= ~mask;
-	temp |= value & mask;
-	write32(offset, temp);
-}
-
-
 inline uint32
-read32MC(uint32 offset)
+_read32MC(uint32 offset)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	if (info.device_chipset == RADEON_R600) {
-		write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
+		_write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
 			| RS600_MC_INDEX_CITF_ARB0));
-		return read32(RS600_MC_DATA);
+		return _read32(RS600_MC_DATA);
 	} else if (info.device_chipset == (RADEON_R600 & 0x90)
 		|| info.device_chipset == (RADEON_R700 & 0x40)) {
-		write32(RS690_MC_INDEX, (offset & RS690_MC_INDEX_ADDR_MASK));
-		return read32(RS690_MC_DATA);
+		_write32(RS690_MC_INDEX, (offset & RS690_MC_INDEX_ADDR_MASK));
+		return _read32(RS690_MC_DATA);
 	} else if (info.device_chipset == (RADEON_R700 & 0x80)
 		|| info.device_chipset == (RADEON_R800 & 0x80)) {
-		write32(RS780_MC_INDEX, offset & RS780_MC_INDEX_ADDR_MASK);
-		return read32(RS780_MC_DATA);
+		_write32(RS780_MC_INDEX, offset & RS780_MC_INDEX_ADDR_MASK);
+		return _read32(RS780_MC_DATA);
 	}
 
 	// eh.
-	return read32(offset);
+	return _read32(offset);
 }
 
 
 inline void
-write32MC(uint32 offset, uint32 data)
+_write32MC(uint32 offset, uint32 data)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	if (info.device_chipset == RADEON_R600) {
-		write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
+		_write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
 			| RS600_MC_INDEX_CITF_ARB0 | RS600_MC_INDEX_WR_EN));
-		write32(RS600_MC_DATA, data);
+		_write32(RS600_MC_DATA, data);
 	} else if (info.device_chipset == (RADEON_R600 & 0x90)
 		|| info.device_chipset == (RADEON_R700 & 0x40)) {
-		write32(RS690_MC_INDEX, ((offset & RS690_MC_INDEX_ADDR_MASK)
+		_write32(RS690_MC_INDEX, ((offset & RS690_MC_INDEX_ADDR_MASK)
 			| RS690_MC_INDEX_WR_EN));
-		write32(RS690_MC_DATA, data);
-		write32(RS690_MC_INDEX, RS690_MC_INDEX_WR_ACK);
+		_write32(RS690_MC_DATA, data);
+		_write32(RS690_MC_INDEX, RS690_MC_INDEX_WR_ACK);
 	} else if (info.device_chipset == (RADEON_R700 & 0x80)
 		|| info.device_chipset == (RADEON_R800 & 0x80)) {
-			write32(RS780_MC_INDEX, ((offset & RS780_MC_INDEX_ADDR_MASK)
+			_write32(RS780_MC_INDEX, ((offset & RS780_MC_INDEX_ADDR_MASK)
 				| RS780_MC_INDEX_WR_EN));
-			write32(RS780_MC_DATA, data);
+			_write32(RS780_MC_DATA, data);
 	}
 }
 
 
 inline uint32
-read32PLL(uint16 offset)
+_read32PLL(uint16 offset)
 {
-	write32(CLOCK_CNTL_INDEX, offset & PLL_ADDR);
-	return read32(CLOCK_CNTL_DATA);
+	_write32(CLOCK_CNTL_INDEX, offset & PLL_ADDR);
+	return _read32(CLOCK_CNTL_DATA);
 }
 
 
 inline void
-write32PLL(uint16 offset, uint32 data)
+_write32PLL(uint16 offset, uint32 data)
 {
-	write32(CLOCK_CNTL_INDEX, (offset & PLL_ADDR) | PLL_WR_EN);
-	write32(CLOCK_CNTL_DATA, data);
+	_write32(CLOCK_CNTL_INDEX, (offset & PLL_ADDR) | PLL_WR_EN);
+	_write32(CLOCK_CNTL_DATA, data);
+}
+
+
+inline uint32
+Read32(uint32 subsystem, uint32 offset)
+{
+	switch (subsystem) {
+		default:
+		case OUT:
+		case VGA:
+			return _read32(offset);
+		case CRT:
+			return _read32(offset);
+		case PLL:
+			return _read32PLL(offset);
+		case MC:
+			return _read32MC(offset);
+	};
 }
 
 
 inline void
-write32PLLAtMask(uint16 offset, uint32 value, uint32 mask)
+Write32(uint32 subsystem, uint32 offset, uint32 value)
 {
-	uint32 temp = read32PLL(offset);
+	switch (subsystem) {
+		default:
+		case OUT:
+		case VGA:
+			_write32(offset, value);
+			return;
+		case CRT:
+			_write32(offset, value);
+			return;
+		case PLL:
+			_write32PLL(offset, value);
+			return;
+		case MC:
+			_write32MC(offset, value);
+			return;
+	};
+}
+
+
+inline void
+Write32Mask(uint32 subsystem, uint32 offset, uint32 value, uint32 mask)
+{
+	uint32 temp;
+	switch (subsystem) {
+		default:
+		case OUT:
+		case VGA:
+			temp = _read32(offset);
+			break;
+		case CRT:
+			temp = _read32(offset);
+			break;
+		case PLL:
+			temp = _read32PLL(offset);
+			break;
+		case MC:
+			temp = _read32MC(offset);
+			break;
+	};
+
+	// only effect mask
 	temp &= ~mask;
 	temp |= value & mask;
-	write32PLL(offset, temp);
+
+	switch (subsystem) {
+		default:
+		case OUT:
+		case VGA:
+			_write32(offset, temp);
+			return;
+		case CRT:
+			_write32(offset, temp);
+			return;
+		case PLL:
+			_write32PLL(offset, temp);
+			return;
+		case MC:
+			_write32MC(offset, temp);
+			return;
+	};
 }
 
 

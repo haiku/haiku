@@ -89,7 +89,7 @@ UINT32
 CailReadATIRegister(VOID* CAIL, UINT32 idx)
 {
 	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx << 2);
-	return read32(idx << 2);
+	return Read32(OUT, idx << 2);
 }
 
 
@@ -100,7 +100,7 @@ CailWriteATIRegister(VOID *CAIL, UINT32 idx, UINT32 data)
 
 	// TODO : save MMIO via atomSaveRegisters in CailWriteATIRegister
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMMIO, idx << 2);
-	write32(idx << 2, data);
+	Write32(OUT, idx << 2, data);
 }
 
 
@@ -131,7 +131,7 @@ ULONG
 CailReadPLL(VOID *CAIL, ULONG address)
 {
 	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
-	return read32PLL(address);
+	return Read32(PLL, address);
 }
 
 
@@ -143,7 +143,7 @@ CailWritePLL(VOID *CAIL, ULONG address, ULONG data)
 	// TODO : save PLL registers
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPLL, address);
 	// TODO : Assumed screen index 0
-	write32PLL(address, data);
+	Write32(PLL, address, data);
 }
 
 
@@ -186,7 +186,7 @@ CailReadFBData(VOID* CAIL, UINT32 idx)
 
 	// If we have a physical offset for our frame buffer, use it
 	if (fbLocation > 0)
-		ret = read32(fbLocation + idx);
+		ret = Read32(PLL, fbLocation + idx);
 	else {
 		TRACE("%s: ERROR: Frame Buffer offset not defined\n",
 			__func__);
@@ -209,7 +209,7 @@ CailWriteFBData(VOID *CAIL, UINT32 idx, UINT32 data)
 
 	// If we have a physical offset for our frame buffer, use it
 	if (fbLocation > 0)
-		write32(fbLocation + idx, data);
+		Write32(OUT, fbLocation + idx, data);
 	else
 		TRACE("%s: ERROR: Frame Buffer offset not defined\n",
 			__func__);
