@@ -239,7 +239,7 @@ AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
 	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
-		scsi_periph ;
+		scsi_periph <module>tty ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
@@ -271,6 +271,7 @@ AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
 AddDriversToHaikuImage misc			: <driver>poke <driver>mem ;
 AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+AddDriversToHaikuImage ports		: usb_serial ;
 #AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
