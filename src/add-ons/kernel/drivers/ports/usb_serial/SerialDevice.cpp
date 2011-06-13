@@ -54,12 +54,12 @@ SerialDevice::~SerialDevice()
 {
 	Removed();
 
-	if (fDoneRead >= B_OK)
+	if (fDoneRead >= 0)
 		delete_sem(fDoneRead);
-	if (fDoneWrite >= B_OK)
+	if (fDoneWrite >= 0)
 		delete_sem(fDoneWrite);
 
-	if (fBufferArea >= B_OK)
+	if (fBufferArea >= 0)
 		delete_area(fBufferArea);
 }
 
@@ -68,13 +68,20 @@ status_t
 SerialDevice::Init()
 {
 	fDoneRead = create_sem(0, "usb_serial:done_read");
+	if (fDoneRead < 0)
+		return fDoneRead;
+
 	fDoneWrite = create_sem(0, "usb_serial:done_write");
+	if (fDoneWrite < 0)
+		return fDoneWrite;
 
 	size_t totalBuffers = fReadBufferSize + fOutputBufferSize + fWriteBufferSize
 		+ fInterruptBufferSize;
 	fBufferArea = create_area("usb_serial:buffers_area", (void **)&fReadBuffer,
 		B_ANY_KERNEL_ADDRESS, ROUNDUP(totalBuffers, B_PAGE_SIZE), B_CONTIGUOUS,
 		B_READ_AREA | B_WRITE_AREA);
+	if (fBufferArea < 0)
+		return fBufferArea;
 
 	fOutputBuffer = fReadBuffer + fReadBufferSize;
 	fWriteBuffer = fOutputBuffer + fOutputBufferSize;
@@ -230,7 +237,7 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYSETRTS:
 		{
 			bool set = *(bool *)buffer;
-			uint8 bit = TTYSETDTR ? USB_CDC_CONTROL_SIGNAL_STATE_DTR
+			uint8 bit = op == TTYSETDTR ? USB_CDC_CONTROL_SIGNAL_STATE_DTR
 				: USB_CDC_CONTROL_SIGNAL_STATE_RTS;
 			if (set)
 				fControlOut |= bit;
