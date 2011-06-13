@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
 #include "KFileSystem.h"
@@ -214,6 +214,31 @@ KFileSystem::Initialize(KPartition* partition, const char* name,
 	// let the module do its job
 	result = fModule->initialize(fd, partition->ID(), name, parameters,
 		partition->Size(), job);
+
+	// cleanup and return
+	close(fd);
+	return result;
+}
+
+
+status_t
+KFileSystem::Uninitialize(KPartition* partition, disk_job_id job)
+{
+	// check parameters
+	if (partition == NULL || fModule == NULL)
+		return B_BAD_VALUE;
+	if (fModule->uninitialize == NULL)
+		return B_NOT_SUPPORTED;
+
+	// open partition device
+	int fd = -1;
+	status_t result = partition->Open(O_RDWR, &fd);
+	if (result != B_OK)
+		return result;
+
+	// let the module do its job
+	result = fModule->uninitialize(fd, partition->ID(), partition->Size(),
+		partition->BlockSize(), job);
 
 	// cleanup and return
 	close(fd);
