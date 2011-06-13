@@ -2,7 +2,6 @@
  * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _USBKIT_H
 #define _USBKIT_H
 
@@ -30,9 +29,9 @@ virtual								~BUSBRoster();
 		// The DeviceAdded() hook will be called when a new device gets
 		// attached to the USB bus. The hook is called with an initialized
 		// BUSBDevice object. If you return B_OK from your hook the object
-		// will stay valid and the DeviceRemoved() hook will be called with
-		// for it. Otherwise the object is deleted and DeviceRemoved()
-		// is not called.
+		// will stay valid and the DeviceRemoved() hook will be called for
+		// it. Otherwise the object is deleted and DeviceRemoved() is not
+		// called.
 virtual	status_t					DeviceAdded(BUSBDevice *device) = 0;
 
 		// When a device gets detached from the bus that you hold a
@@ -57,7 +56,7 @@ virtual	void						_ReservedUSBRoster5();
 };
 
 
-/*	The BUSBDevice presents an interface to USB device. You can either get
+/*	The BUSBDevice presents an interface to a USB device. You can either get
 	it through the BUSBRoster or by creating one yourself and setting it to
 	a valid raw usb device (with a path of "/dev/bus/usb/x").
 	The device class provides direct accessors for descriptor fields as well
@@ -65,7 +64,7 @@ virtual	void						_ReservedUSBRoster5();
 	The BUSBDevice also provides access for the BUSBConfiguration objects of
 	a device. These objects and all of their child objects depend on the
 	parent device and will be deleted as soon as the device object is
-	destroyed */
+	destroyed. */
 class BUSBDevice {
 public:
 									BUSBDevice(const char *path = NULL);
@@ -76,11 +75,11 @@ virtual	status_t					InitCheck();
 		status_t					SetTo(const char *path);
 		void						Unset();
 
-		// Returns the location on the bus represented as hub/device sequence
+		// Returns the location on the bus represented as hub/device sequence.
 		const char *				Location() const;
 		bool						IsHub() const;
 
-		// These are direct accessors to descriptor fields
+		// These are direct accessors to descriptor fields.
 		uint16						USBVersion() const;
 		uint8						Class() const;
 		uint8						Subclass() const;
@@ -92,7 +91,7 @@ virtual	status_t					InitCheck();
 
 		// The string functions return the string representation of the
 		// descriptor data. The strings are decoded to normal 0 terminated
-		// c strings and are cached and owned by the object.
+		// C strings and are cached and owned by the object.
 		// If a string is not available an empty string is returned.
 		const char *				ManufacturerString() const;
 		const char *				ProductString() const;
@@ -121,7 +120,8 @@ virtual	status_t					InitCheck();
 		// With ConfigurationAt() or ActiveConfiguration() you can get an
 		// object that represents the configuration at a certain index or at
 		// the index that is currently configured. Note that the index does not
-		// necessarily correspond with the configuration value.
+		// necessarily correspond to the configuration_value present in the
+		// configuration descriptor.
 		// Use the returned object as an argument to SetConfiguration() to
 		// change the active configuration of a device.
 		uint32						CountConfigurations() const;
@@ -131,7 +131,7 @@ virtual	status_t					InitCheck();
 		status_t					SetConfiguration(
 										const BUSBConfiguration *configuration);
 
-		// ControlTransfer() sends requests using the default pipe
+		// ControlTransfer() sends requests using the default pipe.
 		ssize_t						ControlTransfer(uint8 requestType,
 										uint8 request, uint16 value,
 										uint16 index, uint16 length,
@@ -161,7 +161,7 @@ mutable	char *						fSerialNumberString;
 
 /*	A BUSBConfiguration object represents one of possibly multiple
 	configurations a device might have. A valid object can only be gotten
-	through the ConfigurationAt() and ActiveConfiguration() methods of a
+	through the ConfigurationAt() or ActiveConfiguration() methods of a
 	BUSBDevice.
 	The BUSBConfiguration provides further access into the configuration by
 	providing CountInterfaces() and InterfaceAt() to retrieve BUSBInterface
@@ -174,7 +174,7 @@ public:
 		uint32						Index() const;
 		const BUSBDevice *			Device() const;
 
-		// Gets a describing string of this configuration if available.
+		// Gets a descriptive string for this configuration, if available.
 		// Otherwise an empty string is returned.
 		const char *				ConfigurationString() const;
 
@@ -226,8 +226,8 @@ public:
 		const BUSBDevice *			Device() const;
 
 		// These are accessors to descriptor fields. InterfaceString() tries
-		// to return a describing string of this interface. If no string is
-		// available an empty string will be returned.
+		// to return a descriptive string for the interface. If no string is
+		// available an empty string is returned.
 		uint8						Class() const;
 		uint8						Subclass() const;
 		uint8						Protocol() const;
@@ -237,7 +237,8 @@ public:
 									Descriptor() const;
 
 		// Use OtherDescriptorAt() to get generic descriptors of an interface.
-		// These are usually vendor or device specific extensions.
+		// These are usually device/interface class specific or they may
+		// represent vendor specific extensions.
 		status_t					OtherDescriptorAt(uint32 index,
 										usb_descriptor *descriptor,
 										size_t length) const;
@@ -370,4 +371,4 @@ friend	class BUSBInterface;
 		uint32						fReserved[10];
 };
 
-#endif
+#endif // _USB_KIT_H
