@@ -360,9 +360,6 @@ radeon_uninit_accelerant(void)
 
 	gInfo->mode_list = NULL;
 
-	PLLPower(1, RHD_POWER_SHUTDOWN);
-		// Power down PLL
-
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	uninit_lock(&info.accelerant_lock);
