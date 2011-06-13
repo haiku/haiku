@@ -1156,7 +1156,6 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 		return error;
 	}
 
-dprintf("_parameters");
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
