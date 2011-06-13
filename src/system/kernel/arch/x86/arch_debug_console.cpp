@@ -69,6 +69,20 @@ static spinlock sSerialOutputSpinlock = B_SPINLOCK_INITIALIZER;
 
 
 static void
+init_serial_port(uint16 basePort, uint32 baudRate)
+{
+	sSerialBasePort = basePort;
+
+	uint16 divisor = (uint16)(115200 / baudRate);
+
+	out8(0x80, sSerialBasePort + SERIAL_LINE_CONTROL);	/* set divisor latch access bit */
+	out8(divisor & 0xf, sSerialBasePort + SERIAL_DIVISOR_LATCH_LOW);
+	out8(divisor >> 8, sSerialBasePort + SERIAL_DIVISOR_LATCH_HIGH);
+	out8(3, sSerialBasePort + SERIAL_LINE_CONTROL);		/* 8N1 */
+}
+
+
+static void
 put_char(const char c)
 {
 	// wait until the transmitter empty bit is set
@@ -389,16 +403,11 @@ arch_debug_serial_early_boot_message(const char *string)
 status_t
 arch_debug_console_init(kernel_args *args)
 {
-	uint16 divisor = (uint16)(115200 / kSerialBaudRate);
-
 	// only use the port if we could find one, else use the standard port
 	if (args != NULL && args->platform_args.serial_base_ports[0] != 0)
 		sSerialBasePort = args->platform_args.serial_base_ports[0];
 
-	out8(0x80, sSerialBasePort + SERIAL_LINE_CONTROL);	/* set divisor latch access bit */
-	out8(divisor & 0xf, sSerialBasePort + SERIAL_DIVISOR_LATCH_LOW);
-	out8(divisor >> 8, sSerialBasePort + SERIAL_DIVISOR_LATCH_HIGH);
-	out8(3, sSerialBasePort + SERIAL_LINE_CONTROL);		/* 8N1 */
+	init_serial_port(sSerialBasePort, kSerialBaudRate);
 
 	return B_OK;
 }
@@ -409,7 +418,6 @@ arch_debug_console_init_settings(kernel_args *args)
 {
 	uint32 baudRate = kSerialBaudRate;
 	uint16 basePort = sSerialBasePort;
-	uint16 divisor;
 	void *handle;
 
 	// get debug settings
@@ -451,13 +459,7 @@ arch_debug_console_init_settings(kernel_args *args)
 	if (sSerialBasePort == basePort && baudRate == kSerialBaudRate)
 		return B_OK;
 
-	sSerialBasePort = basePort;
-	divisor = (uint16)(115200 / baudRate);
-
-	out8(0x80, sSerialBasePort + SERIAL_LINE_CONTROL);	/* set divisor latch access bit */
-	out8(divisor & 0xf, sSerialBasePort + SERIAL_DIVISOR_LATCH_LOW);
-	out8(divisor >> 8, sSerialBasePort + SERIAL_DIVISOR_LATCH_HIGH);
-	out8(3, sSerialBasePort + SERIAL_LINE_CONTROL);		/* 8N1 */
+	init_serial_port(sSerialBasePort, kSerialBaudRate);
 
 	return B_OK;
 }
