@@ -32,6 +32,7 @@
 #include "FileSourceCode.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
+#include "InspectorWindow.h"
 #include "LocatableFile.h"
 #include "MessageCodes.h"
 #include "RegistersView.h"
@@ -203,6 +204,22 @@ void
 TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_SHOW_INSPECTOR_WINDOW:
+		{
+			if (fInspectorWindow) {
+				fInspectorWindow->Activate(true);
+				break;
+			}
+
+			try {
+				fInspectorWindow = InspectorWindow::Create(fListener);
+				if (fInspectorWindow != NULL)
+					fInspectorWindow->Show();
+           	} catch (...) {
+           		// TODO: notify user
+           	}
+           	break;
+		}
 		case B_REFS_RECEIVED:
 		{
 			entry_ref locatedPath;
@@ -535,6 +552,12 @@ TeamWindow::_Init()
 	menu->AddItem(item);
 	item->SetTarget(this);
 	item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A');
+	menu->AddItem(item);
+	item->SetTarget(this);
+	menu = new BMenu("Tools");
+	fMenuBar->AddItem(menu);
+	item = new BMenuItem("Inspect Memory",
+		new BMessage(MSG_SHOW_INSPECTOR_WINDOW), 'I');
 	menu->AddItem(item);
 	item->SetTarget(this);
 

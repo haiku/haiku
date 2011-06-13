@@ -122,7 +122,7 @@ TeamMemoryBlockManager::GetMemoryBlock(target_addr_t address)
 {
 	AutoLocker<BLocker> lock(fLock);
 
-	address &= ~B_PAGE_SIZE - 1;
+	address &= ~(B_PAGE_SIZE - 1);
 	MemoryBlockEntry* entry = fActiveBlocks->Lookup(address);
 	if (entry != NULL) {
 		if (entry->block->AcquireReference() != 0)

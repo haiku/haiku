@@ -142,6 +142,7 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fFileManager(NULL),
 	fWorker(NULL),
 	fBreakpointManager(NULL),
+	fMemoryBlockManager(NULL),
 	fDebugEventListener(-1),
 	fUserInterface(userInterface),
 	fTerminating(false),
@@ -293,6 +294,15 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	error = fBreakpointManager->Init();
+	if (error != B_OK)
+		return error;
+
+	// create the memory block manager
+	fMemoryBlockManager = new(std::nothrow) TeamMemoryBlockManager();
+	if (fMemoryBlockManager == NULL)
+		return B_NO_MEMORY;
+
+	error = fMemoryBlockManager->Init();
 	if (error != B_OK)
 		return error;
 
@@ -757,6 +767,7 @@ void
 TeamDebugger::JobFailed(Job* job)
 {
 	TRACE_JOBS("TeamDebugger::JobFailed(%p)\n", job);
+	// TODO: notify user
 }
 
 

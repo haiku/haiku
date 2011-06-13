@@ -27,6 +27,7 @@ class BMenuBar;
 class BStringView;
 class BTabView;
 class Image;
+class InspectorWindow;
 class RegistersView;
 class SourceCode;
 class StackFrame;
@@ -161,6 +162,7 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			InspectorWindow*	fInspectorWindow;
 };
 
 
