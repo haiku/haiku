@@ -1287,24 +1287,10 @@ pm_initialize(int fd, partition_id partitionID, const char* name,
 
 status_t
 pm_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
-	disk_job_id job)
+	uint32 blockSize, disk_job_id job)
 {
-	// get partition's block size
-	size_t blockSize;
-	{
-		PartitionReadLocker locker(partitionID);
-		if (!locker.IsLocked())
-			return B_ERROR;
-
-		partition_data* partition = get_partition(partitionID);
-		if (partition == NULL)
-			return B_BAD_VALUE;
-		update_disk_device_job_progress(job, 0.0);
-
-		blockSize = partition->block_size;
-		if (blockSize == 0)
-			return B_BAD_VALUE;
-	}
+	if (blockSize == 0)
+		return B_BAD_VALUE;
 
 	// We overwrite the first block, which contains the partition table.
 	// Allocate a buffer, we can clear and write.

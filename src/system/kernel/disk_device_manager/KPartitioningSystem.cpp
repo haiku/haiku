@@ -429,7 +429,8 @@ KPartitioningSystem::Uninitialize(KPartition* partition, disk_job_id job)
 		return result;
 
 	// let the module do its job
-	result = fModule->uninitialize(fd, partition->ID(), partition->Size(), job);
+	result = fModule->uninitialize(fd, partition->ID(), partition->Size(),
+		partition->BlockSize(), job);
 
 	// cleanup and return
 	close(fd);

@@ -100,7 +100,7 @@ typedef struct partition_module_info {
 	status_t (*initialize)(int fd, partition_id partition, const char* name,
 				const char *parameters, off_t partitionSize, disk_job_id job);
 	status_t (*uninitialize)(int fd, partition_id partition,
-				off_t partitionSize, disk_job_id job);
+				off_t partitionSize, uint32 blockSize, disk_job_id job);
 	status_t (*create_child)(int fd, partition_id partition, off_t offset,
 				off_t size, const char* type, const char* name,
 				const char* parameters, disk_job_id job,
