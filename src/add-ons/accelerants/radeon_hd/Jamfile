@@ -12,6 +12,7 @@ Addon radeon_hd.accelerant :
 	accelerant.cpp
 	engine.cpp
 	hooks.cpp
+	pll.cpp
 	mode.cpp
 	bios.cpp
 	create_display_modes.cpp

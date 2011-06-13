@@ -12,6 +12,7 @@
 
 #include "mode.h"
 #include "radeon_hd.h"
+#include "pll.h"
 
 
 #include <edid.h>
@@ -39,6 +40,7 @@ struct accelerant_info {
 
 
 struct register_info {
+	uint16_t	crtid;
 	uint16_t	grphEnable;
 	uint16_t	grphControl;
 	uint16_t	grphSwapControl;
@@ -103,33 +105,65 @@ write32(uint32 offset, uint32 value)
 
 
 inline void
-write32AtMask(uint32 adress, uint32 value, uint32 mask)
+write32AtMask(uint32 offset, uint32 value, uint32 mask)
 {
-	uint32 temp;
-	temp = read32(adress);
+	uint32 temp = read32(offset);
 	temp &= ~mask;
 	temp |= value & mask;
-	write32(adress, temp);
+	write32(offset, temp);
 }
 
 
-inline uint32_t
-ReadMC(int screenIndex, uint32_t addr)
+inline uint32
+read32MC(uint32 offset)
 {
-	// TODO : readMC for R5XX
-	return 0;
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset == RADEON_R600) {
+		write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
+			| RS600_MC_INDEX_CITF_ARB0));
+		return read32(RS600_MC_DATA);
+	} else if (info.device_chipset == (RADEON_R600 & 0x90)
+		|| info.device_chipset == (RADEON_R700 & 0x40)) {
+		write32(RS690_MC_INDEX, (offset & RS690_MC_INDEX_ADDR_MASK));
+		return read32(RS690_MC_DATA);
+	} else if (info.device_chipset == (RADEON_R700 & 0x80)
+		|| info.device_chipset == (RADEON_R800 & 0x80)) {
+		write32(RS780_MC_INDEX, offset & RS780_MC_INDEX_ADDR_MASK);
+		return read32(RS780_MC_DATA);
+	}
+
+	// eh.
+	return read32(offset);
 }
 
 
 inline void
-WriteMC(int screenIndex, uint32_t addr, uint32_t data)
+write32MC(uint32 offset, uint32 data)
 {
-	// TODO : writeMC for R5XX
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset == RADEON_R600) {
+		write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
+			| RS600_MC_INDEX_CITF_ARB0 | RS600_MC_INDEX_WR_EN));
+		write32(RS600_MC_DATA, data);
+	} else if (info.device_chipset == (RADEON_R600 & 0x90)
+		|| info.device_chipset == (RADEON_R700 & 0x40)) {
+		write32(RS690_MC_INDEX, ((offset & RS690_MC_INDEX_ADDR_MASK)
+			| RS690_MC_INDEX_WR_EN));
+		write32(RS690_MC_DATA, data);
+		write32(RS690_MC_INDEX, RS690_MC_INDEX_WR_ACK);
+	} else if (info.device_chipset == (RADEON_R700 & 0x80)
+		|| info.device_chipset == (RADEON_R800 & 0x80)) {
+			write32(RS780_MC_INDEX, ((offset & RS780_MC_INDEX_ADDR_MASK)
+				| RS780_MC_INDEX_WR_EN));
+			write32(RS780_MC_DATA, data);
+	}
 }
 
 
-inline uint32_t
-ReadPLL(int screenIndex, uint16_t offset)
+inline uint32
+read32PLL(uint16 offset)
 {
 	write32(CLOCK_CNTL_INDEX, offset & PLL_ADDR);
 	return read32(CLOCK_CNTL_DATA);
@@ -137,10 +171,20 @@ ReadPLL(int screenIndex, uint16_t offset)
 
 
 inline void
-WritePLL(int screenIndex, uint16_t offset, uint32_t data)
+write32PLL(uint16 offset, uint32 data)
 {
 	write32(CLOCK_CNTL_INDEX, (offset & PLL_ADDR) | PLL_WR_EN);
 	write32(CLOCK_CNTL_DATA, data);
+}
+
+
+inline void
+write32PLLAtMask(uint16 offset, uint32 value, uint32 mask)
+{
+	uint32 temp = read32PLL(offset);
+	temp &= ~mask;
+	temp |= value & mask;
+	write32PLL(offset, temp);
 }
 
 

@@ -128,48 +128,47 @@ CailWritePCIConfigData(VOID *CAIL, VOID *src, UINT32 idx, UINT16 size)
 
 
 ULONG
-CailReadPLL(VOID *CAIL, ULONG Address)
+CailReadPLL(VOID *CAIL, ULONG address)
 {
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
-	// TODO : Assumed screen index 0
-	return ReadPLL(0, Address);
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
+	return read32PLL(address);
 }
 
 
 VOID
-CailWritePLL(VOID *CAIL, ULONG Address, ULONG Data)
+CailWritePLL(VOID *CAIL, ULONG address, ULONG data)
 {
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
 
 	// TODO : save PLL registers
-	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPLL, Address);
+	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPLL, address);
 	// TODO : Assumed screen index 0
-	WritePLL(0, Address, Data);
+	write32PLL(address, data);
 }
 
 
 ULONG
-CailReadMC(VOID *CAIL, ULONG Address)
+CailReadMC(VOID *CAIL, ULONG address)
 {
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
 	// TODO : CailReadMC
 
 	ULONG ret = 0;
 
-	// ret = RHDReadMC(((atomBiosHandlePtr)CAIL), Address | MC_IND_ALL);
+	// ret = RHDReadMC(((atomBiosHandlePtr)CAIL), address | MC_IND_ALL);
 	return ret;
 }
 
 
 VOID
-CailWriteMC(VOID *CAIL, ULONG Address, ULONG data)
+CailWriteMC(VOID *CAIL, ULONG address, ULONG data)
 {
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, Address);
+	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
 	// TODO : CailWriteMC
 
-	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMC, Address);
+	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMC, address);
 	// RHDWriteMC(((atomBiosHandlePtr)CAIL),
-	//	Address | MC_IND_ALL | MC_IND_WR_EN, data);
+	//	address | MC_IND_ALL | MC_IND_WR_EN, data);
 }
 
 

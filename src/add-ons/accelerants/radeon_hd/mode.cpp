@@ -148,6 +148,15 @@ CardFBSet(display_mode *mode)
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
+	// Disable VGA mode to enable Radeon extended registers
+	write32AtMask(VGA_RENDER_CONTROL, 0, 0x00030000);
+	write32AtMask(VGA_MODE_CONTROL, 0, 0x00000030);
+	write32AtMask(VGA_HDP_CONTROL, 0x00010010, 0x00010010);
+	write32AtMask(D1VGA_CONTROL, 0, D1VGA_MODE_ENABLE
+		| D1VGA_TIMING_SELECT | D1VGA_SYNC_POLARITY_SELECT);
+	write32AtMask(D2VGA_CONTROL, 0, D2VGA_MODE_ENABLE
+		| D2VGA_TIMING_SELECT | D1VGA_SYNC_POLARITY_SELECT);
+
 	// disable R/B swap, disable tiling, disable 16bit alpha, etc.
 	write32AtMask(gRegister->grphEnable, 1, 0x00000001);
 	write32(gRegister->grphControl, 0);
@@ -217,8 +226,6 @@ CardFBSet(display_mode *mode)
 static void
 CardModeSet(display_mode *mode)
 {
-	CardBlankSet(true);
-
 	display_timing& displayTiming = mode->timing;
 
 	TRACE("%s called to do %dx%d\n",
@@ -231,12 +238,14 @@ CardModeSet(display_mode *mode)
 	write32(gRegister->crtHTotal,
 		displayTiming.h_total - 1);
 
+	#if 0
 	// determine blanking based on passed modeline
-	//uint16 blankStart = displayTiming.h_display + 1;
-	//uint16 blankEnd = displayTiming.h_total - 1;
+	uint16 blankStart = displayTiming.h_display;
+	uint16 blankEnd = displayTiming.h_total;
 
-	//write32(gRegister->crtHBlank,
-	//	blankStart | (blankEnd << 16));
+	write32(gRegister->crtHBlank,
+		blankStart | (blankEnd << 16));
+	#endif
 
 	write32(gRegister->crtHSync,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
@@ -249,11 +258,13 @@ CardModeSet(display_mode *mode)
 	write32(gRegister->crtVTotal,
 		displayTiming.v_total - 1);
 
-	//blankStart = displayTiming.v_display + 1;
-	//blankEnd = displayTiming.v_total - 1;
+	#if 0
+	blankStart = displayTiming.v_display;
+	blankEnd = displayTiming.v_total;
 
-	//write32(gRegister->crtVBlank,
-	//	blankStart | (blankEnd << 16));
+	write32(gRegister->crtVBlank,
+		blankStart | (blankEnd << 16));
+	#endif
 
 	// Set Interlace if specified within mode line
 	if (displayTiming.flags & B_TIMING_INTERLACED) {
@@ -276,8 +287,6 @@ CardModeSet(display_mode *mode)
 		should only be set to 1 on 30bpp DVI modes
 	*/
 	write32AtMask(gRegister->crtCountControl, 0x0, 0x1);
-
-	CardBlankSet(false);
 }
 
 
@@ -290,15 +299,9 @@ CardModeScale(display_mode *mode)
 
 	// For now, no overscan support
 	write32(D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
-		(0 << 16) | 0);
+		(0 << 16) | 0); // LEFT | RIGHT
 	write32(D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
-		(0 << 16) | 0);
-
-/*  write32(regOffset + D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
-		(Overscan.OverscanLeft << 16) | Overscan.OverscanRight);
-	write32(regOffset + D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
-		(Overscan.OverscanTop << 16) | Overscan.OverscanBottom);
-*/
+		(0 << 16) | 0); // TOP | BOTTOM
 
 	// No scaling
 	write32(gRegister->sclUpdate, (1<<16));	// Lock
@@ -333,9 +336,15 @@ radeon_set_display_mode(display_mode *mode)
 	int crtNumber = 0;
 
 	init_registers(crtNumber);
+
+	CardBlankSet(true);
 	CardFBSet(mode);
 	CardModeSet(mode);
 	CardModeScale(mode);
+	PLLSet(1, mode->timing.pixel_clock);
+	PLLPower(1, RHD_POWER_ON);
+	DACPower(1, RHD_POWER_ON);
+	CardBlankSet(false);
 
 	int32 crtstatus = read32(D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);
@@ -372,12 +381,13 @@ status_t
 radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 {
 	TRACE("%s\n", __func__);
-/*
+
 	if (_low != NULL) {
 		// lower limit of about 48Hz vertical refresh
 		uint32 totalClocks = (uint32)mode->timing.h_total
 			*(uint32)mode->timing.v_total;
 		uint32 low = (totalClocks * 48L) / 1000L;
+
 		if (low < gInfo->shared_info->pll_info.min_frequency)
 			low = gInfo->shared_info->pll_info.min_frequency;
 		else if (low > gInfo->shared_info->pll_info.max_frequency)
@@ -388,9 +398,9 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 
 	if (_high != NULL)
 		*_high = gInfo->shared_info->pll_info.max_frequency;
-*/
-	*_low = 48L;
-	*_high = 100 * 1000000L;
+
+	//*_low = 48L;
+	//*_high = 100 * 1000000L;
 	return B_OK;
 }
 

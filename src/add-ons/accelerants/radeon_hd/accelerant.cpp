@@ -12,6 +12,7 @@
 #include "accelerant.h"
 
 #include "utility.h"
+#include "pll.h"
 
 #include <errno.h>
 #include <stdlib.h>
@@ -140,6 +141,12 @@ init_common(int device, bool isClone)
 
 	sharedCloner.Keep();
 	regsCloner.Keep();
+
+	// Define Radeon PLL default ranges
+	gInfo->shared_info->pll_info.reference_frequency
+		= RHD_PLL_REFERENCE_DEFAULT;
+	gInfo->shared_info->pll_info.min_frequency = RHD_PLL_MIN_DEFAULT;
+	gInfo->shared_info->pll_info.max_frequency = RHD_PLL_MAX_DEFAULT;
 
 	return B_OK;
 }
@@ -270,6 +277,8 @@ init_registers(uint8 crtid)
 
 	// Populate common registers
 	// TODO : Wait.. this doesn't work with Eyefinity > crt 1.
+	gRegister->crtid = crtid;
+
 	gRegister->modeCenter
 		= (crtid == 1) ? D2MODE_CENTER : D1MODE_CENTER;
 	gRegister->crtHPolarity
@@ -350,6 +359,9 @@ radeon_uninit_accelerant(void)
 	TRACE("%s enter\n", __func__);
 
 	gInfo->mode_list = NULL;
+
+	PLLPower(1, RHD_POWER_SHUTDOWN);
+		// Power down PLL
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
