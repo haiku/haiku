@@ -1245,7 +1245,7 @@ init_driver()
 		return result;
 	}
 
-	gUSBModule->register_driver(DRIVER_NAME, supportedDevices, 3, NULL);
+	gUSBModule->register_driver(DRIVER_NAME, supportedDevices, 1, NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }
