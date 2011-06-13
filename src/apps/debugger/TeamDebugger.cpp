@@ -193,6 +193,7 @@ TeamDebugger::~TeamDebugger()
 	delete fImageHandlers;
 
 	delete fBreakpointManager;
+	delete fMemoryBlockManager;
 	delete fDebuggerInterface;
 	delete fWorker;
 	delete fTeam;
