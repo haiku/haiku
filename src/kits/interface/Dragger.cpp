@@ -319,9 +319,9 @@ BDragger::MessageReceived(BMessage *msg)
 				fTransition = false;
 			} else {
 				if ((fShelf && (fShelf->AllowsDragging() && AreDraggersDrawn()))
-					|| AreDraggersDrawn())
+					|| AreDraggersDrawn()) {
 					Show();
-				else
+				} else
 					Hide();
 			}
 			break;
@@ -629,7 +629,7 @@ BDragger::_InitData()
 {
 	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
 	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
-	
+
 	// we need to translate some strings, and in order to do so, we need
 	// to use the LocaleBackend to reach liblocale.so
 	if (gLocaleBackend == NULL)
@@ -652,7 +652,7 @@ BDragger::_AddToList()
 		// The dragger is not shown - but we can't hide us in case we're the
 		// parent of the actual target view (because then you couldn't see
 		// it anymore).
-		if (fRelation != TARGET_IS_CHILD)
+		if (fRelation != TARGET_IS_CHILD && !IsHidden())
 			Hide();
 	}
 }
