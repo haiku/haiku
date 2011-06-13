@@ -240,7 +240,9 @@ usb_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 	TRACE_FUNCALLS("> usb_serial_read(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
 		position, buffer, *numBytes);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->Read((char *)buffer, numBytes);
+	status_t status = device->Read((char *)buffer, numBytes);
+	TRACE_FUNCRET("< usb_serial_read() returns: 0x%08x\n", status);
+	return status;
 }
 
 
@@ -252,7 +254,9 @@ usb_serial_write(void *cookie, off_t position, const void *buffer,
 	TRACE_FUNCALLS("> usb_serial_write(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
 		position, buffer, *numBytes);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->Write((const char *)buffer, numBytes);
+	status_t status = device->Write((const char *)buffer, numBytes);
+	TRACE_FUNCRET("< usb_serial_write() returns: 0x%08x\n", status);
+	return status;
 }
 
 
@@ -263,7 +267,9 @@ usb_serial_control(void *cookie, uint32 op, void *arg, size_t length)
 	TRACE_FUNCALLS("> usb_serial_control(0x%08x, 0x%08x, 0x%08x, %d)\n",
 		cookie, op, arg, length);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->Control(op, arg, length);
+	status_t status = device->Control(op, arg, length);
+	TRACE_FUNCRET("< usb_serial_control() returns: 0x%08x\n", status);
+	return status;
 }
 
 
@@ -274,7 +280,9 @@ usb_serial_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 	TRACE_FUNCALLS("> usb_serial_select(0x%08x, 0x%08x, 0x%08x, %p)\n",
 		cookie, event, ref, sync);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->Select(event, ref, sync);
+	status_t status = device->Select(event, ref, sync);
+	TRACE_FUNCRET("< usb_serial_select() returns: 0x%08x\n", status);
+	return status;
 }
 
 
@@ -285,7 +293,9 @@ usb_serial_deselect(void *cookie, uint8 event, selectsync *sync)
 	TRACE_FUNCALLS("> usb_serial_deselect(0x%08x, 0x%08x, %p)\n",
 		cookie, event, sync);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->DeSelect(event, sync);
+	status_t status = device->DeSelect(event, sync);
+	TRACE_FUNCRET("< usb_serial_deselect() returns: 0x%08x\n", status);
+	return status;
 }
 
 
@@ -295,7 +305,9 @@ usb_serial_close(void *cookie)
 {
 	TRACE_FUNCALLS("> usb_serial_close(0x%08x)\n", cookie);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->Close();
+	status_t status = device->Close();
+	TRACE_FUNCRET("< usb_serial_close() returns: 0x%08x\n", status);
+	return status;
 }
 
 
@@ -320,6 +332,7 @@ usb_serial_free(void *cookie)
 	}
 
 	release_sem(gDriverLock);
+	TRACE_FUNCRET("< usb_serial_free() returns: 0x%08x\n", status);
 	return status;
 }
 
