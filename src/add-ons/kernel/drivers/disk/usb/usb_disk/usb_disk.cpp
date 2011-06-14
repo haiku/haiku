@@ -787,11 +787,12 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 					break;
 				}
-				TRACE("usb lun %"B_PRIu8" not ready, attempt %"B_PRIu32"\n",
-					i, tries);
+				TRACE("usb lun %"B_PRIu8" is ready... "
+					"but doesn't have any media inserted\n", i);
+				break;
 			}
-			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" failed\n", i,
-				tries);
+			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" failed\n",
+				i, tries);
 
 			bigtime_t snoozeTime = 1000000 * tries;
 			TRACE("snoozing %"B_PRIu64" microseconds for usb lun\n",
