@@ -3,13 +3,21 @@
 #
 # Overridden to support a second argument, the option to be used.
 #
-rule FIncludes { return $(2:E="--bad-include-option ")$(1) ; }
+rule FIncludes
+{
+	return $(2:E="--bad-include-option ")$(1) ;
+}
+
 
 # FSysIncludes <dirs> ;
 #
 # Counterpart of FIncludes for system include search paths.
 #
-rule FSysIncludes { return $(2:E="--bad-include-option ")$(1) ; }
+rule FSysIncludes
+{
+	return $(2:E="--bad-include-option ")$(1) ;
+}
+
 
 rule SubDirSysHdrs
 {
@@ -24,6 +32,7 @@ rule SubDirSysHdrs
 	#
 	SUBDIRSYSHDRS += [ FDirName $(1) ] ;
 }
+
 
 rule ObjectSysHdrs
 {
@@ -75,6 +84,7 @@ rule ObjectSysHdrs
 	}
 }
 
+
 rule SourceHdrs
 {
 	# SourceHdrs <sources> : <headers> [ : <gristed objects> ] ;
@@ -94,6 +104,7 @@ rule SourceHdrs
 	# being listed at all.
 	HDRSEARCH on $(sources) += $(headers) ;
 }
+
 
 rule SourceSysHdrs
 {
@@ -115,6 +126,7 @@ rule SourceSysHdrs
 	HDRSEARCH on $(sources) += $(headers) ;
 }
 
+
 rule PublicHeaders
 {
 	# PublicHeaders <group list>
@@ -131,6 +143,7 @@ rule PublicHeaders
 	return $(dirs) ;
 }
 
+
 rule PrivateHeaders
 {
 	# PrivateHeaders <group list>
@@ -145,6 +158,7 @@ rule PrivateHeaders
 	}
 	return $(dirs) ;
 }
+
 
 rule LibraryHeaders
 {
@@ -161,6 +175,7 @@ rule LibraryHeaders
 	return $(dirs) ;
 }
 
+
 rule ArchHeaders
 {
 	# usage: ArchHeaders <arch> ;
@@ -169,6 +184,7 @@ rule ArchHeaders
 
 	return [ FDirName $(HAIKU_TOP) headers private kernel arch $(1) ] ;
 }
+
 
 rule UseHeaders
 {
@@ -192,6 +208,7 @@ rule UseHeaders
 	}
 }
 
+
 rule UsePublicHeaders
 {
 	# UsePublicHeaders <group list> ;
@@ -204,6 +221,7 @@ rule UsePublicHeaders
 	UseHeaders [ PublicHeaders $(1) ] : true ;
 }
 
+
 rule UsePublicObjectHeaders
 {
 	# UsePublicObjectHeaders <sources> : <group list> [ : <objects> ] ;
@@ -214,6 +232,7 @@ rule UsePublicObjectHeaders
 
 	SourceSysHdrs $(1) : [ PublicHeaders $(2) ] : $(3) ;
 }
+
 
 rule UsePrivateHeaders
 {
@@ -230,6 +249,7 @@ rule UsePrivateHeaders
 
 	UseHeaders [ PrivateHeaders $(1) ] : $(system) ;
 }
+
 
 rule UsePrivateObjectHeaders
 {
@@ -252,10 +272,12 @@ rule UsePrivateObjectHeaders
 	}
 }
 
+
 rule UseCppUnitHeaders
 {
 	SubDirSysHdrs [ FDirName $(HAIKU_TOP) headers tools cppunit ] ;
 }
+
 
 rule UseCppUnitObjectHeaders
 {
@@ -263,6 +285,7 @@ rule UseCppUnitObjectHeaders
 	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers tools cppunit ]
 		: $(2) ;
 }
+
 
 rule UseArchHeaders
 {
@@ -275,6 +298,7 @@ rule UseArchHeaders
 
 	UseHeaders $(headers) : true ;
 }
+
 
 rule UseArchObjectHeaders
 {
@@ -296,6 +320,7 @@ rule UseArchObjectHeaders
 	SourceSysHdrs $(sources) : $(headers) : $(objects) ;
 }
 
+
 rule UsePosixObjectHeaders
 {
 	# UsePosixObjectHeaders <sources> [ : <objects> ] ;
@@ -306,6 +331,7 @@ rule UsePosixObjectHeaders
 
 	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers posix ] : $(2) ;
 }
+
 
 rule UseLibraryHeaders
 {
@@ -318,6 +344,7 @@ rule UseLibraryHeaders
 	UseHeaders [ LibraryHeaders $(1) ] : true ;
 }
 
+
 rule UseLegacyHeaders
 {
 	# usage: UseLegacyHeaders <group list> ;
@@ -326,6 +353,7 @@ rule UseLegacyHeaders
 
 	UseHeaders [ FDirName $(HAIKU_TOP) headers legacy $(1) ] : true ;
 }
+
 
 rule UseLegacyObjectHeaders
 {
@@ -338,15 +366,18 @@ rule UseLegacyObjectHeaders
 	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers legacy ] : $(2) ;
 }
 
+
 rule UsePrivateKernelHeaders
 {
 	UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 }
 
+
 rule UsePrivateSystemHeaders
 {
 	UseHeaders $(TARGET_PRIVATE_SYSTEM_HEADERS) : true ;
 }
+
 
 rule FStandardOSHeaders
 {
@@ -360,6 +391,7 @@ rule FStandardOSHeaders
 	return [ FDirName $(HAIKU_TOP) headers os ]
 		[ PublicHeaders $(osIncludes) ] ;
 }
+
 
 rule FStandardHeaders
 {
@@ -401,6 +433,7 @@ rule FStandardHeaders
 
 	return $(headers) ;
 }
+
 
 # SUBDIRSYSHDRS shall be reset automatically for each subdir
 SUBDIRRESET += SYSHDRS ;
