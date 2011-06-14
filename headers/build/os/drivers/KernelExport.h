@@ -1,3 +1,2 @@
-#define dprintf	haiku_dprintf
-#include <../os/drivers/KernelExport.h>
-#undef dprintf
+#include <OS.h>
+	// We don't actually need anything from <KernelExport.h>.
