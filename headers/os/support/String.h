@@ -49,7 +49,7 @@ public:
 			BString&		SetToChars(const char* string, int32 charCount);
 			BString&		SetToChars(const BString& string, int32 charCount);
 			BString&		AdoptChars(BString& from, int32 charCount);
-			
+
 			BString&		SetToFormat(const char* format, ...);
 
 			// Substring copying
@@ -309,10 +309,10 @@ public:
 			BString&		operator<<(char c);
 			BString&		operator<<(int value);
 			BString&		operator<<(unsigned int value);
-			BString&		operator<<(uint32 value);
-			BString&		operator<<(int32 value);
-			BString&		operator<<(uint64 value);
-			BString&		operator<<(int64 value);
+			BString&		operator<<(unsigned long value);
+			BString&		operator<<(long value);
+			BString&		operator<<(unsigned long long value);
+			BString&		operator<<(long long value);
 			// float output hardcodes %.2f style formatting
 			BString&		operator<<(float value);
 
