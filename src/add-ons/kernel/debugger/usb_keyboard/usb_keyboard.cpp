@@ -176,10 +176,13 @@ enter_debugger(void)
 static void
 exit_debugger(void)
 {
-	// make sure a possibly pending transfer is canceled
-	evaluate_debug_command("uhci_process_transfer cancel");
+	if (sUseUSBKeyboard) {
+		// make sure a possibly pending transfer is canceled
+		set_debug_variable("_usbPipe", (uint64)sUSBPipe);
+		evaluate_debug_command("uhci_process_transfer cancel");
 
-	sUseUSBKeyboard = false;
+		sUseUSBKeyboard = false;
+	}
 }
 
 
