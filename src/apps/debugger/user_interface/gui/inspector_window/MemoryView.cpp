@@ -107,7 +107,7 @@ MemoryView::Draw(BRect rect)
 		+ startByte);
 	uint16* maxAddress = (uint16*)(fTargetBlock->BaseAddress()
 		+ fTargetBlock->Size());
-	BPoint drawPoint(1.0, startLine * fLineHeight);
+	BPoint drawPoint(1.0, (startLine + 1) * fLineHeight);
 	int32 currentWordsPerLine = fNybblesPerLine / 4;
 
 	for (int32 i = startLine; i <= endLine && currentAddress < maxAddress;
