@@ -14,6 +14,7 @@
 #include <Flattenable.h>
 #include <OS.h>
 #include <Rect.h>
+#include <Size.h>
 
 #include <AppDefs.h>		/* For convenience */
 #include <TypeConstants.h>	/* For convenience */
