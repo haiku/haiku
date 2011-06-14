@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT license.
 //---------------------------------------------------------------------
 /*!
@@ -81,7 +81,7 @@ BFile::BFile(const BEntry *entry, uint32 openMode)
 // constructor
 /*! \brief Creates a BFile and initializes it to the file referred to by
 		   the supplied path name and according to the specified open mode.
-	\param path the file's path name 
+	\param path the file's path name
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
@@ -167,9 +167,9 @@ BFile::SetTo(const entry_ref *ref, uint32 openMode)
 		set_fd(fd);
 		fMode = openMode;
 		fCStatus = B_OK;
-	
+
 		fcntl(fd, F_SETFD, FD_CLOEXEC);
-	
+
 	} else
 		fCStatus = fd;
 
@@ -211,7 +211,7 @@ BFile::SetTo(const BEntry *entry, uint32 openMode)
 		set_fd(fd);
 		fMode = openMode;
 		fCStatus = B_OK;
-	
+
 		fcntl(fd, F_SETFD, FD_CLOEXEC);
 	} else
 		fCStatus = fd;
@@ -222,7 +222,7 @@ BFile::SetTo(const BEntry *entry, uint32 openMode)
 // SetTo
 /*! \brief Re-initializes the BFile to the file referred to by the
 		   supplied path name and according to the specified open mode.
-	\param path the file's path name 
+	\param path the file's path name
 	\param openMode the mode in which the file should be opened
 	\return
 	- \c B_OK: Everything went fine.
@@ -249,7 +249,7 @@ BFile::SetTo(const char *path, uint32 openMode)
 		set_fd(fd);
 		fMode = openMode;
 		fCStatus = B_OK;
-	
+
 		fcntl(fd, F_SETFD, FD_CLOEXEC);
 	} else
 		fCStatus = fd;
@@ -291,7 +291,7 @@ BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 		set_fd(fd);
 		fMode = openMode;
 		fCStatus = B_OK;
-	
+
 		fcntl(fd, F_SETFD, FD_CLOEXEC);
 	} else
 		fCStatus = fd;
@@ -460,6 +460,14 @@ BFile::SetSize(off_t size)
 	statData.st_size = size;
 	return set_stat(statData, B_STAT_SIZE);
 }
+
+
+status_t
+BFile::GetSize(off_t* size) const
+{
+	return BStatable::GetSize(size);
+}
+
 
 // =
 //!	Assigns another BFile to this BFile.

@@ -1078,7 +1078,7 @@ BEntry::Dump(const char *name)
 		&& _kern_read_stat(fDirFd, NULL, false, &st,
 				sizeof(struct stat)) == B_OK) {
 		printf("dir.device == %d\n", (int)st.st_dev);
-		printf("dir.inode  == %" B_PRIdINO "\n", st.st_ino);
+		printf("dir.inode  == %lld\n", (long long)st.st_ino);
 	} else {
 		printf("dir == NullFd\n");
 	}

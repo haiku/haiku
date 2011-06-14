@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CONFIG_BUILD_TYPES_H
@@ -70,13 +70,42 @@ typedef __haiku_std_uint64	__haiku_uint64;
 #endif
 #define __HAIKU_PHYS_SADDR_MIN		(-__HAIKU_SADDR_MAX-1)
 
+
+/* printf()/scanf() format prefixes */
+/* TODO: The following are only guesses! We should define them in the
+   build/host headers. */
+#define	__HAIKU_STD_PRI_PREFIX_32	""
+#ifdef __HAIKU_ARCH_64_BIT
+#	define __HAIKU_STD_PRI_PREFIX_64	"l"
+#else
+#	define __HAIKU_STD_PRI_PREFIX_64	"ll"
+#endif
+
+#define	__HAIKU_PRI_PREFIX_32		__HAIKU_STD_PRI_PREFIX_32
+#define	__HAIKU_PRI_PREFIX_64		__HAIKU_STD_PRI_PREFIX_64
+
+#ifdef __HAIKU_ARCH_64_BIT
+#	define __HAIKU_PRI_PREFIX_ADDR	__HAIKU_PRI_PREFIX_64
+#else
+#	define __HAIKU_PRI_PREFIX_ADDR	__HAIKU_PRI_PREFIX_32
+#endif
+
+#ifdef __HAIKU_ARCH_PHYSICAL_64_BIT
+#	define __HAIKU_PRI_PREFIX_PHYS_ADDR	__HAIKU_PRI_PREFIX_64
+#else
+#	define __HAIKU_PRI_PREFIX_PHYS_ADDR	__HAIKU_PRI_PREFIX_32
+#endif
+
+
 /* a generic address type wide enough for virtual and physical addresses */
 #if __HAIKU_ARCH_BITS >= __HAIKU_ARCH_PHYSICAL_BITS
 	typedef __haiku_addr_t					__haiku_generic_addr_t;
 #	define __HAIKU_GENERIC_ADDR_MAX			__HAIKU_ADDR_MAX
+#	define __HAIKU_PRI_PREFIX_GENERIC_ADDR	__HAIKU_PRI_PREFIX_ADDR
 #else
 	typedef __haiku_phys_addr_t				__haiku_generic_addr_t;
 #	define __HAIKU_GENERIC_ADDR_MAX			__HAIKU_PHYS_ADDR_MAX
+#	define __HAIKU_PRI_PREFIX_GENERIC_ADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR
 #endif
 
 

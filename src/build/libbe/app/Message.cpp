@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku Inc. All rights reserved.
+ * Copyright 2005-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -598,9 +598,9 @@ BMessage::_PrintToStream(const char* indent) const
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
-					printf("entry_ref(device=%d, directory=%" B_PRIdINO
-						", name=\"%s\", ", (int)ref.device, ref.directory,
-						ref.name);
+					printf("entry_ref(device=%d, directory=%lld"
+						", name=\"%s\", ", (int)ref.device,
+						(long long)ref.directory, ref.name);
 
 					BPath path(&ref);
 					printf("path=\"%s\")\n", path.Path());

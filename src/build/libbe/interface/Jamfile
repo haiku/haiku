@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src build libbe interface ;
 
 UsePrivateBuildHeaders app interface shared ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+
 USES_BE_API on <libbe_build>interface_kit.o = true ;
 
 BuildPlatformMergeObjectPIC <libbe_build>interface_kit.o :

@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src build libbe app ;
 
-UsePrivateBuildHeaders app shared ;
+UsePrivateBuildHeaders app kernel shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits app ] ;
 
 USES_BE_API on <libbe_build>app_kit.o = true ;
 

@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src build libroot ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os drivers ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
@@ -17,6 +18,9 @@ UsePrivateBuildHeaders kernel ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 }
+
+DEFINES += KMESSAGE_CONTAINER_ONLY ;
+ObjectC++Flags KMessage.cpp : $(HOST_BE_API_C++FLAGS) ;
 
 # locate the library
 MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
@@ -51,6 +55,8 @@ local librootSources =
 
 	$(strlSources)
 	strnlen.c
+
+	KMessage.cpp
 ;
 
 BuildPlatformSharedLibrary libroot_build.so :
@@ -66,3 +72,5 @@ BuildPlatformStaticLibrary libroot_build.a :
 
 SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles KMessage.cpp ]
+    = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;

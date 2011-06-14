@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 /*!
@@ -9,25 +9,22 @@
 #ifndef _FILE_H
 #define _FILE_H
 
+
 #include <DataIO.h>
 #include <Node.h>
-#include <StorageDefs.Private.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 /*!
 	\class BFile
 	\brief BFile is a wrapper class for common operations on files providing
 	access to the file's content data and its attributes.
-	
+
 	A BFile represents a file in some file system. It implements the
 	BPositionIO interface and thus the methods to read from and write to the
 	file, and is derived of BNode to provide access to the file's attributes.
 
 	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
-	
+
 	\version 0.0.0
 */
 class BFile : public BNode, public BPositionIO {
@@ -57,6 +54,7 @@ public:
 	virtual off_t Position() const;
 
 	virtual status_t SetSize(off_t size);
+	virtual	status_t GetSize(off_t* size) const;
 
 	BFile &operator=(const BFile &file);
 
@@ -79,10 +77,5 @@ private:
 	uint32 fMode;
 };
 
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
 
 #endif	// _FILE_H
-
-

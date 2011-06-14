@@ -883,6 +883,7 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		[ FDirName $(HAIKU_TOP) headers build os opengl ]
 		[ FDirName $(HAIKU_TOP) headers build os storage ]
 		[ FDirName $(HAIKU_TOP) headers build os support ]
+		[ FDirName $(HAIKU_TOP) headers build private ]
 	;
 	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
 	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;

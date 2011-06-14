@@ -4,6 +4,9 @@ UsePrivateBuildHeaders app kernel shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage mime ] ;
+
 USES_BE_API on <libbe_build>storage_kit.o = true ;
 
 BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :

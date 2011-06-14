@@ -13,11 +13,7 @@
 #include <Node.h>
 #include <EntryList.h>
 #include <StorageDefs.h>
-#include <StorageDefs.Private.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 class BFile;
 class BSymLink;
@@ -107,10 +103,4 @@ private:
 status_t create_directory(const char *path, mode_t mode);
 
 
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
-
 #endif	// _DIRECTORY_H
-
-
