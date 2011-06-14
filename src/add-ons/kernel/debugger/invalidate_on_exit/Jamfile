@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel debugger invalidate_on_exit ;
 
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
 
 KernelAddon <kdebug>invalidate_on_exit :
 	invalidate_on_exit.cpp
-	;
+;

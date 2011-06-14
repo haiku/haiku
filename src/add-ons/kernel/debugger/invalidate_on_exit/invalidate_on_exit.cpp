@@ -2,8 +2,14 @@
  * Copyright 2008, Michael Lotz, mmlr@mlotz.ch
  * Distributed under the terms of the MIT License.
  */
+
+
 #include <debug.h>
+
 #include <signal.h>
+
+#include <kscheduler.h>
+#include <smp.h>
 
 
 static sem_id sRequestSem = -1;
@@ -33,6 +39,12 @@ invalidate_loop(void *data)
 static void
 exit_debugger()
 {
+	// If someone holds the scheduler lock at this point, release_sem_etc()
+	// will block forever. So avoid that.
+	if (!try_acquire_spinlock(&gSchedulerLock))
+		return;
+	release_spinlock(&gSchedulerLock);
+
 	release_sem_etc(sRequestSem, 1, B_DO_NOT_RESCHEDULE);
 }
 
