@@ -376,7 +376,7 @@ class BMessage {
 
 		enum			{ sNumReplyPorts = 3 };
 		static port_id	sReplyPorts[sNumReplyPorts];
-		static long		sReplyPortInUse[sNumReplyPorts];
+		static int32	sReplyPortInUse[sNumReplyPorts];
 		static int32	sGetCachedReplyPort();
 
 		static BBlockCache* sMsgCache;

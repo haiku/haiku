@@ -78,7 +78,7 @@ extern "C" {
 
 BBlockCache *BMessage::sMsgCache = NULL;
 port_id BMessage::sReplyPorts[sNumReplyPorts];
-long BMessage::sReplyPortInUse[sNumReplyPorts];
+int32 BMessage::sReplyPortInUse[sNumReplyPorts];
 
 
 template<typename Type>
