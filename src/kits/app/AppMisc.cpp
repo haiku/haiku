@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 
 #include <Entry.h>
 #include <image.h>
