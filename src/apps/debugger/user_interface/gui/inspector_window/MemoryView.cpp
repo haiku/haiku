@@ -98,7 +98,7 @@ MemoryView::Draw(BRect rect)
 	if (fTargetBlock == NULL)
 		return;
 
-	char buffer[9];
+	char buffer[32];
 
 	int32 startLine = (int32)rect.top / fLineHeight;
 	int32 bytesPerLine = fNybblesPerLine / 2;
