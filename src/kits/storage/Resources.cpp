@@ -60,7 +60,7 @@ BResources::BResources()
 	\param clobber if \c true, the file's resources are truncated to size 0
 */
 BResources::BResources(const BFile* file, bool clobber)
-	: 
+	:
 	fFile(),
 	fContainer(NULL),
 	fResourceFile(NULL),
@@ -247,7 +247,7 @@ BResources::SetTo(const entry_ref* ref, bool clobber)
 	// delegate the actual work
 	return SetTo(&file, clobber);
 }
-	
+
 // SetToImage
 /*!	\brief Re-initialized the BResources object to represent the resources of
 	the file from which the specified image has been loaded.
@@ -262,6 +262,7 @@ BResources::SetTo(const entry_ref* ref, bool clobber)
 status_t
 BResources::SetToImage(image_id image, bool clobber)
 {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	// get an image info
 	image_info info;
 	status_t error = get_image_info(image, &info);
@@ -272,8 +273,11 @@ BResources::SetToImage(image_id image, bool clobber)
 
 	// delegate the actual work
 	return SetTo(info.name, clobber);
+#else	// HAIKU_TARGET_PLATFORM_HAIKU
+	return B_NOT_SUPPORTED;
+#endif
 }
-	
+
 /*!	\brief Re-initialized the BResources object to represent the resources of
 	the file from which the specified image has been loaded.
 	The image belongs to the current team and is identified by a pointer into
@@ -291,6 +295,7 @@ BResources::SetToImage(image_id image, bool clobber)
 status_t
 BResources::SetToImage(const void* codeOrDataPointer, bool clobber)
 {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (!codeOrDataPointer)
 		return B_BAD_VALUE;
 
@@ -309,6 +314,9 @@ BResources::SetToImage(const void* codeOrDataPointer, bool clobber)
 	}
 
 	return B_ENTRY_NOT_FOUND;
+#else	// HAIKU_TARGET_PLATFORM_HAIKU
+	return B_NOT_SUPPORTED;
+#endif
 }
 
 // Unset
