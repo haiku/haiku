@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src build libbe app ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
+UsePrivateBuildHeaders app shared ;
 
 USES_BE_API on <libbe_build>app_kit.o = true ;
 

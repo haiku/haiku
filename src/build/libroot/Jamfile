@@ -8,7 +8,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
+UsePrivateBuildHeaders kernel ;
 
 {
 	local defines = [ FDefines

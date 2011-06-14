@@ -1,9 +1,6 @@
 SubDir HAIKU_TOP src build libbe storage ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private storage ] : true ;
+UsePrivateBuildHeaders app kernel shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 

@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src tools ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build private storage ] : true ;
+UsePrivateBuildHeaders app storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
 
