@@ -98,6 +98,8 @@ MemoryView::Draw(BRect rect)
 	if (fTargetBlock == NULL)
 		return;
 
+	char buffer[9];
+
 	int32 startLine = (int32)rect.top / fLineHeight;
 	int32 bytesPerLine = fNybblesPerLine / 2;
 	int32 startByte = bytesPerLine * startLine;
@@ -105,21 +107,21 @@ MemoryView::Draw(BRect rect)
 	target_addr_t maxAddress = fTargetBlock->BaseAddress()
 		+ fTargetBlock->Size();
 	BPoint drawPoint(1.0, rect.top);
-	BString tempData;
 	int32 currentBytesPerLine = bytesPerLine;
+
 	for (int32 i = startLine; drawPoint.y < rect.bottom
 		&& currentAddress < maxAddress; i++, drawPoint.y += fLineHeight) {
 		drawPoint.x = 1.0;
-		tempData.SetToFormat("%" B_PRIx32 "  ",
-			currentAddress);
-		DrawString(tempData.String(), drawPoint);
+		snprintf(buffer, sizeof(buffer), "%" B_PRIx32 "  ",
+			(uint32)currentAddress);
+		DrawString(buffer, drawPoint);
 		drawPoint.x += fCharWidth * 10;
 		if (currentAddress + bytesPerLine > maxAddress)
 			currentBytesPerLine = maxAddress - currentAddress;
 		for (int32 j = 0; j < currentBytesPerLine; j += 2) {
-			tempData.SetToFormat("%04" B_PRIx16 " ",
+			snprintf(buffer, sizeof(buffer), "%04" B_PRIx16 " ",
 				*((uint16*)&fTargetBlock->Data()[i * bytesPerLine + j]));
-			DrawString(tempData.String(), drawPoint);
+			DrawString(buffer, drawPoint);
 			drawPoint.x += fCharWidth * 5;
 		}
 		currentAddress += bytesPerLine;

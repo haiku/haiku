@@ -135,5 +135,4 @@ InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
 	fCurrentBlock = block;
 	fMemoryView->SetTargetAddress(block, fCurrentAddress);
-
 }
