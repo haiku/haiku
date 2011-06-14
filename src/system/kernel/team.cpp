@@ -1577,6 +1577,7 @@ static status_t
 team_create_thread_start(void* args)
 {
 	team_create_thread_start_internal(args);
+	team_init_exit_info_on_error(thread_get_current_thread()->team);
 	thread_exit();
 		// does not return
 	return B_OK;
@@ -3239,6 +3240,27 @@ team_set_job_control_state(Team* team, job_control_state newState,
 		childList->entries.Add(entry);
 		team->parent->dead_children.condition_variable.NotifyAll(
 			schedulerLocked);
+	}
+}
+
+
+/*!	Inits the given team's exit information, if not yet initialized, to some
+	generic "killed" status.
+	The caller must not hold the team's lock. Interrupts must be enabled.
+
+	\param team The team whose exit info shall be initialized.
+*/
+void
+team_init_exit_info_on_error(Team* team)
+{
+	TeamLocker teamLocker(team);
+
+	if (!team->exit.initialized) {
+		team->exit.reason = CLD_KILLED;
+		team->exit.signal = SIGKILL;
+		team->exit.signaling_user = geteuid();
+		team->exit.status = 0;
+		team->exit.initialized = true;
 	}
 }
 

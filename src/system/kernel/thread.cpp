@@ -721,6 +721,10 @@ common_thread_entry(void* _args)
 	if (args->enterUserland) {
 		enter_userspace(thread, (UserThreadEntryArguments*)args);
 			// only returns or error
+
+		// If that's the team's main thread, init the team exit info.
+		if (thread == thread->team->main_thread)
+			team_init_exit_info_on_error(thread->team);
 	}
 
 	// we're done
