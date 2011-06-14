@@ -230,7 +230,7 @@ static int
 dump_cache_info(int argc, char* argv[])
 {
 	if (argc < 2) {
-		kprintf("usage: cache_info [address]\n");
+		kprintf("usage: slab_cache [address]\n");
 		return 0;
 	}
 
