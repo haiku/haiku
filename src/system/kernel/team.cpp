@@ -1706,13 +1706,16 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	// Create a kernel thread, but under the context of the new team
 	// The new thread will take over ownership of teamArgs.
-	thread = thread_create_thread(
-		ThreadCreationAttributes(team_create_thread_start, threadName,
-			B_NORMAL_PRIORITY, teamArgs, teamID, mainThread),
-		false);
-	if (thread < 0) {
-		status = thread;
-		goto err5;
+	{
+		ThreadCreationAttributes threadAttributes(team_create_thread_start,
+			threadName, B_NORMAL_PRIORITY, teamArgs, teamID, mainThread);
+		threadAttributes.additional_stack_size = sizeof(user_space_program_args)
+			+ teamArgs->flat_args_size;
+		thread = thread_create_thread(threadAttributes, false);
+		if (thread < 0) {
+			status = thread;
+			goto err5;
+		}
 	}
 
 	// The team has been created successfully, so we keep the reference. Or
