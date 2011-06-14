@@ -41,6 +41,8 @@ typedef void (*smp_call_func)(uint32 data1, int32 currentCPU, uint32 data2, uint
 extern "C" {
 #endif
 
+bool try_acquire_spinlock(spinlock* lock);
+
 status_t smp_init(struct kernel_args *args);
 status_t smp_per_cpu_init(struct kernel_args *args, int32 cpu);
 status_t smp_init_post_generic_syscalls(void);
@@ -71,10 +73,18 @@ int smp_intercpu_int_handler(int32 cpu);
 // {acquire,release}_spinlock().
 #if !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
 
+
+static inline bool
+try_acquire_spinlock_inline(spinlock* lock)
+{
+	return atomic_or((int32*)lock, 1) == 0;
+}
+
+
 static inline void
 acquire_spinlock_inline(spinlock* lock)
 {
-	if (atomic_or((int32*)lock, 1) == 0)
+	if (try_acquire_spinlock_inline(lock))
 		return;
 	acquire_spinlock(lock);
 }
@@ -87,8 +97,9 @@ release_spinlock_inline(spinlock* lock)
 }
 
 
-#define acquire_spinlock(lock)	acquire_spinlock_inline(lock)
-#define release_spinlock(lock)	release_spinlock_inline(lock)
+#define try_acquire_spinlock(lock)	try_acquire_spinlock_inline(lock)
+#define acquire_spinlock(lock)		acquire_spinlock_inline(lock)
+#define release_spinlock(lock)		release_spinlock_inline(lock)
 
 #endif	// !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
 

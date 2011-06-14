@@ -41,6 +41,7 @@
 #endif
 
 
+#undef try_acquire_spinlock
 #undef acquire_spinlock
 #undef release_spinlock
 
@@ -289,6 +290,32 @@ process_all_pending_ici(int32 currentCPU)
 {
 	while (process_pending_ici(currentCPU) != B_ENTRY_NOT_FOUND)
 		;
+}
+
+
+bool
+try_acquire_spinlock(spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("try_acquire_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
+#endif
+
+#if B_DEBUG_SPINLOCK_CONTENTION
+	if (atomic_add(&lock->lock, 1) != 0)
+		return false;
+#else
+	if (atomic_or((int32*)lock, 1) != 0)
+		return false;
+
+#	if DEBUG_SPINLOCKS
+	push_lock_caller(arch_debug_get_caller(), lock);
+#	endif
+#endif
+
+	return true;
 }
 
 
