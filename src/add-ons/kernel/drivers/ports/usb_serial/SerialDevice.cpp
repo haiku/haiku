@@ -49,6 +49,8 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 		fInputThread(-1),
 		fStopThreads(false)
 {
+	memset(&fTTYConfig, 0, sizeof(termios));
+	fTTYConfig.c_cflag = B9600 | CS8 | CREAD;
 }
 
 
@@ -147,16 +149,29 @@ baud_index_to_speed(int index)
 void
 SerialDevice::SetModes(struct termios *tios)
 {
-	uint16 newControl = fControlOut;
 	TRACE_FUNCRES(trace_termios, tios);
 
-	int32 speed = baud_index_to_speed(tios->c_cflag & CBAUD);
-	if (speed < 0)
-		speed = baud_index_to_speed(tios->c_ispeed);
-	if (speed < 0)
-		speed = baud_index_to_speed(tios->c_ospeed);
-	if (speed < 0)
+	uint8 baud = tios->c_cflag & CBAUD;
+	int32 speed = baud_index_to_speed(baud);
+	if (speed < 0) {
+		baud = B19200;
 		speed = 19200;
+	}
+
+	// update our master config in full
+	memcpy(&fTTYConfig, tios, sizeof(termios));
+	fTTYConfig.c_cflag &= ~CBAUD;
+	fTTYConfig.c_cflag |= baud;
+
+	// only apply the relevant parts to the device side
+	termios config;
+	memset(&config, 0, sizeof(termios));
+	config.c_cflag = tios->c_cflag;
+	config.c_cflag &= ~CBAUD;
+	config.c_cflag |= baud;
+
+	// update the termios of the device side
+	gTTYModule->tty_control(fDeviceTTYCookie, TCSETA, &config, sizeof(termios));
 
 	usb_cdc_line_coding lineCoding;
 	lineCoding.speed = speed;
@@ -171,12 +186,6 @@ SerialDevice::SetModes(struct termios *tios)
 		lineCoding.parity = USB_CDC_LINE_CODING_NO_PARITY;
 
 	lineCoding.databits = (tios->c_cflag & CS8) ? 8 : 7;
-
-	if (fControlOut != newControl) {
-		fControlOut = newControl;
-		TRACE("newctrl send to modem: 0x%08x\n", newControl);
-		SetControlLineState(newControl);
-	}
 
 	if (memcmp(&lineCoding, &fLineCoding, sizeof(usb_cdc_line_coding)) != 0) {
 		fLineCoding.speed = lineCoding.speed;
@@ -325,6 +334,10 @@ SerialDevice::Open(uint32 flags)
 	if (status < B_OK)
 		TRACE_ALWAYS("failed to queue initial interrupt\n");
 
+	// set our config (will propagate to the slave config as well in SetModes()
+	gTTYModule->tty_control(fSystemTTYCookie, TCSETA, &fTTYConfig,
+		sizeof(termios));
+
 	fDeviceOpen = true;
 	return B_OK;
 }
@@ -400,9 +413,7 @@ SerialDevice::Control(uint32 op, void *arg, size_t length)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	gTTYModule->tty_control(fSystemTTYCookie, op, arg, length);
-	gTTYModule->tty_control(fDeviceTTYCookie, op, arg, length);
-	return B_OK;
+	return gTTYModule->tty_control(fSystemTTYCookie, op, arg, length);
 }
 
 
