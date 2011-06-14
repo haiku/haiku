@@ -40,6 +40,8 @@ private:
 	UserInterfaceListener*		fListener;
 	BTextControl*				fAddressInput;
 	MemoryView*					fMemoryView;
+	TeamMemoryBlock*			fCurrentBlock;
+	target_addr_t				fCurrentAddress;
 };
 
 #endif // INSPECTOR_WINDOW_H

@@ -9,49 +9,43 @@
 
 #include <View.h>
 
-#include "Team.h"
+#include "Types.h"
+
+
+class TeamMemoryBlock;
 
 
 class MemoryView : public BView {
 public:
-	class Listener;
-
-public:
-								MemoryView(
-									Team* team, Listener* listener);
+								MemoryView();
 	virtual						~MemoryView();
 
-	static MemoryView*			Create(Team* team, Listener* listener);
+	static MemoryView*			Create();
 									// throws
 
-			void				UnsetListener();
-
-			void				SetTargetAddress(target_addr_t address);
+			void				SetTargetAddress(TeamMemoryBlock* block,
+									target_addr_t address);
 
 			void				TargetAddressChanged(target_addr_t address);
 
+
 	virtual void				TargetedByScrollView(BScrollView* scrollView);
 
+	virtual	void				AttachedToWindow();
 	virtual void				Draw(BRect rect);
+	virtual void				FrameResized(float width, float height);
 	virtual void				MessageReceived(BMessage* message);
 
 private:
 	void						_Init();
+	void						_RecalcScrollBars();
 
 private:
-	Team*						fTeam;
+	TeamMemoryBlock*			fTargetBlock;
 	target_addr_t				fTargetAddress;
-	Listener*					fListener;
+	float						fCharWidth;
+	float						fLineHeight;
+	int32						fNybblesPerLine;
 };
-
-
-class MemoryView::Listener {
-public:
-	virtual						~Listener();
-
-	virtual void				SetTargetAddressRequested(
-									target_addr_t address) = 0;
-};
-
 
 #endif // MEMORY_VIEW_H

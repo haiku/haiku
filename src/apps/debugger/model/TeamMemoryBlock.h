@@ -39,6 +39,7 @@ public:
 			target_addr_t	BaseAddress() const 	{ return fBaseAddress; };
 			uint8*			Data() 					{ return fData; };
 			size_t			Size() const			{ return sizeof(fData); };
+			bool			Contains(target_addr_t address) const;
 
 			bool			IsWritable() const		{ return fWritable; }
 			void			SetWritable(bool writable);

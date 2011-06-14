@@ -68,8 +68,6 @@ private:
 									UserBreakpoint* breakpoint);
 	virtual void				InspectRequested(target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
-	virtual void				InspectRequested(const char* addressExpression,
-									TeamMemoryBlock::Listener* listener);
 	virtual	bool				UserInterfaceQuitRequested();
 
 	// JobListener
@@ -125,9 +123,6 @@ private:
 
 			void				_HandleInspectAddress(
 									target_addr_t address,
-									TeamMemoryBlock::Listener* listener);
-			void				_HandleInspectAddress(
-									const char* addressExpression,
 									TeamMemoryBlock::Listener* listener);
 
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);

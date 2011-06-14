@@ -77,6 +77,14 @@ TeamMemoryBlock::Invalidate()
 }
 
 
+bool
+TeamMemoryBlock::Contains(target_addr_t address) const
+{
+	return fValid && address >= fBaseAddress
+		&& address < (fBaseAddress + sizeof(fData));
+}
+
+
 void
 TeamMemoryBlock::SetWritable(bool writable)
 {

@@ -14,7 +14,6 @@
 
 #include <Message.h>
 
-#include <ExpressionParser.h>
 #include <AutoLocker.h>
 
 #include "debug_utils.h"
@@ -468,12 +467,8 @@ TeamDebugger::MessageReceived(BMessage* message)
 				break;
 			}
 
-			const char* addressExpression;
 			target_addr_t address;
-			if (message->FindString("addressExpression",
-				&addressExpression)	== B_OK) {
-				_HandleInspectAddress(addressExpression, listener);
-			} else if (message->FindUInt64("address",
+			if (message->FindUInt64("address",
 				&address) == B_OK) {
 				_HandleInspectAddress(address, listener);
 			}
@@ -692,17 +687,6 @@ TeamDebugger::ClearBreakpointRequested(UserBreakpoint* breakpoint)
 		&& PostMessage(&message) == B_OK) {
 		breakpointReference.Detach();
 	}
-}
-
-
-void
-TeamDebugger::InspectRequested(const char* addressExpression,
-	TeamMemoryBlock::Listener *listener)
-{
-	BMessage message(MSG_INSPECT_ADDRESS);
-	message.AddString("addressExpression", addressExpression);
-	message.AddPointer("listener", listener);
-	PostMessage(&message);
 }
 
 
@@ -1301,36 +1285,11 @@ TeamDebugger::_HandleClearUserBreakpoint(UserBreakpoint* breakpoint)
 
 
 void
-TeamDebugger::_HandleInspectAddress(const char* addressExpression,
-	TeamMemoryBlock::Listener* listener)
-{
-	TRACE_CONTROL("TeamDebugger::_HandleInspectAddress(%s, %p)\n",
-		addressExpression, listener);
-
-	ExpressionParser parser;
-	parser.SetSupportHexInput(true);
-	target_addr_t address = 0LL;
-	try {
-		address = parser.EvaluateToInt64(addressExpression);
-	} catch(ParseException parseError) {
-		_NotifyUser("Inspect Address", "Failed to parse address: %s",
-			parseError.message.String());
-		return;
-	} catch(...) {
-		_NotifyUser("Inspect Address", "Unknown error while parsing address");
-		return;
-	}
-
-	_HandleInspectAddress(address, listener);
-}
-
-
-void
 TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	TeamMemoryBlock::Listener* listener)
 {
 	TRACE_CONTROL("TeamDebugger::_HandleInspectAddress(" B_PRIx64 ", %p)\n",
-		addressExpression, listener);
+		address, listener);
 
 	TeamMemoryBlock* memoryBlock = fMemoryBlockManager
 		->GetMemoryBlock(address);

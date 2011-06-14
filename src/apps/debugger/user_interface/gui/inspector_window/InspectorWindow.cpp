@@ -5,13 +5,16 @@
 
 #include "InspectorWindow.h"
 
+#include <stdio.h>
+
+#include <Alert.h>
 #include <Application.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
 #include <TextControl.h>
 
-#include <stdio.h>
+#include <ExpressionParser.h>
 
 #include "MemoryView.h"
 #include "MessageCodes.h"
@@ -20,9 +23,11 @@
 
 InspectorWindow::InspectorWindow(UserInterfaceListener* listener)
 	:
-	BWindow(BRect(100, 100, 500, 250), "Inspector", B_DOCUMENT_WINDOW,
+	BWindow(BRect(100, 100, 500, 250), "Inspector", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
-	fListener(listener)
+	fListener(listener),
+	fMemoryView(NULL),
+	fCurrentBlock(NULL)
 {
 }
 
@@ -51,12 +56,17 @@ InspectorWindow::Create(UserInterfaceListener* listener)
 void
 InspectorWindow::_Init()
 {
+	BScrollView* scrollView;
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fAddressInput = new BTextControl("addrInput",
 			"Target Address:", "",
 			new BMessage(MSG_INSPECT_ADDRESS)))
-		.Add(fMemoryView = new MemoryView(NULL, NULL))
+		.Add(scrollView = new BScrollView("memory scroll",
+			NULL, 0, false, true), 3.0f)
 	.End();
+
+	scrollView->SetTarget(fMemoryView = MemoryView::Create());
 
 	fAddressInput->SetTarget(this);
 }
@@ -69,8 +79,43 @@ InspectorWindow::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case MSG_INSPECT_ADDRESS:
 		{
+			ExpressionParser parser;
+			parser.SetSupportHexInput(true);
+			target_addr_t address = 0;
 			const char* addressExpression = fAddressInput->Text();
-			fListener->InspectRequested(addressExpression, this);
+			BString errorMessage;
+			try {
+				address = parser.EvaluateToInt64(addressExpression);
+			} catch(ParseException parseError) {
+				errorMessage.SetToFormat("Failed to parse address: %s",
+					parseError.message.String());
+			} catch(...) {
+				errorMessage.SetToFormat(
+					"Unknown error while parsing address");
+			}
+
+			if (errorMessage.Length() > 0) {
+				BAlert* alert = new(std::nothrow) BAlert("Inspect Address",
+					errorMessage.String(), "Close");
+				if (alert != NULL)
+					alert->Go();
+			} else {
+				if (fCurrentBlock != NULL
+					&& !fCurrentBlock->Contains(address)) {
+					fCurrentBlock->ReleaseReference();
+					fCurrentBlock = NULL;
+				}
+
+				if (fCurrentBlock == NULL)
+					fListener->InspectRequested(address, this);
+				else
+					fMemoryView->SetTargetAddress(fCurrentBlock, address);
+
+				fCurrentAddress = address;
+				BString computedAddress;
+				computedAddress.SetToFormat("0x%" B_PRIx64, address);
+				fAddressInput->SetText(computedAddress.String());
+			}
 			break;
 		}
 	}
@@ -88,5 +133,7 @@ InspectorWindow::QuitRequested()
 void
 InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	// TODO: implement
+	fCurrentBlock = block;
+	fMemoryView->SetTargetAddress(block, fCurrentAddress);
+
 }
