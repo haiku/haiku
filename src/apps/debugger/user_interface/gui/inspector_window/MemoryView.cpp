@@ -98,33 +98,36 @@ MemoryView::Draw(BRect rect)
 	if (fTargetBlock == NULL)
 		return;
 
-	char buffer[32];
+	char buffer[16];
 
-	int32 startLine = (int32)rect.top / fLineHeight;
-	int32 bytesPerLine = fNybblesPerLine / 2;
-	int32 startByte = bytesPerLine * startLine;
-	target_addr_t currentAddress = fTargetBlock->BaseAddress() + startByte;
-	target_addr_t maxAddress = fTargetBlock->BaseAddress()
-		+ fTargetBlock->Size();
-	BPoint drawPoint(1.0, rect.top);
-	int32 currentBytesPerLine = bytesPerLine;
+	int32 startLine = rect.top / fLineHeight;
+	int32 endLine = rect.bottom / fLineHeight + 1;
+	int32 startByte = fNybblesPerLine / 2 * startLine;
+	uint16* currentAddress = (uint16*)(fTargetBlock->BaseAddress()
+		+ startByte);
+	uint16* maxAddress = (uint16*)(fTargetBlock->BaseAddress()
+		+ fTargetBlock->Size());
+	BPoint drawPoint(1.0, startLine * fLineHeight);
+	int32 currentWordsPerLine = fNybblesPerLine / 4;
 
-	for (int32 i = startLine; drawPoint.y < rect.bottom
-		&& currentAddress < maxAddress; i++, drawPoint.y += fLineHeight) {
+	for (int32 i = startLine; i <= endLine && currentAddress < maxAddress;
+		i++, drawPoint.y += fLineHeight) {
 		drawPoint.x = 1.0;
-		snprintf(buffer, sizeof(buffer), "%" B_PRIx32 "  ",
+		snprintf(buffer, sizeof(buffer), "%" B_PRIx32,
 			(uint32)currentAddress);
 		DrawString(buffer, drawPoint);
 		drawPoint.x += fCharWidth * 10;
-		if (currentAddress + bytesPerLine > maxAddress)
-			currentBytesPerLine = maxAddress - currentAddress;
-		for (int32 j = 0; j < currentBytesPerLine; j += 2) {
-			snprintf(buffer, sizeof(buffer), "%04" B_PRIx16 " ",
-				*((uint16*)&fTargetBlock->Data()[i * bytesPerLine + j]));
+
+		if (currentAddress + currentWordsPerLine > maxAddress)
+			currentWordsPerLine = (maxAddress - currentAddress) / 2;
+
+		for (int32 j = 0; j < currentWordsPerLine; j++) {
+			snprintf(buffer, sizeof(buffer), "%04" B_PRIx16,
+				currentAddress[j]);
 			DrawString(buffer, drawPoint);
 			drawPoint.x += fCharWidth * 5;
 		}
-		currentAddress += bytesPerLine;
+		currentAddress += currentWordsPerLine;
 	}
 }
 
@@ -176,7 +179,7 @@ MemoryView::_RecalcScrollBars()
 		// line plus some spacing to separate that from the data
 		fNybblesPerLine -= 10;
 		// also allocate a space between each 16-bit grouping
-		fNybblesPerLine -= (fNybblesPerLine / 4);
+		fNybblesPerLine -= (fNybblesPerLine / 4) - 1;
 		fNybblesPerLine &= ~3;
 		int32 lineCount = ceil(2 * fTargetBlock->Size() / fNybblesPerLine);
 		float totalHeight = lineCount * fLineHeight;
