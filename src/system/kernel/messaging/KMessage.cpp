@@ -53,7 +53,7 @@ _Align(int32 offset)
 static inline void*
 _Align(void* address, int32 offset = 0)
 {
-	return (void*)(((uint32)address + offset + 3) & ~0x3);
+	return (void*)(((addr_t)address + offset + 3) & ~0x3);
 }
 
 
