@@ -114,7 +114,7 @@ EthernetSettingsView::EthernetSettingsView()
 	rootLayout->SetSpacing(inset);
 	layout->SetSpacing(inset, inset);
 
-	BPopUpMenu* deviceMenu = new BPopUpMenu("devices");
+	BPopUpMenu* deviceMenu = new BPopUpMenu("<No adapter>");
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
 		BString& name = *fInterfaces.ItemAt(i);
 		BString label = name;
@@ -235,9 +235,8 @@ EthernetSettingsView::AttachedToWindow()
 	fNetworkMenuField->Menu()->SetTargetForItems(this);
 	fTypeMenuField->Menu()->SetTargetForItems(this);
 
-	// display settigs of first adapter on startup
-	if (fSettings.ItemAt(0))
-		_ShowConfiguration(fSettings.ItemAt(0));
+	// Display settigs of first adapter on startup, if any
+	_ShowConfiguration(fSettings.ItemAt(0));
 }
 
 
@@ -331,10 +330,33 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	fSecondaryDNSTextControl->SetText("");
 	fDomainTextControl->SetText("");
 
+	fDeviceMenuField->SetEnabled(settings != NULL);
+	fTypeMenuField->SetEnabled(settings != NULL);
+
+	bool enableControls = false;
+	BMenuItem* item;
+
+	if (settings == NULL || settings->IsDisabled())
+		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
+	else if (settings->AutoConfigure())
+		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("DHCP"));
+	else {
+		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Static"));
+		enableControls = true;
+	}
+	if (item != NULL)
+		item->SetMarked(true);
+
+	if (settings == NULL) {
+		if (!fNetworkMenuField->IsHidden(fNetworkMenuField))
+			fNetworkMenuField->Hide();
+		_EnableTextControls(false);
+		return;
+	}
+
 	// Show/hide networks menu
 	BNetworkDevice device(settings->Name());
-	if (fNetworkMenuField->IsHidden(fNetworkMenuField)
-		&& device.IsWireless()) {
+	if (fNetworkMenuField->IsHidden(fNetworkMenuField) && device.IsWireless()) {
 		fNetworkMenuField->Show();
 		Window()->InvalidateLayout();
 	} else if (!fNetworkMenuField->IsHidden(fNetworkMenuField)
@@ -381,29 +403,13 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		menu->SetTargetForItems(this);
 	}
 
-	bool enableControls = false;
-	fTypeMenuField->SetEnabled(settings != NULL);
-
-	BMenuItem* item = fDeviceMenuField->Menu()->FindItem(settings->Name());
-	if (item)
+	item = fDeviceMenuField->Menu()->FindItem(settings->Name());
+	if (item != NULL)
 		item->SetMarked(true);
 
 	fIPTextControl->SetText(settings->IP());
 	fGatewayTextControl->SetText(settings->Gateway());
 	fNetMaskTextControl->SetText(settings->Netmask());
-
-	enableControls = false;
-
-	if (settings->IsDisabled())
-		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
-	else if (settings->AutoConfigure())
-		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("DHCP"));
-	else {
-		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Static"));
-		enableControls = true;
-	}
-	if (item)
-		item->SetMarked(true);
 
 	if (settings->NameServers().CountItems() >= 2) {
 		fSecondaryDNSTextControl->SetText(
