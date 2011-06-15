@@ -228,6 +228,7 @@ extern const char* __haiku_firmware_name_map[][2];
 
 #define DRIVER_MODULE(name, busname, driver, devclass, evh, arg) \
 	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver); \
-	devclass_t *__class_ ## busname ## _ ## devclass = &(devclass)
+	devclass_t *__class_ ## name ## _ ## busname ## _ ## devclass = &(devclass)
+
 
 #endif	/* _FBSD_COMPAT_SYS_HAIKU_MODULE_H_ */
