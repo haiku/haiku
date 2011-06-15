@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku Inc. All rights reserved.
+ * Copyright 2005-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2632,12 +2632,15 @@ BMessage::FindString(const char *name, int32 index, BString *string) const
 	if (string == NULL)
 		return B_BAD_VALUE;
 
-	const char *cstr;
-	status_t error = FindString(name, index, &cstr);
-	if (error < B_OK)
+	const char *value;
+	status_t error = FindString(name, index, &value);
+	if (error != B_OK) {
+		// Find*() clobbers the object even on failure
+		string->Truncate(0);
 		return error;
+	}
 
-	*string = cstr;
+	*string = value;
 	return B_OK;
 }
 
