@@ -89,5 +89,8 @@ AddOnMonitor::SetHandler(AddOnMonitorHandler* handler)
 		return;
 	}
 
+	// Send an initial message to process added directories immediately
+	messenger.SendMessage(&pulseMessage);
+
 	fInitCheck = B_OK;
 }
