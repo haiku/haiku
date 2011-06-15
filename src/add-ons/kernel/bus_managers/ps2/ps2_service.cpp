@@ -8,33 +8,36 @@
  *		Marcus Overhagen (marcus@overhagen.de)
  */
 
+
 #include "ps2_service.h"
+
 #include "packet_buffer.h"
 
-#define DEBUG_PUBLISHING
 
+#define DEBUG_PUBLISHING
 #ifdef DEBUG_PUBLISHING
-  #include <debug.h>
-  #include <stdlib.h>
+#	include <stdlib.h>
+#	include <debug.h>
 #endif
+
+
+typedef struct {
+	uint32		id;
+	ps2_dev *	dev;
+} ps2_service_cmd;
+
+enum {
+	PS2_SERVICE_NOTIFY_DEVICE_ADDED = 1,
+	PS2_SERVICE_NOTIFY_DEVICE_REPUBLISH,
+	PS2_SERVICE_NOTIFY_DEVICE_REMOVED,
+};
+
 
 static sem_id			sServiceSem;
 static thread_id		sServiceThread;
 static volatile bool	sServiceTerminate;
 static packet_buffer *  sServiceCmdBuffer;
 
-typedef struct
-{
-	uint32		id;
-	ps2_dev *	dev;
-} ps2_service_cmd;
-
-enum
-{
-	PS2_SERVICE_NOTIFY_DEVICE_ADDED = 1,
-	PS2_SERVICE_NOTIFY_DEVICE_REPUBLISH,
-	PS2_SERVICE_NOTIFY_DEVICE_REMOVED,
-};
 
 void
 ps2_service_notify_device_added(ps2_dev *dev)
@@ -104,7 +107,6 @@ ps2_service_thread(void *arg)
 			packet_buffer_read(sServiceCmdBuffer, (uint8 *)&cmd, sizeof(cmd));
 			switch (cmd.id) {
 				case PS2_SERVICE_NOTIFY_DEVICE_ADDED:
-					snooze(1000000); // for better testing of possible input server race condition
 					TRACE("ps2: PS2_SERVICE_NOTIFY_DEVICE_ADDED %s\n", cmd.dev->name);
 					ps2_dev_publish(cmd.dev);
 					break;
@@ -112,7 +114,7 @@ ps2_service_thread(void *arg)
 				case PS2_SERVICE_NOTIFY_DEVICE_REPUBLISH:
 					TRACE("ps2: PS2_SERVICE_NOTIFY_DEVICE_REPUBLISH %s\n", cmd.dev->name);
 					ps2_dev_unpublish(cmd.dev);
-					snooze(2500000);
+					snooze(1500000);
 					ps2_dev_publish(cmd.dev);
 					break;
 
