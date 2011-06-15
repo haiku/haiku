@@ -63,7 +63,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Установка приложений</a></h2>
 <p>Приложения для Haiku всегда поставляются в архиве. В большинстве случаев это ZIP-архивы, однако некоторые старые BeOS приложения поставляются в формате Software Valet PKG. Software Valet позволял автоматически выполнять сценарии установки, вам нужно было лишь дважды щелкнуть по пакету и выбрать, куда произвести установку и больше ни о чем не заботиться.<br />
-Если это ZIP-архив, двойной щелчок мыши запустит <span class="app">Expander</span>, где вы также выбираете куда распаковать и распаковываете согласно рекомендациям в теме <a href="filesystem-layout.html">иерархия файловой системы</a>.</p>
+Если это ZIP-архив, двойной щелчок мыши запустит <span class="app">Распаковщик</span>, где вы также выбираете куда распаковать и распаковываете согласно рекомендациям в теме <a href="filesystem-layout.html">иерархия файловой системы</a>.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>для приложений доступных для всех пользователей.</td></tr>
 <tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>для приложений доступных только для вас.</td></tr>
@@ -73,7 +73,7 @@
 <p>После установки некоторые приложения требуют последующей настройки. Например, <a href="tracker-add-ons.html">дополнения для Tracker</a>, <a href="preferences/datatranslations.html">трансляторы</a> или другие компоненты, расширяющие возможности системы. В одном случае вы найдете небольшой файл-сценарий (обычно имеющий расширение <span class="cli">.sh</span>), типа <span class="cli">install</span>, который нужно просто запустить двойным щелчком мыши .<br />
 В другом - папки, которые ссылаются на нужное место назначения. Они обычно называются "<span class="cli">drag [filename] here...</span>". Таким образом, просто следуя этим инструкциям, вы сможете все успешно настроить.</p>
 <p>Однако в большинстве случаев от вас кроме распаковки архива ничего не потребуется.<br />
-В темах <a href="deskbar.html">Deskbar - панель задачи</a> и <a href="desktop-applets/launchbox.html">LaunchBox</a>  описано, как добавить значок для новых приложений.</p>
+В темах <a href="deskbar.html">Deskbar - панель задачи</a> и <a href="desktop-applets/launchbox.html">LaunchBox - Панель запуска</a>  описано, как добавить значок для новых приложений.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -88,55 +88,55 @@
 <a id="list-of-apps" name="list-of-apps">Haiku-приложения</a></h2>
 <p>Haiku поставляется с небольшим набором необходимых приложений. Вы можете найти их по адресу <span class="path">/boot/system/apps/</span> или <span class="path">/boot/common/apps/</span>. Приложения, которые обычно не запускаются по двойному щелчку по файлу (например, ShowImage для просмотра изображений) могут быть найдены в меню <span class="menu">Приложения (Applications)</span> панели Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">Монитор активности</a></td><td style="width:10px;"> </td>
 		<td valign="top">Приложение для отслеживания системных ресурсов, например использование ЦП и оперативной памяти.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CD плеер</a></td><td> </td>
 		<td valign="top">Проигрыватель CD-дисков.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">Карта символов</a></td><td> </td>
 		<td valign="top">Приложение, отображающее карту Unicode-символов.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">Вебкамера</a></td><td> </td>
 		<td valign="top">Приложение для работы с веб-камерой, позволяющее загружать изображения на сервер.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">Калькулятор</a></td><td> </td>
 		<td valign="top">Калькулятор.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">Редактор диска</a></td><td> </td>
 		<td valign="top">HEX-редактор файлов и устройств.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">DiskUsage</a></td><td> </td>
-		<td valign="top">Приложение для визуализации израсходованного и свободного места на диске.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">Использование диска</a></td><td> </td>
+		<td valign="top">Приложение для визуализации занятого и свободного места на диске.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">Разметка диска</a></td><td> </td>
 		<td valign="top">Приложение для работы с разделами жесткого диска.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Распаковщик</a></td><td> </td>
 		<td valign="top">Приложение для распаковки архивов.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Икономатик</a></td><td> </td>
 		<td valign="top">Приложениe для создания векторных иконок Haiku.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
-		<td valign="top">Приложение для установки Haiku на раздел.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Установщик</a></td><td> </td>
+		<td valign="top">Приложение для установки Haiku.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Увеличитель</a></td><td> </td>
 		<td valign="top">Приложение для увеличения области вокруг указателя мыши (аналог экранной лупы в Windows).</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Почта</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Email-клиент. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">Медиаплеер</a></td><td> </td>
 		<td valign="top">Медиа-проигрыватель для аудио и видео файлов.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MIDI плеер</a></td><td> </td>
 		<td valign="top">Проигрыватель MIDI-файлов.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">Установщик пакетов</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Установщик BeOS пакетов в формате PKG. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">Контакты</a></td><td> </td>
 		<td valign="top">Менеджер контактов.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">Вебсервер</a></td><td> </td>
 		<td valign="top">Небольшой веб-сервер.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Снимок экрана</a></td><td> </td>
 		<td valign="top">Приложение для снятия изображений рабочего стола.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">Просмотр изображений</a></td><td> </td>
 		<td valign="top">Позволяет просматривать изображения.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">Звукозапись</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Приложения для записи звук через микрофон. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
 		<td valign="top">Небольшой редактор текста.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Терминал</a></td><td> </td>
 		<td valign="top">Командная строка, предоставляющая доступ к bash.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
-		<td valign="top">Приложение для поиска текстовых файлов.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">Текстовый поиск</a></td><td> </td>
+		<td valign="top">Приложение для поиска текста в файлах.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">Телевидение</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Приложения для просмотра аналогового ТВ. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
 		<td valign="top">Родной браузер, написанный под Haiku.</td></tr>
@@ -161,7 +161,7 @@
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
 		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
-		<td valign="top">Расширенный редактор кода с подсветкой синтаксиса и многим другим.</td></tr>
+		<td valign="top">Продвинутый редактор кода с подсветкой синтаксиса и многим другим.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
 		<td valign="top"><acronym title="Internet Relay Chat">IRC</acronym>-клиент.</td></tr>
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="276"><a href="applications/vlc.html">VLC media player</a></td><td> </td>

@@ -534,8 +534,10 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 
 		// Create menu and items
 		BPartition* parentPartition = NULL;
-		if (selectedPartition <= -2)
+		if (selectedPartition <= -2) {
+			// a partitionable space item is selected
 			parentPartition = disk->FindDescendant(parentID);
+		}
 
 		if (parentPartition && parentPartition->ContainsPartitioningSystem())
 			fCreateMI->SetEnabled(true);
@@ -545,8 +547,6 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fDeleteMI->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
-		if (partition == NULL)
-			partition = disk;
 
 		BDiskSystem diskSystem;
 		fDDRoster.RewindDiskSystems();
@@ -569,20 +569,17 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			BMenuItem* item = new BMenuItem(label.String(), message);
 
 // TODO: Very unintuitive that we have to use the pretty name here!
-//			item->SetEnabled(partition->CanInitialize(diskSystem.Name()));
-			item->SetEnabled(partition->CanInitialize(diskSystem.PrettyName()));
+			item->SetEnabled(partition != NULL
+//				&& partition->CanInitialize(diskSystem.Name()));
+				&& partition->CanInitialize(diskSystem.PrettyName()));
 			fInitMenu->AddItem(item);
 		}
 
 		// Mount items
 		if (partition) {
-			BDiskSystem partitionDiskSystem;
-			partition->GetDiskSystem(&partitionDiskSystem);
 			fInitMenu->SetEnabled(!partition->IsMounted()
 				&& !partition->IsReadOnly()
-				&& partition->Device()->HasMedia()
-				// Check if the current disk system allows initialzation.
-				&& partition->CanInitialize(partitionDiskSystem.PrettyName()));
+				&& partition->Device()->HasMedia());
 
 			fDeleteMI->SetEnabled(!partition->IsMounted()
 				&& !partition->IsDevice());
@@ -604,6 +601,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		} else {
 			fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(false);
+			fInitMenu->SetEnabled(false);
 		}
 
 		if (prepared)
