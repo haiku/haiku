@@ -32,8 +32,13 @@ waitpid(pid_t pid, int* _status, int options)
 
 	pthread_testcancel();
 
-	if (child < 0)
+	if (child < 0) {
+		// When not getting a child status when WNOHANG was specified, don't
+		// fail.
+		if (child == B_WOULD_BLOCK && (options & WNOHANG) != 0)
+			return 0;
 		RETURN_AND_SET_ERRNO(child);
+	}
 
 	// prepare the status
 	if (_status != NULL) {
