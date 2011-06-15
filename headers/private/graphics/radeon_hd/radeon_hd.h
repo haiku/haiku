@@ -37,6 +37,11 @@
 #define EDID_BOOT_INFO "vesa_edid/v1"
 #define MODES_BOOT_INFO "vesa_modes/v1"
 
+#define RHD_POWER_ON       0
+#define RHD_POWER_RESET    1   /* off temporarily */
+#define RHD_POWER_SHUTDOWN 2   /* long term shutdown */
+#define RHD_POWER_UNKNOWN  3   /* initial state */
+
 
 // info about PLL on graphics card
 struct pll_info {
