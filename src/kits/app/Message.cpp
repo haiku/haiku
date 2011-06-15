@@ -2634,14 +2634,10 @@ BMessage::FindString(const char *name, int32 index, BString *string) const
 
 	const char *value;
 	status_t error = FindString(name, index, &value);
-	if (error != B_OK) {
-		// Find*() clobbers the object even on failure
-		string->Truncate(0);
-		return error;
-	}
 
-	*string = value;
-	return B_OK;
+	// Find*() clobbers the object even on failure
+	string->SetTo(value);
+	return error;
 }
 
 
