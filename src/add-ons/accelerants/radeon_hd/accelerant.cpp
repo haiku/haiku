@@ -34,6 +34,7 @@ extern "C" void _sPrintf(const char *format, ...);
 
 struct accelerant_info *gInfo;
 struct register_info *gRegister;
+crt_info *gCRT[MAX_CRT];
 
 
 class AreaCloner {
@@ -100,8 +101,17 @@ init_common(int device, bool isClone)
 	if (gInfo == NULL || gRegister == NULL)
 		return B_NO_MEMORY;
 
+	for (uint32 id = 0; id < MAX_CRT; id++) {
+		gCRT[id] = (crt_info *)malloc(sizeof(crt_info));
+		if (gCRT[id] == NULL)
+			return B_NO_MEMORY;
+	}
+
 	memset(gInfo, 0, sizeof(accelerant_info));
 	memset(gRegister, 0, sizeof(register_info));
+
+	for (uint32 id = 0; id < MAX_CRT; id++)
+		memset(gCRT[id], 0, sizeof(crt_info));
 
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
@@ -167,6 +177,9 @@ uninit_common(void)
 
 	free(gInfo);
 	free(gRegister);
+
+	for (uint32 id = 0; id < MAX_CRT; id++)
+		free(gCRT[id]);
 }
 
 
@@ -177,7 +190,7 @@ init_registers(uint8 crtid)
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	if (info.device_chipset >= RADEON_R800) {
-		uint16_t offset = 0;
+		uint32 offset = 0;
 
 		// AMD Eyefinity on Evergreen GPUs
 		if (crtid == 1) {

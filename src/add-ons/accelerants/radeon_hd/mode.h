@@ -21,7 +21,10 @@
 #define FMT1_REG_OFFSET 0x0000
 #define FMT2_REG_OFFSET 0x800
 
+#define OVERSCAN 8
+	// default overscan? Applied to all sides
 
+status_t detect_crt_ranges();
 status_t create_mode_list(void);
 bool is_mode_supported(display_mode* mode);
 status_t is_mode_sane(display_mode *mode);

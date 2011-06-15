@@ -134,7 +134,6 @@ PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 status_t
 PLLPower(uint8 pllIndex, int command)
 {
-
 	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
 
 	bool hasDccg = DCCGCLKAvailable(pllIndex);
@@ -179,6 +178,8 @@ PLLPower(uint8 pllIndex, int command)
 		default:
 			TRACE("%s: PLL Power Shutdown\n", __func__);
 
+			radeon_shared_info &info = *gInfo->shared_info;
+
 			if (hasDccg)
 				DCCGCLKSet(pllIndex, RV620_DCCGCLK_RELEASE);
 
@@ -186,20 +187,22 @@ PLLPower(uint8 pllIndex, int command)
 				// Reset
 			snooze(2);
 
-			// Sometimes we have to keep an unused PLL running. Xorg Bug #18016
-			if ((Read32(PLL, RV620_EXT1_DIFF_POST_DIV_CNTL)
-				& RV62_EXT1_DIFF_DRIVER_ENABLE) == 0) {
-				Write32Mask(PLL, pllControlReg, 0x02, 0x02);
-					// Power Down
-			} else {
-				TRACE("%s: PHYA differential clock driver not disabled\n",
-					__func__);
+			if (info.device_chipset >= (RADEON_R600 | 0x20)) {
+				// Sometimes we have to keep an unused PLL running. X Bug #18016
+				if ((Read32(PLL, RV620_EXT1_DIFF_POST_DIV_CNTL)
+					& RV62_EXT1_DIFF_DRIVER_ENABLE) == 0) {
+					Write32Mask(PLL, pllControlReg, 0x02, 0x02);
+						// Power Down
+				} else {
+					TRACE("%s: PHYA differential clock driver not disabled\n",
+						__func__);
+				}
+
+				snooze(200);
+
+				Write32Mask(PLL, pllControlReg,  0x2000, 0x2000);
+					// Reset anti-glitch?
 			}
-
-			snooze(200);
-
-			Write32Mask(PLL, pllControlReg,  0x2000, 0x2000);
-				// Reset anti-glitch?
 	}
 
 	return B_OK;
@@ -209,21 +212,120 @@ PLLPower(uint8 pllIndex, int command)
 status_t
 PLLSet(uint8 pllIndex, uint32 pixelClock)
 {
-
-	TRACE("%s: enter to set pixel clock %d\n", __func__,
-		(int)pixelClock);
-
 	radeon_shared_info &info = *gInfo->shared_info;
-
-	bool hasDccg = DCCGCLKAvailable(pllIndex);
-
-	TRACE("%s: card has DCCG = %c\n", __func__, hasDccg ? 'y' : 'n');
 
 	uint16 reference = 0;
 	uint16 feedback = 0;
 	uint16 post = 0;
 
 	PLLCalculate(pixelClock, &reference, &feedback, &post);
+
+	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
+		TRACE("%s : setting pixel clock %d on r620+\n", __func__,
+			(int)pixelClock);
+		PLLSetLowR620(pllIndex, pixelClock, reference,
+			feedback, post);
+	} else if (info.device_chipset < (RADEON_R600 | 0x20)) {
+		TRACE("%s : setting pixel clock %d on r600-r610\n", __func__,
+			(int)pixelClock);
+		PLLSetLowLegacy(pllIndex, pixelClock, reference,
+			feedback, post);
+	}
+
+	return B_OK;
+}
+
+
+void
+PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
+	uint16 feedback, uint16 post)
+{
+	uint32 feedbackTemp = feedback << 16;
+	uint32 referenceTemp = reference;
+
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset == RADEON_R600)
+		feedbackTemp |= 0x00000030;
+	else if (info.device_chipset > RADEON_R600) {
+		if (feedback <= 0x24)
+			feedbackTemp |= 0x00000030;
+		else if (feedback <= 0x3F)
+			feedbackTemp |= 0x00000020;
+	} else
+		feedbackTemp |= Read32(PLL, EXT1_PPLL_FB_DIV) & 0x00000030;
+
+	uint32 postTemp = Read32(PLL, EXT1_PPLL_POST_DIV) & ~0x0000007F;
+	postTemp |= post & 0x0000007F;
+
+	uint32 control;
+	if (info.device_chipset == RADEON_R600)
+		control = 0x01130704;
+	else
+		PLLControlTable(RV610PLLControl, feedback);
+
+	if (!control)
+		control = Read32(PLL, EXT1_PPLL_CNTL);
+
+	Write32Mask(PLL, P1PLL_INT_SS_CNTL, 0, 0x00000001);
+		// Disable Spread Spectrum
+
+	Write32(PLL, EXT1_PPLL_REF_DIV_SRC, 0x01); /* XTAL */
+	Write32(PLL, EXT1_PPLL_POST_DIV_SRC, 0x00); /* source = reference */
+
+	Write32(PLL, EXT1_PPLL_UPDATE_LOCK, 0x01); /* lock */
+
+	Write32(PLL, EXT1_PPLL_REF_DIV, referenceTemp);
+	Write32(PLL, EXT1_PPLL_FB_DIV, feedbackTemp);
+	Write32(PLL, EXT1_PPLL_POST_DIV, postTemp);
+	Write32(PLL, EXT1_PPLL_CNTL, control);
+
+	Write32Mask(PLL, EXT1_PPLL_UPDATE_CNTL, 0x00010000, 0x00010000);
+		// No autoreset
+	Write32Mask(PLL, P1PLL_CNTL, 0, 0x04);
+		// Don't bypass calibration
+
+	/* We need to reset the anti glitch logic */
+	Write32Mask(PLL, P1PLL_CNTL, 0, 0x00000002);
+		// Power up
+
+	/* reset anti glitch logic */
+	Write32Mask(PLL, P1PLL_CNTL, 0x00002000, 0x00002000);
+	snooze(2);
+	Write32Mask(PLL, P1PLL_CNTL, 0, 0x00002000);
+
+	/* powerdown and reset */
+	Write32Mask(PLL, P1PLL_CNTL, 0x00000003, 0x00000003);
+	snooze(2);
+
+	Write32(PLL, EXT1_PPLL_UPDATE_LOCK, 0);
+		// Unlock
+	Write32Mask(PLL, EXT1_PPLL_UPDATE_CNTL, 0, 0x01);
+		// Done updating
+
+	Write32Mask(PLL, P1PLL_CNTL, 0, 0x02);
+		// Power up PLL
+	snooze(2);
+
+	PLLCalibrate(pllIndex);
+
+	Write32(PLL, EXT1_PPLL_POST_DIV_SRC, 0x01);
+		// Set source as PLL
+
+	// TODO : If CRT2 ah-la R500PLLCRTCGrab
+	PLLCRTCGrab(pllIndex, false);
+}
+
+
+void
+PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
+	uint16 feedback, uint16 post)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	bool hasDccg = DCCGCLKAvailable(pllIndex);
+
+	TRACE("%s: card has DCCG = %c\n", __func__, hasDccg ? 'y' : 'n');
 
 	if (hasDccg)
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_RESET);
@@ -259,7 +361,8 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 	postDivider |= post & 0x0000007F;
 
 	uint32 control;
-	if (info.device_chipset >= (RADEON_R600 & 0x70))
+
+	if (info.device_chipset >= (RADEON_R600 | 0x70))
 		control = PLLControlTable(RV670PLLControl, feedback);
 	else
 		control = PLLControlTable(RV610PLLControl, feedback);
@@ -324,14 +427,12 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_GRAB);
 
 	TRACE("%s: PLLSet exit\n", __func__);
-	return B_OK;
 }
 
 
 status_t
 PLLCalibrate(uint8 pllIndex)
 {
-
 	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
 
 	Write32Mask(PLL, pllControlReg, 1, 0x01);
@@ -407,6 +508,11 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 bool
 DCCGCLKAvailable(uint8 pllIndex)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset < (RADEON_R600 | 0x20))
+		return false;
+
 	uint32 dccg = Read32(PLL, DCCG_DISP_CLK_SRCSEL) & 0x03;
 
 	if (dccg & 0x02)

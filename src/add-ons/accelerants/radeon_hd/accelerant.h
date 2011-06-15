@@ -18,6 +18,10 @@
 #include <edid.h>
 
 
+#define MAX_CRT 6
+	// eyefinity limit
+
+
 struct accelerant_info {
 	vuint8			*regs;
 	area_id			regs_area;
@@ -77,6 +81,14 @@ struct register_info {
 };
 
 
+typedef struct {
+	uint32	vfreq_max;
+	uint32	vfreq_min;
+	uint32	hfreq_max;
+	uint32	hfreq_min;
+} crt_info;
+
+
 #define HEAD_MODE_A_ANALOG		0x01
 #define HEAD_MODE_B_DIGITAL		0x02
 #define HEAD_MODE_CLONE			0x03
@@ -89,8 +101,10 @@ struct register_info {
 #define PLL 0x4 // PLL calls
 #define MC	0x5 // Memory Controler calls
 
+
 extern accelerant_info *gInfo;
 extern register_info *gRegister;
+extern crt_info *gCRT[MAX_CRT];
 
 
 status_t init_registers(uint8 crtid);
@@ -121,12 +135,12 @@ _read32MC(uint32 offset)
 		_write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
 			| RS600_MC_INDEX_CITF_ARB0));
 		return _read32(RS600_MC_DATA);
-	} else if (info.device_chipset == (RADEON_R600 & 0x90)
-		|| info.device_chipset == (RADEON_R700 & 0x40)) {
+	} else if (info.device_chipset == (RADEON_R600 | 0x90)
+		|| info.device_chipset == (RADEON_R700 | 0x40)) {
 		_write32(RS690_MC_INDEX, (offset & RS690_MC_INDEX_ADDR_MASK));
 		return _read32(RS690_MC_DATA);
-	} else if (info.device_chipset == (RADEON_R700 & 0x80)
-		|| info.device_chipset == (RADEON_R800 & 0x80)) {
+	} else if (info.device_chipset == (RADEON_R700 | 0x80)
+		|| info.device_chipset == (RADEON_R800 | 0x80)) {
 		_write32(RS780_MC_INDEX, offset & RS780_MC_INDEX_ADDR_MASK);
 		return _read32(RS780_MC_DATA);
 	}
@@ -145,14 +159,14 @@ _write32MC(uint32 offset, uint32 data)
 		_write32(RS600_MC_INDEX, ((offset & RS600_MC_INDEX_ADDR_MASK)
 			| RS600_MC_INDEX_CITF_ARB0 | RS600_MC_INDEX_WR_EN));
 		_write32(RS600_MC_DATA, data);
-	} else if (info.device_chipset == (RADEON_R600 & 0x90)
-		|| info.device_chipset == (RADEON_R700 & 0x40)) {
+	} else if (info.device_chipset == (RADEON_R600 | 0x90)
+		|| info.device_chipset == (RADEON_R700 | 0x40)) {
 		_write32(RS690_MC_INDEX, ((offset & RS690_MC_INDEX_ADDR_MASK)
 			| RS690_MC_INDEX_WR_EN));
 		_write32(RS690_MC_DATA, data);
 		_write32(RS690_MC_INDEX, RS690_MC_INDEX_WR_ACK);
-	} else if (info.device_chipset == (RADEON_R700 & 0x80)
-		|| info.device_chipset == (RADEON_R800 & 0x80)) {
+	} else if (info.device_chipset == (RADEON_R700 | 0x80)
+		|| info.device_chipset == (RADEON_R800 | 0x80)) {
 			_write32(RS780_MC_INDEX, ((offset & RS780_MC_INDEX_ADDR_MASK)
 				| RS780_MC_INDEX_WR_EN));
 			_write32(RS780_MC_DATA, data);
@@ -187,7 +201,8 @@ Read32(uint32 subsystem, uint32 offset)
 		case CRT:
 			return _read32(offset);
 		case PLL:
-			return _read32PLL(offset);
+			return _read32(offset);
+			//return _read32PLL(offset);
 		case MC:
 			return _read32MC(offset);
 	};
@@ -207,7 +222,8 @@ Write32(uint32 subsystem, uint32 offset, uint32 value)
 			_write32(offset, value);
 			return;
 		case PLL:
-			_write32PLL(offset, value);
+			_write32(offset, value);
+			//_write32PLL(offset, value);
 			return;
 		case MC:
 			_write32MC(offset, value);
@@ -230,7 +246,8 @@ Write32Mask(uint32 subsystem, uint32 offset, uint32 value, uint32 mask)
 			temp = _read32(offset);
 			break;
 		case PLL:
-			temp = _read32PLL(offset);
+			temp = _read32(offset);
+			//temp = _read32PLL(offset);
 			break;
 		case MC:
 			temp = _read32MC(offset);
@@ -251,7 +268,8 @@ Write32Mask(uint32 subsystem, uint32 offset, uint32 value, uint32 mask)
 			_write32(offset, temp);
 			return;
 		case PLL:
-			_write32PLL(offset, temp);
+			_write32(offset, temp);
+			//_write32PLL(offset, temp);
 			return;
 		case MC:
 			_write32MC(offset, temp);

@@ -38,6 +38,8 @@ create_mode_list(void)
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
+	detect_crt_ranges();
+
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
 		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
 		NULL, 0, kRadeonHDSpaces,
@@ -148,12 +150,14 @@ CardFBSet(display_mode *mode)
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
+	#if 0
 	// Disable VGA mode to enable Radeon extended registers
 	Write32Mask(VGA, VGA_RENDER_CONTROL, 0, 0x00030000);
 	Write32Mask(VGA, VGA_MODE_CONTROL, 0, 0x00000030);
 	Write32Mask(VGA, VGA_HDP_CONTROL, 0x00010010, 0x00010010);
 	Write32Mask(VGA, gRegister->vgaControl, 0, D1VGA_MODE_ENABLE
 		| D1VGA_TIMING_SELECT | D1VGA_SYNC_POLARITY_SELECT);
+	#endif
 
 	// disable R/B swap, disable tiling, disable 16bit alpha, etc.
 	Write32Mask(CRT, gRegister->grphEnable, 1, 0x00000001);
@@ -190,7 +194,7 @@ CardFBSet(display_mode *mode)
 	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
 
 	// Tell GPU which frame buffer address to draw from
-	if (gInfo->shared_info->device_chipset >= (uint16)(RADEON_R700 & 0x70)) {
+	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
 		Write32(CRT, gRegister->grphPrimarySurfaceAddrHigh,
 			(fbAddress >> 32) & 0xf);
 		Write32(CRT, gRegister->grphSecondarySurfaceAddrHigh,
@@ -235,14 +239,15 @@ CardModeSet(display_mode *mode)
 	Write32(CRT, gRegister->crtHTotal,
 		displayTiming.h_total - 1);
 
-	#if 0
-	// determine blanking based on passed modeline
-	uint16 blankStart = displayTiming.h_display;
-	uint16 blankEnd = displayTiming.h_total;
+	// Calculate blanking
+	uint16 frontPorch = displayTiming.h_sync_start - displayTiming.h_display;
+	uint16 backPorch = displayTiming.h_total - displayTiming.h_sync_end;
+
+	uint16 blankStart = frontPorch - OVERSCAN;
+	uint16 blankEnd = backPorch;
 
 	Write32(CRT, gRegister->crtHBlank,
 		blankStart | (blankEnd << 16));
-	#endif
 
 	Write32(CRT, gRegister->crtHSync,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
@@ -255,13 +260,14 @@ CardModeSet(display_mode *mode)
 	Write32(CRT, gRegister->crtVTotal,
 		displayTiming.v_total - 1);
 
-	#if 0
-	blankStart = displayTiming.v_display;
-	blankEnd = displayTiming.v_total;
+	frontPorch = displayTiming.v_sync_start - displayTiming.v_display;
+	backPorch = displayTiming.v_total - displayTiming.v_sync_end;
+
+	blankStart = frontPorch - OVERSCAN;
+	blankEnd = backPorch;
 
 	Write32(CRT, gRegister->crtVBlank,
 		blankStart | (blankEnd << 16));
-	#endif
 
 	// Set Interlace if specified within mode line
 	if (displayTiming.flags & B_TIMING_INTERLACED) {
@@ -276,9 +282,8 @@ CardModeSet(display_mode *mode)
 		(displayTiming.v_sync_end - displayTiming.v_sync_start) << 16);
 
 	// set flag for neg. V sync. M76 Register Reference Guide 2-258
-	// we don't need a mask here as this is the only param for Vertical
-	Write32(CRT, gRegister->crtVPolarity,
-		displayTiming.flags & B_POSITIVE_VSYNC ? 0 : 1);
+	Write32Mask(CRT, gRegister->crtVPolarity,
+		displayTiming.flags & B_POSITIVE_VSYNC ? 0 : 1, 0x1);
 
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
 		should only be set to 1 on 30bpp DVI modes
@@ -296,9 +301,9 @@ CardModeScale(display_mode *mode)
 
 	// For now, no overscan support
 	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
-		(0 << 16) | 0); // LEFT | RIGHT
+		(OVERSCAN << 16) | OVERSCAN); // LEFT | RIGHT
 	Write32(CRT, D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
-		(0 << 16) | 0); // TOP | BOTTOM
+		(OVERSCAN << 16) | OVERSCAN); // TOP | BOTTOM
 
 	// No scaling
 	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
@@ -336,12 +341,21 @@ radeon_set_display_mode(display_mode *mode)
 
 	CardBlankSet(true);
 	CardFBSet(mode);
+	CardBlankSet(false);
 	CardModeSet(mode);
 	CardModeScale(mode);
+
+	#if 0
 	PLLSet(0, mode->timing.pixel_clock);
 	PLLPower(0, RHD_POWER_ON);
 	DACPower(0, RHD_POWER_ON);
-	CardBlankSet(false);
+	#endif
+
+	// ensure graphics are enabled and powered on
+	Write32Mask(CRT, D1GRPH_ENABLE, 0x00000001, 0x00000001);
+	snooze(2);
+	Write32Mask(CRT, D1CRTC_CONTROL, 0, 0x01000000); /* enable read requests */
+	Write32Mask(CRT, D1CRTC_CONTROL, 1, 1);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);
@@ -405,22 +419,47 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 bool
 is_mode_supported(display_mode *mode)
 {
+	TRACE("MODE: %d ; %d %d %d %d ; %d %d %d %d\n",
+		mode->timing.pixel_clock, mode->timing.h_display,
+		mode->timing.h_sync_start, mode->timing.h_sync_end,
+		mode->timing.h_total, mode->timing.v_display,
+		mode->timing.v_sync_start, mode->timing.v_sync_end,
+		mode->timing.v_total);
+
 	// Validate modeline is within a sane range
 	if (is_mode_sane(mode) != B_OK)
 		return false;
 
-	// TODO : Look at min and max monitor freqs and verify selected
-	// mode is within tolerances.
-	#if 0
-	int crtid = 0;
+	uint32 crtid = 0;
 
-	edid1_detailed_monitor *monitor
-		= &gInfo->shared_info->edid_info.detailed_monitor[crtid + 1];
-	edid1_monitor_range& range = monitor->data.monitor_range;
+	// if we have edid info, check frequency adginst crt reported valid ranges
+	if (gInfo->shared_info->has_edid) {
 
-	TRACE("%s CRT Min/Max H %d/%d; CRT Min/Max V %d/%d\n", __func__,
-		range.min_h, range.max_h, range.min_v, range.max_v);
-	#endif
+		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
+		if (hfreq > gCRT[crtid]->hfreq_max + 1
+			|| hfreq < gCRT[crtid]->hfreq_min - 1) {
+			TRACE("!!! hfreq : %d , hfreq_min : %d, hfreq_max : %d\n",
+				hfreq, gCRT[crtid]->hfreq_min, gCRT[crtid]->hfreq_max);
+			TRACE("!!! %dx%d falls outside of CRT %d's valid "
+				"horizontal range.\n", mode->timing.h_display,
+				mode->timing.v_display, crtid);
+			return false;
+		}
+
+		uint32 vfreq = mode->timing.pixel_clock / ((mode->timing.v_total
+			* mode->timing.h_total) / 1000);
+
+		if (vfreq > gCRT[crtid]->vfreq_max + 1
+			|| vfreq < gCRT[crtid]->vfreq_min - 1) {
+			TRACE("!!! vfreq : %d , vfreq_min : %d, vfreq_max : %d\n",
+				vfreq, gCRT[crtid]->vfreq_min, gCRT[crtid]->vfreq_max);
+			TRACE("!!! %dx%d falls outside of CRT %d's valid vertical range\n",
+				mode->timing.h_display, mode->timing.v_display, crtid);
+			return false;
+		}
+		TRACE("%dx%d is within CRT %d's valid frequency range\n",
+			mode->timing.h_display, mode->timing.v_display, crtid);
+	}
 
 	return true;
 }
@@ -478,3 +517,34 @@ is_mode_sane(display_mode *mode)
 	return B_OK;
 }
 
+
+// TODO : Move to a new "monitors.c" file
+status_t
+detect_crt_ranges()
+{
+	edid1_info *edid = &gInfo->shared_info->edid_info;
+
+	int crtid = 0;
+		// edid indexes are not in order
+
+	for (uint32 index = 0; index < MAX_CRT; index++) {
+
+		edid1_detailed_monitor *monitor
+				= &edid->detailed_monitor[index];
+
+		if (monitor->monitor_desc_type
+			== EDID1_MONITOR_RANGES) {
+			edid1_monitor_range range = monitor->data.monitor_range;
+			gCRT[crtid]->vfreq_min = range.min_v;	/* in Hz */
+			gCRT[crtid]->vfreq_max = range.max_v;
+			gCRT[crtid]->hfreq_min = range.min_h;	/* in kHz */
+			gCRT[crtid]->hfreq_max = range.max_h;
+			TRACE("CRT %d : v_min %d : v_max %d : h_min %d : h_max %d\n",
+				crtid, gCRT[crtid]->vfreq_min, gCRT[crtid]->vfreq_max,
+				gCRT[crtid]->hfreq_min, gCRT[crtid]->hfreq_max);
+			crtid++;
+		}
+
+	}
+	return B_OK;
+}
