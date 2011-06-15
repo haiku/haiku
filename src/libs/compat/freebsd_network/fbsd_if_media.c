@@ -66,7 +66,7 @@
 
 #define IFMEDIA_DEBUG
 #ifdef IFMEDIA_DEBUG
-#   define TRACE(x...) dprintf("BSD_IFMEDIA_DEBUG: " x)
+#   define TRACE(x...) dprintf(x)
 #else
 #   define TRACE(x...) ;
 #endif
@@ -159,7 +159,7 @@ ifmedia_list_add(ifm, lp, count)
 }
 
 /*
- * Set the default active media. 
+ * Set the default active media.
  *
  * Called by device-specific code which is assumed to have already
  * selected the default media in hardware.  We do _not_ call the
@@ -167,7 +167,7 @@ ifmedia_list_add(ifm, lp, count)
  */
 void
 ifmedia_set(ifm, target)
-	struct ifmedia *ifm; 
+	struct ifmedia *ifm;
 	int target;
 
 {
@@ -261,7 +261,7 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
 	/*
 	 * Get list of available media and current media on interface.
 	 */
-	case  SIOCGIFMEDIA: 
+	case  SIOCGIFMEDIA:
 	{
 		struct ifmedia_entry *ep;
 		int *kptr, count;
@@ -356,7 +356,7 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
  */
 static struct ifmedia_entry *
 ifmedia_match(ifm, target, mask)
-	struct ifmedia *ifm; 
+	struct ifmedia *ifm;
 	int target;
 	int mask;
 {
@@ -384,7 +384,7 @@ ifmedia_match(ifm, target, mask)
  * Compute the interface `baudrate' from the media, for the interface
  * metrics (used by routing daemons).
  */
-static const struct ifmedia_baudrate ifmedia_baudrate_descriptions[] =   
+static const struct ifmedia_baudrate ifmedia_baudrate_descriptions[] =
     IFM_BAUDRATE_DESCRIPTIONS;
 
 uint64_t
@@ -401,7 +401,7 @@ ifmedia_baudrate(int mword)
 	/* Not known. */
 	return (0);
 }
- 
+
 #ifdef IFMEDIA_DEBUG
 struct ifmedia_description ifm_type_descriptions[] =
     IFM_TYPE_DESCRIPTIONS;
