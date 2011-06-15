@@ -1197,7 +1197,16 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 	if (error != B_OK)
 		return error;
 
-	partition->SetDiskSystem(diskSystem);
+	// Set the disk system. Re-check whether a disk system is already set on the
+	// partition. Some disk systems just write the on-disk structures and let
+	// the DDM rescan the partition, in which case the disk system will already
+	// be set. In very unfortunate cases the on-disk structure of the previous
+	// disk system has not been destroyed and the previous disk system has a
+	// higher priority than the new one. The old disk system will thus prevail.
+	// Not setting the new disk system will at least prevent that the partition
+	// object gets into an inconsistent state.
+	if (partition->DiskSystem() == NULL)
+		partition->SetDiskSystem(diskSystem);
 
 	// return change counter
 	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
