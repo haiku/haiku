@@ -412,7 +412,8 @@ NetworkStatusView::MouseDown(BPoint point)
 		menu->AddItem(new BMenuItem(label.String(), info));
 	}
 
-	menu->AddSeparatorItem();
+	if (!fInterfaces.IsEmpty())
+		menu->AddSeparatorItem();
 
 	// Add wireless networks, if any
 
