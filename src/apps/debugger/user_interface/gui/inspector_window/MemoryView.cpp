@@ -100,8 +100,8 @@ MemoryView::Draw(BRect rect)
 
 	char buffer[16];
 
-	int32 startLine = rect.top / fLineHeight;
-	int32 endLine = rect.bottom / fLineHeight + 1;
+	int32 startLine = int32(rect.top / fLineHeight);
+	int32 endLine = int32(rect.bottom / fLineHeight) + 1;
 	int32 startByte = fNybblesPerLine / 2 * startLine;
 	uint16* currentAddress = (uint16*)(fTargetBlock->BaseAddress()
 		+ startByte);
@@ -174,14 +174,15 @@ MemoryView::_RecalcScrollBars()
 	BScrollBar *scrollBar = ScrollBar(B_VERTICAL);
 	if (fTargetBlock != NULL) {
 		BRect bounds = Bounds();
-		fNybblesPerLine = bounds.Width() / fCharWidth;
+		fNybblesPerLine = int32(bounds.Width() / fCharWidth);
 		// we allocate 8 characters for the starting address of the current
 		// line plus some spacing to separate that from the data
 		fNybblesPerLine -= 10;
 		// also allocate a space between each 16-bit grouping
 		fNybblesPerLine -= (fNybblesPerLine / 4) - 1;
 		fNybblesPerLine &= ~3;
-		int32 lineCount = ceil(2 * fTargetBlock->Size() / fNybblesPerLine);
+		int32 lineCount
+			= (int32)ceil(2 * fTargetBlock->Size() / fNybblesPerLine);
 		float totalHeight = lineCount * fLineHeight;
 		max = totalHeight - bounds.Height();
 		scrollBar->SetProportion(bounds.Height() / totalHeight);
