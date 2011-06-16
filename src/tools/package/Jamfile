@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src tools package ;
+
+UsePrivateBuildHeaders shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
+
+USES_BE_API on <build>package = true ;
+
+BuildPlatformMain <build>package :
+	command_create.cpp
+	command_dump.cpp
+	command_extract.cpp
+	command_list.cpp
+	package.cpp
+	StandardErrorOutput.cpp
+
+	:
+	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++)
+;
