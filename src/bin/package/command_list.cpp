@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
@@ -96,7 +97,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 			printf("  '%c%c%c%c'", int(type >> 24), int((type >> 16) & 0xff),
 				int((type >> 8) & 0xff), int(type & 0xff));
 		} else
-			printf("  %#lx", type);
+			printf("  %#" B_PRIx32, type);
 
 		printf(">\n");
 		return B_OK;
