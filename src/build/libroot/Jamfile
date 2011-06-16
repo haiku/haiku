@@ -18,16 +18,18 @@ UsePrivateBuildHeaders kernel libroot ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 
-	local defines = [ FDefines
+	defines = [ FDefines
 		HAIKU_BUILD_GENERATED_DIRECTORY="\\\"$(HAIKU_OUTPUT_DIR)\\\""
 	] ;
-	SubDirC++Flags $(defines) ;
 	ObjectC++Flags find_directory.cpp : $(defines) ;
+
+	defines = [ FDefines BUILDING_HAIKU_ERROR_MAPPER=1 ] ;
+	ObjectC++Flags errors.cpp : $(defines) ;
+
+	defines = [ FDefines KMESSAGE_CONTAINER_ONLY=1 ] ;
+	ObjectC++Flags KMessage.cpp : $(defines) ;
+
 }
-
-
-DEFINES += KMESSAGE_CONTAINER_ONLY ;
-ObjectC++Flags KMessage.cpp : $(HOST_BE_API_C++FLAGS) ;
 
 # locate the library
 MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;

@@ -1,7 +1,8 @@
+/*
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-
-#define BUILDING_HAIKU_ERROR_MAPPER 1
-#include <BeOSBuildCompatibility.h>
 
 #include <errno.h>
 #include <string.h>
