@@ -1,0 +1,74 @@
+SubDir HAIKU_TOP src build libpackage ;
+
+UsePrivateBuildHeaders kernel shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+
+USES_BE_API on libpackage_build.so = true ;
+
+HPKG_SOURCES =
+	BlockBufferCache.cpp
+	BlockBufferCacheImpl.cpp
+	BufferCache.cpp
+	CachedBuffer.cpp
+	DataOutput.cpp
+	DataReader.cpp
+	ErrorOutput.cpp
+	PackageContentHandler.cpp
+	PackageData.cpp
+	PackageDataReader.cpp
+	PackageEntry.cpp
+	PackageEntryAttribute.cpp
+	PackageReader.cpp
+	PackageReaderImpl.cpp
+	PackageWriter.cpp
+	PackageWriterImpl.cpp
+	ReaderImplBase.cpp
+	RepositoryReader.cpp
+	RepositoryReaderImpl.cpp
+	RepositoryWriter.cpp
+	RepositoryWriterImpl.cpp
+	Strings.cpp
+	WriterImplBase.cpp
+
+	# compression
+	ZlibCompressionBase.cpp
+	ZlibCompressor.cpp
+	ZlibDecompressor.cpp
+;
+
+# locate the library
+MakeLocate libpackage_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
+
+BuildPlatformSharedLibrary libpackage_build.so
+	:
+	ActivateRepositoryCacheJob.cpp
+	ActivateRepositoryConfigJob.cpp
+	AddRepositoryRequest.cpp
+	Attributes.cpp
+	BlockBufferCacheNoLock.cpp
+	ChecksumAccessors.cpp
+	Context.cpp
+	DropRepositoryRequest.cpp
+	FetchFileJob.cpp
+	Job.cpp
+	JobQueue.cpp
+	PackageInfo.cpp
+	PackageResolvable.cpp
+	PackageResolvableExpression.cpp
+	PackageRoster.cpp
+	PackageVersion.cpp
+	RefreshRepositoryRequest.cpp
+	RemoveRepositoryJob.cpp
+	RepositoryCache.cpp
+	RepositoryConfig.cpp
+	RepositoryInfo.cpp
+	Request.cpp
+	TempfileManager.cpp
+	ValidateChecksumJob.cpp
+
+	$(HPKG_SOURCES)
+	:
+	libshared_build.a $(HOST_LIBBE) z $(HOST_LIBSTDC++)
+;
