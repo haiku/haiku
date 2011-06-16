@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <Entry.h>
 
@@ -53,11 +54,11 @@ public:
 			return;
 
 		printf("----- TOC Info -----------------------------------\n");
-		printf("cached strings size:     %10llu (uncompressed)\n",
+		printf("cached strings size:     %10" B_PRIu64 " (uncompressed)\n",
 			uncompressedStringsSize);
-		printf("TOC main size:           %10llu (uncompressed)\n",
+		printf("TOC main size:           %10" B_PRIu64 " (uncompressed)\n",
 			uncompressedMainSize);
-		printf("total TOC size:          %10llu (uncompressed)\n",
+		printf("total TOC size:          %10" B_PRIu64 " (uncompressed)\n",
 			uncompressedTOCSize);
 	}
 
@@ -68,8 +69,8 @@ public:
 			return;
 
 		printf("----- Package Attribute Info ---------------------\n");
-		printf("string count:            %10lu\n", stringCount);
-		printf("package attributes size: %10lu (uncompressed)\n",
+		printf("string count:            %10" B_PRIu32 "\n", stringCount);
+		printf("package attributes size: %10" B_PRIu32 " (uncompressed)\n",
 			uncompressedSize);
 	}
 
@@ -80,11 +81,12 @@ public:
 			return;
 
 		printf("----- Package Info ----------------\n");
-		printf("header size:             %10lu\n", headerSize);
-		printf("heap size:               %10llu\n", heapSize);
-		printf("TOC size:                %10llu\n", tocSize);
-		printf("package attributes size: %10lu\n", packageAttributesSize);
-		printf("total size:              %10llu\n", totalSize);
+		printf("header size:             %10" B_PRIu32 "\n", headerSize);
+		printf("heap size:               %10" B_PRIu64 "\n", heapSize);
+		printf("TOC size:                %10" B_PRIu64 "\n", tocSize);
+		printf("package attributes size: %10" B_PRIu32 "\n",
+			packageAttributesSize);
+		printf("total size:              %10" B_PRIu64 "\n", totalSize);
 		printf("-----------------------------------\n");
 	}
 
