@@ -576,26 +576,3 @@ DCCGCLKSet(uint8 pllIndex, int set)
 	}
 }
 
-
-void
-DACPower(uint8 dacIndex, int mode)
-{
-	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
-	uint32 powerdown;
-
-	switch (mode) {
-		case RHD_POWER_ON:
-			// TODO : SensedType Detection?
-			powerdown = 0;
-			Write32(OUT, dacOffset + DACA_ENABLE, 1);
-			Write32(OUT, dacOffset + DACA_POWERDOWN, 0);
-			snooze(14);
-			Write32Mask(OUT, dacOffset + DACA_POWERDOWN, powerdown, 0xFFFFFF00);
-			snooze(2);
-			Write32(OUT, dacOffset + DACA_FORCE_OUTPUT_CNTL, 0);
-			Write32Mask(OUT, dacOffset + DACA_SYNC_SELECT, 0, 0x00000101);
-			Write32(OUT, dacOffset + DACA_SYNC_TRISTATE_CONTROL, 0);
-			return;
-	}
-}
-

@@ -26,12 +26,6 @@
 #define RV620_DCCGCLK_GRAB    1
 #define RV620_DCCGCLK_RELEASE 2
 
-// DAC Offsets
-#define REG_DACA_OFFSET 0
-#define REG_DACB_OFFSET 0x200
-#define RV620_REG_DACA_OFFSET 0
-#define RV620_REG_DACB_OFFSET 0x100
-
 
 struct PLL_Control {
 	uint16 feedbackDivider; // 0xFFFF is the endmarker
@@ -51,7 +45,6 @@ status_t PLLCalibrate(uint8 pllIndex);
 void PLLCRTCGrab(uint8 pllIndex, bool crt2);
 bool DCCGCLKAvailable(uint8 pllIndex);
 void DCCGCLKSet(uint8 pllIndex, int set);
-void DACPower(uint8 dacIndex, int mode);
 
 
 #endif /* RADEON_HD_PLL_H */

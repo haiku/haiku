@@ -335,7 +335,7 @@ CardModeScale(display_mode *mode)
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	int crtNumber = 0;
+	uint8 crtNumber = 0;
 
 	init_registers(crtNumber);
 
@@ -344,18 +344,19 @@ radeon_set_display_mode(display_mode *mode)
 	CardBlankSet(false);
 	CardModeSet(mode);
 	CardModeScale(mode);
-
-	#if 0
 	PLLSet(0, mode->timing.pixel_clock);
-	PLLPower(0, RHD_POWER_ON);
-	DACPower(0, RHD_POWER_ON);
-	#endif
+		// Set pixel clock
+	DACSet(0, 0);
+		// Set DAC A to crt 0
 
-	// ensure graphics are enabled and powered on
+	// ensure graphics are enabled and powered on (CRT Power)
+	// aka D1Power
 	Write32Mask(CRT, D1GRPH_ENABLE, 0x00000001, 0x00000001);
 	snooze(2);
 	Write32Mask(CRT, D1CRTC_CONTROL, 0, 0x01000000); /* enable read requests */
 	Write32Mask(CRT, D1CRTC_CONTROL, 1, 1);
+
+	DACPower(0, RHD_POWER_ON);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);

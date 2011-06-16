@@ -13,6 +13,7 @@
 #include "mode.h"
 #include "radeon_hd.h"
 #include "pll.h"
+#include "dac.h"
 
 
 #include <edid.h>
