@@ -964,7 +964,8 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 
 			while (compressedSize > 0) {
 				// read compressed buffer
-				size_t toRead = std::min(compressedSize, fScratchBufferSize);
+				size_t toRead = std::min((size_t)compressedSize,
+					fScratchBufferSize);
 				error = ReadBuffer(offset, fScratchBuffer, toRead);
 				if (error != B_OK)
 					return error;

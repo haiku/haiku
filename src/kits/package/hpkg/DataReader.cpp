@@ -90,7 +90,7 @@ BBufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
 	if (offset < 0)
 		return B_BAD_VALUE;
 
-	if (size > fSize || offset > fSize - size)
+	if (size > fSize || offset > (off_t)fSize - (off_t)size)
 		return B_ERROR;
 
 	memcpy(buffer, (const uint8*)fData + offset, size);

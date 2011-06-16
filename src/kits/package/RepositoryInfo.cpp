@@ -15,6 +15,7 @@
 
 #include <driver_settings.h>
 #include <File.h>
+#include <Message.h>
 
 #include <package/PackageInfo.h>
 

@@ -671,7 +671,11 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	}
 	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_ATIME, uint32(st.st_atime));
 	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_MTIME, uint32(st.st_mtime));
+#ifdef __HAIKU__
 	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_crtime));
+#else
+	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_mtime));
+#endif
 	// TODO: File user/group!
 
 	// add file data/symlink path
