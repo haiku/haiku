@@ -127,13 +127,10 @@ if $(HAIKU_USE_GCC_PIPE) = 1 {
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
 }
-# TODO: With Haiku as the host platform, this does not appear to be set up
-# correctly, at least when compiling the libbe_test target platform. When
-# enabling the lines below, these flags suddenly appear as link flags passed
-# to ld as well.
-#if $(HOST_GCC_VERSION[1]) >= 3 {
-#	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
-#}
+
+if $(HOST_GCC_VERSION[1]) >= 3 {
+	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
+}
 
 # override gcc 2.95.3's header directory -- strictly necessary only when using
 # the BeOS native compiler (since its headers are incompatible), but it doesn't
@@ -529,14 +526,26 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 
 # analyze the host gcc machine spec to find out about 64-bitness
 HOST_PLATFORM_IS_64_BIT = ;
+switch $(HOST_GCC_MACHINE) {
+	case amd64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+	case i686-apple-darwin10 :	HOST_PLATFORM_IS_64_BIT = 1 ;
+	case x86_64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+}
+
+# If HAIKU_HOST_USE_32BIT is set, add the required gcc base flag (the LD flag
+# is set later), or, if the architecture isn't actually 64 bit, clear
+# HAIKU_HOST_USE_32BIT.
+# Afterwards HOST_PLATFORM_IS_64_BIT will indicate whether the architecture is
+# effectively (i.e. when using the compiler/linker flags) 64 bit and
+# HAIKU_HOST_USE_32BIT will be set, iff the architecture is really 64 bit and
+# 32 bit mode was requested.
 if $(HAIKU_HOST_USE_32BIT) = 1 {
-	# enable GCC -m32 option
-	HOST_GCC_BASE_FLAGS = -m32 ;
-} else {
-	switch $(HOST_GCC_MACHINE) {
-		case amd64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
-		case i686-apple-darwin10 :	HOST_PLATFORM_IS_64_BIT = 1 ;
-		case x86_64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+	if $(HOST_PLATFORM_IS_64_BIT) {
+		# enable GCC -m32 option
+		HOST_GCC_BASE_FLAGS = -m32 ;
+		HOST_PLATFORM_IS_64_BIT = ;
+	} else {
+		HAIKU_HOST_USE_32BIT = 0 ;
 	}
 }
 
@@ -550,7 +559,7 @@ HOST_RANLIB			?= $(RANLIB) ;
 HOST_CPPFLAGS		?= $(CPPFLAGS) ;
 HOST_CCFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(CCFLAGS) ;
 HOST_C++FLAGS		?= $(HOST_GCC_BASE_FLAGS) $(C++FLAGS) ;
-HOST_LDFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(LDFLAGS) ;
+HOST_LDFLAGS		?= $(LDFLAGS) ;
 HOST_LINKFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(LINKFLAGS) ;
 HOST_DEFINES		?= $(DEFINES) ;
 HOST_HDRS			?= $(HDRS) ;
@@ -682,7 +691,7 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 }
 
 # ld flags
-if $(HOST_ARCH) = x86_64 && $(HAIKU_HOST_USE_32BIT) = 1 {
+if $(HAIKU_HOST_USE_32BIT) = 1 {
 	HOST_LDFLAGS += -melf_i386 ;
 }
 
