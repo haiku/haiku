@@ -73,15 +73,18 @@ DACGetElectrical(uint8 type, uint8 dac,
 		while (list[i].pciIdMin != 0) {
 			if (list[i].pciIdMin <= info.device_id
 				&& list[i].pciIdMax >= info.device_id) {
-				if (*bandgap == 0) *bandgap = list[i].bandgap[dac][type];
-				if (*whitefine == 0) *whitefine = list[i].whitefine[dac][type];
+				if (*bandgap == 0)
+					*bandgap = list[i].bandgap[dac][type];
+				if (*whitefine == 0)
+					*whitefine = list[i].whitefine[dac][type];
 				break;
 			}
 			i++;
 		}
-		if (list[i].pciIdMin != 0)
+		if (list[i].pciIdMin != 0) {
 			TRACE("%s: found new BandGap / WhiteFine in table for card!\n",
 				__func__);
+		}
 	}
 }
 
@@ -99,8 +102,10 @@ DACSet(uint8 dacIndex, uint32 crtid)
 	DACGetElectrical(standard, dacIndex, &bandGap, &whiteFine);
 
 	uint32 mask = 0;
-	if (bandGap) mask |= 0xFF << 16;
-	if (whiteFine) mask |= 0xFF << 8;
+	if (bandGap)
+		mask |= 0xFF << 16;
+	if (whiteFine)
+		mask |= 0xFF << 8;
 
 	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
 

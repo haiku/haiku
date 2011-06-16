@@ -55,9 +55,10 @@ PLLControlTable(struct PLL_Control *table, uint16 feedbackDivider)
 {
 	int i;
 
-	for (i = 0; table[i].feedbackDivider < 0xFFFF ; i++)
+	for (i = 0; table[i].feedbackDivider < 0xFFFF ; i++) {
 		if (table[i].feedbackDivider >= feedbackDivider)
 			break;
+	}
 
 	return table[i].control;
 }
@@ -445,9 +446,10 @@ PLLCalibrate(uint8 pllIndex)
 
 	int i;
 
-	for (i = 0; i < PLL_CALIBRATE_WAIT; i++)
+	for (i = 0; i < PLL_CALIBRATE_WAIT; i++) {
 		if (((Read32(PLL, pllControlReg) >> 20) & 0x03) == 0x03)
 			break;
+	}
 
 	if (i >= PLL_CALIBRATE_WAIT) {
 		if (Read32(PLL, pllControlReg) & 0x00100000) /* Calibration done? */

@@ -5,9 +5,9 @@
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
-
 #ifndef RADEON_HD_DAC_H
 #define RADEON_HD_DAC_H
+
 
 // DAC Offsets
 #define REG_DACA_OFFSET 0
