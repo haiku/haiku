@@ -81,13 +81,11 @@ InspectorWindow::_Init()
 	message->ReplaceInt32("mode", HexMode32BitInt);
 	item = new BMenuItem("32-bit integer", message, '3');
 	hexMenu->AddItem(item);
-	// TODO: enable once problem with 64-bit hex string formatting is found
-	/*
 	message = new BMessage(*message);
 	message->ReplaceInt32("mode", HexMode64BitInt);
-	item = new BMenuItem("64-bit integer", message, '3');
+	item = new BMenuItem("64-bit integer", message, '4');
 	hexMenu->AddItem(item);
-	*/
+
 
 	BMenu* textMenu = new BMenu("Text Mode");
 	message = new BMessage(MSG_SET_TEXT_MODE);

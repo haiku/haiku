@@ -90,15 +90,15 @@ MemoryView::AttachedToWindow()
 	fCharWidth = be_fixed_font->StringWidth("a");
 	font_height fontHeight;
 	be_fixed_font->GetHeight(&fontHeight);
-	fLineHeight = fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading;
+	fLineHeight = ceilf(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading);
 }
 
 
 void
 MemoryView::Draw(BRect rect)
 {
-	BView::Draw(rect);
+	rect = Bounds();
 
 	float divider = 9 * fCharWidth;
 	StrokeLine(BPoint(divider, rect.top),
@@ -107,9 +107,10 @@ MemoryView::Draw(BRect rect)
 	if (fTargetBlock == NULL)
 		return;
 
-	uint32 hexBlockSize = 1 << fHexMode;
+	uint32 hexBlockSize = (1 << fHexMode) + 1;
+	uint32 blockByteSize = hexBlockSize / 2;
 	if (fHexMode != HexModeNone && fTextMode != TextModeNone) {
-		divider += (fHexBlocksPerLine * (hexBlockSize + 1) + 1) * fCharWidth;
+		divider += (fHexBlocksPerLine * hexBlockSize + 1) * fCharWidth;
 		StrokeLine(BPoint(divider, rect.top),
 					BPoint(divider, rect.bottom));
 	}
@@ -117,29 +118,32 @@ MemoryView::Draw(BRect rect)
 	char buffer[32];
 	char textbuffer[512];
 
-	int32 startLine = int32(rect.top / fLineHeight) - 1;
-	if (startLine < 0)
-		startLine = 0;
-	int32 endLine = int32(rect.bottom / fLineHeight) + 1;
-	int32 startByte = fHexBlocksPerLine * hexBlockSize * startLine;
-	const char* currentAddress = (const char*)(fTargetBlock->BaseAddress()
-		+ startByte);
-	const char* maxAddress = (const char*)(fTargetBlock->BaseAddress()
+	int32 startLine = int32(rect.top / fLineHeight);
+	const char* currentAddress = (const char*)(fTargetBlock->Data()
+		+ fHexBlocksPerLine * blockByteSize * startLine);
+	const char* maxAddress = (const char*)(fTargetBlock->Data()
 		+ fTargetBlock->Size());
+	const char* targetAddress = (const char *)fTargetBlock->Data()
+		+ fTargetAddress - fTargetBlock->BaseAddress();
 	BPoint drawPoint(1.0, (startLine + 1) * fLineHeight);
 	int32 currentBlocksPerLine = fHexBlocksPerLine;
 	int32 currentCharsPerLine = fTextCharsPerLine;
 	rgb_color addressColor = tint_color(HighColor(), B_LIGHTEN_1_TINT);
 	rgb_color dataColor = HighColor();
-	for (int32 i = startLine; i <= endLine && currentAddress < maxAddress;
-		i++, drawPoint.y += fLineHeight) {
+	font_height fh;
+	GetFontHeight(&fh);
+	uint32 lineAddress = (uint32)fTargetBlock->BaseAddress() + startLine
+		* currentCharsPerLine;
+	for (; currentAddress < maxAddress && drawPoint.y < rect.bottom
+		+ fLineHeight; drawPoint.y += fLineHeight) {
 		drawPoint.x = 1.0;
 		snprintf(buffer, sizeof(buffer), "%" B_PRIx32,
-			(uint32)currentAddress);
-		SetHighColor(addressColor);
+			lineAddress);
+		PushState();
+		SetHighColor(tint_color(HighColor(), B_LIGHTEN_1_TINT));
 		DrawString(buffer, drawPoint);
 		drawPoint.x += fCharWidth * 10;
-		SetHighColor(dataColor);
+		PopState();
 
 		if (fHexMode != HexModeNone) {
 			if (currentAddress + (currentBlocksPerLine * hexBlockSize)
@@ -150,12 +154,29 @@ MemoryView::Draw(BRect rect)
 			}
 
 			for (int32 j = 0; j < currentBlocksPerLine; j++) {
+				const char* blockAddress = currentAddress + (j
+					* blockByteSize);
 				_GetNextHexBlock(buffer,
-					std::min(hexBlockSize + 1, sizeof(buffer)),
-					currentAddress + (j * hexBlockSize / 2));
+					std::min(hexBlockSize, sizeof(buffer)),
+					blockAddress);
 				DrawString(buffer, drawPoint);
-				drawPoint.x += fCharWidth * (hexBlockSize + 1);
+				if (targetAddress >= blockAddress && targetAddress <
+					blockAddress + blockByteSize) {
+					PushState();
+					SetHighColor(B_TRANSPARENT_COLOR);
+					SetDrawingMode(B_OP_INVERT);
+					FillRect(BRect(drawPoint.x, drawPoint.y - fh.ascent,
+						drawPoint.x + (hexBlockSize - 1) * fCharWidth,
+						drawPoint.y + fh.descent));
+					PopState();
+				}
+
+				drawPoint.x += fCharWidth * hexBlockSize;
 			}
+
+			if (currentBlocksPerLine < fHexBlocksPerLine)
+				drawPoint.x += fCharWidth * hexBlockSize
+					* (fHexBlocksPerLine - currentBlocksPerLine);
 		}
 		if (fTextMode != TextModeNone) {
 			drawPoint.x += fCharWidth;
@@ -166,11 +187,30 @@ MemoryView::Draw(BRect rect)
 			}
 			textbuffer[fTextCharsPerLine] = '\0';
 			DrawString(textbuffer, drawPoint);
+			if (targetAddress >= currentAddress && targetAddress
+				< currentAddress + currentCharsPerLine) {
+				PushState();
+				SetHighColor(B_TRANSPARENT_COLOR);
+				SetDrawingMode(B_OP_INVERT);
+				float startX = drawPoint.x + fCharWidth * (targetAddress
+						- currentAddress);
+				float endX = startX;
+				if (fHexMode != HexModeNone)
+					endX += fCharWidth * ((hexBlockSize - 1) / 2);
+				else
+					endX += fCharWidth;
+				FillRect(BRect(startX, drawPoint.y - fh.ascent, endX,
+					drawPoint.y + fh.descent));
+				PopState();
+			}
 		}
-		if (currentBlocksPerLine > 0)
-			currentAddress += currentBlocksPerLine * hexBlockSize / 2;
-		else
+		if (currentBlocksPerLine > 0) {
+			currentAddress += currentBlocksPerLine * blockByteSize;
+			lineAddress += currentBlocksPerLine * blockByteSize;
+		} else {
 			currentAddress += fTextCharsPerLine;
+			lineAddress += fTextCharsPerLine;
+		}
 	}
 }
 
@@ -265,7 +305,7 @@ MemoryView::_RecalcScrollBars()
 			fHexBlocksPerLine = nybblesPerLine / sizeFactor;
 			fHexBlocksPerLine &= ~1;
 			if (fTextMode != TextModeNone)
-				fTextCharsPerLine = fHexBlocksPerLine * (hexDigits / 2);
+				fTextCharsPerLine = fHexBlocksPerLine * hexDigits / 2;
 		} else if (fTextMode != TextModeNone)
 			fTextCharsPerLine = int32(textWidth / fCharWidth);
 
@@ -273,7 +313,7 @@ MemoryView::_RecalcScrollBars()
 		float totalHeight = 0.0;
 		if (fHexBlocksPerLine > 0) {
 			lineCount = fTargetBlock->Size() / (fHexBlocksPerLine
-					* hexDigits);
+					* hexDigits / 2);
 		} else if (fTextCharsPerLine > 0)
 			lineCount = fTargetBlock->Size() / fTextCharsPerLine;
 
