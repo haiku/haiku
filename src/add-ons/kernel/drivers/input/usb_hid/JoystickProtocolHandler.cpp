@@ -104,10 +104,10 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 	}
 
 
-	fCurrentValues.initialize(fAxisCount, 0, fMaxButton);
+	fCurrentValues.initialize(fAxisCount, fHatCount, fMaxButton);
 
-	TRACE("joystick device with %lu buttons and %lu axes\n", fButtonCount,
-		fAxisCount);
+	TRACE("joystick device with %lu buttons, %lu axes and %lu hats\n",
+		fButtonCount, fAxisCount, fHatCount);
 	TRACE("report id: %u\n", report.ID());
 }
 
