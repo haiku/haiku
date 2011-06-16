@@ -74,6 +74,23 @@ MemoryView::SetTargetAddress(TeamMemoryBlock* block, target_addr_t address)
 
 
 void
+MemoryView::ScrollToSelection()
+{
+	if (fTargetBlock != NULL) {
+		target_addr_t offset = fTargetAddress - fTargetBlock->BaseAddress();
+		int32 lineNumber = 0;
+		if (fHexBlocksPerLine > 0)
+			lineNumber = offset / (fHexBlocksPerLine * (1 << (fHexMode - 1)));
+		else if (fTextCharsPerLine > 0)
+			lineNumber = offset / fTextCharsPerLine;
+		float y = lineNumber * fLineHeight;
+		if (!Bounds().Contains(BPoint(0.0, y)))
+			ScrollTo(0.0, y);
+	}
+}
+
+
+void
 MemoryView::TargetedByScrollView(BScrollView* scrollView)
 {
 	BView::TargetedByScrollView(scrollView);
@@ -231,6 +248,7 @@ MemoryView::MessageReceived(BMessage* message)
 		case MSG_TARGET_ADDRESS_CHANGED:
 		{
 			_RecalcScrollBars();
+			ScrollToSelection();
 			Invalidate();
 			break;
 		}

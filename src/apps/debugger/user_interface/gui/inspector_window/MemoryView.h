@@ -45,9 +45,7 @@ public:
 
 			void				SetTargetAddress(TeamMemoryBlock* block,
 									target_addr_t address);
-
-			void				TargetAddressChanged(target_addr_t address);
-
+			void				ScrollToSelection();
 
 	virtual void				TargetedByScrollView(BScrollView* scrollView);
 
