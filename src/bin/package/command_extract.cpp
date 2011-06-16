@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -209,7 +209,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		} else
 			error = _ExtractFileData(&fPackageFileReader, data, fd);
 
-		close(fd);
+		fs_close_attr(fd);
 
 		return error;
 	}
@@ -278,7 +278,7 @@ private:
 			}
 
 			// write
-			ssize_t bytesWritten = pwrite(fd, fDataBuffer, toCopy, offset);
+			ssize_t bytesWritten = write_pos(fd, offset, fDataBuffer, toCopy);
 			if (bytesWritten < 0) {
 				fprintf(stderr, "Error: Failed to write data: %s\n",
 					strerror(errno));
