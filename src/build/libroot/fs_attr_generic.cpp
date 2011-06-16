@@ -33,7 +33,7 @@ init_attribute_dir_base_dir()
 
 	if (initialized)
 		return initError;
-	
+
 	// stat the dir
 	struct stat st;
 	initError = B_OK;
@@ -44,7 +44,7 @@ init_attribute_dir_base_dir()
 				"directory base directory exists, but is no directory!\n");
 			initError = B_FILE_ERROR;
 		}
-	
+
 	} else {
 		// doesn't exist yet: create it
 		if (mkdir(sAttributeDirBasePath, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
@@ -68,7 +68,7 @@ escape_attr_name(const char *name)
 			escapedName += "__";
 		else
 			escapedName += *name;
-	
+
 		name++;
 	}
 
@@ -84,7 +84,7 @@ deescape_attr_name(const char *name)
 		return "___";
 	}
 	name++;
-	
+
 	string deescapedName;
 	while (*name != '\0') {
 		if (*name == '_') {
@@ -100,11 +100,11 @@ deescape_attr_name(const char *name)
 			}
 		} else
 			deescapedName += *name;
-		
+
 		name++;
 	}
 
-	return deescapedName;	
+	return deescapedName;
 }
 
 // get_attribute_dir_path
@@ -179,7 +179,7 @@ get_attribute_path(NodeRef ref, const char *path, int fd,
 		errno = error;
 		return -1;
 	}
-	
+
 	// construct the attribute path
 	attrPath = get_attribute_dir_path(ref) + '/';
 	string attrName(escape_attr_name(attribute));
@@ -206,7 +206,7 @@ get_attribute_path_virtual_fd(int fd, const char *attribute, string &attrPath,
 	// (i.e. system) file descriptor, which is just as well.
 	string path;
 	bool pathValid = (get_path(fd, NULL, path) == B_OK);
-	
+
 	// get the attribute path
 	return get_attribute_path(ref, (pathValid ? path.c_str() : NULL),
 		(pathValid ? -1 : fd), attribute, attrPath, typePath);
@@ -269,7 +269,7 @@ fs_fopen_attr_dir(int fd)
 	// (i.e. system) file descriptor, which is just as well.
 	string path;
 	bool pathValid = (get_path(fd, NULL, path) == B_OK);
-	
+
 	// get the attribute path
 	return open_attr_dir(NodeRef(st), (pathValid ? path.c_str() : NULL),
 		(pathValid ? -1 : fd));
@@ -292,8 +292,8 @@ fs_read_attr_dir(DIR *dir)
 		entry = readdir(dir);
 		if (!entry)
 			return NULL;
-	
-		// ignore administrative entries; the 
+
+		// ignore administrative entries; the
 		if (entry->d_name[0] == '_') {
 			string attrName = deescape_attr_name(entry->d_name);
 			strcpy(entry->d_name, attrName.c_str());
@@ -309,15 +309,15 @@ fs_rewind_attr_dir(DIR *dir)
 	rewinddir(dir);
 }
 
-// fs_open_attr
+// fs_fopen_attr
 int
-fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
+fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
 {
 	if (!attribute) {
 		errno = B_BAD_VALUE;
 		return -1;
 	}
-	
+
 	// get the attribute path
 	string attrPath;
 	string typePath;
@@ -344,7 +344,7 @@ fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 			// write the type into the file
 			if (write(typeFD, &type, sizeof(type)) < 0)
 				error = errno;
-			
+
 			close(typeFD);
 
 		} else
@@ -355,10 +355,10 @@ fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 			if (typeFD > 0) {
 				unlink(typePath.c_str());
 			}
-		
+
 			close(attrFD);
 			unlink(attrPath.c_str());
-		
+
 			errno = error;
 			return -1;
 		}
@@ -395,7 +395,7 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos,
 		errno = error;
 		return -1;
 	}
-	
+
 	return bytesRead;
 }
 
@@ -421,7 +421,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos,
 		errno = error;
 		return -1;
 	}
-	
+
 	return bytesWritten;
 }
 
@@ -433,7 +433,7 @@ fs_remove_attr(int fd, const char *attribute)
 		errno = B_BAD_VALUE;
 		return -1;
 	}
-	
+
 	// get the attribute path
 	string attrPath;
 	string typePath;
@@ -446,9 +446,9 @@ fs_remove_attr(int fd, const char *attribute)
 	// remove the attribute
 	if (unlink(attrPath.c_str()) < 0)
 		return -1;
-	
+
 	unlink(typePath.c_str());
-	
+
 	return B_OK;
 }
 
@@ -474,7 +474,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 	struct stat st;
 	if (lstat(attrPath.c_str(), &st) < 0)
 		return -1;
-		
+
 	attrInfo->size = st.st_size;
 
 	// now open the attribute type file and read the attribute's type
@@ -496,7 +496,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 		return -1;
 	}
 
-	return 0;					
+	return 0;
 }
 
 
@@ -524,14 +524,14 @@ _kern_open_attr_dir(int fd, const char *path)
 		if (error != B_OK)
 			return error;
 	}
-	
+
 	// open the attr dir
 	DIR *dir = open_attr_dir(ref, (path ? realPath.c_str() : NULL),
 		(path ? -1 : fd));
 	if (!dir)
 		return errno;
 
-	// create descriptor	
+	// create descriptor
 	AttrDirDescriptor *descriptor = new AttrDirDescriptor(dir, ref);
 	return add_descriptor(descriptor);
 }
@@ -571,7 +571,7 @@ _kern_rename_attr(int fromFile, const char *fromName, int toFile,
 
 		return error;
 	}
-	
+
 	return B_OK;
 }
 
