@@ -612,6 +612,17 @@ smp_init(void)
 	return;
 #endif
 
+	cpuid_info info;
+	if (get_current_cpuid(&info, 1) != B_OK)
+		return;
+
+	if ((info.eax_1.features & IA32_FEATURE_APIC) == 0) {
+		// Local APICs aren't present; As they form the basis for all inter CPU
+		// communication and therefore SMP, we don't need to go any further.
+		dprintf("no local APIC present, not attempting SMP init\n");
+		return;
+	}
+
 	// first try to find ACPI tables to get MP configuration as it handles
 	// physical as well as logical MP configurations as in multiple cpus,
 	// multiple cores or hyper threading.
