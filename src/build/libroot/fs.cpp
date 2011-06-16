@@ -130,17 +130,17 @@ normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
 	status_t error = find_dir_entry(path.c_str(), ref, name, true)				;
 	if (error != B_OK)
 		return error;
-		
+
 	// recurse to get the parent dir path, if found
 	error = normalize_dir_path(path, parentRef, normalizedPath);
 	if (error != 0)
 		return error;
 
-	// construct the normalizedPath		
+	// construct the normalizedPath
 	if (normalizedPath.length() > 1) // don't append "/", if parent is root
 		normalizedPath += '/';
 	normalizedPath += name;
-	
+
 	return 0;
 }
 
@@ -152,7 +152,7 @@ normalize_dir_path(const char *path, string &normalizedPath)
 	struct stat st;
 	if (stat(path, &st) < 0)
 		return errno;
-		
+
 	return normalize_dir_path(path, NodeRef(st), normalizedPath);
 }
 
@@ -162,7 +162,7 @@ normalize_entry_path(const char *path, string &normalizedPath)
 {
 	const char *dirPath = NULL;
 	const char *leafName = NULL;
-	
+
 	string dirPathString;
 	if (const char *lastSlash = strrchr(path, '/')) {
 		// found a slash: decompose into dir path and leaf name
@@ -184,7 +184,7 @@ normalize_entry_path(const char *path, string &normalizedPath)
 	// catch special case: no leaf, or leaf is a directory
 	if (!leafName || strcmp(leafName, ".") == 0 || strcmp(leafName, "..") == 0)
 		return normalize_dir_path(path, normalizedPath);
-	
+
 	// normalize the dir path
 	status_t error = normalize_dir_path(dirPath, normalizedPath);
 	if (error != B_OK)
@@ -222,7 +222,7 @@ get_path(const NodeRef *ref, const char *name, string &path)
 		DirPathMap::iterator it = sDirPathMap.find(*ref);
 		if (it == sDirPathMap.end())
 			return B_ENTRY_NOT_FOUND;
-	
+
 		path = it->second;
 
 		// stat the path to check, if it is still valid
@@ -250,7 +250,7 @@ get_path(const NodeRef *ref, const char *name, string &path)
 		path += '/';
 		path += name;
 	}
-	
+
 	return B_OK;
 }
 
@@ -272,7 +272,7 @@ BPrivate::get_path(int fd, const char *name, string &path)
 			return error;
 
 		return ::get_path(&ref, name, path);
-	
+
 	} else	// no descriptor or absolute path
 		return ::get_path((NodeRef*)NULL, name, path);
 }
@@ -284,7 +284,7 @@ get_path(dev_t device, ino_t directory, const char *name, string &path)
 	NodeRef ref;
 	ref.device = device;
 	ref.node = directory;
-	
+
 	return get_path(&ref, name, path);
 }
 
@@ -315,7 +315,7 @@ _kern_entry_ref_to_path(dev_t device, ino_t node, const char *leaf,
 	// copy it back to the user buffer
 	if (strlcpy(userPath, path.c_str(), pathLength) >= pathLength)
 		return B_BUFFER_OVERFLOW;
-	
+
 	return B_OK;
 }
 
@@ -334,8 +334,8 @@ _kern_create_dir(int fd, const char *path, int perms)
 
 	// mkdir
 	if (mkdir(realPath.c_str(), perms) < 0)
-		return errno;	
-	
+		return errno;
+
 	return B_OK;
 }
 
@@ -352,8 +352,8 @@ _kern_create_dir_entry_ref(dev_t device, ino_t node, const char *name,
 
 	// mkdir
 	if (mkdir(realPath.c_str(), perms) < 0)
-		return errno;	
-	
+		return errno;
+
 	return B_OK;
 }
 
@@ -382,7 +382,7 @@ open_dir(const char *path)
 	NodeRef ref(st);
 	add_dir_path(path, ref);
 
-	// create descriptor	
+	// create descriptor
 	DirectoryDescriptor *descriptor = new DirectoryDescriptor(dir, ref);
 	return add_descriptor(descriptor);
 }
@@ -443,7 +443,7 @@ _kern_open_parent_dir(int fd, char *name, size_t nameLength)
 		return B_BUFFER_OVERFLOW;
 
 	// open the parent directory
-				
+
 	return open_dir(realPath.c_str());
 }
 
@@ -455,7 +455,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 	if (maxCount <= 0)
 		return B_BAD_VALUE;
 
-	// get the descriptor	
+	// get the descriptor
 	DirectoryDescriptor *descriptor
 		= dynamic_cast<DirectoryDescriptor*>(get_descriptor(fd));
 	if (!descriptor)
@@ -484,7 +484,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 status_t
 _kern_rewind_dir(int fd)
 {
-	// get the descriptor	
+	// get the descriptor
 	DirectoryDescriptor *descriptor
 		= dynamic_cast<DirectoryDescriptor*>(get_descriptor(fd));
 	if (!descriptor)
@@ -523,7 +523,7 @@ open_file(const char *path, int openMode, int perms)
 		status_t error = normalize_entry_path(path, normalizedPath);
 		if (error != B_OK)
 			return error;
-		
+
 		descriptor = new SymlinkDescriptor(normalizedPath.c_str());
 	} else {
 		// open the file
@@ -534,11 +534,11 @@ open_file(const char *path, int openMode, int perms)
 
 		descriptor = new FileDescriptor(newFD);
 	}
-	
+
 	// cache path, if this is a directory
 	if (exists && S_ISDIR(st.st_mode))
 		add_dir_path(path, NodeRef(st));
-	
+
 	return add_descriptor(descriptor);
 }
 
@@ -603,7 +603,7 @@ _kern_read(int fd, off_t pos, void *buffer, size_t bufferSize)
 		if (result < 0)
 			return errno;
 	}
-	
+
 	// read
 	ssize_t bytesRead = haiku_host_platform_read(descriptor->fd, buffer,
 		bufferSize);
@@ -629,7 +629,7 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize)
 		if (result < 0)
 			return errno;
 	}
-	
+
 	// read
 	ssize_t bytesWritten = haiku_host_platform_write(descriptor->fd, buffer,
 		bufferSize);
@@ -706,10 +706,10 @@ _kern_read_stat(int fd, const char *path, bool traverseLink,
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
 			return B_FILE_ERROR;
-	
+
 		return descriptor->GetStat(traverseLink, st);
 	}
-			
+
 	return B_OK;
 }
 
@@ -734,7 +734,7 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 			return errno;
 
 		isSymlink = S_ISLNK(tmpStat.st_mode);
-			
+
 	} else {
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
@@ -743,17 +743,17 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 		if (FileDescriptor *fileFD
 				= dynamic_cast<FileDescriptor*>(descriptor)) {
 			realFD = fileFD->fd;
-		
+
 		} else if (dynamic_cast<DirectoryDescriptor*>(descriptor)) {
 			error = get_path(fd, NULL, realPath);
 			if (error != B_OK)
 				return error;
-		
+
 		} else if (SymlinkDescriptor *linkFD
 				= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
 			realPath = linkFD->path;
 			isSymlink = true;
-		
+
 		} else
 			return B_FILE_ERROR;
 	}
@@ -762,23 +762,23 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 	// available functions traverse symlinks.
 	if (isSymlink && !traverseLink)
 		return B_ERROR;
-	
+
 	if (realFD >= 0) {
 		if (statMask & B_STAT_MODE) {
 			if (fchmod(realFD, st->st_mode) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_UID) {
 			if (fchown(realFD, st->st_uid, (gid_t)-1) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_GID) {
 			if (fchown(realFD, (uid_t)-1, st->st_gid) < 0)
 				return errno;
 		}
-		
+
 		if (statMask & B_STAT_SIZE) {
 			if (ftruncate(realFD, st->st_size) < 0)
 				return errno;
@@ -790,25 +790,25 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME)) {
 			return B_ERROR;
 		}
-		
+
 		return 0;
-	
+
 	} else {
 		if (statMask & B_STAT_MODE) {
 			if (chmod(realPath.c_str(), st->st_mode) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_UID) {
 			if (chown(realPath.c_str(), st->st_uid, (gid_t)-1) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_GID) {
 			if (chown(realPath.c_str(), (uid_t)-1, st->st_gid) < 0)
 				return errno;
 		}
-		
+
 		if (statMask & B_STAT_SIZE) {
 			if (truncate(realPath.c_str(), st->st_size) < 0)
 				return errno;
@@ -822,18 +822,18 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 				if (stat(realPath.c_str(), &oldStat) < 0)
 					return errno;
 			}
-				
+
 			utimbuf buffer;
 			buffer.actime = (statMask & B_STAT_ACCESS_TIME) ? st->st_atime : oldStat.st_atime;
 			buffer.modtime = (statMask & B_STAT_MODIFICATION_TIME) ? st->st_mtime : oldStat.st_mtime;
 			if (utime(realPath.c_str(), &buffer) < 0)
 				return errno;
 		}
-				
-		// not supported	
+
+		// not supported
 		if (statMask & (B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME))
 			return B_ERROR;
-	}	
+	}
 
 	return B_OK;
 }
@@ -878,7 +878,7 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 	if (*_bufferSize > 0) {
 		if ((size_t)bytesRead == *_bufferSize)
 			bytesRead--;
-	
+
 		buffer[bytesRead] = '\0';
 	}
 
@@ -918,7 +918,7 @@ _kern_rename(int oldDir, const char *oldPath, int newDir, const char *newPath)
 	error = get_path(newDir, newPath, realNewPath);
 	if (error != B_OK)
 		return error;
-		
+
 	// rename
 	if (rename(realOldPath.c_str(), realNewPath.c_str()) < 0)
 		return errno;
@@ -954,7 +954,7 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
 	ssize_t bytesRead = haiku_host_platform_read(fd, buffer, bufferSize);
 	if (bytesRead < 0) {
@@ -969,12 +969,25 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 ssize_t
 write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 {
+	// If this is an attribute descriptor, let it do the job.
+	AttributeDescriptor* descriptor
+		= dynamic_cast<AttributeDescriptor*>(get_descriptor(fd));
+	if (descriptor != NULL) {
+		status_t error = descriptor->Write(pos, buffer, bufferSize);
+		if (error != B_OK) {
+			errno = error;
+			return -1;
+		}
+
+		return 0;
+	}
+
 	// seek
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
 
-	// read
+	// write
 	ssize_t bytesWritten = haiku_host_platform_write(fd, buffer, bufferSize);
 	if (bytesWritten < 0) {
 		errno = bytesWritten;
@@ -992,7 +1005,7 @@ readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
 	ssize_t bytesRead = haiku_host_platform_readv(fd, vec, count);
 	if (bytesRead < 0) {
@@ -1011,7 +1024,7 @@ writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
 	ssize_t bytesWritten = haiku_host_platform_writev(fd, vec, count);
 	if (bytesWritten < 0) {

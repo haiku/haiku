@@ -11,7 +11,9 @@
 
 #include <map>
 
+#include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <fs_attr.h>
@@ -247,6 +249,151 @@ SymlinkDescriptor::GetPath(string& path) const
 {
 	path = this->path;
 	return B_OK;
+}
+
+
+// #pragma mark - AttributeDescriptor
+
+
+AttributeDescriptor::AttributeDescriptor(int fileFD, const char* attribute,
+	uint32 type, int openMode)
+	:
+	fFileFD(dup(fileFD)),
+	fType(type),
+	fOpenMode(openMode),
+	fData(NULL),
+	fDataSize(0)
+
+{
+	strlcpy(fAttribute, attribute, sizeof(fAttribute));
+}
+
+
+AttributeDescriptor::~AttributeDescriptor()
+{
+	Close();
+}
+
+
+status_t
+AttributeDescriptor::Init()
+{
+	if (fFileFD < 0)
+		return B_IO_ERROR;
+
+	// stat the attribute
+	attr_info info;
+	if (fs_stat_attr(fFileFD, fAttribute, &info) < 0) {
+		if (errno == B_ENTRY_NOT_FOUND) {
+			if ((fOpenMode & O_CREAT) == 0)
+				return errno;
+
+			// create the attribute
+			if (fs_write_attr(fFileFD, fAttribute, fType, 0, NULL, 0) < 0)
+				return errno;
+			return B_OK;
+		}
+		return errno;
+	}
+
+	if ((fOpenMode & O_TRUNC) == 0) {
+		// truncate the attribute
+		if (fs_write_attr(fFileFD, fAttribute, fType, 0, NULL, 0) < 0)
+			return errno;
+		return B_OK;
+	}
+
+	// we have to read in the attribute data
+	if (info.size == 0)
+		return B_OK;
+
+	fData = (uint8*)malloc(info.size);
+	if (fData == NULL)
+		return B_NO_MEMORY;
+
+	fDataSize = info.size;
+
+	ssize_t bytesRead = fs_read_attr(fFileFD, fAttribute, fType, 0, fData,
+		fDataSize);
+	if (bytesRead < 0)
+		return errno;
+	if ((size_t)bytesRead != fDataSize)
+		return B_IO_ERROR;
+
+	return B_OK;
+}
+
+
+status_t
+AttributeDescriptor::Write(off_t offset, const void* buffer, size_t bufferSize)
+{
+	if (offset < 0)
+		return B_BAD_VALUE;
+
+	if ((fOpenMode & O_ACCMODE) != O_WRONLY
+		&& (fOpenMode & O_ACCMODE) != O_RDWR) {
+		return B_NOT_ALLOWED;
+	}
+
+	// we may need to resize the buffer
+	size_t minSize = (size_t)offset + bufferSize;
+	if (minSize > fDataSize) {
+		uint8* data = (uint8*)realloc(fData, minSize);
+		if (data == NULL)
+			return B_NO_MEMORY;
+
+		if ((size_t)offset > fDataSize)
+			memset(data + offset, 0, offset - fDataSize);
+
+		fData = data;
+		fDataSize = minSize;
+	}
+
+	// copy the data and write all of it
+	if (bufferSize == 0)
+		return B_OK;
+
+	memcpy((uint8*)fData + offset, buffer, bufferSize);
+
+	ssize_t bytesWritten = fs_write_attr(fFileFD, fAttribute, fType, 0,
+		fData, fDataSize);
+	if (bytesWritten < 0)
+		return errno;
+	if ((size_t)bytesWritten != fDataSize)
+		return B_IO_ERROR;
+
+	return B_OK;
+}
+
+
+status_t
+AttributeDescriptor::Close()
+{
+	if (fFileFD < 0)
+		return B_BAD_VALUE;
+
+	close(fFileFD);
+	fFileFD = -1;
+
+	free(fData);
+	fData = NULL;
+	fDataSize = 0;
+
+	return B_OK;
+}
+
+
+status_t
+AttributeDescriptor::Dup(Descriptor*& clone)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+AttributeDescriptor::GetStat(bool traverseLink, struct stat* st)
+{
+	return B_NOT_SUPPORTED;
 }
 
 

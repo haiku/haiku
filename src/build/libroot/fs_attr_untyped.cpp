@@ -452,22 +452,50 @@ fs_rewind_attr_dir(DIR *dir)
 		attrDir->RewindDir();
 }
 
-// fs_open_attr
+// fs_fopen_attr
 int
-fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
+fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
 {
-	// not supported ATM
-	errno = B_BAD_VALUE;
-	return -1;
+	if (fd < 0) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	AttributeDescriptor* descriptor = new(std::nothrow) AttributeDescriptor(fd,
+		attribute, type, openMode);
+	if (descriptor == NULL) {
+		errno = B_NO_MEMORY;
+		return -1;
+	}
+
+	status_t error = descriptor->Init();
+	if (error != B_OK) {
+		delete descriptor;
+		errno = error;
+		return -1;
+	}
+
+	int attributeFD = add_descriptor(descriptor);
+	if (attributeFD < 0) {
+		delete descriptor;
+		errno = B_NO_MEMORY;
+		return -1;
+	}
+
+	return attributeFD;
 }
 
 // fs_close_attr
 int
 fs_close_attr(int fd)
 {
-	// not supported ATM
-	errno = B_BAD_VALUE;
-	return -1;
+	status_t error = delete_descriptor(fd);
+	if (error != 0) {
+		errno = error;
+		return -1;
+	}
+
+	return 0;
 }
 
 // fs_read_attr
