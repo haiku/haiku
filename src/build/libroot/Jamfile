@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
-UsePrivateBuildHeaders kernel ;
+UsePrivateBuildHeaders kernel libroot ;
 
 {
 	local defines = [ FDefines
@@ -17,7 +17,14 @@ UsePrivateBuildHeaders kernel ;
 	] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
+
+	local defines = [ FDefines
+		HAIKU_BUILD_GENERATED_DIRECTORY="\\\"$(HAIKU_OUTPUT_DIR)\\\""
+	] ;
+	SubDirC++Flags $(defines) ;
+	ObjectC++Flags find_directory.cpp : $(defines) ;
 }
+
 
 DEFINES += KMESSAGE_CONTAINER_ONLY ;
 ObjectC++Flags KMessage.cpp : $(HOST_BE_API_C++FLAGS) ;
@@ -44,6 +51,7 @@ local librootSources =
 	atomic.cpp
 	byteorder.cpp
 	errors.cpp
+	find_directory.cpp
 	fs.cpp
 	fs_attr.cpp
 	fs_descriptors.cpp
@@ -53,11 +61,15 @@ local librootSources =
 
 	$(hostPlatformSources)
 
+	driver_settings.cpp
+
 	$(strlSources)
 	strnlen.c
 
 	KMessage.cpp
 ;
+
+USES_BE_API on [ FGristFiles $(librootSources:S=$(SUFOBJ)) ] = true ;
 
 BuildPlatformSharedLibrary libroot_build.so :
 	$(librootSources)
@@ -70,6 +82,8 @@ BuildPlatformStaticLibrary libroot_build.a :
 	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
 ;
 
+SEARCH on [ FGristFiles driver_settings.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]
