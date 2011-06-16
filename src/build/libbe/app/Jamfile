@@ -9,6 +9,7 @@ USES_BE_API on <libbe_build>app_kit.o = true ;
 BuildPlatformMergeObjectPIC <libbe_build>app_kit.o :
  	Application.cpp
  	AppMisc.cpp
+	Looper.cpp
 	Message.cpp
 	MessageAdapter.cpp
  	Messenger.cpp
