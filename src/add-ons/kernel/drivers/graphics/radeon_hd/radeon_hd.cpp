@@ -93,6 +93,7 @@ radeon_hd_init(radeon_info &info)
 	frambufferMapper.Detach();
 
 	// Pass common information to accelerant
+	info.shared_info->device_id = info.device_id;
 	info.shared_info->device_chipset = info.device_chipset;
 	info.shared_info->registers_area = info.registers_area;
 	info.shared_info->frame_buffer_area = info.framebuffer_area;

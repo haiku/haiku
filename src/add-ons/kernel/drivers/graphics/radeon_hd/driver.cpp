@@ -242,6 +242,7 @@ init_driver(void)
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
 		gDeviceInfo[found]->registers = (uint8 *)info->u.h0.base_registers[0];
+		gDeviceInfo[found]->device_id = kSupportedDevices[type].device_id;
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_chipset = kSupportedDevices[type].chipset;
 
