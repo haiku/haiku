@@ -724,3 +724,12 @@ rule BuildPlatformStaticLibrary lib : sources : otherObjects
 	StaticLibrary $(lib) : $(sources) : $(otherObjects) ;
 }
 
+rule BuildPlatformStaticLibraryPIC target : sources : otherObjects
+{
+	# Like BuildPlatformStaticLibrary, but producing position independent code.
+
+	ObjectCcFlags $(sources) : $(HOST_PIC_CCFLAGS) ;
+	ObjectC++Flags $(sources) : $(HOST_PIC_C++FLAGS) ;
+
+	BuildPlatformStaticLibrary $(target) : $(sources) : $(otherObjects) ;
+}
