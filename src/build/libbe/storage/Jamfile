@@ -16,6 +16,7 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	EntryList.cpp
 	File.cpp
 	FileIO.cpp
+	FindDirectory.cpp
 	Mime.cpp
 	MimeType.cpp
 	Node.cpp

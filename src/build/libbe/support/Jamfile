@@ -14,5 +14,6 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Flattenable.cpp
 	List.cpp
 	Locker.cpp
+	PointerList.cpp
 	String.cpp
 ;
