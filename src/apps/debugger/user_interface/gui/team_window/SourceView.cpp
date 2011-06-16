@@ -32,6 +32,7 @@
 #include "FileSourceCode.h"
 #include "LocatableFile.h"
 #include "MessageCodes.h"
+#include "SourceLanguage.h"
 #include "StackTrace.h"
 #include "Statement.h"
 #include "Team.h"
@@ -1232,7 +1233,13 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 			BMessage message;
 			message.AddData ("text/plain", B_MIME_TYPE, text.String(),
 				text.Length());
-			BString clipName = fSourceCode->GetSourceFile()->Name();
+			BString clipName;
+			if (fSourceCode->GetSourceFile() != NULL)
+				clipName = fSourceCode->GetSourceFile()->Name();
+			else if (fSourceCode->GetSourceLanguage() != NULL)
+				clipName = fSourceCode->GetSourceLanguage()->Name();
+			else
+				clipName = "Text";
 			clipName << " clipping";
 			message.AddString ("be:clip_name", clipName.String());
 			message.AddInt32 ("be:actions", B_COPY_TARGET);
