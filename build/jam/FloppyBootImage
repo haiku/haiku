@@ -59,23 +59,28 @@ AddFilesToFloppyBootArchive system add-ons kernel busses ide
 	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
 AddFilesToFloppyBootArchive system add-ons kernel busses scsi
 	: ahci ;
-AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
+AddFilesToFloppyBootArchive system add-ons kernel console
+	: vga_text ;
 AddFilesToFloppyBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive system add-ons kernel generic
 	: $(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph ;
-AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
+AddFilesToFloppyBootArchive
+	system add-ons kernel partitioning_systems
 	: intel session ;
-AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
+AddFilesToFloppyBootArchive
+	system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
 
 if $(USB_BOOT) = 1 {
-	AddFilesToFloppyBootArchive system add-ons kernel busses usb
+	AddFilesToFloppyBootArchive
+		system add-ons kernel busses usb
 		: <usb>uhci <usb>ohci <usb>ehci ;
 }
 
 if $(TARGET_ARCH) = x86 {
-	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
+	AddFilesToFloppyBootArchive system add-ons kernel cpu
+		: generic_x86 ;
 }
 
 # drivers
@@ -89,7 +94,8 @@ if $(NET_BOOT) = 1 {
 }
 
 # kernel
-AddFilesToFloppyBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
+AddFilesToFloppyBootArchive system
+	: <revisioned>kernel_$(TARGET_ARCH) ;
 
 # scripts and data files
 
@@ -103,13 +109,17 @@ if $(NET_BOOT) = 1 {
 	# add-ons
 	AddFilesToFloppyBootArchive system add-ons kernel network
 		: stack socket ;
-	AddFilesToFloppyBootArchive system add-ons kernel network devices
+	AddFilesToFloppyBootArchive
+		system add-ons kernel network devices
 		: $(SYSTEM_NETWORK_DEVICES) ;
-	AddFilesToFloppyBootArchive system add-ons kernel network datalink_protocols
+	AddFilesToFloppyBootArchive
+		system add-ons kernel network datalink_protocols
 		: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
-	AddFilesToFloppyBootArchive system add-ons kernel network ppp
+	AddFilesToFloppyBootArchive
+		system add-ons kernel network ppp
 		: $(SYSTEM_NETWORK_PPP) ;
-	AddFilesToFloppyBootArchive system add-ons kernel network protocols
+	AddFilesToFloppyBootArchive
+		system add-ons kernel network protocols
 		: $(SYSTEM_NETWORK_PROTOCOLS) ;
 }
 

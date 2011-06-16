@@ -53,8 +53,8 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "BarWindow.h"
-#include "BeMenu.h"
-#include "DeskBarUtils.h"
+#include "DeskbarMenu.h"
+#include "DeskbarUtils.h"
 #include "ExpandoMenuBar.h"
 #include "FSUtils.h"
 #include "ResourceSet.h"
@@ -157,7 +157,7 @@ TBarView::MessageReceived(BMessage* message)
 		case B_REFS_RECEIVED:
 			// received when an item is selected during DnD
 			// message is targeted here from Be menu
-			HandleBeMenu(message);
+			HandleDeskbarMenu(message);
 			break;
 
 		case B_ARCHIVED_OBJECT:
@@ -261,7 +261,7 @@ TBarView::MouseDown(BPoint where)
 
 
 void
-TBarView::PlaceBeMenu()
+TBarView::PlaceDeskbarMenu()
 {
 	// top or bottom, full
 	if (!fVertical && fBarMenuBar) {
@@ -302,7 +302,7 @@ TBarView::PlaceBeMenu()
 			width = floorf(width) / 2;
 		loc = Bounds().LeftTop();
 	} else {
-		// mini mode, BeMenu next to team menu
+		// mini mode, DeskbarMenu next to team menu
 		fBarMenuBar->AddTeamMenu();
 	}
 
@@ -525,7 +525,7 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 
 	BRect screenFrame = (BScreen(Window())).Frame();
 
-	PlaceBeMenu();
+	PlaceDeskbarMenu();
 	PlaceTray(vertSwap, leftSwap, screenFrame);
 
 	// We need to keep track of what apps are expanded.
@@ -773,12 +773,12 @@ TBarView::MenuTrackingHook(BMenu* menu, void* castToThis)
 		// keep tracking
 		endMenu = false;
 	} else {
-		// see if the mouse is in the team/be menu item
+		// see if the mouse is in the team/deskbar menu item
 		menu->ConvertToScreen(&location);
 		if (barview->LockLooper()) {
 			TExpandoMenuBar* expando = barview->ExpandoMenuBar();
-			TBeMenu* bemenu
-				= (dynamic_cast<TBarWindow*>(barview->Window()))->BeMenu();
+			TDeskbarMenu* bemenu
+				= (dynamic_cast<TBarWindow*>(barview->Window()))->DeskbarMenu();
 
 			if (bemenu && bemenu->LockLooper()) {
 				bemenu->ConvertFromScreen(&location);
@@ -939,7 +939,7 @@ TBarView::InvokeItem(const char* signature)
 
 
 void
-TBarView::HandleBeMenu(BMessage* messagewithdestination)
+TBarView::HandleDeskbarMenu(BMessage* messagewithdestination)
 {
 	if (!Dragging())
 		return;
@@ -963,13 +963,13 @@ TBarView::HandleBeMenu(BMessage* messagewithdestination)
 			if (entry.IsDirectory()) {
 				// if the ref received (should only be 1) is a directory
 				// then add the drag refs to the directory
-				AddRefsToBeMenu(DragMessage(), &ref);
+				AddRefsToDeskbarMenu(DragMessage(), &ref);
 			} else
 				SendDragMessage(NULL, &ref);
 		}
 	} else {
-		// adds drag refs to top level in be menu
-		AddRefsToBeMenu(DragMessage(), NULL);
+		// adds drag refs to top level in deskbar menu
+		AddRefsToDeskbarMenu(DragMessage(), NULL);
 	}
 
 	// clean up drag message and types list

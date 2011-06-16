@@ -10,7 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UsePrivateHeaders net ;
+UsePrivateHeaders libroot net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared

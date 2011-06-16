@@ -30,6 +30,8 @@
 #include <Application.h>
 #include <Catalog.h>
 #include <Deskbar.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include <Roster.h>
 
 #include <stdio.h>
@@ -139,8 +141,16 @@ PCApplication::ArgvReceived(int32 argc, char **argv)
 				snooze(10000);
 			} while (be_roster->IsRunning(kTrackerSig) && k-- > 0);
 		}
-		remove("/boot/home/config/settings/Tracker/tracker_shelf");
-		launch(kTrackerSig, "/boot/system/Tracker");
+		BPath shelfPath;
+		if (find_directory(B_USER_SETTINGS_DIRECTORY, &shelfPath) == B_OK
+			&& shelfPath.Append("Tracker/tracker_shelf") == B_OK) {
+			remove(shelfPath.Path());
+		}
+		BPath trackerPath;
+		if (find_directory(B_SYSTEM_DIRECTORY, &trackerPath) == B_OK
+			&& trackerPath.Append("Tracker") == B_OK) {
+			launch(kTrackerSig, trackerPath.Path());
+		}
 	} else if (argc == 2 && strcmp(argv[1], "-deskbar") == 0) {
 		BDeskbar deskbar;
 		if (!gInDeskbar && !deskbar.HasItem(kDeskbarItemName))

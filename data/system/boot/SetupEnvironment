@@ -6,8 +6,10 @@
 export HOME=/boot/home
 export LC_CTYPE="en_US.UTF-8"
 
-BUILDHOME=/boot/develop
-BETOOLS="$BUILDHOME/tools/gnupro/bin"
+BUILDHOME=/boot/system/develop
+
+#TODO: fix this or drop it!
+BETOOLS="/boot/common/settings/develop/tools/current/bin"
 
 case `uname -m` in
 BePC|Intel|unknown)
@@ -20,7 +22,9 @@ BeMac|BeBox)
 	BE_HOST_CPU=unknown
 esac
 
-BELIBRARIES="$BUILDHOME/abi/current/library-paths/common:$BUILDHOME/lib/$BE_HOST_CPU"
+BELIBRARIES="/boot/common/non-packaged/lib:/boot/common/lib:$BUILDHOME/lib"
+
+# not used by Haiku, but probably by legacy applications (BeIDE?)
 BH=$BUILDHOME/headers
 BEINCLUDES="$BH;$BH/be;$BH/posix;$BH/glibc;$BH/cpp;$BH/be/app;$BH/be/device;$BH/be/interface;$BH/be/locale;$BH/be/media;$BH/be/midi;$BH/be/midi2;$BH/be/net;$BH/be/kernel;$BH/be/storage;$BH/be/support;$BH/be/game;$BH/be/opengl;$BH/be/drivers;$BH/gnu;$BH/be/mail;$BH/be/translation;$BH/be/devel;$BH/be/add-ons/graphics;$BH/be/be_apps/Deskbar;$BH/be/be_apps/NetPositive;$BH/be/be_apps/Tracker"
 
@@ -40,13 +44,13 @@ export BE_DEFAULT_CPLUS_FLAGS=""
 
 if [ "$SAFEMODE" != "yes" ]
 then
-	export PATH=.:$HOME/config/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences:$BETOOLS
-	export LIBRARY_PATH="%A/lib:$HOME/config/lib:/boot/common/lib:/boot/system/lib"
-	export ADDON_PATH="%A/add-ons:$HOME/config/add-ons:/boot/common/add-ons:/boot/system/add-ons"
+	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/common/non-packaged/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences:$BETOOLS
+	export LIBRARY_PATH="%A/lib:$HOME/config/non-packaged/lib:$HOME/config/lib:/boot/common/non-packaged/lib:/boot/common/lib:/boot/system/lib"
+	export ADDON_PATH="%A/add-ons:$HOME/config/non-packaged/add-ons:$HOME/config/add-ons:/boot/common/non-packaged/add-ons:/boot/common/add-ons:/boot/system/add-ons"
 else
-	export PATH=.:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences:$BETOOLS
-	export LIBRARY_PATH="%A/lib:/boot/common/lib:/boot/system/lib"
-	export ADDON_PATH="%A/add-ons:/boot/common/add-ons:/boot/system/add-ons"
+	export PATH=.:/bin:/boot/apps:/boot/system/apps:/boot/system/preferences:$BETOOLS
+	export LIBRARY_PATH="%A/lib:/boot/system/lib"
+	export ADDON_PATH="%A/add-ons:/boot/system/add-ons"
 fi
 
 # media kit

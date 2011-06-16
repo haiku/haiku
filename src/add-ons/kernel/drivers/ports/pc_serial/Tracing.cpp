@@ -11,6 +11,7 @@
 #include <stdio.h> //sprintf
 #include <unistd.h> //posix file i/o - create, write, close
 #include <Drivers.h>
+#include <directories.h>
 #include <driver_settings.h>
 
 
@@ -26,7 +27,7 @@ bool gLogFunctionCalls = false;
 bool gLogFunctionReturns = false;
 bool gLogFunctionResults = false;
 
-static const char *sLogFilePath="/boot/home/"DRIVER_NAME".log";
+static const char *sLogFilePath = kCommonLogDirectory "/" DRIVER_NAME ".log";
 static sem_id sLogLock;
 
 

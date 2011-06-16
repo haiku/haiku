@@ -2810,14 +2810,21 @@ BContainerWindow::EachAddon(bool (*eachAddon)(const Model *, const char *,
 	BObjectList<Model> uniqueList(10, true);
 	BPath path;
 	bool bail = false;
-	if (find_directory(B_BEOS_ADDONS_DIRECTORY, &path) == B_OK)
+	if (find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &path) == B_OK)
 		bail = EachAddon(path, eachAddon, &uniqueList, passThru);
 
 	if (!bail && find_directory(B_USER_ADDONS_DIRECTORY, &path) == B_OK)
 		bail = EachAddon(path, eachAddon, &uniqueList, passThru);
 
+	if (!bail
+		&& find_directory(B_COMMON_NONPACKAGED_ADDONS_DIRECTORY, &path) == B_OK)
+		EachAddon(path, eachAddon, &uniqueList, passThru);
+
 	if (!bail && find_directory(B_COMMON_ADDONS_DIRECTORY, &path) == B_OK)
 		EachAddon(path, eachAddon, &uniqueList, passThru);
+
+	if (!bail && find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path) == B_OK)
+		bail = EachAddon(path, eachAddon, &uniqueList, passThru);
 }
 
 

@@ -13,7 +13,7 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 
 UsePrivateHeaders [ FDirName kernel ] 			# For kernel_cpp.cpp
-	media ;
+	libroot media ;
 
 # set some additional defines
 SubDirCcFlags -DECHO_BEOS -DINDIGO_FAMILY -DCARDBUS ;

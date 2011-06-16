@@ -50,18 +50,22 @@ AddFilesToNetBootArchive system add-ons kernel busses ide
 	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
 AddFilesToNetBootArchive system add-ons kernel busses scsi
 	: ahci ;
-AddFilesToNetBootArchive system add-ons kernel console : vga_text ;
+AddFilesToNetBootArchive system add-ons kernel console
+	: vga_text ;
 AddFilesToNetBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToNetBootArchive system add-ons kernel generic
 	: $(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool scsi_periph ;
-AddFilesToNetBootArchive system add-ons kernel partitioning_systems
+AddFilesToNetBootArchive
+	system add-ons kernel partitioning_systems
 	: intel session ;
-AddFilesToNetBootArchive system add-ons kernel interrupt_controllers
+AddFilesToNetBootArchive
+	system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
 
 if $(TARGET_ARCH) = x86 {
-	AddFilesToNetBootArchive system add-ons kernel cpu : generic_x86 ;
+	AddFilesToNetBootArchive system add-ons kernel cpu
+		: generic_x86 ;
 }
 
 # drivers
@@ -71,7 +75,8 @@ AddDriversToNetBootArchive disk virtual	: remote_disk ;
 AddDriversToNetBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 
 # kernel
-AddFilesToNetBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
+AddFilesToNetBootArchive system
+	: <revisioned>kernel_$(TARGET_ARCH) ;
 
 # scripts and data files
 
@@ -86,11 +91,13 @@ AddFilesToNetBootArchive system add-ons kernel network
 	: <net>notifications stack ;
 AddFilesToNetBootArchive system add-ons kernel network devices
 	: $(SYSTEM_NETWORK_DEVICES) ;
-AddFilesToNetBootArchive system add-ons kernel network datalink_protocols
+AddFilesToNetBootArchive
+	system add-ons kernel network datalink_protocols
 	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
 AddFilesToNetBootArchive system add-ons kernel network ppp
 	: $(SYSTEM_NETWORK_PPP) ;
-AddFilesToNetBootArchive system add-ons kernel network protocols
+AddFilesToNetBootArchive
+	system add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 
 # boot module links

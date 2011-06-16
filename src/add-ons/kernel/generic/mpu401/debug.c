@@ -25,16 +25,24 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+
 #include <KernelExport.h>
+#include <OS.h>
+
 #include <stdio.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <OS.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <directories.h>
+
 #include "debug.h"
+
 
 #define DRIVER_NAME "mpu401"
 #define VERSION "0.2"
+
 
 void debug_printf(const char *text,...)
 {
@@ -48,10 +56,11 @@ void debug_printf(const char *text,...)
 	dprintf(DRIVER_NAME ": %s",buf);
 }
 
-#if DEBUG > 0
 
-static const char * logfile="/boot/home/mpu401.log";
+#if DEBUG > 0
+static const char *logfile = kCommonLogDirectory "/mpu401.log";
 static sem_id loglock;
+
 
 void log_create(void)
 {
@@ -61,6 +70,7 @@ void log_create(void)
 	write(fd,text,strlen(text));
 	close(fd);
 }
+
 
 void log_printf(const char *text,...)
 {
@@ -84,5 +94,4 @@ void log_printf(const char *text,...)
 		snooze(150000);
 	#endif
 }
-
 #endif

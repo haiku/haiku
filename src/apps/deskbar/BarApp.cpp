@@ -56,7 +56,7 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarView.h"
 #include "BarWindow.h"
-#include "DeskBarUtils.h"
+#include "DeskbarUtils.h"
 #include "FSUtils.h"
 #include "PublicCommands.h"
 #include "ResourceSet.h"
@@ -69,7 +69,7 @@ BList TBarApp::sBarTeamInfoList;
 BList TBarApp::sSubscribers;
 
 
-const uint32 kShowBeMenu = 'BeMn';
+const uint32 kShowDeskbarMenu = 'BeMn';
 const uint32 kShowTeamMenu = 'TmMn';
 
 
@@ -332,9 +332,9 @@ TBarApp::MessageReceived(BMessage* message)
 			fPreferencesWindow->PostMessage(kStateChanged);
 			break;
 
-		case kShowBeMenu:
+		case kShowDeskbarMenu:
 			if (fBarWindow->Lock()) {
-				fBarWindow->ShowBeMenu();
+				fBarWindow->ShowDeskbarMenu();
 				fBarWindow->Unlock();
 			}
 			break;

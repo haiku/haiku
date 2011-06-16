@@ -191,7 +191,7 @@ ScreenSaverFilter::_Invoke()
 	BPath path;
 	if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
 		|| path.Append("screen_blanker") != B_OK)
-		path.SetTo("/boot/system/bin/screen_blanker");
+		path.SetTo("/bin/screen_blanker");
 	BEntry entry(path.Path());
 	entry_ref ref;
 	if (entry.GetRef(&ref) == B_OK 

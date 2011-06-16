@@ -2,15 +2,6 @@
 # It is directly included from HaikuImage -- all variables defined there can
 # be used
 
-# Detect a hybrid GCC2/GCC4 image and disable the checks for unavailable GCC4
-# packages. (It does not matter if a package was built with either compiler,
-# the system should have the respective other system libs.)
-local isHybridBuild ;
-if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
-		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
-	isHybridBuild = 1 ;
-}
-
 
 # Available Optional Lib Packages:
 #	AllegroLibs
@@ -65,7 +56,7 @@ if [ IsOptionalHaikuImagePackageAdded box2d ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package box2d available for $(TARGET_ARCH)" ;
 	} else {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				box2d-2.1.2-r1a3-r1a3-x86-gcc4-2011-05-26.zip
 				: $(baseURL)/lib/box2d-2.1.2-r1a3-x86-gcc4-2011-05-26.zip

@@ -403,13 +403,18 @@ BPrinter::_DriverPath() const
 	if (driverName.Length() <= 0)
 		return BPath();
 
-	directory_which directorys[] = { B_USER_ADDONS_DIRECTORY,
-		B_COMMON_ADDONS_DIRECTORY, B_BEOS_ADDONS_DIRECTORY };
+	directory_which directories[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY
+	};
 
 	BPath path;
 	driverName.Prepend("Print/");
-	for (int32 i = 0; i < 3; ++i) {
-		if (find_directory(directorys[i], &path) == B_OK) {
+	for (int32 i = 0; i < sizeof(directories) / sizeof(directories[0]); ++i) {
+		if (find_directory(directories[i], &path) == B_OK) {
 			path.Append(driverName.String());
 
 			BEntry driver(path.Path());

@@ -47,14 +47,14 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bzip2
 	mkfifo mkfs mkindex mktemp modifiers mount mount_nfs mountvolume mv
 	netcat netstat nl nohup notify nproc
 	od open
-	passwd paste patch pathchk pc ping ping6 play playfile playsound playwav
-	pr prio printenv printf profile ps ptx pwd
+	package package_repo passwd paste patch pathchk pc ping ping6 pkgman play
+	playfile playsound playwav pr prio printenv printf profile ps ptx pwd
 	query quit
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route
 	safemode screen_blanker screenmode screenshot sdiff setdecor settype
-	setversion setvolume seq sha1sum shar shred shuf shutdown sleep sort
-	spamdbm
+	setversion setvolume seq sha1sum sha256sum shar shred shuf shutdown sleep
+	sort spamdbm
 	split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tput tr traceroute translate trash true truncate tsort tty
@@ -89,8 +89,8 @@ SYSTEM_LIBS =
 	liblocale.so
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
-	libpng.so
-	<revisioned>libroot.so libroot-addon-icu.so
+	libpackage.so libpng.so
+	<revisioned>libroot.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	libz.so
@@ -101,6 +101,7 @@ PRIVATE_SYSTEM_LIBS =
 	libfluidsynth.so
 	libilmimf.so
 	liblpsolve55.so
+	libroot-addon-icu.so
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
@@ -190,8 +191,8 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
 	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
-SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs
-	attribute_overlay write_overlay ntfs reiserfs udf googlefs ;
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
+	attribute_overlay write_overlay ntfs packagefs reiserfs udf googlefs ;
 
 # wifi firmware
 for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
@@ -232,7 +233,8 @@ AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
-AddFilesToHaikuImage system add-ons kernel console : vga_text ;
+AddFilesToHaikuImage system add-ons kernel console
+	: vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm
 	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
@@ -241,13 +243,16 @@ AddFilesToHaikuImage system add-ons kernel file_systems
 AddFilesToHaikuImage system add-ons kernel generic
 	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
 		scsi_periph <module>tty ;
-AddFilesToHaikuImage system add-ons kernel partitioning_systems
+AddFilesToHaikuImage
+	system add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
-AddFilesToHaikuImage system add-ons kernel interrupt_controllers
+AddFilesToHaikuImage
+	system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
 
 if $(TARGET_ARCH) = x86 {
-	AddFilesToHaikuImage system add-ons kernel cpu : generic_x86 ;
+	AddFilesToHaikuImage system add-ons kernel cpu
+		: generic_x86 ;
 }
 
 # drivers
@@ -276,10 +281,11 @@ AddDriversToHaikuImage ports		: usb_serial ;
 #AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
-AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
+AddFilesToHaikuImage system
+	: <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
-AddLibrariesToHaikuHybridImage system lib
+AddLibrariesToHaikuImage system lib
 	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
 
 # libnetwork.so replaces quite a few libraries
@@ -289,12 +295,12 @@ SYSTEM_LIBS_LIBNETWORK_ALIASES
 if $(HAIKU_GCC_VERSION[1]) = 2 {
 	local lib ;
 	for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
-		AddSymlinkToHaikuHybridImage system lib : libnetwork.so : $(lib)
-			: : true ;
+		AddSymlinkToHaikuImage system lib
+			: libnetwork.so : $(lib) ;
 	}
 
-	AddSymlinkToHaikuHybridImage system lib : libbnetapi.so : libnetapi.so
-		: : true ;
+	AddSymlinkToHaikuImage system lib : libbnetapi.so
+		: libnetapi.so ;
 }
 
 
@@ -305,7 +311,8 @@ SYSTEM_LIBS_LIBGL_ALIASES
 if $(TARGET_ARCH) = x86 {
 	local lib ;
 	for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
-		AddSymlinkToHaikuHybridImage system lib : libGL.so : $(lib) : : true ;
+		AddSymlinkToHaikuImage system lib
+			: libGL.so : $(lib) ;
 	}
 }
 
@@ -319,10 +326,12 @@ SYSTEM_LIBS_ALIASES =
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToHaikuImage system				: runtime_loader Deskbar Tracker ;
+AddFilesToHaikuImage system		: runtime_loader ;
+AddFilesToHaikuImage system		: Deskbar Tracker ;
 AddFilesToHaikuImage system bin			: $(SYSTEM_BIN) consoled ;
 AddFilesToHaikuImage system apps		: $(SYSTEM_APPS) ;
-AddFilesToHaikuImage system preferences	: $(SYSTEM_PREFERENCES) ;
+AddFilesToHaikuImage system preferences
+	: $(SYSTEM_PREFERENCES) ;
 AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 
 SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
@@ -330,15 +339,18 @@ AddFilesToHaikuImage system bin			: which ;
 SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: installoptionalpackage ;
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
+AddFilesToHaikuImage system bin
+	: install-wifi-firmwares.sh ;
 
+# TODO: remove!
 # Add the files to be used by installoptionalpackage.
 AddDirectoryToHaikuImage common data optional-packages ;
 local optional-pkg-files = OptionalBuildFeatures OptionalPackageDependencies
 	OptionalPackages OptionalLibPackages ;
 for name in $(optional-pkg-files) {
 	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
-	AddFilesToHaikuImage common data optional-packages : $(file) ;
+	AddFilesToHaikuImage common data optional-packages
+		: $(file) ;
 }
 AddInstalledPackagesFileToHaikuImage ;
 
@@ -352,8 +364,9 @@ AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 
+AddSymlinkToHaikuImage home config settings : deskbar : be ;
 # Deskbar Application links
-AddDirectoryToHaikuImage home config be Applications ;
+AddDirectoryToHaikuImage home config settings deskbar Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
 	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
@@ -361,32 +374,33 @@ DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
-	AddSymlinkToHaikuImage home config be Applications
+	AddSymlinkToHaikuImage home config settings deskbar Applications
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Desktop applets links
-AddDirectoryToHaikuImage home config be Desktop\ applets ;
+AddDirectoryToHaikuImage home config settings deskbar Desktop\ applets ;
 DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
 	Workspaces
 ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
-	AddSymlinkToHaikuImage home config be Desktop\ applets
+	AddSymlinkToHaikuImage home config settings deskbar Desktop\ applets
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Preferences links
-AddDirectoryToHaikuImage home config be Preferences ;
+AddDirectoryToHaikuImage home config settings deskbar Preferences ;
 DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
-	AddSymlinkToHaikuImage home config be Preferences
-		: /boot/system/preferences/$(linkTarget) : $(linkTarget) ;
+	AddSymlinkToHaikuImage home config settings deskbar Preferences
+		: /boot/system/preferences/$(linkTarget)
+		: $(linkTarget) ;
 }
 
 # Deskbar Demo links
-AddDirectoryToHaikuImage home config be Demos ;
+AddDirectoryToHaikuImage home config settings deskbar Demos ;
 for linkTarget in $(SYSTEM_DEMOS) {
-	AddSymlinkToHaikuImage home config be Demos
+	AddSymlinkToHaikuImage home config settings deskbar Demos
 		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 
@@ -431,14 +445,15 @@ local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
-AddFilesToHaikuImage system data spell_check word_dictionary : $(spellFiles) ;
+AddFilesToHaikuImage system data spell_check word_dictionary
+	: $(spellFiles) ;
 
 local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(etcDir) ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
-AddFilesToHaikuImage common etc : $(etcFiles) ;
+AddFilesToHaikuImage common settings etc : $(etcFiles) ;
 
 local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;
 profileFiles = $(profileFiles:G=profile-d) ;
@@ -477,9 +492,11 @@ local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
 local cannaDic = [ Glob $(cannaDir)/dic : *.cbp ] ;
 local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
 	: *.cld *.ctd *.cbd *.dir ] ;
-AddFilesToHaikuImage system data Canna default : $(cannaDefault) ;
+AddFilesToHaikuImage system data Canna default
+	: $(cannaDefault) ;
 AddFilesToHaikuImage system data Canna dic : $(cannaDic) ;
-AddFilesToHaikuImage system data Canna dic canna : $(cannaDicCanna) ;
+AddFilesToHaikuImage system data Canna dic canna
+	: $(cannaDicCanna) ;
 AddDirectoryToHaikuImage system data Canna dic group ;
 AddDirectoryToHaikuImage system data Canna dic user ;
 
@@ -487,14 +504,18 @@ local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
 	: *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
 AddFilesToHaikuImage system data Keymaps : $(keymapFiles) ;
-AddSymlinkToHaikuImage system data Keymaps : Swedish : Finnish ;
-AddSymlinkToHaikuImage system data Keymaps : Slovene : Croatian ;
-AddSymlinkToHaikuImage system data Keymaps : US-International : Brazilian ;
+AddSymlinkToHaikuImage system data Keymaps : Swedish
+	: Finnish ;
+AddSymlinkToHaikuImage system data Keymaps : Slovene
+	: Croatian ;
+AddSymlinkToHaikuImage system data Keymaps : US-International
+	: Brazilian ;
 
 local keyboardLayoutsDir
 	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
 local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
-AddFilesToHaikuImage system data KeyboardLayouts : $(keyboardLayouts) ;
+AddFilesToHaikuImage system data KeyboardLayouts
+	: $(keyboardLayouts) ;
 
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)
@@ -515,7 +536,8 @@ SEARCH on $(postInstallFiles)
 	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
 SEARCH on <post-install>fresh_install
 	= [ FDirName $(HAIKU_TOP) data common settings ] ;
-AddFilesToHaikuImage common boot post_install : $(postInstallFiles) ;
+AddFilesToHaikuImage common boot post_install
+	: $(postInstallFiles) ;
 AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 
 # boot loader
@@ -538,20 +560,27 @@ AddBootModuleSymlinksToHaikuImage
 # add-ons
 AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToHaikuHybridImage system add-ons opengl
-	: Mesa\ Software\ Renderer : : true ;
-AddFilesToHaikuHybridImage system add-ons Translators
-	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
+AddFilesToHaikuImage system add-ons opengl
+	: Mesa\ Software\ Renderer ;
+AddFilesToHaikuImage system add-ons Translators
+	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToHaikuImage system add-ons locale catalogs
 	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
-AddFilesToHaikuHybridImage system add-ons locale catalogs
-	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) : : true ;
-AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
-AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
-AddFilesToHaikuImage system add-ons mail_daemon inbound_filters
+AddFilesToHaikuImage system add-ons locale catalogs
+	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+AddFilesToHaikuImage
+	system add-ons mail_daemon inbound_protocols
+	: POP3 IMAP ;
+AddFilesToHaikuImage
+	system add-ons mail_daemon outbound_protocols : SMTP ;
+AddFilesToHaikuImage
+	system add-ons mail_daemon inbound_filters
 	: MatchHeader SpamFilter NewMailNotification ;
-AddFilesToHaikuImage system add-ons mail_daemon outbound_filters : Fortune ;
-AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
+AddFilesToHaikuImage
+	system add-ons mail_daemon outbound_filters
+	: Fortune ;
+AddFilesToHaikuImage system add-ons media
+	: $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 AddFilesToHaikuImage system add-ons Tracker
@@ -571,13 +600,15 @@ AddFilesToHaikuImage system add-ons kernel network
 	: <net>notifications stack ;
 AddFilesToHaikuImage system add-ons kernel network devices
 	: $(SYSTEM_NETWORK_DEVICES) ;
-AddFilesToHaikuImage system add-ons kernel network datalink_protocols
+AddFilesToHaikuImage
+	system add-ons kernel network datalink_protocols
 	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
 AddFilesToHaikuImage system add-ons kernel network ppp
 	: $(SYSTEM_NETWORK_PPP) ;
 AddFilesToHaikuImage system add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
-AddFilesToHaikuImage system add-ons Print : $(SYSTEM_ADD_ONS_PRINT) ;
+AddFilesToHaikuImage system add-ons Print
+	: $(SYSTEM_ADD_ONS_PRINT) ;
 AddFilesToHaikuImage system add-ons Print transport
 	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
 AddFilesToHaikuImage system add-ons Screen\ Savers
@@ -593,15 +624,17 @@ AddFilesToHaikuImage home config add-ons decorators :
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;
-AddDirectoryToHaikuImage common include ;
+AddDirectoryToHaikuImage common cache tmp ;
+AddDirectoryToHaikuImage common develop headers ;
 AddDirectoryToHaikuImage common lib ;
+AddDirectoryToHaikuImage common non-packaged ;
+AddDirectoryToHaikuImage common var empty ;
+AddDirectoryToHaikuImage common var log ;
 AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home config bin ;
 AddDirectoryToHaikuImage home config lib ;
+AddDirectoryToHaikuImage home config non-packaged ;
 AddDirectoryToHaikuImage home mail ;
-AddDirectoryToHaikuImage common var empty ;
-AddDirectoryToHaikuImage common var log ;
-AddDirectoryToHaikuImage common cache tmp ;
 
 AddDirectoryToHaikuImage home config add-ons kernel drivers bin ;
 AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;
@@ -688,49 +721,6 @@ if $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) {
 }
 
 
-#pragma mark - Alternative GCC Libraries
-
-
-# We build a zip archive containing the libraries built with the alternative
-# GCC and unzip onto our image. Building the archive is done by a sub-jam.
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) AlternativeGCCArchive ] ;
-
-if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
-		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
-	# let another jam build a zip with the system libraries
-	rule InvokeSubJam target : directory : jamLine
-	{
-		DIRECTORY on $(target) = $(directory) ;
-		COMMAND_LINE on $(target) = $(jamLine) ;
-		local optionalPackages = $(HAIKU_ADDED_OPTIONAL_PACKAGES:J=/) ;
-		OPTIONAL_PACKAGES on $(target) = $(optionalPackages:E="") ;
-		Always $(target) ;
-		InvokeSubJam1 $(target) ;
-	}
-
-	actions InvokeSubJam1
-	{
-		cd $(DIRECTORY)
-		export HAIKU_IGNORE_USER_BUILD_CONFIG=1
-		export HAIKU_ADD_OPTIONAL_PACKAGES=$(OPTIONAL_PACKAGES)
-		export HAIKU_PRIMARY_GCC=$(HAIKU_GCC_VERSION[1])
-		$(JAM:E=jam) -q $(COMMAND_LINE) ;
-	}
-
-	local otherAlternativeSystemLibsZip
-		= <other-image>alternative_system_libs.zip ;
-	MakeLocate $(otherAlternativeSystemLibsZip)
-		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) ;
-
-	InvokeSubJam $(otherAlternativeSystemLibsZip)
-		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)
-		: "haiku-alternative-gcc-archive" ;
-
-	# install the alternative libs in the right directory
-	ExtractArchiveToHaikuImage : $(otherAlternativeSystemLibsZip) ;
-}
-
-
 #pragma mark - User/Group Setup
 
 
@@ -777,13 +767,6 @@ HAIKU_INSTALL_DIR ?= $(HAIKU_DEFAULT_INSTALL_DIR) ;
 
 # the pseudo target all image contents is attached to
 NotFile $(HAIKU_IMAGE_CONTAINER_NAME) ;
-
-# Detect a hybrid GCC2/GCC4 image.
-local isHybridBuild ;
-if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
-		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
-	isHybridBuild = 1 ;
-}
 
 # prepare the script that initializes the shell variables
 HAIKU_IMAGE_INIT_VARIABLES_SCRIPT = <HaikuImage>haiku.image-init-vars ;

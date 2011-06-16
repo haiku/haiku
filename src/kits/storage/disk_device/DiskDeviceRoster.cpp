@@ -36,9 +36,11 @@
 
 /*!	\brief find_directory constants of the add-on dirs to be searched. */
 static const directory_which kAddOnDirs[] = {
+	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 	B_USER_ADDONS_DIRECTORY,
+	B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 	B_COMMON_ADDONS_DIRECTORY,
-	B_BEOS_ADDONS_DIRECTORY
+	B_SYSTEM_ADDONS_DIRECTORY,
 };
 /*!	\brief Size of the kAddOnDirs array. */
 static const int32 kAddOnDirCount

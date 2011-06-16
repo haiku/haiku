@@ -137,14 +137,6 @@ AddOptionalHaikuImagePackages WonderBrush ;
 AddOptionalHaikuImagePackages WebPositive ;
 SuppressOptionalHaikuImagePackages SQLite ;
 
-# Don't add the libraries built with the alternative gcc version.
-# If the alternative gcc generated directory has been specified via the
-# configure option --alternative-gcc-output-dir, the libraries for the
-# alternative gcc version are added by default. Unsetting this variable disables
-# building and adding the libraries. Ignored, if --alternative-gcc-output-dir
-# was not specified.
-HAIKU_ADD_ALTERNATIVE_GCC_LIBS = 0 ;
-
 # Specify scripts that shall be run when populating the image/installation
 # directory. The "early" script is run before anything has been copied onto
 # the image/into the installation directory. The "late" script is run after

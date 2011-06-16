@@ -66,7 +66,7 @@ All rights reserved.
 
 #include "icons_logo.h"
 #include "BarApp.h"
-#include "DeskBarUtils.h"
+#include "DeskbarUtils.h"
 #include "ResourceSet.h"
 #include "StatusView.h"
 #include "StatusViewShelf.h"

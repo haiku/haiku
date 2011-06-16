@@ -18,7 +18,9 @@
 #include <Autolock.h>
 #include <debug_support.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <Invoker.h>
+#include <Path.h>
 
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
@@ -43,11 +45,6 @@ using std::nothrow;
 
 
 static const char *kSignature = "application/x-vnd.Haiku-debug_server";
-
-// paths to the apps used for debugging
-static const char *kConsoledPath	= "/bin/consoled";
-static const char *kTerminalPath	= "/boot/system/apps/Terminal";
-static const char *kGDBPath			= "/bin/gdb";
 
 
 static void
@@ -452,12 +449,39 @@ TeamDebugHandler::_EnterDebugger()
 	char teamString[32];
 	snprintf(teamString, sizeof(teamString), "--pid=%ld", fTeam);
 
-	const char *terminal = (debugInConsoled ? kConsoledPath : kTerminalPath);
+	BPath terminalPath;
+	if (debugInConsoled) {
+		error = find_directory(B_SYSTEM_BIN_DIRECTORY, &terminalPath);
+		if (error != B_OK) {
+			debug_printf("debug_server: can't find system-bin directory: %s\n",
+				strerror(error));
+			return error;
+		}
+		error = terminalPath.Append("consoled");
+		if (error != B_OK) {
+			debug_printf("debug_server: can't append to system-bin path: %s\n",
+				strerror(error));
+			return error;
+		}
+	} else {
+		error = find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath);
+		if (error != B_OK) {
+			debug_printf("debug_server: can't find system-apps directory: %s\n",
+				strerror(error));
+			return error;
+		}
+		error = terminalPath.Append("Terminal");
+		if (error != B_OK) {
+			debug_printf("debug_server: can't append to system-apps path: %s\n",
+				strerror(error));
+			return error;
+		}
+	}
 
 	const char *argv[16];
 	int argc = 0;
 
-	argv[argc++] = terminal;
+	argv[argc++] = terminalPath.Path();
 
 	if (!debugInConsoled) {
 		char windowTitle[64];
@@ -467,7 +491,21 @@ TeamDebugHandler::_EnterDebugger()
 		argv[argc++] = windowTitle;
 	}
 
-	argv[argc++] = kGDBPath;
+	BPath gdbPath;
+	error = find_directory(B_SYSTEM_BIN_DIRECTORY, &gdbPath);
+	if (error != B_OK) {
+		debug_printf("debug_server: can't find system-bin directory: %s\n",
+			strerror(error));
+		return error;
+	}
+	error = gdbPath.Append("gdb");
+	if (error != B_OK) {
+		debug_printf("debug_server: can't append to system-bin path: %s\n",
+			strerror(error));
+		return error;
+	}
+
+	argv[argc++] = gdbPath.Path();
 	argv[argc++] = teamString;
 	if (strlen(fExecutablePath) > 0)
 		argv[argc++] = fExecutablePath;

@@ -11,6 +11,7 @@
 #include "interface.h"
 #include "sis900.h"
 
+#include <directories.h>
 #include <driver_settings.h>
 
 #include <stdlib.h>
@@ -63,7 +64,8 @@ bug(const char *format, ...)
 	int     i;
 	int     file;
 
-	if ((file = open("/boot/home/sis900-driver.log", O_RDWR | O_APPEND | O_CREAT)) >= 0) {
+	if ((file = open(kCommonLogDirectory "/sis900-driver.log",
+		O_RDWR | O_APPEND | O_CREAT)) >= 0) {
 //		time_t timer = time(NULL);
 //		strftime(c, 2048, "%H:%M:S: ", localtime(&timer));
 

@@ -67,6 +67,8 @@ public:
 
 private:
 			struct Token;
+			struct ListElementParser;
+	friend	struct ListElementParser;
 
 			Token				_NextToken();
 			void				_RewindTo(const Token& token);
@@ -77,6 +79,7 @@ private:
 									BPackageArchitecture* value);
 			void				_ParseVersionValue(BPackageVersion* value,
 									bool releaseIsOptional);
+			void				_ParseList(ListElementParser& elementParser);
 			void				_ParseStringList(BObjectList<BString>* value,
 									bool allowQuotedStrings = true);
 			void				_ParseResolvableList(
@@ -136,6 +139,11 @@ struct BPackageInfo::Parser::Token {
 	{
 		return type != TOKEN_EOF;
 	}
+};
+
+
+struct BPackageInfo::Parser::ListElementParser {
+	virtual void operator()(const Token& token) = 0;
 };
 
 
@@ -277,7 +285,7 @@ BPackageInfo::Parser::_NextToken()
 		{
 			const char* start = fPos;
 			while (isalnum(*fPos) || *fPos == '.' || *fPos == '-'
-				|| *fPos == '_' || *fPos == ':') {
+				|| *fPos == '_' || *fPos == ':' || *fPos == '+') {
 				fPos++;
 			}
 			if (fPos == start)
@@ -384,8 +392,7 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 
 
 void
-BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value, bool
-	allowQuotedStrings)
+BPackageInfo::Parser::_ParseList(ListElementParser& elementParser)
 {
 	Token openBracket = _NextToken();
 	if (openBracket.type != TOKEN_OPEN_BRACKET)
@@ -401,12 +408,41 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value, bool
 			if (token.type != TOKEN_COMMA)
 				throw ParseError("expected comma", token.pos);
 			token = _NextToken();
+			if (token.type == TOKEN_CLOSE_BRACKET) {
+				// silently skip trailing comma at end of list
+				return;
+			}
 		} else
 			needComma = true;
 
+		elementParser(token);
+	}
+}
+
+
+void
+BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
+	bool allowQuotedStrings)
+{
+	struct StringParser : public ListElementParser {
+		BObjectList<BString>* value;
+		bool allowQuotedStrings;
+
+		StringParser(BObjectList<BString>* value_, bool allowQuotedStrings_)
+			:
+			value(value_),
+			allowQuotedStrings(allowQuotedStrings_)
+		{
+		}
+
+		virtual void operator()(const Token& token)
+		{
 		if (allowQuotedStrings) {
-			if (token.type != TOKEN_QUOTED_STRING && token.type != TOKEN_WORD)
-				throw ParseError("expected quoted-string or word", token.pos);
+				if (token.type != TOKEN_QUOTED_STRING
+					&& token.type != TOKEN_WORD) {
+					throw ParseError("expected quoted-string or word",
+						token.pos);
+				}
 		} else {
 			if (token.type != TOKEN_WORD)
 				throw ParseError("expected word", token.pos);
@@ -414,31 +450,26 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value, bool
 
 		value->AddItem(new BString(token.text));
 	}
+	} stringParser(value, allowQuotedStrings);
+
+	_ParseList(stringParser);
 }
 
 
 uint32
 BPackageInfo::Parser::_ParseFlags()
 {
-	uint32 flags = 0;
+	struct FlagParser : public ListElementParser {
+		uint32 flags;
 
-	Token openBracket = _NextToken();
-	if (openBracket.type != TOKEN_OPEN_BRACKET)
-		throw ParseError("expected start of list ('[')", openBracket.pos);
+		FlagParser()
+			:
+			flags(0)
+		{
+		}
 
-	bool needComma = false;
-	while (true) {
-		Token token = _NextToken();
-		if (token.type == TOKEN_CLOSE_BRACKET)
-			break;
-
-		if (needComma) {
-			if (token.type != TOKEN_COMMA)
-				throw ParseError("expected comma", token.pos);
-			token = _NextToken();
-		} else
-			needComma = true;
-
+		virtual void operator()(const Token& token)
+		{
 		if (token.type != TOKEN_WORD)
 			throw ParseError("expected word (a flag)", token.pos);
 
@@ -447,12 +478,16 @@ BPackageInfo::Parser::_ParseFlags()
 		else if (token.text.ICompare("system_package") == 0)
 			flags |= B_PACKAGE_FLAG_SYSTEM_PACKAGE;
 		else {
-			throw ParseError("expected 'approve_license' or 'system_package'",
+				throw ParseError(
+					"expected 'approve_license' or 'system_package'",
 				token.pos);
 		}
 	}
+	} flagParser;
 
-	return flags;
+	_ParseList(flagParser);
+
+	return flagParser.flags;
 }
 
 
@@ -460,60 +495,63 @@ void
 BPackageInfo::Parser::_ParseResolvableList(
 	BObjectList<BPackageResolvable>* value)
 {
-	Token openBracket = _NextToken();
-	if (openBracket.type != TOKEN_OPEN_BRACKET)
-		throw ParseError("expected start of list ('[')", openBracket.pos);
+	struct ResolvableParser : public ListElementParser {
+		Parser& parser;
+		BObjectList<BPackageResolvable>* value;
 
-	bool needComma = false;
-	while (true) {
-		BPackageResolvableType type = B_PACKAGE_RESOLVABLE_TYPE_DEFAULT;
+		ResolvableParser(Parser& parser_,
+			BObjectList<BPackageResolvable>* value_)
+			:
+			parser(parser_),
+			value(value_)
+		{
+		}
 
-		Token word = _NextToken();
-		if (word.type == TOKEN_CLOSE_BRACKET)
-			return;
+		virtual void operator()(const Token& token)
+		{
+			if (token.type != TOKEN_WORD) {
+				throw ParseError("expected word (a resolvable name)",
+					token.pos);
+			}
 
-		if (needComma) {
-			if (word.type != TOKEN_COMMA)
-				throw ParseError("expected comma", word.pos);
-			word = _NextToken();
-		} else
-			needComma = true;
-
-		if (word.type != TOKEN_WORD)
-			throw ParseError("expected word (a resolvable name)", word.pos);
-
-		int32 colonPos = word.text.FindFirst(':');
+			BPackageResolvableType type = B_PACKAGE_RESOLVABLE_TYPE_DEFAULT;
+			int32 colonPos = token.text.FindFirst(':');
 		if (colonPos >= 0) {
-			BString typeName(word.text, colonPos);
+				BString typeName(token.text, colonPos);
 			for (int i = 0; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
-				if (typeName.ICompare(BPackageResolvable::kTypeNames[i]) == 0) {
+					if (typeName.ICompare(BPackageResolvable::kTypeNames[i])
+							== 0) {
 					type = (BPackageResolvableType)i;
 					break;
 				}
 			}
 			if (type == B_PACKAGE_RESOLVABLE_TYPE_DEFAULT) {
 				BString error("resolvable type (<type>:) must be one of [");
-				for (int i = 1; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
+					for (int i = 1; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT;
+						++i) {
 					if (i > 1)
 						error << ",";
 					error << BPackageResolvable::kTypeNames[i];
 				}
 				error << "]";
-				throw ParseError(error, word.pos);
+					throw ParseError(error, token.pos);
 			}
 		}
 
 		BPackageVersion version;
-		Token op = _NextToken();
+			Token op = parser._NextToken();
 		if (op.type == TOKEN_OPERATOR_ASSIGN)
-			_ParseVersionValue(&version, true);
+				parser._ParseVersionValue(&version, true);
 		else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
-			_RewindTo(op);
+				parser._RewindTo(op);
 		else
 			throw ParseError("expected '=', comma or ']'", op.pos);
 
-		value->AddItem(new BPackageResolvable(word.text, type, version));
+			value->AddItem(new BPackageResolvable(token.text, type, version));
 	}
+	} resolvableParser(*this, value);
+
+	_ParseList(resolvableParser);
 }
 
 
@@ -521,37 +559,36 @@ void
 BPackageInfo::Parser::_ParseResolvableExprList(
 	BObjectList<BPackageResolvableExpression>* value)
 {
-	Token openBracket = _NextToken();
-	if (openBracket.type != TOKEN_OPEN_BRACKET)
-		throw ParseError("expected start of list ('[')", openBracket.pos);
+	struct ResolvableExpressionParser : public ListElementParser {
+		Parser& parser;
+		BObjectList<BPackageResolvableExpression>* value;
 
-	bool needComma = false;
-	while (true) {
-		Token name = _NextToken();
-		if (name.type == TOKEN_CLOSE_BRACKET)
-			return;
+		ResolvableExpressionParser(Parser& parser_,
+			BObjectList<BPackageResolvableExpression>* value_)
+			:
+			parser(parser_),
+			value(value_)
+		{
+		}
 
-		if (needComma) {
-			if (name.type != TOKEN_COMMA)
-				throw ParseError("expected comma", name.pos);
-			name = _NextToken();
-		} else
-			needComma = true;
-
-		if (name.type != TOKEN_WORD)
-			throw ParseError("expected word (a resolvable name)", name.pos);
+		virtual void operator()(const Token& token)
+		{
+			if (token.type != TOKEN_WORD) {
+				throw ParseError("expected word (a resolvable name)",
+					token.pos);
+			}
 
 		BPackageVersion version;
-		Token op = _NextToken();
+			Token op = parser._NextToken();
 		if (op.type == TOKEN_OPERATOR_LESS
 			|| op.type == TOKEN_OPERATOR_LESS_EQUAL
 			|| op.type == TOKEN_OPERATOR_EQUAL
 			|| op.type == TOKEN_OPERATOR_NOT_EQUAL
 			|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
 			|| op.type == TOKEN_OPERATOR_GREATER)
-			_ParseVersionValue(&version, true);
+				parser._ParseVersionValue(&version, true);
 		else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
-			_RewindTo(op);
+				parser._RewindTo(op);
 		else {
 			throw ParseError(
 				"expected '<', '<=', '==', '!=', '>=', '>', comma or ']'",
@@ -561,9 +598,12 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 		BPackageResolvableOperator resolvableOperator
 			= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
 
-		value->AddItem(new BPackageResolvableExpression(name.text,
+			value->AddItem(new BPackageResolvableExpression(token.text,
 			resolvableOperator, version));
 	}
+	} resolvableExpressionParser(*this, value);
+
+	_ParseList(resolvableExpressionParser);
 }
 
 
@@ -665,6 +705,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseVersionValue(&version, false);
 			packageInfo->SetVersion(version);
 			seen[B_PACKAGE_INFO_VERSION] = true;
+		} else if (t.text.ICompare("copyright") == 0) {
+			BString copyright;
+			_ParseStringValue(&copyright);
+			packageInfo->AddCopyright(copyright);
+			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_COPYRIGHTS]) == 0) {
 			if (seen[B_PACKAGE_INFO_COPYRIGHTS]) {
 				BString error = BString(names[B_PACKAGE_INFO_COPYRIGHTS])
@@ -678,6 +723,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			for (int i = 0; i < count; ++i)
 				packageInfo->AddCopyright(*(copyrightList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
+		} else if (t.text.ICompare("license") == 0) {
+			BString license;
+			_ParseStringValue(&license);
+			packageInfo->AddLicense(license);
+			seen[B_PACKAGE_INFO_LICENSES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
 			if (seen[B_PACKAGE_INFO_LICENSES]) {
 				BString error = BString(names[B_PACKAGE_INFO_LICENSES])
@@ -769,8 +819,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			for (int i = 0; i < count; ++i)
 				packageInfo->AddReplaces(*(replacesList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_REPLACES] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FLAGS])
-				== 0) {
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FLAGS]) == 0) {
 			if (seen[B_PACKAGE_INFO_FLAGS]) {
 				BString error = BString(names[B_PACKAGE_INFO_FLAGS])
 					<< " already seen!";

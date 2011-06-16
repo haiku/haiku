@@ -29,15 +29,6 @@ HAIKU_CONTAINER_GRIST on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
 	= HAIKU_NET_BOOT_ARCHIVE_INSTALL_TARGETS ;
 
-# alternative gcc archive
-HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME
-	= haiku-alternative-gcc-archive-container ;
-HAIKU_CONTAINER_GRIST on $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
-	= AlternativeGCCArchive ;
-# HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
-HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
-	= HAIKU_ALTERNATIVE_GCC_ARCHIVE_INSTALL_TARGETS ;
-
 # boot floppy
 HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME = haiku-boot-floppy-container ;
 HAIKU_CONTAINER_GRIST on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
@@ -149,13 +140,6 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 # harm for the cross-compiler either.
 if $(HAIKU_GCC_VERSION[1]) = 2 {
 	HAIKU_GCC_HEADERS_DIR = [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
-}
-
-# the subdirectory into which the alternative GCC libraries are to be installed
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR = gcc2 ;
-} else {
-	HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR = gcc4 ;
 }
 
 # initial state for flags etc.

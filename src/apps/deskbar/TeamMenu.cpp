@@ -40,7 +40,7 @@ All rights reserved.
 
 #include "BarApp.h"
 #include "BarMenuBar.h"
-#include "DeskBarUtils.h"
+#include "DeskbarUtils.h"
 #include "TeamMenuItem.h"
 #include "TeamMenu.h"
 

@@ -8,6 +8,7 @@
 #include "elf.h"
 #include "RootFileSystem.h"
 
+#include <directories.h>
 #include <OS.h>
 #include <util/list.h>
 #include <boot/stage2.h>
@@ -28,8 +29,11 @@
 
 
 static const char *sPaths[] = {
-	"system/add-ons/kernel",
-	"home/config/add-ons/kernel",
+	kVolumeLocalSystemKernelAddonsDirectory,
+	kVolumeLocalCommonNonpackagedKernelAddonsDirectory,
+	kVolumeLocalCommonKernelAddonsDirectory,
+	kVolumeLocalUserNonpackagedKernelAddonsDirectory,
+	kVolumeLocalUserKernelAddonsDirectory,
 	NULL
 };
 
@@ -176,7 +180,8 @@ load_modules(stage2_args *args, Directory *volume)
 
 	// ToDo: this should be mostly replaced by a hardware oriented detection mechanism
 
-	for (int32 i = 0; sPaths[i]; i++) {
+	int32 i = 0;
+	for (; sPaths[i]; i++) {
 		char path[B_FILE_NAME_LENGTH];
 		snprintf(path, sizeof(path), "%s/boot", sPaths[i]);
 
@@ -184,7 +189,7 @@ load_modules(stage2_args *args, Directory *volume)
 			failed++;
 	}
 
-	if (failed > 1) {
+	if (failed == i) {
 		// couldn't load any boot modules
 		// fall back to load all modules (currently needed by the boot floppy)
 		const char *paths[] = { "bus_managers", "busses/ide", "busses/scsi",

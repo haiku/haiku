@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio emuxki ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders media ;
+UsePrivateHeaders libroot media ;
 
 KernelAddon emuxki :
 	ac97.c

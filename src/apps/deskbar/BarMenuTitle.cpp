@@ -200,8 +200,8 @@ TBarMenuTitle::Invoke(BMessage* message)
 	if (barview) {
 		BLooper* looper = barview->Looper();
 		if (looper->Lock()) {
-			// tell barview to add the refs to the be menu
-			barview->HandleBeMenu(NULL);
+			// tell barview to add the refs to the deskbar menu
+			barview->HandleDeskbarMenu(NULL);
 			looper->Unlock();
 		}
 	}

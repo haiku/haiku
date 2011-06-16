@@ -163,18 +163,22 @@ extractFile()
 	targetExtractedDir=$2
 	extractedSubDir=$3
 
-	echo "Extracting $archiveFile ..."
-
 	extractDir=$tmpDir/extract
 	$rmAttrs -rf "$extractDir"
 	mkdir -p "$extractDir"
 
 	case "$archiveFile" in
 		*.zip)
+			echo "Extracting $archiveFile ..."
 			$unzip -q -d "$extractDir" "$archiveFile"
 			;;
 		*.tgz|*.tar.gz)
+			echo "Extracting $archiveFile ..."
 			tar -C "$extractDir" -xf "$archiveFile"
+			;;
+		*.hpkg)
+			echo "Adding package $archiveFile ..."
+			cp "$archiveFile" "$extractDir"
 			;;
 		*)
 			echo "Unhandled archive extension in build_haiku_image extractFile()"

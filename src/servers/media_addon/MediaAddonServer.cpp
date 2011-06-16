@@ -294,13 +294,15 @@ MediaAddonServer::ReadyToRun()
 
 	// load dormant media nodes
 	const directory_which directories[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY
+		B_SYSTEM_ADDONS_DIRECTORY
 	};
 
-	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
-	for (uint32 i = safeMode ? 2 : 0;
+	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
+	for (uint32 i = safeMode ? 4 : 0;
 			i < sizeof(directories) / sizeof(directory_which); i++) {
 		BDirectory directory;
 		node_ref nodeRef;

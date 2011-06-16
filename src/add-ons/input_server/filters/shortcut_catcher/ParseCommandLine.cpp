@@ -16,16 +16,19 @@
 #include <string.h>
 
 
-#include <Roster.h>
-#include <List.h>
-#include <Entry.h>
 #include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <List.h>
+#include <Path.h>
+#include <Roster.h>
+#include <String.h>
 #include <SupportKit.h>
 
 
 // This char is used to hold words together into single words...
 #define GUNK_CHAR 0x01
-#define PATHTOTRACKER "/boot/system/Tracker"
+#define PATHTOTRACKER "/system/Tracker"
 
 // Turn all spaces that are not-to-be-counted-as-spaces into GUNK_CHAR chars.
 static void
@@ -299,11 +302,14 @@ LaunchCommand(char** argv, int32 argc)
 			// Hack way to do this--really I should be able to do this by 
 			// sending a BMessage. But how? When I finally get my copy of the
 			// BeOS Bible, maybe then I'll find out.
-			const char* trackerFile = PATHTOTRACKER;
-			char* temp = new char[strlen(trackerFile) + strlen(argv[0]) + 10];
-			sprintf(temp, "%s '%s'", trackerFile, argv[0]);
-			system(temp);
-			delete [] temp;
+			BPath trackerPath;
+			if (find_directory(B_SYSTEM_DIRECTORY, &trackerPath) != B_OK
+				|| trackerPath.Append("Tracker") != B_OK) {
+				return B_ENTRY_NOT_FOUND;
+			}
+			BString cmd(trackerPath.Path());
+			cmd << " '" << argv[0] << "'";
+			system(cmd.String());
 			return B_NO_ERROR;
 		} else {
 			// It's not a directory. Must be a file.

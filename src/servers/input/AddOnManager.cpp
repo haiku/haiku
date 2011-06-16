@@ -261,9 +261,11 @@ AddOnManager::_RegisterAddOns()
 	BAutolock locker(this);
 
 	const directory_which directories[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY
+		B_SYSTEM_ADDONS_DIRECTORY
 	};
 	const char* subDirectories[] = {
 		"input_server/devices",
@@ -275,8 +277,8 @@ AddOnManager::_RegisterAddOns()
 	node_ref nref;
 	BDirectory directory;
 	BPath path;
-	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
-	for (uint32 i = fSafeMode ? 2 : 0;
+	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
+	for (uint32 i = fSafeMode ? 4 : 0;
 			i < sizeof(directories) / sizeof(directory_which); i++) {
 		for (int32 j = 0; j < subDirectoryCount; j++) {
 			if (find_directory(directories[i], &path) == B_OK

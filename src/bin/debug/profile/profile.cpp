@@ -17,7 +17,9 @@
 #include <string>
 
 #include <debugger.h>
+#include <FindDirectory.h>
 #include <OS.h>
+#include <Path.h>
 #include <String.h>
 
 #include <syscalls.h>
@@ -454,7 +456,13 @@ private:
 				BString name = imageInfo.name;
 				if (name.FindFirst('/') == -1) {
 					// modules without a path are likely to be boot modules
-					name.Prepend("/system/add-ons/kernel/boot/");
+					BPath bootAddonPath;
+					if (find_directory(B_SYSTEM_ADDONS_DIRECTORY,
+							&bootAddonPath) == B_OK
+						&& bootAddonPath.Append("kernel") == B_OK
+						&& bootAddonPath.Append("boot") == B_OK) {
+						name = BString(bootAddonPath.Path()) << "/" << name;
+				}
 				}
 
 				error = sharedImage->Init(name.String());

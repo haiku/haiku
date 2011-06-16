@@ -114,7 +114,7 @@ class TBarView : public BView {
 		bool DragOverride();
 		bool InvokeItem(const char* signature);
 
-		void HandleBeMenu(BMessage* targetmessage);
+		void HandleDeskbarMenu(BMessage* targetmessage);
 
 		status_t ItemInfo(int32 id, const char** name, DeskbarShelf* shelf);
 		status_t ItemInfo(const char* name, int32* id, DeskbarShelf* shelf);
@@ -143,12 +143,12 @@ class TBarView : public BView {
 		TDragRegion* DragRegion() const { return fDragRegion; }
 			
 	private:
-		friend class TBeMenu;
+		friend class TDeskbarMenu;
 		friend class PreferencesWindow;
 
 		status_t SendDragMessage(const char* signature, entry_ref* ref = NULL);
 
-		void PlaceBeMenu();
+		void PlaceDeskbarMenu();
 		void PlaceTray(bool vertSwap, bool leftSwap, BRect screenFrame);
 		void PlaceApplicationBar(BRect screenFrame);
 

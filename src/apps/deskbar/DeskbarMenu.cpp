@@ -42,10 +42,14 @@ All rights reserved.
 #include <MenuItem.h>
 #include <Roster.h>
 
-#include "BeMenu.h"
+#include "DeskbarMenu.h"
 #include "BarApp.h"
 #include "BarView.h"
-#include "DeskBarUtils.h"
+#include "DeskbarUtils.h"
+#include "IconMenuItem.h"
+#include "MountMenu.h"
+#include "IconMenuItem.h"
+#include "MountMenu.h"
 #include "IconMenuItem.h"
 #include "MountMenu.h"
 #include "PublicCommands.h"
@@ -54,7 +58,7 @@ All rights reserved.
 #include "tracker_private.h"
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BeMenu"
+#define B_TRANSLATE_CONTEXT "DeskbarMenu"
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
@@ -81,8 +85,8 @@ using namespace BPrivate;
 //	#pragma mark -
 
 
-TBeMenu::TBeMenu(TBarView* barView)
-	: BNavMenu("BeMenu", B_REFS_RECEIVED, DefaultTarget()),
+TDeskbarMenu::TDeskbarMenu(TBarView* barView)
+	: BNavMenu("DeskbarMenu", B_REFS_RECEIVED, DefaultTarget()),
 	fAddState(kStart),
 	fBarView(barView)
 {
@@ -90,7 +94,7 @@ TBeMenu::TBeMenu(TBarView* barView)
 
 
 void
-TBeMenu::AttachedToWindow()
+TDeskbarMenu::AttachedToWindow()
 {
 	if (fBarView && fBarView->LockLooper()) {
 		if (fBarView->Dragging()) {
@@ -113,7 +117,7 @@ TBeMenu::AttachedToWindow()
 
 
 void
-TBeMenu::DetachedFromWindow()
+TDeskbarMenu::DetachedFromWindow()
 {
 	if (fBarView) {
 		BLooper* looper = fBarView->Looper();
@@ -130,7 +134,7 @@ TBeMenu::DetachedFromWindow()
 
 
 bool
-TBeMenu::StartBuildingItemList()
+TDeskbarMenu::StartBuildingItemList()
 {
 	RemoveItems(0, CountItems(), true);
 	fAddState = kStart;
@@ -139,11 +143,11 @@ TBeMenu::StartBuildingItemList()
 
 
 void
-TBeMenu::DoneBuildingItemList()
+TDeskbarMenu::DoneBuildingItemList()
 {
 	if (fItemList->CountItems() <= 0) {
-		BMenuItem* item = new BMenuItem(B_TRANSLATE("<Be folder is empty>"),
-			0);
+		BMenuItem* item
+			= new BMenuItem(B_TRANSLATE("<Deskbar folder is empty>"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	} else
@@ -152,10 +156,10 @@ TBeMenu::DoneBuildingItemList()
 
 
 bool
-TBeMenu::AddNextItem()
+TDeskbarMenu::AddNextItem()
 {
 	if (fAddState == kStart)
-		return AddStandardBeMenuItems();
+		return AddStandardDeskbarMenuItems();
 
 	TrackingHookData* data = fBarView->GetTrackingHookData();
 	if (fAddState == kAddingRecents) {
@@ -199,11 +203,11 @@ TBeMenu::AddNextItem()
 		}
 
 		AddSeparatorItem();
-		fAddState = kAddingBeMenu;
+		fAddState = kAddingDeskbarMenu;
 		return true;
 	}
 
-	if (fAddState == kAddingBeMenu) {
+	if (fAddState == kAddingDeskbarMenu) {
 		// keep reentering and adding items
 		// until this returns false
 		bool done = BNavMenu::AddNextItem();
@@ -229,7 +233,7 @@ TBeMenu::AddNextItem()
 
 
 bool
-TBeMenu::AddStandardBeMenuItems()
+TDeskbarMenu::AddStandardDeskbarMenuItems()
 {
 	bool dragging = false;
 	if (fBarView)
@@ -245,8 +249,7 @@ TBeMenu::AddStandardBeMenuItems()
 	}
 
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
-		"About Haiku");
+	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK("About Haiku");
 #else
 	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
 		"About this system");
@@ -334,7 +337,7 @@ TBeMenu::AddStandardBeMenuItems()
 
 
 void
-TBeMenu::ClearMenuBuildingState()
+TDeskbarMenu::ClearMenuBuildingState()
 {
 	fAddState = kDone;
 	fMenuBuilt = false;
@@ -344,7 +347,7 @@ TBeMenu::ClearMenuBuildingState()
 
 
 void
-TBeMenu::ResetTargets()
+TDeskbarMenu::ResetTargets()
 {
 	// This method does not recurse into submenus
 	// and does not affect menu items in submenus.
@@ -389,7 +392,7 @@ TBeMenu::ResetTargets()
 
 
 BPoint
-TBeMenu::ScreenLocation()
+TDeskbarMenu::ScreenLocation()
 {
 	bool vertical = fBarView->Vertical();
 	int32 expando = (fBarView->State() == kExpandoState);
@@ -413,7 +416,7 @@ TBeMenu::ScreenLocation()
 
 /*static*/
 BMessenger
-TBeMenu::DefaultTarget()
+TDeskbarMenu::DefaultTarget()
 {
 	// if Tracker is not available we target the BarApp
 	BMessenger target(kTrackerSignature);
@@ -429,7 +432,7 @@ TBeMenu::DefaultTarget()
 
 TRecentsMenu::TRecentsMenu(const char* name, TBarView* bar, int32 which,
 		const char* signature, entry_ref* appRef)
-	: BNavMenu(name, B_REFS_RECEIVED, TBeMenu::DefaultTarget()),
+	: BNavMenu(name, B_REFS_RECEIVED, TDeskbarMenu::DefaultTarget()),
 	fWhich(which),
 	fAppRef(NULL),
 	fSignature(NULL),
@@ -633,7 +636,7 @@ TRecentsMenu::ResetTargets()
 	// if we are dragging, set the target to whatever was set
 	// else set it to the default (Tracker)
 	if (!fBarView->Dragging())
-		SetTarget(TBeMenu::DefaultTarget());
+		SetTarget(TDeskbarMenu::DefaultTarget());
 
 	// now set the target for the menuitems to the currently
 	// set target, which may or may not be tracker

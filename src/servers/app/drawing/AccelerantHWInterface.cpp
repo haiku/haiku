@@ -272,14 +272,16 @@ AccelerantHWInterface::_OpenAccelerant(int device)
 
 	struct stat accelerant_stat;
 	const static directory_which dirs[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY
+		B_SYSTEM_ADDONS_DIRECTORY
 	};
 
 	fAccelerantImage = -1;
 
-	for (int32 i = 0; i < 3; i++) {
+	for (uint32 i = 0; i < sizeof(dirs) / sizeof(directory_which); i++) {
 		char path[PATH_MAX];
 		if (find_directory(dirs[i], -1, false, path, PATH_MAX) != B_OK)
 			continue;

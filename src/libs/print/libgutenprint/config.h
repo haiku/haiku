@@ -150,7 +150,7 @@
 #define PACKAGE_BUGREPORT "gimp-print-devel@lists.sourceforge.net"
 
 /* */
-#define PACKAGE_DATA_DIR "/boot/common/data/gutenprint"
+#define PACKAGE_DATA_DIR "/system/data/gutenprint"
 
 /* */
 #define PACKAGE_LIB_DIR "/boot/common/lib/gutenprint"
@@ -174,7 +174,7 @@
 #define PKGMODULEDIR "/boot/common/lib/gutenprint/5.2/modules"
 
 /* */
-#define PKGXMLDATADIR "/boot/common/data/gutenprint"
+#define PKGXMLDATADIR "/system/data/gutenprint"
 
 /* Package release date. */
 #define RELEASE_DATE "01 May 2011"

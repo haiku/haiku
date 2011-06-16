@@ -12,20 +12,6 @@ usage()
 
 Usage: $0 <options>
 options:
-  --alternative-gcc-output-dir <dir>
-                              Build a Haiku installation that supports running
-                              executables built with a gcc version incompatible
-                              with the primary gcc (e.g. gcc 2 executables under
-                              a gcc 4 Haiku or vice versa). <dir> specifies the
-                              output directory of the other gcc. The directory
-                              must already be fully configured.
-                              Note, that a sub-jam will be executed when
-                              building Haiku. When using a jam that is not
-                              simply invoked by "jam", the JAM build variable
-                              needs to be set accordingly.
-                              To disable building the alternative libraries
-                              the variable HAIKU_ADD_ALTERNATIVE_GCC_LIBS can be
-                              unset in the UserBuildConfig file.
   --build-cross-tools <build tools dir>
                               Assume cross compilation. <build tools dir>
                               defines the location of the build tools sources.
@@ -320,14 +306,12 @@ TARGET_PLATFORM=haiku
 HAIKU_USE_GCC_PIPE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
-HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=
-HAIKU_ADD_ALTERNATIVE_GCC_LIBS=0
 HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-100818"
+haikuRequiredLegacyGCCVersion="2.95.3-110228"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
@@ -377,14 +361,6 @@ fi
 #
 while [ $# -gt 0 ] ; do
 	case "$1" in
-		--alternative-gcc-output-dir)
-			assertparam "$1" $#
-			cd $2 || exit 1
-			HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=`pwd`
-			HAIKU_ADD_ALTERNATIVE_GCC_LIBS=1
-			cd $currentDir
-			shift 2
-			;;
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--build-cross-tools-gcc4)
 			assertparams "$1" 2 $#
@@ -558,8 +534,6 @@ HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
 HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
-HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR} ;
-HAIKU_ADD_ALTERNATIVE_GCC_LIBS		?= ${HAIKU_ADD_ALTERNATIVE_GCC_LIBS} ;
 
 HAIKU_GCC_RAW_VERSION		?= ${HAIKU_GCC_RAW_VERSION} ;
 HAIKU_GCC_MACHINE			?= ${HAIKU_GCC_MACHINE} ;

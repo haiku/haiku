@@ -4,7 +4,7 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
 	userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders libroot shared ;
 UsePrivateKernelHeaders ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;

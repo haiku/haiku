@@ -52,7 +52,8 @@ InspectorApp::InspectorApp()
 
 	AddToTranslatorsList("/system/add-ons/Translators",
 		SYSTEM_TRANSLATOR);
-	AddToTranslatorsList("/boot/home/config/add-ons/Translators",
+	AddToTranslatorsList(
+		"/boot/home/config/add-ons/Translators",
 		USER_TRANSLATOR);
 
 	// Show application window

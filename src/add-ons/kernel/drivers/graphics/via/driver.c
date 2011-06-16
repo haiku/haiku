@@ -12,6 +12,7 @@
 #include <ISA.h>
 #include <PCI.h>
 #include <OS.h>
+#include <directories.h>
 #include <driver_settings.h>
 #include <malloc.h>
 #include <stdlib.h> // for strtoXX
@@ -135,7 +136,8 @@ static void dumprom (void *rom, uint32 size)
 	int fd;
 	uint32 cnt;
 
-	fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
+	fd = open (kUserDirectory "/" DRIVER_PREFIX ".rom",
+		O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
 
 	/* apparantly max. 32kb may be written at once;

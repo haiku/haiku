@@ -117,8 +117,13 @@ ScreenSaverRunner::_LoadAddOn()
 
 	// try all directories until the first one succeeds
 
-	directory_which which[] = {B_BEOS_ADDONS_DIRECTORY, B_COMMON_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY};
+	directory_which which[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY,
+	};
 	BPath path;
 
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {

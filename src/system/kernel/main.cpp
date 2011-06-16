@@ -341,12 +341,12 @@ main2(void *unused)
 	// start the init process
 	{
 		KPath bootScriptPath;
-		status_t status = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice,
+		status_t status = find_directory(B_SYSTEM_BOOT_DIRECTORY, gBootDevice,
 			false, bootScriptPath.LockBuffer(), bootScriptPath.BufferSize());
 		if (status != B_OK)
 			dprintf("main2: find_directory() failed: %s\n", strerror(status));
 		bootScriptPath.UnlockBuffer();
-		status = bootScriptPath.Append("boot/Bootscript");
+		status = bootScriptPath.Append("/Bootscript");
 		if (status != B_OK) {
 			dprintf("main2: constructing path to Bootscript failed: "
 				"%s\n", strerror(status));

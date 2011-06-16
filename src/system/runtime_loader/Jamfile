@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system runtime_loader ;
 
-UsePrivateHeaders runtime_loader shared ;
+UsePrivateHeaders libroot runtime_loader shared ;
 UsePrivateHeaders kernel ;
 	# for <util/KMessage.h>
 UsePrivateSystemHeaders ;

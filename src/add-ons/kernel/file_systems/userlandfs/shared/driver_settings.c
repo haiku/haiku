@@ -6,6 +6,7 @@
 
 
 #include <OS.h>
+#include <directories.h>
 #include <driver_settings.h>
 
 #include <stdlib.h>
@@ -37,7 +38,7 @@ strlcat(char *dst, char const *src, size_t s)
 	return j + i + strlen(src + i);
 }
 
-#define SETTINGS_DIRECTORY "/boot/home/config/settings/kernel/drivers/"
+#define SETTINGS_DIRECTORY kUserSettingsDirectory "/kernel/drivers/"
 #define SETTINGS_MAGIC		'DrvS'
 
 // Those maximum values are independent from the implementation - they

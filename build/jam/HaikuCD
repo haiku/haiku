@@ -8,13 +8,6 @@ HAIKU_CD = $(HAIKU_CD_NAME) ;
 HAIKU_CD_LABEL ?= $(HAIKU_DEFAULT_CD_LABEL) ;
 MakeLocate $(HAIKU_CD) : $(HAIKU_CD_DIR) ;
 
-# Detect a hybrid GCC2/GCC4 image.
-local isHybridBuild ;
-if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
-		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
-	isHybridBuild = 1 ;
-}
-
 # prepare the script that initializes the shell variables
 HAIKU_CD_INIT_VARIABLES_SCRIPT = <HaikuCD>haiku.cd-init-vars ;
 local script = $(HAIKU_CD_INIT_VARIABLES_SCRIPT) ;

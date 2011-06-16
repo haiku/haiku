@@ -12,6 +12,7 @@
 #include <stdio.h> //sprintf
 #include <string.h> //strcpy
 #include <unistd.h> //posix file i/o - create, write, close 
+#include <directories.h>
 #include <driver_settings.h>
 
 #include "usb_vision.h"
@@ -30,7 +31,8 @@ bool b_log_funcres  = false;
 
 bool b_log_settings_loaded = false;
 
-static const char *private_log_path="/boot/home/"DRIVER_NAME".log";
+static const char *private_log_path
+	= kCommonLogDirectory "/" DRIVER_NAME ".log";
 static sem_id loglock;
 
 void load_setting(void){

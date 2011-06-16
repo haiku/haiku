@@ -52,7 +52,7 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "BarView.h"
-#include "BeMenu.h"
+#include "DeskbarMenu.h"
 #include "PublicCommands.h"
 #include "StatusView.h"
 #include "tracker_private.h"
@@ -80,7 +80,7 @@ extern "C" void
 	BMenuBar_StartMenuBar_Hack(BMenuBar*, int32, bool, bool, BRect*);
 
 
-TBeMenu* TBarWindow::sBeMenu = NULL;
+TDeskbarMenu* TBarWindow::sDeskbarMenu = NULL;
 
 
 TBarWindow::TBarWindow()
@@ -118,18 +118,18 @@ TBarWindow::MenusBeginning()
 	if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
 		//	need the entry_ref to the actual item
 		entry.GetRef(&ref);
-		//	set the nav directory to the be folder
-		sBeMenu->SetNavDir(&ref);
+		//	set the nav directory to the deskbar folder
+		sDeskbarMenu->SetNavDir(&ref);
 	} else if (!entry.Exists()) {
-		//	the Be folder does not exist
+		//	the deskbar folder does not exist
 		//	create one now
 		BDirectory dir;
 		if (entry.GetParent(&dir) == B_OK) {
-			BDirectory bedir;
-			dir.CreateDirectory("be", &bedir);
-			if (bedir.GetEntry(&entry) == B_OK
+			BDirectory deskbarDir;
+			dir.CreateDirectory("deskbar", &deskbarDir);
+			if (deskbarDir.GetEntry(&entry) == B_OK
 				&& entry.GetRef(&ref) == B_OK)
-				sBeMenu->SetNavDir(&ref);
+				sDeskbarMenu->SetNavDir(&ref);
 		}
 	} else {
 		//	this really should never happen
@@ -137,8 +137,8 @@ TBarWindow::MenusBeginning()
 		return;
 	}
 
-	sBeMenu->NeedsToRebuild();
-	sBeMenu->ResetTargets();
+	sDeskbarMenu->NeedsToRebuild();
+	sDeskbarMenu->ResetTargets();
 
 	fBarView->SetEventMask(0);
 		// This works around a BeOS bug - the menu is quit with every
@@ -153,10 +153,10 @@ TBarWindow::MenusEnded()
 {
 	BWindow::MenusEnded();
 
-	if (sBeMenu->LockLooper()) {
+	if (sDeskbarMenu->LockLooper()) {
 		// TODO: is this ok?
-		sBeMenu->RemoveItems(0, sBeMenu->CountItems(), true);
-		sBeMenu->UnlockLooper();
+		sDeskbarMenu->RemoveItems(0, sDeskbarMenu->CountItems(), true);
+		sDeskbarMenu->UnlockLooper();
 	}
 
 	fBarView->UpdateEventMask();
@@ -273,21 +273,21 @@ TBarWindow::ScreenChanged(BRect size, color_space depth)
 
 
 void
-TBarWindow::SetBeMenu(TBeMenu* menu)
+TBarWindow::SetDeskbarMenu(TDeskbarMenu* menu)
 {
-	sBeMenu = menu;
+	sDeskbarMenu = menu;
 }
 
 
-TBeMenu*
-TBarWindow::BeMenu()
+TDeskbarMenu*
+TBarWindow::DeskbarMenu()
 {
-	return sBeMenu;
+	return sDeskbarMenu;
 }
 
 
 void
-TBarWindow::ShowBeMenu()
+TBarWindow::ShowDeskbarMenu()
 {
 	BMenuBar* menuBar = fBarView->BarMenuBar();
 	if (menuBar == NULL)

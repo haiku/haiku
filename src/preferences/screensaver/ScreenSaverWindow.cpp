@@ -383,7 +383,7 @@ ModulesView::MessageReceived(BMessage* message)
 			BPath path;
 			if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
 				|| path.Append("screen_blanker") != B_OK)
-				path.SetTo("/boot/system/bin/screen_blanker");
+				path.SetTo("/bin/screen_blanker");
 
 			BEntry entry(path.Path());
 			entry_ref ref;
@@ -442,7 +442,12 @@ ModulesView::PopulateScreenSaverList()
 	// Iterate over add-on directories, and add their files to the list view
 
 	directory_which which[] = {
-		B_BEOS_ADDONS_DIRECTORY, B_USER_ADDONS_DIRECTORY};
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY,
+	};
 	ScreenSaverItem* selectItem = NULL;
 
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {

@@ -58,9 +58,11 @@ private:
 
 
 static const directory_which sDirectories[] = {
+	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 	B_USER_ADDONS_DIRECTORY,
+	B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 	B_COMMON_ADDONS_DIRECTORY,
-	B_BEOS_ADDONS_DIRECTORY,
+	B_SYSTEM_ADDONS_DIRECTORY
 };
 
 
@@ -120,8 +122,8 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 		"%ld\n", format.Encoding());
 
 	// Since the list of decoders is unsorted, we need to search for
-	// an decoder by add-on directory, in order to maintain the shadowing
-	// of system add-ons by user add-ons, in case they offer decorders
+	// a decoder by add-on directory, in order to maintain the shadowing
+	// of system add-ons by user add-ons, in case they offer decoders
 	// for the same format.
 
 	BPath path;

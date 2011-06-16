@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 
 # For ether_driver.h
-UsePrivateHeaders net ;
+UsePrivateHeaders libroot net ;
 
 KernelAddon sis900 :
 	driver.c

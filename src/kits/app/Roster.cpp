@@ -244,13 +244,15 @@ compare_queried_apps(const entry_ref* app1, const entry_ref* app2)
 		}
 	}
 
-	// Check system folder
+	// Check system servers folder
+	BPath path;
+	find_directory(B_SYSTEM_SERVERS_DIRECTORY, &path);
+	BString serverPath(path.Path());
+	serverPath << '/';
+	size_t length = serverPath.Length();
 
-	static const char* kSystemPath = "/boot/system/servers/";
-	size_t length = strlen(kSystemPath);
-
-	bool inSystem1 = !strncmp(kSystemPath, path1.Path(), length);
-	bool inSystem2 = !strncmp(kSystemPath, path2.Path(), length);
+	bool inSystem1 = !strncmp(serverPath.String(), path1.Path(), length);
+	bool inSystem2 = !strncmp(serverPath.String(), path2.Path(), length);
 	if (inSystem1 != inSystem2)
 		return inSystem1 ? 1 : -1;
 

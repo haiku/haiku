@@ -27,6 +27,3 @@
 
 # Add the optional package WonderBrush to the image.
 #AddOptionalHaikuImagePackages WonderBrush ;
-
-# Don't add the libraries built with the alternative gcc version.
-#HAIKU_ADD_ALTERNATIVE_GCC_LIBS = 0 ;

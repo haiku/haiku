@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <directories.h>
+
 #include "net_module.h"
 
 
@@ -37,10 +39,10 @@ typedef uint32 ppp_interface_id;
 // path defines
 #define PPP_MODULES_PATH					NETWORK_MODULES_ROOT "ppp"
 #define PTP_INTERFACE_SETTINGS_PATH	\
-	"/boot/home/config/settings/kernel/drivers/ptpnet"
+	kUserSettingsDirectory "/kernel/drivers/ptpnet"
 		// TODO: should be: /etc/ptpnet
 #define PTP_SETTINGS_PATH \
-	"/boot/home/config/settings/kernel/drivers/ptpnet.settings"
+	kUserSettingsDirectory "/kernel/drivers/ptpnet.settings"
 		// TODO: should be: /etc/ptpnet.settings
 
 // built-in protocols
