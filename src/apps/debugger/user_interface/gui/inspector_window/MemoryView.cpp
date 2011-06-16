@@ -163,11 +163,11 @@ MemoryView::Draw(BRect rect)
 		PopState();
 
 		if (fHexMode != HexModeNone) {
-			if (currentAddress + (currentBlocksPerLine * hexBlockSize)
+			if (currentAddress + (currentBlocksPerLine * blockByteSize)
 				> maxAddress) {
 				currentCharsPerLine = maxAddress - currentAddress;
 				currentBlocksPerLine = currentCharsPerLine
-					/ hexBlockSize;
+					/ blockByteSize;
 			}
 
 			for (int32 j = 0; j < currentBlocksPerLine; j++) {

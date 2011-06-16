@@ -45,6 +45,8 @@ private:
 	BMenuField*					fHexMode;
 	BMenuField*					fTextMode;
 	MemoryView*					fMemoryView;
+	BButton*					fPreviousBlockButton;
+	BButton*					fNextBlockButton;
 	TeamMemoryBlock*			fCurrentBlock;
 	target_addr_t				fCurrentAddress;
 	::Team*						fTeam;

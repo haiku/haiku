@@ -9,7 +9,9 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Autolock.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
 #include <TextControl.h>
@@ -20,6 +22,12 @@
 #include "MessageCodes.h"
 #include "Team.h"
 #include "UserInterface.h"
+
+
+enum {
+	MSG_NAVIGATE_PREVIOUS_BLOCK = 'npbl',
+	MSG_NAVIGATE_NEXT_BLOCK		= 'npnl'
+};
 
 
 InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener)
@@ -99,9 +107,15 @@ InspectorWindow::_Init()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
-		.Add(fAddressInput = new BTextControl("addrInput",
+		.AddGroup(B_HORIZONTAL, 4.0f)
+			.Add(fAddressInput = new BTextControl("addrInput",
 			"Target Address:", "",
 			new BMessage(MSG_INSPECT_ADDRESS)))
+			.Add(fPreviousBlockButton = new BButton("navPrevious", "<",
+				new BMessage(MSG_NAVIGATE_PREVIOUS_BLOCK)))
+			.Add(fNextBlockButton = new BButton("navNext", ">",
+				new BMessage(MSG_NAVIGATE_NEXT_BLOCK)))
+		.End()
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(fHexMode = new BMenuField("outputStyle", "Hex Mode:",
 				hexMenu))
@@ -119,6 +133,10 @@ InspectorWindow::_Init()
 	scrollView->SetTarget(fMemoryView = MemoryView::Create());
 
 	fAddressInput->SetTarget(this);
+	fPreviousBlockButton->SetTarget(this);
+	fNextBlockButton->SetTarget(this);
+	fPreviousBlockButton->SetEnabled(false);
+	fNextBlockButton->SetEnabled(false);
 
 	hexMenu->SetLabelFromMarked(true);
 	hexMenu->SetTargetForItems(fMemoryView);
@@ -138,27 +156,36 @@ InspectorWindow::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case MSG_INSPECT_ADDRESS:
 		{
-			ExpressionParser parser;
-			parser.SetSupportHexInput(true);
 			target_addr_t address = 0;
-			const char* addressExpression = fAddressInput->Text();
-			BString errorMessage;
-			try {
-				address = parser.EvaluateToInt64(addressExpression);
-			} catch(ParseException parseError) {
-				errorMessage.SetToFormat("Failed to parse address: %s",
-					parseError.message.String());
-			} catch(...) {
-				errorMessage.SetToFormat(
-					"Unknown error while parsing address");
+			bool addressValid = false;
+			if (msg->FindUInt64("address", &address) != B_OK)
+			{
+				ExpressionParser parser;
+				parser.SetSupportHexInput(true);
+				const char* addressExpression = fAddressInput->Text();
+				BString errorMessage;
+				try {
+					address = parser.EvaluateToInt64(addressExpression);
+				} catch(ParseException parseError) {
+					errorMessage.SetToFormat("Failed to parse address: %s",
+						parseError.message.String());
+				} catch(...) {
+					errorMessage.SetToFormat(
+						"Unknown error while parsing address");
+				}
+
+				if (errorMessage.Length() > 0) {
+					BAlert* alert = new(std::nothrow) BAlert("Inspect Address",
+						errorMessage.String(), "Close");
+					if (alert != NULL)
+						alert->Go();
+				} else
+					addressValid = true;
+			} else {
+				addressValid = true;
 			}
 
-			if (errorMessage.Length() > 0) {
-				BAlert* alert = new(std::nothrow) BAlert("Inspect Address",
-					errorMessage.String(), "Close");
-				if (alert != NULL)
-					alert->Go();
-			} else {
+			if (addressValid) {
 				if (fCurrentBlock != NULL
 					&& !fCurrentBlock->Contains(address)) {
 					fCurrentBlock->ReleaseReference();
@@ -177,6 +204,31 @@ InspectorWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
+		case MSG_NAVIGATE_PREVIOUS_BLOCK:
+		case MSG_NAVIGATE_NEXT_BLOCK:
+		{
+			if (fCurrentBlock != NULL)
+			{
+				target_addr_t address = fCurrentBlock->BaseAddress();
+				if (msg->what == MSG_NAVIGATE_PREVIOUS_BLOCK)
+					address -= fCurrentBlock->Size();
+				else
+					address += fCurrentBlock->Size();
+
+				BMessage setMessage(MSG_INSPECT_ADDRESS);
+				setMessage.AddUInt64("address", address);
+				PostMessage(&setMessage);
+			}
+			break;
+		}
+		{
+			break;
+		}
+		default:
+		{
+			BWindow::MessageReceived(msg);
+			break;
+		}
 	}
 }
 
@@ -192,6 +244,11 @@ InspectorWindow::QuitRequested()
 void
 InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	fCurrentBlock = block;
-	fMemoryView->SetTargetAddress(block, fCurrentAddress);
+	BAutolock lock(this);
+	if (lock.IsLocked()) {
+		fCurrentBlock = block;
+		fMemoryView->SetTargetAddress(block, fCurrentAddress);
+		fPreviousBlockButton->SetEnabled(true);
+		fNextBlockButton->SetEnabled(true);
+	}
 }
