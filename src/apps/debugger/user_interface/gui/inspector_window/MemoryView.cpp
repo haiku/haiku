@@ -6,6 +6,8 @@
 
 #include "MemoryView.h"
 
+#include <algorithm>
+
 #include <stdio.h>
 
 #include <Messenger.h>
@@ -24,7 +26,13 @@ MemoryView::MemoryView()
 	:
 	BView("memoryView", B_WILL_DRAW | B_FRAME_EVENTS | B_SUBPIXEL_PRECISE),
 	fTargetBlock(NULL),
-	fTargetAddress(0)
+	fTargetAddress(0LL),
+	fCharWidth(0.0),
+	fLineHeight(0.0),
+	fTextCharsPerLine(0),
+	fHexBlocksPerLine(0),
+	fHexMode(HexMode8BitInt),
+	fTextMode(TextModeASCII)
 {
 }
 
@@ -92,42 +100,77 @@ MemoryView::Draw(BRect rect)
 {
 	BView::Draw(rect);
 
-	StrokeLine(BPoint(9 * fCharWidth, rect.top),
-				BPoint(9 * fCharWidth, rect.bottom));
+	float divider = 9 * fCharWidth;
+	StrokeLine(BPoint(divider, rect.top),
+				BPoint(divider, rect.bottom));
 
 	if (fTargetBlock == NULL)
 		return;
 
-	char buffer[16];
+	uint32 hexBlockSize = 1 << fHexMode;
+	if (fHexMode != HexModeNone && fTextMode != TextModeNone) {
+		divider += (fHexBlocksPerLine * (hexBlockSize + 1) + 1) * fCharWidth;
+		StrokeLine(BPoint(divider, rect.top),
+					BPoint(divider, rect.bottom));
+	}
 
-	int32 startLine = int32(rect.top / fLineHeight);
+	char buffer[32];
+	char textbuffer[512];
+
+	int32 startLine = int32(rect.top / fLineHeight) - 1;
+	if (startLine < 0)
+		startLine = 0;
 	int32 endLine = int32(rect.bottom / fLineHeight) + 1;
-	int32 startByte = fNybblesPerLine / 2 * startLine;
-	uint16* currentAddress = (uint16*)(fTargetBlock->BaseAddress()
+	int32 startByte = fHexBlocksPerLine * hexBlockSize * startLine;
+	const char* currentAddress = (const char*)(fTargetBlock->BaseAddress()
 		+ startByte);
-	uint16* maxAddress = (uint16*)(fTargetBlock->BaseAddress()
+	const char* maxAddress = (const char*)(fTargetBlock->BaseAddress()
 		+ fTargetBlock->Size());
 	BPoint drawPoint(1.0, (startLine + 1) * fLineHeight);
-	int32 currentWordsPerLine = fNybblesPerLine / 4;
-
+	int32 currentBlocksPerLine = fHexBlocksPerLine;
+	int32 currentCharsPerLine = fTextCharsPerLine;
+	rgb_color addressColor = tint_color(HighColor(), B_LIGHTEN_1_TINT);
+	rgb_color dataColor = HighColor();
 	for (int32 i = startLine; i <= endLine && currentAddress < maxAddress;
 		i++, drawPoint.y += fLineHeight) {
 		drawPoint.x = 1.0;
 		snprintf(buffer, sizeof(buffer), "%" B_PRIx32,
 			(uint32)currentAddress);
+		SetHighColor(addressColor);
 		DrawString(buffer, drawPoint);
 		drawPoint.x += fCharWidth * 10;
+		SetHighColor(dataColor);
 
-		if (currentAddress + currentWordsPerLine > maxAddress)
-			currentWordsPerLine = (maxAddress - currentAddress) / 2;
+		if (fHexMode != HexModeNone) {
+			if (currentAddress + (currentBlocksPerLine * hexBlockSize)
+				> maxAddress) {
+				currentCharsPerLine = maxAddress - currentAddress;
+				currentBlocksPerLine = currentCharsPerLine
+					/ hexBlockSize;
+			}
 
-		for (int32 j = 0; j < currentWordsPerLine; j++) {
-			snprintf(buffer, sizeof(buffer), "%04" B_PRIx16,
-				currentAddress[j]);
-			DrawString(buffer, drawPoint);
-			drawPoint.x += fCharWidth * 5;
+			for (int32 j = 0; j < currentBlocksPerLine; j++) {
+				_GetNextHexBlock(buffer,
+					std::min(hexBlockSize + 1, sizeof(buffer)),
+					currentAddress + (j * hexBlockSize / 2));
+				DrawString(buffer, drawPoint);
+				drawPoint.x += fCharWidth * (hexBlockSize + 1);
+			}
 		}
-		currentAddress += currentWordsPerLine;
+		if (fTextMode != TextModeNone) {
+			drawPoint.x += fCharWidth;
+			for (int32 j = 0; j < currentCharsPerLine; j++) {
+				// filter non-printable characters
+				textbuffer[j] = currentAddress[j] > 32 ? currentAddress[j]
+					: '.';
+			}
+			textbuffer[fTextCharsPerLine] = '\0';
+			DrawString(textbuffer, drawPoint);
+		}
+		if (currentBlocksPerLine > 0)
+			currentAddress += currentBlocksPerLine * hexBlockSize / 2;
+		else
+			currentAddress += fTextCharsPerLine;
 	}
 }
 
@@ -149,6 +192,26 @@ MemoryView::MessageReceived(BMessage* message)
 		{
 			_RecalcScrollBars();
 			Invalidate();
+			break;
+		}
+		case MSG_SET_HEX_MODE:
+		{
+			int32 mode;
+			if (message->FindInt32("mode", &mode) == B_OK) {
+				fHexMode = mode;
+				_RecalcScrollBars();
+				Invalidate();
+			}
+			break;
+		}
+		case MSG_SET_TEXT_MODE:
+		{
+			int32 mode;
+			if (message->FindInt32("mode", &mode) == B_OK) {
+				fTextMode = mode;
+				_RecalcScrollBars();
+				Invalidate();
+			}
 			break;
 		}
 		default:
@@ -174,19 +237,83 @@ MemoryView::_RecalcScrollBars()
 	BScrollBar *scrollBar = ScrollBar(B_VERTICAL);
 	if (fTargetBlock != NULL) {
 		BRect bounds = Bounds();
-		fNybblesPerLine = int32(bounds.Width() / fCharWidth);
-		// we allocate 8 characters for the starting address of the current
-		// line plus some spacing to separate that from the data
-		fNybblesPerLine -= 10;
-		// also allocate a space between each 16-bit grouping
-		fNybblesPerLine -= (fNybblesPerLine / 4) - 1;
-		fNybblesPerLine &= ~3;
-		int32 lineCount
-			= (int32)ceil(2 * fTargetBlock->Size() / fNybblesPerLine);
-		float totalHeight = lineCount * fLineHeight;
-		max = totalHeight - bounds.Height();
-		scrollBar->SetProportion(bounds.Height() / totalHeight);
-		scrollBar->SetSteps(fLineHeight, bounds.Height());
+		// the left portion of the view is off limits since it
+		// houses the address offset of the current line
+		float baseWidth = bounds.Width() - (10.0 * fCharWidth);
+		float hexWidth = 0.0;
+		float textWidth = 0.0;
+		int32 hexDigits = 1 << fHexMode;
+		int32 sizeFactor = 1 + hexDigits;
+		if (fHexMode != HexModeNone) {
+			if (fTextMode != TextModeNone) {
+				float hexProportion = sizeFactor / (float)(sizeFactor
+					+ hexDigits / 2);
+				hexWidth = baseWidth * hexProportion;
+				// when sharing the display between hex and text,
+				// we allocate a 2 character space to separate the views
+				hexWidth -= 2 * fCharWidth;
+				textWidth = baseWidth - hexWidth;
+			} else
+				hexWidth = baseWidth;
+		} else if (fTextMode != TextModeNone)
+			textWidth = baseWidth;
+
+		int32 nybblesPerLine = int32(hexWidth / fCharWidth);
+		fHexBlocksPerLine = 0;
+		fTextCharsPerLine = 0;
+		if (fHexMode != HexModeNone) {
+			fHexBlocksPerLine = nybblesPerLine / sizeFactor;
+			fHexBlocksPerLine &= ~1;
+			if (fTextMode != TextModeNone)
+				fTextCharsPerLine = fHexBlocksPerLine * (hexDigits / 2);
+		} else if (fTextMode != TextModeNone)
+			fTextCharsPerLine = int32(textWidth / fCharWidth);
+
+		int32 lineCount = 0;
+		float totalHeight = 0.0;
+		if (fHexBlocksPerLine > 0) {
+			lineCount = fTargetBlock->Size() / (fHexBlocksPerLine
+					* hexDigits);
+		} else if (fTextCharsPerLine > 0)
+			lineCount = fTargetBlock->Size() / fTextCharsPerLine;
+
+		totalHeight = lineCount * fLineHeight;
+		if (totalHeight > 0.0) {
+			max = totalHeight - bounds.Height();
+			scrollBar->SetProportion(bounds.Height() / totalHeight);
+			scrollBar->SetSteps(fLineHeight, bounds.Height());
+		}
 	}
 	scrollBar->SetRange(0.0, max);
+}
+
+void
+MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
+	const char* address)
+{
+	switch(fHexMode) {
+		case HexMode8BitInt:
+		{
+			snprintf(buffer, bufferSize, "%02" B_PRIx8, *address);
+			break;
+		}
+		case HexMode16BitInt:
+		{
+			snprintf(buffer, bufferSize, "%04" B_PRIx16,
+				*((const uint16*)address));
+			break;
+		}
+		case HexMode32BitInt:
+		{
+			snprintf(buffer, bufferSize, "%08" B_PRIx32,
+				*((const uint32*)address));
+			break;
+		}
+		case HexMode64BitInt:
+		{
+			snprintf(buffer, bufferSize, "%0*" B_PRIx64,
+				16, *((const uint64*)address));
+			break;
+		}
+	}
 }

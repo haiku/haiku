@@ -212,7 +212,7 @@ TeamWindow::MessageReceived(BMessage* message)
 			}
 
 			try {
-				fInspectorWindow = InspectorWindow::Create(fListener);
+				fInspectorWindow = InspectorWindow::Create(fTeam, fListener);
 				if (fInspectorWindow != NULL)
 					fInspectorWindow->Show();
            	} catch (...) {

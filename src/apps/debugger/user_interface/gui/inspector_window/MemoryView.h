@@ -12,6 +12,26 @@
 #include "Types.h"
 
 
+enum {
+	MSG_SET_HEX_MODE 	= 'sofm',
+	MSG_SET_TEXT_MODE	= 'some'
+};
+
+enum {
+	HexModeNone	= 0,
+	HexMode8BitInt,
+	HexMode16BitInt,
+	HexMode32BitInt,
+	HexMode64BitInt
+	// TODO: floating point representation?
+};
+
+enum {
+	TextModeNone = 0,
+	TextModeASCII
+};
+
+
 class TeamMemoryBlock;
 
 
@@ -39,13 +59,18 @@ public:
 private:
 	void						_Init();
 	void						_RecalcScrollBars();
+	void						_GetNextHexBlock(char* buffer,
+									int32 bufferSize, const char* address);
 
 private:
 	TeamMemoryBlock*			fTargetBlock;
 	target_addr_t				fTargetAddress;
 	float						fCharWidth;
 	float						fLineHeight;
-	int32						fNybblesPerLine;
+	int32						fTextCharsPerLine;
+	int32						fHexBlocksPerLine;
+	int32						fHexMode;
+	int32						fTextMode;
 };
 
 #endif // MEMORY_VIEW_H

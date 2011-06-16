@@ -13,19 +13,22 @@
 
 
 class BButton;
+class BMenuField;
 class BTextControl;
 class MemoryView;
+class Team;
 class UserInterfaceListener;
 
 
 class InspectorWindow : public BWindow,
 	public TeamMemoryBlock::Listener {
 public:
-								InspectorWindow(
+								InspectorWindow(::Team* team,
 									UserInterfaceListener* listener);
 	virtual						~InspectorWindow();
 
-	static	InspectorWindow*	Create(UserInterfaceListener* listener);
+	static	InspectorWindow*	Create(::Team* team,
+									UserInterfaceListener* listener);
 										// throws
 
 	virtual void				MessageReceived(BMessage* message);
@@ -39,9 +42,12 @@ private:
 private:
 	UserInterfaceListener*		fListener;
 	BTextControl*				fAddressInput;
+	BMenuField*					fHexMode;
+	BMenuField*					fTextMode;
 	MemoryView*					fMemoryView;
 	TeamMemoryBlock*			fCurrentBlock;
 	target_addr_t				fCurrentAddress;
+	::Team*						fTeam;
 };
 
 #endif // INSPECTOR_WINDOW_H
