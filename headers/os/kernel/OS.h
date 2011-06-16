@@ -414,6 +414,8 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 
 #if __INTEL__
 #	define B_MAX_CPU_COUNT	8
+#elif __x86_64__
+#	define B_MAX_CPU_COUNT	8
 #elif __POWERPC__
 #	define B_MAX_CPU_COUNT	8
 #elif __M68K__

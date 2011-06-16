@@ -583,6 +583,11 @@ if $(HOST_PLATFORM) = cygwin {
 
 HOST_CPU	?= $(OSPLAT:L) ;
 
+# Jam doesn't know x86_64, so override HOST_CPU, if 64 bit.
+if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) {
+	HOST_CPU = x86_64 ;
+}
+
 HOST_ARCH				?= $(HOST_CPU) ;
 HOST_ARCH_MACRO_DEFINE	= ARCH_$(HOST_CPU) ;
 
@@ -677,7 +682,7 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 }
 
 # ld flags
-if $(HOST_ARCH) = x86 && $(HAIKU_HOST_USE_32BIT) = 1 {
+if $(HOST_ARCH) = x86_64 && $(HAIKU_HOST_USE_32BIT) = 1 {
 	HOST_LDFLAGS += -melf_i386 ;
 }
 
@@ -762,7 +767,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBSUPC++ = gcc_s.1 stdc++ ;
 		HOST_LIBSTDC++ = ;
 	} else if $(HOST_PLATFORM) = freebsd {
-		if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) = 1 {
+		if $(HOST_CPU) = x86_64 {
 			# amd64 FreeBSD 8 doesn't come without a shared libsupc++, and the
 			# static one prevents us from building shared libraries. So we have
 			# to work around by using the shared libstdc++.
@@ -784,6 +789,8 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# build platform we need to make sure, this is also defined.
 	if $(HOST_CPU) = x86 {
 		HOST_DEFINES += __INTEL__ ;
+	} else if $(HOST_CPU) = x86_64 {
+		HOST_DEFINES += __x86_64__ ;
 	} else if $(HOST_CPU) = ppc {
 		HOST_DEFINES += __POWERPC__ ;
 	} else if $(HOST_CPU) = m68k {
