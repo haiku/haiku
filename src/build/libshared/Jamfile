@@ -5,9 +5,10 @@ USES_BE_API on libshared_build.a = true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 UsePrivateBuildHeaders shared ;
 
-BuildPlatformStaticLibrary libshared_build.a :
-	Keymap.cpp
-;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits shared ] ;
 
-SEARCH on [ FGristFiles Keymap.cpp ]
-	= [ FDirName $(HAIKU_TOP) src kits shared ] ;
+BuildPlatformStaticLibraryPIC libshared_build.a :
+	Keymap.cpp
+	NaturalCompare.cpp
+	SHA256.cpp
+;
