@@ -53,7 +53,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#ifndef B_BUFFER_OVERFLOW
 #	define B_BUFFER_OVERFLOW B_ERROR
 #endif
 
