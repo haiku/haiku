@@ -68,8 +68,11 @@ static net_stack_module_info* sStackModule;
 static status_t
 switch_to_command_mode(dialup_device* device)
 {
-	if (device->state != UP || !device->data_mode)
+	if (device->state != UP)
 		return B_ERROR;
+
+	if (!device->data_mode)
+		return B_OK;
 
 	snooze(device->escape_silence);
 
@@ -83,11 +86,14 @@ switch_to_command_mode(dialup_device* device)
 	return B_OK;
 }
 
-#if 0
+
 static status_t
 switch_to_data_mode(dialup_device* device)
 {
 	if (device->state != UP)
+		return B_ERROR;
+
+	if (device->data_mode)
 		return B_OK;
 
 	// TODO: check if it's needed, as these days any
@@ -100,7 +106,7 @@ switch_to_data_mode(dialup_device* device)
 	device->data_mode = true;
 	return B_OK;
 }
-#endif
+
 
 static status_t
 send_command(dialup_device* device, const char* command)
@@ -293,6 +299,8 @@ dialup_up(net_device* _device)
 		}
 	}
 
+	reply[0] = '\0';
+
 	if (strlen(device->dial_string) > 0) {
 		// Send dialing string
 		device->state = DIALING;
@@ -390,7 +398,7 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 
 	// encode HDLC packet
 
-	// worst case: begin and end sequence flags and each byte needing escape
+	// worst case: begin and end sequence flags plus each payload byte escaped
 	packet = (uint8*)malloc(2 + 2 * buffer->size);
 	if (packet == NULL) {
 		status = B_NO_MEMORY;
