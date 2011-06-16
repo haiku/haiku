@@ -209,8 +209,10 @@ MemoryView::Draw(BRect rect)
 				PushState();
 				SetHighColor(B_TRANSPARENT_COLOR);
 				SetDrawingMode(B_OP_INVERT);
-				float startX = drawPoint.x + fCharWidth * (targetAddress
-						- currentAddress);
+				uint32 blockAddress = uint32(targetAddress - currentAddress);
+				if (fHexMode != HexModeNone)
+					blockAddress &= ~(blockByteSize - 1);
+				float startX = drawPoint.x + fCharWidth * blockAddress;
 				float endX = startX;
 				if (fHexMode != HexModeNone)
 					endX += fCharWidth * ((hexBlockSize - 1) / 2);
