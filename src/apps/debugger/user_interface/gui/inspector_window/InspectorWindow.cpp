@@ -146,6 +146,8 @@ InspectorWindow::_Init()
 	// default to 8-bit format w/ text display
 	hexMenu->ItemAt(1)->SetMarked(true);
 	textMenu->ItemAt(1)->SetMarked(true);
+
+	fAddressInput->TextView()->MakeFocus(true);
 }
 
 
