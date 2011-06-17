@@ -40,7 +40,7 @@ rule FPackageConfigSubPath
 		} else {
 			configSubPath = $(TARGET_PLATFORM) $(TARGET_ARCH) ;
 		}
-	
+
 		if $(DEBUG) = 0 {
 			configSubPath += release ;
 		} else {
@@ -120,7 +120,7 @@ rule PackageSymLink
 	local packagename = $(1) ;
 	local symlinkPath = $(2) ;
 	local symlinkTarget = $(3) ;
-	
+
 	local configSubPath = [ FPackageConfigSubPath $(packagename) ] ;
 
 	local symlinkDir = [ FReverse $(symlinkPath) ] ;
@@ -159,7 +159,7 @@ rule PackageDriverSymLink
 {
 	# PackageDriverSymLink <packageName> : <devRelativeSymlinkComponents> ;
 	# <packageName>: Package name.
-	# <devRelativeSymlinkComponents>: Path components relative to the 
+	# <devRelativeSymlinkComponents>: Path components relative to the
 	#     /boot/home/config/add-ons/kernel/drivers/dev directory, e.g.
 	#     "graphics mga.driver" (no quotation, of course).
 	#
@@ -247,4 +247,180 @@ rule LinkInstallZip
 actions together LinkInstallZip
 {
 	ln -sf "`pwd`/$(2)" "$(1)" ;
+}
+
+
+# TODO: The stuff above should be moved (Copy) or removed (the rest).
+
+
+#pragma mark - Haiku Packages
+
+
+rule FHaikuPackageGrist package
+{
+	local grist = [ Match "<(.*)>" : $(package:G) ] ;
+	return hpkg_$(grist:E="")_$(package:G=) ;
+}
+
+
+rule HaikuPackage package
+{
+	local grist = [ FHaikuPackageGrist $(package) ] ;
+
+	HAIKU_CONTAINER_GRIST on $(package) = $(grist) ;
+	HAIKU_INCLUDE_IN_CONTAINER_VAR on $(package)
+		= $(grist)_HAIKU_INCLUDE_IN_PACKAGE ;
+	HAIKU_INSTALL_TARGETS_VAR on $(package)
+		= $(grist)_HAIKU_PACKAGE_INSTALL_TARGETS ;
+}
+
+
+rule BuildHaikuPackage package : packageInfo
+{
+	local grist = [ FHaikuPackageGrist $(package) ] ;
+
+	local tempDir = [ FDirName $(HAIKU_PACKAGES_BUILD_DIR) $(grist) ] ;
+	local scriptDir = [ FDirName $(tempDir) scripts ] ;
+
+	# locate the package and package info
+	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR) ;
+	SEARCH on $(packageInfo) += $(HAIKU_PACKAGE_INFOS_DIR) ;
+	LocalDepends $(package) : $(packageInfo) ;
+
+	# prepare the script that initializes the shell variables
+	local initVariablesScript = <$(grist)>haiku.package-init-vars ;
+	MakeLocate $(initVariablesScript) : $(scriptDir) ;
+	Always $(initVariablesScript) ;
+
+	local script = $(initVariablesScript) ;
+	AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
+	AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
+	AddVariableToScript $(script) : tmpDir : $(tempDir) ;
+	AddVariableToScript $(script) : addBuildCompatibilityLibDir
+		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+	AddTargetVariableToScript $(script) : <build>addattr ;
+	AddTargetVariableToScript $(script) : <build>copyattr ;
+	AddTargetVariableToScript $(script) : <build>package ;
+	AddTargetVariableToScript $(script) : <build>rc ;
+	AddTargetVariableToScript $(script) : <build>resattr ;
+	AddTargetVariableToScript $(script) : <build>unzip ;
+	if $(HOST_RM_ATTRS_TARGET) {
+		AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET)
+			: rmAttrs ;
+	} else {
+		AddVariableToScript $(script) : rmAttrs : rm ;
+	}
+
+	# create the other scripts
+	local makeDirsScript = <$(grist)>haiku.package-make-dirs ;
+	local copyFilesScript = <$(grist)>haiku.package-copy-files ;
+
+	MakeLocate $(makeDirsScript) $(copyFilesScript) : $(scriptDir) ;
+
+	CreateContainerMakeDirectoriesScript $(package) : $(makeDirsScript) ;
+	CreateContainerCopyFilesScript $(package) : $(copyFilesScript) ;
+
+	local scripts = $(initVariablesScript) $(makeDirsScript)
+		$(copyFilesScript) ;
+
+	# call the build actions
+	local mainScript = build_haiku_package ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	LocalDepends $(package) : $(mainScript) $(scripts) ;
+	BuildHaikuPackage1 $(package) : $(mainScript) $(packageInfo) $(scripts) ;
+}
+
+
+actions BuildHaikuPackage1
+{
+	$(2[1]) "$(1)" "$(2[2])" $(2[3-])
+}
+
+
+rule AddDirectoryToPackage package : directoryTokens : attributeFiles
+{
+	local dir = [ AddDirectoryToContainer $(package) : $(directoryTokens) ] ;
+	local grist = [ FHaikuPackageGrist $(package) ] ;
+
+	if $(attributeFiles) {
+		SEARCH on $(attributeFiles)
+			+= [ FDirName $(HAIKU_TOP) data package_directories $(grist) ] ;
+		ATTRIBUTE_FILES on $(dir) += $(attributeFiles) ;
+	}
+
+	return $(dir) ;
+}
+
+
+rule AddFilesToPackage package : directory : targets : destName
+{
+	AddFilesToContainer $(package) : $(directory) : $(targets) : $(destName) ;
+}
+
+
+rule AddSymlinkToPackage package : directoryTokens : linkTarget : linkName
+{
+	linkTarget = $(linkTarget:J=/) ;
+
+	AddSymlinkToContainer $(package) : $(directoryTokens) : $(linkTarget)
+		: $(linkName) ;
+}
+
+
+rule CopyDirectoryToPackage package : directoryTokens : sourceDirectory
+	: targetDirectoryName : excludePatterns : alwaysUpdate
+{
+	CopyDirectoryToContainer $(package) : $(directoryTokens)
+		: $(sourceDirectory) : $(targetDirectoryName) : $(excludePatterns)
+		: $(alwaysUpdate) ;
+}
+
+
+rule AddHeaderDirectoryToPackage package : dirTokens : dirName : alwaysUpdate
+{
+	AddHeaderDirectoryToContainer $(package) : $(dirTokens) : $(dirName)
+		: $(alwaysUpdate) ;
+}
+
+
+rule AddWifiFirmwareToPackage package : driver : subDirToExtract : archive
+	: extract
+{
+	AddWifiFirmwareToContainer $(package) : $(driver) : $(subDirToExtract)
+		: $(archive) : $(extract) ;
+}
+
+
+rule ExtractArchiveToPackage package : dirTokens : archiveFile : alwaysUpdate
+	: extractedSubDir
+{
+	# TODO: Update support?
+	ExtractArchiveToContainer $(package) : $(dirTokens) : $(archiveFile)
+		: $(extractedSubDir) ;
+}
+
+
+rule AddDriversToPackage package : relativeDirectoryTokens : targets
+{
+	AddDriversToContainer $(package) : $(relativeDirectoryTokens) : $(targets) ;
+}
+
+
+rule AddNewDriversToPackage package : relativeDirectoryTokens : targets
+{
+	AddNewDriversToContainer $(package) : $(relativeDirectoryTokens)
+		: $(targets) ;
+}
+
+
+rule AddBootModuleSymlinksToPackage package : targets
+{
+	AddBootModuleSymlinksToContainer $(package) : $(targets) ;
+}
+
+
+rule AddLibrariesToPackage package : directory : libs
+{
+	AddLibrariesToContainer $(package) : $(directory) : $(libs) ;
 }

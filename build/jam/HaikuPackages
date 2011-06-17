@@ -1,0 +1,345 @@
+local haikuPackage = haiku.hpkg ;
+HaikuPackage $(haikuPackage) ;
+
+
+# wifi firmware
+for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
+	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
+	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
+	local extract = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_DO_EXTRACT) ] ;
+	if $(archive) {
+		AddWifiFirmwareToPackage $(haikuPackage) : $(driver) : $(package)
+			: $(archive) : $(extract) ;
+	}
+	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
+	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
+	for archive in $(archives) {
+		AddWifiFirmwareToPackage $(haikuPackage) : $(driver) : $(packages[1])
+			: $(archive) : $(extract) ;
+		packages = $(packages[2-]) ;
+	}
+}
+
+
+# modules
+AddFilesToPackage $(haikuPackage) : system add-ons kernel bus_managers
+	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel busses agp_gart
+	: $(X86_ONLY)<agp_gart>intel ;
+
+if $(HAIKU_ATA_STACK) = 1 {
+	AddFilesToPackage $(haikuPackage) : system add-ons kernel busses ata
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112
+			$(X86_ONLY)ide_isa ;
+} else {
+	AddFilesToPackage $(haikuPackage) : system add-ons kernel busses ide
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112
+			$(X86_ONLY)ide_isa ;
+}
+
+AddFilesToPackage $(haikuPackage) : system add-ons kernel busses scsi
+	: ahci ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel busses usb
+	: <usb>uhci <usb>ohci <usb>ehci ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel console
+	: vga_text ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel debugger
+	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm
+	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel file_systems
+	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel generic
+	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
+		scsi_periph <module>tty ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons kernel partitioning_systems
+	: amiga_rdb apple efi_gpt intel session ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons kernel interrupt_controllers
+	: $(PPC_ONLY)openpic ;
+
+if $(TARGET_ARCH) = x86 {
+	AddFilesToPackage $(haikuPackage) : system add-ons kernel cpu
+		: generic_x86 ;
+}
+
+# drivers
+AddNewDriversToPackage $(haikuPackage) : disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToPackage $(haikuPackage) : power : $(X86_ONLY)enhanced_speedstep ;
+AddNewDriversToPackage $(haikuPackage) : power : $(X86_ONLY)acpi_battery ;
+
+# legacy drivers
+AddDriversToPackage $(haikuPackage) :
+	: console dprintf null random <driver>tty zero ;
+AddDriversToPackage $(haikuPackage) : audio hmulti
+	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
+AddDriversToPackage $(haikuPackage) : audio old
+	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
+AddDriversToPackage $(haikuPackage) : midi
+	: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
+AddDriversToPackage $(haikuPackage) : bus			: usb_raw fw_raw ;
+AddDriversToPackage $(haikuPackage) : disk floppy	: $(X86_ONLY)pc_floppy ;
+AddDriversToPackage $(haikuPackage) : disk usb		: usb_disk ;
+AddDriversToPackage $(haikuPackage) : disk usb		: usb_floppy ;
+AddDriversToPackage $(haikuPackage) : printer usb	: usb_printer ;
+AddDriversToPackage $(haikuPackage) : disk virtual	: nbd ;
+AddDriversToPackage $(haikuPackage) : dvb			: cx23882 ;
+AddDriversToPackage $(haikuPackage) : graphics
+	: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToPackage $(haikuPackage) : input			: ps2_hid usb_hid wacom ;
+AddDriversToPackage $(haikuPackage) : misc			: <driver>poke <driver>mem ;
+AddDriversToPackage $(haikuPackage) : net
+	: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+AddDriversToPackage $(haikuPackage) : ports		: usb_serial ;
+#AddDriversToPackage $(haikuPackage) : power
+#	: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
+
+# kernel
+AddFilesToPackage $(haikuPackage) : system
+	: <revisioned>kernel_$(TARGET_ARCH) ;
+
+# libs
+AddLibrariesToPackage $(haikuPackage) : system lib
+	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
+
+# libnetwork.so replaces quite a few libraries
+SYSTEM_LIBS_LIBNETWORK_ALIASES
+	= libsocket.so libbind.so libnet.so ;
+
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	local lib ;
+	for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
+		AddSymlinkToPackage $(haikuPackage) : system lib
+			: libnetwork.so : $(lib) ;
+	}
+
+	AddSymlinkToPackage $(haikuPackage) : system lib : libbnetapi.so
+		: libnetapi.so ;
+}
+
+
+# libGL.so has GLU (like BeOS) *and* GLUT API built-in
+SYSTEM_LIBS_LIBGL_ALIASES
+	= libGLU.so libglut.so ;
+
+if $(TARGET_ARCH) = x86 {
+	local lib ;
+	for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
+		AddSymlinkToPackage $(haikuPackage) : system lib : libGL.so : $(lib) ;
+	}
+}
+
+SYSTEM_LIBS_ALIASES =
+	$(SYSTEM_LIBS_LIBNETWORK_ALIASES)
+	libnetapi.so
+	$(SYSTEM_LIBS_LIBGL_ALIASES)
+;
+
+# servers
+AddFilesToPackage $(haikuPackage) : system servers : $(SYSTEM_SERVERS) ;
+
+# apps
+AddFilesToPackage $(haikuPackage) : system			: runtime_loader ;
+AddFilesToPackage $(haikuPackage) : system			: Deskbar Tracker ;
+AddFilesToPackage $(haikuPackage) : system bin		: $(SYSTEM_BIN) consoled ;
+AddFilesToPackage $(haikuPackage) : system apps		: $(SYSTEM_APPS) ;
+AddFilesToPackage $(haikuPackage) : system preferences
+	: $(SYSTEM_PREFERENCES) ;
+AddFilesToPackage $(haikuPackage) : system demos	: $(SYSTEM_DEMOS) ;
+
+SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage $(haikuPackage) : system bin : which ;
+SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage $(haikuPackage) : system bin : installoptionalpackage ;
+SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage $(haikuPackage) : system bin : install-wifi-firmwares.sh ;
+
+AddSymlinkToPackage $(haikuPackage) : system bin : bash : sh ;
+AddSymlinkToPackage $(haikuPackage) : system bin : trash : untrash ;
+
+AddSymlinkToPackage $(haikuPackage) : system bin : bzip2 : bunzip2 ;
+AddSymlinkToPackage $(haikuPackage) : system bin : less : more ;
+AddSymlinkToPackage $(haikuPackage) : system bin : gzip : gunzip ;
+AddSymlinkToPackage $(haikuPackage) : system bin : gzip : zcat ;
+AddSymlinkToPackage $(haikuPackage) : system bin : zdiff : zcmp ;
+AddSymlinkToPackage $(haikuPackage) : system bin : unzip : zipinfo ;
+AddSymlinkToPackage $(haikuPackage) : system bin : gawk : awk ;
+AddSymlinkToPackage $(haikuPackage) : system bin : grep : egrep ;
+AddSymlinkToPackage $(haikuPackage) : system bin : grep : fgrep ;
+
+# scripts and data files
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
+	InstallerInitScript InstallerFinishScript ;
+SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
+AddFilesToPackage $(haikuPackage) : system boot : $(bootScripts) ;
+
+# artwork and sounds
+local logoArtwork =
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - normal.png" ;
+SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
+AddFilesToPackage $(haikuPackage) : system data artwork : $(logoArtwork) ;
+
+AddDirectoryToPackage $(haikuPackage) : system data sounds ;
+
+# Mail spell check dictionaries
+local spellFiles = words geekspeak ;
+spellFiles = $(spellFiles:G=spell) ;
+SEARCH on $(spellFiles) = [ FDirName $(HAIKU_TOP) src apps mail ] ;
+AddFilesToPackage $(haikuPackage) : system data spell_check word_dictionary
+	: $(spellFiles) ;
+
+local dataFiles = teapot.data ;
+dataFiles = $(dataFiles:G=data) ;
+SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data system data ] ;
+AddFilesToPackage $(haikuPackage) : system data : $(dataFiles) ;
+
+local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
+	: [a-zA-Z0-9]* ] ;
+fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
+AddFilesToPackage $(haikuPackage) : system data fortunes : $(fortuneFiles) ;
+
+local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
+local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
+local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
+AddFilesToPackage $(haikuPackage) : system data fonts psfonts : $(psFonts) ;
+AddFilesToPackage $(haikuPackage) : system data fonts ttfonts : $(ttFonts) ;
+
+local cannaDir = [ FDirName $(HAIKU_TOP) data system data Canna ] ;
+local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
+local cannaDic = [ Glob $(cannaDir)/dic : *.cbp ] ;
+local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
+	: *.cld *.ctd *.cbd *.dir ] ;
+AddFilesToPackage $(haikuPackage) : system data Canna default
+	: $(cannaDefault) ;
+AddFilesToPackage $(haikuPackage) : system data Canna dic : $(cannaDic) ;
+AddFilesToPackage $(haikuPackage) : system data Canna dic canna
+	: $(cannaDicCanna) ;
+AddDirectoryToPackage $(haikuPackage) : system data Canna dic group ;
+AddDirectoryToPackage $(haikuPackage) : system data Canna dic user ;
+
+local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
+	: *.keymap ] ;
+keymapFiles = $(keymapFiles:BG=keymap) ;
+AddFilesToPackage $(haikuPackage) : system data Keymaps : $(keymapFiles) ;
+AddSymlinkToPackage $(haikuPackage) : system data Keymaps : Swedish
+	: Finnish ;
+AddSymlinkToPackage $(haikuPackage) : system data Keymaps : Slovene
+	: Croatian ;
+AddSymlinkToPackage $(haikuPackage) : system data Keymaps : US-International
+	: Brazilian ;
+
+local keyboardLayoutsDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
+local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
+AddFilesToPackage $(haikuPackage) : system data KeyboardLayouts
+	: $(keyboardLayouts) ;
+
+# boot loader
+AddFilesToPackage $(haikuPackage) : system : haiku_loader ;
+
+# boot module links
+AddBootModuleSymlinksToPackage $(haikuPackage) :
+	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager dpc
+	$(IDE_ONLY)ide scsi usb
+	$(PPC_ONLY)openpic
+	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
+	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
+	$(X86_ONLY)ide_isa
+	<usb>uhci <usb>ohci <usb>ehci
+	scsi_cd scsi_disk usb_disk
+	intel
+	bfs
+;
+
+# add-ons
+AddFilesToPackage $(haikuPackage) : system add-ons accelerants
+	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons opengl
+	: Mesa\ Software\ Renderer ;
+AddFilesToPackage $(haikuPackage) : system add-ons Translators
+	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons locale catalogs
+	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons locale catalogs
+	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons mail_daemon inbound_protocols
+	: POP3 IMAP ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons mail_daemon outbound_protocols : SMTP ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons mail_daemon inbound_filters
+	: MatchHeader SpamFilter NewMailNotification ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons mail_daemon outbound_filters
+	: Fortune ;
+AddFilesToPackage $(haikuPackage) : system add-ons media
+	: $(SYSTEM_ADD_ONS_MEDIA) ;
+AddFilesToPackage $(haikuPackage) : system add-ons media plugins
+	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons Tracker
+	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
+	Open\ Terminal-T ZipOMatic-Z ;
+AddSymlinkToPackage $(haikuPackage) : system add-ons Tracker
+	: /boot/system/preferences/Backgrounds : Background-B ;
+AddSymlinkToPackage $(haikuPackage) : system add-ons Tracker
+	: /boot/system/apps/TextSearch : TextSearch-G ;
+AddSymlinkToPackage $(haikuPackage) : system add-ons Tracker
+	: /boot/system/apps/DiskUsage : DiskUsage-I ;
+AddFilesToPackage $(haikuPackage) : system add-ons input_server devices
+	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
+AddFilesToPackage $(haikuPackage) : system add-ons input_server filters
+	: screen_saver shortcut_catcher ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel network
+	: <net>notifications stack ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel network devices
+	: $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToPackage $(haikuPackage) :
+	system add-ons kernel network datalink_protocols
+	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel network ppp
+	: $(SYSTEM_NETWORK_PPP) ;
+AddFilesToPackage $(haikuPackage) : system add-ons kernel network protocols
+	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+AddFilesToPackage $(haikuPackage) : system add-ons Print
+	: $(SYSTEM_ADD_ONS_PRINT) ;
+AddFilesToPackage $(haikuPackage) : system add-ons Print transport
+	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
+AddFilesToPackage $(haikuPackage) : system add-ons Screen\ Savers
+	: $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
+
+AddFilesToPackage $(haikuPackage) : system add-ons disk_systems
+	: <disk_system>intel <disk_system>bfs ;
+
+
+AddDirectoryToPackage $(haikuPackage) : system data synth ;
+AddDirectoryToPackage $(haikuPackage) : system add-ons input_server methods ;
+
+# optional
+AddFilesToPackage $(haikuPackage) : optional system add-ons input_server methods
+	: canna ;
+
+
+# PDF Writer enconding files
+CopyDirectoryToPackage $(haikuPackage) : system data
+	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
+	: "PDF Writer" : -x .svn -x Jamfile ;
+
+# licenses
+CopyDirectoryToPackage $(haikuPackage) : system data
+	: [ FDirName $(HAIKU_TOP) data system data licenses ]
+	: licenses : -x .svn ;
+
+# Copy documentation as per DiskUsage's license requirement.
+CopyDirectoryToPackage $(haikuPackage) : system documentation
+	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
+	: diskusage : -x .svn ;
+
+# Copy documentation as per PDFlib Lite's license requirement.
+CopyDirectoryToPackage $(haikuPackage) : system documentation
+	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
+	: pdflib : -x .svn ;
+
+
+BuildHaikuPackage $(haikuPackage) : haiku ;

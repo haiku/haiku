@@ -1,0 +1,19 @@
+name = Haiku
+version = 1-1
+architecture = x86
+summary = "The Haiku base system"
+description = "The Haiku base system includes all system core software, like
+boot loader, kernel, the system libraries, servers, and applications."
+
+packager = "Ingo Weinhold <ingo_weinhold@gmx.de>"
+vendor = "Haiku Project"
+
+copyright = "2001-2011 Haiku, Inc. et al"
+licenses = [ "MIT" ]
+
+provides = [
+	haiku
+]
+
+requires = [
+]

@@ -1139,6 +1139,13 @@ HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
 
 HAIKU_PACKAGE_DIR ?= [ FDirName $(HAIKU_OUTPUT_DIR) packages ] ;
 HAIKU_PACKAGE_OBJECT_DIR ?= [ FDirName $(HAIKU_OBJECT_DIR) packages ] ;
+	# TODO: Remove those together with the obsolete package rules!
+
+HAIKU_PACKAGES_DIR			= [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
+								packages ] ;
+HAIKU_PACKAGES_BUILD_DIR	= [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
+								packages_build ] ;
+HAIKU_PACKAGE_INFOS_DIR		= [ FDirName $(HAIKU_TOP) src data package_infos ] ;
 
 TARGET_TEST_DIR				?= [ FDirName $(HAIKU_TEST_DIR)
 									$(TARGET_PLATFORM) ] ;

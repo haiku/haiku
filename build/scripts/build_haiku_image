@@ -331,16 +331,18 @@ fi	# ! updateOnly
 
 
 # add the concatenated copyrights as an attribute to AboutSystem
+# TODO: That might not be necessary, when all third-party software everything
+# is packaged. Though we might not package everything.
 
-if [ ! $updateOnly ]; then
-	if [ -f $copyrightsFile ]; then
-		copyrightAttrs=$tmpDir/copyrightAttrs
-		$rmAttrs -f $copyrightAttrs
-		touch $copyrightAttrs
-		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
-		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}system/apps/AboutSystem
-	fi
-fi
+# if [ ! $updateOnly ]; then
+# 	if [ -f $copyrightsFile ]; then
+# 		copyrightAttrs=$tmpDir/copyrightAttrs
+# 		$rmAttrs -f $copyrightAttrs
+# 		touch $copyrightAttrs
+# 		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
+# 		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}system/apps/AboutSystem
+# 	fi
+# fi
 
 if [ $isCD ]; then
 	# generate the attribute stores

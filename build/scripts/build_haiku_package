@@ -1,0 +1,66 @@
+#!/bin/sh
+set -o errexit
+
+# The first argument is the shell script that initializes the variables:
+# sourceDir
+# outputDir
+# tmpDir
+# addBuildCompatibilityLibDir
+#
+# addattr
+# copyattr
+# package
+# rc
+# rmAttrs
+# unzip
+#
+
+if [ $# -le 1 ]; then
+	echo "$0: Missing parameters!" >&2
+	exit 1
+fi
+
+packagePath="$1"
+packageInfoPath="$2"
+shift 2
+echo "Building package $1 with info $2..."
+
+if [ $# -gt 0 ]; then
+	. $1
+	shift
+fi
+
+# this adds the build library dir to LD_LIBRARY_PATH
+eval "$addBuildCompatibilityLibDir"
+
+
+# make a clean contents dir
+contentsDir="$tmpDir/contents"
+$rmAttrs -rf "$contentsDir"
+mkdir -p "$contentsDir"
+
+
+# map the shell commands
+sPrefix=
+tPrefix="$contentsDir/"
+cd=cd
+scd=:
+cp="$copyattr -d"
+copyAttrs="$copyattr"
+ln=ln
+mkdir=mkdir
+rm=$rmAttrs
+mkindex=mkindex
+
+
+# execute the scripts preparing the package contents
+while [ $# -gt 0 ]; do
+	. $1
+	shift
+done
+
+
+# create the package
+cp "$packageInfoPath" "$contentsDir/.PackageInfo"
+rm -f "$packagePath"
+$package create -C "$contentsDir" "$packagePath"

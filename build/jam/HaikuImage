@@ -194,153 +194,9 @@ SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
 	attribute_overlay write_overlay ntfs packagefs reiserfs udf googlefs ;
 
-# wifi firmware
-for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
-	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
-	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
-	local extract = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_DO_EXTRACT) ] ;
-	if $(archive) {
-		AddWifiFirmwareToHaikuImage $(driver) : $(package) : $(archive)
-			: $(extract) ;
-	}
-	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
-	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
-	for archive in $(archives) {
-		AddWifiFirmwareToHaikuImage $(driver) : $(packages[1]) : $(archive)
-			: $(extract) ;
-		packages = $(packages[2-]) ;
-	}
-}
 
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 
-# modules
-AddFilesToHaikuImage system add-ons kernel bus_managers
-	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToHaikuImage system add-ons kernel busses agp_gart
-	: $(X86_ONLY)<agp_gart>intel ;
-
-if $(HAIKU_ATA_STACK) = 1 {
-	AddFilesToHaikuImage system add-ons kernel busses ata
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112
-			$(X86_ONLY)ide_isa ;
-} else {
-	AddFilesToHaikuImage system add-ons kernel busses ide
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112
-			$(X86_ONLY)ide_isa ;
-}
-
-AddFilesToHaikuImage system add-ons kernel busses scsi
-	: ahci ;
-AddFilesToHaikuImage system add-ons kernel busses usb
-	: <usb>uhci <usb>ohci <usb>ehci ;
-AddFilesToHaikuImage system add-ons kernel console
-	: vga_text ;
-AddFilesToHaikuImage system add-ons kernel debugger
-	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm
-	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
-AddFilesToHaikuImage system add-ons kernel file_systems
-	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToHaikuImage system add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
-		scsi_periph <module>tty ;
-AddFilesToHaikuImage
-	system add-ons kernel partitioning_systems
-	: amiga_rdb apple efi_gpt intel session ;
-AddFilesToHaikuImage
-	system add-ons kernel interrupt_controllers
-	: $(PPC_ONLY)openpic ;
-
-if $(TARGET_ARCH) = x86 {
-	AddFilesToHaikuImage system add-ons kernel cpu
-		: generic_x86 ;
-}
-
-# drivers
-AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
-AddNewDriversToHaikuImage power : $(X86_ONLY)enhanced_speedstep ;
-AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
-
-# legacy drivers
-AddDriversToHaikuImage				: console dprintf null
-									  random <driver>tty zero ;
-AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
-AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
-AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToHaikuImage bus			: usb_raw fw_raw ;
-AddDriversToHaikuImage disk floppy	: $(X86_ONLY)pc_floppy ;
-AddDriversToHaikuImage disk usb		: usb_disk ;
-AddDriversToHaikuImage disk usb		: usb_floppy ;
-AddDriversToHaikuImage printer usb	: usb_printer ;
-AddDriversToHaikuImage disk virtual	: nbd ;
-AddDriversToHaikuImage dvb			: cx23882 ;
-AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
-AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
-AddDriversToHaikuImage misc			: <driver>poke <driver>mem ;
-AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
-AddDriversToHaikuImage ports		: usb_serial ;
-#AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
-
-# kernel
-AddFilesToHaikuImage system
-	: <revisioned>kernel_$(TARGET_ARCH) ;
-
-# libs
-AddLibrariesToHaikuImage system lib
-	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
-
-# libnetwork.so replaces quite a few libraries
-SYSTEM_LIBS_LIBNETWORK_ALIASES
-	= libsocket.so libbind.so libnet.so ;
-
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	local lib ;
-	for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
-		AddSymlinkToHaikuImage system lib
-			: libnetwork.so : $(lib) ;
-	}
-
-	AddSymlinkToHaikuImage system lib : libbnetapi.so
-		: libnetapi.so ;
-}
-
-
-# libGL.so has GLU (like BeOS) *and* GLUT API built-in
-SYSTEM_LIBS_LIBGL_ALIASES
-	= libGLU.so libglut.so ;
-
-if $(TARGET_ARCH) = x86 {
-	local lib ;
-	for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
-		AddSymlinkToHaikuImage system lib
-			: libGL.so : $(lib) ;
-	}
-}
-
-SYSTEM_LIBS_ALIASES =
-	$(SYSTEM_LIBS_LIBNETWORK_ALIASES)
-	libnetapi.so
-	$(SYSTEM_LIBS_LIBGL_ALIASES)
-;
-
-# servers
-AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
-
-# apps
-AddFilesToHaikuImage system		: runtime_loader ;
-AddFilesToHaikuImage system		: Deskbar Tracker ;
-AddFilesToHaikuImage system bin			: $(SYSTEM_BIN) consoled ;
-AddFilesToHaikuImage system apps		: $(SYSTEM_APPS) ;
-AddFilesToHaikuImage system preferences
-	: $(SYSTEM_PREFERENCES) ;
-AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
-
-SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToHaikuImage system bin			: which ;
-SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToHaikuImage system bin			: installoptionalpackage ;
-SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToHaikuImage system bin
-	: install-wifi-firmwares.sh ;
 
 # TODO: remove!
 # Add the files to be used by installoptionalpackage.
@@ -353,9 +209,6 @@ for name in $(optional-pkg-files) {
 		: $(file) ;
 }
 AddInstalledPackagesFileToHaikuImage ;
-
-AddSymlinkToHaikuImage system bin : bash : sh ;
-AddSymlinkToHaikuImage system bin : trash : untrash ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
@@ -404,23 +257,8 @@ for linkTarget in $(SYSTEM_DEMOS) {
 		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 
-AddSymlinkToHaikuImage system bin : bzip2 : bunzip2 ;
-AddSymlinkToHaikuImage system bin : less : more ;
-AddSymlinkToHaikuImage system bin : gzip : gunzip ;
-AddSymlinkToHaikuImage system bin : gzip : zcat ;
-AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
-AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
-AddSymlinkToHaikuImage system bin : gawk : awk ;
-AddSymlinkToHaikuImage system bin : grep : egrep ;
-AddSymlinkToHaikuImage system bin : grep : fgrep ;
-
 
 # scripts and data files
-local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
-	InstallerInitScript InstallerFinishScript ;
-SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
-AddFilesToHaikuImage system boot : $(bootScripts) ;
-
 local userBootScripts = UserBootscript UserSetupEnvironment.sample ;
 SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
 AddFilesToHaikuImage home config boot : $(userBootScripts) ;
@@ -428,37 +266,21 @@ AddFilesToHaikuImage home config boot : $(userBootScripts) ;
 # Add boot launch directory
 AddDirectoryToHaikuImage home config boot launch ;
 
-local logoArtwork =
-	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
-	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - normal.png" ;
-SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
-AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
-
-AddDirectoryToHaikuImage system data sounds ;
-
 # Add mail provider infos.
 AddFilesToHaikuImage home config settings Mail ProviderInfo :
 	$(HAIKU_PROVIDER_INFOS) ;
 
-# Mail spell check dictionaries
-local spellFiles = words geekspeak ;
-spellFiles = $(spellFiles:G=spell) ;
-SEARCH on $(spellFiles)
-	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
-AddFilesToHaikuImage system data spell_check word_dictionary
-	: $(spellFiles) ;
-
 local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
-SEARCH on $(etcFiles) = [ FDirName $(etcDir) ] ;
+SEARCH on $(etcFiles) = $(etcDir) ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
 AddFilesToHaikuImage common settings etc : $(etcFiles) ;
 
 local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;
 profileFiles = $(profileFiles:G=profile-d) ;
-AddDirectoryToHaikuImage common etc profile.d ;
-AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
+AddDirectoryToHaikuImage common settings etc profile.d ;
+AddFilesToHaikuImage common settings etc profile.d : $(profileFiles) ;
 
 #local bashCompletionFiles = [ Glob $(etcDir)/bash_completion.d : * ] ;
 #local bashCompletionHelperFiles
@@ -470,52 +292,6 @@ AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
 #AddFilesToHaikuImage common etc bash_completion.d : $(bashCompletionFiles) ;
 #AddFilesToHaikuImage common etc bash_completion.d helpers
 #    : $(bashCompletionHelperFiles) ;
-
-local dataFiles = teapot.data ;
-dataFiles = $(dataFiles:G=data) ;
-SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data system data ] ;
-AddFilesToHaikuImage system data : $(dataFiles) ;
-
-local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
-	: [a-zA-Z0-9]* ] ;
-fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
-AddFilesToHaikuImage system data fortunes : $(fortuneFiles) ;
-
-local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
-local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
-local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
-AddFilesToHaikuImage system data fonts psfonts : $(psFonts) ;
-AddFilesToHaikuImage system data fonts ttfonts : $(ttFonts) ;
-
-local cannaDir = [ FDirName $(HAIKU_TOP) data system data Canna ] ;
-local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
-local cannaDic = [ Glob $(cannaDir)/dic : *.cbp ] ;
-local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
-	: *.cld *.ctd *.cbd *.dir ] ;
-AddFilesToHaikuImage system data Canna default
-	: $(cannaDefault) ;
-AddFilesToHaikuImage system data Canna dic : $(cannaDic) ;
-AddFilesToHaikuImage system data Canna dic canna
-	: $(cannaDicCanna) ;
-AddDirectoryToHaikuImage system data Canna dic group ;
-AddDirectoryToHaikuImage system data Canna dic user ;
-
-local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
-	: *.keymap ] ;
-keymapFiles = $(keymapFiles:BG=keymap) ;
-AddFilesToHaikuImage system data Keymaps : $(keymapFiles) ;
-AddSymlinkToHaikuImage system data Keymaps : Swedish
-	: Finnish ;
-AddSymlinkToHaikuImage system data Keymaps : Slovene
-	: Croatian ;
-AddSymlinkToHaikuImage system data Keymaps : US-International
-	: Brazilian ;
-
-local keyboardLayoutsDir
-	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
-local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
-AddFilesToHaikuImage system data KeyboardLayouts
-	: $(keyboardLayouts) ;
 
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)
@@ -542,80 +318,6 @@ AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 
 # boot loader
 AddFilesToHaikuImage system : haiku_loader ;
-
-# boot module links
-AddBootModuleSymlinksToHaikuImage
-	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager dpc
-	$(IDE_ONLY)ide scsi usb
-	$(PPC_ONLY)openpic
-	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
-	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
-	$(X86_ONLY)ide_isa
-	<usb>uhci <usb>ohci <usb>ehci
-	scsi_cd scsi_disk usb_disk
-	intel
-	bfs
-;
-
-# add-ons
-AddFilesToHaikuImage system add-ons accelerants
-	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToHaikuImage system add-ons opengl
-	: Mesa\ Software\ Renderer ;
-AddFilesToHaikuImage system add-ons Translators
-	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
-AddFilesToHaikuImage system add-ons locale catalogs
-	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
-AddFilesToHaikuImage system add-ons locale catalogs
-	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
-AddFilesToHaikuImage
-	system add-ons mail_daemon inbound_protocols
-	: POP3 IMAP ;
-AddFilesToHaikuImage
-	system add-ons mail_daemon outbound_protocols : SMTP ;
-AddFilesToHaikuImage
-	system add-ons mail_daemon inbound_filters
-	: MatchHeader SpamFilter NewMailNotification ;
-AddFilesToHaikuImage
-	system add-ons mail_daemon outbound_filters
-	: Fortune ;
-AddFilesToHaikuImage system add-ons media
-	: $(SYSTEM_ADD_ONS_MEDIA) ;
-AddFilesToHaikuImage system add-ons media plugins
-	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
-AddFilesToHaikuImage system add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
-	Open\ Terminal-T ZipOMatic-Z ;
-AddSymlinkToHaikuImage system add-ons Tracker
-	: /boot/system/preferences/Backgrounds : Background-B ;
-AddSymlinkToHaikuImage system add-ons Tracker
-	: /boot/system/apps/TextSearch : TextSearch-G ;
-AddSymlinkToHaikuImage system add-ons Tracker
-	: /boot/system/apps/DiskUsage : DiskUsage-I ;
-AddFilesToHaikuImage system add-ons input_server devices
-	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
-AddFilesToHaikuImage system add-ons input_server filters
-	: screen_saver shortcut_catcher ;
-AddFilesToHaikuImage system add-ons kernel network
-	: <net>notifications stack ;
-AddFilesToHaikuImage system add-ons kernel network devices
-	: $(SYSTEM_NETWORK_DEVICES) ;
-AddFilesToHaikuImage
-	system add-ons kernel network datalink_protocols
-	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
-AddFilesToHaikuImage system add-ons kernel network ppp
-	: $(SYSTEM_NETWORK_PPP) ;
-AddFilesToHaikuImage system add-ons kernel network protocols
-	: $(SYSTEM_NETWORK_PROTOCOLS) ;
-AddFilesToHaikuImage system add-ons Print
-	: $(SYSTEM_ADD_ONS_PRINT) ;
-AddFilesToHaikuImage system add-ons Print transport
-	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
-AddFilesToHaikuImage system add-ons Screen\ Savers
-	: $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
-
-AddFilesToHaikuImage system add-ons disk_systems
-	: <disk_system>intel <disk_system>bfs ;
 
 # decorators
 AddDirectoryToHaikuImage home config add-ons decorators ;
@@ -646,22 +348,12 @@ AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Print ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
-AddDirectoryToHaikuImage system data synth ;
-AddDirectoryToHaikuImage system add-ons input_server methods ;
-
-# optional
-AddFilesToHaikuImage optional system add-ons input_server methods : canna ;
 
 # printers
 AddDirectoryToHaikuImage home config settings printers Preview
 	: home-config-settings-printers-preview.rdef ;
 AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 	: home-config-settings-printers-save-as-pdf.rdef ;
-
-# PDF Writer enconding files
-CopyDirectoryToHaikuImage system data
-	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
-	: "PDF Writer" : -x .svn -x Jamfile ;
 
 # Gutenprint data files
 CopyDirectoryToHaikuImage common data
@@ -672,21 +364,6 @@ CopyDirectoryToHaikuImage common data
 CopyDirectoryToHaikuImage home config settings Media
 	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
 	: dvb : -x .svn -x Jamfile ;
-
-# licenses
-CopyDirectoryToHaikuImage system data
-	: [ FDirName $(HAIKU_TOP) data system data licenses ]
-	: licenses : -x .svn ;
-
-# Copy documentation as per DiskUsage's license requirement.
-CopyDirectoryToHaikuImage system documentation
-	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
-	: diskusage : -x .svn ;
-
-# Copy documentation as per PDFlib Lite's license requirement.
-CopyDirectoryToHaikuImage system documentation
-	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
-	: pdflib : -x .svn ;
 
 # Copy sample programs as per PDFlib Lite's license requirement.
 CopyDirectoryToHaikuImage develop sample-code
