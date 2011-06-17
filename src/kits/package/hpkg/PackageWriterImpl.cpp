@@ -38,6 +38,75 @@
 using BPrivate::FileDescriptorCloser;
 
 
+// We need to remap a few file operations on non-Haiku platforms, so dealing
+// with symlinks works correctly.
+#ifndef __HAIKU__
+
+
+extern "C" int _kern_open(int fd, const char *path, int openMode, int perms);
+extern "C" status_t _kern_close(int fd);
+extern "C" status_t _kern_read_stat(int fd, const char *path, bool traverseLink,
+	struct stat *st, size_t statSize);
+
+
+static int
+build_openat(int dirFD, const char* fileName, int openMode, int permissions)
+{
+	int fd = _kern_open(dirFD, fileName, openMode, permissions);
+	if (fd < 0) {
+		errno = fd;
+		return -1;
+	}
+
+	return fd;
+}
+
+
+static int
+build_fstat(int fd, struct stat* st)
+{
+	status_t error = _kern_read_stat(fd, NULL, false, st, sizeof(struct stat));
+	if (error != B_OK) {
+		errno = error;
+		return -1;
+	}
+
+	return 0;
+}
+
+
+struct BuildFileDescriptorCloser {
+	BuildFileDescriptorCloser(int fd)
+		:
+		fFD(fd)
+	{
+	}
+
+	~BuildFileDescriptorCloser()
+	{
+		if (fFD >= 0)
+			_kern_close(fFD);
+	}
+
+private:
+	int	fFD;
+};
+
+
+#undef openat
+#define openat(dirFD, fileName, openMode) \
+	build_openat(dirFD, fileName, openMode, 0)
+
+#undef fstat
+#define fstat(fd, st)	build_fstat(fd, st)
+
+#undef FileDescriptorCloser
+#define FileDescriptorCloser	BuildFileDescriptorCloser
+
+
+#endif
+
+
 namespace BPackageKit {
 
 namespace BHPKG {
@@ -914,7 +983,7 @@ PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
 	uint64 writeOffset, uint64& _compressedSize)
 {
 	// Use zlib compression only for data large enough.
-	if (size < kZlibCompressionSizeThreshold)
+	if (size < (off_t)kZlibCompressionSizeThreshold)
 		return B_BAD_VALUE;
 
 	// fDataBuffer is 2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, so split it into
