@@ -65,6 +65,20 @@ Constraint::SetLeftSide(SummandList* summands)
 	if (!fIsValid)
 		return;
 
+	// check left side
+	for (int32 i = 0; i < summands->CountItems(); i++) {
+		Summand* summand = summands->ItemAt(i);
+		for (int32 a = i + 1; a < summands->CountItems(); a++) {
+			Summand* nextSummand = summands->ItemAt(a);
+			if (summand->Var() == nextSummand->Var()) {
+				summand->SetCoeff(summand->Coeff() + nextSummand->Coeff());
+				summands->RemoveItem(nextSummand);
+				delete nextSummand;
+				a--;	
+			}
+		}
+	}
+
 	fLeftSide = summands;
 	fLS->UpdateLeftSide(this);
 }
@@ -80,7 +94,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1)
 		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	fLS->UpdateLeftSide(this);
+	SetLeftSide(fLeftSide);
 }
 
 
@@ -96,7 +110,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	fLeftSide->MakeEmpty();
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	fLS->UpdateLeftSide(this);
+	SetLeftSide(fLeftSide);
 }
 
 
@@ -114,7 +128,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff3, var3));
-	fLS->UpdateLeftSide(this);
+	SetLeftSide(fLeftSide);
 }
 
 
@@ -134,7 +148,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff3, var3));
 	fLeftSide->AddItem(new(std::nothrow) Summand(coeff4, var4));
-	fLS->UpdateLeftSide(this);
+	SetLeftSide(fLeftSide);
 }
 
 
@@ -336,9 +350,11 @@ Constraint::ToString() const
 	if (fIsValid) {
 		for (int i = 0; i < fLeftSide->CountItems(); i++) {
 			Summand* s = static_cast<Summand*>(fLeftSide->ItemAt(i));
+			if (i != 0 && s->Coeff() >= 0)
+				string << " + ";
 			string << (float)s->Coeff() << "*";
 			string << "x";
-			string << s->Var()->Index() - 1;
+			string << s->Var()->Index();
 			string << " ";
 		}
 		string << ((fOp == kEQ) ? "== "
@@ -369,7 +385,6 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 	double rightSide, double penaltyNeg, double penaltyPos)
 	:
 	fLS(ls),
-	fLeftSide(summands),
 	fOp(op),
 	fRightSide(rightSide),
 	fPenaltyNeg(penaltyNeg),
@@ -378,7 +393,7 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 	fDPosObjSummand(NULL),
 	fIsValid(true)
 {
-
+	SetLeftSide(summands);
 }
 
 
