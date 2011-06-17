@@ -7,6 +7,17 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
 USES_BE_API on libpackage_build.so = true ;
 
+
+{
+	# The package writer needs to know where the license files are located.
+	local dataDir = [ FDirName $(HAIKU_TOP) data system data ] ;
+	local defines = [ FDefines
+		HAIKU_BUILD_SYSTEM_DATA_DIRECTORY="\\\"$(dataDir)\\\""
+	] ;
+	ObjectC++Flags PackageWriterImpl.cpp : $(defines) ;
+}
+
+
 HPKG_SOURCES =
 	BlockBufferCache.cpp
 	BlockBufferCacheImpl.cpp
