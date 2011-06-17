@@ -35,11 +35,11 @@ enum {
 };
 
 static const convert_tag kDefaultTags[] = {
-	{TAG_MAKER,			B_ANY_TYPE,		B_TRANSLATE_MARK("Maker")},
-	{TAG_MODEL,			B_ANY_TYPE,		B_TRANSLATE_MARK("Model")},
-	{TAG_ORIENTATION,	B_INT32_TYPE,	B_TRANSLATE_MARK("Orientation")},
-	{TAG_EXPOSURE_TIME,	B_DOUBLE_TYPE,	B_TRANSLATE_MARK("ExposureTime")},
-	{TAG_ISO,			B_INT32_TYPE,	B_TRANSLATE_MARK("ISO")},
+	{TAG_MAKER,			B_ANY_TYPE,		"Maker"},
+	{TAG_MODEL,			B_ANY_TYPE,		"Model"},
+	{TAG_ORIENTATION,	B_INT32_TYPE,	"Orientation"},
+	{TAG_EXPOSURE_TIME,	B_DOUBLE_TYPE,	"ExposureTime"},
+	{TAG_ISO,			B_INT32_TYPE,	"ISO"},
 };
 static const size_t kNumDefaultTags = sizeof(kDefaultTags)
 	/ sizeof(kDefaultTags[0]);
