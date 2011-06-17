@@ -283,6 +283,38 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	DIRECTORIES_TO_INSTALL on $(directory) += $(targetDir) ;
 }
 
+
+rule AddHeaderDirectoryToContainer container : dirTokens : dirName
+	: alwaysUpdate
+{
+	# AddHeaderDirectoryToContainer <container> : <dirTokens> : [ <dirName> ]
+	#	: <alwaysUpdate> ;
+
+	CopyDirectoryToContainer $(container) : system develop headers
+		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
+		: $(dirName) : -x .svn : $(alwaysUpdate) ;
+}
+
+
+rule AddWifiFirmwareToContainer container : driver : package : archive : extract
+{
+	# AddWifiFirmwareToContainer <container> : <driver> : <package> : <archive>
+	#	: <extract>
+
+	# complete location to wifi firmware archive
+	local firmwareArchive = [ FDirName
+		$(HAIKU_TOP) data system data firmware $(driver) $(archive) ] ;
+
+	local dirTokens = system data firmware $(driver) ;
+	if $(extract) = true || $(extract) = 1 {
+		ExtractArchiveToContainer $(container) : $(dirTokens)
+			: $(firmwareArchive) : $(package) ;
+	} else {
+		AddFilesToContainer $(container) : $(dirTokens) : $(firmwareArchive)  ;
+	}
+}
+
+
 rule ExtractArchiveToContainer container : directoryTokens : archiveFile
 	: extractedSubDir
 {
@@ -345,7 +377,8 @@ rule AddBootModuleSymlinksToContainer container : targets
 	# AddBootModuleSymlinksToContainer <container> : <targets> ;
 	#
 
-	# If the image shall only be updated, we don't add any symlinks.
+	# If the container shall only be updated, we don't add any symlinks.
+
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
 		&& ! [ IncludeAllTargetsInContainer $(container) ] {
 		return ;
@@ -372,6 +405,29 @@ rule AddBootModuleSymlinksToContainer container : targets
 		AddSymlinkToContainer $(container)
 			: system add-ons kernel boot
 			: $(linkTarget) : $(name) ;
+	}
+}
+
+
+rule AddLibrariesToContainer container : directory : libs
+{
+	# AddLibrariesToContainer <container> : <directory> : <libs>
+	#
+	# Installs libraries with the appropriate links into the container.
+	#
+
+	local lib ;
+	for lib in $(libs) {
+		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
+		if $(abiVersion) {
+			local abiVersionedLib = $(lib).$(abiVersion) ;
+			AddFilesToContainer $(container) : $(directory) : $(lib)
+				: $(abiVersionedLib) ;
+			AddSymlinkToContainer $(container) : $(directory)
+				: $(abiVersionedLib) : $(lib) ;
+		} else {
+			AddFilesToContainer $(container) : $(directory) : $(lib) ;
+		}
 	}
 }
 
@@ -709,26 +765,16 @@ rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
 	# AddHeaderDirectoryToHaikuImage <dirTokens> : [ <dirName> ]
 	#	: <alwaysUpdate> ;
 
-	CopyDirectoryToHaikuImage system develop headers
-		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
-		: $(dirName) : -x .svn : $(alwaysUpdate) ;
+	AddHeaderDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
+		: $(dirName) : $(alwaysUpdate) ;
 }
 
 rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
 {
-	#AddWifiFirmwareToHaikuImage <driver> : <package> : <archive> : <extract>
+	# AddWifiFirmwareToHaikuImage <driver> : <package> : <archive> : <extract>
 
-	# complete location to wifi firmware archive
-	local firmwareArchive = [ FDirName
-		$(HAIKU_TOP) data system data firmware $(driver) $(archive) ] ;
-
-	local dirTokens = system data firmware $(driver) ;
-	if $(extract) = true || $(extract) = 1 {
-		ExtractArchiveToHaikuImage $(dirTokens) : $(firmwareArchive) :
-			: $(package) ;
-	} else {
-		AddFilesToHaikuImage $(dirTokens) : $(firmwareArchive)  ;
-	}
+	AddWifiFirmwareToHaikuImage $(HAIKU_IMAGE_CONTAINER_NAME) : $(driver)
+		: $(package) : $(archive) : $(extract) ;
 }
 
 rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
@@ -978,6 +1024,18 @@ rule AddLicenseToHaikuImage file : name : searchPath
 }
 
 
+rule AddLibrariesToHaikuImage directory : libs
+{
+	# AddLibraryToHaikuImage <directory> : <libs>
+	#
+	# Installs libraries with the appropriate links onto the image.
+	#
+
+	AddLibrariesToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directory)
+		: $(libs) ;
+}
+
+
 rule CreateHaikuImageMakeDirectoriesScript script
 {
 	CreateContainerMakeDirectoriesScript $(HAIKU_IMAGE_CONTAINER_NAME)
@@ -1130,27 +1188,6 @@ rule BuildNetBootArchive archive : scripts
 actions BuildNetBootArchive1
 {
 	$(2[1]) $(1) $(2[2-])
-}
-
-
-rule AddLibrariesToHaikuImage directory : libs
-{
-	# AddLibraryToHaikuImage <directory> : <libs>
-	#
-	# Installs libraries with the appropriate links onto the image.
-	#
-
-	local lib ;
-	for lib in $(libs) {
-		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
-		if $(abiVersion) {
-			local abiVersionedLib = $(lib).$(abiVersion) ;
-			AddFilesToHaikuImage $(directory) : $(lib) : $(abiVersionedLib) ;
-			AddSymlinkToHaikuImage $(directory)	: $(abiVersionedLib) : $(lib) ;
-		} else {
-			AddFilesToHaikuImage $(directory) : $(lib) ;
-		}
-	}
 }
 
 
