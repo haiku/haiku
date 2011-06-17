@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -336,7 +336,11 @@ PackageWriterImpl::_CheckLicenses()
 {
 	BPath systemLicensePath;
 	status_t result
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		= find_directory(B_SYSTEM_DATA_DIRECTORY, &systemLicensePath);
+#else
+		= systemLicensePath.SetTo(HAIKU_BUILD_SYSTEM_DATA_DIRECTORY);
+#endif
 	if (result != B_OK) {
 		fListener->PrintError("unable to find system data path!\n");
 		return result;
@@ -706,7 +710,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	if (DIR* attrDir = fs_fopen_attr_dir(fd)) {
 		CObjectDeleter<DIR, int> attrDirCloser(attrDir, fs_close_attr_dir);
 
-		while (dirent* entry = readdir(attrDir)) {
+		while (dirent* entry = fs_read_attr_dir(attrDir)) {
 			attr_info attrInfo;
 			if (fs_stat_attr(fd, entry->d_name, &attrInfo) < 0) {
 				fListener->PrintError(
