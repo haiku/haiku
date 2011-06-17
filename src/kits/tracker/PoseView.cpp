@@ -6716,6 +6716,9 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 	if (!window)
 		return;
 
+	if (!window->Dragging())
+		window->DragStart(message);
+
 	switch (moveCode) {
 		case B_INSIDE_VIEW:
 		case B_ENTERED_VIEW:
@@ -6789,7 +6792,6 @@ BPoseView::MouseIdle(const BMessage *message)
 		return;
 
 	if (fDropTarget != NULL) {
-		window->DragStart(message);
 		FrameForPose(fDropTarget, true, &fStartFrame);
 		ShowContextMenu(where);
 	} else
