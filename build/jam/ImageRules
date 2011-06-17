@@ -97,9 +97,9 @@ actions AddTargetVariableToScript1
 
 #pragma mark -
 
-rule AddDirectoryToContainer container : directoryTokens
+rule AddDirectoryToContainer container : directoryTokens : attributeFiles
 {
-	# AddDirectoryToContainer <container> : <directoryTokens>
+	# AddDirectoryToContainer <container> : <directoryTokens> : <attributeFiles>
 
 	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 	local directory = [ FDirName $(directoryTokens) ] ;
@@ -119,6 +119,12 @@ rule AddDirectoryToContainer container : directoryTokens
 			parent = $(parent:G=$(containerGrist)) ;
 			DONT_CREATE on $(parent) = true ;
 		}
+	}
+
+	if $(attributeFiles) {
+		SEARCH on $(attributeFiles)
+			+= [ FDirName $(HAIKU_TOP) data image_directories ] ;
+		ATTRIBUTE_FILES on $(dir) += $(attributeFiles) ;
 	}
 
 	return $(directory) ;
@@ -699,18 +705,10 @@ rule IsUpdateHaikuImageOnly
 
 rule AddDirectoryToHaikuImage directoryTokens : attributeFiles
 {
-	# AddDirectoryToHaikuImage <directoryTokens>
+	# AddDirectoryToHaikuImage <directoryTokens> : <attributeFiles>
 
-	local dir = [ AddDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
-		: $(directoryTokens) ] ;
-
-	if $(attributeFiles) {
-		SEARCH on $(attributeFiles)
-			+= [ FDirName $(HAIKU_TOP) data image_directories ] ;
-		ATTRIBUTE_FILES on $(dir) += $(attributeFiles) ;
-	}
-
-	return $(dir) ;
+	return [ AddDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(directoryTokens) : $(attributeFiles) ] ;
 }
 
 rule AddFilesToHaikuImage directory : targets : destName

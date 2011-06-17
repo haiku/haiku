@@ -340,16 +340,8 @@ actions BuildHaikuPackage1
 
 rule AddDirectoryToPackage package : directoryTokens : attributeFiles
 {
-	local dir = [ AddDirectoryToContainer $(package) : $(directoryTokens) ] ;
-	local grist = [ FHaikuPackageGrist $(package) ] ;
-
-	if $(attributeFiles) {
-		SEARCH on $(attributeFiles)
-			+= [ FDirName $(HAIKU_TOP) data package_directories $(grist) ] ;
-		ATTRIBUTE_FILES on $(dir) += $(attributeFiles) ;
-	}
-
-	return $(dir) ;
+	return [ AddDirectoryToContainer $(package)
+		: $(directoryTokens) : $(attributeFiles) ] ;
 }
 
 
