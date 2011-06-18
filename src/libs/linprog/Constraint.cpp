@@ -310,10 +310,9 @@ Constraint::DPos() const
 bool
 Constraint::IsSoft() const
 {
-	if (fPenaltyNeg > 0. && fOp != kLE)
-		return true;
-		
-	if (fPenaltyPos > 0. && fOp != kGE)
+	if (fOp != kEQ)
+		return false;
+    if (fPenaltyNeg > 0. || fPenaltyPos > 0.)
 		return true;
 	return false;
 }
@@ -406,7 +405,7 @@ Constraint::~Constraint()
 	Invalidate();
 
 	for (int32 i = 0; i < fLeftSide->CountItems(); i++)
-		delete (Summand*)fLeftSide->ItemAt(i);
+		delete fLeftSide->ItemAt(i);
 	delete fLeftSide;
 	fLeftSide = NULL;
 }

@@ -1,5 +1,15 @@
+/*
+ * Copyright 2010 - 2011, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ */
+
+
 #include "ActiveSetSolver.h"
 
+#include <algorithm>
 #include <stdio.h>
 
 #include "LayoutOptimizer.h"
@@ -16,17 +26,7 @@
 
 
 using namespace LinearProgramming;
-//using namespace BPrivate::Layout;
-
-
-template<typename Type>
-static inline void
-swap(Type& a, Type& b)
-{
-	Type c = a;
-	a = b;
-	b = c;
-}
+using namespace std;
 
 
 EquationSystem::EquationSystem(int32 rows, int32 columns)
@@ -273,7 +273,7 @@ EquationSystem::Print()
 
 ActiveSetSolver::ActiveSetSolver(LinearSpec* linearSpec)
 	:
-	SolverInterface(linearSpec),
+	QPSolverInterface(linearSpec),
 
 	fVariables(linearSpec->UsedVariables()),
 	fConstraints(linearSpec->Constraints())
@@ -462,14 +462,14 @@ ActiveSetSolver::VariableRangeChanged(Variable* variable)
 bool
 ActiveSetSolver::ConstraintAdded(Constraint* constraint)
 {
-	return true;
+	return QPSolverInterface::ConstraintAdded(constraint);
 }
 
 
 bool
 ActiveSetSolver::ConstraintRemoved(Constraint* constraint)
 {
-	return true;
+	return QPSolverInterface::ConstraintRemoved(constraint);
 }
 
 

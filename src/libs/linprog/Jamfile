@@ -7,12 +7,13 @@ UsePrivateHeaders shared ;
 
 
 StaticLibrary liblinprog.a : 
+	ActiveSetSolver.cpp
 	Constraint.cpp
+	LayoutOptimizer.cpp
 	LinearSpec.cpp
 	LPSolveInterface.cpp
+	QPSolverInterface.cpp
 	Summand.cpp
 	Variable.cpp
-	LayoutOptimizer.cpp
-	ActiveSetSolver.cpp
 ;
 

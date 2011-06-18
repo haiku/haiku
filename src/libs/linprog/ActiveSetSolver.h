@@ -6,7 +6,7 @@
 #define ACTICE_SET_SOLVER_H
 
 
-#include "LinearSpec.h"
+#include "QPSolverInterface.h"
 
 
 class EquationSystem {
@@ -48,7 +48,7 @@ private:
 };
 
 
-class ActiveSetSolver : public LinearProgramming::SolverInterface {
+class ActiveSetSolver : public QPSolverInterface {
 public:
 								ActiveSetSolver(LinearSpec* linearSpec);
 								~ActiveSetSolver();

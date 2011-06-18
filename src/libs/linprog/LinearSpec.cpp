@@ -112,10 +112,14 @@ LinearSpec::AddVariable(Variable* variable)
 bool
 LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 {
-	// must be called first otherwise the index is invalid
-	if (!fSolver->VariableRemoved(variable))
+	// do we know the variable?
+	if (fVariables.RemoveItem(variable) == false)
 		return false;
-	fVariables.RemoveItem(variable);
+
+	// must be called first otherwise the index is invalid
+	if (fSolver->VariableRemoved(variable) == false)
+		return false;
+
 	variable->fIsValid = false;
 
 	// invalidate all constraints that use this variable
