@@ -53,8 +53,7 @@ BControlLook::DefaultItemSpacing() const
 float
 BControlLook::ComposeSpacing(float spacing)
 {
-	// We only need to check one of each synonym (B_*_SPACING | B_*_INSETS)
-	if (spacing == B_USE_ITEM_SPACING) {
+	if (spacing == B_USE_DEFAULT_SPACING || spacing == B_USE_ITEM_SPACING) {
 		return be_control_look->DefaultItemSpacing();
 	} else if (spacing == B_USE_HALF_ITEM_SPACING) {
 		return be_control_look->DefaultItemSpacing() * 0.5f;
