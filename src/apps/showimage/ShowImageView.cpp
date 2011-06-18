@@ -1284,7 +1284,10 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 			ClearSelection();
 			break;
 		case B_DELETE:
-			_SendMessageToWindow(kMsgDeleteCurrentFile);
+			if (fHasSelection)
+				ClearSelection();
+			else
+				_SendMessageToWindow(kMsgDeleteCurrentFile);
 			break;
 		case '0':
 			FitToBounds();
