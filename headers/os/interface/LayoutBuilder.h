@@ -61,6 +61,9 @@ public:
 	inline						Group(BWindow* window,
 									enum orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
+	inline						Group(BView* view,
+									enum orientation orientation = B_HORIZONTAL,
+									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Group(BGroupLayout* layout);
 	inline						Group(BGroupView* view);
 
@@ -125,6 +128,9 @@ public:
 										= B_USE_DEFAULT_SPACING,
 									float vertical = B_USE_DEFAULT_SPACING);
 	inline						Grid(BWindow* window,
+									float horizontal = B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
+	inline						Grid(BView* view,
 									float horizontal = B_USE_DEFAULT_SPACING,
 									float vertical = B_USE_DEFAULT_SPACING);
 	inline						Grid(BGridLayout* layout);
@@ -355,6 +361,18 @@ Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
 	window->SetLayout(fLayout);
 
 	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		// TODO: we get a white background if we don't do this
+}
+
+
+template<typename ParentBuilder>
+Group<ParentBuilder>::Group(BView* view, enum orientation orientation,
+	float spacing)
+	:
+	fLayout(new BGroupLayout(orientation, spacing))
+{
+	view->SetLayout(fLayout);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// TODO: we get a white background if we don't do this
 }
 
@@ -613,6 +631,18 @@ Grid<ParentBuilder>::Grid(BWindow* window, float horizontalSpacing,
 	window->SetLayout(fLayout);
 
 	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		// TODO: we get a white background if we don't do this
+}
+
+
+template<typename ParentBuilder>
+Grid<ParentBuilder>::Grid(BView* view, float horizontalSpacing,
+	float verticalSpacing)
+	:
+	fLayout(new BGridLayout(horizontalSpacing, verticalSpacing))
+{
+	view->SetLayout(fLayout);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// TODO: we get a white background if we don't do this
 }
 
