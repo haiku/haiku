@@ -6716,7 +6716,8 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 	if (!window)
 		return;
 
-	window->DragStart(message);
+	if (message != NULL && !window->Dragging())
+		window->DragStart(message);
 
 	switch (moveCode) {
 		case B_INSIDE_VIEW:
