@@ -28,6 +28,7 @@
 #include <BitmapStream.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <Cursor.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -195,7 +196,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fShowCaption(false),
 	fShowingPopUpMenu(false),
 	fHideCursorCountDown(HIDE_CURSOR_DELAY_TIME),
-	fIsActiveWin(true)
+	fIsActiveWin(true),
+	fDefaultCursor(NULL),
+	fGrabCursor(NULL)
 {
 	ShowImageSettings* settings = my_app->Settings();
 	if (settings->Lock()) {
@@ -204,6 +207,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 		fScaleBilinear = settings->GetBool("ScaleBilinear", fScaleBilinear);
 		settings->Unlock();
 	}
+
+	fDefaultCursor = new BCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
+	fGrabCursor = new BCursor(B_CURSOR_ID_GRABBING);
 
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kBorderColor);
@@ -1115,6 +1121,7 @@ ShowImageView::MouseDown(BPoint position)
 		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		fScrollingBitmap = true;
 		fFirstPoint = ConvertToScreen(position);
+		be_app->SetCursor(fGrabCursor);
 	}
 }
 
@@ -1169,6 +1176,7 @@ ShowImageView::MouseUp(BPoint point)
 	} else if (fScrollingBitmap) {
 		_ScrollBitmap(point);
 		fScrollingBitmap = false;
+		be_app->SetCursor(fDefaultCursor);
 	}
 	_AnimateSelection(true);
 }

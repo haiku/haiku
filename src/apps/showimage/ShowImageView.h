@@ -222,6 +222,9 @@ private:
 			bool				fIsActiveWin;
 				// Is the parent window the active window?
 
+			BCursor*			fDefaultCursor;
+			BCursor*			fGrabCursor;
+
 			image_orientation	fImageOrientation;
 	static	image_orientation	fTransformation[
 									ImageProcessor
