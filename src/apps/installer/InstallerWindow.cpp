@@ -481,13 +481,12 @@ InstallerWindow::MessageReceived(BMessage *msg)
 
 			_SetCopyEngineCancelSemaphore(-1);
 
-			fBeginButton->SetLabel(B_TRANSLATE("Quit"));
-
 			PartitionMenuItem* dstItem
 				= (PartitionMenuItem*)fDestMenu->FindMarked();
 
 			char status[1024];
 			if (be_roster->IsRunning(kDeskbarSignature)) {
+				fBeginButton->SetLabel(B_TRANSLATE("Quit"));
 				snprintf(status, sizeof(status), B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
 					"Quit to leave the Installer or choose a new target "
@@ -495,9 +494,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
 			} else {
+				fBeginButton->SetLabel(B_TRANSLATE("Restart"));
 				snprintf(status, sizeof(status), B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
-					"Quit to restart the computer or choose a new target "
+					"Restart to restart the computer or choose a new target "
 					"volume to perform another installation."),
 					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
