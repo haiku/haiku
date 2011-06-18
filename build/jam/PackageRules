@@ -272,6 +272,8 @@ rule HaikuPackage package
 		= $(grist)_HAIKU_INCLUDE_IN_PACKAGE ;
 	HAIKU_INSTALL_TARGETS_VAR on $(package)
 		= $(grist)_HAIKU_PACKAGE_INSTALL_TARGETS ;
+
+	HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE = $(package) ;
 }
 
 
@@ -338,81 +340,85 @@ actions BuildHaikuPackage1
 }
 
 
-rule AddDirectoryToPackage package : directoryTokens : attributeFiles
+rule AddDirectoryToPackage directoryTokens : attributeFiles
 {
-	return [ AddDirectoryToContainer $(package)
+	return [ AddDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
 		: $(directoryTokens) : $(attributeFiles) ] ;
 }
 
 
-rule AddFilesToPackage package : directory : targets : destName
+rule AddFilesToPackage directory : targets : destName
 {
-	AddFilesToContainer $(package) : $(directory) : $(targets) : $(destName) ;
+	AddFilesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE) : $(directory)
+		: $(targets) : $(destName) ;
 }
 
 
-rule AddSymlinkToPackage package : directoryTokens : linkTarget : linkName
+rule AddSymlinkToPackage directoryTokens : linkTarget : linkName
 {
 	linkTarget = $(linkTarget:J=/) ;
 
-	AddSymlinkToContainer $(package) : $(directoryTokens) : $(linkTarget)
-		: $(linkName) ;
+	AddSymlinkToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
 }
 
 
-rule CopyDirectoryToPackage package : directoryTokens : sourceDirectory
+rule CopyDirectoryToPackage directoryTokens : sourceDirectory
 	: targetDirectoryName : excludePatterns : alwaysUpdate
 {
-	CopyDirectoryToContainer $(package) : $(directoryTokens)
-		: $(sourceDirectory) : $(targetDirectoryName) : $(excludePatterns)
-		: $(alwaysUpdate) ;
+	CopyDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directoryTokens) : $(sourceDirectory) : $(targetDirectoryName)
+		: $(excludePatterns) : $(alwaysUpdate) ;
 }
 
 
-rule AddHeaderDirectoryToPackage package : dirTokens : dirName : alwaysUpdate
+rule AddHeaderDirectoryToPackage dirTokens : dirName : alwaysUpdate
 {
-	AddHeaderDirectoryToContainer $(package) : $(dirTokens) : $(dirName)
-		: $(alwaysUpdate) ;
+	AddHeaderDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(dirTokens) : $(dirName) : $(alwaysUpdate) ;
 }
 
 
-rule AddWifiFirmwareToPackage package : driver : subDirToExtract : archive
+rule AddWifiFirmwareToPackage driver : subDirToExtract : archive
 	: extract
 {
-	AddWifiFirmwareToContainer $(package) : $(driver) : $(subDirToExtract)
-		: $(archive) : $(extract) ;
+	AddWifiFirmwareToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(driver) : $(subDirToExtract) : $(archive) : $(extract) ;
 }
 
 
-rule ExtractArchiveToPackage package : dirTokens : archiveFile : alwaysUpdate
+rule ExtractArchiveToPackage dirTokens : archiveFile : alwaysUpdate
 	: extractedSubDir
 {
 	# TODO: Update support?
-	ExtractArchiveToContainer $(package) : $(dirTokens) : $(archiveFile)
-		: $(extractedSubDir) ;
+	ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(dirTokens) : $(archiveFile) : $(extractedSubDir) ;
 }
 
 
-rule AddDriversToPackage package : relativeDirectoryTokens : targets
+rule AddDriversToPackage relativeDirectoryTokens : targets
 {
-	AddDriversToContainer $(package) : $(relativeDirectoryTokens) : $(targets) ;
+	AddDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(relativeDirectoryTokens) : $(targets) ;
 }
 
 
-rule AddNewDriversToPackage package : relativeDirectoryTokens : targets
+rule AddNewDriversToPackage relativeDirectoryTokens : targets
 {
-	AddNewDriversToContainer $(package) : $(relativeDirectoryTokens)
+	AddNewDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+
+rule AddBootModuleSymlinksToPackage targets
+{
+	AddBootModuleSymlinksToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
 		: $(targets) ;
 }
 
 
-rule AddBootModuleSymlinksToPackage package : targets
+rule AddLibrariesToPackage directory : libs
 {
-	AddBootModuleSymlinksToContainer $(package) : $(targets) ;
-}
-
-
-rule AddLibrariesToPackage package : directory : libs
-{
-	AddLibrariesToContainer $(package) : $(directory) : $(libs) ;
+	AddLibrariesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directory) : $(libs) ;
 }
