@@ -960,7 +960,7 @@ user_menu_reboot(Menu* menu, MenuItem* item)
 
 
 status_t
-user_menu(Directory** _bootVolume)
+user_menu(BootVolume& _bootVolume)
 {
 	Menu* menu = new(std::nothrow) Menu(MAIN_MENU);
 	Menu* safeModeMenu = NULL;
@@ -973,7 +973,7 @@ user_menu(Directory** _bootVolume)
 
 	// Add boot volume
 	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume",
-		add_boot_volume_menu(*_bootVolume)));
+		add_boot_volume_menu(_bootVolume.RootDirectory())));
 
 	// Add safe mode
 	menu->AddItem(item = new(std::nothrow) MenuItem("Select safe mode options",
@@ -993,7 +993,7 @@ user_menu(Directory** _bootVolume)
 	item->SetShortcut('r');
 
 	menu->AddItem(item = new(std::nothrow) MenuItem("Continue booting"));
-	if (*_bootVolume == NULL) {
+	if (!_bootVolume.IsValid()) {
 		item->SetEnabled(false);
 		menu->ItemAt(0)->Select(true);
 	} else
@@ -1003,7 +1003,7 @@ user_menu(Directory** _bootVolume)
 
 	// See if a new boot device has been selected, and propagate that back
 	if (item->Data() != NULL)
-		*_bootVolume = (Directory*)item->Data();
+		_bootVolume.SetTo((Directory*)item->Data());
 
 	apply_safe_mode_options(safeModeMenu);
 	apply_safe_mode_options(debugMenu);

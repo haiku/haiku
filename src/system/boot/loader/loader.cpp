@@ -24,8 +24,12 @@
 #	error BOOT_ARCH has to be defined to differentiate the kernel per platform
 #endif
 
+#define SYSTEM_DIRECTORY_PREFIX	"system/"
 #define KERNEL_IMAGE	"kernel_" BOOT_ARCH
-#define KERNEL_PATH		"system/" KERNEL_IMAGE
+#define KERNEL_PATH		SYSTEM_DIRECTORY_PREFIX KERNEL_IMAGE
+
+
+static const char* const kSystemDirectoryPrefix = SYSTEM_DIRECTORY_PREFIX;
 
 
 static const char *sPaths[] = {
@@ -38,15 +42,32 @@ static const char *sPaths[] = {
 };
 
 
+static int
+open_maybe_packaged(BootVolume& volume, const char* path, int openMode)
+{
+	if (strncmp(path, kSystemDirectoryPrefix, strlen(kSystemDirectoryPrefix))
+			== 0) {
+		path += strlen(kSystemDirectoryPrefix);
+		return open_from(volume.SystemDirectory(), path, openMode);
+	}
+
+	return open_from(volume.RootDirectory(), path, openMode);
+}
+
+
 bool
 is_bootable(Directory *volume)
 {
 	if (volume->IsEmpty())
 		return false;
 
+	BootVolume bootVolume;
+	if (bootVolume.SetTo(volume) != B_OK)
+		return false;
+
 	// check for the existance of a kernel (for our platform)
-	int fd = open_from(volume, KERNEL_PATH, O_RDONLY);
-	if (fd < B_OK)
+	int fd = open_maybe_packaged(bootVolume, KERNEL_PATH, O_RDONLY);
+	if (fd < 0)
 		return false;
 
 	close(fd);
@@ -56,9 +77,9 @@ is_bootable(Directory *volume)
 
 
 status_t
-load_kernel(stage2_args *args, Directory *volume)
+load_kernel(stage2_args* args, BootVolume& volume)
 {
-	int fd = open_from(volume, KERNEL_PATH, O_RDONLY);
+	int fd = open_maybe_packaged(volume, KERNEL_PATH, O_RDONLY);
 	if (fd < B_OK)
 		return fd;
 
@@ -87,11 +108,11 @@ load_kernel(stage2_args *args, Directory *volume)
 
 
 static status_t
-load_modules_from(Directory *volume, const char *path)
+load_modules_from(BootVolume& volume, const char* path)
 {
 	// we don't have readdir() & co. (yet?)...
 
-	int fd = open_from(volume, path, O_RDONLY);
+	int fd = open_maybe_packaged(volume, path, O_RDONLY);
 	if (fd < B_OK)
 		return fd;
 
@@ -125,7 +146,7 @@ load_modules_from(Directory *volume, const char *path)
  */
 
 static status_t
-load_module(Directory *volume, const char *name)
+load_module(BootVolume& volume, const char* name)
 {
 	char moduleName[B_FILE_NAME_LENGTH];
 	if (strlcpy(moduleName, name, sizeof(moduleName)) > sizeof(moduleName))
@@ -133,7 +154,7 @@ load_module(Directory *volume, const char *name)
 
 	for (int32 i = 0; sPaths[i]; i++) {
 		// get base path
-		int baseFD = open_from(volume, sPaths[i], O_RDONLY);
+		int baseFD = open_maybe_packaged(volume, sPaths[i], O_RDONLY);
 		if (baseFD < B_OK)
 			continue;
 
@@ -174,7 +195,7 @@ load_module(Directory *volume, const char *name)
 
 
 status_t
-load_modules(stage2_args *args, Directory *volume)
+load_modules(stage2_args* args, BootVolume& volume)
 {
 	int32 failed = 0;
 
@@ -209,7 +230,8 @@ load_modules(stage2_args *args, Directory *volume)
 			false)) {
 		// iterate over the mounted volumes and load their file system
 		Partition *partition;
-		if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {
+		if (gRoot->GetPartitionFor(volume.RootDirectory(), &partition)
+				== B_OK) {
 			while (partition != NULL) {
 				load_module(volume, partition->ModuleName());
 				partition = partition->Parent();

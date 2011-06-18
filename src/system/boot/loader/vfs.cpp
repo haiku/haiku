@@ -357,6 +357,77 @@ Descriptor::Release()
 //	#pragma mark -
 
 
+BootVolume::BootVolume()
+	:
+	fRootDirectory(NULL),
+	fSystemDirectory(NULL),
+	fPackaged(false)
+{
+}
+
+
+BootVolume::~BootVolume()
+{
+	Unset();
+}
+
+
+status_t
+BootVolume::SetTo(Directory* rootDirectory)
+{
+	Unset();
+
+	if (rootDirectory == NULL)
+		return B_BAD_VALUE;
+
+	fRootDirectory = rootDirectory;
+
+	// find the system directory
+	Node* systemNode = fRootDirectory->Lookup("system", true);
+	if (systemNode == NULL || !S_ISDIR(systemNode->Type())) {
+		if (systemNode != NULL)
+			systemNode->Release();
+		Unset();
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	fSystemDirectory = static_cast<Directory*>(systemNode);
+
+	// check, if the system is packaged
+	int packageFD = open_from(fSystemDirectory, ,
+		O_RDONLY);
+	fPackaged = packageFD >= 0;
+	if (!fPackaged)
+		return B_OK;
+
+	// the system is packaged -- mount the packagefs
+// TODO:...
+Unset();
+dprintf("BootVolume::SetTo(): packagefs not supported yet!\n");
+return B_NOT_SUPPORTED;
+}
+
+
+void
+BootVolume::Unset()
+{
+	if (fRootDirectory != NULL) {
+		fRootDirectory->Release();
+		fRootDirectory = NULL;
+	}
+
+	if (fSystemDirectory != NULL) {
+		fSystemDirectory->Release();
+		fSystemDirectory = NULL;
+	}
+
+	fPackaged = false;
+}
+
+
+//	#pragma mark -
+
+
 status_t
 vfs_init(stage2_args *args)
 {
@@ -393,41 +464,50 @@ register_boot_file_system(Directory *volume)
 }
 
 
-/** Gets the boot device, scans all of its partitions, gets the
- *	boot partition, and mounts its file system.
- *	Returns the file system's root node or NULL for failure.
- */
+/*! Gets the boot device, scans all of its partitions, gets the
+	boot partition, and mounts its file system.
 
-Directory *
-get_boot_file_system(stage2_args *args)
+	\param args The stage 2 arguments.
+	\param _bootVolume On success set to the boot volume.
+	\return \c B_OK on success, another error code otherwise.
+*/
+status_t
+get_boot_file_system(stage2_args* args, BootVolume& _bootVolume)
 {
 	Node *device;
-	if (platform_add_boot_device(args, &gBootDevices) < B_OK)
-		return NULL;
+	status_t error = platform_add_boot_device(args, &gBootDevices);
+	if (error != B_OK)
+		return error;
 
 	// the boot device must be the first device in the list
 	device = gBootDevices.First();
 
-	if (add_partitions_for(device, false, true) < B_OK)
-		return NULL;
+	error = add_partitions_for(device, false, true);
+	if (error != B_OK)
+		return error;
 
 	Partition *partition;
-	if (platform_get_boot_partition(args, device, &gPartitions, &partition) < B_OK)
-		return NULL;
+	error = platform_get_boot_partition(args, device, &gPartitions, &partition);
+	if (error != B_OK)
+		return error;
 
 	Directory *fileSystem;
-	status_t status = partition->Mount(&fileSystem, true);
-
-	if (status < B_OK) {
+	error = partition->Mount(&fileSystem, true);
+	if (error != B_OK) {
 		// this partition doesn't contain any known file system; we
 		// don't need it anymore
 		gPartitions.Remove(partition);
 		delete partition;
-		return NULL;
+		return error;
 	}
 
+	// init the BootVolume
+	error = _bootVolume.SetTo(fileSystem);
+	if (error != B_OK)
+		return error;
+
 	sBootDevice = device;
-	return fileSystem;
+	return B_OK;
 }
 
 
