@@ -1570,6 +1570,7 @@ BContainerWindow::MessageReceived(BMessage *message)
 				//
 				entry_ref ref;
 				if (message->FindRef("refs", &ref) == B_OK) {
+
 					//printf("BContainerWindow::MessageReceived - refs received\n");
 					fWaitingForRefs = false;
 					BEntry entry(&ref, true);
@@ -1577,37 +1578,12 @@ BContainerWindow::MessageReceived(BMessage *message)
 					//	don't copy to printers dir
 					if (!FSIsPrintersDir(&entry)) {
 						if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
-							uint32 moveMode = kMoveSelectionTo;
-							int32 buttons = fDragMessage->FindInt32("buttons");
-							if (buttons & B_SECONDARY_MOUSE_BUTTON || modifiers() & B_CONTROL_KEY) {
-								BPoint dropPoint;
-								PoseView()->GetMouse(&dropPoint, NULL, true);
-								moveMode = ShowDropContextMenu(dropPoint);
-								if (moveMode == kCancelButton)
-									break;
-							}
-							//
-							//	build of list of entry_refs from the list
-							//	in the drag message
-							entry_ref dragref;
-							int32 index = 0;
-							BObjectList<entry_ref> *list = new BObjectList<entry_ref>(0, true);
-							while (fDragMessage->FindRef("refs", index++, &dragref) == B_OK)
-								list->AddItem(new entry_ref(dragref));
-							//
-							//	compare the target and one of the drag items' parent
-							//
 							Model targetModel(&entry, true, false);
-							if (!CheckDevicesEqual(list->ItemAt(0), &targetModel))
-								moveMode = kCopySelectionTo;
-							//	copy drag contents to target ref in message
-							FSMoveToFolder(list, new BEntry(entry),
-									moveMode);
-							targetModel.CloseNode();
-						} else {
-							// 	current message sent to apps is only B_REFS_RECEIVED
-							fDragMessage->what = B_REFS_RECEIVED;
-							FSLaunchItem(&ref, (const BMessage *)fDragMessage, true, true);
+							BPoint dropPoint;
+							uint32 buttons;
+							PoseView()->GetMouse(&dropPoint, &buttons, true);
+							PoseView()->HandleDropCommon(fDragMessage, &targetModel, NULL,
+								PoseView(), dropPoint);
 						}
 					}
 				}
@@ -3029,7 +3005,7 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 		EnableNamedMenuItem(menu, kDelete, selectCount > 0);
 		EnableNamedMenuItem(menu, kDuplicateSelection, selectCount > 0);
 	}
-	
+
 	Model *selectedModel = NULL;
 	if (selectCount == 1)
 		selectedModel = PoseView()->SelectionList()->FirstItem()->TargetModel();

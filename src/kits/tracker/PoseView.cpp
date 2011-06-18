@@ -6716,6 +6716,8 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 	if (!window)
 		return;
 
+	window->DragStart(message);
+
 	switch (moveCode) {
 		case B_INSIDE_VIEW:
 		case B_ENTERED_VIEW:
@@ -7021,10 +7023,6 @@ BPoseView::DragSelectedPoses(const BPose *pose, BPoint clickPoint)
 				// this DragMessage supports alpha blending
 		} else
 			DragMessage(&message, dragRect);
-
-		BContainerWindow* window = ContainerWindow();
-		if (window != NULL)
-			window->DragStart(&message);
 
 		// turn on auto scrolling
 		fAutoScrollState = kWaitForTransition;
