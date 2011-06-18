@@ -195,7 +195,10 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
 	attribute_overlay write_overlay ntfs packagefs reiserfs udf googlefs ;
 
 
+# build the haiku system package and add it
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
+
+AddFilesToHaikuImage system packages : haiku.hpkg ;
 
 
 # TODO: remove!
