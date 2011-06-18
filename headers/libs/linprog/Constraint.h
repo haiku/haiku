@@ -31,6 +31,8 @@ public:
 			int32				Index() const;
 
 			SummandList*		LeftSide();
+			/*! This just overwrites the current list. The caller has to take
+			care about the old left side, i.e. delete it. */
 			void				SetLeftSide(SummandList* summands);
 			
 			void				SetLeftSide(double coeff1, Variable* var1);
