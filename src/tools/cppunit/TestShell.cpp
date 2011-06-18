@@ -112,22 +112,20 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 		status_t err;
 		err = addonEntry.GetPath(&addonPath);
 		if (!err) {
-//			cout << "Checking " << addonPath.Path() << "..." << flush;
+//			cout << "Checking " << addonPath.Path() << "..." << endl;
 			addonImage = load_add_on(addonPath.Path());
-			err = (addonImage > 0 ? B_OK : B_ERROR);
+			err = (addonImage >= 0 ? B_OK : B_ERROR);
 		}
-		if (!err) {
+		if (err == B_OK) {
 //			cout << "..." << endl;
-			err = get_image_symbol(addonImage,
-				    "getTestSuite",
-				      B_SYMBOL_TYPE_TEXT,
-				        reinterpret_cast<void **>(&func));
+			err = get_image_symbol(addonImage, "getTestSuite",
+				B_SYMBOL_TYPE_TEXT, reinterpret_cast<void **>(&func));
 		} else {
 //			cout << " !!! err == " << err << endl;
 		}
-		if (!err)
+		if (err == B_OK)
 			err = AddSuite(func());
-		if (!err)
+		if (err == B_OK)
 			count++;
 	}
 	return count;
