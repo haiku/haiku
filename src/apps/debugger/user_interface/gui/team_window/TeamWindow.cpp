@@ -169,6 +169,10 @@ TeamWindow::DispatchMessage(BMessage* message, BHandler* handler)
 					&& message->FindInt32("modifiers", (int32*)&modifiers)
 					== B_OK) {
 					switch (key) {
+						case B_F5_KEY:
+							fListener->ThreadActionRequested(
+								fActiveThread->ID(), MSG_THREAD_RUN);
+							break;
 						case B_F10_KEY:
 							fListener->ThreadActionRequested(
 								fActiveThread->ID(), MSG_THREAD_STEP_OVER);
