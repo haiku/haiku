@@ -70,7 +70,13 @@ public:
 	virtual						~TabFilteringTextView();
 
 	virtual	void				KeyDown(const char* bytes, int32 count);
+	virtual	void				TargetedByScrollView(BScrollView* scroller);
+	virtual	void				MakeFocus(bool focused = true);
+
+private:
+			BScrollView*		fScrollView;
 };
+
 
 class SupportedTypeItem : public BStringItem {
 public:
@@ -89,6 +95,7 @@ private:
 			BString				fType;
 			::Icon				fIcon;
 };
+
 
 class SupportedTypeListView : public DropTargetListView {
 public:
@@ -109,7 +116,8 @@ public:
 
 TabFilteringTextView::TabFilteringTextView(const char* name)
 	:
-	BTextView(name, B_WILL_DRAW | B_PULSE_NEEDED)
+	BTextView(name, B_WILL_DRAW | B_PULSE_NEEDED | B_NAVIGABLE),
+	fScrollView(NULL)
 {
 }
 
@@ -126,6 +134,23 @@ TabFilteringTextView::KeyDown(const char* bytes, int32 count)
 		BView::KeyDown(bytes, count);
 	else
 		BTextView::KeyDown(bytes, count);
+}
+
+
+void
+TabFilteringTextView::TargetedByScrollView(BScrollView* scroller)
+{
+	fScrollView = scroller;
+}
+
+
+void
+TabFilteringTextView::MakeFocus(bool focused)
+{
+	BTextView::MakeFocus(focused);
+
+	if (fScrollView)
+		fScrollView->SetBorderHighlighted(focused);
 }
 
 
