@@ -1089,7 +1089,10 @@ ShowImageView::MouseDown(BPoint position)
 		buttons = Window()->CurrentMessage()->FindInt32("buttons");
 	}
 
-	if (buttons == B_PRIMARY_MOUSE_BUTTON && clickCount == 2) {
+	// Using clickCount >= 2 and the modulo 2 accounts for quickly repeated
+	// double-clicks
+	if (buttons == B_PRIMARY_MOUSE_BUTTON && clickCount >= 2 && 
+			clickCount % 2 == 0) {
 		Window()->PostMessage(MSG_FULL_SCREEN);
 		return;
 	}
