@@ -220,6 +220,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 ShowImageView::~ShowImageView()
 {
 	_DeleteBitmap();
+
+	delete fDefaultCursor;
+	delete fGrabCursor;
 }
 
 
