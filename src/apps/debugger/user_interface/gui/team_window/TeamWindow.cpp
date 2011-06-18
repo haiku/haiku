@@ -216,13 +216,18 @@ TeamWindow::MessageReceived(BMessage* message)
 			}
 
 			try {
-				fInspectorWindow = InspectorWindow::Create(fTeam, fListener);
+				fInspectorWindow = InspectorWindow::Create(fTeam, fListener,
+					this);
 				if (fInspectorWindow != NULL)
 					fInspectorWindow->Show();
            	} catch (...) {
            		// TODO: notify user
            	}
            	break;
+		}
+		case MSG_INSPECTOR_WINDOW_CLOSED:
+		{
+			fInspectorWindow = NULL;
 		}
 		case B_REFS_RECEIVED:
 		{

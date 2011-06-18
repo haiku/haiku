@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 
+#include <ByteOrder.h>
 #include <Messenger.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -22,7 +23,7 @@ enum {
 };
 
 
-MemoryView::MemoryView()
+MemoryView::MemoryView(int32 hostEndianMode, int32 targetEndianMode)
 	:
 	BView("memoryView", B_WILL_DRAW | B_FRAME_EVENTS | B_SUBPIXEL_PRECISE),
 	fTargetBlock(NULL),
@@ -31,6 +32,9 @@ MemoryView::MemoryView()
 	fLineHeight(0.0),
 	fTextCharsPerLine(0),
 	fHexBlocksPerLine(0),
+	fCurrentEndianMode(hostEndianMode),
+	fHostEndianMode(hostEndianMode),
+	fTargetEndianMode(targetEndianMode),
 	fHexMode(HexMode8BitInt),
 	fTextMode(TextModeASCII)
 {
@@ -45,9 +49,9 @@ MemoryView::~MemoryView()
 
 
 /*static */ MemoryView*
-MemoryView::Create()
+MemoryView::Create(int32 hostEndianMode, int32 targetEndianMode)
 {
-	MemoryView* self = new MemoryView();
+	MemoryView* self = new MemoryView(hostEndianMode, targetEndianMode);
 
 	try {
 		self->_Init();
@@ -264,6 +268,15 @@ MemoryView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case MSG_SET_ENDIAN_MODE:
+		{
+			int32 mode;
+			if (message->FindInt32("mode", &mode) == B_OK) {
+				fCurrentEndianMode = mode;
+				Invalidate();
+			}
+			break;
+		}
 		case MSG_SET_TEXT_MODE:
 		{
 			int32 mode;
@@ -359,20 +372,71 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 		}
 		case HexMode16BitInt:
 		{
+			uint16 data = *((const uint16*)address);
+			if (fCurrentEndianMode != fHostEndianMode) {
+				switch(fCurrentEndianMode)
+				{
+					case EndianModeBigEndian:
+					{
+						data = B_HOST_TO_BENDIAN_INT16(data);
+					}
+					break;
+
+					case EndianModeLittleEndian:
+					{
+						data = B_HOST_TO_LENDIAN_INT16(data);
+					}
+					break;
+				}
+			}
 			snprintf(buffer, bufferSize, "%04" B_PRIx16,
-				*((const uint16*)address));
+				data);
 			break;
 		}
 		case HexMode32BitInt:
 		{
+			uint32 data = *((const uint32*)address);
+			if (fCurrentEndianMode != fHostEndianMode) {
+				switch(fCurrentEndianMode)
+				{
+					case EndianModeBigEndian:
+					{
+						data = B_HOST_TO_BENDIAN_INT32(data);
+					}
+					break;
+
+					case EndianModeLittleEndian:
+					{
+						data = B_HOST_TO_LENDIAN_INT32(data);
+					}
+					break;
+				}
+			}
 			snprintf(buffer, bufferSize, "%08" B_PRIx32,
-				*((const uint32*)address));
+				data);
 			break;
 		}
 		case HexMode64BitInt:
 		{
+			uint64 data = *((const uint16*)address);
+			if (fCurrentEndianMode != fHostEndianMode) {
+				switch(fCurrentEndianMode)
+				{
+					case EndianModeBigEndian:
+					{
+						data = B_HOST_TO_BENDIAN_INT64(data);
+					}
+					break;
+
+					case EndianModeLittleEndian:
+					{
+						data = B_HOST_TO_LENDIAN_INT64(data);
+					}
+					break;
+				}
+			}
 			snprintf(buffer, bufferSize, "%0*" B_PRIx64,
-				16, *((const uint64*)address));
+				16, data);
 			break;
 		}
 	}

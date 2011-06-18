@@ -13,8 +13,9 @@
 
 
 enum {
-	MSG_SET_HEX_MODE 	= 'sofm',
-	MSG_SET_TEXT_MODE	= 'some'
+	MSG_SET_HEX_MODE 	= 'sehe',
+	MSG_SET_ENDIAN_MODE	= 'seme',
+	MSG_SET_TEXT_MODE	= 'stme'
 };
 
 enum {
@@ -27,9 +28,17 @@ enum {
 };
 
 enum {
+	EndianModeLittleEndian = 0,
+	EndianModeBigEndian = 1
+};
+
+enum {
 	TextModeNone = 0,
 	TextModeASCII
 };
+
+
+class Team;
 
 
 class TeamMemoryBlock;
@@ -37,10 +46,12 @@ class TeamMemoryBlock;
 
 class MemoryView : public BView {
 public:
-								MemoryView();
+								MemoryView(int32 hostEndianMode,
+									int32 targetEndianMode);
 	virtual						~MemoryView();
 
-	static MemoryView*			Create();
+	static MemoryView*			Create(int32 hostEndianMode,
+									int32 targetEndianMode);
 									// throws
 
 			void				SetTargetAddress(TeamMemoryBlock* block,
@@ -67,6 +78,9 @@ private:
 	float						fLineHeight;
 	int32						fTextCharsPerLine;
 	int32						fHexBlocksPerLine;
+	int32						fCurrentEndianMode;
+	int32						fHostEndianMode;
+	int32						fTargetEndianMode;
 	int32						fHexMode;
 	int32						fTextMode;
 };

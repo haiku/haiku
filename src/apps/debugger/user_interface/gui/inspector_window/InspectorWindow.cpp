@@ -18,6 +18,7 @@
 
 #include <ExpressionParser.h>
 
+#include "Architecture.h"
 #include "MemoryView.h"
 #include "MessageCodes.h"
 #include "Team.h"
@@ -30,7 +31,8 @@ enum {
 };
 
 
-InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener)
+InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener,
+	BHandler* target)
 	:
 	BWindow(BRect(100, 100, 700, 500), "Inspector", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
@@ -41,7 +43,8 @@ InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener)
 	fMemoryView(NULL),
 	fCurrentBlock(NULL),
 	fCurrentAddress(0LL),
-	fTeam(team)
+	fTeam(team),
+	fTarget(target)
 {
 }
 
@@ -52,9 +55,10 @@ InspectorWindow::~InspectorWindow()
 
 
 /* static */ InspectorWindow*
-InspectorWindow::Create(::Team* team, UserInterfaceListener* listener)
+InspectorWindow::Create(::Team* team, UserInterfaceListener* listener,
+	BHandler* target)
 {
-	InspectorWindow* self = new InspectorWindow(team, listener);
+	InspectorWindow* self = new InspectorWindow(team, listener, target);
 
 	try {
 		self->_Init();
@@ -94,6 +98,15 @@ InspectorWindow::_Init()
 	item = new BMenuItem("64-bit integer", message, '4');
 	hexMenu->AddItem(item);
 
+	BMenu* endianMenu = new BMenu("Endian Mode");
+	message = new BMessage(MSG_SET_ENDIAN_MODE);
+	message->AddInt32("mode", EndianModeLittleEndian);
+	item = new BMenuItem("Little Endian", message, 'L');
+	endianMenu->AddItem(item);
+	message = new BMessage(*message);
+	message->ReplaceInt32("mode", EndianModeBigEndian);
+	item = new BMenuItem("Big Endian", message, 'B');
+	endianMenu->AddItem(item);
 
 	BMenu* textMenu = new BMenu("Text Mode");
 	message = new BMessage(MSG_SET_TEXT_MODE);
@@ -117,8 +130,11 @@ InspectorWindow::_Init()
 				new BMessage(MSG_NAVIGATE_NEXT_BLOCK)))
 		.End()
 		.AddGroup(B_HORIZONTAL, 4.0f)
-			.Add(fHexMode = new BMenuField("outputStyle", "Hex Mode:",
+			.Add(fHexMode = new BMenuField("hexMode", "Hex Mode:",
 				hexMenu))
+			.AddGlue()
+			.Add(fEndianMode = new BMenuField("endianMode", "Endian Mode:",
+				endianMenu))
 			.AddGlue()
 			.Add(fTextMode = new BMenuField("viewMode",  "Text Mode:",
 				textMenu))
@@ -128,9 +144,20 @@ InspectorWindow::_Init()
 	.End();
 
 	fHexMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fEndianMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTextMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	scrollView->SetTarget(fMemoryView = MemoryView::Create());
+	Architecture* architecture = fTeam->GetArchitecture();
+	int32 hostEndian;
+	int32 targetEndian;
+	targetEndian = architecture->IsBigEndian() ? EndianModeBigEndian
+		: EndianModeLittleEndian;
+	hostEndian = architecture->IsHostEndian() ? targetEndian
+		: architecture->IsBigEndian() ? EndianModeLittleEndian
+			: EndianModeBigEndian;
+
+	scrollView->SetTarget(fMemoryView = MemoryView::Create(hostEndian,
+		targetEndian));
 
 	fAddressInput->SetTarget(this);
 	fPreviousBlockButton->SetTarget(this);
@@ -140,12 +167,19 @@ InspectorWindow::_Init()
 
 	hexMenu->SetLabelFromMarked(true);
 	hexMenu->SetTargetForItems(fMemoryView);
+	endianMenu->SetLabelFromMarked(true);
+	endianMenu->SetTargetForItems(fMemoryView);
 	textMenu->SetLabelFromMarked(true);
 	textMenu->SetTargetForItems(fMemoryView);
 
 	// default to 8-bit format w/ text display
 	hexMenu->ItemAt(1)->SetMarked(true);
 	textMenu->ItemAt(1)->SetMarked(true);
+
+	if (architecture->IsBigEndian())
+		endianMenu->ItemAt(1)->SetMarked(true);
+	else
+		endianMenu->ItemAt(0)->SetMarked(true);
 
 	fAddressInput->TextView()->MakeFocus(true);
 }
@@ -238,7 +272,7 @@ InspectorWindow::MessageReceived(BMessage* msg)
 bool
 InspectorWindow::QuitRequested()
 {
-	be_app_messenger.SendMessage(MSG_INSPECTOR_WINDOW_CLOSED);
+	BMessenger(fTarget).SendMessage(MSG_INSPECTOR_WINDOW_CLOSED);
 	return true;
 }
 
