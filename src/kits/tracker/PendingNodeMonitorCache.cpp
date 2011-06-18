@@ -53,13 +53,13 @@ PendingNodeMonitorEntry::NodeMonitor() const
 	return &fNodeMonitor;
 }
 
-bool 
+bool
 PendingNodeMonitorEntry::Match(const node_ref *node) const
 {
 	return fNode == *node;
 }
 
-bool 
+bool
 PendingNodeMonitorEntry::TooOld(bigtime_t now) const
 {
 	return now > fExpiresAfter;
@@ -76,7 +76,7 @@ PendingNodeMonitorCache::~PendingNodeMonitorCache()
 {
 }
 
-void 
+void
 PendingNodeMonitorCache::Add(const BMessage *message)
 {
 #if xDEBUG
@@ -91,39 +91,38 @@ PendingNodeMonitorCache::Add(const BMessage *message)
 	fList.AddItem(new PendingNodeMonitorEntry(&node, message));
 }
 
-void 
+void
 PendingNodeMonitorCache::RemoveEntries(const node_ref *nodeRef)
 {
 	int32 count = fList.CountItems();
-	for (int32 index = count - 1; index >= 0; index--) 
+	for (int32 index = count - 1; index >= 0; index--)
 		if (fList.ItemAt(index)->Match(nodeRef))
 			delete fList.RemoveItemAt(index);
 }
 
-void 
+void
 PendingNodeMonitorCache::RemoveOldEntries()
 {
 	bigtime_t now = system_time();
 	int32 count = fList.CountItems();
-	for (int32 index = count - 1; index >= 0; index--) 
+	for (int32 index = count - 1; index >= 0; index--)
 		if (fList.ItemAt(index)->TooOld(now)) {
 			PRINT(("removing old entry from pending node monitor cache\n"));
 			delete fList.RemoveItemAt(index);
 		}
 }
 
-void 
+void
 PendingNodeMonitorCache::PoseCreatedOrMoved(BPoseView *poseView, const BPose *pose)
 {
 	bigtime_t now = system_time();
-	int32 count = fList.CountItems();
-	for (int32 index = 0; index < count;) {
+	for (int32 index = 0; index < fList.CountItems();) {
 		PendingNodeMonitorEntry *item = fList.ItemAt(index);
 		if (item->TooOld(now)) {
 			PRINT(("removing old entry from pending node monitor cache\n"));
 			delete fList.RemoveItemAt(index);
-			count--;			
 		} else if (item->Match(pose->TargetModel()->NodeRef())) {
+			fList.RemoveItemAt(index);
 #if DEBUG
 			PRINT(("reapplying node monitor for model:\n"));
 			pose->TargetModel()->PrintToStream();
@@ -132,8 +131,7 @@ PendingNodeMonitorCache::PoseCreatedOrMoved(BPoseView *poseView, const BPose *po
 #endif
 			poseView->FSNotification(item->NodeMonitor());
 			ASSERT(result);
-			delete fList.RemoveItemAt(index);
-			count--;
+			delete item;
 		} else
 			index++;
 	}
