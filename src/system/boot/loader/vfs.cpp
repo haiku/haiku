@@ -394,7 +394,7 @@ BootVolume::SetTo(Directory* rootDirectory)
 	fSystemDirectory = static_cast<Directory*>(systemNode);
 
 	// check, if the system is packaged
-	int packageFD = open_from(fSystemDirectory, ,
+	int packageFD = open_from(fSystemDirectory, "packages/haiku.hpkg",
 		O_RDONLY);
 	fPackaged = packageFD >= 0;
 	if (!fPackaged)
