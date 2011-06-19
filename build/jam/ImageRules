@@ -165,6 +165,8 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
 	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
 
 	# If the image shall only be updated, we filter out all targets not marked
 	# accordingly.
@@ -201,8 +203,8 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		if $(catalogs) {
 			local signature
 				= [ on $(target) return $(HAIKU_CATALOG_SIGNATURE) ] ;
-			AddFilesToHaikuImage
-				system data locale catalogs $(signature)
+			AddFilesToContainer $(container)
+				: $(systemDirTokens) data locale catalogs $(signature)
 				: $(catalogs) ;
 		}
 	}
@@ -296,7 +298,10 @@ rule AddHeaderDirectoryToContainer container : dirTokens : dirName
 	# AddHeaderDirectoryToContainer <container> : <dirTokens> : [ <dirName> ]
 	#	: <alwaysUpdate> ;
 
-	CopyDirectoryToContainer $(container) : system develop headers
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
+
+	CopyDirectoryToContainer $(container) : $(systemDirTokens) develop headers
 		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
 		: $(dirName) : -x .svn : $(alwaysUpdate) ;
 }
@@ -311,7 +316,10 @@ rule AddWifiFirmwareToContainer container : driver : package : archive : extract
 	local firmwareArchive = [ FDirName
 		$(HAIKU_TOP) data system data firmware $(driver) $(archive) ] ;
 
-	local dirTokens = system data firmware $(driver) ;
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
+
+	local dirTokens = $(systemDirTokens) data firmware $(driver) ;
 	if $(extract) = true || $(extract) = 1 {
 		ExtractArchiveToContainer $(container) : $(dirTokens)
 			: $(firmwareArchive) : $(package) ;
@@ -338,11 +346,13 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 {
 	# AddDriversToContainer <container> : <relative directory> : <targets> ;
 	#
-	local directoryTokens = system add-ons kernel drivers dev
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
+	local directoryTokens = $(systemDirTokens) add-ons kernel drivers dev
 		$(relativeDirectoryTokens) ;
 
 	AddFilesToContainer $(container)
-		: system add-ons kernel drivers bin
+		: $(systemDirTokens) add-ons kernel drivers bin
 		: $(targets) ;
 
 	# If the image shall only be updated, we don't add any symlinks.
@@ -371,7 +381,9 @@ rule AddNewDriversToContainer container : relativeDirectoryTokens
 {
 	# AddNewDriversToContainer <container> : <directory> : <targets> ;
 	#
-	local directoryTokens = system add-ons kernel drivers
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
+	local directoryTokens = $(systemDirTokens) add-ons kernel drivers
 		$(relativeDirectoryTokens) ;
 
 	AddFilesToContainer $(container) : $(directoryTokens)
@@ -390,6 +402,9 @@ rule AddBootModuleSymlinksToContainer container : targets
 		return ;
 	}
 
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
+
 	# add the symlinks
 	local installTargetsVar
 		= [ on $(container) return $(HAIKU_INSTALL_TARGETS_VAR) ] ;
@@ -406,10 +421,10 @@ rule AddBootModuleSymlinksToContainer container : targets
 		}
 
 		local name = $(target:BS) ;
-		local linkTarget = [ FDirName /boot $(installDir:G=) $(name) ] ;
+		local linkTarget = [ FDirName ../../.. $(installDir:G=) $(name) ] ;
 
 		AddSymlinkToContainer $(container)
-			: system add-ons kernel boot
+			: $(systemDirTokens) add-ons kernel boot
 			: $(linkTarget) : $(name) ;
 	}
 }
@@ -1017,8 +1032,10 @@ rule AddLicenseToHaikuImage file : name : searchPath
 		name = ;
 	}
 
-	AddFilesToHaikuImage system data licenses : $(file)
-		: $(name) ;
+	local systemDirTokens
+		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
+
+	AddFilesToHaikuImage $(systemDirTokens) data licenses : $(file) : $(name) ;
 }
 
 

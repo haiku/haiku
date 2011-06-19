@@ -272,6 +272,7 @@ rule HaikuPackage package
 		= $(grist)_HAIKU_INCLUDE_IN_PACKAGE ;
 	HAIKU_INSTALL_TARGETS_VAR on $(package)
 		= $(grist)_HAIKU_PACKAGE_INSTALL_TARGETS ;
+	HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(package) = ;
 
 	HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE = $(package) ;
 }
