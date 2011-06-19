@@ -2351,10 +2351,11 @@ Desktop::_LaunchInputServer()
 	// Could not load input_server by signature, try well-known location
 
 	BEntry entry;
-	BPath systemServersDir;
-	if (find_directory(B_SYSTEM_SERVERS_DIRECTORY, &systemServersDir) == B_OK)
-		entry.SetTo(systemServersDir.Path());
-	else
+	BPath inputServerPath;
+	if (find_directory(B_SYSTEM_SERVERS_DIRECTORY, &inputServerPath) == B_OK
+		&& inputServerPath.Append("input_server") == B_OK) {
+		entry.SetTo(inputServerPath.Path());
+	} else
 		entry.SetTo("/system/servers/input_server");
 	entry_ref ref;
 	status_t entryStatus = entry.GetRef(&ref);
