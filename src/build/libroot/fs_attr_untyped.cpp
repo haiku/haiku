@@ -566,7 +566,7 @@ fs_write_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 {
 	// check params
 	if (pos < 0 || pos + writeBytes > kMaxAttributeLength
-		|| !_attribute || !buffer) {
+		|| _attribute == NULL || (writeBytes > 0 && buffer == NULL)) {
 		errno = B_BAD_VALUE;
 		return -1;
 	}
@@ -587,7 +587,10 @@ fs_write_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 	AttributeHeader* header = (AttributeHeader*)attributeBuffer;
 	header->type = type;
 	memset(attributeBuffer + sizeof(AttributeHeader), 0, pos);
-	memcpy(attributeBuffer + sizeof(AttributeHeader) + pos, buffer, writeBytes);
+	if (writeBytes > 0) {
+		memcpy(attributeBuffer + sizeof(AttributeHeader) + pos, buffer,
+			writeBytes);
+	}
 
 	// write the attribute
 	ssize_t toWrite = sizeof(AttributeHeader) + pos + writeBytes;
