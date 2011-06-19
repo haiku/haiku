@@ -11,10 +11,13 @@
 #include <stdio.h>
 
 #include <ByteOrder.h>
+#include <Looper.h>
 #include <Messenger.h>
 #include <ScrollView.h>
 #include <String.h>
 
+#include "Architecture.h"
+#include "Team.h"
 #include "TeamMemoryBlock.h"
 
 
@@ -23,18 +26,19 @@ enum {
 };
 
 
-MemoryView::MemoryView(int32 hostEndianMode, int32 targetEndianMode)
+MemoryView::MemoryView(::Team* team)
 	:
-	BView("memoryView", B_WILL_DRAW | B_FRAME_EVENTS | B_SUBPIXEL_PRECISE),
+	BView("memoryView", B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE
+		| B_SUBPIXEL_PRECISE),
+	fTeam(team),
 	fTargetBlock(NULL),
 	fTargetAddress(0LL),
 	fCharWidth(0.0),
 	fLineHeight(0.0),
 	fTextCharsPerLine(0),
 	fHexBlocksPerLine(0),
-	fCurrentEndianMode(hostEndianMode),
-	fHostEndianMode(hostEndianMode),
-	fTargetEndianMode(targetEndianMode),
+	fCurrentEndianMode(team->GetArchitecture()->IsBigEndian()
+		? EndianModeBigEndian : EndianModeLittleEndian),
 	fHexMode(HexMode8BitInt),
 	fTextMode(TextModeASCII)
 {
@@ -49,9 +53,9 @@ MemoryView::~MemoryView()
 
 
 /*static */ MemoryView*
-MemoryView::Create(int32 hostEndianMode, int32 targetEndianMode)
+MemoryView::Create(::Team* team)
 {
-	MemoryView* self = new MemoryView(hostEndianMode, targetEndianMode);
+	MemoryView* self = new MemoryView(team);
 
 	try {
 		self->_Init();
@@ -73,32 +77,8 @@ MemoryView::SetTargetAddress(TeamMemoryBlock* block, target_addr_t address)
 
 	fTargetBlock = block;
 	fTargetBlock->AcquireReference();
+	MakeFocus(true);
 	BMessenger(this).SendMessage(MSG_TARGET_ADDRESS_CHANGED);
-}
-
-
-void
-MemoryView::ScrollToSelection()
-{
-	if (fTargetBlock != NULL) {
-		target_addr_t offset = fTargetAddress - fTargetBlock->BaseAddress();
-		int32 lineNumber = 0;
-		if (fHexBlocksPerLine > 0)
-			lineNumber = offset / (fHexBlocksPerLine * (1 << (fHexMode - 1)));
-		else if (fTextCharsPerLine > 0)
-			lineNumber = offset / fTextCharsPerLine;
-		float y = lineNumber * fLineHeight;
-		if (!Bounds().Contains(BPoint(0.0, y)))
-			ScrollTo(0.0, y);
-	}
-}
-
-
-void
-MemoryView::TargetedByScrollView(BScrollView* scrollView)
-{
-	BView::TargetedByScrollView(scrollView);
-	scrollView->ScrollBar(B_VERTICAL)->SetRange(0.0, 0.0);
 }
 
 
@@ -248,6 +228,96 @@ MemoryView::FrameResized(float width, float height)
 
 
 void
+MemoryView::KeyDown(const char* bytes, int32 numBytes)
+{
+	bool handled = true;
+	if (fTargetBlock != NULL) {
+		target_addr_t newAddress = fTargetAddress;
+		target_addr_t maxAddress = fTargetBlock->BaseAddress()
+			+ fTargetBlock->Size() - 1;
+		int32 blockSize = 1;
+		if (fHexMode != HexModeNone)
+			blockSize = 1 << (fHexMode - 1);
+		int32 lineCount = int32(Bounds().Height() / fLineHeight);
+
+		switch(bytes[0]) {
+			case B_UP_ARROW:
+			{
+				newAddress -= blockSize * fHexBlocksPerLine;
+				break;
+			}
+			case B_DOWN_ARROW:
+			{
+				newAddress += blockSize * fHexBlocksPerLine;
+				break;
+			}
+			case B_LEFT_ARROW:
+			{
+				newAddress -= blockSize;
+				break;
+			}
+			case B_RIGHT_ARROW:
+			{
+				newAddress += blockSize;
+				break;
+			}
+			case B_PAGE_UP:
+			{
+				newAddress -= (blockSize * fHexBlocksPerLine) * lineCount;
+				break;
+			}
+			case B_PAGE_DOWN:
+			{
+				newAddress += (blockSize * fHexBlocksPerLine) * lineCount;
+				break;
+			}
+			case B_HOME:
+			{
+				newAddress = fTargetBlock->BaseAddress();
+				break;
+			}
+			case B_END:
+			{
+				newAddress = maxAddress;
+				break;
+			}
+			default:
+			{
+				handled = false;
+				break;
+			}
+		}
+		if (handled) {
+			if (newAddress < fTargetBlock->BaseAddress())
+				newAddress = fTargetAddress;
+			else if (newAddress > maxAddress)
+				newAddress = maxAddress;
+
+			if (newAddress != fTargetAddress) {
+				fTargetAddress = newAddress;
+				BMessenger(this).SendMessage(MSG_TARGET_ADDRESS_CHANGED);
+			}
+		}
+	} else
+		handled = false;
+
+	if (!handled)
+		BView::KeyDown(bytes, numBytes);
+}
+
+
+void
+MemoryView::MakeFocus(bool isFocused)
+{
+	BScrollView* parent = dynamic_cast<BScrollView*>(Parent());
+	if (parent != NULL)
+		parent->SetBorderHighlighted(isFocused);
+
+	BView::MakeFocus(isFocused);
+}
+
+
+void
 MemoryView::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
@@ -293,6 +363,43 @@ MemoryView::MessageReceived(BMessage* message)
 			break;
 		}
 	}
+}
+
+
+void
+MemoryView::MouseDown(BPoint point)
+{
+	if (!IsFocus())
+		MakeFocus(true);
+
+	BView::MouseDown(point);
+}
+
+
+void
+MemoryView::ScrollToSelection()
+{
+	if (fTargetBlock != NULL) {
+		target_addr_t offset = fTargetAddress - fTargetBlock->BaseAddress();
+		int32 lineNumber = 0;
+		if (fHexBlocksPerLine > 0)
+			lineNumber = offset / (fHexBlocksPerLine * (1 << (fHexMode - 1)));
+		else if (fTextCharsPerLine > 0)
+			lineNumber = offset / fTextCharsPerLine;
+		float y = lineNumber * fLineHeight;
+		if (y < Bounds().top)
+			ScrollTo(0.0, y);
+		else if (y + fLineHeight > Bounds().bottom)
+			ScrollTo(0.0, y + fLineHeight - Bounds().Height());
+	}
+}
+
+
+void
+MemoryView::TargetedByScrollView(BScrollView* scrollView)
+{
+	BView::TargetedByScrollView(scrollView);
+	scrollView->ScrollBar(B_VERTICAL)->SetRange(0.0, 0.0);
 }
 
 
@@ -373,21 +480,19 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 		case HexMode16BitInt:
 		{
 			uint16 data = *((const uint16*)address);
-			if (fCurrentEndianMode != fHostEndianMode) {
-				switch(fCurrentEndianMode)
+			switch(fCurrentEndianMode)
+			{
+				case EndianModeBigEndian:
 				{
-					case EndianModeBigEndian:
-					{
-						data = B_HOST_TO_BENDIAN_INT16(data);
-					}
-					break;
-
-					case EndianModeLittleEndian:
-					{
-						data = B_HOST_TO_LENDIAN_INT16(data);
-					}
-					break;
+					data = B_HOST_TO_BENDIAN_INT16(data);
 				}
+				break;
+
+				case EndianModeLittleEndian:
+				{
+					data = B_HOST_TO_LENDIAN_INT16(data);
+				}
+				break;
 			}
 			snprintf(buffer, bufferSize, "%04" B_PRIx16,
 				data);
@@ -396,21 +501,19 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 		case HexMode32BitInt:
 		{
 			uint32 data = *((const uint32*)address);
-			if (fCurrentEndianMode != fHostEndianMode) {
-				switch(fCurrentEndianMode)
+			switch(fCurrentEndianMode)
+			{
+				case EndianModeBigEndian:
 				{
-					case EndianModeBigEndian:
-					{
-						data = B_HOST_TO_BENDIAN_INT32(data);
-					}
-					break;
-
-					case EndianModeLittleEndian:
-					{
-						data = B_HOST_TO_LENDIAN_INT32(data);
-					}
-					break;
+					data = B_HOST_TO_BENDIAN_INT32(data);
 				}
+				break;
+
+				case EndianModeLittleEndian:
+				{
+					data = B_HOST_TO_LENDIAN_INT32(data);
+				}
+				break;
 			}
 			snprintf(buffer, bufferSize, "%08" B_PRIx32,
 				data);
@@ -419,21 +522,19 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 		case HexMode64BitInt:
 		{
 			uint64 data = *((const uint16*)address);
-			if (fCurrentEndianMode != fHostEndianMode) {
-				switch(fCurrentEndianMode)
+			switch(fCurrentEndianMode)
+			{
+				case EndianModeBigEndian:
 				{
-					case EndianModeBigEndian:
-					{
-						data = B_HOST_TO_BENDIAN_INT64(data);
-					}
-					break;
-
-					case EndianModeLittleEndian:
-					{
-						data = B_HOST_TO_LENDIAN_INT64(data);
-					}
-					break;
+					data = B_HOST_TO_BENDIAN_INT64(data);
 				}
+				break;
+
+				case EndianModeLittleEndian:
+				{
+					data = B_HOST_TO_LENDIAN_INT64(data);
+				}
+				break;
 			}
 			snprintf(buffer, bufferSize, "%0*" B_PRIx64,
 				16, data);

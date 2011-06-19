@@ -46,24 +46,24 @@ class TeamMemoryBlock;
 
 class MemoryView : public BView {
 public:
-								MemoryView(int32 hostEndianMode,
-									int32 targetEndianMode);
+								MemoryView(::Team* team);
 	virtual						~MemoryView();
 
-	static MemoryView*			Create(int32 hostEndianMode,
-									int32 targetEndianMode);
-									// throws
+	static MemoryView*			Create(::Team* team);
+									// thrws
 
 			void				SetTargetAddress(TeamMemoryBlock* block,
 									target_addr_t address);
-			void				ScrollToSelection();
-
-	virtual void				TargetedByScrollView(BScrollView* scrollView);
 
 	virtual	void				AttachedToWindow();
 	virtual void				Draw(BRect rect);
 	virtual void				FrameResized(float width, float height);
+	virtual void				KeyDown(const char* bytes, int32 numBytes);
+	virtual void				MakeFocus(bool isFocused);
 	virtual void				MessageReceived(BMessage* message);
+	virtual void				MouseDown(BPoint point);
+			void				ScrollToSelection();
+	virtual void				TargetedByScrollView(BScrollView* scrollView);
 
 private:
 	void						_Init();
@@ -72,6 +72,7 @@ private:
 									int32 bufferSize, const char* address);
 
 private:
+	::Team*						fTeam;
 	TeamMemoryBlock*			fTargetBlock;
 	target_addr_t				fTargetAddress;
 	float						fCharWidth;
@@ -79,8 +80,6 @@ private:
 	int32						fTextCharsPerLine;
 	int32						fHexBlocksPerLine;
 	int32						fCurrentEndianMode;
-	int32						fHostEndianMode;
-	int32						fTargetEndianMode;
 	int32						fHexMode;
 	int32						fTextMode;
 };

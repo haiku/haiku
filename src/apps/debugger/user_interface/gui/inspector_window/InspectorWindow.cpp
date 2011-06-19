@@ -147,17 +147,10 @@ InspectorWindow::_Init()
 	fEndianMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTextMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	Architecture* architecture = fTeam->GetArchitecture();
-	int32 hostEndian;
-	int32 targetEndian;
-	targetEndian = architecture->IsBigEndian() ? EndianModeBigEndian
-		: EndianModeLittleEndian;
-	hostEndian = architecture->IsHostEndian() ? targetEndian
-		: architecture->IsBigEndian() ? EndianModeLittleEndian
-			: EndianModeBigEndian;
+	int32 targetEndian = fTeam->GetArchitecture()->IsBigEndian()
+		? EndianModeBigEndian : EndianModeLittleEndian;
 
-	scrollView->SetTarget(fMemoryView = MemoryView::Create(hostEndian,
-		targetEndian));
+	scrollView->SetTarget(fMemoryView = MemoryView::Create(fTeam));
 
 	fAddressInput->SetTarget(this);
 	fPreviousBlockButton->SetTarget(this);
@@ -176,7 +169,7 @@ InspectorWindow::_Init()
 	hexMenu->ItemAt(1)->SetMarked(true);
 	textMenu->ItemAt(1)->SetMarked(true);
 
-	if (architecture->IsBigEndian())
+	if (targetEndian == EndianModeBigEndian)
 		endianMenu->ItemAt(1)->SetMarked(true);
 	else
 		endianMenu->ItemAt(0)->SetMarked(true);
