@@ -20,7 +20,8 @@ class Link : public File {
 		Link(const Stream &stream);
 
 		status_t InitCheck();
-		status_t ReadLink(char *buffer, size_t bufferSize);
+
+		virtual status_t ReadLink(char *buffer, size_t bufferSize);
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);

@@ -119,7 +119,7 @@ public:
 									size_t bufferSize) const;
 
 	virtual	TarFS::Entry*		LookupEntry(const char* name);
-	virtual	::Node*				Lookup(const char* name, bool traverseLinks);
+	virtual	::Node*				LookupDontTraverse(const char* name);
 
 	virtual	status_t			GetNextEntry(void* cookie, char* nameBuffer,
 									size_t bufferSize);
@@ -152,6 +152,8 @@ public:
 									size_t bufferSize);
 	virtual	ssize_t				WriteAt(void* cookie, off_t pos,
 									const void* buffer, size_t bufferSize);
+
+	virtual	status_t			ReadLink(char* buffer, size_t bufferSize);
 
 	virtual	status_t			GetName(char* nameBuffer,
 									size_t bufferSize) const;
@@ -392,25 +394,13 @@ TarFS::Directory::LookupEntry(const char* name)
 
 
 ::Node*
-TarFS::Directory::Lookup(const char* name, bool traverseLinks)
+TarFS::Directory::LookupDontTraverse(const char* name)
 {
 	TarFS::Entry* entry = LookupEntry(name);
 	if (!entry)
 		return NULL;
 
 	Node* node = entry->ToNode();
-
-	if (traverseLinks) {
-		if (S_ISLNK(node->Type())) {
-			Symlink* symlink = static_cast<Symlink*>(node);
-			int fd = open_from(this, symlink->LinkPath(), O_RDONLY);
-			if (fd >= 0) {
-				node = get_node_from(fd);
-				close(fd);
-			}
-		}
-	}
-
 	if (node)
 		node->Acquire();
 
@@ -584,6 +574,20 @@ TarFS::Symlink::WriteAt(void* cookie, off_t pos, const void* buffer,
 	size_t bufferSize)
 {
 	return B_NOT_ALLOWED;
+}
+
+
+status_t
+TarFS::Symlink::ReadLink(char* buffer, size_t bufferSize)
+{
+	const char* path = fHeader->linkname;
+	size_t size = strlen(path) + 1;
+
+	if (size > bufferSize)
+		return B_BUFFER_OVERFLOW;
+
+	memcpy(buffer, path, size);
+	return B_OK;
 }
 
 

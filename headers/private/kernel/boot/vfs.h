@@ -26,8 +26,12 @@ class Node : public DoublyLinkedListLinkImpl<Node> {
 		virtual status_t Open(void **_cookie, int mode);
 		virtual status_t Close(void *cookie);
 
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize) = 0;
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize) = 0;
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
+			size_t bufferSize) = 0;
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
+			size_t bufferSize) = 0;
+
+		virtual status_t ReadLink(char* buffer, size_t bufferSize);
 
 		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
 		virtual status_t GetFileMap(struct file_map_run *runs, int32 *count);
@@ -55,7 +59,8 @@ class Directory : public Node {
 
 		virtual int32 Type() const;
 
-		virtual Node *Lookup(const char *name, bool traverseLinks) = 0;
+		virtual Node* Lookup(const char* name, bool traverseLinks);
+		virtual Node* LookupDontTraverse(const char* name) = 0;
 
 		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize) = 0;
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;

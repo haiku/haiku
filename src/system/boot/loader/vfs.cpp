@@ -22,6 +22,7 @@
 #include <syscall_utils.h>
 
 #include "RootFileSystem.h"
+#include "file_systems/packagefs/packagefs.h"
 
 
 using namespace boot;
@@ -95,6 +96,13 @@ Node::Close(void *cookie)
 {
 	TRACE(("%p::Close()\n", this));
 	return Release();
+}
+
+
+status_t
+Node::ReadLink(char* buffer, size_t bufferSize)
+{
+	return B_BAD_VALUE;
 }
 
 
@@ -206,6 +214,40 @@ int32
 Directory::Type() const
 {
 	return S_IFDIR;
+}
+
+
+Node*
+Directory::Lookup(const char* name, bool traverseLinks)
+{
+	Node* node = LookupDontTraverse(name);
+	if (node == NULL)
+		return NULL;
+
+	if (!traverseLinks || !S_ISLNK(node->Type()))
+		return node;
+
+	// the node is a symbolic link, so we have to resolve the path
+	char linkPath[B_PATH_NAME_LENGTH];
+	status_t error = node->ReadLink(linkPath, sizeof(linkPath));
+
+	node->Release();
+		// we don't need this one anymore
+
+	if (error != B_OK)
+		return NULL;
+
+	// let open_from() do the real work
+	int fd = open_from(this, linkPath, O_RDONLY);
+	if (fd < 0)
+		return NULL;
+
+	node = get_node_from(fd);
+	if (node != NULL)
+		node->Acquire();
+
+	close(fd);
+	return node;
 }
 
 
@@ -393,7 +435,7 @@ BootVolume::SetTo(Directory* rootDirectory)
 
 	fSystemDirectory = static_cast<Directory*>(systemNode);
 
-	// check, if the system is packaged
+	// try opening the system package
 	int packageFD = open_from(fSystemDirectory, "packages/haiku.hpkg",
 		O_RDONLY);
 	fPackaged = packageFD >= 0;
@@ -401,10 +443,18 @@ BootVolume::SetTo(Directory* rootDirectory)
 		return B_OK;
 
 	// the system is packaged -- mount the packagefs
-// TODO:...
-Unset();
-dprintf("BootVolume::SetTo(): packagefs not supported yet!\n");
-return B_NOT_SUPPORTED;
+	Directory* packageRootDirectory;
+	status_t error = packagefs_mount_file(packageFD, packageRootDirectory);
+	close(packageFD);
+	if (error != B_OK) {
+		Unset();
+		return error;
+	}
+
+	fSystemDirectory->Release();
+	fSystemDirectory = packageRootDirectory;
+
+	return B_OK;
 }
 
 
@@ -722,6 +772,13 @@ read_pos(int fd, off_t offset, void *buffer, size_t bufferSize)
 		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
 	RETURN_AND_SET_ERRNO(descriptor->ReadAt(offset, buffer, bufferSize));
+}
+
+
+ssize_t
+pread(int fd, void* buffer, size_t bufferSize, off_t offset)
+{
+	return read_pos(fd, offset, buffer, bufferSize);
 }
 
 

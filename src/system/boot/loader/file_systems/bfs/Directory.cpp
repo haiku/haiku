@@ -52,14 +52,14 @@ Directory::~Directory()
 }
 
 
-status_t 
+status_t
 Directory::InitCheck()
 {
 	return fStream.InitCheck();
 }
 
 
-status_t 
+status_t
 Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -72,7 +72,7 @@ Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -82,43 +82,18 @@ Directory::Close(void *cookie)
 }
 
 
-Node *
-Directory::Lookup(const char *name, bool traverseLinks)
+Node*
+Directory::LookupDontTraverse(const char* name)
 {
 	off_t id;
 	if (fTree.Find((uint8 *)name, strlen(name), &id) < B_OK)
 		return NULL;
 
-	Node *node = Stream::NodeFactory(fStream.GetVolume(), id);
-	if (!node)
-		return NULL;
-
-	if (S_ISLNK(node->Type())) {
-		// the node is a symbolic link, so we have to resolve the path
-		char linkPath[B_PATH_NAME_LENGTH];
-		((Link *)node)->ReadLink(linkPath, sizeof(linkPath));
-
-		delete node;
-			// we don't need this one anymore
-
-		int fd = open_from(this, linkPath, O_RDONLY);
-		if (fd >= 0) {
-			node = get_node_from(fd);
-			if (node != NULL)
-				node->Acquire();
-
-			close(fd);
-			return node;
-		}
-
-		return NULL;
-	}
-
-	return node;
+	return Stream::NodeFactory(fStream.GetVolume(), id);
 }
 
 
-status_t 
+status_t
 Directory::GetNextEntry(void *cookie, char *name, size_t size)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -129,7 +104,7 @@ Directory::GetNextEntry(void *cookie, char *name, size_t size)
 }
 
 
-status_t 
+status_t
 Directory::GetNextNode(void *cookie, Node **_node)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -149,7 +124,7 @@ Directory::GetNextNode(void *cookie, Node **_node)
 }
 
 
-status_t 
+status_t
 Directory::Rewind(void *cookie)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -158,7 +133,7 @@ Directory::Rewind(void *cookie)
 }
 
 
-bool 
+bool
 Directory::IsEmpty()
 {
 	TreeIterator iterator(&fTree);

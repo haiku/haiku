@@ -1,0 +1,46 @@
+SubDir HAIKU_TOP src system boot loader file_systems packagefs ;
+
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders kernel shared ;
+SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+
+DEFINES += _BOOT_MODE ;
+
+local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
+	kernel_cpp.h ] ;
+
+SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+
+
+KernelStaticLibrary boot_packagefs :
+	packagefs.cpp
+
+	# package kit
+	BlockBufferCacheNoLock.cpp
+
+	# package kit/hpkg
+	BlockBufferCache.cpp
+	BlockBufferCacheImpl.cpp
+	BufferCache.cpp
+	CachedBuffer.cpp
+	DataOutput.cpp
+	DataReader.cpp
+	ErrorOutput.cpp
+	FDDataReader.cpp
+	PackageContentHandler.cpp
+	PackageData.cpp
+	PackageDataReader.cpp
+	PackageEntry.cpp
+	PackageEntryAttribute.cpp
+	PackageReaderImpl.cpp
+	ReaderImplBase.cpp
+
+	# compression
+	ZlibCompressionBase.cpp
+	ZlibDecompressor.cpp
+
+	: -fno-pic
+;

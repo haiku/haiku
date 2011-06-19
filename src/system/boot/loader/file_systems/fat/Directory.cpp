@@ -351,10 +351,10 @@ Directory::Close(void *cookie)
 }
 
 
-Node *
-Directory::Lookup(const char *name, bool traverseLinks)
+Node*
+Directory::LookupDontTraverse(const char* name)
 {
-	TRACE(("FASFS::Directory::%s('%s', %d)\n", __FUNCTION__, name, traverseLinks));
+	TRACE(("FASFS::Directory::%s('%s')\n", __FUNCTION__, name));
 	if (!strcmp(name, ".")) {
 		Acquire();
 		return this;

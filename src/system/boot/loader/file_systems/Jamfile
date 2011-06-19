@@ -4,4 +4,5 @@ SubInclude HAIKU_TOP src system boot loader file_systems amiga_ffs ;
 SubInclude HAIKU_TOP src system boot loader file_systems bfs ;
 SubInclude HAIKU_TOP src system boot loader file_systems fat ;
 SubInclude HAIKU_TOP src system boot loader file_systems hfs_plus ;
+SubInclude HAIKU_TOP src system boot loader file_systems packagefs ;
 SubInclude HAIKU_TOP src system boot loader file_systems tarfs ;

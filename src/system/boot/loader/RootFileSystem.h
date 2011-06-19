@@ -20,7 +20,7 @@ class RootFileSystem : public Directory {
 		virtual status_t Open(void **_cookie, int mode);
 		virtual status_t Close(void *cookie);
 
-		virtual Node *Lookup(const char *name, bool traverseLinks);
+		virtual Node* LookupDontTraverse(const char* name);
 
 		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize);
 		virtual status_t GetNextNode(void *cookie, Node **_node);

@@ -45,14 +45,14 @@ Directory::~Directory()
 }
 
 
-status_t 
+status_t
 Directory::InitCheck()
 {
 	return fNode.ValidateCheckSum();
 }
 
 
-status_t 
+status_t
 Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -71,7 +71,7 @@ Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -81,8 +81,8 @@ Directory::Close(void *cookie)
 }
 
 
-Node *
-Directory::Lookup(const char *name, bool traverseLinks)
+Node*
+Directory::LookupDontTraverse(const char* name)
 {
 	if (!strcmp(name, ".")) {
 		Acquire();
@@ -113,7 +113,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 }
 
 
-status_t 
+status_t
 Directory::GetNextEntry(void *cookie, char *name, size_t size)
 {
 	HashIterator *iterator = (HashIterator *)cookie;
@@ -127,7 +127,7 @@ Directory::GetNextEntry(void *cookie, char *name, size_t size)
 }
 
 
-status_t 
+status_t
 Directory::GetNextNode(void *cookie, Node **_node)
 {
 	return B_ERROR;
