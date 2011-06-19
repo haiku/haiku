@@ -25,6 +25,10 @@ local librootFunctions =
 	strtol.o
 ;
 
+local librootArchFunctions =
+	atomic.o
+;
+
 local extraLinkerArgs = ;
 if $(HAIKU_BOARD_LOADER_BASE) {
 	extraLinkerArgs += --defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
@@ -59,6 +63,7 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	# libroot functions needed by the stage2 boot loader (compiled for the
 	# kernel)
 	$(librootFunctions:G=src!system!kernel!lib)
+	$(librootArchFunctions:G=src!system!kernel!lib!arch!$(TARGET_ARCH))
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(TARGET_BOOT_PLATFORM).ld
 	: -Bstatic $(extraLinkerArgs)
