@@ -38,6 +38,9 @@
 using BPrivate::FileDescriptorCloser;
 
 
+static const char* const kPublicDomainLicenseName = "Public Domain";
+
+
 // We need to remap a few file operations on non-Haiku platforms, so dealing
 // with symlinks works correctly.
 #ifndef __HAIKU__
@@ -425,6 +428,9 @@ PackageWriterImpl::_CheckLicenses()
 	const BObjectList<BString>& licenseList = fPackageInfo.LicenseList();
 	for (int i = 0; i < licenseList.CountItems(); ++i) {
 		const BString& licenseName = *licenseList.ItemAt(i);
+		if (licenseName == kPublicDomainLicenseName)
+			continue;
+
 		BEntry license;
 		if (systemLicenseDir.FindEntry(licenseName.String(), &license) == B_OK)
 			continue;
