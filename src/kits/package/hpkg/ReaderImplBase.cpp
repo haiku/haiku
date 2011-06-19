@@ -569,7 +569,12 @@ ReaderImplBase::CheckCompression(const SectionInfo& section) const
 status_t
 ReaderImplBase::ParseStrings()
 {
-	// allocate table
+	// allocate table, if there are any strings
+	if (fCurrentSection->stringsCount == 0) {
+		fCurrentSection->currentOffset += fCurrentSection->stringsLength;
+		return B_OK;
+	}
+
 	fCurrentSection->strings
 		= new(std::nothrow) char*[fCurrentSection->stringsCount];
 	if (fCurrentSection->strings == NULL) {
