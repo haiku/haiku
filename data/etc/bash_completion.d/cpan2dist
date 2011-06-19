@@ -1,0 +1,52 @@
+# bash completion for cpan2dist
+
+have cpan2dist &&
+_cpan2dist()
+{
+    local cur prev packagelist cpandirs
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        --format)
+            # should remove ":" from COMP_WORDBREAKS, but doesn't work (?)
+            COMPREPLY=( $( compgen -W '$(perl -MCPANPLUS::Dist -e \
+                "print map { \"\$_\n\" } CPANPLUS::Dist->dist_types")' \
+                -- "$cur" ) )
+            return 0
+            ;;
+        --banlist|--ignorelist|--modulelist|--logfile)
+            _filedir
+            return 0
+            ;;
+    esac
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '--help --skiptest --force --install \
+            --verbose --keepsource --makefile --buildprereq \
+            --archive --flushcache --defaults --edit-metafile \
+            --format --ban --banlist --ignore --ignorelist \
+            --modulelist --logfile --timeout --set-config \
+            --set-program --dist-opts --default-banlist \
+            --default-ignorelist' -- $cur ) )
+    else
+        cpandirs=( "$HOME/.cpanplus/" "$HOME/.cpan/source/modules/" )
+        for dir in ${cpandirs[@]}; do
+            [[ -d "$dir" && -r "$dir/02packages.details.txt.gz" ]] && \
+                packagelist="$dir/02packages.details.txt.gz"
+        done
+        COMPREPLY=( $( zgrep "^${cur//-/::}" \
+            $packagelist 2>/dev/null \
+            | awk '{print $1}' | sed -e 's/::/-/g' ) )
+    fi
+} &&
+complete -F _cpan2dist -o default cpan2dist
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

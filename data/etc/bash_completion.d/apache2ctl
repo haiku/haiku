@@ -1,0 +1,24 @@
+# apache2ctl(1) completion
+
+have apache2ctl && {
+_apache2ctl() {
+    local APWORDS cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    APWORDS=$(apache2ctl 2>&1 >/dev/null | awk 'NR<2 { print $3; exit }' | \
+        tr "|" " ")
+
+    COMPREPLY=( $( compgen -W "$APWORDS" -- "$cur" ) )
+}
+complete -F _apache2ctl apache2ctl
+}
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

@@ -1,0 +1,37 @@
+# chsh(1) completion
+
+_chsh()
+{
+    local cur prev
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        --list-shells|--help|-v|--version)
+            return 0
+            ;;
+        -s|--shell)
+            _shells
+            return 0
+            ;;
+    esac
+
+    if [[ "$cur" == -* && "$( uname -s )" == @(Linux|GNU|GNU/*) ]]; then
+        COMPREPLY=( $( compgen -W '--shell --list-shells --help --version' \
+            -- "$cur" ) )
+    else
+        COMPREPLY=( $( compgen -u -- "$cur" ) )
+    fi
+
+    return 0
+}
+complete -F _chsh chsh
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

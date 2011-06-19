@@ -1,0 +1,26 @@
+# BitKeeper completion adapted from code by  Bart Trojanowski <bart@jukie.net>
+
+have bk &&
+_bk() {
+    local BKCMDS
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    BKCMDS="$( bk help topics | awk '/^  bk/ { print $4 }' | \
+        xargs printf '%s ' )"
+
+    COMPREPLY=( $( compgen -W "$BKCMDS" -- "$cur" ) )
+    _filedir
+
+    return 0
+} &&
+complete -F _bk bk
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

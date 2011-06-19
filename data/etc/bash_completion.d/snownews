@@ -1,0 +1,25 @@
+# snownews(1) completion
+
+have snownews &&
+_snownews()
+{
+    local cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    if [[ "$cur" == -* ]]; then
+        # return list of available options
+        COMPREPLY=( $( compgen -W '--update --help --version \
+            --disable-versioncheck -u -h -V' -- "$cur"))
+    fi
+} &&
+complete -F _snownews snownews
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

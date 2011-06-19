@@ -1,0 +1,22 @@
+# bash completion for Slackware Linux pkgtools
+
+have removepkg && [ -f /etc/slackware-version ] &&
+_removepkg()
+{
+    local packages cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    COMPREPLY=( $( (cd /var/log/packages; compgen -f -- "$cur") ) )
+} &&
+complete -F _removepkg -o filenames removepkg &&
+    complete -o dirnames -f -X '!*.t[bglx]z' installpkg upgradepkg explodepkg
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

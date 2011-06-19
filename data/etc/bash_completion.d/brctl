@@ -1,0 +1,48 @@
+# bash completion for brctl
+
+have brctl &&
+_brctl()
+{
+    local cur command
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+    command=${COMP_WORDS[1]}
+
+    case $COMP_CWORD in
+        1)
+            COMPREPLY=( $( compgen -W "addbr delbr addif delif \
+                setageing setbridgeprio setfd sethello \
+                setmaxage setpathcost setportprio show \
+                showmacs showstp stp" -- "$cur" ) )
+            ;;
+        2)
+            case $command in
+                show)
+                    ;;
+                *)
+                    COMPREPLY=( $( compgen -W "$(brctl show | \
+                        awk 'NR>1 {print $1}' )" -- "$cur" ) )
+            esac
+            ;;
+        3)
+            case $command in
+                addif|delif)
+                    _configured_interfaces
+                    ;;
+                stp)
+                    COMPREPLY=( $( compgen -W 'on off' -- "$cur" ) )
+                    ;;
+            esac
+            ;;
+    esac
+} &&
+complete -F _brctl -o default brctl
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

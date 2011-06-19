@@ -1,0 +1,52 @@
+# bash completion for xrandr
+
+have xrandr &&
+_xrandr()
+{
+    local cur prev output modes
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        --output)
+            local outputs=$(xrandr|awk '/connected/ {print $1}')
+            COMPREPLY=( $(compgen -W "$outputs" -- "$cur"))
+            return 0
+            ;;
+        --mode)
+            for(( i = 1; i < COMP_CWORD; i++ )); do
+                if [[ "${COMP_WORDS[i]}" == "--output" ]]; then
+                    output=${COMP_WORDS[i+1]}
+                    break
+                fi
+            done
+            modes=$(xrandr|sed -e "1,/$output/ d" \
+                -e "/connected/,$ d"|awk '{print $1}')
+            COMPREPLY=( $( compgen -W "$modes" -- "$cur"))
+            return 0
+            ;;
+    esac
+
+    case $cur in
+        *)
+            COMPREPLY=( $(compgen -W '-display -help --orientation --query \
+                --size --rate --version -x -y --screen --verbose --dryrun \
+                --prop --fb --fbmm --dpi --output --auto --mode --preferred \
+                --pos --reflect --rotate --left-of --right-of --above --below \
+                --same-as --set --off --crtc --newmode --rmmode --addmode \
+                --delmode' -- "$cur") )
+            return 0
+            ;;
+    esac
+
+    return 0
+} &&
+complete -F _xrandr xrandr
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

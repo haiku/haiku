@@ -116,11 +116,10 @@ function _svn_lls()
 #      suggested for 'revert', only not svn-managed files for 'add', and so on.
 #      Possible values are:
 #      - username: guess usernames from ~/.subversion/auth/...
-#      - urls: guess urls from ~/.subversion/auth/... or others
 #      - svnstatus: use 'svn status' for completion
 #      - recurse: allow recursion (expensive)
 #      - externals: recurse into externals (very expensive)
-#     Former options are reasonable, but beware that both later options
+#     Both former options are reasonable, but beware that both later options
 #     may be unadvisable if used on large working copies.
 #     None of these costly completions are activated by default.
 #     Argument completion outside a working copy results in an error message.
@@ -132,8 +131,6 @@ function _svn_lls()
 # - obsolete commands could be removed? (e.g. resolved)
 # - completion does not work properly when editing in the middle of the line
 #   status/previous are those at the end of the line, not at the entry position
-# - url completion should select more cases where it is relevant
-# - url completion of http:// schemas could suggest sub directories?
 _svn()
 {
 	local cur cmds cmdOpts pOpts mOpts rOpts qOpts nOpts optsParam opt
@@ -145,9 +142,9 @@ _svn()
 	cmds='add blame annotate praise cat changelist cl checkout co cleanup'
 	cmds="$cmds commit ci copy cp delete remove rm diff export help import"
 	cmds="$cmds info list ls lock log merge mergeinfo mkdir move mv rename"
-	cmds="$cmds patch propdel pdel propedit pedit propget pget proplist"
-	cmds="$cmds plist propset pset resolve resolved revert status switch"
-	cmds="$cmds unlock update"
+	cmds="$cmds propdel pdel propedit pedit propget pget proplist plist"
+	cmds="$cmds propset pset resolve resolved revert status switch unlock"
+	cmds="$cmds update"
 
 	# help options have a strange command status...
 	local helpOpts='--help -h'
@@ -167,9 +164,7 @@ _svn()
 	# svn:* and other (env SVN_BASH_*_PROPS) properties
 	local svnProps revProps allProps psCmds propCmds
 
-	# svn and user configured "file" (or directory) properties
-	# the "svn:mergeinfo" prop is not included by default because it is
-	# managed automatically, so there should be no need to edit it by hand.
+	# svn and user configured file properties
 	svnProps="svn:keywords svn:executable svn:needs-lock svn:externals
 	          svn:ignore svn:eol-style svn:mime-type $SVN_BASH_FILE_PROPS"
 
@@ -182,9 +177,6 @@ _svn()
 	# subcommands that expect property names
 	psCmds='propset|pset|ps'
 	propCmds="$psCmds|propget|pget|pg|propedit|pedit|pe|propdel|pdel|pd"
-
-	# possible URL schemas to access a subversion server
-	local urlSchemas='file:/// http:// https:// svn:// svn+ssh://'
 
 	# Parse arguments and set various variables about what was found.
 	#
@@ -366,45 +358,6 @@ _svn()
 	then
 	    COMPREPLY=( $( compgen -W "$cmds" -- $cur ) )
 	    return 0
-	fi
-
-	# URL completion
-	if [[ $cmd == @(co|checkout|ls|list) && $stat = 'arg' && \
-			$SVN_BASH_COMPL_EXT == *urls* ]]
-	then
-		# see about COMP_WORDBREAKS workaround in prop completion
-		if [[ $cur == file:* ]]
-		then
-			# file completion for file:// urls
-			local where=${cur/file:/}
-			COMPREPLY=( $(compgen -d -S '/' -X '*/.*' -- $where ) )
-			return
-		elif [[ $cur == *:* ]]
-		then
-			# get known urls
-			local urls= file=
-			for file in ~/.subversion/auth/svn.simple/* ; do
-				if [ -r $file ] ; then
-					local url=$(_svn_read_hashfile svn:realmstring < $file)
-					url=${url/*</}
-					url=${url/>*/}
-					urls="$urls $url"
-				fi
-			done
-
-			# only suggest/show possible suffixes
-			local prefix=${cur%:*} suffix=${cur#*:} c= choices=
-			for c in $urls ; do
-				[[ $c == $prefix:* ]] && choices="$choices ${c#*:}"
-			done
-
-			COMPREPLY=( $(compgen -W "$choices" -- $suffix ) )
-			return
-		else
-			# show schemas
-			COMPREPLY=( $(compgen -W "$urlSchemas" -- $cur) )
-			return
-		fi
 	fi
 
 	if [[ $cmd = 'merge' || $cmd = 'mergeinfo' ]]
@@ -813,7 +766,7 @@ _svn()
 	diff|di)
 		cmdOpts="$rOpts -x --extensions --diff-cmd --no-diff-deleted \
 		         $nOpts $pOpts --force --old --new --notice-ancestry \
-		         -c --change --summarize --changelist --xml --svnpatch"
+		         -c --change --summarize --changelist --xml"
 		;;
 	export)
 		cmdOpts="$rOpts $qOpts $pOpts $nOpts --force --native-eol \
@@ -857,9 +810,6 @@ _svn()
 	move|mv|rename|ren)
 		cmdOpts="$mOpts $rOpts $qOpts --force --editor-cmd $pOpts \
                          --parents"
-		;;
-	patch)
-		cmdOpts="$qOpts --force"
 		;;
 	propdel|pdel|pd)
 		cmdOpts="$qOpts -R --recursive $rOpts $pOpts --changelist \
@@ -1380,88 +1330,3 @@ _svnsync ()
 	return 0
 }
 complete -F _svnsync -o default svnsync
-
-# reasonable completion for 'svnversion'
-_svnversion ()
-{
-	local cmdOpts=" -n --no-newline -c --committed -h --help --version "
-	local cur=${COMP_WORDS[COMP_CWORD]}
-
-	COMPREPLY=()
-
-	# parse current options
-	local options= wcpath= trailurl= last='none' stat= opt= i=-1 isCur=
-	for opt in ${COMP_WORDS[@]}
-	do
-		[[ $i -eq $COMP_CWORD ]] && stat=$last
-		let i++
-
-		# are we processing the current word?
-		isCur=
-		[[ $i -eq $COMP_CWORD ]] && isCur=1
-
-		# skip first command, should be 'svnversion'
-		if [ $last = 'none' ] ; then
-			last='first'
-			continue
-		fi
-
-		# get options
-		if [[ $last != 'arg' && $opt == -* ]]
-		then
-			# if '--' is at the current position, it means that we are looking
-			# for '--*' options, and not the end of option processing.
-			if [[ $opt = '--' && ! $isCur ]]
-			then
-				last='arg'
-			else
-				options="$options $opt "
-				last='opt'
-			fi
-			continue
-		fi
-		# get arguments
-		if [[ $opt != -* ]]
-		then
-			last='arg'
-			if [[ ! $wcpath ]]
-			then
-				wcpath=$opt
-			elif [[ ! $trailurl ]]
-			then
-				trailurl=$opt
-			fi
-		fi
-	done
-	[[ $stat ]] || stat=$last
-
-	# argument part
-	if [[ $cur != -* || $stat = 'arg' ]]
-	then
-		[[ $wcpath && $trailurl ]] && COMPREPLY=( '' )
-		return 0
-	fi
-
-	# suggest options, and  take out already given options
-	for opt in $options
-	do
-		# take out options
-		cmdOpts=${cmdOpts/ $opt / }
-
-		# take out alternatives
-		case $opt in
-			-n)              cmdOpts=${cmdOpts/ --no-newline / } ;;
-			--no-newline)    cmdOpts=${cmdOpts/ -n / } ;;
-			-h)              cmdOpts=${cmdOpts/ --help / } ;;
-			--help)          cmdOpts=${cmdOpts/ -h / } ;;
-			-c)              cmdOpts=${cmdOpts/ --committed / } ;;
-			--committed)     cmdOpts=${cmdOpts/ -c / } ;;
-		esac
-	done
-
-	COMPREPLY=( $( compgen -W "$cmdOpts" -- $cur ) )
-
-	return 0
-}
-# -X option does not seem to work?
-complete -F _svnversion -o dirnames -X '*.svn*' svnversion

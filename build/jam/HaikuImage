@@ -432,11 +432,28 @@ SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system data spell_check word_dictionary : $(spellFiles) ;
 
-local etcFiles = inputrc profile ;
+local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
+local etcFiles = inputrc profile bash_completion ;
 etcFiles = $(etcFiles:G=etc) ;
-SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
+SEARCH on $(etcFiles) = [ FDirName $(etcDir) ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
 AddFilesToHaikuImage common etc : $(etcFiles) ;
+
+local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;
+profileFiles = $(profileFiles:G=profile-d) ;
+AddDirectoryToHaikuImage common etc profile.d ;
+AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
+
+local bashCompletionFiles = [ Glob $(etcDir)/bash_completion.d : * ] ;
+local bashCompletionHelperFiles
+    = [ Glob $(etcDir)/bash_completion.d/helpers : * ] ;
+bashCompletionFiles = $(bashCompletionFiles:G=bash-completion) ;
+bashCompletionHelperFiles = $(bashCompletionHelperFiles:G=bash-completion-hlp) ;
+AddDirectoryToHaikuImage common etc bash_completion.d ;
+AddDirectoryToHaikuImage common etc bash_completion.d helpers ;
+AddFilesToHaikuImage common etc bash_completion.d : $(bashCompletionFiles) ;
+AddFilesToHaikuImage common etc bash_completion.d helpers
+    : $(bashCompletionHelperFiles) ;
 
 local dataFiles = teapot.data ;
 dataFiles = $(dataFiles:G=data) ;

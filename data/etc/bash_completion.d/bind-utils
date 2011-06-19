@@ -1,0 +1,23 @@
+# bash completion for nslookup
+
+have nslookup &&
+_nslookup()
+{
+    local cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    COMPREPLY=( $( compgen -P '-' -W 'all class= debug d2 domain= srchlist= \
+        defname search port= querytype= type= recurse retry root timeout vc \
+        ignoretc' -- "$cur" ) )
+} &&
+complete -F _nslookup nslookup
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

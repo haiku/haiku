@@ -1,0 +1,22 @@
+# PINE address-book completion
+
+have pine || have alpine &&
+_pineaddr()
+{
+    local cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    COMPREPLY=( $( compgen -W '$( awk "{print \$1}" ~/.addressbook \
+        2>/dev/null)' -- "$cur" ) )
+} &&
+complete -F _pineaddr -o default pine alpine
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

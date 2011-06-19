@@ -1,0 +1,23 @@
+# autorpm(8) completion
+
+have autorpm &&
+_autorpm()
+{
+    local cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+
+    COMPREPLY=( $( compgen -W '--notty --debug --help --version auto add \
+        fullinfo info help install list remove set' -- "$cur" ) )
+
+} &&
+complete -F _autorpm autorpm
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

@@ -1,0 +1,36 @@
+# bash completion for yp-tools
+
+have ypcat &&
+_ypmatch()
+{
+    local cur map cmd
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur
+    cmd=${1##*/}
+
+    [[ $cmd == ypcat && $COMP_CWORD -gt 1 ]] && return 0
+    [[ $cmd == ypmatch && $COMP_CWORD -gt 2 ]] && return 0
+
+    if [[ $cmd == ypmatch && $COMP_CWORD -eq 1 && \
+        ${#COMP_WORDS[@]} -eq 3 ]]; then
+        map=${COMP_WORDS[2]}
+        COMPREPLY=( $( compgen -W '$( ypcat $map | \
+            cut -d':' -f 1 )' -- "$cur") )
+    else
+        [[ $cmd == ypmatch && $COMP_CWORD -ne 2 ]] && return 0
+        COMPREPLY=( $( compgen -W \
+            '$( printf "%s\n" $(ypcat -x | cut -d"\"" -f 2) )' -- "$cur"))
+    fi
+
+    return 0
+} &&
+complete -F _ypmatch ypmatch ypcat
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh

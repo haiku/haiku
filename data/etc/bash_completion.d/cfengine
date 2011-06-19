@@ -1,0 +1,88 @@
+# bash completion for cfengine
+
+have cfagent && {
+_cfagent_options()
+{
+    COMPREPLY=( $( compgen -W '--sysadm --force-net-copy --no-check-files \
+        --no-check-mounts --debug --define --no-edits --enforce-links --file \
+        --help --no-hard-classes --no-ifconfig --inform --no-copy --no-lock \
+        --traverse-links --delete-stale-links --no-mount --no-modules \
+        --dry-run --negate --parse-only --no-processes --no-splay \
+        --no-commands --silent --no-tidy --use-env --underscore-classes \
+        --verbose --version --no-preconf --no-links --quiet' -- "$cur" ) )
+}
+
+_cfagent()
+{
+    local cur prev
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        -f|--file)
+            _filedir
+            return 0
+            ;;
+    esac
+
+    if [[ "$cur" == -* ]]; then
+        _cfagent_options
+    fi
+}
+complete -F _cfagent cfagent
+
+_cfrun()
+{
+    local i section cfinputs cur prev
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    section=1
+    for (( i=1; i < COMP_CWORD; i++ )); do
+        if [[ "${COMP_WORDS[i]}" == -- ]]; then
+            section=$((section + 1))
+        fi
+    done
+
+    case $section in
+        1)
+            case $prev in
+                -f)
+                    _filedir
+                    return 0
+                    ;;
+            esac
+
+            if [[ "$cur" == -* ]]; then
+                COMPREPLY=( $( compgen -W '-f -h -d -S -T -v' -- $cur ) )
+            else
+                hostfile=${CFINPUTS:-/var/lib/cfengine/inputs}/cfrun.hosts
+                for (( i=1; i < COMP_CWORD; i++ )); do
+                    if [[ "${COMP_WORDS[i]}" == -f ]]; then
+                        hostfile=${COMP_WORDS[i+1]}
+                        break
+                    fi
+                done
+                [ ! -f $hostfile ] && return 0
+
+                COMPREPLY=( $(compgen -W  "$( command grep -v \
+                    -E '(=|^$|^#)' $hostfile )" -- "$cur" ) )
+            fi
+            ;;
+        2)
+            _cfagent_options
+            ;;
+    esac
+}
+complete -F _cfrun cfrun
+}
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh
