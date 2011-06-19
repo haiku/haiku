@@ -285,7 +285,8 @@ private:
 				return errno;
 			}
 			if ((size_t)bytesWritten != toCopy) {
-				fprintf(stderr, "Error: Failed to write all data\n");
+				fprintf(stderr, "Error: Failed to write all data (%zd of "
+					"%zu)\n", bytesWritten, toCopy);
 				return B_ERROR;
 			}
 
