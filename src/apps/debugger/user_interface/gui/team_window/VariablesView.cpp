@@ -70,14 +70,16 @@ private:
 
 class VariablesView::ModelNode : public BReferenceable {
 public:
-	ModelNode(ModelNode* parent, ValueNodeChild* nodeChild,
+	ModelNode(ModelNode* parent, Variable* variable, ValueNodeChild* nodeChild,
 		bool isPresentationNode)
 		:
 		fParent(parent),
 		fNodeChild(nodeChild),
+		fVariable(variable),
 		fValue(NULL),
 		fValueHandler(NULL),
 		fTableCellRenderer(NULL),
+		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
 		fHidden(false)
 	{
@@ -94,6 +96,29 @@ public:
 			child->ReleaseReference();
 
 		fNodeChild->ReleaseReference();
+
+		if (fComponentPath != NULL)
+			fComponentPath->ReleaseReference();
+	}
+
+	status_t Init()
+	{
+		fComponentPath = new(std::nothrow) TypeComponentPath();
+		if (fComponentPath == NULL)
+			return B_NO_MEMORY;
+
+		if (fParent != NULL)
+			*fComponentPath = *fParent->GetPath();
+
+		TypeComponent component;
+		// TODO: this should actually discriminate between different
+		// classes of type component kinds
+		component.SetToBaseType(fNodeChild->GetType()->Kind(),
+			0, fNodeChild->Name());
+
+		fComponentPath->AddComponent(component);
+
+		return B_OK;
 	}
 
 	ModelNode* Parent() const
@@ -116,6 +141,11 @@ public:
 		return fNodeChild->GetType();
 	}
 
+	Variable* GetVariable() const
+	{
+		return fVariable;
+	}
+
 	Value* GetValue() const
 	{
 		return fValue;
@@ -133,6 +163,11 @@ public:
 
 		if (fValue != NULL)
 			fValue->AcquireReference();
+	}
+
+	TypeComponentPath* GetPath() const
+	{
+		return fComponentPath;
 	}
 
 	ValueHandler* GetValueHandler() const
@@ -219,10 +254,12 @@ private:
 private:
 	ModelNode*				fParent;
 	ValueNodeChild*			fNodeChild;
+	Variable*				fVariable;
 	Value*					fValue;
 	ValueHandler*			fValueHandler;
 	TableCellValueRenderer*	fTableCellRenderer;
 	ChildList				fChildren;
+	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
 	bool					fHidden;
 
@@ -353,7 +390,7 @@ private:
 private:
 			// container must be locked
 
-			status_t			_AddNode(ModelNode* parent,
+			status_t			_AddNode(Variable* variable, ModelNode* parent,
 									ValueNodeChild* nodeChild,
 									bool isPresentationNode = false);
 			void				_AddNode(Variable* variable);
@@ -780,8 +817,10 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 	int32 childCount = valueNode->CountChildren();
 	for (int32 i = 0; i < childCount; i++) {
 		ValueNodeChild* child = valueNode->ChildAt(i);
-		if (fNodeTable.Lookup(child) == NULL)
-			_AddNode(modelNode, child, child->IsInternal());
+		if (fNodeTable.Lookup(child) == NULL) {
+			_AddNode(modelNode->GetVariable(), modelNode, child,
+				child->IsInternal());
+		}
 	}
 }
 
@@ -956,8 +995,8 @@ VariablesView::VariableTableModel::NotifyNodeChanged(ModelNode* node)
 
 
 status_t
-VariablesView::VariableTableModel::_AddNode(ModelNode* parent,
-	ValueNodeChild* nodeChild, bool isPresentationNode)
+VariablesView::VariableTableModel::_AddNode(Variable* variable,
+	ModelNode* parent, ValueNodeChild* nodeChild, bool isPresentationNode)
 {
 	// Don't create nodes for unspecified types -- we can't get/show their
 	// value anyway.
@@ -965,10 +1004,10 @@ VariablesView::VariableTableModel::_AddNode(ModelNode* parent,
 	if (nodeChildRawType->Kind() == TYPE_UNSPECIFIED)
 		return B_OK;
 
-	ModelNode* node = new(std::nothrow) ModelNode(parent, nodeChild,
+	ModelNode* node = new(std::nothrow) ModelNode(parent, variable, nodeChild,
 		isPresentationNode);
 	BReference<ModelNode> nodeReference(node, true);
-	if (node == NULL)
+	if (node == NULL || node->Init() != B_OK)
 		return B_NO_MEMORY;
 
 	int32 childIndex;
@@ -1029,7 +1068,7 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable)
 	}
 
 	// create the model node
-	status_t error = _AddNode(NULL, nodeChild, false);
+	status_t error = _AddNode(variable, NULL, nodeChild, false);
 	if (error != B_OK)
 		return;
 
@@ -1231,7 +1270,7 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 	if (thread == fThread && stackFrame == fStackFrame)
 		return;
 
-//	_SaveViewState();
+	_SaveViewState();
 
 	_FinishContextMenu(true);
 
@@ -1262,7 +1301,7 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 		}
 	}
 
-//	_RestoreViewState();
+	_RestoreViewState();
 }
 
 
@@ -1490,7 +1529,7 @@ VariablesView::_FinishContextMenu(bool force)
 }
 
 
-#if 0
+
 void
 VariablesView::_SaveViewState() const
 {
@@ -1574,7 +1613,7 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
 
 		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
-			node->Path(), nodeInfo);
+			node->GetPath(), nodeInfo);
 		if (error != B_OK)
 			return error;
 
@@ -1602,7 +1641,7 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 
 		// apply the node's info, if any
 		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
-			node->GetVariable()->ID(), node->Path());
+			node->GetVariable()->ID(), node->GetPath());
 		if (nodeInfo != NULL) {
 			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
 
@@ -1618,7 +1657,6 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 
 	return B_OK;
 }
-#endif	// 0
 
 
 // #pragma mark - Listener

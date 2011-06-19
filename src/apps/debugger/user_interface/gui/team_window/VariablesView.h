@@ -65,14 +65,14 @@ private:
 			void				_RequestNodeValue(ModelNode* node);
 			void				_FinishContextMenu(bool force);
 
-//			void				_SaveViewState() const;
-//			void				_RestoreViewState();
-//			status_t			_AddViewStateDescendentNodeInfos(
-//									VariablesViewState* viewState, void* parent,
-//									TreeTablePath& path) const;
-//			status_t			_ApplyViewStateDescendentNodeInfos(
-//									VariablesViewState* viewState, void* parent,
-//									TreeTablePath& path);
+			void				_SaveViewState() const;
+			void				_RestoreViewState();
+			status_t			_AddViewStateDescendentNodeInfos(
+									VariablesViewState* viewState, void* parent,
+									TreeTablePath& path) const;
+			status_t			_ApplyViewStateDescendentNodeInfos(
+									VariablesViewState* viewState, void* parent,
+									TreeTablePath& path);
 
 private:
 			Thread*				fThread;
