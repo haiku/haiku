@@ -128,10 +128,10 @@ BMailSettings::WindowFollowsCorner()
 
 
 void
-BMailSettings::SetWindowFollowsCorner(int32 which_corner)
+BMailSettings::SetWindowFollowsCorner(int32 whichCorner)
 {
-	if (fData.ReplaceInt32("WindowFollowsCorner",which_corner))
-		fData.AddInt32("WindowFollowsCorner",which_corner);
+	if (fData.ReplaceInt32("WindowFollowsCorner", whichCorner) != B_OK)
+		fData.AddInt32("WindowFollowsCorner", whichCorner);
 }
 
 
@@ -151,8 +151,8 @@ BMailSettings::ShowStatusWindow()
 void
 BMailSettings::SetShowStatusWindow(uint32 mode)
 {
-	if (fData.ReplaceInt32("ShowStatusWindow",mode))
-		fData.AddInt32("ShowStatusWindow",mode);
+	if (fData.ReplaceInt32("ShowStatusWindow", mode) != B_OK)
+		fData.AddInt32("ShowStatusWindow", mode);
 }
 
 
@@ -164,10 +164,10 @@ BMailSettings::DaemonAutoStarts()
 
 
 void
-BMailSettings::SetDaemonAutoStarts(bool does_it)
+BMailSettings::SetDaemonAutoStarts(bool startIt)
 {
-	if (fData.ReplaceBool("DaemonAutoStarts",does_it))
-		fData.AddBool("DaemonAutoStarts",does_it);
+	if (fData.ReplaceBool("DaemonAutoStarts", startIt) != B_OK)
+		fData.AddBool("DaemonAutoStarts", startIt);
 }
 
 
@@ -181,8 +181,8 @@ BMailSettings::ConfigWindowFrame()
 void
 BMailSettings::SetConfigWindowFrame(BRect frame)
 {
-	if (fData.ReplaceRect("ConfigWindowFrame",frame))
-		fData.AddRect("ConfigWindowFrame",frame);
+	if (fData.ReplaceRect("ConfigWindowFrame", frame) != B_OK)
+		fData.AddRect("ConfigWindowFrame", frame);
 }
 
 
@@ -200,8 +200,8 @@ BMailSettings::StatusWindowFrame()
 void
 BMailSettings::SetStatusWindowFrame(BRect frame)
 {
-	if (fData.ReplaceRect("StatusWindowFrame",frame))
-		fData.AddRect("StatusWindowFrame",frame);
+	if (fData.ReplaceRect("StatusWindowFrame", frame) != B_OK)
+		fData.AddRect("StatusWindowFrame", frame);
 }
 
 
@@ -219,8 +219,8 @@ BMailSettings::StatusWindowWorkspaces()
 void
 BMailSettings::SetStatusWindowWorkspaces(int32 workspace)
 {
-	if (fData.ReplaceInt32("StatusWindowWorkSpace",workspace))
-		fData.AddInt32("StatusWindowWorkSpace",workspace);
+	if (fData.ReplaceInt32("StatusWindowWorkSpace", workspace) != B_OK)
+		fData.AddInt32("StatusWindowWorkSpace", workspace);
 
 	BMessage msg('wsch');
 	msg.AddInt32("StatusWindowWorkSpace",workspace);
@@ -238,11 +238,11 @@ BMailSettings::StatusWindowLook()
 void
 BMailSettings::SetStatusWindowLook(int32 look)
 {
-	if (fData.ReplaceInt32("StatusWindowLook",look))
-		fData.AddInt32("StatusWindowLook",look);
+	if (fData.ReplaceInt32("StatusWindowLook", look) != B_OK)
+		fData.AddInt32("StatusWindowLook", look);
 
 	BMessage msg('lkch');
-	msg.AddInt32("StatusWindowLook",look);
+	msg.AddInt32("StatusWindowLook", look);
 	BMessenger("application/x-vnd.Be-POST").SendMessage(&msg);
 }
 
@@ -262,8 +262,8 @@ BMailSettings::AutoCheckInterval()
 void
 BMailSettings::SetAutoCheckInterval(bigtime_t interval)
 {
-	if (fData.ReplaceInt64("AutoCheckInterval",interval))
-		fData.AddInt64("AutoCheckInterval",interval);
+	if (fData.ReplaceInt64("AutoCheckInterval", interval) != B_OK)
+		fData.AddInt64("AutoCheckInterval", interval);
 }
 
 
@@ -277,8 +277,8 @@ BMailSettings::CheckOnlyIfPPPUp()
 void
 BMailSettings::SetCheckOnlyIfPPPUp(bool yes)
 {
-	if (fData.ReplaceBool("CheckOnlyIfPPPUp",yes))
-		fData.AddBool("CheckOnlyIfPPPUp",yes);
+	if (fData.ReplaceBool("CheckOnlyIfPPPUp", yes))
+		fData.AddBool("CheckOnlyIfPPPUp", yes);
 }
 
 
@@ -292,8 +292,8 @@ BMailSettings::SendOnlyIfPPPUp()
 void
 BMailSettings::SetSendOnlyIfPPPUp(bool yes)
 {
-	if (fData.ReplaceBool("SendOnlyIfPPPUp",yes))
-		fData.AddBool("SendOnlyIfPPPUp",yes);
+	if (fData.ReplaceBool("SendOnlyIfPPPUp", yes))
+		fData.AddBool("SendOnlyIfPPPUp", yes);
 }
 
 
@@ -307,9 +307,12 @@ BMailSettings::DefaultOutboundAccount()
 void
 BMailSettings::SetDefaultOutboundAccount(int32 to)
 {
-	if (fData.ReplaceInt32("DefaultOutboundAccount",to))
-		fData.AddInt32("DefaultOutboundAccount",to);
+	if (fData.ReplaceInt32("DefaultOutboundAccount", to) != B_OK)
+		fData.AddInt32("DefaultOutboundAccount", to);
 }
+
+
+// #pragma mark -
 
 
 BMailAccounts::BMailAccounts()
@@ -412,14 +415,13 @@ BMailAccounts::AccountByName(const char* name)
 }
 
 
-using std::vector;
+// #pragma mark -
 
 
 AddonSettings::AddonSettings()
 	:
 	fModified(false)
 {
-
 }
 
 
@@ -427,12 +429,11 @@ bool
 AddonSettings::Load(const BMessage& message)
 {
 	const char* addonPath = NULL;
-	if (message.FindString("add-on path", &addonPath) != B_OK)
+	if (message.FindString("add-on path", &addonPath) != B_OK
+		|| get_ref_for_path(addonPath, &fAddonRef) != B_OK
+		|| message.FindMessage("settings", &fSettings) != B_OK)
 		return false;
-	if (get_ref_for_path(addonPath, &fAddonRef) != B_OK)
-		return false;
-	if (message.FindMessage("settings", &fSettings) != B_OK)
-		return false;
+
 	fModified = false;
 	return true;
 }
@@ -483,6 +484,9 @@ AddonSettings::HasBeenModified()
 {
 	return fModified;
 }
+
+
+// #pragma mark -
 
 
 bool

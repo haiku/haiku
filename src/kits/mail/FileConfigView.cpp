@@ -1,5 +1,5 @@
 /*
- * Copyright 20011, Haiku Inc. All Rights Reserved.
+ * Copyright 2011, Haiku Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
