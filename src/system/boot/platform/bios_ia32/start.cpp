@@ -28,7 +28,7 @@
 #include "smp.h"
 
 
-#define HEAP_SIZE (512 * 1024)
+#define HEAP_SIZE (1024 * 1024)
 
 
 // GCC defined globals
