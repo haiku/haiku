@@ -3,8 +3,6 @@
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "AutoConfigView.h"
 
 #include <Catalog.h>
@@ -140,7 +138,7 @@ AutoConfigView::GetBasicAccountInfo(account_info &info)
 		info.inboundType = IMAP;
 	else
 		info.inboundType = POP;
-
+	
 	info.outboundProtocol = fSMTPAddonRef;
 	info.name = fNameView->Text();
 	info.accountName = fAccountNameView->Text();
@@ -166,7 +164,7 @@ AutoConfigView::SetupProtocolView(BRect rect)
 
 		path.Append("mail_daemon");
 		path.Append("inbound_protocols");
-
+				
 		BDirectory dir(path.Path());
 		entry_ref protocolRef;
 		while (dir.GetNextRef(&protocolRef) == B_OK)
@@ -198,27 +196,27 @@ AutoConfigView::SetupProtocolView(BRect rect)
 status_t
 AutoConfigView::GetSMTPAddonRef(entry_ref *ref)
 {
-	directory_which which[] = {
-		B_USER_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY
-	};
-
-	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+	for (int i = 0; i < 2; i++) {
 		BPath path;
-		status_t status = find_directory(which[i], &path);
+		status_t status = find_directory((i == 0) ? B_USER_ADDONS_DIRECTORY :
+											B_BEOS_ADDONS_DIRECTORY, &path);
 		if (status != B_OK)
+		{
 			return B_ERROR;
+		}
 
 		path.Append("mail_daemon");
 		path.Append("outbound_protocols");
-		path.Append("SMTP");
-
-		BEntry entry(path.Path());
-		if (entry.Exists() && entry.GetRef(ref) == B_OK)
+				
+		BDirectory dir(path.Path());
+		
+		while (dir.GetNextRef(ref) == B_OK)
+		{
 			return B_OK;
+		}
 	}
 
-	return B_FILE_NOT_FOUND;
+	return B_ERROR;
 }
 
 
@@ -271,23 +269,19 @@ AutoConfigView::IsValidMailAddress(BString email)
 	email.CopyInto(provider, atPos + 1, email.Length() - atPos);
 	if (provider.FindLast(".") < 0)
 		return false;
-	return true;
+	return true;	
 }
 
 
-// #pragma mark -
-
-
 ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
-	:
-	BView(rect, NULL,B_FOLLOW_ALL,0),
-	fInboundAccount(true),
-	fOutboundAccount(true),
-	fInboundAuthMenu(NULL),
-	fOutboundAuthMenu(NULL),
-	fInboundEncrItemStart(NULL),
-	fOutboundEncrItemStart(NULL),
-	fImageId(-1)
+	:	BView(rect, NULL,B_FOLLOW_ALL,0),
+		fInboundAccount(true),
+		fOutboundAccount(true),
+		fInboundAuthMenu(NULL),
+		fOutboundAuthMenu(NULL),
+		fInboundEncrItemStart(NULL),
+		fOutboundEncrItemStart(NULL),
+		fImageId(-1)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -302,7 +296,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	boxRect.bottom -= 5;
 
 	BBox *box = new BBox(boxRect);
-	box->SetLabel(B_TRANSLATE("Incoming"));
+	box->SetLabel(B_TRANSLATE("Inbound"));
 	AddChild(box);
 
 	BString serverName;
@@ -317,10 +311,10 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	fInboundNameView->SetDivider(divider);
 
 	box->AddChild(fInboundNameView);
-
+	
 	GetAuthEncrMenu(info.inboundProtocol, &fInboundAuthMenu,
-		&fInboundEncryptionMenu);
-	if (fInboundAuthMenu != NULL) {
+						&fInboundEncryptionMenu);
+	if (fInboundAuthMenu) {
 		int authID = info.providerInfo.authentification_pop;
 		if (info.inboundType == POP)
 			fInboundAuthMenu->Menu()->ItemAt(authID)->SetMarked(true);
@@ -332,16 +326,16 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	if (fInboundEncryptionMenu) {
 		BMenuItem *item = NULL;
 		if (info.inboundType == POP) {
-			item = fInboundEncryptionMenu->Menu()->ItemAt(
-				info.providerInfo.ssl_pop);
-			if (item != NULL)
+			item = fInboundEncryptionMenu->Menu()
+					->ItemAt(info.providerInfo.ssl_pop);
+			if (item)
 				item->SetMarked(true);
 			fInboundEncryptionMenu->MoveTo(10, 80);
 		}
 		if (info.inboundType == IMAP) {
 			item = fInboundEncryptionMenu->Menu()->ItemAt(
 				info.providerInfo.ssl_imap);
-			if (item != NULL)
+			if (item)
 				item->SetMarked(true);
 			fInboundEncryptionMenu->MoveTo(10, 50);
 		}
@@ -349,7 +343,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		box->AddChild(fInboundEncryptionMenu);
 		fInboundEncryptionMenu->SetDivider(divider);
 	}
-
+	
 	if (!fInboundAccount) {
 		fInboundNameView->SetEnabled(false);
 		if (fInboundAuthMenu)
@@ -362,7 +356,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	boxRect.top += 5;
 
 	box = new BBox(boxRect);
-	box->SetLabel(B_TRANSLATE("Outgoing"));
+	box->SetLabel(B_TRANSLATE("Outbound"));
 	AddChild(box);
 
 	serverName = info.providerInfo.smtp_server;
@@ -372,23 +366,23 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	fOutboundNameView->SetDivider(divider);
 
 	box->AddChild(fOutboundNameView);
-
+	
 	GetAuthEncrMenu(info.outboundProtocol, &fOutboundAuthMenu,
-		&fOutboundEncryptionMenu);
-	if (fOutboundAuthMenu != NULL) {
+						&fOutboundEncryptionMenu);
+	if (fOutboundAuthMenu) {
 		BMenuItem *item = fOutboundAuthMenu->Menu()->ItemAt(
 			info.providerInfo.authentification_smtp);
-		if (item != NULL)
+		if (item)
 			item->SetMarked(true);
 		fOutboundAuthItemStart = item;
 		box->AddChild(fOutboundAuthMenu);
 		fOutboundAuthMenu->SetDivider(divider);
 		fOutboundAuthMenu->MoveTo(10, 50);
 	}
-	if (fOutboundEncryptionMenu != NULL) {
+	if (fOutboundEncryptionMenu) {
 		BMenuItem *item = fOutboundEncryptionMenu->Menu()->ItemAt(
 			info.providerInfo.ssl_smtp);
-		if (item != NULL)
+		if (item)
 			item->SetMarked(true);
 		fOutboundEncrItemStart = item;
 		box->AddChild(fOutboundEncryptionMenu);
@@ -401,7 +395,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		if (fOutboundAuthMenu)
 			fOutboundAuthMenu->SetEnabled(false);
 	}
-
+	
 }
 
 
@@ -420,47 +414,43 @@ ServerSettingsView::GetServerInfo(account_info &info)
 {
 	if (info.inboundType == IMAP) {
 		info.providerInfo.imap_server = fInboundNameView->Text();
-		if (fInboundEncryptionMenu != NULL) {
+		if (fInboundEncryptionMenu) {
 			BMenuItem* item = fInboundEncryptionMenu->Menu()->FindMarked();
-			if (item != NULL) {
-				info.providerInfo.ssl_imap
-					= fInboundEncryptionMenu->Menu()->IndexOf(item);
-			}
+			if (item)
+				info.providerInfo.ssl_imap = fInboundEncryptionMenu->Menu()
+												->IndexOf(item);
 		}
 	} else {
 		info.providerInfo.pop_server = fInboundNameView->Text();
 		BMenuItem* item = NULL;
-		if (fInboundAuthMenu != NULL) {
+		if (fInboundAuthMenu) {
 			item = fInboundAuthMenu->Menu()->FindMarked();
-			if (item != NULL) {
-				info.providerInfo.authentification_pop
-					= fInboundAuthMenu->Menu()->IndexOf(item);
-			}
+			if (item)
+				info.providerInfo.authentification_pop = fInboundAuthMenu
+															->Menu()
+															->IndexOf(item);
 		}
-		if (fInboundEncryptionMenu != NULL) {
+		if (fInboundEncryptionMenu) {
 			item = fInboundEncryptionMenu->Menu()->FindMarked();
-			if (item != NULL) {
-				info.providerInfo.ssl_pop
-					= fInboundEncryptionMenu->Menu()->IndexOf(item);
-			}
+			if (item)
+				info.providerInfo.ssl_pop = fInboundEncryptionMenu->Menu()
+												->IndexOf(item);
 		}
 	}
 	info.providerInfo.smtp_server = fOutboundNameView->Text();
 	BMenuItem* item = NULL;
-	if (fOutboundAuthMenu != NULL) {
+	if (fOutboundAuthMenu) {
 		item = fOutboundAuthMenu->Menu()->FindMarked();
-		if (item != NULL) {
-			info.providerInfo.authentification_smtp
-				= fOutboundAuthMenu->Menu()->IndexOf(item);
-		}
+		if (item)
+			info.providerInfo.authentification_smtp = fOutboundAuthMenu->Menu()
+														->IndexOf(item);
 	}
 
-	if (fOutboundEncryptionMenu != NULL) {
+	if (fOutboundEncryptionMenu) {
 		item = fOutboundEncryptionMenu->Menu()->FindMarked();
-		if (item != NULL) {
-			info.providerInfo.ssl_smtp
-				= fOutboundEncryptionMenu->Menu()->IndexOf(item);
-		}
+		if (item)
+			info.providerInfo.ssl_smtp = fOutboundEncryptionMenu->Menu()
+											->IndexOf(item);
 	}
 	DetectMenuChanges();
 }
@@ -470,22 +460,22 @@ void
 ServerSettingsView::DetectMenuChanges()
 {
 	bool changed = false;
-	if (fInboundAuthMenu != NULL) {
+	if (fInboundAuthMenu) {
 		BMenuItem *item = fInboundAuthMenu->Menu()->FindMarked();
 		if (fInboundAuthItemStart != item)
 			changed = true;
 	}
-	if (fInboundEncryptionMenu != NULL) {
+	if (fInboundEncryptionMenu) {
 		BMenuItem *item = fInboundEncryptionMenu->Menu()->FindMarked();
 		if (fInboundEncrItemStart != item)
 			changed = true;
 	}
-	if (fOutboundAuthMenu != NULL) {
+	if (fOutboundAuthMenu) {
 		BMenuItem *item = fOutboundAuthMenu->Menu()->FindMarked();
 		if (fOutboundAuthItemStart != item)
 			changed = true;
 	}
-	if (fOutboundEncryptionMenu != NULL) {
+	if (fOutboundEncryptionMenu) {
 		BMenuItem *item = fOutboundEncryptionMenu->Menu()->FindMarked();
 		if (fOutboundEncrItemStart != item)
 			changed = true;
@@ -506,8 +496,8 @@ ServerSettingsView::GetAuthEncrMenu(entry_ref protocol,
 	BView *view = CreateConfigView(protocol, dummySettings.InboundSettings(),
 		dummySettings, &fImageId);
 
-	*authField = (BMenuField *)view->FindView("auth_method");
-	*sslField = (BMenuField *)view->FindView("flavor");
+	*authField = (BMenuField *)(view->FindView("auth_method"));
+	*sslField = (BMenuField *)(view->FindView("flavor"));
 
 	view->RemoveChild(*authField);
 	view->RemoveChild(*sslField);
