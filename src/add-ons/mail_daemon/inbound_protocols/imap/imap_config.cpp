@@ -10,13 +10,14 @@
 #include <Button.h>
 #include <TextControl.h>
 
-#include <FileConfigView.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <ProtocolConfigView.h>
 #include <MailAddon.h>
+#include <Path.h>
 
+#include <FileConfigView.h>
+#include <ProtocolConfigView.h>
+#include <MailPrivate.h>
 #include <MDRLanguage.h>
+
 #include "IMAPFolderConfig.h"
 
 
@@ -52,12 +53,11 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 	 	| B_MAIL_PROTOCOL_HAS_FLAVORS
 #endif
 	 ),
-
 	 fAddonSettings(settings)
 {
 #ifdef USE_SSL
-		AddFlavor("No encryption");
-		AddFlavor("SSL");
+	AddFlavor("No encryption");
+	AddFlavor("SSL");
 #endif
 
 	SetTo(settings);
@@ -70,18 +70,13 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 	((BControl *)(FindView("delete_remote_when_local")))->SetEnabled(true);
 	((BControl *)(FindView("delete_remote_when_local")))->MoveBy(0, -25);
 
-
 	fIMAPFolderButton = new BButton(frame, "IMAP Folders", "IMAP Folders",
 		new BMessage(kMsgOpenIMAPFolder));
 	AddChild(fIMAPFolderButton);
 
 	frame.right -= 10;
 
-	BPath defaultFolder;
-	if (find_directory(B_USER_DIRECTORY, &defaultFolder) == B_OK)
-		defaultFolder.Append("mail");
-	else
-		defaultFolder.SetTo("/boot/home/mail/");
+	BPath defaultFolder = BPrivate::default_mail_directory();
 	defaultFolder.Append(accountSettings.Name());
 
 	fFileView =  new BMailFileConfigView("Destination:", "destination",
@@ -131,7 +126,7 @@ IMAPConfig::MessageReceived(BMessage* message)
 	}
 
 	default:
-		BMailProtocolConfigView::MessageReceived(message);		
+		BMailProtocolConfigView::MessageReceived(message);
 	}
 }
 

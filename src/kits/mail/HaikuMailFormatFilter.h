@@ -28,7 +28,8 @@ private:
 									const BString& name);
 			BString				_ExtractName(const BString& from);
 
-			int32				fAccountId;
+private:
+			int32				fAccountID;
 			BString				fAccountName;
 			BString				fOutboundDirectory;
 };

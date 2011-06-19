@@ -4,36 +4,71 @@
 */
 
 
-#include <Messenger.h>
-#include <String.h>
-#include <Entry.h>
-#include <File.h>
-#include <Path.h>
-#include <Directory.h>
-#include <Locker.h>
-#include <Autolock.h>
+#include <MailPrivate.h>
 
 #include <stdio.h>
 
+#include <Autolock.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Locker.h>
+#include <Messenger.h>
+#include <Path.h>
+#include <String.h>
+
+
 #define timeout 5e5
 
-namespace MailInternal {
 
-status_t WriteMessageFile(const BMessage& archive, const BPath& path, const char* name);
+namespace BPrivate {
 
+
+BPath
+default_mail_directory()
+{
+	BPath path;
+	if (find_directory(B_USER_DIRECTORY, &path) == B_OK)
+		path.Append("mail");
+	else
+		path.SetTo("/boot/home/mail/");
+
+	return path;
 }
 
 
-status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& path, const char* name)
+BPath
+default_mail_in_directory()
+{
+	BPath path = default_mail_directory();
+	path.Append("in");
+
+	return path;
+}
+
+
+BPath
+default_mail_out_directory()
+{
+	BPath path = default_mail_directory();
+	path.Append("out");
+
+	return path;
+}
+
+
+status_t
+WriteMessageFile(const BMessage& archive, const BPath& path, const char* name)
 {
 	status_t ret = B_OK;
 	BString leaf = name;
 	leaf << ".tmp";
-	
+
 	BEntry settings_entry;
 	BFile tmpfile;
 	bigtime_t now = system_time();
-	
+
 	create_directory(path.Path(), 0777);
 	{
 		BDirectory account_dir(path.Path());
@@ -44,7 +79,7 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 				path.Path(), strerror(ret));
 			return ret;
 		}
-		
+
 		// get an entry for the tempfile
 		// Get it here so that failure doesn't create any problems
 		ret = settings_entry.SetTo(&account_dir,leaf.String());
@@ -55,11 +90,11 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 			return ret;
 		}
 	}
-	
+
 	//
 	// Save to a temporary file
 	//
-	
+
 	// Our goal is to write to a tempfile and then use 'rename' to
 	// link that file into place once it contains valid contents.
 	// Given the filesystem's guarantee of atomic "rename" oper-
@@ -110,14 +145,14 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 	// we get the Relink() api.  An implementation of the above
 	// follows.
 	//
-	
+
 	// Create or open
 	ret = B_TIMED_OUT;
 	while (system_time() - now < timeout) //-ATT-no timeout arg. Setting by #define
 	{
 		ret = tmpfile.SetTo(&settings_entry, B_WRITE_ONLY | B_CREATE_FILE);
 		if (ret != B_BUSY) break;
-		
+
 		// wait 1/100th second
 		snooze((bigtime_t)1e4);
 	}
@@ -127,14 +162,14 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 			path.Path(), leaf.String(), (float)timeout/1e6, strerror(ret));
 		return ret==B_BUSY? B_TIMED_OUT:ret;
 	}
-	
+
 	// lock
 	ret = B_TIMED_OUT;
 	while (system_time() - now < timeout)
 	{
 		ret = tmpfile.Lock(); //-ATT-changed account_file to tmpfile. Is that allowed?
 		if (ret != B_BUSY) break;
-		
+
 		// wait 1/100th second
 		snooze((bigtime_t)1e4);
 	}
@@ -147,10 +182,10 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 		// that's OK.
 		return ret==B_BUSY? B_TIMED_OUT:ret;
 	}
-	
+
 	// truncate
 	tmpfile.SetSize(0);
-	
+
 	// write
 	ret = archive.Flatten(&tmpfile);
 	if (ret != B_OK)
@@ -159,7 +194,7 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 			path.Path(), leaf.String(), strerror(ret));
 		return ret;
 	}
-	
+
 	// ensure it's actually writen
 	ret = tmpfile.Sync();
 	if (ret != B_OK)
@@ -168,7 +203,7 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 			path.Path(), leaf.String(), strerror(ret));
 		return ret;
 	}
-	
+
 	// clobber old settings
 	ret = settings_entry.Rename(name,true);
 	if (ret != B_OK)
@@ -177,7 +212,9 @@ status_t MailInternal::WriteMessageFile(const BMessage& archive, const BPath& pa
 			path.Path(), name, strerror(ret));
 		return ret;
 	}
-	
+
 	return B_OK;
 }
 
+
+}	// namespace BPrivate

@@ -9,6 +9,7 @@
 
 #include <FileConfigView.h>
 #include <MailAddon.h>
+#include <MailPrivate.h>
 #include <ProtocolConfigView.h>
 
 
@@ -47,7 +48,7 @@ POP3ConfigView::POP3ConfigView(MailAddonSettings& settings,
 	SetTo(settings);
 
 	fFileView =  new BMailFileConfigView("Destination:", "destination",
-		false, "/boot/home/mail/in");
+		false, BPrivate::default_mail_in_directory().Path());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
 	float w, h;

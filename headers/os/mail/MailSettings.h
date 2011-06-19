@@ -20,8 +20,7 @@
 class BPath;
 
 
-typedef enum
-{
+typedef enum {
 	B_MAIL_SHOW_STATUS_WINDOW_NEVER         = 0,
 	B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING	= 1,
 	B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE	= 2,
@@ -29,17 +28,13 @@ typedef enum
 } b_mail_status_window_option;
 
 
-typedef enum
-{
+typedef enum {
 	B_MAIL_STATUS_LOOK_TITLED                = 0,
 	B_MAIL_STATUS_LOOK_NORMAL_BORDER         = 1,
 	B_MAIL_STATUS_LOOK_FLOATING              = 2,
 	B_MAIL_STATUS_LOOK_THIN_BORDER           = 3,
 	B_MAIL_STATUS_LOOK_NO_BORDER             = 4
 } b_mail_status_window_look;
-
-
-BString default_sent_directory();
 
 
 class BMailSettings {
@@ -57,7 +52,7 @@ public:
 
 			uint32				ShowStatusWindow();
 			void				SetShowStatusWindow(uint32 mode);
-			
+
 			bool				DaemonAutoStarts();
 			void				SetDaemonAutoStarts(bool does_it);
 
@@ -91,8 +86,7 @@ private:
 };
 
 
-class AddonSettings
-{
+class AddonSettings {
 public:
 								AddonSettings();
 
@@ -106,6 +100,7 @@ public:
 			BMessage&			EditSettings();
 
 			bool				HasBeenModified();
+
 private:
 			BMessage			fSettings;
 			entry_ref			fAddonRef;
@@ -114,8 +109,7 @@ private:
 };
 
 
-class MailAddonSettings : public AddonSettings
-{
+class MailAddonSettings : public AddonSettings {
 public:
 			bool				Load(const BMessage& message);
 			bool				Save(BMessage& message);
@@ -127,13 +121,13 @@ public:
 			AddonSettings*		FilterSettingsAt(int32 index);
 
 			bool				HasBeenModified();
+
 private:
 			std::vector<AddonSettings>	fFiltersSettings;
 };
 
 
-class BMailAccountSettings
-{
+class BMailAccountSettings {
 	public:
 								BMailAccountSettings();
 								BMailAccountSettings(BEntry account);
@@ -176,9 +170,11 @@ class BMailAccountSettings
 			bool				HasBeenModified();
 
 	const	BEntry&				AccountFile();
+
 private:
 			status_t			_CreateAccountFilePath();
 
+private:
 			status_t			fStatus;
 			BEntry				fAccountFile;
 

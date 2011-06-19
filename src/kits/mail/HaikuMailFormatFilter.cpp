@@ -16,8 +16,7 @@
 #include <NodeMessage.h>
 
 
-struct mail_header_field
-{
+struct mail_header_field {
 	const char *rfc_name;
 
 	const char *attr_name;
@@ -26,8 +25,7 @@ struct mail_header_field
 };
 
 
-static const mail_header_field gDefaultFields[] =
-{
+static const mail_header_field gDefaultFields[] = {
 	{ "To",				B_MAIL_ATTR_TO,			B_STRING_TYPE },
 	{ "From",         	B_MAIL_ATTR_FROM,		B_STRING_TYPE },
 	{ "Cc",				B_MAIL_ATTR_CC,			B_STRING_TYPE },
@@ -53,15 +51,11 @@ HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
 	BMailAccountSettings* settings)
 	:
 	MailFilter(protocol, NULL),
-
-	fAccountId(settings->AccountID()),
+	fAccountID(settings->AccountID()),
 	fAccountName(settings->Name())
 {
 	const BMessage* outboundSettings = &settings->OutboundSettings().Settings();
-	if (outboundSettings->FindString("destination", &fOutboundDirectory)
-		!= B_OK) {
-		fOutboundDirectory = default_sent_directory();
-	}
+	outboundSettings->FindString("destination", &fOutboundDirectory);
 }
 
 
@@ -72,7 +66,7 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 
 	BMessage attributes;
 	// TODO attributes.AddInt32(B_MAIL_ATTR_CONTENT, length);
-	attributes.AddInt32(B_MAIL_ATTR_ACCOUNT_ID, fAccountId);
+	attributes.AddInt32(B_MAIL_ATTR_ACCOUNT_ID, fAccountID);
 	attributes.AddString(B_MAIL_ATTR_ACCOUNT, fAccountName);
 
 	BString header;
@@ -198,11 +192,11 @@ HaikuMailFormatFilter::MessageSent(const entry_ref& ref, BFile* file)
 	file->WriteAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags, sizeof(int32));
 	file->WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, "Sent", 5);
 
-	if (fOutboundDirectory == "")
-		return;
-	create_directory(fOutboundDirectory, 755);
-	BDirectory dir(fOutboundDirectory);
-	fMailProtocol.Looper()->TriggerFileMove(ref, dir);
+	if (!fOutboundDirectory.IsEmpty()) {
+		create_directory(fOutboundDirectory, 755);
+		BDirectory dir(fOutboundDirectory);
+		fMailProtocol.Looper()->TriggerFileMove(ref, dir);
+	}
 }
 
 
@@ -236,7 +230,7 @@ HaikuMailFormatFilter::_ExtractName(const BString& from)
 			name.Remove(0, 1);
 		name.Trim();
 	}
-	if (name != "") 
+	if (name != "")
 		return name;
 
 	// empty name extract email address
