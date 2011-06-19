@@ -220,7 +220,7 @@ AddBootModuleSymlinksToPackage
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel
-	bfs
+	bfs packagefs
 ;
 
 # add-ons
