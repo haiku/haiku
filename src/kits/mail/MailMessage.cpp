@@ -27,27 +27,13 @@
 #include <ctype.h>
 #include <parsedate.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
-	#include <sys/socket.h>
-	#define BONE_SERIAL_PPP_GET_STATUS 0xbe230501
-	#define BSPPP_CONNECTED 4
-	typedef struct {
-		char if_name[32];
-		int connection_status;
-		status_t last_error;
-		int connect_speed;
-	} bsppp_status_t;
-	#include <unistd.h>
-#endif
-
-class _EXPORT BEmailMessage;
-
 #include <MailMessage.h>
 #include <MailAttachment.h>
 #include <MailSettings.h>
 #include <MailDaemon.h>
 #include <mail_util.h>
 #include <StringList.h>
+
 
 //-------Change the following!----------------------
 #define mime_boundary "----------Zoidberg-BeMail-temp--------"
@@ -114,12 +100,12 @@ BEmailMessage *
 BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail,
 	const char *quoteStyle)
 {
-	BEmailMessage *to_return = new BEmailMessage;
+	BEmailMessage *reply = new BEmailMessage;
 
 	// Set ReplyTo:
 
 	if (replyTo == B_MAIL_REPLY_TO_ALL) {
-		to_return->SetTo(From());
+		reply->SetTo(From());
 
 		BList list;
 		get_address_list(list, CC(), extract_address);
@@ -150,34 +136,35 @@ BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail,
 		}
 
 		if (cc.Length() > 0)
-			to_return->SetCC(cc.String());
+			reply->SetCC(cc.String());
 	} else if (replyTo == B_MAIL_REPLY_TO_SENDER || ReplyTo() == NULL)
-		to_return->SetTo(From());
+		reply->SetTo(From());
 	else
-		to_return->SetTo(ReplyTo());
+		reply->SetTo(ReplyTo());
 
 	// Set special "In-Reply-To:" header (used for threading)
 	const char *messageID = _body ? _body->HeaderField("Message-Id") : NULL;
 	if (messageID != NULL)
-		to_return->SetHeaderField("In-Reply-To", messageID);
+		reply->SetHeaderField("In-Reply-To", messageID);
 
 	// quote body text
-	to_return->SetBodyTextTo(BodyText());
+	reply->SetBodyTextTo(BodyText());
 	if (quoteStyle)
-		to_return->Body()->Quote(quoteStyle);
+		reply->Body()->Quote(quoteStyle);
 
 	// Set the subject (and add a "Re:" if needed)
 	BString string = Subject();
 	if (string.ICompare("re:", 3) != 0)
 		string.Prepend("Re: ");
-	to_return->SetSubject(string.String());
+	reply->SetSubject(string.String());
 
 	// set the matching outbound chain
 	if (accountFromMail)
-		to_return->SendViaAccountFrom(this);
+		reply->SendViaAccountFrom(this);
 
-	return to_return;
+	return reply;
 }
+
 
 BEmailMessage *
 BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
@@ -221,7 +208,6 @@ BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 			io.Seek(0, SEEK_SET);
 			clone->SetToRFC822(&io, io.BufferLength(), true);
 			message->AddComponent(clone);
-			//---
 		}
 	}
 	if (accountFromMail)
@@ -255,7 +241,8 @@ BEmailMessage::ReplyTo()
 const char *
 BEmailMessage::CC()
 {
-	return HeaderField("Cc"); // Note case of CC is "Cc" in our internal headers.
+	return HeaderField("Cc");
+		// Note case of CC is "Cc" in our internal headers.
 }
 
 
@@ -272,10 +259,11 @@ BEmailMessage::Date()
 	return HeaderField("Date");
 }
 
+
 int
 BEmailMessage::Priority()
 {
-	int			priorityNumber;
+	int priorityNumber;
 	const char *priorityString;
 
 	/* The usual values are a number from 1 to 5, or one of three words:
@@ -299,44 +287,66 @@ BEmailMessage::Priority()
 			priorityNumber = 1;
 		return priorityNumber;
 	}
-	if (strcasecmp (priorityString, "Low") == 0 ||
-	strcasecmp (priorityString, "non-urgent") == 0)
+	if (strcasecmp (priorityString, "Low") == 0
+		|| strcasecmp (priorityString, "non-urgent") == 0)
 		return 5;
-	if (strcasecmp (priorityString, "High") == 0 ||
-	strcasecmp (priorityString, "urgent") == 0)
+	if (strcasecmp (priorityString, "High") == 0
+		|| strcasecmp (priorityString, "urgent") == 0)
 		return 1;
 	return 3;
 }
 
-void BEmailMessage::SetSubject(const char *subject, uint32 charset, mail_encoding encoding) {
+
+void
+BEmailMessage::SetSubject(const char *subject, uint32 charset,
+	mail_encoding encoding)
+{
 	SetHeaderField("Subject", subject, charset, encoding);
 }
 
-void BEmailMessage::SetReplyTo(const char *reply_to, uint32 charset, mail_encoding encoding) {
+
+void
+BEmailMessage::SetReplyTo(const char *reply_to, uint32 charset,
+	mail_encoding encoding)
+{
 	SetHeaderField("Reply-To", reply_to, charset, encoding);
 }
 
-void BEmailMessage::SetFrom(const char *from, uint32 charset, mail_encoding encoding) {
+
+void
+BEmailMessage::SetFrom(const char *from, uint32 charset, mail_encoding encoding)
+{
 	SetHeaderField("From", from, charset, encoding);
 }
 
-void BEmailMessage::SetTo(const char *to, uint32 charset, mail_encoding encoding) {
+
+void
+BEmailMessage::SetTo(const char *to, uint32 charset, mail_encoding encoding)
+{
 	SetHeaderField("To", to, charset, encoding);
 }
 
-void BEmailMessage::SetCC(const char *cc, uint32 charset, mail_encoding encoding) {
+
+void
+BEmailMessage::SetCC(const char *cc, uint32 charset, mail_encoding encoding)
+{
 	// For consistency with our header names, use Cc as the name.
 	SetHeaderField("Cc", cc, charset, encoding);
 }
 
-void BEmailMessage::SetBCC(const char *bcc) {
-	free(_bcc);
 
+void
+BEmailMessage::SetBCC(const char *bcc)
+{
+	free(_bcc);
 	_bcc = strdup(bcc);
 }
 
-void BEmailMessage::SetPriority(int to) {
-	char	tempString [20];
+
+void
+BEmailMessage::SetPriority(int to)
+{
+	char tempString [20];
 
 	if (to < 1)
 		to = 1;
@@ -364,12 +374,13 @@ BEmailMessage::GetName(char *name, int32 maxLength) const
 		return B_BAD_VALUE;
 
 	if (BFile *file = dynamic_cast<BFile *>(fData)) {
-		status_t status = file->ReadAttr(B_MAIL_ATTR_NAME,B_STRING_TYPE,0,name,maxLength);
+		status_t status = file->ReadAttr(B_MAIL_ATTR_NAME, B_STRING_TYPE, 0,
+			name, maxLength);
 		name[maxLength - 1] = '\0';
 
 		return status >= 0 ? B_OK : status;
 	}
-	// ToDo: look at From header?  But usually there is
+	// TODO: look at From header?  But usually there is
 	// a file since only the BeMail GUI calls this.
 	return B_ERROR;
 }
@@ -438,7 +449,7 @@ status_t
 BEmailMessage::GetAccountName(BString& accountName) const
 {
 	BFile *file = dynamic_cast<BFile *>(fData);
-	if (!file)
+	if (file == NULL)
 		return B_ERROR;
 
 	int32 accountId;
@@ -466,15 +477,18 @@ BEmailMessage::AddComponent(BMailComponent *component)
 	if (_num_components == 0)
 		_body = component;
 	else if (_num_components == 1) {
-		BMIMEMultipartMailContainer *container = new BMIMEMultipartMailContainer (
-			mime_boundary, mime_warning, _charSetForTextDecoding);
-		if ((status = container->AddComponent(_body)) == B_OK)
+		BMIMEMultipartMailContainer *container
+			= new BMIMEMultipartMailContainer(
+				mime_boundary, mime_warning, _charSetForTextDecoding);
+		status = container->AddComponent(_body);
+		if (status == B_OK)
 			status = container->AddComponent(component);
 		_body = container;
 	} else {
-		BMIMEMultipartMailContainer *container = dynamic_cast<BMIMEMultipartMailContainer *>(_body);
+		BMIMEMultipartMailContainer *container
+			= dynamic_cast<BMIMEMultipartMailContainer *>(_body);
 		if (container == NULL)
-			return B_MISMATCHED_VALUES; //---This really needs a B_WTF constant...
+			return B_MISMATCHED_VALUES;
 
 		status = container->AddComponent(component);
 	}
@@ -503,10 +517,11 @@ BEmailMessage::RemoveComponent(int32 /*index*/)
 
 
 BMailComponent *
-BEmailMessage::GetComponent(int32 i, bool parse_now)
+BEmailMessage::GetComponent(int32 i, bool parseNow)
 {
-	if (BMIMEMultipartMailContainer *container = dynamic_cast<BMIMEMultipartMailContainer *>(_body))
-		return container->GetComponent(i, parse_now);
+	if (BMIMEMultipartMailContainer *container
+			= dynamic_cast<BMIMEMultipartMailContainer *>(_body))
+		return container->GetComponent(i, parseNow);
 
 	if (i < _num_components)
 		return _body;
@@ -541,9 +556,10 @@ BEmailMessage::IsComponentAttachment(int32 i)
 	if (_num_components == 1)
 		return _body->IsAttachment();
 
-	BMIMEMultipartMailContainer *container = dynamic_cast<BMIMEMultipartMailContainer *>(_body);
+	BMIMEMultipartMailContainer *container
+		= dynamic_cast<BMIMEMultipartMailContainer *>(_body);
 	if (container == NULL)
-		return false; //-----This should never, ever, ever, ever, happen
+		return false;
 
 	BMailComponent *component = container->GetComponent(i);
 	if (component == NULL)
@@ -616,9 +632,10 @@ BEmailMessage::RetrieveTextBody(BMailComponent *component)
 
 			switch (component->ComponentType()) {
 				case B_MAIL_PLAIN_TEXT_BODY:
-					// AttributedAttachment returns the MIME type of its contents, so
-					// we have to use dynamic_cast here
-					body = dynamic_cast<BTextMailComponent *>(container->GetComponent(i));
+					// AttributedAttachment returns the MIME type of its
+					// contents, so we have to use dynamic_cast here
+					body = dynamic_cast<BTextMailComponent *>(
+						container->GetComponent(i));
 					if (body != NULL)
 						return body;
 					break;
@@ -662,15 +679,15 @@ BEmailMessage::SetToRFC822(BPositionIO *mail_file, size_t length,
 	//------------Move headers that we use to us, everything else to _body
 	const char *name;
 	for (int32 i = 0; (name = _body->HeaderAt(i)) != NULL; i++) {
-		if ((strcasecmp(name,"Subject") != 0)
-		  && (strcasecmp(name,"To") != 0)
-		  && (strcasecmp(name,"From") != 0)
-		  && (strcasecmp(name,"Reply-To") != 0)
-		  && (strcasecmp(name,"Cc") != 0)
-		  && (strcasecmp(name,"Priority") != 0)
-		  && (strcasecmp(name,"X-Priority") != 0)
-		  && (strcasecmp(name,"X-Msmail-Priority") != 0)
-		  && (strcasecmp(name,"Date") != 0)) {
+		if (strcasecmp(name,"Subject") != 0
+			&& strcasecmp(name,"To") != 0
+			&& strcasecmp(name,"From") != 0
+			&& strcasecmp(name,"Reply-To") != 0
+			&& strcasecmp(name,"Cc") != 0
+			&& strcasecmp(name,"Priority") != 0
+			&& strcasecmp(name,"X-Priority") != 0
+			&& strcasecmp(name,"X-Msmail-Priority") != 0
+			&& strcasecmp(name,"Date") != 0) {
 			RemoveHeader(name);
 		}
 	}
@@ -686,7 +703,8 @@ BEmailMessage::SetToRFC822(BPositionIO *mail_file, size_t length,
 	_body->RemoveHeader("Date");
 
 	_num_components = 1;
-	if (BMIMEMultipartMailContainer *container = dynamic_cast<BMIMEMultipartMailContainer *>(_body))
+	if (BMIMEMultipartMailContainer *container
+			= dynamic_cast<BMIMEMultipartMailContainer *>(_body))
 		_num_components = container->CountComponents();
 
 	return B_OK;
@@ -799,7 +817,7 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 		attributed->WriteAttrString(B_MAIL_ATTR_STATUS, &attr);
 		attr = "1.0";
 		attributed->WriteAttrString(B_MAIL_ATTR_MIME, &attr);
-		
+
 		attributed->WriteAttr(B_MAIL_ATTR_ACCOUNT, B_INT32_TYPE, 0,
 			&_account_id, sizeof(int32));
 
@@ -820,10 +838,10 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 status_t
 BEmailMessage::RenderTo(BDirectory *dir, BEntry *msg)
 {
-	time_t		currentTime;
-	char		numericDateString [40];
-	struct tm   timeFields;
-	BString		worker;
+	time_t currentTime;
+	char numericDateString [40];
+	struct tm timeFields;
+	BString worker;
 
 	// Generate a file name for the outgoing message.  See also
 	// FolderFilter::ProcessMailMessage which does something similar for
@@ -871,8 +889,7 @@ BEmailMessage::RenderTo(BDirectory *dir, BEntry *msg)
 
 	int32 tries = 30;
 	bool exists;
-	while (((exists = dir->Contains(worker.String())) == true) /* pacify mwcc */ &&
-		(--tries > 0)) {
+	while ((exists = dir->Contains(worker.String())) && --tries > 0) {
 		srand(rand());
 		uniquer += (rand() >> 16) - 16384;
 
@@ -896,7 +913,7 @@ BEmailMessage::RenderTo(BDirectory *dir, BEntry *msg)
 
 
 status_t
-BEmailMessage::Send(bool send_now)
+BEmailMessage::Send(bool sendNow)
 {
 	BMailAccounts accounts;
 	BMailAccountSettings* account = accounts.AccountByID(_account_id);
@@ -910,7 +927,7 @@ BEmailMessage::Send(bool send_now)
 
 	BString path;
 	if (account->OutboundSettings().Settings().FindString("path", &path)
-		!= B_OK) {
+			!= B_OK) {
 		BPath defaultMailOutPath;
 		if (find_directory(B_USER_DIRECTORY, &defaultMailOutPath) != B_OK
 			|| defaultMailOutPath.Append("mail/out") != B_OK)
@@ -925,28 +942,10 @@ BEmailMessage::Send(bool send_now)
 	BEntry message;
 
 	status_t status = RenderTo(&directory, &message);
-	if (status >= B_OK && send_now) {
+	if (status >= B_OK && sendNow) {
 		BMailSettings settings_file;
 		if (settings_file.SendOnlyIfPPPUp()) {
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
-			int s = socket(AF_INET, SOCK_DGRAM, 0);
-			bsppp_status_t ppp_status;
-
-			strcpy(ppp_status.if_name, "ppp0");
-			if (ioctl(s, BONE_SERIAL_PPP_GET_STATUS, &ppp_status, sizeof(ppp_status)) != 0) {
-				close(s);
-				return B_OK;
-			} else {
-				if (ppp_status.connection_status != BSPPP_CONNECTED) {
-					close(s);
-					return B_OK;
-				}
-			}
-			close(s);
-#else
-			if (find_thread("tty_thread") <= 0)
-				return B_OK;
-#endif
+			// TODO!
 		}
 
 		BMessenger daemon("application/x-vnd.Be-POST");
@@ -964,7 +963,7 @@ BEmailMessage::Send(bool send_now)
 	return status;
 }
 
+
 void BEmailMessage::_ReservedMessage1() {}
 void BEmailMessage::_ReservedMessage2() {}
 void BEmailMessage::_ReservedMessage3() {}
-
