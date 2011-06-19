@@ -56,8 +56,9 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 # ICU
 
 # Note ICU isn't actually optional, but is still an external package
-HAIKU_ICU_GCC_2_PACKAGE = icu-4.4.1-r1a3-x86-gcc2-2011-05-29.zip ;
+HAIKU_ICU_GCC_2_PACKAGE = icu-4.4.1-r1a3-x86-gcc2-2011-05-29.hpkg ;
 HAIKU_ICU_GCC_4_PACKAGE = icu-4.4.1-r1a3-x86-gcc4-2011-05-29.zip ;
+	# TODO: Make hpkg!
 HAIKU_ICU_PPC_PACKAGE = icu-4.4.1-ppc-2010-08-17.zip ;
 HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.4.1-2010-07-26.zip ;
 
@@ -94,25 +95,25 @@ if $(TARGET_ARCH) = ppc {
 		icu_package = $(HAIKU_ICU_GCC_4_PACKAGE) ;
 	}
 
-	local zipFile = [ DownloadFile $(icu_package)
-		: $(baseURL)/$(icu_package) ] ;
+	local packageFile = [ DownloadFile $(icu_package)
+		: $(hpkgBaseURL)/$(icu_package) ] ;
 
 	# zip file and output directory
-	HAIKU_ICU_ZIP_FILE = $(zipFile) ;
+	HAIKU_ICU_PACKAGE_FILE = $(packageFile) ;
 	HAIKU_ICU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 		$(icu_package:B) ] ;
 
 	# extract libraries
 	HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
 		:
-		libicudata.so.44
-		libicui18n.so.44
-		libicuio.so.44
-		libicule.so.44
-		libiculx.so.44
-		libicutu.so.44
-		libicuuc.so.44
-		: $(zipFile)
+		lib/libicudata.so.44
+		lib/libicui18n.so.44
+		lib/libicuio.so.44
+		lib/libicule.so.44
+		lib/libiculx.so.44
+		lib/libicutu.so.44
+		lib/libicuuc.so.44
+		: $(packageFile)
 		: extracted-icu
 	] ;
 }
@@ -142,6 +143,7 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
+local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
 HAIKU_CLUCENE_PACKAGE = clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip ;
 HAIKU_CLUCENE_URL = $(baseURL)/$(HAIKU_CLUCENE_PACKAGE) ;
 

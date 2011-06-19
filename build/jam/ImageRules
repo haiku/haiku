@@ -900,7 +900,10 @@ rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 	# download archive file
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
 
-	if ( $(isCDPackage) = true || $(isCDPackage) = 1 ) && $(HAIKU_CD_NAME) {
+	if $(package:S) = .hpkg {
+		AddFilesToHaikuImage $(dirTokens) : $(archiveFile) ;
+	} else if ( $(isCDPackage) = true || $(isCDPackage) = 1 )
+		&& $(HAIKU_CD_NAME) {
 		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
 		# image!
 		# copy onto image
