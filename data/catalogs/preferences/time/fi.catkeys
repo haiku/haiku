@@ -1,16 +1,36 @@
-1	finnish	x-vnd.Haiku-Time	844587475
-<Other>	Time		<muut>
-Clock set to:	Time		Kello asetettu aikaan:
+1	finnish	x-vnd.Haiku-Time	453699369
+<Other>	Time		<Muut>
+Add	Time		Lisää
+Could not contact server	Time		Ei voitu ottaa yhteyttä palvelimeen
+Could not create socket	Time		Ei voitu luoda pistoketta
 Current time:	Time		Nykyinen aika:
-Date & Time	Time		Päivämäärä & Aika
+Date and time	Time		Päivämäärä ja aika
+Etc	Time		Jne
 GMT	Time		Greenwichin aika
+Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
 Local time	Time		Paikallinen aika
+Message receiving failed	Time		Viestin vastaanotto epäonnistui
+Network time	Time		Verkkoaika
 OK	Time		Valmis
 Preview time:	Time		Esikatseluaika:
+Received invalid time	Time		Vastaanotettiin virheellinen aika
+Remove	Time		Poista
+Reset	Time		Nollaa
 Revert	Time		Palauta
+Sending request failed	Time		Pyynnön lähettäminen epäonnistui
 Set time zone	Time		Aseta aikavyöhyke
+Stop	Time		Pysäytä
+Synchronize	Time		Synkronoi
+Synchronize again	Time		Synkronoi uudelleen
+Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
+The following error occured while synchronizing:r\n%s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
+This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Tämä asetus ohjaa sitä, kuinka Haiku näyttää ajan perustuen siihen kuinka\naika on mitattu tietokoneeen laitteistokellossa. Ikkunat asetetaan\nnormaalisti paikalliseen aikaan, mikä tarkoittaa että laitteistokello mittaa samaa\naikaa asetetussa aikavyöhykkeessä. Kun tämä aika on asetettu Greenwichin aikaan,\nse tarkoittaa, että mittaus perustuu siihen ja Haiku voi säätää aikaa\nasetettuun aikavyöhykkeeseen perustuen.
 Time	System name		Aika-asetukset
+Time	Time		Aika
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Aikavyöhyke
+Try all servers	Time		Yritä kaikkia palvelimia
+Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
 \nNow: 	Time		\nNyt:
 about	Time		Ohjelmasta
