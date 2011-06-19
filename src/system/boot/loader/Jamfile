@@ -10,7 +10,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 
 {
-	local defines =
+	DEFINES +=
 		_BOOT_MODE
 		BOOT_ARCH=\\\"$(TARGET_ARCH)\\\"
 		KMESSAGE_CONTAINER_ONLY
@@ -28,7 +28,7 @@ UsePrivateHeaders shared storage ;
 	switch $(TARGET_ARCH) {
 		case "ppc" :
 		{
-			defines +=
+			DEFINES +=
 				BOOT_SUPPORT_PARTITION_AMIGA
 				BOOT_SUPPORT_PARTITION_APPLE
 
@@ -37,7 +37,7 @@ UsePrivateHeaders shared storage ;
 		}
 		case "x86" :
 		{
-			defines +=
+			DEFINES +=
 				BOOT_SUPPORT_PARTITION_EFI
 
 				#BOOT_SUPPORT_FILE_SYSTEM_FAT
@@ -45,10 +45,12 @@ UsePrivateHeaders shared storage ;
 		}
 	}
 
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti ;
+	local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
+		kernel_cpp.h ] ;
+
+	SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
 }
+
 
 KernelStaticLibrary boot_loader :
 	elf.cpp
@@ -74,6 +76,8 @@ KernelStaticLibrary boot_loader :
 	list.cpp
 	ring_buffer.cpp
 	safemode_settings.cpp
+
+	Referenceable.cpp
 
 	: -fno-pic
 	;
@@ -119,6 +123,9 @@ SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
 
 SEARCH on [ FGristFiles stage2_crt0.S ]
     = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_ARCH) ] ;
+
+SEARCH on [ FGristFiles Referenceable.cpp ]
+    = [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 
 SubInclude HAIKU_TOP src system boot loader file_systems ;
