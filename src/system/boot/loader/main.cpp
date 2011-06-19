@@ -106,7 +106,7 @@ main(stage2_args *args)
 		// is already loaded at this point and we definitely
 		// know our boot volume, too
 		if (status == B_OK) {
-			register_boot_file_system(bootVolume.RootDirectory());
+			register_boot_file_system(bootVolume);
 
 			if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) == 0)
 				platform_switch_to_logo();

@@ -27,6 +27,7 @@
 #define BOOT_METHOD						"boot method"
 #define BOOT_VOLUME_USER_SELECTED		"user selected"
 #define BOOT_VOLUME_BOOTED_FROM_IMAGE	"booted from image"
+#define BOOT_VOLUME_PACKAGED			"packaged"
 #define BOOT_VOLUME_PARTITION_OFFSET	"partition offset"
 #define BOOT_VOLUME_DISK_IDENTIFIER		"disk identifier"
 

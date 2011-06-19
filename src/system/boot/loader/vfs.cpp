@@ -490,19 +490,23 @@ vfs_init(stage2_args *args)
 
 
 status_t
-register_boot_file_system(Directory *volume)
+register_boot_file_system(BootVolume& bootVolume)
 {
-	gRoot->AddLink("boot", volume);
+	Directory* rootDirectory = bootVolume.RootDirectory();
+	gRoot->AddLink("boot", rootDirectory);
 
 	Partition *partition;
-	status_t status = gRoot->GetPartitionFor(volume, &partition);
+	status_t status = gRoot->GetPartitionFor(rootDirectory, &partition);
 	if (status != B_OK) {
-		dprintf("register_boot_file_system(): could not locate boot volume in root!\n");
+		dprintf("register_boot_file_system(): could not locate boot volume in "
+			"root!\n");
 		return status;
 	}
 
 	gKernelArgs.boot_volume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
 		partition->offset);
+	if (bootVolume.IsPackaged())
+		gKernelArgs.boot_volume.SetBool(BOOT_VOLUME_PACKAGED, true);
 
 	Node *device = get_node_from(partition->FD());
 	if (device == NULL) {

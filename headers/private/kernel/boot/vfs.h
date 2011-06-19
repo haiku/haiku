@@ -136,7 +136,7 @@ private:
 /* function prototypes */
 
 extern status_t vfs_init(stage2_args *args);
-extern status_t register_boot_file_system(Directory *directory);
+extern status_t register_boot_file_system(BootVolume& bootVolume);
 extern status_t get_boot_file_system(stage2_args* args,
 			BootVolume& _bootVolume);
 extern status_t mount_file_systems(stage2_args *args);
