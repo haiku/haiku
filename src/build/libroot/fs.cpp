@@ -979,7 +979,7 @@ write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 			return -1;
 		}
 
-		return 0;
+		return bufferSize;
 	}
 
 	// seek
