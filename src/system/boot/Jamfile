@@ -17,6 +17,7 @@ local librootFunctions =
 	strncmp.o
 	strcat.o
 	strcpy.o
+	strerror.o
 	strlcat.o
 	strlcpy.o
 	strchr.o
@@ -31,6 +32,9 @@ if $(HAIKU_BOARD_LOADER_BASE) {
 
 AddResources haiku_loader : boot_loader.rdef ;
 
+# don't link against libsupc++
+HAIKU_NO_LIBSUPC++ on boot_loader_$(TARGET_BOOT_PLATFORM) = true ;
+
 KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_arch_$(TARGET_ARCH).o
@@ -43,8 +47,13 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_amiga_ffs.a
 	boot_tarfs.a
 	boot_fatfs.a
+	boot_packagefs.a
 
-	# needed by tarfs and video_splash.cpp
+	boot_loader.a
+		# a second time, so undefined references in the file systems can be
+		# resolved
+
+	# needed by tarfs, packagefs, and video_splash.cpp
 	boot_zlib.a
 
 	# libroot functions needed by the stage2 boot loader (compiled for the
