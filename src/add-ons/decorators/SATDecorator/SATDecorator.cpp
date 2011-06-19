@@ -119,7 +119,7 @@ SATDecorator::_DoLayout()
 
 	bool hasTab = false;
 
-	switch (Look()) {
+	switch ((int)Look()) {
 		case B_MODAL_WINDOW_LOOK:
 			fBorderWidth = 5;
 			break;
