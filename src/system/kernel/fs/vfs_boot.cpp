@@ -508,6 +508,19 @@ vfs_mount_boot_file_system(kernel_args* args)
 		_kern_create_symlink(-1, path, "/boot", 0);
 	}
 
+	// If we're booting off a packaged system, mount packagefs.
+	if (args->boot_volume.GetBool(BOOT_VOLUME_PACKAGED, false)) {
+		static const char* const kPackageFSName = "packagefs";
+
+		dev_t systemPackageMount = _kern_mount("/boot/system",
+			NULL, kPackageFSName, 0, "packages /boot/system/packages",
+			0 /* unused argument length */);
+		if (systemPackageMount < 0) {
+			panic("Failed to mount system packagefs: %s",
+				strerror(systemPackageMount));
+		}
+	}
+
 	// Do post-boot-volume module initialization. The module code wants to know
 	// whether the module images the boot loader has pre-loaded are the same as
 	// on the boot volume. That is the case when booting from hard disk or CD,
