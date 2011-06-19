@@ -235,12 +235,20 @@ rule ExtractArchive directory : entries : archiveFile : grist
 		Depends $(directory) : $(archiveFile) ;
 		switch $(archiveFile:S)
 		{
-			case .zip 	: ExtractZipArchive1 $(targets) : $(directory)
-							$(archiveFile) ;
-			case .tgz 	: ExtractTarArchive1 $(targets) : $(directory)
-							$(archiveFile) ;
-			case * 		: Exit "ExtractArchive: Unhandled archive extension:
-							$(archiveFile:S)" ;
+			case .zip :
+				ExtractZipArchive1 $(targets) : $(directory) $(archiveFile) ;
+
+			case .tgz :
+				ExtractTarArchive1 $(targets) : $(directory) $(archiveFile) ;
+
+			case .hpkg :
+				Depends $(targets) : <build>package ;
+				ExtractHPKGArchive1 $(targets)
+					: <build>package $(directory) $(archiveFile) ;
+
+			case * :
+				Exit "ExtractArchive: Unhandled archive extension:"
+					"$(archiveFile:S)" ;
 		}
 		INITIALIZED on $(directory) = 1 ;
 	}
@@ -251,6 +259,7 @@ rule ExtractArchive directory : entries : archiveFile : grist
 
 	return $(targets) ;
 }
+
 
 actions ExtractZipArchive1
 {
@@ -263,6 +272,15 @@ actions ExtractTarArchive1
 	mkdir -p $(2[1])
 	tar -C $(2[1]) -xf $(2[2])
 }
+
+
+actions ExtractHPKGArchive1
+{
+	mkdir -p "$(2[2])"
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) extract -C "$(2[2])" "$(2[3])"
+}
+
 
 actions ExtractArchiveDummy
 {
