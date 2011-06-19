@@ -1,9 +1,11 @@
+/*
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 #ifndef ZOIDBERG_GARGOYLE_MAIL_UTIL_H
 #define ZOIDBERG_GARGOYLE_MAIL_UTIL_H
-/* mail util - header parsing
-**
-** Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+
+
+//! Header parsing utilities
 
 
 #include <stdio.h>
@@ -13,7 +15,7 @@
 #include <E-mail.h>
 
 
-#define R5_COMPATIBLE 1
+// TODO: this should only be preserved for gcc2 compatibility
 
 
 class BString;
@@ -95,6 +97,8 @@ void extract_address_name(BString &address);
 	// Given a header field (usually the From: e-mail address) with gobbledygook in
 	// it, find the longest human-readable phrase (usually the person's name).
 
-void get_address_list(BList &list, const char *string, void (*cleanupFunc)(BString &) = NULL);
+void get_address_list(BList &list, const char *string,
+	void (*cleanupFunc)(BString &) = NULL);
+
 
 #endif	/* ZOIDBERG_GARGOYLE_MAIL_UTIL_H */
