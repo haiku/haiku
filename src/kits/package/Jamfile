@@ -9,6 +9,7 @@ UsePrivateHeaders
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
 HPKG_SOURCES =
+	AttributeDataReader.cpp
 	BlockBufferCache.cpp
 	BlockBufferCacheImpl.cpp
 	BufferCache.cpp
@@ -16,6 +17,7 @@ HPKG_SOURCES =
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
+	FDDataReader.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
