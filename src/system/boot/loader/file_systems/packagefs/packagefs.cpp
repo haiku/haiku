@@ -208,9 +208,14 @@ struct PackageDirectory : PackageNode {
 		return fEntries.GetNext(child);
 	}
 
-	PackageNode* Lookup(const char* name) const
+	PackageNode* Lookup(const char* name)
 	{
-		for (NodeList::ConstIterator it = fEntries.GetIterator();
+		if (strcmp(name, ".") == 0)
+			return this;
+		if (strcmp(name, "..") == 0)
+			return fParentDirectory;
+
+		for (NodeList::Iterator it = fEntries.GetIterator();
 				PackageNode* child = it.Next();) {
 			if (strcmp(child->Name(), name) == 0)
 				return child;
@@ -319,11 +324,6 @@ struct PackageVolume : BReferenceable {
 		return fNextNodeID++;
 	}
 
-	void AddNode(PackageNode* node)
-	{
-		fRootDirectory.AddChild(node);
-	}
-
 	status_t CreateFileDataReader(const BPackageData& data,
 		FileDataReader*& _fileDataReader)
 	{
@@ -395,6 +395,9 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 				(PackageNode*)parentEntry->UserToken());
 		}
 
+		if (parentDir == NULL)
+			parentDir = fVolume->RootDirectory();
+
 		status_t error;
 
 		// get the file mode -- filter out write permissions
@@ -437,10 +440,7 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 		node->SetModifiedTime(entry->ModifiedTime());
 
 		// add it to the parent directory
-		if (parentDir != NULL)
-			parentDir->AddChild(node);
-		else
-			fVolume->AddNode(node);
+		parentDir->AddChild(node);
 
 		entry->SetUserToken(node);
 
