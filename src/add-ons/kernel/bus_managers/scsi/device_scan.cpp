@@ -117,7 +117,7 @@ scsi_scan_get_inquiry(scsi_ccb *worker_req, scsi_res_inquiry *new_inquiry_data)
 			// bad luck
 			if (std::min((int)cmd->allocation_length,
 						new_inquiry_data->additional_length + 4)
-					>= (int)offsetof(scsi_res_inquiry, version_descriptor[9])) {
+					>= (int)offsetof(scsi_res_inquiry, _res74)) {
 				int i, previousStandard = -1;
 
 				for (i = 0; i < 8; ++i) {
