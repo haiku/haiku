@@ -50,7 +50,7 @@ public:
 	virtual						~MemoryView();
 
 	static MemoryView*			Create(::Team* team);
-									// thrws
+									// throws
 
 			void				SetTargetAddress(TeamMemoryBlock* block,
 									target_addr_t address);
@@ -77,6 +77,7 @@ private:
 	target_addr_t				fTargetAddress;
 	float						fCharWidth;
 	float						fLineHeight;
+	int32						fTargetAddressSize;
 	int32						fTextCharsPerLine;
 	int32						fHexBlocksPerLine;
 	int32						fCurrentEndianMode;

@@ -37,11 +37,14 @@ MemoryView::MemoryView(::Team* team)
 	fLineHeight(0.0),
 	fTextCharsPerLine(0),
 	fHexBlocksPerLine(0),
-	fCurrentEndianMode(team->GetArchitecture()->IsBigEndian()
-		? EndianModeBigEndian : EndianModeLittleEndian),
 	fHexMode(HexMode8BitInt),
 	fTextMode(TextModeASCII)
 {
+	Architecture* architecture = team->GetArchitecture();
+	fTargetAddressSize = architecture->AddressSize() * 2;
+	fCurrentEndianMode = architecture->IsBigEndian()
+		? EndianModeBigEndian : EndianModeLittleEndian;
+
 }
 
 
@@ -133,17 +136,17 @@ MemoryView::Draw(BRect rect)
 	rgb_color dataColor = HighColor();
 	font_height fh;
 	GetFontHeight(&fh);
-	uint32 lineAddress = (uint32)fTargetBlock->BaseAddress() + startLine
+	target_addr_t lineAddress = fTargetBlock->BaseAddress() + startLine
 		* currentCharsPerLine;
 	for (; currentAddress < maxAddress && drawPoint.y < rect.bottom
 		+ fLineHeight; drawPoint.y += fLineHeight) {
 		drawPoint.x = 1.0;
-		snprintf(buffer, sizeof(buffer), "%" B_PRIx32,
-			lineAddress);
+		snprintf(buffer, sizeof(buffer), "%0*" B_PRIx64,
+			(int)fTargetAddressSize, lineAddress);
 		PushState();
 		SetHighColor(tint_color(HighColor(), B_LIGHTEN_1_TINT));
 		DrawString(buffer, drawPoint);
-		drawPoint.x += fCharWidth * 10;
+		drawPoint.x += fCharWidth * (fTargetAddressSize + 2);
 		PopState();
 
 		if (fHexMode != HexModeNone) {
@@ -419,7 +422,8 @@ MemoryView::_RecalcScrollBars()
 		BRect bounds = Bounds();
 		// the left portion of the view is off limits since it
 		// houses the address offset of the current line
-		float baseWidth = bounds.Width() - (10.0 * fCharWidth);
+		float baseWidth = bounds.Width() - ((fTargetAddressSize + 2)
+			* fCharWidth);
 		float hexWidth = 0.0;
 		float textWidth = 0.0;
 		int32 hexDigits = 1 << fHexMode;
