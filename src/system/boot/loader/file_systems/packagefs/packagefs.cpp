@@ -64,6 +64,7 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 		fVolume(volume),
 		fParentDirectory(NULL),
 		fName(NULL),
+		fNodeID(0),
 		fMode(mode)
 	{
 		fModifiedTime.tv_sec = 0;
@@ -75,10 +76,11 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 		free(fName);
 	}
 
-	status_t Init(PackageDirectory* parentDir, const char* name)
+	status_t Init(PackageDirectory* parentDir, const char* name, ino_t nodeID)
 	{
 		fParentDirectory = parentDir;
 		fName = strdup(name);
+		fNodeID = nodeID;
 
 		return fName != NULL ? B_OK : B_NO_MEMORY;
 	}
@@ -91,6 +93,11 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 	const char* Name() const
 	{
 		return fName;
+	}
+
+	ino_t NodeID() const
+	{
+		return fNodeID;
 	}
 
 	mode_t Mode() const
@@ -112,6 +119,7 @@ protected:
 	PackageVolume*		fVolume;
 	PackageDirectory*	fParentDirectory;
 	char*				fName;
+	ino_t				fNodeID;
 	mode_t				fMode;
 	timespec			fModifiedTime;
 };
@@ -269,6 +277,7 @@ private:
 struct PackageVolume : BReferenceable {
 	PackageVolume()
 		:
+		fNextNodeID(1),
 		fRootDirectory(this, S_IFDIR),
 		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
 		fDataReaderFactory(&fBufferCache),
@@ -284,7 +293,12 @@ struct PackageVolume : BReferenceable {
 
 	status_t Init(int fd)
 	{
-		status_t error = fBufferCache.Init();
+		status_t error = fRootDirectory.Init(&fRootDirectory, ".",
+			NextNodeID());
+		if (error != B_OK)
+			return error;
+
+		error = fBufferCache.Init();
 		if (error != B_OK)
 			return error;
 
@@ -298,6 +312,11 @@ struct PackageVolume : BReferenceable {
 	PackageDirectory* RootDirectory()
 	{
 		return &fRootDirectory;
+	}
+
+	ino_t NextNodeID()
+	{
+		return fNextNodeID++;
 	}
 
 	void AddNode(PackageNode* node)
@@ -324,6 +343,7 @@ struct PackageVolume : BReferenceable {
 	}
 
 private:
+	ino_t						fNextNodeID;
 	PackageDirectory			fRootDirectory;
 	BBlockBufferCacheNoLock		fBufferCache;
 	BPackageDataReaderFactory	fDataReaderFactory;
@@ -408,7 +428,7 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 		if (node == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
 
-		error = node->Init(parentDir, entry->Name());
+		error = node->Init(parentDir, entry->Name(), fVolume->NextNodeID());
 		if (error != B_OK) {
 			delete node;
 			RETURN_ERROR(error);
@@ -539,6 +559,11 @@ struct File : ::Node {
 		return fFile->Size();
 	}
 
+	virtual ino_t Inode() const
+	{
+		return fFile->NodeID();
+	}
+
 private:
 	PackageFile*	fFile;
 };
@@ -600,6 +625,11 @@ struct Symlink : ::Node {
 		return strlen(fSymlink->SymlinkPath()) + 1;
 	}
 
+	virtual ino_t Inode() const
+	{
+		return fSymlink->NodeID();
+	}
+
 private:
 	PackageSymlink*	fSymlink;
 };
@@ -642,6 +672,11 @@ struct Directory : ::Directory {
 	virtual int32 Type() const
 	{
 		return fDirectory->Mode() & S_IFMT;
+	}
+
+	virtual ino_t Inode() const
+	{
+		return fDirectory->NodeID();
 	}
 
 	virtual status_t Open(void** _cookie, int mode)
