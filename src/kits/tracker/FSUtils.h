@@ -260,6 +260,18 @@ _IMPEXP_TRACKER void FSOpenWithDocuments(const entry_ref *executableToLaunch,
 _IMPEXP_TRACKER status_t FSLaunchUsing(const entry_ref *ref, BMessage *listOfRefs);
 
 
+// some extra directory_which values
+// move these to FindDirectory.h
+const uint32 B_USER_MAIL_DIRECTORY = 3500;
+const uint32 B_USER_QUERIES_DIRECTORY = 3501;
+const uint32 B_USER_PEOPLE_DIRECTORY = 3502;
+const uint32 B_USER_DOWNLOADS_DIRECTORY = 3503;
+const uint32 B_USER_DESKBAR_APPS_DIRECTORY = 3504;
+const uint32 B_USER_DESKBAR_PREFERENCES_DIRECTORY = 3505;
+const uint32 B_USER_DESKBAR_DEVELOP_DIRECTORY = 3506;
+const uint32 B_BOOT_DISK = 3507;
+	// map /boot into the directory_which enum for convenience
+
 class WellKnowEntryList {
 	// matches up names, id's and node_refs of well known entries in the
 	// system hierarchy

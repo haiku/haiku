@@ -647,7 +647,7 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 		// match up well known entries in the file system with specialized
 		// icons stored in Tracker's resources
 		int32 resid = -1;
-		switch (wellKnownEntry->which) {
+		switch ((uint32)wellKnownEntry->which) {
 			case B_BOOT_DISK:
 				resid = R_BootVolumeIcon;
 				break;
