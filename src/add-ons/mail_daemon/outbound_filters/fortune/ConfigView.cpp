@@ -51,7 +51,7 @@ ConfigView::ConfigView()
 void ConfigView::SetTo(const BMessage *archive)
 {
 	BMailFileConfigView* control = (BMailFileConfigView*)FindView(
-		"fortune_file")
+		"fortune_file");
 	if (control != NULL)
 		control->SetTo(archive, NULL);
 

@@ -38,8 +38,7 @@ BFileControl::BFileControl(BRect rect, const char* name, const char* label,
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 13;
-	BString selectString = B_TRANSLATE("Select");
-	selectString += B_UTF8_ELLIPSIS;
+	BString selectString = B_TRANSLATE("Select" B_UTF8_ELLIPSIS);
 	float labelWidth = StringWidth(selectString) + 20;
 	rect = Bounds();
 	rect.right -= labelWidth;
