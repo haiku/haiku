@@ -12,8 +12,6 @@ UsePrivateHeaders shared ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-AddResources mail_daemon : mail_daemon.rdef DeskbarViewIcons.rdef ;
-
 Server mail_daemon :
 	DeskbarView.cpp
 	ErrorLogWindow.cpp
@@ -22,9 +20,10 @@ Server mail_daemon :
 	main.cpp
 	Notifier.cpp
 	StatusWindow.cpp
+	: be libmail.so tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+		$(TARGET_NETWORK_LIBS)
+	: mail_daemon.rdef DeskbarViewIcons.rdef
 ;
-
-LinkAgainst mail_daemon : be libmail.so tracker $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS) ;
 
 Package haiku-maildaemon-cvs :
 	mail_daemon :
@@ -32,3 +31,11 @@ Package haiku-maildaemon-cvs :
 
 Packages haiku-maildaemon-cvs :
 	README LICENSE HISTORY install.sh ;
+
+DoCatalogs mail_daemon :
+	x-vnd.Haiku-mail_daemon
+	:
+	DeskbarView.cpp
+	MailDaemon.cpp
+	StatusWindow.cpp
+;

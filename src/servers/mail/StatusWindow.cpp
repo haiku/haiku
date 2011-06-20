@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2004-2009, Haiku Inc. All rights reserved.
+ * Copyright 2004-2011, Haiku Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -13,11 +13,10 @@
 
 #include "MailSettings.h"
 
-#include <MDRLanguage.h>
-
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <E-mail.h>
 #include <FindDirectory.h>
@@ -32,6 +31,10 @@
 
 #include <stdio.h>
 #include <assert.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "StatusWindow"
 
 
 static BLocker sLock;
@@ -50,7 +53,7 @@ MailStatusWindow::MailStatusWindow(BRect rect, const char *name,
 	frame.InsetBy(90.0 + 5.0, 5.0);
 
 	fCheckNowButton = new BButton(frame, "check_mail",
-		MDR_DIALECT_CHOICE ("Check mail now","メールチェック"),
+		B_TRANSLATE("Check mail now"),
 		new BMessage('mbth'), B_FOLLOW_LEFT_RIGHT,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
 	fCheckNowButton->ResizeToPreferred();
@@ -62,9 +65,9 @@ MailStatusWindow::MailStatusWindow(BRect rect, const char *name,
 	frame.InsetBy(-90.0, 0.0);
 
 	fMessageView = new BStringView(frame, "message_view", "",
-								   B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+		B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	fMessageView->SetAlignment(B_ALIGN_CENTER);
-	fMessageView->SetText(MDR_DIALECT_CHOICE ("No new messages.","未読メッセージはありません"));
+	fMessageView->SetText(B_TRANSLATE("No new messages."));
 	float framewidth = frame.Width();
 	fMessageView->ResizeToPreferred();
 	fMessageView->ResizeTo(framewidth, fMessageView->Bounds().Height());

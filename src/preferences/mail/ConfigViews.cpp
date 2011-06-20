@@ -28,8 +28,6 @@
 
 #include <MailSettings.h>
 
-#include <MDRLanguage.h>
-
 #include "FilterConfigView.h"
 
 

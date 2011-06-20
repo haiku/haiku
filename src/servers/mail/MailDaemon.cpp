@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <Beep.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -28,7 +29,10 @@
 #include <MailDaemon.h>
 #include <MailMessage.h>
 #include <MailSettings.h>
-#include <MDRLanguage.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MailDaemon"
 
 
 void
@@ -159,20 +163,15 @@ MailDaemonApp::ReadyToRun()
 	}
 
 	BString string;
-	MDR_DIALECT_CHOICE(
-		if (fNewMessages > 0)
-			string << fNewMessages;
-		else
-			string << "No";
+	if (fNewMessages > 0) {
 		if (fNewMessages != 1)
-			string << " new messages.";
+			string << fNewMessages << B_TRANSLATE(" new messages.");
 		else
-			string << " new message.";,
-		if (fNewMessages > 0)
-			string << fNewMessages << " 通の未読メッセージがあります ";
-		else
-			string << "未読メッセージはありません";
-	);
+			string << fNewMessages << B_TRANSLATE(" new message.");
+	}
+	else
+		string = B_TRANSLATE("No new messages");
+
 	fCentralBeep = false;
 	fMailStatusWindow->SetDefaultMessage(string);
 
@@ -473,9 +472,8 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 
 			if (fAlertString != B_EMPTY_STRING) {
 				fAlertString.Truncate(fAlertString.Length() - 1);
-				BAlert* alert = new BAlert(MDR_DIALECT_CHOICE("New Messages",
-					"新着メッセージ"), fAlertString.String(), "OK", NULL, NULL,
-					B_WIDTH_AS_USUAL);
+				BAlert* alert = new BAlert(B_TRANSLATE("New Messages"),
+					fAlertString.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL);
 				alert->SetFeel(B_NORMAL_WINDOW_FEEL);
 				alert->Go(NULL);
 				fAlertString = B_EMPTY_STRING;
@@ -519,17 +517,13 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 		case 'numg':
 		{
 			int32 numMessages = msg->FindInt32("num_messages");
-			MDR_DIALECT_CHOICE(
-				fAlertString << numMessages << " new message";
-				if (numMessages > 1)
-					fAlertString << 's';
+			if (numMessages > 1)
+				fAlertString << numMessages << B_TRANSLATE(" new messages");
+			else
+				fAlertString << numMessages << B_TRANSLATE(" new message");
 
-				fAlertString << " for " << msg->FindString("name")
-					<< '\n';,
-
-				fAlertString << msg->FindString("name") << "より\n"
-					<< numMessages << " 通のメッセージが届きました　　";
-			);
+			fAlertString << B_TRANSLATE(" for ") << msg->FindString("name")
+				<< '\n';
 			break;
 		}
 
@@ -548,21 +542,14 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 
 			BString string;
 
-			MDR_DIALECT_CHOICE(
-				if (fNewMessages > 0)
-					string << fNewMessages;
-				else
-					string << "No";
+			if (fNewMessages > 0) {
 				if (fNewMessages != 1)
-					string << " new messages.";
+					string << fNewMessages << B_TRANSLATE(" new messages.");
 				else
-					string << " new message.";,
-
-				if (fNewMessages > 0)
-					string << fNewMessages << " 通の未読メッセージがあります";
-				else
-					string << "未読メッセージはありません";
-			);
+					string << fNewMessages << B_TRANSLATE(" new message.");
+			}
+			else
+				string << B_TRANSLATE("No new messages.");
 
 			fMailStatusWindow->SetDefaultMessage(string.String());
 			break;
@@ -715,7 +702,7 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 	BVolume volume;
 
 	map<int32, send_mails_info> messages;
-	
+
 
 	int32 account = -1;
 	if (msg->FindInt32("account", &account) != B_OK)

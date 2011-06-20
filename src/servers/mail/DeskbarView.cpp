@@ -10,6 +10,7 @@
 #include <malloc.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -36,9 +37,13 @@
 #include <E-mail.h>
 #include <MailDaemon.h>
 #include <MailSettings.h>
-#include <MDRLanguage.h>
 
 #include "DeskbarViewIcons.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DeskbarView"
+
 
 const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
@@ -462,9 +467,8 @@ DeskbarView::_BuildMenu()
 	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
 
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE (
-		"Create new message", "N) 新規メッセージ作成")B_UTF8_ELLIPSIS,
-		new BMessage(MD_OPEN_NEW)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Create new message"
+		B_UTF8_ELLIPSIS), new BMessage(MD_OPEN_NEW)));
 	menu->AddSeparatorItem();
 
 	BMessenger tracker(kTrackerSignature);
@@ -530,9 +534,7 @@ DeskbarView::_BuildMenu()
 
 	// Hack for R5's buggy Query Notification
 	#ifdef HAIKU_TARGET_PLATFORM_BEOS
-		menu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE("Refresh New Mail Count",
-				"未読メールカウントを更新"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh New Mail Count"),
 			new BMessage(MD_REFRESH_QUERY)));
 	#endif
 
@@ -540,10 +542,10 @@ DeskbarView::_BuildMenu()
 
 	if (fNewMessages > 0) {
 		BString string;
-		MDR_DIALECT_CHOICE(
-			string << fNewMessages << " new message"
-				<< (fNewMessages != 1 ? "s" : B_EMPTY_STRING),
-			string << fNewMessages << " 通の未読メッセージ");
+		if (fNewMessages != 1)
+			string << fNewMessages << B_TRANSLATE(" new messages");
+		else
+			string << fNewMessages << B_TRANSLATE(" new message");
 
 		_GetNewQueryRef(ref);
 
@@ -554,16 +556,16 @@ DeskbarView::_BuildMenu()
 		navMenu->SetNavDir(&ref);
 
 		menu->AddItem(item);
-	} else {
-		menu->AddItem(item = new BMenuItem(
-			MDR_DIALECT_CHOICE ("No new messages","未読メッセージなし"), NULL));
+	}
+	else {
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("No new messages"),
+			NULL));
 		item->SetEnabled(false);
 	}
 
 	BMailAccounts accounts;
 	if (modifiers() & B_SHIFT_KEY) {
-		BMenu *accountMenu = new BMenu(
-			MDR_DIALECT_CHOICE ("Check for mails only","R) メール受信のみ"));
+		BMenu *accountMenu = new BMenu(B_TRANSLATE("Check for mails only"));
 		BFont font;
 		menu->GetFont(&font);
 		accountMenu->SetFont(&font);
@@ -577,7 +579,7 @@ DeskbarView::_BuildMenu()
 			accountMenu->AddItem(new BMenuItem(account->Name(), message));
 		}
 		if (accounts.CountAccounts() == 0) {
-			item = new BMenuItem("<no accounts>", NULL);
+			item = new BMenuItem(B_TRANSLATE("<no accounts>"), NULL);
 			item->SetEnabled(false);
 			accountMenu->AddItem(item);
 		}
@@ -586,27 +588,23 @@ DeskbarView::_BuildMenu()
 			new BMessage(MD_CHECK_FOR_MAILS)));
 
 		// Not used:
-		// menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE (
-		// "Check For Mails Only","メール受信のみ"), new BMessage(MD_CHECK_FOR_MAILS)));
-		menu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Send pending mails", "M) 保留メールを送信"),
-		new BMessage(MD_SEND_MAILS)));
+		// menu->AddItem(new BMenuItem(B_TRANSLATE("Check For Mails Only"),
+		// new BMessage(MD_CHECK_FOR_MAILS)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Send pending mails"),
+			new BMessage(MD_SEND_MAILS)));
 	} else {
-		menu->AddItem(item = new BMenuItem(
-			MDR_DIALECT_CHOICE ("Check for mail now", "C) メールチェック"),
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Check for mail now"),
 			new BMessage(MD_CHECK_SEND_NOW)));
 		if (accounts.CountAccounts() == 0)
 			item->SetEnabled(false);
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(
-		MDR_DIALECT_CHOICE ("Preferences", "P) メール環境設定") B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
 		new BMessage(MD_OPEN_PREFS)));
 
 	if (modifiers() & B_SHIFT_KEY) {
-		menu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Shutdown mail services", "Q) 終了"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Shutdown mail services"),
 			new BMessage(B_QUIT_REQUESTED)));
 	}
 
