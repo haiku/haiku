@@ -426,16 +426,64 @@ dump_feature_string(int currentCPU, cpu_ent *cpu)
 		strlcat(features, "pbe ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE3)
 		strlcat(features, "sse3 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_PCLMULQDQ)
+		strlcat(features, "pclmulqdq ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DTES64)
+		strlcat(features, "dtes64 ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MONITOR)
 		strlcat(features, "monitor ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DSCPL)
 		strlcat(features, "dscpl ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_VMX)
+		strlcat(features, "vmx ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SMX)
+		strlcat(features, "smx ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_EST)
 		strlcat(features, "est ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TM2)
 		strlcat(features, "tm2 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSSE3)
+		strlcat(features, "ssse3 ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CNXTID)
 		strlcat(features, "cnxtid ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_FMA)
+		strlcat(features, "fma ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CX16)
+		strlcat(features, "cx16 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_XTPR)
+		strlcat(features, "xtpr ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_PDCM)
+		strlcat(features, "pdcm ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_PCID)
+		strlcat(features, "pcid ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DCA)
+		strlcat(features, "dca ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE4_1)
+		strlcat(features, "sse4_1 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE4_2)
+		strlcat(features, "sse4_2 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_X2APIC)
+		strlcat(features, "x2apic ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MOVBE)
+		strlcat(features, "movbe ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_POPCNT)
+		strlcat(features, "popcnt ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TSCDEADLINE)
+		strlcat(features, "tscdeadline ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_AES)
+		strlcat(features, "aes ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_XSAVE)
+		strlcat(features, "xsave ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_OSXSAVE)
+		strlcat(features, "osxsave ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_AVX)
+		strlcat(features, "avx ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_F16C)
+		strlcat(features, "f16c ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_RDRND)
+		strlcat(features, "rdrnd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_HYPERVISOR)
+		strlcat(features, "hypervisor ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_SYSCALL)
 		strlcat(features, "syscall ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_NX)

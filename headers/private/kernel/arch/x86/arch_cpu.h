@@ -34,6 +34,7 @@
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
 // x86 features from cpuid eax 1, edx register
+// reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-5)
 #define IA32_FEATURE_FPU	0x00000001 // x87 fpu
 #define IA32_FEATURE_VME	0x00000002 // virtual 8086
 #define IA32_FEATURE_DE		0x00000004 // debugging extensions
@@ -65,12 +66,37 @@
 #define IA32_FEATURE_PBE	0x80000000 // pending break enable
 
 // x86 features from cpuid eax 1, ecx register
-#define IA32_FEATURE_EXT_SSE3			0x00000001	// SSE3
-#define IA32_FEATURE_EXT_MONITOR		0x00000008	// MONITOR/MWAIT
-#define IA32_FEATURE_EXT_DSCPL			0x00000010	// CPL qualified debug store
-#define IA32_FEATURE_EXT_EST			0x00000080	// speedstep
-#define IA32_FEATURE_EXT_TM2			0x00000100	// thermal monitor 2
-#define IA32_FEATURE_EXT_CNXTID			0x00000400	// L1 context ID
+// reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-4)
+#define IA32_FEATURE_EXT_SSE3		0x00000001	// SSE3
+#define IA32_FEATURE_EXT_PCLMULQDQ	0x00000002	// PCLMULQDQ Instruction 
+#define IA32_FEATURE_EXT_DTES64		0x00000004	// 64-Bit Debug Store
+#define IA32_FEATURE_EXT_MONITOR	0x00000008	// MONITOR/MWAIT
+#define IA32_FEATURE_EXT_DSCPL		0x00000010	// CPL qualified debug store
+#define IA32_FEATURE_EXT_VMX		0x00000020	// Virtual Machine Extensions
+#define IA32_FEATURE_EXT_SMX		0x00000040	// Safer Mode Extensions
+#define IA32_FEATURE_EXT_EST		0x00000080	// Enhanced SpeedStep
+#define IA32_FEATURE_EXT_TM2		0x00000100	// Thermal Monitor 2
+#define IA32_FEATURE_EXT_SSSE3		0x00000200	// Supplemental SSE-3
+#define IA32_FEATURE_EXT_CNXTID		0x00000400	// L1 Context ID
+#define IA32_FEATURE_EXT_FMA		0x00001000	// Fused Multiply Add
+#define IA32_FEATURE_EXT_CX16		0x00002000	// CMPXCHG16B
+#define IA32_FEATURE_EXT_XTPR		0x00004000	// xTPR Update Control
+#define IA32_FEATURE_EXT_PDCM		0x00008000	// Perfmon and Debug Capability
+#define IA32_FEATURE_EXT_PCID		0x00020000	// Process Context Identifiers
+#define IA32_FEATURE_EXT_DCA		0x00040000	// Direct Cache Access
+#define IA32_FEATURE_EXT_SSE4_1		0x00080000	// SSE4.1
+#define IA32_FEATURE_EXT_SSE4_2		0x00100000	// SSE4.2
+#define IA32_FEATURE_EXT_X2APIC		0x00200000	// Extended xAPIC Support
+#define IA32_FEATURE_EXT_MOVBE 		0x00400000	// MOVBE Instruction
+#define IA32_FEATURE_EXT_POPCNT		0x00800000	// POPCNT Instruction
+#define IA32_FEATURE_EXT_TSCDEADLINE	0x01000000	// Time Stamp Counter Deadline
+#define IA32_FEATURE_EXT_AES		0x02000000	// AES Instruction Extensions
+#define IA32_FEATURE_EXT_XSAVE		0x04000000	// XSAVE/XSTOR States
+#define IA32_FEATURE_EXT_OSXSAVE	0x08000000	// OS-Enabled XSAVE
+#define IA32_FEATURE_EXT_AVX		0x10000000	// Advanced Vector Extensions
+#define IA32_FEATURE_EXT_F16C		0x20000000	// 16-bit FP conversion
+#define IA32_FEATURE_EXT_RDRND		0x40000000	// RDRAND instruction
+#define IA32_FEATURE_EXT_HYPERVISOR	0x80000000	// Running on a hypervisor
 
 // x86 features from cpuid eax 0x80000001, edx register (AMD)
 // only care about the ones that are unique to this register
