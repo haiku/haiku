@@ -947,6 +947,6 @@ LayoutOptimizer::_SolveSubProblem(const double* d, int am, double* p)
 void
 LayoutOptimizer::_SetResult(const double* x, double* values)
 {
-	for (int i = 1; i < fVariableCount; i++)
+	for (int i = 0; i < fVariableCount; i++)
 		values[i] = x[i];
 }
