@@ -204,9 +204,9 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
-	InstallOptionalHaikuImagePackage bebook_20081026.zip
-		: $(baseURL)/bebook_20081026.zip
-		: system documentation ;
+	InstallOptionalHaikuImagePackage bebook-2008-10-26-1.hpkg
+		: $(hpkgBaseURL)/bebook-2008-10-26-1.hpkg
+		: system packages ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/bebook/index.html
 		: BeBook ;
@@ -602,90 +602,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 			$(HAIKU_GCC_VERSION[1]) ;
 	}
 
-	local arch = $(TARGET_ARCH) ;
-	local developDirTokens = system develop ;
-
-	# glue code
-	AddFilesToHaikuImage $(developDirTokens) lib :
-		<src!system!glue!arch!$(arch)>crti.o
-		<src!system!glue!arch!$(arch)>crtn.o
-		<src!system!glue>init_term_dyn.o
-		<src!system!glue>start_dyn.o
-		<src!system!glue>haiku_version_glue.o
-	;
-
-	# kernel
-	AddFilesToHaikuImage $(developDirTokens) lib : kernel.so : _KERNEL_ ;
-
-	# additional libraries
-	local developmentLibs = <revisioned>libroot_debug.so ;
-	AddFilesToHaikuImage system lib : $(developmentLibs) ;
-
-	# library symlinks
-	local lib ;
-	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
-		AddSymlinkToHaikuImage $(developDirTokens) lib
-			: /system/lib $(lib:BS) ;
-		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
-		if $(abiVersion) {
-			local abiVersionedLib = $(lib:BS).$(abiVersion) ;
-			AddSymlinkToHaikuImage $(developDirTokens) lib
-				: /system/lib $(abiVersionedLib) ;
-		}
-	}
-
-	# static libraries
-	AddFilesToHaikuImage $(developDirTokens) lib : libncurses.a ;
-	AddFilesToHaikuImage $(developDirTokens) lib : liblocalestub.a ;
-
-	# the POSIX error code mapper library
-	AddFilesToHaikuImage $(developDirTokens) lib : libposix_error_mapper.a ;
-
-	# ABI independent stuff
-
-	# scripts: cc and c++ wrapper, freetype-config, setgcc
-	local scripts = cc c++ freetype-config setgcc ;
-	SEARCH on $(scripts) = [ FDirName $(HAIKU_TOP) data bin ] ;
-	AddFilesToHaikuImage system bin : $(scripts) ;
-
-	# skeleton makefile and makefile-engine
-	local makefileEngineFiles =
-		<makefile-engine>makefile
-		<makefile-engine>makefile-engine
-	;
-	SEARCH on $(makefileEngineFiles)
-		= [ FDirName $(HAIKU_TOP) data develop ] ;
-	AddFilesToHaikuImage common develop etc
-		: $(makefileEngineFiles) ;
-
-	# headers
-	AddHeaderDirectoryToHaikuImage config ;
-	AddHeaderDirectoryToHaikuImage glibc ;
-	AddHeaderDirectoryToHaikuImage os ;
-	AddHeaderDirectoryToHaikuImage posix ;
-
-	# create be -> os symlink for now
-	AddSymlinkToHaikuImage $(developDirTokens) headers : os : be ;
-
-	# BSD and GNU compatibility headers
-	AddHeaderDirectoryToHaikuImage compatibility bsd : bsd ;
-	AddHeaderDirectoryToHaikuImage compatibility gnu : gnu ;
-
-	# third party libs headers
-	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs jpeg : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs termcap : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
-
-	# cpp headers
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
-		CopyDirectoryToHaikuImage $(developDirTokens) headers c++
-			: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 : -x .svn ;
-	}
+	AddFilesToHaikuImage system packages : haiku-devel.hpkg ;
+	AddFilesToHaikuImage common packages : makefile-engine.hpkg ;
 }
 
 
@@ -1492,8 +1410,8 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 
 # TimGMSoundFont
 if [ IsOptionalHaikuImagePackageAdded TimGMSoundFont ] {
-	InstallOptionalHaikuImagePackage TimGMSoundFont-2010-06-16.zip
-		: $(baseURL)/TimGMSoundFont-2010-06-16.zip ;
+	InstallOptionalHaikuImagePackage TimGMSoundFont-2010-06-16.hpkg
+		: $(hpkgBaseURL)/TimGMSoundFont-2010-06-16.hpkg ;
 }
 
 
@@ -1637,12 +1555,9 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	CopyDirectoryToHaikuImage system documentation
-		: [ FDirName $(HAIKU_TOP) docs welcome ]
-		: welcome : -x .svn ;
-	CopyDirectoryToHaikuImage system documentation
-		: [ FDirName $(HAIKU_TOP) docs userguide ]
-		: userguide : -x .svn ;
+	AddFilesToHaikuImage system packages : haiku-userguide.hpkg ;
+	AddFilesToHaikuImage system packages : haiku-welcome.hpkg ;
+
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/welcome/welcome_en.html
 		: Welcome ;

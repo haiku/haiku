@@ -1,3 +1,6 @@
+#pragma mark - haiku.hpkg
+
+
 local haikuPackage = haiku.hpkg ;
 HaikuPackage $(haikuPackage) ;
 
@@ -298,3 +301,127 @@ CopyDirectoryToPackage documentation
 
 
 BuildHaikuPackage $(haikuPackage) : haiku ;
+
+
+#pragma mark - haiku-devel.hpkg
+
+
+local haikuDevelPackage = haiku-devel.hpkg ;
+HaikuPackage $(haikuDevelPackage) ;
+
+local arch = $(TARGET_ARCH) ;
+local developDirTokens = develop ;
+
+# glue code
+AddFilesToPackage $(developDirTokens) lib :
+	<src!system!glue!arch!$(arch)>crti.o
+	<src!system!glue!arch!$(arch)>crtn.o
+	<src!system!glue>init_term_dyn.o
+	<src!system!glue>start_dyn.o
+	<src!system!glue>haiku_version_glue.o
+;
+
+# kernel
+AddFilesToPackage $(developDirTokens) lib : kernel.so : _KERNEL_ ;
+
+# additional libraries
+local developmentLibs = <revisioned>libroot_debug.so ;
+AddFilesToPackage lib : $(developmentLibs) ;
+
+# library symlinks
+local lib ;
+for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
+	AddSymlinkToPackage $(developDirTokens) lib : /system/lib $(lib:BS) ;
+	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
+	if $(abiVersion) {
+		local abiVersionedLib = $(lib:BS).$(abiVersion) ;
+		AddSymlinkToPackage $(developDirTokens) lib
+			: /system/lib $(abiVersionedLib) ;
+	}
+}
+
+# static libraries
+AddFilesToPackage $(developDirTokens) lib : libncurses.a ;
+AddFilesToPackage $(developDirTokens) lib : liblocalestub.a ;
+
+# the POSIX error code mapper library
+AddFilesToPackage $(developDirTokens) lib : libposix_error_mapper.a ;
+
+# ABI independent stuff
+
+# scripts: cc and c++ wrapper, freetype-config, setgcc
+local scripts = cc c++ freetype-config setgcc ;
+SEARCH on $(scripts) = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : $(scripts) ;
+
+# headers
+AddHeaderDirectoryToPackage config ;
+AddHeaderDirectoryToPackage glibc ;
+AddHeaderDirectoryToPackage os ;
+AddHeaderDirectoryToPackage posix ;
+
+# create be -> os symlink for now
+AddSymlinkToPackage $(developDirTokens) headers : os : be ;
+
+# BSD and GNU compatibility headers
+AddHeaderDirectoryToPackage compatibility bsd : bsd ;
+AddHeaderDirectoryToPackage compatibility gnu : gnu ;
+
+# third party libs headers
+AddHeaderDirectoryToPackage libs freetype2 : 3rdparty ;
+AddHeaderDirectoryToPackage libs jpeg : 3rdparty ;
+AddHeaderDirectoryToPackage libs ncurses : 3rdparty ;
+AddHeaderDirectoryToPackage libs png : 3rdparty ;
+AddHeaderDirectoryToPackage libs termcap : 3rdparty ;
+AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
+AddHeaderDirectoryToPackage libs zlib : 3rdparty ;
+
+# cpp headers
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
+	CopyDirectoryToPackage $(developDirTokens) headers c++
+		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 : -x .svn ;
+}
+
+BuildHaikuPackage $(haikuDevelPackage) : haiku-devel ;
+
+
+#pragma mark - haiku-userguide.hpkg
+
+
+local haikuUserGuidePackage = haiku-userguide.hpkg ;
+HaikuPackage $(haikuUserGuidePackage) ;
+
+CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs userguide ]
+	: userguide : -x .svn ;
+
+BuildHaikuPackage $(haikuUserGuidePackage) : haiku-userguide ;
+
+
+#pragma mark - haiku-welcome.hpkg
+
+
+local haikuWelcomePackage = haiku-welcome.hpkg ;
+HaikuPackage $(haikuWelcomePackage) ;
+
+CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs welcome ]
+	: welcome : -x .svn ;
+
+BuildHaikuPackage $(haikuWelcomePackage) : haiku-welcome ;
+
+
+#pragma mark - makefile-engine.hpkg
+
+
+local makefileEnginePackage = makefile-engine.hpkg ;
+HaikuPackage $(makefileEnginePackage) ;
+
+# skeleton makefile and makefile-engine
+local makefileEngineFiles =
+	<makefile-engine>makefile
+	<makefile-engine>makefile-engine
+;
+SEARCH on $(makefileEngineFiles) = [ FDirName $(HAIKU_TOP) data develop ] ;
+AddFilesToPackage develop etc : $(makefileEngineFiles) ;
+
+BuildHaikuPackage $(makefileEnginePackage) : makefile-engine ;

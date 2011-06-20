@@ -1,0 +1,21 @@
+name = haiku-devel
+version = 1-1
+architecture = x86_gcc2
+summary = "The Haiku base system development files"
+description = "The package contains all files associated with the base system
+needed for development, like static libraries, glue code, library symlinks,
+header files, etc."
+
+packager = "The Haiku build system"
+vendor = "Haiku Project"
+
+copyright = "2001-2011 Haiku, Inc. et al"
+licenses = [ "MIT" ]
+
+provides = [
+	haiku-devel
+]
+
+requires = [
+	haiku
+]

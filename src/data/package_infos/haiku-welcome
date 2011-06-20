@@ -1,0 +1,18 @@
+name = haiku-welcome
+version = 1-1
+architecture = any
+summary = "The Haiku welcome documentation"
+description = "The Haiku welcome documentation for new users."
+
+packager = "The Haiku build system"
+vendor = "Haiku Project"
+
+copyright = "2001-2011 Haiku, Inc. et al"
+licenses = [ "MIT" ]
+
+provides = [
+	haiku-welcome
+]
+
+requires = [
+]
