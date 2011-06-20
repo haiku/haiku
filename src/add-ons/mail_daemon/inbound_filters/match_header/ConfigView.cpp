@@ -4,6 +4,9 @@
 */
 
 
+#include <stdio.h>
+
+#include <Catalog.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
 #include <Message.h>
@@ -14,7 +17,10 @@
 #include <FileConfigView.h>
 #include <MailSettings.h>
 
-#include <MDRLanguage.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
+
 
 const uint32 kMsgActionMoveTo = 'argm';
 const uint32 kMsgActionDelete = 'argd';
@@ -40,7 +46,6 @@ class RuleFilterConfig : public BView {
 		int32 chain;
 };
 
-#include <stdio.h>
 
 RuleFilterConfig::RuleFilterConfig(const BMessage *settings)
 	:
@@ -48,25 +53,29 @@ RuleFilterConfig::RuleFilterConfig(const BMessage *settings)
 		0), menu(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	attr = new BTextControl(BRect(5,5,100,20),"attr",MDR_DIALECT_CHOICE ("If","条件:"),MDR_DIALECT_CHOICE ("header (e.g. Subject)","ヘッダ(例えばSubject)"),NULL);
-	attr->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE ("If ","条件: "))+ 4);
+	attr = new BTextControl(BRect(5,5,100,20),"attr", B_TRANSLATE("If"),
+		B_TRANSLATE("header (e.g. Subject)"),NULL);
+	attr->SetDivider(be_plain_font->StringWidth(B_TRANSLATE("If "))+ 4);
 	if (settings->HasString("attribute"))
 		attr->SetText(settings->FindString("attribute"));
 	AddChild(attr);
 
-	regex = new BTextControl(BRect(104,5,255,20),"attr",MDR_DIALECT_CHOICE (" has "," が "),MDR_DIALECT_CHOICE ("value (use REGEX: in from of regular expressions like *spam*)","値(正規表現対応)"),NULL);
-	regex->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE (" has "," が ")) + 4);
+	regex = new BTextControl(BRect(104,5,255,20),"attr", B_TRANSLATE(" has "),
+		B_TRANSLATE("value (use REGEX: in from of regular expressions like "
+		"*spam*)"), NULL);
+	regex->SetDivider(be_plain_font->StringWidth(B_TRANSLATE(" has ")) + 4);
 	if (settings->HasString("regex"))
 		regex->SetText(settings->FindString("regex"));
 	AddChild(regex);
 
-	arg = new BFileControl(BRect(5,55,255,80),"arg",NULL,MDR_DIALECT_CHOICE ("this field is based on the action","ここは動作によって意味が変わります"));
+	arg = new BFileControl(BRect(5,55,255,80),"arg", NULL,
+		B_TRANSLATE("this field is based on the action"));
 	if (BControl *control = (BControl *)arg->FindView("select_file"))
 		control->SetEnabled(false);
 	if (settings->HasString("argument"))
 		arg->SetText(settings->FindString("argument"));
 
-	outbound = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose account>","<アカウントを選択>"));
+	outbound = new BPopUpMenu(B_TRANSLATE("<Choose account>"));
 
 	if (settings->HasInt32("do_what"))
 		staging = settings->FindInt32("do_what");
@@ -96,17 +105,23 @@ void RuleFilterConfig::AttachedToWindow() {
 	if (menu != NULL)
 		return; // We switched back from another tab
 
-	menu = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose action>","<動作を選択>"));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Move to","移動する"), new BMessage(kMsgActionMoveTo)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set flags to","フラグを指定する"), new BMessage(kMsgActionSetTo)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Delete message","削除する"), new BMessage(kMsgActionDelete)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Reply with","返事を書く"), new BMessage(kMsgActionReplyWith)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set as read","既読にする"), new BMessage(kMsgActionSetRead)));
+	menu = new BPopUpMenu(B_TRANSLATE("<Choose action>"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Move to"),
+		new BMessage(kMsgActionMoveTo)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Set flags to"),
+		new BMessage(kMsgActionSetTo)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Delete message"),
+		new BMessage(kMsgActionDelete)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Reply with"),
+		new BMessage(kMsgActionReplyWith)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Set as read"),
+		new BMessage(kMsgActionSetRead)));
 	menu->SetTargetForItems(this);
 
-	BMenuField *field = new BMenuField(BRect(5,30,210,50),"do_what",MDR_DIALECT_CHOICE ("Then","ならば"),menu);
+	BMenuField *field = new BMenuField(BRect(5,30,210,50),"do_what",
+		B_TRANSLATE("Then"), menu);
 	field->ResizeToPreferred();
-	field->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE ("Then","ならば")) + 8);
+	field->SetDivider(be_plain_font->StringWidth(B_TRANSLATE("Then")) + 8);
 	AddChild(field);
 
 	outbound_field = new BMenuField(BRect(5,55,255,80),"reply","Foo",outbound);

@@ -7,6 +7,7 @@
 
 #include "IMAPFolderConfig.h"
 
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <ListItem.h>
 #include <SpaceLayoutItem.h>
@@ -16,6 +17,10 @@
 #include <StringForSize.h>
 
 #include <crypt.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "IMAPFolderConfig"
 
 
 class EditableListItem {
@@ -90,7 +95,6 @@ CheckBoxItem::DrawItem(BView* owner, BRect itemRect, bool drawEverything)
 	BRect boxRect(0.0f, 2.0f, ceilf(3.0f + fontHeight.ascent),
 		ceilf(5.0f + fontHeight.ascent));
 
-	
 	fBoxRect.left = itemRect.right - boxRect.Width();
 	fBoxRect.top = itemRect.top + (itemRect.Height() - boxRect.Height()) / 2;
 	fBoxRect.right = itemRect.right;
@@ -201,7 +205,7 @@ class StatusWindow : public BWindow {
 public:
 	StatusWindow(const char* text)
 		:
-		BWindow(BRect(0, 0, 10, 10), "status", B_MODAL_WINDOW_LOOK,
+		BWindow(BRect(0, 0, 10, 10), B_TRANSLATE("status"), B_MODAL_WINDOW_LOOK,
 			B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE
 			| B_AVOID_FRONT | B_NOT_RESIZABLE)
 	{
@@ -230,9 +234,9 @@ const uint32 kMsgInit = '&Ini';
 
 FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	:
-	BWindow(BRect(0, 0, 300, 300), "IMAP Folders", B_TITLED_WINDOW_LOOK,
-		B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE
-			| B_AVOID_FRONT),
+	BWindow(BRect(0, 0, 300, 300), B_TRANSLATE("IMAP Folders"),
+		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION
+		| B_NOT_ZOOMABLE | B_AVOID_FRONT),
 	fSettings(settings)
 {
 	BView* rootView = new BView(Bounds(), "root", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -244,13 +248,14 @@ FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	rootView->SetLayout(layout);
 	layout->SetInset(spacing);
 
-	fFolderListView = new EditListView("IMAP Folders");
+	fFolderListView = new EditListView(B_TRANSLATE("IMAP Folders"));
 	fFolderListView->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNLIMITED));
-	fApplyButton = new BButton("Apply", "Apply", new BMessage(kMsgApplyButton));
+	fApplyButton = new BButton("Apply", B_TRANSLATE("Apply"),
+		new BMessage(kMsgApplyButton));
 
 	fQuotaView = new BStringView("quota view",
-		"Failed to fetch available storage.");
+		B_TRANSLATE("Failed to fetch available storage."));
 	fQuotaView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
@@ -294,8 +299,8 @@ FolderConfigWindow::MessageReceived(BMessage* message)
 void
 FolderConfigWindow::_LoadFolders()
 {
-	StatusWindow* status = new StatusWindow("Fetching IMAP folders, have "
-		"patience...");
+	StatusWindow* status = new StatusWindow(
+		B_TRANSLATE("Fetching IMAP folders, have patience..."));
 	status->Show();
 
 	BString server;
@@ -356,8 +361,8 @@ FolderConfigWindow::_ApplyChanges()
 	if (!haveChanges)
 		return;
 
-	StatusWindow* status = new StatusWindow("Subcribe / Unsuscribe IMAP "
-		"folders, have patience...");
+	StatusWindow* status = new StatusWindow(B_TRANSLATE("Subcribe / Unsuscribe "
+		"IMAP folders, have patience..."));
 	status->Show();
 
 	for (unsigned int i = 0; i < fFolderList.size(); i++) {

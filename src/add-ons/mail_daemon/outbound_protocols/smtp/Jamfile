@@ -27,5 +27,12 @@ if $(HAIKU_OPENSSL_ENABLED) {
 Addon SMTP
 	: $(sources)
 	: be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
-		$(HAIKU_OPENSSL_LIBS)
+		$(HAIKU_LOCALE_LIBS) $(HAIKU_OPENSSL_LIBS)
+;
+
+DoCatalogs SMTP :
+	x-vnd.Haiku-SMTP
+	:
+	ConfigView.cpp
+	smtp.cpp
 ;

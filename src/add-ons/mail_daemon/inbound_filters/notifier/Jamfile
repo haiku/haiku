@@ -9,5 +9,12 @@ Addon NewMailNotification :
 	filter.cpp
 	ConfigView.cpp
 	:
-	be libmail.so $(TARGET_LIBSUPC++)
+	be libmail.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	;
+
+DoCatalogs NewMailNotification :
+	x-vnd.Haiku-NewMailNotification
+	:
+	ConfigView.cpp
+	filter.cpp
+;

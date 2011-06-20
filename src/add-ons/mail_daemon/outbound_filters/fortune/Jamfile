@@ -8,7 +8,13 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 Addon Fortune :
 	ConfigView.cpp
-	filter.cpp ;
+	filter.cpp
+	:
+	be libmail.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+;
 
-LinkAgainst Fortune :
-	 be libmail.so $(TARGET_LIBSUPC++) ;
+DoCatalogs Fortune :
+	x-vnd.Haiku-Fortune
+	:
+	ConfigView.cpp
+;

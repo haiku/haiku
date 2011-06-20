@@ -7,10 +7,15 @@
  */
 
 
+#include <Catalog.h>
 #include <FileConfigView.h>
 #include <MailAddon.h>
 #include <MailPrivate.h>
 #include <ProtocolConfigView.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
 
 
 class POP3ConfigView : public BMailProtocolConfigView {
@@ -47,8 +52,8 @@ POP3ConfigView::POP3ConfigView(MailAddonSettings& settings,
 
 	SetTo(settings);
 
-	fFileView =  new BMailFileConfigView("Destination:", "destination",
-		false, BPrivate::default_mail_in_directory().Path());
+	fFileView =  new BMailFileConfigView(B_TRANSLATE("Destination:"),
+		"destination", false, BPrivate::default_mail_in_directory().Path());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
 	float w, h;

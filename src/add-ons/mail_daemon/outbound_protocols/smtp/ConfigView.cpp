@@ -9,12 +9,16 @@
 
 #include <TextControl.h>
 
+#include <Catalog.h>
 #include <FileConfigView.h>
 #include <MailAddon.h>
-#include <MDRLanguage.h>
 #include <MenuField.h>
 #include <MailPrivate.h>
 #include <ProtocolConfigView.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
 
 
 class SMTPConfigView : public BMailProtocolConfigView {
@@ -45,12 +49,12 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 	AddFlavor("STARTTLS");
 #endif
 
-	AddAuthMethod(MDR_DIALECT_CHOICE("None","無し"), false);
-	AddAuthMethod(MDR_DIALECT_CHOICE("ESMTP","ESMTP"));
-	AddAuthMethod(MDR_DIALECT_CHOICE("POP3 before SMTP","送信前に受信する"), false);
+	AddAuthMethod(B_TRANSLATE("None"), false);
+	AddAuthMethod(B_TRANSLATE("ESMTP"));
+	AddAuthMethod(B_TRANSLATE("POP3 before SMTP"), false);
 
 	BTextControl *control = (BTextControl *)(FindView("host"));
-	control->SetLabel(MDR_DIALECT_CHOICE("SMTP server: ","SMTPサーバ: "));
+	control->SetLabel(B_TRANSLATE("SMTP server: "));
 
 	// Reset the dividers after changing one
 	float widestLabel = 0;
@@ -68,8 +72,8 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 
 	SetTo(settings);
 
-	fFileView = new BMailFileConfigView("Destination:", "path", false,
-		BPrivate::default_mail_out_directory().Path());
+	fFileView = new BMailFileConfigView(B_TRANSLATE("Destination:"), "path",
+		false, BPrivate::default_mail_out_directory().Path());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
 	float w, h;

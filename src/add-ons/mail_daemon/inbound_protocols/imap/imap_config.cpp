@@ -8,6 +8,7 @@
 
 
 #include <Button.h>
+#include <Catalog.h>
 #include <TextControl.h>
 
 #include <MailAddon.h>
@@ -16,9 +17,12 @@
 #include <FileConfigView.h>
 #include <ProtocolConfigView.h>
 #include <MailPrivate.h>
-#include <MDRLanguage.h>
 
 #include "IMAPFolderConfig.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "imap_config"
 
 
 const uint32 kMsgOpenIMAPFolder = '&OIF';
@@ -70,8 +74,8 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 	((BControl *)(FindView("delete_remote_when_local")))->SetEnabled(true);
 	((BControl *)(FindView("delete_remote_when_local")))->MoveBy(0, -25);
 
-	fIMAPFolderButton = new BButton(frame, "IMAP Folders", "IMAP Folders",
-		new BMessage(kMsgOpenIMAPFolder));
+	fIMAPFolderButton = new BButton(frame, "IMAP Folders", B_TRANSLATE(
+		"IMAP Folders"), new BMessage(kMsgOpenIMAPFolder));
 	AddChild(fIMAPFolderButton);
 
 	frame.right -= 10;
@@ -79,8 +83,8 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 	BPath defaultFolder = BPrivate::default_mail_directory();
 	defaultFolder.Append(accountSettings.Name());
 
-	fFileView =  new BMailFileConfigView("Destination:", "destination",
-		false, defaultFolder.Path());
+	fFileView =  new BMailFileConfigView(B_TRANSLATE("Destination:"),
+		"destination", false, defaultFolder.Path());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
 	fFileView->MoveBy(0, frame.bottom + 5);

@@ -6,6 +6,7 @@
 
 #include "ConfigView.h"
 
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <PopUpMenu.h>
 #include <MenuItem.h>
@@ -13,10 +14,13 @@
 #include <String.h>
 #include <Message.h>
 
-#include <MDRLanguage.h>
-
 #include <MailAddon.h>
 #include <MailSettings.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
+
 
 const uint32 kMsgNotifyMethod = 'nomt';
 
@@ -35,19 +39,22 @@ ConfigView::ConfigView()
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING,false,false);
 
 	const char *notifyMethods[] = {
-		MDR_DIALECT_CHOICE ("Beep","音"),
-		MDR_DIALECT_CHOICE ("Alert","窓（メール毎）"),
-		MDR_DIALECT_CHOICE ("Keyboard LEDs","キーボードLED"),
-		MDR_DIALECT_CHOICE ("Central alert","窓（一括）"),
-		"Central beep","Log window"};
-	for (int32 i = 0,j = 1;i < 6;i++,j *= 2)
-		menu->AddItem(new BMenuItem(notifyMethods[i],new BMessage(kMsgNotifyMethod)));
+		B_TRANSLATE("Beep"),
+		B_TRANSLATE("Alert"),
+		B_TRANSLATE("Keyboard LEDs"),
+		B_TRANSLATE("Central alert"),
+		B_TRANSLATE("Central beep"),
+		B_TRANSLATE("Log window")
+	};
+	for (int32 i = 0,j = 1;i < 6;i++,j *= 2) {
+		menu->AddItem(new BMenuItem(notifyMethods[i],
+			new BMessage(kMsgNotifyMethod)));
+	}
 
-	BMenuField *field = new BMenuField(frame,"notify",
-		MDR_DIALECT_CHOICE ("Method:","方法："),menu);
+	BMenuField *field = new BMenuField(frame,"notify", B_TRANSLATE("Method:"),
+		menu);
 	field->ResizeToPreferred();
-	field->SetDivider(field->StringWidth(
-		MDR_DIALECT_CHOICE ("Method:","方法：")) + 6);
+	field->SetDivider(field->StringWidth(B_TRANSLATE("Method:")) + 6);
 	AddChild(field);
 
 	ResizeToPreferred();

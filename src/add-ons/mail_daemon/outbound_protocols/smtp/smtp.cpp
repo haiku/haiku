@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <DataIO.h>
 #include <Entry.h>
 #include <File.h>
@@ -46,7 +47,9 @@
 #	include "md5.h"
 #endif
 
-#include <MDRLanguage.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "smtp"
 
 
 #define CRLF "\r\n"
@@ -268,7 +271,8 @@ SMTPProtocol::Connect()
 		// to the SMTP server first...
 		status_t status = _POP3Authentication();
 		if (status < B_OK) {
-			error_msg << MDR_DIALECT_CHOICE ("POP3 authentication failed. The server said:\n","POP3認証に失敗しました\n") << fLog;
+			error_msg << B_TRANSLATE("POP3 authentication failed. The server "
+				"said:\n") << fLog;
 			ShowError(error_msg.String());
 			return status;
 		}
@@ -277,16 +281,17 @@ SMTPProtocol::Connect()
 	status = Open(fSettingsMessage.FindString("server"),
 		fSettingsMessage.FindInt32("port"), authMethod == 1);
 	if (status < B_OK) {
-		error_msg << MDR_DIALECT_CHOICE ("Error while opening connection to ","接続中にエラーが発生しました") << fSettingsMessage.FindString("server");
+		error_msg << B_TRANSLATE("Error while opening connection to ")
+			<< fSettingsMessage.FindString("server");
 
 		if (fSettingsMessage.FindInt32("port") > 0)
 			error_msg << ":" << fSettingsMessage.FindInt32("port");
 
 		// << strerror(err) - BNetEndpoint sucks, we can't use this;
 		if (fLog.Length() > 0)
-			error_msg << ". The server says:\n" << fLog;
+			error_msg << B_TRANSLATE(". The server says:\n") << fLog;
 		else
-			error_msg << MDR_DIALECT_CHOICE (": Connection refused or host not found.","；接続が拒否されたかサーバーが見つかりません");
+			error_msg << B_TRANSLATE(": Connection refused or host not found.");
 
 		ShowError(error_msg.String());
 
@@ -299,8 +304,9 @@ SMTPProtocol::Connect()
 
 	if (status != B_OK) {
 		//-----This is a really cool kind of error message. How can we make it work for POP3?
-		error_msg << MDR_DIALECT_CHOICE ("Error while logging in to ","ログイン中にエラーが発生しました\n") << fSettingsMessage.FindString("server")
-			<< MDR_DIALECT_CHOICE (". The server said:\n","サーバーエラー\n") << fLog;
+		error_msg << B_TRANSLATE("Error while logging in to ")
+			<< fSettingsMessage.FindString("server")
+			<< B_TRANSLATE(". The server said:\n") << fLog;
 		ShowError(error_msg.String());
 	}
 	return B_OK;
@@ -350,7 +356,7 @@ SMTPProtocol::SendMessages(const std::vector<entry_ref>& mails,
 status_t
 SMTPProtocol::Open(const char *address, int port, bool esmtp)
 {
-	ReportProgress(0, 0, MDR_DIALECT_CHOICE ("Connecting to server...","接続中..."));
+	ReportProgress(0, 0, B_TRANSLATE("Connecting to server" B_UTF8_ELLIPSIS));
 
 	#ifdef USE_SSL
 		use_ssl = (fSettingsMessage.FindInt32("flavor") == 1);
@@ -408,7 +414,8 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
     	if (SSL_connect(ssl) <= 0) {
     		BString error;
-			error << "Could not connect to SMTP server " << fSettingsMessage.FindString("server");
+			error << "Could not connect to SMTP server "
+				<< fSettingsMessage.FindString("server");
 			if (port != 465)
 				error << ":" << port;
 			error << ". (SSL connection error)";

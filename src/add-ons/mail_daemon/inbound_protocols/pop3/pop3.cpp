@@ -30,9 +30,10 @@
 #endif
 
 #include <Alert.h>
-#include <fs_attr.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
+#include <fs_attr.h>
 #include <Path.h>
 #include <String.h>
 #include <VolumeRoster.h>
@@ -42,7 +43,10 @@
 #include "MailSettings.h"
 #include "MessageIO.h"
 
-#include <MDRLanguage.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "pop3"
+
 
 #define POP3_RETRIEVAL_TIMEOUT 60000000
 #define CRLF	"\r\n"
@@ -140,15 +144,14 @@ POP3Protocol::SyncMessages()
 	_ReadManifest();
 
 	SetTotalItems(2);
-	ReportProgress(0, 1, "Connect to server...");
+	ReportProgress(0, 1, B_TRANSLATE("Connect to server" B_UTF8_ELLIPSIS));
 	status_t error = Connect();
 	if (error < B_OK) {
 		ResetProgress();
 		return error;
 	}
 
-	ReportProgress(0, 1, MDR_DIALECT_CHOICE("Getting UniqueIDs...",
-		"固有のIDを取得中..."));
+	ReportProgress(0, 1, B_TRANSLATE("Getting UniqueIDs" B_UTF8_ELLIPSIS));
 	error = _UniqueIDs();
 	if (error < B_OK) {
 		ResetProgress();
@@ -326,8 +329,8 @@ POP3Protocol::DeleteMessage(const entry_ref& ref)
 status_t
 POP3Protocol::Open(const char *server, int port, int)
 {
-	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Connecting to POP3 server...",
-		"POP3サーバに接続しています..."));
+	ReportProgress(0, 0, B_TRANSLATE("Connecting to POP3 server"
+		B_UTF8_ELLIPSIS));
 
 	if (port <= 0) {
 #ifdef USE_SSL
@@ -341,8 +344,7 @@ POP3Protocol::Open(const char *server, int port, int)
 
 	// Prime the error message
 	BString error_msg;
-	error_msg << MDR_DIALECT_CHOICE("Error while connecting to server ",
-		"サーバに接続中にエラーが発生しました ") << server;
+	error_msg << B_TRANSLATE("Error while connecting to server ") << server;
 	if (port != 110)
 		error_msg << ":" << port;
 
@@ -354,8 +356,7 @@ POP3Protocol::Open(const char *server, int port, int)
 	}
 
 	if (hostIP == 0) {
-		error_msg << MDR_DIALECT_CHOICE(": Connection refused or host not found",
-			": ：接続が拒否されたかサーバーが見つかりません");
+		error_msg << B_TRANSLATE(": Connection refused or host not found");
 		ShowError(error_msg.String());
 
 		return B_NAME_NOT_FOUND;
@@ -368,7 +369,8 @@ POP3Protocol::Open(const char *server, int port, int)
 		saAddr.sin_family = AF_INET;
 		saAddr.sin_port = htons(port);
 		saAddr.sin_addr.s_addr = hostIP;
-		int result = connect(fSocket, (struct sockaddr *) &saAddr, sizeof(saAddr));
+		int result = connect(fSocket, (struct sockaddr *) &saAddr,
+			sizeof(saAddr));
 		if (result < 0) {
 			close(fSocket);
 			fSocket = -1;
@@ -377,7 +379,7 @@ POP3Protocol::Open(const char *server, int port, int)
 			return errno;
 		}
 	} else {
-		error_msg << ": Could not allocate socket.";
+		error_msg << B_TRANSLATE(": Could not allocate socket.");
 		ShowError(error_msg.String());
 		return B_ERROR;
 	}
@@ -424,10 +426,10 @@ POP3Protocol::Open(const char *server, int port, int)
 
 	if (strncmp(line.String(), "+OK", 3) != 0) {
 		if (line.Length() > 0) {
-			error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
-				"サーバのメッセージです\n") << line.String();
+			error_msg << B_TRANSLATE(". The server said:\n")
+				<< line.String();
 		} else
-			error_msg << ": No reply.\n";
+			error_msg << B_TRANSLATE(": No reply.\n");
 
 		ShowError(error_msg.String());
 		return B_ERROR;
@@ -444,14 +446,13 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 	status_t err;
 
 	BString error_msg;
-	error_msg << MDR_DIALECT_CHOICE("Error while authenticating user ",
-		"ユーザー認証中にエラーが発生しました ") << uid;
+	error_msg << B_TRANSLATE("Error while authenticating user ") << uid;
 
 	if (method == 1) {	//APOP
 		int32 index = fLog.FindFirst("<");
 		if(index != B_ERROR) {
-			ReportProgress(0, 0, MDR_DIALECT_CHOICE(
-				"Sending APOP authentication...", "APOP認証情報を送信中..."));
+			ReportProgress(0, 0, B_TRANSLATE("Sending APOP authentication"
+				B_UTF8_ELLIPSIS));
 			int32 end = fLog.FindFirst(">",index);
 			BString timestamp("");
 			fLog.CopyInto(timestamp, index, end - index + 1);
@@ -466,22 +467,19 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 
 			err = SendCommand(cmd.String());
 			if (err != B_OK) {
-				error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
-					"サーバのメッセージです\n") << fLog;
+				error_msg << B_TRANSLATE(". The server said:\n") << fLog;
 				ShowError(error_msg.String());
 				return err;
 			}
 
 			return B_OK;
 		} else {
-			error_msg << MDR_DIALECT_CHOICE(": The server does not support APOP.",
-				"サーバはAPOPをサポートしていません");
+			error_msg << B_TRANSLATE(": The server does not support APOP.");
 			ShowError(error_msg.String());
 			return B_NOT_ALLOWED;
 		}
 	}
-	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending username...",
-		"ユーザーID送信中..."));
+	ReportProgress(0, 0, B_TRANSLATE("Sending username" B_UTF8_ELLIPSIS));
 
 	BString cmd = "USER ";
 	cmd += uid;
@@ -489,22 +487,19 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 
 	err = SendCommand(cmd.String());
 	if (err != B_OK) {
-		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
-			"サーバのメッセージです\n") << fLog;
+		error_msg << B_TRANSLATE(". The server said:\n") << fLog;
 		ShowError(error_msg.String());
 		return err;
 	}
 
-	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending password...",
-		"パスワード送信中..."));
+	ReportProgress(0, 0, B_TRANSLATE("Sending password" B_UTF8_ELLIPSIS));
 	cmd = "PASS ";
 	cmd += password;
 	cmd += CRLF;
 
 	err = SendCommand(cmd.String());
 	if (err != B_OK) {
-		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
-			"サーバのメッセージです\n") << fLog;
+		error_msg << B_TRANSLATE(". The server said:\n") << fLog;
 		ShowError(error_msg.String());
 		return err;
 	}
@@ -516,8 +511,7 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 status_t
 POP3Protocol::Stat()
 {
-	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Getting mailbox size...",
-		"メールボックスのサイズを取得しています..."));
+	ReportProgress(0, 0, B_TRANSLATE("Getting mailbox size" B_UTF8_ELLIPSIS));
 
 	if (SendCommand("STAT" CRLF) < B_OK)
 		return B_ERROR;
@@ -746,10 +740,10 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 					// since that will get mistakenly evaluated again in the
 					// next loop and delete a character by mistake.
 					if (testIndex >= amountInBuffer - 4 && testStr[2] == '.') {
-						printf ("POP3Protocol::RetrieveInternal: Jackpot!  You have "
-							"hit the rare situation with an escaped period at the "
-							"end of the buffer.  Aren't you happy it decodes it "
-							"correctly?\n");
+						printf ("POP3Protocol::RetrieveInternal: Jackpot!  "
+							"You have hit the rare situation with an escaped "
+							"period at the end of the buffer.  Aren't you happy"
+							"it decodes it correctly?\n");
 						flushWholeBuffer = true;
 					}
 				}

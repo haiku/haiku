@@ -33,7 +33,7 @@ Addon IMAP
 	:
 	$(sources)
 	:
-	be libmail.so $(TARGET_NETWORK_LIBS) libalm.so
+	be libmail.so $(HAIKU_LOCALE_LIBS) $(TARGET_NETWORK_LIBS) libalm.so
 		libshared.a $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
 ;
 
@@ -45,4 +45,11 @@ SEARCH on [ FGristFiles IMAPFolders.cpp IMAPHandler.cpp IMAPMailbox.cpp
 Package haiku-maildaemon-cvs :
 	IMAP :
 	boot home config add-ons mail_daemon inbound_protocols
+;
+
+DoCatalogs IMAP :
+	x-vnd.Haiku-IMAP
+	:
+	imap_config.cpp
+	IMAPFolderConfig.cpp
 ;
