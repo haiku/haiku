@@ -58,4 +58,13 @@ SharedLibrary libmail.so :
 	$(TARGET_NETWORK_LIBS)
 	$(TARGET_SELECT_UNAME_ETC_LIB)
 	$(HAIKU_OPENSSL_LIBS)
+	$(HAIKU_LOCALE_LIBS)
+;
+
+
+DoCatalogs libmail.so :
+	x-vnd.Haiku-libmail
+	:
+	FileConfigView.cpp
+	ProtocolConfigView.cpp
 ;

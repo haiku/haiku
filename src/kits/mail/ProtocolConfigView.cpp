@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -22,7 +23,10 @@
 #include <TextControl.h>
 
 #include <crypt.h>
-#include <MDRLanguage.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProtocolConfigView"
 
 
 const char* kPartialDownloadLimit = "partial_download_limit";
@@ -32,9 +36,8 @@ BodyDownloadConfig::BodyDownloadConfig()
 	:
 	BView(BRect(0,0,50,50), "body_config", B_FOLLOW_ALL_SIDES, 0)
 {
-	const char *partial_text = MDR_DIALECT_CHOICE (
-		"Partially download messages larger than",
-		"部分ダウンロードする");
+	const char *partial_text = B_TRANSLATE(
+		"Partially download messages larger than");
 
 	BRect r(0, 0, 280, 15);
 	fPartialBox = new BCheckBox(r, "size_if", partial_text,
@@ -213,22 +216,23 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 	rect.bottom = rect.top - 2 + sItemHeight;
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_HOSTNAME)
-		AddChild(AddTextField(rect,"host",MDR_DIALECT_CHOICE ("Mail server:","サーバ名　：")));
+		AddChild(AddTextField(rect, "host", B_TRANSLATE("Mail server:")));
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_USERNAME)
-		AddChild(AddTextField(rect,"user",MDR_DIALECT_CHOICE ("Username:","ユーザーID：")));
+		AddChild(AddTextField(rect, "user", B_TRANSLATE("Username:")));
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_PASSWORD) {
-		BTextControl *control = AddTextField(rect,"pass",MDR_DIALECT_CHOICE ("Password:","パスワード："));
+		BTextControl *control = AddTextField(rect, "pass",
+			B_TRANSLATE("Password:"));
 		control->TextView()->HideTyping(true);
 		AddChild(control);
 	}
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_FLAVORS)
-		AddChild(AddMenuField(rect,"flavor","Connection type:"));
+		AddChild(AddMenuField(rect, "flavor", B_TRANSLATE("Connection type:")));
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_AUTH_METHODS)
-		AddChild(AddMenuField(rect,"auth_method",MDR_DIALECT_CHOICE ("Login type:","認証方法　：")));
+		AddChild(AddMenuField(rect, "auth_method", B_TRANSLATE("Login type:")));
 
 	// set divider
 	float width = FindWidestLabel(this);
@@ -239,11 +243,9 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 
 	if (options_mask & B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER) {
 		AddChild(AddCheckBox(rect, "leave_mail_on_server",
-			MDR_DIALECT_CHOICE ("Leave mail on server",
-				"受信後にサーバ内のメールを削除しない"), new BMessage('lmos')));
+			B_TRANSLATE("Leave mail on server"), new BMessage('lmos')));
 		BCheckBox* box = AddCheckBox(rect, "delete_remote_when_local",
-			MDR_DIALECT_CHOICE ("Remove mail from server when deleted",
-				"端末で削除されたらサーバ保存分も削除"));
+			B_TRANSLATE("Remove mail from server when deleted"));
 		box->SetEnabled(false);
 		AddChild(box);
 	}

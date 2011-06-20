@@ -1,30 +1,34 @@
-/*
- * Copyright 2011, Haiku Inc. All Rights Reserved.
- * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
- */
+/* BMailFileConfigView - a file configuration view for filters
+**
+** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+*/
 
-
-//!	A file configuration view for filters.
-
-
-#include <FileConfigView.h>
 
 #include <stdio.h>
 
 #include <Button.h>
+#include <Catalog.h>
 #include <Message.h>
 #include <Path.h>
 #include <String.h>
 #include <TextControl.h>
 
-#include <MDRLanguage.h>
+#include <FileConfigView.h>
+
+
+class _EXPORT BFileControl;
+class _EXPORT BMailFileConfigView;
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MailKit"
 
 
 const uint32 kMsgSelectButton = 'fsel';
 
 
 BFileControl::BFileControl(BRect rect, const char* name, const char* label,
-	const char* pathOfFile, uint32 flavors)
+	const char *pathOfFile,uint32 flavors)
 	:
 	BView(rect, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, 0)
 {
@@ -33,26 +37,26 @@ BFileControl::BFileControl(BRect rect, const char* name, const char* label,
 	// determine font height
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading) + 13;
-	float labelWidth = StringWidth("Select" B_UTF8_ELLIPSIS) + 20;
+	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 13;
+	BString selectString = B_TRANSLATE("Select");
+	selectString += B_UTF8_ELLIPSIS;
+	float labelWidth = StringWidth(selectString) + 20;
 	rect = Bounds();
 	rect.right -= labelWidth;
 	rect.top = 4;	rect.bottom = itemHeight + 2;
-	fText = new BTextControl(rect, "file_path", label, pathOfFile, NULL);
+	fText = new BTextControl(rect,"file_path",label,pathOfFile,NULL);
 	if (label)
 		fText->SetDivider(fText->StringWidth(label) + 6);
 	AddChild(fText);
 
-	fButton = new BButton(BRect(0, 0, 1, 1), "select_file",
-		MDR_DIALECT_CHOICE ("Select","選択") B_UTF8_ELLIPSIS,
+	fButton = new BButton(BRect(0,0,1,1), "select_file", selectString,
 		new BMessage(kMsgSelectButton));
 	fButton->ResizeToPreferred();
 	fButton->MoveBy(rect.right + 6,
 		(rect.Height() - fButton->Frame().Height()) / 2);
 	AddChild(fButton);
 
-	fPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, flavors, false);
+	fPanel = new BFilePanel(B_OPEN_PANEL,NULL,NULL,flavors,false);
 
 	ResizeToPreferred();
 }
@@ -78,10 +82,12 @@ BFileControl::AttachedToWindow()
 void
 BFileControl::MessageReceived(BMessage *msg)
 {
-	switch (msg->what) {
+	switch (msg->what)
+	{
 		case kMsgSelectButton:
 		{
 			fPanel->Hide();
+			//fPanel->Window()->SetTitle(title);
 
 			BPath path(fText->Text());
 			if (path.InitCheck() >= B_OK)
@@ -137,17 +143,17 @@ BFileControl::SetEnabled(bool enabled)
 
 
 void
-BFileControl::GetPreferredSize(float* width, float* height)
+BFileControl::GetPreferredSize(float *width, float *height)
 {
 	*width = fButton->Frame().right + 5;
 	*height = fText->Bounds().Height() + 8;
 }
 
 
+//--------------------------------------------------------------------------
 //	#pragma mark -
 
-
-BMailFileConfigView::BMailFileConfigView(const char* label, const char* name,
+BMailFileConfigView::BMailFileConfigView(const char* label, const char*name,
 	bool useMeta, const char* defaultPath, uint32 flavors)
 	:
 	BFileControl(BRect(5, 0, 255, 10), name, label, defaultPath, flavors),
@@ -158,23 +164,25 @@ BMailFileConfigView::BMailFileConfigView(const char* label, const char* name,
 
 
 void
-BMailFileConfigView::SetTo(const BMessage* archive, BMessage* meta)
+BMailFileConfigView::SetTo(const BMessage *archive, BMessage *meta)
 {
 	fMeta = meta;
 	BString path = (fUseMeta ? meta : archive)->FindString(fName);
+
 	if (path != "")
 		SetText(path.String());
 }
 
 
 status_t
-BMailFileConfigView::Archive(BMessage* into, bool /*deep*/) const
+BMailFileConfigView::Archive(BMessage *into, bool /*deep*/) const
 {
-	const char* path = Text();
-	BMessage* archive = fUseMeta ? fMeta : into;
+	const char *path = Text();
+	BMessage *archive = fUseMeta ? fMeta : into;
 
-	if (archive->ReplaceString(fName, path) != B_OK)
-		archive->AddString(fName, path);
+	if (archive->ReplaceString(fName,path) != B_OK)
+		archive->AddString(fName,path);
 
 	return B_OK;
 }
+

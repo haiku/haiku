@@ -23,8 +23,6 @@
 #include <StringList.h>
 #include <VolumeRoster.h>
 
-#include <MDRLanguage.h>
-
 #include <mail_util.h>
 #include <MailAddon.h>
 #include <MailDaemon.h>
