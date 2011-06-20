@@ -37,25 +37,27 @@ BFileControl::BFileControl(BRect rect, const char* name, const char* label,
 	// determine font height
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 13;
+	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 13;
 	BString selectString = B_TRANSLATE("Select" B_UTF8_ELLIPSIS);
 	float labelWidth = StringWidth(selectString) + 20;
 	rect = Bounds();
 	rect.right -= labelWidth;
-	rect.top = 4;	rect.bottom = itemHeight + 2;
-	fText = new BTextControl(rect,"file_path",label,pathOfFile,NULL);
+	rect.top = 4;
+	rect.bottom = itemHeight + 2;
+	fText = new BTextControl(rect,"file_path", label, pathOfFile, NULL);
 	if (label)
 		fText->SetDivider(fText->StringWidth(label) + 6);
 	AddChild(fText);
 
-	fButton = new BButton(BRect(0,0,1,1), "select_file", selectString,
+	fButton = new BButton(BRect(0, 0, 1, 1), "select_file", selectString,
 		new BMessage(kMsgSelectButton));
 	fButton->ResizeToPreferred();
 	fButton->MoveBy(rect.right + 6,
 		(rect.Height() - fButton->Frame().Height()) / 2);
 	AddChild(fButton);
 
-	fPanel = new BFilePanel(B_OPEN_PANEL,NULL,NULL,flavors,false);
+	fPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, flavors, false);
 
 	ResizeToPreferred();
 }
@@ -79,7 +81,7 @@ BFileControl::AttachedToWindow()
 
 
 void
-BFileControl::MessageReceived(BMessage *msg)
+BFileControl::MessageReceived(BMessage* msg)
 {
 	switch (msg->what)
 	{
@@ -99,7 +101,7 @@ BFileControl::MessageReceived(BMessage *msg)
 		case B_REFS_RECEIVED:
 		{
 			entry_ref ref;
-			if (msg->FindRef("refs",&ref) >= B_OK)
+			if (msg->FindRef("refs", &ref) >= B_OK)
 			{
 				BEntry entry(&ref);
 				if (entry.InitCheck() >= B_OK)
@@ -120,7 +122,7 @@ BFileControl::MessageReceived(BMessage *msg)
 
 
 void
-BFileControl::SetText(const char *pathOfFile)
+BFileControl::SetText(const char* pathOfFile)
 {
 	fText->SetText(pathOfFile);
 }
@@ -142,7 +144,7 @@ BFileControl::SetEnabled(bool enabled)
 
 
 void
-BFileControl::GetPreferredSize(float *width, float *height)
+BFileControl::GetPreferredSize(float* width, float* height)
 {
 	*width = fButton->Frame().right + 5;
 	*height = fText->Bounds().Height() + 8;
@@ -163,7 +165,7 @@ BMailFileConfigView::BMailFileConfigView(const char* label, const char*name,
 
 
 void
-BMailFileConfigView::SetTo(const BMessage *archive, BMessage *meta)
+BMailFileConfigView::SetTo(const BMessage* archive, BMessage* meta)
 {
 	fMeta = meta;
 	BString path = (fUseMeta ? meta : archive)->FindString(fName);
@@ -174,14 +176,13 @@ BMailFileConfigView::SetTo(const BMessage *archive, BMessage *meta)
 
 
 status_t
-BMailFileConfigView::Archive(BMessage *into, bool /*deep*/) const
+BMailFileConfigView::Archive(BMessage* into, bool /*deep*/) const
 {
-	const char *path = Text();
-	BMessage *archive = fUseMeta ? fMeta : into;
+	const char* path = Text();
+	BMessage* archive = fUseMeta ? fMeta : into;
 
 	if (archive->ReplaceString(fName,path) != B_OK)
 		archive->AddString(fName,path);
 
 	return B_OK;
 }
-
