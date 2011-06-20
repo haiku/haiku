@@ -28,6 +28,7 @@ struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
 			VMCache*			cache;
 			struct fs_mount*	mount;
 			struct vnode*		covered_by;
+			struct vnode*		covers;
 			struct advisory_locking* advisory_locking;
 			struct file_descriptor* mandatory_locked_by;
 			list_link			unused_link;
