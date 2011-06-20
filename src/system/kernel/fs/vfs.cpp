@@ -121,15 +121,15 @@ typedef DoublyLinkedList<vnode> VnodeList;
 
 /*!	\brief Structure to manage a mounted file system
 
-	Note: The root_vnode and covers_vnode fields (what others?) are
+	Note: The root_vnode and root_vnode->covers fields (what others?) are
 	initialized in fs_mount() and not changed afterwards. That is as soon
 	as the mount is mounted and it is made sure it won't be unmounted
 	(e.g. by holding a reference to a vnode of that mount) (read) access
 	to those fields is always safe, even without additional locking. Morever
-	while mounted the mount holds a reference to the covers_vnode, and thus
-	making the access path vnode->mount->covers_vnode->mount->... safe if a
-	reference to vnode is held (note that for the root mount covers_vnode
-	is NULL, though).
+	while mounted the mount holds a reference to the root_vnode->covers vnode,
+	and thus making the access path vnode->mount->root_vnode->covers->mount->...
+	safe if a reference to vnode is held (note that for the root mount
+	root_vnode->covers is NULL, though).
 */
 struct fs_mount {
 	fs_mount()
@@ -164,7 +164,6 @@ struct fs_mount {
 	recursive_lock	rlock;	// guards the vnodes list
 		// TODO: Make this a mutex! It is never used recursively.
 	struct vnode*	root_vnode;
-	struct vnode*	covers_vnode;
 	KPartition*		partition;
 	VnodeList		vnodes;
 	EntryCache		entry_cache;
@@ -1737,7 +1736,7 @@ replace_vnode_if_disconnected(struct fs_mount* mount,
 
 		if (vnode == mount->root_vnode) {
 			// redirect the vnode to the covered vnode
-			vnode = mount->covers_vnode;
+			vnode = mount->root_vnode->covers;
 		} else
 			vnode = fallBack;
 
@@ -1933,8 +1932,8 @@ resolve_volume_root_to_mount_point(struct vnode* vnode)
 	struct vnode* mountPoint = NULL;
 
 	struct fs_mount* mount = vnode->mount;
-	if (vnode == mount->root_vnode && mount->covers_vnode) {
-		mountPoint = mount->covers_vnode;
+	if (vnode == mount->root_vnode && mount->root_vnode->covers != NULL) {
+		mountPoint = mount->root_vnode->covers;
 		inc_vnode_ref_count(mountPoint);
 	}
 
@@ -2119,8 +2118,8 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 				path = nextPath;
 				continue;
 			} else if (vnode->mount->root_vnode == vnode
-				&& vnode->mount->covers_vnode) {
-				nextVnode = vnode->mount->covers_vnode;
+				&& vnode->mount->root_vnode->covers != NULL) {
+				nextVnode = vnode->mount->root_vnode->covers;
 				inc_vnode_ref_count(nextVnode);
 				put_vnode(vnode);
 				vnode = nextVnode;
@@ -2427,8 +2426,8 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	// vnode so we get the underlying file system
 	VNodePutter vnodePutter;
 	if (vnode->mount->root_vnode == vnode
-		&& vnode->mount->covers_vnode != NULL) {
-		vnode = vnode->mount->covers_vnode;
+		&& vnode->mount->root_vnode->covers != NULL) {
+		vnode = vnode->mount->root_vnode->covers;
 		inc_vnode_ref_count(vnode);
 		vnodePutter.SetTo(vnode);
 	}
@@ -2938,7 +2937,7 @@ _dump_mount(struct fs_mount* mount)
 	kprintf(" id:            %ld\n", mount->id);
 	kprintf(" device_name:   %s\n", mount->device_name);
 	kprintf(" root_vnode:    %p\n", mount->root_vnode);
-	kprintf(" covers_vnode:  %p\n", mount->covers_vnode);
+	kprintf(" covers:        %p\n", mount->root_vnode->covers);
 	kprintf(" partition:     %p\n", mount->partition);
 	kprintf(" lock:          %p\n", &mount->rlock);
 	kprintf(" flags:        %s%s\n", mount->unmounting ? " unmounting" : "",
@@ -2957,7 +2956,7 @@ _dump_mount(struct fs_mount* mount)
 
 	set_debug_variable("_volume", (addr_t)mount->volume->private_volume);
 	set_debug_variable("_root", (addr_t)mount->root_vnode);
-	set_debug_variable("_covers", (addr_t)mount->covers_vnode);
+	set_debug_variable("_covers", (addr_t)mount->root_vnode->covers);
 	set_debug_variable("_partition", (addr_t)mount->partition);
 }
 
@@ -3018,8 +3017,8 @@ debug_resolve_vnode_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 
 	while (true) {
 		while (vnode->mount->root_vnode == vnode
-				&& vnode->mount->covers_vnode != NULL) {
-			vnode = vnode->mount->covers_vnode;
+				&& vnode->mount->root_vnode->covers != NULL) {
+			vnode = vnode->mount->root_vnode->covers;
 		}
 
 		if (vnode == sRoot) {
@@ -3146,7 +3145,7 @@ dump_mounts(int argc, char** argv)
 	while ((mount = (struct fs_mount*)hash_next(sMountsTable, &iterator))
 			!= NULL) {
 		kprintf("%p%4ld %p %p %p %s\n", mount, mount->id, mount->root_vnode,
-			mount->covers_vnode, mount->volume->private_volume,
+			mount->root_vnode->covers, mount->volume->private_volume,
 			mount->volume->file_system_name);
 
 		fs_volume* volume = mount->volume;
@@ -5682,7 +5681,7 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 	// we need to replace d_dev and d_ino with the actual values.
 	if (strcmp(entry->d_name, "..") == 0
 		&& parent->mount->root_vnode == parent
-		&& parent->mount->covers_vnode) {
+		&& parent->mount->root_vnode->covers != NULL) {
 		inc_vnode_ref_count(parent);
 			// vnode_path_to_vnode() puts the node
 
@@ -6978,6 +6977,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	status_t status = B_OK;
 	fs_volume* volume = NULL;
 	int32 layer = 0;
+	Vnode* coveredNode = NULL;
 
 	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
 
@@ -7105,7 +7105,6 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	mount->id = sNextMountID++;
 	mount->partition = NULL;
 	mount->root_vnode = NULL;
-	mount->covers_vnode = NULL;
 	mount->unmounting = false;
 	mount->owns_file_device = false;
 	mount->volume = NULL;
@@ -7185,17 +7184,17 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		if (status != 0)
 			goto err2;
 	} else {
-		status = path_to_vnode(path, true, &mount->covers_vnode, NULL, kernel);
+		status = path_to_vnode(path, true, &coveredNode, NULL, kernel);
 		if (status != B_OK)
 			goto err2;
 
 		// make sure covered_vnode is a directory
-		if (!S_ISDIR(mount->covers_vnode->Type())) {
+		if (!S_ISDIR(coveredNode->Type())) {
 			status = B_NOT_A_DIRECTORY;
 			goto err3;
 		}
 
-		if (mount->covers_vnode->mount->root_vnode == mount->covers_vnode) {
+		if (coveredNode->mount->root_vnode == coveredNode) {
 			// this is already a mount point
 			status = B_BUSY;
 			goto err3;
@@ -7233,10 +7232,12 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	}
 
 	// No race here, since fs_mount() is the only function changing
-	// covers_vnode (and holds sMountOpLock at that time).
+	// root_vnode->covers (and holds sMountOpLock at that time).
 	rw_lock_write_lock(&sVnodeLock);
-	if (mount->covers_vnode)
-		mount->covers_vnode->covered_by = mount->root_vnode;
+	if (coveredNode != NULL) {
+		mount->root_vnode->covers = coveredNode;
+		coveredNode->covered_by = mount->root_vnode;
+	}
 	rw_lock_write_unlock(&sVnodeLock);
 
 	if (!sRoot) {
@@ -7260,16 +7261,16 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	}
 
 	notify_mount(mount->id,
-		mount->covers_vnode ? mount->covers_vnode->device : -1,
-		mount->covers_vnode ? mount->covers_vnode->id : -1);
+		coveredNode != NULL ? coveredNode->device : -1,
+		coveredNode ? coveredNode->id : -1);
 
 	return mount->id;
 
 err4:
 	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
 err3:
-	if (mount->covers_vnode != NULL)
-		put_vnode(mount->covers_vnode);
+	if (coveredNode != NULL)
+		put_vnode(coveredNode);
 err2:
 	mutex_lock(&sMountMutex);
 	hash_remove(sMountsTable, mount);
@@ -7413,11 +7414,12 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	mount->root_vnode->ref_count--;
 	vnode_to_be_freed(mount->root_vnode);
 
-	mount->covers_vnode->covered_by = NULL;
+	Vnode* coveredNode = mount->root_vnode->covers;
+	coveredNode->covered_by = NULL;
 
 	vnodesWriteLocker.Unlock();
 
-	put_vnode(mount->covers_vnode);
+	put_vnode(coveredNode);
 
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
