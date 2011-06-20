@@ -234,12 +234,12 @@ static recursive_lock sMountOpLock;
 	private_node, mount) to which only read-only access is allowed.
 	The mutable fields advisory_locking, mandatory_locked_by, and ref_count, as
 	well as the busy, removed, unused flags, and the vnode's type can also be
-	write access when holding a read lock to sVnodeLock *and* having the vnode
-	locked. Writing access to covered_by requires to write lock sVnodeLock.
+	write accessed when holding a read lock to sVnodeLock *and* having the vnode
+	locked. Write access to covered_by requires to write lock sVnodeLock.
 
 	The thread trying to acquire the lock must not hold sMountMutex.
-	You must not have this lock held when calling create_sem(), as this
-	might call vfs_free_unused_vnodes() and thus cause a deadlock.
+	You must not hold this lock when calling create_sem(), as this might call
+	vfs_free_unused_vnodes() and thus cause a deadlock.
 */
 static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 
