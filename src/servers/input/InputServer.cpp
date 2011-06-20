@@ -1795,7 +1795,7 @@ InputServer::_DispatchEvent(BMessage* event)
 
 	BMessenger reply;
 	BMessage::Private messagePrivate(event);
-	return messagePrivate.SendMessage(fAppServerPort, -1, 0, true, 0, reply);
+	return messagePrivate.SendMessage(fAppServerPort, -1, 0, 0, false, reply);
 }
 
 
