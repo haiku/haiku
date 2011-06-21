@@ -164,6 +164,7 @@ struct fs_mount {
 	recursive_lock	rlock;	// guards the vnodes list
 		// TODO: Make this a mutex! It is never used recursively.
 	struct vnode*	root_vnode;
+	struct vnode*	covers_vnode;	// immutable
 	KPartition*		partition;
 	VnodeList		vnodes;
 	EntryCache		entry_cache;
@@ -2481,7 +2482,7 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	// The FS doesn't support getting the name of a vnode. So we search the
 	// parent directory for the vnode, if the caller let us.
 
-	if (parent == NULL)
+	if (parent == NULL || !HAS_FS_CALL(parent, read_dir))
 		return B_UNSUPPORTED;
 
 	void* cookie;
@@ -2490,7 +2491,10 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	if (status >= B_OK) {
 		while (true) {
 			uint32 num = 1;
-			status = dir_read(ioContext, parent, cookie, buffer, bufferSize,
+			// We use the FS hook directly instead of dir_read(), since we don't
+			// want the entries to be fixed. We have already resolved vnode to
+			// the covered node.
+			status = FS_CALL(parent, read_dir, cookie, buffer, bufferSize,
 				&num);
 			if (status != B_OK)
 				break;
@@ -4974,6 +4978,66 @@ out:
 }
 
 
+status_t
+vfs_get_mount_point(dev_t mountID, dev_t* _mountPointMountID,
+	ino_t* _mountPointNodeID)
+{
+	ReadLocker nodeLocker(sVnodeLock);
+	MutexLocker mountLocker(sMountMutex);
+
+	struct fs_mount* mount = find_mount(mountID);
+	if (mount == NULL)
+		return B_BAD_VALUE;
+
+	Vnode* mountPoint = mount->covers_vnode;
+
+	*_mountPointMountID = mountPoint->device;
+	*_mountPointNodeID = mountPoint->id;
+
+	return B_OK;
+}
+
+
+status_t
+vfs_bind_mount_directory(dev_t mountID, ino_t nodeID, dev_t coveredMountID,
+	ino_t coveredNodeID)
+{
+	// get the vnodes
+	Vnode* vnode;
+	status_t error = get_vnode(mountID, nodeID, &vnode, true, false);
+	if (error != B_OK)
+		return B_BAD_VALUE;
+	VNodePutter vnodePutter(vnode);
+
+	Vnode* coveredVnode;
+	error = get_vnode(coveredMountID, coveredNodeID, &coveredVnode, true,
+		false);
+	if (error != B_OK)
+		return B_BAD_VALUE;
+	VNodePutter coveredVnodePutter(coveredVnode);
+
+	// establish the covered/covering links
+	WriteLocker locker(sVnodeLock);
+
+	if (vnode->covers != NULL || coveredVnode->covered_by != NULL)
+		return B_BUSY;
+
+	vnode->covers = coveredVnode;
+	vnode->SetCovering(true);
+
+	coveredVnode->covered_by = vnode;
+	coveredVnode->SetCovered(true);
+
+	// the vnodes do now reference each other
+	inc_vnode_ref_count(vnode);
+	inc_vnode_ref_count(coveredVnode);
+
+// TODO: This relationship must be tracked, so it can be dissolved on unmount.
+
+	return B_OK;
+}
+
+
 int
 vfs_getrlimit(int resource, struct rlimit* rlp)
 {
@@ -7141,6 +7205,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	mount->id = sNextMountID++;
 	mount->partition = NULL;
 	mount->root_vnode = NULL;
+	mount->covers_vnode = NULL;
 	mount->unmounting = false;
 	mount->owns_file_device = false;
 	mount->volume = NULL;
@@ -7223,6 +7288,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		status = path_to_vnode(path, true, &coveredNode, NULL, kernel);
 		if (status != B_OK)
 			goto err2;
+
+		mount->covers_vnode = coveredNode;
 
 		// make sure covered_vnode is a directory
 		if (!S_ISDIR(coveredNode->Type())) {
@@ -8719,7 +8786,7 @@ _user_open_dir(int fd, const char* userPath)
 /*!	\brief Opens a directory's parent directory and returns the entry name
 		   of the former.
 
-	Aside from that is returns the directory's entry name, this method is
+	Aside from that it returns the directory's entry name, this method is
 	equivalent to \code _user_open_dir(fd, "..") \endcode. It really is
 	equivalent, if \a userName is \c NULL.
 
