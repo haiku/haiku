@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_DOMAIN_H
@@ -34,9 +34,9 @@ public:
 			void				AddPackage(Package* package);
 			void				RemovePackage(Package* package);
 
-			Package*			FindPackage(const char* name) const;
+			Package*			FindPackage(const char* fileName) const;
 
-			const PackageHashTable& Packages() const
+			const PackageFileNameHashTable& Packages() const
 									{ return fPackages; }
 
 private:
@@ -45,7 +45,7 @@ private:
 			dev_t				fDeviceID;
 			ino_t				fNodeID;
 			NotificationListener* fListener;
-			PackageHashTable	fPackages;
+			PackageFileNameHashTable fPackages;
 };
 
 

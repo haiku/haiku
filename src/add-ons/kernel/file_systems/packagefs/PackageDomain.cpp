@@ -41,7 +41,7 @@ PackageDomain::~PackageDomain()
 
 	Package* package = fPackages.Clear(true);
 	while (package != NULL) {
-		Package* next = package->HashTableNext();
+		Package* next = package->FileNameHashTableNext();
 		package->ReleaseReference();
 		package = next;
 	}
@@ -113,7 +113,7 @@ PackageDomain::RemovePackage(Package* package)
 
 
 Package*
-PackageDomain::FindPackage(const char* name) const
+PackageDomain::FindPackage(const char* fileName) const
 {
-	return fPackages.Lookup(name);
+	return fPackages.Lookup(fileName);
 }
