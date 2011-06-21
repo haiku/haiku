@@ -68,6 +68,7 @@ public:
 									const DwarfTargetInterface* targetInterface,
 									target_addr_t instructionPointer,
 									target_addr_t objectPointer,
+									bool hasObjectPointer,
 									target_addr_t framePointer,
 									target_addr_t relocationDelta,
 									ValueLocation& _result);

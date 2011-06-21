@@ -120,6 +120,7 @@ public:
 			status_t			ResolveLocation(DwarfTypeContext* typeContext,
 									const LocationDescription* description,
 									target_addr_t objectAddress,
+									bool hasObjectAddress,
 									ValueLocation& _location);
 
 private:

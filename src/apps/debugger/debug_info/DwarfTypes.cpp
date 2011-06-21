@@ -213,13 +213,14 @@ DwarfType::ResolveObjectDataLocation(target_addr_t objectAddress,
 status_t
 DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 	const LocationDescription* description, target_addr_t objectAddress,
-	ValueLocation& _location)
+	bool hasObjectAddress, ValueLocation& _location)
 {
 	status_t error = typeContext->File()->ResolveLocation(
 		typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
 		description, typeContext->TargetInterface(),
-		typeContext->InstructionPointer(), objectAddress,
-		typeContext->FramePointer(), typeContext->RelocationDelta(), _location);
+		typeContext->InstructionPointer(), objectAddress, hasObjectAddress,
+		typeContext->FramePointer(), typeContext->RelocationDelta(),
+		_location);
 	if (error != B_OK)
 		return error;
 
@@ -678,7 +679,7 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 
 			// evaluate the location description
 			status_t error = memberType->ResolveLocation(TypeContext(),
-				&locationDescription, piece.address, *location);
+				&locationDescription, piece.address, true, *location);
 			if (error != B_OK)
 				return error;
 

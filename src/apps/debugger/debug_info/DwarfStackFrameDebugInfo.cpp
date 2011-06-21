@@ -258,7 +258,7 @@ DwarfStackFrameDebugInfo::_CreateVariable(ObjectID* id, const BString& name,
 
 	if (locationDescription->IsValid()) {
 		status_t error = type->ResolveLocation(fTypeContext,
-			locationDescription, 0, *location);
+			locationDescription, 0, false, *location);
 		if (error != B_OK)
 			return error;
 

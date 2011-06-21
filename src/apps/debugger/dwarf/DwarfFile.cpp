@@ -36,7 +36,7 @@ public:
 		DIESubprogram* subprogramEntry,
 		const DwarfTargetInterface* targetInterface,
 		target_addr_t instructionPointer, target_addr_t objectPointer,
-		target_addr_t framePointer,
+		bool hasObjectPointer, target_addr_t framePointer,
 		target_addr_t relocationDelta)
 		:
 		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize(),
@@ -46,6 +46,7 @@ public:
 		fSubprogramEntry(subprogramEntry),
 		fInstructionPointer(instructionPointer),
 		fObjectPointer(objectPointer),
+		fHasObjectPointer(hasObjectPointer),
 		fFramePointer(framePointer),
 		fFrameBasePointer(0),
 		fFrameBaseEvaluated(false)
@@ -54,7 +55,7 @@ public:
 
 	virtual bool GetObjectAddress(target_addr_t& _address)
 	{
-		if (fObjectPointer == 0)
+		if (!fHasObjectPointer)
 			return false;
 
 		_address = fObjectPointer;
@@ -145,6 +146,7 @@ private:
 	DIESubprogram*		fSubprogramEntry;
 	target_addr_t		fInstructionPointer;
 	target_addr_t		fObjectPointer;
+	bool				fHasObjectPointer;
 	target_addr_t		fFramePointer;
 	target_addr_t		fFrameBasePointer;
 	bool				fFrameBaseEvaluated;
@@ -827,7 +829,7 @@ DwarfFile::EvaluateExpression(CompilationUnit* unit,
 	target_addr_t valueToPush, bool pushValue, target_addr_t& _result)
 {
 	ExpressionEvaluationContext context(this, unit, subprogramEntry,
-		targetInterface, instructionPointer, 0, framePointer, 0);
+		targetInterface, instructionPointer, 0, false, framePointer, 0);
 	DwarfExpressionEvaluator evaluator(&context);
 
 	if (pushValue && evaluator.Push(valueToPush) != B_OK)
@@ -842,8 +844,8 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 	DIESubprogram* subprogramEntry, const LocationDescription* location,
 	const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t objectPointer,
-	target_addr_t framePointer, target_addr_t relocationDelta,
-	ValueLocation& _result)
+	bool hasObjectPointer, target_addr_t framePointer,
+	target_addr_t relocationDelta, ValueLocation& _result)
 {
 	// get the expression
 	const void* expression;
@@ -855,8 +857,8 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 
 	// evaluate it
 	ExpressionEvaluationContext context(this, unit, subprogramEntry,
-		targetInterface, instructionPointer, objectPointer, framePointer,
-		relocationDelta);
+		targetInterface, instructionPointer, objectPointer, hasObjectPointer,
+		framePointer, relocationDelta);
 	DwarfExpressionEvaluator evaluator(&context);
 	return evaluator.EvaluateLocation(expression, expressionLength,
 		_result);
