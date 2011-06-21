@@ -424,13 +424,6 @@ Volume::Mount(const char* parameterString)
 
 	// run the package loader
 	resume_thread(fPackageLoader);
-dprintf("mounted packagefs successfully!\n");
-{
-	for (Node* node = fRootDirectory->FirstChild(); node != NULL;
-			node = fRootDirectory->NextChild(node)) {
-		dprintf("  node %lld: \"%s\"\n", node->ID(), node->Name());
-	}
-}
 
 	return B_OK;
 }
