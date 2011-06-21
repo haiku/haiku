@@ -1411,7 +1411,8 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 # TimGMSoundFont
 if [ IsOptionalHaikuImagePackageAdded TimGMSoundFont ] {
 	InstallOptionalHaikuImagePackage TimGMSoundFont-2010-06-16.hpkg
-		: $(hpkgBaseURL)/TimGMSoundFont-2010-06-16.hpkg ;
+		: $(hpkgBaseURL)/TimGMSoundFont-2010-06-16.hpkg
+		: system packages ;
 }
 
 
