@@ -95,7 +95,7 @@ typedef struct _variable_joystick {
 	// The data is always structured in the following way (see extended_joystick
 	// for data interpretation):
 	//		bigtime_t	timestamp;
-	//		uint32		button_bitmap_blocks[button_block];
+	//		uint32		button_bitmap_blocks[button_blocks];
 	//		int16		axes[axis_count];
 	//		uint8		hats[hat_count];
 	size_t		data_size;
