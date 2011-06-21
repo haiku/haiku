@@ -22,6 +22,7 @@
 #include <AutoDeleter.h>
 
 #include <Notifications.h>
+#include <vfs.h>
 
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageEntry.h>
@@ -43,6 +44,16 @@ using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
 // node ID of the root directory
 static const ino_t kRootDirectoryID = 1;
+
+// shine-through directories
+const char* const kSystemShineThroughDirectories[] = {
+	"packages", NULL
+};
+const char* const kCommonShineThroughDirectories[] = {
+	"non-packaged", "packages", "settings", "var", NULL
+};
+const char* const* kHomeShineThroughDirectories
+	= kCommonShineThroughDirectories;
 
 
 // #pragma mark - Job
@@ -355,14 +366,21 @@ Volume::Mount(const char* parameterString)
 
 	const char* packages = NULL;
 	const char* volumeName = NULL;
+	const char* shineThrough = NULL;
+
 	void* parameterHandle = parse_driver_settings_string(parameterString);
 	if (parameterHandle != NULL) {
-		packages
-			= get_driver_parameter(parameterHandle, "packages", NULL, NULL);
-		volumeName
-			= get_driver_parameter(parameterHandle, "volume-name", NULL, NULL);
-		delete_driver_settings(parameterHandle);
+		packages = get_driver_parameter(parameterHandle, "packages", NULL,
+			NULL);
+		volumeName = get_driver_parameter(parameterHandle, "volume-name", NULL,
+			NULL);
+		shineThrough = get_driver_parameter(parameterHandle, "shine-through",
+			NULL, NULL);
 	}
+
+	CObjectDeleter<void, status_t> parameterHandleDeleter(parameterHandle,
+		&delete_driver_settings);
+
 	if (packages == NULL || packages[0] == '\0') {
 		ERROR("need package folder ('packages' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
@@ -396,11 +414,23 @@ Volume::Mount(const char* parameterString)
 	error = PublishVNode(fRootDirectory);
 	if (error != B_OK) {
 		fRootDirectory->ReleaseReference();
-		return error;
+		RETURN_ERROR(error);
 	}
+
+	// establish shine-through directories
+	error = _CreateShineThroughDirectories(shineThrough);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	// run the package loader
 	resume_thread(fPackageLoader);
+dprintf("mounted packagefs successfully!\n");
+{
+	for (Node* node = fRootDirectory->FirstChild(); node != NULL;
+			node = fRootDirectory->NextChild(node)) {
+		dprintf("  node %lld: \"%s\"\n", node->ID(), node->Name());
+	}
+}
 
 	return B_OK;
 }
@@ -452,7 +482,7 @@ Volume::AddPackageDomain(const char* path)
 
 	status_t error = packageDomain->Init(path);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	Job* job = new(std::nothrow) AddPackageDomainJob(this, packageDomain);
 	if (job == NULL)
@@ -536,7 +566,7 @@ Volume::_AddInitialPackageDomain(const char* path)
 
 	status_t error = domain->Init(path);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	return _AddPackageDomain(domain, false);
 }
@@ -556,7 +586,7 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 	if (error != B_OK) {
 		ERROR("Failed to prepare package domain \"%s\": %s\n",
 			domain->Path(), strerror(errno));
-		return errno;
+		RETURN_ERROR(errno);
 	}
 
 	// iterate through the dir and create packages
@@ -564,7 +594,7 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 	if (dir == NULL) {
 		ERROR("Failed to open package domain directory \"%s\": %s\n",
 			domain->Path(), strerror(errno));
-		return errno;
+		RETURN_ERROR(errno);
 	}
 	CObjectDeleter<DIR, int> dirCloser(dir, closedir);
 
@@ -589,7 +619,7 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 					break;
 				_RemovePackageContent(activePackage, NULL, notify);
 			}
-			return error;
+			RETURN_ERROR(error);
 		}
 	}
 
@@ -614,17 +644,17 @@ Volume::_LoadPackage(Package* package)
 	PackageReaderImpl packageReader(&errorOutput);
 	status_t error = packageReader.Init(fd, false);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	// parse content
 	PackageLoaderContentHandler handler(package);
 	error = handler.Init();
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	error = packageReader.ParseContent(&handler);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	return B_OK;
 }
@@ -641,7 +671,7 @@ Volume::_AddPackageContent(Package* package, bool notify)
 		status_t error = _AddPackageContentRootNode(package, node, notify);
 		if (error != B_OK) {
 			_RemovePackageContent(package, node, notify);
-			return error;
+			RETURN_ERROR(error);
 		}
 	}
 
@@ -658,12 +688,12 @@ Volume::_RemovePackageContent(Package* package, PackageNode* endNode,
 		if (node == endNode)
 			break;
 
-		// skip over ".PackageInfo" file, it isn't part of the package content
-		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
-			continue;
-
 		PackageNode* nextNode = package->Nodes().GetNext(node);
-		_RemovePackageContentRootNode(package, node, NULL, notify);
+
+		// skip over ".PackageInfo" file, it isn't part of the package content
+		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) != 0)
+			_RemovePackageContentRootNode(package, node, NULL, notify);
+
 		node = nextNode;
 	}
 }
@@ -696,7 +726,7 @@ Volume::_AddPackageContentRootNode(Package* package,
 			// remove the added package nodes
 			_RemovePackageContentRootNode(package, rootPackageNode, packageNode,
 				notify);
-			return error;
+			RETURN_ERROR(error);
 		}
 
 		// recursive into directory
@@ -798,7 +828,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		status_t error = _CreateNode(packageNode->Mode(), directory,
 			packageNode->Name(), node);
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 		newNode = true;
 	}
 	BReference<Node> nodeReference(node);
@@ -808,7 +838,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		// remove the node, if created before
 		if (newNode)
 			_RemoveNode(node);
-		return error;
+		RETURN_ERROR(error);
 	}
 
 	if (notify) {
@@ -911,7 +941,7 @@ Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
 
 	status_t error = node->Init(parent, name);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	parent->AddChild(node);
 
@@ -1083,4 +1113,93 @@ Volume::_DomainEntryMoved(PackageDomain* domain, dev_t deviceID,
 		notify);
 	_DomainEntryCreated(domain, deviceID, toDirectoryID, nodeID, name, true,
 		notify);
+}
+
+
+status_t
+Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
+{
+	if (shineThroughSetting == NULL)
+		return B_OK;
+
+	// get the directories to map
+	const char* const* directories = NULL;
+
+	if (strcmp(shineThroughSetting, "system") == 0)
+		directories = kSystemShineThroughDirectories;
+	else if (strcmp(shineThroughSetting, "common") == 0)
+		directories = kCommonShineThroughDirectories;
+	else if (strcmp(shineThroughSetting, "home") == 0)
+		directories = kHomeShineThroughDirectories;
+	else if (strcmp(shineThroughSetting, "none") == 0)
+		directories = NULL;
+	else
+		RETURN_ERROR(B_BAD_VALUE);
+
+	if (directories == NULL)
+		return B_OK;
+
+	// get our mount point
+	dev_t mountPointDevice;
+	ino_t mountPointNode;
+	status_t error = vfs_get_mount_point(fFSVolume->id, &mountPointDevice,
+		&mountPointNode);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// iterate through the directory list, create the directories, and bind them
+	// to the mount point subdirectories
+	while (const char* directoryName = *(directories++)) {
+		// look up the mount point subdirectory
+		struct vnode* vnode;
+		error = vfs_entry_ref_to_vnode(mountPointDevice, mountPointNode,
+			directoryName, &vnode);
+		if (error != B_OK) {
+			dprintf("packagefs: Failed to get shine-through directory \"%s\": "
+				"%s\n", directoryName, strerror(error));
+			continue;
+		}
+		CObjectDeleter<struct vnode> vnodePutter(vnode, &vfs_put_vnode);
+
+		// stat it
+		struct stat st;
+		error = vfs_stat_vnode(vnode, &st);
+		if (error != B_OK) {
+			dprintf("packagefs: Failed to stat shine-through directory \"%s\": "
+				"%s\n", directoryName, strerror(error));
+			continue;
+		}
+
+		if (!S_ISDIR(st.st_mode)) {
+			dprintf("packagefs: Shine-through entry \"%s\" is not a "
+				"directory\n", directoryName);
+			continue;
+		}
+
+		// create the directory
+		Node* directory;
+		error = _CreateNode(S_IFDIR, fRootDirectory, directoryName, directory);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// publish its vnode, so the VFS will find it without asking us
+		error = PublishVNode(directory);
+		if (error != B_OK) {
+			_RemoveNode(directory);
+			RETURN_ERROR(error);
+		}
+
+		// bind the directory
+		error = vfs_bind_mount_directory(st.st_dev, st.st_ino, fFSVolume->id,
+			directory->ID());
+
+		PutVNode(directory->ID());
+			// release our reference again -- on success
+			// vfs_bind_mount_directory() got one
+
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	}
+
+	return B_OK;
 }
