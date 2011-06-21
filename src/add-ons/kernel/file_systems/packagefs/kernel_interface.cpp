@@ -117,14 +117,17 @@ packagefs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<Volume> volumeDeleter(volume);
 
+	// Initialize the fs_volume now already, so it is mostly usable in during
+	// mounting.
+	fsVolume->private_volume = volumeDeleter.Detach();
+	fsVolume->ops = &gPackageFSVolumeOps;
+
 	status_t error = volume->Mount(parameters);
 	if (error != B_OK)
 		return error;
 
 	// set return values
 	*_rootID = volume->RootDirectory()->ID();
-	fsVolume->private_volume = volumeDeleter.Detach();
-	fsVolume->ops = &gPackageFSVolumeOps;
 
 	return B_OK;
 }

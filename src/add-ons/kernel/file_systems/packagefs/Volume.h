@@ -118,6 +118,8 @@ private:
 									ino_t nodeID, const char* fromName,
 									const char* name, bool notify);
 
+			status_t			_CreateShineThroughDirectories(
+									const char* shineThroughSetting);
 private:
 			rw_lock				fLock;
 			fs_volume*			fFSVolume;
