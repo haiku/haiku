@@ -5780,14 +5780,14 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 	// If this is the ".." entry and the directory covering another vnode,
 	// we need to replace d_dev and d_ino with the actual values.
 	if (strcmp(entry->d_name, "..") == 0 && parent->IsCovering()) {
-		inc_vnode_ref_count(parent);
-			// vnode_path_to_vnode() puts the node
-
 		// Make sure the IO context root is not bypassed.
 		if (parent == ioContext->root) {
 			entry->d_dev = parent->device;
 			entry->d_ino = parent->id;
 		} else {
+			inc_vnode_ref_count(parent);
+				// vnode_path_to_vnode() puts the node
+
 			// ".." is guaranteed not to be clobbered by this call
 			struct vnode* vnode;
 			status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
@@ -5796,6 +5796,7 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 			if (status == B_OK) {
 				entry->d_dev = vnode->device;
 				entry->d_ino = vnode->id;
+				put_vnode(vnode);
 			}
 		}
 	} else {
