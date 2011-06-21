@@ -209,6 +209,22 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 
 
 static status_t
+packagefs_get_vnode_name(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
+	size_t bufferSize)
+{
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), %p, %zu\n",
+		fsVolume->private_volume, node, node->ID(), buffer, bufferSize);
+
+	if (strlcpy(buffer, node->Name(), bufferSize) >= bufferSize)
+		return B_BUFFER_OVERFLOW;
+
+	return B_OK;
+}
+
+
+static status_t
 packagefs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 	int* _type, uint32* _flags, bool reenter)
 {
@@ -1103,7 +1119,7 @@ fs_volume_ops gPackageFSVolumeOps = {
 fs_vnode_ops gPackageFSVnodeOps = {
 	// vnode operations
 	&packagefs_lookup,
-	NULL,	// get_vnode_name,
+	&packagefs_get_vnode_name,
 	&packagefs_put_vnode,
 	&packagefs_put_vnode,	// remove_vnode -- same as put_vnode
 
