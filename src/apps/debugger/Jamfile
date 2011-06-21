@@ -220,6 +220,7 @@ Application Debugger :
 	ValueNodeContainer.cpp
 
 	# value/type_handlers
+	BMessageTypeHandler.cpp
 	CStringTypeHandler.cpp
 
 	# value/value_handlers
@@ -233,6 +234,7 @@ Application Debugger :
 	# value/value_nodes
 	AddressValueNode.cpp
 	ArrayValueNode.cpp
+	BMessageValueNode.cpp
 	CompoundValueNode.cpp
 	CStringValueNode.cpp
 	EnumerationValueNode.cpp

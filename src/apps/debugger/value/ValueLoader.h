@@ -31,6 +31,9 @@ public:
 									type_code valueType, bool shortValueIsFine,
 									BVariant& _value);
 
+			status_t			LoadRawValue(BVariant& location,
+									size_t maxSize, void* _value);
+
 			status_t			LoadStringValue(BVariant& location,
 									size_t maxSize, BString& _value);
 

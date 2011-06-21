@@ -14,6 +14,7 @@
 #include "AddressValueNode.h"
 #include "ArrayValueNode.h"
 #include "CompoundValueNode.h"
+#include "BMessageTypeHandler.h"
 #include "CStringTypeHandler.h"
 #include "EnumerationValueNode.h"
 #include "PointerToMemberValueNode.h"
@@ -126,25 +127,31 @@ TypeHandlerRoster::RegisterDefaultHandlers()
 	TypeHandler* handler;
 	BReference<TypeHandler> handlerReference;
 
-	#undef REGISTER_HANDLER
-	#define REGISTER_HANDLER(name)								\
+	#undef REGISTER_BASIC_HANDLER
+	#define REGISTER_BASIC_HANDLER(name)						\
 		handler = new(std::nothrow)								\
 			BasicTypeHandler<name##Type, name##ValueNode>();	\
 		handlerReference.SetTo(handler, true);					\
 		if (handler == NULL || !RegisterHandler(handler))		\
 			return B_NO_MEMORY;
 
-	REGISTER_HANDLER(Address);
-	REGISTER_HANDLER(Array);
-	REGISTER_HANDLER(Compound);
-	REGISTER_HANDLER(Enumeration);
-	REGISTER_HANDLER(PointerToMember);
-	REGISTER_HANDLER(Primitive);
+	REGISTER_BASIC_HANDLER(Address);
+	REGISTER_BASIC_HANDLER(Array);
+	REGISTER_BASIC_HANDLER(Compound);
+	REGISTER_BASIC_HANDLER(Enumeration);
+	REGISTER_BASIC_HANDLER(PointerToMember);
+	REGISTER_BASIC_HANDLER(Primitive);
 
-	handler = new(std::nothrow) CStringTypeHandler();
-	handlerReference.SetTo(handler, true);
-	if (handler == NULL || !RegisterHandler(handler))
-		return B_NO_MEMORY;
+	#undef REGISTER_SPECIALIZED_HANDLER
+	#define REGISTER_SPECIALIZED_HANDLER(name)					\
+		handler = new(std::nothrow)								\
+			name##TypeHandler();								\
+		handlerReference.SetTo(handler, true);					\
+		if (handler == NULL || !RegisterHandler(handler))		\
+			return B_NO_MEMORY;
+
+	REGISTER_SPECIALIZED_HANDLER(CString);
+//	REGISTER_SPECIALIZED_HANDLER(BMessage);
 
 	return B_OK;
 }

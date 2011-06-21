@@ -188,6 +188,19 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 
 
 status_t
+ValueLoader::LoadRawValue(BVariant& location, size_t bytesToRead, void* _value)
+{
+	ssize_t bytesRead = fTeamMemory->ReadMemory(location.ToUInt64(),
+		_value, bytesToRead);
+	if (bytesRead < 0)
+		return bytesRead;
+	if ((uint32)bytesRead != bytesToRead)
+		return B_BAD_ADDRESS;
+	return B_OK;
+}
+
+
+status_t
 ValueLoader::LoadStringValue(BVariant& location, size_t maxSize, BString& _value)
 {
 	static const size_t kMaxStringSize = 255;
