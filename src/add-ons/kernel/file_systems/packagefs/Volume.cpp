@@ -603,8 +603,8 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 
 	// add the packages to the node tree
 	VolumeWriteLocker volumeLocker(this);
-	for (PackageHashTable::Iterator it = domain->Packages().GetIterator();
-			Package* package = it.Next();) {
+	for (PackageFileNameHashTable::Iterator it
+			= domain->Packages().GetIterator(); Package* package = it.Next();) {
 		error = _AddPackageContent(package, notify);
 		if (error != B_OK) {
 			for (it.Rewind(); Package* activePackage = it.Next();) {

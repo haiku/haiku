@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,7 +21,7 @@
 Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
 	:
 	fDomain(domain),
-	fName(NULL),
+	fFileName(NULL),
 	fFD(-1),
 	fOpenCount(0),
 	fNodeID(nodeID),
@@ -36,17 +36,17 @@ Package::~Package()
 	while (PackageNode* node = fNodes.RemoveHead())
 		node->ReleaseReference();
 
-	free(fName);
+	free(fFileName);
 
 	mutex_destroy(&fLock);
 }
 
 
 status_t
-Package::Init(const char* name)
+Package::Init(const char* fileName)
 {
-	fName = strdup(name);
-	if (fName == NULL)
+	fFileName = strdup(fileName);
+	if (fFileName == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
 	return B_OK;
@@ -71,16 +71,16 @@ Package::Open()
 	}
 
 	// open the file
-	fFD = openat(fDomain->DirectoryFD(), fName, O_RDONLY);
+	fFD = openat(fDomain->DirectoryFD(), fFileName, O_RDONLY);
 	if (fFD < 0) {
-		ERROR("Failed to open package file \"%s\"\n", fName);
+		ERROR("Failed to open package file \"%s\"\n", fFileName);
 		return errno;
 	}
 
 	// stat it to verify that it's still the same file
 	struct stat st;
 	if (fstat(fFD, &st) < 0) {
-		ERROR("Failed to stat package file \"%s\"\n", fName);
+		ERROR("Failed to stat package file \"%s\"\n", fFileName);
 		close(fFD);
 		fFD = -1;
 		return errno;

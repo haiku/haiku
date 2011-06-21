@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_H
@@ -25,28 +25,28 @@ public:
 									ino_t nodeID);
 								~Package();
 
-			status_t			Init(const char* name);
+			status_t			Init(const char* fileName);
 
-			PackageDomain*		Domain() const	{ return fDomain; }
-			const char*			Name() const	{ return fName; }
+			PackageDomain*		Domain() const		{ return fDomain; }
+			const char*			FileName() const	{ return fFileName; }
 
-			Package*&			HashTableNext() { return fHashTableNext; }
+			Package*&			FileNameHashTableNext()
+									{ return fFileNameHashTableNext; }
 
 			void				AddNode(PackageNode* node);
 
 			int					Open();
 			void				Close();
 
-			const PackageNodeList&	Nodes() const
-									{ return fNodes; }
+			const PackageNodeList&	Nodes() const	{ return fNodes; }
 
 private:
 			mutex				fLock;
 			PackageDomain*		fDomain;
-			char*				fName;
+			char*				fFileName;
 			int					fFD;
 			uint32				fOpenCount;
-			Package*			fHashTableNext;
+			Package*			fFileNameHashTableNext;
 			ino_t				fNodeID;
 			dev_t				fDeviceID;
 			PackageNodeList		fNodes;
@@ -76,7 +76,7 @@ private:
 };
 
 
-struct PackageHashDefinition {
+struct PackageFileNameHashDefinition {
 	typedef const char*		KeyType;
 	typedef	Package			ValueType;
 
@@ -87,22 +87,22 @@ struct PackageHashDefinition {
 
 	size_t Hash(const Package* value) const
 	{
-		return HashKey(value->Name());
+		return HashKey(value->FileName());
 	}
 
 	bool Compare(const char* key, const Package* value) const
 	{
-		return strcmp(value->Name(), key) == 0;
+		return strcmp(value->FileName(), key) == 0;
 	}
 
 	Package*& GetLink(Package* value) const
 	{
-		return value->HashTableNext();
+		return value->FileNameHashTableNext();
 	}
 };
 
 
-typedef BOpenHashTable<PackageHashDefinition> PackageHashTable;
+typedef BOpenHashTable<PackageFileNameHashDefinition> PackageFileNameHashTable;
 
 
 #endif	// PACKAGE_H
