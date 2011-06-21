@@ -3808,7 +3808,7 @@ remove_vnode(fs_volume* volume, ino_t vnodeID)
 	if (vnode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (vnode->covered_by != NULL) {
+	if (vnode->covered_by != NULL || vnode->covers != NULL) {
 		// this vnode is in use
 		return B_BUSY;
 	}
