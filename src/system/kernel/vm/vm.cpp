@@ -4839,8 +4839,8 @@ status_t
 vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory, void* buffer,
 	size_t size, bool copyToUnsafe)
 {
-	if (size > B_PAGE_SIZE
-			|| ((addr_t)unsafeMemory + size) % B_PAGE_SIZE < size) {
+	if (size > B_PAGE_SIZE || ROUNDDOWN((addr_t)unsafeMemory, B_PAGE_SIZE)
+			!= ROUNDDOWN((addr_t)unsafeMemory + size - 1, B_PAGE_SIZE)) {
 		return B_BAD_VALUE;
 	}
 
