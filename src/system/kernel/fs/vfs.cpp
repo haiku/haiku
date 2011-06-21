@@ -219,7 +219,6 @@ static mutex sMountMutex = MUTEX_INITIALIZER("vfs_mount_lock");
 	- sMountsTable will not be modified,
 	- the fields immutable after initialization of the fs_mount structures in
 	  sMountsTable will not be modified,
-	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
 
 	The thread trying to lock the lock must not hold sVnodeLock or
 	sMountMutex.
@@ -234,7 +233,8 @@ static recursive_lock sMountOpLock;
 	The mutable fields advisory_locking, mandatory_locked_by, and ref_count, as
 	well as the busy, removed, unused flags, and the vnode's type can also be
 	write accessed when holding a read lock to sVnodeLock *and* having the vnode
-	locked. Write access to covered_by requires to write lock sVnodeLock.
+	locked. Write access to covered_by and covers requires to write lock
+	sVnodeLock.
 
 	The thread trying to acquire the lock must not hold sMountMutex.
 	You must not hold this lock when calling create_sem(), as this might call
@@ -1320,6 +1320,104 @@ free_unused_vnodes(int32 level)
 }
 
 
+/*!	Gets the vnode the given vnode is covering.
+
+	The caller must have \c sVnodeLock read-locked at least.
+
+	The function returns a reference to the retrieved vnode (if any), the caller
+	is responsible to free.
+
+	\param vnode The vnode whose covered node shall be returned.
+	\return The covered vnode, or \c NULL if the given vnode doesn't cover any
+		vnode.
+*/
+static inline Vnode*
+get_covered_vnode_locked(Vnode* vnode)
+{
+	if (Vnode* coveredNode = vnode->covers) {
+		while (coveredNode->covers != NULL)
+			coveredNode = coveredNode->covers;
+
+		inc_vnode_ref_count(coveredNode);
+		return coveredNode;
+	}
+
+	return NULL;
+}
+
+
+/*!	Gets the vnode the given vnode is covering.
+
+	The caller must not hold \c sVnodeLock. Note that this implies a race
+	condition, since the situation can change at any time.
+
+	The function returns a reference to the retrieved vnode (if any), the caller
+	is responsible to free.
+
+	\param vnode The vnode whose covered node shall be returned.
+	\return The covered vnode, or \c NULL if the given vnode doesn't cover any
+		vnode.
+*/
+static inline Vnode*
+get_covered_vnode(Vnode* vnode)
+{
+	if (!vnode->IsCovering())
+		return NULL;
+
+	ReadLocker vnodeReadLocker(sVnodeLock);
+	return get_covered_vnode_locked(vnode);
+}
+
+
+/*!	Gets the vnode the given vnode is covered by.
+
+	The caller must have \c sVnodeLock read-locked at least.
+
+	The function returns a reference to the retrieved vnode (if any), the caller
+	is responsible to free.
+
+	\param vnode The vnode whose covering node shall be returned.
+	\return The covering vnode, or \c NULL if the given vnode isn't covered by
+		any vnode.
+*/
+static Vnode*
+get_covering_vnode_locked(Vnode* vnode)
+{
+	if (Vnode* coveringNode = vnode->covered_by) {
+		while (coveringNode->covered_by != NULL)
+			coveringNode = coveringNode->covered_by;
+
+		inc_vnode_ref_count(coveringNode);
+		return coveringNode;
+	}
+
+	return NULL;
+}
+
+
+/*!	Gets the vnode the given vnode is covered by.
+
+	The caller must not hold \c sVnodeLock. Note that this implies a race
+	condition, since the situation can change at any time.
+
+	The function returns a reference to the retrieved vnode (if any), the caller
+	is responsible to free.
+
+	\param vnode The vnode whose covering node shall be returned.
+	\return The covering vnode, or \c NULL if the given vnode isn't covered by
+		any vnode.
+*/
+static inline Vnode*
+get_covering_vnode(Vnode* vnode)
+{
+	if (!vnode->IsCovered())
+		return NULL;
+
+	ReadLocker vnodeReadLocker(sVnodeLock);
+	return get_covering_vnode_locked(vnode);
+}
+
+
 static void
 free_unused_vnodes()
 {
@@ -1725,30 +1823,36 @@ replace_vnode_if_disconnected(struct fs_mount* mount,
 	struct vnode* vnodeToDisconnect, struct vnode*& vnode,
 	struct vnode* fallBack, bool lockRootLock)
 {
+	struct vnode* givenVnode = vnode;
+	bool vnodeReplaced = false;
+
+	ReadLocker vnodeReadLocker(sVnodeLock);
+
 	if (lockRootLock)
 		mutex_lock(&sIOContextRootLock);
 
-	struct vnode* obsoleteVnode = NULL;
-
-	if (vnode != NULL && vnode->mount == mount
+	while (vnode != NULL && vnode->mount == mount
 		&& (vnodeToDisconnect == NULL || vnodeToDisconnect == vnode)) {
-		obsoleteVnode = vnode;
-
-		if (vnode == mount->root_vnode) {
+		if (vnode->covers != NULL) {
 			// redirect the vnode to the covered vnode
-			vnode = mount->root_vnode->covers;
+			vnode = vnode->covers;
 		} else
 			vnode = fallBack;
 
-		if (vnode != NULL)
-			inc_vnode_ref_count(vnode);
+		vnodeReplaced = true;
 	}
+
+	// If we've replaced the node, grab a reference for the new one.
+	if (vnodeReplaced && vnode != NULL)
+		inc_vnode_ref_count(vnode);
 
 	if (lockRootLock)
 		mutex_unlock(&sIOContextRootLock);
 
-	if (obsoleteVnode != NULL)
-		put_vnode(obsoleteVnode);
+	vnodeReadLocker.Unlock();
+
+	if (vnodeReplaced)
+		put_vnode(givenVnode);
 }
 
 
@@ -1834,44 +1938,11 @@ get_root_vnode(bool kernel)
 }
 
 
-/*!	\brief Resolves a mount point vnode to the volume root vnode it is covered
-		   by.
-
-	Given an arbitrary vnode, the function checks, whether the node is covered
-	by the root of a volume. If it is the function obtains a reference to the
-	volume root node and returns it.
-
-	\param vnode The vnode in question.
-	\return The volume root vnode the vnode cover is covered by, if it is
-			indeed a mount point, or \c NULL otherwise.
-*/
-static struct vnode*
-resolve_mount_point_to_volume_root(struct vnode* vnode)
-{
-	if (!vnode)
-		return NULL;
-
-	struct vnode* volumeRoot = NULL;
-
-	rw_lock_read_lock(&sVnodeLock);
-
-	if (vnode->covered_by) {
-		volumeRoot = vnode->covered_by;
-		inc_vnode_ref_count(volumeRoot);
-	}
-
-	rw_lock_read_unlock(&sVnodeLock);
-
-	return volumeRoot;
-}
-
-
-/*!	\brief Resolves a mount point vnode to the volume root vnode it is covered
-		   by.
+/*!	\brief Resolves a vnode to the vnode it is covered by, if any.
 
 	Given an arbitrary vnode (identified by mount and node ID), the function
-	checks, whether the node is covered by the root of a volume. If it is the
-	function returns the mount and node ID of the volume root node. Otherwise
+	checks, whether the vnode is covered by another vnode. If it is, the
+	function returns the mount and node ID of the covering vnode. Otherwise
 	it simply returns the supplied mount and node ID.
 
 	In case of error (e.g. the supplied node could not be found) the variables
@@ -1887,7 +1958,7 @@ resolve_mount_point_to_volume_root(struct vnode* vnode)
 	- another error code, if something went wrong.
 */
 status_t
-resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
+resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
 	dev_t* resolvedMountID, ino_t* resolvedNodeID)
 {
 	// get the node
@@ -1897,10 +1968,9 @@ resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
 		return error;
 
 	// resolve the node
-	struct vnode* resolvedNode = resolve_mount_point_to_volume_root(node);
-	if (resolvedNode) {
+	if (Vnode* coveringNode = get_covering_vnode(node)) {
 		put_vnode(node);
-		node = resolvedNode;
+		node = coveringNode;
 	}
 
 	// set the return values
@@ -1910,34 +1980,6 @@ resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
 	put_vnode(node);
 
 	return B_OK;
-}
-
-
-/*!	\brief Resolves a volume root vnode to the underlying mount point vnode.
-
-	Given an arbitrary vnode, the function checks, whether the node is the
-	root of a volume. If it is (and if it is not "/"), the function obtains
-	a reference to the underlying mount point node and returns it.
-
-	\param vnode The vnode in question (caller must have a reference).
-	\return The mount point vnode the vnode covers, if it is indeed a volume
-			root and not "/", or \c NULL otherwise.
-*/
-static struct vnode*
-resolve_volume_root_to_mount_point(struct vnode* vnode)
-{
-	if (!vnode)
-		return NULL;
-
-	struct vnode* mountPoint = NULL;
-
-	struct fs_mount* mount = vnode->mount;
-	if (vnode == mount->root_vnode && mount->root_vnode->covers != NULL) {
-		mountPoint = mount->root_vnode->covers;
-		inc_vnode_ref_count(mountPoint);
-	}
-
-	return mountPoint;
 }
 
 
@@ -2109,7 +2151,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 			while (*nextPath == '/');
 		}
 
-		// See if the '..' is at the root of a mount and move to the covered
+		// See if the '..' is at a covering vnode move to the covered
 		// vnode so we pass the '..' path to the underlying filesystem.
 		// Also prevent breaking the root of the IO context.
 		if (strcmp("..", path) == 0) {
@@ -2117,10 +2159,10 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 				// Attempted prison break! Keep it contained.
 				path = nextPath;
 				continue;
-			} else if (vnode->mount->root_vnode == vnode
-				&& vnode->mount->root_vnode->covers != NULL) {
-				nextVnode = vnode->mount->root_vnode->covers;
-				inc_vnode_ref_count(nextVnode);
+			}
+
+			if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
+				nextVnode = coveredVnode;
 				put_vnode(vnode);
 				vnode = nextVnode;
 			}
@@ -2235,11 +2277,10 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		path = nextPath;
 		vnode = nextVnode;
 
-		// see if we hit a mount point
-		struct vnode* mountPoint = resolve_mount_point_to_volume_root(vnode);
-		if (mountPoint) {
+		// see if we hit a covered node
+		if (Vnode* coveringNode = get_covering_vnode(vnode)) {
 			put_vnode(vnode);
-			vnode = mountPoint;
+			vnode = coveringNode;
 		}
 	}
 
@@ -2422,13 +2463,11 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	if (bufferSize < sizeof(struct dirent))
 		return B_BAD_VALUE;
 
-	// See if vnode is the root of a mount and move to the covered
+	// See if the vnode is convering another vnode and move to the covered
 	// vnode so we get the underlying file system
 	VNodePutter vnodePutter;
-	if (vnode->mount->root_vnode == vnode
-		&& vnode->mount->root_vnode->covers != NULL) {
-		vnode = vnode->mount->root_vnode->covers;
-		inc_vnode_ref_count(vnode);
+	if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
+		vnode = coveredVnode;
 		vnodePutter.SetTo(vnode);
 	}
 
@@ -2532,11 +2571,10 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 
 	if (vnode != ioContext->root) {
 		// we don't hit the IO context root
-		// resolve a volume root to its mount point
-		struct vnode* mountPoint = resolve_volume_root_to_mount_point(vnode);
-		if (mountPoint) {
+		// resolve a vnode to its covered vnode
+		if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
 			put_vnode(vnode);
-			vnode = mountPoint;
+			vnode = coveredVnode;
 		}
 	}
 
@@ -2567,12 +2605,10 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 
 		if (vnode != ioContext->root) {
 			// we don't hit the IO context root
-			// resolve a volume root to its mount point
-			struct vnode* mountPoint
-				= resolve_volume_root_to_mount_point(parentVnode);
-			if (mountPoint) {
+			// resolve a vnode to its covered vnode
+			if (Vnode* coveredVnode = get_covered_vnode(parentVnode)) {
 				put_vnode(parentVnode);
-				parentVnode = mountPoint;
+				parentVnode = coveredVnode;
 				parentID = parentVnode->id;
 			}
 		}
@@ -3016,10 +3052,8 @@ debug_resolve_vnode_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	buffer[--bufferSize] = '\0';
 
 	while (true) {
-		while (vnode->mount->root_vnode == vnode
-				&& vnode->mount->root_vnode->covers != NULL) {
-			vnode = vnode->mount->root_vnode->covers;
-		}
+		while (vnode->covers != NULL)
+			vnode = vnode->covers;
 
 		if (vnode == sRoot) {
 			_truncated = bufferSize == 0;
@@ -3068,6 +3102,7 @@ _dump_vnode(struct vnode* vnode, bool printPath)
 	kprintf(" private_node:  %p\n", vnode->private_node);
 	kprintf(" mount:         %p\n", vnode->mount);
 	kprintf(" covered_by:    %p\n", vnode->covered_by);
+	kprintf(" covers:        %p\n", vnode->covers);
 	kprintf(" cache:         %p\n", vnode->cache);
 	kprintf(" type:          %#" B_PRIx32 "\n", vnode->Type());
 	kprintf(" flags:         %s%s%s\n", vnode->IsRemoved() ? "r" : "-",
@@ -3099,6 +3134,7 @@ _dump_vnode(struct vnode* vnode, bool printPath)
 	set_debug_variable("_node", (addr_t)vnode->private_node);
 	set_debug_variable("_mount", (addr_t)vnode->mount);
 	set_debug_variable("_covered_by", (addr_t)vnode->covered_by);
+	set_debug_variable("_covers", (addr_t)vnode->covers);
 	set_debug_variable("_adv_lock", (addr_t)vnode->advisory_locking);
 }
 
@@ -5670,11 +5706,9 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 	entry->d_pdev = parent->device;
 	entry->d_pino = parent->id;
 
-	// If this is the ".." entry and the directory is the root of a FS,
+	// If this is the ".." entry and the directory covering another vnode,
 	// we need to replace d_dev and d_ino with the actual values.
-	if (strcmp(entry->d_name, "..") == 0
-		&& parent->mount->root_vnode == parent
-		&& parent->mount->root_vnode->covers != NULL) {
+	if (strcmp(entry->d_name, "..") == 0 && parent->IsCovering()) {
 		inc_vnode_ref_count(parent);
 			// vnode_path_to_vnode() puts the node
 
@@ -5694,15 +5728,17 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 			}
 		}
 	} else {
-		// resolve mount points
+		// resolve covered vnodes
 		ReadLocker _(&sVnodeLock);
 
 		struct vnode* vnode = lookup_vnode(entry->d_dev, entry->d_ino);
-		if (vnode != NULL) {
-			if (vnode->covered_by != NULL) {
-				entry->d_dev = vnode->covered_by->device;
-				entry->d_ino = vnode->covered_by->id;
-			}
+		if (vnode != NULL && vnode->covered_by != NULL) {
+			do {
+				vnode = vnode->covered_by;
+			} while (vnode->covered_by != NULL);
+
+			entry->d_dev = vnode->device;
+			entry->d_ino = vnode->id;
 		}
 	}
 
@@ -7194,8 +7230,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 			goto err3;
 		}
 
-		if (coveredNode->mount->root_vnode == coveredNode) {
-			// this is already a mount point
+		if (coveredNode->IsCovered()) {
+			// this is already a covered vnode
 			status = B_BUSY;
 			goto err3;
 		}
@@ -7231,12 +7267,21 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		goto err4;
 	}
 
-	// No race here, since fs_mount() is the only function changing
-	// root_vnode->covers (and holds sMountOpLock at that time).
+	// set up the links between the root vnode and the vnode it covers
 	rw_lock_write_lock(&sVnodeLock);
 	if (coveredNode != NULL) {
+		if (coveredNode->IsCovered()) {
+			// the vnode is covered now
+			status = B_BUSY;
+			rw_lock_write_unlock(&sVnodeLock);
+			goto err4;
+		}
+
 		mount->root_vnode->covers = coveredNode;
+		mount->root_vnode->SetCovering(true);
+
 		coveredNode->covered_by = mount->root_vnode;
+		coveredNode->SetCovered(true);
 	}
 	rw_lock_write_unlock(&sVnodeLock);
 
@@ -7415,7 +7460,12 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	vnode_to_be_freed(mount->root_vnode);
 
 	Vnode* coveredNode = mount->root_vnode->covers;
-	coveredNode->covered_by = NULL;
+	coveredNode->covered_by = mount->root_vnode->covered_by;
+	coveredNode->SetCovered(coveredNode->covered_by != NULL);
+
+	mount->root_vnode->covered_by = NULL;
+	mount->root_vnode->SetCovered(false);
+	mount->root_vnode->SetCovering(false);
 
 	vnodesWriteLocker.Unlock();
 

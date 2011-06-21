@@ -687,7 +687,7 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 	// If node is a mount point, we need to resolve it to the mounted
 	// volume's root node.
 	dev_t nodeDevice = device;
-	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
+	resolve_vnode_to_covering_vnode(device, node, &nodeDevice, &node);
 
 	RecursiveLocker locker(fRecursiveLock);
 
