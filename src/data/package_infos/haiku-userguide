@@ -11,7 +11,7 @@ copyright = "2001-2011 Haiku, Inc. et al"
 licenses = [ "MIT" ]
 
 provides = [
-	haiku-welcome
+	haiku-userguide
 ]
 
 requires = [
