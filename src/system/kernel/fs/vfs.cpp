@@ -5034,8 +5034,6 @@ vfs_bind_mount_directory(dev_t mountID, ino_t nodeID, dev_t coveredMountID,
 	inc_vnode_ref_count(vnode);
 	inc_vnode_ref_count(coveredVnode);
 
-// TODO: This relationship must be tracked, so it can be dissolved on unmount.
-
 	return B_OK;
 }
 
@@ -7473,11 +7471,20 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		// make sure all of them are not busy or have refs on them
 		VnodeList::Iterator iterator = mount->vnodes.GetIterator();
 		while (struct vnode* vnode = iterator.Next()) {
-			// The root vnode ref_count needs to be 1 here (the mount has a
-			// reference).
-			if (vnode->IsBusy()
-				|| ((vnode->ref_count != 0 && mount->root_vnode != vnode)
-					|| (vnode->ref_count != 1 && mount->root_vnode == vnode))) {
+			if (vnode->IsBusy()) {
+				busy = true;
+				break;
+			}
+
+			// check the vnode's ref count -- subtract additional references for
+			// covering
+			int32 refCount = vnode->ref_count;
+			if (vnode->covers != NULL)
+				refCount--;
+			if (vnode->covered_by != NULL)
+				refCount--;
+
+			if (refCount != 0) {
 				// there are still vnodes in use on this mount, so we cannot
 				// unmount yet
 				busy = true;
@@ -7515,37 +7522,75 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		vnodesWriteLocker.Lock();
 	}
 
-	// we can safely continue, mark all of the vnodes busy and this mount
-	// structure in unmounting state
+	// We can safely continue. Mark all of the vnodes busy and this mount
+	// structure in unmounting state. Also undo the vnode covers/covered_by
+	// links.
 	mount->unmounting = true;
 
 	VnodeList::Iterator iterator = mount->vnodes.GetIterator();
 	while (struct vnode* vnode = iterator.Next()) {
+		// Remove all covers/covered_by links from other mounts' nodes to this
+		// vnode and adjust the node ref count accordingly. We will release the
+		// references to the external vnodes below.
+		if (Vnode* coveredNode = vnode->covers) {
+			if (Vnode* coveringNode = vnode->covered_by) {
+				// We have both covered and covering vnodes, so just remove us
+				// from the chain.
+				coveredNode->covered_by = coveringNode;
+				coveringNode->covers = coveredNode;
+				vnode->ref_count -= 2;
+
+				vnode->covered_by = NULL;
+				vnode->covers = NULL;
+				vnode->SetCovering(false);
+				vnode->SetCovered(false);
+			} else {
+				// We only have a covered vnode. Remove its link to us.
+				coveredNode->covered_by = NULL;
+				coveredNode->SetCovered(false);
+				vnode->ref_count--;
+
+				// If the other node is an external vnode, we keep its link
+				// link around so we can put the reference later on. Otherwise
+				// we get rid of it right now.
+				if (coveredNode->mount == mount) {
+					vnode->covers = NULL;
+					coveredNode->ref_count--;
+				}
+			}
+		} else if (Vnode* coveringNode = vnode->covered_by) {
+			// We only have a covering vnode. Remove its link to us.
+			coveringNode->covers = NULL;
+			coveringNode->SetCovering(false);
+			vnode->ref_count--;
+
+			// If the other node is an external vnode, we keep its link
+			// link around so we can put the reference later on. Otherwise
+			// we get rid of it right now.
+			if (coveringNode->mount == mount) {
+				vnode->covered_by = NULL;
+				coveringNode->ref_count--;
+			}
+		}
+
 		vnode->SetBusy(true);
 		vnode_to_be_freed(vnode);
 	}
 
-	// The ref_count of the root node is 1 at this point, see above why this is
-	mount->root_vnode->ref_count--;
-	vnode_to_be_freed(mount->root_vnode);
-
-	Vnode* coveredNode = mount->root_vnode->covers;
-	coveredNode->covered_by = mount->root_vnode->covered_by;
-	coveredNode->SetCovered(coveredNode->covered_by != NULL);
-
-	mount->root_vnode->covered_by = NULL;
-	mount->root_vnode->SetCovered(false);
-	mount->root_vnode->SetCovering(false);
-
 	vnodesWriteLocker.Unlock();
-
-	put_vnode(coveredNode);
 
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
 	// we don't have to do this.
-	while (struct vnode* vnode = mount->vnodes.Head())
+	while (struct vnode* vnode = mount->vnodes.Head()) {
+		// Put the references to external covered/covering vnodes we kept above.
+		if (Vnode* coveredNode = vnode->covers)
+			put_vnode(coveredNode);
+		if (Vnode* coveringNode = vnode->covered_by)
+			put_vnode(coveringNode);
+
 		free_vnode(vnode, false);
+	}
 
 	// remove the mount structure from the hash table
 	mutex_lock(&sMountMutex);
