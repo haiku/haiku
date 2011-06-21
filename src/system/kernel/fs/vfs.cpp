@@ -5019,8 +5019,10 @@ vfs_bind_mount_directory(dev_t mountID, ino_t nodeID, dev_t coveredMountID,
 	// establish the covered/covering links
 	WriteLocker locker(sVnodeLock);
 
-	if (vnode->covers != NULL || coveredVnode->covered_by != NULL)
+	if (vnode->covers != NULL || coveredVnode->covered_by != NULL
+		|| vnode->mount->unmounting || coveredVnode->mount->unmounting) {
 		return B_BUSY;
+	}
 
 	vnode->covers = coveredVnode;
 	vnode->SetCovering(true);
