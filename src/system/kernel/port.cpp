@@ -1434,38 +1434,27 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 	message->sender_team = team_get_current_team_id();
 
 	if (bufferSize > 0) {
-		uint32 i;
-		if (userCopy) {
-			// copy from user memory
-			for (i = 0; i < vecCount; i++) {
-				size_t bytes = msgVecs[i].iov_len;
-				if (bytes > bufferSize)
-					bytes = bufferSize;
+		size_t offset = 0;
+		for (uint32 i = 0; i < vecCount; i++) {
+			size_t bytes = msgVecs[i].iov_len;
+			if (bytes > bufferSize)
+				bytes = bufferSize;
 
-				status_t status = user_memcpy(message->buffer,
+			if (userCopy) {
+				status_t status = user_memcpy(message->buffer + offset,
 					msgVecs[i].iov_base, bytes);
 				if (status != B_OK) {
 					put_port_message(message);
 					goto error;
 				}
+			} else
+				memcpy(message->buffer + offset, msgVecs[i].iov_base, bytes);
 
-				bufferSize -= bytes;
-				if (bufferSize == 0)
-					break;
-			}
-		} else {
-			// copy from kernel memory
-			for (i = 0; i < vecCount; i++) {
-				size_t bytes = msgVecs[i].iov_len;
-				if (bytes > bufferSize)
-					bytes = bufferSize;
+			bufferSize -= bytes;
+			if (bufferSize == 0)
+				break;
 
-				memcpy(message->buffer, msgVecs[i].iov_base, bytes);
-
-				bufferSize -= bytes;
-				if (bufferSize == 0)
-					break;
-			}
+			offset += bytes;
 		}
 	}
 
