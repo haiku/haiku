@@ -49,6 +49,11 @@
 //   Port::owner.
 // * Port::lock: Protects all Port members save team_link, hash_link, and lock.
 //   id is immutable.
+// * sPortQuotaLock: Protects sTotalSpaceInUse, sAreaChangeCounter,
+//   sWaitingForSpace and the critical section of creating/adding areas for the
+//   port heap in the grow case. It also has to be held when reading
+//   sWaitingForSpace to determine whether or not to notify the
+//   sNoSpaceCondition condition variable.
 //
 // The locking order is sPortsLock -> Port::lock. A port must be looked up
 // in sPorts and locked with sPortsLock held. Afterwards sPortsLock can be
@@ -338,12 +343,13 @@ static int32 sUsedPorts = 0;
 static PortHashTable sPorts;
 static heap_allocator* sPortAllocator;
 static ConditionVariable sNoSpaceCondition;
-static vint32 sTotalSpaceInUse;
-static vint32 sAreaChangeCounter;
-static vint32 sAllocatingArea;
+static int32 sTotalSpaceInUse;
+static int32 sAreaChangeCounter;
+static int32 sWaitingForSpace;
 static port_id sNextPortID = 1;
 static bool sPortsActive = false;
 static mutex sPortsLock = MUTEX_INITIALIZER("ports list");
+static mutex sPortQuotaLock = MUTEX_INITIALIZER("port quota");
 
 static PortNotificationService sNotificationService;
 
@@ -492,59 +498,91 @@ notify_port_select_events(Port* port, uint16 events)
 }
 
 
+static Port*
+get_locked_port(port_id id)
+{
+	MutexLocker portsLocker(sPortsLock);
+
+	Port* port = sPorts.Lookup(id);
+	if (port != NULL)
+		mutex_lock(&port->lock);
+	return port;
+}
+
+
+/*!	You need to own the port's lock when calling this function */
+static inline bool
+is_port_closed(Port* port)
+{
+	return port->capacity == 0;
+}
+
+
 static void
 put_port_message(port_message* message)
 {
 	size_t size = sizeof(port_message) + message->size;
 	heap_free(sPortAllocator, message);
 
-	atomic_add(&sTotalSpaceInUse, -size);
-	sNoSpaceCondition.NotifyAll();
+	MutexLocker quotaLocker(sPortQuotaLock);
+	sTotalSpaceInUse -= size;
+	if (sWaitingForSpace > 0)
+		sNoSpaceCondition.NotifyAll();
 }
 
 
 static status_t
 get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
-	port_message** _message)
+	port_message** _message, Port& port)
 {
 	size_t size = sizeof(port_message) + bufferSize;
-	bool limitReached = false;
+	bool needToWait = false;
+
+	MutexLocker quotaLocker(sPortQuotaLock);
 
 	while (true) {
-		if (atomic_add(&sTotalSpaceInUse, size)
-				> int32(kTotalSpaceLimit - size)) {
+		while (sTotalSpaceInUse + size > kTotalSpaceLimit || needToWait) {
 			// TODO: add per team limit
 			// We are not allowed to create another heap area, as our
 			// space limit has been reached - just wait until we get
 			// some free space again.
-			limitReached = true;
-
-		wait:
-			MutexLocker locker(sPortsLock);
-
-			atomic_add(&sTotalSpaceInUse, -size);
 
 			// TODO: we don't want to wait - but does that also mean we
 			// shouldn't wait for the area creation?
-			if (limitReached && (flags & B_RELATIVE_TIMEOUT) != 0
-				&& timeout <= 0)
+			if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 				return B_WOULD_BLOCK;
 
 			ConditionVariableEntry entry;
 			sNoSpaceCondition.Add(&entry);
 
-			locker.Unlock();
+			sWaitingForSpace++;
+			quotaLocker.Unlock();
+
+			port_id portID = port.id;
+			mutex_unlock(&port.lock);
 
 			status_t status = entry.Wait(flags, timeout);
+
+			// re-lock the port and the quota
+			Port* newPort = get_locked_port(portID);
+			quotaLocker.Lock();
+			sWaitingForSpace--;
+
+			if (newPort != &port || is_port_closed(&port)) {
+				// the port is no longer usable
+				return B_BAD_PORT_ID;
+			}
+
 			if (status == B_TIMED_OUT)
 				return B_TIMED_OUT;
 
-			// just try again
-			limitReached = false;
+			needToWait = false;
 			continue;
 		}
 
-		int32 areaChangeCounter = atomic_get(&sAreaChangeCounter);
+		int32 areaChangeCounter = sAreaChangeCounter;
+		sTotalSpaceInUse += size;
+		quotaLocker.Unlock();
 
 		// Quota is fulfilled, try to allocate the buffer
 
@@ -558,13 +596,16 @@ get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
 			return B_OK;
 		}
 
-		if (atomic_or(&sAllocatingArea, 1) != 0) {
-			// Just wait for someone else to create an area for us
-			goto wait;
-		}
+		quotaLocker.Lock();
 
-		if (areaChangeCounter != atomic_get(&sAreaChangeCounter)) {
-			atomic_add(&sTotalSpaceInUse, -size);
+		// We weren't able to allocate and we'll start over, including
+		// re-acquireing the quota, so we remove our size from the in-use
+		// counter again.
+		sTotalSpaceInUse -= size;
+
+		if (areaChangeCounter != sAreaChangeCounter) {
+			// There was already an area added since we tried allocating,
+			// start over.
 			continue;
 		}
 
@@ -575,25 +616,19 @@ get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
 			B_ANY_KERNEL_ADDRESS, kBufferGrowRate, B_NO_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (area < 0) {
-			// it's time to let the userland feel our pain
-			sNoSpaceCondition.NotifyAll();
-			return B_NO_MEMORY;
+			// We'll have to get by with what we have, so wait for someone
+			// to free a message instead. We enforce waiting so that we don't
+			// try to create a new area over and over.
+			needToWait = true;
+			continue;
 		}
 
 		heap_add_area(sPortAllocator, area, base, kBufferGrowRate);
 
-		atomic_add(&sAreaChangeCounter, 1);
-		sNoSpaceCondition.NotifyAll();
-		atomic_and(&sAllocatingArea, 0);
+		sAreaChangeCounter++;
+		if (sWaitingForSpace > 0)
+			sNoSpaceCondition.NotifyAll();
 	}
-}
-
-
-/*!	You need to own the port's lock when calling this function */
-static inline bool
-is_port_closed(Port* port)
-{
-	return port->capacity == 0;
 }
 
 
@@ -650,18 +685,6 @@ uninit_port_locked(Port* port)
 	port->read_condition.NotifyAll(false, B_BAD_PORT_ID);
 	port->write_condition.NotifyAll(false, B_BAD_PORT_ID);
 	sNotificationService.Notify(PORT_REMOVED, port->id);
-}
-
-
-static Port*
-get_locked_port(port_id id)
-{
-	MutexLocker portsLocker(sPortsLock);
-
-	Port* port = sPorts.Lookup(id);
-	if (port != NULL)
-		mutex_lock(&port->lock);
-	return port;
 }
 
 
@@ -1394,9 +1417,16 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 		port->write_count--;
 
 	status = get_port_message(msgCode, bufferSize, flags, timeout,
-		&message);
-	if (status != B_OK)
+		&message, *port);
+	if (status != B_OK) {
+		if (status == B_BAD_PORT_ID) {
+			// the port had to be unlocked and is now no longer there
+			T(Write(id, 0, 0, 0, 0, B_BAD_PORT_ID));
+			return B_BAD_PORT_ID;
+		}
+
 		goto error;
+	}
 
 	// sender credentials
 	message->sender = geteuid();
