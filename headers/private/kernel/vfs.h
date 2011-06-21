@@ -143,7 +143,7 @@ status_t	vfs_create_special_node(const char *path, fs_vnode *subVnode,
 				struct vnode **_createdVnode);
 
 /* service call for the node monitor */
-status_t	resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
+status_t	vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
 				dev_t *resolvedMountID, ino_t *resolvedNodeID);
 
 /* calls the syscall dispatcher should use for user file I/O */

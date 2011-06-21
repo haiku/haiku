@@ -1958,7 +1958,7 @@ get_root_vnode(bool kernel)
 	- another error code, if something went wrong.
 */
 status_t
-resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
+vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
 	dev_t* resolvedMountID, ino_t* resolvedNodeID)
 {
 	// get the node
