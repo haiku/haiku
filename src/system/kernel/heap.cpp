@@ -305,9 +305,6 @@ get_caller()
 #endif
 
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
-
-
 static void
 dump_page(heap_page *page)
 {
@@ -379,12 +376,14 @@ dump_allocator(heap_allocator *heap, bool areas, bool bins)
 static int
 dump_heap_list(int argc, char **argv)
 {
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 	if (argc == 2 && strcmp(argv[1], "grow") == 0) {
 		// only dump dedicated grow heap info
 		kprintf("dedicated grow heap:\n");
 		dump_allocator(sGrowHeap, true, true);
 		return 0;
 	}
+#endif
 
 	bool stats = false;
 	int i = 1;
@@ -401,9 +400,13 @@ dump_heap_list(int argc, char **argv)
 	}
 
 	if (heapAddress == 0) {
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 		// dump default kernel heaps
 		for (uint32 i = 0; i < sHeapCount; i++)
 			dump_allocator(sHeaps[i], !stats, !stats);
+#else
+		print_debugger_command_usage(argv[0]);
+#endif
 	} else {
 		// dump specified heap
 		dump_allocator((heap_allocator*)(addr_t)heapAddress, !stats, !stats);
@@ -431,10 +434,22 @@ dump_allocations(int argc, char **argv)
 
 	size_t totalSize = 0;
 	uint32 totalCount = 0;
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 	for (uint32 heapIndex = 0; heapIndex < sHeapCount; heapIndex++) {
 		heap_allocator *heap = sHeaps[heapIndex];
 		if (heapAddress != 0)
 			heap = (heap_allocator *)(addr_t)heapAddress;
+#else
+	while (true) {
+		heap_allocator *heap = (heap_allocator *)(addr_t)heapAddress;
+		if (heap == NULL) {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+#endif
+#if 0
+	}
+#endif
 
 		// go through all the pages in all the areas
 		heap_area *area = heap->all_areas;
@@ -823,8 +838,6 @@ dump_allocations_per_caller(int argc, char **argv)
 }
 
 #endif // KERNEL_HEAP_LEAK_CHECK
-
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 #if PARANOID_HEAP_VALIDATION
@@ -2054,7 +2067,7 @@ heap_init(addr_t base, size_t size)
 		"argument, only allocations matching the team ID, thread ID, caller\n"
 		"address or allocated address given in the second argument are printed.\n"
 		"If the optional argument \"stats\" is specified, only the allocation\n"
-		"counts and no individual allocations are printed\n", 0);
+		"counts and no individual allocations are printed.\n", 0);
 	add_debugger_command_etc("allocations_per_caller",
 		&dump_allocations_per_caller,
 		"Dump current heap allocations summed up per caller",
@@ -2189,7 +2202,22 @@ heap_init_post_thread()
 
 	resume_thread(sHeapGrowThread);
 
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#else	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+	// set up some debug commands
+	add_debugger_command_etc("heap", &dump_heap_list,
+		"Dump infos about a specific heap",
+		"[\"stats\"] <heap>\n"
+		"Dump infos about the specified kernel heap. If \"stats\" is given\n"
+		"as the argument, currently only the heap count is printed.\n", 0);
+#if !KERNEL_HEAP_LEAK_CHECK
+	add_debugger_command_etc("allocations", &dump_allocations,
+		"Dump current heap allocations",
+		"[\"stats\"] <heap>\n"
+		"If the optional argument \"stats\" is specified, only the allocation\n"
+		"counts and no individual allocations are printed.\n", 0);
+#endif	// KERNEL_HEAP_LEAK_CHECK
+#endif	// USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 	// run the deferred deleter roughly once a second
 	if (register_kernel_daemon(deferred_deleter, NULL, 10) != B_OK)
