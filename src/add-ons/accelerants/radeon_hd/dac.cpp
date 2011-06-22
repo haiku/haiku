@@ -146,7 +146,6 @@ DACPower(uint8 dacIndex, int mode)
 	uint32 powerdown;
 
 	switch (mode) {
-		// TODO : RHD_POWER_OFF, etc
 		case RHD_POWER_ON:
 			// TODO : SensedType Detection?
 			powerdown = 0;
@@ -158,6 +157,19 @@ DACPower(uint8 dacIndex, int mode)
 			Write32(OUT, dacOffset + DACA_FORCE_OUTPUT_CNTL, 0);
 			Write32Mask(OUT, dacOffset + DACA_SYNC_SELECT, 0, 0x00000101);
 			Write32(OUT, dacOffset + DACA_SYNC_TRISTATE_CONTROL, 0);
+			return;
+		case RHD_POWER_RESET:
+			// No action
+			return;
+		case RHD_POWER_SHUTDOWN:
+		default:
+			Write32Mask(OUT, dacOffset + DACA_FORCE_DATA, 0, 0x0000FFFF);
+			Write32Mask(OUT, dacOffset + DACA_FORCE_OUTPUT_CNTL,
+				0x0000701, 0x0000701);
+			Write32(OUT, dacOffset + DACA_POWERDOWN, 0x01010100);
+			Write32(OUT, dacOffset + DACA_POWERDOWN, 0x01010101);
+			Write32(OUT, dacOffset + DACA_ENABLE, 0);
+			Write32(OUT, dacOffset + DACA_ENABLE, 0);
 			return;
 	}
 }
