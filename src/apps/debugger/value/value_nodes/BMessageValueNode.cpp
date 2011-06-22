@@ -81,14 +81,17 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 	uint8 buffer[sizeof(BMessage)];
 	error = valueLoader->LoadRawValue(addressData, sizeof(BMessage), buffer);
+
+#ifdef TRACE_LOCALS
 	if (error == B_OK) {
-		BMessage* message = (BMessage *)buffer;
+		BMessage* message = (BMessage*)buffer;
 		TRACE_LOCALS("Loaded BMessage('%c%c%c%c')\n",
 			char((message->what >> 24) & 0xff),
 			char((message->what >> 16) & 0xff),
 			char((message->what >> 8) & 0xff),
 			char(message->what & 0xff));
 	}
+#endif
 
 	return B_BAD_VALUE;
 }
