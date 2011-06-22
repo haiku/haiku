@@ -89,8 +89,62 @@ DACGetElectrical(uint8 type, uint8 dac,
 }
 
 
+/* For Cards >= r620 */
 void
-DACSet(uint8 dacIndex, uint32 crtid)
+DACSetModern(uint8 dacIndex, uint32 crtid)
+{
+	uint8 bandGap;
+	uint8 whiteFine;
+
+	// BIG TODO : NTSC, PAL, ETC.  We assume VGA for now
+	uint8 standard = FORMAT_VGA; /* VGA */
+	uint32 mode = 2;
+	bool istv = false;
+	uint32 source = istv ? 0x2 : crtid;
+
+	DACGetElectrical(standard, dacIndex, &bandGap, &whiteFine);
+
+	uint32 mask = 0;
+	if (bandGap)
+		mask |= 0xFF << 16;
+	if (whiteFine)
+		mask |= 0xFF << 8;
+
+	uint32 dacOffset = (dacIndex == 1) ? RV620_REG_DACA_OFFSET
+		: RV620_REG_DACB_OFFSET;
+
+	Write32Mask(OUT, dacOffset + RV620_DACA_MACRO_CNTL, mode, 0xFF);
+		// no fine control yet
+
+	Write32Mask(OUT, dacOffset + RV620_DACA_SOURCE_SELECT, source, 0x00000003);
+
+	// enable tv if has TV mux(DACB) and istv
+	if (dacIndex)
+		Write32Mask(OUT, dacOffset + RV620_DACA_CONTROL2, istv << 8, 0x0100);
+
+	// use fine control from white_fine control register
+	Write32Mask(OUT, dacOffset + RV620_DACA_AUTO_CALIB_CONTROL, 0x0, 0x4);
+	Write32Mask(OUT, dacOffset + RV620_DACA_BGADJ_SRC, 0x0, 0x30);
+	Write32Mask(OUT, dacOffset + RV620_DACA_MACRO_CNTL,
+		(bandGap << 16) | (whiteFine << 8), mask);
+
+	// reset the FMT register
+	// TODO : ah-la external DxFMTSet
+	uint32 fmtOffset = (crtid == 0) ? FMT1_REG_OFFSET : FMT2_REG_OFFSET;
+	Write32(OUT, fmtOffset + RV620_FMT1_BIT_DEPTH_CONTROL, 0);
+
+	Write32Mask(OUT, fmtOffset + RV620_FMT1_CONTROL, 0,
+		RV62_FMT_PIXEL_ENCODING);
+		// 4:4:4 encoding
+
+	Write32(OUT, fmtOffset + RV620_FMT1_CLAMP_CNTL, 0);
+		// disable color clamping
+}
+
+
+/* For Cards < r620 */
+void
+DACSetLegacy(uint8 dacIndex, uint32 crtid)
 {
 	bool istv = false;
 	uint8 bandGap;
@@ -140,7 +194,59 @@ DACSet(uint8 dacIndex, uint32 crtid)
 
 
 void
-DACPower(uint8 dacIndex, int mode)
+DACSet(uint8 dacIndex, uint32 crtid)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset < (RADEON_R600 | 0x20))
+		DACSetLegacy(dacIndex, crtid);
+	else
+		DACSetModern(dacIndex, crtid);
+}
+
+
+/* For Cards >= r620 */
+void
+DACPowerModern(uint8 dacIndex, int mode)
+{
+	uint32 dacOffset = (dacIndex == 1) ? RV620_REG_DACB_OFFSET
+		: RV620_REG_DACA_OFFSET;
+	uint32 powerdown;
+
+	switch (mode) {
+		case RHD_POWER_ON:
+			// TODO : SensedType Detection?
+			powerdown = 0;
+			if (!(Read32(OUT, dacOffset + RV620_DACA_ENABLE) & 0x01))
+				Write32Mask(OUT, dacOffset + RV620_DACA_ENABLE, 0x1, 0xff);
+			Write32Mask(OUT, dacOffset + RV620_DACA_FORCE_OUTPUT_CNTL,
+				0x01, 0x01);
+			Write32Mask(OUT, dacOffset + RV620_DACA_POWERDOWN, 0x0, 0xff);
+			snooze(20);
+			Write32Mask(OUT, dacOffset + RV620_DACA_POWERDOWN,
+				powerdown, 0xFFFFFF00);
+			Write32(OUT, dacOffset + RV620_DACA_FORCE_OUTPUT_CNTL, 0x0);
+			Write32(OUT, dacOffset + RV620_DACA_SYNC_TRISTATE_CONTROL, 0x0);
+			return;
+		case RHD_POWER_RESET:
+			// No action
+			return;
+		case RHD_POWER_SHUTDOWN:
+		default:
+			Write32(OUT, dacOffset + RV620_DACA_POWERDOWN, 0x01010100);
+			Write32(OUT, dacOffset + RV620_DACA_POWERDOWN, 0x01010101);
+			Write32(OUT, dacOffset + RV620_DACA_ENABLE, 0);
+			Write32Mask(OUT, dacOffset + RV620_DACA_FORCE_DATA, 0, 0xffff);
+			Write32Mask(OUT, dacOffset + RV620_DACA_FORCE_OUTPUT_CNTL,
+				0x701, 0x701);
+			return;
+	}
+}
+
+
+/* For Cards < r620 */
+void
+DACPowerLegacy(uint8 dacIndex, int mode)
 {
 	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
 	uint32 powerdown;
@@ -173,3 +279,16 @@ DACPower(uint8 dacIndex, int mode)
 			return;
 	}
 }
+
+
+void
+DACPower(uint8 dacIndex, int mode)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.device_chipset < (RADEON_R600 | 0x20))
+		DACPowerLegacy(dacIndex, mode);
+	else
+		DACPowerModern(dacIndex, mode);
+}
+
