@@ -196,6 +196,9 @@ BMessage::operator=(const BMessage &other)
 	if (fHeader == NULL)
 		return *this;
 
+	if (other.fHeader == NULL)
+		return *this;
+
 	memcpy(fHeader, other.fHeader, sizeof(message_header));
 
 	// Clear some header flags inherited from the original message that don't
@@ -207,7 +210,9 @@ BMessage::operator=(const BMessage &other)
 
 	if (fHeader->field_count > 0) {
 		size_t fieldsSize = fHeader->field_count * sizeof(field_header);
-		fFields = (field_header *)malloc(fieldsSize);
+		if (other.fFields != NULL)
+			fFields = (field_header *)malloc(fieldsSize);
+
 		if (fFields == NULL) {
 			fHeader->field_count = 0;
 			fHeader->data_size = 0;
@@ -216,7 +221,9 @@ BMessage::operator=(const BMessage &other)
 	}
 
 	if (fHeader->data_size > 0) {
-		fData = (uint8 *)malloc(fHeader->data_size);
+		if (other.fData != NULL)
+			fData = (uint8 *)malloc(fHeader->data_size);
+
 		if (fData == NULL) {
 			fHeader->field_count = 0;
 			free(fFields);
@@ -268,6 +275,9 @@ BMessage::HasSameData(const BMessage &other, bool ignoreFieldOrder,
 	if (this == &other)
 		return true;
 
+	if (fHeader == NULL)
+		return other.fHeader == NULL;
+
 	if (fHeader->field_count != other.fHeader->field_count)
 		return false;
 
@@ -290,8 +300,10 @@ BMessage::HasSameData(const BMessage &other, bool ignoreFieldOrder,
 				return false;
 		}
 
-		if (otherField->type != field->type || otherField->count != field->count)
+		if (otherField->type != field->type
+			|| otherField->count != field->count) {
 			return false;
+		}
 
 		uint8 *data = fData + field->offset + field->name_length;
 		uint8 *otherData = other.fData + otherField->offset
@@ -341,7 +353,6 @@ BMessage::_InitCommon(bool initHeader)
 	if (initHeader)
 		return _InitHeader();
 
-	fHeader = NULL;
 	return B_OK;
 }
 
@@ -416,15 +427,18 @@ BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
 	type_code *typeFound, int32 *countFound) const
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (index < 0 || (uint32)index >= fHeader->field_count)
 		return B_BAD_INDEX;
 
 	if (typeRequested == B_ANY_TYPE) {
-		if (nameFound)
+		if (nameFound != NULL)
 			*nameFound = (char *)fData + fFields[index].offset;
-		if (typeFound)
+		if (typeFound != NULL)
 			*typeFound = fFields[index].type;
-		if (countFound)
+		if (countFound != NULL)
 			*countFound = fFields[index].count;
 		return B_OK;
 	}
@@ -436,11 +450,11 @@ BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
 			counter++;
 
 		if (counter == index) {
-			if (nameFound)
+			if (nameFound != NULL)
 				*nameFound = (char *)fData + field->offset;
-			if (typeFound)
+			if (typeFound != NULL)
 				*typeFound = field->type;
-			if (countFound)
+			if (countFound != NULL)
 				*countFound = field->count;
 			return B_OK;
 		}
@@ -458,17 +472,17 @@ BMessage::GetInfo(const char *name, type_code *typeFound, int32 *countFound)
 	const
 {
 	DEBUG_FUNCTION_ENTER;
-	if (countFound)
+	if (countFound != NULL)
 		*countFound = 0;
 
 	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
-	if (result < B_OK || field == NULL)
+	if (result != B_OK)
 		return result;
 
-	if (typeFound)
+	if (typeFound != NULL)
 		*typeFound = field->type;
-	if (countFound)
+	if (countFound != NULL)
 		*countFound = field->count;
 
 	return B_OK;
@@ -482,12 +496,12 @@ BMessage::GetInfo(const char *name, type_code *typeFound, bool *fixedSize)
 	DEBUG_FUNCTION_ENTER;
 	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
-	if (result < B_OK || field == NULL)
+	if (result != B_OK)
 		return result;
 
-	if (typeFound)
+	if (typeFound != NULL)
 		*typeFound = field->type;
-	if (fixedSize)
+	if (fixedSize != NULL)
 		*fixedSize = (field->flags & FIELD_FLAG_FIXED_SIZE) != 0;
 
 	return B_OK;
@@ -501,14 +515,14 @@ BMessage::GetInfo(const char *name, type_code *typeFound, int32 *countFound,
 	DEBUG_FUNCTION_ENTER;
 	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
-	if (result < B_OK || field == NULL)
+	if (result != B_OK)
 		return result;
 
-	if (typeFound)
+	if (typeFound != NULL)
 		*typeFound = field->type;
-	if (countFound)
+	if (countFound != NULL)
 		*countFound = field->count;
-	if (fixedSize)
+	if (fixedSize != NULL)
 		*fixedSize = (field->flags & FIELD_FLAG_FIXED_SIZE) != 0;
 
 	return B_OK;
@@ -519,6 +533,9 @@ int32
 BMessage::CountNames(type_code type) const
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return 0;
+
 	if (type == B_ANY_TYPE)
 		return fHeader->field_count;
 
@@ -537,7 +554,7 @@ bool
 BMessage::IsEmpty() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return fHeader->field_count == 0;
+	return fHeader == NULL || fHeader->field_count == 0;
 }
 
 
@@ -567,7 +584,7 @@ bool
 BMessage::IsReply() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_IS_REPLY) != 0;
+	return fHeader != NULL && (fHeader->flags & MESSAGE_FLAG_IS_REPLY) != 0;
 }
 
 
@@ -580,7 +597,7 @@ BMessage::PrintToStream() const
 
 
 void
-BMessage::_PrintToStream(const char* indent) const
+BMessage::_PrintToStream(const char *indent) const
 {
 	DEBUG_FUNCTION_ENTER;
 
@@ -730,6 +747,9 @@ BMessage::Rename(const char *oldEntry, const char *newEntry)
 	if (oldEntry == NULL || newEntry == NULL)
 		return B_BAD_VALUE;
 
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
@@ -755,7 +775,7 @@ BMessage::Rename(const char *oldEntry, const char *newEntry)
 			int32 newLength = strlen(newEntry) + 1;
 			status_t result = _ResizeData(field->offset + 1,
 				newLength - field->name_length);
-			if (result < B_OK)
+			if (result != B_OK)
 				return result;
 
 			memcpy(fData + field->offset, newEntry, newLength);
@@ -774,7 +794,8 @@ bool
 BMessage::WasDelivered() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) != 0;
+	return fHeader != NULL
+		&& (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) != 0;
 }
 
 
@@ -782,7 +803,8 @@ bool
 BMessage::IsSourceWaiting() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) != 0
+	return fHeader != NULL
+		&& (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) != 0
 		&& (fHeader->flags & MESSAGE_FLAG_REPLY_DONE) == 0;
 }
 
@@ -791,7 +813,8 @@ bool
 BMessage::IsSourceRemote() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) != 0
+	return fHeader != NULL
+		&& (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) != 0
 		&& fHeader->reply_team != BPrivate::current_team();
 }
 
@@ -800,14 +823,13 @@ BMessenger
 BMessage::ReturnAddress() const
 {
 	DEBUG_FUNCTION_ENTER;
-	if ((fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) != 0) {
-		BMessenger messenger;
-		BMessenger::Private(messenger).SetTo(fHeader->reply_team,
-			fHeader->reply_port, fHeader->reply_target);
-		return messenger;
-	}
+	if (fHeader == NULL || (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) == 0)
+		return BMessenger();
 
-	return BMessenger();
+	BMessenger messenger;
+	BMessenger::Private(messenger).SetTo(fHeader->reply_team,
+		fHeader->reply_port, fHeader->reply_target);
+	return messenger;
 }
 
 
@@ -833,7 +855,8 @@ bool
 BMessage::WasDropped() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_WAS_DROPPED) != 0;
+	return fHeader != NULL
+		&& (fHeader->flags & MESSAGE_FLAG_WAS_DROPPED) != 0;
 }
 
 
@@ -841,7 +864,7 @@ BPoint
 BMessage::DropPoint(BPoint *offset) const
 {
 	DEBUG_FUNCTION_ENTER;
-	if (offset)
+	if (offset != NULL)
 		*offset = FindPoint("_drop_offset_");
 
 	return FindPoint("_drop_point_");
@@ -870,6 +893,9 @@ status_t
 BMessage::SendReply(BMessage *reply, BMessenger replyTo, bigtime_t timeout)
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
 	messengerPrivate.SetTo(fHeader->reply_team, fHeader->reply_port,
@@ -921,6 +947,9 @@ BMessage::SendReply(BMessage *reply, BMessage *replyToReply,
 	bigtime_t sendTimeout, bigtime_t replyTimeout)
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
 	messengerPrivate.SetTo(fHeader->reply_team, fHeader->reply_port,
@@ -964,6 +993,9 @@ ssize_t
 BMessage::FlattenedSize() const
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	return sizeof(message_header) + fHeader->field_count * sizeof(field_header)
 		+ fHeader->data_size;
 }
@@ -1071,6 +1103,9 @@ status_t
 BMessage::_FlattenToArea(message_header **_header) const
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	message_header *header = (message_header *)malloc(sizeof(message_header));
 	if (header == NULL)
 		return B_NO_MEMORY;
@@ -1109,6 +1144,9 @@ status_t
 BMessage::_Reference()
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	fHeader->flags &= ~MESSAGE_FLAG_PASS_BY_AREA;
 
 	/* if there is no data at all we don't need the area */
@@ -1117,7 +1155,7 @@ BMessage::_Reference()
 
 	area_info areaInfo;
 	status_t result = get_area_info(fHeader->message_area, &areaInfo);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	uint8 *address = (uint8 *)areaInfo.address;
@@ -1132,6 +1170,9 @@ status_t
 BMessage::_Dereference()
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	delete_area(fHeader->message_area);
 	fHeader->message_area = -1;
 	fFields = NULL;
@@ -1144,6 +1185,8 @@ status_t
 BMessage::_CopyForWrite()
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
 
 	field_header *newFields = NULL;
 	uint8 *newData = NULL;
@@ -1181,6 +1224,10 @@ BMessage::_CopyForWrite()
 status_t
 BMessage::_ValidateMessage()
 {
+	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (fHeader->field_count == 0)
 		return B_OK;
 
@@ -1341,7 +1388,7 @@ BMessage::AddSpecifier(const char *property)
 	DEBUG_FUNCTION_ENTER;
 	BMessage message(B_DIRECT_SPECIFIER);
 	status_t result = message.AddString(B_PROPERTY_ENTRY, property);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	return AddSpecifier(&message);
@@ -1354,11 +1401,11 @@ BMessage::AddSpecifier(const char *property, int32 index)
 	DEBUG_FUNCTION_ENTER;
 	BMessage message(B_INDEX_SPECIFIER);
 	status_t result = message.AddString(B_PROPERTY_ENTRY, property);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	result = message.AddInt32("index", index);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	return AddSpecifier(&message);
@@ -1374,15 +1421,15 @@ BMessage::AddSpecifier(const char *property, int32 index, int32 range)
 
 	BMessage message(B_RANGE_SPECIFIER);
 	status_t result = message.AddString(B_PROPERTY_ENTRY, property);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	result = message.AddInt32("index", index);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	result = message.AddInt32("range", range);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	return AddSpecifier(&message);
@@ -1395,11 +1442,11 @@ BMessage::AddSpecifier(const char *property, const char *name)
 	DEBUG_FUNCTION_ENTER;
 	BMessage message(B_NAME_SPECIFIER);
 	status_t result = message.AddString(B_PROPERTY_ENTRY, property);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	result = message.AddString(B_PROPERTY_NAME_ENTRY, name);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	return AddSpecifier(&message);
@@ -1411,7 +1458,7 @@ BMessage::AddSpecifier(const BMessage *specifier)
 {
 	DEBUG_FUNCTION_ENTER;
 	status_t result = AddMessage(B_SPECIFIER_ENTRY, specifier);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	fHeader->current_specifier++;
@@ -1430,7 +1477,7 @@ BMessage::SetCurrentSpecifier(int32 index)
 	type_code type;
 	int32 count;
 	status_t result = GetInfo(B_SPECIFIER_ENTRY, &type, &count);
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	if (index > count)
@@ -1446,6 +1493,8 @@ BMessage::GetCurrentSpecifier(int32 *index, BMessage *specifier, int32 *_what,
 	const char **property) const
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
 
 	if (index != NULL)
 		*index = fHeader->current_specifier;
@@ -1456,14 +1505,14 @@ BMessage::GetCurrentSpecifier(int32 *index, BMessage *specifier, int32 *_what,
 
 	if (specifier) {
 		if (FindMessage(B_SPECIFIER_ENTRY, fHeader->current_specifier,
-			specifier) < B_OK)
+			specifier) != B_OK)
 			return B_BAD_SCRIPT_SYNTAX;
 
 		if (_what != NULL)
 			*_what = specifier->what;
 
 		if (property) {
-			if (specifier->FindString(B_PROPERTY_ENTRY, property) < B_OK)
+			if (specifier->FindString(B_PROPERTY_ENTRY, property) != B_OK)
 				return B_BAD_SCRIPT_SYNTAX;
 		}
 	}
@@ -1476,7 +1525,8 @@ bool
 BMessage::HasSpecifiers() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_HAS_SPECIFIERS) != 0;
+	return fHeader != NULL
+		&& (fHeader->flags & MESSAGE_FLAG_HAS_SPECIFIERS) != 0;
 }
 
 
@@ -1484,6 +1534,9 @@ status_t
 BMessage::PopSpecifier()
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (fHeader->current_specifier < 0 ||
 		(fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) == 0)
 		return B_BAD_VALUE;
@@ -1582,12 +1635,16 @@ BMessage::_HashName(const char *name) const
 
 
 status_t
-BMessage::_FindField(const char *name, type_code type, field_header **result) const
+BMessage::_FindField(const char *name, type_code type, field_header **result)
+	const
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
 
-	if (fHeader == NULL || fFields == NULL || fData == NULL)
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
+	if (fHeader->field_count == 0 || fFields == NULL || fData == NULL)
 		return B_NAME_NOT_FOUND;
 
 	uint32 hash = _HashName(name) % fHeader->hash_table_size;
@@ -1619,7 +1676,7 @@ BMessage::_AddField(const char *name, type_code type, bool isFixedSize,
 	field_header **result)
 {
 	if (fHeader == NULL)
-		return B_ERROR;
+		return B_NO_INIT;
 
 	if (fFieldsAvailable <= 0) {
 		uint32 count = fHeader->field_count * 2 + 1;
@@ -1648,7 +1705,7 @@ BMessage::_AddField(const char *name, type_code type, bool isFixedSize,
 	field->offset = fHeader->data_size;
 	field->name_length = strlen(name) + 1;
 	status_t status = _ResizeData(field->offset, field->name_length);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	memcpy(fData + field->offset, name, field->name_length);
@@ -1668,7 +1725,7 @@ BMessage::_RemoveField(field_header *field)
 {
 	status_t result = _ResizeData(field->offset, -(field->data_size
 		+ field->name_length));
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	int32 index = ((uint8 *)field - (uint8 *)fFields) / sizeof(field_header);
@@ -1725,6 +1782,9 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (numBytes <= 0 || data == NULL)
 		return B_BAD_VALUE;
 
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
@@ -1733,7 +1793,7 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (result == B_NAME_NOT_FOUND)
 		result = _AddField(name, type, isFixedSize, &field);
 
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
 
 	if (field == NULL)
@@ -1748,7 +1808,7 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 		}
 
 		result = _ResizeData(offset, numBytes);
-		if (result < B_OK) {
+		if (result != B_OK) {
 			if (field->count == 0)
 				_RemoveField(field);
 			return result;
@@ -1759,7 +1819,7 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	} else {
 		int32 change = numBytes + sizeof(uint32);
 		result = _ResizeData(offset, change);
-		if (result < B_OK) {
+		if (result != B_OK) {
 			if (field->count == 0)
 				_RemoveField(field);
 			return result;
@@ -1783,17 +1843,16 @@ BMessage::RemoveData(const char *name, int32 index)
 	if (index < 0)
 		return B_BAD_INDEX;
 
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
 	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
-
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
-
-	if (field == NULL)
-		return B_ERROR;
 
 	if ((uint32)index >= field->count)
 		return B_BAD_INDEX;
@@ -1805,7 +1864,7 @@ BMessage::RemoveData(const char *name, int32 index)
 	if ((field->flags & FIELD_FLAG_FIXED_SIZE) != 0) {
 		ssize_t size = field->data_size / field->count;
 		result = _ResizeData(offset + index * size, -size);
-		if (result < B_OK)
+		if (result != B_OK)
 			return result;
 
 		field->data_size -= size;
@@ -1818,7 +1877,7 @@ BMessage::RemoveData(const char *name, int32 index)
 
 		size_t currentSize = *(uint32 *)pointer + sizeof(uint32);
 		result = _ResizeData(offset, -currentSize);
-		if (result < B_OK)
+		if (result != B_OK)
 			return result;
 
 		field->data_size -= currentSize;
@@ -1833,17 +1892,16 @@ status_t
 BMessage::RemoveName(const char *name)
 {
 	DEBUG_FUNCTION_ENTER;
+	if (fHeader == NULL)
+		return B_NO_INIT;
+
 	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
 	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
-
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
-
-	if (field == NULL)
-		return B_ERROR;
 
 	return _RemoveField(field);
 }
@@ -1854,8 +1912,7 @@ BMessage::MakeEmpty()
 {
 	DEBUG_FUNCTION_ENTER;
 	_Clear();
-	_InitHeader();
-	return B_OK;
+	return _InitHeader();
 }
 
 
@@ -1870,12 +1927,8 @@ BMessage::FindData(const char *name, type_code type, int32 index,
 	*data = NULL;
 	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
-
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
-
-	if (field == NULL)
-		return B_ERROR;
 
 	if (index < 0 || (uint32)index >= field->count)
 		return B_BAD_INDEX;
@@ -1909,12 +1962,8 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 
 	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
-
-	if (result < B_OK)
+	if (result != B_OK)
 		return result;
-
-	if (field == NULL)
-		return B_ERROR;
 
 	if (index < 0 || (uint32)index >= field->count)
 		return B_BAD_INDEX;
@@ -1941,7 +1990,7 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 		size_t currentSize = *(uint32 *)pointer;
 		int32 change = numBytes - currentSize;
 		result = _ResizeData(offset, change);
-		if (result < B_OK)
+		if (result != B_OK)
 			return result;
 
 		uint32 newSize = (uint32)numBytes;
@@ -1960,11 +2009,7 @@ BMessage::HasData(const char *name, type_code type, int32 index) const
 	DEBUG_FUNCTION_ENTER;
 	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
-
-	if (result < B_OK)
-		return false;
-
-	if (field == NULL)
+	if (result != B_OK)
 		return false;
 
 	if (index < 0 || (uint32)index >= field->count)
@@ -2061,14 +2106,14 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	status_t result = B_OK;
 
 	BPrivate::BDirectMessageTarget* direct = NULL;
-	BMessage* copy = NULL;
+	BMessage *copy = NULL;
 	if (portOwner == BPrivate::current_team())
 		BPrivate::gDefaultTokens.AcquireHandlerTarget(token, &direct);
 
 	if (direct != NULL) {
-		// We have a direct local message target - we can just enqueue the message
-		// in its message queue. This will also prevent possible deadlocks when the
-		// queue is full.
+		// We have a direct local message target - we can just enqueue the
+		// message in its message queue. This will also prevent possible
+		// deadlocks when the queue is full.
 		copy = new BMessage(*this);
 		if (copy != NULL) {
 			header = copy->fHeader;
@@ -2119,7 +2164,7 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 			return B_NO_MEMORY;
 
 		result = Flatten(buffer, size);
-		if (result < B_OK) {
+		if (result != B_OK) {
 			free(buffer);
 			return result;
 		}
@@ -2177,7 +2222,8 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		// this is a local message transmission
 		direct->AddMessage(copy);
 		if (direct->Queue()->IsNextMessage(copy) && port_count(port) <= 0) {
-			// there is currently no message waiting, and we need to wakeup the looper
+			// there is currently no message waiting, and we need to wakeup the
+			// looper
 			write_port_etc(port, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
 		}
 		direct->Release();
@@ -2206,10 +2252,10 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	port_id replyPort = B_BAD_PORT_ID;
 	status_t result = B_OK;
 
-	if (cachedReplyPort < B_OK) {
+	if (cachedReplyPort < 0) {
 		// All the cached reply ports are in use; create a new one
 		replyPort = create_port(1 /* for one message */, "tmp_reply_port");
-		if (replyPort < B_OK)
+		if (replyPort < 0)
 			return replyPort;
 	} else {
 		assert(cachedReplyPort < sNumReplyPorts);
@@ -2222,14 +2268,14 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	else {
 		port_info portInfo;
 		result = get_port_info(replyPort, &portInfo);
-		if (result < B_OK)
+		if (result != B_OK)
 			goto error;
 
 		team = portInfo.team;
 	}
 
 	result = set_port_owner(replyPort, portOwner);
-	if (result < B_OK)
+	if (result != B_OK)
 		goto error;
 
 	// tests if the queue of the reply port is really empty
@@ -2272,17 +2318,18 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		BMessenger replyTarget;
 		BMessenger::Private(replyTarget).SetTo(team, replyPort,
 			B_PREFERRED_TOKEN);
-		// TODO: replying could also use a BDirectMessageTarget like mechanism for local targets
+		// TODO: replying could also use a BDirectMessageTarget like mechanism
+		// for local targets
 		result = _SendMessage(port, -1, token, sendTimeout, true,
 			replyTarget);
 	}
 
-	if (result < B_OK)
+	if (result != B_OK)
 		goto error;
 
 	int32 code;
 	result = handle_reply(replyPort, &code, replyTimeout, reply);
-	if (result < B_OK && cachedReplyPort >= 0) {
+	if (result != B_OK && cachedReplyPort >= 0) {
 		delete_port(replyPort);
 		sReplyPorts[cachedReplyPort] = create_port(1, "tmp_rport");
 	}
@@ -2311,7 +2358,8 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 	uint32 magic = *(uint32 *)data;
 
-	if (magic == MESSAGE_FORMAT_HAIKU || magic == MESSAGE_FORMAT_HAIKU_SWAPPED) {
+	if (magic == MESSAGE_FORMAT_HAIKU
+		|| magic == MESSAGE_FORMAT_HAIKU_SWAPPED) {
 		message_header *header = (message_header *)data;
 		header->target = token;
 		header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
@@ -2321,7 +2369,8 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 			+ sizeof(ssize_t) /* flattenedSize */ + sizeof(int32) /* what */
 			+ sizeof(uint8) /* flags */;
 		*(int32 *)header = token;
-	} else if (((KMessage::Header *)data)->magic == KMessage::kMessageHeaderMagic) {
+	} else if (((KMessage::Header *)data)->magic
+			== KMessage::kMessageHeaderMagic) {
 		KMessage::Header *header = (KMessage::Header *)data;
 		header->targetToken = token;
 	} else {
@@ -2460,9 +2509,9 @@ DEFINE_LAZY_FIND_FUNCTION(double, Double, 0);
 #undef DEFINE_LAZY_FIND_FUNCTION
 
 status_t
-BMessage::AddAlignment(const char* name, const BAlignment& alignment)
+BMessage::AddAlignment(const char *name, const BAlignment &alignment)
 {
-	int32 data[2] = {alignment.horizontal, alignment.vertical};
+	int32 data[2] = { alignment.horizontal, alignment.vertical };
 	return AddData(name, B_ALIGNMENT_TYPE, data, sizeof(data));
 }
 
@@ -2470,14 +2519,16 @@ BMessage::AddAlignment(const char* name, const BAlignment& alignment)
 status_t
 BMessage::AddString(const char *name, const char *string)
 {
-	return AddData(name, B_STRING_TYPE, string, string ? strlen(string) + 1 : 0, false);
+	return AddData(name, B_STRING_TYPE, string, string ? strlen(string) + 1 : 0,
+		false);
 }
 
 
 status_t
 BMessage::AddString(const char *name, const BString &string)
 {
-	return AddData(name, B_STRING_TYPE, string.String(), string.Length() + 1, false);
+	return AddData(name, B_STRING_TYPE, string.String(), string.Length() + 1,
+		false);
 }
 
 
@@ -2523,7 +2574,7 @@ BMessage::AddMessage(const char *name, const BMessage *message)
 	char stackBuffer[16384];
 	ssize_t size = message->FlattenedSize();
 
-	char* buffer;
+	char *buffer;
 	if (size > (ssize_t)sizeof(stackBuffer)) {
 		buffer = (char *)malloc(size);
 		if (buffer == NULL)
@@ -2552,7 +2603,7 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 	char stackBuffer[16384];
 	ssize_t size = object->FlattenedSize();
 
-	char* buffer;
+	char *buffer;
 	if (size > (ssize_t)sizeof(stackBuffer)) {
 		buffer = (char *)malloc(size);
 		if (buffer == NULL)
@@ -2573,20 +2624,20 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 
 
 status_t
-BMessage::FindAlignment(const char* name, BAlignment* alignment) const
+BMessage::FindAlignment(const char *name, BAlignment *alignment) const
 {
 	return FindAlignment(name, 0, alignment);
 }
 
 
 status_t
-BMessage::FindAlignment(const char* name, int32 index,
-	BAlignment* alignment) const
+BMessage::FindAlignment(const char *name, int32 index, BAlignment *alignment)
+	const
 {
 	if (!alignment)
 		return B_BAD_VALUE;
 
-	int32* data;
+	int32 *data;
 	ssize_t bytes;
 
 	status_t err = FindData(name, B_ALIGNMENT_TYPE, index,
@@ -2784,7 +2835,7 @@ BMessage::FindData(const char *name, type_code type, const void **data,
 
 
 status_t
-BMessage::ReplaceAlignment(const char* name, const BAlignment& alignment)
+BMessage::ReplaceAlignment(const char *name, const BAlignment &alignment)
 {
 	int32 data[2] = {alignment.horizontal, alignment.vertical};
 	return ReplaceData(name, B_ALIGNMENT_TYPE, 0, data, sizeof(data));
@@ -2792,8 +2843,8 @@ BMessage::ReplaceAlignment(const char* name, const BAlignment& alignment)
 
 
 status_t
-BMessage::ReplaceAlignment(const char* name, int32 index,
-	const BAlignment& alignment)
+BMessage::ReplaceAlignment(const char *name, int32 index,
+	const BAlignment &alignment)
 {
 	int32 data[2] = {alignment.horizontal, alignment.vertical};
 	return ReplaceData(name, B_ALIGNMENT_TYPE, index, data, sizeof(data));
