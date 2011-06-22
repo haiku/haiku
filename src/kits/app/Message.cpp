@@ -1011,21 +1011,20 @@ BMessage::Flatten(char *buffer, ssize_t size) const
 	if (fHeader == NULL)
 		return B_NO_INIT;
 
+	if (size < FlattenedSize())
+		return B_BUFFER_OVERFLOW;
+
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
 
-	memcpy(buffer, fHeader, min_c(sizeof(message_header), (size_t)size));
+	memcpy(buffer, fHeader, sizeof(message_header));
 	buffer += sizeof(message_header);
-	size -= sizeof(message_header);
 
 	size_t fieldsSize = fHeader->field_count * sizeof(field_header);
-	memcpy(buffer, fFields, min_c(fieldsSize, (size_t)size));
+	memcpy(buffer, fFields, fieldsSize);
 	buffer += fieldsSize;
-	size -= fieldsSize;
 
-	memcpy(buffer, fData, min_c(fHeader->data_size, (size_t)size));
-	if ((size_t)size < fHeader->data_size)
-		return B_BUFFER_OVERFLOW;
+	memcpy(buffer, fData, fHeader->data_size);
 
 	return B_OK;
 }
