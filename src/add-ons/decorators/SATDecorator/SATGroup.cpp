@@ -78,31 +78,6 @@ WindowArea::MoveWindowToPosition(SATWindow* window, int32 index)
 }
 
 
-void
-WindowArea::UpdateSizeLimits()
-{
-	int32 minWidth, maxWidth, minHeight, maxHeight;
-	minWidth = minHeight = 1;
-	maxWidth = maxHeight = 1;
-
-	for (int i = 0; i < fWindowList.CountItems(); i++) {
-		int32 minW, maxW, minH, maxH;
-		fWindowList.ItemAt(i)->GetSizeLimits(&minW, &maxW, &minH, &maxH);
-		if (minW > minWidth)
-			minWidth = minW;
-		if (maxW > maxWidth)
-			maxWidth = maxW;
-		if (minH > minHeight)
-			minHeight = minH;
-		if (maxH > maxHeight)
-			maxHeight = maxH;
-	}
-	for (int i = 0; i < fWindowList.CountItems(); i++)
-		fWindowList.ItemAt(i)->SetSizeLimits(minWidth, maxWidth, minHeight,
-			maxHeight);
-}
-
-
 bool
 WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 {
@@ -719,10 +694,13 @@ SATGroup::RemoveWindow(SATWindow* window, bool stayBelowMouse)
 	if (area)
 		area->_RemoveWindow(window);
 
-	for (int i = 0; i < CountItems(); i++)
-		WindowAt(i)->DoGroupLayout();
+	int32 windowCount = CountItems();
 
 	window->RemovedFromGroup(this, stayBelowMouse);
+
+	if (windowCount >= 2)
+		WindowAt(0)->DoGroupLayout();
+
 	// Do nothing after removing the window from the group because this
 	// could have released the last reference and destroyed ourself.
 	return true;

@@ -22,7 +22,9 @@ using namespace BPrivate;
 using namespace LinearProgramming;
 
 
-const uint32 kExtentPenalty = 10;
+const float kExtentPenalty = 1;
+const float kHighPenalty = 10;
+const float kInequalityPenalty = 10000;
 
 
 GroupCookie::GroupCookie(SATWindow* satWindow)
@@ -36,15 +38,10 @@ GroupCookie::GroupCookie(SATWindow* satWindow)
 	fRightBorder(NULL),
 	fBottomBorder(NULL),
 
-	fLeftBorderConstraint(NULL),
-	fTopBorderConstraint(NULL),
-	fRightBorderConstraint(NULL),
-	fBottomBorderConstraint(NULL),
-
-	fLeftConstraint(NULL),
-	fTopConstraint(NULL),
 	fMinWidthConstraint(NULL),
 	fMinHeightConstraint(NULL),
+	fMaxWidthConstraint(NULL),
+	fMaxHeightConstraint(NULL),
 	fWidthConstraint(NULL),
 	fHeightConstraint(NULL)
 {
@@ -58,12 +55,12 @@ GroupCookie::~GroupCookie()
 
 
 void
-GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
+GroupCookie::DoGroupLayout()
 {
 	if (!fSATGroup.Get())
 		return;
 
-	BRect frame = triggerWindow->CompleteWindowFrame();
+	BRect frame = fSATWindow->CompleteWindowFrame();
 	// Make it also work for solver which don't support negative variables
 	frame.OffsetBy(kMakePositiveOffset, kMakePositiveOffset);
 
@@ -72,17 +69,16 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	fHeightConstraint->SetRightSide(frame.Height());
 
 	LinearSpec* linearSpec = fSATGroup->GetLinearSpec();
-	fLeftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder, kEQ,
-		frame.left);
-	fTopConstraint  = linearSpec->AddConstraint(1.0, fTopBorder, kEQ,
+	Constraint* leftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder,
+		kEQ, frame.left);
+	Constraint* topConstraint = linearSpec->AddConstraint(1.0, fTopBorder, kEQ,
 		frame.top);
 
-	// adjust window position soft constraints
-	// (a bit more penalty for them so they take precedence)
-	fWidthConstraint->SetPenaltyNeg(-1);
-	fWidthConstraint->SetPenaltyPos(-1);
-	fHeightConstraint->SetPenaltyNeg(-1);
-	fHeightConstraint->SetPenaltyPos(-1);
+	// give soft constraints a high penalty
+	fWidthConstraint->SetPenaltyNeg(kHighPenalty);
+	fWidthConstraint->SetPenaltyPos(kHighPenalty);
+	fHeightConstraint->SetPenaltyNeg(kHighPenalty);
+	fHeightConstraint->SetPenaltyPos(kHighPenalty);
 
 	// After we set the new parameter solve and apply the new layout.
 	ResultType result;
@@ -93,8 +89,7 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 			break;
 		}
 		if (result == kOptimal) {
-			fSATGroup->AdjustWindows(triggerWindow);
-			_UpdateWindowSize(frame);
+			fSATGroup->AdjustWindows(fSATWindow);
 			break;
 		}
 	}
@@ -105,10 +100,8 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	fHeightConstraint->SetPenaltyNeg(kExtentPenalty);
 	fHeightConstraint->SetPenaltyPos(kExtentPenalty);
 
-	linearSpec->RemoveConstraint(fLeftConstraint);
-	fLeftConstraint = NULL;
-	linearSpec->RemoveConstraint(fTopConstraint);
-	fTopConstraint = NULL;
+	linearSpec->RemoveConstraint(leftConstraint);
+	linearSpec->RemoveConstraint(topConstraint);
 }
 
 
@@ -124,6 +117,7 @@ GroupCookie::MoveWindow(int32 workspace)
 		fRightBorder->Value() - kMakePositiveOffset,
 		fBottomBorder->Value() - kMakePositiveOffset);
 
+	fSATWindow->AdjustSizeLimits(frameSAT);
 	desktop->MoveWindowBy(window, round(frameSAT.left - frame.left),
 		round(frameSAT.top - frame.top), workspace);
 
@@ -133,7 +127,7 @@ GroupCookie::MoveWindow(int32 workspace)
 	desktop->ResizeWindowBy(window, round(frameSAT.right - frame.right),
 		round(frameSAT.bottom - frame.bottom));
 
-	_UpdateWindowSize(frame);
+	UpdateSizeConstaints(frameSAT);
 }
 
 
@@ -143,6 +137,19 @@ GroupCookie::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
 {
 	fMinWidthConstraint->SetRightSide(minWidth);
 	fMinHeightConstraint->SetRightSide(minHeight);
+	fMaxWidthConstraint->SetRightSide(maxWidth);
+	fMaxHeightConstraint->SetRightSide(maxHeight);
+}
+
+
+void
+GroupCookie::UpdateSizeConstaints(const BRect& frame)
+{
+	// adjust window size soft constraints
+	if (fSATWindow->IsHResizeable() == true)
+		fWidthConstraint->SetRightSide(frame.Width());
+	if (fSATWindow->IsVResizeable() == true)
+		fHeightConstraint->SetRightSide(frame.Height());
 }
 
 
@@ -156,52 +163,40 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 
 	LinearSpec* linearSpec = group->GetLinearSpec();
 	// create variables
-	fLeftBorder = linearSpec->AddVariable();
-	fTopBorder = linearSpec->AddVariable();
-	fRightBorder = linearSpec->AddVariable();
-	fBottomBorder = linearSpec->AddVariable();
+	fLeftBorder = area->LeftTab()->Var();
+	fTopBorder = area->TopTab()->Var();
+	fRightBorder = area->RightTab()->Var();
+	fBottomBorder = area->BottomTab()->Var();
 
-	if (!fLeftBorder || !fTopBorder || !fRightBorder || !fBottomBorder) {
-		// clean up
-		Uninit();
-		return false;
-	}
+	// size limit constraints
+	int32 minWidth, maxWidth;
+	int32 minHeight, maxHeight;
+	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fSATWindow->AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
-	// create constraints
-	BRect frame = fSATWindow->CompleteWindowFrame();
-
-	int32 minWidth, maxWidth, minHeight, maxHeight;
-	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight,
-		&maxHeight);
 	fMinWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
 		fLeftBorder, kGE, minWidth);
 	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
 		fTopBorder, kGE, minHeight);
 
-	// The width and height constraints have higher penalties than the
-	// position constraints (left, top), so a window will keep its size
-	// unless explicitly resized.
-	fWidthConstraint = linearSpec->AddConstraint(-1.0, fLeftBorder, 1.0,
-		fRightBorder, kEQ, frame.Width(), kExtentPenalty,
+	fMaxWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
+		fLeftBorder, kLE, maxWidth, kInequalityPenalty, kInequalityPenalty);
+	fMaxHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
+		fTopBorder, kLE, maxHeight, kInequalityPenalty, kInequalityPenalty);
+
+	// Width and height have soft constraints
+ 	BRect frame = fSATWindow->CompleteWindowFrame();
+	fWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
+		fLeftBorder, kEQ, frame.Width(), kExtentPenalty,
 		kExtentPenalty);
 	fHeightConstraint = linearSpec->AddConstraint(-1.0, fTopBorder, 1.0,
 		fBottomBorder, kEQ, frame.Height(), kExtentPenalty,
 		kExtentPenalty);
 
-	if (!fMinWidthConstraint
-		|| !fMinHeightConstraint || !fWidthConstraint || !fHeightConstraint) {
+	if (!fMinWidthConstraint || !fMinHeightConstraint || !fWidthConstraint
+		|| !fHeightConstraint || !fMaxWidthConstraint
+		|| !fMaxHeightConstraint) {
 		// clean up
-		Uninit();
-		return false;
-	}
-
-	fLeftBorderConstraint = area->LeftTab()->Connect(fLeftBorder);
-	fTopBorderConstraint = area->TopTab()->Connect(fTopBorder);
-	fRightBorderConstraint = area->RightTab()->Connect(fRightBorder);
-	fBottomBorderConstraint = area->BottomTab()->Connect(fBottomBorder);
-
-	if (!fLeftBorderConstraint || !fTopBorderConstraint
-		|| !fRightBorderConstraint || !fBottomBorderConstraint) {
 		Uninit();
 		return false;
 	}
@@ -213,34 +208,21 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 void
 GroupCookie::Uninit()
 {
-	delete fLeftBorder;
-	delete fTopBorder;
-	delete fRightBorder;
-	delete fBottomBorder;
 	fLeftBorder = NULL;
 	fTopBorder = NULL;
 	fRightBorder = NULL;
 	fBottomBorder = NULL;
 
-	delete fLeftBorderConstraint;
-	delete fTopBorderConstraint;
-	delete fRightBorderConstraint;
-	delete fBottomBorderConstraint;
-	fLeftBorderConstraint = NULL;
-	fTopBorderConstraint = NULL;
-	fRightBorderConstraint = NULL;
-	fBottomBorderConstraint = NULL;
-
-	delete fLeftConstraint;
-	delete fTopConstraint;
 	delete fMinWidthConstraint;
 	delete fMinHeightConstraint;
+	delete fMaxWidthConstraint;
+	delete fMaxHeightConstraint;
 	delete fWidthConstraint;
 	delete fHeightConstraint;
-	fLeftConstraint = NULL;
-	fTopConstraint = NULL;
 	fMinWidthConstraint = NULL;
 	fMinHeightConstraint = NULL;
+	fMaxWidthConstraint = NULL;
+	fMaxHeightConstraint = NULL;
 	fWidthConstraint = NULL;
 	fHeightConstraint = NULL;
 
@@ -268,15 +250,6 @@ GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
 }
 
 
-void
-GroupCookie::_UpdateWindowSize(const BRect& frame)
-{
-	// adjust window size soft constraints
-	fWidthConstraint->SetRightSide(frame.Width());
-	fHeightConstraint->SetRightSide(frame.Height());
-}
-
-
 // #pragma mark -
 
 
@@ -297,16 +270,18 @@ SATWindow::SATWindow(StackAndTile* sat, Window* window)
 
 	fDesktop = fWindow->Desktop();
 
+	// read initial limit values
+	fWindow->GetSizeLimits(&fOriginalMinWidth, &fOriginalMaxWidth,
+		&fOriginalMinHeight, &fOriginalMaxHeight);
+	BRect frame = fWindow->Frame();
+	fOriginalWidth = frame.Width();
+	fOriginalHeight = frame.Height();
+
 	fGroupCookie = &fOwnGroupCookie;
 	_InitGroup();
 
 	fSATSnappingBehaviourList.AddItem(&fSATStacking);
 	fSATSnappingBehaviourList.AddItem(&fSATTiling);
-
-	// read initial limit values
-	fWindow->GetSizeLimits(&fOriginalMinWidth, &fOriginalMaxWidth,
-		&fOriginalMinHeight, &fOriginalMaxHeight);
-	Resized();
 }
 
 
@@ -392,11 +367,6 @@ SATWindow::AddedToGroup(SATGroup* group, WindowArea* area)
 		return false;
 	}
 
-	if (group->CountItems() > 1)
-		area->UpdateSizeLimits();
-
-	if (group->CountItems() == 2)
-		group->WindowAt(0)->_UpdateSizeLimits();
 	return true;
 }
 
@@ -408,8 +378,6 @@ SATWindow::RemovedFromGroup(SATGroup* group, bool stayBelowMouse)
 		fWindow->Title());
 
 	_RestoreOriginalSize(stayBelowMouse);
-	if (group->CountItems() == 1)
-		group->WindowAt(0)->_RestoreOriginalSize(false);
 
 	if (fShutdown) {
 		fGroupCookie->Uninit();
@@ -507,26 +475,154 @@ SATWindow::DoGroupLayout()
 	if (!PositionManagedBySAT())
 		return;
 
-	fGroupCookie->DoGroupLayout(this);
+	fGroupCookie->DoGroupLayout();
 
 	DoWindowLayout();
 }
 
 
 void
-SATWindow::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
-	int32 maxHeight)
+SATWindow::AdjustSizeLimits(BRect targetFrame)
 {
-	_UpdateSizeLimits();
+	SATDecorator* decorator = GetDecorator();
+	if (decorator == NULL)
+		return;
+
+	targetFrame.right -= 2 * (int32)decorator->BorderWidth();
+	targetFrame.bottom -= 2 * (int32)decorator->BorderWidth()
+		+ (int32)decorator->TabHeight() + 1;
+
+	int32 minWidth, maxWidth;
+	int32 minHeight, maxHeight;
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+
+	if (maxWidth < targetFrame.Width())
+		maxWidth = targetFrame.IntegerWidth();
+	if (maxHeight < targetFrame.Height())
+		maxHeight = targetFrame.IntegerHeight();
+
+	fWindow->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+}
+
+
+void
+SATWindow::GetSizeLimits(int32* minWidth, int32* maxWidth, int32* minHeight,
+	int32* maxHeight) const
+{
+	*minWidth = fOriginalMinWidth;
+	*minHeight = fOriginalMinHeight;
+	*maxWidth = fOriginalMaxWidth;
+	*maxHeight = fOriginalMaxHeight;
+
+	SATDecorator* decorator = GetDecorator();
+	if (decorator == NULL)
+		return;
+
+	int32 minDecorWidth = 1, maxDecorWidth = 1;
+	int32 minDecorHeight = 1, maxDecorHeight = 1;
+	decorator->GetSizeLimits(&minDecorWidth, &minDecorHeight,
+		&maxDecorWidth, &maxDecorHeight);
+
+	// if no size limit is set but the window is not resizeable choose the
+	// current size as limit
+	if (IsHResizeable() == false && fOriginalMinWidth <= minDecorWidth)
+		*minWidth = (int32)fOriginalWidth;
+	if (IsVResizeable() == false && fOriginalMinHeight <= minDecorHeight)
+		*minHeight = (int32)fOriginalHeight;
+
+	if (*minWidth > *maxWidth)
+		*maxWidth = *minWidth;
+	if (*minHeight > *maxHeight)
+		*maxHeight = *minHeight;
+}
+
+
+void
+SATWindow::AddDecorator(int32* minWidth, int32* maxWidth, int32* minHeight,
+	int32* maxHeight)
+{
+	SATDecorator* decorator = GetDecorator();
+	if (decorator == NULL)
+		return;
+
+	*minWidth += 2 * (int32)decorator->BorderWidth();
+	*minHeight += 2 * (int32)decorator->BorderWidth()
+		+ (int32)decorator->TabHeight() + 1;
+	*maxWidth += 2 * (int32)decorator->BorderWidth();
+	*maxHeight += 2 * (int32)decorator->BorderWidth()
+		+ (int32)decorator->TabHeight() + 1;
+}
+
+
+void
+SATWindow::AddDecorator(BRect& frame)
+{
+	SATDecorator* decorator = GetDecorator();
+	if (!decorator)
+		return;
+	frame.left -= decorator->BorderWidth();
+	frame.right += decorator->BorderWidth() + 1;
+	frame.top -= decorator->BorderWidth() + decorator->TabHeight() + 1;
+	frame.bottom += decorator->BorderWidth();
+}
+
+
+void
+SATWindow::SetOriginalSizeLimits(int32 minWidth, int32 maxWidth,
+	int32 minHeight, int32 maxHeight)
+{
+	fOriginalMinWidth = minWidth;
+	fOriginalMaxWidth = maxWidth;
+	fOriginalMinHeight = minHeight;
+	fOriginalMaxHeight = maxHeight;
+
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fGroupCookie->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 }
 
 
 void
 SATWindow::Resized()
 {
+	bool hResizeable = IsHResizeable();
+	bool vResizeable = IsVResizeable();
+	if (hResizeable == false && vResizeable == false)
+		return;
+
 	BRect frame = fWindow->Frame();
-	fOriginalWidth = frame.Width();
-	fOriginalHeight = frame.Height();
+	if (hResizeable)
+		fOriginalWidth = frame.Width();
+	if (vResizeable)
+		fOriginalHeight = frame.Height();
+
+	fGroupCookie->UpdateSizeConstaints(CompleteWindowFrame());
+}
+
+
+bool
+SATWindow::IsHResizeable() const
+{
+	if (fWindow->Look() == B_MODAL_WINDOW_LOOK
+		|| fWindow->Look() == B_BORDERED_WINDOW_LOOK
+		|| fWindow->Look() == B_NO_BORDER_WINDOW_LOOK
+		|| (fWindow->Flags() & B_NOT_RESIZABLE) != 0
+		|| (fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+		return false;
+	return true;
+}
+
+
+bool
+SATWindow::IsVResizeable() const
+{
+	if (fWindow->Look() == B_MODAL_WINDOW_LOOK
+		|| fWindow->Look() == B_BORDERED_WINDOW_LOOK
+		|| fWindow->Look() == B_NO_BORDER_WINDOW_LOOK
+		|| (fWindow->Flags() & B_NOT_RESIZABLE) != 0
+		|| (fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+		return false;
+	return true;
 }
 
 
@@ -541,34 +637,8 @@ SATWindow::CompleteWindowFrame()
 			frame.OffsetTo(anchor.position);
 	}
 
-	SATDecorator* decorator = GetDecorator();
-	if (!decorator)
-		return frame;
-	frame.left -= decorator->BorderWidth();
-	frame.right += decorator->BorderWidth() + 1;
-	frame.top -= decorator->BorderWidth() + decorator->TabHeight() + 1;
-	frame.bottom += decorator->BorderWidth();
-
+	AddDecorator(frame);
 	return frame;
-}
-
-
-void
-SATWindow::GetSizeLimits(int32* minWidth, int32* maxWidth, int32* minHeight,
-	int32* maxHeight) const
-{
-	fWindow->GetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
-
-	SATDecorator* decorator = GetDecorator();
-	if (decorator == NULL)
-		return;
-
-	*minWidth += 2 * (int32)decorator->BorderWidth() + 1;
-	*minHeight += 2 * (int32)decorator->BorderWidth()
-		+ (int32)decorator->TabHeight() + 1;
-	*maxWidth += 2 * (int32)decorator->BorderWidth() + 1;
-	*maxHeight += 2 * (int32)decorator->BorderWidth()
-		+ (int32)decorator->TabHeight() + 1;
 }
 
 
@@ -711,53 +781,6 @@ SATWindow::_InitGroup()
 }
 
 
-void
-SATWindow::_UpdateSizeLimits()
-{
-	int32 minWidth, minHeight;
-	int32 maxWidth, maxHeight;
-	fWindow->GetSizeLimits(&fOriginalMinWidth, &maxWidth,
-		&fOriginalMinHeight, &maxHeight);
-	minWidth = fOriginalMinWidth;
-	minHeight = fOriginalMinHeight;
-	if (maxWidth != B_SIZE_UNLIMITED)
-		fOriginalMaxWidth = maxWidth;
-	if (maxHeight != B_SIZE_UNLIMITED)
-		fOriginalMaxHeight = maxHeight;
-	SATDecorator* decorator = GetDecorator();
-	// if no size limit is set but the window is not resizeable choose the
-	// current size as limit
-	if (fWindow->Look() == B_MODAL_WINDOW_LOOK
-		|| fWindow->Look() == B_BORDERED_WINDOW_LOOK
-		|| fWindow->Look() == B_NO_BORDER_WINDOW_LOOK
-		|| (fWindow->Flags() & B_NOT_RESIZABLE) != 0
-		|| (fWindow->Flags() & B_NOT_H_RESIZABLE) != 0
-		|| (fWindow->Flags() & B_NOT_V_RESIZABLE) != 0) {
-		int32 minDecorWidth = 1, maxDecorWidth = 1;
-		int32 minDecorHeight = 1, maxDecorHeight = 1;
-		if (decorator)
-			decorator->GetSizeLimits(&minDecorWidth, &minDecorHeight,
-				&maxDecorWidth, &maxDecorHeight);
-		BRect frame = fWindow->Frame();
-		if (fOriginalMinWidth <= minDecorWidth)
-			minWidth = frame.IntegerWidth();
-		if (fOriginalMinHeight <= minDecorHeight)
-			minHeight = frame.IntegerHeight();
-	}
-	fWindow->SetSizeLimits(minWidth, B_SIZE_UNLIMITED,
-		minHeight, B_SIZE_UNLIMITED);
-
-
-	if (decorator) {
-		minWidth += 2 * (int32)decorator->BorderWidth();
-		minHeight += 2 * (int32)decorator->BorderWidth()
-			+ (int32)decorator->TabHeight() + 1;
-	}
-	fGroupCookie->SetSizeLimits(minWidth, B_SIZE_UNLIMITED, minHeight,
-		B_SIZE_UNLIMITED);
-}
-
-
 uint64
 SATWindow::_GenerateId()
 {
@@ -767,6 +790,7 @@ SATWindow::_GenerateId()
 	return (time & ~0xFFFF) | randNumber;
 }
 
+
 void
 SATWindow::_RestoreOriginalSize(bool stayBelowMouse)
 {
@@ -775,18 +799,10 @@ SATWindow::_RestoreOriginalSize(bool stayBelowMouse)
 		fOriginalMinHeight, fOriginalMaxHeight);
 	BRect frame = fWindow->Frame();
 	float x = 0, y = 0;
-	if (fWindow->Look() == B_MODAL_WINDOW_LOOK
-		|| fWindow->Look() == B_BORDERED_WINDOW_LOOK
-		|| fWindow->Look() == B_NO_BORDER_WINDOW_LOOK
-		|| (fWindow->Flags() & B_NOT_RESIZABLE) != 0) {
+	if (IsHResizeable() == false)
 		x = fOriginalWidth - frame.Width();
+	if (IsVResizeable() == false)
 		y = fOriginalHeight - frame.Height();
-	} else {
-		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
-			x = fOriginalWidth - frame.Width();
-		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
-			y = fOriginalHeight - frame.Height();
-	}
 	fDesktop->ResizeWindowBy(fWindow, x, y);
 
 	if (!stayBelowMouse)

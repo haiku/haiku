@@ -397,10 +397,10 @@ StackAndTile::SizeLimitsChanged(Window* window, int32 minWidth, int32 maxWidth,
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
-	WindowArea* area = satWindow->GetWindowArea();
-	if (!area)
-		return;
-	area->UpdateSizeLimits();
+	satWindow->SetOriginalSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+
+	// trigger a relayout
+	WindowMoved(window);
 }
 
 

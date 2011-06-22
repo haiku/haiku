@@ -105,6 +105,7 @@ public:
 			float				Position() const;
 			void				SetPosition(float position);
 			orientation_t		Orientation() const;
+			Variable*			Var() {	return fVariable;	}
 
 			//! Caller takes ownership of the constraint.
 			Constraint*			Connect(Variable* variable);
@@ -143,7 +144,6 @@ public:
 	const	SATWindowList&		LayerOrder() { return fWindowLayerOrder; }
 			bool				MoveWindowToPosition(SATWindow* window,
 									int32 index);
-			void				UpdateSizeLimits();
 
 			Crossing*			LeftTopCrossing()
 									{ return fLeftTopCrossing.Get(); }

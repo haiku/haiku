@@ -30,10 +30,11 @@ public:
 			bool				Init(SATGroup* group, WindowArea* area);
 			void				Uninit();
 
-			void				DoGroupLayout(SATWindow* triggerWindow);
+			void				DoGroupLayout();
 			void				MoveWindow(int32 workspace);
 			void				SetSizeLimits(int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
+			void				UpdateSizeConstaints(const BRect& frame);
 
 			SATGroup*			GetGroup() { return fSATGroup.Get(); }
 
@@ -43,8 +44,6 @@ public:
 									WindowArea* area);
 
 private:
-			void				_UpdateWindowSize(const BRect& frame);
-
 			SATWindow*			fSATWindow;
 
 			BReference<SATGroup>	fSATGroup;
@@ -56,15 +55,12 @@ private:
 			Variable*			fRightBorder;
 			Variable*			fBottomBorder;
 
-			Constraint*			fLeftBorderConstraint;
-			Constraint*			fTopBorderConstraint;
-			Constraint*			fRightBorderConstraint;
-			Constraint*			fBottomBorderConstraint;
-
-			Constraint*			fLeftConstraint;
-			Constraint*			fTopConstraint;
 			Constraint*			fMinWidthConstraint;
 			Constraint*			fMinHeightConstraint;
+			Constraint*			fMaxWidthConstraint;
+			Constraint*			fMaxHeightConstraint;
+			Constraint*			fKeepMaxWidthConstraint;
+			Constraint*			fKeepMaxHeightConstraint;
 			Constraint*			fWidthConstraint;
 			Constraint*			fHeightConstraint;
 };
@@ -107,15 +103,23 @@ public:
 			void				DoWindowLayout();
 			void				DoGroupLayout();
 
-			void				SetSizeLimits(int32 minWidth, int32 maxWidth,
-									int32 minHeight, int32 maxHeight);
+			void				AdjustSizeLimits(BRect targetFrame);
+			void				SetOriginalSizeLimits(int32 minWidth,
+									int32 maxWidth, int32 minHeight,
+									int32 maxHeight);
+			void				GetSizeLimits(int32* minWidth, int32* maxWidth,
+									int32* minHeight, int32* maxHeight) const;
+			void				AddDecorator(int32* minWidth, int32* maxWidth,
+									int32* minHeight, int32* maxHeight);
+			void				AddDecorator(BRect& frame);
+
 			// hook called when window has been resized form the outside
 			void				Resized();
+			bool				IsHResizeable() const;
+			bool				IsVResizeable() const;
 
 			//! \return the complete window frame including the Decorator
 			BRect				CompleteWindowFrame();
-			void				GetSizeLimits(int32* minWidth, int32* maxWidth,
-									int32* minHeight, int32* maxHeight) const;
 
 			//! \return true if window is in a group with a least another window
 			bool				PositionManagedBySAT();
@@ -137,9 +141,9 @@ public:
 			void				GetSettings(BMessage& message);
 private:
 			void				_InitGroup();
-			void				_UpdateSizeLimits();
 			uint64				_GenerateId();
 
+			void				_UpdateSizeLimits();
 			void				_RestoreOriginalSize(
 									bool stayBelowMouse = true);
 
