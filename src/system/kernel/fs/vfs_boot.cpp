@@ -514,7 +514,7 @@ vfs_mount_boot_file_system(kernel_args* args)
 
 		dev_t systemPackageMount = _kern_mount("/boot/system",
 			NULL, kPackageFSName, 0,
-			"packages /boot/system/packages; shine-through system",
+			"packages /boot/system/packages; type system",
 			0 /* unused argument length */);
 		if (systemPackageMount < 0) {
 			panic("Failed to mount system packagefs: %s",
