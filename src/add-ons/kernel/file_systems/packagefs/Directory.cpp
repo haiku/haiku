@@ -7,6 +7,7 @@
 #include "Directory.h"
 
 #include "DebugSupport.h"
+#include "UnpackingAttributeCookie.h"
 #include "Utils.h"
 
 
@@ -168,6 +169,15 @@ status_t
 Directory::ReadSymlink(void* buffer, size_t* bufferSize)
 {
 	return B_IS_A_DIRECTORY;
+}
+
+
+status_t
+Directory::OpenAttribute(const char* name, int openMode,
+	AttributeCookie*& _cookie)
+{
+	return UnpackingAttributeCookie::Open(fPackageDirectories.Head(), name,
+		openMode, _cookie);
 }
 
 
