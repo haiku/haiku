@@ -21,39 +21,6 @@
 #include "ValueNodeContainer.h"
 
 
-// minimal replica of BMessage's class structure for
-// extracting fields
-class BMessageValue {
-	public:
-		uint32			what;
-
-		virtual			~BMessageValue();
-
-		struct message_header;
-		struct field_header;
-
-		message_header*	fHeader;
-		field_header*	fFields;
-		uint8*			fData;
-
-		uint32			fFieldsAvailable;
-		size_t			fDataAvailable;
-
-		mutable	BMessage* fOriginal;
-
-		BMessage*		fQueueLink;
-			// fQueueLink is used by BMessageQueue to build a linked list
-
-		void*			fArchivingPointer;
-
-		uint32			fReserved[8];
-
-		virtual	void	_ReservedMessage1();
-		virtual	void	_ReservedMessage2();
-		virtual	void	_ReservedMessage3();
-};
-
-
 // #pragma mark - BMessageValueNode
 
 
@@ -115,6 +82,9 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	TRACE_LOCALS("BMessage: Address: 0x%" B_PRIx64 "\n",
 		addressData.ToUInt64());
 
+
+	// TODO: redo this by looking up class members off the type
+	// and resolving them instead
 	uint8 classBuffer[sizeof(BMessage)];
 	error = valueLoader->LoadRawValue(addressData, sizeof(BMessage),
 		classBuffer);
