@@ -67,15 +67,15 @@ NotifyFilter::MailboxSynced(status_t status)
 		system_beep("New E-mail");
 
 	if (fStrategy & alert) {
-		BString text;
+		BString text, numString;
 		if (fNNewMessages != 1)
-			text << B_TRANSLATE("You have ") << fNNewMessages << B_TRANSLATE(
-				" new messages") << B_TRANSLATE(" for ")
-				<< fMailProtocol.AccountSettings().Name() << ".";
+			text << B_TRANSLATE("You have %num new messages for %name.");
 		else
-			text << B_TRANSLATE("You have ") << fNNewMessages << B_TRANSLATE(
-				" new message") << B_TRANSLATE(" for ")
-				<< fMailProtocol.AccountSettings().Name() << ".";
+			text << B_TRANSLATE("You have %num new message for %name.");
+
+		numString << fNNewMessages;
+		text.ReplaceFirst("%num", numString);
+		text.ReplaceFirst("%name", fMailProtocol.AccountSettings().Name());
 
 		BAlert *alert = new BAlert(B_TRANSLATE("New messages"), text.String(),
 			"OK", NULL, NULL, B_WIDTH_AS_USUAL);

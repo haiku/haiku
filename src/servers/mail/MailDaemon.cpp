@@ -517,13 +517,16 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 		case 'numg':
 		{
 			int32 numMessages = msg->FindInt32("num_messages");
+			BString numString;
+			
 			if (numMessages > 1)
-				fAlertString << numMessages << B_TRANSLATE(" new messages");
+				fAlertString << B_TRANSLATE("%num new messages for %name\n");
 			else
-				fAlertString << numMessages << B_TRANSLATE(" new message");
+				fAlertString << B_TRANSLATE("%num new message for %name\n");
 
-			fAlertString << B_TRANSLATE(" for ") << msg->FindString("name")
-				<< '\n';
+			numString << numMessages;
+			fAlertString.ReplaceFirst("%num", numString);
+			fAlertString.ReplaceFirst("%name", msg->FindString("name"));
 			break;
 		}
 
