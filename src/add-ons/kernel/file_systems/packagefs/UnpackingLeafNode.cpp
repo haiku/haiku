@@ -4,7 +4,7 @@
  */
 
 
-#include "LeafNode.h"
+#include "UnpackingLeafNode.h"
 
 #include <string.h>
 
@@ -15,27 +15,27 @@
 #include "Utils.h"
 
 
-LeafNode::LeafNode(ino_t id)
+UnpackingLeafNode::UnpackingLeafNode(ino_t id)
 	:
 	Node(id)
 {
 }
 
 
-LeafNode::~LeafNode()
+UnpackingLeafNode::~UnpackingLeafNode()
 {
 }
 
 
 status_t
-LeafNode::Init(Directory* parent, const char* name)
+UnpackingLeafNode::Init(Directory* parent, const char* name)
 {
 	return Node::Init(parent, name);
 }
 
 
 status_t
-LeafNode::VFSInit(dev_t deviceID)
+UnpackingLeafNode::VFSInit(dev_t deviceID)
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->VFSInit(deviceID, fID);
@@ -44,7 +44,7 @@ LeafNode::VFSInit(dev_t deviceID)
 
 
 void
-LeafNode::VFSUninit()
+UnpackingLeafNode::VFSUninit()
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		packageNode->VFSUninit();
@@ -52,7 +52,7 @@ LeafNode::VFSUninit()
 
 
 mode_t
-LeafNode::Mode() const
+UnpackingLeafNode::Mode() const
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->Mode();
@@ -61,7 +61,7 @@ LeafNode::Mode() const
 
 
 uid_t
-LeafNode::UserID() const
+UnpackingLeafNode::UserID() const
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->UserID();
@@ -70,7 +70,7 @@ LeafNode::UserID() const
 
 
 gid_t
-LeafNode::GroupID() const
+UnpackingLeafNode::GroupID() const
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->GroupID();
@@ -79,7 +79,7 @@ LeafNode::GroupID() const
 
 
 timespec
-LeafNode::ModifiedTime() const
+UnpackingLeafNode::ModifiedTime() const
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->ModifiedTime();
@@ -90,7 +90,7 @@ LeafNode::ModifiedTime() const
 
 
 off_t
-LeafNode::FileSize() const
+UnpackingLeafNode::FileSize() const
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->FileSize();
@@ -99,14 +99,14 @@ LeafNode::FileSize() const
 
 
 Node*
-LeafNode::GetNode()
+UnpackingLeafNode::GetNode()
 {
 	return this;
 }
 
 
 status_t
-LeafNode::AddPackageNode(PackageNode* packageNode)
+UnpackingLeafNode::AddPackageNode(PackageNode* packageNode)
 {
 	if (S_ISDIR(packageNode->Mode()))
 		return B_BAD_VALUE;
@@ -132,7 +132,7 @@ LeafNode::AddPackageNode(PackageNode* packageNode)
 
 
 void
-LeafNode::RemovePackageNode(PackageNode* packageNode)
+UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode)
 {
 	bool isNewest = packageNode == fPackageNodes.Head();
 	fPackageNodes.Remove(dynamic_cast<PackageLeafNode*>(packageNode));
@@ -157,14 +157,14 @@ LeafNode::RemovePackageNode(PackageNode* packageNode)
 
 
 PackageNode*
-LeafNode::GetPackageNode()
+UnpackingLeafNode::GetPackageNode()
 {
 	return fPackageNodes.Head();
 }
 
 
 status_t
-LeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
+UnpackingLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->Read(offset, buffer, bufferSize);
@@ -173,7 +173,7 @@ LeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 
 
 status_t
-LeafNode::Read(io_request* request)
+UnpackingLeafNode::Read(io_request* request)
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->Read(request);
@@ -182,7 +182,7 @@ LeafNode::Read(io_request* request)
 
 
 status_t
-LeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
+UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 {
 	PackageLeafNode* packageNode = fPackageNodes.Head();
 	if (packageNode == NULL)
@@ -203,7 +203,7 @@ LeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 
 
 status_t
-LeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
+UnpackingLeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {
 	return UnpackingAttributeDirectoryCookie::Open(fPackageNodes.Head(),
 		_cookie);
@@ -211,7 +211,7 @@ LeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 
 
 status_t
-LeafNode::OpenAttribute(const char* name, int openMode,
+UnpackingLeafNode::OpenAttribute(const char* name, int openMode,
 	AttributeCookie*& _cookie)
 {
 	return UnpackingAttributeCookie::Open(fPackageNodes.Head(), name, openMode,

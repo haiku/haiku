@@ -11,10 +11,10 @@
 #include "UnpackingNode.h"
 
 
-class LeafNode : public Node, public UnpackingNode {
+class UnpackingLeafNode : public Node, public UnpackingNode {
 public:
-								LeafNode(ino_t id);
-	virtual						~LeafNode();
+								UnpackingLeafNode(ino_t id);
+	virtual						~UnpackingLeafNode();
 
 	virtual	status_t			Init(Directory* parent, const char* name);
 
