@@ -74,9 +74,6 @@ protected:
 			char*				fName;
 			Node*				fNameHashTableNext;
 			Node*				fIDHashTableNext;
-			mode_t				fMode;
-			uid_t				fUserID;
-			gid_t				fGroupID;
 };
 
 
