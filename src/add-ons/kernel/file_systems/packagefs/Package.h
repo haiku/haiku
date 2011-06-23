@@ -8,18 +8,24 @@
 
 #include <Referenceable.h>
 
+#include <util/DoublyLinkedList.h>
 #include <util/khash.h>
 #include <util/OpenHashTable.h>
 
 #include <lock.h>
 
+#include "Dependency.h"
 #include "PackageNode.h"
+#include "Resolvable.h"
 
 
 class PackageDomain;
+class PackageFamily;
+class Version;
 
 
-class Package : public BReferenceable {
+class Package : public BReferenceable,
+	public DoublyLinkedListLinkImpl<Package> {
 public:
 								Package(PackageDomain* domain, dev_t deviceID,
 									ino_t nodeID);
@@ -30,10 +36,25 @@ public:
 			PackageDomain*		Domain() const		{ return fDomain; }
 			const char*			FileName() const	{ return fFileName; }
 
+			status_t			SetName(const char* name);
+			const char*			Name() const		{ return fName; }
+
+			void				SetVersion(::Version* version);
+									// takes over object ownership
+			::Version*			Version() const
+									{ return fVersion; }
+
+			void				SetFamily(PackageFamily* family)
+									{ fFamily = family; }
+			PackageFamily*		Family() const
+									{ return fFamily; }
+
 			Package*&			FileNameHashTableNext()
 									{ return fFileNameHashTableNext; }
 
 			void				AddNode(PackageNode* node);
+			void				AddResolvable(Resolvable* resolvable);
+			void				AddDependency(Dependency* dependency);
 
 			int					Open();
 			void				Close();
@@ -44,12 +65,17 @@ private:
 			mutex				fLock;
 			PackageDomain*		fDomain;
 			char*				fFileName;
+			char*				fName;
+			::Version*			fVersion;
+			PackageFamily*		fFamily;
 			int					fFD;
 			uint32				fOpenCount;
 			Package*			fFileNameHashTableNext;
 			ino_t				fNodeID;
 			dev_t				fDeviceID;
 			PackageNodeList		fNodes;
+			ResolvableList		fResolvables;
+			DependencyList		fDependencies;
 };
 
 
@@ -103,6 +129,7 @@ struct PackageFileNameHashDefinition {
 
 
 typedef BOpenHashTable<PackageFileNameHashDefinition> PackageFileNameHashTable;
+typedef DoublyLinkedList<Package> PackageList;
 
 
 #endif	// PACKAGE_H

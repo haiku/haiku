@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,7 @@
 #include <driver_settings.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
+#include <package/PackageInfoAttributes.h>
 
 #include <AutoDeleter.h>
 
@@ -35,9 +36,13 @@
 #include "kernel_interface.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
+#include "PackageFSRoot.h"
 #include "PackageSymlink.h"
+#include "Resolvable.h"
+#include "Version.h"
 
 
+using namespace BPackageKit;
 using namespace BPackageKit::BHPKG;
 using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
@@ -271,6 +276,99 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
+		switch (value.attributeID) {
+//            union {
+//                 uint64          unsignedInt;
+//                 const char*     string;
+//                 BPackageVersionData version;
+//                 BPackageResolvableData resolvable;
+//                 BPackageResolvableExpressionData resolvableExpression;
+//             };
+			case B_PACKAGE_INFO_NAME:
+				return fPackage->SetName(value.string);
+
+			case B_PACKAGE_INFO_VERSION:
+			{
+				Version* version;
+				status_t error = Version::Create(value.version.major,
+					value.version.minor, value.version.micro,
+					value.version.release, version);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+
+				fPackage->SetVersion(version);
+
+				break;
+			}
+
+			case B_PACKAGE_INFO_PROVIDES:
+			{
+				// create a version object, if a version is specified
+				Version* version = NULL;
+				if (value.resolvable.haveVersion) {
+					const BPackageVersionData& versionInfo
+						= value.resolvable.version;
+					status_t error = Version::Create(versionInfo.major,
+						versionInfo.minor, versionInfo.micro,
+						versionInfo.release, version);
+					if (error != B_OK)
+						RETURN_ERROR(error);
+				}
+				ObjectDeleter<Version> versionDeleter(version);
+
+				// create the resolvable
+				Resolvable* resolvable = new(std::nothrow) Resolvable(fPackage);
+				if (resolvable == NULL)
+					RETURN_ERROR(B_NO_MEMORY);
+				ObjectDeleter<Resolvable> resolvableDeleter(resolvable);
+
+				status_t error = resolvable->Init(value.resolvable.name,
+					versionDeleter.Detach());
+				if (error != B_OK)
+					RETURN_ERROR(error);
+
+				fPackage->AddResolvable(resolvableDeleter.Detach());
+
+				break;
+			}
+
+			case B_PACKAGE_INFO_REQUIRES:
+			{
+				// create the dependency
+				Dependency* dependency = new(std::nothrow) Dependency(fPackage);
+				if (dependency == NULL)
+					RETURN_ERROR(B_NO_MEMORY);
+				ObjectDeleter<Dependency> dependencyDeleter(dependency);
+
+				status_t error = dependency->Init(
+					value.resolvableExpression.name);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+
+				// create a version object, if a version is specified
+				Version* version = NULL;
+				if (value.resolvableExpression.haveOpAndVersion) {
+					const BPackageVersionData& versionInfo
+						= value.resolvableExpression.version;
+					status_t error = Version::Create(versionInfo.major,
+						versionInfo.minor, versionInfo.micro,
+						versionInfo.release, version);
+					if (error != B_OK)
+						RETURN_ERROR(error);
+
+					dependency->SetVersionRequirement(
+						value.resolvableExpression.op, version);
+				}
+
+				fPackage->AddDependency(dependencyDeleter.Detach());
+
+				break;
+			}
+
+			default:
+				break;
+		}
+
 		// TODO!
 		return B_OK;
 	}
@@ -323,6 +421,7 @@ Volume::Volume(fs_volume* fsVolume)
 	:
 	fFSVolume(fsVolume),
 	fRootDirectory(NULL),
+	fPackageFSRoot(NULL),
 	fPackageLoader(-1),
 	fNextNodeID(kRootDirectoryID + 1),
 	fTerminating(false)
@@ -348,6 +447,9 @@ Volume::~Volume()
 		node = next;
 	}
 
+	if (fPackageFSRoot != NULL)
+		fPackageFSRoot->UnregisterVolume(this);
+
 	if (fRootDirectory != NULL)
 		fRootDirectory->ReleaseReference();
 
@@ -366,6 +468,7 @@ Volume::Mount(const char* parameterString)
 
 	const char* packages = NULL;
 	const char* volumeName = NULL;
+	const char* mountType = NULL;
 	const char* shineThrough = NULL;
 
 	void* parameterHandle = parse_driver_settings_string(parameterString);
@@ -374,6 +477,7 @@ Volume::Mount(const char* parameterString)
 			NULL);
 		volumeName = get_driver_parameter(parameterHandle, "volume-name", NULL,
 			NULL);
+		mountType = get_driver_parameter(parameterHandle, "type", NULL, NULL);
 		shineThrough = get_driver_parameter(parameterHandle, "shine-through",
 			NULL, NULL);
 	}
@@ -384,6 +488,12 @@ Volume::Mount(const char* parameterString)
 	if (packages == NULL || packages[0] == '\0') {
 		ERROR("need package folder ('packages' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
+	}
+
+	error = _InitMountType(mountType);
+	if (error != B_OK) {
+		ERROR("invalid mount type: \"%s\"\n", mountType);
+		RETURN_ERROR(B_ERROR);
 	}
 
 	struct stat st;
@@ -398,6 +508,23 @@ Volume::Mount(const char* parameterString)
 	fRootDirectory->Init(NULL, volumeName != NULL ? volumeName : "Package FS");
 	fNodes.Insert(fRootDirectory);
 
+	// get our mount point
+	error = vfs_get_mount_point(fFSVolume->id, &fMountPoint.deviceID,
+		&fMountPoint.nodeID);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// register with packagefs root
+	error = ::PackageFSRoot::RegisterVolume(this);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	if (this == fPackageFSRoot->SystemVolume()) {
+		error = _AddPackageLinksDirectory();
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	}
+
 	// create default package domain
 	error = _AddInitialPackageDomain(packages);
 	if (error != B_OK)
@@ -409,6 +536,11 @@ Volume::Mount(const char* parameterString)
 	if (fPackageLoader < 0)
 		RETURN_ERROR(fPackageLoader);
 
+	// establish shine-through directories
+	error = _CreateShineThroughDirectories(shineThrough);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	// publish the root node
 	fRootDirectory->AcquireReference();
 	error = PublishVNode(fRootDirectory);
@@ -416,11 +548,6 @@ Volume::Mount(const char* parameterString)
 		fRootDirectory->ReleaseReference();
 		RETURN_ERROR(error);
 	}
-
-	// establish shine-through directories
-	error = _CreateShineThroughDirectories(shineThrough);
-	if (error != B_OK)
-		RETURN_ERROR(error);
 
 	// run the package loader
 	resume_thread(fPackageLoader);
@@ -468,7 +595,7 @@ Volume::PublishVNode(Node* node)
 status_t
 Volume::AddPackageDomain(const char* path)
 {
-	PackageDomain* packageDomain = new(std::nothrow) PackageDomain;
+	PackageDomain* packageDomain = new(std::nothrow) PackageDomain(this);
 	if (packageDomain == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	BReference<PackageDomain> packageDomainReference(packageDomain, true);
@@ -552,7 +679,7 @@ Volume::_PushJob(Job* job)
 status_t
 Volume::_AddInitialPackageDomain(const char* path)
 {
-	PackageDomain* domain = new(std::nothrow) PackageDomain;
+	PackageDomain* domain = new(std::nothrow) PackageDomain(this);
 	if (domain == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	BReference<PackageDomain> domainReference(domain, true);
@@ -656,12 +783,16 @@ Volume::_LoadPackage(Package* package)
 status_t
 Volume::_AddPackageContent(Package* package, bool notify)
 {
+	status_t error = fPackageFSRoot->AddPackage(package);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	for (PackageNodeList::Iterator it = package->Nodes().GetIterator();
 			PackageNode* node = it.Next();) {
 		// skip over ".PackageInfo" file, it isn't part of the package content
 		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
 			continue;
-		status_t error = _AddPackageContentRootNode(package, node, notify);
+		error = _AddPackageContentRootNode(package, node, notify);
 		if (error != B_OK) {
 			_RemovePackageContent(package, node, notify);
 			RETURN_ERROR(error);
@@ -689,6 +820,8 @@ Volume::_RemovePackageContent(Package* package, PackageNode* endNode,
 
 		node = nextNode;
 	}
+
+	fPackageFSRoot->RemovePackage(package);;
 }
 
 
@@ -1110,15 +1243,47 @@ Volume::_DomainEntryMoved(PackageDomain* domain, dev_t deviceID,
 
 
 status_t
+Volume::_InitMountType(const char* mountType)
+{
+	if (mountType == NULL)
+		fMountType = MOUNT_TYPE_CUSTOM;
+	else if (strcmp(mountType, "system") == 0)
+		fMountType = MOUNT_TYPE_SYSTEM;
+	else if (strcmp(mountType, "common") == 0)
+		fMountType = MOUNT_TYPE_COMMON;
+	else if (strcmp(mountType, "home") == 0)
+		fMountType = MOUNT_TYPE_HOME;
+	else if (strcmp(mountType, "custom") == 0)
+		fMountType = MOUNT_TYPE_CUSTOM;
+	else
+		RETURN_ERROR(B_BAD_VALUE);
+
+	return B_OK;
+}
+
+
+status_t
 Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 {
-	if (shineThroughSetting == NULL)
-		return B_OK;
-
 	// get the directories to map
 	const char* const* directories = NULL;
 
-	if (strcmp(shineThroughSetting, "system") == 0)
+	if (shineThroughSetting == NULL) {
+		// nothing specified -- derive from mount type
+		switch (fMountType) {
+			case MOUNT_TYPE_SYSTEM:
+				directories = kSystemShineThroughDirectories;
+				break;
+			case MOUNT_TYPE_COMMON:
+				directories = kCommonShineThroughDirectories;
+				break;
+			case MOUNT_TYPE_HOME:
+				directories = kHomeShineThroughDirectories;
+				break;
+			case MOUNT_TYPE_CUSTOM:
+				return B_OK;
+		}
+	} else if (strcmp(shineThroughSetting, "system") == 0)
 		directories = kSystemShineThroughDirectories;
 	else if (strcmp(shineThroughSetting, "common") == 0)
 		directories = kCommonShineThroughDirectories;
@@ -1132,21 +1297,13 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 	if (directories == NULL)
 		return B_OK;
 
-	// get our mount point
-	dev_t mountPointDevice;
-	ino_t mountPointNode;
-	status_t error = vfs_get_mount_point(fFSVolume->id, &mountPointDevice,
-		&mountPointNode);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
 	// iterate through the directory list, create the directories, and bind them
 	// to the mount point subdirectories
 	while (const char* directoryName = *(directories++)) {
 		// look up the mount point subdirectory
 		struct vnode* vnode;
-		error = vfs_entry_ref_to_vnode(mountPointDevice, mountPointNode,
-			directoryName, &vnode);
+		status_t error = vfs_entry_ref_to_vnode(fMountPoint.deviceID,
+			fMountPoint.nodeID, directoryName, &vnode);
 		if (error != B_OK) {
 			dprintf("packagefs: Failed to get shine-through directory \"%s\": "
 				"%s\n", directoryName, strerror(error));
@@ -1194,5 +1351,13 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 			RETURN_ERROR(error);
 	}
 
+	return B_OK;
+}
+
+
+status_t
+Volume::_AddPackageLinksDirectory()
+{
+// TODO:...
 	return B_OK;
 }

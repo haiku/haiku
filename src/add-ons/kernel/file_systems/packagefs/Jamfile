@@ -5,13 +5,11 @@ UseLibraryHeaders zlib ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
-DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
-	# TODO: Remove when it is complete!
-
 
 HAIKU_PACKAGE_FS_SOURCES =
 	BlockBufferCacheKernel.cpp
 	DebugSupport.cpp
+	Dependency.cpp
 	Directory.cpp
 	GlobalFactory.cpp
 	kernel_interface.cpp
@@ -20,11 +18,15 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Package.cpp
 	PackageDirectory.cpp
 	PackageDomain.cpp
+	PackageFamily.cpp
 	PackageFile.cpp
+	PackageFSRoot.cpp
 	PackageLeafNode.cpp
 	PackageNode.cpp
 	PackageNodeAttribute.cpp
 	PackageSymlink.cpp
+	Resolvable.cpp
+	Version.cpp
 	Volume.cpp
 ;
 
@@ -50,6 +52,11 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 ;
 
 
+local libSharedSources =
+	NaturalCompare.cpp
+;
+
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
 
@@ -57,9 +64,14 @@ KernelAddon packagefs
 	:
 	$(HAIKU_PACKAGE_FS_SOURCES)
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
+	$(libSharedSources)
 
 	: $(HAIKU_STATIC_LIBSUPC++) libz.a
 ;
+
+
+SEARCH on [ FGristFiles $(libSharedSources) ]
+	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
 
 
 HaikuSubInclude userland ;
