@@ -47,6 +47,9 @@ public:
 	virtual	status_t			VFSInit(dev_t deviceID) = 0;
 	virtual	void				VFSUninit() = 0;
 
+			void				SetID(ino_t id);
+			void				SetParent(Directory* parent);
+
 	virtual	mode_t				Mode() const = 0;
 	virtual	uid_t				UserID() const = 0;
 	virtual	gid_t				GroupID() const = 0;

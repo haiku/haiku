@@ -40,3 +40,17 @@ Node::Init(Directory* parent, const char* name)
 
 	return B_OK;
 }
+
+
+void
+Node::SetID(ino_t id)
+{
+	fID = id;
+}
+
+
+void
+Node::SetParent(Directory* parent)
+{
+	fParent = parent;
+}
