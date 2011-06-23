@@ -11,6 +11,10 @@
 #include <vfs.h>
 
 #include "DebugSupport.h"
+#include "PackageLinksDirectory.h"
+
+
+static const char* const kPackageLinksDirectoryName = "package-links";
 
 
 mutex PackageFSRoot::sRootListLock = MUTEX_INITIALIZER("packagefs root list");
@@ -21,7 +25,8 @@ PackageFSRoot::PackageFSRoot(dev_t deviceID, ino_t nodeID)
 	:
 	fDeviceID(deviceID),
 	fNodeID(nodeID),
-	fSystemVolume(NULL)
+	fSystemVolume(NULL),
+	fPackageLinksDirectory(NULL)
 {
 	rw_lock_init(&fLock, "packagefs root");
 }
@@ -50,6 +55,15 @@ status_t
 PackageFSRoot::Init()
 {
 	status_t error = fPackageFamilies.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// create package links directory
+	fPackageLinksDirectory = new(std::nothrow) PackageLinksDirectory;
+	if (fPackageLinksDirectory == NULL)
+		return B_NO_MEMORY;
+
+	error = fPackageLinksDirectory->Init(NULL, kPackageLinksDirectoryName);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

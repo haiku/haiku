@@ -17,6 +17,9 @@
 #include "Volume.h"
 
 
+class PackageLinksDirectory;
+
+
 class PackageFSRoot : private BReferenceable,
 	public DoublyLinkedListLinkImpl<PackageFSRoot> {
 public:
@@ -45,6 +48,8 @@ public:
 			bool				IsCustom() const	{ return fDeviceID < 0; }
 
 			Volume*				SystemVolume() const;
+			PackageLinksDirectory* GetPackageLinksDirectory() const
+									{ return fPackageLinksDirectory; }
 
 private:
 			typedef DoublyLinkedList<PackageFSRoot> RootList;
@@ -69,6 +74,7 @@ private:
 			VolumeList			fVolumes;
 			Volume*				fSystemVolume;
 			PackageFamilyHashTable fPackageFamilies;
+			PackageLinksDirectory* fPackageLinksDirectory;
 };
 
 
