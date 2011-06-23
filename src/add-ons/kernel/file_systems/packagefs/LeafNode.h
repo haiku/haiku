@@ -41,8 +41,6 @@ public:
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie);
 
-			const char*			SymlinkPath() const;
-
 private:
 			PackageLeafNodeList	fPackageNodes;
 };

@@ -201,12 +201,3 @@ LeafNode::OpenAttribute(const char* name, int openMode,
 	return UnpackingAttributeCookie::Open(fPackageNodes.Head(), name, openMode,
 		_cookie);
 }
-
-
-const char*
-LeafNode::SymlinkPath() const
-{
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
-		return packageNode->SymlinkPath();
-	return NULL;
-}
