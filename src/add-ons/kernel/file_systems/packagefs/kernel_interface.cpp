@@ -22,6 +22,7 @@
 #include "Directory.h"
 #include "GlobalFactory.h"
 #include "PackageFSRoot.h"
+#include "Utils.h"
 #include "Volume.h"
 
 
@@ -42,21 +43,6 @@ is_user_in_group(gid_t gid)
 	}
 
 	return (gid == getegid());
-}
-
-
-static bool
-set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name,
-	size_t nameLen)
-{
-	size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
-	if (length > bufferSize)
-		return false;
-
-	memcpy(buffer->d_name, name, nameLen);
-	buffer->d_name[nameLen] = '\0';
-	buffer->d_reclen = length;
-	return true;
 }
 
 
