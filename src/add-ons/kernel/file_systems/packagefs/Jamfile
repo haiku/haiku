@@ -13,6 +13,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	DebugSupport.cpp
 	Dependency.cpp
 	Directory.cpp
+	EmptyAttributeDirectoryCookie.cpp
 	GlobalFactory.cpp
 	kernel_interface.cpp
 	Node.cpp
