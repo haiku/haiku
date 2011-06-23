@@ -31,7 +31,6 @@
 #include <package/hpkg/PackageReaderImpl.h>
 
 #include "DebugSupport.h"
-#include "Directory.h"
 #include "kernel_interface.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
@@ -39,6 +38,7 @@
 #include "PackageSymlink.h"
 #include "Resolvable.h"
 #include "UnpackingLeafNode.h"
+#include "UnpackingDirectory.h"
 #include "Version.h"
 
 
@@ -1070,7 +1070,7 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
 	if (S_ISREG(mode) || S_ISLNK(mode))
 		unpackingNode = new(std::nothrow) UnpackingLeafNode(fNextNodeID++);
 	else if (S_ISDIR(mode))
-		unpackingNode = new(std::nothrow) Directory(fNextNodeID++);
+		unpackingNode = new(std::nothrow) UnpackingDirectory(fNextNodeID++);
 	else
 		RETURN_ERROR(B_UNSUPPORTED);
 
