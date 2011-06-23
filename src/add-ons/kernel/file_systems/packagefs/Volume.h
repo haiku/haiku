@@ -20,9 +20,18 @@
 
 class Directory;
 class Node;
+class PackageFSRoot;
 
 
-class Volume {
+enum MountType {
+	MOUNT_TYPE_SYSTEM,
+	MOUNT_TYPE_COMMON,
+	MOUNT_TYPE_HOME,
+	MOUNT_TYPE_CUSTOM
+};
+
+
+class Volume : public DoublyLinkedListLinkImpl<Volume> {
 public:
 								Volume(fs_volume* fsVolume);
 								~Volume();
@@ -35,6 +44,18 @@ public:
 			fs_volume*			FSVolume() const	{ return fFSVolume; }
 			dev_t				ID() const			{ return fFSVolume->id; }
 			Directory*			RootDirectory() const { return fRootDirectory; }
+
+			::MountType			MountType() const	{ return fMountType; }
+
+			void				SetPackageFSRoot(::PackageFSRoot* root)
+									{ fPackageFSRoot = root; }
+			::PackageFSRoot*	PackageFSRoot() const
+									{ return fPackageFSRoot; }
+
+			dev_t				MountPointDeviceID() const
+									{ return fMountPoint.deviceID; }
+			ino_t				MountPointNodeID() const
+									{ return fMountPoint.nodeID; }
 
 			status_t			Mount(const char* parameterString);
 			void				Unmount();
@@ -118,14 +139,23 @@ private:
 									ino_t nodeID, const char* fromName,
 									const char* name, bool notify);
 
+			status_t			_InitMountType(const char* mountType);
 			status_t			_CreateShineThroughDirectories(
 									const char* shineThroughSetting);
+			status_t			_AddPackageLinksDirectory();
 private:
 			rw_lock				fLock;
 			fs_volume*			fFSVolume;
 			Directory*			fRootDirectory;
+			::PackageFSRoot*	fPackageFSRoot;
+			::MountType			fMountType;
 			thread_id			fPackageLoader;
 			PackageDomainList	fPackageDomains;
+
+			struct {
+				dev_t			deviceID;
+				ino_t			nodeID;
+			} fMountPoint;
 
 			NodeIDHashTable		fNodes;
 

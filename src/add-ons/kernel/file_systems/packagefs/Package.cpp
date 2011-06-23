@@ -16,12 +16,16 @@
 
 #include "DebugSupport.h"
 #include "PackageDomain.h"
+#include "Version.h"
 
 
 Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
 	:
 	fDomain(domain),
 	fFileName(NULL),
+	fName(NULL),
+	fVersion(NULL),
+	fFamily(NULL),
 	fFD(-1),
 	fOpenCount(0),
 	fNodeID(nodeID),
@@ -36,7 +40,15 @@ Package::~Package()
 	while (PackageNode* node = fNodes.RemoveHead())
 		node->ReleaseReference();
 
+	while (Resolvable* resolvable = fResolvables.RemoveHead())
+		delete resolvable;
+
+	while (Dependency* dependency = fDependencies.RemoveHead())
+		delete dependency;
+
 	free(fFileName);
+	free(fName);
+	delete fVersion;
 
 	mutex_destroy(&fLock);
 }
@@ -53,11 +65,49 @@ Package::Init(const char* fileName)
 }
 
 
+status_t
+Package::SetName(const char* name)
+{
+	if (fName != NULL)
+		free(fName);
+
+	fName = strdup(name);
+	if (fName == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	return B_OK;
+}
+
+
+void
+Package::SetVersion(::Version* version)
+{
+	if (fVersion != NULL)
+		delete fVersion;
+
+	fVersion = version;
+}
+
+
 void
 Package::AddNode(PackageNode* node)
 {
 	fNodes.Add(node);
 	node->AcquireReference();
+}
+
+
+void
+Package::AddResolvable(Resolvable* resolvable)
+{
+	fResolvables.Add(resolvable);
+}
+
+
+void
+Package::AddDependency(Dependency* dependency)
+{
+	fDependencies.Add(dependency);
 }
 
 

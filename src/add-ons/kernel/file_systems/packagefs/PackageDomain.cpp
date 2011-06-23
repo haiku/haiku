@@ -21,8 +21,9 @@
 #include "DebugSupport.h"
 
 
-PackageDomain::PackageDomain()
+PackageDomain::PackageDomain(::Volume* volume)
 	:
+	fVolume(volume),
 	fPath(NULL),
 	fDirFD(-1),
 	fListener(NULL)

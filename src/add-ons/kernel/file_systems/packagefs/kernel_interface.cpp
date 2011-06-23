@@ -22,6 +22,7 @@
 #include "Directory.h"
 #include "GlobalFactory.h"
 #include "LeafNode.h"
+#include "PackageFSRoot.h"
 #include "Volume.h"
 
 
@@ -1063,12 +1064,21 @@ packagefs_std_ops(int32 op, ...)
 				return error;
 			}
 
+			error = PackageFSRoot::GlobalInit();
+			if (error != B_OK) {
+				ERROR("Failed to init PackageFSRoot\n");
+				GlobalFactory::DeleteDefault();
+				exit_debugging();
+				return error;
+			}
+
 			return B_OK;
 		}
 
 		case B_MODULE_UNINIT:
 		{
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
+			PackageFSRoot::GlobalUninit();
 			GlobalFactory::DeleteDefault();
 			exit_debugging();
 			return B_OK;
