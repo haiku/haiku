@@ -36,8 +36,8 @@ public:
 								Volume(fs_volume* fsVolume);
 								~Volume();
 
-	inline	bool				ReadLock();
-	inline	void				ReadUnlock();
+	inline	bool				ReadLock() const;
+	inline	void				ReadUnlock() const;
 	inline	bool				WriteLock();
 	inline	void				WriteUnlock();
 
@@ -144,7 +144,7 @@ private:
 									const char* shineThroughSetting);
 			status_t			_AddPackageLinksDirectory();
 private:
-			rw_lock				fLock;
+	mutable	rw_lock				fLock;
 			fs_volume*			fFSVolume;
 			Directory*			fRootDirectory;
 			::PackageFSRoot*	fPackageFSRoot;
@@ -170,14 +170,14 @@ private:
 
 
 bool
-Volume::ReadLock()
+Volume::ReadLock() const
 {
 	return rw_lock_read_lock(&fLock) == B_OK;
 }
 
 
 void
-Volume::ReadUnlock()
+Volume::ReadUnlock() const
 {
 	rw_lock_read_unlock(&fLock);
 }
@@ -197,7 +197,8 @@ Volume::WriteUnlock()
 }
 
 
-typedef AutoLocker<Volume, AutoLockerReadLocking<Volume> > VolumeReadLocker;
+typedef AutoLocker<const Volume, AutoLockerReadLocking<const Volume> >
+	VolumeReadLocker;
 typedef AutoLocker<Volume, AutoLockerWriteLocking<Volume> > VolumeWriteLocker;
 
 
