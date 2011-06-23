@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "UnpackingAttributeCookie.h"
+#include "UnpackingAttributeDirectoryCookie.h"
 #include "Utils.h"
 
 
@@ -191,6 +192,14 @@ LeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 	*bufferSize = toCopy;
 
 	return B_OK;
+}
+
+
+status_t
+LeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
+{
+	return UnpackingAttributeDirectoryCookie::Open(fPackageNodes.Head(),
+		_cookie);
 }
 
 

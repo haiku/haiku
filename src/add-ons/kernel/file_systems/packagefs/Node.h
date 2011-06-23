@@ -18,6 +18,7 @@
 
 
 class AttributeCookie;
+class AttributeDirectoryCookie;
 class Directory;
 class PackageNode;
 
@@ -64,6 +65,8 @@ public:
 	virtual	status_t			ReadSymlink(void* buffer,
 									size_t* bufferSize) = 0;
 
+	virtual	status_t			OpenAttributeDirectory(
+									AttributeDirectoryCookie*& _cookie) = 0;
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie) = 0;
 
