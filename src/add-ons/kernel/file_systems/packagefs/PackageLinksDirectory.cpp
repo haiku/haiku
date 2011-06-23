@@ -8,34 +8,8 @@
 
 #include <AutoDeleter.h>
 
-#include "AttributeDirectoryCookie.h"
+#include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
-
-
-namespace {
-
-class EmptyAttributeDirectoryCookie : public AttributeDirectoryCookie {
-public:
-	virtual status_t Close()
-	{
-		return B_OK;
-	}
-
-	virtual status_t Read(dev_t volumeID, ino_t nodeID, struct dirent* buffer,
-		size_t bufferSize, uint32* _count)
-	{
-		*_count = 0;
-		return B_OK;
-	}
-
-	virtual status_t Rewind()
-	{
-		return B_OK;
-	}
-};
-
-
-}	// unnamed namespace
 
 
 PackageLinksDirectory::PackageLinksDirectory()
