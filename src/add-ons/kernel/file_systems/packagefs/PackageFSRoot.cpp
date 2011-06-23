@@ -54,16 +54,13 @@ PackageFSRoot::GlobalUninit()
 status_t
 PackageFSRoot::Init()
 {
-	status_t error = fPackageFamilies.Init();
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
 	// create package links directory
 	fPackageLinksDirectory = new(std::nothrow) PackageLinksDirectory;
 	if (fPackageLinksDirectory == NULL)
 		return B_NO_MEMORY;
 
-	error = fPackageLinksDirectory->Init(NULL, kPackageLinksDirectoryName);
+	status_t error = fPackageLinksDirectory->Init(NULL,
+		kPackageLinksDirectoryName);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -162,50 +159,14 @@ PackageFSRoot::UnregisterVolume(Volume* volume)
 status_t
 PackageFSRoot::AddPackage(Package* package)
 {
-	// Create a package family -- there might already be one, but since that's
-	// unlikely, we don't bother to check and recheck later.
-	PackageFamily* packageFamily = new(std::nothrow) PackageFamily;
-	if (packageFamily == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<PackageFamily> packageFamilyDeleter(packageFamily);
-
-	status_t error = packageFamily->Init(package);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// add the family
-	PackageFSRootWriteLocker writeLocker(this);
-	if (PackageFamily* otherPackageFamily
-			= fPackageFamilies.Lookup(packageFamily->Name())) {
-		packageFamily->RemovePackage(package);
-		packageFamily = otherPackageFamily;
-		packageFamily->AddPackage(package);
-	} else
-		fPackageFamilies.Insert(packageFamilyDeleter.Detach());
-
-// TODO:...
-
-	return B_OK;
+	return fPackageLinksDirectory->AddPackage(package);
 }
 
 
 void
 PackageFSRoot::RemovePackage(Package* package)
 {
-	PackageFSRootWriteLocker writeLocker(this);
-
-	PackageFamily* packageFamily = package->Family();
-	if (packageFamily == NULL)
-		return;
-
-	packageFamily->RemovePackage(package);
-
-	if (packageFamily->IsEmpty()) {
-		fPackageFamilies.Remove(packageFamily);
-		delete packageFamily;
-	}
-
-// TODO:...
+	fPackageLinksDirectory->RemovePackage(package);
 }
 
 

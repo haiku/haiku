@@ -6,7 +6,10 @@
 
 #include "PackageLinksDirectory.h"
 
+#include <AutoDeleter.h>
+
 #include "AttributeDirectoryCookie.h"
+#include "DebugSupport.h"
 
 
 namespace {
@@ -55,6 +58,10 @@ PackageLinksDirectory::~PackageLinksDirectory()
 status_t
 PackageLinksDirectory::Init(Directory* parent, const char* name)
 {
+	status_t error = fPackageFamilies.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	return Directory::Init(parent, name);
 }
 
@@ -114,3 +121,54 @@ PackageLinksDirectory::OpenAttribute(const char* name, int openMode,
 {
 	return B_ENTRY_NOT_FOUND;
 }
+
+
+status_t
+PackageLinksDirectory::AddPackage(Package* package)
+{
+	// Create a package family -- there might already be one, but since that's
+	// unlikely, we don't bother to check and recheck later.
+	PackageFamily* packageFamily = new(std::nothrow) PackageFamily;
+	if (packageFamily == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<PackageFamily> packageFamilyDeleter(packageFamily);
+
+	status_t error = packageFamily->Init(package);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// add the family
+	NodeWriteLocker writeLocker(this);
+	if (PackageFamily* otherPackageFamily
+			= fPackageFamilies.Lookup(packageFamily->Name())) {
+		packageFamily->RemovePackage(package);
+		packageFamily = otherPackageFamily;
+		packageFamily->AddPackage(package);
+	} else
+		fPackageFamilies.Insert(packageFamilyDeleter.Detach());
+
+// TODO:...
+
+	return B_OK;
+}
+
+
+void
+PackageLinksDirectory::RemovePackage(Package* package)
+{
+	NodeWriteLocker writeLocker(this);
+
+	PackageFamily* packageFamily = package->Family();
+	if (packageFamily == NULL)
+		return;
+
+	packageFamily->RemovePackage(package);
+
+	if (packageFamily->IsEmpty()) {
+		fPackageFamilies.Remove(packageFamily);
+		delete packageFamily;
+	}
+
+// TODO:...
+}
+
