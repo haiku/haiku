@@ -98,6 +98,13 @@ LeafNode::FileSize() const
 }
 
 
+Node*
+LeafNode::GetNode()
+{
+	return this;
+}
+
+
 status_t
 LeafNode::AddPackageNode(PackageNode* packageNode)
 {

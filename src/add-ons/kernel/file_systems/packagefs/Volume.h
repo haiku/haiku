@@ -21,6 +21,7 @@
 class Directory;
 class Node;
 class PackageFSRoot;
+class UnpackingNode;
 
 
 enum MountType {
@@ -117,8 +118,9 @@ private:
 									PackageNode* packageNode, Node* node,
 									bool notify);
 
-			status_t			_CreateNode(mode_t mode, Directory* parent,
-									const char* name, Node*& _node);
+			status_t			_CreateUnpackingNode(mode_t mode,
+									Directory* parent, const char* name,
+									UnpackingNode*& _node);
 									// does *not* return a reference
 			void				_RemoveNode(Node* node);
 

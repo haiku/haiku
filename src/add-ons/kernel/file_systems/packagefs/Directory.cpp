@@ -99,6 +99,13 @@ Directory::FileSize() const
 }
 
 
+Node*
+Directory::GetNode()
+{
+	return this;
+}
+
+
 status_t
 Directory::AddPackageNode(PackageNode* packageNode)
 {

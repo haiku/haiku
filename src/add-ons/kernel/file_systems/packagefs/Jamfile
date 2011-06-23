@@ -30,6 +30,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Resolvable.cpp
 	UnpackingAttributeCookie.cpp
 	UnpackingAttributeDirectoryCookie.cpp
+	UnpackingNode.cpp
 	Version.cpp
 	Volume.cpp
 ;

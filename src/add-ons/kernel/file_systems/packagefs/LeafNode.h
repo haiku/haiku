@@ -8,9 +8,10 @@
 
 #include "Node.h"
 #include "PackageLeafNode.h"
+#include "UnpackingNode.h"
 
 
-class LeafNode : public Node {
+class LeafNode : public Node, public UnpackingNode {
 public:
 								LeafNode(ino_t id);
 	virtual						~LeafNode();
@@ -25,6 +26,8 @@ public:
 	virtual	gid_t				GroupID() const;
 	virtual	timespec			ModifiedTime() const;
 	virtual	off_t				FileSize() const;
+
+	virtual	Node*				GetNode();
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode);
 	virtual	void				RemovePackageNode(PackageNode* packageNode);
