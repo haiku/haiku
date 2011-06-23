@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef LEAF_NODE_H
@@ -34,6 +34,9 @@ public:
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			Read(io_request* request);
+
+	virtual	status_t			ReadSymlink(void* buffer,
+									size_t* bufferSize);
 
 			const char*			SymlinkPath() const;
 

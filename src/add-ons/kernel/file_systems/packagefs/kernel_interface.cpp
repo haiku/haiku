@@ -21,7 +21,6 @@
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "GlobalFactory.h"
-#include "LeafNode.h"
 #include "PackageFSRoot.h"
 #include "Volume.h"
 
@@ -315,17 +314,7 @@ packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	if (!S_ISLNK(node->Mode()))
 		return B_BAD_VALUE;
 
-	const char* linkPath = dynamic_cast<LeafNode*>(node)->SymlinkPath();
-	if (linkPath == NULL) {
-		*_bufferSize = 0;
-		return B_OK;
-	}
-
-	size_t toCopy = std::min(strlen(linkPath), *_bufferSize);
-	memcpy(buffer, linkPath, toCopy);
-	*_bufferSize = toCopy;
-
-	return B_OK;
+	return node->ReadSymlink(buffer, _bufferSize);
 }
 
 
