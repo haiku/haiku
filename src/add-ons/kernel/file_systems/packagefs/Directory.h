@@ -7,8 +7,6 @@
 
 
 #include "Node.h"
-#include "PackageDirectory.h"
-#include "UnpackingNode.h"
 
 
 struct DirectoryIterator : DoublyLinkedListLinkImpl<DirectoryIterator> {
@@ -24,7 +22,7 @@ struct DirectoryIterator : DoublyLinkedListLinkImpl<DirectoryIterator> {
 typedef DoublyLinkedList<DirectoryIterator> DirectoryIteratorList;
 
 
-class Directory : public Node, public UnpackingNode {
+class Directory : public Node {
 public:
 								Directory(ino_t id);
 	virtual						~Directory();
@@ -34,30 +32,11 @@ public:
 	virtual	status_t			VFSInit(dev_t deviceID);
 	virtual	void				VFSUninit();
 
-	virtual	mode_t				Mode() const;
-	virtual	uid_t				UserID() const;
-	virtual	gid_t				GroupID() const;
-	virtual	timespec			ModifiedTime() const;
-	virtual	off_t				FileSize() const;
-
-	virtual	Node*				GetNode();
-
-	virtual	status_t			AddPackageNode(PackageNode* packageNode);
-	virtual	void				RemovePackageNode(PackageNode* packageNode);
-
-	virtual	PackageNode*		GetPackageNode();
-
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			Read(io_request* request);
 
-	virtual	status_t			ReadSymlink(void* buffer,
-									size_t* bufferSize);
-
-	virtual	status_t			OpenAttributeDirectory(
-									AttributeDirectoryCookie*& _cookie);
-	virtual	status_t			OpenAttribute(const char* name, int openMode,
-									AttributeCookie*& _cookie);
+	virtual	status_t			ReadSymlink(void* buffer, size_t* bufferSize);
 
 			void				AddChild(Node* node);
 			void				RemoveChild(Node* node);
@@ -74,7 +53,6 @@ public:
 private:
 			NodeNameHashTable	fChildTable;
 			NodeList			fChildList;
-			PackageDirectoryList fPackageDirectories;
 			DirectoryIteratorList fIterators;
 };
 
@@ -91,18 +69,6 @@ Directory::NextChild(Node* node) const
 {
 	return fChildList.GetNext(node);
 }
-
-
-class RootDirectory : public Directory {
-public:
-								RootDirectory(ino_t id,
-									const timespec& modifiedTime);
-
-	virtual	timespec			ModifiedTime() const;
-
-private:
-			timespec			fModifiedTime;
-};
 
 
 #endif	// DIRECTORY_H
