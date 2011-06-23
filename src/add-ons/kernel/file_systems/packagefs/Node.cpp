@@ -16,9 +16,7 @@ Node::Node(ino_t id)
 	:
 	fID(id),
 	fParent(NULL),
-	fName(NULL),
-	fUserID(0),
-	fGroupID(0)
+	fName(NULL)
 {
 	rw_lock_init(&fLock, "packagefs node");
 }
