@@ -144,7 +144,10 @@ private:
 			status_t			_InitMountType(const char* mountType);
 			status_t			_CreateShineThroughDirectories(
 									const char* shineThroughSetting);
+
 			status_t			_AddPackageLinksDirectory();
+			void				_RemovePackageLinksDirectory();
+
 private:
 	mutable	rw_lock				fLock;
 			fs_volume*			fFSVolume;

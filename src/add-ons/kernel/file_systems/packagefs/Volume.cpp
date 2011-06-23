@@ -35,6 +35,7 @@
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageFSRoot.h"
+#include "PackageLinksDirectory.h"
 #include "PackageSymlink.h"
 #include "Resolvable.h"
 #include "UnpackingLeafNode.h"
@@ -447,8 +448,12 @@ Volume::~Volume()
 		node = next;
 	}
 
-	if (fPackageFSRoot != NULL)
+	if (fPackageFSRoot != NULL) {
+		if (this == fPackageFSRoot->SystemVolume())
+			_RemovePackageLinksDirectory();
+
 		fPackageFSRoot->UnregisterVolume(this);
+	}
 
 	if (fRootDirectory != NULL)
 		fRootDirectory->ReleaseReference();
@@ -1375,6 +1380,37 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 status_t
 Volume::_AddPackageLinksDirectory()
 {
-// TODO:...
+	// called when mounting, so we don't need to lock the volume
+
+	PackageLinksDirectory* packageLinksDirectory
+		= fPackageFSRoot->GetPackageLinksDirectory();
+
+	NodeWriteLocker rootDirectoryWriteLocker(fRootDirectory);
+	NodeWriteLocker packageLinksDirectoryWriteLocker(packageLinksDirectory);
+
+	packageLinksDirectory->SetID(fNextNodeID++);
+	packageLinksDirectory->SetParent(fRootDirectory);
+
+	fRootDirectory->AddChild(packageLinksDirectory);
+	fNodes.Insert(packageLinksDirectory);
+	packageLinksDirectory->AcquireReference();
+
 	return B_OK;
+}
+
+
+void
+Volume::_RemovePackageLinksDirectory()
+{
+	PackageLinksDirectory* packageLinksDirectory
+		= fPackageFSRoot->GetPackageLinksDirectory();
+
+	VolumeWriteLocker volumeLocker(this);
+	NodeWriteLocker rootDirectoryWriteLocker(fRootDirectory);
+	NodeWriteLocker packageLinksDirectoryWriteLocker(packageLinksDirectory);
+
+	if (packageLinksDirectory->Parent() == fRootDirectory) {
+		_RemoveNode(packageLinksDirectory);
+		packageLinksDirectory->SetParent(NULL);
+	}
 }
