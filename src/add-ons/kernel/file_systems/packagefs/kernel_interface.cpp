@@ -18,6 +18,7 @@
 #include <AutoDeleter.h>
 
 #include "AttributeCookie.h"
+#include "AttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "GlobalFactory.h"
@@ -663,50 +664,6 @@ packagefs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 // #pragma mark - Attribute Directories
 
 
-struct AttributeDirectoryCookie {
-	Node*					node;
-	PackageNode*			packageNode;
-	PackageNodeAttribute*	attribute;
-
-	AttributeDirectoryCookie(Node* node)
-		:
-		node(node),
-		packageNode(node->GetPackageNode()),
-		attribute(NULL)
-	{
-		if (packageNode != NULL) {
-			packageNode->AcquireReference();
-			attribute = packageNode->Attributes().Head();
-		}
-	}
-
-	~AttributeDirectoryCookie()
-	{
-		if (packageNode != NULL)
-			packageNode->ReleaseReference();
-	}
-
-	PackageNodeAttribute* Current() const
-	{
-		return attribute;
-	}
-
-	void Next()
-	{
-		if (attribute == NULL)
-			return;
-
-		attribute = packageNode->Attributes().GetNext(attribute);
-	}
-
-	void Rewind()
-	{
-		if (packageNode != NULL)
-			attribute = packageNode->Attributes().Head();
-	}
-};
-
-
 status_t
 packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 {
@@ -722,10 +679,10 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 
 	// create a cookie
 	NodeReadLocker nodeLocker(node);
-	AttributeDirectoryCookie* cookie
-		= new(std::nothrow) AttributeDirectoryCookie(node);
-	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
+	AttributeDirectoryCookie* cookie;
+	error = node->OpenAttributeDirectory(cookie);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	*_cookie = cookie;
 	return B_OK;
@@ -735,7 +692,8 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 status_t
 packagefs_close_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
-	return B_OK;
+	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
+	return cookie->Close();
 }
 
 
@@ -771,53 +729,7 @@ packagefs_read_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	TOUCH(volume);
 	TOUCH(node);
 
-	uint32 maxCount = *_count;
-	uint32 count = 0;
-
-	dirent* previousEntry = NULL;
-
-	while (PackageNodeAttribute* attribute = cookie->Current()) {
-		// don't read more entries than requested
-		if (count >= maxCount)
-			break;
-
-		// align the buffer for subsequent entries
-		if (count > 0) {
-			addr_t offset = (addr_t)buffer % 8;
-			if (offset > 0) {
-				offset = 8 - offset;
-				if (bufferSize <= offset)
-					break;
-
-				previousEntry->d_reclen += offset;
-				buffer = (dirent*)((addr_t)buffer + offset);
-				bufferSize -= offset;
-			}
-		}
-
-		// fill in the entry name -- checks whether the entry fits into the
-		// buffer
-		const char* name = attribute->Name();
-		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
-			if (count == 0)
-				RETURN_ERROR(B_BUFFER_OVERFLOW);
-			break;
-		}
-
-		// fill in the other data
-		buffer->d_dev = volume->ID();
-		buffer->d_ino = node->ID();
-
-		count++;
-		previousEntry = buffer;
-		bufferSize -= buffer->d_reclen;
-		buffer = (dirent*)((addr_t)buffer + buffer->d_reclen);
-
-		cookie->Next();
-	}
-
-	*_count = count;
-	return B_OK;
+	return cookie->Read(volume->ID(), node->ID(), buffer, bufferSize, _count);
 }
 
 
@@ -833,9 +745,7 @@ packagefs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	TOUCH(volume);
 	TOUCH(node);
 
-	cookie->Rewind();
-
-	return B_OK;
+	return cookie->Rewind();
 }
 
 

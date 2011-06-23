@@ -38,6 +38,8 @@ public:
 	virtual	status_t			ReadSymlink(void* buffer,
 									size_t* bufferSize);
 
+	virtual	status_t			OpenAttributeDirectory(
+									AttributeDirectoryCookie*& _cookie);
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie);
 
