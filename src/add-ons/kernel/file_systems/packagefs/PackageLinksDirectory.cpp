@@ -10,6 +10,7 @@
 
 #include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
+#include "Utils.h"
 
 
 PackageLinksDirectory::PackageLinksDirectory()
@@ -17,10 +18,7 @@ PackageLinksDirectory::PackageLinksDirectory()
 	Directory(0)
 		// the ID needs to be assigned later, when added to a volume
 {
-	bigtime_t timeMicros = real_time_clock_usecs();
-
-	fModifiedTime.tv_sec = timeMicros / 1000000;
-	fModifiedTime.tv_nsec = (timeMicros % 1000000) * 1000;
+	get_real_time(fModifiedTime);
 }
 
 
