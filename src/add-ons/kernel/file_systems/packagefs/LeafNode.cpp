@@ -10,6 +10,7 @@
 
 #include <algorithm>
 
+#include "UnpackingAttributeCookie.h"
 #include "Utils.h"
 
 
@@ -190,6 +191,15 @@ LeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 	*bufferSize = toCopy;
 
 	return B_OK;
+}
+
+
+status_t
+LeafNode::OpenAttribute(const char* name, int openMode,
+	AttributeCookie*& _cookie)
+{
+	return UnpackingAttributeCookie::Open(fPackageNodes.Head(), name, openMode,
+		_cookie);
 }
 
 

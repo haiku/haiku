@@ -7,6 +7,7 @@ UsePrivateHeaders shared ;
 
 
 HAIKU_PACKAGE_FS_SOURCES =
+	AttributeCookie.cpp
 	BlockBufferCacheKernel.cpp
 	DebugSupport.cpp
 	Dependency.cpp
@@ -26,6 +27,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	PackageNodeAttribute.cpp
 	PackageSymlink.cpp
 	Resolvable.cpp
+	UnpackingAttributeCookie.cpp
 	Version.cpp
 	Volume.cpp
 ;

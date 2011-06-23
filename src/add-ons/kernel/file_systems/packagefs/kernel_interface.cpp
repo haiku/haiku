@@ -8,7 +8,6 @@
 
 #include <dirent.h>
 
-#include <algorithm>
 #include <new>
 
 #include <fs_info.h>
@@ -18,15 +17,12 @@
 
 #include <AutoDeleter.h>
 
+#include "AttributeCookie.h"
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "GlobalFactory.h"
 #include "PackageFSRoot.h"
 #include "Volume.h"
-
-
-using BPackageKit::BHPKG::BBufferDataReader;
-using BPackageKit::BHPKG::BFDDataReader;
 
 
 static const uint32 kOptimalIOSize = 64 * 1024;
@@ -860,32 +856,6 @@ packagefs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 // #pragma mark - Attribute Operations
 
 
-struct AttributeCookie {
-	PackageNode*			packageNode;
-	Package*				package;
-	PackageNodeAttribute*	attribute;
-	int						openMode;
-
-	AttributeCookie(PackageNode* packageNode, PackageNodeAttribute* attribute,
-		int openMode)
-		:
-		packageNode(packageNode),
-		package(packageNode->GetPackage()),
-		attribute(attribute),
-		openMode(openMode)
-	{
-		packageNode->AcquireReference();
-		package->AcquireReference();
-	}
-
-	~AttributeCookie()
-	{
-		packageNode->ReleaseReference();
-		package->ReleaseReference();
-	}
-};
-
-
 status_t
 packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	int openMode, void** _cookie)
@@ -907,21 +877,12 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	if (error != B_OK)
 		return error;
 
-	// get the package node and the respectively named attribute
-	PackageNode* packageNode = node->GetPackageNode();
-	PackageNodeAttribute* attribute = packageNode != NULL
-		? packageNode->FindAttribute(name) : NULL;
-	if (attribute == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// allocate the cookie
-	AttributeCookie* cookie = new(std::nothrow) AttributeCookie(packageNode,
-		attribute, openMode);
-	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
+	AttributeCookie* cookie;
+	error = node->OpenAttribute(name, openMode, cookie);
+	if (error != B_OK)
+		return error;
 
 	*_cookie = cookie;
-
 	return B_OK;
 }
 
@@ -929,7 +890,8 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 status_t
 packagefs_close_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
-	return B_OK;
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+	RETURN_ERROR(cookie->Close());
 }
 
 
@@ -951,38 +913,6 @@ packagefs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 }
 
 
-static status_t
-read_package_data(const BPackageData& data, BDataReader* dataReader, off_t offset,
-	void* buffer, size_t* bufferSize)
-{
-	// create a BPackageDataReader
-	BPackageDataReader* reader;
-	status_t error = GlobalFactory::Default()->CreatePackageDataReader(
-		dataReader, data, reader);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	ObjectDeleter<BPackageDataReader> readerDeleter(reader);
-
-	// check the offset
-	if (offset < 0 || (uint64)offset > data.UncompressedSize())
-		return B_BAD_VALUE;
-
-	// clamp the size
-	size_t toRead = std::min((uint64)*bufferSize,
-		data.UncompressedSize() - offset);
-
-	// read
-	if (toRead > 0) {
-		status_t error = reader->ReadData(offset, buffer, toRead);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-	}
-
-	*bufferSize = toRead;
-	return B_OK;
-}
-
-
 status_t
 packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	off_t offset, void* buffer, size_t* bufferSize)
@@ -996,21 +926,7 @@ packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	TOUCH(volume);
 	TOUCH(node);
 
-	const BPackageData& data = cookie->attribute->Data();
-	if (data.IsEncodedInline()) {
-		// inline data
-		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
-		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
-	}
-
-	// data not inline -- open the package
-	int fd = cookie->package->Open();
-	if (fd < 0)
-		RETURN_ERROR(fd);
-	PackageCloser packageCloser(cookie->package);
-
-	BFDDataReader dataReader(fd);
-	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+	return cookie->ReadAttribute(offset, buffer, bufferSize);
 }
 
 
@@ -1027,10 +943,7 @@ packagefs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 	TOUCH(volume);
 	TOUCH(node);
 
-	st->st_size = cookie->attribute->Data().UncompressedSize();
-	st->st_type = cookie->attribute->Type();
-
-	return B_OK;
+	return cookie->ReadAttributeStat(st);
 }
 
 

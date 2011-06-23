@@ -51,6 +51,9 @@ public:
 	virtual	status_t			ReadSymlink(void* buffer,
 									size_t* bufferSize);
 
+	virtual	status_t			OpenAttribute(const char* name, int openMode,
+									AttributeCookie*& _cookie);
+
 			void				AddChild(Node* node);
 			void				RemoveChild(Node* node);
 			Node*				FindChild(const char* name);
