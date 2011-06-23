@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NODE_H
@@ -59,6 +59,9 @@ public:
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize) = 0;
 	virtual	status_t			Read(io_request* request) = 0;
+
+	virtual	status_t			ReadSymlink(void* buffer,
+									size_t* bufferSize) = 0;
 
 protected:
 			rw_lock				fLock;

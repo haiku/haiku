@@ -1,10 +1,14 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "LeafNode.h"
+
+#include <string.h>
+
+#include <algorithm>
 
 #include "Utils.h"
 
@@ -165,6 +169,27 @@ LeafNode::Read(io_request* request)
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())
 		return packageNode->Read(request);
 	return EBADF;
+}
+
+
+status_t
+LeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
+{
+	PackageLeafNode* packageNode = fPackageNodes.Head();
+	if (packageNode == NULL)
+		return B_BAD_VALUE;
+
+	const char* linkPath = packageNode->SymlinkPath();
+	if (linkPath == NULL) {
+		*bufferSize = 0;
+		return B_OK;
+	}
+
+	size_t toCopy = std::min(strlen(linkPath), *bufferSize);
+	memcpy(buffer, linkPath, toCopy);
+	*bufferSize = toCopy;
+
+	return B_OK;
 }
 
 

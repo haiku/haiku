@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -159,6 +159,13 @@ Directory::Read(off_t offset, void* buffer, size_t* bufferSize)
 
 status_t
 Directory::Read(io_request* request)
+{
+	return B_IS_A_DIRECTORY;
+}
+
+
+status_t
+Directory::ReadSymlink(void* buffer, size_t* bufferSize)
 {
 	return B_IS_A_DIRECTORY;
 }
