@@ -32,13 +32,13 @@
 
 #include "DebugSupport.h"
 #include "Directory.h"
-#include "LeafNode.h"
 #include "kernel_interface.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageFSRoot.h"
 #include "PackageSymlink.h"
 #include "Resolvable.h"
+#include "UnpackingLeafNode.h"
 #include "Version.h"
 
 
@@ -1068,7 +1068,7 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
 {
 	UnpackingNode* unpackingNode;
 	if (S_ISREG(mode) || S_ISLNK(mode))
-		unpackingNode = new(std::nothrow) LeafNode(fNextNodeID++);
+		unpackingNode = new(std::nothrow) UnpackingLeafNode(fNextNodeID++);
 	else if (S_ISDIR(mode))
 		unpackingNode = new(std::nothrow) Directory(fNextNodeID++);
 	else

@@ -15,7 +15,6 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Directory.cpp
 	GlobalFactory.cpp
 	kernel_interface.cpp
-	LeafNode.cpp
 	Node.cpp
 	Package.cpp
 	PackageDirectory.cpp
@@ -30,6 +29,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Resolvable.cpp
 	UnpackingAttributeCookie.cpp
 	UnpackingAttributeDirectoryCookie.cpp
+	UnpackingLeafNode.cpp
 	UnpackingNode.cpp
 	Version.cpp
 	Volume.cpp
