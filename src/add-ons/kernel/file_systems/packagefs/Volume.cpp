@@ -949,17 +949,26 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 	bool notify, Node*& _node)
 {
 	bool newNode = false;
+	UnpackingNode* unpackingNode;
 	Node* node = directory->FindChild(packageNode->Name());
-	if (node == NULL) {
-		status_t error = _CreateNode(packageNode->Mode(), directory,
-			packageNode->Name(), node);
+
+	if (node != NULL) {
+		unpackingNode = dynamic_cast<UnpackingNode*>(node);
+		if (unpackingNode == NULL)
+			RETURN_ERROR(B_BAD_VALUE);
+	} else {
+		status_t error = _CreateUnpackingNode(packageNode->Mode(), directory,
+			packageNode->Name(), unpackingNode);
 		if (error != B_OK)
 			RETURN_ERROR(error);
+
+		node = unpackingNode->GetNode();
 		newNode = true;
 	}
+
 	BReference<Node> nodeReference(node);
 
-	status_t error = node->AddPackageNode(packageNode);
+	status_t error = unpackingNode->AddPackageNode(packageNode);
 	if (error != B_OK) {
 		// remove the node, if created before
 		if (newNode)
@@ -971,7 +980,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		if (newNode) {
 			notify_entry_created(ID(), directory->ID(), node->Name(),
 				node->ID());
-		} else if (packageNode == node->GetPackageNode()) {
+		} else if (packageNode == unpackingNode->GetPackageNode()) {
 			// The new package node has become the one representing the node.
 			// Send stat changed notification for directories and entry
 			// removed + created notifications for files and symlinks.
@@ -999,15 +1008,19 @@ void
 Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 	Node* node, bool notify)
 {
+	UnpackingNode* unpackingNode = dynamic_cast<UnpackingNode*>(node);
+	if (unpackingNode == NULL)
+		return;
+
 	BReference<Node> nodeReference(node);
 
-	PackageNode* headPackageNode = node->GetPackageNode();
-	node->RemovePackageNode(packageNode);
+	PackageNode* headPackageNode = unpackingNode->GetPackageNode();
+	unpackingNode->RemovePackageNode(packageNode);
 
 	// If the node doesn't have any more package nodes attached, remove it
 	// completely.
 	bool nodeRemoved = false;
-	if (node->GetPackageNode() == NULL) {
+	if (unpackingNode->GetPackageNode() == NULL) {
 		// we get and put the vnode to notify the VFS
 		// TODO: We should probably only do that, if the node is known to the
 		// VFS in the first place.
@@ -1050,19 +1063,21 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 
 
 status_t
-Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
-	Node*& _node)
+Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
+	UnpackingNode*& _node)
 {
-	Node* node;
+	UnpackingNode* unpackingNode;
 	if (S_ISREG(mode) || S_ISLNK(mode))
-		node = new(std::nothrow) LeafNode(fNextNodeID++);
+		unpackingNode = new(std::nothrow) LeafNode(fNextNodeID++);
 	else if (S_ISDIR(mode))
-		node = new(std::nothrow) Directory(fNextNodeID++);
+		unpackingNode = new(std::nothrow) Directory(fNextNodeID++);
 	else
 		RETURN_ERROR(B_UNSUPPORTED);
 
-	if (node == NULL)
+	if (unpackingNode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+
+	Node* node = unpackingNode->GetNode();
 	BReference<Node> nodeReference(node, true);
 
 	status_t error = node->Init(parent, name);
@@ -1075,7 +1090,7 @@ Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
 	nodeReference.Detach();
 		// we keep the initial node reference for this table
 
-	_node = node;
+	_node = unpackingNode;
 	return B_OK;
 }
 
@@ -1327,23 +1342,25 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 		}
 
 		// create the directory
-		Node* directory;
-		error = _CreateNode(S_IFDIR, fRootDirectory, directoryName, directory);
+		UnpackingNode* directory;
+		error = _CreateUnpackingNode(S_IFDIR, fRootDirectory, directoryName,
+			directory);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
 		// publish its vnode, so the VFS will find it without asking us
-		error = PublishVNode(directory);
+		Node* directoryNode = directory->GetNode();
+		error = PublishVNode(directoryNode);
 		if (error != B_OK) {
-			_RemoveNode(directory);
+			_RemoveNode(directoryNode);
 			RETURN_ERROR(error);
 		}
 
 		// bind the directory
 		error = vfs_bind_mount_directory(st.st_dev, st.st_ino, fFSVolume->id,
-			directory->ID());
+			directoryNode->ID());
 
-		PutVNode(directory->ID());
+		PutVNode(directoryNode->ID());
 			// release our reference again -- on success
 			// vfs_bind_mount_directory() got one
 

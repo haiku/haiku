@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "PackageDirectory.h"
+#include "UnpackingNode.h"
 
 
 struct DirectoryIterator : DoublyLinkedListLinkImpl<DirectoryIterator> {
@@ -23,7 +24,7 @@ struct DirectoryIterator : DoublyLinkedListLinkImpl<DirectoryIterator> {
 typedef DoublyLinkedList<DirectoryIterator> DirectoryIteratorList;
 
 
-class Directory : public Node {
+class Directory : public Node, public UnpackingNode {
 public:
 								Directory(ino_t id);
 	virtual						~Directory();
@@ -38,6 +39,8 @@ public:
 	virtual	gid_t				GroupID() const;
 	virtual	timespec			ModifiedTime() const;
 	virtual	off_t				FileSize() const;
+
+	virtual	Node*				GetNode();
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode);
 	virtual	void				RemovePackageNode(PackageNode* packageNode);

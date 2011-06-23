@@ -53,11 +53,6 @@ public:
 	virtual	timespec			ModifiedTime() const = 0;
 	virtual	off_t				FileSize() const = 0;
 
-	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
-	virtual	void				RemovePackageNode(PackageNode* packageNode) = 0;
-
-	virtual	PackageNode*		GetPackageNode() = 0;
-
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize) = 0;
 	virtual	status_t			Read(io_request* request) = 0;
