@@ -31,13 +31,6 @@ public:
 
 	virtual	PackageNode*		GetPackageNode();
 
-	virtual	status_t			Read(off_t offset, void* buffer,
-									size_t* bufferSize);
-	virtual	status_t			Read(io_request* request);
-
-	virtual	status_t			ReadSymlink(void* buffer,
-									size_t* bufferSize);
-
 	virtual	status_t			OpenAttributeDirectory(
 									AttributeDirectoryCookie*& _cookie);
 	virtual	status_t			OpenAttribute(const char* name, int openMode,

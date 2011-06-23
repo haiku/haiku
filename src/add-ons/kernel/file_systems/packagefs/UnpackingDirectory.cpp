@@ -140,27 +140,6 @@ UnpackingDirectory::GetPackageNode()
 
 
 status_t
-UnpackingDirectory::Read(off_t offset, void* buffer, size_t* bufferSize)
-{
-	return B_IS_A_DIRECTORY;
-}
-
-
-status_t
-UnpackingDirectory::Read(io_request* request)
-{
-	return B_IS_A_DIRECTORY;
-}
-
-
-status_t
-UnpackingDirectory::ReadSymlink(void* buffer, size_t* bufferSize)
-{
-	return B_IS_A_DIRECTORY;
-}
-
-
-status_t
 UnpackingDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {
 	return UnpackingAttributeDirectoryCookie::Open(fPackageDirectories.Head(),
