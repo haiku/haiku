@@ -13,7 +13,6 @@
 
 #include <lock.h>
 
-#include "PackageFamily.h"
 #include "Volume.h"
 
 
@@ -73,7 +72,6 @@ private:
 			ino_t				fNodeID;
 			VolumeList			fVolumes;
 			Volume*				fSystemVolume;
-			PackageFamilyHashTable fPackageFamilies;
 			PackageLinksDirectory* fPackageLinksDirectory;
 };
 
