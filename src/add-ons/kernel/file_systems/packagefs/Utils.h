@@ -8,6 +8,9 @@
 
 #include <dirent.h>
 #include <string.h>
+#include <time.h>
+
+#include <OS.h>
 
 
 inline bool operator<(const timespec& a, const timespec& b)
@@ -35,6 +38,16 @@ set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name,
 	buffer->d_name[nameLen] = '\0';
 	buffer->d_reclen = length;
 	return true;
+}
+
+
+static inline void
+get_real_time(timespec& time)
+{
+	bigtime_t timeMicros = real_time_clock_usecs();
+
+	time.tv_sec = timeMicros / 1000000;
+	time.tv_nsec = (timeMicros % 1000000) * 1000;
 }
 
 
