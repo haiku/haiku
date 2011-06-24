@@ -1008,12 +1008,10 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	}
 	// allocate the bitmap buffer
 	if (error == B_OK) {
-		// NOTE: Maybe the code would look more robust if the
-		// "size" was not calculated here when we ask the server
-		// to allocate the bitmap. -Stephan
+		// TODO: Let the app_server return the size when it allocated the bitmap
 		int32 size = bytesPerRow * (bounds.IntegerHeight() + 1);
 
-		if (flags & B_BITMAP_NO_SERVER_LINK) {
+		if ((flags & B_BITMAP_NO_SERVER_LINK) != 0) {
 			fBasePointer = (uint8*)malloc(size);
 			if (fBasePointer) {
 				fSize = size;
@@ -1055,7 +1053,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 
 				if (allocationFlags & kNewAllocatorArea) {
 					error = allocator->AddArea(fServerArea, fArea,
-						fBasePointer);
+						fBasePointer, size);
 				} else {
 					error = allocator->AreaAndBaseFor(fServerArea, fArea,
 						fBasePointer);

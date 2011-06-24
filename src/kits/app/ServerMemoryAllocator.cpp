@@ -24,6 +24,10 @@
 #endif
 
 
+static const size_t kReservedSize = 128 * 1024 * 1024;
+static const size_t kReserveMaxSize = 32 * 1024 * 1024;
+
+
 namespace BPrivate {
 
 
@@ -61,7 +65,7 @@ ServerMemoryAllocator::InitCheck()
 
 status_t
 ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area,
-	uint8*& _base, bool readOnly)
+	uint8*& _base, size_t size, bool readOnly)
 {
 	area_mapping* mapping = new (std::nothrow) area_mapping;
 	if (mapping == NULL || !fAreas.AddItem(mapping)) {
@@ -73,11 +77,13 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area,
 	uint32 addressSpec = B_ANY_ADDRESS;
 	void* base;
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-	if (!readOnly) {
-		// reserve 128 MB of space for the area
+	if (!readOnly && size < kReserveMaxSize) {
+		// Reserve 128 MB of space for the area, but only if the area
+		// is smaller than 32 MB (else the address space waste would
+		// likely to be too large)
 		base = (void*)0x60000000;
 		status = _kern_reserve_address_range((addr_t*)&base, B_BASE_ADDRESS,
-			128 * 1024 * 1024);
+			kReservedSize);
 		addressSpec = status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS;
 	}
 #endif
