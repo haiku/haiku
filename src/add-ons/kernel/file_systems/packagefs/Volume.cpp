@@ -642,6 +642,9 @@ void
 Volume::PackageLinkDirectoryAdded(PackageLinkDirectory* directory)
 {
 	_AddPackageLinksNode(directory);
+
+	notify_entry_created(ID(), directory->Parent()->ID(), directory->Name(),
+		directory->ID());
 }
 
 
@@ -649,6 +652,9 @@ void
 Volume::PackageLinkDirectoryRemoved(PackageLinkDirectory* directory)
 {
 	_RemovePackageLinksNode(directory);
+
+	notify_entry_removed(ID(), directory->Parent()->ID(), directory->Name(),
+		directory->ID());
 }
 
 
