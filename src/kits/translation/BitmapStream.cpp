@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc.
+ * Copyright 2002-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,8 @@
 
 
 #include <BitmapStream.h>
+
+#include <new>
 
 #include <string.h>
 
@@ -29,7 +31,11 @@ BBitmapStream::BBitmapStream(BBitmap* bitmap)
 	fDetached = false;
 	fPosition = 0;
 	fSize = 0;
-	fBigEndianHeader = new TranslatorBitmap;
+	fBigEndianHeader = new (std::nothrow) TranslatorBitmap;
+	if (fBigEndianHeader == NULL) {
+		fBitmap = NULL;
+		return;
+	}
 
 	// Extract header information if bitmap is available
 	if (fBitmap != NULL && fBitmap->InitCheck() == B_OK) {
@@ -168,7 +174,8 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 			if (fBitmap == NULL) {
 				if (fHeader.bounds.left > 0.0 || fHeader.bounds.top > 0.0)
 					DEBUGGER("non-origin bounds!");
-				fBitmap = new BBitmap(fHeader.bounds, fHeader.colors);
+				fBitmap = new (std::nothrow )BBitmap(fHeader.bounds,
+					fHeader.colors);
 				if (fBitmap == NULL)
 					return B_ERROR;
 				if (!fBitmap->IsValid()) {
