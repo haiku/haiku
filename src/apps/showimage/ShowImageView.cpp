@@ -249,7 +249,6 @@ ShowImageView::Pulse()
 			GetMouse(&mousePos, &buttons, false);
 			if (Bounds().Contains(mousePos)) {
 				be_app->ObscureCursor();
-				_ShowToolBarIfEnabled(false);
 			}
 		} else
 			fHideCursorCountDown--;
@@ -1165,7 +1164,10 @@ void
 ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage* message)
 {
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
-	_ShowToolBarIfEnabled(true);
+	if (fHideCursor) {
+		// Show toolbar when mouse hits top 15 pixels, hide otherwise
+		_ShowToolBarIfEnabled(point.y <= 15);
+	}
 	if (fCreatingSelection)
 		_UpdateSelectionRect(point, false);
 	else if (fScrollingBitmap)
