@@ -1029,6 +1029,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 	}
 
 	BReference<Node> nodeReference(node);
+	NodeWriteLocker nodeWriteLocker(node);
 
 	status_t error = unpackingNode->AddPackageNode(packageNode);
 	if (error != B_OK) {
@@ -1075,6 +1076,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		return;
 
 	BReference<Node> nodeReference(node);
+	NodeWriteLocker nodeWriteLocker(node);
 
 	PackageNode* headPackageNode = unpackingNode->GetPackageNode();
 	unpackingNode->RemovePackageNode(packageNode);
