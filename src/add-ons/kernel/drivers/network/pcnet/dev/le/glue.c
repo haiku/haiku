@@ -1,6 +1,11 @@
 #include <sys/bus.h>
+#include <sys/mutex.h>
 
 #include <net/ethernet.h>
+#include <net/if.h>
+#include <net/if_media.h>
+
+#include <machine/bus.h>
 
 #include <dev/le/lancereg.h>
 #include <dev/le/lancevar.h>
