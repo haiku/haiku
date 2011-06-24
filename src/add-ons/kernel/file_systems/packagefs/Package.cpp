@@ -25,7 +25,7 @@ Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
 	fFileName(NULL),
 	fName(NULL),
 	fVersion(NULL),
-	fFamily(NULL),
+	fLinkDirectory(NULL),
 	fFD(-1),
 	fOpenCount(0),
 	fNodeID(nodeID),
