@@ -506,13 +506,30 @@ Volume::Mount(const char* parameterString)
 	if (stat(packages, &st) < 0)
 		RETURN_ERROR(B_ERROR);
 
+	// If no volume name is given, infer it from the mount type.
+	if (volumeName == NULL) {
+		switch (fMountType) {
+			case MOUNT_TYPE_SYSTEM:
+				volumeName = "system";
+				break;
+			case MOUNT_TYPE_COMMON:
+				volumeName = "common";
+				break;
+			case MOUNT_TYPE_HOME:
+				volumeName = "home";
+				break;
+			case MOUNT_TYPE_CUSTOM:
+				volumeName = "Package FS";
+				break;
+		}
+	}
+
 	// create the root node
 	fRootDirectory
 		= new(std::nothrow) ::RootDirectory(kRootDirectoryID, st.st_mtim);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	fRootDirectory->Init(NULL, volumeName != NULL ? volumeName : "Package FS",
-		0);
+	fRootDirectory->Init(NULL, volumeName, 0);
 	fNodes.Insert(fRootDirectory);
 
 	// get our mount point
