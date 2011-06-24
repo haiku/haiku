@@ -42,6 +42,19 @@ Node::Init(Directory* parent, const char* name)
 }
 
 
+status_t
+Node::VFSInit(dev_t deviceID)
+{
+	return B_OK;
+}
+
+
+void
+Node::VFSUninit()
+{
+}
+
+
 void
 Node::SetID(ino_t id)
 {

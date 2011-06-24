@@ -29,9 +29,6 @@ public:
 
 	virtual	status_t			Init(Directory* parent, const char* name);
 
-	virtual	status_t			VFSInit(dev_t deviceID);
-	virtual	void				VFSUninit();
-
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			Read(io_request* request);
