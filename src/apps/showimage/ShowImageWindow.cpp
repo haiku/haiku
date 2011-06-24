@@ -1543,6 +1543,7 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 		fScrollView->MoveBy(0, diff);
 		fVerticalScrollBar->ResizeBy(0, -diff);
 		fVerticalScrollBar->MoveBy(0, diff);
+		fToolBarView->MoveBy(0, diff);
 		if (!visible)
 			fToolBarView->Hide();
 	}
