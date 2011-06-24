@@ -116,7 +116,7 @@ PackageLinksDirectory::AddPackage(Package* package)
 		// There already is an entry with the name.
 		PackageLinkDirectory* otherLinkDirectory
 			= dynamic_cast<PackageLinkDirectory*>(child);
-		if (otherLinkDirectory != NULL)
+		if (otherLinkDirectory == NULL)
 			RETURN_ERROR(B_BAD_VALUE);
 
 		// There's already a package link directory. Delete the one we created
