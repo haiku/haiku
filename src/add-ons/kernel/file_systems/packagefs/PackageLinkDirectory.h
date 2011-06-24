@@ -19,7 +19,8 @@ public:
 	virtual						~PackageLinkDirectory();
 
 			status_t			Init(Directory* parent, Package* package);
-	virtual	status_t			Init(Directory* parent, const char* name);
+	virtual	status_t			Init(Directory* parent, const char* name,
+									uint32 flags);
 
 	virtual	mode_t				Mode() const;
 	virtual	uid_t				UserID() const;

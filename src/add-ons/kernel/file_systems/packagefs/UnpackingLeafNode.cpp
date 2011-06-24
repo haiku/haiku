@@ -28,13 +28,6 @@ UnpackingLeafNode::~UnpackingLeafNode()
 
 
 status_t
-UnpackingLeafNode::Init(Directory* parent, const char* name)
-{
-	return Node::Init(parent, name);
-}
-
-
-status_t
 UnpackingLeafNode::VFSInit(dev_t deviceID)
 {
 	if (PackageLeafNode* packageNode = fPackageNodes.Head())

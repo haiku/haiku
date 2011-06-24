@@ -23,6 +23,18 @@ class Directory;
 class PackageNode;
 
 
+// node flags
+enum {
+	NODE_FLAG_KEEP_NAME		= 0x01,
+		// Init(): Take over ownership of the given name (i.e. free in
+		// destructor).
+	NODE_FLAG_CONST_NAME	= 0x02,
+		// Init(): The given name is a constant that won't go away during the
+		// lifetime of the object. No need to copy.
+	NODE_FLAG_OWNS_NAME		= NODE_FLAG_CONST_NAME
+};
+
+
 class Node : public BReferenceable, public DoublyLinkedListLinkImpl<Node> {
 public:
 								Node(ino_t id);
@@ -42,7 +54,10 @@ public:
 			Node*&				IDHashTableNext()
 									{ return fIDHashTableNext; }
 
-	virtual	status_t			Init(Directory* parent, const char* name);
+	virtual	status_t			Init(Directory* parent, const char* name,
+									uint32 flags);
+									// If specified to keep the name, it does
+									// so also on error.
 
 	virtual	status_t			VFSInit(dev_t deviceID);
 	virtual	void				VFSUninit();
@@ -75,6 +90,7 @@ protected:
 			char*				fName;
 			Node*				fNameHashTableNext;
 			Node*				fIDHashTableNext;
+			uint32				fFlags;
 };
 
 

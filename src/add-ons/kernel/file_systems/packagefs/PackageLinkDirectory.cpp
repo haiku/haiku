@@ -61,11 +61,6 @@ public:
 	{
 	}
 
-	virtual status_t Init(Directory* parent, const char* name)
-	{
-		return Node::Init(parent, name);
-	}
-
 	virtual mode_t Mode() const
 	{
 		return S_IFLNK | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH
@@ -162,7 +157,7 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 	if (fSelfLink == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fSelfLink->Init(this, kSelfLinkName);
+	status_t error = fSelfLink->Init(this, kSelfLinkName, NODE_FLAG_CONST_NAME);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -182,7 +177,6 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 	char* name = (char*)malloc(size);
 	if (name == NULL)
 		return B_NO_MEMORY;
-	MemoryDeleter nameDeleter(name);
 
 	memcpy(name, package->Name(), nameLength + 1);
 	if (version != NULL) {
@@ -191,8 +185,7 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 	}
 
 	// init the directory/node
-	error = Init(parent, name);
-		// TODO: This copies the name unnecessarily!
+	error = Init(parent, name, NODE_FLAG_KEEP_NAME);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -204,9 +197,9 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 
 
 status_t
-PackageLinkDirectory::Init(Directory* parent, const char* name)
+PackageLinkDirectory::Init(Directory* parent, const char* name, uint32 flags)
 {
-	return Directory::Init(parent, name);
+	return Directory::Init(parent, name, flags);
 }
 
 

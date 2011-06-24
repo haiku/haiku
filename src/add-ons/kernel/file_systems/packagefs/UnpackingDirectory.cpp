@@ -27,13 +27,6 @@ UnpackingDirectory::~UnpackingDirectory()
 }
 
 
-status_t
-UnpackingDirectory::Init(Directory* parent, const char* name)
-{
-	return Directory::Init(parent, name);
-}
-
-
 mode_t
 UnpackingDirectory::Mode() const
 {

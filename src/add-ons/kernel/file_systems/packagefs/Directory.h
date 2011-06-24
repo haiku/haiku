@@ -27,7 +27,8 @@ public:
 								Directory(ino_t id);
 	virtual						~Directory();
 
-	virtual	status_t			Init(Directory* parent, const char* name);
+	virtual	status_t			Init(Directory* parent, const char* name,
+									uint32 flags);
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);

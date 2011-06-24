@@ -511,7 +511,8 @@ Volume::Mount(const char* parameterString)
 		= new(std::nothrow) ::RootDirectory(kRootDirectoryID, st.st_mtim);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	fRootDirectory->Init(NULL, volumeName != NULL ? volumeName : "Package FS");
+	fRootDirectory->Init(NULL, volumeName != NULL ? volumeName : "Package FS",
+		0);
 	fNodes.Insert(fRootDirectory);
 
 	// get our mount point
@@ -1101,7 +1102,7 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
 	Node* node = unpackingNode->GetNode();
 	BReference<Node> nodeReference(node, true);
 
-	status_t error = node->Init(parent, name);
+	status_t error = node->Init(parent, name, 0);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

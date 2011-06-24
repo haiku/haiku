@@ -16,8 +16,6 @@ public:
 								UnpackingLeafNode(ino_t id);
 	virtual						~UnpackingLeafNode();
 
-	virtual	status_t			Init(Directory* parent, const char* name);
-
 	virtual	status_t			VFSInit(dev_t deviceID);
 	virtual	void				VFSUninit();
 

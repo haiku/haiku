@@ -30,13 +30,6 @@ PackageLinksDirectory::~PackageLinksDirectory()
 }
 
 
-status_t
-PackageLinksDirectory::Init(Directory* parent, const char* name)
-{
-	return Directory::Init(parent, name);
-}
-
-
 mode_t
 PackageLinksDirectory::Mode() const
 {

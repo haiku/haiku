@@ -16,8 +16,6 @@ public:
 								UnpackingDirectory(ino_t id);
 	virtual						~UnpackingDirectory();
 
-	virtual	status_t			Init(Directory* parent, const char* name);
-
 	virtual	mode_t				Mode() const;
 	virtual	uid_t				UserID() const;
 	virtual	gid_t				GroupID() const;
