@@ -10,6 +10,9 @@
 #include "Package.h"
 
 
+class PackageLinksListener;
+
+
 class PackageLinkDirectory : public Directory {
 public:
 								PackageLinkDirectory();
@@ -29,8 +32,10 @@ public:
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie);
 
-			void				AddPackage(Package* package);
-			void				RemovePackage(Package* package);
+			void				AddPackage(Package* package,
+									PackageLinksListener* listener);
+			void				RemovePackage(Package* package,
+									PackageLinksListener* listener);
 
 			bool				IsEmpty() const
 									{ return fPackages.IsEmpty(); }

@@ -10,6 +10,7 @@
 
 
 class Package;
+class PackageLinksListener;
 
 
 class PackageLinksDirectory : public Directory {
@@ -30,11 +31,15 @@ public:
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie);
 
+			void				SetListener(PackageLinksListener* listener)
+									{ fListener = listener; }
+
 			status_t			AddPackage(Package* package);
 			void				RemovePackage(Package* package);
 
 private:
 			timespec			fModifiedTime;
+			PackageLinksListener* fListener;
 };
 
 

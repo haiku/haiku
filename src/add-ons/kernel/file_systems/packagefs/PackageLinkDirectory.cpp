@@ -10,6 +10,7 @@
 
 #include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
+#include "PackageLinksListener.h"
 #include "Utils.h"
 #include "Version.h"
 
@@ -60,7 +61,7 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 		RETURN_ERROR(error);
 
 	// add the package
-	AddPackage(package);
+	AddPackage(package, NULL);
 
 	return B_OK;
 }
@@ -131,21 +132,40 @@ PackageLinkDirectory::OpenAttribute(const char* name, int openMode,
 
 
 void
-PackageLinkDirectory::AddPackage(Package* package)
+PackageLinkDirectory::AddPackage(Package* package,
+	PackageLinksListener* listener)
 {
+	NodeWriteLocker writeLocker(this);
+
+	if (listener != NULL)
+		listener->PackageLinkDirectoryRemoved(this);
+
 	// TODO: Add in priority order!
 	fPackages.Add(package);
 	package->SetLinkDirectory(this);
+
+	if (listener != NULL)
+		listener->PackageLinkDirectoryAdded(this);
+	// TODO: The notifications should only happen as necessary!
 }
 
 
 void
-PackageLinkDirectory::RemovePackage(Package* package)
+PackageLinkDirectory::RemovePackage(Package* package,
+	PackageLinksListener* listener)
 {
-
 	ASSERT(package->LinkDirectory() == this);
+
+	NodeWriteLocker writeLocker(this);
+
+	if (listener != NULL)
+		listener->PackageLinkDirectoryRemoved(this);
 
 	package->SetLinkDirectory(NULL);
 	fPackages.Remove(package);
 	// TODO: Check whether that was the top priority package!
+
+	if (listener != NULL && !IsEmpty())
+		listener->PackageLinkDirectoryAdded(this);
+	// TODO: The notifications should only happen as necessary!
 }
