@@ -60,7 +60,7 @@ PackageFSRoot::Init()
 		return B_NO_MEMORY;
 
 	status_t error = fPackageLinksDirectory->Init(NULL,
-		kPackageLinksDirectoryName);
+		kPackageLinksDirectoryName, 0);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

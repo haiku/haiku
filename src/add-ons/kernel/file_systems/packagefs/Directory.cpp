@@ -31,13 +31,13 @@ Directory::~Directory()
 
 
 status_t
-Directory::Init(Directory* parent, const char* name)
+Directory::Init(Directory* parent, const char* name, uint32 flags)
 {
-	status_t error = fChildTable.Init();
+	status_t error = Node::Init(parent, name, flags);
 	if (error != B_OK)
 		return error;
 
-	return Node::Init(parent, name);
+	return fChildTable.Init();
 }
 
 
