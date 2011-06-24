@@ -639,23 +639,6 @@ Volume::AddPackageDomain(const char* path)
 
 
 void
-Volume::_RemovePackageDomain(PackageDomain* domain)
-{
-	// remove the domain's packages from the node tree
-	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
-	VolumeWriteLocker volumeLocker(this);
-	for (PackageFileNameHashTable::Iterator it
-			= domain->Packages().GetIterator(); Package* package = it.Next();) {
-		_RemovePackageContent(package, NULL, false);
-	}
-
-	// remove the domain
-	fPackageDomains.Remove(domain);
-	domain->ReleaseReference();
-}
-
-
-void
 Volume::PackageLinkDirectoryAdded(PackageLinkDirectory* directory)
 {
 	_AddPackageLinksNode(directory);
@@ -803,6 +786,23 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 	domain->AcquireReference();
 
 	return B_OK;
+}
+
+
+void
+Volume::_RemovePackageDomain(PackageDomain* domain)
+{
+	// remove the domain's packages from the node tree
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+	VolumeWriteLocker volumeLocker(this);
+	for (PackageFileNameHashTable::Iterator it
+			= domain->Packages().GetIterator(); Package* package = it.Next();) {
+		_RemovePackageContent(package, NULL, false);
+	}
+
+	// remove the domain
+	fPackageDomains.Remove(domain);
+	domain->ReleaseReference();
 }
 
 
