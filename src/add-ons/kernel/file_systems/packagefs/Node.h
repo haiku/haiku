@@ -31,7 +31,7 @@ enum {
 	NODE_FLAG_CONST_NAME	= 0x02,
 		// Init(): The given name is a constant that won't go away during the
 		// lifetime of the object. No need to copy.
-	NODE_FLAG_OWNS_NAME		= NODE_FLAG_CONST_NAME
+	NODE_FLAG_OWNS_NAME		= NODE_FLAG_KEEP_NAME
 };
 
 
