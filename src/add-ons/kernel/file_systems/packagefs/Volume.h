@@ -16,6 +16,7 @@
 
 #include "Node.h"
 #include "PackageDomain.h"
+#include "PackageLinksListener.h"
 
 
 class Directory;
@@ -32,7 +33,8 @@ enum MountType {
 };
 
 
-class Volume : public DoublyLinkedListLinkImpl<Volume> {
+class Volume : public DoublyLinkedListLinkImpl<Volume>,
+	private PackageLinksListener {
 public:
 								Volume(fs_volume* fsVolume);
 								~Volume();
@@ -71,6 +73,13 @@ public:
 			status_t			PublishVNode(Node* node);
 
 			status_t			AddPackageDomain(const char* path);
+
+private:
+	// PackageLinksListener
+	virtual	void				PackageLinkDirectoryAdded(
+										PackageLinkDirectory* directory);
+	virtual	void				PackageLinkDirectoryRemoved(
+										PackageLinkDirectory* directory);
 
 private:
 			struct Job;
@@ -147,6 +156,10 @@ private:
 
 			status_t			_AddPackageLinksDirectory();
 			void				_RemovePackageLinksDirectory();
+			void				_AddPackageLinksNode(Node* node);
+			void				_RemovePackageLinksNode(Node* node);
+
+	inline	Volume*				_SystemVolumeIfNotSelf() const;
 
 private:
 	mutable	rw_lock				fLock;

@@ -35,6 +35,7 @@
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageFSRoot.h"
+#include "PackageLinkDirectory.h"
 #include "PackageLinksDirectory.h"
 #include "PackageSymlink.h"
 #include "Resolvable.h"
@@ -619,6 +620,20 @@ Volume::AddPackageDomain(const char* path)
 }
 
 
+void
+Volume::PackageLinkDirectoryAdded(PackageLinkDirectory* directory)
+{
+	_AddPackageLinksNode(directory);
+}
+
+
+void
+Volume::PackageLinkDirectoryRemoved(PackageLinkDirectory* directory)
+{
+	_RemovePackageLinksNode(directory);
+}
+
+
 /*static*/ status_t
 Volume::_PackageLoaderEntry(void* data)
 {
@@ -734,6 +749,7 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 	}
 
 	// add the packages to the node tree
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 	VolumeWriteLocker volumeLocker(this);
 	for (PackageFileNameHashTable::Iterator it
 			= domain->Packages().GetIterator(); Package* package = it.Next();) {
@@ -1216,6 +1232,7 @@ Volume::_DomainEntryCreated(PackageDomain* domain, dev_t deviceID,
 	if (error != B_OK)
 		return;
 
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 	VolumeWriteLocker volumeLocker(this);
 	domain->AddPackage(package);
 
@@ -1244,6 +1261,7 @@ Volume::_DomainEntryRemoved(PackageDomain* domain, dev_t deviceID,
 	BReference<Package> packageReference(package);
 
 	// remove the package
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
 	VolumeWriteLocker volumeLocker(this);
 	_RemovePackageContent(package, NULL, true);
 	domain->RemovePackage(package);
@@ -1388,12 +1406,12 @@ Volume::_AddPackageLinksDirectory()
 	NodeWriteLocker rootDirectoryWriteLocker(fRootDirectory);
 	NodeWriteLocker packageLinksDirectoryWriteLocker(packageLinksDirectory);
 
-	packageLinksDirectory->SetID(fNextNodeID++);
 	packageLinksDirectory->SetParent(fRootDirectory);
-
 	fRootDirectory->AddChild(packageLinksDirectory);
-	fNodes.Insert(packageLinksDirectory);
-	packageLinksDirectory->AcquireReference();
+
+	_AddPackageLinksNode(packageLinksDirectory);
+
+	packageLinksDirectory->SetListener(this);
 
 	return B_OK;
 }
@@ -1410,7 +1428,54 @@ Volume::_RemovePackageLinksDirectory()
 	NodeWriteLocker packageLinksDirectoryWriteLocker(packageLinksDirectory);
 
 	if (packageLinksDirectory->Parent() == fRootDirectory) {
-		_RemoveNode(packageLinksDirectory);
+		packageLinksDirectory->SetListener(NULL);
+		_RemovePackageLinksNode(packageLinksDirectory);
 		packageLinksDirectory->SetParent(NULL);
 	}
+}
+
+
+void
+Volume::_AddPackageLinksNode(Node* node)
+{
+	node->SetID(fNextNodeID++);
+
+	fNodes.Insert(node);
+	node->AcquireReference();
+
+	// If this is a directory, recursively add descendants. The directory tree
+	// for the package links isn't deep, so we can do recursion.
+	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		for (Node* child = directory->FirstChild(); child != NULL;
+				child = directory->NextChild(child)) {
+			NodeWriteLocker childWriteLocker(child);
+			_AddPackageLinksNode(child);
+		}
+	}
+}
+
+
+void
+Volume::_RemovePackageLinksNode(Node* node)
+{
+	// If this is a directory, recursively remove descendants. The directory
+	// tree for the package links isn't deep, so we can do recursion.
+	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		for (Node* child = directory->FirstChild(); child != NULL;
+				child = directory->NextChild(child)) {
+			NodeWriteLocker childWriteLocker(child);
+			_RemovePackageLinksNode(child);
+		}
+	}
+
+	_RemoveNode(node);
+}
+
+
+inline Volume*
+Volume::_SystemVolumeIfNotSelf() const
+{
+	if (Volume* systemVolume = fPackageFSRoot->SystemVolume())
+		return systemVolume == this ? NULL : systemVolume;
+	return NULL;
 }

@@ -11,12 +11,14 @@
 #include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "PackageLinkDirectory.h"
+#include "PackageLinksListener.h"
 #include "Utils.h"
 
 
 PackageLinksDirectory::PackageLinksDirectory()
 	:
-	Directory(0)
+	Directory(0),
+	fListener(NULL)
 		// the ID needs to be assigned later, when added to a volume
 {
 	get_real_time(fModifiedTime);
@@ -111,18 +113,26 @@ PackageLinksDirectory::AddPackage(Package* package)
 	// add the link directory
 	NodeWriteLocker writeLocker(this);
 	if (Node* child = FindChild(linkDirectory->Name())) {
+		// There already is an entry with the name.
 		PackageLinkDirectory* otherLinkDirectory
 			= dynamic_cast<PackageLinkDirectory*>(child);
 		if (otherLinkDirectory != NULL)
 			RETURN_ERROR(B_BAD_VALUE);
 
-		linkDirectory->RemovePackage(package);
+		// There's already a package link directory. Delete the one we created
+		// and add the package to the pre-existing one.
+		linkDirectory->RemovePackage(package, NULL);
 		linkDirectory = otherLinkDirectory;
-		linkDirectory->AddPackage(package);
-	} else
+		linkDirectory->AddPackage(package, fListener);
+	} else {
+		// No entry is in the way, so just add the link directory.
 		AddChild(linkDirectory);
 
-// TODO:...
+		if (fListener != NULL) {
+			NodeWriteLocker linkDirectoryWriteLocker(linkDirectory);
+			fListener->PackageLinkDirectoryAdded(linkDirectory);
+		}
+	}
 
 	return B_OK;
 }
@@ -140,12 +150,10 @@ PackageLinksDirectory::RemovePackage(Package* package)
 
 	NodeWriteLocker writeLocker(this);
 
-	linkDirectory->RemovePackage(package);
+	linkDirectory->RemovePackage(package, fListener);
 
 	// if empty, remove the link directory itself
 	if (linkDirectory->IsEmpty())
 		RemoveChild(linkDirectory);
-
-// TODO:...
 }
 
