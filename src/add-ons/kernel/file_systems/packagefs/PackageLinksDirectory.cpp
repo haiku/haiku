@@ -10,6 +10,7 @@
 
 #include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
+#include "PackageLinkDirectory.h"
 #include "Utils.h"
 
 
@@ -30,10 +31,6 @@ PackageLinksDirectory::~PackageLinksDirectory()
 status_t
 PackageLinksDirectory::Init(Directory* parent, const char* name)
 {
-	status_t error = fPackageFamilies.Init();
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
 	return Directory::Init(parent, name);
 }
 
@@ -98,26 +95,32 @@ PackageLinksDirectory::OpenAttribute(const char* name, int openMode,
 status_t
 PackageLinksDirectory::AddPackage(Package* package)
 {
-	// Create a package family -- there might already be one, but since that's
-	// unlikely, we don't bother to check and recheck later.
-	PackageFamily* packageFamily = new(std::nothrow) PackageFamily;
-	if (packageFamily == NULL)
+	// Create a package link directory -- there might already be one, but since
+	// that's unlikely, we don't bother to check and recheck later.
+	PackageLinkDirectory* linkDirectory
+		= new(std::nothrow) PackageLinkDirectory;
+	if (linkDirectory == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<PackageFamily> packageFamilyDeleter(packageFamily);
+	BReference<PackageLinkDirectory> linkDirectoryReference(linkDirectory,
+		true);
 
-	status_t error = packageFamily->Init(package);
+	status_t error = linkDirectory->Init(this, package);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// add the family
+	// add the link directory
 	NodeWriteLocker writeLocker(this);
-	if (PackageFamily* otherPackageFamily
-			= fPackageFamilies.Lookup(packageFamily->Name())) {
-		packageFamily->RemovePackage(package);
-		packageFamily = otherPackageFamily;
-		packageFamily->AddPackage(package);
+	if (Node* child = FindChild(linkDirectory->Name())) {
+		PackageLinkDirectory* otherLinkDirectory
+			= dynamic_cast<PackageLinkDirectory*>(child);
+		if (otherLinkDirectory != NULL)
+			RETURN_ERROR(B_BAD_VALUE);
+
+		linkDirectory->RemovePackage(package);
+		linkDirectory = otherLinkDirectory;
+		linkDirectory->AddPackage(package);
 	} else
-		fPackageFamilies.Insert(packageFamilyDeleter.Detach());
+		AddChild(linkDirectory);
 
 // TODO:...
 
@@ -128,18 +131,20 @@ PackageLinksDirectory::AddPackage(Package* package)
 void
 PackageLinksDirectory::RemovePackage(Package* package)
 {
-	NodeWriteLocker writeLocker(this);
-
-	PackageFamily* packageFamily = package->Family();
-	if (packageFamily == NULL)
+	// get the package's link directory and remove the package from it
+	PackageLinkDirectory* linkDirectory = package->LinkDirectory();
+	if (linkDirectory == NULL)
 		return;
 
-	packageFamily->RemovePackage(package);
+	BReference<PackageLinkDirectory> linkDirectoryReference(linkDirectory);
 
-	if (packageFamily->IsEmpty()) {
-		fPackageFamilies.Remove(packageFamily);
-		delete packageFamily;
-	}
+	NodeWriteLocker writeLocker(this);
+
+	linkDirectory->RemovePackage(package);
+
+	// if empty, remove the link directory itself
+	if (linkDirectory->IsEmpty())
+		RemoveChild(linkDirectory);
 
 // TODO:...
 }

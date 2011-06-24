@@ -20,7 +20,7 @@
 
 
 class PackageDomain;
-class PackageFamily;
+class PackageLinkDirectory;
 class Version;
 
 
@@ -44,10 +44,11 @@ public:
 			::Version*			Version() const
 									{ return fVersion; }
 
-			void				SetFamily(PackageFamily* family)
-									{ fFamily = family; }
-			PackageFamily*		Family() const
-									{ return fFamily; }
+			void				SetLinkDirectory(
+									PackageLinkDirectory* linkDirectory)
+									{ fLinkDirectory = linkDirectory; }
+			PackageLinkDirectory* LinkDirectory() const
+									{ return fLinkDirectory; }
 
 			Package*&			FileNameHashTableNext()
 									{ return fFileNameHashTableNext; }
@@ -67,7 +68,7 @@ private:
 			char*				fFileName;
 			char*				fName;
 			::Version*			fVersion;
-			PackageFamily*		fFamily;
+			PackageLinkDirectory* fLinkDirectory;
 			int					fFD;
 			uint32				fOpenCount;
 			Package*			fFileNameHashTableNext;

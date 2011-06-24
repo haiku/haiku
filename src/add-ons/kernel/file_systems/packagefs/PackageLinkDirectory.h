@@ -2,21 +2,20 @@
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef PACKAGE_LINKS_DIRECTORY_H
-#define PACKAGE_LINKS_DIRECTORY_H
+#ifndef PACKAGE_LINK_DIRECTORY_H
+#define PACKAGE_LINK_DIRECTORY_H
 
 
 #include "Directory.h"
+#include "Package.h"
 
 
-class Package;
-
-
-class PackageLinksDirectory : public Directory {
+class PackageLinkDirectory : public Directory {
 public:
-								PackageLinksDirectory();
-	virtual						~PackageLinksDirectory();
+								PackageLinkDirectory();
+	virtual						~PackageLinkDirectory();
 
+			status_t			Init(Directory* parent, Package* package);
 	virtual	status_t			Init(Directory* parent, const char* name);
 
 	virtual	mode_t				Mode() const;
@@ -30,12 +29,16 @@ public:
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie);
 
-			status_t			AddPackage(Package* package);
+			void				AddPackage(Package* package);
 			void				RemovePackage(Package* package);
+
+			bool				IsEmpty() const
+									{ return fPackages.IsEmpty(); }
 
 private:
 			timespec			fModifiedTime;
+			PackageList			fPackages;
 };
 
 
-#endif	// PACKAGE_LINKS_DIRECTORY_H
+#endif	// PACKAGE_LINK_DIRECTORY_H
