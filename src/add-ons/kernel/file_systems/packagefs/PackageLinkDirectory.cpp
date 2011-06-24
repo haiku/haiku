@@ -135,8 +135,9 @@ private:
 
 PackageLinkDirectory::PackageLinkDirectory()
 	:
-	Directory(0)
+	Directory(0),
 		// the ID needs to be assigned later, when added to a volume
+	fSelfLink(NULL)
 {
 	get_real_time(fModifiedTime);
 }
