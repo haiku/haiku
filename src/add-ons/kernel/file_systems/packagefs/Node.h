@@ -44,8 +44,8 @@ public:
 
 	virtual	status_t			Init(Directory* parent, const char* name);
 
-	virtual	status_t			VFSInit(dev_t deviceID) = 0;
-	virtual	void				VFSUninit() = 0;
+	virtual	status_t			VFSInit(dev_t deviceID);
+	virtual	void				VFSUninit();
 
 			void				SetID(ino_t id);
 			void				SetParent(Directory* parent);
