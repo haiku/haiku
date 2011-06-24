@@ -9,6 +9,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <TextView.h>
 
 #include "DevicesView.h"
@@ -44,20 +45,13 @@ DevicesApplication::DevicesApplication()
 DevicesWindow::DevicesWindow()
 	:
 	BWindow(BRect(50, 50, 750, 550), B_TRANSLATE_SYSTEM_NAME("Devices"),
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS 
-		| B_AUTO_UPDATE_SIZE_LIMITS
-		| B_QUIT_ON_WINDOW_CLOSE)
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS  | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_QUIT_ON_WINDOW_CLOSE)
 {
-	float minWidth;
-	float maxWidth;
-	float minHeight;
-	float maxHeight;
-	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	minWidth = 600;
-	minHeight = 300;
-	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
-	fDevicesView = new DevicesView(Bounds());
-	AddChild(fDevicesView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(0)
+		.Add(fDevicesView = new DevicesView());
+	GetLayout()->SetExplicitMinSize(BSize(600, 300));
 }
 
 

@@ -9,16 +9,10 @@
 #define DEVICESVIEW_H
 
 
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <OutlineListView.h>
 #include <PopUpMenu.h>
-#include <SplitLayoutBuilder.h>
-#include <ScrollView.h>
-#include <String.h>
-#include <StringView.h>
 #include <TabView.h>
 #include <View.h>
 
@@ -50,7 +44,7 @@ typedef std::vector<Device*> Devices;
 
 class DevicesView : public BView {
 	public:
-				DevicesView(const BRect& r);
+				DevicesView();
 				~DevicesView();
 
 		virtual void CreateLayout();

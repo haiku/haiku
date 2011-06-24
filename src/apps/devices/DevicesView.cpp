@@ -9,7 +9,10 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <MenuBar.h>
+#include <ScrollView.h>
+#include <String.h>
 
 #include <iostream>
 
@@ -18,8 +21,9 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "DevicesView"
 
-DevicesView::DevicesView(const BRect& rect)
-	: BView(rect, "DevicesView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
+DevicesView::DevicesView()
+	:
+	BView("DevicesView", B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	CreateLayout();
 	RescanDevices();
@@ -30,8 +34,6 @@ DevicesView::DevicesView(const BRect& rect)
 void
 DevicesView::CreateLayout()
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	BMenuBar* menuBar = new BMenuBar("menu");
 	BMenu* menu = new BMenu(B_TRANSLATE("Devices"));
 	BMenuItem* item;
@@ -90,18 +92,15 @@ DevicesView::CreateLayout()
 	fTabView->AddTab(fAttributesView, fDetailedTab);
 	fDetailedTab->SetLabel(B_TRANSLATE("Detailed"));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-				.Add(menuBar)
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 5)
-					.Add(BGroupLayoutBuilder(B_VERTICAL, 5)
-						.Add(fOrderByMenu, 1)
-						.Add(scrollView, 2)
-						.TopView()
-					)
-					.Add(fTabView, 2)
-					.SetInsets(5, 5, 5, 5)
-				).TopView()
-			);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(menuBar)
+		.AddSplit(B_HORIZONTAL)
+			.SetInsets(B_USE_ITEM_INSETS)
+			.AddGroup(B_VERTICAL)
+				.Add(fOrderByMenu, 1)
+				.Add(scrollView, 2)
+				.End()
+			.Add(fTabView, 2);
 }
 
 
