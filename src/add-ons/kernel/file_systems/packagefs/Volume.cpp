@@ -1486,7 +1486,8 @@ Volume::_RemovePackageLinksNode(Node* node)
 		}
 	}
 
-	_RemoveNode(node);
+	fNodes.Remove(node);
+	node->ReleaseReference();
 }
 
 
