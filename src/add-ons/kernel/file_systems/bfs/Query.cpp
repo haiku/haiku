@@ -4,12 +4,14 @@
  * This file may be used under the terms of the MIT License.
  */
 
+
 /*!	Query parsing and evaluation
 
 	The pattern matching is roughly based on code originally written
 	by J. Kercheval, and on code written by Kenneth Almquist, though
 	it shares no code.
 */
+
 
 #include "Query.h"
 
@@ -21,6 +23,7 @@
 #include "Index.h"
 #include "Inode.h"
 #include "Volume.h"
+
 
 // The parser has a very static design, but it will do what is required.
 //
@@ -1657,10 +1660,10 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 
 	// notify query listeners
 
-	if (stillInQuery)
+	if (stillInQuery) {
 		notify_query_attr_changed(fPort, fToken, fVolume->ID(),
 			fVolume->ToVnode(inode->Parent()), name, inode->ID());
-	else if (entryCreated) {
+	} else if (entryCreated) {
 		notify_query_entry_created(fPort, fToken, fVolume->ID(),
 			fVolume->ToVnode(inode->Parent()), name, inode->ID());
 	} else {
