@@ -107,6 +107,7 @@ private:
 			status_t			_AddInitialPackageDomain(const char* path);
 			status_t			_AddPackageDomain(PackageDomain* domain,
 									bool notify);
+			void				_RemovePackageDomain(PackageDomain* domain);
 			status_t			_LoadPackage(Package* package);
 
 			status_t			_AddPackageContent(Package* package,

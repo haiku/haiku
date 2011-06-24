@@ -438,8 +438,8 @@ Volume::~Volume()
 {
 	_TerminatePackageLoader();
 
-	while (PackageDomain* packageDomain = fPackageDomains.RemoveHead())
-		packageDomain->ReleaseReference();
+	while (PackageDomain* packageDomain = fPackageDomains.Head())
+		_RemovePackageDomain(packageDomain);
 
 	// remove all nodes from the ID hash table
 	Node* node = fNodes.Clear(true);
@@ -635,6 +635,23 @@ Volume::AddPackageDomain(const char* path)
 	_PushJob(job);
 
 	return B_OK;
+}
+
+
+void
+Volume::_RemovePackageDomain(PackageDomain* domain)
+{
+	// remove the domain's packages from the node tree
+	VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+	VolumeWriteLocker volumeLocker(this);
+	for (PackageFileNameHashTable::Iterator it
+			= domain->Packages().GetIterator(); Package* package = it.Next();) {
+		_RemovePackageContent(package, NULL, false);
+	}
+
+	// remove the domain
+	fPackageDomains.Remove(domain);
+	domain->ReleaseReference();
 }
 
 
