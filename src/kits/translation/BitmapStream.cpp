@@ -32,7 +32,7 @@ BBitmapStream::BBitmapStream(BBitmap* bitmap)
 	fBigEndianHeader = new TranslatorBitmap;
 
 	// Extract header information if bitmap is available
-	if (fBitmap != NULL) {
+	if (fBitmap != NULL && fBitmap->InitCheck() == B_OK) {
 		fHeader.magic = B_TRANSLATOR_BITMAP;
 		fHeader.bounds = fBitmap->Bounds();
 		fHeader.rowBytes = fBitmap->BytesPerRow();
@@ -45,7 +45,8 @@ BBitmapStream::BBitmapStream(BBitmap* bitmap)
 			memcpy(fBigEndianHeader, &fHeader, sizeof(TranslatorBitmap));
 		else
 			SwapHeader(&fHeader, fBigEndianHeader);
-	}
+	} else
+		fBitmap = NULL;
 }
 
 
@@ -71,8 +72,8 @@ BBitmapStream::~BBitmapStream()
 ssize_t
 BBitmapStream::ReadAt(off_t pos, void* buffer, size_t size)
 {
-	if (!fBitmap)
-		return B_ERROR;
+	if (fBitmap == NULL)
+		return B_NO_INIT;
 	if (size == 0)
 		return B_OK;
 	if (pos >= fSize || pos < 0 || buffer == NULL)
@@ -113,8 +114,8 @@ BBitmapStream::ReadAt(off_t pos, void* buffer, size_t size)
 ssize_t
 BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 {
-	if (!size)
-		return B_NO_ERROR;
+	if (size == 0)
+		return B_OK;
 	if (!data || pos < 0 || pos > fSize)
 		return B_BAD_VALUE;
 
@@ -128,6 +129,9 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 			toWrite = sizeof(TranslatorBitmap) - pos;
 			dest = (reinterpret_cast<uint8 *> (&fHeader)) + pos;
 		} else {
+			if (fBitmap == NULL || !fBitmap->IsValid())
+				return B_ERROR;
+
 			toWrite = fHeader.dataSize - pos + sizeof(TranslatorBitmap);
 			dest = (reinterpret_cast<uint8 *> (fBitmap->Bits())) +
 				pos - sizeof(TranslatorBitmap);
@@ -152,7 +156,7 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 			if (B_HOST_IS_LENDIAN)
 				SwapHeader(fBigEndianHeader, &fHeader);
 
-			if (fBitmap
+			if (fBitmap != NULL
 				&& (fBitmap->Bounds() != fHeader.bounds
 					|| fBitmap->ColorSpace() != fHeader.colors
 					|| (uint32)fBitmap->BytesPerRow() != fHeader.rowBytes)) {
@@ -161,19 +165,25 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 					delete fBitmap;
 				fBitmap = NULL;
 			}
-			if (!fBitmap) {
+			if (fBitmap == NULL) {
 				if (fHeader.bounds.left > 0.0 || fHeader.bounds.top > 0.0)
 					DEBUGGER("non-origin bounds!");
 				fBitmap = new BBitmap(fHeader.bounds, fHeader.colors);
-				if (!fBitmap)
+				if (fBitmap == NULL)
 					return B_ERROR;
+				if (!fBitmap->IsValid()) {
+					status_t error = fBitmap->InitCheck();
+					delete fBitmap;
+					fBitmap = NULL;
+					return error;
+				}
 				if ((uint32)fBitmap->BytesPerRow() != fHeader.rowBytes) {
 					fprintf(stderr, "BitmapStream %ld %ld\n",
 						fBitmap->BytesPerRow(), fHeader.rowBytes);
 					return B_MISMATCHED_VALUES;
 				}
 			}
-			if (fBitmap)
+			if (fBitmap != NULL)
 				fSize = sizeof(TranslatorBitmap) + fBitmap->BitsLength();
 		}
 	}
