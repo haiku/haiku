@@ -41,8 +41,12 @@ public:
 									{ return fPackages.IsEmpty(); }
 
 private:
+			class SelfLink;
+
+private:
 			timespec			fModifiedTime;
 			PackageList			fPackages;
+			SelfLink*			fSelfLink;
 };
 
 
