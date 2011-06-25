@@ -146,8 +146,14 @@ PackageLinksDirectory::RemovePackage(Package* package)
 	linkDirectory->RemovePackage(package, fListener);
 
 	// if empty, remove the link directory itself
-	if (linkDirectory->IsEmpty())
+	if (linkDirectory->IsEmpty()) {
+		if (fListener != NULL) {
+			NodeWriteLocker linkDirectoryWriteLocker(linkDirectory);
+			fListener->PackageLinkNodeRemoved(linkDirectory);
+		}
+
 		RemoveChild(linkDirectory);
+	}
 }
 
 
