@@ -175,6 +175,35 @@ device_get_parent(device_t dev)
 }
 
 
+int
+device_get_children(device_t dev, device_t **devlistp, int *devcountp)
+{
+	int count;
+	device_t child = NULL;
+	device_t *list;
+
+	count = 0;
+	while (list_get_next_item(&dev->children, child) != NULL) {
+		count++;
+	}
+	
+	list = malloc(count * sizeof(device_t));
+	if (!list)
+		return (ENOMEM);
+
+	count = 0;
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
+		list[count] = child;
+		count++;
+	}
+
+	*devlistp = list;
+	*devcountp = count;
+
+	return (0);
+}
+
+
 void
 device_set_ivars(device_t dev, void *ivars)
 {

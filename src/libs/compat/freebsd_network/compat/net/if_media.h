@@ -149,6 +149,8 @@ uint64_t	ifmedia_baudrate(int);
 /* note 31 is the max! */
 
 #define	IFM_ETH_MASTER	0x00000100	/* master mode (1000baseT) */
+#define	IFM_ETH_RXPAUSE 0x00000200	/* receive PAUSE frames */
+#define	IFM_ETH_TXPAUSE 0x00000400	/* transmit PAUSE frames */
 
 /*
  * Token ring

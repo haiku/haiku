@@ -455,6 +455,22 @@ bus_generic_shutdown(device_t dev)
 
 
 int
+bus_print_child_header(device_t dev, device_t child)
+{
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
+
+
+int
+bus_print_child_footer(device_t dev, device_t child)
+{
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
+
+
+int
 bus_generic_print_child(device_t dev, device_t child)
 {
 	UNIMPLEMENTED();
