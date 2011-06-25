@@ -1503,10 +1503,10 @@ ShowImageView::Undo()
 void
 ShowImageView::SelectAll()
 {
-	_SetHasSelection(true);
 	fCopyFromRect.Set(0, 0, fBitmap->Bounds().Width(),
 		fBitmap->Bounds().Height());
 	fSelectionBox.SetBounds(this, fCopyFromRect);
+	_SetHasSelection(true);
 	Invalidate();
 }
 
