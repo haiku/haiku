@@ -44,3 +44,18 @@ ResolvableFamily::RemoveResolvable(Resolvable* resolvable,
 	resolvable->SetFamily(NULL);
 	fResolvables.Remove(resolvable);
 }
+
+
+bool
+ResolvableFamily::ResolveDependency(Dependency* dependency)
+{
+	for (FamilyResolvableList::Iterator it = fResolvables.GetIterator();
+			Resolvable* resolvable = it.Next();) {
+		if (dependency->ResolvableVersionMatches(resolvable->Version())) {
+			resolvable->AddDependency(dependency);
+			return true;
+		}
+	}
+
+	return false;
+}

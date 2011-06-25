@@ -21,6 +21,8 @@ public:
 									ResolvableDependencyList&
 										dependenciesToUpdate);
 
+			bool				ResolveDependency(Dependency* dependency);
+
 			const char*			Name() const;
 
 			bool				IsLastResolvable(Resolvable* resolvable) const;
