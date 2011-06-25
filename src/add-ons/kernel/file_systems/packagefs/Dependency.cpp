@@ -12,7 +12,7 @@
 #include "Version.h"
 
 
-Dependency::Dependency(Package* package)
+Dependency::Dependency(::Package* package)
 	:
 	fPackage(package),
 	fFamily(NULL),
