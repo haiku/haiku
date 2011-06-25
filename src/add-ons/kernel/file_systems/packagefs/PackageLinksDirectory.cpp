@@ -134,6 +134,8 @@ PackageLinksDirectory::AddPackage(Package* package)
 void
 PackageLinksDirectory::RemovePackage(Package* package)
 {
+	NodeWriteLocker writeLocker(this);
+
 	// get the package's link directory and remove the package from it
 	PackageLinkDirectory* linkDirectory = package->LinkDirectory();
 	if (linkDirectory == NULL)
@@ -141,12 +143,23 @@ PackageLinksDirectory::RemovePackage(Package* package)
 
 	BReference<PackageLinkDirectory> linkDirectoryReference(linkDirectory);
 
-	NodeWriteLocker writeLocker(this);
-
 	linkDirectory->RemovePackage(package, fListener);
 
 	// if empty, remove the link directory itself
 	if (linkDirectory->IsEmpty())
 		RemoveChild(linkDirectory);
+}
+
+
+void
+PackageLinksDirectory::UpdatePackageDependencies(Package* package)
+{
+	NodeWriteLocker writeLocker(this);
+
+	PackageLinkDirectory* linkDirectory = package->LinkDirectory();
+	if (linkDirectory == NULL)
+		return;
+
+	linkDirectory->UpdatePackageDependencies(package, fListener);
 }
 

@@ -34,6 +34,7 @@ public:
 
 			status_t			AddPackage(Package* package);
 			void				RemovePackage(Package* package);
+			void				UpdatePackageDependencies(Package* package);
 
 private:
 			timespec			fModifiedTime;
