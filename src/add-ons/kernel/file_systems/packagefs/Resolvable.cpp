@@ -29,7 +29,7 @@ Resolvable::~Resolvable()
 
 
 status_t
-Resolvable::Init(const char* name, Version* version)
+Resolvable::Init(const char* name, ::Version* version)
 {
 	fVersion = version;
 
