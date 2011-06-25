@@ -639,22 +639,27 @@ Volume::AddPackageDomain(const char* path)
 
 
 void
-Volume::PackageLinkDirectoryAdded(PackageLinkDirectory* directory)
+Volume::PackageLinkNodeAdded(Node* node)
 {
-	_AddPackageLinksNode(directory);
+	_AddPackageLinksNode(node);
 
-	notify_entry_created(ID(), directory->Parent()->ID(), directory->Name(),
-		directory->ID());
+	notify_entry_created(ID(), node->Parent()->ID(), node->Name(), node->ID());
 }
 
 
 void
-Volume::PackageLinkDirectoryRemoved(PackageLinkDirectory* directory)
+Volume::PackageLinkNodeRemoved(Node* node)
 {
-	_RemovePackageLinksNode(directory);
+	_RemovePackageLinksNode(node);
 
-	notify_entry_removed(ID(), directory->Parent()->ID(), directory->Name(),
-		directory->ID());
+	notify_entry_removed(ID(), node->Parent()->ID(), node->Name(), node->ID());
+}
+
+
+void
+Volume::PackageLinkNodeChanged(Node* node, uint32 statFields)
+{
+	notify_stat_changed(ID(), node->ID(), statFields);
 }
 
 

@@ -6,17 +6,20 @@
 #define PACKAGE_LINKS_LISTENER_H
 
 
-class PackageLinkDirectory;
+#include <SupportDefs.h>
+
+
+class Node;
 
 
 class PackageLinksListener {
 public:
 	virtual						~PackageLinksListener();
 
-	virtual	void				PackageLinkDirectoryAdded(
-										PackageLinkDirectory* directory) = 0;
-	virtual	void				PackageLinkDirectoryRemoved(
-										PackageLinkDirectory* directory) = 0;
+	virtual	void				PackageLinkNodeAdded(Node* node) = 0;
+	virtual	void				PackageLinkNodeRemoved(Node* node) = 0;
+	virtual	void				PackageLinkNodeChanged(Node* node,
+									uint32 statFields) = 0;
 };
 
 

@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <new>
 
+#include <NodeMonitor.h>
+
 #include <AutoDeleter.h>
 
 #include "EmptyAttributeDirectoryCookie.h"
@@ -49,16 +51,20 @@ class PackageLinkDirectory::SelfLink : public Node {
 public:
 	SelfLink(Package* package)
 		:
-		Node(0),
-		fPackage(package),
-		fLinkPath(link_path_for_mount_type(
-			package->Domain()->Volume()->MountType()))
+		Node(0)
 	{
-		get_real_time(fModifiedTime);
+		Update(package);
 	}
 
 	virtual ~SelfLink()
 	{
+	}
+
+	void Update(Package* package)
+	{
+		fLinkPath = link_path_for_mount_type(
+			package->Domain()->Volume()->MountType());
+		get_real_time(fModifiedTime);
 	}
 
 	virtual mode_t Mode() const
@@ -124,7 +130,6 @@ public:
 	}
 
 private:
-	Package*	fPackage;
 	timespec	fModifiedTime;
 	const char*	fLinkPath;
 };
@@ -153,17 +158,6 @@ PackageLinkDirectory::~PackageLinkDirectory()
 status_t
 PackageLinkDirectory::Init(Directory* parent, Package* package)
 {
-	// create the self link
-	fSelfLink = new(std::nothrow) SelfLink(package);
-	if (fSelfLink == NULL)
-		return B_NO_MEMORY;
-
-	status_t error = fSelfLink->Init(this, kSelfLinkName, NODE_FLAG_CONST_NAME);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	AddChild(fSelfLink);
-
 	// compute the allocation size needed for the versioned name
 	size_t nameLength = strlen(package->Name());
 	size_t size = nameLength + 1;
@@ -186,7 +180,7 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 	}
 
 	// init the directory/node
-	error = Init(parent, name, NODE_FLAG_KEEP_NAME);
+	status_t error = Init(parent, name, NODE_FLAG_KEEP_NAME);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -267,16 +261,21 @@ PackageLinkDirectory::AddPackage(Package* package,
 {
 	NodeWriteLocker writeLocker(this);
 
-	if (listener != NULL)
-		listener->PackageLinkDirectoryRemoved(this);
+	// Find the insertion point in the list. We sort by mount type -- the more
+	// specific the higher the priority.
+	MountType mountType = package->Domain()->Volume()->MountType();
+	Package* otherPackage = NULL;
+	for (PackageList::Iterator it = fPackages.GetIterator();
+			(otherPackage = it.Next()) != NULL;) {
+		if (otherPackage->Domain()->Volume()->MountType() <= mountType)
+			break;
+	}
 
-	// TODO: Add in priority order!
-	fPackages.Add(package);
+	fPackages.InsertBefore(otherPackage, package);
 	package->SetLinkDirectory(this);
 
-	if (listener != NULL)
-		listener->PackageLinkDirectoryAdded(this);
-	// TODO: The notifications should only happen as necessary!
+	if (package == fPackages.Head())
+		_Update(listener);
 }
 
 
@@ -288,14 +287,62 @@ PackageLinkDirectory::RemovePackage(Package* package,
 
 	NodeWriteLocker writeLocker(this);
 
-	if (listener != NULL)
-		listener->PackageLinkDirectoryRemoved(this);
+	bool firstPackage = package == fPackages.Head();
 
 	package->SetLinkDirectory(NULL);
 	fPackages.Remove(package);
-	// TODO: Check whether that was the top priority package!
 
-	if (listener != NULL && !IsEmpty())
-		listener->PackageLinkDirectoryAdded(this);
-	// TODO: The notifications should only happen as necessary!
+	if (firstPackage)
+		_Update(listener);
+}
+
+
+status_t
+PackageLinkDirectory::_Update(PackageLinksListener* listener)
+{
+	// check, if empty
+	Package* package = fPackages.Head();
+	if (package == NULL) {
+		// remove self link, if any
+		if (fSelfLink != NULL) {
+			NodeWriteLocker selfLinkLocker(fSelfLink);
+			if (listener != NULL)
+				listener->PackageLinkNodeRemoved(fSelfLink);
+
+			RemoveChild(fSelfLink);
+			fSelfLink->ReleaseReference();
+			fSelfLink = NULL;
+		}
+
+		return B_OK;
+	}
+
+	// create/update self link
+	if (fSelfLink == NULL) {
+		fSelfLink = new(std::nothrow) SelfLink(package);
+		if (fSelfLink == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = fSelfLink->Init(this, kSelfLinkName,
+			NODE_FLAG_CONST_NAME);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		AddChild(fSelfLink);
+
+		if (listener != NULL) {
+			NodeWriteLocker selfLinkLocker(fSelfLink);
+			listener->PackageLinkNodeAdded(fSelfLink);
+		}
+	} else {
+		NodeWriteLocker selfLinkLocker(fSelfLink);
+		fSelfLink->Update(package);
+
+		if (listener != NULL) {
+			listener->PackageLinkNodeChanged(fSelfLink,
+				B_STAT_SIZE | B_STAT_MODIFICATION_TIME);
+		}
+	}
+
+	return B_OK;
 }
