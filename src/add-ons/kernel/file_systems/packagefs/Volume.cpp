@@ -1033,6 +1033,13 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		newNode = true;
 	}
 
+	// TODO: The non-new part is broken for files. If a node is already known to
+	// the VFS, we can't just change the file content. The file might be an
+	// executable or library that is currently in use (i.e. mapped) and when
+	// just changing the file content we break things horribly. In fact we don't
+	// even do that correctly in UnpackingLeafNode::AddPackageNode() -- neither
+	// the former nor the new head package node is notified.
+
 	BReference<Node> nodeReference(node);
 	NodeWriteLocker nodeWriteLocker(node);
 
@@ -1082,6 +1089,9 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 
 	BReference<Node> nodeReference(node);
 	NodeWriteLocker nodeWriteLocker(node);
+
+	// TODO: This is broken for files that are in use. Cf. _AddPackageNode() for
+	// details.
 
 	PackageNode* headPackageNode = unpackingNode->GetPackageNode();
 	unpackingNode->RemovePackageNode(packageNode);
