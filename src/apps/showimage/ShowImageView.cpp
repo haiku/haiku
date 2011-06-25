@@ -71,6 +71,7 @@ class PopUpMenu : public BPopUpMenu {
 
 // the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
 #define HIDE_CURSOR_DELAY_TIME 20
+#define STICKY_ZOOM_DELAY_TIME 5
 #define SHOW_IMAGE_ORIENTATION_ATTRIBUTE "ShowImage:orientation"
 
 
@@ -196,6 +197,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fShowCaption(false),
 	fShowingPopUpMenu(false),
 	fHideCursorCountDown(HIDE_CURSOR_DELAY_TIME),
+	fStickyZoomCountDown(0),
 	fIsActiveWin(true),
 	fDefaultCursor(NULL),
 	fGrabCursor(NULL)
@@ -253,6 +255,10 @@ ShowImageView::Pulse()
 		} else
 			fHideCursorCountDown--;
 	}
+
+	if (fStickyZoomCountDown > 0)
+		fStickyZoomCountDown--;
+
 }
 
 
@@ -1355,10 +1361,16 @@ ShowImageView::_MouseWheelChanged(BMessage *msg)
 		uint32 buttons;
 		GetMouse(&where, &buttons);
 
-		if (dy < 0)
-			ZoomIn(where);
-		else if (dy > 0)
-			ZoomOut(where);
+		if (fStickyZoomCountDown <= 0) {
+			if (dy < 0)
+				ZoomIn(where);
+			else if (dy > 0)
+				ZoomOut(where);
+
+			if (fZoom == 1.0)
+				fStickyZoomCountDown = STICKY_ZOOM_DELAY_TIME;
+		}
+
 	}
 }
 
