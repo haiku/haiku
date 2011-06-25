@@ -297,6 +297,14 @@ PackageLinkDirectory::RemovePackage(Package* package,
 }
 
 
+void
+PackageLinkDirectory::UpdatePackageDependencies(Package* package,
+	PackageLinksListener* listener)
+{
+// TODO:...
+}
+
+
 status_t
 PackageLinkDirectory::_Update(PackageLinksListener* listener)
 {

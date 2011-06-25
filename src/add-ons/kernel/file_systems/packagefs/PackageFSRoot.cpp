@@ -268,7 +268,13 @@ PackageFSRoot::_AddPackage(Package* package)
 		dependenciesToUpdate.Add(dependency);
 	}
 
-	return fPackageLinksDirectory->AddPackage(package);
+	status_t error = fPackageLinksDirectory->AddPackage(package);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	_ResolveDependencies(dependenciesToUpdate);
+
+	return B_OK;
 }
 
 
@@ -317,7 +323,35 @@ PackageFSRoot::_ResolveDependencies(ResolvableDependencyList& dependencies)
 	if (dependencies.IsEmpty())
 		return;
 
-	// TODO:...
+	while (Dependency* dependency = dependencies.RemoveHead()) {
+		Package* package = dependency->Package();
+		_ResolveDependency(dependency);
+
+		// also resolve all other dependencies for that package
+		for (ResolvableDependencyList::Iterator it = dependencies.GetIterator();
+				(dependency = it.Next()) != NULL;) {
+			if (dependency->Package() == package) {
+				it.Remove();
+				_ResolveDependency(dependency);
+			}
+		}
+
+		fPackageLinksDirectory->UpdatePackageDependencies(package);
+	}
+}
+
+
+void
+PackageFSRoot::_ResolveDependency(Dependency* dependency)
+{
+	// get the resolvable family for the dependency
+	ResolvableFamily* resolvableFamily
+		= fResolvables.Lookup(dependency->Name());
+	if (resolvableFamily == NULL)
+		return;
+
+	// let the family resolve the dependency
+	resolvableFamily->ResolveDependency(dependency);
 }
 
 

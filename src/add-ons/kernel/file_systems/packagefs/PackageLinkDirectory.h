@@ -37,6 +37,8 @@ public:
 									PackageLinksListener* listener);
 			void				RemovePackage(Package* package,
 									PackageLinksListener* listener);
+			void				UpdatePackageDependencies(Package* package,
+									PackageLinksListener* listener);
 
 			bool				IsEmpty() const
 									{ return fPackages.IsEmpty(); }

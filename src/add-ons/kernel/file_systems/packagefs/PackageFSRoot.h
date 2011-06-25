@@ -65,6 +65,7 @@ private:
 
 			void				_ResolveDependencies(
 									ResolvableDependencyList& dependencies);
+			void				_ResolveDependency(Dependency* dependency);
 
 	static	status_t			_GetOrCreateRoot(dev_t deviceID, ino_t nodeID,
 									PackageFSRoot*& _root);
