@@ -13,6 +13,8 @@
 
 #include <lock.h>
 
+#include "DependencyFamily.h"
+#include "ResolvableFamily.h"
 #include "Volume.h"
 
 
@@ -58,6 +60,12 @@ private:
 			status_t			_AddVolume(Volume* volume);
 			void				_RemoveVolume(Volume* volume);
 
+			status_t			_AddPackage(Package* package);
+			void				_RemovePackage(Package* package);
+
+			void				_ResolveDependencies(
+									ResolvableDependencyList& dependencies);
+
 	static	status_t			_GetOrCreateRoot(dev_t deviceID, ino_t nodeID,
 									PackageFSRoot*& _root);
 	static	PackageFSRoot*		_FindRootLocked(dev_t deviceID, ino_t nodeID);
@@ -73,6 +81,8 @@ private:
 			VolumeList			fVolumes;
 			Volume*				fSystemVolume;
 			PackageLinksDirectory* fPackageLinksDirectory;
+			ResolvableFamilyHashTable fResolvables;
+			DependencyFamilyHashTable fDependencies;
 };
 
 

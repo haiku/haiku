@@ -60,7 +60,11 @@ public:
 			int					Open();
 			void				Close();
 
-			const PackageNodeList&	Nodes() const	{ return fNodes; }
+			const PackageNodeList& Nodes() const	{ return fNodes; }
+			const ResolvableList& Resolvables() const
+									{ return fResolvables; }
+			const DependencyList& Dependencies() const
+									{ return fDependencies; }
 
 private:
 			mutex				fLock;
