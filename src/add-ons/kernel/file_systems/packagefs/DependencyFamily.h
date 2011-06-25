@@ -17,6 +17,9 @@ public:
 			void				AddDependency(Dependency* dependency);
 			void				RemoveDependency(Dependency* dependency);
 
+			void				AddDependenciesToList(
+									ResolvableDependencyList& list) const;
+
 			const char*			Name() const;
 
 			bool				IsLastDependency(Dependency* dependency) const;
@@ -42,6 +45,16 @@ DependencyFamily::RemoveDependency(Dependency* dependency)
 {
 	dependency->SetFamily(NULL);
 	fDependencies.Remove(dependency);
+}
+
+
+inline void
+DependencyFamily::AddDependenciesToList(ResolvableDependencyList& list) const
+{
+	for (FamilyDependencyList::ConstIterator it = fDependencies.GetIterator();
+			Dependency* dependency = it.Next();) {
+		list.Add(dependency);
+	}
 }
 
 

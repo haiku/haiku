@@ -246,6 +246,12 @@ PackageFSRoot::_AddPackage(Package* package)
 
 			family->AddResolvable(resolvable, dependenciesToUpdate);
 			fResolvables.Insert(family);
+
+			// add pre-existing dependencies for that resolvable
+			if (DependencyFamily* dependencyFamily
+					= fDependencies.Lookup(resolvable->Name())) {
+				dependencyFamily->AddDependenciesToList(dependenciesToUpdate);
+			}
 		}
 	}
 
