@@ -49,3 +49,14 @@ Dependency::SetVersionRequirement(BPackageResolvableOperator op,
 	fVersionOperator = op;
 	fVersion = version;
 }
+
+
+bool
+Dependency::ResolvableVersionMatches(Version* resolvableVersion) const
+{
+	if (fVersion == NULL)
+		return true;
+
+	return resolvableVersion != NULL
+		&& fVersion->Compare(fVersionOperator, *resolvableVersion);
+}

@@ -47,6 +47,8 @@ public:
 									{ fResolvable = resolvable; }
 			::Resolvable*		Resolvable() const
 									{ return fResolvable; }
+			bool				ResolvableVersionMatches(
+									Version* resolvableVersion) const;
 
 			const char*			Name() const	{ return fName; }
 
