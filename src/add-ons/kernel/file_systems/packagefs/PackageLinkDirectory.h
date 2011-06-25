@@ -8,6 +8,7 @@
 
 #include "Directory.h"
 #include "Package.h"
+#include "PackageLinkSymlink.h"
 
 
 class PackageLinksListener;
@@ -44,7 +45,7 @@ public:
 									{ return fPackages.IsEmpty(); }
 
 private:
-			class SelfLink;
+			typedef PackageLinkSymlink Link;
 
 private:
 			status_t			_Update(PackageLinksListener* listener);
@@ -52,7 +53,7 @@ private:
 private:
 			timespec			fModifiedTime;
 			PackageList			fPackages;
-			SelfLink*			fSelfLink;
+			Link*				fSelfLink;
 };
 
 

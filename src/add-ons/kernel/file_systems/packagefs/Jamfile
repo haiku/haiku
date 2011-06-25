@@ -26,6 +26,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	PackageLinkDirectory.cpp
 	PackageLinksDirectory.cpp
 	PackageLinksListener.cpp
+	PackageLinkSymlink.cpp
 	PackageNode.cpp
 	PackageNodeAttribute.cpp
 	PackageSymlink.cpp
