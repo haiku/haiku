@@ -25,7 +25,7 @@ using BPackageKit::BPackageResolvableOperator;
 class Dependency : public BReferenceable,
 	public DoublyLinkedListLinkImpl<Dependency> {
 public:
-								Dependency(Package* package);
+								Dependency(::Package* package);
 	virtual						~Dependency();
 
 			status_t			Init(const char* name);
@@ -34,6 +34,9 @@ public:
 									Version* version);
 									// version is optional; object takes over
 									// ownership
+
+			::Package*			Package() const
+									{ return fPackage; }
 
 			void				SetFamily(DependencyFamily* family)
 									{ fFamily = family; }
@@ -48,7 +51,7 @@ public:
 			const char*			Name() const	{ return fName; }
 
 private:
-			Package*			fPackage;
+			::Package*			fPackage;
 			DependencyFamily*	fFamily;
 			::Resolvable*		fResolvable;
 			char*				fName;
