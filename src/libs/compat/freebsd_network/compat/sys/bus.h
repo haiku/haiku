@@ -44,6 +44,17 @@
 #define BUS_PROBE_DEFAULT		20
 #define BUS_PROBE_GENERIC		100
 
+#define __BUS_ACCESSOR(varp, var, ivarp, ivar, type)						\
+																			\
+static __inline type varp ## _get_ ## var(device_t dev)                 \
+{                                                                       \
+	return 0;														\
+}                                                                       \
+																			\
+static __inline void varp ## _set_ ## var(device_t dev, type t)				\
+{																			\
+}
+
 
 struct resource;
 
@@ -104,6 +115,7 @@ void device_set_desc_copy(device_t dev, const char *desc);
 const char *device_get_desc(device_t dev);
 device_t device_get_parent(device_t dev);
 u_int32_t device_get_flags(device_t dev);
+int device_get_children(device_t dev, device_t **devlistp, int *devcountp);
 
 void device_set_ivars(device_t dev, void *);
 void *device_get_ivars(device_t dev);
@@ -113,6 +125,8 @@ int device_delete_child(device_t dev, device_t child);
 int device_is_attached(device_t dev);
 int device_attach(device_t dev);
 int device_detach(device_t dev);
+int bus_print_child_header(device_t dev, device_t child);
+int bus_print_child_footer(device_t dev, device_t child);
 int bus_generic_print_child(device_t dev, device_t child);
 void bus_generic_driver_added(device_t dev, driver_t *driver);
 int bus_generic_attach(device_t dev);
