@@ -21,39 +21,6 @@
 #include "ValueNodeContainer.h"
 
 
-// minimal replica of BMessage's class structure for
-// extracting fields
-class BMessageValue {
-	public:
-		uint32			what;
-
-		virtual			~BMessageValue();
-
-		struct message_header;
-		struct field_header;
-
-		message_header*	fHeader;
-		field_header*	fFields;
-		uint8*			fData;
-
-		uint32			fFieldsAvailable;
-		size_t			fDataAvailable;
-
-		mutable	BMessage* fOriginal;
-
-		BMessage*		fQueueLink;
-			// fQueueLink is used by BMessageQueue to build a linked list
-
-		void*			fArchivingPointer;
-
-		uint32			fReserved[8];
-
-		virtual	void	_ReservedMessage1();
-		virtual	void	_ReservedMessage2();
-		virtual	void	_ReservedMessage3();
-};
-
-
 // #pragma mark - BMessageValueNode
 
 
@@ -105,27 +72,98 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 	BVariant addressData;
 	status_t error = B_OK;
-	if (dynamic_cast<AddressType*>(fType) != NULL) {
+	CompoundType* baseType = dynamic_cast<CompoundType*>(
+		fType->ResolveRawType(false));
+	AddressType* addressType = dynamic_cast<AddressType*>(fType);
+	if (addressType) {
+		baseType = dynamic_cast<CompoundType*>(addressType->BaseType()
+			->ResolveRawType(false));
 		error = valueLoader->LoadValue(location, valueType, false,
 			addressData);
 	} else
 		addressData.SetTo(location->PieceAt(0).address);
 
 
+
 	TRACE_LOCALS("BMessage: Address: 0x%" B_PRIx64 "\n",
 		addressData.ToUInt64());
 
-	// TODO: redo this by looking up fHeader et al off the type
-	// object and resolving their locations instead
-	uint8 classBuffer[sizeof(BMessage)];
-	error = valueLoader->LoadRawValue(addressData, sizeof(BMessage),
-		classBuffer);
-	if (error != B_OK)
-		return error;
+	ValueLocation* memberLocation = NULL;
 
 	BVariant headerAddress;
-	BMessageValue* value = (BMessageValue*)classBuffer;
-	headerAddress.SetTo((target_addr_t)value->fHeader);
+	BVariant fieldAddress;
+	BVariant dataAddress;
+	BVariant what;
+
+	for (int32 i = 0; i < baseType->CountDataMembers(); i++) {
+		DataMember* member = baseType->DataMemberAt(i);
+		if (strcmp(member->Name(), "fHeader") == 0) {
+			error = baseType->ResolveDataMemberLocation(member,
+				*location, memberLocation);
+			if (error != B_OK) {
+				TRACE_LOCALS("BMessageValueNode::ResolvedLocationAndValue(): "
+					"failed to resolve location of header member: %s\n",
+						strerror(error));
+				delete memberLocation;
+				return error;
+			}
+
+			error = valueLoader->LoadValue(memberLocation, valueType,
+				false, headerAddress);
+			delete memberLocation;
+			if (error != B_OK)
+				return error;
+		} else if (strcmp(member->Name(), "what") == 0) {
+			error = baseType->ResolveDataMemberLocation(member,
+				*location, memberLocation);
+			if (error != B_OK) {
+				TRACE_LOCALS("BMessageValueNode::ResolvedLocationAndValue(): "
+					"failed to resolve location of header member: %s\n",
+						strerror(error));
+				delete memberLocation;
+				return error;
+			}
+			error = valueLoader->LoadValue(memberLocation, valueType,
+				false, what);
+			delete memberLocation;
+			if (error != B_OK)
+				return error;
+		} else if (strcmp(member->Name(), "fFields") == 0) {
+			error = baseType->ResolveDataMemberLocation(member,
+				*location, memberLocation);
+			if (error != B_OK) {
+				TRACE_LOCALS("BMessageValueNode::ResolvedLocationAndValue(): "
+					"failed to resolve location of field member: %s\n",
+						strerror(error));
+				delete memberLocation;
+				return error;
+			}
+			error = valueLoader->LoadValue(memberLocation, valueType,
+				false, fieldAddress);
+			delete memberLocation;
+			if (error != B_OK)
+				return error;
+		} else if (strcmp(member->Name(), "fData") == 0) {
+			error = baseType->ResolveDataMemberLocation(member,
+				*location, memberLocation);
+			if (error != B_OK) {
+				TRACE_LOCALS("BMessageValueNode::ResolvedLocationAndValue(): "
+					"failed to resolve location of data member: %s\n",
+						strerror(error));
+				delete memberLocation;
+				return error;
+			}
+			error = valueLoader->LoadValue(memberLocation, valueType,
+				false, dataAddress);
+			delete memberLocation;
+			if (error != B_OK)
+				return error;
+		}
+		memberLocation = NULL;
+	}
+
+	TRACE_LOCALS("BMessage: what: 0x%" B_PRIx32 ", result: %ld\n",
+		what.ToUInt32(), error);
 
 	uint8 headerBuffer[sizeof(BMessage::message_header)];
 	error = valueLoader->LoadRawValue(headerAddress, sizeof(headerBuffer),
@@ -136,6 +174,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		return error;
 
 	BMessage::message_header* header = (BMessage::message_header*)headerBuffer;
+	header->what = what.ToUInt32();
 	size_t fieldsSize = header->field_count * sizeof(BMessage::field_header);
 	size_t totalMessageSize = sizeof(BMessage::message_header)
 		+ fieldsSize + header->data_size;
@@ -152,24 +191,22 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	// in order to reconstruct the flattened buffer ; thus if the
 	// internal representation of that changes, this will have to
 	// follow suit
-	header->what = value->what;
 	uint8* currentBuffer = messageBuffer;
 	memcpy(currentBuffer, header,
 		sizeof(BMessage::message_header));
 
 	if (fieldsSize > 0) {
-		headerAddress.SetTo((target_addr_t)value->fFields);
 		currentBuffer += sizeof(BMessage::message_header);
-		error = valueLoader->LoadRawValue(headerAddress, fieldsSize,
+		error = valueLoader->LoadRawValue(fieldAddress, fieldsSize,
 			currentBuffer);
 		TRACE_LOCALS("BMessage: Field Header Address: 0x%" B_PRIx64
 			", result: %ld\n",	headerAddress.ToUInt64(), error);
 		if (error != B_OK)
 			return error;
 
-		headerAddress.SetTo((target_addr_t)value->fData);
+		headerAddress.SetTo(dataAddress);
 		currentBuffer += fieldsSize;
-		error = valueLoader->LoadRawValue(headerAddress, header->data_size,
+		error = valueLoader->LoadRawValue(dataAddress, header->data_size,
 			currentBuffer);
 		TRACE_LOCALS("BMessage: Data Address: 0x%" B_PRIx64 ", result: %ld\n",
 			headerAddress.ToUInt64(), error);
@@ -182,6 +219,8 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	TRACE_LOCALS("BMessage: Unflatten result: %s\n", strerror(error));
 	if (error != B_OK)
 		return error;
+
+	message.PrintToStream();
 
 	return B_BAD_VALUE;
 }
