@@ -37,6 +37,9 @@ PackageLinkDirectory::~PackageLinkDirectory()
 {
 	if (fSelfLink != NULL)
 		fSelfLink->ReleaseReference();
+
+	while (DependencyLink* link = fDependencyLinks.RemoveHead())
+		link->ReleaseReference();
 }
 
 
@@ -186,13 +189,32 @@ void
 PackageLinkDirectory::UpdatePackageDependencies(Package* package,
 	PackageLinksListener* listener)
 {
-// TODO:...
+	ASSERT(package->LinkDirectory() == this);
+
+	NodeWriteLocker writeLocker(this);
+
+	// We only need to update, if that head package is affected.
+	if (package != fPackages.Head())
+		return;
+
+	_UpdateDependencies(listener);
 }
 
 
 status_t
 PackageLinkDirectory::_Update(PackageLinksListener* listener)
 {
+	// Always remove all dependency links -- if there's still a package, they
+	// will be re-created below.
+	while (DependencyLink* link = fDependencyLinks.RemoveHead()) {
+		NodeWriteLocker selfLinkLocker(link);
+		if (listener != NULL)
+			listener->PackageLinkNodeRemoved(link);
+
+		RemoveChild(link);
+		link->ReleaseReference();
+	}
+
 	// check, if empty
 	Package* package = fPackages.Head();
 	if (package == NULL) {
@@ -230,6 +252,56 @@ PackageLinkDirectory::_Update(PackageLinksListener* listener)
 	} else {
 		NodeWriteLocker selfLinkLocker(fSelfLink);
 		fSelfLink->Update(package, listener);
+	}
+
+	// update the dependency links
+	return _UpdateDependencies(listener);
+}
+
+
+status_t
+PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
+{
+	Package* package = fPackages.Head();
+	if (package == NULL)
+		return B_OK;
+
+	// Iterate through the package's dependencies
+	for (DependencyList::ConstIterator it
+				= package->Dependencies().GetIterator();
+			Dependency* dependency = it.Next();) {
+		Resolvable* resolvable = dependency->Resolvable();
+		Package* resolvablePackage = resolvable != NULL
+			? resolvable->Package() : NULL;
+
+		Node* node = FindChild(dependency->Name());
+		if (node != NULL) {
+			// link already exists -- update
+			DependencyLink* link = static_cast<DependencyLink*>(node);
+
+			NodeWriteLocker linkLocker(link);
+			link->Update(resolvablePackage, listener);
+		} else {
+			// no link for the dependency yet -- create one
+			DependencyLink* link = new(std::nothrow) DependencyLink(
+				resolvablePackage);
+			if (link == NULL)
+				return B_NO_MEMORY;
+
+			status_t error = link->Init(this, dependency->Name(), 0);
+			if (error != B_OK) {
+				delete link;
+				RETURN_ERROR(error);
+			}
+
+			AddChild(link);
+			fDependencyLinks.Add(link);
+
+			if (listener != NULL) {
+				NodeWriteLocker linkLocker(link);
+				listener->PackageLinkNodeAdded(link);
+			}
+		}
 	}
 
 	return B_OK;
