@@ -1617,7 +1617,7 @@ debug_stop_screen_debug_output(void)
 bool
 debug_debugger_running(void)
 {
-	return sDebuggerOnCPU != -1;
+	return sInDebugger > 0;
 }
 
 
