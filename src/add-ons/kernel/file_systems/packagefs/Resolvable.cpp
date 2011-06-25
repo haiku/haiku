@@ -11,9 +11,10 @@
 #include "Version.h"
 
 
-Resolvable::Resolvable(Package* package)
+Resolvable::Resolvable(::Package* package)
 	:
 	fPackage(package),
+	fFamily(NULL),
 	fName(NULL),
 	fVersion(NULL)
 {
@@ -37,4 +38,35 @@ Resolvable::Init(const char* name, Version* version)
 		return B_NO_MEMORY;
 
 	return B_OK;
+}
+
+
+void
+Resolvable::AddDependency(Dependency* dependency)
+{
+	fDependencies.Add(dependency);
+	dependency->SetResolvable(this);
+}
+
+
+void
+Resolvable::RemoveDependency(Dependency* dependency)
+{
+	fDependencies.Remove(dependency);
+	dependency->SetResolvable(NULL);
+}
+
+
+void
+Resolvable::MoveDependencies(ResolvableDependencyList& dependencies)
+{
+	if (fDependencies.IsEmpty())
+		return;
+
+	for (ResolvableDependencyList::Iterator it = fDependencies.GetIterator();
+			Dependency* dependency = it.Next();) {
+		dependency->SetResolvable(NULL);
+	}
+
+	dependencies.MoveFrom(&fDependencies);
 }

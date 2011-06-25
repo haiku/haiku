@@ -15,6 +15,7 @@
 Dependency::Dependency(Package* package)
 	:
 	fPackage(package),
+	fFamily(NULL),
 	fResolvable(NULL),
 	fName(NULL),
 	fVersion(NULL),

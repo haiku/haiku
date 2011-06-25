@@ -64,6 +64,14 @@ PackageFSRoot::Init()
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	error = fResolvables.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = fDependencies.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	return B_OK;
 }
 
@@ -159,14 +167,24 @@ PackageFSRoot::UnregisterVolume(Volume* volume)
 status_t
 PackageFSRoot::AddPackage(Package* package)
 {
-	return fPackageLinksDirectory->AddPackage(package);
+	PackageFSRootWriteLocker writeLocker(this);
+
+	status_t error = _AddPackage(package);
+	if (error != B_OK) {
+		_RemovePackage(package);
+		RETURN_ERROR(error);
+	}
+
+	return B_OK;
 }
 
 
 void
 PackageFSRoot::RemovePackage(Package* package)
 {
-	fPackageLinksDirectory->RemovePackage(package);
+	PackageFSRootWriteLocker writeLocker(this);
+
+	_RemovePackage(package);
 }
 
 
@@ -206,6 +224,100 @@ PackageFSRoot::_RemoveVolume(Volume* volume)
 	fVolumes.Remove(volume);
 
 	volume->SetPackageFSRoot(NULL);
+}
+
+
+status_t
+PackageFSRoot::_AddPackage(Package* package)
+{
+	ResolvableDependencyList dependenciesToUpdate;
+
+	// register resolvables
+	for (ResolvableList::ConstIterator it
+				= package->Resolvables().GetIterator();
+			Resolvable* resolvable = it.Next();) {
+		if (ResolvableFamily* family
+				= fResolvables.Lookup(resolvable->Name())) {
+			family->AddResolvable(resolvable, dependenciesToUpdate);
+		} else {
+			ResolvableFamily* family = new(std::nothrow) ResolvableFamily;
+			if (family == NULL)
+				return B_NO_MEMORY;
+
+			family->AddResolvable(resolvable, dependenciesToUpdate);
+			fResolvables.Insert(family);
+		}
+	}
+
+	// register dependencies
+	for (DependencyList::ConstIterator it
+				= package->Dependencies().GetIterator();
+			Dependency* dependency = it.Next();) {
+		if (DependencyFamily* family
+				= fDependencies.Lookup(dependency->Name())) {
+			family->AddDependency(dependency);
+		} else {
+			DependencyFamily* family = new(std::nothrow) DependencyFamily;
+			if (family == NULL)
+				return B_NO_MEMORY;
+
+			family->AddDependency(dependency);
+			fDependencies.Insert(family);
+		}
+
+		dependenciesToUpdate.Add(dependency);
+	}
+
+	return fPackageLinksDirectory->AddPackage(package);
+}
+
+
+void
+PackageFSRoot::_RemovePackage(Package* package)
+{
+	fPackageLinksDirectory->RemovePackage(package);
+
+	// unregister dependencies
+	for (DependencyList::ConstIterator it
+				= package->Dependencies().GetIterator();
+			Dependency* dependency = it.Next();) {
+		if (DependencyFamily* family = dependency->Family()) {
+			if (family->IsLastDependency(dependency)) {
+				fDependencies.Remove(family);
+				family->RemoveDependency(dependency);
+				delete family;
+			} else
+				family->RemoveDependency(dependency);
+		}
+	}
+
+	// unregister resolvables
+	ResolvableDependencyList dependenciesToUpdate;
+
+	for (ResolvableList::ConstIterator it
+				= package->Resolvables().GetIterator();
+			Resolvable* resolvable = it.Next();) {
+		if (ResolvableFamily* family = resolvable->Family()) {
+			if (family->IsLastResolvable(resolvable)) {
+				fResolvables.Remove(family);
+				family->RemoveResolvable(resolvable, dependenciesToUpdate);
+				delete family;
+			} else
+				family->RemoveResolvable(resolvable, dependenciesToUpdate);
+		}
+	}
+
+	_ResolveDependencies(dependenciesToUpdate);
+}
+
+
+void
+PackageFSRoot::_ResolveDependencies(ResolvableDependencyList& dependencies)
+{
+	if (dependencies.IsEmpty())
+		return;
+
+	// TODO:...
 }
 
 
