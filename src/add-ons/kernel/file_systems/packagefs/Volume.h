@@ -76,10 +76,10 @@ public:
 
 private:
 	// PackageLinksListener
-	virtual	void				PackageLinkDirectoryAdded(
-										PackageLinkDirectory* directory);
-	virtual	void				PackageLinkDirectoryRemoved(
-										PackageLinkDirectory* directory);
+	virtual	void				PackageLinkNodeAdded(Node* node);
+	virtual	void				PackageLinkNodeRemoved(Node* node);
+	virtual	void				PackageLinkNodeChanged(Node* node,
+									uint32 statFields);
 
 private:
 			struct Job;

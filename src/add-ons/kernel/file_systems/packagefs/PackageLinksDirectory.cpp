@@ -123,7 +123,7 @@ PackageLinksDirectory::AddPackage(Package* package)
 
 		if (fListener != NULL) {
 			NodeWriteLocker linkDirectoryWriteLocker(linkDirectory);
-			fListener->PackageLinkDirectoryAdded(linkDirectory);
+			fListener->PackageLinkNodeAdded(linkDirectory);
 		}
 	}
 

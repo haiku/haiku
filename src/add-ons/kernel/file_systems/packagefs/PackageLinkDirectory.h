@@ -45,6 +45,9 @@ private:
 			class SelfLink;
 
 private:
+			status_t			_Update(PackageLinksListener* listener);
+
+private:
 			timespec			fModifiedTime;
 			PackageList			fPackages;
 			SelfLink*			fSelfLink;
