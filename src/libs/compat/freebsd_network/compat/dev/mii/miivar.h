@@ -16,13 +16,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the NetBSD
- *	Foundation, Inc. and its contributors.
- * 4. Neither the name of The NetBSD Foundation nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -36,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/mii/miivar.h,v 1.15.14.1 2006/06/24 06:14:24 oleg Exp $
+ * $FreeBSD$
  */
 
 #ifndef _DEV_MII_MIIVAR_H_
@@ -109,7 +102,7 @@ typedef	int (*mii_downcall_t)(struct mii_softc *, struct mii_data *, int);
  */
 struct mii_softc {
 	device_t mii_dev;		/* generic device glue */
-	
+
 	LIST_ENTRY(mii_softc) mii_list;	/* entry on parent's PHY list */
 
 	int mii_phy;			/* our MII address */
@@ -129,21 +122,39 @@ struct mii_softc {
 typedef struct mii_softc mii_softc_t;
 
 /* mii_flags */
-#define	MIIF_INITDONE	0x0001		/* has been initialized (mii_data) */
-#define	MIIF_NOISOLATE	0x0002		/* do not isolate the PHY */
-#define	MIIF_NOLOOP	0x0004		/* no loopback capability */
-#define MIIF_AUTOTSLEEP	0x0010		/* use tsleep(), not callout() */
-#define MIIF_HAVEFIBER	0x0020		/* from parent: has fiber interface */
-#define	MIIF_HAVE_GTCR	0x0040		/* has 100base-T2/1000base-T CR */
-#define	MIIF_IS_1000X	0x0080		/* is a 1000BASE-X device */
-#define	MIIF_DOPAUSE	0x0100		/* advertise PAUSE capability */
-#define	MIIF_IS_HPNA	0x0200		/* is a HomePNA device */
+#define	MIIF_INITDONE	0x00000001	/* has been initialized (mii_data) */
+#define	MIIF_NOISOLATE	0x00000002	/* do not isolate the PHY */
+#define	MIIF_NOLOOP	0x00000004	/* no loopback capability */
+#define	MIIF_DOINGAUTO	0x00000008	/* doing autonegotiation (mii_softc) */
+#define	MIIF_AUTOTSLEEP	0x00000010	/* use tsleep(), not callout() */
+#define	MIIF_HAVEFIBER	0x00000020	/* from parent: has fiber interface */
+#define	MIIF_HAVE_GTCR	0x00000040	/* has 100base-T2/1000base-T CR */
+#define	MIIF_IS_1000X	0x00000080	/* is a 1000BASE-X device */
+#define	MIIF_DOPAUSE	0x00000100	/* advertise PAUSE capability */
+#define	MIIF_IS_HPNA	0x00000200	/* is a HomePNA device */
+#define	MIIF_FORCEANEG	0x00000400	/* force auto-negotiation */
+#define	MIIF_NOMANPAUSE	0x00100000	/* no manual PAUSE selection */
+#define	MIIF_FORCEPAUSE	0x00200000	/* force PAUSE advertisment */
+#define	MIIF_MACPRIV0	0x01000000	/* private to the MAC driver */
+#define	MIIF_MACPRIV1	0x02000000	/* private to the MAC driver */
+#define	MIIF_MACPRIV2	0x04000000	/* private to the MAC driver */
+#define	MIIF_PHYPRIV0	0x10000000	/* private to the PHY driver */
+#define	MIIF_PHYPRIV1	0x20000000	/* private to the PHY driver */
+#define	MIIF_PHYPRIV2	0x40000000	/* private to the PHY driver */
 
 /* Default mii_anegticks values */
 #define	MII_ANEGTICKS		5
 #define	MII_ANEGTICKS_GIGE	17
 
 #define	MIIF_INHERIT_MASK	(MIIF_NOISOLATE|MIIF_NOLOOP|MIIF_AUTOTSLEEP)
+
+/*
+ * Special `locators' passed to mii_attach().  If one of these is not
+ * an `any' value, we look for *that* PHY and configure it.  If both
+ * are not `any', that is an error, and mii_attach() will fail.
+ */
+#define	MII_OFFSET_ANY		-1
+#define	MII_PHY_ANY		-1
 
 /*
  * Used to attach a PHY to a parent.
@@ -192,6 +203,7 @@ struct mii_media {
 
 #ifdef _KERNEL
 
+#ifdef __HAIKU__
 int __haiku_miibus_readreg(device_t dev, int phy, int reg);
 int __haiku_miibus_writereg(device_t dev, int phy, int reg, int data);
 void __haiku_miibus_statchg(device_t dev);
@@ -213,11 +225,25 @@ void __haiku_miibus_mediainit(device_t dev);
 #define MIIBUS_MEDIAINIT(dev) \
 	__haiku_miibus_mediainit(dev)
 
+#endif
+
 #define PHY_READ(p, r) \
 	MIIBUS_READREG((p)->mii_dev, (p)->mii_phy, (r))
 
 #define PHY_WRITE(p, r, v) \
 	MIIBUS_WRITEREG((p)->mii_dev, (p)->mii_phy, (r), (v))
+
+enum miibus_device_ivars {
+	MIIBUS_IVAR_FLAGS
+};
+
+/*
+ * Simplified accessors for miibus
+ */
+#define	MIIBUS_ACCESSOR(var, ivar, type)				\
+	__BUS_ACCESSOR(miibus, var, MIIBUS, ivar, type)
+
+MIIBUS_ACCESSOR(flags,		FLAGS,		int)
 
 extern devclass_t	miibus_devclass;
 extern driver_t		miibus_driver;
@@ -226,6 +252,8 @@ int	miibus_probe(device_t);
 int	miibus_attach(device_t);
 int	miibus_detach(device_t);
 
+int	mii_attach(device_t, device_t *, struct ifnet *, ifm_change_cb_t,
+	    ifm_stat_cb_t, int, int, int, int);
 int	mii_anar(int);
 void	mii_down(struct mii_data *);
 int	mii_mediachg(struct mii_data *);
@@ -235,17 +263,23 @@ int	mii_phy_probe(device_t, device_t *, ifm_change_cb_t, ifm_stat_cb_t);
 void	mii_add_media(struct mii_softc *);
 void	mii_phy_add_media(struct mii_softc *);
 
-int	mii_media_from_bmcr(int);
+#ifdef __HAIKU__
+int		mii_media_from_bmcr(int);
+#endif
 
 int	mii_phy_auto(struct mii_softc *);
 int	mii_phy_detach(device_t dev);
 void	mii_phy_down(struct mii_softc *);
+u_int	mii_phy_flowstatus(struct mii_softc *);
 void	mii_phy_reset(struct mii_softc *);
 void	mii_phy_setmedia(struct mii_softc *sc);
 void	mii_phy_update(struct mii_softc *, int);
 int	mii_phy_tick(struct mii_softc *);
 
-const struct mii_phydesc * mii_phy_match(const struct mii_attach_args *ma, const struct mii_phydesc *mpd);
+const struct mii_phydesc * mii_phy_match(const struct mii_attach_args *ma,
+    const struct mii_phydesc *mpd);
+const struct mii_phydesc * mii_phy_match_gen(const struct mii_attach_args *ma,
+    const struct mii_phydesc *mpd, size_t endlen);
 int mii_phy_dev_probe(device_t dev, const struct mii_phydesc *mpd, int mrv);
 
 void	ukphy_status(struct mii_softc *);
