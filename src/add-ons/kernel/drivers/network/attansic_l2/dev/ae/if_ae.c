@@ -28,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/ae/if_ae.c,v 1.1.2.1.2.1 2008/11/25 02:59:29 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -105,7 +105,7 @@ static void	ae_phy_init(ae_softc_t *sc);
 static int	ae_reset(ae_softc_t *sc);
 static void	ae_init(void *arg);
 static int	ae_init_locked(ae_softc_t *sc);
-static unsigned	int	ae_detach(device_t dev);
+static int	ae_detach(device_t dev);
 static int	ae_miibus_readreg(device_t dev, int phy, int reg);
 static int	ae_miibus_writereg(device_t dev, int phy, int reg, int val);
 static void	ae_miibus_statchg(device_t dev);
@@ -360,13 +360,11 @@ ae_attach(device_t dev)
 	if (error != 0)
 		goto fail;
 
-	/* Set default PHY address. */
-	sc->phyaddr = AE_PHYADDR_DEFAULT;
-
 	ifp = sc->ifp = if_alloc(IFT_ETHER);
 	if (ifp == NULL) {
 		device_printf(dev, "could not allocate ifnet structure.\n");
 		error = ENXIO;
+		goto fail;
 	}
 
 	ifp->if_softc = sc;
@@ -377,20 +375,23 @@ ae_attach(device_t dev)
 	ifp->if_init = ae_init;
 	ifp->if_capabilities = IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING;
 	ifp->if_hwassist = 0;
-	ifp->if_snd.ifq_drv_maxlen = IFQ_MAXLEN;
+	ifp->if_snd.ifq_drv_maxlen = ifqmaxlen;
 	IFQ_SET_MAXLEN(&ifp->if_snd, ifp->if_snd.ifq_drv_maxlen);
 	IFQ_SET_READY(&ifp->if_snd);
-	if (pci_find_extcap(dev, PCIY_PMG, &pmc) == 0)
+	if (pci_find_extcap(dev, PCIY_PMG, &pmc) == 0) {
+		ifp->if_capabilities |= IFCAP_WOL_MAGIC;
 		sc->flags |= AE_FLAG_PMG;
+	}
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/*
 	 * Configure and attach MII bus.
 	 */
-	error = mii_phy_probe(dev, &sc->miibus, ae_mediachange,
-	    ae_mediastatus);
+	error = mii_attach(dev, &sc->miibus, ifp, ae_mediachange,
+	    ae_mediastatus, BMSR_DEFCAPMASK, AE_PHYADDR_DEFAULT,
+	    MII_OFFSET_ANY, 0);
 	if (error != 0) {
-		device_printf(dev, "no PHY found.\n");
+		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
 	}
 
@@ -562,6 +563,8 @@ ae_init_locked(ae_softc_t *sc)
 	AE_LOCK_ASSERT(sc);
 
 	ifp = sc->ifp;
+	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		return (0);
 	mii = device_get_softc(sc->miibus);
 
 	ae_stop(sc);
@@ -744,7 +747,7 @@ ae_init_locked(ae_softc_t *sc)
 	return (0);
 }
 
-static unsigned int
+static int
 ae_detach(device_t dev)
 {
 	struct ae_softc *sc;
@@ -808,9 +811,6 @@ ae_miibus_readreg(device_t dev, int phy, int reg)
 	 * Locking is done in upper layers.
 	 */
 
-	if (phy != sc->phyaddr)
-		return (0);
-
 	val = ((reg << AE_MDIO_REGADDR_SHIFT) & AE_MDIO_REGADDR_MASK) |
 	    AE_MDIO_START | AE_MDIO_READ | AE_MDIO_SUP_PREAMBLE |
 	    ((AE_MDIO_CLK_25_4 << AE_MDIO_CLK_SHIFT) & AE_MDIO_CLK_MASK);
@@ -845,9 +845,6 @@ ae_miibus_writereg(device_t dev, int phy, int reg, int val)
 	/*
 	 * Locking is done in upper layers.
 	 */
-
-	if (phy != sc->phyaddr)
-		return (0);
 
 	aereg = ((reg << AE_MDIO_REGADDR_SHIFT) & AE_MDIO_REGADDR_MASK) |
 	    AE_MDIO_START | AE_MDIO_SUP_PREAMBLE |
@@ -1045,7 +1042,7 @@ ae_get_reg_eaddr(ae_softc_t *sc, uint32_t *eaddr)
 	if (AE_CHECK_EADDR_VALID(eaddr) != 0) {
 		if (bootverbose)
 			device_printf(sc->dev,
-			    "Ethetnet address registers are invalid.\n");
+			    "Ethernet address registers are invalid.\n");
 		return (EINVAL);
 	}
 	return (0);
@@ -1107,11 +1104,8 @@ ae_dmamap_cb(void *arg, bus_dma_segment_t *segs, int nsegs, int error)
 static int
 ae_alloc_rings(ae_softc_t *sc)
 {
-	bus_dma_tag_t bustag;
 	bus_addr_t busaddr;
 	int error;
-
-	bustag = bus_get_dma_tag(sc->dev);
 
 	/*
 	 * Create parent DMA tag.
@@ -1336,6 +1330,7 @@ ae_pm_init(ae_softc_t *sc)
 	struct ifnet *ifp;
 	uint32_t val;
 	uint16_t pmstat;
+	struct mii_data *mii;
 	int pmc;
 
 	AE_LOCK_ASSERT(sc);
@@ -1347,7 +1342,40 @@ ae_pm_init(ae_softc_t *sc)
 		return;
 	}
 
-	ae_powersave_enable(sc);
+	/*
+	 * Configure WOL if enabled.
+	 */
+	if ((ifp->if_capenable & IFCAP_WOL) != 0) {
+		mii = device_get_softc(sc->miibus);
+		mii_pollstat(mii);
+		if ((mii->mii_media_status & IFM_AVALID) != 0 &&
+		    (mii->mii_media_status & IFM_ACTIVE) != 0) {
+			AE_WRITE_4(sc, AE_WOL_REG, AE_WOL_MAGIC | \
+			    AE_WOL_MAGIC_PME);
+
+			/*
+			 * Configure MAC.
+			 */
+			val = AE_MAC_RX_EN | AE_MAC_CLK_PHY | \
+			    AE_MAC_TX_CRC_EN | AE_MAC_TX_AUTOPAD | \
+			    ((AE_HALFBUF_DEFAULT << AE_HALFBUF_SHIFT) & \
+			    AE_HALFBUF_MASK) | \
+			    ((AE_MAC_PREAMBLE_DEFAULT << \
+			    AE_MAC_PREAMBLE_SHIFT) & AE_MAC_PREAMBLE_MASK) | \
+			    AE_MAC_BCAST_EN | AE_MAC_MCAST_EN;
+			if ((IFM_OPTIONS(mii->mii_media_active) & \
+			    IFM_FDX) != 0)
+				val |= AE_MAC_FULL_DUPLEX;
+			AE_WRITE_4(sc, AE_MAC_REG, val);
+			    
+		} else {	/* No link. */
+			AE_WRITE_4(sc, AE_WOL_REG, AE_WOL_LNKCHG | \
+			    AE_WOL_LNKCHG_PME);
+			AE_WRITE_4(sc, AE_MAC_REG, 0);
+		}
+	} else {
+		ae_powersave_enable(sc);
+	}
 
 	/*
 	 * PCIE hacks. Magic numbers.
@@ -1365,6 +1393,8 @@ ae_pm_init(ae_softc_t *sc)
 	pci_find_extcap(sc->dev, PCIY_PMG, &pmc);
 	pmstat = pci_read_config(sc->dev, pmc + PCIR_POWER_STATUS, 2);
 	pmstat &= ~(PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE);
+	if ((ifp->if_capenable & IFCAP_WOL) != 0)
+		pmstat |= PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE;
 	pci_write_config(sc->dev, pmc + PCIR_POWER_STATUS, pmstat, 2);
 }
 
@@ -1754,7 +1784,10 @@ ae_int_task(void *arg, int pending)
 	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
 		if ((val & (AE_ISR_DMAR_TIMEOUT | AE_ISR_DMAW_TIMEOUT |
 		    AE_ISR_PHY_LINKDOWN)) != 0) {
+			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			ae_init_locked(sc);
+			AE_UNLOCK(sc);
+			return;
 		}
 		if ((val & AE_ISR_TX_EVENT) != 0)
 			ae_tx_intr(sc);
@@ -1869,8 +1902,8 @@ ae_rxeof(ae_softc_t *sc, ae_rxd_t *rxd)
 	if_printf(ifp, "Rx interrupt occuried.\n");
 #endif
 	size = le16toh(rxd->len) - ETHER_CRC_LEN;
-	if (size < 0) {
-		if_printf(ifp, "Negative length packet received.");
+	if (size < (ETHER_MIN_LEN - ETHER_CRC_LEN - ETHER_VLAN_ENCAP_LEN)) {
+		if_printf(ifp, "Runt frame received.");
 		return (EIO);
 	}
 
@@ -1965,6 +1998,7 @@ ae_watchdog(ae_softc_t *sc)
 		if_printf(ifp, "watchdog timeout - resetting.\n");
 
 	ifp->if_oerrors++;
+	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	ae_init_locked(sc);
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
 		taskqueue_enqueue(sc->tq, &sc->tx_task);
@@ -2042,15 +2076,15 @@ ae_rxfilter(ae_softc_t *sc)
 	 * Load multicast tables.
 	 */
 	bzero(mchash, sizeof(mchash));
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
 		if (ifma->ifma_addr->sa_family != AF_LINK)
 			continue;
-		crc = ether_crc32_le(LLADDR((struct sockaddr_dl *)
+		crc = ether_crc32_be(LLADDR((struct sockaddr_dl *)
 			ifma->ifma_addr), ETHER_ADDR_LEN);
 		mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 	AE_WRITE_4(sc, AE_REG_MHT0, mchash[0]);
 	AE_WRITE_4(sc, AE_REG_MHT1, mchash[1]);
 	AE_WRITE_4(sc, AE_MAC_REG, rxcfg);
@@ -2075,8 +2109,10 @@ ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		else if (ifp->if_mtu != ifr->ifr_mtu) {
 			AE_LOCK(sc);
 			ifp->if_mtu = ifr->ifr_mtu;
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
+				ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 				ae_init_locked(sc);
+			}
 			AE_UNLOCK(sc);
 		}
 		break;

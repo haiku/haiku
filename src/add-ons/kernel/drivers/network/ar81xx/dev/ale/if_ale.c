@@ -28,7 +28,7 @@
 /* Driver for Atheros AR8121/AR8113/AR8114 PCIe Ethernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/ale/if_ale.c,v 1.3 2008/12/03 09:01:12 yongari Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -78,9 +78,6 @@ __FBSDID("$FreeBSD: src/sys/dev/ale/if_ale.c,v 1.3 2008/12/03 09:01:12 yongari E
 
 /* For more information about Tx checksum offload issues see ale_encap(). */
 #define	ALE_CSUM_FEATURES	(CSUM_TCP | CSUM_UDP)
-#ifndef	IFCAP_VLAN_HWTSO
-#define	IFCAP_VLAN_HWTSO	0
-#endif
 
 MODULE_DEPEND(ale, pci, 1, 1, 1);
 MODULE_DEPEND(ale, ether, 1, 1, 1);
@@ -211,9 +208,6 @@ ale_miibus_readreg(device_t dev, int phy, int reg)
 
 	sc = device_get_softc(dev);
 
-	if (phy != sc->ale_phyaddr)
-		return (0);
-
 	CSR_WRITE_4(sc, ALE_MDIO, MDIO_OP_EXECUTE | MDIO_OP_READ |
 	    MDIO_SUP_PREAMBLE | MDIO_CLK_25_4 | MDIO_REG_ADDR(reg));
 	for (i = ALE_PHY_TIMEOUT; i > 0; i--) {
@@ -239,9 +233,6 @@ ale_miibus_writereg(device_t dev, int phy, int reg, int val)
 	int i;
 
 	sc = device_get_softc(dev);
-
-	if (phy != sc->ale_phyaddr)
-		return (0);
 
 	CSR_WRITE_4(sc, ALE_MDIO, MDIO_OP_EXECUTE | MDIO_OP_WRITE |
 	    (val & MDIO_DATA_MASK) << MDIO_DATA_SHIFT |
@@ -610,18 +601,28 @@ ale_attach(device_t dev)
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/* Set up MII bus. */
-	if ((error = mii_phy_probe(dev, &sc->ale_miibus, ale_mediachange,
-	    ale_mediastatus)) != 0) {
-		device_printf(dev, "no PHY found!\n");
+	error = mii_attach(dev, &sc->ale_miibus, ifp, ale_mediachange,
+	    ale_mediastatus, BMSR_DEFCAPMASK, sc->ale_phyaddr, MII_OFFSET_ANY,
+	    0);
+	if (error != 0) {
+		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
 	}
 
 	ether_ifattach(ifp, sc->ale_eaddr);
 
 	/* VLAN capability setup. */
-	ifp->if_capabilities |= IFCAP_VLAN_MTU;
-	ifp->if_capabilities |= IFCAP_VLAN_HWTAGGING | IFCAP_VLAN_HWCSUM;
+	ifp->if_capabilities |= IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING |
+	    IFCAP_VLAN_HWCSUM | IFCAP_VLAN_HWTSO;
 	ifp->if_capenable = ifp->if_capabilities;
+	/*
+	 * Even though controllers supported by ale(3) have Rx checksum
+	 * offload bug the workaround for fragmented frames seemed to
+	 * work so far. However it seems Rx checksum offload does not
+	 * work under certain conditions. So disable Rx checksum offload
+	 * until I find more clue about it but allow users to override it.
+	 */
+	ifp->if_capenable &= ~IFCAP_RXCSUM;
 
 	/* Tell the upper layer(s) we support long frames. */
 	ifp->if_data.ifi_hdrlen = sizeof(struct ether_vlan_header);
@@ -1549,20 +1550,11 @@ ale_resume(device_t dev)
 	struct ale_softc *sc;
 	struct ifnet *ifp;
 	int pmc;
-	uint16_t cmd, pmstat;
+	uint16_t pmstat;
 
 	sc = device_get_softc(dev);
 
 	ALE_LOCK(sc);
-	/*
-	 * Clear INTx emulation disable for hardwares that
-	 * is set in resume event. From Linux.
-	 */
-	cmd = pci_read_config(sc->ale_dev, PCIR_COMMAND, 2);
-	if ((cmd & 0x0400) != 0) {
-		cmd &= ~0x0400;
-		pci_write_config(sc->ale_dev, PCIR_COMMAND, cmd, 2);
-	}
 	if (pci_find_extcap(sc->ale_dev, PCIY_PMG, &pmc) == 0) {
 		/* Disable PME and clear PME status. */
 		pmstat = pci_read_config(sc->ale_dev,
@@ -1595,7 +1587,7 @@ ale_encap(struct ale_softc *sc, struct mbuf **m_head)
 	struct tcphdr *tcp;
 	bus_dma_segment_t txsegs[ALE_MAXTXSEGS];
 	bus_dmamap_t map;
-	uint32_t cflags, ip_off, poff, vtag;
+	uint32_t cflags, hdrlen, ip_off, poff, vtag;
 	int error, i, nsegs, prod, si;
 
 	ALE_LOCK_ASSERT(sc);
@@ -1687,7 +1679,13 @@ ale_encap(struct ale_softc *sc, struct mbuf **m_head)
 				*m_head = NULL;
 				return (ENOBUFS);
 			}
+			ip = (struct ip *)(mtod(m, char *) + ip_off);
 			tcp = (struct tcphdr *)(mtod(m, char *) + poff);
+			m = m_pullup(m, poff + (tcp->th_off << 2));
+			if (m == NULL) {
+				*m_head = NULL;
+				return (ENOBUFS);
+			}
 			/*
 			 * AR81xx requires IP/TCP header size and offset as
 			 * well as TCP pseudo checksum which complicates
@@ -1740,15 +1738,21 @@ ale_encap(struct ale_softc *sc, struct mbuf **m_head)
 	}
 
 	/* Check descriptor overrun. */
-	if (sc->ale_cdata.ale_tx_cnt + nsegs >= ALE_TX_RING_CNT - 2) {
+	if (sc->ale_cdata.ale_tx_cnt + nsegs >= ALE_TX_RING_CNT - 3) {
 		bus_dmamap_unload(sc->ale_cdata.ale_tx_tag, map);
 		return (ENOBUFS);
 	}
 	bus_dmamap_sync(sc->ale_cdata.ale_tx_tag, map, BUS_DMASYNC_PREWRITE);
 
 	m = *m_head;
-	/* Configure Tx checksum offload. */
-	if ((m->m_pkthdr.csum_flags & ALE_CSUM_FEATURES) != 0) {
+	if ((m->m_pkthdr.csum_flags & CSUM_TSO) != 0) {
+		/* Request TSO and set MSS. */
+		cflags |= ALE_TD_TSO;
+		cflags |= ((uint32_t)m->m_pkthdr.tso_segsz << ALE_TD_MSS_SHIFT);
+		/* Set IP/TCP header size. */
+		cflags |= ip->ip_hl << ALE_TD_IPHDR_LEN_SHIFT;
+		cflags |= tcp->th_off << ALE_TD_TCPHDR_LEN_SHIFT;
+	} else if ((m->m_pkthdr.csum_flags & ALE_CSUM_FEATURES) != 0) {
 		/*
 		 * AR81xx supports Tx custom checksum offload feature
 		 * that offloads single 16bit checksum computation.
@@ -1779,15 +1783,6 @@ ale_encap(struct ale_softc *sc, struct mbuf **m_head)
 		    ALE_TD_CSUM_XSUMOFFSET_SHIFT);
 	}
 
-	if ((m->m_pkthdr.csum_flags & CSUM_TSO) != 0) {
-		/* Request TSO and set MSS. */
-		cflags |= ALE_TD_TSO;
-		cflags |= ((uint32_t)m->m_pkthdr.tso_segsz << ALE_TD_MSS_SHIFT);
-		/* Set IP/TCP header size. */
-		cflags |= ip->ip_hl << ALE_TD_IPHDR_LEN_SHIFT;
-		cflags |= tcp->th_off << ALE_TD_TCPHDR_LEN_SHIFT;
-	}
-
 	/* Configure VLAN hardware tag insertion. */
 	if ((m->m_flags & M_VLANTAG) != 0) {
 		vtag = ALE_TX_VLAN_TAG(m->m_pkthdr.ether_vtag);
@@ -1795,8 +1790,32 @@ ale_encap(struct ale_softc *sc, struct mbuf **m_head)
 		cflags |= ALE_TD_INSERT_VLAN_TAG;
 	}
 
-	desc = NULL;
-	for (i = 0; i < nsegs; i++) {
+	i = 0;
+	if ((m->m_pkthdr.csum_flags & CSUM_TSO) != 0) {
+		/*
+		 * Make sure the first fragment contains
+		 * only ethernet and IP/TCP header with options.
+		 */
+		hdrlen =  poff + (tcp->th_off << 2);
+		desc = &sc->ale_cdata.ale_tx_ring[prod];
+		desc->addr = htole64(txsegs[i].ds_addr);
+		desc->len = htole32(ALE_TX_BYTES(hdrlen) | vtag);
+		desc->flags = htole32(cflags);
+		sc->ale_cdata.ale_tx_cnt++;
+		ALE_DESC_INC(prod, ALE_TX_RING_CNT);
+		if (m->m_len - hdrlen > 0) {
+			/* Handle remaining payload of the first fragment. */
+			desc = &sc->ale_cdata.ale_tx_ring[prod];
+			desc->addr = htole64(txsegs[i].ds_addr + hdrlen);
+			desc->len = htole32(ALE_TX_BYTES(m->m_len - hdrlen) |
+			    vtag);
+			desc->flags = htole32(cflags);
+			sc->ale_cdata.ale_tx_cnt++;
+			ALE_DESC_INC(prod, ALE_TX_RING_CNT);
+		}
+		i = 1;
+	}
+	for (; i < nsegs; i++) {
 		desc = &sc->ale_cdata.ale_tx_ring[prod];
 		desc->addr = htole64(txsegs[i].ds_addr);
 		desc->len = htole32(ALE_TX_BYTES(txsegs[i].ds_len) | vtag);
@@ -2003,6 +2022,7 @@ ale_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 			else
 				ifp->if_hwassist &= ~CSUM_TSO;
 		}
+
 #ifdef ENABLE_WOL
 		if ((mask & IFCAP_WOL_MCAST) != 0 &&
 		    (ifp->if_capabilities & IFCAP_WOL_MCAST) != 0)
@@ -2011,28 +2031,19 @@ ale_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		    (ifp->if_capabilities & IFCAP_WOL_MAGIC) != 0)
 			ifp->if_capenable ^= IFCAP_WOL_MAGIC;
 #endif
-		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
-		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
-			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
-			ale_rxvlan(sc);
-		}
 		if ((mask & IFCAP_VLAN_HWCSUM) != 0 &&
 		    (ifp->if_capabilities & IFCAP_VLAN_HWCSUM) != 0)
 			ifp->if_capenable ^= IFCAP_VLAN_HWCSUM;
 		if ((mask & IFCAP_VLAN_HWTSO) != 0 &&
 		    (ifp->if_capabilities & IFCAP_VLAN_HWTSO) != 0)
 			ifp->if_capenable ^= IFCAP_VLAN_HWTSO;
-		/*
-		 * VLAN hardware tagging is required to do checksum
-		 * offload or TSO on VLAN interface. Checksum offload
-		 * on VLAN interface also requires hardware checksum
-		 * offload of parent interface.
-		 */
-		if ((ifp->if_capenable & IFCAP_TXCSUM) == 0)
-			ifp->if_capenable &= ~IFCAP_VLAN_HWCSUM;
-		if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) == 0)
-			ifp->if_capenable &=
-			    ~(IFCAP_VLAN_HWTSO | IFCAP_VLAN_HWCSUM);
+		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
+			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
+			if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) == 0)
+				ifp->if_capenable &= ~IFCAP_VLAN_HWTSO;
+			ale_rxvlan(sc);
+		}
 		ALE_UNLOCK(sc);
 		VLAN_CAPABILITIES(ifp);
 		break;
@@ -3063,15 +3074,15 @@ ale_rxfilter(struct ale_softc *sc)
 	/* Program new filter. */
 	bzero(mchash, sizeof(mchash));
 
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &sc->ale_ifp->if_multiaddrs, ifma_link) {
 		if (ifma->ifma_addr->sa_family != AF_LINK)
 			continue;
-		crc = ether_crc32_le(LLADDR((struct sockaddr_dl *)
+		crc = ether_crc32_be(LLADDR((struct sockaddr_dl *)
 		    ifma->ifma_addr), ETHER_ADDR_LEN);
 		mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
 	CSR_WRITE_4(sc, ALE_MAR0, mchash[0]);
 	CSR_WRITE_4(sc, ALE_MAR1, mchash[1]);
