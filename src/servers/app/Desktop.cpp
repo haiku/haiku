@@ -2588,16 +2588,14 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			BPrivate::LinkSender reply(clientReplyPort);
 			LockAllWindows();
-			if (MessageForListener(NULL, link, reply)) {
-				UnlockAllWindows();
-				break;
+			if (MessageForListener(NULL, link, reply) != true) {
+				// unhandled message, at least send an error if needed
+				if (link.NeedsReply()) {
+					reply.StartMessage(B_ERROR);
+					reply.Flush();
+				}
 			}
-
-			// unhandled message at least send an error if needed
-			if (link.NeedsReply()) {
-				reply.StartMessage(B_ERROR);
-				reply.Flush();
-			}
+			UnlockAllWindows();
 			break;
 		}
 
