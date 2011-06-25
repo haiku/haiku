@@ -47,13 +47,31 @@ public:
 private:
 			typedef PackageLinkSymlink Link;
 
+			struct DependencyLink : public PackageLinkSymlink {
+				DependencyLink(Package* package)
+					:
+					PackageLinkSymlink(package)
+				{
+				}
+
+				DoublyLinkedListLink<DependencyLink> fPackageLinkDirectoryLink;
+			};
+
+			typedef DoublyLinkedList<DependencyLink,
+				DoublyLinkedListMemberGetLink<DependencyLink,
+					&DependencyLink::fPackageLinkDirectoryLink> >
+				FamilyDependencyList;
+
 private:
 			status_t			_Update(PackageLinksListener* listener);
+			status_t			_UpdateDependencies(
+									PackageLinksListener* listener);
 
 private:
 			timespec			fModifiedTime;
 			PackageList			fPackages;
 			Link*				fSelfLink;
+			FamilyDependencyList fDependencyLinks;
 };
 
 
