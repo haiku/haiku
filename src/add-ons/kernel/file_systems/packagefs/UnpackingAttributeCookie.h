@@ -25,7 +25,6 @@ public:
 	static	status_t			Open(PackageNode* packageNode, const char* name,
 									int openMode, AttributeCookie*& _cookie);
 
-	virtual	status_t			Close();
 	virtual	status_t			ReadAttribute(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			ReadAttributeStat(struct stat* st);

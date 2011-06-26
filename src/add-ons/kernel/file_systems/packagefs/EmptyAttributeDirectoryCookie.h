@@ -11,7 +11,6 @@
 
 class EmptyAttributeDirectoryCookie : public AttributeDirectoryCookie {
 public:
-	virtual	status_t			Close();
 	virtual	status_t			Read(dev_t volumeID, ino_t nodeID,
 									struct dirent* buffer, size_t bufferSize,
 									uint32* _count);

@@ -10,3 +10,10 @@
 AttributeCookie::~AttributeCookie()
 {
 }
+
+
+status_t
+AttributeCookie::Close()
+{
+	return B_OK;
+}

@@ -15,7 +15,7 @@ class AttributeCookie {
 public:
 	virtual						~AttributeCookie();
 
-	virtual	status_t			Close() = 0;
+	virtual	status_t			Close();
 	virtual	status_t			ReadAttribute(off_t offset, void* buffer,
 									size_t* bufferSize) = 0;
 	virtual	status_t			ReadAttributeStat(struct stat* st) = 0;

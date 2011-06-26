@@ -101,13 +101,6 @@ UnpackingAttributeCookie::Open(PackageNode* packageNode, const char* name,
 
 
 status_t
-UnpackingAttributeCookie::Close()
-{
-	return B_OK;
-}
-
-
-status_t
 UnpackingAttributeCookie::ReadAttribute(off_t offset, void* buffer,
 	size_t* bufferSize)
 {
