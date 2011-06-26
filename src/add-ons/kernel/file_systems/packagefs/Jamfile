@@ -9,6 +9,7 @@ UsePrivateHeaders shared ;
 HAIKU_PACKAGE_FS_SOURCES =
 	AttributeCookie.cpp
 	AttributeDirectoryCookie.cpp
+	AutoPackageAttributes.cpp
 	BlockBufferCacheKernel.cpp
 	DebugSupport.cpp
 	Dependency.cpp

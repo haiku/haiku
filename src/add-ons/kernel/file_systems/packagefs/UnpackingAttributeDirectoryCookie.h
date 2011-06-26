@@ -7,6 +7,7 @@
 
 
 #include "AttributeDirectoryCookie.h"
+#include "AutoPackageAttributes.h"
 
 
 struct dirent;
@@ -32,6 +33,7 @@ public:
 private:
 			PackageNode*		fPackageNode;
 			PackageNodeAttribute* fAttribute;
+			uint32				fState;
 };
 
 
