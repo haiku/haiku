@@ -36,6 +36,14 @@ ps2_reset_mouse(ps2_dev *dev)
 
 	status = ps2_dev_command(dev, PS2_CMD_RESET, NULL, 0, data, 2);
 
+	if (status == B_OK && data[0] == 0xFE && data[1] == 0xAA) {
+		// workaround for HP/Compaq KBCs timeout condition. #2867 #3594 #4315
+		TRACE("ps2: KBC has timed out the mouse reset request. "
+				"Response was: 0x%02x 0x%02x. Requesting the answer data.\n",
+				data[0], data[1]);
+		status = ps2_dev_command(dev, PS2_CMD_RESEND, NULL, 0, data, 2);
+	}
+
 	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
 		TRACE("ps2: reset mouse failed, response was: 0x%02x 0x%02x\n",
 			data[0], data[1]);
@@ -173,7 +181,7 @@ ps2_dev_exit(void)
 void
 ps2_dev_publish(ps2_dev *dev)
 {
-	status_t status;
+	status_t status = B_OK;
 	TRACE("ps2: ps2_dev_publish %s\n", dev->name);
 
 	if (dev->active)
@@ -182,10 +190,30 @@ ps2_dev_publish(ps2_dev *dev)
 	if (atomic_get(&dev->flags) & PS2_FLAG_KEYB) {
 		status = devfs_publish_device(dev->name, &gKeyboardDeviceHooks);
 	} else {
-		device_hooks *hooks;
-		status = ps2_dev_detect_pointing(dev, &hooks);
+		// Check if this is the "pass-through" device and wait until 
+		// the parent_dev goes to enabled state. It is required to prevent
+		// from messing up the Synaptics command sequences in synaptics_open.
+		if (dev->parent_dev) {
+			const bigtime_t timeout = 2000000;
+			bigtime_t start = system_time();
+			while (!(atomic_get(&dev->parent_dev->flags) & PS2_FLAG_ENABLED)) {
+				if ((system_time() - start) > timeout) {
+					status = B_BUSY;
+					break;
+				}
+				snooze(timeout / 20);
+			}
+			TRACE("ps2: publishing %s: parent %s is %s; wait time %Ld\n",
+				dev->name, dev->parent_dev->name, 
+				status == B_OK ? "enabled" : "busy", system_time() - start);
+		}
+
 		if (status == B_OK) {
-			status = devfs_publish_device(dev->name, hooks);
+			device_hooks *hooks;
+			status = ps2_dev_detect_pointing(dev, &hooks);
+			if (status == B_OK) {
+				status = devfs_publish_device(dev->name, hooks);
+			}
 		}
 	}
 
@@ -237,6 +265,18 @@ ps2_dev_handle_int(ps2_dev *dev)
 				// command
 				TRACE("ps2: ps2_dev_handle_int: mouse didn't ack the 'get id' "
 					"command\n");
+				atomic_or(&dev->flags, PS2_FLAG_ACK);
+				if (dev->result_buf_cnt) {
+					dev->result_buf[dev->result_buf_idx] = data;
+					dev->result_buf_idx++;
+					dev->result_buf_cnt--;
+					if (dev->result_buf_cnt == 0) {
+						atomic_and(&dev->flags, ~PS2_FLAG_CMD);
+						cnt++;
+					}
+				}
+			} else if ((flags & PS2_FLAG_RESEND)) {
+				TRACE("ps2: ps2_dev_handle_int: processing RESEND request\n");
 				atomic_or(&dev->flags, PS2_FLAG_ACK);
 				if (dev->result_buf_cnt) {
 					dev->result_buf[dev->result_buf_idx] = data;
@@ -345,7 +385,7 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 	for (i = -1; res == B_OK && i < out_count; i++) {
 
 		atomic_and(&dev->flags,
-			~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID));
+			~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID | PS2_FLAG_RESEND));
 
 		acquire_sem(gControllerSem);
 
@@ -365,6 +405,8 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 			if (i == -1) {
 				if (cmd == PS2_CMD_GET_DEVICE_ID)
 					atomic_or(&dev->flags, PS2_FLAG_CMD | PS2_FLAG_GETID);
+				else if (cmd == PS2_CMD_RESEND)
+					atomic_or(&dev->flags, PS2_FLAG_CMD | PS2_FLAG_RESEND);
 				else
 					atomic_or(&dev->flags, PS2_FLAG_CMD);
 				ps2_write_data(cmd);

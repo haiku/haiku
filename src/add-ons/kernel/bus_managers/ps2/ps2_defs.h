@@ -57,6 +57,7 @@
 #define PS2_CMD_ENABLE					0xf4
 #define PS2_CMD_DISABLE					0xf5
 #define PS2_CMD_RESET					0xff
+#define PS2_CMD_RESEND					0xfe
 
 // reply codes
 #define PS2_REPLY_TEST_PASSED			0x55

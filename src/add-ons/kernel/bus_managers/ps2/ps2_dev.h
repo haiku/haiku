@@ -59,6 +59,7 @@ extern ps2_dev ps2_device[PS2_DEVICE_COUNT];
 #define PS2_FLAG_ACK		(1 << 4)
 #define PS2_FLAG_NACK		(1 << 5)
 #define PS2_FLAG_GETID		(1 << 6)
+#define PS2_FLAG_RESEND		(1 << 7)
 
 
 #ifdef __cplusplus
