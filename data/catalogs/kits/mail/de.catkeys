@@ -1,0 +1,10 @@
+1	german	x-vnd.Haiku-libmail	161731481
+Connection type:	ProtocolConfigView		Verbindungsart:
+Leave mail on server	ProtocolConfigView		E-Mails auf dem Server belassen
+Login type:	ProtocolConfigView		Anmeldemethode:
+Mail server:	ProtocolConfigView		E-Mail-Server:
+Partially download messages larger than	ProtocolConfigView		Nur Kopfzeilen herunterladen bei E-Mails über
+Password:	ProtocolConfigView		Passwort:
+Remove mail from server when deleted	ProtocolConfigView		Gelöschte E-Mails auch vom Server löschen
+Select…	MailKit		Auswählen…
+Username:	ProtocolConfigView		Benutzername:

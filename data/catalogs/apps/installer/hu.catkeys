@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	1755458235
+1	hungarian	x-vnd.Haiku-Installer	3765436628
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
 <none>	InstallerWindow	No partition available	<nincs>
 ?? of ??	InstallerWindow	Unknown progress	??/??
@@ -27,7 +27,6 @@ Install from:	InstallerWindow		E lemezről:
 Install progress:  	InstallerWindow		Telepítés állapota:  
 Installation canceled.	InstallProgress		A telepítés félbeszakadt.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Rendszertelepítő\n\Írta Jérôme Duval és Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
 No optional packages available.	PackagesView		Nincsenek a rendszer feltelepítéséhez nem feltétlenül szükséges csomagok.

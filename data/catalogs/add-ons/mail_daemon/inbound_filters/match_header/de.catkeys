@@ -1,0 +1,14 @@
+1	german	x-vnd.Haiku-MatchHeader	1251743113
+<Choose account>	ConfigView		<Konto wählen>
+<Choose action>	ConfigView		<Aktion wählen>
+Delete message	ConfigView		Nachricht löschen
+If	ConfigView		Wenn
+Move to	ConfigView		Verschieben nach
+Reply with	ConfigView		Antworten von Konto
+Set as read	ConfigView		Als gelesen markieren
+Set flags to	ConfigView		Status setzen auf
+Then	ConfigView		Dann
+has 	ConfigView		enthält
+header (e.g. Subject)	ConfigView		Kopfzeile (z. B. Subject)
+this field is based on the action	ConfigView		dieses Feld ist abhängig von der Aktion
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		Wert (REGEX nutzen: reguläre Ausdrücke wie *spam*)

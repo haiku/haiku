@@ -1,11 +1,10 @@
-1	slovak	x-vnd.Haiku-About	3149623567
+1	slovak	x-vnd.Haiku-About	2446894321
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB celkom
 %d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
 %ld MHz	AboutView		 %ld MHz
 %ld Processors:	AboutView		%ld procesory:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB celkom, %inaccessible MiB neprístupných
-... and the many people making donations!\n\n	AboutView		... a mnohí ďalších, ktorí prispeli dotáciou!\n\n
 About this system	AboutWindow		O tomto systéme
 Contributors:\n	AboutView		Prispievatelia:\n
 Current maintainers:\n	AboutView		Aktívni vývojári:\n
@@ -21,7 +20,6 @@ Processor:	AboutView		Procesor:
 Revision	AboutView		Revízia:
 Source Code: 	AboutView		Zdrojový kód:
 The BeGeistert team\n	AboutView		Tím BeGeistert\n
-The Haiku-Ports team\n	AboutView		T9m Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland a Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Kód, ktorý je  charakteristický pre Haiku, najmä jadro a kód, ktorý využívajú aplikácie môže byť šírený za podmienok %MIT licence%. Niektoré systémové knižnice obsahujú kód tretích strán šírený pod licenciou LGPL. Autorské práva tretích strán nájdete uvedené nižšie.

@@ -1,15 +1,36 @@
-1	simplified_chinese	x-vnd.Haiku-Time	3114592611
+1	simplified_chinese	x-vnd.Haiku-Time	453699369
 <Other>	Time		<其他>
-Clock set to:	Time		时钟设置为：
+Add	Time		添加
+Could not contact server	Time		无法连接服务器
+Could not create socket	Time		无法创建套接字
 Current time:	Time		当前时间：
-Date & Time	Time		日期和时间
+Date and time	Time		日期时间
+Etc	Time		等等
 GMT	Time		GMT 
+Hardware clock set to:	Time		硬件时钟设置为：
 Local time	Time		当地时间
+Message receiving failed	Time		消息接收失败
+Network time	Time		网络时间
 OK	Time		确定
 Preview time:	Time		时间预览：
+Received invalid time	Time		接收时间无效
+Remove	Time		移除
+Reset	Time		重置
 Revert	Time		恢复
+Sending request failed	Time		发送请求失败
 Set time zone	Time		设置时区
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		日期和时间，编写者：\n\n\tAndrew Edward McCall \n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权所有 2004-2008, Haiku, Inc.
+Stop	Time		停止
+Synchronize	Time		同步
+Synchronize again	Time		再次同步
+Synchronize at boot	Time		启动时同步
+The following error occured while synchronizing:r\n%s	Time		时间同步时发生如下错误：r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		同步时间时发生如下错误：r\n%s：%s
+This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		该设置控制了 Haiku 基于硬件时钟显示时间的方式。窗口通常设置为本地时间，\n即硬件时钟的时间与配置的时区时间相同。当设置为 GMT 时，硬件\n时钟基于 GMT 进行计时，Haiku 将会根据时区调整显示时间。
+Time	System name		时间
+Time	Time		时间
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		日期时间，编写者：\n\n\tAndrew Edward McCall \n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权 2004-2008, Haiku, Inc.
 Time zone	Time		时区
+Try all servers	Time		尝试所有服务器
+Waiting for answer failed	Time		等待回复失败
 \nNow: 	Time		\n现在时间：
 about	Time		关于

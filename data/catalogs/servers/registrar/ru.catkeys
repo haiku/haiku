@@ -19,5 +19,5 @@ Shutdown aborted	ShutdownProcess		Выключение прервано
 Shutdown status	ShutdownProcess		Статус выключения
 Shutting down…	ShutdownProcess		Выключение…
 System is shut down	ShutdownProcess		Система выключена
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Приложение \"%appName%\" возможно заблокировано модальным окном.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Приложение \"%appName%\" возможно заблокировано модальным окном или не отвечает.
 Tidying things up a bit.	ShutdownProcess		Подготовка системы к выключению.

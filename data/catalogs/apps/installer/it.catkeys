@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	1952003730
+1	italian	x-vnd.Haiku-Installer	3961982123
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) L'installer renderà la partizione Haiku avviabile, ma non esegue nessun passo per integrare Haiku in un menu di avvio esistente. Se avete GRUB già installato, potete aggiungere Haiku al suo menu d'avvio. Ciò ouò essere fatto in maniera differente, dipende da quale versione di GRUB utilizzate.\n\n\n 
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
@@ -40,7 +40,6 @@ Install from:	InstallerWindow		Installa da:
 Install progress:  	InstallerWindow		Avanzamento dell'installazione:  
 Installation canceled.	InstallProgress		Installazione annullata.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per abbandonare l'Installer oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per riavviare il computer oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tscritto da Jérôme Duval e Stephan Aßmus\n\tCopyright©2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Avvia l'utilità DriveSetup per creare partizioni sui dischi rigidi e altri media disponibili.\nLe partizioni possono essere inizializzate con il \nBe File System necessario per una partizione d'avvio Haiku.
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		NOTA: Se la strategia di denominazione per gli hard disk è ancora come descritto al punto 2.1) lo schema di denominazione per le partizioni è cambiato.\n\n

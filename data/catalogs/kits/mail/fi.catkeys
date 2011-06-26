@@ -1,0 +1,10 @@
+1	finnish	x-vnd.Haiku-libmail	161731481
+Connection type:	ProtocolConfigView		Yhteystyyppi:
+Leave mail on server	ProtocolConfigView		Jätä sähköposti palvelimelle
+Login type:	ProtocolConfigView		Kirjautumistyyppi:
+Mail server:	ProtocolConfigView		Sähköpostipalvelin:
+Partially download messages larger than	ProtocolConfigView		Osittain ladatut viestit suurempia kuin
+Password:	ProtocolConfigView		Salasana:
+Remove mail from server when deleted	ProtocolConfigView		Poista sähköposti palvelimelta poistettaessa
+Select…	MailKit		Valitse...
+Username:	ProtocolConfigView		Käyttäjänimi:

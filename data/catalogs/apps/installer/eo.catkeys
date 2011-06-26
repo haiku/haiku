@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	2179409467
+1	esperanto	x-vnd.Haiku-Installer	4189387860
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld el %2ld
 <none>	InstallerWindow	No partition available	<neniu>
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ĉu vi estas certa, ke vi volas nuligi la instaladon kaj restarti la sistemon?
@@ -16,7 +16,6 @@ Finishing Installation.	InstallProgress		Kompletigante la instaladon.
 Install from:	InstallerWindow		Instali el:
 Install progress:  	InstallerWindow		Instalada progreso:  
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		La instalado sukcesis. La startsektoro estas skribita al '%s'. Klaku al Eliri por forigi la Instalilon aŭ elektu novan celan volumon por denove instali.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		La instalado sukcesis. La startsektoro estas skribita al '%s'. Klaku al Eliri por forigi la Instalilon aŭ elektu novan celan volumon por denove instali.
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalilo\n\tskribita per Jérôme Duval kaj Stephan Aßmus\n\tKopirajto 2005-2010, Haiku.\n\n
 OK	InstallProgress		Bone
 OK	InstallerApp		Bone

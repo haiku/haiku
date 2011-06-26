@@ -1,18 +1,13 @@
-1	czech	x-vnd.Haiku-JPEGTranslator	226512890
+1	czech	x-vnd.Haiku-JPEGTranslator	965709535
 About	JPEGTranslator		O programu
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formát Be Bitmap (JPEGPřekladač)
-ExposureTime	exit_parser		Čas expozice
 High	JPEGTranslator		Vysoká
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		Chyba knihovny JPEG: %s\n
 JPEG Library Warning: %s\n	be_jerror		Varování knihovny JPEG: %s\n
 JPEG images	JPEGTranslator		obrázky JPEG
 Low	JPEGTranslator		Nízká
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Menší soubor (v trošičku horší kvalitě)
-Maker	exit_parser		Autor
-Model	exit_parser		Model
 None	JPEGTranslator		Žádný
-Orientation	exit_parser		Orientace
 Output quality	JPEGTranslator		Výstupní kvalita
 Output smoothing strength	JPEGTranslator		Síla výstupního vyhlazení
 Prevent colors 'washing out'	JPEGTranslator		Předejít "vymytí" barev

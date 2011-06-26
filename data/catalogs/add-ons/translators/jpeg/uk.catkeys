@@ -1,16 +1,11 @@
-1	ukrainian	x-vnd.Haiku-JPEGTranslator	1699433362
+1	ukrainian	x-vnd.Haiku-JPEGTranslator	2438630007
 About	JPEGTranslator		Про
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат Be Bitmap (Перетворювач JPEG)
-ExposureTime	exit_parser		Час витримки
 High	JPEGTranslator		Високе
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
 Low	JPEGTranslator		Низьке
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Зробити файл меньшим (можлива втрата якості)
-Maker	exit_parser		Маркер
-Model	exit_parser		Модель
 None	JPEGTranslator		Жоден
-Orientation	exit_parser		Розташування
 Output quality	JPEGTranslator		Вихідна якість
 Output smoothing strength	JPEGTranslator		Інтенсивність зглажування
 Prevent colors 'washing out'	JPEGTranslator		попереджати втрату 'насичення' кольорів

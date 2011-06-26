@@ -1,14 +1,14 @@
-1	italian	x-vnd.Haiku-Time	3114592611
+1	italian	x-vnd.Haiku-Time	2610033694
 <Other>	Time		<Altro>
-Clock set to:	Time		Orologio impostato a
 Current time:	Time		Ora attuale:
-Date & Time	Time		Data e Ora
+Etc	Time		Ecc
 GMT	Time		GMT
 Local time	Time		Ora locale
 OK	Time		OK
 Preview time:	Time		Durata dell'anteprima:
 Revert	Time		Ripristina
 Set time zone	Time		Imposta fuso orario
+Time	Time		Ora
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, scritto da:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Fuso orario
 \nNow: 	Time		\nOra:

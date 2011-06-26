@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3669711461
+1	japanese	x-vnd.Haiku-Installer	3852628561
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Haikuを(エミュレータでなく)実機にインストールする場合は、ハードディスクのパーティションを先に用意しておくことが望ましいです。インストーラーおよびDriveSetupツールには、Haikuファイルシステムによる既存のパーティションの初期化機能があります。しかし、パーティションを作成、変更するオプションは充分な多種多様のコンピュータの構成でテストされていないため、使用を勧めません。\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) インストーラーは、Haikuのパーティションを起動可能にします。しかし、Haikuを既存のブートメニューにまとめる機能はありません。すでにGRUBがインストールされている場合、ブートメニューにHaikuを追加できます。追加作業は、使用しているGRUBのバージョンによって異なります。\n\n\n
@@ -46,7 +46,7 @@ Install from:	InstallerWindow		インストール元：
 Install progress:  	InstallerWindow		進行状況：  
 Installation canceled.	InstallProgress		インストールが中断されました。
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが '%s' に書き込まれました。終了ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが '%s' に書き込まれました。終了ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが '%s' に書き込まれました。 再起動ボタンでコンピューターを再起動するか、他に Haiku をインストールするボリュームを選択してください。
 Installer	System name		インストーラー
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		使用可能なハードディスクおよび他のメディア上\nのパーティションを操作するツール DriveSetup\nを起動します。このツールを使って、パーティション\nを Haiku の起動に必要な Be ファイルシステム (BFS)\nで初期化します。
@@ -70,6 +70,7 @@ Quit Boot Manager	InstallerWindow		Boot Manager の終了
 Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager と DriveSetup を終了
 Quit DriveSetup	InstallerWindow		DriveSetup の終了
 README	InstallerApp		README
+Restart	InstallerWindow		再起動
 Restart system	InstallerWindow		システムを再起動
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Boot Manager と DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager 実行中…\n\nインストールを続けるには、Boot Manager を閉じてください。

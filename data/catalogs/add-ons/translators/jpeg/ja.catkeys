@@ -1,18 +1,13 @@
-1	japanese	x-vnd.Haiku-JPEGTranslator	226512890
+1	japanese	x-vnd.Haiku-JPEGTranslator	965709535
 About	JPEGTranslator		JPEG Translatorについて
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be ビットマップフォーマット (JPEGTranslator)
-ExposureTime	exit_parser		露出時間
 High	JPEGTranslator		高い
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		JPEG ライブラリエラー: %s\n
 JPEG Library Warning: %s\n	be_jerror		JPEG ライブラリの警告: %s\n
 JPEG images	JPEGTranslator		JPEGイメージ
 Low	JPEGTranslator		低い
 Make file smaller (sligthtly worse quality)	JPEGTranslator		ファイルサイズを小さくする (品質は少し悪くなります)
-Maker	exit_parser		メーカー
-Model	exit_parser		モデル
 None	JPEGTranslator		無し
-Orientation	exit_parser		向き
 Output quality	JPEGTranslator		出力品質
 Output smoothing strength	JPEGTranslator		スムージング強度
 Prevent colors 'washing out'	JPEGTranslator		色が 'washing out' されないようにする

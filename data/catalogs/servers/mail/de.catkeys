@@ -1,0 +1,20 @@
+1	german	x-vnd.Haiku-mail_daemon	3018783227
+%num new message for %name\n	MailDaemon		%num neue Nachricht für %name\n
+%num new messages for %name\n	MailDaemon		%num neue Nachrichten für %name\n
+<no accounts>	DeskbarView		<keine Konten>
+Check for mail now	DeskbarView		E-Mails jetzt abrufen
+Check for mails only	DeskbarView		E-Mails nur abrufen
+Check mail now	StatusWindow		E-Mails jetzt abrufen
+Create new message…	DeskbarView		Nachricht verfassen…
+New Messages	MailDaemon		Neue Nachrichten
+No new messages	DeskbarView		Keine neuen Nachrichten
+No new messages	MailDaemon		Keine neuen Nachrichten
+No new messages.	MailDaemon		Keine neuen Nachrichten.
+No new messages.	StatusWindow		Keine neuen Nachrichten.
+Preferences…	DeskbarView		Einstellungen…
+Send pending mails	DeskbarView		E-Mails senden
+Shutdown mail services	DeskbarView		E-Mail-Dienst ausschalten
+new message	DeskbarView		neue Nachricht
+new message.	MailDaemon		neue Nachricht.
+new messages	DeskbarView		neue Nachrichten
+new messages.	MailDaemon		neue Nachrichten.

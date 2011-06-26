@@ -1,0 +1,20 @@
+1	finnish	x-vnd.Haiku-mail_daemon	3018783227
+%num new message for %name\n	MailDaemon		%num uusi viesti käyttäjälle %name\n
+%num new messages for %name\n	MailDaemon		%num uutta viestiä käyttäjälle %name\n
+<no accounts>	DeskbarView		<ei tilejä>
+Check for mail now	DeskbarView		Tarkista sähköposti nyt
+Check for mails only	DeskbarView		Tarkista vain sähköpostit
+Check mail now	StatusWindow		Tarkista sähköposti nyt
+Create new message…	DeskbarView		Luo uusi viesti...
+New Messages	MailDaemon		Uudet viestit
+No new messages	DeskbarView		Ei uusia viestejä
+No new messages	MailDaemon		Ei uusia viestejä
+No new messages.	MailDaemon		Ei uusia viestejä.
+No new messages.	StatusWindow		Ei uusia viestejä.
+Preferences…	DeskbarView		Asetukset...
+Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostiviestit
+Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
+new message	DeskbarView		uusi viesti
+new message.	MailDaemon		uusi viesti.
+new messages	DeskbarView		uudet viestit
+new messages.	MailDaemon		uusia viestejä.

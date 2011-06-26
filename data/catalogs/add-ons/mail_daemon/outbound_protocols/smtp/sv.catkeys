@@ -1,0 +1,13 @@
+1	swedish	x-vnd.Haiku-SMTP	1882880201
+. The server said:\n	smtp		. Servern sa:\n
+. The server says:\n	smtp		. Servern säger:\n
+: Connection refused or host not found.	smtp		: Anslutningen nekades eller så saknas värden.
+Connecting to server…	smtp		Ansluter till server...
+Destination:	ConfigView		Mål:
+ESMTP	ConfigView		ESMTP
+Error while logging in to 	smtp		Fel vid inloggning till
+Error while opening connection to 	smtp		Fel vid skapande av anslutning till
+None	ConfigView		Ingen
+POP3 authentication failed. The server said:\n	smtp		POP3 verifiering misslyckades. Servern sa:\n
+POP3 before SMTP	ConfigView		POP3 före SMTP
+SMTP server: 	ConfigView		SMTP server:

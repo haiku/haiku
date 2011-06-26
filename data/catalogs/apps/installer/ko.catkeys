@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Installer	837975173
+1	korean	x-vnd.Haiku-Installer	2847953566
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld 의 %2ld
 <none>	InstallerWindow	No partition available	<없음>
 ?? of ??	InstallerWindow	Unknown progress	?? 의 ??
@@ -26,7 +26,6 @@ Install from:	InstallerWindow		원본:
 Install progress:  	InstallerWindow		설치 과정:  
 Installation canceled.	InstallProgress		설치가 취소됨.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'에 기록되었습니다.  나가기를 눌려서 설치프로그램을 나가거나 새로운 설치 볼륨을 선택해서 다른 설치를 할 수 있습니다.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'에 기록되었습니다.  나가기를 눌려서  컴푸터를 다시 시작하거나새로운 설치 볼륨을 선택해서 다른 설치를 할 수 있습니다
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		사용가능한 하드디스크와 다른 미디어의 \파티션을 만들기 위해 드라이브 설정 유틸리티를 시작합니다.\n파티션은 Haiku 부트 파티션에 필요한 \nBe 파일 시스템으로 \n초기화합니다.
 No optional packages available.	PackagesView		선택적인 패키지가 가능하지 않음.
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		설치에 적합한 어떤 파티션도 찾을 수 없습니다. 파티션을 준비해서 최소한 하나의 파티션을 Be 파일 시스템으로 초기화하십시오.

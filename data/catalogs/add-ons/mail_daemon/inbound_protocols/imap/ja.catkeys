@@ -1,0 +1,9 @@
+1	japanese	x-vnd.Haiku-IMAP	3892875357
+Apply	IMAPFolderConfig		適用
+Destination:	imap_config		メッセージの保存先:
+Failed to fetch available storage.	IMAPFolderConfig		使用可能な容量の取得に失敗しました。
+Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAPフォルダーを取得しています。しばらくお待ちください…
+IMAP Folders	IMAPFolderConfig		IMAPフォルダー
+IMAP Folders	imap_config		IMAPフォルダー
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		IMAPフォルダーの購読/購読解除処理を実行しています。しばらくお待ちください。
+status	IMAPFolderConfig		状態

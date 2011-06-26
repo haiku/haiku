@@ -1,18 +1,13 @@
-1	romanian	x-vnd.Haiku-JPEGTranslator	797380431
+1	romanian	x-vnd.Haiku-JPEGTranslator	1536577076
 About	JPEGTranslator		Despre
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format imagine Be (TraducătorJPEG)
-ExposureTime	exit_parser		TimpExpunere
 High	JPEGTranslator		Sus
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		Eroare bibliotecă JPEG: %s\n
 JPEG Library Warning: %s\n	be_jerror		Avertisment bibliotecă JPEG: %s\n
 JPEG images	JPEGTranslator		Imagini JPEG
 Low	JPEGTranslator		Jos
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Micșorează fișierul (calitate mai scăzută)
-Maker	exit_parser		Fabricant
-Model	exit_parser		Model
 None	JPEGTranslator		Nimic
-Orientation	exit_parser		Orientare
 Output quality	JPEGTranslator		Calitatea rezultatului
 Output smoothing strength	JPEGTranslator		Produce putere de netezire
 Prevent colors 'washing out'	JPEGTranslator		Previne „spălarea” culorilor

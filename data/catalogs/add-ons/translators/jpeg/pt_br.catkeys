@@ -1,18 +1,13 @@
-1	brazilian_portuguese	x-vnd.Haiku-JPEGTranslator	226512890
+1	brazilian_portuguese	x-vnd.Haiku-JPEGTranslator	965709535
 About	JPEGTranslator		Sobre
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato de Bitmap Be (JPEGTranslator)
-ExposureTime	exit_parser		Tempo de exposição
 High	JPEGTranslator		Alto
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		Erro na biblioteca JPEG: %s\n
 JPEG Library Warning: %s\n	be_jerror		Aviso da biblioteca JPEG: %s\n
 JPEG images	JPEGTranslator		Imagens JPEG
 Low	JPEGTranslator		Baixo
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Compactar arquivo (diminui a qualidade)
-Maker	exit_parser		Criador
-Model	exit_parser		Modelo
 None	JPEGTranslator		Nenhum
-Orientation	exit_parser		Orientação
 Output quality	JPEGTranslator		Qualidade de saída
 Output smoothing strength	JPEGTranslator		Suavização
 Prevent colors 'washing out'	JPEGTranslator		Prevenir cores 'lavadas'

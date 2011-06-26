@@ -1,0 +1,14 @@
+1	romanian	x-vnd.Haiku-desklink	3053930521
+%g dB	MediaReplicant		%g dB
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Bip
+Control physical output	MediaReplicant		Controlează ieșirea fizică
+Couldn't launch 	MediaReplicant		Nu s-a putut lansa
+Media preferences…	MediaReplicant		Preferințe media...
+No media server running	VolumeControl		Nu rulează niciun server media
+OK	MediaReplicant		OK
+Open MediaPlayer	MediaReplicant		Deschide PlayerMedia
+Options	MediaReplicant		Opțiuni
+Sound preferences…	MediaReplicant		Preferințe sunet...
+Volume	VolumeControl		Volum
+desklink	MediaReplicant		desklink

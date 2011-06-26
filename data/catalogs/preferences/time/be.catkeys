@@ -1,16 +1,37 @@
-1	belarusian	x-vnd.Haiku-Time	844587475
+1	belarusian	x-vnd.Haiku-Time	453699369
 <Other>	Time		<іншае>
-Clock set to:	Time		Гадзіннік усталяваны на:
+Add	Time		Дадаць
+Could not contact server	Time		Няма далучэння да сервера
+Could not create socket	Time		Немагчыма стварыць сеткавы сокет.
 Current time:	Time		Сапраўдны час:
-Date & Time	Time		Дата і час
+Date and time	Time		Дата і Час
+Etc	Time		І г. д.
 GMT	Time		GMT
+Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
 Local time	Time		Лакальны час
+Message receiving failed	Time		Памылка атрымання паведамлення
+Network time	Time		Сеткавы час
 OK	Time		ОК
 Preview time:	Time		Праглядзець час:
+Received invalid time	Time		Атрыманы несапраўдны час
+Remove	Time		Выдаліць
+Reset	Time		Скінуць
 Revert	Time		Адвярнуць
+Sending request failed	Time		Немагчыма адаслаць запыт.
 Set time zone	Time		Пазначыць часавы пояс
+Stop	Time		Спыніць
+Synchronize	Time		Сінхранізаваць
+Synchronize again	Time		Сінхранізаваць ізноў
+Synchronize at boot	Time		Сінхранізаваць падчас старту
+The following error occured while synchronizing:r\n%s	Time		Памылка падчас сінхранізацыі:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
+This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Гэтая наладка дазваляе наладзіць узаемадзеянне Haiku\nз гадзіннікам кампутара. Калі абраны варыянт "Лакальны час"\nто сістэма лічыць, што гадзіннік кампутара (BIOS Time)\nусталяваны на бягучы час абранага часавога поясу, варыянт-жа\n
+"GMT" змусіць сістэму улічваць зрух абранага часавога поясу -\nдадаваць яго да часу гадзінніка кампутара.\nВарыянт "Лакальны час" адпавядае таму які звычайна\nвыкарыстоўваецца аперацыйнай сістэмай Windows.
 Time	System name		Дата і Час
+Time	Time		Час
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, аўтары:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Часавы пояс
+Try all servers	Time		Паспрабаваць усе серверы
+Waiting for answer failed	Time		Памылка падчас чакання адказу
 \nNow: 	Time		\nЗараз:
 about	Time		пра праграму

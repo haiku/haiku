@@ -1,16 +1,36 @@
-1	french	x-vnd.Haiku-Time	844587475
+1	french	x-vnd.Haiku-Time	453699369
 <Other>	Time		<Autre>
-Clock set to:	Time		Heure réglée sur :
+Add	Time		Ajouter
+Could not contact server	Time		Impossible de contacter le serveur
+Could not create socket	Time		Impossible de créer le socket
 Current time:	Time		Heure actuelle :
-Date & Time	Time		Date & Heure
+Date and time	Time		Date et heure
+Etc	Time		Etc
 GMT	Time		GMT
+Hardware clock set to:	Time		L'horloge matérielle est réglée sur :
 Local time	Time		Heure locale
+Message receiving failed	Time		La réception du message a échoué
+Network time	Time		Heure réseau
 OK	Time		OK
 Preview time:	Time		Aperçu de l'heure :
+Received invalid time	Time		Une heure non valide a été reçue
+Remove	Time		Retirer
+Reset	Time		Réinitialiser
 Revert	Time		Rétablir
+Sending request failed	Time		L'envoi d'une requête a échoué
 Set time zone	Time		Régler le fuseau horaire
+Stop	Time		Arrêter
+Synchronize	Time		Synchroniser
+Synchronize again	Time		Synchroniser à nouveau
+Synchronize at boot	Time		Synchroniser au démarrage
+The following error occured while synchronizing:r\n%s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s : %s
+This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Ce paramètre contrôle la façon dont Haiku affiche l'heure en fonction\nde la façon dont elle est gérée dans l'horloge matérielle de l'ordinateur.\nWindows est généralement réglé sur l'heure locale, ce qui signifie que\nl'horloge matérielle est réglée dans le fuseau horaire configuré. Lorsque\ncette option est réglée en GMT, cela signifie que l'horloge matérielle est\nréglée sur le fuseau horaire de Greenwich et Haiku ajuste l'affichage de\nl'heure en tenant compte du fuseau horaire configuré.
 Time	System name		Heure
+Time	Time		Heure
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Date & Heure, écrit par :\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Fuseau horaire
+Try all servers	Time		Essayer tous les serveurs
+Waiting for answer failed	Time		L'attente d'une réponse a échoué
 \nNow: 	Time		\nMaintenant, il est : 
 about	Time		À propos

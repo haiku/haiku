@@ -1,18 +1,13 @@
-1	german	x-vnd.Haiku-JPEGTranslator	226512890
+1	german	x-vnd.Haiku-JPEGTranslator	965709535
 About	JPEGTranslator		Über
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-Bitmap-Format (JPEGTranslator)
-ExposureTime	exit_parser		Belichtungszeit
 High	JPEGTranslator		Hoch
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		JPEG-Bibliothek, Fehler: %s\n
 JPEG Library Warning: %s\n	be_jerror		JPEG-Bibliothek, Warnung: %s\n
 JPEG images	JPEGTranslator		JPEG-Bilder
 Low	JPEGTranslator		Niedrig
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Kleinere Dateien (mit etwas schlechterer Qualität)
-Maker	exit_parser		Ersteller
-Model	exit_parser		Modell
 None	JPEGTranslator		Keine
-Orientation	exit_parser		Ausrichtung
 Output quality	JPEGTranslator		Ausgabequalität
 Output smoothing strength	JPEGTranslator		Glättung
 Prevent colors 'washing out'	JPEGTranslator		'Ausgewaschene' Farben verhindern

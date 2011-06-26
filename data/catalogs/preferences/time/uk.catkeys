@@ -1,11 +1,12 @@
-1	ukrainian	x-vnd.Haiku-Time	2768324476
+1	ukrainian	x-vnd.Haiku-Time	4087029862
 <Other>	Time		<Інше>
 Current time:	Time		Поточний час:
-Date & Time	Time		Дата і Час
+Etc	Time		І т.д.
 OK	Time		Гаразд
 Preview time:	Time		Попередній час:
 Revert	Time		Повернути
 Set time zone	Time		Встановити часову зону
+Time	Time		Час
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, Написаний:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nАвторські права 2004-2008, Haiku.
 Time zone	Time		Часова зона
 about	Time		про

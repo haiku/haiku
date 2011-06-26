@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-Installer	1330828329
+1	brazilian_portuguese	x-vnd.Haiku-Installer	3340806722
 ???	InstallerWindow	Unknown currently copied item	???
 Additional disk space required: %s	InstallerWindow		Espaço adicional necessário em disco: %s
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Um erro foi encontrado e a instalação não foi completado:\n\nErro:  %s
@@ -17,7 +17,6 @@ Hide optional packages	InstallerWindow		Esconder items opcionais
 Install anyway	InstallProgress		Instalar mesmo assim
 Install progress:  	InstallerWindow		Progresso na instalação:  
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação está completa. O setor de inicialização foi escrito em '%s'. Pressione Sair para deixar o Instalador ou escolha uma nova partição para realizar outra instalação.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A instalação está completa. O setor de inicialização foi escrito em '%s'. Pressione Sair para reiniciar o computador ou escolher uma nova partição para realizar outra instalação.
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Abrir o utilitário Configurador de Drive para particionar\nos HDs disponíveis e outras mídias.\nAs partições podem ser inicializadas com o Sistema de Arquivos\nBe necessário para uma partição de inicialização do\nHaiku.
 No optional packages available.	PackagesView		Nenhum item opcional está disponível.

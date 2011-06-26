@@ -1,16 +1,32 @@
-1	russian	x-vnd.Haiku-Time	844587475
+1	russian	x-vnd.Haiku-Time	2002728485
 <Other>	Time		<Другой>
-Clock set to:	Time		Часы настроены на:
+Add	Time		Добавить
+Could not contact server	Time		Ну удалось связаться с сервером
+Could not create socket	Time		Не удалось создать сокет
 Current time:	Time		Текущее время:
-Date & Time	Time		Дата и время
+Date and time	Time		Дата и время
+Etc	Time		И т.д.
 GMT	Time		GMT
 Local time	Time		Местное время
+Network time	Time		Синхронизация времени
 OK	Time		ОК
 Preview time:	Time		Предварительное время:
+Received invalid time	Time		Получено неверное время
+Remove	Time		Удалить
+Reset	Time		Сбросить
 Revert	Time		Вернуть
+Sending request failed	Time		Не удалось отправить запрос
 Set time zone	Time		Установить часовой пояс
+Stop	Time		Остановить
+Synchronize	Time		Синхронизировать
+Synchronize again	Time		Синхронизировать снова
+Synchronize at boot	Time		Синхронизировать при загрузке
+The following error occured while synchronizing:r\n%s	Time		При синхронизации произошла следующая ошибка:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
 Time	System name		Время
+Time	Time		Время
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, разработал:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Часовой пояс
+Try all servers	Time		Пробовать все сервера
 \nNow: 	Time		\nСейчас: 
 about	Time		о программе

@@ -1,0 +1,12 @@
+1	japanese	x-vnd.Haiku-NewMailNotification	3157747612
+Alert	ConfigView		警告ウィンドウ
+Beep	ConfigView		ビープ音
+Central alert	ConfigView		警告ウィンドウ (すべてのアカウント)
+Central beep	ConfigView		ビープ音 (すべてのアカウント)
+Keyboard LEDs	ConfigView		キーボードLED
+Log window	ConfigView		ログウインドウ
+Method:	ConfigView		方法：
+New messages	filter		新着メッセージ
+You have %num new message for %name.	filter		%name より\n%num 通のメッセージが届きました。
+You have %num new messages for %name.	filter		%name より\n%num 通のメッセージが届きました。
+new message	filter		新着メッセージ

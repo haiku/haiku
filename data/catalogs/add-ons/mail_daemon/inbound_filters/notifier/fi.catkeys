@@ -1,0 +1,12 @@
+1	finnish	x-vnd.Haiku-NewMailNotification	3157747612
+Alert	ConfigView		Hälytys
+Beep	ConfigView		Piip
+Central alert	ConfigView		Keskeinen hälytys
+Central beep	ConfigView		Keskeinen piip
+Keyboard LEDs	ConfigView		Näppäimistön ledit
+Log window	ConfigView		Loki-ikkuna
+Method:	ConfigView		Metodi:
+New messages	filter		Uudet viestit
+You have %num new message for %name.	filter		Sinulle on %num uutta viestiä käyttäjälle %name.
+You have %num new messages for %name.	filter		Sinulle on %num uusi viesti käyttäjälle %name.
+new message	filter		uusi viesti

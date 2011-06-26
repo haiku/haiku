@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	3669711461
+1	german	x-vnd.Haiku-Installer	3852628561
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld von %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)    Wird Haiku auf richtiger Hardware (nicht in einem Emulator) installiert, wird die vorherige Vorbereitung einer Festplattenpartition empfohlen. Der Installer und DriveSetup bieten zwar die Initialisierung bestehender Partitionen mit dem haiku-eigenen Dateisystem an. Da aber die Optionen zum Ändern des eigentlichen Partitionslayouts bisher nicht mit genügend unterschiedlichen Computerkonfigurationen getestet wurden, wird davon abgeraten.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)    Der Installer wird die Haiku-Partition selbst bootfähig machen, aber nichts unternehmen, um Haiku in ein bestehendes Bootmenü zu integrieren. Ist bereits GRUB installiert, kann man Haiku zu dessen Bootmenü hinzufügen. Die Vorgehensweise ist dabei abhängig von der verwendeten GRUB-Version.\n\n\n
@@ -46,7 +46,7 @@ Install from:	InstallerWindow		Installieren von:
 Install progress:  	InstallerWindow		Installationsverlauf: 
 Installation canceled.	InstallProgress		Installation abgebrochen.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um das Installationsprogramm zu verlassen, oder ein anderes Ziellaufwerk für eine weitere Installation auswählen.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um den Rechner neu zu starten, oder ein anderes Ziellaufwerk für eine weitere Installation wählen.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Neustarten' klicken, um den Rechner neu zu starten, oder ein anderes Ziellaufwerk für eine weitere Installation wählen.
 Installer	System name		Installer
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Das Werkzeug DriveSetup starten, um\nverfügbare Laufwerke zu partitionieren.\nPartitionen können mit dem 'Be File System'\ninitialisiert werden, das für\neine Haiku-Bootpartition nötig ist.
@@ -70,6 +70,7 @@ Quit Boot Manager	InstallerWindow		BootManager beenden
 Quit Boot Manager and DriveSetup	InstallerWindow		BootManager und DriveSetup beenden
 Quit DriveSetup	InstallerWindow		DriveSetup beenden
 README	InstallerApp		LIESMICH
+Restart	InstallerWindow		Neustarten
 Restart system	InstallerWindow		Rechner neustarten
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		BootManager und DriveSetup laufen...\n\nBeide Anwendungen müssen beendet werden, um mit der Installation fortzufahren.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		BootManager läuft...\n\nBootManager muss beendet werden, um mit der Installation fortzufahren.

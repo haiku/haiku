@@ -1,0 +1,20 @@
+1	japanese	x-vnd.Haiku-mail_daemon	3018783227
+%num new message for %name\n	MailDaemon		%name より %num 通のメッセージが届きました\n
+%num new messages for %name\n	MailDaemon		%name より %num 通のメッセージが届きました\n
+<no accounts>	DeskbarView		<アカウント無し>
+Check for mail now	DeskbarView		今すぐメールをチェック
+Check for mails only	DeskbarView		メール受信のみ
+Check mail now	StatusWindow		今すぐメールをチェック
+Create new message…	DeskbarView		新規メッセージ作成
+New Messages	MailDaemon		通の新着メッセージがあります。
+No new messages	DeskbarView		新着メッセージはありません。
+No new messages	MailDaemon		未読メッセージはありません。
+No new messages.	MailDaemon		新着メッセージはありません。
+No new messages.	StatusWindow		新着メッセージはありません。
+Preferences…	DeskbarView		メールの設定
+Send pending mails	DeskbarView		保留メールを送信
+Shutdown mail services	DeskbarView		終了
+new message	DeskbarView		 通の新着メッセージがあります。
+new message.	MailDaemon		 通の新着メッセージがあります。
+new messages	DeskbarView		 通の未読メッセージがあります。
+new messages.	MailDaemon		 通の新着メッセージがあります。

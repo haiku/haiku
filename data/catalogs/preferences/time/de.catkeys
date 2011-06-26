@@ -1,16 +1,36 @@
-1	german	x-vnd.Haiku-Time	844587475
+1	german	x-vnd.Haiku-Time	453699369
 <Other>	Time		<Andere>
-Clock set to:	Time		Hardwareuhr gestellt auf:
+Add	Time		Hinzu
+Could not contact server	Time		Server konnte nicht erreicht werden
+Could not create socket	Time		Socket konnte nicht erzeugt werden
 Current time:	Time		Aktuelle Zeit:
-Date & Time	Time		Datum & Zeit
+Date and time	Time		Datum und Zeit
+Etc	Time		Etc
 GMT	Time		GMT
+Hardware clock set to:	Time		Hardware-Uhr gestellt auf:
 Local time	Time		Lokale Zeit
+Message receiving failed	Time		Nachricht wurde nicht erhalten
+Network time	Time		Netzwerkzeit
 OK	Time		OK
 Preview time:	Time		Vorschau-Zeit:
+Received invalid time	Time		Ungültige Zeit erhalten
+Remove	Time		Entfernen
+Reset	Time		Reset
 Revert	Time		Anfangswerte
+Sending request failed	Time		Sendeanfrage fehlgeschlagen
 Set time zone	Time		Zeitzone setzen
+Stop	Time		Stopp
+Synchronize	Time		Synchronisieren
+Synchronize again	Time		Nochmal synchronisieren
+Synchronize at boot	Time		Synchronisieren beim Hochfahren
+The following error occured while synchronizing:r\n%s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s: %s
+This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Die Darstellung der Uhrzeit in Haiku hängt von der Einstellung\nder Hardware-Uhr ab. Windows benutzt normalerweise \"Lokale Zeit\",\nd.h. die Hardware-Uhr zeigt die gleiche Zeit wie die eingestellte\nZeitzone. Wird dagegen \"GMT\" benutzt, zeigt die Hardware-Uhr\ndiese von Zeitzonen unabhängige Zeit und Haiku muss seine Uhrzeit\nentsprechend nachstellen.
 Time	System name		Datum & Zeit
+Time	Time		Time - Datum & Zeit
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Zeit\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Zeitzone
+Try all servers	Time		Alle Server abfragen
+Waiting for answer failed	Time		Warten auf Antwort fehlgeschlagen
 \nNow: 	Time		\nJetzt:
 about	Time		über

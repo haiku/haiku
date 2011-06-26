@@ -1,18 +1,13 @@
-1	russian	x-vnd.Haiku-JPEGTranslator	226512890
+1	russian	x-vnd.Haiku-JPEGTranslator	965709535
 About	JPEGTranslator		Авторы
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Растровый формат Be (JPEGTranslator)
-ExposureTime	exit_parser		Экспозиция
 High	JPEGTranslator		Высокое
-ISO	exit_parser		ISO
 JPEG Library Error: %s\n	be_jerror		Ошибка библиотеки JPEG: %s\n
 JPEG Library Warning: %s\n	be_jerror		Предупреждение библиотеки JPEG: %s\n
 JPEG images	JPEGTranslator		JPEG изображения
 Low	JPEGTranslator		Низкое
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Делать файл меньше (немного худшего качества)
-Maker	exit_parser		Создатель
-Model	exit_parser		Модель
 None	JPEGTranslator		Нет
-Orientation	exit_parser		Ориентация
 Output quality	JPEGTranslator		Качество вывода
 Output smoothing strength	JPEGTranslator		Сглаживание вывода
 Prevent colors 'washing out'	JPEGTranslator		Предотвращать 'размывание' цветов

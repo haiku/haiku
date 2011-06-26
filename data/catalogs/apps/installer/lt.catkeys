@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	750349764
+1	lithuanian	x-vnd.Haiku-Installer	2760328157
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld iš %2ld
 <none>	InstallerWindow	No partition available	<nieko>
 ?? of ??	InstallerWindow	Unknown progress	?? iš ??
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Diegti iš:
 Install progress:  	InstallerWindow		Diegimo eiga:  
 Installation canceled.	InstallProgress		Diegimo atsisakyta.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Diegyklė „Installer“\n\tparašyta Jérôme'o Duval'io ir Stephan'o Aßmus'o\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Paleidžia priemonę „DriveSetup“ skirsnių tvarkymui\nprieinamose laikmenose.\nSkirsniai turi būti sužymimi kaip „Be File System“ (BFS),\ntai yra būtina Haiku paleidimo skirsniui.
 No optional packages available.	PackagesView		Papildomų paketų nėra.
