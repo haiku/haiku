@@ -1271,7 +1271,7 @@ Volume::_DomainEntryCreated(PackageDomain* domain, dev_t deviceID,
 
 	// check whether the entry is a file
 	struct stat st;
-	if (fstatat(domain->DirectoryFD(), name, &st, AT_SYMLINK_NOFOLLOW) < 0
+	if (fstatat(domain->DirectoryFD(), name, &st, 0) < 0
 		|| !S_ISREG(st.st_mode)) {
 		return;
 	}
