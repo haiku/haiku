@@ -29,6 +29,13 @@ local sources =
 	IMAPStorage.cpp
 ;
 
+if $(HAIKU_OPENSSL_ENABLED) {
+	SubDirC++Flags -DUSE_SSL ;
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
+}
+
 Addon IMAP
 	:
 	$(sources)
