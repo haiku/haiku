@@ -521,6 +521,7 @@ Volume::Mount(const char* parameterString)
 				volumeName = "home";
 				break;
 			case MOUNT_TYPE_CUSTOM:
+			default:
 				volumeName = "Package FS";
 				break;
 		}
