@@ -125,7 +125,7 @@ ps2_selftest()
 
 
 static status_t
-ps2_setup_command_byte()
+ps2_setup_command_byte(bool interruptsEnabled)
 {
 	status_t res;
 	uint8 cmdbyte;
@@ -135,9 +135,13 @@ ps2_setup_command_byte()
 	if (res != B_OK)
 		cmdbyte = 0x47;
 
-	cmdbyte |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT
-		| PS2_BITS_AUX_INTERRUPT;
+	cmdbyte |= PS2_BITS_TRANSLATE_SCANCODES;
 	cmdbyte &= ~(PS2_BITS_KEYBOARD_DISABLED | PS2_BITS_MOUSE_DISABLED);
+
+	if (interruptsEnabled)
+		cmdbyte |= PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT;
+	else
+		cmdbyte &= ~(PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT);
 
 	res = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
 	TRACE("ps2: set command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
@@ -357,9 +361,12 @@ ps2_init(void)
 	// after that
 	//ps2_selftest();
 
-	status = ps2_setup_command_byte();
+	// Setup the command byte with disabled keyboard and AUX interrupts
+	// to prevent interrupts storm on some KBCs during active multiplexing 
+	// activation procedure. Fixes #7635.
+	status = ps2_setup_command_byte(false);
 	if (status) {
-		INFO("ps2: setting up command byte failed\n");
+		INFO("ps2: initial setup of command byte failed\n");
 		goto err5;
 	}
 
@@ -367,6 +374,12 @@ ps2_init(void)
 	status = ps2_setup_active_multiplexing(&gActiveMultiplexingEnabled);
 	if (status) {
 		INFO("ps2: setting up active multiplexing failed\n");
+		goto err5;
+	}
+
+	status = ps2_setup_command_byte(true);
+	if (status) {
+		INFO("ps2: setting up command byte with enabled interrupts failed\n");
 		goto err5;
 	}
 
