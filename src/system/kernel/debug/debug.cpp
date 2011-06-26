@@ -805,9 +805,6 @@ static void
 kernel_debugger_loop(const char* messagePrefix, const char* message,
 	va_list args, int32 cpu)
 {
-	int32 previousCPU = sDebuggerOnCPU;
-	sDebuggerOnCPU = cpu;
-
 	DebugAllocPool* allocPool = create_debug_alloc_pool();
 
 	sCurrentKernelDebuggerMessagePrefix = messagePrefix;
@@ -936,8 +933,6 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 		va_end(sCurrentKernelDebuggerMessageArgs);
 
 	delete_debug_alloc_pool(allocPool);
-
-	sDebuggerOnCPU = previousCPU;
 }
 
 
@@ -945,6 +940,8 @@ static void
 enter_kernel_debugger(int32 cpu)
 {
 	while (atomic_add(&sInDebugger, 1) > 0) {
+		atomic_add(&sInDebugger, -1);
+
 		// The debugger is already running, find out where...
 		if (sDebuggerOnCPU == cpu) {
 			// We are re-entering the debugger on the same CPU.
@@ -955,7 +952,6 @@ enter_kernel_debugger(int32 cpu)
 		// us. Process ICIs to ensure we get the halt request. Then we are
 		// blocking there until everyone leaves the debugger and we can
 		// try to enter it again.
-		atomic_add(&sInDebugger, -1);
 		smp_intercpu_int_handler(cpu);
 	}
 
@@ -1027,12 +1023,22 @@ kernel_debugger_internal(const char* messagePrefix, const char* message,
 		} else
 			enter_kernel_debugger(cpu);
 
+		// If we're called recursively sDebuggerOnCPU will be != -1.
+		int32 previousCPU = sDebuggerOnCPU;
+		sDebuggerOnCPU = cpu;
+
 		kernel_debugger_loop(messagePrefix, message, args, cpu);
 
-		if (sHandOverKDLToCPU < 0) {
+		if (sHandOverKDLToCPU < 0 && previousCPU == -1) {
+			// We're not handing over to a different CPU and we weren't
+			// called recursively, so we'll exit the debugger.
 			exit_kernel_debugger();
-			break;
 		}
+
+		sDebuggerOnCPU = previousCPU;
+
+		if (sHandOverKDLToCPU < 0)
+			break;
 
 		hand_over_kernel_debugger();
 
@@ -1617,7 +1623,7 @@ debug_stop_screen_debug_output(void)
 bool
 debug_debugger_running(void)
 {
-	return sInDebugger > 0;
+	return sDebuggerOnCPU != -1;
 }
 
 
