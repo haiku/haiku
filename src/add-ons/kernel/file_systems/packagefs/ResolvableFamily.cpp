@@ -43,6 +43,9 @@ ResolvableFamily::RemoveResolvable(Resolvable* resolvable,
 {
 	resolvable->SetFamily(NULL);
 	fResolvables.Remove(resolvable);
+
+	// the removed resolvable's dependencies need to be updated
+	resolvable->MoveDependencies(dependenciesToUpdate);
 }
 
 
