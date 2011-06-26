@@ -1,5 +1,5 @@
 name = makefile-engine
-version = 1-1
+version = R1-alpha3_pm-1
 architecture = any
 summary = "The makefile engine"
 description = "A simple generic makefile engine and makefile template."
@@ -11,7 +11,7 @@ copyright = "? Be Inc. 2001-2011 Haiku, Inc."
 licenses = [ "MIT" ]
 
 provides = [
-	makefile-engine
+	makefile-engine=R1-alpha3_pm-1
 ]
 
 requires = [

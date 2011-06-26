@@ -1,5 +1,5 @@
 name = Haiku
-version = R1.pm1-1
+version = R1-alpha3_pm-1
 architecture = x86_gcc2
 summary = "The Haiku base system"
 description = "The Haiku base system includes all system core software, like
@@ -12,7 +12,7 @@ copyright = "2001-2011 Haiku, Inc. et al"
 licenses = [ "MIT" ]
 
 provides = [
-	haiku=R1.pm1-1
+	haiku=R1-alpha3_pm-1
 ]
 
 requires = [
