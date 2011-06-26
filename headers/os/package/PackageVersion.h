@@ -25,20 +25,22 @@ public:
 									const BPackageVersionData& data);
 								BPackageVersion(const BString& major,
 									const BString& minor, const BString& micro,
-									uint8 release);
+									const BString& preRelease, uint8 release);
 
 			status_t			InitCheck() const;
 
 			const BString&		Major() const;
 			const BString&		Minor() const;
 			const BString&		Micro() const;
+			const BString&		PreRelease() const;
+									// "alpha3", "beta2", "rc1" or "" if final
 			uint8				Release() const;
 
 			BString				ToString() const;
 
 			void				SetTo(const BString& major,
 									const BString& minor, const BString& micro,
-									uint8 release);
+									const BString& preRelease, uint8 release);
 			void				Clear();
 
 			int					Compare(const BPackageVersion& other) const;
@@ -49,6 +51,7 @@ private:
 			BString				fMajor;
 			BString				fMinor;
 			BString				fMicro;
+			BString				fPreRelease;
 			uint8				fRelease;
 };
 

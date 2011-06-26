@@ -19,11 +19,12 @@ public:
 								~Version();
 
 			status_t			Init(const char* major, const char* minor,
-									const char* micro, uint8 release);
+									const char* micro, const char* preRelease,
+									uint8 release);
 
 	static	status_t			Create(const char* major, const char* minor,
-									const char* micro, uint8 release,
-									Version*& _version);
+									const char* micro, const char* preRelease,
+									uint8 release, Version*& _version);
 
 			int					Compare(const Version& other) const;
 			bool				Compare(BPackageResolvableOperator op,
@@ -37,6 +38,7 @@ private:
 			char*				fMajor;
 			char*				fMinor;
 			char*				fMicro;
+			char*				fPreRelease;
 			uint8				fRelease;
 };
 

@@ -523,6 +523,16 @@ WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 		}
 	}
 
+	if (!version.PreRelease().IsEmpty()) {
+		PackageAttribute* preRelease = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		preRelease->string
+			= fPackageStringCache.Get(version.PreRelease().String());
+		versionMajor->children.Add(preRelease);
+	}
+
 	if (version.Release() != 0) {
 		PackageAttribute* versionRelease = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE,

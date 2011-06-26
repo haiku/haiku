@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -125,6 +125,10 @@ ReaderImplBase::PackageVersionAttributeHandler::HandleAttribute(
 
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO:
 			fPackageVersionData.micro = value.string;
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE:
+			fPackageVersionData.preRelease = value.string;
 			break;
 
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE:

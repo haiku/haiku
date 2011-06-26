@@ -56,6 +56,7 @@ static const char* kAttributeNames[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT + 1] = {
 	"package:replaces",
 	"package:resolvable.operator",
 	"package:checksum",
+	"package:version.prerelease",
 	NULL
 };
 

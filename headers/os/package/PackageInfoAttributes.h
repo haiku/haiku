@@ -16,7 +16,7 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_VENDOR,		// e.g. "Haiku Project"
 	B_PACKAGE_INFO_PACKAGER,	// e-mail address preferred
 	B_PACKAGE_INFO_ARCHITECTURE,
-	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]]
+	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]][-<pre>]-<release>
 	B_PACKAGE_INFO_COPYRIGHTS,	// list
 	B_PACKAGE_INFO_LICENSES,	// list
 	B_PACKAGE_INFO_PROVIDES,	// list of resolvables this package provides,

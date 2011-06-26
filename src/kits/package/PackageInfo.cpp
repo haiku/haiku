@@ -349,23 +349,43 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 	if (word.type != TOKEN_WORD)
 		throw ParseError("expected word (a version)", word.pos);
 
+	// get the release number
 	uint8 release = 0;
 	int32 lastDashPos = word.text.FindLast('-');
-	if (lastDashPos < 0) {
-		if (!releaseIsOptional) {
-			throw ParseError("expected release number (-<number> suffix)",
+	if (lastDashPos >= 0) {
+		// Might be either the release number or, if that is optional, a
+		// pre-release. The former always is a number, the latter starts with a
+		// non-digit.
+		if (isdigit(word.text[lastDashPos + 1])) {
+			int number = atoi(word.text.String() + lastDashPos + 1);
+			if (number <= 0 || number > 99) {
+				throw ParseError("release number must be from 1-99",
+					word.pos + word.text.Length());
+			}
+			release = number;
+			word.text.Truncate(lastDashPos);
+			lastDashPos = word.text.FindLast('-');
+		}
+	}
+
+	if (release == 0 && !releaseIsOptional) {
+		throw ParseError("expected release number (-<number> suffix)",
+			word.pos + word.text.Length());
+	}
+
+	// get the pre-release string
+	BString preRelease;
+	if (lastDashPos >= 0) {
+		if (isdigit(word.text[lastDashPos + 1])) {
+			throw ParseError("pre-release number must not start with a digit",
 				word.pos + word.text.Length());
 		}
-	} else {
-		int number = atoi(word.text.String() + lastDashPos + 1);
-		if (number <= 0 || number > 99) {
-			throw ParseError("release number must be from 1-99",
-				word.pos + word.text.Length());
-		}
-		release = number;
+
+		word.text.CopyInto(preRelease, lastDashPos + 1, word.text.Length());
 		word.text.Truncate(lastDashPos);
 	}
 
+	// get major, minor, and micro strings
 	BString major;
 	BString minor;
 	BString micro;
@@ -387,7 +407,7 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 		}
 	}
 
-	value->SetTo(major, minor, micro, release);
+	value->SetTo(major, minor, micro, preRelease, release);
 }
 
 

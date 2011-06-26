@@ -226,6 +226,8 @@ private:
 			printf(".%s", version.minor);
 		if (version.micro != NULL && version.micro[0] != '\0')
 			printf(".%s", version.micro);
+		if (version.preRelease != NULL && version.preRelease[0] != '\0')
+			printf("-%s", version.preRelease);
 		if (version.release > 0)
 			printf("-%d", version.release);
 	}

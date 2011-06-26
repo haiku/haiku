@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
 #include <new>
 
 #include <NaturalCompare.h>
@@ -37,6 +38,7 @@ Version::Version()
 	fMajor(NULL),
 	fMinor(NULL),
 	fMicro(NULL),
+	fPreRelease(NULL),
 	fRelease(0)
 {
 }
@@ -47,12 +49,13 @@ Version::~Version()
 	free(fMajor);
 	free(fMinor);
 	free(fMicro);
+	free(fPreRelease);
 }
 
 
 status_t
 Version::Init(const char* major, const char* minor, const char* micro,
-	uint8 release)
+	const char* preRelease, uint8 release)
 {
 	if (major != NULL) {
 		fMajor = strdup(major);
@@ -72,6 +75,12 @@ Version::Init(const char* major, const char* minor, const char* micro,
 			return B_NO_MEMORY;
 	}
 
+	if (preRelease != NULL) {
+		fPreRelease = strdup(preRelease);
+		if (fPreRelease == NULL)
+			return B_NO_MEMORY;
+	}
+
 	fRelease = release;
 
 	return B_OK;
@@ -80,13 +89,13 @@ Version::Init(const char* major, const char* minor, const char* micro,
 
 /*static*/ status_t
 Version::Create(const char* major, const char* minor, const char* micro,
-	uint8 release, Version*& _version)
+	const char* preRelease, uint8 release, Version*& _version)
 {
 	Version* version = new(std::nothrow) Version;
 	if (version == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = version->Init(major, minor, micro, release);
+	status_t error = version->Init(major, minor, micro, preRelease, release);
 	if (error != B_OK) {
 		delete version;
 		return error;
@@ -111,6 +120,21 @@ Version::Compare(const Version& other) const
 	cmp = compare_version_part(fMicro, other.fMicro);
 	if (cmp != 0)
 		return cmp;
+
+	// The pre-version works differently: The empty string is greater than any
+	// non-empty string (e.g. "R1" is newer than "R1-rc2"). So we catch the
+	// empty string cases first.
+	if (fPreRelease == NULL) {
+		if (other.fPreRelease != NULL)
+			return 1;
+	} else if (other.fPreRelease == NULL) {
+		return -1;
+	} else {
+		// both are non-null -- compare normally
+		cmp = BPrivate::NaturalCompare(fPreRelease, other.fPreRelease);
+		if (cmp != 0)
+			return cmp;
+	}
 
 	return (int)fRelease - other.fRelease;
 }
@@ -147,8 +171,8 @@ Version::ToString(char* buffer, size_t bufferSize) const
 {
 	// We need to normalize the version string somewhat. If a subpart is given,
 	// make sure that also the superparts are defined, using a placeholder. This
-	// avoids clashes, e.g. if one version defines only major and one only
-	// micro.
+	// avoids clashes, e.g. if one version defines major and minor and one only
+	// major and micro.
 	const char* major = fMajor;
 	const char* minor = fMinor;
 	const char* micro = fMicro;
@@ -158,16 +182,28 @@ Version::ToString(char* buffer, size_t bufferSize) const
 	if (minor != NULL && major == NULL)
 		major = kVersionPartPlaceholder;
 
-	if (micro != NULL) {
-		return snprintf(buffer, bufferSize, "%s.%s.%s-%u", major, minor, micro,
-			fRelease);
+	size_t size = strlcpy(buffer, major, bufferSize);
+
+	if (minor != NULL) {
+		size_t offset = std::min(bufferSize, size);
+		size += snprintf(buffer + offset, bufferSize - offset, ".%s", minor);
 	}
 
-	if (minor != NULL)
-		return snprintf(buffer, bufferSize, "%s.%s-%u", major, minor, fRelease);
+	if (micro != NULL) {
+		size_t offset = std::min(bufferSize, size);
+		size += snprintf(buffer + offset, bufferSize - offset, ".%s", micro);
+	}
 
-	if (major != NULL)
-		return snprintf(buffer, bufferSize, "%s-%u", major, fRelease);
+	if (fPreRelease != NULL) {
+		size_t offset = std::min(bufferSize, size);
+		size += snprintf(buffer + offset, bufferSize - offset, "-%s",
+			fPreRelease);
+	}
 
-	return snprintf(buffer, bufferSize, "%u", fRelease);
+	if (fRelease != 0) {
+		size_t offset = std::min(bufferSize, size);
+		size += snprintf(buffer + offset, bufferSize - offset, "-%u", fRelease);
+	}
+
+	return size;
 }
