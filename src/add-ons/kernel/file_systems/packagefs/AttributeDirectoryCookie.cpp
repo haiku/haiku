@@ -10,3 +10,10 @@
 AttributeDirectoryCookie::~AttributeDirectoryCookie()
 {
 }
+
+
+status_t
+AttributeDirectoryCookie::Close()
+{
+	return B_OK;
+}

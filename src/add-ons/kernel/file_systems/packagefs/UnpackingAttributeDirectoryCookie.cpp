@@ -46,13 +46,6 @@ UnpackingAttributeDirectoryCookie::Open(PackageNode* packageNode,
 
 
 status_t
-UnpackingAttributeDirectoryCookie::Close()
-{
-	return B_OK;
-}
-
-
-status_t
 UnpackingAttributeDirectoryCookie::Read(dev_t volumeID, ino_t nodeID,
 	struct dirent* buffer, size_t bufferSize, uint32* _count)
 {
