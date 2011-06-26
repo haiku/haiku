@@ -15,6 +15,7 @@
 
 #include <AutoDeleter.h>
 
+#include "AutoPackageAttributes.h"
 #include "DebugSupport.h"
 #include "GlobalFactory.h"
 #include "Package.h"
@@ -86,8 +87,11 @@ UnpackingAttributeCookie::Open(PackageNode* packageNode, const char* name,
 
 	// get the attribute
 	PackageNodeAttribute* attribute = packageNode->FindAttribute(name);
-	if (attribute == NULL)
-		return B_ENTRY_NOT_FOUND;
+	if (attribute == NULL) {
+		// We don't know the attribute -- maybe it's an auto-generated one.
+		return AutoPackageAttributes::OpenCookie(packageNode->GetPackage(),
+			name, openMode, _cookie);
+	}
 
 	// allocate the cookie
 	UnpackingAttributeCookie* cookie = new(std::nothrow)

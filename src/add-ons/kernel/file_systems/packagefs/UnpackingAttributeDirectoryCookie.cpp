@@ -15,7 +15,8 @@ UnpackingAttributeDirectoryCookie::UnpackingAttributeDirectoryCookie(
 	PackageNode* packageNode)
 	:
 	fPackageNode(packageNode),
-	fAttribute(NULL)
+	fAttribute(NULL),
+	fState(AUTO_PACKAGE_ATTRIBUTE_ENUM_FIRST)
 {
 	if (fPackageNode != NULL) {
 		fPackageNode->AcquireReference();
@@ -54,7 +55,7 @@ UnpackingAttributeDirectoryCookie::Read(dev_t volumeID, ino_t nodeID,
 
 	dirent* previousEntry = NULL;
 
-	while (fAttribute != NULL) {
+	while (fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT || fAttribute != NULL) {
 		// don't read more entries than requested
 		if (count >= maxCount)
 			break;
@@ -73,9 +74,16 @@ UnpackingAttributeDirectoryCookie::Read(dev_t volumeID, ino_t nodeID,
 			}
 		}
 
+		// get the attribute name
+		const char* name;
+		if (fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT) {
+			name = AutoPackageAttributes::NameForAttribute(
+				(AutoPackageAttribute)fState);
+		} else
+			name = fAttribute->Name();
+
 		// fill in the entry name -- checks whether the entry fits into the
 		// buffer
-		const char* name = fAttribute->Name();
 		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
 			if (count == 0)
 				RETURN_ERROR(B_BUFFER_OVERFLOW);
@@ -91,7 +99,10 @@ UnpackingAttributeDirectoryCookie::Read(dev_t volumeID, ino_t nodeID,
 		bufferSize -= buffer->d_reclen;
 		buffer = (dirent*)((addr_t)buffer + buffer->d_reclen);
 
-		fAttribute = fPackageNode->Attributes().GetNext(fAttribute);
+		if (fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT)
+			fState++;
+		else
+			fAttribute = fPackageNode->Attributes().GetNext(fAttribute);
 	}
 
 	*_count = count;
@@ -104,6 +115,8 @@ UnpackingAttributeDirectoryCookie::Rewind()
 {
 	if (fPackageNode != NULL)
 		fAttribute = fPackageNode->Attributes().Head();
+
+	fState = AUTO_PACKAGE_ATTRIBUTE_ENUM_FIRST;
 
 	return B_OK;
 }
