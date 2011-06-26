@@ -294,7 +294,7 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 				Version* version;
 				status_t error = Version::Create(value.version.major,
 					value.version.minor, value.version.micro,
-					value.version.release, version);
+					value.version.preRelease, value.version.release, version);
 				if (error != B_OK)
 					RETURN_ERROR(error);
 
@@ -312,7 +312,7 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 						= value.resolvable.version;
 					status_t error = Version::Create(versionInfo.major,
 						versionInfo.minor, versionInfo.micro,
-						versionInfo.release, version);
+						versionInfo.preRelease, versionInfo.release, version);
 					if (error != B_OK)
 						RETURN_ERROR(error);
 				}
@@ -354,7 +354,7 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 						= value.resolvableExpression.version;
 					status_t error = Version::Create(versionInfo.major,
 						versionInfo.minor, versionInfo.micro,
-						versionInfo.release, version);
+						versionInfo.preRelease, versionInfo.release, version);
 					if (error != B_OK)
 						RETURN_ERROR(error);
 
