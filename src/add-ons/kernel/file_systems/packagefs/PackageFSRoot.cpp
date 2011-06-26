@@ -14,6 +14,14 @@
 #include "PackageLinksDirectory.h"
 
 
+//#define TRACE_DEPENDENCIES_ENABLED
+#ifdef TRACE_DEPENDENCIES_ENABLED
+#	define TRACE_DEPENDENCIES(x...)	TPRINT(x)
+#else
+#	define TRACE_DEPENDENCIES(x...)	do {} while (false)
+#endif
+
+
 static const char* const kPackageLinksDirectoryName = "package-links";
 
 
@@ -230,12 +238,16 @@ PackageFSRoot::_RemoveVolume(Volume* volume)
 status_t
 PackageFSRoot::_AddPackage(Package* package)
 {
+	TRACE_DEPENDENCIES("adding package \"%s\"\n", package->Name());
+
 	ResolvableDependencyList dependenciesToUpdate;
 
 	// register resolvables
 	for (ResolvableList::ConstIterator it
 				= package->Resolvables().GetIterator();
 			Resolvable* resolvable = it.Next();) {
+		TRACE_DEPENDENCIES("  adding resolvable \"%s\"\n", resolvable->Name());
+
 		if (ResolvableFamily* family
 				= fResolvables.Lookup(resolvable->Name())) {
 			family->AddResolvable(resolvable, dependenciesToUpdate);
@@ -259,6 +271,8 @@ PackageFSRoot::_AddPackage(Package* package)
 	for (DependencyList::ConstIterator it
 				= package->Dependencies().GetIterator();
 			Dependency* dependency = it.Next();) {
+		TRACE_DEPENDENCIES("  adding dependency \"%s\"\n", dependency->Name());
+
 		if (DependencyFamily* family
 				= fDependencies.Lookup(dependency->Name())) {
 			family->AddDependency(dependency);
@@ -287,6 +301,8 @@ PackageFSRoot::_AddPackage(Package* package)
 void
 PackageFSRoot::_RemovePackage(Package* package)
 {
+	TRACE_DEPENDENCIES("removing package \"%s\"\n", package->Name());
+
 	fPackageLinksDirectory->RemovePackage(package);
 
 	// unregister dependencies
@@ -294,6 +310,9 @@ PackageFSRoot::_RemovePackage(Package* package)
 				= package->Dependencies().GetIterator();
 			Dependency* dependency = it.Next();) {
 		if (DependencyFamily* family = dependency->Family()) {
+			TRACE_DEPENDENCIES("  removing dependency \"%s\"\n",
+				dependency->Name());
+
 			if (family->IsLastDependency(dependency)) {
 				fDependencies.Remove(family);
 				family->RemoveDependency(dependency);
@@ -310,6 +329,9 @@ PackageFSRoot::_RemovePackage(Package* package)
 				= package->Resolvables().GetIterator();
 			Resolvable* resolvable = it.Next();) {
 		if (ResolvableFamily* family = resolvable->Family()) {
+			TRACE_DEPENDENCIES("  removing resolvable \"%s\"\n",
+				resolvable->Name());
+
 			if (family->IsLastResolvable(resolvable)) {
 				fResolvables.Remove(family);
 				family->RemoveResolvable(resolvable, dependenciesToUpdate);
@@ -350,6 +372,8 @@ PackageFSRoot::_ResolveDependencies(ResolvableDependencyList& dependencies)
 void
 PackageFSRoot::_ResolveDependency(Dependency* dependency)
 {
+	TRACE_DEPENDENCIES("  resolving dependency \"%s\"\n", dependency->Name());
+
 	// get the resolvable family for the dependency
 	ResolvableFamily* resolvableFamily
 		= fResolvables.Lookup(dependency->Name());
