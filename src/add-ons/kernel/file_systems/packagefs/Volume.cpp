@@ -492,19 +492,21 @@ Volume::Mount(const char* parameterString)
 		&delete_driver_settings);
 
 	if (packages == NULL || packages[0] == '\0') {
-		ERROR("need package folder ('packages' parameter)!\n");
+		FATAL("need package folder ('packages' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
 	error = _InitMountType(mountType);
 	if (error != B_OK) {
-		ERROR("invalid mount type: \"%s\"\n", mountType);
-		RETURN_ERROR(B_ERROR);
+		FATAL("invalid mount type: \"%s\"\n", mountType);
+		RETURN_ERROR(error);
 	}
 
 	struct stat st;
-	if (stat(packages, &st) < 0)
+	if (stat(packages, &st) < 0) {
+		FATAL("failed to stat: \"%s\": %s\n", packages, strerror(errno));
 		RETURN_ERROR(B_ERROR);
+	}
 
 	// If no volume name is given, infer it from the mount type.
 	if (volumeName == NULL) {
