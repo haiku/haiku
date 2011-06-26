@@ -61,7 +61,7 @@ Version::Init(const char* major, const char* minor, const char* micro,
 	}
 
 	if (minor != NULL) {
-		fMinor = strdup(major);
+		fMinor = strdup(minor);
 		if (fMinor == NULL)
 			return B_NO_MEMORY;
 	}
