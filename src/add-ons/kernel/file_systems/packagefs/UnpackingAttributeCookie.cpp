@@ -22,10 +22,7 @@
 
 
 using BPackageKit::BHPKG::BBufferDataReader;
-//using BPackageKit::BHPKG::BDataReader;
 using BPackageKit::BHPKG::BFDDataReader;
-//using BPackageKit::BHPKG::BPackageData;
-//using BPackageKit::BHPKG::BPackageDataReader;
 
 
 static status_t
