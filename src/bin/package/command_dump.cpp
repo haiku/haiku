@@ -74,10 +74,12 @@ private:
 	{
 		switch (value.type) {
 			case B_HPKG_ATTRIBUTE_TYPE_INT:
-				printf("%lld (%#llx)", value.signedInt, value.signedInt);
+				printf("%lld (%#llx)", (long long)value.signedInt,
+					(long long)value.signedInt);
 				break;
 			case B_HPKG_ATTRIBUTE_TYPE_UINT:
-				printf("%llu (%#llx)", value.unsignedInt, value.unsignedInt);
+				printf("%llu (%#llx)", (unsigned long long)value.unsignedInt,
+					(unsigned long long)value.unsignedInt);
 				break;
 			case B_HPKG_ATTRIBUTE_TYPE_STRING:
 				printf("\"%s\"", value.string);
@@ -85,12 +87,14 @@ private:
 			case B_HPKG_ATTRIBUTE_TYPE_RAW:
 				switch (value.encoding) {
 					case B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE:
-						printf("data: size: %llu, inline", value.data.size);
+						printf("data: size: %llu, inline",
+							(unsigned long long)value.data.size);
 						// TODO: Print the data bytes!
 						break;
 					case B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP:
 						printf("data: size: %llu, offset: %llu",
-							value.data.size, value.data.offset);
+							(unsigned long long)value.data.size,
+							(unsigned long long)value.data.offset);
 						break;
 					default:
 						break;
