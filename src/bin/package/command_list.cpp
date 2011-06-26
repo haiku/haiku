@@ -45,7 +45,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 
 		// name and size
 		printf("%-*s", indentation < 32 ? 32 - indentation : 0, entry->Name());
-		printf("  %8llu", entry->Data().UncompressedSize());
+		printf("  %8llu", (unsigned long long)entry->Data().UncompressedSize());
 
 		// time
 		struct tm* time = localtime(&entry->ModifiedTime().tv_sec);
@@ -89,7 +89,8 @@ struct PackageContentListHandler : BPackageContentHandler {
 		int indentation = fLevel * 2;
 		printf("%*s<", indentation, "");
 		printf("%-*s  %8llu", indentation < 31 ? 31 - indentation : 0,
-			attribute->Name(), attribute->Data().UncompressedSize());
+			attribute->Name(),
+			(unsigned long long)attribute->Data().UncompressedSize());
 
 		uint32 type = attribute->Type();
 		if (isprint(type & 0xff) && isprint((type >> 8) & 0xff)
