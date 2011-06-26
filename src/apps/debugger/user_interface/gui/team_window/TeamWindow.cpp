@@ -1006,26 +1006,27 @@ TeamWindow::_HandleSourceCodeChanged()
 	AutoLocker< ::Team> locker(fTeam);
 
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
-	if (sourceCode == NULL) {
+	LocatableFile* sourceFile = NULL;
+	BString sourceText;
+	if (sourceCode == NULL)
 		sourceCode = fActiveFunction->GetSourceCode();
 
-		BString sourceText;
-		LocatableFile* sourceFile = fActiveFunction->GetFunctionDebugInfo()
-			->SourceFile();
-		if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
-			sourceFile->GetPath(sourceText);
+	if (sourceCode != NULL)
+		sourceFile = fActiveFunction->GetFunctionDebugInfo()->SourceFile();
 
-		if (sourceCode != NULL && sourceCode->GetSourceFile() == NULL
-			&& sourceFile != NULL) {
-			sourceText.Prepend("Click to locate source file '");
-			sourceText += "'";
-			fSourcePathView->SetText(sourceText.String());
-		} else if (sourceFile != NULL) {
-			sourceText.Prepend("File: ");
-			fSourcePathView->SetText(sourceText.String());
-		} else
-			fSourcePathView->SetText("Source file unavailable.");
-	}
+	if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
+		sourceFile->GetPath(sourceText);
+
+	if (sourceCode != NULL && sourceCode->GetSourceFile() == NULL
+		&& sourceFile != NULL) {
+		sourceText.Prepend("Click to locate source file '");
+		sourceText += "'";
+		fSourcePathView->SetText(sourceText.String());
+	} else if (sourceFile != NULL) {
+		sourceText.Prepend("File: ");
+		fSourcePathView->SetText(sourceText.String());
+	} else
+		fSourcePathView->SetText("Source file unavailable.");
 
 	BReference<SourceCode> sourceCodeReference(sourceCode);
 
