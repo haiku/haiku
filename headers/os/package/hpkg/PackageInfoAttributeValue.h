@@ -32,7 +32,9 @@ struct BPackageResolvableData {
 			BPackageResolvableType	type;
 			const char*			name;
 			bool				haveVersion;
+			bool				haveCompatibleVersion;
 			BPackageVersionData	version;
+			BPackageVersionData	compatibleVersion;
 };
 
 
