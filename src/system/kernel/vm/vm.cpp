@@ -4765,6 +4765,33 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	if (status == B_OK && newSize < oldSize)
 		status = cache->Resize(cache->virtual_base + newSize, priority);
 
+	if (status == B_OK) {
+		// Shrink or grow individual page protections if in use.
+		if (area->page_protections != NULL) {
+			uint32 bytes = (newSize / B_PAGE_SIZE + 1) / 2;
+			uint8* newProtections
+				= (uint8*)realloc(area->page_protections, bytes);
+			if (newProtections == NULL)
+				status = B_NO_MEMORY;
+			else {
+				area->page_protections = newProtections;
+
+				if (oldSize < newSize) {
+					// init the additional page protections to that of the area
+					uint32 offset = (oldSize / B_PAGE_SIZE + 1) / 2;
+					uint32 areaProtection = area->protection
+						& (B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
+					memset(area->page_protections + offset,
+						areaProtection | (areaProtection << 4), bytes - offset);
+					if ((oldSize / B_PAGE_SIZE) % 2 != 0) {
+						uint8& entry = area->page_protections[offset - 1];
+						entry = (entry & 0x0f) | (areaProtection << 4);
+					}
+				}
+			}
+		}
+	}
+
 	if (status != B_OK) {
 		// Something failed -- resize the areas back to their original size.
 		// This can fail, too, in which case we're seriously screwed.
