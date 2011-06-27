@@ -448,28 +448,28 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
 		BObjectList<BString>* value;
 		bool allowQuotedStrings;
 
-		StringParser(BObjectList<BString>* value_, bool allowQuotedStrings_)
+		StringParser(BObjectList<BString>* value, bool allowQuotedStrings)
 			:
-			value(value_),
-			allowQuotedStrings(allowQuotedStrings_)
+			value(value),
+			allowQuotedStrings(allowQuotedStrings)
 		{
 		}
 
 		virtual void operator()(const Token& token)
 		{
-		if (allowQuotedStrings) {
+			if (allowQuotedStrings) {
 				if (token.type != TOKEN_QUOTED_STRING
 					&& token.type != TOKEN_WORD) {
 					throw ParseError("expected quoted-string or word",
 						token.pos);
 				}
-		} else {
-			if (token.type != TOKEN_WORD)
-				throw ParseError("expected word", token.pos);
-		}
+			} else {
+				if (token.type != TOKEN_WORD)
+					throw ParseError("expected word", token.pos);
+			}
 
-		value->AddItem(new BString(token.text));
-	}
+			value->AddItem(new BString(token.text));
+		}
 	} stringParser(value, allowQuotedStrings);
 
 	_ParseList(stringParser);
