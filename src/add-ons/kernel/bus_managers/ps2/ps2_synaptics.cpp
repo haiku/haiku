@@ -123,6 +123,9 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 
 	 	event.wValue = wValue;
 	 	event.gesture = false;
+
+		if (sTouchpadInfo.capMiddleButton || sTouchpadInfo.capFourButtons)
+			event.buttons |= ((event_buffer[0] ^ event_buffer[3]) & 0x01) << 2;
  	} else {
  		bool finger = event_buffer[0] >> 5 & 1;
  		if (finger) {
@@ -160,6 +163,8 @@ query_capability(ps2_dev *dev)
 
 	sTouchpadInfo.capExtended = val[0] >> 7 & 1;
 	TRACE("SYNAPTICS: extended mode %2x\n", val[0] >> 7 & 1);
+	TRACE("SYNAPTICS: middle button %2x\n", val[0] >> 2 & 1);
+	sTouchpadInfo.capMiddleButton = val[0] >> 2 & 1;
 	TRACE("SYNAPTICS: sleep mode %2x\n", val[2] >> 4 & 1);
 	sTouchpadInfo.capSleep = val[2] >> 4 & 1;
 	TRACE("SYNAPTICS: four buttons %2x\n", val[2] >> 3 & 1);

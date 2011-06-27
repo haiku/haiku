@@ -43,6 +43,7 @@ typedef struct {
 	uint8 minorVersion;
 
 	bool capExtended;
+	bool capMiddleButton;
 	bool capSleep;
 	bool capFourButtons;
 	bool capMultiFinger;

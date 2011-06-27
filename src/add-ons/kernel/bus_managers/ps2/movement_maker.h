@@ -96,7 +96,8 @@ enum button_ids
 {
 	kNoButton = 0x00,
 	kLeftButton = 0x01,
-	kRightButton = 0x02	
+	kRightButton = 0x02,
+	kMiddleButton = 0x04
 };
 
 
