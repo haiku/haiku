@@ -79,7 +79,8 @@ private:
 									BPackageArchitecture* value);
 			void				_ParseVersionValue(BPackageVersion* value,
 									bool releaseIsOptional);
-			void				_ParseList(ListElementParser& elementParser);
+			void				_ParseList(ListElementParser& elementParser,
+									bool allowSingleNonListElement);
 			void				_ParseStringList(BObjectList<BString>* value,
 									bool allowQuotedStrings = true);
 			void				_ParseResolvableList(
@@ -412,11 +413,17 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 
 
 void
-BPackageInfo::Parser::_ParseList(ListElementParser& elementParser)
+BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
+	bool allowSingleNonListElement)
 {
 	Token openBracket = _NextToken();
-	if (openBracket.type != TOKEN_OPEN_BRACKET)
-		throw ParseError("expected start of list ('[')", openBracket.pos);
+	if (openBracket.type != TOKEN_OPEN_BRACKET) {
+		if (!allowSingleNonListElement)
+			throw ParseError("expected start of list ('[')", openBracket.pos);
+
+		elementParser(openBracket);
+		return;
+	}
 
 	bool needComma = false;
 	while (true) {
@@ -472,7 +479,7 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
 		}
 	} stringParser(value, allowQuotedStrings);
 
-	_ParseList(stringParser);
+	_ParseList(stringParser, true);
 }
 
 
@@ -505,7 +512,7 @@ BPackageInfo::Parser::_ParseFlags()
 	}
 	} flagParser;
 
-	_ParseList(flagParser);
+	_ParseList(flagParser, true);
 
 	return flagParser.flags;
 }
@@ -587,7 +594,7 @@ BPackageInfo::Parser::_ParseResolvableList(
 		}
 	} resolvableParser(*this, value);
 
-	_ParseList(resolvableParser);
+	_ParseList(resolvableParser, false);
 }
 
 
@@ -639,7 +646,7 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 	}
 	} resolvableExpressionParser(*this, value);
 
-	_ParseList(resolvableExpressionParser);
+	_ParseList(resolvableExpressionParser, false);
 }
 
 
