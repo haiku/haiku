@@ -741,11 +741,6 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseVersionValue(&version, false);
 			packageInfo->SetVersion(version);
 			seen[B_PACKAGE_INFO_VERSION] = true;
-		} else if (t.text.ICompare("copyright") == 0) {
-			BString copyright;
-			_ParseStringValue(&copyright);
-			packageInfo->AddCopyright(copyright);
-			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_COPYRIGHTS]) == 0) {
 			if (seen[B_PACKAGE_INFO_COPYRIGHTS]) {
 				BString error = BString(names[B_PACKAGE_INFO_COPYRIGHTS])
@@ -759,11 +754,6 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			for (int i = 0; i < count; ++i)
 				packageInfo->AddCopyright(*(copyrightList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
-		} else if (t.text.ICompare("license") == 0) {
-			BString license;
-			_ParseStringValue(&license);
-			packageInfo->AddLicense(license);
-			seen[B_PACKAGE_INFO_LICENSES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
 			if (seen[B_PACKAGE_INFO_LICENSES]) {
 				BString error = BString(names[B_PACKAGE_INFO_LICENSES])
