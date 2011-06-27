@@ -437,6 +437,8 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	for (int i = 0; i < providesList.CountItems(); ++i) {
 		BPackageResolvable* resolvable = providesList.ItemAt(i);
 		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
+		bool hasCompatibleVersion
+			= resolvable->CompatibleVersion().InitCheck() == B_OK;
 
 		PackageAttribute* provides = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
@@ -452,6 +454,12 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 
 		if (hasVersion)
 			RegisterPackageVersion(provides->children, resolvable->Version());
+
+		if (hasCompatibleVersion) {
+			RegisterPackageVersion(provides->children,
+				resolvable->CompatibleVersion(),
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE);
+		}
 	}
 
 	// requires list
@@ -495,10 +503,10 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 
 void
 WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
-	const BPackageVersion& version)
+	const BPackageVersion& version, BHPKGAttributeID attributeID)
 {
 	PackageAttribute* versionMajor = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		attributeID, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	versionMajor->string = fPackageStringCache.Get(version.Major().String());
 	attributeList.Add(versionMajor);
