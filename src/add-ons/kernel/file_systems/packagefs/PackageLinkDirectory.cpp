@@ -56,15 +56,28 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 			// + 1 for the '-'
 	}
 
+	const char* architecture = package->ArchitectureName();
+	if (architecture != NULL) {
+		size += 1 + strlen(architecture);
+			// + 1 for the '-'
+	}
+
 	// allocate the name and compose it
 	char* name = (char*)malloc(size);
 	if (name == NULL)
 		return B_NO_MEMORY;
 
 	memcpy(name, package->Name(), nameLength + 1);
+
 	if (version != NULL) {
 		name[nameLength] = '-';
 		version->ToString(name + nameLength + 1, size - nameLength - 1);
+	}
+
+	if (architecture != NULL) {
+		nameLength += strlen(name + nameLength);
+		name[nameLength] = '-';
+		strlcpy(name + nameLength + 1, architecture, size - nameLength - 1);
 	}
 
 	// init the directory/node
