@@ -32,9 +32,9 @@ enum TokenType {
 	TOKEN_OPERATOR_NOT_EQUAL,
 	TOKEN_OPERATOR_GREATER_EQUAL,
 	TOKEN_OPERATOR_GREATER,
-	TOKEN_OPEN_BRACKET,
-	TOKEN_CLOSE_BRACKET,
-	TOKEN_COMMA,
+	TOKEN_OPEN_BRACE,
+	TOKEN_CLOSE_BRACE,
+	TOKEN_ITEM_SEPARATOR,
 	//
 	TOKEN_EOF,
 };
@@ -205,14 +205,25 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 BPackageInfo::Parser::Token
 BPackageInfo::Parser::_NextToken()
 {
-	// eat any whitespace or comments
+	// Eat any whitespace or comments. Also eat ';' -- they have the same
+	// function as newlines. We remember the last encountered ';' or '\n' and
+	// return it as a token afterwards.
+	const char* itemSeparatorPos = NULL;
 	bool inComment = false;
-	while ((inComment && *fPos != '\0') || isspace(*fPos) || *fPos == '#') {
-		if (*fPos == '#')
+	while ((inComment && *fPos != '\0') || isspace(*fPos) || *fPos == ';'
+		|| *fPos == '#') {
+		if (*fPos == '#') {
 			inComment = true;
-		else if (*fPos == '\n')
+		} else if (*fPos == '\n') {
+			itemSeparatorPos = fPos;
 			inComment = false;
+		} else if (!inComment && *fPos == ';')
+			itemSeparatorPos = fPos;
 		fPos++;
+	}
+
+	if (itemSeparatorPos != NULL) {
+		return Token(TOKEN_ITEM_SEPARATOR, itemSeparatorPos);
 	}
 
 	const char* tokenPos = fPos;
@@ -220,17 +231,13 @@ BPackageInfo::Parser::_NextToken()
 		case '\0':
 			return Token(TOKEN_EOF, fPos);
 
-		case ',':
+		case '{':
 			fPos++;
-			return Token(TOKEN_COMMA, tokenPos);
+			return Token(TOKEN_OPEN_BRACE, tokenPos);
 
-		case '[':
+		case '}':
 			fPos++;
-			return Token(TOKEN_OPEN_BRACKET, tokenPos);
-
-		case ']':
-			fPos++;
-			return Token(TOKEN_CLOSE_BRACKET, tokenPos);
+			return Token(TOKEN_CLOSE_BRACE, tokenPos);
 
 		case '<':
 			fPos++;
@@ -264,19 +271,21 @@ BPackageInfo::Parser::_NextToken()
 			return Token(TOKEN_OPERATOR_GREATER, tokenPos, 1);
 
 		case '"':
+		case '\'':
 		{
+			char quoteChar = *fPos;
 			fPos++;
 			const char* start = fPos;
 			// anything until the next quote is part of the value
 			bool lastWasEscape = false;
-			while ((*fPos != '"' || lastWasEscape) && *fPos != '\0') {
+			while ((*fPos != quoteChar || lastWasEscape) && *fPos != '\0') {
 				if (lastWasEscape)
 					lastWasEscape = false;
 				else if (*fPos == '\\')
 					lastWasEscape = true;
 				fPos++;
 			}
-			if (*fPos != '"')
+			if (*fPos != quoteChar)
 				throw ParseError("unterminated quoted-string", tokenPos);
 			const char* end = fPos++;
 			return Token(TOKEN_QUOTED_STRING, start, end - start);
@@ -417,7 +426,7 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 	bool allowSingleNonListElement)
 {
 	Token openBracket = _NextToken();
-	if (openBracket.type != TOKEN_OPEN_BRACKET) {
+	if (openBracket.type != TOKEN_OPEN_BRACE) {
 		if (!allowSingleNonListElement)
 			throw ParseError("expected start of list ('[')", openBracket.pos);
 
@@ -425,22 +434,13 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 		return;
 	}
 
-	bool needComma = false;
 	while (true) {
 		Token token = _NextToken();
-		if (token.type == TOKEN_CLOSE_BRACKET)
+		if (token.type == TOKEN_CLOSE_BRACE)
 			return;
 
-		if (needComma) {
-			if (token.type != TOKEN_COMMA)
-				throw ParseError("expected comma", token.pos);
-			token = _NextToken();
-			if (token.type == TOKEN_CLOSE_BRACKET) {
-				// silently skip trailing comma at end of list
-				return;
-			}
-		} else
-			needComma = true;
+		if (token.type == TOKEN_ITEM_SEPARATOR)
+			continue;
 
 		elementParser(token);
 	}
@@ -568,11 +568,12 @@ BPackageInfo::Parser::_ParseResolvableList(
 			// parse version
 			BPackageVersion version;
 			Token op = parser._NextToken();
-			if (op.type == TOKEN_OPERATOR_ASSIGN)
+			if (op.type == TOKEN_OPERATOR_ASSIGN) {
 				parser._ParseVersionValue(&version, true);
-			else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
+			} else if (op.type == TOKEN_ITEM_SEPARATOR
+				|| op.type == TOKEN_CLOSE_BRACE) {
 				parser._RewindTo(op);
-			else
+			} else
 				throw ParseError("expected '=', comma or ']'", op.pos);
 
 			// parse compatible version
@@ -628,11 +629,12 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 			|| op.type == TOKEN_OPERATOR_EQUAL
 			|| op.type == TOKEN_OPERATOR_NOT_EQUAL
 			|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
-			|| op.type == TOKEN_OPERATOR_GREATER)
+			|| op.type == TOKEN_OPERATOR_GREATER) {
 				parser._ParseVersionValue(&version, true);
-		else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
+		} else if (op.type == TOKEN_ITEM_SEPARATOR
+			|| op.type == TOKEN_CLOSE_BRACE) {
 				parser._RewindTo(op);
-		else {
+		} else {
 			throw ParseError(
 				"expected '<', '<=', '==', '!=', '>=', '>', comma or ']'",
 				op.pos);
@@ -660,14 +662,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 	const char* const* names = BPackageInfo::kElementNames;
 
 	while (Token t = _NextToken()) {
+		if (t.type == TOKEN_ITEM_SEPARATOR)
+			continue;
+
 		if (t.type != TOKEN_WORD)
 			throw ParseError("expected word (a variable name)", t.pos);
-
-		Token opAssign = _NextToken();
-		if (opAssign.type != TOKEN_OPERATOR_ASSIGN) {
-			throw ParseError("expected assignment operator ('=')",
-				opAssign.pos);
-		}
 
 		if (t.text.ICompare(names[B_PACKAGE_INFO_NAME]) == 0) {
 			if (seen[B_PACKAGE_INFO_NAME]) {
