@@ -24,9 +24,11 @@ public:
 								Resolvable(::Package* package);
 	virtual						~Resolvable();
 
-			status_t			Init(const char* name, ::Version* version);
-									// version is optional; object takes over
-									// ownership (even in case of error)
+			status_t			Init(const char* name, ::Version* version,
+									::Version* compatibleVersion);
+									// version and compatibleVersion are
+									// optional; object takes over ownership
+									// (even in case of error)
 
 			::Package*			Package() const	{ return fPackage; }
 
@@ -37,6 +39,8 @@ public:
 
 			const char*			Name() const	{ return fName; }
 			::Version*			Version() const	{ return fVersion; }
+			::Version*			CompatibleVersion() const
+									{ return fCompatibleVersion; }
 
 			void				AddDependency(Dependency* dependency);
 			void				RemoveDependency(Dependency* dependency);
@@ -48,6 +52,7 @@ private:
 			ResolvableFamily*	fFamily;
 			char*				fName;
 			::Version*			fVersion;
+			::Version*			fCompatibleVersion;
 			ResolvableDependencyList fDependencies;
 
 public:	// conceptually package private

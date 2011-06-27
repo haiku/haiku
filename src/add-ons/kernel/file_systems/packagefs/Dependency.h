@@ -49,6 +49,8 @@ public:
 									{ return fResolvable; }
 			bool				ResolvableVersionMatches(
 									Version* resolvableVersion) const;
+			bool				ResolvableCompatibleVersionMatches(
+									Version* resolvableVersion) const;
 
 			const char*			Name() const	{ return fName; }
 

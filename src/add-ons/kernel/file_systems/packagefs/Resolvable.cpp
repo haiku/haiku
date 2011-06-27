@@ -16,7 +16,8 @@ Resolvable::Resolvable(::Package* package)
 	fPackage(package),
 	fFamily(NULL),
 	fName(NULL),
-	fVersion(NULL)
+	fVersion(NULL),
+	fCompatibleVersion(NULL)
 {
 }
 
@@ -25,13 +26,16 @@ Resolvable::~Resolvable()
 {
 	free(fName);
 	delete fVersion;
+	delete fCompatibleVersion;
 }
 
 
 status_t
-Resolvable::Init(const char* name, ::Version* version)
+Resolvable::Init(const char* name, ::Version* version,
+	::Version* compatibleVersion)
 {
 	fVersion = version;
+	fCompatibleVersion = compatibleVersion;
 
 	fName = strdup(name);
 	if (fName == NULL)
