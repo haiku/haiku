@@ -394,8 +394,17 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		fType->ResolveRawType(false));
 	AddressType* addressType = dynamic_cast<AddressType*>(fType);
 	if (addressType != NULL) {
+		BVariant address;
 		baseType = dynamic_cast<CompoundType*>(addressType->BaseType()
 			->ResolveRawType(false));
+		error = valueLoader->LoadValue(location, valueType, false,
+			address);
+		if (error != B_OK)
+			return error;
+
+		ValuePieceLocation pieceLocation;
+		pieceLocation.SetToMemory(address.ToUInt64());
+		location->SetPieceAt(0, pieceLocation);
 	}
 
 	_location = location;
@@ -529,6 +538,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 	error = fMessage.Unflatten((const char *)messageBuffer);
 	TRACE_LOCALS("BMessage: Unflatten result: %s\n", strerror(error));
+
 	if (error != B_OK)
 		return error;
 
