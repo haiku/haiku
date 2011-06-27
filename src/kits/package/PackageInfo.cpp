@@ -558,6 +558,7 @@ BPackageInfo::Parser::_ParseResolvableList(
 				}
 			}
 
+			// parse version
 			BPackageVersion version;
 			Token op = parser._NextToken();
 			if (op.type == TOKEN_OPERATOR_ASSIGN)
@@ -567,7 +568,22 @@ BPackageInfo::Parser::_ParseResolvableList(
 			else
 				throw ParseError("expected '=', comma or ']'", op.pos);
 
-			value->AddItem(new BPackageResolvable(token.text, type, version));
+			// parse compatible version
+			BPackageVersion compatibleVersion;
+			Token compatible = parser._NextToken();
+			if (compatible.type == TOKEN_WORD
+				&& (compatible.text == "compat"
+					|| compatible.text == "compatible")) {
+				op = parser._NextToken();
+				if (op.type == TOKEN_OPERATOR_GREATER_EQUAL) {
+					parser._ParseVersionValue(&compatibleVersion, true);
+				} else
+					parser._RewindTo(compatible);
+			} else
+				parser._RewindTo(compatible);
+
+			value->AddItem(new BPackageResolvable(token.text, type, version,
+				compatibleVersion));
 		}
 	} resolvableParser(*this, value);
 
