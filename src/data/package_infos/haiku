@@ -8,8 +8,8 @@ boot loader, kernel, the system libraries, servers, and applications."
 packager = "Ingo Weinhold <ingo_weinhold@gmx.de>"
 vendor = "Haiku Project"
 
-copyright = "2001-2011 Haiku, Inc. et al"
-licenses = [ "MIT" ]
+copyrights = "2001-2011 Haiku, Inc. et al"
+licenses = [ "MIT" , "GNU LGPL v2.1" ]
 
 provides = [
 	haiku=R1-alpha3_pm-1 compat>=R1-alpha1

@@ -7,8 +7,8 @@ description = "A simple generic makefile engine and makefile template."
 packager = "The Haiku build system"
 vendor = "Be Inc., Haiku Project"
 
-copyright = "? Be Inc. 2001-2011 Haiku, Inc."
-licenses = [ "MIT" ]
+copyrights = "? Be Inc. 2001-2011 Haiku, Inc."
+licenses = "MIT"
 
 provides = [
 	makefile-engine=R1-alpha3_pm-1
