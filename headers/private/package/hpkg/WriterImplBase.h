@@ -154,7 +154,9 @@ protected:
 									const BPackageInfo& packageInfo);
 			void				RegisterPackageVersion(
 									PackageAttributeList& attributeList,
-									const BPackageVersion& version);
+									const BPackageVersion& version,
+									BHPKGAttributeID attributeID
+										= kDefaultVersionAttributeID);
 			void				RegisterPackageResolvableExpressionList(
 									PackageAttributeList& attributeList,
 									const BObjectList<
@@ -197,6 +199,10 @@ protected:
 	inline	void				SetDataWriter(AbstractDataWriter* dataWriter);
 
 	inline	void				SetFinished(bool finished);
+
+private:
+	static const BHPKGAttributeID kDefaultVersionAttributeID
+		= B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR;
 
 private:
 			void				_WritePackageAttributes(
