@@ -536,39 +536,39 @@ BPackageInfo::Parser::_ParseResolvableList(
 
 			BPackageResolvableType type = B_PACKAGE_RESOLVABLE_TYPE_DEFAULT;
 			int32 colonPos = token.text.FindFirst(':');
-		if (colonPos >= 0) {
+			if (colonPos >= 0) {
 				BString typeName(token.text, colonPos);
-			for (int i = 0; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
+				for (int i = 0; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
 					if (typeName.ICompare(BPackageResolvable::kTypeNames[i])
 							== 0) {
-					type = (BPackageResolvableType)i;
-					break;
+						type = (BPackageResolvableType)i;
+						break;
+					}
 				}
-			}
-			if (type == B_PACKAGE_RESOLVABLE_TYPE_DEFAULT) {
-				BString error("resolvable type (<type>:) must be one of [");
+				if (type == B_PACKAGE_RESOLVABLE_TYPE_DEFAULT) {
+					BString error("resolvable type (<type>:) must be one of [");
 					for (int i = 1; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT;
-						++i) {
-					if (i > 1)
-						error << ",";
-					error << BPackageResolvable::kTypeNames[i];
-				}
-				error << "]";
+							++i) {
+						if (i > 1)
+							error << ",";
+						error << BPackageResolvable::kTypeNames[i];
+					}
+					error << "]";
 					throw ParseError(error, token.pos);
+				}
 			}
-		}
 
-		BPackageVersion version;
+			BPackageVersion version;
 			Token op = parser._NextToken();
-		if (op.type == TOKEN_OPERATOR_ASSIGN)
+			if (op.type == TOKEN_OPERATOR_ASSIGN)
 				parser._ParseVersionValue(&version, true);
-		else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
+			else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
 				parser._RewindTo(op);
-		else
-			throw ParseError("expected '=', comma or ']'", op.pos);
+			else
+				throw ParseError("expected '=', comma or ']'", op.pos);
 
 			value->AddItem(new BPackageResolvable(token.text, type, version));
-	}
+		}
 	} resolvableParser(*this, value);
 
 	_ParseList(resolvableParser);
