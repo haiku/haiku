@@ -6,6 +6,8 @@
 #define PACKAGE_H
 
 
+#include <package/PackageArchitecture.h>
+
 #include <Referenceable.h>
 
 #include <util/DoublyLinkedList.h>
@@ -17,6 +19,9 @@
 #include "Dependency.h"
 #include "PackageNode.h"
 #include "Resolvable.h"
+
+
+using BPackageKit::BPackageArchitecture;
 
 
 class PackageDomain;
@@ -43,6 +48,13 @@ public:
 									// takes over object ownership
 			::Version*			Version() const
 									{ return fVersion; }
+
+			void				SetArchitecture(
+									BPackageArchitecture architecture)
+									{ fArchitecture = architecture; }
+			BPackageArchitecture Architecture() const
+									{ return fArchitecture; }
+			const char*			ArchitectureName() const;
 
 			void				SetLinkDirectory(
 									PackageLinkDirectory* linkDirectory)
@@ -72,6 +84,7 @@ private:
 			char*				fFileName;
 			char*				fName;
 			::Version*			fVersion;
+			BPackageArchitecture fArchitecture;
 			PackageLinkDirectory* fLinkDirectory;
 			int					fFD;
 			uint32				fOpenCount;

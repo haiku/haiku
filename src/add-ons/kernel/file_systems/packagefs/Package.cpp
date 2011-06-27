@@ -19,12 +19,20 @@
 #include "Version.h"
 
 
+const char* const kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
+	"any",
+	"x86",
+	"x86_gcc2",
+};
+
+
 Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
 	:
 	fDomain(domain),
 	fFileName(NULL),
 	fName(NULL),
 	fVersion(NULL),
+	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fLinkDirectory(NULL),
 	fFD(-1),
 	fOpenCount(0),
@@ -86,6 +94,18 @@ Package::SetVersion(::Version* version)
 		delete fVersion;
 
 	fVersion = version;
+}
+
+
+const char*
+Package::ArchitectureName() const
+{
+	if (fArchitecture < 0
+		|| fArchitecture >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
+		return NULL;
+	}
+
+	return kArchitectureNames[fArchitecture];
 }
 
 
