@@ -881,9 +881,12 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 		volume.SetTo(destVolumeDevice);
 
 		needPreflightNameCheck = true;
-	} else if (moveMode == kDuplicateSelection)
+	} else if (moveMode == kDuplicateSelection) {
+		BEntry entry;
+		entry.SetTo(srcList->FirstItem());
+		entry.GetParent(&destDir);
 		volume.SetTo(srcVolumeDevice);
-	else {
+	} else {
 		// move is to trash
 		destIsTrash = true;
 
