@@ -54,7 +54,9 @@ ResolvableFamily::ResolveDependency(Dependency* dependency)
 {
 	for (FamilyResolvableList::Iterator it = fResolvables.GetIterator();
 			Resolvable* resolvable = it.Next();) {
-		if (dependency->ResolvableVersionMatches(resolvable->Version())) {
+		if (dependency->ResolvableVersionMatches(resolvable->Version())
+			&& dependency->ResolvableCompatibleVersionMatches(
+				resolvable->CompatibleVersion())) {
 			resolvable->AddDependency(dependency);
 			return true;
 		}

@@ -60,3 +60,23 @@ Dependency::ResolvableVersionMatches(Version* resolvableVersion) const
 	return resolvableVersion != NULL
 		&& fVersion->Compare(fVersionOperator, *resolvableVersion);
 }
+
+
+bool
+Dependency::ResolvableCompatibleVersionMatches(Version* resolvableVersion) const
+{
+	if (fVersion == NULL)
+		return true;
+
+	// Only compare the versions, if the operator indicates that our version is
+	// some kind of minimum required version. Only in that case the resolvable's
+	// actual version is required to be greater (or equal) and the backwards
+	// compatibility check makes sense.
+	if (fVersionOperator == B_PACKAGE_RESOLVABLE_OP_GREATER_EQUAL
+		|| fVersionOperator == B_PACKAGE_RESOLVABLE_OP_GREATER) {
+		return resolvableVersion != NULL
+			&& fVersion->Compare(fVersionOperator, *resolvableVersion);
+	}
+
+	return true;
+}

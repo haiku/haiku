@@ -318,6 +318,20 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 				}
 				ObjectDeleter<Version> versionDeleter(version);
 
+				// create a version object, if a compatible version is specified
+				Version* compatibleVersion = NULL;
+				if (value.resolvable.haveCompatibleVersion) {
+					const BPackageVersionData& versionInfo
+						= value.resolvable.compatibleVersion;
+					status_t error = Version::Create(versionInfo.major,
+						versionInfo.minor, versionInfo.micro,
+						versionInfo.preRelease, versionInfo.release, version);
+					if (error != B_OK)
+						RETURN_ERROR(error);
+				}
+				ObjectDeleter<Version> compatibleVersionDeleter(
+					compatibleVersion);
+
 				// create the resolvable
 				Resolvable* resolvable = new(std::nothrow) Resolvable(fPackage);
 				if (resolvable == NULL)
@@ -325,7 +339,7 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 				ObjectDeleter<Resolvable> resolvableDeleter(resolvable);
 
 				status_t error = resolvable->Init(value.resolvable.name,
-					versionDeleter.Detach());
+					versionDeleter.Detach(), compatibleVersionDeleter.Detach());
 				if (error != B_OK)
 					RETURN_ERROR(error);
 
