@@ -1,21 +1,22 @@
-name = haiku-devel
-version = R1-alpha3_pm-1
-architecture = x86_gcc2
-summary = "The Haiku base system development files"
-description = "The package contains all files associated with the base system
+name			haiku-devel
+version			R1-alpha3_pm-1
+architecture	x86_gcc2
+summary			"The Haiku base system development files"
+
+description		"The package contains all files associated with the base system
 needed for development, like static libraries, glue code, library symlinks,
 header files, etc."
 
-packager = "The Haiku build system"
-vendor = "Haiku Project"
+packager		"The Haiku build system"
+vendor			"Haiku Project"
 
-copyrights = "2001-2011 Haiku, Inc. et al"
-licenses = "MIT"
+copyrights		"2001-2011 Haiku, Inc. et al"
+licenses		"MIT"
 
-provides = [
+provides {
 	haiku-devel=R1-alpha3_pm-1
-]
+}
 
-requires = [
+requires {
 	haiku
-]
+}

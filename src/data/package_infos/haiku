@@ -1,19 +1,23 @@
-name = Haiku
-version = R1-alpha3_pm-1
-architecture = x86_gcc2
-summary = "The Haiku base system"
-description = "The Haiku base system includes all system core software, like
+name 			Haiku
+version			R1-alpha3_pm-1
+architecture	x86_gcc2
+summary			"The Haiku base system"
+
+description		"The Haiku base system includes all system core software, like
 boot loader, kernel, the system libraries, servers, and applications."
 
-packager = "Ingo Weinhold <ingo_weinhold@gmx.de>"
-vendor = "Haiku Project"
+packager		"Ingo Weinhold <ingo_weinhold@gmx.de>"
+vendor			"Haiku Project"
 
-copyrights = "2001-2011 Haiku, Inc. et al"
-licenses = [ "MIT" , "GNU LGPL v2.1" ]
+copyrights		"2001-2011 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
 
-provides = [
+provides {
 	haiku=R1-alpha3_pm-1 compat>=R1-alpha1
-]
+}
 
-requires = [
-]
+requires {
+}

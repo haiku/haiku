@@ -1,19 +1,19 @@
-name = makefile-engine
-version = R1-alpha3_pm-1
-architecture = any
-summary = "The makefile engine"
-description = "A simple generic makefile engine and makefile template."
+name			makefile-engine
+version			R1-alpha3_pm-1
+architecture	any
+summary			"The makefile engine"
+description 	"A simple generic makefile engine and makefile template."
 
-packager = "The Haiku build system"
-vendor = "Be Inc., Haiku Project"
+packager		"The Haiku build system"
+vendor			"Be Inc., Haiku Project"
 
-copyrights = "? Be Inc. 2001-2011 Haiku, Inc."
-licenses = "MIT"
+copyrights		"? Be Inc. 2001-2011 Haiku, Inc."
+licenses		MIT
 
-provides = [
+provides {
 	makefile-engine=R1-alpha3_pm-1
-]
+}
 
-requires = [
+requires {
 	cmd:make
-]
+}

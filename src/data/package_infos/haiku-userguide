@@ -1,18 +1,18 @@
-name = haiku-userguide
-version = R1-alpha3_pm-1
-architecture = any
-summary = "The Haiku user documentation"
-description = "The Haiku user documentation."
+name			haiku-userguide
+version			R1-alpha3_pm-1
+architecture	any
+summary			"The Haiku user documentation"
+description		"The Haiku user documentation."
 
-packager = "The Haiku build system"
-vendor = "Haiku Project"
+packager		"The Haiku build system"
+vendor			"Haiku Project"
 
-copyrights = "2001-2011 Haiku, Inc. et al"
-licenses = "MIT"
+copyrights		"2001-2011 Haiku, Inc. et al"
+licenses		MIT
 
-provides = [
+provides {
 	haiku-userguide=R1-alpha3_pm-1
-]
+}
 
-requires = [
-]
+requires {
+}
