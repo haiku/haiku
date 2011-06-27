@@ -279,13 +279,6 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 		const BPackageInfoAttributeValue& value)
 	{
 		switch (value.attributeID) {
-//            union {
-//                 uint64          unsignedInt;
-//                 const char*     string;
-//                 BPackageVersionData version;
-//                 BPackageResolvableData resolvable;
-//                 BPackageResolvableExpressionData resolvableExpression;
-//             };
 			case B_PACKAGE_INFO_NAME:
 				return fPackage->SetName(value.string);
 
@@ -385,7 +378,6 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 				break;
 		}
 
-		// TODO!
 		return B_OK;
 	}
 
