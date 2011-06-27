@@ -296,6 +296,14 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 				break;
 			}
 
+			case B_PACKAGE_INFO_ARCHITECTURE:
+				if (value.unsignedInt >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT)
+					RETURN_ERROR(B_BAD_VALUE);
+
+				fPackage->SetArchitecture(
+					(BPackageArchitecture)value.unsignedInt);
+				break;
+
 			case B_PACKAGE_INFO_PROVIDES:
 			{
 				// create a version object, if a version is specified
