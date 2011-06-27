@@ -170,6 +170,11 @@ struct PackageContentListHandler : BPackageContentHandler {
 					printf(" = ");
 					_PrintPackageVersion(value.resolvable.version);
 				}
+				if (value.resolvable.haveCompatibleVersion) {
+					printf(" (compatible >= ");
+					_PrintPackageVersion(value.resolvable.compatibleVersion);
+					printf(")");
+				}
 				printf("\n");
 				break;
 
