@@ -199,6 +199,19 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 			}
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE:
+			fPackageInfoValue.resolvable.haveCompatibleVersion = true;
+			fPackageInfoValue.resolvable.compatibleVersion.major = value.string;
+			if (_handler != NULL) {
+				*_handler
+					= new(std::nothrow) PackageVersionAttributeHandler(
+						fPackageInfoValue,
+						fPackageInfoValue.resolvable.compatibleVersion, false);
+				if (*_handler == NULL)
+					return B_NO_MEMORY;
+			}
+			break;
+
 		default:
 			context->errorOutput->PrintError("Error: Invalid package "
 				"attribute section: unexpected package attribute id %d "
