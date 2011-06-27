@@ -23,10 +23,11 @@ using BHPKG::BPackageResolvableData;
 
 /*
  * Defines a resolvable (something other packages can depend upon).
- * Each resolvable is defined as a name (with an optional type prefix)
- * and an optional version.
+ * Each resolvable is defined as a name (with an optional type prefix),
+ * an optional version, and an optional compatibility version (the least
+ * version the resolvable is backwards compatible with).
  *
- * 		resolvable ::= <name>['='<version>]
+ * 		resolvable ::= <name>['='<version>]['compat' '>=' <version>]
  * 		name       ::= [<type>':']<word>
  * 		type       ::= 'lib' | 'cmd' | 'app' | 'add_on'
  *
@@ -39,7 +40,7 @@ using BHPKG::BPackageResolvableData;
  * String examples:
  * 		haiku=r1
  * 		lib:libssl=0.9.8i
- * 		subversion=1.5
+ * 		subversion=1.5 compat>=1.0
  * 		cmd:svn
  */
 class BPackageResolvable {
@@ -51,6 +52,8 @@ public:
 									BPackageResolvableType type
 										= B_PACKAGE_RESOLVABLE_TYPE_DEFAULT,
 									const BPackageVersion& version
+										= BPackageVersion(),
+									const BPackageVersion& compatibleVersion
 										= BPackageVersion());
 
 			status_t			InitCheck() const;
@@ -58,6 +61,7 @@ public:
 			const BString&		Name() const;
 			BPackageResolvableType	Type() const;
 			const BPackageVersion& Version() const;
+			const BPackageVersion& CompatibleVersion() const;
 
 			BString				ToString() const;
 
@@ -65,6 +69,8 @@ public:
 									BPackageResolvableType type
 										= B_PACKAGE_RESOLVABLE_TYPE_DEFAULT,
 									const BPackageVersion& version
+										= BPackageVersion(),
+									const BPackageVersion& compatibleVersion
 										= BPackageVersion());
 			void				Clear();
 
@@ -75,6 +81,7 @@ private:
 			BString				fName;
 			BPackageResolvableType	fType;
 			BPackageVersion		fVersion;
+			BPackageVersion		fCompatibleVersion;
 };
 
 
