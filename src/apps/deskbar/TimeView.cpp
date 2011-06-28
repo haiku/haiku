@@ -332,13 +332,8 @@ TTimeView::Pulse()
 			Update();
 
 		strlcpy(fLastTimeStr, fTimeStr, sizeof(fLastTimeStr));
-		fNeedToUpdate = true;
-	}
-
-	// Update the tooltip if the date has changed
-	if (strcmp(fDateStr, fLastDateStr) != 0) {
 		strlcpy(fLastDateStr, fDateStr, sizeof(fLastDateStr));
-		SetToolTip(fDateStr);
+		fNeedToUpdate = true;
 	}
 
 	if (fNeedToUpdate) {

@@ -86,7 +86,8 @@ TTeamMenu::AttachedToWindow()
 		if (((barInfo->flags & B_BACKGROUND_APP) == 0)
 			&& (strcasecmp(barInfo->sig, kDeskbarSignature) != 0)) {
 			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
-				barInfo->icon, barInfo->name, barInfo->sig, -1, -1, true, true);
+				barInfo->icon, barInfo->name, barInfo->sig, -1, -1,
+				!settings->hideLabels, true);
 
 			if ((settings->trackerAlwaysFirst)
 				&& (strcmp(barInfo->sig, kTrackerSignature) == 0))

@@ -48,15 +48,16 @@ All rights reserved.
 const float kMaxReplicantHeight = 16.0f;
 const float kMaxReplicantWidth = 16.0f;
 const int32 kMinimumReplicantCount = 6;
-const int32	kIconGap = 2;
+const int32 kIconGap = 2;
 const int32 kGutter = 1;
 const int32 kDragRegionWidth = 6;
 
-// 1 pixel left gutter
+// 1 pixel for left gutter
 // space for replicant tray (6 items)
 // 6 pixel drag region
-const float kMinimumTrayWidth = kIconGap + (kMinimumReplicantCount * kIconGap)
-	+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
+const float kMinimumTrayWidth = kIconGap
+		+ (kMinimumReplicantCount * kIconGap)
+		+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
 const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
 
 extern float sMinimumWindowWidth;

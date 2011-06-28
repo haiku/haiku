@@ -80,6 +80,8 @@ const uint32 kTrackerFirst = 'TkFt';
 const uint32 kSortRunningApps = 'SAps';
 const uint32 kSuperExpando = 'SprE';
 const uint32 kExpandNewTeams = 'ExTm';
+const uint32 kHideLabels = 'hLbs';
+const uint32 kResizeTeamIcons = 'RTIs';
 const uint32 kAutoRaise = 'AtRs';
 const uint32 kAutoHide = 'AtHd';
 const uint32 kRestartTracker = 'Trak';
@@ -88,6 +90,11 @@ const uint32 kRestartTracker = 'Trak';
 const uint32 kShutdownSystem = 301;
 const uint32 kRebootSystem = 302;
 const uint32 kSuspendSystem = 304;
+
+// icon size constants
+const int32 kMinimumIconSize = 16;
+const int32 kMaximumIconSize = 96;
+const int32 kIconSizeInterval = 8;
 
 /* --------------------------------------------- */
 
@@ -110,6 +117,8 @@ struct desk_settings {
 	bool sortRunningApps;
 	bool superExpando;
 	bool expandNewTeams;
+	bool hideLabels;
+	int32 iconSize;
 	bool autoRaise;
 	bool autoHide;
 	bool recentAppsEnabled;
@@ -128,7 +137,7 @@ class TBarApp : public BApplication {
 		TBarApp();
 		virtual ~TBarApp();
 
-		virtual	bool QuitRequested();
+		virtual bool QuitRequested();
 		virtual void MessageReceived(BMessage* message);
 		virtual void RefsReceived(BMessage* refs);
 
@@ -141,6 +150,7 @@ class TBarApp : public BApplication {
 
 		static void Subscribe(const BMessenger &subscriber, BList*);
 		static void Unsubscribe(const BMessenger &subscriber);
+		int32 IconSize();
 
 	private:
 		void AddTeam(team_id team, uint32 flags, const char* sig, entry_ref*);
@@ -150,6 +160,9 @@ class TBarApp : public BApplication {
 		void SaveSettings();
 
 		void ShowPreferencesWindow();
+		void ResizeTeamIcons();
+		void FetchAppIcon(const char* signature, BBitmap* icon);
+		BRect IconRect();
 
 		TBarWindow* fBarWindow;
 		BMessenger fSwitcherMessenger;

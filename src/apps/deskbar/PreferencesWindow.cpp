@@ -17,6 +17,7 @@
 #include <OpenWithTracker.h>
 #include <RadioButton.h>
 #include <SeparatorView.h>
+#include <Slider.h>
 
 #include <ctype.h>
 
@@ -55,6 +56,17 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kSuperExpando));
 	fAppsExpandNew = new BCheckBox(B_TRANSLATE("Expand new applications"),
 		new BMessage(kExpandNewTeams));
+	fAppsHideLabels = new BCheckBox(B_TRANSLATE("Hide application names"),
+		new BMessage(kHideLabels));
+	fAppsIconSizeSlider = new BSlider("icon_size", B_TRANSLATE("Icon size"),
+		NULL, kMinimumIconSize / kIconSizeInterval,
+		kMaximumIconSize / kIconSizeInterval, B_HORIZONTAL);
+	fAppsIconSizeSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fAppsIconSizeSlider->SetHashMarkCount((kMaximumIconSize - kMinimumIconSize)
+		/ kIconSizeInterval + 1);
+	fAppsIconSizeSlider->SetLimitLabels(B_TRANSLATE("Small"),
+		B_TRANSLATE("Large"));
+	fAppsIconSizeSlider->SetModificationMessage(new BMessage(kResizeTeamIcons));
 
 	fClockSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
 		new BMessage(kShowSeconds));
@@ -89,6 +101,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsSortTrackerFirst->SetValue(appSettings->trackerAlwaysFirst);
 	fAppsShowExpanders->SetValue(appSettings->superExpando);
 	fAppsExpandNew->SetValue(appSettings->expandNewTeams);
+	fAppsHideLabels->SetValue(appSettings->hideLabels);
+	fAppsIconSizeSlider->SetValue(appSettings->iconSize / kIconSizeInterval);
 
 	int32 docCount = appSettings->recentDocsCount;
 	int32 appCount = appSettings->recentAppsCount;
@@ -132,6 +146,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsSort->SetTarget(be_app);
 	fAppsSortTrackerFirst->SetTarget(be_app);
 	fAppsExpandNew->SetTarget(be_app);
+	fAppsHideLabels->SetTarget(be_app);
+	fAppsIconSizeSlider->SetTarget(be_app);
 
 	fClockSeconds->SetTarget(replicantTray);
 
@@ -181,6 +197,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.SetInsets(20, 0, 0, 0)
 				.Add(fAppsExpandNew)
 				.End()
+			.Add(fAppsIconSizeSlider)
+			.Add(fAppsHideLabels)
 			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
 			.End()

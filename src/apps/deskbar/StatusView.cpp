@@ -107,7 +107,7 @@ DumpList(BList* itemlist)
 		printf("no items in list\n");
 		return;
 	}
-	for (int32 i = count ; i >= 0 ; i--) {
+	for (int32 i = count; i >= 0; i--) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)itemlist->ItemAt(i);
 		if (!item)
 			continue;
@@ -193,7 +193,7 @@ TReplicantTray::DetachedFromWindow()
 void
 TReplicantTray::RememberClockSettings()
 {
-	if (fClock)	{
+	if (fClock) {
 		desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 		settings->timeShowSeconds = fClock->ShowingSeconds();
@@ -240,8 +240,7 @@ TReplicantTray::DealWithClock(bool showClock)
 
 /*! Width is set to a minimum of kMinimumReplicantCount by kMaxReplicantWidth
 	if not in multirowmode and greater than kMinimumReplicantCount
-	the width should be calculated based on the actual
-	replicant widths
+	the width should be calculated based on the actual replicant widths
 */
 void
 TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
@@ -262,8 +261,8 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (fShelf->CountReplicants() > 0) {
-			if (fBarView->ShowingClock()
-				&& fRightBottomReplicant.right + 6 >= fClock->Frame().left) {
+			if (fBarView->ShowingClock() && fRightBottomReplicant.right + 6
+				>= fClock->Frame().left) {
 				width = fRightBottomReplicant.right + 6
 					+ fClock->Frame().Width();
 			} else
@@ -272,6 +271,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 
 		// this view has a fixed minimum width
 		width = max(fMinimumTrayWidth, width);
+		height = kGutter + static_cast<TBarApp*>(be_app)->IconSize() + kGutter;
 	}
 
 	*preferredWidth = width;
@@ -1095,8 +1095,8 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
-			BRect rect(loc.x, loc.y, loc.x + fMinimumTrayWidth - kIconGap - 2.0,
-				loc.y + kMaxReplicantHeight);
+			BRect rect(loc.x, loc.y, loc.x + fMinimumTrayWidth - kIconGap
+				- 2.0, loc.y + kMaxReplicantHeight);
 			if (row == 0 && fBarView->ShowingClock())
 				rect.right -= fClock->Frame().Width() + kIconGap;
 

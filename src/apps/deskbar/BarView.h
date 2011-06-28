@@ -138,11 +138,12 @@ class TBarView : public BView {
 			float* height);
 		void SizeWindow(BRect screenFrame);
 		void PositionWindow(BRect screenFrame);
+		void AddExpandedItem(const char* signature);
 
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
 		TDragRegion* DragRegion() const { return fDragRegion; }
-		void AddExpandedItem(const char* signature);
+		TReplicantTray* ReplicantTray() const { return fReplicantTray; }
 
 	private:
 		friend class TDeskbarMenu;

@@ -10,6 +10,7 @@
 #include <Button.h>
 #include <CheckBox.h>
 #include <RadioButton.h>
+#include <Slider.h>
 #include <StringView.h>
 #include <TextControl.h>
 #include <Window.h>
@@ -52,6 +53,8 @@ private:
 			BCheckBox*		fAppsSortTrackerFirst;
 			BCheckBox*		fAppsShowExpanders;
 			BCheckBox*		fAppsExpandNew;
+			BCheckBox*		fAppsHideLabels;
+			BSlider*		fAppsIconSizeSlider;
 
 			BCheckBox*		fClockSeconds;
 

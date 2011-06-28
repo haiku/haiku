@@ -74,7 +74,6 @@ const uint32 kShowDeskbarMenu = 'BeMn';
 const uint32 kShowTeamMenu = 'TmMn';
 
 
-const BRect kIconRect(0.0f, 0.0f, 15.0f, 15.0f);
 static const color_space kIconFormat = B_RGBA32;
 
 
@@ -215,6 +214,8 @@ TBarApp::SaveSettings()
 		storedSettings.AddBool("sortRunningApps", fSettings.sortRunningApps);
 		storedSettings.AddBool("superExpando", fSettings.superExpando);
 		storedSettings.AddBool("expandNewTeams", fSettings.expandNewTeams);
+		storedSettings.AddBool("hideLabels", fSettings.hideLabels);
+		storedSettings.AddInt32("iconSize", fSettings.iconSize);
 		storedSettings.AddBool("autoRaise", fSettings.autoRaise);
 		storedSettings.AddBool("autoHide", fSettings.autoHide);
 		storedSettings.AddBool("recentAppsEnabled",
@@ -251,6 +252,8 @@ TBarApp::InitSettings()
 	settings.sortRunningApps = false;
 	settings.superExpando = false;
 	settings.expandNewTeams = false;
+	settings.hideLabels = false;
+	settings.iconSize = kMinimumIconSize;
 	settings.autoRaise = false;
 	settings.autoHide = false;
 	settings.recentAppsEnabled = true;
@@ -301,6 +304,8 @@ TBarApp::InitSettings()
 				&settings.sortRunningApps);
 			storedSettings.FindBool("superExpando", &settings.superExpando);
 			storedSettings.FindBool("expandNewTeams", &settings.expandNewTeams);
+			storedSettings.FindBool("hideLabels", &settings.hideLabels);
+			storedSettings.FindInt32("iconSize", (int32*)&settings.iconSize);
 			storedSettings.FindBool("autoRaise", &settings.autoRaise);
 			storedSettings.FindBool("autoHide", &settings.autoHide);
 			storedSettings.FindBool("recentAppsEnabled",
@@ -484,6 +489,36 @@ TBarApp::MessageReceived(BMessage* message)
 			fBarWindow->Unlock();
 			break;
 
+		case kHideLabels:
+			fSettings.hideLabels = !fSettings.hideLabels;
+
+			fBarWindow->Lock();
+			BarView()->UpdatePlacement();
+			fBarWindow->Unlock();
+			break;
+
+		case kResizeTeamIcons:
+		{
+			int32 iconSize;
+
+			if (message->FindInt32("be:value", &iconSize) < B_OK)
+				break;
+
+			fSettings.iconSize = iconSize * kIconSizeInterval;
+
+			if (fSettings.iconSize < kMinimumIconSize)
+				fSettings.iconSize = kMinimumIconSize;
+			else if (fSettings.iconSize > kMaximumIconSize)
+				fSettings.iconSize = kMaximumIconSize;
+
+			ResizeTeamIcons();
+
+			fBarWindow->Lock();
+			BarView()->UpdatePlacement();
+			fBarWindow->Unlock();
+			break;
+		}
+
 		case 'TASK':
 			fSwitcherMessenger.SendMessage(message);
 			break;
@@ -647,11 +682,13 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 		name = ref->name;
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
-		new BBitmap(kIconRect, kIconFormat), strdup(name.String()));
+		new BBitmap(IconRect(), kIconFormat), strdup(ref->name));
+
+	if ((barInfo->flags & B_BACKGROUND_APP) == 0
+		&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0)
+		FetchAppIcon(barInfo->sig, barInfo->icon);
 
 	barInfo->teams->AddItem((void*)team);
-	if (appMime.GetIcon(barInfo->icon, B_MINI_ICON) != B_OK)
-		appMime.GetTrackerIcon(barInfo->icon, B_MINI_ICON);
 
 	sBarTeamInfoList.AddItem(barInfo);
 
@@ -716,6 +753,27 @@ TBarApp::RemoveTeam(team_id team)
 
 
 void
+TBarApp::ResizeTeamIcons()
+{
+	for (int32 i = 0; i < sBarTeamInfoList.CountItems(); i++) {
+		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
+		if ((barInfo->flags & B_BACKGROUND_APP) == 0
+			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
+			barInfo->icon = new BBitmap(IconRect(), kIconFormat);
+			FetchAppIcon(barInfo->sig, barInfo->icon);
+		}
+	}
+}
+
+
+int32
+TBarApp::IconSize()
+{
+	return fSettings.iconSize;
+}
+
+
+void
 TBarApp::ShowPreferencesWindow()
 {
 	if (fPreferencesWindow)
@@ -724,6 +782,31 @@ TBarApp::ShowPreferencesWindow()
 		fPreferencesWindow = new PreferencesWindow(BRect(0, 0, 320, 240));
 		fPreferencesWindow->Show();
 	}
+}
+
+
+void
+TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
+{
+	app_info appInfo;
+
+	if (be_roster->GetAppInfo(signature, &appInfo) == B_OK) {
+		BFile file(&appInfo.ref, B_READ_ONLY);
+		BAppFileInfo appMime(&file);
+		icon_size size = icon->Bounds().IntegerHeight() >= 32
+			? B_LARGE_ICON : B_MINI_ICON;
+
+		if (appMime.GetIcon(icon, size) != B_OK)
+			appMime.GetTrackerIcon(icon, size);
+	}
+}
+
+
+BRect
+TBarApp::IconRect()
+{
+	int32 iconSize = IconSize();
+	return BRect(0, 0, iconSize - 1, iconSize - 1);
 }
 
 
@@ -758,4 +841,3 @@ BarTeamInfo::~BarTeamInfo()
 	delete icon;
 	free(name);
 }
-

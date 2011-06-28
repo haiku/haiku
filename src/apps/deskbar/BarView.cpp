@@ -293,6 +293,7 @@ TBarView::PlaceDeskbarMenu()
 	BRect menuFrame(fBarMenuBar->Frame());
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
+		// TODO: Magic constants need explanation
 		width = 8 + 16 + 8;
 		loc = Bounds().LeftTop();
 	} else if (fState == kExpandoState) {
@@ -381,15 +382,18 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
-		expandoFrame.bottom = kHModeHeight;
+		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+		expandoFrame.bottom = iconSize + 4;
 		if (fTrayLocation != 0)
 			expandoFrame.right = fDragRegion->Frame().left - 1;
 		else
 			expandoFrame.right = screenFrame.Width();
 	}
 
+	bool hideLabels = ((TBarApp*)be_app)->Settings()->hideLabels;
+
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
-		fVertical, fState != kFullState);
+		fVertical, !hideLabels && fState != kFullState);
 	AddChild(fExpando);
 }
 
@@ -401,6 +405,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 	float windowWidth = sMinimumWindowWidth;
 	bool calcHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
 		&& IsHidden() && !DragRegion()->IsDragging();
+	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 
 	if (!calcHiddenSize) {
 		if (fState == kFullState) {
@@ -413,7 +418,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 			} else {
 				// top or bottom, full
 				fExpando->CheckItemSizes(0);
-				windowHeight = kHModeHeight;
+				windowHeight = iconSize + 4;
 				windowWidth = screenFrame.Width();
 			}
 		} else {
@@ -429,6 +434,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 		if (fState == kExpandoState && !fVertical) {
 			// top or bottom, full
 			fExpando->CheckItemSizes(0);
+			windowHeight = iconSize + 4;
 			windowWidth = screenFrame.Width();
 		} else
 			windowWidth = kHModeHiddenHeight;
@@ -1100,6 +1106,7 @@ BRect
 TBarView::OffsetIconFrame(BRect rect) const
 {
 	BRect frame(Frame());
+
 	frame.left += fDragRegion->Frame().left + fReplicantTray->Frame().left
 		+ rect.left;
 	frame.top += fDragRegion->Frame().top + fReplicantTray->Frame().top
