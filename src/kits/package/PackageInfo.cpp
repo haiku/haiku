@@ -754,11 +754,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> copyrightList;
-			_ParseStringList(&copyrightList);
-			int count = copyrightList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddCopyright(*(copyrightList.ItemAt(i)));
+			_ParseStringList(&packageInfo->fCopyrightList);
 			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
 			if (seen[B_PACKAGE_INFO_LICENSES]) {
@@ -767,11 +763,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> licenseList;
-			_ParseStringList(&licenseList);
-			int count = licenseList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddLicense(*(licenseList.ItemAt(i)));
+			_ParseStringList(&packageInfo->fLicenseList);
 			seen[B_PACKAGE_INFO_LICENSES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_URLS]) == 0) {
 			if (seen[B_PACKAGE_INFO_URLS]) {
@@ -780,11 +772,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> urlList;
-			_ParseStringList(&urlList);
-			int count = urlList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddURL(*(urlList.ItemAt(i)));
+			_ParseStringList(&packageInfo->fURLList);
 			seen[B_PACKAGE_INFO_URLS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SOURCE_URLS]) == 0) {
 			if (seen[B_PACKAGE_INFO_SOURCE_URLS]) {
@@ -793,11 +781,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> urlList;
-			_ParseStringList(&urlList);
-			int count = urlList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddSourceURL(*(urlList.ItemAt(i)));
+			_ParseStringList(&packageInfo->fSourceURLList);
 			seen[B_PACKAGE_INFO_SOURCE_URLS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PROVIDES]) == 0) {
 			if (seen[B_PACKAGE_INFO_PROVIDES]) {
@@ -806,11 +790,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageResolvable> providesList;
-			_ParseResolvableList(&providesList);
-			int count = providesList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddProvides(*(providesList.ItemAt(i)));
+			_ParseResolvableList(&packageInfo->fProvidesList);
 			seen[B_PACKAGE_INFO_PROVIDES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REQUIRES]) == 0) {
 			if (seen[B_PACKAGE_INFO_REQUIRES]) {
@@ -819,11 +799,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageResolvableExpression> requiresList;
-			_ParseResolvableExprList(&requiresList);
-			int count = requiresList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddRequires(*(requiresList.ItemAt(i)));
+			_ParseResolvableExprList(&packageInfo->fRequiresList);
 			seen[B_PACKAGE_INFO_REQUIRES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SUPPLEMENTS]) == 0) {
 			if (seen[B_PACKAGE_INFO_SUPPLEMENTS]) {
@@ -832,11 +808,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageResolvableExpression> supplementsList;
-			_ParseResolvableExprList(&supplementsList);
-			int count = supplementsList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddSupplements(*(supplementsList.ItemAt(i)));
+			_ParseResolvableExprList(&packageInfo->fSupplementsList);
 			seen[B_PACKAGE_INFO_SUPPLEMENTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_CONFLICTS]) == 0) {
 			if (seen[B_PACKAGE_INFO_CONFLICTS]) {
@@ -845,11 +817,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageResolvableExpression> conflictsList;
-			_ParseResolvableExprList(&conflictsList);
-			int count = conflictsList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddConflicts(*(conflictsList.ItemAt(i)));
+			_ParseResolvableExprList(&packageInfo->fConflictsList);
 			seen[B_PACKAGE_INFO_CONFLICTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FRESHENS]) == 0) {
 			if (seen[B_PACKAGE_INFO_FRESHENS]) {
@@ -858,11 +826,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageResolvableExpression> freshensList;
-			_ParseResolvableExprList(&freshensList);
-			int count = freshensList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddFreshens(*(freshensList.ItemAt(i)));
+			_ParseResolvableExprList(&packageInfo->fFreshensList);
 			seen[B_PACKAGE_INFO_FRESHENS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REPLACES]) == 0) {
 			if (seen[B_PACKAGE_INFO_REPLACES]) {
@@ -871,11 +835,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> replacesList;
-			_ParseStringList(&replacesList, false);
-			int count = replacesList.CountItems();
-			for (int i = 0; i < count; ++i)
-				packageInfo->AddReplaces(*(replacesList.ItemAt(i)));
+			_ParseStringList(&packageInfo->fReplacesList, false);
 			seen[B_PACKAGE_INFO_REPLACES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FLAGS]) == 0) {
 			if (seen[B_PACKAGE_INFO_FLAGS]) {
