@@ -376,6 +376,14 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 				value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_URL:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_URLS, value.string);
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_SOURCE_URLS, value.string);
+			break;
+
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES:
 			fPackageInfoValue.resolvable.name = value.string;
 			fPackageInfoValue.attributeID = B_PACKAGE_INFO_PROVIDES;
