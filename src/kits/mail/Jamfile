@@ -47,6 +47,7 @@ if $(HAIKU_OPENSSL_ENABLED) {
 	SetupFeatureObjectsDir no-ssl ;
 }
 
+AddResources libmail.so : libmail.rdef ;
 
 SharedLibrary libmail.so :
 	$(sources)

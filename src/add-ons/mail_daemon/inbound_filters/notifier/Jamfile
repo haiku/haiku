@@ -5,6 +5,8 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
+AddResources NewMailNotification : NewMailNotification.rdef ;
+
 Addon NewMailNotification :
 	filter.cpp
 	ConfigView.cpp

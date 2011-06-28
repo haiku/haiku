@@ -24,6 +24,8 @@ if $(HAIKU_OPENSSL_ENABLED) {
 	SetupFeatureObjectsDir no-ssl ;
 }
 
+AddResources SMTP : SMTP.rdef ;
+
 Addon SMTP
 	: $(sources)
 	: be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)

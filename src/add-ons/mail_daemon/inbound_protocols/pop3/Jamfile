@@ -28,6 +28,8 @@ if $(HAIKU_OPENSSL_ENABLED) {
 	SetupFeatureObjectsDir no-ssl ;
 }
 
+AddResources POP3 : POP3.rdef ;
+
 Addon POP3
 	: $(sources)
 	: be libmail.so $(HAIKU_LOCALE_LIBS) $(HAIKU_OPENSSL_LIBS)

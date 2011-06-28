@@ -1,0 +1,15 @@
+/*
+ * IMAP.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-IMAP";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "1.0.0",
+	long_info = "Haiku IMAP mail_daemon add-on."
+};
