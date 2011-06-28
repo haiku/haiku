@@ -135,6 +135,7 @@ SubInclude HAIKU_TOP src tools hack_coff ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools locale ;
 SubInclude HAIKU_TOP src tools makebootable ;
+SubInclude HAIKU_TOP src tools opd_to_package_info ;
 SubInclude HAIKU_TOP src tools package ;
 SubInclude HAIKU_TOP src tools rc ;
 SubInclude HAIKU_TOP src tools remote_disk_server ;

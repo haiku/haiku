@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tools opd_to_package_info ;
+
+USES_BE_API on <build>opd_to_package_info = true ;
+
+BuildPlatformMain <build>opd_to_package_info :
+	opd_to_package_info.cpp
+	:
+	$(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+;
