@@ -668,185 +668,109 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 		if (t.type != TOKEN_WORD)
 			throw ParseError("expected word (a variable name)", t.pos);
 
-		if (t.text.ICompare(names[B_PACKAGE_INFO_NAME]) == 0) {
-			if (seen[B_PACKAGE_INFO_NAME]) {
-				BString error = BString(names[B_PACKAGE_INFO_NAME])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
+		BPackageInfoAttributeID attribute = B_PACKAGE_INFO_ENUM_COUNT;
+		for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; i++) {
+			if (t.text.ICompare(names[i]) == 0) {
+				attribute = (BPackageInfoAttributeID)i;
+				break;
 			}
-
-			BString name;
-			_ParseStringValue(&name);
-			packageInfo->SetName(name);
-			seen[B_PACKAGE_INFO_NAME] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SUMMARY]) == 0) {
-			if (seen[B_PACKAGE_INFO_SUMMARY]) {
-				BString error = BString(names[B_PACKAGE_INFO_SUMMARY])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			BString summary;
-			_ParseStringValue(&summary);
-			if (summary.FindFirst('\n') >= 0)
-				throw ParseError("the summary contains linebreaks", t.pos);
-			packageInfo->SetSummary(summary);
-			seen[B_PACKAGE_INFO_SUMMARY] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_DESCRIPTION]) == 0) {
-			if (seen[B_PACKAGE_INFO_DESCRIPTION]) {
-				BString error = BString(names[B_PACKAGE_INFO_DESCRIPTION])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			BString description;
-			_ParseStringValue(&description);
-			packageInfo->SetDescription(description);
-			seen[B_PACKAGE_INFO_DESCRIPTION] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_VENDOR]) == 0) {
-			if (seen[B_PACKAGE_INFO_VENDOR]) {
-				BString error = BString(names[B_PACKAGE_INFO_VENDOR])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			BString vendor;
-			_ParseStringValue(&vendor);
-			packageInfo->SetVendor(vendor);
-			seen[B_PACKAGE_INFO_VENDOR] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PACKAGER]) == 0) {
-			if (seen[B_PACKAGE_INFO_PACKAGER]) {
-				BString error = BString(names[B_PACKAGE_INFO_PACKAGER])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			BString packager;
-			_ParseStringValue(&packager);
-			packageInfo->SetPackager(packager);
-			seen[B_PACKAGE_INFO_PACKAGER] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_ARCHITECTURE]) == 0) {
-			if (seen[B_PACKAGE_INFO_ARCHITECTURE]) {
-				BString error = BString(names[B_PACKAGE_INFO_ARCHITECTURE])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			BPackageArchitecture architecture;
-			_ParseArchitectureValue(&architecture);
-			packageInfo->SetArchitecture(architecture);
-			seen[B_PACKAGE_INFO_ARCHITECTURE] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_VERSION]) == 0) {
-			if (seen[B_PACKAGE_INFO_VERSION]) {
-				BString error = BString(names[B_PACKAGE_INFO_VERSION])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			BPackageVersion version;
-			_ParseVersionValue(&version, false);
-			packageInfo->SetVersion(version);
-			seen[B_PACKAGE_INFO_VERSION] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_COPYRIGHTS]) == 0) {
-			if (seen[B_PACKAGE_INFO_COPYRIGHTS]) {
-				BString error = BString(names[B_PACKAGE_INFO_COPYRIGHTS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseStringList(&packageInfo->fCopyrightList);
-			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
-			if (seen[B_PACKAGE_INFO_LICENSES]) {
-				BString error = BString(names[B_PACKAGE_INFO_LICENSES])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseStringList(&packageInfo->fLicenseList);
-			seen[B_PACKAGE_INFO_LICENSES] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_URLS]) == 0) {
-			if (seen[B_PACKAGE_INFO_URLS]) {
-				BString error = BString(names[B_PACKAGE_INFO_URLS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseStringList(&packageInfo->fURLList);
-			seen[B_PACKAGE_INFO_URLS] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SOURCE_URLS]) == 0) {
-			if (seen[B_PACKAGE_INFO_SOURCE_URLS]) {
-				BString error = BString(names[B_PACKAGE_INFO_SOURCE_URLS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseStringList(&packageInfo->fSourceURLList);
-			seen[B_PACKAGE_INFO_SOURCE_URLS] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PROVIDES]) == 0) {
-			if (seen[B_PACKAGE_INFO_PROVIDES]) {
-				BString error = BString(names[B_PACKAGE_INFO_PROVIDES])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseResolvableList(&packageInfo->fProvidesList);
-			seen[B_PACKAGE_INFO_PROVIDES] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REQUIRES]) == 0) {
-			if (seen[B_PACKAGE_INFO_REQUIRES]) {
-				BString error = BString(names[B_PACKAGE_INFO_REQUIRES])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseResolvableExprList(&packageInfo->fRequiresList);
-			seen[B_PACKAGE_INFO_REQUIRES] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SUPPLEMENTS]) == 0) {
-			if (seen[B_PACKAGE_INFO_SUPPLEMENTS]) {
-				BString error = BString(names[B_PACKAGE_INFO_SUPPLEMENTS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseResolvableExprList(&packageInfo->fSupplementsList);
-			seen[B_PACKAGE_INFO_SUPPLEMENTS] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_CONFLICTS]) == 0) {
-			if (seen[B_PACKAGE_INFO_CONFLICTS]) {
-				BString error = BString(names[B_PACKAGE_INFO_CONFLICTS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseResolvableExprList(&packageInfo->fConflictsList);
-			seen[B_PACKAGE_INFO_CONFLICTS] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FRESHENS]) == 0) {
-			if (seen[B_PACKAGE_INFO_FRESHENS]) {
-				BString error = BString(names[B_PACKAGE_INFO_FRESHENS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseResolvableExprList(&packageInfo->fFreshensList);
-			seen[B_PACKAGE_INFO_FRESHENS] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REPLACES]) == 0) {
-			if (seen[B_PACKAGE_INFO_REPLACES]) {
-				BString error = BString(names[B_PACKAGE_INFO_REPLACES])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			_ParseStringList(&packageInfo->fReplacesList, false);
-			seen[B_PACKAGE_INFO_REPLACES] = true;
-		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FLAGS]) == 0) {
-			if (seen[B_PACKAGE_INFO_FLAGS]) {
-				BString error = BString(names[B_PACKAGE_INFO_FLAGS])
-					<< " already seen!";
-				throw ParseError(error, t.pos);
-			}
-
-			packageInfo->SetFlags(_ParseFlags());
-			seen[B_PACKAGE_INFO_FLAGS] = true;
 		}
+
+		if (attribute == B_PACKAGE_INFO_ENUM_COUNT) {
+			BString error = BString("unknown attribute \"") << t.text << '"';
+			throw ParseError(error, t.pos);
+		}
+
+		if (seen[attribute]) {
+			BString error = BString(names[attribute]) << " already seen!";
+			throw ParseError(error, t.pos);
+		}
+
+		switch (attribute) {
+			case B_PACKAGE_INFO_NAME:
+				_ParseStringValue(&packageInfo->fName);
+				break;
+
+			case B_PACKAGE_INFO_SUMMARY:
+			{
+				BString summary;
+				_ParseStringValue(&summary);
+				if (summary.FindFirst('\n') >= 0)
+					throw ParseError("the summary contains linebreaks", t.pos);
+				packageInfo->SetSummary(summary);
+				break;
+			}
+
+			case B_PACKAGE_INFO_DESCRIPTION:
+				_ParseStringValue(&packageInfo->fDescription);
+				break;
+
+			case B_PACKAGE_INFO_VENDOR:
+				_ParseStringValue(&packageInfo->fVendor);
+				break;
+
+			case B_PACKAGE_INFO_PACKAGER:
+				_ParseStringValue(&packageInfo->fPackager);
+				break;
+
+			case B_PACKAGE_INFO_ARCHITECTURE:
+				_ParseArchitectureValue(&packageInfo->fArchitecture);
+				break;
+
+			case B_PACKAGE_INFO_VERSION:
+				_ParseVersionValue(&packageInfo->fVersion, false);
+				break;
+
+			case B_PACKAGE_INFO_COPYRIGHTS:
+				_ParseStringList(&packageInfo->fCopyrightList);
+				break;
+
+			case B_PACKAGE_INFO_LICENSES:
+				_ParseStringList(&packageInfo->fLicenseList);
+				break;
+
+			case B_PACKAGE_INFO_URLS:
+				_ParseStringList(&packageInfo->fURLList);
+				break;
+
+			case B_PACKAGE_INFO_SOURCE_URLS:
+				_ParseStringList(&packageInfo->fSourceURLList);
+				break;
+
+			case B_PACKAGE_INFO_PROVIDES:
+				_ParseResolvableList(&packageInfo->fProvidesList);
+				break;
+
+			case B_PACKAGE_INFO_REQUIRES:
+				_ParseResolvableExprList(&packageInfo->fRequiresList);
+				break;
+
+			case B_PACKAGE_INFO_SUPPLEMENTS:
+				_ParseResolvableExprList(&packageInfo->fSupplementsList);
+				break;
+
+			case B_PACKAGE_INFO_CONFLICTS:
+				_ParseResolvableExprList(&packageInfo->fConflictsList);
+				break;
+
+			case B_PACKAGE_INFO_FRESHENS:
+				_ParseResolvableExprList(&packageInfo->fFreshensList);
+				break;
+
+			case B_PACKAGE_INFO_REPLACES:
+				_ParseStringList(&packageInfo->fReplacesList, false);
+				break;
+
+			case B_PACKAGE_INFO_FLAGS:
+				packageInfo->SetFlags(_ParseFlags());
+				break;
+
+			default:
+				// can never get here
+				break;
+		}
+
+		seen[attribute] = true;
 	}
 
 	// everything up to and including 'provides' is mandatory
