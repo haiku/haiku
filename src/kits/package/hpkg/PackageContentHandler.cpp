@@ -59,7 +59,7 @@ static const char* kAttributeNames[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT + 1] = {
 	"package:version.prerelease",
 	"package:provides.compatible",
 	"package:url",
-	"package:source_url",
+	"package:source-url",
 	NULL
 };
 
