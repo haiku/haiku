@@ -4761,10 +4761,6 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		}
 	}
 
-	// shrinking the cache can't fail, so we do it now
-	if (status == B_OK && newSize < oldSize)
-		status = cache->Resize(cache->virtual_base + newSize, priority);
-
 	if (status == B_OK) {
 		// Shrink or grow individual page protections if in use.
 		if (area->page_protections != NULL) {
@@ -4791,6 +4787,10 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 			}
 		}
 	}
+
+	// shrinking the cache can't fail, so we do it now
+	if (status == B_OK && newSize < oldSize)
+		status = cache->Resize(cache->virtual_base + newSize, priority);
 
 	if (status != B_OK) {
 		// Something failed -- resize the areas back to their original size.
