@@ -18,6 +18,7 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
+local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
 HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
@@ -143,7 +144,6 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
 HAIKU_CLUCENE_PACKAGE = clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip ;
 HAIKU_CLUCENE_URL = $(baseURL)/$(HAIKU_CLUCENE_PACKAGE) ;
 
