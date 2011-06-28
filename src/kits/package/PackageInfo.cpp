@@ -773,6 +773,32 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			for (int i = 0; i < count; ++i)
 				packageInfo->AddLicense(*(licenseList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_LICENSES] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_URLS]) == 0) {
+			if (seen[B_PACKAGE_INFO_URLS]) {
+				BString error = BString(names[B_PACKAGE_INFO_URLS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BString> urlList;
+			_ParseStringList(&urlList);
+			int count = urlList.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddURL(*(urlList.ItemAt(i)));
+			seen[B_PACKAGE_INFO_URLS] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SOURCE_URLS]) == 0) {
+			if (seen[B_PACKAGE_INFO_SOURCE_URLS]) {
+				BString error = BString(names[B_PACKAGE_INFO_SOURCE_URLS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BString> urlList;
+			_ParseStringList(&urlList);
+			int count = urlList.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddSourceURL(*(urlList.ItemAt(i)));
+			seen[B_PACKAGE_INFO_SOURCE_URLS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PROVIDES]) == 0) {
 			if (seen[B_PACKAGE_INFO_PROVIDES]) {
 				BString error = BString(names[B_PACKAGE_INFO_PROVIDES])
@@ -890,6 +916,8 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"freshens",
 	"replaces",
 	"flags",
+	"urls",
+	"source-urls",
 	"checksum",		// not being parsed, computed externally
 };
 
@@ -908,6 +936,8 @@ BPackageInfo::BPackageInfo()
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fCopyrightList(5, true),
 	fLicenseList(5, true),
+	fURLList(5, true),
+	fSourceURLList(5, true),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -1060,6 +1090,20 @@ BPackageInfo::LicenseList() const
 }
 
 
+const BObjectList<BString>&
+BPackageInfo::URLList() const
+{
+	return fURLList;
+}
+
+
+const BObjectList<BString>&
+BPackageInfo::SourceURLList() const
+{
+	return fSourceURLList;
+}
+
+
 const BObjectList<BPackageResolvable>&
 BPackageInfo::ProvidesList() const
 {
@@ -1202,6 +1246,42 @@ BPackageInfo::AddLicense(const BString& license)
 
 
 void
+BPackageInfo::ClearURLList()
+{
+	fURLList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddURL(const BString& url)
+{
+	BString* newURL = new (std::nothrow) BString(url);
+	if (newURL == NULL)
+		return B_NO_MEMORY;
+
+	return fURLList.AddItem(newURL) ? B_OK : B_NO_MEMORY;
+}
+
+
+void
+BPackageInfo::ClearSourceURLList()
+{
+	fSourceURLList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddSourceURL(const BString& url)
+{
+	BString* newURL = new (std::nothrow) BString(url);
+	if (newURL == NULL)
+		return B_NO_MEMORY;
+
+	return fSourceURLList.AddItem(newURL) ? B_OK : B_NO_MEMORY;
+}
+
+
+void
 BPackageInfo::ClearProvidesList()
 {
 	fProvidesList.MakeEmpty();
@@ -1328,6 +1408,8 @@ BPackageInfo::Clear()
 	fVersion.Clear();
 	fCopyrightList.MakeEmpty();
 	fLicenseList.MakeEmpty();
+	fURLList.MakeEmpty();
+	fSourceURLList.MakeEmpty();
 	fRequiresList.MakeEmpty();
 	fProvidesList.MakeEmpty();
 	fSupplementsList.MakeEmpty();
