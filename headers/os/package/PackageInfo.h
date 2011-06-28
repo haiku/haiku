@@ -65,6 +65,8 @@ public:
 
 			const BObjectList<BString>&	CopyrightList() const;
 			const BObjectList<BString>&	LicenseList() const;
+			const BObjectList<BString>&	URLList() const;
+			const BObjectList<BString>&	SourceURLList() const;
 
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
@@ -96,6 +98,12 @@ public:
 
 			void				ClearLicenseList();
 			status_t			AddLicense(const BString& license);
+
+			void				ClearURLList();
+			status_t			AddURL(const BString& url);
+
+			void				ClearSourceURLList();
+			status_t			AddSourceURL(const BString& url);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -146,6 +154,8 @@ private:
 
 			BObjectList<BString>	fCopyrightList;
 			BObjectList<BString>	fLicenseList;
+			BObjectList<BString>	fURLList;
+			BObjectList<BString>	fSourceURLList;
 
 			BObjectList<BPackageResolvable>	fProvidesList;
 
