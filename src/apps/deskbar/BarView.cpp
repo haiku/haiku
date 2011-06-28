@@ -48,6 +48,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <ScrollMenu.h>
 #include <String.h>
 
 #include "icons.h"
@@ -130,6 +131,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fBarScrollMenu(NULL),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
@@ -347,8 +349,7 @@ TBarView::MouseDown(BPoint where)
 void
 TBarView::PlaceDeskbarMenu()
 {
-	// top or bottom, full
-	if (!fVertical && fBarMenuBar) {
+	if (!fVertical && fBarMenuBar != NULL) {
 		fBarMenuBar->RemoveSelf();
 		delete fBarMenuBar;
 		fBarMenuBar = NULL;
@@ -367,12 +368,13 @@ TBarView::PlaceDeskbarMenu()
 
 	// if there isn't a bemenu at this point,
 	// DB should be in top/bottom mode, else error
-	if (!fBarMenuBar)
+	if (fBarMenuBar == NULL)
 		return;
 
 	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
 	BRect menuFrame(fBarMenuBar->Frame());
+
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
 		// TODO: Magic constants need explanation
@@ -441,22 +443,22 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
-	if (fExpando != NULL) {
-		SaveExpandedItems();
+	if (fBarScrollMenu != NULL) {
+		fBarScrollMenu->RemoveSelf();
+		delete fBarScrollMenu;
+			// Also deletes fExpando
+		fBarScrollMenu = NULL;
+		fExpando = NULL;
+	} else if (fExpando != NULL) {
 		fExpando->RemoveSelf();
 		delete fExpando;
 		fExpando = NULL;
 	}
 
-	BRect screenFrame = (BScreen(Window())).Frame();
-	if (fState == kMiniState) {
-		SizeWindow(screenFrame);
-		PositionWindow(screenFrame);
-		Window()->UpdateIfNeeded();
-		Invalidate();
+	if (fState == kMiniState)
 		return;
-	}
 
+	BRect screenFrame = (BScreen(Window())).Frame();
 	BRect expandoFrame(0, 0, 0, 0);
 	if (fVertical) {
 		// top left/right
@@ -485,7 +487,13 @@ TBarView::PlaceApplicationBar()
 
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
-	AddChild(fExpando);
+
+	if (fVertical) {
+		fBarScrollMenu = new BScrollMenu(fExpando);
+		AddChild(fBarScrollMenu);
+//printf("fExpando bottom: %f, fBarScrollMenu bottom: %f\n", fExpando->Frame().bottom, fBarScrollMenu->Frame().bottom);
+	} else
+		AddChild(fExpando);
 
 	if (fVertical)
 		ExpandItems();
@@ -522,7 +530,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 		} else if (fState == kExpandoState) {
 			if (fVertical) {
 				// top left or right
-				windowHeight = fExpando->Frame().bottom;
+				windowHeight = fBarScrollMenu->Frame().bottom;
 			} else {
 				// top or bottom, full
 				fExpando->CheckItemSizes(0);

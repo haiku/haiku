@@ -45,6 +45,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <ScrollMenu.h>
 
 #include "icons.h"
 
@@ -797,10 +798,22 @@ TExpandoMenuBar::DrawBackground(BRect)
 void
 TExpandoMenuBar::CheckForSizeOverrun()
 {
-	BRect screenFrame = (BScreen(Window())).Frame();
+	if (!fVertical) {
+		fIsScrolling = false;
+		return;
+	}
 
-	fIsScrolling = fVertical ? Window()->Frame().bottom > screenFrame.bottom
-		: false;
+	BScrollMenu* scrollMenu = dynamic_cast<BScrollMenu*>(Parent());
+	if (scrollMenu == NULL)
+		return;
+
+	BRect screenFrame = (BScreen(Window())).Frame();
+	fIsScrolling = Window()->Frame().bottom > screenFrame.bottom;
+
+	if (fIsScrolling)
+		scrollMenu->AttachScrollers();
+	else
+		scrollMenu->DetachScrollers();
 }
 
 

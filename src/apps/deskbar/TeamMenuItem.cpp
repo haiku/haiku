@@ -479,8 +479,7 @@ TTeamMenuItem::DrawContentLabel()
 	if (Submenu() && fVertical)
 		cachedWidth += 18;
 
-	const char* label = Label();
-	char* truncLabel = NULL;
+	BString label(Label());
 	float max = 0;
 
 	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando)
@@ -492,30 +491,23 @@ TTeamMenuItem::DrawContentLabel()
 		BPoint penloc = menu->PenLocation();
 		BRect frame = Frame();
 		float offset = penloc.x - frame.left;
-		if (cachedWidth + offset > max) {
-			truncLabel = (char*)malloc(strlen(label) + 4);
-			if (!truncLabel)
-				return;
-			TruncateLabel(max-offset, truncLabel);
-			label = truncLabel;
-		}
+		if (cachedWidth + offset > max)
+			menu->TruncateString(&label, B_TRUNCATE_MIDDLE, max - offset);
 	}
 
 	if (!label)
-		label = Label();
+		label = BString(Label());
 
-	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
-	bool canHandle = !barview->Dragging()
-		|| barview->AppCanHandleTypes(Signature());
+	TBarView* barView = (static_cast<TBarApp*>(be_app))->BarView();
+	bool canHandle = !barView->Dragging()
+		|| barView->AppCanHandleTypes(Signature());
 	if (_IsSelected() && IsEnabled() && canHandle)
 		menu->SetLowColor(tint_color(menu->LowColor(),
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
 		menu->SetLowColor(menu->LowColor());
 
-	menu->DrawString(label);
-
-	free(truncLabel);
+	menu->DrawString(label.String());
 }
 
 

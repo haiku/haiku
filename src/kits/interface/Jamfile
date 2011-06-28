@@ -101,6 +101,7 @@ MergeObject <libbe>interface_kit.o :
 	RegionSupport.cpp
 	Screen.cpp
 	ScrollBar.cpp
+	ScrollMenu.cpp
 	ScrollView.cpp
 	SeparatorItem.cpp
 	SeparatorView.cpp

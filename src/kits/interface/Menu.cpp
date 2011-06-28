@@ -30,6 +30,7 @@
 #include <PropertyInfo.h>
 #include <Screen.h>
 #include <ScrollBar.h>
+#include <ScrollMenu.h>
 #include <SystemCatalog.h>
 #include <Window.h>
 
@@ -2811,11 +2812,16 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 void
 BMenu::_UpdateWindowViewSize(const bool &move)
 {
+	if (dynamic_cast<BMenuBar*>(this) != NULL) {
+		BScrollMenu* scrollMenu = dynamic_cast<BScrollMenu*>(Parent());
+		if (scrollMenu != NULL)
+			scrollMenu->ResizeTo(Bounds().Width(), Bounds().Height());
+
+		return;
+	}
+
 	BMenuWindow* window = static_cast<BMenuWindow*>(Window());
 	if (window == NULL)
-		return;
-
-	if (dynamic_cast<BMenuBar*>(this) != NULL)
 		return;
 
 	if (!fResizeToFit)
