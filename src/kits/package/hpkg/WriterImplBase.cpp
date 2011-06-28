@@ -431,6 +431,28 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		attributeList.Add(license);
 	}
 
+	// URL list
+	const BObjectList<BString>& urlList = packageInfo.URLList();
+	for (int i = 0; i < urlList.CountItems(); ++i) {
+		PackageAttribute* url = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_URL, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		url->string = fPackageStringCache.Get(urlList.ItemAt(i)->String());
+		attributeList.Add(url);
+	}
+
+	// source URL list
+	const BObjectList<BString>& sourceURLList = packageInfo.SourceURLList();
+	for (int i = 0; i < sourceURLList.CountItems(); ++i) {
+		PackageAttribute* url = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		url->string = fPackageStringCache.Get(
+			sourceURLList.ItemAt(i)->String());
+		attributeList.Add(url);
+	}
+
 	// provides list
 	const BObjectList<BPackageResolvable>& providesList
 		= packageInfo.ProvidesList();

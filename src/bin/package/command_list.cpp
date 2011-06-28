@@ -164,6 +164,14 @@ struct PackageContentListHandler : BPackageContentHandler {
 				printf("\tlicense: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_URLS:
+				printf("\tURL: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_SOURCE_URLS:
+				printf("\tsource URL: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_PROVIDES:
 				printf("\tprovides: %s", value.resolvable.name);
 				if (value.resolvable.haveVersion) {

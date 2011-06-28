@@ -115,6 +115,16 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 					printf("\tlicense: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_URLS:
+				if (fVerbose)
+					printf("\tURL: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_SOURCE_URLS:
+				if (fVerbose)
+					printf("\tsource URL: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_PROVIDES:
 				if (!fVerbose)
 					break;
