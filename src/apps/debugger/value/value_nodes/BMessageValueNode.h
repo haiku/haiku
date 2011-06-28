@@ -24,6 +24,8 @@ public:
 										ValueLocation*& _location,
 										Value*& _value);
 
+	virtual bool					ChildCreationNeedsValue() const
+										{ return true; }
 	virtual status_t				CreateChildren();
 	virtual int32					CountChildren() const;
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
@@ -40,7 +42,6 @@ private:
 
 private:
 			Type*					fType;
-			bool					fValid;
 			BMessage				fMessage;
 			ChildNodeList			fChildren;
 };

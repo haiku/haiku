@@ -93,7 +93,6 @@ BMessageValueNode::BMessageValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fValid(false),
 	fMessage()
 {
 	fType->AcquireReference();
@@ -291,9 +290,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (error != B_OK)
 		return error;
 
-	fValid = true;
-	CreateChildren();
-
 	return B_OK;
 }
 
@@ -301,11 +297,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 status_t
 BMessageValueNode::CreateChildren()
 {
-	// delay child creation until our location / value has been resolved
-	// since we otherwise have no idea as to what value nodes to present
-	if (!fValid)
-		return B_BAD_VALUE;
-
 	if (!fChildren.IsEmpty())
 		return B_OK;
 
