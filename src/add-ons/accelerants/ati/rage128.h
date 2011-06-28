@@ -1,15 +1,16 @@
 /*
-	Haiku ATI video driver adapted from the X.org ATI driver.
+	Haiku ATI video driver adapted from the X.org ATI driver which has the
+	following copyright:
 
 	Copyright 1999, 2000 ATI Technologies Inc., Markham, Ontario,
 						  Precision Insight, Inc., Cedar Park, Texas, and
 						  VA Linux Systems Inc., Fremont, California.
 
-	Copyright 2009 Haiku, Inc.  All rights reserved.
+	Copyright 2009, 2011 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
 
 	Authors:
-	Gerald Zajac 2009
+	Gerald Zajac
 */
 
 
@@ -17,7 +18,7 @@
 #define __RAGE128_H__
 
 
-#define CURSOR_BYTES	1024		// bytes used for cursor image in video memory
+#define CURSOR_BYTES	1024	// bytes used for cursor image in video memory
 
 #define R128_TIMEOUT	2000000	// Fall out of wait loops after this count
 
@@ -203,7 +204,6 @@
 #define R128_OVR_CLR					  0x0230
 #define R128_OVR_WID_LEFT_RIGHT 		  0x0234
 #define R128_OVR_WID_TOP_BOTTOM 		  0x0238
-#define R128_OV0_SCALE_CNTL 			  0x0420
 
 #define R128_PALETTE_DATA				  0x00b4
 #define R128_PALETTE_INDEX				  0x00b0
@@ -231,11 +231,44 @@
 
 #define R128_TMDS_CRC                     0x02a0
 
-#define R128_VCLK_ECP_CNTL				  0x0008	// PLL
-#		define R128_VCLK_SRC_SEL_MASK	  0x03
-#		define R128_VCLK_SRC_SEL_CPUCLK   0x00
-#		define R128_VCLK_SRC_SEL_PPLLCLK  0x03
+#define R128_VCLK_ECP_CNTL				 0x0008	// PLL
+#		define R128_VCLK_SRC_SEL_MASK	 0x03
+#		define R128_VCLK_SRC_SEL_CPUCLK  0x00
+#		define R128_VCLK_SRC_SEL_PPLLCLK 0x03
+#		define R128_ECP_DIV_MASK		 (3 << 8)
 #define R128_VIPH_CONTROL				  0x01D0	// ?
+
+
+// Definitions used for overlays.
+//===============================
+
+#define R128_OV0_Y_X_START				0x0400
+#define R128_OV0_Y_X_END				0x0404
+#define R128_OV0_EXCLUSIVE_HORZ 		0x0408
+#define R128_OV0_REG_LOAD_CNTL			0x0410
+#define R128_OV0_SCALE_CNTL 			0x0420
+#define R128_OV0_V_INC					0x0424
+#define R128_OV0_P1_V_ACCUM_INIT		0x0428
+#define R128_OV0_P23_V_ACCUM_INIT		0x042C
+#define R128_OV0_P1_BLANK_LINES_AT_TOP	0x0430
+#define R128_OV0_VID_BUF0_BASE_ADRS 	0x0440
+#define R128_OV0_VID_BUF_PITCH0_VALUE	0x0460
+#define R128_OV0_AUTO_FLIP_CNTL 		0x0470
+#define R128_OV0_H_INC					0x0480
+#define R128_OV0_STEP_BY				0x0484
+#define R128_OV0_P1_H_ACCUM_INIT		0x0488
+#define R128_OV0_P23_H_ACCUM_INIT		0x048C
+#define R128_OV0_P1_X_START_END 		0x0494
+#define R128_OV0_P2_X_START_END 		0x0498
+#define R128_OV0_P3_X_START_END 		0x049C
+#define R128_OV0_FILTER_CNTL			0x04A0
+#define R128_OV0_COLOUR_CNTL			0x04E0
+#define R128_OV0_GRAPHICS_KEY_CLR		0x04EC
+#define R128_OV0_GRAPHICS_KEY_MSK		0x04F0
+#define R128_OV0_KEY_CNTL				0x04F4
+#		define R128_GRAPHIC_KEY_FN_EQ	0x00000040L
+#		define R128_GRAPHIC_KEY_FN_NE	0x00000050L
+#define R128_OV0_TEST					0x04F8
 
 
 

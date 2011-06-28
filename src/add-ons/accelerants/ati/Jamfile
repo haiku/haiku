@@ -10,12 +10,14 @@ Addon ati.accelerant :
 	engine.cpp
 	hooks.cpp
 	mode.cpp
+	overlay.cpp
 		
 	mach64_cursor.cpp
 	mach64_dpms.cpp
 	mach64_draw.cpp
 	mach64_init.cpp
 	mach64_mode.cpp
+	mach64_overlay.cpp
 	mach64_util.cpp
 	
 	rage128_cursor.cpp
@@ -23,6 +25,7 @@ Addon ati.accelerant :
 	rage128_draw.cpp
 	rage128_init.cpp
 	rage128_mode.cpp
+	rage128_overlay.cpp
 
 	: be libaccelerantscommon.a
 ;

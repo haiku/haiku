@@ -1,9 +1,9 @@
 /*
-	Copyright 2007-2009 Haiku, Inc.  All rights reserved.
+	Copyright 2007-2011 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
 
 	Authors:
-	Gerald Zajac 2007-2009
+	Gerald Zajac
 */
 
 #include <KernelExport.h>
@@ -20,7 +20,6 @@
 
 #undef TRACE
 
-//#define ENABLE_DEBUG_TRACE
 #ifdef ENABLE_DEBUG_TRACE
 #	define TRACE(x...) dprintf("ati: " x)
 #else
@@ -41,7 +40,7 @@
 #define M64_BIOS_SIZE		0x10000		// 64KB
 #define R128_BIOS_SIZE		0x10000		// 64KB
 
-int32 api_version = B_CUR_DRIVER_API_VERSION;	// revision of driver API we support
+int32 api_version = B_CUR_DRIVER_API_VERSION;	// revision of driver API used
 
 #define VENDOR_ID 0x1002	// ATI vendor ID
 
@@ -54,7 +53,8 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;	// revision of driver API we suppo
 struct ChipInfo {
 	uint16		chipID;			// PCI device id of the chip
 	ChipType	chipType;		// assigned chip type identifier
-	const char*	chipName;		// user recognizable name for chip (must be < 32 chars)
+	const char*	chipName;		// user recognizable name for chip
+								//   (must be < 32 chars)
 };
 
 
@@ -199,14 +199,16 @@ static device_hooks gDeviceHooks =
 static inline uint32
 GetPCI(pci_info& info, uint8 offset, uint8 size)
 {
-	return gPCI->read_pci_config(info.bus, info.device, info.function, offset, size);
+	return gPCI->read_pci_config(info.bus, info.device, info.function, offset,
+		size);
 }
 
 
 static inline void
 SetPCI(pci_info& info, uint8 offset, uint8 size, uint32 value)
 {
-	gPCI->write_pci_config(info.bus, info.device, info.function, offset, size, value);
+	gPCI->write_pci_config(info.bus, info.device, info.function, offset, size,
+		value);
 }
 
 
@@ -251,7 +253,8 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 
 	status_t status = vm86_prepare(&vmState, 0x2000);
 	if (status != B_OK) {
-		TRACE("GetEdidFromBIOS(); vm86_prepare() failed, status: 0x%lx\n", status);
+		TRACE("GetEdidFromBIOS(); vm86_prepare() failed, status: 0x%lx\n",
+			status);
 		return status;
 	}
 
@@ -337,7 +340,8 @@ SetVesaDisplayMode(uint16 mode)
 
 	status_t status = vm86_prepare(&vmState, 0x2000);
 	if (status != B_OK) {
-		TRACE("SetVesaDisplayMode(); vm86_prepare() failed, status: 0x%lx\n", status);
+		TRACE("SetVesaDisplayMode(); vm86_prepare() failed, status: 0x%lx\n",
+			status);
 		return status;
 	}
 
@@ -505,8 +509,9 @@ Rage128_GetBiosParameters(DeviceInfo& di)
 	pll.max_pll_freq = BIOS32(pllInfoBlock + 0x16);
 	pll.xclk = BIOS16(pllInfoBlock + 0x08);
 
-	TRACE("PLL parameters: rf=%d rd=%d min=%ld max=%ld; xclk=%d\n", pll.reference_freq,
-		pll.reference_div, pll.min_pll_freq, pll.max_pll_freq, pll.xclk);
+	TRACE("PLL parameters: rf=%d rd=%d min=%ld max=%ld; xclk=%d\n",
+		pll.reference_freq, pll.reference_div, pll.min_pll_freq,
+		pll.max_pll_freq, pll.xclk);
 
 	// If Mobility chip, get the LCD panel width & height and a few other
 	// related parameters.
@@ -537,7 +542,8 @@ Rage128_GetBiosParameters(DeviceInfo& di)
 						si.panelY = BIOS16(fpStart + 27);
 						si.panelPowerDelay = BIOS8(fpStart + 56);
 						TRACE("LCD Panel size: %dx%d  Panel type: 0x%x   power delay: %d\n",
-							si.panelX, si.panelY, BIOS16(fpStart + 29), si.panelPowerDelay);
+							si.panelX, si.panelY, BIOS16(fpStart + 29),
+							si.panelPowerDelay);
 						break;
 					}
 				}
@@ -566,9 +572,9 @@ MapDevice(DeviceInfo& di)
 
 	// Map the video memory.
 
-	uint32 videoRamAddr = pciInfo.u.h0.base_registers[0];
+	phys_addr_t videoRamAddr = pciInfo.u.h0.base_registers[0];
 	uint32 videoRamSize = pciInfo.u.h0.base_register_sizes[0];
-	si.videoMemPCI = (void *)videoRamAddr;
+	si.videoMemPCI = videoRamAddr;
 	char frameBufferAreaName[] = "ATI frame buffer";
 
 	si.videoMemArea = map_physical_memory(
@@ -577,7 +583,7 @@ MapDevice(DeviceInfo& di)
 		videoRamSize,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA + B_WRITE_AREA,
-		&(si.videoMemAddr));
+		(void**)&(si.videoMemAddr));
 
 	if (si.videoMemArea < 0) {
 		// Try to map this time without write combining.
@@ -587,7 +593,7 @@ MapDevice(DeviceInfo& di)
 			videoRamSize,
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA + B_WRITE_AREA,
-			&(si.videoMemAddr));
+			(void**)&(si.videoMemAddr));
 	}
 
 	if (si.videoMemArea < 0)
@@ -595,7 +601,7 @@ MapDevice(DeviceInfo& di)
 
 	// Map the MMIO register area.
 
-	uint32 regsBase = pciInfo.u.h0.base_registers[2];
+	phys_addr_t regsBase = pciInfo.u.h0.base_registers[2];
 	uint32 regAreaSize = pciInfo.u.h0.base_register_sizes[2];
 
 	// If the register area address or size is not in the PCI info, it should
@@ -619,7 +625,8 @@ MapDevice(DeviceInfo& di)
 
 		regsBase = videoRamAddr + regsOffset;
 		regAreaSize = 0x1000;
-		TRACE("Register address is at end of frame buffer memory at 0x%lx\n", regsBase);
+		TRACE("Register address is at end of frame buffer memory at 0x%lx\n",
+			uint32(regsBase));
 	}
 
 	si.regsArea = map_physical_memory("ATI mmio registers",
@@ -627,7 +634,7 @@ MapDevice(DeviceInfo& di)
 		regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
 		0,		// neither read nor write, to hide it from user space apps
-		(void**)(&(di.regs)));
+		(void**)&di.regs);
 
 	// If there was an error, delete other areas.
 	if (si.regsArea < 0) {
@@ -650,7 +657,7 @@ UnmapDevice(DeviceInfo& di)
 		delete_area(si.videoMemArea);
 
 	si.regsArea = si.videoMemArea = -1;
-	si.videoMemAddr = NULL;
+	si.videoMemAddr = (addr_t)NULL;
 	di.regs = NULL;
 }
 
@@ -768,7 +775,8 @@ InitDevice(DeviceInfo& di)
 		si.vesaModeTableOffset = sharedSize;
 		si.vesaModeCount = vesaModeTableSize / sizeof(VesaMode);
 
-		memcpy((uint8*)&si + si.vesaModeTableOffset, vesaModes, vesaModeTableSize);
+		memcpy((uint8*)&si + si.vesaModeTableOffset, vesaModes,
+			vesaModeTableSize);
 	}
 
 	pci_info& pciInfo = di.pciInfo;
@@ -892,7 +900,8 @@ init_hardware(void)
 	pci_info pciInfo;
 	const ChipInfo* pDevice = GetNextSupportedDevice(pciIndex, pciInfo);
 
-	TRACE("init_hardware() - %s\n", pDevice == NULL ? "no supported devices" : "device supported");
+	TRACE("init_hardware() - %s\n",
+		pDevice == NULL ? "no supported devices" : "device supported");
 
 	put_module(B_PCI_MODULE_NAME);		// put away the module manager
 
@@ -900,7 +909,8 @@ init_hardware(void)
 }
 
 
-status_t  init_driver(void)
+status_t
+init_driver(void)
 {
 	// Get handle for the pci bus.
 
@@ -1011,7 +1021,8 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 		*cookie = &di;		// send cookie to opener
 	}
 
-	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status, di.openCount);
+	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status,
+		di.openCount);
 	return status;
 }
 
@@ -1019,7 +1030,8 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 static status_t
 device_read(void* dev, off_t pos, void* buf, size_t* len)
 {
-	// Following 3 lines of code are here to eliminate "unused parameter" warnings.
+	// Following 3 lines of code are here to eliminate "unused parameter"
+	// warnings.
 	(void)dev;
 	(void)pos;
 	(void)buf;
@@ -1032,7 +1044,8 @@ device_read(void* dev, off_t pos, void* buf, size_t* len)
 static status_t
 device_write(void* dev, off_t pos, const void* buf, size_t* len)
 {
-	// Following 3 lines of code are here to eliminate "unused parameter" warnings.
+	// Following 3 lines of code are here to eliminate "unused parameter"
+	// warnings.
 	(void)dev;
 	(void)pos;
 	(void)buf;
@@ -1068,10 +1081,12 @@ device_free(void* dev)
 		DisableVBI();		// disable & clear any pending interrupts
 
 		if (si.bInterruptAssigned) {
-			remove_io_interrupt_handler(pciInfo.u.h0.interrupt_line, InterruptHandler, &di);
+			remove_io_interrupt_handler(pciInfo.u.h0.interrupt_line,
+				InterruptHandler, &di);
 		}
 
-		// Delete the semaphores, ignoring any errors because the owning team may have died.
+		// Delete the semaphores, ignoring any errors because the owning team
+		// may have died.
 		if (si.vertBlankSem >= 0)
 			delete_sem(si.vertBlankSem);
 		si.vertBlankSem = -1;
@@ -1098,7 +1113,8 @@ device_ioctl(void* dev, uint32 msg, void* buffer, size_t bufferLength)
 {
 	DeviceInfo& di = *((DeviceInfo*)dev);
 
-//	TRACE("device_ioctl(); ioctl: %lu, buffer: 0x%08lx, bufLen: %lu\n", msg, (uint32)buffer, bufferLength);
+//	TRACE("device_ioctl(); ioctl: %lu, buffer: 0x%08lx, bufLen: %lu\n", msg,
+//		(uint32)buffer, bufferLength);
 
 	switch (msg) {
 		case B_GET_ACCELERANT_SIGNATURE:

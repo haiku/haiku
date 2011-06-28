@@ -1,13 +1,14 @@
 /*
-	Haiku ATI video driver adapted from the X.org ATI driver.
+	Haiku ATI video driver adapted from the X.org ATI driver which has the
+	following copyright:
 
 	Copyright 1992,1993,1994,1995,1996,1997 by Kevin E. Martin, Chapel Hill, North Carolina.
 
-	Copyright 2009 Haiku, Inc.  All rights reserved.
+	Copyright 2009, 2011 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
 
 	Authors:
-	Gerald Zajac 2009
+	Gerald Zajac
 */
 
 #ifndef __MACH64_H__
@@ -178,6 +179,39 @@ enum Mach64_MemoryType
 #define GUI_STAT				(0x0c00 + 0x0338)	// Dword offset CE
 
 
+// Definitions used for overlays.
+//===============================
+
+#define REG_BLOCK_1	0x0800		// offset of register block 1 in register area
+
+#define OVERLAY_Y_X_START		(REG_BLOCK_1 + 0x0000)	// Dword offset 00
+#define OVERLAY_LOCK_START		0x80000000ul
+#define OVERLAY_Y_X_END			(REG_BLOCK_1 + 0x0004)	// Dword offset 01
+#define OVERLAY_GRAPHICS_KEY_CLR (REG_BLOCK_1 + 0x0010)	// Dword offset 04
+#define OVERLAY_GRAPHICS_KEY_MSK (REG_BLOCK_1 + 0x0014)	// Dword offset 05
+#define OVERLAY_KEY_CNTL		(REG_BLOCK_1 + 0x0018)	// Dword offset 06
+#define OVERLAY_MIX_FALSE		0x00
+#define OVERLAY_MIX_EQUAL		0x50
+#define OVERLAY_SCALE_INC		(REG_BLOCK_1 + 0x0020)	// Dword offset 08
+#define OVERLAY_SCALE_CNTL		(REG_BLOCK_1 + 0x0024)	// Dword offset 09
+#define SCALE_PIX_EXPAND		0x00000001
+#define OVERLAY_EN				0x40000000
+#define SCALE_EN				0x80000000
+#define SCALER_HEIGHT_WIDTH		(REG_BLOCK_1 + 0x0028)	// Dword offset 0a
+#define SCALER_BUF0_OFFSET		(REG_BLOCK_1 + 0x0034)	// Dword offset 0d
+#define SCALER_BUF0_PITCH		(REG_BLOCK_1 + 0x003c)	// Dword offset 0f
+#define VIDEO_FORMAT			(REG_BLOCK_1 + 0x0048)	// Dword offset 12
+#define SCALE_IN_VYUY422		0x000b0000
+#define BUF0_OFFSET				(REG_BLOCK_1 + 0x0080)	// Dword offset 20
+#define BUF0_PITCH				(REG_BLOCK_1 + 0x008c)	// Dword offset 23
+#define SCALER_COLOUR_CNTL		(REG_BLOCK_1 + 0x0150)	// Dword offset 54
+#define SCALER_H_COEFF0			(REG_BLOCK_1 + 0x0154)	// Dword offset 55
+#define SCALER_H_COEFF1			(REG_BLOCK_1 + 0x0158)	// Dword offset 56
+#define SCALER_H_COEFF2			(REG_BLOCK_1 + 0x015c)	// Dword offset 57
+#define SCALER_H_COEFF3			(REG_BLOCK_1 + 0x0160)	// Dword offset 58
+#define SCALER_H_COEFF4			(REG_BLOCK_1 + 0x0164)	// Dword offset 59
+
+
 // CRTC control values.
 
 #define CRTC_H_SYNC_NEG			0x00200000
@@ -225,11 +259,10 @@ enum Mach64_MemoryType
 #define CRTC_PITCH				0xffc00000
 
 // DAC control values.
-
 #define DAC_8BIT_EN				0x00000100
 
-// Mix control values.
 
+// Mix control values.
 #define MIX_NOT_DST				0x0000
 #define MIX_0 					0x0001
 #define MIX_1 					0x0002
@@ -250,7 +283,7 @@ enum Mach64_MemoryType
 // BUS_CNTL register constants.
 #define BUS_FIFO_ERR_ACK		0x00200000
 #define BUS_HOST_ERR_ACK		0x00800000
-#define BUS_APER_REG_DIS		0x00000010
+#define BUS_EXT_REG_EN			0x08000000
 
 // GEN_TEST_CNTL register constants.
 #define GEN_OVR_OUTPUT_EN		0x20
@@ -361,13 +394,13 @@ enum Mach64_MemoryType
 #define BYTE_ORDER_LSB_TO_MSB 0x1000000
 
 // DP_SRC register constants.
-#define BKGD_SRC_BKGD_CLR 		0
-#define FRGD_SRC_FRGD_CLR 		0x100
-#define FRGD_SRC_BLIT 			0x300
-#define MONO_SRC_ONE				0
+#define BKGD_SRC_BKGD_CLR 	0
+#define FRGD_SRC_FRGD_CLR 	0x100
+#define FRGD_SRC_BLIT 		0x300
+#define MONO_SRC_ONE		0
 
 // GUI_STAT register constants.
-#define ENGINE_BUSY 				1
+#define ENGINE_BUSY 		1
 
 // LCD Index register constants.
 #define LCD_REG_INDEX		0x0000003F

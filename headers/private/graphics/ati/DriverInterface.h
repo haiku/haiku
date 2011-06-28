@@ -1,9 +1,9 @@
 /*
-	Copyright 2007-2009 Haiku, Inc.  All rights reserved.
+	Copyright 2007-2011 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
 
 	Authors:
-	Gerald Zajac 2007-2009
+	Gerald Zajac
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -14,6 +14,7 @@
 #include <GraphicsDefs.h>
 #include <Drivers.h>
 #include <edid.h>
+#include <video_overlay.h>
 
 
 // This file contains info that is shared between the kernel driver and the
@@ -163,6 +164,12 @@ struct DisplayModeEx : display_mode {
 };
 
 
+struct OverlayBuffer : overlay_buffer {
+	OverlayBuffer*	nextBuffer;	// pointer to next buffer in chain, NULL = none
+	uint32			size;		// size of overlay buffer
+};
+
+
 struct SharedInfo {
 	// Device ID info.
 	uint16	vendorID;			// PCI vendor ID, from pci_info
@@ -180,8 +187,8 @@ struct SharedInfo {
 	area_id regsArea;			// area_id for the memory mapped registers. It will
 								// be cloned into accelerant's address space.
 	area_id videoMemArea;		// video memory area_id.  The addresses are shared with all teams.
-	void*	videoMemAddr;		// video memory addr as viewed from virtual memory
-	void*	videoMemPCI;		// video memory addr as viewed from the PCI bus (for DMA)
+	addr_t	videoMemAddr;		// video memory addr as viewed from virtual memory
+	phys_addr_t	videoMemPCI;	// video memory addr as viewed from the PCI bus (for DMA)
 	uint32	videoMemSize; 		// video memory size in bytes.
 
 	uint32	cursorOffset;		// offset of cursor in video memory
@@ -209,6 +216,11 @@ struct SharedInfo {
 	bool		bHaveEDID;		// true = EDID info from device is in edidInfo
 
 	Benaphore	engineLock;		// for serializing access to the acceleration engine
+	Benaphore	overlayLock;	// for overlay operations
+
+	int32		overlayAllocated;	// non-zero if overlay is allocated
+	uint32		overlayToken;
+	OverlayBuffer* overlayBuffer;	// pointer to linked list of buffers; NULL = none
 
 	MonitorType	displayType;
 
@@ -227,7 +239,7 @@ struct SharedInfo {
 	R128_RAMSpec	r128MemSpec;	// Rage128 memory timing spec's
 	R128_PLLParams	r128PLLParams;	// Rage128 PLL parameters from video BIOS ROM
 
-	uint32			r128_dpGuiMasterCntl;	// flags for accelerated drawing
+	uint32		r128_dpGuiMasterCntl;	// flags for accelerated drawing
 };
 
 
