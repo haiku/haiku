@@ -47,6 +47,8 @@ public:
 									{ return fContainer; }
 			void				SetContainer(ValueNodeContainer* container);
 
+			virtual bool		ChildCreationNeedsValue() const
+									{ return false; }
 			bool				ChildrenCreated() const
 									{ return fChildrenCreated; }
 	virtual	status_t			CreateChildren() = 0;

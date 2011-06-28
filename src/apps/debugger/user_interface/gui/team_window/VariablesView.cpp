@@ -853,6 +853,13 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 	if (modelNode == NULL)
 		return;
 
+	if (valueNode->ChildCreationNeedsValue()
+		&& !valueNode->ChildrenCreated()) {
+		status_t error = valueNode->CreateChildren();
+		if (error != B_OK)
+			return;
+	}
+
 	// check whether the value actually changed
 	Value* value = valueNode->GetValue();
 	if (value == modelNode->GetValue())
@@ -1114,6 +1121,11 @@ VariablesView::VariableTableModel::_AddChildNodes(ValueNodeChild* nodeChild)
 			return error;
 		valueNode = nodeChild->Node();
 	}
+
+	// check if this node requires child creation
+	// to be deferred until after its location/value have been resolved
+	if (valueNode->ChildCreationNeedsValue())
+		return B_OK;
 
 	// create the children, if not done yet
 	if (valueNode->ChildrenCreated())
