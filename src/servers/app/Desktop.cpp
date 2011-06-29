@@ -2587,7 +2587,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				break;
 
 			BPrivate::LinkSender reply(clientReplyPort);
-			LockAllWindows();
+			AutoWriteLocker locker(fWindowLock);
 			if (MessageForListener(NULL, link, reply) != true) {
 				// unhandled message, at least send an error if needed
 				if (link.NeedsReply()) {
@@ -2595,7 +2595,6 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					reply.Flush();
 				}
 			}
-			UnlockAllWindows();
 			break;
 		}
 
