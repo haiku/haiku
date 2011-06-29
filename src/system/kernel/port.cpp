@@ -760,9 +760,9 @@ port_init(kernel_args *args)
 		return B_ERROR;
 	}
 
-	static const heap_class kBufferHeapClass = {"default", 100,
+	static const heap_class kBufferHeapClass = { "port heap", 100,
 		PORT_MAX_MESSAGE_SIZE + sizeof(port_message), 2 * 1024,
-		sizeof(port_message), 8, 4, 64};
+		sizeof(port_message), 4, 2, 24 };
 	sPortAllocator = heap_create_allocator("port buffer", base,
 		kInitialPortBufferSize, &kBufferHeapClass, true);
 	if (sPortAllocator == NULL) {
