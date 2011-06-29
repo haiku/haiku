@@ -183,7 +183,7 @@ device_get_children(device_t dev, device_t **devlistp, int *devcountp)
 	device_t *list;
 
 	count = 0;
-	while (list_get_next_item(&dev->children, child) != NULL) {
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
 		count++;
 	}
 	
