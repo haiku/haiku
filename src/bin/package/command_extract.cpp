@@ -116,7 +116,10 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		if (S_ISREG(entry->Mode())) {
 			// create the file
 			fd = openat(parentFD, entry->Name(), O_RDWR | O_CREAT | O_EXCL,
-				entry->Mode() & ALLPERMS);
+				S_IRUSR | S_IWUSR);
+				// Note: We use read+write user permissions now -- so write
+				// operations (e.g. attributes) won't fail, but set them to the
+				// desired ones in HandleEntryDone().
 			if (fd < 0) {
 				fprintf(stderr, "Error: Failed to create file \"%s\": %s\n",
 					entry->Name(), strerror(errno));
@@ -148,8 +151,10 @@ struct PackageContentExtractHandler : BPackageContentHandler {
  		} else if (S_ISDIR(entry->Mode())) {
 			// create the directory, if necessary
 			if (!entryExists
-				&& mkdirat(parentFD, entry->Name(), entry->Mode() & ALLPERMS)
-					!= 0) {
+				&& mkdirat(parentFD, entry->Name(), S_IRWXU) != 0) {
+				// Note: We use read+write+exec user permissions now -- so write
+				// operations (e.g. attributes) won't fail, but set them to the
+				// desired ones in HandleEntryDone().
 				fprintf(stderr, "Error: Failed to create directory \"%s\": "
 					"%s\n", entry->Name(), strerror(errno));
 				return errno;
@@ -216,6 +221,20 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 
 	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
+		// set the node permissions for non-symlinks
+		if (!S_ISLNK(entry->Mode())) {
+			// get parent FD
+			int parentFD = AT_FDCWD;
+			if (entry->Parent() != NULL)
+				parentFD = ((Token*)entry->Parent()->UserToken())->fd;
+
+			if (fchmodat(parentFD, entry->Name(), entry->Mode() & ALLPERMS,
+					/*AT_SYMLINK_NOFOLLOW*/0) != 0) {
+				fprintf(stderr, "Warning: Failed to set permissions of file "
+					"\"%s\": %s\n", entry->Name(), strerror(errno));
+			}
+		}
+
 		if (Token* token = (Token*)entry->UserToken()) {
 			delete token;
 			entry->SetUserToken(NULL);
