@@ -96,9 +96,9 @@ MailDaemonApp::MailDaemonApp()
 	fAutoCheckRunner(NULL)
 {
 	fErrorLogWindow = new ErrorLogWindow(BRect(200, 200, 500, 250),
-		"Mail daemon status log", B_TITLED_WINDOW);
+		B_TRANSLATE("Mail daemon status log"), B_TITLED_WINDOW);
 	fMailStatusWindow = new MailStatusWindow(BRect(40, 400, 360, 400),
-		"Mail Status", fSettingsFile.ShowStatusWindow());
+		B_TRANSLATE("Mail Status"), fSettingsFile.ShowStatusWindow());
 	// install MimeTypes, attributes, indices, and the
 	// system beep add startup
 	MakeMimeTypes();
@@ -162,12 +162,15 @@ MailDaemonApp::ReadyToRun()
 		fQueries.AddItem(query);
 	}
 
-	BString string;
+	BString string, numString;
 	if (fNewMessages > 0) {
 		if (fNewMessages != 1)
-			string << fNewMessages << B_TRANSLATE(" new messages.");
+			string << B_TRANSLATE("%num new messages.");
 		else
-			string << fNewMessages << B_TRANSLATE(" new message.");
+			string << B_TRANSLATE("%num new message.");
+
+		numString << fNewMessages;
+		string.ReplaceFirst("%num", numString);
 	}
 	else
 		string = B_TRANSLATE("No new messages");
@@ -543,13 +546,16 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 					break;
 			}
 
-			BString string;
+			BString string, numString;
 
 			if (fNewMessages > 0) {
 				if (fNewMessages != 1)
-					string << fNewMessages << B_TRANSLATE(" new messages.");
+					string << B_TRANSLATE("%num new messages.");
 				else
-					string << fNewMessages << B_TRANSLATE(" new message.");
+					string << B_TRANSLATE("%num new message.");
+
+			numString << fNewMessages;
+			string.ReplaceFirst("%num", numString);
 			}
 			else
 				string << B_TRANSLATE("No new messages.");

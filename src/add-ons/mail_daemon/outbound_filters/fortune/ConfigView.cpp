@@ -57,7 +57,7 @@ void ConfigView::SetTo(const BMessage *archive)
 
 	BString path = archive->FindString("tag_line");
 	if (!archive->HasString("tag_line"))
-		path = "Fortune cookie says:\n\n";
+		path = B_TRANSLATE("Fortune cookie says:\n\n");
 
 	path.Truncate(path.Length() - 2);
 	if (BTextControl *control = (BTextControl *)FindView("tag_line"))

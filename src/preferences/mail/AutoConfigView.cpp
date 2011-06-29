@@ -49,7 +49,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fEmailView = new BTextControl(BRect(topLeft, rightDown), "email",
-		"E-mail address:", "", new BMessage(kEMailChangedMsg));
+		B_TRANSLATE("E-mail address:"), "", new BMessage(kEMailChangedMsg));
 	fEmailView->SetDivider(divider);
 	AddChild(fEmailView);
 
@@ -57,7 +57,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fLoginNameView = new BTextControl(BRect(topLeft, rightDown),
-		"login", "Login name:", "", NULL);
+		"login", B_TRANSLATE("Login name:"), "", NULL);
 	fLoginNameView->SetDivider(divider);
 	AddChild(fLoginNameView);
 
@@ -65,7 +65,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fPasswordView = new BTextControl(BRect(topLeft, rightDown), "password",
-		"Password:", "", NULL);
+		B_TRANSLATE("Password:"), "", NULL);
 	fPasswordView->SetDivider(divider);
 	fPasswordView->TextView()->HideTyping(true);
 	AddChild(fPasswordView);
@@ -74,7 +74,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fAccountNameView = new BTextControl(BRect(topLeft, rightDown), "account",
-		"Account name:", "", NULL);
+		B_TRANSLATE("Account name:"), "", NULL);
 	fAccountNameView->SetDivider(divider);
 	AddChild(fAccountNameView);
 
@@ -82,7 +82,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fNameView = new BTextControl(BRect(topLeft, rightDown), "name",
-		"Real name:", "", NULL);
+		B_TRANSLATE("Real name:"), "", NULL);
 	AddChild(fNameView);
 	fNameView->SetDivider(divider);
 }
@@ -312,7 +312,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		serverName = info.providerInfo.pop_server;
 
 	fInboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 35),
-		"inbound", "Server Name:", serverName.String(),
+		"inbound", B_TRANSLATE("Server Name:"), serverName.String(),
 		new BMessage(kServerChangedMsg));
 	fInboundNameView->SetDivider(divider);
 

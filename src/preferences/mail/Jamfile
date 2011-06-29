@@ -23,6 +23,7 @@ local sources =
 	main.cpp
 ;
 
+AddResources E-mail : e-mail.rdef ;
 
 Preference E-mail
 	:
@@ -30,13 +31,17 @@ Preference E-mail
 	:
 	be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
 	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
-	: e-mail.rdef
 ;
 
 DoCatalogs E-mail
-	: x-vnd.Haiku-Mail
-	: ConfigViews.cpp
-	  ConfigWindow.cpp
+	:
+	x-vnd.Haiku-Mail
+	:
+	AutoConfigView.cpp
+	AutoConfigWindow.cpp
+	ConfigViews.cpp
+	ConfigWindow.cpp
+	FilterConfigView.cpp
 ;
 
 

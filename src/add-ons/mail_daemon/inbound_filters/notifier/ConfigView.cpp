@@ -33,7 +33,8 @@ ConfigView::ConfigView()
 	// determine font height
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 6;
+	float itemHeight = (int32)(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 6;
 	
 	BRect frame(5,2,250,itemHeight + 2);
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING,false,false);
@@ -105,7 +106,7 @@ void ConfigView::UpdateNotifyText()
 		label.Prepend(item->Label());
 	}
 	if (label == "")
-		label = "none";
+		label = B_TRANSLATE("none");
 	field->MenuItem()->SetLabel(label.String());
 }
 
@@ -171,5 +172,5 @@ instantiate_filter_config_panel(AddonSettings& settings)
 BString
 descriptive_name()
 {
-	return "New mails notification";
+	return B_TRANSLATE("New mails notification");
 }

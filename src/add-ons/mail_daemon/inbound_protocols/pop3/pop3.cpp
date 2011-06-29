@@ -343,8 +343,12 @@ POP3Protocol::Open(const char *server, int port, int)
 	fLog = "";
 
 	// Prime the error message
-	BString error_msg;
-	error_msg << B_TRANSLATE("Error while connecting to server ") << server;
+	BString error_msg, servString;
+	error_msg << B_TRANSLATE("Error while connecting to server %serv");
+
+	servString << server;
+	error_msg.ReplaceFirst("%serv", servString);
+
 	if (port != 110)
 		error_msg << ":" << port;
 
@@ -445,8 +449,11 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 {
 	status_t err;
 
-	BString error_msg;
-	error_msg << B_TRANSLATE("Error while authenticating user ") << uid;
+	BString error_msg, userString;
+	error_msg << B_TRANSLATE("Error while authenticating user %user");
+
+	userString << uid;
+	error_msg.ReplaceFirst("%user", userString);
 
 	if (method == 1) {	//APOP
 		int32 index = fLog.FindFirst("<");

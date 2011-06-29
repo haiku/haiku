@@ -9,12 +9,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <fs_attr.h>
 #include <Node.h>
 #include <String.h>
 
 #include <MailProtocol.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RuleFilter"
 
 
 RuleFilter::RuleFilter(MailProtocol& protocol, AddonSettings* addonSettings)
@@ -123,7 +128,7 @@ descriptive_name()
 	sprintf(buffer + strlen(buffer), " against \"%s\"", reg);
 
 	return B_OK;*/
-	return "Rule filter";
+	return B_TRANSLATE("Rule filter");
 }
 
 

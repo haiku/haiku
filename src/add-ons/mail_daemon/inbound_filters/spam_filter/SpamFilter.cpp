@@ -113,6 +113,7 @@
  */
 
 #include <Beep.h>
+#include <Catalog.h>
 #include <fs_attr.h>
 #include <Messenger.h>
 #include <Node.h>
@@ -126,6 +127,11 @@
 #include <stdio.h>
 
 #include "SpamFilter.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SpamFilter"
+
 
 // The names match the ones set up by spamdbm for sound effects.
 static const char *kAGMSBayesBeepGenuineName = "SpamFilter-Genuine";
@@ -426,7 +432,7 @@ AGMSBayesianSpamFilter::_AddSpamToSubject(BNode* file, float spamRatio)
 BString
 descriptive_name()
 {
-	return "Spam Filter (AGMS Bayesian)";
+	return B_TRANSLATE("Spam Filter (AGMS Bayesian)");
 }
 
 

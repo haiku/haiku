@@ -541,11 +541,14 @@ DeskbarView::_BuildMenu()
 	// The New E-mail query
 
 	if (fNewMessages > 0) {
-		BString string;
+		BString string, numString;
 		if (fNewMessages != 1)
-			string << fNewMessages << B_TRANSLATE(" new messages");
+			string << B_TRANSLATE("%num new messages");
 		else
-			string << fNewMessages << B_TRANSLATE(" new message");
+			string << B_TRANSLATE("%num new message");
+
+		numString << fNewMessages;
+		string.ReplaceFirst("%num", numString);
 
 		_GetNewQueryRef(ref);
 

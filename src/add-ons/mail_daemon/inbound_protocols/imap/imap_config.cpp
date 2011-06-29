@@ -60,8 +60,8 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 	 fAddonSettings(settings)
 {
 #ifdef USE_SSL
-	AddFlavor("No encryption");
-	AddFlavor("SSL");
+	AddFlavor(B_TRANSLATE("No encryption"));
+	AddFlavor(B_TRANSLATE("SSL"));
 #endif
 
 	SetTo(settings);

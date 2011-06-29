@@ -29,7 +29,7 @@
 
 AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 	:
-	BWindow(rect, "Create new account", B_TITLED_WINDOW_LOOK,
+	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT, B_ALL_WORKSPACES),
 	fParentWindow(parent),
@@ -93,7 +93,8 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 				fMainView->GetBasicAccountInfo(fAccountInfo);
 				if (!fMainView->IsValidMailAddress(fAccountInfo.email)) {
 					invalidMailAlert = new BAlert("invalidMailAlert",
-						"Enter a valid e-mail address.", "OK");
+						B_TRANSLATE("Enter a valid e-mail address."),
+						B_TRANSLATE("OK"));
 					invalidMailAlert->Go();
 					return;
 				}

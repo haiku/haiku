@@ -55,15 +55,15 @@ RuleFilterConfig::RuleFilterConfig(const BMessage *settings)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	attr = new BTextControl(BRect(5,5,100,20),"attr", B_TRANSLATE("If"),
 		B_TRANSLATE("header (e.g. Subject)"),NULL);
-	attr->SetDivider(be_plain_font->StringWidth(B_TRANSLATE("If "))+ 4);
+	attr->SetDivider(be_plain_font->StringWidth(B_TRANSLATE("If"))+ 4);
 	if (settings->HasString("attribute"))
 		attr->SetText(settings->FindString("attribute"));
 	AddChild(attr);
 
-	regex = new BTextControl(BRect(104,5,255,20),"attr", B_TRANSLATE(" has "),
+	regex = new BTextControl(BRect(104,5,255,20),"attr", B_TRANSLATE("has"),
 		B_TRANSLATE("value (use REGEX: in from of regular expressions like "
 		"*spam*)"), NULL);
-	regex->SetDivider(be_plain_font->StringWidth(B_TRANSLATE(" has ")) + 4);
+	regex->SetDivider(be_plain_font->StringWidth(B_TRANSLATE("has")) + 4);
 	if (settings->HasString("regex"))
 		regex->SetText(settings->FindString("regex"));
 	AddChild(regex);

@@ -42,12 +42,12 @@ POP3ConfigView::POP3ConfigView(MailAddonSettings& settings,
 #endif
 		)
 {
-	AddAuthMethod("Plain text");
-	AddAuthMethod("APOP");
+	AddAuthMethod(B_TRANSLATE("Plain text"));
+	AddAuthMethod(B_TRANSLATE("APOP"));
 
 #if USE_SSL
-	AddFlavor("No encryption");
-	AddFlavor("SSL");
+	AddFlavor(B_TRANSLATE("No encryption"));
+	AddFlavor(B_TRANSLATE("SSL"));
 #endif
 
 	SetTo(settings);

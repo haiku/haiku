@@ -281,8 +281,8 @@ SMTPProtocol::Connect()
 	status = Open(fSettingsMessage.FindString("server"),
 		fSettingsMessage.FindInt32("port"), authMethod == 1);
 	if (status < B_OK) {
-		error_msg << B_TRANSLATE("Error while opening connection to ")
-			<< fSettingsMessage.FindString("server");
+		error_msg << B_TRANSLATE("Error while opening connection to %serv");
+		error_msg.ReplaceFirst("%serv", fSettingsMessage.FindString("server"));
 
 		if (fSettingsMessage.FindInt32("port") > 0)
 			error_msg << ":" << fSettingsMessage.FindInt32("port");
@@ -304,9 +304,11 @@ SMTPProtocol::Connect()
 
 	if (status != B_OK) {
 		//-----This is a really cool kind of error message. How can we make it work for POP3?
-		error_msg << B_TRANSLATE("Error while logging in to ")
-			<< fSettingsMessage.FindString("server")
+		error_msg << B_TRANSLATE("Error while logging in to %serv")
 			<< B_TRANSLATE(". The server said:\n") << fLog;
+
+		error_msg.ReplaceFirst("%serv", fSettingsMessage.FindString("server"));
+
 		ShowError(error_msg.String());
 	}
 	return B_OK;

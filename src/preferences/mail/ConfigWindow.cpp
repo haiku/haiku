@@ -648,8 +648,10 @@ ConfigWindow::MessageReceived(BMessage *msg)
 
 			BPopUpMenu rightClickMenu("accounts", false, false);
 
-			BMenuItem* inMenuItem = new BMenuItem("Incoming", NULL);
-			BMenuItem* outMenuItem = new BMenuItem("Outgoing", NULL);
+			BMenuItem* inMenuItem = new BMenuItem(B_TRANSLATE("Incoming"),
+				NULL);
+			BMenuItem* outMenuItem = new BMenuItem(B_TRANSLATE("Outgoing"),
+				NULL);
 			rightClickMenu.AddItem(inMenuItem);
 			rightClickMenu.AddItem(outMenuItem);
 
@@ -896,18 +898,18 @@ ConfigWindow::_AddAccountToView(BMailAccountSettings* account)
 	item = new AccountItem(label, account, ACCOUNT_ITEM);
 	fAccountsListView->AddItem(item);
 
-	item = new AccountItem(B_TRANSLATE("   · Incoming"), account, INBOUND_ITEM);
+	item = new AccountItem(B_TRANSLATE("· Incoming"), account, INBOUND_ITEM);
 	fAccountsListView->AddItem(item);
 	if (!account->IsInboundEnabled())
 		item->SetEnabled(false);
 
-	item = new AccountItem(B_TRANSLATE("   · Outgoing"), account,
+	item = new AccountItem(B_TRANSLATE("· Outgoing"), account,
 		OUTBOUND_ITEM);
 	fAccountsListView->AddItem(item);
 	if (!account->IsOutboundEnabled())
 		item->SetEnabled(false);
 
-	item = new AccountItem(B_TRANSLATE("   · E-mail filters"), account,
+	item = new AccountItem(B_TRANSLATE("· E-mail filters"), account,
 		FILTER_ITEM);
 	fAccountsListView->AddItem(item);
 }

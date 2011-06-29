@@ -44,9 +44,9 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 		)
 {
 #ifdef USE_SSL
-	AddFlavor("Unencrypted");
-	AddFlavor("SSL");
-	AddFlavor("STARTTLS");
+	AddFlavor(B_TRANSLATE("Unencrypted"));
+	AddFlavor(B_TRANSLATE("SSL"));
+	AddFlavor(B_TRANSLATE("STARTTLS"));
 #endif
 
 	AddAuthMethod(B_TRANSLATE("None"), false);
@@ -54,7 +54,7 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 	AddAuthMethod(B_TRANSLATE("POP3 before SMTP"), false);
 
 	BTextControl *control = (BTextControl *)(FindView("host"));
-	control->SetLabel(B_TRANSLATE("SMTP server: "));
+	control->SetLabel(B_TRANSLATE("SMTP server:"));
 
 	// Reset the dividers after changing one
 	float widestLabel = 0;

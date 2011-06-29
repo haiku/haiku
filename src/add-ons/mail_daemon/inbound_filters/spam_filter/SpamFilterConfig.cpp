@@ -80,6 +80,7 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -92,6 +93,11 @@
 
 #include <MailAddon.h>
 #include <FileConfigView.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SpamFilterConfig"
+
 
 static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
@@ -179,7 +185,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fAddSpamToSubjectCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"AddToSubject",
-		"Add spam rating to start of subject",
+		B_TRANSLATE("Add spam rating to start of subject"),
 		new BMessage (kAddSpamToSubjectPressed));
 	AddChild (fAddSpamToSubjectCheckBoxPntr);
 	fAddSpamToSubjectCheckBoxPntr->ResizeToPreferred ();
@@ -195,7 +201,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fNoWordsMeansSpamCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"NoWordsMeansSpam",
-		"or empty e-mail",
+		B_TRANSLATE("or empty e-mail"),
 		new BMessage (kNoWordsMeansSpam));
 	AddChild (fNoWordsMeansSpamCheckBoxPntr);
 	fNoWordsMeansSpamCheckBoxPntr->ResizeToPreferred ();
@@ -210,7 +216,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 
 	tempRect.right = fNoWordsMeansSpamCheckBoxPntr->Frame().left -
 		be_plain_font->StringWidth ("a");
-	tempStringPntr = "Spam above:";
+	tempStringPntr = B_TRANSLATE("Spam above:");
 	sprintf (numberString, "%06.4f", (double) fSpamCutoffRatio);
 	fSpamCutoffRatioTextBoxPntr	= new BTextControl (
 		tempRect,
@@ -229,7 +235,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 
 	// Add the box displaying the genuine cutoff ratio, on a line by itself.
 
-	tempStringPntr = "Genuine below and uncertain above:";
+	tempStringPntr = B_TRANSLATE("Genuine below and uncertain above:");
 	sprintf (numberString, "%08.6f", (double) fGenuineCutoffRatio);
 	fGenuineCutoffRatioTextBoxPntr = new BTextControl (
 		tempRect,
@@ -251,7 +257,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fAutoTrainingCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"autoTraining",
-		"Learn from all incoming e-mail",
+		B_TRANSLATE("Learn from all incoming e-mail"),
 		new BMessage (kAutoTrainingPressed));
 	AddChild (fAutoTrainingCheckBoxPntr);
 	fAutoTrainingCheckBoxPntr->ResizeToPreferred ();
@@ -415,9 +421,9 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 	return; // Successful.
 
 ErrorExit:
-	(new BAlert ("SpamFilterConfig Error", "Sorry, unable to launch the "
-		"spamdbm program to let you edit the server settings.",
-		"Close"))->Go ();
+	(new BAlert ("SpamFilterConfig Error", B_TRANSLATE("Sorry, unable to "
+		"launch the spamdbm program to let you edit the server settings."),
+		B_TRANSLATE("Close")))->Go ();
 	return;
 }
 

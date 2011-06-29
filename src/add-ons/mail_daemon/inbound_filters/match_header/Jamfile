@@ -21,4 +21,5 @@ DoCatalogs MatchHeader
 	x-vnd.Haiku-MatchHeader
 	:
 	ConfigView.cpp
+	RuleFilter.cpp
 ;

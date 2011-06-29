@@ -78,7 +78,7 @@ NotifyFilter::MailboxSynced(status_t status)
 		text.ReplaceFirst("%name", fMailProtocol.AccountSettings().Name());
 
 		BAlert *alert = new BAlert(B_TRANSLATE("New messages"), text.String(),
-			"OK", NULL, NULL, B_WIDTH_AS_USUAL);
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL);
 		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
 		alert->Go(NULL);
 	}
@@ -98,11 +98,15 @@ NotifyFilter::MailboxSynced(status_t status)
 	}
 
 	if (fStrategy & log_window) {
-		BString message;
+		BString message, numString;
 		if (fNNewMessages != 1)
-			message << fNNewMessages << B_TRANSLATE(" new messages");
+			message << B_TRANSLATE("%num new messages");
 		else
-			message << fNNewMessages << B_TRANSLATE(" new message");
+			message << B_TRANSLATE("%num new message");
+
+		numString << fNNewMessages;
+		message.ReplaceFirst("%num", numString);
+
 		fMailProtocol.ShowMessage(message.String());
 	}
 
