@@ -173,7 +173,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 			if (error != B_OK) {
 				TRACE_LOCALS("BMessageValueNode::ResolvedLocationAndValue(): "
 					"failed to resolve location of header member: %s\n",
-						strerror(error));
+					strerror(error));
 				delete memberLocation;
 				return error;
 			}
@@ -300,14 +300,14 @@ BMessageValueNode::CreateChildren()
 	if (!fChildren.IsEmpty())
 		return B_OK;
 
-	Type* whatType = NULL;
-
 	CompoundType* baseType = dynamic_cast<CompoundType*>(
 		fType->ResolveRawType(false));
 	if (baseType == NULL)
 		return B_OK;
 
-	DataMember* member;
+	DataMember* member = NULL;
+	Type* whatType = NULL;
+
 	for (int32 i = 0; i < baseType->CountDataMembers(); i++) {
 		member = baseType->DataMemberAt(i);
 		if (strcmp(member->Name(), "what") == 0) {
@@ -316,8 +316,8 @@ BMessageValueNode::CreateChildren()
 		}
 	}
 
-	ValueNodeChild* whatNode =
-		new(std::nothrow) BMessageWhatNodeChild(this, member, whatType);
+	ValueNodeChild* whatNode
+		= new(std::nothrow) BMessageWhatNodeChild(this, member, whatType);
 	if (whatNode == NULL)
 		return B_NO_MEMORY;
 
@@ -328,8 +328,8 @@ BMessageValueNode::CreateChildren()
 	type_code type;
 	int32 count;
 	for (int32 i = 0;
-		fMessage.GetInfo(B_ANY_TYPE, i, &name, &type,
-			&count) == B_OK; i++) {
+			fMessage.GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK;
+			i++) {
 		// TODO: split FieldHeaderNode into two variants in order to
 		// present fields with a count of 1 without subindices.
 		BMessageFieldHeaderNodeChild* node = new(std::nothrow)
@@ -484,8 +484,7 @@ BMessageValueNode::BMessageFieldHeaderNodeChild::CreateInternalNode(
 	ValueNode*& _node)
 {
 	BMessageFieldHeaderNode* node = new(std::nothrow)
-		BMessageFieldHeaderNode(this, fParent, fName, fFieldType,
-			fFieldCount);
+		BMessageFieldHeaderNode(this, fParent, fName, fFieldType, fFieldCount);
 	if (node == NULL)
 		return B_NO_MEMORY;
 
