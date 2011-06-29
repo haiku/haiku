@@ -138,6 +138,7 @@ public:
 
 private:
 			class Parser;
+			friend class Parser;
 
 private:
 			BString				fName;
