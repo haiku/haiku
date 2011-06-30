@@ -91,10 +91,11 @@ struct PackageWriterImpl::Attribute
 
 
 struct PackageWriterImpl::Entry : DoublyLinkedListLinkImpl<Entry> {
-	Entry(char* name, size_t nameLength, bool isImplicit)
+	Entry(char* name, size_t nameLength, int fd, bool isImplicit)
 		:
 		fName(name),
 		fNameLength(nameLength),
+		fFD(fd),
 		fIsImplicit(isImplicit)
 	{
 	}
@@ -105,7 +106,8 @@ struct PackageWriterImpl::Entry : DoublyLinkedListLinkImpl<Entry> {
 		free(fName);
 	}
 
-	static Entry* Create(const char* name, size_t nameLength, bool isImplicit)
+	static Entry* Create(const char* name, size_t nameLength, int fd,
+		bool isImplicit)
 	{
 		char* clonedName = (char*)malloc(nameLength + 1);
 		if (clonedName == NULL)
@@ -113,7 +115,7 @@ struct PackageWriterImpl::Entry : DoublyLinkedListLinkImpl<Entry> {
 		memcpy(clonedName, name, nameLength);
 		clonedName[nameLength] = '\0';
 
-		Entry* entry = new(std::nothrow) Entry(clonedName, nameLength,
+		Entry* entry = new(std::nothrow) Entry(clonedName, nameLength, fd,
 			isImplicit);
 		if (entry == NULL) {
 			free(clonedName);
@@ -126,6 +128,16 @@ struct PackageWriterImpl::Entry : DoublyLinkedListLinkImpl<Entry> {
 	const char* Name() const
 	{
 		return fName;
+	}
+
+	int FD() const
+	{
+		return fFD;
+	}
+
+	void SetFD(int fd)
+	{
+		fFD = fd;
 	}
 
 	bool IsImplicit() const
@@ -174,6 +186,7 @@ struct PackageWriterImpl::Entry : DoublyLinkedListLinkImpl<Entry> {
 private:
 	char*		fName;
 	size_t		fNameLength;
+	int			fFD;
 	bool		fIsImplicit;
 	EntryList	fChildren;
 };
@@ -253,7 +266,7 @@ PackageWriterImpl::Init(const char* fileName)
 
 
 status_t
-PackageWriterImpl::AddEntry(const char* fileName)
+PackageWriterImpl::AddEntry(const char* fileName, int fd)
 {
 	try {
 		// if it's ".PackageInfo", parse it
@@ -267,15 +280,48 @@ PackageWriterImpl::AddEntry(const char* fileName)
 				}
 				BPackageWriterListener* listener;
 			} errorListener(fListener);
-			BEntry packageInfoEntry(fileName);
-			status_t result = fPackageInfo.ReadFromConfigFile(packageInfoEntry,
-				&errorListener);
-			if (result != B_OK || (result = fPackageInfo.InitCheck()) != B_OK)
-				return result;
+
+			if (fd >= 0) {
+				// a file descriptor is given -- read the config from there
+				// stat the file to get the file size
+				struct stat st;
+				if (fstat(fd, &st) != 0)
+					return errno;
+
+				BString packageInfoString;
+				char* buffer = packageInfoString.LockBuffer(st.st_size);
+				if (buffer == NULL)
+					return B_NO_MEMORY;
+
+				ssize_t result = read_pos(fd, 0, buffer, st.st_size);
+				if (result < 0) {
+					packageInfoString.UnlockBuffer(0);
+					return errno;
+				}
+
+				buffer[st.st_size] = '\0';
+				packageInfoString.UnlockBuffer(st.st_size);
+
+				result = fPackageInfo.ReadFromConfigString(packageInfoString,
+					&errorListener);
+				if (result != B_OK)
+					return result;
+			} else {
+printf("  reading by name...\n");
+				// use the file name
+				BEntry packageInfoEntry(fileName);
+				status_t result = fPackageInfo.ReadFromConfigFile(
+					packageInfoEntry, &errorListener);
+				if (result != B_OK
+					|| (result = fPackageInfo.InitCheck()) != B_OK) {
+					return result;
+				}
+			}
+
 			RegisterPackageInfo(PackageAttributes(), fPackageInfo);
 		}
 
-		return _RegisterEntry(fileName);
+		return _RegisterEntry(fileName, fd);
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
@@ -325,7 +371,7 @@ PackageWriterImpl::_Init(const char* fileName)
 		throw std::bad_alloc();
 
 	// create entry list
-	fRootEntry = new Entry(NULL, 0, true);
+	fRootEntry = new Entry(NULL, 0, -1, true);
 
 	fRootAttribute = new Attribute();
 
@@ -425,7 +471,7 @@ PackageWriterImpl::_Finish()
 
 
 status_t
-PackageWriterImpl::_RegisterEntry(const char* fileName)
+PackageWriterImpl::_RegisterEntry(const char* fileName, int fd)
 {
 	if (*fileName == '\0') {
 		fListener->PrintError("Invalid empty file name\n");
@@ -438,7 +484,8 @@ PackageWriterImpl::_RegisterEntry(const char* fileName)
 		const char* nextSlash = strchr(fileName, '/');
 		// no slash, just add the file name
 		if (nextSlash == NULL) {
-			entry = _RegisterEntry(entry, fileName, strlen(fileName), false);
+			entry = _RegisterEntry(entry, fileName, strlen(fileName), fd,
+				false);
 			break;
 		}
 
@@ -447,13 +494,15 @@ PackageWriterImpl::_RegisterEntry(const char* fileName)
 		while (*nextComponent == '/')
 			nextComponent++;
 
+		bool lastComponent = *nextComponent != '\0';
+
 		if (nextSlash == fileName) {
 			// the FS root
-			entry = _RegisterEntry(entry, fileName, 1,
-				*nextComponent != '\0');
+			entry = _RegisterEntry(entry, fileName, 1, lastComponent ? fd : -1,
+				lastComponent);
 		} else {
 			entry = _RegisterEntry(entry, fileName, nextSlash - fileName,
-				*nextComponent != '\0');
+				lastComponent ? fd : -1, lastComponent);
 		}
 
 		fileName = nextComponent;
@@ -465,7 +514,7 @@ PackageWriterImpl::_RegisterEntry(const char* fileName)
 
 PackageWriterImpl::Entry*
 PackageWriterImpl::_RegisterEntry(Entry* parent, const char* name,
-	size_t nameLength, bool isImplicit)
+	size_t nameLength, int fd, bool isImplicit)
 {
 	// check the component name -- don't allow "." or ".."
 	if (name[0] == '.'
@@ -483,10 +532,11 @@ PackageWriterImpl::_RegisterEntry(Entry* parent, const char* name,
 		if (entry->IsImplicit() && !isImplicit) {
 			entry->DeleteChildren();
 			entry->SetImplicit(false);
+			entry->SetFD(fd);
 		}
 	} else {
 		// nope -- create it
-		entry = Entry::Create(name, nameLength, isImplicit);
+		entry = Entry::Create(name, nameLength, fd, isImplicit);
 		parent->AddChild(entry);
 	}
 
@@ -626,14 +676,22 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	}
 
 	// open the node
-	int fd = openat(dirFD, fileName,
-		O_RDONLY | (isImplicitEntry ? 0 : O_NOTRAVERSE));
-	if (fd < 0) {
-		fListener->PrintError("Failed to open entry \"%s\": %s\n", fileName,
-			strerror(errno));
-		throw status_t(errno);
+	int fd;
+	FileDescriptorCloser fdCloser;
+
+	if (entry != NULL && entry->FD() >= 0) {
+		// a file descriptor is already given -- use that
+		fd = entry->FD();
+	} else {
+		fd = openat(dirFD, fileName,
+			O_RDONLY | (isImplicitEntry ? 0 : O_NOTRAVERSE));
+		if (fd < 0) {
+			fListener->PrintError("Failed to open entry \"%s\": %s\n", fileName,
+				strerror(errno));
+			throw status_t(errno);
+		}
+		fdCloser.SetTo(fd);
 	}
-	FileDescriptorCloser fdCloser(fd);
 
 	// stat the node
 	struct stat st;

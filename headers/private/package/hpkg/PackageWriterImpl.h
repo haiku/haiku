@@ -38,7 +38,7 @@ public:
 								~PackageWriterImpl();
 
 			status_t			Init(const char* fileName);
-			status_t			AddEntry(const char* fileName);
+			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
 
 private:
@@ -52,9 +52,9 @@ private:
 			status_t			_Init(const char* fileName);
 			status_t			_Finish();
 
-			status_t			_RegisterEntry(const char* fileName);
+			status_t			_RegisterEntry(const char* fileName, int fd);
 			Entry*				_RegisterEntry(Entry* parent,
-									const char* name, size_t nameLength,
+									const char* name, size_t nameLength, int fd,
 									bool isImplicit);
 
 			status_t			_CheckLicenses();
