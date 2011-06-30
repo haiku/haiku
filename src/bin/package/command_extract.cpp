@@ -366,7 +366,6 @@ command_extract(int argc, const char* const* argv)
 	StandardErrorOutput errorOutput;
 	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
-printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)
 		return 1;
 
@@ -386,7 +385,6 @@ printf("Init(): %s\n", strerror(error));
 		return 1;
 
 	error = packageReader.ParseContent(&handler);
-printf("ParseContent(): %s\n", strerror(error));
 	if (error != B_OK)
 		return 1;
 
