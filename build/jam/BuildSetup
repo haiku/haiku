@@ -760,7 +760,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
 } else {
 	HOST_LIBSTDC++ = stdc++ ;
-	HOST_LIBROOT = libroot_build.so ;
+	HOST_LIBROOT = libroot_build_function_remapper.a libroot_build.so ;
 	HOST_STATIC_LIBROOT = libroot_build.a ;
 	HOST_LIBBE = libbe_build.so ;
 	if $(HOST_PLATFORM) = cygwin {

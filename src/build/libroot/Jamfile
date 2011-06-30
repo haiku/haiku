@@ -14,6 +14,7 @@ UsePrivateBuildHeaders kernel libroot ;
 {
 	local defines = [ FDefines
 		HAIKU_BUILD_ATTRIBUTES_DIR="\\\"$(HAIKU_BUILD_ATTRIBUTES_DIR)\\\""
+		_HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS=1
 	] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
@@ -79,9 +80,16 @@ BuildPlatformSharedLibrary libroot_build.so :
 	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 ;
 
-BuildPlatformStaticLibrary libroot_build.a :
-	:
-	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
+# TODO: This doesn't work with the function remapping.
+#BuildPlatformStaticLibrary libroot_build.a :
+#	:
+#	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
+#;
+
+USES_BE_API on [ FGristFiles function_remapper$(SUFOBJ) ] = true ;
+
+BuildPlatformStaticLibraryPIC libroot_build_function_remapper.a :
+	function_remapper.cpp
 ;
 
 SEARCH on [ FGristFiles driver_settings.cpp ]
