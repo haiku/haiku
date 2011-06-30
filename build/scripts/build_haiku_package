@@ -61,6 +61,5 @@ done
 
 
 # create the package
-cp "$packageInfoPath" "$contentsDir/.PackageInfo"
 rm -f "$packagePath"
-$package create -C "$contentsDir" "$packagePath"
+$package create -i "$packageInfoPath" -C "$contentsDir" "$packagePath"
