@@ -29,6 +29,14 @@ enum type_kind {
 };
 
 
+enum compound_type_kind {
+	COMPOUND_TYPE_CLASS,
+	COMPOUND_TYPE_STRUCT,
+	COMPOUND_TYPE_UNION,
+	COMPOUND_TYPE_INTERFACE
+};
+
+
 enum address_type_kind {
 	DERIVED_TYPE_POINTER,
 	DERIVED_TYPE_REFERENCE

@@ -46,6 +46,7 @@
 #include "TargetAddressRangeList.h"
 #include "TeamMemory.h"
 #include "Tracing.h"
+#include "TypeLookupConstraints.h"
 #include "UnsupportedLanguage.h"
 #include "Variable.h"
 
@@ -383,7 +384,8 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 status_t
 DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
-	const BString& name, Type*& _type)
+	const BString& name, const TypeLookupConstraints& constraints,
+	Type*& _type)
 {
 	int32 registerCount = fArchitecture->CountRegisters();
 	const Register* registers = fArchitecture->Registers();
@@ -410,6 +412,15 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 				= unit->UnitEntry()->Types().GetIterator();
 			DIEType* typeEntry = dynamic_cast<DIEType*>(it.Next());) {
 			if (typeEntry->IsDeclaration())
+				continue;
+
+			if (constraints.HasTypeKind()
+				&& dwarf_tag_to_type_kind(typeEntry->Tag())
+					!= constraints.TypeKind())
+				continue;
+			if (constraints.HasSubtypeKind()
+				&& dwarf_tag_to_subtype_kind(typeEntry->Tag())
+					!= constraints.SubtypeKind())
 				continue;
 
 			BString typeEntryName;

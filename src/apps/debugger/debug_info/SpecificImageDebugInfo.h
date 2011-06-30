@@ -29,6 +29,7 @@ class SourceLocation;
 class StackFrame;
 class Statement;
 class Type;
+class TypeLookupConstraints;
 class ValueLocation;
 
 
@@ -42,7 +43,9 @@ public:
 									// returns references
 
 	virtual	status_t			GetType(GlobalTypeCache* cache,
-									const BString& name, Type*& _type) = 0;
+									const BString& name,
+									const TypeLookupConstraints& constraints,
+									Type*& _type) = 0;
 									// returns a reference
 	virtual AddressSectionType	GetAddressSectionType(target_addr_t address)
 									= 0;

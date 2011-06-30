@@ -51,7 +51,9 @@ public:
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
-									const BString& name, Type*& _type);
+									const BString& name,
+									const TypeLookupConstraints& constraints,
+									Type*& _type);
 
 	virtual AddressSectionType	GetAddressSectionType(target_addr_t address);
 

@@ -15,6 +15,7 @@
 
 class BString;
 class Type;
+class TypeLookupConstraints;
 
 
 enum global_type_cache_scope {
@@ -62,7 +63,9 @@ public:
 	virtual						~GlobalTypeLookup();
 
 	virtual	status_t			GetType(GlobalTypeCache* cache,
-									const BString& name, Type*& _type) = 0;
+									const BString& name,
+									const TypeLookupConstraints& constraints,
+									Type*& _type) = 0;
 									// returns a reference
 };
 

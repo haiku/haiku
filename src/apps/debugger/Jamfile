@@ -134,6 +134,7 @@ Application Debugger :
 	ThreadInfo.cpp
 	Type.cpp
 	TypeComponentPath.cpp
+	TypeLookupConstraints.cpp
 	Variable.cpp
 
 	# settings

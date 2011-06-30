@@ -43,7 +43,9 @@ public:
 			status_t			Init();
 
 	virtual	status_t			GetType(GlobalTypeCache* cache,
-									const BString& name, Type*& _type);
+									const BString& name,
+									const TypeLookupConstraints& constraints,
+									Type*& _type);
 
 			status_t			LoadImageDebugInfo(const ImageInfo& imageInfo,
 									LocatableFile* imageFile,

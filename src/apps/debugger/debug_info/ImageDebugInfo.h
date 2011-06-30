@@ -26,6 +26,7 @@ class GlobalTypeCache;
 class LocatableFile;
 class SpecificImageDebugInfo;
 class Type;
+class TypeLookupConstraints;
 
 
 class ImageDebugInfo : public BReferenceable {
@@ -39,7 +40,9 @@ public:
 			status_t			FinishInit();
 
 			status_t			GetType(GlobalTypeCache* cache,
-									const BString& name, Type*& _type);
+									const BString& name,
+									const TypeLookupConstraints& constraints,
+									Type*& _type);
 									// returns a reference
 			AddressSectionType	GetAddressSectionType(target_addr_t address)
 									const;

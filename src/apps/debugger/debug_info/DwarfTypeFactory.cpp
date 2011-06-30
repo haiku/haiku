@@ -27,6 +27,7 @@
 #include "SourceLanguageInfo.h"
 #include "StringUtils.h"
 #include "Tracing.h"
+#include "TypeLookupConstraints.h"
 #include "ValueLocation.h"
 
 
@@ -314,8 +315,14 @@ DwarfTypeFactory::CreateType(DIEType* typeEntry, DwarfType*& _type)
 
 	// If the type entry indicates a declaration only, we try to look the
 	// type up globally first.
+	TypeLookupConstraints constraints(
+		dwarf_tag_to_type_kind(typeEntry->Tag()));
+	int32 subtypeKind = dwarf_tag_to_subtype_kind(typeEntry->Tag());
+	if (subtypeKind >= 0)
+		constraints.SetSubtypeKind(subtypeKind);
 	if (typeEntry->IsDeclaration() && name.Length() > 0
-		&& fTypeLookup->GetType(fTypeCache, name, globalType)
+		&& fTypeLookup->GetType(fTypeCache, name,
+			constraints, globalType)
 			== B_OK) {
 		DwarfType* globalDwarfType
 			= dynamic_cast<DwarfType*>(globalType);

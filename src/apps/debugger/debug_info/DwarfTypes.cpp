@@ -50,6 +50,84 @@ struct HasByteStridePredicate {
 }	// unnamed namespace
 
 
+type_kind
+dwarf_tag_to_type_kind(int32 tag)
+{
+	switch (tag) {
+		case DW_TAG_class_type:
+		case DW_TAG_structure_type:
+		case DW_TAG_union_type:
+		case DW_TAG_interface_type:
+			return TYPE_COMPOUND;
+
+		case DW_TAG_base_type:
+			return TYPE_PRIMITIVE;
+
+		case DW_TAG_pointer_type:
+		case DW_TAG_reference_type:
+			return TYPE_ADDRESS;
+
+		case DW_TAG_const_type:
+		case DW_TAG_packed_type:
+		case DW_TAG_volatile_type:
+		case DW_TAG_restrict_type:
+		case DW_TAG_shared_type:
+			return TYPE_MODIFIED;
+
+		case DW_TAG_typedef:
+			return TYPE_TYPEDEF;
+
+		case DW_TAG_array_type:
+			return TYPE_ARRAY;
+
+		case DW_TAG_enumeration_type:
+			return TYPE_ENUMERATION;
+
+		case DW_TAG_subrange_type:
+			return TYPE_SUBRANGE;
+
+		case DW_TAG_unspecified_type:
+			return TYPE_UNSPECIFIED;
+
+		case DW_TAG_subroutine_type:
+			return TYPE_FUNCTION;
+
+		case DW_TAG_ptr_to_member_type:
+			return TYPE_POINTER_TO_MEMBER;
+
+	}
+
+	return TYPE_UNSPECIFIED;
+}
+
+
+int32
+dwarf_tag_to_subtype_kind(int32 tag)
+{
+	switch (tag) {
+		case DW_TAG_class_type:
+			return COMPOUND_TYPE_CLASS;
+
+		case DW_TAG_structure_type:
+			return COMPOUND_TYPE_STRUCT;
+
+		case DW_TAG_union_type:
+			return COMPOUND_TYPE_UNION;
+
+		case DW_TAG_interface_type:
+			return COMPOUND_TYPE_INTERFACE;
+
+		case DW_TAG_pointer_type:
+			return DERIVED_TYPE_POINTER;
+
+		case DW_TAG_reference_type:
+			return DERIVED_TYPE_REFERENCE;
+	}
+
+	return -1;
+}
+
+
 // #pragma mark - DwarfTypeContext
 
 

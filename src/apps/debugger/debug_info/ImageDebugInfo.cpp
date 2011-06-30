@@ -78,11 +78,12 @@ ImageDebugInfo::FinishInit()
 
 status_t
 ImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
-	Type*& _type)
+	const TypeLookupConstraints& constraints, Type*& _type)
 {
 	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
 			= fSpecificInfos.ItemAt(i); i++) {
-		status_t error = specificInfo->GetType(cache, name, _type);
+		status_t error = specificInfo->GetType(cache, name, constraints,
+			_type);
 		if (error == B_OK || error == B_NO_MEMORY)
 			return error;
 	}
