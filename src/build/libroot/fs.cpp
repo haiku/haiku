@@ -863,15 +863,14 @@ _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 status_t
 _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 {
-	// get the descriptor
-	SymlinkDescriptor *descriptor
-		= dynamic_cast<SymlinkDescriptor*>(get_descriptor(fd));
-	if (!descriptor)
-		return B_FILE_ERROR;
+	// get the path
+	string realPath;
+	status_t error = get_path(fd, path, realPath);
+	if (error != B_OK)
+		return error;
 
 	// readlink
-	ssize_t bytesRead = readlink(descriptor->path.c_str(), buffer,
-		*_bufferSize);
+	ssize_t bytesRead = readlink(realPath.c_str(), buffer, *_bufferSize);
 	if (bytesRead < 0)
 		return errno;
 
