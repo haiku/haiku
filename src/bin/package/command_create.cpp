@@ -100,6 +100,7 @@ int
 command_create(int argc, const char* const* argv)
 {
 	const char* changeToDirectory = NULL;
+	const char* packageInfoFileName = NULL;
 	bool quiet = false;
 	bool verbose = false;
 
@@ -112,7 +113,7 @@ command_create(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+C:hqv", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+C:hi:qv", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -123,6 +124,10 @@ command_create(int argc, const char* const* argv)
 
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'i':
+				packageInfoFileName = optarg;
 				break;
 
 			case 'q':
@@ -152,6 +157,16 @@ command_create(int argc, const char* const* argv)
 	if (result != B_OK)
 		return 1;
 
+	// If a package info file has been specified explicitly, open it.
+	int packageInfoFD = -1;
+	if (packageInfoFileName != NULL) {
+		packageInfoFD = open(packageInfoFileName, O_RDONLY);
+		if (packageInfoFD < 0) {
+			fprintf(stderr, "Error: Failed to open package info file \"%s\": "
+				"%s\n", packageInfoFileName, strerror(errno));
+		}
+	}
+
 	// change directory, if requested
 	if (changeToDirectory != NULL) {
 		if (chdir(changeToDirectory) != 0) {
@@ -168,15 +183,28 @@ command_create(int argc, const char* const* argv)
 			strerror(errno));
 		return 1;
 	}
+
 	while (dirent* entry = readdir(dir)) {
+		// skip "." and ".."
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		// also skip the .PackageInfo -- we'll add it later
+		if (strcmp(entry->d_name, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
 			continue;
 
 		result = packageWriter.AddEntry(entry->d_name);
 		if (result != B_OK)
 			return 1;
 	}
+
 	closedir(dir);
+
+	// add the .PackageInfo
+	result = packageWriter.AddEntry(B_HPKG_PACKAGE_INFO_FILE_NAME,
+		packageInfoFD);
+	if (result != B_OK)
+		return 1;
 
 	// write the package
 	result = packageWriter.Finish();
