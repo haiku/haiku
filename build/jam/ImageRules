@@ -886,15 +886,6 @@ rule InstallSourceArchive file : url
 	}
 }
 
-rule InstallCommonPackage package : url
-{
-	# download archive file
-	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
-
-	# copy onto image
-	ExtractArchiveToHaikuImage common packages : $(archiveFile) ;
-}
-
 rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 {
 	# download archive file
