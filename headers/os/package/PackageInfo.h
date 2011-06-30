@@ -18,6 +18,7 @@
 
 
 class BEntry;
+class BFile;
 
 
 namespace BPackageKit {
@@ -43,6 +44,9 @@ public:
 
 			status_t			ReadFromConfigFile(
 									const BEntry& packageInfoEntry,
+									ParseErrorListener* listener = NULL);
+			status_t			ReadFromConfigFile(
+									BFile& packageInfoFile,
 									ParseErrorListener* listener = NULL);
 			status_t			ReadFromConfigString(
 									const BString& packageInfoString,

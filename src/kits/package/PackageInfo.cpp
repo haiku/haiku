@@ -849,8 +849,17 @@ BPackageInfo::ReadFromConfigFile(const BEntry& packageInfoEntry,
 	if ((result = file.InitCheck()) != B_OK)
 		return result;
 
+	return ReadFromConfigFile(file, listener);
+}
+
+
+status_t
+BPackageInfo::ReadFromConfigFile(BFile& packageInfoFile,
+	ParseErrorListener* listener)
+{
 	off_t size;
-	if ((result = file.GetSize(&size)) != B_OK)
+	status_t result = packageInfoFile.GetSize(&size);
+	if (result != B_OK)
 		return result;
 
 	BString packageInfoString;
@@ -858,7 +867,7 @@ BPackageInfo::ReadFromConfigFile(const BEntry& packageInfoEntry,
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	if ((result = file.Read(buffer, size)) < size) {
+	if ((result = packageInfoFile.Read(buffer, size)) < size) {
 		packageInfoString.UnlockBuffer(0);
 		return result >= 0 ? B_IO_ERROR : result;
 	}
