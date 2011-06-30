@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -519,6 +519,15 @@ vfs_mount_boot_file_system(kernel_args* args)
 		if (systemPackageMount < 0) {
 			panic("Failed to mount system packagefs: %s",
 				strerror(systemPackageMount));
+		}
+
+		dev_t commonPackageMount = _kern_mount("/boot/common",
+			NULL, kPackageFSName, 0,
+			"packages /boot/common/packages; type common",
+			0 /* unused argument length */);
+		if (commonPackageMount < 0) {
+			dprintf("Failed to mount common packagefs: %s",
+				strerror(commonPackageMount));
 		}
 	}
 
