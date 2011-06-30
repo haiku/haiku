@@ -43,7 +43,6 @@ public:
 
 class BPackageWriter {
 public:
-public:
 								BPackageWriter(
 									BPackageWriterListener* listener);
 								~BPackageWriter();
