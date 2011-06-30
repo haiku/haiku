@@ -309,10 +309,7 @@ AddFilesToHaikuImage home config add-ons decorators :
 	MacDecorator WinDecorator ClassicBe SATDecorator ;
 
 # create directories that will remain empty
-AddDirectoryToHaikuImage common bin ;
 AddDirectoryToHaikuImage common cache tmp ;
-AddDirectoryToHaikuImage common develop headers ;
-AddDirectoryToHaikuImage common lib ;
 AddDirectoryToHaikuImage common non-packaged ;
 AddDirectoryToHaikuImage common var empty ;
 AddDirectoryToHaikuImage common var log ;
