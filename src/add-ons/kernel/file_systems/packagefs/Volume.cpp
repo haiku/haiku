@@ -57,7 +57,7 @@ const char* const kSystemShineThroughDirectories[] = {
 	"packages", NULL
 };
 const char* const kCommonShineThroughDirectories[] = {
-	"non-packaged", "packages", "settings", "var", NULL
+	"cache", "non-packaged", "packages", "settings", "var", NULL
 };
 const char* const* kHomeShineThroughDirectories
 	= kCommonShineThroughDirectories;
