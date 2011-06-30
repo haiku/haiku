@@ -262,11 +262,10 @@ PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	uint32 control;
 	if (info.device_chipset == RADEON_R600)
 		control = 0x01130704;
-	else
+	else {
 		PLLControlTable(RV610PLLControl, feedback);
-
-	if (!control)
 		control = Read32(PLL, EXT1_PPLL_CNTL);
+	}
 
 	Write32Mask(PLL, P1PLL_INT_SS_CNTL, 0, 0x00000001);
 		// Disable Spread Spectrum

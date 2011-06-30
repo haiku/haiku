@@ -93,15 +93,15 @@ DACGetElectrical(uint8 type, uint8 dac,
 void
 DACSetModern(uint8 dacIndex, uint32 crtid)
 {
-	uint8 bandGap;
-	uint8 whiteFine;
+	bool istv = false;
 
 	// BIG TODO : NTSC, PAL, ETC.  We assume VGA for now
 	uint8 standard = FORMAT_VGA; /* VGA */
 	uint32 mode = 2;
-	bool istv = false;
 	uint32 source = istv ? 0x2 : crtid;
 
+	uint8 bandGap;
+	uint8 whiteFine;
 	DACGetElectrical(standard, dacIndex, &bandGap, &whiteFine);
 
 	uint32 mask = 0;
@@ -147,12 +147,12 @@ void
 DACSetLegacy(uint8 dacIndex, uint32 crtid)
 {
 	bool istv = false;
-	uint8 bandGap;
-	uint8 whiteFine;
 
 	// BIG TODO : NTSC, PAL, ETC.  We assume VGA for now
 	uint8 standard = FORMAT_VGA; /* VGA */
 
+	uint8 bandGap;
+	uint8 whiteFine;
 	DACGetElectrical(standard, dacIndex, &bandGap, &whiteFine);
 
 	uint32 mask = 0;

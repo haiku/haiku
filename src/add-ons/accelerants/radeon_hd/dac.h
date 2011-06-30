@@ -21,6 +21,7 @@
 #define FORMAT_VGA 0x2
 #define FORMAT_TvCV 0x3
 
+
 void DACGetElectrical(uint8 type, uint8 dac, uint8 *bandgap, uint8 *whitefine);
 void DACSet(uint8 dacIndex, uint32 crtid);
 void DACPower(uint8 dacIndex, int mode);
