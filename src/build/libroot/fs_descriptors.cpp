@@ -1,3 +1,8 @@
+/*
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #ifdef BUILDING_FS_SHELL
 #	include "compat.h"
@@ -506,5 +511,14 @@ delete_descriptor(int fd)
 	}
 	return error;
 }
+
+
+bool
+is_unknown_or_system_descriptor(int fd)
+{
+	Descriptor* descriptor = get_descriptor(fd);
+	return descriptor == NULL || descriptor->IsSystemFD();
+}
+
 
 } // namespace BPrivate
