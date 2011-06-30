@@ -40,12 +40,12 @@ BPackageWriter::Init(const char* fileName)
 
 
 status_t
-BPackageWriter::AddEntry(const char* fileName)
+BPackageWriter::AddEntry(const char* fileName, int fd)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->AddEntry(fileName);
+	return fImpl->AddEntry(fileName, fd);
 }
 
 
