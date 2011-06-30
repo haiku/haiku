@@ -201,18 +201,6 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 AddFilesToHaikuImage system packages : haiku.hpkg ;
 
 
-# TODO: remove!
-# Add the files to be used by installoptionalpackage.
-AddDirectoryToHaikuImage common data optional-packages ;
-local optional-pkg-files = OptionalBuildFeatures OptionalPackageDependencies
-	OptionalPackages OptionalLibPackages ;
-for name in $(optional-pkg-files) {
-	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
-	AddFilesToHaikuImage common data optional-packages
-		: $(file) ;
-}
-AddInstalledPackagesFileToHaikuImage ;
-
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Mailbox folders and symlink

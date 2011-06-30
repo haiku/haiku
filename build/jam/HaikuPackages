@@ -130,8 +130,6 @@ AddFilesToPackage demos			: $(SYSTEM_DEMOS) ;
 
 SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : which ;
-SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToPackage bin : installoptionalpackage ;
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : install-wifi-firmwares.sh ;
 

@@ -999,23 +999,6 @@ rule AddExpanderRuleToHaikuImage mimetype : extension : list : extract
 		: $(entry) ;
 }
 
-rule AddInstalledPackagesFileToHaikuImage
-{
-	#AddInstalledPackagesFileToHaikuImage
-	local file = <haiku-image>InstalledPackages ;
-
-	Always $(file) ;
-	MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
-	BuildHaikuImageInstalledPackagesFile $(file) ;
-	AddFilesToHaikuImage common data optional-packages
-		: $(file) ;
-}
-
-actions BuildHaikuImageInstalledPackagesFile
-{
-	echo -e "$(HAIKU_ADDED_OPTIONAL_PACKAGES)" | tr '\ ' '\n'  > $(1)
-}
-
 rule AddOptionalPackageDescriptionToHaikuImage file : searchPath
 {
 	if $(searchPath) {
