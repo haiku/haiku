@@ -178,14 +178,15 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for fresh install and run post install scripts.
-postInstallDir=/boot/common/boot/post_install
+postInstallDir=boot/post_install
 freshInstallIndicator=/boot/common/settings/fresh_install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3
 
 	# execute scripts
-	for f in $postInstallDir/*.sh; do
+	for f in /boot/system/$postInstallDir/*.sh /boot/common/$postInstallDir/*.sh
+	do
 		if [ -f $f ]; then
 			echo "Running post install script $f ..." > /dev/dprintf
 			$f

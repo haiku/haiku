@@ -154,6 +154,14 @@ local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToPackage boot : $(bootScripts) ;
 
+# post install scripts
+local postInstallFiles = add_catalog_entry_attributes.sh
+	default_deskbar_items.sh mime_update.sh ;
+postInstallFiles = $(postInstallFiles:G=post-install) ;
+SEARCH on $(postInstallFiles)
+	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+AddFilesToPackage boot post_install : $(postInstallFiles) ;
+
 # artwork and sounds
 local logoArtwork =
 	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
