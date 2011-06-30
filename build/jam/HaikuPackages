@@ -160,6 +160,11 @@ SEARCH on $(postInstallFiles)
 	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
 AddFilesToPackage boot post_install : $(postInstallFiles) ;
 
+# Gutenprint data files
+CopyDirectoryToPackage data
+	: [ FDirName $(HAIKU_TOP) src libs print libgutenprint src xml ]
+	: gutenprint : -x .svn -x *.c -x Makefile.am -x Makefile.in ;
+
 # artwork and sounds
 local logoArtwork =
 	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
