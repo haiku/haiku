@@ -1,3 +1,7 @@
+/*
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef FS_DESCRIPTORS_H
 #define FS_DESCRIPTORS_H
 
@@ -118,6 +122,7 @@ struct AttrDirDescriptor : DirectoryDescriptor {
 Descriptor*	get_descriptor(int fd);
 int			add_descriptor(Descriptor *descriptor);
 status_t	delete_descriptor(int fd);
+bool		is_unknown_or_system_descriptor(int fd);
 
 }	// namespace BPrivate
 
