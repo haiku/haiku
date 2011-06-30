@@ -224,6 +224,12 @@ struct MethodDeleter
 // FileDescriptorCloser
 
 struct FileDescriptorCloser {
+	inline FileDescriptorCloser()
+		:
+		fDescriptor(-1)
+	{
+	}
+
 	inline FileDescriptorCloser(int descriptor)
 		:
 		fDescriptor(descriptor)
@@ -232,13 +238,27 @@ struct FileDescriptorCloser {
 
 	inline ~FileDescriptorCloser()
 	{
-		if (fDescriptor >= 0)
-			close(fDescriptor);
+		SetTo(-1);
 	}
 
-	inline void Detach()
+	inline void SetTo(int descriptor)
 	{
+		if (fDescriptor >= 0)
+			close(fDescriptor);
+
+		fDescriptor = descriptor;
+	}
+
+	inline void Unset()
+	{
+		SetTo(-1);
+	}
+
+	inline int Detach()
+	{
+		int descriptor = fDescriptor;
 		fDescriptor = -1;
+		return descriptor;
 	}
 
 private:
