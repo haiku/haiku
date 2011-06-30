@@ -1920,20 +1920,7 @@ MainWin::_MouseDown(BMessage* msg, BView* originalHandler)
 		fMouseDownTracking = true;
 	}
 
-	// pop up a context menu if right mouse button is down for 200 ms
-
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
-		return;
-
-	bigtime_t start = system_time();
-	bigtime_t delay = 200000;
-	BPoint location;
-	do {
-		fVideoView->GetMouse(&location, &buttons);
-		if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
-			break;
-		snooze(1000);
-	} while (system_time() - start < delay);
+	// pop up a context menu if right mouse button is down
 
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 		_ShowContextMenu(screenWhere);
