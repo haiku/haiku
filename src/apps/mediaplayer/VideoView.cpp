@@ -442,7 +442,8 @@ VideoView::_LayoutSubtitle()
 	switch (fSubtitlePlacement) {
 		default:
 		case mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO:
-			offset.y = fVideoFrame.bottom - fSubtitleFrame.Height();
+			offset.y = min_c(fSubtitleMaxButtom, fVideoFrame.bottom)
+				- fSubtitleFrame.Height();
 			break;
 		case mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_SCREEN:
 		{
