@@ -7,17 +7,12 @@
 #include <Application.h>
 #include <Button.h>
 #include <CardLayout.h>
-#include <GridLayoutBuilder.h>
-#include <GridView.h>
-#include <GroupLayoutBuilder.h>
-#include <GroupView.h>
+#include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <ListView.h>
 #include <MenuField.h>
 #include <RadioButton.h>
 #include <ScrollView.h>
-#include <SpaceLayoutItem.h>
-#include <SplitLayoutBuilder.h>
 #include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
@@ -298,10 +293,10 @@ struct Test : BHandler {
 	BView*	rootView;
 	BString	description;
 
-	Test(const char* name, BView* view, const char* description)
+	Test(const char* name, const char* description)
 		: BHandler(name),
 		  name(name),
-		  rootView(view),
+		  rootView(new BView(name, 0)),
 		  description(description)
 	{
 	}
@@ -319,42 +314,41 @@ struct Test : BHandler {
 // GroupLayoutTest1
 struct GroupLayoutTest1 : public Test {
 	GroupLayoutTest1()
-		: Test("Group", NULL, "Simple BGroupLayout.")
+		:
+		Test("Group", "Simple BGroupLayout.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		 BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				.Add(toggleRowButton = new BButton("Toggle Row",
 						new BMessage(MSG_TOGGLE_1)))
 				.Add(toggleViewButton = new BButton("Toggle View",
 						new BMessage(MSG_TOGGLE_2)))
 				.AddGlue()
-			.End()
+				.End()
 
 			// test views
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				// row 1
-				.AddGroup(B_HORIZONTAL, 10, 1)
+				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1)
 					.Add(new TestView(), 1)
 					.Add(toggledView = new TestView(), 2)
 					.Add(new TestView(), 3)
-				.End()
+					.End()
 
 				// row 2
-				.AddGroup(B_HORIZONTAL, 10, 2).GetTopView(&toggledRow)
+				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 2)
+					.GetView(&toggledRow)
 					.Add(new TestView())
 					.Add(new TestView())
 					.Add(new TestView())
-				.End()
+					.End()
 
 				// row 3
-				.AddGroup(B_HORIZONTAL, 10, 3)
+				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 3)
 					.Add(new TestView(), 3)
 					.Add(new TestView(), 2)
-					.Add(new TestView(), 1)
-				.End()
-			.End()
-		;
+					.Add(new TestView(), 1);
 	}
 
 	virtual void RegisterListeners()
@@ -401,8 +395,7 @@ private:
 // GroupAlignedLayoutTest1
 struct GroupAlignedLayoutTest1 : public Test {
 	GroupAlignedLayoutTest1()
-		: Test("Group aligned", NULL,
-			"Simple BGroupLayout, rows 1 and 3 aligned.")
+		: Test("Group aligned", "Simple BGroupLayout, rows 1 and 3 aligned.")
 	{
 		BGroupView* rootView  = new BGroupView(B_HORIZONTAL, 10);
 		this->rootView = rootView;
@@ -503,20 +496,20 @@ private:
 // GridLayoutTest1
 struct GridLayoutTest1 : public Test {
 	GridLayoutTest1()
-		: Test("Grid", NULL, "Simple BGridLayout.")
+		: Test("Grid", "Simple BGridLayout.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				.Add(toggleView1Button = new BButton("Toggle View 1",
 						new BMessage(MSG_TOGGLE_1)))
 				.Add(toggleView2Button = new BButton("Toggle View 2",
 						new BMessage(MSG_TOGGLE_2)))
 				.AddGlue()
-			.End()
+				.End()
 
 			// test views
-			.Add(BGridLayoutBuilder(10, 10)
+			.AddGrid()
 				// row 1
 				.Add(toggledView1 = new TestView(), 0, 0, 3, 1)
 				.Add(new TestView(), 3, 0)
@@ -550,9 +543,7 @@ struct GridLayoutTest1 : public Test {
 				.SetRowWeight(0, 1)
 				.SetRowWeight(1, 2)
 				.SetRowWeight(2, 3)
-				.SetRowWeight(3, 4)
-			)
-		;
+				.SetRowWeight(3, 4);
 	}
 
 	virtual void RegisterListeners()
@@ -599,46 +590,45 @@ private:
 // SplitterGroupLayoutTest1
 struct SplitterGroupLayoutTest1 : public Test {
 	SplitterGroupLayoutTest1()
-		: Test("Group, splitters 1", NULL, "BGroupLayout with BSplitters.")
+		: Test("Group, splitters 1", "BGroupLayout with BSplitters.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				.Add(toggleRowButton = new BButton("Toggle Row",
 						new BMessage(MSG_TOGGLE_1)))
 				.Add(toggleViewButton = new BButton("Toggle View",
 						new BMessage(MSG_TOGGLE_2)))
 				.AddGlue()
-			.End()
+				.End()
 
 			// test views
-			.Add(BSplitLayoutBuilder(B_VERTICAL, 10)
+			.AddSplit(B_VERTICAL)
 				// row 1
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1)
 					.Add(new TestView(), 1)
 					.Add(toggledView = new TestView(), 2)
 					.Add(new TestView(), 3)
-				, 1)
+					.End()
 				// make the row uncollapsible
 				.SetCollapsible(false)
 
 				// row 2
-				.Add(toggledRow = BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 2)
+					.GetView(&toggledRow)
 					.Add(new TestView())
 					.Add(new TestView())
 					.Add(new TestView())
-				, 2)
+					.End()
 
 				// row 3
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 3)
 					.Add(new TestView(), 3)
 					.Add(toggledView = new TestView(), 2)
 					.Add(new TestView(), 1)
-				, 3)
+					.End()
 				// make the row uncollapsible
-				.SetCollapsible(false)
-			)
-		;
+				.SetCollapsible(false);
 	}
 
 	virtual void RegisterListeners()
@@ -685,24 +675,21 @@ private:
 // SplitterGroupLayoutTest2
 struct SplitterGroupLayoutTest2 : public Test {
 	SplitterGroupLayoutTest2()
-		: Test("Group, splitters 2", NULL,
+		: Test("Group, splitters 2",
 			"BGroupLayout with BSplitters. Restricted maximum widths.")
 	{
 		TestView* testView1 = new TestView();
 		TestView* testView2 = new TestView();
 		TestView* testView3 = new TestView();
 
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// test views
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				// split view
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL)
 					.Add(testView1, 0)
 					.Add(testView2, 1)
-					.Add(testView3, 2)
-				)
-			.End()
-		;
+					.Add(testView3, 2);
 
 		// set maximal width on the test views
 		testView1->SetExplicitMaxSize(BSize(100, B_SIZE_UNSET));
@@ -715,26 +702,25 @@ struct SplitterGroupLayoutTest2 : public Test {
 // SplitterGridLayoutTest1
 struct SplitterGridLayoutTest1 : public Test {
 	SplitterGridLayoutTest1()
-		: Test("Grid, h splitters", NULL,
-			"BGridLayout with horizontal BSplitters.")
+		: Test("Grid, h splitters", "BGridLayout with horizontal BSplitters.")
 	{
 		BGridLayout* layouts[3];
 
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				.Add(toggleView1Button = new BButton("Toggle View 1",
 						new BMessage(MSG_TOGGLE_1)))
 				.Add(toggleView2Button = new BButton("Toggle View 2",
 						new BMessage(MSG_TOGGLE_2)))
 				.AddGlue()
-			.End()
+				.End()
 
 			// test views
-			.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+			.AddSplit(B_HORIZONTAL)
 				// splitter element 1
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[0])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 6)
+					.GetLayout(&layouts[0])
 					// row 1
 					.Add(toggledView1 = new TestView(), 0, 0, 3, 1)
 					// row 2
@@ -751,11 +737,11 @@ struct SplitterGridLayoutTest1 : public Test {
 					.SetColumnWeight(0, 1)
 					.SetColumnWeight(1, 2)
 					.SetColumnWeight(2, 3)
-				, 6)
+					.End()
 				
 				// splitter element 2
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[1])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 4)
+					.GetLayout(&layouts[1])
 					// row 1
 					.Add(new TestView(), 0, 0)
 					// row 2
@@ -764,11 +750,11 @@ struct SplitterGridLayoutTest1 : public Test {
 					.Add(new TestView(), 0, 2)
 					// row 4
 					.Add(new TestView(), 0, 3)
-				, 4)
+					.End()
 
 				// splitter element 3
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[2])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 5)
+					.GetLayout(&layouts[2])
 					// row 1
 					.Add(new TestView(), 0, 0)
 					// row 2
@@ -776,10 +762,7 @@ struct SplitterGridLayoutTest1 : public Test {
 					// row 3
 					.Add(new TestView(), 0, 2)
 					// row 4
-					.Add(new TestView(), 0, 3)
-				, 5)
-			)
-		;
+					.Add(new TestView(), 0, 3);
 
 		// set row weights
 		for (int i = 0; i < 3; i++) {
@@ -842,14 +825,13 @@ private:
 // SplitterGridLayoutTest2
 struct SplitterGridLayoutTest2 : public Test {
 	SplitterGridLayoutTest2()
-		: Test("Grid, v splitters", NULL,
-			"BGridLayout with vertical BSplitters.")
+		: Test("Grid, v splitters", "BGridLayout with vertical BSplitters.")
 	{
 		BGridLayout* layouts[3];
 
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				.Add(toggleView1Button = new BButton("Toggle View 1",
 						new BMessage(MSG_TOGGLE_1)))
 				.Add(toggleView2Button = new BButton("Toggle View 2",
@@ -858,30 +840,30 @@ struct SplitterGridLayoutTest2 : public Test {
 			.End()
 
 			// test views
-			.Add(BSplitLayoutBuilder(B_VERTICAL, 10)
+			.AddSplit(B_VERTICAL)
 				// splitter element 1
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[0])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 1)
+					.GetLayout(&layouts[0])
 					// row 1
 					.Add(toggledView1 = new TestView(), 0, 0, 3, 1)
 					.Add(new TestView(), 3, 0)
 					.Add(new TestView(), 4, 0)
-				, 1)
+					.End()
 				
 				// splitter element 2
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[1])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 2)
+					.GetLayout(&layouts[1])
 					// row 2
 					.Add(new TestView(), 0, 0)
 					.Add(new TestView(), 1, 0)
 					.Add(new TestView(), 2, 0)
 					.Add(new TestView(), 3, 0)
 					.Add(new TestView(), 4, 0)
-				, 2)
+					.End()
 
 				// splitter element 3
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[2])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 7)
+					.GetLayout(&layouts[2])
 					// row 3
 					.Add(new TestView(), 0, 0)
 					.Add(toggledView2 = new TestView(), 1, 0, 2, 2)
@@ -894,10 +876,7 @@ struct SplitterGridLayoutTest2 : public Test {
 
 					// row weights
 					.SetRowWeight(0, 3)
-					.SetRowWeight(1, 4)
-				, 7)
-			)
-		;
+					.SetRowWeight(1, 4);
 
 		// set column weights
 		for (int i = 0; i < 3; i++) {
@@ -957,10 +936,10 @@ private:
 // GroupLayoutHeightForWidthTestHorizontal1
 struct GroupLayoutHeightForWidthTestHorizontal1 : public Test {
 	GroupLayoutHeightForWidthTestHorizontal1()
-		: Test("Group, height for width, h", NULL,
+		: Test("Group, height for width, h",
 			"Horizontal BGroupLayout with height for width view.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
 			.AddGroup(B_VERTICAL, 10, 0)
 				.Add(aspectRatioButton = new BRadioButton("fixed aspect ratio",
@@ -1046,10 +1025,10 @@ private:
 // GroupLayoutHeightForWidthTestVertical1
 struct GroupLayoutHeightForWidthTestVertical1 : public Test {
 	GroupLayoutHeightForWidthTestVertical1()
-		: Test("Group, height for width, v", NULL,
+		: Test("Group, height for width, v",
 			"Vertical BGroupLayout with height for width view.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
 			.AddGroup(B_VERTICAL, 10, 0)
 				.Add(aspectRatioButton = new BRadioButton("fixed aspect ratio",
@@ -1135,12 +1114,12 @@ private:
 // GridLayoutHeightForWidthTest1
 struct GridLayoutHeightForWidthTest1 : public Test {
 	GridLayoutHeightForWidthTest1()
-		: Test("Grid, height for width", NULL,
+		: Test("Grid, height for width",
 			"BGridLayout with height for width view.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10, 0)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING, 0)
 				.Add(aspectRatioButton = new BRadioButton("fixed aspect ratio",
 						new BMessage(MSG_FIXED_ASPECT_RATIO)))
 				.Add(sumButton = new BRadioButton("fixed sum",
@@ -1151,7 +1130,7 @@ struct GridLayoutHeightForWidthTest1 : public Test {
 			.End()
 
 			// test views
-			.Add(BGridLayoutBuilder(10, 10)
+			.AddGrid()
 				// row 1
 				.Add(new TestView(), 0, 0, 3, 1)
 				.Add(new TestView(), 3, 0)
@@ -1186,9 +1165,7 @@ struct GridLayoutHeightForWidthTest1 : public Test {
 				.SetRowWeight(0, 1)
 				.SetRowWeight(1, 2)
 				.SetRowWeight(2, 3)
-				.SetRowWeight(3, 4)
-			)
-		;
+				.SetRowWeight(3, 4);
 
 		aspectRatioButton->SetValue(1);
 	}
@@ -1238,13 +1215,13 @@ private:
 // SplitterGroupLayoutHeightForWidthTest1
 struct SplitterGroupLayoutHeightForWidthTest1 : public Test {
 	SplitterGroupLayoutHeightForWidthTest1()
-		: Test("Group, splitters, height for width", NULL,
+		: Test("Group, splitters, height for width",
 			"Horizontal BGroupLayout with height for width view and "
 				"BSplitters.")
 	{
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL)
 			// controls
-			.AddGroup(B_VERTICAL, 10, 0)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING, 0)
 				.Add(aspectRatioButton = new BRadioButton("fixed aspect ratio",
 						new BMessage(MSG_FIXED_ASPECT_RATIO)))
 				.Add(sumButton = new BRadioButton("fixed sum",
@@ -1255,34 +1232,32 @@ struct SplitterGroupLayoutHeightForWidthTest1 : public Test {
 			.End()
 
 			// test views
-			.Add(BSplitLayoutBuilder(B_VERTICAL, 10)
+			.AddSplit(B_VERTICAL, B_USE_DEFAULT_SPACING, 1)
 				// row 1
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1)
 					.Add(new TestView(), 1)
 					.Add(new TestView(), 2)
 					.Add(new TestView(), 3)
-				, 1)
+					.End()
 				// make the row uncollapsible
 				.SetCollapsible(false)
 
 				// row 2
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 2)
 					.Add(new TestView())
 					.Add(heightForWidthView = new HeightForWidthTestView(kRed,
 							FIXED_ASPECT_RATIO, 0.5f))
 					.Add(new TestView())
-				, 2)
+					.End()
 
 				// row 3
-				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 3)
 					.Add(new TestView(), 3)
 					.Add(new TestView(), 2)
 					.Add(new TestView(), 1)
-				, 3)
+					.End()
 				// make the row uncollapsible
-				.SetCollapsible(false)
-			)
-		;
+				.SetCollapsible(false);
 
 		aspectRatioButton->SetValue(1);
 	}
@@ -1332,14 +1307,14 @@ private:
 // SplitterGridLayoutHeightForWidthTest1
 struct SplitterGridLayoutHeightForWidthTest1 : public Test {
 	SplitterGridLayoutHeightForWidthTest1()
-		: Test("Grid, splitters, height for width", NULL,
+		: Test("Grid, splitters, height for width",
 			"BGridLayout with height for width view and horizontal BSplitters.")
 	{
 		BGridLayout* layouts[3];
 
-		rootView = BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			// controls
-			.AddGroup(B_VERTICAL, 10, 0)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING, 0)
 				.Add(aspectRatioButton = new BRadioButton("fixed aspect ratio",
 						new BMessage(MSG_FIXED_ASPECT_RATIO)))
 				.Add(sumButton = new BRadioButton("fixed sum",
@@ -1350,10 +1325,10 @@ struct SplitterGridLayoutHeightForWidthTest1 : public Test {
 			.End()
 
 			// test views
-			.Add(BSplitLayoutBuilder(B_HORIZONTAL, 10)
+			.AddSplit(B_HORIZONTAL)
 				// splitter element 1
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[0])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 6)
+					.GetLayout(&layouts[0])
 					// row 1
 					.Add(new TestView(), 0, 0, 3, 1)
 					// row 2
@@ -1371,11 +1346,11 @@ struct SplitterGridLayoutHeightForWidthTest1 : public Test {
 					.SetColumnWeight(0, 1)
 					.SetColumnWeight(1, 2)
 					.SetColumnWeight(2, 3)
-				, 6)
+					.End()
 				
 				// splitter element 2
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[1])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 4)
+					.GetLayout(&layouts[1])
 					// row 1
 					.Add(new TestView(), 0, 0)
 					// row 2
@@ -1384,11 +1359,11 @@ struct SplitterGridLayoutHeightForWidthTest1 : public Test {
 					.Add(new TestView(), 0, 2)
 					// row 4
 					.Add(new TestView(), 0, 3)
-				, 4)
+					.End()
 
 				// splitter element 3
-				.Add(BGridLayoutBuilder(10, 10)
-					.GetGridLayout(&layouts[2])
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 5)
+					.GetLayout(&layouts[2])
 					// row 1
 					.Add(new TestView(), 0, 0)
 					// row 2
@@ -1396,10 +1371,7 @@ struct SplitterGridLayoutHeightForWidthTest1 : public Test {
 					// row 3
 					.Add(new TestView(), 0, 2)
 					// row 4
-					.Add(new TestView(), 0, 3)
-				, 5)
-			)
-		;
+					.Add(new TestView(), 0, 3);
 
 		// set row weights
 		for (int i = 0; i < 3; i++) {
@@ -1461,7 +1433,7 @@ private:
 // LabelTest1
 struct LabelTest1 : public Test {
 	LabelTest1()
-		: Test("BTextControl, BMenuField, grid", NULL,
+		: Test("BTextControl, BMenuField, grid",
 			"Aligning BTextControl/BMenuField labels using a 2 column "
 			"BGridLayout.")
 	{
@@ -1469,24 +1441,24 @@ struct LabelTest1 : public Test {
 		textControl2 = new BTextControl("Long Label", NULL, NULL);
 		textControl3 = new BTextControl("Very Long Label", NULL, NULL);
 
-		menuField1 = new BMenuField("Label", new BMenu("Options"), NULL);
+		menuField1 = new BMenuField("Label", new BMenu("Options"));
 		menuField2 = new BMenuField("Long Label",
-							new BMenu("More Options"), NULL);
+			new BMenu("More Options"));
 		menuField3 = new BMenuField("Very Long Label",
-							new BMenu("Obscure Options"), NULL);
+			new BMenu("Obscure Options"));
 
-		rootView = BGroupLayoutBuilder(B_VERTICAL, 10)
+		BLayoutBuilder::Group<>(rootView, B_VERTICAL)
 			// controls
-			.AddGroup(B_HORIZONTAL, 10)
+			.AddGroup(B_HORIZONTAL)
 				.Add(changeLabelsButton = new BButton("Random Labels",
 						new BMessage(MSG_TOGGLE_1)))
 				.AddGlue()
-			.End()
+				.End()
 
 			.AddGlue()
 
 			// test views
-			.Add(BGridLayoutBuilder(10, 10)
+			.AddGrid()
 				// padding
 				.Add(BSpaceLayoutItem::CreateGlue(), 0, 0)
 				.Add(BSpaceLayoutItem::CreateGlue(), 1, 0)
@@ -1518,10 +1490,8 @@ struct LabelTest1 : public Test {
 				// padding
 				.Add(BSpaceLayoutItem::CreateGlue(), 0, 7)
 				.Add(BSpaceLayoutItem::CreateGlue(), 1, 7)
-			)
-
-			.AddGlue()
-		;
+				.End()
+			.AddGlue();
 	}
 
 	virtual void RegisterListeners()
@@ -1589,22 +1559,18 @@ public:
 			B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
 				| B_AUTO_UPDATE_SIZE_LIMITS)
 	{
-		SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-		BGroupView* rootView = new BGroupView(B_HORIZONTAL, 10);
-		BGroupLayout* layout = rootView->GroupLayout();
-		AddChild(rootView);
-		layout->SetInsets(5, 5, 5, 5);
-
 		fTestList = new BListView(BRect(0, 0, 10, 10), "test list",
-B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
+			B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
 		BView* scrollView = new BScrollView("test scroll view", fTestList);
 		scrollView->SetExplicitMaxSize(BSize(190, B_SIZE_UNLIMITED));
-		layout->AddView(scrollView);
 
 		fTestCardLayout = new BCardLayout();
 		BView* cardView = new BView("card view", 0, fTestCardLayout);
-		layout->AddView(cardView);
+
+		BLayoutBuilder::Group<>(this, B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_INSETS)
+			.Add(scrollView)
+			.Add(cardView);
 
 		// add the tests
 		_AddTest(new GroupLayoutTest1());
@@ -1622,7 +1588,7 @@ B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
 		_AddTest(new LabelTest1());
 
 		fTestList->SetSelectionMessage(new BMessage(MSG_TEST_SELECTED));
-_DumpViewHierarchy(rootView);
+		_DumpViewHierarchy(GetLayout()->Owner());
 	}
 
 	virtual void MessageReceived(BMessage* message)
@@ -1641,24 +1607,22 @@ private:
 	void _AddTest(Test* test) {
 		fTestList->AddItem(new BStringItem(test->name.String()));
 
-		BGroupView* containerView = new BGroupView(B_VERTICAL);
+		BGroupView* containerView = new BGroupView(B_VERTICAL, 0);
 
-		// description
-//		BStringView* descriptionView = new BStringView(test->description.String());
-		BStringView* descriptionView = new BStringView(BRect(0, 0, 0, 0),
-			"test description", test->description.String());
+		BStringView* descriptionView = new BStringView("test description",
+			test->description.String());
 
 		descriptionView->SetExplicitMinSize(BSize(0, B_SIZE_UNSET));
 		containerView->AddChild(descriptionView);
 
 		// spacing/glue
 		containerView->GroupLayout()->AddItem(
-			BSpaceLayoutItem::CreateVerticalStrut(10), 0);
+			BSpaceLayoutItem::CreateVerticalStrut(10));
 		containerView->GroupLayout()->AddItem(
 			BSpaceLayoutItem::CreateGlue(), 0);
 		
 		// the test view: wrap it, so we can have unlimited size
-		BGroupView* wrapperView = new BGroupView(B_HORIZONTAL);
+		BGroupView* wrapperView = new BGroupView(B_HORIZONTAL, 0);
 		containerView->AddChild(wrapperView);
 		wrapperView->AddChild(test->rootView);
 
