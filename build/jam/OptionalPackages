@@ -518,8 +518,9 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		&& $(TARGET_ARCH) = x86 {
 	# gcc and binutils
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		InstallCommonPackage gcc-2.95.3_110304-1.hpkg
-			: $(hpkgBaseURL)/gcc-2.95.3_110304-1.hpkg ;
+		InstallOptionalHaikuImagePackage gcc-2.95.3_110304-1.hpkg
+			: $(hpkgBaseURL)/gcc-2.95.3_110304-1.hpkg
+			: common packages ;
 
 		# TODO: remove this when we have a mechanism to switch gcc via PATH
 		AddSymlinkToHaikuImage common settings develop tools
