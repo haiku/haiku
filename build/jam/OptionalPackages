@@ -556,7 +556,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			: $(baseURL)/make-3.82-r1a3-x86-gcc4-2011-05-23.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			bison-2.4.3-r1a3-x86-gcc2-2011-05-17.zip
+			bison-2.4.3-1-x86_gcc2.hpkg
 			: $(hpkgBaseURL)/bison-2.4.3-1-x86_gcc2.hpkg
 			: common packages ;
 		InstallOptionalHaikuImagePackage
