@@ -1257,8 +1257,6 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 		}
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Pe/Pe ;
-		AddSymlinkToHaikuImage common bin
-			: /boot/apps/Pe/lpe ;
 	}
 }
 
