@@ -14,12 +14,12 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 if $(HAIKU_GCC_VERSION[1]) >= 4 {
 	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0d-r1a3-x86-gcc4-2011-05-20.zip ;
 } else {
-	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0d-r1a3-x86-gcc2-2011-05-17.zip ;
+	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0d-1-x86_gcc2.hpkg ;
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
 local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
-HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
+HAIKU_OPENSSL_URL = $(hpkgBaseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
 	if $(TARGET_ARCH) != x86 {
@@ -36,20 +36,19 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 
 		# extract headers and libraries
 		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
-			: common/include/ : $(zipFile) : extracted-openssl
+			: include/ : $(zipFile) : extracted-openssl
 		] ;
 
 		HAIKU_OPENSSL_LIBS = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
 			:
-			common/lib/libcrypto.so
-			common/lib/libssl.so
+			lib/libcrypto.so
+			lib/libssl.so
 			: $(zipFile)
 			: extracted-openssl
 		] ;
 
 		HAIKU_OPENSSL_ENABLED = 1 ;
-		HAIKU_OPENSSL_HEADERS
-			= [ FDirName $(HAIKU_OPENSSL_DIR) common include ] ;
+		HAIKU_OPENSSL_HEADERS = [ FDirName $(HAIKU_OPENSSL_DIR) include ] ;
 	}
 }
 
@@ -61,7 +60,7 @@ HAIKU_ICU_GCC_2_PACKAGE = icu-4.4.1-r1a3-x86-gcc2-2011-05-29.hpkg ;
 HAIKU_ICU_GCC_4_PACKAGE = icu-4.4.1-r1a3-x86-gcc4-2011-05-29.zip ;
 	# TODO: Make hpkg!
 HAIKU_ICU_PPC_PACKAGE = icu-4.4.1-ppc-2010-08-17.zip ;
-HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.4.1-2010-07-26.zip ;
+HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.4.1-1-any.hpkg ;
 
 if $(TARGET_ARCH) = ppc {
 	local icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
@@ -122,7 +121,7 @@ if $(TARGET_ARCH) = ppc {
 
 # zip file and output directory
 HAIKU_ICU_DEVEL_ZIP_FILE = [ DownloadFile $(HAIKU_ICU_DEVEL_PACKAGE)
-		: $(baseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ] ;
+		: $(hpkgBaseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ] ;
 HAIKU_ICU_DEVEL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 	$(HAIKU_ICU_DEVEL_PACKAGE:B) ] ;
 
