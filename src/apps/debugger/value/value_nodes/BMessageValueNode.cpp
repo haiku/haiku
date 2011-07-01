@@ -331,8 +331,8 @@ BMessageValueNode::CreateChildren()
 			i++) {
 		// TODO: split FieldHeaderNode into two variants in order to
 		// present fields with a count of 1 without subindices.
-		BMessageFieldHeaderNodeChild* node = new(std::nothrow)
-			BMessageFieldHeaderNodeChild(this, name, type, count);
+		BMessageFieldNodeChild* node = new(std::nothrow)
+			BMessageFieldNodeChild(this, name, type, count);
 		if (node == NULL)
 			return B_NO_MEMORY;
 
@@ -361,10 +361,10 @@ BMessageValueNode::ChildAt(int32 index) const
 }
 
 
-// #pragma mark - BMessageValueNode::BMessageFieldHeaderNode
+// #pragma mark - BMessageValueNode::BMessageFieldNode
 
-BMessageValueNode::BMessageFieldHeaderNode::BMessageFieldHeaderNode(
-	BMessageFieldHeaderNodeChild *child, BMessageValueNode* parent,
+BMessageValueNode::BMessageFieldNode::BMessageFieldNode(
+	BMessageFieldNodeChild *child, BMessageValueNode* parent,
 	const BString &name, type_code type, int32 count)
 	:
 	ValueNode(child),
@@ -379,7 +379,7 @@ BMessageValueNode::BMessageFieldHeaderNode::BMessageFieldHeaderNode(
 }
 
 
-BMessageValueNode::BMessageFieldHeaderNode::~BMessageFieldHeaderNode()
+BMessageValueNode::BMessageFieldNode::~BMessageFieldNode()
 {
 	fParent->ReleaseReference();
 	fType->ReleaseReference();
@@ -387,34 +387,34 @@ BMessageValueNode::BMessageFieldHeaderNode::~BMessageFieldHeaderNode()
 
 
 Type*
-BMessageValueNode::BMessageFieldHeaderNode::GetType() const
+BMessageValueNode::BMessageFieldNode::GetType() const
 {
 	return fType;
 }
 
 
 status_t
-BMessageValueNode::BMessageFieldHeaderNode::CreateChildren()
+BMessageValueNode::BMessageFieldNode::CreateChildren()
 {
 	return B_OK;
 }
 
 
 int32
-BMessageValueNode::BMessageFieldHeaderNode::CountChildren() const
+BMessageValueNode::BMessageFieldNode::CountChildren() const
 {
 	return 0;
 }
 
 ValueNodeChild*
-BMessageValueNode::BMessageFieldHeaderNode::ChildAt(int32 index) const
+BMessageValueNode::BMessageFieldNode::ChildAt(int32 index) const
 {
 	return NULL;
 }
 
 
 status_t
-BMessageValueNode::BMessageFieldHeaderNode::ResolvedLocationAndValue(
+BMessageValueNode::BMessageFieldNode::ResolvedLocationAndValue(
 	ValueLoader* loader, ValueLocation *& _location, Value*& _value)
 {
 	_location = fParent->Location();
@@ -424,10 +424,10 @@ BMessageValueNode::BMessageFieldHeaderNode::ResolvedLocationAndValue(
 }
 
 
-// #pragma mark - BMessageValueNode::BMessageFieldHeaderNodeChild
+// #pragma mark - BMessageValueNode::BMessageFieldNodeChild
 
 
-BMessageValueNode::BMessageFieldHeaderNodeChild::BMessageFieldHeaderNodeChild(
+BMessageValueNode::BMessageFieldNodeChild::BMessageFieldNodeChild(
 	BMessageValueNode* parent, const BString &name, type_code type,
 	int32 count)
 	:
@@ -443,7 +443,7 @@ BMessageValueNode::BMessageFieldHeaderNodeChild::BMessageFieldHeaderNodeChild(
 }
 
 
-BMessageValueNode::BMessageFieldHeaderNodeChild::~BMessageFieldHeaderNodeChild()
+BMessageValueNode::BMessageFieldNodeChild::~BMessageFieldNodeChild()
 {
 	fParent->ReleaseReference();
 	fType->ReleaseReference();
@@ -451,39 +451,39 @@ BMessageValueNode::BMessageFieldHeaderNodeChild::~BMessageFieldHeaderNodeChild()
 
 
 const BString&
-BMessageValueNode::BMessageFieldHeaderNodeChild::Name() const
+BMessageValueNode::BMessageFieldNodeChild::Name() const
 {
 	return fName;
 }
 
 
 Type*
-BMessageValueNode::BMessageFieldHeaderNodeChild::GetType() const
+BMessageValueNode::BMessageFieldNodeChild::GetType() const
 {
 	return fType;
 }
 
 
 ValueNode*
-BMessageValueNode::BMessageFieldHeaderNodeChild::Parent() const
+BMessageValueNode::BMessageFieldNodeChild::Parent() const
 {
 	return fParent;
 }
 
 
 bool
-BMessageValueNode::BMessageFieldHeaderNodeChild::IsInternal() const
+BMessageValueNode::BMessageFieldNodeChild::IsInternal() const
 {
 	return true;
 }
 
 
 status_t
-BMessageValueNode::BMessageFieldHeaderNodeChild::CreateInternalNode(
+BMessageValueNode::BMessageFieldNodeChild::CreateInternalNode(
 	ValueNode*& _node)
 {
-	BMessageFieldHeaderNode* node = new(std::nothrow)
-		BMessageFieldHeaderNode(this, fParent, fName, fFieldType, fFieldCount);
+	BMessageFieldNode* node = new(std::nothrow)
+		BMessageFieldNode(this, fParent, fName, fFieldType, fFieldCount);
 	if (node == NULL)
 		return B_NO_MEMORY;
 
@@ -493,7 +493,7 @@ BMessageValueNode::BMessageFieldHeaderNodeChild::CreateInternalNode(
 
 
 status_t
-BMessageValueNode::BMessageFieldHeaderNodeChild::ResolveLocation(
+BMessageValueNode::BMessageFieldNodeChild::ResolveLocation(
 	ValueLoader* valueLoader, ValueLocation*& _location)
 {
 	_location = fParent->Location();

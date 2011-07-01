@@ -36,12 +36,12 @@ public:
 										{ return fMessageType; }
 
 private:
-			class BMessageFieldHeaderNode;
-			class BMessageFieldHeaderNodeChild;
+			class BMessageFieldNode;
+			class BMessageFieldNodeChild;
 
 			// for GCC2
-			friend class BMessageFieldHeaderNode;
-			friend class BMessageFieldHeaderNodeChild;
+			friend class BMessageFieldNode;
+			friend class BMessageFieldNodeChild;
 
 			typedef BObjectList<ValueNodeChild> ChildNodeList;
 
@@ -53,15 +53,15 @@ private:
 };
 
 
-class BMessageValueNode::BMessageFieldHeaderNode : public ValueNode {
+class BMessageValueNode::BMessageFieldNode : public ValueNode {
 public:
-									BMessageFieldHeaderNode(
-										BMessageFieldHeaderNodeChild *child,
+									BMessageFieldNode(
+										BMessageFieldNodeChild *child,
 										BMessageValueNode* parent,
 										const BString& name,
 										type_code type, int32 count);
 
-	virtual 						~BMessageFieldHeaderNode();
+	virtual 						~BMessageFieldNode();
 
 	virtual Type* 					GetType() const;
 
@@ -83,14 +83,14 @@ private:
 };
 
 
-class BMessageValueNode::BMessageFieldHeaderNodeChild : public ValueNodeChild {
+class BMessageValueNode::BMessageFieldNodeChild : public ValueNodeChild {
 public:
-									BMessageFieldHeaderNodeChild(
+									BMessageFieldNodeChild(
 										BMessageValueNode* parent,
 										const BString &name,
 										type_code type, int32 count);
 
-	virtual 						~BMessageFieldHeaderNodeChild();
+	virtual 						~BMessageFieldNodeChild();
 
 	virtual const BString& 			Name() const;
 	virtual Type* 					GetType() const;
