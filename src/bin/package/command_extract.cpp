@@ -18,8 +18,12 @@
 #include <new>
 
 #include <fs_attr.h>
+#include <String.h>
 
 #include <AutoDeleter.h>
+#include <HashString.h>
+
+#include <util/OpenHashTable.h>
 
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageDataReader.h>
@@ -36,6 +40,142 @@ using namespace BPackageKit::BHPKG;
 using BPackageKit::BBlockBufferCacheNoLock;
 
 
+struct Entry {
+	Entry(Entry* parent, char* name, bool implicit)
+		:
+		fParent(parent),
+		fName(name),
+		fImplicit(implicit),
+		fSeen(false)
+	{
+	}
+
+	~Entry()
+	{
+		_DeleteChildren();
+
+		free(fName);
+	}
+
+	status_t Init()
+	{
+		return fChildren.Init();
+	}
+
+	static status_t Create(Entry* parent, const char* name, bool implicit,
+		Entry*& _entry)
+	{
+		char* clonedName = strdup(name);
+		if (clonedName == NULL)
+			return B_NO_MEMORY;
+
+		Entry* entry = new(std::nothrow) Entry(parent, clonedName, implicit);
+		if (entry == NULL) {
+			free(clonedName);
+			return B_NO_MEMORY;
+		}
+
+		status_t error = entry->Init();
+		if (error != B_OK) {
+			delete entry;
+			return error;
+		}
+
+		if (parent != NULL)
+			parent->fChildren.Insert(entry);
+
+		_entry = entry;
+		return B_OK;
+	}
+
+	Entry* Parent() const
+	{
+		return fParent;
+	}
+
+	const char* Name() const
+	{
+		return fName;
+	}
+
+	bool IsImplicit() const
+	{
+		return fImplicit;
+	}
+
+	void SetExplicit()
+	{
+		// remove all children and set this entry non-implicit
+		_DeleteChildren();
+		fImplicit = false;
+	}
+
+	void SetSeen()
+	{
+		fSeen = true;
+	}
+
+	bool Seen() const
+	{
+		return fSeen;
+	}
+
+	Entry* FindChild(const char* name) const
+	{
+		return fChildren.Lookup(name);
+	}
+
+private:
+	struct ChildHashDefinition {
+		typedef const char*		KeyType;
+		typedef	Entry			ValueType;
+
+		size_t HashKey(const char* key) const
+		{
+			return string_hash(key);
+		}
+
+		size_t Hash(const Entry* value) const
+		{
+			return HashKey(value->Name());
+		}
+
+		bool Compare(const char* key, const Entry* value) const
+		{
+			return strcmp(value->Name(), key) == 0;
+		}
+
+		Entry*& GetLink(Entry* value) const
+		{
+			return value->fHashTableNext;
+		}
+	};
+
+	typedef BOpenHashTable<ChildHashDefinition> ChildTable;
+
+private:
+	void _DeleteChildren()
+	{
+		Entry* child = fChildren.Clear(true);
+		while (child != NULL) {
+			Entry* next = child->fHashTableNext;
+			delete child;
+			child = next;
+		}
+	}
+
+public:
+	Entry*		fHashTableNext;
+
+private:
+	Entry*		fParent;
+	char*		fName;
+	bool		fImplicit;
+	bool		fSeen;
+	ChildTable	fChildren;
+};
+
+
 struct PackageContentExtractHandler : BPackageContentHandler {
 	PackageContentExtractHandler(int packageFileFD)
 		:
@@ -43,6 +183,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		fPackageFileReader(packageFileFD),
 		fDataBuffer(NULL),
 		fDataBufferSize(0),
+		fRootFilterEntry(NULL, NULL, true),
 		fBaseDirectory(AT_FDCWD),
 		fInfoFileName(NULL),
 		fErrorOccurred(false)
@@ -57,6 +198,10 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 	status_t Init()
 	{
 		status_t error = fBufferCache.Init();
+		if (error != B_OK)
+			return error;
+
+		error = fRootFilterEntry.Init();
 		if (error != B_OK)
 			return error;
 
@@ -78,6 +223,63 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		fInfoFileName = infoFileName;
 	}
 
+	void SetExtractAll()
+	{
+		fRootFilterEntry.SetExplicit();
+	}
+
+	status_t AddFilterEntry(const char* fileName)
+	{
+		// add all components of the path
+		Entry* entry = &fRootFilterEntry;
+		while (*fileName != 0) {
+			const char* nextSlash = strchr(fileName, '/');
+			// no slash, just add the file name
+			if (nextSlash == NULL) {
+				return _AddFilterEntry(entry, fileName, strlen(fileName),
+					false, entry);
+			}
+
+			// find the start of the next component, skipping slashes
+			const char* nextComponent = nextSlash + 1;
+			while (*nextComponent == '/')
+				nextComponent++;
+
+			status_t error = _AddFilterEntry(entry, fileName,
+				nextSlash - fileName, *nextComponent != '\0', entry);
+			if (error != B_OK)
+				return error;
+
+			fileName = nextComponent;
+		}
+
+		return B_OK;
+	}
+
+	Entry* FindFilterEntry(const char* fileName)
+	{
+		// add all components of the path
+		Entry* entry = &fRootFilterEntry;
+		while (entry != NULL && *fileName != 0) {
+			const char* nextSlash = strchr(fileName, '/');
+			// no slash, just add the file name
+			if (nextSlash == NULL)
+				return entry->FindChild(fileName);
+
+			// find the start of the next component, skipping slashes
+			const char* nextComponent = nextSlash + 1;
+			while (*nextComponent == '/')
+				nextComponent++;
+
+			BString componentName(fileName, nextSlash - fileName);
+			entry = entry->FindChild(componentName);
+
+			fileName = nextComponent;
+		}
+
+		return entry;
+	}
+
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
 		// create a token
@@ -85,6 +287,41 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		if (token == NULL)
 			return B_NO_MEMORY;
 		ObjectDeleter<Token> tokenDeleter(token);
+
+		// check whether this entry shall be ignored or is implicit
+		Entry* parentFilterEntry;
+		bool implicit;
+		if (entry->Parent() != NULL) {
+			Token* parentToken = (Token*)entry->Parent()->UserToken();
+			if (parentToken == NULL) {
+				// parent is ignored, so ignore this entry, too
+				return B_OK;
+			}
+
+			parentFilterEntry = parentToken->filterEntry;
+			implicit = parentToken->implicit;
+		} else {
+			parentFilterEntry = &fRootFilterEntry;
+			implicit = fRootFilterEntry.IsImplicit();
+		}
+
+		Entry* filterEntry = parentFilterEntry != NULL
+			? parentFilterEntry->FindChild(entry->Name()) : NULL;
+
+		if (implicit && filterEntry == NULL) {
+			// parent is implicit and the filter doesn't include this entry
+			// -- ignore it
+			return B_OK;
+		}
+
+		// If the entry is in the filter, get its implicit flag.
+		if (filterEntry != NULL) {
+			implicit = filterEntry->IsImplicit();
+			filterEntry->SetSeen();
+		}
+
+		token->filterEntry = filterEntry;
+		token->implicit = implicit;
 
 		// get parent FD and the entry name
 		int parentFD;
@@ -126,6 +363,12 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		// create the entry
 		int fd = -1;
 		if (S_ISREG(entry->Mode())) {
+			if (implicit) {
+				fprintf(stderr, "Error: File \"%s\" was specified as a "
+					"path directory component.\n", entryName);
+				return B_BAD_VALUE;
+			}
+
 			// create the file
 			fd = openat(parentFD, entryName, O_RDWR | O_CREAT | O_EXCL,
 				S_IRUSR | S_IWUSR);
@@ -151,6 +394,12 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			if (error != B_OK)
 				return error;
 		} else if (S_ISLNK(entry->Mode())) {
+			if (implicit) {
+				fprintf(stderr, "Error: Symlink \"%s\" was specified as a "
+					"path directory component.\n", entryName);
+				return B_BAD_VALUE;
+			}
+
 			// create the symlink
 			const char* symlinkPath = entry->SymlinkPath();
 			if (symlinkat(symlinkPath != NULL ? symlinkPath : "", parentFD,
@@ -178,7 +427,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		}
 
 		// If not done yet (symlink, dir), open the node -- we need the FD.
-		if (fd < 0) {
+		if (fd < 0 && (!implicit || S_ISDIR(entry->Mode()))) {
 			fd = openat(parentFD, entryName, O_RDONLY | O_NOTRAVERSE);
 			if (fd < 0) {
 				fprintf(stderr, "Error: Failed to open entry \"%s\": %s\n",
@@ -189,7 +438,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		token->fd = fd;
 
 		// set the file times
-		if (!entryExists) {
+		if (!entryExists && !implicit) {
 			timespec times[2] = {entry->AccessTime(), entry->ModifiedTime()};
 			futimens(fd, times);
 
@@ -204,7 +453,12 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
 		BPackageEntryAttribute* attribute)
 	{
-		int entryFD = ((Token*)entry->UserToken())->fd;
+		// don't write attributes of ignored or implicit entries
+		Token* token = (Token*)entry->UserToken();
+		if (token == NULL || token->implicit)
+			return B_OK;
+
+		int entryFD = token->fd;
 
 		// create the attribute
 		int fd = fs_fopen_attr(entryFD, attribute->Name(), attribute->Type(),
@@ -237,8 +491,10 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 
 	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
+		Token* token = (Token*)entry->UserToken();
+
 		// set the node permissions for non-symlinks
-		if (!S_ISLNK(entry->Mode())) {
+		if (token != NULL && !S_ISLNK(entry->Mode())) {
 			// get parent FD and entry name
 			int parentFD;
 			const char* entryName;
@@ -251,7 +507,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			}
 		}
 
-		if (Token* token = (Token*)entry->UserToken()) {
+		if (token != NULL) {
 			delete token;
 			entry->SetUserToken(NULL);
 		}
@@ -272,11 +528,15 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 
 private:
 	struct Token {
-		int	fd;
+		Entry*	filterEntry;
+		int		fd;
+		bool	implicit;
 
 		Token()
 			:
-			fd(-1)
+			filterEntry(NULL),
+			fd(-1),
+			implicit(true)
 		{
 		}
 
@@ -288,6 +548,16 @@ private:
 	};
 
 private:
+	status_t _AddFilterEntry(Entry* parentEntry, const char* _name,
+		size_t nameLength, bool implicit, Entry*& _entry)
+	{
+		BString name(_name, nameLength);
+		if (name.IsEmpty())
+			return B_NO_MEMORY;
+
+		return Entry::Create(parentEntry, name.String(), implicit, _entry);
+	}
+
 	void _GetParentFDAndEntryName(BPackageEntry* entry, int& _parentFD,
 		const char*& _entryName)
 	{
@@ -352,6 +622,7 @@ private:
 	BFDDataReader			fPackageFileReader;
 	void*					fDataBuffer;
 	size_t					fDataBufferSize;
+	Entry					fRootFilterEntry;
 	int						fBaseDirectory;
 	const char*				fInfoFileName;
 	bool					fErrorOccurred;
@@ -394,8 +665,8 @@ command_extract(int argc, const char* const* argv)
 		}
 	}
 
-	// One argument should remain -- the package file name.
-	if (optind + 1 != argc)
+	// At least one argument should remain -- the package file name.
+	if (optind + 1 > argc)
 		print_usage_and_exit(true);
 
 	const char* packageFileName = argv[optind++];
@@ -408,6 +679,27 @@ command_extract(int argc, const char* const* argv)
 		return 1;
 
 	PackageContentExtractHandler handler(packageReader.PackageFileFD());
+	error = handler.Init();
+	if (error != B_OK)
+		return 1;
+
+	// If entries to extract have been specified explicitly, add those to the
+	// filtered ones.
+	int explicitEntriesIndex = optind;
+	if (optind < argc) {
+		while (optind < argc) {
+			const char* entryName = argv[optind++];
+			if (entryName[0] == '\0' || entryName[0] == '/') {
+				fprintf(stderr, "Error: Invalid entry name: \"%s\".",
+					entryName);
+				return 1;
+			}
+
+			if (handler.AddFilterEntry(entryName) != B_OK)
+				return 1;
+		}
+	} else
+		handler.SetExtractAll();
 
 	// get the target directory, if requested
 	if (changeToDirectory != NULL) {
@@ -427,13 +719,21 @@ command_extract(int argc, const char* const* argv)
 		handler.SetPackageInfoFile(packageInfoFileName);
 
 	// extract
-	error = handler.Init();
-	if (error != B_OK)
-		return 1;
-
 	error = packageReader.ParseContent(&handler);
 	if (error != B_OK)
 		return 1;
+
+	// check whether all explicitly specified entries have been extracted
+	if (explicitEntriesIndex < argc) {
+		for (int i = explicitEntriesIndex; i < argc; i++) {
+			if (Entry* entry = handler.FindFilterEntry(argv[i])) {
+				if (!entry->Seen()) {
+					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
+						argv[i]);
+				}
+			}
+		}
+	}
 
 	return 0;
 }
