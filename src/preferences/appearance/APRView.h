@@ -63,9 +63,6 @@ protected:
 	ColorSet		fCurrentSet;
 	ColorSet		fPrevSet;
 	ColorSet		fDefaultSet;
-
-	BMenu			*fDecorMenu;
-	DecorInfoUtility*fDecorUtil;
 };
 
 #endif

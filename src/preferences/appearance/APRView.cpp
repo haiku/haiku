@@ -23,8 +23,6 @@
 #include <Path.h>
 #include <SpaceLayoutItem.h>
 
-#include <DecorInfo.h>
-
 #include "APRWindow.h"
 #include "defs.h"
 #include "ColorWell.h"
@@ -41,10 +39,8 @@
 
 APRView::APRView(const char* name, uint32 flags)
 	:
- 	BView(name, flags),
- 	fDefaultSet(ColorSet::DefaultColorSet()),
- 	fDecorMenu(NULL),
- 	fDecorUtil(new DecorInfoUtility(false))
+	BView(name, flags),
+	fDefaultSet(ColorSet::DefaultColorSet())
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -126,9 +122,6 @@ APRView::AttachedToWindow()
 	fAttrList->SetTarget(this);
 	fColorWell->SetTarget(this);
 
-	if (fDecorMenu)
-		fDecorMenu->SetTargetForItems(BMessenger(this));
-
 	LoadSettings();
 	fAttrList->Select(0);
 }
@@ -148,15 +141,6 @@ APRView::MessageReceived(BMessage *msg)
 	}
 
 	switch (msg->what) {
-		case DECORATOR_CHANGED:
-		{
-			int32 index = fDecorMenu->IndexOf(fDecorMenu->FindMarked());
-			#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-			if (index >= 0)
-				fDecorUtil->SetDecorator(index);
-			#endif
-			break;
-		}
 		case UPDATE_COLOR:
 		{
 			// Received from the color fPicker when its color changes
@@ -199,15 +183,6 @@ APRView::MessageReceived(BMessage *msg)
 			UpdateControls();
 			UpdateAllColors();
 
-			if (fDecorMenu) {
-				BMenuItem *item = fDecorMenu->FindItem("Default");
-				if (item) {
-					item->SetMarked(true);
-					#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-					fDecorUtil->SetDecorator(fDecorMenu->IndexOf(item));
-					#endif
-				}
-			}
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}

@@ -6,6 +6,7 @@ UseFreeTypeHeaders ;
 Preference Appearance :
 	APRMain.cpp
 	AntialiasingSettingsView.cpp
+	DecorSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
 	ColorSet.cpp
@@ -15,14 +16,13 @@ Preference Appearance :
 	# These are currently disabled while everything else is being worked on
 	#CurView.cpp
 	#CursorWhichItem.cpp
-	#DecView.cpp
 	#SysCursorAPI.cpp
 
 	# These exist for post-R1, so they are disabled for now
 	#FontMenu.cpp
 	#MenuView.cpp
 
-	: be $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Appearance.rdef
 	;
 
@@ -30,6 +30,7 @@ DoCatalogs Appearance :
 	x-vnd.Haiku-Appearance
 	:
 	AntialiasingSettingsView.cpp
+	DecorSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
 	ColorSet.cpp

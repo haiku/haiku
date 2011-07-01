@@ -1,10 +1,13 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
+
+
 #include "APRWindow.h"
 
 #include <Button.h>
@@ -18,16 +21,19 @@
 #include "APRView.h"
 #include "defs.h"
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "APRWindow"
+
 
 static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
+
 APRWindow::APRWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Appearance"), B_TITLED_WINDOW,
- 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES)
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES)
 {
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -42,13 +48,19 @@ APRWindow::APRWindow(BRect frame)
 
 	fAntialiasingSettings = new AntialiasingSettingsView(
 		B_TRANSLATE("Antialiasing"));
+
+	fDecorSettings = new DecorSettingsView(
+		B_TRANSLATE("Window Decorator"));
+
 	fColorsView = new APRView(B_TRANSLATE("Colors"), B_WILL_DRAW);
 
 	tabView->AddTab(fColorsView);
 	tabView->AddTab(fAntialiasingSettings);
+	tabView->AddTab(fDecorSettings);
 
 	fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-		|| fAntialiasingSettings->IsDefaultable());
+		|| fAntialiasingSettings->IsDefaultable()
+		|| fDecorSettings->IsDefaultable());
 	fRevertButton->SetEnabled(false);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
