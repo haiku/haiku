@@ -23,7 +23,7 @@ extern const char* __progname;
 
 
 static const size_t kBufferSize = 1500;
-static const uint32 kFrameType = 0x8888;
+static const uint32 kFrameType = 0x8998;
 
 static const char* kProgramName = __progname;
 
