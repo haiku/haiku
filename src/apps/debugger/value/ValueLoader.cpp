@@ -33,6 +33,21 @@ ValueLoader::ValueLoader(Architecture* architecture, TeamMemory* teamMemory,
 }
 
 
+ValueLoader::ValueLoader(const ValueLoader& other)
+	:
+	fArchitecture(other.fArchitecture),
+	fTeamMemory(other.fTeamMemory),
+	fTypeInformation(other.fTypeInformation),
+	fCpuState(other.fCpuState)
+{
+	fArchitecture->AcquireReference();
+	fTeamMemory->AcquireReference();
+	fTypeInformation->AcquireReference();
+	if (fCpuState != NULL)
+		fCpuState->AcquireReference();
+}
+
+
 ValueLoader::~ValueLoader()
 {
 	fArchitecture->ReleaseReference();

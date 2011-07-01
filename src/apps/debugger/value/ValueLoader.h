@@ -27,6 +27,7 @@ public:
 									TeamTypeInformation* typeInformation,
 									CpuState* cpuState);
 									// cpuState can be NULL
+								ValueLoader(const ValueLoader& other);
 								~ValueLoader();
 
 			Architecture*		GetArchitecture() const
