@@ -77,7 +77,7 @@ typedef struct ancillary_data_container ancillary_data_container;
 
 #define B_NET_FRAME_TYPE(super, sub)	(((int32)(super) << 16) | (sub))
 	// Use this when registering a device handler, see net/if_types.h for
-	// the possible "super" values.
+	// the possible "super" values. Input values are in host byte order.
 
 
 // sub types
