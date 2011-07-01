@@ -652,12 +652,14 @@ RetrieveMemoryBlockJob::RetrieveMemoryBlockJob(Team* team,
 	fTeamMemory(teamMemory),
 	fMemoryBlock(memoryBlock)
 {
+	fTeamMemory->AcquireReference();
 	fMemoryBlock->AcquireReference();
 }
 
 
 RetrieveMemoryBlockJob::~RetrieveMemoryBlockJob()
 {
+	fTeamMemory->ReleaseReference();
 	fMemoryBlock->ReleaseReference();
 }
 
