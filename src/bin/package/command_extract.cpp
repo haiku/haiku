@@ -338,13 +338,14 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 				// remove it, otherwise fail.
 				if (!S_ISREG(st.st_mode) && !S_ISLNK(st.st_mode)) {
 					fprintf(stderr, "Error: Can't create entry \"%s\", since "
-						"something is in the way\n", entryName);
+						"something is in the way\n",
+						_EntryPath(entry).String());
 					return B_FILE_EXISTS;
 				}
 
 				if (unlinkat(parentFD, entryName, 0) != 0) {
 					fprintf(stderr, "Error: Failed to unlink entry \"%s\": %s\n",
-						entryName, strerror(errno));
+						_EntryPath(entry).String(), strerror(errno));
 					return errno;
 				}
 
@@ -354,7 +355,8 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 				// fail.
 				if (!S_ISDIR(st.st_mode)) {
 					fprintf(stderr, "Error: Can't create directory \"%s\", "
-						"since something is in the way\n", entryName);
+						"since something is in the way\n",
+						_EntryPath(entry).String());
 					return B_FILE_EXISTS;
 				}
 			}
@@ -365,7 +367,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		if (S_ISREG(entry->Mode())) {
 			if (implicit) {
 				fprintf(stderr, "Error: File \"%s\" was specified as a "
-					"path directory component.\n", entryName);
+					"path directory component.\n", _EntryPath(entry).String());
 				return B_BAD_VALUE;
 			}
 
@@ -377,7 +379,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 				// desired ones in HandleEntryDone().
 			if (fd < 0) {
 				fprintf(stderr, "Error: Failed to create file \"%s\": %s\n",
-					entryName, strerror(errno));
+					_EntryPath(entry).String(), strerror(errno));
 				return errno;
 			}
 
@@ -396,7 +398,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		} else if (S_ISLNK(entry->Mode())) {
 			if (implicit) {
 				fprintf(stderr, "Error: Symlink \"%s\" was specified as a "
-					"path directory component.\n", entryName);
+					"path directory component.\n", _EntryPath(entry).String());
 				return B_BAD_VALUE;
 			}
 
@@ -405,7 +407,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			if (symlinkat(symlinkPath != NULL ? symlinkPath : "", parentFD,
 					entryName) != 0) {
 				fprintf(stderr, "Error: Failed to create symlink \"%s\": %s\n",
-					entryName, strerror(errno));
+					_EntryPath(entry).String(), strerror(errno));
 				return errno;
 			}
 // TODO: Set symlink permissions?
@@ -417,12 +419,12 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 				// operations (e.g. attributes) won't fail, but set them to the
 				// desired ones in HandleEntryDone().
 				fprintf(stderr, "Error: Failed to create directory \"%s\": "
-					"%s\n", entryName, strerror(errno));
+					"%s\n", _EntryPath(entry).String(), strerror(errno));
 				return errno;
 			}
 		} else {
 			fprintf(stderr, "Error: Invalid file type for entry \"%s\"\n",
-				entryName);
+				_EntryPath(entry).String());
 			return B_BAD_DATA;
 		}
 
@@ -431,7 +433,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			fd = openat(parentFD, entryName, O_RDONLY | O_NOTRAVERSE);
 			if (fd < 0) {
 				fprintf(stderr, "Error: Failed to open entry \"%s\": %s\n",
-					entryName, strerror(errno));
+					_EntryPath(entry).String(), strerror(errno));
 				return errno;
 			}
 		}
@@ -469,8 +471,8 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			_GetParentFDAndEntryName(entry, parentFD, entryName);
 
 			fprintf(stderr, "Error: Failed to create attribute \"%s\" of "
-				"file \"%s\": %s\n", attribute->Name(), entryName,
-				strerror(errno));
+				"file \"%s\": %s\n", attribute->Name(),
+				_EntryPath(entry).String(), strerror(errno));
 			return errno;
 		}
 
@@ -503,7 +505,8 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			if (fchmodat(parentFD, entryName, entry->Mode() & ALLPERMS,
 					/*AT_SYMLINK_NOFOLLOW*/0) != 0) {
 				fprintf(stderr, "Warning: Failed to set permissions of file "
-					"\"%s\": %s\n", entryName, strerror(errno));
+					"\"%s\": %s\n", _EntryPath(entry).String(),
+					strerror(errno));
 			}
 		}
 
@@ -571,6 +574,19 @@ private:
 			_parentFD = entry->Parent() != NULL
 				? ((Token*)entry->Parent()->UserToken())->fd : fBaseDirectory;
 		}
+	}
+
+	BString _EntryPath(const BPackageEntry* entry)
+	{
+		BString path;
+
+		if (const BPackageEntry* parent = entry->Parent()) {
+			path = _EntryPath(parent);
+			path << '/';
+		}
+
+		path << entry->Name();
+		return path;
 	}
 
 	status_t _ExtractFileData(BDataReader* dataReader, const BPackageData& data,
