@@ -112,8 +112,6 @@ enum {
 
 	M_FILE_DELETE,
 
-	M_SHOW_IF_NEEDED,
-
 	M_SLIDE_CONTROLS,
 	M_FINISH_SLIDING_CONTROLS
 };
@@ -169,13 +167,10 @@ static const char* kDisabledSeekMessage = B_TRANSLATE("Drop files to play");
 static const char* kApplicationName = B_TRANSLATE_SYSTEM_NAME(NAME);
 
 
-//#define printf(a...)
-
-
 MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	:
 	BWindow(BRect(100, 100, 400, 300), kApplicationName, B_TITLED_WINDOW,
- 		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
+ 		B_ASYNCHRONOUS_CONTROLS),
  	fCreationTime(system_time()),
 	fInfoWin(NULL),
 	fPlaylistWindow(NULL),
@@ -939,10 +934,6 @@ MainWin::MessageReceived(BMessage* msg)
 			_AdoptGlobalSettings();
 			break;
 
-		case M_SHOW_IF_NEEDED:
-			_ShowIfNeeded();
-			break;
-
 		case M_SLIDE_CONTROLS:
 		{
 			float offset;
@@ -1094,12 +1085,6 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 		BString string;
 		string << "Opening '" << item->Name() << "'.";
 		fControls->SetDisabledString(string.String());
-
-		if (IsHidden()) {
-			BMessage showMessage(M_SHOW_IF_NEEDED);
-			BMessageRunner::StartSending(BMessenger(this), &showMessage,
-				150000, 1);
-		}
 	}
 }
 
@@ -1304,7 +1289,6 @@ MainWin::_RefsReceived(BMessage* message)
 
 	if (message->FindRect("window frame", &fNoVideoFrame) != B_OK)
 		fNoVideoFrame = BRect();
-	_ShowIfNeeded();
 }
 
 
@@ -1396,8 +1380,6 @@ MainWin::_SetupWindow()
 	}
 	_UpdateControlsEnabledStatus();
 
-	_ShowIfNeeded();
-
 	// Adopt the size and window layout if necessary
 	if (previousSourceWidth != fSourceWidth
 		|| previousSourceHeight != fSourceHeight
@@ -1414,6 +1396,8 @@ MainWin::_SetupWindow()
 			FrameResized(Frame().Width(), Frame().Height());
 		}
 	}
+
+	_ShowIfNeeded();
 
 	fVideoView->MakeFocus();
 }
@@ -2320,13 +2304,16 @@ MainWin::_ToggleNoInterface()
 void
 MainWin::_ShowIfNeeded()
 {
+	// Only proceed if the window is already running
 	if (find_thread(NULL) != Thread())
 		return;
 
 	if (!fHasVideo && fNoVideoFrame.IsValid()) {
 		MoveTo(fNoVideoFrame.LeftTop());
 		ResizeTo(fNoVideoFrame.Width(), fNoVideoFrame.Height());
-	}
+	} else if (fHasVideo && IsHidden())
+		CenterOnScreen();
+
 	fNoVideoFrame = BRect();
 
 	if (IsHidden()) {
