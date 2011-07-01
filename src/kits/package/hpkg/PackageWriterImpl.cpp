@@ -307,7 +307,6 @@ PackageWriterImpl::AddEntry(const char* fileName, int fd)
 				if (result != B_OK)
 					return result;
 			} else {
-printf("  reading by name...\n");
 				// use the file name
 				BEntry packageInfoEntry(fileName);
 				status_t result = fPackageInfo.ReadFromConfigFile(
