@@ -130,6 +130,7 @@ Application Debugger :
 	Team.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp
+	TeamTypeInformation.cpp
 	Thread.cpp
 	ThreadInfo.cpp
 	Type.cpp

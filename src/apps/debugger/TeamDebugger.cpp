@@ -252,7 +252,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// create a team object
 	fTeam = new(std::nothrow) ::Team(fTeamID, fDebuggerInterface,
-		fDebuggerInterface->GetArchitecture(), teamDebugInfo);
+		fDebuggerInterface->GetArchitecture(), teamDebugInfo,
+		teamDebugInfo);
 	if (fTeam == NULL)
 		return B_NO_MEMORY;
 
@@ -625,9 +626,8 @@ TeamDebugger::ValueNodeValueRequested(CpuState* cpuState,
 	// schedule the job
 	status_t error = fWorker->ScheduleJob(
 		new(std::nothrow) ResolveValueNodeValueJob(fDebuggerInterface,
-			fDebuggerInterface->GetArchitecture(), cpuState, container,
-			valueNode),
-		this);
+			fDebuggerInterface->GetArchitecture(), cpuState,
+			fTeam->GetTeamTypeInformation(), container,	valueNode),	this);
 	if (error != B_OK) {
 		// scheduling failed -- set the value to invalid
 		valueNode->SetLocationAndValue(NULL, NULL, error);

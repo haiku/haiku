@@ -362,6 +362,13 @@ TeamDebugInfo::Init()
 
 
 status_t
+TeamDebugInfo::LookupTypeByName(const BString& name,
+	const TypeLookupConstraints& constraints, Type*& _type)
+{
+	return GetType(fTypeCache, name, constraints, _type);
+}
+
+status_t
 TeamDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 	const TypeLookupConstraints& constraints, Type*& _type)
 {

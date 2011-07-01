@@ -48,6 +48,7 @@ class SourceLocation;
 class Statement;
 class TeamDebugInfo;
 class TeamMemory;
+class TeamTypeInformation;
 class UserBreakpoint;
 
 
@@ -63,7 +64,8 @@ public:
 public:
 								Team(team_id teamID, TeamMemory* teamMemory,
 									Architecture* architecture,
-									TeamDebugInfo* debugInfo);
+									TeamDebugInfo* debugInfo,
+									TeamTypeInformation* typeInformation);
 								~Team();
 
 			status_t			Init();
@@ -77,6 +79,9 @@ public:
 			Architecture*		GetArchitecture() const
 									{ return fArchitecture; }
 			TeamDebugInfo*		DebugInfo() const	{ return fDebugInfo; }
+			TeamTypeInformation*
+								GetTeamTypeInformation() const
+									{ return fTypeInformation; }
 
 			const char*			Name() const	{ return fName.String(); }
 			void				SetName(const BString& name);
@@ -172,6 +177,8 @@ private:
 			BLocker				fLock;
 			team_id				fID;
 			TeamMemory*			fTeamMemory;
+			TeamTypeInformation*
+								fTypeInformation;
 			Architecture*		fArchitecture;
 			TeamDebugInfo*		fDebugInfo;
 			BString				fName;

@@ -24,6 +24,7 @@ class StackFrameValues;
 class Team;
 class TeamMemory;
 class TeamMemoryBlock;
+class TeamTypeInformation;
 class Thread;
 class Type;
 class TypeComponentPath;
@@ -158,6 +159,7 @@ public:
 									DebuggerInterface* debuggerInterface,
 									Architecture* architecture,
 									CpuState* cpuState,
+									TeamTypeInformation* typeInformation,
 									ValueNodeContainer*	container,
 									ValueNode* valueNode);
 	virtual						~ResolveValueNodeValueJob();
@@ -177,6 +179,8 @@ private:
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			CpuState*			fCpuState;
+			TeamTypeInformation*
+								fTypeInformation;
 			ValueNodeContainer*	fContainer;
 			ValueNode*			fValueNode;
 };

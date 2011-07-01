@@ -14,13 +14,18 @@
 class Architecture;
 class CpuState;
 class TeamMemory;
+class TeamTypeInformation;
+class Type;
+class TypeLookupConstraints;
 class ValueLocation;
 
 
 class ValueLoader {
 public:
 								ValueLoader(Architecture* architecture,
-									TeamMemory* teamMemory, CpuState* cpuState);
+									TeamMemory* teamMemory,
+									TeamTypeInformation* typeInformation,
+									CpuState* cpuState);
 									// cpuState can be NULL
 								~ValueLoader();
 
@@ -37,9 +42,16 @@ public:
 			status_t			LoadStringValue(BVariant& location,
 									size_t maxSize, BString& _value);
 
+			status_t			LookupTypeByName(const BString& name,
+									const TypeLookupConstraints& constraints,
+									Type*& _type);
+									// returns reference
+
 private:
 			Architecture*		fArchitecture;
 			TeamMemory*			fTeamMemory;
+			TeamTypeInformation*
+								fTypeInformation;
 			CpuState*			fCpuState;
 };
 

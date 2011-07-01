@@ -11,15 +11,18 @@
 #include "CpuState.h"
 #include "Register.h"
 #include "TeamMemory.h"
+#include "TeamTypeInformation.h"
 #include "Tracing.h"
+#include "TypeLookupConstraints.h"
 #include "ValueLocation.h"
 
 
 ValueLoader::ValueLoader(Architecture* architecture, TeamMemory* teamMemory,
-	CpuState* cpuState)
+	TeamTypeInformation* typeInformation, CpuState* cpuState)
 	:
 	fArchitecture(architecture),
 	fTeamMemory(teamMemory),
+	fTypeInformation(typeInformation),
 	fCpuState(cpuState)
 {
 // TODO: TeamMemory is not BReferenceable!
@@ -207,4 +210,12 @@ ValueLoader::LoadStringValue(BVariant& location, size_t maxSize, BString& _value
 
 	return fTeamMemory->ReadMemoryString(location.ToUInt64(),
 		std::min(maxSize, kMaxStringSize), _value);
+}
+
+
+status_t
+ValueLoader::LookupTypeByName(const BString& name,
+	const TypeLookupConstraints& constraints, Type*& _type)
+{
+	return fTypeInformation->LookupTypeByName(name, constraints, _type);
 }

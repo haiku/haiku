@@ -25,9 +25,10 @@
 #include "StackFrameValues.h"
 #include "StackTrace.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 #include "TeamMemory.h"
 #include "TeamMemoryBlock.h"
-#include "TeamDebugInfo.h"
+#include "TeamTypeInformation.h"
 #include "Thread.h"
 #include "Tracing.h"
 #include "Type.h"
@@ -416,12 +417,14 @@ LoadSourceCodeJob::Do()
 
 ResolveValueNodeValueJob::ResolveValueNodeValueJob(
 	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	CpuState* cpuState, ValueNodeContainer*	container, ValueNode* valueNode)
+	CpuState* cpuState, TeamTypeInformation* typeInformation,
+	ValueNodeContainer* container, ValueNode* valueNode)
 	:
 	fKey(valueNode, JOB_TYPE_RESOLVE_VALUE_NODE_VALUE),
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
 	fCpuState(cpuState),
+	fTypeInformation(typeInformation),
 	fContainer(container),
 	fValueNode(valueNode)
 {
@@ -534,7 +537,8 @@ ResolveValueNodeValueJob::_ResolveNodeValue()
 	}
 
 	// resolve the node location and value
-	ValueLoader valueLoader(fArchitecture, fDebuggerInterface, fCpuState);
+	ValueLoader valueLoader(fArchitecture, fDebuggerInterface,
+		fTypeInformation, fCpuState);
 	ValueLocation* location;
 	Value* value;
 	status_t error = fValueNode->ResolvedLocationAndValue(&valueLoader,
@@ -565,7 +569,8 @@ status_t
 ResolveValueNodeValueJob::_ResolveNodeChildLocation(ValueNodeChild* nodeChild)
 {
 	// resolve the location
-	ValueLoader valueLoader(fArchitecture, fDebuggerInterface, fCpuState);
+	ValueLoader valueLoader(fArchitecture, fDebuggerInterface,
+		fTypeInformation, fCpuState);
 	ValueLocation* location = NULL;
 	status_t error = nodeChild->ResolveLocation(&valueLoader, location);
 	BReference<ValueLocation> locationReference(location, true);
@@ -605,7 +610,8 @@ ResolveValueNodeValueJob::_ResolveParentNodeValue(ValueNode* parentNode)
 		// schedule the job
 		status_t error = GetWorker()->ScheduleJob(
 			new(std::nothrow) ResolveValueNodeValueJob(fDebuggerInterface,
-				fArchitecture, fCpuState, fContainer, parentNode));
+				fArchitecture, fCpuState, fTypeInformation, fContainer,
+				parentNode));
 		if (error != B_OK) {
 			// scheduling failed -- set the value to invalid
 			parentNode->SetLocationAndValue(NULL, NULL, error);

@@ -50,11 +50,12 @@ private:
 
 
 Team::Team(team_id teamID, TeamMemory* teamMemory, Architecture* architecture,
-	TeamDebugInfo* debugInfo)
+	TeamDebugInfo* debugInfo, TeamTypeInformation* typeInformation)
 	:
 	fLock("team lock"),
 	fID(teamID),
 	fTeamMemory(teamMemory),
+	fTypeInformation(typeInformation),
 	fArchitecture(architecture),
 	fDebugInfo(debugInfo)
 {
