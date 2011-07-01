@@ -42,6 +42,7 @@ static const char* kUsage =
 	"    -C <dir>   - Change to directory <dir> before extracting the "
 		"contents\n"
 	"                  of the archive.\n"
+	"    -i <info>  - Extract the .PackageInfo file to <info> instead.\n"
 	"\n"
 	"  list [ <options> ] <package>\n"
 	"    Lists the contents of package file <package>.\n"

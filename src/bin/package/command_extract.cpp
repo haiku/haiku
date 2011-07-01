@@ -43,6 +43,8 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		fPackageFileReader(packageFileFD),
 		fDataBuffer(NULL),
 		fDataBufferSize(0),
+		fBaseDirectory(AT_FDCWD),
+		fInfoFileName(NULL),
 		fErrorOccurred(false)
 	{
 	}
@@ -66,6 +68,16 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
+	void SetBaseDirectory(int fd)
+	{
+		fBaseDirectory = fd;
+	}
+
+	void SetPackageInfoFile(const char* infoFileName)
+	{
+		fInfoFileName = infoFileName;
+	}
+
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
 		// create a token
@@ -74,14 +86,14 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			return B_NO_MEMORY;
 		ObjectDeleter<Token> tokenDeleter(token);
 
-		// get parent FD
-		int parentFD = AT_FDCWD;
-		if (entry->Parent() != NULL)
-			parentFD = ((Token*)entry->Parent()->UserToken())->fd;
+		// get parent FD and the entry name
+		int parentFD;
+		const char* entryName;
+		_GetParentFDAndEntryName(entry, parentFD, entryName);
 
 		// check whether something is in the way
 		struct stat st;
-		bool entryExists = fstatat(parentFD, entry->Name(), &st,
+		bool entryExists = fstatat(parentFD, entryName, &st,
 			AT_SYMLINK_NOFOLLOW) == 0;
 		if (entryExists) {
 			if (S_ISREG(entry->Mode()) || S_ISLNK(entry->Mode())) {
@@ -89,13 +101,13 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 				// remove it, otherwise fail.
 				if (!S_ISREG(st.st_mode) && !S_ISLNK(st.st_mode)) {
 					fprintf(stderr, "Error: Can't create entry \"%s\", since "
-						"something is in the way\n", entry->Name());
+						"something is in the way\n", entryName);
 					return B_FILE_EXISTS;
 				}
 
-				if (unlinkat(parentFD, entry->Name(), 0) != 0) {
+				if (unlinkat(parentFD, entryName, 0) != 0) {
 					fprintf(stderr, "Error: Failed to unlink entry \"%s\": %s\n",
-						entry->Name(), strerror(errno));
+						entryName, strerror(errno));
 					return errno;
 				}
 
@@ -105,7 +117,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 				// fail.
 				if (!S_ISDIR(st.st_mode)) {
 					fprintf(stderr, "Error: Can't create directory \"%s\", "
-						"since something is in the way\n", entry->Name());
+						"since something is in the way\n", entryName);
 					return B_FILE_EXISTS;
 				}
 			}
@@ -115,14 +127,14 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		int fd = -1;
 		if (S_ISREG(entry->Mode())) {
 			// create the file
-			fd = openat(parentFD, entry->Name(), O_RDWR | O_CREAT | O_EXCL,
+			fd = openat(parentFD, entryName, O_RDWR | O_CREAT | O_EXCL,
 				S_IRUSR | S_IWUSR);
 				// Note: We use read+write user permissions now -- so write
 				// operations (e.g. attributes) won't fail, but set them to the
 				// desired ones in HandleEntryDone().
 			if (fd < 0) {
 				fprintf(stderr, "Error: Failed to create file \"%s\": %s\n",
-					entry->Name(), strerror(errno));
+					entryName, strerror(errno));
 				return errno;
 			}
 
@@ -142,35 +154,35 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			// create the symlink
 			const char* symlinkPath = entry->SymlinkPath();
 			if (symlinkat(symlinkPath != NULL ? symlinkPath : "", parentFD,
-					entry->Name()) != 0) {
+					entryName) != 0) {
 				fprintf(stderr, "Error: Failed to create symlink \"%s\": %s\n",
-					entry->Name(), strerror(errno));
+					entryName, strerror(errno));
 				return errno;
 			}
 // TODO: Set symlink permissions?
  		} else if (S_ISDIR(entry->Mode())) {
 			// create the directory, if necessary
 			if (!entryExists
-				&& mkdirat(parentFD, entry->Name(), S_IRWXU) != 0) {
+				&& mkdirat(parentFD, entryName, S_IRWXU) != 0) {
 				// Note: We use read+write+exec user permissions now -- so write
 				// operations (e.g. attributes) won't fail, but set them to the
 				// desired ones in HandleEntryDone().
 				fprintf(stderr, "Error: Failed to create directory \"%s\": "
-					"%s\n", entry->Name(), strerror(errno));
+					"%s\n", entryName, strerror(errno));
 				return errno;
 			}
 		} else {
 			fprintf(stderr, "Error: Invalid file type for entry \"%s\"\n",
-				entry->Name());
+				entryName);
 			return B_BAD_DATA;
 		}
 
 		// If not done yet (symlink, dir), open the node -- we need the FD.
 		if (fd < 0) {
-			fd = openat(parentFD, entry->Name(), O_RDONLY | O_NOTRAVERSE);
+			fd = openat(parentFD, entryName, O_RDONLY | O_NOTRAVERSE);
 			if (fd < 0) {
 				fprintf(stderr, "Error: Failed to open entry \"%s\": %s\n",
-					entry->Name(), strerror(errno));
+					entryName, strerror(errno));
 				return errno;
 			}
 		}
@@ -198,10 +210,14 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		int fd = fs_fopen_attr(entryFD, attribute->Name(), attribute->Type(),
 			O_WRONLY | O_CREAT | O_TRUNC);
 		if (fd < 0) {
-				fprintf(stderr, "Error: Failed to create attribute \"%s\" of "
-					"file \"%s\": %s\n", attribute->Name(), entry->Name(),
-					strerror(errno));
-				return errno;
+			int parentFD;
+			const char* entryName;
+			_GetParentFDAndEntryName(entry, parentFD, entryName);
+
+			fprintf(stderr, "Error: Failed to create attribute \"%s\" of "
+				"file \"%s\": %s\n", attribute->Name(), entryName,
+				strerror(errno));
+			return errno;
 		}
 
 		// write data
@@ -223,15 +239,15 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 	{
 		// set the node permissions for non-symlinks
 		if (!S_ISLNK(entry->Mode())) {
-			// get parent FD
-			int parentFD = AT_FDCWD;
-			if (entry->Parent() != NULL)
-				parentFD = ((Token*)entry->Parent()->UserToken())->fd;
+			// get parent FD and entry name
+			int parentFD;
+			const char* entryName;
+			_GetParentFDAndEntryName(entry, parentFD, entryName);
 
-			if (fchmodat(parentFD, entry->Name(), entry->Mode() & ALLPERMS,
+			if (fchmodat(parentFD, entryName, entry->Mode() & ALLPERMS,
 					/*AT_SYMLINK_NOFOLLOW*/0) != 0) {
 				fprintf(stderr, "Warning: Failed to set permissions of file "
-					"\"%s\": %s\n", entry->Name(), strerror(errno));
+					"\"%s\": %s\n", entryName, strerror(errno));
 			}
 		}
 
@@ -272,6 +288,21 @@ private:
 	};
 
 private:
+	void _GetParentFDAndEntryName(BPackageEntry* entry, int& _parentFD,
+		const char*& _entryName)
+	{
+		_entryName = entry->Name();
+
+		if (fInfoFileName != NULL
+			&& strcmp(_entryName, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
+			_parentFD = AT_FDCWD;
+			_entryName = fInfoFileName;
+		} else {
+			_parentFD = entry->Parent() != NULL
+				? ((Token*)entry->Parent()->UserToken())->fd : fBaseDirectory;
+		}
+	}
+
 	status_t _ExtractFileData(BDataReader* dataReader, const BPackageData& data,
 		int fd)
 	{
@@ -321,6 +352,8 @@ private:
 	BFDDataReader			fPackageFileReader;
 	void*					fDataBuffer;
 	size_t					fDataBufferSize;
+	int						fBaseDirectory;
+	const char*				fInfoFileName;
 	bool					fErrorOccurred;
 };
 
@@ -329,6 +362,7 @@ int
 command_extract(int argc, const char* const* argv)
 {
 	const char* changeToDirectory = NULL;
+	const char* packageInfoFileName = NULL;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -337,7 +371,7 @@ command_extract(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+C:h", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+C:hi:", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -348,6 +382,10 @@ command_extract(int argc, const char* const* argv)
 
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'i':
+				packageInfoFileName = optarg;
 				break;
 
 			default:
@@ -369,17 +407,26 @@ command_extract(int argc, const char* const* argv)
 	if (error != B_OK)
 		return 1;
 
-	// change directory, if requested
+	PackageContentExtractHandler handler(packageReader.PackageFileFD());
+
+	// get the target directory, if requested
 	if (changeToDirectory != NULL) {
-		if (chdir(changeToDirectory) != 0) {
+		int currentDirFD = open(changeToDirectory, O_RDONLY);
+		if (currentDirFD < 0) {
 			fprintf(stderr, "Error: Failed to change the current working "
 				"directory to \"%s\": %s\n", changeToDirectory,
 				strerror(errno));
+			return 1;
 		}
+
+		handler.SetBaseDirectory(currentDirFD);
 	}
 
+	// If a package info file name is given, set it.
+	if (packageInfoFileName != NULL)
+		handler.SetPackageInfoFile(packageInfoFileName);
+
 	// extract
-	PackageContentExtractHandler handler(packageReader.PackageFileFD());
 	error = handler.Init();
 	if (error != B_OK)
 		return 1;
