@@ -6,13 +6,15 @@
 #define TEAM_MEMORY_H
 
 
+#include <Referenceable.h>
+
 #include "TargetAddressRange.h"
 
 
 class BString;
 
 
-class TeamMemory {
+class TeamMemory : public BReferenceable {
 public:
 	virtual						~TeamMemory();
 

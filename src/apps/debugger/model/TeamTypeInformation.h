@@ -15,7 +15,7 @@ class Type;
 class TypeLookupConstraints;
 
 
-class TeamTypeInformation {
+class TeamTypeInformation : public BReferenceable {
 public:
 	virtual						~TeamTypeInformation();
 

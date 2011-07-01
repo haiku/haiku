@@ -25,8 +25,9 @@ ValueLoader::ValueLoader(Architecture* architecture, TeamMemory* teamMemory,
 	fTypeInformation(typeInformation),
 	fCpuState(cpuState)
 {
-// TODO: TeamMemory is not BReferenceable!
 	fArchitecture->AcquireReference();
+	fTeamMemory->AcquireReference();
+	fTypeInformation->AcquireReference();
 	if (fCpuState != NULL)
 		fCpuState->AcquireReference();
 }
@@ -35,6 +36,8 @@ ValueLoader::ValueLoader(Architecture* architecture, TeamMemory* teamMemory,
 ValueLoader::~ValueLoader()
 {
 	fArchitecture->ReleaseReference();
+	fTeamMemory->ReleaseReference();
+	fTypeInformation->ReleaseReference();
 	if (fCpuState != NULL)
 		fCpuState->ReleaseReference();
 }
