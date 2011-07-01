@@ -64,9 +64,7 @@ public:
 	{
 		ValueLocation* parentLocation = fParent->Location();
 		ValueLocation* location;
-		CompoundType* type = dynamic_cast<CompoundType*>(fParent->GetType());
-		if (type == NULL)
-			return B_BAD_VALUE;
+		CompoundType* type = fParent->GetMessageType();
 
 		status_t error = type->ResolveDataMemberLocation(fMember,
 			*parentLocation, location);
@@ -93,6 +91,7 @@ BMessageValueNode::BMessageValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
+	fMessageType(NULL),
 	fMessage()
 {
 	fType->AcquireReference();
@@ -154,6 +153,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		pieceLocation.SetToMemory(address.ToUInt64());
 		location->SetPieceAt(0, pieceLocation);
 	}
+	fMessageType = baseType;
 
 	_location = location;
 	_value = NULL;
@@ -300,16 +300,15 @@ BMessageValueNode::CreateChildren()
 	if (!fChildren.IsEmpty())
 		return B_OK;
 
-	CompoundType* baseType = dynamic_cast<CompoundType*>(
-		fType->ResolveRawType(false));
-	if (baseType == NULL)
-		return B_OK;
+	if (fMessageType == NULL)
+		return B_BAD_VALUE;
+
 
 	DataMember* member = NULL;
 	Type* whatType = NULL;
 
-	for (int32 i = 0; i < baseType->CountDataMembers(); i++) {
-		member = baseType->DataMemberAt(i);
+	for (int32 i = 0; i < fMessageType->CountDataMembers(); i++) {
+		member = fMessageType->DataMemberAt(i);
 		if (strcmp(member->Name(), "what") == 0) {
 			whatType = member->GetType();
 			break;

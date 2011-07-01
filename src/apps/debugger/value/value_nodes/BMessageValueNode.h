@@ -11,6 +11,9 @@
 #include "ValueNode.h"
 
 
+class CompoundType;
+
+
 class BMessageValueNode : public ValueNode {
 public:
 									BMessageValueNode(ValueNodeChild* nodeChild,
@@ -18,7 +21,6 @@ public:
 	virtual							~BMessageValueNode();
 
 	virtual	Type*					GetType() const;
-
 	virtual	status_t				ResolvedLocationAndValue(
 										ValueLoader* valueLoader,
 										ValueLocation*& _location,
@@ -29,6 +31,9 @@ public:
 	virtual status_t				CreateChildren();
 	virtual int32					CountChildren() const;
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
+
+			CompoundType*			GetMessageType() const
+										{ return fMessageType; }
 
 private:
 			class BMessageFieldHeaderNode;
@@ -42,6 +47,7 @@ private:
 
 private:
 			Type*					fType;
+			CompoundType*			fMessageType;
 			BMessage				fMessage;
 			ChildNodeList			fChildren;
 };
