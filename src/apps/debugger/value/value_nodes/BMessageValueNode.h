@@ -6,8 +6,11 @@
 #define BMESSAGE_VALUE_NODE_H
 
 #include <Message.h>
+#include <MessagePrivate.h>
 #include <ObjectList.h>
+#include <Variant.h>
 
+#include "ValueLocation.h"
 #include "ValueNode.h"
 
 
@@ -36,6 +39,17 @@ public:
 										{ return fMessageType; }
 
 private:
+			status_t				_GetTypeForTypeCode(type_code type,
+										Type*& _type);
+			status_t				_FindField(const char* name,
+										type_code type,
+										BMessage::field_header** result) const;
+			uint32					_HashName(const char* name) const;
+			status_t				_FindDataLocation(const char* name,
+										type_code type, int32 index,
+										ValueLocation& location) const;
+
+private:
 			class BMessageFieldNode;
 			class BMessageFieldNodeChild;
 
@@ -48,8 +62,14 @@ private:
 private:
 			Type*					fType;
 			CompoundType*			fMessageType;
-			BMessage				fMessage;
 			ChildNodeList			fChildren;
+			ValueLoader*			fLoader;
+			BVariant				fDataLocation;
+			BMessage::message_header*
+									fHeader;
+			BMessage::field_header*	fFields;
+			uint8*					fData;
+			BMessage				fMessage;
 };
 
 
@@ -65,14 +85,14 @@ public:
 
 	virtual Type* 					GetType() const;
 
-	virtual	status_t 				CreateChildren();
-	virtual	int32 					CountChildren() const;
-	virtual	ValueNodeChild* 		ChildAt(int32 index) const;
-
 	virtual status_t 				ResolvedLocationAndValue(
 										ValueLoader* loader,
 										ValueLocation *& _location,
 										Value*& _value);
+
+	virtual	status_t 				CreateChildren();
+	virtual	int32 					CountChildren() const;
+	virtual	ValueNodeChild* 		ChildAt(int32 index) const;
 
 private:
 			BString 				fName;
@@ -87,6 +107,7 @@ class BMessageValueNode::BMessageFieldNodeChild : public ValueNodeChild {
 public:
 									BMessageFieldNodeChild(
 										BMessageValueNode* parent,
+										Type* nodeType,
 										const BString &name,
 										type_code type, int32 count);
 
