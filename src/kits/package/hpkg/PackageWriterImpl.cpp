@@ -694,8 +694,8 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 		fd = openat(dirFD, fileName,
 			O_RDONLY | (isImplicitEntry ? 0 : O_NOTRAVERSE));
 		if (fd < 0) {
-			fListener->PrintError("Failed to open entry \"%s\": %s\n", fileName,
-				strerror(errno));
+			fListener->PrintError("Failed to open entry \"%s\": %s\n",
+				pathBuffer, strerror(errno));
 			throw status_t(errno);
 		}
 		fdCloser.SetTo(fd);
@@ -704,7 +704,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	// stat the node
 	struct stat st;
 	if (fstat(fd, &st) < 0) {
-		fListener->PrintError("Failed to fstat() file \"%s\": %s\n", fileName,
+		fListener->PrintError("Failed to fstat() file \"%s\": %s\n", pathBuffer,
 			strerror(errno));
 		throw status_t(errno);
 	}
@@ -712,7 +712,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	// implicit entries must be directories
 	if (isImplicitEntry && !S_ISDIR(st.st_mode)) {
 		fListener->PrintError("Non-leaf path component \"%s\" is not a "
-			"directory\n", fileName);
+			"directory\n", pathBuffer);
 		throw status_t(B_BAD_VALUE);
 	}
 
@@ -731,7 +731,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	} else {
 		// unsupported node type
 		fListener->PrintError("Unsupported node type, entry: \"%s\"\n",
-			fileName);
+			pathBuffer);
 		throw status_t(B_UNSUPPORTED);
 	}
 
@@ -772,7 +772,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 			B_PATH_NAME_LENGTH);
 		if (bytesRead < 0) {
 			fListener->PrintError("Failed to read symlink \"%s\": %s\n",
-				fileName, strerror(errno));
+				pathBuffer, strerror(errno));
 			throw status_t(errno);
 		}
 
@@ -789,7 +789,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 			if (fs_stat_attr(fd, entry->d_name, &attrInfo) < 0) {
 				fListener->PrintError(
 					"Failed to stat attribute \"%s\" of file \"%s\": %s\n",
-					entry->d_name, fileName, strerror(errno));
+					entry->d_name, pathBuffer, strerror(errno));
 				throw status_t(errno);
 			}
 
@@ -831,7 +831,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 			DIR* dir = fdopendir(clonedFD);
 			if (dir == NULL) {
 				fListener->PrintError(
-					"Failed to open directory \"%s\": %s\n", fileName,
+					"Failed to open directory \"%s\": %s\n", pathBuffer,
 					strerror(errno));
 				close(clonedFD);
 				throw status_t(errno);
