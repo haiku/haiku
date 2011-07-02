@@ -196,17 +196,28 @@ private:
 
 
 struct PackageWriterImpl::SubPathAdder {
-	SubPathAdder(char* pathBuffer, const char* subPath)
-		: fOriginalPathEnd(pathBuffer + strlen(pathBuffer))
+	SubPathAdder(BErrorOutput* errorOutput, char* pathBuffer,
+		const char* subPath)
+		:
+		fOriginalPathEnd(pathBuffer + strlen(pathBuffer))
 	{
-		strcat(pathBuffer, "/");
-		strcat(pathBuffer, subPath);
+		if (fOriginalPathEnd != pathBuffer)
+			strlcat(pathBuffer, "/", B_PATH_NAME_LENGTH);
+
+		if (strlcat(pathBuffer, subPath, B_PATH_NAME_LENGTH)
+				>= B_PATH_NAME_LENGTH) {
+			*fOriginalPathEnd = '\0';
+			errorOutput->PrintError("Path too long: \"%s/%s\"\n", pathBuffer,
+				subPath);
+			throw status_t(B_BUFFER_OVERFLOW);
+		}
 	}
 
 	~SubPathAdder()
 	{
 		*fOriginalPathEnd = '\0';
 	}
+
 private:
 	char* fOriginalPathEnd;
 };
@@ -668,11 +679,9 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 {
 	bool isImplicitEntry = entry != NULL && entry->IsImplicit();
 
-	SubPathAdder pathAdder(pathBuffer, fileName);
-	if (!isImplicitEntry) {
-		fListener->OnEntryAdded(pathBuffer + 1);
-			// pathBuffer + 1 in order to skip leading slash
-	}
+	SubPathAdder pathAdder(fListener, pathBuffer, fileName);
+	if (!isImplicitEntry)
+		fListener->OnEntryAdded(pathBuffer);
 
 	// open the node
 	int fd;
