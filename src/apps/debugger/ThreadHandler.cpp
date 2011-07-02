@@ -54,12 +54,14 @@ ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
 	fPreviousInstructionPointer(0),
 	fSingleStepping(false)
 {
+	fDebuggerInterface->AcquireReference();
 }
 
 
 ThreadHandler::~ThreadHandler()
 {
 	_ClearContinuationState();
+	fDebuggerInterface->ReleaseReference();
 }
 
 

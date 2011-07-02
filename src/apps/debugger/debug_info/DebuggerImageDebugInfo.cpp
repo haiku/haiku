@@ -24,11 +24,13 @@ DebuggerImageDebugInfo::DebuggerImageDebugInfo(const ImageInfo& imageInfo,
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture)
 {
+	fDebuggerInterface->AcquireReference();
 }
 
 
 DebuggerImageDebugInfo::~DebuggerImageDebugInfo()
 {
+	fDebuggerInterface->ReleaseReference();
 }
 
 

@@ -160,8 +160,10 @@ TeamDebugger::~TeamDebugger()
 
 	fTerminating = true;
 
-	if (fDebuggerInterface != NULL)
+	if (fDebuggerInterface != NULL) {
 		fDebuggerInterface->Close(fKillTeamOnQuit);
+		fDebuggerInterface->ReleaseReference();
+	}
 
 	if (fWorker != NULL)
 		fWorker->ShutDown();
@@ -193,7 +195,6 @@ TeamDebugger::~TeamDebugger()
 
 	delete fBreakpointManager;
 	delete fMemoryBlockManager;
-	delete fDebuggerInterface;
 	delete fWorker;
 	delete fTeam;
 	delete fFileManager;

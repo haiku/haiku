@@ -26,11 +26,13 @@ BreakpointManager::BreakpointManager(Team* team,
 	fTeam(team),
 	fDebuggerInterface(debuggerInterface)
 {
+	fDebuggerInterface->AcquireReference();
 }
 
 
 BreakpointManager::~BreakpointManager()
 {
+	fDebuggerInterface->ReleaseReference();
 }
 
 

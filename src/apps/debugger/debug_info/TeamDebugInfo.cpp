@@ -262,6 +262,7 @@ TeamDebugInfo::TeamDebugInfo(DebuggerInterface* debuggerInterface,
 	fSourceFiles(NULL),
 	fTypeCache(NULL)
 {
+	fDebuggerInterface->AcquireReference();
 }
 
 
@@ -291,6 +292,8 @@ TeamDebugInfo::~TeamDebugInfo()
 
 		delete fFunctions;
 	}
+
+	fDebuggerInterface->ReleaseReference();
 }
 
 
