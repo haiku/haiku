@@ -32,7 +32,7 @@ public:
 	virtual	status_t			HandleAttributeDone(
 									BHPKGAttributeID attributeID,
 									const BPackageAttributeValue& value,
-									void* token) = 0;
+									void* parentToken, void* token) = 0;
 
 	virtual	void				HandleErrorOccurred() = 0;
 

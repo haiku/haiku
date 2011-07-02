@@ -50,7 +50,7 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 	}
 
 	virtual status_t HandleAttributeDone(BHPKGAttributeID attributeID,
-		const BPackageAttributeValue& value, void* token)
+		const BPackageAttributeValue& value, void* parentToken, void* token)
 	{
 		if (fErrorOccurred)
 			return B_OK;

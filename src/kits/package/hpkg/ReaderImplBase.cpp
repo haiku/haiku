@@ -463,6 +463,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 
 ReaderImplBase::LowLevelAttributeHandler::LowLevelAttributeHandler()
 	:
+	fParentToken(NULL),
 	fToken(NULL),
 	fID(B_HPKG_ATTRIBUTE_ID_ENUM_COUNT)
 {
@@ -470,8 +471,9 @@ ReaderImplBase::LowLevelAttributeHandler::LowLevelAttributeHandler()
 
 
 ReaderImplBase::LowLevelAttributeHandler::LowLevelAttributeHandler(uint8 id,
-	const BPackageAttributeValue& value, void* token)
+	const BPackageAttributeValue& value, void* parentToken, void* token)
 	:
+	fParentToken(NULL),
 	fToken(token),
 	fID(id),
 	fValue(value)
@@ -494,10 +496,10 @@ ReaderImplBase::LowLevelAttributeHandler::HandleAttribute(
 	// create a subhandler for the attribute, if it has children
 	if (_handler != NULL) {
 		*_handler = new(std::nothrow) LowLevelAttributeHandler(id, value,
-			token);
+			fToken, token);
 		if (*_handler == NULL) {
 			context->lowLevelHandler->HandleAttributeDone((BHPKGAttributeID)id,
-				value, token);
+				value, fToken, token);
 			return B_NO_MEMORY;
 		}
 		return B_OK;
@@ -505,7 +507,7 @@ ReaderImplBase::LowLevelAttributeHandler::HandleAttribute(
 
 	// no children -- just call the done hook
 	return context->lowLevelHandler->HandleAttributeDone((BHPKGAttributeID)id,
-		value, token);
+		value, fToken, token);
 }
 
 
@@ -516,7 +518,7 @@ ReaderImplBase::LowLevelAttributeHandler::Delete(
 	status_t error = B_OK;
 	if (fID != B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
 		error = context->lowLevelHandler->HandleAttributeDone(
-			(BHPKGAttributeID)fID, fValue, fToken);
+			(BHPKGAttributeID)fID, fValue, fParentToken, fToken);
 	}
 
 	delete this;

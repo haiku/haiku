@@ -145,7 +145,8 @@ protected:
 			struct LowLevelAttributeHandler : AttributeHandler {
 				LowLevelAttributeHandler();
 				LowLevelAttributeHandler(uint8 id,
-					const BPackageAttributeValue& value, void* token);
+					const BPackageAttributeValue& value, void* parentToken,
+					void* token);
 
 				virtual status_t HandleAttribute(
 					AttributeHandlerContext* context, uint8 id,
@@ -153,6 +154,7 @@ protected:
 				virtual status_t Delete(AttributeHandlerContext* context);
 
 			private:
+				void*			fParentToken;
 				void*			fToken;
 				uint8			fID;
 				AttributeValue	fValue;
