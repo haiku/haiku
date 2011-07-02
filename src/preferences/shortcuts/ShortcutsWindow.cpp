@@ -15,21 +15,27 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Button.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <File.h>
+#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <Input.h>
 #include <Locale.h>
+#include <Message.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <MessageFilter.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Screen.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <SupportDefs.h>
 
 #include "ColumnListView.h"
 
@@ -41,23 +47,23 @@
 
 
 // Window sizing constraints
-#define MIN_WIDTH	600
-#define MIN_HEIGHT	130
-#define MAX_WIDTH	65535
-#define MAX_HEIGHT	65535
+#define MAX_WIDTH 10000
+#define MAX_HEIGHT 10000
+	// SetSizeLimits does not provide a mechanism for specifying an
+	// unrestricted maximum.  10,000 seems to be the most common value used
+	// in other Haiku system applications.
 
-// Default window position
-#define WINDOW_START_X 30
-#define WINDOW_START_Y 100
+#define WINDOW_SETTINGS_FILE_NAME "Shortcuts_window_settings"
+	// Because the "shortcuts_settings" file (SHORTCUTS_SETTING_FILE_NAME) is
+	// already used as a communications method between this configurator and
+	// the "shortcut_catcher" input_server filter, it should not be overloaded
+	// with window position information.  Instead, a separate file is used.
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ShortcutsWindow"
 
 #define ERROR "Shortcuts error"
 #define WARNING "Shortcuts warning"
-
-// Global constants for Shortcuts
-#define V_SPACING 5 // vertical spacing between GUI components
 
 
 // Creates a pop-up-menu that reflects the possible states of the specified 
@@ -94,9 +100,8 @@ CreateKeysPopUp()
 
 ShortcutsWindow::ShortcutsWindow()
 	:
-	BWindow(BRect(WINDOW_START_X, WINDOW_START_Y, WINDOW_START_X + MIN_WIDTH, 
-		WINDOW_START_Y + MIN_HEIGHT * 2), B_TRANSLATE_SYSTEM_NAME("Shortcuts"),
-		B_DOCUMENT_WINDOW, 0L), 
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_SYSTEM_NAME("Shortcuts"),
+		B_TITLED_WINDOW, 0L),
 	fSavePanel(NULL), 
 	fOpenPanel(NULL), 
 	fSelectPanel(NULL), 
@@ -104,57 +109,66 @@ ShortcutsWindow::ShortcutsWindow()
 	fLastOpenWasAppend(false)
 {
 	ShortcutsSpec::InitializeMetaMaps();
+	
+	float spacing = be_control_look->DefaultItemSpacing();
 
-	SetSizeLimits(MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT);
+	BView* top = new BView(Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
+	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(top);
+
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "Menu Bar");
 
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open KeySet" B_UTF8_ELLIPSIS), 
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open KeySet" B_UTF8_ELLIPSIS),
 		new BMessage(OPEN_KEYSET), 'O'));
 	fileMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("Append KeySet" B_UTF8_ELLIPSIS), 
+		B_TRANSLATE("Append KeySet" B_UTF8_ELLIPSIS),
 		new BMessage(APPEND_KEYSET), 'A'));
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert to saved"), 
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert to saved"),
 		new BMessage(REVERT_KEYSET), 'A'));
 	fileMenu->AddItem(new BSeparatorItem);
 	fileMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("Save KeySet as" B_UTF8_ELLIPSIS), 
+		B_TRANSLATE("Save KeySet as" B_UTF8_ELLIPSIS),
 		new BMessage(SAVE_KEYSET_AS), 'S'));
 	fileMenu->AddItem(new BSeparatorItem);
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(fileMenu);
 
-	AddChild(menuBar);
-
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-	float vButtonHeight = ceil(fh.ascent) + ceil(fh.descent) + 5.0f;
+	top->AddChild(menuBar);
 
 	BRect tableBounds = Bounds();
 	tableBounds.top = menuBar->Bounds().bottom + 1;
 	tableBounds.right -= B_V_SCROLL_BAR_WIDTH;
-	tableBounds.bottom -= (B_H_SCROLL_BAR_HEIGHT + V_SPACING + vButtonHeight + 
-		V_SPACING * 2);
-	
+	tableBounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
 	BScrollView* containerView;
-	fColumnListView = new ColumnListView(tableBounds, &containerView, NULL, 
-		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE, 
+	fColumnListView = new ColumnListView(tableBounds, &containerView, NULL,
+		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE,
 		B_SINGLE_SELECTION_LIST, true, true, true, B_NO_BORDER);
-	
-	fColumnListView->SetEditMessage(new BMessage(HOTKEY_ITEM_MODIFIED), 
+
+	fColumnListView->SetEditMessage(new BMessage(HOTKEY_ITEM_MODIFIED),
 		BMessenger(this));
-	
-	const float metaWidth = 50.0f;
+
+	float minListWidth = 0;
+		// A running total is kept as the columns are created.
+	float cellWidth = be_plain_font->StringWidth("Either") + 20;
+		// ShortcutsSpec does not seem to translate the string "Either".
 
 	for (int i = 0; i < ShortcutsSpec::NUM_META_COLUMNS; i++) {
+		const char* name = ShortcutsSpec::GetColumnName(i);
+		float headerWidth = be_plain_font->StringWidth(name) + 20;
+		float width = max_c(headerWidth, cellWidth);
+		minListWidth += width + 1;
+
 		fColumnListView->AddColumn(
-			new CLVColumn(ShortcutsSpec::GetColumnName(i), CreateMetaPopUp(i), 
-			metaWidth, CLV_SORT_KEYABLE));
+			new CLVColumn(name, CreateMetaPopUp(i), width, CLV_SORT_KEYABLE));
 	}
 
+	float keyCellWidth = be_plain_font->StringWidth("Caps Lock") + 20;
 	fColumnListView->AddColumn(new CLVColumn(B_TRANSLATE("Key"),
-		CreateKeysPopUp(), 60, CLV_SORT_KEYABLE));
+		CreateKeysPopUp(), keyCellWidth, CLV_SORT_KEYABLE));
+	minListWidth += keyCellWidth + 1;
 
 	BPopUpMenu* popup = new BPopUpMenu(NULL, false);
 	popup->AddItem(new BMenuItem(
@@ -177,48 +191,77 @@ ShortcutsWindow::ShortcutsWindow()
 	popup->AddItem(new BMenuItem(B_TRANSLATE("*Beep"), NULL));
 	fColumnListView->AddColumn(new CLVColumn(B_TRANSLATE("Application"), popup,
 		323.0, CLV_SORT_KEYABLE));
+	minListWidth += 323.0 + 1;
+	minListWidth += B_V_SCROLL_BAR_WIDTH;
 
 	fColumnListView->SetSortFunction(ShortcutsSpec::MyCompare);
-	AddChild(containerView);
+	top->AddChild(containerView);
 
 	fColumnListView->SetSelectionMessage(new BMessage(HOTKEY_ITEM_SELECTED));
 	fColumnListView->SetTarget(this);
 
-	BRect buttonBounds = Bounds();
-	buttonBounds.left += V_SPACING;
-	buttonBounds.right = ((buttonBounds.right - buttonBounds.left) / 2.0f)
-		+ buttonBounds.left;
-	buttonBounds.bottom -= V_SPACING * 2;
-	buttonBounds.top = buttonBounds.bottom - vButtonHeight;
-	buttonBounds.right -= B_V_SCROLL_BAR_WIDTH;
-	float origRight = buttonBounds.right;
-	buttonBounds.right = (buttonBounds.left + origRight) * 0.40f - 
-		(V_SPACING / 2);
-	AddChild(fAddButton = new ResizableButton(Bounds(), buttonBounds, "add", 
-		B_TRANSLATE("Add new shortcut"), new BMessage(ADD_HOTKEY_ITEM)));
-	buttonBounds.left = buttonBounds.right + V_SPACING;
-	buttonBounds.right = origRight;
-	AddChild(fRemoveButton = new ResizableButton(Bounds(), buttonBounds, 
-		"remove", B_TRANSLATE("Remove selected shortcut"), 
-		new BMessage(REMOVE_HOTKEY_ITEM)));
-	
+	fAddButton = new BButton(BRect(0, 0, 0, 0), "add",
+		B_TRANSLATE("Add new shortcut"), new BMessage(ADD_HOTKEY_ITEM),
+		B_FOLLOW_BOTTOM);
+	fAddButton->ResizeToPreferred();
+	fAddButton->MoveBy(spacing,
+		Bounds().bottom - fAddButton->Bounds().bottom - spacing);
+	top->AddChild(fAddButton);
+
+	fRemoveButton = new BButton(BRect(0, 0, 0, 0), "remove",
+		B_TRANSLATE("Remove selected shortcut"),
+		new BMessage(REMOVE_HOTKEY_ITEM), B_FOLLOW_BOTTOM);
+	fRemoveButton->ResizeToPreferred();
+	fRemoveButton->MoveBy(fAddButton->Frame().right + spacing,
+		Bounds().bottom - fRemoveButton->Bounds().bottom - spacing);
+	top->AddChild(fRemoveButton);
+
 	fRemoveButton->SetEnabled(false);
 
-	float offset = (buttonBounds.right - buttonBounds.left) / 2.0f;
-	BRect saveButtonBounds = buttonBounds;
-	saveButtonBounds.right = Bounds().right - B_V_SCROLL_BAR_WIDTH - offset;
-	saveButtonBounds.left = buttonBounds.right + V_SPACING + offset;
-	AddChild(fSaveButton = new ResizableButton(Bounds(), saveButtonBounds, 
-		"save", B_TRANSLATE("Save & apply"), new BMessage(SAVE_KEYSET)));
-	
+	fSaveButton = new BButton(BRect(0, 0, 0, 0), "save",
+		B_TRANSLATE("Save & apply"), new BMessage(SAVE_KEYSET),
+		B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
+	fSaveButton->ResizeToPreferred();
+	fSaveButton->MoveBy(Bounds().right - fSaveButton->Bounds().right - spacing,
+		Bounds().bottom - fSaveButton->Bounds().bottom - spacing);
+	top->AddChild(fSaveButton);
+
 	fSaveButton->SetEnabled(false);
 
-	entry_ref ref;	
-	if (_GetSettingsFile(&ref)) {
+	containerView->ResizeBy(0,
+		-(fAddButton->Bounds().bottom + 2 * spacing + 2));
+
+	float minButtonBarWidth = fRemoveButton->Frame().right
+		+ fSaveButton->Bounds().right + 2 * spacing;
+	float minWidth = max_c(minListWidth, minButtonBarWidth);
+
+	float menuBarHeight = menuBar->Bounds().bottom;
+	float buttonBarHeight = Bounds().bottom - containerView->Frame().bottom;
+	float minHeight = menuBarHeight + 200 + buttonBarHeight;
+
+	SetSizeLimits(minWidth, MAX_WIDTH, minHeight, MAX_HEIGHT);
+		// SetSizeLimits() will resize the window to the minimum size.
+
+	CenterOnScreen();
+
+	entry_ref windowSettingsRef;
+	if (_GetWindowSettingsFile(&windowSettingsRef)) {
+		// The window settings file is not accepted via B_REFS_RECEIVED; this
+		// is a behind-the-scenes file that the user will never see or
+		// interact with.
+		BFile windowSettingsFile(&windowSettingsRef, B_READ_ONLY);
+		BMessage loadMsg;
+		if (loadMsg.Unflatten(&windowSettingsFile) == B_OK)
+			_LoadWindowSettings(loadMsg);
+	}
+
+	entry_ref keySetRef;
+	if (_GetSettingsFile(&keySetRef)) {
 		BMessage msg(B_REFS_RECEIVED);
-		msg.AddRef("refs", &ref);
+		msg.AddRef("refs", &keySetRef);
 		msg.AddString("startupRef", "please");
-		PostMessage(&msg); // Tell ourself to load this file if it exists.
+		PostMessage(&msg);
+			// Tell ourselves to load this file if it exists.
 	}
 	Show();
 }
@@ -270,8 +313,17 @@ ShortcutsWindow::QuitRequested()
 		}
 	}
 
-	if (ret)
+	if (ret) {
 		fColumnListView->DeselectAll();
+
+		// Save the window position.
+		entry_ref ref;
+		if (_GetWindowSettingsFile(&ref)) {
+			BEntry entry(&ref);
+			_SaveWindowSettings(entry);
+		}
+	}
+	
 	return ret;
 }
 
@@ -336,6 +388,70 @@ ShortcutsWindow::_LoadKeySet(const BMessage& loadMsg)
 			printf("_LoadKeySet: Error parsing spec!\n");
 	}
 	return true;
+}
+
+
+// Gets the filesystem location of the "Shortcuts_window_settings" file.
+bool
+ShortcutsWindow::_GetWindowSettingsFile(entry_ref* eref)
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return false;
+	else
+		path.Append(WINDOW_SETTINGS_FILE_NAME);
+
+	return BEntry(path.Path(), true).GetRef(eref) == B_OK;
+}
+
+
+// Saves the application settings file to (saveEntry).  Because this is a
+// non-essential file, errors are ignored when writing the settings.
+void
+ShortcutsWindow::_SaveWindowSettings(BEntry& saveEntry)
+{
+	BFile saveTo(&saveEntry, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (saveTo.InitCheck() != B_OK)
+		return;
+
+	BMessage saveMsg;
+	saveMsg.AddRect("window frame", Frame());
+
+	for (int i = 0; i < fColumnListView->CountColumns(); i++) {
+		CLVColumn* column = fColumnListView->ColumnAt(i);
+		saveMsg.AddFloat("column width", column->Width());
+	}
+
+	saveMsg.Flatten(&saveTo);
+}
+
+
+// Loads the application settings file from (loadMsg) and resizes the interface
+// to match the previously saved settings.  Because this is a non-essential
+// file, errors are ignored when loading the settings.
+void
+ShortcutsWindow::_LoadWindowSettings(const BMessage& loadMsg)
+{
+	BRect frame;
+	if (loadMsg.FindRect("window frame", &frame) == B_OK) {
+		// Ensure the frame does not resize below the computed minimum.
+		float width = max_c(Bounds().right, frame.right - frame.left);
+		float height = max_c(Bounds().bottom, frame.bottom - frame.top);
+		ResizeTo(width, height);
+
+		// Ensure the frame is not placed outside of the screen.
+		BScreen screen(this);
+		float left = min_c(screen.Frame().right - width, frame.left);
+		float top = min_c(screen.Frame().bottom - height, frame.top);
+		MoveTo(left, top);
+	}
+
+	for (int i = 0; i < fColumnListView->CountColumns(); i++) {
+		CLVColumn* column = fColumnListView->ColumnAt(i);
+		float columnWidth;
+		if (loadMsg.FindFloat("column width", i, &columnWidth) == B_OK)
+			column->SetWidth(max_c(column->Width(), columnWidth));
+	}
 }
 
 
@@ -656,15 +772,6 @@ ShortcutsWindow::Quit()
 
 	fColumnListView->MakeEmpty();
 	BWindow::Quit();
-}
-
-
-void
-ShortcutsWindow::FrameResized(float w, float h)
-{
-	fAddButton->ChangeToNewSize(w, h);
-	fRemoveButton->ChangeToNewSize(w, h);
-	fSaveButton->ChangeToNewSize(w, h);
 }
 
 

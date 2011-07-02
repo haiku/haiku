@@ -6,7 +6,6 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons input_server filters shortc
 Preference Shortcuts :
 	main.cpp
 	MetaKeyStateMap.cpp
-	ResizableButton.cpp
 	ShortcutsApp.cpp
 	ShortcutsSpec.cpp
 	ShortcutsWindow.cpp

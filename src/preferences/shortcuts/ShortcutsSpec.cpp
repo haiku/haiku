@@ -360,6 +360,12 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 	if (text == NULL)
 		return;
 
+	_CacheViewFont(owner);
+		// Ensure that sViewFont is configured before using it to calculate
+		// widths.  The lack of this call was causing the initial display of
+		// columns to be incorrect, with a "jump" as all the columns correct
+		// themselves upon the first column resize.
+
 	float textWidth = sViewFont.StringWidth(text);
 	BPoint point;
 	rgb_color lowColor = color;

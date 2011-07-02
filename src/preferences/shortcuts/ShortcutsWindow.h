@@ -10,14 +10,13 @@
 
 
 #include <Entry.h>
-#include <FilePanel.h>
-#include <Message.h>
-#include <Point.h>
 #include <Window.h>
 
 #include "ColumnListView.h"
-#include "ResizableButton.h"
 
+class BButton;
+class BFilePanel;
+class BMessage;
 
 // This class defines our preferences/configuration window.
 class ShortcutsWindow : public BWindow {
@@ -27,8 +26,7 @@ public:
 
 	virtual void 			DispatchMessage(BMessage* msg, BHandler* handler);
 	virtual void 			Quit();
-	virtual void			FrameResized(float w, float h);
-	virtual void 			MessageReceived(BMessage * msg);
+	virtual void 			MessageReceived(BMessage* msg);
 	virtual bool 			QuitRequested();
 
 	// BMessage 'what' codes, representing commands understood by this Window.
@@ -57,12 +55,15 @@ private:
 			void 				_AddNewSpec(const char* defaultCommand);
 			void 				_MarkKeySetModified();
 			bool 				_LoadKeySet(const BMessage& loadMsg);
-			bool 				_SaveKeySet(BEntry & saveEntry);
+			bool 				_SaveKeySet(BEntry& saveEntry);
 			bool				_GetSettingsFile(entry_ref* ref);
+			void 				_LoadWindowSettings(const BMessage& loadMsg);
+			void 				_SaveWindowSettings(BEntry& saveEntry);
+			bool				_GetWindowSettingsFile(entry_ref* ref);
 
-			ResizableButton*	fAddButton;
-			ResizableButton* 	fRemoveButton;
-			ResizableButton* 	fSaveButton;
+			BButton*	        fAddButton;
+			BButton* 	        fRemoveButton;
+			BButton* 	        fSaveButton;
 			ColumnListView* 	fColumnListView;
 			BFilePanel* 		fSavePanel;		// for saving settings
 			BFilePanel* 		fOpenPanel;		// for loading settings
