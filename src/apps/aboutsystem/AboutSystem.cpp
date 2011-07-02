@@ -1092,6 +1092,7 @@ AboutView::_CreateCreditsView()
 		"Raynald Lesieur\n"
 		"Oscar Lesta\n"
 		"Jerome Leveque\n"
+		"Brian Luft\n"
 		"Christof Lutteroth\n"
 		"Graham MacDonald\n"
 		"Jorge G. Mare (Koki)\n"
