@@ -1,16 +1,23 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de. All Rights Reserved.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef ARRAY_H
-#define ARRAY_H
+#ifndef _ARRAY_H
+#define _ARRAY_H
 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <OS.h>
+#include <SupportDefs.h>
+
+#if DEBUG
+#	include <OS.h>
+#endif
+
+
+namespace BPrivate {
 
 
 template<typename Element>
@@ -20,37 +27,37 @@ public:
 								Array(const Array<Element>& other);
 								~Array();
 
-	inline	int					Size() const		{ return fSize; }
-	inline	int					Count() const		{ return fSize; }
+	inline	int32				Size() const		{ return fSize; }
+	inline	int32				Count() const		{ return fSize; }
 	inline	bool				IsEmpty() const		{ return fSize == 0; }
 	inline	Element*			Elements() const	{ return fElements; }
 
 	inline	bool				Add(const Element& element);
-	inline	bool				AddUninitialized(int elementCount);
-	inline	bool				Insert(const Element& element, int index);
-	inline	bool				InsertUninitialized(int index, int count);
-	inline	bool				Remove(int index, int count = 1);
+	inline	bool				AddUninitialized(int32 elementCount);
+	inline	bool				Insert(const Element& element, int32 index);
+	inline	bool				InsertUninitialized(int32 index, int32 count);
+	inline	bool				Remove(int32 index, int32 count = 1);
 
 			void				Clear();
 	inline	void				MakeEmpty();
 
-	inline	Element&			ElementAt(int index);
-	inline	const Element&		ElementAt(int index) const;
+	inline	Element&			ElementAt(int32 index);
+	inline	const Element&		ElementAt(int32 index) const;
 
-	inline	Element&			operator[](int index);
-	inline	const Element&		operator[](int index) const;
+	inline	Element&			operator[](int32 index);
+	inline	const Element&		operator[](int32 index) const;
 
 			Array<Element>&		operator=(const Array<Element>& other);
 
 private:
-	static	const int			kMinCapacity = 8;
+	static	const int32			kMinCapacity = 8;
 
-			bool				_Resize(int index, int delta);
+			bool				_Resize(int32 index, int32 delta);
 
 private:
 			Element*			fElements;
-			int					fSize;
-			int					fCapacity;
+			int32				fSize;
+			int32				fCapacity;
 };
 
 
@@ -97,7 +104,7 @@ Array<Element>::Add(const Element& element)
 
 template<typename Element>
 inline bool
-Array<Element>::AddUninitialized(int elementCount)
+Array<Element>::AddUninitialized(int32 elementCount)
 {
 	return InsertUninitialized(fSize, elementCount);
 }
@@ -105,7 +112,7 @@ Array<Element>::AddUninitialized(int elementCount)
 
 template<typename Element>
 bool
-Array<Element>::Insert(const Element& element, int index)
+Array<Element>::Insert(const Element& element, int32 index)
 {
 	if (index < 0 || index > fSize)
 		index = fSize;
@@ -121,7 +128,7 @@ Array<Element>::Insert(const Element& element, int index)
 
 template<typename Element>
 bool
-Array<Element>::InsertUninitialized(int index, int count)
+Array<Element>::InsertUninitialized(int32 index, int32 count)
 {
 	if (index < 0 || index > fSize || count < 0)
 		return false;
@@ -138,7 +145,7 @@ Array<Element>::InsertUninitialized(int index, int count)
 
 template<typename Element>
 bool
-Array<Element>::Remove(int index, int count)
+Array<Element>::Remove(int32 index, int32 count)
 {
 	if (index < 0 || count < 0 || index + count > fSize) {
 #if DEBUG
@@ -189,7 +196,7 @@ Array<Element>::MakeEmpty()
 
 template<typename Element>
 Element&
-Array<Element>::ElementAt(int index)
+Array<Element>::ElementAt(int32 index)
 {
 	return fElements[index];
 }
@@ -197,7 +204,7 @@ Array<Element>::ElementAt(int index)
 
 template<typename Element>
 const Element&
-Array<Element>::ElementAt(int index) const
+Array<Element>::ElementAt(int32 index) const
 {
 	return fElements[index];
 }
@@ -205,7 +212,7 @@ Array<Element>::ElementAt(int index) const
 
 template<typename Element>
 Element&
-Array<Element>::operator[](int index)
+Array<Element>::operator[](int32 index)
 {
 	return fElements[index];
 }
@@ -213,7 +220,7 @@ Array<Element>::operator[](int index)
 
 template<typename Element>
 const Element&
-Array<Element>::operator[](int index) const
+Array<Element>::operator[](int32 index) const
 {
 	return fElements[index];
 }
@@ -236,11 +243,11 @@ Array<Element>::operator=(const Array<Element>& other)
 
 template<typename Element>
 bool
-Array<Element>::_Resize(int index, int delta)
+Array<Element>::_Resize(int32 index, int32 delta)
 {
 	// determine new capacity
-	int newSize = fSize + delta;
-	int newCapacity = kMinCapacity;
+	int32 newSize = fSize + delta;
+	int32 newCapacity = kMinCapacity;
 	while (newCapacity < newSize)
 		newCapacity *= 2;
 
@@ -287,4 +294,10 @@ Array<Element>::_Resize(int index, int delta)
 }
 
 
-#endif	// ARRAY_H
+}	// namespace BPrivate
+
+
+using BPrivate::Array;
+
+
+#endif	// _ARRAY_H

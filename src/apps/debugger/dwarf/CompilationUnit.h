@@ -6,11 +6,11 @@
 #define COMPILATION_UNIT_H
 
 
+#include <ObjectList.h>
 #include <String.h>
 
-#include <ObjectList.h>
+#include <Array.h>
 
-#include "Array.h"
 #include "LineNumberProgram.h"
 #include "Types.h"
 
