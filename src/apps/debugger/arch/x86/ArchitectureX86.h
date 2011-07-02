@@ -6,8 +6,9 @@
 #define ARCHITECTURE_X86_H
 
 
+#include <Array.h>
+
 #include "Architecture.h"
-#include "Array.h"
 #include "Register.h"
 
 

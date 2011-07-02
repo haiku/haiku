@@ -8,8 +8,7 @@
 
 #include <SupportDefs.h>
 
-
-#include "Array.h"
+#include <Array.h>
 
 
 class BitBuffer {

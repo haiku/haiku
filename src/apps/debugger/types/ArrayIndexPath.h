@@ -6,7 +6,8 @@
 #define ARRAY_INDEX_PATH_H
 
 
-#include "Array.h"
+#include <Array.h>
+
 #include "Types.h"
 
 
