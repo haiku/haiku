@@ -400,9 +400,8 @@ rule AddWifiFirmwareToPackage driver : subDirToExtract : archive
 rule ExtractArchiveToPackage dirTokens : archiveFile : alwaysUpdate
 	: extractedSubDir
 {
-	# TODO: Update support?
 	ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(dirTokens) : $(archiveFile) : $(extractedSubDir) ;
+		: $(dirTokens) : $(archiveFile) : $(alwaysUpdate) : $(extractedSubDir) ;
 }
 
 

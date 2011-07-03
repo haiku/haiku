@@ -339,7 +339,7 @@ rule AddWifiFirmwareToContainer container : driver : package : archive : extract
 	local dirTokens = $(systemDirTokens) data firmware $(driver) ;
 	if $(extract) = true || $(extract) = 1 {
 		ExtractArchiveToContainer $(container) : $(dirTokens)
-			: $(firmwareArchive) : $(package) ;
+			: $(firmwareArchive) : : $(package) ;
 	} else {
 		AddFilesToContainer $(container) : $(dirTokens) : $(firmwareArchive)  ;
 	}
@@ -347,10 +347,17 @@ rule AddWifiFirmwareToContainer container : driver : package : archive : extract
 
 
 rule ExtractArchiveToContainer container : directoryTokens : archiveFile
-	: extractedSubDir
+	: alwaysUpdate : extractedSubDir
 {
 	# ExtractArchiveToContainer <container> : <directory> : <archiveFile>
-	#	: <extractedSubDir> ;
+	#	: <alwaysUpdate> : <extractedSubDir> ;
+
+	# If the container shall only be updated, we extract only, if explicitely
+	# requested.
+	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
+		&& ! $(alwaysUpdate) {
+		return ;
+	}
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
@@ -815,12 +822,8 @@ rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
 	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>
 	#	: <extractedSubDir> ;
 
-	# If the image shall only be updated, we extract only, if explicitely
-	# requested.
-	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
-		ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-			: $(archiveFile) : $(extractedSubDir) ;
-	}
+	ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
+		: $(archiveFile) : $(alwaysUpdate) : $(extractedSubDir) ;
 }
 
 rule AddDriversToHaikuImage relativeDirectoryTokens : targets
