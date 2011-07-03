@@ -469,6 +469,8 @@ vfs_mount_boot_file_system(kernel_args* args)
 		panic("did not find any boot partitions!");
 	}
 
+	dev_t bootDevice = -1;
+
 	KPartition* bootPartition;
 	while (partitions.Pop(&bootPartition)) {
 		KPath path;
@@ -487,21 +489,22 @@ vfs_mount_boot_file_system(kernel_args* args)
 		}
 
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
-		gBootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
-		if (gBootDevice >= 0) {
+
+		bootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
+		if (bootDevice >= 0) {
 			dprintf("Mounted boot partition: %s\n", path.Path());
 			gReadOnlyBootDevice = readOnly;
 			break;
 		}
 	}
 
-	if (gBootDevice < B_OK)
+	if (bootDevice < B_OK)
 		panic("could not mount boot device!\n");
 
 	// create link for the name of the boot device
 
 	fs_info info;
-	if (_kern_read_fs_info(gBootDevice, &info) == B_OK) {
+	if (_kern_read_fs_info(bootDevice, &info) == B_OK) {
 		char path[B_FILE_NAME_LENGTH + 1];
 		snprintf(path, sizeof(path), "/%s", info.volume_name);
 
@@ -530,6 +533,9 @@ vfs_mount_boot_file_system(kernel_args* args)
 				strerror(commonPackageMount));
 		}
 	}
+
+	// Now that packagefs is mounted, the boot volume is really ready.
+	gBootDevice = bootDevice;
 
 	// Do post-boot-volume module initialization. The module code wants to know
 	// whether the module images the boot loader has pre-loaded are the same as
