@@ -25,7 +25,7 @@ class Array {
 public:
 	inline						Array();
 								Array(const Array<Element>& other);
-								~Array();
+	inline						~Array();
 
 	inline	int32				Size() const		{ return fSize; }
 	inline	int32				Count() const		{ return fSize; }
