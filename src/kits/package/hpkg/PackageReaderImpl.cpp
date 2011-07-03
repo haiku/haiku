@@ -587,12 +587,18 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 status_t
 PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 {
-	AttributeHandlerContext context(ErrorOutput(), contentHandler);
+	AttributeHandlerContext context(ErrorOutput(), contentHandler,
+		B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
 	RootAttributeHandler rootAttributeHandler;
+
 	status_t error
 		= ParsePackageAttributesSection(&context, &rootAttributeHandler);
-	if (error == B_OK)
+
+	if (error == B_OK) {
+		context.section = B_HPKG_SECTION_PACKAGE_TOC;
 		error = _ParseTOC(&context, &rootAttributeHandler);
+	}
+
 	return error;
 }
 
@@ -600,12 +606,18 @@ PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 status_t
 PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 {
-	AttributeHandlerContext context(ErrorOutput(), contentHandler);
+	AttributeHandlerContext context(ErrorOutput(), contentHandler,
+		B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
 	LowLevelAttributeHandler rootAttributeHandler;
+
 	status_t error
 		= ParsePackageAttributesSection(&context, &rootAttributeHandler);
-	if (error == B_OK)
+
+	if (error == B_OK) {
+		context.section = B_HPKG_SECTION_PACKAGE_TOC;
 		error = _ParseTOC(&context, &rootAttributeHandler);
+	}
+
 	return error;
 }
 
@@ -627,8 +639,9 @@ PackageReaderImpl::_ParseTOC(AttributeHandlerContext* context,
 	ClearAttributeHandlerStack();
 	PushAttributeHandler(rootAttributeHandler);
 
-	status_t error = ParseAttributeTree(context);
-	if (error == B_OK) {
+	bool sectionHandled;
+	status_t error = ParseAttributeTree(context, sectionHandled);
+	if (error == B_OK && sectionHandled) {
 		if (fTOCSection.currentOffset < fTOCSection.uncompressedLength) {
 			ErrorOutput()->PrintError("Error: %llu excess byte(s) in TOC "
 				"section\n",

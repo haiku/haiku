@@ -254,11 +254,13 @@ RepositoryReaderImpl::GetRepositoryInfo(BRepositoryInfo* _repositoryInfo) const
 status_t
 RepositoryReaderImpl::ParseContent(BRepositoryContentHandler* contentHandler)
 {
-	AttributeHandlerContext context(ErrorOutput(), contentHandler);
-	PackageAttributeHandler rootAttributeHandler;
 	status_t result = contentHandler->HandleRepositoryInfo(fRepositoryInfo);
-	if (result == B_OK)
+	if (result == B_OK) {
+		AttributeHandlerContext context(ErrorOutput(), contentHandler,
+			B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
+		PackageAttributeHandler rootAttributeHandler;
 		result = ParsePackageAttributesSection(&context, &rootAttributeHandler);
+	}
 	return result;
 }
 
