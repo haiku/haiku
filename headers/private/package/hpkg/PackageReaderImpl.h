@@ -38,6 +38,9 @@ public:
 
 			int					PackageFileFD() const;
 
+			uint64				HeapOffset() const;
+			uint64				HeapSize() const;
+
 protected:
 								// from ReaderImplBase
 	virtual	status_t			ReadAttributeValue(uint8 type, uint8 encoding,
@@ -68,6 +71,20 @@ inline int
 PackageReaderImpl::PackageFileFD() const
 {
 	return FD();
+}
+
+
+inline uint64
+PackageReaderImpl::HeapOffset() const
+{
+	return fHeapOffset;
+}
+
+
+inline uint64
+PackageReaderImpl::HeapSize() const
+{
+	return fHeapSize;
 }
 
 
