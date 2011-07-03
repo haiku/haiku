@@ -34,6 +34,43 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 	{
 	}
 
+	virtual status_t HandleSectionStart(BHPKGPackageSectionID sectionID,
+		bool& _handleSection)
+	{
+		const char* sectionName;
+
+		switch (sectionID) {
+			case B_HPKG_SECTION_HEADER:
+				sectionName = "header";
+				break;
+			case B_HPKG_SECTION_HEAP:
+				sectionName = "heap";
+				break;
+			case B_HPKG_SECTION_PACKAGE_TOC:
+				sectionName = "TOC";
+				break;
+			case B_HPKG_SECTION_PACKAGE_ATTRIBUTES:
+				sectionName = "package attributes";
+				break;
+			case B_HPKG_SECTION_REPOSITORY_INFO:
+				sectionName = "repository info";
+				break;
+			default:
+				sectionName = "<unknown section>";
+				break;
+		}
+
+		printf("\n====  SECTION: %s ====\n", sectionName);
+
+		_handleSection = true;
+		return B_OK;
+	}
+
+	virtual status_t HandleSectionEnd(BHPKGPackageSectionID sectionID)
+	{
+		return B_OK;
+	}
+
 	virtual status_t HandleAttribute(BHPKGAttributeID attributeID,
 		const BPackageAttributeValue& value, void* parentToken, void*& _token)
 	{

@@ -38,21 +38,25 @@ static const size_t kScratchBufferSize = 64 * 1024;
 
 
 ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
-	BErrorOutput* errorOutput, BPackageContentHandler* packageContentHandler)
+	BErrorOutput* errorOutput, BPackageContentHandler* packageContentHandler,
+	BHPKGPackageSectionID section)
 	:
 	errorOutput(errorOutput),
 	packageContentHandler(packageContentHandler),
-	hasLowLevelHandler(false)
+	hasLowLevelHandler(false),
+	section(section)
 {
 }
 
 
 ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
-	BErrorOutput* errorOutput, BLowLevelPackageContentHandler* lowLevelHandler)
+	BErrorOutput* errorOutput, BLowLevelPackageContentHandler* lowLevelHandler,
+	BHPKGPackageSectionID section)
 	:
 	errorOutput(errorOutput),
 	lowLevelHandler(lowLevelHandler),
-	hasLowLevelHandler(true)
+	hasLowLevelHandler(true),
+	section(section)
 {
 }
 
@@ -669,8 +673,9 @@ ReaderImplBase::ParsePackageAttributesSection(
 	ClearAttributeHandlerStack();
 	PushAttributeHandler(rootAttributeHandler);
 
-	status_t error = ParseAttributeTree(context);
-	if (error == B_OK) {
+	bool sectionHandled;
+	status_t error = ParseAttributeTree(context, sectionHandled);
+	if (error == B_OK && sectionHandled) {
 		if (fPackageAttributesSection.currentOffset
 				< fPackageAttributesSection.uncompressedLength) {
 			fErrorOutput->PrintError("Error: %llu excess byte(s) in package "
@@ -698,7 +703,38 @@ ReaderImplBase::ParsePackageAttributesSection(
 
 
 status_t
-ReaderImplBase::ParseAttributeTree(AttributeHandlerContext* context)
+ReaderImplBase::ParseAttributeTree(AttributeHandlerContext* context,
+	bool& _sectionHandled)
+{
+	if (context->hasLowLevelHandler) {
+		bool handleSection = false;
+		status_t error = context->lowLevelHandler->HandleSectionStart(
+			context->section, handleSection);
+		if (error != B_OK)
+			return error;
+
+		if (!handleSection) {
+			_sectionHandled = false;
+			return B_OK;
+		}
+	}
+
+	status_t error = _ParseAttributeTree(context);
+
+	if (context->hasLowLevelHandler) {
+		status_t endError = context->lowLevelHandler->HandleSectionEnd(
+			context->section);
+		if (error == B_OK)
+			error = endError;
+	}
+
+	_sectionHandled = true;
+	return error;
+}
+
+
+status_t
+ReaderImplBase::_ParseAttributeTree(AttributeHandlerContext* context)
 {
 	int level = 0;
 
