@@ -1,27 +1,40 @@
-1	russian	x-vnd.Haiku-Mail	2389972088
+1	russian	x-vnd.Haiku-Mail	2328315862
 Account name:	Config Views		Имя аккаунта:
+Account name:	E-Mail		Имя аккаунта:
 Account settings	Config Views		Настройки аккаунта
 Accounts	Config Window		Аккаунты
 Add	Config Window		Добавить
+Add filter	Config Views		Добавить фильтр
 Always	Config Window		Всегда
 Apply	Config Window		Применить
 Check every	Config Window		Проверять каждые
+Choose Protocol	E-Mail		Выберите протокол
 E-mail	System name		Почта
+E-mail address:	E-Mail		E-mail адрес:
 Edit mailbox menu…	Config Window		Изменить меню…
 Error	Config Window		Ошибка
 Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
+Incoming mail filters	Config Views		Фильтры входящей почты
+Login name:	E-Mail		Имя пользователя:
 Mail checking	Config Window		Проверка почты
 Miscellaneous	Config Window		Разное
+OK	Config Views		ОК
 OK	Config Window		ОК
 Only when dial-up is connected	Config Window		Только при наличии связи
+Outgoing mail filters	Config Views		Фильтры исходящей почты
+Password:	E-Mail		Пароль:
 Real name:	Config Views		Настоящее имя:
+Real name:	E-Mail		Настоящее имя:
+Remove	Config Views		Удалить
 Remove	Config Window		Удалить
 Return address:	Config Views		Обратный адрес:
 Revert	Config Window		Вернуть
 Schedule outgoing mail when dial-up is disconnected	Config Window		Ставить в очередь исходящую почту пока отсутствует подключение
+Server Name:	E-Mail		Адрес сервера:
 Settings	Config Window		Настройки
 Show connection status window:	Config Window		Отображать окно статуса соединения:
 Start mail services on startup	Config Window		Запускать почтовые службы при загрузке
+The filter could not be moved. Deleting filter.	Config Views		Фильтр не может быть перемещен. Удаление фильтра.
 While sending	Config Window		во время отправки
 While sending and receiving	Config Window		во время отправки и получения
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n

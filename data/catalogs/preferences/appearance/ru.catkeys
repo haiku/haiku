@@ -1,8 +1,11 @@
-1	russian	x-vnd.Haiku-Appearance	3187486915
+1	russian	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		О декораторе
+About Decerator	DecorSettingsView		О декораторе
 Antialiasing	APRWindow		Сглаживание
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
 Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
 Appearance	System name		Внешний вид
+Choose Decorator	DecorSettingsView		Выберите декоратор
 Colors	APRWindow		Цвета
 Control background	Colors tab		Фон элемента
 Control border	Colors tab		Граница элемента
@@ -23,6 +26,7 @@ Menu item text	Colors tab		Текст пункта меню
 Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
 Navigation base	Colors tab		Основа навигации
 Navigation pulse	Colors tab		Навигационная пульсация
+OK	DecorSettingsView		ОК
 Off	AntialiasingSettingsView		Выключить
 On	AntialiasingSettingsView		Включить
 Panel background	Colors tab		Фон панели
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Успех
 Tooltip background	Colors tab		Фон подсказки
 Tooltip text	Colors tab		Текст подсказки
+Window Decorator	APRWindow		Оконный декоратор
+Window Decorator:	DecorSettingsView		Оконный декоратор:
 Window tab	Colors tab		Заголовок окна
 Window tab text	Colors tab		Текст заголовка окна

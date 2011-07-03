@@ -1,8 +1,11 @@
-1	japanese	x-vnd.Haiku-Appearance	3187486915
+1	japanese	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		情報
+About Decerator	DecorSettingsView		デコレーターについて
 Antialiasing	APRWindow		アンチエイリアス
 Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
 Antialiasing type:	AntialiasingSettingsView		アンチエイリアスのタイプ：
 Appearance	System name		外観
+Choose Decorator	DecorSettingsView		デコレーターを選択
 Colors	APRWindow		色
 Control background	Colors tab		コントロールの背景
 Control border	Colors tab		コントロールの境界
@@ -23,6 +26,7 @@ Menu item text	Colors tab		メニュー項目の文字
 Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
 Navigation base	Colors tab		ナビゲーション
 Navigation pulse	Colors tab		ナビゲーションの点滅
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		無効
 On	AntialiasingSettingsView		有効
 Panel background	Colors tab		パネルの背景
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		成功
 Tooltip background	Colors tab		ツールチップの背景
 Tooltip text	Colors tab		ツールチップの文字
+Window Decorator	APRWindow		ウィンドウデコレーター
+Window Decorator:	DecorSettingsView		ウィンドウデコレーター：
 Window tab	Colors tab		ウィンドウのタブ
 Window tab text	Colors tab		ウィンドウタブの文字

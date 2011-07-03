@@ -1,27 +1,51 @@
-1	finnish	x-vnd.Haiku-Mail	2389972088
+1	finnish	x-vnd.Haiku-Mail	1746145370
 Account name:	Config Views		Tilin nimi:
+Account name:	E-Mail		Tilinimi:
+Account settings	AutoConfigWindow		Tiliasetukset
 Account settings	Config Views		Tiliasetukset
 Accounts	Config Window		Tilit
 Add	Config Window		Lisää
+Add filter	Config Views		Lisää suodatin
 Always	Config Window		Aina
 Apply	Config Window		Sovella
+Back	AutoConfigWindow		Takaisin
 Check every	Config Window		Tarkista joka
+Choose Protocol	E-Mail		Valitse yhteyskäytäntö
+Create new account	AutoConfigWindow		Luo uusi tili
 E-mail	System name		Sähköpostiasetukset
+E-mail address:	E-Mail		Sähköpostiosoite:
 Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
+Enter a valid e-mail address.	AutoConfigWindow		Kirjoita kelvollinen sähköpostiosoite.
 Error	Config Window		Virhe
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
+Finish	AutoConfigWindow		Valmis
+Incoming	Config Window		Tuleva
+Incoming	E-Mail		Tuleva
+Incoming mail filters	Config Views		Tulevan postin suodattimet
+Login name:	E-Mail		Kirjautumisnimi:
 Mail checking	Config Window		Sähköpostin tarkistus
 Miscellaneous	Config Window		Sekalaiset
+Next	AutoConfigWindow		Seuraava
+OK	AutoConfigWindow		Valmis
+OK	Config Views		Valmis
 OK	Config Window		Valmis
 Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistetty
+Outgoing	Config Window		Lähtevä
+Outgoing	E-Mail		Lähtevä
+Outgoing mail filters	Config Views		Lähtevän postin suodattimet
+Password:	E-Mail		Salasana:
 Real name:	Config Views		Oikea nimi:
+Real name:	E-Mail		Oikea nimi:
+Remove	Config Views		Poista
 Remove	Config Window		Poista
 Return address:	Config Views		Paluuosoite:
 Revert	Config Window		Palauta
 Schedule outgoing mail when dial-up is disconnected	Config Window		Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty
+Server Name:	E-Mail		Palvelinnimi:
 Settings	Config Window		Asetukset
 Show connection status window:	Config Window		Näytä yhteystilaikkuna:
 Start mail services on startup	Config Window		Käynnistä sähköpostipalvelut tietokoneen käynnistyksen yhteydessä
+The filter could not be moved. Deleting filter.	Config Views		Suodatinta ei voitu siirtää. Poistetaan suodatin.
 While sending	Config Window		Lähetettäessä
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n

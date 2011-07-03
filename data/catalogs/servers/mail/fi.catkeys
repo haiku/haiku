@@ -1,20 +1,22 @@
-1	finnish	x-vnd.Haiku-mail_daemon	3018783227
+1	finnish	x-vnd.Be-POST	2900218551
+%num new message	DeskbarView		%num uusi viesti
 %num new message for %name\n	MailDaemon		%num uusi viesti käyttäjälle %name\n
+%num new message.	MailDaemon		%num uusi viesti.
+%num new messages	DeskbarView		%num uutta viestiä
 %num new messages for %name\n	MailDaemon		%num uutta viestiä käyttäjälle %name\n
-<no accounts>	DeskbarView		<ei tilejä>
+%num new messages.	MailDaemon		%num uutta viestiä.
+<no accounts>	DeskbarView		<ei tiliä>
 Check for mail now	DeskbarView		Tarkista sähköposti nyt
 Check for mails only	DeskbarView		Tarkista vain sähköpostit
 Check mail now	StatusWindow		Tarkista sähköposti nyt
 Create new message…	DeskbarView		Luo uusi viesti...
+Mail Status	MailDaemon		Sähköpostitila
+Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki
 New Messages	MailDaemon		Uudet viestit
 No new messages	DeskbarView		Ei uusia viestejä
 No new messages	MailDaemon		Ei uusia viestejä
 No new messages.	MailDaemon		Ei uusia viestejä.
 No new messages.	StatusWindow		Ei uusia viestejä.
 Preferences…	DeskbarView		Asetukset...
-Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostiviestit
+Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
 Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
-new message	DeskbarView		uusi viesti
-new message.	MailDaemon		uusi viesti.
-new messages	DeskbarView		uudet viestit
-new messages.	MailDaemon		uusia viestejä.

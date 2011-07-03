@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-Mail	2389972088
+1	french	x-vnd.Haiku-Mail	936504879
 Account name:	Config Views		Nom du compte :
 Account settings	Config Views		Réglages du compte
 Accounts	Config Window		Comptes
 Add	Config Window		Ajouter
+Add filter	Config Views		Ajouter un filtre
 Always	Config Window		Toujours
 Apply	Config Window		Appliquer
 Check every	Config Window		Vérifier toutes les
@@ -12,6 +13,7 @@ Error	Config Window		Erreur
 Error retrieving general settings: %s\n	Config Window		Erreur à la récupération des réglages généraux : %s\n
 Mail checking	Config Window		Vérification des mails
 Miscellaneous	Config Window		Divers
+OK	Config Views		OK
 OK	Config Window		OK
 Only when dial-up is connected	Config Window		Uniquement quand le modem est connecté
 Real name:	Config Views		Nom réel :

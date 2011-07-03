@@ -1,27 +1,51 @@
-1	german	x-vnd.Haiku-Mail	2389972088
+1	german	x-vnd.Haiku-Mail	1746145370
 Account name:	Config Views		Kontoname:
+Account name:	E-Mail		Kontoname:
+Account settings	AutoConfigWindow		Kontoeinstellungen
 Account settings	Config Views		Kontoeinstellungen
 Accounts	Config Window		Konten
 Add	Config Window		Hinzu
+Add filter	Config Views		Filter hinzufügen
 Always	Config Window		Immer
 Apply	Config Window		Anwenden
+Back	AutoConfigWindow		Zurück
 Check every	Config Window		Abrufen alle
+Choose Protocol	E-Mail		Protokoll wählen
+Create new account	AutoConfigWindow		Neues Konto anlegen
 E-mail	System name		E-Mail-Dienst
+E-mail address:	E-Mail		E-Mail-Adresse
 Edit mailbox menu…	Config Window		Mailbox-Menü bearbeiten...
+Enter a valid e-mail address.	AutoConfigWindow		Eine gültige E-Mail-Adresse angeben.
 Error	Config Window		Fehler
 Error retrieving general settings: %s\n	Config Window		Fehler beim Einlesen der allgemeinen Einstellungen: %s\n
+Finish	AutoConfigWindow		Beenden
+Incoming	Config Window		Eingang
+Incoming	E-Mail		Eingang
+Incoming mail filters	Config Views		Filter für eingehende E-Mail
+Login name:	E-Mail		Login:
 Mail checking	Config Window		E-Mail abfragen
 Miscellaneous	Config Window		Verschiedenes
+Next	AutoConfigWindow		Weiter
+OK	AutoConfigWindow		OK
+OK	Config Views		OK
 OK	Config Window		OK
 Only when dial-up is connected	Config Window		Nur bei aktiver Einwahlverbindung
+Outgoing	Config Window		Ausgang
+Outgoing	E-Mail		Ausgang
+Outgoing mail filters	Config Views		Filter für ausgehende E-Mail
+Password:	E-Mail		Passwort:
 Real name:	Config Views		Benutzername:
+Real name:	E-Mail		Benutzername:
+Remove	Config Views		Entfernen
 Remove	Config Window		Entfernen
 Return address:	Config Views		E-Mail-Adresse:
 Revert	Config Window		Anfangswerte
 Schedule outgoing mail when dial-up is disconnected	Config Window		Versand aufschieben falls Einwahlverbindung nicht aktiv
+Server Name:	E-Mail		Servername:
 Settings	Config Window		Einstellungen
 Show connection status window:	Config Window		Statusfenster anzeigen:
 Start mail services on startup	Config Window		Starte E-Mail-Dienst beim Systemstart
+The filter could not be moved. Deleting filter.	Config Views		Der Filter konnte nicht verschoben werden und wurde gelöscht.
 While sending	Config Window		Beim Senden
 While sending and receiving	Config Window		Beim Senden und Empfangen
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDie allgemeinen Einstellungen konnten nicht zurückgenommen werden.\n\nFehler beim Abrufen der allgemeinen Einstellungen:\n%s\n

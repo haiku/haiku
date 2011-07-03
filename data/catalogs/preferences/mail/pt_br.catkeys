@@ -1,17 +1,22 @@
-1	brazilian_portuguese	x-vnd.Haiku-Mail	778748048
+1	brazilian_portuguese	x-vnd.Haiku-Mail	1492060636
 Account name:	Config Views		Nome da conta
 Account settings	Config Views		Configurações da conta
 Accounts	Config Window		Contas
 Add	Config Window		Adicionar
+Add filter	Config Views		Adicionar filtro
 Always	Config Window		Sempre
 Apply	Config Window		Aplicar
 Check every	Config Window		Checar periodicamente
 Edit mailbox menu…	Config Window		Editar menu da caixa de mail...
 Error retrieving general settings: %s\n	Config Window		Erro ao ler as configurações gerais: %s\n
+Incoming mail filters	Config Views		Filtros de mail recebidos
 Mail checking	Config Window		Checar mail
 Miscellaneous	Config Window		Detalhes
+OK	Config Views		OK
 Only when dial-up is connected	Config Window		Somente quando estiver conectado
+Outgoing mail filters	Config Views		Filtros de mail enviados
 Real name:	Config Views		Nome real:
+Remove	Config Views		Remover
 Remove	Config Window		Remover
 Return address:	Config Views		Endereço de retorno:
 Revert	Config Window		Reverter
@@ -19,6 +24,7 @@ Schedule outgoing mail when dial-up is disconnected	Config Window		Agendar saíd
 Settings	Config Window		Configurações
 Show connection status window:	Config Window		Mostrar janela de status de conexão:
 Start mail services on startup	Config Window		Iniciar serviços de mail na inicialização
+The filter could not be moved. Deleting filter.	Config Views		O filtro não pode ser movido. Deletando filtro.
 While sending	Config Window		Enquanto envia
 While sending and receiving	Config Window		Enquanto envia e recebe
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAs configurações gerais não puderam ser revertidas.\n\Erro ao ler as configurações gerais:\n%s\n

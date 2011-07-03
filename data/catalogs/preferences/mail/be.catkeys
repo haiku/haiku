@@ -1,27 +1,40 @@
-1	belarusian	x-vnd.Haiku-Mail	2389972088
+1	belarusian	x-vnd.Haiku-Mail	2328315862
 Account name:	Config Views		Імя акаунту
+Account name:	E-Mail		Імя акаунта:
 Account settings	Config Views		Наладкі акаунту
 Accounts	Config Window		Акаунты
 Add	Config Window		Дадаць
+Add filter	Config Views		Дадаць фільтр
 Always	Config Window		Заўсёды
 Apply	Config Window		Прымяніць
 Check every	Config Window		Правяраць кожныя
+Choose Protocol	E-Mail		Выбраць пратакол
 E-mail	System name		Е-Пошта
+E-mail address:	E-Mail		Адрас E-mail
 Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні...
 Error	Config Window		Памылка
 Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n
+Incoming mail filters	Config Views		Уваходныя фільтры пошты
+Login name:	E-Mail		Імя карыстача:
 Mail checking	Config Window		Праверка пошты
 Miscellaneous	Config Window		Розныя
+OK	Config Views		ОК
 OK	Config Window		ОК
 Only when dial-up is connected	Config Window		Толькі пры падключаным дайл-апе
+Outgoing mail filters	Config Views		Фільтры выходнай пошты
+Password:	E-Mail		Пароль:
 Real name:	Config Views		Рэальнае імя:
+Real name:	E-Mail		Рэальнае імя:
+Remove	Config Views		Выдаліць
 Remove	Config Window		Выдаліць
 Return address:	Config Views		Адрас звароту:
 Revert	Config Window		Адмяніць
 Schedule outgoing mail when dial-up is disconnected	Config Window		Запланаваць адпраўку пошты на час падключэння дайл-апу
+Server Name:	E-Mail		Імя сервера:
 Settings	Config Window		Наладкі
 Show connection status window:	Config Window		Паказваць статус спалучэння:
 Start mail services on startup	Config Window		Запускаць паштовыя службы пры загрузцы
+The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
 While sending	Config Window		Пры адапраўленні
 While sending and receiving	Config Window		Пры адпраўцы і атрыманні
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nАгульныя опцыі немагчыма адмяніць.\n\nПамылка пры атрыманні агульных опцый:\n%s\n

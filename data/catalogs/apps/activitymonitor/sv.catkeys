@@ -9,7 +9,7 @@ Add graph	ActivityWindow		Lägg till graf
 Additional items	ActivityView		Ytterligare mätvärden
 Apps	DataSource		Program
 Block cache	DataSource		Blockbuffert
-Block cache memory	DataSource		Block cacheminne
+Block cache memory	DataSource		Blockcacheminne
 CPU	DataSource		CPU
 CPU usage	DataSource		CPU användning
 CPU usage (combined)	DataSource		CPU användning (kombinerad)
@@ -27,7 +27,7 @@ Page faults	DataSource		Sidfel
 Ports	DataSource		Portar
 Quit	ActivityWindow		Avsluta
 RX	DataSource	Shorter version for Receiving.	RX
-Raw clipboard	DataSource		Obearbetad urklipp
+Raw clipboard	DataSource		Urklipp rådata
 Receiving	DataSource		Tar emot
 Remove graph	ActivityView		Ta bort graf
 Running applications	DataSource		Aktiva program
@@ -41,8 +41,8 @@ Swap	DataSource		Växling
 Swap space	DataSource		Växlingsutrymme
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		Processer
-Text clipboard	DataSource		Text urklipp
+Text clipboard	DataSource		Urklipp text
 Threads	DataSource		Trådar
 Update time interval:	SettingsWindow		Uppdateringsintervall:
-Used memory	DataSource		Använt minne
+Used memory	DataSource		Minnesanvändning
 usage	DataSource		användning

@@ -1,14 +1,15 @@
-1	finnish	x-vnd.Haiku-MatchHeader	1251743113
+1	finnish	x-vnd.Haiku-MatchHeader	1205906732
 <Choose account>	ConfigView		<Valitse tili>
 <Choose action>	ConfigView		<Valitse toiminto>
 Delete message	ConfigView		Poista viesti
 If	ConfigView		Jos
 Move to	ConfigView		Siirrä kohtaan
 Reply with	ConfigView		Vastaa
+Rule filter	RuleFilter		Sääntösuodatin
 Set as read	ConfigView		Aseta luetuksi
 Set flags to	ConfigView		Aseta lipuksi
 Then	ConfigView		Sitten
-has 	ConfigView		on
+has	ConfigView		on
 header (e.g. Subject)	ConfigView		otsake (esim. Aihe)
 this field is based on the action	ConfigView		tämä kenttä perustuu toimintoon
 value (use REGEX: in from of regular expressions like *spam*)	ConfigView		arvo (käytä REGEX-ohjelmisto: säännöllisistä lausekkeista kuten *spam*)

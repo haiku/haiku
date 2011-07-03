@@ -1,13 +1,13 @@
-1	finnish	x-vnd.Haiku-SMTP	1882880201
+1	finnish	x-vnd.Haiku-SMTP	1052586247
 . The server said:\n	smtp		. Palvelin sanoi:\n
 . The server says:\n	smtp		. Palvelin sanoo:\n
 : Connection refused or host not found.	smtp		: Yhteys torjuttiin tai tietokonetta ei löytynyt.
 Connecting to server…	smtp		Yhdistetään palvelimeen...
 Destination:	ConfigView		Kohde:
 ESMTP	ConfigView		ESMTP
-Error while logging in to 	smtp		Virhe kirjauduttuessa kohteeseen
-Error while opening connection to 	smtp		Virhe avattaessa yhteyttä kohteeseen
+Error while logging in to %serv	smtp		Virhe kirjauduttaessa palvelimeen %serv
+Error while opening connection to %serv	smtp		Virhe avattaessa yhteyttä palvelimeen %serv
 None	ConfigView		Ei mitään
 POP3 authentication failed. The server said:\n	smtp		POP3-todennus epäonnistui. Palvelin sanoi:\n
 POP3 before SMTP	ConfigView		POP3-yhteyskäytäntö ennen SMTP-yhteyskäytäntöä
-SMTP server: 	ConfigView		SMTP-palvelin:
+SMTP server:	ConfigView		SMTP-palvelin:

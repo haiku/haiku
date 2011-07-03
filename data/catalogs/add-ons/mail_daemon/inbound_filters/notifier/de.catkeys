@@ -1,4 +1,6 @@
-1	german	x-vnd.Haiku-NewMailNotification	3157747612
+1	german	x-vnd.Haiku-NewMailNotification	3624191291
+%num new message	filter		%num neue Nachricht
+%num new messages	filter		%num neue Nachrichten
 Alert	ConfigView		Hinweisfenster
 Beep	ConfigView		Piepton
 Central alert	ConfigView		Hinweisfenster (alle Konten)
@@ -6,7 +8,9 @@ Central beep	ConfigView		Piepton (alle Konten)
 Keyboard LEDs	ConfigView		Tastatur-LEDs
 Log window	ConfigView		Statusfenster
 Method:	ConfigView		Methode:
+New mails notification	ConfigView		Ankündigung neuer E-Mails
 New messages	filter		Neue Nachrichten
+OK	filter		OK
 You have %num new message for %name.	filter		%num neue Nachricht für %name.
 You have %num new messages for %name.	filter		%num neue Nachrichten für %name.
-new message	filter		neue Nachricht
+none	ConfigView		keine

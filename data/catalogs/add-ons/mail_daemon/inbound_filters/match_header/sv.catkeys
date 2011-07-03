@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MatchHeader	1251743113
+1	swedish	x-vnd.Haiku-MatchHeader	934971625
 <Choose account>	ConfigView		<Välj konto>
 <Choose action>	ConfigView		<Välj åtgärd>
 Delete message	ConfigView		Radera meddelande
@@ -8,7 +8,7 @@ Reply with	ConfigView		Svara med
 Set as read	ConfigView		Markera som läst
 Set flags to	ConfigView		Markera som
 Then	ConfigView		Då
-has 	ConfigView		har
+has	ConfigView		har
 header (e.g. Subject)	ConfigView		huvud (ex Rubrik)
 this field is based on the action	ConfigView		detta fält är baserat på åtgärden
 value (use REGEX: in from of regular expressions like *spam*)	ConfigView		värde (använd reguljära uttryck i format som *skräppost*)

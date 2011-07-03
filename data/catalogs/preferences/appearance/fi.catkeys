@@ -1,8 +1,11 @@
-1	finnish	x-vnd.Haiku-Appearance	3187486915
+1	finnish	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		Ohjelmasta
+About Decerator	DecorSettingsView		Koristeluohjelmasta
 Antialiasing	APRWindow		Reunanpehmennys
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Appearance	System name		Ulkoasuasetukset
+Choose Decorator	DecorSettingsView		Valitse koristelu
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Control border	Colors tab		Kontrollin reuna
@@ -23,6 +26,7 @@ Menu item text	Colors tab		Valikkovalinnan teksti
 Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
 Navigation base	Colors tab		Navigoinnin pohja
 Navigation pulse	Colors tab		Navigoinnin välke
+OK	DecorSettingsView		Valmis
 Off	AntialiasingSettingsView		Pois päältä
 On	AntialiasingSettingsView		Päällä
 Panel background	Colors tab		Paneelin tausta
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Onnistuminen
 Tooltip background	Colors tab		Työkaluvinkin tausta
 Tooltip text	Colors tab		Työkaluvinkin teksti
+Window Decorator	APRWindow		Ikkunakoristelu
+Window Decorator:	DecorSettingsView		Ikkunakoristelu:
 Window tab	Colors tab		Ikkunakahva
 Window tab text	Colors tab		Ikkunakahvan teksti

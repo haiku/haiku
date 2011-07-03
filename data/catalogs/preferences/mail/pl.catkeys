@@ -1,26 +1,39 @@
-1	polish	x-vnd.Haiku-Mail	2325945990
+1	polish	x-vnd.Haiku-Mail	2264289764
 Account name:	Config Views		Nazwa konta:
+Account name:	E-Mail		Nazwa konta:
 Account settings	Config Views		Ustawienia konta
 Accounts	Config Window		Konta
 Add	Config Window		Dodaj
+Add filter	Config Views		Dodaj filtr
 Always	Config Window		Zawsze
 Apply	Config Window		Zastosuj
 Check every	Config Window		Sprawdzaj co
+Choose Protocol	E-Mail		Wybierz protokół
+E-mail address:	E-Mail		Adres e-mail:
 Edit mailbox menu…	Config Window		Edytuj menu skrzynki pocztowej
 Error	Config Window		Błąd
 Error retrieving general settings: %s\n	Config Window		Błąd podczas odbierania globalnych ustawień: %s\n
+Incoming mail filters	Config Views		Filtry poczty przychodzącej
+Login name:	E-Mail		Login:
 Mail checking	Config Window		Sprawdzanie wiadomości
 Miscellaneous	Config Window		Inne
+OK	Config Views		OK
 OK	Config Window		OK
 Only when dial-up is connected	Config Window		Tylko podczas połączenia dial-up
+Outgoing mail filters	Config Views		Fltry poczty wychodzącej
+Password:	E-Mail		Hasło:
 Real name:	Config Views		Prawdziwe imię:
+Real name:	E-Mail		Prawdziwe imię:
+Remove	Config Views		Usuń
 Remove	Config Window		Usuń
 Return address:	Config Views		Adres zwrotny:
 Revert	Config Window		Przywróć
 Schedule outgoing mail when dial-up is disconnected	Config Window		Zaplanuj wysyłanie poczty wychodzącej, gdy połączenie dialup jest nieaktywne
+Server Name:	E-Mail		Nazwa serwera:
 Settings	Config Window		Ustawienia
 Show connection status window:	Config Window		Pokaż okno stanu połączenia:
 Start mail services on startup	Config Window		Włącz usługi wiadomości podczas uruchamiania
+The filter could not be moved. Deleting filter.	Config Views		Filtr nie mógł zostać przesunięty. Usuwanie filtru.
 While sending	Config Window		Podczas wysyłania
 While sending and receiving	Config Window		Podczas wysyłania i odbierania
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globlnych ustawień:\n%s\n

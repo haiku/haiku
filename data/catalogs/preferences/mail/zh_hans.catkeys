@@ -1,27 +1,40 @@
-1	simplified_chinese	x-vnd.Haiku-Mail	2985311650
+1	simplified_chinese	x-vnd.Haiku-Mail	2923655424
 Account name:	Config Views		用户名：
+Account name:	E-Mail		用户名：
 Account settings	Config Views		用户设置
 Accounts	Config Window		帐户
 Add	Config Window		添加
+Add filter	Config Views		添加过滤器
 Always	Config Window		总是
 Apply	Config Window		应用
 Check every	Config Window		检查每封邮件
+Choose Protocol	E-Mail		选择协议
+E-mail address:	E-Mail		邮箱地址：
 Edit mailbox menu…	Config Window		编辑邮箱菜单...
 Error	Config Window		出错
 Error retrieving general settings: %s\n	Config Window		恢复常用设置出错：%s\n
+Incoming mail filters	Config Views		传入邮件过滤器
+Login name:	E-Mail		登录名称：
 Mail checking	Config Window		检查邮件
 Mail checking	Config Window		邮件检查
 Miscellaneous	Config Window		其他
+OK	Config Views		确定
 OK	Config Window		确定
 Only when dial-up is connected	Config Window		仅在拨号连接时
+Outgoing mail filters	Config Views		送出邮件过滤器
+Password:	E-Mail		密码：
 Real name:	Config Views		真实姓名：
+Real name:	E-Mail		真实姓名：
+Remove	Config Views		删除
 Remove	Config Window		删除
 Return address:	Config Views		返回地址：
 Revert	Config Window		取消
 Schedule outgoing mail when dial-up is disconnected	Config Window		断线时，安排送出邮件。
+Server Name:	E-Mail		服务器：
 Settings	Config Window		设置
 Show connection status window:	Config Window		显示状态窗口：
 Start mail services on startup	Config Window		自启动邮件服务
+The filter could not be moved. Deleting filter.	Config Views		该过滤器无法移动。请删除过滤器。
 While sending	Config Window		在发送时
 While sending and receiving	Config Window		在发送和接收时
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n常用设置无法恢复。\n\n常用设置恢复出错：\n%s\n

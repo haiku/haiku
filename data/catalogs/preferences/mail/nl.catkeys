@@ -1,26 +1,39 @@
-1	dutch	x-vnd.Haiku-Mail	2325945990
+1	dutch	x-vnd.Haiku-Mail	2264289764
 Account name:	Config Views		Accountnaam:
+Account name:	E-Mail		Accountnaam:
 Account settings	Config Views		Accountinstellingen
 Accounts	Config Window		Accounts
 Add	Config Window		Toevoegen
+Add filter	Config Views		Filter toevoegen
 Always	Config Window		Altijd
 Apply	Config Window		Toepassen
 Check every	Config Window		Controleer elke
+Choose Protocol	E-Mail		Kies protocol
+E-mail address:	E-Mail		E-mailadres
 Edit mailbox menu…	Config Window		Mailbox-menu aanpassen...
 Error	Config Window		Fout
 Error retrieving general settings: %s\n	Config Window		Fout bij het ophalen van de algemene instellingen: %s \n
+Incoming mail filters	Config Views		Filters voor binnenkomende mail
+Login name:	E-Mail		Loginnaam:
 Mail checking	Config Window		Mail checken
 Miscellaneous	Config Window		Diversen
+OK	Config Views		Oké
 OK	Config Window		Oké
 Only when dial-up is connected	Config Window		Alleen bij een actieve dial-up-verbinding.
+Outgoing mail filters	Config Views		Filters voor uitgaande mail
+Password:	E-Mail		Paswoord:
 Real name:	Config Views		Echte naam:
+Real name:	E-Mail		Echte naam:
+Remove	Config Views		Verwijderen
 Remove	Config Window		Verwijderen
 Return address:	Config Views		Retouradres:
 Revert	Config Window		Herstellen
 Schedule outgoing mail when dial-up is disconnected	Config Window		Uitgaande mail vastleggen wanneer de dial-up-verbinding verbroken is
+Server Name:	E-Mail		Servernaam:
 Settings	Config Window		Instellingen
 Show connection status window:	Config Window		Toon status-venster van de verbinding:
 Start mail services on startup	Config Window		Start maildiensten bij het opstarten
+The filter could not be moved. Deleting filter.	Config Views		Het filter kon niet verplaatst worden. Filter wordt verwijderd.
 While sending	Config Window		Tijdens het versturen
 While sending and receiving	Config Window		Tijdens versturen en ontvangen
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDe algemene instellingen konden niet hersteld worden.\n\nFout bij het ophalen van de algemene instellingen:\n%s\n

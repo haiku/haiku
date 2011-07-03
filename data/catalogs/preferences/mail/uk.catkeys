@@ -1,25 +1,38 @@
-1	ukrainian	x-vnd.Haiku-Mail	2424940230
+1	ukrainian	x-vnd.Haiku-Mail	2363284004
 Account name:	Config Views		Ім'я аккаунта:
+Account name:	E-Mail		Ім'я акаунту:
 Account settings	Config Views		Настройка аккаунта
 Accounts	Config Window		Аккаунти
 Add	Config Window		Додати
+Add filter	Config Views		Додати фільтр
 Always	Config Window		Завжди
 Apply	Config Window		Прийняти
 Check every	Config Window		Перевіряти кожні
+Choose Protocol	E-Mail		Вибрати протокол
+E-mail address:	E-Mail		Адреса E-mail :
 Edit mailbox menu…	Config Window		Редагувати почтове меню…
 Error	Config Window		Помилка
 Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
+Incoming mail filters	Config Views		Вхідний поштовий фільтр
+Login name:	E-Mail		Логін:
 Mail checking	Config Window		Перевірка пошти
 Miscellaneous	Config Window		Змішаний
+OK	Config Views		Гаразд
 OK	Config Window		Гаразд
+Outgoing mail filters	Config Views		Фільтри вихідної пошти
+Password:	E-Mail		Пароль:
 Real name:	Config Views		Справжнє ім'я:
+Real name:	E-Mail		Справжнє ім'я:
+Remove	Config Views		Видалити
 Remove	Config Window		Видалити
 Return address:	Config Views		Зворотня адреса:
 Revert	Config Window		Повернути
 Schedule outgoing mail when dial-up is disconnected	Config Window		Затримувати відправку вихідних при відключеному діалапі
+Server Name:	E-Mail		Ім'я серверу:
 Settings	Config Window		Налаштування
 Show connection status window:	Config Window		Показати вікно стану підключення:
 Start mail services on startup	Config Window		Запускати сервіс при старті
+The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
 While sending	Config Window		Поки відправляється
 While sending and receiving	Config Window		При відправці і отриманні
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n

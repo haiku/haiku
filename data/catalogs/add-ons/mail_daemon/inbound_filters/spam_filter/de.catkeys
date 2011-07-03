@@ -1,0 +1,9 @@
+1	german	x-vnd.Haiku-SpamFilter	1975155212
+Add spam rating to start of subject	SpamFilterConfig		Spam-Einschätzung der Betreffzeile voranstellen
+Close	SpamFilterConfig		Schließen
+Genuine below and uncertain above:	SpamFilterConfig		Erwünscht unter und ungewiss über:
+Learn from all incoming e-mail	SpamFilterConfig		Von allen eingehenden E-Mails lernen
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Leider konnte die Anwendung spamdbm zum Bearbeiten der Server-Einstellungen nicht gestartet werden.
+Spam Filter (AGMS Bayesian)	SpamFilter		Spamfilter (AGMS Bayesian)
+Spam above:	SpamFilterConfig		Spam über:
+or empty e-mail	SpamFilterConfig		oder leere E-Mail
