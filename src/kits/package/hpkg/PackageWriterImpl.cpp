@@ -1067,7 +1067,6 @@ PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
 				continue;
 			}
 
-			_AddEntry(fd, NULL, entry->d_name, pathBuffer);
 			_UpdateCheckEntryCollisions(entryAttribute, fd, NULL, entry->d_name,
 				pathBuffer);
 		}
