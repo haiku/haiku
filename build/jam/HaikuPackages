@@ -172,8 +172,6 @@ local logoArtwork =
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToPackage data artwork : $(logoArtwork) ;
 
-AddDirectoryToPackage data sounds ;
-
 # Mail spell check dictionaries
 local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
@@ -204,8 +202,10 @@ local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
 AddFilesToPackage data Canna default	: $(cannaDefault) ;
 AddFilesToPackage data Canna dic		: $(cannaDic) ;
 AddFilesToPackage data Canna dic canna	: $(cannaDicCanna) ;
-AddDirectoryToPackage data Canna dic group ;
-AddDirectoryToPackage data Canna dic user ;
+#AddDirectoryToPackage data Canna dic group ;
+#AddDirectoryToPackage data Canna dic user ;
+	# TODO: If those serve any purpose, they should probably live in a writable
+	# subtree.
 
 local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
 	: *.keymap ] ;
@@ -280,9 +280,6 @@ AddFilesToPackage add-ons Screen\ Savers : $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
 AddFilesToPackage add-ons disk_systems : <disk_system>intel <disk_system>bfs ;
 
-
-AddDirectoryToPackage data synth ;
-AddDirectoryToPackage add-ons input_server methods ;
 
 # optional
 # TODO: We should probably build another package (including the data files
