@@ -170,9 +170,8 @@ Depends kernel : kernel_$(TARGET_ARCH) ;
 Depends kernel.so : kernel ;
 	# kernel.so will be rebuilt with the kernel
 
-# propagate HAIKU_INCLUDE_IN_IMAGE variable from kernel to kernel_$(TARGET_ARCH)
-HAIKU_INCLUDE_IN_IMAGE on kernel_$(TARGET_ARCH)
-		= [ on kernel return $(HAIKU_INCLUDE_IN_IMAGE) ] ;
+# propagate the container update variable from kernel to kernel_$(TARGET_ARCH)
+PropagateContainerUpdateTargetFlags kernel_$(TARGET_ARCH) : kernel ;
 
 # Copy kernel and update the copy's revision section. We link everything
 # against the original, but the copy will end up on the disk image (this way

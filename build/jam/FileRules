@@ -341,8 +341,7 @@ rule CopySetHaikuRevision target : source
 		Depends $(target) : $(hgStore) ;
 	}
 
-	HAIKU_INCLUDE_IN_IMAGE on $(target)
-		= [ on $(source) return $(HAIKU_INCLUDE_IN_IMAGE) ] ;
+	PropagateContainerUpdateTargetFlags $(target) : $(source) ;
 
 	Depends $(target) : <build>copyattr <build>set_haiku_revision $(source) ;
 	CopySetHaikuRevision1 $(target)
