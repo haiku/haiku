@@ -9,6 +9,7 @@ BinCommand package :
 	command_list.cpp
 	package.cpp
 	PackageWriterListener.cpp
+	PackageWritingUtils.cpp
 	StandardErrorOutput.cpp
 
 	:
