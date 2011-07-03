@@ -147,7 +147,8 @@ protected:
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName, const char* type);
+			status_t			Init(const char* fileName, const char* type,
+									uint32 flags);
 
 			void				RegisterPackageInfo(
 									PackageAttributeList& attributeList,
@@ -188,6 +189,7 @@ protected:
 									off_t offset);
 
 	inline	int					FD() const;
+	inline	uint32				Flags() const;
 
 	inline	const PackageAttributeList&	PackageAttributes() const;
 	inline	PackageAttributeList&	PackageAttributes();
@@ -211,6 +213,7 @@ private:
 private:
 			BErrorOutput*		fErrorOutput;
 			const char*			fFileName;
+			uint32				fFlags;
 			int					fFD;
 			bool				fFinished;
 
@@ -263,6 +266,13 @@ inline int
 WriterImplBase::FD() const
 {
 	return fFD;
+}
+
+
+inline uint32
+WriterImplBase::Flags() const
+{
+	return fFlags;
 }
 
 

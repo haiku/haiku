@@ -30,12 +30,12 @@ BPackageWriter::~BPackageWriter()
 
 
 status_t
-BPackageWriter::Init(const char* fileName)
+BPackageWriter::Init(const char* fileName, uint32 flags)
 {
 	if (fImpl == NULL)
 		return B_NO_MEMORY;
 
-	return fImpl->Init(fileName);
+	return fImpl->Init(fileName, flags);
 }
 
 
