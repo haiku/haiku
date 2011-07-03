@@ -1567,9 +1567,10 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 
 	// In update mode we don't need to add an entry attribute for an implicit
 	// directory, if there already is one.
-	if (isImplicitEntry && (Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
-		Attribute* entryAttribute = fTopAttribute->FindEntryChild(fileName);
-		if (entryAttribute != NULL) {
+	Attribute* entryAttribute = NULL;
+	if (S_ISDIR(st.st_mode) && (Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
+		entryAttribute = fTopAttribute->FindEntryChild(fileName);
+		if (entryAttribute != NULL && isImplicitEntry) {
 			Stacker<Attribute> entryAttributeStacker(fTopAttribute,
 				entryAttribute);
 			_AddDirectoryChildren(entry, fd, pathBuffer);
@@ -1596,49 +1597,55 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 		throw status_t(B_UNSUPPORTED);
 	}
 
-	// add attribute entry
-	Attribute* entryAttribute = _AddStringAttribute(
-		B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY, fileName);
+	// add attribute entry, if it doesn't already exist (update mode, directory)
+	bool isNewEntry = entryAttribute == NULL;
+	if (entryAttribute == NULL) {
+		entryAttribute = _AddStringAttribute(
+			B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY, fileName);
+	}
+
 	Stacker<Attribute> entryAttributeStacker(fTopAttribute, entryAttribute);
 
-	// add stat data
-	if (fileType != B_HPKG_DEFAULT_FILE_TYPE)
-		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_TYPE, fileType);
-	if (defaultPermissions != uint32(st.st_mode & ALLPERMS)) {
-		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_PERMISSIONS,
-			uint32(st.st_mode & ALLPERMS));
-	}
-	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_ATIME, uint32(st.st_atime));
-	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_MTIME, uint32(st.st_mtime));
+	if (isNewEntry) {
+		// add stat data
+		if (fileType != B_HPKG_DEFAULT_FILE_TYPE)
+			_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_TYPE, fileType);
+		if (defaultPermissions != uint32(st.st_mode & ALLPERMS)) {
+			_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_PERMISSIONS,
+				uint32(st.st_mode & ALLPERMS));
+		}
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_ATIME, uint32(st.st_atime));
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_MTIME, uint32(st.st_mtime));
 #ifdef __HAIKU__
-	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_crtime));
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_crtime));
 #else
-	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_mtime));
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_mtime));
 #endif
-	// TODO: File user/group!
+		// TODO: File user/group!
 
-	// add file data/symlink path
-	if (S_ISREG(st.st_mode)) {
-		// regular file -- add data
-		if (st.st_size > 0) {
-			BFDDataReader dataReader(fd);
-			status_t error = _AddData(dataReader, st.st_size);
-			if (error != B_OK)
-				throw status_t(error);
-		}
-	} else if (S_ISLNK(st.st_mode)) {
-		// symlink -- add link address
-		char path[B_PATH_NAME_LENGTH + 1];
-		ssize_t bytesRead = readlinkat(dirFD, fileName, path,
-			B_PATH_NAME_LENGTH);
-		if (bytesRead < 0) {
-			fListener->PrintError("Failed to read symlink \"%s\": %s\n",
-				pathBuffer, strerror(errno));
-			throw status_t(errno);
-		}
+		// add file data/symlink path
+		if (S_ISREG(st.st_mode)) {
+			// regular file -- add data
+			if (st.st_size > 0) {
+				BFDDataReader dataReader(fd);
+				status_t error = _AddData(dataReader, st.st_size);
+				if (error != B_OK)
+					throw status_t(error);
+			}
+		} else if (S_ISLNK(st.st_mode)) {
+			// symlink -- add link address
+			char path[B_PATH_NAME_LENGTH + 1];
+			ssize_t bytesRead = readlinkat(dirFD, fileName, path,
+				B_PATH_NAME_LENGTH);
+			if (bytesRead < 0) {
+				fListener->PrintError("Failed to read symlink \"%s\": %s\n",
+					pathBuffer, strerror(errno));
+				throw status_t(errno);
+			}
 
-		path[bytesRead] = '\0';
-		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_SYMLINK_PATH, path);
+			path[bytesRead] = '\0';
+			_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_SYMLINK_PATH, path);
+		}
 	}
 
 	// add attributes
