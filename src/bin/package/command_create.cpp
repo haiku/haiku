@@ -5,7 +5,6 @@
  */
 
 
-#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -22,6 +21,7 @@
 
 #include "package.h"
 #include "PackageWriterListener.h"
+#include "PackageWritingUtils.h"
 #include "StandardErrorOutput.h"
 
 
@@ -109,29 +109,9 @@ command_create(int argc, const char* const* argv)
 		}
 	}
 
-	// add all files of current directory
-	DIR* dir = opendir(".");
-	if (dir == NULL) {
-		listener.PrintError("Error: Failed to opendir '.': %s\n",
-			strerror(errno));
+	// add all files of the current directory, save for the .PackageInfo
+	if (add_current_directory_entries(packageWriter, listener, true) != B_OK)
 		return 1;
-	}
-
-	while (dirent* entry = readdir(dir)) {
-		// skip "." and ".."
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-
-		// also skip the .PackageInfo -- we'll add it later
-		if (strcmp(entry->d_name, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
-			continue;
-
-		result = packageWriter.AddEntry(entry->d_name);
-		if (result != B_OK)
-			return 1;
-	}
-
-	closedir(dir);
 
 	// add the .PackageInfo
 	result = packageWriter.AddEntry(B_HPKG_PACKAGE_INFO_FILE_NAME,
