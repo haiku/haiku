@@ -65,6 +65,12 @@ private:
 			void				_WriteAttributeChildren(Attribute* attribute);
 
 			void				_WritePackageAttributes(hpkg_header& header);
+			uint32				_WritePackageAttributesCompressed(
+									uint32& _stringsLengthUncompressed,
+									uint32& _attributesLengthUncompressed);
+			uint32				_WritePackageAttributesUncompressed(
+									uint32& _stringsLengthUncompressed,
+									uint32& _attributesLengthUncompressed);
 
 			void				_AddEntry(int dirFD, Entry* entry,
 									const char* fileName, char* pathBuffer);
