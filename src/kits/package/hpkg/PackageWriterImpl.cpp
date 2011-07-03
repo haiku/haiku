@@ -640,35 +640,81 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 {
 	// write the package attributes (zlib writer on top of a file writer)
 	off_t startOffset = fHeapEnd;
+
+	uint32 compression = B_HPKG_COMPRESSION_ZLIB;
+	uint32 stringsLengthUncompressed;
+	uint32 attributesLengthUncompressed;
+	uint32 stringsCount = _WritePackageAttributesCompressed(
+		stringsLengthUncompressed, attributesLengthUncompressed);
+
+	off_t endOffset = fHeapEnd;
+
+	if ((off_t)attributesLengthUncompressed <= endOffset - startOffset) {
+		// the compressed section isn't shorter -- write uncompressed
+		fHeapEnd = startOffset;
+		compression = B_HPKG_COMPRESSION_NONE;
+		stringsCount = _WritePackageAttributesUncompressed(
+			stringsLengthUncompressed, attributesLengthUncompressed);
+
+		endOffset = fHeapEnd;
+	}
+
+	fListener->OnPackageAttributesSizeInfo(stringsCount,
+		attributesLengthUncompressed);
+
+	// update the header
+	header.attributes_compression = B_HOST_TO_BENDIAN_INT32(compression);
+	header.attributes_length_compressed
+		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
+	header.attributes_length_uncompressed
+		= B_HOST_TO_BENDIAN_INT32(attributesLengthUncompressed);
+	header.attributes_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
+	header.attributes_strings_length
+		= B_HOST_TO_BENDIAN_INT32(stringsLengthUncompressed);
+}
+
+
+uint32
+PackageWriterImpl::_WritePackageAttributesCompressed(
+	uint32& _stringsLengthUncompressed, uint32& _attributesLengthUncompressed)
+{
+	off_t startOffset = fHeapEnd;
 	FDDataWriter realWriter(FD(), startOffset, fListener);
 	ZlibDataWriter zlibWriter(&realWriter);
 	SetDataWriter(&zlibWriter);
 	zlibWriter.Init();
 
 	// write cached strings and package attributes tree
-	uint32 stringsLengthUncompressed;
 	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
-		stringsLengthUncompressed);
+		_stringsLengthUncompressed);
 
 	zlibWriter.Finish();
 	fHeapEnd = realWriter.Offset();
 	SetDataWriter(NULL);
 
-	off_t endOffset = fHeapEnd;
+	_attributesLengthUncompressed = zlibWriter.BytesWritten();
+	return stringsCount;
+}
 
-	fListener->OnPackageAttributesSizeInfo(stringsCount,
-		zlibWriter.BytesWritten());
 
-	// update the header
-	header.attributes_compression
-		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
-	header.attributes_length_compressed
-		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
-	header.attributes_length_uncompressed
-		= B_HOST_TO_BENDIAN_INT32(zlibWriter.BytesWritten());
-	header.attributes_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
-	header.attributes_strings_length
-		= B_HOST_TO_BENDIAN_INT32(stringsLengthUncompressed);
+uint32
+PackageWriterImpl::_WritePackageAttributesUncompressed(
+	uint32& _stringsLengthUncompressed, uint32& _attributesLengthUncompressed)
+{
+	off_t startOffset = fHeapEnd;
+	FDDataWriter realWriter(FD(), startOffset, fListener);
+
+	SetDataWriter(&realWriter);
+
+	// write cached strings and package attributes tree
+	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
+		_stringsLengthUncompressed);
+
+	fHeapEnd = realWriter.Offset();
+	SetDataWriter(NULL);
+
+	_attributesLengthUncompressed = realWriter.BytesWritten();
+	return stringsCount;
 }
 
 
