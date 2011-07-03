@@ -81,7 +81,9 @@ rule ProcessCommandLineArguments
 				if $(JAM_TARGETS[1]) in update-image update-vmware-image
 						update-install {
 					SetUpdateHaikuImageOnly 1 ;
+					HAIKU_PACKAGES_UPDATE_ONLY = 1 ;
 					HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
+					HAIKU_INCLUDE_IN_PACKAGES on $(JAM_TARGETS[2-]) = 1 ;
 
 					if $(JAM_TARGETS[1]) = update-image {
 						JAM_TARGETS = haiku-image ;
