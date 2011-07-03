@@ -162,8 +162,6 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	# AddFilesToContainer <container> : <directoryTokens> : <targets>
 	#	[ : dest name ]
 	#
-	local directory = [ AddDirectoryToContainer $(container)
-		: $(directoryTokens) ] ;
 	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 	local systemDirTokens
 		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
@@ -191,6 +189,13 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 			}
 		}
 	}
+
+	if ! $(targets) {
+		return ;
+	}
+
+	local directory = [ AddDirectoryToContainer $(container)
+		: $(directoryTokens) ] ;
 
 	# We create a unique dummy target per target to install.
 	local installTargetsVar
