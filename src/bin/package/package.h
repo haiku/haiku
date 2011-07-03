@@ -8,6 +8,7 @@
 
 void	print_usage_and_exit(bool error);
 
+int		command_add(int argc, const char* const* argv);
 int		command_create(int argc, const char* const* argv);
 int		command_dump(int argc, const char* const* argv);
 int		command_extract(int argc, const char* const* argv);
