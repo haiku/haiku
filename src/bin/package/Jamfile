@@ -8,6 +8,7 @@ BinCommand package :
 	command_extract.cpp
 	command_list.cpp
 	package.cpp
+	PackageWriterListener.cpp
 	StandardErrorOutput.cpp
 
 	:
