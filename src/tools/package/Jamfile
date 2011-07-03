@@ -7,6 +7,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
 USES_BE_API on <build>package = true ;
 
 BuildPlatformMain <build>package :
+	command_add.cpp
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp

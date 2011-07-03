@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src bin package ;
 UsePrivateHeaders kernel shared ;
 
 BinCommand package :
+	command_add.cpp
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp

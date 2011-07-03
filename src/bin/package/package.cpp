@@ -23,10 +23,25 @@ static const char* kUsage =
 	"Creates, inspects, or extracts a Haiku package.\n"
 	"\n"
 	"Commands:\n"
+	"  add [ <options> ] <package> <entries>...\n"
+	"    Adds the specified entries <entries> to package file <package>.\n"
+	"\n"
+	"    -C <dir>   - Change to directory <dir> before adding entries.\n"
+	"    -f         - Force adding, replacing already existing entries. "
+		"Without\n"
+	"                 this option adding will fail when encountering a "
+		"pre-exiting\n"
+	"                 entry (directories will be merged, though).\n"
+	"    -i <info>  - Use the package info file <info>. It will be added as\n"
+	"                 \".PackageInfo\", overriding a \".PackageInfo\" file,\n"
+	"                 existing.\n"
+	"    -q         - Be quiet (don't show any output except for errors).\n"
+	"    -v         - Be verbose (show more info about created package).\n"
+	"\n"
 	"  create [ <options> ] <package>\n"
 	"    Creates package file <package> from contents of current directory.\n"
 	"\n"
-	"    -C <dir>   - Change to directory <dir> before starting.\n"
+	"    -C <dir>   - Change to directory <dir> before adding entries.\n"
 	"    -i <info>  - Use the package info file <info>. It will be added as\n"
 	"                 \".PackageInfo\", overriding a \".PackageInfo\" file,\n"
 	"                 existing.\n"
@@ -71,6 +86,9 @@ main(int argc, const char* const* argv)
 		print_usage_and_exit(true);
 
 	const char* command = argv[1];
+	if (strcmp(command, "add") == 0)
+		return command_add(argc - 1, argv + 1);
+
 	if (strcmp(command, "create") == 0)
 		return command_create(argc - 1, argv + 1);
 
