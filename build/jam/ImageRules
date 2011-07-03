@@ -157,6 +157,18 @@ rule IncludeAllTargetsInContainer container
 }
 
 
+rule PropagateContainerUpdateTargetFlags toTarget : fromTarget
+{
+	if [ on $(fromTarget) return $(HAIKU_INCLUDE_IN_IMAGE) ] {
+		HAIKU_INCLUDE_IN_IMAGE on $(toTarget) = 1 ;
+	}
+
+	if [ on $(fromTarget) return $(HAIKU_INCLUDE_IN_PACKAGES) ] {
+		HAIKU_INCLUDE_IN_PACKAGES on $(toTarget) = 1 ;
+	}
+}
+
+
 rule AddFilesToContainer container : directoryTokens : targets : destName
 {
 	# AddFilesToContainer <container> : <directoryTokens> : <targets>
