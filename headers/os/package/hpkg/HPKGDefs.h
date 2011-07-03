@@ -24,6 +24,18 @@ enum {
 };
 
 
+// package attribute IDs
+enum BHPKGPackageSectionID {
+	B_HPKG_SECTION_HEADER					= 0,
+	B_HPKG_SECTION_HEAP						= 1,
+	B_HPKG_SECTION_PACKAGE_TOC				= 2,
+	B_HPKG_SECTION_PACKAGE_ATTRIBUTES		= 3,
+	B_HPKG_SECTION_REPOSITORY_INFO			= 4,
+	//
+	B_HPKG_SECTION_ENUM_COUNT
+};
+
+
 // attribute types
 enum {
 	// types
