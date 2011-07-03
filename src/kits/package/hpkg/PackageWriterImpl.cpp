@@ -1316,40 +1316,85 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 {
 	// prepare the writer (zlib writer on top of a file writer)
 	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(FD(), startOffset, fListener);
+
+	// write the sections
+	uint32 compression = B_HPKG_COMPRESSION_ZLIB;
+	uint64 uncompressedStringsSize;
+	uint64 uncompressedMainSize;
+	uint64 tocUncompressedSize;
+	int32 cachedStringsWritten = _WriteTOCCompressed(uncompressedStringsSize,
+		uncompressedMainSize, tocUncompressedSize);
+
+	off_t endOffset = fHeapEnd;
+
+	if (endOffset - startOffset >= (off_t)tocUncompressedSize) {
+		// the compressed section isn't shorter -- write uncompressed
+		fHeapEnd = startOffset;
+		compression = B_HPKG_COMPRESSION_NONE;
+		cachedStringsWritten = _WriteTOCUncompressed(uncompressedStringsSize,
+			uncompressedMainSize, tocUncompressedSize);
+
+		endOffset = fHeapEnd;
+	}
+
+	fListener->OnTOCSizeInfo(uncompressedStringsSize, uncompressedMainSize,
+		tocUncompressedSize);
+
+	// update the header
+
+	// TOC
+	header.toc_compression = B_HOST_TO_BENDIAN_INT32(compression);
+	header.toc_length_compressed = B_HOST_TO_BENDIAN_INT64(
+		endOffset - startOffset);
+	header.toc_length_uncompressed = B_HOST_TO_BENDIAN_INT64(
+		tocUncompressedSize);
+
+	// TOC subsections
+	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(
+		uncompressedStringsSize);
+	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
+}
+
+
+int32
+PackageWriterImpl::_WriteTOCCompressed(uint64& _uncompressedStringsSize,
+	uint64& _uncompressedMainSize, uint64& _tocUncompressedSize)
+{
+	FDDataWriter realWriter(FD(), fHeapEnd, fListener);
 	ZlibDataWriter zlibWriter(&realWriter);
 	SetDataWriter(&zlibWriter);
 	zlibWriter.Init();
 
 	// write the sections
-	uint64 uncompressedStringsSize;
-	uint64 uncompressedMainSize;
 	int32 cachedStringsWritten
-		= _WriteTOCSections(uncompressedStringsSize, uncompressedMainSize);
+		= _WriteTOCSections(_uncompressedStringsSize, _uncompressedMainSize);
 
 	// finish the writer
 	zlibWriter.Finish();
 	fHeapEnd = realWriter.Offset();
 	SetDataWriter(NULL);
 
-	off_t endOffset = fHeapEnd;
+	_tocUncompressedSize = zlibWriter.BytesWritten();
+	return cachedStringsWritten;
+}
 
-	fListener->OnTOCSizeInfo(uncompressedStringsSize, uncompressedMainSize,
-		zlibWriter.BytesWritten());
 
-	// update the header
+int32
+PackageWriterImpl::_WriteTOCUncompressed(uint64& _uncompressedStringsSize,
+	uint64& _uncompressedMainSize, uint64& _tocUncompressedSize)
+{
+	FDDataWriter realWriter(FD(), fHeapEnd, fListener);
+	SetDataWriter(&realWriter);
 
-	// TOC
-	header.toc_compression = B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
-	header.toc_length_compressed = B_HOST_TO_BENDIAN_INT64(
-		endOffset - startOffset);
-	header.toc_length_uncompressed = B_HOST_TO_BENDIAN_INT64(
-		zlibWriter.BytesWritten());
+	// write the sections
+	int32 cachedStringsWritten
+		= _WriteTOCSections(_uncompressedStringsSize, _uncompressedMainSize);
 
-	// TOC subsections
-	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(
-		uncompressedStringsSize);
-	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
+	fHeapEnd = realWriter.Offset();
+	SetDataWriter(NULL);
+
+	_tocUncompressedSize = realWriter.BytesWritten();
+	return cachedStringsWritten;
 }
 
 

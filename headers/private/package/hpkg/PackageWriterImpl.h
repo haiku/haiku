@@ -79,6 +79,14 @@ private:
 			void				_AttributeRemoved(Attribute* attribute);
 
 			void				_WriteTOC(hpkg_header& header);
+			int32				_WriteTOCCompressed(
+									uint64& _uncompressedStringsSize,
+									uint64& _uncompressedMainSize,
+									uint64& _tocUncompressedSize);
+			int32				_WriteTOCUncompressed(
+									uint64& _uncompressedStringsSize,
+									uint64& _uncompressedMainSize,
+									uint64& _tocUncompressedSize);
 			int32				_WriteTOCSections(uint64& _stringsSize,
 									uint64& _mainSize);
 			void				_WriteAttributeChildren(Attribute* attribute);
