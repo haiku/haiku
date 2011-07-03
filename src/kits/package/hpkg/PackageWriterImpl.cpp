@@ -1144,7 +1144,8 @@ PackageWriterImpl::_MoveHeapChunk(off_t fromOffset, off_t toOffset, off_t size)
 			throw status_t(errno);
 		}
 		if ((size_t)bytesRead < toCopy) {
-			fListener->PrintError("Failed to read from package file.\n");
+			fListener->PrintError("Failed to read from package file (wanted "
+				"%zu bytes, got %zd).\n", toCopy, bytesRead);
 			throw status_t(B_IO_ERROR);
 		}
 
