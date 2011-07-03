@@ -448,7 +448,7 @@ PackageWriterImpl::_Finish()
 		_AddEntry(AT_FDCWD, entry, entry->Name(), pathBuffer);
 	}
 
-	off_t heapSize = fHeapEnd - sizeof(hpkg_header);
+	off_t heapSize = fHeapEnd - fHeapOffset;
 
 	hpkg_header header;
 
@@ -458,7 +458,7 @@ PackageWriterImpl::_Finish()
 
 	off_t totalSize = fHeapEnd;
 
-	fListener->OnPackageSizeInfo(sizeof(hpkg_header), heapSize,
+	fListener->OnPackageSizeInfo(fHeapOffset, heapSize,
 		B_BENDIAN_TO_HOST_INT64(header.toc_length_compressed),
 		B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed),
 		totalSize);
@@ -467,8 +467,7 @@ PackageWriterImpl::_Finish()
 
 	// general
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_MAGIC);
-	header.header_size = B_HOST_TO_BENDIAN_INT16(
-		(uint16)sizeof(hpkg_header));
+	header.header_size = B_HOST_TO_BENDIAN_INT16((uint16)fHeapOffset);
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_VERSION);
 	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
 
