@@ -1117,9 +1117,10 @@ PackageWriterImpl::_CompactHeap()
 	}
 
 	// move the final chunk
-	if (delta > 0 && chunkOffset < fHeapEnd) {
+	off_t heapSize = fHeapEnd - fHeapOffset;
+	if (delta > 0 && chunkOffset < heapSize) {
 		_MoveHeapChunk(chunkOffset, chunkOffset - delta,
-			fHeapEnd - chunkOffset);
+			heapSize - chunkOffset);
 	}
 
 	fHeapEnd -= delta;
