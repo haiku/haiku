@@ -327,8 +327,6 @@ PackageWriterImpl::AddEntry(const char* fileName, int fd)
 					return result;
 				}
 			}
-
-			RegisterPackageInfo(PackageAttributes(), fPackageInfo);
 		}
 
 		return _RegisterEntry(fileName, fd);
@@ -350,6 +348,8 @@ PackageWriterImpl::Finish()
 				B_HPKG_PACKAGE_INFO_FILE_NAME);
 			return B_BAD_DATA;
 		}
+
+		RegisterPackageInfo(PackageAttributes(), fPackageInfo);
 
 		status_t result = _CheckLicenses();
 		if (result != B_OK)
