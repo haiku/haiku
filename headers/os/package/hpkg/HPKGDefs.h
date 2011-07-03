@@ -157,6 +157,17 @@ enum {
 };
 
 
+// Writer Init() flags
+enum {
+	B_HPKG_WRITER_UPDATE_PACKAGE	= 0x01,
+		// update the package (don't truncate)
+	B_HPKG_WRITER_FORCE_ADD			= 0x02,
+		// when updating a pre-existing entry, don't fail, but replace the
+		// entry, if possible (directories will be merged, but won't replace a
+		// non-directory)
+};
+
+
 }	// namespace BHPKG
 
 }	// namespace BPackageKit

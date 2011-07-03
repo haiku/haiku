@@ -328,7 +328,7 @@ RepositoryWriterImpl::Finish()
 status_t
 RepositoryWriterImpl::_Init(const char* fileName)
 {
-	return inherited::Init(fileName, "repository");
+	return inherited::Init(fileName, "repository", 0);
 }
 
 

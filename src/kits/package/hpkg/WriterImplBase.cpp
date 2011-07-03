@@ -314,6 +314,7 @@ WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
 	:
 	fErrorOutput(errorOutput),
 	fFileName(NULL),
+	fFlags(0),
 	fFD(-1),
 	fFinished(false),
 	fDataWriter(NULL)
@@ -326,20 +327,25 @@ WriterImplBase::~WriterImplBase()
 	if (fFD >= 0)
 		close(fFD);
 
-	if (!fFinished && fFileName != NULL)
+	if (!fFinished && fFileName != NULL
+		&& (fFlags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
 		unlink(fFileName);
+	}
 }
 
 
 status_t
-WriterImplBase::Init(const char* fileName, const char* type)
+WriterImplBase::Init(const char* fileName, const char* type, uint32 flags)
 {
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
-	// open file
-	fFD = open(fileName, O_WRONLY | O_CREAT | O_TRUNC,
-		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	// open file (don't truncate in update mode)
+	int openMode = O_RDWR;
+	if ((flags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
+		openMode |= O_CREAT | O_TRUNC;
+
+	fFD = open(fileName, openMode, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fFD < 0) {
 		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n", type,
 			fileName, strerror(errno));
@@ -347,6 +353,7 @@ WriterImplBase::Init(const char* fileName, const char* type)
 	}
 
 	fFileName = fileName;
+	fFlags = flags;
 
 	return B_OK;
 }

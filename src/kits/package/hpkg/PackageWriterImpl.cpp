@@ -26,12 +26,21 @@
 #include <fs_attr.h>
 #include <Path.h>
 
+#include <package/BlockBufferCacheNoLock.h>
+
+#include <package/hpkg/PackageAttributeValue.h>
+#include <package/hpkg/PackageContentHandler.h>
+#include <package/hpkg/PackageData.h>
+#include <package/hpkg/PackageDataReader.h>
+
 #include <AutoDeleter.h>
+#include <RangeArray.h>
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
+#include <package/hpkg/PackageReaderImpl.h>
 #include <package/hpkg/Stacker.h>
 
 
@@ -79,11 +88,175 @@ struct PackageWriterImpl::Attribute
 		children.Add(child);
 	}
 
+	void RemoveChild(Attribute* child)
+	{
+		children.Remove(child);
+	}
+
 	void DeleteChildren()
 	{
 		while (Attribute* child = children.RemoveHead())
 			delete child;
 	}
+
+	Attribute* FindEntryChild(const char* fileName) const
+	{
+		for (DoublyLinkedList<Attribute>::ConstIterator it
+				= children.GetIterator(); Attribute* child = it.Next();) {
+			if (child->id != B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY)
+				continue;
+			if (child->value.type != B_HPKG_ATTRIBUTE_TYPE_STRING)
+				continue;
+			const char* childName = child->value.string->string;
+			if (strcmp(fileName, childName) == 0)
+				return child;
+		}
+
+		return NULL;
+	}
+
+	Attribute* FindEntryChild(const char* fileName, size_t nameLength) const
+	{
+		BString name(fileName, nameLength);
+		return (size_t)name.Length() == nameLength
+			? FindEntryChild(name) : NULL;
+	}
+
+	Attribute* FindNodeAttributeChild(const char* attributeName) const
+	{
+		for (DoublyLinkedList<Attribute>::ConstIterator it
+				= children.GetIterator(); Attribute* child = it.Next();) {
+			if (child->id != B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE)
+				continue;
+			if (child->value.type != B_HPKG_ATTRIBUTE_TYPE_STRING)
+				continue;
+			const char* childName = child->value.string->string;
+			if (strcmp(attributeName, childName) == 0)
+				return child;
+		}
+
+		return NULL;
+	}
+
+	Attribute* ChildWithID(BHPKGAttributeID id) const
+	{
+		for (DoublyLinkedList<Attribute>::ConstIterator it
+				= children.GetIterator(); Attribute* child = it.Next();) {
+			if (child->id == id)
+				return child;
+		}
+
+		return NULL;
+	}
+};
+
+
+// #pragma mark - PackageContentHandler
+
+
+struct PackageWriterImpl::PackageContentHandler
+	: BLowLevelPackageContentHandler {
+	PackageContentHandler(Attribute* rootAttribute, BErrorOutput* errorOutput,
+		StringCache& stringCache, uint64 heapOffset)
+		:
+		fErrorOutput(errorOutput),
+		fStringCache(stringCache),
+		fRootAttribute(rootAttribute),
+		fHeapOffset(heapOffset),
+		fErrorOccurred(false)
+	{
+	}
+
+static const char* AttributeNameForID(uint8 id)
+{
+	return BLowLevelPackageContentHandler::AttributeNameForID(id);
+}
+
+	virtual status_t HandleSectionStart(BHPKGPackageSectionID sectionID,
+		bool& _handleSection)
+	{
+		// we're only interested in the TOC
+		_handleSection = sectionID == B_HPKG_SECTION_PACKAGE_TOC;
+		return B_OK;
+	}
+
+	virtual status_t HandleSectionEnd(BHPKGPackageSectionID sectionID)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleAttribute(BHPKGAttributeID attributeID,
+		const BPackageAttributeValue& value, void* parentToken, void*& _token)
+	{
+		if (fErrorOccurred)
+			return B_OK;
+
+		Attribute* parentAttribute = parentToken != NULL
+			? (Attribute*)parentToken : fRootAttribute;
+
+		Attribute* attribute = new Attribute(attributeID);
+		parentAttribute->AddChild(attribute);
+
+		switch (value.type) {
+			case B_HPKG_ATTRIBUTE_TYPE_INT:
+				attribute->value.SetTo(value.signedInt);
+				break;
+
+			case B_HPKG_ATTRIBUTE_TYPE_UINT:
+				attribute->value.SetTo(value.unsignedInt);
+				break;
+
+			case B_HPKG_ATTRIBUTE_TYPE_STRING:
+			{
+				CachedString* string = fStringCache.Get(value.string);
+				if (string == NULL)
+					throw std::bad_alloc();
+				attribute->value.SetTo(string);
+				break;
+			}
+
+			case B_HPKG_ATTRIBUTE_TYPE_RAW:
+				if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP) {
+					attribute->value.SetToData(value.data.size,
+						value.data.offset - fHeapOffset);
+				} else if (value.encoding
+						== B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
+					attribute->value.SetToData(value.data.size, value.data.raw);
+				} else {
+					fErrorOutput->PrintError("Invalid attribute value encoding "
+						"%d (attribute %d)\n", value.encoding, attributeID);
+					return B_BAD_DATA;
+				}
+				break;
+
+			case B_HPKG_ATTRIBUTE_TYPE_INVALID:
+			default:
+				fErrorOutput->PrintError("Invalid attribute value type %d "
+					"(attribute %d)\n", value.type, attributeID);
+				return B_BAD_DATA;
+		}
+
+		_token = attribute;
+		return B_OK;
+	}
+
+	virtual status_t HandleAttributeDone(BHPKGAttributeID attributeID,
+		const BPackageAttributeValue& value, void* parentToken, void* token)
+	{
+		return B_OK;
+	}
+
+	virtual void HandleErrorOccurred()
+	{
+		fErrorOccurred = true;
+	}
+
+private:
+	BErrorOutput*	fErrorOutput;
+	StringCache&	fStringCache;
+	Attribute*		fRootAttribute;
+	uint64			fHeapOffset;
+	bool			fErrorOccurred;
 };
 
 
@@ -223,6 +396,40 @@ private:
 };
 
 
+struct PackageWriterImpl::HeapAttributeOffsetter {
+	HeapAttributeOffsetter(const RangeArray<off_t>& ranges,
+		const Array<off_t>& deltas)
+		:
+		fRanges(ranges),
+		fDeltas(deltas)
+	{
+	}
+
+	void ProcessAttribute(Attribute* attribute)
+	{
+		// If the attribute refers to a heap value, adjust it
+		AttributeValue& value = attribute->value;
+
+		if (value.type == B_HPKG_ATTRIBUTE_TYPE_RAW
+			&& value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP) {
+			off_t delta = fDeltas[fRanges.InsertionIndex(value.data.offset)];
+			value.data.offset -= delta;
+		}
+
+		// recurse
+		for (DoublyLinkedList<Attribute>::Iterator it
+					= attribute->children.GetIterator();
+				Attribute* child = it.Next();) {
+			ProcessAttribute(child);
+		}
+	}
+
+private:
+	const RangeArray<off_t>&	fRanges;
+	const Array<off_t>&			fDeltas;
+};
+
+
 // #pragma mark - PackageWriterImpl (Inline Methods)
 
 
@@ -243,6 +450,7 @@ PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 	:
 	inherited(listener),
 	fListener(listener),
+	fHeapRangesToRemove(NULL),
 	fDataBuffer(NULL),
 	fDataBufferSize(2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB),
 	fRootEntry(NULL),
@@ -263,10 +471,10 @@ PackageWriterImpl::~PackageWriterImpl()
 
 
 status_t
-PackageWriterImpl::Init(const char* fileName)
+PackageWriterImpl::Init(const char* fileName, uint32 flags)
 {
 	try {
-		return _Init(fileName);
+		return _Init(fileName, flags);
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
@@ -343,6 +551,16 @@ status_t
 PackageWriterImpl::Finish()
 {
 	try {
+		RangeArray<off_t> heapRangesToRemove;
+		fHeapRangesToRemove = &heapRangesToRemove;
+
+		if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
+			_UpdateCheckEntryCollisions();
+
+			if (fPackageInfo.InitCheck() != B_OK)
+				_UpdateReadPackageInfo();
+		}
+
 		if (fPackageInfo.InitCheck() != B_OK) {
 			fListener->PrintError("No package-info file found (%s)!\n",
 				B_HPKG_PACKAGE_INFO_FILE_NAME);
@@ -355,6 +573,11 @@ PackageWriterImpl::Finish()
 		if (result != B_OK)
 			return result;
 
+		if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0)
+			_CompactHeap();
+
+		fHeapRangesToRemove = NULL;
+
 		return _Finish();
 	} catch (status_t error) {
 		return error;
@@ -366,9 +589,9 @@ PackageWriterImpl::Finish()
 
 
 status_t
-PackageWriterImpl::_Init(const char* fileName)
+PackageWriterImpl::_Init(const char* fileName, uint32 flags)
 {
-	status_t result = inherited::Init(fileName, "package");
+	status_t result = inherited::Init(fileName, "package", flags);
 	if (result != B_OK)
 		return result;
 
@@ -387,6 +610,29 @@ PackageWriterImpl::_Init(const char* fileName)
 
 	fHeapOffset = fHeapEnd = sizeof(hpkg_header);
 	fTopAttribute = fRootAttribute;
+
+	// in update mode, parse the TOC
+	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
+		PackageReaderImpl packageReader(fListener);
+		result = packageReader.Init(FD(), false);
+		if (result != B_OK)
+			return result;
+
+		fHeapOffset = packageReader.HeapOffset();
+		fHeapEnd = fHeapOffset + packageReader.HeapSize();
+
+		PackageContentHandler handler(fRootAttribute, fListener, fStringCache,
+			fHeapOffset);
+
+		result = packageReader.ParseContent(&handler);
+		if (result != B_OK)
+			return result;
+
+		if ((uint64)fHeapOffset > packageReader.HeapOffset()) {
+			fListener->PrintError("Unexpected heap offset in package file.\n");
+			return B_BAD_DATA;
+		}
+	}
 
 	return B_OK;
 }
@@ -412,7 +658,6 @@ PackageWriterImpl::_CheckLicenses()
 	}
 
 	BDirectory systemLicenseDir(systemLicensePath.Path());
-	BDirectory packageLicenseDir("./data/licenses");
 
 	const BObjectList<BString>& licenseList = fPackageInfo.LicenseList();
 	for (int i = 0; i < licenseList.CountItems(); ++i) {
@@ -425,8 +670,10 @@ PackageWriterImpl::_CheckLicenses()
 			continue;
 
 		// license is not a system license, so it must be contained in package
-		if (packageLicenseDir.FindEntry(licenseName.String(),
-				&license) != B_OK) {
+		BString licensePath("data/licenses/");
+		licensePath << licenseName;
+
+		if (!_IsEntryInPackage(licensePath)) {
 			fListener->PrintError("License '%s' isn't contained in package!\n",
 				licenseName.String());
 			return B_BAD_DATA;
@@ -434,6 +681,507 @@ PackageWriterImpl::_CheckLicenses()
 	}
 
 	return B_OK;
+}
+
+
+bool
+PackageWriterImpl::_IsEntryInPackage(const char* fileName)
+{
+	const char* originalFileName = fileName;
+
+	// find the closest ancestor of the entry that is in the added entries
+	bool added = false;
+	Entry* entry = fRootEntry;
+	while (entry != NULL) {
+		if (!entry->IsImplicit()) {
+			added = true;
+			break;
+		}
+
+		if (*fileName == '\0')
+			break;
+
+		const char* nextSlash = strchr(fileName, '/');
+
+		if (nextSlash == NULL) {
+			// no slash, just the file name
+			size_t length = strlen(fileName);
+			entry  = entry->GetChild(fileName, length);
+			fileName += length;
+			continue;
+		}
+
+		// find the start of the next component, skipping slashes
+		const char* nextComponent = nextSlash + 1;
+		while (*nextComponent == '/')
+			nextComponent++;
+
+		entry = entry->GetChild(fileName, nextSlash - fileName);
+
+		fileName = nextComponent;
+	}
+
+	if (added) {
+		// the entry itself or one of its ancestors has been added to the
+		// package explicitly -- stat it, to see, if it exists
+		struct stat st;
+		if (entry->FD() >= 0) {
+			if (fstatat(entry->FD(), *fileName != '\0' ? fileName : NULL, &st,
+					AT_SYMLINK_NOFOLLOW) == 0) {
+				return true;
+			}
+		} else {
+			if (lstat(originalFileName, &st) == 0)
+				return true;
+		}
+	}
+
+	// In update mode the entry might already be in the package.
+	Attribute* attribute = fRootAttribute;
+	fileName = originalFileName;
+
+	while (attribute != NULL) {
+		if (*fileName == '\0')
+			return true;
+
+		const char* nextSlash = strchr(fileName, '/');
+
+		if (nextSlash == NULL) {
+			// no slash, just the file name
+			return attribute->FindEntryChild(fileName) != NULL;
+		}
+
+		// find the start of the next component, skipping slashes
+		const char* nextComponent = nextSlash + 1;
+		while (*nextComponent == '/')
+			nextComponent++;
+
+		attribute = attribute->FindEntryChild(fileName, nextSlash - fileName);
+
+		fileName = nextComponent;
+	}
+
+	return false;
+}
+
+
+void
+PackageWriterImpl::_UpdateReadPackageInfo()
+{
+	// get the .PackageInfo entry attribute
+	Attribute* attribute = fRootAttribute->FindEntryChild(
+		B_HPKG_PACKAGE_INFO_FILE_NAME);
+	if (attribute == NULL) {
+		fListener->PrintError("No %s in package file.\n",
+			B_HPKG_PACKAGE_INFO_FILE_NAME);
+		throw status_t(B_BAD_DATA);
+	}
+
+	// get the data attribute
+	Attribute* dataAttribute = attribute->ChildWithID(B_HPKG_ATTRIBUTE_ID_DATA);
+	if (dataAttribute == NULL)  {
+		fListener->PrintError("%s entry in package file doesn't have data.\n",
+			B_HPKG_PACKAGE_INFO_FILE_NAME);
+		throw status_t(B_BAD_DATA);
+	}
+
+	AttributeValue& value = dataAttribute->value;
+	if (value.type != B_HPKG_ATTRIBUTE_TYPE_RAW) {
+		fListener->PrintError("%s entry in package file has an invalid data "
+			"attribute (not of type raw).\n", B_HPKG_PACKAGE_INFO_FILE_NAME);
+		throw status_t(B_BAD_DATA);
+	}
+
+	BPackageData data;
+	if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE)
+		data.SetData(value.data.size, value.data.raw);
+	else
+		data.SetData(value.data.size, value.data.offset + fHeapOffset);
+
+	// get the compression
+	uint8 compression = B_HPKG_DEFAULT_DATA_COMPRESSION;
+	if (Attribute* compressionAttribute = dataAttribute->ChildWithID(
+			B_HPKG_ATTRIBUTE_ID_DATA_COMPRESSION)) {
+		if (compressionAttribute->value.type != B_HPKG_ATTRIBUTE_TYPE_UINT) {
+			fListener->PrintError("%s entry in package file has an invalid "
+				"data compression attribute (not of type uint).\n",
+				B_HPKG_PACKAGE_INFO_FILE_NAME);
+			throw status_t(B_BAD_DATA);
+		}
+		compression = compressionAttribute->value.unsignedInt;
+	}
+
+	data.SetCompression(compression);
+
+	// get the size
+	uint64 size;
+	Attribute* sizeAttribute = dataAttribute->ChildWithID(
+		B_HPKG_ATTRIBUTE_ID_DATA_SIZE);
+	if (sizeAttribute == NULL) {
+		size = value.data.size;
+	} else if (sizeAttribute->value.type != B_HPKG_ATTRIBUTE_TYPE_UINT) {
+		fListener->PrintError("%s entry in package file has an invalid data "
+			"size attribute (not of type uint).\n",
+			B_HPKG_PACKAGE_INFO_FILE_NAME);
+		throw status_t(B_BAD_DATA);
+	} else
+		size = sizeAttribute->value.unsignedInt;
+
+	data.SetUncompressedSize(size);
+
+	// get the chunk size
+	uint64 chunkSize = compression == B_HPKG_COMPRESSION_ZLIB
+		? B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB : 0;
+	if (Attribute* chunkSizeAttribute = dataAttribute->ChildWithID(
+			B_HPKG_ATTRIBUTE_ID_DATA_CHUNK_SIZE)) {
+		if (chunkSizeAttribute->value.type != B_HPKG_ATTRIBUTE_TYPE_UINT) {
+			fListener->PrintError("%s entry in package file has an invalid "
+				"data chunk size attribute (not of type uint).\n",
+				B_HPKG_PACKAGE_INFO_FILE_NAME);
+			throw status_t(B_BAD_DATA);
+		}
+		chunkSize = chunkSizeAttribute->value.unsignedInt;
+	}
+
+	data.SetChunkSize(chunkSize);
+
+	// read the value into a string
+	BString valueString;
+	char* valueBuffer = valueString.LockBuffer(size);
+	if (valueBuffer == NULL)
+		throw std::bad_alloc();
+
+	if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
+		// data encoded inline -- just copy to buffer
+		if (size != value.data.size) {
+			fListener->PrintError("%s entry in package file has an invalid "
+				"data attribute (mismatching size).\n",
+				B_HPKG_PACKAGE_INFO_FILE_NAME);
+			throw status_t(B_BAD_DATA);
+		}
+		memcpy(valueBuffer, value.data.raw, value.data.size);
+	} else {
+		// data on heap -- read from there
+		BBlockBufferCacheNoLock	bufferCache(16 * 1024, 1);
+		status_t error = bufferCache.Init();
+		if (error != B_OK) {
+			fListener->PrintError("Failed to initialize buffer cache: %s\n",
+				strerror(error));
+			throw status_t(error);
+		}
+
+		// create a BPackageDataReader
+		BFDDataReader packageFileReader(FD());
+		BPackageDataReader* reader;
+		error = BPackageDataReaderFactory(&bufferCache)
+			.CreatePackageDataReader(&packageFileReader, data, reader);
+		if (error != B_OK) {
+			fListener->PrintError("Failed to create package data reader: %s\n",
+				strerror(error));
+			throw status_t(error);
+		}
+		ObjectDeleter<BPackageDataReader> readerDeleter(reader);
+
+		// read the data
+		error = reader->ReadData(0, valueBuffer, size);
+		if (error != B_OK) {
+			fListener->PrintError("Failed to read data of %s entry in package "
+				"file: %s\n", B_HPKG_PACKAGE_INFO_FILE_NAME, strerror(error));
+			throw status_t(error);
+		}
+	}
+
+	valueString.UnlockBuffer();
+
+	// parse the package info
+	status_t error = fPackageInfo.ReadFromConfigString(valueString);
+	if (error != B_OK) {
+		fListener->PrintError("Failed to parse package info data from package "
+			"file: %s\n", strerror(error));
+		throw status_t(error);
+	}
+}
+
+
+void
+PackageWriterImpl::_UpdateCheckEntryCollisions()
+{
+	for (EntryList::ConstIterator it = fRootEntry->ChildIterator();
+			Entry* entry = it.Next();) {
+		char pathBuffer[B_PATH_NAME_LENGTH];
+		pathBuffer[0] = '\0';
+		_UpdateCheckEntryCollisions(fRootAttribute, AT_FDCWD, entry,
+			entry->Name(), pathBuffer);
+	}
+}
+
+
+void
+PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
+	int dirFD, Entry* entry, const char* fileName, char* pathBuffer)
+{
+	bool isImplicitEntry = entry != NULL && entry->IsImplicit();
+
+	SubPathAdder pathAdder(fListener, pathBuffer, fileName);
+
+	// Check wether there's an entry attribute for this entry. If not, we can
+	// ignore this entry.
+	Attribute* entryAttribute = parentAttribute->FindEntryChild(fileName);
+	if (entryAttribute == NULL)
+		return;
+
+	// open the node
+	int fd;
+	FileDescriptorCloser fdCloser;
+
+	if (entry != NULL && entry->FD() >= 0) {
+		// a file descriptor is already given -- use that
+		fd = entry->FD();
+	} else {
+		fd = openat(dirFD, fileName,
+			O_RDONLY | (isImplicitEntry ? 0 : O_NOTRAVERSE));
+		if (fd < 0) {
+			fListener->PrintError("Failed to open entry \"%s\": %s\n",
+				pathBuffer, strerror(errno));
+			throw status_t(errno);
+		}
+		fdCloser.SetTo(fd);
+	}
+
+	// stat the node
+	struct stat st;
+	if (fstat(fd, &st) < 0) {
+		fListener->PrintError("Failed to fstat() file \"%s\": %s\n", pathBuffer,
+			strerror(errno));
+		throw status_t(errno);
+	}
+
+	// implicit entries must be directories
+	if (isImplicitEntry && !S_ISDIR(st.st_mode)) {
+		fListener->PrintError("Non-leaf path component \"%s\" is not a "
+			"directory.\n", pathBuffer);
+		throw status_t(B_BAD_VALUE);
+	}
+
+	// get the pre-existing node's file type
+	uint32 preExistingFileType = B_HPKG_DEFAULT_FILE_TYPE;
+	if (Attribute* fileTypeAttribute
+			= entryAttribute->ChildWithID(B_HPKG_ATTRIBUTE_ID_FILE_TYPE)) {
+		if (fileTypeAttribute->value.type == B_HPKG_ATTRIBUTE_TYPE_UINT)
+			preExistingFileType = fileTypeAttribute->value.unsignedInt;
+	}
+
+	// Compare the node type with that of the pre-existing one.
+	if (!S_ISDIR(st.st_mode)) {
+		// the pre-existing must not a directory either -- we'll remove it
+		if (preExistingFileType == B_HPKG_FILE_TYPE_DIRECTORY) {
+			fListener->PrintError("Specified file \"%s\" clashes with an "
+				"archived directory.\n", pathBuffer);
+			throw status_t(B_BAD_VALUE);
+		}
+
+		if ((Flags() & B_HPKG_WRITER_FORCE_ADD) == 0) {
+			fListener->PrintError("Specified file \"%s\" clashes with an "
+				"archived file.\n", pathBuffer);
+			throw status_t(B_FILE_EXISTS);
+		}
+
+		parentAttribute->RemoveChild(entryAttribute);
+		_AttributeRemoved(entryAttribute);
+
+		return;
+	}
+
+	// the pre-existing entry needs to be a directory too -- we will merge
+	if (preExistingFileType != B_HPKG_FILE_TYPE_DIRECTORY) {
+		fListener->PrintError("Specified directory \"%s\" clashes with an "
+			"archived non-directory.\n", pathBuffer);
+		throw status_t(B_BAD_VALUE);
+	}
+
+	// directory -- recursively add children
+	if (isImplicitEntry) {
+		// this is an implicit entry -- just check the child entries
+		for (EntryList::ConstIterator it = entry->ChildIterator();
+				Entry* child = it.Next();) {
+			_UpdateCheckEntryCollisions(entryAttribute, fd, child,
+				child->Name(), pathBuffer);
+		}
+	} else {
+		// explicitly specified directory -- we need to read the directory
+
+		// first we check for colliding node attributes, though
+		if (DIR* attrDir = fs_fopen_attr_dir(fd)) {
+			CObjectDeleter<DIR, int> attrDirCloser(attrDir, fs_close_attr_dir);
+
+			while (dirent* entry = fs_read_attr_dir(attrDir)) {
+				attr_info attrInfo;
+				if (fs_stat_attr(fd, entry->d_name, &attrInfo) < 0) {
+					fListener->PrintError(
+						"Failed to stat attribute \"%s\" of directory \"%s\": "
+						"%s\n", entry->d_name, pathBuffer, strerror(errno));
+					throw status_t(errno);
+				}
+
+				// check whether the attribute exists
+				Attribute* attributeAttribute
+					= entryAttribute->FindNodeAttributeChild(entry->d_name);
+				if (attributeAttribute == NULL)
+					continue;
+
+				if ((Flags() & B_HPKG_WRITER_FORCE_ADD) == 0) {
+					fListener->PrintError("Attribute \"%s\" of specified "
+						"directory \"%s\" clashes with an archived "
+						"attribute.\n", pathBuffer);
+					throw status_t(B_FILE_EXISTS);
+				}
+
+				// remove it
+				entryAttribute->RemoveChild(attributeAttribute);
+				_AttributeRemoved(attributeAttribute);
+			}
+		}
+
+		// we need to clone the directory FD for fdopendir()
+		int clonedFD = dup(fd);
+		if (clonedFD < 0) {
+			fListener->PrintError(
+				"Failed to dup() directory FD: %s\n", strerror(errno));
+			throw status_t(errno);
+		}
+
+		DIR* dir = fdopendir(clonedFD);
+		if (dir == NULL) {
+			fListener->PrintError(
+				"Failed to open directory \"%s\": %s\n", pathBuffer,
+				strerror(errno));
+			close(clonedFD);
+			throw status_t(errno);
+		}
+		CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+
+		while (dirent* entry = readdir(dir)) {
+			// skip "." and ".."
+			if (strcmp(entry->d_name, ".") == 0
+				|| strcmp(entry->d_name, "..") == 0) {
+				continue;
+			}
+
+			_AddEntry(fd, NULL, entry->d_name, pathBuffer);
+			_UpdateCheckEntryCollisions(entryAttribute, fd, NULL, entry->d_name,
+				pathBuffer);
+		}
+	}
+}
+
+
+void
+PackageWriterImpl::_CompactHeap()
+{
+	int32 count = fHeapRangesToRemove->CountRanges();
+	if (count == 0)
+		return;
+
+	// compute the move deltas for the ranges
+	Array<off_t> deltas;
+	off_t delta = 0;
+	for (int32 i = 0; i < count; i++) {
+		if (!deltas.Add(delta))
+			throw std::bad_alloc();
+
+		delta += fHeapRangesToRemove->RangeAt(i).size;
+	}
+
+	if (!deltas.Add(delta))
+		throw std::bad_alloc();
+
+	// offset the attributes
+	HeapAttributeOffsetter(*fHeapRangesToRemove, deltas).ProcessAttribute(
+		fRootAttribute);
+
+	// move the heap chunks in the file around
+	off_t chunkOffset = fHeapOffset;
+	delta = 0;
+
+	for (int32 i = 0; i < count; i++) {
+		const Range<off_t>& range = fHeapRangesToRemove->RangeAt(i);
+
+		if (delta > 0 && chunkOffset < range.offset) {
+			// move chunk
+			_MoveHeapChunk(chunkOffset, chunkOffset - delta,
+				range.offset - chunkOffset);
+		}
+
+		chunkOffset = range.EndOffset();
+		delta += range.size;
+	}
+
+	// move the final chunk
+	if (delta > 0 && chunkOffset < fHeapEnd) {
+		_MoveHeapChunk(chunkOffset, chunkOffset - delta,
+			fHeapEnd - chunkOffset);
+	}
+
+	fHeapEnd -= delta;
+}
+
+
+void
+PackageWriterImpl::_MoveHeapChunk(off_t fromOffset, off_t toOffset, off_t size)
+{
+	// convert heap offsets to file offsets
+	fromOffset += fHeapOffset;
+	toOffset += fHeapOffset;
+
+	while (size > 0) {
+		size_t toCopy = std::min(size, (off_t)fDataBufferSize);
+
+		// read data into buffer
+		ssize_t bytesRead = read_pos(FD(), fromOffset, fDataBuffer, toCopy);
+		if (bytesRead < 0) {
+			fListener->PrintError("Failed to read from package file: %s\n",
+				strerror(errno));
+			throw status_t(errno);
+		}
+		if ((size_t)bytesRead < toCopy) {
+			fListener->PrintError("Failed to read from package file.\n");
+			throw status_t(B_IO_ERROR);
+		}
+
+		// write data to target offset
+		ssize_t bytesWritten = write_pos(FD(), toOffset, fDataBuffer, toCopy);
+		if (bytesWritten < 0) {
+			fListener->PrintError("Failed to write to package file: %s\n",
+				strerror(errno));
+			throw status_t(errno);
+		}
+		if ((size_t)bytesWritten < toCopy) {
+			fListener->PrintError("Failed to write to package file.\n");
+			throw status_t(B_IO_ERROR);
+		}
+
+		fromOffset += toCopy;
+		toOffset += toCopy;
+		size -= toCopy;
+	}
+}
+
+
+void
+PackageWriterImpl::_AttributeRemoved(Attribute* attribute)
+{
+	AttributeValue& value = attribute->value;
+	if (value.type == B_HPKG_ATTRIBUTE_TYPE_RAW
+		&& value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP) {
+		if (!fHeapRangesToRemove->AddRange(value.data.offset, value.data.size))
+			throw std::bad_alloc();
+	}
+
+	for (DoublyLinkedList<Attribute>::Iterator it
+				= attribute->children.GetIterator();
+			Attribute* child = it.Next();) {
+		_AttributeRemoved(child);
+	}
 }
 
 
@@ -457,6 +1205,16 @@ PackageWriterImpl::_Finish()
 	_WritePackageAttributes(header);
 
 	off_t totalSize = fHeapEnd;
+
+	// Truncate the file to the size it is supposed to have. In update mode, it
+	// can be greater when one or more files are shrunk. In creation mode, when
+	// writing compressed TOC or package attributes yields a larger size than
+	// uncompressed, the file size may also be greater than it should be.
+	if (ftruncate(FD(), totalSize) != 0) {
+		fListener->PrintError("Failed to truncate package file to new "
+			"size: %s\n", strerror(errno));
+		return errno;
+	}
 
 	fListener->OnPackageSizeInfo(fHeapOffset, heapSize,
 		B_BENDIAN_TO_HOST_INT64(header.toc_length_compressed),
@@ -761,6 +1519,18 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 		throw status_t(B_BAD_VALUE);
 	}
 
+	// In update mode we don't need to add an entry attribute for an implicit
+	// directory, if there already is one.
+	if (isImplicitEntry && (Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
+		Attribute* entryAttribute = fTopAttribute->FindEntryChild(fileName);
+		if (entryAttribute != NULL) {
+			Stacker<Attribute> entryAttributeStacker(fTopAttribute,
+				entryAttribute);
+			_AddDirectoryChildren(entry, fd, pathBuffer);
+			return;
+		}
+	}
+
 	// check/translate the node type
 	uint8 fileType;
 	uint32 defaultPermissions;
@@ -856,42 +1626,48 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 		}
 	}
 
-	if (S_ISDIR(st.st_mode)) {
-		// directory -- recursively add children
-		if (isImplicitEntry) {
-			// this is an implicit entry -- just add it's children
-			for (EntryList::ConstIterator it = entry->ChildIterator();
-					Entry* child = it.Next();) {
-				_AddEntry(fd, child, child->Name(), pathBuffer);
-			}
-		} else {
-			// we need to clone the directory FD for fdopendir()
-			int clonedFD = dup(fd);
-			if (clonedFD < 0) {
-				fListener->PrintError(
-					"Failed to dup() directory FD: %s\n", strerror(errno));
-				throw status_t(errno);
+	if (S_ISDIR(st.st_mode))
+		_AddDirectoryChildren(entry, fd, pathBuffer);
+}
+
+
+void
+PackageWriterImpl::_AddDirectoryChildren(Entry* entry, int fd, char* pathBuffer)
+{
+	// directory -- recursively add children
+	if (entry != NULL && entry->IsImplicit()) {
+		// this is an implicit entry -- just add it's children
+		for (EntryList::ConstIterator it = entry->ChildIterator();
+				Entry* child = it.Next();) {
+			_AddEntry(fd, child, child->Name(), pathBuffer);
+		}
+	} else {
+		// we need to clone the directory FD for fdopendir()
+		int clonedFD = dup(fd);
+		if (clonedFD < 0) {
+			fListener->PrintError(
+				"Failed to dup() directory FD: %s\n", strerror(errno));
+			throw status_t(errno);
+		}
+
+		DIR* dir = fdopendir(clonedFD);
+		if (dir == NULL) {
+			fListener->PrintError(
+				"Failed to open directory \"%s\": %s\n", pathBuffer,
+				strerror(errno));
+			close(clonedFD);
+			throw status_t(errno);
+		}
+		CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+
+		while (dirent* entry = readdir(dir)) {
+			// skip "." and ".."
+			if (strcmp(entry->d_name, ".") == 0
+				|| strcmp(entry->d_name, "..") == 0) {
+				continue;
 			}
 
-			DIR* dir = fdopendir(clonedFD);
-			if (dir == NULL) {
-				fListener->PrintError(
-					"Failed to open directory \"%s\": %s\n", pathBuffer,
-					strerror(errno));
-				close(clonedFD);
-				throw status_t(errno);
-			}
-			CObjectDeleter<DIR, int> dirCloser(dir, closedir);
-
-			while (dirent* entry = readdir(dir)) {
-				// skip "." and ".."
-				if (strcmp(entry->d_name, ".") == 0
-					|| strcmp(entry->d_name, "..") == 0) {
-					continue;
-				}
-
-				_AddEntry(fd, NULL, entry->d_name, pathBuffer);
-			}
+			_AddEntry(fd, NULL, entry->d_name, pathBuffer);
 		}
 	}
 }
