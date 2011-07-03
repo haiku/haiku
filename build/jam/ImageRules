@@ -177,6 +177,18 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		if $(filterVar) {
 			targets = [ FilterContainerUpdateTargets $(targets)
 				: $(filterVar) ] ;
+
+			# If there are any targets, mark the container as to be included in
+			# an update, too, if it has set the update inheritance variable.
+			# This makes updating a target that lives in a package on an image
+			# work.
+			if $(targets) {
+				local updateVariable = [ on $(container) return
+					$(HAIKU_CONTAINER_INHERIT_UPDATE_VARIABLE) ] ;
+				if $(updateVariable) {
+					$(updateVariable) on $(container) = 1 ;
+				}
+			}
 		}
 	}
 
@@ -480,7 +492,9 @@ rule CreateContainerMakeDirectoriesScript container : script
 	# If the image shall only be updated, we don't create directories.
 	if $(dirsToCreate)
 		&& ( ! [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
-			|| [ IncludeAllTargetsInContainer $(container) ] ) {
+			|| [ IncludeAllTargetsInContainer $(container) ]
+			|| [ on $(container) return
+				$(HAIKU_CONTAINER_ALWAYS_CREATE_DIRECTORIES) ] ) {
 		Depends $(scriptBody) : $(dirsToCreate) ;
 		CreateContainerMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
 

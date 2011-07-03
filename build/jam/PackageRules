@@ -268,13 +268,20 @@ rule HaikuPackage package
 	local grist = [ FHaikuPackageGrist $(package) ] ;
 
 	HAIKU_CONTAINER_GRIST on $(package) = $(grist) ;
-	HAIKU_INCLUDE_IN_CONTAINER_VAR on $(package)
-		= $(grist)_HAIKU_INCLUDE_IN_PACKAGE ;
+	HAIKU_INCLUDE_IN_CONTAINER_VAR on $(package) = HAIKU_INCLUDE_IN_PACKAGES ;
 	HAIKU_INSTALL_TARGETS_VAR on $(package)
 		= $(grist)_HAIKU_PACKAGE_INSTALL_TARGETS ;
 	HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(package) = ;
 
 	HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE = $(package) ;
+
+	if $(HAIKU_PACKAGES_UPDATE_ONLY) {
+		HAIKU_CONTAINER_UPDATE_ONLY on $(package) = 1 ;
+		HAIKU_CONTAINER_INHERIT_UPDATE_VARIABLE on $(package)
+			= HAIKU_INCLUDE_IN_IMAGE ;
+	}
+
+	HAIKU_CONTAINER_ALWAYS_CREATE_DIRECTORIES on $(package) = 1 ;
 }
 
 
@@ -301,6 +308,8 @@ rule BuildHaikuPackage package : packageInfo
 	AddVariableToScript $(script) : tmpDir : $(tempDir) ;
 	AddVariableToScript $(script) : addBuildCompatibilityLibDir
 		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+	AddVariableToScript $(script) : updateOnly
+		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
 	AddTargetVariableToScript $(script) : <build>addattr ;
 	AddTargetVariableToScript $(script) : <build>copyattr ;
 	AddTargetVariableToScript $(script) : <build>package ;
