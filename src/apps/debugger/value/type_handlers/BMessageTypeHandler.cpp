@@ -20,29 +20,8 @@ BMessageTypeHandler::~BMessageTypeHandler()
 float
 BMessageTypeHandler::SupportsType(Type* type)
 {
-	AddressType* addressType = dynamic_cast<AddressType*>(type);
-	CompoundType* baseType = dynamic_cast<CompoundType*>(type);
-	ModifiedType* modifiedType = NULL;
-	if (addressType != NULL && addressType->AddressKind()
-		== DERIVED_TYPE_POINTER) {
-			baseType = dynamic_cast<CompoundType*>(
-				addressType->BaseType());
-		if (baseType == NULL) {
-			modifiedType = dynamic_cast<ModifiedType*>(
-				addressType->BaseType());
-		}
-	}
-
-	if (baseType == NULL && modifiedType == NULL)
-		return 0.0f;
-	else if (modifiedType != NULL) {
-		baseType = dynamic_cast<CompoundType*>(
-			modifiedType->ResolveRawType(false));
-		if (baseType == NULL)
-			return 0.0f;
-	}
-
-	if (baseType->ResolveRawType(true)->Name() == "BMessage")
+	if (dynamic_cast<CompoundType*>(type) != NULL
+		&& type->Name() == "BMessage")
 		return 1.0f;
 
 	return 0.0f;

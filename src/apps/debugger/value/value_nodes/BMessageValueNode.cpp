@@ -65,7 +65,7 @@ public:
 	{
 		ValueLocation* parentLocation = fParent->Location();
 		ValueLocation* location;
-		CompoundType* type = fParent->GetMessageType();
+		CompoundType* type = dynamic_cast<CompoundType*>(fParent->GetType());
 
 		status_t error = type->ResolveDataMemberLocation(fMember,
 			*parentLocation, location);
@@ -92,7 +92,6 @@ BMessageValueNode::BMessageValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fMessageType(NULL),
 	fLoader(NULL),
 	fHeader(NULL),
 	fFields(NULL),
@@ -131,7 +130,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (location == NULL)
 		return B_BAD_VALUE;
 
-	TRACE_LOCALS("  TYPE_ADDRESS (BMessage)\n");
 
 	// get the value type
 	type_code valueType;
@@ -146,24 +144,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	// load the value data
 
 	status_t error = B_OK;
-	CompoundType* baseType = dynamic_cast<CompoundType*>(
-		fType->ResolveRawType(false));
-	AddressType* addressType = dynamic_cast<AddressType*>(fType);
-	if (addressType != NULL) {
-		BVariant address;
-		baseType = dynamic_cast<CompoundType*>(addressType->BaseType()
-			->ResolveRawType(false));
-		error = valueLoader->LoadValue(location, valueType, false,
-			address);
-		if (error != B_OK)
-			return error;
-
-		ValuePieceLocation pieceLocation;
-		pieceLocation.SetToMemory(address.ToUInt64());
-		location->SetPieceAt(0, pieceLocation);
-	}
-	fMessageType = baseType;
-
 	_location = location;
 	_value = NULL;
 
@@ -172,6 +152,8 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	BVariant headerAddress;
 	BVariant fieldAddress;
 	BVariant what;
+
+	CompoundType* baseType = dynamic_cast<CompoundType*>(fType);
 
 	for (int32 i = 0; i < baseType->CountDataMembers(); i++) {
 		DataMember* member = baseType->DataMemberAt(i);
@@ -313,14 +295,12 @@ BMessageValueNode::CreateChildren()
 	if (!fChildren.IsEmpty())
 		return B_OK;
 
-	if (fMessageType == NULL)
-		return B_BAD_VALUE;
-
 	DataMember* member = NULL;
 	Type* whatType = NULL;
 
-	for (int32 i = 0; i < fMessageType->CountDataMembers(); i++) {
-		member = fMessageType->DataMemberAt(i);
+	CompoundType* messageType = dynamic_cast<CompoundType*>(fType);
+	for (int32 i = 0; i < messageType->CountDataMembers(); i++) {
+		member = messageType->DataMemberAt(i);
 		if (strcmp(member->Name(), "what") == 0) {
 			whatType = member->GetType();
 			break;
@@ -346,8 +326,9 @@ BMessageValueNode::CreateChildren()
 		_GetTypeForTypeCode(type, fieldType);
 
 		BMessageFieldNodeChild* node = new(std::nothrow)
-			BMessageFieldNodeChild(this, fieldType != NULL ? fieldType : fType,
-			name, type, count);
+			BMessageFieldNodeChild(this,
+				fieldType != NULL ? fieldType : fType, name, type,
+				count);
 		if (node == NULL)
 			return B_NO_MEMORY;
 
@@ -589,7 +570,7 @@ BMessageValueNode::BMessageFieldNode::BMessageFieldNode(
 	:
 	ValueNode(child),
 	fName(name),
-	fType(parent->fMessageType),
+	fType(parent->GetType()),
 	fParent(parent),
 	fFieldType(type),
 	fFieldCount(count)
@@ -694,7 +675,7 @@ BMessageValueNode::BMessageFieldNodeChild::Parent() const
 bool
 BMessageValueNode::BMessageFieldNodeChild::IsInternal() const
 {
-	return fFieldCount > 1;
+	return false;
 }
 
 

@@ -35,9 +35,6 @@ public:
 	virtual int32					CountChildren() const;
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
 
-			CompoundType*			GetMessageType() const
-										{ return fMessageType; }
-
 private:
 			status_t				_GetTypeForTypeCode(type_code type,
 										Type*& _type);
@@ -61,7 +58,6 @@ private:
 
 private:
 			Type*					fType;
-			CompoundType*			fMessageType;
 			ChildNodeList			fChildren;
 			ValueLoader*			fLoader;
 			BVariant				fDataLocation;
