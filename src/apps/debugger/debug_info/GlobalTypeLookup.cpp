@@ -14,6 +14,7 @@
 
 #include "StringUtils.h"
 #include "Type.h"
+#include "TypeLookupConstraints.h"
 
 
 struct GlobalTypeCache::TypeEntry {
@@ -147,9 +148,15 @@ GlobalTypeCache::Init()
 
 
 Type*
-GlobalTypeCache::GetType(const BString& name) const
+GlobalTypeCache::GetType(const BString& name,
+	const TypeLookupConstraints &constraints) const
 {
 	TypeEntry* typeEntry = fTypesByName->Lookup(name);
+	if (typeEntry != NULL) {
+		if (constraints.HasTypeKind()
+			&& typeEntry->type->Kind() != constraints.TypeKind())
+			typeEntry = NULL;
+	}
 	return typeEntry != NULL ? typeEntry->type : NULL;
 }
 

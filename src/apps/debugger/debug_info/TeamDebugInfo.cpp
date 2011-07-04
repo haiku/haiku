@@ -377,7 +377,7 @@ TeamDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 {
 	// maybe the type is already cached
 	AutoLocker<GlobalTypeCache> cacheLocker(cache);
-	Type* type = cache->GetType(name);
+	Type* type = cache->GetType(name, constraints);
 	if (type != NULL) {
 		type->AcquireReference();
 		_type = type;

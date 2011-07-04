@@ -35,7 +35,9 @@ public:
 	inline	void				Unlock();
 
 			// cache must be locked
-			Type*				GetType(const BString& name) const;
+			Type*				GetType(const BString& name,
+									const TypeLookupConstraints &constraints
+									) const;
 			Type*				GetTypeByID(const BString& id) const;
 			status_t			AddType(Type* type);
 			void				RemoveType(Type* type);
