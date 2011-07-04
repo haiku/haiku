@@ -392,7 +392,8 @@ private:
 
 			status_t			_AddNode(Variable* variable, ModelNode* parent,
 									ValueNodeChild* nodeChild,
-									bool isPresentationNode = false);
+									bool isPresentationNode = false,
+									bool isOnlyChild = false);
 			void				_AddNode(Variable* variable);
 			status_t			_CreateValueNode(ValueNodeChild* nodeChild);
 			status_t			_AddChildNodes(ValueNodeChild* nodeChild);
@@ -819,7 +820,7 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 		ValueNodeChild* child = valueNode->ChildAt(i);
 		if (fNodeTable.Lookup(child) == NULL) {
 			_AddNode(modelNode->GetVariable(), modelNode, child,
-				child->IsInternal());
+				child->IsInternal(), childCount == 1);
 		}
 	}
 }
@@ -1003,7 +1004,8 @@ VariablesView::VariableTableModel::NotifyNodeChanged(ModelNode* node)
 
 status_t
 VariablesView::VariableTableModel::_AddNode(Variable* variable,
-	ModelNode* parent, ValueNodeChild* nodeChild, bool isPresentationNode)
+	ModelNode* parent, ValueNodeChild* nodeChild, bool isPresentationNode,
+	bool isOnlyChild)
 {
 	// Don't create nodes for unspecified types -- we can't get/show their
 	// value anyway.
@@ -1036,8 +1038,9 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 
 	fNodeTable.Insert(node);
 
-	// mark a compound type child of a address type parent hidden
-	if (parent != NULL) {
+	// if an address type node has only a single child, and that child
+	// is a compound type, mark it hidden
+	if (isOnlyChild && parent != NULL) {
 		ValueNode* parentValueNode = parent->NodeChild()->Node();
 		if (parentValueNode != NULL
 			&& parentValueNode->GetType()->ResolveRawType(false)->Kind()
