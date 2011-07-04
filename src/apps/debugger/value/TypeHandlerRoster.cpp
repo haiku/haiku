@@ -151,7 +151,7 @@ TypeHandlerRoster::RegisterDefaultHandlers()
 			return B_NO_MEMORY;
 
 	REGISTER_SPECIALIZED_HANDLER(CString);
-//	REGISTER_SPECIALIZED_HANDLER(BMessage);
+	REGISTER_SPECIALIZED_HANDLER(BMessage);
 
 	return B_OK;
 }

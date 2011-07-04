@@ -436,8 +436,9 @@ BMessageValueNode::_GetTypeForTypeCode(type_code type,
 			break;
 
 		case B_POINTER_TYPE:
-			typeName = "void";
+			typeName = "";
 			constraints.SetTypeKind(TYPE_ADDRESS);
+			constraints.SetBaseTypeName("void");
 			break;
 
 		case B_RECT_TYPE:
@@ -456,8 +457,9 @@ BMessageValueNode::_GetTypeForTypeCode(type_code type,
 			break;
 
 		case B_STRING_TYPE:
-			typeName = "char";
+			typeName = "";
 			constraints.SetTypeKind(TYPE_ARRAY);
+			constraints.SetBaseTypeName("char");
 			break;
 
 		default:
