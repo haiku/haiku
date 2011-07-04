@@ -201,6 +201,8 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 AddFilesToHaikuImage system packages : haiku.hpkg ;
 
 
+AddSymlinkToHaikuImage . : /boot/common/apps ;
+AddSymlinkToHaikuImage . : /boot/common/preferences ;
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Mailbox folders and symlink
