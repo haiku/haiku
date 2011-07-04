@@ -1077,6 +1077,10 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 				== TYPE_ADDRESS
 			&& nodeChildRawType->Kind() == TYPE_COMPOUND) {
 			node->SetHidden(true);
+
+			// we need to tell the listener about nodes like this so any
+			// necessary actions can be taken for them (i.e. value resolution),
+			// since they're otherwise invisible to outsiders.
 			NotifyNodeHidden(node);
 		}
 	}
