@@ -25,6 +25,9 @@ public:
 		bool					HasBaseTypeName() const;
 		type_kind				TypeKind() const;
 		int32					SubtypeKind() const;
+
+		// TODO: This should be further generalized to being able to
+		// pass a full set of constraints for the base type, not just the name
 		const BString&			BaseTypeName() const;
 
 		void					SetTypeKind(type_kind typeKind);
