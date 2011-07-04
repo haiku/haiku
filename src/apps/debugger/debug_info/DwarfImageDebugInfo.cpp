@@ -51,6 +51,23 @@
 #include "Variable.h"
 
 
+namespace {
+
+
+// #pragma mark - HasTypePredicate
+
+
+template<typename EntryType>
+struct HasTypePredicate {
+	inline bool operator()(EntryType* entry) const
+	{
+		return entry->GetType() != NULL;
+	}
+};
+
+}
+
+
 // #pragma mark - BasicTargetInterface
 
 
@@ -414,10 +431,16 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 			if (typeEntry->IsDeclaration())
 				continue;
 
-			if (constraints.HasTypeKind()
-				&& dwarf_tag_to_type_kind(typeEntry->Tag())
+			if (constraints.HasTypeKind()) {
+				if (dwarf_tag_to_type_kind(typeEntry->Tag())
 					!= constraints.TypeKind())
 				continue;
+
+				if (!_EvaluateBaseTypeConstraints(typeEntry,
+					constraints))
+					continue;
+			}
+
 			if (constraints.HasSubtypeKind()
 				&& dwarf_tag_to_subtype_kind(typeEntry->Tag())
 					!= constraints.SubtypeKind())
@@ -1011,4 +1034,50 @@ DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
 	}
 
 	return B_OK;
+}
+
+
+bool
+DwarfImageDebugInfo::_EvaluateBaseTypeConstraints(DIEType* type,
+	const TypeLookupConstraints& constraints)
+{
+	if (constraints.HasBaseTypeName()) {
+		BString baseEntryName;
+		DIEType* baseTypeOwnerEntry = NULL;
+
+		switch (constraints.TypeKind()) {
+			case TYPE_ADDRESS:
+			{
+				DIEAddressingType* addressType =
+					dynamic_cast<DIEAddressingType*>(type);
+				if (addressType != NULL) {
+					baseTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
+						addressType, HasTypePredicate<DIEAddressingType>());
+				}
+				break;
+			}
+			case TYPE_ARRAY:
+			{
+				DIEArrayType* arrayType =
+					dynamic_cast<DIEArrayType*>(type);
+				if (arrayType != NULL) {
+					baseTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
+						arrayType, HasTypePredicate<DIEArrayType>());
+				}
+				break;
+			}
+			default:
+				break;
+		}
+
+		if (baseTypeOwnerEntry != NULL) {
+			DwarfUtils::GetFullyQualifiedDIEName(baseTypeOwnerEntry,
+				baseEntryName);
+			if (!baseEntryName.IsEmpty() && baseEntryName
+				!= constraints.BaseTypeName())
+				return false;
+		}
+	}
+
+	return true;
 }

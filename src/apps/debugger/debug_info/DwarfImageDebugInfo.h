@@ -19,6 +19,7 @@
 
 class Architecture;
 class CompilationUnit;
+class DIEType;
 class DwarfStackFrameDebugInfo;
 class DwarfFile;
 class ElfSegment;
@@ -98,6 +99,9 @@ private:
 									target_addr_t lowPC,
 									const EntryListWrapper& variableEntries,
 									const EntryListWrapper& blockEntries);
+
+			bool				_EvaluateBaseTypeConstraints(DIEType* type,
+									const TypeLookupConstraints& constraints);
 
 private:
 			BLocker				fLock;
