@@ -96,6 +96,7 @@ private:
 			BMessageValueNode* 		fParent;
 			type_code				fFieldType;
 			int32					fFieldCount;
+			ChildNodeList			fChildren;
 };
 
 
@@ -105,7 +106,8 @@ public:
 										BMessageValueNode* parent,
 										Type* nodeType,
 										const BString &name,
-										type_code type, int32 count);
+										type_code type, int32 count,
+										int32 index = -1);
 
 	virtual 						~BMessageFieldNodeChild();
 
@@ -122,10 +124,12 @@ public:
 
 private:
 			BString 				fName;
+			BString					fPresentationName;
 			Type*					fType;
 			BMessageValueNode* 		fParent;
 			type_code				fFieldType;
 			int32					fFieldCount;
+			int32					fFieldIndex;
 };
 
 #endif	// BMESSAGE_VALUE_NODE_H

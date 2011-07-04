@@ -597,6 +597,26 @@ BMessageValueNode::BMessageFieldNode::GetType() const
 status_t
 BMessageValueNode::BMessageFieldNode::CreateChildren()
 {
+	Type* type = NULL;
+	status_t error = fParent->_GetTypeForTypeCode(fFieldType, type);
+	if (error != B_OK)
+		return error;
+	for (int32 i = 0; i < fFieldCount; i++) {
+		BMessageFieldNodeChild* child = new(std::nothrow)
+			BMessageFieldNodeChild(fParent, type, fName, fFieldType, fFieldCount, i);
+
+		if (child == NULL)
+			return B_NO_MEMORY;
+
+		if (fContainer != NULL)
+			child->SetContainer(fContainer);
+
+		fChildren.AddItem(child);
+	}
+
+	if (fContainer != NULL)
+		fContainer->NotifyValueNodeChildrenCreated(this);
+
 	return B_OK;
 }
 
@@ -604,13 +624,13 @@ BMessageValueNode::BMessageFieldNode::CreateChildren()
 int32
 BMessageValueNode::BMessageFieldNode::CountChildren() const
 {
-	return 0;
+	return fChildren.CountItems();
 }
 
 ValueNodeChild*
 BMessageValueNode::BMessageFieldNode::ChildAt(int32 index) const
 {
-	return NULL;
+	return fChildren.ItemAt(index);
 }
 
 
@@ -618,7 +638,7 @@ status_t
 BMessageValueNode::BMessageFieldNode::ResolvedLocationAndValue(
 	ValueLoader* loader, ValueLocation *& _location, Value*& _value)
 {
-	_location = fParent->Location();
+	_location = NULL;
 	_value = NULL;
 
 	return B_OK;
@@ -630,17 +650,22 @@ BMessageValueNode::BMessageFieldNode::ResolvedLocationAndValue(
 
 BMessageValueNode::BMessageFieldNodeChild::BMessageFieldNodeChild(
 	BMessageValueNode* parent, Type* nodeType, const BString &name,
-	type_code type, int32 count)
+	type_code type, int32 count, int32 index)
 	:
 	ValueNodeChild(),
 	fName(name),
+	fPresentationName(name),
 	fType(nodeType),
 	fParent(parent),
 	fFieldType(type),
-	fFieldCount(count)
+	fFieldCount(count),
+	fFieldIndex(index)
 {
 	fParent->AcquireReference();
 	fType->AcquireReference();
+
+	if (fFieldIndex >= 0)
+		fPresentationName.SetToFormat("[%ld]", fFieldIndex);
 }
 
 
@@ -654,7 +679,7 @@ BMessageValueNode::BMessageFieldNodeChild::~BMessageFieldNodeChild()
 const BString&
 BMessageValueNode::BMessageFieldNodeChild::Name() const
 {
-	return fName;
+	return fPresentationName;
 }
 
 
@@ -675,7 +700,7 @@ BMessageValueNode::BMessageFieldNodeChild::Parent() const
 bool
 BMessageValueNode::BMessageFieldNodeChild::IsInternal() const
 {
-	return false;
+	return fFieldCount > 1 && fFieldIndex == -1;
 }
 
 
@@ -702,5 +727,8 @@ BMessageValueNode::BMessageFieldNodeChild::ResolveLocation(
 	if (_location == NULL)
 		return B_NO_MEMORY;
 
-	return fParent->_FindDataLocation(fName, fFieldType, 0, *_location);
+	return fParent->_FindDataLocation(fName, fFieldType, fFieldIndex >= 0
+		? fFieldIndex : 0, *_location);
 }
+
+
