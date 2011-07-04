@@ -512,7 +512,7 @@ status_t
 Volume::AddNodeListener(NodeListener *listener, Node *node, uint32 flags)
 {
 	// check parameters
-	if (!listener || !node && !(flags & NODE_LISTEN_ANY_NODE)
+	if (!listener || (!node && !(flags & NODE_LISTEN_ANY_NODE))
 		|| !(flags & NODE_LISTEN_ALL)) {
 		return B_BAD_VALUE;
 	}
@@ -624,7 +624,7 @@ status_t
 Volume::AddEntryListener(EntryListener *listener, Entry *entry, uint32 flags)
 {
 	// check parameters
-	if (!listener || !entry && !(flags & ENTRY_LISTEN_ANY_ENTRY)
+	if (!listener || (!entry && !(flags & ENTRY_LISTEN_ANY_ENTRY))
 		|| !(flags & ENTRY_LISTEN_ALL)) {
 		return B_BAD_VALUE;
 	}
