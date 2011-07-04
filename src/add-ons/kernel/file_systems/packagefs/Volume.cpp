@@ -326,7 +326,8 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 						= value.resolvable.compatibleVersion;
 					status_t error = Version::Create(versionInfo.major,
 						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.release, version);
+						versionInfo.preRelease, versionInfo.release,
+						compatibleVersion);
 					if (error != B_OK)
 						RETURN_ERROR(error);
 				}
