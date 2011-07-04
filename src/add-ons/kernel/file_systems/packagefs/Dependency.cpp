@@ -58,7 +58,7 @@ Dependency::ResolvableVersionMatches(Version* resolvableVersion) const
 		return true;
 
 	return resolvableVersion != NULL
-		&& fVersion->Compare(fVersionOperator, *resolvableVersion);
+		&& resolvableVersion->Compare(fVersionOperator, *fVersion);
 }
 
 
@@ -75,7 +75,7 @@ Dependency::ResolvableCompatibleVersionMatches(Version* resolvableVersion) const
 	if (fVersionOperator == B_PACKAGE_RESOLVABLE_OP_GREATER_EQUAL
 		|| fVersionOperator == B_PACKAGE_RESOLVABLE_OP_GREATER) {
 		return resolvableVersion != NULL
-			&& fVersion->Compare(fVersionOperator, *resolvableVersion);
+			&& fVersion->Compare(*resolvableVersion) >= 0;
 	}
 
 	return true;
