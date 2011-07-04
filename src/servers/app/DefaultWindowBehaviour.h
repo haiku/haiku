@@ -17,8 +17,9 @@
 
 #include "WindowBehaviour.h"
 
-#include "ServerCursor.h"
 #include "Decorator.h"
+#include "MagneticBorder.h"
+#include "ServerCursor.h"
 
 
 class Desktop;
@@ -39,6 +40,9 @@ public:
 
 	virtual	void				ModifiersChanged(int32 modifiers);
 
+protected:
+	virtual bool				AlterDeltaForSnap(Window* window, BPoint& delta,
+									bigtime_t now);
 private:
 			enum Action {
 				ACTION_NONE,
@@ -104,6 +108,8 @@ protected:
 			Desktop*			fDesktop;
 			State*				fState;
 			int32				fLastModifiers;
+
+			MagneticBorder		fMagneticBorder;
 };
 
 

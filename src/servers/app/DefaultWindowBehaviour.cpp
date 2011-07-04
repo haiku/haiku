@@ -210,8 +210,7 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 		bool activateOnMouseUp, bool minimizeCheckOnMouseUp)
 		:
 		MouseTrackingState(behavior, where, activateOnMouseUp,
-			minimizeCheckOnMouseUp),
-		fLastSnapTime(0)
+			minimizeCheckOnMouseUp)
 	{
 	}
 
@@ -235,7 +234,7 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 		if (!(fWindow->Flags() & B_NOT_MOVABLE)) {
 			BPoint oldLeftTop = fWindow->Frame().LeftTop();
 
-			_AlterDeltaForSnap(delta, now);
+			fBehavior.AlterDeltaForSnap(fWindow, delta, now);
 			fDesktop->MoveWindowBy(fWindow, delta.x, delta.y);
 
 			// constrain delta to true change in position
@@ -243,78 +242,6 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 		} else
 			delta = BPoint(0, 0);
 	}
-
-private:
-	void _AlterDeltaForSnap(BPoint& delta, bigtime_t now)
-	{
-		// Alter the delta (which is a proposed offset used while dragging a
-		// window) so that the frame of the window 'snaps' to the edges of the
-		// screen.
-
-		const bigtime_t kSnappingDuration = 1500000LL;
-		const bigtime_t kSnappingPause = 3000000LL;
-		const float kSnapDistance = 8.0f;
-
-		if (now - fLastSnapTime > kSnappingDuration
-			&& now - fLastSnapTime < kSnappingPause) {
-			// Maintain a pause between snapping.
-			return;
-		}
-
-		BRect frame = fWindow->Frame();
-		BPoint offsetWithinFrame;
-		// TODO: Perhaps obtain the usable area (not covered by the Deskbar)?
-		BRect screenFrame = fWindow->Screen()->Frame();
-
-		Decorator* decorator = fWindow->Decorator();
-		if (decorator) {
-			frame = decorator->GetFootprint().Frame();
-			offsetWithinFrame.x = fWindow->Frame().left - frame.left;
-			offsetWithinFrame.y = fWindow->Frame().top - frame.top;
-		}
-
-		frame.OffsetBy(delta);
-
-		float leftDist = fabs(frame.left - screenFrame.left);
-		float topDist = fabs(frame.top - screenFrame.top);
-		float rightDist = fabs(frame.right - screenFrame.right);
-		float bottomDist = fabs(frame.bottom - screenFrame.bottom);
-
-		bool snapped = false;
-		if (leftDist < kSnapDistance || rightDist < kSnapDistance) {
-			snapped = true;
-			if (leftDist < rightDist) {
-				frame.right -= frame.left;
-				frame.left = 0.0f;
-			} else {
-				frame.left -= frame.right - screenFrame.right;
-				frame.right = screenFrame.right;
-			}
-		}
-
-		if (topDist < kSnapDistance || bottomDist < kSnapDistance) {
-			snapped = true;
-			if (topDist < bottomDist) {
-				frame.bottom -= frame.top;
-				frame.top = 0.0f;
-			} else {
-				frame.top -= frame.bottom - screenFrame.bottom;
-				frame.bottom = screenFrame.bottom;
-			}
-		}
-		if (snapped && now - fLastSnapTime > kSnappingPause)
-			fLastSnapTime = now;
-
-
-		frame.top += offsetWithinFrame.y;
-		frame.left += offsetWithinFrame.x;
-
-		delta.y = frame.top - fWindow->Frame().top;
-		delta.x = frame.left - fWindow->Frame().left;
-	}
-
-private:
-	bigtime_t			fLastSnapTime;
 };
 
 
@@ -962,6 +889,14 @@ DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 		if (_IsWindowModifier(modifiers))
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
 	}
+}
+
+
+bool
+DefaultWindowBehaviour::AlterDeltaForSnap(Window* window, BPoint& delta,
+	bigtime_t now)
+{
+	return fMagneticBorder.AlterDeltaForSnap(window, delta, now);
 }
 
 

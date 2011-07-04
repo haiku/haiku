@@ -29,6 +29,13 @@ WindowBehaviour::ModifiersChanged(int32 modifiers)
 }
 
 
+bool
+WindowBehaviour::AlterDeltaForSnap(Window* window, BPoint& delta, bigtime_t now)
+{
+	return false;
+}
+
+
 /*!	\fn WindowBehaviour::MouseDown()
 	\brief Handles a mouse-down message for the window.
 

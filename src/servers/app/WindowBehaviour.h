@@ -16,6 +16,7 @@
 
 class BMessage;
 class ClickTarget;
+class Window;
 
 
 class WindowBehaviour {
@@ -34,6 +35,13 @@ public:
 
 			bool				IsDragging() const { return fIsDragging; }
 			bool				IsResizing() const { return fIsResizing; }
+
+protected:
+	/*! The window is going to be moved by delta. This hook should be used to
+	implement the magnetic screen border, i.e. alter the delta accordantly.
+	\return true if delta has been modified. */
+	virtual bool				AlterDeltaForSnap(Window* window, BPoint& delta,
+									bigtime_t now);
 
 protected:
 			bool				fIsResizing : 1;

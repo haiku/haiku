@@ -39,6 +39,7 @@ Server app_server :
 	InputManager.cpp
 	IntPoint.cpp
 	IntRect.cpp
+	MagneticBorder.cpp
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
