@@ -10,6 +10,8 @@
 
 
 #include <Region.h>
+
+#include "MagneticBorder.h"
 #include "SATDecorator.h"
 #include "Stacking.h"
 #include "Tiling.h"
@@ -63,6 +65,8 @@ private:
 			Constraint*			fKeepMaxHeightConstraint;
 			Constraint*			fWidthConstraint;
 			Constraint*			fHeightConstraint;
+			
+			MagneticBorder		fMagneticBorder;
 };
 
 

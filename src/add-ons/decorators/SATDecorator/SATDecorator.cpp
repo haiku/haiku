@@ -16,6 +16,7 @@
 #include <WindowPrivate.h>
 
 #include "DrawingEngine.h"
+#include "SATWindow.h"
 
 
 //#define DEBUG_SATDECORATOR
@@ -63,6 +64,13 @@ SATDecorAddOn::InitCheck() const
 		return B_ERROR;
 
 	return B_OK;
+}
+
+
+WindowBehaviour*
+SATDecorAddOn::AllocateWindowBehaviour(Window* window)
+{
+	return new (std::nothrow)SATWindowBehaviour(window, &fStackAndTile);
 }
 
 
@@ -464,6 +472,40 @@ SATDecorator::GetComponentColors(Component component, uint8 highlight,
 			_colors[5] = kHighlightFrameColors[5];
 			break;
 	}
+}
+
+
+SATWindowBehaviour::SATWindowBehaviour(Window* window, StackAndTile* sat)
+	:
+	DefaultWindowBehaviour(window),
+
+	fStackAndTile(sat)
+{
+}
+
+
+bool
+SATWindowBehaviour::AlterDeltaForSnap(Window* window, BPoint& delta,
+	bigtime_t now)
+{
+	if (DefaultWindowBehaviour::AlterDeltaForSnap(window, delta, now) == true)
+		return true;
+
+	SATWindow* satWindow = fStackAndTile->GetSATWindow(window);
+	if (satWindow == NULL)
+		return false;
+	SATGroup* group = satWindow->GetGroup();
+	if (group == NULL)
+		return false;
+
+	BRect groupFrame = group->WindowAt(0)->CompleteWindowFrame();
+	for (int32 i = 1; i < group->CountItems(); i++)
+		groupFrame = groupFrame | group->WindowAt(i)->CompleteWindowFrame();
+
+	fMagneticBorder.AlterDeltaForSnap(window->Screen(),
+		groupFrame, delta, now);
+
+	return true;
 }
 
 

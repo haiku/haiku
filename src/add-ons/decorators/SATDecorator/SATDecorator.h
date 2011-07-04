@@ -11,6 +11,7 @@
 
 #include "DecorManager.h"
 #include "DefaultDecorator.h"
+#include "DefaultWindowBehaviour.h"
 #include "StackAndTile.h"
 
 
@@ -19,6 +20,8 @@ public:
 								SATDecorAddOn(image_id id, const char* name);
 
 	virtual status_t			InitCheck() const;
+
+	virtual	WindowBehaviour*	AllocateWindowBehaviour(Window* window);
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
@@ -68,6 +71,20 @@ private:
 			bool				fStackedDrawZoom;
 			float				fStackedTabLength;
 			bool				fStackedTabShifting;
+};
+
+
+class SATWindowBehaviour : public DefaultWindowBehaviour {
+public:
+								SATWindowBehaviour(Window* window,
+									StackAndTile* sat);
+
+protected:
+	virtual bool				AlterDeltaForSnap(Window* window, BPoint& delta,
+									bigtime_t now);
+
+private:
+			StackAndTile*		fStackAndTile;
 };
 
 
