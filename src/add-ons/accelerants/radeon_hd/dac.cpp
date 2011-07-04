@@ -198,6 +198,8 @@ DACSet(uint8 dacIndex, uint32 crtid)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
+	TRACE("%s: dac %d to crt %d\n", __func__, dacIndex, crtid);
+
 	if (info.device_chipset < (RADEON_R600 | 0x20))
 		DACSetLegacy(dacIndex, crtid);
 	else
@@ -209,12 +211,15 @@ DACSet(uint8 dacIndex, uint32 crtid)
 void
 DACPowerModern(uint8 dacIndex, int mode)
 {
+	TRACE("%s: dacIndex: %d; mode: %d\n", __func__, dacIndex, mode);
+
 	uint32 dacOffset = (dacIndex == 1) ? RV620_REG_DACB_OFFSET
 		: RV620_REG_DACA_OFFSET;
 	uint32 powerdown;
 
 	switch (mode) {
 		case RHD_POWER_ON:
+			TRACE("%s: dacIndex: %d; POWER_ON\n", __func__, dacIndex);
 			// TODO : SensedType Detection?
 			powerdown = 0;
 			if (!(Read32(OUT, dacOffset + RV620_DACA_ENABLE) & 0x01))
@@ -229,9 +234,11 @@ DACPowerModern(uint8 dacIndex, int mode)
 			Write32(OUT, dacOffset + RV620_DACA_SYNC_TRISTATE_CONTROL, 0x0);
 			return;
 		case RHD_POWER_RESET:
+			TRACE("%s: dacIndex: %d; POWER_RESET\n", __func__, dacIndex);
 			// No action
 			return;
 		case RHD_POWER_SHUTDOWN:
+			TRACE("%s: dacIndex: %d; POWER_SHUTDOWN\n", __func__, dacIndex);
 		default:
 			Write32(OUT, dacOffset + RV620_DACA_POWERDOWN, 0x01010100);
 			Write32(OUT, dacOffset + RV620_DACA_POWERDOWN, 0x01010101);
@@ -253,6 +260,7 @@ DACPowerLegacy(uint8 dacIndex, int mode)
 
 	switch (mode) {
 		case RHD_POWER_ON:
+			TRACE("%s: dacIndex: %d; POWER_ON\n", __func__, dacIndex);
 			// TODO : SensedType Detection?
 			powerdown = 0;
 			Write32(OUT, dacOffset + DACA_ENABLE, 1);
@@ -265,9 +273,11 @@ DACPowerLegacy(uint8 dacIndex, int mode)
 			Write32(OUT, dacOffset + DACA_SYNC_TRISTATE_CONTROL, 0);
 			return;
 		case RHD_POWER_RESET:
+			TRACE("%s: dacIndex: %d; POWER_RESET\n", __func__, dacIndex);
 			// No action
 			return;
 		case RHD_POWER_SHUTDOWN:
+			TRACE("%s: dacIndex: %d; POWER_SHUTDOWN\n", __func__, dacIndex);
 		default:
 			Write32Mask(OUT, dacOffset + DACA_FORCE_DATA, 0, 0x0000FFFF);
 			Write32Mask(OUT, dacOffset + DACA_FORCE_OUTPUT_CNTL,

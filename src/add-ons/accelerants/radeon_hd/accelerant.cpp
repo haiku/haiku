@@ -236,6 +236,7 @@ init_registers(uint8 crtid)
 		gRegister->grphYStart = offset + EVERGREEN_GRPH_Y_START;
 		gRegister->grphXEnd = offset + EVERGREEN_GRPH_X_END;
 		gRegister->grphYEnd = offset + EVERGREEN_GRPH_Y_END;
+		gRegister->crtControl = offset + EVERGREEN_CRTC_CONTROL;
 		gRegister->modeDesktopHeight = offset + EVERGREEN_DESKTOP_HEIGHT;
 		gRegister->modeDataFormat = offset + EVERGREEN_DATA_FORMAT;
 		gRegister->viewportStart = offset + EVERGREEN_VIEWPORT_START;
@@ -282,6 +283,8 @@ init_registers(uint8 crtid)
 			= (crtid == 1) ? D2GRPH_X_END : D1GRPH_X_END;
 		gRegister->grphYEnd
 			= (crtid == 1) ? D2GRPH_Y_END : D1GRPH_Y_END;
+		gRegister->crtControl
+			= (crtid == 1) ? D2CRTC_CONTROL : D1CRTC_CONTROL;
 		gRegister->modeDesktopHeight
 			= (crtid == 1) ? D2MODE_DESKTOP_HEIGHT : D1MODE_DESKTOP_HEIGHT;
 		gRegister->modeDataFormat
@@ -303,6 +306,8 @@ init_registers(uint8 crtid)
 
 	gRegister->modeCenter
 		= (crtid == 1) ? D2MODE_CENTER : D1MODE_CENTER;
+	gRegister->grphUpdate
+		= (crtid == 1) ? D2GRPH_UPDATE : D1GRPH_UPDATE;
 	gRegister->crtHPolarity
 		= (crtid == 1) ? D2CRTC_H_SYNC_A_CNTL : D1CRTC_H_SYNC_A_CNTL;
 	gRegister->crtVPolarity

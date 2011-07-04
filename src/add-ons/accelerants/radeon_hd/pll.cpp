@@ -68,7 +68,6 @@ status_t
 PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 	uint16 *post)
 {
-
 	// Freaking phase-locked loops, how do they work?
 
 	float ratio = ((float) pixelClock)
@@ -87,7 +86,6 @@ PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 			continue;
 		if (vcoOut >= gInfo->shared_info->pll_info.max_frequency)
 			break;
-
 
 		for (referenceDiv = 1; referenceDiv <= REF_DIV_LIMIT; referenceDiv++) {
 			feedbackDiv = (uint32)((ratio * postDiv * referenceDiv) + 0.5);
@@ -144,7 +142,7 @@ PLLPower(uint8 pllIndex, int command)
 	switch (command) {
 		case RHD_POWER_ON:
 		{
-			TRACE("%s: PLL Power On\n", __func__);
+			TRACE("%s: PLL %d Power On\n", __func__, pllIndex);
 
 			if (hasDccg)
 				DCCGCLKSet(pllIndex, RV620_DCCGCLK_RESET);
@@ -161,7 +159,7 @@ PLLPower(uint8 pllIndex, int command)
 		}
 		case RHD_POWER_RESET:
 		{
-			TRACE("%s: PLL Power Reset\n", __func__);
+			TRACE("%s: PLL %d Power Reset\n", __func__, pllIndex);
 
 			if (hasDccg)
 				DCCGCLKSet(pllIndex, RV620_DCCGCLK_RELEASE);
@@ -177,7 +175,7 @@ PLLPower(uint8 pllIndex, int command)
 
 		case RHD_POWER_SHUTDOWN:
 		default:
-			TRACE("%s: PLL Power Shutdown\n", __func__);
+			TRACE("%s: PLL %d Power Shutdown\n", __func__, pllIndex);
 
 			radeon_shared_info &info = *gInfo->shared_info;
 

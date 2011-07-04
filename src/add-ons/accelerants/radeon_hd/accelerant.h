@@ -48,6 +48,7 @@ struct register_info {
 	uint16	crtid;
 	uint16	vgaControl;
 	uint16	grphEnable;
+	uint16	grphUpdate;
 	uint16	grphControl;
 	uint16	grphSwapControl;
 	uint16	grphPrimarySurfaceAddr;
@@ -61,6 +62,7 @@ struct register_info {
 	uint16	grphYStart;
 	uint16	grphXEnd;
 	uint16	grphYEnd;
+	uint16	crtControl;
 	uint16	crtCountControl;
 	uint16	crtInterlace;
 	uint16	crtHPolarity;

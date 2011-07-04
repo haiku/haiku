@@ -150,18 +150,27 @@ CardFBSet(display_mode *mode)
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
-	#if 0
-	// Disable VGA mode to enable Radeon extended registers
-	Write32Mask(VGA, VGA_RENDER_CONTROL, 0, 0x00030000);
-	Write32Mask(VGA, VGA_MODE_CONTROL, 0, 0x00000030);
-	Write32Mask(VGA, VGA_HDP_CONTROL, 0x00010010, 0x00010010);
-	Write32Mask(VGA, gRegister->vgaControl, 0, D1VGA_MODE_ENABLE
-		| D1VGA_TIMING_SELECT | D1VGA_SYNC_POLARITY_SELECT);
-	#endif
+	Write32(CRT, gRegister->grphUpdate, (1<<16));
+		// Lock for update (isn't this normally the other way around on VGA?
 
-	// disable R/B swap, disable tiling, disable 16bit alpha, etc.
-	Write32Mask(CRT, gRegister->grphEnable, 1, 0x00000001);
+	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
+	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
+
+	// Tell GPU which frame buffer address to draw from
+	Write32(CRT, gRegister->grphPrimarySurfaceAddr,
+		fbAddress & 0xffffffff);
+	Write32(CRT, gRegister->grphSecondarySurfaceAddr,
+		fbAddress & 0xffffffff);
+
+	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
+		Write32(CRT, gRegister->grphPrimarySurfaceAddrHigh,
+			(fbAddress >> 32) & 0xf);
+		Write32(CRT, gRegister->grphSecondarySurfaceAddrHigh,
+			(fbAddress >> 32) & 0xf);
+	}
+
 	Write32(CRT, gRegister->grphControl, 0);
+		// Reset stored depth, format, etc
 
 	// set color mode on video card
 	switch (mode->space) {
@@ -189,33 +198,19 @@ CardFBSet(display_mode *mode)
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
 
-	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
+	Write32Mask(CRT, gRegister->grphEnable, 1, 0x00000001);
+		// Enable graphics
 
-	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
-
-	// Tell GPU which frame buffer address to draw from
-	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
-		Write32(CRT, gRegister->grphPrimarySurfaceAddrHigh,
-			(fbAddress >> 32) & 0xf);
-		Write32(CRT, gRegister->grphSecondarySurfaceAddrHigh,
-			(fbAddress >> 32) & 0xf);
-	}
-
-	Write32(CRT, gRegister->grphPrimarySurfaceAddr,
-		fbAddress & 0xffffffff);
-	Write32(CRT, gRegister->grphSecondarySurfaceAddr,
-		fbAddress & 0xffffffff);
-
-	Write32(CRT, gRegister->grphPitch, bytesPerRow / 4);
 	Write32(CRT, gRegister->grphSurfaceOffsetX, 0);
 	Write32(CRT, gRegister->grphSurfaceOffsetY, 0);
 	Write32(CRT, gRegister->grphXStart, 0);
 	Write32(CRT, gRegister->grphYStart, 0);
 	Write32(CRT, gRegister->grphXEnd, mode->virtual_width);
 	Write32(CRT, gRegister->grphYEnd, mode->virtual_height);
+	Write32(CRT, gRegister->grphPitch, bytesPerRow / 4);
 
-	/* D1Mode registers */
-	Write32(CRT, gRegister->modeDesktopHeight, mode->virtual_height);
+	Write32(CRT, gRegister->grphUpdate, 0);
+		// Unlock changed registers
 
 	// update shared info
 	gInfo->shared_info->bytes_per_row = bytesPerRow;
@@ -295,9 +290,9 @@ CardModeSet(display_mode *mode)
 static void
 CardModeScale(display_mode *mode)
 {
-	Write32(CRT, gRegister->viewportSize,
-		mode->timing.v_display | (mode->timing.h_display << 16));
-	Write32(CRT, gRegister->viewportStart, 0);
+	// No scaling
+	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
+	Write32(CRT, gRegister->modeDesktopHeight, mode->virtual_height);
 
 	// For now, no overscan support
 	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
@@ -305,30 +300,14 @@ CardModeScale(display_mode *mode)
 	Write32(CRT, D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
 		(OVERSCAN << 16) | OVERSCAN); // TOP | BOTTOM
 
-	// No scaling
-	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
+	Write32(CRT, gRegister->viewportStart, 0);
+	Write32(CRT, gRegister->viewportSize,
+		mode->timing.v_display | (mode->timing.h_display << 16));
 	Write32(CRT, gRegister->sclEnable, 0);
 	Write32(CRT, gRegister->sclTapControl, 0);
 	Write32(CRT, gRegister->modeCenter, 0);
+	// D1MODE_DATA_FORMAT?
 	Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
-
-	#if 0
-	// Auto scale keeping aspect ratio
-	Write32(CRT, regOffset + D1MODE_CENTER, 1);
-
-	Write32(CRT, regOffset + D1SCL_UPDATE, 0);
-	Write32(CRT, regOffset + D1SCL_FLIP_CONTROL, 0);
-
-	Write32(CRT, regOffset + D1SCL_ENABLE, 1);
-	Write32(CRT, regOffset + D1SCL_HVSCALE, 0x00010001);
-
-	Write32(CRT, regOffset + D1SCL_TAP_CONTROL, 0x00000101);
-
-	Write32(CRT, regOffset + D1SCL_HFILTER, 0x00030100);
-	Write32(CRT, regOffset + D1SCL_VFILTER, 0x00030100);
-
-	Write32(CRT, regOffset + D1SCL_DITHER, 0x00001010);
-	#endif
 }
 
 
@@ -342,21 +321,23 @@ radeon_set_display_mode(display_mode *mode)
 	CardBlankSet(true);
 	CardFBSet(mode);
 	CardBlankSet(false);
-	CardModeSet(mode);
 	CardModeScale(mode);
+	#if 0
 	PLLSet(0, mode->timing.pixel_clock);
 		// Set pixel clock
-	DACSet(0, 0);
+	#endif
+	CardModeSet(mode);
+	DACSet(crtNumber, 0);
 		// Set DAC A to crt 0
+	DACPower(crtNumber, RHD_POWER_ON);
 
 	// ensure graphics are enabled and powered on (CRT Power)
-	// aka D1Power
 	Write32Mask(CRT, D1GRPH_ENABLE, 0x00000001, 0x00000001);
 	snooze(2);
-	Write32Mask(CRT, D1CRTC_CONTROL, 0, 0x01000000); /* enable read requests */
-	Write32Mask(CRT, D1CRTC_CONTROL, 1, 1);
 
-	DACPower(0, RHD_POWER_ON);
+	Write32(CRT, gRegister->crtControl, 0x01000101);
+	Read32(CRT, gRegister->crtControl);
+	Write32(CRT, gRegister->crtControl, 0x00010101);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);

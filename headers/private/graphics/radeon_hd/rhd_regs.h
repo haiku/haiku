@@ -248,6 +248,7 @@ enum {
     D2GRPH_Y_START                 = 0x6930,
     D2GRPH_X_END                   = 0x6934,
     D2GRPH_Y_END                   = 0x6938,
+    D2GRPH_UPDATE                  = 0x6944,
 
     /* LUTB */
     DC_LUTB_CONTROL                = 0x6CC0,
