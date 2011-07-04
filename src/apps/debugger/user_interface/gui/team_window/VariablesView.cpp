@@ -46,6 +46,12 @@ enum {
 	VALUE_NODE_TYPE	= 'valn'
 };
 
+
+enum {
+	MSG_MODEL_NODE_HIDDEN = 'monh'
+};
+
+
 // maximum number of array elements to show by default
 static const uint64 kMaxArrayElementCount = 10;
 
@@ -61,6 +67,8 @@ public:
 	virtual	void				ValueNodeChildrenCreated(ValueNode* node);
 	virtual	void				ValueNodeChildrenDeleted(ValueNode* node);
 	virtual	void				ValueNodeValueChanged(ValueNode* node);
+
+	virtual void				ModelNodeHidden(ModelNode* node);
 
 private:
 			BHandler*			fIndirectTarget;
@@ -356,6 +364,7 @@ public:
 			void				NodeExpanded(ModelNode* node);
 
 			void				NotifyNodeChanged(ModelNode* node);
+			void				NotifyNodeHidden(ModelNode* node);
 
 private:
 			struct NodeHashDefinition {
@@ -658,6 +667,20 @@ VariablesView::ContainerListener::ValueNodeValueChanged(ValueNode* node)
 	BReference<ValueNode> nodeReference(node);
 
 	BMessage message(MSG_VALUE_NODE_VALUE_CHANGED);
+	if (message.AddPointer("node", node) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeReference.Detach();
+	}
+}
+
+
+void
+VariablesView::ContainerListener::ModelNodeHidden(ModelNode* node)
+{
+	BReference<ModelNode> nodeReference(node);
+
+	BMessage message(MSG_MODEL_NODE_HIDDEN);
 	if (message.AddPointer("node", node) == B_OK
 		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
 			== B_OK) {
@@ -1002,6 +1025,13 @@ VariablesView::VariableTableModel::NotifyNodeChanged(ModelNode* node)
 }
 
 
+void
+VariablesView::VariableTableModel::NotifyNodeHidden(ModelNode* node)
+{
+	fContainerListener->ModelNodeHidden(node);
+}
+
+
 status_t
 VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	ModelNode* parent, ValueNodeChild* nodeChild, bool isPresentationNode,
@@ -1047,6 +1077,7 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 				== TYPE_ADDRESS
 			&& nodeChildRawType->Kind() == TYPE_COMPOUND) {
 			node->SetHidden(true);
+			NotifyNodeHidden(node);
 		}
 	}
 
@@ -1369,6 +1400,14 @@ VariablesView::MessageReceived(BMessage* message)
 				BReference<ValueNode> newNodeReference(node, true);
 				fVariableTableModel->ValueNodeValueChanged(node);
 			}
+
+			break;
+		}
+		case MSG_MODEL_NODE_HIDDEN:
+		{
+			ModelNode* node;
+			if (message->FindPointer("node", (void**)&node) == B_OK)
+				_RequestNodeValue(node);
 
 			break;
 		}
