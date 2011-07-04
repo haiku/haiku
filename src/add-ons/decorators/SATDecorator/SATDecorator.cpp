@@ -502,10 +502,8 @@ SATWindowBehaviour::AlterDeltaForSnap(Window* window, BPoint& delta,
 	for (int32 i = 1; i < group->CountItems(); i++)
 		groupFrame = groupFrame | group->WindowAt(i)->CompleteWindowFrame();
 
-	fMagneticBorder.AlterDeltaForSnap(window->Screen(),
+	return fMagneticBorder.AlterDeltaForSnap(window->Screen(),
 		groupFrame, delta, now);
-
-	return true;
 }
 
 
