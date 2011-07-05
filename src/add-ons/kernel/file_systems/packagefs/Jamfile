@@ -16,6 +16,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Directory.cpp
 	EmptyAttributeDirectoryCookie.cpp
 	GlobalFactory.cpp
+	Index.cpp
 	kernel_interface.cpp
 	Node.cpp
 	NodeListener.cpp
