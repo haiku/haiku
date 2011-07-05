@@ -32,6 +32,7 @@
 
 #include "DebugSupport.h"
 #include "kernel_interface.h"
+#include "NameIndex.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageFSRoot.h"
@@ -506,6 +507,19 @@ Volume::Mount(const char* parameterString)
 	error = fIndices.Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
+	// create the name index
+	NameIndex* index = new(std::nothrow) NameIndex;
+	if (index == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	error = index->Init(this);
+	if (error != B_OK) {
+		delete index;
+		RETURN_ERROR(error);
+	}
+
+	fIndices.Insert(index);
 
 	// get the mount parameters
 	const char* packages = NULL;
