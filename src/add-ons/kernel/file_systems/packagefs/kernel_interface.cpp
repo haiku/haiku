@@ -22,6 +22,7 @@
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "GlobalFactory.h"
+#include "Query.h"
 #include "PackageFSRoot.h"
 #include "Utils.h"
 #include "Volume.h"
@@ -137,7 +138,8 @@ packagefs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 
 	FUNCTION("volume: %p, info: %p\n", volume, info);
 
-	info->flags = B_FS_IS_READONLY;
+	info->flags = B_FS_IS_READONLY | B_FS_HAS_MIME | B_FS_HAS_ATTR
+		| B_FS_HAS_QUERY | B_FS_SUPPORTS_NODE_MONITORING;
 	info->block_size = 4096;
 	info->io_size = kOptimalIOSize;
 	info->total_blocks = info->free_blocks = 1;
@@ -843,6 +845,162 @@ packagefs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 }
 
 
+// #pragma mark - index directory & index operations
+
+status_t
+packagefs_open_index_dir(fs_volume* fsVolume, void** _cookie)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_close_index_dir(fs_volume* fsVolume, void* cookie)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_free_index_dir_cookie(fs_volume* fsVolume, void* cookie)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_read_index_dir(fs_volume* fsVolume, void* cookie, struct dirent* buffer,
+	size_t bufferSize, uint32* _num)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_rewind_index_dir(fs_volume* fsVolume, void* cookie)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_create_index(fs_volume* fsVolume, const char* name, uint32 type,
+	uint32 flags)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_remove_index(fs_volume* fsVolume, const char* name)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_read_index_stat(fs_volume* fsVolume, const char* name,
+	struct stat* stat)
+{
+	// TODO:...
+	return B_NOT_SUPPORTED;
+}
+
+
+// #pragma mark - query operations
+
+
+status_t
+packagefs_open_query(fs_volume* fsVolume, const char* queryString, uint32 flags,
+	port_id port, uint32 token, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, query: \"%s\", flags: %#" B_PRIx32 ", port: %"
+		B_PRId32 ", token: %" B_PRIu32 "\n", volume, queryString, flags, port,
+		token);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	Query* query;
+	status_t error = Query::Create(volume, queryString, flags, port, token,
+		query);
+	if (error != B_OK)
+		return error;
+
+	*_cookie = query;
+	return B_OK;
+}
+
+
+status_t
+packagefs_close_query(fs_volume* fsVolume, void* cookie)
+{
+	FUNCTION_START();
+	return B_OK;
+}
+
+
+status_t
+packagefs_free_query_cookie(fs_volume* fsVolume, void* cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Query* query = (Query*)cookie;
+
+	FUNCTION("volume: %p, query: %p\n", volume, query);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	delete query;
+
+	return B_OK;
+}
+
+
+status_t
+packagefs_read_query(fs_volume* fsVolume, void* cookie, struct dirent* buffer,
+	size_t bufferSize, uint32* _num)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Query* query = (Query*)cookie;
+
+	FUNCTION("volume: %p, query: %p\n", volume, query);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	status_t error = query->GetNextEntry(buffer, bufferSize);
+	if (error == B_OK)
+		*_num = 1;
+	else if (error == B_ENTRY_NOT_FOUND)
+		*_num = 0;
+	else
+		return error;
+
+	return B_OK;
+}
+
+
+status_t
+packagefs_rewind_query(fs_volume* fsVolume, void* cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Query* query = (Query*)cookie;
+
+	FUNCTION("volume: %p, query: %p\n", volume, query);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	return query->Rewind();
+}
+
+
 // #pragma mark - Module Interface
 
 
@@ -916,10 +1074,26 @@ fs_volume_ops gPackageFSVolumeOps = {
 	NULL,	// write_fs_info,
 	NULL,	// sync,
 
-	&packagefs_get_vnode
+	&packagefs_get_vnode,
 
-	// TODO: index operations
-	// TODO: query operations
+	// index directory
+	&packagefs_open_index_dir,
+	&packagefs_close_index_dir,
+	&packagefs_free_index_dir_cookie,
+	&packagefs_read_index_dir,
+	&packagefs_rewind_index_dir,
+
+	&packagefs_create_index,
+	&packagefs_remove_index,
+	&packagefs_read_index_stat,
+
+	// query operations
+	&packagefs_open_query,
+	&packagefs_close_query,
+	&packagefs_free_query_cookie,
+	&packagefs_read_query,
+	&packagefs_rewind_query,
+
 	// TODO: FS layer operations
 };
 
