@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
 UseLibraryHeaders zlib ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared storage ;
 
 
 HAIKU_PACKAGE_FS_SOURCES =
@@ -21,6 +21,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	NameIndex.cpp
 	Node.cpp
 	NodeListener.cpp
+	Query.cpp
 	Package.cpp
 	PackageDirectory.cpp
 	PackageDomain.cpp
