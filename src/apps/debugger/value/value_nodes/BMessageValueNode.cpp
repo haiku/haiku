@@ -319,11 +319,14 @@ BMessageValueNode::CreateChildren()
 	type_code type;
 	int32 count;
 	Type* fieldType = NULL;
+	BReference<Type> typeRef;
 	for (int32 i = 0; fMessage.GetInfo(B_ANY_TYPE, i, &name, &type,
 		&count) == B_OK; i++) {
 		fieldType = NULL;
 
 		_GetTypeForTypeCode(type, fieldType);
+		if (fieldType != NULL)
+			typeRef.SetTo(fieldType, true);
 
 		BMessageFieldNodeChild* node = new(std::nothrow)
 			BMessageFieldNodeChild(this,
@@ -603,6 +606,8 @@ BMessageValueNode::BMessageFieldNode::CreateChildren()
 	status_t error = fParent->_GetTypeForTypeCode(fFieldType, type);
 	if (error != B_OK)
 		return error;
+
+	BReference<Type> typeRef(type, true);
 	for (int32 i = 0; i < fFieldCount; i++) {
 		BMessageFieldNodeChild* child = new(std::nothrow)
 			BMessageFieldNodeChild(fParent, type, fName, fFieldType, fFieldCount, i);
