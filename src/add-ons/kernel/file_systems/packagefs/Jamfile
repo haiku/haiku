@@ -18,6 +18,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	GlobalFactory.cpp
 	kernel_interface.cpp
 	Node.cpp
+	NodeListener.cpp
 	Package.cpp
 	PackageDirectory.cpp
 	PackageDomain.cpp

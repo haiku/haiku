@@ -15,12 +15,12 @@
 #include <util/KMessage.h>
 
 #include "Node.h"
+#include "NodeListener.h"
 #include "PackageDomain.h"
 #include "PackageLinksListener.h"
 
 
 class Directory;
-class Node;
 class PackageFSRoot;
 class UnpackingNode;
 
@@ -65,6 +65,11 @@ public:
 
 			Node*				FindNode(ino_t nodeID) const
 									{ return fNodes.Lookup(nodeID); }
+
+			// node listeners -- volume must be write-locked
+			void				AddNodeListener(NodeListener* listener,
+									Node* node);
+			void				RemoveNodeListener(NodeListener* listener);
 
 			// VFS wrappers
 			status_t			GetVNode(ino_t nodeID, Node*& _node);
@@ -162,6 +167,11 @@ private:
 
 	inline	Volume*				_SystemVolumeIfNotSelf() const;
 
+			void				_NotifyNodeAdded(Node* node);
+			void				_NotifyNodeRemoved(Node* node);
+			void				_NotifyNodeChanged(Node* node,
+									uint32 statFields);
+
 private:
 	mutable	rw_lock				fLock;
 			fs_volume*			fFSVolume;
@@ -177,6 +187,7 @@ private:
 			} fMountPoint;
 
 			NodeIDHashTable		fNodes;
+			NodeListenerHashTable fNodeListeners;
 
 			JobList				fJobQueue;
 			mutex				fJobQueueLock;

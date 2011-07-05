@@ -52,6 +52,10 @@ using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 // node ID of the root directory
 static const ino_t kRootDirectoryID = 1;
 
+static const uint32 kAllStatFields = B_STAT_MODE | B_STAT_UID | B_STAT_GID
+	| B_STAT_SIZE | B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
+	| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME;
+
 // shine-through directories
 const char* const kSystemShineThroughDirectories[] = {
 	"packages", NULL
@@ -482,11 +486,16 @@ Volume::~Volume()
 status_t
 Volume::Mount(const char* parameterString)
 {
-	// init the node table
+	// init the hash tables
 	status_t error = fNodes.Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	error = fNodeListeners.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// get the mount parameters
 	const char* packages = NULL;
 	const char* volumeName = NULL;
 	const char* mountType = NULL;
@@ -605,6 +614,42 @@ Volume::Unmount()
 }
 
 
+void
+Volume::AddNodeListener(NodeListener* listener, Node* node)
+{
+	ASSERT(!listener->IsListening());
+
+	listener->StartedListening(node);
+
+	if (NodeListener* list = fNodeListeners.Lookup(node))
+		list->AddNodeListener(listener);
+	else
+		fNodeListeners.Insert(listener);
+}
+
+
+void
+Volume::RemoveNodeListener(NodeListener* listener)
+{
+	ASSERT(listener->IsListening());
+
+	Node* node = listener->ListenedNode();
+
+	if (NodeListener* next = listener->RemoveNodeListener()) {
+		// list not empty yet -- if we removed the head, add a new head to the
+		// hash table
+		NodeListener* list = fNodeListeners.Lookup(node);
+		if (list == listener) {
+			fNodeListeners.Remove(listener);
+			fNodeListeners.Insert(next);
+		}
+	} else
+		fNodeListeners.Remove(listener);
+
+	listener->StoppedListening();
+}
+
+
 status_t
 Volume::GetVNode(ino_t nodeID, Node*& _node)
 {
@@ -662,6 +707,7 @@ Volume::PackageLinkNodeAdded(Node* node)
 	_AddPackageLinksNode(node);
 
 	notify_entry_created(ID(), node->Parent()->ID(), node->Name(), node->ID());
+	_NotifyNodeAdded(node);
 }
 
 
@@ -671,6 +717,7 @@ Volume::PackageLinkNodeRemoved(Node* node)
 	_RemovePackageLinksNode(node);
 
 	notify_entry_removed(ID(), node->Parent()->ID(), node->Name(), node->ID());
+	_NotifyNodeRemoved(node);
 }
 
 
@@ -678,6 +725,7 @@ void
 Volume::PackageLinkNodeChanged(Node* node, uint32 statFields)
 {
 	notify_stat_changed(ID(), node->ID(), statFields);
+	_NotifyNodeChanged(node, statFields);
 }
 
 
@@ -1069,6 +1117,11 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		RETURN_ERROR(error);
 	}
 
+	if (newNode)
+		_NotifyNodeAdded(node);
+	else
+		_NotifyNodeChanged(node, kAllStatFields);
+
 	if (notify) {
 		if (newNode) {
 			notify_entry_created(ID(), directory->ID(), node->Name(),
@@ -1078,10 +1131,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 			// Send stat changed notification for directories and entry
 			// removed + created notifications for files and symlinks.
 			if (S_ISDIR(packageNode->Mode())) {
-				notify_stat_changed(ID(), node->ID(),
-					B_STAT_MODE | B_STAT_UID | B_STAT_GID | B_STAT_SIZE
-						| B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
-						| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME);
+				notify_stat_changed(ID(), node->ID(), kAllStatFields);
 				// TODO: Actually the attributes might change, too!
 			} else {
 				notify_entry_removed(ID(), directory->ID(), node->Name(),
@@ -1133,6 +1183,11 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		}
 	}
 
+	if (nodeRemoved)
+		_NotifyNodeRemoved(node);
+	else
+		_NotifyNodeChanged(node, kAllStatFields);
+
 	if (!notify)
 		return;
 
@@ -1144,10 +1199,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		// Send stat changed notification for directories and entry
 		// removed + created notifications for files and symlinks.
 		if (S_ISDIR(packageNode->Mode())) {
-			notify_stat_changed(ID(), node->ID(),
-				B_STAT_MODE | B_STAT_UID | B_STAT_GID | B_STAT_SIZE
-					| B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
-					| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME);
+			notify_stat_changed(ID(), node->ID(), kAllStatFields);
 			// TODO: Actually the attributes might change, too!
 		} else {
 			notify_entry_removed(ID(), directory->ID(), node->Name(),
@@ -1555,4 +1607,82 @@ Volume::_SystemVolumeIfNotSelf() const
 	if (Volume* systemVolume = fPackageFSRoot->SystemVolume())
 		return systemVolume == this ? NULL : systemVolume;
 	return NULL;
+}
+
+
+void
+Volume::_NotifyNodeAdded(Node* node)
+{
+	Node* key = node;
+
+	for (int i = 0; i < 2; i++) {
+		if (NodeListener* listener = fNodeListeners.Lookup(key)) {
+			NodeListener* last = listener->PreviousNodeListener();
+
+			while (true) {
+				NodeListener* next = listener->NextNodeListener();
+
+				listener->NodeAdded(node);
+
+				if (listener == last)
+					break;
+
+				listener = next;
+			}
+		}
+
+		key = NULL;
+	}
+}
+
+
+void
+Volume::_NotifyNodeRemoved(Node* node)
+{
+	Node* key = node;
+
+	for (int i = 0; i < 2; i++) {
+		if (NodeListener* listener = fNodeListeners.Lookup(key)) {
+			NodeListener* last = listener->PreviousNodeListener();
+
+			while (true) {
+				NodeListener* next = listener->NextNodeListener();
+
+				listener->NodeRemoved(node);
+
+				if (listener == last)
+					break;
+
+				listener = next;
+			}
+		}
+
+		key = NULL;
+	}
+}
+
+
+void
+Volume::_NotifyNodeChanged(Node* node, uint32 statFields)
+{
+	Node* key = node;
+
+	for (int i = 0; i < 2; i++) {
+		if (NodeListener* listener = fNodeListeners.Lookup(key)) {
+			NodeListener* last = listener->PreviousNodeListener();
+
+			while (true) {
+				NodeListener* next = listener->NextNodeListener();
+
+				listener->NodeChanged(node, statFields);
+
+				if (listener == last)
+					break;
+
+				listener = next;
+			}
+		}
+
+		key = NULL;
+	}
 }
