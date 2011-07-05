@@ -19,6 +19,7 @@
 #include "NodeListener.h"
 #include "PackageDomain.h"
 #include "PackageLinksListener.h"
+#include "Query.h"
 
 
 class Directory;
@@ -71,6 +72,14 @@ public:
 			void				AddNodeListener(NodeListener* listener,
 									Node* node);
 			void				RemoveNodeListener(NodeListener* listener);
+
+			// query support -- volume must be write-locked
+			void				AddQuery(Query* query);
+			void				RemoveQuery(Query* query);
+			void				UpdateLiveQueries(Node* node,
+									const char* attribute, int32 type,
+									const void* oldKey, size_t oldLength,
+									const void* newKey, size_t newLength);
 
 			Index*				FindIndex(const char* name) const
 									{ return fIndices.Lookup(name); }
@@ -192,6 +201,7 @@ private:
 
 			NodeIDHashTable		fNodes;
 			NodeListenerHashTable fNodeListeners;
+			QueryList			fQueries;
 			IndexHashTable		fIndices;
 
 			JobList				fJobQueue;

@@ -676,6 +676,33 @@ Volume::RemoveNodeListener(NodeListener* listener)
 }
 
 
+void
+Volume::AddQuery(Query* query)
+{
+	fQueries.Add(query);
+}
+
+
+void
+Volume::RemoveQuery(Query* query)
+{
+	fQueries.Remove(query);
+}
+
+
+void
+Volume::UpdateLiveQueries(Node* node, const char* attribute, int32 type,
+	const void* oldKey, size_t oldLength, const void* newKey,
+	size_t newLength)
+{
+	for (QueryList::Iterator it = fQueries.GetIterator();
+			Query* query = it.Next();) {
+		query->LiveUpdate(node, attribute, type, oldKey, oldLength, newKey,
+			newLength);
+	}
+}
+
+
 status_t
 Volume::GetVNode(ino_t nodeID, Node*& _node)
 {
