@@ -460,6 +460,14 @@ Volume::~Volume()
 	while (PackageDomain* packageDomain = fPackageDomains.Head())
 		_RemovePackageDomain(packageDomain);
 
+	// delete all indices
+	Index* index = fIndices.Clear(true);
+	while (index != NULL) {
+		Index* next = index->IndexHashLink();
+		delete index;
+		index = next;
+	}
+
 	// remove all nodes from the ID hash table
 	Node* node = fNodes.Clear(true);
 	while (node != NULL) {
@@ -492,6 +500,10 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(error);
 
 	error = fNodeListeners.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = fIndices.Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

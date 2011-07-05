@@ -14,6 +14,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/KMessage.h>
 
+#include "Index.h"
 #include "Node.h"
 #include "NodeListener.h"
 #include "PackageDomain.h"
@@ -70,6 +71,9 @@ public:
 			void				AddNodeListener(NodeListener* listener,
 									Node* node);
 			void				RemoveNodeListener(NodeListener* listener);
+
+			Index*				FindIndex(const char* name) const
+									{ return fIndices.Lookup(name); }
 
 			// VFS wrappers
 			status_t			GetVNode(ino_t nodeID, Node*& _node);
@@ -188,6 +192,7 @@ private:
 
 			NodeIDHashTable		fNodes;
 			NodeListenerHashTable fNodeListeners;
+			IndexHashTable		fIndices;
 
 			JobList				fJobQueue;
 			mutex				fJobQueueLock;
