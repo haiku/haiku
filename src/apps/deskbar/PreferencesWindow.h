@@ -57,6 +57,7 @@ private:
 
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
+			BCheckBox*		fWindowAutoHide;
 };
 
 #endif	// _PREFERENCES_WINDOW_H

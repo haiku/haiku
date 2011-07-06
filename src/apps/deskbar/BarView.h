@@ -57,6 +57,8 @@ const float kMiniHeight = 46.0f;
 const float kHModeHeight = 21.0f;
 const float kMenuBarHeight = 21.0f;
 const float kStatusHeight = 22.0f;
+const float kHModeHiddenHeight = 1.0f;
+const float kMaxPreventHidingDist = 80.0f;
 
 class BShelf;
 class TBarMenuBar;
@@ -78,11 +80,14 @@ class TBarView : public BView {
 		virtual void MessageReceived(BMessage* message);
 		virtual void MouseMoved(BPoint where, uint32 transit,
 			const BMessage* dragMessage);
+		virtual void MouseDown(BPoint where);
 
 		void SaveSettings();
-		void UpdateAutoRaise();
+		void UpdateEventMask();
 		void UpdatePlacement();
 		void ChangeState(int32 state, bool vertical, bool left, bool top);
+		void RaiseDeskbar(bool raise);
+		void HideDeskbar(bool hide);
 
 		bool Vertical() const;
 		bool Left() const;
@@ -136,7 +141,7 @@ class TBarView : public BView {
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
 		TDragRegion* DragRegion() const { return fDragRegion; }
-
+			
 	private:
 		friend class TBeMenu;
 		friend class PreferencesWindow;

@@ -110,7 +110,7 @@ TBarView::AttachedToWindow()
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	SetFont(be_plain_font);
 
-	UpdateAutoRaise();
+	UpdateEventMask();
 	UpdatePlacement();
 
 	fTrackingHookData.fTrackingHook = MenuTrackingHook;
@@ -183,16 +183,79 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	if (Window() == NULL || EventMask() == 0)
 		return;
 
-	// Auto-Raise
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	bool alwaysOnTop = settings->alwaysOnTop;
+	bool autoRaise = settings->autoRaise;
+	bool autoHide = settings->autoHide;
 
+	if (!autoRaise && !autoHide)
+		return;
+
+	if (DragRegion()->IsDragging())
+		return;
+
+	bool isTopMost = Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
+
+	// Auto-Raise
 	where = ConvertToScreen(where);
 	BScreen screen(Window());
-	BRect frame = screen.Frame();
-	if (where.x == frame.left || where.x == frame.right
-		|| where.y == frame.top || where.y == frame.bottom) {
-		// cursor is on screen edge
-		if (Window()->Frame().Contains(where))
-			Window()->Activate();
+	BRect screenFrame = screen.Frame();
+	if ((where.x == screenFrame.left || where.x == screenFrame.right
+			|| where.y == screenFrame.top || where.y == screenFrame.bottom)
+		&& Window()->Frame().Contains(where)) {
+		// cursor is on a screen edge within the window frame
+
+		if (!alwaysOnTop && autoRaise && !isTopMost)
+			RaiseDeskbar(true);
+
+		if (autoHide && IsHidden())
+			HideDeskbar(false);
+	} else {
+		// cursor is not on screen edge
+		BRect preventHideArea = Window()->Frame().InsetByCopy(
+			-kMaxPreventHidingDist, -kMaxPreventHidingDist);
+
+		if (preventHideArea.Contains(where))
+			return;
+
+		// cursor to bar distance above threshold
+		if (!alwaysOnTop && autoRaise && isTopMost)
+			RaiseDeskbar(false);
+
+		if (autoHide && !IsHidden())
+			HideDeskbar(true);
+	}
+}
+
+
+void
+TBarView::MouseDown(BPoint where)
+{
+	where = ConvertToScreen(where);
+
+	if (Window()->Frame().Contains(where)) {
+		Window()->Activate();
+
+		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
+					| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
+			// The window key was pressed - enter dragging code
+			DragRegion()->MouseDown(
+				DragRegion()->DragRegion().LeftTop());
+			return;
+		}
+	} else {
+		// hide deskbar if required
+		desk_settings* settings = ((TBarApp*)be_app)->Settings();
+		bool alwaysOnTop = settings->alwaysOnTop;
+		bool autoRaise = settings->autoRaise;
+		bool autoHide = settings->autoHide;
+		bool isTopMost = Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
+
+		if (!alwaysOnTop && autoRaise && isTopMost)
+			RaiseDeskbar(false);
+
+		if (autoHide && !IsHidden())
+			HideDeskbar(true);
 	}
 }
 
@@ -334,25 +397,39 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 {
 	float windowHeight = 0;
 	float windowWidth = sMinimumWindowWidth;
-	if (fState == kFullState) {
-		windowHeight = screenFrame.bottom;
-		windowWidth = fBarMenuBar->Frame().Width();
-	} else if (fState == kExpandoState) {
-		if (fVertical) {
-			// top left or right
-			windowHeight = fExpando->Frame().bottom;
+	bool calcHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
+		&& IsHidden() && !DragRegion()->IsDragging();
+
+	if (!calcHiddenSize) {
+		if (fState == kFullState) {
+			windowHeight = screenFrame.bottom;
+			windowWidth = fBarMenuBar->Frame().Width();
+		} else if (fState == kExpandoState) {
+			if (fVertical)
+				// top left or right
+				windowHeight = fExpando->Frame().bottom;
+			else {
+				// top or bottom, full
+				fExpando->CheckItemSizes(0);
+				windowHeight = kHModeHeight;
+				windowWidth = screenFrame.Width();
+			}
 		} else {
-			// top or bottom, full
-			fExpando->CheckItemSizes(0);
-			windowHeight = kHModeHeight;
-			windowWidth = screenFrame.Width();
+			// four corners
+			if (fTrayLocation != 0)
+				windowHeight = fDragRegion->Frame().bottom;
+			else
+				windowHeight = fBarMenuBar->Frame().bottom;
 		}
 	} else {
-		// four corners
-		if (fTrayLocation != 0)
-			windowHeight = fDragRegion->Frame().bottom;
-		else
-			windowHeight = fBarMenuBar->Frame().bottom;
+		windowHeight = kHModeHiddenHeight;
+
+		if (fState == kExpandoState && !fVertical) {
+			// top or bottom, full
+			fExpando->CheckItemSizes(0);
+			windowWidth = screenFrame.Width();
+		} else
+			windowWidth = kHModeHiddenHeight;
 	}
 
 	*width = windowWidth;
@@ -408,15 +485,14 @@ TBarView::SaveSettings()
 	settings->showTime = ShowingClock();
 
 	fReplicantTray->RememberClockSettings();
-	settings->alwaysOnTop
-		= (Window()->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0;
 }
 
 
 void
-TBarView::UpdateAutoRaise()
+TBarView::UpdateEventMask()
 {
-	if (((TBarApp*)be_app)->Settings()->autoRaise)
+	if (((TBarApp*)be_app)->Settings()->autoRaise
+		|| ((TBarApp*)be_app)->Settings()->autoHide)
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	else
 		SetEventMask(0);
@@ -443,7 +519,7 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	fTop = top;
 
 	// Send a message to the preferences window to let it know to enable
-	// or disabled preference items
+	// or disable preference items
 	if (stateChanged || vertSwap)
 		be_app->PostMessage(kStateChanged);
 
@@ -504,6 +580,34 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	}
 
 	Invalidate();
+}
+
+
+void
+TBarView::RaiseDeskbar(bool raise)
+{
+	if (raise)
+		Window()->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+	else
+		Window()->SetFeel(B_NORMAL_WINDOW_FEEL);
+}
+
+
+void
+TBarView::HideDeskbar(bool hide)
+{
+	BScreen screen(Window());
+	BRect screenFrame = screen.Frame();
+
+	if (hide) {
+		Hide();
+		PositionWindow(screenFrame);
+		SizeWindow(screenFrame);
+	} else {
+		Show();
+		SizeWindow(screenFrame);
+		PositionWindow(screenFrame);
+	}
 }
 
 

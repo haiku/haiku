@@ -106,29 +106,6 @@ TBarWindow::TBarWindow()
 
 
 void
-TBarWindow::DispatchMessage(BMessage* message, BHandler* handler)
-{
-	// Activate the window when you click on it (ie. on the tray area,
-	// the menu part will do this automatically)
-	if (message->what == B_MOUSE_DOWN) {
-		if (!((TBarApp*)be_app)->Settings()->autoRaise)
-			Activate(true);
-
-		if (_IsFocusMessage(message)
-			&& (modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
-					| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
-			// The window key was pressed - enter dragging code
-			fBarView->DragRegion()->MouseDown(
-				fBarView->DragRegion()->DragRegion().LeftTop());
-			return;
-		}
-	}
-
-	BWindow::DispatchMessage(message, handler);
-}
-
-
-void
 TBarWindow::MenusBeginning()
 {
 	BPath path;
@@ -182,7 +159,7 @@ TBarWindow::MenusEnded()
 		sBeMenu->UnlockLooper();
 	}
 
-	fBarView->UpdateAutoRaise();
+	fBarView->UpdateEventMask();
 }
 
 

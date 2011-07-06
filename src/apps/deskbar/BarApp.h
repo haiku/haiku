@@ -81,6 +81,7 @@ const uint32 kSortRunningApps = 'SAps';
 const uint32 kSuperExpando = 'SprE';
 const uint32 kExpandNewTeams = 'ExTm';
 const uint32 kAutoRaise = 'AtRs';
+const uint32 kAutoHide = 'AtHd';
 const uint32 kRestartTracker = 'Trak';
 
 // from roster_private.h
@@ -110,6 +111,7 @@ struct desk_settings {
 	bool superExpando;
 	bool expandNewTeams;
 	bool autoRaise;
+	bool autoHide;
 	bool recentAppsEnabled;
 	bool recentDocsEnabled;
 	bool recentFoldersEnabled;

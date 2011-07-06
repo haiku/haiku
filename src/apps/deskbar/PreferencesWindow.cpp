@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Haiku, Inc.
+ * Copyright 2009-2011 Haiku, Inc.
  * All Rights Reserved. Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,6 +62,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kAlwaysTop));
 	fWindowAutoRaise = new BCheckBox(B_TRANSLATE("Auto-raise"),
 		new BMessage(kAutoRaise));
+	fWindowAutoHide = new BCheckBox(B_TRANSLATE("Auto-hide"),
+		new BMessage(kAutoHide));
 
 	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
 	BTextView* appTextView = fMenuRecentApplicationCount->TextView();
@@ -122,6 +124,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	fWindowAlwaysOnTop->SetValue(appSettings->alwaysOnTop);
 	fWindowAutoRaise->SetValue(appSettings->autoRaise);
+	fWindowAutoHide->SetValue(appSettings->autoHide);
 
 	_EnableDisableDependentItems();
 
@@ -134,6 +137,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	fWindowAlwaysOnTop->SetTarget(be_app);
 	fWindowAutoRaise->SetTarget(be_app);
+	fWindowAutoHide->SetTarget(be_app);
 
 	// Layout
 	fMenuBox = new BBox("fMenuBox");
@@ -196,6 +200,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		.AddGroup(B_VERTICAL, 1)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
+			.Add(fWindowAutoHide)
 			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
 			.End()
@@ -301,6 +306,11 @@ PreferencesWindow::_EnableDisableDependentItems()
 		fMenuRecentFolderCount->SetEnabled(true);
 	else
 		fMenuRecentFolderCount->SetEnabled(false);
+
+	if (fWindowAlwaysOnTop->Value() == B_CONTROL_ON)
+		fWindowAutoRaise->SetEnabled(false);
+	else
+		fWindowAutoRaise->SetEnabled(true);
 }
 
 
@@ -310,4 +320,3 @@ PreferencesWindow::WindowActivated(bool active)
 	if (!active && IsMinimized())
 		PostMessage(B_QUIT_REQUESTED);
 }
-

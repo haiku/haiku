@@ -54,8 +54,6 @@ public:
 	virtual void				WorkspaceActivated(int32 workspace,
 									bool activate);
 	virtual void				ScreenChanged(BRect size, color_space depth);
-	virtual void				DispatchMessage(BMessage* message,
-									BHandler* handler);
 	virtual void				MessageReceived(BMessage* message);
 	virtual void				Minimize(bool minimize);
 

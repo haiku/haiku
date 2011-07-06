@@ -197,6 +197,8 @@ public:
 
 	int32 DragRegionLocation() const;
 	void SetDragRegionLocation(int32);
+	
+	bool IsDragging() {return IsTracking();}
 
 private:
 	TBarView* fBarView;

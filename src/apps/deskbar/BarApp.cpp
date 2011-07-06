@@ -206,6 +206,7 @@ TBarApp::SaveSettings()
 		storedSettings.AddBool("superExpando", fSettings.superExpando);
 		storedSettings.AddBool("expandNewTeams", fSettings.expandNewTeams);
 		storedSettings.AddBool("autoRaise", fSettings.autoRaise);
+		storedSettings.AddBool("autoHide", fSettings.autoHide);
 		storedSettings.AddBool("recentAppsEnabled",
 			fSettings.recentAppsEnabled);
 		storedSettings.AddBool("recentDocsEnabled",
@@ -241,6 +242,7 @@ TBarApp::InitSettings()
 	settings.superExpando = false;
 	settings.expandNewTeams = false;
 	settings.autoRaise = false;
+	settings.autoHide = false;
 	settings.recentAppsEnabled = true;
 	settings.recentDocsEnabled = true;
 	settings.recentFoldersEnabled = true;
@@ -290,6 +292,7 @@ TBarApp::InitSettings()
 			storedSettings.FindBool("superExpando", &settings.superExpando);
 			storedSettings.FindBool("expandNewTeams", &settings.expandNewTeams);
 			storedSettings.FindBool("autoRaise", &settings.autoRaise);
+			storedSettings.FindBool("autoHide", &settings.autoHide);
 			storedSettings.FindBool("recentAppsEnabled",
 				&settings.recentAppsEnabled);
 			storedSettings.FindBool("recentDocsEnabled",
@@ -408,19 +411,29 @@ TBarApp::MessageReceived(BMessage* message)
 
 		case kAlwaysTop:
 			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
-
 			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
 				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
+			fPreferencesWindow->PostMessage(kStateChanged);
 			break;
 
 		case kAutoRaise:
-			fSettings.autoRaise = !fSettings.autoRaise;
+			fSettings.autoRaise = fSettings.alwaysOnTop ? false :
+				!fSettings.autoRaise;
 
 			fBarWindow->Lock();
-			BarView()->UpdateAutoRaise();
+			BarView()->UpdateEventMask();
 			fBarWindow->Unlock();
 			break;
 
+		case kAutoHide:
+			fSettings.autoHide = !fSettings.autoHide;
+
+			fBarWindow->Lock();
+			BarView()->UpdateEventMask();
+			BarView()->HideDeskbar(fSettings.autoHide);
+			fBarWindow->Unlock();
+			break;
+			
 		case kTrackerFirst:
 			fSettings.trackerAlwaysFirst = !fSettings.trackerAlwaysFirst;
 
