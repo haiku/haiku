@@ -952,8 +952,10 @@ MemoryManager::_GetChunks(MetaChunkList* metaChunkList, size_t chunkSize,
 
 	if (metaChunk == NULL) {
 		// try to get a free meta chunk
-		if ((SLAB_CHUNK_SIZE_LARGE - kAreaAdminSize) / chunkSize >= chunkCount)
+		if ((SLAB_CHUNK_SIZE_LARGE - SLAB_AREA_STRUCT_OFFSET - kAreaAdminSize)
+				/ chunkSize >= chunkCount) {
 			metaChunk = sFreeShortMetaChunks.RemoveHead();
+		}
 		if (metaChunk == NULL)
 			metaChunk = sFreeCompleteMetaChunks.RemoveHead();
 
