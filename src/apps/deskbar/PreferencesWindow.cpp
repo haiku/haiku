@@ -292,25 +292,15 @@ PreferencesWindow::_EnableDisableDependentItems()
 		fAppsExpandNew->SetEnabled(false);
 	}
 
-	if (fMenuRecentDocuments->Value())
-		fMenuRecentDocumentCount->SetEnabled(true);
-	else
-		fMenuRecentDocumentCount->SetEnabled(false);
+	fMenuRecentDocumentCount->SetEnabled(
+		fMenuRecentDocuments->Value() != B_CONTROL_OFF);
+	fMenuRecentApplicationCount->SetEnabled(
+		fMenuRecentApplications->Value() != B_CONTROL_OFF);
+	fMenuRecentFolderCount->SetEnabled(
+		fMenuRecentFolders->Value() != B_CONTROL_OFF);
 
-	if (fMenuRecentApplications->Value())
-		fMenuRecentApplicationCount->SetEnabled(true);
-	else
-		fMenuRecentApplicationCount->SetEnabled(false);
-
-	if (fMenuRecentFolders->Value())
-		fMenuRecentFolderCount->SetEnabled(true);
-	else
-		fMenuRecentFolderCount->SetEnabled(false);
-
-	if (fWindowAlwaysOnTop->Value() == B_CONTROL_ON)
-		fWindowAutoRaise->SetEnabled(false);
-	else
-		fWindowAutoRaise->SetEnabled(true);
+	fWindowAutoRaise->SetEnabled(
+		fWindowAlwaysOnTop->Value() == B_CONTROL_OFF);
 }
 
 
