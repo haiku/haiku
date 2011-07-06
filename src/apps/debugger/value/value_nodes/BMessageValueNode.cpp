@@ -299,6 +299,13 @@ BMessageValueNode::CreateChildren()
 	Type* whatType = NULL;
 
 	CompoundType* messageType = dynamic_cast<CompoundType*>(fType);
+	if (messageType == NULL || messageType->CountDataMembers() == 0) {
+		if (fContainer != NULL)
+			fContainer->NotifyValueNodeChildrenCreated(this);
+
+		return B_OK;
+	}
+
 	for (int32 i = 0; i < messageType->CountDataMembers(); i++) {
 		member = messageType->DataMemberAt(i);
 		if (strcmp(member->Name(), "what") == 0) {
