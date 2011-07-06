@@ -4,13 +4,14 @@
  */
 
 
+#include "NameIndex.h"
+
 #include <TypeConstants.h>
 
 #include <util/TwoKeyAVLTree.h>
 
 #include "DebugSupport.h"
 #include "IndexImpl.h"
-#include "NameIndex.h"
 #include "Node.h"
 #include "Volume.h"
 
@@ -24,8 +25,8 @@ public:
 		:
 		entry(entry),
 		name(name ? name : entry->Name())
-		{
-		}
+	{
+	}
 
 	NameIndexPrimaryKey(const char* name)
 		:
@@ -59,8 +60,7 @@ public:
 // #pragma mark - NameIndexPrimaryKeyCompare
 
 
-class NameIndexPrimaryKeyCompare
-{
+class NameIndexPrimaryKeyCompare {
 public:
 	inline int operator()(const NameIndexPrimaryKey &a,
 		const NameIndexPrimaryKey &b) const
@@ -171,7 +171,7 @@ NameIndex::NodeAdded(Node* node)
 {
 	fEntries->Insert(node);
 
-	// udpate live queries
+	// update live queries
 	_UpdateLiveQueries(node, NULL, node->Name());
 }
 
@@ -181,7 +181,7 @@ NameIndex::NodeRemoved(Node* node)
 {
 	fEntries->Remove(node, node);
 
-	// udpate live queries
+	// update live queries
 	_UpdateLiveQueries(node, node->Name(), NULL);
 }
 
@@ -317,28 +317,28 @@ NameIndexIterator::Next()
 status_t
 NameIndexIterator::Suspend()
 {
-	status_t error = !fSuspended ? B_OK : B_BAD_VALUE;
-	if (error == B_OK) {
-		if (fIterator.Current() != NULL)
-			fIndex->GetVolume()->AddNodeListener(this, *fIterator.Current());
+	if (fSuspended)
+		return B_BAD_VALUE;
 
-		fSuspended = true;
-	}
-	return error;
+	if (fIterator.Current() != NULL)
+		fIndex->GetVolume()->AddNodeListener(this, *fIterator.Current());
+
+	fSuspended = true;
+	return B_OK;
 }
 
 
 status_t
 NameIndexIterator::Resume()
 {
-	status_t error = fSuspended ? B_OK : B_BAD_VALUE;
-	if (error == B_OK) {
-		if (fIterator.Current() != NULL)
-			fIndex->GetVolume()->RemoveNodeListener(this);
+	if (!fSuspended)
+		return B_BAD_VALUE;
 
-		fSuspended = false;
-	}
-	return error;
+	if (fIterator.Current() != NULL)
+		fIndex->GetVolume()->RemoveNodeListener(this);
+
+	fSuspended = false;
+	return B_OK;
 }
 
 
@@ -350,14 +350,14 @@ NameIndexIterator::SetTo(NameIndex* index, const char* name, bool ignoreValue)
 	fIndex = index;
 	fSuspended = false;
 	fIsNext = false;
-	if (fIndex != NULL) {
-		if (ignoreValue) {
-			fIndex->fEntries->GetIterator(&fIterator);
-			return fIterator.Current() != NULL;
-		}
-		return fIndex->fEntries->FindFirst(name, &fIterator);
+	if (fIndex == NULL)
+		return false;
+
+	if (ignoreValue) {
+		fIndex->fEntries->GetIterator(&fIterator);
+		return fIterator.Current() != NULL;
 	}
-	return false;
+	return fIndex->fEntries->FindFirst(name, &fIterator);
 }
 
 
@@ -365,6 +365,6 @@ void
 NameIndexIterator::NodeRemoved(Node* node)
 {
 	Resume();
-	fIsNext = Next();
+	fIsNext = Next() != NULL;
 	Suspend();
 }
