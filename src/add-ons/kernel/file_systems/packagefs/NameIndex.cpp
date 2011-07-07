@@ -67,7 +67,7 @@ public:
 	{
 		if (a.entry != NULL && a.entry == b.entry)
 			return 0;
-		return strcmp(a.name, b.name) != 0;
+		return strcmp(a.name, b.name);
 	}
 };
 
