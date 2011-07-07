@@ -21,6 +21,8 @@ static const char* const kSystemLinkPath = "../..";
 static const char* const kCommonLinkPath = "../../../common";
 static const char* const kHomeLinkPath = "../../../home/config";
 
+static const char* const kUnknownLinkTarget = "?";
+
 
 static const char*
 link_path_for_mount_type(MountType type)
@@ -44,7 +46,8 @@ link_path_for_mount_type(MountType type)
 
 PackageLinkSymlink::PackageLinkSymlink(Package* package)
 	:
-	Node(0)
+	Node(0),
+	fLinkPath(kUnknownLinkTarget)
 {
 	Update(package, NULL);
 }
@@ -62,7 +65,7 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 		fLinkPath = link_path_for_mount_type(
 			package->Domain()->Volume()->MountType());
 	} else
-		fLinkPath = "?";
+		fLinkPath = kUnknownLinkTarget;
 
 	get_real_time(fModifiedTime);
 
