@@ -130,7 +130,7 @@ NameIndex::NameIndex()
 
 NameIndex::~NameIndex()
 {
-	if (fVolume != NULL)
+	if (IsListening())
 		fVolume->RemoveNodeListener(this);
 
 	delete fEntries;
