@@ -12,6 +12,7 @@
 
 #include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
+#include "NodeListener.h"
 #include "PackageLinksListener.h"
 #include "Utils.h"
 #include "Volume.h"
@@ -41,7 +42,34 @@ link_path_for_mount_type(MountType type)
 }
 
 
-// #pragma mark -
+// #pragma mark - OldAttributes
+
+
+struct PackageLinkSymlink::OldAttributes : OldNodeAttributes {
+	OldAttributes(const timespec& modifiedTime, off_t fileSize)
+		:
+		fModifiedTime(modifiedTime),
+		fFileSize(fileSize)
+	{
+	}
+
+	virtual timespec ModifiedTime() const
+	{
+		return fModifiedTime;
+	}
+
+	virtual off_t FileSize() const
+	{
+		return fFileSize;
+	}
+
+private:
+	timespec	fModifiedTime;
+	off_t		fFileSize;
+};
+
+
+// #pragma mark - PackageLinkSymlink
 
 
 PackageLinkSymlink::PackageLinkSymlink(Package* package)
@@ -61,6 +89,8 @@ PackageLinkSymlink::~PackageLinkSymlink()
 void
 PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 {
+	OldAttributes oldAttributes(fModifiedTime, FileSize());
+
 	if (package != NULL) {
 		fLinkPath = link_path_for_mount_type(
 			package->Domain()->Volume()->MountType());
@@ -71,7 +101,7 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 
 	if (listener != NULL) {
 		listener->PackageLinkNodeChanged(this,
-			B_STAT_SIZE | B_STAT_MODIFICATION_TIME);
+			B_STAT_SIZE | B_STAT_MODIFICATION_TIME, oldAttributes);
 	}
 }
 

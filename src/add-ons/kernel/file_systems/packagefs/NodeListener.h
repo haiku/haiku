@@ -6,6 +6,8 @@
 #define NODE_LISTENER_H
 
 
+#include <time.h>
+
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
@@ -16,6 +18,15 @@ class Node;
 #define NOT_LISTENING_NODE	((Node*)~(addr_t)0)
 
 
+class OldNodeAttributes {
+public:
+	virtual						~OldNodeAttributes();
+
+	virtual	timespec			ModifiedTime() const = 0;
+	virtual	off_t				FileSize() const = 0;
+};
+
+
 class NodeListener {
 public:
 								NodeListener();
@@ -23,7 +34,8 @@ public:
 
 	virtual	void				NodeAdded(Node* node);
 	virtual	void				NodeRemoved(Node* node);
-	virtual	void				NodeChanged(Node* node, uint32 statFields);
+	virtual	void				NodeChanged(Node* node, uint32 statFields,
+									const OldNodeAttributes& oldAttributes);
 
 			void				StartedListening(Node* node)
 									{ fNode = node; }

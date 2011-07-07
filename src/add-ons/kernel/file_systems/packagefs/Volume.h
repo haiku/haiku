@@ -97,7 +97,8 @@ private:
 	virtual	void				PackageLinkNodeAdded(Node* node);
 	virtual	void				PackageLinkNodeRemoved(Node* node);
 	virtual	void				PackageLinkNodeChanged(Node* node,
-									uint32 statFields);
+									uint32 statFields,
+									const OldNodeAttributes& oldAttributes);
 
 private:
 			struct Job;
@@ -183,7 +184,8 @@ private:
 			void				_NotifyNodeAdded(Node* node);
 			void				_NotifyNodeRemoved(Node* node);
 			void				_NotifyNodeChanged(Node* node,
-									uint32 statFields);
+									uint32 statFields,
+									const OldNodeAttributes& oldAttributes);
 
 private:
 	mutable	rw_lock				fLock;

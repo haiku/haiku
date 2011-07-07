@@ -186,7 +186,8 @@ NameIndex::NodeRemoved(Node* node)
 
 
 void
-NameIndex::NodeChanged(Node* node, uint32 statFields)
+NameIndex::NodeChanged(Node* node, uint32 statFields,
+	const OldNodeAttributes& oldAttributes)
 {
 	// nothing to do -- the name remains the same
 }

@@ -7,6 +7,17 @@
 #include "NodeListener.h"
 
 
+// #pragma mark - OldNodeAttributes
+
+
+OldNodeAttributes::~OldNodeAttributes()
+{
+}
+
+
+// #pragma mark - NodeListener
+
+
 NodeListener::NodeListener()
 	:
 	fPrevious(this),
@@ -34,6 +45,7 @@ NodeListener::NodeRemoved(Node* node)
 
 
 void
-NodeListener::NodeChanged(Node* node, uint32 statFields)
+NodeListener::NodeChanged(Node* node, uint32 statFields,
+	const OldNodeAttributes& oldAttributes)
 {
 }
