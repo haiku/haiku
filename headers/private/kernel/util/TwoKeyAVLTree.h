@@ -279,6 +279,8 @@ public:
 
 			Value*				FindFirst(const PrimaryKey& key,
 									Iterator* iterator = NULL);
+			Value*				FindFirstClosest(const PrimaryKey& key,
+									bool less, Iterator* iterator = NULL);
 			Value*				FindLast(const PrimaryKey& key,
 									Iterator* iterator = NULL);
 	inline	Value*				Find(const PrimaryKey& primaryKey,
@@ -295,6 +297,10 @@ public:
 	inline	status_t			Remove(const PrimaryKey& primaryKey,
 									const SecondaryKey& secondaryKey);
 	inline	status_t			Remove(Node* node);
+
+private:
+			Node*				_FindFirst(const PrimaryKey& key,
+									Node** _parent) const;
 
 private:
 			TreeMap				fTreeMap;
@@ -432,35 +438,58 @@ TWO_KEY_AVL_TREE_CLASS_NAME::FindFirst(const PrimaryKey& key,
 	Iterator* iterator)
 {
 	const NodeStrategy& strategy = fTreeMap.GetNodeStrategy();
-	Node* node = fTreeMap.RootNode();
 
-	while (node) {
-		int cmp = fPrimaryKeyCompare(key, fGetPrimaryKey(
-			strategy.GetValue(node)));
-		if (cmp == 0) {
-			// found a matching node, now get the left-most node with that key
-			while (node->left && fPrimaryKeyCompare(key,
-				   	fGetPrimaryKey(strategy.GetValue(
-						strategy.GetNode(node->left)))) == 0) {
-				node = strategy.GetNode(node->left);
-			}
-			if (iterator)
-				iterator->_SetTo(fTreeMap.GetIterator(node));
-			return &strategy.GetValue(node);
-		}
+	Node* node = _FindFirst(key, NULL);
+	if (node == NULL)
+		return NULL;
 
-		if (cmp < 0)
-			node = strategy.GetNode(node->left);
-		else
-			node = strategy.GetNode(node->right);
-	}
-	return NULL;
+	if (iterator != NULL)
+		iterator->_SetTo(fTreeMap.GetIterator(node));
+
+	return &strategy.GetValue(node);
 }
 
 
 TWO_KEY_AVL_TREE_TEMPLATE_LIST
 Value*
-TWO_KEY_AVL_TREE_CLASS_NAME::FindLast(const PrimaryKey& key, Iterator* iterator)
+TWO_KEY_AVL_TREE_CLASS_NAME::FindFirstClosest(const PrimaryKey& key, bool less,
+	Iterator* iterator)
+{
+	const NodeStrategy& strategy = fTreeMap.GetNodeStrategy();
+
+	Node* parent;
+	Node* node = _FindFirst(key, &parent);
+	if (node == NULL) {
+		// not found -- try to get the closest node
+		if (parent == NULL)
+			return NULL;
+
+		node = parent;
+		int expectedCmp = less ? 1 : -1;
+		int cmp = fPrimaryKeyCompare(key,
+			fGetPrimaryKey(strategy.GetValue(strategy.GetNode(node))));
+
+		if (cmp != expectedCmp) {
+			// The node's value is less although we were asked for a greater
+			// value, or the other way around. We need to iterate to the next
+			// node in the respective direction. If there is no node, we fail.
+			node = less ? Previous(node) : Next(node);
+			if (node == NULL)
+				return NULL;
+		}
+	}
+
+	if (iterator != NULL)
+		iterator->_SetTo(fTreeMap.GetIterator(node));
+
+	return &strategy.GetValue(node);
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
+Value*
+TWO_KEY_AVL_TREE_CLASS_NAME::FindLast(const PrimaryKey& key,
+	Iterator* iterator)
 {
 	const NodeStrategy& strategy = fTreeMap.GetNodeStrategy();
 	Node* node = fTreeMap.RootNode();
@@ -562,6 +591,44 @@ status_t
 TWO_KEY_AVL_TREE_CLASS_NAME::Remove(Node* node)
 {
 	return fTreeMap.Remove(node);
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
+TWO_KEY_AVL_TREE_CLASS_NAME::Node*
+TWO_KEY_AVL_TREE_CLASS_NAME::_FindFirst(const PrimaryKey& key,
+	Node** _parent) const
+{
+	const NodeStrategy& strategy = fTreeMap.GetNodeStrategy();
+	Node* node = fTreeMap.RootNode();
+	Node* parent = NULL;
+
+	while (node) {
+		int cmp = fPrimaryKeyCompare(key, fGetPrimaryKey(
+			strategy.GetValue(node)));
+		if (cmp == 0) {
+			// found a matching node, now get the left-most node with that key
+			while (node->left && fPrimaryKeyCompare(key,
+				   	fGetPrimaryKey(strategy.GetValue(
+						strategy.GetNode(node->left)))) == 0) {
+				node = strategy.GetNode(node->left);
+			}
+
+			return node;
+		}
+
+		parent = node;
+
+		if (cmp < 0)
+			node = strategy.GetNode(node->left);
+		else
+			node = strategy.GetNode(node->right);
+	}
+
+	if (_parent != NULL)
+		*_parent = parent;
+
+	return NULL;
 }
 
 
