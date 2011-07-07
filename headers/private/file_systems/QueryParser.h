@@ -404,10 +404,8 @@ skipWhitespaceReverse(char** expr, char* stop)
 }
 
 
-// compare_integral
 template<typename Key>
-static inline
-int
+static inline int
 compare_integral(const Key &a, const Key &b)
 {
 	if (a < b)
@@ -417,11 +415,10 @@ compare_integral(const Key &a, const Key &b)
 	return 0;
 }
 
-// compare_keys
-static
-int
-compare_keys(const uint8 *key1, size_t length1, const uint8 *key2,
-			 size_t length2, uint32 type)
+
+static inline int
+compareKeys(uint32 type, const uint8* key1, size_t length1, const uint8* key2,
+	size_t length2)
 {
 	switch (type) {
 		case B_INT32_TYPE:
@@ -448,15 +445,6 @@ compare_keys(const uint8 *key1, size_t length1, const uint8 *key2,
 		}
 	}
 	return -1;
-}
-
-// compareKeys
-static inline
-int
-compareKeys(uint32 type, const uint8 *key1, size_t length1, const uint8 *key2,
-			size_t length2)
-{
-	return compare_keys(key1, length1, key2, length2, type);
 }
 
 
