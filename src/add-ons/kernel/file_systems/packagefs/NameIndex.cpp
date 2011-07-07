@@ -91,10 +91,8 @@ public:
 								NameIndexIterator();
 	virtual						~NameIndexIterator();
 
-	virtual	Node*				Current();
-	virtual	Node*				Current(void* buffer, size_t* _keyLength);
-	virtual	Node*				Previous();
-	virtual	Node*				Next();
+	virtual	bool				HasNext() const;
+	virtual	Node*				Next(void* buffer, size_t* _keyLength);
 
 	virtual	status_t			Suspend();
 	virtual	status_t			Resume();
@@ -107,13 +105,15 @@ public:
 private:
 			friend class NameIndex;
 
-			typedef AbstractIndexIterator BaseClass;
+			typedef NameIndex::EntryTree EntryTree;
+
+private:
+	inline	Node*				_ToNode() const;
 
 private:
 			NameIndex*			fIndex;
-			NameIndex::EntryTree::Iterator fIterator;
+			EntryTree::Node*	fNextTreeNode;
 			bool				fSuspended;
-			bool				fIsNext;
 };
 
 
@@ -255,9 +255,8 @@ NameIndexIterator::NameIndexIterator()
 	:
 	AbstractIndexIterator(),
 	fIndex(NULL),
-	fIterator(),
-	fSuspended(false),
-	fIsNext(false)
+	fNextTreeNode(NULL),
+	fSuspended(false)
 {
 }
 
@@ -268,49 +267,30 @@ NameIndexIterator::~NameIndexIterator()
 }
 
 
-Node*
-NameIndexIterator::Current()
+bool
+NameIndexIterator::HasNext() const
 {
-	return fIndex != NULL
-		&& fIterator.Current() != NULL ? *fIterator.Current() : NULL;
+	return fNextTreeNode != NULL;
 }
 
 
 Node*
-NameIndexIterator::Current(void* buffer, size_t* _keyLength)
+NameIndexIterator::Next(void* buffer, size_t* _keyLength)
 {
-	Node* entry = Current();
+	if (fSuspended || fNextTreeNode == NULL)
+		return NULL;
+
+	Node* entry = _ToNode();
 	if (entry != NULL) {
-		strlcpy((char*)buffer, entry->Name(), kMaxIndexKeyLength);
-		*_keyLength = strlen(entry->Name());
+		if (buffer != NULL) {
+			strlcpy((char*)buffer, entry->Name(), kMaxIndexKeyLength);
+			*_keyLength = strlen(entry->Name());
+		}
+
+		fNextTreeNode = fIndex->fEntries->Next(fNextTreeNode);
 	}
+
 	return entry;
-}
-
-
-Node*
-NameIndexIterator::Previous()
-{
-	if (fSuspended)
-		return NULL;
-	if (!(fIterator.Current() != NULL && fIsNext))
-		fIterator.Previous();
-	fIsNext = false;
-	return fIndex != NULL
-		&& fIterator.Current() != NULL ? *fIterator.Current() : NULL;
-}
-
-
-Node*
-NameIndexIterator::Next()
-{
-	if (fSuspended)
-		return NULL;
-	if (!(fIterator.Current() != NULL && fIsNext))
-		fIterator.Next();
-	fIsNext = false;
-	return fIndex != NULL
-		&& fIterator.Current() != NULL ? *fIterator.Current() : NULL;
 }
 
 
@@ -320,8 +300,8 @@ NameIndexIterator::Suspend()
 	if (fSuspended)
 		return B_BAD_VALUE;
 
-	if (fIterator.Current() != NULL)
-		fIndex->GetVolume()->AddNodeListener(this, *fIterator.Current());
+	if (fNextTreeNode != NULL)
+		fIndex->GetVolume()->AddNodeListener(this, _ToNode());
 
 	fSuspended = true;
 	return B_OK;
@@ -334,7 +314,7 @@ NameIndexIterator::Resume()
 	if (!fSuspended)
 		return B_BAD_VALUE;
 
-	if (fIterator.Current() != NULL)
+	if (fNextTreeNode != NULL)
 		fIndex->GetVolume()->RemoveNodeListener(this);
 
 	fSuspended = false;
@@ -349,15 +329,19 @@ NameIndexIterator::SetTo(NameIndex* index, const char* name, bool ignoreValue)
 
 	fIndex = index;
 	fSuspended = false;
-	fIsNext = false;
+	fNextTreeNode = NULL;
+
 	if (fIndex == NULL)
 		return false;
 
-	if (ignoreValue) {
-		fIndex->fEntries->GetIterator(&fIterator);
-		return fIterator.Current() != NULL;
-	}
-	return fIndex->fEntries->FindFirst(name, &fIterator);
+	EntryTree::Iterator iterator;
+	if (ignoreValue)
+		fIndex->fEntries->GetIterator(&iterator);
+	else if (fIndex->fEntries->FindFirst(name, &iterator) == NULL)
+		return false;
+
+	fNextTreeNode = iterator.CurrentNode();
+	return fNextTreeNode != NULL;
 }
 
 
@@ -365,6 +349,13 @@ void
 NameIndexIterator::NodeRemoved(Node* node)
 {
 	Resume();
-	fIsNext = Next() != NULL;
+	Next(NULL, NULL);
 	Suspend();
+}
+
+
+Node*
+NameIndexIterator::_ToNode() const
+{
+	return EntryTree::NodeStrategy().GetValue(fNextTreeNode);
 }

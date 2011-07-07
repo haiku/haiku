@@ -73,9 +73,7 @@ public:
 								IndexIterator(Index* index);
 								~IndexIterator();
 
-			Node*				Current();
-			Node*				Current(void* buffer, size_t* _keyLength);
-			Node*				Previous();
+			bool				HasNext() const;
 			Node*				Next();
 			Node*				Next(void* buffer, size_t* _keyLength);
 

@@ -117,41 +117,24 @@ IndexIterator::~IndexIterator()
 }
 
 
-Node*
-IndexIterator::Current()
+bool
+IndexIterator::HasNext() const
 {
-	return fIterator != NULL ? fIterator->Current() : NULL;
-}
-
-
-Node*
-IndexIterator::Current(void* buffer, size_t* _keyLength)
-{
-	return fIterator != NULL ? fIterator->Current(buffer, _keyLength) : NULL;
-}
-
-
-Node*
-IndexIterator::Previous()
-{
-	return fIterator != NULL ? fIterator->Previous() : NULL;
+	return fIterator != NULL && fIterator->HasNext();
 }
 
 
 Node*
 IndexIterator::Next()
 {
-	return fIterator != NULL ? fIterator->Next() : NULL;
+	return fIterator != NULL ? fIterator->Next(NULL, NULL) : NULL;
 }
 
 
 Node*
 IndexIterator::Next(void* buffer, size_t* _keyLength)
 {
-	Node* node = NULL;
-	if (fIterator != NULL && fIterator->Next())
-		node = Current(buffer, _keyLength);
-	return node;
+	return fIterator != NULL ? fIterator->Next(buffer, _keyLength) : NULL;
 }
 
 
