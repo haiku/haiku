@@ -29,7 +29,6 @@ class PagesView;
 class PrinterCap;
 class PrinterData;
 
-extern BString& operator<<(BString& text, double value);
 
 template<typename T, typename R>
 class Range

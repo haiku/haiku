@@ -7,7 +7,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
-#include <fcntl.h>  
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -134,12 +134,6 @@ enum {
 };
 
 
-BString& operator<<(BString& text, double value)
-{
-	text << (float)value;
-	return text;
-}
-
 JobSetupView::JobSetupView(JobData* jobData, PrinterData* printerData,
 	const PrinterCap *printerCap)
 	:
@@ -170,7 +164,7 @@ JobSetupView::JobSetupView(JobData* jobData, PrinterData* printerData,
 }
 
 
-BRadioButton* 
+BRadioButton*
 JobSetupView::CreatePageSelectionItem(const char* name, const char* label,
 	JobData::PageSelection pageSelection)
 {
@@ -196,7 +190,7 @@ JobSetupView::AllowOnlyDigits(BTextView* textView, int maxDigits)
 }
 
 
-void 
+void
 JobSetupView::AttachedToWindow()
 {
 	// quality
@@ -210,7 +204,7 @@ JobSetupView::AttachedToWindow()
 		fJobData->GetColor());
 	BMenuField* colorMenuField = new BMenuField("color", "Color:", fColorType);
 	fColorType->SetTargetForItems(this);
-	
+
 	if (IsHalftoneConfigurationNeeded())
 		CreateHalftoneConfigurationUI();
 
@@ -316,11 +310,11 @@ JobSetupView::AttachedToWindow()
 	fPages->SetReverse(fJobData->GetReverse());
 	fPages->SetExplicitMinSize(BSize(150, 40));
 	fPages->SetExplicitMaxSize(BSize(150, 40));
-	
+
 	// page selection
 	BBox* pageSelectionBox = new BBox("pageSelection");
 	pageSelectionBox->SetLabel("Page Selection");
-	
+
 	fAllPages = CreatePageSelectionItem("allPages", "All Pages",
 		JobData::kAllPages);
 	fOddNumberedPages = CreatePageSelectionItem("oddPages",
@@ -341,7 +335,7 @@ JobSetupView::AttachedToWindow()
 		new BMessage(kMsgCancel));
 	BButton* ok = new BButton("ok", "OK", new BMessage(kMsgOK));
 	ok->MakeDefault(true);
-	
+
 	if (IsHalftoneConfigurationNeeded()) {
 		BGroupView* halftoneGroup = new BGroupView(B_VERTICAL, 0);
 		BGroupLayout* halftoneLayout = halftoneGroup->GroupLayout();
@@ -794,8 +788,8 @@ JobSetupView::UpdateButtonEnabledState()
 	bool pageRangeEnabled = fAll->Value() != B_CONTROL_ON;
 	fFromPage->SetEnabled(pageRangeEnabled);
 	fToPage->SetEnabled(pageRangeEnabled);
-	
-	bool pageSelectionEnabled = fDuplex == NULL || 
+
+	bool pageSelectionEnabled = fDuplex == NULL ||
 		fDuplex->Value() != B_CONTROL_ON;
 	fAllPages->SetEnabled(pageSelectionEnabled);
 	fOddNumberedPages->SetEnabled(pageSelectionEnabled);
@@ -803,7 +797,7 @@ JobSetupView::UpdateButtonEnabledState()
 }
 
 
-void 
+void
 JobSetupView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -820,7 +814,7 @@ JobSetupView::MessageReceived(BMessage* message)
 	case kMsgCollateChanged:
 		fPages->SetCollate(fCollate->Value() == B_CONTROL_ON);
 		break;
-	
+
 	case kMsgReverseChanged:
 		fPages->SetReverse(fReverse->Value() == B_CONTROL_ON);
 		break;
@@ -869,7 +863,7 @@ JobSetupView::UpdateDoubleSlider(BMessage* message)
 }
 
 
-JobData::Color 
+JobData::Color
 JobSetupView::Color()
 {
 	const char *label = fColorType->FindMarked()->Label();
@@ -882,7 +876,7 @@ JobSetupView::Color()
 }
 
 
-Halftone::DitherType 
+Halftone::DitherType
 JobSetupView::DitherType()
 {
 	const char *label = fDitherType->FindMarked()->Label();
@@ -891,7 +885,7 @@ JobSetupView::DitherType()
 	return static_cast<Halftone::DitherType>(id);
 }
 
-float 
+float
 JobSetupView::Gamma()
 {
 	const float value = (float)fGamma->Value();
@@ -899,7 +893,7 @@ JobSetupView::Gamma()
 }
 
 
-float 
+float
 JobSetupView::InkDensity()
 {
 	const float value = (float)(127 - fInkDensity->Value());
@@ -920,7 +914,7 @@ JobSetupView::PaperSource()
 
 }
 
-bool 
+bool
 JobSetupView::UpdateJobData()
 {
 	fJobData->SetShowPreview(fPreview->Value() == B_CONTROL_ON);
@@ -966,7 +960,7 @@ JobSetupView::UpdateJobData()
 	if (fEvenNumberedPages->Value() == B_CONTROL_ON)
 		pageSelection = JobData::kEvenNumberedPages;
 	fJobData->SetPageSelection(pageSelection);
-	
+
 	{
 		std::map<PrinterCap::CapID, BPopUpMenu*>::iterator it =
 			fDriverSpecificPopUpMenus.begin();
@@ -1027,7 +1021,7 @@ JobSetupDlg::JobSetupDlg(JobData* jobData, PrinterData* printerData,
 {
 	SetResult(B_ERROR);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	
+
 	fJobSetup = new JobSetupView(jobData, printerData, printerCap);
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
@@ -1037,7 +1031,7 @@ JobSetupDlg::JobSetupDlg(JobData* jobData, PrinterData* printerData,
 }
 
 
-void 
+void
 JobSetupDlg::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -1050,7 +1044,7 @@ JobSetupDlg::MessageReceived(BMessage* message)
 	case kMsgCancel:
 		PostMessage(B_QUIT_REQUESTED);
 		break;
-		
+
 	default:
 		DialogWindow::MessageReceived(message);
 		break;

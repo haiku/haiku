@@ -2029,6 +2029,18 @@ BString::operator<<(char c)
 
 
 BString&
+BString::operator<<(bool value)
+{
+	if (value)
+		_DoAppend("true", 4);
+	else
+		_DoAppend("false", 5);
+
+	return *this;
+}
+
+
+BString&
 BString::operator<<(int i)
 {
 	char num[32];
@@ -2099,6 +2111,17 @@ BString::operator<<(float f)
 {
 	char num[64];
 	int32 length = snprintf(num, sizeof(num), "%.2f", f);
+
+	_DoAppend(num, length);
+	return *this;
+}
+
+
+BString&
+BString::operator<<(double value)
+{
+	char num[64];
+	int32 length = snprintf(num, sizeof(num), "%.2f", value);
 
 	_DoAppend(num, length);
 	return *this;

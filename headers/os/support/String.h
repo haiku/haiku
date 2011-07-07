@@ -307,14 +307,16 @@ public:
 			BString&		operator<<(const char* string);
 			BString&		operator<<(const BString& string);
 			BString&		operator<<(char c);
+			BString&		operator<<(bool value);
 			BString&		operator<<(int value);
 			BString&		operator<<(unsigned int value);
 			BString&		operator<<(unsigned long value);
 			BString&		operator<<(long value);
 			BString&		operator<<(unsigned long long value);
 			BString&		operator<<(long long value);
-			// float output hardcodes %.2f style formatting
+			// float/double output hardcodes %.2f style formatting
 			BString&		operator<<(float value);
+			BString&		operator<<(double value);
 
 private:
 	class PosVect;
