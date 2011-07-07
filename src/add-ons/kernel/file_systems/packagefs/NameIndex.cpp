@@ -94,6 +94,12 @@ struct NameIndex::IteratorPolicy {
 	{
 		return index->fEntries;
 	}
+
+	static void GetNodeValue(Node* node, void* buffer, size_t* _keyLength)
+	{
+		strlcpy((char*)buffer, node->Name(), kMaxIndexKeyLength);
+		*_keyLength = strlen(node->Name());
+	}
 };
 
 
