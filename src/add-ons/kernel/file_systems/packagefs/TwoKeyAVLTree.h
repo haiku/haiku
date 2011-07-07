@@ -2,8 +2,8 @@
  * Copyright 2003-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _KERNEL_UTIL_TWO_KEY_AVL_TREE_H
-#define _KERNEL_UTIL_TWO_KEY_AVL_TREE_H
+#ifndef TWO_KEY_AVL_TREE_H
+#define TWO_KEY_AVL_TREE_H
 
 
 #include <util/AVLTreeMap.h>
@@ -632,4 +632,4 @@ TWO_KEY_AVL_TREE_CLASS_NAME::_FindFirst(const PrimaryKey& key,
 }
 
 
-#endif	// _KERNEL_UTIL_TWO_KEY_AVL_TREE_H
+#endif	// TWO_KEY_AVL_TREE_H

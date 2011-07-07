@@ -8,11 +8,10 @@
 
 #include <TypeConstants.h>
 
-#include <util/TwoKeyAVLTree.h>
-
 #include "DebugSupport.h"
 #include "IndexImpl.h"
 #include "Node.h"
+#include "TwoKeyAVLTree.h"
 #include "Volume.h"
 
 
