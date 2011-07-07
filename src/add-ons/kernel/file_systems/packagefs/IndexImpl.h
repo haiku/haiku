@@ -8,6 +8,7 @@
 
 #include "Index.h"
 #include "Node.h"
+#include "NodeListener.h"
 
 
 class AbstractIndexIterator {
@@ -21,6 +22,162 @@ public:
 	virtual	status_t			Suspend();
 	virtual	status_t			Resume();
 };
+
+
+template<typename Policy>
+class GenericIndexIterator : public AbstractIndexIterator,
+	public NodeListener {
+public:
+			typedef typename Policy::Index		Index;
+			typedef typename Policy::Value		Value;
+			typedef typename Policy::NodeTree	NodeTree;
+			typedef typename NodeTree::Node		TreeNode;
+
+public:
+								GenericIndexIterator();
+	virtual						~GenericIndexIterator();
+
+	virtual	bool				HasNext() const;
+	virtual	Node*				Next(void* buffer, size_t* _keyLength);
+
+	virtual	status_t			Suspend();
+	virtual	status_t			Resume();
+
+			bool				SetTo(Index* index, const Value& name,
+									bool ignoreValue = false);
+
+	virtual void				NodeRemoved(Node* node);
+
+protected:
+	inline	Node*				_ToNode() const;
+
+protected:
+			Index*				fIndex;
+			TreeNode*			fNextTreeNode;
+			bool				fSuspended;
+};
+
+
+template<typename Policy>
+GenericIndexIterator<Policy>::GenericIndexIterator()
+	:
+	AbstractIndexIterator(),
+	fIndex(NULL),
+	fNextTreeNode(NULL),
+	fSuspended(false)
+{
+}
+
+
+template<typename Policy>
+GenericIndexIterator<Policy>::~GenericIndexIterator()
+{
+	SetTo(NULL, NULL);
+}
+
+
+template<typename Policy>
+bool
+GenericIndexIterator<Policy>::HasNext() const
+{
+	return fNextTreeNode != NULL;
+}
+
+
+template<typename Policy>
+Node*
+GenericIndexIterator<Policy>::Next(void* buffer, size_t* _keyLength)
+{
+	if (fSuspended || fNextTreeNode == NULL)
+		return NULL;
+
+	Node* node = _ToNode();
+	if (node != NULL) {
+		if (buffer != NULL) {
+			strlcpy((char*)buffer, node->Name(), kMaxIndexKeyLength);
+			*_keyLength = strlen(node->Name());
+		}
+
+		fNextTreeNode = Policy::GetNodeTree(fIndex)->Next(fNextTreeNode);
+	}
+
+	return node;
+}
+
+
+template<typename Policy>
+status_t
+GenericIndexIterator<Policy>::Suspend()
+{
+	if (fSuspended)
+		return B_BAD_VALUE;
+
+	if (fNextTreeNode != NULL)
+		fIndex->GetVolume()->AddNodeListener(this, _ToNode());
+
+	fSuspended = true;
+	return B_OK;
+}
+
+
+template<typename Policy>
+status_t
+GenericIndexIterator<Policy>::Resume()
+{
+	if (!fSuspended)
+		return B_BAD_VALUE;
+
+	if (fNextTreeNode != NULL)
+		fIndex->GetVolume()->RemoveNodeListener(this);
+
+	fSuspended = false;
+	return B_OK;
+}
+
+
+template<typename Policy>
+bool
+GenericIndexIterator<Policy>::SetTo(Index* index, const Value& value,
+	bool ignoreValue)
+{
+	Resume();
+
+	fIndex = index;
+	fSuspended = false;
+	fNextTreeNode = NULL;
+
+	if (fIndex == NULL)
+		return false;
+
+	typename NodeTree::Iterator iterator;
+	if (ignoreValue)
+		Policy::GetNodeTree(fIndex)->GetIterator(&iterator);
+	else if (Policy::GetNodeTree(fIndex)->FindFirst(value, &iterator) == NULL)
+		return false;
+
+	fNextTreeNode = iterator.CurrentNode();
+	return fNextTreeNode != NULL;
+}
+
+
+template<typename Policy>
+void
+GenericIndexIterator<Policy>::NodeRemoved(Node* node)
+{
+	Resume();
+	Next(NULL, NULL);
+	Suspend();
+}
+
+
+template<typename Policy>
+Node*
+GenericIndexIterator<Policy>::_ToNode() const
+{
+//	return NodeTree::NodeStrategy().GetValue(fNextTreeNode);
+	typename NodeTree::NodeStrategy strategy;
+	return strategy.GetValue(fNextTreeNode);
+}
 
 
 #endif	// INDEX_IMPL_H

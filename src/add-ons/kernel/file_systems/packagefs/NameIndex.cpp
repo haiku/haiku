@@ -82,38 +82,22 @@ class NameIndex::EntryTree : public _EntryTree {
 };
 
 
-// #pragma mark -  NameIndexIterator
+// #pragma mark -  Iterator
 
 
-class NameIndexIterator : public AbstractIndexIterator,
-	public NodeListener {
-public:
-								NameIndexIterator();
-	virtual						~NameIndexIterator();
+struct NameIndex::IteratorPolicy {
+	typedef NameIndex				Index;
+	typedef const char*				Value;
+	typedef NameIndex::EntryTree	NodeTree;
 
-	virtual	bool				HasNext() const;
-	virtual	Node*				Next(void* buffer, size_t* _keyLength);
+	static NodeTree* GetNodeTree(Index* index)
+	{
+		return index->fEntries;
+	}
+};
 
-	virtual	status_t			Suspend();
-	virtual	status_t			Resume();
 
-			bool				SetTo(NameIndex* index, const char* name,
-									bool ignoreValue = false);
-
-	virtual void				NodeRemoved(Node* node);
-
-private:
-			friend class NameIndex;
-
-			typedef NameIndex::EntryTree EntryTree;
-
-private:
-	inline	Node*				_ToNode() const;
-
-private:
-			NameIndex*			fIndex;
-			EntryTree::Node*	fNextTreeNode;
-			bool				fSuspended;
+struct NameIndex::Iterator : public GenericIndexIterator<IteratorPolicy> {
 };
 
 
@@ -196,7 +180,7 @@ NameIndex::NodeChanged(Node* node, uint32 statFields,
 AbstractIndexIterator*
 NameIndex::InternalGetIterator()
 {
-	NameIndexIterator* iterator = new(std::nothrow) NameIndexIterator;
+	Iterator* iterator = new(std::nothrow) Iterator;
 	if (iterator != NULL) {
 		if (!iterator->SetTo(this, NULL, true)) {
 			delete iterator;
@@ -227,7 +211,7 @@ NameIndex::InternalFind(const void* _key, size_t length)
 		key = clonedKey;
 	}
 
-	NameIndexIterator* iterator = new(std::nothrow) NameIndexIterator;
+	Iterator* iterator = new(std::nothrow) Iterator;
 	if (iterator != NULL) {
 		if (!iterator->SetTo(this, (const char*)key)) {
 			delete iterator;
@@ -245,117 +229,4 @@ NameIndex::_UpdateLiveQueries(Node* entry, const char* oldName,
 	fVolume->UpdateLiveQueries(entry, Name(), Type(),
 		oldName, oldName ? strlen(oldName) : 0,
 		newName, newName ? strlen(newName) : 0);
-}
-
-
-// #pragma mark - NameIndexIterator
-
-
-NameIndexIterator::NameIndexIterator()
-	:
-	AbstractIndexIterator(),
-	fIndex(NULL),
-	fNextTreeNode(NULL),
-	fSuspended(false)
-{
-}
-
-
-NameIndexIterator::~NameIndexIterator()
-{
-	SetTo(NULL, NULL);
-}
-
-
-bool
-NameIndexIterator::HasNext() const
-{
-	return fNextTreeNode != NULL;
-}
-
-
-Node*
-NameIndexIterator::Next(void* buffer, size_t* _keyLength)
-{
-	if (fSuspended || fNextTreeNode == NULL)
-		return NULL;
-
-	Node* entry = _ToNode();
-	if (entry != NULL) {
-		if (buffer != NULL) {
-			strlcpy((char*)buffer, entry->Name(), kMaxIndexKeyLength);
-			*_keyLength = strlen(entry->Name());
-		}
-
-		fNextTreeNode = fIndex->fEntries->Next(fNextTreeNode);
-	}
-
-	return entry;
-}
-
-
-status_t
-NameIndexIterator::Suspend()
-{
-	if (fSuspended)
-		return B_BAD_VALUE;
-
-	if (fNextTreeNode != NULL)
-		fIndex->GetVolume()->AddNodeListener(this, _ToNode());
-
-	fSuspended = true;
-	return B_OK;
-}
-
-
-status_t
-NameIndexIterator::Resume()
-{
-	if (!fSuspended)
-		return B_BAD_VALUE;
-
-	if (fNextTreeNode != NULL)
-		fIndex->GetVolume()->RemoveNodeListener(this);
-
-	fSuspended = false;
-	return B_OK;
-}
-
-
-bool
-NameIndexIterator::SetTo(NameIndex* index, const char* name, bool ignoreValue)
-{
-	Resume();
-
-	fIndex = index;
-	fSuspended = false;
-	fNextTreeNode = NULL;
-
-	if (fIndex == NULL)
-		return false;
-
-	EntryTree::Iterator iterator;
-	if (ignoreValue)
-		fIndex->fEntries->GetIterator(&iterator);
-	else if (fIndex->fEntries->FindFirst(name, &iterator) == NULL)
-		return false;
-
-	fNextTreeNode = iterator.CurrentNode();
-	return fNextTreeNode != NULL;
-}
-
-
-void
-NameIndexIterator::NodeRemoved(Node* node)
-{
-	Resume();
-	Next(NULL, NULL);
-	Suspend();
-}
-
-
-Node*
-NameIndexIterator::_ToNode() const
-{
-	return EntryTree::NodeStrategy().GetValue(fNextTreeNode);
 }
