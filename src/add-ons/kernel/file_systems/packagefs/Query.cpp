@@ -171,10 +171,9 @@ struct Query::QueryPolicy {
 		return node->FileSize();
 	}
 
-	static bigtime_t NodeGetLastModifiedTime(Node* node)
+	static time_t NodeGetLastModifiedTime(Node* node)
 	{
-		timespec time = node->ModifiedTime();
-		return (bigtime_t)time.tv_sec * 1000000 + time.tv_nsec / 1000;
+		return node->ModifiedTime().tv_sec;
 	}
 
 	static status_t NodeGetAttribute(Node* node, const char* attribute,

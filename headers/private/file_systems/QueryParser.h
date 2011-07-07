@@ -1055,8 +1055,8 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 		value.Int64 = QueryPolicy::NodeGetSize(node);
 		type = B_INT64_TYPE;
 	} else if (!strcmp(fAttribute, "last_modified")) {
-		value.Int64 = QueryPolicy::NodeGetLastModifiedTime(node);
-		type = B_INT64_TYPE;
+		value.Int32 = QueryPolicy::NodeGetLastModifiedTime(node);
+		type = B_INT32_TYPE;
 	} else {
 		// then for attributes
 		if (QueryPolicy::NodeGetAttribute(node, fAttribute, buffer, &size,
