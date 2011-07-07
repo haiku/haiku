@@ -40,7 +40,6 @@ private:
 
 private:
 			void				_AddIteratorToUpdate(Iterator* iterator);
-// 			void				_RemoveIterator(Iterator* iterator);
 
 private:
 			NodeTree*			fNodes;
