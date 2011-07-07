@@ -148,12 +148,11 @@ NameIndex::Init(Volume* volume)
 	if (error != B_OK)
 		return error;
 
+	fVolume->AddNodeListener(this, NULL);
+
 	fEntries = new(std::nothrow) EntryTree;
 	if (fEntries == NULL)
 		return B_NO_MEMORY;
-
-	fVolume = volume;
-	fVolume->AddNodeListener(this, NULL);
 
 	return B_OK;
 }
