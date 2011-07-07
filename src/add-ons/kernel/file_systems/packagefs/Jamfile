@@ -49,6 +49,10 @@ HAIKU_PACKAGE_FS_SOURCES =
 	Volume.cpp
 ;
 
+HAIKU_PACKAGE_FS_SHARED_SOURCES =
+	QueryParserUtils.cpp
+;
+
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	BlockBufferCacheImpl.cpp
 	BufferCache.cpp
@@ -76,12 +80,10 @@ local libSharedSources =
 ;
 
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
-
-
 KernelAddon packagefs
 	:
 	$(HAIKU_PACKAGE_FS_SOURCES)
+	$(HAIKU_PACKAGE_FS_SHARED_SOURCES)
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
 	$(libSharedSources)
 
@@ -89,6 +91,10 @@ KernelAddon packagefs
 ;
 
 
+SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_SHARED_SOURCES) ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
+	+= [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 SEARCH on [ FGristFiles $(libSharedSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
 
