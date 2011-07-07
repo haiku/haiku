@@ -148,10 +148,12 @@ GenericIndexIterator<Policy>::SetTo(Index* index, const Value& value,
 		return false;
 
 	typename NodeTree::Iterator iterator;
-	if (ignoreValue)
+	if (ignoreValue) {
 		Policy::GetNodeTree(fIndex)->GetIterator(&iterator);
-	else if (Policy::GetNodeTree(fIndex)->FindFirst(value, &iterator) == NULL)
+	} else if (Policy::GetNodeTree(fIndex)->FindFirstClosest(value, false,
+			&iterator) == NULL) {
 		return false;
+	}
 
 	fNextTreeNode = iterator.CurrentNode();
 	return fNextTreeNode != NULL;
