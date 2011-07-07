@@ -38,6 +38,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	PackageSymlink.cpp
 	Resolvable.cpp
 	ResolvableFamily.cpp
+	SizeIndex.cpp
 	UnpackingAttributeCookie.cpp
 	UnpackingAttributeDirectoryCookie.cpp
 	UnpackingDirectory.cpp
