@@ -45,6 +45,8 @@ public:
 			bool				GetIterator(IndexIterator* iterator);
 			bool				Find(const void* key, size_t length,
 									IndexIterator* iterator);
+									// sets the iterator to the first value
+									// >= key
 
 			Index*&				IndexHashLink()
 									{ return fHashLink; }
@@ -56,6 +58,8 @@ protected:
 	virtual	AbstractIndexIterator* InternalGetIterator() = 0;
 	virtual	AbstractIndexIterator* InternalFind(const void* key,
 									size_t length) = 0;
+									// returns an iterator pointing to the first
+									// value >= key
 
 protected:
 			Index*				fHashLink;
