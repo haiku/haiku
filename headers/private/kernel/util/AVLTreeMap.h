@@ -65,6 +65,9 @@ public:
 
 			Node*				RootNode() const;
 
+			Node*				Previous(Node* node) const;
+			Node*				Next(Node* node) const;
+
 	inline	Iterator			GetIterator();
 	inline	ConstIterator		GetIterator() const;
 
@@ -76,7 +79,10 @@ public:
 
 			status_t			Insert(const Key& key, const Value& value,
 									Iterator* iterator);
+			status_t			Insert(const Key& key, const Value& value,
+									Node** _node = NULL);
 			status_t			Remove(const Key& key);
+			status_t			Remove(Node* node);
 
 			const NodeStrategy&	GetNodeStrategy() const	{ return fStrategy; }
 
@@ -185,6 +191,13 @@ public:
 		return NULL;
 	}
 
+	inline Node* CurrentNode()
+	{
+		if (AVLTreeNode* node = fTreeIterator.Current())
+			return fParent->_GetNode(node);
+		return NULL;
+	}
+
 	inline bool HasNext() const
 	{
 		return fTreeIterator.HasNext();
@@ -267,6 +280,32 @@ _AVL_TREE_MAP_CLASS_NAME::RootNode() const
 	if (AVLTreeNode* root = fTree.Root())
 		return _GetNode(root);
 	return NULL;
+}
+
+
+// Previous
+_AVL_TREE_MAP_TEMPLATE_LIST
+inline typename _AVL_TREE_MAP_CLASS_NAME::Node*
+_AVL_TREE_MAP_CLASS_NAME::Previous(Node* node) const
+{
+	if (node == NULL)
+		return NULL;
+
+	AVLTreeNode* treeNode = fTree.Previous(_GetAVLTreeNode(node));
+	return treeNode != NULL ? _GetNode(treeNode) : NULL;
+}
+
+
+// Next
+_AVL_TREE_MAP_TEMPLATE_LIST
+inline typename _AVL_TREE_MAP_CLASS_NAME::Node*
+_AVL_TREE_MAP_CLASS_NAME::Next(Node* node) const
+{
+	if (node == NULL)
+		return NULL;
+
+	AVLTreeNode* treeNode = fTree.Next(_GetAVLTreeNode(node));
+	return treeNode != NULL ? _GetNode(treeNode) : NULL;
 }
 
 
@@ -354,6 +393,32 @@ _AVL_TREE_MAP_CLASS_NAME::Insert(const Key& key, const Value& value,
 }
 
 
+// Insert
+_AVL_TREE_MAP_TEMPLATE_LIST
+status_t
+_AVL_TREE_MAP_CLASS_NAME::Insert(const Key& key, const Value& value,
+	Node** _node)
+{
+	// allocate a node
+	Node* userNode = _Allocate(key, value);
+	if (!userNode)
+		return B_NO_MEMORY;
+
+	// insert node
+	AVLTreeNode* node = _GetAVLTreeNode(userNode);
+	status_t error = fTree.Insert(node);
+	if (error != B_OK) {
+		_Free(userNode);
+		return error;
+	}
+
+	if (_node != NULL)
+		*_node = userNode;
+
+	return B_OK;
+}
+
+
 // Remove
 _AVL_TREE_MAP_TEMPLATE_LIST
 status_t
@@ -364,6 +429,19 @@ _AVL_TREE_MAP_CLASS_NAME::Remove(const Key& key)
 		return B_ENTRY_NOT_FOUND;
 
 	_Free(_GetNode(node));
+	return B_OK;
+}
+
+
+// Remove
+_AVL_TREE_MAP_TEMPLATE_LIST
+status_t
+_AVL_TREE_MAP_CLASS_NAME::Remove(Node* node)
+{
+	if (!fTree.Remove(node))
+		return B_ENTRY_NOT_FOUND;
+
+	_Free(node);
 	return B_OK;
 }
 

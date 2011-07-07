@@ -274,6 +274,9 @@ public:
 
 	inline	int					CountItems() const	{ return fTreeMap.Count(); }
 
+			Node*				Previous(Node* node) const;
+			Node*				Next(Node* node) const;
+
 			Value*				FindFirst(const PrimaryKey& key,
 									Iterator* iterator = NULL);
 			Value*				FindLast(const PrimaryKey& key,
@@ -283,11 +286,15 @@ public:
 									Iterator* iterator = NULL);
 
 	inline	void				GetIterator(Iterator* iterator);
+	inline	void				GetIterator(Node* node, Iterator* iterator);
 
 	inline	status_t			Insert(const Value& value,
-									Iterator* iterator = NULL);
+									Iterator* iterator);
+	inline	status_t			Insert(const Value& value,
+									Node** _node = NULL);
 	inline	status_t			Remove(const PrimaryKey& primaryKey,
 									const SecondaryKey& secondaryKey);
+	inline	status_t			Remove(Node* node);
 
 private:
 			TreeMap				fTreeMap;
@@ -318,6 +325,11 @@ public:
 	inline Value* Current()
 	{
 		return fIterator.CurrentValuePointer();
+	}
+
+	inline Node* CurrentNode()
+	{
+		return fIterator.CurrentNode();
 	}
 
 	inline Value* Next()
@@ -395,6 +407,22 @@ TWO_KEY_AVL_TREE_CLASS_NAME::TwoKeyAVLTree(
 TWO_KEY_AVL_TREE_TEMPLATE_LIST
 TWO_KEY_AVL_TREE_CLASS_NAME::~TwoKeyAVLTree()
 {
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
+typename TWO_KEY_AVL_TREE_CLASS_NAME::Node*
+TWO_KEY_AVL_TREE_CLASS_NAME::Previous(Node* node) const
+{
+	return fTreeMap.Previous(node);
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
+typename TWO_KEY_AVL_TREE_CLASS_NAME::Node*
+TWO_KEY_AVL_TREE_CLASS_NAME::Next(Node* node) const
+{
+	return fTreeMap.Next(node);
 }
 
 
@@ -485,6 +513,14 @@ TWO_KEY_AVL_TREE_CLASS_NAME::GetIterator(Iterator* iterator)
 
 
 TWO_KEY_AVL_TREE_TEMPLATE_LIST
+void
+TWO_KEY_AVL_TREE_CLASS_NAME::GetIterator(Node* node, Iterator* iterator)
+{
+	iterator->_SetTo(fTreeMap.GetIterator(node));
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
 status_t
 TWO_KEY_AVL_TREE_CLASS_NAME::Insert(const Value& value, Iterator* iterator)
 {
@@ -503,10 +539,29 @@ TWO_KEY_AVL_TREE_CLASS_NAME::Insert(const Value& value, Iterator* iterator)
 
 TWO_KEY_AVL_TREE_TEMPLATE_LIST
 status_t
+TWO_KEY_AVL_TREE_CLASS_NAME::Insert(const Value& value, Node** _node)
+{
+	NodeStrategy& strategy
+		= const_cast<NodeStrategy&>(fTreeMap.GetNodeStrategy());
+
+	return fTreeMap.Insert(strategy.GetValueKey(value), value, _node);
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
+status_t
 TWO_KEY_AVL_TREE_CLASS_NAME::Remove(const PrimaryKey& primaryKey,
 	const SecondaryKey& secondaryKey)
 {
 	return fTreeMap.Remove(Key(primaryKey, secondaryKey));
+}
+
+
+TWO_KEY_AVL_TREE_TEMPLATE_LIST
+status_t
+TWO_KEY_AVL_TREE_CLASS_NAME::Remove(Node* node)
+{
+	return fTreeMap.Remove(node);
 }
 
 
