@@ -32,6 +32,7 @@
 
 #include "DebugSupport.h"
 #include "kernel_interface.h"
+#include "LastModifiedIndex.h"
 #include "NameIndex.h"
 #include "OldUnpackingNodeAttributes.h"
 #include "PackageDirectory.h"
@@ -528,6 +529,21 @@ Volume::Mount(const char* parameterString)
 	// create the size index
 	{
 		SizeIndex* index = new(std::nothrow) SizeIndex;
+		if (index == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		error = index->Init(this);
+		if (error != B_OK) {
+			delete index;
+			RETURN_ERROR(error);
+		}
+
+		fIndices.Insert(index);
+	}
+
+	// create the last modified index
+	{
+		LastModifiedIndex* index = new(std::nothrow) LastModifiedIndex;
 		if (index == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
 
