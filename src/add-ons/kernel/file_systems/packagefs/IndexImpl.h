@@ -46,6 +46,9 @@ public:
 			bool				SetTo(Index* index, const Value& name,
 									bool ignoreValue = false);
 
+	inline	void				NodeChangeBegin(Node* node);
+	inline	void				NodeChangeEnd(Node* node);
+
 	virtual void				NodeRemoved(Node* node);
 
 protected:
@@ -157,6 +160,47 @@ GenericIndexIterator<Policy>::SetTo(Index* index, const Value& value,
 
 	fNextTreeNode = iterator.CurrentNode();
 	return fNextTreeNode != NULL;
+}
+
+
+/*!	Moves the iterator temporarily off the current node.
+	Called when the node the iterator currently points to has been modified and
+	the index is about to remove it from and reinsert it into the tree. After
+	having done that NodeChangeEnd() must be called.
+*/
+template<typename Policy>
+void
+GenericIndexIterator<Policy>::NodeChangeBegin(Node* node)
+{
+	fNextTreeNode = Policy::GetNodeTree(fIndex)->Previous(fNextTreeNode);
+}
+
+
+/*!	Brackets a NodeChangeBegin() call.
+*/
+template<typename Policy>
+void
+GenericIndexIterator<Policy>::NodeChangeEnd(Node* node)
+{
+	if (fNextTreeNode != NULL) {
+		fNextTreeNode = Policy::GetNodeTree(fIndex)->Next(fNextTreeNode);
+	} else {
+		typename NodeTree::Iterator iterator;
+		Policy::GetNodeTree(fIndex)->GetIterator(&iterator);
+		fNextTreeNode = iterator.CurrentNode();
+	}
+
+	// If the node is no longer the one we originally pointed to, re-register
+	// the node listener.
+	if (fNextTreeNode == NULL) {
+		fIndex->GetVolume()->RemoveNodeListener(this);
+	} else {
+		Node* newNode = _ToNode();
+		if (newNode != node) {
+			fIndex->GetVolume()->RemoveNodeListener(this);
+			fIndex->GetVolume()->AddNodeListener(this, newNode);
+		}
+	}
 }
 
 
