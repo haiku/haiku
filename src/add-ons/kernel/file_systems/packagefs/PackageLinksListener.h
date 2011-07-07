@@ -10,6 +10,7 @@
 
 
 class Node;
+class OldNodeAttributes;
 
 
 class PackageLinksListener {
@@ -19,7 +20,8 @@ public:
 	virtual	void				PackageLinkNodeAdded(Node* node) = 0;
 	virtual	void				PackageLinkNodeRemoved(Node* node) = 0;
 	virtual	void				PackageLinkNodeChanged(Node* node,
-									uint32 statFields) = 0;
+									uint32 statFields,
+									const OldNodeAttributes& oldAttributes) = 0;
 };
 
 

@@ -25,7 +25,8 @@ public:
 private:
 	virtual	void				NodeAdded(Node* node);
 	virtual	void				NodeRemoved(Node* node);
-	virtual	void				NodeChanged(Node* node, uint32 statFields);
+	virtual	void				NodeChanged(Node* node, uint32 statFields,
+									const OldNodeAttributes& oldAttributes);
 
 protected:
 	virtual	AbstractIndexIterator* InternalGetIterator();

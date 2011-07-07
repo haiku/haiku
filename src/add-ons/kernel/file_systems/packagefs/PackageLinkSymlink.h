@@ -39,6 +39,9 @@ public:
 									AttributeCookie*& _cookie);
 
 private:
+			struct OldAttributes;
+
+private:
 			timespec			fModifiedTime;
 			const char*			fLinkPath;
 };

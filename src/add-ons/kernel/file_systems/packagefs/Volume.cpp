@@ -33,6 +33,7 @@
 #include "DebugSupport.h"
 #include "kernel_interface.h"
 #include "NameIndex.h"
+#include "OldUnpackingNodeAttributes.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageFSRoot.h"
@@ -775,10 +776,11 @@ Volume::PackageLinkNodeRemoved(Node* node)
 
 
 void
-Volume::PackageLinkNodeChanged(Node* node, uint32 statFields)
+Volume::PackageLinkNodeChanged(Node* node, uint32 statFields,
+	const OldNodeAttributes& oldAttributes)
 {
 	notify_stat_changed(ID(), node->ID(), statFields);
-	_NotifyNodeChanged(node, statFields);
+	_NotifyNodeChanged(node, statFields, oldAttributes);
 }
 
 
@@ -1137,6 +1139,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 	bool newNode = false;
 	UnpackingNode* unpackingNode;
 	Node* node = directory->FindChild(packageNode->Name());
+	PackageNode* oldPackageNode = NULL;
 
 	if (node != NULL) {
 		unpackingNode = dynamic_cast<UnpackingNode*>(node);
@@ -1149,6 +1152,7 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 			RETURN_ERROR(error);
 
 		node = unpackingNode->GetNode();
+		oldPackageNode = unpackingNode->GetPackageNode();
 		newNode = true;
 	}
 
@@ -1170,10 +1174,12 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		RETURN_ERROR(error);
 	}
 
-	if (newNode)
+	if (newNode) {
 		_NotifyNodeAdded(node);
-	else
-		_NotifyNodeChanged(node, kAllStatFields);
+	} else if (packageNode == unpackingNode->GetPackageNode()) {
+		_NotifyNodeChanged(node, kAllStatFields,
+			OldUnpackingNodeAttributes(oldPackageNode));
+	}
 
 	if (notify) {
 		if (newNode) {
@@ -1238,8 +1244,10 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 
 	if (nodeRemoved)
 		_NotifyNodeRemoved(node);
-	else
-		_NotifyNodeChanged(node, kAllStatFields);
+	else if (packageNode == headPackageNode) {
+		_NotifyNodeChanged(node, kAllStatFields,
+			OldUnpackingNodeAttributes(headPackageNode));
+	}
 
 	if (!notify)
 		return;
@@ -1716,7 +1724,8 @@ Volume::_NotifyNodeRemoved(Node* node)
 
 
 void
-Volume::_NotifyNodeChanged(Node* node, uint32 statFields)
+Volume::_NotifyNodeChanged(Node* node, uint32 statFields,
+	const OldNodeAttributes& oldAttributes)
 {
 	Node* key = node;
 
@@ -1727,7 +1736,7 @@ Volume::_NotifyNodeChanged(Node* node, uint32 statFields)
 			while (true) {
 				NodeListener* next = listener->NextNodeListener();
 
-				listener->NodeChanged(node, statFields);
+				listener->NodeChanged(node, statFields, oldAttributes);
 
 				if (listener == last)
 					break;
