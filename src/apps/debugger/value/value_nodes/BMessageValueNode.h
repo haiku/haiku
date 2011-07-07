@@ -36,6 +36,7 @@ public:
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
 
 private:
+
 			status_t				_GetTypeForTypeCode(type_code type,
 										Type*& _type);
 			status_t				_FindField(const char* name,
@@ -53,6 +54,7 @@ private:
 			// for GCC2
 			friend class BMessageFieldNode;
 			friend class BMessageFieldNodeChild;
+			friend class BMessageWhatNodeChild;
 
 			typedef BObjectList<ValueNodeChild> ChildNodeList;
 
@@ -66,6 +68,7 @@ private:
 			BMessage::field_header*	fFields;
 			uint8*					fData;
 			BMessage				fMessage;
+			bool					fIsFlatMessage;
 };
 
 
