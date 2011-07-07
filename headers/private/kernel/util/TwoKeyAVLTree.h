@@ -595,7 +595,7 @@ TWO_KEY_AVL_TREE_CLASS_NAME::Remove(Node* node)
 
 
 TWO_KEY_AVL_TREE_TEMPLATE_LIST
-TWO_KEY_AVL_TREE_CLASS_NAME::Node*
+typename TWO_KEY_AVL_TREE_CLASS_NAME::Node*
 TWO_KEY_AVL_TREE_CLASS_NAME::_FindFirst(const PrimaryKey& key,
 	Node** _parent) const
 {
