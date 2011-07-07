@@ -93,10 +93,8 @@ GenericIndexIterator<Policy>::Next(void* buffer, size_t* _keyLength)
 
 	Node* node = _ToNode();
 	if (node != NULL) {
-		if (buffer != NULL) {
-			strlcpy((char*)buffer, node->Name(), kMaxIndexKeyLength);
-			*_keyLength = strlen(node->Name());
-		}
+		if (buffer != NULL)
+			Policy::GetNodeValue(node, buffer, _keyLength);
 
 		fNextTreeNode = Policy::GetNodeTree(fIndex)->Next(fNextTreeNode);
 	}
