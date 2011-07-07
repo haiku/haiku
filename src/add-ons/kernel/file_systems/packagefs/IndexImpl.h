@@ -15,10 +15,8 @@ public:
 								AbstractIndexIterator();
 	virtual						~AbstractIndexIterator();
 
-	virtual Node*				Current() = 0;
-	virtual Node*				Current(void* buffer, size_t* _keyLength) = 0;
-	virtual Node*				Previous() = 0;
-	virtual Node*				Next() = 0;
+	virtual	bool				HasNext() const = 0;
+	virtual Node*				Next(void* buffer, size_t* _keyLength) = 0;
 
 	virtual	status_t			Suspend();
 	virtual	status_t			Resume();
