@@ -10,7 +10,7 @@
 #include "NodeListener.h"
 
 
-class NameIndexIterator;
+template<typename Policy> class GenericIndexIterator;
 
 
 class NameIndex : public Index, private NodeListener {
@@ -35,7 +35,10 @@ protected:
 
 private:
 			class EntryTree;
-			friend class NameIndexIterator;
+			struct IteratorPolicy;
+			struct Iterator;
+
+			friend class IteratorPolicy;
 
 			void				_UpdateLiveQueries(Node* entry,
 									const char* oldName, const char* newName);
