@@ -41,6 +41,7 @@
 #include "PackageLinksDirectory.h"
 #include "PackageSymlink.h"
 #include "Resolvable.h"
+#include "SizeIndex.h"
 #include "UnpackingLeafNode.h"
 #include "UnpackingDirectory.h"
 #include "Version.h"
@@ -510,17 +511,34 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(error);
 
 	// create the name index
-	NameIndex* index = new(std::nothrow) NameIndex;
-	if (index == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
+	{
+		NameIndex* index = new(std::nothrow) NameIndex;
+		if (index == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
 
-	error = index->Init(this);
-	if (error != B_OK) {
-		delete index;
-		RETURN_ERROR(error);
+		error = index->Init(this);
+		if (error != B_OK) {
+			delete index;
+			RETURN_ERROR(error);
+		}
+
+		fIndices.Insert(index);
 	}
 
-	fIndices.Insert(index);
+	// create the size index
+	{
+		SizeIndex* index = new(std::nothrow) SizeIndex;
+		if (index == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		error = index->Init(this);
+		if (error != B_OK) {
+			delete index;
+			RETURN_ERROR(error);
+		}
+
+		fIndices.Insert(index);
+	}
 
 	// get the mount parameters
 	const char* packages = NULL;
