@@ -150,7 +150,7 @@ public:
 								Query<QueryPolicy>*& _query);
 
 			status_t		Rewind();
-			status_t		GetNextEntry(struct dirent* , size_t size);
+	inline	status_t		GetNextEntry(struct dirent* dirent, size_t size);
 
 			void			LiveUpdate(Entry* entry, Node* node,
 								const char* attribute, int32 type,
@@ -168,6 +168,7 @@ public:
 								{ return fFlags; }
 
 private:
+			status_t		_GetNextEntry(struct dirent* dirent, size_t size);
 			void			_SendEntryNotification(Entry* entry,
 								status_t (*notify)(port_id, int32, dev_t, ino_t,
 									const char*, ino_t));
@@ -1755,38 +1756,15 @@ template<typename QueryPolicy>
 status_t
 Query<QueryPolicy>::GetNextEntry(struct dirent* dirent, size_t size)
 {
-	// If we don't have an equation to use yet/anymore, get a new one
-	// from the stack
-	while (true) {
-		if (fIterator == NULL) {
-			if (!fStack.Pop(&fCurrent)
-				|| fCurrent == NULL)
-				return B_ENTRY_NOT_FOUND;
+	if (fIterator != NULL)
+		QueryPolicy::IndexIteratorResume(fIterator);
 
-			status_t status = fCurrent->PrepareQuery(fContext, fIndex,
-				&fIterator, fFlags & B_QUERY_NON_INDEXED);
-			if (status == B_ENTRY_NOT_FOUND) {
-				// try next equation
-				continue;
-			}
+	status_t error = _GetNextEntry(dirent, size);
 
-			if (status != B_OK)
-				return status;
-		}
-		if (fCurrent == NULL)
-			QUERY_RETURN_ERROR(B_ERROR);
+	if (fIterator != NULL)
+		QueryPolicy::IndexIteratorSuspend(fIterator);
 
-		status_t status = fCurrent->GetNextMatching(fContext, fIterator, dirent,
-			size);
-		if (status != B_OK) {
-			QueryPolicy::IndexIteratorDelete(fIterator);
-			fIterator = NULL;
-			fCurrent = NULL;
-		} else {
-			// only return if we have another entry
-			return B_OK;
-		}
-	}
+	return error;
 }
 
 
@@ -1892,6 +1870,45 @@ Query<QueryPolicy>::LiveUpdateRenameMove(Entry* entry, Node* node,
 			_SendEntryNotification(entry, notify_query_entry_removed);
 			_SendEntryNotification(entry, notify_query_entry_created);
 			entry = QueryPolicy::NodeGetNextReferrer(node, entry);
+		}
+	}
+}
+
+
+template<typename QueryPolicy>
+status_t
+Query<QueryPolicy>::_GetNextEntry(struct dirent* dirent, size_t size)
+{
+	// If we don't have an equation to use yet/anymore, get a new one
+	// from the stack
+	while (true) {
+		if (fIterator == NULL) {
+			if (!fStack.Pop(&fCurrent)
+				|| fCurrent == NULL)
+				return B_ENTRY_NOT_FOUND;
+
+			status_t status = fCurrent->PrepareQuery(fContext, fIndex,
+				&fIterator, fFlags & B_QUERY_NON_INDEXED);
+			if (status == B_ENTRY_NOT_FOUND) {
+				// try next equation
+				continue;
+			}
+
+			if (status != B_OK)
+				return status;
+		}
+		if (fCurrent == NULL)
+			QUERY_RETURN_ERROR(B_ERROR);
+
+		status_t status = fCurrent->GetNextMatching(fContext, fIterator, dirent,
+			size);
+		if (status != B_OK) {
+			QueryPolicy::IndexIteratorDelete(fIterator);
+			fIterator = NULL;
+			fCurrent = NULL;
+		} else {
+			// only return if we have another entry
+			return B_OK;
 		}
 	}
 }

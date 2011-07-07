@@ -154,6 +154,16 @@ struct Query::QueryPolicy {
 		return B_OK;
 	}
 
+	static void IndexIteratorSuspend(IndexIterator* indexIterator)
+	{
+		indexIterator->Suspend();
+	}
+
+	static void IndexIteratorResume(IndexIterator* indexIterator)
+	{
+		indexIterator->Resume();
+	}
+
 	// Node interface
 
 	static const off_t NodeGetSize(Node* node)
