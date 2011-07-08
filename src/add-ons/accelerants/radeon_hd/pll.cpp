@@ -242,75 +242,97 @@ PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	uint32 feedbackTemp = feedback << 16;
 	uint32 referenceTemp = reference;
 
+	/* Internal PLL Registers */
+	uint16 pllCntl = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllIntSSCntl
+		= (pllIndex == 1) ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
+
+	/* External PLL Registers */
+	uint16 pllExtCntl
+		= (pllIndex == 1) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
+	uint16 pllExtUpdateCntl
+		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_CNTL : EXT1_PPLL_UPDATE_CNTL;
+	uint16 pllExtUpdateLock
+		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
+	uint16 pllExtPostDiv
+		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
+	uint16 pllExtPostDivSrc
+		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
+	uint16 pllExtFeedbackDiv
+		= (pllIndex == 1) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
+	uint16 pllExtRefDiv
+		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
+	uint16 pllExtRefDivSrc
+		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV_SRC : EXT1_PPLL_REF_DIV_SRC;
+
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	if (info.device_chipset == RADEON_R600)
+	if (info.device_chipset <= RADEON_R600)
 		feedbackTemp |= 0x00000030;
-	else if (info.device_chipset > RADEON_R600) {
+	else {
 		if (feedback <= 0x24)
 			feedbackTemp |= 0x00000030;
 		else if (feedback <= 0x3F)
 			feedbackTemp |= 0x00000020;
-	} else
-		feedbackTemp |= Read32(PLL, EXT1_PPLL_FB_DIV) & 0x00000030;
+	}
 
-	uint32 postTemp = Read32(PLL, EXT1_PPLL_POST_DIV) & ~0x0000007F;
+	uint32 postTemp = Read32(PLL, pllExtPostDiv) & ~0x0000007F;
 	postTemp |= post & 0x0000007F;
 
 	uint32 control;
 	if (info.device_chipset == RADEON_R600)
 		control = 0x01130704;
 	else {
-		PLLControlTable(RV610PLLControl, feedback);
-		control = Read32(PLL, EXT1_PPLL_CNTL);
+		control = PLLControlTable(RV610PLLControl, feedback);
+		if (!control)
+			control = Read32(PLL, pllExtCntl);
 	}
 
-	Write32Mask(PLL, P1PLL_INT_SS_CNTL, 0, 0x00000001);
+	Write32Mask(PLL, pllIntSSCntl, 0, 0x00000001);
 		// Disable Spread Spectrum
 
-	Write32(PLL, EXT1_PPLL_REF_DIV_SRC, 0x01); /* XTAL */
-	Write32(PLL, EXT1_PPLL_POST_DIV_SRC, 0x00); /* source = reference */
+	Write32(PLL, pllExtRefDivSrc, 0x01); /* XTAL */
+	Write32(PLL, pllExtPostDivSrc, 0x00); /* source = reference */
 
-	Write32(PLL, EXT1_PPLL_UPDATE_LOCK, 0x01); /* lock */
+	Write32(PLL, pllExtUpdateLock, 0x01); /* lock */
 
-	Write32(PLL, EXT1_PPLL_REF_DIV, referenceTemp);
-	Write32(PLL, EXT1_PPLL_FB_DIV, feedbackTemp);
-	Write32(PLL, EXT1_PPLL_POST_DIV, postTemp);
-	Write32(PLL, EXT1_PPLL_CNTL, control);
+	Write32(PLL, pllExtRefDiv, referenceTemp);
+	Write32(PLL, pllExtFeedbackDiv, feedbackTemp);
+	Write32(PLL, pllExtPostDiv, postTemp);
+	Write32(PLL, pllExtCntl, control);
 
-	Write32Mask(PLL, EXT1_PPLL_UPDATE_CNTL, 0x00010000, 0x00010000);
+	Write32Mask(PLL, pllExtUpdateCntl, 0x00010000, 0x00010000);
 		// No autoreset
-	Write32Mask(PLL, P1PLL_CNTL, 0, 0x04);
+	Write32Mask(PLL, pllCntl, 0, 0x04);
 		// Don't bypass calibration
 
 	/* We need to reset the anti glitch logic */
-	Write32Mask(PLL, P1PLL_CNTL, 0, 0x00000002);
+	Write32Mask(PLL, pllCntl, 0, 0x00000002);
 		// Power up
 
 	/* reset anti glitch logic */
-	Write32Mask(PLL, P1PLL_CNTL, 0x00002000, 0x00002000);
+	Write32Mask(PLL, pllCntl, 0x00002000, 0x00002000);
 	snooze(2);
-	Write32Mask(PLL, P1PLL_CNTL, 0, 0x00002000);
+	Write32Mask(PLL, pllCntl, 0, 0x00002000);
 
 	/* powerdown and reset */
-	Write32Mask(PLL, P1PLL_CNTL, 0x00000003, 0x00000003);
+	Write32Mask(PLL, pllCntl, 0x00000003, 0x00000003);
 	snooze(2);
 
-	Write32(PLL, EXT1_PPLL_UPDATE_LOCK, 0);
+	Write32(PLL, pllExtUpdateLock, 0);
 		// Unlock
-	Write32Mask(PLL, EXT1_PPLL_UPDATE_CNTL, 0, 0x01);
+	Write32Mask(PLL, pllExtUpdateCntl, 0, 0x01);
 		// Done updating
 
-	Write32Mask(PLL, P1PLL_CNTL, 0, 0x02);
+	Write32Mask(PLL, pllCntl, 0, 0x02);
 		// Power up PLL
 	snooze(2);
 
 	PLLCalibrate(pllIndex);
 
-	Write32(PLL, EXT1_PPLL_POST_DIV_SRC, 0x01);
+	Write32(PLL, pllExtPostDivSrc, 0x01);
 		// Set source as PLL
 
-	// TODO : If CRT2 ah-la R500PLLCRTCGrab
 	PLLCRTCGrab(pllIndex, false);
 }
 
@@ -328,34 +350,42 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	if (hasDccg)
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_RESET);
 
-	uint16 pllLockReg
-		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
-	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
-	uint16 pllExtControlReg = (pllIndex == 1) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
-	uint16 pllDisplayClockControlReg
-		= (pllIndex == 1) ? P2PLL_DISP_CLK_CNTL : P1PLL_DISP_CLK_CNTL;
-	uint16 pllIntSSControlReg
+	/* Internal PLL Registers */
+	uint16 pllCntl = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllIntSSCntl
 		= (pllIndex == 1) ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
-	uint16 pllReferenceDividerReg
-		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
-	uint16 pllFeedbackDividerReg
-		= (pllIndex == 1) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
-	uint16 pllPostDividerReg
-		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
-	uint16 pplPostDividerSymReg
-		= (pllIndex == 1) ? EXT2_SYM_PPLL_POST_DIV : EXT1_SYM_PPLL_POST_DIV;
-	uint16 pllPostDividerSrcReg
-		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
 
-	Write32Mask(PLL, pllIntSSControlReg, 0, 0x00000001);
+	/* External PLL Registers */
+	uint16 pllExtCntl
+		= (pllIndex == 1) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
+	//uint16 pllExtUpdateCntl
+	//	= (pllIndex == 1) ? EXT2_PPLL_UPDATE_CNTL : EXT1_PPLL_UPDATE_CNTL;
+	uint16 pllExtUpdateLock
+		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
+	uint16 pllExtPostDiv
+		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
+	uint16 pllExtPostDivSrc
+		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
+	uint16 pllExtPostDivSym
+		= (pllIndex == 1) ? EXT2_SYM_PPLL_POST_DIV : EXT1_SYM_PPLL_POST_DIV;
+	uint16 pllExtFeedbackDiv
+		= (pllIndex == 1) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
+	uint16 pllExtRefDiv
+		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
+	//uint16 pllExtRefDivSrc
+	//	= (pllIndex == 1) ? EXT2_PPLL_REF_DIV_SRC : EXT1_PPLL_REF_DIV_SRC;
+	uint16 pllExtDispClkCntl
+		= (pllIndex == 1) ? P2PLL_DISP_CLK_CNTL : P1PLL_DISP_CLK_CNTL;
+
+	Write32Mask(PLL, pllIntSSCntl, 0, 0x00000001);
 		// Disable Spread Spectrum
 
 	uint32 referenceDivider = reference;
 
-	uint32 feedbackDivider = Read32(PLL, pllFeedbackDividerReg) & ~0x07FF003F;
+	uint32 feedbackDivider = Read32(PLL, pllExtFeedbackDiv) & ~0x07FF003F;
 	feedbackDivider |= ((feedback << 16) | 0x0030) & 0x07FF003F;
 
-	uint32 postDivider = Read32(PLL, pllPostDividerReg) & ~0x0000007F;
+	uint32 postDivider = Read32(PLL, pllExtPostDiv) & ~0x0000007F;
 	postDivider |= post & 0x0000007F;
 
 	uint32 control;
@@ -368,54 +398,54 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	uint8 symPostDiv = post & 0x0000007F;
 
 	/* switch to external */
-	Write32(PLL, pllPostDividerSrcReg, 0);
-	Write32Mask(PLL, pllDisplayClockControlReg, 0x00000200, 0x00000300);
-	Write32Mask(PLL, pllPostDividerReg, 0, 0x00000100);
+	Write32(PLL, pllExtPostDivSrc, 0);
+	Write32Mask(PLL, pllExtDispClkCntl, 0x00000200, 0x00000300);
+	Write32Mask(PLL, pllExtPostDiv, 0, 0x00000100);
 
-	Write32Mask(PLL, pllControlReg, 0x00000001, 0x00000001);
+	Write32Mask(PLL, pllCntl, 0x00000001, 0x00000001);
 		// reset
 	snooze(2);
-	Write32Mask(PLL, pllControlReg, 0x00000002, 0x00000002);
+	Write32Mask(PLL, pllCntl, 0x00000002, 0x00000002);
 		// power down
 	snooze(10);
-	Write32Mask(PLL, pllControlReg, 0x00002000, 0x00002000);
+	Write32Mask(PLL, pllCntl, 0x00002000, 0x00002000);
 		// reset antiglitch
 
-	Write32(PLL, pllExtControlReg, control);
+	Write32(PLL, pllExtCntl, control);
 
-	Write32Mask(PLL, pllDisplayClockControlReg, 2, 0x0000003F);
+	Write32Mask(PLL, pllExtDispClkCntl, 2, 0x0000003F);
 		// Scalar Divider 2
 
-	Write32(PLL, pllLockReg, 1);
+	Write32(PLL, pllExtUpdateLock, 1);
 		// Lock PLL
 
 	/* Write PLL clocks */
-	Write32(PLL, pllPostDividerSrcReg, 0x00000001);
-	Write32(PLL, pllReferenceDividerReg, referenceDivider);
-	Write32(PLL, pllFeedbackDividerReg, feedbackDivider);
-	Write32Mask(PLL, pllPostDividerReg, postDivider, 0x0000007F);
-	Write32Mask(PLL, pplPostDividerSymReg, symPostDiv, 0x0000007F);
+	Write32(PLL, pllExtPostDivSrc, 0x00000001);
+	Write32(PLL, pllExtRefDiv, referenceDivider);
+	Write32(PLL, pllExtFeedbackDiv, feedbackDivider);
+	Write32Mask(PLL, pllExtPostDiv, postDivider, 0x0000007F);
+	Write32Mask(PLL, pllExtPostDivSym, symPostDiv, 0x0000007F);
 
 	snooze(10);
 
-	Write32(PLL, pllLockReg, 0);
+	Write32(PLL, pllExtUpdateLock, 0);
 		// Unlock PLL
 
-	Write32Mask(PLL, pllControlReg, 0, 0x00000002);
+	Write32Mask(PLL, pllCntl, 0, 0x00000002);
 		// power up
 	snooze(10);
 
-	Write32Mask(PLL, pllControlReg, 0, 0x00002000);
+	Write32Mask(PLL, pllCntl, 0, 0x00002000);
 		// undo reset antiglitch
 
 	PLLCalibrate(pllIndex);
 
 	/* Switch back to PLL */
-	Write32Mask(PLL, pllDisplayClockControlReg, 0, 0x00000300);
-	Write32Mask(PLL, pplPostDividerSymReg, 0x00000100, 0x00000100);
-	Write32(PLL, pllPostDividerSrcReg, 0x00000001);
+	Write32Mask(PLL, pllExtDispClkCntl, 0, 0x00000300);
+	Write32Mask(PLL, pllExtPostDivSym, 0x00000100, 0x00000100);
+	Write32(PLL, pllExtPostDivSrc, 0x00000001);
 
-	Write32Mask(PLL, pllControlReg, 0, 0x80000000);
+	Write32Mask(PLL, pllCntl, 0, 0x80000000);
 		// needed and undocumented
 
 	// TODO : If CRT2 ah-la R500PLLCRTCGrab
@@ -470,12 +500,12 @@ PLLCRTCGrab(uint8 pllIndex, bool crt2)
 	if (!crt2) {
 		pll2IsCurrent = Read32(PLL, PCLK_CRTC1_CNTL) & 0x00010000;
 
-		Write32Mask(PLL, PCLK_CRTC1_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
+		Write32Mask(PLL, PCLK_CRTC1_CNTL, (pllIndex == 0) ? 0x00010000 : 0,
 			0x00010000);
 	} else {
 		pll2IsCurrent = Read32(PLL, PCLK_CRTC2_CNTL) & 0x00010000;
 
-		Write32Mask(PLL, PCLK_CRTC2_CNTL, (pllIndex == 1) ? 0x00010000 : 0,
+		Write32Mask(PLL, PCLK_CRTC2_CNTL, (pllIndex == 0) ? 0x00010000 : 0,
 			0x00010000);
 	}
 
