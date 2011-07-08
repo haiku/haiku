@@ -263,7 +263,7 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 		PackageNode* node = (PackageNode*)entry->UserToken();
 
 		PackageNodeAttribute* nodeAttribute = new(std::nothrow)
-			PackageNodeAttribute(node, attribute->Type(), attribute->Data());
+			PackageNodeAttribute(attribute->Type(), attribute->Data());
 		if (nodeAttribute == NULL)
 			RETURN_ERROR(B_NO_MEMORY)
 
