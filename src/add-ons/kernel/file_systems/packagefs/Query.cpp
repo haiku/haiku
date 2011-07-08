@@ -119,7 +119,7 @@ struct Query::QueryPolicy {
 		if (iterator == NULL)
 			return NULL;
 
-		if (!index.index->GetIterator(iterator)) {
+		if (!index.index->GetIterator(*iterator)) {
 			delete iterator;
 			return NULL;
 		}
@@ -137,7 +137,7 @@ struct Query::QueryPolicy {
 	static status_t IndexIteratorFind(IndexIterator* indexIterator,
 		const void* value, size_t size)
 	{
-		if (!indexIterator->index->Find(value, size, indexIterator))
+		if (!indexIterator->index->Find(value, size, *indexIterator))
 			return B_ENTRY_NOT_FOUND;
 
 		return B_OK;

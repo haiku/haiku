@@ -42,9 +42,9 @@ public:
 
 	virtual	int32				CountEntries() const = 0;
 
-			bool				GetIterator(IndexIterator* iterator);
+			bool				GetIterator(IndexIterator& iterator);
 			bool				Find(const void* key, size_t length,
-									IndexIterator* iterator);
+									IndexIterator& iterator);
 									// sets the iterator to the first value
 									// >= key
 
