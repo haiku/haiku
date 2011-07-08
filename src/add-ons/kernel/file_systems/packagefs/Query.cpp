@@ -187,6 +187,14 @@ struct Query::QueryPolicy {
 
 		error = cookie->ReadAttribute(0, buffer, _size);
 
+		// also get the attribute type
+		if (error == B_OK) {
+			struct stat st;
+			error = cookie->ReadAttributeStat(&st);
+			if (error == B_OK)
+				*_type = st.st_type;
+		}
+
 		cookie->Close();
 		delete cookie;
 
