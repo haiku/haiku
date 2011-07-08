@@ -621,7 +621,7 @@ packagefs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 
 		// fill in the entry name -- checks whether the entry fits into the
 		// buffer
-		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
+		if (!set_dirent_name(buffer, bufferSize, name)) {
 			if (count == 0)
 				RETURN_ERROR(B_BUFFER_OVERFLOW);
 			break;
