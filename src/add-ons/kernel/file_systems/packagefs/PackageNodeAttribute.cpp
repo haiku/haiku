@@ -15,6 +15,7 @@ PackageNodeAttribute::PackageNodeAttribute(uint32 type,
 	:
 	fData(data),
 	fName(NULL),
+	fIndexCookie(NULL),
 	fType(type)
 {
 }

@@ -77,3 +77,17 @@ Node::SetParent(Directory* parent)
 {
 	fParent = parent;
 }
+
+
+status_t
+Node::IndexAttribute(AttributeIndexer* indexer)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+void*
+Node::IndexCookieForAttribute(const char* name) const
+{
+	return NULL;
+}

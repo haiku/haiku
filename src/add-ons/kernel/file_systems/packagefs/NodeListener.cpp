@@ -15,6 +15,13 @@ OldNodeAttributes::~OldNodeAttributes()
 }
 
 
+void*
+OldNodeAttributes::IndexCookieForAttribute(const char* name) const
+{
+	return NULL;
+}
+
+
 // #pragma mark - NodeListener
 
 

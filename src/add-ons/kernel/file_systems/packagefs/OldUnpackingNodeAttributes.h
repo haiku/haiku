@@ -19,6 +19,7 @@ public:
 
 	virtual	timespec			ModifiedTime() const;
 	virtual	off_t				FileSize() const;
+	virtual	void*				IndexCookieForAttribute(const char* name) const;
 
 private:
 			PackageNode*		fPackageNode;

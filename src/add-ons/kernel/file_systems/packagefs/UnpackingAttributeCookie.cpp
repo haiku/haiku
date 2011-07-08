@@ -15,6 +15,7 @@
 
 #include <AutoDeleter.h>
 
+#include "AttributeIndexer.h"
 #include "AutoPackageAttributes.h"
 #include "DebugSupport.h"
 #include "GlobalFactory.h"
@@ -108,21 +109,7 @@ status_t
 UnpackingAttributeCookie::ReadAttribute(off_t offset, void* buffer,
 	size_t* bufferSize)
 {
-	const BPackageData& data = fAttribute->Data();
-	if (data.IsEncodedInline()) {
-		// inline data
-		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
-		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
-	}
-
-	// data not inline -- open the package
-	int fd = fPackage->Open();
-	if (fd < 0)
-		RETURN_ERROR(fd);
-	PackageCloser packageCloser(fPackage);
-
-	BFDDataReader dataReader(fd);
-	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+	return ReadAttribute(fPackageNode, fAttribute, offset, buffer, bufferSize);
 }
 
 
@@ -131,6 +118,66 @@ UnpackingAttributeCookie::ReadAttributeStat(struct stat* st)
 {
 	st->st_size = fAttribute->Data().UncompressedSize();
 	st->st_type = fAttribute->Type();
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+UnpackingAttributeCookie::ReadAttribute(PackageNode* packageNode,
+	PackageNodeAttribute* attribute, off_t offset, void* buffer,
+	size_t* bufferSize)
+{
+	const BPackageData& data = attribute->Data();
+	if (data.IsEncodedInline()) {
+		// inline data
+		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
+		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+	}
+
+	// data not inline -- open the package
+	Package* package = packageNode->GetPackage();
+	int fd = package->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(package);
+
+	BFDDataReader dataReader(fd);
+	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+}
+
+
+/*static*/ status_t
+UnpackingAttributeCookie::IndexAttribute(PackageNode* packageNode,
+	AttributeIndexer* indexer)
+{
+	if (packageNode == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the attribute
+	PackageNodeAttribute* attribute = packageNode->FindAttribute(
+		indexer->IndexName());
+	if (attribute == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// create the index cookie
+	void* data;
+	size_t toRead;
+	status_t error = indexer->CreateCookie(packageNode, attribute,
+		attribute->Type(), attribute->Data().UncompressedSize(), data, toRead);
+	if (error != B_OK)
+		return error;
+
+	// read the attribute
+	if (toRead > 0) {
+		error = ReadAttribute(packageNode, attribute, 0, data, &toRead);
+		if (error != B_OK) {
+			indexer->DeleteCookie();
+			return error;
+		}
+	}
+
+	attribute->SetIndexCookie(indexer->Cookie());
 
 	return B_OK;
 }

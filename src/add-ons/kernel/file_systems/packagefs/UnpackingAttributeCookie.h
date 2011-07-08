@@ -9,6 +9,7 @@
 #include "AttributeCookie.h"
 
 
+class AttributeIndexer;
 class Package;
 class PackageNode;
 class PackageNodeAttribute;
@@ -28,6 +29,13 @@ public:
 	virtual	status_t			ReadAttribute(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			ReadAttributeStat(struct stat* st);
+
+	static	status_t			ReadAttribute(PackageNode* packageNode,
+									PackageNodeAttribute* attribute,
+									off_t offset, void* buffer,
+									size_t* bufferSize);
+	static	status_t			IndexAttribute(PackageNode* packageNode,
+									AttributeIndexer* indexer);
 
 private:
 			PackageNode*		fPackageNode;

@@ -24,6 +24,7 @@ public:
 
 	virtual	timespec			ModifiedTime() const = 0;
 	virtual	off_t				FileSize() const = 0;
+	virtual	void*				IndexCookieForAttribute(const char* name) const;
 };
 
 

@@ -210,3 +210,20 @@ UnpackingLeafNode::OpenAttribute(const char* name, int openMode,
 	return UnpackingAttributeCookie::Open(fPackageNodes.Head(), name, openMode,
 		_cookie);
 }
+
+
+status_t
+UnpackingLeafNode::IndexAttribute(AttributeIndexer* indexer)
+{
+	return UnpackingAttributeCookie::IndexAttribute(fPackageNodes.Head(),
+		indexer);
+}
+
+
+void*
+UnpackingLeafNode::IndexCookieForAttribute(const char* name) const
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode->IndexCookieForAttribute(name);
+	return NULL;
+}
