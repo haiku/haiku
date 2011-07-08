@@ -41,6 +41,13 @@ set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name,
 }
 
 
+static inline bool
+set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name)
+{
+	return set_dirent_name(buffer, bufferSize, name, strlen(name));
+}
+
+
 static inline void
 get_real_time(timespec& time)
 {
