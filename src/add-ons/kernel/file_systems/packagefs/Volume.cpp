@@ -30,6 +30,7 @@
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReaderImpl.h>
 
+#include "AttributeIndex.h"
 #include "DebugSupport.h"
 #include "kernel_interface.h"
 #include "LastModifiedIndex.h"
@@ -548,6 +549,21 @@ Volume::Mount(const char* parameterString)
 			RETURN_ERROR(B_NO_MEMORY);
 
 		error = index->Init(this);
+		if (error != B_OK) {
+			delete index;
+			RETURN_ERROR(error);
+		}
+
+		fIndices.Insert(index);
+	}
+
+	// create a BEOS:APP_SIG index
+	{
+		AttributeIndex* index = new(std::nothrow) AttributeIndex;
+		if (index == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		error = index->Init(this, "BEOS:APP_SIG", B_MIME_STRING_TYPE, 0);
 		if (error != B_OK) {
 			delete index;
 			RETURN_ERROR(error);
