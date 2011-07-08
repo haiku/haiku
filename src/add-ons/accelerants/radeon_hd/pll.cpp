@@ -448,7 +448,6 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	Write32Mask(PLL, pllCntl, 0, 0x80000000);
 		// needed and undocumented
 
-	// TODO : If CRT2 ah-la R500PLLCRTCGrab
 	PLLCRTCGrab(pllIndex, false);
 
 	if (hasDccg)

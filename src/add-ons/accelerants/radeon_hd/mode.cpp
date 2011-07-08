@@ -130,11 +130,8 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 static void
 CardBlankSet(bool blank)
 {
-	int blackColorReg;
-	int blankControlReg;
-
-	blackColorReg = D1CRTC_BLACK_COLOR;
-	blankControlReg = D1CRTC_BLANK_CONTROL;
+	int blackColorReg = D1CRTC_BLACK_COLOR;
+	int blankControlReg = D1CRTC_BLANK_CONTROL;
 
 	Write32(CRT, blackColorReg, 0);
 	Write32Mask(CRT, blankControlReg, blank ? 1 << 8 : 0, 1 << 8);
@@ -208,6 +205,8 @@ CardFBSet(display_mode *mode)
 	Write32(CRT, gRegister->grphXEnd, mode->virtual_width);
 	Write32(CRT, gRegister->grphYEnd, mode->virtual_height);
 	Write32(CRT, gRegister->grphPitch, bytesPerRow / 4);
+
+	Write32(CRT, gRegister->modeDesktopHeight, mode->virtual_height);
 
 	Write32(CRT, gRegister->grphUpdate, 0);
 		// Unlock changed registers
@@ -291,10 +290,9 @@ static void
 CardModeScale(display_mode *mode)
 {
 	// No scaling
-	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
-	Write32(CRT, gRegister->modeDesktopHeight, mode->virtual_height);
+	//Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
 
-	// For now, no overscan support
+	// For now, default overscan
 	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
 		(OVERSCAN << 16) | OVERSCAN); // LEFT | RIGHT
 	Write32(CRT, D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
@@ -305,9 +303,9 @@ CardModeScale(display_mode *mode)
 		mode->timing.v_display | (mode->timing.h_display << 16));
 	Write32(CRT, gRegister->sclEnable, 0);
 	Write32(CRT, gRegister->sclTapControl, 0);
-	Write32(CRT, gRegister->modeCenter, 0);
+	Write32(CRT, gRegister->modeCenter, 2);
 	// D1MODE_DATA_FORMAT?
-	Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
+	//Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
 }
 
 
@@ -318,26 +316,18 @@ radeon_set_display_mode(display_mode *mode)
 
 	init_registers(crtNumber);
 
-	CardBlankSet(true);
 	CardFBSet(mode);
-	CardBlankSet(false);
+	CardModeSet(mode);
 	CardModeScale(mode);
-	#if 0
 	PLLSet(0, mode->timing.pixel_clock);
 		// Set pixel clock
-	#endif
-	CardModeSet(mode);
+
+	Write32(CRT, D1GRPH_LUT_SEL, 0);
+
 	DACSet(crtNumber, 0);
 		// Set DAC A to crt 0
 	DACPower(crtNumber, RHD_POWER_ON);
-
-	// ensure graphics are enabled and powered on (CRT Power)
-	Write32Mask(CRT, D1GRPH_ENABLE, 0x00000001, 0x00000001);
-	snooze(2);
-
-	Write32(CRT, gRegister->crtControl, 0x01000101);
-	Read32(CRT, gRegister->crtControl);
-	Write32(CRT, gRegister->crtControl, 0x00010101);
+	CardBlankSet(false);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);
