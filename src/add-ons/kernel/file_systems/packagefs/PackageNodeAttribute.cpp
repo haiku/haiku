@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,11 +10,10 @@
 #include <string.h>
 
 
-PackageNodeAttribute::PackageNodeAttribute(PackageNode* parent, uint32 type,
+PackageNodeAttribute::PackageNodeAttribute(uint32 type,
 	const BPackageData& data)
 	:
 	fData(data),
-	fParent(parent),
 	fName(NULL),
 	fType(type)
 {

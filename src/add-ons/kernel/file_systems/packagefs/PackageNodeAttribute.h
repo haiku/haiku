@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_NODE_ATTRIBUTE_H
@@ -19,11 +19,10 @@ class PackageNode;
 class PackageNodeAttribute
 	: public DoublyLinkedListLinkImpl<PackageNodeAttribute> {
 public:
-								PackageNodeAttribute(PackageNode* parent,
-									uint32 type, const BPackageData& data);
+								PackageNodeAttribute(uint32 type,
+									const BPackageData& data);
 								~PackageNodeAttribute();
 
-			PackageNode*		Parent() const	{ return fParent; }
 			const char*			Name() const	{ return fName; }
 			uint32				Type() const	{ return fType; }
 			const BPackageData&	Data() const	{ return fData; }
@@ -33,7 +32,6 @@ public:
 
 protected:
 			BPackageData		fData;
-			PackageNode*		fParent;
 			char*				fName;
 			uint32				fType;
 };
