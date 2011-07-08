@@ -258,7 +258,7 @@ SizeIndex::InternalGetIterator()
 AbstractIndexIterator*
 SizeIndex::InternalFind(const void* key, size_t length)
 {
-	if (!key || length != sizeof(off_t))
+	if (length != sizeof(off_t))
 		return NULL;
 	Iterator* iterator = new(std::nothrow) Iterator;
 	if (iterator != NULL) {
