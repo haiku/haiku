@@ -260,7 +260,7 @@ LastModifiedIndex::InternalGetIterator()
 AbstractIndexIterator*
 LastModifiedIndex::InternalFind(const void* key, size_t length)
 {
-	if (!key || length != sizeof(time_t))
+	if (length != sizeof(time_t))
 		return NULL;
 	Iterator* iterator = new(std::nothrow) Iterator;
 	if (iterator != NULL) {

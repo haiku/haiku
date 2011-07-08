@@ -200,7 +200,7 @@ NameIndex::InternalGetIterator()
 AbstractIndexIterator*
 NameIndex::InternalFind(const void* _key, size_t length)
 {
-	if (_key == NULL || length == 0)
+	if (length == 0)
 		return NULL;
 
 	const char* key = (const char*)_key;
