@@ -379,8 +379,9 @@ AttributeIndex::InternalGetIterator()
 AbstractIndexIterator*
 AttributeIndex::InternalFind(const void* key, size_t length)
 {
-	if (key == NULL)
+	if (HasFixedKeyLength() && length != KeyLength())
 		return NULL;
+
 	Iterator* iterator = new(std::nothrow) Iterator;
 	if (iterator != NULL) {
 		if (!iterator->SetTo(this, TreeKey(key, length))) {
