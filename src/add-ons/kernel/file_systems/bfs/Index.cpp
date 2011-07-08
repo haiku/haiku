@@ -14,13 +14,6 @@
 #include "BPlusTree.h"
 
 
-// B_MIME_STRING_TYPE is defined in storage/Mime.h, but we
-// don't need the whole file here; the type can't change anyway
-#ifndef _MIME_H
-#	define B_MIME_STRING_TYPE 'MIMS'
-#endif
-
-
 Index::Index(Volume* volume)
 	:
 	fVolume(volume),

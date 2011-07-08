@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -31,7 +31,6 @@ status_t create_app_meta_mime(const char *path, int recursive, int synchronous,
 
 status_t get_device_icon(const char *dev, void *icon, int32 size);
 
-static const uint32 B_MIME_STRING_TYPE	= 'MIMS';
 
 enum icon_size {
 	B_LARGE_ICON	= 32,
