@@ -1576,28 +1576,35 @@ BPoseView::CreateVolumePose(BVolume *volume, bool watchIndividually)
 	}
 
 	BDirectory root;
-	if (volume->GetRootDirectory(&root) == B_OK) {
-		node_ref itemNode;
-		root.GetNodeRef(&itemNode);
+	if (volume->GetRootDirectory(&root) != B_OK)
+		return;
 
-		BEntry entry;
-		root.GetEntry(&entry);
+	BEntry entry;
+	root.GetEntry(&entry);
 
-		entry_ref ref;
-		entry.GetRef(&ref);
+	entry_ref ref;
+	entry.GetRef(&ref);
 
-		node_ref dirNode;
-		dirNode.device = ref.device;
-		dirNode.node = ref.directory;
+	// If the volume is mounted at a directory of a persistent volume, we don't
+	// want it on the desktop or in the disks window.
+	BVolume parentVolume(ref.device);
+	if (parentVolume.InitCheck() == B_OK && parentVolume.IsPersistent())
+		return;
 
-		BPose *pose = EntryCreated(&dirNode, &itemNode, ref.name, 0);
+	node_ref itemNode;
+	root.GetNodeRef(&itemNode);
 
-		if (pose && watchIndividually) {
-			// make sure volume names still get watched, even though
-			// they are on the desktop which is not their physical parent
-			pose->TargetModel()->WatchVolumeAndMountPoint(B_WATCH_NAME | B_WATCH_STAT
-				| B_WATCH_ATTR, this);
-		}
+	node_ref dirNode;
+	dirNode.device = ref.device;
+	dirNode.node = ref.directory;
+
+	BPose *pose = EntryCreated(&dirNode, &itemNode, ref.name, 0);
+
+	if (pose && watchIndividually) {
+		// make sure volume names still get watched, even though
+		// they are on the desktop which is not their physical parent
+		pose->TargetModel()->WatchVolumeAndMountPoint(B_WATCH_NAME | B_WATCH_STAT
+			| B_WATCH_ATTR, this);
 	}
 }
 
