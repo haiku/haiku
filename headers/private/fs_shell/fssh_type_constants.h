@@ -55,6 +55,9 @@ enum {
 	FSSH_B_UINT64_TYPE					= 'ULLG',
 	FSSH_B_UINT8_TYPE					= 'UBYT',
 	FSSH_B_VECTOR_ICON_TYPE				= 'VICN',
+	FSSH_B_XATTR_TYPE					= 'XATR',
+	FSSH_B_NETWORK_ADDRESS_TYPE			= 'NWAD',
+	FSSH_B_MIME_STRING_TYPE				= 'MIMS',
 
 	// deprecated, do not use
 	FSSH_B_ASCII_TYPE					= 'TEXT'	// use B_STRING_TYPE instead
