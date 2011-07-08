@@ -85,9 +85,10 @@ class NameIndex::EntryTree : public _EntryTree {
 
 
 struct NameIndex::IteratorPolicy {
-	typedef NameIndex				Index;
-	typedef const char*				Value;
-	typedef NameIndex::EntryTree	NodeTree;
+	typedef NameIndex										Index;
+	typedef const char*										Value;
+	typedef NameIndex::EntryTree							NodeTree;
+	typedef GenericIndexIteratorTreePolicy<IteratorPolicy>	TreePolicy;
 
 	static NodeTree* GetNodeTree(Index* index)
 	{

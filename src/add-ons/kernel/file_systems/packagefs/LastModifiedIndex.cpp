@@ -105,9 +105,10 @@ class LastModifiedIndex::IteratorList : public SinglyLinkedList<Iterator> {};
 
 
 struct LastModifiedIndex::IteratorPolicy {
-	typedef LastModifiedIndex			Index;
-	typedef time_t						Value;
-	typedef LastModifiedIndex::NodeTree	NodeTree;
+	typedef LastModifiedIndex								Index;
+	typedef time_t											Value;
+	typedef LastModifiedIndex::NodeTree						NodeTree;
+	typedef GenericIndexIteratorTreePolicy<IteratorPolicy>	TreePolicy;
 
 	static NodeTree* GetNodeTree(Index* index)
 	{

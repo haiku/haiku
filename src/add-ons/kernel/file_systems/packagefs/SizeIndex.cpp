@@ -104,9 +104,10 @@ class SizeIndex::IteratorList : public SinglyLinkedList<Iterator> {};
 
 
 struct SizeIndex::IteratorPolicy {
-	typedef SizeIndex				Index;
-	typedef off_t					Value;
-	typedef SizeIndex::NodeTree		NodeTree;
+	typedef SizeIndex										Index;
+	typedef off_t											Value;
+	typedef SizeIndex::NodeTree								NodeTree;
+	typedef GenericIndexIteratorTreePolicy<IteratorPolicy>	TreePolicy;
 
 	static NodeTree* GetNodeTree(Index* index)
 	{
