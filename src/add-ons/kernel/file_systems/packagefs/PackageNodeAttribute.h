@@ -29,10 +29,15 @@ public:
 
 			status_t			Init(const char* name);
 
+			void				SetIndexCookie(void* cookie)
+									{ fIndexCookie = cookie; }
+			void*				IndexCookie() const
+									{ return fIndexCookie; }
 
 protected:
 			BPackageData		fData;
 			char*				fName;
+			void*				fIndexCookie;
 			uint32				fType;
 };
 

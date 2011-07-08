@@ -149,6 +149,23 @@ UnpackingDirectory::OpenAttribute(const char* name, int openMode,
 }
 
 
+status_t
+UnpackingDirectory::IndexAttribute(AttributeIndexer* indexer)
+{
+	return UnpackingAttributeCookie::IndexAttribute(fPackageDirectories.Head(),
+		indexer);
+}
+
+
+void*
+UnpackingDirectory::IndexCookieForAttribute(const char* name) const
+{
+	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
+		return packageDirectory->IndexCookieForAttribute(name);
+	return NULL;
+}
+
+
 // #pragma mark - RootDirectory
 
 

@@ -90,3 +90,10 @@ PackageNode::FindAttribute(const char* name) const
 
 	return NULL;
 }
+
+
+void
+PackageNode::UnsetIndexCookie(void* attributeCookie)
+{
+	((PackageNodeAttribute*)attributeCookie)->SetIndexCookie(NULL);
+}

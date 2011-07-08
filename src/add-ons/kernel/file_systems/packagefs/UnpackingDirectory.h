@@ -34,6 +34,9 @@ public:
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
 									AttributeCookie*& _cookie);
 
+	virtual	status_t			IndexAttribute(AttributeIndexer* indexer);
+	virtual	void*				IndexCookieForAttribute(const char* name) const;
+
 private:
 			PackageDirectoryList fPackageDirectories;
 };
