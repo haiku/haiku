@@ -17,5 +17,6 @@
 
 typedef int boolean_t;
 typedef __const char* c_caddr_t;
+typedef uint64_t u_quad_t;
 
 #endif

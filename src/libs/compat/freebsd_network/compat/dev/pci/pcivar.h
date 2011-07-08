@@ -32,6 +32,8 @@ uint16_t pci_get_device(device_t dev);
 uint16_t pci_get_subvendor(device_t dev);
 uint16_t pci_get_subdevice(device_t dev);
 uint8_t pci_get_revid(device_t dev);
+uint8_t pci_get_cachelnsz(device_t dev);
+uint8_t *pci_get_ether(device_t dev);
 
 uint32_t pci_read_config(device_t dev, int reg, int width);
 void pci_write_config(device_t dev, int reg, uint32_t val, int width);

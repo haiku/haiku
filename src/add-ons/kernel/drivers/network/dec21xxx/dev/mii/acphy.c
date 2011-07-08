@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 1999, 2000, 2001 The NetBSD Foundation, Inc.
+ * Copyright (c) 1998, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
  * This code is derived from software contributed to The NetBSD Foundation
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
+/*-
  * Copyright (c) 1997 Manuel Bouyer.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,25 +50,21 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	from: NetBSD: bmtphy.c,v 1.8 2002/07/03 06:25:50 simonb Exp
- *
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/bmtphy.c,v 1.12.10.8.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/mii/acphy.c,v 1.21.10.6.2.1 2010/12/21 17:09:25 kensmith Exp $");
 
 /*
- * Driver for the Broadcom BCM5201/BCM5202 "Mini-Theta" PHYs.  This also
- * drives the PHY on the 3Com 3c905C.  The 3c905C's PHY is described in
- * the 3c905C data sheet.
+ * Driver for Altima AC101 10/100 PHY
  */
 
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/kernel.h>
-#include <sys/module.h>
 #include <sys/socket.h>
+#include <sys/errno.h>
+#include <sys/module.h>
 #include <sys/bus.h>
 
 #include <net/if.h>
@@ -78,80 +74,59 @@ __FBSDID("$FreeBSD: src/sys/dev/mii/bmtphy.c,v 1.12.10.8.2.1 2010/12/21 17:09:25
 #include <dev/mii/miivar.h>
 #include "miidevs.h"
 
-#include <dev/mii/bmtphyreg.h>
+#include <dev/mii/acphyreg.h>
 
 #include "miibus_if.h"
 
-static int	bmtphy_probe(device_t);
-static int	bmtphy_attach(device_t);
+static int acphy_probe(device_t);
+static int acphy_attach(device_t);
 
-struct bmtphy_softc {
-	struct mii_softc mii_sc;
-	int mii_model;
-};
-
-static device_method_t bmtphy_methods[] = {
-	/* Device interface */
-	DEVMETHOD(device_probe,		bmtphy_probe),
-	DEVMETHOD(device_attach,	bmtphy_attach),
+static device_method_t acphy_methods[] = {
+	/* device interface */
+	DEVMETHOD(device_probe,		acphy_probe),
+	DEVMETHOD(device_attach,	acphy_attach),
 	DEVMETHOD(device_detach,	mii_phy_detach),
 	DEVMETHOD(device_shutdown,	bus_generic_shutdown),
-
 	{ 0, 0 }
 };
 
-static devclass_t	bmtphy_devclass;
+static devclass_t acphy_devclass;
 
-static driver_t	bmtphy_driver = {
-	"bmtphy",
-	bmtphy_methods,
-	sizeof(struct bmtphy_softc)
+static driver_t acphy_driver = {
+	"acphy",
+	acphy_methods,
+	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(bmtphy, miibus, bmtphy_driver, bmtphy_devclass, 0, 0);
+DRIVER_MODULE(acphy, miibus, acphy_driver, acphy_devclass, 0, 0);
 
-static int	bmtphy_service(struct mii_softc *, struct mii_data *, int);
-static void	bmtphy_status(struct mii_softc *);
-static void	bmtphy_reset(struct mii_softc *);
+static int	acphy_service(struct mii_softc *, struct mii_data *, int);
+static void	acphy_reset(struct mii_softc *);
+static void	acphy_status(struct mii_softc *);
 
-static const struct mii_phydesc bmtphys_dp[] = {
-	MII_PHY_DESC(BROADCOM, BCM4401),
-	MII_PHY_DESC(BROADCOM, BCM5201),
-	MII_PHY_DESC(BROADCOM, BCM5214),
-	MII_PHY_DESC(BROADCOM, BCM5221),
-	MII_PHY_DESC(BROADCOM, BCM5222),
-	MII_PHY_END
-};
-
-static const struct mii_phydesc bmtphys_lp[] = {
-	MII_PHY_DESC(BROADCOM, 3C905B),
-	MII_PHY_DESC(BROADCOM, 3C905C),
+static const struct mii_phydesc acphys[] = {
+	MII_PHY_DESC(xxALTIMA, AC101),
+	MII_PHY_DESC(xxALTIMA, AC101L),
+	/* XXX This is reported to work, but it's not from any data sheet. */
+	MII_PHY_DESC(xxALTIMA, ACXXX),
 	MII_PHY_END
 };
 
 static int
-bmtphy_probe(device_t dev)
+acphy_probe(device_t dev)
 {
-	int	rval;
 
-	/* Let exphy(4) take precedence for these. */
-	rval = mii_phy_dev_probe(dev, bmtphys_lp, BUS_PROBE_LOW_PRIORITY);
-	if (rval <= 0)
-		return (rval);
-
-	return (mii_phy_dev_probe(dev, bmtphys_dp, BUS_PROBE_DEFAULT));
+	return (mii_phy_dev_probe(dev, acphys, BUS_PROBE_DEFAULT));
 }
 
 static int
-bmtphy_attach(device_t dev)
+acphy_attach(device_t dev)
 {
-	struct bmtphy_softc *bsc;
 	struct mii_softc *sc;
 	struct mii_attach_args *ma;
 	struct mii_data *mii;
 
-	bsc = device_get_softc(dev);
-	sc = &bsc->mii_sc;
+	sc = device_get_softc(dev);
 	ma = device_get_ivars(dev);
 	sc->mii_dev = device_get_parent(dev);
 	mii = ma->mii_data;
@@ -160,28 +135,37 @@ bmtphy_attach(device_t dev)
 	sc->mii_flags = miibus_get_flags(dev);
 	sc->mii_inst = mii->mii_instance++;
 	sc->mii_phy = ma->mii_phyno;
-	sc->mii_service = bmtphy_service;
+	sc->mii_service = acphy_service;
 	sc->mii_pdata = mii;
 
-	sc->mii_flags |= MIIF_NOMANPAUSE;
-
-	bsc->mii_model = MII_MODEL(ma->mii_id2);
-
-	bmtphy_reset(sc);
+	acphy_reset(sc);
 
 	sc->mii_capabilities = PHY_READ(sc, MII_BMSR) & ma->mii_capmask;
 	device_printf(dev, " ");
+
+#define	ADD(m, c)	ifmedia_add(&mii->mii_media, (m), (c), NULL)
+	if ((PHY_READ(sc, MII_ACPHY_MCTL) & AC_MCTL_FX_SEL) != 0) {
+		sc->mii_flags |= MIIF_HAVEFIBER;
+		ADD(IFM_MAKEWORD(IFM_ETHER, IFM_100_FX, 0, sc->mii_inst),
+		    MII_MEDIA_100_TX);
+		printf("100baseFX, ");
+		ADD(IFM_MAKEWORD(IFM_ETHER, IFM_100_FX, IFM_FDX, sc->mii_inst),
+		    MII_MEDIA_100_TX_FDX);
+		printf("100baseFX-FDX, ");
+	}
+#undef ADD
+
 	mii_phy_add_media(sc);
 	printf("\n");
 
 	MIIBUS_MEDIAINIT(sc->mii_dev);
-
 	return (0);
 }
 
 static int
-bmtphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
+acphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 {
+	int reg;
 
 	switch (cmd) {
 	case MII_POLLSTAT:
@@ -194,17 +178,29 @@ bmtphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
 			break;
 
+		/* Wake & deisolate up if necessary */
+		reg = PHY_READ(sc, MII_BMCR);
+		if (reg & (BMCR_ISO | BMCR_PDOWN))
+			PHY_WRITE(sc, MII_BMCR, reg & ~(BMCR_ISO | BMCR_PDOWN));
+
 		mii_phy_setmedia(sc);
 		break;
 
 	case MII_TICK:
-		if (mii_phy_tick(sc) == EJUSTRETURN)
+		/*
+		 * Is the interface even up?
+		 */
+		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
 			return (0);
+
+		/*
+		 * This PHY's autonegotiation doesn't need to be kicked.
+		 */
 		break;
 	}
 
 	/* Update the media status. */
-	bmtphy_status(sc);
+	acphy_status(sc);
 
 	/* Callback if something changed. */
 	mii_phy_update(sc, cmd);
@@ -212,20 +208,17 @@ bmtphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 }
 
 static void
-bmtphy_status(struct mii_softc *sc)
+acphy_status(struct mii_softc *sc)
 {
-	struct mii_data *mii;
-	struct ifmedia_entry *ife;
-	int bmsr, bmcr, aux_csr;
-
-	mii = sc->mii_pdata;
-	ife = mii->mii_media.ifm_cur;
+	struct mii_data *mii = sc->mii_pdata;
+	struct ifmedia_entry *ife = mii->mii_media.ifm_cur;
+	int bmsr, bmcr, diag;
 
 	mii->mii_media_status = IFM_AVALID;
 	mii->mii_media_active = IFM_ETHER;
 
-	bmsr = PHY_READ(sc, MII_BMSR) | PHY_READ(sc, MII_BMSR);
-
+	bmsr = PHY_READ(sc, MII_BMSR) |
+	    PHY_READ(sc, MII_BMSR);
 	if (bmsr & BMSR_LINK)
 		mii->mii_media_status |= IFM_ACTIVE;
 
@@ -240,24 +233,19 @@ bmtphy_status(struct mii_softc *sc)
 		mii->mii_media_active |= IFM_LOOP;
 
 	if (bmcr & BMCR_AUTOEN) {
-		/*
-		 * The media status bits are only valid if autonegotiation
-		 * has completed (or it's disabled).
-		 */
 		if ((bmsr & BMSR_ACOMP) == 0) {
 			/* Erg, still trying, I guess... */
 			mii->mii_media_active |= IFM_NONE;
 			return;
 		}
-
-		aux_csr = PHY_READ(sc, MII_BMTPHY_AUX_CSR);
-		if (aux_csr & AUX_CSR_SPEED)
+		diag = PHY_READ(sc, MII_ACPHY_DIAG);
+		if (diag & AC_DIAG_SPEED)
 			mii->mii_media_active |= IFM_100_TX;
 		else
 			mii->mii_media_active |= IFM_10_T;
-		if (aux_csr & AUX_CSR_FDX)
-			mii->mii_media_active |=
-			    IFM_FDX | mii_phy_flowstatus(sc);
+
+		if (diag & AC_DIAG_DUPLEX)
+			mii->mii_media_active |= IFM_FDX;
 		else
 			mii->mii_media_active |= IFM_HDX;
 	} else
@@ -265,30 +253,9 @@ bmtphy_status(struct mii_softc *sc)
 }
 
 static void
-bmtphy_reset(struct mii_softc *sc)
+acphy_reset(struct mii_softc *sc)
 {
-	struct bmtphy_softc *bsc;
-	u_int16_t data;
-
-	bsc = (struct bmtphy_softc *)sc;
 
 	mii_phy_reset(sc);
-
-	if (bsc->mii_model == MII_MODEL_BROADCOM_BCM5221) {
-		/* Enable shadow register mode. */
-		data = PHY_READ(sc, 0x1f);
-		PHY_WRITE(sc, 0x1f, data | 0x0080);
-
-		/* Enable APD (Auto PowerDetect). */
-		data = PHY_READ(sc, MII_BMTPHY_AUX2);
-		PHY_WRITE(sc, MII_BMTPHY_AUX2, data | 0x0020);
-
-		/* Enable clocks across APD for Auto-MDIX functionality. */
-		data = PHY_READ(sc, MII_BMTPHY_INTR);
-		PHY_WRITE(sc, MII_BMTPHY_INTR, data | 0x0004);
-
-		/* Disable shadow register mode. */
-		data = PHY_READ(sc, 0x1f);
-		PHY_WRITE(sc, 0x1f, data & ~0x0080);
-	}
+	PHY_WRITE(sc, MII_ACPHY_INT, 0);
 }

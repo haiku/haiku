@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network dec21xxx dev dc ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelAddon dec21xxx :
+	if_dc.c
+	glue.c
+	: libfreebsd_network.a dec21xxx_mii.a
+	;

@@ -45,6 +45,7 @@ struct __system_init {
 	struct __system_init __uninit_##uniquifier = { (system_init_func_t) func }
 
 #define TUNABLE_INT(path, var)
+#define TUNABLE_INT_FETCH(path, var)
 
 extern int ticks;
 

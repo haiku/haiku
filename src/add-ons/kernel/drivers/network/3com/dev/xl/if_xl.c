@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/pci/if_xl.c,v 1.210 2007/08/06 14:26:03 rwatson Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/xl/if_xl.c,v 1.8.2.7.2.1 2010/12/21 17:09:25 kensmith Exp $");
 
 /*
  * 3Com 3c90x Etherlink XL PCI NIC driver
@@ -96,9 +96,6 @@ __FBSDID("$FreeBSD: src/sys/pci/if_xl.c,v 1.210 2007/08/06 14:26:03 rwatson Exp 
  * Since using bus master DMA is a big win, we use this driver to
  * support the PCI "boomerang" chips even though they work with the
  * "vortex" driver in order to obtain better performance.
- *
- * This driver is in the /sys/pci directory because it only supports
- * PCI-based NICs.
  */
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
@@ -142,7 +139,7 @@ MODULE_DEPEND(xl, miibus, 1, 1, 1);
 /* "device miibus" required.  See GENERIC if you get errors here. */
 #include "miibus_if.h"
 
-#include <pci/if_xlreg.h>
+#include <dev/xl/if_xlreg.h>
 
 /*
  * TX Checksumming is disabled by default for two reasons:
@@ -163,7 +160,7 @@ MODULE_DEPEND(xl, miibus, 1, 1, 1);
 /*
  * Various supported device vendors/types and their names.
  */
-static struct xl_type xl_devs[] = {
+static const struct xl_type xl_devs[] = {
 	{ TC_VENDORID, TC_DEVICEID_BOOMERANG_10BT,
 		"3Com 3c900-TPO Etherlink XL" },
 	{ TC_VENDORID, TC_DEVICEID_BOOMERANG_10BT_COMBO,
@@ -230,8 +227,8 @@ static int xl_detach(device_t);
 static int xl_newbuf(struct xl_softc *, struct xl_chain_onefrag *);
 static void xl_stats_update(void *);
 static void xl_stats_update_locked(struct xl_softc *);
-static int xl_encap(struct xl_softc *, struct xl_chain *, struct mbuf *);
-static void xl_rxeof(struct xl_softc *);
+static int xl_encap(struct xl_softc *, struct xl_chain *, struct mbuf **);
+static int xl_rxeof(struct xl_softc *);
 static void xl_rxeof_task(void *, int);
 static int xl_rx_resync(struct xl_softc *);
 static void xl_txeof(struct xl_softc *);
@@ -246,13 +243,14 @@ static void xl_init(void *);
 static void xl_init_locked(struct xl_softc *);
 static void xl_stop(struct xl_softc *);
 static int xl_watchdog(struct xl_softc *);
-static void xl_shutdown(device_t);
+static int xl_shutdown(device_t);
 static int xl_suspend(device_t);
 static int xl_resume(device_t);
+static void xl_setwol(struct xl_softc *);
 
 #ifdef DEVICE_POLLING
-static void xl_poll(struct ifnet *ifp, enum poll_cmd cmd, int count);
-static void xl_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count);
+static int xl_poll(struct ifnet *ifp, enum poll_cmd cmd, int count);
+static int xl_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count);
 #endif
 
 static int xl_ifmedia_upd(struct ifnet *);
@@ -278,8 +276,6 @@ static void xl_mediacheck(struct xl_softc *);
 static void xl_choose_media(struct xl_softc *sc, int *media);
 static void xl_choose_xcvr(struct xl_softc *, int);
 static void xl_dma_map_addr(void *, bus_dma_segment_t *, int, int);
-static void xl_dma_map_rxbuf(void *, bus_dma_segment_t *, int, bus_size_t, int);
-static void xl_dma_map_txbuf(void *, bus_dma_segment_t *, int, bus_size_t, int);
 #ifdef notdef
 static void xl_testpacket(struct xl_softc *);
 #endif
@@ -319,7 +315,6 @@ static driver_t xl_driver = {
 
 static devclass_t xl_devclass;
 
-DRIVER_MODULE(xl, cardbus, xl_driver, xl_devclass, 0, 0);
 DRIVER_MODULE(xl, pci, xl_driver, xl_devclass, 0, 0);
 DRIVER_MODULE(miibus, xl, miibus_driver, miibus_devclass, 0, 0);
 
@@ -330,46 +325,6 @@ xl_dma_map_addr(void *arg, bus_dma_segment_t *segs, int nseg, int error)
 
 	paddr = arg;
 	*paddr = segs->ds_addr;
-}
-
-static void
-xl_dma_map_rxbuf(void *arg, bus_dma_segment_t *segs, int nseg,
-    bus_size_t mapsize, int error)
-{
-	u_int32_t *paddr;
-
-	if (error)
-		return;
-
-	KASSERT(nseg == 1, ("xl_dma_map_rxbuf: too many DMA segments"));
-	paddr = arg;
-	*paddr = segs->ds_addr;
-}
-
-static void
-xl_dma_map_txbuf(void *arg, bus_dma_segment_t *segs, int nseg,
-    bus_size_t mapsize, int error)
-{
-	struct xl_list *l;
-	int i, total_len;
-
-	if (error)
-		return;
-
-	KASSERT(nseg <= XL_MAXFRAGS, ("too many DMA segments"));
-
-	total_len = 0;
-	l = arg;
-	for (i = 0; i < nseg; i++) {
-		KASSERT(segs[i].ds_len <= MCLBYTES, ("segment size too large"));
-		l->xl_frag[i].xl_addr = htole32(segs[i].ds_addr);
-		l->xl_frag[i].xl_len = htole32(segs[i].ds_len);
-		total_len += segs[i].ds_len;
-	}
-	l->xl_frag[nseg - 1].xl_len = htole32(segs[nseg - 1].ds_len |
-	    XL_LAST_FRAG);
-	l->xl_status = htole32(total_len);
-	l->xl_next = 0;
 }
 
 /*
@@ -568,16 +523,6 @@ xl_miibus_readreg(device_t dev, int phy, int reg)
 
 	sc = device_get_softc(dev);
 
-	/*
-	 * Pretend that PHYs are only available at MII address 24.
-	 * This is to guard against problems with certain 3Com ASIC
-	 * revisions that incorrectly map the internal transceiver
-	 * control registers at all MII addresses. This can cause
-	 * the miibus code to attach the same PHY several times over.
-	 */
-	if ((sc->xl_flags & XL_FLAG_PHYOK) == 0 && phy != 24)
-		return (0);
-
 	bzero((char *)&frame, sizeof(frame));
 	frame.mii_phyaddr = phy;
 	frame.mii_regaddr = reg;
@@ -595,9 +540,6 @@ xl_miibus_writereg(device_t dev, int phy, int reg, int data)
 
 	sc = device_get_softc(dev);
 
-	if ((sc->xl_flags & XL_FLAG_PHYOK) == 0 && phy != 24)
-		return (0);
-
 	bzero((char *)&frame, sizeof(frame));
 	frame.mii_phyaddr = phy;
 	frame.mii_regaddr = reg;
@@ -613,6 +555,7 @@ xl_miibus_statchg(device_t dev)
 {
 	struct xl_softc		*sc;
 	struct mii_data		*mii;
+	uint8_t			macctl;
 
 	sc = device_get_softc(dev);
 	mii = device_get_softc(sc->xl_miibus);
@@ -621,11 +564,22 @@ xl_miibus_statchg(device_t dev)
 
 	/* Set ASIC's duplex mode to match the PHY. */
 	XL_SEL_WIN(3);
-	if ((mii->mii_media_active & IFM_GMASK) == IFM_FDX)
-		CSR_WRITE_1(sc, XL_W3_MAC_CTRL, XL_MACCTRL_DUPLEX);
-	else
-		CSR_WRITE_1(sc, XL_W3_MAC_CTRL,
-		    (CSR_READ_1(sc, XL_W3_MAC_CTRL) & ~XL_MACCTRL_DUPLEX));
+	macctl = CSR_READ_1(sc, XL_W3_MAC_CTRL);
+	if ((IFM_OPTIONS(mii->mii_media_active) & IFM_FDX) != 0) {
+		macctl |= XL_MACCTRL_DUPLEX;
+		if (sc->xl_type == XL_TYPE_905B) {
+			if ((IFM_OPTIONS(mii->mii_media_active) &
+			    IFM_ETH_RXPAUSE) != 0)
+				macctl |= XL_MACCTRL_FLOW_CONTROL_ENB;
+			else
+				macctl &= ~XL_MACCTRL_FLOW_CONTROL_ENB;
+		}
+	} else {
+		macctl &= ~XL_MACCTRL_DUPLEX;
+		if (sc->xl_type == XL_TYPE_905B)
+			macctl &= ~XL_MACCTRL_FLOW_CONTROL_ENB;
+	}
+	CSR_WRITE_1(sc, XL_W3_MAC_CTRL, macctl);
 }
 
 /*
@@ -770,10 +724,10 @@ xl_setmulti(struct xl_softc *sc)
 		return;
 	}
 
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link)
 		mcnt++;
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
 	if (mcnt)
 		rxfilt |= XL_RXFILTER_ALLMULTI;
@@ -812,7 +766,7 @@ xl_setmulti_hash(struct xl_softc *sc)
 		CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_RX_SET_HASH|i);
 
 	/* now program new ones */
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
 		if (ifma->ifma_addr->sa_family != AF_LINK)
 			continue;
@@ -834,7 +788,7 @@ xl_setmulti_hash(struct xl_softc *sc)
 		    h | XL_CMD_RX_SET_HASH | XL_HASH_SET);
 		mcnt++;
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
 	if (mcnt)
 		rxfilt |= XL_RXFILTER_MULTIHASH;
@@ -843,32 +797,6 @@ xl_setmulti_hash(struct xl_softc *sc)
 
 	CSR_WRITE_2(sc, XL_COMMAND, rxfilt | XL_CMD_RX_SET_FILT);
 }
-
-#ifdef notdef
-static void
-xl_testpacket(struct xl_softc *sc)
-{
-	struct mbuf		*m;
-	struct ifnet		*ifp = sc->xl_ifp;
-
-	MGETHDR(m, M_DONTWAIT, MT_DATA);
-
-	if (m == NULL)
-		return;
-
-	bcopy(IF_LLADDR(sc->xl_ifp),
-		mtod(m, struct ether_header *)->ether_dhost, ETHER_ADDR_LEN);
-	bcopy(IF_LLADDR(sc->xl_ifp),
-		mtod(m, struct ether_header *)->ether_shost, ETHER_ADDR_LEN);
-	mtod(m, struct ether_header *)->ether_type = htons(3);
-	mtod(m, unsigned char *)[14] = 0;
-	mtod(m, unsigned char *)[15] = 0;
-	mtod(m, unsigned char *)[16] = 0xE3;
-	m->m_len = m->m_pkthdr.len = sizeof(struct ether_header) + 3;
-	IFQ_ENQUEUE(&ifp->if_snd, m);
-	xl_start(ifp);
-}
-#endif
 
 static void
 xl_setcfg(struct xl_softc *sc)
@@ -1052,7 +980,7 @@ xl_reset(struct xl_softc *sc)
 static int
 xl_probe(device_t dev)
 {
-	struct xl_type		*t;
+	const struct xl_type	*t;
 
 	t = xl_devs;
 
@@ -1217,16 +1145,16 @@ static int
 xl_attach(device_t dev)
 {
 	u_char			eaddr[ETHER_ADDR_LEN];
-	u_int16_t		xcvr[2];
+	u_int16_t		sinfo2, xcvr[2];
 	struct xl_softc		*sc;
 	struct ifnet		*ifp;
-	int			media;
-	int			unit, error = 0, rid, res;
+	int			media, pmcap;
+	int			error = 0, phy, rid, res, unit;
 	uint16_t		did;
 
 	sc = device_get_softc(dev);
 	sc->xl_dev = dev;
-	
+
 	unit = device_get_unit(dev);
 
 	mtx_init(&sc->xl_mtx, device_get_nameunit(dev), MTX_NETWORK_LOCK,
@@ -1369,7 +1297,6 @@ xl_attach(device_t dev)
 		goto fail;
 	}
 
-	sc->xl_unit = unit;
 	callout_init_mtx(&sc->xl_stat_callout, &sc->xl_mtx, 0);
 	TASK_INIT(&sc->xl_task, 0, xl_rxeof_task, sc);
 
@@ -1478,6 +1405,18 @@ xl_attach(device_t dev)
 	else
 		sc->xl_type = XL_TYPE_90X;
 
+	/* Check availability of WOL. */
+	if ((sc->xl_caps & XL_CAPS_PWRMGMT) != 0 &&
+	    pci_find_extcap(dev, PCIY_PMG, &pmcap) == 0) {
+		sc->xl_pmcap = pmcap;
+		sc->xl_flags |= XL_FLAG_WOL;
+		sinfo2 = 0;
+		xl_read_eeprom(sc, (caddr_t)&sinfo2, XL_EE_SOFTINFO2, 1, 0);
+		if ((sinfo2 & XL_SINFO2_AUX_WOL_CON) == 0 && bootverbose)
+			device_printf(dev,
+			    "No auxiliary remote wakeup connector!\n");
+	}
+
 	/* Set the TX start threshold for best performance. */
 	sc->xl_tx_thresh = XL_MIN_FRAMELEN;
 
@@ -1492,6 +1431,8 @@ xl_attach(device_t dev)
 		ifp->if_capabilities |= IFCAP_HWCSUM;
 #endif
 	}
+	if ((sc->xl_flags & XL_FLAG_WOL) != 0)
+		ifp->if_capabilities |= IFCAP_WOL_MAGIC;
 	ifp->if_capenable = ifp->if_capabilities;
 #ifdef DEVICE_POLLING
 	ifp->if_capabilities |= IFCAP_POLLING;
@@ -1525,10 +1466,20 @@ xl_attach(device_t dev)
 		if (bootverbose)
 			device_printf(dev, "found MII/AUTO\n");
 		xl_setcfg(sc);
-		if (mii_phy_probe(dev, &sc->xl_miibus,
-		    xl_ifmedia_upd, xl_ifmedia_sts)) {
-			device_printf(dev, "no PHY found!\n");
-			error = ENXIO;
+		/*
+		 * Attach PHYs only at MII address 24 if !XL_FLAG_PHYOK.
+		 * This is to guard against problems with certain 3Com ASIC
+		 * revisions that incorrectly map the internal transceiver
+		 * control registers at all MII addresses.
+		 */
+		phy = MII_PHY_ANY;
+		if ((sc->xl_flags & XL_FLAG_PHYOK) == 0)
+			phy = 24;
+		error = mii_attach(dev, &sc->xl_miibus, ifp, xl_ifmedia_upd,
+		    xl_ifmedia_sts, BMSR_DEFCAPMASK, phy, MII_OFFSET_ANY,
+		    sc->xl_type == XL_TYPE_905B ? MIIF_DOPAUSE : 0);
+		if (error != 0) {
+			device_printf(dev, "attaching PHYs failed\n");
 			goto fail;
 		}
 		goto done;
@@ -1708,7 +1659,6 @@ xl_detach(device_t dev)
 	/* These should only be active if attach succeeded */
 	if (device_is_attached(dev)) {
 		XL_LOCK(sc);
-		xl_reset(sc);
 		xl_stop(sc);
 		XL_UNLOCK(sc);
 		taskqueue_drain(taskqueue_swi, &sc->xl_task);
@@ -1890,8 +1840,8 @@ xl_newbuf(struct xl_softc *sc, struct xl_chain_onefrag *c)
 {
 	struct mbuf		*m_new = NULL;
 	bus_dmamap_t		map;
-	int			error;
-	u_int32_t		baddr;
+	bus_dma_segment_t	segs[1];
+	int			error, nseg;
 
 	XL_LOCK_ASSERT(sc);
 
@@ -1904,14 +1854,16 @@ xl_newbuf(struct xl_softc *sc, struct xl_chain_onefrag *c)
 	/* Force longword alignment for packet payload. */
 	m_adj(m_new, ETHER_ALIGN);
 
-	error = bus_dmamap_load_mbuf(sc->xl_mtag, sc->xl_tmpmap, m_new,
-	    xl_dma_map_rxbuf, &baddr, BUS_DMA_NOWAIT);
+	error = bus_dmamap_load_mbuf_sg(sc->xl_mtag, sc->xl_tmpmap, m_new,
+	    segs, &nseg, BUS_DMA_NOWAIT);
 	if (error) {
 		m_freem(m_new);
 		device_printf(sc->xl_dev, "can't map mbuf (error %d)\n",
 		    error);
 		return (error);
 	}
+	KASSERT(nseg == 1,
+	    ("%s: too many DMA segments (%d)", __func__, nseg));
 
 	bus_dmamap_unload(sc->xl_mtag, c->xl_map);
 	map = c->xl_map;
@@ -1920,7 +1872,7 @@ xl_newbuf(struct xl_softc *sc, struct xl_chain_onefrag *c)
 	c->xl_mbuf = m_new;
 	c->xl_ptr->xl_frag.xl_len = htole32(m_new->m_len | XL_LAST_FRAG);
 	c->xl_ptr->xl_status = 0;
-	c->xl_ptr->xl_frag.xl_addr = htole32(baddr);
+	c->xl_ptr->xl_frag.xl_addr = htole32(segs->ds_addr);
 	bus_dmamap_sync(sc->xl_mtag, c->xl_map, BUS_DMASYNC_PREREAD);
 	return (0);
 }
@@ -1953,13 +1905,14 @@ xl_rx_resync(struct xl_softc *sc)
  * A frame has been uploaded: pass the resulting mbuf chain up to
  * the higher level protocols.
  */
-static void
+static int
 xl_rxeof(struct xl_softc *sc)
 {
 	struct mbuf		*m;
 	struct ifnet		*ifp = sc->xl_ifp;
 	struct xl_chain_onefrag	*cur_rx;
 	int			total_len = 0;
+	int			rx_npkts = 0;
 	u_int32_t		rxstat;
 
 	XL_LOCK_ASSERT(sc);
@@ -2061,6 +2014,7 @@ again:
 		XL_UNLOCK(sc);
 		(*ifp->if_input)(ifp, m);
 		XL_LOCK(sc);
+		rx_npkts++;
 
 		/*
 		 * If we are running from the taskqueue, the interface
@@ -2068,7 +2022,7 @@ again:
 		 * packet up the network stack.
 		 */
 		if (!(ifp->if_drv_flags & IFF_DRV_RUNNING))
-			return;
+			return (rx_npkts);
 	}
 
 	/*
@@ -2092,6 +2046,7 @@ again:
 		CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_UP_UNSTALL);
 		goto again;
 	}
+	return (rx_npkts);
 }
 
 /*
@@ -2142,13 +2097,13 @@ xl_txeof(struct xl_softc *sc)
 		m_freem(cur_tx->xl_mbuf);
 		cur_tx->xl_mbuf = NULL;
 		ifp->if_opackets++;
+		ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
 
 		cur_tx->xl_next = sc->xl_cdata.xl_tx_free;
 		sc->xl_cdata.xl_tx_free = cur_tx;
 	}
 
 	if (sc->xl_cdata.xl_tx_head == NULL) {
-		ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
 		sc->xl_wdog_timer = 0;
 		sc->xl_cdata.xl_tx_tail = NULL;
 	} else {
@@ -2174,7 +2129,6 @@ xl_txeof_90xB(struct xl_softc *sc)
 	    BUS_DMASYNC_POSTREAD);
 	idx = sc->xl_cdata.xl_tx_cons;
 	while (idx != sc->xl_cdata.xl_tx_prod) {
-
 		cur_tx = &sc->xl_cdata.xl_tx_chain[idx];
 
 		if (!(le32toh(cur_tx->xl_ptr->xl_status) &
@@ -2286,6 +2240,7 @@ xl_intr(void *arg)
 	}
 #endif
 
+
 #ifndef __HAIKU__
 	while ((status = CSR_READ_2(sc, XL_STATUS)) & XL_INTRS &&
 	    status != 0xFFFF) {
@@ -2293,6 +2248,9 @@ xl_intr(void *arg)
 	status = atomic_get((int32 *)&sc->xl_intr_status);
 	while (true) {
 #endif
+		CSR_WRITE_2(sc, XL_COMMAND,
+		    XL_CMD_INTR_ACK|(status & XL_INTRS));
+
 		if (status & XL_STAT_UP_COMPLETE) {
 			int	curpkts;
 
@@ -2317,7 +2275,7 @@ xl_intr(void *arg)
 		}
 
 		if (status & XL_STAT_ADFAIL) {
-			xl_reset(sc);
+			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			xl_init_locked(sc);
 		}
 
@@ -2347,26 +2305,29 @@ xl_intr(void *arg)
 }
 
 #ifdef DEVICE_POLLING
-static void
+static int
 xl_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
 {
 	struct xl_softc *sc = ifp->if_softc;
+	int rx_npkts = 0;
 
 	XL_LOCK(sc);
 	if (ifp->if_drv_flags & IFF_DRV_RUNNING)
-		xl_poll_locked(ifp, cmd, count);
+		rx_npkts = xl_poll_locked(ifp, cmd, count);
 	XL_UNLOCK(sc);
+	return (rx_npkts);
 }
 
-static void
+static int
 xl_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count)
 {
 	struct xl_softc *sc = ifp->if_softc;
+	int rx_npkts;
 
 	XL_LOCK_ASSERT(sc);
 
 	sc->rxcycles = count;
-	xl_rxeof(sc);
+	rx_npkts = xl_rxeof(sc);
 	if (sc->xl_type == XL_TYPE_905B)
 		xl_txeof_90xB(sc);
 	else
@@ -2393,7 +2354,7 @@ xl_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count)
 			}
 
 			if (status & XL_STAT_ADFAIL) {
-				xl_reset(sc);
+				ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 				xl_init_locked(sc);
 			}
 
@@ -2404,6 +2365,7 @@ xl_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count)
 			}
 		}
 	}
+	return (rx_npkts);
 }
 #endif /* DEVICE_POLLING */
 
@@ -2475,26 +2437,21 @@ xl_stats_update_locked(struct xl_softc *sc)
  * pointers to the fragment pointers.
  */
 static int
-xl_encap(struct xl_softc *sc, struct xl_chain *c, struct mbuf *m_head)
+xl_encap(struct xl_softc *sc, struct xl_chain *c, struct mbuf **m_head)
 {
-	int			error;
-	u_int32_t		status;
+	struct mbuf		*m_new;
 	struct ifnet		*ifp = sc->xl_ifp;
+	int			error, i, nseg, total_len;
+	u_int32_t		status;
 
 	XL_LOCK_ASSERT(sc);
 
-	/*
-	 * Start packing the mbufs in this chain into
-	 * the fragment pointers. Stop when we run out
-	 * of fragments or hit the end of the mbuf chain.
-	 */
-	error = bus_dmamap_load_mbuf(sc->xl_mtag, c->xl_map, m_head,
-	    xl_dma_map_txbuf, c->xl_ptr, BUS_DMA_NOWAIT);
+	error = bus_dmamap_load_mbuf_sg(sc->xl_mtag, c->xl_map, *m_head,
+	    sc->xl_cdata.xl_tx_segs, &nseg, BUS_DMA_NOWAIT);
 
 	if (error && error != EFBIG) {
-		m_freem(m_head);
 		if_printf(ifp, "can't map mbuf (error %d)\n", error);
-		return (1);
+		return (error);
 	}
 
 	/*
@@ -2506,42 +2463,64 @@ xl_encap(struct xl_softc *sc, struct xl_chain *c, struct mbuf *m_head)
 	 * and would waste cycles.
 	 */
 	if (error) {
-		struct mbuf		*m_new;
-
-		m_new = m_defrag(m_head, M_DONTWAIT);
+		m_new = m_collapse(*m_head, M_DONTWAIT, XL_MAXFRAGS);
 		if (m_new == NULL) {
-			m_freem(m_head);
-			return (1);
-		} else {
-			m_head = m_new;
+			m_freem(*m_head);
+			*m_head = NULL;
+			return (ENOBUFS);
 		}
+		*m_head = m_new;
 
-		error = bus_dmamap_load_mbuf(sc->xl_mtag, c->xl_map,
-			m_head, xl_dma_map_txbuf, c->xl_ptr, BUS_DMA_NOWAIT);
+		error = bus_dmamap_load_mbuf_sg(sc->xl_mtag, c->xl_map,
+		    *m_head, sc->xl_cdata.xl_tx_segs, &nseg, BUS_DMA_NOWAIT);
 		if (error) {
-			m_freem(m_head);
+			m_freem(*m_head);
+			*m_head = NULL;
 			if_printf(ifp, "can't map mbuf (error %d)\n", error);
-			return (1);
+			return (error);
 		}
 	}
+
+	KASSERT(nseg <= XL_MAXFRAGS,
+	    ("%s: too many DMA segments (%d)", __func__, nseg));
+	if (nseg == 0) {
+		m_freem(*m_head);
+		*m_head = NULL;
+		return (EIO);
+	}
+
+	total_len = 0;
+	for (i = 0; i < nseg; i++) {
+		KASSERT(sc->xl_cdata.xl_tx_segs[i].ds_len <= MCLBYTES,
+		    ("segment size too large"));
+		c->xl_ptr->xl_frag[i].xl_addr =
+		    htole32(sc->xl_cdata.xl_tx_segs[i].ds_addr);
+		c->xl_ptr->xl_frag[i].xl_len =
+		    htole32(sc->xl_cdata.xl_tx_segs[i].ds_len);
+		total_len += sc->xl_cdata.xl_tx_segs[i].ds_len;
+	}
+	c->xl_ptr->xl_frag[nseg - 1].xl_len =
+	    htole32(sc->xl_cdata.xl_tx_segs[nseg - 1].ds_len | XL_LAST_FRAG);
+	c->xl_ptr->xl_status = htole32(total_len);
+	c->xl_ptr->xl_next = 0;
 
 	if (sc->xl_type == XL_TYPE_905B) {
 		status = XL_TXSTAT_RND_DEFEAT;
 
 #ifndef XL905B_TXCSUM_BROKEN
-		if (m_head->m_pkthdr.csum_flags) {
-			if (m_head->m_pkthdr.csum_flags & CSUM_IP)
+		if ((*m_head)->m_pkthdr.csum_flags) {
+			if ((*m_head)->m_pkthdr.csum_flags & CSUM_IP)
 				status |= XL_TXSTAT_IPCKSUM;
-			if (m_head->m_pkthdr.csum_flags & CSUM_TCP)
+			if ((*m_head)->m_pkthdr.csum_flags & CSUM_TCP)
 				status |= XL_TXSTAT_TCPCKSUM;
-			if (m_head->m_pkthdr.csum_flags & CSUM_UDP)
+			if ((*m_head)->m_pkthdr.csum_flags & CSUM_UDP)
 				status |= XL_TXSTAT_UDPCKSUM;
 		}
 #endif
 		c->xl_ptr->xl_status = htole32(status);
 	}
 
-	c->xl_mbuf = m_head;
+	c->xl_mbuf = *m_head;
 	bus_dmamap_sync(sc->xl_mtag, c->xl_map, BUS_DMASYNC_PREWRITE);
 	return (0);
 }
@@ -2574,12 +2553,14 @@ xl_start_locked(struct ifnet *ifp)
 	struct xl_softc		*sc = ifp->if_softc;
 	struct mbuf		*m_head = NULL;
 	struct xl_chain		*prev = NULL, *cur_tx = NULL, *start_tx;
-	struct xl_chain		*prev_tx;
 	u_int32_t		status;
 	int			error;
 
 	XL_LOCK_ASSERT(sc);
 
+	if ((ifp->if_drv_flags & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
+	    IFF_DRV_RUNNING)
+		return;
 	/*
 	 * Check for an available queue slot. If there are none,
 	 * punt.
@@ -2595,20 +2576,23 @@ xl_start_locked(struct ifnet *ifp)
 
 	start_tx = sc->xl_cdata.xl_tx_free;
 
-	while (sc->xl_cdata.xl_tx_free != NULL) {
+	for (; !IFQ_DRV_IS_EMPTY(&ifp->if_snd) &&
+	    sc->xl_cdata.xl_tx_free != NULL;) {
 		IFQ_DRV_DEQUEUE(&ifp->if_snd, m_head);
 		if (m_head == NULL)
 			break;
 
 		/* Pick a descriptor off the free list. */
-		prev_tx = cur_tx;
 		cur_tx = sc->xl_cdata.xl_tx_free;
 
 		/* Pack the data into the descriptor. */
-		error = xl_encap(sc, cur_tx, m_head);
+		error = xl_encap(sc, cur_tx, &m_head);
 		if (error) {
-			cur_tx = prev_tx;
-			continue;
+			if (m_head == NULL)
+				break;
+			ifp->if_drv_flags |= IFF_DRV_OACTIVE;
+			IFQ_DRV_PREPEND(&ifp->if_snd, m_head);
+			break;
 		}
 
 		sc->xl_cdata.xl_tx_free = cur_tx->xl_next;
@@ -2638,7 +2622,7 @@ xl_start_locked(struct ifnet *ifp)
 	 * Place the request for the upload interrupt
 	 * in the last descriptor in the chain. This way, if
 	 * we're chaining several packets at once, we'll only
-	 * get an interupt once for the whole chain rather than
+	 * get an interrupt once for the whole chain rather than
 	 * once for each packet.
 	 */
 	cur_tx->xl_ptr->xl_status = htole32(le32toh(cur_tx->xl_ptr->xl_status) |
@@ -2701,19 +2685,19 @@ xl_start_90xB_locked(struct ifnet *ifp)
 	struct xl_softc		*sc = ifp->if_softc;
 	struct mbuf		*m_head = NULL;
 	struct xl_chain		*prev = NULL, *cur_tx = NULL, *start_tx;
-	struct xl_chain		*prev_tx;
 	int			error, idx;
 
 	XL_LOCK_ASSERT(sc);
 
-	if (ifp->if_drv_flags & IFF_DRV_OACTIVE)
+	if ((ifp->if_drv_flags & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
+	    IFF_DRV_RUNNING)
 		return;
 
 	idx = sc->xl_cdata.xl_tx_prod;
 	start_tx = &sc->xl_cdata.xl_tx_chain[idx];
 
-	while (sc->xl_cdata.xl_tx_chain[idx].xl_mbuf == NULL) {
-
+	for (; !IFQ_DRV_IS_EMPTY(&ifp->if_snd) &&
+	    sc->xl_cdata.xl_tx_chain[idx].xl_mbuf == NULL;) {
 		if ((XL_TX_LIST_CNT - sc->xl_cdata.xl_tx_cnt) < 3) {
 			ifp->if_drv_flags |= IFF_DRV_OACTIVE;
 			break;
@@ -2723,14 +2707,16 @@ xl_start_90xB_locked(struct ifnet *ifp)
 		if (m_head == NULL)
 			break;
 
-		prev_tx = cur_tx;
 		cur_tx = &sc->xl_cdata.xl_tx_chain[idx];
 
 		/* Pack the data into the descriptor. */
-		error = xl_encap(sc, cur_tx, m_head);
+		error = xl_encap(sc, cur_tx, &m_head);
 		if (error) {
-			cur_tx = prev_tx;
-			continue;
+			if (m_head == NULL)
+				break;
+			ifp->if_drv_flags |= IFF_DRV_OACTIVE;
+			IFQ_DRV_PREPEND(&ifp->if_snd, m_head);
+			break;
 		}
 
 		/* Chain it together. */
@@ -2758,7 +2744,7 @@ xl_start_90xB_locked(struct ifnet *ifp)
 	 * Place the request for the upload interrupt
 	 * in the last descriptor in the chain. This way, if
 	 * we're chaining several packets at once, we'll only
-	 * get an interupt once for the whole chain rather than
+	 * get an interrupt once for the whole chain rather than
 	 * once for each packet.
 	 */
 	cur_tx->xl_ptr->xl_status = htole32(le32toh(cur_tx->xl_ptr->xl_status) |
@@ -2796,10 +2782,15 @@ xl_init_locked(struct xl_softc *sc)
 
 	XL_LOCK_ASSERT(sc);
 
+	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		return;
 	/*
 	 * Cancel pending I/O and free all RX/TX buffers.
 	 */
 	xl_stop(sc);
+
+	/* Reset the chip to a known state. */
+	xl_reset(sc);
 
 	if (sc->xl_miibus == NULL) {
 		CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_RX_RESET);
@@ -2812,6 +2803,15 @@ xl_init_locked(struct xl_softc *sc)
 	if (sc->xl_miibus != NULL)
 		mii = device_get_softc(sc->xl_miibus);
 
+	/*
+	 * Clear WOL status and disable all WOL feature as WOL
+	 * would interfere Rx operation under normal environments.
+	 */
+	if ((sc->xl_flags & XL_FLAG_WOL) != 0) {
+		XL_SEL_WIN(7);
+		CSR_READ_2(sc, XL_W7_BM_PME);
+		CSR_WRITE_2(sc, XL_W7_BM_PME, 0);
+	}
 	/* Init our MAC address */
 	XL_SEL_WIN(2);
 	for (i = 0; i < ETHER_ADDR_LEN; i++) {
@@ -3037,15 +3037,14 @@ xl_ifmedia_upd(struct ifnet *ifp)
 	case IFM_10_2:
 	case IFM_10_5:
 		xl_setmode(sc, ifm->ifm_media);
+		XL_UNLOCK(sc);
 		return (0);
-		break;
-	default:
-		break;
 	}
 
 	if (sc->xl_media & XL_MEDIAOPT_MII ||
 	    sc->xl_media & XL_MEDIAOPT_BTX ||
 	    sc->xl_media & XL_MEDIAOPT_BT4) {
+		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		xl_init_locked(sc);
 	} else {
 		xl_setmode(sc, ifm->ifm_media);
@@ -3136,7 +3135,7 @@ xl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 {
 	struct xl_softc		*sc = ifp->if_softc;
 	struct ifreq		*ifr = (struct ifreq *) data;
-	int			error = 0;
+	int			error = 0, mask;
 	struct mii_data		*mii = NULL;
 	u_int8_t		rxfilt;
 
@@ -3161,10 +3160,8 @@ xl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 				CSR_WRITE_2(sc, XL_COMMAND,
 				    XL_CMD_RX_SET_FILT|rxfilt);
 				XL_SEL_WIN(7);
-			} else {
-				if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
-					xl_init_locked(sc);
-			}
+			} else
+				xl_init_locked(sc);
 		} else {
 			if (ifp->if_drv_flags & IFF_DRV_RUNNING)
 				xl_stop(sc);
@@ -3196,41 +3193,50 @@ xl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 			    &mii->mii_media, command);
 		break;
 	case SIOCSIFCAP:
+		mask = ifr->ifr_reqcap ^ ifp->if_capenable;
 #ifdef DEVICE_POLLING
-		if (ifr->ifr_reqcap & IFCAP_POLLING &&
-		    !(ifp->if_capenable & IFCAP_POLLING)) {
-			error = ether_poll_register(xl_poll, ifp);
-			if (error)
-				return(error);
-			XL_LOCK(sc);
-			/* Disable interrupts */
-			CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_INTR_ENB|0);
-			ifp->if_capenable |= IFCAP_POLLING;
-			XL_UNLOCK(sc);
-			return (error);
-			
-		}
-		if (!(ifr->ifr_reqcap & IFCAP_POLLING) &&
-		    ifp->if_capenable & IFCAP_POLLING) {
-			error = ether_poll_deregister(ifp);
-			/* Enable interrupts. */
-			XL_LOCK(sc);
-			CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_INTR_ACK|0xFF);
-			CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_INTR_ENB|XL_INTRS);
-			if (sc->xl_flags & XL_FLAG_FUNCREG)
-				bus_space_write_4(sc->xl_ftag, sc->xl_fhandle,
-				    4, 0x8000);
-			ifp->if_capenable &= ~IFCAP_POLLING;
-			XL_UNLOCK(sc);
-			return (error);
+		if ((mask & IFCAP_POLLING) != 0 &&
+		    (ifp->if_capabilities & IFCAP_POLLING) != 0) {
+			ifp->if_capenable ^= IFCAP_POLLING;
+			if ((ifp->if_capenable & IFCAP_POLLING) != 0) {
+				error = ether_poll_register(xl_poll, ifp);
+				if (error)
+					break;
+				XL_LOCK(sc);
+				/* Disable interrupts */
+				CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_INTR_ENB|0);
+				ifp->if_capenable |= IFCAP_POLLING;
+				XL_UNLOCK(sc);
+			} else {
+				error = ether_poll_deregister(ifp);
+				/* Enable interrupts. */
+				XL_LOCK(sc);
+				CSR_WRITE_2(sc, XL_COMMAND,
+				    XL_CMD_INTR_ACK | 0xFF);
+				CSR_WRITE_2(sc, XL_COMMAND,
+				    XL_CMD_INTR_ENB | XL_INTRS);
+				if (sc->xl_flags & XL_FLAG_FUNCREG)
+					bus_space_write_4(sc->xl_ftag,
+					    sc->xl_fhandle, 4, 0x8000);
+				XL_UNLOCK(sc);
+			}
 		}
 #endif /* DEVICE_POLLING */
 		XL_LOCK(sc);
-		ifp->if_capenable = ifr->ifr_reqcap;
-		if (ifp->if_capenable & IFCAP_TXCSUM)
-			ifp->if_hwassist = XL905B_CSUM_FEATURES;
-		else
-			ifp->if_hwassist = 0;
+		if ((mask & IFCAP_TXCSUM) != 0 &&
+		    (ifp->if_capabilities & IFCAP_TXCSUM) != 0) {
+			ifp->if_capenable ^= IFCAP_TXCSUM;
+			if ((ifp->if_capenable & IFCAP_TXCSUM) != 0)
+				ifp->if_hwassist |= XL905B_CSUM_FEATURES;
+			else
+				ifp->if_hwassist &= ~XL905B_CSUM_FEATURES;
+		}
+		if ((mask & IFCAP_RXCSUM) != 0 &&
+		    (ifp->if_capabilities & IFCAP_RXCSUM) != 0)
+			ifp->if_capenable ^= IFCAP_RXCSUM;
+		if ((mask & IFCAP_WOL_MAGIC) != 0 &&
+		    (ifp->if_capabilities & IFCAP_WOL_MAGIC) != 0)
+			ifp->if_capenable ^= IFCAP_WOL_MAGIC;
 		XL_UNLOCK(sc);
 		break;
 	default:
@@ -3246,11 +3252,30 @@ xl_watchdog(struct xl_softc *sc)
 {
 	struct ifnet		*ifp = sc->xl_ifp;
 	u_int16_t		status = 0;
+	int			misintr;
 
 	XL_LOCK_ASSERT(sc);
 
 	if (sc->xl_wdog_timer == 0 || --sc->xl_wdog_timer != 0)
 		return (0);
+
+	xl_rxeof(sc);
+	xl_txeoc(sc);
+	misintr = 0;
+	if (sc->xl_type == XL_TYPE_905B) {
+		xl_txeof_90xB(sc);
+		if (sc->xl_cdata.xl_tx_cnt == 0)
+			misintr++;
+	} else {
+		xl_txeof(sc);
+		if (sc->xl_cdata.xl_tx_head == NULL)
+			misintr++;
+	}
+	if (misintr != 0) {
+		device_printf(sc->xl_dev,
+		    "watchdog timeout (missed Tx interrupts) -- recovering\n");
+		return (0);
+	}
 
 	ifp->if_oerrors++;
 	XL_SEL_WIN(4);
@@ -3261,10 +3286,7 @@ xl_watchdog(struct xl_softc *sc)
 		device_printf(sc->xl_dev,
 		    "no carrier - transceiver cable problem?\n");
 
-	xl_txeoc(sc);
-	xl_txeof(sc);
-	xl_rxeof(sc);
-	xl_reset(sc);
+	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	xl_init_locked(sc);
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd)) {
@@ -3354,17 +3376,11 @@ xl_stop(struct xl_softc *sc)
  * Stop all chip I/O so that the kernel's probe routines don't
  * get confused by errant DMAs when rebooting.
  */
-static void
+static int
 xl_shutdown(device_t dev)
 {
-	struct xl_softc		*sc;
 
-	sc = device_get_softc(dev);
-
-	XL_LOCK(sc);
-	xl_reset(sc);
-	xl_stop(sc);
-	XL_UNLOCK(sc);
+	return (xl_suspend(dev));
 }
 
 static int
@@ -3376,6 +3392,7 @@ xl_suspend(device_t dev)
 
 	XL_LOCK(sc);
 	xl_stop(sc);
+	xl_setwol(sc);
 	XL_UNLOCK(sc);
 
 	return (0);
@@ -3392,11 +3409,43 @@ xl_resume(device_t dev)
 
 	XL_LOCK(sc);
 
-	xl_reset(sc);
-	if (ifp->if_flags & IFF_UP)
+	if (ifp->if_flags & IFF_UP) {
+		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		xl_init_locked(sc);
+	}
 
 	XL_UNLOCK(sc);
 
 	return (0);
+}
+
+static void
+xl_setwol(struct xl_softc *sc)
+{
+	struct ifnet		*ifp;
+	u_int16_t		cfg, pmstat;
+
+	if ((sc->xl_flags & XL_FLAG_WOL) == 0)
+		return;
+
+	ifp = sc->xl_ifp;
+	XL_SEL_WIN(7);
+	/* Clear any pending PME events. */
+	CSR_READ_2(sc, XL_W7_BM_PME);
+	cfg = 0;
+	if ((ifp->if_capenable & IFCAP_WOL_MAGIC) != 0)
+		cfg |= XL_BM_PME_MAGIC;
+	CSR_WRITE_2(sc, XL_W7_BM_PME, cfg);
+	/* Enable RX. */
+	if ((ifp->if_capenable & IFCAP_WOL_MAGIC) != 0)
+		CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_RX_ENABLE);
+	/* Request PME. */
+	pmstat = pci_read_config(sc->xl_dev,
+	    sc->xl_pmcap + PCIR_POWER_STATUS, 2);
+	if ((ifp->if_capenable & IFCAP_WOL_MAGIC) != 0)
+		pmstat |= PCIM_PSTAT_PMEENABLE;
+	else
+		pmstat &= ~PCIM_PSTAT_PMEENABLE;
+	pci_write_config(sc->xl_dev,
+	    sc->xl_pmcap + PCIR_POWER_STATUS, pmstat, 2);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1997, 1998, 1999
- *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
+ *	Bill Paul <wpaul@ee.columbia.edu>.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,10 +31,12 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/rlphy.c,v 1.32.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/mii/amphy.c,v 1.24.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $");
 
 /*
- * driver for RealTek 8139 internal PHYs
+ * driver for AMD AM79c873 PHYs
+ * This driver also works for Davicom DM910{1,2} PHYs, which appear
+ * to be AM79c873 workalikes.
  */
 
 #include <sys/param.h>
@@ -45,122 +47,80 @@ __FBSDID("$FreeBSD: src/sys/dev/mii/rlphy.c,v 1.32.2.5.2.1 2010/12/21 17:09:25 k
 #include <sys/bus.h>
 
 #include <net/if.h>
-#include <net/if_arp.h>
 #include <net/if_media.h>
 
 #include <dev/mii/mii.h>
 #include <dev/mii/miivar.h>
 #include "miidevs.h"
 
-#include <machine/bus.h>
-#include <pci/if_rlreg.h>
+#include <dev/mii/amphyreg.h>
 
 #include "miibus_if.h"
 
-struct rlphy_softc {
-	struct mii_softc sc_mii;	/* generic PHY */
-	int sc_is_RTL8201L;		/* is an external RTL8201L PHY */
-};
+static int amphy_probe(device_t);
+static int amphy_attach(device_t);
 
-static int rlphy_probe(device_t);
-static int rlphy_attach(device_t);
-
-static device_method_t rlphy_methods[] = {
+static device_method_t amphy_methods[] = {
 	/* device interface */
-	DEVMETHOD(device_probe,		rlphy_probe),
-	DEVMETHOD(device_attach,	rlphy_attach),
+	DEVMETHOD(device_probe,		amphy_probe),
+	DEVMETHOD(device_attach,	amphy_attach),
 	DEVMETHOD(device_detach,	mii_phy_detach),
 	DEVMETHOD(device_shutdown,	bus_generic_shutdown),
 	{ 0, 0 }
 };
 
-static devclass_t rlphy_devclass;
+static devclass_t amphy_devclass;
 
-static driver_t rlphy_driver = {
-	"rlphy",
-	rlphy_methods,
-	sizeof(struct rlphy_softc)
+static driver_t amphy_driver = {
+	"amphy",
+	amphy_methods,
+	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(rlphy, miibus, rlphy_driver, rlphy_devclass, 0, 0);
+DRIVER_MODULE(amphy, miibus, amphy_driver, amphy_devclass, 0, 0);
 
-static int	rlphy_service(struct mii_softc *, struct mii_data *, int);
-static void	rlphy_status(struct mii_softc *);
+static int	amphy_service(struct mii_softc *, struct mii_data *, int);
+static void	amphy_status(struct mii_softc *);
 
-/*
- * RealTek internal PHYs don't have vendor/device ID registers;
- * re(4) and rl(4) fake up a return value of all zeros.
- */
-static const struct mii_phydesc rlintphys[] = {
-	{ 0, 0, "RealTek internal media interface" },
-	MII_PHY_END
-};
-
-static const struct mii_phydesc rlphys[] = {
-	MII_PHY_DESC(REALTEK, RTL8201L),
-	MII_PHY_DESC(ICPLUS, IP101),
+static const struct mii_phydesc amphys[] = {
+	MII_PHY_DESC(DAVICOM, DM9102),
+	MII_PHY_DESC(xxAMD, 79C873),
+	MII_PHY_DESC(xxDAVICOM, DM9101),
 	MII_PHY_END
 };
 
 static int
-rlphy_probe(device_t dev)
+amphy_probe(device_t dev)
 {
-	const char *nic;
-	int rv;
 
-	rv = mii_phy_dev_probe(dev, rlphys, BUS_PROBE_DEFAULT);
-#ifdef __HAIKU__
-	if (rv == BUS_PROBE_DEFAULT)
-		return (rv);
-#else
-	if (rv <= 0)
-		return (rv);
-#endif		
-
-	nic = device_get_name(device_get_parent(device_get_parent(dev)));
-	if (strcmp(nic, "rl") == 0 || strcmp(nic, "re") == 0)
-		return (mii_phy_dev_probe(dev, rlintphys, BUS_PROBE_DEFAULT));
-	return (ENXIO);
+	return (mii_phy_dev_probe(dev, amphys, BUS_PROBE_DEFAULT));
 }
 
 static int
-rlphy_attach(device_t dev)
+amphy_attach(device_t dev)
 {
-	struct mii_softc	*sc;
-	struct mii_attach_args	*ma;
-	struct mii_data		*mii;
-	struct rlphy_softc 	*rsc;
+	struct mii_softc *sc;
+	struct mii_attach_args *ma;
+	struct mii_data *mii;
 
 	sc = device_get_softc(dev);
 	ma = device_get_ivars(dev);
 	sc->mii_dev = device_get_parent(dev);
 	mii = ma->mii_data;
-
-        /*
-         * Check whether we're the RTL8201L PHY and remember so the status
-         * routine can query the proper register for speed detection.
-         */
-	rsc = (struct rlphy_softc *)sc;
-	if (mii_phy_dev_probe(dev, rlphys, 0) == 0)
-		rsc->sc_is_RTL8201L++;
-	
 	LIST_INSERT_HEAD(&mii->mii_phys, sc, mii_list);
 
 	sc->mii_flags = miibus_get_flags(dev);
 	sc->mii_inst = mii->mii_instance++;
 	sc->mii_phy = ma->mii_phyno;
-	sc->mii_service = rlphy_service;
+	sc->mii_service = amphy_service;
 	sc->mii_pdata = mii;
-
-	/*
-	 * The RealTek PHY can never be isolated.
-	 */
-	sc->mii_flags |= MIIF_NOISOLATE;
 
 #define	ADD(m, c)	ifmedia_add(&mii->mii_media, (m), (c), NULL)
 
+#if 0
 	ADD(IFM_MAKEWORD(IFM_ETHER, IFM_100_TX, IFM_LOOP, sc->mii_inst),
 	    MII_MEDIA_100_TX);
+#endif
 
 	mii_phy_reset(sc);
 
@@ -174,7 +134,7 @@ rlphy_attach(device_t dev)
 }
 
 static int
-rlphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
+amphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 {
 
 	switch (cmd) {
@@ -192,21 +152,13 @@ rlphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		break;
 
 	case MII_TICK:
-		/*
-		 * Is the interface even up?
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
+		if (mii_phy_tick(sc) == EJUSTRETURN)
 			return (0);
-
-		/*
-		 * The RealTek PHY's autonegotiation doesn't need to be
-		 * kicked; it continues in the background.
-		 */
 		break;
 	}
 
 	/* Update the media status. */
-	rlphy_status(sc);
+	amphy_status(sc);
 
 	/* Callback if something changed. */
 	mii_phy_update(sc, cmd);
@@ -214,21 +166,21 @@ rlphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 }
 
 static void
-rlphy_status(struct mii_softc *phy)
+amphy_status(struct mii_softc *sc)
 {
-	struct rlphy_softc *rsc =(struct rlphy_softc *)phy;
-	struct mii_data *mii = phy->mii_pdata;
+	struct mii_data *mii = sc->mii_pdata;
 	struct ifmedia_entry *ife = mii->mii_media.ifm_cur;
-	int bmsr, bmcr, anlpar;
+	int bmsr, bmcr, par, anlpar;
 
 	mii->mii_media_status = IFM_AVALID;
 	mii->mii_media_active = IFM_ETHER;
 
-	bmsr = PHY_READ(phy, MII_BMSR) | PHY_READ(phy, MII_BMSR);
+	bmsr = PHY_READ(sc, MII_BMSR) |
+	    PHY_READ(sc, MII_BMSR);
 	if (bmsr & BMSR_LINK)
 		mii->mii_media_status |= IFM_ACTIVE;
 
-	bmcr = PHY_READ(phy, MII_BMCR);
+	bmcr = PHY_READ(sc, MII_BMCR);
 	if (bmcr & BMCR_ISO) {
 		mii->mii_media_active |= IFM_NONE;
 		mii->mii_media_status = 0;
@@ -240,9 +192,8 @@ rlphy_status(struct mii_softc *phy)
 
 	if (bmcr & BMCR_AUTOEN) {
 		/*
-		 * NWay autonegotiation takes the highest-order common
-		 * bit of the ANAR and ANLPAR (i.e. best media advertised
-		 * both by us and our link partner).
+		 * The PAR status bits are only valid if autonegotiation
+		 * has completed (or it's disabled).
 		 */
 		if ((bmsr & BMSR_ACOMP) == 0) {
 			/* Erg, still trying, I guess... */
@@ -250,8 +201,9 @@ rlphy_status(struct mii_softc *phy)
 			return;
 		}
 
-		if ((anlpar = PHY_READ(phy, MII_ANAR) &
-		    PHY_READ(phy, MII_ANLPAR))) {
+		if (PHY_READ(sc, MII_ANER) & ANER_LPAN) {
+			anlpar = PHY_READ(sc, MII_ANAR) &
+			    PHY_READ(sc, MII_ANLPAR);
 			if (anlpar & ANLPAR_TX_FD)
 				mii->mii_media_active |= IFM_100_TX|IFM_FDX;
 			else if (anlpar & ANLPAR_T4)
@@ -266,46 +218,19 @@ rlphy_status(struct mii_softc *phy)
 				mii->mii_media_active |= IFM_NONE;
 			return;
 		}
-		/*
-		 * If the other side doesn't support NWAY, then the
-		 * best we can do is determine if we have a 10Mbps or
-		 * 100Mbps link. There's no way to know if the link
-		 * is full or half duplex, so we default to half duplex
-		 * and hope that the user is clever enough to manually
-		 * change the media settings if we're wrong.
-		 */
 
 		/*
-		 * The RealTek PHY supports non-NWAY link speed
-		 * detection, however it does not report the link
-		 * detection results via the ANLPAR or BMSR registers.
-		 * (What? RealTek doesn't do things the way everyone
-		 * else does? I'm just shocked, shocked I tell you.)
-		 * To determine the link speed, we have to do one
-		 * of two things:
-		 *
-		 * - If this is a standalone RealTek RTL8201(L) PHY,
-		 *   we can determine the link speed by testing bit 0
-		 *   in the magic, vendor-specific register at offset
-		 *   0x19.
-		 *
-		 * - If this is a RealTek MAC with integrated PHY, we
-		 *   can test the 'SPEED10' bit of the MAC's media status
-		 *   register.
+		 * Link partner is not capable of autonegotiation.
 		 */
-		if (rsc->sc_is_RTL8201L) {
-			if (PHY_READ(phy, 0x0019) & 0x01)
-				mii->mii_media_active |= IFM_100_TX;
-			else
-				mii->mii_media_active |= IFM_10_T;
-		} else {
-			if (PHY_READ(phy, RL_MEDIASTAT) &
-			    RL_MEDIASTAT_SPEED10)
-				mii->mii_media_active |= IFM_10_T;
-			else
-				mii->mii_media_active |= IFM_100_TX;
-		}
-		mii->mii_media_active |= IFM_HDX;
+		par = PHY_READ(sc, MII_AMPHY_DSCSR);
+		if (par & DSCSR_100FDX)
+			mii->mii_media_active |= IFM_100_TX|IFM_FDX;
+		else if (par & DSCSR_100HDX)
+			mii->mii_media_active |= IFM_100_TX|IFM_HDX;
+		else if (par & DSCSR_10FDX)
+			mii->mii_media_active |= IFM_10_T|IFM_HDX;
+		else if (par & DSCSR_10HDX)
+			mii->mii_media_active |= IFM_10_T|IFM_HDX;
 	} else
 		mii->mii_media_active = ife->ifm_media;
 }

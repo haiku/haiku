@@ -258,6 +258,7 @@ uint64_t	ifmedia_baudrate(int);
  */
 #define	IFM_FDX		0x00100000	/* Force full duplex */
 #define	IFM_HDX		0x00200000	/* Force half duplex */
+#define	IFM_FLOW	0x00400000	/* Enable hardware flow control */
 #define	IFM_FLAG0	0x01000000	/* Driver defined flag */
 #define	IFM_FLAG1	0x02000000	/* Driver defined flag */
 #define	IFM_FLAG2	0x04000000	/* Driver defined flag */

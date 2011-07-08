@@ -1,6 +1,6 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network 3com pci ;
+SubDir HAIKU_TOP src add-ons kernel drivers network 3com dev xl ;
 
-UseHeaders [ FDirName $(SUBDIR) .. ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 
 UsePrivateHeaders net system ;

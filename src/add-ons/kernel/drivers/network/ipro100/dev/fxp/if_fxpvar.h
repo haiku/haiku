@@ -1,13 +1,13 @@
 /*-
  * Copyright (c) 1995, David Greenman
  * All rights reserved.
- *              
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
- * are met:             
+ * are met:
  * 1. Redistributions of source code must retain the above copyright
  *    notice unmodified, this list of conditions, and the following
- *    disclaimer.  
+ *    disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/fxp/if_fxpvar.h,v 1.40 2006/11/30 14:58:01 glebius Exp $
+ * $FreeBSD: src/sys/dev/fxp/if_fxpvar.h,v 1.49.2.4.2.1 2010/12/21 17:09:25 kensmith Exp $
  */
 
 /*
@@ -38,6 +38,12 @@
  * This must be a power of two.
  */
 #define FXP_NTXCB       128
+#define	FXP_NTXCB_HIWAT	((FXP_NTXCB * 7) / 10)
+
+/*
+ * Maximum size of a DMA segment.
+ */
+#define	FXP_TSO_SEGSIZE	4096
 
 /*
  * Size of the TxCB list.
@@ -86,16 +92,16 @@
 
 /*
  * Default maximum time, in microseconds, that an interrupt may be delayed
- * in an attempt to coalesce interrupts.  This is only effective if the Intel 
+ * in an attempt to coalesce interrupts.  This is only effective if the Intel
  * microcode is loaded, and may be changed via either loader tunables or
  * sysctl.  See also the CPUSAVER_DWORD entry in rcvbundl.h.
  */
 #define TUNABLE_INT_DELAY 1000
 
 /*
- * Default number of packets that will be bundled, before an interrupt is 
+ * Default number of packets that will be bundled, before an interrupt is
  * generated.  This is only effective if the Intel microcode is loaded, and
- * may be changed via either loader tunables or sysctl.  This may not be 
+ * may be changed via either loader tunables or sysctl.  This may not be
  * present in all microcode revisions, see also the CPUSAVER_BUNDLE_MAX_DWORD
  * entry in rcvbundl.h.
  */
@@ -136,6 +142,37 @@ struct fxp_desc_list {
 	bus_dma_tag_t rx_tag;
 };
 
+struct fxp_ident {
+	uint16_t	devid;
+	int16_t		revid;		/* -1 matches anything */
+	uint8_t		ich;
+	const char	*name;
+};
+
+struct fxp_hwstats {
+	uint32_t tx_good;
+	uint32_t tx_maxcols;
+	uint32_t tx_latecols;
+	uint32_t tx_underruns;
+	uint32_t tx_lostcrs;
+	uint32_t tx_deffered;
+	uint32_t tx_single_collisions;
+	uint32_t tx_multiple_collisions;
+	uint32_t tx_total_collisions;
+	uint32_t tx_pause;
+	uint32_t tx_tco;
+	uint32_t rx_good;
+	uint32_t rx_crc_errors;
+	uint32_t rx_alignment_errors;
+	uint32_t rx_rnr_errors;
+	uint32_t rx_overrun_errors;
+	uint32_t rx_cdt_errors;
+	uint32_t rx_shortframes;
+	uint32_t rx_pause;
+	uint32_t rx_controls;
+	uint32_t rx_tco;
+};
+
 /*
  * NOTE: Elements are ordered for optimal cacheline behavior, and NOT
  *	 for functional grouping.
@@ -145,8 +182,10 @@ struct fxp_softc {
 	struct resource	*fxp_res[2];	/* I/O and IRQ resources */
 	struct resource_spec *fxp_spec;	/* the resource spec we used */
 	void *ih;			/* interrupt handler cookie */
+	const struct fxp_ident *ident;
 	struct mtx sc_mtx;
-	bus_dma_tag_t fxp_mtag;		/* bus DMA tag for mbufs */
+	bus_dma_tag_t fxp_txmtag;	/* bus DMA tag for Tx mbufs */
+	bus_dma_tag_t fxp_rxmtag;	/* bus DMA tag for Rx mbufs */
 	bus_dma_tag_t fxp_stag;		/* bus DMA tag for stats */
 	bus_dmamap_t fxp_smap;		/* bus DMA map for stats */
 	bus_dma_tag_t cbl_tag;		/* DMA tag for the TxCB list */
@@ -156,10 +195,11 @@ struct fxp_softc {
 	bus_dmamap_t spare_map;		/* spare DMA map */
 	struct fxp_desc_list fxp_desc;	/* descriptors management struct */
 	int maxtxseg;			/* maximum # of TX segments */
+	int maxsegsize;			/* maximum size of a TX segment */
 	int tx_queued;			/* # of active TxCB's */
-	int need_mcsetup;		/* multicast filter needs programming */
 	struct fxp_stats *fxp_stats;	/* Pointer to interface stats */
 	uint32_t stats_addr;		/* DMA address of the stats structure */
+	struct fxp_hwstats fxp_hwstats;
 	int rx_idle_secs;		/* # of seconds RX has been idle */
 	struct callout stat_ch;		/* stat callout */
 	int watchdog_timer;		/* seconds until chip reset */
@@ -170,13 +210,13 @@ struct fxp_softc {
 	device_t dev;
 	int tunable_int_delay;		/* interrupt delay value for ucode */
 	int tunable_bundle_max;		/* max # frames per interrupt (ucode) */
-	int tunable_noflow;		/* flow control disabled */
 	int rnr;			/* RNR events */
 	int eeprom_size;		/* size of serial EEPROM */
 	int suspended;			/* 0 = normal  1 = suspended or dead */
 	int cu_resume_bug;
 	int revision;
 	int flags;
+	int if_flags;
 	uint8_t rfa_size;
 	uint32_t tx_cmd;
 };
@@ -187,12 +227,15 @@ struct fxp_softc {
 #define FXP_FLAG_EXT_TXCB	0x0008	/* enable use of extended TXCB */
 #define FXP_FLAG_SERIAL_MEDIA	0x0010	/* 10Mbps serial interface */
 #define FXP_FLAG_LONG_PKT_EN	0x0020	/* enable long packet reception */
-#define FXP_FLAG_ALL_MCAST	0x0040	/* accept all multicast frames */
 #define FXP_FLAG_CU_RESUME_BUG	0x0080	/* requires workaround for CU_RESUME */
 #define FXP_FLAG_UCODE		0x0100	/* ucode is loaded */
 #define FXP_FLAG_DEFERRED_RNR	0x0200	/* DEVICE_POLLING deferred RNR */
 #define FXP_FLAG_EXT_RFA	0x0400	/* extended RFDs for csum offload */
 #define FXP_FLAG_SAVE_BAD	0x0800	/* save bad pkts: bad size, CRC, etc */
+#define FXP_FLAG_82559_RXCSUM	0x1000	/* 82559 compatible RX checksum */
+#define FXP_FLAG_WOLCAP		0x2000	/* WOL capability */
+#define FXP_FLAG_WOL		0x4000	/* WOL active */
+#define FXP_FLAG_RXBUG		0x8000	/* Rx lock-up bug */
 
 /* Macros to ease CSR access. */
 #define	CSR_READ_1(sc, reg)		bus_read_1(sc->fxp_res[0], reg)

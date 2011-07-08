@@ -16,13 +16,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the NetBSD
- *	Foundation, Inc. and its contributors.
- * 4. Neither the name of The NetBSD Foundation nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -48,11 +41,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by Manuel Bouyer.
- * 4. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -67,7 +55,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/exphy.c,v 1.19.2.1 2006/08/08 04:37:18 yongari Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/mii/exphy.c,v 1.23.10.5.2.1 2010/12/21 17:09:25 kensmith Exp $");
 
 /*
  * driver for 3Com internal PHYs
@@ -114,42 +102,31 @@ DRIVER_MODULE(xlphy, miibus, exphy_driver, exphy_devclass, 0, 0);
 static int	exphy_service(struct mii_softc *, struct mii_data *, int);
 static void	exphy_reset(struct mii_softc *);
 
+/*
+ * Some 3Com internal PHYs report zero for OUI and model, others use
+ * actual values.
+ * Note that the 3Com internal PHYs having OUI 0x105a and model 0 are
+ * handled fine by ukphy(4); they can be isolated and don't require
+ * special treatment after reset.
+ */
+static const struct mii_phydesc exphys[] = {
+	{ 0, 0, "3Com internal media interface" },
+	MII_PHY_DESC(BROADCOM, 3C905C),
+	MII_PHY_END
+};
+	
 static int
-exphy_probe(dev)
-	device_t		dev;
+exphy_probe(device_t dev)
 {
-	struct mii_attach_args *ma;
-	device_t		parent;
 
-	ma = device_get_ivars(dev);
-	parent = device_get_parent(device_get_parent(dev));
-
-	/*
-	 * Argh, 3Com PHY reports oui == 0 model == 0!
-	 */
-	if ((MII_OUI(ma->mii_id1, ma->mii_id2) != 0 ||
-	    MII_MODEL(ma->mii_id2) != 0) &&
-	    (MII_OUI(ma->mii_id1, ma->mii_id2) != MII_OUI_BROADCOM ||
-	    MII_MODEL(ma->mii_id2) != MII_MODEL_BROADCOM_3C905C))
-		return (ENXIO);
-
-	/*
-	 * Make sure the parent is an `ex'.
-	 */
-	if (strcmp(device_get_name(parent), "xl") != 0)
-		return (ENXIO);
-
-	if (MII_OUI(ma->mii_id1, ma->mii_id2) == 0)
-		device_set_desc(dev, "3Com internal media interface");
-	else
-		device_set_desc(dev, MII_STR_BROADCOM_3C905C);
-
-	return (BUS_PROBE_DEFAULT);
+	if (strcmp(device_get_name(device_get_parent(device_get_parent(dev))),
+	    "xl") == 0)
+		return (mii_phy_dev_probe(dev, exphys, BUS_PROBE_DEFAULT));
+	return (ENXIO);
 }
 
 static int
-exphy_attach(dev)
-	device_t		dev;
+exphy_attach(device_t dev)
 {
 	struct mii_softc *sc;
 	struct mii_attach_args *ma;
@@ -158,62 +135,39 @@ exphy_attach(dev)
 	sc = device_get_softc(dev);
 	ma = device_get_ivars(dev);
 	sc->mii_dev = device_get_parent(dev);
-	mii = device_get_softc(sc->mii_dev);
-
-	/*
-	 * The 3Com PHY can never be isolated, so never allow non-zero
-	 * instances!
-	 */
-	if (mii->mii_instance != 0) {
-		device_printf(dev, "ignoring this PHY, non-zero instance\n");
-		return(ENXIO);
-	}
-
+	mii = ma->mii_data;
 	LIST_INSERT_HEAD(&mii->mii_phys, sc, mii_list);
 
-	sc->mii_inst = mii->mii_instance;
+	sc->mii_flags = miibus_get_flags(dev);
+	sc->mii_inst = mii->mii_instance++;
 	sc->mii_phy = ma->mii_phyno;
 	sc->mii_service = exphy_service;
 	sc->mii_pdata = mii;
-	mii->mii_instance++;
 
+	/*
+	 * The 3Com PHY can never be isolated.
+	 */
 	sc->mii_flags |= MIIF_NOISOLATE;
 
 #define	ADD(m, c)	ifmedia_add(&mii->mii_media, (m), (c), NULL)
 
-#if 0 /* See above. */
-	ADD(IFM_MAKEWORD(IFM_ETHER, IFM_NONE, 0, sc->mii_inst),
-	    BMCR_ISO);
-#endif
-
 	ADD(IFM_MAKEWORD(IFM_ETHER, IFM_100_TX, IFM_LOOP, sc->mii_inst),
-	    BMCR_LOOP|BMCR_S100);
+	    MII_MEDIA_100_TX);
 
 	exphy_reset(sc);
 
-	sc->mii_capabilities =
-	    PHY_READ(sc, MII_BMSR) & ma->mii_capmask;
+	sc->mii_capabilities = PHY_READ(sc, MII_BMSR) & ma->mii_capmask;
 	device_printf(dev, " ");
 	mii_phy_add_media(sc);
 	printf("\n");
 #undef ADD
 	MIIBUS_MEDIAINIT(sc->mii_dev);
-	return(0);
+	return (0);
 }
 
 static int
-exphy_service(sc, mii, cmd)
-	struct mii_softc *sc;
-	struct mii_data *mii;
-	int cmd;
+exphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 {
-	struct ifmedia_entry *ife = mii->mii_media.ifm_cur;
-
-	/*
-	 * We can't isolate the 3Com PHY, so it has to be the only one!
-	 */
-	if (IFM_INST(ife->ifm_media) != sc->mii_inst)
-		panic("exphy_service: can't isolate 3Com PHY");
 
 	switch (cmd) {
 	case MII_POLLSTAT:
@@ -235,12 +189,6 @@ exphy_service(sc, mii, cmd)
 		 */
 		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
 			return (0);
-
-		/*
-		 * Only used for autonegotiation.
-		 */
-		if (IFM_SUBTYPE(ife->ifm_media) != IFM_AUTO)
-			break;
 
 		/*
 		 * The 3Com PHY's autonegotiation doesn't need to be

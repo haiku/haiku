@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network 3com dev ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network 3com dev mii ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network 3com dev xl ;

@@ -169,7 +169,7 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 	$(X86_ONLY)ar81xx $(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2
-	$(X86_ONLY)broadcom440x $(X86_ONLY)broadcom570x etherpci
+	$(X86_ONLY)broadcom440x $(X86_ONLY)broadcom570x $(X86_ONLY)dec21xxx etherpci
 	$(X86_ONLY)ipro100 $(X86_ONLY)ipro1000 $(X86_ONLY)jmicron2x0
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)nforce $(X86_ONLY)pcnet pegasus
 	$(X86_ONLY)rtl8139 $(X86_ONLY)rtl81xx sis900
