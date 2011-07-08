@@ -847,44 +847,93 @@ packagefs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 
 // #pragma mark - index directory & index operations
 
+
+// NOTE: We don't do any locking in the index dir hooks, since once mounted
+// the index directory is immutable.
+
+
 status_t
 packagefs_open_index_dir(fs_volume* fsVolume, void** _cookie)
 {
-	// TODO:...
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p\n", volume);
+
+	IndexDirIterator* iterator = new(std::nothrow) IndexDirIterator(
+		volume->GetIndexDirIterator());
+	if (iterator == NULL)
+		return B_NO_MEMORY;
+
+	*_cookie = iterator;
+	return B_OK;
 }
 
 
 status_t
 packagefs_close_index_dir(fs_volume* fsVolume, void* cookie)
 {
-	// TODO:...
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
 status_t
 packagefs_free_index_dir_cookie(fs_volume* fsVolume, void* cookie)
 {
-	// TODO:...
-	return B_NOT_SUPPORTED;
+	FUNCTION("volume: %p, cookie: %p\n", fsVolume->private_volume, cookie);
+
+	delete (IndexDirIterator*)cookie;
+	return B_OK;
 }
 
 
 status_t
-packagefs_read_index_dir(fs_volume* fsVolume, void* cookie, struct dirent* buffer,
-	size_t bufferSize, uint32* _num)
+packagefs_read_index_dir(fs_volume* fsVolume, void* cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* _num)
 {
-	// TODO:...
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, cookie: %p, buffer: %p, bufferSize: %zu, num: %"
+		B_PRIu32 "\n", volume, cookie, buffer, bufferSize, *_num);
+
+	IndexDirIterator* iterator = (IndexDirIterator*)cookie;
+
+	if (*_num == 0)
+		return B_BAD_VALUE;
+
+	IndexDirIterator previousIterator = *iterator;
+
+	// get the next index
+	Index* index = iterator->Next();
+	if (index == NULL) {
+		*_num = 0;
+		return B_OK;
+	}
+
+	// fill in the entry
+	if (!set_dirent_name(buffer, bufferSize, index->Name())) {
+		*iterator = previousIterator;
+		return B_BUFFER_OVERFLOW;
+	}
+
+	buffer->d_dev = volume->ID();
+	buffer->d_ino = 0;
+
+	*_num = 1;
+	return B_OK;
 }
 
 
 status_t
 packagefs_rewind_index_dir(fs_volume* fsVolume, void* cookie)
 {
-	// TODO:...
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, cookie: %p\n", volume, cookie);
+
+	IndexDirIterator* iterator = (IndexDirIterator*)cookie;
+	*iterator = volume->GetIndexDirIterator();
+
+	return B_OK;
 }
 
 
@@ -892,7 +941,6 @@ status_t
 packagefs_create_index(fs_volume* fsVolume, const char* name, uint32 type,
 	uint32 flags)
 {
-	// TODO:...
 	return B_NOT_SUPPORTED;
 }
 
@@ -900,7 +948,6 @@ packagefs_create_index(fs_volume* fsVolume, const char* name, uint32 type,
 status_t
 packagefs_remove_index(fs_volume* fsVolume, const char* name)
 {
-	// TODO:...
 	return B_NOT_SUPPORTED;
 }
 
@@ -909,8 +956,25 @@ status_t
 packagefs_read_index_stat(fs_volume* fsVolume, const char* name,
 	struct stat* stat)
 {
-	// TODO:...
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, name: \"%s\", stat: %p\n", volume, name, stat);
+
+	Index* index = volume->FindIndex(name);
+	if (index == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	VolumeReadLocker volumeReadLocker(volume);
+
+	memset(stat, 0, sizeof(*stat));
+		// TODO: st_mtime, st_crtime, st_uid, st_gid are made available to
+		// userland, so we should make an attempt to fill in values that make
+		// sense.
+
+	stat->st_type = index->Type();
+	stat->st_size = index->CountEntries();
+
+	return B_OK;
 }
 
 

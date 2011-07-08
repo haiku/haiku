@@ -26,6 +26,8 @@ class Directory;
 class PackageFSRoot;
 class UnpackingNode;
 
+typedef IndexHashTable::Iterator IndexDirIterator;
+
 
 enum MountType {
 	MOUNT_TYPE_SYSTEM,
@@ -83,6 +85,8 @@ public:
 
 			Index*				FindIndex(const char* name) const
 									{ return fIndices.Lookup(name); }
+			IndexDirIterator	GetIndexDirIterator() const
+									{ return fIndices.GetIterator(); }
 
 			// VFS wrappers
 			status_t			GetVNode(ino_t nodeID, Node*& _node);
