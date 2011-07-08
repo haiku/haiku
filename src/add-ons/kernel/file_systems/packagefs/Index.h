@@ -74,7 +74,6 @@ protected:
 class IndexIterator {
 public:
 								IndexIterator();
-								IndexIterator(Index* index);
 								~IndexIterator();
 
 			bool				HasNext() const;

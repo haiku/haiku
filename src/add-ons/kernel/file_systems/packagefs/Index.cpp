@@ -93,15 +93,6 @@ IndexIterator::IndexIterator()
 }
 
 
-IndexIterator::IndexIterator(Index* index)
-	:
-	fIterator(NULL)
-{
-	if (index)
-		index->GetIterator(this);
-}
-
-
 IndexIterator::~IndexIterator()
 {
 	SetIterator(NULL);
