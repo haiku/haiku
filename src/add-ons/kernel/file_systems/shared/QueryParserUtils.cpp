@@ -70,6 +70,7 @@ compareKeys(uint32 type, const void* key1, size_t length1, const void* key2,
 		case B_DOUBLE_TYPE:
 			return compare_integral(*(double*)key1, *(double*)key2);
 		case B_STRING_TYPE:
+		case B_MIME_STRING_TYPE:
 		{
 			int result = strncmp((const char*)key1, (const char*)key2,
 				std::min(length1, length2));
