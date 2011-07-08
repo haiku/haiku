@@ -138,8 +138,8 @@ packagefs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 
 	FUNCTION("volume: %p, info: %p\n", volume, info);
 
-	info->flags = B_FS_IS_READONLY | B_FS_HAS_MIME | B_FS_HAS_ATTR
-		| B_FS_HAS_QUERY | B_FS_SUPPORTS_NODE_MONITORING;
+	info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY | B_FS_HAS_MIME
+		| B_FS_HAS_ATTR | B_FS_HAS_QUERY | B_FS_SUPPORTS_NODE_MONITORING;
 	info->block_size = 4096;
 	info->io_size = kOptimalIOSize;
 	info->total_blocks = info->free_blocks = 1;
