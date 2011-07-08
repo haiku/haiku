@@ -49,32 +49,23 @@ Index::Init(Volume* volume, const char* name, uint32 type, bool fixedKeyLength,
 
 
 bool
-Index::GetIterator(IndexIterator* iterator)
+Index::GetIterator(IndexIterator& iterator)
 {
-	bool result = false;
-	if (iterator) {
-		AbstractIndexIterator* actualIterator = InternalGetIterator();
-		if (actualIterator) {
-			iterator->SetIterator(actualIterator);
-			result = true;
-		}
-	}
-	return result;
+	AbstractIndexIterator* actualIterator = InternalGetIterator();
+	iterator.SetIterator(actualIterator);
+
+	return actualIterator != NULL;
 }
 
 
 bool
-Index::Find(const void* key, size_t length, IndexIterator* iterator)
+Index::Find(const void* key, size_t length, IndexIterator& iterator)
 {
-	bool result = false;
-	if (key && iterator) {
-		AbstractIndexIterator* actualIterator = InternalFind(key, length);
-		if (actualIterator) {
-			iterator->SetIterator(actualIterator);
-			result = true;
-		}
-	}
-	return result;
+	AbstractIndexIterator* actualIterator
+		= key != NULL ? InternalFind(key, length) : NULL;
+	iterator.SetIterator(actualIterator);
+
+	return actualIterator != NULL;
 }
 
 
