@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -77,8 +77,8 @@ typedef DoublyLinkedList<struct net_buffer,
 struct ipv6_packet_key {
 	in6_addr	source;
 	in6_addr	destination;
+	// We use uint32 here due to the hash function
 	uint32		id;
-	// using u32 for the field allows to feed the whole structure in hash func.
 	uint32		protocol;
 };
 
@@ -95,21 +95,54 @@ public:
 									{ return fReceivedLastFragment
 										&& fBytesLeft == 0; }
 
-	static	uint32				Hash(void* _packet, const void* _key,
-									uint32 range);
-	static	int					Compare(void* _packet, const void* _key);
-	static	int32				NextOffset()
-									{ return offsetof(FragmentPacket, fNext); }
+			const ipv6_packet_key& Key() const { return fKey; }
+			FragmentPacket*&	HashTableLink() { return fNext; }
+
 	static	void				StaleTimer(struct net_timer* timer, void* data);
 
 private:
 			FragmentPacket*		fNext;
 			struct ipv6_packet_key fKey;
-			bool				fReceivedLastFragment;
+			uint32				fIndex;
 			int32				fBytesLeft;
 			FragmentList		fFragments;
 			net_timer			fTimer;
+			bool				fReceivedLastFragment;
 };
+
+
+struct FragmentHashDefinition {
+	typedef ipv6_packet_key KeyType;
+	typedef FragmentPacket ValueType;
+
+	size_t HashKey(const KeyType& key) const
+	{
+		return jenkins_hashword((const uint32*)&key,
+			sizeof(ipv6_packet_key) / sizeof(uint32), 0);
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->Key());
+	}
+
+	bool Compare(const KeyType& key, ValueType* value) const
+	{
+		const ipv6_packet_key& packetKey = value->Key();
+
+		return packetKey.id == key.id
+			&& packetKey.source == key.source
+			&& packetKey.destination == key.destination
+			&& packetKey.protocol == key.protocol;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->HashTableLink();
+	}
+};
+
+typedef BOpenHashTable<FragmentHashDefinition, false, true> FragmentTable;
 
 
 class RawSocket
@@ -177,7 +210,7 @@ static net_socket_module_info* sSocketModule;
 static RawSocketList sRawSockets;
 static mutex sRawSocketsLock;
 static mutex sFragmentLock;
-static hash_table* sFragmentHash;
+static FragmentTable sFragmentHash;
 static int32 sFragmentID;
 static mutex sMulticastGroupsLock;
 
@@ -222,7 +255,7 @@ IPv6Header::GetHeaderOffset(net_buffer* buffer, uint32 headerCode) const
 		return 0;
 	}
 
-	// the general transport layer header case 
+	// the general transport layer header case
 	buffer->protocol = next;
 	return offset;
 }
@@ -241,8 +274,8 @@ RawSocket::RawSocket(net_socket* socket)
 FragmentPacket::FragmentPacket(const ipv6_packet_key &key)
 	:
 	fKey(key),
-	fReceivedLastFragment(false),
-	fBytesLeft(IPV6_MAXPACKET)
+	fBytesLeft(IPV6_MAXPACKET),
+	fReceivedLastFragment(false)
 {
 	gStackModule->init_timer(&fTimer, FragmentPacket::StaleTimer, this);
 }
@@ -295,6 +328,9 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 		gBufferModule->free(buffer);
 		return B_OK;
 	}
+
+	fIndex = buffer->index;
+		// adopt the buffer's device index
 
 	TRACE("    previous: %p, next: %p", previous, next);
 
@@ -423,30 +459,10 @@ FragmentPacket::Reassemble(net_buffer* to)
 	if (buffer != to)
 		panic("ipv6 packet reassembly did not work correctly.");
 
+	to->index = fIndex;
+		// reset the buffer's device index
+
 	return B_OK;
-}
-
-
-int
-FragmentPacket::Compare(void* _packet, const void* _key)
-{
-	const ipv6_packet_key* key = (ipv6_packet_key*)_key;
-	ipv6_packet_key* packetKey = &((FragmentPacket*)_packet)->fKey;
-
-	return memcmp(packetKey, key, sizeof(ipv6_packet_key));
-}
-
-
-uint32
-FragmentPacket::Hash(void* _packet, const void* _key, uint32 range)
-{
-	const struct ipv6_packet_key* key = (struct ipv6_packet_key*)_key;
-	FragmentPacket* packet = (FragmentPacket*)_packet;
-	if (packet != NULL)
-		key = &packet->fKey;
-
-	return jenkins_hashword((const uint32*)key,
-		sizeof(ipv6_packet_key) / sizeof(uint32), 0);
 }
 
 
@@ -457,7 +473,7 @@ FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
 	TRACE("Assembling FragmentPacket %p timed out!", packet);
 
 	MutexLocker locker(&sFragmentLock);
-	hash_remove(sFragmentHash, packet);
+	sFragmentHash.Remove(packet);
 	locker.Unlock();
 
 	if (!packet->fFragments.IsEmpty()) {
@@ -529,7 +545,7 @@ reassemble_fragments(const IPv6Header &header, net_buffer** _buffer, uint16 offs
 	// TODO: Make locking finer grained.
 	MutexLocker locker(&sFragmentLock);
 
-	FragmentPacket* packet = (FragmentPacket*)hash_lookup(sFragmentHash, &key);
+	FragmentPacket* packet = sFragmentHash.Lookup(key);
 	if (packet == NULL) {
 		// New fragment packet
 		packet = new (std::nothrow) FragmentPacket(key);
@@ -537,7 +553,7 @@ reassemble_fragments(const IPv6Header &header, net_buffer** _buffer, uint16 offs
 			return B_NO_MEMORY;
 
 		// add packet to hash
-		status = hash_insert(sFragmentHash, packet);
+		status = sFragmentHash.Insert(packet);
 		if (status != B_OK) {
 			delete packet;
 			return status;
@@ -560,7 +576,7 @@ reassemble_fragments(const IPv6Header &header, net_buffer** _buffer, uint16 offs
 		return status;
 
 	if (packet->IsComplete()) {
-		hash_remove(sFragmentHash, packet);
+		sFragmentHash.Remove(packet);
 			// no matter if reassembling succeeds, we won't need this packet
 			// anymore
 
@@ -629,7 +645,7 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 		bool lastFragment = bytesLeft == 0;
 
 		bufferHeader->header.ip6_nxt = IPPROTO_FRAGMENT;
-		bufferHeader->header.ip6_plen = 
+		bufferHeader->header.ip6_plen =
 			htons(fragmentLength + extensionHeadersLength);
 		bufferHeader.Sync();
 
@@ -1619,12 +1635,17 @@ init_ipv6()
 	sMulticastState = new MulticastState();
 	if (sMulticastState == NULL) {
 		status = B_NO_MEMORY;
-		goto err;
+		goto err1;
 	}
 
 	status = sMulticastState->Init();
 	if (status != B_OK)
-		goto err;
+		goto err2;
+
+	new (&sFragmentHash) FragmentTable();
+	status = sFragmentHash.Init(256);
+	if (status != B_OK)
+		goto err3;
 
 	new (&sRawSockets) RawSocketList;
 		// static initializers do not work in the kernel,
@@ -1634,18 +1655,21 @@ init_ipv6()
 	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_RAW, 0,
 		NET_IPV6_MODULE_NAME, NULL);
 	if (status != B_OK)
-		goto err;
+		goto err3;
 
 	status = gStackModule->register_domain(AF_INET6, "internet6", &gIPv6Module,
 		&gIPv6AddressModule, &sDomain);
 	if (status != B_OK)
-		goto err;
+		goto err3;
 
 	TRACE("init_ipv6: OK");
 	return B_OK;
 
-err:
+err3:
+	sFragmentHash.~FragmentTable();
+err2:
 	delete sMulticastState;
+err1:
 	mutex_destroy(&sReceivingProtocolLock);
 	mutex_destroy(&sMulticastGroupsLock);
 	mutex_destroy(&sRawSocketsLock);
@@ -1665,6 +1689,7 @@ uninit_ipv6()
 			gStackModule->put_domain_receiving_protocol(sDomain, i);
 	}
 
+	sFragmentHash.~FragmentTable();
 	delete sMulticastState;
 
 	gStackModule->unregister_domain(sDomain);
