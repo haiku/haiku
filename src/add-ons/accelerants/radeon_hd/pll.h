@@ -42,7 +42,7 @@ void PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	uint16 feedback, uint16 post);
 status_t PLLPower(uint8 pllIndex, int command);
 status_t PLLCalibrate(uint8 pllIndex);
-void PLLCRTCGrab(uint8 pllIndex, bool crt2);
+void PLLCRTCGrab(uint8 pllIndex, uint8 crtid);
 bool DCCGCLKAvailable(uint8 pllIndex);
 void DCCGCLKSet(uint8 pllIndex, int set);
 

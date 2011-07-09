@@ -128,10 +128,12 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 
 // Blacks the screen out, useful for mode setting
 static void
-CardBlankSet(bool blank)
+CardBlankSet(uint8 crtid, bool blank)
 {
-	int blackColorReg = D1CRTC_BLACK_COLOR;
-	int blankControlReg = D1CRTC_BLANK_CONTROL;
+	int blackColorReg
+		= (crtid == 1) ? D2CRTC_BLACK_COLOR : D1CRTC_BLACK_COLOR;
+	int blankControlReg
+		= (crtid == 1) ? D2CRTC_BLANK_CONTROL : D1CRTC_BLANK_CONTROL;
 
 	Write32(CRT, blackColorReg, 0);
 	Write32Mask(CRT, blankControlReg, blank ? 1 << 8 : 0, 1 << 8);
@@ -233,12 +235,10 @@ CardModeSet(display_mode *mode)
 	Write32(CRT, gRegister->crtHTotal,
 		displayTiming.h_total - 1);
 
-	// Calculate blanking
-	uint16 frontPorch = displayTiming.h_sync_start - displayTiming.h_display;
-	uint16 backPorch = displayTiming.h_total - displayTiming.h_sync_end;
-
-	uint16 blankStart = frontPorch - OVERSCAN;
-	uint16 blankEnd = backPorch;
+	// Blanking
+	uint16 blankStart = displayTiming.h_total
+		+ displayTiming.h_display - displayTiming.h_sync_start;
+	uint16 blankEnd = displayTiming.h_total - displayTiming.h_sync_start;
 
 	Write32(CRT, gRegister->crtHBlank,
 		blankStart | (blankEnd << 16));
@@ -254,11 +254,9 @@ CardModeSet(display_mode *mode)
 	Write32(CRT, gRegister->crtVTotal,
 		displayTiming.v_total - 1);
 
-	frontPorch = displayTiming.v_sync_start - displayTiming.v_display;
-	backPorch = displayTiming.v_total - displayTiming.v_sync_end;
-
-	blankStart = frontPorch - OVERSCAN;
-	blankEnd = backPorch;
+	blankStart = displayTiming.v_total
+		+ displayTiming.v_display - displayTiming.v_sync_start;
+	blankEnd = displayTiming.v_total - displayTiming.v_sync_start;
 
 	Write32(CRT, gRegister->crtVBlank,
 		blankStart | (blankEnd << 16));
@@ -290,13 +288,14 @@ static void
 CardModeScale(display_mode *mode)
 {
 	// No scaling
-	//Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
+	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
 
-	// For now, default overscan
+	#if 0
 	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
 		(OVERSCAN << 16) | OVERSCAN); // LEFT | RIGHT
 	Write32(CRT, D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
 		(OVERSCAN << 16) | OVERSCAN); // TOP | BOTTOM
+	#endif
 
 	Write32(CRT, gRegister->viewportStart, 0);
 	Write32(CRT, gRegister->viewportSize,
@@ -305,7 +304,7 @@ CardModeScale(display_mode *mode)
 	Write32(CRT, gRegister->sclTapControl, 0);
 	Write32(CRT, gRegister->modeCenter, 2);
 	// D1MODE_DATA_FORMAT?
-	//Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
+	Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
 }
 
 
@@ -313,24 +312,40 @@ status_t
 radeon_set_display_mode(display_mode *mode)
 {
 	uint8 crtNumber = 0;
+	uint8 dacNumber = 0;
 
 	init_registers(crtNumber);
+
+	// TODO : this obviously breaks horribly on attached multiple outputs
+	if (DACSense(0))
+		dacNumber = 0;
+	else if (DACSense(1))
+		dacNumber = 1;
 
 	CardFBSet(mode);
 	CardModeSet(mode);
 	CardModeScale(mode);
-	PLLSet(0, mode->timing.pixel_clock);
+
+	PLLSet(dacNumber, mode->timing.pixel_clock);
 		// Set pixel clock
 
 	Write32(CRT, D1GRPH_LUT_SEL, 0);
 
-	DACSet(crtNumber, 0);
-		// Set DAC A to crt 0
-	DACPower(crtNumber, RHD_POWER_ON);
-	CardBlankSet(false);
+	DACSet(dacNumber, crtNumber);
+
+	// TODO : Shutdown unused PLL/DAC
+
+	// Power up the output
+	PLLPower(dacNumber, RHD_POWER_ON);
+	DACPower(dacNumber, RHD_POWER_ON);
+
+	// Ensure screen isn't blanked
+	CardBlankSet(crtNumber, false);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);
+	crtstatus = Read32(CRT, D2CRTC_STATUS);
+	TRACE("CRT1 Status: 0x%X\n", crtstatus);
 
 	return B_OK;
 }

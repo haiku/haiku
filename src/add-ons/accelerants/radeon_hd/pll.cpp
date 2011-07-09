@@ -187,9 +187,15 @@ PLLPower(uint8 pllIndex, int command)
 			snooze(2);
 
 			if (info.device_chipset >= (RADEON_R600 | 0x20)) {
+				uint16 pllDiffPostReg
+					= (pllIndex == 1) ? RV620_EXT2_DIFF_POST_DIV_CNTL
+						: RV620_EXT1_DIFF_POST_DIV_CNTL;
+				uint16 pllDiffDriverEnable
+					= (pllIndex == 1) ? RV62_EXT2_DIFF_DRIVER_ENABLE
+						: RV62_EXT1_DIFF_DRIVER_ENABLE;
 				// Sometimes we have to keep an unused PLL running. X Bug #18016
-				if ((Read32(PLL, RV620_EXT1_DIFF_POST_DIV_CNTL)
-					& RV62_EXT1_DIFF_DRIVER_ENABLE) == 0) {
+				if ((Read32(PLL, pllDiffPostReg)
+					& pllDiffDriverEnable) == 0) {
 					Write32Mask(PLL, pllControlReg, 0x02, 0x02);
 						// Power Down
 				} else {
@@ -201,6 +207,11 @@ PLLPower(uint8 pllIndex, int command)
 
 				Write32Mask(PLL, pllControlReg,  0x2000, 0x2000);
 					// Reset anti-glitch?
+
+			} else {
+				Write32Mask(PLL, pllControlReg, 0x02, 0x02);
+					// Power Down
+				snooze(200);
 			}
 	}
 
@@ -333,7 +344,8 @@ PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	Write32(PLL, pllExtPostDivSrc, 0x01);
 		// Set source as PLL
 
-	PLLCRTCGrab(pllIndex, false);
+	// TODO : better way to grab crt to work on?
+	PLLCRTCGrab(pllIndex, gRegister->crtid);
 }
 
 
@@ -448,7 +460,8 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	Write32Mask(PLL, pllCntl, 0, 0x80000000);
 		// needed and undocumented
 
-	PLLCRTCGrab(pllIndex, false);
+	// TODO : better way to grab crt to work on?
+	PLLCRTCGrab(pllIndex, gRegister->crtid);
 
 	if (hasDccg)
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_GRAB);
@@ -492,11 +505,11 @@ PLLCalibrate(uint8 pllIndex)
 
 
 void
-PLLCRTCGrab(uint8 pllIndex, bool crt2)
+PLLCRTCGrab(uint8 pllIndex, uint8 crtid)
 {
 	bool pll2IsCurrent;
 
-	if (!crt2) {
+	if (crtid == 0) {
 		pll2IsCurrent = Read32(PLL, PCLK_CRTC1_CNTL) & 0x00010000;
 
 		Write32Mask(PLL, PCLK_CRTC1_CNTL, (pllIndex == 0) ? 0x00010000 : 0,

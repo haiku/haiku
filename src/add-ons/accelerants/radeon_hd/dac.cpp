@@ -22,6 +22,79 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
+bool
+DACSense(uint8 dacIndex)
+{
+	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
+
+	// Backup current DAC values
+	uint32 compEnable = Read32(OUT, dacOffset + DACA_COMPARATOR_ENABLE);
+	uint32 control1 = Read32(OUT, dacOffset + DACA_CONTROL1);
+	uint32 control2 = Read32(OUT, dacOffset + DACA_CONTROL2);
+	uint32 detectControl = Read32(OUT, dacOffset + DACA_AUTODETECT_CONTROL);
+	uint32 enable = Read32(OUT, dacOffset + DACA_ENABLE);
+
+	Write32(OUT, dacOffset + DACA_ENABLE, 1);
+	// Acknowledge autodetect
+	Write32Mask(OUT, dacOffset + DACA_AUTODETECT_INT_CONTROL, 0x01, 0x01);
+	Write32Mask(OUT, dacOffset + DACA_AUTODETECT_CONTROL, 0, 0x00000003);
+	Write32Mask(OUT, dacOffset + DACA_CONTROL2, 0, 0x00000001);
+	Write32Mask(OUT, dacOffset + DACA_CONTROL2, 0, 0x00ff0000);
+
+	Write32(OUT, dacOffset + DACA_FORCE_DATA, 0);
+	Write32Mask(OUT, dacOffset + DACA_CONTROL2, 0x00000001, 0x0000001);
+
+	Write32Mask(OUT, dacOffset + DACA_COMPARATOR_ENABLE,
+		0x00070000, 0x00070101);
+	Write32(OUT, dacOffset + DACA_CONTROL1, 0x00050802);
+	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0, 0x00000001);
+		// Shutdown Bandgap voltage reference
+
+	snooze(5);
+
+	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0, 0x01010100);
+		// Shutdown RGB
+
+	Write32(OUT, dacOffset + DACA_FORCE_DATA, 0x1e6);
+		// 486 out of 1024
+	snooze(200);
+
+	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0x01010100, 0x01010100);
+		// Enable RGB
+	snooze(88);
+
+	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0, 0x01010100);
+		// Shutdown RGB
+
+	Write32Mask(OUT, dacOffset + DACA_COMPARATOR_ENABLE,
+		0x00000100, 0x00000100);
+
+	snooze(100);
+
+	// Get detected RGB channels
+	// If only G is found, it could be a monochrome monitor, but we
+	// don't bother checking.
+	uint8 out = (Read32(OUT, dacOffset + DACA_COMPARATOR_OUTPUT) & 0x0E) >> 1;
+
+	// Restore stored DAC values
+	Write32Mask(OUT, dacOffset + DACA_COMPARATOR_ENABLE,
+		compEnable, 0x00FFFFFF);
+	Write32(OUT, dacOffset + DACA_CONTROL1, control1);
+	Write32Mask(OUT, dacOffset + DACA_CONTROL2, control2, 0x000001FF);
+	Write32Mask(OUT, dacOffset + DACA_AUTODETECT_CONTROL,
+		detectControl, 0x000000FF);
+	Write32Mask(OUT, dacOffset + DACA_ENABLE, enable, 0x000000FF);
+
+	if (out == 0x7) {
+		TRACE("%s: DAC%d : Display device attached\n", __func__, dacIndex);
+		return true;
+	} else {
+		TRACE("%s: DAC%d : No display device attached\n", __func__, dacIndex);
+		return false;
+	}
+}
+
+
 void
 DACGetElectrical(uint8 type, uint8 dac,
 	uint8 *bandgap, uint8 *whitefine)

@@ -21,8 +21,8 @@
 #define FMT1_REG_OFFSET 0x0000
 #define FMT2_REG_OFFSET 0x800
 
-#define OVERSCAN 8
-	// default overscan? Applied to all sides
+#define OVERSCAN 0
+	// TODO : Overscan and scaling support
 
 status_t detect_crt_ranges();
 status_t create_mode_list(void);
