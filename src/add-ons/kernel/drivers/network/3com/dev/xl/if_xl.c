@@ -2248,9 +2248,6 @@ xl_intr(void *arg)
 	status = atomic_get((int32 *)&sc->xl_intr_status);
 	while (true) {
 #endif
-		CSR_WRITE_2(sc, XL_COMMAND,
-		    XL_CMD_INTR_ACK|(status & XL_INTRS));
-
 		if (status & XL_STAT_UP_COMPLETE) {
 			int	curpkts;
 
