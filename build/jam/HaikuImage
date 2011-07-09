@@ -41,7 +41,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bzip2
 	$(IDE_ONLY)ideinfo $(IDE_ONLY)idestatus
 	join kernel_debugger keymap kill
 	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
-	listport listres listsem listusb ln locate logger login logname ls lsindex
+	listport listres listsem listusb ln locale locate logger login logname ls
+	lsindex
 	mail2mbox makebootable mbox2mail md5sum merge message mimeset mkdos mkdir
 	mkfifo mkfs mkindex mktemp modifiers mount mount_nfs mountvolume mv
 	netcat netstat nl nohup notify nproc

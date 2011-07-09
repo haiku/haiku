@@ -11,3 +11,5 @@ BinCommand collectcatkeys : collectcatkeys.cpp RegExp.cpp
 BinCommand linkcatkeys : linkcatkeys.cpp : be liblocale.so $(TARGET_LIBSTDC++) ;
 
 BinCommand dumpcatalog : dumpcatalog.cpp : be liblocale.so $(TARGET_LIBSUPC++) ;
+
+BinCommand locale : locale.cpp : be liblocale.so $(TARGET_LIBSUPC++) ;

@@ -16,6 +16,21 @@ export PS1="\w> "
 export HISTFILESIZE=50
 export HISTCONTROL=ignoredups
 
+# Locale
+export LANG=`locale -l`
+export LC_CTYPE=`locale -c`
+export LC_TIME=`locale -f`
+export LC_NUMERIC=$LC_TIME
+export LC_COLLATE=$LC_TIME
+export LC_MONETARY=$LC_TIME
+export LC_MESSAGES=$LC_TIME
+export LC_PAPER=$LC_TIME
+export LC_NAME=$LC_TIME
+export LC_ADDRESS=$LC_TIME
+export LC_TELEPHONE=$LC_TIME
+export LC_MEASUREMENT=$LC_TIME
+export LC_IDENTIFICATION=$LC_TIME
+
 alias ls="ls --color"
 alias ll="ls -lA"
 alias la="ls -A"
