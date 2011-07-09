@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-PEPL	382829331
+1	slovak	x-vnd.Be-PEPL	2993050801
 %name% picture	People		Obrázok %name%
 Address	People		Adresa
 Cancel	People		Zrušiť
@@ -28,6 +28,7 @@ New person…	People		Nová osoba...
 Nickname	People		Prezývka
 OK	People		OK
 Paste	People		Vložiť
+People	System name		Ľudia
 Person	Short mimetype description		Osoba
 Quit	People		Ukončiť
 Redo	People		Opakovať

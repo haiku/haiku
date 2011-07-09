@@ -40,8 +40,8 @@ Full volume	MediaPlayer-SettingsWindow		На полной громкости
 Gets the URI of the currently playing item.	MediaPlayer-Main		Получает URI текущей проигрываемой записи.
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Получить/установить громкость (0.0-2.0).
 Hide interface	MediaPlayer-Main		Скрыть интерфейс
-Import Entries	MediaPlayer-ImportPLItemsCmd		Импорт записей
-Import Entry	MediaPlayer-ImportPLItemsCmd		Импортировать запись
+Import Entries	MediaPlayer-ImportPLItemsCmd		импортирование записей
+Import Entry	MediaPlayer-ImportPLItemsCmd		импортирование записи
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (не сработала блокировка). Не удалось сохранить плейлист.
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (плохо сформированное сообщение). Не удалось сохранить плейлист.
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (кончилась память). Не удалось сохранить плейлист.

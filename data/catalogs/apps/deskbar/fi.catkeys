@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Be-TSKB	1962084612
+1	finnish	x-vnd.Be-TSKB	1465644101
 <Be folder is empty>	BeMenu		<Be-kansio on tyhjä>
 About Haiku	BeMenu		Haikusta
 Always on top	PreferencesWindow		Aina päällimmäisenä
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
 Applications	PreferencesWindow		Sovellukset
+Auto-hide	PreferencesWindow		Piilota automaattisesti
 Auto-raise	PreferencesWindow		Nosta automaattisesti
 Change time…	TimeView		Muuta aikaa...
 Clock	PreferencesWindow		Kello

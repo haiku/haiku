@@ -1,14 +1,18 @@
-1	slovak	x-vnd.Be-TSKB	2722191795
+1	slovak	x-vnd.Be-TSKB	1962084612
 <Be folder is empty>	BeMenu		<pričinok Be je prázdny>
 About Haiku	BeMenu		O Haiku
 Always on top	PreferencesWindow		Vždy na vrchu
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikácie
 Applications	PreferencesWindow		Aplikácie
 Auto-raise	PreferencesWindow		Automaticky aktivovať
 Change time…	TimeView		Zmeniť čas...
 Clock	PreferencesWindow		Hodiny
 Close all	WindowMenu		Zatvoriť všetky
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demá
+Deskbar	System name		Panel
 Deskbar preferences	PreferencesWindow		Nastavenia Panelu
 Deskbar preferences…	BeMenu		Nastavenia Panelu...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety plochy
 Edit menu…	PreferencesWindow		Upraviť menu...
 Expand new applications	PreferencesWindow		Výsuvný zoznam nových aplikácií
 Find…	BeMenu		Nájsť...
@@ -18,6 +22,7 @@ Menu	PreferencesWindow		Menu
 Mount	BeMenu		Pripojiť
 No windows	WindowMenu		Žiadne okná
 Power off	BeMenu		Vypnúť
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nastavenia
 Quit application	WindowMenu		Ukončiť aplikáciu
 Recent applications	BeMenu		Nedávne aplikácie
 Recent applications:	PreferencesWindow		Nedávne aplikácie:

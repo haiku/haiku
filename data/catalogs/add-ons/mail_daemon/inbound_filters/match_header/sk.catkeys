@@ -1,0 +1,15 @@
+1	slovak	x-vnd.Haiku-MatchHeader	1205906732
+<Choose account>	ConfigView		<Vyberte účet>
+<Choose action>	ConfigView		<Vyberte operáciu>
+Delete message	ConfigView		Zmazať správu
+If	ConfigView		ak
+Move to	ConfigView		Presunúť do
+Reply with	ConfigView		Odpovedať pomocou
+Rule filter	RuleFilter		Filter pravidiel
+Set as read	ConfigView		Nastaviť ako prečítané
+Set flags to	ConfigView		Nastaviť príznaky na
+Then	ConfigView		potom
+has	ConfigView		má
+header (e.g. Subject)	ConfigView		hlavička (napr. Predmet)
+this field is based on the action	ConfigView		toto pole je založené na operácii
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		hodnota (použite reg. výraz: v tvare reg. výrazov ako *spam*)

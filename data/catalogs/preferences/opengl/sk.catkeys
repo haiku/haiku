@@ -1,0 +1,27 @@
+1	slovak	x-vnd.Haiku-OpenGL	209187778
+Attributes stack size:	Capabilities		Veľkosť zásobníka atribútov:
+Auxiliary buffer(s):	Capabilities		Pomocné buffre:
+Available	Extensions		Dostupné
+Capabilities	Capabilities		Schopnosti
+Extensions	Extensions		Rozšírenia
+GLU version:	InfoView		Verzia GLU:
+GLUT API version:	InfoView		Verzia GLUT API:
+Information	InfoView		Informácie
+List stack size:	Capabilities		Veľkosť zásobníka zoznamu:
+Max. 2D texture size:	Capabilities		Max. veľkosť 2D textúry:
+Max. 3D texture size:	Capabilities		Max. veľkosť 3D textúry:
+Max. clipping planes:	Capabilities		Max. orezávacích rovín:
+Max. convolution:	Capabilities		Max. konvolúcia:
+Max. evaluators equation order:	Capabilities		Max. rád rovnice vyhodnocovačov:
+Max. lights:	Capabilities		Max. svetiel:
+Max. recommended index elements:	Capabilities		Max. odporúčaných indexových prvkov:
+Max. recommended vertex elements:	Capabilities		Max. odporúčaných prvkov vrcholov:
+Max. texture units:	Capabilities		Max. textúrových jednotiek:
+Model stack size:	Capabilities		Veľkosť zásobníka modelu:
+Name stack size:	Capabilities		Veľkosť zásobníka názvov:
+OpenGL	System name		OpenGL
+OpenGL version:	InfoView		Verzia OpenGL:
+Projection stack size:	Capabilities		Veľkosť zásobníka projekcie:
+Renderer name:	InfoView		Názov vykresľovača:
+Texture stack size:	Capabilities		Veľkosť zásobníka textúr:
+Vendor name:	InfoView		Dodávateľ:

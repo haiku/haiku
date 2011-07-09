@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-VirtualMemory	3541691135
+1	slovak	x-vnd.Haiku-VirtualMemory	688347876
 %Ld B	SettingsWindow		%Ld B
 Changes will take effect on restart!	SettingsWindow		Zmeny sa prejavia po reštarte!
 Current swap file size: 	SettingsWindow		Aktuálna veľkosť odkladacieho súboru:
@@ -16,4 +16,5 @@ Requested swap file size:	SettingsWindow		Požadovaná veľkosť odkladacieho s�
 Revert	SettingsWindow		Vrátiť
 Turn off	SettingsWindow		Vypnúť
 Use volume:	SettingsWindow		Použiť zväzok:
+VirtualMemory	System name		Virtuálna pamäť
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuálna pamäť\n\tnapísal Axel Dörfler\n\tCopyright 2005, Haiku.\n

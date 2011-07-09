@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	746661604
+1	slovak	x-vnd.Haiku-Installer	3852628561
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Ak inštalujete Haiku na skutočný hardvér (nie v emulátore), odporúča sa, aby ste mali vopred pripravenú diskovú oblasť. Inštalátor a nástroj DriveSetup vám ponúknu inicializovať existujúce oblasti natívnym súborovým systémom Haiku, ale voľby na zmenu vlastného rozloženia oblastí neboli otestované na dostatočne rozličných konfiguráciách počítačov, preto neodporúčame ich používať.
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Inštalátor označí samotnú oblasť s Haiku ako zavádzaciu, ale nevykoná potrebné kroky na to, aby integroval Haiku do existujúceho menu zavádzača. Ak máte GRUB už nainštalovaný, môžete Haiku pridať do jeho menu. V závislosti na tom, ktorú verziu GRUB používate je postup odlišný.\n\n\n
@@ -22,6 +22,7 @@ Are you sure you want to to stop the installation?	InstallerWindow		Ste si istý
 Begin	InstallerWindow		Začať
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.
 Boot sector successfully written.	InstallProgress		Zavádzací sektor úspešne zapísaný.
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správca zavádzania (aplikácia na nastavenie zavádzacieho menu Haiku) sa nedal spustiť
 Cancel	InstallProgress		Zrušiť
 Cancel	InstallerWindow		Zrušiť
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte z roletového menu disk, na ktorý sa má vykonať inštalácia. Potom kliknite na „Začať“.
@@ -45,6 +46,8 @@ Install from:	InstallerWindow		Inštalovať z:
 Install progress:  	InstallerWindow		Priebeh inštalácie:
 Installation canceled.	InstallProgress		Inštalácia zrušená.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Inštalácia bola dokončená. Zavádzací sektor bol zapísaný na „%s“. Stlačením „Ukončiť“ opusťte Inštalátor alebo zvoľte nový cieľový zväzok, ak chcete vykonať ďalšiu inštaláciu.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Inštalácia bola dokončená. Zavádzací sektor bol zapísaný do „%s“. Stlačením „Reštartovať“ reštartujte počítač alebo zvoľte nový cieľový zväzok ak chcete vykonať ďalšiu inštaláciu.
+Installer	System name		Inštalátor
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Inštalátor\n\tnapísal Jérôme Duval a Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Spustiť nástroj DriveSetup na rozdelenie\ndostupných pevných diskov a ďalších médií.\nOblasti je možné inicializovať Súborovým\nsystémom Be, ktorý je vyžadovaný pre\nzavádzaciu oblasť Haiku.
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		POZN.: Hoci stratégia pomenovania pevných diskov zostáva podľa popisu v 2.1), stratégia pomenovania doskových oblastí sa zmenila.\n\n
@@ -67,6 +70,7 @@ Quit Boot Manager	InstallerWindow		Ukončiť Správcu zavádzania
 Quit Boot Manager and DriveSetup	InstallerWindow		Ukončiť Správcu zavádzania a DriveSetup
 Quit DriveSetup	InstallerWindow		Ukončiť DriveSetup
 README	InstallerApp		README
+Restart	InstallerWindow		Reštartovať
 Restart system	InstallerWindow		Reštartovať systém
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania a DriveSetup…\n\nInštalácia bude pokračovať, keď zatvoríte obe aplikácie.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania…\n\nInštalácia bude pokračovať, keď zatvoríte Správcu zavádzania.

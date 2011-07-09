@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Locale	250177593
+1	slovak	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12-hodinový
 24 hour	TimeFormatSettings		24-hodinový
 Available languages	Locale Preflet Window		Dostupné jazyky
@@ -12,6 +12,7 @@ Full format:	TimeFormatSettings		Plný formát:
 Language	Locale Preflet Window		Jazyk
 Locale	Locale Preflet		Locale
 Locale	Locale Preflet Window		Locale
+Locale	System name		Locale
 Long format:	TimeFormatSettings		Dlhý formát:
 Medium format:	TimeFormatSettings		Stredný formát:
 Negative:	TimeFormatSettings		Záporné čísla

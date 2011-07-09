@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-BluetoothPrefs	4253957200
+1	slovak	x-vnd.Haiku-BluetoothPrefs	4055730587
 15 secs	Settings view		15 sekúnd
 61 secs	Settings view		61 sekúnd
 About Bluetooth…	Window		O aplikácii Bluetooth...
@@ -7,6 +7,7 @@ Add…	Remote devices		Pridať...
 Always ask	Settings view		Vždy sa pýtať
 As blocked	Remote devices		Ako blokované
 Authenticate	Extended local device view		Autentifikovať
+Bluetooth	System name		Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Zistiť, či sú schopnosti Bluetooth vášho vzdialeného zariadenia aktivované. Stlačením „Zistenie“ spustíte hľadanie. Potrebný čas na zistenie názvov nie je známy, ale nemal by byť dlhší ako 3 sekundy na zariadenie. Potom ich budete môcť pridať do svojho hlavného zoznamu, kde sa s nimi budete môcť spárovať.
 Connections & channels…	Window		Spojenia a kanály...
 Default inquiry time:	Settings view		Predvolený čas zisťovania:

@@ -1,0 +1,26 @@
+1	slovak	x-vnd.haiku-screenshot	1697748405
+Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
+Cancel	ScreenshotWindow		Zrušiť
+Capture active window	ScreenshotWindow		Zachytiť aktívne okno
+Choose folder	ScreenshotWindow		Vyberte priečinok
+Choose folder...	ScreenshotWindow		Vyberte priečinok...
+Copy to clipboard	ScreenshotWindow		Skopírovať do schránky
+Delay:	ScreenshotWindow		Oneskorenie:
+Desktop	ScreenshotWindow		Plocha
+Home folder	ScreenshotWindow		Domovský priečinok
+Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši
+Include window border	ScreenshotWindow		Vrátane okraja okna
+Name:	ScreenshotWindow		Názov:
+New screenshot	ScreenshotWindow		Nová snímka obrazovky
+Please select	ScreenshotWindow		Prosím, vyberte
+Save	ScreenshotWindow		Uložiť
+Save as:	ScreenshotWindow		Uložiť ako:
+Save in:	ScreenshotWindow		Uložiť do:
+Screenshot	System name		Snímka obrazovky
+Select	ScreenshotWindow		Vybrať
+Settings…	ScreenshotWindow		Nastavenia...
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
+Translator Settings	ScreenshotWindow		Nastavenia prekladača
+overwrite	ScreenshotWindow		prepísať
+screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
+seconds	ScreenshotWindow		sekúnd

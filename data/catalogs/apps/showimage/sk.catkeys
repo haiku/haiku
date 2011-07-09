@@ -1,0 +1,60 @@
+1	slovak	x-vnd.Haiku-ShowImage	2105704395
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekúnd
+Browse	Menus		Prechádzať
+Cancel	ClosePrompt		Zrušiť
+Clear selection	Menus		Vyčistiť výber
+Close	ClosePrompt		Zatvoriť
+Close	Menus		Zatvoriť
+Close document	ClosePrompt		Zatvoriť dokument
+Copy	Menus		Kopírovať
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepodarilo sa načítať obrázok! Buď súbor alebo prekladač preň neexistuje.
+DPI:	PrintOptionsWindow		DPI:
+Edit	Menus		Upraviť
+File	Menus		Súbor
+Fit image to page	PrintOptionsWindow		Prispôsobiť obrázok stránke
+Fit to window	Menus		Vmestiť do okna
+Flip left to right	Menus		Obrátiť zľava doprava
+Flip top to bottom	Menus		Obrátiť zhora dolu
+Full screen	Menus		Celoobrazovkový režim
+Go to page	Menus		Prejsť na stránku
+Height: 	PrintOptionsWindow		Výška:
+High-quality zooming	Menus		Priblíženie vo vysokej kvalite
+Image	Menus		Obrázok
+Job setup	PrintOptionsWindow		Nastavenie úlohy
+Last page	Menus		Posledná stránka
+Leave full screen	Menus		Opustiť celoobrazovkový režim
+Next file	Menus		Ďalší súbor
+Next page	Menus		Ďalšia stránka
+OK	Alerts		OK
+OK	SaveToFile		OK
+Open…	Menus		Otvoriť...
+Original size	Menus		Pôvodná veľkosť
+Page setup…	Menus		Nastavenie stránky...
+Previous file	Menus		Predošlý súbor
+Previous page	Menus		Predošlá stránka
+Print options	PrintOptionsWindow		Možnosti tlačenia
+Print…	Menus		Tlačiť...
+Progress monitor	ProgressWindow		Monitor priebehu
+Quit	Menus		Ukončiť
+Rating	Menus		Hodnotenie
+Resize to (in 1/72 inches):	PrintOptionsWindow		Zmeniť veľkosť na (v 1/72 palca):
+Rotate clockwise	Menus		Otočiť v smere hodinových ručičiek
+Rotate counterclockwise	Menus		Otočiť proti smeru hodinových ručičiek
+Save as…	Menus		Uložiť ako...
+Select all	Menus		Vybrať všetky
+Selection mode	Menus		Režim výberu
+Show caption in full screen mode	Menus		Zobraziť nadpis v celoobrazovkovom režime
+Show tool bar	Menus		Zobraziť panel nástrojov
+ShowImage	System name		ZobraziťObrázok
+Slide delay	Menus		Oneskorenie snímku
+Slide show	Menus		Prezentácia
+Stretch to window	Menus		Roztiahnuť do okna
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ bol zmenený. Chcete dokument zatvoriť?
+The file '%s' could not be written.	SaveToFile		Súbor „%s“ nebolo možné zapísať.
+Undo	Menus		Vrátiť späť
+Use as background…	Menus		Použiť ako pozadie...
+View	Menus		Zobraziť
+Width:	PrintOptionsWindow		Šírka:
+Zoom factor in %:	PrintOptionsWindow		Priblíženie v %:
+Zoom in	Menus		Priblížiť
+Zoom out	Menus		Oddialiť

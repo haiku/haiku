@@ -1,0 +1,30 @@
+1	slovak	x-vnd.Haiku-Media	1473363280
+<none>	Media views		<žiadne>
+Audio input:	Media views		Zvukový vstup:
+Audio mixer	Media Window		Zmiešavač zvuku
+Audio output:	Media views		Zvukový výstup:
+Audio settings	Media Window		Nastavenia zvuku
+Channel:	Media views		Kanál:
+Cleaning up.	Media Window		Prebieha upratovanie.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepodarilo sa pripojiť k multimediálnemu serveru.\nChcete ho spustiť?
+Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nepodarilo sa odstrániť ovládanie hlasitosti z Panela: %s\n
+Defaults	Media views		Predvolené
+Done shutting down.	Media Window		Vypínanie dokončené.
+Media	System name		Multimédiá
+OK	Media Window		OK
+Quit	Media Window		Ukončiť
+Ready for use…	Media Window		Pripravený na použitie...
+Restart media services	Media views		Reštartovať multimediálne služby
+Restarting media services\nShutting down media server\n	Media Window		Reštartujú sa multimediálne služby\nVypína sa multimediálny server...\n
+Restarting media services\nStarting media server…\n	Media Window		Reštartujú sa multimediálne služby\nSpúšťa sa multimediálny server...\n
+Show volume control on Deskbar	Media views		Zobraziť na Paneli ovládanie hlasitosti
+Start media server	Media Window		Spustiť multimediálny server
+Starting media server…	Media Window		Spúšťa sa multimediálny server...
+Stopping media server…	Media Window		Zastavuje sa multimediálny server
+Telling media_addon_server to quit.	Media Window		Poslaná žiadosť o ukončenie media_addon_server.
+This hardware has no controls.	Media Window		Tento hardvér nemá žiadne ovládacie prvky
+Video input:	Media views		Video vstup:
+Video output:	Media views		Video výstup:
+Video settings	Media Window		Video nastavenia
+Waiting for media_server to quit.	Media Window		Čaká sa na ukončenie media_server.

@@ -1,9 +1,10 @@
-1	german	x-vnd.Be-TSKB	1962084612
+1	german	x-vnd.Be-TSKB	1465644101
 <Be folder is empty>	BeMenu		<Be-Ordner ist leer>
 About Haiku	BeMenu		Über Haiku
 Always on top	PreferencesWindow		Immer im Vordergrund
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
 Applications	PreferencesWindow		Anwendungen
+Auto-hide	PreferencesWindow		Automatisch in den Hintergrund
 Auto-raise	PreferencesWindow		Automatisch nach vorn holen
 Change time…	TimeView		Uhrzeit ändern…
 Clock	PreferencesWindow		Uhr

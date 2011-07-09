@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Network	3810742593
+1	slovak	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<nenájdené žiadne bezdrôtové siete>
 Adapter:	EthernetSettingsView		Adaptér:
 Apply	EthernetSettingsView		Použiť
@@ -13,6 +13,7 @@ Gateway:	EthernetSettingsView		Brána:
 IP address:	EthernetSettingsView		IP adresa:
 Mode:	EthernetSettingsView		Režim:
 Netmask:	EthernetSettingsView		Maska siete:
+Network	System name		Sieť
 Network:	EthernetSettingsView		Sieť:
 OK	EthernetSettingsView		OK
 Revert	EthernetSettingsView		Vrátiť

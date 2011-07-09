@@ -1,0 +1,9 @@
+1	slovak	x-vnd.Haiku-SpamFilter	1975155212
+Add spam rating to start of subject	SpamFilterConfig		Pridať ohodnotenie ako spam na začiatok predmetu
+Close	SpamFilterConfig		Zatvoriť
+Genuine below and uncertain above:	SpamFilterConfig		Originálny pod a neistý nad:
+Learn from all incoming e-mail	SpamFilterConfig		Učiť sa na základe všetkej prichádzajúcej pošty
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Ľutujeme, nie je možné spustiť program spamdbm na umožnenie úpravy nastavenia servera.
+Spam Filter (AGMS Bayesian)	SpamFilter		Spamový filter (AGMS Bayesian)
+Spam above:	SpamFilterConfig		Spam nad:
+or empty e-mail	SpamFilterConfig		alebo prázdny email

@@ -1,0 +1,22 @@
+1	slovak	x-vnd.Haiku-Keymap	1259868356
+(Current)	Keymap window		(aktuálne)
+Acute trigger	Keymap window		Spúšťač dĺžeň
+Circumflex trigger	Keymap window		Spúšťač vokáň
+Diaeresis trigger	Keymap window		Spúšťač rozluky
+File	Keymap window		Súbor
+Font	Keymap window		Písmo
+Grave trigger	Keymap window		Spúšťač apostrof
+Keymap	System name		Mapa kláves
+Layout	Keymap window		Rozloženie
+Open…	Keymap window		Otvoriť...
+Quit	Keymap window		Ukončiť
+Revert	Keymap window		Vrátiť
+Sample and clipboard:	Keymap window		Vzor a schránka:
+Save as…	Keymap window		Uložiť ako...
+Select dead keys	Keymap window		Vyberte mŕtve klávesy
+Switch shortcut keys	Keymap window		Vymeniť skratkové klávesy
+Switch shortcut keys to Haiku mode	Keymap window		Vymeniť skratkové klávesy na režim Haiku
+Switch shortcut keys to Windows/Linux mode	Keymap window		Vymeniť skratkové klávesy na režim Windows/Linux
+System:	Keymap window		Systém
+Tilde trigger	Keymap window		Spúšťač tilda
+User:	Keymap window		Používateľ:

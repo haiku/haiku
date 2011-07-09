@@ -1,0 +1,13 @@
+1	slovak	x-vnd.Haiku-JPEG2000Translator	547915409
+About	JPEG2000Translator		O aplikácii
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bitmap Format (JPEG2000Translator)
+High	JPEG2000Translator		Vysoká
+JPEG2000 images	JPEG2000Translator		Obrázky JPEG2000
+Low	JPEG2000Translator		Nízka
+Output only codestream (.jpc)	JPEG2000Translator		Na výstup poslať iba kódový tok (.jpc)
+Output quality	JPEG2000Translator		Kvalita výstupu
+Read	JPEG2000Translator		Čítať
+Read greyscale images as RGB32	JPEG2000Translator		Čítať čiernobiele obrázky ako RGB32
+Write	JPEG2000Translator		Zapísať
+Write black-and-white images as RGB24	JPEG2000Translator		Zapísať čiernobiele obrázky ako RGB24
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nZaložené na knižnici JasPer:\n© 1999-2000, Image Power, Inc. a\nUniversity of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nAko „tutorial“ bol použitý kodek jp2 z ImageMagick.\n\thttp://www.imagemagick.org/\n

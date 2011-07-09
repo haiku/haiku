@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-LaunchBox	2364133517
+1	slovak	x-vnd.Haiku-LaunchBox	1440389990
 Add button here	LaunchBox		Pridať tlačidlo sem
 Auto-raise	LaunchBox		Automaticky aktivovať
 Bummer	LaunchBox		Škoda
@@ -14,6 +14,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodaril
 Horizontal layout	LaunchBox		Vodorovné rozloženie
 Icon size	LaunchBox		Veľkosť ikon
 Ignore double-click	LaunchBox		Ignorovať dvojité kliknutie
+LaunchBox	System name		Spúšťač
 Name Panel	LaunchBox		Panel Názov
 New	LaunchBox		Nový
 OK	LaunchBox		OK

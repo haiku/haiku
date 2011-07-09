@@ -1,7 +1,11 @@
-1	slovak	x-vnd.Haiku-Appearance	1227622574
+1	slovak	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		O aplikácii
+About Decerator	DecorSettingsView		O dekorátore
 Antialiasing	APRWindow		Antialiasing
 Antialiasing menu	AntialiasingSettingsView		Menu antialiasing
 Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
+Appearance	System name		Vzhľad
+Choose Decorator	DecorSettingsView		Vyberte dekorátor
 Colors	APRWindow		Farby
 Control background	Colors tab		Pozadie ovládacieho prvku
 Control border	Colors tab		Okraj ovládacieho prvku
@@ -22,6 +26,7 @@ Menu item text	Colors tab		Text položky menu
 Monospaced fonts only	AntialiasingSettingsView		Iba písma s pevnou šírkou znaku
 Navigation base	Colors tab		Základ navigácie
 Navigation pulse	Colors tab		Pulz navigácie
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		Vypnuté
 On	AntialiasingSettingsView		Zapnuté
 Panel background	Colors tab		Pozadie panelu
@@ -38,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Úspešné
 Tooltip background	Colors tab		Pozadie tipov
 Tooltip text	Colors tab		Text tipu
+Window Decorator	APRWindow		Dekorátor okna
+Window Decorator:	DecorSettingsView		Dekorátor okna:
 Window tab	Colors tab		Záložka okna
 Window tab text	Colors tab		Text záložky okna

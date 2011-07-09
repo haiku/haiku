@@ -1,0 +1,4 @@
+1	slovak	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nTento démon zodpovedá za zhromažďovanie všetkých systémových správ a ich zápis do celosystémového záznamu v súbore „%s“.\n\n
+OK	SyslogDaemon		OK
+Syslog Daemon	SyslogDaemon		Syslog démon

@@ -1,8 +1,9 @@
-1	slovak	x-vnd.Haiku-Keyboard	1078858058
+1	slovak	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Predvolené
 Delay until key repeat	KeyboardView		Interval do začiatku opakovania klávesu
 Fast	KeyboardView		Rýchlo
 Key repeat rate	KeyboardView		Rýchlosť opakovania kláves
+Keyboard	System name		Klávesnica
 Long	KeyboardView		Dlhý
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Vrátiť

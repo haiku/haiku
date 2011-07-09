@@ -1,0 +1,23 @@
+1	slovak	application/x-vnd.Haiku-Registrar	2599857937
+%action%?	ShutdownProcess		%action%?
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikácia „%appName%“ zrušila vypínanie.
+Asking \"%appName%\" to quit.	ShutdownProcess		Žiadame „%appName%“ o ukončenie.
+Asking background applications to quit.	ShutdownProcess		Žiadame aplikácie na pozadí o ukončenie.
+Asking other processes to quit.	ShutdownProcess		Žiadame ostatné procesy o ukončenie.
+Cancel	ShutdownProcess		Zrušiť
+Cancel shutdown	ShutdownProcess		Zrušiť vypínanie
+Do you really want to restart the system?	ShutdownProcess		Skutočne chcete systém reštartovať?
+Do you really want to shut down the system?	ShutdownProcess		Skutočne chcete systém vypnúť?
+It's now safe to turn off the computer.	ShutdownProcess		Teraz môžete počítač bezpečne vypnúť.
+Kill application	ShutdownProcess		Zabiť aplikáciu
+OK	ShutdownProcess		OK
+Restart	ShutdownProcess		Reštartovať
+Restart system	ShutdownProcess		Reštartovať systém
+Restarting…	ShutdownProcess		Prebieha reštart...
+Shut down	ShutdownProcess		Vypnúť
+Shutdown aborted	ShutdownProcess		Vypínanie zrušené
+Shutdown status	ShutdownProcess		Priebeh vypínania
+Shutting down…	ShutdownProcess		Prebieha vypínanie...
+System is shut down	ShutdownProcess		Systém je vypnutý
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplikácia „%appName%“ môže byť zablokovaná na modálnom dialógu.
+Tidying things up a bit.	ShutdownProcess		Trochu upratujeme.

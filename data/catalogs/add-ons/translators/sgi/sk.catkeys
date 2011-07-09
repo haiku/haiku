@@ -1,0 +1,13 @@
+1	slovak	x-vnd.Haiku-SGITranslator	2222378389
+None	SGIView		Žiadne
+RLE	SGIView		RLE
+SGI Settings	SGIMain		Nastavenia SGI
+SGI image	SGITranslator		obrázok SGI
+SGI image translator	SGITranslator		Prekladač obrázkov SGI
+SGI image translator	SGIView		Prekladač obrázkov SGI
+SGI images	SGITranslator		Obrázky SGI
+SGITranslator Settings	SGITranslator		Nastavenia Prekladača SGI
+Use compression:	SGIView		Použiť kompresiu:
+Version %d.%d.%d %s	SGIView		Verzia %d.%d.%d %s
+\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nzaložené na zásuvnom module SGI v1.5 pre GIMP:\n
+written by:\n	SGIView		napísal:\n

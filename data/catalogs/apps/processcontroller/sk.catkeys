@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ProcessController	526557007
+1	slovak	x-vnd.Haiku-ProcessController	2887520383
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		O Správcovi procesov
 Cancel	ProcessController		Zrušiť
@@ -23,6 +23,7 @@ Normal priority	ProcessController		Normálna priorita
 OK	ProcessController		OK
 Ok!	ProcessController		OK
 Please confirm	ProcessController		Prosím, potvrďte
+ProcessController	System name		Správca procesov
 ProcessController is already installed in Deskbar.	ProcessController		Správca procesov je už v Paneli nainštalovaný.
 Processor %d	ProcessController		Procesor %d
 Quit an application	ProcessController		Ukončiť aplikáciu

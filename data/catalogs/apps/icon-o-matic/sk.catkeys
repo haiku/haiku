@@ -1,0 +1,200 @@
+1	slovak	x-vnd.haiku-icon_o_matic	2326864078
+<modify path>	Icon-O-Matic-PathCmd		<zmeniť cestu>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<niet čo opakovať>
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<niet čo vrátiť>
+<unavailable>	Icon-O-Matic-StyleTypes		<nedostupné>
+<unkown property>	Icon-O-Matic-PropertyNames		<neznáma vlastnosť>
+Add	Icon-O-Matic-PathsList		Pridať
+Add	Icon-O-Matic-StylesList		Pridať
+Add	Icon-O-Matic-TransformersList		Pridať
+Add Control Point	Icon-O-Matic-AddPointCmd		Pridať riadiaci bod
+Add Path	Icon-O-Matic-AddPathsCmd		Pridať cestu
+Add Paths	Icon-O-Matic-AddPathsCmd		Pridať cesty
+Add Shape	Icon-O-Matic-AddShapesCmd		Pridať tvar
+Add Shapes	Icon-O-Matic-AddShapesCmd		Pridať tvary
+Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
+Add Styles	Icon-O-Matic-AddStylesCmd		Pridať štýly
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Pridať transformátor
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Pridať transformátory
+Add circle	Icon-O-Matic-PathsList		Pridať kružnicu
+Add empty	Icon-O-Matic-ShapesList		Pridať prázdne
+Add rect	Icon-O-Matic-PathsList		Pridať pravouh.
+Add shape with path	Icon-O-Matic-Menu-Shape		Pridať tvar s cestou
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Pridať tvar s cestou a štýlom
+Add shape with style	Icon-O-Matic-Menu-Shape		Pridať tvar so štýlom
+Add with path	Icon-O-Matic-ShapesList		Pridať s cestou
+Add with path & style	Icon-O-Matic-ShapesList		Pridať s cestou a štýlom
+Add with style	Icon-O-Matic-ShapesList		Pridať so štýlom
+All	Icon-O-Matic-Properties		Všetky
+Append…	Icon-O-Matic-Menu-File		Pripojiť...
+Assign Path	Icon-O-Matic-AddPathsCmd		Priradiť cestu
+Assign Paths	Icon-O-Matic-AddPathsCmd		Priradiť cesty
+Assign Style	Icon-O-Matic-AssignStyleCmd		Priradiť štýl
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribút BEOS:ICON
+Bleep!	Exporter - Continue in error dialog		Píp!
+Bummer	Cancel button - error alert		Škoda
+Cancel	Icon-O-Matic-ColorPicker		Zrušiť
+Cancel	Icon-O-Matic-Menu-Settings		Zrušiť
+Cancel	Icon-O-Matic-SVGExport		Zrušiť
+Caps	Icon-O-Matic-PropertyNames		Zakončenia
+Change Color	Icon-O-Matic-SetColorCmd		Zmeniť farbu
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Vyčistiť cestu
+Clean up	Icon-O-Matic-PathsList		Vyčistiť
+Click on a shape above	Empty transformers list - 1st line		Kliknite na tvar hore
+Click on an object in	Empty property list - 1st line		Kliknite na objekt v
+Close	Icon-O-Matic-Menu-File		Zatvoriť
+Closed	Icon-O-Matic-PropertyNames		Zatvorené
+Color	Icon-O-Matic-PropertyNames		Farba
+Color	Icon-O-Matic-StyleTypes		Farba
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farba (#%02x%02x%02x)
+Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
+Conic	Icon-O-Matic-StyleTypes		Kužeľ
+Contour	Transformation		Obrys
+Copy	Icon-O-Matic-Properties		Kopírovať
+Detect Orient.	Icon-O-Matic-PropertyNames		Detegovať orient.
+Diamond	Icon-O-Matic-StyleTypes		Diamant
+Discard	Icon-O-Matic-Menu-Settings		Zahodiť
+Duplicate	Icon-O-Matic-PathsList		Duplikovať
+Duplicate	Icon-O-Matic-ShapesList		Duplikovať
+Duplicate	Icon-O-Matic-StylesList		Duplikovať
+Edit	Icon-O-Matic-Menus		Upraviť
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Upraviť farebný prechod
+Error: 	Icon-O-Matic-Exporter		Chyba:
+Error: 	Icon-O-Matic-Main		Chyba:
+Export	Icon-O-Matic-Menu-File		Exportovať
+Export Icon	Dialog title		Exportovať ikonu
+Export as…	Icon-O-Matic-Menu-File		Exportovať ako...
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepodarilo sa otvoriť súbor „%s“ ako dokument SVG.\n\nChyba: %s
+File	Icon-O-Matic-Menus		Súbor
+Flip	Icon-O-Matic-PathManipulator		Prevrátiť
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Prevrátiť riadiaci bod
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Prevrátiť riadiace body
+Format	Icon-O-Matic-SavePanel		Formát
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Zmraziť tvar
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zmraziť tvary
+Freeze transformation	Icon-O-Matic-ShapesList		Zmraziť transformáciu
+Gradient	Icon-O-Matic-StyleTypes		Farebný prechod
+Gradient type	Icon-O-Matic-StyleTypes		Typ farebného prechodu
+HVIF Source Code	Icon-O-Matic-SavePanel		Zdrojový kód HVIF
+Height	Icon-O-Matic-PropertyNames		Výška
+Icon-O-Matic	System name		Icon-O-Matic
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Je možné, že Icon-O-Matic neinterpretoval všetky dáta zo SVG pri načítaní. Ak by ste prepísali pôvodný súbor, tieto dáta by sa teraz stratili.
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Vložiť riadiaci bod
+Invert selection	Icon-O-Matic-Properties		Invertovať výber
+Joins	Icon-O-Matic-PropertyNames		Spoje
+Linear	Icon-O-Matic-StyleTypes		Lineárny
+META:ICON Attribute	Icon-O-Matic-SavePanel		Atribút META:ICON
+Max LOD	Icon-O-Matic-PropertyNames		Max. detail
+Min LOD	Icon-O-Matic-PropertyNames		Min. detail
+Miter Limit	Icon-O-Matic-PropertyNames		Limit ostrého spoja
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Zmeniť riadiaci bod
+Move	Icon-O-Matic-TransformationBoxStates		Presunúť
+Move Path	Icon-O-Matic-MovePathsCmd		Presunúť cestu
+Move Paths	Icon-O-Matic-MovePathsCmd		Presunúť cesty
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Presunúť pivot
+Move Shape	Icon-O-Matic-MoveShapesCommand		Presunúť tvar
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Presunúť tvary
+Move Style	Icon-O-Matic-MoveStylesCmd		Presunúť štýl
+Move Styles	Icon-O-Matic-MoveStylesCmd		Presunúť štýly
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformátor pohybu
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Presunúť transformátory
+Multi Paste Properties	Icon-O-Matic-Properties		Vlastnosti multi-vloženia
+Multi Set 	Multi Set (property name)		Multi množina
+Multi paste	Icon-O-Matic-Properties		Multi vložiť
+Name	Icon-O-Matic-PropertyNames		Názov
+New	Icon-O-Matic-Menu-File		Nový
+No	Icon-O-Matic-StyledTextImport		Nie
+None	Icon-O-Matic-Properties		Žiadne
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Posunúť riadiaci bod
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Posunúť riadiace body
+OK	Icon-O-Matic-ColorPicker		OK
+OK	Icon-O-Matic-SVGImport		OK
+Off	Icon-O-Matic-Menu-Settings		Vypnuté
+Opacity	Icon-O-Matic-PropertyNames		Krytie
+Opening the document failed!	Icon-O-Matic-Main		Otvorenie dokumentu zlyhalo!
+Opening the icon failed!	Icon-O-Matic-Main		Otvorenie ikony zlyhalo!
+Open…	Icon-O-Matic-Menu-File		Otvoriť...
+Options	Icon-O-Matic-Menus		Možnosti
+Overwrite	Icon-O-Matic-SVGExport		Prepísať
+PNG Set	Icon-O-Matic-SavePanel		Množina PNG
+Paste	Icon-O-Matic-Properties		Vložiť
+Paste Properties	Icon-O-Matic-Properties		Vlastnosti vloženia
+Path	Icon-O-Matic-Menus		Cesta
+Path	Icon-O-Matic-PropertyNames		Cesta
+Perspective	Icon-O-Matic-TransformersList		Perspektíva
+Perspective	Transformation		Perspektíva
+Pick a color	Icon-O-Matic-ColorPicker		Vybrať farbu
+Properties	Icon-O-Matic-Menus		Vlastnosti
+Quit	Icon-O-Matic-Menu-File		Ukončiť
+Radial	Icon-O-Matic-StyleTypes		Radiálny
+Redo	Icon-O-Matic-Main		Opakovať
+Remove	Icon-O-Matic-PathManipulator		Odstrániť
+Remove	Icon-O-Matic-PathsList		Odstrániť
+Remove	Icon-O-Matic-ShapesList		Odstrániť
+Remove	Icon-O-Matic-StylesList		Odstrániť
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Odstrániť riadiaci bod
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Odstrániť riadiace body
+Remove Path	Icon-O-Matic-RemovePathsCmd		Odstrániť cestu
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Odstrániť cesty
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Odstrániť tvar
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Odstrániť tvary
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Odstrániť štýl
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Odstrániť stýly
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Odstrániť transformátor
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Odstrániť transformátory
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Obnoviť transformáciu
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Obnoviť transformácie
+Reset transformation	Icon-O-Matic-ShapesList		Obnoviť transformáciu
+Reset transformation	Icon-O-Matic-StylesList		Obnoviť transformáciu
+Reverse	Icon-O-Matic-PathsList		Obrátiť
+Reverse Path	Icon-O-Matic-ReversePathCmd		Obrátiť cestu
+Rotate	Icon-O-Matic-TransformationBoxStates		Otočiť
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Otočiť indexy cesty
+Rotate indices backwards	Icon-O-Matic-PathsList		Otočiť indexy opačne
+Rotate indices forwards	Icon-O-Matic-PathsList		Otočiť indexy vpred
+Rotation	Icon-O-Matic-PropertyNames		Otočenie
+Rounding	Icon-O-Matic-PropertyNames		Zaoblenie
+Save	Icon-O-Matic-Menu-File		Uložiť
+Save	Icon-O-Matic-Menu-Settings		Uložiť
+Save Icon	Dialog title		Uložiť ikonu
+Save as…	Icon-O-Matic-Menu-File		Uložiť ako...
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Uložiť zmeny aktuálnej ikony?
+Saving your document failed!	Icon-O-Matic-Exporter		Uloženie vášho dokumentu zlyhalo!
+Scale	Icon-O-Matic-TransformationBoxStates		Mierka
+Scale X	Icon-O-Matic-PropertyNames		Mierka X
+Scale Y	Icon-O-Matic-PropertyNames		Mierka Y
+Select	Icon-O-Matic-Properties		Vybrať
+Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
+Set 	Set (property name)		Nastaviť
+Settings…	Icon-O-Matic-SavePanel		Nastavenia...
+Shape	Icon-O-Matic-Menus		Tvar
+Shorten	Icon-O-Matic-PropertyNames		Skrátiť
+Snap to grid	Icon-O-Matic-Menu-Settings		Prichytávať k mriežke
+Split	Icon-O-Matic-PathManipulator		Rozdeliť
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Rozdeliť riadiaci bod
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Rozdeliť riadiace body
+Stroke	Transformation		Ťah
+Style	Icon-O-Matic-Menus		Štýl
+Style type	Icon-O-Matic-StyleTypes		Typ štýlu
+Swatches	Icon-O-Matic-Menus		Paleta
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Text, ktorý sa pokúšate importovať je dosť dlhý, ste si istý?
+Transform	Icon-O-Matic-PathManipulator		Transformovať
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformácia
+Transformation	Icon-O-Matic-TransformersList		Transformácia
+Transformation	Transformation		Transformácia
+Transformer	Icon-O-Matic-Menus		Transformátor
+Translation X	Icon-O-Matic-PropertyNames		Posunutie X
+Translation Y	Icon-O-Matic-PropertyNames		Posunutie Y
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Zrušiť priradenie cesty
+Undo	Icon-O-Matic-Main		Vrátiť
+Untitled	Icon-O-Matic-Main		Bez názvu
+Width	Icon-O-Matic-PropertyNames		Šírka
+Yes	Icon-O-Matic-StyledTextImport		Áno
+any of the other lists to	Empty property list - 2nd line		ľubovoľný z ostatných zoznamov na
+bad news	Icon-O-Matic-Exporter		zlé správy
+bad news	Title of error alert		zlé správy
+edit it's properties here.	Empty property list - 3rd line		upravte jeho vlastnosti tu.
+load error	Icon-O-Matic-SVGImport		chyba načítania
+to attach transformers.	Empty transformers list - 2nd line		na pripojenie transformátorov.
+too big	Icon-O-Matic-StyledTextImport		príliš veľký
+warning	Icon-O-Matic-SVGExport		upozornenie

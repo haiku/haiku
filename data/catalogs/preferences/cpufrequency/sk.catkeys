@@ -1,5 +1,6 @@
-1	slovak	x-vnd.Haiku-CPUFrequencyPref	3974849433
+1	slovak	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		Zobrazenie stavy frekvencie CPU
+CPUFrequency	System name		Frekvencia CPU
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tnapísal Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		Predvoľby
 Dynamic performance	Status view		Dynamický výkon

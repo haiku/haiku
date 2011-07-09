@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-BootManager	734273860
+1	slovak	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Chystáte sa obnoviť MBR disku %disk zo súboru %file. Chcete pokračovať?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Chystá sa zápis menu zavádzača na disk. Ste si istý, že chcete pokračovať?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Chystá sa zápis nasledovného menu zavádzača na zavádzací disk (%s). Prosím, overte nasledovné informácie predtým, než budete pokračovať.
@@ -13,6 +13,7 @@ At least one partition must be selected!	BootManagerController		Musí byť vybra
 Back	BootManagerController	Button	Späť
 Backup Master Boot Record	BootManagerController	Title	Zálohovať MBR
 Boot Manager is unable to read the partition table!	BootManagerController		Správca zavádzania nedokáže prečítať tabuľku oblastí!
+BootManager	System name		Správca zavádzania
 Cannot access!	DrivesPage	Cannot install	Nie je možný prístup!
 Default Partition	DefaultPartitionPage	Title	Prevolená disková oblasť
 Default Partition:	DefaultPartitionPage	Menu field label	Predvolená oblasť

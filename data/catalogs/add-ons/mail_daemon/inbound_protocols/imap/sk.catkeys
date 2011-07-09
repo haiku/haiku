@@ -1,0 +1,9 @@
+1	slovak	x-vnd.Haiku-IMAP	3892875357
+Apply	IMAPFolderConfig		Použiť
+Destination:	imap_config		Cieľ:
+Failed to fetch available storage.	IMAPFolderConfig		Nepodarilo sa zistiť dostupné úložné miesto.
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Sťahujú sa priečinky IMAP, strpenie...
+IMAP Folders	IMAPFolderConfig		Priečinky IMAP
+IMAP Folders	imap_config		Priečinky IMAP
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Prihlásuje/odhlasuje sa odber priečinkov IMAP, strpenie...
+status	IMAPFolderConfig		stav

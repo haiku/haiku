@@ -7,7 +7,7 @@ After four seconds	DefaultPartitionPage		4 секунды
 After one minute	DefaultPartitionPage		1 минута
 After one second	DefaultPartitionPage		1 секунда
 After three seconds	DefaultPartitionPage		3 секунды
-After two seconds	DefaultPartitionPage		Через две секунды
+After two seconds	DefaultPartitionPage		2 секунды
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Произошла ошибка при записи загрузочного меню. Загрузочная запись (MBR) может быть повреждена. Вы должны восстановить её (MBR) прямо сейчас!
 At least one partition must be selected!	BootManagerController		Как минимум один раздел должен быть выбран!
 Back	BootManagerController	Button	Назад

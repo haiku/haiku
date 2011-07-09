@@ -1,7 +1,8 @@
-1	slovak	x-vnd.Haiku-CDPlayer	523884218
+1	slovak	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		Zvukové CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		Mechanika CD je prázdna
+CDPlayer	System name		Prehrávač CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disk: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Disk: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Disk: 88:88 / 88:88

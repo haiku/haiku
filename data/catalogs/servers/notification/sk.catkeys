@@ -1,0 +1,8 @@
+1	slovak	x-vnd.Haiku-notification_server	906000487
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Nepodarilo sa spustiť monitor nastavení displeja.\nŽivé zmeny filtra sú vypnuté.
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Nepodarilo sa spustiť monitor filtra. Živé zmeny filtra sú vypnuté.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nepodarilo sa spustiť monitor všeobecných nastavení.\nŽivé zmeny filtra sú vypnuté.
+Darn.	NotificationWindow		Sakra.
+Notification	NotificationWindow		Upozornenie
+OK	NotificationWindow		OK
+Warning	NotificationWindow		Upozornenie

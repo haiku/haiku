@@ -1,0 +1,80 @@
+1	slovak	x-vnd.Haiku-StyledEdit	1508367857
+???	LoadAlert		???
+Align	Menus		Zarovnať
+Black	Menus		Čierna
+Blue	Menus		Modrá
+Bold	Menus		Hrubé
+Can't undo	Menus		Nie je možné vrátiť späť
+Cancel	FindandReplaceWindow		Zrušiť
+Cancel	QuitAlert		Zrušiť
+Cancel	RevertToSavedAlert		Zrušiť
+Cancel	SaveAlert		Zrušiť
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
+Case-sensitive	FindandReplaceWindow		Rozlišovať veľkosť písmen
+Center	Menus		Stred
+Characters:	Statistics		Znakov:
+Close	Menus		Zatvoriť
+Color	Menus		Farba
+Copy	Menus		Kopírovať
+Cut	Menus		Vystrihnúť
+Cyan	Menus		azúrová
+Default	Open_and_SaveAsPanel		Predvolené
+Document	Menus		Dokument
+Document statistics	Statistics		Štatistika dokumentu
+Don't save	QuitAlert		Neukladať
+Don't save	SaveAlert		Neukladať
+Edit	Menus		Upraviť
+Encoding	Open_and_SaveAsPanel		Kódovanie
+Error loading \"%s\":\n\t%s	LoadAlert		Chyba pri načítaní „%s“:\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Chyba pri načítaní „%s“:\n\tNepodporovaný formát
+Error saving \"%s\":\n%s	SaveAlert		Chyba pri ukladaní „%s“:\n%s
+File	Menus		Súbor
+Find	FindandReplaceWindow		Nájsť
+Find again	Menus		Nájsť znova
+Find selection	Menus		Nájsť výber
+Find:	FindandReplaceWindow		Nájsť:
+Find…	Menus		Nájsť...
+Font	Menus		Písmo
+Green	Menus		Zelená
+Italic	Menus		Kurzíva
+Left	Menus		Vľavo
+Lines:	Statistics		Riadky:
+Magenta	Menus		purpurová
+New	Menus		Nový
+OK	LoadAlert		OK
+OK	RevertToSavedAlert		OK
+OK	SaveAlert		OK
+OK	Statistics		OK
+Open…	Menus		Otvoriť...
+Page setup…	Menus		Nastavenie stránky...
+Paste	Menus		Vložiť
+Print…	Menus		Tlačiť...
+Quit	Menus		Ukončiť
+Red	Menus		Červená
+Redo typing	QuitAlert		Opakovať písanie
+Replace	FindandReplaceWindow		Nahradiť
+Replace all	FindandReplaceWindow		Nahradiť všetky
+Replace in all windows	FindandReplaceWindow		Nahradiť vo všetkých oknách
+Replace next	Menus		Nahradiť ďalší
+Replace with:	FindandReplaceWindow		Nahradiť čím:
+Replace…	Menus		Nahradiť...
+Revert to saved…	Menus		Vrátiť späť uložené...
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Vrátiť späť poslednú verziu „%s“?
+Right	Menus		Vpravo
+Save	Menus		Uložiť
+Save	QuitAlert		Uložiť
+Save	SaveAlert		Uložiť
+Save as…	Menus		Uložiť ako...
+Save changes to the document \"%s\"? 	QuitAlert		Uložiť zmeny v dokumente „%s“?
+Search backwards	FindandReplaceWindow		Hľadať dozadu
+Select all	Menus		Vyrať všetky
+Size	Menus		Veľkosť
+Statistics…	Menus		Štatistika...
+StyledEdit	System name		StyledEdit
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tetnto súbor je označený ako len na čítanie. Uložiť zmeny do dokumentu „%s“?
+Undo typing	QuitAlert		Vrátiť späť písanie
+Untitled 	StyledEditWindow		Bez názvu
+Words:	Statistics		Slová:
+Wrap lines	Menus		Zalamovať riadky
+Wrap-around search	FindandReplaceWindow		Pokračovať v hľadaní od začiatku
+Yellow	Menus		Žltá

@@ -1,0 +1,34 @@
+1	slovak	x-vnd.Haiku-Sudoku	2463385585
+Abort	ProgressWindow		Zrušiť
+Advanced	SudokuWindow		Pokročilé
+Blank	SudokuWindow		Prázdne
+Copy	SudokuWindow		Kopírovať
+Could not open \"%s\":\n%s\n	SudokuWindow		Nebolo možné otvoriť „%s“:\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Nepodarilo sa nastaviť Sudoku:\n%s\n
+Creating solvable field	SudokuGenerator		Vytvára sa vyriešiteľné pole
+Easy	SudokuWindow		Jednoduché
+Export as…	SudokuWindow		Exportovať ako...
+File	SudokuWindow		Súbor
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Ťažké
+Help	SudokuWindow		Pomoc
+Mark invalid values	SudokuWindow		Označiť neplatné hodnoty
+Mark valid hints	SudokuWindow		Označiť platné rady
+New	SudokuWindow		Nový
+OK	SudokuWindow		OK
+Open file…	SudokuWindow		Otvoriť súbor...
+Progress monitor	ProgressWindow		Monitor priebehu
+Quit	SudokuWindow		Ukončiť
+Redo	SudokuWindow		Opakovať
+Restore snapshot	SudokuWindow		Obnoviť snímku
+Searching for removable values	SudokuGenerator		Hľadajú sa odstrániteľné hodnoty
+Snapshot current	SudokuWindow		Snímok aktuálneho
+Solve	SudokuWindow		Vyriešiť
+Solve single field	SudokuWindow		Vyriešiť jediné pole
+Start again	SudokuWindow		Začať znova
+Sudoku	System name		Sudoku
+Sudoku request	SudokuWindow		Požiadavka Sudoku
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku vyriešené - gratulujeme!\n
+Text	SudokuWindow		Text
+Undo	SudokuWindow		Vrátiť
+View	SudokuWindow		Zobraziť

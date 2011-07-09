@@ -2,9 +2,9 @@
 %num new message	filter		%num neue Nachricht
 %num new messages	filter		%num neue Nachrichten
 Alert	ConfigView		Hinweisfenster
-Beep	ConfigView		Piepton
+Beep	ConfigView		Tonsignal
 Central alert	ConfigView		Hinweisfenster (alle Konten)
-Central beep	ConfigView		Piepton (alle Konten)
+Central beep	ConfigView		Tonsignal (alle Konten)
 Keyboard LEDs	ConfigView		Tastatur-LEDs
 Log window	ConfigView		Statusfenster
 Method:	ConfigView		Methode:

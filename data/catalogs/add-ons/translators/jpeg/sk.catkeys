@@ -1,0 +1,21 @@
+1	slovak	x-vnd.Haiku-JPEGTranslator	965709535
+About	JPEGTranslator		O aplikácii
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmap Format (JPEGTranslator)
+High	JPEGTranslator		Vysoká
+JPEG Library Error: %s\n	be_jerror		Chyba knižnice JPEG: %s\n
+JPEG Library Warning: %s\n	be_jerror		Upozornenie knižnice JPEG: %s\n
+JPEG images	JPEGTranslator		Obrázky JPEG
+Low	JPEGTranslator		Nízka
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Zmenšiť súbor (mierne horšia kvalita)
+None	JPEGTranslator		Žiadna
+Output quality	JPEGTranslator		Kvalita výstupu
+Output smoothing strength	JPEGTranslator		Sila vyhladzovania výstupu
+Prevent colors 'washing out'	JPEGTranslator		Zabrániť „vyblednutiu“ farieb
+Read	JPEGTranslator		Čítať
+Read greyscale images as RGB32	JPEGTranslator		Čítať čiernobiele obrázky ako RGB32
+Show warning messages	JPEGTranslator		Zobrazovať správy upozornení
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Použiť kód CMYK s 0 pre 100% pokrytie atramentom
+Use progressive compression	JPEGTranslator		Použiť progresívnu kompresiu
+Write	JPEGTranslator		Zapísať
+Write black-and-white images as RGB24	JPEGTranslator		Zapísať čiernobiele obrázky ako RGB24
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nZaložené na knižnici IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\npodporu „bezstratového“ kódovania napísal Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nNiektoré funkcie na konverziu medzi farebnými priestormi napísal Magnus Hellman\n\thttp://www.bebits.com/app/802\n

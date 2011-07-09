@@ -1,0 +1,24 @@
+1	slovak	x-vnd.Haiku-Mouse	1033564338
+...by Andrew Edward McCall	MouseApplication		...napísal Andrew Edward McCall
+1-Button	SettingsView		1-tlačidlová
+2-Button	SettingsView		2-tlačidlová
+3-Button	SettingsView		3-tlačidlová
+Accept first click	SettingsView		Prijať prvé kliknutie
+Click to focus	SettingsView		Aktivácia kliknutím
+Click to focus and raise	SettingsView		Kliknutím aktivovať a preniesť do popredia
+Defaults	MouseWindow		Predvolené
+Dig Deal	MouseApplication		Dig Deal
+Double-click speed	SettingsView		Rýchlosť dvojitého kliknutia
+Double-click test area	SettingsView		Oblasť na testovanie dvojitého kliknutia
+Fast	SettingsView		Rýchla
+Focus follows mouse	SettingsView		Aktivácia pod kurzorom myši
+Focus mode:	SettingsView		Režim aktivácie:
+Instant warp	SettingsView		Okamžité zrýchlenie
+Mouse	System name		Myš
+Mouse acceleration	SettingsView		Zrýchlenie myši
+Mouse speed	SettingsView		Rýchlosť myši
+Mouse type:	SettingsView		Typ myši:
+Normal	SettingsView		Normálna
+Revert	MouseWindow		Obrátiť
+Slow	SettingsView		Pomalá
+Warp	SettingsView		Zrýchlenie
