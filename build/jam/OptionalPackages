@@ -429,9 +429,9 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
-				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
-				: : true ;
+				cmake-2.8.5-1-gcc2_x86.hpkg
+				: $(hpkgBaseURL)/cmake-2.8.5-1-gcc2_x86.hpkg
+				: common packages ;
 		}
 	}
 }
