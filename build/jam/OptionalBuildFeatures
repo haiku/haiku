@@ -35,7 +35,7 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 
 		# extract headers and libraries
 		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
-			: common/include/ : $(zipFile)
+			: common/include/ : $(zipFile) : extracted-openssl
 		] ;
 
 		HAIKU_OPENSSL_LIBS = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
@@ -43,6 +43,7 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 			common/lib/libcrypto.so
 			common/lib/libssl.so
 			: $(zipFile)
+			: extracted-openssl
 		] ;
 
 		HAIKU_OPENSSL_ENABLED = 1 ;
@@ -81,6 +82,7 @@ if $(TARGET_ARCH) = ppc {
 		libicutu.so.44.1
 		libicuuc.so.44.1
 		: $(zipFile)
+		: extracted-icu
 	] ;
 } else if $(TARGET_ARCH) != x86 {
 	Echo "ICU not available for $(TARGET_ARCH)" ;
@@ -111,6 +113,7 @@ if $(TARGET_ARCH) = ppc {
 		libicutu.so.44
 		libicuuc.so.44
 		: $(zipFile)
+		: extracted-icu
 	] ;
 }
 
@@ -123,7 +126,8 @@ HAIKU_ICU_DEVEL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 
 # extract headers
 HAIKU_ICU_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_ICU_DEVEL_DIR)
-	: develop/headers/3rdparty : $(HAIKU_ICU_DEVEL_ZIP_FILE) ] ;
+	: develop/headers/3rdparty : $(HAIKU_ICU_DEVEL_ZIP_FILE)
+	: extracted-icu-devel ] ;
 
 HAIKU_ICU_HEADERS
 	= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers 3rdparty ] ;
@@ -156,13 +160,14 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 
 		# extract headers and libraries
 		HAIKU_CLUCENE_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_CLUCENE_DIR)
-			: common/include/ : $(zipFile)
+			: common/include/ : $(zipFile) : extracted-clucene
 		] ;
 
 		HAIKU_CLUCENE_LIBS = [ ExtractArchive $(HAIKU_CLUCENE_DIR)
 			:
 			common/lib/libclucene.a
 			: $(zipFile)
+			 : extracted-clucene
 		] ;
 
 		HAIKU_CLUCENE_HEADERS
@@ -198,7 +203,7 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 		# extract headers and libraries
 		HAIKU_TAGLIB_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
-			: common/include/ : $(zipFile)
+			: common/include/ : $(zipFile) : extracted-taglib
 		] ;
 
 		HAIKU_TAGLIB_LIBS = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
@@ -206,6 +211,7 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 			common/lib/libtag.so
 			common/lib/libtag_c.so
 			: $(zipFile)
+			: extracted-taglib
 		] ;
 
 		HAIKU_TAGLIB_HEADERS
