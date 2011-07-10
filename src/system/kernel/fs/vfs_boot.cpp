@@ -12,11 +12,11 @@
 
 #include <stdio.h>
 
-#include <directories.h>
 #include <fs_info.h>
 #include <OS.h>
 
 #include <boot/kernel_args.h>
+#include <directories.h>
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KPartitionVisitor.h>
