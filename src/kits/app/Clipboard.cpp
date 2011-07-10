@@ -112,6 +112,9 @@ BClipboard::SystemCount() const
 status_t
 BClipboard::StartWatching(BMessenger target)
 {
+	if (!target.IsValid())
+		return B_BAD_VALUE;
+
 	BMessage message(B_REG_CLIPBOARD_START_WATCHING), reply;
 	if (message.AddString("name", fName) == B_OK
 		&& message.AddMessenger("target", target) == B_OK
@@ -127,6 +130,9 @@ BClipboard::StartWatching(BMessenger target)
 status_t
 BClipboard::StopWatching(BMessenger target)
 {
+	if (!target.IsValid())
+		return B_BAD_VALUE;
+
 	BMessage message(B_REG_CLIPBOARD_STOP_WATCHING), reply;
 	if (message.AddString("name", fName) == B_OK
 		&& message.AddMessenger("target", target) == B_OK
