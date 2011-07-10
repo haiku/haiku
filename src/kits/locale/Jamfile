@@ -52,7 +52,7 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-AddResources liblocale.so : CountryFlags.rdef ;
+AddResources liblocale.so : CountryFlags.rdef LanguageFlags.rdef ;
 
 SharedLibrary liblocale.so
 	: $(sources)
@@ -72,7 +72,7 @@ SEARCH on [ FGristFiles Dragger.cpp ] += [ FDirName $(HAIKU_TOP) src kits interf
 SEARCH on [ FGristFiles Menu.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 SEARCH on [ FGristFiles PrintJob.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 SEARCH on [ FGristFiles ZombieReplicantView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-	
+
 DoCatalogs liblocale.so
 	: system
 	:

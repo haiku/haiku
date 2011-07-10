@@ -66,6 +66,26 @@ int32 BLocaleRoster::kEmbeddedCatResId = 0xCADA;
 	// this may live in an app- or add-on-file
 
 
+static status_t
+load_resources_if_needed(RosterData* rosterData)
+{
+	if (rosterData->fAreResourcesLoaded)
+		return B_OK;
+
+	status_t result = rosterData->fResources.SetToImage(
+		(const void*)&BLocaleRoster::Default);
+	if (result != B_OK)
+		return result;
+
+	result = rosterData->fResources.PreloadResourceType();
+	if (result != B_OK)
+		return result;
+
+	rosterData->fAreResourcesLoaded = true;
+	return B_OK;
+}
+
+
 static const char*
 country_code_for_language(const BLanguage& language)
 {
@@ -302,31 +322,23 @@ BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	if (!rosterData->fAreResourcesLoaded) {
-		status_t result = rosterData->fResources.SetToImage(
-			(const void*)&BLocaleRoster::Default);
-		if (result != B_OK)
-			return result;
+	status_t status = load_resources_if_needed(rosterData);
+	if (status != B_OK)
+		return status;
 
-		result = rosterData->fResources.PreloadResourceType();
-		if (result != B_OK)
-			return result;
-
-		rosterData->fAreResourcesLoaded = true;
-	}
-
-	size_t size;
-
-	// normalize the country code : 2 letters uparcase
-	// filter things out so that "pt_BR" gived the flag for brazil
-	char normalizedCode[3];
-	normalizedCode[2] = '\0';
+	// Normalize the country code: 2 letters uppercase
+	// filter things out so that "pt_BR" gives the flag for brazil
 
 	int codeLength = strlen(countryCode);
+	if (codeLength < 2)
+		return B_BAD_VALUE;
 
+	char normalizedCode[3];
 	normalizedCode[0] = toupper(countryCode[codeLength - 2]);
 	normalizedCode[1] = toupper(countryCode[codeLength - 1]);
+	normalizedCode[2] = '\0';
 
+	size_t size;
 	const void* buffer = rosterData->fResources.LoadResource(
 		B_VECTOR_ICON_TYPE, normalizedCode, &size);
 	if (buffer == NULL || size == 0)
@@ -345,7 +357,32 @@ BLocaleRoster::GetFlagIconForLanguage(BBitmap* flagIcon,
 		|| languageCode[1] == '\0')
 		return B_BAD_VALUE;
 
-	// TODO: Languages like Esperanto have a flag, but no country
+	RosterData* rosterData = RosterData::Default();
+	BAutolock lock(rosterData->fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	status_t status = load_resources_if_needed(rosterData);
+	if (status != B_OK)
+		return status;
+
+	// Normalize the language code: first two letters, lowercase
+
+	char normalizedCode[3];
+	normalizedCode[0] = tolower(languageCode[0]);
+	normalizedCode[1] = tolower(languageCode[1]);
+	normalizedCode[2] = '\0';
+
+	size_t size;
+	const void* buffer = rosterData->fResources.LoadResource(
+		B_VECTOR_ICON_TYPE, normalizedCode, &size);
+	if (buffer != NULL && size != 0) {
+		return BIconUtils::GetVectorIcon(static_cast<const uint8*>(buffer),
+			size, flagIcon);
+	}
+
+	// There is no language flag, try to get the default country's flag for
+	// the language instead.
 
 	BLanguage language(languageCode);
 	const char* countryCode = country_code_for_language(language);
