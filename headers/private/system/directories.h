@@ -2,8 +2,8 @@
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _LIBROOT_DIRECTORIES_H
-#define _LIBROOT_DIRECTORIES_H
+#ifndef _SYSTEM_DIRECTORIES_H
+#define _SYSTEM_DIRECTORIES_H
 
 
 #define kGlobalBinDirectory 			"/bin"
@@ -65,4 +65,4 @@
 #define kUserNonpackagedLibDirectory 	"/boot/home/config/non-packaged/lib"
 
 
-#endif	// _LIBROOT_DIRECTORIES_H
+#endif	// _SYSTEM_DIRECTORIES_H
