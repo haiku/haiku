@@ -47,6 +47,7 @@ enum {
 	MSG_KEYMAP_SELECTED		= 'kmps'
 };
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "BootPromptWindow"
 
@@ -54,6 +55,15 @@ enum {
 namespace BPrivate {
 	void ForceUnloadCatalog();
 };
+
+
+static const char* kLanguageKeymapMappings[] = {
+	// While there is a "Dutch" keymap, it apparently has not been widely
+	// adopted, and the US-International keymap is common
+	"Dutch", "US-International"
+};
+static const size_t kLanguageKeymapMappingsSize
+	 = sizeof(kLanguageKeymapMappings) / sizeof(kLanguageKeymapMappings[0]);
 
 
 class LanguageItem : public BStringItem {
@@ -452,6 +462,14 @@ BootPromptWindow::_KeymapItemForLanguage(BLanguage& language) const
 	BString name;
 	if (language.GetName(name, &english) != B_OK)
 		return fDefaultKeymapItem;
+
+	// Check special mappings first
+	for (size_t i = 0; i < kLanguageKeymapMappingsSize; i += 2) {
+		if (!strcmp(name, kLanguageKeymapMappings[i])) {
+			name = kLanguageKeymapMappings[i + 1];
+			break;
+		}
+	}
 
 	BMenu* menu = fKeymapsMenuField->Menu();
 	for (int32 i = 0; i < menu->CountItems(); i++) {
