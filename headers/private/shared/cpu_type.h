@@ -191,12 +191,13 @@ get_cpu_model_string(system_info *info)
 			get_cpuid_model_string(cpuidName);
 			if (strcasestr(cpuidName, "Celeron") != NULL)
 				return "Core 2 Celeron";
-			if (strcasestr(cpuidName, "Duo") != NULL
-				|| strcasestr(cpuidName, "Quad") != NULL)
-				return "Core 2";
 			if (strcasestr(cpuidName, "Xeon") != NULL)
 				return "Core 2 Xeon";
-			return "Core 2 Extreme";
+			if (strcasestr(cpuidName, "Pentium") != NULL)
+				return "Pentium";
+			if (strcasestr(cpuidName, "Extreme") != NULL)
+				return "Core 2 Extreme";
+			return	"Core 2";
 		case B_CPU_INTEL_PENTIUM_CORE_I5_M430:
 			return "Core i5";
 		case B_CPU_INTEL_PENTIUM_CORE_I7:
