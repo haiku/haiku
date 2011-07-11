@@ -63,7 +63,6 @@ status_t
 BeceemCPU::CPUReset()
 {
 	unsigned int value = 0;
-	unsigned int uiResetValue = 0;
 
 	if (fWmxDevice->deviceChipID >= T3LPB) {
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
@@ -114,6 +113,8 @@ BeceemCPU::CPUReset()
 
 	}
 	// TODO : ELSE OLDER CHIP ID's < T3LP see Misc.c:1048
+
+	unsigned int uiResetValue = 0;
 
 	if (fWmxDevice->CPUFlashBoot) {
 		// In flash boot mode MIPS state register has reverse polarity.

@@ -72,19 +72,24 @@ create_beceem_device(usb_device device)
 		return NULL;
 	}
 
-#define IDS(__vendor, __product) (((__vendor) << 16) | (__product))
-	
+	#define IDS(__vendor, __product) (((__vendor) << 16) | (__product))
+
 	switch(IDS(deviceDescriptor->vendor_id, deviceDescriptor->product_id)) {
 		case IDS(0x0489, 0xe016):
-			return new BeceemDevice(device, "Ubee WiMAX Mobile USB - PXU1900 (Clear)");
+			return new BeceemDevice(device,
+				"Ubee WiMAX Mobile USB - PXU1900 (Clear)");
 		case IDS(0x0489, 0xe017):
-			return new BeceemDevice(device, "Ubee WiMAX Mobile USB - PXU1901 (Sprint)");
+			return new BeceemDevice(device,
+				"Ubee WiMAX Mobile USB - PXU1901 (Sprint)");
 		case IDS(0x198f, 0x0210):
-			return new BeceemDevice(device, "Motorola USBw 100 WiMAX CPE");
+			return new BeceemDevice(device,
+				"Motorola USBw 100 WiMAX CPE");
 		case IDS(0x198f, 0x0220):
-			return new BeceemDevice(device, "Beceem Mobile USB WiMAX CPE");
+			return new BeceemDevice(device,
+				"Beceem Mobile USB WiMAX CPE");
 		case IDS(0x19d2, 0x0007):
-			return new BeceemDevice(device, "ZTE TU25 WiMAX Adapter [Beceem BCS200]");
+			return new BeceemDevice(device,
+				"ZTE TU25 WiMAX Adapter [Beceem BCS200]");
 	}
 	return NULL;
 }
@@ -159,7 +164,7 @@ usb_beceem_device_removed(void *cookie)
 		if (gBeceemDevices[i] == device) {
 			if (device->IsOpen()) {
 				// the device will be deleted upon being freed
-				TRACE("Debug: Device %ld will be deleted upon being freed.\n", i);
+				TRACE("Debug: Device %ld will be deleted when freed.\n", i);
 				device->Removed();
 			} else {
 				TRACE("Debug: Device at %ld will be deleted.\n", i);
@@ -194,9 +199,9 @@ init_driver()
 		return status;
 
 	load_settings();
-	
+
 	TRACE_ALWAYS("%s\n", kVersion);
-	
+
 	for (int32 i = 0; i < MAX_DEVICES; i++)
 		gBeceemDevices[i] = NULL;
 
@@ -208,7 +213,7 @@ init_driver()
 		&usb_beceem_device_removed
 	};
 
-	gUSBModule->register_driver(DRIVER_NAME, gSupportedDevices, 
+	gUSBModule->register_driver(DRIVER_NAME, gSupportedDevices,
 		sizeof(gSupportedDevices) / sizeof(usb_support_descriptor), NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
@@ -235,7 +240,7 @@ uninit_driver()
 
 	mutex_destroy(&gDriverLock);
 	put_module(B_USB_MODULE_NAME);
-	
+
 	release_settings();
 }
 
@@ -295,9 +300,9 @@ usb_beceem_free(void *cookie)
 {
 	TRACE("Debug: Device to be freed\n");
 	BeceemDevice *device = (BeceemDevice *)cookie;
-	
+
 	DriverSmartLock driverLock; // released on exit
-	
+
 	status_t status = device->Free();
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gBeceemDevices[i] == device) {
@@ -324,7 +329,7 @@ publish_devices()
 	}
 
 	DriverSmartLock driverLock; // released on exit
-	
+
 	int32 deviceCount = 0;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gBeceemDevices[i] == NULL)
@@ -336,7 +341,7 @@ publish_devices()
 			TRACE("Debug: publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else
-			TRACE_ALWAYS("Error: out of memory during allocating device name.\n");
+			TRACE_ALWAYS("Error: out of memory allocating device name.\n");
 	}
 
 	gDeviceNames[deviceCount] = NULL;

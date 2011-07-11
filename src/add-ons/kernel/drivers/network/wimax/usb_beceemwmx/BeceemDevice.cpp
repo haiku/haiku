@@ -41,7 +41,7 @@ mutex gUSBLock;
 // auto-release helper class
 class USBSmartLock {
 public:
-	USBSmartLock()	{ mutex_lock(&gUSBLock); }
+	USBSmartLock() { mutex_lock(&gUSBLock); }
 	~USBSmartLock()	{ mutex_unlock(&gUSBLock); }
 };
 
@@ -1005,8 +1005,6 @@ BeceemDevice::StartDevice()
 status_t
 BeceemDevice::LoadConfig()
 {
-	int	dtaread = 0;
-
 	int fh = open(FIRM_CFG, O_RDONLY);
 
 	struct stat cfgStat;
@@ -1024,9 +1022,7 @@ BeceemDevice::LoadConfig()
 		return B_ERROR;
 	}
 
-	dtaread = read(fh, buffer, MAX_USB_TRANSFER);
-
-	if (dtaread < 0) {
+	if (read(fh, buffer, MAX_USB_TRANSFER) < 0) {
 		TRACE_ALWAYS("Error: Error reading from vendor configuration.\n");
 		close(fh);
 		free(buffer);
