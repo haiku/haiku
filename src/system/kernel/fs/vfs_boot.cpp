@@ -46,11 +46,12 @@ static struct {
 	const char *path;
 	const char *target;
 } sPredefinedLinks[] = {
-	{ kGlobalSystemDirectory,	kSystemDirectory },
-	{ kGlobalBinDirectory,		kSystemBinDirectory },
-	{ kGlobalEtcDirectory,		kCommonEtcDirectory },
-	{ kGlobalTempDirectory,		kCommonTempDirectory },
-	{ kGlobalVarDirectory,		kCommonVarDirectory },
+	{ kGlobalSystemDirectory,		kSystemDirectory },
+	{ kGlobalBinDirectory,			kSystemBinDirectory },
+	{ kGlobalEtcDirectory,			kCommonEtcDirectory },
+	{ kGlobalTempDirectory,			kCommonTempDirectory },
+	{ kGlobalVarDirectory,			kCommonVarDirectory },
+	{ kGlobalPackageLinksDirectory,	kSystemPackageLinksDirectory },
 	{NULL}
 };
 
