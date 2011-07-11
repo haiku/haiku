@@ -1274,12 +1274,16 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 	// details.
 
 	PackageNode* headPackageNode = unpackingNode->GetPackageNode();
-	unpackingNode->RemovePackageNode(packageNode);
-
-	// If the node doesn't have any more package nodes attached, remove it
-	// completely.
 	bool nodeRemoved = false;
-	if (unpackingNode->GetPackageNode() == NULL) {
+
+	// If this is the last package node of the node, remove it completely.
+	if (unpackingNode->IsOnlyPackageNode(packageNode)) {
+		// Notify before removing the node. Otherwise the indices might not
+		// find the node anymore.
+		_NotifyNodeRemoved(node);
+
+		unpackingNode->RemovePackageNode(packageNode);
+
 		// we get and put the vnode to notify the VFS
 		// TODO: We should probably only do that, if the node is known to the
 		// VFS in the first place.
@@ -1293,13 +1297,14 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 			RemoveVNode(node->ID());
 			PutVNode(node->ID());
 		}
-	}
+	} else {
+		// The node does at least have one more package node.
+		unpackingNode->RemovePackageNode(packageNode);
 
-	if (nodeRemoved)
-		_NotifyNodeRemoved(node);
-	else if (packageNode == headPackageNode) {
-		_NotifyNodeChanged(node, kAllStatFields,
-			OldUnpackingNodeAttributes(headPackageNode));
+		if (packageNode == headPackageNode) {
+			_NotifyNodeChanged(node, kAllStatFields,
+				OldUnpackingNodeAttributes(headPackageNode));
+		}
 	}
 
 	if (!notify)
