@@ -527,6 +527,17 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 			= fPackageStringCache.Get(packageInfo.Checksum().String());
 		attributeList.Add(checksum);
 	}
+
+	// install path (optional)
+	if (!packageInfo.InstallPath().IsEmpty()) {
+		PackageAttribute* installPath = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		installPath->string = fPackageStringCache.Get(
+			packageInfo.InstallPath().String());
+		attributeList.Add(installPath);
+	}
 }
 
 

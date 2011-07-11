@@ -441,6 +441,10 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_CHECKSUM, value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_INSTALL_PATH, value.string);
+			break;
+
 		default:
 			context->errorOutput->PrintError(
 				"Error: Invalid package attribute section: unexpected "

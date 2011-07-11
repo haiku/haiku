@@ -60,6 +60,7 @@ public:
 			const BString&		Vendor() const;
 			const BString&		Packager() const;
 			const BString&		Checksum() const;
+			const BString&		InstallPath() const;
 
 			uint32				Flags() const;
 
@@ -89,6 +90,7 @@ public:
 			void				SetVendor(const BString& vendor);
 			void				SetPackager(const BString& packager);
 			void				SetChecksum(const BString& checksum);
+			void				SetInstallPath(const BString& installPath);
 
 			void				SetFlags(uint32 flags);
 
@@ -174,6 +176,7 @@ private:
 			BObjectList<BString>	fReplacesList;
 
 			BString				fChecksum;
+			BString				fInstallPath;
 };
 
 

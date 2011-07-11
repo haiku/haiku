@@ -670,7 +670,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 
 		BPackageInfoAttributeID attribute = B_PACKAGE_INFO_ENUM_COUNT;
 		for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; i++) {
-			if (t.text.ICompare(names[i]) == 0) {
+			if (names[i] != NULL && t.text.ICompare(names[i]) == 0) {
 				attribute = (BPackageInfoAttributeID)i;
 				break;
 			}
@@ -803,6 +803,7 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"urls",
 	"source-urls",
 	"checksum",		// not being parsed, computed externally
+	NULL,			// install-path -- not settable via .PackageInfo
 };
 
 
@@ -948,6 +949,13 @@ BPackageInfo::Checksum() const
 }
 
 
+const BString&
+BPackageInfo::InstallPath() const
+{
+	return fInstallPath;
+}
+
+
 uint32
 BPackageInfo::Flags() const
 {
@@ -1078,6 +1086,13 @@ void
 BPackageInfo::SetChecksum(const BString& checksum)
 {
 	fChecksum = checksum;
+}
+
+
+void
+BPackageInfo::SetInstallPath(const BString& installPath)
+{
+	fInstallPath = installPath;
 }
 
 
@@ -1296,6 +1311,7 @@ BPackageInfo::Clear()
 	fVendor.Truncate(0);
 	fPackager.Truncate(0);
 	fChecksum.Truncate(0);
+	fInstallPath.Truncate(0);
 	fFlags = 0;
 	fArchitecture = B_PACKAGE_ARCHITECTURE_ENUM_COUNT;
 	fVersion.Clear();

@@ -39,6 +39,16 @@ BPackageWriter::Init(const char* fileName, uint32 flags)
 }
 
 
+status_t
+BPackageWriter::SetInstallPath(const char* installPath)
+{
+	if (fImpl == NULL)
+		return B_NO_INIT;
+
+	return fImpl->SetInstallPath(installPath);
+}
+
+
 void
 BPackageWriter::SetCheckLicenses(bool checkLicenses)
 {

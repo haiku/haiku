@@ -10,6 +10,8 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include <String.h>
+
 #include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>
 #include <package/hpkg/WriterImplBase.h>
@@ -43,6 +45,7 @@ public:
 								~PackageWriterImpl();
 
 			status_t			Init(const char* fileName, uint32 flags);
+			status_t			SetInstallPath(const char* installPath);
 			void				SetCheckLicenses(bool checkLicenses);
 			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
@@ -148,6 +151,7 @@ private:
 			StringCache			fStringCache;
 
 			BPackageInfo		fPackageInfo;
+			BString				fInstallPath;
 			bool				fCheckLicenses;
 };
 
