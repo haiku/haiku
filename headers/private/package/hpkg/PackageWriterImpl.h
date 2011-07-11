@@ -43,6 +43,7 @@ public:
 								~PackageWriterImpl();
 
 			status_t			Init(const char* fileName, uint32 flags);
+			void				SetCheckLicenses(bool checkLicenses);
 			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
 
@@ -147,6 +148,7 @@ private:
 			StringCache			fStringCache;
 
 			BPackageInfo		fPackageInfo;
+			bool				fCheckLicenses;
 };
 
 

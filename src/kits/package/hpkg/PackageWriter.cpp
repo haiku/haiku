@@ -39,6 +39,14 @@ BPackageWriter::Init(const char* fileName, uint32 flags)
 }
 
 
+void
+BPackageWriter::SetCheckLicenses(bool checkLicenses)
+{
+	if (fImpl != NULL)
+		fImpl->SetCheckLicenses(checkLicenses);
+}
+
+
 status_t
 BPackageWriter::AddEntry(const char* fileName, int fd)
 {
