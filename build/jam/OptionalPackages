@@ -147,7 +147,7 @@ if [ IsOptionalHaikuImagePackageAdded ArmyKnife ] {
 		InstallOptionalHaikuImagePackage
 			armyknife-63-r1a3-x86-gcc2-2011-06-04.zip
 			: $(baseURL)/armyknife-63-r1a3-x86-gcc2-2011-06-04.zip ;
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/ArmyKnife/ArmyKnife ;
 	}
 }
@@ -181,7 +181,7 @@ if [ IsOptionalHaikuImagePackageAdded BeAE ] {
 				beae-22-r1a3-x86-gcc2-2011-05-18.zip
 				: $(baseURL)/beae-22-r1a3-x86-gcc2-2011-05-18.zip ;
 		}
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BeAE/BeAE ;
 	}
 }
@@ -196,7 +196,7 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	} else {
 		InstallOptionalHaikuImagePackage Beam-1.2alpha-x86-gcc2-2010-04-29.zip
 			: $(baseURL)/Beam-1.2alpha-x86-gcc2-2010-04-29.zip ;
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Beam/Beam ;
 	}
 }
@@ -258,7 +258,7 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 			bepdf-1.1.1b4-1-x86_gcc2.hpkg
 			: $(hpkgBaseURL)/bepdf-1.1.1b4-1-x86_gcc2.hpkg
 			: common packages ;
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BePDF/BePDF ;
 	}
 }
@@ -278,7 +278,7 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
 				BeZillaBrowser-2.0.0.22pre-r1a2-x86-gcc2-2010-05-02.zip
 				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-r1a2-x86-gcc2-2010-05-02.zip ;
  		}
- 		AddSymlinkToHaikuImage home config be Applications
+ 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 		InstallSourceArchive BeZillaBrowser-2.0.0.22pre-r1a2-sources.tar.xz
 			: $(baseSourceURL)/2010/BeZillaBrowser-2.0.0.22pre-r1a2-sources.tar.xz ;
@@ -299,7 +299,7 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	AddFilesToHaikuImage system preferences : Bluetooth ;
 	AddFilesToHaikuImage system bin
 		: bt_dev_info bt_discovery ;
-	AddSymlinkToHaikuImage home config be Preferences
+	AddSymlinkToHaikuImage home config settings deskbar Preferences
 		: /boot/system/preferences/Bluetooth ;
 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		&& $(HAIKU_GCC_VERSION[1]) in 2 4 {
@@ -325,7 +325,7 @@ if [ IsOptionalHaikuImagePackageAdded BurnItNow ] {
 			burnitnow-39-r1a3-x86-gcc2-2011-05-18.zip
 			: $(baseURL)/burnitnow-39-r1a3-x86-gcc2-2011-05-18.zip ;
 		}
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BurnItNow/BurnItNow ;
 	}
 }
@@ -396,7 +396,7 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 				Clockwerk-0.0.2-x86-gcc2-2010-10-13-1.zip
 				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2010-10-13-1.zip ;
 		}
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Clockwerk/Clockwerk ;
 	}
 }
@@ -691,7 +691,7 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 				friss-24-r1a3-x86-gcc2-2011-05-31.zip
 				: $(baseURL)/friss-24-r1a3-x86-gcc2-2011-05-31.zip ;
 		}
-#		AddSymlinkToHaikuImage home config be Desktop\ applets
+#		AddSymlinkToHaikuImage home config settings deskbar Desktop\ applets
 #			: /boot/apps/FRiSS/FRiSS ;
 	}
 }
@@ -830,7 +830,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 				KeymapSwitcher-1.2.6-r1a3-x86-gcc2-2011-06-12.zip
 				: $(baseURL)/KeymapSwitcher-1.2.6-r1a3-x86-gcc2-2011-06-12.zip ;
 		}
-		AddSymlinkToHaikuImage home config be Preferences
+		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
 	}
 }
@@ -949,7 +949,7 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 	} else {
 		InstallOptionalHaikuImagePackage Links.zip
 			: $(baseURL)/links-x86-gcc2-2008-05-03.zip ;
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/home/config/bin/links ;
 	}
 }
@@ -1096,7 +1096,7 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		InstallOptionalHaikuImagePackage
 			netsurf-2.7-r1a3-x86-gcc2-2011-06-04.zip
 			: $(baseURL)/netsurf-2.7-r1a3-x86-gcc2-2011-06-04.zip ;
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/NetSurf/NetSurf ;
 	}
 }
@@ -1214,7 +1214,7 @@ if [ IsOptionalHaikuImagePackageAdded Paladin ] {
 				: $(baseURL)/paladin-1.3-r1a3-x86-gcc2-2011-05-18.zip ;
 		}
 
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Paladin/Paladin ;
 		AddSymlinkToHaikuImage common bin
 			: /boot/apps/Paladin/Paladin ;
@@ -1256,7 +1256,7 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 				: $(hpkgBaseURL)/pe-2.4.3_600-1-x86_gcc2.hpkg
 				: common packages ;
 		}
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Pe/Pe ;
 	}
 }
@@ -1532,7 +1532,7 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 				:  $(baseURL)/vim-7.3-r1a3-x86-gcc2-2011-05-26.zip
 				: : true ;
 		}
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/common/bin/gvim ;
 		# TODO: move this symlink to the archive
 		AddSymlinkToHaikuImage common bin : vim : vi ;
@@ -1554,7 +1554,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 				: $(hpkgBaseURL)/vision-908-1-x86_gcc2.hpkg
 				: common packages ;
 		}
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Vision/Vision ;
 	}
 }
@@ -1570,7 +1570,7 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 		InstallOptionalHaikuImagePackage
 			WebPositive-r1a3-gcc4-x86-r580-2011-06-02.zip
 			: $(baseURL)/WebPositive-r1a3-gcc4-x86-r580-2011-06-02.zip ;
-		AddSymlinkToHaikuImage home config be Applications
+		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/WebPositive/WebPositive ;
 	}
 }
@@ -1652,7 +1652,7 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 #		InstallOptionalHaikuImagePackage WonderBrush-2.1.2.zip
 #			: $(baseURL)/WonderBrush-2.1.2-x86-gcc2-2008-11-08.zip
 #			: common apps ;
-#		AddSymlinkToHaikuImage home config be Applications
+#		AddSymlinkToHaikuImage home config settings deskbar Applications
 #			: /boot/apps/WonderBrush/WonderBrush ;
 	}
 }
