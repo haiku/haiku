@@ -25,25 +25,15 @@ BPackageVersion::BPackageVersion()
 
 
 BPackageVersion::BPackageVersion(const BPackageVersionData& data)
-	:
-	fMajor(data.major),
-	fMinor(data.minor),
-	fMicro(data.micro),
-	fPreRelease(data.preRelease),
-	fRelease(data.release)
 {
+	SetTo(data.major, data.minor, data.micro, data.preRelease, data.release);
 }
 
 
 BPackageVersion::BPackageVersion(const BString& major, const BString& minor,
 	const BString& micro, const BString& preRelease, uint8 release)
-	:
-	fMajor(major),
-	fMinor(minor),
-	fMicro(micro),
-	fPreRelease(preRelease),
-	fRelease(release)
 {
+	SetTo(major, minor, micro, preRelease, release);
 }
 
 
@@ -153,6 +143,11 @@ BPackageVersion::SetTo(const BString& major, const BString& minor,
 	fMicro = micro;
 	fPreRelease = preRelease;
 	fRelease = release;
+
+	fMajor.ToLower();
+	fMinor.ToLower();
+	fMicro.ToLower();
+	fPreRelease.ToLower();
 }
 
 

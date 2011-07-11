@@ -48,6 +48,7 @@ BPackageResolvable::BPackageResolvable(const BString& name,
 	fVersion(version),
 	fCompatibleVersion(compatibleVersion)
 {
+	fName.ToLower();
 }
 
 
@@ -110,6 +111,8 @@ BPackageResolvable::SetTo(const BString& name, BPackageResolvableType type,
 	fType = type;
 	fVersion = version;
 	fCompatibleVersion = compatibleVersion;
+
+	fName.ToLower();
 }
 
 
