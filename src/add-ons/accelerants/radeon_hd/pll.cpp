@@ -190,10 +190,9 @@ PLLPower(uint8 pllIndex, int command)
 				uint16 pllDiffPostReg
 					= (pllIndex == 1) ? RV620_EXT2_DIFF_POST_DIV_CNTL
 						: RV620_EXT1_DIFF_POST_DIV_CNTL;
-
-				uint16 pllDiffDriverEnable = (pllIndex == 1) ? 3 << 8 : 1 << 8;
-					// AKA RV62_EXT2_DIFF_DRIVER_ENABLE : RV62_EXT1_DIFF_DRIVER_ENABLE
-					// this prevents enumeral mismatch without a long static_cast
+				uint16 pllDiffDriverEnable
+					= (pllIndex == 1) ? (uint16)RV62_EXT2_DIFF_DRIVER_ENABLE
+						: (uint16)RV62_EXT1_DIFF_DRIVER_ENABLE;
 
 				// Sometimes we have to keep an unused PLL running. X Bug #18016
 				if ((Read32(PLL, pllDiffPostReg)
