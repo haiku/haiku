@@ -34,6 +34,8 @@ command_create(int argc, const char* const* argv)
 {
 	const char* changeToDirectory = NULL;
 	const char* packageInfoFileName = NULL;
+	const char* installPath = NULL;
+	bool isBuildPackage = false;
 	bool quiet = false;
 	bool verbose = false;
 
@@ -46,11 +48,16 @@ command_create(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+C:hi:qv", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+bC:hi:I:qv", sLongOptions,
+			NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'b':
+				isBuildPackage = true;
+				break;
+
 			case 'C':
 				changeToDirectory = optarg;
 				break;
@@ -61,6 +68,10 @@ command_create(int argc, const char* const* argv)
 
 			case 'i':
 				packageInfoFileName = optarg;
+				break;
+
+			case 'I':
+				installPath = optarg;
 				break;
 
 			case 'q':
@@ -83,6 +94,13 @@ command_create(int argc, const char* const* argv)
 
 	const char* packageFileName = argv[optind++];
 
+	// -I is only allowed when -b is given
+	if (installPath != NULL && !isBuildPackage) {
+		fprintf(stderr, "Error: \"-I\" is only allowed when \"-b\" is "
+			"given.\n");
+		return 1;
+	}
+
 	// create package
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);
@@ -97,6 +115,7 @@ command_create(int argc, const char* const* argv)
 		if (packageInfoFD < 0) {
 			fprintf(stderr, "Error: Failed to open package info file \"%s\": "
 				"%s\n", packageInfoFileName, strerror(errno));
+			return 1;
 		}
 	}
 
@@ -106,12 +125,30 @@ command_create(int argc, const char* const* argv)
 			listener.PrintError(
 				"Error: Failed to change the current working directory to "
 				"\"%s\": %s\n", changeToDirectory, strerror(errno));
+			return 1;
+		}
+	}
+
+	if (isBuildPackage)
+		packageWriter.SetCheckLicenses(false);
+
+	// set install path, if specified
+	if (installPath != NULL) {
+		result = packageWriter.SetInstallPath(installPath);
+		if (result != B_OK) {
+			fprintf(stderr, "Error: Failed to set the package install path: "
+				"%s\n", strerror(result));
+			return 1;
 		}
 	}
 
 	// add all files of the current directory, save for the .PackageInfo
-	if (add_current_directory_entries(packageWriter, listener, true) != B_OK)
-		return 1;
+	if (!isBuildPackage) {
+		if (add_current_directory_entries(packageWriter, listener, true)
+				!= B_OK) {
+			return 1;
+		}
+	}
 
 	// add the .PackageInfo
 	result = packageWriter.AddEntry(B_HPKG_PACKAGE_INFO_FILE_NAME,
