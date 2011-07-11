@@ -131,9 +131,9 @@ static void
 CardBlankSet(uint8 crtid, bool blank)
 {
 	int blackColorReg
-		= (crtid == 1) ? D2CRTC_BLACK_COLOR : D1CRTC_BLACK_COLOR;
+		= crtid == 1 ? D2CRTC_BLACK_COLOR : D1CRTC_BLACK_COLOR;
 	int blankControlReg
-		= (crtid == 1) ? D2CRTC_BLANK_CONTROL : D1CRTC_BLANK_CONTROL;
+		= crtid == 1 ? D2CRTC_BLANK_CONTROL : D1CRTC_BLANK_CONTROL;
 
 	Write32(CRT, blackColorReg, 0);
 	Write32Mask(CRT, blankControlReg, blank ? 1 << 8 : 0, 1 << 8);

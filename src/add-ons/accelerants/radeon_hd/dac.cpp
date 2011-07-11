@@ -25,7 +25,7 @@ extern "C" void _sPrintf(const char *format, ...);
 bool
 DACSense(uint8 dacIndex)
 {
-	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
+	uint32 dacOffset = dacIndex == 1 ? REG_DACB_OFFSET : REG_DACA_OFFSET;
 
 	// Backup current DAC values
 	uint32 compEnable = Read32(OUT, dacOffset + DACA_COMPARATOR_ENABLE);
@@ -183,7 +183,7 @@ DACSetModern(uint8 dacIndex, uint32 crtid)
 	if (whiteFine)
 		mask |= 0xFF << 8;
 
-	uint32 dacOffset = (dacIndex == 1) ? RV620_REG_DACA_OFFSET
+	uint32 dacOffset = dacIndex == 1 ? RV620_REG_DACA_OFFSET
 		: RV620_REG_DACB_OFFSET;
 
 	Write32Mask(OUT, dacOffset + RV620_DACA_MACRO_CNTL, mode, 0xFF);
@@ -203,7 +203,7 @@ DACSetModern(uint8 dacIndex, uint32 crtid)
 
 	// reset the FMT register
 	// TODO : ah-la external DxFMTSet
-	uint32 fmtOffset = (crtid == 0) ? FMT1_REG_OFFSET : FMT2_REG_OFFSET;
+	uint32 fmtOffset = crtid == 0 ? FMT1_REG_OFFSET : FMT2_REG_OFFSET;
 	Write32(OUT, fmtOffset + RV620_FMT1_BIT_DEPTH_CONTROL, 0);
 
 	Write32Mask(OUT, fmtOffset + RV620_FMT1_CONTROL, 0,
@@ -234,7 +234,7 @@ DACSetLegacy(uint8 dacIndex, uint32 crtid)
 	if (whiteFine)
 		mask |= 0xFF << 8;
 
-	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
+	uint32 dacOffset = dacIndex == 1 ? REG_DACB_OFFSET : REG_DACA_OFFSET;
 
 	Write32Mask(OUT, dacOffset + DACA_CONTROL1, standard, 0x000000FF);
 	/* white level fine adjust */
@@ -286,7 +286,7 @@ DACPowerModern(uint8 dacIndex, int mode)
 {
 	TRACE("%s: dacIndex: %d; mode: %d\n", __func__, dacIndex, mode);
 
-	uint32 dacOffset = (dacIndex == 1) ? RV620_REG_DACB_OFFSET
+	uint32 dacOffset = dacIndex == 1 ? RV620_REG_DACB_OFFSET
 		: RV620_REG_DACA_OFFSET;
 	uint32 powerdown;
 
@@ -328,7 +328,7 @@ DACPowerModern(uint8 dacIndex, int mode)
 void
 DACPowerLegacy(uint8 dacIndex, int mode)
 {
-	uint32 dacOffset = (dacIndex == 1) ? REG_DACB_OFFSET : REG_DACA_OFFSET;
+	uint32 dacOffset = dacIndex == 1 ? REG_DACB_OFFSET : REG_DACA_OFFSET;
 	uint32 powerdown;
 
 	switch (mode) {

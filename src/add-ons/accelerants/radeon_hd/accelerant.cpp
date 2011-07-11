@@ -247,52 +247,52 @@ init_registers(uint8 crtid)
 
 		// r600 - r700 are D1 or D2 based on primary / secondary crt
 		gRegister->vgaControl
-			= (crtid == 1) ? D2VGA_CONTROL : D1VGA_CONTROL;
+			= crtid == 1 ? D2VGA_CONTROL : D1VGA_CONTROL;
 		gRegister->grphEnable
-			= (crtid == 1) ? D2GRPH_ENABLE : D1GRPH_ENABLE;
+			= crtid == 1 ? D2GRPH_ENABLE : D1GRPH_ENABLE;
 		gRegister->grphControl
-			= (crtid == 1) ? D2GRPH_CONTROL : D1GRPH_CONTROL;
+			= crtid == 1 ? D2GRPH_CONTROL : D1GRPH_CONTROL;
 		gRegister->grphSwapControl
-			= (crtid == 1) ? D2GRPH_SWAP_CNTL : D1GRPH_SWAP_CNTL;
+			= crtid == 1 ? D2GRPH_SWAP_CNTL : D1GRPH_SWAP_CNTL;
 		gRegister->grphPrimarySurfaceAddr
-			= (crtid == 1) ? D2GRPH_PRIMARY_SURFACE_ADDRESS
+			= crtid == 1 ? D2GRPH_PRIMARY_SURFACE_ADDRESS
 				: D1GRPH_PRIMARY_SURFACE_ADDRESS;
 		gRegister->grphSecondarySurfaceAddr
-			= (crtid == 1) ? D2GRPH_SECONDARY_SURFACE_ADDRESS
+			= crtid == 1 ? D2GRPH_SECONDARY_SURFACE_ADDRESS
 				: D1GRPH_SECONDARY_SURFACE_ADDRESS;
 
 		// Surface Address high only used on r770+
 		gRegister->grphPrimarySurfaceAddrHigh
-			= (crtid == 1) ? R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH
+			= crtid == 1 ? R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH
 				: R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
 		gRegister->grphSecondarySurfaceAddrHigh
-			= (crtid == 1) ? R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH
+			= crtid == 1 ? R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH
 				: R700_D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
 
 		gRegister->grphPitch
-			= (crtid == 1) ? D2GRPH_PITCH : D1GRPH_PITCH;
+			= crtid == 1 ? D2GRPH_PITCH : D1GRPH_PITCH;
 		gRegister->grphSurfaceOffsetX
-			= (crtid == 1) ? D2GRPH_SURFACE_OFFSET_X : D1GRPH_SURFACE_OFFSET_X;
+			= crtid == 1 ? D2GRPH_SURFACE_OFFSET_X : D1GRPH_SURFACE_OFFSET_X;
 		gRegister->grphSurfaceOffsetY
-			= (crtid == 1) ? D2GRPH_SURFACE_OFFSET_Y : D1GRPH_SURFACE_OFFSET_Y;
+			= crtid == 1 ? D2GRPH_SURFACE_OFFSET_Y : D1GRPH_SURFACE_OFFSET_Y;
 		gRegister->grphXStart
-			= (crtid == 1) ? D2GRPH_X_START : D1GRPH_X_START;
+			= crtid == 1 ? D2GRPH_X_START : D1GRPH_X_START;
 		gRegister->grphYStart
-			= (crtid == 1) ? D2GRPH_Y_START : D1GRPH_Y_START;
+			= crtid == 1 ? D2GRPH_Y_START : D1GRPH_Y_START;
 		gRegister->grphXEnd
-			= (crtid == 1) ? D2GRPH_X_END : D1GRPH_X_END;
+			= crtid == 1 ? D2GRPH_X_END : D1GRPH_X_END;
 		gRegister->grphYEnd
-			= (crtid == 1) ? D2GRPH_Y_END : D1GRPH_Y_END;
+			= crtid == 1 ? D2GRPH_Y_END : D1GRPH_Y_END;
 		gRegister->crtControl
-			= (crtid == 1) ? D2CRTC_CONTROL : D1CRTC_CONTROL;
+			= crtid == 1 ? D2CRTC_CONTROL : D1CRTC_CONTROL;
 		gRegister->modeDesktopHeight
-			= (crtid == 1) ? D2MODE_DESKTOP_HEIGHT : D1MODE_DESKTOP_HEIGHT;
+			= crtid == 1 ? D2MODE_DESKTOP_HEIGHT : D1MODE_DESKTOP_HEIGHT;
 		gRegister->modeDataFormat
-			= (crtid == 1) ? D2MODE_DATA_FORMAT : D1MODE_DATA_FORMAT;
+			= crtid == 1 ? D2MODE_DATA_FORMAT : D1MODE_DATA_FORMAT;
 		gRegister->viewportStart
-			= (crtid == 1) ? D2MODE_VIEWPORT_START : D1MODE_VIEWPORT_START;
+			= crtid == 1 ? D2MODE_VIEWPORT_START : D1MODE_VIEWPORT_START;
 		gRegister->viewportSize
-			= (crtid == 1) ? D2MODE_VIEWPORT_SIZE : D1MODE_VIEWPORT_SIZE;
+			= crtid == 1 ? D2MODE_VIEWPORT_SIZE : D1MODE_VIEWPORT_SIZE;
 	} else {
 		// this really shouldn't happen unless a driver PCIID chipset is wrong
 		TRACE("%s, unknown Radeon chipset: r%X\n", __func__,
@@ -305,35 +305,35 @@ init_registers(uint8 crtid)
 	gRegister->crtid = crtid;
 
 	gRegister->modeCenter
-		= (crtid == 1) ? D2MODE_CENTER : D1MODE_CENTER;
+		= crtid == 1 ? D2MODE_CENTER : D1MODE_CENTER;
 	gRegister->grphUpdate
-		= (crtid == 1) ? D2GRPH_UPDATE : D1GRPH_UPDATE;
+		= crtid == 1 ? D2GRPH_UPDATE : D1GRPH_UPDATE;
 	gRegister->crtHPolarity
-		= (crtid == 1) ? D2CRTC_H_SYNC_A_CNTL : D1CRTC_H_SYNC_A_CNTL;
+		= crtid == 1 ? D2CRTC_H_SYNC_A_CNTL : D1CRTC_H_SYNC_A_CNTL;
 	gRegister->crtVPolarity
-		= (crtid == 1) ? D2CRTC_V_SYNC_A_CNTL : D1CRTC_V_SYNC_A_CNTL;
+		= crtid == 1 ? D2CRTC_V_SYNC_A_CNTL : D1CRTC_V_SYNC_A_CNTL;
 	gRegister->crtHTotal
-		= (crtid == 1) ? D2CRTC_H_TOTAL : D1CRTC_H_TOTAL;
+		= crtid == 1 ? D2CRTC_H_TOTAL : D1CRTC_H_TOTAL;
 	gRegister->crtVTotal
-		= (crtid == 1) ? D2CRTC_V_TOTAL : D1CRTC_V_TOTAL;
+		= crtid == 1 ? D2CRTC_V_TOTAL : D1CRTC_V_TOTAL;
 	gRegister->crtHSync
-		= (crtid == 1) ? D2CRTC_H_SYNC_A : D1CRTC_H_SYNC_A;
+		= crtid == 1 ? D2CRTC_H_SYNC_A : D1CRTC_H_SYNC_A;
 	gRegister->crtVSync
-		= (crtid == 1) ? D2CRTC_V_SYNC_A : D1CRTC_V_SYNC_A;
+		= crtid == 1 ? D2CRTC_V_SYNC_A : D1CRTC_V_SYNC_A;
 	gRegister->crtHBlank
-		= (crtid == 1) ? D2CRTC_H_BLANK_START_END : D1CRTC_H_BLANK_START_END;
+		= crtid == 1 ? D2CRTC_H_BLANK_START_END : D1CRTC_H_BLANK_START_END;
 	gRegister->crtVBlank
-		= (crtid == 1) ? D2CRTC_V_BLANK_START_END : D1CRTC_V_BLANK_START_END;
+		= crtid == 1 ? D2CRTC_V_BLANK_START_END : D1CRTC_V_BLANK_START_END;
 	gRegister->crtInterlace
-		= (crtid == 1) ? D2CRTC_INTERLACE_CONTROL : D1CRTC_INTERLACE_CONTROL;
+		= crtid == 1 ? D2CRTC_INTERLACE_CONTROL : D1CRTC_INTERLACE_CONTROL;
 	gRegister->crtCountControl
-		= (crtid == 1) ? D2CRTC_COUNT_CONTROL : D1CRTC_COUNT_CONTROL;
+		= crtid == 1 ? D2CRTC_COUNT_CONTROL : D1CRTC_COUNT_CONTROL;
 	gRegister->sclUpdate
-		= (crtid == 1) ? D2SCL_UPDATE : D1SCL_UPDATE;
+		= crtid == 1 ? D2SCL_UPDATE : D1SCL_UPDATE;
 	gRegister->sclEnable
-		= (crtid == 1) ? D2SCL_ENABLE : D1SCL_ENABLE;
+		= crtid == 1 ? D2SCL_ENABLE : D1SCL_ENABLE;
 	gRegister->sclTapControl
-		= (crtid == 1) ? D2SCL_TAP_CONTROL : D1SCL_TAP_CONTROL;
+		= crtid == 1 ? D2SCL_TAP_CONTROL : D1SCL_TAP_CONTROL;
 
 	TRACE("%s, registers for ATI chipset r%X crt #%d loaded\n", __func__,
 		info.device_chipset, crtid);

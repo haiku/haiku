@@ -133,7 +133,7 @@ PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 status_t
 PLLPower(uint8 pllIndex, int command)
 {
-	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllControlReg = pllIndex == 1 ? P2PLL_CNTL : P1PLL_CNTL;
 
 	bool hasDccg = DCCGCLKAvailable(pllIndex);
 
@@ -188,10 +188,10 @@ PLLPower(uint8 pllIndex, int command)
 
 			if (info.device_chipset >= (RADEON_R600 | 0x20)) {
 				uint16 pllDiffPostReg
-					= (pllIndex == 1) ? RV620_EXT2_DIFF_POST_DIV_CNTL
+					= pllIndex == 1 ? RV620_EXT2_DIFF_POST_DIV_CNTL
 						: RV620_EXT1_DIFF_POST_DIV_CNTL;
 				uint16 pllDiffDriverEnable
-					= (pllIndex == 1) ? (uint16)RV62_EXT2_DIFF_DRIVER_ENABLE
+					= pllIndex == 1 ? (uint16)RV62_EXT2_DIFF_DRIVER_ENABLE
 						: (uint16)RV62_EXT1_DIFF_DRIVER_ENABLE;
 
 				// Sometimes we have to keep an unused PLL running. X Bug #18016
@@ -255,27 +255,27 @@ PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	uint32 referenceTemp = reference;
 
 	/* Internal PLL Registers */
-	uint16 pllCntl = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllCntl = pllIndex == 1 ? P2PLL_CNTL : P1PLL_CNTL;
 	uint16 pllIntSSCntl
-		= (pllIndex == 1) ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
+		= pllIndex == 1 ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
 
 	/* External PLL Registers */
 	uint16 pllExtCntl
-		= (pllIndex == 1) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
+		= pllIndex == 1 ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
 	uint16 pllExtUpdateCntl
-		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_CNTL : EXT1_PPLL_UPDATE_CNTL;
+		= pllIndex == 1 ? EXT2_PPLL_UPDATE_CNTL : EXT1_PPLL_UPDATE_CNTL;
 	uint16 pllExtUpdateLock
-		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
+		= pllIndex == 1 ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
 	uint16 pllExtPostDiv
-		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
+		= pllIndex == 1 ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
 	uint16 pllExtPostDivSrc
-		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
+		= pllIndex == 1 ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
 	uint16 pllExtFeedbackDiv
-		= (pllIndex == 1) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
+		= pllIndex == 1 ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
 	uint16 pllExtRefDiv
-		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
+		= pllIndex == 1 ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
 	uint16 pllExtRefDivSrc
-		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV_SRC : EXT1_PPLL_REF_DIV_SRC;
+		= pllIndex == 1 ? EXT2_PPLL_REF_DIV_SRC : EXT1_PPLL_REF_DIV_SRC;
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -364,31 +364,31 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_RESET);
 
 	/* Internal PLL Registers */
-	uint16 pllCntl = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllCntl = pllIndex == 1 ? P2PLL_CNTL : P1PLL_CNTL;
 	uint16 pllIntSSCntl
-		= (pllIndex == 1) ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
+		= pllIndex == 1 ? P2PLL_INT_SS_CNTL : P1PLL_INT_SS_CNTL;
 
 	/* External PLL Registers */
 	uint16 pllExtCntl
-		= (pllIndex == 1) ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
+		= pllIndex == 1 ? EXT2_PPLL_CNTL : EXT1_PPLL_CNTL;
 	//uint16 pllExtUpdateCntl
-	//	= (pllIndex == 1) ? EXT2_PPLL_UPDATE_CNTL : EXT1_PPLL_UPDATE_CNTL;
+	//	= pllIndex == 1 ? EXT2_PPLL_UPDATE_CNTL : EXT1_PPLL_UPDATE_CNTL;
 	uint16 pllExtUpdateLock
-		= (pllIndex == 1) ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
+		= pllIndex == 1 ? EXT2_PPLL_UPDATE_LOCK : EXT1_PPLL_UPDATE_LOCK;
 	uint16 pllExtPostDiv
-		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
+		= pllIndex == 1 ? EXT2_PPLL_POST_DIV : EXT1_PPLL_POST_DIV;
 	uint16 pllExtPostDivSrc
-		= (pllIndex == 1) ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
+		= pllIndex == 1 ? EXT2_PPLL_POST_DIV_SRC : EXT1_PPLL_POST_DIV_SRC;
 	uint16 pllExtPostDivSym
-		= (pllIndex == 1) ? EXT2_SYM_PPLL_POST_DIV : EXT1_SYM_PPLL_POST_DIV;
+		= pllIndex == 1 ? EXT2_SYM_PPLL_POST_DIV : EXT1_SYM_PPLL_POST_DIV;
 	uint16 pllExtFeedbackDiv
-		= (pllIndex == 1) ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
+		= pllIndex == 1 ? EXT2_PPLL_FB_DIV : EXT1_PPLL_FB_DIV;
 	uint16 pllExtRefDiv
-		= (pllIndex == 1) ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
+		= pllIndex == 1 ? EXT2_PPLL_REF_DIV : EXT1_PPLL_REF_DIV;
 	//uint16 pllExtRefDivSrc
-	//	= (pllIndex == 1) ? EXT2_PPLL_REF_DIV_SRC : EXT1_PPLL_REF_DIV_SRC;
+	//	= pllIndex == 1 ? EXT2_PPLL_REF_DIV_SRC : EXT1_PPLL_REF_DIV_SRC;
 	uint16 pllExtDispClkCntl
-		= (pllIndex == 1) ? P2PLL_DISP_CLK_CNTL : P1PLL_DISP_CLK_CNTL;
+		= pllIndex == 1 ? P2PLL_DISP_CLK_CNTL : P1PLL_DISP_CLK_CNTL;
 
 	Write32Mask(PLL, pllIntSSCntl, 0, 0x00000001);
 		// Disable Spread Spectrum
@@ -474,7 +474,7 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 status_t
 PLLCalibrate(uint8 pllIndex)
 {
-	uint16 pllControlReg = (pllIndex == 1) ? P2PLL_CNTL : P1PLL_CNTL;
+	uint16 pllControlReg = pllIndex == 1 ? P2PLL_CNTL : P1PLL_CNTL;
 
 	Write32Mask(PLL, pllControlReg, 1, 0x01);
 		// PLL Reset
@@ -513,12 +513,12 @@ PLLCRTCGrab(uint8 pllIndex, uint8 crtid)
 	if (crtid == 0) {
 		pll2IsCurrent = Read32(PLL, PCLK_CRTC1_CNTL) & 0x00010000;
 
-		Write32Mask(PLL, PCLK_CRTC1_CNTL, (pllIndex == 0) ? 0x00010000 : 0,
+		Write32Mask(PLL, PCLK_CRTC1_CNTL, pllIndex == 0 ? 0x00010000 : 0,
 			0x00010000);
 	} else {
 		pll2IsCurrent = Read32(PLL, PCLK_CRTC2_CNTL) & 0x00010000;
 
-		Write32Mask(PLL, PCLK_CRTC2_CNTL, (pllIndex == 0) ? 0x00010000 : 0,
+		Write32Mask(PLL, PCLK_CRTC2_CNTL, pllIndex == 0 ? 0x00010000 : 0,
 			0x00010000);
 	}
 
