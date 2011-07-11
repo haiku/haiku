@@ -8,7 +8,7 @@
 
 #define kGlobalBinDirectory 			"/bin"
 #define kGlobalEtcDirectory 			"/etc"
-#define kGlobalPackageLinksDirectory	"/package-links"
+#define kGlobalPackageLinksDirectory	"/packages"
 #define kGlobalSystemDirectory 			"/system"
 #define kGlobalTempDirectory 			"/tmp"
 #define kGlobalVarDirectory 			"/var"
@@ -35,6 +35,7 @@
 #define kSystemDevelopDirectory 		"/boot/develop"
 #define kSystemLibDirectory 			"/boot/system/lib"
 #define kSystemPackagesDirectory 		"/boot/system/packages"
+#define kSystemPackageLinksDirectory 		"/boot/system/package-links"
 #define kSystemPreferencesDirectory 	"/boot/system/preferences"
 #define kSystemServersDirectory 		"/boot/system/servers"
 
