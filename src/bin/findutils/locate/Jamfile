@@ -39,6 +39,7 @@ actions MkUpdateDb1
 {
 	sed \
 	-e "s,@bindir@,/bin," \
+	-e "s,/usr/bin,/boot/common/bin," \
 	-e "s,@libexecdir@,/bin," \
 	-e "s,@LOCATE_DB@,/var/locatedb," \
 	-e "s,@VERSION@,4.2.33," \
