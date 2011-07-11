@@ -230,6 +230,10 @@ struct PackageContentListHandler : BPackageContentHandler {
 				printf("\treplaces: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_INSTALL_PATH:
+				printf("\tinstall path: %s\n", value.string);
+				break;
+
 			default:
 				printf(
 					"*** Invalid package attribute section: unexpected "

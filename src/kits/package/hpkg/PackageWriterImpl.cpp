@@ -485,6 +485,16 @@ PackageWriterImpl::Init(const char* fileName, uint32 flags)
 }
 
 
+status_t
+PackageWriterImpl::SetInstallPath(const char* installPath)
+{
+	fInstallPath = installPath;
+	return installPath == NULL
+		|| (size_t)fInstallPath.Length() == strlen(installPath)
+		? B_OK : B_NO_MEMORY;
+}
+
+
 void
 PackageWriterImpl::SetCheckLicenses(bool checkLicenses)
 {
@@ -574,6 +584,8 @@ PackageWriterImpl::Finish()
 				B_HPKG_PACKAGE_INFO_FILE_NAME);
 			return B_BAD_DATA;
 		}
+
+		fPackageInfo.SetInstallPath(fInstallPath);
 
 		RegisterPackageInfo(PackageAttributes(), fPackageInfo);
 

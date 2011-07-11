@@ -60,6 +60,7 @@ static const char* kAttributeNames[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT + 1] = {
 	"package:provides.compatible",
 	"package:url",
 	"package:source-url",
+	"package:install-path",
 	NULL
 };
 
