@@ -82,7 +82,8 @@ private:
 			void				_ParseList(ListElementParser& elementParser,
 									bool allowSingleNonListElement);
 			void				_ParseStringList(BObjectList<BString>* value,
-									bool allowQuotedStrings = true);
+									bool allowQuotedStrings = true,
+									bool convertToLowerCase = false);
 			void				_ParseResolvableList(
 									BObjectList<BPackageResolvable>* value);
 			void				_ParseResolvableExprList(
@@ -449,16 +450,19 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 
 void
 BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
-	bool allowQuotedStrings)
+	bool allowQuotedStrings, bool convertToLowerCase)
 {
 	struct StringParser : public ListElementParser {
 		BObjectList<BString>* value;
 		bool allowQuotedStrings;
+		bool convertToLowerCase;
 
-		StringParser(BObjectList<BString>* value, bool allowQuotedStrings)
+		StringParser(BObjectList<BString>* value, bool allowQuotedStrings,
+			bool convertToLowerCase)
 			:
 			value(value),
-			allowQuotedStrings(allowQuotedStrings)
+			allowQuotedStrings(allowQuotedStrings),
+			convertToLowerCase(convertToLowerCase)
 		{
 		}
 
@@ -475,9 +479,13 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
 					throw ParseError("expected word", token.pos);
 			}
 
-			value->AddItem(new BString(token.text));
+			BString* element = new BString(token.text);
+			if (convertToLowerCase)
+				element->ToLower();
+
+			value->AddItem(element);
 		}
-	} stringParser(value, allowQuotedStrings);
+	} stringParser(value, allowQuotedStrings, convertToLowerCase);
 
 	_ParseList(stringParser, true);
 }
@@ -688,8 +696,12 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 
 		switch (attribute) {
 			case B_PACKAGE_INFO_NAME:
-				_ParseStringValue(&packageInfo->fName);
+			{
+				BString name;
+				_ParseStringValue(&name);
+				packageInfo->SetName(name);
 				break;
+			}
 
 			case B_PACKAGE_INFO_SUMMARY:
 			{
@@ -758,7 +770,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				break;
 
 			case B_PACKAGE_INFO_REPLACES:
-				_ParseStringList(&packageInfo->fReplacesList, false);
+				_ParseStringList(&packageInfo->fReplacesList, false, true);
 				break;
 
 			case B_PACKAGE_INFO_FLAGS:
@@ -1051,6 +1063,7 @@ void
 BPackageInfo::SetName(const BString& name)
 {
 	fName = name;
+	fName.ToLower();
 }
 
 
@@ -1298,6 +1311,7 @@ BPackageInfo::AddReplaces(const BString& replaces)
 	if (newReplaces == NULL)
 		return B_NO_MEMORY;
 
+	newReplaces->ToLower();
 	return fReplacesList.AddItem(newReplaces) ? B_OK : B_ERROR;
 }
 

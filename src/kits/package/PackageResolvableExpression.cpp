@@ -38,6 +38,7 @@ BPackageResolvableExpression::BPackageResolvableExpression(
 	fOperator(data.op),
 	fVersion(data.version)
 {
+	fName.ToLower();
 }
 
 
@@ -48,6 +49,7 @@ BPackageResolvableExpression::BPackageResolvableExpression(const BString& name,
 	fOperator(_operator),
 	fVersion(version)
 {
+	fName.ToLower();
 }
 
 
@@ -106,6 +108,8 @@ BPackageResolvableExpression::SetTo(const BString& name,
 	fName = name;
 	fOperator = _operator;
 	fVersion = version;
+
+	fName.ToLower();
 }
 
 
