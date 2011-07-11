@@ -40,9 +40,9 @@ mutex gUSBLock;
 
 // auto-release helper class
 class USBSmartLock {
-	public:
-		USBSmartLock()	{ mutex_lock(&gUSBLock);   }
-		~USBSmartLock()	{ mutex_unlock(&gUSBLock); }
+public:
+	USBSmartLock()	{ mutex_lock(&gUSBLock); }
+	~USBSmartLock()	{ mutex_unlock(&gUSBLock); }
 };
 
 
@@ -56,38 +56,35 @@ BeceemDevice::ReadRegister(unsigned int reg, size_t size, uint32_t* buffer)
 		return B_BAD_VALUE;
 	}
 
-	size_t		actualLength = 0;
-	int			retries = 0;
-	status_t	result = B_ERROR;
+	size_t actualLength = 0;
+	int retries = 0;
+	status_t result = B_ERROR;
 
 	do {
-			result =	gUSBModule->send_request(fDevice,
-							0xC0 | USB_REQTYPE_ENDPOINT_OUT, 0x02,
-							(reg & 0xFFFF),
-							((reg >> 16) & 0xFFFF),
-							size, buffer,
-							&actualLength);
-			retries++ ;
-			if (-ENODEV == result)
-			{
-				TRACE_ALWAYS("Error: Device was removed during USB read\n");
-				break;
-			}
+		result = gUSBModule->send_request(fDevice,
+			0xC0 | USB_REQTYPE_ENDPOINT_OUT, 0x02,
+			(reg & 0xFFFF),
+			((reg >> 16) & 0xFFFF),
+			size, buffer,
+			&actualLength);
+		retries++ ;
+		if (-ENODEV == result) {
+			TRACE_ALWAYS("Error: Device was removed during USB read\n");
+			break;
+		}
 
 	} while (result < 0 && retries < MAX_USB_IO_RETRIES);
 
 	if (result < 0) {
 		TRACE_ALWAYS("Error: USB read request failure."
-			" Result: %d; Attempt: %d.\n",
-			result, retries);
+			" Result: %d; Attempt: %d.\n", result, retries);
 		return result;
 	}
 
 
 	if (size != actualLength) {
 		TRACE_ALWAYS("Error: Size mismatch on USB read request."
-			" Asked: %d; Got: %d; Attempt: %d.\n",
-			size, actualLength, retries);
+			" Asked: %d; Got: %d; Attempt: %d.\n", size, actualLength, retries);
 	}
 
 	return result;
@@ -104,23 +101,22 @@ BeceemDevice::WriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
 		return B_BAD_VALUE;
 	}
 
-	size_t		actualLength = 0;
-	int			retries = 0;
-	status_t	result;
+	size_t actualLength = 0;
+	int	 retries = 0;
+	status_t result;
 
 	do {
-			result =	gUSBModule->send_request(fDevice,
-							0x40 | USB_REQTYPE_ENDPOINT_OUT, 0x01,
-							(reg & 0xFFFF),
-							((reg >> 16) & 0xFFFF),
-							size, buffer,
-							&actualLength);
-			retries++ ;
-			if (-ENODEV == result)
-			{
-				TRACE_ALWAYS("Error: Device was removed during USB write\n");
-				break;
-			}
+		result = gUSBModule->send_request(fDevice,
+			0x40 | USB_REQTYPE_ENDPOINT_OUT, 0x01,
+			(reg & 0xFFFF),
+			((reg >> 16) & 0xFFFF),
+			size, buffer,
+			&actualLength);
+		retries++ ;
+		if (-ENODEV == result) {
+			TRACE_ALWAYS("Error: Device was removed during USB write\n");
+			break;
+		}
 
 	} while (result < 0 && retries < MAX_USB_IO_RETRIES);
 
@@ -143,36 +139,38 @@ BeceemDevice::WriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
 
 
 status_t
-BeceemDevice::BizarroReadRegister(unsigned int reg, size_t size, uint32_t* buffer)
+BeceemDevice::BizarroReadRegister(unsigned int reg, size_t size,
+	uint32_t* buffer)
 {
 	// NET_TO_HOST long
 
 	// Read then flip
-	status_t	Status = ReadRegister(reg, size, buffer);
+	status_t status = ReadRegister(reg, size, buffer);
 
 	convertEndian(false, size, buffer);
 
-	return Status;
+	return status;
 }
 
 
 status_t
-BeceemDevice::BizarroWriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
+BeceemDevice::BizarroWriteRegister(unsigned int reg, size_t size,
+	uint32_t* buffer)
 {
 	// HOST_TO_NET long
 
-	volatile uint32_t       reload  =       *buffer;
+	volatile uint32_t reload = *buffer;
 
 	convertEndian(true, size, buffer);
 
-	status_t        Status = WriteRegister(reg, size, buffer);
+	status_t status = WriteRegister(reg, size, buffer);
 		// Flip then write
 
 	// as we modified the input data, and other things
 	// outside this function may need it, restore the original val.
 	*buffer = reload;
 
-	return Status;
+	return status;
 }
 
 
@@ -195,7 +193,7 @@ BeceemDevice::BeceemDevice(usb_device device, const char *description)
 	fHasConnection(false)
 {
 	const usb_device_descriptor
-			*deviceDescriptor = gUSBModule->get_device_descriptor(device);
+		*deviceDescriptor = gUSBModule->get_device_descriptor(device);
 
 	if (deviceDescriptor == NULL) {
 		TRACE_ALWAYS("Error of getting USB device descriptor.\n");
@@ -299,9 +297,8 @@ BeceemDevice::Open(uint32 flags)
 		return B_ERROR;
 
 	status_t result = StartDevice();
-	if (result != B_OK) {
+	if (result != B_OK)
 		return result;
-	}
 
 	// setup state notifications
 	result = gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
@@ -551,9 +548,8 @@ BeceemDevice::Control(uint32 op, void *buffer, size_t length)
 void
 BeceemDevice::Removed()
 {
-	fHasConnection	=	false;
-
-	pwmxdevice->driverHalt	=	true;
+	fHasConnection = false;
+	pwmxdevice->driverHalt = true;
 
 	TRACE("Debug: Pre InsideNotify\n");
 
@@ -594,37 +590,37 @@ BeceemDevice::IdentifyChipset()
 	}
 
 	switch(pwmxdevice->deviceChipID) {
-		case	T3:
+		case T3:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem T3 baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
 			break;
-		case	T3B:
+		case T3B:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem T3B baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
 			break;
-		case	T3LPB:
+		case T3LPB:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem T3LPB baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
 			break;
-		case	BCS250_BC:
+		case BCS250_BC:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem BC250_BC baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
 			break;
-		case	BCS220_2:
+		case BCS220_2:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem BCS220_2 baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
 			break;
-		case	BCS220_2BC:
+		case BCS220_2BC:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem BCS220_2BC baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
 			break;
-		case	BCS220_3:
+		case BCS220_3:
 			TRACE_ALWAYS(
 				"Info: Identified Beceem BCS220_3 baseband chipset (0x%x)\n",
 				pwmxdevice->deviceChipID);
@@ -643,9 +639,6 @@ BeceemDevice::IdentifyChipset()
 status_t
 BeceemDevice::SetupDevice(bool deviceReplugged)
 {
-	unsigned int	value			= 0;
-	unsigned long   dwReadValue     = 0;
-
 	pwmxdevice->driverState = STATE_INIT;
 
 	// ID the Beceem chipset
@@ -658,15 +651,14 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 	if (LoadConfig() != B_OK)
 		return B_ERROR;
 
-	if (pwmxdevice->deviceChipID >= T3LPB)
-	{
+	if (pwmxdevice->deviceChipID >= T3LPB) {
+		unsigned int value = 0;
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
-		pwmxdevice->syscfgBefFw		=	value;
-			if ((value & 0x60)== 0)
-			{
-				TRACE("Debug: CPU is FlashBoot\n");
-				pwmxdevice->CPUFlashBoot = true;
-			}
+		pwmxdevice->syscfgBefFw = value;
+		if ((value & 0x60) == 0) {
+			TRACE("Debug: CPU is FlashBoot\n");
+			pwmxdevice->CPUFlashBoot = true;
+		}
 	}
 
 	// take a quick break to let things settle
@@ -686,7 +678,7 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 		return B_ERROR;
 	} else {
 		TRACE("Debug: DDR Initialization successful.\n");
-		pwmxdevice->driverDDRinit	=	true;
+		pwmxdevice->driverDDRinit = true;
 	}
 
 	// Push vendor configuration to device
@@ -714,14 +706,13 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 
 	TRACE("Debug: Raw PARAM pointer: 0x%x\n", pwmxdevice->hwParamPtr);
 
-	if (pwmxdevice->hwParamPtr < DSD_START_OFFSET ||
-		pwmxdevice->hwParamPtr > pwmxdevice->nvmDSDSize - DSD_START_OFFSET)
-	{
+	if (pwmxdevice->hwParamPtr < DSD_START_OFFSET
+		|| pwmxdevice->hwParamPtr > pwmxdevice->nvmDSDSize - DSD_START_OFFSET) {
 		TRACE_ALWAYS("Error: DSD Status checksum mismatch\n");
 		return B_ERROR;
 	}
 
-	dwReadValue = pwmxdevice->hwParamPtr;
+	unsigned long dwReadValue = pwmxdevice->hwParamPtr;
 		// hw paramater pointer
 	dwReadValue = dwReadValue + DSD_START_OFFSET;
 		// add DSD start offset
@@ -752,14 +743,14 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 		CPURun();
 	}
 
-	ether_address	address;
+	ether_address address;
 
 	if (ReadMACFromNVM(&address) != B_OK)
 		return B_ERROR;
 
 	TRACE("MAC address is: %02x:%02x:%02x:%02x:%02x:%02x\n",
-				address.ebyte[0], address.ebyte[1], address.ebyte[2],
-				address.ebyte[3], address.ebyte[4], address.ebyte[5]);
+		address.ebyte[0], address.ebyte[1], address.ebyte[2],
+		address.ebyte[3], address.ebyte[4], address.ebyte[5]);
 
 	if (deviceReplugged) {
 		// this might be the same device that was replugged - read the
@@ -867,8 +858,8 @@ BeceemDevice::_SetupEndpoints()
 	}
 
 	int notifyEndpoint = -1;
-	int readEndpoint   = -1;
-	int writeEndpoint  = -1;
+	int readEndpoint = -1;
+	int writeEndpoint = -1;
 
 	for (size_t ep = 0; ep < interface->endpoint_count; ep++) {
 		usb_endpoint_descriptor *epd = interface->endpoint[ep].descr;
@@ -893,7 +884,7 @@ BeceemDevice::_SetupEndpoints()
 		} else if ((epd->attributes & USB_ENDPOINT_ATTR_MASK)
 			== USB_ENDPOINT_ATTR_ISOCHRONOUS) {
 			// Isochronous endpoint
-			// TODO : do we need the Isochronous USB endpoints this device provides?
+			// TODO : do we need the Isochronous USB endpoints?
 			// http://www.beyondlogic.org/usbnutshell/usb4.shtml#Isochronous
 		} else {
 			// Strange...
@@ -911,13 +902,13 @@ BeceemDevice::_SetupEndpoints()
 	}
 
 	TRACE("Debug: USB Endpoints configured: notify %d; read %d; write %d\n",
-				notifyEndpoint, readEndpoint, writeEndpoint);
+		notifyEndpoint, readEndpoint, writeEndpoint);
 
 	gUSBModule->set_configuration(fDevice, config);
 
 	fNotifyEndpoint = interface->endpoint[notifyEndpoint].handle;
-	fReadEndpoint   = interface->endpoint[readEndpoint  ].handle;
-	fWriteEndpoint  = interface->endpoint[writeEndpoint ].handle;
+	fReadEndpoint = interface->endpoint[readEndpoint].handle;
+	fWriteEndpoint = interface->endpoint[writeEndpoint].handle;
 
 	return B_OK;
 }
@@ -1014,39 +1005,35 @@ BeceemDevice::StartDevice()
 status_t
 BeceemDevice::LoadConfig()
 {
-	size_t			file_size = 0;
-	unsigned int*	buffer = 0;
-	struct stat		cfgStat;
-	int				dtaread = 0;
+	int	dtaread = 0;
 
 	int fh = open(FIRM_CFG, O_RDONLY);
 
+	struct stat cfgStat;
 	if (fh == B_ERROR || fstat(fh, &cfgStat) < 0) {
 		TRACE_ALWAYS("Error: Unable to open the configuration at %s\n", FIRM_CFG);
 		return fh;
 	}
 
-	file_size = cfgStat.st_size;
+	size_t file_size = cfgStat.st_size;
 
-	buffer=(unsigned int*)malloc(MAX_USB_TRANSFER);
+	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
 
 	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
 
-	dtaread = read(fh , buffer, MAX_USB_TRANSFER);
+	dtaread = read(fh, buffer, MAX_USB_TRANSFER);
 
-	if (dtaread < 0)
-	{
+	if (dtaread < 0) {
 		TRACE_ALWAYS("Error: Error reading from vendor configuration.\n");
 		close(fh);
 		free(buffer);
 		return B_ERROR;
 	}
 
-	if (file_size != sizeof(VENDORCFG))
-	{
+	if (file_size != sizeof(VENDORCFG)) {
 		TRACE_ALWAYS("Error: Size mismatch in vendor configuration struct!\n");
 		close(fh);
 		free(buffer);
@@ -1127,43 +1114,38 @@ BeceemDevice::DumpConfig()
 status_t
 BeceemDevice::PushConfig(unsigned int loc)
 {
-	size_t			file_size = 0;
-	unsigned int*	buffer = 0;
-	struct stat		cfgStat;
-	status_t		result;
-
-	int				chipwriteloc = 0;
-	int				readposition = 0;
-
 	int fh = open(FIRM_CFG, O_RDONLY);
 
+	struct stat cfgStat;
 	if (fh == B_ERROR || fstat(fh, &cfgStat) < 0) {
-		TRACE_ALWAYS("Error: Unable to open the configuration at %s\n", FIRM_CFG);
+		TRACE_ALWAYS("Error: Unable to open the configuration at %s\n",
+			FIRM_CFG);
 		return fh;
 	}
 
-	file_size = cfgStat.st_size;
+	size_t file_size = cfgStat.st_size;
 
 	TRACE_ALWAYS("Info: Vendor configuration to be pushed to 0x%x on device.\n",
 		loc);
 
-	buffer=(unsigned int*)malloc(MAX_USB_TRANSFER);
+	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
 
 	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
 
+	int chipwriteloc = 0;
+	int readposition = 0;
+	status_t result;
+
 	// We have to spoon feed the data to the usb device as it is probbably too
 	// much to be written in one go.
-	while (1)
-	{
-		readposition = read(fh , buffer, MAX_USB_TRANSFER);
+	while (1) {
+		readposition = read(fh, buffer, MAX_USB_TRANSFER);
 
-		if (readposition <= 0)
-		{
-			if (readposition < 0)
-			{
+		if (readposition <= 0) {
+			if (readposition < 0) {
 				TRACE_ALWAYS("Error: Error reading firmware.\n");
 				result = B_ERROR;
 			} else {
@@ -1179,23 +1161,22 @@ BeceemDevice::PushConfig(unsigned int loc)
 
 		// As readposition should always be less then MAX_USB_TRANSFER
 		// and we have checked the validity of read's output above.
-		if (WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK)
-		{
+		if (WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK) {
 			TRACE_ALWAYS("Write failure\n");
 			result = B_ERROR;
 			break;
 		}
 
 		// +1 as we don't want to write the same sector twice
-		chipwriteloc += (MAX_USB_TRANSFER+1);
+		chipwriteloc += MAX_USB_TRANSFER + 1;
 	}
 
 	close(fh);
 	free(buffer);
 
-	if (result < 0)
-	{
-		TRACE_ALWAYS("Error: Push of vendor configuration failed :%d\n", result);
+	if (result < 0) {
+		TRACE_ALWAYS("Error: Push of vendor configuration failed: %d\n",
+			result);
 		return B_ERROR;
 	} else {
 		TRACE_ALWAYS("Info: Push of vendor configuration was successful.\n");
@@ -1207,16 +1188,9 @@ BeceemDevice::PushConfig(unsigned int loc)
 status_t
 BeceemDevice::PushFirmware(unsigned int loc)
 {
-	size_t			file_size = 0;
-	int				chipwriteloc = 0;
-	int				readposition = 0;
-
-	unsigned int* 	buffer = 0;
-	struct stat 	firmStat;
-	status_t		result;
-
 	int fh = open(FIRM_BIN, O_RDONLY);
 
+	struct stat firmStat;
 	if (fh == B_ERROR || fstat(fh, &firmStat) < 0) {
 		TRACE_ALWAYS("Error: Unable to open the firmware at %s\n", FIRM_BIN);
 		return fh;
@@ -1226,36 +1200,37 @@ BeceemDevice::PushFirmware(unsigned int loc)
 	// The size of the firmware can very slightly
 	//   CLEAR 1900 Beceem firmware is 2018596
 	//   Sprint 1901 Beceem firmware is 2028080
-	file_size = firmStat.st_size;
+	size_t file_size = firmStat.st_size;
 
 	TRACE_ALWAYS("Info: %ld byte firmware to be pushed to 0x%x on device.\n",
 		file_size, loc);
 
 	// For the push we load the file into the buffer
-	buffer=(unsigned int*)malloc(MAX_USB_TRANSFER);
+	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
 
 	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
 
-	// TODO : Firmware Download : investigate this, SHADOW clearing thing causes a KDL atm
+	// TODO : Firmware Download : investigate this, SHADOW clearing causes a KDL
 	#if 0
 	// Clear the NVM SHADOW signature always before fw download.
 	WriteRegister(EEPROM_CAL_DATA_INTERNAL_LOC-4, 1, 0);
 	WriteRegister(EEPROM_CAL_DATA_INTERNAL_LOC-8, 1, 0);
 	#endif
 
+	int chipwriteloc = 0;
+	int readposition = 0;
+	status_t result;
+
 	// We have to spoon feed the data to the usb device as it is probbably too
 	// much to be written in one go.
-	while (1)
-	{
-		readposition = read(fh , buffer, MAX_USB_TRANSFER);
+	while (1) {
+		readposition = read(fh, buffer, MAX_USB_TRANSFER);
 
-		if (readposition <= 0)
-		{
-			if (readposition < 0)
-			{
+		if (readposition <= 0) {
+			if (readposition < 0) {
 				TRACE_ALWAYS("Error: Error reading firmware.\n");
 				result = B_ERROR;
 			} else {
@@ -1271,22 +1246,20 @@ BeceemDevice::PushFirmware(unsigned int loc)
 
 		// As readposition should always be less then MAX_USB_TRANSFER
 		// and we have checked the validity of read's output above.
-		if (WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK)
-		{
+		if (WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK) {
 			TRACE_ALWAYS("Write failure\n");
 			result = B_ERROR;
 			break;
 		}
 
 		// +1 as we don't want to write the same sector twice
-		chipwriteloc += (MAX_USB_TRANSFER+1);
+		chipwriteloc += MAX_USB_TRANSFER + 1;
 	}
 
 	free(buffer);
 	close(fh);
 
-	if (result != B_OK)
-	{
+	if (result != B_OK) {
 		TRACE_ALWAYS("Error: Push of firmware to device failed :%d\n",
 			result);
 		return B_ERROR;
@@ -1323,13 +1296,13 @@ BeceemDevice::GetLinkState(ether_link_state *linkState)
 	linkState->media = IFM_ETHER | IFM_100_TX;
 
 	if (fHasConnection == false) {
-		linkState->quality	=	0;
-		linkState->speed	=	100000000;
+		linkState->quality = 0;
+		linkState->speed = 100000000;
 	} else {
-		linkState->quality	=	1.0;
-		linkState->media	|=	IFM_ACTIVE;
+		linkState->quality = 1.0;
+		linkState->media |= IFM_ACTIVE;
 		// 40Mbits is the maximum theoretical speed for a 802.16e connection.
-		linkState->speed	=	100000000;
+		linkState->speed = 100000000;
 	}
 
 	return B_OK;
