@@ -23,6 +23,7 @@ public:
 	virtual	void				RemovePackageNode(PackageNode* packageNode) = 0;
 
 	virtual	PackageNode*		GetPackageNode() = 0;
+	virtual	bool				IsOnlyPackageNode(PackageNode* node) const = 0;
 };
 
 

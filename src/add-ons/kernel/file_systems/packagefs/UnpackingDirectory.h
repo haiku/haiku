@@ -28,6 +28,7 @@ public:
 	virtual	void				RemovePackageNode(PackageNode* packageNode);
 
 	virtual	PackageNode*		GetPackageNode();
+	virtual	bool				IsOnlyPackageNode(PackageNode* node) const;
 
 	virtual	status_t			OpenAttributeDirectory(
 									AttributeDirectoryCookie*& _cookie);
