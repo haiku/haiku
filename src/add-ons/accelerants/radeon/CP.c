@@ -329,7 +329,10 @@ void Radeon_SendIndirectBuffer( accelerator_info *ai,
 	// flush writes to CP buffers
 	// (this code is a bit of a overkill - currently, only some WinChip/Cyrix 
 	//  CPU's support out-of-order writes, but we are prepared)
+	// TODO : Other Architectures? PowerPC?
+	#if defined(__x86__) || defined(__x86_64__)
 	__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory");
+	#endif
 	// make sure the motherboard chipset has flushed its write buffer by
 	// reading some uncached memory
 	//(void)*(volatile int *)si->framebuffer;
