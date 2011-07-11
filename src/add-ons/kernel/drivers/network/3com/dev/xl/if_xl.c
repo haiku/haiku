@@ -2244,6 +2244,8 @@ xl_intr(void *arg)
 #ifndef __HAIKU__
 	while ((status = CSR_READ_2(sc, XL_STATUS)) & XL_INTRS &&
 	    status != 0xFFFF) {
+		CSR_WRITE_2(sc, XL_COMMAND,
+		    XL_CMD_INTR_ACK|(status & XL_INTRS));
 #else
 	status = atomic_get((int32 *)&sc->xl_intr_status);
 	while (true) {
