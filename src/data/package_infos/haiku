@@ -1,4 +1,4 @@
-name 			Haiku
+name 			haiku
 version			R1-alpha3_pm-1
 architecture	x86_gcc2
 summary			"The Haiku base system"
