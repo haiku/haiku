@@ -44,6 +44,9 @@ public:
 			status_t			SetName(const char* name);
 			const char*			Name() const		{ return fName; }
 
+			status_t			SetInstallPath(const char* installPath);
+			const char*			InstallPath() const	{ return fInstallPath; }
+
 			void				SetVersion(::Version* version);
 									// takes over object ownership
 			::Version*			Version() const
@@ -83,6 +86,7 @@ private:
 			PackageDomain*		fDomain;
 			char*				fFileName;
 			char*				fName;
+			char*				fInstallPath;
 			::Version*			fVersion;
 			BPackageArchitecture fArchitecture;
 			PackageLinkDirectory* fLinkDirectory;

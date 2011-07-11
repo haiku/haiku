@@ -92,8 +92,11 @@ PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 	OldAttributes oldAttributes(fModifiedTime, FileSize());
 
 	if (package != NULL) {
-		fLinkPath = link_path_for_mount_type(
-			package->Domain()->Volume()->MountType());
+		fLinkPath = package->InstallPath();
+		if (fLinkPath == NULL) {
+			fLinkPath = link_path_for_mount_type(
+				package->Domain()->Volume()->MountType());
+		}
 	} else
 		fLinkPath = kUnknownLinkTarget;
 
