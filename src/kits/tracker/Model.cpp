@@ -320,16 +320,14 @@ Model::CompareFolderNamesFirst(const Model *compareModel) const
 	const Model *resolvedCompareModel = compareModel->ResolveIfLink();
 	const Model *resolvedMe = ResolveIfLink();
 
-	if (resolvedMe->IsVolume()) {
-		if (!resolvedCompareModel->IsVolume())
-			return -1;
-	} else if (resolvedCompareModel->IsVolume())
-		return 1;
+	bool meIsDirOrVolume = resolvedMe->IsDirectory() || resolvedMe->IsVolume();
+	bool otherIsDirOrVolume = resolvedCompareModel->IsDirectory()
+		|| resolvedCompareModel->IsVolume();
 
-	if (resolvedMe->IsDirectory()) {
-		if (!resolvedCompareModel->IsDirectory())
+	if (meIsDirOrVolume) {
+		if (!otherIsDirOrVolume)
 			return -1;
-	} else if (resolvedCompareModel->IsDirectory())
+	} else if (otherIsDirOrVolume)
 		return 1;
 
 	return NaturalCompare(Name(), compareModel->Name());
