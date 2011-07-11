@@ -132,6 +132,14 @@ UnpackingDirectory::GetPackageNode()
 }
 
 
+bool
+UnpackingDirectory::IsOnlyPackageNode(PackageNode* node) const
+{
+	return node == fPackageDirectories.Head()
+		&& node == fPackageDirectories.Tail();
+}
+
+
 status_t
 UnpackingDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {

@@ -31,6 +31,7 @@ public:
 	virtual	void				RemovePackageNode(PackageNode* packageNode);
 
 	virtual	PackageNode*		GetPackageNode();
+	virtual	bool				IsOnlyPackageNode(PackageNode* node) const;
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);

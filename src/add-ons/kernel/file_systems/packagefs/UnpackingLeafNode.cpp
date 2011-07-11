@@ -156,6 +156,14 @@ UnpackingLeafNode::GetPackageNode()
 }
 
 
+bool
+UnpackingLeafNode::IsOnlyPackageNode(PackageNode* node) const
+{
+	PackageLeafNode* head = fPackageNodes.Head();
+	return node == head && fPackageNodes.GetNext(head) == NULL;
+}
+
+
 status_t
 UnpackingLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 {
