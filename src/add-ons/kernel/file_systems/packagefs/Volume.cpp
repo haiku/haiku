@@ -291,6 +291,9 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 			case B_PACKAGE_INFO_NAME:
 				return fPackage->SetName(value.string);
 
+			case B_PACKAGE_INFO_INSTALL_PATH:
+				return fPackage->SetInstallPath(value.string);
+
 			case B_PACKAGE_INFO_VERSION:
 			{
 				Version* version;

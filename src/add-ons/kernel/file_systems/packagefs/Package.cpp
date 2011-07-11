@@ -31,6 +31,7 @@ Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
 	fDomain(domain),
 	fFileName(NULL),
 	fName(NULL),
+	fInstallPath(NULL),
 	fVersion(NULL),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fLinkDirectory(NULL),
@@ -56,6 +57,7 @@ Package::~Package()
 
 	free(fFileName);
 	free(fName);
+	free(fInstallPath);
 	delete fVersion;
 
 	mutex_destroy(&fLock);
@@ -81,6 +83,20 @@ Package::SetName(const char* name)
 
 	fName = strdup(name);
 	if (fName == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	return B_OK;
+}
+
+
+status_t
+Package::SetInstallPath(const char* installPath)
+{
+	if (fInstallPath != NULL)
+		free(fInstallPath);
+
+	fInstallPath = strdup(installPath);
+	if (fInstallPath == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
 	return B_OK;
