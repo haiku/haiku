@@ -429,8 +429,8 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.5-1-gcc2_x86.hpkg
-				: $(hpkgBaseURL)/cmake-2.8.5-1-gcc2_x86.hpkg
+				cmake-2.8.5-2-gcc2_x86.hpkg
+				: $(hpkgBaseURL)/cmake-2.8.5-2-gcc2_x86.hpkg
 				: common packages ;
 		}
 	}
@@ -629,9 +629,9 @@ if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				doxygen-1.6.3-x86-gcc2-2010-05-17.zip
-				: $(baseURL)/doxygen-1.6.3-x86-gcc2-2010-05-17.zip
-				: : true ;
+				doxygen-1.6.3-1-gcc2_x86.hpkg
+				: $(hpkgBaseURL)/doxygen-1.6.3-1-gcc2_x86.hpkg
+				: common packages ;
 		}
 	}
 }
