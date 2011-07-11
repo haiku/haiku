@@ -234,7 +234,11 @@ static status_t initGATT( GART_info *gart )
 	// back to real live - some chipsets have write buffers that
 	// proove all previous assumptions wrong
 	// (don't know whether this really helps though)
+	#if defined(__x86__) || defined(__x86_64__)
 	asm volatile ( "wbinvd" ::: "memory" );
+	#elif defined(__powerpc__)
+	// TODO : icbi on PowerPC to flush instruction cache?
+	#endif
 	return B_OK;
 }
 
