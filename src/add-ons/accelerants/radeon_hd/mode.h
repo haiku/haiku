@@ -13,6 +13,7 @@
 #include <ddc.h>
 #include <edid.h>
 
+#include "mc.h"
 
 #define T_POSITIVE_SYNC (B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 

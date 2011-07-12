@@ -13,6 +13,7 @@
 
 #include "utility.h"
 #include "pll.h"
+#include "mc.h"
 
 #include <errno.h>
 #include <stdlib.h>

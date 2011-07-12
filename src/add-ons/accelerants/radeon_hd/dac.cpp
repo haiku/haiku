@@ -375,3 +375,16 @@ DACPower(uint8 dacIndex, int mode)
 		DACPowerModern(dacIndex, mode);
 }
 
+
+void
+DACAllIdle()
+{
+	// This really doesn't do anything on DAC monitors
+	// Implimented for completeness
+	uint8 i;
+
+	for (i = 0; i < 2; i++) {
+		DACPower(i, RHD_POWER_RESET);
+	}
+}
+

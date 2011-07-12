@@ -26,6 +26,7 @@ bool DACSense(uint8 dacIndex);
 void DACGetElectrical(uint8 type, uint8 dac, uint8 *bandgap, uint8 *whitefine);
 void DACSet(uint8 dacIndex, uint32 crtid);
 void DACPower(uint8 dacIndex, int mode);
+void DACAllIdle();
 
 
 #endif

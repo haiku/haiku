@@ -149,6 +149,17 @@ CardFBSet(display_mode *mode)
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
+	#if 0
+	// TMDSAllIdle	// DVI / HDMI
+	// LVTMAAllIdle	// DVI
+	DACAllIdle();
+
+	// Set the inital frame buffer location in the memory controler
+	uint32 mcFbSize;
+	MCFBLocation(0, &mcFbSize);
+	MCFBSetup(Read32(OUT, R6XX_CONFIG_FB_BASE), mcFbSize);
+	#endif
+
 	Write32(CRT, gRegister->grphUpdate, (1<<16));
 		// Lock for update (isn't this normally the other way around on VGA?
 
@@ -316,11 +327,13 @@ radeon_set_display_mode(display_mode *mode)
 
 	init_registers(crtNumber);
 
-	// TODO : this obviously breaks horribly on attached multiple outputs
+	// TODO Populate gCRT with interface connection
 	if (DACSense(0))
 		dacNumber = 0;
 	else if (DACSense(1))
 		dacNumber = 1;
+
+	TMDSSense(0);	// DVI / HDMI
 
 	CardFBSet(mode);
 	CardModeSet(mode);
