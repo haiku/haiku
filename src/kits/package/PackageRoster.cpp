@@ -139,7 +139,7 @@ BPackageRoster::GetRepositoryCache(const BString& name,
 	if (repoCacheEntry.Exists())
 		return repositoryCache->SetTo(repoCacheEntry);
 
-	if ((result = GetCommonRepositoryCachePath(&path)) != B_OK)
+	if ((result = GetCommonRepositoryCachePath(&path, true)) != B_OK)
 		return result;
 	path.Append(name.String());
 
@@ -166,7 +166,7 @@ BPackageRoster::GetRepositoryConfig(const BString& name,
 	if (repoConfigEntry.Exists())
 		return repositoryConfig->SetTo(repoConfigEntry);
 
-	if ((result = GetCommonRepositoryConfigPath(&path)) != B_OK)
+	if ((result = GetCommonRepositoryConfigPath(&path, true)) != B_OK)
 		return result;
 	path.Append(name.String());
 
