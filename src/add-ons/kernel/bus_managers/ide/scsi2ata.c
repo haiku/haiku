@@ -8,7 +8,7 @@
 /*
 	Part of Open IDE bus manager
 
-	Converts SCSI commands to ATA commands. 
+	Converts SCSI commands to ATA commands.
 */
 
 
@@ -63,7 +63,7 @@ ata_mode_sense_10(ide_device_info *device, ide_qrequest *qrequest)
 	copy_sg_data(request, 0, allocationLength, &param_header,
 		sizeof(param_header), false);
 
-	/*block_desc = (scsi_mode_param_block_desc *)(request->data 
+	/*block_desc = (scsi_mode_param_block_desc *)(request->data
 		+ sizeof(*param_header));*/
 	memset(&block_desc, 0, sizeof(block_desc));
 	// density is reserved (0), descriptor apply to entire medium (num_blocks=0)
@@ -75,16 +75,16 @@ ata_mode_sense_10(ide_device_info *device, ide_qrequest *qrequest)
 	copy_sg_data(request, sizeof(param_header), allocationLength,
 		&block_desc, sizeof(block_desc), false);
 
-	/*contr = (scsi_modepage_contr *)(request->data 
+	/*contr = (scsi_modepage_contr *)(request->data
 		+ sizeof(*param_header)
-		+ ((uint16)param_header->high_block_desc_len << 8) 
+		+ ((uint16)param_header->high_block_desc_len << 8)
 		+ param_header->low_block_desc_len);*/
 
 	memset(&control, 0, sizeof(control));
 	control.RLEC = false;
 	control.DQue = !device->CQ_enabled;
 	control.QErr = false;
-		// when a command fails we requeue all 
+		// when a command fails we requeue all
 		// lost commands automagically
 	control.QAM = SCSI_QAM_UNRESTRICTED;
 
@@ -150,7 +150,7 @@ ata_mode_select_10(ide_device_info *device, ide_qrequest *qrequest)
 	modepageOffset = sizeof(param_header)
 		+ B_BENDIAN_TO_HOST_INT16(param_header.block_desc_length);
 
-	// go through list of pages		
+	// go through list of pages
 	while (modepageOffset < totalLength) {
 		uint32 pageLength;
 
@@ -211,7 +211,7 @@ ata_test_unit_ready(ide_device_info *device, ide_qrequest *qrequest)
 		|| device->infoblock._127_RMSN_support != 1)
 		return true;
 
-	// ask device about status		
+	// ask device about status
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
@@ -244,7 +244,7 @@ ata_flush_cache(ide_device_info *device, ide_qrequest *qrequest)
 		return true;
 
 	device->tf_param_mask = 0;
-	device->tf.lba.command = device->use_48bits ? IDE_CMD_FLUSH_CACHE_EXT 
+	device->tf.lba.command = device->use_48bits ? IDE_CMD_FLUSH_CACHE_EXT
 		: IDE_CMD_FLUSH_CACHE;
 
 	// spec says that this may take more then 30s, how much more?
@@ -335,9 +335,9 @@ ata_inquiry(ide_device_info *device, ide_qrequest *qrequest)
 	data.relative_address = false;
 
 	// the following fields are *much* to small, sigh...
-	memcpy(data.vendor_ident, device->infoblock.model_number, 
+	memcpy(data.vendor_ident, device->infoblock.model_number,
 		sizeof(data.vendor_ident));
-	memcpy(data.product_ident, device->infoblock.model_number + 8, 
+	memcpy(data.product_ident, device->infoblock.model_number + 8,
 		sizeof(data.product_ident));
 	memcpy(data.product_rev, "    ", sizeof(data.product_rev));
 
@@ -380,9 +380,9 @@ void
 ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 {
 	scsi_ccb *request = qrequest->request;
-	
+
 	SHOW_FLOW(3, "command=%x", request->cdb[0]);
-		
+
 	// ATA devices have one LUN only
 	if (request->target_lun != 0) {
 		request->subsys_status = SCSI_SEL_TIMEOUT;
@@ -392,7 +392,7 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 
 	// starting a request means deleting sense, so don't do it if
 	// the command wants to read it
-	if (request->cdb[0] != SCSI_OP_REQUEST_SENSE)	
+	if (request->cdb[0] != SCSI_OP_REQUEST_SENSE)
 		start_request(device, qrequest);
 
 	switch (request->cdb[0]) {
@@ -412,7 +412,7 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
-		case SCSI_OP_INQUIRY: 
+		case SCSI_OP_INQUIRY:
 			ata_inquiry(device, qrequest);
 			break;
 
@@ -466,14 +466,14 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 			read_capacity(device, qrequest);
 			break;
 
-		case SCSI_OP_VERIFY:
+		case SCSI_OP_VERIFY_6:
 			// does anyone uses this function?
 			// effectly, it does a read-and-compare, which IDE doesn't support
 			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
 		case SCSI_OP_SYNCHRONIZE_CACHE:
-			// we ignore range and immediate bit, we always immediately flush everything 
+			// we ignore range and immediate bit, we always immediately flush everything
 			ata_flush_cache(device, qrequest);
 			break;
 
