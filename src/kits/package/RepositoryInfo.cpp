@@ -55,7 +55,7 @@ BRepositoryInfo::BRepositoryInfo(BMessage* data)
 
 BRepositoryInfo::BRepositoryInfo(const BEntry& entry)
 {
-	SetTo(entry);
+	fInitStatus = SetTo(entry);
 }
 
 
