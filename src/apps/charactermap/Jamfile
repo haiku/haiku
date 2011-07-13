@@ -19,6 +19,7 @@ DoCatalogs CharacterMap :
     x-vnd.Haiku-CharacterMap
     :
 	CharacterMap.cpp
+	CharacterView.cpp
 	CharacterWindow.cpp
 	UnicodeBlocks.cpp
 ;
