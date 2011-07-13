@@ -1,8 +1,11 @@
-1	swedish	x-vnd.Haiku-Appearance	3187486915
+1	swedish	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		Om
+About Decerator	DecorSettingsView		Om Dekor
 Antialiasing	APRWindow		Kantutjämning
 Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
 Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Appearance	System name		Utseende
+Choose Decorator	DecorSettingsView		Välj dekor
 Colors	APRWindow		Färger
 Control background	Colors tab		Kontrollbakgrund
 Control border	Colors tab		Kontrollkant
@@ -23,6 +26,7 @@ Menu item text	Colors tab		Menyalternativstext
 Monospaced fonts only	AntialiasingSettingsView		Endast typsnitt med fast bredd
 Navigation base	Colors tab		Navigeringsbas
 Navigation pulse	Colors tab		Navigeringspuls
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		Av
 On	AntialiasingSettingsView		På
 Panel background	Colors tab		Panelbakgrund
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Framgång
 Tooltip background	Colors tab		Hjälprutsbakgrund
 Tooltip text	Colors tab		Hjälprutstext
+Window Decorator	APRWindow		Fönsterdekor
+Window Decorator:	DecorSettingsView		Fönsterdekor
 Window tab	Colors tab		Fösterflik
 Window tab text	Colors tab		Fönsterflik text

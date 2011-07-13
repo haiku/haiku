@@ -1,27 +1,51 @@
-1	swedish	x-vnd.Haiku-Mail	2389972088
+1	swedish	x-vnd.Haiku-Mail	1746145370
 Account name:	Config Views		Kontonamn:
+Account name:	E-Mail		Kontonamn:
+Account settings	AutoConfigWindow		Kontoinställningar
 Account settings	Config Views		Kontoinställningar
 Accounts	Config Window		Konton
 Add	Config Window		Lägg till
+Add filter	Config Views		Lägg till filter
 Always	Config Window		Alltid
 Apply	Config Window		Verkställ
+Back	AutoConfigWindow		Tillbaka
 Check every	Config Window		Kontrollera varje
+Choose Protocol	E-Mail		Välj protokoll
+Create new account	AutoConfigWindow		Skapa konto
 E-mail	System name		E-post
+E-mail address:	E-Mail		E-postadress:
 Edit mailbox menu…	Config Window		Redigera e-postmeny...
+Enter a valid e-mail address.	AutoConfigWindow		Ange en giltig e-postadress.
 Error	Config Window		Fel
 Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
+Finish	AutoConfigWindow		Slutför
+Incoming	Config Window		Inkommande
+Incoming	E-Mail		Inkommande
+Incoming mail filters	Config Views		Inkommande e-postfilter
+Login name:	E-Mail		Inloggningsnamn:
 Mail checking	Config Window		Kontrollera e-post
 Miscellaneous	Config Window		Diverse
+Next	AutoConfigWindow		Nästa
+OK	AutoConfigWindow		OK
+OK	Config Views		OK
 OK	Config Window		OK
 Only when dial-up is connected	Config Window		Endast när uppringd förbindelse är uppkopplad
+Outgoing	Config Window		Utgående
+Outgoing	E-Mail		Utgående
+Outgoing mail filters	Config Views		Utgående e-postfilter
+Password:	E-Mail		Lösenord:
 Real name:	Config Views		Verkligt namn:
+Real name:	E-Mail		Verkligt namn:
+Remove	Config Views		Ta bort
 Remove	Config Window		Ta bort
 Return address:	Config Views		Svarsadress:
 Revert	Config Window		Återgå
 Schedule outgoing mail when dial-up is disconnected	Config Window		Schemalägg utgående e-post när uppringning är nerkopplad
+Server Name:	E-Mail		Servernamn:
 Settings	Config Window		Inställningar
 Show connection status window:	Config Window		Visa anslutningsstatusfönster:
 Start mail services on startup	Config Window		Starta e-posttjänster vid start
+The filter could not be moved. Deleting filter.	Config Views		Filtret kunde inte flyttas. Tar bort filtret.
 While sending	Config Window		När sändning sker
 While sending and receiving	Config Window		När sändning och mottagning sker
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n

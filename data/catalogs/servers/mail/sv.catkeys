@@ -1,18 +1,22 @@
-1	swedish	x-vnd.Haiku-mail_daemon	1380020630
+1	swedish	x-vnd.Be-POST	2900218551
+%num new message	DeskbarView		%num nytt meddelande
+%num new message for %name\n	MailDaemon		%num nytt meddelande för %name\n
+%num new message.	MailDaemon		%num nytt meddelande.
+%num new messages	DeskbarView		%num nya meddelanden
+%num new messages for %name\n	MailDaemon		%num nya meddelanden för %name\n
+%num new messages.	MailDaemon		%num nya meddelanden.
 <no accounts>	DeskbarView		<inga konton>
 Check for mail now	DeskbarView		Kontrollera e-post nu
 Check for mails only	DeskbarView		Kontrollera bara e-post
 Check mail now	StatusWindow		Kontrollera e-post nu
 Create new message…	DeskbarView		Skapa nytt meddelande...
+Mail Status	MailDaemon		E-post status
+Mail daemon status log	MailDaemon		Statuslog för e-postdemon
 New Messages	MailDaemon		nya meddelanden
 No new messages	DeskbarView		inga nya meddelanden
-No new messages	MailDaemon		Inga nya meddelanden
-No new messages.	MailDaemon		Inga nya meddelanden.
-No new messages.	StatusWindow		Inga nya meddelanden.
+No new messages	MailDaemon		inga nya meddelanden
+No new messages.	MailDaemon		inga nya meddelanden.
+No new messages.	StatusWindow		inga nya meddelanden.
 Preferences…	DeskbarView		Inställningar...
 Send pending mails	DeskbarView		Skicka väntande meddelanden
 Shutdown mail services	DeskbarView		Stäng av e-posttjänsterna
-new message	DeskbarView		nytt meddelande
-new message.	MailDaemon		nytt meddelande.
-new messages	DeskbarView		nya meddelanden
-new messages.	MailDaemon		nya meddelanden.

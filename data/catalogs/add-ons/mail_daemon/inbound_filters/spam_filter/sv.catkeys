@@ -1,0 +1,5 @@
+1	swedish	x-vnd.Haiku-SpamFilter	3701267948
+Close	SpamFilterConfig		Stäng
+Learn from all incoming e-mail	SpamFilterConfig		Lär från all inkommande e-post
+Spam Filter (AGMS Bayesian)	SpamFilter		Skräppostfilter (AGMS Bayesian)
+Spam above:	SpamFilterConfig		Skräppost över:

@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Be-TSKB	1962084612
+1	swedish	x-vnd.Be-TSKB	4265681964
 <Be folder is empty>	BeMenu		<mappen är tom>
-About Haiku	BeMenu		Om Haiku
+About this system	BeMenu		Om Haiku
 Always on top	PreferencesWindow		Alltid överst
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
 Applications	PreferencesWindow		Program
+Auto-hide	PreferencesWindow		Dölj automatiskt
 Auto-raise	PreferencesWindow		Höj fönstret vid närkontakt
 Change time…	TimeView		Ställ in tid...
 Clock	PreferencesWindow		Klocka
