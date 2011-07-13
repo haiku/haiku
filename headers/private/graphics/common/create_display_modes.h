@@ -23,6 +23,8 @@ area_id create_display_modes(const char* name, edid1_info* edid,
 	const color_space* spaces, uint32 spacesCount,
 	check_display_mode_hook hook, display_mode** _modes, uint32* _count);
 
+void fill_display_mode(display_mode* mode);
+
 #ifdef __cplusplus
 }
 #endif

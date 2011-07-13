@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010, Haiku, Inc.
+ * Copyright 2005-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -1617,7 +1617,7 @@ AboutView::_CreateCreditsView()
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING
 			"1999-2010 by the authors of Gutenprint. All rights reserved."))
 		.SetLicense("GNU GPL v2")
-		.SetURL("http://gutenprint.sourceforge.net"));
+		.SetURL("http://gutenprint.sourceforge.net/"));
 
 	// libwebp
 	_AddPackageCredit(PackageCredit("libwebp")
@@ -1625,6 +1625,13 @@ AboutView::_CreateCreditsView()
 			"2010-2011 Google Inc. All rights reserved."))
 		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://www.webmproject.org/code/#libwebp_webp_image_library"));
+
+	// GTF
+	_AddPackageCredit(PackageCredit("GTF")
+		.SetCopyright(B_TRANSLATE("2001 by Andy Ritger based on the "
+			"Generalized Timing Formula"))
+		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
+		.SetURL("http://gtf.sourceforge.net/"));
 
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();

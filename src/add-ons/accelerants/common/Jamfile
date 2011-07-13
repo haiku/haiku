@@ -7,6 +7,7 @@ UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 StaticLibrary libaccelerantscommon.a :
+	compute_display_timing.cpp
 	create_display_modes.cpp
 	ddc.c
 	decode_edid.c

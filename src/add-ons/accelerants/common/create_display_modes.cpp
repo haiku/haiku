@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <compute_display_timing.h>
 #include <video_overlay.h>
 
 
@@ -80,29 +81,33 @@ namespace BPrivate {
 
 class ModeList {
 public:
-	ModeList();
-	~ModeList();
+								ModeList();
+								~ModeList();
 
-	bool AddModes(edid1_info* info);
-	bool AddModes(const display_mode* modes, uint32 count);
+			bool				AddModes(edid1_info* info);
+			bool				AddModes(const display_mode* modes,
+									uint32 count);
 
-	bool CreateColorSpaces(const color_space* spaces, uint32 count);
-	void Filter(check_display_mode_hook hook);
-	void Clean();
+			bool				CreateColorSpaces(const color_space* spaces,
+									uint32 count);
+			void				Filter(check_display_mode_hook hook);
+			void				Clean();
 
-	const display_mode* Modes() const { return fModes; }
-	uint32 Count() const { return fCount; }
+			const display_mode*	Modes() const { return fModes; }
+			uint32				Count() const { return fCount; }
 
 private:
-	bool _MakeSpace(uint32 count);
-	bool _AddMode(const display_mode* mode);
-	void _RemoveModeAt(uint32 index);
-	void _AddBaseMode(uint16 width, uint16 height, uint32 refresh);
-	display_mode* _FindMode(uint16 width, uint16 height) const;
+			bool				_MakeSpace(uint32 count);
+			bool				_AddMode(const display_mode& mode);
+			void				_RemoveModeAt(uint32 index);
+			void				_AddBaseMode(uint16 width, uint16 height,
+									uint32 refresh);
+			display_mode*		_FindMode(uint16 width, uint16 height) const;
 
-	display_mode*	fModes;
-	uint32			fCount;
-	uint32			fCapacity;
+private:
+			display_mode*		fModes;
+			uint32				fCount;
+			uint32				fCapacity;
 };
 
 }	// namespace BPrivate
@@ -271,7 +276,7 @@ ModeList::AddModes(edid1_info* info)
 		mode.v_display_start = 0;
 		mode.flags = MODE_FLAGS;
 
-		_AddMode(&mode);
+		_AddMode(mode);
 	}
 
 	// Add other modes from the base list that satisfy the display's
@@ -301,7 +306,7 @@ ModeList::AddModes(edid1_info* info)
 				continue;
 		}
 
-		_AddMode(&mode);
+		_AddMode(mode);
 	}
 
 	return true;
@@ -370,6 +375,8 @@ ModeList::Clean()
 void
 ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 {
+	// Check the manually tweaked list first
+
 	for (uint32 i = 0; i < kNumBaseModes; i++) {
 		const display_mode& mode = kBaseModeList[i];
 
@@ -381,9 +388,20 @@ ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 
 		if (mode.timing.h_display == width && mode.timing.v_display == height
 			&& fabs(get_refresh_rate(mode) - refresh) < refresh * 0.012) {
-			_AddMode(&mode);
+			_AddMode(mode);
+			return;
 		}
 	}
+
+	// If that didn't have any entries, compute the entry
+	display_mode mode;
+	if (compute_display_timing(width, height, refresh, false, &mode.timing)
+			!= B_OK)
+		return;
+
+	fill_display_mode(&mode);
+
+	_AddMode(mode);
 }
 
 
@@ -420,12 +438,12 @@ ModeList::_MakeSpace(uint32 count)
 
 
 bool
-ModeList::_AddMode(const display_mode* mode)
+ModeList::_AddMode(const display_mode& mode)
 {
 	if (!_MakeSpace(1))
 		return false;
 
-	fModes[fCount++] = *mode;
+	fModes[fCount++] = mode;
 	return true;
 }
 
@@ -495,3 +513,14 @@ create_display_modes(const char* name, edid1_info* edid,
 	return area;
 }
 
+
+void
+fill_display_mode(display_mode* mode)
+{
+	mode->space = B_CMAP8;
+	mode->virtual_width = mode->timing.h_display;
+	mode->virtual_height = mode->timing.v_display;
+	mode->h_display_start = 0;
+	mode->v_display_start = 0;
+	mode->flags = MODE_FLAGS;
+}
