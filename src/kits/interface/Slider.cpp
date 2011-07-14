@@ -810,21 +810,6 @@ BSlider::Draw(BRect updateRect)
 		drawBackground = false;
 	}
 
-	// ToDo: the triangle thumb doesn't delete its background, so we still have
-	// to do it Note, this also creates a different behaviour for subclasses,
-	// depending on the thumb style - if possible this should be avoided.
-	if (Style() == B_BLOCK_THUMB) {
-		BRect thumbFrame = ThumbFrame();
-		if (be_control_look != NULL) {
-			// fill background where shadow will be...
-			// TODO: Such drawint dependent behavior should be moved into
-			// BControlLook of course.
-			thumbFrame.right--;
-			thumbFrame.bottom--;
-		}
-		background.Exclude(thumbFrame);
-	}
-
 #if USE_OFF_SCREEN_VIEW
 	if (!fOffScreenBits)
 		return;
