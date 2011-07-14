@@ -129,6 +129,7 @@ country_code_for_language(const BLanguage& language)
 		case 'pt':	// Portugal
 		case 'ro':	// Romania
 		case 'ru':	// Russia
+		case 'sk':	// Slovakia
 			return language.Code();
 	}
 
