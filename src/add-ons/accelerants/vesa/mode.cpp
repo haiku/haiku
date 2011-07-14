@@ -86,8 +86,8 @@ create_mode_list(void)
 			vesa_mode* vesaModes = gInfo->vesa_modes;
 
 			for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
-				compute_display_timing(vesaModes[i].width, vesaModes[i].height, 60,
-					false, &initialModes[i].timing);
+				compute_display_timing(vesaModes[i].width, vesaModes[i].height,
+					60, false, &initialModes[i].timing);
 				fill_display_mode(&initialModes[i]);
 			}
 		}
