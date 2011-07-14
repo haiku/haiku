@@ -27,6 +27,7 @@ public:
 private:
 			struct SoftInEqData {
 				Summand*	slack;
+				Constraint*	constraint;
 				Constraint*	minSlackConstraint;
 			};
 

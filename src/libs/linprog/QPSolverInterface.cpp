@@ -45,6 +45,7 @@ QPSolverInterface::ConstraintAdded(Constraint* constraint)
 	data.minSlackConstraint = fLinearSpec->AddConstraint(1.,
 		data.slack->Var(), kEQ, 0., constraint->PenaltyNeg(),
 		constraint->PenaltyPos());
+	data.constraint = constraint;
 	fInEqSlackConstraints.push_back(data);
 
 	SummandList* leftSide = constraint->LeftSide();
@@ -63,7 +64,7 @@ QPSolverInterface::ConstraintRemoved(Constraint* constraint)
 
 	for (unsigned int i = 0; i < fInEqSlackConstraints.size(); i++) {
 		SoftInEqData& data = fInEqSlackConstraints[i];
-		if (data.minSlackConstraint != constraint)
+		if (data.constraint != constraint)
 			continue;
 
 		SummandList* leftSide = constraint->LeftSide();
