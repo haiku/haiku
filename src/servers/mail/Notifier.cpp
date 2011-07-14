@@ -4,8 +4,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <Catalog.h>
 
 #include "Notifier.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Notifier"
 
 
 DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
@@ -17,9 +22,11 @@ DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
 	fStatusWindow(statusWindow)
 {
 	BString desc;
-    desc += (fIsInbound == true) ? "Fetching" : "Sending";
-	desc += " mail for ";
-	desc += fAccountName;
+	if (fIsInbound == true)
+		desc << B_TRANSLATE("Fetching mail for %name");
+	else
+		desc << B_TRANSLATE("Sending mail for %name");
+    desc.ReplaceFirst("%name", fAccountName);
 
 	fStatusWindow->Lock();
 	fStatusView = fStatusWindow->NewStatusView(desc, fIsInbound != false);

@@ -38,5 +38,6 @@ DoCatalogs mail_daemon :
 	:
 	DeskbarView.cpp
 	MailDaemon.cpp
+	Notifier.cpp
 	StatusWindow.cpp
 ;

@@ -481,10 +481,14 @@ MailStatusView::AddProgress(int32 how_much)
 			strcpy(pre_text,status->TrailingText());
 		char final[80];
 		if (by_bytes) {
-			sprintf(final,"%.1f / %.1f kb (%d / %d messages)",float(float(status->CurrentValue() + how_much) / 1024),float(float(status->MaxValue()) / 1024),(int)items_now+1,(int)total_items);
+			sprintf(final, B_TRANSLATE("%.1f / %.1f kb (%d / %d messages)"),
+				float(float(status->CurrentValue() + how_much) / 1024),
+				float(float(status->MaxValue()) / 1024),(int)items_now+1,
+				(int)total_items);
 			status->Update(how_much,NULL,final);
 		} else {
-			sprintf(final,"%d / %d messages",(int)items_now,(int)total_items);
+			sprintf(final, B_TRANSLATE("%d / %d messages"),(int)items_now,
+				(int)total_items);
 			status->Update(how_much,NULL,final);
 		}
 		UnlockLooper();

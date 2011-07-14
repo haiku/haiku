@@ -308,7 +308,7 @@ ConfigWindow::ConfigWindow()
 
 	BPopUpMenu* frequencyPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char* frequencyStrings[] = {
-		B_TRANSLATE("never"),
+		B_TRANSLATE_COMMENT("never", "mail checking frequency"),
 		B_TRANSLATE("minutes"),
 		B_TRANSLATE("hours"),
 		B_TRANSLATE("days")};
@@ -348,7 +348,7 @@ ConfigWindow::ConfigWindow()
 
 	BPopUpMenu *statusPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *statusModes[] = {
-		B_TRANSLATE("Never"),
+		B_TRANSLATE_COMMENT("Never", "show status window"),
 		B_TRANSLATE("While sending"),
 		B_TRANSLATE("While sending and receiving"),
 		B_TRANSLATE("Always")};
@@ -898,18 +898,18 @@ ConfigWindow::_AddAccountToView(BMailAccountSettings* account)
 	item = new AccountItem(label, account, ACCOUNT_ITEM);
 	fAccountsListView->AddItem(item);
 
-	item = new AccountItem(B_TRANSLATE("· Incoming"), account, INBOUND_ITEM);
+	item = new AccountItem(B_TRANSLATE("\t\t· Incoming"), account, INBOUND_ITEM);
 	fAccountsListView->AddItem(item);
 	if (!account->IsInboundEnabled())
 		item->SetEnabled(false);
 
-	item = new AccountItem(B_TRANSLATE("· Outgoing"), account,
+	item = new AccountItem(B_TRANSLATE("\t\t· Outgoing"), account,
 		OUTBOUND_ITEM);
 	fAccountsListView->AddItem(item);
 	if (!account->IsOutboundEnabled())
 		item->SetEnabled(false);
 
-	item = new AccountItem(B_TRANSLATE("· E-mail filters"), account,
+	item = new AccountItem(B_TRANSLATE("\t\t· E-mail filters"), account,
 		FILTER_ITEM);
 	fAccountsListView->AddItem(item);
 }
