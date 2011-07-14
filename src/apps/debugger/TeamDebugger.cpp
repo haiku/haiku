@@ -1289,7 +1289,7 @@ void
 TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	TeamMemoryBlock::Listener* listener)
 {
-	TRACE_CONTROL("TeamDebugger::_HandleInspectAddress(" B_PRIx64 ", %p)\n",
+	TRACE_CONTROL("TeamDebugger::_HandleInspectAddress(%" B_PRIx64 ", %p)\n",
 		address, listener);
 
 	TeamMemoryBlock* memoryBlock = fMemoryBlockManager
