@@ -440,6 +440,8 @@ ModeList::_MakeSpace(uint32 count)
 bool
 ModeList::_AddMode(const display_mode& mode)
 {
+	// TODO: filter by monitor timing constraints!
+	// TODO: remove double entries
 	if (!_MakeSpace(1))
 		return false;
 
