@@ -136,7 +136,6 @@ main(int argc, char **argv)
 
 	switch(outputTarget) {
 		case TARGET_ATTRIBUTE: {
-			printf("To attribute\n");
 			BEntry entry(outputFile.String());
 			entry_ref eref;
 			entry.GetRef(&eref);
