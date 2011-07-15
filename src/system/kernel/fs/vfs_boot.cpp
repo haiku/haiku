@@ -530,7 +530,7 @@ vfs_mount_boot_file_system(kernel_args* args)
 			"packages /boot/common/packages; type common",
 			0 /* unused argument length */);
 		if (commonPackageMount < 0) {
-			dprintf("Failed to mount common packagefs: %s",
+			dprintf("Failed to mount common packagefs: %s\n",
 				strerror(commonPackageMount));
 		}
 	}
