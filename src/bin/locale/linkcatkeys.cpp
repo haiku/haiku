@@ -136,6 +136,7 @@ main(int argc, char **argv)
 
 	switch(outputTarget) {
 		case TARGET_ATTRIBUTE: {
+			printf("To attribute\n");
 			BEntry entry(outputFile.String());
 			entry_ref eref;
 			entry.GetRef(&eref);
@@ -159,6 +160,7 @@ main(int argc, char **argv)
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
+			break;
 		}
 		default: {
 			res = targetCatalog.WriteToFile(outputFile.String());
@@ -168,6 +170,7 @@ main(int argc, char **argv)
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
+			break;
 		}
 	}
 	if (showSummary) {
