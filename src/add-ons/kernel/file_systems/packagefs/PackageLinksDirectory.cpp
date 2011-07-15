@@ -70,10 +70,8 @@ PackageLinksDirectory::AddPackage(Package* package)
 		// No entry is in the way, so just add the link directory.
 		AddChild(linkDirectory);
 
-		if (fListener != NULL) {
-			NodeWriteLocker linkDirectoryWriteLocker(linkDirectory);
-			fListener->PackageLinkNodeAdded(linkDirectory);
-		}
+		if (fListener != NULL)
+			linkDirectory->NotifyDirectoryAdded(fListener);
 	}
 
 	return B_OK;
