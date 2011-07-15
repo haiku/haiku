@@ -135,6 +135,18 @@ struct RepositoryContentHandler : BRepositoryContentHandler {
 				fPackageInfo.AddReplaces(value.string);
 				break;
 
+			case B_PACKAGE_INFO_URLS:
+				fPackageInfo.AddURL(value.string);
+				break;
+
+			case B_PACKAGE_INFO_SOURCE_URLS:
+				fPackageInfo.AddSourceURL(value.string);
+				break;
+
+			case B_PACKAGE_INFO_INSTALL_PATH:
+				fPackageInfo.SetInstallPath(value.string);
+				break;
+
 			case B_PACKAGE_INFO_CHECKSUM:
 			{
 				fPackageInfo.SetChecksum(value.string);
