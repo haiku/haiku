@@ -5,6 +5,6 @@ resource app_version {
 	variety = B_APPV_FINAL,
 	internal = 0,
 	short_info = "coreutils", 
-	long_info  = "coreutils ©210 The Free Software Foundation"
+	long_info  = "coreutils ©2010 The Free Software Foundation"
 };
 
