@@ -1066,7 +1066,11 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 		}
 
 		default:
+		{
+			fErrorOutput->PrintError("Error: Invalid compression type: %u\n",
+				section.compression);
 			return B_BAD_DATA;
+		}
 	}
 }
 
