@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "DebugSupport.h"
+#include "EmptyAttributeDirectoryCookie.h"
 
 
 Node::Node(ino_t id)
@@ -76,6 +77,40 @@ void
 Node::SetParent(Directory* parent)
 {
 	fParent = parent;
+}
+
+
+uid_t
+Node::UserID() const
+{
+	return 0;
+}
+
+
+gid_t
+Node::GroupID() const
+{
+	return 0;
+}
+
+
+status_t
+Node::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
+{
+	AttributeDirectoryCookie* cookie
+		= new(std::nothrow) EmptyAttributeDirectoryCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	_cookie = cookie;
+	return B_OK;
+}
+
+
+status_t
+Node::OpenAttribute(const char* name, int openMode, AttributeCookie*& _cookie)
+{
+	return B_ENTRY_NOT_FOUND;
 }
 
 

@@ -41,6 +41,20 @@ Directory::Init(Directory* parent, const char* name, uint32 flags)
 }
 
 
+mode_t
+Directory::Mode() const
+{
+	return S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+}
+
+
+off_t
+Directory::FileSize() const
+{
+	return 0;
+}
+
+
 status_t
 Directory::Read(off_t offset, void* buffer, size_t* bufferSize)
 {

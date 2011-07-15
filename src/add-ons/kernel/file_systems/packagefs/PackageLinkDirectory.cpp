@@ -12,7 +12,6 @@
 
 #include <AutoDeleter.h>
 
-#include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "PackageLinksListener.h"
 #include "Utils.h"
@@ -86,62 +85,11 @@ PackageLinkDirectory::Init(Directory* parent, const char* name, uint32 flags)
 }
 
 
-mode_t
-PackageLinkDirectory::Mode() const
-{
-	return S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
-}
-
-
-uid_t
-PackageLinkDirectory::UserID() const
-{
-	return 0;
-}
-
-
-gid_t
-PackageLinkDirectory::GroupID() const
-{
-	return 0;
-}
-
-
 timespec
 PackageLinkDirectory::ModifiedTime() const
 {
 	return fModifiedTime;
 }
-
-
-off_t
-PackageLinkDirectory::FileSize() const
-{
-	return 0;
-}
-
-
-status_t
-PackageLinkDirectory::OpenAttributeDirectory(
-	AttributeDirectoryCookie*& _cookie)
-{
-	AttributeDirectoryCookie* cookie
-		= new(std::nothrow) EmptyAttributeDirectoryCookie;
-	if (cookie == NULL)
-		return B_NO_MEMORY;
-
-	_cookie = cookie;
-	return B_OK;
-}
-
-
-status_t
-PackageLinkDirectory::OpenAttribute(const char* name, int openMode,
-	AttributeCookie*& _cookie)
-{
-	return B_ENTRY_NOT_FOUND;
-}
-
 
 void
 PackageLinkDirectory::AddPackage(Package* package,

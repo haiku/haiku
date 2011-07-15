@@ -22,8 +22,6 @@ public:
 									PackageLinksListener* listener);
 
 	virtual	mode_t				Mode() const;
-	virtual	uid_t				UserID() const;
-	virtual	gid_t				GroupID() const;
 	virtual	timespec			ModifiedTime() const;
 	virtual	off_t				FileSize() const;
 
@@ -32,11 +30,6 @@ public:
 	virtual	status_t			Read(io_request* request);
 
 	virtual	status_t			ReadSymlink(void* buffer, size_t* bufferSize);
-
-	virtual	status_t			OpenAttributeDirectory(
-									AttributeDirectoryCookie*& _cookie);
-	virtual	status_t			OpenAttribute(const char* name, int openMode,
-									AttributeCookie*& _cookie);
 
 private:
 			struct OldAttributes;
