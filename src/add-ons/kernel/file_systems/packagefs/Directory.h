@@ -30,6 +30,9 @@ public:
 	virtual	status_t			Init(Directory* parent, const char* name,
 									uint32 flags);
 
+	virtual	mode_t				Mode() const;
+	virtual	off_t				FileSize() const;
+
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			Read(io_request* request);

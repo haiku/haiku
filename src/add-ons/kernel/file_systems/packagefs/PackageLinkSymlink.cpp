@@ -10,7 +10,6 @@
 
 #include <NodeMonitor.h>
 
-#include "EmptyAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "NodeListener.h"
 #include "PackageLinksListener.h"
@@ -116,20 +115,6 @@ PackageLinkSymlink::Mode() const
 }
 
 
-uid_t
-PackageLinkSymlink::UserID() const
-{
-	return 0;
-}
-
-
-gid_t
-PackageLinkSymlink::GroupID() const
-{
-	return 0;
-}
-
-
 timespec
 PackageLinkSymlink::ModifiedTime() const
 {
@@ -166,25 +151,4 @@ PackageLinkSymlink::ReadSymlink(void* buffer, size_t* bufferSize)
 	*bufferSize = toCopy;
 
 	return B_OK;
-}
-
-
-status_t
-PackageLinkSymlink::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
-{
-	AttributeDirectoryCookie* cookie
-		= new(std::nothrow) EmptyAttributeDirectoryCookie;
-	if (cookie == NULL)
-		return B_NO_MEMORY;
-
-	_cookie = cookie;
-	return B_OK;
-}
-
-
-status_t
-PackageLinkSymlink::OpenAttribute(const char* name, int openMode,
-	AttributeCookie*& _cookie)
-{
-	return B_ENTRY_NOT_FOUND;
 }

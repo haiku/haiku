@@ -67,8 +67,8 @@ public:
 			void				SetParent(Directory* parent);
 
 	virtual	mode_t				Mode() const = 0;
-	virtual	uid_t				UserID() const = 0;
-	virtual	gid_t				GroupID() const = 0;
+	virtual	uid_t				UserID() const;
+	virtual	gid_t				GroupID() const;
 	virtual	timespec			ModifiedTime() const = 0;
 	virtual	off_t				FileSize() const = 0;
 
@@ -80,9 +80,9 @@ public:
 									size_t* bufferSize) = 0;
 
 	virtual	status_t			OpenAttributeDirectory(
-									AttributeDirectoryCookie*& _cookie) = 0;
+									AttributeDirectoryCookie*& _cookie);
 	virtual	status_t			OpenAttribute(const char* name, int openMode,
-									AttributeCookie*& _cookie) = 0;
+									AttributeCookie*& _cookie);
 
 	virtual	status_t			IndexAttribute(AttributeIndexer* indexer);
 	virtual	void*				IndexCookieForAttribute(const char* name) const;
