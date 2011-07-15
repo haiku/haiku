@@ -111,6 +111,7 @@ private:
 			struct PackageLoaderErrorOutput;
 			struct PackageLoaderContentHandler;
 			struct DomainDirectoryListener;
+			struct ShineThroughDirectory;
 
 			friend struct AddPackageDomainJob;
 			friend struct DomainDirectoryEventJob;
@@ -175,8 +176,11 @@ private:
 									const char* name, bool notify);
 
 			status_t			_InitMountType(const char* mountType);
+			status_t			_CreateShineThroughDirectory(Directory* parent,
+									const char* name, Directory*& _directory);
 			status_t			_CreateShineThroughDirectories(
 									const char* shineThroughSetting);
+			status_t			_PublishShineThroughDirectories();
 
 			status_t			_AddPackageLinksDirectory();
 			void				_RemovePackageLinksDirectory();
