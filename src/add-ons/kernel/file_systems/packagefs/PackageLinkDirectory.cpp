@@ -149,6 +149,26 @@ PackageLinkDirectory::UpdatePackageDependencies(Package* package,
 }
 
 
+void
+PackageLinkDirectory::NotifyDirectoryAdded(PackageLinksListener* listener)
+{
+	NodeWriteLocker writeLocker(this);
+
+	listener->PackageLinkNodeAdded(this);
+
+	if (fSelfLink != NULL) {
+		NodeWriteLocker selfLinkLocker(fSelfLink);
+		listener->PackageLinkNodeAdded(fSelfLink);
+	}
+
+	for (FamilyDependencyList::Iterator it = fDependencyLinks.GetIterator();
+			DependencyLink* link = it.Next();) {
+		NodeWriteLocker linkLocker(link);
+		listener->PackageLinkNodeAdded(link);
+	}
+}
+
+
 status_t
 PackageLinkDirectory::_Update(PackageLinksListener* listener)
 {
