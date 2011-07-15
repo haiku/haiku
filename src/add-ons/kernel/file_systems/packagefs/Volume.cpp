@@ -46,6 +46,7 @@
 #include "SizeIndex.h"
 #include "UnpackingLeafNode.h"
 #include "UnpackingDirectory.h"
+#include "Utils.h"
 #include "Version.h"
 
 
@@ -443,6 +444,27 @@ private:
 };
 
 
+// #pragma mark - ShineThroughDirectory
+
+
+struct Volume::ShineThroughDirectory : public Directory {
+	ShineThroughDirectory(ino_t id)
+		:
+		Directory(id)
+	{
+		get_real_time(fModifiedTime);
+	}
+
+	virtual timespec ModifiedTime() const
+	{
+		return fModifiedTime;
+	}
+
+private:
+	timespec	fModifiedTime;
+};
+
+
 // #pragma mark - Volume
 
 
@@ -656,6 +678,11 @@ Volume::Mount(const char* parameterString)
 			RETURN_ERROR(error);
 	}
 
+	// create shine-through directories
+	error = _CreateShineThroughDirectories(shineThrough);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	// create default package domain
 	error = _AddInitialPackageDomain(packages);
 	if (error != B_OK)
@@ -667,11 +694,6 @@ Volume::Mount(const char* parameterString)
 	if (fPackageLoader < 0)
 		RETURN_ERROR(fPackageLoader);
 
-	// establish shine-through directories
-	error = _CreateShineThroughDirectories(shineThrough);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
 	// publish the root node
 	fRootDirectory->AcquireReference();
 	error = PublishVNode(fRootDirectory);
@@ -679,6 +701,11 @@ Volume::Mount(const char* parameterString)
 		fRootDirectory->ReleaseReference();
 		RETURN_ERROR(error);
 	}
+
+	// bind and publish the shine-through directories
+	error = _PublishShineThroughDirectories();
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	// run the package loader
 	resume_thread(fPackageLoader);
@@ -1083,6 +1110,7 @@ Volume::_AddPackageContentRootNode(Package* package,
 	do {
 		Node* node;
 		status_t error = _AddPackageNode(directory, packageNode, notify, node);
+			// returns B_OK with a NULL node, when skipping the node
 		if (error != B_OK) {
 			// unlock all directories
 			while (directory != NULL) {
@@ -1096,14 +1124,16 @@ Volume::_AddPackageContentRootNode(Package* package,
 			RETURN_ERROR(error);
 		}
 
-		// recursive into directory
-		if (PackageDirectory* packageDirectory
-				= dynamic_cast<PackageDirectory*>(packageNode)) {
-			if (packageDirectory->FirstChild() != NULL) {
-				directory = dynamic_cast<Directory*>(node);
-				packageNode = packageDirectory->FirstChild();
-				directory->WriteLock();
-				continue;
+		// recursive into directory, unless we're supposed to skip the node
+		if (node != NULL) {
+			if (PackageDirectory* packageDirectory
+					= dynamic_cast<PackageDirectory*>(packageNode)) {
+				if (packageDirectory->FirstChild() != NULL) {
+					directory = dynamic_cast<Directory*>(node);
+					packageNode = packageDirectory->FirstChild();
+					directory->WriteLock();
+					continue;
+				}
 			}
 		}
 
@@ -1196,8 +1226,11 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 
 	if (node != NULL) {
 		unpackingNode = dynamic_cast<UnpackingNode*>(node);
-		if (unpackingNode == NULL)
-			RETURN_ERROR(B_BAD_VALUE);
+		if (unpackingNode == NULL) {
+			_node = NULL;
+			return B_OK;
+		}
+		oldPackageNode = unpackingNode->GetPackageNode();
 	} else {
 		status_t error = _CreateUnpackingNode(packageNode->Mode(), directory,
 			packageNode->Name(), unpackingNode);
@@ -1205,7 +1238,6 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 			RETURN_ERROR(error);
 
 		node = unpackingNode->GetNode();
-		oldPackageNode = unpackingNode->GetPackageNode();
 		newNode = true;
 	}
 
@@ -1356,7 +1388,7 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const char* name,
 
 	fNodes.Insert(node);
 	nodeReference.Detach();
-		// we keep the initial node reference for this table
+		// we keep the initial node reference for the table
 
 	_node = unpackingNode;
 	return B_OK;
@@ -1548,6 +1580,31 @@ Volume::_InitMountType(const char* mountType)
 
 
 status_t
+Volume::_CreateShineThroughDirectory(Directory* parent, const char* name,
+	Directory*& _directory)
+{
+	ShineThroughDirectory* directory = new(std::nothrow) ShineThroughDirectory(
+		fNextNodeID++);
+	if (directory == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	BReference<ShineThroughDirectory> directoryReference(directory, true);
+
+	status_t error = directory->Init(parent, name, 0);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	parent->AddChild(directory);
+
+	fNodes.Insert(directory);
+	directoryReference.Detach();
+		// we keep the initial node reference for the table
+
+	_directory = directory;
+	return B_OK;
+}
+
+
+status_t
 Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 {
 	// get the directories to map
@@ -1582,9 +1639,38 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 	if (directories == NULL)
 		return B_OK;
 
-	// iterate through the directory list, create the directories, and bind them
-	// to the mount point subdirectories
+	// iterate through the directory list and create the directories
 	while (const char* directoryName = *(directories++)) {
+		// create the directory
+		Directory* directory;
+		status_t error = _CreateShineThroughDirectory(fRootDirectory,
+			directoryName, directory);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_PublishShineThroughDirectories()
+{
+	// Iterate through the root directory children and bind the shine-through
+	// directories to the respective mount point subdirectories.
+	Node* nextNode;
+	for (Node* node = fRootDirectory->FirstChild(); node != NULL;
+			node = nextNode) {
+		nextNode = fRootDirectory->NextChild(node);
+
+		// skip anything but shine-through directories
+		ShineThroughDirectory* directory
+			= dynamic_cast<ShineThroughDirectory*>(node);
+		if (directory == NULL)
+			continue;
+
+		const char* directoryName = directory->Name();
+
 		// look up the mount point subdirectory
 		struct vnode* vnode;
 		status_t error = vfs_entry_ref_to_vnode(fMountPoint.deviceID,
@@ -1592,6 +1678,7 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 		if (error != B_OK) {
 			dprintf("packagefs: Failed to get shine-through directory \"%s\": "
 				"%s\n", directoryName, strerror(error));
+			_RemoveNode(directory);
 			continue;
 		}
 		CObjectDeleter<struct vnode> vnodePutter(vnode, &vfs_put_vnode);
@@ -1602,35 +1689,29 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 		if (error != B_OK) {
 			dprintf("packagefs: Failed to stat shine-through directory \"%s\": "
 				"%s\n", directoryName, strerror(error));
+			_RemoveNode(directory);
 			continue;
 		}
 
 		if (!S_ISDIR(st.st_mode)) {
 			dprintf("packagefs: Shine-through entry \"%s\" is not a "
 				"directory\n", directoryName);
+			_RemoveNode(directory);
 			continue;
 		}
 
-		// create the directory
-		UnpackingNode* directory;
-		error = _CreateUnpackingNode(S_IFDIR, fRootDirectory, directoryName,
-			directory);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		// publish its vnode, so the VFS will find it without asking us
-		Node* directoryNode = directory->GetNode();
-		error = PublishVNode(directoryNode);
+		// publish the vnode, so the VFS will find it without asking us
+		error = PublishVNode(directory);
 		if (error != B_OK) {
-			_RemoveNode(directoryNode);
+			_RemoveNode(directory);
 			RETURN_ERROR(error);
 		}
 
 		// bind the directory
 		error = vfs_bind_mount_directory(st.st_dev, st.st_ino, fFSVolume->id,
-			directoryNode->ID());
+			directory->ID());
 
-		PutVNode(directoryNode->ID());
+		PutVNode(directory->ID());
 			// release our reference again -- on success
 			// vfs_bind_mount_directory() got one
 
