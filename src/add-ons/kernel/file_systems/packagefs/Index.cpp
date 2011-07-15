@@ -7,6 +7,7 @@
 #include "Index.h"
 
 #include "DebugSupport.h"
+#include "Directory.h"
 #include "Node.h"
 #include "IndexImpl.h"
 
@@ -73,11 +74,13 @@ void
 Index::Dump()
 {
 	D(
-		PRINT(("Index: `%s', type: %lx\n", Name(), Type()));
-		for (IndexIterator it(this); it.Current(); it.Next()) {
-			Node* node = it.Current();
-			PRINT(("  node: `%s', dir: %lld\n", node->GetName(),
-				node->Parent()->ID()));
+		PRINT("Index: `%s', type: %" B_PRIx32 "\n", Name(), Type());
+		IndexIterator it;
+		if (GetIterator(it)) {
+			while (Node* node = it.Next()) {
+				PRINT("  node: `%s', dir: %" B_PRIdINO "\n", node->Name(),
+					node->Parent()->ID());
+			}
 		}
 	)
 }
