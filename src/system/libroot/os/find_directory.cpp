@@ -349,7 +349,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			templatePath = "utilities";
 			break;
 		case B_PACKAGE_LINKS_DIRECTORY:
-			templatePath = "package-links";
+			templatePath = "packages";
 			break;
 
 		default:
