@@ -79,10 +79,12 @@ create_mode_list(void)
 	// Create the initial list from the support mode list - but only if we don't
 	// have EDID info available, as that should be good enough.
 	display_mode* initialModes = NULL;
+	uint32 initialModesCount = 0;
 	if (!gInfo->shared_info->has_edid) {
 		initialModes = (display_mode*)malloc(
 			sizeof(display_mode) * gInfo->shared_info->vesa_mode_count);
 		if (initialModes != NULL) {
+			initialModesCount = gInfo->shared_info->vesa_mode_count;
 			vesa_mode* vesaModes = gInfo->vesa_modes;
 
 			for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
@@ -95,7 +97,7 @@ create_mode_list(void)
 
 	gInfo->mode_list_area = create_display_modes("vesa modes",
 		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
-		initialModes, gInfo->shared_info->vesa_mode_count,
+		initialModes, initialModesCount,
 		kVesaSpaces, sizeof(kVesaSpaces) / sizeof(kVesaSpaces[0]),
 		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
 
