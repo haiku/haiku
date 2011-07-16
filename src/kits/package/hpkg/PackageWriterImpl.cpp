@@ -167,11 +167,6 @@ struct PackageWriterImpl::PackageContentHandler
 	{
 	}
 
-static const char* AttributeNameForID(uint8 id)
-{
-	return BLowLevelPackageContentHandler::AttributeNameForID(id);
-}
-
 	virtual status_t HandleSectionStart(BHPKGPackageSectionID sectionID,
 		bool& _handleSection)
 	{
