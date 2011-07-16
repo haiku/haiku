@@ -477,7 +477,8 @@ create_display_modes(const char* name, edid1_info* edid,
 	// compile initial mode list from the different sources
 
 	ModeList modes;
-	modes.AddModes(initialModes, initialModeCount);
+	if (initialModes != NULL)
+		modes.AddModes(initialModes, initialModeCount);
 
 	if (edid != NULL)
 		modes.AddModes(edid);
