@@ -18,7 +18,7 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
-#include <HashMap.h>
+#include <util/OpenHashTable.h>
 
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
@@ -36,14 +36,100 @@ using BPrivate::HashableString;
 using namespace BHPKG;
 
 
-namespace {
+// #pragma mark - PackageInfo
 
 
-typedef ::BPrivate::HashMap<HashableString, BPackageInfo> PackageHashMap;
+struct BRepositoryCache::PackageInfo : public BPackageInfo {
+	PackageInfo*	hashNext;
+	PackageInfo*	listNext;
 
-struct RepositoryContentHandler : BRepositoryContentHandler {
+	PackageInfo(const BPackageInfo& other)
+		:
+		BPackageInfo(other),
+		listNext(NULL)
+	{
+	}
+};
+
+
+// #pragma mark - PackageInfoHashDefinition
+
+
+struct BRepositoryCache::PackageInfoHashDefinition {
+	typedef const char*		KeyType;
+	typedef	PackageInfo		ValueType;
+
+	size_t HashKey(const char* key) const
+	{
+		return BString::HashValue(key);
+	}
+
+	size_t Hash(const PackageInfo* value) const
+	{
+		return value->Name().HashValue();
+	}
+
+	bool Compare(const char* key, const PackageInfo* value) const
+	{
+		return value->Name() == key;
+	}
+
+	PackageInfo*& GetLink(PackageInfo* value) const
+	{
+		return value->hashNext;
+	}
+};
+
+
+// #pragma mark - PackageMap
+
+
+struct BRepositoryCache::PackageMap
+	: public BOpenHashTable<PackageInfoHashDefinition> {
+
+	PackageMap()
+		:
+		fCount(0)
+	{
+	}
+
+	~PackageMap()
+	{
+		PackageInfo* info = Clear(true);
+		while (info != NULL) {
+			PackageInfo* next = info->hashNext;
+			delete info;
+			info = next;
+		}
+	}
+
+	void AddPackageInfo(PackageInfo* info)
+	{
+		if (PackageInfo* oldInfo = Lookup(info->Name())) {
+			info->listNext = oldInfo->listNext;
+			oldInfo->listNext = info;
+		} else
+			Insert(info);
+
+		fCount++;
+	}
+
+	uint32 CountPackageInfos() const
+	{
+		return fCount;
+	}
+
+private:
+	uint32	fCount;
+};
+
+
+// #pragma mark - RepositoryContentHandler
+
+
+struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
 	RepositoryContentHandler(BRepositoryInfo* repositoryInfo,
-		PackageHashMap* packageMap)
+		PackageMap* packageMap)
 		:
 		fRepositoryInfo(repositoryInfo),
 		fPackageMap(packageMap)
@@ -154,11 +240,21 @@ struct RepositoryContentHandler : BRepositoryContentHandler {
 				if (result != B_OK)
 					return result;
 
-				if (fPackageMap->ContainsKey(fPackageInfo.Name()))
-					return B_NAME_IN_USE;
-				result = fPackageMap->Put(fPackageInfo.Name(), fPackageInfo);
-				if (result != B_OK)
+				PackageInfo* info = new(std::nothrow) PackageInfo(fPackageInfo);
+				if (info == NULL)
+					return B_NO_MEMORY;
+
+				result = info->InitCheck();
+				if (result != B_OK) {
+					delete info;
 					return result;
+				}
+
+				if (PackageInfo* oldInfo = fPackageMap->Lookup(info->Name())) {
+					info->listNext = oldInfo->listNext;
+					oldInfo->listNext = info;
+				} else
+					fPackageMap->Insert(info);
 
 				fPackageInfo.Clear();
 				break;
@@ -185,11 +281,14 @@ struct RepositoryContentHandler : BRepositoryContentHandler {
 private:
 	BRepositoryInfo*	fRepositoryInfo;
 	BPackageInfo		fPackageInfo;
-	PackageHashMap*		fPackageMap;
+	PackageMap*			fPackageMap;
 };
 
 
-class StandardErrorOutput : public BErrorOutput {
+// #pragma mark - StandardErrorOutput
+
+
+class BRepositoryCache::StandardErrorOutput : public BErrorOutput {
 	virtual	void PrintErrorVarArgs(const char* format, va_list args)
 	{
 		vfprintf(stderr, format, args);
@@ -197,41 +296,67 @@ class StandardErrorOutput : public BErrorOutput {
 };
 
 
-}	// anonymous namespace
+// #pragma mark - Iterator
 
 
-struct BRepositoryCache::PackageMap : public PackageHashMap {
-};
-
-
-BRepositoryCache::BRepositoryCache()
+BRepositoryCache::Iterator::Iterator()
 	:
-	fInitStatus(B_NO_INIT),
-	fIsUserSpecific(false),
-	fPackageMap(new (std::nothrow) PackageMap)
+	fCache(NULL),
+	fNextInfo(NULL)
 {
 }
 
 
-BRepositoryCache::BRepositoryCache(const BEntry& entry)
+BRepositoryCache::Iterator::Iterator(const BRepositoryCache* cache)
+	:
+	fCache(cache),
+	fNextInfo(fCache->fPackageMap->GetIterator().Next())
+{
+}
+
+bool
+BRepositoryCache::Iterator::HasNext() const
+{
+	return fNextInfo != NULL;
+}
+
+
+const BPackageInfo*
+BRepositoryCache::Iterator::Next()
+{
+	BPackageInfo* result = fNextInfo;
+
+	if (fNextInfo != NULL) {
+		if (fNextInfo->listNext != NULL) {
+			// get next in list
+			fNextInfo = fNextInfo->listNext;
+		} else {
+			// get next in hash table
+			PackageMap::Iterator iterator
+				= fCache->fPackageMap->GetIterator(fNextInfo->Name());
+			iterator.Next();
+			fNextInfo = iterator.Next();
+		}
+	}
+
+	return result;
+}
+
+
+// #pragma mark - BRepositoryCache
+
+
+BRepositoryCache::BRepositoryCache()
 	:
 	fIsUserSpecific(false),
-	fPackageMap(new (std::nothrow) PackageMap)
+	fPackageMap(NULL)
 {
-	fInitStatus = SetTo(entry);
 }
 
 
 BRepositoryCache::~BRepositoryCache()
 {
 	delete fPackageMap;
-}
-
-
-status_t
-BRepositoryCache::InitCheck() const
-{
-	return fInitStatus;
 }
 
 
@@ -266,14 +391,25 @@ BRepositoryCache::SetIsUserSpecific(bool isUserSpecific)
 status_t
 BRepositoryCache::SetTo(const BEntry& entry)
 {
+	// unset
+	if (fPackageMap != NULL) {
+		delete fPackageMap;
+		fPackageMap = NULL;
+	}
+
+	fEntry.Unset();
+
+	// create the package map
+	fPackageMap = new (std::nothrow) PackageMap;
 	if (fPackageMap == NULL)
 		return B_NO_MEMORY;
-	status_t result = fPackageMap->InitCheck();
+
+	status_t result = fPackageMap->Init();
 	if (result != B_OK)
 		return result;
 
+	// get cache file path
 	fEntry = entry;
-	fPackageMap->Clear();
 
 	BPath repositoryCachePath;
 	if ((result = entry.GetPath(&repositoryCachePath)) != B_OK)
@@ -301,12 +437,19 @@ BRepositoryCache::SetTo(const BEntry& entry)
 
 
 uint32
-BRepositoryCache::PackageCount() const
+BRepositoryCache::CountPackages() const
 {
 	if (fPackageMap == NULL)
 		return 0;
 
-	return fPackageMap->Size();
+	return fPackageMap->CountPackageInfos();
+}
+
+
+BRepositoryCache::Iterator
+BRepositoryCache::GetIterator() const
+{
+	return Iterator(this);
 }
 
 
