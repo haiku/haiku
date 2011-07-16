@@ -44,32 +44,19 @@ Interpolate::float_to_float(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
 	#define SRC(n) *(const float*)(src + n * srcSampleOffset)
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			*(float*)dest = gain
-				* (SRC(0) + (SRC((int)skipcount) - SRC(0)) * offset);
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -95,33 +82,20 @@ Interpolate::int32_to_float(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
 	#undef SRC
 	#define SRC(n) *(const int32*)(src + n * srcSampleOffset)
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
-				* offset);
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -147,33 +121,20 @@ Interpolate::int16_to_float(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
 	#undef SRC
 	#define SRC(n) *(const int16*)(src + n * srcSampleOffset)
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current);
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
-				* offset);
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current);
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -199,33 +160,20 @@ Interpolate::int8_to_float(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
 	#undef SRC
 	#define SRC(n) *(const int8*)(src + n * srcSampleOffset)
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
-				* offset);
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -251,33 +199,20 @@ Interpolate::uint8_to_float(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
 	#undef SRC
 	#define SRC(n) ( *(const uint8*)(src + n * srcSampleOffset) - 128)
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current);
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
-				* offset);
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current);
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -309,46 +244,27 @@ Interpolate::float_to_int32(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
 	#undef SRC
 	#define SRC(n) *(const float*)(src + n * srcSampleOffset)
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
-				* current);
-			if (sample > 2147483647.0f)
-				*(int32 *)dest = 2147483647L;
-			else if (sample < -2147483647.0f)
-				*(int32 *)dest = -2147483647L;
-			else
-				*(int32 *)dest = (int32)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
-				- SRC(0)) * offset);
-			if (sample > 2147483647.0f)
-				*(int32 *)dest = 2147483647L;
-			else if (sample < -2147483647.0f)
-				*(int32 *)dest = -2147483647L;
-			else
-				*(int32 *)dest = (int32)sample;
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
+			* current);
+		if (sample > 2147483647.0f)
+			*(int32 *)dest = 2147483647L;
+		else if (sample < -2147483647.0f)
+			*(int32 *)dest = -2147483647L;
+		else
+			*(int32 *)dest = (int32)sample;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -380,43 +296,24 @@ Interpolate::float_to_int16(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
-				* current);
-			if (sample > 32767.0f)
-				*(int16 *)dest = 32767;
-			else if (sample < -32767.0f)
-				*(int16 *)dest = -32767;
-			else
-				*(int16 *)dest = (int16)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
-				- SRC(0)) * offset);
-			if (sample > 32767.0f)
-				*(int16 *)dest = 32767;
-			else if (sample < -32767.0f)
-				*(int16 *)dest = -32767;
-			else
-				*(int16 *)dest = (int16)sample;
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
+			* current);
+		if (sample > 32767.0f)
+			*(int16 *)dest = 32767;
+		else if (sample < -32767.0f)
+			*(int16 *)dest = -32767;
+		else
+			*(int16 *)dest = (int16)sample;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -448,43 +345,24 @@ Interpolate::float_to_int8(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
-				* current);
-			if (sample > 127.0f)
-				*(int8 *)dest = 127;
-			else if (sample < -127.0f)
-				*(int8 *)dest = -127;
-			else
-				*(int8 *)dest = (int8)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
-				- SRC(0)) * offset);
-			if (sample > 127.0f)
-				*(int8 *)dest = 127;
-			else if (sample < -127.0f)
-				*(int8 *)dest = -127;
-			else
-				*(int8 *)dest = (int8)sample;
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
+			* current);
+		if (sample > 127.0f)
+			*(int8 *)dest = 127;
+		else if (sample < -127.0f)
+			*(int8 *)dest = -127;
+		else
+			*(int8 *)dest = (int8)sample;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
@@ -516,43 +394,24 @@ Interpolate::float_to_uint8(const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
-				* current);
-			if (sample > 255.0f)
-				*(uint8 *)dest = 255;
-			else if (sample < 1.0f)
-				*(uint8 *)dest = 1;
-			else
-				*(uint8 *)dest = (uint8)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			double skipcount;
-			register float offset = modf(current, &skipcount);
-			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
-				- SRC(0)) * offset) + 128.0f;
-			if (sample > 255.0f)
-				*(uint8 *)dest = 255;
-			else if (sample < 1.0f)
-				*(uint8 *)dest = 1;
-			else
-				*(uint8 *)dest = (uint8)sample;
-			dest += destSampleOffset;
-			current += delta - skipcount;
-			src += (int)skipcount * srcSampleOffset;
+	while (count--) {
+		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
+			* current);
+		if (sample > 255.0f)
+			*(uint8 *)dest = 255;
+		else if (sample < 1.0f)
+			*(uint8 *)dest = 1;
+		else
+			*(uint8 *)dest = (uint8)sample;
+		dest += destSampleOffset;
+		current += delta;
+		if (current >= 1.0f) {
+			double ipart;
+			current = modf(current, &ipart);
+			src += srcSampleOffset * (int)ipart;
 		}
 	}
 }
