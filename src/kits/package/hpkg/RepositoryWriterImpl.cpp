@@ -24,6 +24,7 @@
 #include <package/BlockBufferCacheNoLock.h>
 #include <package/ChecksumAccessors.h>
 #include <package/HashableString.h>
+#include <package/PackageInfoContentHandler.h>
 #include <package/RepositoryInfo.h>
 
 
@@ -85,12 +86,11 @@ private:
 };
 
 
-struct PackageContentHandler : public BPackageContentHandler {
+struct PackageContentHandler : public BPackageInfoContentHandler {
 	PackageContentHandler(BErrorOutput* errorOutput, BPackageInfo* packageInfo,
 		int packageFileFD, BRepositoryInfo* repositoryInfo)
 		:
-		fErrorOutput(errorOutput),
-		fPackageInfo(packageInfo),
+		BPackageInfoContentHandler(*packageInfo, errorOutput),
 		fPackageFileReader(packageFileFD),
 		fRepositoryInfo(repositoryInfo)
 	{
@@ -100,7 +100,7 @@ struct PackageContentHandler : public BPackageContentHandler {
 	{
 		// if license must be approved, read any license files from package such
 		// that those can be stored in the repository later
-		if ((fPackageInfo->Flags() & B_PACKAGE_FLAG_APPROVE_LICENSE) == 0
+		if ((fPackageInfo.Flags() & B_PACKAGE_FLAG_APPROVE_LICENSE) == 0
 			|| entry == NULL)
 			return B_OK;
 
@@ -160,108 +160,11 @@ struct PackageContentHandler : public BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandlePackageAttribute(
-		const BPackageInfoAttributeValue& value)
-	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				fPackageInfo->SetName(value.string);
-				break;
-
-			case B_PACKAGE_INFO_SUMMARY:
-				fPackageInfo->SetSummary(value.string);
-				break;
-
-			case B_PACKAGE_INFO_DESCRIPTION:
-				fPackageInfo->SetDescription(value.string);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				fPackageInfo->SetVendor(value.string);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				fPackageInfo->SetPackager(value.string);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				fPackageInfo->SetFlags(value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				fPackageInfo->SetArchitecture(
-					(BPackageArchitecture)value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				fPackageInfo->SetVersion(value.version);
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				fPackageInfo->AddCopyright(value.string);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				fPackageInfo->AddLicense(value.string);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				fPackageInfo->AddProvides(value.resolvable);
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				fPackageInfo->AddRequires(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				fPackageInfo->AddSupplements(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				fPackageInfo->AddConflicts(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				fPackageInfo->AddFreshens(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				fPackageInfo->AddReplaces(value.string);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				fPackageInfo->AddURL(value.string);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				fPackageInfo->AddSourceURL(value.string);
-				break;
-
-			case B_PACKAGE_INFO_CHECKSUM:
-				fPackageInfo->SetChecksum(value.string);
-				break;
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-				fPackageInfo->SetInstallPath(value.string);
-				break;
-
-			default:
-				fErrorOutput->PrintError(
-					"Invalid package attribute section: unexpected package "
-					"attribute id %d encountered\n", value.attributeID);
-				return B_BAD_DATA;
-		}
-
-		return B_OK;
-	}
-
 	virtual void HandleErrorOccurred()
 	{
 	}
 
 private:
-	BErrorOutput* 		fErrorOutput;
-	BPackageInfo* 		fPackageInfo;
 	BPackageReader*		fPackageReader;
 	BFDDataReader		fPackageFileReader;
 	BRepositoryInfo*	fRepositoryInfo;
