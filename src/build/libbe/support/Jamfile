@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src build libbe support ;
 
-UsePrivateBuildHeaders app interface shared ;
+UsePrivateBuildHeaders app interface shared support ;
 
 USES_BE_API on <libbe_build>support_kit.o = true ;
 
