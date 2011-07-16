@@ -9,18 +9,16 @@
 #include <Entry.h>
 #include <String.h>
 
+#include <package/PackageInfoSet.h>
 #include <package/RepositoryInfo.h>
 
 
 namespace BPackageKit {
 
 
-class BPackageInfo;
-
-
 class BRepositoryCache {
 public:
-			class Iterator;
+			typedef BPackageInfoSet::Iterator Iterator;
 
 public:
 								BRepositoryCache();
@@ -38,39 +36,15 @@ public:
 			Iterator			GetIterator() const;
 
 private:
-			struct PackageInfo;
-			struct PackageInfoHashDefinition;
-			struct PackageMap;
 			struct RepositoryContentHandler;
 			struct StandardErrorOutput;
-
-			friend class Iterator;
 
 private:
 			BEntry				fEntry;
 			BRepositoryInfo		fInfo;
 			bool				fIsUserSpecific;
 
-			PackageMap*			fPackageMap;
-};
-
-
-class BRepositoryCache::Iterator {
-public:
-								Iterator();
-
-			bool				HasNext() const;
-			const BPackageInfo*	Next();
-
-private:
-								Iterator(const BRepositoryCache* cache);
-
-private:
-			friend class BRepositoryCache;
-
-private:
-			const BRepositoryCache* fCache;
-			PackageInfo*		fNextInfo;
+			BPackageInfoSet		fPackages;
 };
 
 
