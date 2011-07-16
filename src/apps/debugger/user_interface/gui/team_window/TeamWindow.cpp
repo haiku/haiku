@@ -795,11 +795,14 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 	// look if our current stack trace has a frame matching the selected
 	// function. If so, set it to match.
 	StackFrame* matchingFrame = NULL;
+	BReference<StackFrame> frameRef;
+
 	if (fActiveStackTrace != NULL) {
 		for (int32 i = 0; i < fActiveStackTrace->CountFrames(); i++) {
 			StackFrame* frame = fActiveStackTrace->FrameAt(i);
 			if (frame->Function() == fActiveFunction) {
 				matchingFrame = frame;
+				frameRef.SetTo(frame);
 				break;
 			}
 		}
