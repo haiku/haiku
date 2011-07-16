@@ -55,6 +55,7 @@ SharedLibrary libpackage.so
 	Job.cpp
 	JobQueue.cpp
 	PackageInfo.cpp
+	PackageInfoSet.cpp
 	PackageResolvable.cpp
 	PackageResolvableExpression.cpp
 	PackageRoster.cpp
