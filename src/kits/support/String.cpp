@@ -23,6 +23,7 @@
 
 #include <Debug.h>
 
+#include <StringPrivate.h>
 #include <utf8_functions.h>
 
 
@@ -34,7 +35,7 @@
 #define REPLACE_ALL 0x7FFFFFFF
 
 
-const uint32 kPrivateDataOffset = 2 * sizeof(int32);
+static const uint32 kPrivateDataOffset = BString::Private::kPrivateDataOffset;
 
 const char* B_EMPTY_STRING = "";
 
@@ -76,20 +77,6 @@ static inline const char*
 safestr(const char* str)
 {
 	return str ? str : "";
-}
-
-
-static inline vint32&
-data_reference_count(char* data)
-{
-	return *(((int32 *)data) - 2);
-}
-
-
-static inline int32&
-data_length(char* data)
-{
-	return *(((int32*)data) - 1);
 }
 
 
@@ -202,14 +189,14 @@ BStringRef::operator&()
 inline vint32&
 BString::_ReferenceCount()
 {
-	return data_reference_count(fPrivateData);
+	return Private::DataRefCount(fPrivateData);
 }
 
 
 inline const vint32&
 BString::_ReferenceCount() const
 {
-	return data_reference_count(fPrivateData);
+	return Private::DataRefCount(fPrivateData);
 }
 
 
@@ -2132,6 +2119,15 @@ BString::operator<<(double value)
 //	#pragma mark - Private or reserved
 
 
+BString::BString(char* privateData, PrivateDataTag tag)
+	:
+	fPrivateData(privateData)
+{
+	if (fPrivateData != NULL)
+		atomic_add(&_ReferenceCount(), 1);
+}
+
+
 /*!	Detaches this string from an eventually shared fPrivateData, ie. this makes
 	this string writable.
 */
@@ -2210,8 +2206,8 @@ BString::_Allocate(int32 length)
 	newData[length] = '\0';
 
 	// initialize reference count & length
-	data_reference_count(newData) = 1;
-	data_length(newData) = length & 0x7fffffff;
+	Private::DataRefCount(newData) = 1;
+	Private::DataLength(newData) = length & 0x7fffffff;
 
 	return newData;
 }
@@ -2303,7 +2299,7 @@ BString::_ShrinkAtBy(int32 offset, int32 length)
 void
 BString::_SetLength(int32 length)
 {
-	data_length(fPrivateData) = length & 0x7fffffff;
+	Private::DataLength(fPrivateData) = length & 0x7fffffff;
 }
 
 

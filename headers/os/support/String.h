@@ -321,9 +321,20 @@ public:
 			BString&		operator<<(float value);
 			BString&		operator<<(double value);
 
+public:
+			class Private;
+			friend class Private;
+
 private:
-	class PosVect;
-	friend class BStringRef;
+			class PosVect;
+			friend class BStringRef;
+
+			enum PrivateDataTag {
+				PRIVATE_DATA
+			};
+
+private:
+							BString(char* privateData, PrivateDataTag tag);
 
 			// Management
 			status_t		_MakeWritable();
