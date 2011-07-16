@@ -417,46 +417,43 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	RegisterPackageVersion(attributeList, packageInfo.Version());
 
 	// copyright list
-	const BObjectList<BString>& copyrightList = packageInfo.CopyrightList();
-	for (int i = 0; i < copyrightList.CountItems(); ++i) {
+	const BStringList& copyrightList = packageInfo.CopyrightList();
+	for (int i = 0; i < copyrightList.CountStrings(); ++i) {
 		PackageAttribute* copyright = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		copyright->string
-			= fPackageStringCache.Get(copyrightList.ItemAt(i)->String());
+		copyright->string = fPackageStringCache.Get(copyrightList.StringAt(i));
 		attributeList.Add(copyright);
 	}
 
 	// license list
-	const BObjectList<BString>& licenseList = packageInfo.LicenseList();
-	for (int i = 0; i < licenseList.CountItems(); ++i) {
+	const BStringList& licenseList = packageInfo.LicenseList();
+	for (int i = 0; i < licenseList.CountStrings(); ++i) {
 		PackageAttribute* license = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		license->string
-			= fPackageStringCache.Get(licenseList.ItemAt(i)->String());
+		license->string = fPackageStringCache.Get(licenseList.StringAt(i));
 		attributeList.Add(license);
 	}
 
 	// URL list
-	const BObjectList<BString>& urlList = packageInfo.URLList();
-	for (int i = 0; i < urlList.CountItems(); ++i) {
+	const BStringList& urlList = packageInfo.URLList();
+	for (int i = 0; i < urlList.CountStrings(); ++i) {
 		PackageAttribute* url = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_URL, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		url->string = fPackageStringCache.Get(urlList.ItemAt(i)->String());
+		url->string = fPackageStringCache.Get(urlList.StringAt(i));
 		attributeList.Add(url);
 	}
 
 	// source URL list
-	const BObjectList<BString>& sourceURLList = packageInfo.SourceURLList();
-	for (int i = 0; i < sourceURLList.CountItems(); ++i) {
+	const BStringList& sourceURLList = packageInfo.SourceURLList();
+	for (int i = 0; i < sourceURLList.CountStrings(); ++i) {
 		PackageAttribute* url = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
 			B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		url->string = fPackageStringCache.Get(
-			sourceURLList.ItemAt(i)->String());
+		url->string = fPackageStringCache.Get(sourceURLList.StringAt(i));
 		attributeList.Add(url);
 	}
 
@@ -508,13 +505,12 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		packageInfo.FreshensList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS);
 
 	// replaces list
-	const BObjectList<BString>& replacesList = packageInfo.ReplacesList();
-	for (int i = 0; i < replacesList.CountItems(); ++i) {
+	const BStringList& replacesList = packageInfo.ReplacesList();
+	for (int i = 0; i < replacesList.CountStrings(); ++i) {
 		PackageAttribute* replaces = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		replaces->string
-			= fPackageStringCache.Get(replacesList.ItemAt(i)->String());
+		replaces->string = fPackageStringCache.Get(replacesList.StringAt(i));
 		attributeList.Add(replaces);
 	}
 

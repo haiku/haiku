@@ -681,9 +681,9 @@ PackageWriterImpl::_CheckLicenses()
 
 	BDirectory systemLicenseDir(systemLicensePath.Path());
 
-	const BObjectList<BString>& licenseList = fPackageInfo.LicenseList();
-	for (int i = 0; i < licenseList.CountItems(); ++i) {
-		const BString& licenseName = *licenseList.ItemAt(i);
+	const BStringList& licenseList = fPackageInfo.LicenseList();
+	for (int i = 0; i < licenseList.CountStrings(); ++i) {
+		const BString& licenseName = licenseList.StringAt(i);
 		if (licenseName == kPublicDomainLicenseName)
 			continue;
 

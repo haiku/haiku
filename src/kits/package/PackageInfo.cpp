@@ -81,7 +81,7 @@ private:
 									bool releaseIsOptional);
 			void				_ParseList(ListElementParser& elementParser,
 									bool allowSingleNonListElement);
-			void				_ParseStringList(BObjectList<BString>* value,
+			void				_ParseStringList(BStringList* value,
 									bool allowQuotedStrings = true,
 									bool convertToLowerCase = false);
 			void				_ParseResolvableList(
@@ -449,15 +449,15 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 
 
 void
-BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
+BPackageInfo::Parser::_ParseStringList(BStringList* value,
 	bool allowQuotedStrings, bool convertToLowerCase)
 {
 	struct StringParser : public ListElementParser {
-		BObjectList<BString>* value;
+		BStringList* value;
 		bool allowQuotedStrings;
 		bool convertToLowerCase;
 
-		StringParser(BObjectList<BString>* value, bool allowQuotedStrings,
+		StringParser(BStringList* value, bool allowQuotedStrings,
 			bool convertToLowerCase)
 			:
 			value(value),
@@ -479,11 +479,11 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value,
 					throw ParseError("expected word", token.pos);
 			}
 
-			BString* element = new BString(token.text);
+			BString element(token.text);
 			if (convertToLowerCase)
-				element->ToLower();
+				element.ToLower();
 
-			value->AddItem(element);
+			value->Add(element);
 		}
 	} stringParser(value, allowQuotedStrings, convertToLowerCase);
 
@@ -831,16 +831,16 @@ BPackageInfo::BPackageInfo()
 	:
 	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
-	fCopyrightList(5, true),
-	fLicenseList(5, true),
-	fURLList(5, true),
-	fSourceURLList(5, true),
+	fCopyrightList(5),
+	fLicenseList(5),
+	fURLList(5),
+	fSourceURLList(5),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
 	fConflictsList(5, true),
 	fFreshensList(5, true),
-	fReplacesList(5, true)
+	fReplacesList(5)
 {
 }
 
@@ -989,28 +989,28 @@ BPackageInfo::Version() const
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BPackageInfo::CopyrightList() const
 {
 	return fCopyrightList;
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BPackageInfo::LicenseList() const
 {
 	return fLicenseList;
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BPackageInfo::URLList() const
 {
 	return fURLList;
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BPackageInfo::SourceURLList() const
 {
 	return fSourceURLList;
@@ -1052,7 +1052,7 @@ BPackageInfo::FreshensList() const
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BPackageInfo::ReplacesList() const
 {
 	return fReplacesList;
@@ -1140,11 +1140,7 @@ BPackageInfo::ClearCopyrightList()
 status_t
 BPackageInfo::AddCopyright(const BString& copyright)
 {
-	BString* newCopyright = new (std::nothrow) BString(copyright);
-	if (newCopyright == NULL)
-		return B_NO_MEMORY;
-
-	return fCopyrightList.AddItem(newCopyright) ? B_OK : B_ERROR;
+	return fCopyrightList.Add(copyright) ? B_OK : B_ERROR;
 }
 
 
@@ -1158,11 +1154,7 @@ BPackageInfo::ClearLicenseList()
 status_t
 BPackageInfo::AddLicense(const BString& license)
 {
-	BString* newLicense = new (std::nothrow) BString(license);
-	if (newLicense == NULL)
-		return B_NO_MEMORY;
-
-	return fLicenseList.AddItem(newLicense) ? B_OK : B_ERROR;
+	return fLicenseList.Add(license) ? B_OK : B_ERROR;
 }
 
 
@@ -1176,11 +1168,7 @@ BPackageInfo::ClearURLList()
 status_t
 BPackageInfo::AddURL(const BString& url)
 {
-	BString* newURL = new (std::nothrow) BString(url);
-	if (newURL == NULL)
-		return B_NO_MEMORY;
-
-	return fURLList.AddItem(newURL) ? B_OK : B_NO_MEMORY;
+	return fURLList.Add(url) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -1194,11 +1182,7 @@ BPackageInfo::ClearSourceURLList()
 status_t
 BPackageInfo::AddSourceURL(const BString& url)
 {
-	BString* newURL = new (std::nothrow) BString(url);
-	if (newURL == NULL)
-		return B_NO_MEMORY;
-
-	return fSourceURLList.AddItem(newURL) ? B_OK : B_NO_MEMORY;
+	return fSourceURLList.Add(url) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -1307,12 +1291,7 @@ BPackageInfo::ClearReplacesList()
 status_t
 BPackageInfo::AddReplaces(const BString& replaces)
 {
-	BString* newReplaces = new (std::nothrow) BString(replaces);
-	if (newReplaces == NULL)
-		return B_NO_MEMORY;
-
-	newReplaces->ToLower();
-	return fReplacesList.AddItem(newReplaces) ? B_OK : B_ERROR;
+	return fReplacesList.Add(BString(replaces).ToLower()) ? B_OK : B_ERROR;
 }
 
 

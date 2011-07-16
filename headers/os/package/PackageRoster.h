@@ -11,7 +11,7 @@
 #include <Path.h>
 
 
-template <class T> class BObjectList;
+class BStringList;
 
 
 namespace BPackageKit {
@@ -45,7 +45,7 @@ public:
 			status_t			GetUserRepositoryConfigPath(BPath* path,
 									bool create = false) const;
 
-			status_t			GetRepositoryNames(BObjectList<BString>& names);
+			status_t			GetRepositoryNames(BStringList& names);
 
 			status_t			VisitCommonRepositoryConfigs(
 									BRepositoryConfigVisitor& visitor);

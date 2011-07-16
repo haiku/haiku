@@ -47,7 +47,7 @@ BRepositoryInfo::BRepositoryInfo()
 BRepositoryInfo::BRepositoryInfo(BMessage* data)
 	:
 	inherited(data),
-	fLicenseTexts(5, true)
+	fLicenseTexts(5)
 {
 	fInitStatus = SetTo(data);
 }
@@ -94,13 +94,13 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 		return result;
 	if ((result = data->AddUInt8(kArchitectureField, fArchitecture)) != B_OK)
 		return result;
-	for (int i = 0; i < fLicenseNames.CountItems(); ++i) {
-		result = data->AddString(kLicenseNameField, *fLicenseNames.ItemAt(i));
+	for (int i = 0; i < fLicenseNames.CountStrings(); ++i) {
+		result = data->AddString(kLicenseNameField, fLicenseNames.StringAt(i));
 		if (result != B_OK)
 			return result;
 	}
-	for (int i = 0; i < fLicenseTexts.CountItems(); ++i) {
-		result = data->AddString(kLicenseTextField, *fLicenseTexts.ItemAt(i));
+	for (int i = 0; i < fLicenseTexts.CountStrings(); ++i) {
+		result = data->AddString(kLicenseTextField, fLicenseTexts.StringAt(i));
 		if (result != B_OK)
 			return result;
 	}
@@ -146,11 +146,7 @@ BRepositoryInfo::SetTo(const BMessage* data)
 		data->FindString(kLicenseNameField, i, &licenseName) == B_OK
 			&& data->FindString(kLicenseTextField, i, &licenseText) == B_OK;
 		++i) {
-		BString* newLicenseName = new (std::nothrow) BString(licenseName);
-		if (newLicenseName == NULL || !fLicenseNames.AddItem(newLicenseName))
-			return B_NO_MEMORY;
-		BString* newLicenseText = new (std::nothrow) BString(licenseText);
-		if (newLicenseText == NULL || !fLicenseTexts.AddItem(newLicenseText))
+		if (!fLicenseNames.Add(licenseName) || !fLicenseTexts.Add(licenseText))
 			return B_NO_MEMORY;
 	}
 
@@ -269,14 +265,14 @@ BRepositoryInfo::Architecture() const
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BRepositoryInfo::LicenseNames() const
 {
 	return fLicenseNames;
 }
 
 
-const BObjectList<BString>&
+const BStringList&
 BRepositoryInfo::LicenseTexts() const
 {
 	return fLicenseTexts;
@@ -329,12 +325,7 @@ status_t
 BRepositoryInfo::AddLicense(const BString& licenseName,
 	const BString& licenseText)
 {
-	BString* newLicenseName = new (std::nothrow) BString(licenseName);
-	if (newLicenseName == NULL || !fLicenseNames.AddItem(newLicenseName))
-		return B_NO_MEMORY;
-
-	BString* newLicenseText = new (std::nothrow) BString(licenseText);
-	if (newLicenseText == NULL || !fLicenseTexts.AddItem(newLicenseText))
+	if (!fLicenseNames.Add(licenseName) || !fLicenseTexts.Add(licenseText))
 		return B_NO_MEMORY;
 
 	return B_OK;

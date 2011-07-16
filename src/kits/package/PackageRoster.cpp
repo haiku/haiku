@@ -14,9 +14,9 @@
 
 #include <Directory.h>
 #include <Entry.h>
-#include <ObjectList.h>
 #include <Path.h>
 #include <String.h>
+#include <StringList.h>
 
 #include <package/RepositoryCache.h>
 #include <package/RepositoryConfig.h>
@@ -89,10 +89,10 @@ BPackageRoster::VisitUserRepositoryConfigs(BRepositoryConfigVisitor& visitor)
 
 
 status_t
-BPackageRoster::GetRepositoryNames(BObjectList<BString>& names)
+BPackageRoster::GetRepositoryNames(BStringList& names)
 {
 	struct RepositoryNameCollector : public BRepositoryConfigVisitor {
-		RepositoryNameCollector(BObjectList<BString>& _names)
+		RepositoryNameCollector(BStringList& _names)
 			: names(_names)
 		{
 		}
@@ -102,15 +102,15 @@ BPackageRoster::GetRepositoryNames(BObjectList<BString>& names)
 			status_t result = entry.GetName(name);
 			if (result != B_OK)
 				return result;
-			int32 count = names.CountItems();
+			int32 count = names.CountStrings();
 			for (int i = 0; i < count; ++i) {
-				if (names.ItemAt(i)->Compare(name) == 0)
+				if (names.StringAt(i).Compare(name) == 0)
 					return B_OK;
 			}
-			names.AddItem(new (std::nothrow) BString(name));
+			names.Add(name);
 			return B_OK;
 		}
-		BObjectList<BString>& names;
+		BStringList& names;
 	};
 	RepositoryNameCollector repositoryNameCollector(names);
 	status_t result = VisitUserRepositoryConfigs(repositoryNameCollector);
