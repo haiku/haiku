@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #include <Errors.h>
-#include <SupportDefs.h>
+#include <StringList.h>
 
 #include <package/Context.h>
 #include <package/RefreshRepositoryRequest.h>
@@ -74,7 +74,7 @@ command_refresh(int argc, const char* const* argv)
 	JobStateListener listener;
 	BContext context(decisionProvider, listener);
 
-	BObjectList<BString> repositoryNames(20, true);
+	BStringList repositoryNames(20);
 
 	BPackageRoster roster;
 	if (nameCount == 0) {
@@ -83,16 +83,14 @@ command_refresh(int argc, const char* const* argv)
 			DIE(result, "can't collect repository names");
 	} else {
 		for (int i = 0; i < nameCount; ++i) {
-			BString* repoName = new (std::nothrow) BString(repoArgs[i]);
-			if (repoName == NULL)
+			if (!repositoryNames.Add(repoArgs[i]))
 				DIE(B_NO_MEMORY, "can't allocate repository name");
-			repositoryNames.AddItem(repoName);
 		}
 	}
 
 	status_t result;
-	for (int i = 0; i < repositoryNames.CountItems(); ++i) {
-		const BString& repoName = *(repositoryNames.ItemAt(i));
+	for (int i = 0; i < repositoryNames.CountStrings(); ++i) {
+		const BString& repoName = repositoryNames.StringAt(i);
 		BRepositoryConfig repoConfig;
 		result = roster.GetRepositoryConfig(repoName, &repoConfig);
 		if (result != B_OK) {

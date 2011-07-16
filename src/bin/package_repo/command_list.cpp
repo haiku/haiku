@@ -214,11 +214,11 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 		printf("\tpriority: %u\n", repositoryInfo.Priority());
 		printf("\tarchitecture: %s\n",
 			BPackageInfo::kArchitectureNames[repositoryInfo.Architecture()]);
-		const BObjectList<BString> licenseNames = repositoryInfo.LicenseNames();
+		const BStringList licenseNames = repositoryInfo.LicenseNames();
 		if (!licenseNames.IsEmpty()) {
 			printf("\tlicenses:\n");
-			for (int i = 0; i < licenseNames.CountItems(); ++i)
-				printf("\t\t%s\n", licenseNames.ItemAt(i)->String());
+			for (int i = 0; i < licenseNames.CountStrings(); ++i)
+				printf("\t\t%s\n", licenseNames.StringAt(i).String());
 		}
 
 		return B_OK;

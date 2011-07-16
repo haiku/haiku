@@ -119,10 +119,9 @@ struct PackageContentHandler : public BPackageContentHandler {
 			return B_OK;
 
 		// check if license already is in repository
-		const BObjectList<BString>& licenseNames
-			= fRepositoryInfo->LicenseNames();
-		for (int i = 0; i < licenseNames.CountItems(); ++i) {
-			if (licenseNames.ItemAt(i)->ICompare(entry->Name()) == 0) {
+		const BStringList& licenseNames = fRepositoryInfo->LicenseNames();
+		for (int i = 0; i < licenseNames.CountStrings(); ++i) {
+			if (licenseNames.StringAt(i).ICompare(entry->Name()) == 0) {
 				// license already exists
 				return B_OK;
 			}
@@ -365,7 +364,7 @@ RepositoryWriterImpl::_Finish()
 		sizeof(header) + infoLengthCompressed, packagesLengthCompressed);
 
 	fListener->OnRepositoryDone(sizeof(header), infoLengthCompressed,
-		fRepositoryInfo->LicenseNames().CountItems(), fPackageCount,
+		fRepositoryInfo->LicenseNames().CountStrings(), fPackageCount,
 		packagesLengthCompressed, totalSize);
 
 	// general

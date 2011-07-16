@@ -8,6 +8,7 @@
 
 #include <ObjectList.h>
 #include <String.h>
+#include <StringList.h>
 
 #include <package/PackageArchitecture.h>
 #include <package/PackageFlags.h>
@@ -68,10 +69,10 @@ public:
 
 			const BPackageVersion&	Version() const;
 
-			const BObjectList<BString>&	CopyrightList() const;
-			const BObjectList<BString>&	LicenseList() const;
-			const BObjectList<BString>&	URLList() const;
-			const BObjectList<BString>&	SourceURLList() const;
+			const BStringList&	CopyrightList() const;
+			const BStringList&	LicenseList() const;
+			const BStringList&	URLList() const;
+			const BStringList&	SourceURLList() const;
 
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
@@ -82,7 +83,7 @@ public:
 								ConflictsList() const;
 			const BObjectList<BPackageResolvableExpression>&
 								FreshensList() const;
-			const BObjectList<BString>&	ReplacesList() const;
+			const BStringList&	ReplacesList() const;
 
 			void				SetName(const BString& name);
 			void				SetSummary(const BString& summary);
@@ -159,10 +160,10 @@ private:
 
 			BPackageVersion		fVersion;
 
-			BObjectList<BString>	fCopyrightList;
-			BObjectList<BString>	fLicenseList;
-			BObjectList<BString>	fURLList;
-			BObjectList<BString>	fSourceURLList;
+			BStringList			fCopyrightList;
+			BStringList			fLicenseList;
+			BStringList			fURLList;
+			BStringList			fSourceURLList;
 
 			BObjectList<BPackageResolvable>	fProvidesList;
 
@@ -173,7 +174,7 @@ private:
 
 			BObjectList<BPackageResolvableExpression>	fFreshensList;
 
-			BObjectList<BString>	fReplacesList;
+			BStringList			fReplacesList;
 
 			BString				fChecksum;
 			BString				fInstallPath;
