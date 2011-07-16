@@ -15,14 +15,18 @@
 namespace BPackageKit {
 
 
+class BPackageInfo;
+
+
 class BRepositoryCache {
 public:
+			class Iterator;
+
+public:
 								BRepositoryCache();
-								BRepositoryCache(const BEntry& entry);
 	virtual						~BRepositoryCache();
 
 			status_t			SetTo(const BEntry& entry);
-			status_t			InitCheck() const;
 
 			const BRepositoryInfo&	Info() const;
 			const BEntry&		Entry() const;
@@ -30,19 +34,43 @@ public:
 
 			void				SetIsUserSpecific(bool isUserSpecific);
 
-			uint32				PackageCount() const;
+			uint32				CountPackages() const;
+			Iterator			GetIterator() const;
 
 private:
+			struct PackageInfo;
+			struct PackageInfoHashDefinition;
 			struct PackageMap;
+			struct RepositoryContentHandler;
+			struct StandardErrorOutput;
+
+			friend class Iterator;
 
 private:
-			status_t			fInitStatus;
-
 			BEntry				fEntry;
 			BRepositoryInfo		fInfo;
 			bool				fIsUserSpecific;
 
 			PackageMap*			fPackageMap;
+};
+
+
+class BRepositoryCache::Iterator {
+public:
+								Iterator();
+
+			bool				HasNext() const;
+			const BPackageInfo*	Next();
+
+private:
+								Iterator(const BRepositoryCache* cache);
+
+private:
+			friend class BRepositoryCache;
+
+private:
+			const BRepositoryCache* fCache;
+			PackageInfo*		fNextInfo;
 };
 
 
