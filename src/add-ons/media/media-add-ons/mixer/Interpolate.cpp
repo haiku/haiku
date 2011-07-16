@@ -49,7 +49,7 @@ Interpolate::float_to_float(const void *_src, int32 srcSampleOffset,
 
 	#define SRC(n) *(const float*)(src + n * srcSampleOffset)
 
-	while (count--) {
+	while (--count) {
 		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
 		dest += destSampleOffset;
 		current += delta;
@@ -59,6 +59,8 @@ Interpolate::float_to_float(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	*(float*)dest = SRC(0) * gain;
 }
 
 
@@ -88,7 +90,7 @@ Interpolate::int32_to_float(const void *_src, int32 srcSampleOffset,
 	#undef SRC
 	#define SRC(n) *(const int32*)(src + n * srcSampleOffset)
 
-	while (count--) {
+	while (--count) {
 		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
 		dest += destSampleOffset;
 		current += delta;
@@ -98,6 +100,8 @@ Interpolate::int32_to_float(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	*(float*)dest = SRC(0) * gain;
 }
 
 
@@ -127,7 +131,7 @@ Interpolate::int16_to_float(const void *_src, int32 srcSampleOffset,
 	#undef SRC
 	#define SRC(n) *(const int16*)(src + n * srcSampleOffset)
 
-	while (count--) {
+	while (--count) {
 		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current);
 		dest += destSampleOffset;
 		current += delta;
@@ -137,6 +141,8 @@ Interpolate::int16_to_float(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	*(float*)dest = SRC(0) * gain;
 }
 
 
@@ -166,7 +172,7 @@ Interpolate::int8_to_float(const void *_src, int32 srcSampleOffset,
 	#undef SRC
 	#define SRC(n) *(const int8*)(src + n * srcSampleOffset)
 
-	while (count--) {
+	while (--count) {
 		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current) ;
 		dest += destSampleOffset;
 		current += delta;
@@ -176,6 +182,8 @@ Interpolate::int8_to_float(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	*(float*)dest = SRC(0) * gain;
 }
 
 
@@ -205,7 +213,7 @@ Interpolate::uint8_to_float(const void *_src, int32 srcSampleOffset,
 	#undef SRC
 	#define SRC(n) ( *(const uint8*)(src + n * srcSampleOffset) - 128)
 
-	while (count--) {
+	while (--count) {
 		*(float*)dest = gain * (SRC(0) + (SRC(1) - SRC(0)) * current);
 		dest += destSampleOffset;
 		current += delta;
@@ -215,6 +223,8 @@ Interpolate::uint8_to_float(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	*(float*)dest = SRC(0) * gain;
 }
 
 
@@ -250,7 +260,7 @@ Interpolate::float_to_int32(const void *_src, int32 srcSampleOffset,
 	#undef SRC
 	#define SRC(n) *(const float*)(src + n * srcSampleOffset)
 
-	while (count--) {
+	while (--count) {
 		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
 			* current);
 		if (sample > 2147483647.0f)
@@ -267,6 +277,14 @@ Interpolate::float_to_int32(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	register float sample = SRC(0)*gain;
+	if (sample > 2147483647.0f)
+		*(int32 *)dest = 2147483647L;
+	else if (sample < -2147483647.0f)
+		*(int32 *)dest = -2147483647L;
+	else
+		*(int32 *)dest = (int32)sample;
 }
 
 
@@ -299,7 +317,7 @@ Interpolate::float_to_int16(const void *_src, int32 srcSampleOffset,
 	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
-	while (count--) {
+	while (--count) {
 		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
 			* current);
 		if (sample > 32767.0f)
@@ -316,6 +334,14 @@ Interpolate::float_to_int16(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	register float sample = SRC(0) * gain;
+	if (sample > 32767.0f)
+		*(int16 *)dest = 32767;
+	else if (sample < -32767.0f)
+		*(int16 *)dest = -32767;
+	else
+		*(int16 *)dest = (int16)sample;
 }
 
 
@@ -348,7 +374,7 @@ Interpolate::float_to_int8(const void *_src, int32 srcSampleOffset,
 	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
-	while (count--) {
+	while (--count) {
 		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
 			* current);
 		if (sample > 127.0f)
@@ -365,6 +391,14 @@ Interpolate::float_to_int8(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	register float sample = SRC(0) * gain;
+	if (sample > 127.0f)
+		*(int8 *)dest = 127;
+	else if (sample < -127.0f)
+		*(int8 *)dest = -127;
+	else
+		*(int8 *)dest = (int8)sample;
 }
 
 
@@ -397,7 +431,7 @@ Interpolate::float_to_uint8(const void *_src, int32 srcSampleOffset,
 	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
 	register float current = 0.0f;
 
-	while (count--) {
+	while (--count) {
 		register float sample = gain * (SRC(0) + (SRC(1) - SRC(0))
 			* current);
 		if (sample > 255.0f)
@@ -414,5 +448,13 @@ Interpolate::float_to_uint8(const void *_src, int32 srcSampleOffset,
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
+	
+	register float sample = SRC(0) * gain;
+	if (sample > 255.0f)
+		*(uint8 *)dest = 255;
+	else if (sample < 1.0f)
+		*(uint8 *)dest = 1;
+	else
+		*(uint8 *)dest = (uint8)sample;
 }
 
