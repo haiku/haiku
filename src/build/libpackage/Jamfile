@@ -68,6 +68,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	Job.cpp
 	JobQueue.cpp
 	PackageInfo.cpp
+	PackageInfoContentHandler.cpp
 	PackageInfoSet.cpp
 	PackageResolvable.cpp
 	PackageResolvableExpression.cpp
