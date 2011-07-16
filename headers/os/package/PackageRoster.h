@@ -10,6 +10,8 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
+#include <package/PackageDefs.h>
+
 
 class BStringList;
 
@@ -26,6 +28,7 @@ struct BRepositoryConfigVisitor {
 };
 
 
+class BPackageInfoSet;
 class BRepositoryCache;
 class BRepositoryConfig;
 
@@ -56,12 +59,16 @@ public:
 									BRepositoryCache* repositoryCache);
 			status_t			GetRepositoryConfig(const BString& name,
 									BRepositoryConfig* repositoryConfig);
+
+			status_t			GetActivePackages(
+									BPackageInstallationLocation location,
+									BPackageInfoSet& packageInfos);
+
 private:
 			status_t			_GetRepositoryPath(BPath* path, bool create,
 									directory_which whichDir) const;
 			status_t			_VisitRepositoryConfigs(const BPath& path,
 									BRepositoryConfigVisitor& visitor);
-
 };
 
 
