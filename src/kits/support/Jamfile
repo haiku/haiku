@@ -20,5 +20,6 @@ MergeObject <libbe>support_kit.o :
 	Referenceable.cpp
 	StopWatch.cpp
 	String.cpp
+	StringList.cpp
 	Url.cpp
 ;
