@@ -743,9 +743,6 @@ TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
 void
 TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 {
-// TODO: If a function is selected by other means than via selecting a stack
-// frame, we should still select a matching stack frame, if it features the
-// same function.
 	if (functionInstance == fActiveFunction)
 		return;
 
@@ -792,6 +789,26 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 	_SetActiveSourceCode(sourceCode);
 
 	fImageFunctionsView->SetFunction(fActiveFunction);
+
+	locker.Lock();
+
+	// look if our current stack trace has a frame matching the selected
+	// function. If so, set it to match.
+	StackFrame* matchingFrame = NULL;
+	if (fActiveStackTrace != NULL) {
+		for (int32 i = 0; i < fActiveStackTrace->CountFrames(); i++) {
+			StackFrame* frame = fActiveStackTrace->FrameAt(i);
+			if (frame->Function() == fActiveFunction) {
+				matchingFrame = frame;
+				break;
+			}
+		}
+	}
+
+	locker.Unlock();
+
+	if (matchingFrame != NULL)
+		_SetActiveStackFrame(matchingFrame);
 }
 
 
