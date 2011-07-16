@@ -230,12 +230,9 @@ struct DwarfFile::CIEAugmentation {
 			return B_OK;
 		}
 
-		if (strcmp(fString, "eh") == 0) {
-			// the augmentation consists of the exception table pointer
-			// -- just ignore it
-			dataReader.ReadAddress(0);
+		// nothing to do
+		if (strcmp(fString, "eh") == 0)
 			return B_OK;
-		}
 
 		// something we can't handle
 		return B_UNSUPPORTED;
@@ -1583,6 +1580,12 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 
 	// read the augmentation string
 	cieAugmentation.Init(dataReader);
+
+	// in the cause of augmentation string "eh",
+	// the exception table pointer is located immediately before the
+	// code/data alignment values. We have no use for it so simply skip.
+	if (strcmp(cieAugmentation.String(), "eh") == 0)
+		dataReader.Skip(dwarf64 ? sizeof(uint64) : sizeof(uint32));
 
 	context.SetCodeAlignment(dataReader.ReadUnsignedLEB128(0));
 	context.SetDataAlignment(dataReader.ReadSignedLEB128(0));
