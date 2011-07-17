@@ -311,7 +311,7 @@ HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 
-haikuRequiredLegacyGCCVersion="2.95.3-110228"
+haikuRequiredLegacyGCCVersion="2.95.3-110711"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
