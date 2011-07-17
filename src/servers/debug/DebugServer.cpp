@@ -27,6 +27,9 @@
 #include <util/DoublyLinkedList.h>
 
 
+#define HANDOVER_USE_GDB 1
+//#define HANDOVER_USE_DEBUGGER 1
+
 #define USE_GUI true
 	// define to false if the debug server shouldn't use GUI (i.e. an alert)
 
@@ -45,9 +48,13 @@ using std::nothrow;
 static const char *kSignature = "application/x-vnd.Haiku-debug_server";
 
 // paths to the apps used for debugging
+#ifdef HANDOVER_USE_GDB
 static const char *kConsoledPath	= "/bin/consoled";
 static const char *kTerminalPath	= "/boot/system/apps/Terminal";
 static const char *kGDBPath			= "/bin/gdb";
+#elif defined(HANDOVER_USE_DEBUGGER)
+static const char *kDebuggerPath	= "/boot/system/apps/Debugger";
+#endif
 
 
 static void
@@ -434,8 +441,6 @@ TeamDebugHandler::_EnterDebugger()
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld\n",
 		fTeam));
 
-	bool debugInConsoled = _IsGUIServer() || !_AreGUIServersAlive();
-
 	// prepare a debugger handover
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): preparing "
 		"debugger handover for team %ld...\n", fTeam));
@@ -448,14 +453,16 @@ TeamDebugHandler::_EnterDebugger()
 		return error;
 	}
 
-	// prepare the argument vector
+	const char *argv[16];
+	int argc = 0;
 	char teamString[32];
+#ifdef HANDOVER_USE_GDB
+	bool debugInConsoled = _IsGUIServer() || !_AreGUIServersAlive();
+
+	// prepare the argument vector
 	snprintf(teamString, sizeof(teamString), "--pid=%ld", fTeam);
 
 	const char *terminal = (debugInConsoled ? kConsoledPath : kTerminalPath);
-
-	const char *argv[16];
-	int argc = 0;
 
 	argv[argc++] = terminal;
 
@@ -477,9 +484,24 @@ TeamDebugHandler::_EnterDebugger()
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
 		"terminal (debugger) for team %ld...\n", fTeam));
 
+#elif defined(HANDOVER_USE_DEBUGGER)
+	// prepare the argument vector
+	snprintf(teamString, sizeof(teamString), "%ld", fTeam);
+
+	argv[argc++] = kDebuggerPath;
+	argv[argc++] = "--team";
+	argv[argc++] = teamString;
+	argv[argc] = NULL;
+
+	// start the debugger
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
+		"graphical debugger for team %ld...\n", fTeam));
+
+#endif
+
 	thread_id thread = load_image(argc, argv, (const char**)environ);
 	if (thread < 0) {
-		debug_printf("debug_server: Failed to start consoled + gdb: %s\n",
+		debug_printf("debug_server: Failed to start debugger: %s\n",
 			strerror(thread));
 		return thread;
 	}
