@@ -108,7 +108,7 @@ struct _pthread_rwlock {
 			__haiku_std_int32	writer_count;
 			void*				waiters[2];
 		} local;
-	};
+	} u;
 };
 
 struct _pthread_spinlock {
