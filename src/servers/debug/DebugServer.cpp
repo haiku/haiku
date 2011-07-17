@@ -48,11 +48,10 @@ using std::nothrow;
 static const char *kSignature = "application/x-vnd.Haiku-debug_server";
 
 // paths to the apps used for debugging
-#ifdef HANDOVER_USE_GDB
 static const char *kConsoledPath	= "/bin/consoled";
 static const char *kTerminalPath	= "/boot/system/apps/Terminal";
 static const char *kGDBPath			= "/bin/gdb";
-#elif defined(HANDOVER_USE_DEBUGGER)
+#ifdef HANDOVER_USE_DEBUGGER
 static const char *kDebuggerPath	= "/boot/system/apps/Debugger";
 #endif
 
@@ -117,6 +116,8 @@ private:
 	status_t _PopMessage(DebugMessage *&message);
 
 	thread_id _EnterDebugger();
+	void _SetupGDBArguments(const char **argv, int &argc, char *teamString,
+		size_t teamStringSize, bool usingConsoled);
 	void _KillTeam();
 
 	bool _HandleMessage(DebugMessage *message);
@@ -435,6 +436,33 @@ TeamDebugHandler::_PopMessage(DebugMessage *&message)
 }
 
 
+void
+TeamDebugHandler::_SetupGDBArguments(const char **argv, int &argc,
+	char *teamString, size_t teamStringSize, bool usingConsoled)
+{
+	// prepare the argument vector
+	snprintf(teamString, teamStringSize, "--pid=%ld", fTeam);
+
+	const char *terminal = (usingConsoled ? kConsoledPath : kTerminalPath);
+
+	argv[argc++] = terminal;
+
+	if (!usingConsoled) {
+		char windowTitle[64];
+		snprintf(windowTitle, sizeof(windowTitle), "Debug of Team %ld: %s",
+			fTeam, _LastPathComponent(fExecutablePath));
+		argv[argc++] = "-t";
+		argv[argc++] = windowTitle;
+	}
+
+	argv[argc++] = kGDBPath;
+	argv[argc++] = teamString;
+	if (strlen(fExecutablePath) > 0)
+		argv[argc++] = fExecutablePath;
+	argv[argc] = NULL;
+}
+
+
 thread_id
 TeamDebugHandler::_EnterDebugger()
 {
@@ -456,47 +484,33 @@ TeamDebugHandler::_EnterDebugger()
 	const char *argv[16];
 	int argc = 0;
 	char teamString[32];
-#ifdef HANDOVER_USE_GDB
 	bool debugInConsoled = _IsGUIServer() || !_AreGUIServersAlive();
+#ifdef HANDOVER_USE_GDB
 
-	// prepare the argument vector
-	snprintf(teamString, sizeof(teamString), "--pid=%ld", fTeam);
-
-	const char *terminal = (debugInConsoled ? kConsoledPath : kTerminalPath);
-
-	argv[argc++] = terminal;
-
-	if (!debugInConsoled) {
-		char windowTitle[64];
-		snprintf(windowTitle, sizeof(windowTitle), "Debug of Team %ld: %s",
-			fTeam, _LastPathComponent(fExecutablePath));
-		argv[argc++] = "-t";
-		argv[argc++] = windowTitle;
-	}
-
-	argv[argc++] = kGDBPath;
-	argv[argc++] = teamString;
-	if (strlen(fExecutablePath) > 0)
-		argv[argc++] = fExecutablePath;
-	argv[argc] = NULL;
+	_SetupGDBArguments(argv, argc, teamString, sizeof(teamString),
+		debugInConsoled);
 
 	// start the terminal
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
 		"terminal (debugger) for team %ld...\n", fTeam));
 
 #elif defined(HANDOVER_USE_DEBUGGER)
-	// prepare the argument vector
-	snprintf(teamString, sizeof(teamString), "%ld", fTeam);
+	if (debugInConsoled) {
+		_SetupGDBArguments(argv, argc, teamString, sizeof(teamString),
+			debugInConsoled);
+	} else {
+		// prepare the argument vector
+		snprintf(teamString, sizeof(teamString), "%ld", fTeam);
 
-	argv[argc++] = kDebuggerPath;
-	argv[argc++] = "--team";
-	argv[argc++] = teamString;
-	argv[argc] = NULL;
+		argv[argc++] = kDebuggerPath;
+		argv[argc++] = "--team";
+		argv[argc++] = teamString;
+		argv[argc] = NULL;
 
-	// start the debugger
-	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
-		"graphical debugger for team %ld...\n", fTeam));
-
+		// start the debugger
+		TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
+			"graphical debugger for team %ld...\n", fTeam));
+	}
 #endif
 
 	thread_id thread = load_image(argc, argv, (const char**)environ);
