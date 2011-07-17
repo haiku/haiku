@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel generic mpu401 ;
 
-UsePrivateHeaders libroot ;
+UsePrivateSystemHeaders ;
 
 KernelAddon mpu401 :
 	mpu401.c
