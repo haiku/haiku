@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders graphics libroot ;
+UsePrivateHeaders graphics ;
+UsePrivateSystemHeaders ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
@@ -13,7 +14,7 @@ KernelAddon nvidia :
 Package haiku-nvidia-cvs :
 	README.html UPDATE.html ;
 Package haiku-nvidia-cvs :
-	nvidia : 
+	nvidia :
 	boot home config add-ons kernel drivers bin ;
 PackageDriverSymLink haiku-nvidia-cvs : graphics nvidia ;
 Package haiku-nvidia-cvs :

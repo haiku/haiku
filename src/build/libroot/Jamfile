@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
-UsePrivateBuildHeaders kernel libroot ;
+UsePrivateBuildHeaders kernel system ;
 
 {
 	local defines = [ FDefines
