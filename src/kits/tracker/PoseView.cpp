@@ -6709,14 +6709,14 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 	if (fSelectionRectInfo.isDragging)
 		_UpdateSelectionRect(mouseLoc);
 
-	if (!fDropEnabled || !message)
+	if (!fDropEnabled || message == NULL)
 		return;
 
 	BContainerWindow* window = ContainerWindow();
 	if (!window)
 		return;
 
-	if (message != NULL && !window->Dragging())
+	if (!window->Dragging())
 		window->DragStart(message);
 
 	switch (moveCode) {
@@ -6731,6 +6731,7 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 			break;
 
 		case B_EXITED_VIEW:
+			DragStop();
 			// reset cursor in case we set it to the copy cursor
 			// in UpdateDropTarget
 			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
@@ -6786,9 +6787,12 @@ BPoseView::MouseIdle(const BMessage *message)
 	BPoint where;
 	uint32 buttons = 0;
 	GetMouse(&where, &buttons);
+		// We could retrieve 'where' from the incoming
+		// message but we need the buttons state anyway
+		// and B_MOUSE_IDLE message doesn't pass it
 	BContainerWindow* window = ContainerWindow();
 
-	if (buttons == 0 || window == NULL)
+	if (buttons == 0 || window == NULL || !window->Dragging())
 		return;
 
 	if (fDropTarget != NULL) {

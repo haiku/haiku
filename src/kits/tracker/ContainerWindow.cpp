@@ -3790,7 +3790,7 @@ BContainerWindow::SaveWindowState(BMessage &message) const
 status_t
 BContainerWindow::DragStart(const BMessage *incoming)
 {
-	if (!incoming)
+	if (incoming == NULL)
 		return B_ERROR;
 
 	//	if already dragging, or
