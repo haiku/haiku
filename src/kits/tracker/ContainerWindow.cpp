@@ -3788,19 +3788,19 @@ BContainerWindow::SaveWindowState(BMessage &message) const
 
 
 status_t
-BContainerWindow::DragStart(const BMessage *incoming)
+BContainerWindow::DragStart(const BMessage* dragMessage)
 {
-	if (incoming == NULL)
+	if (dragMessage == NULL)
 		return B_ERROR;
 
 	//	if already dragging, or
 	//	if all the refs match
-	if (Dragging() && SpringLoadedFolderCompareMessages(incoming, fDragMessage))
+	if (Dragging() && SpringLoadedFolderCompareMessages(dragMessage, fDragMessage))
 		return B_OK;
 
 	//	cache the current drag message
 	//	build a list of the mimetypes in the message
-	SpringLoadedFolderCacheDragData(incoming, &fDragMessage, &fCachedTypesList);
+	SpringLoadedFolderCacheDragData(dragMessage, &fDragMessage, &fCachedTypesList);
 
 	fWaitingForRefs = true;
 

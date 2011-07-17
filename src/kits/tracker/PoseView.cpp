@@ -6704,12 +6704,12 @@ BPoseView::_EndSelectionRect()
 
 
 void
-BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
+BPoseView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
 	if (fSelectionRectInfo.isDragging)
-		_UpdateSelectionRect(mouseLoc);
+		_UpdateSelectionRect(where);
 
-	if (!fDropEnabled || message == NULL)
+	if (!fDropEnabled || dragMessage == NULL)
 		return;
 
 	BContainerWindow* window = ContainerWindow();
@@ -6717,12 +6717,12 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 		return;
 
 	if (!window->Dragging())
-		window->DragStart(message);
+		window->DragStart(dragMessage);
 
-	switch (moveCode) {
+	switch (transit) {
 		case B_INSIDE_VIEW:
 		case B_ENTERED_VIEW:
-			UpdateDropTarget(mouseLoc, message, window->ContextMenu());
+			UpdateDropTarget(where, dragMessage, window->ContextMenu());
 			if (fAutoScrollState == kAutoScrollOff) {
 				// turn on auto scrolling if it's not yet on
 				fAutoScrollState = kWaitForTransition;
