@@ -399,7 +399,7 @@ ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 			!= B_OK)
 		return;
 
-	fill_display_mode(&mode);
+	fill_display_mode(width, height, &mode);
 
 	_AddMode(mode);
 }
@@ -518,11 +518,11 @@ create_display_modes(const char* name, edid1_info* edid,
 
 
 void
-fill_display_mode(display_mode* mode)
+fill_display_mode(uint32 width, uint32 height, display_mode* mode)
 {
 	mode->space = B_CMAP8;
-	mode->virtual_width = mode->timing.h_display;
-	mode->virtual_height = mode->timing.v_display;
+	mode->virtual_width = width;
+	mode->virtual_height = height;
 	mode->h_display_start = 0;
 	mode->v_display_start = 0;
 	mode->flags = MODE_FLAGS;
