@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src bin screenmode ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 	# for multimon.h
 
@@ -11,13 +12,8 @@ BinCommand screenmode :
 	screenmode.cpp
 
 	# from Screen preferences
-	gtf.cpp
 	multimon.cpp
 	ScreenMode.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) libaccelerantscommon.a
 ;
-
-#SEARCH on [ FGristFiles
-#		ScreenMode.cpp
-#	] = [ FDirName $(HAIKU_TOP) src preferences screen ] ;
