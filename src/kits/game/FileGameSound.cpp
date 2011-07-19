@@ -353,10 +353,18 @@ BFileGameSound::IsPaused()
 status_t
 BFileGameSound::Init(const entry_ref* file)
 {
-	fAudioStream = new _gs_media_tracker;
-	memset(fAudioStream, 0, sizeof(_gs_media_tracker));
+	fAudioStream = new(std::nothrow) _gs_media_tracker;
+	if (!fAudioStream)
+		return B_NO_MEMORY;
 
-	fAudioStream->file = new BMediaFile(file);
+	memset(fAudioStream, 0, sizeof(_gs_media_tracker));
+	fAudioStream->file = new(std::nothrow) BMediaFile(file);
+	if (!fAudioStream->file) {
+		delete fAudioStream;
+		fAudioStream = NULL;
+		return B_NO_MEMORY;
+	}
+	
 	status_t error = fAudioStream->file->InitCheck();
 	if (error != B_OK)
 		return error;
@@ -365,19 +373,28 @@ BFileGameSound::Init(const entry_ref* file)
 
 	// is this is an audio file?
 	media_format playFormat;
-	if ((error = fAudioStream->stream->EncodedFormat(&playFormat)) != B_OK)
+	if ((error = fAudioStream->stream->EncodedFormat(&playFormat)) != B_OK) {
+		fAudioStream->file->ReleaseTrack(fAudioStream->stream);
+		fAudioStream->stream = NULL;
 		return error;
+	}
 
-	if (!playFormat.IsAudio())
+	if (!playFormat.IsAudio()) {
+		fAudioStream->file->ReleaseTrack(fAudioStream->stream);
+		fAudioStream->stream = NULL;
 		return B_MEDIA_BAD_FORMAT;
+	}
 
 	gs_audio_format dformat = Device()->Format();
 
 	// request the format we want the sound
 	memset(&playFormat, 0, sizeof(media_format));
 	playFormat.type = B_MEDIA_RAW_AUDIO;
-	if (fAudioStream->stream->DecodedFormat(&playFormat) != B_OK)
+	if (fAudioStream->stream->DecodedFormat(&playFormat) != B_OK) {
+		fAudioStream->file->ReleaseTrack(fAudioStream->stream);
+		fAudioStream->stream = NULL;
 		return B_MEDIA_BAD_FORMAT;
+	}
 
 	// translate the format into a "GameKit" friendly one
 	gs_audio_format gsformat;
@@ -410,6 +427,9 @@ BFileGameSound::Init(const entry_ref* file)
 bool
 BFileGameSound::Load()
 {
+	if (!fAudioStream || !fAudioStream->stream)
+		return false;
+  
 	// read a new buffer
 	int64 frames = 0;
 	fAudioStream->stream->ReadFrames(fBuffer, &frames);
