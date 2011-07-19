@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,14 +8,15 @@
 
 
 #include "ScreenMode.h"
-#include "gtf.h"
-
-#include <InterfaceDefs.h>
-#include <String.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <InterfaceDefs.h>
+#include <String.h>
+
+#include <compute_display_timing.h>
 
 
 /* Note, this headers defines a *private* interface to the Radeon accelerant.
@@ -626,9 +627,8 @@ ScreenMode::_GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 	// For the mode selected by the width, height, and refresh rate, compute
 	// the video timing parameters for the mode by using the VESA Generalized
 	// Timing Formula (GTF).
-
-	ComputeGTFVideoTiming(displayMode.timing.h_display,
-		displayMode.timing.v_display, mode.refresh, displayMode.timing);
+	compute_display_timing(mode.width, mode.height, mode.refresh, false,
+		&displayMode.timing);
 
 	return true;
 }
