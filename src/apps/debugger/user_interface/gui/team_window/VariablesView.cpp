@@ -48,7 +48,8 @@ enum {
 
 
 enum {
-	MSG_MODEL_NODE_HIDDEN = 'monh'
+	MSG_MODEL_NODE_HIDDEN 		= 'monh',
+	MSG_VALUE_NODE_NEEDS_VALUE 	= 'mvnv'
 };
 
 
@@ -69,6 +70,8 @@ public:
 	virtual	void				ValueNodeValueChanged(ValueNode* node);
 
 	virtual void				ModelNodeHidden(ModelNode* node);
+
+	virtual void				ModelNodeValueRequested(ModelNode* node);
 
 private:
 			BHandler*			fIndirectTarget;
@@ -689,6 +692,20 @@ VariablesView::ContainerListener::ModelNodeHidden(ModelNode* node)
 }
 
 
+void
+VariablesView::ContainerListener::ModelNodeValueRequested(ModelNode* node)
+{
+	BReference<ModelNode> nodeReference(node);
+
+	BMessage message(MSG_VALUE_NODE_NEEDS_VALUE);
+	if (message.AddPointer("node", node) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeReference.Detach();
+	}
+}
+
+
 // #pragma mark - VariableTableModel
 
 
@@ -845,6 +862,13 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 			_AddNode(modelNode->GetVariable(), modelNode, child,
 				child->IsInternal(), childCount == 1);
 		}
+
+		if (valueNode->ChildCreationNeedsValue()) {
+			ModelNode* childNode = fNodeTable.Lookup(child);
+			if (childNode != NULL)
+				fContainerListener->ModelNodeValueRequested(childNode);
+		}
+
 	}
 }
 
@@ -882,6 +906,12 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 		status_t error = valueNode->CreateChildren();
 		if (error != B_OK)
 			return;
+
+		for (int32 i = 0; i < valueNode->CountChildren(); i++) {
+			ValueNodeChild* child = valueNode->ChildAt(i);
+			_CreateValueNode(child);
+			_AddChildNodes(child);
+		}
 	}
 
 	// check whether the value actually changed
@@ -1407,6 +1437,7 @@ VariablesView::MessageReceived(BMessage* message)
 
 			break;
 		}
+		case MSG_VALUE_NODE_NEEDS_VALUE:
 		case MSG_MODEL_NODE_HIDDEN:
 		{
 			ModelNode* node;
