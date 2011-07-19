@@ -2402,6 +2402,28 @@ BPoseView::MessageReceived(BMessage *message)
 				be_clipboard->Unlock();
 			}
 			break;
+
+		case kArrangeBy:
+		{
+			uint32 attrHash;
+			if (message->FindInt32("attr_hash", (int32*)&attrHash) == B_OK) {
+				if (ColumnFor(attrHash) == NULL)
+					HandleAttrMenuItemSelected(message);
+
+				if (PrimarySort() == attrHash)
+					attrHash = 0;
+					
+				SetPrimarySort(attrHash);
+				SetSecondarySort(0);
+				Cleanup(true);
+			}
+			break;
+		}
+		case kArrangeReverseOrder:
+			SetReverseSort(!fViewState->ReverseSort());
+			Cleanup(true);
+			break;
+
 		case kAttributeItem:
 			HandleAttrMenuItemSelected(message);
 			break;
@@ -2981,10 +3003,8 @@ BPoseView::SetViewMode(uint32 newMode)
 		AddToVSList(pose);
 	}
 
-	// sort poselist if we are switching to list mode
-	if (newMode == kListMode)
-		SortPoses();
-	else
+	SortPoses();
+	if (newMode != kListMode)
 		RecalcExtent();
 
 	UpdateScrollRange();
