@@ -55,7 +55,7 @@ GameProducer::GameProducer(GameSoundBuffer* object,
 	fPreferredFormat.u.raw_audio.channel_count = format->channel_count;
 	fPreferredFormat.u.raw_audio.frame_rate = format->frame_rate;		// measured in Hertz
 	fPreferredFormat.u.raw_audio.byte_order = format->byte_order;
-//	fPreferredFormat.u.raw_audio.channel_mask = B_CHANNEL_LEFT & B_CHANNEL_RIGHT;
+//	fPreferredFormat.u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 //	fPreferredFormat.u.raw_audio.valid_bits = 32;
 //	fPreferredFormat.u.raw_audio.matrix_mask = B_MATRIX_AMBISONIC_WXYZ;
 	
@@ -186,7 +186,7 @@ GameProducer::PrepareToConnect(const media_source& what, const media_destination
 	fOutput.destination = where;
 	fOutput.format = *format;
 	*out_source = fOutput.source;
-	strncpy(out_name, fOutput.name, B_MEDIA_NAME_LENGTH);
+	strlcpy(out_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 	return B_OK;
 }
 
@@ -207,7 +207,7 @@ GameProducer::Connect(status_t error, const media_source& source, const media_de
 	// that we agreed on, and report our connection name again.
 	fOutput.destination = destination;
 	fOutput.format = format;
-	strncpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
+	strlcpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
@@ -393,7 +393,7 @@ GameProducer::NodeRegistered()
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.node = Node();
-	::strcpy(fOutput.name, "GameProducer Output");
+	strlcpy(fOutput.name, "GameProducer Output", B_MEDIA_NAME_LENGTH);
 }
 
 
