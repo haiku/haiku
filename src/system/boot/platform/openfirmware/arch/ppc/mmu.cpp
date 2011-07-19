@@ -30,6 +30,14 @@
 //#define PHYSINVAL ((void *)-1)
 #define PHYSINVAL NULL
 
+//#define TRACE_MMU
+#ifdef TRACE_MMU
+#   define TRACE(x...) dprintf(x)
+#else
+#   define TRACE(x...) ;
+#endif
+
+
 segment_descriptor sSegments[16];
 page_table_entry_group *sPageTable;
 uint32 sPageTableHashMask;
@@ -62,7 +70,7 @@ static status_t
 find_physical_memory_ranges(size_t &total)
 {
 	int memory, package;
-	printf("checking for memory...\n");
+	dprintf("checking for memory...\n");
 	if (of_getprop(gChosen, "memory", &memory, sizeof(int)) == OF_FAILED)
 		return B_ERROR;
 	package = of_instance_to_package(memory);
@@ -80,17 +88,18 @@ find_physical_memory_ranges(size_t &total)
 
 	for (int32 i = 0; i < count; i++) {
 		if (regions[i].size <= 0) {
-			printf("%ld: empty region\n", i);
+			dprintf("%ld: empty region\n", i);
 			continue;
 		}
-		printf("%ld: base = %p, size = %lu\n", i, regions[i].base,
-			regions[i].size);
+		dprintf("%" B_PRIu32 ": base = %p, size = %" B_PRIu32 "\n", i,
+			regions[i].base, regions[i].size);
 
 		total += regions[i].size;
 
 		if (insert_physical_memory_range((addr_t)regions[i].base,
 				regions[i].size) != B_OK) {
-			printf("cannot map physical memory range (num ranges = %lu)!\n",
+			dprintf("cannot map physical memory range "
+				"(num ranges = %" B_PRIu32 ")!\n",
 				gKernelArgs.num_physical_memory_ranges);
 			return B_ERROR;
 		}
@@ -184,7 +193,8 @@ map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 
 		fill_page_table_entry(&group->entry[i], virtualSegmentID,
 			virtualAddress, physicalAddress, mode, false);
-		//printf("map: va = %p -> %p, mode = %d, hash = %lu\n", virtualAddress, physicalAddress, mode, hash);
+		//TRACE("map: va = %p -> %p, mode = %d, hash = %lu\n",
+		//	virtualAddress, physicalAddress, mode, hash);
 		return;
 	}
 
@@ -197,12 +207,12 @@ map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 
 		fill_page_table_entry(&group->entry[i], virtualSegmentID,
 			virtualAddress, physicalAddress, mode, true);
-		//printf("map: va = %p -> %p, mode = %d, second hash = %lu\n", virtualAddress, physicalAddress, mode, hash);
+		//TRACE("map: va = %p -> %p, mode = %d, second hash = %lu\n",
+		//	virtualAddress, physicalAddress, mode, hash);
 		return;
 	}
 
-	panic("out of page table entries! (you would think this could not happen "
-		"in a boot loader...)\n");
+	panic("%s: out of page table entries!\n", __func__);
 }
 
 
@@ -226,7 +236,7 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 	// we have proper driver support for the target hardware).
 	int mmu;
 	if (of_getprop(gChosen, "mmu", &mmu, sizeof(int)) == OF_FAILED) {
-		puts("no OF mmu");
+		dprintf("%s: Error: no OpenFirmware mmu\n", __func__);
 		return B_ERROR;
 	}
 	mmu = of_instance_to_package(mmu);
@@ -241,30 +251,33 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 	int length = of_getprop(mmu, "translations", &translations,
 		sizeof(translations));
 	if (length == OF_FAILED) {
-		puts("no OF translations");
+		dprintf("Error: no OF translations.\n");
 		return B_ERROR;
 	}
 	length = length / sizeof(struct translation_map);
 	uint32 total = 0;
-	printf("found %d translations\n", length);
+	dprintf("found %d translations\n", length);
 
 	for (int i = 0; i < length; i++) {
 		struct translation_map *map = &translations[i];
 		bool keepRange = true;
-		//printf("%i: map: %p, length %d -> physical: %p, mode %d\n", i, map->virtual_address, map->length, map->physical_address, map->mode);
+		TRACE("%i: map: %p, length %d -> physical: %p, mode %d\n", i,
+			map->virtual_address, map->length,
+			map->physical_address, map->mode);
 
 		// insert range in physical allocated, if it points to physical memory
 
 		if (is_physical_memory(map->physical_address)
 			&& insert_physical_allocated_range((addr_t)map->physical_address,
 					map->length) != B_OK) {
-			printf("cannot map physical allocated range (num ranges = %lu)!\n",
+			dprintf("cannot map physical allocated range "
+				"(num ranges = %" B_PRIu32 ")!\n",
 				gKernelArgs.num_physical_allocated_ranges);
 			return B_ERROR;
 		}
 
 		if (map->virtual_address == pageTable) {
-			puts("found page table!");
+			dprintf("found page table\n");
 			*_physicalPageTable
 				= (page_table_entry_group *)map->physical_address;
 			keepRange = false;
@@ -272,7 +285,7 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		}
 		if ((addr_t)map->physical_address <= 0x100
 			&& (addr_t)map->physical_address + map->length >= 0x1000) {
-			puts("found exception handlers!");
+			dprintf("found exception handlers\n");
 			*_exceptionHandlers = map->virtual_address;
 			keepRange = false;
 				// we keep it explicitely anyway
@@ -284,7 +297,8 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		if (insert_virtual_allocated_range((addr_t)map->virtual_address,
 				map->length) != B_OK) {
-			printf("cannot map virtual allocated range (num ranges = %lu)!\n",
+			dprintf("cannot map virtual allocated range "
+				"(num ranges = %" B_PRIu32 ")!\n",
 				gKernelArgs.num_virtual_allocated_ranges);
 		}
 
@@ -298,20 +312,21 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		if (keepRange) {
 			if (insert_virtual_range_to_keep(map->virtual_address,
 					map->length) != B_OK) {
-				printf("cannot map virtual range to keep (num ranges = %lu)!\n",
+				dprintf("cannot map virtual range to keep "
+					"(num ranges = %" B_PRIu32 ")\n",
 					gKernelArgs.num_virtual_allocated_ranges);
 			}
 		}
 
 		total += map->length;
 	}
-	//printf("total mapped: %lu\n", total);
+	dprintf("total mapped: %" B_PRIu32 "\n", total);
 
 	// remove the boot loader code from the virtual ranges to keep in the
 	// kernel
 	if (remove_virtual_range_to_keep(&__text_begin, &_end - &__text_begin)
 			!= B_OK) {
-		printf("find_allocated_ranges(): Failed to remove boot loader range "
+		dprintf("find_allocated_ranges(): Failed to remove boot loader range "
 			"from virtual ranges to keep.\n");
 	}
 
@@ -431,7 +446,7 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	// fail if the exact address was requested, but is not free
 	if (exactAddress && _virtualAddress && virtualAddress != _virtualAddress) {
 		dprintf("arch_mmu_allocate(): exact address requested, but virtual "
-			"range (base: %p, size: %lu) is not free.\n",
+			"range (base: %p, size: %" B_PRIuSIZE ") is not free.\n",
 			_virtualAddress, size);
 		return NULL;
 	}
@@ -443,14 +458,14 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 
 	void *physicalAddress = find_free_physical_range(size);
 	if (physicalAddress == PHYSINVAL) {
-		dprintf("arch_mmu_allocate(base: %p, size: %lu) no free physical "
-			"address\n", virtualAddress, size);
+		dprintf("arch_mmu_allocate(base: %p, size: %" B_PRIuSIZE ") "
+			"no free physical address\n", virtualAddress, size);
 		return NULL;
 	}
 
 	// everything went fine, so lets mark the space as used.
 
-	printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress,
+	dprintf("mmu_alloc: va %p, pa %p, size %" B_PRIuSIZE "\n", virtualAddress,
 		physicalAddress, size);
 	insert_virtual_allocated_range((addr_t)virtualAddress, size);
 	insert_physical_allocated_range((addr_t)physicalAddress, size);
@@ -618,7 +633,7 @@ static int
 callback(struct of_arguments *args)
 {
 	const char *name = args->name;
-printf("CALLBACK: %s\n", name);
+	TRACE("OF CALLBACK: %s\n", name);
 
 	if (!strcmp(name, "map"))
 		return map_callback(args);
@@ -642,10 +657,10 @@ arch_set_callback(void)
 	void *oldCallback = NULL;
 	if (of_call_client_function("set-callback", 1, 1, &callback, &oldCallback)
 			== OF_FAILED) {
-		puts("set-callback failed!");
+		dprintf("Error: OpenFirmware set-callback failed\n");
 		return B_ERROR;
 	}
-	//printf("old callback = %p\n", oldCallback);
+	TRACE("old callback = %p; new callback = %p\n", oldCallback, callback);
 
 	return B_OK;
 }
@@ -658,10 +673,10 @@ arch_mmu_init(void)
 
 	size_t total;
 	if (find_physical_memory_ranges(total) != B_OK) {
-		puts("could not find physical memory ranges!");
+		dprintf("Error: could not find physical memory ranges!\n");
 		return B_ERROR;
 	}
-	printf("total physical memory = %u MB\n", total / (1024*1024));
+	dprintf("total physical memory = %" B_PRId32 "MB\n", total / (1024 * 1024));
 
 	// get OpenFirmware's current page table
 
@@ -679,23 +694,25 @@ arch_mmu_init(void)
 
 	// can we just keep the page table?
 	size_t suggestedTableSize = suggested_page_table_size(total);
-	printf("suggested page table size = %u\n", suggestedTableSize);
+	dprintf("suggested page table size = %" B_PRIuSIZE "\n",
+		suggestedTableSize);
 	if (tableSize < suggestedTableSize) {
 		// nah, we need a new one!
-		printf("need new page table, size = %u!\n", suggestedTableSize);
+		dprintf("need new page table, size = %" B_PRIuSIZE "!\n",
+			suggestedTableSize);
 		table = (page_table_entry_group *)of_claim(NULL, suggestedTableSize,
 			suggestedTableSize);
 			// KERNEL_BASE would be better as virtual address, but
 			// at least with Apple's OpenFirmware, it makes no
 			// difference - we will have to remap it later
 		if (table == (void *)OF_FAILED) {
-			panic("Could not allocate new page table (size = %ld)!!\n",
-				suggestedTableSize);
+			panic("Could not allocate new page table "
+				"(size = %" B_PRIuSIZE ")!!\n", suggestedTableSize);
 			return B_NO_MEMORY;
 		}
 		if (table == NULL) {
 			// work-around for the broken Pegasos OpenFirmware
-			puts("broken OpenFirmware detected (claim doesn't work).");
+			dprintf("broken OpenFirmware detected (claim doesn't work)\n");
 			realMode = true;
 
 			addr_t tableBase = 0;
@@ -706,7 +723,7 @@ arch_mmu_init(void)
 			table = (page_table_entry_group *)tableBase;
 		}
 
-		printf("new table at: %p\n", table);
+		dprintf("new table at: %p\n", table);
 		sPageTable = table;
 		tableSize = suggestedTableSize;
 	} else {
@@ -723,9 +740,9 @@ arch_mmu_init(void)
 	// turn off address translation via the page table/segment mechanism,
 	// identity map the first 256 MB (where our code/data reside)
 
-	printf("MSR: %p\n", (void *)get_msr());
+	dprintf("MSR: %p\n", (void *)get_msr());
 
-#if 0
+	#if 0
 	block_address_translation bat;
 
 	bat.length = BAT_LENGTH_256MB;
@@ -736,7 +753,7 @@ arch_mmu_init(void)
 	set_ibat0(&bat);
 	set_dbat0(&bat);
 	isync();
-#endif
+	#endif
 
 	// initialize segment descriptors, but don't set the registers
 	// until we're about to take over the page table - we're mapping
@@ -752,8 +769,8 @@ arch_mmu_init(void)
 	void *exceptionHandlers = (void *)-1;
 	if (find_allocated_ranges(oldTable, table, &physicalTable,
 			&exceptionHandlers) != B_OK) {
-		puts("find_allocated_ranges() failed!");
-		//return B_ERROR;
+		dprintf("Error: find_allocated_ranges() failed\n");
+		return B_ERROR;
 	}
 
 #if 0
@@ -766,14 +783,18 @@ arch_mmu_init(void)
 #endif
 
 	if (physicalTable == NULL) {
-		puts("arch_mmu_init(): Didn't find physical address of page table!");
+		dprintf("%s: Didn't find physical address of page table\n", __func__);
 		if (!realMode)
 			return B_ERROR;
 
 		// Pegasos work-around
-		//map_range((void *)realBase, (void *)realBase, realSize * 2, PAGE_READ_WRITE);
-		//map_range((void *)(total - realSize), (void *)(total - realSize), realSize, PAGE_READ_WRITE);
-		//map_range((void *)table, (void *)table, tableSize, PAGE_READ_WRITE);
+		#if 0
+		map_range((void *)realBase, (void *)realBase,
+			realSize * 2, PAGE_READ_WRITE);
+		map_range((void *)(total - realSize), (void *)(total - realSize),
+			realSize, PAGE_READ_WRITE);
+		map_range((void *)table, (void *)table, tableSize, PAGE_READ_WRITE);
+		#endif
 		insert_physical_allocated_range(realBase, realSize * 2);
 		insert_virtual_allocated_range(realBase, realSize * 2);
 		insert_physical_allocated_range(total - realSize, realSize);
@@ -790,7 +811,7 @@ arch_mmu_init(void)
 
 	if (exceptionHandlers == (void *)-1) {
 		// TODO: create mapping for the exception handlers
-		puts("no mapping for the exception handlers!");
+		dprintf("Error: no mapping for the exception handlers!\n");
 	}
 
 	// Set the Open Firmware memory callback. From now on the Open Firmware
@@ -820,9 +841,12 @@ arch_mmu_init(void)
 
 	// set kernel args
 
-	printf("virt_allocated: %lu\n", gKernelArgs.num_virtual_allocated_ranges);
-	printf("phys_allocated: %lu\n", gKernelArgs.num_physical_allocated_ranges);
-	printf("phys_memory: %lu\n", gKernelArgs.num_physical_memory_ranges);
+	dprintf("virt_allocated: %" B_PRIu32 "\n",
+		gKernelArgs.num_virtual_allocated_ranges);
+	dprintf("phys_allocated: %" B_PRIu32 "\n",
+		gKernelArgs.num_physical_allocated_ranges);
+	dprintf("phys_memory: %" B_PRIu32 "\n",
+		gKernelArgs.num_physical_memory_ranges);
 
 	gKernelArgs.arch_args.page_table.start = (addr_t)sPageTable;
 	gKernelArgs.arch_args.page_table.size = tableSize;
