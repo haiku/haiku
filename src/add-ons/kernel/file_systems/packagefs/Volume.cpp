@@ -1124,7 +1124,7 @@ Volume::_AddPackageContentRootNode(Package* package,
 			RETURN_ERROR(error);
 		}
 
-		// recursive into directory, unless we're supposed to skip the node
+		// recurse into directory, unless we're supposed to skip the node
 		if (node != NULL) {
 			if (PackageDirectory* packageDirectory
 					= dynamic_cast<PackageDirectory*>(packageNode)) {
@@ -1178,7 +1178,7 @@ Volume::_RemovePackageContentRootNode(Package* package,
 		if (packageNode == endPackageNode)
 			break;
 
-		// recursive into directory
+		// recurse into directory
 		if (PackageDirectory* packageDirectory
 				= dynamic_cast<PackageDirectory*>(packageNode)) {
 			if (packageDirectory->FirstChild() != NULL) {
