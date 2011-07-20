@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011, Alexander von Gluck, kallisti5@unixzen.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -61,26 +62,28 @@ determine_machine(void)
 
 	int root = of_finddevice("/");
 	char buffer[64];
-	int length;
-	if ((length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1))
-			== OF_FAILED)
-		return;
-	buffer[length] = '\0';
 
-	// ToDo: add more, and be as generic as possible
+	// TODO : Probe other OpenFirmware platforms and set gMachine as needed
+
+	int length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1);
+	buffer[length] = '\0';
 
 	if (!strcasecmp("chrp", buffer))
 		gMachine = MACHINE_CHRP;
-	else if (!strcasecmp("bootrom", buffer))
+	else //(bootrom) + QEMU
 		gMachine = MACHINE_MAC;
-
-	if ((length = of_getprop(root, "model", buffer, sizeof(buffer) - 1))
-			== OF_FAILED)
-		return;
+		
+	length = of_getprop(root, "model", buffer, sizeof(buffer) - 1);
 	buffer[length] = '\0';
 
 	if (!strcasecmp("pegasos", buffer))
 		gMachine |= MACHINE_PEGASOS;
+
+	length = of_getprop(root, "name", buffer, sizeof(buffer) - 1);
+	buffer[length] = '\0';
+
+	if (!strcasecmp("openbiosteam,openbios", buffer))
+		gMachine |= MACHINE_QEMU;
 }
 
 
@@ -155,6 +158,13 @@ start(void *openFirmwareEntry)
 
 	determine_machine();
 	console_init();
+
+	if (gMachine & MACHINE_QEMU)
+		dprintf("OpenBIOS (QEMU?) OpenFirmware machine detected\n");
+	else if (gMachine & MACHINE_PEGASOS)
+		dprintf("Pegasos PowerPC machine detected\n");
+	else
+		dprintf("Apple PowerPC machine assumed\n");
 
 	// Initialize and take over MMU and set the OpenFirmware callbacks - it
 	// will ask us for memory after that instead of maintaining it itself
