@@ -1182,11 +1182,13 @@ Volume::_RemovePackageContentRootNode(Package* package,
 		if (PackageDirectory* packageDirectory
 				= dynamic_cast<PackageDirectory*>(packageNode)) {
 			if (packageDirectory->FirstChild() != NULL) {
-				directory = dynamic_cast<Directory*>(
-					directory->FindChild(packageNode->Name()));
-				packageNode = packageDirectory->FirstChild();
-				directory->WriteLock();
-				continue;
+				if (Directory* childDirectory = dynamic_cast<Directory*>(
+						directory->FindChild(packageNode->Name()))) {
+					directory = childDirectory;
+					packageNode = packageDirectory->FirstChild();
+					directory->WriteLock();
+					continue;
+				}
 			}
 		}
 
