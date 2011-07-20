@@ -114,9 +114,8 @@ is_virtual_allocated(void *address, size_t size)
 {
 	addr_t foundBase;
 	return !get_free_address_range(gKernelArgs.virtual_allocated_range,
-			gKernelArgs.num_virtual_allocated_ranges, (addr_t)address, size,
-			&foundBase)
-		|| foundBase != (addr_t)address;
+		gKernelArgs.num_virtual_allocated_ranges, (addr_t)address, size,
+		&foundBase) || foundBase != (addr_t)address;
 }
 
 
@@ -125,10 +124,9 @@ is_physical_allocated(void *address, size_t size)
 {
 	phys_addr_t foundBase;
 	return !get_free_physical_address_range(
-			gKernelArgs.physical_allocated_range,
-			gKernelArgs.num_physical_allocated_ranges, (addr_t)address, size,
-			&foundBase)
-		|| foundBase != (addr_t)address;
+		gKernelArgs.physical_allocated_range,
+		gKernelArgs.num_physical_allocated_ranges, (addr_t)address, size,
+		&foundBase) || foundBase != (addr_t)address;
 }
 
 
@@ -269,7 +267,7 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		if (is_physical_memory(map->physical_address)
 			&& insert_physical_allocated_range((addr_t)map->physical_address,
-					map->length) != B_OK) {
+				map->length) != B_OK) {
 			dprintf("cannot map physical allocated range "
 				"(num ranges = %" B_PRIu32 ")!\n",
 				gKernelArgs.num_physical_allocated_ranges);
@@ -277,7 +275,8 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		}
 
 		if (map->virtual_address == pageTable) {
-			dprintf("found page table\n");
+			dprintf("%i: found page table at va %p\n", i,
+				map->virtual_address);
 			*_physicalPageTable
 				= (page_table_entry_group *)map->physical_address;
 			keepRange = false;
@@ -285,7 +284,8 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		}
 		if ((addr_t)map->physical_address <= 0x100
 			&& (addr_t)map->physical_address + map->length >= 0x1000) {
-			dprintf("found exception handlers\n");
+			dprintf("%i: found exception handlers at va %p\n", i,
+				map->virtual_address);
 			*_exceptionHandlers = map->virtual_address;
 			keepRange = false;
 				// we keep it explicitely anyway
@@ -310,6 +310,9 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		// insert range in virtual ranges to keep
 
 		if (keepRange) {
+			TRACE("%i: keeping free range starting at va %p\n", i,
+				map->virtual_address);
+
 			if (insert_virtual_range_to_keep(map->virtual_address,
 					map->length) != B_OK) {
 				dprintf("cannot map virtual range to keep "
@@ -320,14 +323,14 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		total += map->length;
 	}
-	dprintf("total mapped: %" B_PRIu32 "\n", total);
+	dprintf("total size kept: %" B_PRIu32 "\n", total);
 
 	// remove the boot loader code from the virtual ranges to keep in the
 	// kernel
 	if (remove_virtual_range_to_keep(&__text_begin, &_end - &__text_begin)
 			!= B_OK) {
-		dprintf("find_allocated_ranges(): Failed to remove boot loader range "
-			"from virtual ranges to keep.\n");
+		dprintf("%s: Failed to remove boot loader range "
+			"from virtual ranges to keep.\n", __func__);
 	}
 
 	return B_OK;
@@ -688,7 +691,10 @@ arch_mmu_init(void)
 	oldTable = table;
 
 	bool realMode = false;
+
 	// TODO: read these values out of the OF settings
+	// NOTE: I've only ever seen -1 (0xffffffff) for these values in
+	//       OpenFirmware.. even after loading the bootloader -- Alex
 	addr_t realBase = 0;
 	addr_t realSize = 0x400000;
 
