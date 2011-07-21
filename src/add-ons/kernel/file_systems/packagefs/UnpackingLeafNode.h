@@ -32,6 +32,12 @@ public:
 
 	virtual	PackageNode*		GetPackageNode();
 	virtual	bool				IsOnlyPackageNode(PackageNode* node) const;
+	virtual	bool				WillBeFirstPackageNode(
+									PackageNode* packageNode) const;
+
+	virtual	void				PrepareForRemoval();
+	virtual	status_t			CloneTransferPackageNodes(ino_t id,
+									UnpackingNode*& _newNode);
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
@@ -49,7 +55,11 @@ public:
 	virtual	void*				IndexCookieForAttribute(const char* name) const;
 
 private:
+	inline	PackageLeafNode*	_ActivePackageNode() const;
+
+private:
 			PackageLeafNodeList	fPackageNodes;
+			PackageLeafNode*	fFinalPackageNode;
 };
 
 

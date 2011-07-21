@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -157,6 +157,8 @@ private:
 									UnpackingNode*& _node);
 									// does *not* return a reference
 			void				_RemoveNode(Node* node);
+			void				_RemoveNodeAndVNode(Node* node);
+									// caller must hold a reference
 
 			void				_DomainListenerEventOccurred(
 									PackageDomain* domain,

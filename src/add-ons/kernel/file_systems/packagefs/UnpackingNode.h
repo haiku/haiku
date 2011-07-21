@@ -24,6 +24,12 @@ public:
 
 	virtual	PackageNode*		GetPackageNode() = 0;
 	virtual	bool				IsOnlyPackageNode(PackageNode* node) const = 0;
+	virtual	bool				WillBeFirstPackageNode(
+									PackageNode* packageNode) const = 0;
+
+	virtual	void				PrepareForRemoval() = 0;
+	virtual	status_t			CloneTransferPackageNodes(ino_t id,
+									UnpackingNode*& _newNode);
 };
 
 

@@ -1243,21 +1243,59 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 		newNode = true;
 	}
 
-	// TODO: The non-new part is broken for files. If a node is already known to
-	// the VFS, we can't just change the file content. The file might be an
-	// executable or library that is currently in use (i.e. mapped) and when
-	// just changing the file content we break things horribly. In fact we don't
-	// even do that correctly in UnpackingLeafNode::AddPackageNode() -- neither
-	// the former nor the new head package node is notified.
-
 	BReference<Node> nodeReference(node);
 	NodeWriteLocker nodeWriteLocker(node);
 
+	BReference<Node> newNodeReference;
+	NodeWriteLocker newNodeWriteLocker;
+	Node* oldNode = NULL;
+
+	if (!newNode && !S_ISDIR(node->Mode()) && oldPackageNode != NULL
+		&& unpackingNode->WillBeFirstPackageNode(packageNode)) {
+		// The package node we're going to add will represent the node,
+		// replacing the current head package node. Since the node isn't a
+		// directory, we must make sure that clients having opened or mapped the
+		// node won't be surprised. So we create a new node and remove the
+		// current one.
+		// create a new node and transfer the package nodes to it
+		UnpackingNode* newUnpackingNode;
+		status_t error = unpackingNode->CloneTransferPackageNodes(
+			fNextNodeID++, newUnpackingNode);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// remove the old node
+		_NotifyNodeRemoved(node);
+		_RemoveNodeAndVNode(node);
+		oldNode = node;
+
+		// add the new node
+		unpackingNode = newUnpackingNode;
+		node = unpackingNode->GetNode();
+		newNodeReference.SetTo(node);
+		newNodeWriteLocker.SetTo(node, false);
+
+		directory->AddChild(node);
+		fNodes.Insert(node);
+		newNode = true;
+	}
+
 	status_t error = unpackingNode->AddPackageNode(packageNode);
 	if (error != B_OK) {
-		// remove the node, if created before
-		if (newNode)
-			_RemoveNode(node);
+		// Remove the node, if created before. If the node was created to
+		// replace the previous node, send out notifications instead.
+		if (newNode) {
+			if (oldNode != NULL) {
+				_NotifyNodeAdded(node);
+				if (notify) {
+					notify_entry_removed(ID(), directory->ID(), oldNode->Name(),
+						oldNode->ID());
+					notify_entry_created(ID(), directory->ID(), node->Name(),
+						node->ID());
+				}
+			} else
+				_RemoveNode(node);
+		}
 		RETURN_ERROR(error);
 	}
 
@@ -1270,21 +1308,18 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 
 	if (notify) {
 		if (newNode) {
+			if (oldNode != NULL) {
+				notify_entry_removed(ID(), directory->ID(), oldNode->Name(),
+					oldNode->ID());
+			}
 			notify_entry_created(ID(), directory->ID(), node->Name(),
 				node->ID());
 		} else if (packageNode == unpackingNode->GetPackageNode()) {
 			// The new package node has become the one representing the node.
 			// Send stat changed notification for directories and entry
 			// removed + created notifications for files and symlinks.
-			if (S_ISDIR(packageNode->Mode())) {
-				notify_stat_changed(ID(), node->ID(), kAllStatFields);
-				// TODO: Actually the attributes might change, too!
-			} else {
-				notify_entry_removed(ID(), directory->ID(), node->Name(),
-					node->ID());
-				notify_entry_created(ID(), directory->ID(), node->Name(),
-					node->ID());
-			}
+			notify_stat_changed(ID(), node->ID(), kAllStatFields);
+			// TODO: Actually the attributes might change, too!
 		}
 	}
 
@@ -1304,11 +1339,12 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 	BReference<Node> nodeReference(node);
 	NodeWriteLocker nodeWriteLocker(node);
 
-	// TODO: This is broken for files that are in use. Cf. _AddPackageNode() for
-	// details.
-
 	PackageNode* headPackageNode = unpackingNode->GetPackageNode();
 	bool nodeRemoved = false;
+	Node* newNode = NULL;
+
+	BReference<Node> newNodeReference;
+	NodeWriteLocker newNodeWriteLocker;
 
 	// If this is the last package node of the node, remove it completely.
 	if (unpackingNode->IsOnlyPackageNode(packageNode)) {
@@ -1316,29 +1352,54 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		// find the node anymore.
 		_NotifyNodeRemoved(node);
 
-		unpackingNode->RemovePackageNode(packageNode);
+		unpackingNode->PrepareForRemoval();
 
-		// we get and put the vnode to notify the VFS
-		// TODO: We should probably only do that, if the node is known to the
-		// VFS in the first place.
-		Node* dummyNode;
-		bool gotVNode = GetVNode(node->ID(), dummyNode) == B_OK;
-
-		_RemoveNode(node);
+		_RemoveNodeAndVNode(node);
 		nodeRemoved = true;
-
-		if (gotVNode) {
-			RemoveVNode(node->ID());
-			PutVNode(node->ID());
-		}
-	} else {
-		// The node does at least have one more package node.
-		unpackingNode->RemovePackageNode(packageNode);
-
-		if (packageNode == headPackageNode) {
+	} else if (packageNode == headPackageNode) {
+		// The node does at least have one more package node, but the one to be
+		// removed is the head. Unless it's a directory, we replace the node
+		// with a completely new one and let the old one die. This is necessary
+		// to avoid surprises for clients that have opened/mapped the node.
+		if (S_ISDIR(packageNode->Mode())) {
+			unpackingNode->RemovePackageNode(packageNode);
 			_NotifyNodeChanged(node, kAllStatFields,
 				OldUnpackingNodeAttributes(headPackageNode));
+		} else {
+			// create a new node and transfer the package nodes to it
+			UnpackingNode* newUnpackingNode;
+			status_t error = unpackingNode->CloneTransferPackageNodes(
+				fNextNodeID++, newUnpackingNode);
+			if (error == B_OK) {
+				// remove the package node
+				newUnpackingNode->RemovePackageNode(packageNode);
+
+				// remove the old node
+				_NotifyNodeRemoved(node);
+				_RemoveNodeAndVNode(node);
+
+				// add the new node
+				newNode = newUnpackingNode->GetNode();
+				newNodeReference.SetTo(newNode);
+				newNodeWriteLocker.SetTo(newNode, false);
+
+				directory->AddChild(newNode);
+				fNodes.Insert(newNode);
+				_NotifyNodeAdded(newNode);
+			} else {
+				// There's nothing we can do. Remove the node completely.
+				_NotifyNodeRemoved(node);
+
+				unpackingNode->PrepareForRemoval();
+
+				_RemoveNodeAndVNode(node);
+				nodeRemoved = true;
+			}
 		}
+	} else {
+		// The package node to remove is not the head of the node. This change
+		// doesn't have any visible effect.
+		unpackingNode->RemovePackageNode(packageNode);
 	}
 
 	if (!notify)
@@ -1348,7 +1409,7 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 	if (nodeRemoved) {
 		notify_entry_removed(ID(), directory->ID(), node->Name(), node->ID());
 	} else if (packageNode == headPackageNode) {
-		// The new package node was the one representing the node.
+		// The removed package node was the one representing the node.
 		// Send stat changed notification for directories and entry
 		// removed + created notifications for files and symlinks.
 		if (S_ISDIR(packageNode->Mode())) {
@@ -1357,8 +1418,8 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		} else {
 			notify_entry_removed(ID(), directory->ID(), node->Name(),
 				node->ID());
-			notify_entry_created(ID(), directory->ID(), node->Name(),
-				node->ID());
+			notify_entry_created(ID(), directory->ID(), newNode->Name(),
+				newNode->ID());
 		}
 	}
 }
@@ -1407,6 +1468,24 @@ Volume::_RemoveNode(Node* node)
 	// remove from node table
 	fNodes.Remove(node);
 	node->ReleaseReference();
+}
+
+
+void
+Volume::_RemoveNodeAndVNode(Node* node)
+{
+	// we get and put the vnode to notify the VFS
+	// TODO: We should probably only do that, if the node is known to the
+	// VFS in the first place.
+	Node* dummyNode;
+	bool gotVNode = GetVNode(node->ID(), dummyNode) == B_OK;
+
+	_RemoveNode(node);
+
+	if (gotVNode) {
+		RemoveVNode(node->ID());
+		PutVNode(node->ID());
+	}
 }
 
 
