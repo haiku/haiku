@@ -32,7 +32,9 @@ enum {
 	NODE_FLAG_CONST_NAME	= 0x02,
 		// Init(): The given name is a constant that won't go away during the
 		// lifetime of the object. No need to copy.
-	NODE_FLAG_OWNS_NAME		= NODE_FLAG_KEEP_NAME
+	NODE_FLAG_OWNS_NAME		= NODE_FLAG_KEEP_NAME,
+	NODE_FLAG_KNOWN_TO_VFS	= 0x04,
+		// internal flag
 };
 
 
@@ -61,7 +63,11 @@ public:
 									// so also on error.
 
 	virtual	status_t			VFSInit(dev_t deviceID);
+									// base class version must be called on
+									// success
 	virtual	void				VFSUninit();
+									// base class version must be called
+	inline	bool				IsKnownToVFS() const;
 
 			void				SetID(ino_t id);
 			void				SetParent(Directory* parent);
@@ -124,6 +130,16 @@ Node::WriteUnlock()
 {
 	rw_lock_write_unlock(&fLock);
 }
+
+
+bool
+Node::IsKnownToVFS() const
+{
+	return (fFlags & NODE_FLAG_KNOWN_TO_VFS) != 0;
+}
+
+
+// #pragma mark -
 
 
 struct NodeNameHashDefinition {
