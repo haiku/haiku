@@ -1474,15 +1474,36 @@ Volume::_RemoveNode(Node* node)
 void
 Volume::_RemoveNodeAndVNode(Node* node)
 {
-	// we get and put the vnode to notify the VFS
-	// TODO: We should probably only do that, if the node is known to the
-	// VFS in the first place.
-	Node* dummyNode;
-	bool gotVNode = GetVNode(node->ID(), dummyNode) == B_OK;
+	// If the node is known to the VFS, we get the vnode, remove it, and put it,
+	// so that the VFS will discard it as soon as possible (i.e. now, if no one
+	// else is using it).
+	NodeWriteLocker nodeWriteLocker(node);
 
+	// Remove the node from its parent and the volume. This makes the node
+	// inaccessible via the get_vnode() and lookup() hooks.
 	_RemoveNode(node);
 
-	if (gotVNode) {
+	bool getVNode = node->IsKnownToVFS();
+
+	nodeWriteLocker.Unlock();
+
+	// Get a vnode reference, if the node is already known to the VFS.
+	Node* dummyNode;
+	if (getVNode && GetVNode(node->ID(), dummyNode) == B_OK) {
+		// TODO: There still is a race condition here which we can't avoid
+		// without more help from the VFS. Right after we drop the write
+		// lock a vnode for the node could be discarded by the VFS. At that
+		// point another thread trying to get the vnode by ID would create
+		// a vnode, mark it busy and call our get_vnode() hook. It would
+		// block since we (i.e. the package loader thread executing this
+		// method) still have the volume write lock. Our get_vnode() call
+		// would block, since it finds the vnode marked busy. It times out
+		// eventually, but until then a good deal of FS operations might
+		// block as well due to us holding the volume lock and probably
+		// several node locks as well. A get_vnode*() variant (e.g.
+		// get_vnode_etc() with flags parameter) that wouldn't block and
+		// only get the vnode, if already loaded and non-busy, would be
+		// perfect here.
 		RemoveVNode(node->ID());
 		PutVNode(node->ID());
 	}
