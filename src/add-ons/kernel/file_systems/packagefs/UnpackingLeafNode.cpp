@@ -34,9 +34,14 @@ UnpackingLeafNode::~UnpackingLeafNode()
 status_t
 UnpackingLeafNode::VFSInit(dev_t deviceID)
 {
+	status_t error = B_OK;
 	if (PackageLeafNode* packageNode = _ActivePackageNode())
-		return packageNode->VFSInit(deviceID, fID);
-	return B_OK;
+		error = packageNode->VFSInit(deviceID, fID);
+
+	if (error == B_OK)
+		Node::VFSInit(deviceID);
+
+	return error;
 }
 
 
@@ -45,6 +50,8 @@ UnpackingLeafNode::VFSUninit()
 {
 	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		packageNode->VFSUninit();
+
+	Node::VFSUninit();
 }
 
 

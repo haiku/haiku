@@ -56,6 +56,7 @@ Node::Init(Directory* parent, const char* name, uint32 flags)
 status_t
 Node::VFSInit(dev_t deviceID)
 {
+	fFlags |= NODE_FLAG_KNOWN_TO_VFS;
 	return B_OK;
 }
 
@@ -63,6 +64,7 @@ Node::VFSInit(dev_t deviceID)
 void
 Node::VFSUninit()
 {
+	fFlags &= ~(uint32)NODE_FLAG_KNOWN_TO_VFS;
 }
 
 
