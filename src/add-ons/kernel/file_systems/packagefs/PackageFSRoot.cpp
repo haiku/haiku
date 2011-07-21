@@ -320,6 +320,9 @@ PackageFSRoot::_RemovePackage(Package* package)
 			} else
 				family->RemoveDependency(dependency);
 		}
+
+		if (Resolvable* resolvable = dependency->Resolvable())
+			resolvable->RemoveDependency(dependency);
 	}
 
 	// unregister resolvables
