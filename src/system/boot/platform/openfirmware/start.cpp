@@ -39,10 +39,10 @@ static uint32 sBootOptions;
 
 static void
 call_ctors(void)
-{ 
+{
 	void (**f)(void);
 
-	for (f = &__ctor_list; f < &__ctor_end; f++) {		
+	for (f = &__ctor_list; f < &__ctor_end; f++) {
 		(**f)();
 	}
 }
@@ -55,35 +55,40 @@ clear_bss(void)
 }
 
 
-static void 
+static void
 determine_machine(void)
 {
 	gMachine = MACHINE_UNKNOWN;
 
 	int root = of_finddevice("/");
 	char buffer[64];
+	int length;
 
 	// TODO : Probe other OpenFirmware platforms and set gMachine as needed
 
-	int length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1);
-	buffer[length] = '\0';
-
-	if (!strcasecmp("chrp", buffer))
-		gMachine = MACHINE_CHRP;
-	else //(bootrom) + QEMU
+	if ((length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1))
+		!= OF_FAILED) {
+		buffer[length] = '\0';
+		if (!strcasecmp("chrp", buffer))
+			gMachine = MACHINE_CHRP;
+		else if (!strcasecmp("bootrom", buffer))
+			gMachine = MACHINE_MAC;
+	} else
 		gMachine = MACHINE_MAC;
-		
-	length = of_getprop(root, "model", buffer, sizeof(buffer) - 1);
-	buffer[length] = '\0';
 
-	if (!strcasecmp("pegasos", buffer))
-		gMachine |= MACHINE_PEGASOS;
+	if ((length = of_getprop(root, "model", buffer, sizeof(buffer) - 1))
+		!= OF_FAILED) {
+		buffer[length] = '\0';
+		if (!strcasecmp("pegasos", buffer))
+			gMachine |= MACHINE_PEGASOS;
+	}
 
-	length = of_getprop(root, "name", buffer, sizeof(buffer) - 1);
-	buffer[length] = '\0';
-
-	if (!strcasecmp("openbiosteam,openbios", buffer))
-		gMachine |= MACHINE_QEMU;
+	if ((length = of_getprop(root, "name", buffer, sizeof(buffer) - 1))
+		!= OF_FAILED) {
+		buffer[length] = '\0';
+		if (!strcasecmp("openbiosteam,openbios", buffer))
+			gMachine |= MACHINE_QEMU;
+	}
 }
 
 
@@ -97,7 +102,7 @@ platform_start_kernel(void)
 	printf("kernel entry at %p\n", (void*)kernelEntry);
 	printf("kernel stack top: %p\n", (void*)stackTop);
 
-	/* TODO: ? 
+	/* TODO: ?
 	mmu_init_for_kernel();
 	smp_boot_other_cpus();
 	*/
@@ -159,9 +164,9 @@ start(void *openFirmwareEntry)
 	determine_machine();
 	console_init();
 
-	if (gMachine & MACHINE_QEMU)
+	if ((gMachine & MACHINE_QEMU) != 0)
 		dprintf("OpenBIOS (QEMU?) OpenFirmware machine detected\n");
-	else if (gMachine & MACHINE_PEGASOS)
+	else if ((gMachine & MACHINE_PEGASOS) != 0)
 		dprintf("Pegasos PowerPC machine detected\n");
 	else
 		dprintf("Apple PowerPC machine assumed\n");
