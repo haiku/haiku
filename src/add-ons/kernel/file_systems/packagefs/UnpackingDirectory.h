@@ -29,6 +29,10 @@ public:
 
 	virtual	PackageNode*		GetPackageNode();
 	virtual	bool				IsOnlyPackageNode(PackageNode* node) const;
+	virtual	bool				WillBeFirstPackageNode(
+									PackageNode* packageNode) const;
+
+	virtual	void				PrepareForRemoval();
 
 	virtual	status_t			OpenAttributeDirectory(
 									AttributeDirectoryCookie*& _cookie);

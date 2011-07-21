@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include <algorithm>
+#include <new>
 
 #include "UnpackingAttributeCookie.h"
 #include "UnpackingAttributeDirectoryCookie.h"
@@ -17,20 +18,23 @@
 
 UnpackingLeafNode::UnpackingLeafNode(ino_t id)
 	:
-	Node(id)
+	Node(id),
+	fFinalPackageNode(NULL)
 {
 }
 
 
 UnpackingLeafNode::~UnpackingLeafNode()
 {
+	if (fFinalPackageNode != NULL)
+		fFinalPackageNode->ReleaseReference();
 }
 
 
 status_t
 UnpackingLeafNode::VFSInit(dev_t deviceID)
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->VFSInit(deviceID, fID);
 	return B_OK;
 }
@@ -39,7 +43,7 @@ UnpackingLeafNode::VFSInit(dev_t deviceID)
 void
 UnpackingLeafNode::VFSUninit()
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		packageNode->VFSUninit();
 }
 
@@ -47,7 +51,7 @@ UnpackingLeafNode::VFSUninit()
 mode_t
 UnpackingLeafNode::Mode() const
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->Mode();
 	return S_IFREG | S_IRUSR | S_IRGRP | S_IROTH;
 }
@@ -56,7 +60,7 @@ UnpackingLeafNode::Mode() const
 uid_t
 UnpackingLeafNode::UserID() const
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->UserID();
 	return 0;
 }
@@ -65,7 +69,7 @@ UnpackingLeafNode::UserID() const
 gid_t
 UnpackingLeafNode::GroupID() const
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->GroupID();
 	return 0;
 }
@@ -74,7 +78,7 @@ UnpackingLeafNode::GroupID() const
 timespec
 UnpackingLeafNode::ModifiedTime() const
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->ModifiedTime();
 
 	timespec time = { 0, 0 };
@@ -85,7 +89,7 @@ UnpackingLeafNode::ModifiedTime() const
 off_t
 UnpackingLeafNode::FileSize() const
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->FileSize();
 	return 0;
 }
@@ -101,6 +105,8 @@ UnpackingLeafNode::GetNode()
 status_t
 UnpackingLeafNode::AddPackageNode(PackageNode* packageNode)
 {
+	ASSERT(fFinalPackageNode == NULL);
+
 	if (S_ISDIR(packageNode->Mode()))
 		return B_BAD_VALUE;
 
@@ -127,6 +133,8 @@ UnpackingLeafNode::AddPackageNode(PackageNode* packageNode)
 void
 UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode)
 {
+	ASSERT(fFinalPackageNode == NULL);
+
 	bool isNewest = packageNode == fPackageNodes.Head();
 	fPackageNodes.Remove(dynamic_cast<PackageLeafNode*>(packageNode));
 
@@ -152,22 +160,78 @@ UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode)
 PackageNode*
 UnpackingLeafNode::GetPackageNode()
 {
-	return fPackageNodes.Head();
+	return _ActivePackageNode();
 }
 
 
 bool
 UnpackingLeafNode::IsOnlyPackageNode(PackageNode* node) const
 {
+	ASSERT(fFinalPackageNode == NULL);
+
 	PackageLeafNode* head = fPackageNodes.Head();
 	return node == head && fPackageNodes.GetNext(head) == NULL;
+}
+
+
+bool
+UnpackingLeafNode::WillBeFirstPackageNode(PackageNode* packageNode) const
+{
+	PackageLeafNode* packageLeafNode
+		= dynamic_cast<PackageLeafNode*>(packageNode);
+	if (packageLeafNode == NULL)
+		return false;
+
+	PackageLeafNode* headNode = fPackageNodes.Head();
+	return headNode == NULL
+		|| packageLeafNode->ModifiedTime() > headNode->ModifiedTime();
+}
+
+void
+UnpackingLeafNode::PrepareForRemoval()
+{
+	ASSERT(fFinalPackageNode == NULL);
+
+	fFinalPackageNode = fPackageNodes.Head();
+	if (fFinalPackageNode != NULL) {
+		fFinalPackageNode->AcquireReference();
+		fPackageNodes.MakeEmpty();
+	}
+}
+
+
+status_t
+UnpackingLeafNode::CloneTransferPackageNodes(ino_t id, UnpackingNode*& _newNode)
+{
+	ASSERT(fFinalPackageNode == NULL);
+
+	UnpackingLeafNode* clone = new(std::nothrow) UnpackingLeafNode(id);
+	if (clone == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = clone->Init(Parent(), Name(), 0);
+	if (error != B_OK) {
+		delete clone;
+		return error;
+	}
+
+	// We keep the old head as fFinalPackageNode, which will make us to behave
+	// exactly as before with respect to FS operations.
+	fFinalPackageNode = fPackageNodes.Head();
+	if (fFinalPackageNode != NULL) {
+		fFinalPackageNode->AcquireReference();
+		clone->fPackageNodes.MoveFrom(&fPackageNodes);
+	}
+
+	_newNode = clone;
+	return B_OK;
 }
 
 
 status_t
 UnpackingLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->Read(offset, buffer, bufferSize);
 	return B_ERROR;
 }
@@ -176,7 +240,7 @@ UnpackingLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 status_t
 UnpackingLeafNode::Read(io_request* request)
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->Read(request);
 	return EBADF;
 }
@@ -185,7 +249,7 @@ UnpackingLeafNode::Read(io_request* request)
 status_t
 UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 {
-	PackageLeafNode* packageNode = fPackageNodes.Head();
+	PackageLeafNode* packageNode = _ActivePackageNode();
 	if (packageNode == NULL)
 		return B_BAD_VALUE;
 
@@ -206,7 +270,7 @@ UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 status_t
 UnpackingLeafNode::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {
-	return UnpackingAttributeDirectoryCookie::Open(fPackageNodes.Head(),
+	return UnpackingAttributeDirectoryCookie::Open(_ActivePackageNode(),
 		_cookie);
 }
 
@@ -215,7 +279,7 @@ status_t
 UnpackingLeafNode::OpenAttribute(const char* name, int openMode,
 	AttributeCookie*& _cookie)
 {
-	return UnpackingAttributeCookie::Open(fPackageNodes.Head(), name, openMode,
+	return UnpackingAttributeCookie::Open(_ActivePackageNode(), name, openMode,
 		_cookie);
 }
 
@@ -223,7 +287,7 @@ UnpackingLeafNode::OpenAttribute(const char* name, int openMode,
 status_t
 UnpackingLeafNode::IndexAttribute(AttributeIndexer* indexer)
 {
-	return UnpackingAttributeCookie::IndexAttribute(fPackageNodes.Head(),
+	return UnpackingAttributeCookie::IndexAttribute(_ActivePackageNode(),
 		indexer);
 }
 
@@ -231,7 +295,16 @@ UnpackingLeafNode::IndexAttribute(AttributeIndexer* indexer)
 void*
 UnpackingLeafNode::IndexCookieForAttribute(const char* name) const
 {
-	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+	if (PackageLeafNode* packageNode = _ActivePackageNode())
 		return packageNode->IndexCookieForAttribute(name);
 	return NULL;
+}
+
+
+PackageLeafNode*
+UnpackingLeafNode::_ActivePackageNode() const
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode;
+	return fFinalPackageNode;
 }

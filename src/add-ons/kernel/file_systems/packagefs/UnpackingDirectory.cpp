@@ -140,6 +140,27 @@ UnpackingDirectory::IsOnlyPackageNode(PackageNode* node) const
 }
 
 
+bool
+UnpackingDirectory::WillBeFirstPackageNode(PackageNode* packageNode) const
+{
+	PackageDirectory* packageDirectory
+		= dynamic_cast<PackageDirectory*>(packageNode);
+	if (packageDirectory == NULL)
+		return false;
+
+	PackageDirectory* other = fPackageDirectories.Head();
+	return other == NULL
+		|| packageDirectory->ModifiedTime() > other->ModifiedTime();
+}
+
+
+void
+UnpackingDirectory::PrepareForRemoval()
+{
+	fPackageDirectories.MakeEmpty();
+}
+
+
 status_t
 UnpackingDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
 {
