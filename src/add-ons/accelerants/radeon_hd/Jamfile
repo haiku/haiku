@@ -15,6 +15,7 @@ Addon radeon_hd.accelerant :
 	pll.cpp
 	mc.cpp
 	dac.cpp
+	display.cpp
 	tmds.cpp
 	mode.cpp
 	bios.cpp

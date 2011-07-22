@@ -38,8 +38,6 @@ create_mode_list(void)
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
-	detect_crt_ranges();
-
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
 		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
 		NULL, 0, kRadeonHDSpaces,
@@ -141,13 +139,16 @@ CardBlankSet(uint8 crtid, bool blank)
 
 
 static void
-CardFBSet(display_mode *mode)
+CardFBSet(uint8 crtid, display_mode *mode)
 {
+	register_info* regs = gDisplay[crtid]->regs;
+
 	uint32 colorMode;
 	uint32 bytesPerRow;
 	uint32 bitsPerPixel;
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
+
 
 	#if 0
 	// TMDSAllIdle	// DVI / HDMI
@@ -160,68 +161,68 @@ CardFBSet(display_mode *mode)
 	MCFBSetup(Read32(OUT, R6XX_CONFIG_FB_BASE), mcFbSize);
 	#endif
 
-	Write32(CRT, gRegister->grphUpdate, (1<<16));
+	Write32(CRT, regs->grphUpdate, (1<<16));
 		// Lock for update (isn't this normally the other way around on VGA?
 
 	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
 	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
 
 	// Tell GPU which frame buffer address to draw from
-	Write32(CRT, gRegister->grphPrimarySurfaceAddr,
+	Write32(CRT, regs->grphPrimarySurfaceAddr,
 		fbAddress & 0xffffffff);
-	Write32(CRT, gRegister->grphSecondarySurfaceAddr,
+	Write32(CRT, regs->grphSecondarySurfaceAddr,
 		fbAddress & 0xffffffff);
 
 	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
-		Write32(CRT, gRegister->grphPrimarySurfaceAddrHigh,
+		Write32(CRT, regs->grphPrimarySurfaceAddrHigh,
 			(fbAddress >> 32) & 0xf);
-		Write32(CRT, gRegister->grphSecondarySurfaceAddrHigh,
+		Write32(CRT, regs->grphSecondarySurfaceAddrHigh,
 			(fbAddress >> 32) & 0xf);
 	}
 
-	Write32(CRT, gRegister->grphControl, 0);
+	Write32(CRT, regs->grphControl, 0);
 		// Reset stored depth, format, etc
 
 	// set color mode on video card
 	switch (mode->space) {
 		case B_CMAP8:
-			Write32Mask(CRT, gRegister->grphControl,
+			Write32Mask(CRT, regs->grphControl,
 				0, 0x00000703);
 			break;
 		case B_RGB15_LITTLE:
-			Write32Mask(CRT, gRegister->grphControl,
+			Write32Mask(CRT, regs->grphControl,
 				0x000001, 0x00000703);
 			break;
 		case B_RGB16_LITTLE:
-			Write32Mask(CRT, gRegister->grphControl,
+			Write32Mask(CRT, regs->grphControl,
 				0x000101, 0x00000703);
 			break;
 		case B_RGB24_LITTLE:
 		case B_RGB32_LITTLE:
 		default:
-			Write32Mask(CRT, gRegister->grphControl,
+			Write32Mask(CRT, regs->grphControl,
 				0x000002, 0x00000703);
 			break;
 	}
 
-	Write32(CRT, gRegister->grphSwapControl, 0);
+	Write32(CRT, regs->grphSwapControl, 0);
 		// only for chipsets > r600
 		// R5xx - RS690 case is GRPH_CONTROL bit 16
 
-	Write32Mask(CRT, gRegister->grphEnable, 1, 0x00000001);
+	Write32Mask(CRT, regs->grphEnable, 1, 0x00000001);
 		// Enable graphics
 
-	Write32(CRT, gRegister->grphSurfaceOffsetX, 0);
-	Write32(CRT, gRegister->grphSurfaceOffsetY, 0);
-	Write32(CRT, gRegister->grphXStart, 0);
-	Write32(CRT, gRegister->grphYStart, 0);
-	Write32(CRT, gRegister->grphXEnd, mode->virtual_width);
-	Write32(CRT, gRegister->grphYEnd, mode->virtual_height);
-	Write32(CRT, gRegister->grphPitch, bytesPerRow / 4);
+	Write32(CRT, regs->grphSurfaceOffsetX, 0);
+	Write32(CRT, regs->grphSurfaceOffsetY, 0);
+	Write32(CRT, regs->grphXStart, 0);
+	Write32(CRT, regs->grphYStart, 0);
+	Write32(CRT, regs->grphXEnd, mode->virtual_width);
+	Write32(CRT, regs->grphYEnd, mode->virtual_height);
+	Write32(CRT, regs->grphPitch, bytesPerRow / 4);
 
-	Write32(CRT, gRegister->modeDesktopHeight, mode->virtual_height);
+	Write32(CRT, regs->modeDesktopHeight, mode->virtual_height);
 
-	Write32(CRT, gRegister->grphUpdate, 0);
+	Write32(CRT, regs->grphUpdate, 0);
 		// Unlock changed registers
 
 	// update shared info
@@ -232,18 +233,19 @@ CardFBSet(display_mode *mode)
 
 
 static void
-CardModeSet(display_mode *mode)
+CardModeSet(uint8 crtid, display_mode *mode)
 {
 	display_timing& displayTiming = mode->timing;
+	register_info* regs = gDisplay[crtid]->regs;
 
 	TRACE("%s called to do %dx%d\n",
 		__func__, displayTiming.h_display, displayTiming.v_display);
 
 	// enable read requests
-	Write32Mask(CRT, gRegister->grphControl, 0, 0x01000000);
+	Write32Mask(CRT, regs->grphControl, 0, 0x01000000);
 
 	// *** Horizontal
-	Write32(CRT, gRegister->crtHTotal,
+	Write32(CRT, regs->crtHTotal,
 		displayTiming.h_total - 1);
 
 	// Blanking
@@ -251,55 +253,57 @@ CardModeSet(display_mode *mode)
 		+ displayTiming.h_display - displayTiming.h_sync_start;
 	uint16 blankEnd = displayTiming.h_total - displayTiming.h_sync_start;
 
-	Write32(CRT, gRegister->crtHBlank,
+	Write32(CRT, regs->crtHBlank,
 		blankStart | (blankEnd << 16));
 
-	Write32(CRT, gRegister->crtHSync,
+	Write32(CRT, regs->crtHSync,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
 
 	// set flag for neg. H sync. M76 Register Reference Guide 2-256
-	Write32Mask(CRT, gRegister->crtHPolarity,
+	Write32Mask(CRT, regs->crtHPolarity,
 		displayTiming.flags & B_POSITIVE_HSYNC ? 0 : 1, 0x1);
 
 	// *** Vertical
-	Write32(CRT, gRegister->crtVTotal,
+	Write32(CRT, regs->crtVTotal,
 		displayTiming.v_total - 1);
 
 	blankStart = displayTiming.v_total
 		+ displayTiming.v_display - displayTiming.v_sync_start;
 	blankEnd = displayTiming.v_total - displayTiming.v_sync_start;
 
-	Write32(CRT, gRegister->crtVBlank,
+	Write32(CRT, regs->crtVBlank,
 		blankStart | (blankEnd << 16));
 
 	// Set Interlace if specified within mode line
 	if (displayTiming.flags & B_TIMING_INTERLACED) {
-		Write32(CRT, gRegister->crtInterlace, 0x1);
-		Write32(CRT, gRegister->modeDataFormat, 0x1);
+		Write32(CRT, regs->crtInterlace, 0x1);
+		Write32(CRT, regs->modeDataFormat, 0x1);
 	} else {
-		Write32(CRT, gRegister->crtInterlace, 0x0);
-		Write32(CRT, gRegister->modeDataFormat, 0x0);
+		Write32(CRT, regs->crtInterlace, 0x0);
+		Write32(CRT, regs->modeDataFormat, 0x0);
 	}
 
-	Write32(CRT, gRegister->crtVSync,
+	Write32(CRT, regs->crtVSync,
 		(displayTiming.v_sync_end - displayTiming.v_sync_start) << 16);
 
 	// set flag for neg. V sync. M76 Register Reference Guide 2-258
-	Write32Mask(CRT, gRegister->crtVPolarity,
+	Write32Mask(CRT, regs->crtVPolarity,
 		displayTiming.flags & B_POSITIVE_VSYNC ? 0 : 1, 0x1);
 
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
 		should only be set to 1 on 30bpp DVI modes
 	*/
-	Write32Mask(CRT, gRegister->crtCountControl, 0x0, 0x1);
+	Write32Mask(CRT, regs->crtCountControl, 0x0, 0x1);
 }
 
 
 static void
-CardModeScale(display_mode *mode)
+CardModeScale(uint8 crtid, display_mode *mode)
 {
+	register_info* regs = gDisplay[crtid]->regs;
+
 	// No scaling
-	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
+	Write32(CRT, regs->sclUpdate, (1<<16));// Lock
 
 	#if 0
 	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
@@ -308,52 +312,40 @@ CardModeScale(display_mode *mode)
 		(OVERSCAN << 16) | OVERSCAN); // TOP | BOTTOM
 	#endif
 
-	Write32(CRT, gRegister->viewportStart, 0);
-	Write32(CRT, gRegister->viewportSize,
+	Write32(CRT, regs->viewportStart, 0);
+	Write32(CRT, regs->viewportSize,
 		mode->timing.v_display | (mode->timing.h_display << 16));
-	Write32(CRT, gRegister->sclEnable, 0);
-	Write32(CRT, gRegister->sclTapControl, 0);
-	Write32(CRT, gRegister->modeCenter, 2);
+	Write32(CRT, regs->sclEnable, 0);
+	Write32(CRT, regs->sclTapControl, 0);
+	Write32(CRT, regs->modeCenter, 2);
 	// D1MODE_DATA_FORMAT?
-	Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
+	Write32(CRT, regs->sclUpdate, 0);		// Unlock
 }
 
 
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	uint8 crtNumber = 0;
-	uint8 dacNumber = 0;
+	uint8 display_id = 0;
 
-	init_registers(crtNumber);
+	CardFBSet(display_id, mode);
+	CardModeSet(display_id, mode);
+	CardModeScale(display_id, mode);
 
-	// TODO Populate gCRT with interface connection
-	if (DACSense(0))
-		dacNumber = 0;
-	else if (DACSense(1))
-		dacNumber = 1;
+	// If this is DAC, set our PLL
+	if ((gDisplay[display_id]->connection_type & CONNECTION_DAC) != 0) {
+		PLLSet(gDisplay[display_id]->connection_id, mode->timing.pixel_clock);
+		DACSet(gDisplay[display_id]->connection_id, display_id);
 
-	TMDSSense(0);	// DVI / HDMI
+		// TODO : Shutdown unused PLL/DAC
 
-	CardFBSet(mode);
-	CardModeSet(mode);
-	CardModeScale(mode);
-
-	PLLSet(dacNumber, mode->timing.pixel_clock);
-		// Set pixel clock
-
-	Write32(CRT, D1GRPH_LUT_SEL, 0);
-
-	DACSet(dacNumber, crtNumber);
-
-	// TODO : Shutdown unused PLL/DAC
-
-	// Power up the output
-	PLLPower(dacNumber, RHD_POWER_ON);
-	DACPower(dacNumber, RHD_POWER_ON);
+		// Power up the output
+		PLLPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
+		DACPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
+	}
 
 	// Ensure screen isn't blanked
-	CardBlankSet(crtNumber, false);
+	CardBlankSet(display_id, false);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);
@@ -430,16 +422,17 @@ is_mode_supported(display_mode *mode)
 	if (is_mode_sane(mode) != B_OK)
 		return false;
 
+	// TODO : is_mode_supported on *which* display?
 	uint32 crtid = 0;
 
 	// if we have edid info, check frequency adginst crt reported valid ranges
 	if (gInfo->shared_info->has_edid) {
 
 		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
-		if (hfreq > gCRT[crtid]->hfreq_max + 1
-			|| hfreq < gCRT[crtid]->hfreq_min - 1) {
+		if (hfreq > gDisplay[crtid]->hfreq_max + 1
+			|| hfreq < gDisplay[crtid]->hfreq_min - 1) {
 			TRACE("!!! hfreq : %d , hfreq_min : %d, hfreq_max : %d\n",
-				hfreq, gCRT[crtid]->hfreq_min, gCRT[crtid]->hfreq_max);
+				hfreq, gDisplay[crtid]->hfreq_min, gDisplay[crtid]->hfreq_max);
 			TRACE("!!! %dx%d falls outside of CRT %d's valid "
 				"horizontal range.\n", mode->timing.h_display,
 				mode->timing.v_display, crtid);
@@ -449,10 +442,10 @@ is_mode_supported(display_mode *mode)
 		uint32 vfreq = mode->timing.pixel_clock / ((mode->timing.v_total
 			* mode->timing.h_total) / 1000);
 
-		if (vfreq > gCRT[crtid]->vfreq_max + 1
-			|| vfreq < gCRT[crtid]->vfreq_min - 1) {
+		if (vfreq > gDisplay[crtid]->vfreq_max + 1
+			|| vfreq < gDisplay[crtid]->vfreq_min - 1) {
 			TRACE("!!! vfreq : %d , vfreq_min : %d, vfreq_max : %d\n",
-				vfreq, gCRT[crtid]->vfreq_min, gCRT[crtid]->vfreq_max);
+				vfreq, gDisplay[crtid]->vfreq_min, gDisplay[crtid]->vfreq_max);
 			TRACE("!!! %dx%d falls outside of CRT %d's valid vertical range\n",
 				mode->timing.h_display, mode->timing.v_display, crtid);
 			return false;
@@ -518,33 +511,3 @@ is_mode_sane(display_mode *mode)
 }
 
 
-// TODO : Move to a new "monitors.c" file
-status_t
-detect_crt_ranges()
-{
-	edid1_info *edid = &gInfo->shared_info->edid_info;
-
-	int crtid = 0;
-		// edid indexes are not in order
-
-	for (uint32 index = 0; index < MAX_CRT; index++) {
-
-		edid1_detailed_monitor *monitor
-				= &edid->detailed_monitor[index];
-
-		if (monitor->monitor_desc_type
-			== EDID1_MONITOR_RANGES) {
-			edid1_monitor_range range = monitor->data.monitor_range;
-			gCRT[crtid]->vfreq_min = range.min_v;	/* in Hz */
-			gCRT[crtid]->vfreq_max = range.max_v;
-			gCRT[crtid]->hfreq_min = range.min_h;	/* in kHz */
-			gCRT[crtid]->hfreq_max = range.max_h;
-			TRACE("CRT %d : v_min %d : v_max %d : h_min %d : h_max %d\n",
-				crtid, gCRT[crtid]->vfreq_min, gCRT[crtid]->vfreq_max,
-				gCRT[crtid]->hfreq_min, gCRT[crtid]->hfreq_max);
-			crtid++;
-		}
-
-	}
-	return B_OK;
-}

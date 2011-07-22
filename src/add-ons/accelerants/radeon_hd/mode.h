@@ -25,7 +25,7 @@
 #define OVERSCAN 0
 	// TODO : Overscan and scaling support
 
-status_t detect_crt_ranges();
+
 status_t create_mode_list(void);
 bool is_mode_supported(display_mode* mode);
 status_t is_mode_sane(display_mode *mode);

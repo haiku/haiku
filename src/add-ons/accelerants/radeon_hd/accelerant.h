@@ -20,8 +20,8 @@
 #include <edid.h>
 
 
-#define MAX_CRT 6
-	// eyefinity limit
+#define MAX_DISPLAY 2
+	// Maximum displays (more then two requires AtomBIOS)
 
 
 struct accelerant_info {
@@ -46,7 +46,6 @@ struct accelerant_info {
 
 
 struct register_info {
-	uint16	crtid;
 	uint16	vgaControl;
 	uint16	grphEnable;
 	uint16	grphUpdate;
@@ -86,19 +85,21 @@ struct register_info {
 
 
 typedef struct {
-	uint16	location;
-	uint16	locationIndex;
-	uint32	vfreq_max;
-	uint32	vfreq_min;
-	uint32	hfreq_max;
-	uint32	hfreq_min;
+	bool			active;
+	uint32			connection_type;
+	uint8			connection_id;
+	register_info	*regs;
+	uint32			vfreq_max;
+	uint32			vfreq_min;
+	uint32			hfreq_max;
+	uint32			hfreq_min;
 } crt_info;
 
 
-#define HEAD_MODE_A_ANALOG		0x01
-#define HEAD_MODE_B_DIGITAL		0x02
-#define HEAD_MODE_CLONE			0x03
-#define HEAD_MODE_LVDS_PANEL	0x08
+// crt_info connection_type
+#define CONNECTION_DAC			0x0001
+#define CONNECTION_TMDS			0x0002
+#define CONNECTION_LVDS			0x0003
 
 // register MMIO modes
 #define OUT 0x1	// direct MMIO calls
@@ -109,11 +110,7 @@ typedef struct {
 
 
 extern accelerant_info *gInfo;
-extern register_info *gRegister;
-extern crt_info *gCRT[MAX_CRT];
-
-
-status_t init_registers(uint8 crtid);
+extern crt_info *gDisplay[MAX_DISPLAY];
 
 
 // register access

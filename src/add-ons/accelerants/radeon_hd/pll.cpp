@@ -345,8 +345,8 @@ PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	Write32(PLL, pllExtPostDivSrc, 0x01);
 		// Set source as PLL
 
-	// TODO : better way to grab crt to work on?
-	PLLCRTCGrab(pllIndex, gRegister->crtid);
+	// TODO : for now we assume crt 0, needs refactoring
+	PLLCRTCGrab(pllIndex, 0);
 }
 
 
@@ -461,8 +461,8 @@ PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	Write32Mask(PLL, pllCntl, 0, 0x80000000);
 		// needed and undocumented
 
-	// TODO : better way to grab crt to work on?
-	PLLCRTCGrab(pllIndex, gRegister->crtid);
+	// TODO : for now we assume crt 0, needs refactoring
+	PLLCRTCGrab(pllIndex, 0);
 
 	if (hasDccg)
 		DCCGCLKSet(pllIndex, RV620_DCCGCLK_GRAB);
