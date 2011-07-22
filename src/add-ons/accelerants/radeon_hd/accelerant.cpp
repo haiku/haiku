@@ -35,7 +35,7 @@ extern "C" void _sPrintf(const char *format, ...);
 
 
 struct accelerant_info *gInfo;
-crt_info *gDisplay[MAX_DISPLAY];
+display_info *gDisplay[MAX_DISPLAY];
 
 
 class AreaCloner {
@@ -104,10 +104,10 @@ init_common(int device, bool isClone)
 	memset(gInfo, 0, sizeof(accelerant_info));
 
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		gDisplay[id] = (crt_info *)malloc(sizeof(crt_info));
+		gDisplay[id] = (display_info *)malloc(sizeof(display_info));
 		if (gDisplay[id] == NULL)
 			return B_NO_MEMORY;
-		memset(gDisplay[id], 0, sizeof(crt_info));
+		memset(gDisplay[id], 0, sizeof(display_info));
 
 		gDisplay[id]->regs = (register_info *)malloc(sizeof(register_info));
 		if (gDisplay[id]->regs == NULL)

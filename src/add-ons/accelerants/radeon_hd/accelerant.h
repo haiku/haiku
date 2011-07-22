@@ -93,10 +93,10 @@ typedef struct {
 	uint32			vfreq_min;
 	uint32			hfreq_max;
 	uint32			hfreq_min;
-} crt_info;
+} display_info;
 
 
-// crt_info connection_type
+// display_info connection_type
 #define CONNECTION_DAC			0x0001
 #define CONNECTION_TMDS			0x0002
 #define CONNECTION_LVDS			0x0003
@@ -110,7 +110,7 @@ typedef struct {
 
 
 extern accelerant_info *gInfo;
-extern crt_info *gDisplay[MAX_DISPLAY];
+extern display_info *gDisplay[MAX_DISPLAY];
 
 
 // register access

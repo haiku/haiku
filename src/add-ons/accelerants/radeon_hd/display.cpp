@@ -189,9 +189,9 @@ detect_crt_ranges(uint32 crtid)
 {
 	edid1_info *edid = &gInfo->shared_info->edid_info;
 
-	// TODO : VESA edid is just for primary monitor
+	// TODO : VESA edid is just for primary monitor?
 
-	// EDID spec states 4 descriptor blocks
+	// Scan each VESA EDID description for monitor ranges
 	for (uint32 index = 0; index < EDID1_NUM_DETAILED_MONITOR_DESC; index++) {
 
 		edid1_detailed_monitor *monitor
