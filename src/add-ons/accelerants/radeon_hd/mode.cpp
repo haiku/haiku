@@ -342,6 +342,9 @@ radeon_set_display_mode(display_mode *mode)
 		// Power up the output
 		PLLPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
 		DACPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
+	} else if ((gDisplay[display_id]->connection_type & CONNECTION_TMDS) != 0) {
+		TMDSSet(gDisplay[display_id]->connection_id, mode);
+		TMDSPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
 	}
 
 	// Ensure screen isn't blanked

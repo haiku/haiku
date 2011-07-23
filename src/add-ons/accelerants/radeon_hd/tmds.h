@@ -9,7 +9,10 @@
 #define RADEON_HD_TMDS_H
 
 
+void TMDSVoltageControl(uint8 tmdsIndex);
 bool TMDSSense(uint8 tmdsIndex);
+status_t TMDSPower(uint8 tmdsIndex, int command);
+status_t TMDSSet(uint8 tmdsIndex, display_mode *mode);
 
 
 #endif
