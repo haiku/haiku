@@ -273,13 +273,13 @@ debug_displays()
 			else
 				TRACE(" + connection: UNKNOWN\n");
 
-				TRACE(" + connection index: % " B_PRIu8 "\n",
-					gDisplay[id]->connection_id);
+			TRACE(" + connection index: % " B_PRIu8 "\n",
+				gDisplay[id]->connection_id);
 
-				TRACE(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
-					gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
-				TRACE(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
-					gDisplay[id]->hfreq_min, gDisplay[id]->hfreq_max);
+			TRACE(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
+				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
+			TRACE(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
+				gDisplay[id]->hfreq_min, gDisplay[id]->hfreq_max);
 		}
 	}
 	TRACE("==========================================\n");
