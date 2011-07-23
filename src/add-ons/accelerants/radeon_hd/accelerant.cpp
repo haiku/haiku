@@ -210,6 +210,8 @@ radeon_init_accelerant(int device)
 	if (status != B_OK)
 		return status;
 
+	debug_displays();
+
 	status = create_mode_list();
 	if (status != B_OK) {
 		uninit_common();

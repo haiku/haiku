@@ -40,12 +40,6 @@ TMDSSense(uint8 tmdsIndex)
 	// Restore saved value
 	Write32Mask(OUT, TMDSA_LOAD_DETECT, loadDetect, 0x00000001);
 
-	if (result) {
-		TRACE("%s: TMDS%d: Display device attached\n", __func__, tmdsIndex);
-	} else {
-		TRACE("%s: TMDS%d: No display device attached\n", __func__, tmdsIndex);
-	}
-
 	return result;
 }
 

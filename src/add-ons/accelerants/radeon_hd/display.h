@@ -12,6 +12,7 @@
 status_t init_registers(register_info* reg, uint8 crtid);
 status_t detect_crt_ranges(uint32 crtid);
 status_t detect_displays();
+void debug_displays();
 
 
 #endif /* RADEON_HD_DISPLAY_H */

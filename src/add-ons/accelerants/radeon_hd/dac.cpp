@@ -85,13 +85,7 @@ DACSense(uint8 dacIndex)
 		detectControl, 0x000000FF);
 	Write32Mask(OUT, dacOffset + DACA_ENABLE, enable, 0x000000FF);
 
-	if (out == 0x7) {
-		TRACE("%s: DAC%d : Display device attached\n", __func__, dacIndex);
-		return true;
-	} else {
-		TRACE("%s: DAC%d : No display device attached\n", __func__, dacIndex);
-		return false;
-	}
+	return (out == 0x7);
 }
 
 

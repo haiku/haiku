@@ -204,12 +204,8 @@ detect_crt_ranges(uint32 crtid)
 			gDisplay[crtid]->vfreq_max = range.max_v;
 			gDisplay[crtid]->hfreq_min = range.min_h;   /* in kHz */
 			gDisplay[crtid]->hfreq_max = range.max_h;
-			TRACE("CRT %d : v_min %d : v_max %d : h_min %d : h_max %d\n",
-				crtid, gDisplay[crtid]->vfreq_min, gDisplay[crtid]->vfreq_max,
-				gDisplay[crtid]->hfreq_min, gDisplay[crtid]->hfreq_max);
 			return B_OK;
 		}
-
 	}
 
 	return B_ERROR;
@@ -258,4 +254,35 @@ detect_displays()
 	return B_OK;
 }
 
+
+void
+debug_displays()
+{
+	TRACE("Currently detected monitors===============\n");
+	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
+		TRACE("Display #%" B_PRIu32 " active = %s\n",
+			id, gDisplay[id]->active ? "true" : "false");
+
+		if (gDisplay[id]->active) {
+			if (gDisplay[id]->connection_type == CONNECTION_DAC)
+				TRACE(" + connection: DAC\n");
+			else if (gDisplay[id]->connection_type == CONNECTION_TMDS)
+				TRACE(" + connection: TMDS\n");
+			else if (gDisplay[id]->connection_type == CONNECTION_LVDS)
+				TRACE(" + connection: LVDS\n");
+			else
+				TRACE(" + connection: UNKNOWN\n");
+
+				TRACE(" + connection index: % " B_PRIu8 "\n",
+					gDisplay[id]->connection_id);
+
+				TRACE(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
+					gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
+				TRACE(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
+					gDisplay[id]->hfreq_min, gDisplay[id]->hfreq_max);
+		}
+	}
+	TRACE("==========================================\n");
+
+}
 
