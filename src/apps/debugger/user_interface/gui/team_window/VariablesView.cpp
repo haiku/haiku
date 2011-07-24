@@ -49,8 +49,8 @@ enum {
 
 
 enum {
-	MSG_MODEL_NODE_HIDDEN 			= 'monh',
-	MSG_VALUE_NODE_NEEDS_VALUE 		= 'mvnv',
+	MSG_MODEL_NODE_HIDDEN			= 'monh',
+	MSG_VALUE_NODE_NEEDS_VALUE		= 'mvnv',
 	MSG_RESTORE_PARTIAL_VIEW_STATE	= 'mpvs'
 };
 
