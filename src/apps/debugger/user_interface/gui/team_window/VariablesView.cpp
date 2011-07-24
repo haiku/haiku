@@ -888,9 +888,10 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 			if (childNode != NULL)
 				fContainerListener->ModelNodeValueRequested(childNode);
 		}
-
-		fContainerListener->ModelNodeRestoreViewStateRequested(modelNode);
 	}
+
+	if (valueNode->ChildCreationNeedsValue())
+		fContainerListener->ModelNodeRestoreViewStateRequested(modelNode);
 }
 
 
