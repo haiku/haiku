@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -48,8 +49,9 @@ enum {
 
 
 enum {
-	MSG_MODEL_NODE_HIDDEN 		= 'monh',
-	MSG_VALUE_NODE_NEEDS_VALUE 	= 'mvnv'
+	MSG_MODEL_NODE_HIDDEN 			= 'monh',
+	MSG_VALUE_NODE_NEEDS_VALUE 		= 'mvnv',
+	MSG_RESTORE_PARTIAL_VIEW_STATE	= 'mpvs'
 };
 
 
@@ -72,6 +74,8 @@ public:
 	virtual void				ModelNodeHidden(ModelNode* node);
 
 	virtual void				ModelNodeValueRequested(ModelNode* node);
+
+	virtual void				ModelNodeRestoreViewStateRequested(ModelNode* node);
 
 private:
 			BHandler*			fIndirectTarget;
@@ -364,6 +368,9 @@ public:
 	virtual	bool				GetValueAt(void* object, int32 columnIndex,
 									BVariant& _value);
 
+			bool				GetTreePath(ModelNode* node,
+									TreeTablePath& _path) const;
+
 			void				NodeExpanded(ModelNode* node);
 
 			void				NotifyNodeChanged(ModelNode* node);
@@ -412,8 +419,6 @@ private:
 
 //			ModelNode*			_GetNode(Variable* variable,
 //									TypeComponentPath* path) const;
-			bool				_GetTreePath(ModelNode* node,
-									TreeTablePath& _path) const;
 
 private:
 			Thread*				fThread;
@@ -706,6 +711,21 @@ VariablesView::ContainerListener::ModelNodeValueRequested(ModelNode* node)
 }
 
 
+void
+VariablesView::ContainerListener::ModelNodeRestoreViewStateRequested(
+	ModelNode* node)
+{
+	BReference<ModelNode> nodeReference(node);
+
+	BMessage message(MSG_RESTORE_PARTIAL_VIEW_STATE);
+	if (message.AddPointer("node", node) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeReference.Detach();
+	}
+}
+
+
 // #pragma mark - VariableTableModel
 
 
@@ -869,6 +889,7 @@ VariablesView::VariableTableModel::ValueNodeChildrenCreated(
 				fContainerListener->ModelNodeValueRequested(childNode);
 		}
 
+		fContainerListener->ModelNodeRestoreViewStateRequested(modelNode);
 	}
 }
 
@@ -1047,7 +1068,7 @@ VariablesView::VariableTableModel::NotifyNodeChanged(ModelNode* node)
 {
 	if (!node->IsHidden()) {
 		TreeTablePath treePath;
-		if (_GetTreePath(node, treePath)) {
+		if (GetTreePath(node, treePath)) {
 			int32 index = treePath.RemoveLastComponent();
 			NotifyNodesChanged(treePath, index, 1);
 		}
@@ -1118,7 +1139,7 @@ VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	// notify table model listeners
 	if (!node->IsHidden()) {
 		TreeTablePath path;
-		if (parent == NULL || _GetTreePath(parent, path))
+		if (parent == NULL || GetTreePath(parent, path))
 			NotifyNodesAdded(path, childIndex, 1);
 	}
 
@@ -1269,12 +1290,12 @@ VariablesView::VariableTableModel::_AddChildNodes(ValueNodeChild* nodeChild)
 
 
 bool
-VariablesView::VariableTableModel::_GetTreePath(ModelNode* node,
+VariablesView::VariableTableModel::GetTreePath(ModelNode* node,
 	TreeTablePath& _path) const
 {
 	// recurse, if the node has a parent
 	if (ModelNode* parent = node->Parent()) {
-		if (!_GetTreePath(parent, _path))
+		if (!GetTreePath(parent, _path))
 			return false;
 
 		if (node->IsHidden())
@@ -1435,6 +1456,28 @@ VariablesView::MessageReceived(BMessage* message)
 				fVariableTableModel->ValueNodeValueChanged(node);
 			}
 
+			break;
+		}
+		case MSG_RESTORE_PARTIAL_VIEW_STATE:
+		{
+			ModelNode* node;
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				TreeTablePath path;
+				if (fVariableTableModel->GetTreePath(node, path)) {
+					FunctionID* functionID = fStackFrame->Function()
+						->GetFunctionID();
+					if (functionID == NULL)
+						return;
+					BReference<FunctionID> functionIDReference(functionID,
+						true);
+					VariablesViewState* viewState = fViewStateHistory
+						->GetState(fThread->ID(), functionID);
+					if (viewState != NULL) {
+						_ApplyViewStateDescendentNodeInfos(viewState, node,
+							path);
+					}
+				}
+			}
 			break;
 		}
 		case MSG_VALUE_NODE_NEEDS_VALUE:
