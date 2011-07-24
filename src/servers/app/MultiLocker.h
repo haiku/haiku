@@ -25,13 +25,14 @@
 
 #define MULTI_LOCKER_TIMING	0
 #if DEBUG
+#	include <assert.h>
 #	define MULTI_LOCKER_DEBUG	DEBUG
 #endif
 
 #if MULTI_LOCKER_DEBUG
-#	define ASSERT_MULTI_LOCKED(x) ((x).IsWriteLocked() || (x).IsReadLocked())
-#	define ASSERT_MULTI_READ_LOCKED(x) ((x).IsReadLocked())
-#	define ASSERT_MULTI_WRITE_LOCKED(x) ((x).IsWriteLocked())
+#	define ASSERT_MULTI_LOCKED(x) assert((x).IsWriteLocked() || (x).IsReadLocked())
+#	define ASSERT_MULTI_READ_LOCKED(x) assert((x).IsReadLocked())
+#	define ASSERT_MULTI_WRITE_LOCKED(x) assert((x).IsWriteLocked())
 #else
 #	define MULTI_LOCKER_DEBUG	0
 #	define ASSERT_MULTI_LOCKED(x) ;

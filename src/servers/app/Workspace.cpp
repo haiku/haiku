@@ -82,7 +82,6 @@ Workspace::Workspace(Desktop& desktop, int32 index)
 	fDesktop(desktop),
 	fCurrentWorkspace(index == desktop.CurrentWorkspace())
 {
-	ASSERT_MULTI_LOCKED(desktop.WindowLocker());
 	RewindWindows();
 }
 
