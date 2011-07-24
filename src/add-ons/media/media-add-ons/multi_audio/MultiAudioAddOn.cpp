@@ -197,8 +197,9 @@ MultiAudioAddOn::_RecursiveScan(const char* rootPath, BEntry* rootEntry, uint32 
 		} else {
 			BPath path;
 			entry.GetPath(&path);
-			MultiAudioDevice *device = new MultiAudioDevice(path.Path()
-				+ strlen(rootPath), path.Path());
+			MultiAudioDevice *device = 
+				new(std::nothrow) MultiAudioDevice(path.Path()
+					+ strlen(rootPath), path.Path());
 			if (device) {
 				if (device->InitCheck() == B_OK)
 					fDevices.AddItem(device);
