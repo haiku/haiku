@@ -342,6 +342,14 @@ BRegion::PrintToStream() const
 // #pragma mark -
 
 
+
+void
+BRegion::OffsetBy(const BPoint& point)
+{
+	OffsetBy(point.x, point.y);
+}
+
+
 /*!	\brief Offsets all region's rects, and bounds by the given values.
 	\param dh The horizontal offset.
 	\param dv The vertical offset.
