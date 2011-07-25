@@ -16,8 +16,7 @@ extern int gChosen;
 
 
 template<typename addressSize>
-struct of_region
-{
+struct of_region {
 	addressSize base;
 	uint32 size;
 };
