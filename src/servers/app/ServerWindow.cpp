@@ -299,8 +299,6 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 Window*
 ServerWindow::Window() const
 {
-	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
-
 	if (!fWindowAddedToDesktop)
 		return NULL;
 
