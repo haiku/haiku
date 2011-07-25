@@ -17,6 +17,7 @@
 #include <arch_mmu.h>
 #include <kernel.h>
 
+#include "of_support.h"
 
 // set protection to WIMGNPP: -----PP
 // PP:	00 - no access
@@ -69,30 +70,81 @@ remove_virtual_range_to_keep(void *start, uint32 size)
 static status_t
 find_physical_memory_ranges(size_t &total)
 {
-	int memory, package;
+	int memory;
 	dprintf("checking for memory...\n");
 	if (of_getprop(gChosen, "memory", &memory, sizeof(int)) == OF_FAILED)
 		return B_ERROR;
-	package = of_instance_to_package(memory);
+	int package = of_instance_to_package(memory);
 
 	total = 0;
 
-	struct of_region regions[64];
-	int count;
-	count = of_getprop(package, "reg", regions, sizeof(regions));
+	/* Memory base addresses are provided in 32 or 64 bit flavors
+	   #address-cells and #size-cells matches the number of 32-bit 'cells'
+	   representing the length of the base address and size fields
+	*/
+	int root = of_finddevice("/");
+	int regAddressCount = of_address_cells(root);
+	int regSizeCount = of_size_cells(root);
+	if (regAddressCount == OF_FAILED || regSizeCount == OF_FAILED) {
+		dprintf("finding base/size length counts failed, assume 32-bit.\n");
+		regAddressCount = 1;
+		regSizeCount = 1;
+	}
+	dprintf("memory range address cells: %d; size cells: %d;\n",
+		regAddressCount, regSizeCount);
+
+	if (regAddressCount > 2 || regSizeCount > 1) {
+		dprintf("Unsupported cell size detected. (machine is > 64bit?).\n");
+		return B_ERROR;
+	}
+
+	// On 64-bit PowerPC systems (G5), our mem base range address is larger
+	if (regAddressCount == 2) {
+		struct of_region<uint64> regions[64];
+		int count = of_getprop(package, "reg", regions, sizeof(regions));
+		if (count == OF_FAILED)
+			count = of_getprop(memory, "reg", regions, sizeof(regions));
+		if (count == OF_FAILED)
+			return B_ERROR;
+		count /= sizeof(regions[0]);
+
+		for (int32 i = 0; i < count; i++) {
+			if (regions[i].size <= 0) {
+				dprintf("%ld: empty region\n", i);
+				continue;
+			}
+			dprintf("%" B_PRIu32 ": base = %" B_PRIu64 ","
+				"size = %" B_PRIu32 "\n", i, regions[i].base, regions[i].size);
+
+			total += regions[i].size;
+
+			if (insert_physical_memory_range((addr_t)regions[i].base,
+					regions[i].size) != B_OK) {
+				dprintf("cannot map physical memory range "
+					"(num ranges = %" B_PRIu32 ")!\n",
+					gKernelArgs.num_physical_memory_ranges);
+				return B_ERROR;
+			}
+		}
+		return B_OK;
+	}
+
+	// Otherwise, normal 32-bit PowerPC G3 or G4 have a smaller 32-bit one
+	struct of_region<uint32> regions[64];
+	int count = of_getprop(package, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		count = of_getprop(memory, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		return B_ERROR;
-	count /= sizeof(of_region);
+	count /= sizeof(regions[0]);
 
 	for (int32 i = 0; i < count; i++) {
 		if (regions[i].size <= 0) {
 			dprintf("%ld: empty region\n", i);
 			continue;
 		}
-		dprintf("%" B_PRIu32 ": base = %p, size = %" B_PRIu32 "\n", i,
-			regions[i].base, regions[i].size);
+		dprintf("%" B_PRIu32 ": base = %" B_PRIu32 ","
+			"size = %" B_PRIu32 "\n", i, regions[i].base, regions[i].size);
 
 		total += regions[i].size;
 

@@ -15,6 +15,13 @@
 extern int gChosen;
 
 
+template<typename addressSize>
+struct of_region
+{
+	addressSize base;
+	uint32 size;
+};
+
 struct of_arguments {
 	const char	*name;
 	int			num_args;
@@ -25,11 +32,6 @@ struct of_arguments {
 	int &Argument(int index) { return data[index]; }
 	int &ReturnValue(int index) { return data[num_args + index]; }
 #endif
-};
-
-struct of_region {
-	void	*base;
-	uint32	size;
 };
 
 

@@ -17,7 +17,7 @@ KernelMergeObject boot_platform_openfirmware.o :
 	network.cpp
 	real_time_clock.cpp
 	start.cpp
-	support.cpp
+	of_support.cpp
 	video.cpp
 
 	openfirmware.cpp
