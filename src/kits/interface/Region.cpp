@@ -342,7 +342,6 @@ BRegion::PrintToStream() const
 // #pragma mark -
 
 
-
 void
 BRegion::OffsetBy(const BPoint& point)
 {
