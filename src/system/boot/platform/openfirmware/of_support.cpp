@@ -40,8 +40,9 @@ uint32
 of_size_cells(int package) {
 	uint32 size_cells;
 	if (of_getprop(package, "#size-cells",
-       &size_cells, sizeof(size_cells)) == OF_FAILED)
-       return OF_FAILED;
+		&size_cells, sizeof(size_cells)) == OF_FAILED)
+		return OF_FAILED;
+
 	return size_cells;
 }
 
