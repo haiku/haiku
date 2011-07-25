@@ -40,6 +40,7 @@
 #include "DecorManager.h"
 #include "DesktopSettingsPrivate.h"
 #include "DrawingEngine.h"
+#include "FontManager.h"
 #include "HWInterface.h"
 #include "InputManager.h"
 #include "Screen.h"

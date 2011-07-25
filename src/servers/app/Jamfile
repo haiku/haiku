@@ -8,6 +8,26 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseFreeTypeHeaders ;
 
 
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
+local decorator_src =
+	DecorManager.cpp
+	Decorator.cpp
+	DefaultDecorator.cpp
+	DefaultWindowBehaviour.cpp
+	MagneticBorder.cpp
+	WindowBehaviour.cpp
+	;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
+local font_src =
+	FontCache.cpp
+	FontCacheEntry.cpp
+	FontEngine.cpp
+	FontFamily.cpp
+	FontManager.cpp
+	FontStyle.cpp
+	;
+
 Server app_server :
 	Angle.cpp
 	AppServer.cpp
@@ -18,10 +38,6 @@ Server app_server :
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
-	DecorManager.cpp
-	Decorator.cpp
-	DefaultDecorator.cpp
-	DefaultWindowBehaviour.cpp
 	Desktop.cpp
 	DesktopListener.cpp
 	DesktopSettings.cpp
@@ -29,17 +45,10 @@ Server app_server :
 	DrawState.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
-	FontCache.cpp
-	FontCacheEntry.cpp
-	FontEngine.cpp
-	FontFamily.cpp
-	FontManager.cpp
-	FontStyle.cpp
 	HashTable.cpp
 	InputManager.cpp
 	IntPoint.cpp
 	IntRect.cpp
-	MagneticBorder.cpp
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
@@ -60,10 +69,12 @@ Server app_server :
 	View.cpp
 	VirtualScreen.cpp
 	Window.cpp
-	WindowBehaviour.cpp
 	WindowList.cpp
 	Workspace.cpp
 	WorkspacesView.cpp
+
+	$(decorator_src)
+	$(font_src)
 
 	# libraries
 	:
@@ -73,5 +84,9 @@ Server app_server :
 
 	: app_server.rdef
 ;
+
+SEARCH on [ FGristFiles $(decorator_src) ] = [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
+SEARCH on [ FGristFiles $(font_src) ] = [ FDirName $(HAIKU_TOP) src servers app font ] ;
+
 
 SubInclude HAIKU_TOP src servers app drawing ;
