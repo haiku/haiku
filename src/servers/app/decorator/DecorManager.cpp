@@ -243,13 +243,14 @@ DecorManager::SetDecorator(BString path, Desktop* desktop)
 		return error == B_OK ? B_ERROR : error;
 
 	DecorAddOn* oldDecor = fCurrentDecor;
+
 	BString oldPath = fCurrentDecorPath;
 	image_id oldImage = fCurrentDecor->ImageID();
 
 	fCurrentDecor = newDecor;
 	fCurrentDecorPath = path.String();
 
-	if (desktop->ReloadDecor()) {
+	if (desktop->ReloadDecor(oldDecor)) {
 		// now safe to unload all old decorator data
 		// saves us from deleting oldDecor...
 		unload_add_on(oldImage);

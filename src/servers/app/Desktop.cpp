@@ -2047,18 +2047,18 @@ Desktop::RedrawBackground()
 
 
 bool
-Desktop::ReloadDecor()
+Desktop::ReloadDecor(DecorAddOn* oldDecor)
 {
 	AutoWriteLocker _(fWindowLock);
 
 	bool returnValue = true;
 
-	// TODO it is assumed all listeners are registered by one decor
-	// unregister old listeners
-	const DesktopListenerDLList& currentListeners = GetDesktopListenerList();
-	for (DesktopListener* listener = currentListeners.First();
-		listener != NULL; listener = currentListeners.GetNext(listener))
-		UnregisterListener(listener);
+	if (oldDecor != NULL) {
+		const DesktopListenerList* oldListeners
+			= &oldDecor->GetDesktopListeners();
+		for (int i = 0; i < oldListeners->CountItems(); i++)
+			UnregisterListener(oldListeners->ItemAt(i));
+	}
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {

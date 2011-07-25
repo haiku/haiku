@@ -39,6 +39,7 @@
 
 class BMessage;
 
+class DecorAddOn;
 class DrawingEngine;
 class HWInterface;
 class ServerApp;
@@ -221,7 +222,7 @@ public:
 			void				Redraw();
 			void				RedrawBackground();
 
-			bool				ReloadDecor();
+			bool				ReloadDecor(DecorAddOn* oldDecor);
 
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }
