@@ -42,35 +42,10 @@ public:
 									BRect frame, window_look look,
 									uint32 flags);
 
-			/*! Indicates that window is stacked */
-			void				SetStackedMode(bool stacked, BRegion* dirty);
-			bool				StackedMode() const
-									{ return fStackedMode; }
-
-			/*! Set the tab length if the decorator is in stacked mode and if
-				the tab is the last one in the tab bar. */
-			void				SetStackedTabLength(float length,
-									BRegion* dirty);
-			float				StackedTabLength() const
-									{ return fStackedTabLength; }
-
 protected:
-			void				_DoLayout();
-			void				_LayoutTabItems(const BRect& tabRect);
-
-			bool				_SetTabLocation(float location,
-									BRegion* updateRegion = NULL);
-			void				_SetFocus();
-
-	virtual	void				DrawButtons(const BRect& invalid);
 	virtual	void				GetComponentColors(Component component,
-									 uint8 highlight, ComponentColors _colors);
-
-private:
-			bool				fStackedMode;
-			bool				fStackedDrawZoom;
-			float				fStackedTabLength;
-			bool				fStackedTabShifting;
+									uint8 highlight, ComponentColors _colors,
+									Decorator::Tab* tab = NULL);
 };
 
 

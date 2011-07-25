@@ -104,7 +104,6 @@ public:
 
 			void				FindSnappingCandidates();
 			bool				JoinCandidates();
-			void				DoWindowLayout();
 			void				DoGroupLayout();
 
 			void				AdjustSizeLimits(BRect targetFrame);
@@ -133,11 +132,6 @@ public:
 									bool active);
 			bool				IsTabHighlighted();
 			bool				IsBordersHighlighted();
-
-			bool				SetStackedMode(bool stacked = true);
-			bool				SetStackedTabLength(float length);
-			bool				SetStackedTabMoving(bool moving = true);
-			void				TabLocationMoved(float location, bool shifting);
 
 			uint64				Id();
 

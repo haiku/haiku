@@ -227,11 +227,11 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 	BPoint mousePosition;
 	int32 buttons;
 	fSATWindow->GetDesktop()->GetLastMouseState(&mousePosition, &buttons);
-	if (!window->Decorator()->TabRect().Contains(mousePosition))
+	if (!window->Decorator()->TitleBarRect().Contains(mousePosition))
 		return false;
 
 	// use the upper edge of the candidate window to find the parent window
-	mousePosition.y = window->Decorator()->TabRect().top;
+	mousePosition.y = window->Decorator()->TitleBarRect().top;
 
 	for (int i = 0; i < group->CountItems(); i++) {
 		SATWindow* satWindow = group->WindowAt(i);
@@ -239,7 +239,10 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 		Window* win = satWindow->GetWindow();
 		if (win == window || !win->Decorator())
 			continue;
-		if (win->Decorator()->TabRect().Contains(mousePosition)) {
+		Decorator::Tab* tab = win->Decorator()->TabAt(win->PositionInStack());
+		if (tab == NULL)
+			continue;
+		if (tab->tabRect.Contains(mousePosition)) {
 			// remember window as the parent for stacking
 			fStackingParent = satWindow;
 			_HighlightWindows(true);
@@ -265,63 +268,11 @@ SATStacking::JoinCandidates()
 
 
 void
-SATStacking::DoWindowLayout()
-{
-	_AdjustWindowTabs();
-}
-
-
-void
 SATStacking::RemovedFromArea(WindowArea* area)
 {
 	const SATWindowList& list = area->WindowList();
-	if (list.CountItems() == 1)
-		list.ItemAt(0)->SetStackedMode(false);
-	else if (list.CountItems() > 0)
+	if (list.CountItems() > 0)
 		list.ItemAt(0)->DoGroupLayout();
-
-	fSATWindow->SetStackedMode(false);
-}
-
-
-void
-SATStacking::TabLocationMoved(float location, bool shifting)
-{
-	if (!shifting) {
-		_AdjustWindowTabs();
-		return;
-	}
-
-	SATDecorator* decorator = fSATWindow->GetDecorator();
-	Desktop* desktop = fSATWindow->GetWindow()->Desktop();
-	WindowArea* area = fSATWindow->GetWindowArea();
-	if (!desktop || !area || ! decorator)
-		return;
-
-	const SATWindowList& stackedWindows = area->WindowList();
-	ASSERT(stackedWindows.CountItems() > 0);
-	int32 windowIndex = stackedWindows.IndexOf(fSATWindow);
-	ASSERT(windowIndex >= 0);
-	float tabLength = stackedWindows.ItemAt(0)->GetDecorator()
-		->StackedTabLength();
-
-	float oldTabPosition = windowIndex * (tabLength + 1);
-	if (fabs(oldTabPosition - location) < tabLength / 2)
-		return;
-
-	int32 neighbourIndex = windowIndex;
-	if (oldTabPosition > location)
-		neighbourIndex--;
-	else
-		neighbourIndex++;
-
-	SATWindow* neighbour = stackedWindows.ItemAt(neighbourIndex);
-	if (!neighbour)
-		return;
-
-	float newNeighbourPosition = windowIndex * (tabLength + 1);
-	area->MoveWindowToPosition(fSATWindow, neighbourIndex);
-	desktop->SetWindowTabLocation(neighbour->GetWindow(), newNeighbourPosition);
 }
 
 
@@ -344,47 +295,4 @@ SATStacking::_HighlightWindows(bool highlight)
 		return;
 	fStackingParent->HighlightTab(highlight);
 	fSATWindow->HighlightTab(highlight);
-}
-
-
-bool
-SATStacking::_AdjustWindowTabs()
-{
-	SATDecorator* decorator = fSATWindow->GetDecorator();
-	Desktop* desktop = fSATWindow->GetWindow()->Desktop();
-	WindowArea* area = fSATWindow->GetWindowArea();
-	if (!desktop || !area || ! decorator)
-		return false;
-
-	if (!decorator->StackedMode())
-		return false;
-
-	BRect frame = fSATWindow->CompleteWindowFrame();
-
-	const SATWindowList& stackedWindows = area->WindowList();
-
-	int stackCount = stackedWindows.CountItems();
-	float titleBarLength = frame.Width();
-	ASSERT(titleBarLength > 0);
-	// floor to avoid drawing issues
-	float tabLength = floorf(titleBarLength / stackCount);
-	// the part that we lost due to the floor
-	float roundingError = 0;
-	if (tabLength > kMaxTabWidth)
-		tabLength = kMaxTabWidth;
-	else
-		roundingError = titleBarLength - stackCount * tabLength;
-
-	float location = 0;
-	for (int i = 0; i < stackCount; i++) {
-		SATWindow* window = stackedWindows.ItemAt(i);
-		if (i == stackCount - 1)
-			window->SetStackedTabLength(tabLength - 1 + roundingError);
-		else
-			window->SetStackedTabLength(tabLength - 1);
-
-		desktop->SetWindowTabLocation(window->GetWindow(), location);
-		location += tabLength;
-	}
-	return true;
 }

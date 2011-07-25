@@ -74,7 +74,7 @@ public:
 	virtual void				WindowMinimized(Window* window, bool minimize);
 
 	virtual void				WindowTabLocationChanged(Window* window,
-									float location);
+									float location, bool isShifting);
 	virtual void				SizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
@@ -107,8 +107,6 @@ private:
 			SATWindowList		fGrouplessWindows;
 
 			SATWindow*			fCurrentSATWindow;
-
-			bool				fTabIsShifting;
 };
 
 
@@ -167,7 +165,6 @@ public:
 	virtual bool				JoinCandidates() = 0;
 	/*! Update the window tab values, solve the layout and move all windows in
 	the group accordantly. */
-	virtual void				DoWindowLayout() = 0;
 	virtual void				RemovedFromArea(WindowArea* area) {}
 	virtual void				TabLocationMoved(float location, bool shifting)
 									{}

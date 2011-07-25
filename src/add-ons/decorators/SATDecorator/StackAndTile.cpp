@@ -26,8 +26,7 @@ StackAndTile::StackAndTile()
 	:
 	fDesktop(NULL),
 	fSATKeyPressed(false),
-	fCurrentSATWindow(NULL),
-	fTabIsShifting(false)
+	fCurrentSATWindow(NULL)
 {
 
 }
@@ -218,7 +217,8 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 	if (message->FindInt32("clicks") == 2)
 		return;
 
-	switch (satWindow->GetDecorator()->RegionAt(where)) {
+	int32 tab;
+	switch (satWindow->GetDecorator()->RegionAt(where, tab)) {
 		case Decorator::REGION_TAB:
 		case Decorator::REGION_LEFT_BORDER:
 		case Decorator::REGION_RIGHT_BORDER:
@@ -247,15 +247,6 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 void
 StackAndTile::MouseUp(Window* window, BMessage* message, const BPoint& where)
 {
-	if (fTabIsShifting) {
-		SATWindow*	satWindow = GetSATWindow(window);
-		if (satWindow) {
-			fTabIsShifting = false;
-			satWindow->TabLocationMoved(satWindow->GetWindow()->TabLocation(),
-				fTabIsShifting);
-		}
-	}
-
 	if (fSATKeyPressed)
 		_StopSAT();
 
@@ -287,20 +278,8 @@ StackAndTile::WindowResized(Window* window)
 
 	if (SATKeyPressed() && fCurrentSATWindow)
 		satWindow->FindSnappingCandidates();
-	else {
+	else
 		satWindow->DoGroupLayout();
-
-		// Do a window layout for all windows. TODO: maybe do it a bit more
-		// efficient
-		SATGroup* group = satWindow->GetGroup();
-		if (!group)
-			return;
-		for (int i = 0; i < group->CountItems(); i++) {
-			SATWindow* listWindow = group->WindowAt(i);
-			if (listWindow != satWindow)
-				listWindow->DoWindowLayout();
-		}
-	}
 }
 
 
@@ -379,14 +358,10 @@ StackAndTile::WindowMinimized(Window* window, bool minimize)
 
 
 void
-StackAndTile::WindowTabLocationChanged(Window* window, float location)
+StackAndTile::WindowTabLocationChanged(Window* window, float location,
+	bool isShifting)
 {
-	SATWindow* satWindow = GetSATWindow(window);
-	if (!satWindow)
-		return;
 
-	fTabIsShifting = true;
-	satWindow->TabLocationMoved(location, fTabIsShifting);
 }
 
 

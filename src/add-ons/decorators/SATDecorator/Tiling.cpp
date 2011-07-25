@@ -78,13 +78,6 @@ SATTiling::JoinCandidates()
 }
 
 
-void
-SATTiling::DoWindowLayout()
-{
-
-}
-
-
 bool
 SATTiling::_FindFreeAreaInGroup(SATGroup* group)
 {

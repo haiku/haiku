@@ -34,12 +34,10 @@ public:
 		void				DoWindowLayout();
 
 		void				RemovedFromArea(WindowArea* area);
-		void				TabLocationMoved(float location, bool shifting);
 
 private:
 		void				_ClearSearchResult();
 		void				_HighlightWindows(bool highlight = true);
-		bool				_AdjustWindowTabs();
 
 		SATWindow*			fSATWindow;
 

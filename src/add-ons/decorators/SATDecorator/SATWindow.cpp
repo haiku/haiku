@@ -403,15 +403,17 @@ SATWindow::StackWindow(SATWindow* child)
 	if (!group || !area)
 		return false;
 
-	bool status = group->AddWindow(child, area, this);
-
-	if (status) {
-		area->WindowList().ItemAt(0)->SetStackedMode(true);
-			// for the case we are the first added window
-		child->SetStackedMode(true);
-	}
+	if (group->AddWindow(child, area, this) == false)
+		return false;
 
 	DoGroupLayout();
+
+	if (fWindow->AddWindowToStack(child->GetWindow()) == false) {
+		group->RemoveWindow(child);
+		DoGroupLayout();
+		return false;
+	}
+
 	return true;
 }
 
@@ -419,6 +421,7 @@ SATWindow::StackWindow(SATWindow* child)
 void
 SATWindow::RemovedFromArea(WindowArea* area)
 {
+	fWindow->DetachFromWindowStack(true);
 	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
 		fSATSnappingBehaviourList.ItemAt(i)->RemovedFromArea(area);
 }
@@ -462,22 +465,12 @@ SATWindow::JoinCandidates()
 
 
 void
-SATWindow::DoWindowLayout()
-{
-	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
-		fSATSnappingBehaviourList.ItemAt(i)->DoWindowLayout();
-}
-
-
-void
 SATWindow::DoGroupLayout()
 {
 	if (!PositionManagedBySAT())
 		return;
 
 	fGroupCookie->DoGroupLayout();
-
-	DoWindowLayout();
 }
 
 
@@ -659,15 +652,17 @@ SATWindow::HighlightTab(bool active)
 	if (!decorator)
 		return false;
 
+	int32 tabIndex = fWindow->PositionInStack();
 	BRegion dirty;
 	uint8 highlight = active ?  SATDecorator::HIGHLIGHT_STACK_AND_TILE : 0;
-	decorator->SetRegionHighlight(SATDecorator::REGION_TAB, highlight, &dirty);
-	decorator->SetRegionHighlight(SATDecorator::REGION_CLOSE_BUTTON, highlight,
-		&dirty);
-	decorator->SetRegionHighlight(SATDecorator::REGION_ZOOM_BUTTON, highlight,
-		&dirty);
+	decorator->SetRegionHighlight(Decorator::REGION_TAB, highlight, &dirty,
+		tabIndex);
+	decorator->SetRegionHighlight(Decorator::REGION_CLOSE_BUTTON, highlight,
+		&dirty, tabIndex);
+	decorator->SetRegionHighlight(Decorator::REGION_ZOOM_BUTTON, highlight,
+		&dirty, tabIndex);
 
-	fWindow->ProcessDirtyRegion(dirty);
+	fWindow->TopLayerStackWindow()->ProcessDirtyRegion(dirty);
 	return true;
 }
 
@@ -685,55 +680,6 @@ SATWindow::HighlightBorders(Decorator::Region region, bool active)
 
 	fWindow->ProcessDirtyRegion(dirty);
 	return true;
-}
-
-
-bool
-SATWindow::SetStackedMode(bool stacked)
-{
-	SATDecorator* decorator = GetDecorator();
-	if (!decorator)
-		return false;
-	BRegion dirty;
-	decorator->SetStackedMode(stacked, &dirty);
-	fDesktop->RebuildAndRedrawAfterWindowChange(fWindow, dirty);
-	return true;
-}
-
-
-bool
-SATWindow::SetStackedTabLength(float length)
-{
-	SATDecorator* decorator = GetDecorator();
-	if (!decorator)
-		return false;
-	BRegion dirty;
-	decorator->SetStackedTabLength(length, &dirty);
-	fDesktop->RebuildAndRedrawAfterWindowChange(fWindow, dirty);
-	return true;
-}
-
-
-bool
-SATWindow::SetStackedTabMoving(bool moving)
-{
-	SATDecorator* decorator = GetDecorator();
-	if (!decorator)
-		return false;
-
-	if (!moving)
-		DoGroupLayout();
-
-	return true;
-}
-
-
-void
-SATWindow::TabLocationMoved(float location, bool shifting)
-{
-	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
-		fSATSnappingBehaviourList.ItemAt(i)->TabLocationMoved(location,
-			shifting);
 }
 
 
@@ -814,7 +760,7 @@ SATWindow::_RestoreOriginalSize(bool stayBelowMouse)
 	SATDecorator* decorator = GetDecorator();
 	if (decorator == NULL)
 		return;
-	BRect tabRect = decorator->TabRect();
+	BRect tabRect = decorator->TitleBarRect();
 	if (mousePosition.y < tabRect.bottom && mousePosition.y > tabRect.top
 		&& mousePosition.x <= frame.right + decorator->BorderWidth() +1
 		&& mousePosition.x >= frame.left + decorator->BorderWidth()) {
