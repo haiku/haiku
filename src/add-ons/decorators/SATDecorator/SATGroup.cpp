@@ -78,6 +78,13 @@ WindowArea::MoveWindowToPosition(SATWindow* window, int32 index)
 }
 
 
+SATWindow*
+WindowArea::TopWindow()
+{
+	return fWindowLayerOrder.ItemAt(fWindowLayerOrder.CountItems() - 1);
+}
+
+
 bool
 WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 {

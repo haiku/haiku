@@ -502,15 +502,12 @@ StackAndTile::_ActivateWindow(SATWindow* satWindow)
 		return;
 	area->MoveToTopLayer(satWindow);
 
-	//desktop->ActivateWindow(satWindow->GetWindow());
-
-	WindowIterator iter(group);
-	for (SATWindow* listWindow = iter.NextWindow(); listWindow != NULL;
-		listWindow = iter.NextWindow()) {
-		if (listWindow != satWindow)
-			//desktop->SendWindowBehind(listWindow->GetWindow(),
-			//	satWindow->GetWindow());
-				desktop->ActivateWindow(listWindow->GetWindow());
+	const WindowAreaList& areas = group->GetAreaList() ;
+	for (int32 i = 0; i < areas.CountItems(); i++) {
+		WindowArea* currentArea = areas.ItemAt(i);
+		if (currentArea == area)
+			continue;
+		desktop->ActivateWindow(currentArea->TopWindow()->GetWindow());
 	}
 
 	desktop->ActivateWindow(satWindow->GetWindow());

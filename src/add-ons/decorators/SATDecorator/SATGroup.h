@@ -144,6 +144,7 @@ public:
 	const	SATWindowList&		LayerOrder() { return fWindowLayerOrder; }
 			bool				MoveWindowToPosition(SATWindow* window,
 									int32 index);
+			SATWindow*			TopWindow();
 
 			Crossing*			LeftTopCrossing()
 									{ return fLeftTopCrossing.Get(); }
