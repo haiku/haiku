@@ -49,7 +49,7 @@ const struct supported_device {
 	{0x94cc, RADEON_R600 | 0x10, "Radeon HD 2400"},	/*RV610*/
 	{0x9586, RADEON_R600 | 0x30, "Radeon HD 2600"},	/*RV630*/
 	{0x9588, RADEON_R600 | 0x30, "Radeon HD 2600"},	/*RV630*/
-	{0x958a, RADEON_R600 | 0x30, "Radeon HD 2600 X2"}, /*RV630*/
+	{0x958a, RADEON_R600 | 0x30, "Radeon HD 2600 X2"},/*RV630*/
 	//	Radeon 2700		- RV630
 	{0x9400, RADEON_R600 | 0x0, "Radeon HD 2900"},	/*RV600*/
 	{0x9405, RADEON_R600 | 0x0, "Radeon HD 2900"},	/*RV600*/
@@ -66,21 +66,22 @@ const struct supported_device {
 	{0x95c9, RADEON_R600 | 0x20, "Radeon HD 3450"},	/*RV620*/
 	{0x95c4, RADEON_R600 | 0x20, "Radeon HD 3470"},	/*RV620*/
 	{0x95c0, RADEON_R600 | 0x20, "Radeon HD 3550"},	/*RV620*/
-	{0x9581, RADEON_R600 | 0x30, "Radeon HD 3600"}, /*RV630*/
-	{0x9583, RADEON_R600 | 0x30, "Radeon HD 3600"}, /*RV630*/
-	{0x9598, RADEON_R600 | 0x30, "Radeon HD 3600"}, /*RV630*/
-	{0x9591, RADEON_R600 | 0x35, "Radeon HD 3600"}, /*RV635*/
+	{0x9581, RADEON_R600 | 0x30, "Radeon HD 3600"},	/*RV630*/
+	{0x9583, RADEON_R600 | 0x30, "Radeon HD 3600"},	/*RV630*/
+	{0x9598, RADEON_R600 | 0x30, "Radeon HD 3600"},	/*RV630*/
+	{0x9591, RADEON_R600 | 0x35, "Radeon HD 3600"},	/*RV635*/
 	{0x9589, RADEON_R600 | 0x30, "Radeon HD 3610"},	/*RV630*/
 	//  Radeon 3650		- RV635
 	//  Radeon 3670		- RV635
 	{0x9507, RADEON_R600 | 0x70, "Radeon HD 3830"},	/*RV670*/
 	{0x9505, RADEON_R600 | 0x70, "Radeon HD 3850"},	/*RV670, IGP*/
-	{0x9513, RADEON_R600 | 0x80, "Radeon HD 3850 X2"}, /*RV670*/
+	{0x9513, RADEON_R600 | 0x80, "Radeon HD 3850 X2"},/*RV670*/
 	{0x9501, RADEON_R600 | 0x70, "Radeon HD 3870"},	/*RV670*/
-	{0x950F, RADEON_R600 | 0x80, "Radeon HD 3870 X2"}, /*R680*/
+	{0x950F, RADEON_R600 | 0x80, "Radeon HD 3870 X2"},/*R680*/
 	{0x9710, RADEON_R600 | 0x20, "Radeon HD 4200"},	/*RV620, IGP*/
-	//	Radeon 4225		- RV620
+	{0x9715, RADEON_R600 | 0x20, "Radeon HD 4250"},	/*RV620, IGP*/
 	{0x9712, RADEON_R600 | 0x20, "Radeon HD 4270"},	/*RV620, IGP*/
+	{0x9714, RADEON_R600 | 0x20, "Radeon HD 4290"},	/*RV620, IGP*/
 
 	// R700 series	(HD4330 - HD4890, HD51xx, HD5xxV)
 	// Codename: Wekiva
@@ -91,17 +92,17 @@ const struct supported_device {
 	{0x9540, RADEON_R700 | 0x10, "Radeon HD 4550"},	/*RV710*/
 	{0x9498, RADEON_R700 | 0x30, "Radeon HD 4650"},	/*RV740*/
 	{0x94b4, RADEON_R700 | 0x40, "Radeon HD 4700"},	/*RV740*/
-	{0x9490, RADEON_R700 | 0x30, "Radeon HD 4710"}, /*RV740*/
+	{0x9490, RADEON_R700 | 0x30, "Radeon HD 4710"},	/*RV740*/
 	{0x94b3, RADEON_R700 | 0x40, "Radeon HD 4770"},	/*RV740*/
 	{0x94b5, RADEON_R700 | 0x40, "Radeon HD 4770"},	/*RV740*/
-	{0x944a, RADEON_R700 | 0x70, "Radeon HD 4800"}, /*RV740*/
+	{0x944a, RADEON_R700 | 0x70, "Radeon HD 4800"},	/*RV740*/
 	{0x944e, RADEON_R700 | 0x70, "Radeon HD 4810"},	/*RV740*/
 	{0x944c, RADEON_R700 | 0x70, "Radeon HD 4830"},	/*RV740*/
 	{0x9442, RADEON_R700 | 0x70, "Radeon HD 4850"},	/*RV770*/
-	{0x9443, RADEON_R700 | 0x70, "Radeon HD 4850 X2"}, /*RV770*/
+	{0x9443, RADEON_R700 | 0x70, "Radeon HD 4850 X2"},/*RV770*/
 	{0x94a1, RADEON_R700 | 0x90, "Radeon HD 4860"},	/*RV780, IGP*/
 	{0x9440, RADEON_R700 | 0x70, "Radeon HD 4870"},	/*RV770*/
-	{0x9441, RADEON_R700 | 0x70, "Radeon HD 4870 X2"}, /*RV770*/
+	{0x9441, RADEON_R700 | 0x70, "Radeon HD 4870 X2"},/*RV770*/
 
 	// R800 series (HD54xx - HD59xx)
 	// Codename: Evergreen
