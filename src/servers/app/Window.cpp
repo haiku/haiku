@@ -137,7 +137,8 @@ Window::Window(const BRect& frame, const char *name,
 				&fMaxHeight);
 		}
 	}
-	fWindowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
+	if (fFeel != kOffscreenWindowFeel)
+		fWindowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
 
 	// do we need to change our size to let the decorator fit?
 	// _ResizeBy() will adapt the frame for validity before resizing
@@ -183,7 +184,8 @@ Window::~Window()
 status_t
 Window::InitCheck() const
 {
-	if (!fDrawingEngine || !fWindowBehaviour)
+	if (fDrawingEngine == NULL
+		|| (fFeel != kOffscreenWindowFeel && fWindowBehaviour == NULL))
 		return B_NO_MEMORY;
 	// TODO: anything else?
 	return B_OK;
@@ -1597,7 +1599,8 @@ Window::IsValidFeel(window_feel feel)
 		|| feel == kDesktopWindowFeel
 		|| feel == kMenuWindowFeel
 		|| feel == kWindowScreenFeel
-		|| feel == kPasswordWindowFeel;
+		|| feel == kPasswordWindowFeel
+		|| feel == kOffscreenWindowFeel;
 }
 
 
