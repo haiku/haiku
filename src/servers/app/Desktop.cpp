@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -581,6 +581,7 @@ Desktop::BroadcastToAllWindows(int32 code)
 filter_result
 Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 {
+	filter_result result = B_DISPATCH_MESSAGE;
 	if (LockAllWindows()) {
 		Window* window = MouseEventWindow();
 		if (window == NULL)
@@ -591,13 +592,13 @@ Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 				window->ModifiersChanged(modifiers);
 		}
 
+		if (NotifyKeyPressed(what, key, modifiers))
+			result = B_SKIP_MESSAGE;
+
 		UnlockAllWindows();
 	}
 
-	if (NotifyKeyPressed(what, key, modifiers))
-		return B_SKIP_MESSAGE;
-
-	return B_DISPATCH_MESSAGE;
+	return result;
 }
 
 
@@ -1115,15 +1116,12 @@ Desktop::ActivateWindow(Window* window)
 		}
 	}
 
-	// we don't need to redraw what is currently
-	// visible of the window
-	BRegion clean(window->VisibleRegion());
 	WindowList windows(kWorkingList);
-
 	Window* frontmost = window->Frontmost();
 
 	CurrentWindows().RemoveWindow(window);
 	windows.AddWindow(window);
+	window->MoveToTopStackLayer();
 
 	if (frontmost != NULL && frontmost->IsModal()) {
 		// all modal windows follow their subsets to the front
@@ -1335,6 +1333,10 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	if (!LockAllWindows())
 		return;
 
+	Window* topWindow = window->TopLayerStackWindow();
+	if (topWindow)
+		window = topWindow;
+
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
 	if (!window->IsVisible() || workspace != fCurrentWorkspace) {
@@ -1472,16 +1474,16 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 
 
 bool
-Desktop::SetWindowTabLocation(Window* window, float location)
+Desktop::SetWindowTabLocation(Window* window, float location, bool isShifting)
 {
 	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
-	bool changed = window->SetTabLocation(location, dirty);
+	bool changed = window->SetTabLocation(location, isShifting, dirty);
 	if (changed)
 		RebuildAndRedrawAfterWindowChange(window, dirty);
 
-	NotifyWindowTabLocationChanged(window, location);
+	NotifyWindowTabLocationChanged(window, location, isShifting);
 
 	return changed;
 }
@@ -1763,7 +1765,7 @@ Desktop::WindowAt(BPoint where)
 	for (Window* window = CurrentWindows().LastWindow(); window;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->IsVisible() && window->VisibleRegion().Contains(where))
-			return window;
+			return window->StackedWindowAt(where);
 	}
 
 	return NULL;
@@ -3177,6 +3179,7 @@ void
 Desktop::RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 	BRegion& dirty)
 {
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
 	if (!changedWindow->IsVisible() || dirty.CountRects() == 0)
 		return;
 

@@ -59,7 +59,7 @@ public:
 									bool minimize) = 0;
 
 	virtual void				WindowTabLocationChanged(Window* window,
-									float location) = 0;
+									float location, bool isShifting) = 0;
 	virtual void				SizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight) = 0;
@@ -113,7 +113,7 @@ public:
 									bool minimize);
 
 			void				NotifyWindowTabLocationChanged(Window* window,
-									float location);
+									float location, bool isShifting);
 			void				NotifySizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);

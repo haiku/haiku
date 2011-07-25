@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -14,6 +14,17 @@
 
 #include "Window.h"
 
+#include <new>
+#include <stdio.h>
+
+#include <Debug.h>
+
+#include <DirectWindow.h>
+#include <PortLink.h>
+#include <View.h>
+#include <ViewPrivate.h>
+#include <WindowPrivate.h>
+
 #include "ClickTarget.h"
 #include "Decorator.h"
 #include "DecorManager.h"
@@ -27,17 +38,6 @@
 #include "WindowBehaviour.h"
 #include "Workspace.h"
 #include "WorkspacesView.h"
-
-#include <ViewPrivate.h>
-#include <WindowPrivate.h>
-
-#include <Debug.h>
-#include <DirectWindow.h>
-#include <PortLink.h>
-#include <View.h>
-
-#include <new>
-#include <stdio.h>
 
 
 // Toggle debug output
@@ -91,7 +91,6 @@ Window::Window(const BRect& frame, const char *name,
 	fRegionPool(),
 
 	fWindowBehaviour(NULL),
-	fDecorator(NULL),
 	fTopView(NULL),
 	fWindow(window),
 	fDrawingEngine(drawingEngine),
@@ -120,6 +119,8 @@ Window::Window(const BRect& frame, const char *name,
 
 	fWorkspacesViewCount(0)
 {
+	_InitWindowStack();
+
 	// make sure our arguments are valid
 	if (!IsValidLook(fLook))
 		fLook = B_TITLED_WINDOW_LOOK;
@@ -128,11 +129,12 @@ Window::Window(const BRect& frame, const char *name,
 
 	SetFlags(flags, NULL);
 
-	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
-		fDecorator = gDecorManager.AllocateDecorator(this);
-		if (fDecorator) {
-			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight,
-				&fMaxWidth, &fMaxHeight);
+	if (fLook != B_NO_BORDER_WINDOW_LOOK && fCurrentStack.Get() != NULL) {
+		// allocates a decorator
+		::Decorator* decorator = Decorator();
+		if (decorator != NULL) {
+			decorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
+				&fMaxHeight);
 		}
 	}
 	fWindowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
@@ -169,8 +171,9 @@ Window::~Window()
 		delete fTopView;
 	}
 
+	DetachFromWindowStack(false);
+
 	delete fWindowBehaviour;
-	delete fDecorator;
 	delete fDrawingEngine;
 
 	gDecorManager.CleanupForWindow(this);
@@ -220,8 +223,9 @@ Window::GetBorderRegion(BRegion* region)
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
 
-	if (fDecorator)
-		*region = fDecorator->GetFootprint();
+	::Decorator* decorator = Decorator();
+	if (decorator)
+		*region = decorator->GetFootprint();
 	else
 		region->MakeEmpty();
 }
@@ -272,7 +276,7 @@ Window::_PropagatePosition()
 
 
 void
-Window::MoveBy(int32 x, int32 y)
+Window::MoveBy(int32 x, int32 y, bool moveStack)
 {
 	// this function is only called from the desktop thread
 
@@ -296,12 +300,25 @@ Window::MoveBy(int32 x, int32 y)
 
 	fEffectiveDrawingRegionValid = false;
 
-	if (fDecorator)
-		fDecorator->MoveBy(x, y);
-
 	if (fTopView != NULL) {
 		fTopView->MoveBy(x, y, NULL);
 		fTopView->UpdateOverlay();
+	}
+
+	::Decorator* decorator = Decorator();
+	if (moveStack && decorator)
+		decorator->MoveBy(x, y);
+
+	WindowStack* stack = GetWindowStack();
+	if (moveStack && stack) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* window = stack->WindowList().ItemAt(i);
+			if (window == this)
+				continue;
+			window->MoveBy(x, y, false);
+			
+			//fDesktop->RebuildAndRedrawAfterWindowChange(window, dirty);
+		}
 	}
 
 	// the desktop will take care of dirty regions
@@ -315,7 +332,7 @@ Window::MoveBy(int32 x, int32 y)
 
 
 void
-Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
+Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 {
 	// this function is only called from the desktop thread
 
@@ -345,19 +362,29 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	if (fDecorator) {
-		fDecorator->ResizeBy(x, y, dirtyRegion);
+	if (fTopView != NULL) {
+		fTopView->ResizeBy(x, y, dirtyRegion);
+		fTopView->UpdateOverlay();
+	}
+
+	::Decorator* decorator = Decorator();
+	if (decorator && resizeStack) {
+		decorator->ResizeBy(x, y, dirtyRegion);
 //if (dirtyRegion) {
 //fDrawingEngine->FillRegion(*dirtyRegion, (rgb_color){ 255, 255, 0, 255 });
 //snooze(40000);
 //}
 	}
 
-	if (fTopView != NULL) {
-		fTopView->ResizeBy(x, y, dirtyRegion);
-		fTopView->UpdateOverlay();
+	WindowStack* stack = GetWindowStack();
+	if (resizeStack && stack) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* window = stack->WindowList().ItemAt(i);
+			if (window == this)
+				continue;
+			window->ResizeBy(x, y, dirtyRegion, false);
+		}
 	}
-
 //if (dirtyRegion)
 //fDrawingEngine->FillRegion(*dirtyRegion, (rgb_color){ 0, 255, 255, 255 });
 
@@ -543,20 +570,32 @@ Window::PreviousWindow(int32 index) const
 }
 
 
+::Decorator*
+Window::Decorator() const
+{
+	if (fCurrentStack.Get() == NULL)
+		return NULL;
+	return fCurrentStack->Decorator();
+}
+
+
 bool
 Window::ReloadDecor()
 {
 	::Decorator* decorator = NULL;
 	WindowBehaviour* windowBehaviour = NULL;
-
+	WindowStack* stack = GetWindowStack();
+	if (stack == NULL)
+		return false;
 
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
 		decorator = gDecorManager.AllocateDecorator(this);
 		if (decorator == NULL)
 			return false;
+		int32 index = PositionInStack();
 		if (IsFocus())
-			decorator->SetFocus(true);
+			decorator->SetFocus(index, true);
 	}
 
 	windowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
@@ -565,8 +604,7 @@ Window::ReloadDecor()
 		return false;
 	}
 
-	delete fDecorator;
-	fDecorator = decorator;
+	stack->SetDecorator(decorator);
 
 	delete fWindowBehaviour;
 	fWindowBehaviour = windowBehaviour;
@@ -578,7 +616,8 @@ Window::ReloadDecor()
 void
 Window::SetScreen(const ::Screen* screen)
 {
-	ASSERT_MULTI_WRITE_LOCKED(fDesktop->ScreenLocker());
+	// TODO this assert fails in Desktop::ShowWindow
+	//ASSERT_MULTI_WRITE_LOCKED(fDesktop->ScreenLocker());
 	fScreen = screen;
 }
 
@@ -586,7 +625,8 @@ Window::SetScreen(const ::Screen* screen)
 const ::Screen*
 Window::Screen() const
 {
-	ASSERT_MULTI_READ_LOCKED(fDesktop->ScreenLocker());
+	// TODO this assert also fails
+	//ASSERT_MULTI_READ_LOCKED(fDesktop->ScreenLocker());
 	return fScreen;
 }
 
@@ -640,7 +680,7 @@ Window::DrawingRegionChanged(View* view) const
 void
 Window::ProcessDirtyRegion(BRegion& region)
 {
-	// if this is exectuted in the desktop thread,
+	// if this is executed in the desktop thread,
 	// it means that the window thread currently
 	// blocks to get the read lock, if it is
 	// executed from the window thread, it should
@@ -669,8 +709,13 @@ Window::ProcessDirtyRegion(BRegion& region)
 void
 Window::RedrawDirtyRegion()
 {
-	// executed from ServerWindow with the read lock held
+	if (TopLayerStackWindow() != this) {
+		fDirtyRegion.MakeEmpty();
+		fDirtyCause = 0;
+		return;
+	}
 
+	// executed from ServerWindow with the read lock held
 	if (IsVisible()) {
 		_DrawBorder();
 
@@ -961,22 +1006,27 @@ Window::SetTitle(const char* name, BRegion& dirty)
 
 	fTitle = name;
 
-	if (fDecorator)
-		fDecorator->SetTitle(name, &dirty);
+	::Decorator* decorator = Decorator();
+	if (decorator) {
+		int32 index = PositionInStack();
+		decorator->SetTitle(index, name, &dirty);
+	}
 }
 
 
 void
 Window::SetFocus(bool focus)
 {
+	::Decorator* decorator = Decorator();
+
 	// executed from Desktop thread
 	// it holds the clipping write lock,
 	// so the window thread cannot be
 	// accessing fIsFocus
 
 	BRegion* dirty = NULL;
-	if (fDecorator)
-		dirty = fRegionPool.GetRegion(fDecorator->GetFootprint());
+	if (decorator)
+		dirty = fRegionPool.GetRegion(decorator->GetFootprint());
 	if (dirty) {
 		dirty->IntersectWith(&fVisibleRegion);
 		fDesktop->MarkDirty(*dirty);
@@ -984,8 +1034,10 @@ Window::SetFocus(bool focus)
 	}
 
 	fIsFocus = focus;
-	if (fDecorator)
-		fDecorator->SetFocus(focus);
+	if (decorator) {
+		int32 index = PositionInStack();
+		decorator->SetFocus(index, focus);
+	}
 
 	Activated(focus);
 }
@@ -1066,8 +1118,9 @@ Window::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
 	fMaxHeight = maxHeight;
 
 	// give the Decorator a say in this too
-	if (fDecorator) {
-		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
+	::Decorator* decorator = Decorator();
+	if (decorator) {
+		decorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
 			&fMaxHeight);
 	}
 
@@ -1087,10 +1140,13 @@ Window::GetSizeLimits(int32* minWidth, int32* maxWidth,
 
 
 bool
-Window::SetTabLocation(float location, BRegion& dirty)
+Window::SetTabLocation(float location, bool isShifting, BRegion& dirty)
 {
-	if (fDecorator)
-		return fDecorator->SetTabLocation(location, &dirty);
+	::Decorator* decorator = Decorator();
+	if (decorator) {
+		int32 index = PositionInStack();
+		return decorator->SetTabLocation(index, location, isShifting, &dirty);
+	}
 
 	return false;
 }
@@ -1099,8 +1155,11 @@ Window::SetTabLocation(float location, BRegion& dirty)
 float
 Window::TabLocation() const
 {
-	if (fDecorator)
-		return fDecorator->TabLocation();
+	::Decorator* decorator = Decorator();
+	if (decorator) {
+		int32 index = PositionInStack();
+		return decorator->TabLocation(index);
+	}
 	return 0.0;
 }
 
@@ -1116,8 +1175,10 @@ Window::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
 		return false;
 	}
 
-	if (fDecorator)
-		return fDecorator->SetSettings(settings, &dirty);
+	::Decorator* decorator = Decorator();
+	if (decorator)
+		return decorator->SetSettings(settings, &dirty);
+
 	return false;
 }
 
@@ -1128,8 +1189,9 @@ Window::GetDecoratorSettings(BMessage* settings)
 	if (fDesktop)
 		fDesktop->GetDecoratorSettings(this, *settings);
 
-	if (fDecorator)
-		return fDecorator->GetSettings(settings);
+	::Decorator* decorator = Decorator();
+	if (decorator)
+		return decorator->GetSettings(settings);
 
 	return false;
 }
@@ -1138,9 +1200,10 @@ Window::GetDecoratorSettings(BMessage* settings)
 void
 Window::FontsChanged(BRegion* updateRegion)
 {
-	if (fDecorator != NULL) {
+	::Decorator* decorator = Decorator();
+	if (decorator != NULL) {
 		DesktopSettings settings(fDesktop);
-		fDecorator->FontsChanged(settings, updateRegion);
+		decorator->FontsChanged(settings, updateRegion);
 	}
 }
 
@@ -1148,11 +1211,14 @@ Window::FontsChanged(BRegion* updateRegion)
 void
 Window::SetLook(window_look look, BRegion* updateRegion)
 {
-	if (fDecorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
+	::Decorator* decorator = Decorator();
+	if (decorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
-		fDecorator = gDecorManager.AllocateDecorator(this);
-		if (IsFocus())
-			fDecorator->SetFocus(true);
+		decorator = gDecorManager.AllocateDecorator(this);
+		if (IsFocus()) {
+			int32 index = PositionInStack();
+			decorator->SetFocus(index, true);
+		}
 	}
 
 	fLook = look;
@@ -1163,20 +1229,19 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 		// ...and therefor the drawing region is
 		// likely not valid anymore either
 
-	if (fDecorator != NULL) {
+	if (decorator != NULL) {
 		DesktopSettings settings(fDesktop);
-		fDecorator->SetLook(settings, look, updateRegion);
+		decorator->SetLook(settings, look, updateRegion);
 
 		// we might need to resize the window!
-		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
+		decorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
 			&fMaxHeight);
 		_ObeySizeLimits();
 	}
 
-	if (look == B_NO_BORDER_WINDOW_LOOK) {
+	if (look == B_NO_BORDER_WINDOW_LOOK && fCurrentStack.Get() != NULL) {
 		// we don't need a decorator for this window
-		delete fDecorator;
-		fDecorator = NULL;
+		fCurrentStack->SetDecorator(NULL);
 	}
 }
 
@@ -1216,16 +1281,15 @@ Window::SetFlags(uint32 flags, BRegion* updateRegion)
 	if ((fFlags & B_SAME_POSITION_IN_ALL_WORKSPACES) != 0)
 		_PropagatePosition();
 
-	if (fDecorator == NULL)
+	::Decorator* decorator = Decorator();
+	if (decorator == NULL)
 		return;
 
-	fDecorator->SetFlags(flags, updateRegion);
+	decorator->SetFlags(flags, updateRegion);
 
 	// we might need to resize the window!
-	if (fDecorator) {
-		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
-		_ObeySizeLimits();
-	}
+	decorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
+	_ObeySizeLimits();
 
 // TODO: not sure if we want to do this
 #if 0
@@ -1672,8 +1736,8 @@ Window::_DrawBorder()
 	// this is executed in the window thread, but only
 	// in respond to a REDRAW message having been received, the
 	// clipping lock is held for reading
-
-	if (!fDecorator)
+	::Decorator* decorator = Decorator();
+	if (!decorator)
 		return;
 
 	// construct the region of the border that needs redrawing
@@ -1686,13 +1750,13 @@ Window::_DrawBorder()
 	// intersect with the dirty region
 	dirtyBorderRegion->IntersectWith(&fDirtyRegion);
 
-	DrawingEngine* engine = fDecorator->GetDrawingEngine();
+	DrawingEngine* engine = decorator->GetDrawingEngine();
 	if (dirtyBorderRegion->CountRects() > 0 && engine->LockParallelAccess()) {
 		engine->ConstrainClippingRegion(dirtyBorderRegion);
 		bool copyToFrontEnabled = engine->CopyToFrontEnabled();
 		engine->SetCopyToFrontEnabled(true);
 
-		fDecorator->Draw(dirtyBorderRegion->Frame());
+		decorator->Draw(dirtyBorderRegion->Frame());
 
 		engine->SetCopyToFrontEnabled(copyToFrontEnabled);
 
@@ -1887,8 +1951,9 @@ Window::_UpdateContentRegion()
 	fContentRegion.Set(fFrame);
 
 	// resize handle
-	if (fDecorator)
-		fContentRegion.Exclude(&fDecorator->GetFootprint());
+	::Decorator* decorator = Decorator();
+	if (decorator)
+		fContentRegion.Exclude(&decorator->GetFootprint());
 
 	fContentRegionValid = true;
 }
@@ -1990,4 +2055,271 @@ void
 Window::UpdateSession::AddCause(uint8 cause)
 {
 	fCause |= cause;
+}
+
+
+int32
+Window::PositionInStack() const
+{
+	if (fCurrentStack.Get() == NULL)
+		return -1;
+	return fCurrentStack->WindowList().IndexOf(this);
+}
+
+
+bool
+Window::DetachFromWindowStack(bool ownStackNeeded)
+{
+	// The lock must normally be held but is not held when closing the window.
+	//ASSERT_MULTI_WRITE_LOCKED(fDesktop->WindowLocker());
+
+	if (fCurrentStack.Get() == NULL)
+		return false;
+	if (fCurrentStack->CountWindows() == 1)
+		return true;
+
+	int32 index = PositionInStack();
+
+	if (fCurrentStack->RemoveWindow(this) == false)
+		return false;
+
+	BRegion dirty;
+	::Decorator* decorator = fCurrentStack->Decorator();
+	if (decorator != NULL)
+		decorator->RemoveTab(index, &dirty);
+
+	Window* remainingTop = fCurrentStack->TopLayerWindow();
+	if (remainingTop != NULL) {
+		decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
+		// propagate focus to the decorator
+		remainingTop->SetFocus(remainingTop->IsFocus());
+	}
+
+	fCurrentStack = NULL;
+	if (ownStackNeeded == true)
+		_InitWindowStack();
+	// propagate focus to the new decorator
+	SetFocus(IsFocus());
+
+	fDesktop->RebuildAndRedrawAfterWindowChange(this, dirty);
+	if (remainingTop != NULL)
+		fDesktop->MarkDirty(remainingTop->VisibleRegion());
+
+	return true;
+}
+
+
+bool
+Window::AddWindowToStack(Window* window)
+{
+	ASSERT_MULTI_WRITE_LOCKED(fDesktop->WindowLocker());
+
+	WindowStack* stack = GetWindowStack();
+	if (stack == NULL)
+		return false;
+
+	// first collect dirt from the window to add
+	BRegion dirty;
+	::Decorator* otherDecorator = window->Decorator();
+	if (otherDecorator != NULL)
+		dirty.Include(otherDecorator->TitleBarRect());
+	::Decorator* decorator = stack->Decorator();
+	if (decorator != NULL)
+		dirty.Include(decorator->TitleBarRect());
+
+	int32 position = PositionInStack() + 1;
+	if (position >= stack->CountWindows())
+		position = -1;
+	if (stack->AddWindow(window, position) == false)
+		return false;
+	window->DetachFromWindowStack(false);
+	window->fCurrentStack.SetTo(stack);
+
+	if (decorator != NULL)
+		decorator->AddTab(window->Title(), position, &dirty);
+
+	fDesktop->RebuildAndRedrawAfterWindowChange(TopLayerStackWindow(), dirty);
+	window->SetFocus(window->IsFocus());
+	return true;
+}
+
+
+Window*
+Window::StackedWindowAt(const BPoint& where)
+{
+	::Decorator* decorator = Decorator();
+	if (decorator == NULL)
+		return NULL;
+
+	int tab = decorator->TabAt(where);
+	// if we have a decorator we also have a stack
+	Window* window = fCurrentStack->WindowAt(tab);
+	if (window != NULL)
+		return window;
+	return this;
+}
+
+
+Window*
+Window::TopLayerStackWindow()
+{
+	if (fCurrentStack.Get() == NULL)
+		return this;
+	return fCurrentStack->TopLayerWindow();
+}
+
+
+WindowStack*
+Window::GetWindowStack()
+{
+	if (fCurrentStack.Get() == NULL)
+		return _InitWindowStack();
+	return fCurrentStack;
+}
+
+
+
+bool
+Window::MoveToTopStackLayer()
+{
+	::Decorator* decorator = Decorator();
+	if (decorator == NULL)
+		return false;
+	decorator->SetDrawingEngine(fDrawingEngine);
+	decorator->SetTopTap(PositionInStack());
+	return fCurrentStack->MoveToTopLayer(this);
+}
+
+
+bool
+Window::MoveToStackPosition(int32 to, bool isMoving)
+{
+	if (fCurrentStack.Get() == NULL)
+		return false;
+	int32 index = PositionInStack();
+	if (fCurrentStack->Move(index, to) == false)
+		return false;
+
+	BRegion dirty;
+	::Decorator* decorator = Decorator();
+	if (decorator && decorator->MoveTab(index, to, isMoving, &dirty) == false)
+		return false;
+	
+	fDesktop->RebuildAndRedrawAfterWindowChange(this, dirty);
+	return true;
+}
+
+
+WindowStack*
+Window::_InitWindowStack()
+{
+	fCurrentStack = NULL;
+	::Decorator* decorator = NULL;
+	if (fLook != B_NO_BORDER_WINDOW_LOOK)
+		decorator = gDecorManager.AllocateDecorator(this);
+
+	WindowStack* stack = new(std::nothrow) WindowStack(decorator);
+	if (stack == NULL)
+		return NULL;
+
+	if (stack->AddWindow(this) != true) {
+		delete stack;
+		return NULL;
+	}
+	fCurrentStack.SetTo(stack, true);
+	return stack;
+}
+
+
+WindowStack::WindowStack(::Decorator* decorator)
+	:
+	fDecorator(decorator)
+{
+
+}
+
+
+WindowStack::~WindowStack()
+{
+	delete fDecorator;
+}
+
+
+void
+WindowStack::SetDecorator(::Decorator* decorator)
+{
+	delete fDecorator;
+	fDecorator = decorator;
+}
+
+
+::Decorator*
+WindowStack::Decorator()
+{
+	return fDecorator;
+}
+
+
+Window*
+WindowStack::TopLayerWindow() const
+{
+	return fWindowLayerOrder.ItemAt(fWindowLayerOrder.CountItems() - 1);
+}
+
+
+int32
+WindowStack::CountWindows()
+{
+	return fWindowList.CountItems();
+}
+
+
+Window*
+WindowStack::WindowAt(int32 index)
+{
+	return fWindowList.ItemAt(index);
+}
+
+
+bool
+WindowStack::AddWindow(Window* window, int32 position)
+{
+	if (position >= 0) {
+		if (fWindowList.AddItem(window, position) == false)
+			return false;
+	} else if (fWindowList.AddItem(window) == false)
+		return false;
+
+	if (fWindowLayerOrder.AddItem(window) == false) {
+		fWindowList.RemoveItem(window);
+		return false;
+	}
+	return true;
+}
+
+
+bool
+WindowStack::RemoveWindow(Window* window)
+{
+	if (fWindowList.RemoveItem(window) == false)
+		return false;
+
+	fWindowLayerOrder.RemoveItem(window);
+	return true;
+}
+
+
+bool
+WindowStack::MoveToTopLayer(Window* window)
+{
+	int32 index = fWindowLayerOrder.IndexOf(window);
+	return fWindowLayerOrder.MoveItem(index,
+		fWindowLayerOrder.CountItems() - 1);
+}
+
+
+bool
+WindowStack::Move(int32 from, int32 to)
+{
+	return fWindowList.MoveItem(from, to);
 }

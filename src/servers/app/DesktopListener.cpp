@@ -244,7 +244,7 @@ DesktopObservable::NotifyWindowMinimized(Window* window, bool minimize)
 
 void
 DesktopObservable::NotifyWindowTabLocationChanged(Window* window,
-	float location)
+	float location, bool isShifting)
 {
 	if (fWeAreInvoking)
 		return;
@@ -252,7 +252,7 @@ DesktopObservable::NotifyWindowTabLocationChanged(Window* window,
 
 	for (DesktopListener* listener = fDesktopListenerList.First();
 		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
-		listener->WindowTabLocationChanged(window, location);
+		listener->WindowTabLocationChanged(window, location, isShifting);
 }
 
 

@@ -21,6 +21,7 @@
 
 #include "ClickTarget.h"
 #include "Desktop.h"
+#include "DefaultDecorator.h"
 #include "DrawingEngine.h"
 #include "Window.h"
 
@@ -286,15 +287,57 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 	{
 	}
 
+	virtual
+	~SlideTabState()
+	{
+		fDesktop->SetWindowTabLocation(fWindow, fWindow->TabLocation(), false);
+	}
+
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
 	{
-		float loc = fWindow->TabLocation();
+		float location = fWindow->TabLocation();
 		// TODO: change to [0:1]
-		loc += delta.x;
-		if (fDesktop->SetWindowTabLocation(fWindow, loc))
+		location += delta.x;
+		AdjustMultiTabLocation(location, true);
+		if (fDesktop->SetWindowTabLocation(fWindow, location, true))
 			delta.y = 0;
 		else
 			delta = BPoint(0, 0);
+	}
+
+	void AdjustMultiTabLocation(float location, bool isShifting)
+	{
+		::Decorator* decorator = fWindow->Decorator();
+		if (decorator == NULL || decorator->CountTabs() <= 1)
+			return;
+
+		// TODO does not work for none continuous shifts
+		int32 windowIndex = fWindow->PositionInStack();
+		DefaultDecorator::Tab*	movingTab = static_cast<DefaultDecorator::Tab*>(
+			decorator->TabAt(windowIndex));
+		int32 neighbourIndex = windowIndex;
+		if (movingTab->tabOffset > location)
+			neighbourIndex--;
+		else
+			neighbourIndex++;
+
+		DefaultDecorator::Tab* neighbourTab
+			= static_cast<DefaultDecorator::Tab*>(decorator->TabAt(
+				neighbourIndex));
+		if (neighbourTab == NULL)
+			return;
+
+		if (movingTab->tabOffset > location) {
+			if (location >
+				neighbourTab->tabOffset + neighbourTab->tabRect.Width() / 2)
+				return;
+		} else {
+			if (location + movingTab->tabRect.Width() <
+				neighbourTab->tabOffset + neighbourTab->tabRect.Width() / 2)
+				return;
+		}
+		
+		fWindow->MoveToStackPosition(neighbourIndex, isShifting);
 	}
 };
 
@@ -423,9 +466,10 @@ private:
 
 struct DefaultWindowBehaviour::DecoratorButtonState : State {
 	DecoratorButtonState(DefaultWindowBehaviour& behavior,
-		Decorator::Region button)
+		int32 tab, Decorator::Region button)
 		:
 		State(behavior),
+		fTab(tab),
 		fButton(button)
 	{
 	}
@@ -452,22 +496,23 @@ struct DefaultWindowBehaviour::DecoratorButtonState : State {
 			engine->LockParallelAccess();
 			engine->ConstrainClippingRegion(visibleBorder);
 
+			int32 tab;
 			switch (fButton) {
 				case Decorator::REGION_CLOSE_BUTTON:
-					decorator->SetClose(false);
-					if (fBehavior._RegionFor(message) == fButton)
+					decorator->SetClose(fTab, false);
+					if (fBehavior._RegionFor(message, tab) == fButton)
 						fWindow->ServerWindow()->NotifyQuitRequested();
 					break;
 
 				case Decorator::REGION_ZOOM_BUTTON:
-					decorator->SetZoom(false);
-					if (fBehavior._RegionFor(message) == fButton)
+					decorator->SetZoom(fTab, false);
+					if (fBehavior._RegionFor(message, tab) == fButton)
 						fWindow->ServerWindow()->NotifyZoom();
 					break;
 
 				case Decorator::REGION_MINIMIZE_BUTTON:
-					decorator->SetMinimize(false);
-					if (fBehavior._RegionFor(message) == fButton)
+					decorator->SetMinimize(fTab, false);
+					if (fBehavior._RegionFor(message, tab) == fButton)
 						fWindow->ServerWindow()->NotifyMinimize(true);
 					break;
 
@@ -500,20 +545,21 @@ private:
 			engine->LockParallelAccess();
 			engine->ConstrainClippingRegion(visibleBorder);
 
+			int32 tab;
 			Decorator::Region hitRegion = message != NULL
-				? fBehavior._RegionFor(message) : fButton;
+				? fBehavior._RegionFor(message, tab) : fButton;
 
 			switch (fButton) {
 				case Decorator::REGION_CLOSE_BUTTON:
-					decorator->SetClose(hitRegion == fButton);
+					decorator->SetClose(fTab, hitRegion == fButton);
 					break;
 
 				case Decorator::REGION_ZOOM_BUTTON:
-					decorator->SetZoom(hitRegion == fButton);
+					decorator->SetZoom(fTab, hitRegion == fButton);
 					break;
 
 				case Decorator::REGION_MINIMIZE_BUTTON:
-					decorator->SetMinimize(hitRegion == fButton);
+					decorator->SetMinimize(fTab, hitRegion == fButton);
 					break;
 
 				default:
@@ -526,6 +572,7 @@ private:
 	}
 
 protected:
+	int32				fTab;
 	Decorator::Region	fButton;
 };
 
@@ -669,6 +716,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 	Decorator* decorator = fWindow->Decorator();
 
 	Decorator::Region hitRegion = Decorator::REGION_NONE;
+	int32 tab = -1;
 	Action action = ACTION_NONE;
 
 	bool inBorderRegion = false;
@@ -688,7 +736,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 			hitRegion = Decorator::REGION_LEFT_BORDER;
 		} else {
 			// click on the decorator -- get the exact region
-			hitRegion = _RegionFor(message);
+			hitRegion = _RegionFor(message, tab);
 		}
 
 		// translate the region into an action
@@ -697,7 +745,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
 			// left mouse button
 			switch (hitRegion) {
-				case Decorator::REGION_TAB:
+				case Decorator::REGION_TAB: {
 					// tab sliding in any case if either shift key is held down
 					// except sliding up-down by moving mouse left-right would
 					// look strange
@@ -708,6 +756,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 					}
 					action = ACTION_DRAG;
 					break;
+				}
 
 				case Decorator::REGION_LEFT_BORDER:
 				case Decorator::REGION_RIGHT_BORDER:
@@ -809,7 +858,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		case ACTION_ZOOM:
 		case ACTION_MINIMIZE:
 			_NextState(
-				new (std::nothrow) DecoratorButtonState(*this, hitRegion));
+				new (std::nothrow) DecoratorButtonState(*this, tab, hitRegion));
 			STRACE_CLICK(("===> ACTION_CLOSE/ZOOM/MINIMIZE\n"));
 			break;
 
@@ -910,7 +959,7 @@ DefaultWindowBehaviour::_IsWindowModifier(int32 modifiers) const
 
 
 Decorator::Region
-DefaultWindowBehaviour::_RegionFor(const BMessage* message) const
+DefaultWindowBehaviour::_RegionFor(const BMessage* message, int32& tab) const
 {
 	Decorator* decorator = fWindow->Decorator();
 	if (decorator == NULL)
@@ -920,7 +969,7 @@ DefaultWindowBehaviour::_RegionFor(const BMessage* message) const
 	if (message->FindPoint("where", &where) != B_OK)
 		return Decorator::REGION_NONE;
 
-	return decorator->RegionAt(where);
+	return decorator->RegionAt(where, tab);
 }
 
 

@@ -88,7 +88,8 @@ private:
 
 private:
 			bool				_IsWindowModifier(int32 modifiers) const;
-			Decorator::Region	_RegionFor(const BMessage* message) const;
+			Decorator::Region	_RegionFor(const BMessage* message,
+									int32& tab) const;
 
 			void				_SetBorderHighlights(int8 horizontal,
 									int8 vertical, bool active);

@@ -171,7 +171,7 @@ public:
 			void				ResizeWindowBy(Window* window, float x,
 									float y);
 			bool				SetWindowTabLocation(Window* window,
-									float location);
+									float location, bool isShifting);
 			bool				SetWindowDecoratorSettings(Window* window,
 									const BMessage& settings);
 

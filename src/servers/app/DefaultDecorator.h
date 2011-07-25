@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,13 +22,33 @@ class ServerBitmap;
 
 class DefaultDecorator: public Decorator {
 public:
+	class Tab : public Decorator::Tab {
+	public:
+								Tab();
+
+			uint32				tabOffset;
+			float				tabLocation;
+			float				textOffset;
+
+			BString				truncatedTitle;
+			int32				truncatedTitleLength;
+
+			bool				buttonFocus : 1;
+
+			bool				isHighlighted : 1;
+			ServerBitmap*		closeBitmaps[4];
+			ServerBitmap*		zoomBitmaps[4];
+
+			float				minTabSize;
+			float				maxTabSize;
+	};
+
 								DefaultDecorator(DesktopSettings& settings,
 									BRect frame, window_look look,
 									uint32 flags);
 	virtual						~DefaultDecorator();
 
-	virtual float				TabLocation() const
-									{ return (float)fTabOffset; }
+	virtual float				TabLocation(int32 tab) const;
 
 	virtual	bool				GetSettings(BMessage* settings) const;
 
@@ -38,10 +58,11 @@ public:
 	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
 									int32* maxWidth, int32* maxHeight) const;
 
-	virtual	Region				RegionAt(BPoint where) const;
+	virtual	Region				RegionAt(BPoint where, int32& tab) const;
 
 	virtual	bool				SetRegionHighlight(Region region,
-									uint8 highlight, BRegion* dirty);
+									uint8 highlight, BRegion* dirty,
+									int32 tab = -1);
 
 	virtual	void				ExtendDirtyRegion(Region region,
 									BRegion& dirty);
@@ -83,16 +104,22 @@ protected:
 
 protected:
 	virtual void				_DoLayout();
+	virtual void				_DoTabLayout();
+			void				_DistributeTabSize(float delta);
+
+	virtual	Decorator::Tab*		_AllocateNewTab();
+			DefaultDecorator::Tab*	_TabAt(int32 index) const;
 
 	virtual void				_DrawFrame(BRect r);
-	virtual void				_DrawTab(BRect r);
+	virtual void				_DrawTab(Decorator::Tab* tab, BRect r);
 
-	virtual void				_DrawClose(BRect r);
-	virtual void				_DrawTitle(BRect r);
-	virtual void				_DrawZoom(BRect r);
+	virtual void				_DrawClose(Decorator::Tab* tab, BRect r);
+	virtual void				_DrawTitle(Decorator::Tab* tab, BRect r);
+	virtual void				_DrawZoom(Decorator::Tab* tab, BRect r);
 
-	virtual	void				_SetTitle(const char* string,
+	virtual	void				_SetTitle(Decorator::Tab* tab, const char* string,
 									BRegion* updateRegion = NULL);
+	virtual void				_SetFocus(Decorator::Tab* tab);
 
 	virtual void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
@@ -102,15 +129,21 @@ protected:
 	virtual void				_SetFlags(uint32 flags,
 									BRegion* updateRegion = NULL);
 
-	virtual void				_SetFocus();
-
 	virtual	void				_MoveBy(BPoint offset);
 	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
 
-	virtual bool				_SetTabLocation(float location,
+	virtual bool				_SetTabLocation(Decorator::Tab* tab,
+									float location, bool isShifting,
 									BRegion* updateRegion = NULL);
 
 	virtual	bool				_SetSettings(const BMessage& settings,
+									BRegion* updateRegion = NULL);
+
+	virtual bool				_AddTab(int32 index = -1,
+									BRegion* updateRegion = NULL);
+	virtual	bool				_RemoveTab(int32 index,
+									BRegion* updateRegion = NULL);
+	virtual	bool				_MoveTab(int32 from, int32 to, bool isMoving,
 									BRegion* updateRegion = NULL);
 
 	virtual	void				_GetFootprint(BRegion *region);
@@ -120,9 +153,11 @@ protected:
 									float* inset) const;
 
 	// DefaultDecorator customization points
-	virtual	void				DrawButtons(const BRect& invalid);
+	virtual	void				DrawButtons(Decorator::Tab* tab,
+									const BRect& invalid);
 	virtual	void				GetComponentColors(Component component,
-									uint8 highlight, ComponentColors _colors);
+									uint8 highlight, ComponentColors _colors,
+									Decorator::Tab* tab = NULL);
 
 private:
 			void				_UpdateFont(DesktopSettings& settings);
@@ -131,14 +166,20 @@ private:
 			void				_DrawBlendedRect(DrawingEngine *engine,
 									BRect rect, bool down,
 									const ComponentColors& colors);
-			void				_LayoutTabItems(const BRect& tabRect);
+			void				_LayoutTabItems(Decorator::Tab* tab,
+									const BRect& tabRect);
 			void 				_InvalidateBitmaps();
-			ServerBitmap*		_GetBitmapForButton(Component item, bool down,
-									int32 width, int32 height);
+			ServerBitmap*		_GetBitmapForButton(Decorator::Tab* tab,
+									Component item, bool down, int32 width,
+									int32 height);
 
 			void				_GetComponentColors(Component component,
-									ComponentColors _colors);
+									ComponentColors _colors,
+									Decorator::Tab* tab = NULL);
 
+	inline	float				_DefaultTextOffset() const;
+
+			void				_CalculateTabsRegion();
 protected:
 	static	const rgb_color		kFrameColors[4];
 	static	const rgb_color		kFocusFrameColors[2];
@@ -156,10 +197,6 @@ protected:
 			const rgb_color		kNonFocusTabColorShadow;
 			const rgb_color		kNonFocusTextColor;
 
-			bool				fButtonFocus;
-			ServerBitmap*		fCloseBitmaps[4];
-			ServerBitmap*		fZoomBitmaps[4];
-
 			// Individual rects for handling window frame
 			// rendering the proper way
 			BRect				fRightBorder;
@@ -169,14 +206,8 @@ protected:
 
 			int32				fBorderWidth;
 
-			uint32				fTabOffset;
-			float				fTabLocation;
-			float				fTextOffset;
-
-			float				fMinTabSize;
-			float				fMaxTabSize;
-			BString				fTruncatedTitle;
-			int32				fTruncatedTitleLength;
+			BRegion				fTabsRegion;
+			BRect				fOldMovingTab;
 };
 
 

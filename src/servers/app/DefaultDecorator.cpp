@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,10 +18,12 @@
 #include "DefaultDecorator.h"
 
 #include <algorithm>
+#include <cmath>
 #include <new>
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Debug.h>
 #include <GradientLinear.h>
 #include <Rect.h>
 #include <View.h>
@@ -43,6 +45,18 @@
 #else
 #	define STRACE(x) ;
 #endif
+
+
+DefaultDecorator::Tab::Tab()
+	:
+	tabOffset(0),
+	tabLocation(0.0),
+	isHighlighted(false)
+{
+	closeBitmaps[0] = closeBitmaps[1] = closeBitmaps[2] = closeBitmaps[3]
+		= zoomBitmaps[0] = zoomBitmaps[1] = zoomBitmaps[2] = zoomBitmaps[3]
+		= NULL;
+}
 
 
 static const float kBorderResizeLength = 22.0;
@@ -107,18 +121,10 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 	kNonFocusTabColorShadow(tint_color(kNonFocusTabColor,
  		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
 	kNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR)),
-	fTabOffset(0),
-	fTabLocation(0.0)
+
+	fOldMovingTab(0, 0, -1, -1)
 {
 	_UpdateFont(settings);
-
-	fCloseBitmaps[0] = fCloseBitmaps[1] = fCloseBitmaps[2] = fCloseBitmaps[3]
-		= fZoomBitmaps[0] = fZoomBitmaps[1] = fZoomBitmaps[2] = fZoomBitmaps[3]
-		= NULL;
-
-	// Set appropriate colors based on the current focus value. In this case,
-	// each decorator defaults to not having the focus.
-	_SetFocus();
 
 	// Do initial decorator setup
 	_DoLayout();
@@ -138,19 +144,36 @@ DefaultDecorator::~DefaultDecorator()
 }
 
 
+float
+DefaultDecorator::TabLocation(int32 tab) const
+{
+	DefaultDecorator::Tab* decoratorTab = _TabAt(tab);
+	if (decoratorTab == NULL)
+		return 0.;
+	return (float)decoratorTab->tabOffset;
+}
+
+
 bool
 DefaultDecorator::GetSettings(BMessage* settings) const
 {
-	if (!fTabRect.IsValid())
+	if (!fTitleBarRect.IsValid())
 		return false;
 
-	if (settings->AddRect("tab frame", fTabRect) != B_OK)
+	if (settings->AddRect("tab frame", fTitleBarRect) != B_OK)
 		return false;
 
 	if (settings->AddFloat("border width", fBorderWidth) != B_OK)
 		return false;
 
-	return settings->AddFloat("tab location", (float)fTabOffset) == B_OK;
+	// TODO only add the location of the tab of the window who requested the
+	// settings
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		DefaultDecorator::Tab* tab = _TabAt(i);
+		if (settings->AddFloat("tab location", (float)tab->tabOffset) != B_OK)
+			return false;
+	}
+	return true;
 }
 
 
@@ -168,7 +191,7 @@ DefaultDecorator::Draw(BRect update)
 	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(update);
-	_DrawTab(update);
+	_DrawTabs(update);
 }
 
 
@@ -180,7 +203,7 @@ DefaultDecorator::Draw()
 	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
-	_DrawTab(fTabRect);
+	_DrawTabs(fTitleBarRect);
 }
 
 
@@ -188,9 +211,12 @@ void
 DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 	int32* maxWidth, int32* maxHeight) const
 {
-	if (fTabRect.IsValid()) {
+	float minTabSize = 0;
+	if (CountTabs() > 0)
+		minTabSize = _TabAt(0)->minTabSize;
+	if (fTitleBarRect.IsValid()) {
 		*minWidth = (int32)roundf(max_c(*minWidth,
-			fMinTabSize - 2 * fBorderWidth));
+			minTabSize - 2 * fBorderWidth));
 	}
 	if (fResizeRect.IsValid()) {
 		*minHeight = (int32)roundf(max_c(*minHeight,
@@ -200,10 +226,10 @@ DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 
 
 Decorator::Region
-DefaultDecorator::RegionAt(BPoint where) const
+DefaultDecorator::RegionAt(BPoint where, int32& tab) const
 {
 	// Let the base class version identify hits of the buttons and the tab.
-	Region region = Decorator::RegionAt(where);
+	Region region = Decorator::RegionAt(where, tab);
 	if (region != REGION_NONE)
 		return region;
 
@@ -245,24 +271,28 @@ DefaultDecorator::RegionAt(BPoint where) const
 
 bool
 DefaultDecorator::SetRegionHighlight(Region region, uint8 highlight,
-	BRegion* dirty)
+	BRegion* dirty, int32 tabIndex)
 {
-	// Invalidate the bitmap caches for the close/zoom button, when the
-	// highlight changes.
-	switch (region) {
-		case REGION_CLOSE_BUTTON:
-			if (highlight != RegionHighlight(region))
-				memset(&fCloseBitmaps, 0, sizeof(fCloseBitmaps));
-			break;
-		case REGION_ZOOM_BUTTON:
-			if (highlight != RegionHighlight(region))
-				memset(&fZoomBitmaps, 0, sizeof(fZoomBitmaps));
-			break;
-		default:
-			break;
+	DefaultDecorator::Tab* tab = _TabAt(tabIndex);
+	if (tab != NULL) {
+		tab->isHighlighted = highlight != 0;
+		// Invalidate the bitmap caches for the close/zoom button, when the
+		// highlight changes.
+		switch (region) {
+			case REGION_CLOSE_BUTTON:
+				if (highlight != RegionHighlight(region))
+					memset(&tab->closeBitmaps, 0, sizeof(tab->closeBitmaps));
+				break;
+			case REGION_ZOOM_BUTTON:
+				if (highlight != RegionHighlight(region))
+					memset(&tab->zoomBitmaps, 0, sizeof(tab->zoomBitmaps));
+				break;
+			default:
+				break;
+		}
 	}
 
-	return Decorator::SetRegionHighlight(region, highlight, dirty);
+	return Decorator::SetRegionHighlight(region, highlight, dirty, tabIndex);
 }
 
 
@@ -271,17 +301,19 @@ DefaultDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
 {
 	switch (region) {
 		case REGION_TAB:
-			dirty.Include(fTabRect);
+			dirty.Include(fTitleBarRect);
 			break;
 
 		case REGION_CLOSE_BUTTON:
 			if ((fFlags & B_NOT_CLOSABLE) == 0)
-				dirty.Include(fCloseRect);
+				for (int32 i = 0; i < fTabList.CountItems(); i++)
+					dirty.Include(fTabList.ItemAt(i)->closeRect);
 			break;
 
 		case REGION_ZOOM_BUTTON:
 			if ((fFlags & B_NOT_ZOOMABLE) == 0)
-				dirty.Include(fZoomRect);
+				for (int32 i = 0; i < fTabList.CountItems(); i++)
+					dirty.Include(fTabList.ItemAt(i)->zoomRect);
 			break;
 
 		case REGION_LEFT_BORDER:
@@ -335,8 +367,8 @@ DefaultDecorator::BorderWidth()
 float
 DefaultDecorator::TabHeight()
 {
-	if (fTabRect.IsValid())
-		return fTabRect.Height();
+	if (fTitleBarRect.IsValid())
+		return fTitleBarRect.Height();
 	return BorderWidth();
 }
 
@@ -374,77 +406,6 @@ DefaultDecorator::_DoLayout()
 			fBorderWidth = 0;
 	}
 
-	// calculate our tab rect
-	if (hasTab) {
-		// distance from one item of the tab bar to another.
-		// In this case the text and close/zoom rects
-		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK
-			|| fLook == kLeftTitledWindowLook) ? 10 : 18;
-
-		font_height fontHeight;
-		fDrawState.Font().GetHeight(fontHeight);
-
-		if (fLook != kLeftTitledWindowLook) {
-			fTabRect.Set(fFrame.left - fBorderWidth,
-				fFrame.top - fBorderWidth
-					- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
-				((fFrame.right - fFrame.left) < 35.0 ?
-					fFrame.left + 35.0 : fFrame.right) + fBorderWidth,
-				fFrame.top - fBorderWidth);
-		} else {
-			fTabRect.Set(fFrame.left - fBorderWidth
-				- ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
-					fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
-				fFrame.bottom + fBorderWidth);
-		}
-
-		// format tab rect for a floating window - make the rect smaller
-		if (fLook == B_FLOATING_WINDOW_LOOK) {
-			fTabRect.InsetBy(0, 2);
-			fTabRect.OffsetBy(0, 2);
-		}
-
-		float offset;
-		float size;
-		float inset;
-		_GetButtonSizeAndOffset(fTabRect, &offset, &size, &inset);
-
-		// fMinTabSize contains just the room for the buttons
-		fMinTabSize = inset * 2 + fTextOffset;
-		if ((fFlags & B_NOT_CLOSABLE) == 0)
-			fMinTabSize += offset + size;
-		if ((fFlags & B_NOT_ZOOMABLE) == 0)
-			fMinTabSize += offset + size;
-
-		// fMaxTabSize contains fMinWidth + the width required for the title
-		fMaxTabSize = fDrawingEngine
-			? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title()),
-				fDrawState.Font())) : 0.0;
-		if (fMaxTabSize > 0.0)
-			fMaxTabSize += fTextOffset;
-		fMaxTabSize += fMinTabSize;
-
-		float tabSize = (fLook != kLeftTitledWindowLook
-			? fFrame.Width() : fFrame.Height()) + fBorderWidth * 2;
-		if (tabSize < fMinTabSize)
-			tabSize = fMinTabSize;
-		if (tabSize > fMaxTabSize)
-			tabSize = fMaxTabSize;
-
-		// layout buttons and truncate text
-		if (fLook != kLeftTitledWindowLook)
-			fTabRect.right = fTabRect.left + tabSize;
-		else
-			fTabRect.bottom = fTabRect.top + tabSize;
-	} else {
-		// no tab
-		fMinTabSize = 0.0;
-		fMaxTabSize = 0.0;
-		fTabRect.Set(0.0, 0.0, -1.0, -1.0);
-		fCloseRect.Set(0.0, 0.0, -1.0, -1.0);
-		fZoomRect.Set(0.0, 0.0, -1.0, -1.0);
-	}
-
 	// calculate left/top/right/bottom borders
 	if (fBorderWidth > 0) {
 		// NOTE: no overlapping, the left and right border rects
@@ -479,18 +440,202 @@ DefaultDecorator::_DoLayout()
 	}
 
 	if (hasTab) {
-		// make sure fTabOffset is within limits and apply it to
-		// the fTabRect
-		if (fTabLocation != 0.0
-			&& fTabOffset > (fRightBorder.right - fLeftBorder.left
-				- fTabRect.Width()))
-			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left
-				- fTabRect.Width());
-		fTabRect.OffsetBy(fTabOffset, 0);
-
-		// finally, layout the buttons and text within the tab rect
-		_LayoutTabItems(fTabRect);
+		_DoTabLayout();
+		return;
+	} else {
+		// no tab
+		fTitleBarRect.Set(0.0, 0.0, -1.0, -1.0);
 	}
+}
+
+
+void
+DefaultDecorator::_DoTabLayout()
+{
+	float tabPosition = 0;
+	if (fTabList.CountItems() == 1)
+		tabPosition = _TabAt(0)->tabOffset;
+	float sumTabWidth = 0;
+	// calculate our tab rect
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		DefaultDecorator::Tab* tab = _TabAt(i);
+
+		BRect& tabRect = tab->tabRect;
+		// distance from one item of the tab bar to another.
+		// In this case the text and close/zoom rects
+		tab->textOffset = _DefaultTextOffset();
+
+		font_height fontHeight;
+		fDrawState.Font().GetHeight(fontHeight);
+
+		if (fLook != kLeftTitledWindowLook) {
+			tabRect.Set(fFrame.left - fBorderWidth,
+				fFrame.top - fBorderWidth
+					- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
+				((fFrame.right - fFrame.left) < 35.0 ?
+					fFrame.left + 35.0 : fFrame.right) + fBorderWidth,
+				fFrame.top - fBorderWidth);
+		} else {
+			tabRect.Set(fFrame.left - fBorderWidth
+				- ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
+					fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
+				fFrame.bottom + fBorderWidth);
+		}
+
+		// format tab rect for a floating window - make the rect smaller
+		if (fLook == B_FLOATING_WINDOW_LOOK) {
+			tabRect.InsetBy(0, 2);
+			tabRect.OffsetBy(0, 2);
+		}
+
+		float offset;
+		float size;
+		float inset;
+		_GetButtonSizeAndOffset(tabRect, &offset, &size, &inset);
+
+		// tab->minTabSize contains just the room for the buttons
+		tab->minTabSize = inset * 2 + tab->textOffset;
+		if ((fFlags & B_NOT_CLOSABLE) == 0)
+			tab->minTabSize += offset + size;
+		if ((fFlags & B_NOT_ZOOMABLE) == 0)
+			tab->minTabSize += offset + size;
+
+		// tab->maxTabSize contains tab->minTabSize + the width required for the
+		// title
+		tab->maxTabSize = fDrawingEngine
+			? ceilf(fDrawingEngine->StringWidth(Title(tab), strlen(Title(tab)),
+				fDrawState.Font())) : 0.0;
+		if (tab->maxTabSize > 0.0)
+			tab->maxTabSize += tab->textOffset;
+		tab->maxTabSize += tab->minTabSize;
+
+		float tabSize = (fLook != kLeftTitledWindowLook
+			? fFrame.Width() : fFrame.Height()) + fBorderWidth * 2;
+		if (tabSize < tab->minTabSize)
+			tabSize = tab->minTabSize;
+		if (tabSize > tab->maxTabSize)
+			tabSize = tab->maxTabSize;
+
+		// layout buttons and truncate text
+		if (fLook != kLeftTitledWindowLook)
+			tabRect.right = tabRect.left + tabSize;
+		else
+			tabRect.bottom = tabRect.top + tabSize;
+
+		// make sure fTabOffset is within limits and apply it to
+		// the tabRect
+		if (tab->tabLocation != 0.0
+			&& tab->tabOffset > (fRightBorder.right - fLeftBorder.left
+				- tabRect.Width())) {
+			tab->tabOffset = uint32(fRightBorder.right - fLeftBorder.left
+				- tabRect.Width());
+		}
+		tab->tabOffset = (uint32)tabPosition;
+		tabRect.OffsetBy(tab->tabOffset, 0);
+		tabPosition += tabRect.Width();
+
+		sumTabWidth += tabRect.Width();
+	}
+
+	float windowWidth = fFrame.Width() + 2 * fBorderWidth;
+	if (CountTabs() > 1 && sumTabWidth > windowWidth)
+		_DistributeTabSize(sumTabWidth - windowWidth);
+
+	// finally, layout the buttons and text within the tab rect
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+
+		if (i == 0)
+			fTitleBarRect = tab->tabRect;
+		else
+			fTitleBarRect = fTitleBarRect | tab->tabRect;
+
+		_LayoutTabItems(tab, tab->tabRect);
+	}
+	fTabsRegion = fTitleBarRect;
+}
+
+
+static bool
+int_equal(float x, float y)
+{
+	return abs(x - y) <= 1;
+}
+
+
+void
+DefaultDecorator::_DistributeTabSize(float delta)
+{
+	ASSERT(CountTabs() > 1);
+
+	float maxTabSize = 0;
+	float secMaxTabSize = 0;
+	int32 nTabsWithMaxSize = 0;
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		float tabWidth = tab->tabRect.Width();
+		if (int_equal(maxTabSize, tabWidth)) {
+			nTabsWithMaxSize++;
+			continue;
+		}
+		if (maxTabSize < tabWidth) {
+			secMaxTabSize = maxTabSize;
+			maxTabSize = tabWidth;
+			nTabsWithMaxSize = 1;
+		} else if (secMaxTabSize <= tabWidth)
+			secMaxTabSize = tabWidth;
+	}
+
+	float minus = ceil(std::min(maxTabSize - secMaxTabSize, delta));
+	delta -= minus;
+	minus /= nTabsWithMaxSize;
+
+	Decorator::Tab* prevTab = NULL;
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (int_equal(maxTabSize, tab->tabRect.Width()))
+			tab->tabRect.right -= minus;
+
+		if (prevTab) {
+			tab->tabRect.OffsetBy(prevTab->tabRect.right - tab->tabRect.left,
+				0);
+		}
+
+		prevTab = tab;
+	}
+
+	if (delta > 0) {
+		_DistributeTabSize(delta);
+		return;
+	}
+
+	// done
+	prevTab->tabRect.right = floor(fFrame.right + fBorderWidth);
+
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		DefaultDecorator::Tab* tab = _TabAt(i);
+		tab->tabOffset = uint32(tab->tabRect.left - fLeftBorder.left);
+	}
+}
+
+
+Decorator::Tab*
+DefaultDecorator::_AllocateNewTab()
+{
+	Decorator::Tab* tab = new(std::nothrow) DefaultDecorator::Tab;
+	if (tab == NULL)
+		return NULL;
+	// Set appropriate colors based on the current focus value. In this case,
+	// each decorator defaults to not having the focus.
+	_SetFocus(tab);
+	return tab;
+}
+
+
+DefaultDecorator::Tab*
+DefaultDecorator::_TabAt(int32 index) const
+{
+	return static_cast<DefaultDecorator::Tab*>(fTabList.ItemAt(index));
 }
 
 
@@ -525,12 +670,14 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.right - i, r.top + i), colors[i]);
 				}
-				if (fTabRect.IsValid()) {
+				if (fTitleBarRect.IsValid()) {
 					// grey along the bottom of the tab
 					// (overwrites "white" from frame)
 					fDrawingEngine->StrokeLine(
-						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
-						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+						BPoint(fTitleBarRect.left + 2,
+							fTitleBarRect.bottom + 1),
+						BPoint(fTitleBarRect.right - 2,
+							fTitleBarRect.bottom + 1),
 						colors[2]);
 				}
 			}
@@ -581,13 +728,14 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.right - i, r.top + i), colors[i * 2]);
 				}
-				if (fTabRect.IsValid() && fLook != kLeftTitledWindowLook) {
+				if (fTitleBarRect.IsValid() && fLook != kLeftTitledWindowLook) {
 					// grey along the bottom of the tab
 					// (overwrites "white" from frame)
 					fDrawingEngine->StrokeLine(
-						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
-						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-						colors[2]);
+						BPoint(fTitleBarRect.left + 2,
+							fTitleBarRect.bottom + 1),
+						BPoint(fTitleBarRect.right - 2,
+							fTitleBarRect.bottom + 1), colors[2]);
 				}
 			}
 			// left
@@ -599,13 +747,14 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.left + i, r.bottom - i), colors[i * 2]);
 				}
-				if (fLook == kLeftTitledWindowLook && fTabRect.IsValid()) {
+				if (fLook == kLeftTitledWindowLook && fTitleBarRect.IsValid()) {
 					// grey along the right side of the tab
 					// (overwrites "white" from frame)
 					fDrawingEngine->StrokeLine(
-						BPoint(fTabRect.right + 1, fTabRect.top + 2),
-						BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
-						colors[2]);
+						BPoint(fTitleBarRect.right + 1,
+							fTitleBarRect.top + 2),
+						BPoint(fTitleBarRect.right + 1,
+							fTitleBarRect.bottom - 2), colors[2]);
 				}
 			}
 			// bottom
@@ -683,7 +832,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14),
 					BPoint(x - 1, y - 14), colors[1]);
 
-				if (!IsFocus())
+				if (fTopTab && !IsFocus(fTopTab))
 					break;
 
 				static const rgb_color kWhite
@@ -729,86 +878,93 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 
 
 void
-DefaultDecorator::_DrawTab(BRect invalid)
+DefaultDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 {
 	STRACE(("_DrawTab(%.1f,%.1f,%.1f,%.1f)\n",
-			invalid.left, invalid.top, invalid.right, invalid.bottom));
+		invalid.left, invalid.top, invalid.right, invalid.bottom));
+	const BRect& tabRect = tab->tabRect;
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if (!fTabRect.IsValid() || !invalid.Intersects(fTabRect))
+	if (!tabRect.IsValid() || !invalid.Intersects(tabRect))
 		return;
 
 	ComponentColors colors;
-	_GetComponentColors(COMPONENT_TAB, colors);
+	_GetComponentColors(COMPONENT_TAB, colors, tab);
 
 	// outer frame
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(),
+	fDrawingEngine->StrokeLine(tabRect.LeftTop(), tabRect.LeftBottom(),
 		colors[COLOR_TAB_FRAME_LIGHT]);
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(),
+	fDrawingEngine->StrokeLine(tabRect.LeftTop(), tabRect.RightTop(),
 		colors[COLOR_TAB_FRAME_LIGHT]);
 	if (fLook != kLeftTitledWindowLook) {
-		fDrawingEngine->StrokeLine(fTabRect.RightTop(), fTabRect.RightBottom(),
+		fDrawingEngine->StrokeLine(tabRect.RightTop(), tabRect.RightBottom(),
 			colors[COLOR_TAB_FRAME_DARK]);
 	} else {
-		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),
-			fTabRect.RightBottom(), colors[COLOR_TAB_FRAME_DARK]);
+		fDrawingEngine->StrokeLine(tabRect.LeftBottom(),
+			tabRect.RightBottom(), colors[COLOR_TAB_FRAME_DARK]);
 	}
 
+	float tabBotton = tabRect.bottom;
+	if (fTopTab != tab)
+		tabBotton -= 1;
+
 	// bevel
-	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.left + 1,
-			fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
+	fDrawingEngine->StrokeLine(BPoint(tabRect.left + 1, tabRect.top + 1),
+		BPoint(tabRect.left + 1,
+			tabBotton - (fLook == kLeftTitledWindowLook ? 1 : 0)),
 		colors[COLOR_TAB_BEVEL]);
-	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
-			fTabRect.top + 1),
+	fDrawingEngine->StrokeLine(BPoint(tabRect.left + 1, tabRect.top + 1),
+		BPoint(tabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
+			tabRect.top + 1),
 		colors[COLOR_TAB_BEVEL]);
 
 	if (fLook != kLeftTitledWindowLook) {
-		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
-			BPoint(fTabRect.right - 1, fTabRect.bottom),
+		fDrawingEngine->StrokeLine(BPoint(tabRect.right - 1, tabRect.top + 2),
+			BPoint(tabRect.right - 1, tabBotton),
 			colors[COLOR_TAB_SHADOW]);
 	} else {
 		fDrawingEngine->StrokeLine(
-			BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
-			BPoint(fTabRect.right, fTabRect.bottom - 1),
+			BPoint(tabRect.left + 2, tabRect.bottom - 1),
+			BPoint(tabRect.right, tabRect.bottom - 1),
 			colors[COLOR_TAB_SHADOW]);
 	}
 
 	// fill
 	BGradientLinear gradient;
-	gradient.SetStart(fTabRect.LeftTop());
+	gradient.SetStart(tabRect.LeftTop());
 	gradient.AddColor(colors[COLOR_TAB_LIGHT], 0);
 	gradient.AddColor(colors[COLOR_TAB], 255);
 
 	if (fLook != kLeftTitledWindowLook) {
-		gradient.SetEnd(fTabRect.LeftBottom());
-		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
-			fTabRect.right - 2, fTabRect.bottom), gradient);
+		gradient.SetEnd(tabRect.LeftBottom());
+		fDrawingEngine->FillRect(BRect(tabRect.left + 2, tabRect.top + 2,
+			tabRect.right - 2, tabBotton), gradient);
 	} else {
-		gradient.SetEnd(fTabRect.RightTop());
-		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
-			fTabRect.right, fTabRect.bottom - 2), gradient);
+		gradient.SetEnd(tabRect.RightTop());
+		fDrawingEngine->FillRect(BRect(tabRect.left + 2, tabRect.top + 2,
+			tabRect.right, tabRect.bottom - 2), gradient);
 	}
 
-	_DrawTitle(fTabRect);
+	_DrawTitle(tab, tabRect);
 
-	DrawButtons(invalid);
+	DrawButtons(tab, invalid);
 }
 
 
 void
-DefaultDecorator::_DrawClose(BRect rect)
+DefaultDecorator::_DrawClose(Decorator::Tab* _tab, BRect rect)
 {
 	STRACE(("_DrawClose(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
 
-	int32 index = (fButtonFocus ? 0 : 1) + (GetClose() ? 0 : 2);
-	ServerBitmap* bitmap = fCloseBitmaps[index];
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
+
+	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->closePressed ? 0 : 2);
+	ServerBitmap* bitmap = tab->closeBitmaps[index];
 	if (bitmap == NULL) {
-		bitmap = _GetBitmapForButton(COMPONENT_CLOSE_BUTTON, GetClose(),
-			rect.IntegerWidth(), rect.IntegerHeight());
-		fCloseBitmaps[index] = bitmap;
+		bitmap = _GetBitmapForButton(tab, COMPONENT_CLOSE_BUTTON,
+			tab->closePressed, rect.IntegerWidth(), rect.IntegerHeight());
+		tab->closeBitmaps[index] = bitmap;
 	}
 
 	_DrawButtonBitmap(bitmap, rect);
@@ -816,12 +972,18 @@ DefaultDecorator::_DrawClose(BRect rect)
 
 
 void
-DefaultDecorator::_DrawTitle(BRect r)
+DefaultDecorator::_DrawTitle(Decorator::Tab* _tab, BRect r)
 {
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
+
+	const BRect& tabRect = tab->tabRect;
+	const BRect& closeRect = tab->closeRect;
+	const BRect& zoomRect = tab->zoomRect;
+
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
 	ComponentColors colors;
-	_GetComponentColors(COMPONENT_TAB, colors);
+	_GetComponentColors(COMPONENT_TAB, colors, tab);
 
 	fDrawingEngine->SetDrawingMode(B_OP_OVER);
 	fDrawingEngine->SetHighColor(colors[COLOR_TAB_TEXT]);
@@ -833,20 +995,20 @@ DefaultDecorator::_DrawTitle(BRect r)
 
 	BPoint titlePos;
 	if (fLook != kLeftTitledWindowLook) {
-		titlePos.x = fCloseRect.IsValid() ? fCloseRect.right + fTextOffset
-			: fTabRect.left + fTextOffset;
-		titlePos.y = floorf(((fTabRect.top + 2.0) + fTabRect.bottom
+		titlePos.x = closeRect.IsValid() ? closeRect.right + tab->textOffset
+			: tabRect.left + tab->textOffset;
+		titlePos.y = floorf(((tabRect.top + 2.0) + tabRect.bottom
 			+ fontHeight.ascent + fontHeight.descent) / 2.0
 			- fontHeight.descent + 0.5);
 	} else {
-		titlePos.x = floorf(((fTabRect.left + 2.0) + fTabRect.right
+		titlePos.x = floorf(((tabRect.left + 2.0) + tabRect.right
 			+ fontHeight.ascent + fontHeight.descent) / 2.0
 			- fontHeight.descent + 0.5);
-		titlePos.y = fZoomRect.IsValid() ? fZoomRect.top - fTextOffset
-			: fTabRect.bottom - fTextOffset;
+		titlePos.y = zoomRect.IsValid() ? zoomRect.top - tab->textOffset
+			: tabRect.bottom - tab->textOffset;
 	}
 
-	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength,
+	fDrawingEngine->DrawString(tab->truncatedTitle, tab->truncatedTitleLength,
 		titlePos);
 
 	fDrawingEngine->SetDrawingMode(B_OP_COPY);
@@ -854,17 +1016,20 @@ DefaultDecorator::_DrawTitle(BRect r)
 
 
 void
-DefaultDecorator::_DrawZoom(BRect rect)
+DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, BRect rect)
 {
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
+	if (rect.IntegerWidth() < 1)
+		return;
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
 
-	int32 index = (fButtonFocus ? 0 : 1) + (GetZoom() ? 0 : 2);
-	ServerBitmap* bitmap = fZoomBitmaps[index];
+	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->zoomPressed ? 0 : 2);
+	ServerBitmap* bitmap = tab->zoomBitmaps[index];
 	if (bitmap == NULL) {
-		bitmap = _GetBitmapForButton(COMPONENT_ZOOM_BUTTON, GetZoom(),
-			rect.IntegerWidth(), rect.IntegerHeight());
-		fZoomBitmaps[index] = bitmap;
+		bitmap = _GetBitmapForButton(tab, COMPONENT_ZOOM_BUTTON,
+			tab->zoomPressed, rect.IntegerWidth(), rect.IntegerHeight());
+		tab->zoomBitmaps[index] = bitmap;
 	}
 
 	_DrawButtonBitmap(bitmap, rect);
@@ -872,18 +1037,19 @@ DefaultDecorator::_DrawZoom(BRect rect)
 
 
 void
-DefaultDecorator::_SetTitle(const char* string, BRegion* updateRegion)
+DefaultDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
+	BRegion* updateRegion)
 {
 	// TODO: we could be much smarter about the update region
 
-	BRect rect = TabRect();
+	BRect rect = TabRect(tab);
 
 	_DoLayout();
 
 	if (updateRegion == NULL)
 		return;
 
-	rect = rect | TabRect();
+	rect = rect | TabRect(tab);
 
 	rect.bottom++;
 		// the border will look differently when the title is adjacent
@@ -951,11 +1117,14 @@ DefaultDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 
 
 void
-DefaultDecorator::_SetFocus()
+DefaultDecorator::_SetFocus(Decorator::Tab* _tab)
 {
-	fButtonFocus = IsFocus()
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
+	tab->buttonFocus = IsFocus(tab)
 		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
 			&& (fFlags & B_AVOID_FOCUS) != 0);
+	if (CountTabs() > 1)
+		_LayoutTabItems(tab, tab->tabRect);
 }
 
 
@@ -964,11 +1133,17 @@ DefaultDecorator::_MoveBy(BPoint offset)
 {
 	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n", offset.x, offset.y));
 	// Move all internal rectangles the appropriate amount
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+
+		tab->zoomRect.OffsetBy(offset);
+		tab->closeRect.OffsetBy(offset);
+		tab->tabRect.OffsetBy(offset);
+	}
 	fFrame.OffsetBy(offset);
-	fCloseRect.OffsetBy(offset);
-	fTabRect.OffsetBy(offset);
+	fTitleBarRect.OffsetBy(offset);
+	fTabsRegion.OffsetBy(offset);
 	fResizeRect.OffsetBy(offset);
-	fZoomRect.OffsetBy(offset);
 	fBorderRect.OffsetBy(offset);
 
 	fLeftBorder.OffsetBy(offset);
@@ -1066,8 +1241,16 @@ DefaultDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 	}
 
 	// resize tab and layout tab items
-	if (fTabRect.IsValid()) {
-		BRect oldTabRect(fTabRect);
+	if (fTitleBarRect.IsValid()) {
+		if (fTabList.CountItems() > 1) {
+			_DoTabLayout();
+			dirty->Include(fTitleBarRect);
+			return;
+		}
+
+		DefaultDecorator::Tab* tab = _TabAt(0);
+		BRect& tabRect = tab->tabRect;
+		BRect oldTabRect(tabRect);
 
 		float tabSize;
 		float maxLocation;
@@ -1076,39 +1259,39 @@ DefaultDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 		} else {
 			tabSize = fBottomBorder.bottom - fTopBorder.top;
 		}
-		maxLocation = tabSize - fMaxTabSize;
+		maxLocation = tabSize - tab->maxTabSize;
 		if (maxLocation < 0)
 			maxLocation = 0;
 
-		float tabOffset = floorf(fTabLocation * maxLocation);
-		float delta = tabOffset - fTabOffset;
-		fTabOffset = (uint32)tabOffset;
+		float tabOffset = floorf(tab->tabLocation * maxLocation);
+		float delta = tabOffset - tab->tabOffset;
+		tab->tabOffset = (uint32)tabOffset;
 		if (fLook != kLeftTitledWindowLook)
-			fTabRect.OffsetBy(delta, 0.0);
+			tabRect.OffsetBy(delta, 0.0);
 		else
-			fTabRect.OffsetBy(0.0, delta);
+			tabRect.OffsetBy(0.0, delta);
 
-		if (tabSize < fMinTabSize)
-			tabSize = fMinTabSize;
-		if (tabSize > fMaxTabSize)
-			tabSize = fMaxTabSize;
+		if (tabSize < tab->minTabSize)
+			tabSize = tab->minTabSize;
+		if (tabSize > tab->maxTabSize)
+			tabSize = tab->maxTabSize;
 
-		if (fLook != kLeftTitledWindowLook && tabSize != fTabRect.Width()) {
-			fTabRect.right = fTabRect.left + tabSize;
+		if (fLook != kLeftTitledWindowLook && tabSize != tabRect.Width()) {
+			tabRect.right = tabRect.left + tabSize;
 		} else if (fLook == kLeftTitledWindowLook
-			&& tabSize != fTabRect.Height()) {
-			fTabRect.bottom = fTabRect.top + tabSize;
+			&& tabSize != tabRect.Height()) {
+			tabRect.bottom = tabRect.top + tabSize;
 		}
 
-		if (oldTabRect != fTabRect) {
-			_LayoutTabItems(fTabRect);
+		if (oldTabRect != tabRect) {
+			_LayoutTabItems(tab, tabRect);
 
 			if (dirty) {
 				// NOTE: the tab rect becoming smaller only would
 				// handled be the Desktop anyways, so it is sufficient
 				// to include it into the dirty region in it's
 				// final state
-				BRect redraw(fTabRect);
+				BRect redraw(tabRect);
 				if (delta != 0.0) {
 					redraw = redraw | oldTabRect;
 					if (fLook != kLeftTitledWindowLook)
@@ -1119,44 +1302,72 @@ DefaultDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 				dirty->Include(redraw);
 			}
 		}
+		fTitleBarRect = tabRect;
+		fTabsRegion = fTitleBarRect;
 	}
 }
 
 
 bool
-DefaultDecorator::_SetTabLocation(float location, BRegion* updateRegion)
+DefaultDecorator::_SetTabLocation(Decorator::Tab* _tab, float location,
+	bool isShifting, BRegion* updateRegion)
 {
 	STRACE(("DefaultDecorator: Set Tab Location(%.1f)\n", location));
-	if (!fTabRect.IsValid())
+	if (CountTabs() > 1) {
+		if (isShifting == false) {
+			_DoTabLayout();
+			if (updateRegion != NULL)
+				updateRegion->Include(fTitleBarRect);
+			fOldMovingTab = BRect(0, 0, -1, -1);
+			return true;
+		} else {
+			if (fOldMovingTab.IsValid() == false)
+				fOldMovingTab = _tab->tabRect;
+		}
+	}
+	
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
+	BRect& tabRect = tab->tabRect;
+	if (tabRect.IsValid() == false)
 		return false;
 
 	if (location < 0)
 		location = 0;
 
 	float maxLocation
-		= fRightBorder.right - fLeftBorder.left - fTabRect.Width();
+		= fRightBorder.right - fLeftBorder.left - tabRect.Width();
+	if (CountTabs() > 1)
+		maxLocation = fTitleBarRect.right - fLeftBorder.left - tabRect.Width();
+
 	if (location > maxLocation)
 		location = maxLocation;
 
-	float delta = location - fTabOffset;
+	float delta = floor(location - tab->tabOffset);
 	if (delta == 0.0)
 		return false;
 
-	// redraw old rect (1 pix on the border also must be updated)
-	BRect trect(fTabRect);
-	trect.bottom++;
-	updateRegion->Include(trect);
+	// redraw old rect (1 pixel on the border must also be updated)
+	BRect rect(tabRect);
+	rect.bottom++;
+	if (updateRegion != NULL)
+		updateRegion->Include(rect);
 
-	fTabRect.OffsetBy(delta, 0);
-	fTabOffset = (int32)location;
-	_LayoutTabItems(fTabRect);
+	tabRect.OffsetBy(delta, 0);
+	tab->tabOffset = (int32)location;
+	_LayoutTabItems(_tab, tabRect);
+	tab->tabLocation = maxLocation > 0.0 ? tab->tabOffset / maxLocation : 0.0;
 
-	fTabLocation = maxLocation > 0.0 ? fTabOffset / maxLocation : 0.0;
+	if (fTabList.CountItems() == 1)
+		fTitleBarRect = tabRect;
+
+	_CalculateTabsRegion();
 
 	// redraw new rect as well
-	trect = fTabRect;
-	trect.bottom++;
-	updateRegion->Include(trect);
+	rect = tabRect;
+	rect.bottom++;
+	if (updateRegion != NULL)
+		updateRegion->Include(rect);
+	
 	return true;
 }
 
@@ -1165,10 +1376,63 @@ bool
 DefaultDecorator::_SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
 	float tabLocation;
-	if (settings.FindFloat("tab location", &tabLocation) == B_OK)
-		return SetTabLocation(tabLocation, updateRegion);
+	bool modified = false;
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		if (settings.FindFloat("tab location", i, &tabLocation) != B_OK)
+			return false;
+		modified |= SetTabLocation(i, tabLocation, updateRegion);
+	}
+	return modified;
+}
 
-	return false;
+
+bool
+DefaultDecorator::_AddTab(int32 index, BRegion* updateRegion)
+{
+	_DoLayout();
+	if (updateRegion != NULL)
+		updateRegion->Include(fTitleBarRect);
+	return true;
+}
+
+
+bool
+DefaultDecorator::_RemoveTab(int32 index, BRegion* updateRegion )
+{
+	BRect oldTitle = fTitleBarRect;
+	_DoLayout();
+	if (updateRegion != NULL) {
+		updateRegion->Include(oldTitle);
+		updateRegion->Include(fTitleBarRect);
+	}
+	return true;
+}
+
+
+bool
+DefaultDecorator::_MoveTab(int32 from, int32 to, bool isMoving,
+	BRegion* updateRegion)
+{
+	DefaultDecorator::Tab* toTab = _TabAt(to);
+	if (toTab == NULL)
+		return false;
+
+	if (from < to) {
+		fOldMovingTab.OffsetBy(toTab->tabRect.Width(), 0);
+		toTab->tabRect.OffsetBy(-fOldMovingTab.Width(), 0);
+	} else {
+		fOldMovingTab.OffsetBy(-toTab->tabRect.Width(), 0);
+		toTab->tabRect.OffsetBy(fOldMovingTab.Width(), 0);
+	}
+
+	toTab->tabOffset = uint32(toTab->tabRect.left - fLeftBorder.left);
+	_LayoutTabItems(toTab, toTab->tabRect);
+
+	_CalculateTabsRegion();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(fTitleBarRect);
+	return true;
 }
 
 
@@ -1195,7 +1459,7 @@ DefaultDecorator::_GetFootprint(BRegion *region)
 	if (fLook == B_BORDERED_WINDOW_LOOK)
 		return;
 
-	region->Include(fTabRect);
+	region->Include(&fTabsRegion);
 
 	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
@@ -1207,13 +1471,13 @@ DefaultDecorator::_GetFootprint(BRegion *region)
 
 
 void
-DefaultDecorator::DrawButtons(const BRect& invalid)
+DefaultDecorator::DrawButtons(Decorator::Tab* tab, const BRect& invalid)
 {
 	// Draw the buttons if we're supposed to
-	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
-		_DrawClose(fCloseRect);
-	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
-		_DrawZoom(fZoomRect);
+	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(tab->closeRect))
+		_DrawClose(tab, tab->closeRect);
+	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(tab->zoomRect))
+		_DrawZoom(tab, tab->zoomRect);
 }
 
 
@@ -1228,13 +1492,14 @@ DefaultDecorator::DrawButtons(const BRect& invalid)
 */
 void
 DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
-	ComponentColors _colors)
+	ComponentColors _colors, Decorator::Tab* _tab)
 {
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
 	switch (component) {
 		case COMPONENT_TAB:
 			_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
 			_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
-			if (fButtonFocus) {
+			if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB] = kFocusTabColor;
 				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
 				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
@@ -1251,7 +1516,7 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
-			if (fButtonFocus) {
+			if (tab && tab->buttonFocus) {
 				_colors[COLOR_BUTTON] = kFocusTabColor;
 				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
 			} else {
@@ -1268,7 +1533,7 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 		default:
 			_colors[0] = kFrameColors[0];
 			_colors[1] = kFrameColors[1];
-			if (fButtonFocus) {
+			if (tab && tab->buttonFocus) {
 				_colors[2] = kFocusFrameColors[0];
 				_colors[3] = kFocusFrameColors[1];
 			} else {
@@ -1380,38 +1645,46 @@ DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
 
 
 void
-DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
+DefaultDecorator::_LayoutTabItems(Decorator::Tab* _tab, const BRect& tabRect)
 {
+	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
+
 	float offset;
 	float size;
 	float inset;
 	_GetButtonSizeAndOffset(tabRect, &offset, &size, &inset);
 
+	// default textOffset
+	tab->textOffset = _DefaultTextOffset();
+
+	BRect& closeRect = tab->closeRect;
+	BRect& zoomRect = tab->zoomRect;
+
 	// calulate close rect based on the tab rectangle
 	if (fLook != kLeftTitledWindowLook) {
-		fCloseRect.Set(tabRect.left + offset, tabRect.top + offset,
+		closeRect.Set(tabRect.left + offset, tabRect.top + offset,
 			tabRect.left + offset + size, tabRect.top + offset + size);
 
-		fZoomRect.Set(tabRect.right - offset - size, tabRect.top + offset,
+		zoomRect.Set(tabRect.right - offset - size, tabRect.top + offset,
 			tabRect.right - offset, tabRect.top + offset + size);
 
 		// hidden buttons have no width
 		if ((Flags() & B_NOT_CLOSABLE) != 0)
-			fCloseRect.right = fCloseRect.left - offset;
+			closeRect.right = closeRect.left - offset;
 		if ((Flags() & B_NOT_ZOOMABLE) != 0)
-			fZoomRect.left = fZoomRect.right + offset;
+			zoomRect.left = zoomRect.right + offset;
 	} else {
-		fCloseRect.Set(tabRect.left + offset, tabRect.top + offset,
+		closeRect.Set(tabRect.left + offset, tabRect.top + offset,
 			tabRect.left + offset + size, tabRect.top + offset + size);
 
-		fZoomRect.Set(tabRect.left + offset, tabRect.bottom - offset - size,
+		zoomRect.Set(tabRect.left + offset, tabRect.bottom - offset - size,
 			tabRect.left + size + offset, tabRect.bottom - offset);
 
 		// hidden buttons have no height
 		if ((Flags() & B_NOT_CLOSABLE) != 0)
-			fCloseRect.bottom = fCloseRect.top - offset;
+			closeRect.bottom = closeRect.top - offset;
 		if ((Flags() & B_NOT_ZOOMABLE) != 0)
-			fZoomRect.top = fZoomRect.bottom + offset;
+			zoomRect.top = zoomRect.bottom + offset;
 	}
 
 	// calculate room for title
@@ -1419,29 +1692,54 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	//	truncated for no apparent reason - OTOH the title does
 	//	also not appear perfectly in the middle
 	if (fLook != kLeftTitledWindowLook)
-		size = (fZoomRect.left - fCloseRect.right) - fTextOffset * 2 + inset;
+		size = (zoomRect.left - closeRect.right) - tab->textOffset * 2 + inset;
 	else
-		size = (fZoomRect.top - fCloseRect.bottom) - fTextOffset * 2 + inset;
+		size = (zoomRect.top - closeRect.bottom) - tab->textOffset * 2 + inset;
 
-	fTruncatedTitle = Title();
-	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_MIDDLE, size);
-	fTruncatedTitleLength = fTruncatedTitle.Length();
+	bool stackMode = fTabList.CountItems() > 1;
+	if (stackMode && IsFocus(tab) == false) {
+		zoomRect.Set(0, 0, 0, 0);
+		size = (tab->tabRect.right - closeRect.right) - tab->textOffset * 2
+			+ inset;
+	}
+	uint8 truncateMode = B_TRUNCATE_MIDDLE;
+	if (stackMode) {
+		if (tab->tabRect.Width() < 100)
+			truncateMode = B_TRUNCATE_END;
+		float titleWidth = fDrawState.Font().StringWidth(Title(tab),
+			BString(Title(tab)).Length());
+		if (size < titleWidth) {
+			float oldTextOffset = tab->textOffset;
+			tab->textOffset -= (titleWidth - size) / 2;
+			const float kMinTextOffset = 5.;
+			if (tab->textOffset < kMinTextOffset)
+				tab->textOffset = kMinTextOffset;
+			size += oldTextOffset * 2;
+			size -= tab->textOffset * 2;
+		}
+	}
+	tab->truncatedTitle = Title(tab);
+	fDrawState.Font().TruncateString(&tab->truncatedTitle, truncateMode, size);
+	tab->truncatedTitleLength = tab->truncatedTitle.Length();
 }
 
 
 void
 DefaultDecorator::_InvalidateBitmaps()
 {
-	for (int32 index = 0; index < 4; index++) {
-		fCloseBitmaps[index] = NULL;
-		fZoomBitmaps[index] = NULL;
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		DefaultDecorator::Tab* tab = _TabAt(i);
+		for (int32 index = 0; index < 4; index++) {
+			tab->closeBitmaps[index] = NULL;
+			tab->zoomBitmaps[index] = NULL;
+		}
 	}
 }
 
 
 ServerBitmap*
-DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
-	int32 height)
+DefaultDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
+	bool down, int32 width, int32 height)
 {
 	// TODO: the list of shared bitmaps is never freed
 	struct decorator_bitmap {
@@ -1459,7 +1757,7 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
 	static decorator_bitmap* sBitmapList = NULL;
 
 	ComponentColors colors;
-	_GetComponentColors(item, colors);
+	_GetComponentColors(item, colors, tab);
 
 	BAutolock locker(sBitmapListLock);
 
@@ -1546,7 +1844,7 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
 
 void
 DefaultDecorator::_GetComponentColors(Component component,
-	ComponentColors _colors)
+	ComponentColors _colors, Decorator::Tab* tab)
 {
 	// get the highlight for our component
 	Region region = REGION_NONE;
@@ -1577,5 +1875,22 @@ DefaultDecorator::_GetComponentColors(Component component,
 			break;
 	}
 
-	return GetComponentColors(component, RegionHighlight(region), _colors);
+	return GetComponentColors(component, RegionHighlight(region), _colors, tab);
+}
+
+
+float
+DefaultDecorator::_DefaultTextOffset() const
+{
+	return (fLook == B_FLOATING_WINDOW_LOOK
+		|| fLook == kLeftTitledWindowLook) ? 10 : 18;
+}
+
+
+void
+DefaultDecorator::_CalculateTabsRegion()
+{
+	fTabsRegion.MakeEmpty();
+	for (int32 i = 0; i < fTabList.CountItems(); i++)
+		fTabsRegion.Include(fTabList.ItemAt(i)->tabRect);
 }

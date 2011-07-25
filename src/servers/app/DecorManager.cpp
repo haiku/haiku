@@ -65,15 +65,16 @@ DecorAddOn::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
 	DesktopSettings settings(desktop);
 	Decorator* decorator;
 	decorator = _AllocateDecorator(settings, rect, look, flags);
-
 	desktop->UnlockSingleWindow();
-
 	if (!decorator)
 		return NULL;
 
-	decorator->SetDrawingEngine(engine);
-	decorator->SetTitle(title);
+	if (decorator->AddTab(title) == false) {
+		delete decorator;
+		return NULL;
+	}
 
+	decorator->SetDrawingEngine(engine);
 	return decorator;
 }
 

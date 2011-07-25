@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,6 +22,22 @@
 #include "DrawingEngine.h"
 
 
+Decorator::Tab::Tab()
+	:
+	zoomRect(),
+	closeRect(),
+	minimizeRect(),
+
+	closePressed(false),
+	zoomPressed(false),
+	minimizePressed(false),
+	isFocused(false),
+	title("")
+{
+
+}
+
+
 /*!	\brief Constructor
 
 	Does general initialization of internal data members and creates a colorset
@@ -41,19 +57,12 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
 	fLook(look),
 	fFlags(flags),
 
-	fZoomRect(),
-	fCloseRect(),
-	fMinimizeRect(),
-	fTabRect(),
+	fTitleBarRect(),
 	fFrame(rect),
 	fResizeRect(),
 	fBorderRect(),
 
-	fClosePressed(false),
-	fZoomPressed(false),
-	fMinimizePressed(false),
-	fIsFocused(false),
-	fTitle(""),
+	fTopTab(NULL),
 
 	fFootprintValid(false)
 {
@@ -68,6 +77,89 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
 */
 Decorator::~Decorator()
 {
+}
+
+
+Decorator::Tab*
+Decorator::AddTab(const char* title, int32 index, BRegion* updateRegion)
+{
+	Decorator::Tab* tab = _AllocateNewTab();
+	if (tab == NULL)
+		return NULL;
+	tab->title = title;
+
+	bool ok = false;
+	if (index >= 0) {
+		if (fTabList.AddItem(tab, index) == true)
+			ok = true;
+	} else if (fTabList.AddItem(tab) == true)
+		ok = true;
+
+	if (ok == false) {
+		delete tab;
+		return NULL;
+	}
+
+	if (_AddTab(index, updateRegion) == false) {
+		fTabList.RemoveItem(tab);
+		delete tab;
+		return NULL;
+	}
+
+	if (fTopTab == NULL)
+		fTopTab = tab;
+
+	_InvalidateFootprint();
+	return tab;
+}
+
+
+bool
+Decorator::RemoveTab(int32 index, BRegion* updateRegion)
+{
+	Decorator::Tab* tab = fTabList.RemoveItemAt(index);
+	if (tab == NULL)
+		return false;
+
+	_RemoveTab(index, updateRegion);
+
+	delete tab;
+	_InvalidateFootprint();
+	return true;
+}
+
+
+bool
+Decorator::MoveTab(int32 from, int32 to, bool isMoving, BRegion* updateRegion)
+{
+	if (_MoveTab(from, to, isMoving, updateRegion) == false)
+		return false;
+	if (fTabList.MoveItem(from, to) == false) {
+		// move the tab back
+		_MoveTab(from, to, isMoving, updateRegion);
+		return false;
+	}
+	return true;
+}
+
+
+int32
+Decorator::TabAt(const BPoint& where) const
+{
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab->tabRect.Contains(where))
+			return i;
+	}
+
+	return -1;
+}
+
+
+void
+Decorator::SetTopTap(int32 tab)
+{
+	fTopTab = fTabList.ItemAt(tab);
 }
 
 
@@ -132,71 +224,6 @@ Decorator::SetLook(DesktopSettings& settings, window_look look,
 }
 
 
-/*!	\brief Sets the close button's value.
-
-	Note that this does not update the button's look - it just updates the
-	internal button value
-
-	\param is_down Whether the button is down or not
-*/
-void
-Decorator::SetClose(bool pressed)
-{
-	if (pressed != fClosePressed) {
-		fClosePressed = pressed;
-		DrawClose();
-	}
-}
-
-/*!	\brief Sets the minimize button's value.
-
-	Note that this does not update the button's look - it just updates the
-	internal button value
-
-	\param is_down Whether the button is down or not
-*/
-void
-Decorator::SetMinimize(bool pressed)
-{
-	if (pressed != fMinimizePressed) {
-		fMinimizePressed = pressed;
-		DrawMinimize();
-	}
-}
-
-/*!	\brief Sets the zoom button's value.
-
-	Note that this does not update the button's look - it just updates the
-	internal button value
-
-	\param is_down Whether the button is down or not
-*/
-void
-Decorator::SetZoom(bool pressed)
-{
-	if (pressed != fZoomPressed) {
-		fZoomPressed = pressed;
-		DrawZoom();
-	}
-}
-
-
-/*!	\brief Updates the value of the decorator title
-	\param string New title value
-*/
-void
-Decorator::SetTitle(const char* string, BRegion* updateRegion)
-{
-	fTitle.SetTo(string);
-	_SetTitle(string, updateRegion);
-
-	_InvalidateFootprint();
-		// the border very likely changed
-
-	// TODO: redraw?
-}
-
-
 /*!	\brief Returns the decorator's window look
 	\return the decorator's window look
 */
@@ -217,16 +244,6 @@ Decorator::Flags() const
 }
 
 
-/*!	\brief Returns the decorator's title
-	\return the decorator's title
-*/
-const char*
-Decorator::Title() const
-{
-	return fTitle.String();
-}
-
-
 /*!	\brief Returns the decorator's border rectangle
 	\return the decorator's border rectangle
 */
@@ -237,52 +254,149 @@ Decorator::BorderRect() const
 }
 
 
+BRect
+Decorator::TitleBarRect() const
+{
+	return fTitleBarRect;
+}
+
+
 /*!	\brief Returns the decorator's tab rectangle
 	\return the decorator's tab rectangle
 */
 BRect
-Decorator::TabRect() const
+Decorator::TabRect(int32 tab) const
 {
-	return fTabRect;
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return BRect();
+	return decoratorTab->tabRect;
 }
 
 
-/*!	\brief Returns the value of the close button
-	\return true if down, false if up
+BRect
+Decorator::TabRect(Decorator::Tab* tab) const
+{
+	return tab->tabRect;
+}
+
+
+/*!	\brief Sets the close button's value.
+
+	Note that this does not update the button's look - it just updates the
+	internal button value
+
+	\param is_down Whether the button is down or not
 */
-bool
-Decorator::GetClose()
-{
-	return fClosePressed;
-}
-
-
-/*!	\brief Returns the value of the minimize button
-	\return true if down, false if up
-*/
-bool
-Decorator::GetMinimize()
-{
-	return fMinimizePressed;
-}
-
-
-/*!	\brief Returns the value of the zoom button
-	\return true if down, false if up
-*/
-bool
-Decorator::GetZoom()
-{
-	return fZoomPressed;
-}
-
-
 void
-Decorator::GetSizeLimits(int32* minWidth, int32* minHeight, int32* maxWidth,
-	int32* maxHeight) const
+Decorator::SetClose(int32 tab, bool pressed)
 {
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+
+	if (pressed != decoratorTab->closePressed) {
+		decoratorTab->closePressed = pressed;
+		DrawClose(tab);
+	}
 }
 
+/*!	\brief Sets the minimize button's value.
+
+	Note that this does not update the button's look - it just updates the
+	internal button value
+
+	\param is_down Whether the button is down or not
+*/
+void
+Decorator::SetMinimize(int32 tab, bool pressed)
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+
+	if (pressed != decoratorTab->minimizePressed) {
+		decoratorTab->minimizePressed = pressed;
+		DrawMinimize(tab);
+	}
+}
+
+/*!	\brief Sets the zoom button's value.
+
+	Note that this does not update the button's look - it just updates the
+	internal button value
+
+	\param is_down Whether the button is down or not
+*/
+void
+Decorator::SetZoom(int32 tab, bool pressed)
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+
+	if (pressed != decoratorTab->zoomPressed) {
+		decoratorTab->zoomPressed = pressed;
+		DrawZoom(tab);
+	}
+}
+
+
+/*!	\brief Updates the value of the decorator title
+	\param string New title value
+*/
+void
+Decorator::SetTitle(int32 tab, const char* string, BRegion* updateRegion)
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+
+	decoratorTab->title.SetTo(string);
+	_SetTitle(decoratorTab, string, updateRegion);
+
+	_InvalidateFootprint();
+		// the border very likely changed
+
+	// TODO: redraw?
+}
+
+
+/*!	\brief Returns the decorator's title
+	\return the decorator's title
+*/
+const char*
+Decorator::Title(int32 tab) const
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return "";
+	return decoratorTab->title;
+}
+
+
+const char*
+Decorator::Title(Decorator::Tab* tab) const
+{
+	return tab->title;
+}
+
+
+bool
+Decorator::SetTabLocation(int32 tab, float location, bool isShifting,
+	BRegion* updateRegion)
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return false;
+	if (_SetTabLocation(decoratorTab, location, isShifting, updateRegion)) {
+		_InvalidateFootprint();
+		return true;
+	}
+	return false;
+}
+
+ 
 
 /*!	\brief Changes the focus value of the decorator
 
@@ -292,11 +406,38 @@ Decorator::GetSizeLimits(int32* minWidth, int32* minHeight, int32* maxWidth,
 	\param active True if active, false if not
 */
 void
-Decorator::SetFocus(bool active)
+Decorator::SetFocus(int32 tab, bool active)
 {
-	fIsFocused = active;
-	_SetFocus();
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	decoratorTab->isFocused = active;
+	_SetFocus(decoratorTab);
 	// TODO: maybe it would be cleaner to handle the redraw here.
+}
+
+
+bool
+Decorator::IsFocus(int32 tab) const
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return false;
+	return decoratorTab->isFocused;
+};
+
+
+bool
+Decorator::IsFocus(Decorator::Tab* tab) const
+{
+	return tab->isFocused;
+}
+
+
+void
+Decorator::GetSizeLimits(int32* minWidth, int32* minHeight, int32* maxWidth,
+	int32* maxHeight) const
+{
 }
 
 
@@ -339,14 +480,25 @@ Decorator::GetFootprint()
 		- \c REGION_RIGHT_BOTTOM_CORNER The right-bottom corner.
 */
 Decorator::Region
-Decorator::RegionAt(BPoint where) const
+Decorator::RegionAt(BPoint where, int32& tabIndex) const
 {
-	if (fCloseRect.Contains(where))
-		return REGION_CLOSE_BUTTON;
-	if (fZoomRect.Contains(where))
-		return REGION_ZOOM_BUTTON;
-	if (fTabRect.Contains(where))
-		return REGION_TAB;
+	tabIndex = -1;
+
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab->closeRect.Contains(where)) {
+			tabIndex = i;
+			return REGION_CLOSE_BUTTON;
+		}
+		if (tab->zoomRect.Contains(where)) {
+			tabIndex = i;
+			return REGION_ZOOM_BUTTON;
+		}
+		if (tab->tabRect.Contains(where)) {
+			tabIndex = i;
+			return REGION_TAB;
+		}
+	}
 
 	return REGION_NONE;
 }
@@ -411,17 +563,6 @@ Decorator::ResizeBy(BPoint offset, BRegion* dirty)
 }
 
 
-bool
-Decorator::SetTabLocation(float location, BRegion* updateRegion)
-{
-	if (_SetTabLocation(location, updateRegion)) {
-		_InvalidateFootprint();
-		return true;
-	}
-	return false;
-}
-
-
 /*!	\brief Sets a specific highlight for a decorator region.
 
 	Can be overridden by derived classes, but the base class version must be
@@ -434,7 +575,8 @@ Decorator::SetTabLocation(float location, BRegion* updateRegion)
 	\return \c true, if the highlight could be applied.
 */
 bool
-Decorator::SetRegionHighlight(Region region, uint8 highlight, BRegion* dirty)
+Decorator::SetRegionHighlight(Region region, uint8 highlight, BRegion* dirty,
+	int32 tab)
 {
 	int32 index = (int32)region - 1;
 	if (index < 0 || index >= REGION_COUNT - 1)
@@ -479,7 +621,7 @@ void
 Decorator::Draw(BRect rect)
 {
 	_DrawFrame(rect & fFrame);
-	_DrawTab(rect & fTabRect);
+	_DrawTabs(rect & fTitleBarRect);
 }
 
 
@@ -488,15 +630,7 @@ void
 Decorator::Draw()
 {
 	_DrawFrame(fFrame);
-	_DrawTab(fTabRect);
-}
-
-
-//! Draws the close button
-void
-Decorator::DrawClose()
-{
-	_DrawClose(fCloseRect);
+	_DrawTabs(fTitleBarRect);
 }
 
 
@@ -508,39 +642,63 @@ Decorator::DrawFrame()
 }
 
 
-//! draws the minimize button
+//! draws the tab, title, and buttons
 void
-Decorator::DrawMinimize()
+Decorator::DrawTab(int32 tabIndex)
 {
-	_DrawTab(fMinimizeRect);
+	Decorator::Tab* tab = fTabList.ItemAt(tabIndex);
+	if (tab == NULL)
+		return;
+
+	_DrawTab(tab, tab->tabRect);
+	_DrawZoom(tab, tab->zoomRect);
+	_DrawMinimize(tab, tab->minimizeRect);
+	_DrawTitle(tab, tab->tabRect);
+	_DrawClose(tab, tab->closeRect);
 }
 
 
-//! draws the tab, title, and buttons
+//! Draws the close button
 void
-Decorator::DrawTab()
+Decorator::DrawClose(int32 tab)
 {
-	_DrawTab(fTabRect);
-	_DrawZoom(fZoomRect);
-	_DrawMinimize(fMinimizeRect);
-	_DrawTitle(fTabRect);
-	_DrawClose(fCloseRect);
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	_DrawClose(decoratorTab, decoratorTab->closeRect);
+}
+
+
+//! draws the minimize button
+void
+Decorator::DrawMinimize(int32 tab)
+{
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	_DrawTab(decoratorTab, decoratorTab->minimizeRect);
 }
 
 
 //! draws the title
 void
-Decorator::DrawTitle()
+Decorator::DrawTitle(int32 tab)
 {
-	_DrawTitle(fTabRect);
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	_DrawTitle(decoratorTab, decoratorTab->tabRect);
 }
 
 
 //! draws the zoom button
 void
-Decorator::DrawZoom()
+Decorator::DrawZoom(int32 tab)
 {
-	_DrawZoom(fZoomRect);
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	_DrawZoom(decoratorTab, decoratorTab->zoomRect);
 }
 
 
@@ -582,6 +740,24 @@ Decorator::_DrawFrame(BRect rect)
 }
 
 
+
+void
+Decorator::_DrawTabs(BRect rect)
+{
+	Decorator::Tab* focusTab = NULL;
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab->isFocused) {
+			focusTab = tab;
+			continue;
+		}
+		_DrawTab(tab, rect);
+	}
+	if (focusTab != NULL)
+		_DrawTab(focusTab, rect);
+}
+
+
 /*!	\brief Actually draws the tab
 
 	This function is called when the tab itself needs drawn. Other items,
@@ -590,7 +766,7 @@ Decorator::_DrawFrame(BRect rect)
 	\param rect Area of the tab to update
 */
 void
-Decorator::_DrawTab(BRect rect)
+Decorator::_DrawTab(Decorator::Tab* tab, BRect rect)
 {
 }
 
@@ -603,7 +779,7 @@ Decorator::_DrawTab(BRect rect)
 	\param rect Area of the button to update
 */
 void
-Decorator::_DrawClose(BRect rect)
+Decorator::_DrawClose(Decorator::Tab* tab, BRect rect)
 {
 }
 
@@ -618,7 +794,7 @@ Decorator::_DrawClose(BRect rect)
 	\param rect area of the title to update
 */
 void
-Decorator::_DrawTitle(BRect rect)
+Decorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 {
 }
 
@@ -631,7 +807,7 @@ Decorator::_DrawTitle(BRect rect)
 	\param rect Area of the button to update
 */
 void
-Decorator::_DrawZoom(BRect rect)
+Decorator::_DrawZoom(Decorator::Tab* tab, BRect rect)
 {
 }
 
@@ -644,14 +820,22 @@ Decorator::_DrawZoom(BRect rect)
 	\param rect Area of the button to update
 */
 void
-Decorator::_DrawMinimize(BRect rect)
+Decorator::_DrawMinimize(Decorator::Tab* tab, BRect rect)
 {
+}
+
+
+bool
+Decorator::_SetTabLocation(Decorator::Tab* tab, float location, bool isShifting,
+	BRegion* /*updateRegion*/)
+{
+	return false;
 }
 
 
 //! Hook function called when the decorator changes focus
 void
-Decorator::_SetFocus()
+Decorator::_SetFocus(Decorator::Tab* tab)
 {
 }
 
@@ -680,11 +864,15 @@ Decorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 void
 Decorator::_MoveBy(BPoint offset)
 {
-	fZoomRect.OffsetBy(offset);
-	fCloseRect.OffsetBy(offset);
-	fMinimizeRect.OffsetBy(offset);
-	fMinimizeRect.OffsetBy(offset);
-	fTabRect.OffsetBy(offset);
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+
+		tab->zoomRect.OffsetBy(offset);
+		tab->closeRect.OffsetBy(offset);
+		tab->minimizeRect.OffsetBy(offset);
+		tab->tabRect.OffsetBy(offset);
+	}
+	fTitleBarRect.OffsetBy(offset);
 	fFrame.OffsetBy(offset);
 	fResizeRect.OffsetBy(offset);
 	fBorderRect.OffsetBy(offset);
