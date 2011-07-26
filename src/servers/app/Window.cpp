@@ -1213,16 +1213,6 @@ Window::FontsChanged(BRegion* updateRegion)
 void
 Window::SetLook(window_look look, BRegion* updateRegion)
 {
-	::Decorator* decorator = Decorator();
-	if (decorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
-		// we need a new decorator
-		decorator = gDecorManager.AllocateDecorator(this);
-		if (IsFocus()) {
-			int32 index = PositionInStack();
-			decorator->SetFocus(index, true);
-		}
-	}
-
 	fLook = look;
 
 	fContentRegionValid = false;
@@ -1230,6 +1220,20 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 	fEffectiveDrawingRegionValid = false;
 		// ...and therefor the drawing region is
 		// likely not valid anymore either
+
+	if (fCurrentStack.Get() == NULL)
+		return;
+
+	::Decorator* decorator = Decorator();
+	if (decorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
+		// we need a new decorator
+		decorator = gDecorManager.AllocateDecorator(this);
+		fCurrentStack->SetDecorator(decorator);
+		if (IsFocus()) {
+			int32 index = PositionInStack();
+			decorator->SetFocus(index, true);
+		}
+	}
 
 	if (decorator != NULL) {
 		DesktopSettings settings(fDesktop);
@@ -1241,7 +1245,7 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 		_ObeySizeLimits();
 	}
 
-	if (look == B_NO_BORDER_WINDOW_LOOK && fCurrentStack.Get() != NULL) {
+	if (look == B_NO_BORDER_WINDOW_LOOK) {
 		// we don't need a decorator for this window
 		fCurrentStack->SetDecorator(NULL);
 	}
@@ -2152,7 +2156,7 @@ Window::StackedWindowAt(const BPoint& where)
 {
 	::Decorator* decorator = Decorator();
 	if (decorator == NULL)
-		return NULL;
+		return this;
 
 	int tab = decorator->TabAt(where);
 	// if we have a decorator we also have a stack
