@@ -1,6 +1,11 @@
 /*
  * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
- * Distributed under the terms of the MIT License.
+ * Copyright 2010-2011, Haiku, Inc. All Rights Reserved.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de.
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -18,6 +23,7 @@
 #include <kernel.h>
 
 #include "of_support.h"
+
 
 // set protection to WIMGNPP: -----PP
 // PP:	00 - no access
@@ -78,28 +84,28 @@ find_physical_memory_ranges(size_t &total)
 
 	total = 0;
 
-	/* Memory base addresses are provided in 32 or 64 bit flavors
-	   #address-cells and #size-cells matches the number of 32-bit 'cells'
-	   representing the length of the base address and size fields
-	*/
+	// Memory base addresses are provided in 32 or 64 bit flavors
+	// #address-cells and #size-cells matches the number of 32-bit 'cells'
+	// representing the length of the base address and size fields
 	int root = of_finddevice("/");
-	int regAddressCount = of_address_cells(root);
-	int regSizeCount = of_size_cells(root);
-	if (regAddressCount == OF_FAILED || regSizeCount == OF_FAILED) {
+	int32 regAddressCells = of_address_cells(root);
+	int32 regSizeCells = of_size_cells(root);
+	if (regAddressCells == OF_FAILED || regSizeCells == OF_FAILED) {
 		dprintf("finding base/size length counts failed, assume 32-bit.\n");
-		regAddressCount = 1;
-		regSizeCount = 1;
+		regAddressCells = 1;
+		regSizeCells = 1;
 	}
-	dprintf("memory range address cells: %d; size cells: %d;\n",
-		regAddressCount, regSizeCount);
 
-	if (regAddressCount > 2 || regSizeCount > 1) {
-		dprintf("Unsupported cell size detected. (machine is > 64bit?).\n");
+	// NOTE : Size Cells of 2 is possible in theory... but I haven't seen it yet.
+	if (regAddressCells > 2 || regSizeCells > 1) {
+		panic("%s: Unsupported OpenFirmware cell count detected.\n"
+		"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
+		" (CPU > 64bit?).\n", __func__, regAddressCells, regSizeCells);
 		return B_ERROR;
 	}
 
 	// On 64-bit PowerPC systems (G5), our mem base range address is larger
-	if (regAddressCount == 2) {
+	if (regAddressCells == 2) {
 		struct of_region<uint64> regions[64];
 		int count = of_getprop(package, "reg", regions, sizeof(regions));
 		if (count == OF_FAILED)

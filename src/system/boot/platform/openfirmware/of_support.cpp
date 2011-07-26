@@ -25,7 +25,7 @@ system_time(void)
 +   in the reg property
 + */
 
-uint32
+int32
 of_address_cells(int package) {
 	uint32 address_cells;
 	if (of_getprop(package, "#address-cells",
@@ -36,7 +36,7 @@ of_address_cells(int package) {
 }
 
 
-uint32
+int32
 of_size_cells(int package) {
 	uint32 size_cells;
 	if (of_getprop(package, "#size-cells",

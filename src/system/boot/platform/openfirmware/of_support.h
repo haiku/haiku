@@ -13,7 +13,7 @@
 
 
 bigtime_t system_time(void);
-uint32 of_address_cells(int package);
-uint32 of_size_cells(int package);
+int32 of_address_cells(int package);
+int32 of_size_cells(int package);
 
 #endif

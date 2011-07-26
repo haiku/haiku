@@ -11,13 +11,14 @@
 
 #define OF_FAILED	(-1)
 
+
 /* global device tree/properties access */
 extern int gChosen;
 
 
-template<typename addressSize>
+template<typename AddressSize>
 struct of_region {
-	addressSize base;
+	AddressSize base;
 	uint32 size;
 };
 
