@@ -9,13 +9,15 @@
 
 #include "MessageLooper.h"
 
-#include <Autolock.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <Autolock.h>
+
 
 MessageLooper::MessageLooper(const char* name)
-	: BLocker(name),
+	:
+	BLocker(name),
 	fThread(-1),
 	fQuitting(false),
 	fDeathSemaphore(-1)
