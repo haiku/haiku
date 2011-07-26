@@ -1333,8 +1333,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	if (x == 0 && y == 0)
 		return;
 
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
 
 	Window* topWindow = window->TopLayerStackWindow();
 	if (topWindow)
@@ -1356,7 +1355,6 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 			window->MoveBy((int32)x, (int32)y);
 
 		NotifyWindowMoved(window);
-		UnlockAllWindows();
 		return;
 	}
 
@@ -1411,8 +1409,6 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	}
 
 	NotifyWindowMoved(window);
-
-	UnlockAllWindows();
 }
 
 
@@ -1422,13 +1418,15 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	if (x == 0 && y == 0)
 		return;
 
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
+
+	Window* topWindow = window->TopLayerStackWindow();
+	if (topWindow)
+		window = topWindow;
 
 	if (!window->IsVisible()) {
 		window->ResizeBy((int32)x, (int32)y, NULL);
 		NotifyWindowResized(window);
-		UnlockAllWindows();
 		return;
 	}
 
@@ -1471,8 +1469,6 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	}
 
 	NotifyWindowResized(window);
-
-	UnlockAllWindows();
 }
 
 
