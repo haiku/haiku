@@ -106,8 +106,7 @@ Decorator::AddTab(const char* title, int32 index, BRegion* updateRegion)
 		return NULL;
 	}
 
-	if (fTopTab == NULL)
-		fTopTab = tab;
+	fTopTab = tab;
 
 	_InvalidateFootprint();
 	return tab;
