@@ -318,8 +318,6 @@ Window::MoveBy(int32 x, int32 y, bool moveStack)
 			if (window == this)
 				continue;
 			window->MoveBy(x, y, false);
-			
-			//fDesktop->RebuildAndRedrawAfterWindowChange(window, dirty);
 		}
 	}
 
@@ -370,13 +368,8 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 	}
 
 	::Decorator* decorator = Decorator();
-	if (decorator && resizeStack) {
+	if (decorator && resizeStack)
 		decorator->ResizeBy(x, y, dirtyRegion);
-//if (dirtyRegion) {
-//fDrawingEngine->FillRegion(*dirtyRegion, (rgb_color){ 255, 255, 0, 255 });
-//snooze(40000);
-//}
-	}
 
 	WindowStack* stack = GetWindowStack();
 	if (resizeStack && stack) {
@@ -387,8 +380,6 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 			window->ResizeBy(x, y, dirtyRegion, false);
 		}
 	}
-//if (dirtyRegion)
-//fDrawingEngine->FillRegion(*dirtyRegion, (rgb_color){ 0, 255, 255, 255 });
 
 	// send a message to the client informing about the changed size
 	BRect frame(Frame());
