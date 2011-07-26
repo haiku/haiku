@@ -171,6 +171,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				default:
 					return -EINVAL;
 			}
+			break;
 		case 0xbece0310:
 		{
 			switch (vendorDDRSetting) {
