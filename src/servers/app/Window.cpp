@@ -2111,10 +2111,10 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	// propagate focus to the new decorator
 	SetFocus(IsFocus());
 
-	fDesktop->RebuildAndRedrawAfterWindowChange(this, dirty);
-	if (remainingTop != NULL)
-		fDesktop->MarkDirty(remainingTop->VisibleRegion());
-
+	if (remainingTop != NULL) {
+		dirty.Include(&remainingTop->VisibleRegion());
+		fDesktop->RebuildAndRedrawAfterWindowChange(remainingTop, dirty);
+	}
 	return true;
 }
 
