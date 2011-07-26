@@ -113,11 +113,14 @@ protected:
 	virtual void				_DrawFrame(BRect r);
 	virtual void				_DrawTab(Decorator::Tab* tab, BRect r);
 
-	virtual void				_DrawClose(Decorator::Tab* tab, BRect r);
+	virtual void				_DrawClose(Decorator::Tab* tab, bool direct,
+									BRect r);
 	virtual void				_DrawTitle(Decorator::Tab* tab, BRect r);
-	virtual void				_DrawZoom(Decorator::Tab* tab, BRect r);
+	virtual void				_DrawZoom(Decorator::Tab* tab, bool direct,
+									BRect r);
 
-	virtual	void				_SetTitle(Decorator::Tab* tab, const char* string,
+	virtual	void				_SetTitle(Decorator::Tab* tab,
+									const char* string,
 									BRegion* updateRegion = NULL);
 	virtual void				_SetFocus(Decorator::Tab* tab);
 
@@ -162,7 +165,7 @@ protected:
 private:
 			void				_UpdateFont(DesktopSettings& settings);
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,
- 									BRect rect);
+ 									bool direct, BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,
 									BRect rect, bool down,
 									const ComponentColors& colors);

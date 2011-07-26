@@ -1761,11 +1761,12 @@ Window::_DrawBorder()
 	if (dirtyBorderRegion->CountRects() > 0 && engine->LockParallelAccess()) {
 		engine->ConstrainClippingRegion(dirtyBorderRegion);
 		bool copyToFrontEnabled = engine->CopyToFrontEnabled();
-		engine->SetCopyToFrontEnabled(true);
+		engine->SetCopyToFrontEnabled(false);
 
 		decorator->Draw(dirtyBorderRegion->Frame());
 
 		engine->SetCopyToFrontEnabled(copyToFrontEnabled);
+		engine->CopyToFront(*dirtyBorderRegion);
 
 // TODO: remove this once the DrawState stuff is handled
 // more cleanly. The reason why this is needed is that

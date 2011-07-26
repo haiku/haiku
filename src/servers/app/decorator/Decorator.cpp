@@ -651,10 +651,10 @@ Decorator::DrawTab(int32 tabIndex)
 		return;
 
 	_DrawTab(tab, tab->tabRect);
-	_DrawZoom(tab, tab->zoomRect);
-	_DrawMinimize(tab, tab->minimizeRect);
+	_DrawZoom(tab, false, tab->zoomRect);
+	_DrawMinimize(tab, false, tab->minimizeRect);
 	_DrawTitle(tab, tab->tabRect);
-	_DrawClose(tab, tab->closeRect);
+	_DrawClose(tab, false, tab->closeRect);
 }
 
 
@@ -665,7 +665,7 @@ Decorator::DrawClose(int32 tab)
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return;
-	_DrawClose(decoratorTab, decoratorTab->closeRect);
+	_DrawClose(decoratorTab, true, decoratorTab->closeRect);
 }
 
 
@@ -698,7 +698,7 @@ Decorator::DrawZoom(int32 tab)
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return;
-	_DrawZoom(decoratorTab, decoratorTab->zoomRect);
+	_DrawZoom(decoratorTab, true, decoratorTab->zoomRect);
 }
 
 
@@ -779,7 +779,7 @@ Decorator::_DrawTab(Decorator::Tab* tab, BRect rect)
 	\param rect Area of the button to update
 */
 void
-Decorator::_DrawClose(Decorator::Tab* tab, BRect rect)
+Decorator::_DrawClose(Decorator::Tab* tab, bool direct, BRect rect)
 {
 }
 
@@ -807,7 +807,7 @@ Decorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 	\param rect Area of the button to update
 */
 void
-Decorator::_DrawZoom(Decorator::Tab* tab, BRect rect)
+Decorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect rect)
 {
 }
 
@@ -820,7 +820,7 @@ Decorator::_DrawZoom(Decorator::Tab* tab, BRect rect)
 	\param rect Area of the button to update
 */
 void
-Decorator::_DrawMinimize(Decorator::Tab* tab, BRect rect)
+Decorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
 {
 }
 

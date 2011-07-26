@@ -173,10 +173,14 @@ protected:
 
 	virtual	void			_DrawTabs(BRect rect);
 	virtual	void			_DrawTab(Decorator::Tab* tab, BRect rect);
-	virtual	void			_DrawClose(Decorator::Tab* tab, BRect rect);
 	virtual	void			_DrawTitle(Decorator::Tab* tab, BRect rect);
-	virtual	void			_DrawZoom(Decorator::Tab* tab, BRect rect);
-	virtual	void			_DrawMinimize(Decorator::Tab* tab, BRect rect);
+	//! direct means drawing without double buffering
+	virtual	void			_DrawClose(Decorator::Tab* tab, bool direct,
+								BRect rect);
+	virtual	void			_DrawZoom(Decorator::Tab* tab, bool direct,
+								BRect rect);
+	virtual	void			_DrawMinimize(Decorator::Tab* tab, bool direct,
+								BRect rect);
 
 	virtual	Decorator::Tab*	_AllocateNewTab() = 0;
 

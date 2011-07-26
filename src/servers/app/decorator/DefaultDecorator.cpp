@@ -952,7 +952,7 @@ DefaultDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 
 
 void
-DefaultDecorator::_DrawClose(Decorator::Tab* _tab, BRect rect)
+DefaultDecorator::_DrawClose(Decorator::Tab* _tab, bool direct, BRect rect)
 {
 	STRACE(("_DrawClose(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
@@ -967,7 +967,7 @@ DefaultDecorator::_DrawClose(Decorator::Tab* _tab, BRect rect)
 		tab->closeBitmaps[index] = bitmap;
 	}
 
-	_DrawButtonBitmap(bitmap, rect);
+	_DrawButtonBitmap(bitmap, direct, rect);
 }
 
 
@@ -1016,7 +1016,7 @@ DefaultDecorator::_DrawTitle(Decorator::Tab* _tab, BRect r)
 
 
 void
-DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, BRect rect)
+DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 {
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
@@ -1032,7 +1032,7 @@ DefaultDecorator::_DrawZoom(Decorator::Tab* _tab, BRect rect)
 		tab->zoomBitmaps[index] = bitmap;
 	}
 
-	_DrawButtonBitmap(bitmap, rect);
+	_DrawButtonBitmap(bitmap, direct, rect);
 }
 
 
@@ -1397,7 +1397,7 @@ DefaultDecorator::_AddTab(int32 index, BRegion* updateRegion)
 
 
 bool
-DefaultDecorator::_RemoveTab(int32 index, BRegion* updateRegion )
+DefaultDecorator::_RemoveTab(int32 index, BRegion* updateRegion)
 {
 	BRect oldTitle = fTitleBarRect;
 	_DoLayout();
@@ -1475,9 +1475,9 @@ DefaultDecorator::DrawButtons(Decorator::Tab* tab, const BRect& invalid)
 {
 	// Draw the buttons if we're supposed to
 	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(tab->closeRect))
-		_DrawClose(tab, tab->closeRect);
+		_DrawClose(tab, false, tab->closeRect);
 	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(tab->zoomRect))
-		_DrawZoom(tab, tab->zoomRect);
+		_DrawZoom(tab, false, tab->zoomRect);
 }
 
 
@@ -1574,13 +1574,14 @@ DefaultDecorator::_UpdateFont(DesktopSettings& settings)
 
 
 void
-DefaultDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, BRect rect)
+DefaultDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, bool direct,
+	BRect rect)
 {
 	if (bitmap == NULL)
 		return;
 
 	bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
-	fDrawingEngine->SetCopyToFrontEnabled(true);
+	fDrawingEngine->SetCopyToFrontEnabled(direct);
 	drawing_mode oldMode;
 	fDrawingEngine->SetDrawingMode(B_OP_OVER, oldMode);
 	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
