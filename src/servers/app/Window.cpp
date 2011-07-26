@@ -2100,6 +2100,8 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 		decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
 		// propagate focus to the decorator
 		remainingTop->SetFocus(remainingTop->IsFocus());
+		remainingTop->SetFeel(remainingTop->Feel());
+		remainingTop->SetLook(remainingTop->Look(), &dirty);
 	}
 
 	fCurrentStack = NULL;
@@ -2183,7 +2185,6 @@ Window::GetWindowStack()
 		return _InitWindowStack();
 	return fCurrentStack;
 }
-
 
 
 bool

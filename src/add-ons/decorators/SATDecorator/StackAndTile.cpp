@@ -382,10 +382,19 @@ StackAndTile::SizeLimitsChanged(Window* window, int32 minWidth, int32 maxWidth,
 void
 StackAndTile::WindowLookChanged(Window* window, window_look look)
 {
-	// if the decorator has been removed remove it from the stacking group
-	if (look != B_NO_BORDER_WINDOW_LOOK)
+	SATWindow* satWindow = GetSATWindow(window);
+	if (!satWindow)
 		return;
+	satWindow->WindowLookChanged(look);
+}
 
+
+void
+StackAndTile::WindowFeelChanged(Window* window, window_feel feel)
+{
+	// check if it is still a compatible feel
+	if (feel != B_NORMAL_WINDOW_FEEL)
+		return;
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;

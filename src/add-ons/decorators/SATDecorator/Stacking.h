@@ -34,8 +34,9 @@ public:
 		void				DoWindowLayout();
 
 		void				RemovedFromArea(WindowArea* area);
-
+		void				WindowLookChanged(window_look look);
 private:
+		bool				_IsStackableWindow(Window* window);
 		void				_ClearSearchResult();
 		void				_HighlightWindows(bool highlight = true);
 

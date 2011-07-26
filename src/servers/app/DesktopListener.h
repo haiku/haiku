@@ -65,6 +65,8 @@ public:
 									int32 minHeight, int32 maxHeight) = 0;
 	virtual void				WindowLookChanged(Window* window,
 									window_look look) = 0;
+	virtual void				WindowFeelChanged(Window* window,
+									window_feel feel) = 0;
 
 	virtual bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings) = 0;
@@ -119,6 +121,8 @@ public:
 									int32 minHeight, int32 maxHeight);
 			void				NotifyWindowLookChanged(Window* window,
 									window_look look);
+			void				NotifyWindowFeelChanged(Window* window,
+									window_feel feel);
 
 			bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings);

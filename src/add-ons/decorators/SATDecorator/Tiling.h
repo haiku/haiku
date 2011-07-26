@@ -25,7 +25,10 @@ public:
 		bool				FindSnappingCandidates(SATGroup* group);
 		bool				JoinCandidates();
 
+		void				WindowLookChanged(window_look look);
 private:
+		bool				_IsTileableWindow(Window* window);
+
 		bool				_FindFreeAreaInGroup(SATGroup* group);
 		bool				_FindFreeAreaInGroup(SATGroup* group,
 								Corner::position_t corner);

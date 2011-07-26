@@ -99,6 +99,7 @@ public:
 			bool				RemovedFromGroup(SATGroup* group,
 									bool stayBelowMouse);
 			void				RemovedFromArea(WindowArea* area);
+			void				WindowLookChanged(window_look look);
 
 			bool				StackWindow(SATWindow* child);
 

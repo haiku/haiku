@@ -428,6 +428,14 @@ SATWindow::RemovedFromArea(WindowArea* area)
 
 
 void
+SATWindow::WindowLookChanged(window_look look)
+{
+	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
+		fSATSnappingBehaviourList.ItemAt(i)->WindowLookChanged(look);
+}
+
+
+void
 SATWindow::FindSnappingCandidates()
 {
 	fOngoingSnapping = NULL;

@@ -239,6 +239,9 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 		Window* win = satWindow->GetWindow();
 		if (win == window || !win->Decorator())
 			continue;
+		if (_IsStackableWindow(win) == false
+			|| _IsStackableWindow(window) == false)
+			continue;
 		Decorator::Tab* tab = win->Decorator()->TabAt(win->PositionInStack());
 		if (tab == NULL)
 			continue;
@@ -273,6 +276,32 @@ SATStacking::RemovedFromArea(WindowArea* area)
 	const SATWindowList& list = area->WindowList();
 	if (list.CountItems() > 0)
 		list.ItemAt(0)->DoGroupLayout();
+}
+
+
+void
+SATStacking::WindowLookChanged(window_look look)
+{
+	Window* window = fSATWindow->GetWindow();
+	WindowStack* stack = window->GetWindowStack();
+	if (stack == NULL)
+		return;
+	SATGroup* group = fSATWindow->GetGroup();
+	if (group == NULL)
+		return;
+	if (stack->CountWindows() > 1 && _IsStackableWindow(window) == false)
+		group->RemoveWindow(fSATWindow);
+}
+
+
+bool
+SATStacking::_IsStackableWindow(Window* window)
+{
+	if (window->Look() == B_DOCUMENT_WINDOW_LOOK)
+		return true;
+	if (window->Look() == B_TITLED_WINDOW_LOOK)
+		return true;
+	return false;
 }
 
 

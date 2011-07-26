@@ -46,6 +46,10 @@ SATTiling::FindSnappingCandidates(SATGroup* group)
 {
 	_ResetSearchResults();
 
+	if (_IsTileableWindow(fSATWindow->GetWindow()) == false
+		|| (group->CountItems() == 1
+			&& _IsTileableWindow(group->WindowAt(0)->GetWindow()) == false))
+		return false;
 	if (fSATWindow->GetGroup() == group)
 		return false;
 
@@ -75,6 +79,34 @@ SATTiling::JoinCandidates()
 
 	_ResetSearchResults();
 	return true;
+}
+
+
+void
+SATTiling::WindowLookChanged(window_look look)
+{
+	SATGroup* group = fSATWindow->GetGroup();
+	if (group == NULL)
+		return;
+	if (_IsTileableWindow(fSATWindow->GetWindow()) == false)
+		group->RemoveWindow(fSATWindow);
+}
+
+
+bool
+SATTiling::_IsTileableWindow(Window* window)
+{
+	if (window->Look() == B_DOCUMENT_WINDOW_LOOK)
+		return true;
+	if (window->Look() == B_TITLED_WINDOW_LOOK)
+		return true;
+	if (window->Look() == B_FLOATING_WINDOW_LOOK)
+		return true;
+	if (window->Look() == B_MODAL_WINDOW_LOOK)
+		return true;
+	if (window->Look() == B_BORDERED_WINDOW_LOOK)
+		return true;
+	return false;	
 }
 
 

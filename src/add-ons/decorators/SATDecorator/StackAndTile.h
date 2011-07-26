@@ -80,6 +80,8 @@ public:
 									int32 minHeight, int32 maxHeight);
 	virtual void				WindowLookChanged(Window* window,
 									window_look look);
+	virtual void				WindowFeelChanged(Window* window,
+									window_feel feel);
 
 	virtual bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings);
@@ -166,8 +168,7 @@ public:
 	/*! Update the window tab values, solve the layout and move all windows in
 	the group accordantly. */
 	virtual void				RemovedFromArea(WindowArea* area) {}
-	virtual void				TabLocationMoved(float location, bool shifting)
-									{}
+	virtual void				WindowLookChanged(window_look look) {}
 };
 
 

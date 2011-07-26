@@ -1724,6 +1724,8 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 	if (window == FocusWindow() && !window->IsVisible())
 		SetFocusWindow();
 
+	NotifyWindowFeelChanged(window, newFeel);
+
 	UnlockAllWindows();
 }
 

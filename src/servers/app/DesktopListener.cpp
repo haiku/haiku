@@ -284,6 +284,19 @@ DesktopObservable::NotifyWindowLookChanged(Window* window, window_look look)
 }
 
 
+void
+DesktopObservable::NotifyWindowFeelChanged(Window* window, window_feel feel)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowFeelChanged(window, feel);
+}
+
+
 bool
 DesktopObservable::SetDecoratorSettings(Window* window,
 	const BMessage& settings)
