@@ -501,7 +501,7 @@ BeceemNVM::FlashBulkRead(unsigned int offset, unsigned int size,
 	if (pwmxdevice->driverHalt == true)
 		return -ENODEV;
 
-	if (size > sizeof(&buffer))
+	if (size > sizeof(buffer))
 		TRACE("Warning: Reading more then the buffer can handle\n");
 
 	bSelectedChip = RESET_CHIP_SELECT;

@@ -270,15 +270,15 @@ BeceemDevice::~BeceemDevice()
 	if (fNotifyWriteSem >= B_OK)
 		delete_sem(fNotifyWriteSem);
 
-	if (fNotifyBuffer)
+	if (fNotifyBuffer != NULL)
 		free(fNotifyBuffer);
 			// Free notification buffer
 
-	if (pwmxdevice->nvmFlashCSInfo)
+	if (pwmxdevice->nvmFlashCSInfo != NULL)
 		free(pwmxdevice->nvmFlashCSInfo);
 			// Free flash configuration structure
 
-	if (pwmxdevice)
+	if (pwmxdevice != NULL)
 		free(pwmxdevice);
 			// Free malloc of wimax device struct
 
@@ -1017,7 +1017,7 @@ BeceemDevice::LoadConfig()
 
 	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
 
-	if (!buffer) {
+	if (buffer == NULL) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
@@ -1118,8 +1118,6 @@ BeceemDevice::PushConfig(unsigned int loc)
 			FIRM_CFG);
 		return fh;
 	}
-
-	size_t file_size = cfgStat.st_size;
 
 	TRACE_ALWAYS("Info: Vendor configuration to be pushed to 0x%x on device.\n",
 		loc);
