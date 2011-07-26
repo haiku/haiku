@@ -16,9 +16,9 @@
 extern int gChosen;
 
 
-template<typename AddressSize>
+template<typename AddressType>
 struct of_region {
-	AddressSize base;
+	AddressType base;
 	uint32 size;
 };
 

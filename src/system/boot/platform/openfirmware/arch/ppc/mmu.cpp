@@ -22,7 +22,7 @@
 #include <arch_mmu.h>
 #include <kernel.h>
 
-#include "of_support.h"
+#include "support.h"
 
 
 // set protection to WIMGNPP: -----PP

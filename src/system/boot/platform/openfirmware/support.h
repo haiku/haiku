@@ -5,8 +5,8 @@
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
-#ifndef OF_SUPPORT_H
-#define OF_SUPPORT_H
+#ifndef SUPPORT_H
+#define SUPPORT_H
 
 
 #include <OS.h>

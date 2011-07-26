@@ -9,7 +9,7 @@
  */
 
 
-#include "of_support.h"
+#include "support.h"
 #include <platform/openfirmware/openfirmware.h>
 
 
