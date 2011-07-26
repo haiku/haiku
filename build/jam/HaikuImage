@@ -588,8 +588,7 @@ AddFilesToHaikuImage system add-ons disk_systems
 
 # decorators
 AddDirectoryToHaikuImage home config add-ons decorators ;
-AddFilesToHaikuImage home config add-ons decorators :
-	SATDecorator ;
+#AddFilesToHaikuImage home config add-ons decorators : ;
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;

@@ -31,6 +31,7 @@
 #include "Screen.h"
 #include "ScreenManager.h"
 #include "ServerCursor.h"
+#include "StackAndTile.h"
 #include "VirtualScreen.h"
 #include "WindowList.h"
 #include "Workspace.h"
@@ -246,6 +247,7 @@ public:
 
 			Window*				WindowForClientLooperPort(port_id port);
 
+			StackAndTile*		GetStackAndTile() { return &fStackAndTile; }
 private:
 			WindowList&			_Windows(int32 index);
 
@@ -350,6 +352,8 @@ private:
 			Window*				fFocus;
 			Window*				fFront;
 			Window*				fBack;
+
+			StackAndTile		fStackAndTile;
 };
 
 #endif	// DESKTOP_H

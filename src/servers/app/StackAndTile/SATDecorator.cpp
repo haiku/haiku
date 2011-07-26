@@ -49,39 +49,6 @@ static const rgb_color kHighlightTabColorShadow = tint_color(kHighlightTabColor,
 	(B_DARKEN_1_TINT + B_NO_TINT) / 2);
 
 
-SATDecorAddOn::SATDecorAddOn(image_id id, const char* name)
-	:
-	DecorAddOn(id, name)
-{
-	fDesktopListeners.AddItem(&fStackAndTile);
-}
-
-
-status_t
-SATDecorAddOn::InitCheck() const
-{
-	if (fDesktopListeners.CountItems() != 1)
-		return B_ERROR;
-
-	return B_OK;
-}
-
-
-WindowBehaviour*
-SATDecorAddOn::AllocateWindowBehaviour(Window* window)
-{
-	return new (std::nothrow)SATWindowBehaviour(window, &fStackAndTile);
-}
-
-
-Decorator*
-SATDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
-	window_look look, uint32 flags)
-{
-	return new (std::nothrow)SATDecorator(settings, rect, look, flags);
-}
-
-
 SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
 	window_look look, uint32 flags)
 	:
@@ -174,10 +141,4 @@ SATWindowBehaviour::AlterDeltaForSnap(Window* window, BPoint& delta,
 
 	return fMagneticBorder.AlterDeltaForSnap(window->Screen(),
 		groupFrame, delta, now);
-}
-
-
-extern "C" DecorAddOn* (instantiate_decor_addon)(image_id id, const char* name)
-{
-	return new (std::nothrow)SATDecorAddOn(id, name);
 }

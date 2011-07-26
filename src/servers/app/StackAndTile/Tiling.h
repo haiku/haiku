@@ -12,6 +12,7 @@
 
 #include "Decorator.h"
 #include "StackAndTile.h"
+#include "SATGroup.h"
 
 
 class SATWindow;

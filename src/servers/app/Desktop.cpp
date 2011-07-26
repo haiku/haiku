@@ -449,6 +449,8 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 	fLink.SetReceiverPort(fMessagePort);
 
 	// register listeners
+	RegisterListener(&fStackAndTile);
+
 	const DesktopListenerList& newListeners
 		= gDecorManager.GetDesktopListeners();
 	for (int i = 0; i < newListeners.CountItems(); i++)

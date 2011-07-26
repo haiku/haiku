@@ -12,6 +12,7 @@
 
 #include "StackAndTilePrivate.h"
 
+#include "Desktop.h"
 #include "SATWindow.h"
 #include "Window.h"
 

@@ -15,22 +15,6 @@
 #include "StackAndTile.h"
 
 
-class SATDecorAddOn : public DecorAddOn {
-public:
-								SATDecorAddOn(image_id id, const char* name);
-
-	virtual status_t			InitCheck() const;
-
-	virtual	WindowBehaviour*	AllocateWindowBehaviour(Window* window);
-
-protected:
-	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect, window_look look, uint32 flags);
-
-			StackAndTile		fStackAndTile;
-};
-
-
 class SATDecorator : public DefaultDecorator {
 public:
 			enum {

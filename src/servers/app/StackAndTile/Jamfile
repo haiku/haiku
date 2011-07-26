@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons decorators SATDecorator ;
+SubDir HAIKU_TOP src servers app StackAndTile ;
 
 UseLibraryHeaders agg lp_solve linprog ;
 UsePrivateHeaders app graphics interface shared kernel ;
@@ -10,20 +10,11 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseFreeTypeHeaders ;
 
-AddResources SATDecorator : resources.rdef ;
-
-Addon SATDecorator :
+StaticLibrary StackAndTile.a :
 	SATDecorator.cpp
 	SATGroup.cpp
 	SATWindow.cpp
 	StackAndTile.cpp
 	Stacking.cpp
 	Tiling.cpp
-
-	# libraries
-	:
-	libbe.so
-	<nogrist>app_server
-	$(TARGET_LIBSTDC++)
-	liblpsolve55.so liblinprog.a
 ;

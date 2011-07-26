@@ -14,9 +14,8 @@
 #include <Message.h>
 #include <MessageFilter.h>
 
-#include "Desktop.h"
+#include "DesktopListener.h"
 #include "ObjectList.h"
-#include "SATGroup.h"
 #include "WindowList.h"
 
 
@@ -29,8 +28,10 @@
 #endif
 
 
+class SATGroup;
 class SATWindow;
 class Window;
+class WindowArea;
 
 
 typedef std::map<Window*, SATWindow*> SATWindowMap;
@@ -106,7 +107,7 @@ private:
 			bool				fSATKeyPressed;
 		
 			SATWindowMap		fSATWindowMap;
-			SATWindowList		fGrouplessWindows;
+			BObjectList<SATWindow>	fGrouplessWindows;
 
 			SATWindow*			fCurrentSATWindow;
 };

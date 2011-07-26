@@ -13,6 +13,7 @@
 
 #include "StackAndTilePrivate.h"
 
+#include "Desktop.h"
 #include "SATGroup.h"
 #include "ServerApp.h"
 #include "Window.h"

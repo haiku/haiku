@@ -21,11 +21,10 @@
 #include <syslog.h>
 
 #include "AppServer.h"
-#include "DefaultDecorator.h"
-#include "DefaultWindowBehaviour.h"
 #include "Desktop.h"
 #include "DesktopSettings.h"
 #include "ServerConfig.h"
+#include "SATDecorator.h"
 #include "Window.h"
 
 typedef float get_version(void);
@@ -82,7 +81,8 @@ DecorAddOn::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
 WindowBehaviour*
 DecorAddOn::AllocateWindowBehaviour(Window* window)
 {
-	return new (std::nothrow)DefaultWindowBehaviour(window);
+	return new (std::nothrow)SATWindowBehaviour(window,
+		window->Desktop()->GetStackAndTile());
 }
 
 
@@ -97,7 +97,7 @@ Decorator*
 DecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
 	window_look look, uint32 flags)
 {
-	return new (std::nothrow)DefaultDecorator(settings, rect, look, flags);
+	return new (std::nothrow)SATDecorator(settings, rect, look, flags);
 }
 
 

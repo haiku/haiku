@@ -14,6 +14,8 @@
 #include <Debug.h>
 #include <Message.h>
 
+#include "Desktop.h"
+
 #include "SATWindow.h"
 #include "StackAndTile.h"
 #include "Window.h"
