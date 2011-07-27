@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	128117018
+1	finnish	x-vnd.Haiku-About	1190044815
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d mebitavua yhteensä
 %d MiB used (%d%%)	AboutView		%d mebitavua käytetty (%d%%)
@@ -6,6 +6,7 @@
 %ld Processors:	AboutView		%ld Suoritinta:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total mebitavua yhteensä, %inaccessible mebitavua luoksepääsemätön
 ... and the many people making donations!\n\n	AboutView		... ja monet lahjoituksia tehneet ihmiset!\n\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001, Andy Ritger perustuen Generalized Timing Formula -standardiin
 About this system	AboutWindow		Tietoa tästä järjestelmästä
 AboutSystem	System name		Järjestelmästä
 BSD (2-clause)	AboutView		BSD (2-ehto)
