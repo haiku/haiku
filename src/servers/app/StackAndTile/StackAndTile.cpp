@@ -115,10 +115,15 @@ StackAndTile::WindowRemoved(Window* window)
 bool
 StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 {
-	// switch to and from stacking and snapping mode
-	if (what == B_MODIFIERS_CHANGED) {
+	const int32 kRightOptionKey = 103;
+	if (what == B_MODIFIERS_CHANGED
+		|| (what == B_UNMAPPED_KEY_DOWN && key == kRightOptionKey)
+		|| (what == B_UNMAPPED_KEY_UP && key == kRightOptionKey)) {
+		// switch to and from stacking and snapping mode
 		bool wasPressed = fSATKeyPressed;
-		fSATKeyPressed = modifiers & B_OPTION_KEY;
+		fSATKeyPressed = (what == B_MODIFIERS_CHANGED
+			&& modifiers & B_OPTION_KEY)
+			|| (what == B_UNMAPPED_KEY_DOWN && key == kRightOptionKey);
 		if (wasPressed && !fSATKeyPressed)
 			_StopSAT();
 		if (!wasPressed && fSATKeyPressed)
