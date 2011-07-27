@@ -270,17 +270,12 @@ BeceemDevice::~BeceemDevice()
 	if (fNotifyWriteSem >= B_OK)
 		delete_sem(fNotifyWriteSem);
 
-	if (fNotifyBuffer != NULL)
-		free(fNotifyBuffer);
-			// Free notification buffer
-
-	if (pwmxdevice->nvmFlashCSInfo != NULL)
-		free(pwmxdevice->nvmFlashCSInfo);
-			// Free flash configuration structure
-
-	if (pwmxdevice != NULL)
-		free(pwmxdevice);
-			// Free malloc of wimax device struct
+	free(fNotifyBuffer);
+		// Free notification buffer
+	free(pwmxdevice->nvmFlashCSInfo);
+		// Free flash configuration structure
+	free(pwmxdevice);
+		// Free malloc of wimax device struct
 
 	mutex_destroy(&gUSBLock);
 
