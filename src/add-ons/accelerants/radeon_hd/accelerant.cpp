@@ -168,22 +168,24 @@ init_common(int device, bool isClone)
 static void
 uninit_common(void)
 {
-	delete_area(gInfo->regs_area);
-	delete_area(gInfo->shared_info_area);
+	if (gInfo != NULL) {
+		delete_area(gInfo->regs_area);
+		delete_area(gInfo->shared_info_area);
 
-	gInfo->regs_area = gInfo->shared_info_area = -1;
+		gInfo->regs_area = gInfo->shared_info_area = -1;
 
-	// close the file handle ONLY if we're the clone
-	if (gInfo->is_clone)
-		close(gInfo->device);
+		// close the file handle ONLY if we're the clone
+		if (gInfo->is_clone)
+			close(gInfo->device);
 
-	free(gInfo);
+		free(gInfo);
+	}
 
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		if (gDisplay[id]->regs != NULL)
+		if (gDisplay[id] != NULL) {
 			free(gDisplay[id]->regs);
-		if (gDisplay[id] != NULL)
 			free(gDisplay[id]);
+		}
 	}
 }
 
