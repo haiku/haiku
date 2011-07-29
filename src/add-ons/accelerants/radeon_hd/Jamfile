@@ -17,6 +17,7 @@ Addon radeon_hd.accelerant :
 	dac.cpp
 	display.cpp
 	tmds.cpp
+	lvds.cpp
 	mode.cpp
 	bios.cpp
 	create_display_modes.cpp

@@ -15,6 +15,7 @@
 #include "pll.h"
 #include "dac.h"
 #include "tmds.h"
+#include "lvds.h"
 
 
 #include <edid.h>
@@ -89,6 +90,7 @@ typedef struct {
 	uint32			connection_type;
 	uint8			connection_id;
 	register_info	*regs;
+	bool			found_ranges;
 	uint32			vfreq_max;
 	uint32			vfreq_min;
 	uint32			hfreq_max;
@@ -99,7 +101,7 @@ typedef struct {
 // display_info connection_type
 #define CONNECTION_DAC			0x0001
 #define CONNECTION_TMDS			0x0002
-#define CONNECTION_LVDS			0x0003
+#define CONNECTION_LVDS			0x0004
 
 // register MMIO modes
 #define OUT 0x1	// direct MMIO calls

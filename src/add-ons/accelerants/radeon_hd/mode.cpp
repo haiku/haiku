@@ -149,7 +149,6 @@ CardFBSet(uint8 crtid, display_mode *mode)
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
-
 	#if 0
 	// TMDSAllIdle	// DVI / HDMI
 	// LVTMAAllIdle	// DVI
@@ -249,9 +248,10 @@ CardModeSet(uint8 crtid, display_mode *mode)
 		displayTiming.h_total - 1);
 
 	// Blanking
-	uint16 blankStart = displayTiming.h_total
-		+ displayTiming.h_display - displayTiming.h_sync_start;
-	uint16 blankEnd = displayTiming.h_total - displayTiming.h_sync_start;
+	uint16 blankStart = MIN(displayTiming.h_sync_start,
+		displayTiming.h_display);
+	uint16 blankEnd = MAX(displayTiming.h_sync_end,
+		displayTiming.h_total);
 
 	Write32(CRT, regs->crtHBlank,
 		blankStart | (blankEnd << 16));
@@ -267,9 +267,10 @@ CardModeSet(uint8 crtid, display_mode *mode)
 	Write32(CRT, regs->crtVTotal,
 		displayTiming.v_total - 1);
 
-	blankStart = displayTiming.v_total
-		+ displayTiming.v_display - displayTiming.v_sync_start;
-	blankEnd = displayTiming.v_total - displayTiming.v_sync_start;
+	blankStart = MIN(displayTiming.v_sync_start,
+		displayTiming.v_display);
+	blankEnd = MAX(displayTiming.v_sync_end,
+		displayTiming.v_total);
 
 	Write32(CRT, regs->crtVBlank,
 		blankStart | (blankEnd << 16));
@@ -345,6 +346,9 @@ radeon_set_display_mode(display_mode *mode)
 	} else if ((gDisplay[display_id]->connection_type & CONNECTION_TMDS) != 0) {
 		TMDSSet(gDisplay[display_id]->connection_id, mode);
 		TMDSPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
+	} else if ((gDisplay[display_id]->connection_type & CONNECTION_LVDS) != 0) {
+		LVDSSet(gDisplay[display_id]->connection_id, mode);
+		LVDSPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
 	}
 
 	// Ensure screen isn't blanked
@@ -429,7 +433,8 @@ is_mode_supported(display_mode *mode)
 	uint32 crtid = 0;
 
 	// if we have edid info, check frequency adginst crt reported valid ranges
-	if (gInfo->shared_info->has_edid) {
+	if (gInfo->shared_info->has_edid
+		&& gDisplay[crtid]->found_ranges) {
 
 		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
 		if (hfreq > gDisplay[crtid]->hfreq_max + 1
@@ -453,9 +458,10 @@ is_mode_supported(display_mode *mode)
 				mode->timing.h_display, mode->timing.v_display, crtid);
 			return false;
 		}
-		TRACE("%dx%d is within CRT %d's valid frequency range\n",
-			mode->timing.h_display, mode->timing.v_display, crtid);
 	}
+
+	TRACE("%dx%d is within CRT %d's valid frequency range\n",
+		mode->timing.h_display, mode->timing.v_display, crtid);
 
 	return true;
 }

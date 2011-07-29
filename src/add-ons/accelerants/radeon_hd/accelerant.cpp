@@ -209,16 +209,16 @@ radeon_init_accelerant(int device)
 	init_lock(&info.engine_lock, "radeon hd engine");
 
 	status = detect_displays();
-	if (status != B_OK)
-		return status;
+	//if (status != B_OK)
+	//	return status;
 
 	debug_displays();
 
 	status = create_mode_list();
-	if (status != B_OK) {
-		uninit_common();
-		return status;
-	}
+	//if (status != B_OK) {
+	//	radeon_uninit_accelerant();
+	//	return status;
+	//}
 
 	TRACE("%s done\n", __func__);
 	return B_OK;

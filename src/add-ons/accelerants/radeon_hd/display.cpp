@@ -216,8 +216,10 @@ status_t
 detect_displays()
 {
 	// reset known displays
-	for (uint32 id = 0; id < MAX_DISPLAY; id++)
+	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		gDisplay[id]->active = false;
+		gDisplay[id]->found_ranges = false;
+	}
 
 	uint32 index = 0;
 
@@ -228,7 +230,9 @@ detect_displays()
 			gDisplay[index]->connection_type = CONNECTION_DAC;
 			gDisplay[index]->connection_id = id;
 			init_registers(gDisplay[index]->regs, index);
-			detect_crt_ranges(index);
+			if (detect_crt_ranges(index) == B_OK)
+				gDisplay[index]->found_ranges = true;
+
 			if (index < MAX_DISPLAY)
 				index++;
 			else
@@ -243,12 +247,23 @@ detect_displays()
 			gDisplay[index]->connection_type = CONNECTION_TMDS;
 			gDisplay[index]->connection_id = id;
 			init_registers(gDisplay[index]->regs, index);
-			detect_crt_ranges(index);
+			if (detect_crt_ranges(index) == B_OK)
+				gDisplay[index]->found_ranges = true;
+
 			if (index < MAX_DISPLAY)
 				index++;
 			else
 				return B_OK;
 		}
+	}
+
+	// No monitors? Lets assume LVDS for now
+	if (index == 0) {
+		gDisplay[index]->active = true;
+		gDisplay[index]->connection_type = CONNECTION_LVDS;
+		gDisplay[index]->connection_id = 1;
+			// 0 : LVDSA ; 1 : LVDSB / TDMSB
+		init_registers(gDisplay[index]->regs, index);
 	}
 
 	return B_OK;
