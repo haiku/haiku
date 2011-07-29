@@ -128,7 +128,6 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 static void
 CardBlankSet(uint8 crtid, bool blank)
 {
-	return;
 	int blackColorReg
 		= crtid == 1 ? D2CRTC_BLACK_COLOR : D1CRTC_BLACK_COLOR;
 	int blankControlReg
