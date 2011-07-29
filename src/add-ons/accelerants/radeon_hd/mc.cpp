@@ -65,9 +65,10 @@ MCFBSetup(uint32 newFbLocation, uint32 newFbSize)
 		return B_OK;
 	}
 
-	if (oldFbLocation >> 32)
+	if (oldFbLocation >> 32) {
 		TRACE("%s: board claims to use a frame buffer address > 32-bits\n",
 			__func__);
+	}
 
 	uint32 idleState = MCIdle();
 	if (idleState > 0) {

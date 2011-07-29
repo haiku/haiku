@@ -28,6 +28,7 @@
 void LVDSVoltageControl(uint8 lvdsIndex);
 void LVDSPower(uint8 lvdsIndex, int command);
 status_t LVDSSet(uint8 lvdsIndex, display_mode *mode);
+void LVDSAllIdle();
 
 
 #endif /* RADEON_HD_LVDS_H */

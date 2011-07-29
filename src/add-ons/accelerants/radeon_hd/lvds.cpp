@@ -258,3 +258,10 @@ LVDSSet(uint8 lvdsIndex, display_mode *mode)
 
 	return B_OK;
 }
+
+
+void
+LVDSAllIdle()
+{
+	LVDSPower(1, RHD_POWER_RESET);
+}

@@ -128,6 +128,7 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 static void
 CardBlankSet(uint8 crtid, bool blank)
 {
+	return;
 	int blackColorReg
 		= crtid == 1 ? D2CRTC_BLACK_COLOR : D1CRTC_BLACK_COLOR;
 	int blankControlReg
@@ -149,34 +150,34 @@ CardFBSet(uint8 crtid, display_mode *mode)
 
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
 
-	#if 0
-	// TMDSAllIdle	// DVI / HDMI
-	// LVTMAAllIdle	// DVI
+	LVDSAllIdle();
+		// DVI / HDMI / LCD
+	TMDSAllIdle();
+		// DVI / HDMI
 	DACAllIdle();
+		// VGA
+
+	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
+	//uint64 fbAddress = gInfo->shared_info->frame_buffer_phys;
+	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
 
 	// Set the inital frame buffer location in the memory controler
 	uint32 mcFbSize;
-	MCFBLocation(0, &mcFbSize);
-	MCFBSetup(Read32(OUT, R6XX_CONFIG_FB_BASE), mcFbSize);
-	#endif
+	MCFBLocation(fbAddressInt, &mcFbSize);
+	//MCFBSetup(gInfo->shared_info->frame_buffer_int, mcFbSize);
 
 	Write32(CRT, regs->grphUpdate, (1<<16));
 		// Lock for update (isn't this normally the other way around on VGA?
 
-	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
-	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
-
 	// Tell GPU which frame buffer address to draw from
-	Write32(CRT, regs->grphPrimarySurfaceAddr,
-		fbAddress & 0xffffffff);
-	Write32(CRT, regs->grphSecondarySurfaceAddr,
-		fbAddress & 0xffffffff);
+	Write32(CRT, regs->grphPrimarySurfaceAddr, fbAddressInt & 0xffffffff);
+	Write32(CRT, regs->grphSecondarySurfaceAddr, fbAddressInt & 0xffffffff);
 
 	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
 		Write32(CRT, regs->grphPrimarySurfaceAddrHigh,
-			(fbAddress >> 32) & 0xf);
+			(fbAddressInt >> 32) & 0xf);
 		Write32(CRT, regs->grphSecondarySurfaceAddrHigh,
-			(fbAddress >> 32) & 0xf);
+			(fbAddressInt >> 32) & 0xf);
 	}
 
 	Write32(CRT, regs->grphControl, 0);
@@ -248,10 +249,9 @@ CardModeSet(uint8 crtid, display_mode *mode)
 		displayTiming.h_total - 1);
 
 	// Blanking
-	uint16 blankStart = MIN(displayTiming.h_sync_start,
-		displayTiming.h_display);
-	uint16 blankEnd = MAX(displayTiming.h_sync_end,
-		displayTiming.h_total);
+	uint16 blankStart = displayTiming.h_total - displayTiming.h_sync_start;
+	uint16 blankEnd = displayTiming.h_total
+		+ displayTiming.h_display - displayTiming.h_sync_start;
 
 	Write32(CRT, regs->crtHBlank,
 		blankStart | (blankEnd << 16));
@@ -267,10 +267,10 @@ CardModeSet(uint8 crtid, display_mode *mode)
 	Write32(CRT, regs->crtVTotal,
 		displayTiming.v_total - 1);
 
-	blankStart = MIN(displayTiming.v_sync_start,
-		displayTiming.v_display);
-	blankEnd = MAX(displayTiming.v_sync_end,
-		displayTiming.v_total);
+	// Blanking
+	blankStart = displayTiming.v_total - displayTiming.v_sync_start;
+	blankEnd = displayTiming.v_total
+		+ displayTiming.v_display - displayTiming.v_sync_start;
 
 	Write32(CRT, regs->crtVBlank,
 		blankStart | (blankEnd << 16));

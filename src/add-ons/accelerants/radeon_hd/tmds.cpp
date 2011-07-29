@@ -224,3 +224,10 @@ TMDSSet(uint8 tmdsIndex, display_mode *mode)
 	// TODO : HdmiSetMode(mode)
 	return B_OK;
 }
+
+
+void
+TMDSAllIdle()
+{
+	TMDSPower(0, RHD_POWER_RESET);
+}
