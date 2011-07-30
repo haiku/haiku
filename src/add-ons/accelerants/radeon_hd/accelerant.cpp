@@ -18,6 +18,7 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -250,8 +251,11 @@ radeon_get_accelerant_device_info(accelerant_device_info *di)
 {
 	di->version = B_ACCELERANT_VERSION;
 	strcpy(di->name, gInfo->shared_info->device_identifier);
-	strcpy(di->chipset, "radeon_hd");
-		// TODO : Give chipset, ex: r600
+
+	char chipset[32];
+	sprintf(chipset, "r%X", gInfo->shared_info->device_chipset);
+	strcpy(di->chipset, chipset);
+
 	strcpy(di->serial_no, "None" );
 
 	di->memory = gInfo->shared_info->graphics_memory_size;
