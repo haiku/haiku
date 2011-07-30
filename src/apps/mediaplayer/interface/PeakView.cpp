@@ -40,7 +40,7 @@ enum {
 
 PeakView::PeakView(const char* name, bool useGlobalPulse, bool displayLabels)
 	:
-	BView(name, (useGlobalPulse ? 0 : B_PULSE_NEEDED)
+	BView(name, (useGlobalPulse ? B_PULSE_NEEDED : 0)
 		| B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fUseGlobalPulse(useGlobalPulse),
 	fDisplayLabels(displayLabels),
