@@ -28,17 +28,6 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
-uint64
-MCFBLocation(uint16 chipset, uint32* size)
-{
-	// TODO : R800 : This is only valid for all R6xx and R7xx?
-	uint32 fbLocationReg = Read32(MC, R7XX_MC_VM_FB_LOCATION);
-	*size = (((fbLocationReg & 0xFFFF0000)
-		- ((fbLocationReg & 0xFFFF) << 16))) << 8;
-	return (fbLocationReg & 0xFFFF) << 24;
-}
-
-
 uint32
 MCIdle()
 {
@@ -53,22 +42,15 @@ MCIdle()
 
 
 status_t
-MCFBSetup(uint32 newFbLocation, uint32 newFbSize)
+MCFBSetup()
 {
-	uint32 oldFbSize;
-	uint64 oldFbLocation = MCFBLocation(0, &oldFbSize);
+	uint32 fb_location_int = gInfo->shared_info->frame_buffer_int;
 
-	if (oldFbLocation == newFbLocation
-		&& oldFbSize == newFbSize) {
-		TRACE("%s: not adjusting frame buffer as it is already correct\n",
-			__func__);
-		return B_OK;
-	}
-
-	if (oldFbLocation >> 32) {
-		TRACE("%s: board claims to use a frame buffer address > 32-bits\n",
-			__func__);
-	}
+	uint32 fb_location = Read32(OUT, R6XX_MC_VM_FB_LOCATION);
+	uint16 fb_size = (fb_location >> 16) - (fb_location & 0xFFFF);
+	uint32 fb_location_tmp = fb_location_int >> 24;
+	fb_location_tmp |= (fb_location_tmp + fb_size) << 16;
+	uint32 fb_offset_tmp = (fb_location_int >> 8) & 0xff0000;
 
 	uint32 idleState = MCIdle();
 	if (idleState > 0) {
@@ -77,13 +59,12 @@ MCFBSetup(uint32 newFbLocation, uint32 newFbSize)
 		return B_ERROR;
 	}
 
-	TRACE("%s: Setting MC/FB from 0x%08X to 0x%08X [size 0x%08X]\n",
-		__func__, oldFbLocation, newFbLocation, newFbSize);
+	TRACE("%s: Setting frame buffer from 0x%08X to 0x%08X [size 0x%08X]\n",
+		__func__, fb_location, fb_location_tmp, fb_size);
 
 	// The MC Write32 will handle cards needing a special MC read/write register
-	Write32(MC, R6XX_MC_VM_FB_LOCATION,
-		R6XX_FB_LOCATION(newFbLocation, newFbSize));
-	Write32(MC, R6XX_HDP_NONSURFACE_BASE, R6XX_HDP_LOCATION(newFbLocation));
+	Write32(MC, R6XX_MC_VM_FB_LOCATION, fb_location_tmp);
+	Write32(MC, R6XX_HDP_NONSURFACE_BASE, fb_offset_tmp);
 
 	return B_OK;
 }

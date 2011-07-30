@@ -15,6 +15,7 @@
 #include "accelerant.h"
 #include "utility.h"
 #include "mode.h"
+#include "display.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -157,20 +158,16 @@ CardFBSet(uint8 crtid, display_mode *mode)
 		// VGA
 
 	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
-	//uint64 fbAddress = gInfo->shared_info->frame_buffer_phys;
 	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
 
-	// Set the inital frame buffer location in the memory controler
-	uint32 mcFbSize;
-	MCFBLocation(fbAddressInt, &mcFbSize);
-	//MCFBSetup(gInfo->shared_info->frame_buffer_int, mcFbSize);
+	MCFBSetup();
 
 	Write32(CRT, regs->grphUpdate, (1<<16));
 		// Lock for update (isn't this normally the other way around on VGA?
 
 	// Tell GPU which frame buffer address to draw from
-	Write32(CRT, regs->grphPrimarySurfaceAddr, fbAddressInt & 0xffffffff);
-	Write32(CRT, regs->grphSecondarySurfaceAddr, fbAddressInt & 0xffffffff);
+	Write32(CRT, regs->grphPrimarySurfaceAddr, fbAddressInt & 0xFFFFFFFF);
+	//Write32(CRT, regs->grphSecondarySurfaceAddr, fbAddressInt);
 
 	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
 		Write32(CRT, regs->grphPrimarySurfaceAddrHigh,
@@ -247,13 +244,15 @@ CardModeSet(uint8 crtid, display_mode *mode)
 	Write32(CRT, regs->crtHTotal,
 		displayTiming.h_total - 1);
 
+	/*
 	// Blanking
-	uint16 blankStart = displayTiming.h_total - displayTiming.h_sync_start;
-	uint16 blankEnd = displayTiming.h_total
+	uint16 blankStart = displayTiming.h_total
 		+ displayTiming.h_display - displayTiming.h_sync_start;
+	uint16 blankEnd = displayTiming.h_total - displayTiming.h_sync_start;
 
 	Write32(CRT, regs->crtHBlank,
 		blankStart | (blankEnd << 16));
+	*/
 
 	Write32(CRT, regs->crtHSync,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
@@ -266,13 +265,15 @@ CardModeSet(uint8 crtid, display_mode *mode)
 	Write32(CRT, regs->crtVTotal,
 		displayTiming.v_total - 1);
 
+	/*
 	// Blanking
-	blankStart = displayTiming.v_total - displayTiming.v_sync_start;
-	blankEnd = displayTiming.v_total
+	blankStart = displayTiming.v_total
 		+ displayTiming.v_display - displayTiming.v_sync_start;
+	blankEnd = displayTiming.v_total - displayTiming.v_sync_start;
 
 	Write32(CRT, regs->crtVBlank,
 		blankStart | (blankEnd << 16));
+	*/
 
 	// Set Interlace if specified within mode line
 	if (displayTiming.flags & B_TIMING_INTERLACED) {
@@ -303,7 +304,6 @@ CardModeScale(uint8 crtid, display_mode *mode)
 	register_info* regs = gDisplay[crtid]->regs;
 
 	// No scaling
-	Write32(CRT, regs->sclUpdate, (1<<16));// Lock
 
 	#if 0
 	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
@@ -315,43 +315,75 @@ CardModeScale(uint8 crtid, display_mode *mode)
 	Write32(CRT, regs->viewportStart, 0);
 	Write32(CRT, regs->viewportSize,
 		mode->timing.v_display | (mode->timing.h_display << 16));
+
 	Write32(CRT, regs->sclEnable, 0);
 	Write32(CRT, regs->sclTapControl, 0);
 	Write32(CRT, regs->modeCenter, 2);
 	// D1MODE_DATA_FORMAT?
-	Write32(CRT, regs->sclUpdate, 0);		// Unlock
 }
 
 
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	uint8 display_id = 0;
+	// Disable VGA (boo, hiss)
+	Write32Mask(OUT, VGA_RENDER_CONTROL, 0, 0x00030000);
+	Write32Mask(OUT, VGA_MODE_CONTROL, 0, 0x00000030);
+	Write32Mask(OUT, VGA_HDP_CONTROL, 0x00010010, 0x00010010);
+	Write32(OUT, D1VGA_CONTROL, 0);
+	Write32(OUT, D2VGA_CONTROL, 0);
 
-	CardFBSet(display_id, mode);
-	CardModeSet(display_id, mode);
-	CardModeScale(display_id, mode);
+	// TODO : We set the same VESA EDID mode on each display
 
-	// If this is DAC, set our PLL
-	if ((gDisplay[display_id]->connection_type & CONNECTION_DAC) != 0) {
-		PLLSet(gDisplay[display_id]->connection_id, mode->timing.pixel_clock);
-		DACSet(gDisplay[display_id]->connection_id, display_id);
+	// Set mode on each display
+	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+		// Skip if display is inactive
+		if (gDisplay[id]->active == false) {
+			CardBlankSet(id, true);
+			display_power(id, RHD_POWER_ON);
+			continue;
+		}
 
-		// TODO : Shutdown unused PLL/DAC
+		// Program CRT Controller
+		CardFBSet(id, mode);
+		CardModeSet(id, mode);
+		CardModeScale(id, mode);
 
-		// Power up the output
-		PLLPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
-		DACPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
-	} else if ((gDisplay[display_id]->connection_type & CONNECTION_TMDS) != 0) {
-		TMDSSet(gDisplay[display_id]->connection_id, mode);
-		TMDSPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
-	} else if ((gDisplay[display_id]->connection_type & CONNECTION_LVDS) != 0) {
-		LVDSSet(gDisplay[display_id]->connection_id, mode);
-		LVDSPower(gDisplay[display_id]->connection_id, RHD_POWER_ON);
+		display_power(id, RHD_POWER_RESET);
+
+		// Program connector controllers
+		switch (gDisplay[id]->connection_type) {
+			case CONNECTION_DAC:
+				PLLSet(gDisplay[id]->connection_id,
+					mode->timing.pixel_clock);
+				DACSet(gDisplay[id]->connection_id, id);
+				break;
+			case CONNECTION_TMDS:
+				TMDSSet(gDisplay[id]->connection_id, mode);
+				break;
+			case CONNECTION_LVDS:
+				LVDSSet(gDisplay[id]->connection_id, mode);
+				break;
+		}
+
+		// Power CRT Controller
+		display_power(id, RHD_POWER_ON);
+		CardBlankSet(id, false);
+
+		// Power connector controllers
+		switch (gDisplay[id]->connection_type) {
+			case CONNECTION_DAC:
+				PLLPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+				DACPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+				break;
+			case CONNECTION_TMDS:
+				TMDSPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+				break;
+			case CONNECTION_LVDS:
+				LVDSPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+				break;
+		}
 	}
-
-	// Ensure screen isn't blanked
-	CardBlankSet(display_id, false);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);

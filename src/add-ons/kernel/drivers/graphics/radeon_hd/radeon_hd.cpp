@@ -102,6 +102,8 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->frame_buffer_int
 		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
+	strcpy(info.shared_info->device_identifier, info.device_identifier);
+
 	// Pull active monitor VESA EDID from boot loader
 	edid1_info* edidInfo = (edid1_info*)get_boot_item(EDID_BOOT_INFO,
 		NULL);

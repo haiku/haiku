@@ -244,3 +244,16 @@ radeon_uninit_accelerant(void)
 	TRACE("%s done\n", __func__);
 }
 
+
+status_t
+radeon_get_accelerant_device_info(accelerant_device_info *di)
+{
+	di->version = B_ACCELERANT_VERSION;
+	strcpy(di->name, gInfo->shared_info->device_identifier);
+	strcpy(di->chipset, "radeon_hd");
+		// TODO : Give chipset, ex: r600
+	strcpy(di->serial_no, "None" );
+
+	di->memory = gInfo->shared_info->graphics_memory_size;
+	return B_OK;
+}

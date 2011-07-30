@@ -26,11 +26,14 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)radeon_accelerant_clone_info_size;
 		case B_GET_ACCELERANT_CLONE_INFO:
 			return (void*)radeon_get_accelerant_clone_info;
+		*/
 		case B_GET_ACCELERANT_DEVICE_INFO:
 			return (void*)radeon_get_accelerant_device_info;
+		/*
 		case B_ACCELERANT_RETRACE_SEMAPHORE:
 			return (void*)radeon_accelerant_retrace_semaphore;
-*/
+		*/
+
 		/* mode configuration */
 		case B_ACCELERANT_MODE_COUNT:
 			return (void*)radeon_accelerant_mode_count;

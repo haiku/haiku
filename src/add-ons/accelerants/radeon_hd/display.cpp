@@ -301,3 +301,30 @@ debug_displays()
 
 }
 
+
+void
+display_power(uint8 crtid, int command)
+{
+	register_info* regs = gDisplay[crtid]->regs;
+
+	switch (command) {
+		case RHD_POWER_ON:
+			Write32Mask(OUT, regs->grphEnable, 0x00000001, 0x00000001);
+			snooze(2);
+			Write32Mask(OUT, regs->crtControl, 0, 0x01000000);
+				// Enable read requests
+			Write32Mask(OUT, regs->crtControl, 1, 1);
+			return;
+		case RHD_POWER_RESET:
+			Write32Mask(OUT, regs->crtControl, 0x01000000, 0x01000000);
+				// Disable read requestes
+			//D1CRTCDisable?
+			return;
+		case RHD_POWER_SHUTDOWN:
+			Write32Mask(OUT, regs->crtControl, 0x01000000, 0x01000000);
+				// Disable read requests
+			//D1CRTCDisable?
+			Write32Mask(OUT, regs->grphEnable, 0x00000001, 0x00000001);
+			return;
+	}
+}
