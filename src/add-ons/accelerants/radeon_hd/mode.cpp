@@ -340,7 +340,7 @@ radeon_set_display_mode(display_mode *mode)
 		// Skip if display is inactive
 		if (gDisplay[id]->active == false) {
 			CardBlankSet(id, true);
-			display_power(id, RHD_POWER_ON);
+			display_power(id, RHD_POWER_SHUTDOWN);
 			continue;
 		}
 
