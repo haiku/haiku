@@ -1191,10 +1191,8 @@ intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 		uint32 color = colors[0] << 16 | colors[1] << 8 | colors[2];
 		colors += 3;
 
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_PALETTE + first * sizeof(uint32), color);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_PALETTE + first * sizeof(uint32), color);
+		write32(INTEL_DISPLAY_A_PALETTE + first * sizeof(uint32), color);
+		write32(INTEL_DISPLAY_B_PALETTE + first * sizeof(uint32), color);
 	}
 }
 
