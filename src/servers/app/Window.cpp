@@ -2084,8 +2084,10 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 
 	BRegion dirty;
 	::Decorator* decorator = fCurrentStack->Decorator();
-	if (decorator != NULL)
+	if (decorator != NULL) {
 		decorator->RemoveTab(index, &dirty);
+		decorator->SetTopTap(fCurrentStack->LayerOrder().CountItems() - 1);
+	}
 
 	Window* remainingTop = fCurrentStack->TopLayerWindow();
 	if (remainingTop != NULL) {
