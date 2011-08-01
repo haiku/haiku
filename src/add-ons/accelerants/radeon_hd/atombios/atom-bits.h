@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 Advanced Micro Devices, Inc.  
+ * Copyright 2008 Advanced Micro Devices, Inc.  
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -18,29 +18,31 @@
  * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Author: Stanislaw Skowronek
  */
 
-#ifdef NT_BUILD
-#ifdef LH_BUILD
-#include <ntddk.h>
-#else
-#include <miniport.h>
-#endif // LH_BUILD
-#endif // NT_BUILD
+#ifndef ATOM_BITS_H
+#define ATOM_BITS_H
 
+static inline uint8_t get_u8(void *bios, int ptr)
+{
+    return ((unsigned char *)bios)[ptr];
+}
+#define U8(ptr) get_u8(ctx->ctx->bios,(ptr))
+#define CU8(ptr) get_u8(ctx->bios,(ptr))
+static inline uint16_t get_u16(void *bios, int ptr)
+{
+    return get_u8(bios,ptr)|(((uint16_t)get_u8(bios,ptr+1))<<8);
+}
+#define U16(ptr) get_u16(ctx->ctx->bios,(ptr))
+#define CU16(ptr) get_u16(ctx->bios,(ptr))
+static inline uint32_t get_u32(void *bios, int ptr)
+{
+    return get_u16(bios,ptr)|(((uint32_t)get_u16(bios,ptr+2))<<16);
+}
+#define U32(ptr) get_u32(ctx->ctx->bios,(ptr))
+#define CU32(ptr) get_u32(ctx->bios,(ptr))
+#define CSTR(ptr) (((char *)(ctx->bios))+(ptr))
 
-#if ((defined DBG) || (defined DEBUG))
-#define DEBUG_PARSER				1   // enable parser debug output
 #endif
-
-#define USE_SWITCH_COMMAND			1
-#define	DRIVER_TYPE_PARSER		0x48
-
-#define PARSER_TYPE DRIVER_TYPE_PARSER
-
-#define AllocateWorkSpace(x,y)      AllocateMemory(pDeviceData,y)
-#define FreeWorkSpace(x,y)          ReleaseMemory(x,y)
-
-#define RELATIVE_TO_BIOS_IMAGE( x ) ((ULONG_PTR)x + (ULONG_PTR)((DEVICE_DATA*)pParserTempData->pDeviceData->pBIOS_Image))
-#define RELATIVE_TO_TABLE( x )      (x + (UCHAR *)(pParserTempData->pWorkingTableData->pTableHead))
-

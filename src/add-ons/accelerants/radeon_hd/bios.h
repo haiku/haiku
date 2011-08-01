@@ -13,10 +13,14 @@
 
 // AtomBios includes
 extern "C" {
-#include "CD_Common_Types.h"
-#include "CD_Definitions.h"
-#include "atombios.h"
+//#include "atom.h"
 }
+
+
+struct bios_info {
+	uint32 location;
+	uint32 size;
+};
 
 
 status_t AtomParser(void *parameterSpace, uint8_t index,
