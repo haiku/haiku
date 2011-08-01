@@ -163,7 +163,7 @@ BWindowStack::HasWindow(const BMessenger& window)
 	int32 code = B_ERROR;
 	fLink->FlushWithReply(code);
 	if (code != B_OK)
-		return code;
+		return false;
 
 	bool hasWindow;
 	if (fLink->Read<bool>(&hasWindow) != B_OK)
@@ -205,5 +205,6 @@ BWindowStack::_StartMessage(int32 what)
 {
 	fLink->StartMessage(AS_TALK_TO_DESKTOP_LISTENER);
 	fLink->Attach<int32>(kMagicSATIdentifier);
+	fLink->Attach<int32>(kStacking);
 	return fLink->Attach<int32>(what);
 }

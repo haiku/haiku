@@ -2643,7 +2643,7 @@ Desktop::AllWindows()
 Window*
 Desktop::WindowForClientLooperPort(port_id port)
 {
-	ASSERT(fWindowLock.IsReadLocked());
+	ASSERT_MULTI_LOCKED(fWindowLock);
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
