@@ -1477,9 +1477,9 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 					byte = 0;
 
 				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-					|| byte == B_HANKAKU_ZENKAKU) {
-					if (SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY)) == B_OK)
-					{
+						|| byte == B_HANKAKU_ZENKAKU) {
+					if (SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY))
+							== B_OK)	{
 						// this event isn't sent to the user
 						events.RemoveItemAt(index);
 						delete event;
