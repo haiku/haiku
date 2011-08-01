@@ -129,7 +129,8 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 		if (!wasPressed && fSATKeyPressed)
 			_StartSAT();
 	}
-
+// switch off group navigation because it clashes with tracker...
+return false;
 	if (!SATKeyPressed() || (modifiers & B_COMMAND_KEY) == 0
 		|| what != B_KEY_DOWN)
 		return false;
@@ -216,6 +217,12 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 {
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow || !satWindow->GetDecorator())
+		return;
+
+	// fCurrentSATWindow is not zero if e.g. the secondary and the primary
+	// mouse button are pressed at the same time
+	if ((message->FindInt32("buttons") & B_PRIMARY_MOUSE_BUTTON) == 0 ||
+		fCurrentSATWindow != NULL)
 		return;
 
 	// we are only interested in single clicks
