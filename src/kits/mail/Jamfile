@@ -13,6 +13,7 @@ UsePrivateHeaders textencoding ;
 
 
 local sources =
+	b_mail_message.cpp
 	c_mail_api.cpp
 	crypt.cpp
 	des.c
