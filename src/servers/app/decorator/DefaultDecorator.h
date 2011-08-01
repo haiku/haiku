@@ -181,6 +181,7 @@ private:
 									Decorator::Tab* tab = NULL);
 
 	inline	float				_DefaultTextOffset() const;
+	inline	float				_SingleTabOffsetAndSize(float& tabSize);
 
 			void				_CalculateTabsRegion();
 protected:

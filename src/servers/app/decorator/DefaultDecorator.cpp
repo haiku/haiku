@@ -452,9 +452,12 @@ DefaultDecorator::_DoLayout()
 void
 DefaultDecorator::_DoTabLayout()
 {
-	float tabPosition = 0;
-	if (fTabList.CountItems() == 1)
-		tabPosition = _TabAt(0)->tabOffset;
+	float tabOffset = 0;
+	if (fTabList.CountItems() == 1) {
+		float tabSize;
+		tabOffset = _SingleTabOffsetAndSize(tabSize);
+	}
+
 	float sumTabWidth = 0;
 	// calculate our tab rect
 	for (int32 i = 0; i < fTabList.CountItems(); i++) {
@@ -524,15 +527,15 @@ DefaultDecorator::_DoTabLayout()
 
 		// make sure fTabOffset is within limits and apply it to
 		// the tabRect
-		if (tab->tabLocation != 0.0
+		tab->tabOffset = (uint32)tabOffset;
+		if (tab->tabLocation != 0.0 && fTabList.CountItems() == 1
 			&& tab->tabOffset > (fRightBorder.right - fLeftBorder.left
 				- tabRect.Width())) {
 			tab->tabOffset = uint32(fRightBorder.right - fLeftBorder.left
 				- tabRect.Width());
 		}
-		tab->tabOffset = (uint32)tabPosition;
 		tabRect.OffsetBy(tab->tabOffset, 0);
-		tabPosition += tabRect.Width();
+		tabOffset += tabRect.Width();
 
 		sumTabWidth += tabRect.Width();
 	}
@@ -1253,17 +1256,8 @@ DefaultDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 		BRect oldTabRect(tabRect);
 
 		float tabSize;
-		float maxLocation;
-		if (fLook != kLeftTitledWindowLook) {
-			tabSize = fRightBorder.right - fLeftBorder.left;
-		} else {
-			tabSize = fBottomBorder.bottom - fTopBorder.top;
-		}
-		maxLocation = tabSize - tab->maxTabSize;
-		if (maxLocation < 0)
-			maxLocation = 0;
+		float tabOffset = _SingleTabOffsetAndSize(tabSize);
 
-		float tabOffset = floorf(tab->tabLocation * maxLocation);
 		float delta = tabOffset - tab->tabOffset;
 		tab->tabOffset = (uint32)tabOffset;
 		if (fLook != kLeftTitledWindowLook)
@@ -1885,6 +1879,24 @@ DefaultDecorator::_DefaultTextOffset() const
 {
 	return (fLook == B_FLOATING_WINDOW_LOOK
 		|| fLook == kLeftTitledWindowLook) ? 10 : 18;
+}
+
+
+float
+DefaultDecorator::_SingleTabOffsetAndSize(float& tabSize)
+{
+	float maxLocation;
+	if (fLook != kLeftTitledWindowLook) {
+		tabSize = fRightBorder.right - fLeftBorder.left;
+	} else {
+		tabSize = fBottomBorder.bottom - fTopBorder.top;
+	}
+	DefaultDecorator::Tab* tab = _TabAt(0);
+	maxLocation = tabSize - tab->maxTabSize;
+	if (maxLocation < 0)
+		maxLocation = 0;
+
+	return floorf(tab->tabLocation * maxLocation);
 }
 
 
