@@ -25,10 +25,23 @@
 #ifndef ATOM_H
 #define ATOM_H
 
+
 #ifndef __HAIKU__
 #include <linux/types.h>
-#endif
 #include "card.h"
+#else
+struct card_info {
+    struct drm_device *dev;
+    void (* reg_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
+        uint32_t (* reg_read)(struct card_info *, uint32_t);          /*  filled by driver */
+    void (* ioreg_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
+        uint32_t (* ioreg_read)(struct card_info *, uint32_t);          /*  filled by driver */
+    void (* mc_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
+        uint32_t (* mc_read)(struct card_info *, uint32_t);          /*  filled by driver */
+    void (* pll_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
+        uint32_t (* pll_read)(struct card_info *, uint32_t);          /*  filled by driver */
+};
+#endif
 
 #define ATOM_BIOS_MAGIC		0xAA55
 #define ATOM_ATI_MAGIC_PTR	0x30

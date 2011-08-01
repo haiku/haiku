@@ -13,7 +13,7 @@
 
 // AtomBios includes
 extern "C" {
-//#include "atom.h"
+	#include "atom.h"
 }
 
 
