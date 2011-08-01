@@ -233,8 +233,8 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 			guilib-1.2.1-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/guilib-1.2.1-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-gfx-2.0.20-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-gfx-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-gfx-2.0.22-r1a3-x86-gcc4-2011-05-26.zip
+			: $(baseURL)/lib/sdl-gfx-2.0.22-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
 			sdl-image-1.2.10-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/sdl-image-1.2.10-r1a3-x86-gcc4-2011-05-26.zip ;
