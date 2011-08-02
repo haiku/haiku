@@ -11,10 +11,7 @@
 
 #include <stdint.h>
 
-// AtomBios includes
-extern "C" {
-	#include "atom.h"
-}
+#include "atom.h"
 
 
 struct bios_info {
@@ -23,8 +20,7 @@ struct bios_info {
 };
 
 
-status_t AtomParser(void *parameterSpace, uint8_t index,
-	void *handle, void *biosBase);
+status_t bios_init();
 
 
 #endif /* RADEON_HD_BIOS_H */

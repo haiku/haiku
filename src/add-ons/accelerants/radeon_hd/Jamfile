@@ -9,7 +9,7 @@ UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 Addon radeon_hd.accelerant :
-	#atombios/atom.c
+	atombios/atom.cpp
 	accelerant.cpp
 	engine.cpp
 	hooks.cpp

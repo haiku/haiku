@@ -24,3 +24,46 @@
 #   define TRACE(x...) ;
 #endif
 
+
+// AtomBios related calls
+
+
+status_t
+bios_init()
+{
+	struct card_info *atom_card_info
+		= (card_info*)malloc(sizeof(card_info));
+
+	if (!atom_card_info)
+		return B_NO_MEMORY;
+
+	atom_card_info->reg_read = _read32;
+	atom_card_info->reg_write = _write32;
+
+	if (false) {
+		// TODO : if rio_mem, use ioreg
+		//atom_card_info->ioreg_read = cail_ioreg_read;
+		//atom_card_info->ioreg_write = cail_ioreg_write;
+	} else {
+		TRACE("%s: Cannot find PCI I/O BAR; using MMIO\n", __func__);
+		atom_card_info->ioreg_read = _read32;
+		atom_card_info->ioreg_write = _write32;
+	}
+	atom_card_info->mc_read = _read32;
+	atom_card_info->mc_write = _write32;
+	atom_card_info->pll_read = _read32;
+	atom_card_info->pll_write = _write32;
+
+	// System VGA shadow bios? Why not (temporary)
+	atom_parse(atom_card_info, (void*)0xC0000);
+
+	// TODO : we need to get a copy of the VGA bios :(
+	#if 0
+	rdev->mode_info.atom_context = atom_parse(atom_card_info, rdev->bios);
+	mutex_init(&rdev->mode_info.atom_context->mutex);
+	radeon_atom_initialize_bios_scratch_regs(rdev->ddev);
+	atom_allocate_fb_scratch(rdev->mode_info.atom_context);
+	#endif
+
+	return B_OK;
+}

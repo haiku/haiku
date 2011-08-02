@@ -21,27 +21,26 @@
  *
  * Author: Stanislaw Skowronek
  */
-
 #ifndef ATOM_H
 #define ATOM_H
 
 
-#ifndef __HAIKU__
-#include <linux/types.h>
-#include "card.h"
-#else
+#include <String.h>
+#include <SupportDefs.h>
+
+
 struct card_info {
-    struct drm_device *dev;
-    void (* reg_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
-        uint32_t (* reg_read)(struct card_info *, uint32_t);          /*  filled by driver */
-    void (* ioreg_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
-        uint32_t (* ioreg_read)(struct card_info *, uint32_t);          /*  filled by driver */
-    void (* mc_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
-        uint32_t (* mc_read)(struct card_info *, uint32_t);          /*  filled by driver */
-    void (* pll_write)(struct card_info *, uint32_t, uint32_t);   /*  filled by driver */
-        uint32_t (* pll_read)(struct card_info *, uint32_t);          /*  filled by driver */
+	// Filled by driver
+	void (*reg_write)(uint32 offset, uint32 data);
+		uint32 (*reg_read)(uint32 offset);
+	void (*ioreg_write)(uint32 offset, uint32 data);
+		uint32 (*ioreg_read)(uint32 offset);
+	void (*mc_write)(uint32 offset, uint32 data);
+		uint32 (*mc_read)(uint32 offset);
+	void (*pll_write)(uint32 offset, uint32 data);
+		uint32 (*pll_read)(uint32 offset);
 };
-#endif
+
 
 #define ATOM_BIOS_MAGIC		0xAA55
 #define ATOM_ATI_MAGIC_PTR	0x30
@@ -124,25 +123,25 @@ struct card_info {
 #define ATOM_IO_IIO		0x80
 
 typedef struct atom_context_s {
-    card_info *card;
-    void *bios;
-    uint32_t cmd_table, data_table;
-    uint16_t *iio;
+	card_info *card;
+	void *bios;
+	uint32 cmd_table, data_table;
+	uint16 *iio;
 
-    uint16_t data_block;
-    uint32_t fb_base;
-    uint32_t divmul[2];
-    uint16_t io_attr;
-    uint16_t reg_block;
-    uint8_t shift;
-    int cs_equal, cs_above;
-    int io_mode;
+	uint16 data_block;
+	uint32 fb_base;
+	uint32 divmul[2];
+	uint16 io_attr;
+	uint16 reg_block;
+	uint8 shift;
+	int cs_equal, cs_above;
+	int io_mode;
 } atom_context;
 
 extern int atom_debug;
 
 atom_context *atom_parse(card_info *, void *);
-void atom_execute_table(atom_context *, int, uint32_t *);
+void atom_execute_table(atom_context *, int, uint32 *);
 int atom_asic_init(atom_context *);
 void atom_destroy(atom_context *);
 

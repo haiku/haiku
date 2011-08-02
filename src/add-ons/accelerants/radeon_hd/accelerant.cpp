@@ -218,6 +218,9 @@ radeon_init_accelerant(int device)
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
+	// Init AtomBIOS
+	bios_init();
+
 	status = detect_displays();
 	//if (status != B_OK)
 	//	return status;
