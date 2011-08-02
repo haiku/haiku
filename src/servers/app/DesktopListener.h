@@ -55,6 +55,7 @@ public:
 									Window* behindOf) = 0;
 	virtual void				WindowWorkspacesChanged(Window* window,
 									uint32 workspaces) = 0;
+	virtual void				WindowHidden(Window* window) = 0;
 	virtual void				WindowMinimized(Window* window,
 									bool minimize) = 0;
 
@@ -111,6 +112,7 @@ public:
 									Window* behindOf);
 			void				NotifyWindowWorkspacesChanged(Window* window,
 									uint32 workspaces);
+			void				NotifyWindowHidden(Window* window);
 			void				NotifyWindowMinimized(Window* window,
 									bool minimize);
 

@@ -270,7 +270,7 @@ void
 StackAndTile::WindowMoved(Window* window)
 {
 	SATWindow* satWindow = GetSATWindow(window);
-	if (!satWindow)
+	if (satWindow == NULL)
 		return;
 
 	if (SATKeyPressed() && fCurrentSATWindow)
@@ -284,7 +284,7 @@ void
 StackAndTile::WindowResized(Window* window)
 {
 	SATWindow* satWindow = GetSATWindow(window);
-	if (!satWindow)
+	if (satWindow == NULL)
 		return;
 	satWindow->Resized();
 
@@ -298,8 +298,8 @@ StackAndTile::WindowResized(Window* window)
 void
 StackAndTile::WindowActitvated(Window* window)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
-	if (!satWindow)
+	SATWindow* satWindow = GetSATWindow(window);
+	if (satWindow == NULL)
 		return;
 	_ActivateWindow(satWindow);
 }
@@ -308,14 +308,14 @@ StackAndTile::WindowActitvated(Window* window)
 void
 StackAndTile::WindowSentBehind(Window* window, Window* behindOf)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
-	if (!satWindow)
+	SATWindow* satWindow = GetSATWindow(window);
+	if (satWindow == NULL)
 		return;
 	SATGroup* group = satWindow->GetGroup();
-	if (!group)
+	if (group == NULL)
 		return;
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
-	if (!desktop)
+	if (desktop == NULL)
 		return;
 
 	WindowIterator iter(group, true);
@@ -330,14 +330,14 @@ StackAndTile::WindowSentBehind(Window* window, Window* behindOf)
 void
 StackAndTile::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
-	if (!satWindow)
+	SATWindow* satWindow = GetSATWindow(window);
+	if (satWindow == NULL)
 		return;
 	SATGroup* group = satWindow->GetGroup();
-	if (!group)
+	if (group == NULL)
 		return;
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
-	if (!desktop)
+	if (desktop == NULL)
 		return;
 
 	for (int i = 0; i < group->CountItems(); i++) {
@@ -349,16 +349,29 @@ StackAndTile::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 
 
 void
-StackAndTile::WindowMinimized(Window* window, bool minimize)
+StackAndTile::WindowHidden(Window* window)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
-	if (!satWindow)
+	SATWindow* satWindow = GetSATWindow(window);
+	if (satWindow == NULL)
 		return;
 	SATGroup* group = satWindow->GetGroup();
-	if (!group)
+	if (group == NULL)
+		return;
+	group->RemoveWindow(satWindow);
+}
+
+
+void
+StackAndTile::WindowMinimized(Window* window, bool minimize)
+{
+	SATWindow* satWindow = GetSATWindow(window);
+	if (satWindow == NULL)
+		return;
+	SATGroup* group = satWindow->GetGroup();
+	if (group == NULL)
 		return;
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
-	if (!desktop)
+	if (desktop == NULL)
 		return;
 
 	for (int i = 0; i < group->CountItems(); i++) {

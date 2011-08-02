@@ -230,6 +230,19 @@ DesktopObservable::NotifyWindowWorkspacesChanged(Window* window,
 
 
 void
+DesktopObservable::NotifyWindowHidden(Window* window)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowHidden(window);
+}
+
+
+void
 DesktopObservable::NotifyWindowMinimized(Window* window, bool minimize)
 {
 	if (fWeAreInvoking)

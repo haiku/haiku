@@ -1300,6 +1300,8 @@ Desktop::HideWindow(Window* window)
 		}
 	}
 
+	NotifyWindowHidden(window);
+
 	UnlockAllWindows();
 
 	if (window == fWindowUnderMouse)
