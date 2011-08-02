@@ -17,6 +17,8 @@
 #include "pll.h"
 #include "utility.h"
 
+#include <Debug.h>
+
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,9 +29,10 @@
 #include <AGP.h>
 
 
+#undef TRACE
+
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
-extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
 #	define TRACE(x...) ;
@@ -138,8 +141,7 @@ init_common(int device, bool isClone)
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
-		TRACE("%s, failed shared area%i, %i\n",
-			__func__, data.shared_info_area, gInfo->shared_info_area);
+		TRACE("%s, failed to create shared area\n", __func__);
 		return status;
 	}
 
@@ -150,11 +152,24 @@ init_common(int device, bool isClone)
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
+		TRACE("%s, failed to create mmio area\n", __func__);
 		return status;
+	}
+
+	AreaCloner romCloner;
+	gInfo->rom_area = romCloner.Clone("radeon hd rom",
+		(void **)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		gInfo->shared_info->rom_area);
+	status = romCloner.InitCheck();
+	if (status < B_OK) {
+		//free(gInfo);
+		TRACE("%s, failed to create rom area\n", __func__);
+		//return status;
 	}
 
 	sharedCloner.Keep();
 	regsCloner.Keep();
+	romCloner.Keep();
 
 	// Define Radeon PLL default ranges
 	gInfo->shared_info->pll_info.reference_frequency
@@ -173,6 +188,7 @@ uninit_common(void)
 	if (gInfo != NULL) {
 		delete_area(gInfo->regs_area);
 		delete_area(gInfo->shared_info_area);
+		delete_area(gInfo->rom_area);
 
 		gInfo->regs_area = gInfo->shared_info_area = -1;
 
@@ -189,6 +205,52 @@ uninit_common(void)
 			free(gDisplay[id]);
 		}
 	}
+}
+
+
+status_t
+radeon_init_bios()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint32 bus_cntl = Read32(OUT, R600_BUS_CNTL);
+	uint32 d1vga_control = Read32(OUT, D1VGA_CONTROL);
+	uint32 d2vga_control = Read32(OUT, D2VGA_CONTROL);
+	uint32 vga_render_control = Read32(OUT, VGA_RENDER_CONTROL);
+	uint32 rom_cntl = Read32(OUT, R600_ROM_CNTL);
+
+	// Enable rom access
+	Write32(OUT, R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
+	/* Disable VGA mode */
+	Write32(OUT, D1VGA_CONTROL, (d1vga_control
+		& ~(DVGA_CONTROL_MODE_ENABLE
+			| DVGA_CONTROL_TIMING_SELECT)));
+	Write32(OUT, D2VGA_CONTROL, (d2vga_control
+		& ~(DVGA_CONTROL_MODE_ENABLE
+			| DVGA_CONTROL_TIMING_SELECT)));
+	Write32(OUT, VGA_RENDER_CONTROL, (vga_render_control
+		& ~VGA_VSTATUS_CNTL_MASK));
+	Write32(OUT, R600_ROM_CNTL, rom_cntl | R600_SCK_OVERWRITE);
+
+	void* atomBIOS = (void*)malloc(info.rom_size);
+	if (atomBIOS == NULL)
+		return B_NO_MEMORY;
+
+	snooze(2);
+
+	memcpy(atomBIOS, gInfo->rom, info.rom_size);
+
+	/* restore regs */
+	Write32(OUT, R600_BUS_CNTL, bus_cntl);
+	Write32(OUT, D1VGA_CONTROL, d1vga_control);
+	Write32(OUT, D2VGA_CONTROL, d2vga_control);
+	Write32(OUT, VGA_RENDER_CONTROL, vga_render_control);
+	Write32(OUT, R600_ROM_CNTL, rom_cntl);
+
+	// Init AtomBIOS
+	bios_init(atomBIOS);
+
+	return B_OK;
 }
 
 
@@ -210,8 +272,7 @@ radeon_init_accelerant(int device)
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
-	// Init AtomBIOS
-	bios_init();
+	radeon_init_bios();
 
 	status = detect_displays();
 	//if (status != B_OK)

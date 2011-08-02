@@ -29,8 +29,15 @@ atom_context *gAtomBIOS;
 
 
 status_t
-bios_init()
+bios_init(void* bios)
 {
+	if (gInfo->rom == NULL) {
+		// just incase, this prevents a crash
+		TRACE("%s: called even though VGA rom hasn't been mapped!\n",
+			__func__);
+		return B_ERROR;
+	}
+
 	struct card_info *atom_card_info
 		= (card_info*)malloc(sizeof(card_info));
 
@@ -55,7 +62,7 @@ bios_init()
 	atom_card_info->pll_write = _write32;
 
 	// Point AtomBIOS parser to card bios and malloc gAtomBIOS
-	gAtomBIOS = atom_parse(atom_card_info, gInfo->shared_info->rom);
+	gAtomBIOS = atom_parse(atom_card_info, bios);
 
 	if (gAtomBIOS == NULL) {
 		TRACE("%s: couldn't parse system AtomBIOS\n", __func__);
