@@ -1051,40 +1051,44 @@ atom_index_iio(atom_context *ctx, int base)
 atom_context*
 atom_parse(card_info *card, void *bios)
 {
-	int base;
 	atom_context *ctx = (atom_context*)malloc(sizeof(atom_context));
-	char *str;
+
+	if (ctx == NULL) {
+		TRACE("%s: Error: No memory for atom_context mapping\n", __func__);
+		return NULL;
+	}
 
 	ctx->card = card;
 	ctx->bios = bios;
 
 	if (CU16(0) != ATOM_BIOS_MAGIC) {
-	TRACE("Invalid BIOS magic.\n");
-	free(ctx);
-	return NULL;
+		TRACE("Invalid BIOS magic.\n");
+		free(ctx);
+		return NULL;
 	}
 	if (strncmp(CSTR(ATOM_ATI_MAGIC_PTR), ATOM_ATI_MAGIC,
 		strlen(ATOM_ATI_MAGIC))) {
-	TRACE("Invalid ATI magic.\n");
-	free(ctx);
-	return NULL;
+		TRACE("Invalid ATI magic.\n");
+		free(ctx);
+		return NULL;
 	}
 
-	base = CU16(ATOM_ROM_TABLE_PTR);
+	int base = CU16(ATOM_ROM_TABLE_PTR);
 	if (strncmp(CSTR(base + ATOM_ROM_MAGIC_PTR), ATOM_ROM_MAGIC,
 		strlen(ATOM_ROM_MAGIC))) {
-	TRACE("Invalid ATOM magic.\n");
-	free(ctx);
-	return NULL;
+		TRACE("Invalid ATOM magic.\n");
+		free(ctx);
+		return NULL;
 	}
 
 	ctx->cmd_table = CU16(base + ATOM_ROM_CMD_PTR);
 	ctx->data_table = CU16(base + ATOM_ROM_DATA_PTR);
 	atom_index_iio(ctx, CU16(ctx->data_table + ATOM_DATA_IIO_PTR) + 4);
 
-	str = CSTR(CU16(base + ATOM_ROM_MSG_PTR));
+	char *str = CSTR(CU16(base + ATOM_ROM_MSG_PTR));
 	while (*str && ((*str == '\n') || (*str == '\r')))
 		str++;
+
 	TRACE("ATOM BIOS: %s", str);
 
 	return ctx;
