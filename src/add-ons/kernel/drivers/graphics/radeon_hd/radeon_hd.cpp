@@ -84,15 +84,15 @@ radeon_hd_init(radeon_info &info)
 		return info.framebuffer_area;
 	}
 
-	// *** AtomBIOS mapping
+	// *** VGA rom / AtomBIOS mapping
 	AreaKeeper romMapper;
 	info.rom_area = romMapper.Map("radeon hd rom",
 		(void *)info.pci->u.h0.rom_base,
 		info.pci->u.h0.rom_size,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void **)&info.shared_info->rom);
-	if (frambufferMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": card(%ld): could not map AtomBIOS!\n",
+	if (romMapper.InitCheck() < B_OK) {
+		dprintf(DEVICE_NAME ": card(%ld): could not map VGA rom!\n",
 			info.id);
 		return info.rom_area;
 	}
