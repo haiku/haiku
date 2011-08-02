@@ -34,6 +34,14 @@
 #include "r600_reg_r7xx.h"
 
 
+#define R600_ROM_CNTL				0x1600
+#define R600_BUS_CNTL				0x5420
+#define R600_BIOS_ROM_DIS			(1 << 1)
+#define R600_SCK_OVERWRITE			(1 << 1)
+#define DVGA_CONTROL_MODE_ENABLE	(1 << 0)
+#define DVGA_CONTROL_TIMING_SELECT	(1 << 8)
+#define VGA_VSTATUS_CNTL_MASK		(3 << 16)
+
 /* SET_*_REG offsets + ends */
 enum {
     SET_CONFIG_REG_offset          = 0x00008000,
