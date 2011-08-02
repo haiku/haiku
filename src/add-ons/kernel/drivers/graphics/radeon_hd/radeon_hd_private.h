@@ -27,6 +27,7 @@ struct radeon_info {
 	uint8*			registers;
 	area_id			registers_area;
 	area_id			framebuffer_area;
+	area_id			rom_area;
 
 	struct radeon_shared_info* shared_info;
 	area_id			shared_area;

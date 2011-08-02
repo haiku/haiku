@@ -71,8 +71,10 @@ struct radeon_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
-	uint32			rom_base;			// AtomBIOS base location
-	uint32			rom_size;			// AtomBIOS size
+	uint32			rom_phys;			// rom base location
+	area_id			rom_area;			// area of mapped rom
+	uint32			rom_size;			// rom size
+	uint8*			rom;				// virtual memory mapped PCI ROM
 
 	display_mode	current_mode;
 	uint32			bytes_per_row;

@@ -1048,8 +1048,8 @@ atom_index_iio(atom_context *ctx, int base)
 }
 
 
-atom_context
-*atom_parse(card_info *card, void *bios)
+atom_context*
+atom_parse(card_info *card, void *bios)
 {
 	int base;
 	atom_context *ctx = (atom_context*)malloc(sizeof(atom_context));

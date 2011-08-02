@@ -55,7 +55,7 @@ bios_init()
 	atom_card_info->pll_write = _write32;
 
 	// Point AtomBIOS parser to card bios and malloc gAtomBIOS
-	gAtomBIOS = atom_parse(atom_card_info, (void*)gInfo->shared_info->rom_base);
+	gAtomBIOS = atom_parse(atom_card_info, gInfo->shared_info->rom);
 
 	if (gAtomBIOS == NULL) {
 		TRACE("%s: couldn't parse system AtomBIOS\n", __func__);

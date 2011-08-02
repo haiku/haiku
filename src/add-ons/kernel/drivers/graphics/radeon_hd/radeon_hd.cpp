@@ -84,6 +84,19 @@ radeon_hd_init(radeon_info &info)
 		return info.framebuffer_area;
 	}
 
+	// *** AtomBIOS mapping
+	AreaKeeper romMapper;
+	info.rom_area = romMapper.Map("radeon hd AtomBIOS",
+		(void *)info.pci->u.h0.rom_base,
+		info.pci->u.h0.rom_size,
+		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void **)&info.shared_info->rom);
+	if (frambufferMapper.InitCheck() < B_OK) {
+		dprintf(DEVICE_NAME ": card(%ld): could not map AtomBIOS!\n",
+			info.id);
+		return info.rom_area;
+	}
+
 	// Turn on write combining for the area
 	vm_set_area_memory_type(info.framebuffer_area,
 		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
@@ -91,6 +104,7 @@ radeon_hd_init(radeon_info &info)
 	sharedCreator.Detach();
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
+	romMapper.Detach();
 
 	// Pass common information to accelerant
 	info.shared_info->device_id = info.device_id;
@@ -101,9 +115,9 @@ radeon_hd_init(radeon_info &info)
 		= info.pci->u.h0.base_registers[RHD_FB_BAR];
 	info.shared_info->frame_buffer_int
 		= read32(info.registers + R6XX_CONFIG_FB_BASE);
-
-	info.shared_info->rom_base = info.pci->u.h0.rom_base;
-		// Grab ROM base from PCI (AtomBIOS location for card)
+	info.shared_info->rom_area = info.rom_area;
+	info.shared_info->rom_phys = info.pci->u.h0.rom_base;
+	info.shared_info->rom_size = info.pci->u.h0.rom_size;
 
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 
@@ -167,5 +181,6 @@ radeon_hd_uninit(radeon_info &info)
 	delete_area(info.shared_area);
 	delete_area(info.registers_area);
 	delete_area(info.framebuffer_area);
+	delete_area(info.rom_area);
 }
 
