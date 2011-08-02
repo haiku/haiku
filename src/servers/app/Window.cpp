@@ -2097,7 +2097,8 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 
 	Window* remainingTop = fCurrentStack->TopLayerWindow();
 	if (remainingTop != NULL) {
-		decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
+		if (decorator != NULL)
+			decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
 		// propagate focus to the decorator
 		remainingTop->SetFocus(remainingTop->IsFocus());
 		remainingTop->SetFeel(remainingTop->Feel());
