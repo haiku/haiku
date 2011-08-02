@@ -86,7 +86,7 @@ radeon_hd_init(radeon_info &info)
 
 	// *** AtomBIOS mapping
 	AreaKeeper romMapper;
-	info.rom_area = romMapper.Map("radeon hd AtomBIOS",
+	info.rom_area = romMapper.Map("radeon hd rom",
 		(void *)info.pci->u.h0.rom_base,
 		info.pci->u.h0.rom_size,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
