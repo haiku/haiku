@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons accelerants radeon_hd ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants radeon_hd atombios ] ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -9,7 +10,7 @@ UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 Addon radeon_hd.accelerant :
-	atombios/atom.cpp
+	atom.cpp
 	accelerant.cpp
 	engine.cpp
 	hooks.cpp
