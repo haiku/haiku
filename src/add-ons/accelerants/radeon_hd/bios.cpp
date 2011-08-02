@@ -25,7 +25,7 @@
 #endif
 
 
-// AtomBios related calls
+atom_context *gAtomBIOS;
 
 
 status_t
@@ -54,10 +54,14 @@ bios_init()
 	atom_card_info->pll_read = _read32;
 	atom_card_info->pll_write = _write32;
 
-	// System VGA shadow bios? Why not (temporary)
-	atom_parse(atom_card_info, (void*)0xC0000);
+	// Point AtomBIOS parser to card bios and malloc gAtomBIOS
+	gAtomBIOS = atom_parse(atom_card_info, (void*)gInfo->shared_info->rom_base);
 
-	// TODO : we need to get a copy of the VGA bios :(
+	if (gAtomBIOS == NULL) {
+		TRACE("%s: couldn't parse system AtomBIOS\n", __func__);
+		return B_ERROR;
+	}
+
 	#if 0
 	rdev->mode_info.atom_context = atom_parse(atom_card_info, rdev->bios);
 	mutex_init(&rdev->mode_info.atom_context->mutex);

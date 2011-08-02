@@ -102,6 +102,9 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->frame_buffer_int
 		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
+	info.shared_info->rom_base = info.pci->u.h0.rom_base;
+		// Grab ROM base from PCI (AtomBIOS location for card)
+
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 
 	// Pull active monitor VESA EDID from boot loader

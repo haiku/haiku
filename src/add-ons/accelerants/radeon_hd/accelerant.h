@@ -10,6 +10,7 @@
 #define RADEON_HD_ACCELERANT_H
 
 
+#include "atom.h"
 #include "mode.h"
 #include "radeon_hd.h"
 #include "pll.h"
@@ -112,6 +113,7 @@ typedef struct {
 
 
 extern accelerant_info *gInfo;
+extern atom_context *gAtomBIOS;
 extern display_info *gDisplay[MAX_DISPLAY];
 
 

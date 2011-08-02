@@ -14,12 +14,6 @@
 #include "atom.h"
 
 
-struct bios_info {
-	uint32 location;
-	uint32 size;
-};
-
-
 status_t bios_init();
 
 

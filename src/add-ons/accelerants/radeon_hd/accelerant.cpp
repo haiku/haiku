@@ -37,7 +37,6 @@ extern "C" void _sPrintf(const char *format, ...);
 
 
 struct accelerant_info *gInfo;
-struct bios_info *gBIOS;
 display_info *gDisplay[MAX_DISPLAY];
 
 
@@ -100,13 +99,11 @@ init_common(int device, bool isClone)
 	// initialize global accelerant info structure
 
 	gInfo = (accelerant_info *)malloc(sizeof(accelerant_info));
-	gBIOS = (bios_info *)malloc(sizeof(bios_info));
 
-	if (gInfo == NULL || gBIOS == NULL)
+	if (gInfo == NULL)
 		return B_NO_MEMORY;
 
 	memset(gInfo, 0, sizeof(accelerant_info));
-	memset(gBIOS, 0, sizeof(bios_info));
 
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		gDisplay[id] = (display_info *)malloc(sizeof(display_info));
@@ -131,7 +128,6 @@ init_common(int device, bool isClone)
 	if (ioctl(device, RADEON_GET_PRIVATE_DATA, &data,
 			sizeof(radeon_get_private_data)) != 0) {
 		free(gInfo);
-		free(gBIOS);
 		return B_ERROR;
 	}
 
@@ -142,7 +138,6 @@ init_common(int device, bool isClone)
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
-		free(gBIOS);
 		TRACE("%s, failed shared area%i, %i\n",
 			__func__, data.shared_info_area, gInfo->shared_info_area);
 		return status;
@@ -155,7 +150,6 @@ init_common(int device, bool isClone)
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
-		free(gBIOS);
 		return status;
 	}
 
@@ -188,8 +182,6 @@ uninit_common(void)
 
 		free(gInfo);
 	}
-
-	free(gBIOS);
 
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id] != NULL) {
