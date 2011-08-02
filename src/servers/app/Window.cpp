@@ -340,15 +340,22 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 	int32 wantHeight = fFrame.IntegerHeight() + y;
 
 	// enforce size limits
-	if (wantWidth < fMinWidth)
-		wantWidth = fMinWidth;
-	if (wantWidth > fMaxWidth)
-		wantWidth = fMaxWidth;
+	WindowStack* stack = GetWindowStack();
+	if (resizeStack && stack) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* window = stack->WindowList().ItemAt(i);
 
-	if (wantHeight < fMinHeight)
-		wantHeight = fMinHeight;
-	if (wantHeight > fMaxHeight)
-		wantHeight = fMaxHeight;
+			if (wantWidth < window->fMinWidth)
+				wantWidth = window->fMinWidth;
+			if (wantWidth > window->fMaxWidth)
+				wantWidth = window->fMaxWidth;
+
+			if (wantHeight < window->fMinHeight)
+				wantHeight = window->fMinHeight;
+			if (wantHeight > window->fMaxHeight)
+				wantHeight = window->fMaxHeight;
+		}
+	}
 
 	x = wantWidth - fFrame.IntegerWidth();
 	y = wantHeight - fFrame.IntegerHeight();
@@ -371,7 +378,6 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 	if (decorator && resizeStack)
 		decorator->ResizeBy(x, y, dirtyRegion);
 
-	WindowStack* stack = GetWindowStack();
 	if (resizeStack && stack) {
 		for (int32 i = 0; i < stack->CountWindows(); i++) {
 			Window* window = stack->WindowList().ItemAt(i);
