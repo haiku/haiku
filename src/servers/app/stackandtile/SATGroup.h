@@ -35,10 +35,10 @@ public:
 
 		enum position_t
 		{
-			kLeftTop,
-			kRightTop,
-			kLeftBottom,
-			kRightBottom
+			kLeftTop = 0,
+			kRightTop = 1,
+			kLeftBottom = 2,
+			kRightBottom = 3
 		};
 
 						Corner();
@@ -58,22 +58,21 @@ public:
 			Corner*				GetOppositeCorner(
 									Corner::position_t corner) const;
 
-			Corner*				LeftTopCorner() { return &fLeftTop; }
-			Corner*				RightTopCorner() { return &fRightTop; }
-			Corner*				LeftBottomCorner() { return &fLeftBottom; }
-			Corner*				RightBottomCorner() { return &fRightBottom; }
+			Corner*				LeftTopCorner()
+									{ return &fCorners[Corner::kLeftTop]; }
+			Corner*				RightTopCorner()
+									{ return &fCorners[Corner::kRightTop]; }
+			Corner*				LeftBottomCorner()
+									{ return &fCorners[Corner::kLeftBottom]; }
+			Corner*				RightBottomCorner()
+									{ return &fCorners[Corner::kRightBottom]; }
 
 			Tab*				VerticalTab() const;
 			Tab*				HorizontalTab() const;
 
 			void				Trace() const;
 private:
-		Corner*		_GetCorner(Corner::position_t corner) const;
-
-		Corner		fLeftTop;
-		Corner		fRightTop;
-		Corner		fLeftBottom;
-		Corner		fRightBottom;
+		Corner		fCorners[4];
 
 		Tab*		fVerticalTab;
 		Tab*		fHorizontalTab;

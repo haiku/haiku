@@ -5,7 +5,7 @@ UsePrivateHeaders app graphics input interface kernel shared storage support ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers app StackAndTile ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app stackandtile ] ;
 UseFreeTypeHeaders ;
 
 
@@ -81,7 +81,7 @@ Server app_server :
 	:
 	libtranslation.so libbe.so libbnetapi.so
 	libasdrawing.a libasremote.a libpainter.a libagg.a libfreetype.so
-	StackAndTile.a liblinprog.a libtextencoding.so libshared.a
+	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
 	$(TARGET_LIBSTDC++)
 
 	: app_server.rdef
@@ -92,4 +92,4 @@ SEARCH on [ FGristFiles $(font_src) ] = [ FDirName $(HAIKU_TOP) src servers app 
 
 
 SubInclude HAIKU_TOP src servers app drawing ;
-SubInclude HAIKU_TOP src servers app StackAndTile ;
+SubInclude HAIKU_TOP src servers app stackandtile ;

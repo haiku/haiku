@@ -66,17 +66,8 @@ bool
 WindowArea::MoveWindowToPosition(SATWindow* window, int32 index)
 {
 	int32 oldIndex = fWindowList.IndexOf(window);
-	if (oldIndex < 0)
-		return false;
 	ASSERT(oldIndex != index);
-	if (oldIndex < index)
-		index++;
-	else
-		oldIndex++;
-	if (!fWindowList.AddItem(window, index))
-		return false;
-	fWindowList.RemoveItemAt(oldIndex);
-	return true;
+	return fWindowList.MoveItem(oldIndex, index);
 }
 
 
@@ -94,8 +85,7 @@ WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 		int32 indexAfter = fWindowList.IndexOf(after);
 		if (!fWindowList.AddItem(window, indexAfter + 1))
 			return false;
-	}
-	else if (!fWindowList.AddItem(window))
+	} else if (fWindowList.AddItem(window) == false)
 		return false;
 
 	AcquireReference();
@@ -361,7 +351,14 @@ Crossing::~Crossing()
 Corner*
 Crossing::GetCorner(Corner::position_t corner) const
 {
-	return _GetCorner(corner);
+	return &const_cast<Corner*>(fCorners)[corner];
+}
+
+
+Corner*
+Crossing::GetOppositeCorner(Corner::position_t corner) const
+{
+	return &const_cast<Corner*>(fCorners)[3 - corner];
 }
 
 
@@ -383,47 +380,13 @@ void
 Crossing::Trace() const
 {
 	STRACE_SAT("left-top corner: ");
-	fLeftTop.Trace();
+	fCorners[Corner::kLeftTop].Trace();
 	STRACE_SAT("right-top corner: ");
-	fRightTop.Trace();
+	fCorners[Corner::kRightTop].Trace();
 	STRACE_SAT("left-bottom corner: ");
-	fLeftBottom.Trace();
+	fCorners[Corner::kLeftBottom].Trace();
 	STRACE_SAT("right-bottom corner: ");
-	fRightBottom.Trace();
-}
-
-
-Corner*
-Crossing::_GetCorner(Corner::position_t corner) const
-{
-	switch (corner) {
-		case Corner::kLeftTop:
-			return const_cast<Corner*>(&fLeftTop);
-		case Corner::kRightTop:
-			return const_cast<Corner*>(&fRightTop);
-		case Corner::kLeftBottom:
-			return const_cast<Corner*>(&fLeftBottom);
-		case Corner::kRightBottom:
-			return const_cast<Corner*>(&fRightBottom);
-	};
-	return NULL;
-}
-
-
-Corner*
-Crossing::GetOppositeCorner(Corner::position_t corner) const
-{
-	switch (corner) {
-		case Corner::kLeftTop:
-			return const_cast<Corner*>(&fRightBottom);
-		case Corner::kRightTop:
-			return const_cast<Corner*>(&fLeftBottom);
-		case Corner::kLeftBottom:
-			return const_cast<Corner*>(&fRightTop);
-		case Corner::kRightBottom:
-			return const_cast<Corner*>(&fLeftTop);
-	};
-	return NULL;
+	fCorners[Corner::kRightBottom].Trace();
 }
 
 
@@ -520,13 +483,15 @@ int32
 Tab::FindCrossingIndex(Tab* tab)
 {
 	if (fOrientation == kVertical) {
-		for (int32 i = 0; i < fCrossingList.CountItems(); i++)
+		for (int32 i = 0; i < fCrossingList.CountItems(); i++) {
 			if (fCrossingList.ItemAt(i)->HorizontalTab() == tab)
 				return i;
+		}
 	} else {
-		for (int32 i = 0; i < fCrossingList.CountItems(); i++)
+		for (int32 i = 0; i < fCrossingList.CountItems(); i++) {
 			if (fCrossingList.ItemAt(i)->VerticalTab() == tab)
 				return i;
+		}
 	}
 	return -1;
 }
@@ -536,13 +501,15 @@ int32
 Tab::FindCrossingIndex(float pos)
 {
 	if (fOrientation == kVertical) {
-		for (int32 i = 0; i < fCrossingList.CountItems(); i++)
+		for (int32 i = 0; i < fCrossingList.CountItems(); i++) {
 			if (fCrossingList.ItemAt(i)->HorizontalTab()->Position() == pos)
 				return i;
+		}
 	} else {
-		for (int32 i = 0; i < fCrossingList.CountItems(); i++)
+		for (int32 i = 0; i < fCrossingList.CountItems(); i++) {
 			if (fCrossingList.ItemAt(i)->VerticalTab()->Position() == pos)
 				return i;
+		}
 	}
 	return -1;
 }
