@@ -1247,7 +1247,8 @@ DefaultDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 	if (fTitleBarRect.IsValid()) {
 		if (fTabList.CountItems() > 1) {
 			_DoTabLayout();
-			dirty->Include(fTitleBarRect);
+			if (dirty != NULL)
+				dirty->Include(fTitleBarRect);
 			return;
 		}
 
