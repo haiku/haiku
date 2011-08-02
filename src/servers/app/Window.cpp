@@ -2148,6 +2148,7 @@ Window::AddWindowToStack(Window* window)
 	if (decorator != NULL)
 		decorator->AddTab(window->Title(), position, &dirty);
 
+	window->SetLook(window->Look(), &dirty);
 	fDesktop->RebuildAndRedrawAfterWindowChange(TopLayerStackWindow(), dirty);
 	window->SetFocus(window->IsFocus());
 	return true;
@@ -2195,6 +2196,8 @@ Window::MoveToTopStackLayer()
 	if (decorator == NULL)
 		return false;
 	decorator->SetDrawingEngine(fDrawingEngine);
+	DesktopSettings settings(fDesktop);
+	SetLook(Look(), NULL);
 	decorator->SetTopTap(PositionInStack());
 	return fCurrentStack->MoveToTopLayer(this);
 }
