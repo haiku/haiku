@@ -291,6 +291,10 @@ CardModeSet(uint8 crtid, display_mode *mode)
 	Write32Mask(CRT, regs->crtVPolarity,
 		displayTiming.flags & B_POSITIVE_VSYNC ? 0 : 1, 0x1);
 
+	// TODO : for now fixed non-interlace
+	Write32(OUT, D1CRTC_INTERLACE_CONTROL, 0x0);
+	Write32(OUT, D1MODE_DATA_FORMAT, 0x0);
+
 	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
 		should only be set to 1 on 30bpp DVI modes
 	*/
@@ -319,7 +323,6 @@ CardModeScale(uint8 crtid, display_mode *mode)
 	Write32(CRT, regs->sclEnable, 0);
 	Write32(CRT, regs->sclTapControl, 0);
 	Write32(CRT, regs->modeCenter, 2);
-	// D1MODE_DATA_FORMAT?
 }
 
 
