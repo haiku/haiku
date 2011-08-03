@@ -19,6 +19,12 @@
 #include "lock.h"
 
 
+#define RADEON_BIOS8(adr, v) 	(adr[v])
+#define RADEON_BIOS16(adr, v) 	((adr[v]) | (adr[(v) + 1] << 8))
+#define RADEON_BIOS32(adr, v)	\
+	((RADEON_BIOS16(adr, v) | RADEON_BIOS16(adr, v + 2) << 16))
+
+
 struct radeon_info {
 	int32			open_count;
 	status_t		init_status;

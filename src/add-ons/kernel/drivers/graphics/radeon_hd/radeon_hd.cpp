@@ -42,13 +42,25 @@
 #define RHD_MMIO_BAR 2
 
 
+inline bool
+isAtomBIOS(uint8* bios)
+{
+	uint16 bios_header = RADEON_BIOS16(bios, 0x48);
+
+	return !memcmp(&bios[bios_header + 4], "ATOM", 4) ||
+		!memcmp(&bios[bios_header + 4], "MOTA", 4);
+}
+
+
 status_t
 radeon_hd_getbios(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
-	uint32 backuprom = get_pci_config(info.pci, PCI_rom_base, 4);
-	set_pci_config(info.pci, PCI_rom_base, 4, 0xffffffff);
+	// Enable ROM decoding
+	uint32 rom_config = get_pci_config(info.pci, PCI_rom_base, 4);
+	rom_config |= PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, rom_config);
 
 	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
 	if (flags & PCI_rom_enable)
@@ -91,27 +103,35 @@ radeon_hd_getbios(radeon_info &info)
 		if (info.rom_area < B_OK) {
 			dprintf(DEVICE_NAME ": failed to map rom\n");
 			result = B_ERROR;
-		} else
-			result = B_OK;
-
-		if (result == B_OK && (bios[0] != 0x55 || bios[1] != 0xAA)) {
-			uint16 id = bios[0] + (bios[1] << 8);
-			dprintf(DEVICE_NAME ": not a PCI rom (%X)!\n", id);
-			result = B_OK;
 		} else {
-			info.shared_info->rom = (uint8*)malloc(rom_size);
-			if (info.shared_info->rom == NULL) {
-				dprintf(DEVICE_NAME ": failed to clone atombios!\n");
+			if (bios[0] != 0x55 || bios[1] != 0xAA) {
+				uint16 id = bios[0] + (bios[1] << 8);
+				dprintf(DEVICE_NAME ": not a PCI rom (%X)!\n", id);
 				result = B_ERROR;
 			} else {
-				memcpy(info.shared_info->rom, (void *)bios, rom_size);
-				result = B_OK;
+				TRACE("%s: found a valid VGA bios!\n", __func__);
+				info.shared_info->rom = (uint8*)malloc(rom_size);
+				if (info.shared_info->rom == NULL) {
+					dprintf(DEVICE_NAME ": failed to clone atombios!\n");
+					result = B_ERROR;
+				} else {
+					memcpy(info.shared_info->rom, (void *)bios, rom_size);
+					if (isAtomBIOS(info.shared_info->rom)) {
+						dprintf(DEVICE_NAME ": AtomBIOS found and mapped!\n");
+						result = B_OK;
+					} else {
+						dprintf(DEVICE_NAME ": AtomBIOS not mapped!\n");
+						result = B_ERROR;
+					}
+				}
 			}
+			delete_area(rom_area);
 		}
-		delete_area(rom_area);
 	}
 
-	set_pci_config(info.pci, PCI_rom_base, 4, backuprom);
+	// Disable ROM decoding
+	rom_config &= ~PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, rom_config);
 
 	info.shared_info->rom_phys = rom_base;
 	info.shared_info->rom_size = rom_size;
