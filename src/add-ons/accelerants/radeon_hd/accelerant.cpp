@@ -156,6 +156,16 @@ init_common(int device, bool isClone)
 		return status;
 	}
 
+	gInfo->rom_area = clone_area("radeon hd AtomBIOS",
+		(void **)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		gInfo->shared_info->rom_area);
+
+	if (gInfo->rom_area < 0)
+		TRACE("%s: Clone of AtomBIOS failed!\n", __func__);
+
+	if (gInfo->rom[0] != 0x55 || gInfo->rom[0] != 0xAA)
+		TRACE("%s: didn't find a VGA bios in cloned region!\n", __func__);
+
 	sharedCloner.Keep();
 	regsCloner.Keep();
 
@@ -176,6 +186,7 @@ uninit_common(void)
 	if (gInfo != NULL) {
 		delete_area(gInfo->regs_area);
 		delete_area(gInfo->shared_info_area);
+		delete_area(gInfo->rom_area);
 
 		gInfo->regs_area = gInfo->shared_info_area = -1;
 
@@ -213,7 +224,7 @@ radeon_init_accelerant(int device)
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
-	radeon_init_bios(info.rom);
+	radeon_init_bios(gInfo->rom);
 
 	status = detect_displays();
 	//if (status != B_OK)

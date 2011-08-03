@@ -110,13 +110,13 @@ radeon_hd_getbios(radeon_info &info)
 				result = B_ERROR;
 			} else {
 				TRACE("%s: found a valid VGA bios!\n", __func__);
-				info.shared_info->rom = (uint8*)malloc(rom_size);
-				if (info.shared_info->rom == NULL) {
+				info.atom_buffer = (uint8*)malloc(rom_size);
+				if (info.atom_buffer == NULL) {
 					dprintf(DEVICE_NAME ": failed to clone atombios!\n");
 					result = B_ERROR;
 				} else {
-					memcpy(info.shared_info->rom, (void *)bios, rom_size);
-					if (isAtomBIOS(info.shared_info->rom)) {
+					memcpy(info.atom_buffer, (void *)bios, rom_size);
+					if (isAtomBIOS(info.atom_buffer)) {
 						dprintf(DEVICE_NAME ": AtomBIOS found and mapped!\n");
 						result = B_OK;
 					} else {
@@ -263,7 +263,15 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	// *** VGA rom / AtomBIOS mapping
-	status_t foundRom = radeon_hd_getbios_r600(info);
+	status_t biosStatus = radeon_hd_getbios_r600(info);
+
+	// *** AtomBIOS mapping
+	info.rom_area = create_area("radeon hd AtomBIOS",
+		(void **)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
+		info.shared_info->rom_size, B_READ_AREA | B_WRITE_AREA, B_NO_LOCK);
+
+	if (info.rom_area < 0)
+		dprintf("%s: failed to create kernel AtomBIOS area!\n", __func__);
 
 	// Turn on write combining for the area
 	vm_set_area_memory_type(info.framebuffer_area,
@@ -284,7 +292,8 @@ radeon_hd_init(radeon_info &info)
 		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
 	// populate VGA rom info into shared_info
-	info.shared_info->has_rom = (foundRom == B_OK) ? true : false;
+	info.shared_info->has_rom = (biosStatus == B_OK) ? true : false;
+	info.shared_info->rom_area = info.rom_area;
 
 	// Copy device name into shared_info
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
@@ -349,6 +358,5 @@ radeon_hd_uninit(radeon_info &info)
 	delete_area(info.shared_area);
 	delete_area(info.registers_area);
 	delete_area(info.framebuffer_area);
-	delete_area(info.rom_area);
 }
 

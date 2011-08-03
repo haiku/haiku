@@ -73,6 +73,7 @@ struct radeon_shared_info {
 	uint32			mode_count;
 
 	bool			has_rom;			// was rom mapped?
+	area_id			rom_area;			// area of mapped rom
 	uint32			rom_phys;			// rom base location
 	uint32			rom_size;			// rom size
 	uint8*			rom;				// cloned, memory mapped PCI ROM

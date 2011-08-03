@@ -36,6 +36,9 @@ struct accelerant_info {
 	display_mode	*mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
+	uint8*			rom;
+	area_id			rom_area;
+
 	edid1_info		edid_info;
 	bool			has_edid;
 

@@ -31,6 +31,9 @@ struct radeon_info {
 	int32			id;
 	pci_info*		pci;
 	uint8*			registers;
+
+	uint8*			atom_buffer;	// buffer for atombios
+
 	area_id			registers_area;
 	area_id			framebuffer_area;
 	area_id			rom_area;
