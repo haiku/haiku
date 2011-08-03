@@ -1082,11 +1082,13 @@ FrameMoved(origin);
 
 				// we notify the input server if we are gaining or losing focus
 				// from a view which has the B_INPUT_METHOD_AWARE on a window
-				// (de)activation
+				// activation
+				if (!active)
+					break;
 				bool inputMethodAware = false;
 				if (fFocus)
 					inputMethodAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
-				BMessage msg(active && inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+				BMessage msg(inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
 				BMessenger messenger(fFocus);
 				BMessage reply;
 				if (fFocus)
