@@ -17,9 +17,9 @@
 using namespace std;
 
 
-//#define DEBUG_TILEING
+//#define DEBUG_TILING
 
-#ifdef DEBUG_TILEING
+#ifdef DEBUG_TILING
 #	define STRACE_TILING(x...) debug_printf("SAT Tiling: "x)
 #else
 #	define STRACE_TILING(x...) ;

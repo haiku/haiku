@@ -19,7 +19,7 @@
 #include "WindowList.h"
 
 
-#define DEBUG_STACK_AND_TILE
+//#define DEBUG_STACK_AND_TILE
 
 #ifdef DEBUG_STACK_AND_TILE
 #	define STRACE_SAT(x...) debug_printf("SAT: "x)

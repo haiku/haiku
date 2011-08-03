@@ -17,7 +17,7 @@
 #include "Window.h"
 
 
-#define DEBUG_STACKING
+//#define DEBUG_STACKING
 
 #ifdef DEBUG_STACKING
 #	define STRACE_STACKING(x...) debug_printf("SAT Stacking: "x)
