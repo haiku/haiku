@@ -51,14 +51,14 @@ radeon_hd_getbios(radeon_info &info)
 	set_pci_config(info.pci, PCI_rom_base, 4, 0xffffffff);
 
 	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
-	if (flags & 1)
-		dprintf(DEVICE_NAME ": PCI ROM Disabled\n");
-	if (flags & 2)
-		dprintf(DEVICE_NAME ": PCI ROM Shadowed\n");
-	if (flags & 4)
-		dprintf(DEVICE_NAME ": PCI ROM Copied\n");
-	if (flags & 8)
-		dprintf(DEVICE_NAME ": PCI ROM BIOS copied\n");
+	if (flags & PCI_rom_enable)
+		dprintf(DEVICE_NAME ": PCI ROM decode enabled\n");
+	if (flags & PCI_rom_shadow)
+		dprintf(DEVICE_NAME ": PCI ROM shadowed\n");
+	if (flags & PCI_rom_copy)
+		dprintf(DEVICE_NAME ": PCI ROM allocated copy\n");
+	if (flags & PCI_rom_bios)
+		dprintf(DEVICE_NAME ": PCI ROM BIOS copy\n");
 
 	uint32 rom_base = info.pci->u.h0.rom_base;
 	uint32 rom_size = info.pci->u.h0.rom_size;
@@ -74,6 +74,9 @@ radeon_hd_getbios(radeon_info &info)
 		}
 	}
 
+	TRACE("%s: seeking rom at 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
+		__func__, rom_base, rom_size);
+
 	uint8* bios;
 	status_t result = B_ERROR;
 
@@ -87,7 +90,7 @@ radeon_hd_getbios(radeon_info &info)
 
 		if (info.rom_area < B_OK) {
 			dprintf(DEVICE_NAME ": failed to map rom\n");
-			result = B_ERROR;;
+			result = B_ERROR;
 		} else
 			result = B_OK;
 
@@ -107,6 +110,7 @@ radeon_hd_getbios(radeon_info &info)
 		}
 		delete_area(rom_area);
 	}
+
 	set_pci_config(info.pci, PCI_rom_base, 4, backuprom);
 
 	info.shared_info->rom_phys = rom_base;
@@ -171,7 +175,7 @@ radeon_hd_getbios_r600(radeon_info &info)
 	write32(info.registers + R600_LOWER_GPIO_ENABLE,
 		(lower_gpio_enable | 0x400));
 
-	status_t result = radeon_hd_getbios_r600(info);
+	status_t result = radeon_hd_getbios(info);
 
 	// restore regs
 	write32(info.registers + RADEON_VIPH_CONTROL, viph_control);
@@ -239,7 +243,7 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	// *** VGA rom / AtomBIOS mapping
-	status_t foundRom = radeon_hd_getbios(info);
+	status_t foundRom = radeon_hd_getbios_r600(info);
 
 	// Turn on write combining for the area
 	vm_set_area_memory_type(info.framebuffer_area,
