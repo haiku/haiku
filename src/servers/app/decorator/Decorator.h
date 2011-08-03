@@ -41,6 +41,8 @@ public:
 				bool			zoomPressed : 1;
 				bool			minimizePressed : 1;
 
+				window_look		look;
+				uint32			flags;
 				bool			isFocused : 1;
 
 				BString			title;
@@ -76,18 +78,18 @@ public:
 			};
 
 public:
-							Decorator(DesktopSettings& settings, BRect rect,
-								window_look look, uint32 flags);
+							Decorator(DesktopSettings& settings, BRect rect);
 	virtual					~Decorator();
 
-	virtual	Decorator::Tab*	AddTab(const char* title, int32 index = -1,
-								BRegion* updateRegion = NULL);
+	virtual	Decorator::Tab*	AddTab(DesktopSettings& settings, const char* title,
+								window_look look, uint32 flags,
+								int32 index = -1, BRegion* updateRegion = NULL);
 	virtual	bool			RemoveTab(int32 index,
 								BRegion* updateRegion = NULL);
 	virtual	bool			MoveTab(int32 from, int32 to, bool isMoving,
 								BRegion* updateRegion = NULL);
 	virtual int32			TabAt(const BPoint& where) const;
-			Decorator::Tab*	TabAt(int32 index)
+			Decorator::Tab*	TabAt(int32 index) const 
 								{ return fTabList.ItemAt(index); }
 			int32			CountTabs() const
 								{ return fTabList.CountItems(); }
@@ -99,13 +101,13 @@ public:
 
 			void			FontsChanged(DesktopSettings& settings,
 								BRegion* updateRegion = NULL);
-			void			SetLook(DesktopSettings& settings, window_look look,
-								BRegion* updateRegion = NULL);
-			void			SetFlags(uint32 flags,
+			void			SetLook(int32 tab, DesktopSettings& settings,
+								window_look look, BRegion* updateRegion = NULL);
+			void			SetFlags(int32 tab, uint32 flags,
 								BRegion* updateRegion = NULL);
 
-			window_look		Look() const;
-			uint32			Flags() const;
+			window_look		Look(int32 tab) const;
+			uint32			Flags(int32 tab) const;
 
 			BRect			BorderRect() const;
 			BRect			TitleBarRect() const;
@@ -195,9 +197,10 @@ protected:
 
 	virtual void			_FontsChanged(DesktopSettings& settings,
 								BRegion* updateRegion = NULL);
-	virtual void			_SetLook(DesktopSettings& settings,
-								window_look look, BRegion* updateRegion = NULL);
-	virtual void			_SetFlags(uint32 flags,
+	virtual void			_SetLook(Decorator::Tab* tab,
+								DesktopSettings& settings, window_look look,
+								BRegion* updateRegion = NULL);
+	virtual void			_SetFlags(Decorator::Tab* tab, uint32 flags,
 								BRegion* updateRegion = NULL);
 
 	virtual void			_MoveBy(BPoint offset);
@@ -206,7 +209,8 @@ protected:
 	virtual bool			_SetSettings(const BMessage& settings,
 								BRegion* updateRegion = NULL);
 
-	virtual bool			_AddTab(int32 index = -1,
+	virtual bool			_AddTab(DesktopSettings& settings,
+								int32 index = -1,
 								BRegion* updateRegion = NULL) = 0;
 	virtual	bool			_RemoveTab(int32 index,
 								BRegion* updateRegion = NULL) = 0;
@@ -218,9 +222,6 @@ protected:
 
 			DrawingEngine*	fDrawingEngine;
 			DrawState		fDrawState;
-
-			window_look		fLook;
-			uint32			fFlags;
 
 			BRect			fTitleBarRect;
 			BRect			fFrame;

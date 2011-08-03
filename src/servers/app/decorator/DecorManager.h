@@ -52,7 +52,7 @@ public:
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect, window_look look, uint32 flags);
+									BRect rect);
 
 			DesktopListenerList	fDesktopListeners;
 

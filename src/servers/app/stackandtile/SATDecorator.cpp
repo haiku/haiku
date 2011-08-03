@@ -49,10 +49,9 @@ static const rgb_color kHighlightTabColorShadow = tint_color(kHighlightTabColor,
 	(B_DARKEN_1_TINT + B_NO_TINT) / 2);
 
 
-SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
-	window_look look, uint32 flags)
+SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame)
 	:
-	DefaultDecorator(settings, frame, look, flags)
+	DefaultDecorator(settings, frame)
 {
 
 }

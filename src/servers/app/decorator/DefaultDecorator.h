@@ -44,8 +44,7 @@ public:
 	};
 
 								DefaultDecorator(DesktopSettings& settings,
-									BRect frame, window_look look,
-									uint32 flags);
+									BRect frame);
 	virtual						~DefaultDecorator();
 
 	virtual float				TabLocation(int32 tab) const;
@@ -126,10 +125,10 @@ protected:
 
 	virtual void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
-	virtual void				_SetLook(DesktopSettings& settings,
-									window_look look,
+	virtual void				_SetLook(Decorator::Tab* tab,
+									DesktopSettings& settings, window_look look,
 									BRegion* updateRegion = NULL);
-	virtual void				_SetFlags(uint32 flags,
+	virtual void				_SetFlags(Decorator::Tab* tab, uint32 flags,
 									BRegion* updateRegion = NULL);
 
 	virtual	void				_MoveBy(BPoint offset);
@@ -142,7 +141,8 @@ protected:
 	virtual	bool				_SetSettings(const BMessage& settings,
 									BRegion* updateRegion = NULL);
 
-	virtual bool				_AddTab(int32 index = -1,
+	virtual bool				_AddTab(DesktopSettings& settings,
+									int32 index = -1,
 									BRegion* updateRegion = NULL);
 	virtual	bool				_RemoveTab(int32 index,
 									BRegion* updateRegion = NULL);

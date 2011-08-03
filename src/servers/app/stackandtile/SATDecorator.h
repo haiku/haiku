@@ -23,8 +23,7 @@ public:
 
 public:
 								SATDecorator(DesktopSettings& settings,
-									BRect frame, window_look look,
-									uint32 flags);
+									BRect frame);
 
 protected:
 	virtual	void				GetComponentColors(Component component,

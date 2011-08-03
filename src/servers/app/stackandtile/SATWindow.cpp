@@ -379,6 +379,8 @@ SATWindow::RemovedFromGroup(SATGroup* group, bool stayBelowMouse)
 		fWindow->Title());
 
 	_RestoreOriginalSize(stayBelowMouse);
+	if (group->CountItems() == 1)
+		group->WindowAt(0)->_RestoreOriginalSize(false);
 
 	if (fShutdown) {
 		fGroupCookie->Uninit();

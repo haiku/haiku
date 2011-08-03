@@ -31,6 +31,9 @@ Decorator::Tab::Tab()
 	closePressed(false),
 	zoomPressed(false),
 	minimizePressed(false),
+
+	look(B_TITLED_WINDOW_LOOK),
+	flags(0),
 	isFocused(false),
 	title("")
 {
@@ -48,14 +51,10 @@ Decorator::Tab::Tab()
 	\param wfeel style of window feel. See Window.h
 	\param wflags various window flags. See Window.h
 */
-Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
-		uint32 flags)
+Decorator::Decorator(DesktopSettings& settings, BRect rect)
 	:
 	fDrawingEngine(NULL),
 	fDrawState(),
-
-	fLook(look),
-	fFlags(flags),
 
 	fTitleBarRect(),
 	fFrame(rect),
@@ -81,12 +80,15 @@ Decorator::~Decorator()
 
 
 Decorator::Tab*
-Decorator::AddTab(const char* title, int32 index, BRegion* updateRegion)
+Decorator::AddTab(DesktopSettings& settings, const char* title,
+	window_look look, uint32 flags, int32 index, BRegion* updateRegion)
 {
 	Decorator::Tab* tab = _AllocateNewTab();
 	if (tab == NULL)
 		return NULL;
 	tab->title = title;
+	tab->look = look;
+	tab->flags = flags;
 
 	bool ok = false;
 	if (index >= 0) {
@@ -100,13 +102,14 @@ Decorator::AddTab(const char* title, int32 index, BRegion* updateRegion)
 		return NULL;
 	}
 
-	if (_AddTab(index, updateRegion) == false) {
+	Decorator::Tab* oldTop = fTopTab;
+	fTopTab = tab;
+	if (_AddTab(settings, index, updateRegion) == false) {
 		fTabList.RemoveItem(tab);
 		delete tab;
+		fTopTab = oldTop;
 		return NULL;
 	}
-
-	fTopTab = tab;
 
 	_InvalidateFootprint();
 	return tab;
@@ -184,7 +187,7 @@ Decorator::SetDrawingEngine(DrawingEngine* engine)
 	\param flags New value for the flags
 */
 void
-Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
+Decorator::SetFlags(int32 tab, uint32 flags, BRegion* updateRegion)
 {
 	// we're nice to our subclasses - we make sure B_NOT_{H|V|}_RESIZABLE
 	// are in sync (it's only a semantical simplification, not a necessity)
@@ -194,7 +197,10 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 	if (flags & B_NOT_RESIZABLE)
 		flags |= B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE;
 
-	_SetFlags(flags, updateRegion);
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	_SetFlags(decoratorTab, flags, updateRegion);
 	_InvalidateFootprint();
 		// the border might have changed (smaller/larger tab)
 }
@@ -214,10 +220,13 @@ Decorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 	\param look New value for the look
 */
 void
-Decorator::SetLook(DesktopSettings& settings, window_look look,
+Decorator::SetLook(int32 tab, DesktopSettings& settings, window_look look,
 	BRegion* updateRect)
 {
-	_SetLook(settings, look, updateRect);
+	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
+	if (decoratorTab == NULL)
+		return;
+	_SetLook(decoratorTab, settings, look, updateRect);
 	_InvalidateFootprint();
 		// the border very likely changed
 }
@@ -227,9 +236,9 @@ Decorator::SetLook(DesktopSettings& settings, window_look look,
 	\return the decorator's window look
 */
 window_look
-Decorator::Look() const
+Decorator::Look(int32 tab) const
 {
-	return fLook;
+	return TabAt(tab)->look;
 }
 
 
@@ -237,9 +246,9 @@ Decorator::Look() const
 	\return the decorator's window flags
 */
 uint32
-Decorator::Flags() const
+Decorator::Flags(int32 tab) const
 {
-	return fFlags;
+	return TabAt(tab)->flags;
 }
 
 
@@ -846,17 +855,17 @@ Decorator::_FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 
 
 void
-Decorator::_SetLook(DesktopSettings& settings, window_look look,
-	BRegion* updateRect)
+Decorator::_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
+	window_look look, BRegion* updateRect)
 {
-	fLook = look;
+	tab->look = look;
 }
 
 
 void
-Decorator::_SetFlags(uint32 flags, BRegion* updateRegion)
+Decorator::_SetFlags(Decorator::Tab* tab, uint32 flags, BRegion* updateRegion)
 {
-	fFlags = flags;
+	tab->flags = flags;
 }
 
 

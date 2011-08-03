@@ -1221,20 +1221,20 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 	if (fCurrentStack.Get() == NULL)
 		return;
 
+	int32 stackPosition = PositionInStack();
+
 	::Decorator* decorator = Decorator();
 	if (decorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
 		decorator = gDecorManager.AllocateDecorator(this);
 		fCurrentStack->SetDecorator(decorator);
-		if (IsFocus()) {
-			int32 index = PositionInStack();
-			decorator->SetFocus(index, true);
-		}
+		if (IsFocus())
+			decorator->SetFocus(stackPosition, true);
 	}
 
 	if (decorator != NULL) {
 		DesktopSettings settings(fDesktop);
-		decorator->SetLook(settings, look, updateRegion);
+		decorator->SetLook(stackPosition, settings, look, updateRegion);
 
 		// we might need to resize the window!
 		decorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
@@ -1288,7 +1288,8 @@ Window::SetFlags(uint32 flags, BRegion* updateRegion)
 	if (decorator == NULL)
 		return;
 
-	decorator->SetFlags(flags, updateRegion);
+	int32 stackPosition = PositionInStack();
+	decorator->SetFlags(stackPosition, flags, updateRegion);
 
 	// we might need to resize the window!
 	decorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
@@ -2101,7 +2102,6 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 			decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
 		// propagate focus to the decorator
 		remainingTop->SetFocus(remainingTop->IsFocus());
-		remainingTop->SetFeel(remainingTop->Feel());
 		remainingTop->SetLook(remainingTop->Look(), &dirty);
 	}
 
@@ -2145,8 +2145,11 @@ Window::AddWindowToStack(Window* window)
 	window->DetachFromWindowStack(false);
 	window->fCurrentStack.SetTo(stack);
 
-	if (decorator != NULL)
-		decorator->AddTab(window->Title(), position, &dirty);
+	if (decorator != NULL) {
+		DesktopSettings settings(fDesktop);
+		decorator->AddTab(settings, window->Title(), window->Look(),
+			window->Flags(), position, &dirty);
+	}
 
 	window->SetLook(window->Look(), &dirty);
 	fDesktop->RebuildAndRedrawAfterWindowChange(TopLayerStackWindow(), dirty);
@@ -2196,7 +2199,6 @@ Window::MoveToTopStackLayer()
 	if (decorator == NULL)
 		return false;
 	decorator->SetDrawingEngine(fDrawingEngine);
-	DesktopSettings settings(fDesktop);
 	SetLook(Look(), NULL);
 	decorator->SetTopTap(PositionInStack());
 	return fCurrentStack->MoveToTopLayer(this);
