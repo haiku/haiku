@@ -13,6 +13,7 @@
 #include "lock.h"
 
 #include "rhd_regs.h"
+#include "r500_reg.h"
 #include "r600_reg.h"
 #include "r800_reg.h"
 
@@ -71,10 +72,10 @@ struct radeon_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
+	bool			has_rom;			// was rom mapped?
 	uint32			rom_phys;			// rom base location
-	area_id			rom_area;			// area of mapped rom
 	uint32			rom_size;			// rom size
-	uint8*			rom;				// virtual memory mapped PCI ROM
+	uint8*			rom;				// cloned, memory mapped PCI ROM
 
 	display_mode	current_mode;
 	uint32			bytes_per_row;
@@ -211,6 +212,39 @@ struct radeon_free_graphics_memory {
 #define DISPLAY_CONTROL_RGB15			(4UL << 26)
 #define DISPLAY_CONTROL_RGB16			(5UL << 26)
 #define DISPLAY_CONTROL_RGB32			(6UL << 26)
+
+/* VIP bus */
+#define RADEON_VIPH_CH0_DATA                0x0c00
+#define RADEON_VIPH_CH1_DATA                0x0c04
+#define RADEON_VIPH_CH2_DATA                0x0c08
+#define RADEON_VIPH_CH3_DATA                0x0c0c
+#define RADEON_VIPH_CH0_ADDR                0x0c10
+#define RADEON_VIPH_CH1_ADDR                0x0c14
+#define RADEON_VIPH_CH2_ADDR                0x0c18
+#define RADEON_VIPH_CH3_ADDR                0x0c1c
+#define RADEON_VIPH_CH0_SBCNT               0x0c20
+#define RADEON_VIPH_CH1_SBCNT               0x0c24
+#define RADEON_VIPH_CH2_SBCNT               0x0c28
+#define RADEON_VIPH_CH3_SBCNT               0x0c2c
+#define RADEON_VIPH_CH0_ABCNT               0x0c30
+#define RADEON_VIPH_CH1_ABCNT               0x0c34
+#define RADEON_VIPH_CH2_ABCNT               0x0c38
+#define RADEON_VIPH_CH3_ABCNT               0x0c3c
+#define RADEON_VIPH_CONTROL                 0x0c40
+#       define RADEON_VIP_BUSY 0
+#       define RADEON_VIP_IDLE 1
+#       define RADEON_VIP_RESET 2
+#       define RADEON_VIPH_EN               (1 << 21)
+#define RADEON_VIPH_DV_LAT                  0x0c44
+#define RADEON_VIPH_BM_CHUNK                0x0c48
+#define RADEON_VIPH_DV_INT                  0x0c4c
+#define RADEON_VIPH_TIMEOUT_STAT            0x0c50
+#define RADEON_VIPH_TIMEOUT_STAT__VIPH_REG_STAT 0x00000010
+#define RADEON_VIPH_TIMEOUT_STAT__VIPH_REG_AK   0x00000010
+#define RADEON_VIPH_TIMEOUT_STAT__VIPH_REGR_DIS 0x01000000
+
+#define RADEON_VIPH_REG_DATA                0x0084
+#define RADEON_VIPH_REG_ADDR                0x0080
 
 // PCI bridge memory management
 

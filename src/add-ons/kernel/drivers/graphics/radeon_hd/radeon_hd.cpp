@@ -5,6 +5,7 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Fredrik Holmqvis, fredrik.holmqvist@gmail.com
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
@@ -39,6 +40,159 @@
 
 #define RHD_FB_BAR   0
 #define RHD_MMIO_BAR 2
+
+
+status_t
+radeon_hd_getbios(radeon_info &info)
+{
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
+
+	uint32 backuprom = get_pci_config(info.pci, PCI_rom_base, 4);
+	set_pci_config(info.pci, PCI_rom_base, 4, 0xffffffff);
+
+	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
+	if (flags & 1)
+		dprintf(DEVICE_NAME ": PCI ROM Disabled\n");
+	if (flags & 2)
+		dprintf(DEVICE_NAME ": PCI ROM Shadowed\n");
+	if (flags & 4)
+		dprintf(DEVICE_NAME ": PCI ROM Copied\n");
+	if (flags & 8)
+		dprintf(DEVICE_NAME ": PCI ROM BIOS copied\n");
+
+	uint32 rom_base = info.pci->u.h0.rom_base;
+	uint32 rom_size = info.pci->u.h0.rom_size;
+
+	if (rom_base == 0) {
+		TRACE("%s: no PCI rom, trying shadow rom\n", __func__);
+		// ROM has been copied by BIOS
+		rom_base = 0xC0000;
+		if (rom_size == 0) {
+			rom_size = 0x7FFF;
+			// Maximum shadow bios size
+			// TODO : This is a guess at best
+		}
+	}
+
+	uint8* bios;
+	status_t result = B_ERROR;
+
+	if (rom_base == 0 || rom_size == 0) {
+		TRACE("%s: no VGA rom located, disabling AtomBIOS\n", __func__);
+		result = B_ERROR;
+	} else {
+		area_id rom_area = map_physical_memory("radeon hd rom",
+			rom_base, rom_size, B_ANY_KERNEL_ADDRESS, B_READ_AREA,
+			(void **)&bios);
+
+		if (info.rom_area < B_OK) {
+			dprintf(DEVICE_NAME ": failed to map rom\n");
+			result = B_ERROR;;
+		} else
+			result = B_OK;
+
+		if (result == B_OK && (bios[0] != 0x55 || bios[1] != 0xAA)) {
+			uint16 id = bios[0] + (bios[1] << 8);
+			dprintf(DEVICE_NAME ": not a PCI rom (%X)!\n", id);
+			result = B_OK;
+		} else {
+			info.shared_info->rom = (uint8*)malloc(rom_size);
+			if (info.shared_info->rom == NULL) {
+				dprintf(DEVICE_NAME ": failed to clone atombios!\n");
+				result = B_ERROR;
+			} else {
+				memcpy(info.shared_info->rom, (void *)bios, rom_size);
+				result = B_OK;
+			}
+		}
+		delete_area(rom_area);
+	}
+	set_pci_config(info.pci, PCI_rom_base, 4, backuprom);
+
+	info.shared_info->rom_phys = rom_base;
+	info.shared_info->rom_size = rom_size;
+
+	return result;
+}
+
+
+status_t
+radeon_hd_getbios_r600(radeon_info &info)
+{
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	uint32 viph_control = read32(info.registers + RADEON_VIPH_CONTROL);
+	uint32 bus_cntl = read32(info.registers + R600_BUS_CNTL);
+	uint32 d1vga_control = read32(info.registers + AVIVO_D1VGA_CONTROL);
+	uint32 d2vga_control = read32(info.registers + AVIVO_D2VGA_CONTROL);
+	uint32 vga_render_control
+		= read32(info.registers + AVIVO_VGA_RENDER_CONTROL);
+	uint32 rom_cntl = read32(info.registers + R600_ROM_CNTL);
+	uint32 general_pwrmgt = read32(info.registers + R600_GENERAL_PWRMGT);
+	uint32 low_vid_lower_gpio_cntl
+		= read32(info.registers + R600_LOW_VID_LOWER_GPIO_CNTL);
+	uint32 medium_vid_lower_gpio_cntl
+		= read32(info.registers + R600_MEDIUM_VID_LOWER_GPIO_CNTL);
+	uint32 high_vid_lower_gpio_cntl
+		= read32(info.registers + R600_HIGH_VID_LOWER_GPIO_CNTL);
+	uint32 ctxsw_vid_lower_gpio_cntl
+		= read32(info.registers + R600_CTXSW_VID_LOWER_GPIO_CNTL);
+	uint32 lower_gpio_enable
+		= read32(info.registers + R600_LOWER_GPIO_ENABLE);
+
+	// disable VIP
+	write32(info.registers + RADEON_VIPH_CONTROL,
+		(viph_control & ~RADEON_VIPH_EN));
+	// enable the rom
+	write32(info.registers + R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
+	// disable VGA mode
+	write32(info.registers + AVIVO_D1VGA_CONTROL, (d1vga_control
+		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + D2VGA_CONTROL, (d2vga_control
+		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
+		(vga_render_control & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
+
+	write32(info.registers + R600_ROM_CNTL,
+		((rom_cntl & ~R600_SCK_PRESCALE_CRYSTAL_CLK_MASK)
+		| (1 << R600_SCK_PRESCALE_CRYSTAL_CLK_SHIFT) | R600_SCK_OVERWRITE));
+
+	write32(info.registers + R600_GENERAL_PWRMGT,
+		(general_pwrmgt & ~R600_OPEN_DRAIN_PADS));
+	write32(info.registers + R600_LOW_VID_LOWER_GPIO_CNTL,
+		(low_vid_lower_gpio_cntl & ~0x400));
+	write32(info.registers + R600_MEDIUM_VID_LOWER_GPIO_CNTL,
+		(medium_vid_lower_gpio_cntl & ~0x400));
+	write32(info.registers + R600_HIGH_VID_LOWER_GPIO_CNTL,
+		(high_vid_lower_gpio_cntl & ~0x400));
+	write32(info.registers + R600_CTXSW_VID_LOWER_GPIO_CNTL,
+		(ctxsw_vid_lower_gpio_cntl & ~0x400));
+	write32(info.registers + R600_LOWER_GPIO_ENABLE,
+		(lower_gpio_enable | 0x400));
+
+	status_t result = radeon_hd_getbios_r600(info);
+
+	// restore regs
+	write32(info.registers + RADEON_VIPH_CONTROL, viph_control);
+	write32(info.registers + R600_BUS_CNTL, bus_cntl);
+	write32(info.registers + AVIVO_D1VGA_CONTROL, d1vga_control);
+	write32(info.registers + AVIVO_D2VGA_CONTROL, d2vga_control);
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL, vga_render_control);
+	write32(info.registers + R600_ROM_CNTL, rom_cntl);
+	write32(info.registers + R600_GENERAL_PWRMGT, general_pwrmgt);
+	write32(info.registers + R600_LOW_VID_LOWER_GPIO_CNTL,
+		low_vid_lower_gpio_cntl);
+	write32(info.registers + R600_MEDIUM_VID_LOWER_GPIO_CNTL,
+		medium_vid_lower_gpio_cntl);
+	write32(info.registers + R600_HIGH_VID_LOWER_GPIO_CNTL,
+		high_vid_lower_gpio_cntl);
+	write32(info.registers + R600_CTXSW_VID_LOWER_GPIO_CNTL,
+		ctxsw_vid_lower_gpio_cntl);
+	write32(info.registers + R600_LOWER_GPIO_ENABLE, lower_gpio_enable);
+
+	return result;
+}
 
 
 status_t
@@ -85,17 +239,7 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	// *** VGA rom / AtomBIOS mapping
-	AreaKeeper romMapper;
-	info.rom_area = romMapper.Map("radeon hd rom",
-		(void *)info.pci->u.h0.rom_base,
-		info.pci->u.h0.rom_size,
-		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-		(void **)&info.shared_info->rom);
-	if (romMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": card(%ld): could not map VGA rom!\n",
-			info.id);
-		return info.rom_area;
-	}
+	status_t foundRom = radeon_hd_getbios(info);
 
 	// Turn on write combining for the area
 	vm_set_area_memory_type(info.framebuffer_area,
@@ -104,7 +248,6 @@ radeon_hd_init(radeon_info &info)
 	sharedCreator.Detach();
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
-	romMapper.Detach();
 
 	// Pass common information to accelerant
 	info.shared_info->device_id = info.device_id;
@@ -115,10 +258,11 @@ radeon_hd_init(radeon_info &info)
 		= info.pci->u.h0.base_registers[RHD_FB_BAR];
 	info.shared_info->frame_buffer_int
 		= read32(info.registers + R6XX_CONFIG_FB_BASE);
-	info.shared_info->rom_area = info.rom_area;
-	info.shared_info->rom_phys = info.pci->u.h0.rom_base;
-	info.shared_info->rom_size = info.pci->u.h0.rom_size;
 
+	// populate VGA rom info into shared_info
+	info.shared_info->has_rom = (foundRom == B_OK) ? true : false;
+
+	// Copy device name into shared_info
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 
 	// Pull active monitor VESA EDID from boot loader

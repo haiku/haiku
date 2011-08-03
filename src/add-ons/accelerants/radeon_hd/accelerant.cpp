@@ -41,7 +41,6 @@
 
 struct accelerant_info *gInfo;
 display_info *gDisplay[MAX_DISPLAY];
-void *gAtomBIOS;
 
 
 class AreaCloner {
@@ -157,26 +156,8 @@ init_common(int device, bool isClone)
 		return status;
 	}
 
-	AreaCloner romCloner;
-	gInfo->rom_area = romCloner.Clone("radeon hd rom",
-		(void **)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-		gInfo->shared_info->rom_area);
-	status = romCloner.InitCheck();
-	if (status < B_OK) {
-		free(gInfo);
-		TRACE("%s, failed to create rom area\n", __func__);
-		return status;
-	}
-
 	sharedCloner.Keep();
 	regsCloner.Keep();
-	romCloner.Keep();
-
-	gAtomBIOS = (void*)malloc(gInfo->shared_info->rom_size);
-
-	if (gAtomBIOS == NULL) {
-		TRACE("%s, failed to malloc AtomBIOS pointer of holding\n", __func__);
-	}
 
 	// Define Radeon PLL default ranges
 	gInfo->shared_info->pll_info.reference_frequency
@@ -195,7 +176,6 @@ uninit_common(void)
 	if (gInfo != NULL) {
 		delete_area(gInfo->regs_area);
 		delete_area(gInfo->shared_info_area);
-		delete_area(gInfo->rom_area);
 
 		gInfo->regs_area = gInfo->shared_info_area = -1;
 
@@ -205,8 +185,6 @@ uninit_common(void)
 
 		free(gInfo);
 	}
-
-	free(gAtomBIOS);
 
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id] != NULL) {
@@ -235,7 +213,7 @@ radeon_init_accelerant(int device)
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
-	radeon_init_bios(gAtomBIOS);
+	radeon_init_bios(info.rom);
 
 	status = detect_displays();
 	//if (status != B_OK)

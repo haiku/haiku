@@ -1,8 +1,7 @@
 /*
- * RadeonHD R6xx, R7xx Register documentation
- *
- * Copyright (C) 2008-2009  Advanced Micro Devices, Inc.
- * Copyright (C) 2008-2009  Matthias Hopf
+ * Copyright 2008 Advanced Micro Devices, Inc.
+ * Copyright 2008 Red Hat Inc.
+ * Copyright 2009 Jerome Glisse.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -11,155 +10,197 @@
  * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE COPYRIGHT HOLDER(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE COPYRIGHT HOLDER(S) OR AUTHOR(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Authors: Dave Airlie
+ *          Alex Deucher
+ *          Jerome Glisse
  */
+#ifndef __R600_REG_H__
+#define __R600_REG_H__
 
-#ifndef _R600_REG_H_
-#define _R600_REG_H_
-
-/*
- * Register definitions
- */
 
 #include "r600_reg_auto_r6xx.h"
 #include "r600_reg_r6xx.h"
 #include "r600_reg_r7xx.h"
 
 
-/* From Linux DRM Radeon driver for AtomBIOS */
-#define RADEON_SEPROM_CNTL1			0x01c0
-#define RADEON_SCK_PRESCALE_SHIFT	24
-#define RADEON_SCK_PRESCALE_MASK	(0xff << 24)
+#define R600_PCIE_PORT_INDEX                0x0038
+#define R600_PCIE_PORT_DATA                 0x003c
 
-#define RADEON_VIPH_CONTROL			0x0c40
-#define RADEON_VIPH_EN				(1 << 21)
+#define R600_MC_VM_FB_LOCATION			0x2180
+#define		R600_MC_FB_BASE_MASK			0x0000FFFF
+#define		R600_MC_FB_BASE_SHIFT			0
+#define		R600_MC_FB_TOP_MASK			0xFFFF0000
+#define		R600_MC_FB_TOP_SHIFT			16
+#define R600_MC_VM_AGP_TOP			0x2184
+#define		R600_MC_AGP_TOP_MASK			0x0003FFFF
+#define		R600_MC_AGP_TOP_SHIFT			0
+#define R600_MC_VM_AGP_BOT			0x2188
+#define		R600_MC_AGP_BOT_MASK			0x0003FFFF
+#define		R600_MC_AGP_BOT_SHIFT			0
+#define R600_MC_VM_AGP_BASE			0x218c
+#define R600_MC_VM_SYSTEM_APERTURE_LOW_ADDR	0x2190
+#define		R600_LOGICAL_PAGE_NUMBER_MASK		0x000FFFFF
+#define		R600_LOGICAL_PAGE_NUMBER_SHIFT		0
+#define R600_MC_VM_SYSTEM_APERTURE_HIGH_ADDR	0x2194
+#define R600_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR	0x2198
 
-#define RADEON_GPIOPAD_MASK			0x0198
-#define RADEON_GPIOPAD_A            0x019c
-#define RADEON_GPIOPAD_EN			0x01a0
-#define RADEON_GPIOPAD_Y			0x01a4
-#define RADEON_MDGPIO_MASK			0x01a8
-#define RADEON_MDGPIO_A				0x01ac
-#define RADEON_MDGPIO_EN			0x01b0
-#define RADEON_MDGPIO_Y				0x01b4
+#define R700_MC_VM_FB_LOCATION			0x2024
+#define		R700_MC_FB_BASE_MASK			0x0000FFFF
+#define		R700_MC_FB_BASE_SHIFT			0
+#define		R700_MC_FB_TOP_MASK			0xFFFF0000
+#define		R700_MC_FB_TOP_SHIFT			16
+#define R700_MC_VM_AGP_TOP			0x2028
+#define		R700_MC_AGP_TOP_MASK			0x0003FFFF
+#define		R700_MC_AGP_TOP_SHIFT			0
+#define R700_MC_VM_AGP_BOT			0x202c
+#define		R700_MC_AGP_BOT_MASK			0x0003FFFF
+#define		R700_MC_AGP_BOT_SHIFT			0
+#define R700_MC_VM_AGP_BASE			0x2030
+#define R700_MC_VM_SYSTEM_APERTURE_LOW_ADDR	0x2034
+#define		R700_LOGICAL_PAGE_NUMBER_MASK		0x000FFFFF
+#define		R700_LOGICAL_PAGE_NUMBER_SHIFT		0
+#define R700_MC_VM_SYSTEM_APERTURE_HIGH_ADDR	0x2038
+#define R700_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR	0x203c
 
-#define RV370_BUS_CNTL				0x004c
-
-#define R600_CG_SPLL_FUNC_CNTL		0x600
-#define R600_CG_SPLL_STATUS			0x60c
-#define R600_ROM_CNTL				0x1600
-#define R600_BUS_CNTL				0x5420
-
-#define R600_BIOS_ROM_DIS			(1 << 1)
-#define R600_SCK_OVERWRITE			(1 << 1)
-#define R600_SPLL_CHG_STATUS		(1 << 1)
-#define R600_SPLL_BYPASS_EN			(1 << 3)
-#define DVGA_CONTROL_MODE_ENABLE	(1 << 0)
-#define DVGA_CONTROL_TIMING_SELECT	(1 << 8)
-#define VGA_VSTATUS_CNTL_MASK		(3 << 16)
+#define R600_RAMCFG				       0x2408
+#       define R600_CHANSIZE                           (1 << 7)
+#       define R600_CHANSIZE_OVERRIDE                  (1 << 10)
 
 
-/* SET_*_REG offsets + ends */
-enum {
-    SET_CONFIG_REG_offset          = 0x00008000,
-    SET_CONFIG_REG_end             = 0x0000ac00,
-    SET_CONTEXT_REG_offset         = 0x00028000,
-    SET_CONTEXT_REG_end            = 0x00029000,
-    SET_ALU_CONST_offset           = 0x00030000,
-    SET_ALU_CONST_end              = 0x00032000,
-    SET_RESOURCE_offset            = 0x00038000,
-    SET_RESOURCE_end               = 0x0003c000,
-    SET_SAMPLER_offset             = 0x0003c000,
-    SET_SAMPLER_end                = 0x0003cff0,
-    SET_CTL_CONST_offset           = 0x0003cff0,
-    SET_CTL_CONST_end              = 0x0003e200,
-    SET_LOOP_CONST_offset          = 0x0003e200,
-    SET_LOOP_CONST_end             = 0x0003e380,
-    SET_BOOL_CONST_offset          = 0x0003e380,
-    SET_BOOL_CONST_end             = 0x0003e38c
-};
+#define R600_GENERAL_PWRMGT                                        0x618
+#	define R600_OPEN_DRAIN_PADS				   (1 << 11)
 
-/* packet3 IT_SURFACE_BASE_UPDATE bits */
-enum {
-	DEPTH_BASE    = (1 << 0),
-	COLOR0_BASE   = (1 << 1),
-	COLOR1_BASE   = (1 << 2),
-	COLOR2_BASE   = (1 << 3),
-	COLOR3_BASE   = (1 << 4),
-	COLOR4_BASE   = (1 << 5),
-	COLOR5_BASE   = (1 << 6),
-	COLOR6_BASE   = (1 << 7),
-	COLOR7_BASE   = (1 << 8),
-	STRMOUT_BASE0 = (1 << 9),
-	STRMOUT_BASE1 = (1 << 10),
-	STRMOUT_BASE2 = (1 << 11),
-	STRMOUT_BASE3 = (1 << 12),
-	COHER_BASE0   = (1 << 13),
-	COHER_BASE1   = (1 << 14)
-};
+#define R600_LOWER_GPIO_ENABLE                                     0x710
+#define R600_CTXSW_VID_LOWER_GPIO_CNTL                             0x718
+#define R600_HIGH_VID_LOWER_GPIO_CNTL                              0x71c
+#define R600_MEDIUM_VID_LOWER_GPIO_CNTL                            0x720
+#define R600_LOW_VID_LOWER_GPIO_CNTL                               0x724
 
-/* packet3 IT_WAIT_REG_MEM operation encoding */
-enum {
-	WAIT_ALWAYS = (0<<0),
-	WAIT_LT     = (1<<0),
-	WAIT_LE     = (2<<0),
-	WAIT_EQ     = (3<<0),
-	WAIT_NE     = (4<<0),
-	WAIT_GE     = (5<<0),
-	WAIT_GT     = (6<<0),
+#define R600_D1GRPH_SWAP_CONTROL                               0x610C
+#       define R600_D1GRPH_SWAP_ENDIAN_NONE                    (0 << 0)
+#       define R600_D1GRPH_SWAP_ENDIAN_16BIT                   (1 << 0)
+#       define R600_D1GRPH_SWAP_ENDIAN_32BIT                   (2 << 0)
+#       define R600_D1GRPH_SWAP_ENDIAN_64BIT                   (3 << 0)
 
-	WAIT_REG    = (0<<4),
-	WAIT_MEM    = (1<<4)
-};
+#define R600_HDP_NONSURFACE_BASE                                0x2c04
 
-/* Packet3 commands */
-enum {
-    IT_NOP                               = 0x10,
-    IT_INDIRECT_BUFFER_END               = 0x17,
-    IT_SET_PREDICATION                   = 0x20,
-    IT_REG_RMW                           = 0x21,
-    IT_COND_EXEC                         = 0x22,
-    IT_PRED_EXEC                         = 0x23,
-    IT_START_3D_CMDBUF                   = 0x24,
-    IT_DRAW_INDEX_2                      = 0x27,
-    IT_CONTEXT_CONTROL                   = 0x28,
-    IT_DRAW_INDEX_IMMD_BE                = 0x29,
-    IT_INDEX_TYPE                        = 0x2A,
-    IT_DRAW_INDEX                        = 0x2B,
-    IT_DRAW_INDEX_AUTO                   = 0x2D,
-    IT_DRAW_INDEX_IMMD                   = 0x2E,
-    IT_NUM_INSTANCES                     = 0x2F,
-    IT_STRMOUT_BUFFER_UPDATE             = 0x34,
-    IT_INDIRECT_BUFFER_MP                = 0x38,
-    IT_MEM_SEMAPHORE                     = 0x39,
-    IT_MPEG_INDEX                        = 0x3A,
-    IT_WAIT_REG_MEM                      = 0x3C,
-    IT_MEM_WRITE                         = 0x3D,
-    IT_INDIRECT_BUFFER                   = 0x32,
-    IT_CP_INTERRUPT                      = 0x40,
-    IT_SURFACE_SYNC                      = 0x43,
-    IT_ME_INITIALIZE                     = 0x44,
-    IT_COND_WRITE                        = 0x45,
-    IT_EVENT_WRITE                       = 0x46,
-    IT_EVENT_WRITE_EOP                   = 0x47,
-    IT_ONE_REG_WRITE                     = 0x57,
-    IT_SET_CONFIG_REG                    = 0x68,
-    IT_SET_CONTEXT_REG                   = 0x69,
-    IT_SET_ALU_CONST                     = 0x6A,
-    IT_SET_BOOL_CONST                    = 0x6B,
-    IT_SET_LOOP_CONST                    = 0x6C,
-    IT_SET_RESOURCE                      = 0x6D,
-    IT_SET_SAMPLER                       = 0x6E,
-    IT_SET_CTL_CONST                     = 0x6F,
-    IT_SURFACE_BASE_UPDATE               = 0x73
-};
+#define R600_BUS_CNTL                                           0x5420
+#       define R600_BIOS_ROM_DIS                                (1 << 1)
+#define R600_CONFIG_CNTL                                        0x5424
+#define R600_CONFIG_MEMSIZE                                     0x5428
+#define R600_CONFIG_F0_BASE                                     0x542C
+#define R600_CONFIG_APER_SIZE                                   0x5430
+
+#define R600_ROM_CNTL                              0x1600
+#       define R600_SCK_OVERWRITE                  (1 << 1)
+#       define R600_SCK_PRESCALE_CRYSTAL_CLK_SHIFT 28
+#       define R600_SCK_PRESCALE_CRYSTAL_CLK_MASK  (0xf << 28)
+
+#define R600_CG_SPLL_FUNC_CNTL                     0x600
+#       define R600_SPLL_BYPASS_EN                 (1 << 3)
+#define R600_CG_SPLL_STATUS                        0x60c
+#       define R600_SPLL_CHG_STATUS                (1 << 1)
+
+#define R600_BIOS_0_SCRATCH               0x1724
+#define R600_BIOS_1_SCRATCH               0x1728
+#define R600_BIOS_2_SCRATCH               0x172c
+#define R600_BIOS_3_SCRATCH               0x1730
+#define R600_BIOS_4_SCRATCH               0x1734
+#define R600_BIOS_5_SCRATCH               0x1738
+#define R600_BIOS_6_SCRATCH               0x173c
+#define R600_BIOS_7_SCRATCH               0x1740
+
+/* Audio, these regs were reverse enginered,
+ * so the chance is high that the naming is wrong
+ * R6xx+ ??? */
+
+/* Audio clocks */
+#define R600_AUDIO_PLL1_MUL               0x0514
+#define R600_AUDIO_PLL1_DIV               0x0518
+#define R600_AUDIO_PLL2_MUL               0x0524
+#define R600_AUDIO_PLL2_DIV               0x0528
+#define R600_AUDIO_CLK_SRCSEL             0x0534
+
+/* Audio general */
+#define R600_AUDIO_ENABLE                 0x7300
+#define R600_AUDIO_TIMING                 0x7344
+
+/* Audio params */
+#define R600_AUDIO_VENDOR_ID              0x7380
+#define R600_AUDIO_REVISION_ID            0x7384
+#define R600_AUDIO_ROOT_NODE_COUNT        0x7388
+#define R600_AUDIO_NID1_NODE_COUNT        0x738c
+#define R600_AUDIO_NID1_TYPE              0x7390
+#define R600_AUDIO_SUPPORTED_SIZE_RATE    0x7394
+#define R600_AUDIO_SUPPORTED_CODEC        0x7398
+#define R600_AUDIO_SUPPORTED_POWER_STATES 0x739c
+#define R600_AUDIO_NID2_CAPS              0x73a0
+#define R600_AUDIO_NID3_CAPS              0x73a4
+#define R600_AUDIO_NID3_PIN_CAPS          0x73a8
+
+/* Audio conn list */
+#define R600_AUDIO_CONN_LIST_LEN          0x73ac
+#define R600_AUDIO_CONN_LIST              0x73b0
+
+/* Audio verbs */
+#define R600_AUDIO_RATE_BPS_CHANNEL       0x73c0
+#define R600_AUDIO_PLAYING                0x73c4
+#define R600_AUDIO_IMPLEMENTATION_ID      0x73c8
+#define R600_AUDIO_CONFIG_DEFAULT         0x73cc
+#define R600_AUDIO_PIN_SENSE              0x73d0
+#define R600_AUDIO_PIN_WIDGET_CNTL        0x73d4
+#define R600_AUDIO_STATUS_BITS            0x73d8
+
+/* HDMI base register addresses */
+#define R600_HDMI_BLOCK1                  0x7400
+#define R600_HDMI_BLOCK2                  0x7700
+#define R600_HDMI_BLOCK3                  0x7800
+
+/* HDMI registers */
+#define R600_HDMI_ENABLE                0x00
+#define R600_HDMI_STATUS                0x04
+#       define R600_HDMI_INT_PENDING    (1 << 29)
+#define R600_HDMI_CNTL                  0x08
+#       define R600_HDMI_INT_EN         (1 << 28)
+#       define R600_HDMI_INT_ACK        (1 << 29)
+#define R600_HDMI_UNKNOWN_0             0x0C
+#define R600_HDMI_AUDIOCNTL             0x10
+#define R600_HDMI_VIDEOCNTL             0x14
+#define R600_HDMI_VERSION               0x18
+#define R600_HDMI_UNKNOWN_1             0x28
+#define R600_HDMI_VIDEOINFOFRAME_0      0x54
+#define R600_HDMI_VIDEOINFOFRAME_1      0x58
+#define R600_HDMI_VIDEOINFOFRAME_2      0x5c
+#define R600_HDMI_VIDEOINFOFRAME_3      0x60
+#define R600_HDMI_32kHz_CTS             0xac
+#define R600_HDMI_32kHz_N               0xb0
+#define R600_HDMI_44_1kHz_CTS           0xb4
+#define R600_HDMI_44_1kHz_N             0xb8
+#define R600_HDMI_48kHz_CTS             0xbc
+#define R600_HDMI_48kHz_N               0xc0
+#define R600_HDMI_AUDIOINFOFRAME_0      0xcc
+#define R600_HDMI_AUDIOINFOFRAME_1      0xd0
+#define R600_HDMI_IEC60958_1            0xd4
+#define R600_HDMI_IEC60958_2            0xd8
+#define R600_HDMI_UNKNOWN_2             0xdc
+#define R600_HDMI_AUDIO_DEBUG_0         0xe0
+#define R600_HDMI_AUDIO_DEBUG_1         0xe4
+#define R600_HDMI_AUDIO_DEBUG_2         0xe8
+#define R600_HDMI_AUDIO_DEBUG_3         0xec
+
+/* HDMI additional config base register addresses */
+#define R600_HDMI_CONFIG1                 0x7600
+#define R600_HDMI_CONFIG2                 0x7a00
 
 #endif

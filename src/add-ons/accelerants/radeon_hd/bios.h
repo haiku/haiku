@@ -14,7 +14,7 @@
 #include "atom.h"
 
 
-status_t radeon_init_bios(void* bios);
+status_t radeon_init_bios(uint8* bios);
 
 
 #endif /* RADEON_HD_BIOS_H */
