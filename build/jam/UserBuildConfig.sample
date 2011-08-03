@@ -30,3 +30,8 @@
 
 # Don't add the libraries built with the alternative gcc version.
 #HAIKU_ADD_ALTERNATIVE_GCC_LIBS = 0 ;
+
+# Add an optional gfx driver and its accelerant.
+# (Drivers just have a special rule because of the need for the symlink in dev/)
+AddDriversToHaikuImage graphics : optional_driver ;
+AddFilesToHaikuImage system add-ons accelerants : optional_driver.accelerant ;
