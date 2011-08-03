@@ -640,7 +640,10 @@ struct pci_module_info {
 	masks for flags in expansion rom base address registers
 --- */
 
-#define PCI_rom_enable			0x00000001	/* 1 = expansion rom decode enabled */
+#define PCI_rom_enable			0x00000001	/* 1 expansion rom decode enabled */
+#define PCI_rom_shadow			0x00000010	/* 2 rom copied at shadow (C0000) */
+#define PCI_rom_copy			0x00000100	/* 4 rom is allocated copy */
+#define PCI_rom_bios			0x00001000	/* 8 rom is bios copy */
 #define PCI_rom_address_mask	0xFFFFF800	/* mask to get expansion rom addr */
 
 /** PCI interrupt pin values */
