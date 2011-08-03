@@ -41,6 +41,7 @@
 
 struct accelerant_info *gInfo;
 display_info *gDisplay[MAX_DISPLAY];
+void *gAtomBIOS;
 
 
 class AreaCloner {
@@ -162,14 +163,20 @@ init_common(int device, bool isClone)
 		gInfo->shared_info->rom_area);
 	status = romCloner.InitCheck();
 	if (status < B_OK) {
-		//free(gInfo);
+		free(gInfo);
 		TRACE("%s, failed to create rom area\n", __func__);
-		//return status;
+		return status;
 	}
 
 	sharedCloner.Keep();
 	regsCloner.Keep();
 	romCloner.Keep();
+
+	gAtomBIOS = (void*)malloc(gInfo->shared_info->rom_size);
+
+	if (gAtomBIOS == NULL) {
+		TRACE("%s, failed to malloc AtomBIOS pointer of holding\n", __func__);
+	}
 
 	// Define Radeon PLL default ranges
 	gInfo->shared_info->pll_info.reference_frequency
@@ -199,58 +206,14 @@ uninit_common(void)
 		free(gInfo);
 	}
 
+	free(gAtomBIOS);
+
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id] != NULL) {
 			free(gDisplay[id]->regs);
 			free(gDisplay[id]);
 		}
 	}
-}
-
-
-status_t
-radeon_init_bios()
-{
-	radeon_shared_info &info = *gInfo->shared_info;
-
-	uint32 bus_cntl = Read32(OUT, R600_BUS_CNTL);
-	uint32 d1vga_control = Read32(OUT, D1VGA_CONTROL);
-	uint32 d2vga_control = Read32(OUT, D2VGA_CONTROL);
-	uint32 vga_render_control = Read32(OUT, VGA_RENDER_CONTROL);
-	uint32 rom_cntl = Read32(OUT, R600_ROM_CNTL);
-
-	// Enable rom access
-	Write32(OUT, R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
-	/* Disable VGA mode */
-	Write32(OUT, D1VGA_CONTROL, (d1vga_control
-		& ~(DVGA_CONTROL_MODE_ENABLE
-			| DVGA_CONTROL_TIMING_SELECT)));
-	Write32(OUT, D2VGA_CONTROL, (d2vga_control
-		& ~(DVGA_CONTROL_MODE_ENABLE
-			| DVGA_CONTROL_TIMING_SELECT)));
-	Write32(OUT, VGA_RENDER_CONTROL, (vga_render_control
-		& ~VGA_VSTATUS_CNTL_MASK));
-	Write32(OUT, R600_ROM_CNTL, rom_cntl | R600_SCK_OVERWRITE);
-
-	void* atomBIOS = (void*)malloc(info.rom_size);
-	if (atomBIOS == NULL)
-		return B_NO_MEMORY;
-
-	snooze(2);
-
-	memcpy(atomBIOS, gInfo->rom, info.rom_size);
-
-	/* restore regs */
-	Write32(OUT, R600_BUS_CNTL, bus_cntl);
-	Write32(OUT, D1VGA_CONTROL, d1vga_control);
-	Write32(OUT, D2VGA_CONTROL, d2vga_control);
-	Write32(OUT, VGA_RENDER_CONTROL, vga_render_control);
-	Write32(OUT, R600_ROM_CNTL, rom_cntl);
-
-	// Init AtomBIOS
-	bios_init(atomBIOS);
-
-	return B_OK;
 }
 
 
@@ -272,7 +235,7 @@ radeon_init_accelerant(int device)
 	init_lock(&info.accelerant_lock, "radeon hd accelerant");
 	init_lock(&info.engine_lock, "radeon hd engine");
 
-	radeon_init_bios();
+	radeon_init_bios(gAtomBIOS);
 
 	status = detect_displays();
 	//if (status != B_OK)

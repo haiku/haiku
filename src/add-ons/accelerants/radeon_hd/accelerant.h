@@ -116,7 +116,8 @@ typedef struct {
 
 
 extern accelerant_info *gInfo;
-extern atom_context *gAtomBIOS;
+extern void *gAtomBIOS;
+extern atom_context *gAtomContext;
 extern display_info *gDisplay[MAX_DISPLAY];
 
 

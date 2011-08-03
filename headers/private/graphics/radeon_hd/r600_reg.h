@@ -34,13 +34,38 @@
 #include "r600_reg_r7xx.h"
 
 
+/* From Linux DRM Radeon driver for AtomBIOS */
+#define RADEON_SEPROM_CNTL1			0x01c0
+#define RADEON_SCK_PRESCALE_SHIFT	24
+#define RADEON_SCK_PRESCALE_MASK	(0xff << 24)
+
+#define RADEON_VIPH_CONTROL			0x0c40
+#define RADEON_VIPH_EN				(1 << 21)
+
+#define RADEON_GPIOPAD_MASK			0x0198
+#define RADEON_GPIOPAD_A            0x019c
+#define RADEON_GPIOPAD_EN			0x01a0
+#define RADEON_GPIOPAD_Y			0x01a4
+#define RADEON_MDGPIO_MASK			0x01a8
+#define RADEON_MDGPIO_A				0x01ac
+#define RADEON_MDGPIO_EN			0x01b0
+#define RADEON_MDGPIO_Y				0x01b4
+
+#define RV370_BUS_CNTL				0x004c
+
+#define R600_CG_SPLL_FUNC_CNTL		0x600
+#define R600_CG_SPLL_STATUS			0x60c
 #define R600_ROM_CNTL				0x1600
 #define R600_BUS_CNTL				0x5420
+
 #define R600_BIOS_ROM_DIS			(1 << 1)
 #define R600_SCK_OVERWRITE			(1 << 1)
+#define R600_SPLL_CHG_STATUS		(1 << 1)
+#define R600_SPLL_BYPASS_EN			(1 << 3)
 #define DVGA_CONTROL_MODE_ENABLE	(1 << 0)
 #define DVGA_CONTROL_TIMING_SELECT	(1 << 8)
 #define VGA_VSTATUS_CNTL_MASK		(3 << 16)
+
 
 /* SET_*_REG offsets + ends */
 enum {
