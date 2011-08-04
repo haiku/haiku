@@ -3200,7 +3200,7 @@ BWindow::_SetFocus(BView* focusView, bool notifyInputServer)
 	// we notify the input server if we are passing focus
 	// from a view which has the B_INPUT_METHOD_AWARE to a one
 	// which does not, or vice-versa
-	if (notifyInputServer) {
+	if (notifyInputServer && fActive) {
 		bool inputMethodAware = false;
 		if (focusView)
 			inputMethodAware = focusView->Flags() & B_INPUT_METHOD_AWARE;
