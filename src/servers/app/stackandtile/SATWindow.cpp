@@ -424,6 +424,10 @@ SATWindow::StackWindow(SATWindow* child)
 void
 SATWindow::RemovedFromArea(WindowArea* area)
 {
+	SATDecorator* decorator = GetDecorator();
+	if (decorator != NULL)
+		fOldTabLocatiom = decorator->TabRect(fWindow->PositionInStack()).left;
+
 	fWindow->DetachFromWindowStack(true);
 	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
 		fSATSnappingBehaviourList.ItemAt(i)->RemovedFromArea(area);
@@ -776,11 +780,8 @@ SATWindow::_RestoreOriginalSize(bool stayBelowMouse)
 		&& mousePosition.x <= frame.right + decorator->BorderWidth() +1
 		&& mousePosition.x >= frame.left + decorator->BorderWidth()) {
 		// verify mouse stays on the tab
-		float deltaX = 0;
-		if (tabRect.right < mousePosition.x)
-			deltaX = mousePosition.x - tabRect.right + 20;
-		else if (tabRect.left > mousePosition.x)
-			deltaX = mousePosition.x - tabRect.left - 20;
+		float oldOffset = mousePosition.x - fOldTabLocatiom;
+		float deltaX = mousePosition.x - (tabRect.left + oldOffset);
 		fDesktop->MoveWindowBy(fWindow, deltaX, 0);
 	} else {
 		// verify mouse stays on the border

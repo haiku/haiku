@@ -174,6 +174,8 @@ private:
 			float				fOriginalHeight;
 
 			uint64				fId;
+
+			float				fOldTabLocatiom;
 };
 
 
