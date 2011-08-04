@@ -2089,10 +2089,9 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	if (fCurrentStack->RemoveWindow(this) == false)
 		return false;
 
-	BRegion dirty;
 	::Decorator* decorator = fCurrentStack->Decorator();
 	if (decorator != NULL) {
-		decorator->RemoveTab(index, &dirty);
+		decorator->RemoveTab(index);
 		decorator->SetTopTap(fCurrentStack->LayerOrder().CountItems() - 1);
 	}
 
@@ -2102,7 +2101,7 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 			decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
 		// propagate focus to the decorator
 		remainingTop->SetFocus(remainingTop->IsFocus());
-		remainingTop->SetLook(remainingTop->Look(), &dirty);
+		remainingTop->SetLook(remainingTop->Look(), NULL);
 	}
 
 	fCurrentStack = NULL;
@@ -2112,9 +2111,8 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	SetFocus(IsFocus());
 
 	if (remainingTop != NULL) {
-		dirty.Include(&remainingTop->VisibleRegion());
-		dirty.IntersectWith(&remainingTop->VisibleRegion());
-		fDesktop->RebuildAndRedrawAfterWindowChange(remainingTop, dirty);
+		fDesktop->RebuildAndRedrawAfterWindowChange(remainingTop,
+			remainingTop->VisibleRegion());
 	}
 	return true;
 }
