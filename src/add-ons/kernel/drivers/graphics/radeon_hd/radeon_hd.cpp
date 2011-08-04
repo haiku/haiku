@@ -64,13 +64,7 @@ radeon_hd_getbios(radeon_info &info)
 
 	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
 	if (flags & PCI_rom_enable)
-		dprintf(DEVICE_NAME ": PCI ROM decode enabled\n");
-	if (flags & PCI_rom_shadow)
-		dprintf(DEVICE_NAME ": PCI ROM shadowed\n");
-	if (flags & PCI_rom_copy)
-		dprintf(DEVICE_NAME ": PCI ROM allocated copy\n");
-	if (flags & PCI_rom_bios)
-		dprintf(DEVICE_NAME ": PCI ROM BIOS copy\n");
+		TRACE("%s: PCI ROM decode enabled successfully\n", __func__);
 
 	uint32 rom_base = info.shared_info->rom_phys;
 	uint32 rom_size = info.shared_info->rom_size;
@@ -94,16 +88,17 @@ radeon_hd_getbios(radeon_info &info)
 		} else {
 			if (bios[0] != 0x55 || bios[1] != 0xAA) {
 				uint16 id = bios[0] + (bios[1] << 8);
-				dprintf(DEVICE_NAME ": not a PCI rom (%X)!\n", id);
+				TRACE("%s: this isn't a PCI rom (%X)\n", __func__, id);
 				result = B_ERROR;
 			} else {
-				TRACE("%s: found a valid VGA bios!\n", __func__);
 				memcpy(info.atom_buffer, (void *)bios, rom_size);
 				if (isAtomBIOS(info.atom_buffer)) {
-					dprintf(DEVICE_NAME ": AtomBIOS found and mapped!\n");
+					dprintf(DEVICE_NAME ": %s: AtomBIOS found and mapped!\n",
+						__func__);
 					result = B_OK;
 				} else {
-					dprintf(DEVICE_NAME ": AtomBIOS not mapped!\n");
+					dprintf(DEVICE_NAME ": %s: AtomBIOS not mapped!\n",
+						__func__);
 					result = B_ERROR;
 				}
 			}
@@ -209,13 +204,14 @@ radeon_hd_init(radeon_info &info)
 		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sizeof(radeon_shared_info)), B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK) {
+		dprintf(DEVICE_NAME ": card (%ld): couldn't map shared area!\n",
+			info.id);
 		return info.shared_area;
 	}
 
 	memset((void *)info.shared_info, 0, sizeof(radeon_shared_info));
 
 	// *** Map Memory mapped IO
-	// R6xx_R7xx_3D.pdf, 5.3.3.1 SET_CONFIG_REG
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
 		(void *)info.pci->u.h0.base_registers[RHD_MMIO_BAR],
@@ -223,7 +219,7 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": card (%ld): could not map memory I/O!\n",
+		dprintf(DEVICE_NAME ": card (%ld): couldn't map memory I/O!\n",
 			info.id);
 		return info.registers_area;
 	}
@@ -236,18 +232,30 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void **)&info.shared_info->frame_buffer);
 	if (frambufferMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": card(%ld): could not map framebuffer!\n",
+		dprintf(DEVICE_NAME ": card(%ld): couldn't map framebuffer!\n",
 			info.id);
 		return info.framebuffer_area;
 	}
 
-	// Turn on write combining for the area
+	// Turn on write combining for the frame buffer area
 	vm_set_area_memory_type(info.framebuffer_area,
 		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
 
 	sharedCreator.Detach();
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
+
+	// Pass common information to accelerant
+	info.shared_info->device_id = info.device_id;
+	info.shared_info->device_chipset = info.device_chipset;
+	info.shared_info->registers_area = info.registers_area;
+	strcpy(info.shared_info->device_identifier, info.device_identifier);
+
+	info.shared_info->frame_buffer_area = info.framebuffer_area;
+	info.shared_info->frame_buffer_phys
+		= info.pci->u.h0.base_registers[RHD_FB_BAR];
+	info.shared_info->frame_buffer_int
+		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
 	// *** AtomBIOS mapping
 	uint32 rom_base = info.pci->u.h0.rom_base;
@@ -272,44 +280,38 @@ radeon_hd_init(radeon_info &info)
 	status_t biosStatus = B_ERROR;
 	if (info.rom_area < 0) {
 		dprintf("%s: failed to create kernel AtomBIOS area!\n", __func__);
+		dprintf(DEVICE_NAME ": card(%ld): couldn't map kernel AtomBIOS area!\n",
+			info.id);
 		biosStatus = B_ERROR;
 	} else {
-		//memset(&info.atom_buffer, 0, info.shared_info->rom_size);
-		biosStatus = radeon_hd_getbios_r600(info);
+		memset((void*)info.atom_buffer, 0, info.shared_info->rom_size);
+		// First we try an active bios read
+		biosStatus = radeon_hd_getbios(info);
+		if (biosStatus != B_OK) {
+			// If the active read fails, we do a disabled read
+			if (info.device_chipset > RADEON_R600)
+				biosStatus = radeon_hd_getbios_r600(info);
+		}
 	}
-
-	// Pass common information to accelerant
-	info.shared_info->device_id = info.device_id;
-	info.shared_info->device_chipset = info.device_chipset;
-	info.shared_info->registers_area = info.registers_area;
-	info.shared_info->frame_buffer_area = info.framebuffer_area;
-	info.shared_info->frame_buffer_phys
-		= info.pci->u.h0.base_registers[RHD_FB_BAR];
-	info.shared_info->frame_buffer_int
-		= read32(info.registers + R6XX_CONFIG_FB_BASE);
-
-	// populate VGA rom info into shared_info
 	info.shared_info->has_rom = (biosStatus == B_OK) ? true : false;
 	info.shared_info->rom_area = info.rom_area;
 
-	// Copy device name into shared_info
-	strcpy(info.shared_info->device_identifier, info.device_identifier);
+	// *** Pull active monitor VESA EDID from boot loader
+	edid1_info* edidInfo
+		= (edid1_info*)get_boot_item(EDID_BOOT_INFO, NULL);
 
-	// Pull active monitor VESA EDID from boot loader
-	edid1_info* edidInfo = (edid1_info*)get_boot_item(EDID_BOOT_INFO,
-		NULL);
 	if (edidInfo != NULL) {
-		TRACE("card(%ld): %s found BIOS EDID information.\n", info.id,
+		TRACE("card(%ld): %s found VESA EDID information.\n", info.id,
 			__func__);
 		info.shared_info->has_edid = true;
 		memcpy(&info.shared_info->edid_info, edidInfo, sizeof(edid1_info));
 	} else {
-		TRACE("card(%ld): %s didn't find BIOS EDID modes.\n", info.id,
+		TRACE("card(%ld): %s didn't find VESA EDID modes.\n", info.id,
 			__func__);
 		info.shared_info->has_edid = false;
 	}
 
-	// Populate graphics_memory/aperture_size with KB
+	// *** Populate graphics_memory/aperture_size with KB
 	if (info.shared_info->device_chipset >= RADEON_R800) {
 		// R800+ has memory stored in MB
 		info.shared_info->graphics_memory_size
