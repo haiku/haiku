@@ -72,26 +72,14 @@ radeon_hd_getbios(radeon_info &info)
 	if (flags & PCI_rom_bios)
 		dprintf(DEVICE_NAME ": PCI ROM BIOS copy\n");
 
-	uint32 rom_base = info.pci->u.h0.rom_base;
-	uint32 rom_size = info.pci->u.h0.rom_size;
-
-	if (rom_base == 0) {
-		TRACE("%s: no PCI rom, trying shadow rom\n", __func__);
-		// ROM has been copied by BIOS
-		rom_base = 0xC0000;
-		if (rom_size == 0) {
-			rom_size = 0x7FFF;
-			// Maximum shadow bios size
-			// TODO : This is a guess at best
-		}
-	}
+	uint32 rom_base = info.shared_info->rom_phys;
+	uint32 rom_size = info.shared_info->rom_size;
 
 	TRACE("%s: seeking rom at 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
 		__func__, rom_base, rom_size);
 
 	uint8* bios;
 	status_t result = B_ERROR;
-
 	if (rom_base == 0 || rom_size == 0) {
 		TRACE("%s: no VGA rom located, disabling AtomBIOS\n", __func__);
 		result = B_ERROR;
@@ -110,19 +98,13 @@ radeon_hd_getbios(radeon_info &info)
 				result = B_ERROR;
 			} else {
 				TRACE("%s: found a valid VGA bios!\n", __func__);
-				info.atom_buffer = (uint8*)malloc(rom_size);
-				if (info.atom_buffer == NULL) {
-					dprintf(DEVICE_NAME ": failed to clone atombios!\n");
-					result = B_ERROR;
+				memcpy(info.atom_buffer, (void *)bios, rom_size);
+				if (isAtomBIOS(info.atom_buffer)) {
+					dprintf(DEVICE_NAME ": AtomBIOS found and mapped!\n");
+					result = B_OK;
 				} else {
-					memcpy(info.atom_buffer, (void *)bios, rom_size);
-					if (isAtomBIOS(info.atom_buffer)) {
-						dprintf(DEVICE_NAME ": AtomBIOS found and mapped!\n");
-						result = B_OK;
-					} else {
-						dprintf(DEVICE_NAME ": AtomBIOS not mapped!\n");
-						result = B_ERROR;
-					}
+					dprintf(DEVICE_NAME ": AtomBIOS not mapped!\n");
+					result = B_ERROR;
 				}
 			}
 			delete_area(rom_area);
@@ -132,9 +114,6 @@ radeon_hd_getbios(radeon_info &info)
 	// Disable ROM decoding
 	rom_config &= ~PCI_rom_enable;
 	set_pci_config(info.pci, PCI_rom_base, 4, rom_config);
-
-	info.shared_info->rom_phys = rom_base;
-	info.shared_info->rom_size = rom_size;
 
 	return result;
 }
@@ -262,17 +241,6 @@ radeon_hd_init(radeon_info &info)
 		return info.framebuffer_area;
 	}
 
-	// *** VGA rom / AtomBIOS mapping
-	status_t biosStatus = radeon_hd_getbios_r600(info);
-
-	// *** AtomBIOS mapping
-	info.rom_area = create_area("radeon hd AtomBIOS",
-		(void **)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
-		info.shared_info->rom_size, B_READ_AREA | B_WRITE_AREA, B_NO_LOCK);
-
-	if (info.rom_area < 0)
-		dprintf("%s: failed to create kernel AtomBIOS area!\n", __func__);
-
 	// Turn on write combining for the area
 	vm_set_area_memory_type(info.framebuffer_area,
 		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
@@ -280,6 +248,35 @@ radeon_hd_init(radeon_info &info)
 	sharedCreator.Detach();
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
+
+	// *** AtomBIOS mapping
+	uint32 rom_base = info.pci->u.h0.rom_base;
+	uint32 rom_size = info.pci->u.h0.rom_size;
+	if (rom_base == 0) {
+		TRACE("%s: no PCI rom, trying shadow rom\n", __func__);
+		// ROM has been copied by BIOS
+		rom_base = 0xC0000;
+		if (rom_size == 0) {
+			rom_size = 0x7FFF;
+			// A guess at maximum shadow bios size
+		}
+	}
+	info.shared_info->rom_phys = rom_base;
+	info.shared_info->rom_size = rom_size;
+
+	info.rom_area = create_area("radeon hd AtomBIOS",
+		(void **)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
+		info.shared_info->rom_size, B_FULL_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+
+	status_t biosStatus = B_ERROR;
+	if (info.rom_area < 0) {
+		dprintf("%s: failed to create kernel AtomBIOS area!\n", __func__);
+		biosStatus = B_ERROR;
+	} else {
+		//memset(&info.atom_buffer, 0, info.shared_info->rom_size);
+		biosStatus = radeon_hd_getbios_r600(info);
+	}
 
 	// Pass common information to accelerant
 	info.shared_info->device_id = info.device_id;
@@ -358,5 +355,6 @@ radeon_hd_uninit(radeon_info &info)
 	delete_area(info.shared_area);
 	delete_area(info.registers_area);
 	delete_area(info.framebuffer_area);
+	delete_area(info.rom_area);
 }
 

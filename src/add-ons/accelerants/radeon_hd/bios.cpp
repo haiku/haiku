@@ -62,7 +62,7 @@ radeon_init_bios(uint8* bios)
 	atom_card_info->pll_write = _write32;
 
 	// Point AtomBIOS parser to card bios and malloc gAtomContext
-	gAtomContext = atom_parse(atom_card_info, &bios);
+	gAtomContext = atom_parse(atom_card_info, bios);
 
 	if (gAtomContext == NULL) {
 		TRACE("%s: couldn't parse system AtomBIOS\n", __func__);

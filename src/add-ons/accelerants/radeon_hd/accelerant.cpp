@@ -160,8 +160,10 @@ init_common(int device, bool isClone)
 		(void **)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->rom_area);
 
-	if (gInfo->rom_area < 0)
+	if (gInfo->rom_area < 0) {
 		TRACE("%s: Clone of AtomBIOS failed!\n", __func__);
+		gInfo->shared_info->has_rom = false;
+	}
 
 	if (gInfo->rom[0] != 0x55 || gInfo->rom[1] != 0xAA)
 		TRACE("%s: didn't find a VGA bios in cloned region!\n", __func__);
