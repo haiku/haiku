@@ -357,7 +357,8 @@ StackAndTile::WindowHidden(Window* window)
 	SATGroup* group = satWindow->GetGroup();
 	if (group == NULL)
 		return;
-	group->RemoveWindow(satWindow);
+	if (group->CountItems() > 1)
+		group->RemoveWindow(satWindow);
 }
 
 
@@ -418,7 +419,7 @@ void
 StackAndTile::WindowFeelChanged(Window* window, window_feel feel)
 {
 	// check if it is still a compatible feel
-	if (feel != B_NORMAL_WINDOW_FEEL)
+	if (feel == B_NORMAL_WINDOW_FEEL)
 		return;
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
@@ -426,7 +427,8 @@ StackAndTile::WindowFeelChanged(Window* window, window_feel feel)
 	SATGroup* group = satWindow->GetGroup();
 	if (!group)
 		return;
-	group->RemoveWindow(satWindow);
+	if (group->CountItems() > 1)
+		group->RemoveWindow(satWindow);
 }
 
 
