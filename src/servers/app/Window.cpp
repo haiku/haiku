@@ -2113,6 +2113,7 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 
 	if (remainingTop != NULL) {
 		dirty.Include(&remainingTop->VisibleRegion());
+		dirty.IntersectWith(&remainingTop->VisibleRegion());
 		fDesktop->RebuildAndRedrawAfterWindowChange(remainingTop, dirty);
 	}
 	return true;
