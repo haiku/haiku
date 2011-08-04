@@ -160,7 +160,8 @@ public:
 	// Window methods
 
 			void				SelectWindow(Window* window);
-			void				ActivateWindow(Window* window);
+			void				ActivateWindow(Window* window,
+									bool activateStack = true);
 			void				SendWindowBehind(Window* window,
 									Window* behindOf = NULL);
 

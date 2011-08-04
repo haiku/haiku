@@ -1036,10 +1036,20 @@ Desktop::SelectWindow(Window* window)
 	of their subset.
 */
 void
-Desktop::ActivateWindow(Window* window)
+Desktop::ActivateWindow(Window* window, bool activateStack)
 {
 	STRACE(("ActivateWindow(%p, %s)\n", window, window
 		? window->Title() : "<none>"));
+
+	WindowStack* stack = window->GetWindowStack();
+	if (activateStack && stack != NULL) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* win = stack->LayerOrder().ItemAt(i);
+			if (window == win)
+				continue;
+			ActivateWindow(win, false);
+		}
+	}
 
 	if (window == NULL) {
 		fBack = NULL;
