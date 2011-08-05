@@ -14,7 +14,6 @@
 #include "atom.h"
 
 
-void atombios_crtc_power(uint8 crt_id, int state);
 status_t radeon_init_bios(uint8* bios);
 
 

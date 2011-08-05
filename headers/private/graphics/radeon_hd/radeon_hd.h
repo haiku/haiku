@@ -12,7 +12,9 @@
 
 #include "lock.h"
 
-#include "rhd_regs.h"
+#include "radeon_reg.h"
+
+#include "rhd_regs.h"	// to phase out
 #include "r500_reg.h"
 #include "r600_reg.h"
 #include "r800_reg.h"

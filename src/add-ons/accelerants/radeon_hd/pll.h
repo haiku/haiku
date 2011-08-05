@@ -35,7 +35,7 @@ struct PLL_Control {
 
 status_t PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
 	uint16 *post);
-status_t PLLSet(uint8 pllIndex, uint32 pixelClock);
+status_t pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id);
 void PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
 	uint16 feedback, uint16 post);
 void PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,

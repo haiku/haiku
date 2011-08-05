@@ -22,7 +22,7 @@
  * Author: Stanislaw Skowronek
  */
 
-/* Reworked for the Haiku Operating System Radeon HD driver
+/* Rewritten for the Haiku Operating System Radeon HD driver
  * Author:
  *	Alexander von Gluck, kallisti5@unixzen.com
  */

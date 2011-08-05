@@ -9,6 +9,7 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
+#include "bios.h"
 #include "utility.h"
 #include "pll.h"
 
@@ -25,6 +26,17 @@ extern "C" void _sPrintf(const char *format, ...);
 #else
 #   define TRACE(x...) ;
 #endif
+
+
+// For AtomBIOS PLLSet
+union set_pixel_clock {
+	SET_PIXEL_CLOCK_PS_ALLOCATION base;
+	PIXEL_CLOCK_PARAMETERS v1;
+	PIXEL_CLOCK_PARAMETERS_V2 v2;
+	PIXEL_CLOCK_PARAMETERS_V3 v3;
+	PIXEL_CLOCK_PARAMETERS_V5 v5;
+	PIXEL_CLOCK_PARAMETERS_V6 v6;
+};
 
 
 /* From hardcoded values. */
@@ -221,16 +233,70 @@ PLLPower(uint8 pllIndex, int command)
 
 
 status_t
-PLLSet(uint8 pllIndex, uint32 pixelClock)
+pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
-
 	uint16 reference = 0;
 	uint16 feedback = 0;
 	uint16 post = 0;
 
 	PLLCalculate(pixelClock, &reference, &feedback, &post);
 
+	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
+	union set_pixel_clock args;
+	memset(&args, 0, sizeof(args));
+
+	//uint8 frev;
+	//uint8 crev;
+	//atom_parse_cmd_header(gAtomContext, index, &frev, &crev);
+
+	uint8 frev = 1;
+	uint8 crev = 1;
+
+	switch (crev) {
+		case 1:
+			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v1.usRefDiv = B_HOST_TO_LENDIAN_INT16(reference);
+			args.v1.usFbDiv = B_HOST_TO_LENDIAN_INT16(feedback);
+			// args.v1.ucFracFbDiv = frac_fb_div;
+			args.v1.ucFracFbDiv = 0;
+			args.v1.ucPostDiv = post;
+			args.v1.ucPpll = pll_id;
+			args.v1.ucCRTC = crtc_id;
+			args.v1.ucRefDivSrc = 1;
+			break;
+		case 2:
+			args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v2.usRefDiv = B_HOST_TO_LENDIAN_INT16(reference);
+			args.v2.usFbDiv = B_HOST_TO_LENDIAN_INT16(feedback);
+			// args.v2.ucFracFbDiv = frac_fb_div;
+			args.v2.ucPostDiv = post;
+			args.v2.ucPpll = pll_id;
+			args.v2.ucCRTC = crtc_id;
+			args.v2.ucRefDivSrc = 1;
+			break;
+		#if 0
+		case 3:
+			args.v3.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v3.usRefDiv = B_HOST_TO_LENDIAN_INT16(reference);
+			args.v3.usFbDiv = B_HOST_TO_LENDIAN_INT16(feedback);
+			// args.v3.ucFracFbDiv = frac_fb_div;
+			args.v3.ucPostDiv = post;
+			args.v3.ucPpll = pll_id;
+			args.v3.ucMiscInfo = (pll_id << 2);
+			if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
+				args.v3.ucMiscInfo |= PIXEL_CLOCK_MISC_REF_DIV_SRC;
+			args.v3.ucTransmitterId = encoder_id;
+			args.v3.ucEncoderMode = encoder_mode;
+			break;
+		#endif
+		default:
+			TRACE("%s: TODO: table version %d %d\n", __func__, frev, crev);
+			return B_ERROR;
+	}
+
+	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+
+	#if 0
 	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
 		TRACE("%s : setting pixel clock %d on r620+\n", __func__,
 			(int)pixelClock);
@@ -242,6 +308,7 @@ PLLSet(uint8 pllIndex, uint32 pixelClock)
 		PLLSetLowLegacy(pllIndex, pixelClock, reference,
 			feedback, post);
 	}
+	#endif
 
 	return B_OK;
 }
@@ -617,4 +684,3 @@ DCCGCLKSet(uint8 pllIndex, int set)
 			break;
 	}
 }
-

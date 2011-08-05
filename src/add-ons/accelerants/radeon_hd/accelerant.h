@@ -19,6 +19,7 @@
 #include "lvds.h"
 
 
+#include <ByteOrder.h>
 #include <edid.h>
 
 
@@ -57,8 +58,8 @@ struct register_info {
 	uint16	grphControl;
 	uint16	grphSwapControl;
 	uint16	grphPrimarySurfaceAddr;
-	uint16	grphPrimarySurfaceAddrHigh;
 	uint16	grphSecondarySurfaceAddr;
+	uint16	grphPrimarySurfaceAddrHigh;
 	uint16	grphSecondarySurfaceAddrHigh;
 	uint16	grphPitch;
 	uint16	grphSurfaceOffsetX;
@@ -78,6 +79,7 @@ struct register_info {
 	uint16	crtVBlank;
 	uint16	crtHTotal;
 	uint16	crtVTotal;
+	uint16	crtcOffset;
 	uint16	modeDesktopHeight;
 	uint16	modeDataFormat;
 	uint16	modeCenter;

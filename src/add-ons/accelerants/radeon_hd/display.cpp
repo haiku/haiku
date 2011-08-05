@@ -9,6 +9,7 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
+#include "bios.h"
 #include "display.h"
 
 #include <stdlib.h>
@@ -56,15 +57,17 @@ init_registers(register_info* regs, uint8 crtid)
 			regs->vgaControl = D1VGA_CONTROL;
 		}
 
+		regs->crtcOffset = offset;
+
 		// Evergreen+ is crtoffset + register
 		regs->grphEnable = offset + EVERGREEN_GRPH_ENABLE;
 		regs->grphControl = offset + EVERGREEN_GRPH_CONTROL;
 		regs->grphSwapControl = offset + EVERGREEN_GRPH_SWAP_CONTROL;
+
 		regs->grphPrimarySurfaceAddr
 			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
 		regs->grphSecondarySurfaceAddr
 			= offset + EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS;
-
 		regs->grphPrimarySurfaceAddrHigh
 			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
 		regs->grphSecondarySurfaceAddrHigh
@@ -103,6 +106,9 @@ init_registers(register_info* regs, uint8 crtid)
 		regs->grphSecondarySurfaceAddr
 			= crtid == 1 ? D2GRPH_SECONDARY_SURFACE_ADDRESS
 				: D1GRPH_SECONDARY_SURFACE_ADDRESS;
+
+		regs->crtcOffset
+			= crtid == 1 ? (D2GRPH_X_END - D1GRPH_X_END) : 0;
 
 		// Surface Address high only used on r770+
 		regs->grphPrimarySurfaceAddrHigh
@@ -303,28 +309,335 @@ debug_displays()
 
 
 void
-display_power(uint8 crtid, int command)
+display_crtc_lock(uint8 crtc_id, int command)
 {
-	register_info* regs = gDisplay[crtid]->regs;
+	ENABLE_CRTC_PS_ALLOCATION args;
+	int index
+		= GetIndexIntoMasterTable(COMMAND, UpdateCRTC_DoubleBufferRegisters);
 
-	switch (command) {
-		case RHD_POWER_ON:
-			Write32Mask(OUT, regs->grphEnable, 0x00000001, 0x00000001);
-			snooze(2);
-			Write32Mask(OUT, regs->crtControl, 0, 0x01000000);
-				// Enable read requests
-			Write32Mask(OUT, regs->crtControl, 1, 1);
-			return;
-		case RHD_POWER_RESET:
-			Write32Mask(OUT, regs->crtControl, 0x01000000, 0x01000000);
-				// Disable read requestes
-			//D1CRTCDisable?
-			return;
-		case RHD_POWER_SHUTDOWN:
-			Write32Mask(OUT, regs->crtControl, 0x01000000, 0x01000000);
-				// Disable read requests
-			//D1CRTCDisable?
-			Write32Mask(OUT, regs->grphEnable, 0x00000001, 0x00000001);
-			return;
-	}
+	memset(&args, 0, sizeof(args));
+
+	args.ucCRTC = crtc_id;
+	args.ucEnable = command;
+
+	atom_execute_table(gAtomContext, index, (uint32 *)&args);
 }
+
+
+void
+display_crtc_blank(uint8 crtc_id, int command)
+{
+	int index = GetIndexIntoMasterTable(COMMAND, BlankCRTC);
+	BLANK_CRTC_PS_ALLOCATION args;
+
+	memset(&args, 0, sizeof(args));
+
+	args.ucCRTC = crtc_id;
+	args.ucBlanking = command;
+
+	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+}
+
+
+void
+display_crtc_scale(uint8 crtc_id, display_mode *mode)
+{
+	ENABLE_SCALER_PS_ALLOCATION args;
+	int index = GetIndexIntoMasterTable(COMMAND, EnableScaler);
+
+	memset(&args, 0, sizeof(args));
+
+	args.ucScaler = crtc_id;
+	args.ucEnable = ATOM_SCALER_EXPANSION;
+
+	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+}
+
+
+void
+display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+	register_info* regs = gDisplay[crtc_id]->regs;
+
+	uint32 fb_swap = R600_D1GRPH_SWAP_ENDIAN_NONE;
+	uint32 fb_format;
+
+	uint32 bytesPerPixel;
+	uint32 bitsPerPixel;
+
+	switch (mode->space) {
+		case B_CMAP8:
+			bytesPerPixel = 1;
+			bitsPerPixel = 8;
+			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_8BPP
+				| AVIVO_D1GRPH_CONTROL_8BPP_INDEXED;
+			break;
+		case B_RGB15_LITTLE:
+			bytesPerPixel = 2;
+			bitsPerPixel = 15;
+			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_16BPP
+				| AVIVO_D1GRPH_CONTROL_16BPP_ARGB1555;
+			break;
+		case B_RGB16_LITTLE:
+			bytesPerPixel = 2;
+			bitsPerPixel = 16;
+			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_16BPP
+				| AVIVO_D1GRPH_CONTROL_16BPP_RGB565;
+			#ifdef __POWERPC__
+			fb_swap = R600_D1GRPH_SWAP_ENDIAN_16BIT;
+			#endif
+			break;
+		case B_RGB24_LITTLE:
+		case B_RGB32_LITTLE:
+		default:
+			bytesPerPixel = 4;
+			bitsPerPixel = 32;
+			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_32BPP
+				| AVIVO_D1GRPH_CONTROL_32BPP_ARGB8888;
+			#ifdef __POWERPC__
+			fb_swap = R600_D1GRPH_SWAP_ENDIAN_32BIT;
+			#endif
+			break;
+	}
+
+	uint32 bytesPerRow = mode->virtual_width * bytesPerPixel;
+
+	Write32(OUT, regs->vgaControl, 0);
+
+	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
+
+	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
+	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
+
+	if (info.device_chipset >= (RADEON_R700 | 0x70)) {
+		Write32(OUT, regs->grphPrimarySurfaceAddrHigh,
+			(fbAddressInt >> 32) & 0xf);
+		Write32(OUT, regs->grphSecondarySurfaceAddrHigh,
+			(fbAddressInt >> 32) & 0xf);
+	}
+
+	if (info.device_chipset >= RADEON_R600)
+		Write32(CRT, regs->grphSwapControl, fb_swap);
+
+	Write32(CRT, regs->grphSurfaceOffsetX, 0);
+	Write32(CRT, regs->grphSurfaceOffsetY, 0);
+	Write32(CRT, regs->grphXStart, 0);
+	Write32(CRT, regs->grphYStart, 0);
+	Write32(CRT, regs->grphXEnd, mode->virtual_width);
+	Write32(CRT, regs->grphYEnd, mode->virtual_height);
+	Write32(CRT, regs->grphPitch, bytesPerRow / 4);
+
+	Write32(CRT, regs->grphEnable, 1);
+		// Enable Frame buffer
+
+	Write32(CRT, regs->modeDesktopHeight, mode->virtual_height);
+
+	Write32(CRT, regs->viewportStart, 0);
+
+	Write32(CRT, regs->viewportSize,
+		mode->timing.v_display | (mode->timing.h_display << 16));
+
+	uint32 tmp = Read32(CRT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset);
+	tmp &= ~AVIVO_D1GRPH_SURFACE_UPDATE_H_RETRACE_EN;
+	Write32(OUT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset, tmp);
+
+	Write32(OUT, AVIVO_D1MODE_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
+		// Pageflip to happen anywhere in vblank
+}
+
+
+void
+display_crtc_fb_set_legacy(uint8 crtc_id, display_mode *mode)
+{
+	register_info* regs = gDisplay[crtc_id]->regs;
+
+	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
+
+	Write32(CRT, regs->grphUpdate, (1<<16));
+		// Lock for update (isn't this normally the other way around on VGA?
+
+	Write32Mask(CRT, regs->grphEnable, 1, 0x00000001);
+		// Enable Frame buffer
+
+	Write32(CRT, regs->grphControl, 0);
+		// Reset stored depth, format, etc
+
+	uint32 bytesPerPixel;
+	uint32 bitsPerPixel;
+
+	// set color mode on video card
+	switch (mode->space) {
+		case B_CMAP8:
+			bytesPerPixel = 1;
+			bitsPerPixel = 8;
+			Write32Mask(CRT, regs->grphControl,
+				0, 0x00000703);
+			break;
+		case B_RGB15_LITTLE:
+			bytesPerPixel = 2;
+			bitsPerPixel = 15;
+			Write32Mask(CRT, regs->grphControl,
+				0x000001, 0x00000703);
+			break;
+		case B_RGB16_LITTLE:
+			bytesPerPixel = 2;
+			bitsPerPixel = 16;
+			Write32Mask(CRT, regs->grphControl,
+				0x000101, 0x00000703);
+			break;
+		case B_RGB24_LITTLE:
+			bytesPerPixel = 4;
+			bitsPerPixel = 24;
+			Write32Mask(CRT, regs->grphControl,
+				0x000002, 0x00000703);
+			break;
+		case B_RGB32_LITTLE:
+		default:
+			bytesPerPixel = 4;
+			bitsPerPixel = 32;
+			Write32Mask(CRT, regs->grphControl,
+				0x000002, 0x00000703);
+			break;
+	}
+
+	uint32 bytesPerRow = mode->virtual_width * bytesPerPixel;
+
+	Write32(CRT, regs->grphSwapControl, 0);
+		// only for chipsets > r600
+
+	// Tell GPU which frame buffer address to draw from
+	Write32(CRT, regs->grphPrimarySurfaceAddr, fbAddressInt & 0xFFFFFFFF);
+	Write32(CRT, regs->grphSecondarySurfaceAddr, fbAddressInt & 0xFFFFFFFF);
+
+	Write32(CRT, regs->grphSurfaceOffsetX, 0);
+	Write32(CRT, regs->grphSurfaceOffsetY, 0);
+	Write32(CRT, regs->grphXStart, 0);
+	Write32(CRT, regs->grphYStart, 0);
+	Write32(CRT, regs->grphXEnd, mode->virtual_width);
+	Write32(CRT, regs->grphYEnd, mode->virtual_height);
+	Write32(CRT, regs->grphPitch, bytesPerRow / 4);
+
+	Write32(CRT, regs->modeDesktopHeight, mode->virtual_height);
+
+	Write32(CRT, regs->grphUpdate, 0);
+		// Unlock changed registers
+
+	// update shared info
+	gInfo->shared_info->bytes_per_row = bytesPerRow;
+	gInfo->shared_info->current_mode = *mode;
+	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
+
+	// TODO : recompute bandwidth via rv515_bandwidth_avivo_update
+}
+
+
+void
+display_crtc_set(uint8 crtc_id, display_mode *mode)
+{
+	display_timing& displayTiming = mode->timing;
+
+	TRACE("%s called to do %dx%d\n",
+		__func__, displayTiming.h_display, displayTiming.v_display);
+
+	SET_CRTC_TIMING_PARAMETERS_PS_ALLOCATION args;
+	int index = GetIndexIntoMasterTable(COMMAND, SetCRTC_Timing);
+	uint16 misc = 0;
+
+	memset(&args, 0, sizeof(args));
+
+	args.usH_Total = B_HOST_TO_LENDIAN_INT16(displayTiming.h_total);
+	args.usH_Disp = B_HOST_TO_LENDIAN_INT16(displayTiming.h_display);
+	args.usH_SyncStart = B_HOST_TO_LENDIAN_INT16(displayTiming.h_sync_start);
+	args.usH_SyncWidth = B_HOST_TO_LENDIAN_INT16(displayTiming.h_sync_end
+		- displayTiming.h_sync_start);
+
+	args.usV_Total = B_HOST_TO_LENDIAN_INT16(displayTiming.v_total);
+	args.usV_Disp = B_HOST_TO_LENDIAN_INT16(displayTiming.v_display);
+	args.usV_SyncStart = B_HOST_TO_LENDIAN_INT16(displayTiming.v_sync_start);
+	args.usV_SyncWidth = B_HOST_TO_LENDIAN_INT16(displayTiming.v_sync_end
+		- displayTiming.v_sync_start);
+
+	args.ucOverscanRight = 0;
+	args.ucOverscanLeft = 0;
+	args.ucOverscanBottom = 0;
+	args.ucOverscanTop = 0;
+
+	if ((displayTiming.flags & B_POSITIVE_HSYNC) == 0)
+		misc |= ATOM_HSYNC_POLARITY;
+	if ((displayTiming.flags & B_POSITIVE_VSYNC) == 0)
+		misc |= ATOM_VSYNC_POLARITY;
+
+	args.susModeMiscInfo.usAccess = B_HOST_TO_LENDIAN_INT16(misc);
+	args.ucCRTC = crtc_id;
+
+	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+}
+
+
+void
+display_crtc_set_dtd(uint8 crtc_id, display_mode *mode)
+{
+	display_timing& displayTiming = mode->timing;
+
+	TRACE("%s called to do %dx%d\n",
+		__func__, displayTiming.h_display, displayTiming.v_display);
+
+	SET_CRTC_USING_DTD_TIMING_PARAMETERS args;
+	int index = GetIndexIntoMasterTable(COMMAND, SetCRTC_UsingDTDTiming);
+	uint16 misc = 0;
+
+	memset(&args, 0, sizeof(args));
+
+	uint16 blankStart
+		= MIN(displayTiming.h_sync_start, displayTiming.h_display);
+	uint16 blankEnd
+		= MAX(displayTiming.h_sync_end, displayTiming.h_total);
+	args.usH_Size = B_HOST_TO_LENDIAN_INT16(displayTiming.h_display);
+	args.usH_Blanking_Time = B_HOST_TO_LENDIAN_INT16(blankEnd - blankStart);
+
+	blankStart = MIN(displayTiming.v_sync_start, displayTiming.v_display);
+	blankEnd = MAX(displayTiming.v_sync_end, displayTiming.v_total);
+	args.usV_Size = B_HOST_TO_LENDIAN_INT16(displayTiming.v_display);
+	args.usV_Blanking_Time = B_HOST_TO_LENDIAN_INT16(blankEnd - blankStart);
+
+	args.usH_SyncOffset = B_HOST_TO_LENDIAN_INT16(displayTiming.h_sync_start
+		- displayTiming.h_display);
+	args.usH_SyncWidth = B_HOST_TO_LENDIAN_INT16(displayTiming.h_sync_end
+		- displayTiming.h_sync_start);
+
+	args.usV_SyncOffset = B_HOST_TO_LENDIAN_INT16(displayTiming.v_sync_start
+		- displayTiming.v_display);
+	args.usV_SyncWidth = B_HOST_TO_LENDIAN_INT16(displayTiming.v_sync_end
+		- displayTiming.v_sync_start);
+
+	args.ucH_Border = 0;
+	args.ucV_Border = 0;
+
+	if ((displayTiming.flags & B_POSITIVE_HSYNC) == 0)
+		misc |= ATOM_HSYNC_POLARITY;
+	if ((displayTiming.flags & B_POSITIVE_VSYNC) == 0)
+		misc |= ATOM_VSYNC_POLARITY;
+
+	args.susModeMiscInfo.usAccess = B_HOST_TO_LENDIAN_INT16(misc);
+	args.ucCRTC = crtc_id;
+
+	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+}
+
+
+void
+display_crtc_power(uint8 crt_id, int command)
+{
+	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTC);
+	ENABLE_CRTC_PS_ALLOCATION args;
+
+	memset(&args, 0, sizeof(args));
+
+	args.ucCRTC = crt_id;
+	args.ucEnable = command;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+

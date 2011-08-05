@@ -29,21 +29,6 @@ atom_context *gAtomContext;
 
 
 void
-atombios_crtc_power(uint8 crt_id, int state)
-{
-	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTC);
-	ENABLE_CRTC_PS_ALLOCATION args;
-
-	memset(&args, 0, sizeof(args));
-
-	args.ucCRTC = crt_id;
-	args.ucEnable = state;
-
-	atom_execute_table(gAtomContext, index, (uint32*)&args);
-}
-
-
-void
 radeon_bios_init_scratch()
 {
 	radeon_shared_info &info = *gInfo->shared_info;
@@ -114,6 +99,9 @@ radeon_init_bios(uint8* bios)
 		TRACE("%s: couldn't parse system AtomBIOS\n", __func__);
 		return B_ERROR;
 	}
+
+	atom_asic_init(gAtomContext);
+		// Post card
 
 	// mutex_init(&rdev->mode_info.atom_context->mutex);
 	radeon_bios_init_scratch();
