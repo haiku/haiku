@@ -507,16 +507,15 @@ atom_op_compare(atom_exec_context *ctx, int *ptr, int arg)
 static void
 atom_op_delay(atom_exec_context *ctx, int *ptr, int arg)
 {
-	uint8 count = U8((*ptr)++);
+	bigtime_t count = U8((*ptr)++);
 	if (arg == ATOM_UNIT_MICROSEC) {
-		TRACE("%s: %" B_PRIu8 " microseconds\n", __func__, count);
+		TRACE("%s: %" B_PRId64 " microseconds\n", __func__, count);
 		// Microseconds
-		usleep(count);
+		snooze(count);
 	} else {
-		TRACE("%s: %" B_PRIu8 " milliseconds\n", __func__, count);
-		// TODO : check
+		TRACE("%s: %" B_PRId64 " milliseconds\n", __func__, count);
 		// Milliseconds
-		usleep(count);
+		snooze(count * 1000);
 	}
 }
 
