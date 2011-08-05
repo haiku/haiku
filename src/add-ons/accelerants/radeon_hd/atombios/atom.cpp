@@ -138,7 +138,7 @@ atom_iio_execute(atom_context *ctx, int base, uint32 index, uint32 data)
 	case ATOM_IIO_END:
 		return temp;
 	default:
-		TRACE("Unknown IIO opcode.\n");
+		TRACE("%s: Unknown IIO opcode.\n", __func__);
 		return 0;
 	}
 }
@@ -162,18 +162,19 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 		val = gctx->card->reg_read(idx);
 		break;
 	case ATOM_IO_PCI:
-		TRACE("PCI registers are not implemented.\n");
+		TRACE("%s: PCI registers are not implemented.\n", __func__);
 		return 0;
 	case ATOM_IO_SYSIO:
-		TRACE("SYSIO registers are not implemented.\n");
+		TRACE("%s: SYSIO registers are not implemented.\n", __func__);
 		return 0;
 	default:
 		if (!(gctx->io_mode&0x80)) {
-		TRACE("Bad IO mode.\n");
+		TRACE("%s: Bad IO mode.\n", __func__);
 		return 0;
 		}
 		if (!gctx->iio[gctx->io_mode&0x7F]) {
-		TRACE("Undefined indirect IO read method %d.\n", gctx->io_mode&0x7F);
+		TRACE("%s: Undefined indirect IO read method %d.\n", __func__,
+			gctx->io_mode&0x7F);
 		return 0;
 		}
 		val = atom_iio_execute(gctx, gctx->iio[gctx->io_mode&0x7F], idx, 0);
@@ -224,7 +225,7 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 	case ATOM_ARG_FB:
 	idx = U8(*ptr);
 	(*ptr)++;
-	TRACE("FB access is not implemented.\n");
+	TRACE("%s: FB access is not implemented.\n", __func__);
 	return 0;
 	case ATOM_ARG_IMM:
 	switch(align) {
@@ -256,7 +257,7 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 	case ATOM_ARG_MC:
 	idx = U8(*ptr);
 	(*ptr)++;
-	TRACE("MC registers are not implemented.\n");
+	TRACE("%s: MC registers are not implemented.\n", __func__);
 	return 0;
 	}
 	if (saved)
@@ -354,14 +355,14 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 		gctx->card->reg_write(idx, val);
 		break;
 	case ATOM_IO_PCI:
-		TRACE("PCI registers are not implemented.\n");
+		TRACE("%s: PCI registers are not implemented.\n", __func__);
 		return;
 	case ATOM_IO_SYSIO:
-		TRACE("SYSIO registers are not implemented.\n");
+		TRACE("%s: SYSIO registers are not implemented.\n", __func__);
 		return;
 	default:
 		if (!(gctx->io_mode&0x80)) {
-		TRACE("Bad IO mode.\n");
+		TRACE("%s: Bad IO mode.\n", __func__);
 		return;
 		}
 		if (!gctx->iio[gctx->io_mode&0xFF]) {
@@ -407,7 +408,7 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 	case ATOM_ARG_FB:
 	idx = U8(*ptr);
 	(*ptr)++;
-	TRACE("FB access is not implemented.\n");
+	TRACE("%s: FB access is not implemented.\n", __func__);
 	return;
 	case ATOM_ARG_PLL:
 	idx = U8(*ptr);
@@ -418,7 +419,7 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 	case ATOM_ARG_MC:
 	idx = U8(*ptr);
 	(*ptr)++;
-	TRACE("MC registers are not implemented.\n");
+	TRACE("%s: MC registers are not implemented.\n", __func__);
 	return;
 	}
 }
@@ -430,12 +431,13 @@ atom_op_add(atom_exec_context *ctx, int *ptr, int arg)
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src, saved;
 	int dptr = *ptr;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
-	TRACE("   src: ");
 	src = atom_get_src(ctx, attr, ptr);
+	#ifdef TRACE_ATOM
+	TRACE("%s: 0x%" B_PRIX32 " + 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
+		__func__, dst, src, dst + src);
+	#endif
 	dst += src;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -446,12 +448,13 @@ atom_op_and(atom_exec_context *ctx, int *ptr, int arg)
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src, saved;
 	int dptr = *ptr;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
-	TRACE("   src: ");
 	src = atom_get_src(ctx, attr, ptr);
+	#ifdef TRACE_ATOM
+	TRACE("%s: 0x%" B_PRIX32 " & 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
+		__func__, src, dst, dst & src);
+	#endif
 	dst &= src;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -459,7 +462,7 @@ atom_op_and(atom_exec_context *ctx, int *ptr, int arg)
 static void
 atom_op_beep(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("ATOM BIOS beeped!\n");
+	TRACE("%s: Quack!\n", __func__);
 }
 
 
@@ -467,7 +470,7 @@ static void
 atom_op_calltable(atom_exec_context *ctx, int *ptr, int arg)
 {
 	int idx = U8((*ptr)++);
-	TRACE("   table: %d\n", idx);
+	TRACE("%s: table: %d\n", __func__, idx);
 	if (U16(ctx->ctx->cmd_table + 4 + 2 * idx))
 	atom_execute_table(ctx->ctx, idx, ctx->ps + ctx->ps_shift);
 }
@@ -482,7 +485,7 @@ atom_op_clear(atom_exec_context *ctx, int *ptr, int arg)
 	attr &= 0x38;
 	attr |= atom_def_dst[attr>>3]<<6;
 	atom_get_dst(ctx, arg, attr, ptr, &saved, 0);
-	TRACE("   dst: ");
+	TRACE("%s\n", __func__);
 	atom_put_dst(ctx, arg, attr, &dptr, 0, saved);
 }
 
@@ -492,14 +495,12 @@ atom_op_compare(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src;
-	TRACE("   src1: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
-	TRACE("   src2: ");
 	src = atom_get_src(ctx, attr, ptr);
 	ctx->ctx->cs_equal = (dst == src);
 	ctx->ctx->cs_above = (dst > src);
-	TRACE("   result: %s %s\n", ctx->ctx->cs_equal ? "EQ" : "NE",
-		ctx->ctx->cs_above ? "GT" : "LE");
+	TRACE("%s: 0x%" B_PRIX32 " %s 0x%" B_PRIX32 "\n", __func__,
+		dst, ctx->ctx->cs_above ? ">" : "<=", src);
 }
 
 
@@ -507,11 +508,12 @@ static void
 atom_op_delay(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 count = U8((*ptr)++);
-	TRACE("   count: %d\n", count);
 	if (arg == ATOM_UNIT_MICROSEC) {
+		TRACE("%s: %" B_PRIu8 " microseconds\n", __func__, count);
 		// Microseconds
 		usleep(count);
 	} else {
+		TRACE("%s: %" B_PRIu8 " milliseconds\n", __func__, count);
 		// TODO : check
 		// Milliseconds
 		usleep(count);
@@ -524,9 +526,7 @@ atom_op_div(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src;
-	TRACE("   src1: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
-	TRACE("   src2: ");
 	src = atom_get_src(ctx, attr, ptr);
 	if (src != 0) {
 		ctx->ctx->divmul[0] = dst / src;
@@ -535,6 +535,11 @@ atom_op_div(atom_exec_context *ctx, int *ptr, int arg)
 		ctx->ctx->divmul[0] = 0;
 		ctx->ctx->divmul[1] = 0;
 	}
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " / 0x%" B_PRIX32 " is 0x%" B_PRIX32
+		" remander 0x%" B_PRIX32 "\n", __func__, dst, src,
+		ctx->ctx->divmul[0], ctx->ctx->divmul[1]);
+	#endif
 }
 
 
@@ -573,11 +578,10 @@ atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 	execute = !ctx->ctx->cs_equal;
 	break;
 	}
-	if (arg != ATOM_COND_ALWAYS)
-	TRACE("   taken: %s\n", execute?"yes":"no");
-	TRACE("   target: 0x%04X\n", target);
+	TRACE("%s: execute jump: %s; target: 0x%04X\n", __func__,
+		execute? "yes" : "no", target);
 	if (execute)
-	*ptr = ctx->start + target;
+		*ptr = ctx->start + target;
 }
 
 
@@ -587,15 +591,13 @@ atom_op_mask(atom_exec_context *ctx, int *ptr, int arg)
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src1, src2, saved;
 	int dptr = *ptr;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
-	TRACE("   src1: ");
 	src1 = atom_get_src(ctx, attr, ptr);
-	TRACE("   src2: ");
 	src2 = atom_get_src(ctx, attr, ptr);
 	dst &= src1;
 	dst |= src2;
-	TRACE("   dst: ");
+	TRACE("%s: src: 0x%" B_PRIX32 " mask 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
+		__func__, src1, src2, dst);
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -607,14 +609,14 @@ atom_op_move(atom_exec_context *ctx, int *ptr, int arg)
 	uint32 src, saved;
 	int dptr = *ptr;
 	if (((attr>>3)&7) != ATOM_SRC_DWORD)
-	atom_get_dst(ctx, arg, attr, ptr, &saved, 0);
+		atom_get_dst(ctx, arg, attr, ptr, &saved, 0);
 	else {
-	atom_skip_dst(ctx, arg, attr, ptr);
-	saved = 0xCDCDCDCD;
+		atom_skip_dst(ctx, arg, attr, ptr);
+		saved = 0xCDCDCDCD;
 	}
-	TRACE("   src: ");
 	src = atom_get_src(ctx, attr, ptr);
-	TRACE("   dst: ");
+	TRACE("%s: src: 0x%" B_PRIX32 "; saved: 0x%" B_PRIX32 "\n",
+		__func__, src, saved);
 	atom_put_dst(ctx, arg, attr, &dptr, src, saved);
 }
 
@@ -624,11 +626,11 @@ atom_op_mul(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src;
-	TRACE("   src1: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
-	TRACE("   src2: ");
 	src = atom_get_src(ctx, attr, ptr);
 	ctx->ctx->divmul[0] = dst * src;
+	TRACE("%s: 0x%" B_PRIX32 " * 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
+		__func__, dst, src, ctx->ctx->divmul[0]);
 }
 
 
@@ -645,12 +647,13 @@ atom_op_or(atom_exec_context *ctx, int *ptr, int arg)
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src, saved;
 	int dptr = *ptr;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
-	TRACE("   src: ");
 	src = atom_get_src(ctx, attr, ptr);
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " | 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
+		__func__, dst, src, dst | src);
+	#endif
 	dst |= src;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -658,27 +661,27 @@ atom_op_or(atom_exec_context *ctx, int *ptr, int arg)
 static void
 atom_op_postcard(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("unimplemented!\n");
+	TRACE("%s: unimplemented!\n", __func__);
 }
 
 
 static void atom_op_repeat(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("unimplemented!\n");
+	TRACE("%s: unimplemented!\n", __func__);
 }
 
 
 static void
 atom_op_restorereg(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("unimplemented!\n");
+	TRACE("%s: unimplemented!\n", __func__);
 }
 
 
 static void
 atom_op_savereg(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("unimplemented!\n");
+	TRACE("%s: unimplemented!\n", __func__);
 }
 
 
@@ -687,7 +690,7 @@ atom_op_setdatablock(atom_exec_context *ctx, int *ptr, int arg)
 {
 	int idx = U8(*ptr);
 	(*ptr)++;
-	TRACE("   block: %d\n", idx);
+	TRACE("%s: block: %d\n", __func__, idx);
 	if (!idx)
 	ctx->ctx->data_block = 0;
 	else if (idx==255)
@@ -701,8 +704,8 @@ static void
 atom_op_setfbbase(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	TRACE("   fb_base: ");
 	ctx->ctx->fb_base = atom_get_src(ctx, attr, ptr);
+	TRACE("%s: fb_base: 0x%" B_PRIX32 "\n", __func__, ctx->ctx->fb_base);
 }
 
 
@@ -713,7 +716,7 @@ atom_op_setport(atom_exec_context *ctx, int *ptr, int arg)
 	switch(arg) {
 	case ATOM_PORT_ATI:
 	port = U16(*ptr);
-	TRACE("   port: %d\n", port);
+	TRACE("%s: port: %d\n", __func__, port);
 	if (!port)
 		ctx->ctx->io_mode = ATOM_IO_MM;
 	else
@@ -748,12 +751,13 @@ atom_op_shl(atom_exec_context *ctx, int *ptr, int arg)
 	int dptr = *ptr;
 	attr &= 0x38;
 	attr |= atom_def_dst[attr>>3]<<6;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	shift = U8((*ptr)++);
-	TRACE("   shift: %d\n", shift);
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " << %" B_PRId8 " is 0X%" B_PRIX32 "\n",
+		__func__, dst, shift, dst << shift);
+	#endif
 	dst <<= shift;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -766,12 +770,13 @@ atom_op_shr(atom_exec_context *ctx, int *ptr, int arg)
 	int dptr = *ptr;
 	attr &= 0x38;
 	attr |= atom_def_dst[attr>>3]<<6;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	shift = U8((*ptr)++);
-	TRACE("   shift: %d\n", shift);
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " >> %" B_PRId8 " is 0X%" B_PRIX32 "\n",
+		__func__, dst, shift, dst >> shift);
+	#endif
 	dst >>= shift;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -782,12 +787,13 @@ atom_op_sub(atom_exec_context *ctx, int *ptr, int arg)
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src, saved;
 	int dptr = *ptr;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
-	TRACE("   src: ");
 	src = atom_get_src(ctx, attr, ptr);
+	#ifdef TRACE_ATOM
+	TRACE("%s: 0x%" B_PRIX32 " - 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
+		__func__, dst, src, dst - src);
+	#endif
 	dst -= src;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -797,12 +803,12 @@ atom_op_switch(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
 	uint32 src, val, target;
-	TRACE("   switch: ");
+	TRACE("%s: switch start\n", __func__);
 	src = atom_get_src(ctx, attr, ptr);
 	while (U16(*ptr) != ATOM_CASE_END)
 	if (U8(*ptr) == ATOM_CASE_MAGIC) {
 		(*ptr)++;
-		TRACE("   case: ");
+		TRACE("%s: switch case\n", __func__);
 		val = atom_get_src(ctx, (attr&0x38)|ATOM_ARG_IMM, ptr);
 		target = U16(*ptr);
 		if (val == src) {
@@ -811,7 +817,7 @@ atom_op_switch(atom_exec_context *ctx, int *ptr, int arg)
 		}
 		(*ptr) += 2;
 	} else {
-		TRACE("Bad case.\n");
+		TRACE("%s: ERROR bad case\n", __func__);
 		return;
 	}
 	(*ptr) += 2;
@@ -823,12 +829,11 @@ atom_op_test(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src;
-	TRACE("   src1: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
-	TRACE("   src2: ");
 	src = atom_get_src(ctx, attr, ptr);
 	ctx->ctx->cs_equal = ((dst & src) == 0);
-	TRACE("   result: %s\n", ctx->ctx->cs_equal?"EQ":"NE");
+	TRACE("%s: 0x%" B_PRIX32 " and 0x%" B_PRIX32 " are %s\n", __func__,
+		dst, src, ctx->ctx->cs_equal ? "EQ" : "NE");
 }
 
 
@@ -838,12 +843,13 @@ atom_op_xor(atom_exec_context *ctx, int *ptr, int arg)
 	uint8 attr = U8((*ptr)++);
 	uint32 dst, src, saved;
 	int dptr = *ptr;
-	TRACE("   dst: ");
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
-	TRACE("   src: ");
 	src = atom_get_src(ctx, attr, ptr);
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " ^ 0X%" B_PRIX32 " is " B_PRIX32 "\n",
+		__func__, dst, src, dst ^ src);
+	#endif
 	dst ^= src;
-	TRACE("   dst: ");
 	atom_put_dst(ctx, arg, attr, &dptr, dst, saved);
 }
 
@@ -851,7 +857,7 @@ atom_op_xor(atom_exec_context *ctx, int *ptr, int arg)
 static void
 atom_op_debug(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("unimplemented!\n");
+	TRACE("%s: unimplemented!\n", __func__);
 }
 
 
