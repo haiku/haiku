@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2178365750
+1	slovak	x-vnd.Haiku-libtracker	2574176493
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld bajtov
@@ -137,7 +137,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 Error creating link to \"%name\".	FSUtils		Chyba pri vytváraní odkazu „%name“
 Error deleting items	FSUtils		Chyba pri mazaní položiek
 Error emptying Trash!	FSUtils		Chyba pri vyprázdňovaní Koša!
-Error in regular expression:\n\n'%errstring'	PoseView		Chyba v regulárnom výraze:\n\n'%errstring'
 Error moving \"%name\"	FSUtils		Chyba pri presúvaní „%name“
 Error moving \"%name\" to Trash. (%error)	FSUtils		Chyba pri presúvaní „%name“ do Koša. (%error)	
 

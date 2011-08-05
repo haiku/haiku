@@ -98,7 +98,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Herzlich Willkommen zum Haiku-
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Bei GRUB 2 besitzt die erste logische Partition immer die Nummer \"5\", unabhängig von der Anzahl primärer Partitionen.\n\n
 With GRUB it's: (hdN,n)\n\n	InstallerApp		Bei GRUB ist es: (hdN,n)\n\n
 Write boot sector	InstallerWindow		Bootsektor schreiben
-Write boot sector to '%s'	InstallerWindow		Der Bootsektor wird auf '%s' geschrieben
+Write boot sector to '%s'	InstallerWindow		Bootsektor auf '%s' schreiben
 You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Die richtige Partition findet man beispielweise mit GParted.\n\n\n
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Der Inhalt eines Laufwerks kann nicht auf sich selbst installiert werden. Bitte ein anderes Ziellaufwerk wählen.
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Wie man sieht, besitzt GRUB ein zu Linux unterschiedliches Benennungsschema für Festplatten.\n\n

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-About	1388347678
+1	czech	x-vnd.Haiku-About	1542889289
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB celkem
 %d MiB used (%d%%)	AboutView		%d MiB používáno (%d%%)
@@ -47,7 +47,6 @@ The BeGeistert team\n	AboutView		Tým BeGeister\n
 The Haiku-Ports team\n	AboutView		Tým Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Tým Haikuware a jejich systém prémií\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Aucklandská Universita a Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Kód, který je jedinečný pro Haiku, zejména jádro a veškerý kód, ke kterému se mohou odkazovat aplikace, je distribuován pod podmínkami %MIT licence%. Některé knihovny obsahují kód třetích stran distribuovaný pod licencí LGPL. Copyrighty ke kódu třetích stran je možno nalézt níže.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Autorská práva ke kódu Haiku jsou majetkem společnosti Haiku, Inc., nebo příslušných autorů, je-li to výslovně uvedeno ve zdroji. Haiku a logo Haiku jsou ochranné známky společnosti Haiku, Inc.\n\n
 Time running:	AboutView		Uptime:
 Translations:\n	AboutView		Překlady:\n

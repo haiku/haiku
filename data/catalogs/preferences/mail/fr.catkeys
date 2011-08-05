@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Mail	936504879
+1	french	x-vnd.Haiku-Mail	3361588786
 Account name:	Config Views		Nom du compte :
 Account settings	Config Views		Réglages du compte
 Accounts	Config Window		Comptes
@@ -31,7 +31,3 @@ While sending and receiving	Config Window		Pendant l'envoi et la réception
 days	Config Window		jours
 hours	Config Window		heures
 minutes	Config Window		minutes
-never	Config Window		jamais
-· E-mail filters	Config Window		. Filtres E-mail
-· Incoming	Config Window		. Réception
-· Outgoing	Config Window		. Envoi

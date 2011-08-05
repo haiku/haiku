@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	2137207616
+1	japanese	x-vnd.Haiku-CharacterMap	4082916013
 Aegean numbers	UnicodeBlocks		エーゲ数字
 Alphabetic presentation forms	UnicodeBlocks		アルファベット表示形
 Ancient Greek musical notation	UnicodeBlocks		古代ギリシャ記譜法
@@ -43,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		結合分音記号補助
 Combining half marks	UnicodeBlocks		半記号(合成可能)
 Control pictures	UnicodeBlocks		制御機能用記号
 Coptic	UnicodeBlocks		コプト文字
+Copy as escaped byte string	CharacterView		エスケープされた数値としてコピー
+Copy character	CharacterView		文字をコピー
 Counting rod numerals	UnicodeBlocks		算木
 Cuneiform	UnicodeBlocks		楔形文字
 Cuneiform numbers and punctuation	UnicodeBlocks		楔形文字数字と句読点

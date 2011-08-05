@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2699246155
+1	swedish	x-vnd.Haiku-libtracker	3486294898
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld byte
@@ -38,6 +38,7 @@ An item named \"%name\" already exists in this folder. Would you like to replace
 And	FindPanel		Och
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Är du säker på att du vill radera de valda objekten? Denna operation kan inte ångras.
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Är du säker på att du vill flytta eller kopiera dom valda objekt(en) till denna mapp?
+Arrange by	ContainerWindow		Sortera efter
 Ask before delete	SettingsView		Fråga innan borttagning
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		I %func \nfind_directory() misslyckades. \nOrsak: %error
 Attributes	ContainerWindow		Attribut
@@ -301,6 +302,7 @@ Resize to fit	QueryContainerWindow		Anpassa
 Resize to fit	VolumeWindow		Skala till passform
 Restore	ContainerWindow		Återställ
 Restoring: 	StatusWindow		Återställer:
+Reverse order	ContainerWindow		Omvänd ordning
 Revert	TrackerSettingsWindow		Återställ
 Save	FilePanelPriv		Spara
 Save	FindPanel		Spara

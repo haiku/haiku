@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	3149623567
+1	lithuanian	x-vnd.Haiku-About	3304165178
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB iš viso
 %d MiB used (%d%%)	AboutView		%d MiB naudojama (%d%%)
@@ -24,7 +24,6 @@ The BeGeistert team\n	AboutView		„BeGeistert“ komandai\n
 The Haiku-Ports team\n	AboutView		„Haiku-Ports“ komandai\n
 The Haikuware team and their bounty program\n	AboutView		„Haikuware“ komandai ir jos premijavimo programai\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Oklando universitetui ir Kristofui Luterotui\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Pirminiai tekstai, naudojami išimtinai „Haiku“, ypač branduolio bei visas kodas su kuriuo galima saistyti programas, platinamas pagal %MIT licence%. Kai kuriose sistemos bibliotekose yra trečiųjų šalių kodo, platinamo LGPL licenzijos sąlygomis. Trečiųjų šalių kodo autorių teisės yra išvardintos žemiau žemiau.\n\n
 Time running:	AboutView		Veikimo laikas:
 Translations:\n	AboutView		Vertimai:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Traviui Geiselbrecht (bei jo NewOS branduoliui)\n

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-About	128117018
+1	slovak	x-vnd.Haiku-About	282658629
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB celkom
 %d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
@@ -70,7 +70,6 @@ The BeGeistert team\n	AboutView		Tím BeGeistert\n
 The Haiku-Ports team\n	AboutView		Tím Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland a Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Kód, ktorý je  charakteristický pre Haiku, najmä jadro a kód, ktorý využívajú aplikácie môže byť šírený za podmienok %MIT licence%. Niektoré systémové knižnice obsahujú kód tretích strán šírený pod licenciou LGPL. Autorské práva tretích strán nájdete uvedené nižšie.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Autorské práva ku kódu Haiku sú vlastníctvom Haiku, Inc. alebo jednotlivých autorov, kde sú v kóde výslovne uvedení. Haiku™ a logo HAIKU® sú (registrované) obchodné známky Haiku, Inc.\n\n
 Time running:	AboutView		Čas behu:
 Translations:\n	AboutView		Preklady:\n

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-About	128117018
+1	romanian	x-vnd.Haiku-About	282658629
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB total
 %d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)
@@ -70,7 +70,6 @@ The BeGeistert team\n	AboutView		Echipa BeGeistert\n
 The Haiku-Ports team\n	AboutView		Echipa Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Universitatea Auckland și Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Codul sursă care este unic pentru Haiku, în special nucleul și întreg codul sursă utilizat de acesta, este distribuit utilizând termenii descriși de %MIT licence%. O parte din bibliotecile sistemului conțin cod sursă provenind de la terți distribuit sub licența LGPL. Puteți găsi mai jos mențiunile referitoare la drepturile de autor asupra codulului sursă provenit de la terți.\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku sunt proprietăți ale Haiku, Inc. sau ale autorilor respectivi când este notat în mod special în sursă. Haiku™ și sigla® Haiku sunt mărci (înregistrate) ale Haiku, Inc.\n\n
 Time running:	AboutView		Rulează de:
 Translations:\n	AboutView		Traduceri:\n

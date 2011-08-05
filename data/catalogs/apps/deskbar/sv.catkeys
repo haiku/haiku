@@ -5,7 +5,7 @@ Always on top	PreferencesWindow		Alltid överst
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
 Applications	PreferencesWindow		Program
 Auto-hide	PreferencesWindow		Dölj automatiskt
-Auto-raise	PreferencesWindow		Höj fönstret vid närkontakt
+Auto-raise	PreferencesWindow		Höj vid närkontakt
 Change time…	TimeView		Ställ in tid...
 Clock	PreferencesWindow		Klocka
 Close all	WindowMenu		Stäng alla

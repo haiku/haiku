@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	128117018
+1	swedish	x-vnd.Haiku-About	3091539351
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totalt
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
@@ -6,6 +6,7 @@
 %ld Processors:	AboutView		%ld Processorer:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB otillgängligt
 ... and the many people making donations!\n\n	AboutView		...och alla de som har skänkt pengar!\n\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 av Andy Ritger, baserat på generaliserad tidsformel
 About this system	AboutWindow		Om Haiku
 AboutSystem	System name		OmHaiku
 BSD (2-clause)	AboutView		BSD (2-klausul)
@@ -70,7 +71,7 @@ The BeGeistert team\n	AboutView		BeGeistert-teamet\n
 The Haiku-Ports team\n	AboutView		Haiku Ports-teamet\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland och Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Koden som är unik för Haiku, speciellt kärnan och all kod som applikationer kan länka till, är distribuerad under villkoren av %MIT licence%. Vissa systembibliotek kan innehålla kod från tredjepart distribuerad under LGPL licensen. Här under kan du finna upphovsrätten till kod från tredjepart.\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT license%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView	%MIT license% isn't a variable and has to be translated.	Koden som är unik för Haiku, särskilt kärnan och all kod som program länkar mot, är distribuerad under villkoren hos %MIT licensen%. Några systembibliotek innehåller tredjepartskod distribuerat under villkoren för LGPL licensen. Du kan finna upphovsrättsvillkoren för tredjepartskod nedan.\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten till Haikus källkod är en egendom tillhörande Haiku, Inc eller dess respektive skapare där det uttryckligen är angivet i källkoden. Haiku™ och HAIKU logotyp® är (registrerade) varumärken tillhörande Haiku, Inc.\n\n
 Time running:	AboutView		Tid sedan uppstart:
 Translations:\n	AboutView		Översättningar:\n

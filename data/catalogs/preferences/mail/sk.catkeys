@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Mail	3450803213
+1	slovak	x-vnd.Haiku-Mail	4171229277
 Account name:	Config Views		Názov účtu:
 Account name:	E-Mail		Názov účtu:
 Account settings	AutoConfigWindow		Nastavenie účtu
@@ -21,10 +21,13 @@ Error retrieving general settings: %s\n	Config Window		Chyba pri získavaní vš
 Finish	AutoConfigWindow		Dokončiť
 Incoming	Config Window		Prichádzajúce
 Incoming	E-Mail		Prichádzajúce
+Incoming mail filters	Config Views		Filtre prichádzajúcej pošty
 Login name:	E-Mail		Prihlasovacie meno:
 Mail checking	Config Window		Kontrola pošty
 Miscellaneous	Config Window		Rozličné
+Next	AutoConfigWindow		Ďalej
 OK	AutoConfigWindow		OK
+OK	Config Views		OK
 OK	Config Window		OK
 Only when dial-up is connected	Config Window		Iba ak je vytočené spojenie
 Outgoing	Config Window		Odchádzajúce
@@ -42,13 +45,11 @@ Server Name:	E-Mail		Názov servera:
 Settings	Config Window		Nastavenie
 Show connection status window:	Config Window		Zobraziť okno stavu spojenia:
 Start mail services on startup	Config Window		Spustiť služby pošty pri štarte
+The filter could not be moved. Deleting filter.	Config Views		Filter nebolo možné presunúť. Filter sa zmaže.
 While sending	Config Window		Počas odosielania
 While sending and receiving	Config Window		Počas odosielania a prijímania
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nVšeobecné nastavenia nebolo možné vrátiť.\n\nChyba pri získavaní všeobecných nastavení:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNový účet vytvoríte tlačidlom Pridať.\n\nÚčet odstránite tlačidlom odstrániť na vybranej položke.\n\nNastavenia položky zmeníte jej vybraním v zozname.
 days	Config Window		dní
+hours	Config Window		hodín
 minutes	Config Window		minút
-never	Config Window		nikdy
-· E-mail filters	Config Window		· Filtre pošty
-· Incoming	Config Window		· Prichádzajúce
-· Outgoing	Config Window		· Odchádzajúce

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Mail	1746145370
+1	german	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		Kontoname:
 Account name:	E-Mail		Kontoname:
 Account settings	AutoConfigWindow		Kontoeinstellungen
@@ -13,7 +13,7 @@ Check every	Config Window		Abrufen alle
 Choose Protocol	E-Mail		Protokoll wählen
 Create new account	AutoConfigWindow		Neues Konto anlegen
 E-mail	System name		E-Mail-Dienst
-E-mail address:	E-Mail		E-Mail-Adresse
+E-mail address:	E-Mail		E-Mail-Adresse:
 Edit mailbox menu…	Config Window		Mailbox-Menü bearbeiten...
 Enter a valid e-mail address.	AutoConfigWindow		Eine gültige E-Mail-Adresse angeben.
 Error	Config Window		Fehler
@@ -25,6 +25,7 @@ Incoming mail filters	Config Views		Filter für eingehende E-Mail
 Login name:	E-Mail		Login:
 Mail checking	Config Window		E-Mail abfragen
 Miscellaneous	Config Window		Verschiedenes
+Never	Config Window	show status window	Nie
 Next	AutoConfigWindow		Weiter
 OK	AutoConfigWindow		OK
 OK	Config Views		OK
@@ -50,10 +51,10 @@ While sending	Config Window		Beim Senden
 While sending and receiving	Config Window		Beim Senden und Empfangen
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDie allgemeinen Einstellungen konnten nicht zurückgenommen werden.\n\nFehler beim Abrufen der allgemeinen Einstellungen:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNeues Konto erstellen über den \"Hinzu\" Button.\n\nZum Löschen, Konto auswählen und \"Entfernen\" klicken.\n\nKonto auswählen, um dessen Einstellungen zu ändern.
+\t\t· E-mail filters	Config Window		\t\t· E-Mail-Filter
+\t\t· Incoming	Config Window		\t\t· Eingang
+\t\t· Outgoing	Config Window		\t\t· Ausgang
 days	Config Window		Tage
 hours	Config Window		Stunden
 minutes	Config Window		Minuten
-never	Config Window		nie
-· E-mail filters	Config Window		· E-Mail-Filter
-· Incoming	Config Window		· Eingang
-· Outgoing	Config Window		· Ausgang
+never	Config Window	mail checking frequency	nie

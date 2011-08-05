@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	128117018
+1	japanese	x-vnd.Haiku-About	1344586426
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		合計 %d MiB
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
@@ -6,11 +6,12 @@
 %ld Processors:	AboutView		%ld プロセッサー：
 %total MiB total, %inaccessible MiB inaccessible	AboutView		合計 %total MiB / %inaccessible MiB アクセス不可
 ... and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger based on the Generalized Timing Formula
 About this system	AboutWindow		このシステムについて
 AboutSystem	System name		このシステムについて
-BSD (2-clause)	AboutView		BSD (第2条)
-BSD (3-clause)	AboutView		BSD (第3条)
-BSD (4-clause)	AboutView		BSD (第4条)
+BSD (2-clause)	AboutView		BSD (2条項)
+BSD (3-clause)	AboutView		BSD (3条項)
+BSD (4-clause)	AboutView		BSD (4条項)
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. およびその開発チーム: 彼らはBeOSを創造してくれました!
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		次のソフトウェアはNetBSD Foundation, Inc.およびその貢献者らにより開発されたソフトウェアを含みます:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		次のソフトウェアはFreeBSD Projectで開発され、BSDライセンスで公開されているソフトウェアを含みます:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.
@@ -70,7 +71,6 @@ The BeGeistert team\n	AboutView		BeGeistert 展チーム\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports チーム\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 と Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haiku 特有のコード、特にカーネルとカーネルにリンクするアプリケーションのコードは、%MIT licence%で公開しています。一部のシステムライブラリが LPGL ライセンスで公開されている第三者が作のコードを含めています。第三者の著作権情報は下記に記載されています。\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku™およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。
 Time running:	AboutView		稼動時間：
 Translations:\n	AboutView		各国語翻訳：\n

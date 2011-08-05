@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-About	128117018
+1	norwegian_bokmål	x-vnd.Haiku-About	282658629
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totalt
 %d MiB used (%d%%)	AboutView		%d MiB brukt (%d%%)
@@ -70,7 +70,6 @@ The BeGeistert team\n	AboutView		BeGeistert-teamet\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports-teamet\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet og deres dusørprogram\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland og Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Koden som er unik for Haiku, særlig kjernen og all kode som applikasjoner kan lenkes til, distribueres under %MIT-lisensen%. Noen systembiblioteker inneholder kode fra tredjepart som distribueres under LGPL-lisensen. Opphavsrettighetene til tredjepartskode finner du nedenfor.\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Opphavsretten til Haiku-koden tilhører Haiku, Inc. eller de respektive forfattere der det er uttrykkelig nevnt i kildekoden. Haiku™ og HAIKU-logoen® er (registrerte) varemerker tilhørende Haiku, Inc.\n\n
 Time running:	AboutView		Oppetid:
 Translations:\n	AboutView		Oversettelse:\n

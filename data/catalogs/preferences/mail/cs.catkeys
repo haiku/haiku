@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Mail	1290248466
+1	czech	x-vnd.Haiku-Mail	3715332373
 Account name:	Config Views		Název účtu:
 Account settings	Config Views		Nastavení účtu
 Accounts	Config Window		Úcty
@@ -28,7 +28,3 @@ While sending and receiving	Config Window		Během odesílání a přijímání
 days	Config Window		dny
 hours	Config Window		hodiny
 minutes	Config Window		minut/y
-never	Config Window		nikdy
-· E-mail filters	Config Window		· filtry zpráv
-· Incoming	Config Window		· Příchozí
-· Outgoing	Config Window		· Odchozí

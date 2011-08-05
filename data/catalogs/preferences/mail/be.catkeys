@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Mail	2328315862
+1	belarusian	x-vnd.Haiku-Mail	458432473
 Account name:	Config Views		Імя акаунту
 Account name:	E-Mail		Імя акаунта:
 Account settings	Config Views		Наладкі акаунту
@@ -42,7 +42,3 @@ While sending and receiving	Config Window		Пры адпраўцы і атрым
 days	Config Window		дзен
 hours	Config Window		гадзін
 minutes	Config Window		хвілін
-never	Config Window		ніколі
-· E-mail filters	Config Window		· Фільтры пошты
-· Incoming	Config Window		· Прыходзячыя
-· Outgoing	Config Window		· Зыходзячыя

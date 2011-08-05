@@ -1,4 +1,6 @@
-1	swedish	x-vnd.Be-POST	2900218551
+1	swedish	x-vnd.Be-POST	1358359182
+%.1f / %.1f kb (%d / %d messages)	StatusWindow		%.1f / %.1f kb (%d / %d meddelanden)
+%d / %d messages	StatusWindow		%d / %d meddelanden
 %num new message	DeskbarView		%num nytt meddelande
 %num new message for %name\n	MailDaemon		%num nytt meddelande för %name\n
 %num new message.	MailDaemon		%num nytt meddelande.
@@ -10,6 +12,7 @@ Check for mail now	DeskbarView		Kontrollera e-post nu
 Check for mails only	DeskbarView		Kontrollera bara e-post
 Check mail now	StatusWindow		Kontrollera e-post nu
 Create new message…	DeskbarView		Skapa nytt meddelande...
+Fetching mail for %name	Notifier		Hämtar e-post för %name
 Mail Status	MailDaemon		E-post status
 Mail daemon status log	MailDaemon		Statuslog för e-postdemon
 New Messages	MailDaemon		nya meddelanden
@@ -19,4 +22,5 @@ No new messages.	MailDaemon		inga nya meddelanden.
 No new messages.	StatusWindow		inga nya meddelanden.
 Preferences…	DeskbarView		Inställningar...
 Send pending mails	DeskbarView		Skicka väntande meddelanden
+Sending mail for %name	Notifier		Skickar e-post för %name
 Shutdown mail services	DeskbarView		Stäng av e-posttjänsterna
