@@ -25,6 +25,8 @@
 #define ATOM_H
 
 
+#include "atombios.h"
+
 #include <String.h>
 #include <SupportDefs.h>
 

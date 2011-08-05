@@ -13,6 +13,7 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
+#include "bios.h"
 #include "utility.h"
 #include "mode.h"
 #include "display.h"
@@ -343,7 +344,8 @@ radeon_set_display_mode(display_mode *mode)
 		// Skip if display is inactive
 		if (gDisplay[id]->active == false) {
 			CardBlankSet(id, true);
-			display_power(id, RHD_POWER_SHUTDOWN);
+			// LEGACY : display_power(id, RHD_POWER_SHUTDOWN);
+			atombios_crtc_power(id, ATOM_DISABLE);
 			continue;
 		}
 
@@ -352,7 +354,7 @@ radeon_set_display_mode(display_mode *mode)
 		CardModeSet(id, mode);
 		CardModeScale(id, mode);
 
-		display_power(id, RHD_POWER_RESET);
+		// LEGACY : display_power(id, RHD_POWER_RESET);
 
 		// Program connector controllers
 		switch (gDisplay[id]->connection_type) {
@@ -370,7 +372,8 @@ radeon_set_display_mode(display_mode *mode)
 		}
 
 		// Power CRT Controller
-		display_power(id, RHD_POWER_ON);
+		// LEGACY : display_power(id, RHD_POWER_ON);
+		atombios_crtc_power(id, ATOM_ENABLE);
 		CardBlankSet(id, false);
 
 		// Power connector controllers

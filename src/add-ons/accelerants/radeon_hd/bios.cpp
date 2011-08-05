@@ -28,6 +28,52 @@
 atom_context *gAtomContext;
 
 
+void
+atombios_crtc_power(uint8 crt_id, int state)
+{
+	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTC);
+	ENABLE_CRTC_PS_ALLOCATION args;
+
+	memset(&args, 0, sizeof(args));
+
+	args.ucCRTC = crt_id;
+	args.ucEnable = state;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+void
+radeon_bios_init_scratch()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint32 bios_2_scratch;
+	uint32 bios_6_scratch;
+
+	if (info.device_chipset >= RADEON_R600) {
+		bios_2_scratch = Read32(OUT, R600_BIOS_2_SCRATCH);
+		bios_6_scratch = Read32(OUT, R600_BIOS_6_SCRATCH);
+	} else {
+		bios_2_scratch = Read32(OUT, RADEON_BIOS_2_SCRATCH);
+		bios_6_scratch = Read32(OUT, RADEON_BIOS_6_SCRATCH);
+	}
+
+	bios_2_scratch &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
+		// bios should control backlight
+	bios_6_scratch |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
+		// bios shouldn't handle mode switching
+
+	if (info.device_chipset >= RADEON_R600) {
+		Write32(OUT, R600_BIOS_2_SCRATCH, bios_2_scratch);
+		Write32(OUT, R600_BIOS_6_SCRATCH, bios_6_scratch);
+	} else {
+		Write32(OUT, RADEON_BIOS_2_SCRATCH, bios_2_scratch);
+		Write32(OUT, RADEON_BIOS_6_SCRATCH, bios_6_scratch);
+	}
+}
+
+
 status_t
 radeon_init_bios(uint8* bios)
 {
@@ -69,12 +115,8 @@ radeon_init_bios(uint8* bios)
 		return B_ERROR;
 	}
 
-	#if 0
-	rdev->mode_info.atom_context = atom_parse(atom_card_info, rdev->bios);
-	mutex_init(&rdev->mode_info.atom_context->mutex);
-	radeon_atom_initialize_bios_scratch_regs(rdev->ddev);
-	atom_allocate_fb_scratch(rdev->mode_info.atom_context);
-	#endif
+	// mutex_init(&rdev->mode_info.atom_context->mutex);
+	radeon_bios_init_scratch();
 
 	return B_OK;
 }
