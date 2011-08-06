@@ -51,6 +51,8 @@ public:
 	virtual	void 					WorkspaceActivated(int32, bool);
 	virtual	BHandler*				ResolveSpecifier(BMessage*, int32, BMessage*,
 										int32, const char*);
+										
+			void					Show();
 
 			icon_size				IconSize();
 			int32					Timeout();

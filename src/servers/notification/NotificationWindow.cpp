@@ -62,8 +62,7 @@ NotificationWindow::NotificationWindow()
 	fBorder = new BorderView(Bounds(), "Notification");
 
 	AddChild(fBorder);
-
-	SetPosition();
+	
 	Show();
 	Hide();
 
@@ -371,8 +370,13 @@ NotificationWindow::ResizeAll()
 void
 NotificationWindow::SetPosition()
 {
-	float width = Bounds().Width();
-	float height = Bounds().Height();
+	BRect bounds = DecoratorFrame();
+	float width = bounds.Width();
+	float height = bounds.Height();
+	
+	float leftOffset = Frame().left - DecoratorFrame().left;
+	float topOffset = DecoratorFrame().top - Frame().top;
+	
 	float x = 0, y = 0, sx, sy;
 	float pad = 0;
 	BDeskbar deskbar;
@@ -381,10 +385,8 @@ NotificationWindow::SetPosition()
 	switch (deskbar.Location()) {
 		case B_DESKBAR_TOP:
 			// Put it just under, top right corner
-			sx = frame.right;
-			sy = frame.bottom + pad;
-			y = sy;
-			x = sx - width - pad;
+			y = frame.bottom + pad + topOffset;
+			x = frame.right - width;
 			break;
 		case B_DESKBAR_BOTTOM:
 			// Put it just above, lower left corner
@@ -396,14 +398,14 @@ NotificationWindow::SetPosition()
 		case B_DESKBAR_LEFT_TOP:
 			// Put it just to the right of the deskbar
 			sx = frame.right + pad;
-			sy = frame.top - height;
-			x = sx;
+			//sy = frame.top - height;
+			x = sx + leftOffset;
 			y = frame.top + pad;
 			break;
 		case B_DESKBAR_RIGHT_TOP:
 			// Put it just to the left of the deskbar
 			sx = frame.left - width - pad;
-			sy = frame.top - height;
+			//sy = frame.top - height;
 			x = sx;
 			y = frame.top + pad;
 			break;
@@ -411,7 +413,7 @@ NotificationWindow::SetPosition()
 			// Put it to the right of the deskbar.
 			sx = frame.right + pad;
 			sy = frame.bottom;
-			x = sx;
+			x = sx + leftOffset;
 			y = sy - height - pad;
 			break;
 		case B_DESKBAR_RIGHT_BOTTOM:
@@ -513,6 +515,13 @@ NotificationWindow::SaveAppFilters()
 		settings.AddFlat("app_usage", fIt->second);
 
 	settings.Flatten(&file);
+}
+
+
+void NotificationWindow::Show()
+{
+	BWindow::Show();
+	SetPosition();
 }
 
 

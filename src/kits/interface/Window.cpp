@@ -2078,14 +2078,34 @@ BRect
 BWindow::DecoratorFrame() const
 {
 	BRect decoratorFrame(Frame());
-	float borderWidth;
-	float tabHeight;
-	_GetDecoratorSize(&borderWidth, &tabHeight);
-	// TODO: Broken for tab on left window side windows...
-	decoratorFrame.top -= tabHeight;
-	decoratorFrame.left -= borderWidth;
-	decoratorFrame.right += borderWidth;
-	decoratorFrame.bottom += borderWidth;
+	BRect tabRect(0, 0, 0, 0);
+	
+	float borderWidth = 5.0;
+
+	BMessage settings;
+	if (GetDecoratorSettings(&settings) == B_OK) {
+		settings.FindRect("tab frame", &tabRect);
+		settings.FindFloat("border width", &borderWidth);
+	} else {
+		// probably no-border window look
+		if (fLook == B_NO_BORDER_WINDOW_LOOK) {
+			borderWidth = 0.0;
+		}
+		// else use fall-back values from above
+	}
+
+	if (fLook & kLeftTitledWindowLook) {
+		decoratorFrame.top -= borderWidth;
+		decoratorFrame.left -= tabRect.Width();
+		decoratorFrame.right += borderWidth;
+		decoratorFrame.bottom += borderWidth;
+	} else {
+		decoratorFrame.top -= tabRect.Height();
+		decoratorFrame.left -= borderWidth;
+		decoratorFrame.right += borderWidth;
+		decoratorFrame.bottom += borderWidth;
+	}
+	
 	return decoratorFrame;
 }
 
