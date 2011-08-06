@@ -58,14 +58,15 @@ AppGroupView::Draw(BRect updateRect)
 	be_bold_font->GetHeight(&fh);
 	float labelOffset = fh.ascent + fh.leading;
 
-	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
-	borderRect.top = labelOffset;
 
-	BRect textRect = borderRect;
-	textRect.left = kEdgePadding * 2;
-	textRect.right = textRect.left + be_bold_font->StringWidth(label.String())
-		+ (kEdgePadding * 3);
-	textRect.bottom = labelOffset;
+	BRect textRect = Bounds();
+	//textRect.left = kEdgePadding * 2;
+	//textRect.right = textRect.left + be_bold_font->StringWidth(label.String())
+	//	+ (kEdgePadding * 3);
+	textRect.bottom = 2 * labelOffset;
+	
+	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
+	borderRect.top = 2 * labelOffset;
 
 	BRect closeCross = fCloseRect;
 	closeCross.InsetBy(kSmallPadding, kSmallPadding);
@@ -137,36 +138,24 @@ AppGroupView::Draw(BRect updateRect)
 			SetFont(be_bold_font);
 			SetPenSize(kPenSize);
 
-			// Draw the border
-			PushState();
-				SetHighColor(detailCol);
-				// StrokeRoundRect(borderRect, kEdgePadding, kEdgePadding * 2);
-				StrokeRect(borderRect);
-			PopState();
-
+			SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 			FillRect(textRect, B_SOLID_LOW);
+			
+			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 
 			// Draw the collapse widget
-			PushState();
-				SetHighColor(detailCol);
-				StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
+			StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
 
-				BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-				BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
+			BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
+			BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
 
-				StrokeLine(expandHorStart, expandHorEnd);
-			PopState();
+			StrokeLine(expandHorStart, expandHorEnd);
 
 			// Draw the dismiss widget
-			PushState();
-				SetHighColor(detailCol);			
-				FillRect(fCloseRect, B_SOLID_LOW);
+			StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
 
-				StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-
-				StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-				StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
-			PopState();
+			StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
+			StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
 
 			// Draw the label
 			DrawString(label.String(), BPoint(fCollapseRect.right + kEdgePadding, labelOffset + kEdgePadding));
@@ -310,7 +299,7 @@ AppGroupView::ResizeViews()
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
 
-	float offset = fh.ascent + fh.leading + fh.descent;
+	float offset = 2 * kEdgePadding + fh.ascent + fh.leading + fh.descent;
 	int32 children = fInfo.size();
 
 	if (!fCollapsed) {
@@ -318,7 +307,7 @@ AppGroupView::ResizeViews()
 
 		for (int32 i = 0; i < children; i++) {
 			fInfo[i]->ResizeToPreferred();
-			fInfo[i]->MoveTo(kEdgePadding + kPenSize, offset);
+			fInfo[i]->MoveTo(0, offset);
 			
 			offset += fInfo[i]->Bounds().Height();
 			if (fInfo[i]->IsHidden())
@@ -342,7 +331,7 @@ AppGroupView::ResizeViews()
 	float labelOffset = fh.ascent + fh.leading;
 
 	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
-	borderRect.top = labelOffset;
+	borderRect.top = 2*labelOffset;
 
 	fCollapseRect = borderRect;
 	fCollapseRect.right = fCollapseRect.left + kExpandSize;

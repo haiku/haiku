@@ -23,6 +23,7 @@
 #include <File.h>
 #include <NodeMonitor.h>
 #include <PropertyInfo.h>
+#include <private/interface/WindowPrivate.h>
 
 #include "AppGroupView.h"
 #include "AppUsage.h"
@@ -48,13 +49,13 @@ property_info main_prop_list[] = {
 const float kCloseSize				= 8;
 const float kExpandSize				= 8;
 const float kPenSize				= 1;
-const float kEdgePadding			= 5;
+const float kEdgePadding			= 2;
 const float kSmallPadding			= 2;
 
 NotificationWindow::NotificationWindow()
 	:
 	BWindow(BRect(10, 10, 30, 30), B_TRANSLATE_MARK("Notification"), 
-		B_BORDERED_WINDOW, B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE 
+		kLeftTitledWindowLook, B_FLOATING_ALL_WINDOW_FEEL, B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE 
 		| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE, 
 		B_ALL_WORKSPACES)
 {

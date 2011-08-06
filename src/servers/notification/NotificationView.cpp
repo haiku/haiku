@@ -32,6 +32,8 @@ const char* kSmallIconAttribute	= "BEOS:M:STD_ICON";
 const char* kLargeIconAttribute	= "BEOS:L:STD_ICON";
 const char* kIconAttribute		= "BEOS:ICON";
 
+static const int kIconStripeWidth = 30;
+
 property_info message_prop_list[] = {
 	{ "type", {B_GET_PROPERTY, B_SET_PROPERTY, 0},
 		{B_DIRECT_SPECIFIER, 0}, "get the notification type"},
@@ -297,7 +299,14 @@ NotificationView::Draw(BRect updateRect)
 
 	// Icon size
 	float iconSize = (float)fParent->IconSize();
-
+	
+	BRect stripeRect = Bounds();
+	int32 iconLayoutScale = max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
+	stripeRect.right = kIconStripeWidth * iconLayoutScale;
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	FillRect(stripeRect);
+	
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	// Rectangle for icon and overlay icon
 	BRect iconRect(0, 0, 0, 0);
 

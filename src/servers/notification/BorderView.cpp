@@ -77,11 +77,11 @@ BorderView::Draw(BRect rect)
 	SetHighColor(tint_color(col_bg, B_DARKEN_2_TINT));
 
 	BRect content = Bounds();
-	content.InsetBy(kBorderWidth, kBorderWidth);
+//	content.InsetBy(kBorderWidth, kBorderWidth);
 	content.top += text_pos + fh.descent + 2;
 
 	BRect content_line(content);
-	content_line.InsetBy(-1, -1);
+//	content_line.InsetBy(-1, -1);
 
 	StrokeRect(content_line);
 }
