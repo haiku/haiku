@@ -62,7 +62,8 @@ public:
 private:
 	friend class AppGroupView;
 
-			void					PopupAnimation(float, float);
+			void					SetPosition();
+			void					PopupAnimation();
 			void					LoadSettings(bool startMonitor = false);
 			void					LoadAppFilters(bool startMonitor = false);
 			void					SaveAppFilters();

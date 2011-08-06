@@ -54,7 +54,7 @@ const float kSmallPadding			= 2;
 
 NotificationWindow::NotificationWindow()
 	:
-	BWindow(BRect(10, 10, 30, 30), B_TRANSLATE_MARK("Notification"), 
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_MARK("Notification"), 
 		kLeftTitledWindowLook, B_FLOATING_ALL_WINDOW_FEEL, B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE 
 		| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE, 
 		B_ALL_WORKSPACES)
@@ -63,6 +63,7 @@ NotificationWindow::NotificationWindow()
 
 	AddChild(fBorder);
 
+	SetPosition();
 	Show();
 	Hide();
 
@@ -363,13 +364,15 @@ NotificationWindow::ResizeAll()
 	}
 
 	ResizeTo(ViewWidth(), height);
-	PopupAnimation(Bounds().Width(), Bounds().Height());
+	PopupAnimation();
 }
 
 
 void
-NotificationWindow::PopupAnimation(float width, float height)
+NotificationWindow::SetPosition()
 {
+	float width = Bounds().Width();
+	float height = Bounds().Height();
 	float x = 0, y = 0, sx, sy;
 	float pad = 0;
 	BDeskbar deskbar;
@@ -423,6 +426,12 @@ NotificationWindow::PopupAnimation(float width, float height)
 	}
 
 	MoveTo(x, y);
+}
+
+void
+NotificationWindow::PopupAnimation()
+{
+	SetPosition();
 
 	if (IsHidden() && fViews.size() != 0)
 		Show();
