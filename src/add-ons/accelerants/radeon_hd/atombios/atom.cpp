@@ -102,38 +102,38 @@ atom_iio_execute(atom_context *ctx, int base, uint32 index, uint32 data)
 		base++;
 		break;
 	case ATOM_IIO_READ:
-		temp = ctx->card->reg_read(CU16(base + 1));
-		base+=3;
+		temp = ctx->card->ioreg_read(CU16(base + 1));
+		base += 3;
 		break;
 	case ATOM_IIO_WRITE:
-		ctx->card->reg_write(CU16(base + 1), temp);
-		base+=3;
+		ctx->card->ioreg_write(CU16(base + 1), temp);
+		base += 3;
 		break;
 	case ATOM_IIO_CLEAR:
 		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
-		base+=3;
+		base += 3;
 		break;
 	case ATOM_IIO_SET:
 		temp |= (0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2);
-		base+=3;
+		base += 3;
 		break;
 	case ATOM_IIO_MOVE_INDEX:
 		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
 		temp |= ((index >> CU8(base + 2))
 			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
-		base+=4;
+		base += 4;
 		break;
 	case ATOM_IIO_MOVE_DATA:
 		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
 		temp |= ((data >> CU8(base + 2))
 			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
-		base+=4;
+		base += 4;
 		break;
 	case ATOM_IIO_MOVE_ATTR:
 		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
 		temp |= ((ctx->io_attr >> CU8(base + 2))
 			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
-		base+=4;
+		base += 4;
 		break;
 	case ATOM_IIO_END:
 		return temp;
@@ -153,115 +153,120 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 	arg = attr & 7;
 	align = (attr >> 3) & 7;
 	switch(arg) {
-	case ATOM_ARG_REG:
-	idx = U16(*ptr);
-	(*ptr)+=2;
-	idx += gctx->reg_block;
-	switch(gctx->io_mode) {
-	case ATOM_IO_MM:
-		val = gctx->card->reg_read(idx);
-		break;
-	case ATOM_IO_PCI:
-		TRACE("%s: PCI registers are not implemented.\n", __func__);
-		return 0;
-	case ATOM_IO_SYSIO:
-		TRACE("%s: SYSIO registers are not implemented.\n", __func__);
-		return 0;
-	default:
-		if (!(gctx->io_mode&0x80)) {
-		TRACE("%s: Bad IO mode.\n", __func__);
-		return 0;
-		}
-		if (!gctx->iio[gctx->io_mode&0x7F]) {
-		TRACE("%s: Undefined indirect IO read method %d.\n", __func__,
-			gctx->io_mode&0x7F);
-		return 0;
-		}
-		val = atom_iio_execute(gctx, gctx->iio[gctx->io_mode&0x7F], idx, 0);
-	}
-	break;
-	case ATOM_ARG_PS:
-	idx = U8(*ptr);
-	(*ptr)++;
-	val = ctx->ps[idx];
-	break;
-	case ATOM_ARG_WS:
-	idx = U8(*ptr);
-	(*ptr)++;
-	switch(idx) {
-	case ATOM_WS_QUOTIENT:
-		val = gctx->divmul[0];
-		break;
-	case ATOM_WS_REMAINDER:
-		val = gctx->divmul[1];
-		break;
-	case ATOM_WS_DATAPTR:
-		val = gctx->data_block;
-		break;
-	case ATOM_WS_SHIFT:
-		val = gctx->shift;
-		break;
-	case ATOM_WS_OR_MASK:
-		val = 1<<gctx->shift;
-		break;
-	case ATOM_WS_AND_MASK:
-		val = ~(1<<gctx->shift);
-		break;
-	case ATOM_WS_FB_WINDOW:
-		val = gctx->fb_base;
-		break;
-	case ATOM_WS_ATTRIBUTES:
-		val = gctx->io_attr;
-		break;
-	default:
-		val = ctx->ws[idx];
-	}
-	break;
-	case ATOM_ARG_ID:
-	idx = U16(*ptr);
-	(*ptr)+=2;
-	val = U32(idx + gctx->data_block);
-	break;
-	case ATOM_ARG_FB:
-	idx = U8(*ptr);
-	(*ptr)++;
-	TRACE("%s: FB access is not implemented.\n", __func__);
-	return 0;
-	case ATOM_ARG_IMM:
-	switch(align) {
-	case ATOM_SRC_DWORD:
-		val = U32(*ptr);
-		(*ptr)+=4;
-		return val;
-	case ATOM_SRC_WORD0:
-	case ATOM_SRC_WORD8:
-	case ATOM_SRC_WORD16:
-		val = U16(*ptr);
-		(*ptr)+=2;
-		return val;
-	case ATOM_SRC_BYTE0:
-	case ATOM_SRC_BYTE8:
-	case ATOM_SRC_BYTE16:
-	case ATOM_SRC_BYTE24:
-		val = U8(*ptr);
-		(*ptr)++;
-		return val;
-	}
-	return 0;
-	case ATOM_ARG_PLL:
-	idx = U8(*ptr);
-	(*ptr)++;
-	gctx->card->reg_write(PLL_INDEX, idx);
-	val = gctx->card->reg_read(PLL_DATA);
-	break;
-	case ATOM_ARG_MC:
-	idx = U8(*ptr);
-	(*ptr)++;
-	TRACE("%s: MC registers are not implemented.\n", __func__);
-	return 0;
+		case ATOM_ARG_REG:
+			idx = U16(*ptr);
+			(*ptr)+=2;
+			idx += gctx->reg_block;
+			switch(gctx->io_mode) {
+				case ATOM_IO_MM:
+					val = gctx->card->reg_read(idx);
+					break;
+				case ATOM_IO_PCI:
+					TRACE("%s: PCI registers are not implemented.\n", __func__);
+					return 0;
+				case ATOM_IO_SYSIO:
+					TRACE("%s: SYSIO registers are not implemented.\n",
+						__func__);
+					return 0;
+				default:
+					if (!(gctx->io_mode & 0x80)) {
+						TRACE("%s: Bad IO mode.\n", __func__);
+						return 0;
+					}
+					if (!gctx->iio[gctx->io_mode & 0x7F]) {
+						TRACE("%s: Undefined indirect IO read method %d.\n",
+							__func__, gctx->io_mode & 0x7F);
+						return 0;
+					}
+					val = atom_iio_execute(gctx,
+						gctx->iio[gctx->io_mode & 0x7F], idx, 0);
+			}
+			break;
+		case ATOM_ARG_PS:
+			idx = U8(*ptr);
+			(*ptr)++;
+			val = ctx->ps[idx];
+				// TODO	: val = get_unaligned_le32((u32 *)&ctx->ps[idx]);
+			break;
+		case ATOM_ARG_WS:
+			idx = U8(*ptr);
+			(*ptr)++;
+			switch(idx) {
+				case ATOM_WS_QUOTIENT:
+					val = gctx->divmul[0];
+					break;
+				case ATOM_WS_REMAINDER:
+					val = gctx->divmul[1];
+					break;
+				case ATOM_WS_DATAPTR:
+					val = gctx->data_block;
+					break;
+				case ATOM_WS_SHIFT:
+					val = gctx->shift;
+					break;
+				case ATOM_WS_OR_MASK:
+					val = 1 << gctx->shift;
+					break;
+				case ATOM_WS_AND_MASK:
+					val = ~(1 << gctx->shift);
+					break;
+				case ATOM_WS_FB_WINDOW:
+					val = gctx->fb_base;
+					break;
+				case ATOM_WS_ATTRIBUTES:
+					val = gctx->io_attr;
+					break;
+				case ATOM_WS_REGPTR:
+					val = gctx->reg_block;
+					break;
+				default:
+					val = ctx->ws[idx];
+			}
+			break;
+		case ATOM_ARG_ID:
+			idx = U16(*ptr);
+			(*ptr) += 2;
+			val = U32(idx + gctx->data_block);
+			break;
+		case ATOM_ARG_FB:
+			idx = U8(*ptr);
+			(*ptr)++;
+			val = gctx->scratch[((gctx->fb_base + idx) / 4)];
+			return 0;
+		case ATOM_ARG_IMM:
+			switch(align) {
+				case ATOM_SRC_DWORD:
+					val = U32(*ptr);
+					(*ptr)+=4;
+					return val;
+				case ATOM_SRC_WORD0:
+				case ATOM_SRC_WORD8:
+				case ATOM_SRC_WORD16:
+					val = U16(*ptr);
+					(*ptr) += 2;
+					return val;
+				case ATOM_SRC_BYTE0:
+				case ATOM_SRC_BYTE8:
+				case ATOM_SRC_BYTE16:
+				case ATOM_SRC_BYTE24:
+					val = U8(*ptr);
+					(*ptr)++;
+					return val;
+			}
+			return 0;
+		case ATOM_ARG_PLL:
+			idx = U8(*ptr);
+			(*ptr)++;
+			val = gctx->card->pll_read(idx);
+			break;
+		case ATOM_ARG_MC:
+			idx = U8(*ptr);
+			(*ptr)++;
+			val = gctx->card->mc_read(idx);
+			return 0;
 	}
 	if (saved)
-	*saved = val;
+		*saved = val;
 	val &= atom_arg_mask[align];
 	val >>= atom_arg_shift[align];
 	return val;

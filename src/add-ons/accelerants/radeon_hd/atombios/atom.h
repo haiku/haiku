@@ -107,6 +107,7 @@ struct card_info {
 #define ATOM_WS_AND_MASK	0x45
 #define ATOM_WS_FB_WINDOW	0x46
 #define ATOM_WS_ATTRIBUTES	0x47
+#define ATOM_WS_REGPTR		0x48
 
 #define ATOM_IIO_NOP		0
 #define ATOM_IIO_START		1
@@ -138,6 +139,7 @@ typedef struct atom_context_s {
 	uint8 shift;
 	int cs_equal, cs_above;
 	int io_mode;
+	uint32 *scratch;
 } atom_context;
 
 extern int atom_debug;
