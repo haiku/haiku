@@ -29,6 +29,7 @@
 
 #include <String.h>
 #include <SupportDefs.h>
+#include <ByteOrder.h>
 
 
 struct card_info {
@@ -131,6 +132,7 @@ typedef struct atom_context_s {
 	uint32 cmd_table, data_table;
 	uint16 *iio;
 
+	sem_id exec_sem;
 	uint16 data_block;
 	uint32 fb_base;
 	uint32 divmul[2];
@@ -145,7 +147,7 @@ typedef struct atom_context_s {
 extern int atom_debug;
 
 atom_context *atom_parse(card_info *, void *);
-void atom_execute_table(atom_context *, int, uint32 *);
+status_t atom_execute_table(atom_context *, int, uint32 *);
 int atom_asic_init(atom_context *);
 void atom_destroy(atom_context *);
 

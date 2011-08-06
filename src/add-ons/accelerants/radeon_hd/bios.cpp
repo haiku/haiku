@@ -103,7 +103,13 @@ radeon_init_bios(uint8* bios)
 	atom_asic_init(gAtomContext);
 		// Post card
 
-	// mutex_init(&rdev->mode_info.atom_context->mutex);
+	if ((gAtomContext->exec_sem = create_sem(1, "AtomBIOS_exec"))
+		< B_NO_ERROR) {
+		TRACE("%s: couldn't create semaphore for AtomBIOS exec thread!\n",
+			__func__);
+		return B_ERROR;
+	}
+
 	radeon_bios_init_scratch();
 
 	return B_OK;
