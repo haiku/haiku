@@ -1326,6 +1326,8 @@ BlockAllocator::StopChecking(check_control* control)
 
 			int32 blocksInBitmap = fNumGroups * fBlocksPerGroup;
 			size_t blockSize = fVolume->BlockSize();
+			if (blocksInBitmap > (int32)fNumBlocks)
+				blocksInBitmap = fNumBlocks;
 
 			for (int32 i = 0; i < blocksInBitmap; i += 512) {
 				Transaction transaction(fVolume, 1 + i);
