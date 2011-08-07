@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -706,6 +706,57 @@ out:
 		return B_BAD_INDEX;
 
 	return B_OK;
+}
+
+
+status_t
+get_symbol_at_address(void* address, image_id* _imageID, char* nameBuffer,
+	int32* _nameLength, int32* _type, void** _location)
+{
+	rld_lock();
+
+	image_t* image = find_loaded_image_by_address((addr_t)address);
+	if (image == NULL) {
+		rld_unlock();
+		return B_BAD_VALUE;
+	}
+
+	for (uint32 i = 0; i < HASHTABSIZE(image); i++) {
+		for (int32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
+				j = HASHCHAINS(image)[j]) {
+			struct Elf32_Sym *symbol = &image->syms[j];
+			addr_t location = symbol->st_value + image->regions[0].delta;
+
+			if (location <= (addr_t)address
+				&& location - 1 + symbol->st_size >= (addr_t)address) {
+				const char* symbolName = SYMNAME(image, symbol);
+				strlcpy(nameBuffer, symbolName, *_nameLength);
+				*_nameLength = strlen(symbolName);
+
+				int32 type;
+				if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
+					type = B_SYMBOL_TYPE_TEXT;
+				else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
+					type = B_SYMBOL_TYPE_DATA;
+				else
+					type = B_SYMBOL_TYPE_ANY;
+					// TODO: check with the return types of that BeOS function
+
+				if (_imageID != NULL)
+					*_imageID = image->id;
+				if (_type != NULL)
+					*_type = type;
+				if (_location != NULL)
+					*_location = (void*)location;
+
+				rld_unlock();
+				return B_OK;
+			}
+		}
+	}
+
+	rld_unlock();
+	return B_BAD_VALUE;
 }
 
 

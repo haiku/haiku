@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -591,6 +591,22 @@ find_loaded_image_by_id(image_id id, bool ignoreDisposable)
 	for (image_t* image = sDisposableImages.head; image; image = image->next) {
 		if (image->id == id)
 			return image;
+	}
+
+	return NULL;
+}
+
+
+image_t*
+find_loaded_image_by_address(addr_t address)
+{
+	for (image_t* image = sLoadedImages.head; image; image = image->next) {
+		for (uint32 i = 0; i < image->num_regions; i++) {
+			elf_region_t& region = image->regions[i];
+			if (region.vmstart <= address
+				&& region.vmstart - 1 + region.vmsize >= address)
+				return image;
+		}
 	}
 
 	return NULL;

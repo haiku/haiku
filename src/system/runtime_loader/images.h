@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -66,6 +66,7 @@ void		dequeue_disposable_image(image_t* image);
 
 image_t*	find_loaded_image_by_name(char const* name, uint32 typeMask);
 image_t*	find_loaded_image_by_id(image_id id, bool ignoreDisposable);
+image_t*	find_loaded_image_by_address(addr_t address);
 
 void		set_image_flags_recursively(image_t* image, uint32 flags);
 void		clear_image_flags_recursively(image_t* image, uint32 flags);

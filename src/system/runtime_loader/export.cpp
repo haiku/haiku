@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -51,6 +51,7 @@ struct rld_export gRuntimeLoader = {
 	get_symbol,
 	get_library_symbol,
 	get_nth_symbol,
+	get_symbol_at_address,
 	test_executable,
 	get_next_image_dependency,
 
