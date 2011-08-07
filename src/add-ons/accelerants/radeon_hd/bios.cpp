@@ -111,6 +111,7 @@ radeon_init_bios(uint8* bios)
 		// Post card
 
 	radeon_bios_init_scratch();
+	atom_allocate_fb_scratch(gAtomContext);
 
 	return B_OK;
 }

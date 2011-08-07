@@ -154,5 +154,7 @@ status_t atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,
 	uint8 * crev);
 status_t atom_asic_init(atom_context *);
 void atom_destroy(atom_context *);
+status_t atom_allocate_fb_scratch(atom_context *ctx);
+
 
 #endif

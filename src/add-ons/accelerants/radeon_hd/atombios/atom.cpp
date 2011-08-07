@@ -1272,6 +1272,7 @@ atom_destroy(atom_context *ctx)
 {
 	if (ctx != NULL) {
 		free(ctx->iio);
+		free(ctx->scratch);
 		delete_sem(ctx->exec_sem);
 	}
 
@@ -1319,3 +1320,32 @@ atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,
 	return B_OK;
 }
 
+
+status_t
+atom_allocate_fb_scratch(atom_context *ctx)
+{
+	int index = GetIndexIntoMasterTable(DATA, VRAM_UsageByFirmware);
+	uint16 data_offset;
+	int usage_bytes = 0;
+	_ATOM_VRAM_USAGE_BY_FIRMWARE *firmware;
+
+	if (atom_parse_data_header(ctx, index, NULL, NULL, NULL, &data_offset)) {
+		firmware = (_ATOM_VRAM_USAGE_BY_FIRMWARE *)
+				((uint16*)ctx->bios + data_offset);
+
+		TRACE("Atom firmware requested 0x%" B_PRIX32 " %" B_PRIu16 "kb\n",
+			firmware->asFirmwareVramReserveInfo[0].ulStartAddrUsedByFirmware,
+			firmware->asFirmwareVramReserveInfo[0].usFirmwareUseInKb);
+
+		usage_bytes
+			= firmware->asFirmwareVramReserveInfo[0].usFirmwareUseInKb * 1024;
+	}
+	if (usage_bytes == 0)
+		usage_bytes = 20 * 1024;
+	/* allocate some scratch memory */
+	ctx->scratch = (uint32*)malloc(usage_bytes);
+	if (!ctx->scratch)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
