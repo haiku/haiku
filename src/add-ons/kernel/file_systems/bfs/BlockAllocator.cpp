@@ -1324,17 +1324,14 @@ BlockAllocator::StopChecking(check_control* control)
 			fVolume->SuperBlock().used_blocks
 				= HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 
-			int32 blocksInBitmap = fNumGroups * fBlocksPerGroup;
 			size_t blockSize = fVolume->BlockSize();
-			if (blocksInBitmap > (int32)fNumBlocks)
-				blocksInBitmap = fNumBlocks;
 
-			for (int32 i = 0; i < blocksInBitmap; i += 512) {
+			for (uint32 i = 0; i < fNumBlocks; i += 512) {
 				Transaction transaction(fVolume, 1 + i);
 
-				int32 blocksToWrite = 512;
-				if (blocksToWrite + i > blocksInBitmap)
-					blocksToWrite = blocksInBitmap - i;
+				uint32 blocksToWrite = 512;
+				if (blocksToWrite + i > fNumBlocks)
+					blocksToWrite = fNumBlocks - i;
 
 				status_t status = transaction.WriteBlocks(1 + i,
 					(uint8*)fCheckBitmap + i * blockSize, blocksToWrite);
