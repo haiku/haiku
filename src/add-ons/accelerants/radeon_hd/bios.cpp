@@ -107,11 +107,11 @@ radeon_init_bios(uint8* bios)
 		return B_ERROR;
 	}
 
-	atom_asic_init(gAtomContext);
-		// Post card
-
 	radeon_bios_init_scratch();
 	atom_allocate_fb_scratch(gAtomContext);
+
+	atom_asic_init(gAtomContext);
+		// Post card
 
 	return B_OK;
 }

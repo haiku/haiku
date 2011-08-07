@@ -1329,7 +1329,8 @@ atom_allocate_fb_scratch(atom_context *ctx)
 	int usage_bytes = 0;
 	_ATOM_VRAM_USAGE_BY_FIRMWARE *firmware;
 
-	if (atom_parse_data_header(ctx, index, NULL, NULL, NULL, &data_offset)) {
+	if (atom_parse_data_header(ctx, index, NULL, NULL, NULL, &data_offset)
+		== B_OK) {
 		firmware = (_ATOM_VRAM_USAGE_BY_FIRMWARE *)
 				((uint16*)ctx->bios + data_offset);
 
