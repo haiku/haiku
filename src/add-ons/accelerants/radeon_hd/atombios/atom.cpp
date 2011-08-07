@@ -1248,7 +1248,7 @@ atom_parse(card_info *card, void *bios)
 }
 
 
-int
+status_t
 atom_asic_init(atom_context *ctx)
 {
 	int hwi = CU16(ctx->data_table + ATOM_DATA_FWI_PTR);
@@ -1258,21 +1258,62 @@ atom_asic_init(atom_context *ctx)
 	ps[0] = CU32(hwi + ATOM_FWI_DEFSCLK_PTR);
 	ps[1] = CU32(hwi + ATOM_FWI_DEFMCLK_PTR);
 	if (!ps[0] || !ps[1])
-		return 1;
+		return B_ERROR;
 
 	if (!CU16(ctx->cmd_table + 4 + 2 * ATOM_CMD_INIT))
-		return 1;
+		return B_ERROR;
 
-	atom_execute_table(ctx, ATOM_CMD_INIT, ps);
-
-	return 0;
+	return atom_execute_table(ctx, ATOM_CMD_INIT, ps);
 }
 
 
 void
 atom_destroy(atom_context *ctx)
 {
-	if (ctx->iio)
-	free(ctx->iio);
+	if (ctx != NULL)
+		free(ctx->iio);
+
 	free(ctx);
 }
+
+
+status_t
+atom_parse_data_header(atom_context *ctx, int index, uint16 *size,
+	uint8 *frev, uint8 *crev, uint16 *data_start)
+{
+	int offset = index * 2 + 4;
+	int idx = CU16(ctx->data_table + offset);
+	uint16 *mdt = (uint16 *)ctx->bios + ctx->data_table + 4;
+
+	if (!mdt[index])
+		return B_ERROR;
+
+	if (size)
+		*size = CU16(idx);
+	if (frev)
+		*frev = CU8(idx + 2);
+	if (crev)
+		*crev = CU8(idx + 3);
+	*data_start = idx;
+	return B_OK;
+}
+
+
+status_t
+atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,
+	uint8 * crev)
+{
+	int offset = index * 2 + 4;
+	int idx = CU16(ctx->cmd_table + offset);
+	uint16 *mct = (uint16 *)ctx->bios + ctx->cmd_table + 4;
+
+	if (!mct[index])
+		return B_ERROR;
+
+	if (frev)
+		*frev = CU8(idx + 2);
+	if (crev)
+		*crev = CU8(idx + 3);
+	return B_OK;
+}
+

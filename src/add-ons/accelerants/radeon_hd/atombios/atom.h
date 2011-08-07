@@ -148,7 +148,11 @@ extern int atom_debug;
 
 atom_context *atom_parse(card_info *, void *);
 status_t atom_execute_table(atom_context *, int, uint32 *);
-int atom_asic_init(atom_context *);
+status_t atom_parse_data_header(atom_context *ctx, int index, uint16 *size,
+	uint8 *frev, uint8 *crev, uint16 *data_start);
+status_t atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,
+	uint8 * crev);
+status_t atom_asic_init(atom_context *);
 void atom_destroy(atom_context *);
 
 #endif
