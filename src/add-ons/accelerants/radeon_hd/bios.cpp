@@ -100,15 +100,15 @@ radeon_init_bios(uint8* bios)
 		return B_ERROR;
 	}
 
-	atom_asic_init(gAtomContext);
-		// Post card
-
 	if ((gAtomContext->exec_sem = create_sem(1, "AtomBIOS_exec"))
 		< B_NO_ERROR) {
 		TRACE("%s: couldn't create semaphore for AtomBIOS exec thread!\n",
 			__func__);
 		return B_ERROR;
 	}
+
+	atom_asic_init(gAtomContext);
+		// Post card
 
 	radeon_bios_init_scratch();
 

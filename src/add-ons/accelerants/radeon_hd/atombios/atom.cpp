@@ -1270,8 +1270,10 @@ atom_asic_init(atom_context *ctx)
 void
 atom_destroy(atom_context *ctx)
 {
-	if (ctx != NULL)
+	if (ctx != NULL) {
 		free(ctx->iio);
+		delete_sem(ctx->exec_sem);
+	}
 
 	free(ctx);
 }
