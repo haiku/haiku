@@ -156,6 +156,89 @@ radeon_hd_getbios(radeon_info &info)
 
 
 status_t
+radeon_hd_getbios_ni(radeon_info &info)
+{
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	uint32 bus_cntl = read32(info.registers + R600_BUS_CNTL);
+	uint32 d1vga_control = read32(info.registers + AVIVO_D1VGA_CONTROL);
+	uint32 d2vga_control = read32(info.registers + AVIVO_D2VGA_CONTROL);
+	uint32 vga_render_control
+		= read32(info.registers + AVIVO_VGA_RENDER_CONTROL);
+	uint32 rom_cntl = read32(info.registers + R600_ROM_CNTL);
+
+	// enable the rom
+	write32(info.registers + R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
+	// disable VGA mode
+	write32(info.registers + AVIVO_D1VGA_CONTROL, (d1vga_control
+		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + D2VGA_CONTROL, (d2vga_control
+		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
+		(vga_render_control & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
+
+	write32(info.registers + R600_ROM_CNTL, (rom_cntl | R600_SCK_OVERWRITE));
+
+	// try to grab the bios
+	status_t result = radeon_hd_getbios(info);
+
+	// restore regs
+	write32(info.registers + R600_BUS_CNTL, bus_cntl);
+	write32(info.registers + AVIVO_D1VGA_CONTROL, d1vga_control);
+	write32(info.registers + AVIVO_D2VGA_CONTROL, d2vga_control);
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL, vga_render_control);
+	write32(info.registers + R600_ROM_CNTL, rom_cntl);
+
+	return result;
+}
+
+
+status_t
+radeon_hd_getbios_r700(radeon_info &info)
+{
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	uint32 viph_control = read32(info.registers + RADEON_VIPH_CONTROL);
+	uint32 bus_cntl = read32(info.registers + R600_BUS_CNTL);
+	uint32 d1vga_control = read32(info.registers + AVIVO_D1VGA_CONTROL);
+	uint32 d2vga_control = read32(info.registers + AVIVO_D2VGA_CONTROL);
+	uint32 vga_render_control
+		= read32(info.registers + AVIVO_VGA_RENDER_CONTROL);
+	uint32 rom_cntl = read32(info.registers + R600_ROM_CNTL);
+
+	// disable VIP
+	write32(info.registers + RADEON_VIPH_CONTROL,
+		(viph_control & ~RADEON_VIPH_EN));
+	// enable the rom
+	write32(info.registers + R600_BUS_CNTL, (bus_cntl & ~R600_BIOS_ROM_DIS));
+	// disable VGA mode
+	write32(info.registers + AVIVO_D1VGA_CONTROL, (d1vga_control
+		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + D2VGA_CONTROL, (d2vga_control
+		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
+		(vga_render_control & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
+
+	write32(info.registers + R600_ROM_CNTL, (rom_cntl | R600_SCK_OVERWRITE));
+
+	// try to grab the bios
+	status_t result = radeon_hd_getbios(info);
+
+	// restore regs
+	write32(info.registers + RADEON_VIPH_CONTROL, viph_control);
+	write32(info.registers + R600_BUS_CNTL, bus_cntl);
+	write32(info.registers + AVIVO_D1VGA_CONTROL, d1vga_control);
+	write32(info.registers + AVIVO_D2VGA_CONTROL, d2vga_control);
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL, vga_render_control);
+	write32(info.registers + R600_ROM_CNTL, rom_cntl);
+
+	return result;
+}
+
+
+status_t
 radeon_hd_getbios_r600(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -304,7 +387,13 @@ radeon_hd_init(radeon_info &info)
 	status_t biosStatus = radeon_hd_getbios(info);
 	if (biosStatus != B_OK) {
 		// If the active read fails, we do a disabled read
-		if (info.device_chipset > RADEON_R600)
+
+		// TODO : IGP read
+		if (info.device_chipset >= (RADEON_R1000 | 0x20))
+			biosStatus = radeon_hd_getbios_ni(info);
+		else if (info.device_chipset >= (RADEON_R700 | 0x70))
+			biosStatus = radeon_hd_getbios_r700(info);
+		else if (info.device_chipset >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
 	}
 
@@ -330,7 +419,7 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	// *** Populate graphics_memory/aperture_size with KB
-	if (info.shared_info->device_chipset >= RADEON_R800) {
+	if (info.shared_info->device_chipset >= RADEON_R1000) {
 		// R800+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;

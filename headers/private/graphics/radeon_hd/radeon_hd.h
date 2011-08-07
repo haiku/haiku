@@ -25,11 +25,16 @@
 #include <PCI.h>
 
 
-#define VENDOR_ID_ATI			0x1002
+#define VENDOR_ID_ATI	0x1002
 
-#define RADEON_R600	0x0600
-#define RADEON_R700	0x0700
-#define RADEON_R800	0x0800
+#define RADEON_R520		0x0520	// Fudo
+#define RADEON_R580		0x0580	// Rodin
+#define RADEON_R600		0x0600	// Pele
+#define RADEON_R700		0x0700	// Wekiva
+#define RADEON_R1000	0x1000	// Evergreen
+#define RADEON_R2000	0x2000  // Northern Islands
+#define RADEON_R3000	0x3000	// Southern Islands
+#define RADEON_R4000	0x4000	// Not yet known / used
 
 #define RADEON_VBIOS_SIZE 0x10000
 

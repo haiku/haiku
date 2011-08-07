@@ -33,7 +33,7 @@ init_registers(register_info* regs, uint8 crtid)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	if (info.device_chipset >= RADEON_R800) {
+	if (info.device_chipset >= RADEON_R1000) {
 		uint32 offset = 0;
 
 		// AMD Eyefinity on Evergreen GPUs
@@ -89,7 +89,7 @@ init_registers(register_info* regs, uint8 crtid)
 		regs->viewportSize = offset + EVERGREEN_VIEWPORT_SIZE;
 
 	} else if (info.device_chipset >= RADEON_R600
-		&& info.device_chipset < RADEON_R800) {
+		&& info.device_chipset < RADEON_R1000) {
 
 		// r600 - r700 are D1 or D2 based on primary / secondary crt
 		regs->vgaControl
