@@ -517,7 +517,8 @@ BlockAllocator::BlockAllocator(Volume* volume)
 	:
 	fVolume(volume),
 	fGroups(NULL),
-	fCheckBitmap(NULL)
+	fCheckBitmap(NULL),
+	fCheckCookie(NULL)
 {
 	mutex_init(&fLock, "bfs allocator");
 }
@@ -538,7 +539,7 @@ BlockAllocator::Initialize(bool full)
 	fNumBlocks = (fVolume->NumBlocks() + fVolume->BlockSize() * 8 - 1)
 		/ (fVolume->BlockSize() * 8);
 
-	fGroups = new AllocationGroup[fNumGroups];
+	fGroups = new(std::nothrow) AllocationGroup[fNumGroups];
 	if (fGroups == NULL)
 		return B_NO_MEMORY;
 
@@ -1215,7 +1216,7 @@ BlockAllocator::StartChecking(const check_control* control)
 		return B_NO_MEMORY;
 	}
 
-	fCheckCookie = new check_cookie();
+	fCheckCookie = new(std::nothrow) check_cookie();
 	if (fCheckCookie == NULL) {
 		free(fCheckBitmap);
 		fCheckBitmap = NULL;
@@ -1432,7 +1433,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 			fCheckCookie->parent = inode;
 			fCheckCookie->parent_mode = inode->Mode();
 
-			fCheckCookie->iterator = new TreeIterator(tree);
+			fCheckCookie->iterator = new(std::nothrow) TreeIterator(tree);
 			if (fCheckCookie->iterator == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
 

@@ -356,7 +356,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
-	fJournal = new Journal(this);
+	fJournal = new(std::nothrow) Journal(this);
 	if (fJournal == NULL)
 		return B_NO_MEMORY;
 
@@ -384,15 +384,17 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	fRootNode = new Inode(this, ToVnode(Root()));
+	fRootNode = new(std::nothrow) Inode(this, ToVnode(Root()));
 	if (fRootNode != NULL && fRootNode->InitCheck() == B_OK) {
 		status = publish_vnode(fVolume, ToVnode(Root()), (void*)fRootNode,
 			&gBFSVnodeOps, fRootNode->Mode(), 0);
 		if (status == B_OK) {
 			// try to get indices root dir
 
-			if (!Indices().IsZero())
-				fIndicesNode = new Inode(this, ToVnode(Indices()));
+			if (!Indices().IsZero()) {
+				fIndicesNode = new(std::nothrow) Inode(this,
+					ToVnode(Indices()));
+			}
 
 			if (fIndicesNode == NULL
 				|| fIndicesNode->InitCheck() < B_OK
@@ -690,7 +692,7 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
-	fJournal = new Journal(this);
+	fJournal = new(std::nothrow) Journal(this);
 	if (fJournal == NULL || fJournal->InitCheck() < B_OK)
 		RETURN_ERROR(B_ERROR);
 
