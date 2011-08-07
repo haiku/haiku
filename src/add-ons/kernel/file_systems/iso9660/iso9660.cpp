@@ -870,7 +870,8 @@ InitNode(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 	// for relocated directories we take the name from the placeholder entry
 	if (!relocated) {
 		node->name_length = nameLength;
-		TRACE(("InitNode - file id length is %u\n", node->name_length));
+		TRACE(("InitNode - file id length is %" B_PRIu32 "\n",
+			node->name_length));
 	}
 
 	// Set defaults, in case there is no RockRidge stuff.
