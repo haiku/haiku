@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1017,14 +1017,14 @@ InputServer::SetNextMethod(bool direction)
 
 	int32 index = gInputMethodList.IndexOf(fActiveMethod);
 	int32 oldIndex = index;
-	
+
 	index += (direction ? 1 : -1);
 
 	if (index < -1)
 		index = gInputMethodList.CountItems() - 1;
 	if (index >= gInputMethodList.CountItems())
 		index = -1;
-		
+
 	if (index == oldIndex)
 		return B_BAD_INDEX;
 
@@ -1465,7 +1465,7 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 				// we scan for Alt+Space key down events which means we change
 				// to next input method
 				// (pressing "shift" will let us switch to the previous method)
-				
+
 				// If there is only one input method, SetNextMethod will return
 				// B_BAD_INDEX and the event will be forwarded to the user.
 
@@ -1476,15 +1476,14 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 				if (event->FindInt8("byte", (int8*)&byte) < B_OK)
 					byte = 0;
 
-				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-						|| byte == B_HANKAKU_ZENKAKU) {
-					if (SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY))
-							== B_OK)	{
-						// this event isn't sent to the user
-						events.RemoveItemAt(index);
-						delete event;
-						continue;
-					}
+				if ((((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
+						|| byte == B_HANKAKU_ZENKAKU)
+					&& SetNextMethod((fKeyInfo.modifiers & B_SHIFT_KEY) == 0)
+							== B_OK) {
+					// this event isn't sent to the user
+					events.RemoveItemAt(index);
+					delete event;
+					continue;
 				}
 				break;
 		}
