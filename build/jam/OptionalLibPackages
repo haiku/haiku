@@ -54,8 +54,8 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 			dumb-0.9.3-x86-r1a3-x86-gcc2-2011-05-19.zip
 			: $(baseURL)/lib/dumb-0.9.3-r1a3-x86-gcc2-2011-05-19.zip ;
 		InstallOptionalHaikuImagePackage
-			jgmod-0.99-r1a3-x86-gcc2-2011-05-26.zip
-			: $(baseURL)/lib/jgmod-0.99-r1a3-x86-gcc2-2011-05-26.zip ;
+			jgmod-0.99-x86-gcc2-2011-08-02.zip
+			: $(baseURL)/lib/jgmod-0.99-x86-gcc2-2011-08-02.zip ;
 	}
 }
 
