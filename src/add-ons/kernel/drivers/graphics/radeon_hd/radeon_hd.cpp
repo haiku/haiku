@@ -86,7 +86,7 @@ radeon_hd_getbios(radeon_info &info)
 	status_t result = B_ERROR;
 	if (rom_base == 0 || rom_size == 0) {
 		// FAIL: we never found a base to work off of.
-		TRACE("%s: no VGA rom located, disabling AtomBIOS\n", __func__);
+		dprintf(DEVICE_NAME ": %s: no rom address located.\n", __func__);
 		result = B_ERROR;
 	} else {
 		area_id rom_area = map_physical_memory("radeon hd rom",
@@ -101,7 +101,8 @@ radeon_hd_getbios(radeon_info &info)
 			if (bios[0] != 0x55 || bios[1] != 0xAA) {
 				// FAIL : not a PCI rom
 				uint16 id = bios[0] + (bios[1] << 8);
-				TRACE("%s: this isn't a PCI rom (%X)\n", __func__, id);
+				dprintf(DEVICE_NAME ": %s: this isn't a PCI rom (%X)\n",
+					__func__, id);
 				result = B_ERROR;
 			} else if (isAtomBIOS(bios)) {
 				info.rom_area = create_area("radeon hd AtomBIOS",
@@ -134,7 +135,7 @@ radeon_hd_getbios(radeon_info &info)
 					}
 				}
 			} else {
-				dprintf(DEVICE_NAME ": %s: PCI rom found wasn't identified"
+				dprintf(DEVICE_NAME ": %s: rom found wasn't identified"
 				" as AtomBIOS!\n", __func__);
 				result = B_ERROR;
 			}
@@ -322,6 +323,10 @@ radeon_hd_init(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
+	dprintf(DEVICE_NAME ": card(%ld): "
+		"Radeon r%" B_PRIX16 " 1002:%" B_PRIX32 "\n",
+		info.id, info.device_chipset, info.device_id);
+
 	// *** Map shared info
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("radeon hd shared info",
@@ -397,8 +402,16 @@ radeon_hd_init(radeon_info &info)
 			biosStatus = radeon_hd_getbios_r600(info);
 	}
 
-	// TODO : may want to just return B_ERROR if AtomBIOS isn't
-	// found as we will require it in the future
+	// Check if a valid AtomBIOS image was found.
+	if (biosStatus != B_OK) {
+		dprintf(DEVICE_NAME ": card (%ld): couldn't find AtomBIOS rom!\n",
+			info.id);
+		dprintf(DEVICE_NAME ": card (%ld): exiting. Please open a bug ticket"
+			" at haiku-os.org with your /var/log/syslog\n",
+			info.id);
+		// Fallback to VESA
+		return B_ERROR;
+	}
 
 	info.shared_info->has_rom = (biosStatus == B_OK) ? true : false;
 	info.shared_info->rom_area = (biosStatus == B_OK) ? info.rom_area : -1;
