@@ -1,70 +1,91 @@
-/*!
-\class BCountry
-\ingroup locale
-\brief Class representing a country
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de.
+ *		Adrien Destugues, pulkomandy@gmail.com.
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/locale/Country.h	 rev 42274
+ *		/trunk/src/kits/locale/Country.cpp	 rev 42274
+ */
 
-BCountry provides all the information about a particular country.
-This includes the country flag (as an HVIF icon), the localized name of the
-country, and the iso country code.
 
-Date, timeand numer formatting also depends to some extent of the language,
-so they are done in the BLocale classinstead.
-
+/*!	\file Country.h
+	\brief BCountry class definition.
 */
 
-/*!
-\fn BCountry::BCountry(const char* languageCode, const char* countryCode)
-\brief Constructor.
 
-Construct a BCountry from a language and a country code.
+/*!	\class BCountry
+	\ingroup locale
+	\brief Class representing a country
 
+	BCountry provides all the information about a particular country.
+	This includes the country flag (as an HVIF icon), the localized name
+	of the country, and the ISO country code.
+
+	Date, time, and numer formatting also depends to some extent on the
+	language used, so they are found in the BLocale class instead.
 */
 
-/*!
-\fn bool BCountry::GetName(BString& name) const
-\brief Get the name of the country
 
-Fills in the name parameter with the name of the country, in the user's locale.
+/*!
+	\fn BCountry::BCountry(const char* countryCode)
+	\brief Initialize a BCountry from a country code.
+
+	\param countryCode The country code to initialize from.
 */
 
+
 /*!
-\fn const char* BCountry::Code() const
-\brief Returns the country code.
+	\fn BCountry::BCountry(const BCountry& other)
+	\brief Initialize a BCountry from another BCountry object.
+
+	\param other The BCountry object to initialize from.
 */
 
+
 /*!
-\fn status_t BCountry::GetIcon(BBitmap* result) const;
-\brief Render the country's flag to the given BBitmap
-
-This function renders the Country's flag to the given BBitmap. The bitmap
-should already be set to the pixel format and size you want to use.
-
-The flag is stored in HVIF format and can be rendered atany size and color depth.
-
-\param result The BBitmap to drag the flag to.
-\returns B_OK if the drawing was successful.
+	\fn BCountry& BCountry::operator=(const BCountry& other)
 */
 
+
 /*!
-\fn const char* BCountry::GetLocalizedString(uint32 id) const;
-\brief Get one of the default localized strings for this country.
-
-The strings include monetary symbols and other similar things.
-
+	\fn BCountry::~BCountry()
+	\brief Destructor method.
 */
 
-/*!
-\fn int8 BCountry::Measurement() const
-\brief Returrns the measurement used in this country.
 
-\returns B_METRIC for the metric system, or B_US for the USA's system.
+/*!
+	\fn bool BCountry::GetName(BString& name) const
+	\brief Get the name of the country.
+
+	Fills in the name parameter with the name of the country in the 
+	language set by the user's locale.
 */
 
+
 /*!
-\fn int BCountry::GetTimeZones(BList& timezones) const
-\brief Returns all the timeaones used in this country.
+	\fn const char* BCountry::Code() const
+	\brief Gets the ISO country code for the country.
 
-The count may vary from 0 for countries where there is no data, to twelve, for Russia.
+	\returns The ISO country code for the country.
+*/
 
-\returns The number of timezones that were added to the list.
+
+/*!
+	\fn status_t BCountry::GetIcon(BBitmap* result) const;
+	\brief Render the country's flag to the given BBitmap.
+
+	This function renders the country's flag to the given BBitmap. The bitmap
+	should already be set to the pixel format and size you want to use.
+
+	The flag is stored in HVIF format so it can be rendered at any size and
+	color depth.
+
+	\param result The BBitmap to drag the flag into.
+
+	\returns \c B_OK if the drawing was successful.
 */

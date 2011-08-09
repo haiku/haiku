@@ -1,0 +1,113 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/media/Buffer.h	 rev 42274
+ *		/trunk/src/kits/media/Buffer.cpp	 rev 42274
+ */
+
+
+/*!
+	\file Buffer.h
+	\brief Defines the buffer_clone_info struct and BBuffer class.
+*/
+
+
+/*!
+	\struct buffer_clone_info
+	\brief A struct that stores where in memory a BBuffer object is in memory
+		as well as the buffer flags.
+*/
+
+
+/*!
+	\class BBuffer
+	\ingroup media
+	\brief A reference to a chunk of memory useful for sharing media data
+		between applications and nodes.
+*/
+
+
+/*!
+	\fn void* BBuffer::Data()
+	\brief Returns a pointer to the data of the buffer.
+*/
+
+
+/*!
+	\fn size_t BBuffer::SizeAvailable()
+	\brief Returns the size of the buffer in bytes. Alias for Size().
+*/
+
+
+/*!
+	\fn size_t BBuffer::SizeUsed()
+	\brief Returns the size of the portion of the buffer that is currently in
+		use in bytes.
+*/
+
+
+/*!
+	\fn void BBuffer::SetSizeUsed(size_t size_used)
+	\brief Sets the size of the buffer that is used in bytes.
+	
+	This method should be called after writing data to the buffer.
+*/
+
+
+/*!
+	\fn uint32 BBuffer::Flags()
+	\brief Returns the flags of the buffer.
+*/
+
+
+/*!
+	\fn void BBuffer::Recycle()
+	\brief Recycles the buffer so that it can be reused.
+*/
+
+
+/*!
+	\fn buffer_clone_info BBuffer::CloneInfo() const
+	\brief Returns the buffer_clone_info struct that describes the buffer.
+*/
+
+
+/*!
+	\fn media_buffer_id BBuffer::ID()
+	\brief Returns the app_server ID of the buffer.
+*/
+
+
+/*!
+	\fn media_type BBuffer::Type()
+	\brief Returns the media type of the data in the buffer.
+*/
+
+
+/*!
+	\fn media_header* BBuffer::Header()
+	\brief Returns a pointer to the header of the buffer.
+*/
+
+
+/*!
+	\fn media_audio_header* BBuffer::AudioHeader()
+	\brief Returns a pointer to a header of the audio buffer.
+*/
+
+
+/*!
+	\fn media_video_header* BBuffer::VideoHeader()
+	\brief Returns a pointer to a header of the video buffer.
+*/
+
+
+/*!
+	\fn size_t BBuffer::Size()
+	\brief Returns the size of the buffer in bytes. Alias for SizeAvailable().
+*/

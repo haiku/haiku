@@ -25,49 +25,6 @@
 // Move the documentation there!
 
 /*!
-	\enum write_stat_mask
-	\brief This mask is used in file_system_module_info::write_stat() to
-		determine which values need to be written.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_MODE
-	\brief The mode parameter should be updated.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_UID
-	\brief The UID field should be updated.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_GID
-	\brief The GID field should be updated.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_SIZE
-	\brief The size field should be updated. If the actual size is less than the
-		new provided file size, the file should be set to the new size and the
-		extra space should be filled with zeros.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_ATIME
-	\brief The access time should be updated.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_MTIME
-	\brief The 'last modified' field should be updated.
-*/
-
-/*!
-	\var write_stat_mask::FS_WRITE_STAT_CRTIME
-	\brief The 'creation time' should be updated.
-*/
-
-/*!
 	\def B_STAT_SIZE_INSECURE
 	\brief Flag for the fs_vnode_ops::write_stat hook indicating that the FS
 		is allowed not to clear the additional space when enlarging a file.
@@ -248,46 +205,6 @@
 */
 
 //! @{
-
-/*!
-	\fn bool (*file_system_module_info::supports_defragmenting)(partition_data
-		*partition, bool *whileMounted)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn bool (*file_system_module_info::supports_repairing)(partition_data *partition,
-			bool checkOnly, bool *whileMounted)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn bool (*file_system_module_info::supports_resizing)(partition_data *partition,
-			bool *whileMounted)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn bool (*file_system_module_info::supports_moving)(partition_data *partition, bool *isNoOp)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn bool (*file_system_module_info::supports_setting_content_name)(partition_data *partition,
-			bool *whileMounted)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn bool (*file_system_module_info::supports_setting_content_parameters)(partition_data *partition,
-			bool *whileMounted)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn bool (*file_system_module_info::supports_initializing)(partition_data *partition)
-	\brief Undocumented. TODO.
-*/
 
 /*!
 	\fn bool (*file_system_module_info::validate_resize)(partition_data *partition, off_t *size)
@@ -638,11 +555,11 @@
 	\param volume The volume object.
 	\param query The string that represents a query.
 	\param flags Any combination of none or more of these flags:
-		- \c #B_LIVE_QUERY The query is live. When a query is live, it is
+		- \c B_LIVE_QUERY The query is live. When a query is live, it is
 		  constantly updated using the \a port. The FS must invoke the functions
 		  notify_query_entry_created() and notify_query_entry_removed() whenever
 		  an entry starts respectively stops to match the query predicate.
-		- \c #B_QUERY_NON_INDEXED Normally at least one of the attributes used
+		- \c B_QUERY_NON_INDEXED Normally at least one of the attributes used
 		  in the query string should be indexed. If none is, this hook is
 		  allowed to fail, unless this flag is specified. Usually an
 		  implementation will simply add a wildcard match for any complete
@@ -1714,7 +1631,7 @@
 	\param vnode The node object.
 	\param cookie The cookie you associated with this attribute.
 	\param stat A pointer to the new stats you should write.
-	\param statMask One or more of the values of #write_stat_mask that tell you
+	\param statMask One or more of the values of write_stat_mask that tell you
 		which fields of \a stat are to be updated.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */

@@ -95,9 +95,9 @@
 	
 	This class is at the center of the web of messaging classes, in the sense
 	that it defines the actual structure of the messages. Messages have two
-	<b>important elements</b>: the #what identifer, and the data members. The
+	<b>important elements</b>: the #what identifier, and the data members. The
 	first can be directly manipulated, the latter can be manipulated through
-	AddData(), FindData() and ReplaceData() and their deratives. Neither of
+	AddData(), FindData() and ReplaceData() and their derivatives. Neither of
 	these elements are mandatory.
 	
 	The second important role of BMessage is that it stores <b>meta data</b>:
@@ -115,7 +115,7 @@
 	
 	All methods can be classified in these areas:
 	- Adding, Finding, Replacing and Removing Data.
-	- Statistics and Miscelanous information.
+	- Statistics and Miscellaneous information.
 	- Delivery information.
 	- Utilities to reply to messages.
 	
@@ -135,7 +135,7 @@
 /*!
 	\fn BMessage::BMessage()
 	\brief Construct an empty message, without any data members and with a 
-		\c what constant set to zero (0).
+		\a what constant set to \c 0.
 	
 	\see BMessage(uint32 what)
 	\see BMessage(const BMessage &other)
@@ -144,7 +144,7 @@
 
 /*!
 	\fn BMessage::BMessage(uint32 what)
-	\brief Construct an empty message with the \c what member set tot the
+	\brief Construct an empty message with the \a what member set to the
 		specified value.
 	
 	\see BMessage::BMessage()
@@ -156,14 +156,14 @@
 	\fn BMessage::BMessage(const BMessage &other)
 	\brief Construct a new message that is a copy of another message.
 	
-	The \c what member and the data values are copied. The metadata, such as
+	The \a what member and the data values are copied. The metadata, such as
 	whether or not the message is a drop message or reply information, is
 	not copied. So if the original message is a reply to a previous message,
 	which will make IsReply() return \c true, calling the same method on a copy
 	of the message will return \c false.
 	
 	\remarks BeOS R5 did keep the metadata of the message. Haiku deviates from
-	this behaviour. Please use the Haiku implementation of message copying as
+	this behavior. Please use the Haiku implementation of message copying as
 	the default behavior. This will keep your applications backwards
 	compatible.
 
@@ -185,13 +185,13 @@
 	\fn BMessage &BMessage::operator=(const BMessage &other)
 	\brief Copy one message into another.
 	
-	See the copy constructor, BMessage(const BMessage &other), for details on what is
-	copied, and what isn't.
+	See the copy constructor, BMessage(const BMessage &other), for details on
+	what is copied, and what isn't.
 */
 
 
 /*!
-	\name Statistics and Miscelanous Information
+	\name Statistics and Miscellaneous Information
 */
 
 
@@ -212,21 +212,21 @@
 		in a pointer to the internal name buffer in the message. This means
 		that you should not manipulate this name. If you are not interested in
 		the name, you can safely pass \c NULL.
-	\param[out] typeFound The type of the item at \a index. If you are not
-		interested in the type (because you specifically asked for a type), you
-		can safely pass NULL.
-	\param[out] countFound The number of items at \a index. If data items have
-		the same name, they will be placed under the same index.
+	\param[out] typeFound The type of the item at \a index. If you are
+		not interested in the type (because you specifically asked for a type),
+		you can safely pass \c NULL.
+	\param[out] countFound The number of items at \a index. If data
+		items have the same name, they will be placed under the same index.
 		
-	\return If the \a index is found, and matches the requested type, the
-		other parameters will be filled in. If this is not the case, the method
-		will return with an error.
+	\return If the \a index is found, and matches the requested type,
+		then the other parameters will be filled in. If this is not the case,
+		the method will return with an error.
 	
 	\retval B_OK An match was found. The values have been filled in.
-	\retval B_BAD_INDEX The \a index was out of range. None of the passed
-		variables have been altered.
-	\retval B_BAD_TYPE The data field at \a index does not have the requested
-		type.
+	\retval B_BAD_INDEX The \a index was out of range. None of the
+		passed variables have been altered.
+	\retval B_BAD_TYPE The data field at \a index does not have the
+		requested type.
 */
 
 
@@ -244,9 +244,9 @@
 		label will be in this parameter. In case you are not interested, you
 		can safely pass \c NULL.
 	
-	\return If the message has data associated with the given \a name, the
-		other parameters will contain information associated with the data.
-		Else, the method will return with an error.
+	\return If the message has data associated with the given \a name,
+		the other parameters will contain information associated with the data,
+		else, the method will return with an error.
 	
 	\retval B_OK A match was found. The other parameters have been filled in.
 	\retval B_BAD_VALUE You passed \c NULL as argument to \a name.
@@ -260,9 +260,10 @@
 	\brief Retrieve the type and whether or not the size of the data is fixed
 		associated with a \a name.
 	
-	This method is the same as GetInfo(const char *,type_code *, int32 *) const , with the difference that you can find out whether or
-	not the size of the data associated with the \a name is fixed. You will
-	get this value in the variable you passed as \a fixedSize parameter.
+	This method is the same as GetInfo(const char *,type_code *, int32 *) const,
+	with the difference that you can find out whether or not the size of the
+	data associated with the \a name is fixed. You will get this value
+	in the variable you passed as \a fixedSize parameter.
 */
 
 
@@ -277,7 +278,7 @@
 		method will return the total number of data items.
 	
 	\return The number of data items in this message with the specified
-		\a type, or zero in case no items match the type.
+		\a type, or \c 0 in case no items match the type.
 */
 
 
@@ -328,8 +329,8 @@
 	\param newEntry The new name of the data entry.
 	
 	\retval B_OK Renaming succeeded.
-	\retval B_BAD_VALUE Either the \a oldEntry or the \a newEntry pointers are
-		\c NULL.
+	\retval B_BAD_VALUE Either the \a oldEntry or the
+		\a newEntry pointers are \c NULL.
 	\retval B_NAME_NOT_FOUND There is no data associated with the label
 		\a oldEntry.
 */
@@ -477,9 +478,9 @@
 	
 	This method sends a reply to this message to the sender. On your turn,
 	you specify a messenger that handles a reply back to the message you
-	specify as the \a reply argument. You can set a timeout for the message
-	to be delivered. This method blocks until the message has been received,
-	or the \a timeout has been reached.
+	specify as the \a reply argument. You can set a timeout for the
+	message to be delivered. This method blocks until the message has been
+	received, or the \a timeout has been reached.
 	
 	\param reply The message that is in reply to this message.
 	\param replyTo In case the receiver needs to reply to the message you are
@@ -492,8 +493,9 @@
 	\retval B_OK The message has been delivered.
 	\retval B_DUPLICATE_REPLY There already has been a reply to this message.
 	\retval B_BAD_PORT_ID The reply address is not valid (anymore).
-	\retval B_WOULD_BLOCK The delivery \a timeout was \c B_INFINITE_TIMEOUT
-		(zero) and the target port was full when trying to deliver the message.
+	\retval B_WOULD_BLOCK The delivery \a timeout was
+		\c B_INFINITE_TIMEOUT (\c 0) and the target port was full when trying
+		to deliver the message.
 	\retval B_TIMED_OUT The timeout expired while trying to deliver the
 	  message.
 	\see SendReply(uint32 command, BHandler *replyTo)
@@ -517,12 +519,13 @@
 	\brief 	Synchronously send a reply to this message, and wait for a reply
 		 back.
 	
-	This method sends a reply to this message to the sender. The \a reply is
-	delivered, and then the method waits for a reply from the receiver. If a
-	reply is received, that reply is copied into the \a replyToReply argument.
+	This method sends a reply to this message to the sender. The
+	\a reply is delivered, and then the method waits for a reply from
+	the receiver. If a reply is received, that reply is copied into the
+	\a replyToReply argument.
 	If the message was delivered properly, but the receiver did not reply
-	within the specified \a replyTimeout, the \c what member of \a replyToReply
-	will be set to \c B_NO_REPLY.
+	within the specified \a replyTimeout, the \a what member of
+	\a replyToReply will be set to \c B_NO_REPLY.
 	
 	\param reply The message that is in reply to this message.
 	\param[out] replyToReply The reply is copied into this argument. 
@@ -535,10 +538,12 @@
 	
 	\retval B_OK The message has been delivered.
 	\retval B_DUPLICATE_REPLY There already has been a reply to this message.
-	\retval B_BAD_VALUE Either \a reply or \a replyToReply is \c NULL.
+	\retval B_BAD_VALUE Either \a reply or \a replyToReply is
+		\c NULL.
 	\retval B_BAD_PORT_ID The reply address is not valid (anymore).
-	\retval B_WOULD_BLOCK The delivery \a timeout was \c B_INFINITE_TIMEOUT
-		(zero) and the target port was full when trying to deliver the message.
+	\retval B_WOULD_BLOCK The delivery \a timeout was
+		\c B_INFINITE_TIMEOUT (\c 0) and the target port was full when trying
+		to deliver the message.
 	\retval B_TIMED_OUT The timeout expired while trying to deliver the
 	  message.
 	\retval B_NO_MORE_PORTS All reply ports are in use.
@@ -721,20 +726,23 @@
 	 	const void *data, ssize_t numBytes, bool isFixedSize, int32 count)
 	\brief Add \a data of a certain \a type to the message.
 	
-	The amount of \a numBytes is copied into the message. The data is stored
-	at the label specified in \a name. You are responsible for specifying the
-	correct \a type. The Haiku API already specifies many constants, such as
-	B_FLOAT_TYPE or B_RECT_TYPE. See TypeConstants.h for more information on
-	the system-wide defined types. 
+	The amount of \a numBytes is copied into the message. The data is
+	stored at the label specified in \a name. You are responsible for
+	specifying the correct \a type. The Haiku API already specifies
+	many constants, such as \c B_FLOAT_TYPE or \c B_RECT_TYPE. See
+	TypeConstants.h for more information on the system-wide defined types. 
 	
-	If the field with the \a name already exists, the data is added in an
-	array-like form. If you are adding a certain \a name for the first time,
-	you are able to specify some properties of this array. You can fix the size
-	of each data entry, and you can also instruct BMessage to allocate a
-	\a count of items. The latter does not mean that the number of items is
-	fixed; the array will grow nonetheless. Also, note that every \a name can
-	only be associated with one \a type of data. If consecutive method calls
-	specify a different \a type than the initial, these calls will fail.
+	If the field with the \a name already exists, the data is added in
+	an array-like form. If you are adding a certain \a name for the
+	first time, you are able to specify some properties of this array. You can
+	fix the size of each data entry, and you can also instruct BMessage to
+	allocate a \a count of items. The latter does not mean that the
+	number of items is fixed; the array will grow nonetheless. Also, note that
+	every \a name can only be associated with one \a type of
+	data.
+
+	If consecutive method calls specify a different \a type than the
+	initial, these calls will fail.
 	
 	There is no limit to the number of labels, or the amount of data, but
 	note that searching of data members is linear, as well as that some
@@ -742,31 +750,32 @@
 	data you need to pass is too big, find another way to pass it.
 	
 	\param name The label to which this data needs to be associated. If the
-		\a name already exists, the new data will be added in an array-like
-		style.
-	\param type The type of data. If you are adding data to the same \a name,
-		make sure it is the same type.
+		\a name already exists, the new data will be added in an
+		array-like style.
+	\param type The type of data. If you are adding data to the same
+	\a name, make sure it is the same type.
 	\param data The data buffer to copy the bytes from.
 	\param numBytes The number of bytes to be copied. If this is the first call
-		to this method for this type of data, and you set \a isFixedSize to
-		\c true, this will specify the size of all consecutive calls to this
+		to this method for this type of data, and you set
+		\a isFixedSize to \c true, this will specify the size of all
+		consecutive calls to this
 		method.
 	\param isFixedSize If this is the first call to this method with this
-		\a name, you can specify the whether or not all items in this array
-		should have the same fixed size.
+		\a name, you can specify the whether or not all items in this
+		array should have the same fixed size.
 	\param count If this is the first call to this method with this
-		\a name, you can instruct this message to allocate a number of items in
-		advance. This does not limit the amount of items though. The array will
-		grow if needed.
+		\a name, you can instruct this message to allocate a number of
+		items in advance. This does not limit the amount of items though. The
+		array will grow if needed.
 	
 	\retval B_OK The \a data is succesfully added.
-	\retval B_BAD_VALUE The \a numBytes is less than, or equal to zero (0), or
-		the size of this item is larger than the \a name allows, since it has
-		been specified to have a fixed size.
+	\retval B_BAD_VALUE The \a numBytes is less than, or equal to \c 0,
+		or the size of this item is larger than the \a name allows,
+		since it has been specified to have a fixed size.
 	\retval B_ERROR There was an error whilst creating the label with your 
 		\a name.
-	\retval B_BAD_TYPE The \a type you specified is different than the one
-		already associated with \a name.
+	\retval B_BAD_TYPE The \a type you specified is different than the
+		one already associated with \a name.
 */
 
 
@@ -959,7 +968,8 @@
 
 /*!
 	\fn status_t BMessage::AddRef(const char *name, const entry_ref *ref)
-	\brief Convenience method to add an \c entry_ref to the label \a name.
+	\brief Convenience method to add an \c entry_ref to the label
+		\a name.
 
 	This method calls AddData() with the \c B_REF_TYPE \a type.
 
@@ -992,9 +1002,9 @@
 
 	This method uses BFlattenable::TypeCode() to determine the type. It also
 	uses BFlattenable::IsFixedSize() to determine whether or not the size of
-	the object is supposedly always the same. You can specify a \a count, to
-	pre-allocate more entries if you are going to add more than one of this
-	type.
+	the object is supposedly always the same. You can specify a
+	\a count, to pre-allocate more entries if you are going to add
+	more than one of this type.
 
 	\param name The label to associate the data with.
 	\param object The object to flatten into the message.
@@ -1019,7 +1029,8 @@
 
 /*!
 	\fn status_t BMessage::RemoveData(const char *name, int32 index)
-	\brief Remove data associated with \a name at a specified \a index.
+	\brief Remove data associated with \a name at a specified
+		\a index.
 	
 	If this is the only instance of the data, then the entire label will be
 	removed. This means you can recreate it with another type.
@@ -1027,10 +1038,10 @@
 	\param name The \a name of which the associated data should be cleared.
 	\param index The \a index of the item that should be cleared.
 	\retval B_OK The data has been removed.
-	\retval B_BAD_VALUE The \a index is less than zero (0).
+	\retval B_BAD_VALUE The \a index is less than \c 0.
 	\retval B_BAD_INDEX The \a index is out of bounds.
-	\retval B_NAME_NOT_FOUND The \a name does not hava any data associated with
-	 	it.
+	\retval B_NAME_NOT_FOUND The \a name does not hava any data
+		associated with it.
 	\see RemoveName()
 	\see MakeEmpty()
 */
@@ -1043,7 +1054,8 @@
 	This also removes the label, so that you can recreate it with another type,
 	if you want to.
 	
-	\param name The \a name that refers to the data you want to clear out.
+	\param name The \a name that refers to the data you want to clear
+		out.
 	\retval B_OK All the data is removed.
 	\retval B_BAD_VALUE The \a name pointer points to \c NULL.
 	\retval B_NAME_NOT_FOUND The \a name does not exist in this message.
@@ -1059,7 +1071,7 @@
 	Everything is cleared out, all labels and all associated data, as well
 	as metadata such as reply info.
 	
-	\return This method always returns B_OK.
+	\return This method always returns \c B_OK.
 	\see RemoveData()
 	\see RemoveName()
 */
@@ -1079,7 +1091,7 @@
 	
 	<table>
 		<tr><th>Type of data</th><th>Type code</th><th>Method</td></tr>
-		<tr><td>BRect</td><td>B_RECT_TYPE</td><td>FindRect()</td></tr>
+		<tr><td>BRect</td><td>\c B_RECT_TYPE</td><td>FindRect()</td></tr>
 	</table>
 */
 
@@ -1090,12 +1102,14 @@
 /*!
 	\fn status_t BMessage::FindData(const char *name, type_code type,
 		int32 index, const void **data, ssize_t *numBytes) const
-	\brief Find \a data that is stored in this message at an \a index.
+	\brief Find \a data that is stored in this message at an
+		\a index.
 	
-	This method matches the label \a name with the \a type you are asking for,
-	and it looks for the data that is stored at a certain \a index number. If
-	all these things match, you will get a pointer to the internal buffer, and
-	the method will put the size of the item in \a numBytes.
+	This method matches the label \a name with the \a type you
+	are asking for, and it looks for the data that is stored at a certain
+	\a index number. If all these things match, you will get a pointer
+	to the internal buffer, and the method will put the size of the item in
+	\a numBytes.
 	
 	Note that only this method, and FindString(const char *, const char **),
 	pass a pointer to the internal buffer. The other more specific methods,
@@ -1110,8 +1124,8 @@
 		Note that the array is zero-based.
 	\param[out] data A pointer to a pointer where the data can point to.
 	\param[out] numBytes The size of the data will be put in this parameter.
-	\retval B_OK The \a name was found, matches the type, and the data at
-		\a index has been put in \a data.
+	\retval B_OK The \a name was found, matches the type, and the data
+		at \a index has been put in \a data.
 	\retval B_BAD_VALUE One of the output arguments were \c NULL.
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
@@ -1125,8 +1139,9 @@
 	 	const void **data, ssize_t *numBytes) const
 	\brief Find \a data that is stored in this message.
 	
-	This is an overloaded method of FindData(const char *, type_code, int32,
-	const void **, ssize_t *) const, where data is sought at \a index 0.
+	This is an overloaded method of
+	FindData(const char *, type_code, int32, const void **, ssize_t *) const
+	where data is sought at \a index \c 0.
 */
 
 
@@ -1134,8 +1149,9 @@
 	\fn status_t BMessage::FindRect(const char *name, BRect *rect) const
 	\brief Find a rectangle at the label \a name.
 	
-	This is an overloaded method of FindRect(const char *, int32, BRect *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindRect(const char *, int32, BRect *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1143,7 +1159,7 @@
 	\fn status_t BMessage::FindRect(const char *name, int32 index, BRect *rect) const
 	\brief Find a rectangle at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_RECT_TYPE, and copies it into
+	This method looks for the data with the \c B_RECT_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1160,8 +1176,9 @@
 	\fn status_t BMessage::FindPoint(const char *name, BPoint *point) const
 	\brief Find a point at the label \a name.
 	
-	This is an overloaded method of FindPoint(const char *, int32, BPoint *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindPoint(const char *, int32, BPoint *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1169,7 +1186,7 @@
 	\fn status_t BMessage::FindPoint(const char *name, int32 index, BPoint *point) const
 	\brief Find a point at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_POINT_TYPE, and copies it into
+	This method looks for the data with the \c B_POINT_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1186,8 +1203,9 @@
 	\fn status_t BMessage::FindString(const char *name, const char **string) const
 	\brief Find a string at the label \a name.
 	
-	This is an overloaded method of FindString(const char *, int32, const char **) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindString(const char *, int32, const char **) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1196,7 +1214,7 @@
 		const char ** string) const
 	\brief Find a string at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_STRING_TYPE, and returns a
+	This method looks for the data with the \c B_STRING_TYPE, and returns a
 	pointer to the internal buffer of the message. Note that this pointer is
 	valid, until the message is deleted.
 	
@@ -1215,17 +1233,17 @@
 	\fn status_t BMessage::FindString(const char *name, BString *string) const
 	\brief Find a string at the label \a name.
 	
-	This is an overloaded method of FindString(const char *, int32, BString *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindString(const char *, int32, BString *) const
+	where the data is sought at \a index \c 0.
 */
 
 
 /*!
-	\fn status_t BMessage::FindString(const char *name, int32 index,
-	 	BString *string) const
+	\fn status_t BMessage::FindString(const char *name, int32 index, BString *string) const
 	\brief Find a string at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_STRING_TYPE, and copies it
+	This method looks for the data with the \c B_STRING_TYPE, and copies it
 	into the \a string object.
 	
 	\param name The label to which the data is associated.
@@ -1244,7 +1262,7 @@
 	\brief Find an integer at the label \a name.
 	
 	This is an overloaded method of FindInt8(const char *, int32, int8 *) const
-	where the data is sought at \a index zero.
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1252,7 +1270,7 @@
 	\fn status_t BMessage::FindInt8(const char *name, int32 index, int8 *value) const
 	\brief Find an integer at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_INT8_TYPE, and copies it into
+	This method looks for the data with the \c B_INT8_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1270,7 +1288,7 @@
 	\brief Find an integer at the label \a name.
 	
 	This is an overloaded method of FindInt8(const char *, int32, int16 *) const
-	where the data is sought at \a index zero.
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1278,7 +1296,7 @@
 	\fn status_t BMessage::FindInt16(const char *name, int32 index, int16 *value) const
 	\brief Find an integer at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_INT16_TYPE, and copies it into
+	This method looks for the data with the \c B_INT16_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1295,8 +1313,9 @@
 	\fn status_t BMessage::FindInt32(const char *name, int32 *value) const
 	\brief Find an integer at the label \a name.
 	
-	This is an overloaded method of FindInt32(const char *, int32, int32 *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindInt32(const char *, int32, int32 *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1304,7 +1323,7 @@
 	\fn status_t BMessage::FindInt32(const char *name, int32 index, int32 *value) const
 	\brief Find an integer at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_INT32_TYPE, and copies it into
+	This method looks for the data with the \c B_INT32_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1321,8 +1340,9 @@
 	\fn status_t BMessage::FindInt64(const char *name, int64 *value) const
 	\brief Find an integer at the label \a name.
 	
-	This is an overloaded method of FindInt64(const char *, int32, int64 *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindInt64(const char *, int32, int64 *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1330,7 +1350,7 @@
 	\fn status_t BMessage::FindInt64(const char *name, int32 index, int64 *value) const
 	\brief Find an integer at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_INT64_TYPE, and copies it into
+	This method looks for the data with the \c B_INT64_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1347,8 +1367,9 @@
 	\fn status_t BMessage::FindBool(const char *name, bool *value) const
 	\brief Find a boolean at the label \a name.
 	
-	This is an overloaded method of FindBool(const char *, int32, bool *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindBool(const char *, int32, bool *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1356,7 +1377,7 @@
 	\fn status_t BMessage::FindBool(const char *name, int32 index, bool *value) const
 	\brief Find a boolean at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_BOOL_TYPE, and copies it into
+	This method looks for the data with the \c B_BOOL_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1373,8 +1394,9 @@
 	\fn status_t BMessage::FindFloat(const char *name, float *value) const
 	\brief Find a float at the label \a name.
 	
-	This is an overloaded method of FindFloat(const char *, int32, float *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindFloat(const char *, int32, float *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1382,7 +1404,7 @@
 	\fn status_t BMessage::FindFloat(const char *name, int32 index, float *value) const
 	\brief Find a float at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_FLOAT_TYPE, and copies it into
+	This method looks for the data with the \c B_FLOAT_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1399,8 +1421,9 @@
 	\fn status_t BMessage::FindDouble(const char *name, double *value) const
 	\brief Find a double at the label \a name.
 	
-	This is an overloaded method of FindDouble(const char *, int32, double *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindDouble(const char *, int32, double *) const
+	where the data is sought at \a index \c 0.
 */
 
 
@@ -1408,7 +1431,7 @@
 	\fn status_t BMessage::FindDouble(const char *name, int32 index, double *value) const
 	\brief Find a double at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_DOUBLE_TYPE, and copies it into
+	This method looks for the data with the \c B_DOUBLE_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1425,16 +1448,17 @@
 	\fn status_t BMessage::FindPointer(const char *name, void **pointer) const
 	\brief Find a pointer at the label \a name.
 	
-	This is an overloaded method of FindPointer(const char *, int32, void *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindPointer(const char *, int32, void *) const
+	where the data is sought at \a index \c 0.
 */
 
 
 /*!
-	\fn status_t BMessage::FindPointer(const char *name, int32 index,  void **pointer) const
+	\fn status_t BMessage::FindPointer(const char *name, int32 index, void **pointer) const
 	\brief Find a pointer at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_POINTER_TYPE, and copies it into
+	This method looks for the data with the \c B_POINTER_TYPE, and copies it into
 	a provided buffer.
 	
 	\warning If you want to share objects between applications, please remember
@@ -1457,18 +1481,18 @@
 	\fn status_t BMessage::FindMessenger(const char *name, BMessenger *messenger) const
 	\brief Find a messenger at the label \a name.
 	
-	This is an overloaded method of FindMessenger(const char *, int32, BMessenger *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindMessenger(const char *, int32, BMessenger *) const
+	where the data is sought at \a index \c 0.
 */
 
 
 /*!
-	\fn status_t BMessage::FindMessenger(const char *name, int32 index,
-	 	BMessenger *messenger) const
+	\fn status_t BMessage::FindMessenger(const char *name, int32 index, BMessenger *messenger) const
 	\brief Find a messenger at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_MESSENGER_TYPE, and copies it into
-	a provided buffer.
+	This method looks for the data with the \c B_MESSENGER_TYPE, and copies it
+	into a provided buffer.
 	
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1484,16 +1508,18 @@
 	\fn status_t BMessage::FindRef(const char *name, entry_ref *ref) const
 	\brief Find a reference to a file at the label \a name.
 	
-	This is an overloaded method of FindRef(const char *, int32, entry_ref *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindRef(const char *, int32, entry_ref *) const
+	where the data is sought at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::FindRef(const char *name, int32 index, entry_ref *ref) const
-	\brief Find a reference to a file at the label \a name at an \a index.
+	\brief Find a reference to a file at the label \a name at an
+		\a index.
 	
-	This method looks for the data with the \a B_REF_TYPE, and copies it into
+	This method looks for the data with the \c B_REF_TYPE, and copies it into
 	a provided buffer.
 	
 	\param name The label to which the data is associated.
@@ -1510,18 +1536,18 @@
 	\fn status_t BMessage::FindMessage(const char *name, BMessage *message) const
 	\brief Find a message at the label \a name.
 	
-	This is an overloaded method of FindMessage(const char *, int32, BMessage *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindMessage(const char *, int32, BMessage *) const
+	where the data is sought at \a index \c 0.
 */
 
 
 /*!
-	\fn status_t BMessage::FindMessage(const char *name, int32 index,
-	 	BMessage *message) const
+	\fn status_t BMessage::FindMessage(const char *name, int32 index, BMessage *message) const
 	\brief Find a message at the label \a name at an \a index.
 	
-	This method looks for the data with the \a B_MESSAGE_TYPE, and copies it into
-	a provided buffer.
+	This method looks for the data with the \c B_MESSAGE_TYPE, and copies it
+	into a provided buffer.
 	
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1537,15 +1563,17 @@
 	\fn status_t BMessage::FindFlat(const char *name, BFlattenable *object) const
 	\brief Find a flattened object at the label \a name.
 	
-	This is an overloaded method of FindFlat(const char *, int32, BFlattenable *) const
-	where the data is sought at \a index zero.
+	This is an overloaded method of
+	FindFlat(const char *, int32, BFlattenable *) const
+	where the data is sought at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::FindFlat(const char *name, int32 index,
 	 	BFlattenable *object) const
-	\brief Find a flattened object at the label \a name at an \a index.
+	\brief Find a flattened object at the label \a name at an
+		\a index.
 	
 	The type is determined by the type of the passed object. If that type is
 	available at the specified label, then the Unflatten() method of that
@@ -1579,18 +1607,21 @@
 		const void *data, ssize_t numBytes)
 	\brief Replace the data at label \a name.
 	
-	This method is an overloaded method that replaces the data at \a index
-	zero. See ReplaceData(const char *, type_code, int32, const void *, ssize_t).
+	This method is an overloaded method that replaces the data at
+	\a index \c 0. See
+	ReplaceData(const char *, type_code, int32, const void *, ssize_t).
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceData(const char *name, type_code type,
 	 	int32 index, const void *data, ssize_t numBytes)
-	\brief Replace the data at label \a name at a specified \a index.
+	\brief Replace the data at label \a name at a specified
+		\a index.
 	
-	The conditions for replacing data are that the \a name is correct, the
-	\a type matches and the data entry at \a index exists.
+	The conditions for replacing data are that the\a name is correct,
+		the \a type matches and the data entry at \a index
+		exists.
 	
 	There is also a collection of convenience methods, that allow you to
 	efficiently replace rectanges (ReplaceRect()), booleans (ReplaceBool()),
@@ -1615,17 +1646,19 @@
 	\fn status_t BMessage::ReplaceRect(const char *name, BRect aRect)
 	\brief Replace a rectangle at the label \a name.
 	
-	This method is an overloaded method of ReplaceRect(const char *, int32, BRect).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceRect(const char *, int32, BRect).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceRect(const char *name, int32 index, BRect aRect)
-	\brief Replace a rectangle at the label \a name at a specified \a index.
+	\brief Replace a rectangle at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_RECT_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_RECT_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aRect The object to store in the message.
@@ -1639,17 +1672,19 @@
 	\fn status_t BMessage::ReplacePoint(const char *name, BPoint aPoint)
 	\brief Replace a point at the label \a name.
 	
-	This method is an overloaded method of ReplacePoint(const char *, int32, BPoint).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplacePoint(const char *, int32, BPoint).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplacePoint(const char *name, int32 index, BPoint aPoint)
-	\brief Replace a point at the label \a name at a specified \a index.
+	\brief Replace a point at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_POINT_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_POINT_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aPoint The object to store in the message.
@@ -1663,17 +1698,19 @@
 	\fn status_t BMessage::ReplaceString(const char *name, const char *aString)
 	\brief Replace a string at the label \a name.
 	
-	This method is an overloaded method of ReplaceString(const char *, int32, const char *).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceString(const char *, int32, const char *).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceString(const char *name, int32 index, const char *aString)
-	\brief Replace a string at the label \a name at a specified \a index.
+	\brief Replace a string at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_STRING_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_STRING_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aString The object to store in the message.
@@ -1687,17 +1724,19 @@
 	\fn status_t BMessage::ReplaceString(const char *name, const BString &aString)
 	\brief Replace a string at the label \a name.
 	
-	This method is an overloaded method of ReplaceString(const char *, int32, BString &).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceString(const char *, int32, BString &).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceString(const char *name, int32 index, const BString &aString)
-	\brief Replace a string at the label \a name at a specified \a index.
+	\brief Replace a string at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_STRING_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_STRING_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aString The object to store in the message.
@@ -1711,17 +1750,19 @@
 	\fn status_t BMessage::ReplaceInt8(const char *name, int8 value)
 	\brief Replace an integer at the label \a name.
 	
-	This method is an overloaded method of ReplaceInt8(const char *, int32, int8).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceInt8(const char *, int32, int8).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceInt8(const char *name, int32 index, int8 value)
-	\brief Replace an integer at the label \a name at a specified \a index.
+	\brief Replace an integer at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_INT8_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_INT8_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param value The object to store in the message.
@@ -1735,17 +1776,19 @@
 	\fn status_t BMessage::ReplaceInt16(const char *name, int16 value)
 	\brief Replace an integer at the label \a name.
 	
-	This method is an overloaded method of ReplaceInt16(const char *, int32, int16).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceInt16(const char *, int32, int16).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceInt16(const char *name, int32 index, int16 value)
-	\brief Replace an integer at the label \a name at a specified \a index.
+	\brief Replace an integer at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_INT16_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_INT16_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param value The object to store in the message.
@@ -1759,17 +1802,19 @@
 	\fn status_t BMessage::ReplaceInt32(const char *name, int32 value)
 	\brief Replace an integer at the label \a name.
 	
-	This method is an overloaded method of ReplaceInt8(const char *, int32, int32).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceInt8(const char *, int32, int32).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceInt32(const char *name, int32 index, int32 value)
-	\brief Replace an integer at the label \a name at a specified \a index.
+	\brief Replace an integer at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_INT32_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_INT32_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param value The object to store in the message.
@@ -1783,17 +1828,19 @@
 	\fn status_t BMessage::ReplaceInt64(const char *name, int64 value)
 	\brief Replace an integer at the label \a name.
 	
-	This method is an overloaded method of ReplaceInt8(const char *, int32, int64).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceInt8(const char *, int32, int64).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceInt64(const char *name, int32 index, int64 value)
-	\brief Replace an integer at the label \a name at a specified \a index.
+	\brief Replace an integer at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_INT64_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_INT64_TYPE.
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param value The object to store in the message.
@@ -1807,17 +1854,20 @@
 	\fn status_t BMessage::ReplaceBool(const char *name, bool aBoolean)
 	\brief Replace a boolean at the label \a name.
 	
-	This method is an overloaded method of ReplaceBool(const char *, int32, bool).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceBool(const char *, int32, bool).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceBool(const char *name, int32 index, bool aBoolean)
-	\brief Replace a boolean at the label \a name at a specified \a index.
+	\brief Replace a boolean at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_BOOL_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_BOOL_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aBoolean The object to store in the message.
@@ -1831,17 +1881,20 @@
 	\fn status_t BMessage::ReplaceFloat(const char *name, float aFloat)
 	\brief Replace a float at the label \a name.
 	
-	This method is an overloaded method of ReplaceFloat(const char *, int32, float).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceFloat(const char *, int32, float).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceFloat(const char *name, int32 index, float aFloat)
-	\brief Replace a float at the label \a name at a specified \a index.
+	\brief Replace a float at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_FLOAT_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_FLOAT_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aFloat The object to store in the message.
@@ -1855,17 +1908,20 @@
 	\fn status_t BMessage::ReplaceDouble(const char *name, double aDouble)
 	\brief Replace a double at the label \a name.
 	
-	This method is an overloaded method of ReplaceDouble(const char *, int32, double).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceDouble(const char *, int32, double).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceDouble(const char *name, int32 index, double aDouble)
-	\brief Replace a double at the label \a name at a specified \a index.
+	\brief Replace a double at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_DOUBLE_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_DOUBLE_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param aDouble The object to store in the message.
@@ -1879,17 +1935,19 @@
 	\fn status_t BMessage::ReplacePointer(const char *name, const void *pointer)
 	\brief Replace a pointer at the label \a name.
 	
-	This method is an overloaded method of ReplacePointer(const char *, int32, const void *).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplacePointer(const char *, int32, const void *).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
-	\fn status_t BMessage::ReplacePointer(const char *name,int32 index,const void *pointer)
+	\fn status_t BMessage::ReplacePointer(const char *name,int32 index, const void *pointer)
 	\brief Replace a pointer at the label \a name at a specified \a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_POINTER_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_POINTER_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param pointer The object to store in the message.
@@ -1903,17 +1961,20 @@
 	\fn status_t BMessage::ReplaceMessenger(const char *name, BMessenger messenger)
 	\brief Replace a messenger at the label \a name.
 	
-	This method is an overloaded method of ReplaceMessenger(const char *, int32, BMessenger).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceMessenger(const char *, int32, BMessenger).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceMessenger(const char *name, int32 index, BMessenger messenger)
-	\brief Replace a messenger at the label \a name at a specified \a index.
+	\brief Replace a messenger at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_MESSENGER_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_MESSENGER_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param messenger The object to store in the message.
@@ -1927,18 +1988,20 @@
 	\fn status_t BMessage::ReplaceRef(const char *name,const entry_ref *ref)
 	\brief Replace a reference to a file at the label \a name.
 	
-	This method is an overloaded method of ReplaceRef(const char *, int32, entry_ref *).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceRef(const char *, int32, entry_ref *).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceRef(	const char *name, int32 index, const entry_ref *ref)
-	\brief Replace a reference to a file at the label \a name at a specified
-	 	\a index.
+	\brief Replace a reference to a file at the label \a name at a
+		specified \a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_REF_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_REF_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param ref The object to store in the message.
@@ -1952,17 +2015,20 @@
 	\fn status_t BMessage::ReplaceMessage(const char *name, const BMessage *message)
 	\brief Replace a message at the label \a name.
 	
-	This method is an overloaded method of ReplaceMessage(const char *, int32, BMessage *).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceMessage(const char *, int32, BMessage *).
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *message)
-	\brief Replace a message at the label \a name at a specified \a index.
+	\brief Replace a message at the label \a name at a specified
+		\a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the \c B_MESSAGE_TYPE.
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the \c B_MESSAGE_TYPE.
+
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param message The object to store in the message.
@@ -1976,25 +2042,29 @@
 	\fn status_t BMessage::ReplaceFlat(const char *name, BFlattenable *object)
 	\brief Replace a flattened object at the label \a name.
 	
-	This method is an overloaded method of ReplaceFlat(const char *, int32, BFlattenable *).
-	It replaces the data at \a index zero.
+	This method is an overloaded method of
+	ReplaceFlat(const char *, int32, BFlattenable *).
+
+	It replaces the data at \a index \c 0.
 */
 
 
 /*!
 	\fn status_t BMessage::ReplaceFlat(const char *name, int32 index, BFlattenable *object)
-	\brief Replace a flattened object at the label \a name at a specified
-	 	\a index.
+	\brief Replace a flattened object at the label \a name at a
+		specified \a index.
 	
-	The data at the specified \a name and \a index will be replaced, if it
-	matches the type returned by your object. This method uses
+	The data at the specified \a name and \a index will be
+	replaced, if it matches the type returned by your object. This method uses
 	BFlattenable::TypeCode() to determine the type of the object.
 	
 	\param name The name associated with the data to replace.	
 	\param index The index in the array to replace.
 	\param object The object to store in the message.
+
 	\retval B_OK The operation succeeded.
 	\retval B_BAD_INDEX The index was out of range.
+
 	\see ReplaceFlat(const char*, BFlattenable *)
 */
 
@@ -2005,9 +2075,9 @@
 /*!
 	\name Deprecated methods
 	
-	These methods are <em>very</em> likely to disappear, and they have been
-	replaced by safer and more powerful methods. These methods are still
-	implemented for binary compatibility, but they are not documented.
+	These methods are \e very likely to disappear, and they have been replaced
+	by safer and more powerful methods. These methods are still implemented
+	for binary compatibility, but they are not documented.
 */
 
 

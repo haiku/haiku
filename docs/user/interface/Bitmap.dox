@@ -1,0 +1,556 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT Licence.
+ *
+ * Documentation by:
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		John Scipione <jscipione@gmail.com>
+ * Corresponds to:
+ *		/trunk/headers/os/interface/Bitmap.h	 rev 42274
+ *		/trunk/src/kits/interface/Bitmap.cpp	 rev 42274
+ */
+
+/*!
+	\file Bitmap.h
+	\brief Defines the BBitmap class and global operators and functions for
+		handling bitmaps.
+*/
+
+
+/*!
+	\class BBitmap
+	\ingroup interface
+	\ingroup libbe
+	\brief Access and manipulate digital images commonly known as bitmaps.
+
+	A BBitmap is a rectangular map of pixel data. The BBitmap class allows you
+	to create a bitmap by specifying its pixel data and has operations for
+	altering and accessing the properties of bitmaps.
+
+	To create a BBitmap object use one of the constructor methods below. You
+	can determine if initialization was successful by calling the InitCheck()
+	method. You can determine if a BBitmap object is valid at any time by
+	calling the IsValid() method.
+
+	An example of creating a new 32x32 pixel BBitmap object and assigning the
+	icon of the current application looks like this:
+	\code
+BBitmap iconBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32));
+appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
+	\endcode
+
+	You can access the properties of a bitmap by calling the Bounds(),
+	Flags(), ColorSpace(), Area(), Bits(), BitsLength(), BytesPerRow(),
+	and GetOverlayRestrictions() methods.
+
+	To directly set the pixel data of a bitmap call the Bits() or SetBits()
+	methods or you can use the ImportBits() method to copy the bits from an
+	existing bitmap.
+
+	You can also draw into a bitmap by attaching a child BView to the bitmap.
+	To add and remove child BView&apos;s to a bitmap call the AddChild() and
+	RemoveChild() methods respectively. You can access the child views of a
+	bitmap by calling the CountChildren(), ChildAt(), and FindView() methods.
+
+	For off-screen bitmaps it is important to lock the bitmap before drawing
+	the pixels and then unlock the bitmap when you are done to prevent
+	flickering. To lock and unlock a bitmap call the LockBits() and UnLockBits()
+	methods respectively. To lock and unlock the off-screen window that a
+	bitmap resides in you should call the Lock() and UnLock() methods. To
+	determine is a bitmap is currently locked you can call the IsLocked()
+	method.
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
+		int32 bytesPerRow, screen_id screenID)
+	\brief Creates and initializes a BBitmap object.
+
+	\param bounds The bitmap dimensions.
+	\param flags Creation flags.
+	\param colorSpace The bitmap's color space.
+	\param bytesPerRow The number of bytes per row the bitmap should use.
+		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
+		   value.
+	\param screenID ???
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(BRect bounds, color_space colorSpace,
+		bool acceptsViews, bool needsContiguous)
+	\brief Creates and initializes a BBitmap object.
+
+	\param bounds The bitmap dimensions.
+	\param colorSpace The bitmap's color space.
+	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
+		   it shall be possible to attach BView to the bitmap and draw into
+		   it.
+	\param needsContiguous If \c true a physically contiguous chunk of memory
+		   will be allocated.
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(const BBitmap* source, bool acceptsViews,
+		bool needsContiguous)
+	\brief Creates a BBitmap object as a clone of another bitmap.
+
+	\param source The source bitmap.
+	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
+		   it shall be possible to attach BView to the bitmap and draw into
+		   it.
+	\param needsContiguous If \c true a physically contiguous chunk of memory
+		   will be allocated.
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(const BBitmap& source, uint32 flags)
+	\brief Creates a BBitmap object as a clone of another bitmap.
+
+	\param source The source bitmap.
+	\param flags Creation flags.
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(const BBitmap& source)
+	\brief Creates a BBitmap object as a clone of another bitmap.
+
+	\param source The source bitmap.
+*/
+
+
+/*!
+	\fn BBitmap::~BBitmap()
+	\brief Destructor Method
+
+	Frees all resources associated with this object.
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BBitmap::BBitmap(BMessage* data)
+	\brief Unarchives a bitmap from a BMessage.
+
+	\param data The archive.
+*/
+
+
+/*!
+	\fn BArchivable* BBitmap::Instantiate(BMessage* data)
+	\brief Instantiates a BBitmap from an archive.
+
+	\param data The archive.
+	\return A bitmap reconstructed from the archive or \c NULL, if an error
+		occurred.
+*/
+
+
+/*!
+	\fn status_t BBitmap::Archive(BMessage* data, bool deep) const
+	\brief Archives the BBitmap object.
+
+	\param data The archive.
+	\param deep if \c true, child object will be archived as well.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn status_t BBitmap::InitCheck() const
+	\brief Gets the status of the constructor.
+
+	\returns B_OK if initialization succeeded, otherwise returns an
+		error status.
+*/
+
+
+/*!
+	\fn bool BBitmap::IsValid() const
+	\brief Determines whether or not the BBitmap object is valid.
+
+	\return \c true, if the object is properly initialized, \c false otherwise.
+*/
+
+
+/*!
+	\name Locking
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BBitmap::LockBits(uint32* state)
+	\brief Locks the bitmap bits so that they cannot be relocated.
+
+	This is currently only used for overlay bitmaps; whenever you
+	need to access their Bits() you must lock them first.
+	On resolution change overlay bitmaps can be relocated in memory;
+	using this call prevents you from accessing an invalid pointer
+	and clobbering memory that doesn't belong you.
+
+	\param state Unused
+	\returns \c B_OK on success or an error status code.
+*/
+
+
+/*!
+	\fn void BBitmap::UnlockBits()
+	\brief Unlocks the bitmap's buffer.
+
+	Counterpart to BBitmap::LockBits().
+*/
+
+
+/*!
+	\fn bool BBitmap::Lock()
+	\brief Locks the off-screen window that belongs to the bitmap.
+
+	The bitmap must accept views, if locking should work.
+
+	\returns \c true, if the lock was acquired successfully.
+*/
+
+
+/*!
+	\fn void BBitmap::Unlock()
+	\brief Unlocks the off-screen window that belongs to the bitmap.
+
+	The bitmap must accept views, if locking should work.
+*/
+
+
+/*!
+	\fn bool BBitmap::IsLocked() const
+	\brief Determines whether or not the bitmap's off-screen window is locked.
+
+	The bitmap must accept views, if locking should work.
+
+	\return \c true, if the caller owns a lock , \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Accessors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn area_id BBitmap::Area() const
+	\brief Gets the ID of the area the bitmap data reside in.
+
+	\return The ID of the area the bitmap data reside in.
+*/
+
+
+/*!
+	\fn void* BBitmap::Bits() const
+	\brief Gets the pointer to the bitmap data.
+
+	\return The pointer to the bitmap data.
+*/
+
+
+/*!
+	\fn int32 BBitmap::BitsLength() const
+	\brief Gets the length of the bitmap data.
+
+	\return The length of the bitmap data as an int32.
+*/
+
+
+/*!
+	\fn int32 BBitmap::BytesPerRow() const
+	\brief Gets the number of bytes used to store a row of bitmap data.
+
+	\return The number of bytes used to store a row of bitmap data.
+*/
+
+
+/*!
+	\fn color_space BBitmap::ColorSpace() const
+	\brief Gets the bitmap's color space.
+
+	\return The bitmap's color space.
+*/
+
+
+/*!
+	\fn BRect BBitmap::Bounds() const
+	\brief Gets a BRect the size of the bitmap's dimensions.
+
+	\return A BRect the size of the bitmap's dimensions.
+*/
+
+
+/*!
+	\fn uint32 BBitmap::Flags() const
+	\brief Accesses the bitmap's creation flags.
+
+	This method informs about which flags have been used to create the
+	bitmap. It would for example tell you wether this is an overlay
+	bitmap. If bitmap creation succeeded, all flags are fulfilled.
+
+	\return The bitmap's creation flags.
+*/
+
+
+/*!
+	\fn status_t BBitmap::GetOverlayRestrictions(overlay_restrictions*
+		restrictions) const
+	\brief Gets the overlay_restrictions structure for this bitmap.
+
+	\note This function is not part of the BeOS R5 API.
+
+	\param restrictions The overlay restrictions flag
+
+	\retval B_OK The overlay restriction structure was found.
+	\retval B_BAD_TYPE The overlay restriction structure for the bitmap could
+		not be found.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Setters
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BBitmap::SetBits(const void* data, int32 length, int32 offset,
+		color_space colorSpace)
+	\brief Assigns data to the bitmap.
+
+	Data are directly written into the bitmap's data buffer, being converted
+	beforehand, if necessary. Some conversions do not work intuitively:
+	- \c B_RGB32: The source buffer is supposed to contain \c B_RGB24_BIG
+	  data without padding at the end of the rows.
+	- \c B_RGB32: The source buffer is supposed to contain \c B_CMAP8
+	  data without padding at the end of the rows.
+	- other color spaces: The source buffer is supposed to contain data
+	  according to the specified color space being padded to int32 row-wise.
+
+	The currently supported source/target color spaces are
+	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
+	<code>B_GRAY{8,1}</code>.
+
+	\note Since this methods is a bit strange to use, Haiku has introduced
+		the ImportBits() method which is the recommended replacement.
+
+	\param data The data to be copied.
+	\param length The length in bytes of the data to be copied.
+	\param offset The offset (in bytes) relative to beginning of the bitmap
+		   data specifying the position at which the source data shall be
+		   written.
+	\param colorSpace Color space of the source data.
+*/
+
+
+/*!
+	\fn status_t BBitmap::ImportBits(const void* data, int32 length, int32 bpr,
+		int32 offset, color_space colorSpace)
+	\brief Assigns data to the bitmap.
+
+	Data are directly written into the bitmap's data buffer, being converted
+	beforehand, if necessary. Unlike for SetBits(), the meaning of
+	\a colorSpace is exactly the expected one here, i.e. the source buffer
+	is supposed to contain data of that color space. \a bpr specifies how
+	many bytes the source contains per row. \c B_ANY_BYTES_PER_ROW can be
+	supplied, if standard padding to int32 is used.
+
+	The currently supported source/target color spaces are
+	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
+	<code>B_GRAY{8,1}</code>.
+
+	\note This function is not part of the BeOS R5 API.
+
+	\param data The data to be copied.
+	\param length The length in bytes of the data to be copied.
+	\param bpr The number of bytes per row in the source data.
+	\param offset The offset (in bytes) relative to beginning of the bitmap
+		   data specifying the position at which the source data shall be
+		   written.
+	\param colorSpace Color space of the source data.
+
+	\retval B_OK The bits were imported into the bitmap.
+	\retval B_BAD_VALUE \c NULL \a data, invalid \a bpr or \a offset, or
+	  unsupported \a colorSpace.
+*/
+
+
+/*!
+	\fn status_t BBitmap::ImportBits(const void* data, int32 length,
+		int32 bpr, color_space colorSpace, BPoint from, BPoint to,
+		int32 width, int32 height)
+	\brief Assigns data to the bitmap.
+
+	Allows for a BPoint offset in the source and in the bitmap. The region
+	of the source at \a from extending \a width and \a height is assigned
+	(and converted if necessary) to the bitmap at \a to.
+
+	The currently supported source/target color spaces are
+	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
+	<code>B_GRAY{8,1}</code>.
+
+	\note This function is not part of the BeOS R5 API.
+
+	\param data The data to be copied.
+	\param length The length in bytes of the data to be copied.
+	\param bpr The number of bytes per row in the source data.
+	\param colorSpace Color space of the source data.
+	\param from The offset in the source where reading should begin.
+	\param to The offset in the bitmap where the source should be written.
+	\param width The width (in pixels) to be imported.
+	\param height The height (in pixels) to be imported.
+
+	\retval B_OK The bits were imported into the bitmap.
+	\retval B_BAD_VALUE: \c NULL \a data, invalid \a bpr, unsupported
+		\a colorSpace or invalid \a width or \a height.
+*/
+
+
+/*!
+	\fn status_t BBitmap::ImportBits(const BBitmap* bitmap)
+	\brief Assigns another bitmap's data to this bitmap.
+
+	The supplied bitmap must have the exactly same dimensions as this bitmap.
+	Its data is converted to the color space of this bitmap.
+
+	The currently supported source/target color spaces are
+	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
+	<code>B_GRAY{8,1}</code>.
+
+	\note This function is not part of the BeOS R5 API.
+
+	\param bitmap The source bitmap.
+
+	\retval B_OK The bits were imported into the bitmap.
+	\retval B_BAD_VALUE \c NULL \a bitmap, or \a bitmap has other dimensions,
+		or the conversion from or to one of the color spaces is not supported.
+*/
+
+
+/*!
+	\fn status_t BBitmap::ImportBits(const BBitmap* bitmap, BPoint from,
+		BPoint to,int32 width, int32 height)
+	\brief Assigns data to the bitmap.
+
+	Allows for a BPoint offset in the source and in the bitmap. The region
+	of the source at \a from extending \a width and \a height is assigned
+	(and converted if necessary) to the bitmap at \a to. The source bitmap is
+	clipped to the bitmap and they don't need to have the same dimensions.
+
+	The currently supported source/target color spaces are
+	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
+	<code>B_GRAY{8,1}</code>.
+
+	\note This function is not part of the BeOS R5 API.
+
+	\param bitmap The source bitmap.
+	\param from The offset in the source where reading should begin.
+	\param to The offset in the bitmap where the source should be written.
+	\param width The width (in pixels) to be imported.
+	\param height The height (in pixels) to be imported.
+
+	\retval B_OK The bits were imported into the bitmap.
+	\retval B_BAD_VALUE \c NULL \a bitmap, the conversion from or to one of
+	  	the color spaces is not supported, or invalid \a width or \a height.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Child View Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BBitmap::AddChild(BView* view)
+	\brief Adds a BView to the bitmap's view hierarchy.
+
+	The bitmap must accept views and the supplied view must not be child of
+	another parent.
+
+	\param view The view to be added.
+*/
+
+
+/*!
+	\fn bool BBitmap::RemoveChild(BView* view)
+	\brief Removes a BView from the bitmap's view hierarchy.
+
+	\param view The view to be removed.
+*/
+
+
+/*!
+	\fn int32 BBitmap::CountChildren() const
+	\brief Gets the number of BViews currently belonging to the bitmap.
+
+	\returns The number of BViews currently belonging to the bitmap.
+*/
+
+
+/*!
+	\fn BView* BBitmap::ChildAt(int32 index) const
+	\brief Gets the BView at a certain index in the bitmap's list of views.
+
+	\param index The index of the BView to be returned.
+	\returns The BView at index \a index or \c NULL if the index is out of
+		range.
+*/
+
+
+/*!
+	\fn BView* BBitmap::FindView(const char* viewName) const
+	\brief Accesses a bitmap's child BView with a the name \a viewName.
+
+	\param viewName The name of the BView to be returned.
+	\returns The BView with the name \a name or \c NULL if the bitmap doesn't
+		know a view with that name.
+*/
+
+
+/*!
+	\fn BView* BBitmap::FindView(BPoint point) const
+	\brief Accesses a bitmap's BView at a certain location.
+
+	\param point The location.
+	\returns The BView with located at \a point or \c NULL if the bitmap
+		doesn't know a view at this location.
+*/
+
+
+//! @}

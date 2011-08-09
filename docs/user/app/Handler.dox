@@ -444,13 +444,14 @@ ShowImageApp::MessageReceived(BMessage *message)
 /*!
 	\fn BHandler * BHandler::ResolveSpecifier(BMessage *msg, int32 index,
 		BMessage *specifier, int32 form, const char *property)
-	\brief Undocumented.
+	\brief Determine the proper handler for a scripting message.
 */
 
 
 /*!
 	\fn status_t BHandler::GetSupportedSuites(BMessage *data)
-	\brief Undocumented.
+	\brief Reports the suites of messages and specifiers that derived classes
+		understand.
 */
 
 

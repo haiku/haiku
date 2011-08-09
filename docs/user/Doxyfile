@@ -177,7 +177,8 @@ TAB_SIZE               = 4
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES                = 
+# For keyboard shortcuts and anything related to pressing keys
+ALIASES                = "key{1}=<span class=\"keycap\">\1</span>"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -475,16 +476,21 @@ INPUT                  = . \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
 						 ../../headers/os/interface/AbstractLayout.h \
+						 ../../headers/os/interface/Alert.h \
+						 ../../headers/os/interface/Button.h \
+						 ../../headers/os/interface/Bitmap.h \
 						 ../../headers/os/interface/Box.h \
 						 ../../headers/os/interface/GridLayout.h \
 						 ../../headers/os/interface/GroupLayout.h \
 						 ../../headers/os/interface/IconUtils.h \
+						 ../../headers/os/interface/InterfaceDefs.h \
 						 ../../headers/os/interface/Layout.h \
 						 ../../headers/os/interface/LayoutBuilder.h \
 						 ../../headers/os/interface/LayoutItem.h \
 						 ../../headers/os/interface/TwoDimensionalLayout.h \
                          ../../headers/os/locale \
                          ../../headers/os/midi2 \
+						 ../../headers/os/storage/AppFileInfo.h \
                          ../../headers/os/support \
                          ../../headers/posix/syslog.h
 
@@ -565,6 +571,7 @@ EXAMPLE_RECURSIVE      = NO
 # the \image command).
 
 IMAGE_PATH             = . \
+						 interface\
                          midi2
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 

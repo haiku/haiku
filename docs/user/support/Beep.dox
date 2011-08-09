@@ -13,7 +13,7 @@
  ///// and not completely implemented, so this needs revision if everything
  ///// is finished.
  
- /*!
+/*!
   \file Beep.h
   \brief Functions to generate sounds from the computer.
 */
@@ -24,34 +24,31 @@
 
 //! @{
 
-/*!
-  \fn status_t beep()
-  \brief Invoke the standard system beep to alert users.
+/*!	\fn status_t beep()
+	\brief Invoke the standard system beep to alert users.
 
-  From Beep.h and in libbe.so.
-  
-  \see system_beep() and add_system_beep_event()
+	From Beep.h and in libbe.so.
+
+	\see system_beep() and add_system_beep_event()
 */
 
-/*!
-  \fn status_t system_beep(const char* eventName)
-  \brief Invokes the sound for event \a eventName.
-  
-  You can add the events using add_system_beep_event().
+/*!	\fn status_t system_beep(const char* eventName)
+	\brief Invokes the sound for event \a eventName.
 
-  From Beep.h and in libbe.so.
+	You can add the events using add_system_beep_event().
+
+	From Beep.h and in libbe.so.
 */
 
-/*!
-  \fn status_t add_system_beep_event(const char* eventName, uint32 flags = 0)
-  \brief Adds an event to the media server.
-  
-  Call this method to add a specific event to the media server.
+/*!	\fn status_t add_system_beep_event(const char* eventName, uint32 flags = 0)
+	\brief Adds an event to the media server.
 
-  From Beep.h and in libbe.so.
-  
-  \param eventName The name of the event.
-  \param flags Currently unused. Pass \c 0.
+	Call this method to add a specific event to the media server.
+
+	From Beep.h and in libbe.so.
+
+	\param eventName The name of the event.
+	\param flags Currently unused. Pass \c 0.
 */
 
 //! @}

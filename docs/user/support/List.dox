@@ -26,7 +26,7 @@
 	\class BList
 	\ingroup support
 	\ingroup libbe
-	\brief An ordered container that is designed to hold generic \c void * 
+	\brief An ordered container that is designed to hold generic \c void* 
 		objects.
 	
 	This class is designed to be used for a variety of tasks. Unlike similar
@@ -399,7 +399,7 @@ A C D E F G B H I J
 	If one of the actions on the items fails it means that the \a func function
 	returned \c false and the processing of the list will be stopped.
 	
-	\param func A function that takes a \c void * argument and returns a
+	\param func A function that takes a \c void* argument and returns a
 		boolean.
 	\see DoForEach(bool (*func)(void* item, void* arg2), void *arg2)
 */
@@ -412,8 +412,8 @@ A C D E F G B H I J
 	If one of the actions on the items fails it means that the \a func function
 	returned \c false and the processing of the list will be stopped.
 	
-	\param func A function with the first \c void * argument being the item
-		and the second \c void * being the argument that you supply. It should
+	\param func A function with the first \c void* argument being the item
+		and the second \c void* being the argument that you supply. It should
 		return a boolean value on whether it succeeded or not.
 	\param arg2 An argument to supply to \a func.
 	\see DoForEach(bool (*func)(void* item))

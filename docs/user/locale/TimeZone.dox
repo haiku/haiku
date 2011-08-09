@@ -1,0 +1,110 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT Licence.
+ *
+ * Documentation by:
+ *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ *		John Scipione <jscipione@gmail.com>
+ *		Oliver Tappe <zooey@hirschkaefer.de>
+ * Corresponds to:
+ *		/trunk/headers/os/locale/TimeZone.h	 rev 42274
+ *		/trunk/src/kits/locale/TimeZone.cpp	 rev 42274
+ */
+
+
+/*!
+	\file TimeZone.h
+	\brief Provides for the BTimeZone class.
+*/
+
+
+/*!
+	\class BTimeZone
+	\ingroup locale
+	\brief Provides information about time zones.
+*/
+
+
+/*!
+	\fn BTimeZone::BTimeZone(const char* zoneID, const BLanguage* language)
+	\brief Construct a timezone from its \a zoneID and \a language.
+
+	The constructor only allows you to construct a timezone if you already
+	know its code. If you don't know the code, you can instead go through the
+	BCountry class which can enumerate all timezones in a country, or use the
+	BLocaleRoster, which knows the timezone selected by the user.
+*/
+
+
+/*!
+	\fn BTimeZone::BTimeZone(const BTimeZone& other)
+*/
+
+
+/*!
+	\fn BTimeZone& BTimeZone::operator=(const BTimeZone& source)
+*/
+
+
+/*!
+	\fn const BString& BTimeZone::ID() const
+	\brief Returns the ID of the time zone.
+*/
+
+
+/*!
+	\fn const BString& BTimeZone::Name() const
+	\brief Returns the localized name of the time zone.
+
+	Use this method to display the time zone's name to the user.
+*/
+
+
+/*!
+	\fn const BString& BTimeZone::DaylightSavingName() const
+	\brief Returns the name of the daylight savings rules used in this timezone.
+*/
+
+
+/*!
+	\fn const BString& BTimeZone::ShortName() const
+	\brief Returns the short name of the timezone, in the user's locale.
+*/
+
+
+/*!
+	\fn const BString& BTimeZone::ShortDaylightSavingName() const
+	\brief Returns the short name of the daylight savings rules used in this
+		timezone.
+*/
+
+
+/*!
+	\fn int BTimeZone::OffsetFromGMT() const
+	\brief Return the offset from GMT.
+
+	The offset is a number of seconds, positive or negative.
+*/
+
+
+/*!
+	\fn bool BTimeZone::SupportsDaylightSaving() const
+	\brief Return true if the time zone has daylight saving rules
+*/
+
+
+/*!
+	\fn status_t BTimeZone::InitCheck() const
+	\brief Return \c false if there was an error creating the timezone
+		for instance if you called the constructor or SetTo() with an invalid
+		timezone code.)
+*/
+
+
+/*!
+	\fn status_t BTimeZone::SetTo(const char* zoneCode)
+	\brief Set the timezone to another code.
+
+	\returns \c false if there was an error (likely due to an invalid
+		timezone code.)
+*/

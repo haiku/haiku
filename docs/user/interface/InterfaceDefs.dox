@@ -1,0 +1,65 @@
+/*
+ * Copyright 2001-2011, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*!	\file InterfaceDefs.h
+	\brief Defines standard interface definitions for controls.
+*/
+
+/*!	\enum border_style
+	Collection of flags that determine the border style drawn around a BBox.
+*/
+
+/*! \var border_style B_PLAIN_BORDER
+
+	\image html B_PLAIN_BORDER.png
+
+	The right and bottom sides of the box are darker than the top and
+	left sides to produce a shadow effect and make the box look like it
+	is raised slightly above the surrounding surface.
+*/
+
+/*! \var border_style B_FANCY_BORDER
+
+	\image html B_FANCY_BORDER.png
+
+	The border is a bevelled to give it a 3D effect. The border is uniform
+	in appearance on all four sides. This is the default appearance.
+*/
+
+/*! \var border_style B_NO_BORDER
+	No border.
+*/
+
+/*!	\enum orientation
+Orientation flag sets the layout to either horizontal or vertical
+	alignment.
+*/
+
+/*!	\var orientation B_HORIZONTAL
+	Horizontal alignment
+*/
+
+/*! \var orientation B_VERTICAL
+	Vertical alignment
+*/
+
+/*!	\enum button_width
+	Collection of flags that determine how wide to draw the buttons in a
+	BAlert dialog.
+*/
+
+/*!	\var button_width B_WIDTH_AS_USUAL
+	Set the width of each button based on the standard width.
+*/
+
+/*!	\var button_width B_WIDTH_FROM_WIDEST
+	Set the width of each button based on the width of the widest button.
+*/
+
+/*!	\var button_width B_WIDTH_FROM_LABEL
+	Set the width of each button to accomidate the width of the button's
+	label.
+*/
+

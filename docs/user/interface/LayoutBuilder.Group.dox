@@ -1,3 +1,23 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/interface/GroupLayoutBuilder.h	 rev 42274
+ *		/trunk/src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
+ */
+
+
+/*!
+	\file GroupLayoutBuilder.h
+	\brief Provides the BLayoutBuilder::Group<> class.
+*/
+
+
 /*!
 	\class BLayoutBuilder::Group<>
 	\ingroup interface
@@ -32,14 +52,16 @@
 
 /*!
 	\name Constructors
-
-	@{
 */
 
 
+//! @{
+
+
 /*!
-	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BWindow* window,
-		enum orientation, float spacing)
+	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BWindow *window,
+		enum orientation orientation=B_HORIZONTAL,
+		float spacing=B_USE_DEFAULT_SPACING)
 	\brief Creates a new BGroupLayout, and attaches it to a BWindow.
 
 	\note The top BView* in \a window has its ViewColor set to
@@ -71,8 +93,9 @@
 
 
 /*!
-	\fn template <ParentBuilder> BLayoutBuilder::Group<ParentBuilder>::Group(
-		enum orientation, float spacing)
+	\fn BLayoutBuilder::Group<ParentBuilder>::Group(
+		enum orientation orientation=B_HORIZONTAL,
+		float spacing=B_USE_DEFAULT_SPACING)
 	\brief Creates a new BGroupView and targets it.
 
 	Methods called on this builder will be directed to the new BGroupView's
@@ -83,14 +106,15 @@
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Adding BViews and BLayoutItems
-
-	@{
 */
+
+
+//! @{
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::Add(BView* view)
@@ -133,7 +157,7 @@
 */
 
 
-//@}
+//! @}
 
 
 /*!
@@ -142,14 +166,16 @@
 	BLayoutBuilder::Base subclass representing the newly added object. These
 	methods push a new builder on top of the stack, you will not be using
 	\c this builder again until you call End().
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
 	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
-		enum orientation, float spacing, float weight)
+		enum orientation orientation, float spacing=B_USE_DEFAULT_SPACING,
+		float weight=1.0f)
 	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
 		representing the newly added layout.
 
@@ -157,6 +183,7 @@
 	\param spacing The spacing to use for the new BGroupLayout.
 	\param weight The weight for the new BGroupLayout in the BGroupLayout this
 		builder represents.
+
 	\returns A GroupBuilder representing the newly created BGroupLayout.
 */
 
@@ -233,7 +260,8 @@
 
 /*!
 	\fn SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
-		enum orientation, float spacing, float weight)
+		enum orientation orientation, float spacing=B_USE_DEFAULT_SPACING,
+		float weight=1.0f)
 
 	\brief Create and add a new BSplitView with a weight of \c weight, then
 		return a SplitBuilder representing the new BSplitView.
@@ -258,15 +286,16 @@
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Adding BSpaceLayoutItems
 	Some convenience methods for adding special BSpaceLayoutItems.
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -305,9 +334,10 @@
 
 /*!
 	\name Accessors
-
-	@{
 */
+
+
+//! @{
 
 
 /*!

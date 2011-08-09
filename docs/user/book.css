@@ -186,6 +186,24 @@ div.contents {
 	background: #ffeae6 url(images/alert_stop_32.png) 15px 15px no-repeat;
 }
 
+
+/* For keyboard shortcuts and the like (also from userguide) */
+
+div.contents span.keycap {
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;	
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border-color: #c7c7c7;
+	border-style: solid;
+	border-width: 1px;
+	padding: 0px 2px 0px 2px;
+	background-color: #e8e8e8;
+	font-family: serif;
+	font-variant: small-caps;
+}
+
+
 /* Continue with the rest of the standard Doxygen stuff... */
 
 CAPTION { font-weight: bold }

@@ -7,8 +7,10 @@
   - \ref drivers
   - \ref interface | \link interface_intro \em Introduction \endlink
   - \ref locale | \link locale_intro \em Introduction \endlink
+  - \ref media | \link media_intro \em Introduction \endlink
   - \ref midi1
   - \ref midi2 | \link midi2_intro \em Introduction \endlink
+  - \ref storage | \link storage_intro \em Introduction \endlink
   - \ref support | \link support_intro \em Introduction \endlink
 
   \section notes General Notes and Information
