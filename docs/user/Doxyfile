@@ -478,6 +478,7 @@ INPUT                  = . \
 						 ../../headers/os/interface/Box.h \
 						 ../../headers/os/interface/GridLayout.h \
 						 ../../headers/os/interface/GroupLayout.h \
+						 ../../headers/os/interface/IconUtils.h \
 						 ../../headers/os/interface/Layout.h \
 						 ../../headers/os/interface/LayoutBuilder.h \
 						 ../../headers/os/interface/LayoutItem.h \

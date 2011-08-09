@@ -68,7 +68,7 @@
 
 
 /*!	\fn static status_t BIconUtils::GetVectorIcon(const uint8* buffer,
-		const char* attrName, BBitmap* result)
+		size_t size, BBitmap* result)
 	\brief Utility function to import a vector icon in "flat icon" format.
 	
 	Utility function to import a vector icon in "flat icon"
