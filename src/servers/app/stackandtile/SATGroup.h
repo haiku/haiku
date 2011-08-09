@@ -14,6 +14,8 @@
 #include "ObjectList.h"
 #include "Referenceable.h"
 
+#include "MagneticBorder.h"
+
 #include "LinearSpec.h"
 
 
@@ -72,10 +74,10 @@ public:
 
 			void				Trace() const;
 private:
-		Corner		fCorners[4];
+			Corner				fCorners[4];
 
-		Tab*		fVerticalTab;
-		Tab*		fHorizontalTab;
+			BReference<Tab>		fVerticalTab;
+			BReference<Tab>		fHorizontalTab;
 };
 
 
@@ -137,7 +139,12 @@ public:
 									Crossing* rightBottom);
 								~WindowArea();
 
-			bool				SetGroup(SATGroup* group);
+			bool				Init(SATGroup* group);
+			SATGroup*			Group() { return fGroup; }
+
+			void				DoGroupLayout();
+			void				UpdateSizeLimits();
+			void				UpdateSizeConstaints(const BRect& frame);
 
 	const	SATWindowList&		WindowList() { return fWindowList; }
 	const	SATWindowList&		LayerOrder() { return fWindowLayerOrder; }
@@ -159,6 +166,11 @@ public:
 			Tab*				TopTab();
 			Tab*				BottomTab();
 
+			Variable*			LeftVar() { return LeftTab()->Var(); }
+			Variable*			RightVar() { return RightTab()->Var(); }
+			Variable*			TopVar() { return TopTab()->Var(); }
+			Variable*			BottomVar() { return BottomTab()->Var(); }
+
 			BRect				Frame();
 
 			bool				PropagateToGroup(SATGroup* group);
@@ -167,6 +179,9 @@ public:
 
 private:
 		friend class SATGroup;
+			void				_UninitConstraints();
+			void				_UpdateConstraintValues();
+
 			/*! SATGroup adds new windows to the area. */
 			bool				_AddWindow(SATWindow* window,
 									SATWindow* after = NULL);
@@ -188,7 +203,9 @@ private:
 			BReference<Crossing>	_CrossingByPosition(Crossing* crossing,
 										SATGroup* group);
 
-			SATGroup*			fGroup;
+			void				_MoveToSAT(SATWindow* topWindow);
+
+			BReference<SATGroup>	fGroup;
 
 			SATWindowList		fWindowList;
 
@@ -198,6 +215,17 @@ private:
 			BReference<Crossing>	fRightTopCrossing;
 			BReference<Crossing>	fLeftBottomCrossing;
 			BReference<Crossing>	fRightBottomCrossing;
+
+			Constraint*			fMinWidthConstraint;
+			Constraint*			fMinHeightConstraint;
+			Constraint*			fMaxWidthConstraint;
+			Constraint*			fMaxHeightConstraint;
+			Constraint*			fKeepMaxWidthConstraint;
+			Constraint*			fKeepMaxHeightConstraint;
+			Constraint*			fWidthConstraint;
+			Constraint*			fHeightConstraint;
+			
+			MagneticBorder		fMagneticBorder;
 };
 
 
@@ -218,8 +246,6 @@ public:
 								~SATGroup();
 
 			LinearSpec*			GetLinearSpec() { return &fLinearSpec; }
-
-			void				AdjustWindows(SATWindow* triggerWindow);
 
 			/*! Create a new WindowArea from the crossing and add the window. */
 			bool				AddWindow(SATWindow* window, Tab* left, Tab* top,

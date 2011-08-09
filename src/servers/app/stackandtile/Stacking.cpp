@@ -237,13 +237,14 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 	for (int i = 0; i < group->CountItems(); i++) {
 		SATWindow* satWindow = group->WindowAt(i);
 		// search for stacking parent
-		Window* win = satWindow->GetWindow();
-		if (win == window || !win->Decorator())
+		Window* parentWindow = satWindow->GetWindow();
+		if (parentWindow == window || parentWindow->Decorator() == NULL)
 			continue;
-		if (_IsStackableWindow(win) == false
+		if (_IsStackableWindow(parentWindow) == false
 			|| _IsStackableWindow(window) == false)
 			continue;
-		Decorator::Tab* tab = win->Decorator()->TabAt(win->PositionInStack());
+		Decorator::Tab* tab = parentWindow->Decorator()->TabAt(
+			parentWindow->PositionInStack());
 		if (tab == NULL)
 			continue;
 		if (tab->tabRect.Contains(mousePosition)) {

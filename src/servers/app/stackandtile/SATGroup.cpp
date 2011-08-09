@@ -22,6 +22,12 @@
 
 
 using namespace std;
+using namespace LinearProgramming;
+
+
+const float kExtentPenalty = 1;
+const float kHighPenalty = 100;
+const float kInequalityPenalty = 10000;
 
 
 WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
@@ -32,23 +38,16 @@ WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
 	fLeftTopCrossing(leftTop),
 	fRightTopCrossing(rightTop),
 	fLeftBottomCrossing(leftBottom),
-	fRightBottomCrossing(rightBottom)
+	fRightBottomCrossing(rightBottom),
+
+	fMinWidthConstraint(NULL),
+	fMinHeightConstraint(NULL),
+	fMaxWidthConstraint(NULL),
+	fMaxHeightConstraint(NULL),
+	fWidthConstraint(NULL),
+	fHeightConstraint(NULL)
 {
 
-}
-
-
-bool
-WindowArea::SetGroup(SATGroup* group)
-{
-	if (group && !group->fWindowAreaList.AddItem(this))
-		return false;
-
-	if (fGroup)
-		fGroup->fWindowAreaList.RemoveItem(this);
-
-	fGroup = group;
-	return true;
 }
 
 
@@ -58,7 +57,120 @@ WindowArea::~WindowArea()
 		fGroup->WindowAreaRemoved(this);
 
 	_CleanupCorners();
-	SetGroup(NULL);
+	fGroup->fWindowAreaList.RemoveItem(this);
+
+	_UninitConstraints();
+}
+
+
+bool
+WindowArea::Init(SATGroup* group)
+{
+	_UninitConstraints();
+
+	if (group != NULL && group->fWindowAreaList.AddItem(this) == false)
+		return false;
+
+	fGroup = group;
+
+	LinearSpec* linearSpec = fGroup->GetLinearSpec();
+
+	fMinWidthConstraint = linearSpec->AddConstraint(1.0, RightVar(), -1.0,
+		LeftVar(), kGE, 0);
+	fMinHeightConstraint = linearSpec->AddConstraint(1.0, BottomVar(), -1.0,
+		TopVar(), kGE, 0);
+
+	fMaxWidthConstraint = linearSpec->AddConstraint(1.0, RightVar(), -1.0,
+		LeftVar(), kLE, 0, kInequalityPenalty, kInequalityPenalty);
+	fMaxHeightConstraint = linearSpec->AddConstraint(1.0, BottomVar(), -1.0,
+		TopVar(), kLE, 0, kInequalityPenalty, kInequalityPenalty);
+
+	// Width and height have soft constraints
+	fWidthConstraint = linearSpec->AddConstraint(1.0, RightVar(), -1.0,
+		LeftVar(), kEQ, 0, kExtentPenalty,
+		kExtentPenalty);
+	fHeightConstraint = linearSpec->AddConstraint(-1.0, TopVar(), 1.0,
+		BottomVar(), kEQ, 0, kExtentPenalty,
+		kExtentPenalty);
+
+	if (!fMinWidthConstraint || !fMinHeightConstraint || !fWidthConstraint
+		|| !fHeightConstraint || !fMaxWidthConstraint
+		|| !fMaxHeightConstraint)
+		return false;
+
+	return true;
+}
+
+
+void
+WindowArea::DoGroupLayout()
+{
+	SATWindow* parentWindow = fWindowLayerOrder.ItemAt(0);
+	if (parentWindow == NULL)
+		return;
+
+	BRect frame = parentWindow->CompleteWindowFrame();
+	// Make it also work for solver which don't support negative variables
+	frame.OffsetBy(kMakePositiveOffset, kMakePositiveOffset);
+
+	// adjust window size soft constraints
+	fWidthConstraint->SetRightSide(frame.Width());
+	fHeightConstraint->SetRightSide(frame.Height());
+
+	LinearSpec* linearSpec = fGroup->GetLinearSpec();
+	Constraint* leftConstraint = linearSpec->AddConstraint(1.0, LeftVar(),
+		kEQ, frame.left);
+	Constraint* topConstraint = linearSpec->AddConstraint(1.0, TopVar(), kEQ,
+		frame.top);
+
+	// give soft constraints a high penalty
+	fWidthConstraint->SetPenaltyNeg(kHighPenalty);
+	fWidthConstraint->SetPenaltyPos(kHighPenalty);
+	fHeightConstraint->SetPenaltyNeg(kHighPenalty);
+	fHeightConstraint->SetPenaltyPos(kHighPenalty);
+
+	// After we set the new parameter solve and apply the new layout.
+	ResultType result;
+	for (int32 tries = 0; tries < 15; tries++) {
+		result = fGroup->GetLinearSpec()->Solve();
+		if (result == kInfeasible) {
+			debug_printf("can't solve constraints!\n");
+			break;
+		}
+		if (result == kOptimal) {
+			const WindowAreaList& areas = fGroup->GetAreaList();
+			for (int32 i = 0; i < areas.CountItems(); i++) {
+				WindowArea* area = areas.ItemAt(i);
+				area->_MoveToSAT(parentWindow);
+			}
+			break;
+		}
+	}
+
+	// set penalties back to normal
+	fWidthConstraint->SetPenaltyNeg(kExtentPenalty);
+	fWidthConstraint->SetPenaltyPos(kExtentPenalty);
+	fHeightConstraint->SetPenaltyNeg(kExtentPenalty);
+	fHeightConstraint->SetPenaltyPos(kExtentPenalty);
+
+	linearSpec->RemoveConstraint(leftConstraint);
+	linearSpec->RemoveConstraint(topConstraint);
+}
+
+
+void
+WindowArea::UpdateSizeLimits()
+{
+	_UpdateConstraintValues();
+}
+
+
+void
+WindowArea::UpdateSizeConstaints(const BRect& frame)
+{
+	// adjust window size soft constraints
+	fWidthConstraint->SetRightSide(frame.Width());
+	fHeightConstraint->SetRightSide(frame.Height());
 }
 
 
@@ -78,6 +190,46 @@ WindowArea::TopWindow()
 }
 
 
+void
+WindowArea::_UpdateConstraintValues()
+{
+	SATWindow* topWindow = TopWindow();
+	if (topWindow == NULL)
+		return;
+
+	int32 minWidth, maxWidth;
+	int32 minHeight, maxHeight;
+	SATWindow* window = fWindowList.ItemAt(0);
+	window->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	for (int32 i = 1; i < fWindowList.CountItems(); i++) {
+		window = fWindowList.ItemAt(i);
+		// size limit constraints
+		int32 minW, maxW;
+		int32 minH, maxH;
+		window->GetSizeLimits(&minW, &maxW, &minH, &maxH);
+		if (minWidth < minW)
+			minWidth = minW;
+		if (minHeight < minH)
+			minHeight = minH;
+		if (maxWidth < maxW)
+			maxWidth = maxW;
+		if (maxHeight < maxH)
+			maxHeight = maxH;
+	}
+
+	topWindow->AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fMinWidthConstraint->SetRightSide(minWidth);
+	fMinHeightConstraint->SetRightSide(minHeight);
+
+	fMaxWidthConstraint->SetRightSide(maxWidth);
+	fMaxHeightConstraint->SetRightSide(maxHeight);
+
+	BRect frame = topWindow->CompleteWindowFrame();
+	fWidthConstraint->SetRightSide(frame.Width());
+	fHeightConstraint->SetRightSide(frame.Height());
+}
+
+
 bool
 WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 {
@@ -94,6 +246,8 @@ WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 		_InitCorners();
 
 	fWindowLayerOrder.AddItem(window);
+
+	_UpdateConstraintValues();
 	return true;
 }
 
@@ -105,6 +259,8 @@ WindowArea::_RemoveWindow(SATWindow* window)
 		return false;
 
 	fWindowLayerOrder.RemoveItem(window);
+	_UpdateConstraintValues();
+
 	window->RemovedFromArea(this);
 	ReleaseReference();
 	return true;
@@ -169,8 +325,24 @@ WindowArea::PropagateToGroup(SATGroup* group)
 	fLeftBottomCrossing = newLeftBottom;
 	fRightBottomCrossing = newRightBottom;
 
-	for (int i = 0; i < fWindowList.CountItems(); i++)
-		fWindowList.ItemAt(i)->PropagateToGroup(group, this);
+	_InitCorners();
+
+	BReference<SATGroup> oldGroup = fGroup;
+	// manage constraints
+	if (Init(group) == false)
+		return false;
+	oldGroup->fWindowAreaList.RemoveItem(this);
+	for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+		SATWindow* window = fWindowList.ItemAt(i);
+		if (oldGroup->fSATWindowList.RemoveItem(window) == false)
+			return false;
+		if (group->fSATWindowList.AddItem(window) == false) {
+			_UninitConstraints();
+			return false;
+		}
+	}
+
+	_UpdateConstraintValues();
 
 	return true;
 }
@@ -182,6 +354,24 @@ WindowArea::MoveToTopLayer(SATWindow* window)
 	if (!fWindowLayerOrder.RemoveItem(window))
 		return false;
 	return fWindowLayerOrder.AddItem(window);
+}
+
+
+void
+WindowArea::_UninitConstraints()
+{
+	delete fMinWidthConstraint;
+	delete fMinHeightConstraint;
+	delete fMaxWidthConstraint;
+	delete fMaxHeightConstraint;
+	delete fWidthConstraint;
+	delete fHeightConstraint;
+	fMinWidthConstraint = NULL;
+	fMinHeightConstraint = NULL;
+	fMaxWidthConstraint = NULL;
+	fMaxHeightConstraint = NULL;
+	fWidthConstraint = NULL;
+	fHeightConstraint = NULL;
 }
 
 
@@ -198,7 +388,7 @@ WindowArea::_CrossingByPosition(Crossing* crossing, SATGroup* group)
 		return crossRef;
 
 	Tab* oldVTab = crossing->VerticalTab();
-	crossRef = hTab->FindCrossing(oldHTab->Position());
+	crossRef = hTab->FindCrossing(oldVTab->Position());
 	if (crossRef)
 		return crossRef;
 
@@ -294,6 +484,38 @@ WindowArea::_UnsetNeighbourCorner(Corner* neighbour, Corner* opponent)
 }
 
 
+void
+WindowArea::_MoveToSAT(SATWindow* topWindow)
+{
+	int32 workspace = topWindow->GetWindow()->CurrentWorkspace();
+	Desktop* desktop = topWindow->GetWindow()->Desktop();
+
+	BRect frameSAT(LeftVar()->Value() - kMakePositiveOffset,
+		TopVar()->Value() - kMakePositiveOffset,
+		RightVar()->Value() - kMakePositiveOffset,
+		BottomVar()->Value() - kMakePositiveOffset);
+
+	for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+		SATWindow* window = fWindowList.ItemAt(i);
+		window->AdjustSizeLimits(frameSAT);
+
+		BRect frame = window->CompleteWindowFrame();
+		float deltaToX = round(frameSAT.left - frame.left);
+		float deltaToY = round(frameSAT.top - frame.top);
+		frame.OffsetBy(deltaToX, deltaToY);
+		float deltaByX = round(frameSAT.right - frame.right);
+		float deltaByY = round(frameSAT.bottom - frame.bottom);
+
+		desktop->MoveWindowBy(window->GetWindow(), deltaToX, deltaToY,
+			workspace);
+		// Update frame to the new position
+		desktop->ResizeWindowBy(window->GetWindow(), deltaByX, deltaByY);
+	}
+
+	UpdateSizeConstaints(frameSAT);
+}
+
+
 Corner::Corner()
 	:
 	status(kNotDockable),
@@ -308,21 +530,21 @@ Corner::Trace() const
 {
 	switch (status) {
 		case kFree:
-			STRACE_SAT("free corner\n");
+			debug_printf("free corner\n");
 			break;
 
 		case kUsed:
 		{
-			STRACE_SAT("attached windows:\n");
+			debug_printf("attached windows:\n");
 			const SATWindowList& list = windowArea->WindowList();
 			for (int i = 0; i < list.CountItems(); i++) {
-				STRACE_SAT("- %s\n", list.ItemAt(i)->GetWindow()->Title());
+				debug_printf("- %s\n", list.ItemAt(i)->GetWindow()->Title());
 			}
 			break;
 		}
 
 		case kNotDockable:
-			STRACE_SAT("not dockable\n");
+			debug_printf("not dockable\n");
 			break;
 	};
 }
@@ -333,8 +555,6 @@ Crossing::Crossing(Tab* vertical, Tab* horizontal)
 	fVerticalTab(vertical),
 	fHorizontalTab(horizontal)
 {
-	fVerticalTab->AcquireReference();
-	fHorizontalTab->AcquireReference();
 }
 
 
@@ -342,9 +562,6 @@ Crossing::~Crossing()
 {
 	fVerticalTab->RemoveCrossing(this);
 	fHorizontalTab->RemoveCrossing(this);
-
-	fVerticalTab->ReleaseReference();
-	fHorizontalTab->ReleaseReference();
 }
 
 
@@ -379,13 +596,13 @@ Crossing::HorizontalTab() const
 void
 Crossing::Trace() const
 {
-	STRACE_SAT("left-top corner: ");
+	debug_printf("left-top corner: ");
 	fCorners[Corner::kLeftTop].Trace();
-	STRACE_SAT("right-top corner: ");
+	debug_printf("right-top corner: ");
 	fCorners[Corner::kRightTop].Trace();
-	STRACE_SAT("left-bottom corner: ");
+	debug_printf("left-bottom corner: ");
 	fCorners[Corner::kLeftBottom].Trace();
-	STRACE_SAT("right-bottom corner: ");
+	debug_printf("right-bottom corner: ");
 	fCorners[Corner::kRightBottom].Trace();
 }
 
@@ -502,12 +719,14 @@ Tab::FindCrossingIndex(float pos)
 {
 	if (fOrientation == kVertical) {
 		for (int32 i = 0; i < fCrossingList.CountItems(); i++) {
-			if (fCrossingList.ItemAt(i)->HorizontalTab()->Position() == pos)
+			if (fabs(fCrossingList.ItemAt(i)->HorizontalTab()->Position() - pos)
+				< 0.0001)
 				return i;
 		}
 	} else {
 		for (int32 i = 0; i < fCrossingList.CountItems(); i++) {
-			if (fCrossingList.ItemAt(i)->VerticalTab()->Position() == pos)
+			if (fabs(fCrossingList.ItemAt(i)->VerticalTab()->Position() - pos)
+				< 0.0001)
 				return i;
 		}
 	}
@@ -557,7 +776,6 @@ SATGroup::SATGroup()
 
 SATGroup::~SATGroup()
 {
-	ASSERT(fSATWindowList.CountItems() == 0);
 	// Should be empty
 	//while (fSATWindowList.CountItems() > 0)
 	//	RemoveWindow(fSATWindowList.ItemAt(0));
@@ -628,7 +846,7 @@ SATGroup::AddWindow(SATWindow* window, Tab* left, Tab* top, Tab* right,
 	if (!area)
 		return false;
 	// the area register itself in our area list
-	if (!area->SetGroup(this)) {
+	if (area->Init(this) == false) {
 		delete area;
 		return false;
 	}
@@ -730,18 +948,6 @@ Tab*
 SATGroup::FindVerticalTab(float position)
 {
 	return _FindTab(fVerticalTabs, position);
-}
-
-
-void
-SATGroup::AdjustWindows(SATWindow* triggerWindow)
-{
-	// set window locations and sizes
-	for (int i = 0; i < fSATWindowList.CountItems(); i++) {
-		SATWindow* windowSAT = fSATWindowList.ItemAt(i);
-		windowSAT->MoveWindowToSAT(
-			triggerWindow->GetWindow()->CurrentWorkspace());
-	}
 }
 
 
@@ -927,7 +1133,7 @@ Tab*
 SATGroup::_FindTab(const TabList& list, float position)
 {
 	for (int i = 0; i < list.CountItems(); i++)
-		if (list.ItemAt(i)->Position() == position)
+		if (fabs(list.ItemAt(i)->Position() - position) < 0.00001)
 			return list.ItemAt(i);
 
 	return NULL;

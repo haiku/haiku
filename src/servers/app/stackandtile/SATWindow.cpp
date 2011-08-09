@@ -20,235 +20,6 @@
 
 
 using namespace BPrivate;
-using namespace LinearProgramming;
-
-
-const float kExtentPenalty = 1;
-const float kHighPenalty = 10;
-const float kInequalityPenalty = 10000;
-
-
-GroupCookie::GroupCookie(SATWindow* satWindow)
-	:
-	fSATWindow(satWindow),
-
-	fWindowArea(NULL),
-
-	fLeftBorder(NULL),
-	fTopBorder(NULL),
-	fRightBorder(NULL),
-	fBottomBorder(NULL),
-
-	fMinWidthConstraint(NULL),
-	fMinHeightConstraint(NULL),
-	fMaxWidthConstraint(NULL),
-	fMaxHeightConstraint(NULL),
-	fWidthConstraint(NULL),
-	fHeightConstraint(NULL)
-{
-}
-
-
-GroupCookie::~GroupCookie()
-{
-	Uninit();
-}
-
-
-void
-GroupCookie::DoGroupLayout()
-{
-	if (!fSATGroup.Get())
-		return;
-
-	BRect frame = fSATWindow->CompleteWindowFrame();
-	// Make it also work for solver which don't support negative variables
-	frame.OffsetBy(kMakePositiveOffset, kMakePositiveOffset);
-
-	// adjust window size soft constraints
-	fWidthConstraint->SetRightSide(frame.Width());
-	fHeightConstraint->SetRightSide(frame.Height());
-
-	LinearSpec* linearSpec = fSATGroup->GetLinearSpec();
-	Constraint* leftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder,
-		kEQ, frame.left);
-	Constraint* topConstraint = linearSpec->AddConstraint(1.0, fTopBorder, kEQ,
-		frame.top);
-
-	// give soft constraints a high penalty
-	fWidthConstraint->SetPenaltyNeg(kHighPenalty);
-	fWidthConstraint->SetPenaltyPos(kHighPenalty);
-	fHeightConstraint->SetPenaltyNeg(kHighPenalty);
-	fHeightConstraint->SetPenaltyPos(kHighPenalty);
-
-	// After we set the new parameter solve and apply the new layout.
-	ResultType result;
-	for (int32 tries = 0; tries < 15; tries++) {
-		result = fSATGroup->GetLinearSpec()->Solve();
-		if (result == kInfeasible) {
-			debug_printf("can't solve constraints!\n");
-			break;
-		}
-		if (result == kOptimal) {
-			fSATGroup->AdjustWindows(fSATWindow);
-			break;
-		}
-	}
-
-	// set penalties back to normal
-	fWidthConstraint->SetPenaltyNeg(kExtentPenalty);
-	fWidthConstraint->SetPenaltyPos(kExtentPenalty);
-	fHeightConstraint->SetPenaltyNeg(kExtentPenalty);
-	fHeightConstraint->SetPenaltyPos(kExtentPenalty);
-
-	linearSpec->RemoveConstraint(leftConstraint);
-	linearSpec->RemoveConstraint(topConstraint);
-}
-
-
-void
-GroupCookie::MoveWindow(int32 workspace)
-{
-	Window* window = fSATWindow->GetWindow();
-	Desktop* desktop = window->Desktop();
-
-	BRect frame = fSATWindow->CompleteWindowFrame();
-	BRect frameSAT(fLeftBorder->Value() - kMakePositiveOffset,
-		fTopBorder->Value() - kMakePositiveOffset,
-		fRightBorder->Value() - kMakePositiveOffset,
-		fBottomBorder->Value() - kMakePositiveOffset);
-
-	fSATWindow->AdjustSizeLimits(frameSAT);
-	desktop->MoveWindowBy(window, round(frameSAT.left - frame.left),
-		round(frameSAT.top - frame.top), workspace);
-
-	// Update frame to the new position
-	frame.OffsetBy(round(frameSAT.left - frame.left),
-		round(frameSAT.top - frame.top));
-	desktop->ResizeWindowBy(window, round(frameSAT.right - frame.right),
-		round(frameSAT.bottom - frame.bottom));
-
-	UpdateSizeConstaints(frameSAT);
-}
-
-
-void
-GroupCookie::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
-	int32 maxHeight)
-{
-	fMinWidthConstraint->SetRightSide(minWidth);
-	fMinHeightConstraint->SetRightSide(minHeight);
-	fMaxWidthConstraint->SetRightSide(maxWidth);
-	fMaxHeightConstraint->SetRightSide(maxHeight);
-}
-
-
-void
-GroupCookie::UpdateSizeConstaints(const BRect& frame)
-{
-	// adjust window size soft constraints
-	if (fSATWindow->IsHResizeable() == true)
-		fWidthConstraint->SetRightSide(frame.Width());
-	if (fSATWindow->IsVResizeable() == true)
-		fHeightConstraint->SetRightSide(frame.Height());
-}
-
-
-bool
-GroupCookie::Init(SATGroup* group, WindowArea* area)
-{
-	ASSERT(fSATGroup.Get() == NULL);
-
-	fSATGroup.SetTo(group);
-	fWindowArea = area;
-
-	LinearSpec* linearSpec = group->GetLinearSpec();
-	// create variables
-	fLeftBorder = area->LeftTab()->Var();
-	fTopBorder = area->TopTab()->Var();
-	fRightBorder = area->RightTab()->Var();
-	fBottomBorder = area->BottomTab()->Var();
-
-	// size limit constraints
-	int32 minWidth, maxWidth;
-	int32 minHeight, maxHeight;
-	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fSATWindow->AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
-
-	fMinWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
-		fLeftBorder, kGE, minWidth);
-	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
-		fTopBorder, kGE, minHeight);
-
-	fMaxWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
-		fLeftBorder, kLE, maxWidth, kInequalityPenalty, kInequalityPenalty);
-	fMaxHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
-		fTopBorder, kLE, maxHeight, kInequalityPenalty, kInequalityPenalty);
-
-	// Width and height have soft constraints
- 	BRect frame = fSATWindow->CompleteWindowFrame();
-	fWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
-		fLeftBorder, kEQ, frame.Width(), kExtentPenalty,
-		kExtentPenalty);
-	fHeightConstraint = linearSpec->AddConstraint(-1.0, fTopBorder, 1.0,
-		fBottomBorder, kEQ, frame.Height(), kExtentPenalty,
-		kExtentPenalty);
-
-	if (!fMinWidthConstraint || !fMinHeightConstraint || !fWidthConstraint
-		|| !fHeightConstraint || !fMaxWidthConstraint
-		|| !fMaxHeightConstraint) {
-		// clean up
-		Uninit();
-		return false;
-	}
-
-	return true;
-}
-
-
-void
-GroupCookie::Uninit()
-{
-	fLeftBorder = NULL;
-	fTopBorder = NULL;
-	fRightBorder = NULL;
-	fBottomBorder = NULL;
-
-	delete fMinWidthConstraint;
-	delete fMinHeightConstraint;
-	delete fMaxWidthConstraint;
-	delete fMaxHeightConstraint;
-	delete fWidthConstraint;
-	delete fHeightConstraint;
-	fMinWidthConstraint = NULL;
-	fMinHeightConstraint = NULL;
-	fMaxWidthConstraint = NULL;
-	fMaxHeightConstraint = NULL;
-	fWidthConstraint = NULL;
-	fHeightConstraint = NULL;
-
-	fSATGroup.Unset();
-	fWindowArea = NULL;
-}
-
-
-bool
-GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
-{
-	if (!fSATGroup->fSATWindowList.RemoveItem(fSATWindow))
-		return false;
-	Uninit();
-
-	if (!Init(group, area))
-		return false;
-
-	if (!area->SetGroup(group) || !group->fSATWindowList.AddItem(fSATWindow)) {
-		Uninit();
-		return false;
-	}
-
-	return true;
-}
 
 
 // #pragma mark -
@@ -259,13 +30,11 @@ SATWindow::SATWindow(StackAndTile* sat, Window* window)
 	fWindow(window),
 	fStackAndTile(sat),
 
-	fOwnGroupCookie(this),
-	fForeignGroupCookie(this),
+	fWindowArea(NULL),
 
 	fOngoingSnapping(NULL),
 	fSATStacking(this),
-	fSATTiling(this),
-	fShutdown(false)
+	fSATTiling(this)
 {
 	fId = _GenerateId();
 
@@ -278,9 +47,6 @@ SATWindow::SATWindow(StackAndTile* sat, Window* window)
 	fOriginalWidth = frame.Width();
 	fOriginalHeight = frame.Height();
 
-	fGroupCookie = &fOwnGroupCookie;
-	_InitGroup();
-
 	fSATSnappingBehaviourList.AddItem(&fSATStacking);
 	fSATSnappingBehaviourList.AddItem(&fSATTiling);
 }
@@ -288,12 +54,8 @@ SATWindow::SATWindow(StackAndTile* sat, Window* window)
 
 SATWindow::~SATWindow()
 {
-	fShutdown = true;
-
-	if (fForeignGroupCookie.GetGroup())
-		fForeignGroupCookie.GetGroup()->RemoveWindow(this);
-	if (fOwnGroupCookie.GetGroup())
-		fOwnGroupCookie.GetGroup()->RemoveWindow(this);
+	if (fWindowArea != NULL)
+		fWindowArea->Group()->RemoveWindow(this);
 }
 
 
@@ -307,22 +69,33 @@ SATWindow::GetDecorator() const
 SATGroup*
 SATWindow::GetGroup()
 {
-	if (!fGroupCookie->GetGroup())
-		_InitGroup();
+	if (fWindowArea == NULL) {
+		SATGroup* group = new (std::nothrow)SATGroup;
+		if (group == NULL)
+			return group;
+		BReference<SATGroup> groupRef;
+		groupRef.SetTo(group, true);
 
-	// manually set the tabs of the single window
-	WindowArea* windowArea = fGroupCookie->GetWindowArea();
-	if (!PositionManagedBySAT() && windowArea) {
+		/* AddWindow also will trigger the window to hold a reference on the new
+		group. */
+		if (group->AddWindow(this, NULL, NULL, NULL, NULL) == false)
+			return NULL;
+	}
+
+	ASSERT(fWindowArea != NULL);
+
+	 // manually set the tabs of the single window
+	if (PositionManagedBySAT() == false) {
 		BRect frame = CompleteWindowFrame();
-		windowArea->LeftTopCrossing()->VerticalTab()->SetPosition(frame.left);
-		windowArea->LeftTopCrossing()->HorizontalTab()->SetPosition(frame.top);
-		windowArea->RightBottomCrossing()->VerticalTab()->SetPosition(
+		fWindowArea->LeftTopCrossing()->VerticalTab()->SetPosition(frame.left);
+		fWindowArea->LeftTopCrossing()->HorizontalTab()->SetPosition(frame.top);
+		fWindowArea->RightBottomCrossing()->VerticalTab()->SetPosition(
 			frame.right);
-		windowArea->RightBottomCrossing()->HorizontalTab()->SetPosition(
+		fWindowArea->RightBottomCrossing()->HorizontalTab()->SetPosition(
 			frame.bottom);
 	}
 
-	return fGroupCookie->GetGroup();
+	return fWindowArea->Group();
 }
 
 
@@ -340,16 +113,11 @@ SATWindow::HandleMessage(SATWindow* sender, BPrivate::LinkReceiver& link,
 
 
 bool
-SATWindow::PropagateToGroup(SATGroup* group, WindowArea* area)
+SATWindow::PropagateToGroup(SATGroup* group)
 {
-	return fGroupCookie->PropagateToGroup(group, area);
-}
-
-
-void
-SATWindow::MoveWindowToSAT(int32 workspace)
-{
-	fGroupCookie->MoveWindow(workspace);
+	if (fWindowArea == NULL)
+		return false;
+	return fWindowArea->PropagateToGroup(group);
 }
 
 
@@ -358,16 +126,7 @@ SATWindow::AddedToGroup(SATGroup* group, WindowArea* area)
 {
 	STRACE_SAT("SATWindow::AddedToGroup group: %p window %s\n", group,
 		fWindow->Title());
-	if (fGroupCookie == &fForeignGroupCookie)
-		return false;
-	if (fOwnGroupCookie.GetGroup())
-		fGroupCookie = &fForeignGroupCookie;
-
-	if (!fGroupCookie->Init(group, area)) {
-		fGroupCookie = &fOwnGroupCookie;
-		return false;
-	}
-
+	fWindowArea = area;
 	return true;
 }
 
@@ -382,18 +141,7 @@ SATWindow::RemovedFromGroup(SATGroup* group, bool stayBelowMouse)
 	if (group->CountItems() == 1)
 		group->WindowAt(0)->_RestoreOriginalSize(false);
 
-	if (fShutdown) {
-		fGroupCookie->Uninit();
-		return true;
-	}
-
-	ASSERT(fGroupCookie->GetGroup() == group);
-	fGroupCookie->Uninit();
-	if (fGroupCookie == &fOwnGroupCookie)
-		_InitGroup();
-	else
-		fGroupCookie = &fOwnGroupCookie;
-
+	fWindowArea = NULL;
 	return true;
 }
 
@@ -485,7 +233,8 @@ SATWindow::DoGroupLayout()
 	if (!PositionManagedBySAT())
 		return;
 
-	fGroupCookie->DoGroupLayout();
+	if (fWindowArea != NULL)
+		fWindowArea->DoGroupLayout();
 }
 
 
@@ -584,9 +333,8 @@ SATWindow::SetOriginalSizeLimits(int32 minWidth, int32 maxWidth,
 	fOriginalMinHeight = minHeight;
 	fOriginalMaxHeight = maxHeight;
 
-	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fGroupCookie->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+	if (fWindowArea != NULL)
+		fWindowArea->UpdateSizeLimits();
 }
 
 
@@ -604,7 +352,8 @@ SATWindow::Resized()
 	if (vResizeable)
 		fOriginalHeight = frame.Height();
 
-	fGroupCookie->UpdateSizeConstaints(CompleteWindowFrame());
+	if (fWindowArea != NULL)
+		fWindowArea->UpdateSizeConstaints(CompleteWindowFrame());
 }
 
 
@@ -653,7 +402,7 @@ SATWindow::CompleteWindowFrame()
 bool
 SATWindow::PositionManagedBySAT()
 {
-	if (fGroupCookie->GetGroup() && fGroupCookie->GetGroup()->CountItems() == 1)
+	if (fWindowArea == NULL || fWindowArea->Group()->CountItems() == 1)
 		return false;
 
 	return true;
@@ -720,25 +469,6 @@ void
 SATWindow::GetSettings(BMessage& message)
 {
 	message.AddInt64("window_id", fId);
-}
-
-
-void
-SATWindow::_InitGroup()
-{
-	ASSERT(fGroupCookie == &fOwnGroupCookie);
-	ASSERT(fOwnGroupCookie.GetGroup() == NULL);
-	STRACE_SAT("SATWindow::_InitGroup %s\n", fWindow->Title());
-	SATGroup* group = new (std::nothrow)SATGroup;
-	if (!group)
-		return;
-	BReference<SATGroup> groupRef;
-	groupRef.SetTo(group, true);
-
-	/* AddWindow also will trigger the window to hold a reference on the new
-	group. */
-	if (!groupRef->AddWindow(this, NULL, NULL, NULL, NULL))
-		STRACE_SAT("SATWindow::_InitGroup(): adding window to group failed\n");
 }
 
 
