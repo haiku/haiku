@@ -11,11 +11,11 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 
 Addon radeon_hd.accelerant :
 	atom.cpp
+	gpu.cpp
 	accelerant.cpp
 	engine.cpp
 	hooks.cpp
 	pll.cpp
-	mc.cpp
 	dac.cpp
 	display.cpp
 	tmds.cpp

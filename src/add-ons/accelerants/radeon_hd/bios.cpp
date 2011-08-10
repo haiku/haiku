@@ -110,6 +110,10 @@ radeon_init_bios(uint8* bios)
 	radeon_bios_init_scratch();
 	atom_allocate_fb_scratch(gAtomContext);
 
+	// TODO : this is only *required* on cards <= r500
+	// is it ok to run on cards > r500 before asic_init?
+	radeon_gpu_reset();
+
 	atom_asic_init(gAtomContext);
 		// Post card
 

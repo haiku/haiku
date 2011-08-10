@@ -29,11 +29,6 @@
 #define __R600_REG_H__
 
 
-#include "r600_reg_auto_r6xx.h"
-#include "r600_reg_r6xx.h"
-#include "r600_reg_r7xx.h"
-
-
 #define R600_PCIE_PORT_INDEX                0x0038
 #define R600_PCIE_PORT_DATA                 0x003c
 

@@ -13,7 +13,7 @@
 
 #include "bios.h"
 #include "display.h"
-#include "mc.h"
+#include "gpu.h"
 #include "pll.h"
 #include "utility.h"
 
