@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -5308,7 +5308,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	FUNCTION(("file_open_entry_ref(ref = (%ld, %Ld, %s), openMode = %d)\n",
 		mountID, directoryID, name, openMode));
 
-	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
+	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 
 	// get the vnode matching the entry_ref
 	struct vnode* vnode;
@@ -5337,7 +5337,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 static int
 file_open(int fd, char* path, int openMode, bool kernel)
 {
-	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
+	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 
 	FUNCTION(("file_open: fd: %d, entry path = '%s', omode %d, kernel %d\n",
 		fd, path, openMode, kernel));
@@ -6396,11 +6396,17 @@ attr_create(int fd, char* path, const char* name, uint32 type,
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
+	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path,
-		(openMode & O_NOTRAVERSE) != 0, &vnode, NULL, kernel);
+	status_t status = fd_and_path_to_vnode(fd, path, traverse, &vnode, NULL,
+		kernel);
 	if (status != B_OK)
 		return status;
+
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
+		status = B_LINK_LIMIT;
+		goto err;
+	}
 
 	if (!HAS_FS_CALL(vnode, create_attr)) {
 		status = B_READ_ONLY_DEVICE;
@@ -6436,11 +6442,17 @@ attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
+	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path,
-		(openMode & O_NOTRAVERSE) != 0, &vnode, NULL, kernel);
+	status_t status = fd_and_path_to_vnode(fd, path, traverse, &vnode, NULL,
+		kernel);
 	if (status != B_OK)
 		return status;
+
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
+		status = B_LINK_LIMIT;
+		goto err;
+	}
 
 	if (!HAS_FS_CALL(vnode, open_attr)) {
 		status = B_NOT_SUPPORTED;
