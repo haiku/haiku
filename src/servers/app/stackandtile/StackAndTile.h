@@ -72,7 +72,7 @@ public:
 									Window* behindOf);
 	virtual void				WindowWorkspacesChanged(Window* window,
 									uint32 workspaces);
-	virtual void				WindowHidden(Window* window);
+	virtual void				WindowHidden(Window* window, bool fromMinimize);
 	virtual void				WindowMinimized(Window* window, bool minimize);
 
 	virtual void				WindowTabLocationChanged(Window* window,

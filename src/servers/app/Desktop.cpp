@@ -1261,7 +1261,7 @@ Desktop::ShowWindow(Window* window)
 
 
 void
-Desktop::HideWindow(Window* window)
+Desktop::HideWindow(Window* window, bool fromMinimize)
 {
 	if (window->IsHidden())
 		return;
@@ -1310,7 +1310,7 @@ Desktop::HideWindow(Window* window)
 		}
 	}
 
-	NotifyWindowHidden(window);
+	NotifyWindowHidden(window, fromMinimize);
 
 	UnlockAllWindows();
 
@@ -1326,7 +1326,7 @@ Desktop::MinimizeWindow(Window* window, bool minimize)
 		return;
 
 	if (minimize && !window->IsHidden()) {
-		HideWindow(window);
+		HideWindow(window, true);
 		window->SetMinimized(minimize);
 		NotifyWindowMinimized(window, minimize);
 	} else if (!minimize && window->IsHidden()) {

@@ -166,7 +166,8 @@ public:
 									Window* behindOf = NULL);
 
 			void				ShowWindow(Window* window);
-			void				HideWindow(Window* window);
+			void				HideWindow(Window* window,
+									bool fromMinimize = false);
 			void				MinimizeWindow(Window* window, bool minimize);
 
 			void				MoveWindowBy(Window* window, float x, float y,

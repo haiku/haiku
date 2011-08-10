@@ -349,7 +349,7 @@ StackAndTile::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 
 
 void
-StackAndTile::WindowHidden(Window* window)
+StackAndTile::WindowHidden(Window* window, bool fromMinimize)
 {
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)
@@ -357,7 +357,7 @@ StackAndTile::WindowHidden(Window* window)
 	SATGroup* group = satWindow->GetGroup();
 	if (group == NULL)
 		return;
-	if (group->CountItems() > 1)
+	if (fromMinimize == false && group->CountItems() > 1)
 		group->RemoveWindow(satWindow);
 }
 
