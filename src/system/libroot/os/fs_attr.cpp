@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,11 +21,11 @@
 
 
 static DIR *
-open_attr_dir(int file, const char *path)
+open_attr_dir(int file, const char *path, bool traverse)
 {
 	DIR *dir;
 
-	int fd = _kern_open_attr_dir(file, path);
+	int fd = _kern_open_attr_dir(file, path, traverse);
 	if (fd < 0) {
 		errno = fd;
 		return NULL;
@@ -126,14 +126,20 @@ fs_close_attr(int fd)
 extern "C" DIR*
 fs_open_attr_dir(const char* path)
 {
-	return open_attr_dir(-1, path);
+	return open_attr_dir(-1, path, true);
 }
 
 
 extern "C" DIR*
+fs_lopen_attr_dir(const char* path)
+{
+	return open_attr_dir(-1, path, false);
+}
+
+extern "C" DIR*
 fs_fopen_attr_dir(int fd)
 {
-	return open_attr_dir(fd, NULL);
+	return open_attr_dir(fd, NULL, false);
 }
 
 

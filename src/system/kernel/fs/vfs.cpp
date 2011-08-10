@@ -5207,9 +5207,7 @@ static int
 open_dir_vnode(struct vnode* vnode, bool kernel)
 {
 	void* cookie;
-	int status;
-
-	status = FS_CALL(vnode, open_dir, &cookie);
+	status_t status = FS_CALL(vnode, open_dir, &cookie);
 	if (status != B_OK)
 		return status;
 
@@ -5232,18 +5230,17 @@ open_dir_vnode(struct vnode* vnode, bool kernel)
 static int
 open_attr_dir_vnode(struct vnode* vnode, bool kernel)
 {
-	void* cookie;
-	int status;
-
 	if (!HAS_FS_CALL(vnode, open_attr_dir))
 		return B_NOT_SUPPORTED;
 
-	status = FS_CALL(vnode, open_attr_dir, &cookie);
+	void* cookie;
+	status_t status = FS_CALL(vnode, open_attr_dir, &cookie);
 	if (status != B_OK)
 		return status;
 
 	// directory is opened, create a fd
-	status = get_new_fd(FDTYPE_ATTR_DIR, NULL, vnode, cookie, O_CLOEXEC, kernel);
+	status = get_new_fd(FDTYPE_ATTR_DIR, NULL, vnode, cookie, O_CLOEXEC,
+		kernel);
 	if (status >= 0)
 		return status;
 
@@ -5258,14 +5255,12 @@ static int
 file_create_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	int openMode, int perms, bool kernel)
 {
-	struct vnode* directory;
-	int status;
-
 	FUNCTION(("file_create_entry_ref: name = '%s', omode %x, perms %d, "
 		"kernel %d\n", name, openMode, perms, kernel));
 
 	// get directory to put the new file in
-	status = get_vnode(mountID, directoryID, &directory, true, false);
+	struct vnode* directory;
+	status_t status = get_vnode(mountID, directoryID, &directory, true, false);
 	if (status != B_OK)
 		return status;
 
@@ -5279,15 +5274,14 @@ file_create_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 static int
 file_create(int fd, char* path, int openMode, int perms, bool kernel)
 {
-	char name[B_FILE_NAME_LENGTH];
-	struct vnode* directory;
-	int status;
-
 	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path,
 		openMode, perms, kernel));
 
 	// get directory to put the new file in
-	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
+	char name[B_FILE_NAME_LENGTH];
+	struct vnode* directory;
+	status_t status = fd_and_path_to_dir_vnode(fd, path, &directory, name,
+		kernel);
 	if (status < 0)
 		return status;
 
@@ -5577,15 +5571,14 @@ dir_create(int fd, char* path, int perms, bool kernel)
 static int
 dir_open_entry_ref(dev_t mountID, ino_t parentID, const char* name, bool kernel)
 {
-	struct vnode* vnode;
-	int status;
-
 	FUNCTION(("dir_open_entry_ref()\n"));
 
-	if (name && *name == '\0')
+	if (name && name[0] == '\0')
 		return B_BAD_VALUE;
 
 	// get the vnode matching the entry_ref/node_ref
+	struct vnode* vnode;
+	status_t status;
 	if (name) {
 		status = entry_ref_to_vnode(mountID, parentID, name, true, kernel,
 			&vnode);
@@ -6261,15 +6254,13 @@ static status_t
 common_path_read_stat(int fd, char* path, bool traverseLeafLink,
 	struct stat* stat, bool kernel)
 {
-	struct vnode* vnode;
-	status_t status;
-
 	FUNCTION(("common_path_read_stat: fd: %d, path '%s', stat %p,\n", fd, path,
 		stat));
 
-	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, NULL,
-		kernel);
-	if (status < 0)
+	struct vnode* vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode,
+		NULL, kernel);
+	if (status != B_OK)
 		return status;
 
 	status = FS_CALL(vnode, read_stat, stat);
@@ -6290,15 +6281,13 @@ static status_t
 common_path_write_stat(int fd, char* path, bool traverseLeafLink,
 	const struct stat* stat, int statMask, bool kernel)
 {
-	struct vnode* vnode;
-	status_t status;
-
 	FUNCTION(("common_write_stat: fd: %d, path '%s', stat %p, stat_mask %d, "
 		"kernel %d\n", fd, path, stat, statMask, kernel));
 
-	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, NULL,
-		kernel);
-	if (status < 0)
+	struct vnode* vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode,
+		NULL, kernel);
+	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(vnode, write_stat))
@@ -6313,15 +6302,14 @@ common_path_write_stat(int fd, char* path, bool traverseLeafLink,
 
 
 static int
-attr_dir_open(int fd, char* path, bool kernel)
+attr_dir_open(int fd, char* path, bool traverseLeafLink, bool kernel)
 {
-	struct vnode* vnode;
-	int status;
-
 	FUNCTION(("attr_dir_open(fd = %d, path = '%s', kernel = %d)\n", fd, path,
 		kernel));
 
-	status = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
+	struct vnode* vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode,
+		NULL, kernel);
 	if (status != B_OK)
 		return status;
 
@@ -8252,7 +8240,7 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 
 
 int
-_kern_open_attr_dir(int fd, const char* path)
+_kern_open_attr_dir(int fd, const char* path, bool traverseLeafLink)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -8261,7 +8249,8 @@ _kern_open_attr_dir(int fd, const char* path)
 	if (path != NULL)
 		pathBuffer.SetTo(path);
 
-	return attr_dir_open(fd, path ? pathBuffer.LockBuffer() : NULL, true);
+	return attr_dir_open(fd, path ? pathBuffer.LockBuffer() : NULL,
+		traverseLeafLink, true);
 }
 
 
@@ -9225,7 +9214,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 
 
 int
-_user_open_attr_dir(int fd, const char* userPath)
+_user_open_attr_dir(int fd, const char* userPath, bool traverseLeafLink)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -9239,7 +9228,7 @@ _user_open_attr_dir(int fd, const char* userPath)
 			return B_BAD_ADDRESS;
 	}
 
-	return attr_dir_open(fd, userPath ? path : NULL, false);
+	return attr_dir_open(fd, userPath ? path : NULL, traverseLeafLink, false);
 }
 
 
