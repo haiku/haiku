@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc.
+ * Copyright 2002-2011, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -814,7 +814,7 @@ status_t
 BNode::InitAttrDir()
 {
 	if (fCStatus == B_OK && fAttrFd < 0) {
-		fAttrFd = _kern_open_attr_dir(fFd, NULL);
+		fAttrFd = _kern_open_attr_dir(fFd, NULL, false);
 		if (fAttrFd < 0)
 			return fAttrFd;
 
