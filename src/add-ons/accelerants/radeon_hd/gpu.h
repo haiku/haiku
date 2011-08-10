@@ -5,8 +5,8 @@
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
-#ifndef RADEON_HD_MC_H
-#define RADEON_HD_MC_H
+#ifndef RADEON_HD_GPU_H
+#define RADEON_HD_GPU_H
 
 
 // GPU Control registers. These are combined as
