@@ -548,7 +548,7 @@ struct attr_entry text_attrs[] = {
 };
 
 char *readmestr = \
-"Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku™.\n"
+"Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku®.\n"
 "Copyright© 2004-2008, François Revol.\n"
 "Google is a trademark of Google, Inc.\n"
 "BeOS is a trademark of ACCESS.\n"

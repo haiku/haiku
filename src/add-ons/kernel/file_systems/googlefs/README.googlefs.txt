@@ -1,9 +1,9 @@
-Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku™.
+Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku®.
 Copyright© 2004, 2005, François Revol.
 Google is a trademark of Google,Inc.
 BeOS is a trademark of PalmSource.
 Zeta is a trademark of yellowTAB GmbH.
-Haiku is a trademark of Haiku Inc.
+Haiku is a trademark of Haiku, Inc.
 
 
 REQUIRES BONE
