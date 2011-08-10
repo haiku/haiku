@@ -485,32 +485,31 @@ WindowArea::_UnsetNeighbourCorner(Corner* neighbour, Corner* opponent)
 
 
 void
-WindowArea::_MoveToSAT(SATWindow* topWindow)
+WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 {
-	int32 workspace = topWindow->GetWindow()->CurrentWorkspace();
-	Desktop* desktop = topWindow->GetWindow()->Desktop();
+	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
+	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
 
 	BRect frameSAT(LeftVar()->Value() - kMakePositiveOffset,
 		TopVar()->Value() - kMakePositiveOffset,
 		RightVar()->Value() - kMakePositiveOffset,
 		BottomVar()->Value() - kMakePositiveOffset);
 
-	for (int32 i = 0; i < fWindowList.CountItems(); i++) {
-		SATWindow* window = fWindowList.ItemAt(i);
-		window->AdjustSizeLimits(frameSAT);
+	SATWindow* topWindow = TopWindow();
+	topWindow->AdjustSizeLimits(frameSAT);
 
-		BRect frame = window->CompleteWindowFrame();
-		float deltaToX = round(frameSAT.left - frame.left);
-		float deltaToY = round(frameSAT.top - frame.top);
-		frame.OffsetBy(deltaToX, deltaToY);
-		float deltaByX = round(frameSAT.right - frame.right);
-		float deltaByY = round(frameSAT.bottom - frame.bottom);
+	BRect frame = topWindow->CompleteWindowFrame();
+	float deltaToX = round(frameSAT.left - frame.left);
+	float deltaToY = round(frameSAT.top - frame.top);
+	frame.OffsetBy(deltaToX, deltaToY);
+	float deltaByX = round(frameSAT.right - frame.right);
+	float deltaByY = round(frameSAT.bottom - frame.bottom);
 
-		desktop->MoveWindowBy(window->GetWindow(), deltaToX, deltaToY,
-			workspace);
-		// Update frame to the new position
-		desktop->ResizeWindowBy(window->GetWindow(), deltaByX, deltaByY);
-	}
+	desktop->MoveWindowBy(topWindow->GetWindow(), deltaToX, deltaToY,
+		workspace);
+	// Update frame to the new position
+	desktop->ResizeWindowBy(topWindow->GetWindow(), deltaByX, deltaByY);
+
 
 	UpdateSizeConstaints(frameSAT);
 }

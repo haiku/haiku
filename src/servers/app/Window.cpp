@@ -2127,8 +2127,20 @@ Window::AddWindowToStack(Window* window)
 	if (stack == NULL)
 		return false;
 
-	// first collect dirt from the window to add
 	BRegion dirty;
+	// move window to the own position
+	BRect ownFrame = Frame();
+	BRect frame = window->Frame();
+	float deltaToX = round(ownFrame.left - frame.left);
+	float deltaToY = round(ownFrame.top - frame.top);
+	frame.OffsetBy(deltaToX, deltaToY);
+	float deltaByX = round(ownFrame.right - frame.right);
+	float deltaByY = round(ownFrame.bottom - frame.bottom);
+	dirty.Include(&window->VisibleRegion());
+	window->MoveBy(deltaToX, deltaToY, false);
+	window->ResizeBy(deltaByX, deltaByY, &dirty, false);
+
+	// first collect dirt from the window to add
 	::Decorator* otherDecorator = window->Decorator();
 	if (otherDecorator != NULL)
 		dirty.Include(otherDecorator->TitleBarRect());
