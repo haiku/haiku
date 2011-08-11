@@ -835,20 +835,16 @@ isochronous_transfer_data *
 EHCI::FindIsochronousTransfer(ehci_itd *itd)
 {
 	// Simply check every last descriptor of the isochronous transfer list
-	if (LockIsochronous()) {
-		isochronous_transfer_data *transfer = fFirstIsochronousTransfer;
-		if (transfer) {
-			while (transfer->descriptors[transfer->last_to_process]
-				!= itd) {
-				transfer = transfer->link;
-				if (!transfer)
-					break;
-			}
+	isochronous_transfer_data *transfer = fFirstIsochronousTransfer;
+	if (transfer) {
+		while (transfer->descriptors[transfer->last_to_process]
+			!= itd) {
+			transfer = transfer->link;
+			if (!transfer)
+				break;
 		}
-		UnlockIsochronous();
-		return transfer;
 	}
-	return NULL;
+	return transfer;
 }
 
 
@@ -1690,6 +1686,9 @@ EHCI::FinishIsochronousTransfers()
 				" at frame %ld\n", itd, itd->this_phy, itd->prev,
 				itd->prev != NULL ? itd->prev->this_phy : 0, currentFrame);
 
+			if (!LockIsochronous())
+				continue;
+
 			// Process the frame till it has isochronous descriptors in it.
 			while (!(itd->next_phy & EHCI_ITEM_TERMINATE) && itd->prev != NULL) {
 				TRACE("FinishIsochronousTransfers checking itd %p last_token"
@@ -1720,25 +1719,22 @@ EHCI::FinishIsochronousTransfers()
 					}
 
 					// Remove the transfer
-					if (LockIsochronous()) {
-						if (transfer == fFirstIsochronousTransfer) {
-							fFirstIsochronousTransfer = transfer->link;
-							if (transfer == fLastIsochronousTransfer)
-								fLastIsochronousTransfer = NULL;
-						} else {
-							isochronous_transfer_data *temp
-								= fFirstIsochronousTransfer;
-							while (temp != NULL && transfer != temp->link)
-								temp = temp->link;
+					if (transfer == fFirstIsochronousTransfer) {
+						fFirstIsochronousTransfer = transfer->link;
+						if (transfer == fLastIsochronousTransfer)
+							fLastIsochronousTransfer = NULL;
+					} else {
+						isochronous_transfer_data *temp
+							= fFirstIsochronousTransfer;
+						while (temp != NULL && transfer != temp->link)
+							temp = temp->link;
 
-							if (transfer == fLastIsochronousTransfer)
-								fLastIsochronousTransfer = temp;
-							if (temp != NULL && temp->link != NULL)
-								temp->link = temp->link->link;
-						}
-						transfer->link = NULL;
-						UnlockIsochronous();
+						if (transfer == fLastIsochronousTransfer)
+							fLastIsochronousTransfer = temp;
+						if (temp != NULL && temp->link != NULL)
+							temp->link = temp->link->link;
 					}
+					transfer->link = NULL;
 
 					transfer->transfer->Finished(B_OK, actualLength);
 
@@ -1758,6 +1754,8 @@ EHCI::FinishIsochronousTransfers()
 				}
 				itd = itd->prev;
 			}
+
+			UnlockIsochronous();
 
 			TRACE("FinishIsochronousTransfers next frame\n");
 
@@ -2243,7 +2241,6 @@ EHCI::LinkDescriptors(ehci_qtd *first, ehci_qtd *last, ehci_qtd *alt)
 void
 EHCI::LinkITDescriptors(ehci_itd *itd, ehci_itd **_last)
 {
-	LockIsochronous();
 	ehci_itd *last = *_last;
 	itd->next_phy = last->next_phy;
 	itd->next = NULL;
@@ -2251,14 +2248,12 @@ EHCI::LinkITDescriptors(ehci_itd *itd, ehci_itd **_last)
 	last->next = itd;
 	last->next_phy = itd->this_phy;
 	*_last = itd;
-	UnlockIsochronous();
 }
 
 
 void
 EHCI::LinkSITDescriptors(ehci_sitd *sitd, ehci_sitd **_last)
 {
-	LockIsochronous();
 	ehci_sitd *last = *_last;
 	sitd->next_phy = last->next_phy;
 	sitd->next = NULL;
@@ -2266,34 +2261,29 @@ EHCI::LinkSITDescriptors(ehci_sitd *sitd, ehci_sitd **_last)
 	last->next = sitd;
 	last->next_phy = sitd->this_phy;
 	*_last = sitd;
-	UnlockIsochronous();
 }
 
 void
 EHCI::UnlinkITDescriptors(ehci_itd *itd, ehci_itd **last)
 {
-	LockIsochronous();
 	itd->prev->next_phy = itd->next_phy;
 	itd->prev->next = itd->next;
 	if (itd->next != NULL)
 		itd->next->prev = itd->prev;
 	if (itd == *last)
 		*last = itd->prev;
-	UnlockIsochronous();
 }
 
 
 void
 EHCI::UnlinkSITDescriptors(ehci_sitd *sitd, ehci_sitd **last)
 {
-	LockIsochronous();
 	sitd->prev->next_phy = sitd->next_phy;
 	sitd->prev->next = sitd->next;
 	if (sitd->next != NULL)
 		sitd->next->prev = sitd->prev;
 	if (sitd == *last)
 		*last = sitd->prev;
-	UnlockIsochronous();
 }
 
 
