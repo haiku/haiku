@@ -15,6 +15,7 @@
 
 
 status_t radeon_init_bios(uint8* bios);
+status_t radeon_dump_bios();
 
 
 #endif /* RADEON_HD_BIOS_H */

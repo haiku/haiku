@@ -69,6 +69,10 @@ radeon_init_bios(uint8* bios)
 		return B_ERROR;
 	}
 
+	#ifdef TRACE_ATOM
+	radeon_dump_bios();
+	#endif
+
 	struct card_info *atom_card_info
 		= (card_info*)malloc(sizeof(card_info));
 
@@ -116,6 +120,36 @@ radeon_init_bios(uint8* bios)
 
 	atom_asic_init(gAtomContext);
 		// Post card
+
+	return B_OK;
+}
+
+
+status_t
+radeon_dump_bios()
+{
+	// For debugging use, dump card AtomBIOS
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	TRACE("%s: Dumping AtomBIOS as ATOM_DEBUG is set...\n",
+		__func__);
+
+	FILE* fp;
+	char filename[255];
+	sprintf(filename, "/boot/common/cache/tmp/radeon_hd_bios_1002_%" B_PRIx32
+		"_%" B_PRIu32 ".bin", info.device_id, info.device_index);
+
+	fp = fopen(filename, "wb");
+	if (fp == NULL) {
+		TRACE("%s: Cannot create AtomBIOS blob at %s\n", __func__, filename);
+		return B_ERROR;
+	}
+
+	fwrite(gInfo->rom, info.rom_size, 1, fp);
+
+	fclose(fp);
+
+	TRACE("%s: AtomBIOS dumped to %s\n", __func__, filename);
 
 	return B_OK;
 }
