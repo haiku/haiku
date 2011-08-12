@@ -103,49 +103,49 @@ atom_iio_execute(atom_context *ctx, int base, uint32 index, uint32 data)
 	uint32 temp = 0xCDCDCDCD;
 	while (1)
 	switch(CU8(base)) {
-	case ATOM_IIO_NOP:
-		base++;
-		break;
-	case ATOM_IIO_READ:
-		temp = ctx->card->ioreg_read(CU16(base + 1));
-		base += 3;
-		break;
-	case ATOM_IIO_WRITE:
-		(void)ctx->card->reg_read(CU16(base + 1));
-		ctx->card->ioreg_write(CU16(base + 1), temp);
-		base += 3;
-		break;
-	case ATOM_IIO_CLEAR:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
-		base += 3;
-		break;
-	case ATOM_IIO_SET:
-		temp |= (0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2);
-		base += 3;
-		break;
-	case ATOM_IIO_MOVE_INDEX:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
-		temp |= ((index >> CU8(base + 2))
-			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
-		base += 4;
-		break;
-	case ATOM_IIO_MOVE_DATA:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
-		temp |= ((data >> CU8(base + 2))
-			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
-		base += 4;
-		break;
-	case ATOM_IIO_MOVE_ATTR:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
-		temp |= ((ctx->io_attr >> CU8(base + 2))
-			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
-		base += 4;
-		break;
-	case ATOM_IIO_END:
-		return temp;
-	default:
-		TRACE("%s: Unknown IIO opcode.\n", __func__);
-		return 0;
+		case ATOM_IIO_NOP:
+			base++;
+			break;
+		case ATOM_IIO_READ:
+			temp = ctx->card->ioreg_read(CU16(base + 1));
+			base += 3;
+			break;
+		case ATOM_IIO_WRITE:
+			(void)ctx->card->reg_read(CU16(base + 1));
+			ctx->card->ioreg_write(CU16(base + 1), temp);
+			base += 3;
+			break;
+		case ATOM_IIO_CLEAR:
+			temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
+			base += 3;
+			break;
+		case ATOM_IIO_SET:
+			temp |= (0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2);
+			base += 3;
+			break;
+		case ATOM_IIO_MOVE_INDEX:
+			temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
+			temp |= ((index >> CU8(base + 2))
+				& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
+			base += 4;
+			break;
+		case ATOM_IIO_MOVE_DATA:
+			temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
+			temp |= ((data >> CU8(base + 2))
+				& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
+			base += 4;
+			break;
+		case ATOM_IIO_MOVE_ATTR:
+			temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
+			temp |= ((ctx->io_attr >> CU8(base + 2))
+				& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
+			base += 4;
+			break;
+		case ATOM_IIO_END:
+			return temp;
+		default:
+			TRACE("%s: Unknown IIO opcode.\n", __func__);
+			return 0;
 	}
 }
 
@@ -389,7 +389,7 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 			switch(gctx->io_mode) {
 				case ATOM_IO_MM:
 					if (idx == 0)
-						gctx->card->reg_write(idx, val<<2);
+						gctx->card->reg_write(idx, val << 2);
 					else
 						gctx->card->reg_write(idx, val);
 					break;
@@ -402,11 +402,11 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 						__func__);
 					return;
 				default:
-					if (!(gctx->io_mode&0x80)) {
+					if (!(gctx->io_mode & 0x80)) {
 						TRACE("%s: Bad IO mode.\n", __func__);
 						return;
 					}
-					if (!gctx->iio[gctx->io_mode&0xFF]) {
+					if (!gctx->iio[gctx->io_mode & 0xFF]) {
 						TRACE("%s: Undefined indirect IO write method %d\n",
 							__func__, gctx->io_mode & 0x7F);
 						return;
@@ -1243,7 +1243,18 @@ atom_parse(card_info *card, void *bios)
 	while (*str && ((*str == '\n') || (*str == '\r')))
 		str++;
 
-	TRACE("ATOM BIOS: %s", str);
+	int i;
+	char name[512];
+	// Terminate bios string if not 0 terminated
+	for (i = 0; i < 511; i++) {
+		name[i] = str[i];
+		if (name[i] < '.' || name[i] > 'z') {
+			name[i] = 0;
+			break;
+		}
+	}
+
+	TRACE("ATOM BIOS: %s", name);
 
 	return ctx;
 }
@@ -1256,8 +1267,8 @@ atom_asic_init(atom_context *ctx)
 	uint32 ps[16];
 	memset(ps, 0, 64);
 
-	ps[0] = CU32(hwi + ATOM_FWI_DEFSCLK_PTR);
-	ps[1] = CU32(hwi + ATOM_FWI_DEFMCLK_PTR);
+	ps[0] = B_HOST_TO_LENDIAN_INT32(CU32(hwi + ATOM_FWI_DEFSCLK_PTR));
+	ps[1] = B_HOST_TO_LENDIAN_INT32(CU32(hwi + ATOM_FWI_DEFMCLK_PTR));
 	if (!ps[0] || !ps[1])
 		return B_ERROR;
 
