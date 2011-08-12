@@ -111,6 +111,7 @@ atom_iio_execute(atom_context *ctx, int base, uint32 index, uint32 data)
 		base += 3;
 		break;
 	case ATOM_IIO_WRITE:
+		(void)ctx->card->reg_read(CU16(base + 1));
 		ctx->card->ioreg_write(CU16(base + 1), temp);
 		base += 3;
 		break;
@@ -123,19 +124,19 @@ atom_iio_execute(atom_context *ctx, int base, uint32 index, uint32 data)
 		base += 3;
 		break;
 	case ATOM_IIO_MOVE_INDEX:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
+		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
 		temp |= ((index >> CU8(base + 2))
 			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
 		base += 4;
 		break;
 	case ATOM_IIO_MOVE_DATA:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
+		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
 		temp |= ((data >> CU8(base + 2))
 			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
 		base += 4;
 		break;
 	case ATOM_IIO_MOVE_ATTR:
-		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 2));
+		temp &= ~((0xFFFFFFFF >> (32 - CU8(base + 1))) << CU8(base + 3));
 		temp |= ((ctx->io_attr >> CU8(base + 2))
 			& (0xFFFFFFFF >> (32 - CU8(base + 1)))) << CU8(base + 3);
 		base += 4;
@@ -190,7 +191,7 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 		case ATOM_ARG_PS:
 			idx = U8(*ptr);
 			(*ptr)++;
-			val = ctx->ps[idx];
+			val = B_LENDIAN_TO_HOST_INT32(ctx->ps[idx]);
 				// TODO	: val = get_unaligned_le32((u32 *)&ctx->ps[idx]);
 			break;
 		case ATOM_ARG_WS:
@@ -237,7 +238,7 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 			idx = U8(*ptr);
 			(*ptr)++;
 			val = gctx->scratch[((gctx->fb_base + idx) / 4)];
-			return 0;
+			break;
 		case ATOM_ARG_IMM:
 			switch(align) {
 				case ATOM_SRC_DWORD:
@@ -455,7 +456,7 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 			idx = U8(*ptr);
 			(*ptr)++;
 			gctx->scratch[((gctx->fb_base + idx) / 4)] = val;
-			return;
+			break;
 		case ATOM_ARG_PLL:
 			idx = U8(*ptr);
 			(*ptr)++;
@@ -1332,7 +1333,7 @@ atom_allocate_fb_scratch(atom_context *ctx)
 	if (atom_parse_data_header(ctx, index, NULL, NULL, NULL, &data_offset)
 		== B_OK) {
 		firmware = (_ATOM_VRAM_USAGE_BY_FIRMWARE *)
-				((uint16*)ctx->bios + data_offset);
+			((uint16*)ctx->bios + data_offset);
 
 		TRACE("Atom firmware requested 0x%" B_PRIX32 " %" B_PRIu16 "kb\n",
 			firmware->asFirmwareVramReserveInfo[0].ulStartAddrUsedByFirmware,
