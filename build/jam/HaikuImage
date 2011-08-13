@@ -331,6 +331,14 @@ SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: installoptionalpackage ;
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
+SEARCH on welcome = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin : welcome ;
+AddSymlinkToHaikuImage home Desktop
+	: /boot/system/bin/welcome : Welcome ;
+SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin : userguide ;
+AddSymlinkToHaikuImage home Desktop
+	: /boot/system/bin/userguide : User\ Guide ;
 
 # Add the files to be used by installoptionalpackage.
 AddDirectoryToHaikuImage common data optional-packages ;

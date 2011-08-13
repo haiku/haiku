@@ -1,0 +1,16 @@
+#!/bin/bash
+
+userGuideURL="\
+	http://svn.haiku-os.org/haiku/haiku/trunk/docs/userguide/en/contents.html"
+userGuideDir=/boot/system/documentation/userguide/
+userGuide=$userGuideDir/en/contents.html
+localizedUserGuide=$userGuideDir/"$LANG"/contents.html
+
+if [ -f $localizedUserGuide ]; then
+	open file://$localizedUserGuide
+elif [ -f $userGuide ]; then
+	open $userGuide
+else
+	open $userGuideURL
+fi
+
