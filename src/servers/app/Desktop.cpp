@@ -1036,20 +1036,10 @@ Desktop::SelectWindow(Window* window)
 	of their subset.
 */
 void
-Desktop::ActivateWindow(Window* window, bool activateStack)
+Desktop::ActivateWindow(Window* window)
 {
 	STRACE(("ActivateWindow(%p, %s)\n", window, window
 		? window->Title() : "<none>"));
-
-	WindowStack* stack = window->GetWindowStack();
-	if (activateStack && stack != NULL) {
-		for (int32 i = 0; i < stack->CountWindows(); i++) {
-			Window* win = stack->LayerOrder().ItemAt(i);
-			if (window == win)
-				continue;
-			ActivateWindow(win, false);
-		}
-	}
 
 	if (window == NULL) {
 		fBack = NULL;
@@ -1164,10 +1154,15 @@ Desktop::ActivateWindow(Window* window, bool activateStack)
 
 
 void
-Desktop::SendWindowBehind(Window* window, Window* behindOf)
+Desktop::SendWindowBehind(Window* window, Window* behindOf, bool sendStack)
 {
 	if (!LockAllWindows())
 		return;
+
+	Window* orgWindow = window;
+	WindowStack* stack = window->GetWindowStack();
+	if (sendStack && stack != NULL)
+		window = stack->TopLayerWindow();
 
 	// TODO: should the "not in current workspace" be handled anyway?
 	//	(the code below would have to be changed then, though)
@@ -1195,10 +1190,13 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 	BRegion dummy;
 	_RebuildClippingForAllWindows(dummy);
 
-	// mark everything dirty that is no longer visible
-	BRegion clean(window->VisibleRegion());
-	dirty.Exclude(&clean);
-	MarkDirty(dirty);
+	// only redraw the top layer window to avoid flicker
+	if (sendStack) {
+		// mark everything dirty that is no longer visible
+		BRegion clean(window->VisibleRegion());
+		dirty.Exclude(&clean);
+		MarkDirty(dirty);
+	}
 
 	_UpdateFronts();
 	if (fSettings->MouseMode() == B_FOCUS_FOLLOWS_MOUSE)
@@ -1212,7 +1210,16 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 
 	_WindowChanged(window);
 
-	NotifyWindowSentBehind(window, behindOf);
+	if (sendStack && stack != NULL) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* stackWindow = stack->LayerOrder().ItemAt(i);
+			if (stackWindow == window)
+				continue;
+			SendWindowBehind(stackWindow, behindOf, false);
+		}
+	}
+
+	NotifyWindowSentBehind(orgWindow, behindOf);
 
 	UnlockAllWindows();
 
