@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2010 Haiku Inc. All rights reserved.
+# Copyright (c) 2010 Haiku, Inc.
 # Distributed under the terms of the MIT License.
 #
 # Authors:
