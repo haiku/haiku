@@ -1,4 +1,5 @@
 /*
+ * Copyright 1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -29,13 +30,6 @@
  */
 
 
-/*
-	NodeHarnessApp.cpp
-
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
-
 #include "NodeHarnessApp.h"
 #include "NodeHarnessWin.h"
 
@@ -44,7 +38,7 @@ NodeHarnessApp::NodeHarnessApp(const char *signature)
 {
 }
 
-void 
+void
 NodeHarnessApp::ReadyToRun()
 {
 	BWindow* win = new NodeHarnessWin(BRect(100, 200, 210, 330), "ToneProducer");

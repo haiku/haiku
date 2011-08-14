@@ -1,4 +1,5 @@
 /*
+ * Copyright 1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -28,13 +29,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-/*
-	NodeHarnessWin.cpp
-
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
 
 #include "NodeHarnessWin.h"
 #include "ToneProducer.h"
@@ -83,7 +77,7 @@ NodeHarnessWin::NodeHarnessWin(BRect frame, const char *title)
 	mStopButton = new BButton(r, "Stop", "Stop", new BMessage(BUTTON_STOP));
 	mStopButton->SetEnabled(false);
 	AddChild(mStopButton);
-	
+
 	// e.moon 2jun99: create the node
 	BMediaRoster* roster = BMediaRoster::Roster();
 	mToneNode = new ToneProducer();
@@ -120,14 +114,14 @@ NodeHarnessWin::~NodeHarnessWin()
 	}
 }
 
-void 
+void
 NodeHarnessWin::Quit()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	BWindow::Quit();
 }
 
-void 
+void
 NodeHarnessWin::MessageReceived(BMessage *msg)
 {
 	status_t err;
@@ -176,7 +170,7 @@ NodeHarnessWin::MessageReceived(BMessage *msg)
 
 			// got the endpoints; now we connect it!
 			media_format format;
-			format.type = B_MEDIA_RAW_AUDIO;	
+			format.type = B_MEDIA_RAW_AUDIO;
 			format.u.raw_audio = media_raw_audio_format::wildcard;
 			err = r->Connect(soundOutput.source, mixerInput.destination, &format, &soundOutput, &mixerInput);
 			ErrorCheck(err, "unable to connect nodes");
@@ -228,7 +222,7 @@ NodeHarnessWin::MessageReceived(BMessage *msg)
 }
 
 // Private routines
-void 
+void
 NodeHarnessWin::StopNodes()
 {
 	mStartButton->SetEnabled(true);

@@ -1,4 +1,5 @@
 /*
+ * Copyright 1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -34,9 +35,7 @@
 // --------------
 // Declares the MultiInvoker class.
 //
-// Copyright 1999, Be Incorporated.   All Rights Reserved.
-// This file may be used under the terms of the Be Sample
-// Code License.
+
 
 #ifndef _MultiInvoker_h
 #define _MultiInvoker_h
@@ -56,13 +55,13 @@ public:
 		MultiInvoker();
 		MultiInvoker(const MultiInvoker& src);
 virtual	~MultiInvoker();
-		
+
 		MultiInvoker&	operator=(const MultiInvoker& src);
-		
+
 virtual	void		SetMessage(BMessage* message);
 		BMessage*	Message() const;
 		uint32		Command() const;
-		
+
 virtual	status_t	AddTarget(const BHandler* h, const BLooper* loop=0);
 
 		// For this version of AddTarget, the MultiInvoker
@@ -78,20 +77,20 @@ virtual void		RemoveTarget(int32 index);
 
 		void		SetTimeout(bigtime_t timeout);
 		bigtime_t	Timeout() const;
-		
+
 virtual	void		SetHandlerForReply(BHandler* h);
 		BHandler*	HandlerForReply() const;
-		
+
 virtual status_t	Invoke(BMessage* msg =0);
-		
+
 private:
 		void		Clear();
 		void		Clone(const MultiInvoker& src);
-		
+
 		BMessage*	m_message;
 		BList		m_messengers;
 		bigtime_t	m_timeout;
-		BHandler*	m_replyHandler;	
+		BHandler*	m_replyHandler;
 };
 
 #endif /* _MultiInvoker_h */

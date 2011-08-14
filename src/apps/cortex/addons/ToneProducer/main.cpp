@@ -1,4 +1,5 @@
 /*
+ * Copyright 1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -29,13 +30,6 @@
  */
 
 
-/*
-	ToneProducerApp main.cpp
-
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
-
 #include "NodeHarnessApp.h"
 #include "MediaNodeControlApp.h"
 #include <cstring>
@@ -57,6 +51,6 @@ int main(int argc, char** argv) {
 		MediaNodeControlApp app(g_pAppSignature, id);
 		app.Run();
 	}
-	
+
 	return 0;
 }

@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -138,7 +139,7 @@ public:
 	/* the format; you should not ask him about it in here. */
 	status_t FormatChanged(
 		const media_source& producer,
-		const media_destination& consumer, 
+		const media_destination& consumer,
 		int32 change_tag,
 		const media_format& format);
 
@@ -149,7 +150,7 @@ public:
 	status_t SeekTagRequested(
 		const media_destination& destination,
 		bigtime_t in_target_time,
-		uint32 in_flags, 
+		uint32 in_flags,
 		media_seek_tag* out_seek_tag,
 		bigtime_t* out_tagged_time,
 		uint32* out_flags);
@@ -181,7 +182,7 @@ private:
 	bigtime_t mLastLatencyChange;			// when did we last change our latency?
 	bigtime_t mLastSpinChange;					// when did we last change our CPU usage?
 	bigtime_t mLastPrioChange;					// when did we last change thread priority?
-	
+
 	// host addon
 	// [11jun99] e.moon
 	BMediaAddOn*		m_pAddOn;

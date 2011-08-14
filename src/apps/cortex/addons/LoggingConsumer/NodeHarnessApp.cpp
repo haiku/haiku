@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -39,7 +40,7 @@ NodeHarnessApp::NodeHarnessApp(const char *signature)
 {
 }
 
-void 
+void
 NodeHarnessApp::ReadyToRun()
 {
 	BWindow* win = new NodeHarnessWin(BRect(100, 200, 210, 330), "NodeLogger");

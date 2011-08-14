@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -32,7 +33,7 @@
 // LoggingConsumerApp.cpp
 //
 // HISTORY
-//   eamoon@meadgroup.com		11june99		
+//   eamoon@meadgroup.com		11june99
 //   [origin: Be Developer Newsletter III.18: 5may99]
 
 #include "NodeHarnessApp.h"

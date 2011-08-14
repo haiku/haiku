@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -145,7 +146,7 @@ LogWriter::~LogWriter()
 //
 // This method, called by the client, really just enqueues a message to the writer thread,
 // which will deal with it in the HandleMessage() method.
-void 
+void
 LogWriter::Log(log_what what, const log_message& data)
 {
 	bigtime_t now = ::system_time();
@@ -155,7 +156,7 @@ LogWriter::Log(log_what what, const log_message& data)
 }
 
 // Enable or disable a particular log_what code's output
-void 
+void
 LogWriter::SetEnabled(log_what what, bool enable)
 {
 	if (enable)	 mFilters.erase(what);
@@ -163,7 +164,7 @@ LogWriter::SetEnabled(log_what what, bool enable)
 }
 
 // enabling everything means just clearing out the filter set
-void 
+void
 LogWriter::EnableAllMessages()
 {
 	mFilters.clear();
@@ -171,7 +172,7 @@ LogWriter::EnableAllMessages()
 
 // disabling everything is more tedious -- we have to add them all to the
 // filter set, one by one
-void 
+void
 LogWriter::DisableAllMessages()
 {
 //	mFilters.insert(LOG_QUIT);				// don't disable our quit messages
@@ -222,7 +223,7 @@ LogWriter::DisableAllMessages()
 
 // Writer thread's message handling function -- this is where messages are actuall
 // formatted and written to the log file
-void 
+void
 LogWriter::HandleMessage(log_what what, const log_message& msg)
 {
 	char buf[256];		// scratch buffer for building logged output

@@ -1,4 +1,5 @@
 /*
+ * Copyright 1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -28,13 +29,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-/*
-	NodeHarnessWin.h
-
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
 
 #ifndef NodeHarnessWin_H
 #define NodeHarnessWin_H 1

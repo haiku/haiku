@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *

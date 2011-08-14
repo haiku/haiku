@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -98,14 +99,14 @@ NodeHarnessWin::~NodeHarnessWin()
 	}
 }
 
-void 
+void
 NodeHarnessWin::Quit()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	BWindow::Quit();
 }
 
-void 
+void
 NodeHarnessWin::MessageReceived(BMessage *msg)
 {
 	status_t err;
@@ -199,7 +200,7 @@ NodeHarnessWin::MessageReceived(BMessage *msg)
 			bigtime_t latency;
 			r->GetLatencyFor(mConnection.producer, &latency);
 			printf("Setting producer run mode latency to %Ld\n", latency);
-			r->SetProducerRunModeDelay(mConnection.producer, latency + 6000);			
+			r->SetProducerRunModeDelay(mConnection.producer, latency + 6000);
 
 			// preroll first, to be a good citizen
 			r->PrerollNode(mConnection.consumer);
@@ -239,7 +240,7 @@ NodeHarnessWin::MessageReceived(BMessage *msg)
 }
 
 // Private routines
-void 
+void
 NodeHarnessWin::StopNodes()
 {
 	mStartButton->SetEnabled(true);

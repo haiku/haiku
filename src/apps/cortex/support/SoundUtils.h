@@ -1,4 +1,5 @@
 /*
+ * Copyright 1998-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -34,8 +35,6 @@
 /	File:			SoundUtils.h
 /
 /   Description:	Utility functions for handling audio data.
-/
-/	Copyright 1998-1999, Be Incorporated, All Rights Reserved
 /
 *******************************************************************************/
 
@@ -78,7 +77,7 @@ enum {
 	B_DISCONNECTED,			//
 	B_FORMAT_CHANGED,		//	media_raw_audio_format*
 	B_NODE_DIES,			//	node will die!
-	B_HOOKS_CHANGED,		//	
+	B_HOOKS_CHANGED,		//
 	B_OP_TIMED_OUT,			//	timeout that expired -- Consumer only
 	B_PRODUCER_DATA_STATUS,	//	status performance_time -- Consumer only
 	B_LATE_NOTICE			//	how_much performance_time -- Producer only

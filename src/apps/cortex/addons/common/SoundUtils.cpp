@@ -1,4 +1,5 @@
 /*
+ * Copyright 1998-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -34,8 +35,6 @@
 /	File:			SoundUtils.cpp
 /
 /   Description:	Utility functions for handling audio data.
-/
-/	Copyright 1998-1999, Be Incorporated, All Rights Reserved
 /
 *******************************************************************************/
 

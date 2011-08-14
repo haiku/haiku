@@ -1,4 +1,5 @@
 /*
+ * Copyright 1991-1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -46,11 +47,11 @@
 class LoggingConsumerAddOn :
 	public		BMediaAddOn {
 	typedef	BMediaAddOn _inherited;
-	
+
 public:					// ctor/dtor
 	virtual ~LoggingConsumerAddOn();
 	explicit LoggingConsumerAddOn(image_id image);
-	
+
 public:					// BMediaAddOn impl
 virtual	status_t InitCheck(
 				const char** out_failure_text);

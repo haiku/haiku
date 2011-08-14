@@ -1,4 +1,5 @@
 /*
+ * Copyright 1999, Be Incorporated.
  * Copyright (c) 1999-2000, Eric Moon.
  * All rights reserved.
  *
@@ -34,9 +35,6 @@
 // ----------------
 // Implements the MultiInvoker class.
 //
-// Copyright 1999, Be Incorporated.   All Rights Reserved.
-// This file may be used under the terms of the Be Sample
-// Code License.
 
 #include <Messenger.h>
 #include "MultiInvoker.h"
@@ -111,7 +109,7 @@ status_t MultiInvoker::AddTarget(const BHandler* h, const BLooper* loop)
 		m_messengers.AddItem(msgr);
 	else
 		delete msgr;
-	return err;	
+	return err;
 }
 
 status_t MultiInvoker::AddTarget(BMessenger* msgr)
@@ -204,8 +202,8 @@ status_t MultiInvoker::Invoke(BMessage* msg)
 	if (! sendMsg)
 		return B_BAD_VALUE;
 
-	status_t err, finalResult=B_OK;	
-	BMessage replyMsg;	
+	status_t err, finalResult=B_OK;
+	BMessage replyMsg;
 	int32 len = CountTargets();
 	for (int32 i=0; i<len; i++) {
 		BMessenger* msgr = MessengerAt(i);
