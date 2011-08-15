@@ -438,6 +438,11 @@ DefaultDecorator::_DoLayout()
 		return;
 	} else {
 		// no tab
+		for (int32 i = 0; i < fTabList.CountItems(); i++) {
+			Decorator::Tab* tab = fTabList.ItemAt(i);
+			tab->tabRect.Set(0.0, 0.0, -1.0, -1.0);
+		}
+		fTabsRegion.MakeEmpty();
 		fTitleBarRect.Set(0.0, 0.0, -1.0, -1.0);
 	}
 }
