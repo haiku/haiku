@@ -271,9 +271,30 @@ remove_notify_handler(acpi_handle device, uint32 handlerType,
 
 
 status_t
+update_all_gpes()
+{
+	return AcpiUpdateAllGpes() == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
 enable_gpe(acpi_handle handle, uint32 gpeNumber)
 {
 	return AcpiEnableGpe(handle, gpeNumber) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+disable_gpe(acpi_handle handle, uint32 gpeNumber)
+{
+	return AcpiDisableGpe(handle, gpeNumber) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+clear_gpe(acpi_handle handle, uint32 gpeNumber)
+{
+	return AcpiClearGpe(handle, gpeNumber) == AE_OK ? B_OK : B_ERROR;
 }
 
 
@@ -285,19 +306,26 @@ set_gpe(acpi_handle handle, uint32 gpeNumber, uint8 action)
 
 
 status_t
+finish_gpe(acpi_handle handle, uint32 gpeNumber)
+{
+	return AcpiFinishGpe(handle, gpeNumber) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
 install_gpe_handler(acpi_handle handle, uint32 gpeNumber, uint32 type,
-	acpi_event_handler handler, void *data)
+	acpi_gpe_handler handler, void *data)
 {
 	return AcpiInstallGpeHandler(handle, gpeNumber, type,
-		(ACPI_EVENT_HANDLER)handler, data) == AE_OK ? B_OK : B_ERROR;
+		(ACPI_GPE_HANDLER)handler, data) == AE_OK ? B_OK : B_ERROR;
 }
 
 
 status_t
 remove_gpe_handler(acpi_handle handle, uint32 gpeNumber,
-	acpi_event_handler address)
+	acpi_gpe_handler address)
 {
-	return AcpiRemoveGpeHandler(handle, gpeNumber, (ACPI_EVENT_HANDLER)address)
+	return AcpiRemoveGpeHandler(handle, gpeNumber, (ACPI_GPE_HANDLER)address)
 		== AE_OK ? B_OK : B_ERROR;
 }
 
@@ -701,8 +729,12 @@ struct acpi_module_info gACPIModule = {
 	release_global_lock,
 	install_notify_handler,
 	remove_notify_handler,
+	update_all_gpes,
 	enable_gpe,
+	disable_gpe,
+	clear_gpe,
 	set_gpe,
+	finish_gpe,
 	install_gpe_handler,
 	remove_gpe_handler,
 	install_address_space_handler,

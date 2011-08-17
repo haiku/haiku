@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -729,9 +729,9 @@ AcpiEvInitializeRegion (
                  *
                  * See AcpiNsExecModuleCode
                  */
-                if (ObjDesc->Method.Flags & AOPOBJ_MODULE_LEVEL)
+                if (ObjDesc->Method.InfoFlags & ACPI_METHOD_MODULE_LEVEL)
                 {
-                    HandlerObj = ObjDesc->Method.Extra.Handler;
+                    HandlerObj = ObjDesc->Method.Dispatch.Handler;
                 }
                 break;
 
@@ -768,7 +768,7 @@ AcpiEvInitializeRegion (
                         }
                     }
 
-                    Status = AcpiEvExecuteRegMethod (RegionObj, 1);
+                    Status = AcpiEvExecuteRegMethod (RegionObj, ACPI_REG_CONNECT);
 
                     if (AcpiNsLocked)
                     {

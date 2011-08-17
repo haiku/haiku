@@ -60,14 +60,17 @@ typedef struct acpi_root_info {
     				uint32 handlerType, acpi_notify_handler handler);
 
 	/* GPE Handler */
-
+	status_t	(*update_all_gpes)();
 	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber);
+	status_t	(*disable_gpe)(acpi_handle handle, uint32 gpeNumber);
+	status_t	(*clear_gpe)(acpi_handle handle, uint32 gpeNumber);
 	status_t	(*set_gpe)(acpi_handle handle, uint32 gpeNumber,
 					uint8 action);
+	status_t	(*finish_gpe)(acpi_handle handle, uint32 gpeNumber);
 	status_t	(*install_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
-					uint32 type, acpi_event_handler handler, void *data);
+					uint32 type, acpi_gpe_handler handler, void *data);
 	status_t	(*remove_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
-					acpi_event_handler address);
+					acpi_gpe_handler address);
 
 	/* Address Space Handler */
 
@@ -162,12 +165,16 @@ status_t install_notify_handler(acpi_handle device,	uint32 handlerType,
 status_t remove_notify_handler(acpi_handle device, uint32 handlerType,
 	acpi_notify_handler handler);
 
+status_t update_all_gpes();
 status_t enable_gpe(acpi_handle handle, uint32 gpeNumber);
+status_t disable_gpe(acpi_handle handle, uint32 gpeNumber);
+status_t clear_gpe(acpi_handle handle, uint32 gpeNumber);
 status_t set_gpe(acpi_handle handle, uint32 gpeNumber, uint8 action);
+status_t finish_gpe(acpi_handle handle, uint32 gpeNumber);
 status_t install_gpe_handler(acpi_handle handle, uint32 gpeNumber, uint32 type,
-	acpi_event_handler handler, void* data);
+	acpi_gpe_handler handler, void* data);
 status_t remove_gpe_handler(acpi_handle handle, uint32 gpeNumber,
-	acpi_event_handler address);
+	acpi_gpe_handler address);
 
 status_t install_address_space_handler(acpi_handle handle, uint32 spaceID,
 	acpi_adr_space_handler handler, acpi_adr_space_setup setup, void* data);

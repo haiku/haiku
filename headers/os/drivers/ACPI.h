@@ -145,6 +145,8 @@ typedef uint32 acpi_status;
 
 
 typedef uint32 (*acpi_event_handler)(void *Context);
+typedef uint32 (*acpi_gpe_handler) (acpi_handle GpeDevice, uint32 GpeNumber,
+	void *Context);
 
 typedef acpi_status (*acpi_adr_space_handler)(uint32 function,
 	acpi_physical_address address, uint32 bitWidth, int *value,
@@ -178,13 +180,17 @@ struct acpi_module_info {
 
 	/* GPE Handler */
 
+	status_t	(*update_all_gpes)();
 	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber);
+	status_t	(*disable_gpe)(acpi_handle handle, uint32 gpeNumber);
+	status_t	(*clear_gpe)(acpi_handle handle, uint32 gpeNumber);
 	status_t	(*set_gpe)(acpi_handle handle, uint32 gpeNumber,
 					uint8 action);
+	status_t	(*finish_gpe)(acpi_handle handle, uint32 gpeNumber);
 	status_t	(*install_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
-					uint32 type, acpi_event_handler handler, void *data);
+					uint32 type, acpi_gpe_handler handler, void *data);
 	status_t	(*remove_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
-					acpi_event_handler address);
+					acpi_gpe_handler address);
 
 	/* Address Space Handler */
 

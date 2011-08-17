@@ -13,6 +13,8 @@ local common_src =
 	;
 
 local dispatcher_src =
+	dsargs.c
+	dscontrol.c
 	dsfield.c
 	dsinit.c
 	dsmethod.c
@@ -22,12 +24,14 @@ local dispatcher_src =
 	dsutils.c
 	dswexec.c
 	dswload.c
+	dswload2.c
 	dswscope.c
 	dswstate.c
 	;
 
 local events_src =
 	evevent.c
+	evglock.c
 	evgpe.c
 	evgpeblk.c
 	evgpeinit.c
@@ -38,6 +42,7 @@ local events_src =
 	evsci.c
 	evxface.c
 	evxfevnt.c
+	evxfgpe.c
 	evxfregn.c
 	;
 	
@@ -142,6 +147,7 @@ local utilities_src =
 	utcache.c
 	utclib.c
 	utcopy.c
+	utdecode.c
 	utdebug.c
 	utdelete.c
 	uteval.c

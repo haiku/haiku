@@ -43,6 +43,7 @@ extern "C" {
 #	include "acpi.h"
 #	include "accommon.h"
 #	include "acnamesp.h"
+#	include "actypes.h"
 #	include "acpi_priv.h"
 }
 
@@ -54,11 +55,8 @@ extern "C" {
 #	define TRACE(x...)
 #endif
 
+#define ERROR(x...) dprintf("EC: " x)
 
-#define ACPI_REGION_DEACTIVATE  1
-
-#define ACPI_READ						0
-#define ACPI_WRITE						1
 
 typedef uint8							EC_COMMAND;
 
@@ -128,12 +126,10 @@ typedef uint8							EC_EVENT;
 #define EC_SET_CSR(sc, v) \
 		bus_space_write_1((sc)->ec_csr_pci_address, (v))
 
-
 #define ACPI_PKG_VALID(pkg, size) \
 		((pkg) != NULL && (pkg)->object_type == ACPI_TYPE_PACKAGE && \
 		(pkg)->data.package.count >= (size))
 
-int32 acpi_get_type(device_node* dev);
 
 /*
  * Driver cookie.
@@ -213,7 +209,8 @@ EcUnlock(struct acpi_ec_cookie *sc)
 }
 
 
-static uint32			EcGpeHandler(void *context);
+static uint32			EcGpeHandler(acpi_handle gpeDevice, uint32 gpeNumber,
+							void *context);
 
 static acpi_status		EcSpaceSetup(acpi_handle region, uint32 function,
 							void *context, void **return_Context);
@@ -227,7 +224,7 @@ static acpi_status		EcCommand(struct acpi_ec_cookie *sc, EC_COMMAND cmd);
 static acpi_status		EcRead(struct acpi_ec_cookie *sc, uint8 address,
 							uint8 *readData);
 static acpi_status		EcWrite(struct acpi_ec_cookie *sc, uint8 address,
-							uint8 *writeData);
+							uint8 writeData);
 
 
 #endif	// ACPI_EMBEDDED_CONTROLLER_H

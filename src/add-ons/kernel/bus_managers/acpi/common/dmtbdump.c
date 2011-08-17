@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -122,6 +122,12 @@
 
 #define _COMPONENT          ACPI_CA_DISASSEMBLER
         ACPI_MODULE_NAME    ("dmtbdump")
+
+
+static void
+AcpiDmValidateFadtLength (
+    UINT32                  Revision,
+    UINT32                  Length);
 
 
 /*******************************************************************************
@@ -273,6 +279,10 @@ AcpiDmDumpXsdt (
  *
  * DESCRIPTION: Format the contents of a FADT
  *
+ * NOTE:        We cannot depend on the FADT version to indicate the actual
+ *              contents of the FADT because of BIOS bugs. The table length
+ *              is the only reliable indicator.
+ *
  ******************************************************************************/
 
 void
@@ -280,20 +290,21 @@ AcpiDmDumpFadt (
     ACPI_TABLE_HEADER       *Table)
 {
 
-    /* Common ACPI 1.0 portion of FADT */
+    /* Always dump the minimum FADT revision 1 fields (ACPI 1.0) */
 
     AcpiDmDumpTable (Table->Length, 0, Table, 0, AcpiDmTableInfoFadt1);
 
-    /* Check for ACPI 1.0B MS extensions (FADT revision 2) */
+    /* Check for FADT revision 2 fields (ACPI 1.0B MS extensions) */
 
-    if (Table->Revision == 2)
+    if ((Table->Length > ACPI_FADT_V1_SIZE) &&
+        (Table->Length <= ACPI_FADT_V2_SIZE))
     {
         AcpiDmDumpTable (Table->Length, 0, Table, 0, AcpiDmTableInfoFadt2);
     }
 
-    /* Check for ACPI 2.0+ extended data (FADT revision 3+) */
+    /* Check for FADT revision 3 fields and up (ACPI 2.0+ extended data) */
 
-    else if (Table->Length >= sizeof (ACPI_TABLE_FADT))
+    else if (Table->Length > ACPI_FADT_V2_SIZE)
     {
         AcpiDmDumpTable (Table->Length, 0, Table, 0, AcpiDmTableInfoFadt3);
     }
@@ -301,6 +312,68 @@ AcpiDmDumpFadt (
     /* Validate various fields in the FADT, including length */
 
     AcpiTbCreateLocalFadt (Table, Table->Length);
+
+    /* Validate FADT length against the revision */
+
+    AcpiDmValidateFadtLength (Table->Revision, Table->Length);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiDmValidateFadtLength
+ *
+ * PARAMETERS:  Revision            - FADT revision (Header->Revision)
+ *              Length              - FADT length (Header->Length
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Check the FADT revision against the expected table length for
+ *              that revision. Issue a warning if the length is not what was
+ *              expected. This seems to be such a common BIOS bug that the
+ *              FADT revision has been rendered virtually meaningless.
+ *
+ ******************************************************************************/
+
+static void
+AcpiDmValidateFadtLength (
+    UINT32                  Revision,
+    UINT32                  Length)
+{
+    UINT32                  ExpectedLength;
+
+
+    switch (Revision)
+    {
+    case 0:
+        AcpiOsPrintf ("// ACPI Warning: Invalid FADT revision: 0\n");
+        return;
+
+    case 1:
+        ExpectedLength = ACPI_FADT_V1_SIZE;
+        break;
+
+    case 2:
+        ExpectedLength = ACPI_FADT_V2_SIZE;
+        break;
+
+    case 3:
+    case 4:
+        ExpectedLength = ACPI_FADT_V3_SIZE;
+        break;
+
+    default:
+        return;
+    }
+
+    if (Length == ExpectedLength)
+    {
+        return;
+    }
+
+    AcpiOsPrintf (
+        "\n// ACPI Warning: FADT revision %X does not match length: found %X expected %X\n",
+        Revision, Length, ExpectedLength);
 }
 
 
@@ -1274,6 +1347,81 @@ AcpiDmDumpMsct (
 
 /*******************************************************************************
  *
+ * FUNCTION:    AcpiDmDumpSlic
+ *
+ * PARAMETERS:  Table               - A SLIC table
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Format the contents of a SLIC
+ *
+ ******************************************************************************/
+
+void
+AcpiDmDumpSlic (
+    ACPI_TABLE_HEADER       *Table)
+{
+    ACPI_STATUS             Status;
+    UINT32                  Offset = sizeof (ACPI_TABLE_SLIC);
+    ACPI_SLIC_HEADER        *SubTable;
+    ACPI_DMTABLE_INFO       *InfoTable;
+
+
+    /* There is no main SLIC table, only subtables */
+
+    SubTable = ACPI_ADD_PTR (ACPI_SLIC_HEADER, Table, Offset);
+    while (Offset < Table->Length)
+    {
+        /* Common sub-table header */
+
+        AcpiOsPrintf ("\n");
+        Status = AcpiDmDumpTable (Table->Length, Offset, SubTable,
+                    SubTable->Length, AcpiDmTableInfoSlicHdr);
+        if (ACPI_FAILURE (Status))
+        {
+            return;
+        }
+
+        switch (SubTable->Type)
+        {
+        case ACPI_SLIC_TYPE_PUBLIC_KEY:
+            InfoTable = AcpiDmTableInfoSlic0;
+            break;
+        case ACPI_SLIC_TYPE_WINDOWS_MARKER:
+            InfoTable = AcpiDmTableInfoSlic1;
+            break;
+        default:
+            AcpiOsPrintf ("\n**** Unknown SLIC sub-table type 0x%X\n", SubTable->Type);
+
+            /* Attempt to continue */
+
+            if (!SubTable->Length)
+            {
+                AcpiOsPrintf ("Invalid zero length subtable\n");
+                return;
+            }
+            goto NextSubTable;
+        }
+
+        AcpiOsPrintf ("\n");
+        Status = AcpiDmDumpTable (Table->Length, Offset, SubTable,
+                    SubTable->Length, InfoTable);
+        if (ACPI_FAILURE (Status))
+        {
+            return;
+        }
+
+NextSubTable:
+        /* Point to next sub-table */
+
+        Offset += SubTable->Length;
+        SubTable = ACPI_ADD_PTR (ACPI_SLIC_HEADER, SubTable, SubTable->Length);
+    }
+}
+
+
+/*******************************************************************************
+ *
  * FUNCTION:    AcpiDmDumpSlit
  *
  * PARAMETERS:  Table               - An SLIT
@@ -1332,12 +1480,12 @@ AcpiDmDumpSlit (
 
             if ((j+1) < Localities)
             {
-                AcpiOsPrintf (",");
+                AcpiOsPrintf (" ");
 
                 if (j && (((j+1) % 16) == 0))
                 {
-                    AcpiOsPrintf ("\n");
-                    AcpiDmLineHeader (Offset, 0, "");
+                    AcpiOsPrintf ("\\\n"); /* With line continuation char */
+                    AcpiDmLineHeader (Offset, 0, NULL);
                 }
             }
         }
