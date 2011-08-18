@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2010-2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FORMATTING_CONVENTIONS_PRIVATE_H
@@ -23,7 +23,7 @@ public:
 		fFormattingConventions = conventions;
 	}
 
-	icu_44::Locale*
+	icu::Locale*
 	ICULocale()
 	{
 		return fFormattingConventions->fICULocale;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc.
+ * Copyright 2003-2011, Haiku, Inc.
  * Distributed under the terms of the MIT Licence.
  */
 #ifndef _FORMATTING_CONVENTIONS_H_
@@ -17,7 +17,7 @@ class BBitmap;
 class BLanguage;
 class BMessage;
 
-namespace icu_44 {
+namespace icu {
 	class DateFormat;
 	class Locale;
 }
@@ -122,7 +122,7 @@ private:
 
 			bool				fUseStringsFromPreferredLanguage;
 
-			icu_44::Locale*		fICULocale;
+			icu::Locale*		fICULocale;
 };
 
 

@@ -25,9 +25,6 @@
 #include <unicode/locid.h>
 
 
-#define ICU_VERSION icu_44
-
-
 BLanguage::BLanguage()
 	:
 	fDirection(B_LEFT_TO_RIGHT),
@@ -64,7 +61,7 @@ status_t
 BLanguage::SetTo(const char* language)
 {
 	delete fICULocale;
-	fICULocale = new ICU_VERSION::Locale(language);
+	fICULocale = new icu::Locale(language);
 	if (fICULocale == NULL)
 		return B_NO_MEMORY;
 

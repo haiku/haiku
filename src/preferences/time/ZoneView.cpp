@@ -316,14 +316,13 @@ TimeZoneView::_BuildZoneMenu()
 
 			BString region(zoneID, slashPos);
 
-			if (region == B_TRANSLATE("Etc"))
+			if (region == "Etc")
 				region = kOtherRegion;
 			else if (countryName.Length() == 0) {
 				// skip global timezones from other regions, we are just
 				// interested in the generic GMT-based ones under "Etc/"
 				continue;
 			}
-
 
 			// just accept timezones from "proper" regions, others are aliases
 			ZoneItemMap::iterator regionIter = zoneMap.find(region);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc.
+ * Copyright 2003-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_LOCALE_H_
@@ -12,7 +12,7 @@
 #include <Locker.h>
 
 
-namespace icu_44 {
+namespace icu {
 	class DateFormat;
 }
 
@@ -145,9 +145,9 @@ public:
 									BString* sortKey) const;
 
 private:
-			icu_44::DateFormat*	_CreateDateFormatter(
+			icu::DateFormat*	_CreateDateFormatter(
 									const BString& format) const;
-			icu_44::DateFormat*	_CreateTimeFormatter(
+			icu::DateFormat*	_CreateTimeFormatter(
 									const BString& format) const;
 
 	mutable	BLocker				fLock;

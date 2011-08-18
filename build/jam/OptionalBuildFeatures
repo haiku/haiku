@@ -56,10 +56,12 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 # ICU
 
 # Note ICU isn't actually optional, but is still an external package
-HAIKU_ICU_GCC_2_PACKAGE = icu-4.4.1-r1a3-x86-gcc2-2011-05-29.zip ;
-HAIKU_ICU_GCC_4_PACKAGE = icu-4.4.1-r1a3-x86-gcc4-2011-05-29.zip ;
+HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1-x86-gcc2-2011-08-18.zip ;
+HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1-x86-gcc4-2011-08-18.zip ;
+HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-2011-08-18.zip ;
+
+# TODO: this needs to be upgraded before ICU can be used on PPC!
 HAIKU_ICU_PPC_PACKAGE = icu-4.4.1-ppc-2010-08-17.zip ;
-HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.4.1-2010-07-26.zip ;
 
 if $(TARGET_ARCH) = ppc {
 	local icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
@@ -105,13 +107,20 @@ if $(TARGET_ARCH) = ppc {
 	# extract libraries
 	HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
 		:
-		libicudata.so.44
-		libicui18n.so.44
-		libicuio.so.44
-		libicule.so.44
-		libiculx.so.44
-		libicutu.so.44
-		libicuuc.so.44
+		libicudata.so.48
+		libicudata.so.48.1
+		libicui18n.so.48
+		libicui18n.so.48.1
+		libicuio.so.48
+		libicuio.so.48.1
+		libicule.so.48
+		libicule.so.48.1
+		libiculx.so.48
+		libiculx.so.48.1
+		libicutu.so.48
+		libicutu.so.48.1
+		libicuuc.so.48
+		libicuuc.so.48.1
 		: $(zipFile)
 		: extracted-icu
 	] ;
