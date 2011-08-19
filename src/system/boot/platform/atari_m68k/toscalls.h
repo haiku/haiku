@@ -442,10 +442,17 @@ typedef struct screeninfo {
 	int32	planeWrap;
 	int32	scrFormat;
 	int32	scrClut;
-	/*
 	int32	redBits;
-	...
-	*/
+	int32	greenBits;
+	int32	blueBits;
+	int32	alphaBits;
+	int32	genlockBits;
+	int32	unusedBits;
+	int32	bitFlags;
+	int32	maxmem;
+	int32	pagemem;
+	int32	max_x;
+	int32	max_y;
 } SCREENINFO;
 
 
@@ -456,8 +463,7 @@ typedef struct screeninfo {
 #define Physbase() (void *)toscallV(XBIOS_TRAP, 2)
 #define Logbase() (void *)toscallV(XBIOS_TRAP, 3)
 #define Getrez() toscallV(XBIOS_TRAP, 4)
-#define Setscreen(log, phys, mode) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode, (int16)0)
-#define SetscreenM(log, phys, command) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)MI_MAGIC, (int16)command)
+#define Setscreen(log, phys, mode, command) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode, (int16)command)
 #define VsetScreen(log, phys, mode, modecode) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode, (int16)modecode)
 #define Floprd(buf, dummy, dev, sect, track, side, count) toscallPLWWWWW(XBIOS_TRAP, 8, (void *)buf, (int32)dummy, (int16)dev, (int16)sect, (int16)track, (int16)side, (int16)count)
 //#define Mfpint() toscallV(XBIOS_TRAP, 13, )
