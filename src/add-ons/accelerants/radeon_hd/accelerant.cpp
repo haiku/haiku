@@ -108,6 +108,8 @@ init_common(int device, bool isClone)
 
 	memset(gInfo, 0, sizeof(accelerant_info));
 
+	gInfo->mc_info = (gpu_mc_info *)malloc(sizeof(gpu_mc_info));
+
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		gDisplay[id] = (display_info *)malloc(sizeof(display_info));
 		if (gDisplay[id] == NULL)
@@ -130,6 +132,7 @@ init_common(int device, bool isClone)
 
 	if (ioctl(device, RADEON_GET_PRIVATE_DATA, &data,
 			sizeof(radeon_get_private_data)) != 0) {
+		free(gInfo->mc_info);
 		free(gInfo);
 		return B_ERROR;
 	}
@@ -140,6 +143,7 @@ init_common(int device, bool isClone)
 		data.shared_info_area);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
+		free(gInfo->mc_info);
 		free(gInfo);
 		TRACE("%s, failed to create shared area\n", __func__);
 		return status;
@@ -151,6 +155,7 @@ init_common(int device, bool isClone)
 		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
+		free(gInfo->mc_info);
 		free(gInfo);
 		TRACE("%s, failed to create mmio area\n", __func__);
 		return status;
@@ -171,12 +176,6 @@ init_common(int device, bool isClone)
 	sharedCloner.Keep();
 	regsCloner.Keep();
 
-	// Define Radeon PLL default ranges
-	gInfo->shared_info->pll_info.reference_frequency
-		= RHD_PLL_REFERENCE_DEFAULT;
-	gInfo->shared_info->pll_info.min_frequency = RHD_PLL_MIN_DEFAULT;
-	gInfo->shared_info->pll_info.max_frequency = RHD_PLL_MAX_DEFAULT;
-
 	return B_OK;
 }
 
@@ -196,6 +195,7 @@ uninit_common(void)
 		if (gInfo->is_clone)
 			close(gInfo->device);
 
+		free(gInfo->mc_info);
 		free(gInfo);
 	}
 

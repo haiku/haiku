@@ -9,42 +9,25 @@
 #define RADEON_HD_PLL_H
 
 
-#define RHD_PLL_MIN_DEFAULT 16000
-#define RHD_PLL_MAX_DEFAULT 400000
-#define RHD_PLL_REFERENCE_DEFAULT 27000
+#define MAX_TOLERANCE 10
 
-// xorg default is 0x100000 which seems a little much.
-#define PLL_CALIBRATE_WAIT 0x010000
+#define PLL_MIN_DEFAULT 16000
+#define PLL_MAX_DEFAULT 400000
+#define PLL_REFERENCE_DEFAULT 27000
 
 /* limited by the number of bits available */
+#define FB_DIV_MIN 4
 #define FB_DIV_LIMIT 2048
+#define REF_DIV_MIN 2
 #define REF_DIV_LIMIT 1024
-#define POST_DIV_LIMIT 128
-
-// DCCGClk Operation Modes
-#define RV620_DCCGCLK_RESET   0
-#define RV620_DCCGCLK_GRAB    1
-#define RV620_DCCGCLK_RELEASE 2
+#define POST_DIV_MIN 2
+#define POST_DIV_LIMIT 127
 
 
-struct PLL_Control {
-	uint16 feedbackDivider; // 0xFFFF is the endmarker
-	uint32 control;
-};
-
-
-status_t PLLCalculate(uint32 pixelClock, uint16 *reference, uint16 *feedback,
-	uint16 *post);
+status_t pll_compute(uint32 pixelClock, uint32 *dotclockOut,
+	uint32 *referenceOut, uint32 *feedbackOut, uint32 *feedbackFracOut,
+	uint32 *postOut);
 status_t pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id);
-void PLLSetLowLegacy(uint8 pllIndex, uint32 pixelClock, uint16 reference,
-	uint16 feedback, uint16 post);
-void PLLSetLowR620(uint8 pllIndex, uint32 pixelClock, uint16 reference,
-	uint16 feedback, uint16 post);
-status_t PLLPower(uint8 pllIndex, int command);
-status_t PLLCalibrate(uint8 pllIndex);
-void PLLCRTCGrab(uint8 pllIndex, uint8 crtid);
-bool DCCGCLKAvailable(uint8 pllIndex);
-void DCCGCLKSet(uint8 pllIndex, int set);
 
 
 #endif /* RADEON_HD_PLL_H */

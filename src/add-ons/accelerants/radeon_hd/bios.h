@@ -15,6 +15,7 @@
 
 
 status_t radeon_init_bios(uint8* bios);
+bool radeon_bios_isposted();
 status_t radeon_dump_bios();
 
 

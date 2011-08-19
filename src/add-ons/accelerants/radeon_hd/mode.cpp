@@ -17,6 +17,7 @@
 #include "utility.h"
 #include "mode.h"
 #include "display.h"
+#include "pll.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -108,8 +109,8 @@ radeon_set_display_mode(display_mode *mode)
 			continue;
 		}
 
-		//pll_set(gDisplay[id]->connection_id,
-		//	mode->timing.pixel_clock, id);
+		pll_set(gDisplay[id]->connection_id,
+			mode->timing.pixel_clock, id);
 
 		// Program CRT Controller
 		display_crtc_set_dtd(id, mode);
@@ -119,13 +120,14 @@ radeon_set_display_mode(display_mode *mode)
 
 		// Program connector controllers
 		switch (gDisplay[id]->connection_type) {
-			case CONNECTION_DAC:
+			case ATOM_ENCODER_MODE_CRT:
 				DACSet(gDisplay[id]->connection_id, id);
 				break;
-			case CONNECTION_TMDS:
+			case ATOM_ENCODER_MODE_DVI:
+			case ATOM_ENCODER_MODE_HDMI:
 				TMDSSet(gDisplay[id]->connection_id, mode);
 				break;
-			case CONNECTION_LVDS:
+			case ATOM_ENCODER_MODE_LVDS:
 				LVDSSet(gDisplay[id]->connection_id, mode);
 				break;
 		}
@@ -134,17 +136,19 @@ radeon_set_display_mode(display_mode *mode)
 		display_crtc_blank(id, ATOM_DISABLE);
 		display_crtc_power(id, ATOM_ENABLE);
 
-		PLLPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+		//PLLPower(gDisplay[id]->connection_id, RHD_POWER_ON);
 
 		// Power connector controllers
 		switch (gDisplay[id]->connection_type) {
-			case CONNECTION_DAC:
+			case ATOM_ENCODER_MODE_CRT:
 				DACPower(gDisplay[id]->connection_id, RHD_POWER_ON);
 				break;
-			case CONNECTION_TMDS:
+			case ATOM_ENCODER_MODE_DVI:
+			case ATOM_ENCODER_MODE_HDMI:
 				TMDSPower(gDisplay[id]->connection_id, RHD_POWER_ON);
 				break;
-			case CONNECTION_LVDS:
+			case ATOM_ENCODER_MODE_LVDS:
+				LVDSSet(gDisplay[id]->connection_id, mode);
 				LVDSPower(gDisplay[id]->connection_id, RHD_POWER_ON);
 				break;
 		}
@@ -197,16 +201,16 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 			*(uint32)mode->timing.v_total;
 		uint32 low = (totalClocks * 48L) / 1000L;
 
-		if (low < gInfo->shared_info->pll_info.min_frequency)
-			low = gInfo->shared_info->pll_info.min_frequency;
-		else if (low > gInfo->shared_info->pll_info.max_frequency)
+		if (low < PLL_MIN_DEFAULT)
+			low = PLL_MIN_DEFAULT;
+		else if (low > PLL_MAX_DEFAULT)
 			return B_ERROR;
 
 		*_low = low;
 	}
 
 	if (_high != NULL)
-		*_high = gInfo->shared_info->pll_info.max_frequency;
+		*_high = PLL_MAX_DEFAULT;
 
 	//*_low = 48L;
 	//*_high = 100 * 1000000L;

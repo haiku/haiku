@@ -107,7 +107,7 @@ const struct supported_device {
 
 	// From here on AMD no longer used numeric identifiers
 
-	// R1000 series (HD54xx - HD59xx)
+	// R1000 series (HD54xx - HD63xx)
 	// Codename: Evergreen
 	//  Cedar
 	{0x68e1, RADEON_R1000 | 0x00, false, "Radeon HD 5430"},
@@ -128,6 +128,12 @@ const struct supported_device {
 	{0x6898, RADEON_R1000 | 0x30, false, "Radeon HD 5870"},
 	//  Hemlock
 	{0x689c, RADEON_R1000 | 0x40, false, "Radeon HD 5900"},
+	// Fusion APUS
+	//  Palms
+	{0x9804, RADEON_R1000 | 0x50, true,  "Radeon HD 6250"},
+	{0x9805, RADEON_R1000 | 0x50, true,  "Radeon HD 6290"},
+	{0x9802, RADEON_R1000 | 0x50, true,  "Radeon HD 6310"},
+	{0x9803, RADEON_R1000 | 0x50, true,  "Radeon HD 6310"},
 
 	// R2000 series (HD64xx - HD69xx)
 	// Codename: Nothern Islands

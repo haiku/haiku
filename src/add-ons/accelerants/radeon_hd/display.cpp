@@ -112,11 +112,11 @@ init_registers(register_info* regs, uint8 crtid)
 
 		// Surface Address high only used on r770+
 		regs->grphPrimarySurfaceAddrHigh
-			= crtid == 1 ? R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH
-				: R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+			= crtid == 1 ? D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH
+				: D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
 		regs->grphSecondarySurfaceAddrHigh
-			= crtid == 1 ? R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH
-				: R700_D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
+			= crtid == 1 ? D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH
+				: D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
 
 		regs->grphPitch
 			= crtid == 1 ? D2GRPH_PITCH : D1GRPH_PITCH;
@@ -233,7 +233,7 @@ detect_displays()
 	for (uint32 id = 0; id < 2; id++) {
 		if (DACSense(id)) {
 			gDisplay[index]->active = true;
-			gDisplay[index]->connection_type = CONNECTION_DAC;
+			gDisplay[index]->connection_type = ATOM_ENCODER_MODE_CRT;
 			gDisplay[index]->connection_id = id;
 			init_registers(gDisplay[index]->regs, index);
 			if (detect_crt_ranges(index) == B_OK)
@@ -250,7 +250,8 @@ detect_displays()
 	for (uint32 id = 0; id < 1; id++) {
 		if (TMDSSense(id)) {
 			gDisplay[index]->active = true;
-			gDisplay[index]->connection_type = CONNECTION_TMDS;
+			gDisplay[index]->connection_type = ATOM_ENCODER_MODE_DVI;
+				// or ATOM_ENCODER_MODE_HDMI?
 			gDisplay[index]->connection_id = id;
 			init_registers(gDisplay[index]->regs, index);
 			if (detect_crt_ranges(index) == B_OK)
@@ -266,7 +267,7 @@ detect_displays()
 	// No monitors? Lets assume LVDS for now
 	if (index == 0) {
 		gDisplay[index]->active = true;
-		gDisplay[index]->connection_type = CONNECTION_LVDS;
+		gDisplay[index]->connection_type = ATOM_ENCODER_MODE_LVDS;
 		gDisplay[index]->connection_id = 1;
 			// 0 : LVDSA ; 1 : LVDSB / TDMSB
 		init_registers(gDisplay[index]->regs, index);
@@ -285,14 +286,40 @@ debug_displays()
 			id, gDisplay[id]->active ? "true" : "false");
 
 		if (gDisplay[id]->active) {
-			if (gDisplay[id]->connection_type == CONNECTION_DAC)
-				TRACE(" + connection: DAC\n");
-			else if (gDisplay[id]->connection_type == CONNECTION_TMDS)
-				TRACE(" + connection: TMDS\n");
-			else if (gDisplay[id]->connection_type == CONNECTION_LVDS)
-				TRACE(" + connection: LVDS\n");
-			else
-				TRACE(" + connection: UNKNOWN\n");
+			switch (gDisplay[id]->connection_type) {
+				case ATOM_ENCODER_MODE_DP:
+					TRACE(" + connection: DP\n");
+					break;
+				case ATOM_ENCODER_MODE_LVDS:
+					TRACE(" + connection: LVDS\n");
+					break;
+				case ATOM_ENCODER_MODE_DVI:
+					TRACE(" + connection: DVI\n");
+					break;
+				case ATOM_ENCODER_MODE_HDMI:
+					TRACE(" + connection: HDMI\n");
+					break;
+				case ATOM_ENCODER_MODE_SDVO:
+					TRACE(" + connection: SDVO\n");
+					break;
+				case ATOM_ENCODER_MODE_DP_AUDIO:
+					TRACE(" + connection: DP AUDIO\n");
+					break;
+				case ATOM_ENCODER_MODE_TV:
+					TRACE(" + connection: TV\n");
+					break;
+				case ATOM_ENCODER_MODE_CV:
+					TRACE(" + connection: CV\n");
+					break;
+				case ATOM_ENCODER_MODE_CRT:
+					TRACE(" + connection: CRT\n");
+					break;
+				case ATOM_ENCODER_MODE_DVO:
+					TRACE(" + connection: DVO\n");
+					break;
+				default:
+					TRACE(" + connection: UNKNOWN\n");
+			}
 
 			TRACE(" + connection index: % " B_PRIu8 "\n",
 				gDisplay[id]->connection_id);

@@ -38,9 +38,10 @@ radeon_gpu_reset()
 
 	TRACE("%s: GPU software reset in progress...\n", __func__);
 
-	// TODO : mc stop
+	// Halt memory controller
+	radeon_gpu_mc_halt();
 
-	if (radeon_gpu_mc_idle() > 0) {
+	if (radeon_gpu_mc_idlecheck() > 0) {
 		ERROR("%s: Timeout waiting for MC to idle!\n", __func__);
 	}
 
@@ -152,14 +153,66 @@ radeon_gpu_reset()
 		snooze(50);
 	}
 
-
-	// TODO : mc resume
+	// Resume memory controller
+	radeon_gpu_mc_resume();
 	return B_OK;
 }
 
 
+void
+radeon_gpu_mc_halt()
+{
+	// Backup current memory controller state
+	gInfo->mc_info->d1vga_control = Read32(OUT, D1VGA_CONTROL);
+	gInfo->mc_info->d2vga_control = Read32(OUT, D2VGA_CONTROL);
+	gInfo->mc_info->vga_render_control = Read32(OUT, VGA_RENDER_CONTROL);
+	gInfo->mc_info->vga_hdp_control = Read32(OUT, VGA_HDP_CONTROL);
+	gInfo->mc_info->d1crtc_control = Read32(OUT, D1CRTC_CONTROL);
+	gInfo->mc_info->d2crtc_control = Read32(OUT, D2CRTC_CONTROL);
+
+	// halt all memory controller actions
+	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, VGA_RENDER_CONTROL, 0);
+	Write32(OUT, D1CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, D2CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, D1CRTC_CONTROL, 0);
+	Write32(OUT, D2CRTC_CONTROL, 0);
+	Write32(OUT, D1CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, D1VGA_CONTROL, 0);
+	Write32(OUT, D2VGA_CONTROL, 0);
+}
+
+
+void
+radeon_gpu_mc_resume()
+{
+	// TODO : do surface addresses disappear on mc halt?
+	//Write32(OUT, D1GRPH_PRIMARY_SURFACE_ADDRESS, rdev->mc.vram_start);
+	//Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, rdev->mc.vram_start);
+	//Write32(OUT, D2GRPH_PRIMARY_SURFACE_ADDRESS, rdev->mc.vram_start);
+	//Write32(OUT, D2GRPH_SECONDARY_SURFACE_ADDRESS, rdev->mc.vram_start);
+	//Write32(OUT, VGA_MEMORY_BASE_ADDRESS, rdev->mc.vram_start);
+
+	// Rnlock host access
+	Write32(OUT, VGA_HDP_CONTROL, gInfo->mc_info->vga_hdp_control);
+	snooze(1);
+
+	// Restore memory controller state
+	Write32(OUT, D1VGA_CONTROL, gInfo->mc_info->d1vga_control);
+	Write32(OUT, D2VGA_CONTROL, gInfo->mc_info->d2vga_control);
+	Write32(OUT, D1CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, D2CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, D1CRTC_CONTROL, gInfo->mc_info->d1crtc_control);
+	Write32(OUT, D2CRTC_CONTROL, gInfo->mc_info->d2crtc_control);
+	Write32(OUT, D1CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, VGA_RENDER_CONTROL, gInfo->mc_info->vga_render_control);
+}
+
+
 uint32
-radeon_gpu_mc_idle()
+radeon_gpu_mc_idlecheck()
 {
 	uint32 idleStatus;
 	if (!((idleStatus = Read32(MC, SRBM_STATUS)) &
@@ -176,13 +229,15 @@ radeon_gpu_mc_setup()
 {
 	uint32 fb_location_int = gInfo->shared_info->frame_buffer_int;
 
-	uint32 fb_location = Read32(OUT, R6XX_MC_VM_FB_LOCATION);
+	uint32 fb_location = Read32(OUT, R600_MC_VM_FB_LOCATION);
 	uint16 fb_size = (fb_location >> 16) - (fb_location & 0xFFFF);
 	uint32 fb_location_tmp = fb_location_int >> 24;
 	fb_location_tmp |= (fb_location_tmp + fb_size) << 16;
 	uint32 fb_offset_tmp = (fb_location_int >> 8) & 0xff0000;
 
-	uint32 idleState = radeon_gpu_mc_idle();
+	radeon_gpu_mc_halt();
+
+	uint32 idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
 		TRACE("%s: Cannot modify non-idle MC! idleState: 0x%" B_PRIX32 "\n",
 			__func__, idleState);
@@ -194,8 +249,10 @@ radeon_gpu_mc_setup()
 		__func__, fb_location, fb_location_tmp, fb_size);
 
 	// The MC Write32 will handle cards needing a special MC read/write register
-	Write32(MC, R6XX_MC_VM_FB_LOCATION, fb_location_tmp);
-	Write32(MC, R6XX_HDP_NONSURFACE_BASE, fb_offset_tmp);
+	Write32(MC, R600_MC_VM_FB_LOCATION, fb_location_tmp);
+	Write32(MC, R600_HDP_NONSURFACE_BASE, fb_offset_tmp);
+
+	radeon_gpu_mc_resume();
 
 	return B_OK;
 }

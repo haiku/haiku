@@ -9,6 +9,9 @@
 #define RADEON_HD_GPU_H
 
 
+#include "accelerant.h"
+
+
 // GPU Control registers. These are combined as
 // the registers exist on all models, some flags
 // are different though and are commented as such
@@ -160,7 +163,9 @@
 
 
 status_t radeon_gpu_reset();
-uint32 radeon_gpu_mc_idle();
+void radeon_gpu_mc_halt();
+void radeon_gpu_mc_resume();
+uint32 radeon_gpu_mc_idlecheck();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_irq_setup();
 

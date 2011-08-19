@@ -59,6 +59,51 @@ radeon_bios_init_scratch()
 }
 
 
+bool
+radeon_bios_isposted()
+{
+	// aka, is primary graphics card that POST loaded
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 reg;
+
+	if (info.device_chipset == (RADEON_R1000 | 0x50)) {
+		// palms
+		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
+			+ EVERGREEN_CRTC0_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+			+ EVERGREEN_CRTC1_REGISTER_OFFSET);
+		if (reg & EVERGREEN_CRTC_MASTER_EN)
+			return true;
+	} else if (info.device_chipset >= RADEON_R1000) {
+		// evergreen or higher
+		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC0_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC1_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC2_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC3_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC4_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
+		if (reg & EVERGREEN_CRTC_MASTER_EN)
+			return true;
+	} else if (info.device_chipset > RADEON_R580) {
+		// avivio through r700
+		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
+			Read32(OUT, AVIVO_D2CRTC_CONTROL);
+		if (reg & AVIVO_CRTC_EN) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 status_t
 radeon_init_bios(uint8* bios)
 {
@@ -114,12 +159,16 @@ radeon_init_bios(uint8* bios)
 	radeon_bios_init_scratch();
 	atom_allocate_fb_scratch(gAtomContext);
 
-	// TODO : this is only *required* on cards <= r500
-	// is it ok to run on cards > r500 before asic_init?
-	radeon_gpu_reset();
-
-	atom_asic_init(gAtomContext);
-		// Post card
+	// post card atombios if needed
+	if (!radeon_bios_isposted()) {
+		TRACE("%s: init AtomBIOS for this card as it is not not posted\n",
+			__func__);
+		// radeon_gpu_reset();	// <= r500 only?
+		atom_asic_init(gAtomContext);
+	} else {
+		TRACE("%s: AtomBIOS is already posted\n",
+			__func__);
+	}
 
 	return B_OK;
 }
