@@ -25,7 +25,7 @@
 #include <string.h>
 
 
-//#define TRACE_VIDEO
+#define TRACE_VIDEO
 #ifdef TRACE_VIDEO
 #	define TRACE(x) dprintf x
 #else
@@ -204,6 +204,202 @@ ModeOps::MakeLabel(const struct video_mode *mode, char *label, size_t len)
 }
 
 
+//	#pragma mark - ST/TT XBIOS API
+
+class STModeOps : public ModeOps {
+public:
+	STModeOps() : ModeOps("ST/TT") {};
+	~STModeOps() {};
+	virtual status_t	Init();
+
+	virtual status_t	Enumerate();
+	virtual status_t	Decode(int16 id, struct video_mode *mode);
+	virtual status_t	Get(struct video_mode *mode);
+	virtual status_t	Set(const struct video_mode *mode);
+	virtual status_t	Unset(const struct video_mode *mode);
+
+	virtual status_t	SetPalette(const struct video_mode *mode,
+							const uint8 *palette);
+	virtual addr_t		Framebuffer();
+	virtual void		MakeLabel(const struct video_mode *mode,
+							char *label, size_t len);
+private:
+	static int16		fPreviousMode;
+	static bool			fIsTT;
+};
+
+
+int16 STModeOps::fPreviousMode = -1;
+bool STModeOps::fIsTT = false;
+
+
+status_t
+STModeOps::Init()
+{
+	const tos_cookie *c = tos_find_cookie('_VDO');
+	if (c == NULL)
+		return ENODEV;
+	if (c->ivalue >> 16 < 1)
+		return ENODEV;
+	if (c->ivalue >= 2)
+		fIsTT = true;
+	fInitStatus = B_OK;
+	return fInitStatus;
+}
+
+
+
+status_t
+STModeOps::Enumerate()
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	static int16 modes[] = { 0, /*TT:*/ 4, 7 };
+	for (int i = 0; i < sizeof(modes) / sizeof(int16); i++) {
+		if (!fIsTT && i > 0)
+			break;
+
+		video_mode *videoMode = AllocMode();
+		if (videoMode == NULL)
+			continue;
+
+		if (Decode(modes[i], videoMode) != B_OK)
+			continue;
+		add_video_mode(videoMode);
+
+	}
+	return B_OK;
+
+#if 0
+	// TODO: use TT video monitor detection and build possible mode list there...
+	return ENODEV;
+#endif
+}
+
+
+status_t
+STModeOps::Decode(int16 id, struct video_mode *mode)
+{
+	mode->ops = this;
+	mode->mode = id;
+
+	switch (id) {
+		case 0:
+			mode->width = 320;
+			mode->height = 200;
+			mode->bits_per_pixel = 4;
+			break;
+		case 4:
+			mode->width = 640;
+			mode->height = 480;
+			mode->bits_per_pixel = 4;
+			break;
+		case 7:
+			mode->width = 320;
+			mode->height = 480;
+			mode->bits_per_pixel = 8;
+			break;
+		default:
+			mode->bits_per_pixel = 0;
+			break;
+	}
+
+	mode->bytes_per_row = mode->width * mode->bits_per_pixel / 8;
+	return B_OK;
+}
+
+
+status_t
+STModeOps::Get(struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	int16 m = Getrez();
+	return Decode(m, mode);
+}
+
+
+status_t
+STModeOps::Set(const struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+	if (mode == NULL)
+		return B_BAD_VALUE;
+
+	fPreviousMode = Getrez();
+
+#warning M68K: FIXME: allocate framebuffer
+	dprintf("Switching to mode 0x%04x\n", mode->mode);
+	//VsetScreen(((uint32)0x00d00000), ((uint32)0x00d00000), 3, mode->mode);
+	Setscreen(-1, -1, mode->mode, 0);
+	if (Getrez() != mode->mode) {
+		dprintf("failed to set mode %d. Current is %d\n", mode->mode, fPreviousMode);
+		fPreviousMode = -1;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+STModeOps::Unset(const struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	if (fPreviousMode != -1) {
+		dprintf("Reverting to mode 0x%04x\n", fPreviousMode);
+		Setscreen(-1, -1, fPreviousMode, 0);
+		fPreviousMode = -1;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+STModeOps::SetPalette(const struct video_mode *mode, const uint8 *palette)
+{
+	switch (mode->bits_per_pixel) {
+		case 4:
+			//VsetRGB(0, 16, palette);
+			//XXX: Use ESet*
+			break;
+		case 8:
+			//VsetRGB(0, 256, palette);
+			//XXX: Use ESet*
+			break;
+		default:
+			break;
+	}
+}
+
+
+addr_t
+STModeOps::Framebuffer()
+{
+	addr_t fb = (addr_t)Physbase();
+	return fb;
+}
+
+
+void
+STModeOps::MakeLabel(const struct video_mode *mode, char *label,
+	size_t len)
+{
+	ModeOps::MakeLabel(mode, label, len);
+	label += strlen(label);
+	// XXX no len check
+	sprintf(label, " 0x%04x", mode->mode);
+}
+
+
+static STModeOps sSTModeOps;
+
+
 //	#pragma mark - Falcon XBIOS API
 
 class FalconModeOps : public ModeOps {
@@ -345,7 +541,9 @@ FalconModeOps::Set(const struct video_mode *mode)
 
 #warning M68K: FIXME: allocate framebuffer
 	dprintf("Switching to mode 0x%04x\n", mode->mode);
-	VsetScreen(((uint32)0x00d00000), ((uint32)0x00d00000), 3, mode->mode);
+	//VsetScreen(((uint32)0x00d00000), ((uint32)0x00d00000), 3, mode->mode);
+	VsetScreen(((uint32)0x00c00000), ((uint32)0x00c00000), 3, mode->mode);
+	//VsetScreen(((uint32)-1), ((uint32)-1), 3, mode->mode);
 
 	return B_OK;
 }
@@ -410,6 +608,221 @@ FalconModeOps::MakeLabel(const struct video_mode *mode, char *label,
 
 
 static FalconModeOps sFalconModeOps;
+
+
+//	#pragma mark - Milan XBIOS API
+
+class MilanModeOps : public ModeOps {
+public:
+	MilanModeOps() : ModeOps("Milan") {};
+	~MilanModeOps() {};
+	virtual status_t	Init();
+
+	virtual status_t	Enumerate();
+	virtual status_t	Decode(int16 id, struct video_mode *mode);
+	virtual status_t	Get(struct video_mode *mode);
+	virtual status_t	Set(const struct video_mode *mode);
+	virtual status_t	Unset(const struct video_mode *mode);
+
+	virtual status_t	SetPalette(const struct video_mode *mode,
+							const uint8 *palette);
+	virtual addr_t		Framebuffer();
+	virtual void		MakeLabel(const struct video_mode *mode,
+							char *label, size_t len);
+private:
+	static int16		fPreviousMode;
+};
+
+
+int16 MilanModeOps::fPreviousMode = -1;
+
+
+status_t
+MilanModeOps::Init()
+{
+	const tos_cookie *c = tos_find_cookie('_MIL');
+	if (c == NULL)
+		return ENODEV;
+	fInitStatus = B_OK;
+	return fInitStatus;
+}
+
+
+
+status_t
+MilanModeOps::Enumerate()
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	SCREENINFO info;
+	info.size = sizeof(info);
+	
+
+	static int16 modes[] = {
+		0x001b, 0x001c, 0x002b, 0x002c, 
+		0x003a, 0x003b, 0x003c, 0x000c, 
+		0x0034, 0x0004
+		/*0x003a, 0x003b, 0x0003, 0x000c, 
+		0x000b, 0x0033, 0x000c, 0x001c*/ };
+	for (int i = 0; i < sizeof(modes) / sizeof(int16); i++) {
+		video_mode *videoMode = AllocMode();
+		if (videoMode == NULL)
+			continue;
+
+		if (Decode(modes[i], videoMode) != B_OK)
+			continue;
+		add_video_mode(videoMode);
+
+	}
+	return B_OK;
+
+#if 0
+	// TODO: use Milan video monitor detection and build possible mode list there...
+	int16 monitor;
+	bool vga = false;
+	bool tv = false;
+	monitor = VgetMonitor();
+	switch (monitor) {
+		case 0:
+			panic("Monochrome ?\n");
+			break;
+		case 2:
+			vga = true;
+			break;
+		case 3:
+			tv = true;
+			break;
+		//case 4 & 5: check for CT60
+		case 1:
+		default:
+			dprintf("monitor type %d\n", monitor);
+			break;
+	}
+	return ENODEV;
+#endif
+}
+
+
+status_t
+MilanModeOps::Decode(int16 id, struct video_mode *mode)
+{
+	SCREENINFO info;
+	info.size = sizeof(info);
+	info.devID = mode->mode;
+	info.scrFlags = 0;
+
+	mode->ops = this;
+	mode->mode = id;
+
+	Setscreen(-1,&info,MI_MAGIC,CMD_GETINFO);
+	
+	if (info.scrFlags & SCRINFO_OK == 0)
+		return B_ERROR;
+
+	// cf. F30.TXT
+	mode->width = info.scrWidth;
+	mode->height = info.scrHeight;
+	mode->bits_per_pixel = info.scrPlanes;
+	mode->bytes_per_row = mode->width * mode->bits_per_pixel / 8;
+	return B_OK;
+}
+
+
+status_t
+MilanModeOps::Get(struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	int16 m = -1;
+	Setscreen(-1,&m,MI_MAGIC,CMD_GETMODE);
+	if (m == -1)
+		return B_ERROR;
+	return Decode(m, mode);
+}
+
+
+status_t
+MilanModeOps::Set(const struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+	if (mode == NULL)
+		return B_BAD_VALUE;
+
+	Setscreen(-1,&fPreviousMode,MI_MAGIC,CMD_GETMODE);
+
+#warning M68K: FIXME: allocate framebuffer
+	dprintf("Switching to mode 0x%04x\n", mode->mode);
+	//VsetScreen(((uint32)0x00d00000), ((uint32)0x00d00000), 3, mode->mode);
+	//VsetScreen(((uint32)-1), ((uint32)-1), 3, mode->mode);
+	Setscreen(-1,mode->mode,MI_MAGIC,CMD_SETMODE);
+
+	return B_OK;
+}
+
+
+status_t
+MilanModeOps::Unset(const struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	if (fPreviousMode != -1) {
+		dprintf("Reverting to mode 0x%04x\n", fPreviousMode);
+		Setscreen(-1,fPreviousMode,MI_MAGIC,CMD_SETMODE);
+		fPreviousMode = -1;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+MilanModeOps::SetPalette(const struct video_mode *mode, const uint8 *palette)
+{
+	switch (mode->bits_per_pixel) {
+		case 4:
+			//VsetRGB(0, 16, palette);
+			break;
+		case 8:
+			//VsetRGB(0, 256, palette);
+			break;
+		default:
+			break;
+	}
+}
+
+
+addr_t
+MilanModeOps::Framebuffer()
+{
+	//XXX
+	addr_t fb = (addr_t)Physbase();
+	return fb;
+}
+
+
+void
+MilanModeOps::MakeLabel(const struct video_mode *mode, char *label,
+	size_t len)
+{
+	ModeOps::MakeLabel(mode, label, len);
+	label += strlen(label);
+	// XXX no len check
+	int16 m = mode->mode;
+	sprintf(label, " 0x%04x", mode->mode);
+	/*sprintf(label, "%s%s%s%s",
+		m & 0x0010 ? " vga" : " tv",
+		m & 0x0020 ? " pal" : "",
+		m & 0x0040 ? " oscan" : "",
+		//m & 0x0080 ? " tv" : "",
+		m & 0x0100 ? " ilace" : "");*/
+}
+
+
+static MilanModeOps sMilanModeOps;
 
 
 //	#pragma mark - ARAnyM NFVDI API
@@ -723,7 +1136,7 @@ platform_switch_to_logo(void)
 	}
 	gKernelArgs.frame_buffer.enabled = true;
 
-#if 0
+#if 1
 	// If the new frame buffer is either larger than the old one or located at
 	// a different address, we need to remap it, so we first have to throw
 	// away its previous mapping
@@ -777,7 +1190,11 @@ platform_init_video(void)
 	//sNFVDIModeOps.Init();
 	//sNFVDIModeOps.Enumerate();
 
-	if (sFalconModeOps.Init() == B_OK) {
+	if (sMilanModeOps.Init() == B_OK) {
+		sMilanModeOps.Enumerate();
+	} else if (sSTModeOps.Init() == B_OK) {
+		sSTModeOps.Enumerate();
+	} else if (sFalconModeOps.Init() == B_OK) {
 		sFalconModeOps.Enumerate();
 	} else {
 		dprintf("No usable video API found\n");
