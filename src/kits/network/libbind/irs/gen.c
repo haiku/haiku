@@ -26,7 +26,7 @@ static const char rcsid[] = "$Id: gen.c,v 1.7 2005/04/27 04:56:23 sra Exp $";
  * The dispatcher is implemented as an accessor class; it is an
  * accessor class that calls other accessor classes, as controlled by a
  * configuration file.
- * 
+ *
  * A big difference between this accessor class and others is that the
  * map class initializers are NULL, and the map classes are already
  * filled in with method functions that will do the right thing.
@@ -44,9 +44,11 @@ static const char rcsid[] = "$Id: gen.c,v 1.7 2005/04/27 04:56:23 sra Exp $";
 #include <string.h>
 
 #include <sys/types.h>
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <resolv.h>
+
+#include <FindDirectory.h>
 
 #include <isc/memcluster.h>
 #include <irs.h>
@@ -121,7 +123,7 @@ struct irs_acc *
 irs_gen_acc(const char *options, const char *conf_file) {
 	struct irs_acc *acc;
 	struct gen_p *irs;
-		
+
 	if (!(acc = memget(sizeof *acc))) {
 		errno = ENOMEM;
 		return (NULL);
@@ -218,7 +220,7 @@ static void
 gen_close(struct irs_acc *this) {
 	struct gen_p *irs = (struct gen_p *)this->private;
 	int n;
-	
+
 	/* Search rules. */
 	for (n = 0; n < irs_nmap; n++)
 		while (irs->map_rules[n] != NULL)
@@ -382,10 +384,17 @@ default_map_rules(struct gen_p *irs) {
 static void
 init_map_rules(struct gen_p *irs, const char *conf_file) {
 	char line[1024], pattern[40], mapname[20], accname[20], options[100];
+	char path[PATH_MAX];
 	FILE *conf;
 
-	if (conf_file == NULL) 
-		conf_file = _PATH_IRS_CONF ;
+	if (conf_file == NULL) {
+		if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+				sizeof(path)) == B_OK) {
+			strlcat(path, "/network/irs.conf", sizeof(path));
+			conf_file = path;
+		} else
+			conf_file = _PATH_IRS_CONF;
+	}
 
 	/* A conf file of "" means compiled in defaults. Irpd wants this */
 	if (conf_file[0] == '\0' || (conf = fopen(conf_file, "r")) == NULL) {
