@@ -94,6 +94,7 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	status_t status;
 	uint8 bus;
 	int domain;
+	TRACE(("pci_reserve_device(%d, %d, %d, %s)\n", virtualBus, device, function, driverName));
 
 	/*
 	 * we add 2 nodes to the PCI devices, one with constant attributes,
@@ -189,6 +190,7 @@ pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 	status_t status;
 	uint8 bus;
 	int domain;
+	TRACE(("pci_unreserve_device(%d, %d, %d, %s)\n", virtualBus, device, function, driverName));
 
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return B_ERROR;
