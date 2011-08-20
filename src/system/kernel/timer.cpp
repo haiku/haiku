@@ -94,7 +94,7 @@ static void
 per_cpu_real_time_clock_changed(void*, int cpu)
 {
 	per_cpu_timer_data& cpuData = sPerCPU[cpu];
-	SpinLocker cpuDataLocker(cpuData.lock);
+	InterruptsSpinLocker cpuDataLocker(cpuData.lock);
 
 	bigtime_t realTimeOffset = rtc_boot_time();
 	if (realTimeOffset == cpuData.real_time_offset)
