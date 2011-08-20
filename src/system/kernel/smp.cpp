@@ -1266,13 +1266,14 @@ smp_get_current_cpu(void)
 void
 call_all_cpus(void (*func)(void*, int), void* cookie)
 {
+	cpu_status state = disable_interrupts();
+	
 	// if inter-CPU communication is not yet enabled, use the early mechanism
 	if (!sICIEnabled) {
 		call_all_cpus_early(func, cookie);
+		restore_interrupts(state);
 		return;
 	}
-
-	cpu_status state = disable_interrupts();
 
 	if (smp_get_num_cpus() > 1) {
 		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
@@ -1289,13 +1290,14 @@ call_all_cpus(void (*func)(void*, int), void* cookie)
 void
 call_all_cpus_sync(void (*func)(void*, int), void* cookie)
 {
+	cpu_status state = disable_interrupts();
+	
 	// if inter-CPU communication is not yet enabled, use the early mechanism
 	if (!sICIEnabled) {
 		call_all_cpus_early(func, cookie);
+		restore_interrupts(state);
 		return;
 	}
-
-	cpu_status state = disable_interrupts();
 
 	if (smp_get_num_cpus() > 1) {
 		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
