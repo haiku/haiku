@@ -1,17 +1,27 @@
 1	german	x-vnd.Haiku-Time	453699369
 <Other>	Time		<Andere>
 Add	Time		Hinzu
+Africa	Time		Afrika
+America	Time		Amerika
+Antarctica	Time		Antarktis
+Arctic	Time		Arktis
+Asia	Time		Asien
+Atlantic	Time		Atlantik
+Australia	Time		Australien
 Could not contact server	Time		Server konnte nicht erreicht werden
 Could not create socket	Time		Socket konnte nicht erzeugt werden
 Current time:	Time		Aktuelle Zeit:
 Date and time	Time		Datum und Zeit
 Etc	Time		Etc
+Europe	Time		Europa
 GMT	Time		GMT
 Hardware clock set to:	Time		Hardware-Uhr gestellt auf:
+Indian	Time		Indischer Ozean
 Local time	Time		Lokale Zeit
 Message receiving failed	Time		Nachricht wurde nicht erhalten
 Network time	Time		Netzwerkzeit
 OK	Time		OK
+Pacific	Time		Pazifik
 Preview time:	Time		Vorschau-Zeit:
 Received invalid time	Time		Ungültige Zeit erhalten
 Remove	Time		Entfernen
