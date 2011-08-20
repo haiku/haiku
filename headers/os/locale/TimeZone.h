@@ -46,7 +46,7 @@ public:
 private:
 	friend	class Private;
 
-			icu::TimeZone*	fICUTimeZone;
+			icu::TimeZone*		fICUTimeZone;
 			icu::Locale*		fICULocale;
 			status_t			fInitStatus;
 
