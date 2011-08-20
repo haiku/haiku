@@ -124,8 +124,8 @@ radeon_init_bios(uint8* bios)
 	if (!atom_card_info)
 		return B_NO_MEMORY;
 
-	atom_card_info->reg_read = _read32;
-	atom_card_info->reg_write = _write32;
+	atom_card_info->reg_read = Read32Cail;
+	atom_card_info->reg_write = Write32Cail;
 
 	if (false) {
 		// TODO : if rio_mem, use ioreg
@@ -133,8 +133,8 @@ radeon_init_bios(uint8* bios)
 		//atom_card_info->ioreg_write = cail_ioreg_write;
 	} else {
 		TRACE("%s: Cannot find PCI I/O BAR; using MMIO\n", __func__);
-		atom_card_info->ioreg_read = _read32;
-		atom_card_info->ioreg_write = _write32;
+		atom_card_info->ioreg_read = Read32Cail;
+		atom_card_info->ioreg_write = Write32Cail;
 	}
 	atom_card_info->mc_read = _read32;
 	atom_card_info->mc_write = _write32;
@@ -159,6 +159,11 @@ radeon_init_bios(uint8* bios)
 	radeon_bios_init_scratch();
 	atom_allocate_fb_scratch(gAtomContext);
 
+	// TODO : Always post bios for now... not doing this
+	// at a later date may save boot time
+	atom_asic_init(gAtomContext);
+
+	#if 0
 	// post card atombios if needed
 	if (!radeon_bios_isposted()) {
 		TRACE("%s: init AtomBIOS for this card as it is not not posted\n",
@@ -169,6 +174,7 @@ radeon_init_bios(uint8* bios)
 		TRACE("%s: AtomBIOS is already posted\n",
 			__func__);
 	}
+	#endif
 
 	return B_OK;
 }

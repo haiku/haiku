@@ -181,6 +181,21 @@ _write32(uint32 offset, uint32 value)
 }
 
 
+// AtomBIOS cail register calls (are *4... no clue why)
+inline uint32
+Read32Cail(uint32 offset)
+{
+	return _read32(offset * 4);
+}
+
+
+inline void
+Write32Cail(uint32 offset, uint32 value)
+{
+	_write32(offset * 4, value);
+}
+
+
 inline uint32
 Read32(uint32 subsystem, uint32 offset)
 {
