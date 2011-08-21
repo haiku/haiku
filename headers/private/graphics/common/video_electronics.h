@@ -27,28 +27,6 @@
 #define VIDEO_CONNECTOR_TV			0x0E
 
 
-const struct video_connectors {
-	uint32      type;
-	const char* name;
-} kVideoConnector[] = {
-	{VIDEO_CONNECTOR_UNKNOWN, "Unknown"},
-	{VIDEO_CONNECTOR_VGA, "VGA" },
-	{VIDEO_CONNECTOR_DVII, "DVI-I"},
-	{VIDEO_CONNECTOR_DVID, "DVI-D"},
-	{VIDEO_CONNECTOR_DVIA, "DVI-A"},
-	{VIDEO_CONNECTOR_COMPOSITE, "Composite"},
-	{VIDEO_CONNECTOR_SVIDEO, "S-Video"},
-	{VIDEO_CONNECTOR_LVDS, "LVDS"},
-	{VIDEO_CONNECTOR_COMPONENT, "Component"},
-	{VIDEO_CONNECTOR_9DIN, "DIN"},
-	{VIDEO_CONNECTOR_DP, "DisplayPort"},
-	{VIDEO_CONNECTOR_EDP, "Embedded DisplayPort"},
-	{VIDEO_CONNECTOR_HDMIA, "HDMI A"},
-	{VIDEO_CONNECTOR_HDMIB, "HDMI B"},
-	{VIDEO_CONNECTOR_TV, "TV"},
-};
-
-
 // Video encoder types
 #define VIDEO_ENCODER_NONE		0x00
 #define VIDEO_ENCODER_DAC		0x01
@@ -57,16 +35,20 @@ const struct video_connectors {
 #define VIDEO_ENCODER_TVDAC		0x04
 
 
-const struct video_encoders {
-	uint32      type;
-	const char* name;
-} kVideoEncoder[] = {
-	{VIDEO_ENCODER_NONE, "None"},
-	{VIDEO_ENCODER_DAC, "DAC"},
-	{VIDEO_ENCODER_TMDS, "TMDS"},
-	{VIDEO_ENCODER_LVDS, "LVDS"},
-	{VIDEO_ENCODER_TVDAC, "TV"},
-};
+// to ensure compatibility with C accelerants
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+// mostly for debugging detected monitors
+const char* decode_connector_name(uint32 connector);
+const char* decode_encoder_name(uint32 encoder);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /* _VIDEO_ELECTRONICS_H */
