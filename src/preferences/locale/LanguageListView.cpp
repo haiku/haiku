@@ -30,47 +30,40 @@
 #define B_TRANSLATE_CONTEXT "LanguageListView"
 
 
-static const float kFlagWidth = 17.0;
+static const float kLeftInset = 4;
 
 LanguageListItem::LanguageListItem(const char* text, const char* id,
-	const char* code, const char* countryCode)
+	const char* languageCode)
 	:
 	BStringItem(text),
 	fID(id),
-	fCode(code)
+	fCode(languageCode)
 {
-	fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-	if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
-			countryCode) != B_OK) {
-		delete fIcon;
-		fIcon = NULL;
-	}
 }
 
 
 LanguageListItem::LanguageListItem(const LanguageListItem& other)
 	:
 	BStringItem(other.Text()),
-	fID(other.ID()),
-	fCode(other.Code()),
-	fIcon(NULL)
+	fID(other.fID),
+	fCode(other.fCode)
 {
-	if (other.fIcon != NULL)
-		fIcon = new BBitmap(*other.fIcon);
-}
-
-
-LanguageListItem::~LanguageListItem()
-{
-	delete fIcon;
 }
 
 
 void
 LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
-	rgb_color kHighlight = {140, 140, 140, 0};
-	rgb_color kBlack = {0, 0, 0, 0};
+	DrawItemWithTextOffset(owner, frame, complete, 0);
+}
+
+
+void
+LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
+	bool complete, float textOffset)
+{
+	static rgb_color kHighlight = {140, 140, 140, 0};
+	static rgb_color kBlack = {0, 0, 0, 0};
 
 	if (IsSelected() || complete) {
 		rgb_color color;
@@ -90,41 +83,81 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->SetHighColor(kBlack);
 	else {
 		owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_3_TINT));
-		text += "   [";
-		text += B_TRANSLATE("already chosen");
-		text += "]";
+		text << "   [" << B_TRANSLATE("already chosen") << "]";
 	}
 
-	BFont font = be_plain_font;
-	font_height	finfo;
-	font.GetHeight(&finfo);
-	owner->SetFont(&font);
-	// TODO: the position is unnecessarily complicated, and not correct either
-	owner->MovePenTo(frame.left + 8, frame.top
-		+ (frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2
-		+ (finfo.ascent + finfo.descent) - 1);
+	owner->MovePenTo(frame.left + kLeftInset + textOffset,
+		frame.top + BaselineOffset());
 	owner->DrawString(text.String());
+}
 
-	// Draw the icon
-	frame.left = frame.right - kFlagWidth;
-	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top + 1, iconFrame.left + kFlagWidth - 2,
-		iconFrame.top + kFlagWidth - 1);
 
-	if (fIcon != NULL && fIcon->IsValid()) {
-		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(fIcon, iconFrame);
-		owner->SetDrawingMode(B_OP_COPY);
-	}
+// #pragma mark -
 
+
+LanguageListItemWithFlag::LanguageListItemWithFlag(const char* text,
+	const char* id, const char* languageCode, const char* countryCode)
+	:
+	LanguageListItem(text, id, languageCode),
+	fCountryCode(countryCode),
+	fIcon(NULL)
+{
+}
+
+
+LanguageListItemWithFlag::LanguageListItemWithFlag(
+	const LanguageListItemWithFlag& other)
+	:
+	LanguageListItem(other),
+	fCountryCode(other.fCountryCode),
+	fIcon(other.fIcon != NULL ? new BBitmap(*other.fIcon) : NULL)
+{
+}
+
+
+LanguageListItemWithFlag::~LanguageListItemWithFlag()
+{
+	delete fIcon;
 }
 
 
 void
-LanguageListItem::Update(BView* owner, const BFont* font)
+LanguageListItemWithFlag::Update(BView* owner, const BFont* font)
 {
-	BStringItem::Update(owner, font);
-	SetWidth(Width() + kFlagWidth);
+	LanguageListItem::Update(owner, font);
+
+	float iconSize = Height();
+	SetWidth(Width() + iconSize + 4);
+
+	if (fCountryCode.IsEmpty())
+		return;
+
+	fIcon = new(std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
+		B_RGBA32);
+	if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
+			fCountryCode.String()) != B_OK) {
+		delete fIcon;
+		fIcon = NULL;
+	}
+}
+
+
+void
+LanguageListItemWithFlag::DrawItem(BView* owner, BRect frame, bool complete)
+{
+	if (fIcon == NULL || !fIcon->IsValid()) {
+		DrawItemWithTextOffset(owner, frame, complete, 0);
+		return;
+	}
+
+	float iconSize = fIcon->Bounds().Width();
+	DrawItemWithTextOffset(owner, frame, complete, iconSize + 4);
+
+	BRect iconFrame(frame.left + kLeftInset, frame.top,
+		frame.left + kLeftInset + iconSize - 1, frame.top + iconSize - 1);
+	owner->SetDrawingMode(B_OP_OVER);
+	owner->DrawBitmap(fIcon, iconFrame);
+	owner->SetDrawingMode(B_OP_COPY);
 }
 
 

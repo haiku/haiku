@@ -20,10 +20,9 @@
 class LanguageListItem : public BStringItem {
 public:
 								LanguageListItem(const char* text,
-									const char* id, const char* langCode,
-									const char* countryCode = NULL);
-								LanguageListItem(const LanguageListItem& other);
-	virtual						~LanguageListItem();
+									const char* id, const char* languageCode);
+								LanguageListItem(
+									const LanguageListItem& other);
 
 			const BString&		ID() const { return fID; }
 			const BString&		Code() const { return fCode; }
@@ -31,11 +30,33 @@ public:
 	virtual	void				DrawItem(BView* owner, BRect frame,
 									bool complete = false);
 
-	virtual void				Update(BView* owner, const BFont* font);
+protected:
+			void				DrawItemWithTextOffset(BView* owner,
+									BRect frame, bool complete,
+									float textOffset);
 
 private:
 			BString				fID;
 			BString				fCode;
+};
+
+
+class LanguageListItemWithFlag : public LanguageListItem {
+public:
+								LanguageListItemWithFlag(const char* text,
+									const char* id, const char* languageCode,
+									const char* countryCode = NULL);
+								LanguageListItemWithFlag(
+									const LanguageListItemWithFlag& other);
+	virtual						~LanguageListItemWithFlag();
+
+	virtual void				Update(BView* owner, const BFont* font);
+
+	virtual	void				DrawItem(BView* owner, BRect frame,
+									bool complete = false);
+
+private:
+			BString				fCountryCode;
 			BBitmap*			fIcon;
 };
 
