@@ -343,7 +343,7 @@ TimeZoneView::_BuildZoneMenu()
 			// just accept timezones from our supported regions, others are
 			// aliases and would just make the list even longer
 			TranslatedRegionMap::iterator regionIter = regionMap.find(region);
-			if (regionIter == zoneItemMap.end())
+			if (regionIter == regionMap.end())
 				continue;
 			const BString& regionName = regionIter->second;
 
