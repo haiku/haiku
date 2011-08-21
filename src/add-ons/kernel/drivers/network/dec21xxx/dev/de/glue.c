@@ -51,7 +51,7 @@ check_disable_interrupts_de(device_t dev)
 	TULIP_CSR_WRITE(sc, csr_intr, 0);
 
 	HAIKU_INTR_REGISTER_LEAVE();
-	
+
 	return 1;
 }
 
@@ -64,3 +64,4 @@ reenable_interrupts_de(device_t dev)
 	TULIP_CSR_WRITE(sc, csr_intr, sc->tulip_intrmask);
 	TULIP_UNLOCK(sc);
 }
+
