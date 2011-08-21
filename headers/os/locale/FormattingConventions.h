@@ -70,6 +70,8 @@ public:
 			const char*			LanguageCode() const;
 			const char*			CountryCode() const;
 
+			bool				AreCountrySpecific() const;
+
 			status_t			GetNativeName(BString& name) const;
 			status_t			GetName(BString& name,
 									const BLanguage* displayLanguage = NULL

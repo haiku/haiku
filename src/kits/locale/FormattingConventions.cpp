@@ -345,6 +345,13 @@ BFormattingConventions::CountryCode() const
 }
 
 
+bool
+BFormattingConventions::AreCountrySpecific() const
+{
+	return CountryCode() != NULL;
+}
+
+
 status_t
 BFormattingConventions::GetNativeName(BString& name) const
 {
