@@ -53,7 +53,13 @@ const struct supported_device {
 	{0x958a, RADEON_R600 | 0x30, false, "Radeon HD 2600 X2"},
 	//	Radeon 2700		- RV630
 	{0x9400, RADEON_R600 | 0x00, false, "Radeon HD 2900"},
+	{0x9401, RADEON_R600 | 0x00, false, "Radeon HD 2900"},
+	{0x9402, RADEON_R600 | 0x00, false, "Radeon HD 2900"},
+	{0x9403, RADEON_R600 | 0x00, false, "Radeon HD 2900 Pro"},
 	{0x9405, RADEON_R600 | 0x00, false, "Radeon HD 2900"},
+	{0x940a, RADEON_R600 | 0x00, false, "Radeon FireGL V8650"},
+	{0x940b, RADEON_R600 | 0x00, false, "Radeon FireGL V8600"},
+	{0x940f, RADEON_R600 | 0x00, false, "Radeon FireGL V7600"},
 	{0x9611, RADEON_R600 | 0x20, true,  "Radeon HD 3100"},
 	{0x9613, RADEON_R600 | 0x20, true,  "Radeon HD 3100"},
 	{0x9610, RADEON_R600 | 0x10, true,  "Radeon HD 3200"},
@@ -96,7 +102,7 @@ const struct supported_device {
 	{0x9490, RADEON_R700 | 0x30, false, "Radeon HD 4710"},
 	{0x94b3, RADEON_R700 | 0x40, false, "Radeon HD 4770"},
 	{0x94b5, RADEON_R700 | 0x40, false, "Radeon HD 4770"},
-	{0x944a, RADEON_R700 | 0x70, false, "Radeon HD 4800"},
+	{0x944a, RADEON_R700 | 0x70, false, "Radeon HD 4850 Mobile"}, // IGP?
 	{0x944e, RADEON_R700 | 0x70, false, "Radeon HD 4810"},
 	{0x944c, RADEON_R700 | 0x70, false, "Radeon HD 4830"},
 	{0x9442, RADEON_R700 | 0x70, false, "Radeon HD 4850"},
