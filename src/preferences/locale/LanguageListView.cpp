@@ -62,8 +62,8 @@ void
 LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 	bool complete, float textOffset)
 {
-	static rgb_color kHighlight = {140, 140, 140, 0};
-	static rgb_color kBlack = {0, 0, 0, 0};
+	static const rgb_color kHighlight = {140, 140, 140, 0};
+	static const rgb_color kBlack = {0, 0, 0, 0};
 
 	if (IsSelected() || complete) {
 		rgb_color color;
