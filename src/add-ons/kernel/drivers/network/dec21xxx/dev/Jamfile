@@ -2,3 +2,4 @@ SubDir HAIKU_TOP src add-ons kernel drivers network dec21xxx dev ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx dev mii ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx dev dc ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx dev de ;
