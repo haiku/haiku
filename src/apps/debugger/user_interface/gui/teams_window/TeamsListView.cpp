@@ -229,8 +229,25 @@ TeamRow::_SetTo(team_info& info)
 			get_ref_for_path(kernelPath.Path(), &appInfo.ref);
 		}
 	} else {
-		BEntry entry(teamInfo.args, true);
-		entry.GetRef(&appInfo.ref);
+		// Not an application known to be_roster
+		
+		// The teamInfo.args string is not safe and could be truncated. 
+		// This could leads to show an intermediate folder icon!
+		//
+		// Let's retrieve instead the entry_ref from the first team's image of 
+		// type B_APP_IMAGE
+		int32 cookie = 0;
+		image_info imageInfo;
+		while (get_next_image_info(teamInfo.team, &cookie, &imageInfo) == B_OK) {
+			if (imageInfo.type == B_APP_IMAGE) {
+				BPath imagePath(imageInfo.name);
+				appInfo.ref.device 		= imageInfo.device;
+				appInfo.ref.directory 	= imageInfo.node;
+				appInfo.ref.set_name(imagePath.Leaf());
+				break;
+			}
+		}
+		
 	}
 
 	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
