@@ -37,7 +37,7 @@
 
 #undef TRACE
 
-#define TRACE_ATOM
+//#define TRACE_ATOM
 #ifdef TRACE_ATOM
 #   define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
@@ -518,10 +518,11 @@ atom_op_calltable(atom_exec_context *ctx, int *ptr, int arg)
 	int idx = U8((*ptr)++);
 	status_t result = B_OK;
 
-	if (idx < ATOM_TABLE_NAMES_CNT)
+	if (idx < ATOM_TABLE_NAMES_CNT) {
 		TRACE("%s: table: %s (%d)\n", __func__, atom_table_names[idx], idx);
-	else
+	} else {
 		TRACE("%s: table: unknown (%d)\n", __func__, idx);
+	}
 
 	if (U16(ctx->ctx->cmd_table + 4 + 2 * idx)) {
 		result = atom_execute_table_locked(ctx->ctx,
@@ -731,8 +732,10 @@ atom_op_or(atom_exec_context *ctx, int *ptr, int arg)
 static void
 atom_op_postcard(atom_exec_context *ctx, int *ptr, int arg)
 {
+	#ifdef ATOM_TRACE
 	uint8 val = U8((*ptr)++);
 	TRACE("%s: POST card output: 0x%" B_PRIX8 "\n", __func__, val);
+	#endif
 }
 
 
