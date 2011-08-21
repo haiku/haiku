@@ -27,8 +27,8 @@ public:
 	virtual	void			MouseUp(BPoint point);
 	virtual	void			MouseMoved(BPoint point, uint32 transit,
 								const BMessage* message);
-	virtual	void			FrameResized(float, float);
-	
+	virtual	void			DoLayout();
+
 	virtual	BSize			MaxSize();
 	virtual	BSize			MinSize();
 	virtual	BSize			PreferredSize();
@@ -60,7 +60,7 @@ private:
 			int32			fMinutes;
 			int32			fSeconds;
 			bool			fDirty;
-			
+
 			float 			fCenterX;
 			float			fCenterY;
 			float			fRadius;
@@ -70,7 +70,7 @@ private:
 			bool			fDrawSecondHand;
 			bool			fInteractive;
 
-			bool			fTimeChangeIsOngoing;	
+			bool			fTimeChangeIsOngoing;
 };
 
 
