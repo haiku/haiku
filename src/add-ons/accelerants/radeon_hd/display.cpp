@@ -24,6 +24,8 @@ extern "C" void _sPrintf(const char *format, ...);
 #   define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) _sPrintf("radeon_hd: " x)
+
 
 /*! Populate regs with device dependant register locations */
 status_t
@@ -215,6 +217,281 @@ detect_crt_ranges(uint32 crtid)
 	}
 
 	return B_ERROR;
+}
+
+
+union atom_supported_devices {
+	struct _ATOM_SUPPORTED_DEVICES_INFO info;
+	struct _ATOM_SUPPORTED_DEVICES_INFO_2 info_2;
+	struct _ATOM_SUPPORTED_DEVICES_INFO_2d1 info_2d1;
+};
+
+
+status_t
+detect_connectors()
+{
+	int index = GetIndexIntoMasterTable(DATA, SupportedDevicesInfo);
+	uint8 frev;
+	uint8 crev;
+	uint16 size;
+	uint16 data_offset;
+
+	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
+		&data_offset) != B_OK) {
+		ERROR("%s: unable to parse data header!\n", __func__);
+		return B_ERROR;
+	}
+
+	union atom_supported_devices *supported_devices;
+	supported_devices
+		= (union atom_supported_devices *)
+		((uint16 *)gAtomContext->bios + data_offset);
+
+	uint16 device_support
+		= B_LENDIAN_TO_HOST_INT16(supported_devices->info.usDeviceSupport);
+
+	int32 i;
+	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+		ATOM_CONNECTOR_INFO_I2C ci
+			= supported_devices->info.asConnInfo[i];
+
+		gConnector[i]->valid = false;
+
+		if (!(device_support & (1 << i)))
+			continue;
+
+		if (i == ATOM_DEVICE_CV_INDEX) {
+			TRACE("%s: skipping component video\n",
+				__func__);
+			continue;
+		}
+
+		gConnector[i]->connector_type
+			= connector_convert[ci.sucConnectorInfo.sbfAccess.bfConnectorType];
+
+		if (gConnector[i]->connector_type
+			== VIDEO_CONNECTOR_UNKNOWN) {
+			TRACE("%s: skipping unknown connector at %" B_PRId32
+				" of 0x%" B_PRIX8"\n", __func__, i,
+				ci.sucConnectorInfo.sbfAccess.bfConnectorType);
+			continue;
+		}
+
+		// uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
+		gConnector[i]->line_mux = ci.sucI2cId.ucAccess;
+
+		// TODO : give tv unique connector ids
+		// TODO : ddc bus
+
+		// Always set CRT1 and CRT2 as VGA, some cards incorrectly set
+		// VGA ports as DVI
+		if (i == ATOM_DEVICE_CRT1_INDEX || i == ATOM_DEVICE_CRT2_INDEX)
+			gConnector[i]->connector_type = VIDEO_CONNECTOR_VGA;
+
+		gConnector[i]->valid = true;
+		gConnector[i]->devices = (1 << i);
+
+		// TODO : add the encoder
+		#if 0
+		radeon_add_atom_encoder(dev,
+			radeon_get_encoder_enum(dev,
+				(1 << i),
+				dac),
+			(1 << i),
+			0);
+		#endif
+	}
+
+	// TODO : combine shared connectors
+
+	// TODO : add connectors
+
+	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE_INFO; i++) {
+		if (gConnector[i]->valid == true) {
+			TRACE("%s: connector #%" B_PRId32 " is %s\n", __func__, i,
+				decode_connector_name(gConnector[i]->connector_type));
+		}
+	}
+
+	return B_OK;
+}
+
+
+// TODO : this gets connectors from object table
+status_t
+detect_connectors_manual()
+{
+	int index = GetIndexIntoMasterTable(DATA, Object_Header);
+
+	uint8 frev;
+	uint8 crev;
+	uint16 size;
+	uint16 data_offset;
+
+	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
+		&data_offset) != B_OK) {
+		ERROR("%s: ERROR: parsing data header failed!\n", __func__);
+		return B_ERROR;
+	}
+
+	if (crev < 2) {
+		ERROR("%s: ERROR: data header version unknown!\n", __func__);
+		return B_ERROR;
+	}
+
+	ATOM_CONNECTOR_OBJECT_TABLE *con_obj;
+	ATOM_ENCODER_OBJECT_TABLE *enc_obj;
+	ATOM_OBJECT_TABLE *router_obj;
+	ATOM_DISPLAY_OBJECT_PATH_TABLE *path_obj;
+	ATOM_OBJECT_HEADER *obj_header;
+
+	obj_header = (ATOM_OBJECT_HEADER *)
+		((uint16 *)gAtomContext->bios + data_offset);
+	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE *)
+		((uint16 *)gAtomContext->bios + data_offset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usDisplayPathTableOffset));
+	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE *)
+		((uint16 *)gAtomContext->bios + data_offset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usConnectorObjectTableOffset));
+	enc_obj = (ATOM_ENCODER_OBJECT_TABLE *)
+		((uint16 *)gAtomContext->bios + data_offset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usEncoderObjectTableOffset));
+	router_obj = (ATOM_OBJECT_TABLE *)
+		((uint16 *)gAtomContext->bios + data_offset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usRouterObjectTableOffset));
+	int device_support = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
+
+	int path_size = 0;
+	int32 i = 0;
+
+	TRACE("%s: found %" B_PRIu8 " potential display paths.\n", __func__,
+		path_obj->ucNumOfDispPath);
+
+	for (i = 0; i < path_obj->ucNumOfDispPath; i++) {
+		uint8 *addr = (uint8*)path_obj->asDispPath;
+		ATOM_DISPLAY_OBJECT_PATH *path;
+		addr += path_size;
+		path = (ATOM_DISPLAY_OBJECT_PATH *) addr;
+		path_size += B_LENDIAN_TO_HOST_INT16(path->usSize);
+
+		int connector_type;
+		uint16 connector_object_id;
+
+		if (device_support & B_LENDIAN_TO_HOST_INT16(path->usDeviceTag)) {
+			TRACE("%s: Display Path #%" B_PRId32 "\n", __func__, i);
+
+			uint16 igp_lane_info;
+
+			uint8 con_obj_id
+				= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+			//uint8 con_obj_num
+			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+			//	& ENUM_ID_MASK) >> ENUM_ID_SHIFT;
+			//uint8 con_obj_type
+			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+			//	& OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
+
+			// TODO : CV support
+			if (B_LENDIAN_TO_HOST_INT16(path->usDeviceTag)
+				== ATOM_DEVICE_CV_SUPPORT) {
+				continue;
+			}
+
+			if (0)
+				ERROR("%s: TODO : IGP chip connector detection\n", __func__);
+			else {
+				igp_lane_info = 0;
+				connector_type = manual_connector_convert[con_obj_id];
+				connector_object_id = con_obj_id;
+			}
+
+			if (connector_type == VIDEO_CONNECTOR_UNKNOWN) {
+				TRACE("%s: Unknown connector, skipping\n", __func__);
+				continue;
+			} else {
+				TRACE("%s: Found connector %s\n", __func__,
+					decode_connector_name(connector_type));
+			}
+
+			// We have to go deeper! -AMD
+			// (find encoder for connector)
+			int32 j;
+			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
+				j++) {
+				//uint8 grph_obj_id
+				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
+				//	OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+				//uint8 grph_obj_num
+				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
+				//	ENUM_ID_MASK) >> ENUM_ID_SHIFT;
+				uint8 grph_obj_type
+					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
+					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
+				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
+					int32 k;
+					TRACE("%s: Found encoder at #%" B_PRIu32 "\n", __func__, j);
+					for (k = 0; k < enc_obj->ucNumberOfObjects; k++) {
+						uint16 encoder_obj
+							= B_LENDIAN_TO_HOST_INT16(
+							enc_obj->asObjects[k].usObjectID);
+						if (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
+							== encoder_obj) {
+							ATOM_COMMON_RECORD_HEADER *record
+								= (ATOM_COMMON_RECORD_HEADER *)
+								((uint16 *)gAtomContext->bios + data_offset
+								+ B_LENDIAN_TO_HOST_INT16(
+								enc_obj->asObjects[k].usRecordOffset));
+							ATOM_ENCODER_CAP_RECORD *cap_record;
+							uint16 caps = 0;
+							while (record->ucRecordSize > 0
+								&& record->ucRecordType > 0
+								&& record->ucRecordType
+								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
+								switch (record->ucRecordType) {
+									case ATOM_ENCODER_CAP_RECORD_TYPE:
+										cap_record = (ATOM_ENCODER_CAP_RECORD *)
+											record;
+										caps = B_LENDIAN_TO_HOST_INT16(
+											cap_record->usEncoderCap);
+										break;
+								}
+								record = (ATOM_COMMON_RECORD_HEADER *)
+									((char *)record + record->ucRecordSize);
+							}
+							TRACE("%s: add encoder\n", __func__);
+							// TODO : add the encoder - Finally!
+							//radeon_add_atom_encoder(dev,
+							//	encoder_obj,
+							//	le16_to_cpu
+							//	(path->
+							//	usDeviceTag),
+							//	caps);
+						}
+					}
+				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
+					ERROR("%s: TODO : Router object?\n", __func__);
+				}
+			}
+
+			// TODO : look up gpio for ddc, hpd
+
+			// TODO : aux chan transactions
+
+			// TODO : add connector
+			TRACE("%s: add connector\n", __func__);
+			// radeon_add_atom_connector(dev,
+			// 	conn_id,
+			// 	le16_to_cpu(path-> usDeviceTag),
+			// 	connector_type, &ddc_bus,
+			// 	igp_lane_info,
+			// 	connector_object_id,
+			// 	&hpd,
+			// 	&router);
+		}
+	}
+
+	return B_OK;
 }
 
 

@@ -139,6 +139,16 @@ struct pll_info {
 
 
 typedef struct {
+	bool valid;
+	uint16 line_mux;
+	uint16 devices;
+	uint32 connector_type;
+	// TODO struct radeon_i2c_bus_rec ddc_bus;
+	// TODO struct radeon_hpd hpd;
+} connector_info;
+
+
+typedef struct {
 	bool			active;
 	uint32			connection_type;
 	uint8			connection_id;
@@ -163,6 +173,7 @@ typedef struct {
 extern accelerant_info *gInfo;
 extern atom_context *gAtomContext;
 extern display_info *gDisplay[MAX_DISPLAY];
+extern connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access

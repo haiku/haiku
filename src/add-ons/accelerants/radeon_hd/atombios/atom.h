@@ -26,6 +26,7 @@
 
 
 #include "atombios.h"
+#include "ObjectID.h"
 
 #include <String.h>
 #include <SupportDefs.h>

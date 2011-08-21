@@ -41,6 +41,7 @@
 
 struct accelerant_info *gInfo;
 display_info *gDisplay[MAX_DISPLAY];
+connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 class AreaCloner {
@@ -110,6 +111,7 @@ init_common(int device, bool isClone)
 
 	gInfo->mc_info = (gpu_mc_info *)malloc(sizeof(gpu_mc_info));
 
+	// malloc memory for active display information
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		gDisplay[id] = (display_info *)malloc(sizeof(display_info));
 		if (gDisplay[id] == NULL)
@@ -121,6 +123,16 @@ init_common(int device, bool isClone)
 			return B_NO_MEMORY;
 		memset(gDisplay[id]->regs, 0, sizeof(register_info));
 	}
+
+	// malloc for possible physical card connectors
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		gConnector[id] = (connector_info *)malloc(sizeof(connector_info));
+
+		if (gConnector[id] == NULL)
+			return B_NO_MEMORY;
+		memset(gConnector[id], 0, sizeof(connector_info));
+	}
+
 
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
@@ -205,6 +217,12 @@ uninit_common(void)
 			free(gDisplay[id]);
 		}
 	}
+
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id] != NULL) {
+			free(gConnector[id]);
+		}
+	}
 }
 
 
@@ -227,6 +245,13 @@ radeon_init_accelerant(int device)
 	init_lock(&info.engine_lock, "radeon hd engine");
 
 	radeon_init_bios(gInfo->rom);
+
+	status = detect_connectors();
+	if (status != B_OK) {
+		// TODO : detect_connectors_manual to get from object table
+		TRACE("%s: couldn't detect supported connectors!\n", __func__);
+		return status;
+	}
 
 	status = detect_displays();
 	//if (status != B_OK)
