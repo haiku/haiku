@@ -218,11 +218,8 @@ uninit_common(void)
 		}
 	}
 
-	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
-		if (gConnector[id] != NULL) {
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++)
 			free(gConnector[id]);
-		}
-	}
 }
 
 
