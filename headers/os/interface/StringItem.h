@@ -30,6 +30,9 @@ public:
 
 	virtual	status_t			Perform(perform_code code, void* arg);
 
+protected:
+			float				BaselineOffset() const;
+
 private:
 	// FBC padding and forbidden methods
 	virtual	void				_ReservedStringItem1();

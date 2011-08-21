@@ -22,7 +22,7 @@ BStringItem::BStringItem(const char* text, uint32 level, bool expanded)
 	: BListItem(level, expanded),
 	fText(NULL),
 	fBaselineOffset(0)
-{	
+{
 	SetText(text);
 }
 
@@ -106,7 +106,7 @@ BStringItem::SetText(const char *text)
 {
 	free(fText);
 	fText = NULL;
-	
+
 	if (text)
 		fText = strdup(text);
 }
@@ -139,6 +139,13 @@ status_t
 BStringItem::Perform(perform_code d, void *arg)
 {
 	return BListItem::Perform(d, arg);
+}
+
+
+float
+BStringItem::BaselineOffset() const
+{
+	return fBaselineOffset;
 }
 
 
