@@ -353,30 +353,8 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit,
 				int32 index = FullListIndexOf(where);
 				if (index < 0)
 					index = FullListCountItems();
-				if (fDropIndex != index) {
+				if (fDropIndex != index)
 					fDropIndex = index;
-					if (fDropIndex >= 0) {
-// TODO: find out what this was intended for (as it doesn't have any effect)
-//						int32 count = FullListCountItems();
-//						if (fDropIndex == count) {
-//							BRect r;
-//							if (FullListItemAt(count - 1)) {
-//								r = ItemFrame(count - 1);
-//								r.top = r.bottom;
-//								r.bottom = r.top + 1.0;
-//							} else {
-//								r = Bounds();
-//								r.bottom--;
-//									// compensate for scrollbars moved slightly
-//									// out of window
-//							}
-//						} else {
-//							BRect r = ItemFrame(fDropIndex);
-//							r.top--;
-//							r.bottom = r.top + 1.0;
-//						}
-					}
-				}
 				break;
 			}
 		}
