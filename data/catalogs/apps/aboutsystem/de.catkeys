@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	3091539351
+1	german	x-vnd.Haiku-About	1133193730
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB gesamt
 %d MiB used (%d%%)	AboutView		%d MiB benutzt (%d%%)
@@ -72,7 +72,7 @@ The Haiku-Ports team\n	AboutView		Das Haiku-Ports-Team\n
 The Haikuware team and their bounty program\n	AboutView		Das Haikuware-Team und deren Bounty-Programm\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Die Universität von Auckland und Christof Lutteroth\n\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT license%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView	%MIT license% isn't a variable and has to be translated.	Der von Haiku selbst erstellte Quellcode, besonders der Kernel und alle Teile des Codes, gegen den Anwendungen gelinkt werden können, wird unter den Bedingungen der %MIT Lizenz% veröffentlicht. Einige Systembibliotheken, die Code von Dritten enthalten, stehen unter der LGPL Lizenz. Angaben zum Copyright von externen Quellen sind unten aufgeführt.\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku™ und das HAIKU Logo® sind (registrierte) Marken von Haiku, Inc.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n
 Time running:	AboutView		Laufzeit:
 Translations:\n	AboutView		Übersetzungen:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (und seinen NewOS-Kernel)\n
