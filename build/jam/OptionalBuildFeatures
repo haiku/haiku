@@ -61,39 +61,15 @@ HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1-x86-gcc4-2011-08-20.zip ;
 HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
 HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-2011-08-18.zip ;
 
-if $(TARGET_ARCH) = ppc {
-	local icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
-	local zipFile = [ DownloadFile $(icu_package)
-		: $(baseURL)/$(icu_package) ] ;
-
-	# zip file and output directory
-	HAIKU_ICU_ZIP_FILE = $(zipFile) ;
-	HAIKU_ICU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-		$(icu_package:B) ] ;
-
-	# extract libraries
-	HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
-		:
-		libicudata.so.44.1
-		libicui18n.so.44.1
-		libicuio.so.44.1
-		libicule.so.44.1
-		libiculx.so.44.1
-		libicutu.so.44.1
-		libicuuc.so.44.1
-		: $(zipFile)
-		: extracted-icu
-	] ;
-} else if $(TARGET_ARCH) != x86 {
-	Echo "ICU not available for $(TARGET_ARCH)" ;
-} else {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	local icu_package ;
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
+	if $(TARGET_ARCH) = ppc {
+		icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
+	} else if $(HAIKU_GCC_VERSION[1]) = 2 {
 		icu_package = $(HAIKU_ICU_GCC_2_PACKAGE) ;
 	} else {
 		icu_package = $(HAIKU_ICU_GCC_4_PACKAGE) ;
 	}
-
 	local zipFile = [ DownloadFile $(icu_package)
 		: $(baseURL)/$(icu_package) ] ;
 
@@ -115,6 +91,8 @@ if $(TARGET_ARCH) = ppc {
 		: $(zipFile)
 		: extracted-icu
 	] ;
+} else  {
+	Echo "ICU not available for $(TARGET_ARCH)" ;
 }
 
 
