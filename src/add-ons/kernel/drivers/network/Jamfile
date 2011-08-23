@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network etherpci ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pegasus ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8169 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network sis900 ;
@@ -33,6 +32,7 @@ SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network 3com ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network atheros813x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
 

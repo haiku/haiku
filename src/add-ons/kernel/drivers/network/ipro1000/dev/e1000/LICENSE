@@ -1,6 +1,6 @@
-$FreeBSD: src/sys/dev/e1000/LICENSE,v 1.1.2.1 2008/08/11 18:33:10 jfv Exp $
+$FreeBSD: src/sys/dev/e1000/LICENSE,v 1.1.4.2.4.1 2010/12/21 17:09:25 kensmith Exp $
 
-  Copyright (c) 2001-2008, Intel Corporation 
+  Copyright (c) 2001-2010, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
