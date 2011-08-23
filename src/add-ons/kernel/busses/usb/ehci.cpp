@@ -123,6 +123,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fCleanupSem(-1),
 		fCleanupThread(-1),
 		fStopThreads(false),
+		fNextStartingFrame(-1),
 		fFrameBandwidth(NULL),
 		fFirstIsochronousTransfer(NULL),
 		fLastIsochronousTransfer(NULL),
@@ -220,6 +221,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	TRACE("structural parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCSPARAMS));
 	TRACE("capability parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCCPARAMS));
+
+	if (EHCI_HCCPARAMS_FRAME_CACHE(ReadCapReg32(EHCI_HCCPARAMS)))
+		fThreshold = 2 + 8;
+	else
+		fThreshold = 2 + EHCI_HCCPARAMS_IPT(ReadCapReg32(EHCI_HCCPARAMS));
 
 	// read port count from capability register
 	fPortCount = ReadCapReg32(EHCI_HCSPARAMS) & 0x0f;
@@ -730,24 +736,26 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	if (isochronousData->flags & USB_ISO_ASAP ||
 		isochronousData->starting_frame_number == NULL) {
 
-		uint32 threshold = (ReadCapReg32(EHCI_HCCPARAMS)
-			>> EHCI_HCCPARAMS_IPT_SHIFT) & EHCI_HCCPARAMS_IPT_MASK;
-		TRACE("threshold: %ld\n", threshold);
+		if (fFirstIsochronousTransfer != NULL && fNextStartingFrame != -1)
+			currentFrame = fNextStartingFrame;
+		else {
+			uint32 threshold = fThreshold;
+			TRACE("threshold: %ld\n", threshold);
 
-		// find the first available frame with enough bandwidth.
-		// This should always be the case, as defining the starting frame
-		// number in the driver makes no sense for many reason, one of which
-		// is that frame numbers value are host controller specific, and the
-		// driver does not know which host controller is running.
-		currentFrame = (ReadOpReg(EHCI_FRINDEX) / 8)
-			& (EHCI_FRAMELIST_ENTRIES_COUNT - 1);
+			// find the first available frame with enough bandwidth.
+			// This should always be the case, as defining the starting frame
+			// number in the driver makes no sense for many reason, one of which
+			// is that frame numbers value are host controller specific, and the
+			// driver does not know which host controller is running.
+			currentFrame = ((ReadOpReg(EHCI_FRINDEX) + threshold) / 8)
+				& (EHCI_FRAMELIST_ENTRIES_COUNT - 1);
+		}
 
 		// Make sure that:
 		// 1. We are at least 5ms ahead the controller
 		// 2. We stay in the range 0-127
 		// 3. There is enough bandwidth in the first entry
-		currentFrame = (currentFrame + threshold)
-			& (EHCI_VFRAMELIST_ENTRIES_COUNT - 1);
+		currentFrame &= EHCI_VFRAMELIST_ENTRIES_COUNT - 1;
 	} else {
 		// Find out if the frame number specified has enough bandwidth,
 		// otherwise find the first next available frame with enough bandwidth
@@ -762,6 +770,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	addr_t bufferPhy;
 	if (fStack->AllocateChunk(&bufferLog, (void**)&bufferPhy, dataLength) < B_OK) {
 		TRACE_ERROR("unable to allocate itd buffer\n");
+		delete isoRequest;
 		return B_NO_MEMORY;
 	}
 
@@ -791,6 +800,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 				itd->buffer_phy[pg + 1] = currentPhy & 0xfffff000;
 				pg++;
 			}
+			if (dataLength <= 0)
+				itd->token[i] |= EHCI_ITD_IOC;
 		}
 
 		currentPhy += (offset & 0xfff) - (currentPhy & 0xfff);
@@ -799,12 +810,17 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 			| (pipe->DeviceAddress() << EHCI_ITD_ADDRESS_SHIFT);
 		itd->buffer_phy[1] |= (pipe->MaxPacketSize() & EHCI_ITD_MAXPACKETSIZE_MASK)
 			| (directionIn << EHCI_ITD_DIR_SHIFT);
-		itd->buffer_phy[2] |= (1 << EHCI_ITD_MUL_SHIFT);
+		itd->buffer_phy[2] |=
+			((((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1)
+			& EHCI_ITD_MUL_MASK) << EHCI_ITD_MUL_SHIFT);
 
 		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%lx, 0x%lx 0x%lx\n",
 			itd->buffer_phy[0], itd->buffer_phy[1], itd->buffer_phy[2]);
 
+		if (!LockIsochronous())
+			continue;
 		LinkITDescriptors(itd, &fItdEntries[currentFrame]);
+		UnlockIsochronous();
 		fFrameBandwidth[currentFrame] -= bandwidth;
 		currentFrame = (currentFrame + 1) & (EHCI_VFRAMELIST_ENTRIES_COUNT - 1);
 		frameCount++;
@@ -818,11 +834,15 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		transfer->DataLength());
 	if (result < B_OK) {
 		TRACE_ERROR("failed to add pending isochronous transfer\n");
+		for (uint32 i = 0; i < itdIndex; i++)
+			FreeDescriptor(isoRequest[i]);
+		delete isoRequest;
 		return result;
 	}
 
 	TRACE("appended isochronous transfer by starting at frame number %d\n",
 		currentFrame);
+	fNextStartingFrame = currentFrame + 1;
 
 	// Wake up the isochronous finisher thread
 	release_sem_etc(fFinishIsochronousTransfersSem, 1 /*frameCount*/, B_DO_NOT_RESCHEDULE);
@@ -2146,7 +2166,8 @@ EHCI::FreeDescriptor(ehci_qtd *descriptor)
 			(void *)descriptor->buffer_phy[0], descriptor->buffer_size);
 	}
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy, sizeof(ehci_qtd));
+	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy,
+		sizeof(ehci_qtd));
 }
 
 
@@ -2208,7 +2229,8 @@ EHCI::FreeDescriptor(ehci_itd *descriptor)
 	if (!descriptor)
 		return;
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy, sizeof(ehci_itd));
+	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy,
+		sizeof(ehci_itd));
 }
 
 
@@ -2218,7 +2240,8 @@ EHCI::FreeDescriptor(ehci_sitd *descriptor)
 	if (!descriptor)
 		return;
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy, sizeof(ehci_sitd));
+	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy,
+		sizeof(ehci_sitd));
 }
 
 
@@ -2372,7 +2395,8 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE("read descriptor chain (%ld bytes, no more vectors)\n", actualLength);
+					TRACE("read descriptor chain (%ld bytes, no more vectors)"
+						"\n", actualLength);
 					*nextDataToggle = dataToggle > 0 ? true : false;
 					return actualLength;
 				}
@@ -2437,7 +2461,6 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 {
 	iovec *vector = transfer->transfer->Vector();
 	size_t vectorCount = transfer->transfer->VectorCount();
-
 	size_t vectorOffset = 0;
 	size_t vectorIndex = 0;
 	usb_isochronous_data *isochronousData
@@ -2456,6 +2479,10 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 
 			size_t bufferSize = (itd->token[j] >> EHCI_ITD_TLENGTH_SHIFT)
 				& EHCI_ITD_TLENGTH_MASK;
+			if (((itd->token[j] >> EHCI_ITD_STATUS_SHIFT)
+				& EHCI_ITD_STATUS_MASK) != 0) {
+				bufferSize = 0;
+			}
 			isochronousData->packet_descriptors[packet].actual_length =
 				bufferSize;
 
@@ -2467,6 +2494,7 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 			totalLength += bufferSize;
 
 			size_t offset = bufferOffset;
+			size_t skipSize = packetSize - bufferSize;
 			while (bufferSize > 0) {
 				size_t length = min_c(bufferSize,
 					vector[vectorIndex].iov_len - vectorOffset);
@@ -2476,6 +2504,23 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 				vectorOffset += length;
 				bufferSize -= length;
 
+				if (vectorOffset >= vector[vectorIndex].iov_len) {
+					if (++vectorIndex >= vectorCount) {
+						TRACE("read isodescriptor chain (%ld bytes, no more "
+							"vectors)\n", totalLength);
+						return totalLength;
+					}
+
+					vectorOffset = 0;
+				}
+			}
+
+			// skip to next packet offset
+			while (skipSize > 0) {
+				size_t length = min_c(skipSize,
+					vector[vectorIndex].iov_len - vectorOffset);
+				vectorOffset += length;
+				skipSize -= length;
 				if (vectorOffset >= vector[vectorIndex].iov_len) {
 					if (++vectorIndex >= vectorCount) {
 						TRACE("read isodescriptor chain (%ld bytes, no more "
