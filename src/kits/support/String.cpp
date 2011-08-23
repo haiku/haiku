@@ -1389,13 +1389,8 @@ BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 
 	// detach and set first match
 	if (pos >= 0 && _MakeWritable() == B_OK) {
-		fPrivateData[pos] = withThis;
-		for (pos = pos;;) {
-			pos = FindFirst(replaceThis, pos);
-			if (pos < 0)
-				break;
+		for( ; pos >= 0; pos = FindFirst(replaceThis, pos + 1))
 			fPrivateData[pos] = withThis;
-		}
 	}
 	return *this;
 }
@@ -1409,13 +1404,10 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount,
 	int32 pos = FindFirst(replaceThis, fromOffset);
 
 	if (maxReplaceCount > 0 && pos >= 0 && _MakeWritable() == B_OK) {
-		maxReplaceCount--;
-		fPrivateData[pos] = withThis;
-		for (pos = pos;  maxReplaceCount > 0; maxReplaceCount--) {
-			pos = FindFirst(replaceThis, pos);
-			if (pos < 0)
-				break;
+		for( ; maxReplaceCount > 0 && pos >= 0;
+			pos = FindFirst(replaceThis, pos + 1)) {
 			fPrivateData[pos] = withThis;
+			maxReplaceCount--;
 		}
 	}
 	return *this;
@@ -1546,13 +1538,8 @@ BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 	int32 pos = _IFindAfter(tmp, fromOffset, 1);
 
 	if (pos >= 0 && _MakeWritable() == B_OK) {
-		fPrivateData[pos] = withThis;
-		for (pos = pos;;) {
-			pos = _IFindAfter(tmp, pos, 1);
-			if (pos < 0)
-				break;
+		for( ; pos >= 0; pos = _IFindAfter(tmp, pos + 1, 1))
 			fPrivateData[pos] = withThis;
-		}
 	}
 	return *this;
 }
@@ -1567,13 +1554,10 @@ BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount,
 	int32 pos = _IFindAfter(tmp, fromOffset, 1);
 
 	if (maxReplaceCount > 0 && pos >= 0 && _MakeWritable() == B_OK) {
-		fPrivateData[pos] = withThis;
-		maxReplaceCount--;
-		for (pos = pos;  maxReplaceCount > 0; maxReplaceCount--) {
-			pos = _IFindAfter(tmp, pos, 1);
-			if (pos < 0)
-				break;
+		for( ; maxReplaceCount > 0 && pos >= 0;
+			pos = _IFindAfter(tmp, pos + 1, 1)) {
 			fPrivateData[pos] = withThis;
+			maxReplaceCount--;
 		}
 	}
 
