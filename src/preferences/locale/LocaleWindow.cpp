@@ -89,6 +89,7 @@ LocaleWindow::LocaleWindow()
 
 	fLanguageListView->SetInvocationMessage(new BMessage(kMsgLanguageInvoked));
 	fLanguageListView->SetDragMessage(new BMessage(kMsgLanguageDragged));
+	fLanguageListView->SetGlobalDropTargetIndicator(true);
 
 	BFont font;
 	fLanguageListView->GetFont(&font);
@@ -335,7 +336,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
 					i++) {
 				LanguageListItem* item = static_cast<LanguageListItem*>(
-					fLanguageListView->FullListItemAt(index));
+					fLanguageListView->ItemAt(index));
 				_InsertPreferredLanguage(item, dropIndex++);
 			}
 			break;
@@ -363,15 +364,18 @@ LocaleWindow::MessageReceived(BMessage* message)
 				// change ordering
 				int32 dropIndex = message->FindInt32("drop_index");
 				int32 index = 0;
-				if (message->FindInt32("index", &index) == B_OK
-					&& dropIndex != index) {
+				for (int32 i = 0;
+						message->FindInt32("index", i, &index) == B_OK;
+						i++, dropIndex++) {
+					if (dropIndex > index) {
+						dropIndex--;
+						index -= i;
+					}
 					BListItem* item = fPreferredListView->RemoveItem(index);
-					if (dropIndex > index)
-						index--;
 					fPreferredListView->AddItem(item, dropIndex);
-
-					_PreferredLanguagesChanged();
 				}
+
+				_PreferredLanguagesChanged();
 				break;
 			}
 
@@ -385,13 +389,18 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 			// Remove from preferred languages
 			int32 index = 0;
-			if (message->FindInt32("index", &index) == B_OK) {
-				delete fPreferredListView->RemoveItem(index);
-				_PreferredLanguagesChanged();
+			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
+					i++) {
+				delete fPreferredListView->RemoveItem(index - i);
 
-				if (message->what == kMsgPreferredLanguageDeleted)
-					fPreferredListView->Select(index);
+				if (message->what == kMsgPreferredLanguageDeleted) {
+					int32 count = fPreferredListView->CountItems();
+					fPreferredListView->Select(
+						index < count ? index : count - 1);
+				}
 			}
+
+			_PreferredLanguagesChanged();
 			break;
 		}
 
@@ -495,10 +504,9 @@ LocaleWindow::_PreferredLanguagesChanged()
 {
 	BMessage preferredLanguages;
 	int index = 0;
-	while (index < fPreferredListView->FullListCountItems()) {
-		// only include subitems: we can guess the superitem from them anyway
+	while (index < fPreferredListView->CountItems()) {
 		LanguageListItem* item = static_cast<LanguageListItem*>(
-			fPreferredListView->FullListItemAt(index));
+			fPreferredListView->ItemAt(index));
 		if (item != NULL)
 			preferredLanguages.AddString("language", item->ID());
 		index++;

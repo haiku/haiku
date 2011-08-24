@@ -62,25 +62,21 @@ void
 LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 	bool complete, float textOffset)
 {
-	static const rgb_color kHighlight = {140, 140, 140, 0};
-	static const rgb_color kBlack = {0, 0, 0, 0};
-
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
-			color = kHighlight;
+			color = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
 		else
 			color = owner->ViewColor();
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 		owner->FillRect(frame);
-		owner->SetHighColor(kBlack);
 	} else
 		owner->SetLowColor(owner->ViewColor());
 
 	BString text = Text();
 	if (IsEnabled())
-		owner->SetHighColor(kBlack);
+		owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 	else {
 		owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_3_TINT));
 		text << "   [" << B_TRANSLATE("already chosen") << "]";
@@ -168,6 +164,8 @@ LanguageListView::LanguageListView(const char* name, list_view_type type)
 	:
 	BOutlineListView(name, type),
 	fDropIndex(-1),
+	fDropTargetHighlightFrame(),
+	fGlobalDropTargetIndicator(false),
 	fDeleteMessage(NULL),
 	fDragMessage(NULL)
 {
@@ -232,6 +230,13 @@ LanguageListView::SetDragMessage(BMessage* message)
 
 
 void
+LanguageListView::SetGlobalDropTargetIndicator(bool isGlobal)
+{
+	fGlobalDropTargetIndicator = isGlobal;
+}
+
+
+void
 LanguageListView::AttachedToWindow()
 {
 	BOutlineListView::AttachedToWindow();
@@ -247,10 +252,21 @@ LanguageListView::MessageReceived(BMessage* message)
 		BMessage dragMessage(*message);
 		dragMessage.AddInt32("drop_index", fDropIndex);
 		dragMessage.AddPointer("drop_target", this);
-
-		Invoke(&dragMessage);
+		Messenger().SendMessage(&dragMessage);
 	} else
 		BOutlineListView::MessageReceived(message);
+}
+
+
+void
+LanguageListView::Draw(BRect updateRect)
+{
+	BOutlineListView::Draw(updateRect);
+
+	if (fDropIndex >= 0 && fDropTargetHighlightFrame.IsValid()) {
+		SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR));
+		StrokeRect(fDropTargetHighlightFrame);
+	}
 }
 
 
@@ -261,7 +277,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 	if (fDragMessage == NULL)
 		return false;
 
-	BListItem* item = FullListItemAt(CurrentSelection(0));
+	BListItem* item = ItemAt(CurrentSelection(0));
 	if (item == NULL) {
 		// workaround for a timing problem
 		// TODO: this should support extending the selection
@@ -276,7 +292,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 	message.AddPointer("listview", this);
 
 	for (int32 i = 0;; i++) {
-		int32 index = FullListCurrentSelection(i);
+		int32 index = CurrentSelection(i);
 		if (index < 0)
 			break;
 
@@ -292,7 +308,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 	// figure out, how many items fit into our bitmap
 	for (int32 i = 0, index; message.FindInt32("index", i, &index) == B_OK;
 			i++) {
-		BListItem* item = FullListItemAt(index);
+		BListItem* item = ItemAt(index);
 		if (item == NULL)
 			break;
 
@@ -318,7 +334,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 		for (int32 i = 0; i < numItems; i++) {
 			int32 index = message.FindInt32("index", i);
 			LanguageListItem* item
-				= static_cast<LanguageListItem*>(FullListItemAt(index));
+				= static_cast<LanguageListItem*>(ItemAt(index));
 			itemBounds.bottom = itemBounds.top + ceilf(item->Height());
 			if (itemBounds.bottom > dragRect.bottom)
 				itemBounds.bottom = dragRect.bottom;
@@ -378,21 +394,63 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit,
 			case B_ENTERED_VIEW:
 			case B_INSIDE_VIEW:
 			{
-				// set drop target through virtual function
-				// offset where by half of item height
-				BRect r = ItemFrame(0);
-				where.y += r.Height() / 2.0;
+				BRect highlightFrame;
 
-				int32 index = FullListIndexOf(where);
-				if (index < 0)
-					index = FullListCountItems();
-				if (fDropIndex != index)
+				if (fGlobalDropTargetIndicator) {
+					highlightFrame = Bounds();
+					fDropIndex = 0;
+				} else {
+					// offset where by half of item height
+					BRect r = ItemFrame(0);
+					where.y += r.Height() / 2.0;
+
+					int32 index = IndexOf(where);
+					if (index < 0)
+						index = CountItems();
+					highlightFrame = ItemFrame(index);
+					if (highlightFrame.IsValid())
+						highlightFrame.bottom = highlightFrame.top;
+					else {
+						highlightFrame = ItemFrame(index - 1);
+						if (highlightFrame.IsValid())
+							highlightFrame.top = highlightFrame.bottom;
+						else {
+							// empty view, show indicator at top
+							highlightFrame = Bounds();
+							highlightFrame.bottom = highlightFrame.top;
+						}
+					}
 					fDropIndex = index;
-				break;
+				}
+
+				if (fDropTargetHighlightFrame != highlightFrame) {
+					Invalidate(fDropTargetHighlightFrame);
+					fDropTargetHighlightFrame = highlightFrame;
+					Invalidate(fDropTargetHighlightFrame);
+				}
+
+				BOutlineListView::MouseMoved(where, transit, dragMessage);
+				return;
 			}
 		}
-	} else
-		BOutlineListView::MouseMoved(where, transit, dragMessage);
+	}
+
+	if (fDropTargetHighlightFrame.IsValid()) {
+		Invalidate(fDropTargetHighlightFrame);
+		fDropTargetHighlightFrame = BRect();
+	}
+	BOutlineListView::MouseMoved(where, transit, dragMessage);
+}
+
+
+void
+LanguageListView::MouseUp(BPoint point)
+{
+	BOutlineListView::MouseUp(point);
+	if (fDropTargetHighlightFrame.IsValid()) {
+		Invalidate(fDropTargetHighlightFrame);
+		fDropTargetHighlightFrame = BRect();
+	}
 }
 
 
