@@ -418,14 +418,14 @@ detect_connectors()
 				continue;
 			}
 
-			// TODO : to find encoder for connector
-			#if 0
+			uint32 encoder_type = VIDEO_ENCODER_NONE;
+			uint16 encoder_object_id = 0;
 			int32 j;
 			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
 				j++) {
-				//uint8 grph_obj_id
-				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
-				//	OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+				uint16 grph_obj_id
+					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
+					& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 				//uint8 grph_obj_num
 				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 				//	ENUM_ID_MASK) >> ENUM_ID_SHIFT;
@@ -463,21 +463,81 @@ detect_connectors()
 								record = (ATOM_COMMON_RECORD_HEADER *)
 									((char *)record + record->ucRecordSize);
 							}
-							TRACE("%s: add encoder\n", __func__);
-							// TODO : add the encoder - Finally!
-							//radeon_add_atom_encoder(dev,
-							//	encoder_obj,
-							//	le16_to_cpu
-							//	(path->
-							//	usDeviceTag),
-							//	caps);
+							uint32 encoder_id = (encoder_obj & OBJECT_ID_MASK)
+								>> OBJECT_ID_SHIFT;
+							uint32 encoder_support
+								= B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
+
+							switch(encoder_id) {
+								case ENCODER_OBJECT_ID_INTERNAL_LVDS:
+								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
+								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
+								case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
+									if (encoder_support
+										& ATOM_DEVICE_LCD_SUPPORT) {
+										encoder_type = VIDEO_ENCODER_LVDS;
+										// radeon_atombios_get_lvds_info
+									} else {
+										encoder_type = VIDEO_ENCODER_TMDS;
+										// radeon_atombios_set_dig_info
+									}
+									// drm_encoder_helper_add
+									break;
+								case ENCODER_OBJECT_ID_INTERNAL_DAC1:
+									encoder_type = VIDEO_ENCODER_DAC;
+									break;
+								case ENCODER_OBJECT_ID_INTERNAL_DAC2:
+								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+									encoder_type = VIDEO_ENCODER_TVDAC;
+									// drm_encoder_helper_add
+									break;
+								case ENCODER_OBJECT_ID_INTERNAL_DVO1:
+								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+								case ENCODER_OBJECT_ID_INTERNAL_DDI:
+								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+									if (encoder_support
+										& ATOM_DEVICE_LCD_SUPPORT) {
+										encoder_type = VIDEO_ENCODER_LVDS;
+									} else if (encoder_support
+										& ATOM_DEVICE_CRT_SUPPORT) {
+										encoder_type = VIDEO_ENCODER_DAC;
+									} else {
+										encoder_type = VIDEO_ENCODER_TMDS;
+									}
+									// drm_encoder_helper_add
+									break;
+								case ENCODER_OBJECT_ID_SI170B:
+								case ENCODER_OBJECT_ID_CH7303:
+								case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
+								case ENCODER_OBJECT_ID_EXTERNAL_SDVOB:
+								case ENCODER_OBJECT_ID_TITFP513:
+								case ENCODER_OBJECT_ID_VT1623:
+								case ENCODER_OBJECT_ID_HDMI_SI1930:
+								case ENCODER_OBJECT_ID_TRAVIS:
+								case ENCODER_OBJECT_ID_NUTMEG:
+									if (encoder_support
+										& ATOM_DEVICE_LCD_SUPPORT) {
+										encoder_type = VIDEO_ENCODER_LVDS;
+									} else if (encoder_support
+										& ATOM_DEVICE_CRT_SUPPORT) {
+										encoder_type = VIDEO_ENCODER_DAC;
+									} else {
+										encoder_type = VIDEO_ENCODER_TMDS;
+									}
+									// drm_encoder_helper_add
+									break;
+							}
+							encoder_object_id = grph_obj_id;
 						}
 					}
 				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
 					ERROR("%s: TODO : Router object?\n", __func__);
 				}
 			}
-			#endif
 
 			// TODO : look up gpio for ddc, hpd
 
@@ -486,10 +546,15 @@ detect_connectors()
 			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
 				__func__, i, decode_connector_name(connector_type),
 				connector_type);
+			TRACE("%s: Path #%" B_PRId32 ": Found encoder %s\n", __func__,
+				i, decode_encoder_name(encoder_type));
+
 			gConnector[connector_index]->valid = true;
 			gConnector[connector_index]->connector_type = connector_type;
 			gConnector[connector_index]->connector_object_id
 				= connector_object_id;
+			gConnector[connector_index]->encoder_type = encoder_type;
+			gConnector[connector_index]->encoder_object_id = encoder_object_id;
 			connector_index++;
 
 			// radeon_add_atom_connector(dev,
