@@ -143,6 +143,7 @@ typedef struct {
 	uint16 line_mux;
 	uint16 devices;
 	uint32 connector_type;
+	uint16 connector_object_id;
 	// TODO struct radeon_i2c_bus_rec ddc_bus;
 	// TODO struct radeon_hpd hpd;
 } connector_info;

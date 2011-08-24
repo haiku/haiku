@@ -129,7 +129,7 @@ struct card_info {
 
 typedef struct atom_context_s {
 	card_info *card;
-	void *bios;
+	uint8 *bios;
 	uint32 cmd_table, data_table;
 	uint16 *iio;
 
@@ -147,8 +147,8 @@ typedef struct atom_context_s {
 
 extern int atom_debug;
 
-atom_context *atom_parse(card_info *, void *);
-status_t atom_execute_table(atom_context *, int, uint32 *);
+atom_context *atom_parse(card_info *card, uint8 *bios);
+status_t atom_execute_table(atom_context *ctx, int index, uint32 *params);
 status_t atom_parse_data_header(atom_context *ctx, int index, uint16 *size,
 	uint8 *frev, uint8 *crev, uint16 *data_start);
 status_t atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,

@@ -13,7 +13,7 @@
 
 
 // convert radeon connector to common connector type
-const int connector_convert[] = {
+const int connector_convert_legacy[] = {
 	VIDEO_CONNECTOR_UNKNOWN,
 	VIDEO_CONNECTOR_VGA,
 	VIDEO_CONNECTOR_DVII,
@@ -32,7 +32,7 @@ const int connector_convert[] = {
 	VIDEO_CONNECTOR_DP
 };
 
-const int manual_connector_convert[] = {
+const int connector_convert[] = {
 	VIDEO_CONNECTOR_UNKNOWN,
 	VIDEO_CONNECTOR_DVII,
 	VIDEO_CONNECTOR_DVII,
@@ -58,8 +58,9 @@ const int manual_connector_convert[] = {
 };
 
 status_t init_registers(register_info* reg, uint8 crtid);
-status_t detect_crt_ranges(uint32 crtid);
+status_t detect_connectors_legacy();
 status_t detect_connectors();
+status_t detect_crt_ranges(uint32 crtid);
 status_t detect_displays();
 void debug_displays();
 

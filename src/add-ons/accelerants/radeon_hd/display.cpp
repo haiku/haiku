@@ -227,8 +227,9 @@ union atom_supported_devices {
 };
 
 
+// only used on r4xx, r5xx, and rs600/rs690/rs740
 status_t
-detect_connectors()
+detect_connectors_legacy()
 {
 	int index = GetIndexIntoMasterTable(DATA, SupportedDevicesInfo);
 	uint8 frev;
@@ -245,18 +246,17 @@ detect_connectors()
 	union atom_supported_devices *supported_devices;
 	supported_devices
 		= (union atom_supported_devices *)
-		((uint16 *)gAtomContext->bios + data_offset);
+		(gAtomContext->bios + data_offset);
 
 	uint16 device_support
 		= B_LENDIAN_TO_HOST_INT16(supported_devices->info.usDeviceSupport);
 
 	int32 i;
 	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
-		ATOM_CONNECTOR_INFO_I2C ci
-			= supported_devices->info.asConnInfo[i];
 
 		gConnector[i]->valid = false;
 
+		// check if this connector is used
 		if (!(device_support & (1 << i)))
 			continue;
 
@@ -266,13 +266,16 @@ detect_connectors()
 			continue;
 		}
 
-		gConnector[i]->connector_type
-			= connector_convert[ci.sucConnectorInfo.sbfAccess.bfConnectorType];
+		ATOM_CONNECTOR_INFO_I2C ci
+			= supported_devices->info.asConnInfo[i];
 
-		if (gConnector[i]->connector_type
-			== VIDEO_CONNECTOR_UNKNOWN) {
+		gConnector[i]->connector_type
+			= connector_convert_legacy[
+				ci.sucConnectorInfo.sbfAccess.bfConnectorType];
+
+		if (gConnector[i]->connector_type == VIDEO_CONNECTOR_UNKNOWN) {
 			TRACE("%s: skipping unknown connector at %" B_PRId32
-				" of 0x%" B_PRIX8"\n", __func__, i,
+				" of 0x%" B_PRIX8 "\n", __func__, i,
 				ci.sucConnectorInfo.sbfAccess.bfConnectorType);
 			continue;
 		}
@@ -317,9 +320,9 @@ detect_connectors()
 }
 
 
-// TODO : this gets connectors from object table
+// r600+
 status_t
-detect_connectors_manual()
+detect_connectors()
 {
 	int index = GetIndexIntoMasterTable(DATA, Object_Header);
 
@@ -345,19 +348,18 @@ detect_connectors_manual()
 	ATOM_DISPLAY_OBJECT_PATH_TABLE *path_obj;
 	ATOM_OBJECT_HEADER *obj_header;
 
-	obj_header = (ATOM_OBJECT_HEADER *)
-		((uint16 *)gAtomContext->bios + data_offset);
+	obj_header = (ATOM_OBJECT_HEADER *)(gAtomContext->bios + data_offset);
 	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE *)
-		((uint16 *)gAtomContext->bios + data_offset
+		(gAtomContext->bios + data_offset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usDisplayPathTableOffset));
 	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE *)
-		((uint16 *)gAtomContext->bios + data_offset
+		(gAtomContext->bios + data_offset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usConnectorObjectTableOffset));
 	enc_obj = (ATOM_ENCODER_OBJECT_TABLE *)
-		((uint16 *)gAtomContext->bios + data_offset
+		(gAtomContext->bios + data_offset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usEncoderObjectTableOffset));
 	router_obj = (ATOM_OBJECT_TABLE *)
-		((uint16 *)gAtomContext->bios + data_offset
+		(gAtomContext->bios + data_offset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usRouterObjectTableOffset));
 	int device_support = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
 
@@ -367,24 +369,25 @@ detect_connectors_manual()
 	TRACE("%s: found %" B_PRIu8 " potential display paths.\n", __func__,
 		path_obj->ucNumOfDispPath);
 
+	uint32 connector_index = 0;
 	for (i = 0; i < path_obj->ucNumOfDispPath; i++) {
+
+		if (connector_index >= ATOM_MAX_SUPPORTED_DEVICE)
+			continue;
+
 		uint8 *addr = (uint8*)path_obj->asDispPath;
 		ATOM_DISPLAY_OBJECT_PATH *path;
 		addr += path_size;
-		path = (ATOM_DISPLAY_OBJECT_PATH *) addr;
+		path = (ATOM_DISPLAY_OBJECT_PATH *)addr;
 		path_size += B_LENDIAN_TO_HOST_INT16(path->usSize);
 
-		int connector_type;
+		uint32 connector_type;
 		uint16 connector_object_id;
 
 		if (device_support & B_LENDIAN_TO_HOST_INT16(path->usDeviceTag)) {
-			TRACE("%s: Display Path #%" B_PRId32 "\n", __func__, i);
-
-			uint16 igp_lane_info;
-
-			uint8 con_obj_id
-				= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+			uint8 con_obj_id = (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+
 			//uint8 con_obj_num
 			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 			//	& ENUM_ID_MASK) >> ENUM_ID_SHIFT;
@@ -392,30 +395,31 @@ detect_connectors_manual()
 			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 			//	& OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 
-			// TODO : CV support
 			if (B_LENDIAN_TO_HOST_INT16(path->usDeviceTag)
 				== ATOM_DEVICE_CV_SUPPORT) {
+				TRACE("%s: Path #%" B_PRId32 ": skipping component video.\n",
+					__func__, i);
 				continue;
 			}
 
+
+			uint16 igp_lane_info;
 			if (0)
 				ERROR("%s: TODO : IGP chip connector detection\n", __func__);
 			else {
 				igp_lane_info = 0;
-				connector_type = manual_connector_convert[con_obj_id];
+				connector_type = connector_convert[con_obj_id];
 				connector_object_id = con_obj_id;
 			}
 
 			if (connector_type == VIDEO_CONNECTOR_UNKNOWN) {
-				TRACE("%s: Unknown connector, skipping\n", __func__);
+				TRACE("%s: Path #%" B_PRId32 ": skipping unknown connector.\n",
+					__func__, i);
 				continue;
-			} else {
-				TRACE("%s: Found connector %s\n", __func__,
-					decode_connector_name(connector_type));
 			}
 
-			// We have to go deeper! -AMD
-			// (find encoder for connector)
+			// TODO : to find encoder for connector
+			#if 0
 			int32 j;
 			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
 				j++) {
@@ -473,13 +477,21 @@ detect_connectors_manual()
 					ERROR("%s: TODO : Router object?\n", __func__);
 				}
 			}
+			#endif
 
 			// TODO : look up gpio for ddc, hpd
 
 			// TODO : aux chan transactions
 
-			// TODO : add connector
-			TRACE("%s: add connector\n", __func__);
+			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
+				__func__, i, decode_connector_name(connector_type),
+				connector_type);
+			gConnector[connector_index]->valid = true;
+			gConnector[connector_index]->connector_type = connector_type;
+			gConnector[connector_index]->connector_object_id
+				= connector_object_id;
+			connector_index++;
+
 			// radeon_add_atom_connector(dev,
 			// 	conn_id,
 			// 	le16_to_cpu(path-> usDeviceTag),
@@ -489,7 +501,7 @@ detect_connectors_manual()
 			// 	&hpd,
 			// 	&router);
 		}
-	}
+	} // end for each display path
 
 	return B_OK;
 }

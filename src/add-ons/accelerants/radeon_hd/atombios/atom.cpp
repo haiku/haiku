@@ -1206,7 +1206,7 @@ atom_index_iio(atom_context *ctx, int base)
 
 
 atom_context*
-atom_parse(card_info *card, void *bios)
+atom_parse(card_info *card, uint8 *bios)
 {
 	atom_context *ctx = (atom_context*)malloc(sizeof(atom_context));
 
@@ -1301,7 +1301,7 @@ atom_parse_data_header(atom_context *ctx, int index, uint16 *size,
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->data_table + offset);
-	uint16 *mdt = (uint16 *)ctx->bios + ctx->data_table + 4;
+	uint8 *mdt = ctx->bios + ctx->data_table + 4;
 
 	if (!mdt[index])
 		return B_ERROR;
@@ -1323,7 +1323,7 @@ atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->cmd_table + offset);
-	uint16 *mct = (uint16 *)ctx->bios + ctx->cmd_table + 4;
+	uint8 *mct = ctx->bios + ctx->cmd_table + 4;
 
 	if (!mct[index])
 		return B_ERROR;
@@ -1346,8 +1346,7 @@ atom_allocate_fb_scratch(atom_context *ctx)
 
 	if (atom_parse_data_header(ctx, index, NULL, NULL, NULL, &data_offset)
 		== B_OK) {
-		firmware = (_ATOM_VRAM_USAGE_BY_FIRMWARE *)
-			((uint16*)ctx->bios + data_offset);
+		firmware = (_ATOM_VRAM_USAGE_BY_FIRMWARE *)(ctx->bios + data_offset);
 
 		TRACE("Atom firmware requested 0x%" B_PRIX32 " %" B_PRIu16 "kb\n",
 			firmware->asFirmwareVramReserveInfo[0].ulStartAddrUsedByFirmware,
