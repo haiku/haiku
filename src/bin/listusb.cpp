@@ -52,7 +52,7 @@ ClassName(int classNumber) {
 		case 0xE0:
 			return "Wireless controller";
 		case 0xEF:
-			return "Miscelaneous";
+			return "Miscellaneous";
 		case 0xFE:
 			return "Application specific";
 		case 0xFF:

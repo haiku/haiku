@@ -565,8 +565,15 @@ CamDevice::DataPumpThread()
 	}
 #ifdef SUPPORT_ISO
 	else if (SupportsIsochronous()) {
-		int numPacketDescriptors = 20;
+		int numPacketDescriptors = 16;
 		usb_iso_packet_descriptor packetDescriptors[numPacketDescriptors];
+		
+		// Initialize packetDescriptor request lengths
+		for (int i = 0; i<numPacketDescriptors; i++)
+			packetDescriptors[i].request_length = 256;	
+
+		int fullPackets = 0;
+		int totalPackets = 0;
 		while (fTransferEnabled) {
 			ssize_t len = -1;
 			BAutolock lock(fLocker);
@@ -575,7 +582,8 @@ CamDevice::DataPumpThread()
 			if (!fIsoIn)
 				break;
 #ifndef DEBUG_DISCARD_INPUT
-			len = fIsoIn->IsochronousTransfer(fBuffer, fBufferLen, packetDescriptors, numPacketDescriptors);
+			len = fIsoIn->IsochronousTransfer(fBuffer, fBufferLen, packetDescriptors,
+				numPacketDescriptors);
 #endif
 
 			//PRINT((CH ": got %d bytes" CT, len));
@@ -594,8 +602,16 @@ CamDevice::DataPumpThread()
 
 #ifndef DEBUG_DISCARD_DATA
 			if (fDataInput) {
-				fDataInput->Write(fBuffer, len);
-				// else drop
+				int fBufferIndex = 0;
+				for (int i = 0; i < numPacketDescriptors; i++) {
+					int actual_length = ((usb_iso_packet_descriptor)
+						packetDescriptors[i]).actual_length;
+					if (actual_length > 0) {
+						fDataInput->Write(&fBuffer[fBufferIndex],
+							actual_length);
+					}
+					fBufferIndex += actual_length;
+				}				
 			}
 #endif
 			//snooze(2000);
