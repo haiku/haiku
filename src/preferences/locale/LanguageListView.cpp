@@ -19,7 +19,9 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <FormattingConventions.h>
+#include <GradientLinear.h>
 #include <LocaleRoster.h>
+#include <Region.h>
 #include <Window.h>
 
 
@@ -264,8 +266,24 @@ LanguageListView::Draw(BRect updateRect)
 	BOutlineListView::Draw(updateRect);
 
 	if (fDropIndex >= 0 && fDropTargetHighlightFrame.IsValid()) {
-		SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR));
-		StrokeRect(fDropTargetHighlightFrame);
+		// TODO: decide if drawing of a drop target indicator should be moved
+		//       into ControlLook
+		BGradientLinear gradient;
+		int step = fGlobalDropTargetIndicator ? 64 : 128;
+		for (int i = 0; i < 256; i += step)
+			gradient.AddColor(i % (step * 2) == 0
+				? ViewColor() : ui_color(B_CONTROL_HIGHLIGHT_COLOR), i);
+		gradient.AddColor(ViewColor(), 255);
+		gradient.SetStart(fDropTargetHighlightFrame.LeftTop());
+		gradient.SetEnd(fDropTargetHighlightFrame.RightBottom());
+		if (fGlobalDropTargetIndicator) {
+			BRegion region(fDropTargetHighlightFrame);
+			region.Exclude(fDropTargetHighlightFrame.InsetByCopy(2.0, 2.0));
+			ConstrainClippingRegion(&region);
+			FillRect(fDropTargetHighlightFrame, gradient);
+			ConstrainClippingRegion(NULL);
+		} else
+			FillRect(fDropTargetHighlightFrame, gradient);
 	}
 }
 
