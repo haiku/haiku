@@ -919,7 +919,7 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 	local arch = $(TARGET_ARCH) ;
 	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
 	for abiVersionedLib in $(HAIKU_ICU_LIBS) {
-		abiVersionedLib = $(abiVersionedLib:G=) ;
+		abiVersionedLib = $(abiVersionedLib:B:G=) ;
 		local lib = $(abiVersionedLib:B) ;
 		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
 			: /system/lib $(abiVersionedLib) : : true ;
