@@ -17,7 +17,7 @@
 
 usb_webcam_support_descriptor kSupportedDevices[] = {
 	// ofcourse we support a generic UVC device...
-	{{ CC_VIDEO, SC_VIDEOCONTROL, 0, 0, 0 }, "USB", "Video Class", "??" },
+	{{ CC_VIDEO, SC_VIDEOCONTROL, 0, 0, 0 }, "Generic UVC", "Video Class", "??" },
 	// ...whilst the following IDs were 'stolen' from a recent Linux driver:
 	{{ 0, 0, 0, 0x045e, 0x00f8, }, "Microsoft",     "Lifecam NX-6000",                 "??" },
 	{{ 0, 0, 0, 0x045e, 0x0723, }, "Microsoft",     "Lifecam VX-7000",                 "??" },
@@ -27,6 +27,7 @@ usb_webcam_support_descriptor kSupportedDevices[] = {
 	{{ 0, 0, 0, 0x046d, 0x08c5, }, "Logitech",      "QuickCam Pro 5000",               "??" },
 	{{ 0, 0, 0, 0x046d, 0x08c6, }, "Logitech",      "QuickCam OEM Dell Notebook",      "??" },
 	{{ 0, 0, 0, 0x046d, 0x08c7, }, "Logitech",      "QuickCam OEM Cisco VT Camera II", "??" },
+	{{ 0, 0, 0, 0x046d, 0x0821, }, "Logitech",      "HD Pro Webcam C910",              "??" },
 	{{ 0, 0, 0, 0x05ac, 0x8501, }, "Apple",         "Built-In iSight",                 "??" },
 	{{ 0, 0, 0, 0x05e3, 0x0505, }, "Genesys Logic", "USB 2.0 PC Camera",               "??" },
 	{{ 0, 0, 0, 0x0e8d, 0x0004, }, "N/A",           "MT6227",                          "??" },
