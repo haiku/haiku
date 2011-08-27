@@ -88,6 +88,8 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	fCalendarView(NULL),
 	fSuppressFirstClose(true)
 {
+	SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+
 	BPrivate::week_start startOfWeek
 		= (BPrivate::week_start)BLocale::Default()->StartOfWeek();
 
