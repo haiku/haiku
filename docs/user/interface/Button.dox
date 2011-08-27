@@ -338,7 +338,7 @@
 
 /*!
 	\fn void BButton::FrameMoved(BPoint newLocation)
-	\brief Move the frame of the BButton.
+	\brief Hook method that is called when the BButton has moved.
 
 	\param newLocation The location on the screen that the BButton
 		is moved to.
@@ -349,7 +349,7 @@
 
 /*!
 	\fn void BButton::FrameResized(float width, float height)
-	\brief Resize the BButton.
+	\brief Hook method that is called when the BButton changes size.
 
 	\param width the new \a width of the BButton
 	\param height the new \a height of the BButton
