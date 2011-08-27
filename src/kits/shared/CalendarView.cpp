@@ -91,6 +91,25 @@ BCalendarView::BCalendarView(const char* name, uint32 flags)
 }
 
 
+BCalendarView::BCalendarView(const char* name, week_start start,
+	uint32 flags)
+	:
+	BView(name, flags),
+	BInvoker(),
+	fSelectionMessage(NULL),
+	fDay(0),
+	fYear(0),
+	fMonth(0),
+	fFocusChanged(false),
+	fSelectionChanged(false),
+	fWeekStart(start),
+	fDayNameHeaderVisible(true),
+	fWeekNumberHeaderVisible(true)
+{
+	_InitObject();
+}
+
+
 BCalendarView::~BCalendarView()
 {
 	SetSelectionMessage(NULL);

@@ -34,7 +34,6 @@ public:
 	virtual 					~DateTimeView();
 
 	virtual	void			 	AttachedToWindow();
-	virtual	void 				Draw(BRect updaterect);
 	virtual	void 				MessageReceived(BMessage* message);
 
 			bool				CheckCanRevert();

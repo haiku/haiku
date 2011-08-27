@@ -46,7 +46,7 @@ using BPrivate::B_LOCAL_TIME;
 
 
 DateTimeView::DateTimeView(const char* name)
-	: 
+	:
 	BGroupView(name, B_HORIZONTAL, 5),
 	fGmtTime(NULL),
 	fUseGmtTime(false),
@@ -78,30 +78,6 @@ DateTimeView::AttachedToWindow()
 
 		fCalendarView->SetTarget(this);
 	}
-}
-
-
-void
-DateTimeView::Draw(BRect /*updateRect*/)
-{
-	rgb_color viewcolor = ViewColor();
-	rgb_color dark = tint_color(viewcolor, B_DARKEN_4_TINT);
-	rgb_color light = tint_color(viewcolor, B_LIGHTEN_MAX_TINT);
-
-	// draw a separator line
-	BRect bounds(Bounds());
-	BPoint start(bounds.Width() / 2.0f, bounds.top + 5.0f);
-	BPoint end(bounds.Width() / 2.0, bounds.bottom - 5.0f);
-
-	BeginLineArray(2);
-		AddLine(start, end, dark);
-		start.x++;
-		end.x++;
-		AddLine(start, end, light);
-	EndLineArray();
-
-	fTimeEdit->Draw(bounds);
-	fDateEdit->Draw(bounds);
 }
 
 
@@ -211,7 +187,9 @@ DateTimeView::_PrefletUptime() const
 void
 DateTimeView::_InitView()
 {
-	fCalendarView = new BCalendarView("calendar");
+	BPrivate::week_start weekStart = (BPrivate::week_start)
+		BLocale::Default()->StartOfWeek();
+	fCalendarView = new BCalendarView("calendar", weekStart);
 	fCalendarView->SetWeekNumberHeaderVisible(false);
 	fCalendarView->SetSelectionMessage(new BMessage(kDayChanged));
 	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
@@ -219,7 +197,7 @@ DateTimeView::_InitView()
 	fDateEdit = new TDateEdit("dateEdit", 3);
 	fTimeEdit = new TTimeEdit("timeEdit", 4);
 	fClock = new TAnalogClock("analogClock");
-	
+
 	BTime time(BTime::CurrentTime(B_LOCAL_TIME));
 	fClock->SetTime(time.Hour(), time.Minute(), time.Second());
 
