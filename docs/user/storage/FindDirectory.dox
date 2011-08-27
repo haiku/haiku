@@ -1,0 +1,179 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT Licence.
+ *
+ * Documentation by:
+ *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ * Corresponds to:
+ *		/trunk/headers/os/storage/FindDirectory.h	 rev 42600
+ *		/trunk/src/kits/storage/FindDirectory.cpp	 rev 42600
+ */
+
+
+/*!
+	\file FindDirectory.h
+	\ingroup storage
+	\brief Provides the find_dirctory function.
+	
+	Haiku provides a set of directories for applications to use. These can be
+	accessed using the find_directory function. It is very important to use the
+	function at runtime and not hardcode the path, as it may change in future
+	versions of Haiku, and already changed in past ones. Using this function
+	makes your application more future-proof, and makes sure everyone puts data
+	in the same place, which makes the system cleaner and easier to manage.
+	
+	Note this function can be accessed from C code, to make it easy to use also
+	in ported applications.
+*/
+
+/*!
+	\enum directory_which
+	\brief Directory constants to use with find_directory.
+	
+	There are four kind of directories. Volume-local directories exist on each
+	volume. They may be at a different place in each of them, for example the
+	trash location depends on the filesystem. System and common directories are
+	system-wide. They live on only one volume. The difference is system is
+	only meant for internal system management and shouldn't be used by
+	applications. The common directories have a similar hierarchy, and they are
+	ignored when the user disable user add-ons in the boot menu. User
+	directories have a different value depending on the UID of the application
+	calling the function. They are usually located in the user home directory.
+	
+	Use common directories for system-wide filessuch as drivers. Use user
+	directories for application settings, since each user may want different
+	settings.
+*/
+
+/*!
+	\var directory_which B_DESKTOP_DIRECTORY
+	The desktop for a given volume.
+	
+	\var directory_which B_TRASH_DIRECTORY
+	The trash for a given volume.
+	
+	\var directory_which B_SYSTEM_DIRECTORY
+	The system directory.
+	
+	\var directory_which B_SYSTEM_ADDONS_DIRECTORY
+	The system add-ons directory
+	
+	\var directory_which B_SYSTEM_BOOT_DIRECTORY
+	The system boot directory. Contains the minimal set of files required for
+	booting Haiku.
+	
+	\var directory_which B_SYSTEM_FONTS_DIRECTORY
+	The system fonts directory
+	
+	\var directory_which B_SYSTEM_LIB_DIRECTORY
+	The system lib directory.
+	
+ 	\var directory_which B_SYSTEM_SERVERS_DIRECTORY
+ 	The system servers directory.
+ 	
+	\var directory_which B_SYSTEM_APPS_DIRECTORY
+	The system applications direcotry. Contains applications executable from
+	Tracker.
+	
+	\var directory_which B_SYSTEM_BIN_DIRECTORY
+	The system bin directory. Contains command-line applications runnable from
+	Terminal.
+	
+	\var directory_which B_SYSTEM_DOCUMENTATION_DIRECTORY
+	The system documentation directory. Contains manpages.
+	
+	\var directory_which B_SYSTEM_PREFERENCES_DIRECTORY
+	The system preferences directory.
+	
+	\var directory_which B_SYSTEM_TRANSLATORS_DIRECTORY
+	The system translator directory.
+	
+	\var directory_which B_SYSTEM_MEDIA_NODES_DIRECTORY
+	The system media nodes directory.
+	
+	\var directory_which B_SYSTEM_SOUNDS_DIRECTORY
+	The system sounds directory.
+	
+	\var directory_which B_SYSTEM_DATA_DIRECTORY
+	The system data directory.
+
+	\var directory_which B_COMMON_DIRECTORY
+	The common directory.
+	
+	\var directory_which B_COMMON_SYSTEM_DIRECTORY
+	\var directory_which B_COMMON_ADDONS_DIRECTORY
+	\var directory_which B_COMMON_BOOT_DIRECTORY
+	\var directory_which B_COMMON_FONTS_DIRECTORY
+	\var directory_which B_COMMON_LIB_DIRECTORY
+	\var directory_which B_COMMON_SERVERS_DIRECTORY
+	\var directory_which B_COMMON_BIN_DIRECTORY
+	\var directory_which B_COMMON_ETC_DIRECTORY
+	\var directory_which B_COMMON_DOCUMENTATION_DIRECTORY
+	\var directory_which B_COMMON_SETTINGS_DIRECTORY
+	\var directory_which B_COMMON_DEVELOP_DIRECTORY
+	The common development directory. Contains toolchains, include files,
+	and other tools related to application development.
+	
+	\var directory_which B_COMMON_LOG_DIRECTORY
+	The common log directory. Log files are stored here.
+	
+	\var directory_which B_COMMON_SPOOL_DIRECTORY
+	\var directory_which B_COMMON_TEMP_DIRECTORY
+	\var directory_which B_COMMON_VAR_DIRECTORY
+	\var directory_which B_COMMON_TRANSLATORS_DIRECTORY
+	\var directory_which B_COMMON_MEDIA_NODES_DIRECTORY
+	\var directory_which B_COMMON_SOUNDS_DIRECTORY
+	\var directory_which B_COMMON_DATA_DIRECTORY
+	The common data directory. You may store application data here, such as
+	resources (graphics, music) for your application.
+	
+	\var directory_which B_COMMON_CACHE_DIRECTORY
+	The common cache directory. You may store temporary data here, such as
+	thumbnails for a picture viewer application, or a web browser data cache.
+
+	\var directory_which B_USER_DIRECTORY
+	The user home directory. Do NOT store application settings here as on unix,
+	instead use B_USER_SETTINGS_DIRECTORY.
+	
+	\var directory_which B_USER_CONFIG_DIRECTORY
+	\var directory_which B_USER_ADDONS_DIRECTORY
+	\var directory_which B_USER_BOOT_DIRECTORY
+	\var directory_which B_USER_FONTS_DIRECTORY
+	\var directory_which B_USER_LIB_DIRECTORY
+	\var directory_which B_USER_SETTINGS_DIRECTORY
+	The user settings directory. You may store your application settings here.
+	Create a subdirectory for your application if you have multiple files to
+	store, else, put a single file. The file or directory should have the same
+	name as your application, so the user knows what it's used for.
+	
+	\var directory_which B_USER_DESKBAR_DIRECTORY
+	The user deskbar directory. You may add a link to your application here, so
+	it shows up in the user deskbar's leaf menu.
+	
+	\var directory_which B_USER_PRINTERS_DIRECTORY
+	\var directory_which B_USER_TRANSLATORS_DIRECTORY
+	\var directory_which B_USER_MEDIA_NODES_DIRECTORY
+	\var directory_which B_USER_SOUNDS_DIRECTORY
+	\var directory_which B_USER_DATA_DIRECTORY
+	\var directory_which B_USER_CACHE_DIRECTORY
+
+	\var directory_which B_APPS_DIRECTORY
+	\var directory_which B_PREFERENCES_DIRECTORY
+	\var directory_which B_UTILITIES_DIRECTORY
+*/
+
+/*!
+	\fn status_t find_directory(directory_which which, dev_t volume, bool createIt, char* pathString, int32 length)
+	\brief C interface to find_directory
+	
+	Fills up to \a length characters of \a pathString with the path to \a which
+	on \a volume. Creates the directory if it doesn't exists and \a creqteIt is
+	set.
+*/
+
+/*!
+	\fn status_t find_directory(directory_which which, BPath* path, bool createIt = false, BVolume* volume = NULL)
+	\brief C++ interface to find_directory
+	
+	Set \a path to \a which on \a volume.
+*/

@@ -470,6 +470,7 @@ INPUT                  = . \
 						 locale \
                          midi \
                          midi2 \
+                         storage \
                          support \
 						 ../../headers/os/app \
                          ../../headers/os/drivers/fs_interface.h \
@@ -491,6 +492,7 @@ INPUT                  = . \
                          ../../headers/os/locale \
                          ../../headers/os/midi2 \
 						 ../../headers/os/storage/AppFileInfo.h \
+						 ../../headers/os/storage/FindDirectory.h \
                          ../../headers/os/support \
                          ../../headers/posix/syslog.h
 
