@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CALENDAR_VIEW_H_
@@ -30,24 +30,32 @@ enum week_start {
 class BCalendarView : public BView, public BInvoker {
 	public:
 								BCalendarView(BRect frame, const char *name,
-									uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+									uint32 resizeMask = B_FOLLOW_LEFT
+										| B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
+										| B_NAVIGABLE);
 
-								BCalendarView(BRect frame, const char *name, week_start start,
-									uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+								BCalendarView(BRect frame, const char *name,
+									week_start start,
+									uint32 resizeMask = B_FOLLOW_LEFT
+										| B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
+										| B_NAVIGABLE);
 
 								BCalendarView(const char* name,
-									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
+										| B_NAVIGABLE);
 
-								BCalendarView(const char* name, week_start start,
-									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+								BCalendarView(const char* name,
+									week_start start, uint32 flags = B_WILL_DRAW
+										| B_FRAME_EVENTS | B_NAVIGABLE);
 
 		virtual					~BCalendarView();
 
 								BCalendarView(BMessage *archive);
 		static BArchivable*		Instantiate(BMessage *archive);
-		virtual status_t		Archive(BMessage *archive, bool deep = true) const;
+		virtual status_t		Archive(BMessage *archive,
+									bool deep = true) const;
 
 		virtual void			AttachedToWindow();
 		virtual	void			DetachedFromWindow();
@@ -60,11 +68,13 @@ class BCalendarView : public BView, public BInvoker {
 
 		virtual void			Draw(BRect updateRect);
 
-		virtual void			DrawDay(BView *owner, BRect frame, const char *text,
-									bool isSelected = false, bool isEnabled = true,
-									bool focus = false);
-		virtual void			DrawDayName(BView *owner, BRect frame, const char *text);
-		virtual void			DrawWeekNumber(BView *owner, BRect frame, const char *text);
+		virtual void			DrawDay(BView *owner, BRect frame,
+									const char *text, bool isSelected = false,
+									bool isEnabled = true, bool focus = false);
+		virtual void			DrawDayName(BView *owner, BRect frame,
+									const char *text);
+		virtual void			DrawWeekNumber(BView *owner, BRect frame,
+									const char *text);
 
 		virtual void			MessageReceived(BMessage *message);
 
@@ -88,7 +98,8 @@ class BCalendarView : public BView, public BInvoker {
 		virtual void			KeyDown(const char *bytes, int32 numBytes);
 
 		virtual BHandler*		ResolveSpecifier(BMessage *message, int32 index,
-									BMessage *specifier, int32 form, const char *property);
+									BMessage *specifier, int32 form,
+									const char *property);
 		virtual status_t		GetSupportedSuites(BMessage *data);
 		virtual status_t		Perform(perform_code code, void* arg);
 
@@ -133,10 +144,11 @@ class BCalendarView : public BView, public BInvoker {
 		void					_DrawWeekHeader();
 		void					_DrawDay(int32 curRow, int32 curColumn,
 									int32 row, int32 column, int32 counter,
-									BRect frame, const char *text, bool focus = false);
-		void					_DrawItem(BView *owner, BRect frame, const char *text,
-									bool isSelected = false, bool isEnabled = true,
+									BRect frame, const char *text,
 									bool focus = false);
+		void					_DrawItem(BView *owner, BRect frame,
+									const char *text, bool isSelected = false,
+									bool isEnabled = true, bool focus = false);
 
 		void					_UpdateSelection();
 		BRect					_FirstCalendarItemFrame() const;
@@ -157,13 +169,23 @@ class BCalendarView : public BView, public BInvoker {
 									int32 column;
 
 									Selection& operator=(const Selection &s)
-									{ row = s.row; column = s.column; return *this; }
+									{
+										row = s.row;
+										column = s.column;
+										return *this;
+									}
 
 									bool operator==(const Selection &s) const
-									{ return row == s.row && column == s.column; }
+									{
+										return row == s.row
+											&& column == s.column;
+									}
 
 									bool operator!=(const Selection &s) const
-									{ return row != s.row || column != s.column; }
+									{
+										return row != s.row
+											|| column != s.column;
+									}
 								};
 		BRect					_RectOfDay(const Selection &selection) const;
 

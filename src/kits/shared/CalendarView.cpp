@@ -478,7 +478,8 @@ BCalendarView::MouseDown(BPoint where)
 
 
 void
-BCalendarView::MouseMoved(BPoint point, uint32 code, const BMessage *dragMessage)
+BCalendarView::MouseMoved(BPoint point, uint32 code,
+	const BMessage *dragMessage)
 {
 	BView::MouseMoved(point, code, dragMessage);
 }
@@ -806,7 +807,8 @@ BCalendarView::_SetToDay()
 	for (int32 row = 0; row < 6; ++row) {
 		for (int32 column = 0; column < 7; ++column) {
 			int32 day = counter - (firstDay - 1);
-			if (counter >= firstDay && counter <= dayCountCurrent + firstDay - 1) {
+			if (counter >= firstDay
+				&& counter <= dayCountCurrent + firstDay - 1) {
 				if (day == fDay) {
 					fNewFocusedDay.SetTo(row, column);
 					fNewSelectedDay.SetTo(row, column);
@@ -845,7 +847,8 @@ BCalendarView::_GetYearMonth(int32 *year, int32 *month) const
 	int32 counter = 0;
 	for (int32 row = 0; row < 6; ++row) {
 		for (int32 column = 0; column < 7; ++column) {
-			if (counter < firstDay || counter > dayCountCurrent + firstDay - 1) {
+			if (counter < firstDay
+				|| counter > dayCountCurrent + firstDay - 1) {
 				if (counter - firstDay < 0) {
 					if (row == currRow && column == currColumn) {
 						*year = date.Year();
@@ -954,7 +957,8 @@ BCalendarView::_SetupDayNumbers()
 	for (int32 row = 0; row < 6; ++row) {
 		for (int32 column = 0; column < 7; ++column) {
 			int32 day = counter - (firstDay - 1);
-			if (counter < firstDay || counter > dayCountCurrent + firstDay - 1) {
+			if (counter < firstDay
+				|| counter > dayCountCurrent + firstDay - 1) {
 				if (counter - firstDay < 0)
 					day += lastDayBefore;
 				else
@@ -997,8 +1001,8 @@ BCalendarView::_SetupWeekNumbers()
 
 
 void
-BCalendarView::_DrawDay(int32 currRow, int32 currColumn, int32 row, int32 column,
-	int32 counter, BRect frame, const char *text, bool focus)
+BCalendarView::_DrawDay(int32 currRow, int32 currColumn, int32 row,
+	int32 column, int32 counter, BRect frame, const char *text, bool focus)
 {
 	const BDate date(fYear, fMonth, 1);
 	const int32 daysMonth = date.DaysInMonth();
@@ -1044,7 +1048,8 @@ BCalendarView::_DrawDays()
 			counter++;
 			const char *day = fDayNumbers[row][column].String();
 			bool focus = isFocus && focusRow == row && focusColumn == column;
-			_DrawDay(currRow, currColumn, row, column, counter, tmp, day, focus);
+			_DrawDay(currRow, currColumn, row, column, counter, tmp, day,
+				focus);
 
 			tmp.OffsetBy(tmp.Width(), 0.0);
 		}
@@ -1074,11 +1079,13 @@ BCalendarView::_DrawFocusRect()
 
 				bool focus = IsFocus() && true;
 				const char *day = fDayNumbers[row][column].String();
-				_DrawDay(currRow, currColumn, row, column, counter, tmp, day, focus);
+				_DrawDay(currRow, currColumn, row, column, counter, tmp, day,
+					focus);
 			}
 			else if (focusRow == row && focusColumn == column) {
 				const char *day = fDayNumbers[row][column].String();
-				_DrawDay(currRow, currColumn, row, column, counter, tmp, day, false);
+				_DrawDay(currRow, currColumn, row, column, counter, tmp, day,
+					false);
 			}
 			tmp.OffsetBy(tmp.Width(), 0.0);
 		}
@@ -1198,16 +1205,19 @@ BCalendarView::_UpdateSelection()
 		BRect tmp = frame;
 		for (int32 column = 0; column < 7; ++column) {
 			counter++;
-			if (fNewSelectedDay.row == row && fNewSelectedDay.column == column) {
+			if (fNewSelectedDay.row == row
+				&& fNewSelectedDay.column == column) {
 				fSelectedDay.SetTo(row, column);
 
 				const char *day = fDayNumbers[row][column].String();
-				bool focus = IsFocus() && focusRow == row && focusColumn == column;
+				bool focus = IsFocus() && focusRow == row
+					&& focusColumn == column;
 				_DrawDay(row, column, row, column, counter, tmp, day, focus);
 			}
 			else if (currRow == row && currColumn == column) {
 				const char *day = fDayNumbers[row][column].String();
-				bool focus = IsFocus() && focusRow == row && focusColumn == column;
+				bool focus = IsFocus() && focusRow == row
+					&& focusColumn == column;
 				_DrawDay(currRow, currColumn, -1, -1, counter, tmp, day, focus);
 			}
 			tmp.OffsetBy(tmp.Width(), 0.0);
