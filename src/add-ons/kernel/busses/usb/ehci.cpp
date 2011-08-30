@@ -1758,6 +1758,8 @@ EHCI::FinishIsochronousTransfers()
 
 					transfer->transfer->Finished(B_OK, actualLength);
 
+					itd = itd->prev;
+
 					for (uint32 i = 0; i <= transfer->last_to_process; i++)
 						FreeDescriptor(transfer->descriptors[i]);
 
@@ -1771,8 +1773,8 @@ EHCI::FinishIsochronousTransfers()
 					transferDone = true;
 				} else {
 					TRACE("FinishIsochronousTransfers not end of transfer\n");
+					itd = itd->prev;
 				}
-				itd = itd->prev;
 			}
 
 			UnlockIsochronous();
