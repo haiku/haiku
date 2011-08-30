@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	2137207616
+1	belarusian	x-vnd.Haiku-CharacterMap	4082916013
 Aegean numbers	UnicodeBlocks		Эгейскія лічбы
 Alphabetic presentation forms	UnicodeBlocks		Формы алфавітнага прадстаўлення
 Ancient Greek musical notation	UnicodeBlocks		Старажытнагрэчаскія музыкальныя сімвалы
@@ -33,7 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		Іерогліфы CJK дап�
 CJK unified ideographs extension B	UnicodeBlocks		Іерогліфы CJK дапаўненне B
 Carian	UnicodeBlocks		Карыянскі
 Cham	UnicodeBlocks		Чам
-CharacterMap	System name		Таблица сімвалаў
+CharacterMap	System name		Табліца сімвалаў
 Cherokee	UnicodeBlocks		Чырокі
 Clear	CharacterWindow		Ачысціць
 Code	CharacterWindow		Код
@@ -43,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		Камбінаванне �
 Combining half marks	UnicodeBlocks		Камбінаванне паўметак
 Control pictures	UnicodeBlocks		Выявы ўпраўлення
 Coptic	UnicodeBlocks		Коптскі
+Copy as escaped byte string	CharacterView		Капіяваць кадаваным радком
+Copy character	CharacterView		Капіяваць сімвал
 Counting rod numerals	UnicodeBlocks		Лічбы злічальных палачак
 Cuneiform	UnicodeBlocks		Клінапіс
 Cuneiform numbers and punctuation	UnicodeBlocks		Клінапісныя лічбы і пунктуацыя

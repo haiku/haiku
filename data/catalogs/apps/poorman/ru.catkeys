@@ -34,7 +34,7 @@ Logging view	PoorMan		Окно логирования
 Max. simultaneous connections:	PoorMan		Максимум одновременных соединений:
 OK	PoorMan		ОК
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Пожалуйста, выберите папку для публикации.\n\nPoorMan может создать папку по умолчанию public_html в вашей домашней папке.\nИли вы можете выбрать любую другую папку.
-PoorMan	System name		Вебсервер
+PoorMan	Application name		Вебсервер
 PoorMan settings	PoorMan		Настройки PoorMan
 Quit	PoorMan		Выход
 Run server	PoorMan		Запустиь сервер

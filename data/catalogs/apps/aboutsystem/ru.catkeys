@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	345253943
+1	russian	x-vnd.Haiku-About	2392344107
 %.2f GHz	AboutView		%.2f ГГц
 %d MiB total	AboutView		Всего %d Мбайт
 %d MiB used (%d%%)	AboutView		%d Мбайт использовано  (%d%%)
@@ -45,8 +45,6 @@ The BeGeistert team\n	AboutView		Команде BeGeistert\n
 The Haiku-Ports team\n	AboutView		Команде Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Университету Окленда и Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Код, написанный специально для Haiku, особенно ядро и весь код, с которым могут быть связаны приложения, распространяется на условиях %MIT licence%. Некоторые системные библиотеки содержат сторонний код, распространяемый под лицензией LGPL. Вы можете найти авторские права на этот код ниже.\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku™ и логотип HAIKU® являются (зарегистрированными) торговыми марками Haiku, Inc.\n\n
 Time running:	AboutView		Время работы:
 Translations:\n	AboutView		Переводчики:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n

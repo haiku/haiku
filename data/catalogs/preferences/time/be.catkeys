@@ -1,11 +1,10 @@
-1	belarusian	x-vnd.Haiku-Time	453699369
+1	belarusian	x-vnd.Haiku-Time	265526963
 <Other>	Time		<іншае>
 Add	Time		Дадаць
 Could not contact server	Time		Няма далучэння да сервера
 Could not create socket	Time		Немагчыма стварыць сеткавы сокет.
 Current time:	Time		Сапраўдны час:
 Date and time	Time		Дата і Час
-Etc	Time		І г. д.
 GMT	Time		GMT
 Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
 Local time	Time		Лакальны час

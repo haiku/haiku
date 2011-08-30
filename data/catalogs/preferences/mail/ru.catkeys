@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mail	2328315862
+1	russian	x-vnd.Haiku-Mail	458432473
 Account name:	Config Views		Имя аккаунта:
 Account name:	E-Mail		Имя аккаунта:
 Account settings	Config Views		Настройки аккаунта
@@ -42,7 +42,3 @@ While sending and receiving	Config Window		во время отправки и �
 days	Config Window		дней
 hours	Config Window		часов
 minutes	Config Window		минут
-never	Config Window		не проверять
-· E-mail filters	Config Window		· Почтовые фильтры
-· Incoming	Config Window		· Входящие
-· Outgoing	Config Window		· Исходящие
