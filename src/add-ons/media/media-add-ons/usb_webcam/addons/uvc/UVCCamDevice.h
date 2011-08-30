@@ -49,14 +49,23 @@ private:
 									unsigned char *src, int32 width,
 									int32 height);
 
+			void				_AddProcessingParameter(BParameterGroup* group,
+									int32 index,
+									const usbvc_processing_unit_descriptor*
+										descriptor);
 			float				_AddParameter(BParameterGroup* group,
 									BParameterGroup** subgroup, int32 index,
 									uint16 wValue, const char* name);
-			int 				_AddAutoParameter(BParameterGroup* subgroup,
+			uint8 				_AddAutoParameter(BParameterGroup* subgroup,
 									int32 index, uint16 wValue);
-				
+			status_t			_SetParameterValue(uint16 wValue,
+									int16 setValue);
+			status_t			_SetParameterValue(uint16 wValue,
+									int8 setValue);
+
+
 			usbvc_interface_header_descriptor *fHeaderDescriptor;
-			
+
 			const BUSBEndpoint*	fInterruptIn;
 			uint32				fControlIndex;
 			uint16				fControlRequestIndex;
@@ -67,10 +76,10 @@ private:
 			uint32				fMJPEGFrameIndex;
 			uint32				fMaxVideoFrameSize;
 			uint32				fMaxPayloadTransferSize;
-			
+
 			BList				fUncompressedFrames;
 			BList				fMJPEGFrames;
-			
+
 			float				fBrightness;
 			float				fContrast;
 			float				fHue;
@@ -81,16 +90,16 @@ private:
 			float				fWBComponent;
 			float				fBacklightCompensation;
 			float				fGain;
-			
+
 			bool				fBinaryBacklightCompensation;
-			
+
 			int					fWBTempAuto;
 			int					fWBCompAuto;
 			int					fHueAuto;
 			int					fBacklightCompensationBinary;
 			int					fPowerlineFrequency;
-			
-			
+
+
 };
 
 
