@@ -141,7 +141,7 @@ struct pll_info {
 typedef struct {
 	bool valid;
 	uint16 line_mux;
-	uint16 devices;
+	uint16 connector_flags;
 	uint32 connector_type;
 	uint16 connector_object_id;
 	uint32 encoder_type;
@@ -153,8 +153,7 @@ typedef struct {
 
 typedef struct {
 	bool			active;
-	uint32			connection_type;
-	uint8			connection_id;
+	uint32			connector_index; // matches connector id in connector_info
 	register_info	*regs;
 	bool			found_ranges;
 	uint32			vfreq_max;

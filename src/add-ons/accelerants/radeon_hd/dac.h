@@ -22,7 +22,7 @@
 #define FORMAT_TvCV 0x3
 
 
-bool DACSense(uint8 dacIndex);
+bool dac_sense(uint32 connector_id);
 void DACGetElectrical(uint8 type, uint8 dac, uint8 *bandgap, uint8 *whitefine);
 void DACSet(uint8 dacIndex, uint32 crtid);
 void DACPower(uint8 dacIndex, int mode);

@@ -197,7 +197,7 @@ detect_crt_ranges(uint32 crtid)
 {
 	edid1_info *edid = &gInfo->shared_info->edid_info;
 
-	// TODO : VESA edid is just for primary monitor?
+	// TODO : use radeon ddc to get to connector EDID instead of VESA
 
 	// Scan each VESA EDID description for monitor ranges
 	for (uint32 index = 0; index < EDID1_NUM_DETAILED_MONITOR_DESC; index++) {
@@ -292,7 +292,7 @@ detect_connectors_legacy()
 			gConnector[i]->connector_type = VIDEO_CONNECTOR_VGA;
 
 		gConnector[i]->valid = true;
-		gConnector[i]->devices = (1 << i);
+		gConnector[i]->connector_flags = (1 << i);
 
 		// TODO : add the encoder
 		#if 0
@@ -383,8 +383,9 @@ detect_connectors()
 
 		uint32 connector_type;
 		uint16 connector_object_id;
+		uint16 connector_flags = B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
 
-		if (device_support & B_LENDIAN_TO_HOST_INT16(path->usDeviceTag)) {
+		if (device_support & connector_flags) {
 			uint8 con_obj_id = (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
@@ -395,8 +396,7 @@ detect_connectors()
 			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 			//	& OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 
-			if (B_LENDIAN_TO_HOST_INT16(path->usDeviceTag)
-				== ATOM_DEVICE_CV_SUPPORT) {
+			if (connector_flags == ATOM_DEVICE_CV_SUPPORT) {
 				TRACE("%s: Path #%" B_PRId32 ": skipping component video.\n",
 					__func__, i);
 				continue;
@@ -465,15 +465,13 @@ detect_connectors()
 							}
 							uint32 encoder_id = (encoder_obj & OBJECT_ID_MASK)
 								>> OBJECT_ID_SHIFT;
-							uint32 encoder_support
-								= B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
 
 							switch(encoder_id) {
 								case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-									if (encoder_support
+									if (connector_flags
 										& ATOM_DEVICE_LCD_SUPPORT) {
 										encoder_type = VIDEO_ENCODER_LVDS;
 										// radeon_atombios_get_lvds_info
@@ -499,10 +497,10 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
-									if (encoder_support
+									if (connector_flags
 										& ATOM_DEVICE_LCD_SUPPORT) {
 										encoder_type = VIDEO_ENCODER_LVDS;
-									} else if (encoder_support
+									} else if (connector_flags
 										& ATOM_DEVICE_CRT_SUPPORT) {
 										encoder_type = VIDEO_ENCODER_DAC;
 									} else {
@@ -519,10 +517,10 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_HDMI_SI1930:
 								case ENCODER_OBJECT_ID_TRAVIS:
 								case ENCODER_OBJECT_ID_NUTMEG:
-									if (encoder_support
+									if (connector_flags
 										& ATOM_DEVICE_LCD_SUPPORT) {
 										encoder_type = VIDEO_ENCODER_LVDS;
-									} else if (encoder_support
+									} else if (connector_flags
 										& ATOM_DEVICE_CRT_SUPPORT) {
 										encoder_type = VIDEO_ENCODER_DAC;
 									} else {
@@ -550,6 +548,8 @@ detect_connectors()
 				i, decode_encoder_name(encoder_type));
 
 			gConnector[connector_index]->valid = true;
+
+			gConnector[connector_index]->connector_flags = connector_flags;
 			gConnector[connector_index]->connector_type = connector_type;
 			gConnector[connector_index]->connector_object_id
 				= connector_object_id;
@@ -581,50 +581,33 @@ detect_displays()
 		gDisplay[id]->found_ranges = false;
 	}
 
-	uint32 index = 0;
+	uint32 displayIndex = 0;
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == false)
+			continue;
+		if (displayIndex >= MAX_DISPLAY)
+			continue;
 
-	// Probe for DAC monitors connected
-	for (uint32 id = 0; id < 2; id++) {
-		if (DACSense(id)) {
-			gDisplay[index]->active = true;
-			gDisplay[index]->connection_type = ATOM_ENCODER_MODE_CRT;
-			gDisplay[index]->connection_id = id;
-			init_registers(gDisplay[index]->regs, index);
-			if (detect_crt_ranges(index) == B_OK)
-				gDisplay[index]->found_ranges = true;
-
-			if (index < MAX_DISPLAY)
-				index++;
-			else
-				return B_OK;
+		bool found = false;
+		switch(gConnector[id]->encoder_type) {
+			case VIDEO_ENCODER_DAC:
+				found = dac_sense(id);
+				break;
+			default:
+				found = false;
 		}
-	}
 
-	// Probe for TMDS monitors connected
-	for (uint32 id = 0; id < 1; id++) {
-		if (TMDSSense(id)) {
-			gDisplay[index]->active = true;
-			gDisplay[index]->connection_type = ATOM_ENCODER_MODE_DVI;
-				// or ATOM_ENCODER_MODE_HDMI?
-			gDisplay[index]->connection_id = id;
-			init_registers(gDisplay[index]->regs, index);
-			if (detect_crt_ranges(index) == B_OK)
-				gDisplay[index]->found_ranges = true;
+		if (found == true) {
+			gDisplay[displayIndex]->active = true;
+				// set this display as active
+			gDisplay[displayIndex]->connector_index = id;
+				// set physical connector index from gConnector
+			init_registers(gDisplay[displayIndex]->regs, displayIndex);
 
-			if (index < MAX_DISPLAY)
-				index++;
-			else
-				return B_OK;
+			if (detect_crt_ranges(displayIndex) == B_OK)
+				gDisplay[displayIndex]->found_ranges = true;
+			displayIndex++;
 		}
-	}
-
-	// No monitors? Lets assume LVDS for now
-	if (index == 0) {
-		gDisplay[index]->active = true;
-		gDisplay[index]->connection_type = ATOM_ENCODER_MODE_LVDS;
-		gDisplay[index]->connection_id = 1;
-			// 0 : LVDSA ; 1 : LVDSB / TDMSB
-		init_registers(gDisplay[index]->regs, index);
 	}
 
 	return B_OK;
@@ -639,44 +622,13 @@ debug_displays()
 		TRACE("Display #%" B_PRIu32 " active = %s\n",
 			id, gDisplay[id]->active ? "true" : "false");
 
-		if (gDisplay[id]->active) {
-			switch (gDisplay[id]->connection_type) {
-				case ATOM_ENCODER_MODE_DP:
-					TRACE(" + connection: DP\n");
-					break;
-				case ATOM_ENCODER_MODE_LVDS:
-					TRACE(" + connection: LVDS\n");
-					break;
-				case ATOM_ENCODER_MODE_DVI:
-					TRACE(" + connection: DVI\n");
-					break;
-				case ATOM_ENCODER_MODE_HDMI:
-					TRACE(" + connection: HDMI\n");
-					break;
-				case ATOM_ENCODER_MODE_SDVO:
-					TRACE(" + connection: SDVO\n");
-					break;
-				case ATOM_ENCODER_MODE_DP_AUDIO:
-					TRACE(" + connection: DP AUDIO\n");
-					break;
-				case ATOM_ENCODER_MODE_TV:
-					TRACE(" + connection: TV\n");
-					break;
-				case ATOM_ENCODER_MODE_CV:
-					TRACE(" + connection: CV\n");
-					break;
-				case ATOM_ENCODER_MODE_CRT:
-					TRACE(" + connection: CRT\n");
-					break;
-				case ATOM_ENCODER_MODE_DVO:
-					TRACE(" + connection: DVO\n");
-					break;
-				default:
-					TRACE(" + connection: UNKNOWN\n");
-			}
+		uint32 connector_index = gDisplay[id]->connector_index;
 
-			TRACE(" + connection index: % " B_PRIu8 "\n",
-				gDisplay[id]->connection_id);
+		if (gDisplay[id]->active) {
+			uint32 connector_type = gConnector[connector_index]->connector_type;
+			uint32 encoder_type = gConnector[connector_index]->encoder_type;
+			TRACE(" + connector: %s\n", decode_connector_name(connector_type));
+			TRACE(" + encoder:   %s\n", decode_encoder_name(encoder_type));
 
 			TRACE(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
 				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
@@ -686,6 +638,50 @@ debug_displays()
 	}
 	TRACE("==========================================\n");
 
+}
+
+
+uint32
+display_get_encoder_mode(uint32 connector_index)
+{
+	uint32 connector_type = gConnector[connector_index]->connector_type;
+	switch (connector_type) {
+		case VIDEO_CONNECTOR_DVII:
+		case VIDEO_CONNECTOR_HDMIB: /* HDMI-B is DL-DVI; analog works fine */
+			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
+			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
+			// if (gConnector[connector_index]->use_digital)
+			//	return ATOM_ENCODER_MODE_DVI;
+			// else
+				return ATOM_ENCODER_MODE_CRT;
+			break;
+		case VIDEO_CONNECTOR_DVID:
+		case VIDEO_CONNECTOR_HDMIA:
+		default:
+			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
+			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
+			return ATOM_ENCODER_MODE_DVI;
+		case VIDEO_CONNECTOR_LVDS:
+			return ATOM_ENCODER_MODE_LVDS;
+		case VIDEO_CONNECTOR_DP:
+			// dig_connector = radeon_connector->con_priv;
+			// if ((dig_connector->dp_sink_type == CONNECTOR_OBJECT_ID_DISPLAYPORT)
+			// 	|| (dig_connector->dp_sink_type == CONNECTOR_OBJECT_ID_eDP)) {
+			// 	return ATOM_ENCODER_MODE_DP;
+			// }
+			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
+			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
+			return ATOM_ENCODER_MODE_DVI;
+		case VIDEO_CONNECTOR_EDP:
+			return ATOM_ENCODER_MODE_DP;
+		case VIDEO_CONNECTOR_DVIA:
+		case VIDEO_CONNECTOR_VGA:
+			return ATOM_ENCODER_MODE_CRT;
+		case VIDEO_CONNECTOR_COMPOSITE:
+		case VIDEO_CONNECTOR_SVIDEO:
+		case VIDEO_CONNECTOR_9DIN:
+			return ATOM_ENCODER_MODE_TV;
+	}
 }
 
 

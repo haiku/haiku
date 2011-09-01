@@ -64,6 +64,7 @@ status_t detect_crt_ranges(uint32 crtid);
 status_t detect_displays();
 void debug_displays();
 
+uint32 display_get_encoder_mode(uint32 connector_index);
 void display_crtc_lock(uint8 crtc_id, int command);
 void display_crtc_blank(uint8 crtc_id, int command);
 void display_crtc_scale(uint8 crtc_id, display_mode *mode);

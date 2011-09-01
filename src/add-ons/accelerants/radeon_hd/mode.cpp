@@ -109,8 +109,13 @@ radeon_set_display_mode(display_mode *mode)
 			continue;
 		}
 
-		pll_set(gDisplay[id]->connection_id,
-			mode->timing.pixel_clock, id);
+		uint32 connector_index = gDisplay[id]->connector_index;
+		// uint32 connector_type = gConnector[connector_index]->connector_type;
+		uint32 encoder_type = gConnector[connector_index]->encoder_type;
+
+		// TODO : the first id is the pll we use... this won't work for
+		// more then two monitors
+		pll_set(id, mode->timing.pixel_clock, id);
 
 		// Program CRT Controller
 		display_crtc_set_dtd(id, mode);
@@ -119,16 +124,16 @@ radeon_set_display_mode(display_mode *mode)
 		display_crtc_scale(id, mode);
 
 		// Program connector controllers
-		switch (gDisplay[id]->connection_type) {
-			case ATOM_ENCODER_MODE_CRT:
-				DACSet(gDisplay[id]->connection_id, id);
+		switch (encoder_type) {
+			case VIDEO_ENCODER_DAC:
+			case VIDEO_ENCODER_TVDAC:
+				// DACSet(connector_index, id);
 				break;
-			case ATOM_ENCODER_MODE_DVI:
-			case ATOM_ENCODER_MODE_HDMI:
-				TMDSSet(gDisplay[id]->connection_id, mode);
+			case VIDEO_ENCODER_TMDS:
+				// TMDSSet(connector_index, mode);
 				break;
-			case ATOM_ENCODER_MODE_LVDS:
-				LVDSSet(gDisplay[id]->connection_id, mode);
+			case VIDEO_ENCODER_LVDS:
+				// LVDSSet(connector_index, mode);
 				break;
 		}
 
@@ -139,17 +144,17 @@ radeon_set_display_mode(display_mode *mode)
 		//PLLPower(gDisplay[id]->connection_id, RHD_POWER_ON);
 
 		// Power connector controllers
-		switch (gDisplay[id]->connection_type) {
-			case ATOM_ENCODER_MODE_CRT:
-				DACPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+		switch (encoder_type) {
+			case VIDEO_ENCODER_DAC:
+			case VIDEO_ENCODER_TVDAC:
+				// DACPower(connector_index, RHD_POWER_ON);
 				break;
-			case ATOM_ENCODER_MODE_DVI:
-			case ATOM_ENCODER_MODE_HDMI:
-				TMDSPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+			case VIDEO_ENCODER_TMDS:
+				// TMDSPower(connector_index, RHD_POWER_ON);
 				break;
-			case ATOM_ENCODER_MODE_LVDS:
-				LVDSSet(gDisplay[id]->connection_id, mode);
-				LVDSPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+			case VIDEO_ENCODER_LVDS:
+				// LVDSSet(connector_index, mode);
+				// LVDSPower(connector_index, RHD_POWER_ON);
 				break;
 		}
 

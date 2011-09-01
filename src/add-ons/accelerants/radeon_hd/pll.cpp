@@ -10,6 +10,7 @@
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
+#include "display.h"
 #include "utility.h"
 #include "pll.h"
 
@@ -187,6 +188,8 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 	uint8 crev;
 	atom_parse_cmd_header(gAtomContext, index, &frev, &crev);
 
+	uint32 connector_index = gDisplay[crtc_id]->connector_index;
+
 	switch (crev) {
 		case 1:
 			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
@@ -220,7 +223,7 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			// 	args.v3.ucMiscInfo |= PIXEL_CLOCK_MISC_REF_DIV_SRC;
 			args.v3.ucTransmitterId = crtc_id;
 				// TODO : transmitter id is now CRTC id?
-			args.v3.ucEncoderMode = gDisplay[crtc_id]->connection_type;
+			args.v3.ucEncoderMode = display_get_encoder_mode(connector_index);
 			break;
 		default:
 			TRACE("%s: ERROR: table version %d.%d TODO\n", __func__,

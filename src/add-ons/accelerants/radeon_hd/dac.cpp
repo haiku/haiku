@@ -23,69 +23,75 @@ extern "C" void _sPrintf(const char *format, ...);
 
 
 bool
-DACSense(uint8 dacIndex)
+dac_sense(uint32 connector_id)
 {
-	uint32 dacOffset = dacIndex == 1 ? REG_DACB_OFFSET : REG_DACA_OFFSET;
+	uint16 flags = gConnector[connector_id]->connector_flags;
 
-	// Backup current DAC values
-	uint32 compEnable = Read32(OUT, dacOffset + DACA_COMPARATOR_ENABLE);
-	uint32 control1 = Read32(OUT, dacOffset + DACA_CONTROL1);
-	uint32 control2 = Read32(OUT, dacOffset + DACA_CONTROL2);
-	uint32 detectControl = Read32(OUT, dacOffset + DACA_AUTODETECT_CONTROL);
-	uint32 enable = Read32(OUT, dacOffset + DACA_ENABLE);
+	if (flags & (ATOM_DEVICE_CRT_SUPPORT
+		| ATOM_DEVICE_CV_SUPPORT
+		| ATOM_DEVICE_TV_SUPPORT)) {
 
-	Write32(OUT, dacOffset + DACA_ENABLE, 1);
-	// Acknowledge autodetect
-	Write32Mask(OUT, dacOffset + DACA_AUTODETECT_INT_CONTROL, 0x01, 0x01);
-	Write32Mask(OUT, dacOffset + DACA_AUTODETECT_CONTROL, 0, 0x00000003);
-	Write32Mask(OUT, dacOffset + DACA_CONTROL2, 0, 0x00000001);
-	Write32Mask(OUT, dacOffset + DACA_CONTROL2, 0, 0x00ff0000);
+		DAC_LOAD_DETECTION_PS_ALLOCATION args;
+		int index = GetIndexIntoMasterTable(COMMAND, DAC_LoadDetection);
+		uint8 frev, crev;
+		memset(&args, 0, sizeof(args));
 
-	Write32(OUT, dacOffset + DACA_FORCE_DATA, 0);
-	Write32Mask(OUT, dacOffset + DACA_CONTROL2, 0x00000001, 0x0000001);
+		if (!atom_parse_cmd_header(gAtomContext, index, &frev, &crev))
+			return false;
 
-	Write32Mask(OUT, dacOffset + DACA_COMPARATOR_ENABLE,
-		0x00070000, 0x00070101);
-	Write32(OUT, dacOffset + DACA_CONTROL1, 0x00050802);
-	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0, 0x00000001);
-		// Shutdown Bandgap voltage reference
+		args.sDacload.ucMisc = 0;
 
-	snooze(5);
+		if ((flags & ENCODER_OBJECT_ID_INTERNAL_DAC1)
+			|| (flags & ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1))
+			args.sDacload.ucDacType = ATOM_DAC_A;
+		else
+			args.sDacload.ucDacType = ATOM_DAC_B;
 
-	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0, 0x01010100);
-		// Shutdown RGB
+		if (flags & ATOM_DEVICE_CRT1_SUPPORT) {
+			args.sDacload.usDeviceID
+				= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT1_SUPPORT);
+		} else if (flags & ATOM_DEVICE_CRT2_SUPPORT) {
+			args.sDacload.usDeviceID
+				= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT2_SUPPORT);
+		} else if (flags & ATOM_DEVICE_CV_SUPPORT) {
+			args.sDacload.usDeviceID
+				= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CV_SUPPORT);
+			if (crev >= 3)
+				args.sDacload.ucMisc = DAC_LOAD_MISC_YPrPb;
+		} else if (flags & ATOM_DEVICE_TV1_SUPPORT) {
+			args.sDacload.usDeviceID
+				= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_TV1_SUPPORT);
+			if (crev >= 3)
+				args.sDacload.ucMisc = DAC_LOAD_MISC_YPrPb;
+		}
 
-	Write32(OUT, dacOffset + DACA_FORCE_DATA, 0x1e6);
-		// 486 out of 1024
-	snooze(200);
+		atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0x01010100, 0x01010100);
-		// Enable RGB
-	snooze(88);
+		uint32 bios_0_scratch;
 
-	Write32Mask(OUT, dacOffset + DACA_POWERDOWN, 0, 0x01010100);
-		// Shutdown RGB
+		bios_0_scratch = Read32(OUT, R600_BIOS_0_SCRATCH);
 
-	Write32Mask(OUT, dacOffset + DACA_COMPARATOR_ENABLE,
-		0x00000100, 0x00000100);
-
-	snooze(100);
-
-	// Get detected RGB channels
-	// If only G is found, it could be a monochrome monitor, but we
-	// don't bother checking.
-	uint8 out = (Read32(OUT, dacOffset + DACA_COMPARATOR_OUTPUT) & 0x0E) >> 1;
-
-	// Restore stored DAC values
-	Write32Mask(OUT, dacOffset + DACA_COMPARATOR_ENABLE,
-		compEnable, 0x00FFFFFF);
-	Write32(OUT, dacOffset + DACA_CONTROL1, control1);
-	Write32Mask(OUT, dacOffset + DACA_CONTROL2, control2, 0x000001FF);
-	Write32Mask(OUT, dacOffset + DACA_AUTODETECT_CONTROL,
-		detectControl, 0x000000FF);
-	Write32Mask(OUT, dacOffset + DACA_ENABLE, enable, 0x000000FF);
-
-	return (out == 0x7);
+		if (flags & ATOM_DEVICE_CRT1_SUPPORT) {
+			if (bios_0_scratch & ATOM_S0_CRT1_MASK)
+				return true;
+		}
+		if (flags & ATOM_DEVICE_CRT2_SUPPORT) {
+			if (bios_0_scratch & ATOM_S0_CRT2_MASK)
+				return true;
+		}
+		if (flags & ATOM_DEVICE_CV_SUPPORT) {
+			if (bios_0_scratch & (ATOM_S0_CV_MASK|ATOM_S0_CV_MASK_A))
+				return true;
+		}
+		if (flags & ATOM_DEVICE_TV1_SUPPORT) {
+			if (bios_0_scratch
+				& (ATOM_S0_TV1_COMPOSITE | ATOM_S0_TV1_COMPOSITE_A))
+				return true; /* CTV */
+		else if (bios_0_scratch & (ATOM_S0_TV1_SVIDEO | ATOM_S0_TV1_SVIDEO_A))
+			return true; /* STV */
+		}
+	}
+	return false;
 }
 
 
