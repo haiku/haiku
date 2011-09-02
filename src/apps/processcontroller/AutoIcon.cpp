@@ -23,6 +23,7 @@
 
 #include <Bitmap.h>
 #include <Entry.h>
+#include <MimeType.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 
@@ -45,8 +46,10 @@ AutoIcon::Bitmap()
 		if (fSignature) {
 			entry_ref ref;
 			be_roster->FindApp (fSignature, &ref);
-			if (BNodeInfo::GetTrackerIcon(&ref, fBitmap, B_MINI_ICON) != B_OK)
-				fBitmap->SetBits(k_app_mini, 256, 0, B_CMAP8);
+			if (BNodeInfo::GetTrackerIcon(&ref, fBitmap, B_MINI_ICON) != B_OK) {
+				BMimeType genericAppType(B_APP_MIME_TYPE);
+				genericAppType.GetIcon(fBitmap, B_MINI_ICON);
+			}
 		}
 
 		if (fbits)
