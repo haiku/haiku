@@ -144,6 +144,7 @@ typedef struct {
 	uint16 connector_flags;
 	uint32 connector_type;
 	uint16 connector_object_id;
+	i2c_bus	connector_i2c;
 	uint32 encoder_type;
 	uint16 encoder_object_id;
 	// TODO struct radeon_i2c_bus_rec ddc_bus;

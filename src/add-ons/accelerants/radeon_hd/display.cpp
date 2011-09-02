@@ -537,7 +537,57 @@ detect_connectors()
 				}
 			}
 
-			// TODO : look up gpio for ddc, hpd
+			// Set up information buses such as ddc
+			if ((connector_flags
+				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) == 0) {
+				for (j = 0; j < con_obj->ucNumberOfObjects; j++) {
+					if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+						== B_LENDIAN_TO_HOST_INT16(
+						con_obj->asObjects[j].usObjectID)) {
+						ATOM_COMMON_RECORD_HEADER *record
+							= (ATOM_COMMON_RECORD_HEADER*)(gAtomContext->bios
+							+ data_offset + B_LENDIAN_TO_HOST_INT16(
+							con_obj->asObjects[j].usRecordOffset));
+						while (record->ucRecordSize > 0
+							&& record->ucRecordType > 0
+							&& record->ucRecordType
+								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
+							ATOM_I2C_RECORD *i2c_record;
+							ATOM_I2C_ID_CONFIG_ACCESS *i2c_config;
+							//ATOM_HPD_INT_RECORD *hpd_record;
+
+							switch (record->ucRecordType) {
+								case ATOM_I2C_RECORD_TYPE:
+									i2c_record
+										= (ATOM_I2C_RECORD *)record;
+									i2c_config
+										= (ATOM_I2C_ID_CONFIG_ACCESS *)
+										&i2c_record->sucI2cId;
+
+									// i2c_config->ucAccess is gpio_id
+
+									// ddc_bus = radeon_lookup_i2c_gpio(rdev,
+									//	i2c_config->ucAccess);
+
+									TRACE("Found i2c record: GPIO: 0x%"
+										B_PRIx32 "\n", i2c_config->ucAccess);
+
+									// ddc2_init_timing(
+									//	&gConnector[connector_index]->connector_i2c);
+
+									break;
+								case ATOM_HPD_INT_RECORD_TYPE:
+									// TODO : HPD (Hot Plug)
+									break;
+							}
+
+							// move to next record
+							record = (ATOM_COMMON_RECORD_HEADER *)
+								((char *)record + record->ucRecordSize);
+						}
+					}
+				}
+			}
 
 			// TODO : aux chan transactions
 
