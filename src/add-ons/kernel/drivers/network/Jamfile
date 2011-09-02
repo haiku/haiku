@@ -37,5 +37,4 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network wimax ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wwan ;

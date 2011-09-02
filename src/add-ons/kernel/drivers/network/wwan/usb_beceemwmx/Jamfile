@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network wimax usb_beceemwmx ;
+SubDir HAIKU_TOP src add-ons kernel drivers network wwan usb_beceemwmx ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
