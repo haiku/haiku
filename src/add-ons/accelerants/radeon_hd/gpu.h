@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Alexander von Gluck, kallisti5@unixzen.com
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 #ifndef RADEON_HD_GPU_H
 #define RADEON_HD_GPU_H
@@ -168,6 +168,7 @@ void radeon_gpu_mc_resume();
 uint32 radeon_gpu_mc_idlecheck();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_irq_setup();
+status_t radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id);
 
 
 #endif

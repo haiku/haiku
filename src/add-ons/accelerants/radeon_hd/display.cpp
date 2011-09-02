@@ -564,17 +564,9 @@ detect_connectors()
 										= (ATOM_I2C_ID_CONFIG_ACCESS *)
 										&i2c_record->sucI2cId;
 
-									// i2c_config->ucAccess is gpio_id
-
-									// ddc_bus = radeon_lookup_i2c_gpio(rdev,
-									//	i2c_config->ucAccess);
-
-									TRACE("Found i2c record: GPIO: 0x%"
-										B_PRIx32 "\n", i2c_config->ucAccess);
-
-									// ddc2_init_timing(
-									//	&gConnector[connector_index]->connector_i2c);
-
+									// set up i2c bus for connector
+									radeon_gpu_i2c_setup(connector_index,
+										i2c_config->ucAccess);
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
 									// TODO : HPD (Hot Plug)

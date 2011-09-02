@@ -3,7 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Alexander von Gluck, kallisti5@unixzen.com
+ *		Alexander von Gluck, kallisti5@unixzen.com
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -272,4 +273,110 @@ radeon_gpu_irq_setup()
 	// setup interrupt control
 
 	return B_ERROR;
+}
+
+
+static status_t
+get_i2c_signals(void* cookie, int* _clock, int* _data)
+{
+	#if 0
+	uint32 ioRegister = (uint32)cookie;
+	uint32 value = read32(ioRegister);
+
+	*_clock = (value & I2C_CLOCK_VALUE_IN) != 0;
+	*_data = (value & I2C_DATA_VALUE_IN) != 0;
+	#endif
+
+	return B_OK;
+}
+
+
+static status_t
+set_i2c_signals(void* cookie, int clock, int data)
+{
+	#if 0
+	uint32 ioRegister = (uint32)cookie;
+	uint32 value = read32(OUT, ioRegister) & I2C_RESERVED;
+
+	if (data != 0)
+		value |= I2C_DATA_DIRECTION_MASK;
+	else {
+		value |= I2C_DATA_DIRECTION_MASK
+			| I2C_DATA_DIRECTION_OUT
+			| I2C_DATA_VALUE_MASK;
+	}
+
+	if (clock != 0)
+		value |= I2C_CLOCK_DIRECTION_MASK;
+	else
+		value |= I2C_CLOCK_DIRECTION_MASK
+			| I2C_CLOCK_DIRECTION_OUT
+			| I2C_CLOCK_VALUE_MASK;
+
+	write32(OUT, ioRegister, value);
+	read32(OUT, ioRegister);
+		// make sure the PCI bus has flushed the write
+	#endif
+
+	return B_OK;
+}
+
+
+status_t
+radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
+{
+	// aka radeon_lookup_i2c_gpio
+	TRACE("%s: Path #%" B_PRId32 ": GPIO Pin 0x%" B_PRIx8 "\n", __func__,
+		connector, gpio_id);
+
+	ATOM_GPIO_I2C_ASSIGMENT *gpio;
+	struct _ATOM_GPIO_I2C_INFO *i2c_info;
+	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
+	uint16 offset;
+	uint16 size;
+
+	if (atom_parse_data_header(gAtomContext, index,
+		&size, NULL, NULL, &offset)) {
+
+		i2c_info = (struct _ATOM_GPIO_I2C_INFO *)(gAtomContext->bios + offset);
+
+		uint32 num_indices = (size - sizeof(ATOM_COMMON_TABLE_HEADER))
+			/ sizeof(ATOM_GPIO_I2C_ASSIGMENT);
+
+		for (uint32 i = 0; i < num_indices; i++) {
+			gpio = &i2c_info->asGPIO_Info[i];
+
+			// TODO : if DCE 4 and i == 7 ... manual override for evergreen
+			// TODO : if DCE 3 and i == 4 ... manual override
+
+			if (gpio->sucI2cId.ucAccess == gpio_id) {
+				i2c_bus bus;
+
+				// successful lookup
+				TRACE("%s: successful i2c gpio lookup\n", __func__);
+
+				// pull registers for data and clock...
+				uint16 analogDataReg
+					= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
+				//uint16 analogClockReg
+				//	= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
+				//uint16 digitalDataReg
+				//	= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
+				//uint16 digitalClockReg
+				//	= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
+
+				// populate cookie with analog data register
+				bus.cookie = (void*)analogDataReg;
+				bus.set_signals = &set_i2c_signals;
+				bus.get_signals = &get_i2c_signals;
+
+				ddc2_init_timing(&bus);
+				// TODO : check for valid analog edid
+				// TODO : check for valid digital edid no results on analog
+			}
+		}
+
+	}
+
+	return B_OK;
 }
