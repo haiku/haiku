@@ -35,9 +35,9 @@ char *gDeviceNames[MAX_DEVICES + 1];
 usb_module_info *gUSBModule = NULL;
 
 usb_support_descriptor gSupportedDevices[] = {
-	{ 0, 0, 0, 0x0fe6, 0x8101}, // "Sunrising JP108"
+	{ 0, 0, 0, 0x0fe6, 0x8101}, // "Supereal SR9600"
 	{ 0, 0, 0, 0x07aa, 0x9601}, // "Corega FEther USB-TXC"
-	{ 0, 0, 0, 0x0a46, 0x9601}, // "Davicom USB-100"
+	{ 0, 0, 0, 0x0a46, 0x9601}, // "Davicom DM9601"
 	{ 0, 0, 0, 0x0a46, 0x6688}, // "ZT6688 USB NIC"
 	{ 0, 0, 0, 0x0a46, 0x0268}, // "ShanTou ST268 USB NIC"
 	{ 0, 0, 0, 0x0a46, 0x8515}, // "ADMtek ADM8515 USB NIC"
@@ -67,14 +67,22 @@ create_davicom_device(usb_device device)
 #define IDS(__vendor, __product) (((__vendor) << 16) | (__product))
 	
 	switch(IDS(deviceDescriptor->vendor_id, deviceDescriptor->product_id)) {
-		case IDS(0x0fe6, 0x8101): return new DavicomDevice(device, "Sunrising JP108");
-		case IDS(0x07aa, 0x9601): return new DavicomDevice(device, "Corega FEther USB-TXC");
-		case IDS(0x0a46, 0x9601): return new DavicomDevice(device, "Davicom USB-100");
-		case IDS(0x0a46, 0x6688): return new DavicomDevice(device, "ZT6688 USB NIC");
-		case IDS(0x0a46, 0x0268): return new DavicomDevice(device, "ShanTou ST268 USB NIC");
-		case IDS(0x0a46, 0x8515): return new DavicomDevice(device, "ADMtek ADM8515 USB NIC");
-		case IDS(0x0a47, 0x9601): return new DavicomDevice(device, "Hirose USB-100");
-		case IDS(0x0a46, 0x9000): return new DavicomDevice(device, "DM9000E");
+		case IDS(0x0fe6, 0x8101):
+			return new DavicomDevice(device, "Sunrising JP108");
+		case IDS(0x07aa, 0x9601):
+			return new DavicomDevice(device, "Corega FEther USB-TXC");
+		case IDS(0x0a46, 0x9601):
+			return new DavicomDevice(device, "Davicom USB-100");
+		case IDS(0x0a46, 0x6688):
+			return new DavicomDevice(device, "ZT6688 USB NIC");
+		case IDS(0x0a46, 0x0268):
+			return new DavicomDevice(device, "ShanTou ST268 USB NIC");
+		case IDS(0x0a46, 0x8515):
+			return new DavicomDevice(device, "ADMtek ADM8515 USB NIC");
+		case IDS(0x0a47, 0x9601):
+			return new DavicomDevice(device, "Hirose USB-100");
+		case IDS(0x0a46, 0x9000):
+			return new DavicomDevice(device, "DM9000E");
 	}
 	return NULL;
 }

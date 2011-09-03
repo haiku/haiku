@@ -33,8 +33,11 @@
 #define NSR	0x01	// Network status
 #define RCR 0x05	// RX Control
 #define PAR 0x10	// 6 bits - Physical address (MAC)
-#define GPCR 0x1E	// General purpose control
-#define GPR 0x1F	// General purpose
+#define GPCR 0x1E	// GPIO pins direction
+#define GPR 0x1F	// GPIO pins data
+#define VID 0x28	// Vendor ID (16bit)
+#define PID 0x2A	// Product ID (16bit)
+#define CHIPR 0x2C	// Chip revision
 
 #define NCR_EXT_PHY		0x80	// External PHY
 #define NCR_FDX			0x08	// Full duplex
@@ -60,7 +63,7 @@
 
 
 status_t
-DavicomDevice::_ReadRegister(uint8 reg, size_t size, uint8* buffer)
+DavicomDevice::_ReadRegister(uint8 reg, size_t size, void* buffer)
 {
 	if (size > 255) return B_BAD_VALUE;
 	size_t actualLength;
@@ -181,14 +184,6 @@ DavicomDevice::Open(uint32 flags)
 
 	status_t result = StartDevice();
 	if (result != B_OK) {
-		return result;
-	}
-
-	// setup state notifications
-	result = gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
-		kNotifyBufferSize, _NotifyCallback, this);
-	if(result != B_OK) {
-		TRACE_ALWAYS("Error of requesting notify interrupt:%#010x\n", result);
 		return result;
 	}
 
@@ -362,9 +357,11 @@ DavicomDevice::Control(uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
 		case ETHER_INIT:
+			TRACE_ALWAYS("ETHER_INIT\n");
 			return B_OK;
 
 		case ETHER_GETADDR:
+			TRACE_ALWAYS("ETHER_GETADDR\n");
 			memcpy(buffer, &fMACAddress, sizeof(fMACAddress));
 			return B_OK;
 
@@ -395,6 +392,7 @@ DavicomDevice::Control(uint32 op, void *buffer, size_t length)
 			return B_OK;
 
 		case ETHER_GET_LINK_STATE:
+			TRACE_ALWAYS("ETHER_GET_LINK_STATE\n");
 			return GetLinkState((ether_link_state *)buffer);
 #endif
 
@@ -433,10 +431,10 @@ DavicomDevice::Removed()
 status_t
 DavicomDevice::SetupDevice(bool deviceReplugged)
 {
+	/* First of all, we need to know the MAC address */
 	ether_address address;
 	status_t result = ReadMACAddress(&address);
 	if(result != B_OK) {
-		TRACE_ALWAYS("Error reading MAC address:%#010x\n", result);
 		return result;
 	}
 
@@ -445,17 +443,44 @@ DavicomDevice::SetupDevice(bool deviceReplugged)
 				address.ebyte[3], address.ebyte[4], address.ebyte[5]);
 
 	if(deviceReplugged) {
-		// this might be the same device that was replugged - read the MAC address
-		// (which should be at the same index) to make sure
+		// this might be the same device that was replugged - read the MAC
+		// address (which should be at the same index) to make sure
 		if(memcmp(&address, &fMACAddress, sizeof(address)) != 0) {
 			TRACE_ALWAYS("Cannot replace device with MAC address:"
-												"%02x:%02x:%02x:%02x:%02x:%02x\n",
-				fMACAddress.ebyte[0], fMACAddress.ebyte[1], fMACAddress.ebyte[2],
-				fMACAddress.ebyte[3], fMACAddress.ebyte[4], fMACAddress.ebyte[5]);
+				"%02x:%02x:%02x:%02x:%02x:%02x\n",
+				fMACAddress.ebyte[0], fMACAddress.ebyte[1], 
+				fMACAddress.ebyte[2], fMACAddress.ebyte[3],
+				fMACAddress.ebyte[4], fMACAddress.ebyte[5]);
 			return B_BAD_VALUE; // is not the same
 		}
 	} else
 		fMACAddress = address;
+
+
+	/* Read the product ID, vendor ID, and chip revision (not used so far, but
+	I feel the quirks coming in sooner or later !) */
+
+	uint16 vidpid[3];
+	vidpid[2] = 0; // We overwrite only the fist byte of this one.
+
+	result = _ReadRegister(VID, 5, vidpid);
+	if (result != B_OK)
+		TRACE_ALWAYS("Error reading CHIPR: %#010x.\n", result);
+	else
+		TRACE_ALWAYS("Chip %#04x:%#04x revision %d\n", vidpid[0], vidpid[1],
+			vidpid[2]);
+
+	// setup state notifications (we need this to get linkup/linkdown events)
+	result = gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
+		kNotifyBufferSize, _NotifyCallback, this);
+	if(result != B_OK) {
+		TRACE_ALWAYS("Error of requesting notify interrupt:%#010x\n", result);
+		return result;
+	}
+	
+	// TODO enable "wakeup" at the device level or we'll never get anything !
+	// TODO check if link was already up before enabling interrupts. If so, we
+	// need to notify the network stack right now.
 
 	return B_OK;
 }
@@ -532,34 +557,41 @@ DavicomDevice::_SetupEndpoints()
 	int writeEndpoint  = -1;
 
 	for(size_t ep = 0; ep < interface->endpoint_count; ep++) {
-	  usb_endpoint_descriptor *epd = interface->endpoint[ep].descr;
-	  if((epd->attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_INTERRUPT) {
-	    notifyEndpoint = ep;
-	    continue;
-	  }
+		usb_endpoint_descriptor *epd = interface->endpoint[ep].descr;
+		
+		// Is it an interrupt enpoint ?
+		if((epd->attributes & USB_ENDPOINT_ATTR_MASK)
+	  			== USB_ENDPOINT_ATTR_INTERRUPT) {
+	    	notifyEndpoint = ep;
+	    	continue;
+	  	}
+	  	
+	  	// Is it a bulk one ?
+	  	if((epd->attributes & USB_ENDPOINT_ATTR_MASK) != USB_ENDPOINT_ATTR_BULK) 		{
+	    	TRACE_ALWAYS("Error: USB endpoint type %#04x is unknown.\n",
+	    		epd->attributes);
+	    	continue;
+	  	}
 
-	  if((epd->attributes & USB_ENDPOINT_ATTR_MASK) != USB_ENDPOINT_ATTR_BULK) {
-	    TRACE_ALWAYS("Error: USB endpoint type %#04x is unknown.\n", epd->attributes);
-	    continue;
-	  }
+		// If so, which direction ?
+		if((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
+				== USB_ENDPOINT_ADDR_DIR_IN) {
+	    	readEndpoint = ep;
+			continue;
+		}
 
-	  if((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
-			  										== USB_ENDPOINT_ADDR_DIR_IN) {
-	    readEndpoint = ep;
-		continue;
-	  }
-
-	  if((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_OUT)
-			  										== USB_ENDPOINT_ADDR_DIR_OUT) {
-	    writeEndpoint = ep;
-		continue;
-	  }
+		if((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_OUT)
+				== USB_ENDPOINT_ADDR_DIR_OUT) {
+	    	writeEndpoint = ep;
+			continue;
+		}
 	}
 
+	// Did we find all the needed endpoints ?
 	if (notifyEndpoint == -1 || readEndpoint == -1 || writeEndpoint == -1) {
 		TRACE_ALWAYS("Error: not all USB endpoints were found: "
-										"notify:%d; read:%d; write:%d\n",
-											notifyEndpoint, readEndpoint, writeEndpoint);
+			"notify:%d; read:%d; write:%d\n", notifyEndpoint, readEndpoint,
+			writeEndpoint);
 		return B_ERROR;
 	}
 
@@ -576,7 +608,8 @@ DavicomDevice::_SetupEndpoints()
 status_t
 DavicomDevice::ReadMACAddress(ether_address_t *address)
 {
-	status_t result = _ReadRegister(PAR, sizeof(ether_address), (uint8*)address);
+	status_t result = _ReadRegister(PAR, sizeof(ether_address),
+		(uint8*)address);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of reading MAC address:%#010x\n", result);
 		return result;
@@ -687,7 +720,6 @@ DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 		*/
 	}
 
-	// parse data in overriden class
 	device->OnNotify(actualLength);
 
 	// schedule next notification buffer
@@ -701,9 +733,10 @@ status_t
 DavicomDevice::StartDevice()
 {
 	uint8 registerValue = 0;
-
+	status_t result;
+	
 	/* disable loopback  */
-	status_t result = _ReadRegister(NCR, 1, &registerValue);
+	result = _ReadRegister(NCR, 1, &registerValue);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading NCR: %#010x.\n", result);
 		return result;
@@ -736,7 +769,7 @@ DavicomDevice::StartDevice()
 		TRACE_ALWAYS("Error reading GPCR: %#010x.\n", result);
 		return result;
 	}
-	registerValue &= GPCR_GEP_CNTL0;
+	registerValue |= GPCR_GEP_CNTL0;
 	result = _Write1Register(GPCR, registerValue);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error writing %#02X to GPCR: %#010x.\n", registerValue, result);
@@ -787,7 +820,7 @@ DavicomDevice::OnNotify(uint32 actualLength)
 			TRACE("Link is now up at %s Mb/s\n",
 				(fNotifyBuffer[0] & NSR_SPEED) ? "10" : "100");
 		} else
-			TRACE("Link is now down");
+			TRACE("Link is now down.\n");
 	}
 
 	if (rxOverflow)
@@ -826,7 +859,7 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 		linkState->media |= IFM_ACTIVE;
 		result = _ReadRegister(NCR, 1, &registerValue);
 		if (result != B_OK) {
-			TRACE_ALWAYS("Error reading NCR register! %x\n",result);
+			TRACE_ALWAYS("Error reading NCR register: %s\n",strerror(result));
 			return result;
 		}
 
