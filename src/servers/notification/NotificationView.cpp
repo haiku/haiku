@@ -10,7 +10,7 @@
  *		Mikael Eiman, mikael@eiman.tv
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Adrien Destugues <pulokmandy@pulkomandy.ath.cx>
+ *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  */
 
 #include <stdlib.h>
@@ -340,8 +340,6 @@ NotificationView::Draw(BRect updateRect)
 	PopState();
 
 	Sync();
-	
-	BView::Draw(updateRect);
 }
 
 
