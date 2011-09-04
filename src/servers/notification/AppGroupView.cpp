@@ -60,7 +60,6 @@ AppGroupView::Draw(BRect updateRect)
 
 
 	BRect textRect = Bounds();
-	//textRect.left = kEdgePadding * 2;
 	//textRect.right = textRect.left + be_bold_font->StringWidth(label.String())
 	//	+ (kEdgePadding * 3);
 	textRect.bottom = 2 * labelOffset;
@@ -75,92 +74,49 @@ AppGroupView::Draw(BRect updateRect)
 	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
 	// detailCol = tint_color(detailCol, B_LIGHTEN_1_TINT);
 
+	PushState();
+	SetFont(be_bold_font);
+	SetPenSize(kPenSize);
+
 	if (fCollapsed) {
+		// Draw the expand widget
 		PushState();
-			SetFont(be_bold_font);
-			SetPenSize(kPenSize);
-			float linePos = textRect.top + textRect.Height() / 2;
-
-			// Draw the line to the expand widget			
-			PushState();
-				SetHighColor(detailCol);				
-				StrokeLine(BPoint(kEdgePadding, linePos), BPoint(fCollapseRect.left, linePos));
-			PopState();
-			
-			// Draw the expand widget
-			PushState();
-				SetHighColor(detailCol);
-				StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
-				
-				BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-				BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);			
-				StrokeLine(expandHorStart, expandHorEnd);
-				
-				BPoint expandVerStart(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.top + kSmallPadding);
-				BPoint expandVerEnd(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.bottom - kSmallPadding);				
-				StrokeLine(expandVerStart, expandVerEnd);
-			PopState();
-			
-			// Draw the app title
-			DrawString(label.String(), BPoint(fCollapseRect.right + kEdgePadding, labelOffset + kEdgePadding));
-			
-			// Draw the line from the label to the close widget
-			PushState();
-				SetHighColor(detailCol);
-				
-				BPoint lineSeg2Start(textRect.right + kSmallPadding / 2, linePos);
-				BPoint lineSeg2End(fCloseRect.left, linePos);
-				StrokeLine(lineSeg2Start, lineSeg2End);
-			PopState();
-
-			// Draw the dismiss widget
-			PushState();
-				SetHighColor(detailCol);
-
-				StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-
-				StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-				StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
-			PopState();
-
-			// Draw the line from the dismiss widget
-			PushState();
-				SetHighColor(detailCol);
-
-				BPoint lineSeg3Start(fCloseRect.right, linePos);
-				BPoint lineSeg3End(borderRect.right, linePos);
-				StrokeLine(lineSeg3Start, lineSeg3End);
-			PopState();
-
-		PopState();
-	} else {
-		PushState();
-			SetFont(be_bold_font);
-			SetPenSize(kPenSize);
-
-			SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-			FillRect(textRect, B_SOLID_LOW);
-			
-			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-
-			// Draw the collapse widget
+			SetHighColor(detailCol);
 			StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
-
+			
 			BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-			BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-
+			BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);			
 			StrokeLine(expandHorStart, expandHorEnd);
-
-			// Draw the dismiss widget
-			StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-
-			StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-			StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
-
-			// Draw the label
-			DrawString(label.String(), BPoint(fCollapseRect.right + kEdgePadding, labelOffset + kEdgePadding));
+			
+			BPoint expandVerStart(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.top + kSmallPadding);
+			BPoint expandVerEnd(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.bottom - kSmallPadding);				
+			StrokeLine(expandVerStart, expandVerEnd);
 		PopState();
+		
+		SetHighColor(tint_color(ui_color(B_PANEL_TEXT_COLOR), B_LIGHTEN_1_TINT));
+	} else {
+		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		FillRect(textRect, B_SOLID_LOW);
+			
+		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+
+		// Draw the collapse widget
+		StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
+
+		BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
+		BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
+
+		StrokeLine(expandHorStart, expandHorEnd);
 	}
+	// Draw the dismiss widget
+	StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
+
+	StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
+	StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
+
+	// Draw the label
+	DrawString(label.String(), BPoint(fCollapseRect.right + 2 * kEdgePadding, labelOffset + kEdgePadding));
+	PopState();
 
 	Sync();	
 }
@@ -339,10 +295,10 @@ AppGroupView::ResizeViews()
 	fCollapseRect.OffsetTo(kEdgePadding * 2, kEdgePadding * 1.5);
 
 	fCloseRect = borderRect;
-	fCloseRect.right -= kEdgePadding * 4;
+	fCloseRect.right -= kEdgePadding * 2;
+	fCloseRect.top += kEdgePadding * 1.5;
 	fCloseRect.left = fCloseRect.right - kCloseSize;
 	fCloseRect.bottom = fCloseRect.top + kCloseSize;
-	fCloseRect.OffsetTo(fCloseRect.left, kEdgePadding * 1.5);
 
 	fParent->ResizeAll();
 }

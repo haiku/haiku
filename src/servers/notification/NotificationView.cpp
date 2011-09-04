@@ -34,7 +34,7 @@ const char* kSmallIconAttribute	= "BEOS:M:STD_ICON";
 const char* kLargeIconAttribute	= "BEOS:L:STD_ICON";
 const char* kIconAttribute		= "BEOS:ICON";
 
-static const int kIconStripeWidth = 16;
+static const int kIconStripeWidth = 32;
 
 property_info message_prop_list[] = {
 	{ "type", {B_GET_PROPERTY, B_SET_PROPERTY, 0},
@@ -280,8 +280,7 @@ NotificationView::Draw(BRect updateRect)
 	float iconSize = (float)fParent->IconSize();
 	
 	BRect stripeRect = Bounds();
-	int32 iconLayoutScale = max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
-	stripeRect.right = kIconStripeWidth * iconLayoutScale;
+	stripeRect.right = kIconStripeWidth;
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
 	
@@ -291,23 +290,16 @@ NotificationView::Draw(BRect updateRect)
 
 	// Draw icon
 	if (fBitmap) {
-		LineInfo* appLine = fLines.back();
-		font_height fh;
-		appLine->font.GetHeight(&fh);
-
-		float title_bottom = appLine->location.y + fh.descent;
-
-		float ix = kEdgePadding;
-		float iy = 0;
-		if (fParent->Layout() == TitleAboveIcon)
-			iy = title_bottom + kEdgePadding + (Bounds().Height() - title_bottom
-				- kEdgePadding * 2 - iconSize) / 2;
-		else
-			iy = (Bounds().Height() - iconSize) / 2.0;
+		float ix = kIconStripeWidth - iconSize / 3.0;
+			// Icon is centered around stripe right border
+		float iy = (Bounds().Height() - iconSize) / 2.0;
+			// Icon is vertically centered in view
 
 		if (fType == B_PROGRESS_NOTIFICATION)
+		{
 			// Move icon up by half progress bar height if it's present
-			iy -= (progRect.Height() + kEdgePadding) / 2.0;
+			iy -= (progRect.Height() + kEdgePadding);
+		}
 
 		iconRect.Set(ix, iy, ix + iconSize - 1.0, iy + iconSize - 1.0);
 		DrawBitmapAsync(fBitmap, fBitmap->Bounds(), iconRect);
@@ -327,7 +319,7 @@ NotificationView::Draw(BRect updateRect)
 
 	// Draw the close widget
 	BRect closeRect = Bounds();
-	closeRect.InsetBy(kEdgePadding, kEdgePadding);
+	closeRect.InsetBy(2 * kEdgePadding, 2 * kEdgePadding);
 	closeRect.left = closeRect.right - kCloseSize;
 	closeRect.bottom = closeRect.top + kCloseSize;
 
@@ -488,15 +480,17 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 	fTitle = title;
 	fText = text;
 
-	float iconRight = kEdgePadding + kEdgePadding;
+	float iconRight = kIconStripeWidth;
 	if (fBitmap != NULL)
-		iconRight += fParent->IconSize();
+		iconRight += fParent->IconSize() * 0.75;
+	else
+		iconRight += 24;
 
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
 	float fontHeight = ceilf(fh.leading) + ceilf(fh.descent)
 		+ ceilf(fh.ascent);
-	float y = fontHeight;
+	float y = 2 * fontHeight;
 
 	// Title
 	LineInfo* titleLine = new LineInfo;

@@ -56,7 +56,7 @@ NotificationWindow::NotificationWindow()
 	:
 	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_MARK("Notification"), 
 		kLeftTitledWindowLook, B_FLOATING_ALL_WINDOW_FEEL, B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE 
-		| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE, 
+		| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_NOT_MOVABLE, 
 		B_ALL_WORKSPACES)
 {
 	fBorder = new BorderView(Bounds(), "Notification");
@@ -371,57 +371,47 @@ void
 NotificationWindow::SetPosition()
 {
 	BRect bounds = DecoratorFrame();
-	float width = bounds.Width();
-	float height = bounds.Height();
+	float width = Bounds().Width() + 1;
+	float height = Bounds().Height() + 1;
 	
-	float leftOffset = Frame().left - DecoratorFrame().left;
-	float topOffset = DecoratorFrame().top - Frame().top;
+	float leftOffset = Frame().left - bounds.left;
+	float topOffset = Frame().top - bounds.top;
+	float rightOffset = bounds.right - Frame().right;
+	float bottomOffset = bounds.bottom - Frame().bottom;
+		// Size of the borders around the window
 	
-	float x = 0, y = 0, sx, sy;
-	float pad = 0;
+	float x = Frame().left, y = Frame().top;
+		// If we can't guess, don't move...
+
 	BDeskbar deskbar;
 	BRect frame = deskbar.Frame();
 
 	switch (deskbar.Location()) {
 		case B_DESKBAR_TOP:
 			// Put it just under, top right corner
-			y = frame.bottom + pad + topOffset;
-			x = frame.right - width;
+			y = frame.bottom + topOffset;
+			x = frame.right - width - rightOffset;
 			break;
 		case B_DESKBAR_BOTTOM:
 			// Put it just above, lower left corner
-			sx = frame.right;
-			sy = frame.top - height - pad;
-			y = sy;
-			x = sx - width - pad;
-			break;
-		case B_DESKBAR_LEFT_TOP:
-			// Put it just to the right of the deskbar
-			sx = frame.right + pad;
-			//sy = frame.top - height;
-			x = sx + leftOffset;
-			y = frame.top + pad;
+			y = frame.top - height - bottomOffset;
+			x = frame.right - width - rightOffset;
 			break;
 		case B_DESKBAR_RIGHT_TOP:
-			// Put it just to the left of the deskbar
-			sx = frame.left - width - pad;
-			//sy = frame.top - height;
-			x = sx;
-			y = frame.top + pad;
+			x = frame.left - width - rightOffset;
+			y = frame.top + topOffset;
 			break;
-		case B_DESKBAR_LEFT_BOTTOM:
-			// Put it to the right of the deskbar.
-			sx = frame.right + pad;
-			sy = frame.bottom;
-			x = sx + leftOffset;
-			y = sy - height - pad;
+		case B_DESKBAR_LEFT_TOP:
+			x = frame.right + leftOffset;
+			y = frame.top + topOffset;
 			break;
 		case B_DESKBAR_RIGHT_BOTTOM:
-			// Put it to the left of the deskbar.
-			sx = frame.left - width - pad;
-			sy = frame.bottom;
-			y = sy - height - pad;
-			x = sx;
+			y = frame.bottom - height - bottomOffset;
+			x = frame.left - width - rightOffset;
+			break;
+		case B_DESKBAR_LEFT_BOTTOM:
+			y = frame.bottom - height - bottomOffset;
+			x = frame.right + leftOffset;
 			break;
 		default:
 			break;
