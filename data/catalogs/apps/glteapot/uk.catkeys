@@ -1,0 +1,24 @@
+1	ukrainian	x-vnd.Haiku-GLTeapot	2890609668
+Add a teapot	TeapotWindow		Додати чайник
+Backface culling	TeapotWindow		Backface culling
+Blue	TeapotWindow		Голубий
+FPS display	TeapotWindow		Показати FPS
+File	TeapotWindow		Файл
+Filled polygons	TeapotWindow		Заповнити багатокутники
+Fog	TeapotWindow		Туман
+GLTeapot	System name		Чайник GL
+Gouraud shading	TeapotWindow		Затінення Гуро
+Green	TeapotWindow		Зелений
+Lighting	TeapotWindow		Свічення
+Lights	TeapotWindow		Світло
+Lower left	TeapotWindow		Нижній лівий
+Off	TeapotWindow		Вимкнути
+Options	TeapotWindow		Опції
+Perspective	TeapotWindow		Перспектива
+Quit	TeapotWindow		Вийти
+Red	TeapotWindow		Червоний
+Right	TeapotWindow		Вправо
+Upper center	TeapotWindow		Вище центру
+White	TeapotWindow		Білий
+Yellow	TeapotWindow		Жовтий
+Z-buffered	TeapotWindow		Z-буферизація

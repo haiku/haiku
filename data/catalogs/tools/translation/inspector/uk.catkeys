@@ -1,18 +1,32 @@
-1	ukrainian	x.vnd.OBOS-Inspector	2081327042
+1	ukrainian	x.vnd.OBOS-Inspector	2075781936
 Active Translators	ImageWindow		Активні транслятори
 Active Translators	InspectorApp		Активні транслятори
 Bummer	ImageWindow		Помилка
 File	ImageWindow		Файл
 First Page	ImageWindow		Перша сторінка
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Образ: %1\nКолір простору: %2 (%3)\nDРозміри: %4 x %5\nБіти в стрічці: %6\nВсього бітів: %7\n\nідентифікаційна інформація:\nID Стрічка: %8\nТипMIME: %9\nТип: '%10' (%11)\nТранслятор ID: %12\nГрупа: '%13' (%14)\nЯкість: %15\nЄмність: %16\n\nІнформація про розширення:\n
+Info	ImageWindow		Інформація
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Info Win
+Last Page	ImageWindow		Остання сторінка
 Next Page	ImageWindow		Наступна сторінка
 No image available to save.	ImageWindow		Немає доступних для збереження образів.
 Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Кількість документів: %1\n\nВикористати транслятор:\nName: %2\nІнфо: %3\nВерсія: %4\n
+OK	ImageView		Гаразд
+OK	ImageWindow		Гаразд
+Open...	ImageWindow		Відкрити…
 Previous Page	ImageWindow		Попередня сторінка
+Quit	ImageWindow		Вийти
 Save feature not implemented yet.	ImageWindow		Функція збереження не реалізована.
+Save...	ImageWindow		Зберегти…
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Вибрати документ: %1\n\nВикористати транслятор:\nІ'мя: %2\nІнформація: %3\nВерсія: %4\n
 Sorry, unable to load the image.	ImageView		Прикро , неможливо завантажити образ.
 Sorry, unable to write the image file.	ImageView		Прикро, неможливо записати файл образу.
 System Translators	ActiveTranslatorsWindow		Системні транслятори
 Unknown	ImageView		Невідомий
 User Translators	ActiveTranslatorsWindow		Транслятори користувача
+View	ImageWindow		Вигляд
+Window	ImageWindow		Вікно
 \nInput Formats:	ImageView		\nВхідні формати:
+\nOutput Formats:	ImageView		\nВихідні формати:
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nВикористати транслятор:\nІ'мя: %1\nІнформація: %2\nВерсія: %3\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТип: '%1' (%2)\nГрупа: '%3' (%4)\nЯкість: %5\nЄмність: %6\nТип MIME: %7\nІ'мя: %8\n

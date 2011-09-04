@@ -1,24 +1,31 @@
-1	ukrainian	x-vnd.Haiku-Locale	558426720
+1	ukrainian	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12 годин
 24 hour	TimeFormatSettings		24 години
 Available languages	Locale Preflet Window		Доступні мови
+Cancel	Locale Preflet Window		Відміна
 Currency	TimeFormatSettings		Валюта
 Date	TimeFormatSettings		Дата
 Defaults	Locale Preflet Window		По замовчуванню
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar і Tracker потребують перезавантаження для вступу змін в силу. Ви бажаєте перезавантажитись?
 Formatting	Locale Preflet Window		Форматування
 Full format:	TimeFormatSettings		Повний формат:
 Language	Locale Preflet Window		Мова
 Locale	Locale Preflet		Локаль
 Locale	Locale Preflet Window		Локаль
+Locale	System name		Локаль
+Long format:	TimeFormatSettings		Звичний формат:
 Medium format:	TimeFormatSettings		Середній формат:
 Negative:	TimeFormatSettings		Негатив:
 Numbers	TimeFormatSettings		Номери
 OK	Locale Preflet Window		Гаразд
+Options	Locale Preflet Window		Опції
 Positive:	TimeFormatSettings		Позитив:
 Preferred languages	Locale Preflet Window		Мови, що переважають
+Restart	Locale Preflet Window		Перезавантаження
 Revert	Locale Preflet Window		Повернути
 Short format:	TimeFormatSettings		Скорочений формат:
 Time	TimeFormatSettings		Час
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Перекласти додатки і назви папок в Deskbar і Tracker.
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Неможливо знайти доступні мови! Ви не можете  використовувати цю функцію!
 Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня  для вибраної мови
 already chosen	LanguageListView		повністю закритий

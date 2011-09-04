@@ -1,7 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Appearance	1227622574
+1	ukrainian	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		Про
+About Decerator	DecorSettingsView		Про Декоратор
 Antialiasing	APRWindow		Зглажування
 Antialiasing menu	AntialiasingSettingsView		Меню зглажування
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
+Appearance	System name		Оформлення
+Choose Decorator	DecorSettingsView		Вибір декоратора
 Colors	APRWindow		Кольори
 Control background	Colors tab		Тло елементу
 Control border	Colors tab		Межа елемента
@@ -22,6 +26,7 @@ Menu item text	Colors tab		Текст пункта меню
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
 Navigation base	Colors tab		Основа навігації
 Navigation pulse	Colors tab		Навігація рulse
+OK	DecorSettingsView		Згода
 Off	AntialiasingSettingsView		Слабе
 On	AntialiasingSettingsView		Увімкнути
 Panel background	Colors tab		Панель
@@ -38,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Успіх
 Tooltip background	Colors tab		Тло підказки
 Tooltip text	Colors tab		Текст підказки
+Window Decorator	APRWindow		Декоратор вікна
+Window Decorator:	DecorSettingsView		Декоратор вікна:
 Window tab	Colors tab		Заголовок вікна
 Window tab text	Colors tab		Текст заголовка вікна

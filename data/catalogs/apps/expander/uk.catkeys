@@ -1,10 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Expander	2487745131
+1	ukrainian	x-vnd.Haiku-Expander	187676748
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпаковка елементів може бути неповною.
 Automatically expand files	ExpanderPreferences		Автоматично розпакувати файли
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
 Cancel	ExpanderPreferences		Відміна
 Cancel	ExpanderWindow		Відмінити
 Close	ExpanderMenu		Закрити
+Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
 Continue	ExpanderWindow		Продовжити
 Creating listing for '%s'	ExpanderWindow		Створення списку для '%s'
 Destination	ExpanderWindow		Папка призначення
@@ -12,20 +13,23 @@ Destination folder:	ExpanderPreferences		Папка призначення:
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
 Expand	ExpanderMenu		Розпакувати
 Expand	ExpanderWindow		Розпакувати
+Expander	System name		Розпаковувач
 Expander settings	ExpanderPreferences		Настройки Розпаковувача
-Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть ціль
+Expander: Choose destination	DirectoryFilePanel		Розпаковувач: Виберіть ціль
 Expander: Open	ExpanderWindow		Expander: Відкрити
-Expanding '%s'	ExpanderWindow		Розтиск '%s'
+Expanding '%s'	ExpanderWindow		Розпаковка '%s'
 Expansion:	ExpanderPreferences		Розширення:
 File	ExpanderMenu		Файл
-File expanded	ExpanderWindow		Файл розпаковано
+File expanded	ExpanderWindow		Розпаковка файлу
 Hide contents	ExpanderWindow		Сховати вміст
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
+OK	ExpanderPreferences		Гаразд
 Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розтиску
 Other:	ExpanderPreferences		Інший:
 Same directory as source (archive) file	ExpanderPreferences		Та ж папка що і джерела (архіву)
 Select	DirectoryFilePanel		Вибрати
 Select	ExpanderPreferences		Вибрати
+Select '%s'	DirectoryFilePanel		Вибрати '%s'
 Select current	DirectoryFilePanel		Вибрати поточний
 Set destination…	ExpanderMenu		Встановити ціль…
 Set source…	ExpanderMenu		Встановити джерело…
@@ -42,3 +46,4 @@ The destination is read only.	ExpanderWindow		Ціль тільки для чи�
 The file doesn't exist	ExpanderWindow		Файл відсутній
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка була переіменована, видалена або не\nпідтримується.
 Use:	ExpanderPreferences		Використати:
+is not supported	ExpanderWindow		не підтримується

@@ -1,14 +1,22 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	2046228013
+1	ukrainian	x-vnd.Haiku-NetworkStatus	853756860
+%ifaceName information:\n	NetworkStatusView		%ifaceName інформація:\n
 <no wireless networks found>	NetworkStatusView		<Бездротова мережа не знайдена>
+Address	NetworkStatusView		Адреса
 Broadcast	NetworkStatusView		Передача
 Configuring	NetworkStatusView		Конфігурування
 Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
 Install in Deskbar	NetworkStatus		Встановити у Deskbar
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Під'єднання мережевого придатку призупинене.\n\nПомилка:
 Netmask	NetworkStatusView		Нетмаска
+NetworkStatus	System name		Стан мережі
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Стан мережі опції:\n\t--deskbar\tавтоматично додати реплікант до Deskbar\n\t--help\t\tвидрукувати це повідомлення і вийти\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Стан мережі\n\tавтор %1 і Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Посилання відсутнє
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
+OK	NetworkStatusView		Гаразд
 Open network preferences…	NetworkStatusView		Відкрити настройки мережі…
+Quit	NetworkStatusView		Вийти
 Ready	NetworkStatusView		Готово
 Run in window	NetworkStatus		Запустити у вікні
 Unknown	NetworkStatusView		Невідомий
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ви можете переглянути стан мережі у вікні або встановити в Deskbar.

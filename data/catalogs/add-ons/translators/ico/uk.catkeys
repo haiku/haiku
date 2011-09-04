@@ -1,11 +1,14 @@
-1	ukrainian	x-vnd.Haiku-ICOTranslator	2616402112
+1	ukrainian	x-vnd.Haiku-ICOTranslator	3151213372
 Cursor	ICOTranslator		Курсор
 Enforce valid icon sizes	ConfigView		Змусити доступні розміри іконок
 ICO Settings	main		Настройки ICO
+ICOTranslator Settings	ConfigView		Настройки перетворювача ICO
 Icon	ICOTranslator		Іконка
 Valid icon sizes are 16, 32, or 48	ConfigView		Доступні розміри іконок є 16, 32, або 48
 Version %d.%d.%d, %s	ConfigView		 Версія %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Вікна зображення %s %ld bit
 Windows icon images	ConfigView		Вікна зображень іконок
 Windows icon images	ICOTranslator		Вікна зображень іконки
 Windows icon translator	ICOTranslator		Перетворювач вікон іконок
 Write 32 bit images on true color input	ConfigView		Записати зображення 32 bit на вхід  true color
+pixels in either direction.	ConfigView		пікселів в кожному напрямку.

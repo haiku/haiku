@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-WORK	576959994
+1	ukrainian	x-vnd.Be-WORK	3592128290
 About Workspaces…	Workspaces		Про Робочі простори…
 Always on top	Workspaces		Завжди поверх усіх
 Auto-raise	Workspaces		Автоматичне спливання
@@ -7,5 +7,7 @@ Invalid argument: %s\n	Workspaces		Невірний аргумент: %s\n
 OK	Workspaces		Гаразд
 Quit	Workspaces		Вийти
 Show window border	Workspaces		Показувати рамку вікна
+Show window tab	Workspaces		Показати закладку вікна
 Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Використання: %s [опції] [простір]\nде \"опції\" одне з:\n --notitle\t\показувати без заголовка зі збереженням його меж.\n --noborder\t\те ж саме але без збереження меж.\n --avoidfocus\t\tне давати вікну захоплювати клавіатуру.\n --alwaysontop\t\tрозташовувати вікно спереду\n --notmovable\t\tзаборона переміщення вікна\n --autoraise\t\Вікно простору спливає коли знаходиться біля краю екрану\n --help\t\tпоказати цей текст і вийти\nі \"простір\" номер потрібного простору, переключається в межах (0-31)\n
+Workspaces	System name		Робочі простори
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Робочі простори\nавтори by %1, and %2.\n\nCopyright %3, Haiku.\n\nВідправляйте вікно у тло кнопкою Option. Рухайте вікна вперед кнопкою CTRL.\n

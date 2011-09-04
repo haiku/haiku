@@ -1,11 +1,13 @@
-1	ukrainian	x-vnd.Haiku-CPUFrequencyPref	407096520
+1	ukrainian	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		Статистика частоти ЦП
+CPUFrequency	System name		Частота процесора
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Частота процесора\n\Автор Клеменс Зейдлер\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		По замовчуванню
 Dynamic performance	Status view		Динамічна продуктивність
 Dynamic stepping	CPU Frequency View		Динамічна зміна
 High performance	Status view		Висока продуктивність
 Install replicant into Deskbar	CPU Frequency View		Встановити реплікант в Deskbar
+Integration time [ms]: 	CPU Frequency View		Час інтеграції [мс]:
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Програму Частота процесора не вдалося запустити.\n\nПомилка: 
 Low energy	Status view		Мале споживання
 Ok	Status view		Гаразд
@@ -15,3 +17,4 @@ Revert	Pref Window		Повернути
 Set state	Status view		Встановити стан
 Step up by CPU usage	Color Step View		Крок вгору по продуктивності ЦП:
 Stepping policy	CPU Frequency View		Настройка кроку зміни частоти ЦП
+Stepping policy: 	CPU Frequency View		Настройка кроку зміни частоти ЦП:

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	4031165655
+1	ukrainian	x-vnd.haiku-icon_o_matic	2326864078
 <modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нічого не переробляти>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого, щоб скасувати>
@@ -26,6 +26,7 @@ Add with path	Icon-O-Matic-ShapesList		Додати зі шляхом
 Add with path & style	Icon-O-Matic-ShapesList		Додати зі шляху і стилю
 Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
 All	Icon-O-Matic-Properties		Всі
+Append…	Icon-O-Matic-Menu-File		Додати…
 Assign Path	Icon-O-Matic-AddPathsCmd		Призначити шлях
 Assign Paths	Icon-O-Matic-AddPathsCmd		Призначення шляхів
 Assign Style	Icon-O-Matic-AssignStyleCmd		Прив'язати стиль
@@ -33,6 +34,7 @@ BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
 Bleep!	Exporter - Continue in error dialog		Bleep!
 Bummer	Cancel button - error alert		Помилка
 Cancel	Icon-O-Matic-ColorPicker		Відмінити
+Cancel	Icon-O-Matic-Menu-Settings		Відміна
 Cancel	Icon-O-Matic-SVGExport		Відмінити
 Caps	Icon-O-Matic-PropertyNames		Шапки
 Change Color	Icon-O-Matic-SetColorCmd		Змінити Колір
@@ -40,6 +42,7 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Очистити шлях
 Clean up	Icon-O-Matic-PathsList		Очистити
 Click on a shape above	Empty transformers list - 1st line		Натиснути на фігуру нижче
 Click on an object in	Empty property list - 1st line		Натисніть на об'єкт в
+Close	Icon-O-Matic-Menu-File		Закрити
 Closed	Icon-O-Matic-PropertyNames		Закрити
 Color	Icon-O-Matic-PropertyNames		Колір
 Color	Icon-O-Matic-StyleTypes		Колір
@@ -50,11 +53,13 @@ Contour	Transformation		Контур
 Copy	Icon-O-Matic-Properties		Копіювати
 Detect Orient.	Icon-O-Matic-PropertyNames		Виявляти орієнт.
 Diamond	Icon-O-Matic-StyleTypes		Ромб
+Discard	Icon-O-Matic-Menu-Settings		Витягнути
 Duplicate	Icon-O-Matic-PathsList		Дублювати
 Duplicate	Icon-O-Matic-ShapesList		Дублювати
 Duplicate	Icon-O-Matic-StylesList		Дублювати
 Edit	Icon-O-Matic-Menus		Редагувати
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Редагувати градієнт
+Error: 	Icon-O-Matic-Exporter		Помилка:
 Error: 	Icon-O-Matic-Main		Помилка: 
 Export	Icon-O-Matic-Menu-File		Експорт
 Export Icon	Dialog title		Експорт іконки
@@ -72,6 +77,8 @@ Gradient	Icon-O-Matic-StyleTypes		Градієнт
 Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 HVIF Source Code	Icon-O-Matic-SavePanel		Код джерела HVIF
 Height	Icon-O-Matic-PropertyNames		Висота
+Icon-O-Matic	System name		Icon-O-Matic
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG , коли буде завантажений. При перезаписі файлу ця інформація може бути втрачена.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Вставити контрольну точку
 Invert selection	Icon-O-Matic-Properties		Обернути виділення
 Joins	Icon-O-Matic-PropertyNames		З'єднання
@@ -148,8 +155,10 @@ Rotate indices forwards	Icon-O-Matic-PathsList		обертати за годин
 Rotation	Icon-O-Matic-PropertyNames		Обертання
 Rounding	Icon-O-Matic-PropertyNames		Округлення
 Save	Icon-O-Matic-Menu-File		Зберегти
+Save	Icon-O-Matic-Menu-Settings		Зберегти
 Save Icon	Dialog title		Зберегти Іконку
 Save as…	Icon-O-Matic-Menu-File		Зберегти як…
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Зберегти зміни для біжучої іконки?
 Saving your document failed!	Icon-O-Matic-Exporter		Збереження вашого документу призупинене!
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
@@ -178,6 +187,7 @@ Translation X	Icon-O-Matic-PropertyNames		Перетворення по X
 Translation Y	Icon-O-Matic-PropertyNames		Перетворення по Y
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Відв'язати шлях
 Undo	Icon-O-Matic-Main		Скасувати
+Untitled	Icon-O-Matic-Main		Неназваний
 Width	Icon-O-Matic-PropertyNames		Ширина
 Yes	Icon-O-Matic-StyledTextImport		Так
 any of the other lists to	Empty property list - 2nd line		будь-який з інших списків до

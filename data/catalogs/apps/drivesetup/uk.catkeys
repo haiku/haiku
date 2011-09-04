@@ -1,9 +1,12 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	696879283
+1	ukrainian	x-vnd.Haiku-DriveSetup	1209826930
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<пусто>
 <empty>	PartitionList		<пусто>
 Active	PartitionList		Активний
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте видалити вибраний розділ?\n\nВсі дані на розділі будуть безповоротно втрачені!
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені , що бажаєте ініціалізувати розділ \"%s\"? Ви повинні будете відповісти повторно при запису на диск.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені , що бажаєте ініціалізувати розділ? Ви повинні будете відповісти повторно при запису на диск.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте записати зміни на диск зараз?\n\nВсі дані на диску %s будуть безповоротно втрачені!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте записати зміни на диск зараз?\n\nВсі дані в розділі %s будуть безповоротно втрачені!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви  впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі будуть безповоротно втрачені!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному диску будуть безповоротно втрачені!
@@ -26,8 +29,10 @@ Device	DiskView		Пристрій
 Device	PartitionList		Пристрій
 Disk	MainWindow		Диск
 Disk system \"%s\"\" not found!	MainWindow		Системний диск \"%s\"\" не знайдено!
+DriveSetup	System name		DriveSetup
 Eject	MainWindow		Виштовхнути
 End: %ld MB	Support		Кінець: %ld MB
+Error: 	MainWindow	in any error alert	Помилка:
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.
 Failed to initialize the partition %s!\n	MainWindow		Призупинена ініціалізація розділу %s!\n
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Ініціалізація розділу призупинена. Жодні зміни не були записані на диск.
@@ -39,6 +44,7 @@ Initialize	MainWindow		Ініціалізація
 Mount	MainWindow		Змонтувати
 Mount all	MainWindow		Підмонтувати все
 Mounted at	PartitionList		Змонтувати на
+No disk devices have been recognized.	DiskView		Не розпізнано жодного дискового пристрою.
 OK	MainWindow		Гаразд
 Offset: %ld MB	Support		Початок: %ld MB
 Parameters	PartitionList		Параметри
@@ -56,7 +62,7 @@ The currently selected partition is not empty.	MainWindow		Поточний ви
 The partition %s has been successfully initialized.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
 The partition %s is already mounted.	MainWindow		Розділ %s повністю підмонтований.
 The partition %s is already unmounted.	MainWindow		Розділ %s повністю відмонтований.
-The partition %s is currently mounted.	MainWindow		Розділ %s Повністю підмонтовано.
+The partition %s is currently mounted.	MainWindow		Розділ %s повністю підмонтовано.
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
 The selected partition does not contain a partitioning system.	MainWindow		Вибраний розділ не містить системної розмітки.
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні параметрів розділу.

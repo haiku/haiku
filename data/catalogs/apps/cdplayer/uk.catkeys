@@ -1,6 +1,8 @@
-1	ukrainian	x-vnd.Haiku-CDPlayer	2145467092
+1	ukrainian	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		Аудіо CD
+CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CD пристрій пустий
+CDPlayer	System name		Програвач CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Диск: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Диск: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Диск: 88:88 / 88:88

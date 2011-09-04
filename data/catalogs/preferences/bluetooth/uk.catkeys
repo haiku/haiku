@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-BluetoothPrefs	4253957200
+1	ukrainian	x-vnd.Haiku-BluetoothPrefs	4055730587
 15 secs	Settings view		15 сек.
 61 secs	Settings view		61 сек.
 About Bluetooth…	Window		Про Bluetooth…
@@ -7,6 +7,7 @@ Add…	Remote devices		Додати…
 Always ask	Settings view		Завжди питати
 As blocked	Remote devices		Як заблокований
 Authenticate	Extended local device view		Справдити
+Bluetooth	System name		Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція Bluetooth віддаленого пристрою активована. Натисніть «Запит» для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до головного списку, де потім з’єднуватися з ними.
 Connections & channels…	Window		Список під'єднань і каналів…
 Default inquiry time:	Settings view		Час запиту по замовчуванню:

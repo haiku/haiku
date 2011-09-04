@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MidiPlayer	3885957623
+1	ukrainian	x-vnd.Haiku-MidiPlayer	4180509704
 Cavern	Main Window		Печера
 Closet	Main Window		Комірка
 Could not load song	Main Window		Не вдалося завантажити мелодію
@@ -8,6 +8,7 @@ Garage	Main Window		Гараж
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nЦя крихітна програма\nвміє відтворювати тисячі\nпростих мелодій
 Igor's lab	Main Window		Лабораторія Ігоря
 Live input:	Main Window		Прямий вхід:
+MidiPlayer	System name		Програвач Midi
 None	Main Window		Жоден
 OK	Main Window		Гаразд
 Off	Main Window		Вимкнути

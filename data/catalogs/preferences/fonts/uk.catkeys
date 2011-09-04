@@ -1,7 +1,9 @@
-1	ukrainian	x-vnd.Haiku-Fonts	2902081521
+1	ukrainian	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Виділений шрифт:
 Defaults	Main window		По замовчуванню
 Fixed font:	Font view		Моноширний шрифт:
+Fonts	System name		Шрифти
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Шрифти\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Шрифт меню:
 OK	main		Гаразд
 Plain font:	Font view		Простий шрифт:

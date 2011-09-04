@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-LaunchBox	1555134888
+1	ukrainian	x-vnd.Haiku-LaunchBox	1440389990
 Add button here	LaunchBox		Додати кнопку тут
 Auto-raise	LaunchBox		Автоматичне спливання
 Bummer	LaunchBox		Помилка
@@ -6,18 +6,26 @@ Cancel	LaunchBox		Відміна
 Clear button	LaunchBox		Очистити кнопку
 Clone	LaunchBox		Клонувати
 Close	LaunchBox		Закрити
+Description for '%3'	LaunchBox		Опис для '%3'
+Failed to launch '%1'.\n\nError: 	LaunchBox		Призупинено запуск '%1'.\n\nПомилка:
 Failed to launch 'something',error in Pad data.	LaunchBox		Невдалося запустити 'щось', помилка в даних  панелі.
+Failed to launch application with signature '%2'.\n\nError: 	LaunchBox			Призупинено запуск додатку з сигнатурою '%2'.\n\nПомилка:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду 'відкрити папку' для Tracker.\n\nПомилка:
 Horizontal layout	LaunchBox		Горизонтальне розташування
 Icon size	LaunchBox		Розмір Іконки
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
+LaunchBox	System name		LaunchBox
 Name Panel	LaunchBox		Панель назви
 New	LaunchBox		Новий
 OK	LaunchBox		Гаразд
 Pad	LaunchBox		Панель 
+Pad %1	LaunchBox		Панель %1
 Pad 1	LaunchBox		Панель 1
 Quit	LaunchBox		Вийти
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
 Remove button	LaunchBox		Видалити кнопку
+Set description…	LaunchBox		Встановити Опис…
+Settings	LaunchBox		Настройки
 Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
 Show window border	LaunchBox		Показувати межі вікна
 Vertical layout	LaunchBox		Вертикальне розташування

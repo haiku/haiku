@@ -1,0 +1,14 @@
+1	ukrainian	x-vnd.Haiku-desklink	3053930521
+%g dB	MediaReplicant		%g dB
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Біп
+Control physical output	MediaReplicant		Регулятор фізичного виходу 
+Couldn't launch 	MediaReplicant		Під'єднання відсутнє
+Media preferences…	MediaReplicant		Настройки медіа…
+No media server running	VolumeControl		Не запущено медіа сервер
+OK	MediaReplicant		Гаразд
+Open MediaPlayer	MediaReplicant		Відкрити MediaPlayer
+Options	MediaReplicant		Опції
+Sound preferences…	MediaReplicant		Настройки звуку…
+Volume	VolumeControl		Гучність
+desklink	MediaReplicant		desklink

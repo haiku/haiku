@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DiskProbe	2710260630
+1	ukrainian	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (рідна)
 (native)	ProbeView		 (рідний)
 15 bit	TypeEditors		15 біт
@@ -20,11 +20,17 @@
 Add	ProbeView		Додати
 Attribute	AttributeWindow		Атрибут
 Attribute	ProbeView		Атрибут
+Attribute offset: 	ProbeView		Зміщення атрибуту:
+Attribute type: 	ProbeView		Тип атрибуту:
+Attribute: 	ProbeView		Атрибут:
 Attributes	ProbeView		Атрибути
 Back	ProbeView		Назад
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Основа
 Block	ProbeView		Блок
 Block %Ld (0x%Lx)	ProbeView		Блок %Ld (0x%Lx)
 Block 0x%Lx	ProbeView		Блок 0x%Lx
+Block: 	ProbeView		Блок:
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Розмір блоку
 Bookmarks	ProbeView		Закладки
 Boolean	TypeEditors	This is the type of editor	Булевий
 Boolean editor	TypeEditors		Булевий редактор
@@ -44,7 +50,11 @@ Could not open file \"%s\": %s\n	DiskProbe		Неможливо відкрити 
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Неможливо прочитати образ
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десятковий
 Device	ProbeView		Пристрій
+Device offset: 	ProbeView		Зміщення пристрою:
+Device: 	ProbeView		Пристрій:
+DiskProbe	System name		DiskProbe
 DiskProbe request	AttributeWindow		Запит DiskProbe
+DiskProbe request	DiskProbe		Запит DiskProbe
 DiskProbe request	ProbeView		Запит DiskProbe
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ви дійсно бажаєте видалити атрибут \"%s\" для файлу \"%s\"?\n\nЦя дія незворотня.
 Don't save	ProbeView		Не зберігати
@@ -53,6 +63,8 @@ Edit	ProbeView		Редагувати
 Examine device:	OpenWindow		Перевірка пристрою:
 File	FileWindow		Файл
 File	ProbeView		Файл
+File offset: 	ProbeView		Зміщення файлу:
+File: 	ProbeView		Файл:
 Find	FindWindow		Знайти
 Find again	ProbeView		Знайти знову
 Find…	ProbeView		Знайти…
@@ -61,7 +73,7 @@ Flattened bitmap	TypeEditors		Плаский образ
 Floating-point value:	TypeEditors		Значення з плаваючою комою:
 Font size	ProbeView		Розмір шрифту
 Grayscale	TypeEditors		Відтінки сірого
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шіснадцятичний
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шіснадцятковий
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятичний
 Icon	TypeEditors		Іконка
 Icon view	TypeEditors		У вигляді іконки
@@ -82,17 +94,20 @@ Number editor	TypeEditors		Редактор номеру
 Number:	TypeEditors		Номер:
 OK	DiskProbe		Гаразд
 OK	ProbeView		Гаразд
+Offset: 	ProbeView		Зміщення:
 Open device	FileWindow		Відкрити пристрій
 Open file…	FileWindow		Відкрити файл…
 PNG format	TypeEditors		PNG формат
 Page setup…	ProbeView		Налаштування сторінки…
 Paste	ProbeView		Вставити
 Previous	ProbeView		Попереднє
+Print…	ProbeView		Друк…
 Probe device	OpenWindow		Перевірити пристрій
 Probe file…	OpenWindow		Перевірити файл…
 Quit	FileWindow		Вийти
 Raw editor	AttributeWindow		Raw редактор
 Redo	ProbeView		Відмінити відміну
+Remove	AttributeWindow		Видалити
 Remove from file	AttributeWindow		Видалити для файлу
 Save	ProbeView		Зберегти
 Save changes before closing?	ProbeView		Зберегти зміни перед закриттям?
@@ -110,6 +125,9 @@ Type editor not supported	ProbeView		Редактор типу не підтри
 Undo	ProbeView		Відмінити
 Unknown format	TypeEditors		Невідомий формат
 Unknown type	TypeEditors		Невідомий тип
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Перегляд
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Запис до файлу зупинено:\n%s\n\nКоли Ви вийдете зміни не збережуться.
 none	ProbeView	No attributes	немає
+of 	ProbeView		з
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	з   0x0
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n

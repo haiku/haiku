@@ -1,36 +1,73 @@
-1	ukrainian	x-vnd.Haiku-Devices	197304729
+1	ukrainian	x-vnd.Haiku-Devices	1943893993
+ACPI Information	DeviceACPI		Інформація про ACPI
+ACPI Processor Namespace '%2'	DeviceACPI		Місце імені процесора ACPI '%2'
+ACPI System Bus	DeviceACPI		Шина системи ACPI
+ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
+ACPI Thermal Zone	DeviceACPI		Теплова зона ACPI
+ACPI bus	Device		Шина ACPI
+ACPI bus	DevicesView		ШинаACPI
 ACPI controller	Device		ACPI контролер
+ACPI node '%1'	DeviceACPI		Вузол ACPI '%1'
 Basic information	DevicesView		Основна інформація
 Bridge	Device		Міст
 Bus	DevicesView		Шина
+Bus Information	Device		Інфо про шину
 Category	DevicesView		Категорії
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфо про клас:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Інфо про клас
 Communication controller	Device		Контролер зв’язку
 Computer	Device		Комп’ютер
+Computer	DevicesView		Компютер
 Connection	DevicesView		Підключенню
 Detailed	DevicesView		Докладно
+Device	Device		Пристрій
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Ім'я пристрою\t\t\t\t: %Name%\nВиробник\t\t\t: %Manufacturer%\nВикор. драйвер \t\t\t\t: %DriverUsed%\nШляхи пристрою\t: %DevicePaths%
 Device name	Device		Назва пристрою
+Device name	DeviceACPI		Ім'я пристрою
+Device name	DevicePCI		Ім'я пристрою
 Device name:	Device		Назва пристрою:
 Device paths	Device		Шляхи пристрою
+Device paths	DevicePCI		Шляхи пристрою
 Devices	DevicesView		Пристрої
+Devices	System name		Пристрої
 Display controller	Device		Контролер дисплея
 Docking station	Device		Док-станція
 Driver used	Device		Використовує драйвер
+Driver used	DevicePCI		Використовує драйвер
+Encryption controller	Device		Контроллер шифрування
 Generate system information	DevicesView		Створення системної інформації
 Generic system peripheral	Device		Периферійні пристрої
+ISA bus	Device		ISA bus
+ISA bus	DevicesView		Шина ISA
 Input device controller	Device		Контролер ввідних пристроїв
 Intelligent controller	Device		Інтелектуальний контролер
 Manufacturer	Device		Виробник
+Manufacturer	DeviceACPI		Виробник
+Manufacturer	DevicePCI		Виробник
 Manufacturer:	Device		Виробник:
 Mass storage controller	Device		Контролер накопичувачів
 Memory controller	Device		Контролер пам’яті
 Multimedia controller	Device		Мультимедійний контролер
+Name	PropertyList		Імя
 Network controller	Device		Мережевий контролер
+None	Device		Жоден
+Not implemented	DeviceACPI		Не підтримується
+Not implemented	DevicePCI		Не підтримується
 Order by:	DevicesView		Сортувати по:
+PCI Information	DevicePCI		Інформація про PCI
+PCI bus	Device		ШинаPCI
+PCI bus	DevicesView		Шина PCI
 Processor	Device		Процесор
 Quit	DevicesView		Вийти
 Refresh devices	DevicesView		Оновлення пристроїв
 Report compatibility	DevicesView		Повідомити про сумісність
 Satellite communications controller	Device		Контроллер супутникового зв’язку
 Serial bus controller	Device		Контроллер послідовної шини
+Signal processing controller	Device		Контроллер обробки сигналів
 Unclassified device	Device		Некласифіковані пристрої
+Unknown	DevicePCI		Невідомий
+Unknown device	Device		Невідомий пристрій
+Unknown device	DevicesView		Невідомий пристрій
+Value	PropertyList		Значення
 Wireless controller	Device		Бездротовий контролер
+unknown	Device		невідомий

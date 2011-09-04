@@ -1,8 +1,10 @@
-1	ukrainian	x-vnd.Haiku-mount_server	676706323
+1	ukrainian	x-vnd.Haiku-mount_server	1422362183
 Cancel	AutoMounter		Відмінити
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відмонтувати диск \"%s\":\n\t%s
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Неможливо відмонтувати диск \"%s\":\n\t%s\n\nПрискорити відмонтування?\n\nПримітка: Якщо додаток продовжить запис на розділ можлива втрата даних.\n
 Error mounting volume:\n\n%s	AutoMounter		Помилка підмонтування розділу:\n\n%s
 Force unmount	AutoMounter		Швидке відмонтування
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Рекомендується підмонтовувати всі доступні томи Haiku тільки в режимі для читання. Це вбереже від втрати даних при помилках у Haiku.
 Mount error	AutoMounter		Помилка підмонтування
 Mount read-only	AutoMounter		Змонтувати тільки для читання
 Mount read/write	AutoMounter		Підмонтувати дл запису/читання
@@ -11,4 +13,5 @@ Mounting volume '%s'\n\n	AutoMounter		Підмонтування розділу 
 Mounting volume <unnamed volume>\n\n	AutoMounter		Монтування тому <безіменний том>\n\n
 OK	AutoMounter		Гаразд
 Previous volumes mounted.	AutoMounter		Попередні томи підмонтовані
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файлова система на цьому томі не є файловою системою Haiku. Рекомендуємо підмонтування у режимі тільки для читання, це поможе вберегти дані при виникненні помилок в Haiku.
 Unmount error	AutoMounter		Помилка відмонтування
