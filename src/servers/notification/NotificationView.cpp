@@ -15,6 +15,7 @@
 
 #include <stdlib.h>
 
+#include <ControlLook.h>
 #include <Font.h>
 #include <IconUtils.h>
 #include <Messenger.h>
@@ -104,8 +105,8 @@ NotificationView::NotificationView(NotificationWindow* win,
 			break;
 		case B_PROGRESS_NOTIFICATION:
 		{
-			BRect frame(kIconStripeWidth * 3, Bounds().bottom - 36,
-				Bounds().right - kEdgePadding, Bounds().bottom - kEdgePadding);
+			BRect frame(kIconStripeWidth + 8, Bounds().bottom - 36,
+				Bounds().right - 8, Bounds().bottom - 8);
 			BStatusBar* progress = new BStatusBar(frame, "progress");
 			progress->SetBarHeight(12.0f);
 			progress->SetMaxValue(1.0f);
@@ -290,9 +291,8 @@ NotificationView::Draw(BRect updateRect)
 
 	// Draw icon
 	if (fBitmap) {
-		float ix = kIconStripeWidth - iconSize / 3.0;
-			// Icon is centered around stripe right border
-		float iy = (Bounds().Height() - iconSize) / 2.0;
+		float ix = 18;
+		float iy = (Bounds().Height() - iconSize) / 4.0;
 			// Icon is vertically centered in view
 
 		if (fType == B_PROGRESS_NOTIFICATION)
@@ -330,6 +330,11 @@ NotificationView::Draw(BRect updateRect)
 		StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
 		StrokeLine(closeCross.LeftBottom(), closeCross.RightTop());
 	PopState();
+
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	BPoint left(Bounds().left, Bounds().bottom - 1);
+	BPoint right(Bounds().right, Bounds().bottom - 1);
+	StrokeLine(left, right);
 
 	Sync();
 }
@@ -482,9 +487,9 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 
 	float iconRight = kIconStripeWidth;
 	if (fBitmap != NULL)
-		iconRight += fParent->IconSize() * 0.75;
+		iconRight += fParent->IconSize();
 	else
-		iconRight += 24;
+		iconRight += 32;
 
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
