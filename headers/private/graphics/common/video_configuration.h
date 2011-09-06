@@ -5,8 +5,8 @@
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
-#ifndef _VIDEO_ELECTRONICS_H
-#define _VIDEO_ELECTRONICS_H
+#ifndef _VIDEO_CONFIGURATION_H
+#define _VIDEO_CONFIGURATION_H
 
 
 // Video connector types
@@ -42,8 +42,8 @@ extern "C" {
 
 
 // mostly for debugging detected monitors
-const char* decode_connector_name(uint32 connector);
-const char* decode_encoder_name(uint32 encoder);
+const char* get_connector_name(uint32 connector);
+const char* get_encoder_name(uint32 encoder);
 
 
 #ifdef __cplusplus
@@ -51,4 +51,4 @@ const char* decode_encoder_name(uint32 encoder);
 #endif
 
 
-#endif /* _VIDEO_ELECTRONICS_H */
+#endif /* _VIDEO_CONFIGURATION_H */

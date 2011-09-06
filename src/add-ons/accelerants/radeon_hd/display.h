@@ -9,7 +9,7 @@
 #define RADEON_HD_DISPLAY_H
 
 
-#include <video_electronics.h>
+#include <video_configuration.h>
 
 
 // convert radeon connector to common connector type

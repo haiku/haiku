@@ -10,11 +10,11 @@
 #include <KernelExport.h>
 #include <stdio.h>
 
-#include "video_electronics.h"
+#include "video_configuration.h"
 
 
 const char*
-decode_connector_name(uint32 connector)
+get_connector_name(uint32 connector)
 {
 	switch (connector) {
 		case VIDEO_CONNECTOR_VGA:
@@ -48,12 +48,12 @@ decode_connector_name(uint32 connector)
 		case VIDEO_CONNECTOR_UNKNOWN:
 			return "Unknown";
 	}
-	return "Connector Undefined";
+	return "Undefined";
 }
 
 
 const char*
-decode_encoder_name(uint32 encoder)
+get_encoder_name(uint32 encoder)
 {
 	switch (encoder) {
 		case VIDEO_ENCODER_NONE:
@@ -67,5 +67,5 @@ decode_encoder_name(uint32 encoder)
 		case VIDEO_ENCODER_TVDAC:
 			return "TV DAC";
 	}
-	return "Encoder Undefined";
+	return "Undefined";
 }

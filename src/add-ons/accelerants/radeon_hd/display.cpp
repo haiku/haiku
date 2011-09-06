@@ -312,7 +312,7 @@ detect_connectors_legacy()
 	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE_INFO; i++) {
 		if (gConnector[i]->valid == true) {
 			TRACE("%s: connector #%" B_PRId32 " is %s\n", __func__, i,
-				decode_connector_name(gConnector[i]->connector_type));
+				get_connector_name(gConnector[i]->connector_type));
 		}
 	}
 
@@ -584,10 +584,10 @@ detect_connectors()
 			// TODO : aux chan transactions
 
 			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
-				__func__, i, decode_connector_name(connector_type),
+				__func__, i, get_connector_name(connector_type),
 				connector_type);
 			TRACE("%s: Path #%" B_PRId32 ": Found encoder %s\n", __func__,
-				i, decode_encoder_name(encoder_type));
+				i, get_encoder_name(encoder_type));
 
 			gConnector[connector_index]->valid = true;
 
@@ -669,8 +669,8 @@ debug_displays()
 		if (gDisplay[id]->active) {
 			uint32 connector_type = gConnector[connector_index]->connector_type;
 			uint32 encoder_type = gConnector[connector_index]->encoder_type;
-			TRACE(" + connector: %s\n", decode_connector_name(connector_type));
-			TRACE(" + encoder:   %s\n", decode_encoder_name(encoder_type));
+			TRACE(" + connector: %s\n", get_connector_name(connector_type));
+			TRACE(" + encoder:   %s\n", get_encoder_name(encoder_type));
 
 			TRACE(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
 				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
