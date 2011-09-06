@@ -624,7 +624,7 @@ struct SplitterGroupLayoutTest1 : public Test {
 				// row 3
 				.AddSplit(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 3)
 					.Add(new TestView(), 3)
-					.Add(toggledView = new TestView(), 2)
+					.Add(new TestView(), 2)
 					.Add(new TestView(), 1)
 					.End()
 				// make the row uncollapsible
