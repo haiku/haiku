@@ -564,7 +564,7 @@ detect_connectors()
 										= (ATOM_I2C_ID_CONFIG_ACCESS *)
 										&i2c_record->sucI2cId;
 
-									// set up i2c bus for connector
+									// set up i2c gpio information for connector
 									radeon_gpu_i2c_setup(connector_index,
 										i2c_config->ucAccess);
 									break;
@@ -633,7 +633,7 @@ detect_displays()
 		bool found = false;
 		switch(gConnector[id]->encoder_type) {
 			case VIDEO_ENCODER_DAC:
-				found = dac_sense(id);
+				found = radeon_gpu_read_edid(id, gDisplay[id]->edid_info);
 				break;
 			default:
 				found = false;

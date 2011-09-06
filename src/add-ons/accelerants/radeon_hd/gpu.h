@@ -168,6 +168,7 @@ void radeon_gpu_mc_resume();
 uint32 radeon_gpu_mc_idlecheck();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_irq_setup();
+bool radeon_gpu_read_edid(uint32 connector, edid1_info *edid);
 status_t radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id);
 
 

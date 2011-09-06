@@ -279,13 +279,12 @@ radeon_gpu_irq_setup()
 static status_t
 get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
-	#if 0
-	uint32 ioRegister = (uint32)cookie;
-	uint32 value = read32(ioRegister);
+	ddc_info *info = (ddc_info*)cookie;
 
-	*_clock = (value & I2C_CLOCK_VALUE_IN) != 0;
-	*_data = (value & I2C_DATA_VALUE_IN) != 0;
-	#endif
+	uint32 value = Read32(OUT, info->gpio_id);
+
+	*_clock = (value >> info->gpio_y_scl_shift) & 1;
+	*_data = (value >> info->gpio_y_sda_shift) & 1;
 
 	return B_OK;
 }
@@ -294,31 +293,42 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 static status_t
 set_i2c_signals(void* cookie, int clock, int data)
 {
-	#if 0
-	uint32 ioRegister = (uint32)cookie;
-	uint32 value = read32(OUT, ioRegister) & I2C_RESERVED;
+	ddc_info* info = (ddc_info*)cookie;
 
-	if (data != 0)
-		value |= I2C_DATA_DIRECTION_MASK;
-	else {
-		value |= I2C_DATA_DIRECTION_MASK
-			| I2C_DATA_DIRECTION_OUT
-			| I2C_DATA_VALUE_MASK;
-	}
+	uint32 value = Read32(OUT, info->gpio_id);
 
-	if (clock != 0)
-		value |= I2C_CLOCK_DIRECTION_MASK;
-	else
-		value |= I2C_CLOCK_DIRECTION_MASK
-			| I2C_CLOCK_DIRECTION_OUT
-			| I2C_CLOCK_VALUE_MASK;
+	value &= ~(info->gpio_a_scl_reg | info->gpio_a_sda_reg);
+	value &= ~(info->gpio_en_sda_reg | info->gpio_en_scl_reg);
+	value |= ((1 - clock) << info->gpio_en_scl_shift)
+		| ((1 - data) << info->gpio_en_sda_shift);
 
-	write32(OUT, ioRegister, value);
-	read32(OUT, ioRegister);
-		// make sure the PCI bus has flushed the write
-	#endif
+	Write32(OUT, info->gpio_id, value);
 
 	return B_OK;
+}
+
+
+bool
+radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
+{
+	i2c_bus bus;
+
+	ddc2_init_timing(&bus);
+	bus.cookie = (void*)&gConnector[connector]->connector_ddc_info;
+	bus.set_signals = &set_i2c_signals;
+	bus.get_signals = &get_i2c_signals;
+
+	void *vdif;
+	size_t vdifLength;
+
+	if (ddc2_read_edid1(&bus, edid, &vdif, &vdifLength) != B_OK)
+		return false;
+
+	TRACE("%s: found edid monitor on connector #%" B_PRId32 "\n",
+		__func__, connector);
+
+	free(vdif);
+	return true;
 }
 
 
@@ -349,32 +359,53 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 			// TODO : if DCE 4 and i == 7 ... manual override for evergreen
 			// TODO : if DCE 3 and i == 4 ... manual override
 
-			if (gpio->sucI2cId.ucAccess == gpio_id) {
-				i2c_bus bus;
+			if (gpio->sucI2cId.ucAccess != gpio_id)
+				continue;
 
-				// successful lookup
-				TRACE("%s: successful i2c gpio lookup\n", __func__);
+			// successful lookup
+			TRACE("%s: found i2c gpio\n", __func__);
 
-				// pull registers for data and clock...
-				uint16 analogDataReg
-					= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-				//uint16 analogClockReg
-				//	= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
-				//uint16 digitalDataReg
-				//	= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-				//uint16 digitalClockReg
-				//	= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
 
-				// populate cookie with analog data register
-				bus.cookie = (void*)analogDataReg;
-				bus.set_signals = &set_i2c_signals;
-				bus.get_signals = &get_i2c_signals;
+			// populate gpio information
+			gConnector[connector]->connector_ddc_info.gpio_id = gpio_id;
 
-				ddc2_init_timing(&bus);
-				// TODO : check for valid analog edid
-				// TODO : check for valid digital edid no results on analog
-			}
+			gConnector[connector]->connector_ddc_info.mask_scl_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.mask_sda_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.mask_scl_shift
+				= (1 << gpio->ucClkMaskShift);
+			gConnector[connector]->connector_ddc_info.mask_sda_shift
+				= (1 << gpio->ucDataMaskShift);
+
+			gConnector[connector]->connector_ddc_info.gpio_en_scl_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.gpio_en_sda_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.gpio_en_scl_shift
+				= (1 << gpio->ucClkEnShift);
+			gConnector[connector]->connector_ddc_info.gpio_en_sda_shift
+				= (1 << gpio->ucDataEnShift);
+
+			gConnector[connector]->connector_ddc_info.gpio_y_scl_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.gpio_y_sda_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.gpio_y_scl_shift
+				= (1 << gpio->ucClkY_Shift);
+			gConnector[connector]->connector_ddc_info.gpio_y_sda_shift
+				= (1 << gpio->ucDataY_Shift);
+
+			gConnector[connector]->connector_ddc_info.gpio_a_scl_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
+				= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
+			gConnector[connector]->connector_ddc_info.gpio_a_scl_shift
+				= (1 << gpio->ucClkA_Shift);
+			gConnector[connector]->connector_ddc_info.gpio_a_sda_shift
+				= (1 << gpio->ucDataA_Shift);
 		}
+
 
 	}
 

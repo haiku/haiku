@@ -138,16 +138,41 @@ struct pll_info {
 };
 
 
+struct ddc_info {
+	uint8 gpio_id;
+
+	uint16 mask_scl_reg;
+	uint16 mask_sda_reg;
+	uint16 mask_scl_shift;
+	uint16 mask_sda_shift;
+
+	uint16 gpio_en_scl_reg;
+	uint16 gpio_en_sda_reg;
+	uint16 gpio_en_scl_shift;
+	uint16 gpio_en_sda_shift;
+
+	uint16 gpio_y_scl_reg;
+	uint16 gpio_y_sda_reg;
+	uint16 gpio_y_scl_shift;
+	uint16 gpio_y_sda_shift;
+
+	uint16 gpio_a_scl_reg;
+	uint16 gpio_a_sda_reg;
+	uint16 gpio_a_scl_shift;
+	uint16 gpio_a_sda_shift;
+};
+
+
 typedef struct {
 	bool valid;
 	uint16 line_mux;
 	uint16 connector_flags;
 	uint32 connector_type;
 	uint16 connector_object_id;
-	i2c_bus	connector_i2c;
 	uint32 encoder_type;
 	uint16 encoder_object_id;
-	// TODO struct radeon_i2c_bus_rec ddc_bus;
+	ddc_info connector_ddc_info;
+	i2c_bus	connector_i2c;
 	// TODO struct radeon_hpd hpd;
 } connector_info;
 
@@ -162,6 +187,7 @@ typedef struct {
 	uint32			hfreq_max;
 	uint32			hfreq_min;
 	pll_info		pll;
+	edid1_info		*edid_info;
 } display_info;
 
 
