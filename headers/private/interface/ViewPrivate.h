@@ -66,6 +66,11 @@ public:
 	bool	WillLayout();
 	bool	MinMaxValid();
 
+	bool RemoveSelf()
+	{
+		return fView->_RemoveSelf();
+	}
+
 	BView* fView;
 };
 

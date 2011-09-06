@@ -40,6 +40,31 @@ namespace {
 		= B_LAYOUT_INVALID | B_LAYOUT_IN_PROGRESS;
 
 	const char* const kLayoutItemField = "BLayout:items";
+
+
+	struct ViewRemover {
+		ViewRemover(BView* view) : fView(view) {};
+
+		~ViewRemover()
+		{
+			if (fView)
+				BView::Private(fView).RemoveSelf();
+		}
+
+		void SetTo(BView* view)
+		{
+			if (fView)
+				BView::Private(fView).RemoveSelf();
+			fView = view;
+		}
+
+		void Detach()
+		{
+			fView = NULL;
+		}
+
+		BView* fView;
+	};
 }
 
 
@@ -148,31 +173,31 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 
 	// if the item refers to a BView, we make sure it is added to the parent
 	// view
-	bool addedView = false;
 	BView* view = item->View();
-	if (view && view->fParent != fTarget
-		&& !(addedView = fTarget->_AddChild(view, NULL)))
+	ViewRemover remover(view);
+	if (view && view->fParent != fTarget && !fTarget->_AddChild(view, NULL)) {
+		remover.Detach(); // view wasn't added
 		return false;
+	}
 
 	// validate the index
 	if (index < 0 || index > fItems.CountItems())
 		index = fItems.CountItems();
 
-	if (fItems.AddItem(item, index) && ItemAdded(item, index)) {
-		item->SetLayout(this);
-		if (!fAncestorsVisible)
-			item->AncestorVisibilityChanged(fAncestorsVisible);
-		InvalidateLayout();
-		return true;
-	} else {
-		// this check is necessary so that if an addition somewhere other
-		// than the end of the list fails, we don't remove the wrong item
-		if (fItems.ItemAt(index) == item)
-			fItems.RemoveItem(index);
-		if (addedView)
-			view->_RemoveSelf();
+	if (!fItems.AddItem(item, index))
+		return false;
+
+	if (!ItemAdded(item, index)) {
+		fItems.RemoveItem(index);
 		return false;
 	}
+
+	item->SetLayout(this);
+	if (!fAncestorsVisible)
+		item->AncestorVisibilityChanged(fAncestorsVisible);
+	InvalidateLayout();
+	remover.Detach();
+	return true;
 }
 
 
