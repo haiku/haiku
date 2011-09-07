@@ -9,6 +9,7 @@
 #include <Layout.h>
 #include <LayoutUtils.h>
 #include <View.h>
+#include <ViewPrivate.h>
 
 #include <algorithm>
 
@@ -166,7 +167,15 @@ BLayoutItem::SetLayout(BLayout* layout)
 	std::swap(fLayout, layout);
 	if (layout)
 		DetachedFromLayout(layout);
-		
+
+	if (BView* view = View()) {
+		if (layout && !fLayout) {
+			BView::Private(view).DeregisterLayoutItem(this);
+		} else if (fLayout && !layout) {
+			BView::Private(view).RegisterLayoutItem(this);
+		}
+	}
+	
 	if (fLayout)
 		AttachedToLayout();
 }

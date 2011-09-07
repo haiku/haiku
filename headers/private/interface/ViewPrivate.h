@@ -66,6 +66,11 @@ public:
 	bool	WillLayout();
 	bool	MinMaxValid();
 
+	BLayoutItem* LayoutItemAt(int32 index);
+	int32	CountLayoutItems();
+	void	RegisterLayoutItem(BLayoutItem* item);
+	void	DeregisterLayoutItem(BLayoutItem* item);
+
 	bool RemoveSelf()
 	{
 		return fView->_RemoveSelf();

@@ -238,7 +238,7 @@ BLayout::RemoveItem(int32 index)
 
 	BLayoutItem* item = (BLayoutItem*)fItems.RemoveItem(index);
 
-	// if the item refers to a BView, we make sure, it is removed from the
+	// if the item refers to a BView, we make sure it is removed from the
 	// parent view
 	BView* view = item->View();
 	if (view && view->fParent == fTarget)

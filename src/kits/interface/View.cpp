@@ -34,6 +34,7 @@
 #include <MenuBar.h>
 #include <Message.h>
 #include <MessageQueue.h>
+#include <ObjectList.h>
 #include <Picture.h>
 #include <Point.h>
 #include <Polygon.h>
@@ -335,6 +336,7 @@ struct BView::LayoutData {
 		fLayoutInvalidationDisabled(0),
 		fLayout(NULL),
 		fLayoutContext(NULL),
+		fLayoutItems(5, false),
 		fLayoutValid(true),		// TODO: Rethink these initial values!
 		fMinMaxValid(true),		//
 		fLayoutInProgress(false),
@@ -375,6 +377,7 @@ struct BView::LayoutData {
 	int				fLayoutInvalidationDisabled;
 	BLayout*		fLayout;
 	BLayoutContext*	fLayoutContext;
+	BObjectList<BLayoutItem> fLayoutItems;
 	bool			fLayoutValid;
 	bool			fMinMaxValid;
 	bool			fLayoutInProgress;
@@ -5957,6 +5960,34 @@ BView::_PrintTree()
 
 
 // #pragma mark -
+
+
+BLayoutItem*
+BView::Private::LayoutItemAt(int32 index)
+{
+	return fView->fLayoutData->fLayoutItems.ItemAt(index);
+}
+
+
+int32
+BView::Private::CountLayoutItems()
+{
+	return fView->fLayoutData->fLayoutItems.CountItems();
+}
+
+
+void
+BView::Private::RegisterLayoutItem(BLayoutItem* item)
+{
+	fView->fLayoutData->fLayoutItems.AddItem(item);
+}
+
+
+void
+BView::Private::DeregisterLayoutItem(BLayoutItem* item)
+{
+	fView->fLayoutData->fLayoutItems.RemoveItem(item);
+}
 
 
 bool
