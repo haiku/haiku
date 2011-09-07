@@ -30,8 +30,6 @@
 
 
 using BPrivate::ObjectDeleter;
-using BPrivate::B_WEEK_START_MONDAY;
-using BPrivate::B_WEEK_START_SUNDAY;
 
 
 BLocale::BLocale(const BLanguage* language,
@@ -353,26 +351,54 @@ BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
 }
 
 
-int
-BLocale::StartOfWeek() const
+status_t
+BLocale::GetStartOfWeek(BWeekday* startOfWeek) const
 {
+	if (startOfWeek == NULL)
+		return B_BAD_VALUE;
+
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
 		return B_WOULD_BLOCK;
 
 	UErrorCode err = U_ZERO_ERROR;
-	Calendar* c = Calendar::createInstance(
-		*BFormattingConventions::Private(&fConventions).ICULocale(),
-		err);
+	ObjectDeleter<Calendar> calendar = Calendar::createInstance(
+		*BFormattingConventions::Private(&fConventions).ICULocale(), err);
 
-	if (err == U_ZERO_ERROR && c->getFirstDayOfWeek(err) == UCAL_SUNDAY) {
-		delete c;
-		return B_WEEK_START_SUNDAY;
-	} else {
-		delete c;
-		// Might be another day, but BeAPI will not handle it
-		return B_WEEK_START_MONDAY;
+	if (U_FAILURE(err))
+		return B_ERROR;
+
+	UCalendarDaysOfWeek icuWeekStart = calendar->getFirstDayOfWeek(err);
+	if (U_FAILURE(err))
+		return B_ERROR;
+
+	switch (icuWeekStart) {
+		case UCAL_SUNDAY:
+			*startOfWeek = B_WEEKDAY_SUNDAY;
+			break;
+		case UCAL_MONDAY:
+			*startOfWeek = B_WEEKDAY_MONDAY;
+			break;
+		case UCAL_TUESDAY:
+			*startOfWeek = B_WEEKDAY_TUESDAY;
+			break;
+		case UCAL_WEDNESDAY:
+			*startOfWeek = B_WEEKDAY_WEDNESDAY;
+			break;
+		case UCAL_THURSDAY:
+			*startOfWeek = B_WEEKDAY_THURSDAY;
+			break;
+		case UCAL_FRIDAY:
+			*startOfWeek = B_WEEKDAY_FRIDAY;
+			break;
+		case UCAL_SATURDAY:
+			*startOfWeek = B_WEEKDAY_SATURDAY;
+			break;
+		default:
+			return B_BAD_DATA;
 	}
+
+	return B_OK;
 }
 
 

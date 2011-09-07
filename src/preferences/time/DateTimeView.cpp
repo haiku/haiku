@@ -187,9 +187,7 @@ DateTimeView::_PrefletUptime() const
 void
 DateTimeView::_InitView()
 {
-	BPrivate::week_start weekStart = (BPrivate::week_start)
-		BLocale::Default()->StartOfWeek();
-	fCalendarView = new BCalendarView("calendar", weekStart);
+	fCalendarView = new BCalendarView("calendar");
 	fCalendarView->SetWeekNumberHeaderVisible(false);
 	fCalendarView->SetSelectionMessage(new BMessage(kDayChanged));
 	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
@@ -305,8 +303,16 @@ DateTimeView::_UpdateDateTime(BMessage* message)
 	if (message->FindInt32("month", &month) == B_OK
 		&& message->FindInt32("day", &day) == B_OK
 		&& message->FindInt32("year", &year) == B_OK) {
-		fDateEdit->SetDate(year, month, day);
-		fCalendarView->SetDate(year, month, day);
+		static int32 lastDay;
+		static int32 lastMonth;
+		static int32 lastYear;
+		if (day != lastDay || month != lastMonth || year != lastYear) {
+			fDateEdit->SetDate(year, month, day);
+			fCalendarView->SetDate(year, month, day);
+			lastDay = day;
+			lastMonth = month;
+			lastYear = year;
+		}
 	}
 
 	int32 hour;

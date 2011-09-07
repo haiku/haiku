@@ -22,7 +22,7 @@ class BString;
 class BTimeZone;
 
 
-typedef enum {
+enum BDateElement {
 	B_DATE_ELEMENT_INVALID = B_BAD_DATA,
 	B_DATE_ELEMENT_YEAR = 0,
 	B_DATE_ELEMENT_MONTH,
@@ -31,14 +31,26 @@ typedef enum {
 	B_DATE_ELEMENT_HOUR,
 	B_DATE_ELEMENT_MINUTE,
 	B_DATE_ELEMENT_SECOND
-} BDateElement;
+};
 
-typedef enum {
+enum BNumberElement {
 	B_NUMBER_ELEMENT_INVALID = B_BAD_DATA,
 	B_NUMBER_ELEMENT_INTEGER = 0,
 	B_NUMBER_ELEMENT_FRACTIONAL,
 	B_NUMBER_ELEMENT_CURRENCY
-} BNumberElement;
+};
+
+
+// TODO: move this to BCalendar (should we ever have that) or BDate
+enum BWeekday {
+	B_WEEKDAY_MONDAY = 1,
+	B_WEEKDAY_TUESDAY,
+	B_WEEKDAY_WEDNESDAY,
+	B_WEEKDAY_THURSDAY,
+	B_WEEKDAY_FRIDAY,
+	B_WEEKDAY_SATURDAY,
+	B_WEEKDAY_SUNDAY,
+};
 
 
 class BLocale {
@@ -99,7 +111,7 @@ public:
 									int& fieldCount, BDateFormatStyle style
 									) const;
 
-			int					StartOfWeek() const;
+			status_t			GetStartOfWeek(BWeekday* weekday) const;
 
 								// Time
 
