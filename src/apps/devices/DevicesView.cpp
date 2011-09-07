@@ -280,54 +280,69 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		// Devices Root
 		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
-				&& attributes[i].fValue == "Devices Root") {
+			&& attributes[i].fValue == "Devices Root") {
 			newDevice = new Device(parent, BUS_NONE,
-									CAT_COMPUTER, B_TRANSLATE("Computer"));
+				CAT_COMPUTER, B_TRANSLATE("Computer"));
 			break;
 		}
 
 		// ACPI Controller
 		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
-				&& attributes[i].fValue == "ACPI") {
+			&& attributes[i].fValue == "ACPI") {
 			newDevice = new Device(parent, BUS_ACPI,
-									CAT_BUS, B_TRANSLATE("ACPI bus"));
+				CAT_BUS, B_TRANSLATE("ACPI bus"));
 			break;
 		}
 
 		// PCI bus
 		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
-				&& attributes[i].fValue == "PCI") {
+			&& attributes[i].fValue == "PCI") {
 			newDevice = new Device(parent, BUS_PCI,
-									CAT_BUS, B_TRANSLATE("PCI bus"));
+				CAT_BUS, B_TRANSLATE("PCI bus"));
 			break;
 		}
 
 		// ISA bus
 		if (attributes[i].fName == B_DEVICE_BUS
-				&& attributes[i].fValue == "isa") {
+			&& attributes[i].fValue == "isa") {
 			newDevice = new Device(parent, BUS_ISA,
-									CAT_BUS, B_TRANSLATE("ISA bus"));
+				CAT_BUS, B_TRANSLATE("ISA bus"));
 			break;
 		}
 
 		// PCI device
 		if (attributes[i].fName == B_DEVICE_BUS
-				&& attributes[i].fValue == "pci") {
+			&& attributes[i].fValue == "pci") {
 			newDevice = new DevicePCI(parent);
 			break;
 		}
 
 		// ACPI device
 		if (attributes[i].fName == B_DEVICE_BUS
-				&& attributes[i].fValue == "acpi") {
+			&& attributes[i].fValue == "acpi") {
 			newDevice = new DeviceACPI(parent);
+			break;
+		}
+
+		// SCSI device
+		if (attributes[i].fName == B_DEVICE_BUS
+			&& attributes[i].fValue == "scsi") {
+			newDevice = new DeviceSCSI(parent);
+			break;
+		}
+
+		// Last resort, lets look for a pretty name
+		if (attributes[i].fName == B_DEVICE_PRETTY_NAME) {
+			newDevice = new Device(parent, BUS_NONE,
+				CAT_NONE, attributes[i].fValue);
 			break;
 		}
 	}
 
+	// A completely unknown device
 	if (newDevice == NULL) {
 		newDevice = new Device(parent, BUS_NONE,
-									CAT_NONE, B_TRANSLATE("Unknown device"));
+			CAT_NONE, B_TRANSLATE("Unknown device"));
 	}
 
 	// Add its attributes to the device, initialize it and add to the list.

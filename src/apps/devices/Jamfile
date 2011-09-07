@@ -69,6 +69,7 @@ Application Devices :
 	dm_wrapper.c
 	DevicePCI.cpp
 	DeviceACPI.cpp
+	DeviceSCSI.cpp
 	Device.cpp
 	PropertyList.cpp
 	PropertyListPlain.cpp
@@ -86,6 +87,7 @@ DoCatalogs Devices :
 	PropertyList.cpp
 	PropertyListPlain.cpp
 	DeviceACPI.cpp
+	DeviceSCSI.cpp
 	Device.cpp
 ;
 
