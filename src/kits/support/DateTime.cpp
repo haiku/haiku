@@ -721,7 +721,7 @@ BDate::AddMonths(int32 months)
 		if (fYear == 1582 && fMonth == 10 && fDay > 4 && fDay < 15)
 			fDay = (months > 0) ? 15 : 4;
 
-		fDay = min_c(fDay, DaysInMonth());
+		fDay = min_c(fDay, _DaysInMonth(fYear, fMonth));
 	}
 }
 
