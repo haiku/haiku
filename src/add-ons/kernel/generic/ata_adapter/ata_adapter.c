@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 #include <malloc.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <ata_adapter.h>
@@ -489,14 +490,21 @@ ata_adapter_publish_channel(device_node *controller_node,
 	uint8 channel_index, const char *name, const io_resource *resources,
 	device_node **node)
 {
+	char prettyName[25];
+	sprintf(prettyName, "ATA Channel %" B_PRIu8, channel_index);
+
 	device_attr attrs[] = {
 		// info about ourself and our consumer
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "IDE PCI" }},
-		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: ATA_FOR_CONTROLLER_MODULE_NAME }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+			{ string: prettyName }},
+		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
+			{ string: ATA_FOR_CONTROLLER_MODULE_NAME }},
 
 		// private data to identify channel
-		{ ATA_ADAPTER_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
-		{ ATA_ADAPTER_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
+		{ ATA_ADAPTER_COMMAND_BLOCK_BASE, B_UINT16_TYPE,
+			{ ui16: command_block_base }},
+		{ ATA_ADAPTER_CONTROL_BLOCK_BASE, B_UINT16_TYPE,
+			{ ui16: control_block_base }},
 		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: can_dma }},
 		{ ATA_ADAPTER_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
 		{ ATA_ADAPTER_CHANNEL_INDEX, B_UINT8_TYPE, { ui8: channel_index }},
