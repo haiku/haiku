@@ -433,8 +433,8 @@ detect_connectors()
 					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
+					// Found an encoder
 					int32 k;
-					TRACE("%s: Found encoder at #%" B_PRIu32 "\n", __func__, j);
 					for (k = 0; k < enc_obj->ucNumberOfObjects; k++) {
 						uint16 encoder_obj
 							= B_LENDIAN_TO_HOST_INT16(
@@ -533,7 +533,7 @@ detect_connectors()
 						}
 					}
 				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
-					ERROR("%s: TODO : Router object?\n", __func__);
+					ERROR("%s: TODO : Found router object?\n", __func__);
 				}
 			}
 
@@ -630,20 +630,12 @@ detect_displays()
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
-		bool found = false;
-		switch(gConnector[id]->encoder_type) {
-			case VIDEO_ENCODER_DAC:
-				found = radeon_gpu_read_edid(id, gDisplay[id]->edid_info);
-				break;
-			default:
-				found = false;
-		}
-
-		if (found == true) {
+		if (radeon_gpu_read_edid(id, gDisplay[displayIndex]->edid_info)) {
 			gDisplay[displayIndex]->active = true;
 				// set this display as active
 			gDisplay[displayIndex]->connector_index = id;
 				// set physical connector index from gConnector
+
 			init_registers(gDisplay[displayIndex]->regs, displayIndex);
 
 			if (detect_crt_ranges(displayIndex) == B_OK)

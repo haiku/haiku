@@ -10,6 +10,7 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
+#include "bios.h"
 #include "gpu.h"
 #include "utility.h"
 
@@ -286,6 +287,9 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 	*_clock = (value >> info->gpio_y_scl_shift) & 1;
 	*_data = (value >> info->gpio_y_sda_shift) & 1;
 
+	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
+		__func__, info->gpio_id, *_clock, *_data);
+
 	return B_OK;
 }
 
@@ -304,6 +308,9 @@ set_i2c_signals(void* cookie, int clock, int data)
 
 	Write32(OUT, info->gpio_id, value);
 
+	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
+		__func__, info->gpio_id, clock, data);
+
 	return B_OK;
 }
 
@@ -311,6 +318,11 @@ set_i2c_signals(void* cookie, int clock, int data)
 bool
 radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 {
+	// ensure things are sane
+	if (gConnector[connector]->connector_ddc_info.valid == false
+		|| gConnector[connector]->connector_ddc_info.gpio_id == 0)
+		return false;
+
 	i2c_bus bus;
 
 	ddc2_init_timing(&bus);
@@ -339,74 +351,76 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 	TRACE("%s: Path #%" B_PRId32 ": GPIO Pin 0x%" B_PRIx8 "\n", __func__,
 		connector, gpio_id);
 
-	ATOM_GPIO_I2C_ASSIGMENT *gpio;
-	struct _ATOM_GPIO_I2C_INFO *i2c_info;
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
+	uint8 frev;
+	uint8 crev;
 	uint16 offset;
 	uint16 size;
 
-	if (atom_parse_data_header(gAtomContext, index,
-		&size, NULL, NULL, &offset)) {
+	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
+		&offset) != B_OK) {
+		ERROR("%s: GPIO pin not within AtomBIOS!\n", __func__);
+		gConnector[connector]->connector_ddc_info.valid = false;
+		return B_ERROR;
+	}
 
-		i2c_info = (struct _ATOM_GPIO_I2C_INFO *)(gAtomContext->bios + offset);
+	struct _ATOM_GPIO_I2C_INFO *i2c_info
+		= (struct _ATOM_GPIO_I2C_INFO *)(gAtomContext->bios + offset);
 
-		uint32 num_indices = (size - sizeof(ATOM_COMMON_TABLE_HEADER))
-			/ sizeof(ATOM_GPIO_I2C_ASSIGMENT);
+	uint32 num_indices = (size - sizeof(ATOM_COMMON_TABLE_HEADER))
+		/ sizeof(ATOM_GPIO_I2C_ASSIGMENT);
 
-		for (uint32 i = 0; i < num_indices; i++) {
-			gpio = &i2c_info->asGPIO_Info[i];
+	for (uint32 i = 0; i < num_indices; i++) {
+		ATOM_GPIO_I2C_ASSIGMENT *gpio = &i2c_info->asGPIO_Info[i];
 
-			// TODO : if DCE 4 and i == 7 ... manual override for evergreen
-			// TODO : if DCE 3 and i == 4 ... manual override
+		// TODO : if DCE 4 and i == 7 ... manual override for evergreen
+		// TODO : if DCE 3 and i == 4 ... manual override
 
-			if (gpio->sucI2cId.ucAccess != gpio_id)
-				continue;
+		if (gpio->sucI2cId.ucAccess != gpio_id)
+			continue;
 
-			// successful lookup
-			TRACE("%s: found i2c gpio\n", __func__);
+		// successful lookup
+		TRACE("%s: successful AtomBIOS GPIO lookup\n", __func__);
 
+		// populate gpio information
+		gConnector[connector]->connector_ddc_info.valid = true;
+		gConnector[connector]->connector_ddc_info.gpio_id = gpio_id;
 
-			// populate gpio information
-			gConnector[connector]->connector_ddc_info.gpio_id = gpio_id;
+		gConnector[connector]->connector_ddc_info.mask_scl_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.mask_sda_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.mask_scl_shift
+			= (1 << gpio->ucClkMaskShift);
+		gConnector[connector]->connector_ddc_info.mask_sda_shift
+			= (1 << gpio->ucDataMaskShift);
 
-			gConnector[connector]->connector_ddc_info.mask_scl_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.mask_sda_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.mask_scl_shift
-				= (1 << gpio->ucClkMaskShift);
-			gConnector[connector]->connector_ddc_info.mask_sda_shift
-				= (1 << gpio->ucDataMaskShift);
+		gConnector[connector]->connector_ddc_info.gpio_en_scl_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_en_sda_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_en_scl_shift
+			= (1 << gpio->ucClkEnShift);
+		gConnector[connector]->connector_ddc_info.gpio_en_sda_shift
+			= (1 << gpio->ucDataEnShift);
 
-			gConnector[connector]->connector_ddc_info.gpio_en_scl_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.gpio_en_sda_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.gpio_en_scl_shift
-				= (1 << gpio->ucClkEnShift);
-			gConnector[connector]->connector_ddc_info.gpio_en_sda_shift
-				= (1 << gpio->ucDataEnShift);
+		gConnector[connector]->connector_ddc_info.gpio_y_scl_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_y_sda_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_y_scl_shift
+			= (1 << gpio->ucClkY_Shift);
+		gConnector[connector]->connector_ddc_info.gpio_y_sda_shift
+			= (1 << gpio->ucDataY_Shift);
 
-			gConnector[connector]->connector_ddc_info.gpio_y_scl_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.gpio_y_sda_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.gpio_y_scl_shift
-				= (1 << gpio->ucClkY_Shift);
-			gConnector[connector]->connector_ddc_info.gpio_y_sda_shift
-				= (1 << gpio->ucDataY_Shift);
-
-			gConnector[connector]->connector_ddc_info.gpio_a_scl_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
-				= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-			gConnector[connector]->connector_ddc_info.gpio_a_scl_shift
-				= (1 << gpio->ucClkA_Shift);
-			gConnector[connector]->connector_ddc_info.gpio_a_sda_shift
-				= (1 << gpio->ucDataA_Shift);
-		}
-
-
+		gConnector[connector]->connector_ddc_info.gpio_a_scl_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_a_scl_shift
+			= (1 << gpio->ucClkA_Shift);
+		gConnector[connector]->connector_ddc_info.gpio_a_sda_shift
+			= (1 << gpio->ucDataA_Shift);
 	}
 
 	return B_OK;
