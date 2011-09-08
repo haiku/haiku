@@ -323,7 +323,13 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 			break;
 		}
 
-		// SCSI device
+		// ATA / SCSI / IDE controller
+		if (attributes[i].fName == "controller_name") {
+			newDevice = new Device(parent, BUS_PCI,
+				CAT_MASS, attributes[i].fValue);
+		}
+
+		// SCSI device node
 		if (attributes[i].fName == B_DEVICE_BUS
 			&& attributes[i].fValue == "scsi") {
 			newDevice = new DeviceSCSI(parent);
