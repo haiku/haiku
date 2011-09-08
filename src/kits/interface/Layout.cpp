@@ -279,14 +279,15 @@ BLayout::IndexOfView(BView* child) const
 	if (child == NULL)
 		return -1;
 
-	int itemCount = fItems.CountItems();
+	// A BView can have many items, so we just do our best and return the
+	// index of the first one in this layout.
+	BView::Private viewPrivate(child);
+	int32 itemCount = viewPrivate.CountLayoutItems();
 	for (int32 i = 0; i < itemCount; i++) {
-		BLayoutItem* item = (BLayoutItem*)fItems.ItemAt(i);
-		if (item->View() == child && (dynamic_cast<BViewLayoutItem*>(item)
-				|| dynamic_cast<BLayout*>(item)))
-			return i;
+		BLayoutItem* item = viewPrivate.LayoutItemAt(i);
+		if (item->Layout() == this)
+			return IndexOfItem(item);
 	}
-
 	return -1;
 }
 
