@@ -13,11 +13,14 @@
 
 #include <LayoutContext.h>
 #include <Message.h>
+#include <AutoDeleter.h>
 #include <View.h>
 #include <ViewPrivate.h>
 
 #include "ViewLayoutItem.h"
 
+
+using BPrivate::AutoDeleter;
 
 using std::nothrow;
 using std::swap;
@@ -43,27 +46,9 @@ namespace {
 
 
 	struct ViewRemover {
-		ViewRemover(BView* view) : fView(view) {};
-
-		~ViewRemover()
-		{
-			if (fView)
-				BView::Private(fView).RemoveSelf();
+		inline void operator()(BView* view) {
+			BView::Private(view).RemoveSelf();
 		}
-
-		void SetTo(BView* view)
-		{
-			if (fView)
-				BView::Private(fView).RemoveSelf();
-			fView = view;
-		}
-
-		void Detach()
-		{
-			fView = NULL;
-		}
-
-		BView* fView;
 	};
 }
 
@@ -146,14 +131,17 @@ BLayoutItem*
 BLayout::AddView(int32 index, BView* child)
 {
 	BLayoutItem* item = child->GetLayout();
-	if (!item)
+	ObjectDeleter<BLayoutItem> itemDeleter(NULL);
+	if (!item) {
 		item = new(nothrow) BViewLayoutItem(child);
+		itemDeleter.SetTo(item);
+	}
 
-	if (item && AddItem(index, item))
+	if (item && AddItem(index, item)) {
+		itemDeleter.Detach();
 		return item;
+	}
 
-	if (!child->GetLayout())
-		delete item;
 	return NULL;
 }
 
@@ -174,7 +162,7 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 	// if the item refers to a BView, we make sure it is added to the parent
 	// view
 	BView* view = item->View();
-	ViewRemover remover(view);
+	AutoDeleter<BView, ViewRemover> remover(view);
 	if (view && view->fParent != fTarget && !fTarget->_AddChild(view, NULL)) {
 		remover.Detach(); // view wasn't added
 		return false;
