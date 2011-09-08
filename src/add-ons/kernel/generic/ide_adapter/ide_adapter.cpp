@@ -40,7 +40,7 @@ static device_manager_info *pnp;
 static void
 set_channel(ide_adapter_channel_info *channel, ide_channel ideChannel)
 {
-	channel->ide_channel = ideChannel;
+	channel->ideChannel = ideChannel;
 }
 
 
@@ -212,7 +212,7 @@ ide_adapter_inthand(void *arg)
 	// acknowledge IRQ
 	status = pci->read_io_8(device, channel->command_block_base + 7);
 
-	return ide->irq_handler(channel->ide_channel, status);
+	return ide->irq_handler(channel->ideChannel, status);
 }
 
 
@@ -460,7 +460,7 @@ ide_adapter_channel_removed(ide_adapter_channel_info *channel)
 
 	if (channel != NULL)
 		// disable access instantly
-		atomic_or(&channel->lost, 1);
+		atomic_or((int32*)&channel->lost, 1);
 }
 
 
@@ -644,7 +644,7 @@ ide_adapter_controller_removed(ide_adapter_controller_info *controller)
 
 	if (controller != NULL) {
 		// disable access instantly; unit_device takes care of unregistering ioports
-		atomic_or(&controller->lost, 1);
+		atomic_or((int32*)&controller->lost, 1);
 	}
 }
 
