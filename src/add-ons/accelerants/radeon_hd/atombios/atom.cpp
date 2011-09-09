@@ -1301,7 +1301,7 @@ atom_parse_data_header(atom_context *ctx, int index, uint16 *size,
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->data_table + offset);
-	uint8 *mdt = ctx->bios + ctx->data_table + 4;
+	uint16 *mdt = (uint16 *)ctx->bios + ctx->data_table + 4;
 
 	if (!mdt[index])
 		return B_ERROR;
@@ -1323,7 +1323,7 @@ atom_parse_cmd_header(atom_context *ctx, int index, uint8 * frev,
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->cmd_table + offset);
-	uint8 *mct = ctx->bios + ctx->cmd_table + 4;
+	uint16 *mct = (uint16 *)ctx->bios + ctx->cmd_table + 4;
 
 	if (!mct[index])
 		return B_ERROR;
