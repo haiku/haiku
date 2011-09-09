@@ -387,6 +387,8 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 		gConnector[connector]->connector_ddc_info.valid = true;
 		gConnector[connector]->connector_ddc_info.gpio_id = gpio_id;
 
+		// GPIO mask (Allows software to control the GPIO pad)
+		// 0 = chip access; 1 = only software;
 		gConnector[connector]->connector_ddc_info.mask_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.mask_sda_reg
@@ -396,6 +398,8 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 		gConnector[connector]->connector_ddc_info.mask_sda_shift
 			= (1 << gpio->ucDataMaskShift);
 
+		// GPIO output / write (A) enable
+		// 0 = GPIO input (Y); 1 = GPIO output (A);
 		gConnector[connector]->connector_ddc_info.gpio_en_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.gpio_en_sda_reg
@@ -405,6 +409,17 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 		gConnector[connector]->connector_ddc_info.gpio_en_sda_shift
 			= (1 << gpio->ucDataEnShift);
 
+		// GPIO output / write (A)
+		gConnector[connector]->connector_ddc_info.gpio_a_scl_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
+			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
+		gConnector[connector]->connector_ddc_info.gpio_a_scl_shift
+			= (1 << gpio->ucClkA_Shift);
+		gConnector[connector]->connector_ddc_info.gpio_a_sda_shift
+			= (1 << gpio->ucDataA_Shift);
+
+		// GPIO input / read (Y)
 		gConnector[connector]->connector_ddc_info.gpio_y_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.gpio_y_sda_reg
@@ -414,14 +429,6 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 		gConnector[connector]->connector_ddc_info.gpio_y_sda_shift
 			= (1 << gpio->ucDataY_Shift);
 
-		gConnector[connector]->connector_ddc_info.gpio_a_scl_reg
-			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
-			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_a_scl_shift
-			= (1 << gpio->ucClkA_Shift);
-		gConnector[connector]->connector_ddc_info.gpio_a_sda_shift
-			= (1 << gpio->ucDataA_Shift);
 	}
 
 	return B_OK;
