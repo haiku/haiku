@@ -553,7 +553,7 @@ BSplitLayout::InvalidateLayout(bool children)
 
 
 void
-BSplitLayout::DerivedLayoutItems()
+BSplitLayout::DoLayout()
 {
 	_ValidateMinMax();
 

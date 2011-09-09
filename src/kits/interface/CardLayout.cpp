@@ -183,7 +183,7 @@ BCardLayout::InvalidateLayout(bool children)
 
 
 void
-BCardLayout::DerivedLayoutItems()
+BCardLayout::DoLayout()
 {
 	_ValidateMinMax();
 

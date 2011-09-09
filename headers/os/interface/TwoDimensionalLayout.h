@@ -58,7 +58,7 @@ protected:
 				int32	height;
 			};
 
-	virtual	void				DerivedLayoutItems();
+	virtual	void				DoLayout();
 
 			BSize				AddInsets(BSize size);
 			void				AddInsets(float* minHeight, float* maxHeight,

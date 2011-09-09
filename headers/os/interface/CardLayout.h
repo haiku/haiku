@@ -35,7 +35,7 @@ public:
 	static	BArchivable*		Instantiate(BMessage* from);
 
 protected:
-	virtual	void				DerivedLayoutItems();
+	virtual	void				DoLayout();
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 

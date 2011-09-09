@@ -73,7 +73,7 @@ protected:
 	// BLayout hook methods
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
-	virtual	void				DerivedLayoutItems() = 0;
+	virtual	void				DoLayout() = 0;
 	virtual	void				OwnerChanged(BView* was);
 
 	// BLayoutItem hook methods

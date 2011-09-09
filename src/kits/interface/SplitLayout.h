@@ -77,7 +77,7 @@ public:
 
 	virtual	void				InvalidateLayout(bool children = false);
 
-	virtual	void				DerivedLayoutItems();
+	virtual	void				DoLayout();
 
 	// interface for BSplitView
 			BRect				SplitterItemFrame(int32 index) const;

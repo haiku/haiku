@@ -400,7 +400,7 @@ BLayout::_LayoutWithinContext(bool force, BLayoutContext* context)
 		fOwner->_Layout(force, context);
 	} else {
 		fState |= B_LAYOUT_IN_PROGRESS;
-		DerivedLayoutItems();
+		DoLayout();
 		// we must ensure that all items are laid out, layouts with a view will
 		// have their layout process triggered by their view, but nested
 		// view-less layouts must have their layout triggered here (if it hasn't

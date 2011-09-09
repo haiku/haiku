@@ -337,7 +337,7 @@ topLayout->AddItem(nestedLayoutWithView);
 /*!
 	\fn void BLayout::LayoutItems(bool force = false)
 	\brief If there is no layout currently ongoing, and \a force is \c false,
-		creates a new BLayoutContext and calls the DerivedLayoutItems() method
+		creates a new BLayoutContext and calls the DoLayout() method
 		of this BLayout and any BLayout s nested in this BLayout.
 	
 	If method also guarantees that the owner view of this layout (as returned
@@ -514,7 +514,7 @@ topLayout->AddItem(nestedLayoutWithView);
 
 
 /*!
-	\fn void BLayout::DerivedLayoutItems() = 0
+	\fn void BLayout::DoLayout() = 0
 	\brief Implemented by derived classes to position and resize the items in
 		this layout.
 */

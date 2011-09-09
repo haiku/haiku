@@ -465,7 +465,7 @@ BTwoDimensionalLayout::AllUnarchived(const BMessage* from)
 
 
 void
-BTwoDimensionalLayout::DerivedLayoutItems()
+BTwoDimensionalLayout::DoLayout()
 {
 	_ValidateMinMax();
 
