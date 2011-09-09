@@ -282,13 +282,29 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
 	ddc_info *info = (ddc_info*)cookie;
 
-	uint32 value = Read32(OUT, info->gpio_id);
+	// software only access
+	//uint32 scl_maskVal = Read32(OUT, info->mask_scl_reg);
+	//uint32 sda_maskVal = Read32(OUT, info->mask_sda_reg);
+	//Write32(OUT, info->mask_scl_reg, 1);
+	//Write32(OUT, info->mask_sda_reg, 1);
 
-	*_clock = (value >> info->gpio_y_scl_shift) & 1;
-	*_data = (value >> info->gpio_y_sda_shift) & 1;
+	// set read mode
+	uint32 scl_enVal = Read32(OUT, info->gpio_en_scl_reg);
+	uint32 sda_enVal = Read32(OUT, info->gpio_en_sda_reg);
+	Write32(OUT, info->gpio_en_scl_reg, 0);
+	Write32(OUT, info->gpio_en_sda_reg, 0);
+
+	*_clock = Read32(OUT, info->gpio_y_scl_reg);
+	*_data = Read32(OUT, info->gpio_y_sda_reg);
 
 	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
 		__func__, info->gpio_id, *_clock, *_data);
+
+	// restore previous settings
+	//Write32(OUT, info->mask_scl_reg, scl_maskVal);
+	//Write32(OUT, info->mask_sda_reg, sda_maskVal);
+	Write32(OUT, info->gpio_en_scl_reg, scl_enVal);
+	Write32(OUT, info->gpio_en_sda_reg, sda_enVal);
 
 	return B_OK;
 }
@@ -299,17 +315,33 @@ set_i2c_signals(void* cookie, int clock, int data)
 {
 	ddc_info* info = (ddc_info*)cookie;
 
-	uint32 value = Read32(OUT, info->gpio_id);
+	// software only access
+	uint32 scl_maskVal = Read32(OUT, info->mask_scl_reg);
+	uint32 sda_maskVal = Read32(OUT, info->mask_sda_reg);
+	Write32(OUT, info->mask_scl_reg, 1);
+	Write32(OUT, info->mask_sda_reg, 1);
 
-	value &= ~(info->gpio_a_scl_reg | info->gpio_a_sda_reg);
-	value &= ~(info->gpio_en_sda_reg | info->gpio_en_scl_reg);
-	value |= ((1 - clock) << info->gpio_en_scl_shift)
-		| ((1 - data) << info->gpio_en_sda_shift);
+	// set write mode
+	uint32 scl_enVal = Read32(OUT, info->gpio_en_scl_reg);
+	uint32 sda_enVal = Read32(OUT, info->gpio_en_sda_reg);
+	Write32(OUT, info->gpio_en_scl_reg, 1);
+	Write32(OUT, info->gpio_en_sda_reg, 1);
 
-	Write32(OUT, info->gpio_id, value);
+	Write32(OUT, info->gpio_a_scl_reg, clock);
+	Write32(OUT, info->gpio_a_sda_reg, data);
+
+	// read back to improve reliability?
+	Read32(OUT, info->gpio_a_scl_reg);
+	Read32(OUT, info->gpio_a_sda_reg);
 
 	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
 		__func__, info->gpio_id, clock, data);
+
+	// restore previous settings
+	Write32(OUT, info->mask_scl_reg, scl_maskVal);
+	Write32(OUT, info->mask_sda_reg, sda_maskVal);
+	Write32(OUT, info->gpio_en_scl_reg, scl_enVal);
+	Write32(OUT, info->gpio_en_sda_reg, sda_enVal);
 
 	return B_OK;
 }
