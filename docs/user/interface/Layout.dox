@@ -211,6 +211,8 @@ topLayout->AddItem(nestedLayoutWithView);
 	
 	\warning \a item is not deleted, you must delete it manually, or add it	to
 		another BLayout.
+	\warning \a item->View(), even when it is removed from the target view,
+		is not deleted. If you want it deleted, you must delete it yourself!
 
 	\retval true success
 	\retval false failure
@@ -500,6 +502,11 @@ topLayout->AddItem(nestedLayoutWithView);
 
 	\param item The BLayoutItem being removed.
 	\param fromIndex The index where \a item used to reside.
+
+	When this hook is called, \a item is not yet completely removed. It can
+	no longer be accessed with LayoutItemAt(), nor does it contribute to the
+	value of CountItems(), but the item has not yet had its ItemDetached()
+	hook called.
 
 	\note This is a good time to delete the data you've attached to \a item
 	via BLayoutItem::SetLayoutData().
