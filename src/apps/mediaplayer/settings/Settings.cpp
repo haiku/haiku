@@ -1,14 +1,18 @@
 /*
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fredrik Modéen <fredrik@modeen.se>
  */
 
+
 #include "Settings.h"
 
 #include <Autolock.h>
+
+
+/*static*/ Settings Settings::sGlobalInstance;
 
 
 bool
@@ -40,7 +44,7 @@ Settings::Settings(const char* filename)
 
 
 void
-Settings::LoadSettings(mpSettings& settings) const
+Settings::Get(mpSettings& settings) const
 {
 	BAutolock _(const_cast<Settings*>(this));
 
@@ -68,25 +72,20 @@ Settings::LoadSettings(mpSettings& settings) const
 		= fSettingsMessage.GetValue("bgMovieVolumeMode",
 			(uint32)mpSettings::BG_MOVIES_FULL_VOLUME);
 
-	entry_ref defaultFilePanelFolder;
-		// an "unset" entry_ref
-	settings.filePanelFolder = fSettingsMessage.GetValue(
-		"filePanelDirectory", defaultFilePanelFolder);
-
-	settings.audioPlayerWindowFrame = fSettingsMessage.GetValue(
-		"audioPlayerWindowFrame", BRect());
+	settings.filePanelFolder = FilePanelFolder();
+	settings.audioPlayerWindowFrame = AudioPlayerWindowFrame();
 }
 
 
 void
-Settings::SaveSettings(const mpSettings& settings)
+Settings::Update(const mpSettings& settings)
 {
 	BAutolock _(this);
 
 	fSettingsMessage.SetValue("autostart", settings.autostart);
-	fSettingsMessage.SetValue("closeWhenDonePlayingMovie", 
+	fSettingsMessage.SetValue("closeWhenDonePlayingMovie",
 		settings.closeWhenDonePlayingMovie);
-	fSettingsMessage.SetValue("closeWhenDonePlayingSound", 
+	fSettingsMessage.SetValue("closeWhenDonePlayingSound",
 		settings.closeWhenDonePlayingSound);
 	fSettingsMessage.SetValue("loopMovie", settings.loopMovie);
 	fSettingsMessage.SetValue("loopSound", settings.loopSound);
@@ -105,31 +104,45 @@ Settings::SaveSettings(const mpSettings& settings)
 	fSettingsMessage.SetValue("filePanelDirectory",
 		settings.filePanelFolder);
 
-	fSettingsMessage.SetValue("audioPlayerWindowFrame",
-		settings.audioPlayerWindowFrame);
-
-	// Save at this point, although saving is also done on destruction,
-	// this will make sure the settings are saved even when the player
-	// crashes.
-	fSettingsMessage.Save();
+	SetAudioPlayerWindowFrame(settings.audioPlayerWindowFrame);
 
 	Notify();
 }
 
 
-// #pragma mark - static
-
-/*static*/ Settings
-Settings::sGlobalInstance;
-
-
-/*static*/ mpSettings
-Settings::CurrentSettings()
+entry_ref
+Settings::FilePanelFolder() const
 {
-	mpSettings settings;
-	sGlobalInstance.LoadSettings(settings);
-	return settings;
+	BAutolock locker(const_cast<Settings*>(this));
+	return fSettingsMessage.GetValue("filePanelDirectory", entry_ref());
 }
+
+
+void
+Settings::SetFilePanelFolder(const entry_ref& ref)
+{
+	BAutolock locker(this);
+	fSettingsMessage.SetValue("filePanelDirectory", ref);
+}
+
+
+BRect
+Settings::AudioPlayerWindowFrame() const
+{
+	BAutolock locker(const_cast<Settings*>(this));
+	return fSettingsMessage.GetValue("audioPlayerWindowFrame", BRect());
+}
+
+
+void
+Settings::SetAudioPlayerWindowFrame(BRect frame)
+{
+	BAutolock locker(this);
+	fSettingsMessage.SetValue("audioPlayerWindowFrame", frame);
+}
+
+
+// #pragma mark - static
 
 
 /*static*/ Settings*

@@ -1,19 +1,23 @@
 /*
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fredrik Modéen <fredrik@modeen.se>
  */
- 
 #ifndef SETTINGS_H
 #define SETTINGS_H
+
 
 #include <Entry.h>
 #include <Locker.h>
 
 #include "Notifier.h"
 #include "SettingsMessage.h"
+
+
+#define SETTINGS_FILENAME "MediaPlayer"
+
 
 struct mpSettings {
 			enum {
@@ -43,23 +47,27 @@ struct mpSettings {
 			uint32				subtitlePlacement;
 			uint32				backgroundMovieVolumeMode;
 			entry_ref			filePanelFolder;
-		
+
 			bool				operator!=(const mpSettings& other) const;
 
 			BRect				audioPlayerWindowFrame;
 };
 
-#define SETTINGS_FILENAME "MediaPlayer"
 
 class Settings : public BLocker, public Notifier {
 public:
 								Settings(
 									const char* filename = SETTINGS_FILENAME);
 
-			void				LoadSettings(mpSettings& settings) const;
-			void				SaveSettings(const mpSettings& settings);
+			void				Get(mpSettings& settings) const;
+			void				Update(const mpSettings& settings);
 
-	static	mpSettings			CurrentSettings();
+			entry_ref			FilePanelFolder() const;
+			void				SetFilePanelFolder(const entry_ref& ref);
+
+			BRect				AudioPlayerWindowFrame() const;
+			void				SetAudioPlayerWindowFrame(BRect frame);
+
 	static	Settings*			Default();
 
 private:
@@ -68,5 +76,6 @@ private:
 
 	static	Settings			sGlobalInstance;
 };
+
 
 #endif  // SETTINGS_H

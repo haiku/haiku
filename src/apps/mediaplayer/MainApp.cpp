@@ -75,8 +75,7 @@ MainApp::MainApp()
 	fAudioWindowFrameSaved(false),
 	fLastSavedAudioWindowCreationTime(0)
 {
-	mpSettings settings = Settings::CurrentSettings();
-	fLastFilePanelFolder = settings.filePanelFolder;
+	fLastFilePanelFolder = Settings::Default()->FilePanelFolder();
 
 	// Now tell the application roster, that we're interested
 	// in getting notifications of apps being launched or quit.
@@ -91,7 +90,7 @@ MainApp::MainApp()
 	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
 		BAlert* alert = new BAlert("start_media_server",
 			B_TRANSLATE("It appears the media server is not running.\n"
-			"Would you like to start it ?"), B_TRANSLATE("Quit"), 
+			"Would you like to start it ?"), B_TRANSLATE("Quit"),
 			B_TRANSLATE("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go() == 0) {
@@ -145,9 +144,7 @@ MainApp::QuitRequested()
 	fSettingsWindow = NULL;
 
 	// store the current file panel ref in the global settings
-	mpSettings settings = Settings::CurrentSettings();
-	settings.filePanelFolder = fLastFilePanelFolder;
-	Settings::Default()->SaveSettings(settings);
+	Settings::Default()->SetFilePanelFolder(fLastFilePanelFolder);
 
 	return BApplication::QuitRequested();
 }
@@ -294,16 +291,12 @@ MainApp::MessageReceived(BMessage* message)
 				&& message->FindBool("audio only", &audioOnly) == B_OK
 				&& message->FindRect("window frame", &windowFrame) == B_OK
 				&& message->FindInt64("creation time", &creationTime) == B_OK) {
-				if (audioOnly) {
-					if (!fAudioWindowFrameSaved
-						|| creationTime < fLastSavedAudioWindowCreationTime) {
-						fAudioWindowFrameSaved = true;
-						fLastSavedAudioWindowCreationTime = creationTime;
-						mpSettings settings
-							= Settings::Default()->CurrentSettings();
-						settings.audioPlayerWindowFrame = windowFrame;
-						Settings::Default()->SaveSettings(settings);
-					}
+				if (audioOnly && (!fAudioWindowFrameSaved
+						|| creationTime < fLastSavedAudioWindowCreationTime)) {
+					fAudioWindowFrameSaved = true;
+					fLastSavedAudioWindowCreationTime = creationTime;
+
+					Settings::Default()->SetAudioPlayerWindowFrame(windowFrame);
 				}
 			}
 

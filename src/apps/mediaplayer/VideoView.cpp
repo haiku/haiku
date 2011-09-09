@@ -168,8 +168,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 				rgb_color key;
 				status_t ret = SetViewOverlay(bitmap, bitmap->Bounds(),
 					fVideoFrame, &key, B_FOLLOW_ALL,
-					B_OVERLAY_FILTER_HORIZONTAL
-					| B_OVERLAY_FILTER_VERTICAL);
+					B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
 				if (ret == B_OK) {
 					fOverlayKeyColor = key;
 					SetLowColor(key);
@@ -181,8 +180,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 
 					// update restrictions
 					overlay_restrictions restrictions;
-					if (bitmap->GetOverlayRestrictions(&restrictions)
-							== B_OK)
+					if (bitmap->GetOverlayRestrictions(&restrictions) == B_OK)
 						fOverlayRestrictions = restrictions;
 				} else {
 					// try again next time
@@ -391,8 +389,8 @@ VideoView::_DrawSubtitle()
 void
 VideoView::_AdoptGlobalSettings()
 {
-	mpSettings settings = Settings::CurrentSettings();
-		// thread safe
+	mpSettings settings;
+	Settings::Default()->Get(settings);
 
 	fUseOverlays = settings.useOverlays;
 	fUseBilinearScaling = settings.scaleBilinear;
