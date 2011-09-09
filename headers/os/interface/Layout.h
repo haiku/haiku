@@ -89,7 +89,6 @@ protected:
 private:
 			friend class BView;
 
-			bool				RemoveViewRecursive(BView* view);
 			bool				InvalidateLayoutsForView(BView* view);
 			bool				InvalidationLegal();
 			void				SetOwner(BView* owner);

@@ -4022,8 +4022,14 @@ BView::PreviousSibling() const
 bool
 BView::RemoveSelf()
 {
-	if (fParent && fParent->fLayoutData->fLayout)
-		return fParent->fLayoutData->fLayout->RemoveViewRecursive(this);
+	if (fParent && fParent->fLayoutData->fLayout) {
+		int32 itemCount = fLayoutData->fLayoutItems.CountItems();
+		for (int32 i = 0; i < itemCount; i++) {
+			BLayoutItem* item = fLayoutData->fLayoutItems.ItemAt(i);
+			item->Layout()->RemoveItem(item);
+			delete item;
+		}
+	}
 
 	return _RemoveSelf();
 }

@@ -168,6 +168,9 @@ BLayoutItem::SetLayout(BLayout* layout)
 	if (layout)
 		DetachedFromLayout(layout);
 
+	// TODO: is this the right place to do this?
+	// at this point, this->Layout() will return not exactly truthful
+	// values... this could cause problems in DetachedFromLayout();
 	if (BView* view = View()) {
 		if (layout && !fLayout) {
 			BView::Private(view).DeregisterLayoutItem(this);

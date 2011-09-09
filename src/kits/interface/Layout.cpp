@@ -11,9 +11,9 @@
 #include <new>
 #include <syslog.h>
 
+#include <AutoDeleter.h>
 #include <LayoutContext.h>
 #include <Message.h>
-#include <AutoDeleter.h>
 #include <View.h>
 #include <ViewPrivate.h>
 
@@ -195,10 +195,11 @@ BLayout::RemoveView(BView* child)
 	bool removed = false;
 
 	// a view can have any number of layout items - we need to remove them all
-	for (int32 i = fItems.CountItems(); i-- > 0;) {
-		BLayoutItem* item = ItemAt(i);
+	BView::Private viewPrivate(child);
+	for (int32 i = viewPrivate.CountLayoutItems() - 1; i >= 0; i--) {
+		BLayoutItem* item = viewPrivate.LayoutItemAt(i);
 
-		if (item->View() != child)
+		if (item->Layout() != this)
 			continue;
 
 		RemoveItem(i);
@@ -225,13 +226,15 @@ BLayout::RemoveItem(int32 index)
 		return NULL;
 
 	BLayoutItem* item = (BLayoutItem*)fItems.RemoveItem(index);
-
-	// if the item refers to a BView, we make sure it is removed from the
-	// parent view
+	// If this is the last item in use that refers to a certain BView,
+	// that BView now needs to be removed.
 	BView* view = item->View();
-	if (view && view->fParent == fTarget)
+	if (view && BView::Private(view).CountLayoutItems() == 0)
 		view->_RemoveSelf();
 
+	// TODO: Is this the right place/order to call these hooks?
+	// view->Parent() could be NULL, maybe that's not a problem..
+	
 	ItemRemoved(item, index);
 	item->SetLayout(NULL);
 	InvalidateLayout();
@@ -579,39 +582,19 @@ BLayout::LayoutContext() const
 
 
 bool
-BLayout::RemoveViewRecursive(BView* view)
-{
-	bool removed = RemoveView(view);
-	for (int32 i = fNestedLayouts.CountItems() - 1; i >= 0; i--) {
-		BLayout* nested = (BLayout*)fNestedLayouts.ItemAt(i);
-		removed |= nested->RemoveViewRecursive(view);
-	}
-	return removed;
-}
-
-
-bool
 BLayout::InvalidateLayoutsForView(BView* view)
 {
-	bool found = false;
-	for (int32 i = fNestedLayouts.CountItems() - 1; i >= 0; i--) {
-		BLayout* layout = (BLayout*)fNestedLayouts.ItemAt(i);
-		found |= layout->InvalidateLayoutsForView(view);
-	}
-
-	if (found)
-		return found;
-
-	if (!InvalidationLegal())
+	BView::Private viewPrivate(view);
+	int32 count = viewPrivate.CountLayoutItems();
+	if (count == 0)
 		return false;
 
-	for (int32 i = CountItems() - 1; i >= 0; i--) {
-		if (ItemAt(i)->View() == view) {
-			InvalidateLayout();
-			return true;
-		}
+	for (int32 i = 0; i < count; i++) {
+		BLayout* layout = viewPrivate.LayoutItemAt(i)->Layout();
+		if (layout->InvalidationLegal())
+			layout->InvalidateLayout();
 	}
-	return found;
+	return true;
 }
 
 
@@ -653,3 +636,4 @@ BLayout::SetTarget(BView* target)
 		InvalidateLayout();
 	}
 }
+
