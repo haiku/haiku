@@ -359,7 +359,8 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 
 	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
 		&offset) != B_OK) {
-		ERROR("%s: GPIO pin not within AtomBIOS!\n", __func__);
+		ERROR("%s: could't read GPIO_I2C_Info table from AtomBIOS index %d!\n",
+			__func__, index);
 		gConnector[connector]->connector_ddc_info.valid = false;
 		return B_ERROR;
 	}
