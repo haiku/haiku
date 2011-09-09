@@ -226,19 +226,17 @@ BLayout::RemoveItem(int32 index)
 		return NULL;
 
 	BLayoutItem* item = (BLayoutItem*)fItems.RemoveItem(index);
-	// If this is the last item in use that refers to a certain BView,
-	// that BView now needs to be removed.
-	BView* view = item->View();
-	if (view && BView::Private(view).CountLayoutItems() == 0)
-		view->_RemoveSelf();
-
-	// TODO: Is this the right place/order to call these hooks?
-	// view->Parent() could be NULL, maybe that's not a problem..
-	
 	ItemRemoved(item, index);
 	item->SetLayout(NULL);
-	InvalidateLayout();
 
+	// If this is the last item in use that refers to its BView,
+	// that BView now needs to be removed. UNLESS fTarget is NULL,
+	// in which case we leave the view as is. (See SetTarget() for more info)
+	BView* view = item->View();
+	if (fTarget && view && BView::Private(view).CountLayoutItems() == 0)
+		view->_RemoveSelf();
+
+	InvalidateLayout();
 	return item;
 }
 
@@ -624,8 +622,10 @@ void
 BLayout::SetTarget(BView* target)
 {
 	if (fTarget != target) {
+		/* With fTarget NULL, RemoveItem() will not remove the views from their
+		 * parent. This ensures that the views are not lost to the void.
+		 */
 		fTarget = NULL;
-			// only remove items, not views
 
 		// remove and delete all items
 		for (int32 i = CountItems() - 1; i >= 0; i--)
