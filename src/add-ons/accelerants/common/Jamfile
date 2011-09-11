@@ -9,9 +9,10 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 StaticLibrary libaccelerantscommon.a :
 	compute_display_timing.cpp
 	create_display_modes.cpp
-	video_configuration.cpp
 	ddc.c
 	decode_edid.c
 	dump_edid.c
 	i2c.c
+	validate_display_mode.cpp
+	video_configuration.cpp
 ;
