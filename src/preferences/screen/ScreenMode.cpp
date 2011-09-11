@@ -242,6 +242,36 @@ ScreenMode::GetOriginalMode(screen_mode& mode, int32 workspace) const
 }
 
 
+status_t
+ScreenMode::Set(const display_mode& mode, int32 workspace)
+{
+	if (!fUpdatedModes)
+		UpdateOriginalModes();
+
+	BScreen screen(fWindow);
+
+	if (workspace == ~0)
+		workspace = current_workspace();
+
+	// BScreen::SetMode() needs a non-const display_mode
+	display_mode nonConstMode;
+	memcpy(&nonConstMode, &mode, sizeof(display_mode));
+	return screen.SetMode(workspace, &nonConstMode, true);
+}
+
+
+status_t
+ScreenMode::Get(display_mode& mode, int32 workspace) const
+{
+	BScreen screen(fWindow);
+
+	if (workspace == ~0)
+		workspace = current_workspace();
+
+	return screen.GetMode(workspace, &mode);
+}
+
+
 /*!	This method assumes that you already reverted to the correct number
 	of workspaces.
 */
@@ -558,6 +588,18 @@ ScreenMode::ModeAt(int32 index)
 }
 
 
+const display_mode&
+ScreenMode::DisplayModeAt(int32 index)
+{
+	if (index < 0)
+		index = 0;
+	else if (index >= (int32)fModeCount)
+		index = fModeCount - 1;
+
+	return fModeList[index];
+}
+
+
 int32
 ScreenMode::CountModes()
 {
@@ -565,6 +607,9 @@ ScreenMode::CountModes()
 }
 
 
+/*!	Searches for a similar mode in the reported mode list, and if that does not
+	find a matching mode, it will compute the mode manually using the GTF.
+*/
 bool
 ScreenMode::_GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,40 +38,50 @@ struct screen_mode {
 
 class ScreenMode {
 public:
-							ScreenMode(BWindow* window);
-							~ScreenMode();
+								ScreenMode(BWindow* window);
+								~ScreenMode();
 
-			status_t		Set(const screen_mode& mode, int32 workspace = ~0);
-			status_t		Get(screen_mode& mode, int32 workspace = ~0) const;
-			status_t		GetOriginalMode(screen_mode &mode,
-								int32 workspace = ~0) const;
+			status_t			Set(const screen_mode& mode,
+									int32 workspace = ~0);
+			status_t			Get(screen_mode& mode,
+									int32 workspace = ~0) const;
+			status_t			GetOriginalMode(screen_mode &mode,
+									int32 workspace = ~0) const;
 
-			status_t		Revert();
-			void			UpdateOriginalModes();
+			status_t			Set(const display_mode& mode,
+									int32 workspace = ~0);
+			status_t			Get(display_mode& mode,
+									int32 workspace = ~0) const;
 
-			bool			SupportsColorSpace(const screen_mode& mode,
-								color_space space);
-			status_t		GetRefreshLimits(const screen_mode& mode,
-								float& min, float& max);
-			status_t		GetMonitorInfo(monitor_info& info,
-								float* _diagonalInches = NULL);
+			status_t			Revert();
+			void				UpdateOriginalModes();
 
-			status_t		GetDeviceInfo(accelerant_device_info& info);
+			bool				SupportsColorSpace(const screen_mode& mode,
+									color_space space);
+			status_t			GetRefreshLimits(const screen_mode& mode,
+									float& min, float& max);
+			status_t			GetMonitorInfo(monitor_info& info,
+									float* _diagonalInches = NULL);
 
-			screen_mode		ModeAt(int32 index);
-			int32			CountModes();
+			status_t			GetDeviceInfo(accelerant_device_info& info);
+
+			screen_mode			ModeAt(int32 index);
+			const display_mode&	DisplayModeAt(int32 index);
+			int32				CountModes();
 
 private:
-			bool			_GetDisplayMode(const screen_mode& mode,
-								display_mode& displayMode);
+			bool				_GetDisplayMode(const screen_mode& mode,
+									display_mode& displayMode);
 
-			BWindow*		fWindow;
-			display_mode*	fModeList;
-			uint32			fModeCount;
+private:
+			BWindow*			fWindow;
+			display_mode*		fModeList;
+			uint32				fModeCount;
 
-			bool			fUpdatedModes;
-			display_mode	fOriginalDisplayMode[32];
-			screen_mode		fOriginal[32];
+			bool				fUpdatedModes;
+			display_mode		fOriginalDisplayMode[32];
+			screen_mode			fOriginal[32];
 };
+
 
 #endif	/* SCREEN_MODE_H */
