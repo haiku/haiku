@@ -277,34 +277,66 @@ radeon_gpu_irq_setup()
 }
 
 
+static void
+lock_i2c(void* cookie, bool lock)
+{
+	ddc_info *info = (ddc_info*)cookie;
+
+	uint32 buffer = 0;
+
+	if (info->hw_capable == true) {
+		// Switch GPIO pads to ddc mode
+		buffer = Read32(OUT, info->mask_scl_reg);
+		buffer &= ~(1 << 16);
+		Write32(OUT, info->mask_scl_reg, buffer);
+	}
+
+	// Clear pins
+	buffer = Read32(OUT, info->gpio_a_scl_reg) & ~info->gpio_a_scl_shift;
+	Write32(OUT, info->gpio_a_scl_reg, buffer);
+	buffer = Read32(OUT, info->gpio_a_sda_reg) & ~info->gpio_a_sda_shift;
+	Write32(OUT, info->gpio_a_sda_reg, buffer);
+
+	// Set pins to input
+	buffer = Read32(OUT, info->gpio_en_scl_reg) & ~info->gpio_en_scl_shift;
+	Write32(OUT, info->gpio_en_scl_reg, buffer);
+	buffer = Read32(OUT, info->gpio_en_sda_reg) & ~info->gpio_en_sda_shift;
+	Write32(OUT, info->gpio_en_sda_reg, buffer);
+
+	// mask GPIO pins for software use
+	buffer = Read32(OUT, info->mask_scl_reg);
+	if (lock == true)
+		buffer |= info->mask_scl_shift;
+	else
+		buffer &= ~info->mask_scl_shift;
+	Write32(OUT, info->mask_scl_reg, buffer);
+	Read32(OUT, info->mask_scl_reg);
+
+	buffer = Read32(OUT, info->mask_sda_reg);
+	if (lock == true)
+		buffer |= info->mask_sda_shift;
+	else
+		buffer &= ~info->mask_sda_shift;
+	Write32(OUT, info->mask_sda_reg, buffer);
+	Read32(OUT, info->mask_sda_reg);
+}
+
+
 static status_t
 get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
 	ddc_info *info = (ddc_info*)cookie;
 
-	// software only access
-	//uint32 scl_maskVal = Read32(OUT, info->mask_scl_reg);
-	//uint32 sda_maskVal = Read32(OUT, info->mask_sda_reg);
-	//Write32(OUT, info->mask_scl_reg, 1);
-	//Write32(OUT, info->mask_sda_reg, 1);
+	lock_i2c(cookie, true);
+	uint32 scl = Read32(OUT, info->gpio_y_scl_reg) & info->gpio_y_scl_shift;
+	uint32 sda = Read32(OUT, info->gpio_y_sda_reg) & info->gpio_y_sda_shift;
+	lock_i2c(cookie, false);
 
-	// set read mode
-	uint32 scl_enVal = Read32(OUT, info->gpio_en_scl_reg);
-	uint32 sda_enVal = Read32(OUT, info->gpio_en_sda_reg);
-	Write32(OUT, info->gpio_en_scl_reg, 0);
-	Write32(OUT, info->gpio_en_sda_reg, 0);
-
-	*_clock = Read32(OUT, info->gpio_y_scl_reg);
-	*_data = Read32(OUT, info->gpio_y_sda_reg);
+	*_clock = (scl != 0);
+	*_data = (sda != 0);
 
 	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
 		__func__, info->gpio_id, *_clock, *_data);
-
-	// restore previous settings
-	//Write32(OUT, info->mask_scl_reg, scl_maskVal);
-	//Write32(OUT, info->mask_sda_reg, sda_maskVal);
-	Write32(OUT, info->gpio_en_scl_reg, scl_enVal);
-	Write32(OUT, info->gpio_en_sda_reg, sda_enVal);
 
 	return B_OK;
 }
@@ -315,33 +347,21 @@ set_i2c_signals(void* cookie, int clock, int data)
 {
 	ddc_info* info = (ddc_info*)cookie;
 
-	// software only access
-	uint32 scl_maskVal = Read32(OUT, info->mask_scl_reg);
-	uint32 sda_maskVal = Read32(OUT, info->mask_sda_reg);
-	Write32(OUT, info->mask_scl_reg, 1);
-	Write32(OUT, info->mask_sda_reg, 1);
+	lock_i2c(cookie, true);
+	uint32 scl = Read32(OUT, info->gpio_en_scl_reg)
+		& ~info->gpio_en_scl_shift;
+	uint32 sda = Read32(OUT, info->gpio_en_sda_reg)
+		& ~info->gpio_en_sda_shift;
 
-	// set write mode
-	uint32 scl_enVal = Read32(OUT, info->gpio_en_scl_reg);
-	uint32 sda_enVal = Read32(OUT, info->gpio_en_sda_reg);
-	Write32(OUT, info->gpio_en_scl_reg, 1);
-	Write32(OUT, info->gpio_en_sda_reg, 1);
+	scl |= clock ? 0 : info->gpio_en_scl_shift;
+	sda |= data ? 0 : info->gpio_en_sda_shift;
 
 	Write32(OUT, info->gpio_a_scl_reg, clock);
 	Write32(OUT, info->gpio_a_sda_reg, data);
-
-	// read back to improve reliability?
-	Read32(OUT, info->gpio_a_scl_reg);
-	Read32(OUT, info->gpio_a_sda_reg);
+	lock_i2c(cookie, false);
 
 	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
 		__func__, info->gpio_id, clock, data);
-
-	// restore previous settings
-	Write32(OUT, info->mask_scl_reg, scl_maskVal);
-	Write32(OUT, info->mask_sda_reg, sda_maskVal);
-	Write32(OUT, info->gpio_en_scl_reg, scl_enVal);
-	Write32(OUT, info->gpio_en_sda_reg, sda_enVal);
 
 	return B_OK;
 }
@@ -417,6 +437,13 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 
 		// populate gpio information
 		gConnector[connector]->connector_ddc_info.valid = true;
+
+		// TODO : what is hw_capable?
+		if (gpio->sucI2cId.sbfAccess.bfHW_Capable)
+			gConnector[connector]->connector_ddc_info.hw_capable = true;
+		else
+			gConnector[connector]->connector_ddc_info.hw_capable = true;
+
 		gConnector[connector]->connector_ddc_info.gpio_id = gpio_id;
 
 		// GPIO mask (Allows software to control the GPIO pad)

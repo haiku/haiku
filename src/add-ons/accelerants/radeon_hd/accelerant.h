@@ -140,6 +140,8 @@ struct pll_info {
 
 struct ddc_info {
 	bool	valid;
+	bool	hw_capable;
+
 	uint8	gpio_id;
 
 	uint16	mask_scl_reg;
