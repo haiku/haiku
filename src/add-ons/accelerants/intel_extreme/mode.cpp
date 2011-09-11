@@ -21,6 +21,7 @@
 #include <create_display_modes.h>
 #include <ddc.h>
 #include <edid.h>
+#include <validate_display_mode.h>
 
 
 #define TRACE_MODE
@@ -419,7 +420,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
 			>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
 		divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
-			>> DISPLAY_PLL_N_DIVISOR_SHIFT;		
+			>> DISPLAY_PLL_N_DIVISOR_SHIFT;
 	}
 
 	pll_limits limits;
@@ -428,7 +429,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
 			divisors.post1 = (pll & DISPLAY_PLL_IGD_POST1_DIVISOR_MASK)
-				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;			
+				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 		} else {
 			divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
 				>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
@@ -574,6 +575,27 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 }
 
 
+static bool
+sanitize_display_mode(display_mode& mode)
+{
+	// TODO: verify constraints - these are more or less taken from the
+	// radeon driver!
+	const display_constraints constraints = {
+		// resolution
+		320, 8192, 200, 4096,
+		// pixel clock
+		gInfo->shared_info->pll_info.min_frequency,
+		gInfo->shared_info->pll_info.max_frequency,
+		// horizontal
+		{8, 16, 8160, 24, 504, 15, 8192},
+		{1, 1, 4092, 2, 63, 1, 4096}
+	};
+
+	return sanitize_display_mode(mode, constraints,
+		gInfo->has_edid ? &gInfo->edid_info : NULL);
+}
+
+
 //	#pragma mark -
 
 
@@ -601,22 +623,10 @@ intel_propose_display_mode(display_mode *target, const display_mode *low,
 {
 	TRACE(("intel_propose_display_mode()\n"));
 
-	// just search for the specified mode in the list
+	sanitize_display_mode(*target);
 
-	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
-		display_mode *mode = &gInfo->mode_list[i];
-
-		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
-
-		if (target->virtual_width != mode->virtual_width
-			|| target->virtual_height != mode->virtual_height
-			|| target->space != mode->space)
-			continue;
-
-		*target = *mode;
-		return B_OK;
-	}
-	return B_BAD_VALUE;
+	return is_display_mode_within_bounds(*target, *low, *high)
+		? B_OK : B_BAD_VALUE;
 }
 
 
@@ -634,8 +644,10 @@ intel_set_display_mode(display_mode *mode)
 	// TODO: it may be acceptable to continue when using panel fitting or
 	// centering, since the data from propose_display_mode will not actually be
 	// used as is in this case.
-	if (intel_propose_display_mode(&target, mode, mode))
+	if (sanitize_display_mode(target)) {
+		TRACE(("intel_extreme: invalid mode set!"));
 		return B_BAD_VALUE;
+	}
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
@@ -779,7 +791,7 @@ if (first) {
 					| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
 						& DISPLAY_PLL_M1_DIVISOR_MASK)
 					| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-						& DISPLAY_PLL_M2_DIVISOR_MASK));				
+						& DISPLAY_PLL_M2_DIVISOR_MASK));
 			}
 			write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
 			read32(INTEL_DISPLAY_B_PLL);
@@ -819,7 +831,7 @@ if (first) {
 				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
 					& DISPLAY_PLL_M1_DIVISOR_MASK)
 				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M2_DIVISOR_MASK));	
+					& DISPLAY_PLL_M2_DIVISOR_MASK));
 		}
 
 		write32(INTEL_DISPLAY_B_PLL, dpll);
