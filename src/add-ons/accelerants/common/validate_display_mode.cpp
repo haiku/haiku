@@ -6,6 +6,8 @@
 
 #include <validate_display_mode.h>
 
+#include <string.h>
+
 
 static uint16
 round(uint16 value, uint16 resolution)
