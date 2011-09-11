@@ -327,10 +327,8 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
 	ddc_info *info = (ddc_info*)cookie;
 
-	lock_i2c(cookie, true);
 	uint32 scl = Read32(OUT, info->gpio_y_scl_reg) & info->gpio_y_scl_mask;
 	uint32 sda = Read32(OUT, info->gpio_y_sda_reg) & info->gpio_y_sda_mask;
-	lock_i2c(cookie, false);
 
 	*_clock = (scl != 0);
 	*_data = (sda != 0);
@@ -347,7 +345,6 @@ set_i2c_signals(void* cookie, int clock, int data)
 {
 	ddc_info* info = (ddc_info*)cookie;
 
-	lock_i2c(cookie, true);
 	uint32 scl = Read32(OUT, info->gpio_en_scl_reg)
 		& ~info->gpio_en_scl_mask;
 	uint32 sda = Read32(OUT, info->gpio_en_sda_reg)
@@ -358,7 +355,6 @@ set_i2c_signals(void* cookie, int clock, int data)
 
 	Write32(OUT, info->gpio_a_scl_reg, clock);
 	Write32(OUT, info->gpio_a_sda_reg, data);
-	lock_i2c(cookie, false);
 
 	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
 		__func__, info->gpio_id, clock, data);
@@ -382,16 +378,16 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 
-	void *vdif;
-	size_t vdifLength;
+	lock_i2c(bus.cookie, true);
+	status_t edid_result = ddc2_read_edid1(&bus, edid, NULL, NULL);
+	lock_i2c(bus.cookie, false);
 
-	if (ddc2_read_edid1(&bus, edid, &vdif, &vdifLength) != B_OK)
+	if (edid_result != B_OK)
 		return false;
 
 	TRACE("%s: found edid monitor on connector #%" B_PRId32 "\n",
 		__func__, connector);
 
-	free(vdif);
 	return true;
 }
 
