@@ -146,23 +146,23 @@ struct ddc_info {
 
 	uint16	mask_scl_reg;
 	uint16	mask_sda_reg;
-	uint16	mask_scl_shift;
-	uint16	mask_sda_shift;
+	uint16	mask_scl_mask;
+	uint16	mask_sda_mask;
 
 	uint16	gpio_en_scl_reg;
 	uint16	gpio_en_sda_reg;
-	uint16	gpio_en_scl_shift;
-	uint16	gpio_en_sda_shift;
+	uint16	gpio_en_scl_mask;
+	uint16	gpio_en_sda_mask;
 
 	uint16	gpio_y_scl_reg;
 	uint16	gpio_y_sda_reg;
-	uint16	gpio_y_scl_shift;
-	uint16	gpio_y_sda_shift;
+	uint16	gpio_y_scl_mask;
+	uint16	gpio_y_sda_mask;
 
 	uint16	gpio_a_scl_reg;
 	uint16	gpio_a_sda_reg;
-	uint16	gpio_a_scl_shift;
-	uint16	gpio_a_sda_shift;
+	uint16	gpio_a_scl_mask;
+	uint16	gpio_a_sda_mask;
 };
 
 

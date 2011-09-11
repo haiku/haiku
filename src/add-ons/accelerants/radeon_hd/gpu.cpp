@@ -292,31 +292,31 @@ lock_i2c(void* cookie, bool lock)
 	}
 
 	// Clear pins
-	buffer = Read32(OUT, info->gpio_a_scl_reg) & ~info->gpio_a_scl_shift;
+	buffer = Read32(OUT, info->gpio_a_scl_reg) & ~info->gpio_a_scl_mask;
 	Write32(OUT, info->gpio_a_scl_reg, buffer);
-	buffer = Read32(OUT, info->gpio_a_sda_reg) & ~info->gpio_a_sda_shift;
+	buffer = Read32(OUT, info->gpio_a_sda_reg) & ~info->gpio_a_sda_mask;
 	Write32(OUT, info->gpio_a_sda_reg, buffer);
 
 	// Set pins to input
-	buffer = Read32(OUT, info->gpio_en_scl_reg) & ~info->gpio_en_scl_shift;
+	buffer = Read32(OUT, info->gpio_en_scl_reg) & ~info->gpio_en_scl_mask;
 	Write32(OUT, info->gpio_en_scl_reg, buffer);
-	buffer = Read32(OUT, info->gpio_en_sda_reg) & ~info->gpio_en_sda_shift;
+	buffer = Read32(OUT, info->gpio_en_sda_reg) & ~info->gpio_en_sda_mask;
 	Write32(OUT, info->gpio_en_sda_reg, buffer);
 
 	// mask GPIO pins for software use
 	buffer = Read32(OUT, info->mask_scl_reg);
 	if (lock == true)
-		buffer |= info->mask_scl_shift;
+		buffer |= info->mask_scl_mask;
 	else
-		buffer &= ~info->mask_scl_shift;
+		buffer &= ~info->mask_scl_mask;
 	Write32(OUT, info->mask_scl_reg, buffer);
 	Read32(OUT, info->mask_scl_reg);
 
 	buffer = Read32(OUT, info->mask_sda_reg);
 	if (lock == true)
-		buffer |= info->mask_sda_shift;
+		buffer |= info->mask_sda_mask;
 	else
-		buffer &= ~info->mask_sda_shift;
+		buffer &= ~info->mask_sda_mask;
 	Write32(OUT, info->mask_sda_reg, buffer);
 	Read32(OUT, info->mask_sda_reg);
 }
@@ -328,8 +328,8 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 	ddc_info *info = (ddc_info*)cookie;
 
 	lock_i2c(cookie, true);
-	uint32 scl = Read32(OUT, info->gpio_y_scl_reg) & info->gpio_y_scl_shift;
-	uint32 sda = Read32(OUT, info->gpio_y_sda_reg) & info->gpio_y_sda_shift;
+	uint32 scl = Read32(OUT, info->gpio_y_scl_reg) & info->gpio_y_scl_mask;
+	uint32 sda = Read32(OUT, info->gpio_y_sda_reg) & info->gpio_y_sda_mask;
 	lock_i2c(cookie, false);
 
 	*_clock = (scl != 0);
@@ -349,12 +349,12 @@ set_i2c_signals(void* cookie, int clock, int data)
 
 	lock_i2c(cookie, true);
 	uint32 scl = Read32(OUT, info->gpio_en_scl_reg)
-		& ~info->gpio_en_scl_shift;
+		& ~info->gpio_en_scl_mask;
 	uint32 sda = Read32(OUT, info->gpio_en_sda_reg)
-		& ~info->gpio_en_sda_shift;
+		& ~info->gpio_en_sda_mask;
 
-	scl |= clock ? 0 : info->gpio_en_scl_shift;
-	sda |= data ? 0 : info->gpio_en_sda_shift;
+	scl |= clock ? 0 : info->gpio_en_scl_mask;
+	sda |= data ? 0 : info->gpio_en_sda_mask;
 
 	Write32(OUT, info->gpio_a_scl_reg, clock);
 	Write32(OUT, info->gpio_a_sda_reg, data);
@@ -452,9 +452,9 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.mask_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.mask_scl_shift
+		gConnector[connector]->connector_ddc_info.mask_scl_mask
 			= (1 << gpio->ucClkMaskShift);
-		gConnector[connector]->connector_ddc_info.mask_sda_shift
+		gConnector[connector]->connector_ddc_info.mask_sda_mask
 			= (1 << gpio->ucDataMaskShift);
 
 		// GPIO output / write (A) enable
@@ -463,9 +463,9 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.gpio_en_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_en_scl_shift
+		gConnector[connector]->connector_ddc_info.gpio_en_scl_mask
 			= (1 << gpio->ucClkEnShift);
-		gConnector[connector]->connector_ddc_info.gpio_en_sda_shift
+		gConnector[connector]->connector_ddc_info.gpio_en_sda_mask
 			= (1 << gpio->ucDataEnShift);
 
 		// GPIO output / write (A)
@@ -473,9 +473,9 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_a_scl_shift
+		gConnector[connector]->connector_ddc_info.gpio_a_scl_mask
 			= (1 << gpio->ucClkA_Shift);
-		gConnector[connector]->connector_ddc_info.gpio_a_sda_shift
+		gConnector[connector]->connector_ddc_info.gpio_a_sda_mask
 			= (1 << gpio->ucDataA_Shift);
 
 		// GPIO input / read (Y)
@@ -483,9 +483,9 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
 		gConnector[connector]->connector_ddc_info.gpio_y_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_y_scl_shift
+		gConnector[connector]->connector_ddc_info.gpio_y_scl_mask
 			= (1 << gpio->ucClkY_Shift);
-		gConnector[connector]->connector_ddc_info.gpio_y_sda_shift
+		gConnector[connector]->connector_ddc_info.gpio_y_sda_mask
 			= (1 << gpio->ucDataY_Shift);
 
 	}
