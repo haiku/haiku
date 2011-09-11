@@ -44,6 +44,7 @@
 #   define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 #define ATOM_COND_ABOVE		0
 #define ATOM_COND_ABOVEOREQUAL	1
@@ -641,7 +642,7 @@ atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 	if (execute) {
 		if (ctx->last_jump == (ctx->start + target)) {
 			if (ctx->last_jump_count > 128) {
-				TRACE("%s: DANGER! AtomBIOS stuck in infinite loop"
+				ERROR("%s: DANGER! AtomBIOS stuck in infinite loop"
 					" for more then 128 jumps... abort!\n", __func__);
 				ctx->abort = true;
 			} else {
@@ -1146,7 +1147,7 @@ atom_execute_table_locked(atom_context *ctx, int index, uint32 * params)
 			TRACE("%s: unknown (0x%" B_PRIX16 ")\n", __func__, ptr - 1);
 
 		if (ectx.abort == true) {
-			TRACE("AtomBios parser was aborted executing (0x%" B_PRIX16 ")\n",
+			ERROR("AtomBios parser was aborted executing (0x%" B_PRIX16 ")\n",
 				ptr - 1);
 			free(ectx.ws);
 			return B_ERROR;
@@ -1172,7 +1173,7 @@ atom_execute_table(atom_context *ctx, int index, uint32 *params)
 {
 	if (acquire_sem_etc(ctx->exec_sem, 1, B_RELATIVE_TIMEOUT, 5000000)
 		!= B_NO_ERROR) {
-		TRACE("%s: Timeout to obtain semaphore!\n", __func__);
+		ERROR("%s: Timeout to obtain semaphore!\n", __func__);
 		return B_ERROR;
 	}
 	/* reset reg block */
@@ -1211,7 +1212,7 @@ atom_parse(card_info *card, uint8 *bios)
 	atom_context *ctx = (atom_context*)malloc(sizeof(atom_context));
 
 	if (ctx == NULL) {
-		TRACE("%s: Error: No memory for atom_context mapping\n", __func__);
+		ERROR("%s: Error: No memory for atom_context mapping\n", __func__);
 		return NULL;
 	}
 
@@ -1219,13 +1220,13 @@ atom_parse(card_info *card, uint8 *bios)
 	ctx->bios = bios;
 
 	if (CU16(0) != ATOM_BIOS_MAGIC) {
-		TRACE("Invalid BIOS magic.\n");
+		ERROR("Invalid BIOS magic.\n");
 		free(ctx);
 		return NULL;
 	}
 	if (strncmp(CSTR(ATOM_ATI_MAGIC_PTR), ATOM_ATI_MAGIC,
 		strlen(ATOM_ATI_MAGIC))) {
-		TRACE("Invalid ATI magic.\n");
+		ERROR("Invalid ATI magic.\n");
 		free(ctx);
 		return NULL;
 	}
@@ -1233,7 +1234,7 @@ atom_parse(card_info *card, uint8 *bios)
 	int base = CU16(ATOM_ROM_TABLE_PTR);
 	if (strncmp(CSTR(base + ATOM_ROM_MAGIC_PTR), ATOM_ROM_MAGIC,
 		strlen(ATOM_ROM_MAGIC))) {
-		TRACE("Invalid ATOM magic.\n");
+		ERROR("Invalid ATOM magic.\n");
 		free(ctx);
 		return NULL;
 	}
