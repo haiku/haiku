@@ -132,6 +132,7 @@ main(int argc, char** argv)
 			case 'f':
 				fallbackMode = true;
 				setMode = true;
+				confirm = false;
 				break;
 			case 's':
 				shortOutput = true;
