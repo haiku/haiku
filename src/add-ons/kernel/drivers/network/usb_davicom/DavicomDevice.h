@@ -23,8 +23,7 @@
 
 class DavicomDevice {
 public:
-							DavicomDevice(usb_device device,
-								const char *description);
+							DavicomDevice(usb_device device, const char *description);
 		virtual				~DavicomDevice();
 
 		status_t			InitCheck() { return fStatus; };
@@ -55,10 +54,8 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 
 		status_t			_SetupEndpoints();
 
-		status_t			_ReadRegister(uint8 reg, size_t size,
-								void* buffer);
-		status_t			_WriteRegister(uint8 reg, size_t size,
-								uint8* buffer);
+		status_t			_ReadRegister(uint8 reg, size_t size, uint8* buffer);
+		status_t			_WriteRegister(uint8 reg, size_t size, uint8* buffer);
 		status_t			_Write1Register(uint8 reg, uint8 buffer);
 
 static const int			kFrameSize = 1518;
