@@ -162,10 +162,14 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 	// if the item refers to a BView, we make sure it is added to the parent
 	// view
 	BView* view = item->View();
-	AutoDeleter<BView, ViewRemover> remover(view);
-	if (view && view->fParent != fTarget && !fTarget->_AddChild(view, NULL)) {
-		remover.Detach(); // view wasn't added
-		return false;
+	AutoDeleter<BView, ViewRemover> remover(NULL);
+		// In case of errors, we don't want to leave this view added where it
+		// shouldn't be.
+	if (view && view->fParent != fTarget) {
+		if (!fTarget->_AddChild(view, NULL))
+			return false;
+		else
+			remover.SetTo(view);
 	}
 
 	// validate the index
