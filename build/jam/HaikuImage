@@ -174,7 +174,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 	$(X86_ONLY)ipro100 $(X86_ONLY)ipro1000 $(X86_ONLY)jmicron2x0
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)nforce $(X86_ONLY)pcnet pegasus
 	$(X86_ONLY)rtl8139 $(X86_ONLY)rtl81xx sis900
-	$(X86_ONLY)syskonnect usb_asix usb_ecm $(X86_ONLY)via_rhine
+	$(X86_ONLY)syskonnect usb_davicom usb_asix usb_ecm $(X86_ONLY)via_rhine
 	$(X86_ONLY)vt612x wb840
 
 	# WLAN drivers
