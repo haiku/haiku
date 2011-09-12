@@ -1,60 +1,53 @@
 /*
- *  Davicom 9601 USB 1.1 Ethernet Driver.
- *  Copyright 2009 Adrien Destugues <pulkomandy@gmail.com>
+ *	Davicom DM9601 USB 1.1 Ethernet Driver.
+ *	Copyright (c) 2008, 2011 Siarzhuk Zharski <imker@gmx.li>
+ *	Copyright (c) 2009 Adrien Destugues <pulkomandy@gmail.com>
  *	Distributed under the terms of the MIT license.
  *
- *	Heavily based on code of 
- *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
- *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
- *	Distributed under the terms of the MIT license.
- *	
+ *	Heavily based on code of the
  *	Driver for USB Ethernet Control Model devices
  *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
  *	Distributed under the terms of the MIT license.
- *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#include <lock.h> // for mutex
-#else
-#include "BeOSCompatibility.h" // for pseudo mutex
-#endif
+#include "Driver.h"
+
+#include <stdio.h>
+
+#include <lock.h>
+#include <util/AutoLock.h>
 
 #include "DavicomDevice.h"
-#include "Driver.h"
 #include "Settings.h"
+
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 static const char *sDeviceBaseName = "net/usb_davicom/";
 DavicomDevice *gDavicomDevices[MAX_DEVICES];
 char *gDeviceNames[MAX_DEVICES + 1];
 usb_module_info *gUSBModule = NULL;
-
-usb_support_descriptor gSupportedDevices[] = {
-	{ 0, 0, 0, 0x0fe6, 0x8101}, // "Sunrising JP108"
-	{ 0, 0, 0, 0x07aa, 0x9601}, // "Corega FEther USB-TXC"
-	{ 0, 0, 0, 0x0a46, 0x9601}, // "Davicom USB-100"
-	{ 0, 0, 0, 0x0a46, 0x6688}, // "ZT6688 USB NIC"
-	{ 0, 0, 0, 0x0a46, 0x0268}, // "ShanTou ST268 USB NIC"
-	{ 0, 0, 0, 0x0a46, 0x8515}, // "ADMtek ADM8515 USB NIC"
-	{ 0, 0, 0, 0x0a47, 0x9601}, // "Hirose USB-100"
-	{ 0, 0, 0, 0x0a46, 0x9000}	// "DM9000E"
-};
-
 mutex gDriverLock;
-// auto-release helper class
-class DriverSmartLock {
-public:
-	DriverSmartLock()  { mutex_lock(&gDriverLock);   }
-	~DriverSmartLock() { mutex_unlock(&gDriverLock); }
+
+
+// IMPORTANT: keep entries sorted by ids to let the
+// binary search lookup procedure work correctly !!!
+DeviceInfo gSupportedDevices[] = {
+	{ { { 0x01e1, 0x9601 } }, "Noname DM9601" },
+	{ { { 0x07aa, 0x9601 } }, "Corega FEther USB-TXC" },
+	{ { { 0x0a46, 0x0268 } }, "ShanTou ST268 USB NIC" },
+	{ { { 0x0a46, 0x6688 } }, "ZT6688 USB NIC" },
+	{ { { 0x0a46, 0x8515 } }, "ADMtek ADM8515 USB NIC" },
+	{ { { 0x0a46, 0x9000 } }, "DM9000E" },
+	{ { { 0x0a46, 0x9601 } }, "Davicom DM9601" },
+	{ { { 0x0a47, 0x9601 } }, "Hirose USB-100" },
+	{ { { 0x0fe6, 0x8101 } }, "Sunrising SR9600" },
+	{ { { 0x0fe6, 0x9700 } }, "Kontron DM9601" }
 };
+
 
 DavicomDevice *
-create_davicom_device(usb_device device)
+lookup_and_create_device(usb_device device)
 {
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
@@ -64,18 +57,22 @@ create_davicom_device(usb_device device)
 		return NULL;
 	}
 
-#define IDS(__vendor, __product) (((__vendor) << 16) | (__product))
+	TRACE("trying %#06x:%#06x.\n", 
+			deviceDescriptor->vendor_id, deviceDescriptor->product_id);
 	
-	switch(IDS(deviceDescriptor->vendor_id, deviceDescriptor->product_id)) {
-		case IDS(0x0fe6, 0x8101): return new DavicomDevice(device, "Sunrising JP108");
-		case IDS(0x07aa, 0x9601): return new DavicomDevice(device, "Corega FEther USB-TXC");
-		case IDS(0x0a46, 0x9601): return new DavicomDevice(device, "Davicom USB-100");
-		case IDS(0x0a46, 0x6688): return new DavicomDevice(device, "ZT6688 USB NIC");
-		case IDS(0x0a46, 0x0268): return new DavicomDevice(device, "ShanTou ST268 USB NIC");
-		case IDS(0x0a46, 0x8515): return new DavicomDevice(device, "ADMtek ADM8515 USB NIC");
-		case IDS(0x0a47, 0x9601): return new DavicomDevice(device, "Hirose USB-100");
-		case IDS(0x0a46, 0x9000): return new DavicomDevice(device, "DM9000E");
+	// use binary search to lookup device in table
+	DeviceInfo::Id id = { { deviceDescriptor->vendor_id, 
+							deviceDescriptor->product_id } };
+	int left  = -1;
+	int right = _countof(gSupportedDevices);
+	while((right - left) > 1) {
+		int i = (left + right) / 2;
+		((gSupportedDevices[i].Key() < id.fKey) ? left : right) = i;
 	}
+
+	if(gSupportedDevices[right].Key() == id.fKey) 
+		return new DavicomDevice(device, gSupportedDevices[right]);
+
 	return NULL;
 }
 
@@ -85,7 +82,7 @@ usb_davicom_device_added(usb_device device, void **cookie)
 {
 	*cookie = NULL;
 
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker lock(gDriverLock); // released on exit
 
 	// check if this is a replug of an existing device first
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
@@ -101,7 +98,7 @@ usb_davicom_device_added(usb_device device, void **cookie)
 	}
 
 	// no such device yet, create a new one
-	DavicomDevice *davicomDevice = create_davicom_device(device);
+	DavicomDevice *davicomDevice = lookup_and_create_device(device);
 	if (davicomDevice == 0) {
 		return ENODEV;
 	}
@@ -140,7 +137,7 @@ usb_davicom_device_added(usb_device device, void **cookie)
 status_t
 usb_davicom_device_removed(void *cookie)
 {
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker lock(gDriverLock); // released on exit
 
 	DavicomDevice *device = (DavicomDevice *)cookie;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
@@ -161,7 +158,7 @@ usb_davicom_device_removed(void *cookie)
 }
 
 
-//#pragma mark -
+// #pragma mark -
 
 
 status_t
@@ -180,9 +177,9 @@ init_driver()
 		return status;
 
 	load_settings();
-	
+
 	TRACE_ALWAYS("%s\n", kVersion);
-	
+
 	for (int32 i = 0; i < MAX_DEVICES; i++)
 		gDavicomDevices[i] = NULL;
 
@@ -194,8 +191,15 @@ init_driver()
 		&usb_davicom_device_removed
 	};
 
-	gUSBModule->register_driver(DRIVER_NAME, gSupportedDevices, 
-		sizeof(gSupportedDevices) / sizeof(usb_support_descriptor), NULL);
+	const size_t count = _countof(gSupportedDevices);
+	static usb_support_descriptor sDescriptors[count] = {{ 0 }};
+
+	for(size_t i = 0; i < count; i++) {
+		sDescriptors[i].vendor  = gSupportedDevices[i].VendorId();
+		sDescriptors[i].product = gSupportedDevices[i].ProductId();
+	}
+
+	gUSBModule->register_driver(DRIVER_NAME, sDescriptors, count, NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }
@@ -221,7 +225,7 @@ uninit_driver()
 
 	mutex_destroy(&gDriverLock);
 	put_module(B_USB_MODULE_NAME);
-	
+
 	release_settings();
 }
 
@@ -229,7 +233,7 @@ uninit_driver()
 static status_t
 usb_davicom_open(const char *name, uint32 flags, void **cookie)
 {
-	DriverSmartLock driverLock; // released on exit
+	MutexLocker lock(gDriverLock); // released on exit
 
 	*cookie = NULL;
 	status_t status = ENODEV;
@@ -280,9 +284,9 @@ static status_t
 usb_davicom_free(void *cookie)
 {
 	DavicomDevice *device = (DavicomDevice *)cookie;
-	
-	DriverSmartLock driverLock; // released on exit
-	
+
+	MutexLocker lock(gDriverLock); // released on exit
+
 	status_t status = device->Free();
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gDavicomDevices[i] == device) {
@@ -307,8 +311,8 @@ publish_devices()
 		gDeviceNames[i] = NULL;
 	}
 
-	DriverSmartLock driverLock; // released on exit
-	
+	MutexLocker lock(gDriverLock); // released on exit
+
 	int32 deviceCount = 0;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gDavicomDevices[i] == NULL)
@@ -320,7 +324,7 @@ publish_devices()
 			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
 			deviceCount++;
 		} else
-			TRACE_ALWAYS("Error: out of memory during allocating device name.\n");
+			TRACE_ALWAYS("Error: out of memory during allocating dev.name.\n");
 	}
 
 	gDeviceNames[deviceCount] = NULL;
@@ -338,8 +342,8 @@ find_device(const char *name)
 		usb_davicom_control,
 		usb_davicom_read,
 		usb_davicom_write,
-		NULL,				/* select */
-		NULL				/* deselect */
+		NULL,				// select
+		NULL				// deselect
 	};
 
 	return &deviceHooks;

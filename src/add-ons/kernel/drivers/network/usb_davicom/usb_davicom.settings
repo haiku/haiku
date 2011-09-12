@@ -1,25 +1,25 @@
 ##
-##	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
-##	Copyright (c) 2008 S.Zharski <imker@gmx.li>
+##	Davicom DM9601 USB 1.1 Ethernet Driver.
+##	Copyright (c) 2008, 2011 Siarzhuk Zharski <imker@gmx.li>
 ##	Distributed under the terms of the MIT license.
 ##	
 
 ## trace [on|off] - activate additional tracing.
 ## default value: off
 
-trace on 
+# trace on 
 
 ## logfile [full path to private log file] 
 ## default path value: /var/log/usb_davicom.log
 ## if disabled - all output goes to syslog
 
-logfile /var/log/usb_davicom.log
+# logfile /var/log/usb_davicom.log
 
 ## reset_logfile [on|off] - truncate private log file on driver/system restart
 ## default value: off
 ##
 
-reset_logfile on
+# reset_logfile on
 
 
 ## add_timestamp  [on|off]  - add time of writing the string in private log file.
@@ -27,6 +27,12 @@ reset_logfile on
 ##
 
 # add_timestamp off
+
+###########################################################################
+##
+## Following settings are usable only with special version of the driver
+## compiled with UDAV_TRACE defined. Look into Driver.h for details.
+##
 
 ## trace_state [on|off] - activate state tracing. Statistic about of 
 ##                       media state.
@@ -45,3 +51,10 @@ reset_logfile on
 ## default value: off
 
 # trace_tx on
+
+## trace_stats [on|off] - activate tx/rx error counters tracing. 
+##                       
+## default value: off
+
+# trace_stats on
+
