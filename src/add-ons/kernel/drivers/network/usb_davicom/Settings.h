@@ -25,8 +25,14 @@ void usb_davicom_trace(bool force, const char *func, const char *fmt, ...);
 #define	TRACE(x...)			usb_davicom_trace(false, __func__, x)
 #define TRACE_ALWAYS(x...)	usb_davicom_trace(true,  __func__, x)
 
-extern bool gTraceFlow;
-#define TRACE_FLOW(x...)	usb_davicom_trace(gTraceFlow, NULL, x)
+extern bool gTraceState;
+#define TRACE_STATE(x...)	usb_davicom_trace(gTraceState, NULL, x)
+
+extern bool gTraceRX;
+#define TRACE_RX(x...)	usb_davicom_trace(gTraceRX, NULL, x)
+
+extern bool gTraceTX;
+#define TRACE_TX(x...)	usb_davicom_trace(gTraceTX, NULL, x)
 
 #define TRACE_RET(result)	usb_davicom_trace(false, __func__, \
 									"Returns:%#010x\n", result);

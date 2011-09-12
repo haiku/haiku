@@ -17,7 +17,9 @@
 bool gTraceOn = false;
 bool gTruncateLogFile = false;
 bool gAddTimeStamp = true;
-bool gTraceFlow = false;
+bool gTraceState = false;
+bool gTraceRX = false;
+bool gTraceTX = false;
 static char *gLogFilePath = NULL;
 mutex gLogLock;
 
@@ -40,7 +42,9 @@ void load_settings()
 		return;
 
 	gTraceOn = get_driver_boolean_parameter(handle, "trace", gTraceOn, true);
-	gTraceFlow = get_driver_boolean_parameter(handle, "trace_flow", gTraceFlow, true);
+	gTraceState = get_driver_boolean_parameter(handle, "trace_state", gTraceState, true);
+	gTraceRX = get_driver_boolean_parameter(handle, "trace_rx", gTraceRX, true);
+	gTraceTX = get_driver_boolean_parameter(handle, "trace_tx", gTraceTX, true);
 	gTruncateLogFile = get_driver_boolean_parameter(handle,	"truncate_logfile", 
 						gTruncateLogFile, true);
 	gAddTimeStamp = get_driver_boolean_parameter(handle, "add_timestamp", 

@@ -1,22 +1,21 @@
 /*
  *	Davicom DM9601 USB 1.1 Ethernet Driver.
  *	Copyright (c) 2009 Adrien Destugues <pulkomandy@gmail.com>
+ *	Copyright (c) 2008, 2011 Siarzhuk Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
  *
- *	Heavily based on code of
- *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
- *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
- *	Distributed under the terms of the MIT license.
- *
+ *	Heavily based on code of the 
  *	Driver for USB Ethernet Control Model devices
  *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
  *	Distributed under the terms of the MIT license.
  *
  */
 
+
+#include "DavicomDevice.h"
+
 #include "Driver.h"
 #include "Settings.h"
-#include "DavicomDevice.h"
 
 
 // Vendor commands
@@ -54,6 +53,21 @@
 #define GPCR_GEP_CNTL0	0x01	// Power Down function
 
 #define GPR_GEP_GEPIO0	0x01	// Power down
+
+#define EPCR		0x0b	// EEPROM/PHY Control Register
+#define EPCR_EPOS	0x08	// EEPROM/PHY Operation Select
+#define EPCR_ERPRR	0x04	// EEPROM/PHY Register Read Command
+#define EPCR_ERPRW	0x02	// EEPROM/PHY Register Write Command
+
+#define EPAR		0x0c	// EEPROM/PHY Control Register
+#define EPAR_ADDR0	0x40	// EEPROM/PHY Address 
+#define EPAR_MASK	0x1f	// mask [0:5]
+
+#define EPDRL		0x0d	// EEPROM/PHY Data Register
+
+#define USBCR		0xf4	// USB Control Register
+#define EP3ACK		0x20	// ACK with 8-byte data on interrupt EP
+#define EP3NACK		0x10	// Supress ACK on interrupt EP
 
 //TODO: multicast support
 //TODO: set media state support
@@ -93,7 +107,163 @@ DavicomDevice::_Write1Register(uint8 reg, uint8 value)
 	size_t actualLength;
 	status_t result = gUSBModule->send_request(fDevice,
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-		WRITE1_REGISTER, 0, reg, 1, &value, &actualLength);
+		WRITE1_REGISTER, value, reg, 0, NULL, &actualLength);
+	return result;
+}
+
+
+status_t
+DavicomDevice::_ReadMII(uint8 reg, uint16* data)
+{
+	// select PHY and set PHY register address
+	status_t result = _Write1Register(EPAR, EPAR_ADDR0 | (reg & EPAR_MASK));
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to set MII address %#x. Error:%#x\n", reg, result);
+		return result;
+	}
+	
+	// select PHY operation and initiate reading
+	result = _Write1Register(EPCR, EPCR_EPOS | EPCR_ERPRR);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to starting MII reading. Error:%#x\n", result);
+		return result;
+	}
+
+	// finalize writing
+	uint8 control = 0;
+	result = _ReadRegister(EPCR, 1, &control);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to read EPCR register. Error:%#x\n", result);
+		return result;
+	}
+
+	result = _Write1Register(EPCR, control & ~EPCR_ERPRR);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to write EPCR register. Error:%#x\n", result);
+		return result;
+	}
+
+	// retrieve the result from data registers
+	uint8 values[2] = { 0 };
+	result = _ReadRegister(EPDRL, 2, values);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to retrieve data %#x. Error:%#x\n", data, result);
+		return result;
+	}
+
+	*data = values[0] | values[1] << 8;  
+	return result;
+}
+
+
+status_t
+DavicomDevice::_WriteMII(uint8 reg, uint16 data)
+{
+	// select PHY and set PHY register address
+	status_t result = _Write1Register(EPAR, EPAR_ADDR0 | (reg & EPAR_MASK));
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to set MII address %#x. Error:%#x\n", reg, result);
+		return result;
+	}
+
+	// put the value to data register
+	uint8 values[] = { data & 0xff, ( data >> 8 ) & 0xff };
+	result = _WriteRegister(EPDRL, sizeof(uint16), values);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to put data %#x. Error:%#x\n", data, result);
+		return result;
+	}
+
+	// select PHY operation and initiate writing
+	result = _Write1Register(EPCR, EPCR_EPOS | EPCR_ERPRW);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to starting MII wrintig. Error:%#x\n", result);
+		return result;
+	}
+
+	// finalize writing
+	uint8 control = 0;
+	result = _ReadRegister(EPCR, 1, &control);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to read EPCR register. Error:%#x\n", result);
+		return result;
+	}
+
+	result = _Write1Register(EPCR, control & ~EPCR_ERPRW);
+	if (result != B_OK)
+		TRACE_ALWAYS("Failed to write EPCR register. Error:%#x\n", result);
+	
+	return result;
+}
+
+
+status_t
+DavicomDevice::_InitMII()
+{
+	uint16 control = 0;
+	status_t result = _ReadMII(0, &control); // read BMCR
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to read BMCR register. Error:%#x\n", result);
+		return result;
+	}
+
+	result = _WriteMII(0, control & ~0x0400); // clear Isolate flag
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to write BMCR register. Error:%#x\n", result);
+		return result;
+	}
+
+	result = _WriteMII(0, 0x8000); // write reset to BMCR
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to reset BMCR register. Error:%#x\n", result);
+		return result;
+	}
+
+	uint16 id01 = 0, id02 = 0;
+	result = _ReadMII(0x02, &id01); // read PHY_ID 0
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to read PHY ID 0. Error:%#x\n", result);
+		return result;
+	}
+
+	result = _ReadMII(0x03, &id02); // read PHY_ID 1
+	if (result != B_OK) {
+		TRACE_ALWAYS("Failed to read PHY ID 1. Error:%#x\n", result);
+		return result;
+	}
+
+#define MII_OUI(id1, id2)       (((id1) << 6) | ((id2) >> 10))
+#define MII_MODEL(id2)          (((id2) & 0x03f0) >> 4)
+#define MII_REV(id2)             ((id2) & 0x000f)
+
+	TRACE_ALWAYS("MII Info: OUI:%04x; Model:%04x; rev:%02x.\n",
+			MII_OUI(id01, id02), MII_MODEL(id02), MII_REV(id02));
+
+	return result;
+}
+
+
+status_t
+DavicomDevice::_EnableInterrupts(bool enable)
+{
+	uint8 control = 0;
+	status_t result = _ReadRegister(USBCR, 1, &control);
+	if(result != B_OK) {
+		TRACE_ALWAYS("Error of reading USB control register:%#010x\n", result);
+		return result;
+	}
+
+	if (enable) {
+		control |= EP3ACK;
+		control &= ~EP3NACK;
+	} else {
+		control &= ~EP3ACK;
+	}
+
+	result = _Write1Register(USBCR, control);
+	if(result != B_OK)
+		TRACE_ALWAYS("Error of setting USB control register:%#010x\n", result);
+
 	return result;
 }
 
@@ -109,6 +279,7 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		fNotifyEndpoint(0),
 		fReadEndpoint(0),
 		fWriteEndpoint(0),
+		fMaxTXPacketSize(0),
 		fNotifyReadSem(-1),
 		fNotifyWriteSem(-1),
 		fNotifyBuffer(NULL),
@@ -150,7 +321,7 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		return;
 	}
 
-	// TODO : others inits here ?
+	_InitMII();
 
 	fStatus = B_OK;
 }
@@ -192,6 +363,8 @@ DavicomDevice::Open(uint32 flags)
 		return result;
 	}
 
+	result = _EnableInterrupts(true); 
+
 	fNonBlocking = (flags & O_NONBLOCK) == O_NONBLOCK;
 	fOpen = true;
 	return result;
@@ -205,6 +378,8 @@ DavicomDevice::Close()
 		fOpen = false;
 		return B_OK;
 	}
+	
+	_EnableInterrupts(false); 
 
 	// wait until possible notification handling finished...
 	while (atomic_add(&fInsideNotify, 0) != 0)
@@ -238,16 +413,16 @@ DavicomDevice::Read(uint8 *buffer, size_t *numBytes)
 		return B_DEVICE_NOT_FOUND;
 	}
 
-	TRACE_FLOW("Request %d bytes.\n", numBytesToRead);
+//	TRACE_RX("Request %d bytes.\n", numBytesToRead);
 
 	uint8 header[kRXHeaderSize];
 	iovec rxData[] = {
-		{ &header, kRXHeaderSize },
+		{ header, kRXHeaderSize },
 		{ buffer,  numBytesToRead }
 	};
 
 	status_t result = gUSBModule->queue_bulk_v(fReadEndpoint,
-		rxData, 1, _ReadCallback, this);
+		rxData, 2, _ReadCallback, this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -291,7 +466,7 @@ DavicomDevice::Read(uint8 *buffer, size_t *numBytes)
 			*numBytes, fActualLengthRead - kRXHeaderSize);
 	}
 
-	TRACE_FLOW("Read %d bytes.\n", *numBytes);
+//	TRACE_RX("Read %d bytes.\n", *numBytes);
 	return B_OK;
 }
 
@@ -320,19 +495,26 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 		return B_ERROR;
 	}
 
-	TRACE_FLOW("Write %d bytes.\n", numBytesToWrite);
+	TRACE_TX("Write %d bytes.\n", numBytesToWrite);
 
-	uint8 header[kTXHeaderSize];
-	header[0] = *numBytes & 0xFF;
-	header[1] = *numBytes >> 8;
+	uint16 length = numBytesToWrite;
+	size_t count = 2;
+	if (((numBytesToWrite + 2) % fMaxTXPacketSize) == 0) {
+		length++;
+		count++;
+	}
+
+	uint8 header[kTXHeaderSize] = { length & 0xFF, length >> 8 };
+	uint8 padding = 0;
 
 	iovec txData[] = {
-		{ &header, kTXHeaderSize },
-		{ (uint8*)buffer, numBytesToWrite }
+		{ header, kTXHeaderSize },
+		{ (uint8*)buffer, numBytesToWrite },
+		{ &padding, 1 }
 	};
 
 	status_t result = gUSBModule->queue_bulk_v(fWriteEndpoint,
-		txData, 2, _WriteCallback, this);
+		txData, count/*2*/, _WriteCallback, this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -352,7 +534,7 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 
 	*numBytes = fActualLengthWrite - kTXHeaderSize;;
 
-	TRACE_FLOW("Written %d bytes.\n", *numBytes);
+	TRACE_TX("Written %d bytes.\n", *numBytes);
 	return B_OK;
 }
 
@@ -568,6 +750,7 @@ DavicomDevice::_SetupEndpoints()
 	fNotifyEndpoint = interface->endpoint[notifyEndpoint].handle;
 	fReadEndpoint   = interface->endpoint[readEndpoint  ].handle;
 	fWriteEndpoint  = interface->endpoint[writeEndpoint ].handle;
+	fMaxTXPacketSize = interface->endpoint[writeEndpoint].descr->max_packet_size;
 
 	return B_OK;
 }
@@ -589,18 +772,21 @@ DavicomDevice::ReadMACAddress(ether_address_t *address)
 status_t
 DavicomDevice::StopDevice()
 {
-	/*
-	status_t result = WriteRXControlRegister(0);
+	uint8 control = 0;
 
-	if(result != B_OK) {
-		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
+	// disable RX
+	status_t result = _ReadRegister(RCR, 1, &control);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error reading RCR: %#010x.\n", result);
+		return result;
 	}
 
-	TRACE_RET(result);
+	control &= ~RCR_RXEN;
+	result = _Write1Register(RCR, control);
+	if (result != B_OK)
+		TRACE_ALWAYS("Error writing %#02X to RCR: %#010x.\n", control, result);
+
 	return result;
-	*/
-	TRACE_ALWAYS("Stop device not implemented\n");
-	return B_ERROR;
 }
 
 
@@ -646,7 +832,7 @@ void
 DavicomDevice::_ReadCallback(void *cookie, int32 status, void *data,
 	uint32 actualLength)
 {
-	TRACE_FLOW("ReadCB: %d bytes; status:%#010x\n", actualLength, status);
+//	TRACE_RX("ReadCB: %d bytes; status:%#010x\n", actualLength, status);
 	DavicomDevice *device = (DavicomDevice *)cookie;
 	device->fActualLengthRead = actualLength;
 	device->fStatusRead = status;
@@ -658,7 +844,7 @@ void
 DavicomDevice::_WriteCallback(void *cookie, int32 status, void *data,
 	uint32 actualLength)
 {
-	TRACE_FLOW("WriteCB: %d bytes; status:%#010x\n", actualLength, status);
+	TRACE_TX("WriteCB: %d bytes; status:%#010x\n", actualLength, status);
 	DavicomDevice *device = (DavicomDevice *)cookie;
 	device->fActualLengthWrite = actualLength;
 	device->fStatusWrite = status;
@@ -700,58 +886,64 @@ DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 status_t
 DavicomDevice::StartDevice()
 {
-	uint8 registerValue = 0;
+	uint8 control = 0;
 
-	/* disable loopback  */
-	status_t result = _ReadRegister(NCR, 1, &registerValue);
+	// disable loopback
+	status_t result = _ReadRegister(NCR, 1, &control);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading NCR: %#010x.\n", result);
 		return result;
 	}
-	if (registerValue & NCR_EXT_PHY)
+
+	if (control & NCR_EXT_PHY)
 		TRACE_ALWAYS("Device uses external PHY\n");
-	registerValue &= ~NCR_LBK;
-	result = _Write1Register(NCR, registerValue);
+
+	control &= ~NCR_LBK;
+	result = _Write1Register(NCR, control);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to NCR: %#010x.\n", registerValue, result);
+		TRACE_ALWAYS("Error writing %#02X to NCR: %#010x.\n", control, result);
 		return result;
 	}
 
-	/* Initialize RX control register */
-	result = _ReadRegister(RCR, 1, &registerValue);
+	// Initialize RX control register, enable RX and activate multicast
+	result = _ReadRegister(RCR, 1, &control);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading RCR: %#010x.\n", result);
 		return result;
 	}
-	registerValue &= RCR_DIS_LONG & RCR_DIS_CRC & RCR_RXEN;
-	result = _Write1Register(RCR, registerValue);
+
+	// TODO: do not forget handle promiscous mode correctly in the future!!!
+	control |= RCR_DIS_LONG | RCR_DIS_CRC | RCR_RXEN | RCR_ALL;
+	result = _Write1Register(RCR, control);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to RCR: %#010x.\n", registerValue, result);
+		TRACE_ALWAYS("Error writing %#02X to RCR: %#010x.\n", control, result);
 		return result;
 	}
 
-	/* clear POWER_DOWN state of internal PHY */
-	result = _ReadRegister(GPCR, 1, &registerValue);
+	// clear POWER_DOWN state of internal PHY
+	result = _ReadRegister(GPCR, 1, &control);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading GPCR: %#010x.\n", result);
 		return result;
 	}
-	registerValue &= GPCR_GEP_CNTL0;
-	result = _Write1Register(GPCR, registerValue);
+
+	control |= GPCR_GEP_CNTL0;
+	result = _Write1Register(GPCR, control);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to GPCR: %#010x.\n", registerValue, result);
+		TRACE_ALWAYS("Error writing %#02X to GPCR: %#010x.\n", control, result);
 		return result;
 	}
 
-	result = _ReadRegister(GPR, 1, &registerValue);
+	result = _ReadRegister(GPR, 1, &control);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading GPR: %#010x.\n", result);
 		return result;
 	}
-	registerValue &= ~GPR_GEP_GEPIO0;
-	result = _Write1Register(GPR, registerValue);
+
+	control &= ~GPR_GEP_GEPIO0;
+	result = _Write1Register(GPR, control);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to GPR: %#010x.\n", registerValue, result);
+		TRACE_ALWAYS("Error writing %#02X to GPR: %#010x.\n", control, result);
 		return result;
 	}
 
@@ -804,6 +996,7 @@ DavicomDevice::OnNotify(uint32 actualLength)
 	return B_OK;
 }
 
+
 status_t
 DavicomDevice::GetLinkState(ether_link_state *linkState)
 {
@@ -838,11 +1031,12 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 		if (registerValue & NCR_LBK)
 			linkState->media |= IFM_LOOP;
 	}
-
-	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
+/*	
+	TRACE_STATE("Medium state: %s, %lld MBit/s, %s duplex.\n",
 						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
-						linkState->speed,
+						linkState->speed / 1000000,
 						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
+*/						
 	return B_OK;
 }
 

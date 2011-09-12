@@ -28,8 +28,20 @@ reset_logfile on
 
 # add_timestamp off
 
-## trace_flow [on|off] - activate data flow tracing. Statistic about of 
-##                       transferred data amount and media state.
+## trace_state [on|off] - activate state tracing. Statistic about of 
+##                       media state.
 ## default value: off
 
-# trace_flow on
+# trace_state on
+
+## trace_rx [on|off] - activate data receivening tracing. Statistic about of 
+##                       transferred data amount.
+## default value: off
+
+# trace_rx on
+
+## trace_tx [on|off] - activate data transmitting tracing. Statistic about of 
+##                       transferred data amount.
+## default value: off
+
+# trace_tx on

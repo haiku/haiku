@@ -1,25 +1,23 @@
 /*
  *	Davicom DM9601 USB 1.1 Ethernet Driver.
  *	Copyright (c) 2009 Adrien Destugues <pulkomandy@gmail.com>
+ *	Copyright (c) 2008, 2011 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
  *
- *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
- *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
- *	Distributed under the terms of the MIT license.
- *	
  *	Heavily based on code of the 
  *	Driver for USB Ethernet Control Model devices
  *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
  *	Distributed under the terms of the MIT license.
  *
  */
-
 #ifndef _USB_Davicom_DEVICE_H_
 #define _USB_Davicom_DEVICE_H_
+
 
 #include <net/if_media.h>
 
 #include "Driver.h"
+
 
 class DavicomDevice {
 public:
@@ -57,10 +55,14 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 		status_t			_ReadRegister(uint8 reg, size_t size, uint8* buffer);
 		status_t			_WriteRegister(uint8 reg, size_t size, uint8* buffer);
 		status_t			_Write1Register(uint8 reg, uint8 buffer);
+		status_t			_ReadMII(uint8 reg, uint16* data);
+		status_t			_WriteMII(uint8 reg, uint16 data);
+		status_t			_InitMII();
+		status_t			_EnableInterrupts(bool enable);
 
 static const int			kFrameSize = 1518;
-static const int			kRXHeaderSize = 3;
-static const int			kTXHeaderSize = 2;
+static const size_t			kRXHeaderSize = 3;
+static const size_t			kTXHeaderSize = 2;
 
 protected:
 		/* overrides */
@@ -87,6 +89,7 @@ const	char *				fDescription;
 		usb_pipe			fNotifyEndpoint;
 		usb_pipe			fReadEndpoint;
 		usb_pipe			fWriteEndpoint;
+		uint16				fMaxTXPacketSize;
 
 		// data stores for async usb transfers
 		uint32				fActualLengthRead;
@@ -97,7 +100,7 @@ const	char *				fDescription;
 		sem_id				fNotifyWriteSem;
 
 		uint8 *				fNotifyBuffer;
-static const int			kNotifyBufferSize = 8;
+static const size_t			kNotifyBufferSize = 8;
 
 		// connection data
 		sem_id				fLinkStateChangeSem;
