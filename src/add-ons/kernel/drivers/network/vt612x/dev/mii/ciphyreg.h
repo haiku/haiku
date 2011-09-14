@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/mii/ciphyreg.h,v 1.2 2005/01/06 01:42:55 imp Exp $
+ * $FreeBSD: src/sys/dev/mii/ciphyreg.h,v 1.3.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
  */
 
 #ifndef _DEV_MII_CIPHYREG_H_
@@ -251,6 +251,16 @@
 /* Extended PHY control register #1 */
 #define CIPHY_MII_ECTL1		0x17
 #define CIPHY_ECTL1_ACTIPHY	0x0020	/* Enable ActiPHY power saving */
+#define CIPHY_ECTL1_IOVOL	0x0e00	/* MAC interface and I/O voltage select */
+#define CIPHY_ECTL1_INTSEL	0xf000	/* select MAC interface */
+
+#define CIPHY_IOVOL_3300MV	0x0000	/* 3.3V for I/O pins */
+#define CIPHY_IOVOL_2500MV	0x0200	/* 2.5V for I/O pins */
+
+#define CIPHY_INTSEL_GMII	0x0000	/* GMII/MII */
+#define CIPHY_INTSEL_RGMII	0x1000
+#define CIPHY_INTSEL_TBI	0x2000
+#define CIPHY_INTSEL_RTBI	0x3000
 
 /* Extended PHY control register #2 */
 #define CIPHY_MII_ECTL2		0x18

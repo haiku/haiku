@@ -14,7 +14,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;
 # FreeBSD 7 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom440x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network nforce ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet ;
@@ -23,7 +22,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network attansic_l1 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network attansic_l2 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ar81xx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl81xx ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network vt612x ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
@@ -31,10 +29,12 @@ SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
 # FreeBSD 8 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network 3com ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network atheros813x ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network vt612x ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wwan ;

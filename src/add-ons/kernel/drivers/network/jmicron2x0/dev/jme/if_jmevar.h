@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/jme/if_jmevar.h,v 1.3 2008/12/04 02:16:53 yongari Exp $
+ * $FreeBSD: src/sys/dev/jme/if_jmevar.h,v 1.3.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
  */
 
 #ifndef	_IF_JMEVAR_H
