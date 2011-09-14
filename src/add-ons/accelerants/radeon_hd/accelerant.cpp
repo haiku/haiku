@@ -245,15 +245,15 @@ radeon_init_accelerant(int device)
 
 	status = detect_connectors();
 	if (status != B_OK) {
-		// TODO : detect_connectors_manual to get from object table
 		TRACE("%s: couldn't detect supported connectors!\n", __func__);
 		return status;
 	}
 
+	debug_connectors();
+
 	status = detect_displays();
 	//if (status != B_OK)
 	//	return status;
-
 	debug_displays();
 
 	status = create_mode_list();

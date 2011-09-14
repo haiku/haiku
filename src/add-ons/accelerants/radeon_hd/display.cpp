@@ -653,7 +653,7 @@ debug_displays()
 {
 	TRACE("Currently detected monitors===============\n");
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		TRACE("Display #%" B_PRIu32 " active = %s\n",
+		ERROR("Display #%" B_PRIu32 " active = %s\n",
 			id, gDisplay[id]->active ? "true" : "false");
 
 		uint32 connector_index = gDisplay[id]->connector_index;
@@ -661,17 +661,38 @@ debug_displays()
 		if (gDisplay[id]->active) {
 			uint32 connector_type = gConnector[connector_index]->connector_type;
 			uint32 encoder_type = gConnector[connector_index]->encoder_type;
-			TRACE(" + connector: %s\n", get_connector_name(connector_type));
-			TRACE(" + encoder:   %s\n", get_encoder_name(encoder_type));
+			ERROR(" + connector: %s\n", get_connector_name(connector_type));
+			ERROR(" + encoder:   %s\n", get_encoder_name(encoder_type));
 
-			TRACE(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
+			ERROR(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
 				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
-			TRACE(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
+			ERROR(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
 				gDisplay[id]->hfreq_min, gDisplay[id]->hfreq_max);
 		}
 	}
 	TRACE("==========================================\n");
 
+}
+
+
+void
+debug_connectors()
+{
+	ERROR("Currently detected connectors=============\n");
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == true) {
+			uint32 connector_type = gConnector[id]->connector_type;
+			uint32 encoder_type = gConnector[id]->encoder_type;
+			ERROR("Connector #%" B_PRIu32 ")\n", id);
+			ERROR(" + connector:  %s\n", get_connector_name(connector_type));
+			ERROR(" + encoder:    %s\n", get_encoder_name(encoder_type));
+			ERROR(" + gpio valid: %s\n",
+				(gConnector[id]->connector_gpio.valid) ? "true" : "false");
+			ERROR(" + gpio pin:   0x%" B_PRIX8 "\n",
+				gConnector[id]->connector_gpio.pin);
+		}
+	}
+	ERROR("==========================================\n");
 }
 
 

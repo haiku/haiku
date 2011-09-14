@@ -138,31 +138,31 @@ struct pll_info {
 };
 
 
-struct ddc_info {
+struct gpio_info {
 	bool	valid;
 	bool	hw_capable;
 
-	uint8	gpio_id;
+	uint8	pin;
 
-	uint16	mask_scl_reg;
-	uint16	mask_sda_reg;
-	uint16	mask_scl_mask;
-	uint16	mask_sda_mask;
+	uint32	mask_scl_reg;
+	uint32	mask_sda_reg;
+	uint32	mask_scl_mask;
+	uint32	mask_sda_mask;
 
-	uint16	gpio_en_scl_reg;
-	uint16	gpio_en_sda_reg;
-	uint16	gpio_en_scl_mask;
-	uint16	gpio_en_sda_mask;
+	uint32	en_scl_reg;
+	uint32	en_sda_reg;
+	uint32	en_scl_mask;
+	uint32	en_sda_mask;
 
-	uint16	gpio_y_scl_reg;
-	uint16	gpio_y_sda_reg;
-	uint16	gpio_y_scl_mask;
-	uint16	gpio_y_sda_mask;
+	uint32	y_scl_reg;
+	uint32	y_sda_reg;
+	uint32	y_scl_mask;
+	uint32	y_sda_mask;
 
-	uint16	gpio_a_scl_reg;
-	uint16	gpio_a_sda_reg;
-	uint16	gpio_a_scl_mask;
-	uint16	gpio_a_sda_mask;
+	uint32	a_scl_reg;
+	uint32	a_sda_reg;
+	uint32	a_scl_mask;
+	uint32	a_sda_mask;
 };
 
 
@@ -172,10 +172,9 @@ typedef struct {
 	uint16		connector_flags;
 	uint32		connector_type;
 	uint16		connector_object_id;
+	gpio_info	connector_gpio;
 	uint32		encoder_type;
 	uint16		encoder_object_id;
-	ddc_info	connector_ddc_info;
-	i2c_bus		connector_i2c;
 	// TODO struct radeon_hpd hpd;
 } connector_info;
 

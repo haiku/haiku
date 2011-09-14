@@ -280,7 +280,7 @@ radeon_gpu_irq_setup()
 static void
 lock_i2c(void* cookie, bool lock)
 {
-	ddc_info *info = (ddc_info*)cookie;
+	gpio_info *info = (gpio_info*)cookie;
 
 	uint32 buffer = 0;
 
@@ -292,49 +292,59 @@ lock_i2c(void* cookie, bool lock)
 	}
 
 	// Clear pins
-	buffer = Read32(OUT, info->gpio_a_scl_reg) & ~info->gpio_a_scl_mask;
-	Write32(OUT, info->gpio_a_scl_reg, buffer);
-	buffer = Read32(OUT, info->gpio_a_sda_reg) & ~info->gpio_a_sda_mask;
-	Write32(OUT, info->gpio_a_sda_reg, buffer);
+	buffer = Read32(OUT, info->a_scl_reg) & ~info->a_scl_mask;
+	Write32(OUT, info->a_scl_reg, buffer);
+	buffer = Read32(OUT, info->a_sda_reg) & ~info->a_sda_mask;
+	Write32(OUT, info->a_sda_reg, buffer);
 
 	// Set pins to input
-	buffer = Read32(OUT, info->gpio_en_scl_reg) & ~info->gpio_en_scl_mask;
-	Write32(OUT, info->gpio_en_scl_reg, buffer);
-	buffer = Read32(OUT, info->gpio_en_sda_reg) & ~info->gpio_en_sda_mask;
-	Write32(OUT, info->gpio_en_sda_reg, buffer);
+	buffer = Read32(OUT, info->en_scl_reg) & ~info->en_scl_mask;
+	Write32(OUT, info->en_scl_reg, buffer);
+	buffer = Read32(OUT, info->en_sda_reg) & ~info->en_sda_mask;
+	Write32(OUT, info->en_sda_reg, buffer);
 
 	// mask GPIO pins for software use
-	buffer = Read32(OUT, info->mask_scl_reg);
-	if (lock == true)
-		buffer |= info->mask_scl_mask;
-	else
-		buffer &= ~info->mask_scl_mask;
+	// TODO : we should use the mask... but it doesn't work for some reason
+	// buffer = Read32(OUT, info->mask_scl_reg);
+	if (lock == true) {
+		buffer = 1;
+		//buffer |= info->mask_scl_mask;
+	} else {
+		buffer = 0;
+		//buffer &= ~info->mask_scl_mask;
+	}
+
 	Write32(OUT, info->mask_scl_reg, buffer);
 	Read32(OUT, info->mask_scl_reg);
 
 	buffer = Read32(OUT, info->mask_sda_reg);
-	if (lock == true)
-		buffer |= info->mask_sda_mask;
-	else
-		buffer &= ~info->mask_sda_mask;
+	if (lock == true) {
+		buffer = 1;
+	//	buffer |= info->mask_sda_mask;
+	} else {
+		buffer = 0;
+	//	buffer &= ~info->mask_sda_mask;
+	}
+
 	Write32(OUT, info->mask_sda_reg, buffer);
 	Read32(OUT, info->mask_sda_reg);
+
 }
 
 
 static status_t
 get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
-	ddc_info *info = (ddc_info*)cookie;
+	gpio_info *info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->gpio_y_scl_reg) & info->gpio_y_scl_mask;
-	uint32 sda = Read32(OUT, info->gpio_y_sda_reg) & info->gpio_y_sda_mask;
+	uint32 scl = Read32(OUT, info->y_scl_reg) & info->y_scl_mask;
+	uint32 sda = Read32(OUT, info->y_sda_reg) & info->y_sda_mask;
 
 	*_clock = (scl != 0);
 	*_data = (sda != 0);
 
-	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
-		__func__, info->gpio_id, *_clock, *_data);
+	//TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
+	//	__func__, info->pin, *_clock, *_data);
 
 	return B_OK;
 }
@@ -343,21 +353,21 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 static status_t
 set_i2c_signals(void* cookie, int clock, int data)
 {
-	ddc_info* info = (ddc_info*)cookie;
+	gpio_info* info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->gpio_en_scl_reg)
-		& ~info->gpio_en_scl_mask;
-	uint32 sda = Read32(OUT, info->gpio_en_sda_reg)
-		& ~info->gpio_en_sda_mask;
+	uint32 scl = Read32(OUT, info->en_scl_reg)
+		& ~info->en_scl_mask;
+	uint32 sda = Read32(OUT, info->en_sda_reg)
+		& ~info->en_sda_mask;
 
-	scl |= clock ? 0 : info->gpio_en_scl_mask;
-	sda |= data ? 0 : info->gpio_en_sda_mask;
+	scl |= clock ? 0 : info->en_scl_mask;
+	sda |= data ? 0 : info->en_sda_mask;
 
-	Write32(OUT, info->gpio_a_scl_reg, clock);
-	Write32(OUT, info->gpio_a_sda_reg, data);
+	Write32(OUT, info->a_scl_reg, clock);
+	Write32(OUT, info->a_sda_reg, data);
 
-	TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
-		__func__, info->gpio_id, clock, data);
+	//TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
+	//	__func__, info->pin, clock, data);
 
 	return B_OK;
 }
@@ -367,14 +377,13 @@ bool
 radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 {
 	// ensure things are sane
-	if (gConnector[connector]->connector_ddc_info.valid == false
-		|| gConnector[connector]->connector_ddc_info.gpio_id == 0)
+	if (gConnector[connector]->connector_gpio.valid == false)
 		return false;
 
 	i2c_bus bus;
 
 	ddc2_init_timing(&bus);
-	bus.cookie = (void*)&gConnector[connector]->connector_ddc_info;
+	bus.cookie = (void*)&gConnector[connector]->connector_gpio;
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 
@@ -393,11 +402,11 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 
 
 status_t
-radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
+radeon_gpu_i2c_setup(uint32 id, uint8 gpio_pin)
 {
 	// aka radeon_lookup_i2c_gpio
 	TRACE("%s: Path #%" B_PRId32 ": GPIO Pin 0x%" B_PRIx8 "\n", __func__,
-		connector, gpio_id);
+		id, gpio_pin);
 
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
 	uint8 frev;
@@ -409,7 +418,7 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 		&offset) != B_OK) {
 		ERROR("%s: could't read GPIO_I2C_Info table from AtomBIOS index %d!\n",
 			__func__, index);
-		gConnector[connector]->connector_ddc_info.valid = false;
+		gConnector[id]->connector_gpio.valid = false;
 		return B_ERROR;
 	}
 
@@ -425,65 +434,65 @@ radeon_gpu_i2c_setup(uint32 connector, uint8 gpio_id)
 		// TODO : if DCE 4 and i == 7 ... manual override for evergreen
 		// TODO : if DCE 3 and i == 4 ... manual override
 
-		if (gpio->sucI2cId.ucAccess != gpio_id)
+		if (gpio->sucI2cId.ucAccess != gpio_pin)
 			continue;
 
-		// successful lookup
-		TRACE("%s: successful AtomBIOS GPIO lookup\n", __func__);
-
 		// populate gpio information
-		gConnector[connector]->connector_ddc_info.valid = true;
-
 		// TODO : what is hw_capable?
-		if (gpio->sucI2cId.sbfAccess.bfHW_Capable)
-			gConnector[connector]->connector_ddc_info.hw_capable = true;
-		else
-			gConnector[connector]->connector_ddc_info.hw_capable = true;
+		gConnector[id]->connector_gpio.hw_capable
+			= (gpio->sucI2cId.sbfAccess.bfHW_Capable) ? true : false;
 
-		gConnector[connector]->connector_ddc_info.gpio_id = gpio_id;
+		gConnector[id]->connector_gpio.pin = gpio_pin;
 
 		// GPIO mask (Allows software to control the GPIO pad)
 		// 0 = chip access; 1 = only software;
-		gConnector[connector]->connector_ddc_info.mask_scl_reg
+		gConnector[id]->connector_gpio.mask_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.mask_sda_reg
+		gConnector[id]->connector_gpio.mask_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.mask_scl_mask
+		gConnector[id]->connector_gpio.mask_scl_mask
 			= (1 << gpio->ucClkMaskShift);
-		gConnector[connector]->connector_ddc_info.mask_sda_mask
+		gConnector[id]->connector_gpio.mask_sda_mask
 			= (1 << gpio->ucDataMaskShift);
 
 		// GPIO output / write (A) enable
 		// 0 = GPIO input (Y); 1 = GPIO output (A);
-		gConnector[connector]->connector_ddc_info.gpio_en_scl_reg
+		gConnector[id]->connector_gpio.en_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_en_sda_reg
+		gConnector[id]->connector_gpio.en_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_en_scl_mask
+		gConnector[id]->connector_gpio.en_scl_mask
 			= (1 << gpio->ucClkEnShift);
-		gConnector[connector]->connector_ddc_info.gpio_en_sda_mask
+		gConnector[id]->connector_gpio.en_sda_mask
 			= (1 << gpio->ucDataEnShift);
 
 		// GPIO output / write (A)
-		gConnector[connector]->connector_ddc_info.gpio_a_scl_reg
+		gConnector[id]->connector_gpio.a_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_a_sda_reg
+		gConnector[id]->connector_gpio.a_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_a_scl_mask
+		gConnector[id]->connector_gpio.a_scl_mask
 			= (1 << gpio->ucClkA_Shift);
-		gConnector[connector]->connector_ddc_info.gpio_a_sda_mask
+		gConnector[id]->connector_gpio.a_sda_mask
 			= (1 << gpio->ucDataA_Shift);
 
 		// GPIO input / read (Y)
-		gConnector[connector]->connector_ddc_info.gpio_y_scl_reg
+		gConnector[id]->connector_gpio.y_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_y_sda_reg
+		gConnector[id]->connector_gpio.y_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-		gConnector[connector]->connector_ddc_info.gpio_y_scl_mask
+		gConnector[id]->connector_gpio.y_scl_mask
 			= (1 << gpio->ucClkY_Shift);
-		gConnector[connector]->connector_ddc_info.gpio_y_sda_mask
+		gConnector[id]->connector_gpio.y_sda_mask
 			= (1 << gpio->ucDataY_Shift);
 
+		// ensure data is valid
+		gConnector[id]->connector_gpio.valid
+			= (gConnector[id]->connector_gpio.mask_scl_reg) ? true : false;
+
+		// see if we found what we were looking for
+		if (gConnector[id]->connector_gpio.valid == true)
+			break;
 	}
 
 	return B_OK;
