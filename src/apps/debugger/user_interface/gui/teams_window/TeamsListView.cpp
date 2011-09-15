@@ -202,6 +202,21 @@ TeamRow::TeamRow(team_id team)
 
 
 status_t
+TeamRow::UpdateInfo(team_info& info)
+{
+	// Check if we need to rebuilt the row's fields because the team critical 
+	// info (basically, app image running under that team ID) has changed
+	
+	if (info.argc != fTeamInfo.argc 
+		|| strncmp(info.args, fTeamInfo.args, sizeof(fTeamInfo.args)) != 0) {
+		return _SetTo(info);
+	}
+	
+	return B_OK;
+}			
+
+
+status_t
 TeamRow::_SetTo(team_info& info)
 {
 	team_info teamInfo = fTeamInfo = info;
@@ -427,7 +442,10 @@ TeamsListView::_UpdateList()
 				row = dynamic_cast<TeamRow*>(RowAt(index));
 		}
 
-		if (row == NULL || tmi.team != row->TeamID()) {
+		if (row != NULL && tmi.team == row->TeamID()) {
+			// The team image app could have change due after an exec*() call, 
+			row->UpdateInfo(tmi);
+		} else if (row == NULL || tmi.team != row->TeamID()) {
 			// Team not found in previously known teams list: insert a new row
 			TeamRow* newRow = new(std::nothrow) TeamRow(tmi);
 			if (newRow != NULL) {
