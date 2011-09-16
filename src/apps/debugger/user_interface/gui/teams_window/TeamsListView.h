@@ -69,7 +69,7 @@ public:
 public:
 			team_id				TeamID() const 				{ return fTeamInfo.team; }
 
-			status_t			UpdateInfo(team_info& info);
+			bool				NeedsUpdate(team_info& info);
 
 	virtual	void				SetEnabled(bool enabled) 	{ fEnabled = enabled; }
 			bool				IsEnabled() const			{ return fEnabled; }
