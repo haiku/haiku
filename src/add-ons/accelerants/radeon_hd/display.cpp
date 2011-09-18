@@ -644,6 +644,18 @@ detect_displays()
 		}
 	}
 
+	// fallback if no edid monitors were found
+	if (displayIndex == 0) {
+		ERROR("%s: ERROR: 0 attached monitors were found on display connectors."
+			" Injecting first connector as a last resort.\n", __func__);
+		gDisplay[displayIndex]->active = true;
+		gDisplay[displayIndex]->connector_index = 0;
+		init_registers(gDisplay[displayIndex]->regs, displayIndex);
+		if (detect_crt_ranges(displayIndex) == B_OK)
+			gDisplay[displayIndex]->found_ranges = true;
+	}
+
+
 	return B_OK;
 }
 
