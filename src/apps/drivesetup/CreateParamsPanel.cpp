@@ -77,7 +77,9 @@ private:
 enum {
 	MSG_OK						= 'okok',
 	MSG_CANCEL					= 'cncl',
-	MSG_PARTITION_TYPE			= 'type'
+	MSG_PARTITION_TYPE			= 'type',
+	MSG_SIZE_SLIDER				= 'ssld',
+	MSG_SIZE_TEXTCONTROL		= 'stct'
 };
 
 
@@ -138,6 +140,22 @@ CreateParamsPanel::MessageReceived(BMessage* message)
 				fEditor->PartitionTypeChanged(type);
 			}
 			break;
+		
+		case MSG_SIZE_SLIDER:
+			_UpdateTextControl();
+			break;
+			
+		case MSG_SIZE_TEXTCONTROL:
+		{
+			BString sizeString;
+			sizeString = fSizeTextControl->Text();
+			int32 sizeInt = atoi(sizeString.String());
+			if (sizeInt >= 0 && sizeInt <= fSizeSlider->MaxPartitionSize())
+				fSizeSlider->SetValue(sizeInt);
+			else
+				_UpdateTextControl();
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -225,6 +243,17 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	fSizeSlider = new SizeSlider("Slider", B_TRANSLATE("Partition size"), NULL,
 		offset, offset + size);
 	fSizeSlider->SetPosition(1.0);
+	fSizeSlider->SetModificationMessage(new BMessage(MSG_SIZE_SLIDER));
+	
+	BString sizeText;
+	sizeText << fSizeSlider->Value();
+	fSizeTextControl = new BTextControl("Size Control",
+		"", sizeText.String(), NULL);
+	for(int32 i = 0; i < 256; i++)
+		fSizeTextControl->TextView()->DisallowChar(i);
+	for(int32 i = '0'; i <= '9'; i++)
+		fSizeTextControl->TextView()->AllowChar(i);
+	fSizeTextControl->SetModificationMessage(new BMessage(MSG_SIZE_TEXTCONTROL));
 
 	fNameTextControl = new BTextControl("Name Control",
 		B_TRANSLATE("Partition name:"),	"", NULL);
@@ -257,6 +286,7 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
 		.Add(fSizeSlider)
+		.Add(fSizeTextControl)
 		.Add(BGridLayoutBuilder(0.0, 5.0)
 			.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
 			.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0)
@@ -284,3 +314,11 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	layout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
+
+void
+CreateParamsPanel::_UpdateTextControl()
+{
+	BString sizeString;
+	sizeString << fSizeSlider->Value();
+	fSizeTextControl->SetText(sizeString.String());
+}

@@ -38,6 +38,8 @@ private:
 			void 				_CreateViewControls(BPartition* parent,
 									off_t offset, off_t size);
 
+			void				_UpdateTextControl();
+
 	class EscapeFilter;
 			EscapeFilter*		fEscapeFilter;
 			sem_id				fExitSemaphore;
@@ -50,6 +52,7 @@ private:
 			BMenuField*			fTypeMenuField;
 			BTextControl*		fNameTextControl;
 			SizeSlider*			fSizeSlider;
+			BTextControl*		fSizeTextControl;
 };
 
 #endif // CREATE_PARAMS_PANEL_H

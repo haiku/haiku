@@ -51,10 +51,12 @@ public:
 	virtual const char*			UpdateText() const;
 			int32				Size();
 			int32				Offset();
+			int32				MaxPartitionSize();
 
 private:
 			off_t				fStartOffset;
 			off_t				fEndOffset;
+			off_t				fMaxPartitionSize;
 	mutable	char				fStatusLabel[64];
 };
 
