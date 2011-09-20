@@ -47,7 +47,7 @@ public:
 
 
 status_t
-BeceemDevice::ReadRegister(unsigned int reg, size_t size, uint32_t* buffer)
+BeceemDevice::ReadRegister(uint32 reg, size_t size, uint32* buffer)
 {
 	USBSmartLock USBSubsystemLock; // released on exit
 
@@ -92,7 +92,7 @@ BeceemDevice::ReadRegister(unsigned int reg, size_t size, uint32_t* buffer)
 
 
 status_t
-BeceemDevice::WriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
+BeceemDevice::WriteRegister(uint32 reg, size_t size, uint32* buffer)
 {
 	USBSmartLock USBSubsystemLock; // released on exit
 
@@ -139,8 +139,8 @@ BeceemDevice::WriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
 
 
 status_t
-BeceemDevice::BizarroReadRegister(unsigned int reg, size_t size,
-	uint32_t* buffer)
+BeceemDevice::BizarroReadRegister(uint32 reg, size_t size,
+	uint32* buffer)
 {
 	// NET_TO_HOST long
 
@@ -154,12 +154,12 @@ BeceemDevice::BizarroReadRegister(unsigned int reg, size_t size,
 
 
 status_t
-BeceemDevice::BizarroWriteRegister(unsigned int reg, size_t size,
-	uint32_t* buffer)
+BeceemDevice::BizarroWriteRegister(uint32 reg, size_t size,
+	uint32* buffer)
 {
 	// HOST_TO_NET long
 
-	volatile uint32_t reload = *buffer;
+	volatile uint32 reload = *buffer;
 
 	convertEndian(true, size, buffer);
 
@@ -577,7 +577,7 @@ status_t
 BeceemDevice::IdentifyChipset()
 {
 
-	if (BizarroReadRegister(CHIP_ID_REG, sizeof(unsigned int),
+	if (BizarroReadRegister(CHIP_ID_REG, sizeof(uint32),
 		&pwmxdevice->deviceChipID) != B_OK)
 	{
 		TRACE_ALWAYS("Error: Beceem device identification read failure\n");
@@ -647,7 +647,7 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 		return B_ERROR;
 
 	if (pwmxdevice->deviceChipID >= T3LPB) {
-		unsigned int value = 0;
+		uint32 value = 0;
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
 		pwmxdevice->syscfgBefFw = value;
 		if ((value & 0x60) == 0) {
@@ -689,12 +689,12 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 	if (pwmxdevice->nvmVerMajor < 5) {
 		TRACE("Debug: VerMajor < 5 PARAM pointer\n");
 		NVMRead(GPIO_PARAM_POINTER, 2,
-			(unsigned int*)&pwmxdevice->hwParamPtr);
+			(uint32*)&pwmxdevice->hwParamPtr);
 		pwmxdevice->hwParamPtr = ntohs(pwmxdevice->hwParamPtr);
 	} else {
 		TRACE("Debug: VerMajor 5+ PARAM pointer\n");
 		NVMRead(GPIO_PARAM_POINTER_MAP5, 4,
-			(unsigned int*)&pwmxdevice->hwParamPtr);
+			(uint32*)&pwmxdevice->hwParamPtr);
 		// TODO : NVM : validate v5+ nvm params a-la ValidateDSDParamsChecksum
 		pwmxdevice->hwParamPtr = ntohl(pwmxdevice->hwParamPtr);
 	}
@@ -714,7 +714,7 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 	dwReadValue = dwReadValue + GPIO_START_OFFSET;
 		// add GPIO start offset
 
-	NVMRead(dwReadValue, 32, (uint32_t*)&pwmxdevice->gpioInfo);
+	NVMRead(dwReadValue, 32, (uint32*)&pwmxdevice->gpioInfo);
 		// populate for LED information
 
 	ValidateDSD(pwmxdevice->hwParamPtr);
@@ -1010,7 +1010,7 @@ BeceemDevice::LoadConfig()
 
 	size_t file_size = cfgStat.st_size;
 
-	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
+	uint32* buffer = (uint32*)malloc(MAX_USB_TRANSFER);
 
 	if (buffer == NULL) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
@@ -1103,7 +1103,7 @@ BeceemDevice::DumpConfig()
 
 
 status_t
-BeceemDevice::PushConfig(unsigned int loc)
+BeceemDevice::PushConfig(uint32 loc)
 {
 	int fh = open(FIRM_CFG, O_RDONLY);
 
@@ -1117,7 +1117,7 @@ BeceemDevice::PushConfig(unsigned int loc)
 	TRACE_ALWAYS("Info: Vendor configuration to be pushed to 0x%x on device.\n",
 		loc);
 
-	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
+	uint32* buffer = (uint32*)malloc(MAX_USB_TRANSFER);
 
 	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
@@ -1175,7 +1175,7 @@ BeceemDevice::PushConfig(unsigned int loc)
 
 
 status_t
-BeceemDevice::PushFirmware(unsigned int loc)
+BeceemDevice::PushFirmware(uint32 loc)
 {
 	int fh = open(FIRM_BIN, O_RDONLY);
 
@@ -1195,7 +1195,7 @@ BeceemDevice::PushFirmware(unsigned int loc)
 		file_size, loc);
 
 	// For the push we load the file into the buffer
-	unsigned int* buffer = (unsigned int*)malloc(MAX_USB_TRANSFER);
+	uint32* buffer = (uint32*)malloc(MAX_USB_TRANSFER);
 
 	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");

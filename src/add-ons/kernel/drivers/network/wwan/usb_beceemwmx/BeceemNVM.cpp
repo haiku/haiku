@@ -43,7 +43,7 @@ BeceemNVM::NVMInit(WIMAX_DEVICE* swmxdevice)
 
 	unsigned short	usNVMVersion  = 0;
 
-	NVMRead(NVM_VERSION_OFFSET, 2, (unsigned int*)&usNVMVersion);
+	NVMRead(NVM_VERSION_OFFSET, 2, (uint32*)&usNVMVersion);
 	pwmxdevice->nvmVerMinor = usNVMVersion&0xFF;
 	pwmxdevice->nvmVerMajor = ((usNVMVersion>>8)&0xFF);
 
@@ -62,7 +62,7 @@ BeceemNVM::NVMFlush()
 	 * But we get 0x00001122. */
 	TRACE("Debug: Fixing reset value on 0x0f003004\n");
 
-	unsigned int value = NVM_READ_DATA_AVAIL;
+	uint32 value = NVM_READ_DATA_AVAIL;
 	BizarroWriteRegister(NVM_SPI_Q_STATUS1_REG, sizeof(value), &value);
 
 	/* Flush the all of the NVM queues. */
@@ -79,7 +79,7 @@ BeceemNVM::NVMFlush()
 status_t
 BeceemNVM::NVMDetect()
 {
-	unsigned int uiData = 0;
+	uint32 uiData = 0;
 
 	EEPROMBulkRead(0x0, 4, &uiData);
 	if (uiData == BECM) {
@@ -111,7 +111,7 @@ BeceemNVM::NVMDetect()
 
 
 status_t
-BeceemNVM::NVMChipSelect(unsigned int offset)
+BeceemNVM::NVMChipSelect(uint32 offset)
 {
 	int chipIndex = offset / FLASH_PART_SIZE;
 
@@ -125,16 +125,16 @@ BeceemNVM::NVMChipSelect(unsigned int offset)
 	// Migrate selected chip to new selection
 	bSelectedChip = chipIndex;
 
-	unsigned int flashConfig = 0;
+	uint32 flashConfig = 0;
 	BizarroReadRegister(FLASH_CONFIG_REG, 4, &flashConfig);
 
-	unsigned int gpioConfig = 0;
+	uint32 gpioConfig = 0;
 	BizarroReadRegister(FLASH_GPIO_CONFIG_REG, 4, &gpioConfig);
 
 	// TRACE("Reading GPIO config 0x%x\n", &GPIOConfig);
 	// TRACE("Reading Flash config 0x%x\n", &FlashConfig);
 
-	unsigned int partitionNumber = 0;
+	uint32 partitionNumber = 0;
 	switch (chipIndex) {
 	case 0:
 		partitionNumber = 0;
@@ -175,12 +175,12 @@ BeceemNVM::NVMChipSelect(unsigned int offset)
 
 
 int
-BeceemNVM::NVMRead(unsigned int offset, unsigned int size, unsigned int* buffer)
+BeceemNVM::NVMRead(uint32 offset, uint32 size, uint32* buffer)
 {
-	unsigned int temp = 0;
-	unsigned int value = 0;
+	uint32 temp = 0;
+	uint32 value = 0;
 	int status = 0;
-	unsigned int myOffset = 0;
+	uint32 myOffset = 0;
 
 	if (pwmxdevice->nvmType == NVM_FLASH) {
 
@@ -218,11 +218,11 @@ BeceemNVM::NVMRead(unsigned int offset, unsigned int size, unsigned int* buffer)
 
 
 int
-BeceemNVM::NVMWrite(unsigned int offset, unsigned int size,
-	unsigned int* buffer)
+BeceemNVM::NVMWrite(uint32 offset, uint32 size,
+	uint32* buffer)
 {
-	unsigned int temp = 0;
-	unsigned int value = 0;
+	uint32 temp = 0;
+	uint32 value = 0;
 	int status = 0;
 
 	if (pwmxdevice->nvmType == NVM_FLASH) {
@@ -277,7 +277,7 @@ BeceemNVM::FlashGetBaseAddr()
 }
 
 
-unsigned int
+uint32
 BeceemNVM::FlashGetSize()
 {
 	// TODO : Check for Flash2X
@@ -289,7 +289,7 @@ unsigned long
 BeceemNVM::FlashReadID()
 {
 	// Read the ID from FLASH_CMD_READ_ID
-	unsigned int value = FLASH_CMD_READ_ID << 24;
+	uint32 value = FLASH_CMD_READ_ID << 24;
 	BizarroWriteRegister(FLASH_SPI_CMDQ_REG, sizeof(value), &value);
 
 	snooze(10);
@@ -298,7 +298,7 @@ BeceemNVM::FlashReadID()
 	// The ID is the first 3 bytes.
 	unsigned long readQID = 0;
 	BizarroReadRegister(FLASH_SPI_READQ_REG, sizeof(readQID),
-		(unsigned int*)&readQID);
+		(uint32*)&readQID);
 
 	return readQID >> 8;
 }
@@ -318,13 +318,13 @@ BeceemNVM::FlashReadCS()
 
 	if (pwmxdevice->driverDDRinit == false)
 	{
-		unsigned int value = FLASH_CONTIGIOUS_START_ADDR_BEFORE_INIT;
+		uint32 value = FLASH_CONTIGIOUS_START_ADDR_BEFORE_INIT;
 		BizarroWriteRegister(0xAF00A080, sizeof(value), &value);
 	}
 
 	// CS Signature(4), Minor(2), Major(2)
 	FlashBulkRead(pwmxdevice->nvmFlashCSStart, 8,
-		(unsigned int*)pwmxdevice->nvmFlashCSInfo);
+		(uint32*)pwmxdevice->nvmFlashCSInfo);
 
 	pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion
 		= ntohl(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
@@ -349,7 +349,7 @@ BeceemNVM::FlashReadCS()
 	{
 		// device is older flash map
 		FlashBulkRead(pwmxdevice->nvmFlashCSStart, sizeof(FLASH_CS_INFO),
-			(unsigned int*)pwmxdevice->nvmFlashCSInfo);
+			(uint32*)pwmxdevice->nvmFlashCSInfo);
 		snooze(100);
 		FlashCSFlip(pwmxdevice->nvmFlashCSInfo);
 		FlashCSDump(pwmxdevice->nvmFlashCSInfo);
@@ -495,8 +495,8 @@ BeceemNVM::FlashCSDump(PFLASH_CS_INFO FlashCSInfo)
 
 
 status_t
-BeceemNVM::FlashBulkRead(unsigned int offset, unsigned int size,
-	unsigned int* buffer)
+BeceemNVM::FlashBulkRead(uint32 offset, uint32 size,
+	uint32* buffer)
 {
 	if (pwmxdevice->driverHalt == true)
 		return -ENODEV;
@@ -508,24 +508,24 @@ BeceemNVM::FlashBulkRead(unsigned int offset, unsigned int size,
 
 	TRACE("Debug: About to read %d bytes from 0x%x \n", size, offset);
 
-	unsigned int workOffset = offset; // our scratch work offset
-	unsigned int bytesLeft = size; // counter holding bytes left
-	unsigned int outputOffset = 0; // where we are in the output
+	uint32 workOffset = offset; // our scratch work offset
+	uint32 bytesLeft = size; // counter holding bytes left
+	uint32 outputOffset = 0; // where we are in the output
 
 	while (bytesLeft > 0)
 	{
 		NVMChipSelect(workOffset);
 
-		unsigned int partOffset = (workOffset & (FLASH_PART_SIZE - 1))
+		uint32 partOffset = (workOffset & (FLASH_PART_SIZE - 1))
 			+ FlashGetBaseAddr();
-		unsigned int workBytes = MIN(MAX_RW_SIZE, bytesLeft);
+		uint32 workBytes = MIN(MAX_RW_SIZE, bytesLeft);
 			// We read the max RW size or whats left
 
 		TRACE("Debug: reading %d bytes from 0x%x to 0x%x (output offset %d)\n",
 			workBytes, partOffset, partOffset + workBytes, outputOffset);
 
 		if (ReadRegister(partOffset, workBytes,
-			(unsigned int*)((unsigned char*)buffer + outputOffset)) != B_OK) {
+			(uint32*)((unsigned char*)buffer + outputOffset)) != B_OK) {
 				// I've only done this once before.
 				TRACE_ALWAYS("Error: Read error at 0x%x."
 					" Read of %d bytes failed.\n",
@@ -550,7 +550,7 @@ BeceemNVM::FlashBulkRead(unsigned int offset, unsigned int size,
 status_t
 BeceemNVM::RestoreBlockProtect(unsigned long writestatus)
 {
-	unsigned int value = (FLASH_CMD_WRITE_ENABLE<< 24);
+	uint32 value = (FLASH_CMD_WRITE_ENABLE<< 24);
 	BizarroWriteRegister(FLASH_SPI_CMDQ_REG, sizeof(value), &value);
 
 	snooze(20);
@@ -563,15 +563,15 @@ BeceemNVM::RestoreBlockProtect(unsigned long writestatus)
 
 
 unsigned long
-BeceemNVM::DisableBlockProtect(unsigned int offset, size_t size)
+BeceemNVM::DisableBlockProtect(uint32 offset, size_t size)
 {
 	return 0;
 }
 
 
 status_t
-BeceemNVM::FlashBulkWrite(unsigned int offset, unsigned int size,
-	unsigned int* buffer)
+BeceemNVM::FlashBulkWrite(uint32 offset, uint32 size,
+	uint32* buffer)
 {
 	// TODO : Implement flash writing, not really needed for normal use
 	TRACE_ALWAYS("%s: Not yet implemented\n", __func__);
@@ -580,19 +580,19 @@ BeceemNVM::FlashBulkWrite(unsigned int offset, unsigned int size,
 
 
 status_t
-BeceemNVM::FlashSectorErase(unsigned int addr, unsigned int numOfSectors)
+BeceemNVM::FlashSectorErase(uint32 addr, uint32 numOfSectors)
 {
 	TRACE("Debug: Erasing %d sectors at 0x%x\n", numOfSectors, addr);
 
-	unsigned int uiStatus = 0;
-	unsigned int iIndex;
+	uint32 uiStatus = 0;
+	uint32 iIndex;
 	for (iIndex = 0 ; iIndex < numOfSectors ; iIndex++) {
-		unsigned int value = 0x06000000;
+		uint32 value = 0x06000000;
 		BizarroWriteRegister(FLASH_SPI_CMDQ_REG, sizeof(value), &value);
 
 		value = (0xd8000000 | (addr & 0xFFFFFF));
 		BizarroWriteRegister(FLASH_SPI_CMDQ_REG, sizeof(value), &value);
-		unsigned int iRetries = 0;
+		uint32 iRetries = 0;
 
 		do {
 			value = (FLASH_CMD_STATUS_REG_READ << 24);
@@ -630,14 +630,14 @@ status_t
 BeceemNVM::ReadMACFromNVM(ether_address *address)
 {
 	unsigned char MacAddr[6] = {0};
-	status_t status = NVMRead(MAC_ADDR_OFFSET, 6, (unsigned int*)&MacAddr[0]);
+	status_t status = NVMRead(MAC_ADDR_OFFSET, 6, (uint32*)&MacAddr[0]);
 	memcpy(address, MacAddr, 6);
 
 	return (status);
 }
 
 
-unsigned int
+uint32
 BeceemNVM::EEPROMGetSize()
 {
 	// To find the EEPROM size read the possible boundaries of the
@@ -645,12 +645,12 @@ BeceemNVM::EEPROMGetSize()
 	// result in wrap around. So when we get the End of the EEPROM we will
 	// get 'BECM' string which is indeed at offset 0.
 
-	unsigned int uiData = 0;
+	uint32 uiData = 0;
 	EEPROMBulkRead(0x0, 4, &uiData);
 
 	if (ntohl(uiData) == BECM) {
 		// If EEPROM is present, it will have 'BECM' string at 0th offset.
-		unsigned int uiIndex;
+		uint32 uiIndex;
 		for (uiIndex = 1 ; uiIndex <= 256; uiIndex *= 2) {
 			EEPROMBulkRead(uiIndex * 1024, 4, &uiData);
 
@@ -664,16 +664,16 @@ BeceemNVM::EEPROMGetSize()
 
 
 status_t
-BeceemNVM::EEPROMRead(unsigned int offset, unsigned int *pdwData)
+BeceemNVM::EEPROMRead(uint32 offset, uint32 *pdwData)
 {
 	// Read 4 bytes from EEPROM
 
 	// read 0x0f003020 until bit 2 of 0x0f003008 is set.
-	unsigned int regValue = 0;
+	uint32 regValue = 0;
 	BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG,
-		sizeof(unsigned int), &regValue);
+		sizeof(uint32), &regValue);
 
-	unsigned int retries = 16;
+	uint32 retries = 16;
 	while (((regValue >> 2) & 1) == 0) {
 		retries--;
 
@@ -685,7 +685,7 @@ BeceemNVM::EEPROMRead(unsigned int offset, unsigned int *pdwData)
 		}
 
 		BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG,
-			sizeof(unsigned int), &regValue);
+			sizeof(uint32), &regValue);
 	}
 
 	// wrm (0x0f003018, 0xNbXXXXXX)
@@ -697,11 +697,11 @@ BeceemNVM::EEPROMRead(unsigned int offset, unsigned int *pdwData)
 
 	offset |= 0x3b000000;
 
-	BizarroWriteRegister(EEPROM_CMDQ_SPI_REG, sizeof(unsigned int), &offset);
+	BizarroWriteRegister(EEPROM_CMDQ_SPI_REG, sizeof(uint32), &offset);
 
 	retries = 50;
 
-	BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG, sizeof(unsigned int),
+	BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG, sizeof(uint32),
 		&regValue);
 
 	while (((regValue >> 1) & 1) == 1) {
@@ -714,23 +714,23 @@ BeceemNVM::EEPROMRead(unsigned int offset, unsigned int *pdwData)
 			return B_ERROR;
 		}
 
-		BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG, sizeof(unsigned int),
+		BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG, sizeof(uint32),
 			&regValue);
 	}
 
-	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(unsigned int), &regValue);
+	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(uint32), &regValue);
 
-	unsigned int dwReadValue = regValue;
+	uint32 dwReadValue = regValue;
 
-	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(unsigned int), &regValue);
+	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(uint32), &regValue);
 
 	dwReadValue |= regValue << 8;
 
-	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(unsigned int), &regValue);
+	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(uint32), &regValue);
 
 	dwReadValue |= regValue << 16;
 
-	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(unsigned int), &regValue);
+	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(uint32), &regValue);
 
 	dwReadValue |= regValue << 24;
 
@@ -741,15 +741,15 @@ BeceemNVM::EEPROMRead(unsigned int offset, unsigned int *pdwData)
 
 
 status_t
-BeceemNVM::EEPROMBulkRead(unsigned int offset, size_t numBytes,
-	unsigned int* buffer)
+BeceemNVM::EEPROMBulkRead(uint32 offset, size_t numBytes,
+	uint32* buffer)
 {
-	unsigned int	uiData[4] = {0};
-	unsigned int	uiBytesRemaining = numBytes;
-	unsigned int	uiIndex = 0;
+	uint32	uiData[4] = {0};
+	uint32	uiBytesRemaining = numBytes;
+	uint32	uiIndex = 0;
 
-	unsigned int	uiTempOffset = 0;
-	unsigned int	uiExtraBytes = 0;
+	uint32	uiTempOffset = 0;
+	uint32	uiExtraBytes = 0;
 	unsigned char*	pcBuff = (unsigned char*)buffer;
 
 	TRACE("Debug: Reading %x bytes at offset %x.\n", numBytes, offset);
@@ -758,7 +758,7 @@ BeceemNVM::EEPROMBulkRead(unsigned int offset, size_t numBytes,
 		uiTempOffset = offset - (offset%16);
 		uiExtraBytes = offset - uiTempOffset;
 
-		EEPROMBulkRead(uiTempOffset, 16, (unsigned int*)&uiData[0]);
+		EEPROMBulkRead(uiTempOffset, 16, (uint32*)&uiData[0]);
 
 		if (uiBytesRemaining >= (16 - uiExtraBytes)) {
 			memcpy(buffer,
@@ -827,7 +827,7 @@ BeceemNVM::ValidateDSD(unsigned long hwParam)
 
 	/* Read the Length of structure */
 	unsigned short hwParamLen = 0;
-	NVMRead(dwReadValue, 2, (unsigned int*)&hwParamLen);
+	NVMRead(dwReadValue, 2, (uint32*)&hwParamLen);
 	hwParamLen = ntohs(hwParamLen);
 
 	/* Validate length */
@@ -846,7 +846,7 @@ BeceemNVM::ValidateDSD(unsigned long hwParam)
 		return B_ERROR;
 	}
 
-	NVMRead(dwReadValue, hwParamLen, (unsigned int*)puBuffer);
+	NVMRead(dwReadValue, hwParamLen, (uint32*)puBuffer);
 		// Populate allocated memory with string for checksum
 
 	unsigned short usChksmCalc = 0;
@@ -854,7 +854,7 @@ BeceemNVM::ValidateDSD(unsigned long hwParam)
 		// Perform checksum on values
 
 	unsigned short usChksmOrg = 0;
-	NVMRead(dwReadValue + hwParamLen, 2, (unsigned int*)&usChksmOrg);
+	NVMRead(dwReadValue + hwParamLen, 2, (uint32*)&usChksmOrg);
 		// Read what the device thinks the checksum should be
 
 	usChksmOrg = ntohs(usChksmOrg);

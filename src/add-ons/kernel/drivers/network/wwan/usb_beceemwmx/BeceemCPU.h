@@ -24,15 +24,15 @@ public:
 			status_t			CPUReset();
 
 // yuck.  These are in a parent class
-	virtual	status_t			ReadRegister(unsigned int reg, size_t size,
-									uint32_t* buffer) { return NULL; };
-	virtual	status_t			WriteRegister(unsigned int reg, size_t size,
-									uint32_t* buffer) { return NULL; };
-	virtual	status_t			BizarroReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual	status_t			ReadRegister(uint32 reg, size_t size,
+									uint32* buffer) { return NULL; };
+	virtual	status_t			WriteRegister(uint32 reg, size_t size,
+									uint32* buffer) { return NULL; };
+	virtual	status_t			BizarroReadRegister(uint32 reg,
+									size_t size, uint32* buffer)
 										{ return NULL; };
-	virtual status_t			BizarroWriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			BizarroWriteRegister(uint32 reg,
+									size_t size, uint32* buffer)
 										{ return NULL; };
 
 private:

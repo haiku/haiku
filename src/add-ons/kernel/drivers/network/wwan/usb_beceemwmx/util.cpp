@@ -10,23 +10,23 @@
 #include "util.h"
 
 void
-convertEndian(bool write, unsigned int uiByteCount, unsigned int* buffer)
+convertEndian(bool write, uint32 uiByteCount, uint32* buffer)
 {
-	unsigned int uiIndex = 0;
+	uint32 uiIndex = 0;
 
 	if( write == true ) {
-		for(uiIndex = 0; uiIndex < (uiByteCount/sizeof(unsigned int)); uiIndex++) {
+		for(uiIndex = 0; uiIndex < (uiByteCount/sizeof(uint32)); uiIndex++) {
 			buffer[uiIndex] = htonl(buffer[uiIndex]);
 		}
 	} else {
-		for(uiIndex = 0; uiIndex < (uiByteCount/sizeof(unsigned int)); uiIndex++) {
+		for(uiIndex = 0; uiIndex < (uiByteCount/sizeof(uint32)); uiIndex++) {
 			buffer[uiIndex] = ntohl(buffer[uiIndex]);
 		}
 	}
 }
 
 uint16_t
-CalculateHWChecksum(uint8_t* pu8Buffer, uint32_t u32Size)
+CalculateHWChecksum(uint8_t* pu8Buffer, uint32 u32Size)
 {
 	uint16_t u16CheckSum=0;
 	while(u32Size--) {

@@ -20,25 +20,25 @@ public:
 								BeceemLED();
 			status_t			LEDInit(WIMAX_DEVICE* wmxdevice);
 			status_t			LEDThreadTerminate();
-			status_t			LEDOff(unsigned int index);
-			status_t			LEDOn(unsigned int index);
+			status_t			LEDOff(uint32 index);
+			status_t			LEDOn(uint32 index);
 			status_t			LightsOut();
 	static	status_t			LEDThread(void *cookie);
 
 			WIMAX_DEVICE*		pwmxdevice;
 
 	// yuck.  These are in a parent class
-	virtual status_t			ReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			ReadRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
-	virtual status_t			WriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			WriteRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
-	virtual status_t			BizarroReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			BizarroReadRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
-	virtual status_t			BizarroWriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			BizarroWriteRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
 
 private:

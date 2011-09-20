@@ -58,22 +58,22 @@ virtual							~BeceemDevice();
 			status_t			Control(uint32 op, void *buffer, size_t length);
 			status_t			LoadConfig();
 			void				DumpConfig();
-			status_t			PushConfig(unsigned int loc);
-			status_t			PushFirmware(unsigned int loc);
+			status_t			PushConfig(uint32 loc);
+			status_t			PushFirmware(uint32 loc);
 
 			void				Removed();
 
 			status_t			CompareAndReattach(usb_device device);
 virtual		status_t			SetupDevice(bool deviceReplugged);
 
-			status_t			ReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer);
-			status_t			WriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer);
-			status_t			BizarroReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer);
-			status_t			BizarroWriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer);
+			status_t			ReadRegister(uint32 reg,
+									size_t size, uint32* buffer);
+			status_t			WriteRegister(uint32 reg,
+									size_t size, uint32* buffer);
+			status_t			BizarroReadRegister(uint32 reg,
+									size_t size, uint32* buffer);
+			status_t			BizarroWriteRegister(uint32 reg,
+									size_t size, uint32* buffer);
 
 private:
 static		void				_ReadCallback(void *cookie, int32 status,

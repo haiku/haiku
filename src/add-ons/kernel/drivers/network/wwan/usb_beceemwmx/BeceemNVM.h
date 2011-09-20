@@ -83,23 +83,23 @@ public:
 			status_t			ValidateDSD(unsigned long hwParam);
 
 
-			int					NVMRead(unsigned int offset, unsigned int size,
-									unsigned int* buffer);
-			int					NVMWrite(unsigned int offset, unsigned int size,
-									unsigned int* buffer);
+			int					NVMRead(uint32 offset, uint32 size,
+									uint32* buffer);
+			int					NVMWrite(uint32 offset, uint32 size,
+									uint32* buffer);
 
 	// yuck.  These are in a child class class
-	virtual status_t			ReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			ReadRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
-	virtual status_t			WriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			WriteRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
-	virtual status_t			BizarroReadRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			BizarroReadRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
-	virtual status_t			BizarroWriteRegister(unsigned int reg,
-									size_t size, uint32_t* buffer)
+	virtual status_t			BizarroWriteRegister(uint32 reg,
+									size_t size, uint32* buffer)
 									{ return NULL; };
 
 			int 				bSelectedChip;			// selected chip
@@ -109,30 +109,30 @@ private:
 
 			status_t			NVMDetect();
 			status_t			NVMFlush();
-			status_t			NVMChipSelect(unsigned int offset);
+			status_t			NVMChipSelect(uint32 offset);
 			status_t			RestoreBlockProtect(unsigned long writestatus);
-			unsigned long		DisableBlockProtect(unsigned int offset,
+			unsigned long		DisableBlockProtect(uint32 offset,
 									size_t size);
 
 			int					FlashGetBaseAddr();
 			unsigned long		FlashReadID();
 			status_t			FlashReadCS();
-			status_t			FlashSectorErase(unsigned int addr,
-									unsigned int numOfSectors);
-			status_t			FlashBulkRead(unsigned int offset,
-									unsigned int size, unsigned int* buffer);
-			status_t			FlashBulkWrite(unsigned int offset,
-									unsigned int size, unsigned int* buffer);
+			status_t			FlashSectorErase(uint32 addr,
+									uint32 numOfSectors);
+			status_t			FlashBulkRead(uint32 offset,
+									uint32 size, uint32* buffer);
+			status_t			FlashBulkWrite(uint32 offset,
+									uint32 size, uint32* buffer);
 			status_t			FlashCSFlip(PFLASH_CS_INFO FlashCSInfo);
 			status_t			FlashCSDump(PFLASH_CS_INFO FlashCSInfo);
 
-			unsigned int		EEPROMGetSize();
-			unsigned int		FlashGetSize();
+			uint32		EEPROMGetSize();
+			uint32		FlashGetSize();
 
-			status_t			EEPROMRead(unsigned int offset,
-									unsigned int *pdwData);
-			status_t			EEPROMBulkRead( unsigned int offset,
-									size_t numBytes, unsigned int* buffer);
+			status_t			EEPROMRead(uint32 offset,
+									uint32 *pdwData);
+			status_t			EEPROMBulkRead( uint32 offset,
+									size_t numBytes, uint32* buffer);
 };
 
 

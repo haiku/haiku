@@ -10,6 +10,7 @@
 
 
 #include "BeceemDDR.h"
+#include "BeceemDDRTiming.h"
 #include "Settings.h"
 
 
@@ -25,21 +26,21 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 	fWmxDevice = swmxdevice;
 	PDDR_SETTING psDDRSetting = NULL;
 
-	unsigned int chipID = fWmxDevice->deviceChipID;
+	uint32 chipID = fWmxDevice->deviceChipID;
 
 	unsigned long registerCount = 0;
 	unsigned long value = 0;
-	unsigned int uiResetValue = 0;
-	unsigned int uiClockSetting = 0;
+	uint32 uiResetValue = 0;
+	uint32 uiClockSetting = 0;
 	int retval = B_OK;
 
 	// Grab the Config6 metric from the vendor config and convert endianness
-	unsigned int vendorConfig6raw = fWmxDevice->vendorcfg.HostDrvrConfig6;
+	uint32 vendorConfig6raw = fWmxDevice->vendorcfg.HostDrvrConfig6;
 	vendorConfig6raw &= ~(htonl(1 << 15));
-	unsigned int vendorConfig6 = ntohl(vendorConfig6raw);
+	uint32 vendorConfig6 = ntohl(vendorConfig6raw);
 
 	// Read our vendor provided Config6 metric and populate memory settings
-	unsigned int vendorDDRSetting = (ntohl(vendorConfig6raw) >> 8) & 0x0F;
+	uint32 vendorDDRSetting = (ntohl(vendorConfig6raw) >> 8) & 0x0F;
 	bool vendorPmuMode = (vendorConfig6 >> 24) & 0x03;
 	bool vendorMipsConfig = (vendorConfig6 >> 20) & 0x01;
 	bool vendorPLLConfig = (vendorConfig6 >> 19) & 0x01;
@@ -84,7 +85,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 			if ((chipID != BCS220_2)
 				&& (chipID != BCS220_2BC)
 				&& (chipID != BCS220_3)) {
-				retval = BizarroReadRegister((unsigned int)0x0f000830,
+				retval = BizarroReadRegister((uint32)0x0f000830,
 					sizeof(uiResetValue), &uiResetValue);
 
 				if (retval < 0) {
@@ -93,7 +94,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 					return retval;
 				}
 				uiResetValue |= 0x44;
-				retval = BizarroWriteRegister((unsigned int)0x0f000830,
+				retval = BizarroWriteRegister((uint32)0x0f000830,
 					sizeof(uiResetValue), &uiResetValue);
 				if (retval < 0) {
 					TRACE_ALWAYS("%s:%d BizarroWriteRegister failed\n",
@@ -227,7 +228,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 			value = psDDRSetting->ulRegValue;
 
 		retval = BizarroWriteRegister(psDDRSetting->ulRegAddress,
-			sizeof(value), (unsigned int*)&value);
+			sizeof(value), (uint32*)&value);
 
 		if (B_OK != retval) {
 			TRACE_ALWAYS(
@@ -248,7 +249,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 			&& (chipID != BCS220_3)) {
 			/* drive MDDR to half in case of UMA-B:	*/
 			uiResetValue = 0x01010001;
-			retval = BizarroWriteRegister((unsigned int)0x0F007018,
+			retval = BizarroWriteRegister((uint32)0x0F007018,
 				sizeof(uiResetValue), &uiResetValue);
 
 			if (retval < 0) {
@@ -257,7 +258,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x00040020;
-			retval = BizarroWriteRegister((unsigned int)0x0F007094,
+			retval = BizarroWriteRegister((uint32)0x0F007094,
 				sizeof(uiResetValue), &uiResetValue);
 
 			if (retval < 0) {
@@ -266,7 +267,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x01020101;
-			retval = BizarroWriteRegister((unsigned int)0x0F00701c,
+			retval = BizarroWriteRegister((uint32)0x0F00701c,
 				sizeof(uiResetValue), &uiResetValue);
 
 			if (retval < 0) {
@@ -275,7 +276,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x01010000;
-			retval = BizarroWriteRegister((unsigned int)0x0F007018,
+			retval = BizarroWriteRegister((uint32)0x0F007018,
 				sizeof(uiResetValue), &uiResetValue);
 
 			if (retval < 0) {
@@ -295,7 +296,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 	     */
 		if (vendorPmuMode == HYBRID_MODE_7C) {
 			TRACE("Debug: Hybrid Power Mode 7C\n");
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 
 			if (retval < 0) {
@@ -303,7 +304,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 					__FUNCTION__, __LINE__);
 				return retval;
 			}
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
@@ -311,21 +312,21 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x1322a8;
-			retval = BizarroWriteRegister((unsigned int)0x0f000d1c,
+			retval = BizarroWriteRegister((uint32)0x0f000d1c,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroWriteRegister failed\n",
 					__FUNCTION__, __LINE__);
 				return retval;
 			}
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
 					__FUNCTION__, __LINE__);
 				return retval;
 			}
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
@@ -333,7 +334,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x132296;
-			retval = BizarroWriteRegister((unsigned int)0x0f000d14,
+			retval = BizarroWriteRegister((uint32)0x0f000d14,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroWriteRegister failed\n",
@@ -343,14 +344,14 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 		} else if (vendorPmuMode == HYBRID_MODE_6) {
 
 			TRACE("Debug: Hybrid Power Mode 6\n");
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
 					__FUNCTION__, __LINE__);
 				return retval;
 			}
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
@@ -358,21 +359,21 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x6003229a;
-			retval = BizarroWriteRegister((unsigned int)0x0f000d14,
+			retval = BizarroWriteRegister((uint32)0x0f000d14,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroWriteRegister failed\n",
 					__FUNCTION__, __LINE__);
 				return retval;
 			}
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
 					__FUNCTION__, __LINE__);
 				return retval;
 			}
-			retval = BizarroReadRegister((unsigned int)0x0f000c00,
+			retval = BizarroReadRegister((uint32)0x0f000c00,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroReadRegister failed\n",
@@ -380,7 +381,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 				return retval;
 			}
 			uiResetValue = 0x1322a8;
-			retval = BizarroWriteRegister((unsigned int)0x0f000d1c,
+			retval = BizarroWriteRegister((uint32)0x0f000d1c,
 				sizeof(uiResetValue), &uiResetValue);
 			if (retval < 0) {
 				TRACE_ALWAYS("%s:%d BizarroWriteRegister failed\n",

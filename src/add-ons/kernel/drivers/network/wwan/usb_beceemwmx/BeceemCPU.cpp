@@ -33,7 +33,7 @@ BeceemCPU::CPUInit(WIMAX_DEVICE* swmxdevice)
 status_t
 BeceemCPU::CPURun()
 {
-	unsigned int clockRegister = 0;
+	uint32 clockRegister = 0;
 
 	// Read current clock register contents
 	if (BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1,
@@ -62,7 +62,7 @@ BeceemCPU::CPURun()
 status_t
 BeceemCPU::CPUReset()
 {
-	unsigned int value = 0;
+	uint32 value = 0;
 
 	if (fWmxDevice->deviceChipID >= T3LPB) {
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
@@ -114,7 +114,7 @@ BeceemCPU::CPUReset()
 	}
 	// TODO : ELSE OLDER CHIP ID's < T3LP see Misc.c:1048
 
-	unsigned int uiResetValue = 0;
+	uint32 uiResetValue = 0;
 
 	if (fWmxDevice->CPUFlashBoot) {
 		// In flash boot mode MIPS state register has reverse polarity.

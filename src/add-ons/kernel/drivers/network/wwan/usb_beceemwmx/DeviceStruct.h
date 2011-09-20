@@ -97,7 +97,7 @@ typedef struct _VENDORCFG
 	#              Ack generation
 	# Version 50 - Added flag for handling partial nacking of PDUs, and retxing
 	#              only nacked blocks  */
-	unsigned int	m_u32CfgVersion;
+	uint32	m_u32CfgVersion;
 
 	/*
 	Scanning Parameters
@@ -105,19 +105,19 @@ typedef struct _VENDORCFG
 		Or use: 2336, 2345, 2354, 2367.5, 2385.5
 		Choosing the center frequency non-zero will
 		disable scanning! */
-	unsigned int	m_u32CenterFrequency;
-	unsigned int	m_u32BandAScan;
-	unsigned int	m_u32BandBScan;
-	unsigned int	m_u32BandCScan;
+	uint32	m_u32CenterFrequency;
+	uint32	m_u32BandAScan;
+	uint32	m_u32BandBScan;
+	uint32	m_u32BandCScan;
 
 	// QoS Params
-	unsigned int	m_u32minGrantsize;       // size of minimum grant is 0 or 6
-	unsigned int	m_u32PHSEnable;
+	uint32	m_u32minGrantsize;       // size of minimum grant is 0 or 6
+	uint32	m_u32PHSEnable;
 
 	// HO Params
-	unsigned int	m_u32HoEnable;
-	unsigned int	m_u32HoReserved1;
-	unsigned int	m_u32HoReserved2;
+	uint32	m_u32HoEnable;
+	uint32	m_u32HoReserved1;
+	uint32	m_u32HoReserved2;
 
 	/*
 	MIMO Enable ==> 0xddccbbaa
@@ -127,7 +127,7 @@ typedef struct _VENDORCFG
 		0xdd Reserved
 		0x0101 => Enables DL MIMO and UL CSM
 		0x010101 =? Enable DL MIMO, UL CSM, and disable MIMO B in DL */
-	unsigned int	m_u32MimoEnable;
+	uint32	m_u32MimoEnable;
 
 	/*
 	Security Parameters
@@ -136,20 +136,20 @@ typedef struct _VENDORCFG
 		bit 2 = Enable domain restriction for security
 		bit 3 = Disable encryption support
 		bit[31:4] = Unused. */
-	unsigned int	m_u32SecurityEnable;
+	uint32	m_u32SecurityEnable;
 
 	/*
 	PowerSaving enable
 		bit 1 = 1 Idlemode enable
 		bit 2 = 1 Sleepmode Enable */
-	unsigned int	m_u32PowerSavingModesEnable;
+	uint32	m_u32PowerSavingModesEnable;
 
 	/*
 	PowerSaving Mode Options
 		bit 0 = 1: CPE mode - to keep pcmcia if alive;
 		bit 1 = 1: CINR reporing in Idlemode Msg
 		bit 2 = 1: Default PSC Enable in sleepmode */
-	unsigned int	m_u32PowerSavingModeOptions;
+	uint32	m_u32PowerSavingModeOptions;
 
 	/*
 	ARQ Enable ==> 0xddccbbaa
@@ -159,7 +159,7 @@ typedef struct _VENDORCFG
 		cc => 0x01 Enable ARQ FB BW req enh
 		dd => 0th bit Disable ARQ Cut thru for Ack Generation
 		dd => 1st bit enables handling of partial nacking of PDUs, and retxing */
-	unsigned int	m_u32ArqEnable;
+	uint32	m_u32ArqEnable;
 
 	/*
 	HARQ Enable ==> 0xddccbbaa
@@ -175,28 +175,28 @@ typedef struct _VENDORCFG
 					  Enables out of deliver on the non-ARQ rx ERTPS HARQ connections
 		Eg. 0x0501 => Enables HARQ on Management and HARQ on Transport Connections
 					  Enables out of deliver on the non-ARQ RX HARQ connections */
-	unsigned int	m_u32HarqEnable;
+	uint32	m_u32HarqEnable;
 
 	// EEPROM Param Location
-	unsigned int	m_u32EEPROMFlag;
+	uint32	m_u32EEPROMFlag;
 
 	/*
 	Customize
 		Normal Mode should be set to (0x00000100)
 		Set bit 0 for using D5 CQICH IE (WiBro NW)
 		Bit 26 should be set to disable the BEU */
-	unsigned int	m_u32Customize;
+	uint32	m_u32Customize;
 
 	/*
 	Config Bandwidth
 		Should be in Hz i.e. 8750000, 10000000 */
-	unsigned int	m_u32ConfigBW;
+	uint32	m_u32ConfigBW;
 
 	/*
 	Shutdown Timer
 		number of frames (5 ms)
 		ShutDown Timer Value =  0x7fffffff */
-	unsigned int	m_u32ShutDownTimer;
+	uint32	m_u32ShutDownTimer;
 
 	/*
 	Radio Parameter
@@ -217,7 +217,7 @@ typedef struct _VENDORCFG
 		# 3.5GHz MS120 single band unit needs 0x42
 		# 2.3G and/or 3.5G BCS200 unit needs 0x40022
 		# 2.5G and/or 3.5G BCS200 unit needs 0x40032 */
-	unsigned int	m_u32RadioParameter;
+	uint32	m_u32RadioParameter;
 
 	/*
 	PhyParameter1 e.g. 0xccccbbaa
@@ -226,7 +226,7 @@ typedef struct _VENDORCFG
 		aa		= [7:0]		Number of UL symbols
 		Special value of 0xFFFFFFFF indicates use of embedded logic
 		PhyParameter1 = 0xFFFFFFFF */
-	unsigned int	m_u32PhyParameter1;
+	uint32	m_u32PhyParameter1;
 
 	/*
 	PhyParameter2
@@ -234,11 +234,11 @@ typedef struct _VENDORCFG
 				If set to 1, note the BTS Link Adaptation tables may need change
 		[15:8]	Backoff in 0.25dBm steps in Transmit power to be
 				applied for an uncalibrated unit */
-	unsigned int	m_u32PhyParameter2;
+	uint32	m_u32PhyParameter2;
 
 	/*
 	PhyParameter3 = 0x0 */
-	unsigned int	m_u32PhyParameter3;
+	uint32	m_u32PhyParameter3;
 
 	/*
 	TestOptions
@@ -271,14 +271,14 @@ typedef struct _VENDORCFG
 		-#define ENABLE__BF_WA									 	0x20000000
 		-#define ENABLE_BR_PWR_INCR_AND_IGNORE_PC_IE_OUT_DYNAMIC_RNG 0x40000000
 		-#define ENABLE_BR_CODE_TIMEOUT_PWR_ADJ_PDUS				0x80000000*/
-	unsigned int	m_u32TestOptions;
+	uint32	m_u32TestOptions;
 
 	/*
 	Max MAC Data per Frame to be sent in REG-REQ */
-	unsigned int	m_u32MaxMACDataperDLFrame;
-	unsigned int	m_u32MaxMACDataperULFrame;
+	uint32	m_u32MaxMACDataperDLFrame;
+	uint32	m_u32MaxMACDataperULFrame;
 
-	unsigned int	m_u32Corr2MacFlags;
+	uint32	m_u32Corr2MacFlags;
 
 	/*
 	HostDrvrConfig1/HostDrvrConfig2/HostDrvrConfig3
@@ -287,9 +287,9 @@ typedef struct _VENDORCFG
 		ON State (This makes sure that the LED is ON till a state is achieved)
 		Blink State (This makes sure that the LED Keeps Blinking till a state is
 		achieved e.g. firmware download state)*/
-	unsigned int	HostDrvrConfig1;
-	unsigned int	HostDrvrConfig2;
-	unsigned int	HostDrvrConfig3;
+	uint32	HostDrvrConfig1;
+	uint32	HostDrvrConfig2;
+	uint32	HostDrvrConfig3;
 
 	/*
 	HostDrvrConfig4/HostDrvrConfig5
@@ -300,8 +300,8 @@ typedef struct _VENDORCFG
 		HostDrvrConfig5 [31:0]
 			To set WiMAX Trigger Threshold for the type
 			selected in HostDrvrConfig4 */
-	unsigned int	HostDrvrConfig4;
-	unsigned int	HostDrvrConfig5;
+	uint32	HostDrvrConfig4;
+	uint32	HostDrvrConfig5;
 
 	/*
 	HostDrvrConfig6:
@@ -322,13 +322,13 @@ typedef struct _VENDORCFG
 			DEVICE_POWERSAVE_MODE_AS_PMU_SHUTDOWN			= 0x2
 		Bit[15]		Idlemode Auto correct mode.
 			0-Enable, 1- Disable. */
-	unsigned int	HostDrvrConfig6;
+	uint32	HostDrvrConfig6;
 
 	/*
 	Segmented PSUC
 		Option to enable support of Segmented PUSC.
 		If set to 0, only full reuse profiles are supported */
-	unsigned int	m_u32SegmentedPUSCenable;
+	uint32	m_u32SegmentedPUSCenable;
 
 	/*
 	BAMC Related Parameters
@@ -339,7 +339,7 @@ typedef struct _VENDORCFG
 		Bit[16..31]	Band AMC Data configuration:
 			Bit 16 = 1 Band AMC 2x3 support.
 		Bit 0 is effective only if bit 16 is set. */
-	unsigned int	 m_u32BandAMCEnable;
+	uint32	 m_u32BandAMCEnable;
 
 } VENDORCFG, *PSVENDORCFG;
 
@@ -384,69 +384,69 @@ typedef struct _GPIO_LED_MAP
 
 typedef struct _FLASH_CS_INFO
 {
-	uint32_t	MagicNumber;
+	uint32	MagicNumber;
 		// 0xBECE - F1A5 for FLAS(H)
 
-	uint32_t	FlashLayoutVersion;
+	uint32	FlashLayoutVersion;
 		// Flash layout version
 
-	uint32_t	ISOImageVersion;
+	uint32	ISOImageVersion;
 		// ISO Image / Format / Eng version
 
-	uint32_t	SCSIFirmwareVersion;
+	uint32	SCSIFirmwareVersion;
 		// SCSI Firmware Version
 
-	uint32_t	OffsetFromZeroForPart1ISOImage;
+	uint32	OffsetFromZeroForPart1ISOImage;
 		// Normally 0
 
-	uint32_t	OffsetFromZeroForScsiFirmware;
+	uint32	OffsetFromZeroForScsiFirmware;
 		// Normally 12MB
 
-	uint32_t	SizeOfScsiFirmware;
+	uint32	SizeOfScsiFirmware;
 		// Size of firmware, varies
 
-	uint32_t	OffsetFromZeroForPart2ISOImage;
+	uint32	OffsetFromZeroForPart2ISOImage;
 		// 1st word offset 12MB + sizeofScsiFirmware
 
-	uint32_t	OffsetFromZeroForCalibrationStart;
-	uint32_t	OffsetFromZeroForCalibrationEnd;
+	uint32	OffsetFromZeroForCalibrationStart;
+	uint32	OffsetFromZeroForCalibrationEnd;
 
-	uint32_t	OffsetFromZeroForVSAStart;
-	uint32_t	OffsetFromZeroForVSAEnd;
+	uint32	OffsetFromZeroForVSAStart;
+	uint32	OffsetFromZeroForVSAEnd;
 		// VSA0 offsets
 
-	uint32_t	OffsetFromZeroForControlSectionStart;
-	uint32_t	OffsetFromZeroForControlSectionData;
+	uint32	OffsetFromZeroForControlSectionStart;
+	uint32	OffsetFromZeroForControlSectionData;
 		// Control Section offsets
 
-	uint32_t	CDLessInactivityTimeout;
+	uint32	CDLessInactivityTimeout;
 		// NO Data Activity timeout to switch from MSC to NW Mode
 
-	uint32_t	NewImageSignature;
+	uint32	NewImageSignature;
 		// New ISO Image Signature
 
-	uint32_t	FlashSectorSizeSig;
+	uint32	FlashSectorSizeSig;
 		// Signature to validate the sector size.
 
-	uint32_t	FlashSectorSize;
+	uint32	FlashSectorSize;
 		// Sector Size
 
-	uint32_t	FlashWriteSupportSize;
+	uint32	FlashWriteSupportSize;
 		// Write Size Support
 
-	uint32_t	TotalFlashSize;
+	uint32	TotalFlashSize;
 		// Total Flash Size
 
-	uint32_t	FlashBaseAddr;
+	uint32	FlashBaseAddr;
 		// Flash Base Address for offset specified
 
-	uint32_t	FlashPartMaxSize;
+	uint32	FlashPartMaxSize;
 		// Flash Part Max Size
 
-	uint32_t	IsCDLessDeviceBootSig;
+	uint32	IsCDLessDeviceBootSig;
 		// Is CDLess or Flash Bootloader
 
-	uint32_t	MassStorageTimeout;
+	uint32	MassStorageTimeout;
 		// MSC Timeout after reset to switch from MSC to NW Mode
 
 } FLASH_CS_INFO, *PFLASH_CS_INFO;
@@ -455,15 +455,15 @@ struct WIMAX_DEVICE
 {
 			VENDORCFG			vendorcfg;
 				// we memcpy the vendor cfg here
-			unsigned int        syscfgBefFw;
+			uint32        syscfgBefFw;
 				// SYS_CFG before firmware
 			bool                CPUFlashBoot;
 				// Reverse MIPS
-			unsigned int        deviceChipID;
+			uint32        deviceChipID;
 				// Beceem interface chip model
 volatile	bool				driverHalt;
 				// gets set to true when driver is being shutdown
-volatile	unsigned int		driverState;
+volatile	uint32		driverState;
 				// Driver state, defined in Driver.h
 volatile	bool				driverDDRinit;
 				// has the DDR memory been initialized?
@@ -476,16 +476,16 @@ volatile	bool				driverFwPushed;
 			thread_id			LEDThreadID;
 				// Thread ID of LED state handler
 
-			unsigned int		nvmType;
+			uint32		nvmType;
 				// NVM Type (FLASH|EEPROM|UNKNOWN)
-			unsigned int		nvmDSDSize;
+			uint32		nvmDSDSize;
 				// NVM DSD Size
-			unsigned int		nvmVerMajor;
+			uint32		nvmVerMajor;
 				// NVM Major
-			unsigned int		nvmVerMinor;
+			uint32		nvmVerMinor;
 				// NVM Minor
 
-volatile	uint32_t			nvmFlashBaseAddr;
+volatile	uint32			nvmFlashBaseAddr;
 				// NVM Flash base address
 			unsigned long		nvmFlashCalStart;
 				// NVM Flash calibrated start
@@ -500,16 +500,16 @@ volatile	bool				nvmFlashCSDone;
 volatile	bool				nvmFlashRaw;
 				// Do we need raw access at the moment?
 
-			unsigned int		nvmFlashMajor;
+			uint32		nvmFlashMajor;
 				// NVM Flash layout major version
-			unsigned int		nvmFlashMinor;
+			uint32		nvmFlashMinor;
 				// NVM Flash layout major version
 
-			unsigned int		hwParamPtr;
+			uint32		hwParamPtr;
 				// Pointer to the NVM Param section address
 			unsigned char		gpioInfo[32];
 				// Stored GPIO information
-			unsigned int		gpioBitMap;
+			uint32		gpioBitMap;
 				// GPIO LED bitmap
 };
 

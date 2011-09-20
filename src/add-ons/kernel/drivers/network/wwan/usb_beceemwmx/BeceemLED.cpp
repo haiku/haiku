@@ -27,21 +27,18 @@ BeceemLED::LEDInit(WIMAX_DEVICE* wmxdevice)
 {
 	pwmxdevice = wmxdevice;
 
-	uint8_t			GPIO_Array[NUM_OF_LEDS+1];
-	unsigned char	ucIndex			= 0;
-	uint32_t		uiIndex			= 0;
-	unsigned char*	puCFGData		= NULL;
-	unsigned char	bData			= 0;
+	uint8 GPIO_Array[NUM_OF_LEDS + 1];
+	uint8 ucIndex = 0;
+	uint32 uiIndex = 0;
 
-	memset(GPIO_Array, GPIO_DISABLE_VAL, NUM_OF_LEDS+1);
+	memset(GPIO_Array, GPIO_DISABLE_VAL, NUM_OF_LEDS + 1);
 
 	TRACE("Debug: Raw GPIO information: 0x%x\n", pwmxdevice->gpioInfo);
 
 	snooze(500000);
 
 	if (pwmxdevice->deviceChipID == 0xbece0120
-		|| pwmxdevice->deviceChipID == 0xbece0121)
-	{
+		|| pwmxdevice->deviceChipID == 0xbece0121) {
 		/*Hardcode the values of GPIO numbers for ASIC board.*/
 		GPIO_Array[RED_LED] = 2;
 		GPIO_Array[BLUE_LED] = 3;
@@ -49,29 +46,27 @@ BeceemLED::LEDInit(WIMAX_DEVICE* wmxdevice)
 		GPIO_Array[GREEN_LED] = 4;
 	} else {
 		// for all possible GPIO pins...
-		for (ucIndex = 0; ucIndex < 32; ucIndex++)
-		{
-			switch(pwmxdevice->gpioInfo[ucIndex])
-			{
+		for (ucIndex = 0; ucIndex < 32; ucIndex++) {
+			switch(pwmxdevice->gpioInfo[ucIndex]) {
 				case RED_LED:
 					TRACE("Debug: GPIO: %d found RED_LED!\n", ucIndex);
 					GPIO_Array[RED_LED] = ucIndex;
-					pwmxdevice->gpioBitMap |= (1<<ucIndex);
+					pwmxdevice->gpioBitMap |= (1 << ucIndex);
 					break;
 				case BLUE_LED:
 					TRACE("Debug: GPIO: %d found BLUE_LED!\n", ucIndex);
 					GPIO_Array[BLUE_LED] = ucIndex;
-					pwmxdevice->gpioBitMap |= (1<<ucIndex);
+					pwmxdevice->gpioBitMap |= (1 << ucIndex);
 					break;
 				case YELLOW_LED:
 					TRACE("Debug: GPIO: %d found YELLOW_LED!\n", ucIndex);
 					GPIO_Array[YELLOW_LED] = ucIndex;
-					pwmxdevice->gpioBitMap |= (1<<ucIndex);
+					pwmxdevice->gpioBitMap |= (1 << ucIndex);
 					break;
 				case GREEN_LED:
 					TRACE("Debug: GPIO: %d found GREEN_LED!\n", ucIndex);
 					GPIO_Array[GREEN_LED] = ucIndex;
-					pwmxdevice->gpioBitMap |= (1<<ucIndex);
+					pwmxdevice->gpioBitMap |= (1 << ucIndex);
 					break;
 				default:
 					// TRACE("Debug: GPIO: %d found NO_LED!\n", ucIndex);
@@ -84,15 +79,14 @@ BeceemLED::LEDInit(WIMAX_DEVICE* wmxdevice)
 		pwmxdevice->gpioBitMap);
 
 	// Load GPIO configuration data from vendor config
-	puCFGData = (unsigned char *)&pwmxdevice->vendorcfg.HostDrvrConfig1;
+	uint8* puCFGData = (uint8*)&pwmxdevice->vendorcfg.HostDrvrConfig1;
 
-	for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++)
-	{
-		bData = *puCFGData;
+	for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++) {
+
+		uint8 bData = *puCFGData;
 
 		// Check Bit 8 for polarity. If it is set, polarity is reverse
-		if (bData & 0x80)
-		{
+		if (bData & 0x80) {
 			pwmxdevice->LEDMap.LEDState[uiIndex].BitPolarity = 0;
 			// unset bit 8
 			bData = bData & 0x7f;
@@ -123,8 +117,7 @@ BeceemLED::LEDInit(WIMAX_DEVICE* wmxdevice)
 
 	GPIOReset();	// Set all GPIO pins to off
 
-	for (uiIndex = 0; uiIndex<NUM_OF_LEDS; uiIndex++)
-	{
+	for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++) {
 		if (pwmxdevice->LEDMap.LEDState[uiIndex].GPIO_Num != GPIO_DISABLE_VAL) {
 			LEDOn(uiIndex);
 			TRACE("Debug: LED[%d].LED_Type = %x\n",
@@ -144,12 +137,12 @@ BeceemLED::LEDInit(WIMAX_DEVICE* wmxdevice)
 
 
 	// Spawn LED monitor / blink thread
-	pwmxdevice->LEDThreadID		= 	spawn_kernel_thread(LEDThread,
-										"usb_beceemwmx GPIO:LED",
-										B_NORMAL_PRIORITY, this);
+	pwmxdevice->LEDThreadID = spawn_kernel_thread(LEDThread,
+		"usb_beceemwmx GPIO:LED", B_NORMAL_PRIORITY, this);
 
 	if (pwmxdevice->LEDThreadID < 1) {
-		TRACE("Error: Problem spawning LED Thread: %i\n", pwmxdevice->LEDThreadID);
+		TRACE("Error: Problem spawning LED Thread: %i\n",
+			pwmxdevice->LEDThreadID);
 		return B_ERROR;
 	}
 
@@ -196,10 +189,9 @@ BeceemLED::LEDThreadTerminate()
 status_t
 BeceemLED::LightsOut()
 {
-	unsigned int    uiIndex			= 0;
+	uint32 uiIndex;
 
-	for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++)
-	{
+	for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++) {
 		if (pwmxdevice->LEDMap.LEDState[uiIndex].GPIO_Num != GPIO_DISABLE_VAL) {
 			LEDOff(uiIndex);
 		}
@@ -209,13 +201,11 @@ BeceemLED::LightsOut()
 
 
 status_t
-BeceemLED::LEDOn(unsigned int index)
+BeceemLED::LEDOn(uint32 index)
 {
-	status_t	result;
-	uint32_t	gpio_towrite = 0;
-	uint32_t	uiResetValue = 0;
+	status_t result;
 
-	gpio_towrite = 1<<pwmxdevice->LEDMap.LEDState[index].GPIO_Num;
+	uint32 gpio_towrite = 1 << pwmxdevice->LEDMap.LEDState[index].GPIO_Num;
 
 	if (pwmxdevice->LEDMap.LEDState[index].BitPolarity == 0)
 		result = BizarroWriteRegister(GPIO_OUTPUT_SET_REG,
@@ -229,23 +219,22 @@ BeceemLED::LEDOn(unsigned int index)
 			index, gpio_towrite, pwmxdevice->LEDMap.LEDState[index].GPIO_Num);
 	}
 
-	uiResetValue = BizarroReadRegister(GPIO_MODE_REGISTER,
+	uint32 uiResetValue = BizarroReadRegister(GPIO_MODE_REGISTER,
 		sizeof(uiResetValue), &uiResetValue);
 	uiResetValue |= gpio_towrite;
-	BizarroWriteRegister(GPIO_MODE_REGISTER, sizeof(uiResetValue), &uiResetValue);
+	BizarroWriteRegister(GPIO_MODE_REGISTER,
+		sizeof(uiResetValue), &uiResetValue);
 
 	return B_OK;
 }
 
 
 status_t
-BeceemLED::LEDOff(unsigned int index)
+BeceemLED::LEDOff(uint32 index)
 {
-	status_t	result;
-	uint32_t	gpio_towrite = 0;
-	uint32_t	uiResetValue = 0;
+	status_t result;
 
-	gpio_towrite = 1<<pwmxdevice->LEDMap.LEDState[index].GPIO_Num;
+	uint32 gpio_towrite = 1 << pwmxdevice->LEDMap.LEDState[index].GPIO_Num;
 
 	if (pwmxdevice->LEDMap.LEDState[index].BitPolarity == 0)
 		result = BizarroWriteRegister(GPIO_OUTPUT_CLR_REG,
@@ -259,7 +248,7 @@ BeceemLED::LEDOff(unsigned int index)
 			index, gpio_towrite, pwmxdevice->LEDMap.LEDState[index].GPIO_Num);
 	}
 
-	uiResetValue = BizarroReadRegister(GPIO_MODE_REGISTER,
+	uint32 uiResetValue = BizarroReadRegister(GPIO_MODE_REGISTER,
 		sizeof(uiResetValue), &uiResetValue);
 	uiResetValue |= gpio_towrite;
 	BizarroWriteRegister(GPIO_MODE_REGISTER,
@@ -276,24 +265,21 @@ BeceemLED::LEDThread(void *cookie)
 	BeceemLED *led = (BeceemLED *)cookie;
 
 	// While the driver is active
-	while (!led->pwmxdevice->driverHalt)
-	{
-		unsigned int  	uiIndex = 0;
-		unsigned int  	uiLedIndex = 0;
-		bool			blink = false;
+	while (!led->pwmxdevice->driverHalt) {
+		bool blink = false;
 
 		// LED state changes will be at least 500ms apart
 		snooze(500000);
 
+		uint32 uiIndex;
+		uint32 uiLedIndex = 0;
 		// determine what the LED is doing in each state
 		switch(led->pwmxdevice->driverState)
 		{
 			case STATE_FWPUSH:
-				for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++)
-				{
-					if (led->pwmxdevice->LEDMap.LEDState[uiIndex].LED_Blink_State
-						& STATE_FWPUSH)
-					{
+				for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++) {
+					if (led->pwmxdevice->LEDMap
+						.LEDState[uiIndex].LED_Blink_State & STATE_FWPUSH) {
 						if (led->pwmxdevice->LEDMap.LEDState[uiIndex].GPIO_Num
 							!= GPIO_DISABLE_VAL) {
 							uiLedIndex = uiIndex;
@@ -304,11 +290,9 @@ BeceemLED::LEDThread(void *cookie)
 				break;
 
 			case STATE_NONET:
-				for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++)
-				{
+				for (uiIndex = 0; uiIndex < NUM_OF_LEDS; uiIndex++) {
 					if (led->pwmxdevice->LEDMap.LEDState[uiIndex].LED_On_State
-						& STATE_NONET)
-					{
+						& STATE_NONET) {
 						if (led->pwmxdevice->LEDMap.LEDState[uiIndex].GPIO_Num
 							!= GPIO_DISABLE_VAL) {
 							uiLedIndex = uiIndex;
