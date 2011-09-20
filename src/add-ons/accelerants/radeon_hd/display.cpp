@@ -648,11 +648,17 @@ detect_displays()
 	if (displayIndex == 0) {
 		ERROR("%s: ERROR: 0 attached monitors were found on display connectors."
 			" Injecting first connector as a last resort.\n", __func__);
-		gDisplay[displayIndex]->active = true;
-		gDisplay[displayIndex]->connector_index = 0;
-		init_registers(gDisplay[displayIndex]->regs, displayIndex);
-		if (detect_crt_ranges(displayIndex) == B_OK)
-			gDisplay[displayIndex]->found_ranges = true;
+		for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+			// skip TV DAC connectors as likely fallback isn't for TV
+			if (gConnector[id]->encoder_type == VIDEO_ENCODER_TVDAC)
+				continue;
+			gDisplay[0]->active = true;
+			gDisplay[0]->connector_index = id;
+			init_registers(gDisplay[0]->regs, 0);
+			if (detect_crt_ranges(0) == B_OK)
+				gDisplay[0]->found_ranges = true;
+			break;
+		}
 	}
 
 
