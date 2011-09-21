@@ -142,7 +142,7 @@ struct gpio_info {
 	bool	valid;
 	bool	hw_capable;
 
-	uint8	pin;
+	uint8	i2c_slave_addr;
 
 	uint32	mask_scl_reg;
 	uint32	mask_sda_reg;

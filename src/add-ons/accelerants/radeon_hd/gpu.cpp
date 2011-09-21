@@ -344,7 +344,7 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 	*_data = (sda != 0);
 
 	//TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
-	//	__func__, info->pin, *_clock, *_data);
+	//	__func__, info->i2c_slave_addr, *_clock, *_data);
 
 	return B_OK;
 }
@@ -367,7 +367,7 @@ set_i2c_signals(void* cookie, int clock, int data)
 	Write32(OUT, info->a_sda_reg, data);
 
 	//TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
-	//	__func__, info->pin, clock, data);
+	//	__func__, info->i2c_slave_addr, clock, data);
 
 	return B_OK;
 }
@@ -402,11 +402,11 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 
 
 status_t
-radeon_gpu_i2c_setup(uint32 id, uint8 gpio_pin)
+radeon_gpu_i2c_setup(uint32 id, uint8 i2c_slave_addr)
 {
 	// aka radeon_lookup_i2c_gpio
-	TRACE("%s: Path #%" B_PRId32 ": GPIO Pin 0x%" B_PRIx8 "\n", __func__,
-		id, gpio_pin);
+	TRACE("%s: Path #%" B_PRId32 ": i2c slave: 0x%" B_PRIx8 "\n", __func__,
+		id, i2c_slave_addr);
 
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
 	uint8 frev;
@@ -434,7 +434,7 @@ radeon_gpu_i2c_setup(uint32 id, uint8 gpio_pin)
 		// TODO : if DCE 4 and i == 7 ... manual override for evergreen
 		// TODO : if DCE 3 and i == 4 ... manual override
 
-		if (gpio->sucI2cId.ucAccess != gpio_pin)
+		if (gpio->sucI2cId.ucAccess != i2c_slave_addr)
 			continue;
 
 		// populate gpio information
@@ -442,7 +442,8 @@ radeon_gpu_i2c_setup(uint32 id, uint8 gpio_pin)
 		gConnector[id]->connector_gpio.hw_capable
 			= (gpio->sucI2cId.sbfAccess.bfHW_Capable) ? true : false;
 
-		gConnector[id]->connector_gpio.pin = gpio_pin;
+		// slave address of i2c endpoint
+		gConnector[id]->connector_gpio.i2c_slave_addr = i2c_slave_addr;
 
 		// GPIO mask (Allows software to control the GPIO pad)
 		// 0 = chip access; 1 = only software;
