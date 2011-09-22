@@ -50,13 +50,13 @@ typedef DoublyLinkedList<net_socket_private> SocketList;
 
 struct net_socket_private : net_socket,
 		DoublyLinkedListLinkImpl<net_socket_private>,
-		WeakReferenceable<net_socket_private> {
+		BWeakReferenceable {
 	net_socket_private();
 	~net_socket_private();
 
 	void RemoveFromParent();
 
-	WeakPointer<net_socket_private>* parent;
+	BWeakReference<net_socket_private> parent;
 	team_id						owner;
 	uint32						max_backlog;
 	uint32						child_count;
@@ -82,8 +82,7 @@ static mutex sSocketLock;
 
 
 net_socket_private::net_socket_private()
-	: WeakReferenceable<net_socket_private>(this),
-	parent(NULL),
+	:
 	owner(-1),
 	max_backlog(0),
 	child_count(0),
@@ -148,7 +147,6 @@ net_socket_private::RemoveFromParent()
 {
 	ASSERT(!is_in_socket_list && parent != NULL);
 
-	parent->ReleaseReference();
 	parent = NULL;
 
 	mutex_lock(&sSocketLock);
@@ -337,10 +335,11 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 static void
 print_socket_line(net_socket_private* socket, const char* prefix)
 {
+	BReference<net_socket_private> parent = socket->parent.GetReference();
 	kprintf("%s%p %2d.%2d.%2d %6ld %p %p  %p%s\n", prefix, socket,
 		socket->family, socket->type, socket->protocol, socket->owner,
-		socket->first_protocol, socket->first_info, socket->parent,
-		socket->parent != NULL ? socket->is_connected ? " (c)" : " (p)" : "");
+		socket->first_protocol, socket->first_info, parent.Get(),
+		parent.Get() != NULL ? socket->is_connected ? " (c)" : " (p)" : "");
 }
 
 
@@ -357,8 +356,8 @@ dump_socket(int argc, char** argv)
 	kprintf("SOCKET %p\n", socket);
 	kprintf("  family.type.protocol: %d.%d.%d\n",
 		socket->family, socket->type, socket->protocol);
-	WeakReference<net_socket_private> parent = socket->parent;
-	kprintf("  parent:               %p (%p)\n", parent.Get(), socket->parent);
+	BReference<net_socket_private> parent = socket->parent.GetReference();
+	kprintf("  parent:               %p\n", parent.Get());
 	kprintf("  first protocol:       %p\n", socket->first_protocol);
 	kprintf("  first module_info:    %p\n", socket->first_info);
 	kprintf("  options:              %x\n", socket->options);
@@ -719,7 +718,7 @@ socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 
 	// add to the parent's list of pending connections
 	parent->pending_children.Add(socket);
-	socket->parent = parent->GetWeakPointer();
+	socket->parent = parent;
 	parent->child_count++;
 
 	*_socket = socket;
@@ -815,7 +814,7 @@ socket_connected(net_socket* _socket)
 
 	TRACE("socket_connected(%p)\n", socket);
 
-	WeakReference<net_socket_private> parent = socket->parent;
+	BReference<net_socket_private> parent = socket->parent.GetReference();
 	if (parent.Get() == NULL)
 		return B_BAD_VALUE;
 
@@ -843,7 +842,7 @@ socket_aborted(net_socket* _socket)
 
 	TRACE("socket_aborted(%p)\n", socket);
 
-	WeakReference<net_socket_private> parent = socket->parent;
+	BReference<net_socket_private> parent = socket->parent.GetReference();
 	if (parent.Get() == NULL)
 		return B_BAD_VALUE;
 
