@@ -8,6 +8,8 @@
 
 #include <Referenceable.h>
 
+#include <new>
+
 
 namespace BPrivate {
 
@@ -37,6 +39,8 @@ class BWeakReferenceable {
 public:
 								BWeakReferenceable();
 	virtual						~BWeakReferenceable();
+
+			status_t			InitCheck();
 
 			void				AcquireReference()
 									{ fPointer->GetUnchecked(); }
@@ -243,7 +247,7 @@ WeakPointer::GetUnchecked()
 inline
 BWeakReferenceable::BWeakReferenceable()
 	:
-	fPointer(new WeakPointer(this))
+	fPointer(new(std::nothrow) WeakPointer(this))
 {
 }
 
@@ -252,6 +256,15 @@ inline
 BWeakReferenceable::~BWeakReferenceable()
 {
 	fPointer->ReleaseReference();
+}
+
+
+inline status_t
+BWeakReferenceable::InitCheck()
+{
+	if (fPointer == NULL)
+		return B_NO_MEMORY;
+	return B_OK;
 }
 
 
