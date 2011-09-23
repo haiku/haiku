@@ -185,12 +185,17 @@ create_socket(int family, int type, int protocol, net_socket_private** _socket)
 	struct net_socket_private* socket = new(std::nothrow) net_socket_private;
 	if (socket == NULL)
 		return B_NO_MEMORY;
+	status_t status = socket->InitCheck();
+	if (status != B_OK) {
+		delete socket;
+		return status;
+	}
 
 	socket->family = family;
 	socket->type = type;
 	socket->protocol = protocol;
 
-	status_t status = get_domain_protocols(socket);
+	status = get_domain_protocols(socket);
 	if (status != B_OK) {
 		delete socket;
 		return status;
