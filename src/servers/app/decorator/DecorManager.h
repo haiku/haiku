@@ -5,6 +5,7 @@
  * Author:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Joseph Groover <looncraz@satx.rr.com>
  */
 #ifndef DECOR_MANAGER_H
 #define DECOR_MANAGER_H

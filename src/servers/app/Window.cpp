@@ -587,14 +587,24 @@ Window::ReloadDecor()
 	if (stack == NULL)
 		return false;
 
+	// only reload the window at the first position
+	if (stack->WindowAt(0) != this)
+		return true;
+
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
 		decorator = gDecorManager.AllocateDecorator(this);
 		if (decorator == NULL)
 			return false;
-		int32 index = PositionInStack();
-		if (IsFocus())
-			decorator->SetFocus(index, true);
+
+		// add all tabs to the decorator
+		for (int32 i = 1; i < stack->CountWindows(); i++) {
+			Window* window = stack->WindowAt(i);
+			BRegion dirty;
+			DesktopSettings settings(fDesktop);
+			decorator->AddTab(settings, window->Title(), window->Look(),
+				window->Flags(), -1, &dirty);
+		}
 	}
 
 	windowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
@@ -607,6 +617,15 @@ Window::ReloadDecor()
 
 	delete fWindowBehaviour;
 	fWindowBehaviour = windowBehaviour;
+
+	// set the correct focus and top layer tab
+	for (int32 i = 0; i < stack->CountWindows(); i++) {
+		Window* window = stack->WindowAt(i);
+		if (window->IsFocus())
+			decorator->SetFocus(i, true);
+		if (window == stack->TopLayerWindow())
+			decorator->SetTopTap(i);
+	}
 
 	return true;
 }
