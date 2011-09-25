@@ -9,11 +9,11 @@ Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands o
 Igor's lab	Main Window		Igor's labb
 Live input:	Main Window		Livekälla:
 MidiPlayer	System name		MidiSpelare
-None	Main Window		Ingen
+None	Main Window		Inget
 OK	Main Window		OK
 Off	Main Window		Av
 Play	Main Window		Spela
-Reverb:	Main Window		Reverb:
+Reverb:	Main Window		Eko:
 Scope	Main Window		Visualisering
 Stop	Main Window		Stopp
 Volume:	Main Window		Volym:
