@@ -281,10 +281,13 @@ static void
 lock_i2c(void* cookie, bool lock)
 {
 	gpio_info *info = (gpio_info*)cookie;
+	radeon_shared_info &sinfo = *gInfo->shared_info;
 
 	uint32 buffer = 0;
 
-	if (info->hw_capable == true) {
+	// hw_capable and > DCE3
+	if (info->hw_capable == true
+		&& sinfo.device_chipset >= (RADEON_R600 | 0x20)) {
 		// Switch GPIO pads to ddc mode
 		buffer = Read32(OUT, info->mask_scl_reg);
 		buffer &= ~(1 << 16);
@@ -304,14 +307,11 @@ lock_i2c(void* cookie, bool lock)
 	Write32(OUT, info->en_sda_reg, buffer);
 
 	// mask GPIO pins for software use
-	// TODO : we should use the mask... but it doesn't work for some reason
-	// buffer = Read32(OUT, info->mask_scl_reg);
+	buffer = Read32(OUT, info->mask_scl_reg);
 	if (lock == true) {
-		buffer = 1;
-		//buffer |= info->mask_scl_mask;
+		buffer |= info->mask_scl_mask;
 	} else {
-		buffer = 0;
-		//buffer &= ~info->mask_scl_mask;
+		buffer &= ~info->mask_scl_mask;
 	}
 
 	Write32(OUT, info->mask_scl_reg, buffer);
@@ -319,16 +319,13 @@ lock_i2c(void* cookie, bool lock)
 
 	buffer = Read32(OUT, info->mask_sda_reg);
 	if (lock == true) {
-		buffer = 1;
-	//	buffer |= info->mask_sda_mask;
+		buffer |= info->mask_sda_mask;
 	} else {
-		buffer = 0;
-	//	buffer &= ~info->mask_sda_mask;
+		buffer &= ~info->mask_sda_mask;
 	}
 
 	Write32(OUT, info->mask_sda_reg, buffer);
 	Read32(OUT, info->mask_sda_reg);
-
 }
 
 
@@ -337,14 +334,13 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
 	gpio_info *info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->y_scl_reg) & info->y_scl_mask;
-	uint32 sda = Read32(OUT, info->y_sda_reg) & info->y_sda_mask;
+	uint32 scl = Read32(OUT, info->y_scl_reg);
+	scl &= info->y_scl_mask;
+	uint32 sda = Read32(OUT, info->y_sda_reg);
+	sda &= info->y_sda_mask;
 
 	*_clock = (scl != 0);
 	*_data = (sda != 0);
-
-	//TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
-	//	__func__, info->i2c_slave_addr, *_clock, *_data);
 
 	return B_OK;
 }
@@ -363,11 +359,8 @@ set_i2c_signals(void* cookie, int clock, int data)
 	scl |= clock ? 0 : info->en_scl_mask;
 	sda |= data ? 0 : info->en_sda_mask;
 
-	Write32(OUT, info->a_scl_reg, clock);
-	Write32(OUT, info->a_sda_reg, data);
-
-	//TRACE("%s: GPIO 0x%" B_PRIX8 ", clock: %d, data: %d\n",
-	//	__func__, info->i2c_slave_addr, clock, data);
+	Write32(OUT, info->en_scl_reg, scl);
+	Write32(OUT, info->en_sda_reg, sda);
 
 	return B_OK;
 }
