@@ -138,11 +138,11 @@ struct pll_info {
 };
 
 
-struct gpio_info {
+typedef struct {
 	bool	valid;
-	bool	hw_capable;
 
-	uint8	i2c_slave_addr;
+	bool	hw_capable;
+	uint32	hw_line;
 
 	uint32	mask_scl_reg;
 	uint32	mask_sda_reg;
@@ -163,7 +163,7 @@ struct gpio_info {
 	uint32	a_sda_reg;
 	uint32	a_scl_mask;
 	uint32	a_sda_mask;
-};
+} gpio_info;
 
 
 typedef struct {
@@ -172,7 +172,7 @@ typedef struct {
 	uint16		connector_flags;
 	uint32		connector_type;
 	uint16		connector_object_id;
-	gpio_info	connector_gpio;
+	uint16		connector_gpio_id;
 	uint32		encoder_type;
 	uint16		encoder_object_id;
 	// TODO struct radeon_hpd hpd;
@@ -205,6 +205,7 @@ extern accelerant_info *gInfo;
 extern atom_context *gAtomContext;
 extern display_info *gDisplay[MAX_DISPLAY];
 extern connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+extern gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access

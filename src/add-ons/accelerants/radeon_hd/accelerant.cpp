@@ -42,6 +42,7 @@
 struct accelerant_info *gInfo;
 display_info *gDisplay[MAX_DISPLAY];
 connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 class AreaCloner {
@@ -133,6 +134,14 @@ init_common(int device, bool isClone)
 		memset(gConnector[id], 0, sizeof(connector_info));
 	}
 
+	// malloc for card gpio pin information
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		gGPIOInfo[id] = (gpio_info *)malloc(sizeof(gpio_info));
+
+		if (gGPIOInfo[id] == NULL)
+			return B_NO_MEMORY;
+		memset(gGPIOInfo[id], 0, sizeof(gpio_info));
+	}
 
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
@@ -218,8 +227,10 @@ uninit_common(void)
 		}
 	}
 
-	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++)
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		free(gConnector[id]);
+		free(gGPIOInfo[id]);
+	}
 }
 
 
@@ -243,19 +254,28 @@ radeon_init_accelerant(int device)
 
 	radeon_init_bios(gInfo->rom);
 
+	// detect GPIO pins
+	radeon_gpu_gpio_setup();
+
+	// detect physical connectors
 	status = detect_connectors();
 	if (status != B_OK) {
 		TRACE("%s: couldn't detect supported connectors!\n", __func__);
 		return status;
 	}
 
+	// print found connectors
 	debug_connectors();
 
+	// detect attached displays
 	status = detect_displays();
 	//if (status != B_OK)
 	//	return status;
+
+	// print found displays
 	debug_displays();
 
+	// create initial list of video modes
 	status = create_mode_list();
 	//if (status != B_OK) {
 	//	radeon_uninit_accelerant();

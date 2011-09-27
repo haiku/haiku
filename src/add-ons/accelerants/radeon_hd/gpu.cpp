@@ -371,13 +371,15 @@ bool
 radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 {
 	// ensure things are sane
-	if (gConnector[connector]->connector_gpio.valid == false)
+	uint32 gpio_id = gConnector[connector]->connector_gpio_id;
+	if (gGPIOInfo[gpio_id]->valid == false)
 		return false;
 
 	i2c_bus bus;
 
 	ddc2_init_timing(&bus);
-	bus.cookie = (void*)&gConnector[connector]->connector_gpio;
+	//bus.cookie = (void*)&gConnector[connector]->connector_gpio;
+	bus.cookie = (void*)gGPIOInfo[gpio_id];
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 
@@ -396,12 +398,25 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 
 
 status_t
-radeon_gpu_i2c_setup(uint32 id, uint8 i2c_slave_addr)
+radeon_gpu_i2c_attach(uint32 id, uint8 hw_line)
 {
-	// aka radeon_lookup_i2c_gpio
-	TRACE("%s: Path #%" B_PRId32 ": i2c slave: 0x%" B_PRIx8 "\n", __func__,
-		id, i2c_slave_addr);
+	gConnector[id]->connector_gpio_id = 0;
+	for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+		if (gGPIOInfo[i]->hw_line != hw_line)
+			continue;
+		gConnector[id]->connector_gpio_id = i;
+		return B_OK;
+	}
 
+	TRACE("%s: couldn't find GPIO for connector %" B_PRIu32 "\n",
+		__func__, id);
+	return B_ERROR;
+}
+
+
+status_t
+radeon_gpu_gpio_setup()
+{
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
 	uint8 frev;
 	uint8 crev;
@@ -412,7 +427,6 @@ radeon_gpu_i2c_setup(uint32 id, uint8 i2c_slave_addr)
 		&offset) != B_OK) {
 		ERROR("%s: could't read GPIO_I2C_Info table from AtomBIOS index %d!\n",
 			__func__, index);
-		gConnector[id]->connector_gpio.valid = false;
 		return B_ERROR;
 	}
 
@@ -422,72 +436,73 @@ radeon_gpu_i2c_setup(uint32 id, uint8 i2c_slave_addr)
 	uint32 num_indices = (size - sizeof(ATOM_COMMON_TABLE_HEADER))
 		/ sizeof(ATOM_GPIO_I2C_ASSIGMENT);
 
+	if (num_indices > ATOM_MAX_SUPPORTED_DEVICE) {
+		ERROR("%s: ERROR: AtomBIOS contains more GPIO_Info items then I"
+			"was prepared for! (seen: %" B_PRIu32 "; max: %" B_PRIu32 ")\n",
+			__func__, num_indices, (uint32)ATOM_MAX_SUPPORTED_DEVICE);
+		return B_ERROR;
+	}
+
 	for (uint32 i = 0; i < num_indices; i++) {
 		ATOM_GPIO_I2C_ASSIGMENT *gpio = &i2c_info->asGPIO_Info[i];
 
 		// TODO : if DCE 4 and i == 7 ... manual override for evergreen
 		// TODO : if DCE 3 and i == 4 ... manual override
 
-		if (gpio->sucI2cId.ucAccess != i2c_slave_addr)
-			continue;
-
 		// populate gpio information
-		// TODO : what is hw_capable?
-		gConnector[id]->connector_gpio.hw_capable
+		gGPIOInfo[i]->hw_line
+			= gpio->sucI2cId.ucAccess;
+		gGPIOInfo[i]->hw_capable
 			= (gpio->sucI2cId.sbfAccess.bfHW_Capable) ? true : false;
-
-		// slave address of i2c endpoint
-		gConnector[id]->connector_gpio.i2c_slave_addr = i2c_slave_addr;
 
 		// GPIO mask (Allows software to control the GPIO pad)
 		// 0 = chip access; 1 = only software;
-		gConnector[id]->connector_gpio.mask_scl_reg
+		gGPIOInfo[i]->mask_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
-		gConnector[id]->connector_gpio.mask_sda_reg
+		gGPIOInfo[i]->mask_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
-		gConnector[id]->connector_gpio.mask_scl_mask
+		gGPIOInfo[i]->mask_scl_mask
 			= (1 << gpio->ucClkMaskShift);
-		gConnector[id]->connector_gpio.mask_sda_mask
+		gGPIOInfo[i]->mask_sda_mask
 			= (1 << gpio->ucDataMaskShift);
 
 		// GPIO output / write (A) enable
 		// 0 = GPIO input (Y); 1 = GPIO output (A);
-		gConnector[id]->connector_gpio.en_scl_reg
+		gGPIOInfo[i]->en_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
-		gConnector[id]->connector_gpio.en_sda_reg
+		gGPIOInfo[i]->en_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
-		gConnector[id]->connector_gpio.en_scl_mask
+		gGPIOInfo[i]->en_scl_mask
 			= (1 << gpio->ucClkEnShift);
-		gConnector[id]->connector_gpio.en_sda_mask
+		gGPIOInfo[i]->en_sda_mask
 			= (1 << gpio->ucDataEnShift);
 
 		// GPIO output / write (A)
-		gConnector[id]->connector_gpio.a_scl_reg
+		gGPIOInfo[i]->a_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
-		gConnector[id]->connector_gpio.a_sda_reg
+		gGPIOInfo[i]->a_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-		gConnector[id]->connector_gpio.a_scl_mask
+		gGPIOInfo[i]->a_scl_mask
 			= (1 << gpio->ucClkA_Shift);
-		gConnector[id]->connector_gpio.a_sda_mask
+		gGPIOInfo[i]->a_sda_mask
 			= (1 << gpio->ucDataA_Shift);
 
 		// GPIO input / read (Y)
-		gConnector[id]->connector_gpio.y_scl_reg
+		gGPIOInfo[i]->y_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
-		gConnector[id]->connector_gpio.y_sda_reg
+		gGPIOInfo[i]->y_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-		gConnector[id]->connector_gpio.y_scl_mask
+		gGPIOInfo[i]->y_scl_mask
 			= (1 << gpio->ucClkY_Shift);
-		gConnector[id]->connector_gpio.y_sda_mask
+		gGPIOInfo[i]->y_sda_mask
 			= (1 << gpio->ucDataY_Shift);
 
 		// ensure data is valid
-		gConnector[id]->connector_gpio.valid
-			= (gConnector[id]->connector_gpio.mask_scl_reg) ? true : false;
+		gGPIOInfo[i]->valid = (gGPIOInfo[i]->mask_scl_reg) ? true : false;
 
-		// see if we found what we were looking for
-		if (gConnector[id]->connector_gpio.valid == true)
-			break;
+		TRACE("%s: GPIO @ %" B_PRIu32 ", valid: %s, hw_line: 0x%" B_PRIX32 "\n",
+			__func__, i, gGPIOInfo[i]->valid ? "true" : "false",
+			gGPIOInfo[i]->hw_line);
 	}
 
 	return B_OK;

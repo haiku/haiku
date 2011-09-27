@@ -563,11 +563,9 @@ detect_connectors()
 									i2c_config
 										= (ATOM_I2C_ID_CONFIG_ACCESS *)
 										&i2c_record->sucI2cId;
-
-									// set up i2c gpio information for connector
-									radeon_gpu_i2c_setup(connector_index,
+									// attach i2c gpio information for connector
+									radeon_gpu_i2c_attach(connector_index,
 										i2c_config->ucAccess);
-
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
 									// TODO : HPD (Hot Plug)
@@ -702,13 +700,15 @@ debug_connectors()
 		if (gConnector[id]->valid == true) {
 			uint32 connector_type = gConnector[id]->connector_type;
 			uint32 encoder_type = gConnector[id]->encoder_type;
+			uint16 gpio_id = gConnector[id]->connector_gpio_id;
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
 			ERROR(" + connector:  %s\n", get_connector_name(connector_type));
 			ERROR(" + encoder:    %s\n", get_encoder_name(encoder_type));
-			ERROR(" + i2c slave address:   0x%" B_PRIX8 "\n",
-				gConnector[id]->connector_gpio.i2c_slave_addr);
+			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpio_id);
 			ERROR(" + gpio valid: %s\n",
-				(gConnector[id]->connector_gpio.valid) ? "true" : "false");
+				gGPIOInfo[gpio_id]->valid ? "true" : "false");
+			ERROR(" + hw line:    0x%" B_PRIX32 "\n",
+				gGPIOInfo[gpio_id]->hw_line);
 		}
 	}
 	ERROR("==========================================\n");
