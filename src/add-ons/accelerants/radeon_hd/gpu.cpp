@@ -285,20 +285,22 @@ lock_i2c(void* cookie, bool lock)
 
 	uint32 buffer = 0;
 
-	// hw_capable and > DCE3
-	if (info->hw_capable == true
-		&& sinfo.device_chipset >= (RADEON_R600 | 0x20)) {
-		// Switch GPIO pads to ddc mode
-		buffer = Read32(OUT, info->mask_scl_reg);
-		buffer &= ~(1 << 16);
-		Write32(OUT, info->mask_scl_reg, buffer);
-	}
+	if (lock == true) {
+		// hw_capable and > DCE3
+		if (info->hw_capable == true
+			&& sinfo.device_chipset >= (RADEON_R600 | 0x20)) {
+			// Switch GPIO pads to ddc mode
+			buffer = Read32(OUT, info->mask_scl_reg);
+			buffer &= ~(1 << 16);
+			Write32(OUT, info->mask_scl_reg, buffer);
+		}
 
-	// Clear pins
-	buffer = Read32(OUT, info->a_scl_reg) & ~info->a_scl_mask;
-	Write32(OUT, info->a_scl_reg, buffer);
-	buffer = Read32(OUT, info->a_sda_reg) & ~info->a_sda_mask;
-	Write32(OUT, info->a_sda_reg, buffer);
+		// Clear pins
+		buffer = Read32(OUT, info->a_scl_reg) & ~info->a_scl_mask;
+		Write32(OUT, info->a_scl_reg, buffer);
+		buffer = Read32(OUT, info->a_sda_reg) & ~info->a_sda_mask;
+		Write32(OUT, info->a_sda_reg, buffer);
+	}
 
 	// Set pins to input
 	buffer = Read32(OUT, info->en_scl_reg) & ~info->en_scl_mask;
@@ -313,7 +315,6 @@ lock_i2c(void* cookie, bool lock)
 	} else {
 		buffer &= ~info->mask_scl_mask;
 	}
-
 	Write32(OUT, info->mask_scl_reg, buffer);
 	Read32(OUT, info->mask_scl_reg);
 
@@ -323,7 +324,6 @@ lock_i2c(void* cookie, bool lock)
 	} else {
 		buffer &= ~info->mask_sda_mask;
 	}
-
 	Write32(OUT, info->mask_sda_reg, buffer);
 	Read32(OUT, info->mask_sda_reg);
 }
@@ -353,14 +353,15 @@ set_i2c_signals(void* cookie, int clock, int data)
 
 	uint32 scl = Read32(OUT, info->en_scl_reg)
 		& ~info->en_scl_mask;
+	scl |= clock ? 0 : info->en_scl_mask;
+	Write32(OUT, info->en_scl_reg, scl);
+	Read32(OUT, info->en_scl_reg);
+
 	uint32 sda = Read32(OUT, info->en_sda_reg)
 		& ~info->en_sda_mask;
-
-	scl |= clock ? 0 : info->en_scl_mask;
 	sda |= data ? 0 : info->en_sda_mask;
-
-	Write32(OUT, info->en_scl_reg, scl);
 	Write32(OUT, info->en_sda_reg, sda);
+	Read32(OUT, info->en_sda_reg);
 
 	return B_OK;
 }
