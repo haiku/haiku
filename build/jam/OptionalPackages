@@ -90,7 +90,8 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 #	WonderBrush				- native graphics application
-#	WQY-MicroHei				- Chinese font
+#	wpa_supplicant			- a WPA Supplicant with support for WPA and WPA2
+#	WQY-MicroHei			- Chinese font
 #	XZ-Utils				- file archiving utility
 #	Yasm					- the assembler utility
 
@@ -1746,6 +1747,22 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 			: apps ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/WonderBrush/WonderBrush ;
+	}
+}
+
+
+# wpa_supplicant
+if [ IsOptionalHaikuImagePackageAdded wpa_supplicant ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package wpa_supplicant available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4) {
+		InstallOptionalHaikuImagePackage
+			wpa_supplicant-0.7.3-x86-gcc4-2011-09-27.zip
+			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2011-09-27.zip ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			wpa_supplicant-0.7.3-x86-gcc2-2011-09-27.zip
+			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc2-2011-09-27.zip ;
 	}
 }
 
