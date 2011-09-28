@@ -465,7 +465,8 @@ void
 Thread::DeleteUserTimers(bool userDefinedOnly)
 {
 	int32 count = fUserTimers.DeleteTimers(userDefinedOnly);
-	team->UserDefinedTimersRemoved(count);
+	if (count > 0)
+		team->UserDefinedTimersRemoved(count);
 }
 
 
