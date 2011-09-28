@@ -151,22 +151,6 @@ set_80211(const char* name, int32 type, void* data,
 }
 
 
-static int32
-translate_wep_key(const char*& buffer, char* key)
-{
-	memset(key, 0, IEEE80211_KEYBUF_SIZE);
-
-	// TODO: support possibility to set them all
-	if (buffer[0] != '\0') {
-		int32 length = strlcpy(key, buffer, IEEE80211_KEYBUF_SIZE);
-		buffer += length;
-		return length;
-	}
-
-	return 0;
-}
-
-
 // #pragma mark - exported functions
 
 
@@ -982,6 +966,8 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 	// Get network
 	BNetworkDevice device(deviceName);
 	wireless_network network;
+
+	bool askForConfig = false;
 	if ((address.Family() != AF_LINK
 			|| device.GetNetwork(address, network) != B_OK)
 		&& device.GetNetwork(name, network) != B_OK) {
@@ -993,12 +979,14 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		network.cipher = 0;
 		network.group_cipher = 0;
 		network.key_mode = 0;
+		askForConfig = true;
 	}
 
 	const char* string;
 	if (message.FindString("authentication", &string) == B_OK
 		|| (found && networkMessage.FindString("authentication", &string)
 				== B_OK)) {
+		askForConfig = false;
 		if (!strcasecmp(string, "wpa2")) {
 			network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA2;
 			network.key_mode = B_KEY_MODE_IEEE802_1X;
@@ -1011,20 +999,14 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 			network.authentication_mode = B_NETWORK_AUTHENTICATION_WEP;
 			network.key_mode = B_KEY_MODE_NONE;
 			network.cipher = network.group_cipher = B_NETWORK_CIPHER_WEP_40;
-		} else if (strcasecmp(string, "none") && strcasecmp(string, "open"))
+		} else if (strcasecmp(string, "none") && strcasecmp(string, "open")) {
 			fprintf(stderr, "%s: invalid authentication mode.\n", name);
+			askForConfig = true;
+		}
 	}
 
-	// TODO: if password is still NULL, ask password manager once we have one
-	// TODO: remove the clear text settings password once we have
-
-	if (password == NULL
-		&& network.authentication_mode > B_NETWORK_AUTHENTICATION_NONE)
-		return B_NOT_ALLOWED;
-
-	// Join the specified network with the specified authentication method
-
-	if (network.authentication_mode < B_NETWORK_AUTHENTICATION_WPA) {
+	if (!askForConfig
+		&& network.authentication_mode == B_NETWORK_AUTHENTICATION_NONE) {
 		// we join the network ourselves
 		status_t status = set_80211(deviceName, IEEE80211_IOC_SSID,
 			network.name, strlen(network.name));
@@ -1032,39 +1014,6 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 			fprintf(stderr, "%s: joining SSID failed: %s\n", name,
 				strerror(status));
 			return status;
-		}
-
-		if (network.authentication_mode == B_NETWORK_AUTHENTICATION_WEP) {
-			status = set_80211(deviceName, IEEE80211_IOC_WEP, NULL, 0,
-				IEEE80211_WEP_ON);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: turning on WEP failed: %s\n", name,
-					strerror(status));
-				return status;
-			}
-
-			const char* buffer = password;
-
-			// set key
-			for (int32 i = 0; i < 4; i++) {
-				char key[IEEE80211_KEYBUF_SIZE];
-				int32 keyLength = translate_wep_key(buffer, key);
-				status = set_80211(deviceName, IEEE80211_IOC_WEPKEY, key,
-					keyLength);
-				if (status != B_OK)
-					break;
-			}
-
-			if (status == B_OK) {
-				status = set_80211(deviceName, IEEE80211_IOC_WEPKEY, NULL, 0,
-					0);
-			}
-
-			if (status != B_OK) {
-				fprintf(stderr, "%s: setting WEP keys failed: %s\n", name,
-					strerror(status));
-				return status;
-			}
 		}
 
 		return B_OK;
@@ -1084,6 +1033,12 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		status = join.AddString("name", network.name);
 	if (status == B_OK)
 		status = join.AddFlat("address", &network.address);
+	if (status == B_OK && !askForConfig)
+		status = join.AddUInt32("authentication", network.authentication_mode);
+	if (status == B_OK && password != NULL)
+		status = join.AddString("password", password);
+	if (status != B_OK)
+		return status;
 
 	BMessenger wpaSupplicant(kWPASupplicantSignature);
 	BMessage reply;
