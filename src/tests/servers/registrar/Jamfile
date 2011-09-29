@@ -113,8 +113,7 @@ Server test_registrar
 
 	R5Compatibility.cpp
 	:
-	be
-	$(TARGET_LIBSTDC++)
+	be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
 	:
 	registrar.rdef
 ;
