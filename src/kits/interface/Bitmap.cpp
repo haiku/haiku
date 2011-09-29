@@ -1051,7 +1051,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				BPrivate::ServerMemoryAllocator* allocator
 					= BApplication::Private::ServerAllocator();
 
-				if (allocationFlags & kNewAllocatorArea) {
+				if ((allocationFlags & kNewAllocatorArea) != 0) {
 					error = allocator->AddArea(fServerArea, fArea,
 						fBasePointer, size);
 				} else {
