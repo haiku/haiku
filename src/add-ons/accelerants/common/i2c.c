@@ -28,7 +28,7 @@ void _sPrintf(const char *format, ...);
 
 
 /*!
-	I2c timings, rounded up (Phillips 1995 i2c bus specification, p20)
+	I2c timings, rounded up (Philips 1995 i2c bus specification, p20)
 */
 
 //! Timing for standard mode i2c (100kHz max)
