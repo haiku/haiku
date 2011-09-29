@@ -11,10 +11,10 @@
 #include <Bitmap.h>
 #include <InterfaceDefs.h>
 #include <String.h>
-#include <Window.h>
 #include <View.h>
+#include <Window.h>
 
-#include <private/interface/DecorInfo.h>
+#include <DecorInfo.h>
 
 
 void
