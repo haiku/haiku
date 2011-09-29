@@ -584,7 +584,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	memory->allocating_thread = find_thread(NULL);
 #endif
 
-#else
+#else	// !__HAIKU__ || GART_TEST
 	void *address;
 	memory->area = create_area("GART memory", &address, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK | ((flags & B_APERTURE_NEED_PHYSICAL) != 0
