@@ -76,17 +76,16 @@ create_mode_list(void)
 	const color_space kVesaSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
-	display_mode* initialModes = NULL;
 	uint32 initialModesCount = 0;
 
 	// Add initial VESA modes.
-	initialModes = (display_mode*)malloc(
+	display_mode* initialModes = (display_mode*)malloc(
 		sizeof(display_mode) * gInfo->shared_info->vesa_mode_count);
 	if (initialModes != NULL) {
 		initialModesCount = gInfo->shared_info->vesa_mode_count;
 		vesa_mode* vesaModes = gInfo->vesa_modes;
 
-		for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
+		for (uint32 i = 0; i < initialModesCount; i++) {
 			compute_display_timing(vesaModes[i].width, vesaModes[i].height,
 				60, false, &initialModes[i].timing);
 			fill_display_mode(vesaModes[i].width, vesaModes[i].height,
