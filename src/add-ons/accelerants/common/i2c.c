@@ -14,6 +14,7 @@
 #include <OS.h>
 #include <string.h>
 
+
 //#define TRACE_I2C
 #ifdef TRACE_I2C
 #ifdef __cplusplus
@@ -26,7 +27,11 @@ void _sPrintf(const char *format, ...);
 #endif
 
 
-//!	Timining for 100kHz bus (fractional parts are rounded up)
+/*!
+	I2c timings, rounded up (Phillips 1995 i2c bus specification, p20)
+*/
+
+//! Timing for standard mode i2c (100kHz max)
 const static i2c_timing kTiming100k = {
 	.buf = 5,
 	.hd_sta = 4,
@@ -38,8 +43,8 @@ const static i2c_timing kTiming100k = {
 	.r = 2,
 	.f = 2,
 	.su_sto = 4,
-	
-	// as these are unspecified, we use half a clock cycle as a safe guess
+
+	// these are unspecified, use half a clock cycle as a safe guess
 	.start_timeout = 5,
 	.byte_timeout = 5,
 	.bit_timeout = 5,
@@ -47,8 +52,7 @@ const static i2c_timing kTiming100k = {
 	.ack_timeout = 5
 };
 
-// timing for 400 kHz bus
-// (argh! heavy up-rounding here)
+//! Timing for fast mode i2c (400kHz max)
 const static i2c_timing kTiming400k = {
 	.buf = 2,
 	.hd_sta = 1,
@@ -60,8 +64,8 @@ const static i2c_timing kTiming400k = {
 	.r = 1,
 	.f = 1,
 	.su_sto = 1,
-	
-	// see kTiming100k
+
+	// these are unspecified, use half a clock cycle as a safe guess
 	.start_timeout = 2,
 	.byte_timeout = 2,
 	.bit_timeout = 2,
@@ -71,7 +75,7 @@ const static i2c_timing kTiming400k = {
 
 
 /*!
-	There's no spin in user space, but we need it to wait a couple 
+	There's no spin in user space, but we need it to wait a couple
 	of microseconds only
 	(in this case, snooze has much too much overhead)
 */
@@ -121,7 +125,7 @@ send_start_condition(const i2c_bus *bus)
 
 	status = wait_for_clk(bus, bus->timing.start_timeout);
 	if (status != B_OK) {
-		TRACE("send_start_condition(): Timeout sending start condition\n");
+		TRACE("%s: Timeout sending start condition\n", __func__);
 		return status;
 	}
 
@@ -149,7 +153,7 @@ send_stop_condition(const i2c_bus *bus)
 	// to make the slave release bus control
 	status = wait_for_clk(bus, bus->timing.ack_timeout);
 	if (status != B_OK) {
-		TRACE("send_stop_condition(): Timeout sending stop condition\n");
+		TRACE("%s: Timeout sending stop condition\n", __func__);
 		return status;
 	}
 
@@ -175,7 +179,7 @@ send_bit(const i2c_bus *bus, uint8 bit, int timeout)
 
 	status = wait_for_clk(bus, timeout);
 	if (status != B_OK) {
-		TRACE("send_bit(): Timeout when sending next bit\n");
+		TRACE("%s: Timeout when sending next bit\n", __func__);
 		return status;
 	}
 
@@ -201,7 +205,7 @@ send_acknowledge(const i2c_bus *bus)
 
 	status = wait_for_clk(bus, bus->timing.ack_start_timeout);
 	if (status != B_OK) {
-		TRACE("send_acknowledge(): Timeout when sending acknowledge\n");
+		TRACE("%s: Timeout when sending acknowledge\n", __func__);
 		return status;
 	}
 
@@ -218,8 +222,8 @@ send_acknowledge(const i2c_bus *bus)
 			break;
 
 		if (system_time() - startTime > bus->timing.ack_timeout) {
-			TRACE("send_acknowledge(): Slave didn't acknowledge byte within ack_timeout: %ld\n", 
-				bus->timing.ack_timeout);
+			TRACE("%s: slave didn't acknowledge byte within ack_timeout: %ld\n",
+				__func__, bus->timing.ack_timeout);
 			return B_TIMEOUT;
 		}
 
@@ -228,7 +232,7 @@ send_acknowledge(const i2c_bus *bus)
 
 	TRACE("send_acknowledge(): Success!\n");
 
-	// make sure we've waited at least t_high 
+	// make sure we've waited at least t_high
 	spin(bus->timing.high);
 
 	bus->set_signals(bus->cookie, 0, 1);
@@ -244,10 +248,10 @@ send_byte(const i2c_bus *bus, uint8 byte, bool acknowledge)
 {
 	int i;
 
-	//TRACE("send_byte(byte = %x)\n", byte);
+	//TRACE("%s: (byte = %x)\n", __func__, byte);
 
 	for (i = 7; i >= 0; --i) {
-		status_t status = send_bit(bus, byte >> i, 
+		status_t status = send_bit(bus, byte >> i,
 			i == 7 ? bus->timing.byte_timeout : bus->timing.bit_timeout);
 		if (status != B_OK)
 			return status;
@@ -266,6 +270,7 @@ send_slave_address(const i2c_bus *bus, int slaveAddress, bool isWrite)
 {
 	status_t status;
 
+	TRACE("%s: 0x%X\n", __func__, slaveAddress);
 	status = send_byte(bus, (slaveAddress & 0xfe) | !isWrite, true);
 	if (status != B_OK)
 		return status;
@@ -279,7 +284,7 @@ send_slave_address(const i2c_bus *bus, int slaveAddress, bool isWrite)
 	// - 0000 1xxx |-> reserved
 	// - 1111 1xxx |
 	// - 1111 0xxx - 10 bit address  (second byte contains remaining 8 bits)
-	
+
 	// the lsb is 0 for write and 1 for read (except for general call address)
 	if ((slaveAddress & 0xff) != 0 && (slaveAddress & 0xf8) != 0xf0)
 		return B_OK;
@@ -302,7 +307,7 @@ receive_bit(const i2c_bus *bus, bool *bit, int timeout)
 	// wait for slave to raise clock
 	status = wait_for_clk(bus, timeout);
 	if (status != B_OK) {
-		TRACE("receive_bit(): Timeout waiting for bit sent by slave\n");
+		TRACE("%s: Timeout waiting for bit sent by slave\n", __func__);
 		return status;
 	}
 
@@ -319,7 +324,7 @@ receive_bit(const i2c_bus *bus, bool *bit, int timeout)
 		// let it settle and leave it low for minimal time
 		// to make sure slave has finished bit transmission too
 
-	*bit = data;	
+	*bit = data;
 	return B_OK;
 }
 
@@ -360,7 +365,7 @@ receive_byte(const i2c_bus *bus, uint8 *resultByte, bool acknowledge)
 static status_t
 send_bytes(const i2c_bus *bus, const uint8 *writeBuffer, ssize_t writeLength)
 {
-	TRACE("send_bytes(length = %ld)\n", writeLength);
+	TRACE("%s: (length = %ld)\n", __func__, writeLength);
 
 	for (; writeLength > 0; --writeLength, ++writeBuffer) {
 		status_t status = send_byte(bus, *writeBuffer, true);
@@ -376,7 +381,7 @@ send_bytes(const i2c_bus *bus, const uint8 *writeBuffer, ssize_t writeLength)
 static status_t
 receive_bytes(const i2c_bus *bus, uint8 *readBuffer, ssize_t readLength)
 {
-	TRACE("receive_bytes(length = %ld)\n", readLength);
+	TRACE("%s: (length = %ld)\n", __func__, readLength);
 
 	for (; readLength > 0; --readLength, ++readBuffer) {
 		status_t status = receive_byte(bus, readBuffer, readLength > 1);
@@ -423,7 +428,7 @@ i2c_send_receive(const i2c_bus *bus, int slaveAddress, const uint8 *writeBuffer,
 	return send_stop_condition(bus);
 
 err:
-	TRACE("i2c_send_receive(): Cancelling transmission\n");
+	TRACE("%s: Cancelling transmission\n", __func__);
 	send_stop_condition(bus);
 	return status;
 }
@@ -432,6 +437,7 @@ err:
 void
 i2c_get100k_timing(i2c_timing *timing)
 {
+	// AKA standard i2c mode
 	memcpy(timing, &kTiming100k, sizeof(i2c_timing));
 }
 
@@ -439,5 +445,6 @@ i2c_get100k_timing(i2c_timing *timing)
 void
 i2c_get400k_timing(i2c_timing *timing)
 {
+	// AKA fast i2c mode
 	memcpy(timing, &kTiming400k, sizeof(i2c_timing));
 }
