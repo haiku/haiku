@@ -18,15 +18,19 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 # headers/build/private/kernel is needed for safemode.h and syscalls.h.
 # headers/private/kernel for the util/* stuff.
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
-UsePrivateHeaders kernel ;
+UsePrivateHeaders kernel support ;
 
 local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 
+UseHeaders [ FDirName $(appServerDir) decorator ] ;
 UseHeaders [ FDirName $(appServerDir) drawing ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
+UseHeaders [ FDirName $(appServerDir) font ] ;
+UseHeaders [ FDirName $(appServerDir) stackandtile ] ;
 UseFreeTypeHeaders ;
+UseLibraryHeaders agg lp_solve linprog ;
 
 # This overrides the definitions in private/servers/app/ServerConfig.h
 local defines = [ FDefines TEST_MODE=1 ] ;
@@ -36,8 +40,11 @@ SubDirCcFlags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO
 SubDirC++Flags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 
 SEARCH_SOURCE += $(appServerDir) ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) decorator ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing Painter ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) font ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) stackandtile ] ;
 
 SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
@@ -71,6 +78,7 @@ SharedLibrary libtestappserver.so :
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
+	DesktopListener.cpp
 	DesktopSettings.cpp
 	DirectWindowInfo.cpp
 	DrawState.cpp
@@ -94,6 +102,14 @@ SharedLibrary libtestappserver.so :
 
 	# drawing
 	PatternHandler.cpp
+
+	# stack and tile
+	SATDecorator.cpp
+	SATGroup.cpp
+	SATWindow.cpp
+	StackAndTile.cpp
+	Stacking.cpp
+	Tiling.cpp
 
 #	trace.c
 
