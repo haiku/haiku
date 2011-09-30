@@ -144,17 +144,48 @@ const struct supported_device {
 	// R2000 series (HD64xx - HD69xx)
 	// Codename: Nothern Islands
 	//  Caicos
-	{0x6770, RADEON_R2000 | 0x00, true,  "Radeon HD 6400"},
+	{0x6760, RADEON_R2000 | 0x00, false, "Radeon HD 6470M"},
+	{0x6761, RADEON_R2000 | 0x00, false, "Radeon HD 6430M"},
+	{0x6762, RADEON_R2000 | 0x00, false, "Radeon HD CAICOS"},
+	{0x6763, RADEON_R2000 | 0x00, false, "Radeon HD E6460 Discreet"},
+	{0x6764, RADEON_R2000 | 0x00, false, "Radeon HD CAICOS"},
+	{0x6765, RADEON_R2000 | 0x00, false, "Radeon HD CAICOS"},
+	{0x6766, RADEON_R2000 | 0x00, false, "Radeon HD CAICOS"},
+	{0x6767, RADEON_R2000 | 0x00, false, "Radeon HD CAICOS"},
+	{0x6768, RADEON_R2000 | 0x00, false, "Radeon HD CAICOS"},
+	{0x6770, RADEON_R2000 | 0x00, false, "Radeon HD 6400"},
 	{0x6779, RADEON_R2000 | 0x00, false, "Radeon HD 6450"},
 	//  Turks
+	{0x6740, RADEON_R2000 | 0x10, false, "Radeon HD 6700M"},
+	{0x6741, RADEON_R2000 | 0x10, false, "Radeon HD 6600M"},
+	{0x6742, RADEON_R2000 | 0x10, false, "Radeon HD 6625M"},
+	{0x6743, RADEON_R2000 | 0x10, false, "Radeon HD E6760 Discreet"},
+	{0x6744, RADEON_R2000 | 0x10, false, "Radeon HD TURKS M"},
+	{0x6745, RADEON_R2000 | 0x10, false, "Radeon HD TURKS M"},
+	{0x6746, RADEON_R2000 | 0x10, false, "Radeon HD TURKS"},
+	{0x6747, RADEON_R2000 | 0x10, false, "Radeon HD TURKS"},
+	{0x6748, RADEON_R2000 | 0x10, false, "Radeon HD TURKS"},
+	{0x6749, RADEON_R2000 | 0x10, false, "FirePro v4900"},
 	{0x6759, RADEON_R2000 | 0x10, false, "Radeon HD 6570"},
-	{0x6741, RADEON_R2000 | 0x10, true,  "Radeon HD 6650M"},
 	//  Barts
 	{0x673e, RADEON_R2000 | 0x20, false, "Radeon HD 6790"},
 	{0x6739, RADEON_R2000 | 0x20, false, "Radeon HD 6850"},
 	{0x6738, RADEON_R2000 | 0x20, false, "Radeon HD 6870"},
 	//  Cayman
+	{0x6700, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6701, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6702, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6703, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6704, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6705, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6706, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6707, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6708, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x6709, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
 	{0x6718, RADEON_R2000 | 0x30, false, "Radeon HD 6970"},
+	{0x6719, RADEON_R2000 | 0x30, false, "Radeon HD 6950"},
+	{0x671C, RADEON_R2000 | 0x30, false, "Radeon HD CAYMAN"},
+	{0x671F, RADEON_R2000 | 0x30, false, "Radeon HD 6900"},
 	//  Antilles
 	{0x671d, RADEON_R2000 | 0x40, false, "Radeon HD 6990"}
 
