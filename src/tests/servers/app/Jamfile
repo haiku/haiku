@@ -79,8 +79,8 @@ SharedLibrary libtestappserver.so :
 	CursorManager.cpp
 	CursorSet.cpp
 	DesktopListener.cpp
-	DesktopSettings.cpp
 	DirectWindowInfo.cpp
+	DrawingEngine.cpp
 	DrawState.cpp
 	FontCache.cpp
 	FontCacheEntry.cpp
@@ -101,35 +101,34 @@ SharedLibrary libtestappserver.so :
 	SystemPalette.cpp
 
 	# drawing
+	drawing_support.cpp
 	PatternHandler.cpp
-
-	# stack and tile
-	SATDecorator.cpp
-	SATGroup.cpp
-	SATWindow.cpp
-	StackAndTile.cpp
-	Stacking.cpp
-	Tiling.cpp
 
 #	trace.c
 
 	# libraries
-	: be libpainter.a libtextencoding.so libfreetype.so libshared.a
+	: be libpainter.a libagg.a libtextencoding.so libfreetype.so libshared.a
 ;
 
 AddResources test_app_server : app_server.rdef ;
 
 Server test_app_server :
 	# Misc. Sources
-	Decorator.cpp
 	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
 	MessageLooper.cpp
 
+	# Decorator
+	Decorator.cpp
+	DecorManager.cpp
+	DefaultDecorator.cpp
+	DefaultWindowBehaviour.cpp
+	MagneticBorder.cpp
+	WindowBehaviour.cpp
+
 	# Manager Classes
 	BitmapManager.cpp
-	DecorManager.cpp
 	InputManager.cpp
 	ScreenManager.cpp
 
@@ -145,12 +144,11 @@ Server test_app_server :
 	BitmapBuffer.cpp
 	BitmapDrawingEngine.cpp
 	drawing_support.cpp
-	DrawingEngine.cpp
 	MallocBuffer.cpp
 
+	DesktopSettings.cpp
 	VirtualScreen.cpp
 	BitmapHWInterface.cpp
-	DefaultDecorator.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
 	RegionPool.cpp
@@ -163,11 +161,19 @@ Server test_app_server :
 	Workspace.cpp
 	WorkspacesView.cpp
 
+	# stack and tile
+	SATDecorator.cpp
+	SATGroup.cpp
+	SATWindow.cpp
+	StackAndTile.cpp
+	Stacking.cpp
+	Tiling.cpp
+
 	# libraries
 	:
-	z libtestappserver.so libpainter.a be
-	libhwinterface.so libhwinterfaceimpl.so
-	libagg.a libfreetype.so libtextencoding.so
+	z libtestappserver.so be
+	libhwinterface.so libhwinterfaceimpl.so liblinprog.a
+	libfreetype.so libtextencoding.so
 	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;
 
