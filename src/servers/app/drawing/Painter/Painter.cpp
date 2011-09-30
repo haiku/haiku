@@ -5,9 +5,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 /*!	API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
 	rendering pipe-lines for stroke, fills, bitmap and text rendering.
 */
+
 
 #include "Painter.h"
 
@@ -154,7 +156,9 @@ detect_simd()
 		systemSIMD &= cpuSIMD;
 	}
 	return systemSIMD;
-#endif	// __INTEL__
+#else	// !__INTEL__
+	return 0;
+#endif
 }
 
 
