@@ -629,7 +629,7 @@ detect_displays()
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
-		if (radeon_gpu_read_edid(id, gDisplay[displayIndex]->edid_info)) {
+		if (radeon_gpu_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
 			gDisplay[displayIndex]->active = true;
 				// set this display as active
 			gDisplay[displayIndex]->connector_index = id;

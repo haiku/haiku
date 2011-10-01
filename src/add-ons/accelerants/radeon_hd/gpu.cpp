@@ -334,10 +334,10 @@ get_i2c_signals(void* cookie, int* _clock, int* _data)
 {
 	gpio_info *info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->y_scl_reg);
-	scl &= info->y_scl_mask;
-	uint32 sda = Read32(OUT, info->y_sda_reg);
-	sda &= info->y_sda_mask;
+	uint32 scl = Read32(OUT, info->y_scl_reg)
+		& info->y_scl_mask;
+	uint32 sda = Read32(OUT, info->y_sda_reg)
+		& info->y_sda_mask;
 
 	*_clock = (scl != 0);
 	*_data = (sda != 0);
@@ -378,7 +378,6 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 	i2c_bus bus;
 
 	ddc2_init_timing(&bus);
-	//bus.cookie = (void*)&gConnector[connector]->connector_gpio;
 	bus.cookie = (void*)gGPIOInfo[gpio_id];
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;

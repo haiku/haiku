@@ -189,7 +189,7 @@ typedef struct {
 	uint32			hfreq_max;
 	uint32			hfreq_min;
 	pll_info		pll;
-	edid1_info		*edid_info;
+	edid1_info		edid_info;
 } display_info;
 
 
