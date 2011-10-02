@@ -550,6 +550,14 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 			}
 
 			if (!matched) {
+				if (pci->read_pci_config(bus, device, function,
+						PCI_interrupt_line, 1) == 0) {
+					dprintf("assuming no interrupt use on PCI device"
+						" %u:%u:%u (bios irq 0, no routing information)\n",
+						bus, device, function);
+					continue;
+				}
+
 				panic("unable to find irq routing for PCI %u:%u:%u", bus,
 					device, function);
 				return B_ERROR;
