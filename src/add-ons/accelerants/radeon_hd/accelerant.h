@@ -11,12 +11,10 @@
 
 
 #include "atom.h"
+#include "encoder.h"
 #include "mode.h"
 #include "radeon_hd.h"
 #include "pll.h"
-#include "dac.h"
-#include "tmds.h"
-#include "lvds.h"
 
 
 #include <ByteOrder.h>

@@ -13,13 +13,11 @@ Addon radeon_hd.accelerant :
 	atom.cpp
 	gpu.cpp
 	accelerant.cpp
+	encoder.cpp
 	engine.cpp
 	hooks.cpp
 	pll.cpp
-	dac.cpp
 	display.cpp
-	tmds.cpp
-	lvds.cpp
 	mode.cpp
 	bios.cpp
 	create_display_modes.cpp

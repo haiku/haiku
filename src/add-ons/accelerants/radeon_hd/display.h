@@ -74,7 +74,6 @@ void display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode);
 void display_crtc_set(uint8 crtc_id, display_mode *mode);
 void display_crtc_set_dtd(uint8 crtc_id, display_mode *mode);
 void display_crtc_power(uint8 crt_id, int command);
-void display_crtc_assign_encoder(uint8 crt_id);
 
 
 #endif /* RADEON_HD_DISPLAY_H */

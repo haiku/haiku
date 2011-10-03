@@ -221,8 +221,8 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			args.v3.ucMiscInfo = (pll_id << 2);
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			// 	args.v3.ucMiscInfo |= PIXEL_CLOCK_MISC_REF_DIV_SRC;
-			args.v3.ucTransmitterId = crtc_id;
-				// TODO : transmitter id is now CRTC id?
+			args.v3.ucTransmitterId
+				= gConnector[connector_index]->encoder_object_id;
 			args.v3.ucEncoderMode = display_get_encoder_mode(connector_index);
 			break;
 		default:

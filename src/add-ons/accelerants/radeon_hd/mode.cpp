@@ -113,11 +113,11 @@ radeon_set_display_mode(display_mode *mode)
 			continue;
 		}
 
-		uint32 connector_index = gDisplay[id]->connector_index;
+		// uint32 connector_index = gDisplay[id]->connector_index;
 		// uint32 connector_type = gConnector[connector_index]->connector_type;
-		uint32 encoder_type = gConnector[connector_index]->encoder_type;
+		// uint32 encoder_type = gConnector[connector_index]->encoder_type;
 
-		display_crtc_assign_encoder(id);
+		encoder_assign_crtc(id);
 
 		// TODO : the first id is the pll we use... this won't work for
 		// more then two monitors
@@ -125,44 +125,15 @@ radeon_set_display_mode(display_mode *mode)
 
 		// Program CRT Controller
 		display_crtc_set_dtd(id, mode);
-		//display_crtc_fb_set_dce1(id, mode);
-		display_crtc_fb_set_legacy(id, mode);
+		display_crtc_fb_set_dce1(id, mode);
+		//display_crtc_fb_set_legacy(id, mode);
 		display_crtc_scale(id, mode);
-
-		// Program connector controllers
-		switch (encoder_type) {
-			case VIDEO_ENCODER_DAC:
-			case VIDEO_ENCODER_TVDAC:
-				// DACSet(connector_index, id);
-				break;
-			case VIDEO_ENCODER_TMDS:
-				// TMDSSet(connector_index, mode);
-				break;
-			case VIDEO_ENCODER_LVDS:
-				// LVDSSet(connector_index, mode);
-				break;
-		}
 
 		// Power CRT Controller
 		display_crtc_blank(id, ATOM_DISABLE);
 		display_crtc_power(id, ATOM_ENABLE);
 
 		//PLLPower(gDisplay[id]->connection_id, RHD_POWER_ON);
-
-		// Power connector controllers
-		switch (encoder_type) {
-			case VIDEO_ENCODER_DAC:
-			case VIDEO_ENCODER_TVDAC:
-				// DACPower(connector_index, RHD_POWER_ON);
-				break;
-			case VIDEO_ENCODER_TMDS:
-				// TMDSPower(connector_index, RHD_POWER_ON);
-				break;
-			case VIDEO_ENCODER_LVDS:
-				// LVDSSet(connector_index, mode);
-				// LVDSPower(connector_index, RHD_POWER_ON);
-				break;
-		}
 
 		display_crtc_lock(id, ATOM_DISABLE);
 			// commit
