@@ -468,19 +468,21 @@ NetServer::_ConfigureInterface(BMessage& message)
 	bool startAutoConfig = false;
 
 	int32 flags;
-	if (message.FindInt32("flags", &flags) < B_OK)
+	if (message.FindInt32("flags", &flags) != B_OK)
 		flags = IFF_UP;
 
 	bool autoConfigured;
-	if (message.FindBool("auto_configured", &autoConfigured) == B_OK && autoConfigured)
+	if (message.FindBool("auto_configured", &autoConfigured) == B_OK
+			&& autoConfigured) {
 		flags |= IFF_AUTO_CONFIGURED;
+	}
 
 	int32 mtu;
-	if (message.FindInt32("mtu", &mtu) < B_OK)
+	if (message.FindInt32("mtu", &mtu) != B_OK)
 		mtu = -1;
 
 	int32 metric;
-	if (message.FindInt32("metric", &metric) < B_OK)
+	if (message.FindInt32("metric", &metric) != B_OK)
 		metric = -1;
 
 	BNetworkInterface interface(name);
