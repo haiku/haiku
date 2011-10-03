@@ -195,9 +195,7 @@ init_registers(register_info* regs, uint8 crtid)
 status_t
 detect_crt_ranges(uint32 crtid)
 {
-	edid1_info *edid = &gInfo->shared_info->edid_info;
-
-	// TODO : use radeon ddc to get to connector EDID instead of VESA
+	edid1_info *edid = &gDisplay[crtid]->edid_info;
 
 	// Scan each VESA EDID description for monitor ranges
 	for (uint32 index = 0; index < EDID1_NUM_DETAILED_MONITOR_DESC; index++) {
@@ -325,7 +323,6 @@ status_t
 detect_connectors()
 {
 	int index = GetIndexIntoMasterTable(DATA, Object_Header);
-
 	uint8 frev;
 	uint8 crev;
 	uint16 size;
@@ -423,9 +420,9 @@ detect_connectors()
 			int32 j;
 			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
 				j++) {
-				uint16 grph_obj_id
-					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
-					& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+				//uint16 grph_obj_id
+				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
+				//	& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 				//uint8 grph_obj_num
 				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 				//	ENUM_ID_MASK) >> ENUM_ID_SHIFT;
@@ -529,7 +526,8 @@ detect_connectors()
 									// drm_encoder_helper_add
 									break;
 							}
-							encoder_object_id = grph_obj_id;
+							//encoder_object_id = grph_obj_id;
+							encoder_object_id = encoder_id;
 						}
 					}
 				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
@@ -1092,3 +1090,143 @@ display_crtc_power(uint8 crt_id, int command)
 }
 
 
+union crtc_source_param {
+	SELECT_CRTC_SOURCE_PS_ALLOCATION v1;
+	SELECT_CRTC_SOURCE_PARAMETERS_V2 v2;
+};
+
+
+void
+display_crtc_assign_encoder(uint8 crtc_id)
+{
+	int index = GetIndexIntoMasterTable(COMMAND, SelectCRTC_Source);
+	union crtc_source_param args;
+	uint8 frev;
+	uint8 crev;
+
+	memset(&args, 0, sizeof(args));
+
+	if (atom_parse_cmd_header(gAtomContext, index, &frev, &crev)
+		!= B_OK)
+		return;
+
+	uint16 connector_index = gDisplay[crtc_id]->connector_index;
+	uint16 encoder_id = gConnector[connector_index]->encoder_object_id;
+
+	switch (frev) {
+		case 1:
+			switch (crev) {
+				case 1:
+				default:
+					args.v1.ucCRTC = crtc_id;
+					switch (encoder_id) {
+						case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
+							args.v1.ucDevice = ATOM_DEVICE_DFP1_INDEX;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_LVDS:
+						case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
+							//if (radeon_encoder->devices
+							//	& ATOM_DEVICE_LCD1_SUPPORT)
+							//	args.v1.ucDevice = ATOM_DEVICE_LCD1_INDEX;
+							//else
+								args.v1.ucDevice = ATOM_DEVICE_DFP3_INDEX;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_DVO1:
+						case ENCODER_OBJECT_ID_INTERNAL_DDI:
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+							args.v1.ucDevice = ATOM_DEVICE_DFP2_INDEX;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_DAC1:
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+							//if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_TV_SUPPORT))
+							//	args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
+							//else if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_CV_SUPPORT))
+							//	args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
+							//else
+								args.v1.ucDevice = ATOM_DEVICE_CRT1_INDEX;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_DAC2:
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+							//if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_TV_SUPPORT))
+							//	args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
+							//else if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_CV_SUPPORT))
+							//	args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
+							//else
+								args.v1.ucDevice = ATOM_DEVICE_CRT2_INDEX;
+							break;
+					}
+					break;
+				case 2:
+					args.v2.ucCRTC = crtc_id;
+					args.v2.ucEncodeMode
+						= display_get_encoder_mode(connector_index);
+					switch (encoder_id) {
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+							ERROR("%s: DIG encoder not yet supported!\n",
+								__func__);
+							//dig = radeon_encoder->enc_priv;
+							//switch (dig->dig_encoder) {
+							//	case 0:
+							//		args.v2.ucEncoderID = ASIC_INT_DIG1_ENCODER_ID;
+							//		break;
+							//	case 1:
+							//		args.v2.ucEncoderID = ASIC_INT_DIG2_ENCODER_ID;
+							//		break;
+							//	case 2:
+							//		args.v2.ucEncoderID = ASIC_INT_DIG3_ENCODER_ID;
+							//		break;
+							//	case 3:
+							//		args.v2.ucEncoderID = ASIC_INT_DIG4_ENCODER_ID;
+							//		break;
+							//	case 4:
+							//		args.v2.ucEncoderID = ASIC_INT_DIG5_ENCODER_ID;
+							//		break;
+							//	case 5:
+							//		args.v2.ucEncoderID = ASIC_INT_DIG6_ENCODER_ID;
+							//		break;
+							//}
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+							args.v2.ucEncoderID = ASIC_INT_DVO_ENCODER_ID;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+							//if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_TV_SUPPORT))
+							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							//else if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_CV_SUPPORT))
+							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							//else
+								args.v2.ucEncoderID = ASIC_INT_DAC1_ENCODER_ID;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+							//if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_TV_SUPPORT))
+							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							//else if (radeon_encoder->active_device
+							//	& (ATOM_DEVICE_CV_SUPPORT))
+							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							//else
+								args.v2.ucEncoderID = ASIC_INT_DAC2_ENCODER_ID;
+							break;
+					}
+					break;
+			}
+			break;
+		default:
+			ERROR("%s: Unknown table version: %d, %d\n", __func__, frev, crev);
+			return;
+	}
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+	// TODO : encoder_crtc_scratch_regs?
+}

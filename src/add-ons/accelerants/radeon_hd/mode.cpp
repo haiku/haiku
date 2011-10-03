@@ -38,6 +38,8 @@ extern "C" void _sPrintf(const char *format, ...);
 status_t
 create_mode_list(void)
 {
+	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
+
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
@@ -80,6 +82,8 @@ radeon_get_mode_list(display_mode *modeList)
 status_t
 radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 {
+	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
+
 	TRACE("%s\n", __func__);
 	if (!gInfo->shared_info->has_edid)
 		return B_ERROR;
@@ -96,7 +100,7 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	// TODO : We set the same VESA EDID mode on each display
+	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
 
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
@@ -112,6 +116,8 @@ radeon_set_display_mode(display_mode *mode)
 		uint32 connector_index = gDisplay[id]->connector_index;
 		// uint32 connector_type = gConnector[connector_index]->connector_type;
 		uint32 encoder_type = gConnector[connector_index]->encoder_type;
+
+		display_crtc_assign_encoder(id);
 
 		// TODO : the first id is the pll we use... this won't work for
 		// more then two monitors
