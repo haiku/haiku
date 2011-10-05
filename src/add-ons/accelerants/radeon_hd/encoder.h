@@ -13,6 +13,7 @@ void encoder_assign_crtc(uint8 crt_id);
 void encoder_mode_set(uint8 id, uint32 pixelClock);
 void encoder_analog_setup(uint8 id, uint32 pixelClock, int command);
 void encoder_output_lock(bool lock);
+void encoder_dpms_set(uint8 encoder_id, int mode);
 
 
 #endif /* RADEON_HD_ENCODER_H */

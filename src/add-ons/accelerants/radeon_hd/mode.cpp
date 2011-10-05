@@ -136,9 +136,11 @@ radeon_set_display_mode(display_mode *mode)
 		if (gDisplay[id]->active == false)
 			continue;
 
+		uint16 connector_index = gDisplay[id]->connector_index;
 		// *** encoder prep
 		encoder_output_lock(true);
-		// encoder DPMS OFF
+		encoder_dpms_set(gConnector[connector_index]->encoder_object_id,
+			B_DPMS_OFF);
 
 		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
@@ -167,7 +169,8 @@ radeon_set_display_mode(display_mode *mode)
 
 
 		// *** encoder commit
-		// encoder DPMS OFF
+		encoder_dpms_set(gConnector[connector_index]->encoder_object_id,
+			B_DPMS_ON);
 		encoder_output_lock(false);
 	}
 

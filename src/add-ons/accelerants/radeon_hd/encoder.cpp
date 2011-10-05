@@ -242,6 +242,84 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 
 
 void
+encoder_dpms_set(uint8 encoder_id, int mode)
+{
+	int index = 0;
+	DISPLAY_DEVICE_OUTPUT_CONTROL_PS_ALLOCATION args;
+
+	memset(&args, 0, sizeof(args));
+
+	switch (encoder_id) {
+		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
+			index = GetIndexIntoMasterTable(COMMAND, TMDSAOutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+			ERROR("%s: TODO DIG DPMS set\n", __func__);
+			return;
+		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
+		case ENCODER_OBJECT_ID_INTERNAL_DDI:
+			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+			// TODO : encoder dpms set newer cards
+			// If DCE5, dvo true
+			// If DCE3, dig true
+			// else...
+			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
+			index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
+			// TODO : Laptop LCD special cases dpms set
+			// if ATOM_DEVICE_LCD_SUPPORT, LCD1OutputControl
+			// else...
+			index = GetIndexIntoMasterTable(COMMAND, LVTMAOutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+			// TODO : encoder dpms dce5 dac
+			// else...
+			/*
+			if (radeon_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT))
+				index = GetIndexIntoMasterTable(COMMAND, TV1OutputControl);
+			else if (radeon_encoder->active_device & (ATOM_DEVICE_CV_SUPPORT))
+				index = GetIndexIntoMasterTable(COMMAND, CV1OutputControl);
+			else
+			*/
+			index = GetIndexIntoMasterTable(COMMAND, DAC1OutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+			// TODO : tv or CV encoder on DAC2
+			index = GetIndexIntoMasterTable(COMMAND, DAC2OutputControl);
+			break;
+	}
+
+	switch (mode) {
+		case B_DPMS_ON:
+			args.ucAction = ATOM_ENABLE;
+			atom_execute_table(gAtomContext, index, (uint32*)&args);
+			// TODO : ATOM_DEVICE_LCD_SUPPORT : args.ucAction = ATOM_LCD_BLON;
+			//		  execute again
+			break;
+		case B_DPMS_STAND_BY:
+		case B_DPMS_SUSPEND:
+		case B_DPMS_OFF:
+			args.ucAction = ATOM_DISABLE;
+			atom_execute_table(gAtomContext, index, (uint32*)&args);
+			// TODO : ATOM_DEVICE_LCD_SUPPORT : args.ucAction = ATOM_LCD_BLOFF;
+			//		  execute again
+			break;
+	}
+}
+
+
+void
 encoder_output_lock(bool lock)
 {
 	TRACE("%s: %s\n", __func__, lock ? "true" : "false");
