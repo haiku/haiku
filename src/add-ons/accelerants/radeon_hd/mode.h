@@ -29,6 +29,7 @@
 status_t create_mode_list(void);
 bool is_mode_supported(display_mode* mode);
 status_t is_mode_sane(display_mode *mode);
+void radeon_dpms_set(int mode);
 
 
 #endif /*RADEON_HD_MODE_H*/

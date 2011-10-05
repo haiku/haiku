@@ -97,47 +97,81 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 }
 
 
+void
+radeon_dpms_set(int mode)
+{
+	switch(mode) {
+		case B_DPMS_ON:
+			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+				if (gDisplay[id]->active == false)
+					continue;
+				display_crtc_power(id, ATOM_ENABLE);
+				display_crtc_memreq(id, ATOM_ENABLE);
+				display_crtc_blank(id, ATOM_DISABLE);
+			}
+			break;
+		case B_DPMS_STAND_BY:
+		case B_DPMS_SUSPEND:
+		case B_DPMS_OFF:
+			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+				if (gDisplay[id]->active == false)
+					continue;
+				display_crtc_blank(id, ATOM_ENABLE);
+				display_crtc_memreq(id, ATOM_DISABLE);
+				display_crtc_power(id, ATOM_DISABLE);
+			}
+			break;
+	}
+}
+
+
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
 	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
+	radeon_dpms_set(B_DPMS_OFF);
 
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
-		display_crtc_lock(id, ATOM_ENABLE);
-		// Skip if display is inactive
-		if (gDisplay[id]->active == false) {
-			display_crtc_blank(id, ATOM_ENABLE);
-			display_crtc_power(id, ATOM_DISABLE);
-			display_crtc_lock(id, ATOM_DISABLE);
+		if (gDisplay[id]->active == false)
 			continue;
-		}
 
-		// uint32 connector_index = gDisplay[id]->connector_index;
-		// uint32 connector_type = gConnector[connector_index]->connector_type;
-		// uint32 encoder_type = gConnector[connector_index]->encoder_type;
+		// *** encoder prep
+		encoder_output_lock(true);
+		// encoder DPMS OFF
 
-		encoder_assign_crtc(id);
+		// *** CRT controler prep
+		display_crtc_lock(id, ATOM_ENABLE);
 
-		// TODO : the first id is the pll we use... this won't work for
-		// more then two monitors
-		pll_set(id, mode->timing.pixel_clock, id);
 
-		// Program CRT Controller
+		// *** CRT controler mode set
+		// TODO program SS
+		pll_set(0, mode->timing.pixel_clock, id);
+			// TODO : check if pll 0 is used and use pll 1 if so
 		display_crtc_set_dtd(id, mode);
+
+		// TODO : vvvv : atombios_crtc_set_base
 		display_crtc_fb_set_dce1(id, mode);
-		//display_crtc_fb_set_legacy(id, mode);
+		// display_crtc_fb_set_legacy(id, mode);
+		// atombios_overscan_setup
 		display_crtc_scale(id, mode);
 
-		// Power CRT Controller
-		display_crtc_blank(id, ATOM_DISABLE);
-		display_crtc_power(id, ATOM_ENABLE);
 
-		//PLLPower(gDisplay[id]->connection_id, RHD_POWER_ON);
+		// *** encoder mode set
+		encoder_mode_set(id, mode->timing.pixel_clock);
+		encoder_assign_crtc(id);
 
+
+		// *** CRT controler commit
 		display_crtc_lock(id, ATOM_DISABLE);
-			// commit
+
+
+		// *** encoder commit
+		// encoder DPMS OFF
+		encoder_output_lock(false);
 	}
+
+	radeon_dpms_set(B_DPMS_ON);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);

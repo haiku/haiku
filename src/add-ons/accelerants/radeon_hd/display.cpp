@@ -431,6 +431,7 @@ detect_connectors()
 					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
 					// Found an encoder
+					// TODO : it may be possible to have more then one encoder
 					int32 k;
 					for (k = 0; k < enc_obj->ucNumberOfObjects; k++) {
 						uint16 encoder_obj
@@ -526,7 +527,6 @@ detect_connectors()
 									// drm_encoder_helper_add
 									break;
 							}
-							//encoder_object_id = grph_obj_id;
 							encoder_object_id = encoder_id;
 						}
 					}
@@ -1076,17 +1076,30 @@ display_crtc_set_dtd(uint8 crtc_id, display_mode *mode)
 
 
 void
-display_crtc_power(uint8 crt_id, int command)
+display_crtc_power(uint8 crtc_id, int command)
 {
 	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTC);
 	ENABLE_CRTC_PS_ALLOCATION args;
 
 	memset(&args, 0, sizeof(args));
 
-	args.ucCRTC = crt_id;
+	args.ucCRTC = crtc_id;
 	args.ucEnable = command;
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
+void
+display_crtc_memreq(uint8 crtc_id, int command)
+{
+	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTCMemReq);
+	ENABLE_CRTC_PS_ALLOCATION args;
+
+	memset(&args, 0, sizeof(args));
+
+	args.ucCRTC = crtc_id;
+	args.ucEnable = command;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+}

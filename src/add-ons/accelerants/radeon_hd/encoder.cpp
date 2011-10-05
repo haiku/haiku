@@ -37,7 +37,7 @@ union crtc_source_param {
 
 
 void
-encoder_assign_crtc(uint8 crtc_id)
+encoder_assign_crtc(uint8 id)
 {
 	int index = GetIndexIntoMasterTable(COMMAND, SelectCRTC_Source);
 	union crtc_source_param args;
@@ -50,7 +50,7 @@ encoder_assign_crtc(uint8 crtc_id)
 		!= B_OK)
 		return;
 
-	uint16 connector_index = gDisplay[crtc_id]->connector_index;
+	uint16 connector_index = gDisplay[id]->connector_index;
 	uint16 encoder_id = gConnector[connector_index]->encoder_object_id;
 
 	switch (frev) {
@@ -58,7 +58,7 @@ encoder_assign_crtc(uint8 crtc_id)
 			switch (crev) {
 				case 1:
 				default:
-					args.v1.ucCRTC = crtc_id;
+					args.v1.ucCRTC = id;
 					switch (encoder_id) {
 						case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
@@ -102,7 +102,7 @@ encoder_assign_crtc(uint8 crtc_id)
 					}
 					break;
 				case 2:
-					args.v2.ucCRTC = crtc_id;
+					args.v2.ucCRTC = id;
 					args.v2.ucEncodeMode
 						= display_get_encoder_mode(connector_index);
 					switch (encoder_id) {
@@ -169,4 +169,91 @@ encoder_assign_crtc(uint8 crtc_id)
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 
 	// TODO : encoder_crtc_scratch_regs?
+}
+
+
+void
+encoder_mode_set(uint8 id, uint32 pixelClock)
+{
+	uint32 connector_index = gDisplay[id]->connector_index;
+
+	switch (gConnector[connector_index]->encoder_object_id) {
+		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+			encoder_analog_setup(id, pixelClock, ATOM_ENABLE);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
+		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
+		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
+			TRACE("%s: TODO for digital encoder setup\n", __func__);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+			TRACE("%s: TODO for DIG encoder setup\n", __func__);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_DDI:
+		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+			TRACE("%s: TODO for DVO encoder setup\n", __func__);
+			break;
+		default:
+			TRACE("%s: TODO for unknown encoder setup!\n", __func__);
+	}
+
+}
+
+
+void
+encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
+{
+	TRACE("%s\n", __func__);
+
+	uint32 connector_index = gDisplay[id]->connector_index;
+
+	int index = 0;
+	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
+	memset(&args, 0, sizeof(args));
+
+	switch (gConnector[connector_index]->encoder_object_id) {
+		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+			index = GetIndexIntoMasterTable(COMMAND, DAC1EncoderControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+			index = GetIndexIntoMasterTable(COMMAND, DAC2EncoderControl);
+			break;
+	}
+
+	args.ucAction = command;
+	args.ucDacStandard = ATOM_DAC1_PS2;
+		// TODO : or ATOM_DAC1_CV if ATOM_DEVICE_CV_SUPPORT
+		// TODO : or ATOM_DAC1_PAL or ATOM_DAC1_NTSC if else
+
+	args.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+void
+encoder_output_lock(bool lock)
+{
+	TRACE("%s: %s\n", __func__, lock ? "true" : "false");
+	uint32 bios_6_scratch = Read32(OUT, R600_BIOS_6_SCRATCH);
+
+	if (lock) {
+		bios_6_scratch |= ATOM_S6_CRITICAL_STATE;
+		bios_6_scratch &= ~ATOM_S6_ACC_MODE;
+	} else {
+		bios_6_scratch &= ~ATOM_S6_CRITICAL_STATE;
+		bios_6_scratch |= ATOM_S6_ACC_MODE;
+	}
+
+	Write32(OUT, R600_BIOS_6_SCRATCH, bios_6_scratch);
 }
