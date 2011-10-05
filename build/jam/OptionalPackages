@@ -1757,7 +1757,7 @@ if [ IsOptionalHaikuImagePackageAdded wpa_supplicant ] {
 		Echo "No optional package wpa_supplicant available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4) {
 		InstallOptionalHaikuImagePackage
-			wpa_supplicant-0.7.3-x86-gcc4-2011-09-27.zip
+			wpa_supplicant-0.7.3-x86-gcc4-2011-10-03.zip
 			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2011-10-03.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
