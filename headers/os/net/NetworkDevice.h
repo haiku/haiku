@@ -97,6 +97,9 @@ public:
 			status_t			GetNetwork(const BNetworkAddress& address,
 									wireless_network& network);
 
+			status_t			AddPersistentNetwork(
+									const wireless_network& network);
+
 			status_t			JoinNetwork(const char* name,
 									const char* password = NULL);
 			status_t			JoinNetwork(const wireless_network& network,

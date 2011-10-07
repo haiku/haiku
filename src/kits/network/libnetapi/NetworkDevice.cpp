@@ -697,6 +697,90 @@ BNetworkDevice::GetNetwork(const BNetworkAddress& address,
 
 
 status_t
+BNetworkDevice::AddPersistentNetwork(const wireless_network& network)
+{
+	BMessage message(kMsgAddPersistentNetwork);
+	status_t status = message.AddString("name", network.name);
+	if (status != B_OK)
+		return status;
+
+	if (status == B_OK && network.address.Family() == AF_LINK) {
+		size_t addressLength = network.address.LinkLevelAddressLength();
+		uint8* macAddress = network.address.LinkLevelAddress();
+		bool usable = false;
+		BString formatted;
+
+		for (size_t index = 0; index < addressLength; index++) {
+			if (index > 0)
+				formatted.Append(":");
+			char buffer[3];
+			snprintf(buffer, sizeof(buffer), "%2x", macAddress[index]);
+			formatted.Append(buffer, sizeof(buffer));
+
+			if (macAddress[index] != 0)
+				usable = true;
+		}
+
+		if (usable)
+			status = message.AddString("mac", formatted);
+	}
+
+	const char* authentication = NULL;
+	switch (network.authentication_mode) {
+		case B_NETWORK_AUTHENTICATION_NONE:
+			authentication = "none";
+			break;
+		case B_NETWORK_AUTHENTICATION_WEP:
+			authentication = "wep";
+			break;
+		case B_NETWORK_AUTHENTICATION_WPA:
+			authentication = "wpa";
+			break;
+		case B_NETWORK_AUTHENTICATION_WPA2:
+			authentication = "wpa2";
+			break;
+	}
+
+	if (status == B_OK && authentication != NULL)
+		status = message.AddString("authentication", authentication);
+
+	if (status == B_OK && (network.cipher & B_NETWORK_CIPHER_NONE) != 0)
+		status = message.AddString("cipher", "none");
+	if (status == B_OK && (network.cipher & B_NETWORK_CIPHER_TKIP) != 0)
+		status = message.AddString("cipher", "tkip");
+	if (status == B_OK && (network.cipher & B_NETWORK_CIPHER_CCMP) != 0)
+		status = message.AddString("cipher", "ccmp");
+
+	if (status == B_OK && (network.group_cipher & B_NETWORK_CIPHER_NONE) != 0)
+		status = message.AddString("group_cipher", "none");
+	if (status == B_OK && (network.group_cipher & B_NETWORK_CIPHER_WEP_40) != 0)
+		status = message.AddString("group_cipher", "wep40");
+	if (status == B_OK
+		&& (network.group_cipher & B_NETWORK_CIPHER_WEP_104) != 0) {
+		status = message.AddString("group_cipher", "wep104");
+	}
+	if (status == B_OK && (network.group_cipher & B_NETWORK_CIPHER_TKIP) != 0)
+		status = message.AddString("group_cipher", "tkip");
+	if (status == B_OK && (network.group_cipher & B_NETWORK_CIPHER_CCMP) != 0)
+		status = message.AddString("group_cipher", "ccmp");
+
+	// TODO: the other fields aren't currently used, add them when they are
+	// and when it's clear how they will be stored
+
+	if (status != B_OK)
+		return status;
+
+	BMessenger networkServer(kNetServerSignature);
+	BMessage reply;
+	status = networkServer.SendMessage(&message, &reply);
+	if (status == B_OK)
+		reply.FindInt32("status", &status);
+
+	return status;
+}
+
+
+status_t
 BNetworkDevice::JoinNetwork(const char* name, const char* password)
 {
 	if (name == NULL || name[0] == '\0')
