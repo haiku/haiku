@@ -14,6 +14,7 @@
 #include <fs_interface.h>
 #include <Path.h>
 #include <PathMonitor.h>
+#include <String.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -214,7 +215,7 @@ Settings::_ConvertFromDriverParameter(const driver_parameter& parameter,
 		for (int32 j = 0; j < parameter.parameter_count; j++) {
 			status = _ConvertFromDriverParameter(parameter.parameters[j],
 				settingsTemplate->sub_template, subMessage);
-			if (status < B_OK)
+			if (status != B_OK)
 				break;
 
 			const settings_template* parentValueTemplate
@@ -245,7 +246,7 @@ Settings::_ConvertFromDriverSettings(const driver_settings& settings,
 			// ignore unknown entries
 			continue;
 		}
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -259,7 +260,7 @@ Settings::_ConvertFromDriverSettings(const char* name,
 {
 	BPath path;
 	status_t status = _GetPath(name, path);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	void* handle = load_driver_settings(path.Path());
@@ -278,23 +279,163 @@ Settings::_ConvertFromDriverSettings(const char* name,
 
 
 status_t
+Settings::_AppendSettings(const settings_template* settingsTemplate,
+	BString& settings, const BMessage& message, const char* name,
+	type_code type, int32 count, const char* settingName)
+{
+	const settings_template* valueTemplate
+		= _FindSettingsTemplate(settingsTemplate, name);
+	if (valueTemplate == NULL) {
+		fprintf(stderr, "unknown field %s\n", name);
+		return B_BAD_VALUE;
+	}
+
+	if (valueTemplate->type != type) {
+		fprintf(stderr, "field type mismatch %s\n", name);
+		return B_BAD_VALUE;
+	}
+
+	if (settingName == NULL)
+		settingName = name;
+
+	if (type != B_MESSAGE_TYPE) {
+		settings.Append("\n");
+		settings.Append(settingName);
+		settings.Append("\t");
+	}
+
+	for (int32 valueIndex = 0; valueIndex < count; valueIndex++) {
+		if (valueIndex > 0 && type != B_MESSAGE_TYPE)
+			settings.Append(" ");
+
+		switch (type) {
+			case B_BOOL_TYPE:
+			{
+				bool value;
+				status_t result = message.FindBool(name, valueIndex, &value);
+				if (result != B_OK)
+					return result;
+
+				settings.Append(value ? "true" : "false");
+				break;
+			}
+
+			case B_STRING_TYPE:
+			{
+				const char* value = NULL;
+				status_t result = message.FindString(name, valueIndex, &value);
+				if (result != B_OK)
+					return result;
+
+				settings.Append(value);
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				int32 value;
+				status_t result = message.FindInt32(name, valueIndex, &value);
+				if (result != B_OK)
+					return result;
+
+				char buffer[100];
+				snprintf(buffer, sizeof(buffer), "%"B_PRId32, value);
+				settings.Append(buffer, sizeof(buffer));
+				break;
+			}
+
+			case B_MESSAGE_TYPE:
+			{
+				BMessage subMessage;
+				status_t result = message.FindMessage(name, valueIndex,
+					&subMessage);
+				if (result != B_OK)
+					return result;
+
+				const settings_template* parentValueTemplate
+					= _FindParentValueTemplate(valueTemplate);
+				if (parentValueTemplate != NULL) {
+					_AppendSettings(valueTemplate->sub_template, settings,
+						subMessage, parentValueTemplate->name,
+						parentValueTemplate->type, 1, name);
+					subMessage.RemoveName(parentValueTemplate->name);
+				}
+
+				BString subSettings;
+				_ConvertToDriverSettings(valueTemplate->sub_template,
+					subSettings, subMessage);
+				subSettings.ReplaceAll("\n", "\n\t");
+				subSettings.RemoveFirst("\n");
+
+				settings.Append(" {\n");
+				settings.Append(subSettings);
+				settings.Append("\n}");
+			}
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Settings::_ConvertToDriverSettings(const settings_template* settingsTemplate,
+	BString& settings, const BMessage& message)
+{
+	int32 index = 0;
+	char *name = NULL;
+	type_code type;
+	int32 count = 0;
+
+	while (message.GetInfo(B_ANY_TYPE, index++, &name, &type, &count) == B_OK) {
+		status_t result = _AppendSettings(settingsTemplate, settings, message,
+			name, type, count);
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Settings::_ConvertToDriverSettings(const char* name,
+	const settings_template* settingsTemplate, const BMessage& message)
+{
+	BPath path;
+	status_t status = _GetPath(name, path);
+	if (status != B_OK)
+		return status;
+
+	BString settings;
+	status = _ConvertToDriverSettings(settingsTemplate, settings, message);
+	if (status == B_OK) {
+		settings.RemoveFirst("\n");
+		// TODO: actually write the settings.String() out into the file
+	}
+
+	return status;
+}
+
+
+status_t
 Settings::_Load(const char* name, uint32* _type)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
 
-	if (name == NULL || !strcmp(name, "interfaces")) {
+	if (name == NULL || strcmp(name, "interfaces") == 0) {
 		status = _ConvertFromDriverSettings("interfaces", kInterfacesTemplate,
 			fInterfaces);
 		if (status == B_OK && _type != NULL)
 			*_type = kMsgInterfaceSettingsUpdated;
 	}
-	if (name == NULL || !strcmp(name, "wireless_networks")) {
+	if (name == NULL || strcmp(name, "wireless_networks") == 0) {
 		status = _ConvertFromDriverSettings("wireless_networks",
 			kNetworksTemplate, fNetworks);
 		if (status == B_OK && _type != NULL)
 			*_type = kMsgInterfaceSettingsUpdated;
 	}
-	if (name == NULL || !strcmp(name, "services")) {
+	if (name == NULL || strcmp(name, "services") == 0) {
 		status = _ConvertFromDriverSettings("services", kServicesTemplate,
 			fServices);
 		if (status == B_OK && _type != NULL)
@@ -306,11 +447,33 @@ Settings::_Load(const char* name, uint32* _type)
 
 
 status_t
+Settings::_Save(const char* name)
+{
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	if (name == NULL || strcmp(name, "interfaces") == 0) {
+		status = _ConvertToDriverSettings("interfaces", kInterfacesTemplate,
+			fInterfaces);
+	}
+	if (name == NULL || strcmp(name, "wireless_networks") == 0) {
+		status = _ConvertToDriverSettings("wireless_networks",
+			kNetworksTemplate, fNetworks);
+	}
+	if (name == NULL || strcmp(name, "services") == 0) {
+		status = _ConvertToDriverSettings("services", kServicesTemplate,
+			fServices);
+	}
+
+	return status;
+}
+
+
+status_t
 Settings::_StartWatching(const char* name, const BMessenger& target)
 {
 	BPath path;
 	status_t status = _GetPath(name, path);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	return BPrivate::BPathMonitor::StartWatching(path.Path(), B_WATCH_STAT,
@@ -352,8 +515,8 @@ Settings::Update(BMessage* message)
 {
 	const char* pathName;
 	int32 opcode;
-	if (message->FindInt32("opcode", &opcode) < B_OK
-		|| message->FindString("path", &pathName) < B_OK)
+	if (message->FindInt32("opcode", &opcode) != B_OK
+		|| message->FindString("path", &pathName) != B_OK)
 		return B_BAD_VALUE;
 
 	BPath settingsFolderPath;
@@ -409,6 +572,17 @@ Settings::GetNextNetwork(uint32& cookie, BMessage& network)
 
 	cookie++;
 	return B_OK;
+}
+
+
+status_t
+Settings::AddNetwork(const BMessage& network)
+{
+	status_t result = fNetworks.AddMessage("network", &network);
+	if (result != B_OK)
+		return result;
+
+	return _Save("wireless_networks");
 }
 
 

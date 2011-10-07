@@ -25,8 +25,11 @@ public:
 
 			status_t			GetNextInterface(uint32& cookie,
 									BMessage& interface);
+
 			status_t			GetNextNetwork(uint32& cookie,
 									BMessage& network);
+			status_t			AddNetwork(const BMessage& network);
+
 			status_t			GetNextService(uint32& cookie,
 									BMessage& service);
 			const BMessage&		Services() const;
@@ -39,6 +42,7 @@ public:
 private:
 			status_t			_Load(const char* name = NULL,
 									uint32* _type = NULL);
+			status_t			_Save(const char* name = NULL);
 			status_t			_GetPath(const char* name, BPath& path);
 
 			status_t			_StartWatching(const char* name,
@@ -63,6 +67,19 @@ private:
 			status_t			_ConvertFromDriverSettings(const char* path,
 									const settings_template* settingsTemplate,
 									BMessage& message);
+
+			status_t			_AppendSettings(
+									const settings_template* settingsTemplate,
+									BString& settings, const BMessage& message,
+									const char* name, type_code type,
+									int32 count,
+									const char* settingName = NULL);
+			status_t			_ConvertToDriverSettings(
+									const settings_template* settingsTemplate,
+									BString& settings, const BMessage& message);
+			status_t			_ConvertToDriverSettings(const char* path,
+									const settings_template* settingsTemplate,
+									const BMessage& message);
 
 			bool				_IsWatching(const BMessenger& target) const
 									{ return fListener == target; }
