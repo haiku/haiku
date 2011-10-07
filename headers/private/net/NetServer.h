@@ -11,10 +11,11 @@
 
 #define kNetServerSignature		"application/x-vnd.haiku-net_server"
 
-#define kMsgConfigureInterface	'COif'
-#define kMsgConfigureResolver	'COrs'
-#define kMsgJoinNetwork			'JNnw'
-#define kMsgLeaveNetwork		'LVnw'
+#define kMsgConfigureInterface		'COif'
+#define kMsgConfigureResolver		'COrs'
+#define kMsgAddPersistentNetwork	'APnw'
+#define kMsgJoinNetwork				'JNnw'
+#define kMsgLeaveNetwork			'LVnw'
 
 
 #endif	// _NET_SERVER_H

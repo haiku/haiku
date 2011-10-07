@@ -357,6 +357,16 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgAddPersistentNetwork:
+		{
+			status_t status = fSettings.AddNetwork(*message);
+
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", status);
+			message->SendReply(&reply);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			return;
