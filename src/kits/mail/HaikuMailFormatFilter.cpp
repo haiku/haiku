@@ -1,6 +1,7 @@
 /*
  * Copyright 2011, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,10 +18,9 @@
 
 
 struct mail_header_field {
-	const char *rfc_name;
-
-	const char *attr_name;
-	type_code attr_type;
+	const char*	rfc_name;
+	const char*	attr_name;
+	type_code	attr_type;
 	// currently either B_STRING_TYPE and B_TIME_TYPE
 };
 
@@ -65,7 +65,7 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	file->Seek(0, SEEK_SET);
 
 	BMessage attributes;
-	// TODO attributes.AddInt32(B_MAIL_ATTR_CONTENT, length);
+	// TODO: attributes.AddInt32(B_MAIL_ATTR_CONTENT, length);
 	attributes.AddInt32(B_MAIL_ATTR_ACCOUNT_ID, fAccountID);
 	attributes.AddString(B_MAIL_ATTR_ACCOUNT, fAccountName);
 
@@ -83,6 +83,7 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 			gDefaultFields[i].rfc_name, target);
 		if (status != B_OK)
 			continue;
+
 		switch (gDefaultFields[i].attr_type){
 			case B_STRING_TYPE:
 				attributes.AddString(gDefaultFields[i].attr_name, target);
@@ -111,8 +112,9 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	if (name.Length() <= 0)
 		name = "No Subject";
 	attributes.AddString(B_MAIL_ATTR_THREAD, name);
+	// Avoid hidden files, starting with a dot.
 	if (name[0] == '.')
-		name.Prepend ("_"); // Avoid hidden files, starting with a dot.
+		name.Prepend ("_");
 
 	// Convert the date into a year-month-day fixed digit width format, so that
 	// sorting by file name will give all the messages with the same subject in
@@ -120,23 +122,20 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	time_t dateAsTime = 0;
 	const time_t* datePntr;
 	ssize_t dateSize;
-	char numericDateString [40];
+	char numericDateString[40];
 	struct tm timeFields;
 
 	if (attributes.FindData(B_MAIL_ATTR_WHEN, B_TIME_TYPE,
-		(const void**)&datePntr, &dateSize) == B_OK)
+			(const void**)&datePntr, &dateSize) == B_OK)
 		dateAsTime = *datePntr;
 	localtime_r(&dateAsTime, &timeFields);
-	sprintf(numericDateString, "%04d%02d%02d%02d%02d%02d",
-		timeFields.tm_year + 1900,
-		timeFields.tm_mon + 1,
-		timeFields.tm_mday,
-		timeFields.tm_hour,
-		timeFields.tm_min,
-		timeFields.tm_sec);
+	snprintf(numericDateString, sizeof(numericDateString),
+		"%04d%02d%02d%02d%02d%02d",
+		timeFields.tm_year + 1900, timeFields.tm_mon + 1, timeFields.tm_mday,
+		timeFields.tm_hour, timeFields.tm_min, timeFields.tm_sec);
 	name << " " << numericDateString;
 
-	BString worker = attributes.FindString("MAIL:from");
+	BString worker = attributes.FindString(B_MAIL_ATTR_FROM);
 	extract_address_name(worker);
 	name << " " << worker;
 
@@ -149,8 +148,9 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	name.ReplaceAll('!', '_');
 	name.ReplaceAll('<', '_');
 	name.ReplaceAll('>', '_');
-	while (name.FindFirst("  ") >= 0) // Remove multiple spaces.
-		name.Replace("  " /* Old */, " " /* New */, 1024 /* Count */);
+	// Remove multiple spaces.
+	while (name.FindFirst("  ") >= 0)
+		name.Replace("  ", " ", 1024);
 
 	worker = name;
 	int32 identicalNumber = 1;
@@ -162,10 +162,10 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 		worker << "_" << identicalNumber;
 		status = _SetFileName(ref, worker);
 	}
-	if (status < B_OK)
+	if (status < B_OK) {
 		printf("FolderFilter::ProcessMailMessage: could not rename mail (%s)! "
 			"(should be: %s)\n",strerror(status), worker.String());
-	else {
+	} else {
 		entry_ref to(ref.device, ref.directory, worker);
 		fMailProtocol.FileRenamed(ref, to);
 	}

@@ -1,7 +1,7 @@
-/* BMailProtocol - the base class for protocol filters
-**
-** Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 
 
 #include <stdio.h>
@@ -35,54 +35,63 @@
 using std::map;
 
 
+const uint32 kMsgSyncMessages = '&SyM';
+const uint32 kMsgDeleteMessage = '&DeM';
+const uint32 kMsgAppendMessage = '&ApM';
+
+const uint32 kMsgMoveFile = '&MoF';
+const uint32 kMsgDeleteFile = '&DeF';
+const uint32 kMsgFileRenamed = '&FiR';
+const uint32 kMsgFileDeleted = '&FDe';
+const uint32 kMsgInit = '&Ini';
+
+const uint32 kMsgSendMessage = '&SeM';
+
+
 MailFilter::MailFilter(MailProtocol& protocol, AddonSettings* settings)
 	:
 	fMailProtocol(protocol),
 	fAddonSettings(settings)
 {
-
 }
 
 
 MailFilter::~MailFilter()
 {
-	
 }
 
 
 void
 MailFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
-
 }
 
 
 void
 MailFilter::BodyFetched(const entry_ref& ref, BFile* file)
 {
-
 }
 
 
 void
 MailFilter::MailboxSynced(status_t status)
 {
-
 }
 
 
 void
 MailFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
 {
-
 }
 
 
 void
 MailFilter::MessageSent(const entry_ref& ref, BFile* file)
 {
-
 }
+
+
+// #pragma mark -
 
 
 MailProtocol::MailProtocol(BMailAccountSettings* settings)
@@ -379,6 +388,9 @@ MailProtocol::_LoadFilter(AddonSettings* filterSettings)
 }
 
 
+// #pragma mark -
+
+
 InboundProtocol::InboundProtocol(BMailAccountSettings* settings)
 	:
 	MailProtocol(settings)
@@ -389,7 +401,7 @@ InboundProtocol::InboundProtocol(BMailAccountSettings* settings)
 
 InboundProtocol::~InboundProtocol()
 {
-	
+
 }
 
 
@@ -408,6 +420,9 @@ InboundProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 }
 
 
+// #pragma mark -
+
+
 OutboundProtocol::OutboundProtocol(BMailAccountSettings* settings)
 	:
 	MailProtocol(settings)
@@ -418,15 +433,11 @@ OutboundProtocol::OutboundProtocol(BMailAccountSettings* settings)
 
 OutboundProtocol::~OutboundProtocol()
 {
-	
+
 }
 
 
-const uint32 kMsgMoveFile = '&MoF';
-const uint32 kMsgDeleteFile = '&DeF';
-const uint32 kMsgFileRenamed = '&FiR';
-const uint32 kMsgFileDeleted = '&FDe';
-const uint32 kMsgInit = '&Ini';
+// #pragma mark -
 
 
 MailProtocolThread::MailProtocolThread(MailProtocol* protocol)
@@ -448,48 +459,50 @@ void
 MailProtocolThread::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case kMsgInit:
-		fMailProtocol->SetProtocolThread(this);
-		break;
+		case kMsgInit:
+			fMailProtocol->SetProtocolThread(this);
+			break;
 
-	case kMsgMoveFile:
-	{
-		entry_ref file;
-		message->FindRef("file", &file);
-		entry_ref dir;
-		message->FindRef("directory", &dir);
-		BDirectory directory(&dir);
-		fMailProtocol->MoveMessage(file, directory);
-		break;
-	}
+		case kMsgMoveFile:
+		{
+			entry_ref file;
+			message->FindRef("file", &file);
+			entry_ref dir;
+			message->FindRef("directory", &dir);
+			BDirectory directory(&dir);
+			fMailProtocol->MoveMessage(file, directory);
+			break;
+		}
 
-	case kMsgDeleteFile:
-	{
-		entry_ref file;
-		message->FindRef("file", &file);
-		fMailProtocol->DeleteMessage(file);
-		break;
-	}
+		case kMsgDeleteFile:
+		{
+			entry_ref file;
+			message->FindRef("file", &file);
+			fMailProtocol->DeleteMessage(file);
+			break;
+		}
 
-	case kMsgFileRenamed:
-	{
-		entry_ref from;
-		message->FindRef("from", &from);
-		entry_ref to;
-		message->FindRef("to", &to);
-		fMailProtocol->FileRenamed(from, to);
-	}
+		case kMsgFileRenamed:
+		{
+			entry_ref from;
+			message->FindRef("from", &from);
+			entry_ref to;
+			message->FindRef("to", &to);
+			fMailProtocol->FileRenamed(from, to);
+			break;
+		}
 
-	case kMsgFileDeleted:
-	{
-		node_ref node;
-		message->FindInt32("device",&node.device);
-		message->FindInt64("node", &node.node);
-		fMailProtocol->FileDeleted(node);
-	}
+		case kMsgFileDeleted:
+		{
+			node_ref node;
+			message->FindInt32("device",&node.device);
+			message->FindInt64("node", &node.node);
+			fMailProtocol->FileDeleted(node);
+			break;
+		}
 
-	default:
-		BLooper::MessageReceived(message);
+		default:
+			BLooper::MessageReceived(message);
 	}
 }
 
@@ -538,9 +551,7 @@ MailProtocolThread::TriggerFileDeleted(const node_ref& node)
 }
 
 
-const uint32 kMsgSyncMessages = '&SyM';
-const uint32 kMsgDeleteMessage = '&DeM';
-const uint32 kMsgAppendMessage = '&ApM';
+// #pragma mark -
 
 
 InboundProtocolThread::InboundProtocolThread(InboundProtocol* protocol)
@@ -562,57 +573,58 @@ void
 InboundProtocolThread::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case kMsgSyncMessages:
-	{
-		status_t status = fProtocol->SyncMessages();
-		_NotiyMailboxSynced(status);
-		break;
-	}
-
-	case kMsgFetchBody:
-	{
-		entry_ref ref;
-		message->FindRef("ref", &ref);
-		status_t status = fProtocol->FetchBody(ref);
-
-		BMessenger target;
-		if (message->FindMessenger("target", &target) != B_OK)
+		case kMsgSyncMessages:
+		{
+			status_t status = fProtocol->SyncMessages();
+			_NotiyMailboxSynced(status);
 			break;
+		}
 
-		BMessage message(kMsgBodyFetched);
-		message.AddInt32("status", status);
-		message.AddRef("ref", &ref);
-		target.SendMessage(&message);
-		break;
-	}
+		case kMsgFetchBody:
+		{
+			entry_ref ref;
+			message->FindRef("ref", &ref);
+			status_t status = fProtocol->FetchBody(ref);
 
-	case kMsgMarkMessageAsRead:
-	{
-		entry_ref ref;
-		message->FindRef("ref", &ref);
-		read_flags read = (read_flags)message->FindInt32("read");
-		fProtocol->MarkMessageAsRead(ref, read);
-		break;
-	}
+			BMessenger target;
+			if (message->FindMessenger("target", &target) != B_OK)
+				break;
 
-	case kMsgDeleteMessage:
-	{
-		entry_ref ref;
-		message->FindRef("ref", &ref);
-		fProtocol->DeleteMessage(ref);
-		break;
-	}
+			BMessage message(kMsgBodyFetched);
+			message.AddInt32("status", status);
+			message.AddRef("ref", &ref);
+			target.SendMessage(&message);
+			break;
+		}
 
-	case kMsgAppendMessage:
-	{
-		entry_ref ref;
-		message->FindRef("ref", &ref);
-		fProtocol->AppendMessage(ref);
-		break;
-	}
+		case kMsgMarkMessageAsRead:
+		{
+			entry_ref ref;
+			message->FindRef("ref", &ref);
+			read_flags read = (read_flags)message->FindInt32("read");
+			fProtocol->MarkMessageAsRead(ref, read);
+			break;
+		}
 
-	default:
-		MailProtocolThread::MessageReceived(message);
+		case kMsgDeleteMessage:
+		{
+			entry_ref ref;
+			message->FindRef("ref", &ref);
+			fProtocol->DeleteMessage(ref);
+			break;
+		}
+
+		case kMsgAppendMessage:
+		{
+			entry_ref ref;
+			message->FindRef("ref", &ref);
+			fProtocol->AppendMessage(ref);
+			break;
+		}
+
+		default:
+			MailProtocolThread::MessageReceived(message);
+			break;
 	}
 }
 
@@ -671,7 +683,7 @@ InboundProtocolThread::_NotiyMailboxSynced(status_t status)
 }
 
 
-const uint32 kMsgSendMessage = '&SeM';
+// #pragma mark -
 
 
 OutboundProtocolThread::OutboundProtocolThread(OutboundProtocol* protocol)
@@ -693,22 +705,22 @@ void
 OutboundProtocolThread::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case kMsgSendMessage:
-	{
-		std::vector<entry_ref> mails;
-		for (int32 i = 0; ;i++) {
-			entry_ref ref;
-			if (message->FindRef("ref", i, &ref) != B_OK)
-				break;
-			mails.push_back(ref);
+		case kMsgSendMessage:
+		{
+			std::vector<entry_ref> mails;
+			for (int32 i = 0; ;i++) {
+				entry_ref ref;
+				if (message->FindRef("ref", i, &ref) != B_OK)
+					break;
+				mails.push_back(ref);
+			}
+			size_t size = message->FindInt32("size");
+			fProtocol->SendMessages(mails, size);
+			break;
 		}
-		size_t size = message->FindInt32("size");
-		fProtocol->SendMessages(mails, size);
-		break;
-	}
 
-	default:
-		MailProtocolThread::MessageReceived(message);
+		default:
+			MailProtocolThread::MessageReceived(message);
 	}
 }
 
