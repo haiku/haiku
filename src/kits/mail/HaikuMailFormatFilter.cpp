@@ -8,8 +8,9 @@
 
 #include "HaikuMailFormatFilter.h"
 
-#include <Directory.h>
+#include <ctype.h>
 
+#include <Directory.h>
 #include <E-mail.h>
 #include <NodeInfo.h>
 
@@ -45,6 +46,34 @@ static const mail_header_field gDefaultFields[] = {
 	{ "NAME",       	B_MAIL_ATTR_NAME,		B_STRING_TYPE },
 	{ NULL,				NULL,					0 }
 };
+
+
+//!	Replaces tabs and other white space with spaces, compresses spaces.
+void
+sanitize_white_space(BString& string)
+{
+	char* buffer = string.LockBuffer(string.Length() + 1);
+	if (buffer == NULL)
+		return;
+
+	int32 count = string.Length();
+	int32 spaces = 0;
+	for (int32 i = 0; buffer[i] != '\0'; i++, count--) {
+		if (isspace(buffer[i])) {
+			buffer[i] = ' ';
+			spaces++;
+		} else {
+			if (spaces > 1)
+				memmove(buffer + i + 1 - spaces, buffer + i, count + 1);
+			spaces = 0;
+		}
+	}
+
+	string.UnlockBuffer();
+}
+
+
+// #pragma mark -
 
 
 HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
@@ -86,6 +115,7 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 
 		switch (gDefaultFields[i].attr_type){
 			case B_STRING_TYPE:
+				sanitize_white_space(target);
 				attributes.AddString(gDefaultFields[i].attr_name, target);
 				break;
 
