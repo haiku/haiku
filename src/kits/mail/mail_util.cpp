@@ -1453,11 +1453,13 @@ extract_from_header(const BString& header, const BString& field,
 	size_t length = rfc2047_to_utf8(&buffer, &bufferSize, bufferSize);
 	target.UnlockBuffer(length);
 
+	trim_white_space(target);
+
 	return B_OK;
 }
 
 
-_EXPORT void
+void
 extract_address(BString &address)
 {
 	const char *string = address.String();
@@ -1504,8 +1506,9 @@ extract_address(BString &address)
 }
 
 
-_EXPORT void
-get_address_list(BList &list, const char *string, void (*cleanupFunc)(BString &))
+void
+get_address_list(BList &list, const char *string,
+	void (*cleanupFunc)(BString &))
 {
 	if (string == NULL || !string[0])
 		return;
