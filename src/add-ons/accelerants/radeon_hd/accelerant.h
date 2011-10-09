@@ -164,15 +164,24 @@ typedef struct {
 } gpio_info;
 
 
+struct encoder_info {
+	bool		valid;
+	uint32		type;
+	uint16		object_id;
+	uint32		flags;
+	bool		is_hdmi;
+	bool		is_tv;
+};
+
+
 typedef struct {
 	bool		valid;
+	uint32		type;
+	uint16		object_id;
+	uint32		flags;
 	uint16		line_mux;
-	uint16		connector_flags;
-	uint32		connector_type;
-	uint16		connector_object_id;
-	uint16		connector_gpio_id;
-	uint32		encoder_type;
-	uint16		encoder_object_id;
+	uint16		gpio_id;
+	struct encoder_info encoder;
 	// TODO struct radeon_hpd hpd;
 } connector_info;
 

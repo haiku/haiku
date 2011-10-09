@@ -51,7 +51,7 @@ encoder_assign_crtc(uint8 id)
 		return;
 
 	uint16 connector_index = gDisplay[id]->connector_index;
-	uint16 encoder_id = gConnector[connector_index]->encoder_object_id;
+	uint16 encoder_id = gConnector[connector_index]->encoder.object_id;
 
 	switch (frev) {
 		case 1:
@@ -177,7 +177,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 {
 	uint32 connector_index = gDisplay[id]->connector_index;
 
-	switch (gConnector[connector_index]->encoder_object_id) {
+	switch (gConnector[connector_index]->encoder.object_id) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
@@ -225,9 +225,9 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 	memset(&args, 0, sizeof(args));
 
 	int index = 0;
-	uint16 connector_flags = gConnector[connector_index]->connector_flags;
+	uint16 connector_flags = gConnector[connector_index]->encoder.flags;
 
-	switch (gConnector[connector_index]->encoder_object_id) {
+	switch (gConnector[connector_index]->encoder.object_id) {
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 			index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
 			break;
@@ -343,7 +343,7 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
 
-	switch (gConnector[connector_index]->encoder_object_id) {
+	switch (gConnector[connector_index]->encoder.object_id) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 			index = GetIndexIntoMasterTable(COMMAND, DAC1EncoderControl);

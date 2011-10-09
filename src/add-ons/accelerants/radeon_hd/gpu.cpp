@@ -371,7 +371,7 @@ bool
 radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 {
 	// ensure things are sane
-	uint32 gpio_id = gConnector[connector]->connector_gpio_id;
+	uint32 gpio_id = gConnector[connector]->gpio_id;
 	if (gGPIOInfo[gpio_id]->valid == false)
 		return false;
 
@@ -399,11 +399,11 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 status_t
 radeon_gpu_i2c_attach(uint32 id, uint8 hw_line)
 {
-	gConnector[id]->connector_gpio_id = 0;
+	gConnector[id]->gpio_id = 0;
 	for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
 		if (gGPIOInfo[i]->hw_line != hw_line)
 			continue;
-		gConnector[id]->connector_gpio_id = i;
+		gConnector[id]->gpio_id = i;
 		return B_OK;
 	}
 
