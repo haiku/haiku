@@ -1,19 +1,20 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs btree ;
 
-SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
 
-UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
 
 rule FPreIncludes { return -include\ $(1:D=$(SUBDIR)) ; }
 
 {
 	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
 	local preIncludes = [ FPreIncludes Journal.h Inode.h ] ;
-	SubDirC++Flags $(defines) $(preIncludes) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+	SubDirC++Flags $(defines) $(preIncludes) -fno-exceptions ; #-fcheck-memory-usage
 }
 
 SimpleTest btreeTest
-	: test.cpp
+	: #test.cpp
 	  Volume.cpp
 	  Inode.cpp
 	  cache.cpp
@@ -24,4 +25,4 @@ SimpleTest btreeTest
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles BPlusTree.cpp Utility.cpp Debug.cpp ]
-	= [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
