@@ -159,13 +159,8 @@ radeon_init_bios(uint8* bios)
 	radeon_bios_init_scratch();
 	atom_allocate_fb_scratch(gAtomContext);
 
-	// TODO : Always post bios for now... not doing this
-	// at a later date may save boot time
-	atom_asic_init(gAtomContext);
-
-	#if 0
 	// post card atombios if needed
-	if (!radeon_bios_isposted()) {
+	if (radeon_bios_isposted() == false) {
 		TRACE("%s: init AtomBIOS for this card as it is not not posted\n",
 			__func__);
 		// radeon_gpu_reset();	// <= r500 only?
@@ -174,7 +169,6 @@ radeon_init_bios(uint8* bios)
 		TRACE("%s: AtomBIOS is already posted\n",
 			__func__);
 	}
-	#endif
 
 	return B_OK;
 }

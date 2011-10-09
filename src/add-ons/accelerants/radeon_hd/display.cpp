@@ -282,7 +282,6 @@ detect_connectors_legacy()
 		gConnector[i]->line_mux = ci.sucI2cId.ucAccess;
 
 		// TODO : give tv unique connector ids
-		// TODO : ddc bus
 
 		// Always set CRT1 and CRT2 as VGA, some cards incorrectly set
 		// VGA ports as DVI
@@ -603,6 +602,15 @@ detect_connectors()
 			gConnector[connector_index]->type = connector_type;
 			gConnector[connector_index]->object_id
 				= connector_object_id;
+
+			if (connector_type == VIDEO_CONNECTOR_COMPOSITE
+				|| connector_type == VIDEO_CONNECTOR_SVIDEO
+				|| connector_type == VIDEO_CONNECTOR_9DIN) {
+				gConnector[connector_index]->encoder.is_tv = true;
+			} else {
+				gConnector[connector_index]->encoder.is_tv = false;
+			}
+
 			connector_index++;
 		}
 	} // end for each display path
@@ -623,6 +631,9 @@ detect_displays()
 	uint32 displayIndex = 0;
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		if (gConnector[id]->valid == false)
+			continue;
+		// TODO : currently we skip TV connectors during detection
+		if (gConnector[id]->encoder.is_tv == true)
 			continue;
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
@@ -760,6 +771,7 @@ display_get_encoder_mode(uint32 connector_index)
 void
 display_crtc_lock(uint8 crtc_id, int command)
 {
+	TRACE("%s\n", __func__);
 	ENABLE_CRTC_PS_ALLOCATION args;
 	int index
 		= GetIndexIntoMasterTable(COMMAND, UpdateCRTC_DoubleBufferRegisters);
@@ -776,8 +788,9 @@ display_crtc_lock(uint8 crtc_id, int command)
 void
 display_crtc_blank(uint8 crtc_id, int command)
 {
-	int index = GetIndexIntoMasterTable(COMMAND, BlankCRTC);
+	TRACE("%s\n", __func__);
 	BLANK_CRTC_PS_ALLOCATION args;
+	int index = GetIndexIntoMasterTable(COMMAND, BlankCRTC);
 
 	memset(&args, 0, sizeof(args));
 
@@ -791,6 +804,7 @@ display_crtc_blank(uint8 crtc_id, int command)
 void
 display_crtc_scale(uint8 crtc_id, display_mode *mode)
 {
+	TRACE("%s\n", __func__);
 	ENABLE_SCALER_PS_ALLOCATION args;
 	int index = GetIndexIntoMasterTable(COMMAND, EnableScaler);
 
@@ -875,17 +889,19 @@ display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode)
 	Write32(CRT, regs->grphYStart, 0);
 	Write32(CRT, regs->grphXEnd, mode->virtual_width);
 	Write32(CRT, regs->grphYEnd, mode->virtual_height);
-	Write32(CRT, regs->grphPitch, bytesPerRow / 4);
+	Write32(CRT, regs->grphPitch, (bytesPerRow / 4));
 
 	Write32(CRT, regs->grphEnable, 1);
 		// Enable Frame buffer
 
 	Write32(CRT, regs->modeDesktopHeight, mode->virtual_height);
 
-	Write32(CRT, regs->viewportStart, 0);
+	uint32 viewport_w = mode->timing.h_display;
+	uint32 viewport_h = (mode->timing.v_display + 1) & ~1;
 
+	Write32(CRT, regs->viewportStart, 0);
 	Write32(CRT, regs->viewportSize,
-		mode->timing.v_display | (mode->timing.h_display << 16));
+		(viewport_w << 16) | viewport_h);
 
 	uint32 tmp = Read32(CRT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset);
 	tmp &= ~AVIVO_D1GRPH_SURFACE_UPDATE_H_RETRACE_EN;
@@ -893,91 +909,12 @@ display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode)
 
 	Write32(OUT, AVIVO_D1MODE_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
 		// Pageflip to happen anywhere in vblank
-}
-
-
-void
-display_crtc_fb_set_legacy(uint8 crtc_id, display_mode *mode)
-{
-	register_info* regs = gDisplay[crtc_id]->regs;
-
-	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
-
-	Write32(CRT, regs->grphUpdate, (1<<16));
-		// Lock for update (isn't this normally the other way around on VGA?
-
-	Write32Mask(CRT, regs->grphEnable, 1, 0x00000001);
-		// Enable Frame buffer
-
-	Write32(CRT, regs->grphControl, 0);
-		// Reset stored depth, format, etc
-
-	uint32 bytesPerPixel;
-	uint32 bitsPerPixel;
-
-	// set color mode on video card
-	switch (mode->space) {
-		case B_CMAP8:
-			bytesPerPixel = 1;
-			bitsPerPixel = 8;
-			Write32Mask(CRT, regs->grphControl,
-				0, 0x00000703);
-			break;
-		case B_RGB15_LITTLE:
-			bytesPerPixel = 2;
-			bitsPerPixel = 15;
-			Write32Mask(CRT, regs->grphControl,
-				0x000001, 0x00000703);
-			break;
-		case B_RGB16_LITTLE:
-			bytesPerPixel = 2;
-			bitsPerPixel = 16;
-			Write32Mask(CRT, regs->grphControl,
-				0x000101, 0x00000703);
-			break;
-		case B_RGB24_LITTLE:
-			bytesPerPixel = 4;
-			bitsPerPixel = 24;
-			Write32Mask(CRT, regs->grphControl,
-				0x000002, 0x00000703);
-			break;
-		case B_RGB32_LITTLE:
-		default:
-			bytesPerPixel = 4;
-			bitsPerPixel = 32;
-			Write32Mask(CRT, regs->grphControl,
-				0x000002, 0x00000703);
-			break;
-	}
-
-	uint32 bytesPerRow = mode->virtual_width * bytesPerPixel;
-
-	Write32(CRT, regs->grphSwapControl, 0);
-		// only for chipsets > r600
-
-	// Tell GPU which frame buffer address to draw from
-	Write32(CRT, regs->grphPrimarySurfaceAddr, fbAddressInt & 0xFFFFFFFF);
-	Write32(CRT, regs->grphSecondarySurfaceAddr, fbAddressInt & 0xFFFFFFFF);
-
-	Write32(CRT, regs->grphSurfaceOffsetX, 0);
-	Write32(CRT, regs->grphSurfaceOffsetY, 0);
-	Write32(CRT, regs->grphXStart, 0);
-	Write32(CRT, regs->grphYStart, 0);
-	Write32(CRT, regs->grphXEnd, mode->virtual_width);
-	Write32(CRT, regs->grphYEnd, mode->virtual_height);
-	Write32(CRT, regs->grphPitch, bytesPerRow / 4);
-
-	Write32(CRT, regs->modeDesktopHeight, mode->virtual_height);
-
-	Write32(CRT, regs->grphUpdate, 0);
-		// Unlock changed registers
 
 	// update shared info
 	gInfo->shared_info->bytes_per_row = bytesPerRow;
 	gInfo->shared_info->current_mode = *mode;
 	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
 
-	// TODO : recompute bandwidth via rv515_bandwidth_avivo_update
 }
 
 
@@ -1078,6 +1015,7 @@ display_crtc_set_dtd(uint8 crtc_id, display_mode *mode)
 void
 display_crtc_power(uint8 crtc_id, int command)
 {
+	TRACE("%s\n", __func__);
 	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTC);
 	ENABLE_CRTC_PS_ALLOCATION args;
 
@@ -1093,6 +1031,7 @@ display_crtc_power(uint8 crtc_id, int command)
 void
 display_crtc_memreq(uint8 crtc_id, int command)
 {
+	TRACE("%s\n", __func__);
 	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTCMemReq);
 	ENABLE_CRTC_PS_ALLOCATION args;
 

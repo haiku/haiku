@@ -66,10 +66,10 @@ encoder_assign_crtc(uint8 id)
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 						case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-							//if (radeon_encoder->devices
-							//	& ATOM_DEVICE_LCD1_SUPPORT)
-							//	args.v1.ucDevice = ATOM_DEVICE_LCD1_INDEX;
-							//else
+							if (gConnector[connector_index]->flags
+								& ATOM_DEVICE_LCD1_SUPPORT)
+								args.v1.ucDevice = ATOM_DEVICE_LCD1_INDEX;
+							else
 								args.v1.ucDevice = ATOM_DEVICE_DFP3_INDEX;
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_DVO1:

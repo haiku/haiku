@@ -102,23 +102,29 @@ radeon_dpms_set(int mode)
 {
 	switch(mode) {
 		case B_DPMS_ON:
+			TRACE("%s: ON\n", __func__);
 			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 				if (gDisplay[id]->active == false)
 					continue;
+				display_crtc_lock(id, ATOM_ENABLE);
 				display_crtc_power(id, ATOM_ENABLE);
 				display_crtc_memreq(id, ATOM_ENABLE);
 				display_crtc_blank(id, ATOM_DISABLE);
+				display_crtc_lock(id, ATOM_DISABLE);
 			}
 			break;
 		case B_DPMS_STAND_BY:
 		case B_DPMS_SUSPEND:
 		case B_DPMS_OFF:
+			TRACE("%s: OFF\n", __func__);
 			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 				if (gDisplay[id]->active == false)
 					continue;
+				display_crtc_lock(id, ATOM_ENABLE);
 				display_crtc_blank(id, ATOM_ENABLE);
 				display_crtc_memreq(id, ATOM_DISABLE);
 				display_crtc_power(id, ATOM_DISABLE);
+				display_crtc_lock(id, ATOM_DISABLE);
 			}
 			break;
 	}
@@ -129,8 +135,6 @@ status_t
 radeon_set_display_mode(display_mode *mode)
 {
 	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
-	radeon_dpms_set(B_DPMS_OFF);
-
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id]->active == false)
@@ -146,6 +150,9 @@ radeon_set_display_mode(display_mode *mode)
 
 		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
+		display_crtc_blank(id, ATOM_ENABLE);
+		display_crtc_memreq(id, ATOM_DISABLE);
+		display_crtc_power(id, ATOM_DISABLE);
 
 		// *** CRT controler mode set
 		// TODO : program SS
@@ -155,7 +162,6 @@ radeon_set_display_mode(display_mode *mode)
 
 		// TODO : vvvv : atombios_crtc_set_base
 		display_crtc_fb_set_dce1(id, mode);
-		// display_crtc_fb_set_legacy(id, mode);
 		// atombios_overscan_setup
 		display_crtc_scale(id, mode);
 
@@ -163,6 +169,9 @@ radeon_set_display_mode(display_mode *mode)
 		encoder_mode_set(id, mode->timing.pixel_clock);
 
 		// *** CRT controler commit
+		display_crtc_blank(id, ATOM_DISABLE);
+		display_crtc_memreq(id, ATOM_ENABLE);
+		display_crtc_power(id, ATOM_ENABLE);
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit
@@ -170,8 +179,6 @@ radeon_set_display_mode(display_mode *mode)
 			B_DPMS_ON);
 		encoder_output_lock(false);
 	}
-
-	radeon_dpms_set(B_DPMS_ON);
 
 	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
 	TRACE("CRT0 Status: 0x%X\n", crtstatus);
