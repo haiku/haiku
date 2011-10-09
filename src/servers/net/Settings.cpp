@@ -65,6 +65,7 @@ const static settings_template kNetworkTemplate[] = {
 	{B_STRING_TYPE, "password", NULL},
 	{B_STRING_TYPE, "authentication", NULL},
 	{B_STRING_TYPE, "cipher", NULL},
+	{B_STRING_TYPE, "group_cipher", NULL},
 	{B_STRING_TYPE, "key", NULL},
 	{0, NULL, NULL}
 };
@@ -412,6 +413,7 @@ Settings::_ConvertToDriverSettings(const char* name,
 	if (status == B_OK) {
 		settings.RemoveFirst("\n");
 		// TODO: actually write the settings.String() out into the file
+		printf("settings:\n%s\n", settings.String());
 	}
 
 	return status;
@@ -563,8 +565,19 @@ Settings::GetNextInterface(uint32& cookie, BMessage& interface)
 }
 
 
+int32
+Settings::CountNetworks() const
+{
+	int32 count = 0;
+	if (fNetworks.GetInfo("network", NULL, &count) != B_OK)
+		return 0;
+
+	return count;
+}
+
+
 status_t
-Settings::GetNextNetwork(uint32& cookie, BMessage& network)
+Settings::GetNextNetwork(uint32& cookie, BMessage& network) const
 {
 	status_t status = fNetworks.FindMessage("network", cookie, &network);
 	if (status != B_OK)
@@ -578,11 +591,35 @@ Settings::GetNextNetwork(uint32& cookie, BMessage& network)
 status_t
 Settings::AddNetwork(const BMessage& network)
 {
+	const char* name = NULL;
+	network.FindString("name", &name);
+	RemoveNetwork(name);
+
 	status_t result = fNetworks.AddMessage("network", &network);
 	if (result != B_OK)
 		return result;
 
 	return _Save("wireless_networks");
+}
+
+
+status_t
+Settings::RemoveNetwork(const char* name)
+{
+	int32 index = 0;
+	BMessage network;
+	while (fNetworks.FindMessage("network", index, &network) == B_OK) {
+		const char* networkName = NULL;
+		if (network.FindString("name", &networkName) == B_OK
+			&& strcmp(networkName, name) == 0) {
+			fNetworks.RemoveData("network", index);
+			return _Save("wireless_networks");
+		}
+
+		index++;
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 

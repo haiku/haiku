@@ -26,9 +26,11 @@ public:
 			status_t			GetNextInterface(uint32& cookie,
 									BMessage& interface);
 
+			int32				CountNetworks() const;
 			status_t			GetNextNetwork(uint32& cookie,
-									BMessage& network);
+									BMessage& network) const;
 			status_t			AddNetwork(const BMessage& network);
+			status_t			RemoveNetwork(const char* name);
 
 			status_t			GetNextService(uint32& cookie,
 									BMessage& service);

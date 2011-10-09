@@ -28,6 +28,7 @@ struct wireless_network {
 
 // flags
 #define B_NETWORK_IS_ENCRYPTED			0x01
+#define B_NETWORK_IS_PERSISTENT			0x02
 
 // authentication modes
 enum {
@@ -96,9 +97,6 @@ public:
 									wireless_network& network);
 			status_t			GetNetwork(const BNetworkAddress& address,
 									wireless_network& network);
-
-			status_t			AddPersistentNetwork(
-									const wireless_network& network);
 
 			status_t			JoinNetwork(const char* name,
 									const char* password = NULL);

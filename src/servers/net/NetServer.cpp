@@ -88,6 +88,9 @@ private:
 									const char* name = NULL);
 			status_t			_LeaveNetwork(const BMessage& message);
 
+			status_t			_ConvertNetworkToSettings(BMessage& message);
+			status_t			_ConvertNetworkFromSettings(BMessage& message);
+
 private:
 			Settings			fSettings;
 			LooperMap			fDeviceMap;
@@ -357,12 +360,55 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kMsgAddPersistentNetwork:
+		case kMsgCountPersistentNetworks:
 		{
-			status_t status = fSettings.AddNetwork(*message);
+			BMessage reply(B_REPLY);
+			reply.AddInt32("count", fSettings.CountNetworks());
+			message->SendReply(&reply);
+			break;
+		}
+
+		case kMsgGetPersistentNetwork:
+		{
+			uint32 index = 0;
+			status_t result = message->FindInt32("index", (int32*)&index);
 
 			BMessage reply(B_REPLY);
-			reply.AddInt32("status", status);
+			if (result == B_OK) {
+				BMessage network;
+				result = fSettings.GetNextNetwork(index, network);
+				if (result == B_OK)
+					result = _ConvertNetworkFromSettings(network);
+				if (result == B_OK)
+					result = reply.AddMessage("network", &network);
+			}
+
+			reply.AddInt32("status", result);
+			message->SendReply(&reply);
+			break;
+		}
+
+		case kMsgAddPersistentNetwork:
+		{
+			status_t result = _ConvertNetworkToSettings(*message);
+			if (result == B_OK)
+				result = fSettings.AddNetwork(*message);
+
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", result);
+			message->SendReply(&reply);
+			break;
+		}
+
+		case kMsgRemovePersistentNetwork:
+		{
+			const char* networkName = NULL;
+			status_t result = message->FindString("name", &networkName);
+			if (result == B_OK)
+				result = fSettings.RemoveNetwork(networkName);
+
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", result);
 			message->SendReply(&reply);
 			break;
 		}
@@ -511,7 +557,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 	BNetworkDevice device(name);
 	if (device.IsWireless()) {
 		const char* networkName;
-		if (message.FindString("network", &networkName) != B_OK) {
+		if (message.FindString("network", &networkName) == B_OK) {
 			// join configured network
 			status_t status = _JoinNetwork(message, networkName);
 			if (status != B_OK) {
@@ -908,23 +954,7 @@ NetServer::_AutoJoinNetwork(const char* name)
 		}
 	}
 
-	// None found, try them all
-
-	wireless_network network;
-	cookie = 0;
-	while (device.GetNextNetwork(cookie, network) == B_OK) {
-		if ((network.flags & B_NETWORK_IS_ENCRYPTED) == 0) {
-			status_t status = _JoinNetwork(message, network.name);
-			printf("auto join open network \"%s\": %s\n", network.name,
-				strerror(status));
-			if (status == B_OK)
-				return status;
-		}
-
-		// TODO: once we have a password manager, use that
-	}
-
-	return B_ERROR;
+	return B_NO_INIT;
 }
 
 
@@ -1053,12 +1083,11 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		return status;
 
 	BMessenger wpaSupplicant(kWPASupplicantSignature);
-	BMessage reply;
-	status = wpaSupplicant.SendMessage(&join, &reply);
+	status = wpaSupplicant.SendMessage(&join);
 	if (status != B_OK)
 		return status;
 
-	return reply.FindInt32("status");
+	return B_OK;
 }
 
 
@@ -1067,6 +1096,169 @@ NetServer::_LeaveNetwork(const BMessage& message)
 {
 	// TODO: not yet implemented
 	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+NetServer::_ConvertNetworkToSettings(BMessage& message)
+{
+	BNetworkAddress address;
+	status_t result = message.FindFlat("address", &address);
+	if (result == B_OK)
+		message.RemoveName("address");
+
+	if (result == B_OK && address.Family() == AF_LINK) {
+		size_t addressLength = address.LinkLevelAddressLength();
+		uint8* macAddress = address.LinkLevelAddress();
+		bool usable = false;
+		BString formatted;
+
+		for (size_t index = 0; index < addressLength; index++) {
+			if (index > 0)
+				formatted.Append(":");
+			char buffer[3];
+			snprintf(buffer, sizeof(buffer), "%2x", macAddress[index]);
+			formatted.Append(buffer, sizeof(buffer));
+
+			if (macAddress[index] != 0)
+				usable = true;
+		}
+
+		if (usable)
+			message.AddString("mac", formatted);
+	}
+
+	uint32 authentication = 0;
+	result = message.FindUInt32("authentication_mode", &authentication);
+	if (result == B_OK) {
+		message.RemoveName("authentication_mode");
+
+		const char* authenticationString = NULL;
+		switch (authentication) {
+			case B_NETWORK_AUTHENTICATION_NONE:
+				authenticationString = "none";
+				break;
+			case B_NETWORK_AUTHENTICATION_WEP:
+				authenticationString = "wep";
+				break;
+			case B_NETWORK_AUTHENTICATION_WPA:
+				authenticationString = "wpa";
+				break;
+			case B_NETWORK_AUTHENTICATION_WPA2:
+				authenticationString = "wpa2";
+				break;
+		}
+
+		if (result == B_OK && authenticationString != NULL)
+			message.AddString("authentication", authenticationString);
+	}
+
+	uint32 cipher = 0;
+	result = message.FindUInt32("cipher", &cipher);
+	if (result == B_OK) {
+		message.RemoveName("cipher");
+
+		if ((cipher & B_NETWORK_CIPHER_NONE) != 0)
+			message.AddString("cipher", "none");
+		if ((cipher & B_NETWORK_CIPHER_TKIP) != 0)
+			message.AddString("cipher", "tkip");
+		if ((cipher & B_NETWORK_CIPHER_CCMP) != 0)
+			message.AddString("cipher", "ccmp");
+	}
+
+	uint32 groupCipher = 0;
+	result = message.FindUInt32("group_cipher", &groupCipher);
+	if (result == B_OK) {
+		message.RemoveName("group_cipher");
+
+		if ((groupCipher & B_NETWORK_CIPHER_NONE) != 0)
+			message.AddString("group_cipher", "none");
+		if ((groupCipher & B_NETWORK_CIPHER_WEP_40) != 0)
+			message.AddString("group_cipher", "wep40");
+		if ((groupCipher & B_NETWORK_CIPHER_WEP_104) != 0)
+			message.AddString("group_cipher", "wep104");
+		if ((groupCipher & B_NETWORK_CIPHER_TKIP) != 0)
+			message.AddString("group_cipher", "tkip");
+		if ((groupCipher & B_NETWORK_CIPHER_CCMP) != 0)
+			message.AddString("group_cipher", "ccmp");
+	}
+
+	// TODO: the other fields aren't currently used, add them when they are
+	// and when it's clear how they will be stored
+	message.RemoveName("noise_level");
+	message.RemoveName("signal_strength");
+	message.RemoveName("flags");
+	message.RemoveName("key_mode");
+
+	return B_OK;
+}
+
+
+status_t
+NetServer::_ConvertNetworkFromSettings(BMessage& message)
+{
+	message.RemoveName("mac");
+		// TODO: convert into a flat BNetworkAddress "address"
+
+	const char* authentication = NULL;
+	if (message.FindString("authentication", &authentication) == B_OK) {
+		message.RemoveName("authentication");
+
+		if (strcasecmp(authentication, "none") == 0) {
+			message.AddUInt32("authentication_mode",
+				B_NETWORK_AUTHENTICATION_NONE);
+		} else if (strcasecmp(authentication, "wep") == 0) {
+			message.AddUInt32("authentication_mode",
+				B_NETWORK_AUTHENTICATION_WEP);
+		} else if (strcasecmp(authentication, "wpa") == 0) {
+			message.AddUInt32("authentication_mode",
+				B_NETWORK_AUTHENTICATION_WPA);
+		} else if (strcasecmp(authentication, "wpa2") == 0) {
+			message.AddUInt32("authentication_mode",
+				B_NETWORK_AUTHENTICATION_WPA2);
+		}
+	}
+
+	int32 index = 0;
+	uint32 cipher = 0;
+	const char* cipherString = NULL;
+	while (message.FindString("cipher", index++, &cipherString) == B_OK) {
+		if (strcasecmp(cipherString, "none") == 0)
+			cipher |= B_NETWORK_CIPHER_NONE;
+		else if (strcasecmp(cipherString, "tkip") == 0)
+			cipher |= B_NETWORK_CIPHER_TKIP;
+		else if (strcasecmp(cipherString, "ccmp") == 0)
+			cipher |= B_NETWORK_CIPHER_CCMP;
+	}
+
+	message.RemoveName("cipher");
+	if (cipher != 0)
+		message.AddUInt32("cipher", cipher);
+
+	index = 0;
+	cipher = 0;
+	while (message.FindString("group_cipher", index++, &cipherString) == B_OK) {
+		if (strcasecmp(cipherString, "none") == 0)
+			cipher |= B_NETWORK_CIPHER_NONE;
+		else if (strcasecmp(cipherString, "wep40") == 0)
+			cipher |= B_NETWORK_CIPHER_WEP_40;
+		else if (strcasecmp(cipherString, "wep104") == 0)
+			cipher |= B_NETWORK_CIPHER_WEP_104;
+		else if (strcasecmp(cipherString, "tkip") == 0)
+			cipher |= B_NETWORK_CIPHER_TKIP;
+		else if (strcasecmp(cipherString, "ccmp") == 0)
+			cipher |= B_NETWORK_CIPHER_CCMP;
+	}
+
+	message.RemoveName("group_cipher");
+	if (cipher != 0)
+		message.AddUInt32("group_cipher", cipher);
+
+	message.AddUInt32("flags", B_NETWORK_IS_PERSISTENT);
+
+	// TODO: add the other fields
+	message.RemoveName("key");
+	return B_OK;
 }
 
 

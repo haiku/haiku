@@ -13,7 +13,10 @@
 
 #define kMsgConfigureInterface		'COif'
 #define kMsgConfigureResolver		'COrs'
+#define kMsgCountPersistentNetworks	'CPnw'
+#define kMsgGetPersistentNetwork	'GPnw'
 #define kMsgAddPersistentNetwork	'APnw'
+#define kMsgRemovePersistentNetwork	'RPnw'
 #define kMsgJoinNetwork				'JNnw'
 #define kMsgLeaveNetwork			'LVnw'
 

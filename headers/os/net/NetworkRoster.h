@@ -12,6 +12,7 @@
 
 class BMessenger;
 class BNetworkInterface;
+struct wireless_network;
 
 
 class BNetworkRoster {
@@ -28,6 +29,13 @@ public:
 			status_t			RemoveInterface(const char* name);
 			status_t			RemoveInterface(
 									const BNetworkInterface& interface);
+
+			int32				CountPersistentNetworks() const;
+			status_t			GetNextPersistentNetwork(uint32* cookie,
+									wireless_network& network) const;
+			status_t			AddPersistentNetwork(
+									const wireless_network& network);
+			status_t			RemovePersistentNetwork(const char* name);
 
 			status_t			StartWatching(const BMessenger& target,
 									uint32 eventMask);
