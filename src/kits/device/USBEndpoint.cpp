@@ -24,7 +24,7 @@ BUSBEndpoint::BUSBEndpoint(BUSBInterface *interface, uint32 index, int rawFD)
 	command.endpoint_etc.alternate_index = fInterface->AlternateIndex();
 	command.endpoint_etc.endpoint_index = fIndex;
 	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR_ETC, &command,
-		sizeof(command)) || command.config.status != B_USB_RAW_STATUS_SUCCESS)
+		sizeof(command)) || command.endpoint_etc.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
 }
 
