@@ -477,7 +477,6 @@ detect_connectors()
 										encoder_type = VIDEO_ENCODER_TMDS;
 										// radeon_atombios_set_dig_info
 									}
-									// drm_encoder_helper_add
 									break;
 								case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 									encoder_type = VIDEO_ENCODER_DAC;
@@ -486,7 +485,6 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
 									encoder_type = VIDEO_ENCODER_TVDAC;
-									// drm_encoder_helper_add
 									break;
 								case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
@@ -769,7 +767,7 @@ display_crtc_lock(uint8 crtc_id, int command)
 	args.ucCRTC = crtc_id;
 	args.ucEnable = command;
 
-	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 

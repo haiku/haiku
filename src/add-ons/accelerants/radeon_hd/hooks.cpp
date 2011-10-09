@@ -40,9 +40,9 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)radeon_dpms_capabilities;
 		case B_DPMS_MODE:
 			return (void*)radeon_dpms_mode;
+		*/
 		case B_SET_DPMS_MODE:
 			return (void*)radeon_dpms_set;
-		*/
 
 		/* mode configuration */
 		case B_ACCELERANT_MODE_COUNT:

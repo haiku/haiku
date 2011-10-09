@@ -188,7 +188,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			TRACE("%s: TODO for digital encoder setup\n", __func__);
+			encoder_digital_setup(id, pixelClock, ATOM_ENABLE);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
@@ -208,7 +208,131 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 }
 
 
-void
+union lvds_encoder_control {
+	LVDS_ENCODER_CONTROL_PS_ALLOCATION    v1;
+	LVDS_ENCODER_CONTROL_PS_ALLOCATION_V2 v2;
+};
+
+
+status_t
+encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
+{
+	TRACE("%s\n", __func__);
+
+	uint32 connector_index = gDisplay[id]->connector_index;
+
+	union lvds_encoder_control args;
+	memset(&args, 0, sizeof(args));
+
+	int index = 0;
+	uint16 connector_flags = gConnector[connector_index]->connector_flags;
+
+	switch (gConnector[connector_index]->encoder_object_id) {
+		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
+			index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
+			index = GetIndexIntoMasterTable(COMMAND, TMDS1EncoderControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
+			if (connector_flags & ATOM_DEVICE_LCD_SUPPORT)
+				index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
+			else
+				index = GetIndexIntoMasterTable(COMMAND, TMDS2EncoderControl);
+			break;
+	}
+
+	uint8 frev;
+	uint8 crev;
+	if (atom_parse_cmd_header(gAtomContext, index, &frev, &crev) != B_OK)
+		return B_ERROR;
+
+	switch (frev) {
+	case 1:
+	case 2:
+		switch (crev) {
+			case 1:
+				args.v1.ucMisc = 0;
+				args.v1.ucAction = command;
+				if (0)	// TODO : HDMI?
+					args.v1.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
+				args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+				if (connector_flags & (ATOM_DEVICE_LCD_SUPPORT)) {
+					// TODO : laptop display support
+					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
+					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
+					//if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB)
+					//	args.v1.ucMisc |= ATOM_PANEL_MISC_888RGB;
+				} else {
+					//if (dig->linkb)
+					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_TMDS_LINKB;
+					if (pixelClock > 165000)
+						args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
+					/*if (pScrn->rgbBits == 8) */
+					args.v1.ucMisc |= ATOM_PANEL_MISC_888RGB;
+				}
+				break;
+			case 2:
+			case 3:
+				args.v2.ucMisc = 0;
+				args.v2.ucAction = command;
+				if (crev == 3) {
+					//if (dig->coherent_mode)
+					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_COHERENT;
+				}
+				if (0) // TODO : HDMI?
+					args.v2.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
+				args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+				args.v2.ucTruncate = 0;
+				args.v2.ucSpatial = 0;
+				args.v2.ucTemporal = 0;
+				args.v2.ucFRC = 0;
+				if (connector_flags & ATOM_DEVICE_LCD_SUPPORT) {
+					// TODO : laptop display support
+					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
+					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
+					//if (dig->lcd_misc & ATOM_PANEL_MISC_SPATIAL) {
+					args.v2.ucSpatial = PANEL_ENCODER_SPATIAL_DITHER_EN;
+					//if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB)
+					//	args.v2.ucSpatial |= PANEL_ENCODER_SPATIAL_DITHER_DEPTH;
+					//}
+					//if (dig->lcd_misc & ATOM_PANEL_MISC_TEMPORAL) {
+					//	args.v2.ucTemporal = PANEL_ENCODER_TEMPORAL_DITHER_EN;
+					//	if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB) {
+					//		args.v2.ucTemporal
+					//			|= PANEL_ENCODER_TEMPORAL_DITHER_DEPTH;
+					//	}
+					//	if (((dig->lcd_misc >> ATOM_PANEL_MISC_GREY_LEVEL_SHIFT)
+					//		& 0x3) == 2) {
+					//		args.v2.ucTemporal
+					//			|= PANEL_ENCODER_TEMPORAL_LEVEL_4;
+					//	}
+					//}
+				} else {
+					//if (dig->linkb)
+					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_TMDS_LINKB;
+					if (pixelClock > 165000)
+						args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
+				}
+				break;
+			default:
+				ERROR("%s: Unknown minor table version: %d.%d\n", __func__,
+					frev, crev);
+				return B_ERROR;
+		}
+		break;
+	default:
+		ERROR("%s: Unknown major table version: %d.%d\n", __func__,
+			frev, crev);
+		return B_ERROR;
+	}
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+status_t
 encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
@@ -237,7 +361,7 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 
 	args.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
-	atom_execute_table(gAtomContext, index, (uint32*)&args);
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 

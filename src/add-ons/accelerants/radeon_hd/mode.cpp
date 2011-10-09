@@ -137,17 +137,18 @@ radeon_set_display_mode(display_mode *mode)
 			continue;
 
 		uint16 connector_index = gDisplay[id]->connector_index;
+
 		// *** encoder prep
 		encoder_output_lock(true);
 		encoder_dpms_set(gConnector[connector_index]->encoder_object_id,
 			B_DPMS_OFF);
+		encoder_assign_crtc(id);
 
 		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
 
-
 		// *** CRT controler mode set
-		// TODO program SS
+		// TODO : program SS
 		pll_set(0, mode->timing.pixel_clock, id);
 			// TODO : check if pll 0 is used and use pll 1 if so
 		display_crtc_set_dtd(id, mode);
@@ -158,15 +159,11 @@ radeon_set_display_mode(display_mode *mode)
 		// atombios_overscan_setup
 		display_crtc_scale(id, mode);
 
-
 		// *** encoder mode set
 		encoder_mode_set(id, mode->timing.pixel_clock);
-		encoder_assign_crtc(id);
-
 
 		// *** CRT controler commit
 		display_crtc_lock(id, ATOM_DISABLE);
-
 
 		// *** encoder commit
 		encoder_dpms_set(gConnector[connector_index]->encoder_object_id,
