@@ -366,7 +366,82 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 
 
 void
-encoder_dpms_set(uint8 encoder_id, int mode)
+encoder_dpms_scratch(uint8 crtc_id, bool power)
+{
+	TRACE("%s: power: %s\n", __func__, power ? "true" : "false");
+
+	uint32 connector_index = gDisplay[crtc_id]->connector_index;
+	uint32 encoder_flags = gConnector[connector_index]->encoder.flags;
+
+	// TODO : r500
+	uint32 bios_2_scratch = Read32(OUT, R600_BIOS_2_SCRATCH);
+
+	if (encoder_flags & ATOM_DEVICE_TV1_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_TV1_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_TV1_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_CV_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_CV_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_CV_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_CRT1_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_CRT1_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_CRT1_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_CRT2_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_CRT2_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_CRT2_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_LCD1_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_LCD1_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_LCD1_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP1_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_DFP1_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_DFP1_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP2_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_DFP2_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_DFP2_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP3_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_DFP3_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_DFP3_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP4_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_DFP4_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_DFP4_DPMS_STATE;
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP5_SUPPORT) {
+		if (power == true)
+			bios_2_scratch &= ~ATOM_S2_DFP5_DPMS_STATE;
+		else
+			bios_2_scratch |= ATOM_S2_DFP5_DPMS_STATE;
+	}
+	Write32(OUT, R600_BIOS_2_SCRATCH, bios_2_scratch);
+}
+
+
+void
+encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 {
 	int index = 0;
 	DISPLAY_DEVICE_OUTPUT_CONTROL_PS_ALLOCATION args;
@@ -430,6 +505,7 @@ encoder_dpms_set(uint8 encoder_id, int mode)
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
 			// TODO : ATOM_DEVICE_LCD_SUPPORT : args.ucAction = ATOM_LCD_BLON;
 			//		  execute again
+			encoder_dpms_scratch(crtc_id, true);
 			break;
 		case B_DPMS_STAND_BY:
 		case B_DPMS_SUSPEND:
@@ -438,6 +514,7 @@ encoder_dpms_set(uint8 encoder_id, int mode)
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
 			// TODO : ATOM_DEVICE_LCD_SUPPORT : args.ucAction = ATOM_LCD_BLOFF;
 			//		  execute again
+			encoder_dpms_scratch(crtc_id, false);
 			break;
 	}
 }

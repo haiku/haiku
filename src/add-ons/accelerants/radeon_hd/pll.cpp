@@ -233,7 +233,5 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 
 	TRACE("%s: setting pixel clock %" B_PRIu32 "\n", __func__, pixelClock);
 
-	atom_execute_table(gAtomContext, index, (uint32 *)&args);
-
-	return B_OK;
+	return atom_execute_table(gAtomContext, index, (uint32 *)&args);
 }

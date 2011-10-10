@@ -6,6 +6,11 @@
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
 
+/*
+ * It's dangerous to go alone, take this!
+ *	framebuffer -> crtc -> encoder -> transmitter -> connector -> monitor
+ */
+
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
@@ -398,7 +403,6 @@ detect_connectors()
 				continue;
 			}
 
-
 			uint16 igp_lane_info;
 			if (0)
 				ERROR("%s: TODO : IGP chip connector detection\n", __func__);
@@ -426,6 +430,7 @@ detect_connectors()
 				uint8 grph_obj_type
 					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
+
 				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
 					// Found an encoder
 					// TODO : it may be possible to have more then one encoder
@@ -535,6 +540,9 @@ detect_connectors()
 							TRACE("%s: Path #%" B_PRId32 ": Found encoder "
 								"%s\n", __func__, i,
 								get_encoder_name(encoder_type));
+
+							gConnector[connector_index]->encoder.flags
+								= connector_flags;
 							gConnector[connector_index]->encoder.valid
 								= true;
 							gConnector[connector_index]->encoder.object_id
@@ -543,9 +551,10 @@ detect_connectors()
 								= encoder_type;
 						}
 					}
+					// END if object is encoder
 				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
 					ERROR("%s: TODO : Found router object?\n", __func__);
-				}
+				} // END if object is router
 			}
 
 			// Set up information buses such as ddc
@@ -593,6 +602,7 @@ detect_connectors()
 
 			// TODO : aux chan transactions
 
+			// record connector information
 			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
 				__func__, i, get_connector_name(connector_type),
 				connector_type);
@@ -603,16 +613,23 @@ detect_connectors()
 			gConnector[connector_index]->object_id
 				= connector_object_id;
 
-			if (connector_type == VIDEO_CONNECTOR_COMPOSITE
-				|| connector_type == VIDEO_CONNECTOR_SVIDEO
-				|| connector_type == VIDEO_CONNECTOR_9DIN) {
-				gConnector[connector_index]->encoder.is_tv = true;
-			} else {
-				gConnector[connector_index]->encoder.is_tv = false;
+			gConnector[connector_index]->encoder.is_tv = false;
+			gConnector[connector_index]->encoder.is_hdmi = false;
+
+			switch(connector_type) {
+				case VIDEO_CONNECTOR_COMPOSITE:
+				case VIDEO_CONNECTOR_SVIDEO:
+				case VIDEO_CONNECTOR_9DIN:
+					gConnector[connector_index]->encoder.is_tv = true;
+					break;
+				case VIDEO_CONNECTOR_HDMIA:
+				case VIDEO_CONNECTOR_HDMIB:
+					gConnector[connector_index]->encoder.is_hdmi = true;
+					break;
 			}
 
 			connector_index++;
-		}
+		} // END for each valid connector
 	} // end for each display path
 
 	return B_OK;
