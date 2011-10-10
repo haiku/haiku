@@ -171,6 +171,7 @@ struct encoder_info {
 	uint32		flags;
 	bool		is_hdmi;
 	bool		is_tv;
+	struct pll_info	pll;
 };
 
 
@@ -195,7 +196,6 @@ typedef struct {
 	uint32			vfreq_min;
 	uint32			hfreq_max;
 	uint32			hfreq_min;
-	pll_info		pll;
 	edid1_info		edid_info;
 } display_info;
 

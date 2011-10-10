@@ -168,6 +168,104 @@ pll_compute(uint32 pixelClock, uint32 *dotclockOut, uint32 *referenceOut,
 }
 
 
+union adjust_pixel_clock {
+	ADJUST_DISPLAY_PLL_PS_ALLOCATION v1;
+	ADJUST_DISPLAY_PLL_PS_ALLOCATION_V3 v3;
+};
+
+
+uint32
+pll_adjust(uint32 pixelClock, uint8 crtc_id)
+{
+	uint32 flags = 0;
+	flags |= PLL_PREFER_LOW_REF_DIV;
+	// TODO : PLL flags
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint32 adjustedClock = pixelClock;
+
+	uint32 connector_index = gDisplay[crtc_id]->connector_index;
+	uint32 encoder_id = gConnector[connector_index]->encoder.object_id;
+	uint32 encoder_mode = display_get_encoder_mode(connector_index);
+	pll_info *pll = &gConnector[connector_index]->encoder.pll;
+
+	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
+		union adjust_pixel_clock args;
+		uint8 frev;
+		uint8 crev;
+
+		int index = GetIndexIntoMasterTable(COMMAND, AdjustDisplayPll);
+
+		if (atom_parse_cmd_header(gAtomContext, index, &frev, &crev) != B_OK)
+			return adjustedClock;
+
+		memset(&args, 0, sizeof(args));
+		switch (frev) {
+			case 1:
+				switch (crev) {
+					case 1:
+					case 2:
+						args.v1.usPixelClock
+							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+						args.v1.ucTransmitterID = encoder_id;
+						args.v1.ucEncodeMode = encoder_mode;
+						// TODO : SS and SS % > 0
+						if (0) {
+							args.v1.ucConfig
+								|= ADJUST_DISPLAY_CONFIG_SS_ENABLE;
+						}
+
+						atom_execute_table(gAtomContext, index, (uint32*)&args);
+						// get returned adjusted clock
+						adjustedClock
+							= B_LENDIAN_TO_HOST_INT16(args.v1.usPixelClock);
+						adjustedClock *= 10;
+						break;
+					case 3:
+						args.v3.sInput.usPixelClock
+							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+						args.v3.sInput.ucTransmitterID = encoder_id;
+						args.v3.sInput.ucEncodeMode = encoder_mode;
+						args.v3.sInput.ucDispPllConfig = 0;
+						// TODO : SS and SS % > 0
+						if (0) {
+							args.v3.sInput.ucDispPllConfig
+								|= DISPPLL_CONFIG_SS_ENABLE;
+						}
+						// TODO : if ATOM_DEVICE_DFP_SUPPORT
+						// TODO : display port DP
+
+						// TODO : is DP?
+						args.v3.sInput.ucExtTransmitterID = 0;
+
+						atom_execute_table(gAtomContext, index, (uint32*)&args);
+						adjustedClock
+							= B_LENDIAN_TO_HOST_INT32(
+								args.v3.sOutput.ulDispPllFreq) * 10;
+
+						if (args.v3.sOutput.ucRefDiv) {
+							pll->flags |= PLL_USE_FRAC_FB_DIV;
+							pll->flags |= PLL_USE_REF_DIV;
+							pll->reference_div = args.v3.sOutput.ucRefDiv;
+						}
+						if (args.v3.sOutput.ucPostDiv) {
+							pll->flags |= PLL_USE_FRAC_FB_DIV;
+							pll->flags |= PLL_USE_POST_DIV;
+							pll->post_div = args.v3.sOutput.ucPostDiv;
+						}
+						break;
+					default:
+						return adjustedClock;
+				}
+				break;
+			default:
+				return adjustedClock;
+		}
+	}
+	return adjustedClock;
+}
+
+
 status_t
 pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 {
@@ -177,7 +275,9 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 	uint32 feedbackFrac = 0;
 	uint32 post = 0;
 
-	pll_compute(pixelClock, &dotclock, &reference, &feedback,
+	uint32 adjustedClock = pll_adjust(pixelClock, crtc_id);
+
+	pll_compute(adjustedClock, &dotclock, &reference, &feedback,
 		&feedbackFrac, &post);
 
 	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
@@ -192,7 +292,7 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 
 	switch (crev) {
 		case 1:
-			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
 			args.v1.usRefDiv = B_HOST_TO_LENDIAN_INT16(reference);
 			args.v1.usFbDiv = B_HOST_TO_LENDIAN_INT16(feedback);
 			args.v1.ucFracFbDiv = feedbackFrac;
@@ -202,7 +302,7 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			args.v1.ucRefDivSrc = 1;
 			break;
 		case 2:
-			args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
 			args.v2.usRefDiv = B_HOST_TO_LENDIAN_INT16(reference);
 			args.v2.usFbDiv = B_HOST_TO_LENDIAN_INT16(feedback);
 			args.v2.ucFracFbDiv = feedbackFrac;
@@ -212,7 +312,7 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			args.v2.ucRefDivSrc = 1;
 			break;
 		case 3:
-			args.v3.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v3.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
 			args.v3.usRefDiv = B_HOST_TO_LENDIAN_INT16(reference);
 			args.v3.usFbDiv = B_HOST_TO_LENDIAN_INT16(feedback);
 			args.v3.ucFracFbDiv = feedbackFrac;
@@ -231,7 +331,8 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			return B_ERROR;
 	}
 
-	TRACE("%s: setting pixel clock %" B_PRIu32 "\n", __func__, pixelClock);
+	TRACE("%s: set adjusted pixel clock %" B_PRIu32 " (was %" B_PRIu32 ")\n",
+		__func__, adjustedClock, pixelClock);
 
 	return atom_execute_table(gAtomContext, index, (uint32 *)&args);
 }
