@@ -9,6 +9,20 @@
 #include <string.h>
 
 
+//#define TRACE_VALIDATION
+#ifdef TRACE_VALIDATION
+#ifdef __cplusplus
+extern "C" 
+#endif
+void _sPrintf(const char *format, ...);
+#   define TRACE(x...) _sPrintf("accelerant common: " x)
+#else
+#   define TRACE(x...) ;
+#endif
+
+#define ERROR(x...) _sPrintf("accelerant common: " x)
+
+
 static uint16
 round(uint16 value, uint16 resolution)
 {
@@ -20,21 +34,42 @@ static void
 sanitize_timing(uint16& display, uint16& syncStart, uint16& syncEnd,
 	uint16& total, const timing_constraints& constraints)
 {
-	if (syncStart < display + constraints.min_before_sync)
+	if (syncStart < display + constraints.min_before_sync) {
+		TRACE("%s: syncStart(%" B_PRIu16 ") < display(%" B_PRIu16 ")"
+			" + min_before_sync(%" B_PRIu16 ")\n", __func__, syncStart,
+			display, constraints.min_before_sync);
 		syncStart = display + constraints.min_before_sync;
-	else if (syncStart > constraints.max_sync_start)
+	} else if (syncStart > constraints.max_sync_start) {
+		TRACE("%s: syncStart(%" B_PRIu16 ") > max_sync_start(%" B_PRIu16 ")\n",
+			__func__, syncStart, constraints.max_sync_start);
 		syncStart = constraints.max_sync_start;
+	}
 
 	uint32 syncLength = syncEnd - syncStart;
-	if (syncLength < constraints.min_sync_length)
+	if (syncLength < constraints.min_sync_length) {
+		TRACE("%s: syncLength(%" B_PRIu16 ")"
+			" < min_sync_length(%" B_PRIu16 ")\n",
+			__func__, syncLength, constraints.min_sync_length);
 		syncLength = constraints.min_sync_length;
-	else if (syncLength > constraints.max_sync_length)
+	} else if (syncLength > constraints.max_sync_length) {
+		TRACE("%s: syncLength(%" B_PRIu16 ")"
+			" > max_sync_length(%" B_PRIu16 ")\n",
+			__func__, syncLength, constraints.max_sync_length);
 		syncLength = constraints.max_sync_length;
+	}
 
-	if (total < syncStart + syncLength + constraints.min_after_sync)
+	if (total < syncStart + syncLength + constraints.min_after_sync) {
+		TRACE("%s: total(%" B_PRIu16 ")"
+			" < syncStart(%" B_PRIu16 ")"
+			" + syncLength(%" B_PRIu16 ")"
+			" + min_after_sync(%" B_PRIu16 ")\n",
+			__func__, total, syncStart, syncLength, constraints.min_after_sync);
 		total = syncStart + syncLength + constraints.min_after_sync;
+	}
 
 	if (total > constraints.max_total) {
+		TRACE("%s: total(%" B_PRIu16 ") > max_total(%" B_PRIu16 ")\n"
+			__func__, total, constraints.max_total);
 		total = constraints.max_total;
 		syncLength = min_c(syncLength, uint16(total - syncStart));
 	}
@@ -57,15 +92,25 @@ sanitize_display_mode(display_mode& mode,
 
 	// size
 
-	if (mode.timing.h_display < constraints.min_h_display)
+	if (mode.timing.h_display < constraints.min_h_display) {
+		TRACE("%s: h_display(%" B_PRIu16 ") < min_h_display(%" B_PRIu16 ")\n",
+			__func__, mode.timing.h_display, constraints.min_h_display);
 		mode.timing.h_display = constraints.min_h_display;
-	else if (mode.timing.h_display > constraints.max_h_display)
+	} else if (mode.timing.h_display > constraints.max_h_display) {
+		TRACE("%s: h_display(%" B_PRIu16 ") > max_h_display(%" B_PRIu16 ")\n",
+			__func__, mode.timing.h_display, constraints.max_h_display);
 		mode.timing.h_display = constraints.max_h_display;
+	}
 
-	if (mode.timing.v_display < constraints.min_v_display)
+	if (mode.timing.v_display < constraints.min_v_display) {
+		TRACE("%s: v_display(%" B_PRIu16 ") < min_v_display(%" B_PRIu16 ")\n",
+			__func__, mode.timing.v_display, constraints.min_v_display);
 		mode.timing.v_display = constraints.min_v_display;
-	else if (mode.timing.v_display > constraints.max_v_display)
+	} else if (mode.timing.v_display > constraints.max_v_display) {
+		TRACE("%s: v_display(%" B_PRIu16 ") > max_v_display(%" B_PRIu16 ")\n",
+			__func__, mode.timing.v_display, constraints.max_v_display);
 		mode.timing.v_display = constraints.max_v_display;
+	}
 
 	// horizontal timing
 
