@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network sis19x ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders kernel net ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+
+KernelAddon sis19x :
+	Driver.cpp
+	Device.cpp
+	MIIBus.cpp
+	DataRing.cpp
+	Settings.cpp
+	;

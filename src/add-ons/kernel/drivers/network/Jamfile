@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers network ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network etherpci ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pegasus ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8169 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network sis19x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network sis900 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_asix ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_davicom ;
