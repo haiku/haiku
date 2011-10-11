@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-//#define TRACE_VALIDATION
+#define TRACE_VALIDATION
 #ifdef TRACE_VALIDATION
 #ifdef __cplusplus
 extern "C" 
@@ -68,7 +68,7 @@ sanitize_timing(uint16& display, uint16& syncStart, uint16& syncEnd,
 	}
 
 	if (total > constraints.max_total) {
-		TRACE("%s: total(%" B_PRIu16 ") > max_total(%" B_PRIu16 ")\n"
+		TRACE("%s: total(%" B_PRIu16 ") > max_total(%" B_PRIu16 ")\n",
 			__func__, total, constraints.max_total);
 		total = constraints.max_total;
 		syncLength = min_c(syncLength, uint16(total - syncStart));
