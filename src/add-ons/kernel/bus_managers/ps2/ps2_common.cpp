@@ -278,8 +278,11 @@ ps2_interrupt(void* cookie)
 	ps2_dev *dev;
 
 	ctrl = ps2_read_ctrl();
-	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
+	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL)) {
+		TRACE("ps2: ps2_interrupt unhandled, OBF bit unset, ctrl 0x%02x (%s)\n",
+				ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		return B_UNHANDLED_INTERRUPT;
+	}
 
 	if (atomic_get(&sIgnoreInterrupts)) {
 		TRACE("ps2: ps2_interrupt ignoring, ctrl 0x%02x (%s)\n", ctrl,

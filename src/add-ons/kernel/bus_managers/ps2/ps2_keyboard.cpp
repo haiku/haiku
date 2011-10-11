@@ -289,6 +289,24 @@ probe_keyboard(void)
 //		return B_ERROR;
 //	}
 
+// Some controllers set the disble keyboard command bit to "on" after resetting
+// the keyboard device. Read #7973 #6313 for more details.
+// So check the command byte now and re-enable the keyboard if it is the case.
+	uint8 cmdbyte = 0;
+	status = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
+
+	if (status != B_OK) {
+		INFO("ps2: cannot read CMD byte on kbd probe:0x%#08lx\n", status);
+	} else
+	if ((cmdbyte & PS2_BITS_KEYBOARD_DISABLED) == PS2_BITS_KEYBOARD_DISABLED) {
+		cmdbyte &= ~PS2_BITS_KEYBOARD_DISABLED;
+		status = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
+		if (status != B_OK) {
+			INFO("ps2: cannot write 0x%02x to CMD byte on kbd probe:0x%08lx\n",
+					cmdbyte, status);
+		}
+	}
+
 	return B_OK;
 }
 
