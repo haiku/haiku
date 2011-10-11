@@ -9,6 +9,9 @@
 #define RADEON_HD_PLL_H
 
 
+#include "accelerant.h"
+
+
 #define MAX_TOLERANCE 10
 
 #define PLL_MIN_DEFAULT 16000
@@ -41,10 +44,51 @@
 #define PLL_PREFER_MINM_OVER_MAXP (1 << 14)
 
 
-uint32 pll_adjust(uint32 pixelClock, uint8 crtc_id);
-status_t pll_compute(uint32 pixelClock, uint32 *dotclockOut,
-	uint32 *referenceOut, uint32 *feedbackOut, uint32 *feedbackFracOut,
-	uint32 *postOut);
+struct pll_info {
+	/* pixel clock to be programmed (kHz)*/
+	uint32 pixel_clock;
+
+	/* dot clock (kHz) */
+	uint32 dot_clock;
+
+	/* flags for the current clock */
+	uint32 flags;
+
+	/* pll id */
+	uint32 id;
+
+	/* reference frequency */
+	uint32 reference_freq;
+
+	/* fixed dividers */
+	uint32 post_div;
+	uint32 reference_div;
+	uint32 feedback_div;
+	uint32 feedback_div_frac;
+
+	/* pll in/out limits */
+	uint32 pll_in_min;
+	uint32 pll_in_max;
+	uint32 pll_out_min;
+	uint32 pll_out_max;
+	uint32 lcd_pll_out_min;
+	uint32 lcd_pll_out_max;
+	uint32 best_vco;
+
+	/* divider limits */
+	uint32 min_ref_div;
+	uint32 max_ref_div;
+	uint32 min_post_div;
+	uint32 max_post_div;
+	uint32 min_feedback_div;
+	uint32 max_feedback_div;
+	uint32 min_frac_feedback_div;
+	uint32 max_frac_feedback_div;
+};
+
+
+uint32 pll_adjust(pll_info *pll, uint8 crtc_id);
+status_t pll_compute(pll_info *pll);
 status_t pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id);
 
 

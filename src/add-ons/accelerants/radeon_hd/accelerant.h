@@ -101,41 +101,6 @@ struct register_info {
 };
 
 
-struct pll_info {
-	/* reference frequency */
-	uint32 reference_freq;
-
-	/* fixed dividers */
-	uint32 reference_div;
-	uint32 post_div;
-
-	/* pll in/out limits */
-	uint32 pll_in_min;
-	uint32 pll_in_max;
-	uint32 pll_out_min;
-	uint32 pll_out_max;
-	uint32 lcd_pll_out_min;
-	uint32 lcd_pll_out_max;
-	uint32 best_vco;
-
-	/* divider limits */
-	uint32 min_ref_div;
-	uint32 max_ref_div;
-	uint32 min_post_div;
-	uint32 max_post_div;
-	uint32 min_feedback_div;
-	uint32 max_feedback_div;
-	uint32 min_frac_feedback_div;
-	uint32 max_frac_feedback_div;
-
-	/* flags for the current clock */
-	uint32 flags;
-
-	/* pll id */
-	uint32 id;
-};
-
-
 typedef struct {
 	bool	valid;
 

@@ -156,8 +156,8 @@ radeon_set_display_mode(display_mode *mode)
 
 		// *** CRT controler mode set
 		// TODO : program SS
-		pll_set(0, mode->timing.pixel_clock, id);
-			// TODO : check if pll 0 is used and use pll 1 if so
+		pll_set(ATOM_PPLL1, mode->timing.pixel_clock, id);
+			// TODO : check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
 		display_crtc_set_dtd(id, mode);
 
 		// TODO : vvvv : atombios_crtc_set_base
