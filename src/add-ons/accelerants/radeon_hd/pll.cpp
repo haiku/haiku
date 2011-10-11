@@ -6,6 +6,7 @@
  *	  Alexander von Gluck, kallisti5@unixzen.com
  */
 
+
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
