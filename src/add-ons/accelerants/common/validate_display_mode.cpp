@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-#define TRACE_VALIDATION
+//#define TRACE_VALIDATION
 #ifdef TRACE_VALIDATION
 #ifdef __cplusplus
 extern "C" 
