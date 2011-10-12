@@ -41,21 +41,23 @@ encoder_assign_crtc(uint8 crtcID)
 {
 	int index = GetIndexIntoMasterTable(COMMAND, SelectCRTC_Source);
 	union crtc_source_param args;
-	uint8 frev;
-	uint8 crev;
+
+	// Table version
+	uint8 tableMajor;
+	uint8 tableMinor;
 
 	memset(&args, 0, sizeof(args));
 
-	if (atom_parse_cmd_header(gAtomContext, index, &frev, &crev)
+	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		!= B_OK)
 		return;
 
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint16 encoderID = gConnector[connectorIndex]->encoder.object_id;
 
-	switch (frev) {
+	switch (tableMajor) {
 		case 1:
-			switch (crev) {
+			switch (tableMinor) {
 				case 1:
 				default:
 					args.v1.ucCRTC = crtcID;
@@ -162,7 +164,8 @@ encoder_assign_crtc(uint8 crtcID)
 			}
 			break;
 		default:
-			ERROR("%s: Unknown table version: %d, %d\n", __func__, frev, crev);
+			ERROR("%s: Unknown table version: %" B_PRIu8 ".%" B_PRIu8 "\n",
+				__func__, tableMajor, tableMinor);
 			return;
 	}
 
@@ -244,15 +247,18 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 			break;
 	}
 
-	uint8 frev;
-	uint8 crev;
-	if (atom_parse_cmd_header(gAtomContext, index, &frev, &crev) != B_OK)
+	// Table verson
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
+		!= B_OK)
 		return B_ERROR;
 
-	switch (frev) {
+	switch (tableMajor) {
 	case 1:
 	case 2:
-		switch (crev) {
+		switch (tableMinor) {
 			case 1:
 				args.v1.ucMisc = 0;
 				args.v1.ucAction = command;
@@ -279,7 +285,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 			case 3:
 				args.v2.ucMisc = 0;
 				args.v2.ucAction = command;
-				if (crev == 3) {
+				if (tableMinor == 3) {
 					//if (dig->coherent_mode)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_COHERENT;
 				}
@@ -319,14 +325,15 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 				}
 				break;
 			default:
-				ERROR("%s: Unknown minor table version: %d.%d\n", __func__,
-					frev, crev);
+				ERROR("%s: Unknown minor table version: %"
+					B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+					tableMajor, tableMinor);
 				return B_ERROR;
 		}
 		break;
 	default:
-		ERROR("%s: Unknown major table version: %d.%d\n", __func__,
-			frev, crev);
+		ERROR("%s: Unknown major table version: %" B_PRIu8 ".%" B_PRIu8 "\n",
+			__func__, tableMajor, tableMinor);
 		return B_ERROR;
 	}
 	return atom_execute_table(gAtomContext, index, (uint32*)&args);

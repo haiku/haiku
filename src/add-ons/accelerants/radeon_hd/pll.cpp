@@ -187,18 +187,21 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 
 	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
 		union adjust_pixel_clock args;
-		uint8 frev;
-		uint8 crev;
+
+		uint8 tableMajor;
+		uint8 tableMinor;
 
 		int index = GetIndexIntoMasterTable(COMMAND, AdjustDisplayPll);
 
-		if (atom_parse_cmd_header(gAtomContext, index, &frev, &crev) != B_OK)
+		if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
+			!= B_OK) {
 			return adjustedClock;
+		}
 
 		memset(&args, 0, sizeof(args));
-		switch (frev) {
+		switch (tableMajor) {
 			case 1:
-				switch (crev) {
+				switch (tableMinor) {
 					case 1:
 					case 2:
 						args.v1.usPixelClock
@@ -281,15 +284,16 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	union set_pixel_clock args;
 	memset(&args, 0, sizeof(args));
 
-	uint8 frev;
-	uint8 crev;
-	atom_parse_cmd_header(gAtomContext, index, &frev, &crev);
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
 
 	uint32 bpc = 8;
 		// TODO : BPC == Digital Depth, EDID 1.4+ on digital displays
 		// isn't in Haiku edid common code?
 
-	switch (crev) {
+	switch (tableMinor) {
 		case 1:
 			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
 			args.v1.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
@@ -382,8 +386,8 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v6.ucPpll = pllID;
 			break;
 		default:
-			TRACE("%s: ERROR: table version %d.%d TODO\n", __func__,
-				frev, crev);
+			TRACE("%s: ERROR: table version %" B_PRIu8 ".%" B_PRIu8 " TODO\n",
+				__func__, tableMajor, tableMinor);
 			return B_ERROR;
 	}
 

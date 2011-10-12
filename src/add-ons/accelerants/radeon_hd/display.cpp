@@ -235,13 +235,13 @@ status_t
 detect_connectors_legacy()
 {
 	int index = GetIndexIntoMasterTable(DATA, SupportedDevicesInfo);
-	uint8 frev;
-	uint8 crev;
-	uint16 size;
-	uint16 data_offset;
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableSize;
+	uint16 tableOffset;
 
-	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
-		&data_offset) != B_OK) {
+	if (atom_parse_data_header(gAtomContext, index, &tableSize,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
 		ERROR("%s: unable to parse data header!\n", __func__);
 		return B_ERROR;
 	}
@@ -249,7 +249,7 @@ detect_connectors_legacy()
 	union atom_supported_devices *supported_devices;
 	supported_devices
 		= (union atom_supported_devices *)
-		(gAtomContext->bios + data_offset);
+		(gAtomContext->bios + tableOffset);
 
 	uint16 device_support
 		= B_LENDIAN_TO_HOST_INT16(supported_devices->info.usDeviceSupport);
@@ -327,19 +327,20 @@ status_t
 detect_connectors()
 {
 	int index = GetIndexIntoMasterTable(DATA, Object_Header);
-	uint8 frev;
-	uint8 crev;
-	uint16 size;
-	uint16 data_offset;
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableSize;
+	uint16 tableOffset;
 
-	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
-		&data_offset) != B_OK) {
+	if (atom_parse_data_header(gAtomContext, index, &tableSize,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
 		ERROR("%s: ERROR: parsing data header failed!\n", __func__);
 		return B_ERROR;
 	}
 
-	if (crev < 2) {
-		ERROR("%s: ERROR: data header version unknown!\n", __func__);
+	if (tableMinor < 2) {
+		ERROR("%s: ERROR: table minor version unknown! "
+			"(%" B_PRIu8 ".%" B_PRIu8 ")\n", __func__, tableMajor, tableMinor);
 		return B_ERROR;
 	}
 
@@ -349,22 +350,22 @@ detect_connectors()
 	ATOM_DISPLAY_OBJECT_PATH_TABLE *path_obj;
 	ATOM_OBJECT_HEADER *obj_header;
 
-	obj_header = (ATOM_OBJECT_HEADER *)(gAtomContext->bios + data_offset);
+	obj_header = (ATOM_OBJECT_HEADER *)(gAtomContext->bios + tableOffset);
 	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE *)
-		(gAtomContext->bios + data_offset
+		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usDisplayPathTableOffset));
 	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE *)
-		(gAtomContext->bios + data_offset
+		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usConnectorObjectTableOffset));
 	enc_obj = (ATOM_ENCODER_OBJECT_TABLE *)
-		(gAtomContext->bios + data_offset
+		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usEncoderObjectTableOffset));
 	router_obj = (ATOM_OBJECT_TABLE *)
-		(gAtomContext->bios + data_offset
+		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usRouterObjectTableOffset));
-	int device_support = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
+	int deviceSupport = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
 
-	int path_size = 0;
+	int pathSize = 0;
 	int32 i = 0;
 
 	TRACE("%s: found %" B_PRIu8 " potential display paths.\n", __func__,
@@ -378,15 +379,15 @@ detect_connectors()
 
 		uint8 *addr = (uint8*)path_obj->asDispPath;
 		ATOM_DISPLAY_OBJECT_PATH *path;
-		addr += path_size;
+		addr += pathSize;
 		path = (ATOM_DISPLAY_OBJECT_PATH *)addr;
-		path_size += B_LENDIAN_TO_HOST_INT16(path->usSize);
+		pathSize += B_LENDIAN_TO_HOST_INT16(path->usSize);
 
-		uint32 connector_type;
-		uint16 connector_object_id;
-		uint16 connector_flags = B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
+		uint32 connectorType;
+		uint16 connectorObjectID;
+		uint16 connectorFlags = B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
 
-		if ((device_support & connector_flags) != 0) {
+		if ((deviceSupport & connectorFlags) != 0) {
 			uint8 con_obj_id = (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
@@ -397,7 +398,7 @@ detect_connectors()
 			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 			//	& OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 
-			if (connector_flags == ATOM_DEVICE_CV_SUPPORT) {
+			if (connectorFlags == ATOM_DEVICE_CV_SUPPORT) {
 				TRACE("%s: Path #%" B_PRId32 ": skipping component video.\n",
 					__func__, i);
 				continue;
@@ -408,11 +409,11 @@ detect_connectors()
 				ERROR("%s: TODO : IGP chip connector detection\n", __func__);
 			else {
 				igp_lane_info = 0;
-				connector_type = connector_convert[con_obj_id];
-				connector_object_id = con_obj_id;
+				connectorType = connector_convert[con_obj_id];
+				connectorObjectID = con_obj_id;
 			}
 
-			if (connector_type == VIDEO_CONNECTOR_UNKNOWN) {
+			if (connectorType == VIDEO_CONNECTOR_UNKNOWN) {
 				ERROR("%s: Path #%" B_PRId32 ": skipping unknown connector.\n",
 					__func__, i);
 				continue;
@@ -443,7 +444,7 @@ detect_connectors()
 							== encoder_obj) {
 							ATOM_COMMON_RECORD_HEADER *record
 								= (ATOM_COMMON_RECORD_HEADER *)
-								((uint16 *)gAtomContext->bios + data_offset
+								((uint16 *)gAtomContext->bios + tableOffset
 								+ B_LENDIAN_TO_HOST_INT16(
 								enc_obj->asObjects[k].usRecordOffset));
 							ATOM_ENCODER_CAP_RECORD *cap_record;
@@ -472,7 +473,7 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-									if ((connector_flags
+									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_LVDS;
 										// radeon_atombios_get_lvds_info
@@ -496,10 +497,10 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
-									if ((connector_flags
+									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_LVDS;
-									} else if ((connector_flags
+									} else if ((connectorFlags
 										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_DAC;
 									} else {
@@ -516,10 +517,10 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_HDMI_SI1930:
 								case ENCODER_OBJECT_ID_TRAVIS:
 								case ENCODER_OBJECT_ID_NUTMEG:
-									if ((connector_flags
+									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_LVDS;
-									} else if ((connector_flags
+									} else if ((connectorFlags
 										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_DAC;
 									} else {
@@ -542,7 +543,7 @@ detect_connectors()
 								get_encoder_name(encoder_type));
 
 							gConnector[connectorIndex]->encoder.flags
-								= connector_flags;
+								= connectorFlags;
 							gConnector[connectorIndex]->encoder.valid
 								= true;
 							gConnector[connectorIndex]->encoder.object_id
@@ -558,7 +559,7 @@ detect_connectors()
 			}
 
 			// Set up information buses such as ddc
-			if ((connector_flags
+			if ((connectorFlags
 				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) == 0) {
 				for (j = 0; j < con_obj->ucNumberOfObjects; j++) {
 					if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
@@ -566,7 +567,7 @@ detect_connectors()
 						con_obj->asObjects[j].usObjectID)) {
 						ATOM_COMMON_RECORD_HEADER *record
 							= (ATOM_COMMON_RECORD_HEADER*)(gAtomContext->bios
-							+ data_offset + B_LENDIAN_TO_HOST_INT16(
+							+ tableOffset + B_LENDIAN_TO_HOST_INT16(
 							con_obj->asObjects[j].usRecordOffset));
 						while (record->ucRecordSize > 0
 							&& record->ucRecordType > 0
@@ -604,19 +605,19 @@ detect_connectors()
 
 			// record connector information
 			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
-				__func__, i, get_connector_name(connector_type),
-				connector_type);
+				__func__, i, get_connector_name(connectorType),
+				connectorType);
 
 			gConnector[connectorIndex]->valid = true;
-			gConnector[connectorIndex]->flags = connector_flags;
-			gConnector[connectorIndex]->type = connector_type;
+			gConnector[connectorIndex]->flags = connectorFlags;
+			gConnector[connectorIndex]->type = connectorType;
 			gConnector[connectorIndex]->object_id
-				= connector_object_id;
+				= connectorObjectID;
 
 			gConnector[connectorIndex]->encoder.is_tv = false;
 			gConnector[connectorIndex]->encoder.is_hdmi = false;
 
-			switch(connector_type) {
+			switch(connectorType) {
 				case VIDEO_CONNECTOR_COMPOSITE:
 				case VIDEO_CONNECTOR_SVIDEO:
 				case VIDEO_CONNECTOR_9DIN:

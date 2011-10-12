@@ -417,32 +417,33 @@ status_t
 radeon_gpu_gpio_setup()
 {
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
-	uint8 frev;
-	uint8 crev;
-	uint16 offset;
-	uint16 size;
 
-	if (atom_parse_data_header(gAtomContext, index, &size, &frev, &crev,
-		&offset) != B_OK) {
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableOffset;
+	uint16 tableSize;
+
+	if (atom_parse_data_header(gAtomContext, index, &tableSize,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
 		ERROR("%s: could't read GPIO_I2C_Info table from AtomBIOS index %d!\n",
 			__func__, index);
 		return B_ERROR;
 	}
 
 	struct _ATOM_GPIO_I2C_INFO *i2c_info
-		= (struct _ATOM_GPIO_I2C_INFO *)(gAtomContext->bios + offset);
+		= (struct _ATOM_GPIO_I2C_INFO *)(gAtomContext->bios + tableOffset);
 
-	uint32 num_indices = (size - sizeof(ATOM_COMMON_TABLE_HEADER))
+	uint32 numIndices = (tableSize - sizeof(ATOM_COMMON_TABLE_HEADER))
 		/ sizeof(ATOM_GPIO_I2C_ASSIGMENT);
 
-	if (num_indices > ATOM_MAX_SUPPORTED_DEVICE) {
+	if (numIndices > ATOM_MAX_SUPPORTED_DEVICE) {
 		ERROR("%s: ERROR: AtomBIOS contains more GPIO_Info items then I"
 			"was prepared for! (seen: %" B_PRIu32 "; max: %" B_PRIu32 ")\n",
-			__func__, num_indices, (uint32)ATOM_MAX_SUPPORTED_DEVICE);
+			__func__, numIndices, (uint32)ATOM_MAX_SUPPORTED_DEVICE);
 		return B_ERROR;
 	}
 
-	for (uint32 i = 0; i < num_indices; i++) {
+	for (uint32 i = 0; i < numIndices; i++) {
 		ATOM_GPIO_I2C_ASSIGMENT *gpio = &i2c_info->asGPIO_Info[i];
 
 		// TODO : if DCE 4 and i == 7 ... manual override for evergreen
