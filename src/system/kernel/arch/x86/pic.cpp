@@ -13,6 +13,8 @@
 
 #include <arch/x86/arch_int.h>
 
+#include <int.h>
+
 
 //#define TRACE_PIC
 #ifdef TRACE_PIC
@@ -229,6 +231,8 @@ pic_init()
 
 	TRACE(("PIC level trigger mode: 0x%08lx\n", sLevelTriggeredInterrupts));
 
+	reserve_io_interrupt_vectors(16, 0);
+
 	// make the pic controller the current one
 	arch_int_set_interrupt_controller(picController);
 }
@@ -243,4 +247,6 @@ pic_disable(uint16& enabledInterrupts)
 	// Mask off all interrupts on master and slave
 	out8(0xff, PIC_MASTER_MASK);
 	out8(0xff, PIC_SLAVE_MASK);
+
+	free_io_interrupt_vectors(16, 0);
 }
