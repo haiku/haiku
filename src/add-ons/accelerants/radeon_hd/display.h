@@ -65,15 +65,15 @@ status_t detect_displays();
 void debug_displays();
 void debug_connectors();
 
-uint32 display_get_encoder_mode(uint32 connector_index);
-void display_crtc_lock(uint8 crtc_id, int command);
-void display_crtc_blank(uint8 crtc_id, int command);
-void display_crtc_scale(uint8 crtc_id, display_mode *mode);
-void display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode);
-void display_crtc_set(uint8 crtc_id, display_mode *mode);
-void display_crtc_set_dtd(uint8 crtc_id, display_mode *mode);
-void display_crtc_power(uint8 crtc_id, int command);
-void display_crtc_memreq(uint8 crtc_id, int command);
+uint32 display_get_encoder_mode(uint32 connectorIndex);
+void display_crtc_lock(uint8 crtcID, int command);
+void display_crtc_blank(uint8 crtcID, int command);
+void display_crtc_scale(uint8 crtcID, display_mode *mode);
+void display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode);
+void display_crtc_set(uint8 crtcID, display_mode *mode);
+void display_crtc_set_dtd(uint8 crtcID, display_mode *mode);
+void display_crtc_power(uint8 crtcID, int command);
+void display_crtc_memreq(uint8 crtcID, int command);
 
 
 #endif /* RADEON_HD_DISPLAY_H */

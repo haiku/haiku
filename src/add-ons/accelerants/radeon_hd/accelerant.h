@@ -156,7 +156,7 @@ typedef struct {
 
 typedef struct {
 	bool			active;
-	uint32			connector_index; // matches connector id in connector_info
+	uint32			connectorIndex; // matches connector id in connector_info
 	register_info	*regs;
 	bool			found_ranges;
 	uint32			vfreq_max;

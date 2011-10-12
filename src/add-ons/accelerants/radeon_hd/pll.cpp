@@ -171,7 +171,7 @@ union adjust_pixel_clock {
 
 
 uint32
-pll_adjust(pll_info *pll, uint8 crtc_id)
+pll_adjust(pll_info *pll, uint8 crtcID)
 {
 	pll->flags |= PLL_PREFER_LOW_REF_DIV;
 
@@ -181,9 +181,9 @@ pll_adjust(pll_info *pll, uint8 crtc_id)
 	uint32 pixelClock = pll->pixel_clock;
 	uint32 adjustedClock = pll->pixel_clock;
 
-	uint32 connector_index = gDisplay[crtc_id]->connector_index;
-	uint32 encoder_id = gConnector[connector_index]->encoder.object_id;
-	uint32 encoder_mode = display_get_encoder_mode(connector_index);
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.object_id;
+	uint32 encoder_mode = display_get_encoder_mode(connectorIndex);
 
 	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
 		union adjust_pixel_clock args;
@@ -203,7 +203,7 @@ pll_adjust(pll_info *pll, uint8 crtc_id)
 					case 2:
 						args.v1.usPixelClock
 							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
-						args.v1.ucTransmitterID = encoder_id;
+						args.v1.ucTransmitterID = encoderID;
 						args.v1.ucEncodeMode = encoder_mode;
 						// TODO : SS and SS % > 0
 						if (0) {
@@ -220,7 +220,7 @@ pll_adjust(pll_info *pll, uint8 crtc_id)
 					case 3:
 						args.v3.sInput.usPixelClock
 							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
-						args.v3.sInput.ucTransmitterID = encoder_id;
+						args.v3.sInput.ucTransmitterID = encoderID;
 						args.v3.sInput.ucEncodeMode = encoder_mode;
 						args.v3.sInput.ucDispPllConfig = 0;
 						// TODO : SS and SS % > 0
@@ -263,16 +263,16 @@ pll_adjust(pll_info *pll, uint8 crtc_id)
 
 
 status_t
-pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
+pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 {
-	uint32 connector_index = gDisplay[crtc_id]->connector_index;
-	pll_info *pll = &gConnector[connector_index]->encoder.pll;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	pll_info *pll = &gConnector[connectorIndex]->encoder.pll;
 
 	pll->pixel_clock = pixelClock;
-	pll->id = pll_id;
+	pll->id = pllID;
 
 	// get any needed clock adjustments, set reference/post dividers, set flags
-	uint32 adjustedClock = pll_adjust(pll, crtc_id);
+	uint32 adjustedClock = pll_adjust(pll, crtcID);
 
 	// compute dividers, set flags
 	pll_compute(pll);
@@ -297,7 +297,7 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			args.v1.ucFracFbDiv = pll->feedback_div_frac;
 			args.v1.ucPostDiv = pll->post_div;
 			args.v1.ucPpll = pll->id;
-			args.v1.ucCRTC = crtc_id;
+			args.v1.ucCRTC = crtcID;
 			args.v1.ucRefDivSrc = 1;
 			break;
 		case 2:
@@ -307,7 +307,7 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			args.v2.ucFracFbDiv = pll->feedback_div_frac;
 			args.v2.ucPostDiv = pll->post_div;
 			args.v2.ucPpll = pll->id;
-			args.v2.ucCRTC = crtc_id;
+			args.v2.ucCRTC = crtcID;
 			args.v2.ucRefDivSrc = 1;
 			break;
 		case 3:
@@ -321,11 +321,11 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			// 	args.v3.ucMiscInfo |= PIXEL_CLOCK_MISC_REF_DIV_SRC;
 			args.v3.ucTransmitterId
-				= gConnector[connector_index]->encoder.object_id;
-			args.v3.ucEncoderMode = display_get_encoder_mode(connector_index);
+				= gConnector[connectorIndex]->encoder.object_id;
+			args.v3.ucEncoderMode = display_get_encoder_mode(connectorIndex);
 			break;
 		case 5:
-			args.v5.ucCRTC = crtc_id;
+			args.v5.ucCRTC = crtcID;
 			args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
 			args.v5.ucRefDiv = pll->reference_div;
 			args.v5.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
@@ -345,14 +345,14 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 					break;
 			}
 			args.v5.ucTransmitterID
-				= gConnector[connector_index]->encoder.object_id;
+				= gConnector[connectorIndex]->encoder.object_id;
 			args.v5.ucEncoderMode
-				= display_get_encoder_mode(connector_index);
-			args.v5.ucPpll = pll_id;
+				= display_get_encoder_mode(connectorIndex);
+			args.v5.ucPpll = pllID;
 			break;
 		case 6:
 			args.v6.ulDispEngClkFreq
-				= B_HOST_TO_LENDIAN_INT32(crtc_id << 24 | adjustedClock / 10);
+				= B_HOST_TO_LENDIAN_INT32(crtcID << 24 | adjustedClock / 10);
 			args.v6.ucRefDiv = pll->reference_div;
 			args.v6.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
 			args.v6.ulFbDivDecFrac
@@ -377,9 +377,9 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 					break;
 			}
 			args.v6.ucTransmitterID
-				= gConnector[connector_index]->encoder.object_id;
-			args.v6.ucEncoderMode = display_get_encoder_mode(connector_index);
-			args.v6.ucPpll = pll_id;
+				= gConnector[connectorIndex]->encoder.object_id;
+			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
+			args.v6.ucPpll = pllID;
 			break;
 		default:
 			TRACE("%s: ERROR: table version %d.%d TODO\n", __func__,

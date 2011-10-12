@@ -370,10 +370,10 @@ detect_connectors()
 	TRACE("%s: found %" B_PRIu8 " potential display paths.\n", __func__,
 		path_obj->ucNumOfDispPath);
 
-	uint32 connector_index = 0;
+	uint32 connectorIndex = 0;
 	for (i = 0; i < path_obj->ucNumOfDispPath; i++) {
 
-		if (connector_index >= ATOM_MAX_SUPPORTED_DEVICE)
+		if (connectorIndex >= ATOM_MAX_SUPPORTED_DEVICE)
 			continue;
 
 		uint8 *addr = (uint8*)path_obj->asDispPath;
@@ -463,11 +463,11 @@ detect_connectors()
 								record = (ATOM_COMMON_RECORD_HEADER *)
 									((char *)record + record->ucRecordSize);
 							}
-							uint32 encoder_id = (encoder_obj & OBJECT_ID_MASK)
+							uint32 encoderID = (encoder_obj & OBJECT_ID_MASK)
 								>> OBJECT_ID_SHIFT;
 
 							uint32 encoder_type = VIDEO_ENCODER_NONE;
-							switch(encoder_id) {
+							switch(encoderID) {
 								case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
@@ -541,13 +541,13 @@ detect_connectors()
 								"%s\n", __func__, i,
 								get_encoder_name(encoder_type));
 
-							gConnector[connector_index]->encoder.flags
+							gConnector[connectorIndex]->encoder.flags
 								= connector_flags;
-							gConnector[connector_index]->encoder.valid
+							gConnector[connectorIndex]->encoder.valid
 								= true;
-							gConnector[connector_index]->encoder.object_id
-								= encoder_id;
-							gConnector[connector_index]->encoder.type
+							gConnector[connectorIndex]->encoder.object_id
+								= encoderID;
+							gConnector[connectorIndex]->encoder.type
 								= encoder_type;
 						}
 					}
@@ -584,7 +584,7 @@ detect_connectors()
 										= (ATOM_I2C_ID_CONFIG_ACCESS *)
 										&i2c_record->sucI2cId;
 									// attach i2c gpio information for connector
-									radeon_gpu_i2c_attach(connector_index,
+									radeon_gpu_i2c_attach(connectorIndex,
 										i2c_config->ucAccess);
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
@@ -607,28 +607,28 @@ detect_connectors()
 				__func__, i, get_connector_name(connector_type),
 				connector_type);
 
-			gConnector[connector_index]->valid = true;
-			gConnector[connector_index]->flags = connector_flags;
-			gConnector[connector_index]->type = connector_type;
-			gConnector[connector_index]->object_id
+			gConnector[connectorIndex]->valid = true;
+			gConnector[connectorIndex]->flags = connector_flags;
+			gConnector[connectorIndex]->type = connector_type;
+			gConnector[connectorIndex]->object_id
 				= connector_object_id;
 
-			gConnector[connector_index]->encoder.is_tv = false;
-			gConnector[connector_index]->encoder.is_hdmi = false;
+			gConnector[connectorIndex]->encoder.is_tv = false;
+			gConnector[connectorIndex]->encoder.is_hdmi = false;
 
 			switch(connector_type) {
 				case VIDEO_CONNECTOR_COMPOSITE:
 				case VIDEO_CONNECTOR_SVIDEO:
 				case VIDEO_CONNECTOR_9DIN:
-					gConnector[connector_index]->encoder.is_tv = true;
+					gConnector[connectorIndex]->encoder.is_tv = true;
 					break;
 				case VIDEO_CONNECTOR_HDMIA:
 				case VIDEO_CONNECTOR_HDMIB:
-					gConnector[connector_index]->encoder.is_hdmi = true;
+					gConnector[connectorIndex]->encoder.is_hdmi = true;
 					break;
 			}
 
-			connector_index++;
+			connectorIndex++;
 		} // END for each valid connector
 	} // end for each display path
 
@@ -658,7 +658,7 @@ detect_displays()
 		if (radeon_gpu_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
 			gDisplay[displayIndex]->active = true;
 				// set this display as active
-			gDisplay[displayIndex]->connector_index = id;
+			gDisplay[displayIndex]->connectorIndex = id;
 				// set physical connector index from gConnector
 
 			init_registers(gDisplay[displayIndex]->regs, displayIndex);
@@ -678,7 +678,7 @@ detect_displays()
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC)
 				continue;
 			gDisplay[0]->active = true;
-			gDisplay[0]->connector_index = id;
+			gDisplay[0]->connectorIndex = id;
 			init_registers(gDisplay[0]->regs, 0);
 			if (detect_crt_ranges(0) == B_OK)
 				gDisplay[0]->found_ranges = true;
@@ -699,11 +699,11 @@ debug_displays()
 		ERROR("Display #%" B_PRIu32 " active = %s\n",
 			id, gDisplay[id]->active ? "true" : "false");
 
-		uint32 connector_index = gDisplay[id]->connector_index;
+		uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
 		if (gDisplay[id]->active) {
-			uint32 connector_type = gConnector[connector_index]->type;
-			uint32 encoder_type = gConnector[connector_index]->encoder.type;
+			uint32 connector_type = gConnector[connectorIndex]->type;
+			uint32 encoder_type = gConnector[connectorIndex]->encoder.type;
 			ERROR(" + connector: %s\n", get_connector_name(connector_type));
 			ERROR(" + encoder:   %s\n", get_encoder_name(encoder_type));
 
@@ -742,15 +742,15 @@ debug_connectors()
 
 
 uint32
-display_get_encoder_mode(uint32 connector_index)
+display_get_encoder_mode(uint32 connectorIndex)
 {
-	uint32 connector_type = gConnector[connector_index]->type;
+	uint32 connector_type = gConnector[connectorIndex]->type;
 	switch (connector_type) {
 		case VIDEO_CONNECTOR_DVII:
 		case VIDEO_CONNECTOR_HDMIB: /* HDMI-B is DL-DVI; analog works fine */
 			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
 			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
-			// if (gConnector[connector_index]->use_digital)
+			// if (gConnector[connectorIndex]->use_digital)
 			//	return ATOM_ENCODER_MODE_DVI;
 			// else
 				return ATOM_ENCODER_MODE_CRT;
@@ -786,7 +786,7 @@ display_get_encoder_mode(uint32 connector_index)
 
 
 void
-display_crtc_lock(uint8 crtc_id, int command)
+display_crtc_lock(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);
 	ENABLE_CRTC_PS_ALLOCATION args;
@@ -795,7 +795,7 @@ display_crtc_lock(uint8 crtc_id, int command)
 
 	memset(&args, 0, sizeof(args));
 
-	args.ucCRTC = crtc_id;
+	args.ucCRTC = crtcID;
 	args.ucEnable = command;
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -803,7 +803,7 @@ display_crtc_lock(uint8 crtc_id, int command)
 
 
 void
-display_crtc_blank(uint8 crtc_id, int command)
+display_crtc_blank(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);
 	BLANK_CRTC_PS_ALLOCATION args;
@@ -811,7 +811,7 @@ display_crtc_blank(uint8 crtc_id, int command)
 
 	memset(&args, 0, sizeof(args));
 
-	args.ucCRTC = crtc_id;
+	args.ucCRTC = crtcID;
 	args.ucBlanking = command;
 
 	atom_execute_table(gAtomContext, index, (uint32 *)&args);
@@ -819,7 +819,7 @@ display_crtc_blank(uint8 crtc_id, int command)
 
 
 void
-display_crtc_scale(uint8 crtc_id, display_mode *mode)
+display_crtc_scale(uint8 crtcID, display_mode *mode)
 {
 	TRACE("%s\n", __func__);
 	ENABLE_SCALER_PS_ALLOCATION args;
@@ -827,7 +827,7 @@ display_crtc_scale(uint8 crtc_id, display_mode *mode)
 
 	memset(&args, 0, sizeof(args));
 
-	args.ucScaler = crtc_id;
+	args.ucScaler = crtcID;
 	args.ucEnable = ATOM_SCALER_EXPANSION;
 
 	atom_execute_table(gAtomContext, index, (uint32 *)&args);
@@ -835,10 +835,10 @@ display_crtc_scale(uint8 crtc_id, display_mode *mode)
 
 
 void
-display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode)
+display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
-	register_info* regs = gDisplay[crtc_id]->regs;
+	register_info* regs = gDisplay[crtcID]->regs;
 
 	uint32 fb_swap = R600_D1GRPH_SWAP_ENDIAN_NONE;
 	uint32 fb_format;
@@ -936,7 +936,7 @@ display_crtc_fb_set_dce1(uint8 crtc_id, display_mode *mode)
 
 
 void
-display_crtc_set(uint8 crtc_id, display_mode *mode)
+display_crtc_set(uint8 crtcID, display_mode *mode)
 {
 	display_timing& displayTiming = mode->timing;
 
@@ -972,14 +972,14 @@ display_crtc_set(uint8 crtc_id, display_mode *mode)
 		misc |= ATOM_VSYNC_POLARITY;
 
 	args.susModeMiscInfo.usAccess = B_HOST_TO_LENDIAN_INT16(misc);
-	args.ucCRTC = crtc_id;
+	args.ucCRTC = crtcID;
 
 	atom_execute_table(gAtomContext, index, (uint32 *)&args);
 }
 
 
 void
-display_crtc_set_dtd(uint8 crtc_id, display_mode *mode)
+display_crtc_set_dtd(uint8 crtcID, display_mode *mode)
 {
 	display_timing& displayTiming = mode->timing;
 
@@ -1023,14 +1023,14 @@ display_crtc_set_dtd(uint8 crtc_id, display_mode *mode)
 		misc |= ATOM_VSYNC_POLARITY;
 
 	args.susModeMiscInfo.usAccess = B_HOST_TO_LENDIAN_INT16(misc);
-	args.ucCRTC = crtc_id;
+	args.ucCRTC = crtcID;
 
 	atom_execute_table(gAtomContext, index, (uint32 *)&args);
 }
 
 
 void
-display_crtc_power(uint8 crtc_id, int command)
+display_crtc_power(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);
 	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTC);
@@ -1038,7 +1038,7 @@ display_crtc_power(uint8 crtc_id, int command)
 
 	memset(&args, 0, sizeof(args));
 
-	args.ucCRTC = crtc_id;
+	args.ucCRTC = crtcID;
 	args.ucEnable = command;
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -1046,7 +1046,7 @@ display_crtc_power(uint8 crtc_id, int command)
 
 
 void
-display_crtc_memreq(uint8 crtc_id, int command)
+display_crtc_memreq(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);
 	int index = GetIndexIntoMasterTable(COMMAND, EnableCRTCMemReq);
@@ -1054,7 +1054,7 @@ display_crtc_memreq(uint8 crtc_id, int command)
 
 	memset(&args, 0, sizeof(args));
 
-	args.ucCRTC = crtc_id;
+	args.ucCRTC = crtcID;
 	args.ucEnable = command;
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);

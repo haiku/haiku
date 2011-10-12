@@ -158,11 +158,11 @@ radeon_set_display_mode(display_mode *mode)
 		if (gDisplay[id]->active == false)
 			continue;
 
-		uint16 connector_index = gDisplay[id]->connector_index;
+		uint16 connectorIndex = gDisplay[id]->connectorIndex;
 
 		// *** encoder prep
 		encoder_output_lock(true);
-		encoder_dpms_set(id, gConnector[connector_index]->encoder.object_id,
+		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.object_id,
 			B_DPMS_OFF);
 		encoder_assign_crtc(id);
 
@@ -193,7 +193,7 @@ radeon_set_display_mode(display_mode *mode)
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit
-		encoder_dpms_set(id, gConnector[connector_index]->encoder.object_id,
+		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.object_id,
 			B_DPMS_ON);
 		encoder_output_lock(false);
 	}
