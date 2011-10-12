@@ -267,12 +267,14 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 {
 	uint32 connector_index = gDisplay[crtc_id]->connector_index;
 	pll_info *pll = &gConnector[connector_index]->encoder.pll;
+
 	pll->pixel_clock = pixelClock;
 	pll->id = pll_id;
 
 	// get any needed clock adjustments, set reference/post dividers, set flags
 	uint32 adjustedClock = pll_adjust(pll, crtc_id);
 
+	// compute dividers, set flags
 	pll_compute(pll);
 
 	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
@@ -282,6 +284,10 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 	uint8 frev;
 	uint8 crev;
 	atom_parse_cmd_header(gAtomContext, index, &frev, &crev);
+
+	uint32 bpc = 8;
+		// TODO : BPC == Digital Depth, EDID 1.4+ on digital displays
+		// isn't in Haiku edid common code?
 
 	switch (crev) {
 		case 1:
@@ -317,6 +323,63 @@ pll_set(uint8 pll_id, uint32 pixelClock, uint8 crtc_id)
 			args.v3.ucTransmitterId
 				= gConnector[connector_index]->encoder.object_id;
 			args.v3.ucEncoderMode = display_get_encoder_mode(connector_index);
+			break;
+		case 5:
+			args.v5.ucCRTC = crtc_id;
+			args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
+			args.v5.ucRefDiv = pll->reference_div;
+			args.v5.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
+			args.v5.ulFbDivDecFrac
+				= B_HOST_TO_LENDIAN_INT32(pll->feedback_div_frac * 100000);
+			args.v5.ucPostDiv = pll->post_div;
+			args.v5.ucMiscInfo = 0; /* HDMI depth, etc. */
+			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
+			//	args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_REF_DIV_SRC;
+			switch (bpc) {
+				case 8:
+				default:
+					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
+					break;
+				case 10:
+					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
+					break;
+			}
+			args.v5.ucTransmitterID
+				= gConnector[connector_index]->encoder.object_id;
+			args.v5.ucEncoderMode
+				= display_get_encoder_mode(connector_index);
+			args.v5.ucPpll = pll_id;
+			break;
+		case 6:
+			args.v6.ulDispEngClkFreq
+				= B_HOST_TO_LENDIAN_INT32(crtc_id << 24 | adjustedClock / 10);
+			args.v6.ucRefDiv = pll->reference_div;
+			args.v6.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
+			args.v6.ulFbDivDecFrac
+				= B_HOST_TO_LENDIAN_INT32(pll->feedback_div_frac * 100000);
+			args.v6.ucPostDiv = pll->post_div;
+			args.v6.ucMiscInfo = 0; /* HDMI depth, etc. */
+			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
+			//	args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_REF_DIV_SRC;
+			switch (bpc) {
+				case 8:
+				default:
+					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_24BPP;
+					break;
+				case 10:
+					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_30BPP;
+					break;
+				case 12:
+					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_36BPP;
+					break;
+				case 16:
+					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_48BPP;
+					break;
+			}
+			args.v6.ucTransmitterID
+				= gConnector[connector_index]->encoder.object_id;
+			args.v6.ucEncoderMode = display_get_encoder_mode(connector_index);
+			args.v6.ucPpll = pll_id;
 			break;
 		default:
 			TRACE("%s: ERROR: table version %d.%d TODO\n", __func__,

@@ -37,7 +37,7 @@ union crtc_source_param {
 
 
 void
-encoder_assign_crtc(uint8 id)
+encoder_assign_crtc(uint8 crtc_id)
 {
 	int index = GetIndexIntoMasterTable(COMMAND, SelectCRTC_Source);
 	union crtc_source_param args;
@@ -50,7 +50,7 @@ encoder_assign_crtc(uint8 id)
 		!= B_OK)
 		return;
 
-	uint16 connector_index = gDisplay[id]->connector_index;
+	uint16 connector_index = gDisplay[crtc_id]->connector_index;
 	uint16 encoder_id = gConnector[connector_index]->encoder.object_id;
 
 	switch (frev) {
@@ -58,7 +58,7 @@ encoder_assign_crtc(uint8 id)
 			switch (crev) {
 				case 1:
 				default:
-					args.v1.ucCRTC = id;
+					args.v1.ucCRTC = crtc_id;
 					switch (encoder_id) {
 						case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
@@ -102,7 +102,7 @@ encoder_assign_crtc(uint8 id)
 					}
 					break;
 				case 2:
-					args.v2.ucCRTC = id;
+					args.v2.ucCRTC = crtc_id;
 					args.v2.ucEncodeMode
 						= display_get_encoder_mode(connector_index);
 					switch (encoder_id) {
@@ -168,7 +168,8 @@ encoder_assign_crtc(uint8 id)
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	// TODO : encoder_crtc_scratch_regs?
+	// update crtc encoder scratch register @ scratch 3
+	encoder_crtc_scratch(crtc_id);
 }
 
 
@@ -366,6 +367,55 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 
 
 void
+encoder_crtc_scratch(uint8 crtc_id)
+{
+	TRACE("%s\n", __func__);
+
+	uint32 connector_index = gDisplay[crtc_id]->connector_index;
+	uint32 encoder_flags = gConnector[connector_index]->encoder.flags;
+
+	// TODO : r500
+	uint32 bios_3_scratch = Read32(OUT, R600_BIOS_3_SCRATCH);
+
+	if (encoder_flags & ATOM_DEVICE_TV1_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_TV1_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 18);
+	}
+	if (encoder_flags & ATOM_DEVICE_CV_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_CV_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 24);
+	}
+	if (encoder_flags & ATOM_DEVICE_CRT1_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_CRT1_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 16);
+	}
+	if (encoder_flags & ATOM_DEVICE_CRT2_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_CRT2_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 20);
+	}
+	if (encoder_flags & ATOM_DEVICE_LCD1_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_LCD1_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 17);
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP1_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_DFP1_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 19);
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP2_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_DFP2_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 23);
+	}
+	if (encoder_flags & ATOM_DEVICE_DFP3_SUPPORT) {
+		bios_3_scratch &= ~ATOM_S3_DFP3_CRTC_ACTIVE;
+		bios_3_scratch |= (crtc_id << 25);
+	}
+
+	// TODO : r500
+	Write32(OUT, R600_BIOS_3_SCRATCH, bios_3_scratch);
+}
+
+
+void
 encoder_dpms_scratch(uint8 crtc_id, bool power)
 {
 	TRACE("%s: power: %s\n", __func__, power ? "true" : "false");
@@ -448,6 +498,9 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 
 	memset(&args, 0, sizeof(args));
 
+	uint32 connector_index = gDisplay[crtc_id]->connector_index;
+	uint32 encoder_flags = gConnector[connector_index]->encoder.flags;
+
 	switch (encoder_id) {
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
@@ -474,10 +527,10 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 			index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			// TODO : Laptop LCD special cases dpms set
-			// if ATOM_DEVICE_LCD_SUPPORT, LCD1OutputControl
-			// else...
-			index = GetIndexIntoMasterTable(COMMAND, LVTMAOutputControl);
+			if (encoder_flags & ATOM_DEVICE_LCD_SUPPORT)
+				index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
+			else
+				index = GetIndexIntoMasterTable(COMMAND, LVTMAOutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
@@ -503,8 +556,10 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 		case B_DPMS_ON:
 			args.ucAction = ATOM_ENABLE;
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			// TODO : ATOM_DEVICE_LCD_SUPPORT : args.ucAction = ATOM_LCD_BLON;
-			//		  execute again
+			if (encoder_flags & ATOM_DEVICE_LCD_SUPPORT) {
+				args.ucAction = ATOM_LCD_BLON;
+				atom_execute_table(gAtomContext, index, (uint32*)&args);
+			}
 			encoder_dpms_scratch(crtc_id, true);
 			break;
 		case B_DPMS_STAND_BY:
@@ -512,8 +567,10 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 		case B_DPMS_OFF:
 			args.ucAction = ATOM_DISABLE;
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			// TODO : ATOM_DEVICE_LCD_SUPPORT : args.ucAction = ATOM_LCD_BLOFF;
-			//		  execute again
+			if (encoder_flags & ATOM_DEVICE_LCD_SUPPORT) {
+				args.ucAction = ATOM_LCD_BLOFF;
+				atom_execute_table(gAtomContext, index, (uint32*)&args);
+			}
 			encoder_dpms_scratch(crtc_id, false);
 			break;
 	}
