@@ -73,7 +73,7 @@ radeon_bios_isposted()
 			+ EVERGREEN_CRTC0_REGISTER_OFFSET)
 			| Read32(OUT, EVERGREEN_CRTC_CONTROL
 			+ EVERGREEN_CRTC1_REGISTER_OFFSET);
-		if (reg & EVERGREEN_CRTC_MASTER_EN)
+		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
 	} else if (info.device_chipset >= RADEON_R1000) {
 		// evergreen or higher
@@ -89,13 +89,13 @@ radeon_bios_isposted()
 				+ EVERGREEN_CRTC4_REGISTER_OFFSET)
 			| Read32(OUT, EVERGREEN_CRTC_CONTROL
 				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
-		if (reg & EVERGREEN_CRTC_MASTER_EN)
+		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
 	} else if (info.device_chipset > RADEON_R580) {
 		// avivio through r700
 		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
 			Read32(OUT, AVIVO_D2CRTC_CONTROL);
-		if (reg & AVIVO_CRTC_EN) {
+		if ((reg & AVIVO_CRTC_EN) != 0) {
 			return true;
 		}
 	}

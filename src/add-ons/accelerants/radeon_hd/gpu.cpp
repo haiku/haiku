@@ -35,7 +35,7 @@ radeon_gpu_reset()
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	// Read GRBM Command Processor status
-	if (!(Read32(OUT, GRBM_STATUS) & GUI_ACTIVE))
+	if ((Read32(OUT, GRBM_STATUS) & GUI_ACTIVE) == 0)
 		return B_ERROR;
 
 	TRACE("%s: GPU software reset in progress...\n", __func__);
@@ -95,8 +95,8 @@ radeon_gpu_reset()
 
 		uint32 tmp;
 		/* Check if any of the rendering block is busy and reset it */
-		if ((Read32(OUT, GRBM_STATUS) & grbm_busy_mask)
-			|| (Read32(OUT, GRBM_STATUS2) & grbm2_busy_mask)) {
+		if ((Read32(OUT, GRBM_STATUS) & grbm_busy_mask) != 0
+			|| (Read32(OUT, GRBM_STATUS2) & grbm2_busy_mask) != 0) {
 			tmp = SOFT_RESET_CR
 				| SOFT_RESET_DB
 				| SOFT_RESET_CB

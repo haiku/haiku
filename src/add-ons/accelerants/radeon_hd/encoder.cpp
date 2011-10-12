@@ -66,8 +66,8 @@ encoder_assign_crtc(uint8 crtc_id)
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 						case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-							if (gConnector[connector_index]->flags
-								& ATOM_DEVICE_LCD1_SUPPORT)
+							if ((gConnector[connector_index]->flags
+								& ATOM_DEVICE_LCD1_SUPPORT) != 0)
 								args.v1.ucDevice = ATOM_DEVICE_LCD1_INDEX;
 							else
 								args.v1.ucDevice = ATOM_DEVICE_DFP3_INDEX;
@@ -237,7 +237,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 			index = GetIndexIntoMasterTable(COMMAND, TMDS1EncoderControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			if (connector_flags & ATOM_DEVICE_LCD_SUPPORT)
+			if ((connector_flags & ATOM_DEVICE_LCD_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, TMDS2EncoderControl);
@@ -260,7 +260,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 					args.v1.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
-				if (connector_flags & (ATOM_DEVICE_LCD_SUPPORT)) {
+				if ((connector_flags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 					// TODO : laptop display support
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
 					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
@@ -290,7 +290,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 				args.v2.ucSpatial = 0;
 				args.v2.ucTemporal = 0;
 				args.v2.ucFRC = 0;
-				if (connector_flags & ATOM_DEVICE_LCD_SUPPORT) {
+				if ((connector_flags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 					// TODO : laptop display support
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
@@ -377,35 +377,35 @@ encoder_crtc_scratch(uint8 crtc_id)
 	// TODO : r500
 	uint32 bios_3_scratch = Read32(OUT, R600_BIOS_3_SCRATCH);
 
-	if (encoder_flags & ATOM_DEVICE_TV1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_TV1_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 18);
 	}
-	if (encoder_flags & ATOM_DEVICE_CV_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_CV_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 24);
 	}
-	if (encoder_flags & ATOM_DEVICE_CRT1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_CRT1_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 16);
 	}
-	if (encoder_flags & ATOM_DEVICE_CRT2_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_CRT2_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 20);
 	}
-	if (encoder_flags & ATOM_DEVICE_LCD1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_LCD1_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 17);
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_DFP1_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 19);
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP2_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_DFP2_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 23);
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP3_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
 		bios_3_scratch &= ~ATOM_S3_DFP3_CRTC_ACTIVE;
 		bios_3_scratch |= (crtc_id << 25);
 	}
@@ -426,61 +426,61 @@ encoder_dpms_scratch(uint8 crtc_id, bool power)
 	// TODO : r500
 	uint32 bios_2_scratch = Read32(OUT, R600_BIOS_2_SCRATCH);
 
-	if (encoder_flags & ATOM_DEVICE_TV1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_TV1_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_TV1_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_CV_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_CV_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_CV_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_CRT1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_CRT1_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_CRT1_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_CRT2_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_CRT2_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_CRT2_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_LCD1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_LCD1_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_LCD1_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP1_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_DFP1_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_DFP1_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP2_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_DFP2_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_DFP2_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP3_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_DFP3_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_DFP3_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP4_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_DFP4_DPMS_STATE;
 		else
 			bios_2_scratch |= ATOM_S2_DFP4_DPMS_STATE;
 	}
-	if (encoder_flags & ATOM_DEVICE_DFP5_SUPPORT) {
+	if ((encoder_flags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
 		if (power == true)
 			bios_2_scratch &= ~ATOM_S2_DFP5_DPMS_STATE;
 		else
@@ -527,7 +527,7 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 			index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			if (encoder_flags & ATOM_DEVICE_LCD_SUPPORT)
+			if ((encoder_flags & ATOM_DEVICE_LCD_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, LVTMAOutputControl);
@@ -556,7 +556,7 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 		case B_DPMS_ON:
 			args.ucAction = ATOM_ENABLE;
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			if (encoder_flags & ATOM_DEVICE_LCD_SUPPORT) {
+			if ((encoder_flags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 				args.ucAction = ATOM_LCD_BLON;
 				atom_execute_table(gAtomContext, index, (uint32*)&args);
 			}
@@ -567,7 +567,7 @@ encoder_dpms_set(uint8 crtc_id, uint8 encoder_id, int mode)
 		case B_DPMS_OFF:
 			args.ucAction = ATOM_DISABLE;
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			if (encoder_flags & ATOM_DEVICE_LCD_SUPPORT) {
+			if ((encoder_flags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 				args.ucAction = ATOM_LCD_BLOFF;
 				atom_execute_table(gAtomContext, index, (uint32*)&args);
 			}

@@ -260,7 +260,7 @@ detect_connectors_legacy()
 		gConnector[i]->valid = false;
 
 		// check if this connector is used
-		if (!(device_support & (1 << i)))
+		if ((device_support & (1 << i)) == 0)
 			continue;
 
 		if (i == ATOM_DEVICE_CV_INDEX) {
@@ -386,7 +386,7 @@ detect_connectors()
 		uint16 connector_object_id;
 		uint16 connector_flags = B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
 
-		if (device_support & connector_flags) {
+		if ((device_support & connector_flags) != 0) {
 			uint8 con_obj_id = (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
@@ -472,8 +472,8 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
 								case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-									if (connector_flags
-										& ATOM_DEVICE_LCD_SUPPORT) {
+									if ((connector_flags
+										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_LVDS;
 										// radeon_atombios_get_lvds_info
 									} else {
@@ -496,11 +496,11 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
-									if (connector_flags
-										& ATOM_DEVICE_LCD_SUPPORT) {
+									if ((connector_flags
+										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_LVDS;
-									} else if (connector_flags
-										& ATOM_DEVICE_CRT_SUPPORT) {
+									} else if ((connector_flags
+										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_DAC;
 									} else {
 										encoder_type = VIDEO_ENCODER_TMDS;
@@ -516,11 +516,11 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_HDMI_SI1930:
 								case ENCODER_OBJECT_ID_TRAVIS:
 								case ENCODER_OBJECT_ID_NUTMEG:
-									if (connector_flags
-										& ATOM_DEVICE_LCD_SUPPORT) {
+									if ((connector_flags
+										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_LVDS;
-									} else if (connector_flags
-										& ATOM_DEVICE_CRT_SUPPORT) {
+									} else if ((connector_flags
+										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
 										encoder_type = VIDEO_ENCODER_DAC;
 									} else {
 										encoder_type = VIDEO_ENCODER_TMDS;
