@@ -97,6 +97,23 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 }
 
 
+uint32
+radeon_dpms_capabilities(void)
+{
+	// These should be pretty universally supported on Radeon HD cards
+	return B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF;
+}
+
+
+uint32
+radeon_dpms_mode(void)
+{
+	// TODO : this really isn't a good long-term solution
+	// we may need to look at the encoder dpms scratch registers
+	return gInfo->dpms_mode;
+}
+
+
 void
 radeon_dpms_set(int mode)
 {
@@ -128,6 +145,7 @@ radeon_dpms_set(int mode)
 			}
 			break;
 	}
+	gInfo->dpms_mode = mode;
 }
 
 

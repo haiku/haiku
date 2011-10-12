@@ -56,6 +56,8 @@ struct accelerant_info {
 
 	gpu_mc_info		*mc_info;		// used for last known mc state
 
+	volatile uint32	dpms_mode;		// current driver dpms mode
+
 	// LVDS panel mode passed from the bios/startup.
 	display_mode	lvds_panel_mode;
 };

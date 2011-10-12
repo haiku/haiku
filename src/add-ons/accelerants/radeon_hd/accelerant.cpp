@@ -146,6 +146,9 @@ init_common(int device, bool isClone)
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
 
+	gInfo->dpms_mode = B_DPMS_ON;
+		// initial state
+
 	// get basic info from driver
 
 	radeon_get_private_data data;
