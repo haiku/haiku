@@ -133,22 +133,21 @@ typedef struct {
 
 struct encoder_info {
 	bool		valid;
+	uint16		objectID;
 	uint32		type;
-	uint16		object_id;
 	uint32		flags;
-	bool		is_hdmi;
-	bool		is_tv;
+	bool		isHDMI;
+	bool		isTV;
 	struct pll_info	pll;
 };
 
 
 typedef struct {
 	bool		valid;
+	uint16		objectID;
 	uint32		type;
-	uint16		object_id;
 	uint32		flags;
-	uint16		line_mux;
-	uint16		gpio_id;
+	uint16		gpioID;
 	struct encoder_info encoder;
 	// TODO struct radeon_hpd hpd;
 } connector_info;

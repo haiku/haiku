@@ -182,7 +182,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	uint32 adjustedClock = pll->pixel_clock;
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderID = gConnector[connectorIndex]->encoder.object_id;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 encoder_mode = display_get_encoder_mode(connectorIndex);
 
 	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
@@ -325,7 +325,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			// 	args.v3.ucMiscInfo |= PIXEL_CLOCK_MISC_REF_DIV_SRC;
 			args.v3.ucTransmitterId
-				= gConnector[connectorIndex]->encoder.object_id;
+				= gConnector[connectorIndex]->encoder.objectID;
 			args.v3.ucEncoderMode = display_get_encoder_mode(connectorIndex);
 			break;
 		case 5:
@@ -349,7 +349,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 					break;
 			}
 			args.v5.ucTransmitterID
-				= gConnector[connectorIndex]->encoder.object_id;
+				= gConnector[connectorIndex]->encoder.objectID;
 			args.v5.ucEncoderMode
 				= display_get_encoder_mode(connectorIndex);
 			args.v5.ucPpll = pllID;
@@ -381,7 +381,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 					break;
 			}
 			args.v6.ucTransmitterID
-				= gConnector[connectorIndex]->encoder.object_id;
+				= gConnector[connectorIndex]->encoder.objectID;
 			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
 			args.v6.ucPpll = pllID;
 			break;

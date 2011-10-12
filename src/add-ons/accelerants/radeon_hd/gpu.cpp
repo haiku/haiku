@@ -371,14 +371,14 @@ bool
 radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 {
 	// ensure things are sane
-	uint32 gpio_id = gConnector[connector]->gpio_id;
-	if (gGPIOInfo[gpio_id]->valid == false)
+	uint32 gpioID = gConnector[connector]->gpioID;
+	if (gGPIOInfo[gpioID]->valid == false)
 		return false;
 
 	i2c_bus bus;
 
 	ddc2_init_timing(&bus);
-	bus.cookie = (void*)gGPIOInfo[gpio_id];
+	bus.cookie = (void*)gGPIOInfo[gpioID];
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 
@@ -399,11 +399,11 @@ radeon_gpu_read_edid(uint32 connector, edid1_info *edid)
 status_t
 radeon_gpu_i2c_attach(uint32 id, uint8 hw_line)
 {
-	gConnector[id]->gpio_id = 0;
+	gConnector[id]->gpioID = 0;
 	for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
 		if (gGPIOInfo[i]->hw_line != hw_line)
 			continue;
-		gConnector[id]->gpio_id = i;
+		gConnector[id]->gpioID = i;
 		return B_OK;
 	}
 

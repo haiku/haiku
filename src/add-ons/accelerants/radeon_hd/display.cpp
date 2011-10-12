@@ -223,6 +223,8 @@ detect_crt_ranges(uint32 crtid)
 }
 
 
+// TODO: only used on r4xx, r5xx, and rs600/rs690/rs740
+#if 0
 union atom_supported_devices {
 	struct _ATOM_SUPPORTED_DEVICES_INFO info;
 	struct _ATOM_SUPPORTED_DEVICES_INFO_2 info_2;
@@ -230,7 +232,6 @@ union atom_supported_devices {
 };
 
 
-// only used on r4xx, r5xx, and rs600/rs690/rs740
 status_t
 detect_connectors_legacy()
 {
@@ -284,7 +285,7 @@ detect_connectors_legacy()
 		}
 
 		// uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
-		gConnector[i]->line_mux = ci.sucI2cId.ucAccess;
+		// gConnector[i]->line_mux = ci.sucI2cId.ucAccess;
 
 		// TODO : give tv unique connector ids
 
@@ -320,6 +321,7 @@ detect_connectors_legacy()
 
 	return B_OK;
 }
+#endif
 
 
 // r600+
@@ -467,7 +469,7 @@ detect_connectors()
 							uint32 encoderID = (encoder_obj & OBJECT_ID_MASK)
 								>> OBJECT_ID_SHIFT;
 
-							uint32 encoder_type = VIDEO_ENCODER_NONE;
+							uint32 encoderType = VIDEO_ENCODER_NONE;
 							switch(encoderID) {
 								case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
@@ -475,20 +477,20 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
 									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
-										encoder_type = VIDEO_ENCODER_LVDS;
+										encoderType = VIDEO_ENCODER_LVDS;
 										// radeon_atombios_get_lvds_info
 									} else {
-										encoder_type = VIDEO_ENCODER_TMDS;
+										encoderType = VIDEO_ENCODER_TMDS;
 										// radeon_atombios_set_dig_info
 									}
 									break;
 								case ENCODER_OBJECT_ID_INTERNAL_DAC1:
-									encoder_type = VIDEO_ENCODER_DAC;
+									encoderType = VIDEO_ENCODER_DAC;
 									break;
 								case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-									encoder_type = VIDEO_ENCODER_TVDAC;
+									encoderType = VIDEO_ENCODER_TVDAC;
 									break;
 								case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
@@ -499,12 +501,12 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
-										encoder_type = VIDEO_ENCODER_LVDS;
+										encoderType = VIDEO_ENCODER_LVDS;
 									} else if ((connectorFlags
 										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
-										encoder_type = VIDEO_ENCODER_DAC;
+										encoderType = VIDEO_ENCODER_DAC;
 									} else {
-										encoder_type = VIDEO_ENCODER_TMDS;
+										encoderType = VIDEO_ENCODER_TMDS;
 									}
 									// drm_encoder_helper_add
 									break;
@@ -519,18 +521,18 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_NUTMEG:
 									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
-										encoder_type = VIDEO_ENCODER_LVDS;
+										encoderType = VIDEO_ENCODER_LVDS;
 									} else if ((connectorFlags
 										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
-										encoder_type = VIDEO_ENCODER_DAC;
+										encoderType = VIDEO_ENCODER_DAC;
 									} else {
-										encoder_type = VIDEO_ENCODER_TMDS;
+										encoderType = VIDEO_ENCODER_TMDS;
 									}
 									// drm_encoder_helper_add
 									break;
 							}
 
-							if (encoder_type == VIDEO_ENCODER_NONE) {
+							if (encoderType == VIDEO_ENCODER_NONE) {
 								ERROR("%s: Path #%" B_PRId32 ":"
 									"skipping unknown encoder.\n",
 									__func__, i);
@@ -540,21 +542,21 @@ detect_connectors()
 							// Set up encoder on connector if valid
 							TRACE("%s: Path #%" B_PRId32 ": Found encoder "
 								"%s\n", __func__, i,
-								get_encoder_name(encoder_type));
+								get_encoder_name(encoderType));
 
 							gConnector[connectorIndex]->encoder.flags
 								= connectorFlags;
 							gConnector[connectorIndex]->encoder.valid
 								= true;
-							gConnector[connectorIndex]->encoder.object_id
+							gConnector[connectorIndex]->encoder.objectID
 								= encoderID;
 							gConnector[connectorIndex]->encoder.type
-								= encoder_type;
+								= encoderType;
 						}
 					}
 					// END if object is encoder
 				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
-					ERROR("%s: TODO : Found router object?\n", __func__);
+					ERROR("%s: TODO: Found router object?\n", __func__);
 				} // END if object is router
 			}
 
@@ -611,21 +613,20 @@ detect_connectors()
 			gConnector[connectorIndex]->valid = true;
 			gConnector[connectorIndex]->flags = connectorFlags;
 			gConnector[connectorIndex]->type = connectorType;
-			gConnector[connectorIndex]->object_id
-				= connectorObjectID;
+			gConnector[connectorIndex]->objectID = connectorObjectID;
 
-			gConnector[connectorIndex]->encoder.is_tv = false;
-			gConnector[connectorIndex]->encoder.is_hdmi = false;
+			gConnector[connectorIndex]->encoder.isTV = false;
+			gConnector[connectorIndex]->encoder.isHDMI = false;
 
 			switch(connectorType) {
 				case VIDEO_CONNECTOR_COMPOSITE:
 				case VIDEO_CONNECTOR_SVIDEO:
 				case VIDEO_CONNECTOR_9DIN:
-					gConnector[connectorIndex]->encoder.is_tv = true;
+					gConnector[connectorIndex]->encoder.isTV = true;
 					break;
 				case VIDEO_CONNECTOR_HDMIA:
 				case VIDEO_CONNECTOR_HDMIB:
-					gConnector[connectorIndex]->encoder.is_hdmi = true;
+					gConnector[connectorIndex]->encoder.isHDMI = true;
 					break;
 			}
 
@@ -651,7 +652,7 @@ detect_displays()
 		if (gConnector[id]->valid == false)
 			continue;
 		// TODO : currently we skip TV connectors during detection
-		if (gConnector[id]->encoder.is_tv == true)
+		if (gConnector[id]->encoder.isTV == true)
 			continue;
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
@@ -703,10 +704,10 @@ debug_displays()
 		uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
 		if (gDisplay[id]->active) {
-			uint32 connector_type = gConnector[connectorIndex]->type;
-			uint32 encoder_type = gConnector[connectorIndex]->encoder.type;
-			ERROR(" + connector: %s\n", get_connector_name(connector_type));
-			ERROR(" + encoder:   %s\n", get_encoder_name(encoder_type));
+			uint32 connectorType = gConnector[connectorIndex]->type;
+			uint32 encoderType = gConnector[connectorIndex]->encoder.type;
+			ERROR(" + connector: %s\n", get_connector_name(connectorType));
+			ERROR(" + encoder:   %s\n", get_encoder_name(encoderType));
 
 			ERROR(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
 				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
@@ -715,7 +716,6 @@ debug_displays()
 		}
 	}
 	TRACE("==========================================\n");
-
 }
 
 
@@ -725,17 +725,17 @@ debug_connectors()
 	ERROR("Currently detected connectors=============\n");
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		if (gConnector[id]->valid == true) {
-			uint32 connector_type = gConnector[id]->type;
-			uint32 encoder_type = gConnector[id]->encoder.type;
-			uint16 gpio_id = gConnector[id]->gpio_id;
+			uint32 connectorType = gConnector[id]->type;
+			uint32 encoderType = gConnector[id]->encoder.type;
+			uint16 gpioID = gConnector[id]->gpioID;
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
-			ERROR(" + connector:  %s\n", get_connector_name(connector_type));
-			ERROR(" + encoder:    %s\n", get_encoder_name(encoder_type));
-			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpio_id);
+			ERROR(" + connector:  %s\n", get_connector_name(connectorType));
+			ERROR(" + encoder:    %s\n", get_encoder_name(encoderType));
+			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpioID);
 			ERROR(" + gpio valid: %s\n",
-				gGPIOInfo[gpio_id]->valid ? "true" : "false");
+				gGPIOInfo[gpioID]->valid ? "true" : "false");
 			ERROR(" + hw line:    0x%" B_PRIX32 "\n",
-				gGPIOInfo[gpio_id]->hw_line);
+				gGPIOInfo[gpioID]->hw_line);
 		}
 	}
 	ERROR("==========================================\n");
@@ -745,8 +745,7 @@ debug_connectors()
 uint32
 display_get_encoder_mode(uint32 connectorIndex)
 {
-	uint32 connector_type = gConnector[connectorIndex]->type;
-	switch (connector_type) {
+	switch (gConnector[connectorIndex]->type) {
 		case VIDEO_CONNECTOR_DVII:
 		case VIDEO_CONNECTOR_HDMIB: /* HDMI-B is DL-DVI; analog works fine */
 			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI

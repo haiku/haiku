@@ -53,7 +53,7 @@ encoder_assign_crtc(uint8 crtcID)
 		return;
 
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint16 encoderID = gConnector[connectorIndex]->encoder.object_id;
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	switch (tableMajor) {
 		case 1:
@@ -181,7 +181,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 {
 	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
-	switch (gConnector[connectorIndex]->encoder.object_id) {
+	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
@@ -229,9 +229,9 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 	memset(&args, 0, sizeof(args));
 
 	int index = 0;
-	uint16 connector_flags = gConnector[connectorIndex]->encoder.flags;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	switch (gConnector[connectorIndex]->encoder.object_id) {
+	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 			index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
 			break;
@@ -240,7 +240,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 			index = GetIndexIntoMasterTable(COMMAND, TMDS1EncoderControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			if ((connector_flags & ATOM_DEVICE_LCD_SUPPORT) != 0)
+			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, TMDS2EncoderControl);
@@ -266,7 +266,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 					args.v1.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
-				if ((connector_flags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 					// TODO : laptop display support
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
 					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
@@ -296,7 +296,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 				args.v2.ucSpatial = 0;
 				args.v2.ucTemporal = 0;
 				args.v2.ucFRC = 0;
-				if ((connector_flags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 					// TODO : laptop display support
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
@@ -351,7 +351,7 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
 
-	switch (gConnector[connectorIndex]->encoder.object_id) {
+	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 			index = GetIndexIntoMasterTable(COMMAND, DAC1EncoderControl);
