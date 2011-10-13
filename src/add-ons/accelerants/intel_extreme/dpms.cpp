@@ -104,32 +104,35 @@ set_display_power_mode(uint32 mode)
 {
 	uint32 monitorMode = 0;
 
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
 	if (mode == B_DPMS_ON) {
-		uint32 pll = read32(INTEL_DISPLAY_A_PLL);
+		int targetRegister = isSNB ? PCH_DISPLAY_A_PLL : INTEL_DISPLAY_A_PLL;
+		uint32 pll = read32(targetRegister);
 		if ((pll & DISPLAY_PLL_ENABLED) == 0) {
 			// reactivate PLL
-			write32(INTEL_DISPLAY_A_PLL, pll);
-			read32(INTEL_DISPLAY_A_PLL);
+			write32(targetRegister, pll);
+			read32(targetRegister);
 			spin(150);
-			write32(INTEL_DISPLAY_A_PLL, pll | DISPLAY_PLL_ENABLED);
-			read32(INTEL_DISPLAY_A_PLL);
+			write32(targetRegister, pll | DISPLAY_PLL_ENABLED);
+			read32(targetRegister);
 			spin(150);
-			write32(INTEL_DISPLAY_A_PLL, pll | DISPLAY_PLL_ENABLED);
-			read32(INTEL_DISPLAY_A_PLL);
+			write32(targetRegister, pll | DISPLAY_PLL_ENABLED);
+			read32(targetRegister);
 			spin(150);
 		}
 
-		pll = read32(INTEL_DISPLAY_B_PLL);
+		targetRegister = isSNB ? PCH_DISPLAY_B_PLL : INTEL_DISPLAY_B_PLL;
+		pll = read32(targetRegister);
 		if ((pll & DISPLAY_PLL_ENABLED) == 0) {
 			// reactivate PLL
-			write32(INTEL_DISPLAY_B_PLL, pll);
-			read32(INTEL_DISPLAY_B_PLL);
+			write32(targetRegister, pll);
+			read32(targetRegister);
 			spin(150);
-			write32(INTEL_DISPLAY_B_PLL, pll | DISPLAY_PLL_ENABLED);
-			read32(INTEL_DISPLAY_B_PLL);
+			write32(targetRegister, pll | DISPLAY_PLL_ENABLED);
+			read32(targetRegister);
 			spin(150);
-			write32(INTEL_DISPLAY_B_PLL, pll | DISPLAY_PLL_ENABLED);
-			read32(INTEL_DISPLAY_B_PLL);
+			write32(targetRegister, pll | DISPLAY_PLL_ENABLED);
+			read32(targetRegister);
 			spin(150);
 		}
 
@@ -155,12 +158,16 @@ set_display_power_mode(uint32 mode)
 	}
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		write32(INTEL_DISPLAY_A_ANALOG_PORT, (read32(INTEL_DISPLAY_A_ANALOG_PORT)
+		int targetRegister
+			= isSNB ? PCH_DISPLAY_A_ANALOG_PORT : INTEL_DISPLAY_A_ANALOG_PORT;
+		write32(targetRegister, (read32(targetRegister)
 			& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
 			| monitorMode | (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
 	}
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-		write32(INTEL_DISPLAY_B_DIGITAL_PORT, (read32(INTEL_DISPLAY_B_DIGITAL_PORT)
+		int targetRegister
+			= isSNB ? PCH_DISPLAY_B_DIGITAL_PORT : INTEL_DISPLAY_B_DIGITAL_PORT;
+		write32(targetRegister, (read32(targetRegister)
 			& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
 			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
 			// TODO: monitorMode?
@@ -173,18 +180,21 @@ set_display_power_mode(uint32 mode)
 	}
 
 	if (mode == B_DPMS_OFF) {
-		write32(INTEL_DISPLAY_A_PLL, read32(INTEL_DISPLAY_A_PLL)
+		int targetRegister = isSNB ? PCH_DISPLAY_A_PLL : INTEL_DISPLAY_A_PLL;
+		write32(targetRegister, read32(targetRegister)
 			| DISPLAY_PLL_ENABLED);
-		write32(INTEL_DISPLAY_B_PLL, read32(INTEL_DISPLAY_B_PLL)
+		targetRegister = isSNB ? PCH_DISPLAY_B_PLL : INTEL_DISPLAY_B_PLL;
+		write32(targetRegister, read32(targetRegister)
 			| DISPLAY_PLL_ENABLED);
 
-		read32(INTEL_DISPLAY_B_PLL);
-			// flush the eventually cached PCI bus writes
+		read32(targetRegister);
+			// flush the possibly cached PCI bus writes
 
 		spin(150);
 	}
 
-	if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0)
+	// TODO: fix for SNB
+	if (!isSNB && (gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0)
 		enable_lvds_panel(mode == B_DPMS_ON);
 
 	read32(INTEL_DISPLAY_A_BASE);

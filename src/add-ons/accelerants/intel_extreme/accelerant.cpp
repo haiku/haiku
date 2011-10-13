@@ -203,22 +203,27 @@ intel_init_accelerant(int device)
 	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
 		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
 
-	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+	int lvdsRegister = isSNB ? PCH_DISPLAY_LVDS_PORT : INTEL_DISPLAY_LVDS_PORT;
+	uint32 lvds = read32(lvdsRegister);
 
 	// If we have an enabled display pipe we save the passed information and
 	// assume it is the valid panel size..
 	// Later we query for proper EDID info if it exists, or figure something
 	// else out. (Default modes, etc.)
-	if ((lvds & DISPLAY_PIPE_ENABLED) != 0) {
+	if ((isSNB && (lvds & PCH_LVDS_DETECTED) != 0)
+		|| (!isSNB && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
 		save_lvds_mode();
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
 	}
 
 	TRACE(("head detected: %#x\n", gInfo->head_mode));
 	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
-		read32(INTEL_DISPLAY_A_ANALOG_PORT),
-		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_B_DIGITAL_PORT), read32(INTEL_DISPLAY_LVDS_PORT)));
+		read32(isSNB ? PCH_DISPLAY_A_ANALOG_PORT : INTEL_DISPLAY_A_ANALOG_PORT),
+		read32(isSNB ? PCH_DISPLAY_A_DIGITAL_PORT
+			: INTEL_DISPLAY_A_DIGITAL_PORT),
+		read32(isSNB ? PCH_DISPLAY_B_DIGITAL_PORT
+			: INTEL_DISPLAY_B_DIGITAL_PORT), read32(lvdsRegister)));
 
 	status = create_mode_list();
 	if (status != B_OK) {
