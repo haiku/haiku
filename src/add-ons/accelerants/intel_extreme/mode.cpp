@@ -181,8 +181,8 @@ create_mode_list(void)
 			// We could not read any EDID info. Fallback to creating a list with
 			// only the mode set up by the BIOS.
 			// TODO: support lower modes via scaling and windowing
-			if (gInfo->head_mode & HEAD_MODE_LVDS_PANEL
-					&& ((gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0)) {
+			if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0
+					&& (gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0) {
 				size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
 					& ~(B_PAGE_SIZE - 1);
 
