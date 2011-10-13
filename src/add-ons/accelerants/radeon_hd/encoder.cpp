@@ -373,6 +373,99 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 }
 
 
+bool
+encoder_analog_load_detect(uint8 connectorIndex)
+{
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+
+	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) == 0
+		&& (encoderFlags & ATOM_DEVICE_CV_SUPPORT) == 0
+		&& (encoderFlags & ATOM_DEVICE_CRT_SUPPORT) == 0) {
+		ERROR("%s: executed on non-dac device connector #%" B_PRIu8 "\n",
+			__func__, connectorIndex);
+		return false;
+	}
+
+	// *** tell the card we want to do a DAC detection
+
+	DAC_LOAD_DETECTION_PS_ALLOCATION args;
+	int index = GetIndexIntoMasterTable(COMMAND, DAC_LoadDetection);
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	memset(&args, 0, sizeof(args));
+
+	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
+		!= B_OK) {
+		ERROR("%s: failed getting AtomBIOS header for DAC_LoadDetection\n",
+			__func__);
+		return false;
+	}
+
+	args.sDacload.ucMisc = 0;
+
+	if (encoderID == ENCODER_OBJECT_ID_INTERNAL_DAC1
+		|| encoderID == ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1) {
+		args.sDacload.ucDacType = ATOM_DAC_A;
+	} else {
+		args.sDacload.ucDacType = ATOM_DAC_B;
+	}
+
+	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
+		args.sDacload.usDeviceID
+			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT1_SUPPORT);
+		atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+
+		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
+			return true;
+
+	} else if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
+		args.sDacload.usDeviceID
+			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT2_SUPPORT);
+		atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+
+		if ((biosScratch0 & ATOM_S0_CRT2_MASK) != 0)
+			return true;
+
+	} else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+		args.sDacload.usDeviceID
+			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CV_SUPPORT);
+		if (tableMinor >= 3)
+			args.sDacload.ucMisc = DAC_LOAD_MISC_YPrPb;
+		atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+
+		if ((biosScratch0 & (ATOM_S0_CV_MASK | ATOM_S0_CV_MASK_A)) != 0)
+			return true;
+
+	} else if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+		args.sDacload.usDeviceID
+			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_TV1_SUPPORT);
+		if (tableMinor >= 3)
+			args.sDacload.ucMisc = DAC_LOAD_MISC_YPrPb;
+		atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+
+		if ((biosScratch0
+			& (ATOM_S0_TV1_COMPOSITE | ATOM_S0_TV1_COMPOSITE_A)) != 0) {
+			return true; /* Composite connected */
+		} else if ((biosScratch0
+			& (ATOM_S0_TV1_SVIDEO | ATOM_S0_TV1_SVIDEO_A)) != 0) {
+			return true; /* S-Video connected */
+		}
+
+	}
+	return false;
+}
+
+
 void
 encoder_crtc_scratch(uint8 crtcID)
 {
@@ -382,43 +475,43 @@ encoder_crtc_scratch(uint8 crtcID)
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// TODO : r500
-	uint32 bios_3_scratch = Read32(OUT, R600_BIOS_3_SCRATCH);
+	uint32 biosScratch3 = Read32(OUT, R600_BIOS_3_SCRATCH);
 
 	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_TV1_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 18);
+		biosScratch3 &= ~ATOM_S3_TV1_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 18);
 	}
 	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_CV_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 24);
+		biosScratch3 &= ~ATOM_S3_CV_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 24);
 	}
 	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_CRT1_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 16);
+		biosScratch3 &= ~ATOM_S3_CRT1_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 16);
 	}
 	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_CRT2_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 20);
+		biosScratch3 &= ~ATOM_S3_CRT2_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 20);
 	}
 	if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_LCD1_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 17);
+		biosScratch3 &= ~ATOM_S3_LCD1_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 17);
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_DFP1_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 19);
+		biosScratch3 &= ~ATOM_S3_DFP1_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 19);
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_DFP2_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 23);
+		biosScratch3 &= ~ATOM_S3_DFP2_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 23);
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
-		bios_3_scratch &= ~ATOM_S3_DFP3_CRTC_ACTIVE;
-		bios_3_scratch |= (crtcID << 25);
+		biosScratch3 &= ~ATOM_S3_DFP3_CRTC_ACTIVE;
+		biosScratch3 |= (crtcID << 25);
 	}
 
 	// TODO : r500
-	Write32(OUT, R600_BIOS_3_SCRATCH, bios_3_scratch);
+	Write32(OUT, R600_BIOS_3_SCRATCH, biosScratch3);
 }
 
 
@@ -431,69 +524,69 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// TODO : r500
-	uint32 bios_2_scratch = Read32(OUT, R600_BIOS_2_SCRATCH);
+	uint32 biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
 
 	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_TV1_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_TV1_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_TV1_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_TV1_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_CV_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_CV_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_CV_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_CV_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_CRT1_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_CRT1_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_CRT1_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_CRT1_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_CRT2_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_CRT2_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_CRT2_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_CRT2_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_LCD1_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_LCD1_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_LCD1_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_LCD1_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_DFP1_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_DFP1_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_DFP1_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_DFP1_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_DFP2_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_DFP2_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_DFP2_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_DFP2_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_DFP3_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_DFP3_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_DFP3_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_DFP3_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_DFP4_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_DFP4_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_DFP4_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_DFP4_DPMS_STATE;
 	}
 	if ((encoderFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
 		if (power == true)
-			bios_2_scratch &= ~ATOM_S2_DFP5_DPMS_STATE;
+			biosScratch2 &= ~ATOM_S2_DFP5_DPMS_STATE;
 		else
-			bios_2_scratch |= ATOM_S2_DFP5_DPMS_STATE;
+			biosScratch2 |= ATOM_S2_DFP5_DPMS_STATE;
 	}
-	Write32(OUT, R600_BIOS_2_SCRATCH, bios_2_scratch);
+	Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
 }
 
 
@@ -588,15 +681,15 @@ void
 encoder_output_lock(bool lock)
 {
 	TRACE("%s: %s\n", __func__, lock ? "true" : "false");
-	uint32 bios_6_scratch = Read32(OUT, R600_BIOS_6_SCRATCH);
+	uint32 biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
 
 	if (lock) {
-		bios_6_scratch |= ATOM_S6_CRITICAL_STATE;
-		bios_6_scratch &= ~ATOM_S6_ACC_MODE;
+		biosScratch6 |= ATOM_S6_CRITICAL_STATE;
+		biosScratch6 &= ~ATOM_S6_ACC_MODE;
 	} else {
-		bios_6_scratch &= ~ATOM_S6_CRITICAL_STATE;
-		bios_6_scratch |= ATOM_S6_ACC_MODE;
+		biosScratch6 &= ~ATOM_S6_CRITICAL_STATE;
+		biosScratch6 |= ATOM_S6_ACC_MODE;
 	}
 
-	Write32(OUT, R600_BIOS_6_SCRATCH, bios_6_scratch);
+	Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
 }

@@ -33,28 +33,28 @@ radeon_bios_init_scratch()
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	uint32 bios_2_scratch;
-	uint32 bios_6_scratch;
+	uint32 biosScratch2;
+	uint32 biosScratch6;
 
 	if (info.device_chipset >= RADEON_R600) {
-		bios_2_scratch = Read32(OUT, R600_BIOS_2_SCRATCH);
-		bios_6_scratch = Read32(OUT, R600_BIOS_6_SCRATCH);
+		biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
+		biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
 	} else {
-		bios_2_scratch = Read32(OUT, RADEON_BIOS_2_SCRATCH);
-		bios_6_scratch = Read32(OUT, RADEON_BIOS_6_SCRATCH);
+		biosScratch2 = Read32(OUT, RADEON_BIOS_2_SCRATCH);
+		biosScratch6 = Read32(OUT, RADEON_BIOS_6_SCRATCH);
 	}
 
-	bios_2_scratch &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
+	biosScratch2 &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
 		// bios should control backlight
-	bios_6_scratch |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
+	biosScratch6 |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
 		// bios shouldn't handle mode switching
 
 	if (info.device_chipset >= RADEON_R600) {
-		Write32(OUT, R600_BIOS_2_SCRATCH, bios_2_scratch);
-		Write32(OUT, R600_BIOS_6_SCRATCH, bios_6_scratch);
+		Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
+		Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
 	} else {
-		Write32(OUT, RADEON_BIOS_2_SCRATCH, bios_2_scratch);
-		Write32(OUT, RADEON_BIOS_6_SCRATCH, bios_6_scratch);
+		Write32(OUT, RADEON_BIOS_2_SCRATCH, biosScratch2);
+		Write32(OUT, RADEON_BIOS_6_SCRATCH, biosScratch6);
 	}
 }
 

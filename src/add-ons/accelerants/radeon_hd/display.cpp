@@ -651,15 +651,23 @@ detect_displays()
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		if (gConnector[id]->valid == false)
 			continue;
-		// TODO : currently we skip TV connectors during detection
-		if (gConnector[id]->encoder.isTV == true)
-			continue;
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
 		if (radeon_gpu_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
+
+			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
+				|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC) {
+				// analog? with valid EDID? lets make sure there is load.
+				// There is only one ddc communications path on DVI-I
+				if (encoder_analog_load_detect(id) != true) {
+					TRACE("%s: no analog load on EDID valid connector "
+						"#%" B_PRIu32 "\n", __func__);
+					continue;
+				}
+			}
+
 			gDisplay[displayIndex]->active = true;
-				// set this display as active
 			gDisplay[displayIndex]->connectorIndex = id;
 				// set physical connector index from gConnector
 
@@ -687,7 +695,6 @@ detect_displays()
 			break;
 		}
 	}
-
 
 	return B_OK;
 }
@@ -814,7 +821,7 @@ display_crtc_blank(uint8 crtcID, int command)
 	args.ucCRTC = crtcID;
 	args.ucBlanking = command;
 
-	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
@@ -1025,7 +1032,7 @@ display_crtc_set_dtd(uint8 crtcID, display_mode *mode)
 	args.susModeMiscInfo.usAccess = B_HOST_TO_LENDIAN_INT16(misc);
 	args.ucCRTC = crtcID;
 
-	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
