@@ -861,7 +861,7 @@ if (first) {
 		if (divisors.post2 == LVDS_POST2_RATE_FAST)
 			lvds |= LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP;
 		else
-			lvds &= ~( LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
+			lvds &= ~(LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
 
 		write32(targetRegister, lvds);
 		read32(targetRegister);
@@ -988,8 +988,8 @@ if (first) {
 		}
 
 		write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-			((uint32)(target.timing.h_display - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
+			((uint32)(target.virtual_width - 1) << 16)
+			| ((uint32)target.virtual_height - 1));
 
 		write32(INTEL_DISPLAY_B_POS, 0);
 		write32(INTEL_DISPLAY_B_PIPE_SIZE,
