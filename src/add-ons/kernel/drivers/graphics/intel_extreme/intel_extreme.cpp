@@ -257,6 +257,9 @@ intel_extreme_init(intel_info &info)
 	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
 		dprintf("i965GM/i965GME quirk\n");
 		write32(info.registers + 0x6204, (1L << 29));
+	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
+		dprintf("SNB clock gating\n");
+		write32(info.registers + 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
 	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
 		dprintf("G4x clock gating\n");
 		write32(info.registers + 0x6204, 0);

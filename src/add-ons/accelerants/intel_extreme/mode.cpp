@@ -132,7 +132,8 @@ set_frame_buffer_base()
 	}
 
 	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)) {
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -153,8 +154,10 @@ set_frame_buffer_base()
 status_t
 create_mode_list(void)
 {
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+
 	i2c_bus bus;
-	bus.cookie = (void*)INTEL_I2C_IO_A;
+	bus.cookie = (void*)(isSNB ? PCH_I2C_IO_A : INTEL_I2C_IO_A);
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 	ddc2_init_timing(&bus);
@@ -166,7 +169,7 @@ create_mode_list(void)
 	} else {
 		TRACE(("intel_extreme: getting EDID on port A (analog) failed : %s. "
 			"Trying on port C (lvds)\n", strerror(error)));
-		bus.cookie = (void*)INTEL_I2C_IO_C;
+		bus.cookie = (void*)(isSNB ? PCH_I2C_IO_C : INTEL_I2C_IO_C);
 		error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
 		if (error == B_OK) {
 			edid_dump(&gInfo->edid_info);
@@ -234,7 +237,16 @@ get_pll_limits(pll_limits &limits)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)) {
+		// TODO: support LVDS output limits as well
+		static const pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{  5,  1, 10, false,  1,  79, 12,  5},	// min
+			{ 80,  8,  5, true,   5, 127, 22,  9},	// max
+			225000, 1760000, 3510000
+		};
+		limits = kLimits;
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
@@ -312,8 +324,12 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 
 	TRACE(("required MHz: %g\n", requestedPixelClock));
 
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+
 	if (isLVDS) {
-		if ((read32(INTEL_DISPLAY_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
+		int targetRegister
+			= isSNB ? PCH_DISPLAY_LVDS_PORT : INTEL_DISPLAY_LVDS_PORT;
+		if ((read32(targetRegister) & LVDS_CLKB_POWER_MASK)
 				== LVDS_CLKB_POWER_UP)
 			divisors.post2 = LVDS_POST2_RATE_FAST;
 		else
@@ -400,6 +416,26 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		vTotalRegister = INTEL_DISPLAY_B_VTOTAL;
 		hSyncRegister = INTEL_DISPLAY_B_HSYNC;
 		vSyncRegister = INTEL_DISPLAY_B_VSYNC;
+		imageSizeRegister = INTEL_DISPLAY_B_IMAGE_SIZE;
+		controlRegister = INTEL_DISPLAY_B_CONTROL;
+	} else if (pllRegister == PCH_DISPLAY_A_PLL) {
+		pllDivisor = read32((pll & DISPLAY_PLL_DIVISOR_1) != 0
+			? PCH_DISPLAY_A_PLL_DIVISOR_1 : PCH_DISPLAY_A_PLL_DIVISOR_0);
+
+		hTotalRegister = PCH_TRANSCODER_A_HTOTAL;
+		vTotalRegister = PCH_TRANSCODER_A_VTOTAL;
+		hSyncRegister = PCH_TRANSCODER_A_HSYNC;
+		vSyncRegister = PCH_TRANSCODER_A_VSYNC;
+		imageSizeRegister = INTEL_DISPLAY_A_IMAGE_SIZE;
+		controlRegister = INTEL_DISPLAY_A_CONTROL;
+	} else if (pllRegister == PCH_DISPLAY_B_PLL) {
+		pllDivisor = read32((pll & DISPLAY_PLL_DIVISOR_1) != 0
+			? PCH_DISPLAY_B_PLL_DIVISOR_1 : PCH_DISPLAY_B_PLL_DIVISOR_0);
+
+		hTotalRegister = PCH_TRANSCODER_B_HTOTAL;
+		vTotalRegister = PCH_TRANSCODER_B_VTOTAL;
+		hSyncRegister = PCH_TRANSCODER_B_HSYNC;
+		vSyncRegister = PCH_TRANSCODER_B_VSYNC;
 		imageSizeRegister = INTEL_DISPLAY_B_IMAGE_SIZE;
 		controlRegister = INTEL_DISPLAY_B_CONTROL;
 	} else {
@@ -529,9 +565,12 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 void
 save_lvds_mode(void)
 {
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+
 	// dump currently programmed mode.
 	display_mode biosMode;
-	retrieve_current_mode(biosMode, INTEL_DISPLAY_B_PLL);
+	retrieve_current_mode(biosMode,
+		isSNB ? PCH_DISPLAY_B_PLL : INTEL_DISPLAY_B_PLL);
 	gInfo->lvds_panel_mode = biosMode;
 }
 
@@ -645,7 +684,7 @@ intel_set_display_mode(display_mode *mode)
 	// centering, since the data from propose_display_mode will not actually be
 	// used as is in this case.
 	if (sanitize_display_mode(target)) {
-		TRACE(("intel_extreme: invalid mode set!"));
+		TRACE(("intel_extreme: invalid mode set!\n"));
 		return B_BAD_VALUE;
 	}
 
@@ -710,6 +749,9 @@ if (first) {
 	write32(INTEL_VGA_DISPLAY_CONTROL, VGA_DISPLAY_DISABLED);
 	read32(INTEL_VGA_DISPLAY_CONTROL);
 
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+	int targetRegister;
+
 	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
 		// For LVDS panels, we actually always set the native mode in hardware
 		// Then we use the panel fitter to scale the picture to that.
@@ -761,9 +803,11 @@ if (first) {
 
 		// Compute bitmask from p1 value
 		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
-			dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
+			dpll |= (1 << (divisors.post1 - 1))
+				<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 		} else {
-			dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+			dpll |= (1 << (divisors.post1 - 1))
+				<< DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 		}
 		switch (divisors.post2) {
 			case 5:
@@ -785,7 +829,8 @@ if (first) {
 					| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
 						& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
 			} else {
-				write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+				write32(isSNB ? PCH_DISPLAY_B_PLL_DIVISOR_0
+						: INTEL_DISPLAY_B_PLL_DIVISOR_0,
 					(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 						& DISPLAY_PLL_N_DIVISOR_MASK)
 					| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
@@ -793,13 +838,16 @@ if (first) {
 					| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
 						& DISPLAY_PLL_M2_DIVISOR_MASK));
 			}
-			write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
-			read32(INTEL_DISPLAY_B_PLL);
+			targetRegister = isSNB ? PCH_DISPLAY_B_PLL : INTEL_DISPLAY_B_PLL;
+			write32(targetRegister, dpll & ~DISPLAY_PLL_ENABLED);
+			read32(targetRegister);
 			spin(150);
 		}
 
-		uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT)
-			| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
+		targetRegister
+			= isSNB ? PCH_DISPLAY_LVDS_PORT : INTEL_DISPLAY_LVDS_PORT;
+		uint32 lvds = read32(targetRegister) | LVDS_PORT_EN
+			| LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
 
 		lvds |= LVDS_18BIT_DITHER;
 			// TODO: do not do this if the connected panel is 24-bit
@@ -815,8 +863,8 @@ if (first) {
 		else
 			lvds &= ~( LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
 
-		write32(INTEL_DISPLAY_LVDS_PORT, lvds);
-		read32(INTEL_DISPLAY_LVDS_PORT);
+		write32(targetRegister, lvds);
+		read32(targetRegister);
 
 		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
 			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
@@ -825,7 +873,8 @@ if (first) {
 				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
 		} else {
-			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+			write32(isSNB ? PCH_DISPLAY_B_PLL_DIVISOR_0
+					: INTEL_DISPLAY_B_PLL_DIVISOR_0,
 				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 					& DISPLAY_PLL_N_DIVISOR_MASK)
 				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
@@ -834,8 +883,9 @@ if (first) {
 					& DISPLAY_PLL_M2_DIVISOR_MASK));
 		}
 
-		write32(INTEL_DISPLAY_B_PLL, dpll);
-		read32(INTEL_DISPLAY_B_PLL);
+		targetRegister = isSNB ? PCH_DISPLAY_B_PLL : INTEL_DISPLAY_B_PLL;
+		write32(targetRegister, dpll);
+		read32(targetRegister);
 
 		// Wait for the clocks to stabilize
 		spin(150);
@@ -855,9 +905,9 @@ if (first) {
 			write32(INTEL_DISPLAY_B_PLL_MULTIPLIER_DIVISOR, (0 << 24)
 				| ((pixelMultiply - 1) << 8));
 		} else
-			write32(INTEL_DISPLAY_B_PLL, dpll);
+			write32(targetRegister, dpll);
 
-		read32(INTEL_DISPLAY_B_PLL);
+		read32(targetRegister);
 		spin(150);
 
 		// update timing parameters
@@ -878,14 +928,14 @@ if (first) {
 				+ (hardwareTarget.timing.h_total
 				- target.timing.h_display) / 2;
 
-			write32(INTEL_DISPLAY_B_HTOTAL,
+			write32(isSNB ? PCH_TRANSCODER_B_HTOTAL : INTEL_DISPLAY_B_HTOTAL,
 				((uint32)(hardwareTarget.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HBLANK,
+			write32(isSNB ? PCH_TRANSCODER_B_HBLANK : INTEL_DISPLAY_B_HBLANK,
 				((uint32)(hardwareTarget.timing.h_total - borderWidth / 2 - 1)
 					<< 16)
 				| ((uint32)target.timing.h_display + borderWidth / 2 - 1));
-			write32(INTEL_DISPLAY_B_HSYNC,
+			write32(isSNB ? PCH_TRANSCODER_B_HSYNC : INTEL_DISPLAY_B_HSYNC,
 				((uint32)(syncCenter + syncWidth / 2 - 1) << 16)
 				| ((uint32)syncCenter - syncWidth / 2 - 1));
 
@@ -899,16 +949,16 @@ if (first) {
 				+ (hardwareTarget.timing.v_total
 				- target.timing.v_display) / 2;
 
-			write32(INTEL_DISPLAY_B_VTOTAL,
+			write32(isSNB ? PCH_TRANSCODER_B_VTOTAL : INTEL_DISPLAY_B_VTOTAL,
 				((uint32)(hardwareTarget.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VBLANK,
+			write32(isSNB ? PCH_TRANSCODER_B_VBLANK : INTEL_DISPLAY_B_VBLANK,
 				((uint32)(hardwareTarget.timing.v_total - borderHeight / 2 - 1)
 					<< 16)
 				| ((uint32)target.timing.v_display
 					+ borderHeight / 2 - 1));
-			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(syncCenter
-					+ syncHeight / 2 - 1) << 16)
+			write32(isSNB ? PCH_TRANSCODER_B_VSYNC : INTEL_DISPLAY_B_VSYNC,
+				((uint32)(syncCenter + syncHeight / 2 - 1) << 16)
 				| ((uint32)syncCenter - syncHeight / 2 - 1));
 
 			// This is useful for debugging: it sets the border to red, so you
@@ -916,23 +966,23 @@ if (first) {
 			// sync)
 			// write32(0x61020, 0x00FF0000);
 		} else {
-			write32(INTEL_DISPLAY_B_HTOTAL,
+			write32(isSNB ? PCH_TRANSCODER_B_HTOTAL : INTEL_DISPLAY_B_HTOTAL,
 				((uint32)(target.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HBLANK,
+			write32(isSNB ? PCH_TRANSCODER_B_HBLANK : INTEL_DISPLAY_B_HBLANK,
 				((uint32)(target.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HSYNC, (
-				(uint32)(target.timing.h_sync_end - 1) << 16)
+			write32(isSNB ? PCH_TRANSCODER_B_HSYNC : INTEL_DISPLAY_B_HSYNC,
+				((uint32)(target.timing.h_sync_end - 1) << 16)
 				| ((uint32)target.timing.h_sync_start - 1));
 
-			write32(INTEL_DISPLAY_B_VTOTAL,
+			write32(isSNB ? PCH_TRANSCODER_B_VTOTAL : INTEL_DISPLAY_B_VTOTAL,
 				((uint32)(target.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VBLANK,
+			write32(isSNB ? PCH_TRANSCODER_B_VBLANK : INTEL_DISPLAY_B_VBLANK,
 				((uint32)(target.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VSYNC, (
+			write32(isSNB ? PCH_TRANSCODER_B_VSYNC : INTEL_DISPLAY_B_VSYNC, (
 				(uint32)(target.timing.v_sync_end - 1) << 16)
 				| ((uint32)target.timing.v_sync_start - 1));
 		}
@@ -966,7 +1016,8 @@ if (first) {
 				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
 		} else {
-			write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
+			write32(isSNB ? PCH_DISPLAY_A_PLL_DIVISOR_0
+					: INTEL_DISPLAY_A_PLL_DIVISOR_0,
 				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 					& DISPLAY_PLL_N_DIVISOR_MASK)
 				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
@@ -1008,31 +1059,32 @@ if (first) {
 				pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 		}
 
-		write32(INTEL_DISPLAY_A_PLL, pll);
-		read32(INTEL_DISPLAY_A_PLL);
+		targetRegister = isSNB ? PCH_DISPLAY_A_PLL : INTEL_DISPLAY_A_PLL;
+		write32(targetRegister, pll);
+		read32(targetRegister);
 		spin(150);
-		write32(INTEL_DISPLAY_A_PLL, pll);
-		read32(INTEL_DISPLAY_A_PLL);
+		write32(targetRegister, pll);
+		read32(targetRegister);
 		spin(150);
 
 		// update timing parameters
-		write32(INTEL_DISPLAY_A_HTOTAL,
+		write32(isSNB ? PCH_TRANSCODER_A_HTOTAL : INTEL_DISPLAY_A_HTOTAL,
 			((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_A_HBLANK,
+		write32(isSNB ? PCH_TRANSCODER_A_HBLANK : INTEL_DISPLAY_A_HBLANK,
 			((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_A_HSYNC,
+		write32(isSNB ? PCH_TRANSCODER_A_HSYNC : INTEL_DISPLAY_A_HSYNC,
 			((uint32)(target.timing.h_sync_end - 1) << 16)
 			| ((uint32)target.timing.h_sync_start - 1));
 
-		write32(INTEL_DISPLAY_A_VTOTAL,
+		write32(isSNB ? PCH_TRANSCODER_A_VTOTAL : INTEL_DISPLAY_A_VTOTAL,
 			((uint32)(target.timing.v_total - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_A_VBLANK,
+		write32(isSNB ? PCH_TRANSCODER_A_VBLANK : INTEL_DISPLAY_A_VBLANK,
 			((uint32)(target.timing.v_total - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_A_VSYNC,
+		write32(isSNB ? PCH_TRANSCODER_A_VSYNC : INTEL_DISPLAY_A_VSYNC,
 			((uint32)(target.timing.v_sync_end - 1) << 16)
 			| ((uint32)target.timing.v_sync_start - 1));
 
@@ -1040,8 +1092,10 @@ if (first) {
 			((uint32)(target.timing.h_display - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
 
-		write32(INTEL_DISPLAY_A_ANALOG_PORT,
-			(read32(INTEL_DISPLAY_A_ANALOG_PORT)
+		targetRegister
+			= isSNB ? PCH_DISPLAY_A_ANALOG_PORT : INTEL_DISPLAY_A_ANALOG_PORT;
+		write32(targetRegister,
+			(read32(targetRegister)
 				& ~(DISPLAY_MONITOR_POLARITY_MASK
 					| DISPLAY_MONITOR_VGA_POLARITY))
 			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0
@@ -1097,7 +1151,9 @@ intel_get_display_mode(display_mode *_currentMode)
 {
 	TRACE(("intel_get_display_mode()\n"));
 
-	retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+	retrieve_current_mode(*_currentMode,
+		isSNB ? PCH_DISPLAY_A_PLL : INTEL_DISPLAY_A_PLL);
 	return B_OK;
 }
 

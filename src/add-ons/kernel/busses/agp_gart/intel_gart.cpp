@@ -77,9 +77,11 @@ const struct supported_device {
 	{0x2e30, 0x2e32, INTEL_TYPE_G45, "G41"},
 	{0x2e40, 0x2e42, INTEL_TYPE_G45, "B43"},
 	{0x2e90, 0x2e92, INTEL_TYPE_G45, "B43"},
-	
+
 	{0xa000, 0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa010, 0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
+
+	{0x0104, 0x0126, INTEL_TYPE_SNBGM, "SNBGM"},
 };
 
 struct intel_info {
@@ -131,8 +133,11 @@ static void
 determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 {
 	// read stolen memory from the PCI configuration of the PCI bridge
-	uint16 memoryConfig = get_pci_config(info.bridge,
-		INTEL_GRAPHICS_MEMORY_CONTROL, 2);
+	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
+	if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB)
+		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
+
+	uint16 memoryConfig = get_pci_config(info.bridge, controlRegister, 2);
 	size_t memorySize = 1 << 20; // 1 MB
 	gttSize = 0;
 	stolenSize = 0;
@@ -178,6 +183,18 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 4 << 20;
 				break;
 		}
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
+		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
+			case SNB_GTT_SIZE_NONE:
+				gttSize = 0;
+				break;
+			case SNB_GTT_SIZE_1MB:
+				gttSize = 1 << 20;
+				break;
+			case SNB_GTT_SIZE_2MB:
+				gttSize = 2 << 20;
+				break;
+		}
 	} else {
 		// older models have the GTT as large as their frame buffer mapping
 		// TODO: check if the i9xx version works with the i8xx chips as well
@@ -191,7 +208,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		} else if ((info.type & INTEL_TYPE_9xx) != 0)
 			frameBufferSize = info.display.u.h0.base_register_sizes[2];
 
-		TRACE(("frame buffer size %lu MB\n", frameBufferSize >> 20));
+		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
 		gttSize = frameBufferSize / 1024;
 	}
 
@@ -212,6 +229,57 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				break;
 			case i830_STOLEN_8M:
 				memorySize *= 8;
+				break;
+		}
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
+		switch (memoryConfig & SNB_STOLEN_MEMORY_MASK) {
+			case SNB_STOLEN_MEMORY_32MB:
+				memorySize *= 32;
+				break;
+			case SNB_STOLEN_MEMORY_64MB:
+				memorySize *= 64;
+				break;
+			case SNB_STOLEN_MEMORY_96MB:
+				memorySize *= 96;
+				break;
+			case SNB_STOLEN_MEMORY_128MB:
+				memorySize *= 128;
+				break;
+			case SNB_STOLEN_MEMORY_160MB:
+				memorySize *= 160;
+				break;
+			case SNB_STOLEN_MEMORY_192MB:
+				memorySize *= 192;
+				break;
+			case SNB_STOLEN_MEMORY_224MB:
+				memorySize *= 224;
+				break;
+			case SNB_STOLEN_MEMORY_256MB:
+				memorySize *= 256;
+				break;
+			case SNB_STOLEN_MEMORY_288MB:
+				memorySize *= 288;
+				break;
+			case SNB_STOLEN_MEMORY_320MB:
+				memorySize *= 320;
+				break;
+			case SNB_STOLEN_MEMORY_352MB:
+				memorySize *= 352;
+				break;
+			case SNB_STOLEN_MEMORY_384MB:
+				memorySize *= 384;
+				break;
+			case SNB_STOLEN_MEMORY_416MB:
+				memorySize *= 416;
+				break;
+			case SNB_STOLEN_MEMORY_448MB:
+				memorySize *= 448;
+				break;
+			case SNB_STOLEN_MEMORY_480MB:
+				memorySize *= 480;
+				break;
+			case SNB_STOLEN_MEMORY_512MB:
+				memorySize *= 512;
 				break;
 		}
 	} else if (info.type == INTEL_TYPE_85x
@@ -325,7 +393,8 @@ intel_map(intel_info &info)
 		return B_ERROR;
 
 	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
-		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
+		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
+			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 					+ (2UL << 20);
 		} else

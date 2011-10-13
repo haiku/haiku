@@ -69,9 +69,11 @@ const struct supported_device {
 	{0x2e32, INTEL_TYPE_G45, "G41"},
 	{0x2e42, INTEL_TYPE_G45, "B43"},
 	{0x2e92, INTEL_TYPE_G45, "B43"},
-	
+
 	{0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
+
+	{0x0126, INTEL_TYPE_SNBGM, "SNBGM"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
