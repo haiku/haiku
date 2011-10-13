@@ -1089,8 +1089,8 @@ if (first) {
 			| ((uint32)target.timing.v_sync_start - 1));
 
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE,
-			((uint32)(target.timing.h_display - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
+			((uint32)(target.virtual_width - 1) << 16)
+			| ((uint32)target.virtual_height - 1));
 
 		targetRegister
 			= isSNB ? PCH_DISPLAY_A_ANALOG_PORT : INTEL_DISPLAY_A_ANALOG_PORT;
@@ -1115,8 +1115,8 @@ if (first) {
 
 		if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
 			write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-				((uint32)(target.timing.h_display - 1) << 16)
-				| ((uint32)target.timing.v_display - 1));
+				((uint32)(target.virtual_width - 1) << 16)
+				| ((uint32)target.virtual_height - 1));
 
 			write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
 					& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
