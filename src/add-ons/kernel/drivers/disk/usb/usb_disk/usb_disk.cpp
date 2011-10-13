@@ -704,7 +704,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 					continue;
 
 				if (!hasIn && (endpoint->descr->endpoint_address
-					& USB_ENDPOINT_ADDR_DIR_IN)) {
+					& USB_ENDPOINT_ADDR_DIR_IN) != 0) {
 					device->bulk_in = endpoint->handle;
 					hasIn = true;
 				} else if (!hasOut && (endpoint->descr->endpoint_address
