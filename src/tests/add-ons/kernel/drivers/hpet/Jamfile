@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src tests add-ons kernel drivers hpet ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers timer ] : true ;
+
+Application hpet_test : 
+	main.cpp	
+	: be $(TARGET_LIBSUPC++)
+	;
+
+
