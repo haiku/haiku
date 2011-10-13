@@ -181,8 +181,6 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 	dprintf("\n\tsupports FSB delivery: %s\n",
 			timer->config & HPET_CAP_TIMER_FSB_INT_DEL ? "Yes" : "No");
 
-
-	dprintf("\n");
 	dprintf("Configuration:\n");
 	dprintf("\tFSB Enabled: %s\n",
 		timer->config & HPET_CONF_TIMER_FSB_ENABLE ? "Yes" : "No");
@@ -204,21 +202,24 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 #endif
 
 
-static void
-hpet_init_timer(volatile struct hpet_timer *timer)
+static status_t
+hpet_init_timer(hpet_timer_cookie* cookie)
 {
+	volatile struct hpet_timer *timer = &sHPETRegs->timer[cookie->number];
+
 	uint32 interrupts = (uint32)HPET_GET_CAP_TIMER_ROUTE(timer);
 
 	// TODO: Check if the interrupt is already used, and try another
-	uint32 interrupt = 0;	
+	int32 interrupt = -1;	
 	for (int i = 0; i < 32; i++) {
 		if (interrupts & (1 << i)) {
-			interrupt = i;		
+			interrupt = i;
 			break;
 		}
 	}
 
-	timer->config = 0;
+	if (interrupt == -1)
+		return B_ERROR;
 
 	timer->config |= (interrupt << HPET_CONF_TIMER_INT_ROUTE_SHIFT)
 		& HPET_CONF_TIMER_INT_ROUTE_MASK;
@@ -233,20 +234,16 @@ hpet_init_timer(volatile struct hpet_timer *timer)
 	timer->config &= ~HPET_CONF_TIMER_FSB_ENABLE;
 	timer->config &= ~HPET_CONF_TIMER_32MODE;
 
-
+	cookie->irq = interrupt = HPET_GET_CONF_TIMER_INT_ROUTE(timer);
+	status_t status = install_io_interrupt_handler(interrupt, &hpet_timer_interrupt, cookie, 0);
+	if (status != B_OK) {
+		dprintf("hpet_init_timer(): cannot install interrupt handler: %s\n", strerror(status));
+		return status;
+	}
 #ifdef TRACE_HPET
 	hpet_dump_timer(timer);
 #endif
-}
-
-
-static status_t
-hpet_configure_interrupt(volatile hpet_timer* timer, int32 *irq)
-{
-	status_t status = B_OK;
-	*irq = HPET_GET_CONF_TIMER_INT_ROUTE(timer);
-	// TODO: Configure interrupt using msi or regular irqs
-	return status;
+	return B_OK;
 }
 
 
@@ -299,12 +296,12 @@ hpet_init()
 		return B_ERROR;
 	}
 
-/*
+
 #ifdef TRACE_HPET
 	for (uint32 c = 0; c < numTimers; c++)
 		hpet_dump_timer(&sHPETRegs->timer[c]);
 #endif
-*/
+
 	sHPETRegs->interrupt_status = 0;
 
 	status = hpet_set_enabled(true);
@@ -350,15 +347,24 @@ init_driver(void)
 	}
 
 	sHPETArea = map_physical_memory("HPET registries",
-					hpetTable->hpet_address.address, B_PAGE_SIZE, 0,
-					0, (void**)&sHPETRegs);
+					hpetTable->hpet_address.address,
+					B_PAGE_SIZE,
+					B_ANY_KERNEL_ADDRESS,
+					B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+					(void**)&sHPETRegs);
 
 	if (sHPETArea < 0) {
 		put_module(B_ACPI_MODULE_NAME);	
 		return sHPETArea;
 	}
 
-	return hpet_init();
+	status = hpet_init();
+	if (status != B_OK) {
+		delete_area(sHPETArea);
+		put_module(B_ACPI_MODULE_NAME);
+	}
+
+	return status;
 }
 
 
@@ -413,19 +419,18 @@ hpet_open(const char* name, uint32 flags, void** cookie)
 
 	hpet_set_enabled(false);
 
-	hpet_init_timer(&sHPETRegs->timer[timerNumber]);
-	
-	status_t status = hpet_configure_interrupt(&sHPETRegs->timer[timerNumber], &hpetCookie->irq);
-	if (status == B_OK)
-		status = install_io_interrupt_handler(hpetCookie->irq, &hpet_timer_interrupt, hpetCookie, 0);
-	if (status != B_OK)
-		dprintf("hpet_open(): cannot install interrupt handler: %s\n", strerror(status));
-	else
-		dprintf("hpet_open(): HPET timer uses irq %ld\n", hpetCookie->irq);
+	status_t status = hpet_init_timer(hpetCookie);
+	if (status != B_OK) {
+		dprintf("hpet_open: initializing timer failed: %s\n", strerror(status));
+		return status;
+	}
 
 	hpet_set_enabled(true);
 
 	*cookie = hpetCookie;
+
+	if (status != B_OK)
+		atomic_add(&sOpenCount, -1);
 
 	return status;
 }
