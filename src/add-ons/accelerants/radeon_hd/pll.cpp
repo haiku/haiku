@@ -51,14 +51,14 @@ pll_compute_post_divider(uint32 targetClock)
 	uint32 vco;
 	if (info.device_chipset < (RADEON_R700 | 0x70)) {
 		if (0) // TODO : RADEON_PLL_IS_LCD
-			vco = PLL_MIN_DEFAULT; // pll->lcd_pll_out_min;
+			vco = PLL_MIN_DEFAULT / 10; // pll->lcd_pll_out_min;
 		else
-			vco = PLL_MIN_DEFAULT; // pll->pll_out_min;
+			vco = PLL_MIN_DEFAULT / 10; // pll->pll_out_min;
 	} else {
 		if (0) // TODO : RADEON_PLL_IS_LCD
-			vco = PLL_MAX_DEFAULT; // pll->lcd_pll_out_max;
+			vco = PLL_MAX_DEFAULT / 10; // pll->lcd_pll_out_max;
 		else
-			vco = PLL_MAX_DEFAULT; // pll->pll_out_min;
+			vco = PLL_MAX_DEFAULT / 10; // pll->pll_out_min;
 	}
 
 	uint32 postDivider = vco / targetClock;
@@ -92,6 +92,8 @@ pll_compute(pll_info *pll) {
 	pll->feedback_div = 0;
 	pll->feedback_div_frac = 0;
 
+	uint32 referenceFrequency = PLL_REFERENCE_DEFAULT / 10;
+
 	// if RADEON_PLL_USE_REF_DIV
 	//	ref_div = pll->reference_div;
 
@@ -114,15 +116,16 @@ pll_compute(pll_info *pll) {
 			uint32 retroEncabulator = pll->post_div * pll->reference_div;
 
 			retroEncabulator *= targetClock;
-			pll->feedback_div = retroEncabulator / PLL_REFERENCE_DEFAULT;
-			pll->feedback_div_frac = retroEncabulator % PLL_REFERENCE_DEFAULT;
+			pll->feedback_div = retroEncabulator / referenceFrequency;
+			pll->feedback_div_frac
+				= retroEncabulator % referenceFrequency;
 
 			if (pll->feedback_div > FB_DIV_LIMIT)
 				pll->feedback_div = FB_DIV_LIMIT;
 			else if (pll->feedback_div < FB_DIV_MIN)
 				pll->feedback_div = FB_DIV_MIN;
 
-			if (pll->feedback_div_frac >= (PLL_REFERENCE_DEFAULT / 2))
+			if (pll->feedback_div_frac >= (referenceFrequency / 2))
 				pll->feedback_div++;
 
 			pll->feedback_div_frac = 0;
@@ -132,7 +135,7 @@ pll_compute(pll_info *pll) {
 				TRACE("%s: Caught division by zero\n", __func__);
 				return B_ERROR;
 			}
-			uint32 tmp = (PLL_REFERENCE_DEFAULT * pll->feedback_div)
+			uint32 tmp = (referenceFrequency * pll->feedback_div)
 				/ (pll->post_div * pll->reference_div);
 			tmp = (tmp * 10000) / targetClock;
 
@@ -152,8 +155,8 @@ pll_compute(pll_info *pll) {
 	}
 
 	uint32 calculatedClock
-		= ((PLL_REFERENCE_DEFAULT * pll->feedback_div)
-		+ (PLL_REFERENCE_DEFAULT * pll->feedback_div_frac))
+		= (referenceFrequency * pll->feedback_div)
+		+ (referenceFrequency * pll->feedback_div_frac)
 		/ (pll->reference_div * pll->post_div);
 
 	calculatedClock *= 10;
