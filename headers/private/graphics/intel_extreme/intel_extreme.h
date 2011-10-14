@@ -225,7 +225,11 @@ struct intel_free_graphics_memory {
 // to a PCH based one, that means anything that used to communicate via (G)MCH
 // registers needs to use different ones on PCH based platforms (Ironlake and
 // up, SandyBridge, etc.).
-#define PCH_DE_INTERRUPT_ENABLE			0x4400c	// INTEL_INTERRUPT_ENABLED
+#define PCH_DE_POWER_MEASUREMENT		0x42400
+#define PCH_DE_INTERRUPT_STATUS			0x44000	// INTEL_INTERRUPT_STATUS
+#define PCH_DE_INTERRUPT_MASK			0x44004	// INTEL_INTERRUPT_MASK
+#define PCH_DE_INTERRUPT_IDENTITY		0x44008	// INTEL_INTERRUPT_IDENTITY
+#define PCH_DE_INTERRUPT_ENABLED		0x4400c	// INTEL_INTERRUPT_ENABLED
 #define PCH_DISPLAY_A_ANALOG_PORT		0xe1100	// INTEL_DISPLAY_A_ANALOG_PORT
 #define PCH_DISPLAY_A_DIGITAL_PORT		0xe1120	// INTEL_DISPLAY_A_DIGITAL_PORT
 #define PCH_DISPLAY_B_DIGITAL_PORT		0xe1140	// INTEL_DISPLAY_B_DIGITAL_PORT
@@ -252,6 +256,8 @@ struct intel_free_graphics_memory {
 #define PCH_TRANSCODER_B_VSYNC			0xe1014	// INTEL_DISPLAY_B_VSYNC
 
 #define PCH_LVDS_DETECTED				(1 << 1)
+#define PCH_INTERRUPT_VBLANK_PIPEA		(1 << 7)
+#define PCH_INTERRUPT_VBLANK_PIPEB		(1 << 15)
 
 
 // SandyBridge (SNB)

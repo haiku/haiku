@@ -76,13 +76,16 @@ intel_interrupt_handler(void *data)
 {
 	intel_info &info = *(intel_info *)data;
 
-	uint32 identity = read16(info.registers + INTEL_INTERRUPT_IDENTITY);
+	bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
+	uint32 identity = read16(info.registers
+		+ (isSNB ? PCH_DE_INTERRUPT_IDENTITY : INTEL_INTERRUPT_IDENTITY));
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
 	int32 handled = B_HANDLED_INTERRUPT;
 
-	if ((identity & INTERRUPT_VBLANK_PIPEA) != 0) {
+	uint32 mask = isSNB ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
+	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
@@ -90,7 +93,8 @@ intel_interrupt_handler(void *data)
 			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
-	if ((identity & INTERRUPT_VBLANK_PIPEB) != 0) {
+	mask = isSNB ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
+	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
@@ -99,7 +103,8 @@ intel_interrupt_handler(void *data)
 	}
 
 	// setting the bit clears it!
-	write16(info.registers + INTEL_INTERRUPT_IDENTITY, identity);
+	write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_IDENTITY
+		: INTEL_INTERRUPT_IDENTITY), identity);
 
 	return handled;
 }
@@ -137,14 +142,22 @@ init_interrupt_handler(intel_info &info)
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 			write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			write16(info.registers + INTEL_INTERRUPT_IDENTITY, ~0);
+
+			bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
+			write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_IDENTITY
+				: INTEL_INTERRUPT_IDENTITY), ~0);
 
 			// enable interrupts - we only want VBLANK interrupts
-			write16(info.registers + INTEL_INTERRUPT_ENABLED,
-				read16(info.registers + INTEL_INTERRUPT_ENABLED)
-				| INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
-			write16(info.registers + INTEL_INTERRUPT_MASK,
-				~(INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB));
+			uint16 enable = isSNB
+				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
+				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
+
+			write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_ENABLED
+					: INTEL_INTERRUPT_ENABLED),
+				read16(info.registers + (isSNB ? PCH_DE_INTERRUPT_ENABLED
+					: INTEL_INTERRUPT_ENABLED)) | enable);
+			write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_MASK
+				: INTEL_INTERRUPT_MASK), ~enable);
 		}
 	}
 	if (status < B_OK) {
@@ -354,8 +367,11 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		write16(info.registers + INTEL_INTERRUPT_ENABLED, 0);
-		write16(info.registers + INTEL_INTERRUPT_MASK, ~0);
+		bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
+		write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_ENABLED
+			: INTEL_INTERRUPT_ENABLED), 0);
+		write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_MASK
+			: INTEL_INTERRUPT_MASK), ~0);
 
 		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			intel_interrupt_handler, &info);
