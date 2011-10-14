@@ -87,7 +87,7 @@ struct pll_info {
 };
 
 
-uint32 pll_adjust(pll_info *pll, uint8 crtcID);
+status_t pll_adjust(pll_info *pll, uint8 crtcID);
 status_t pll_compute(pll_info *pll);
 status_t pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID);
 

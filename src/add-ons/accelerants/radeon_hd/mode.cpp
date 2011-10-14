@@ -187,9 +187,9 @@ radeon_set_display_mode(display_mode *mode)
 		encoder_mode_set(id, mode->timing.pixel_clock);
 
 		// *** CRT controler commit
-		display_crtc_blank(id, ATOM_DISABLE);
-		display_crtc_memreq(id, ATOM_ENABLE);
 		display_crtc_power(id, ATOM_ENABLE);
+		display_crtc_memreq(id, ATOM_ENABLE);
+		display_crtc_blank(id, ATOM_DISABLE);
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit
@@ -198,10 +198,17 @@ radeon_set_display_mode(display_mode *mode)
 		encoder_output_lock(false);
 	}
 
-	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
-	TRACE("CRT0 Status: 0x%X\n", crtstatus);
-	crtstatus = Read32(CRT, D2CRTC_STATUS);
-	TRACE("CRT1 Status: 0x%X\n", crtstatus);
+	// for debugging
+	TRACE("D1CRTC_STATUS     Value: 0x%X\n", Read32(CRT, D1CRTC_STATUS));
+	TRACE("D2CRTC_STATUS     Value: 0x%X\n", Read32(CRT, D2CRTC_STATUS));
+	TRACE("D1CRTC_CONTROL    Value: 0x%X\n", Read32(CRT, D1CRTC_CONTROL));
+	TRACE("D2CRTC_CONTROL    Value: 0x%X\n", Read32(CRT, D2CRTC_CONTROL));
+	TRACE("D1GRPH_ENABLE     Value: 0x%X\n", Read32(CRT, D1GRPH_ENABLE));
+	TRACE("D2GRPH_ENABLE     Value: 0x%X\n", Read32(CRT, D2GRPH_ENABLE));
+	TRACE("D1SCL_ENABLE      Value: 0x%X\n", Read32(CRT, D1SCL_ENABLE));
+	TRACE("D2SCL_ENABLE      Value: 0x%X\n", Read32(CRT, D2SCL_ENABLE));
+	TRACE("RV620_DACA_ENABLE Value: 0x%X\n", Read32(CRT, RV620_DACA_ENABLE));
+	TRACE("RV620_DACB_ENABLE Value: 0x%X\n", Read32(CRT, RV620_DACB_ENABLE));
 
 	return B_OK;
 }

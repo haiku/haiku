@@ -85,6 +85,8 @@ status_t
 pll_compute(pll_info *pll) {
 
 	uint32 targetClock = pll->pixel_clock / 10;
+		// to 10 kHz units
+
 	pll->post_div = pll_compute_post_divider(targetClock);
 	pll->reference_div = REF_DIV_MIN;
 	pll->feedback_div = 0;
@@ -149,16 +151,25 @@ pll_compute(pll_info *pll) {
 		return B_ERROR;
 	}
 
-	pll->dot_clock = ((PLL_REFERENCE_DEFAULT * pll->feedback_div * 10)
+	uint32 calculatedClock
+		= ((PLL_REFERENCE_DEFAULT * pll->feedback_div)
 		+ (PLL_REFERENCE_DEFAULT * pll->feedback_div_frac))
-		/ (pll->reference_div * pll->post_div * 10);
+		/ (pll->reference_div * pll->post_div);
+
+	calculatedClock *= 10;
+		// back to kHz for storage
 
 	TRACE("%s: pixel clock: %" B_PRIu32 " gives:"
 		" feedbackDivider = %" B_PRIu32 ".%" B_PRIu32
-		"; referenceDivider = %" B_PRIu32 "; postDivider = %" B_PRIu32
-		"; dotClock = %" B_PRIu32 "\n", __func__, pll->pixel_clock,
-		pll->feedback_div, pll->feedback_div_frac, pll->reference_div,
-		pll->post_div, pll->dot_clock);
+		"; referenceDivider = %" B_PRIu32 "; postDivider = %" B_PRIu32 "\n",
+		__func__, pll->pixel_clock, pll->feedback_div, pll->feedback_div_frac,
+		pll->reference_div, pll->post_div);
+
+	if (pll->pixel_clock != calculatedClock) {
+		TRACE("%s: pixel clock %" B_PRIu32 " was changed to %" B_PRIu32 "\n",
+			__func__, pll->pixel_clock, calculatedClock);
+		pll->pixel_clock = calculatedClock;
+	}
 
 	return B_OK;
 }
@@ -170,7 +181,7 @@ union adjust_pixel_clock {
 };
 
 
-uint32
+status_t
 pll_adjust(pll_info *pll, uint8 crtcID)
 {
 	pll->flags |= PLL_PREFER_LOW_REF_DIV;
@@ -179,7 +190,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	uint32 pixelClock = pll->pixel_clock;
-	uint32 adjustedClock = pll->pixel_clock;
+		// original as pixel_clock will be adjusted
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
@@ -195,7 +206,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 
 		if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 			!= B_OK) {
-			return adjustedClock;
+			return B_ERROR;
 		}
 
 		memset(&args, 0, sizeof(args));
@@ -216,9 +227,9 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 						// get returned adjusted clock
-						adjustedClock
+						pll->pixel_clock
 							= B_LENDIAN_TO_HOST_INT16(args.v1.usPixelClock);
-						adjustedClock *= 10;
+						pll->pixel_clock *= 10;
 						break;
 					case 3:
 						args.v3.sInput.usPixelClock
@@ -238,9 +249,11 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 						args.v3.sInput.ucExtTransmitterID = 0;
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
-						adjustedClock
+						// get returned adjusted clock
+						pll->pixel_clock
 							= B_LENDIAN_TO_HOST_INT32(
-								args.v3.sOutput.ulDispPllFreq) * 10;
+								args.v3.sOutput.ulDispPllFreq);
+						pll->pixel_clock *= 10;
 
 						if (args.v3.sOutput.ucRefDiv) {
 							pll->flags |= PLL_USE_FRAC_FB_DIV;
@@ -254,14 +267,22 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 						}
 						break;
 					default:
-						return adjustedClock;
+						TRACE("%s: ERROR: table version %" B_PRIu8 ".%" B_PRIu8
+							" unknown\n", __func__, tableMajor, tableMinor);
+						return B_ERROR;
 				}
 				break;
 			default:
-				return adjustedClock;
+				TRACE("%s: ERROR: table version %" B_PRIu8 ".%" B_PRIu8
+					" unknown\n", __func__, tableMajor, tableMinor);
+				return B_ERROR;
 		}
 	}
-	return adjustedClock;
+
+	TRACE("%s: was: %" B_PRIu32 ", now: %" B_PRIu32 "\n", __func__,
+		pixelClock, pll->pixel_clock);
+
+	return B_OK;
 }
 
 
@@ -274,11 +295,10 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	pll->pixel_clock = pixelClock;
 	pll->id = pllID;
 
-	// get any needed clock adjustments, set reference/post dividers, set flags
-	uint32 adjustedClock = pll_adjust(pll, crtcID);
-
-	// compute dividers, set flags
+	pll_adjust(pll, crtcID);
+		// get any needed clock adjustments, set reference/post dividers, set flags
 	pll_compute(pll);
+		// compute dividers, set flags
 
 	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
 	union set_pixel_clock args;
@@ -295,7 +315,8 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 
 	switch (tableMinor) {
 		case 1:
-			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
+			args.v1.usPixelClock
+				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
 			args.v1.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
 			args.v1.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
 			args.v1.ucFracFbDiv = pll->feedback_div_frac;
@@ -305,7 +326,8 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v1.ucRefDivSrc = 1;
 			break;
 		case 2:
-			args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
+			args.v2.usPixelClock
+				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
 			args.v2.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
 			args.v2.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
 			args.v2.ucFracFbDiv = pll->feedback_div_frac;
@@ -315,7 +337,8 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v2.ucRefDivSrc = 1;
 			break;
 		case 3:
-			args.v3.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
+			args.v3.usPixelClock
+				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
 			args.v3.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
 			args.v3.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
 			args.v3.ucFracFbDiv = pll->feedback_div_frac;
@@ -330,7 +353,8 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			break;
 		case 5:
 			args.v5.ucCRTC = crtcID;
-			args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(adjustedClock / 10);
+			args.v5.usPixelClock
+				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
 			args.v5.ucRefDiv = pll->reference_div;
 			args.v5.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
 			args.v5.ulFbDivDecFrac
@@ -356,7 +380,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			break;
 		case 6:
 			args.v6.ulDispEngClkFreq
-				= B_HOST_TO_LENDIAN_INT32(crtcID << 24 | adjustedClock / 10);
+				= B_HOST_TO_LENDIAN_INT32(crtcID << 24 | pll->pixel_clock / 10);
 			args.v6.ucRefDiv = pll->reference_div;
 			args.v6.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
 			args.v6.ulFbDivDecFrac
@@ -392,7 +416,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	}
 
 	TRACE("%s: set adjusted pixel clock %" B_PRIu32 " (was %" B_PRIu32 ")\n",
-		__func__, adjustedClock, pll->pixel_clock);
+		__func__, pll->pixel_clock, pixelClock);
 
 	return atom_execute_table(gAtomContext, index, (uint32 *)&args);
 }
