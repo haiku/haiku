@@ -35,8 +35,14 @@
 #include "atom-bits.h"
 
 
-#undef TRACE
+/* AtomBIOS loop detection
+ * Number of repeat AtomBIOS jmp operations
+ * before bailing due to stuck in a loop
+ */
+#define ATOM_OP_JMP_TIMEOUT 128
 
+// *** Tracing
+#undef TRACE
 //#define TRACE_ATOM
 #ifdef TRACE_ATOM
 #   define TRACE(x...) _sPrintf("radeon_hd: " x)
@@ -63,6 +69,7 @@
 
 #define PLL_INDEX	2
 #define PLL_DATA	3
+
 
 typedef struct {
 	atom_context *ctx;
@@ -641,9 +648,10 @@ atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 
 	if (execute) {
 		if (ctx->last_jump == (ctx->start + target)) {
-			if (ctx->last_jump_count > 128) {
-				ERROR("%s: DANGER! AtomBIOS stuck in infinite loop"
-					" for more then 128 jumps... abort!\n", __func__);
+			if (ctx->last_jump_count > ATOM_OP_JMP_TIMEOUT) {
+				ERROR("%s: DANGER! AtomBIOS stuck in loop"
+					" for more then %d jumps... abort!\n",
+					__func__, ATOM_OP_JMP_TIMEOUT);
 				ctx->abort = true;
 			} else {
 				ctx->last_jump_count++;
