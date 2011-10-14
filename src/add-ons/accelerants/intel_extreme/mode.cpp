@@ -1259,8 +1259,11 @@ intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 		uint32 color = colors[0] << 16 | colors[1] << 8 | colors[2];
 		colors += 3;
 
-		write32(INTEL_DISPLAY_A_PALETTE + first * sizeof(uint32), color);
-		write32(INTEL_DISPLAY_B_PALETTE + first * sizeof(uint32), color);
+		bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+		write32((isSNB ? PCH_DISPLAY_A_PALETTE : INTEL_DISPLAY_A_PALETTE)
+			+ first * sizeof(uint32), color);
+		write32((isSNB ? PCH_DISPLAY_B_PALETTE : INTEL_DISPLAY_B_PALETTE)
+			+ first * sizeof(uint32), color);
 	}
 }
 
