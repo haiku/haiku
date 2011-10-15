@@ -74,26 +74,30 @@ enable_display_pipe(bool enable)
 static void
 enable_lvds_panel(bool enable)
 {
-	uint32 control = read32(INTEL_PANEL_CONTROL);
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
+	int controlRegister = isSNB ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
+	int statusRegister = isSNB ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;
+
+	uint32 control = read32(controlRegister);
 	uint32 panelStatus;
 
 	if (enable) {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) == 0) {
-			write32(INTEL_PANEL_CONTROL, control
-				| PANEL_CONTROL_POWER_TARGET_ON);
+			write32(controlRegister, control | PANEL_CONTROL_POWER_TARGET_ON
+				| (isSNB ? PANEL_REGISTER_UNLOCK : 0));
 		}
 
 		do {
-			panelStatus = read32(INTEL_PANEL_STATUS);
+			panelStatus = read32(statusRegister);
 		} while ((panelStatus & PANEL_STATUS_POWER_ON) == 0);
 	} else {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) != 0) {
-			write32(INTEL_PANEL_CONTROL, control
-				& ~PANEL_CONTROL_POWER_TARGET_ON);
+			write32(controlRegister, (control & ~PANEL_CONTROL_POWER_TARGET_ON)
+				| (isSNB ? PANEL_REGISTER_UNLOCK : 0));
 		}
 
 		do {
-			panelStatus = read32(INTEL_PANEL_STATUS);
+			panelStatus = read32(statusRegister);
 		} while ((panelStatus & PANEL_STATUS_POWER_ON) != 0);
 	}
 }
