@@ -552,6 +552,9 @@ detect_connectors()
 								= encoderID;
 							gConnector[connectorIndex]->encoder.type
 								= encoderType;
+
+							pll_limit_probe(
+								&gConnector[connectorIndex]->encoder.pll);
 						}
 					}
 					// END if object is encoder

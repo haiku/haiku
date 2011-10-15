@@ -28,20 +28,103 @@ extern "C" void _sPrintf(const char *format, ...);
 #   define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) _sPrintf("radeon_hd: " x)
 
-// For AtomBIOS PLLSet
-union set_pixel_clock {
-	SET_PIXEL_CLOCK_PS_ALLOCATION base;
-	PIXEL_CLOCK_PARAMETERS v1;
-	PIXEL_CLOCK_PARAMETERS_V2 v2;
-	PIXEL_CLOCK_PARAMETERS_V3 v3;
-	PIXEL_CLOCK_PARAMETERS_V5 v5;
-	PIXEL_CLOCK_PARAMETERS_V6 v6;
+
+union firmware_info {
+	ATOM_FIRMWARE_INFO info;
+	ATOM_FIRMWARE_INFO_V1_2 info_12;
+	ATOM_FIRMWARE_INFO_V1_3 info_13;
+	ATOM_FIRMWARE_INFO_V1_4 info_14;
+	ATOM_FIRMWARE_INFO_V2_1 info_21;
+	ATOM_FIRMWARE_INFO_V2_2 info_22;
 };
 
 
-static uint32
-pll_compute_post_divider(uint32 targetClock)
+status_t
+pll_limit_probe(pll_info *pll)
+{
+	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableOffset;
+
+	if (atom_parse_data_header(gAtomContext, index, NULL,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
+		ERROR("%s: Couldn't parse data header\n", __func__);
+		return B_ERROR;
+	}
+
+	union firmware_info *firmwareInfo
+		= (union firmware_info *)(gAtomContext->bios + tableOffset);
+
+	/* pixel clock limits */
+	pll->referenceFreq
+		= B_LENDIAN_TO_HOST_INT16(firmwareInfo->info.usReferenceClock) * 10;
+
+	if (tableMinor < 2) {
+		pll->pllOutMin
+			= B_LENDIAN_TO_HOST_INT16(
+				firmwareInfo->info.usMinPixelClockPLL_Output) * 10;
+	} else {
+		pll->pllOutMin
+			= B_LENDIAN_TO_HOST_INT32(
+				firmwareInfo->info_12.ulMinPixelClockPLL_Output);
+	}
+
+	pll->pllOutMax
+		= B_LENDIAN_TO_HOST_INT32(
+			firmwareInfo->info.ulMaxPixelClockPLL_Output) * 10;
+
+	if (tableMinor >= 4) {
+		pll->lcdPllOutMin
+			= B_LENDIAN_TO_HOST_INT16(
+				firmwareInfo->info_14.usLcdMinPixelClockPLL_Output) * 100;
+
+		if (pll->lcdPllOutMin == 0)
+			pll->lcdPllOutMin = pll->pllOutMin;
+
+		pll->lcdPllOutMax
+			= B_LENDIAN_TO_HOST_INT16(
+				firmwareInfo->info_14.usLcdMaxPixelClockPLL_Output) * 100;
+
+		if (pll->lcdPllOutMax == 0)
+			pll->lcdPllOutMax = pll->pllOutMax;
+
+	} else {
+		pll->lcdPllOutMin = pll->pllOutMin;
+		pll->lcdPllOutMax = pll->pllOutMax;
+	}
+
+	if (pll->pllOutMin == 0) {
+		pll->pllOutMin = 64800;
+			// Avivo+ limit
+	}
+
+	pll->minPostDiv = POST_DIV_MIN;
+	pll->maxPostDiv = POST_DIV_LIMIT;
+	pll->minRefDiv = REF_DIV_MIN;
+	pll->maxRefDiv = REF_DIV_LIMIT;
+	pll->minFeedbackDiv = FB_DIV_MIN;
+	pll->maxFeedbackDiv = FB_DIV_LIMIT;
+
+//	pll->pllInMin = B_LENDIAN_TO_HOST_INT16(
+//		firmware_info->info.usMinPixelClockPLL_Input) * 10;
+//
+//	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
+//		firmware_info->info.usMaxPixelClockPLL_Input) * 10;
+
+	TRACE("%s: referenceFreq: %" B_PRIu16 "; pllOutMin: %" B_PRIu16 "; "
+		" pllOutMax: %" B_PRIu16 "; pllInMin: %" B_PRIu16 ";"
+		"pllInMax: %" B_PRIu16 "\n", __func__, pll->referenceFreq,
+		pll->pllOutMin, pll->pllOutMax, pll->pllInMin, pll->pllInMax);
+
+	return B_OK;
+}
+
+
+void
+pll_compute_post_divider(pll_info *pll)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -51,18 +134,20 @@ pll_compute_post_divider(uint32 targetClock)
 	uint32 vco;
 	if (info.device_chipset < (RADEON_R700 | 0x70)) {
 		if (0) // TODO : RADEON_PLL_IS_LCD
-			vco = PLL_MIN_DEFAULT / 10; // pll->lcd_pll_out_min;
+			vco = pll->lcdPllOutMin;
 		else
-			vco = PLL_MIN_DEFAULT / 10; // pll->pll_out_min;
+			vco = pll->pllOutMin;
 	} else {
 		if (0) // TODO : RADEON_PLL_IS_LCD
-			vco = PLL_MAX_DEFAULT / 10; // pll->lcd_pll_out_max;
+			vco = pll->lcdPllOutMax;
 		else
-			vco = PLL_MAX_DEFAULT / 10; // pll->pll_out_min;
+			vco = pll->pllOutMin;
 	}
 
-	uint32 postDivider = vco / targetClock;
-	uint32 tmp = vco % targetClock;
+	TRACE("%s: vco = %" B_PRIu32 "\n", __func__, vco);
+
+	uint32 postDivider = vco / pll->pixelClock;
+	uint32 tmp = vco % pll->pixelClock;
 
 	if (info.device_chipset < (RADEON_R700 | 0x70)) {
 		if (tmp)
@@ -72,27 +157,28 @@ pll_compute_post_divider(uint32 targetClock)
 			postDivider--;
 	}
 
-	if (postDivider > POST_DIV_LIMIT)
-		postDivider = POST_DIV_LIMIT;
-	else if (postDivider < POST_DIV_MIN)
-		postDivider = POST_DIV_MIN;
+	if (postDivider > pll->maxPostDiv)
+		postDivider = pll->maxPostDiv;
+	else if (postDivider < pll->minPostDiv)
+		postDivider = pll->minPostDiv;
 
-	return postDivider;
+	pll->postDiv = postDivider;
+	TRACE("%s: postDiv = %" B_PRIu32 "\n", __func__, postDivider);
 }
 
 
 status_t
-pll_compute(pll_info *pll) {
+pll_compute(pll_info *pll)
+{
+	pll_compute_post_divider(pll);
 
-	uint32 targetClock = pll->pixel_clock / 10;
-		// to 10 kHz units
+	uint32 targetClock = pll->pixelClock;
 
-	pll->post_div = pll_compute_post_divider(targetClock);
-	pll->reference_div = REF_DIV_MIN;
-	pll->feedback_div = 0;
-	pll->feedback_div_frac = 0;
+	pll->feedbackDiv = 0;
+	pll->feedbackDivFrac = 0;
+	pll->referenceDiv = pll->minRefDiv;
 
-	uint32 referenceFrequency = PLL_REFERENCE_DEFAULT / 10;
+	uint32 referenceFrequency = pll->referenceFreq;
 
 	// if RADEON_PLL_USE_REF_DIV
 	//	ref_div = pll->reference_div;
@@ -111,67 +197,68 @@ pll_compute(pll_info *pll) {
 	// 		frac_fb_div = 0;
 	// 	}
 	// } else {
-		while (pll->reference_div <= REF_DIV_LIMIT) {
+		while (pll->referenceDiv <= pll->maxRefDiv) {
 			// get feedback divider
-			uint32 retroEncabulator = pll->post_div * pll->reference_div;
+			uint32 retroEncabulator = pll->postDiv * pll->referenceDiv;
 
 			retroEncabulator *= targetClock;
-			pll->feedback_div = retroEncabulator / referenceFrequency;
-			pll->feedback_div_frac
+			pll->feedbackDiv = retroEncabulator / referenceFrequency;
+			pll->feedbackDivFrac
 				= retroEncabulator % referenceFrequency;
 
-			if (pll->feedback_div > FB_DIV_LIMIT)
-				pll->feedback_div = FB_DIV_LIMIT;
-			else if (pll->feedback_div < FB_DIV_MIN)
-				pll->feedback_div = FB_DIV_MIN;
+			if (pll->feedbackDiv > pll->maxFeedbackDiv)
+				pll->feedbackDiv = pll->maxFeedbackDiv;
+			else if (pll->feedbackDiv < pll->minFeedbackDiv)
+				pll->feedbackDiv = pll->minFeedbackDiv;
 
-			if (pll->feedback_div_frac >= (referenceFrequency / 2))
-				pll->feedback_div++;
+			if (pll->feedbackDivFrac >= (referenceFrequency / 2))
+				pll->feedbackDiv++;
 
-			pll->feedback_div_frac = 0;
-			if (pll->reference_div == 0
-				|| pll->post_div == 0
+			pll->feedbackDivFrac = 0;
+
+			if (pll->referenceDiv == 0
+				|| pll->postDiv == 0
 				|| targetClock == 0) {
-				TRACE("%s: Caught division by zero\n", __func__);
+				TRACE("%s: Caught division by zero!\n", __func__);
+				TRACE("%s: referenceDiv %" B_PRIu32 "\n", __func__, pll->referenceDiv);
+				TRACE("%s: postDiv      %" B_PRIu32 "\n", __func__, pll->postDiv);
+				TRACE("%s: targetClock  %" B_PRIu32 "\n", __func__, targetClock);
 				return B_ERROR;
 			}
-			uint32 tmp = (referenceFrequency * pll->feedback_div)
-				/ (pll->post_div * pll->reference_div);
+			uint32 tmp = (referenceFrequency * pll->feedbackDiv)
+				/ (pll->postDiv * pll->referenceDiv);
 			tmp = (tmp * 10000) / targetClock;
 
 			if (tmp > (10000 + MAX_TOLERANCE))
-				pll->reference_div++;
+				pll->referenceDiv++;
 			else if (tmp >= (10000 - MAX_TOLERANCE))
 				break;
 			else
-				pll->reference_div++;
+				pll->referenceDiv++;
 		}
 	// }
 
-	if (pll->reference_div == 0 || pll->post_div == 0) {
+	if (pll->referenceDiv == 0 || pll->postDiv == 0) {
 		TRACE("%s: Caught division by zero of post or reference divider\n",
 			__func__);
 		return B_ERROR;
 	}
 
 	uint32 calculatedClock
-		= (referenceFrequency * pll->feedback_div)
-		+ (referenceFrequency * pll->feedback_div_frac)
-		/ (pll->reference_div * pll->post_div);
-
-	calculatedClock *= 10;
-		// back to kHz for storage
+		= (referenceFrequency * pll->feedbackDiv)
+		+ (referenceFrequency * pll->feedbackDivFrac)
+		/ (pll->referenceDiv * pll->postDiv);
 
 	TRACE("%s: pixel clock: %" B_PRIu32 " gives:"
 		" feedbackDivider = %" B_PRIu32 ".%" B_PRIu32
 		"; referenceDivider = %" B_PRIu32 "; postDivider = %" B_PRIu32 "\n",
-		__func__, pll->pixel_clock, pll->feedback_div, pll->feedback_div_frac,
-		pll->reference_div, pll->post_div);
+		__func__, pll->pixelClock, pll->feedbackDiv, pll->feedbackDivFrac,
+		pll->referenceDiv, pll->postDiv);
 
-	if (pll->pixel_clock != calculatedClock) {
+	if (pll->pixelClock != calculatedClock) {
 		TRACE("%s: pixel clock %" B_PRIu32 " was changed to %" B_PRIu32 "\n",
-			__func__, pll->pixel_clock, calculatedClock);
-		pll->pixel_clock = calculatedClock;
+			__func__, pll->pixelClock, calculatedClock);
+		pll->pixelClock = calculatedClock;
 	}
 
 	return B_OK;
@@ -192,12 +279,12 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	// TODO : PLL flags
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	uint32 pixelClock = pll->pixel_clock;
+	uint32 pixelClock = pll->pixelClock;
 		// original as pixel_clock will be adjusted
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
-	uint32 encoder_mode = display_get_encoder_mode(connectorIndex);
+	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
 
 	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
 		union adjust_pixel_clock args;
@@ -221,7 +308,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 						args.v1.usPixelClock
 							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 						args.v1.ucTransmitterID = encoderID;
-						args.v1.ucEncodeMode = encoder_mode;
+						args.v1.ucEncodeMode = encoderMode;
 						// TODO : SS and SS % > 0
 						if (0) {
 							args.v1.ucConfig
@@ -230,15 +317,15 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 						// get returned adjusted clock
-						pll->pixel_clock
+						pll->pixelClock
 							= B_LENDIAN_TO_HOST_INT16(args.v1.usPixelClock);
-						pll->pixel_clock *= 10;
+						pll->pixelClock *= 10;
 						break;
 					case 3:
 						args.v3.sInput.usPixelClock
 							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 						args.v3.sInput.ucTransmitterID = encoderID;
-						args.v3.sInput.ucEncodeMode = encoder_mode;
+						args.v3.sInput.ucEncodeMode = encoderMode;
 						args.v3.sInput.ucDispPllConfig = 0;
 						// TODO : SS and SS % > 0
 						if (0) {
@@ -253,20 +340,21 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 						// get returned adjusted clock
-						pll->pixel_clock
+						pll->pixelClock
 							= B_LENDIAN_TO_HOST_INT32(
 								args.v3.sOutput.ulDispPllFreq);
-						pll->pixel_clock *= 10;
+						pll->pixelClock *= 10;
+							// convert to kHz for storage
 
 						if (args.v3.sOutput.ucRefDiv) {
 							pll->flags |= PLL_USE_FRAC_FB_DIV;
 							pll->flags |= PLL_USE_REF_DIV;
-							pll->reference_div = args.v3.sOutput.ucRefDiv;
+							pll->referenceDiv = args.v3.sOutput.ucRefDiv;
 						}
 						if (args.v3.sOutput.ucPostDiv) {
 							pll->flags |= PLL_USE_FRAC_FB_DIV;
 							pll->flags |= PLL_USE_POST_DIV;
-							pll->post_div = args.v3.sOutput.ucPostDiv;
+							pll->postDiv = args.v3.sOutput.ucPostDiv;
 						}
 						break;
 					default:
@@ -283,10 +371,20 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	}
 
 	TRACE("%s: was: %" B_PRIu32 ", now: %" B_PRIu32 "\n", __func__,
-		pixelClock, pll->pixel_clock);
+		pixelClock, pll->pixelClock);
 
 	return B_OK;
 }
+
+
+union set_pixel_clock {
+	SET_PIXEL_CLOCK_PS_ALLOCATION base;
+	PIXEL_CLOCK_PARAMETERS v1;
+	PIXEL_CLOCK_PARAMETERS_V2 v2;
+	PIXEL_CLOCK_PARAMETERS_V3 v3;
+	PIXEL_CLOCK_PARAMETERS_V5 v5;
+	PIXEL_CLOCK_PARAMETERS_V6 v6;
+};
 
 
 status_t
@@ -295,7 +393,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info *pll = &gConnector[connectorIndex]->encoder.pll;
 
-	pll->pixel_clock = pixelClock;
+	pll->pixelClock = pixelClock;
 	pll->id = pllID;
 
 	pll_adjust(pll, crtcID);
@@ -319,33 +417,33 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	switch (tableMinor) {
 		case 1:
 			args.v1.usPixelClock
-				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
-			args.v1.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
-			args.v1.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
-			args.v1.ucFracFbDiv = pll->feedback_div_frac;
-			args.v1.ucPostDiv = pll->post_div;
+				= B_HOST_TO_LENDIAN_INT16(pll->pixelClock / 10);
+			args.v1.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->referenceDiv);
+			args.v1.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedbackDiv);
+			args.v1.ucFracFbDiv = pll->feedbackDivFrac;
+			args.v1.ucPostDiv = pll->postDiv;
 			args.v1.ucPpll = pll->id;
 			args.v1.ucCRTC = crtcID;
 			args.v1.ucRefDivSrc = 1;
 			break;
 		case 2:
 			args.v2.usPixelClock
-				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
-			args.v2.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
-			args.v2.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
-			args.v2.ucFracFbDiv = pll->feedback_div_frac;
-			args.v2.ucPostDiv = pll->post_div;
+				= B_HOST_TO_LENDIAN_INT16(pll->pixelClock / 10);
+			args.v2.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->referenceDiv);
+			args.v2.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedbackDiv);
+			args.v2.ucFracFbDiv = pll->feedbackDivFrac;
+			args.v2.ucPostDiv = pll->postDiv;
 			args.v2.ucPpll = pll->id;
 			args.v2.ucCRTC = crtcID;
 			args.v2.ucRefDivSrc = 1;
 			break;
 		case 3:
 			args.v3.usPixelClock
-				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
-			args.v3.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->reference_div);
-			args.v3.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
-			args.v3.ucFracFbDiv = pll->feedback_div_frac;
-			args.v3.ucPostDiv = pll->post_div;
+				= B_HOST_TO_LENDIAN_INT16(pll->pixelClock / 10);
+			args.v3.usRefDiv = B_HOST_TO_LENDIAN_INT16(pll->referenceDiv);
+			args.v3.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedbackDiv);
+			args.v3.ucFracFbDiv = pll->feedbackDivFrac;
+			args.v3.ucPostDiv = pll->postDiv;
 			args.v3.ucPpll = pll->id;
 			args.v3.ucMiscInfo = (pll->id << 2);
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
@@ -357,12 +455,12 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 		case 5:
 			args.v5.ucCRTC = crtcID;
 			args.v5.usPixelClock
-				= B_HOST_TO_LENDIAN_INT16(pll->pixel_clock / 10);
-			args.v5.ucRefDiv = pll->reference_div;
-			args.v5.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
+				= B_HOST_TO_LENDIAN_INT16(pll->pixelClock / 10);
+			args.v5.ucRefDiv = pll->referenceDiv;
+			args.v5.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedbackDiv);
 			args.v5.ulFbDivDecFrac
-				= B_HOST_TO_LENDIAN_INT32(pll->feedback_div_frac * 100000);
-			args.v5.ucPostDiv = pll->post_div;
+				= B_HOST_TO_LENDIAN_INT32(pll->feedbackDivFrac * 100000);
+			args.v5.ucPostDiv = pll->postDiv;
 			args.v5.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_REF_DIV_SRC;
@@ -383,12 +481,12 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			break;
 		case 6:
 			args.v6.ulDispEngClkFreq
-				= B_HOST_TO_LENDIAN_INT32(crtcID << 24 | pll->pixel_clock / 10);
-			args.v6.ucRefDiv = pll->reference_div;
-			args.v6.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedback_div);
+				= B_HOST_TO_LENDIAN_INT32(crtcID << 24 | pll->pixelClock / 10);
+			args.v6.ucRefDiv = pll->referenceDiv;
+			args.v6.usFbDiv = B_HOST_TO_LENDIAN_INT16(pll->feedbackDiv);
 			args.v6.ulFbDivDecFrac
-				= B_HOST_TO_LENDIAN_INT32(pll->feedback_div_frac * 100000);
-			args.v6.ucPostDiv = pll->post_div;
+				= B_HOST_TO_LENDIAN_INT32(pll->feedbackDivFrac * 100000);
+			args.v6.ucPostDiv = pll->postDiv;
 			args.v6.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_REF_DIV_SRC;
@@ -419,7 +517,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	}
 
 	TRACE("%s: set adjusted pixel clock %" B_PRIu32 " (was %" B_PRIu32 ")\n",
-		__func__, pll->pixel_clock, pixelClock);
+		__func__, pll->pixelClock, pixelClock);
 
-	return atom_execute_table(gAtomContext, index, (uint32 *)&args);
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }

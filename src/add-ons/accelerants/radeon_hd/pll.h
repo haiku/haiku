@@ -46,10 +46,7 @@
 
 struct pll_info {
 	/* pixel clock to be programmed (kHz)*/
-	uint32 pixel_clock;
-
-	/* dot clock (kHz) */
-	uint32 dot_clock;
+	uint32 pixelClock;
 
 	/* flags for the current clock */
 	uint32 flags;
@@ -58,35 +55,36 @@ struct pll_info {
 	uint32 id;
 
 	/* reference frequency */
-	uint32 reference_freq;
+	uint32 referenceFreq;
 
 	/* fixed dividers */
-	uint32 post_div;
-	uint32 reference_div;
-	uint32 feedback_div;
-	uint32 feedback_div_frac;
+	uint32 postDiv;
+	uint32 referenceDiv;
+	uint32 feedbackDiv;
+	uint32 feedbackDivFrac;
 
 	/* pll in/out limits */
-	uint32 pll_in_min;
-	uint32 pll_in_max;
-	uint32 pll_out_min;
-	uint32 pll_out_max;
-	uint32 lcd_pll_out_min;
-	uint32 lcd_pll_out_max;
-	uint32 best_vco;
+	uint32 pllInMin;
+	uint32 pllInMax;
+	uint32 pllOutMin;
+	uint32 pllOutMax;
+	uint32 lcdPllOutMin;
+	uint32 lcdPllOutMax;
+	uint32 bestVco;
 
 	/* divider limits */
-	uint32 min_ref_div;
-	uint32 max_ref_div;
-	uint32 min_post_div;
-	uint32 max_post_div;
-	uint32 min_feedback_div;
-	uint32 max_feedback_div;
-	uint32 min_frac_feedback_div;
-	uint32 max_frac_feedback_div;
+	uint32 minRefDiv;
+	uint32 maxRefDiv;
+	uint32 minPostDiv;
+	uint32 maxPostDiv;
+	uint32 minFeedbackDiv;
+	uint32 maxFeedbackDiv;
+	uint32 minFeedbackDivFrac;
+	uint32 maxFeedbackDivFrac;
 };
 
 
+status_t pll_limit_probe(pll_info *pll);
 status_t pll_adjust(pll_info *pll, uint8 crtcID);
 status_t pll_compute(pll_info *pll);
 status_t pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID);
