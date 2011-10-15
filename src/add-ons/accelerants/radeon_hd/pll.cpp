@@ -74,7 +74,7 @@ pll_limit_probe(pll_info *pll)
 
 	pll->pllOutMax
 		= B_LENDIAN_TO_HOST_INT32(
-			firmwareInfo->info.ulMaxPixelClockPLL_Output) * 10;
+			firmwareInfo->info.ulMaxPixelClockPLL_Output);
 
 	if (tableMinor >= 4) {
 		pll->lcdPllOutMin
@@ -108,11 +108,10 @@ pll_limit_probe(pll_info *pll)
 	pll->minFeedbackDiv = FB_DIV_MIN;
 	pll->maxFeedbackDiv = FB_DIV_LIMIT;
 
-//	pll->pllInMin = B_LENDIAN_TO_HOST_INT16(
-//		firmware_info->info.usMinPixelClockPLL_Input) * 10;
-//
-//	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
-//		firmware_info->info.usMaxPixelClockPLL_Input) * 10;
+	pll->pllInMin = B_LENDIAN_TO_HOST_INT16(
+		firmwareInfo->info.usMinPixelClockPLL_Input) * 10;
+	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
+		firmwareInfo->info.usMaxPixelClockPLL_Input) * 10;
 
 	TRACE("%s: referenceFreq: %" B_PRIu16 "; pllOutMin: %" B_PRIu16 "; "
 		" pllOutMax: %" B_PRIu16 "; pllInMin: %" B_PRIu16 ";"
@@ -128,17 +127,17 @@ pll_compute_post_divider(pll_info *pll)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	// if RADEON_PLL_USE_POST_DIV
-	//	return pll->post_div;
+	if ((pll->flags & PLL_USE_POST_DIV) != 0)
+		return;
 
 	uint32 vco;
 	if (info.device_chipset < (RADEON_R700 | 0x70)) {
-		if (0) // TODO : RADEON_PLL_IS_LCD
+		if ((pll->flags & PLL_IS_LCD) != 0)
 			vco = pll->lcdPllOutMin;
 		else
 			vco = pll->pllOutMin;
 	} else {
-		if (0) // TODO : RADEON_PLL_IS_LCD
+		if ((pll->flags & PLL_IS_LCD) != 0)
 			vco = pll->lcdPllOutMax;
 		else
 			vco = pll->pllOutMin;
@@ -271,11 +270,36 @@ union adjust_pixel_clock {
 };
 
 
+void
+pll_setup_flags(pll_info *pll, uint8 crtcID)
+{
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
+	pll->flags |= PLL_PREFER_LOW_REF_DIV;
+
+	if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+		pll->flags |= PLL_IS_LCD;
+
+		// TODO: Spread Spectrum PLL
+		// use reference divider for spread spectrum
+		if (0) { // SS enabled
+			if (0) { // if we have a SS reference divider
+				pll->flags |= PLL_USE_REF_DIV;
+				//pll->reference_div = ss->refdiv;
+				pll->flags |= PLL_USE_FRAC_FB_DIV;
+			}
+		}
+	}
+
+	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
+		pll->flags |= PLL_PREFER_CLOSEST_LOWER;
+}
+
+
 status_t
 pll_adjust(pll_info *pll, uint8 crtcID)
 {
-	pll->flags |= PLL_PREFER_LOW_REF_DIV;
-
 	// TODO : PLL flags
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -396,10 +420,12 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	pll->pixelClock = pixelClock;
 	pll->id = pllID;
 
+	pll_setup_flags(pll, crtcID);
+		// set up any special flags
 	pll_adjust(pll, crtcID);
-		// get any needed clock adjustments, set reference/post dividers, set flags
+		// get any needed clock adjustments, set reference/post dividers
 	pll_compute(pll);
-		// compute dividers, set flags
+		// compute dividers
 
 	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
 	union set_pixel_clock args;
