@@ -76,20 +76,20 @@ intel_interrupt_handler(void *data)
 {
 	intel_info &info = *(intel_info *)data;
 
-	bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
-	uint32 identity = read16(info.registers
-		+ (isSNB ? PCH_DE_INTERRUPT_IDENTITY : INTEL_INTERRUPT_IDENTITY));
+	uint16 identity = read16(info, INTEL_INTERRUPT_IDENTITY);
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
 	int32 handled = B_HANDLED_INTERRUPT;
 
-	uint32 mask = isSNB ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
+	// TODO: verify that these aren't actually the same
+	bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
+	uint16 mask = isSNB ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
 	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
-		write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
+		write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
 			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
@@ -98,13 +98,12 @@ intel_interrupt_handler(void *data)
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
-		write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
+		write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
 	// setting the bit clears it!
-	write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_IDENTITY
-		: INTEL_INTERRUPT_IDENTITY), identity);
+	write16(info, INTEL_INTERRUPT_IDENTITY, identity);
 
 	return handled;
 }
@@ -138,26 +137,22 @@ init_interrupt_handler(intel_info &info)
 		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			&intel_interrupt_handler, (void *)&info, 0);
 		if (status == B_OK) {
-			write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
+			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
+			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 
-			bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
-			write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_IDENTITY
-				: INTEL_INTERRUPT_IDENTITY), ~0);
+			write16(info, INTEL_INTERRUPT_IDENTITY, ~0);
 
 			// enable interrupts - we only want VBLANK interrupts
+			bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
 			uint16 enable = isSNB
 				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
 				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
 
-			write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_ENABLED
-					: INTEL_INTERRUPT_ENABLED),
-				read16(info.registers + (isSNB ? PCH_DE_INTERRUPT_ENABLED
-					: INTEL_INTERRUPT_ENABLED)) | enable);
-			write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_MASK
-				: INTEL_INTERRUPT_MASK), ~enable);
+			write16(info, INTEL_INTERRUPT_ENABLED,
+				read16(info, INTEL_INTERRUPT_ENABLED) | enable);
+			write16(info, INTEL_INTERRUPT_MASK, ~enable);
 		}
 	}
 	if (status < B_OK) {
@@ -248,6 +243,40 @@ intel_extreme_init(intel_info &info)
 		return info.registers_area;
 	}
 
+	uint32 *blocks = info.shared_info->register_blocks;
+	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
+
+	// setup the register blocks for the different architectures
+	if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
+		// PCH based platforms (IronLake and up)
+		blocks[REGISTER_BLOCK(REGS_INTERRUPT)]
+			= PCH_DE_INTERRUPT_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
+			= PCH_NORTH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
+			= PCH_NORTH_PIPE_AND_PORT_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]
+			= PCH_NORTH_PLANE_CONTROL_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]
+			= PCH_SOUTH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]
+			= PCH_SOUTH_TRANSCODER_AND_PORT_REGISTER_BASE;
+	} else {
+		// (G)MCH/ICH based platforms
+		blocks[REGISTER_BLOCK(REGS_INTERRUPT)]
+			= MCH_INTERRUPT_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
+			= MCH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
+			= MCH_PIPE_AND_PORT_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]
+			= MCH_PLANE_CONTROL_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]
+			= ICH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]
+			= ICH_PORT_REGISTER_BASE;
+	}
+
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
 	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci, PCI_command, 2)
 		| PCI_command_io | PCI_command_memory | PCI_command_master);
@@ -269,27 +298,27 @@ intel_extreme_init(intel_info &info)
 	// TODO: clean this up
 	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
 		dprintf("i965GM/i965GME quirk\n");
-		write32(info.registers + 0x6204, (1L << 29));
+		write32(info, 0x6204, (1L << 29));
 	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
 		dprintf("SNB clock gating\n");
-		write32(info.registers + 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
+		write32(info, 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
 	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
 		dprintf("G4x clock gating\n");
-		write32(info.registers + 0x6204, 0);
-		write32(info.registers + 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
-		write32(info.registers + 0x6210, 0);
+		write32(info, 0x6204, 0);
+		write32(info, 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
+		write32(info, 0x6210, 0);
 
 		uint32 gateValue = (1L << 28) | (1L << 3) | (1L << 2);
 		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
 			dprintf("G4x mobile clock gating\n");
 		    gateValue |= 1L << 18;
 		}
-		write32(info.registers + 0x6200, gateValue);
+		write32(info, 0x6200, gateValue);
 	} else {
 		dprintf("i965 quirk\n");
-		write32(info.registers + 0x6204, (1L << 29) | (1L << 23));
+		write32(info, 0x6204, (1L << 29) | (1L << 23));
 	}
-	write32(info.registers + 0x7408, 0x10);
+	write32(info, 0x7408, 0x10);
 
 	// no errors, so keep areas and mappings
 	sharedCreator.Detach();
@@ -367,11 +396,8 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
-		write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_ENABLED
-			: INTEL_INTERRUPT_ENABLED), 0);
-		write16(info.registers + (isSNB ? PCH_DE_INTERRUPT_MASK
-			: INTEL_INTERRUPT_MASK), ~0);
+		write16(info, INTEL_INTERRUPT_ENABLED, 0);
+		write16(info, INTEL_INTERRUPT_MASK, ~0);
 
 		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			intel_interrupt_handler, &info);

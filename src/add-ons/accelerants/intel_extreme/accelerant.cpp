@@ -123,7 +123,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner regsCloner;
 	gInfo->regs_area = regsCloner.Clone("intel extreme regs",
-		(void **)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void **)&gInfo->registers, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
@@ -203,14 +203,13 @@ intel_init_accelerant(int device)
 	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
 		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
 
-	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
-	int lvdsRegister = isSNB ? PCH_DISPLAY_LVDS_PORT : INTEL_DISPLAY_LVDS_PORT;
-	uint32 lvds = read32(lvdsRegister);
+	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
 
 	// If we have an enabled display pipe we save the passed information and
 	// assume it is the valid panel size..
 	// Later we query for proper EDID info if it exists, or figure something
 	// else out. (Default modes, etc.)
+	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
 	if ((isSNB && (lvds & PCH_LVDS_DETECTED) != 0)
 		|| (!isSNB && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
 		save_lvds_mode();
@@ -219,11 +218,9 @@ intel_init_accelerant(int device)
 
 	TRACE(("head detected: %#x\n", gInfo->head_mode));
 	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
-		read32(isSNB ? PCH_DISPLAY_A_ANALOG_PORT : INTEL_DISPLAY_A_ANALOG_PORT),
-		read32(isSNB ? PCH_DISPLAY_A_DIGITAL_PORT
-			: INTEL_DISPLAY_A_DIGITAL_PORT),
-		read32(isSNB ? PCH_DISPLAY_B_DIGITAL_PORT
-			: INTEL_DISPLAY_B_DIGITAL_PORT), read32(lvdsRegister)));
+		read32(INTEL_DISPLAY_A_ANALOG_PORT),
+		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
+		read32(INTEL_DISPLAY_B_DIGITAL_PORT), read32(INTEL_DISPLAY_LVDS_PORT)));
 
 	status = create_mode_list();
 	if (status != B_OK) {

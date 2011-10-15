@@ -31,7 +31,7 @@ struct overlay_frame {
 };
 
 struct accelerant_info {
-	vuint8			*regs;
+	uint8			*registers;
 	area_id			regs_area;
 
 	intel_shared_info *shared_info;
@@ -74,15 +74,19 @@ extern accelerant_info *gInfo;
 // register access
 
 inline uint32
-read32(uint32 offset)
+read32(uint32 encodedRegister)
 {
-	return *(volatile uint32 *)(gInfo->regs + offset);
+	return *(volatile uint32 *)(gInfo->registers
+		+ gInfo->shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
+		+ REGISTER_REGISTER(encodedRegister));
 }
 
 inline void
-write32(uint32 offset, uint32 value)
+write32(uint32 encodedRegister, uint32 value)
 {
-	*(volatile uint32 *)(gInfo->regs + offset) = value;
+	*(volatile uint32 *)(gInfo->registers
+		+ gInfo->shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
+		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
 
 

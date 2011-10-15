@@ -17,16 +17,6 @@
 #include "intel_extreme_private.h"
 
 
-// PCI Communications
-
-#define read8(address)   		(*((volatile uint8*)(address)))
-#define read16(address)  		(*((volatile uint16*)(address)))
-#define read32(address) 		(*((volatile uint32*)(address)))
-#define write8(address, data)  	(*((volatile uint8*)(address)) = (data))
-#define write16(address, data) 	(*((volatile uint16*)(address)) = (data))
-#define write32(address, data) 	(*((volatile uint32*)(address)) = (data))
-
-
 extern char* gDeviceNames[];
 extern intel_info* gDeviceInfo[];
 extern pci_module_info* gPCI;
@@ -47,6 +37,42 @@ set_pci_config(pci_info* info, uint8 offset, uint8 size, uint32 value)
 {
 	gPCI->write_pci_config(info->bus, info->device, info->function, offset,
 		size, value);
+}
+
+
+static inline uint16
+read16(intel_info &info, uint32 encodedRegister)
+{
+	return *(volatile uint16 *)(info.registers
+		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
+		+ REGISTER_REGISTER(encodedRegister));
+}
+
+
+static inline uint32
+read32(intel_info &info, uint32 encodedRegister)
+{
+	return *(volatile uint32 *)(info.registers
+		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
+		+ REGISTER_REGISTER(encodedRegister));
+}
+
+
+static inline void
+write16(intel_info &info, uint32 encodedRegister, uint16 value)
+{
+	*(volatile uint16 *)(info.registers
+		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
+		+ REGISTER_REGISTER(encodedRegister)) = value;
+}
+
+
+static inline void
+write32(intel_info &info, uint32 encodedRegister, uint32 value)
+{
+	*(volatile uint32 *)(info.registers
+		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
+		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
 
 #endif  /* DRIVER_H */

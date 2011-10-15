@@ -76,14 +76,14 @@ getset_register(int argc, char **argv)
 	kprintf("intel_extreme register %#lx\n", reg);
 
 	intel_info &info = *gDeviceInfo[0];
-	uint32 oldValue = read32(info.registers + reg);
+	uint32 oldValue = read32(info, reg);
 
 	kprintf("  %svalue: %#lx (%lu)\n", set ? "old " : "", oldValue, oldValue);
 
 	if (set) {
-		write32(info.registers + reg, value);
+		write32(info, reg, value);
 
-		value = read32(info.registers + reg);
+		value = read32(info, reg);
 		kprintf("  new value: %#lx (%lu)\n", value, value);
 	}
 
