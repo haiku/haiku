@@ -522,7 +522,8 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case KB_GET_KEYBOARD_ID:
 		{
 			TRACE("ps2: ioctl KB_GET_KEYBOARD_ID\n");
-			return user_memcpy(buffer, &sKeyboardIds, sizeof(sKeyboardIds));
+			uint16 keyboardId = sKeyboardIds[1] << 8 | sKeyboardIds[0];
+			return user_memcpy(buffer, &keyboardId, sizeof(keyboardId));
 		}
 
 		case KB_SET_CONTROL_ALT_DEL_TIMEOUT:
