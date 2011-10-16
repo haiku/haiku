@@ -76,7 +76,7 @@ intel_interrupt_handler(void* data)
 {
 	intel_info &info = *(intel_info*)data;
 
-	uint16 identity = read16(info, INTEL_INTERRUPT_IDENTITY);
+	uint16 identity = read16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY));
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
@@ -103,7 +103,7 @@ intel_interrupt_handler(void* data)
 	}
 
 	// setting the bit clears it!
-	write16(info, INTEL_INTERRUPT_IDENTITY, identity);
+	write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), identity);
 
 	return handled;
 }
@@ -142,7 +142,7 @@ init_interrupt_handler(intel_info &info)
 			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 
-			write16(info, INTEL_INTERRUPT_IDENTITY, ~0);
+			write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
 
 			// enable interrupts - we only want VBLANK interrupts
 			bool hasPCH = info.device_type.HasPlatformControlHub();
@@ -150,9 +150,8 @@ init_interrupt_handler(intel_info &info)
 				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
 				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
 
-			write16(info, INTEL_INTERRUPT_ENABLED,
-				read16(info, INTEL_INTERRUPT_ENABLED) | enable);
-			write16(info, INTEL_INTERRUPT_MASK, ~enable);
+			write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
+			write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
 		}
 	}
 	if (status < B_OK) {
@@ -250,8 +249,6 @@ intel_extreme_init(intel_info &info)
 	// setup the register blocks for the different architectures
 	if (info.device_type.HasPlatformControlHub()) {
 		// PCH based platforms (IronLake and up)
-		blocks[REGISTER_BLOCK(REGS_INTERRUPT)]
-			= PCH_DE_INTERRUPT_REGISTER_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
 			= PCH_NORTH_SHARED_REGISTER_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
@@ -264,8 +261,6 @@ intel_extreme_init(intel_info &info)
 			= PCH_SOUTH_TRANSCODER_AND_PORT_REGISTER_BASE;
 	} else {
 		// (G)MCH/ICH based platforms
-		blocks[REGISTER_BLOCK(REGS_INTERRUPT)]
-			= MCH_INTERRUPT_REGISTER_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
 			= MCH_SHARED_REGISTER_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
@@ -401,8 +396,8 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		write16(info, INTEL_INTERRUPT_ENABLED, 0);
-		write16(info, INTEL_INTERRUPT_MASK, ~0);
+		write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+		write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
 
 		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			intel_interrupt_handler, &info);

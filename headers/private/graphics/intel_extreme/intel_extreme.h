@@ -61,7 +61,7 @@
 
 // We encode the register block into the value and extract/translate it when
 // actually accessing.
-#define REGISTER_BLOCK_COUNT				7
+#define REGISTER_BLOCK_COUNT				6
 #define REGISTER_BLOCK_SHIFT				24
 #define REGISTER_BLOCK_MASK					0xff000000
 #define REGISTER_REGISTER_MASK				0x00ffffff
@@ -69,15 +69,13 @@
 #define REGISTER_REGISTER(x) (x & REGISTER_REGISTER_MASK)
 
 #define REGS_FLAT							(0 << REGISTER_BLOCK_SHIFT)
-#define REGS_INTERRUPT						(1 << REGISTER_BLOCK_SHIFT)
-#define REGS_NORTH_SHARED					(2 << REGISTER_BLOCK_SHIFT)
-#define REGS_NORTH_PIPE_AND_PORT			(3 << REGISTER_BLOCK_SHIFT)
-#define REGS_NORTH_PLANE_CONTROL			(4 << REGISTER_BLOCK_SHIFT)
-#define REGS_SOUTH_SHARED					(5 << REGISTER_BLOCK_SHIFT)
-#define REGS_SOUTH_TRANSCODER_PORT			(6 << REGISTER_BLOCK_SHIFT)
+#define REGS_NORTH_SHARED					(1 << REGISTER_BLOCK_SHIFT)
+#define REGS_NORTH_PIPE_AND_PORT			(2 << REGISTER_BLOCK_SHIFT)
+#define REGS_NORTH_PLANE_CONTROL			(3 << REGISTER_BLOCK_SHIFT)
+#define REGS_SOUTH_SHARED					(4 << REGISTER_BLOCK_SHIFT)
+#define REGS_SOUTH_TRANSCODER_PORT			(5 << REGISTER_BLOCK_SHIFT)
 
 // register blocks for (G)MCH/ICH based platforms
-#define MCH_INTERRUPT_REGISTER_BASE						0x020a0
 #define MCH_SHARED_REGISTER_BASE						0x00000
 #define MCH_PIPE_AND_PORT_REGISTER_BASE					0x60000
 #define MCH_PLANE_CONTROL_REGISTER_BASE					0x70000
@@ -88,7 +86,6 @@
 // to a PCH based one, that means anything that used to communicate via (G)MCH
 // registers needs to use different ones on PCH based platforms (Ironlake and
 // up, SandyBridge, etc.).
-#define PCH_DE_INTERRUPT_REGISTER_BASE					0x44000
 #define PCH_NORTH_SHARED_REGISTER_BASE					0x40000
 #define PCH_NORTH_PIPE_AND_PORT_REGISTER_BASE			0x60000
 #define PCH_NORTH_PLANE_CONTROL_REGISTER_BASE			0x70000
@@ -338,13 +335,18 @@ struct intel_free_graphics_memory {
 #define INTEL_RING_BUFFER_ENABLED		1
 
 // interrupts
-#define INTEL_INTERRUPT_ENABLED			(0x0000 | REGS_INTERRUPT)
-#define INTEL_INTERRUPT_IDENTITY		(0x0004 | REGS_INTERRUPT)
-#define INTEL_INTERRUPT_MASK			(0x0008 | REGS_INTERRUPT)
-#define INTEL_INTERRUPT_STATUS			(0x000c | REGS_INTERRUPT)
+#define INTEL_INTERRUPT_ENABLED			0x02a0
+#define INTEL_INTERRUPT_IDENTITY		0x02a4
+#define INTEL_INTERRUPT_MASK			0x02a8
+#define INTEL_INTERRUPT_STATUS			0x02ac
 #define INTERRUPT_VBLANK_PIPEA			(1 << 7)
 #define INTERRUPT_VBLANK_PIPEB			(1 << 5)
-// TODO: verify that these are actually different on older versions
+
+// PCH interrupts
+#define PCH_INTERRUPT_STATUS			0x44000
+#define PCH_INTERRUPT_MASK				0x44004
+#define PCH_INTERRUPT_IDENTITY			0x44008
+#define PCH_INTERRUPT_ENABLED			0x4400c
 #define PCH_INTERRUPT_VBLANK_PIPEA		(1 << 7)
 #define PCH_INTERRUPT_VBLANK_PIPEB		(1 << 15)
 
