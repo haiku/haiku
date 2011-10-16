@@ -262,12 +262,12 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 			case 1:
 				args.v1.ucMisc = 0;
 				args.v1.ucAction = command;
-				if (0)	// TODO : HDMI?
+				if (0)	// TODO: HDMI?
 					args.v1.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
 				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-					// TODO : laptop display support
+					// TODO: laptop display support
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
 					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB)
@@ -289,7 +289,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 					//if (dig->coherent_mode)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_COHERENT;
 				}
-				if (0) // TODO : HDMI?
+				if (0) // TODO: HDMI?
 					args.v2.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 				args.v2.ucTruncate = 0;
@@ -297,7 +297,7 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 				args.v2.ucTemporal = 0;
 				args.v2.ucFRC = 0;
 				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-					// TODO : laptop display support
+					// TODO: laptop display support
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
 					//if (dig->lcd_misc & ATOM_PANEL_MISC_SPATIAL) {
@@ -364,8 +364,8 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 
 	args.ucAction = command;
 	args.ucDacStandard = ATOM_DAC1_PS2;
-		// TODO : or ATOM_DAC1_CV if ATOM_DEVICE_CV_SUPPORT
-		// TODO : or ATOM_DAC1_PAL or ATOM_DAC1_NTSC if else
+		// TODO: or ATOM_DAC1_CV if ATOM_DEVICE_CV_SUPPORT
+		// TODO: or ATOM_DAC1_PAL or ATOM_DAC1_NTSC if else
 
 	args.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
@@ -474,7 +474,7 @@ encoder_crtc_scratch(uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	// TODO : r500
+	// TODO: r500
 	uint32 biosScratch3 = Read32(OUT, R600_BIOS_3_SCRATCH);
 
 	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
@@ -510,7 +510,7 @@ encoder_crtc_scratch(uint8 crtcID)
 		biosScratch3 |= (crtcID << 25);
 	}
 
-	// TODO : r500
+	// TODO: r500
 	Write32(OUT, R600_BIOS_3_SCRATCH, biosScratch3);
 }
 
@@ -523,7 +523,7 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	// TODO : r500
+	// TODO: r500
 	uint32 biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
 
 	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
@@ -617,7 +617,7 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
-			// TODO : encoder dpms set newer cards
+			// TODO: encoder dpms set newer cards
 			// If DCE5, dvo true
 			// If DCE3, dig true
 			// else...
@@ -634,7 +634,7 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-			// TODO : encoder dpms dce5 dac
+			// TODO: encoder dpms dce5 dac
 			// else...
 			/*
 			if (radeon_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT))
@@ -647,7 +647,7 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-			// TODO : tv or CV encoder on DAC2
+			// TODO: tv or CV encoder on DAC2
 			index = GetIndexIntoMasterTable(COMMAND, DAC2OutputControl);
 			break;
 	}

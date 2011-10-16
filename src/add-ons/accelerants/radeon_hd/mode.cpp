@@ -38,7 +38,7 @@ extern "C" void _sPrintf(const char *format, ...);
 status_t
 create_mode_list(void)
 {
-	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
+	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
 
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
@@ -82,7 +82,7 @@ radeon_get_mode_list(display_mode *modeList)
 status_t
 radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 {
-	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
+	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
 
 	TRACE("%s\n", __func__);
 	if (!gInfo->shared_info->has_edid)
@@ -108,7 +108,7 @@ radeon_dpms_capabilities(void)
 uint32
 radeon_dpms_mode(void)
 {
-	// TODO : this really isn't a good long-term solution
+	// TODO: this really isn't a good long-term solution
 	// we may need to look at the encoder dpms scratch registers
 	return gInfo->dpms_mode;
 }
@@ -152,7 +152,7 @@ radeon_dpms_set(int mode)
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	// TODO : multi-monitor?  for now we use VESA and not gDisplay edid
+	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id]->active == false)
@@ -173,12 +173,12 @@ radeon_set_display_mode(display_mode *mode)
 		display_crtc_power(id, ATOM_DISABLE);
 
 		// *** CRT controler mode set
-		// TODO : program SS
+		// TODO: program SS
 		pll_set(ATOM_PPLL1, mode->timing.pixel_clock, id);
-			// TODO : check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
+			// TODO: check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
 		display_crtc_set_dtd(id, mode);
 
-		// TODO : vvvv : atombios_crtc_set_base
+		// TODO: vvvv : atombios_crtc_set_base
 		display_crtc_fb_set_dce1(id, mode);
 		// atombios_overscan_setup
 		display_crtc_scale(id, mode);
@@ -280,7 +280,7 @@ is_mode_supported(display_mode *mode)
 	if (is_mode_sane(mode) != B_OK)
 		return false;
 
-	// TODO : is_mode_supported on *which* display?
+	// TODO: is_mode_supported on *which* display?
 	uint32 crtid = 0;
 
 	// if we have edid info, check frequency adginst crt reported valid ranges

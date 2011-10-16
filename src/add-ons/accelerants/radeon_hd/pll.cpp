@@ -300,7 +300,7 @@ pll_setup_flags(pll_info *pll, uint8 crtcID)
 status_t
 pll_adjust(pll_info *pll, uint8 crtcID)
 {
-	// TODO : PLL flags
+	// TODO: PLL flags
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	uint32 pixelClock = pll->pixelClock;
@@ -333,7 +333,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 						args.v1.ucTransmitterID = encoderID;
 						args.v1.ucEncodeMode = encoderMode;
-						// TODO : SS and SS % > 0
+						// TODO: SS and SS % > 0
 						if (0) {
 							args.v1.ucConfig
 								|= ADJUST_DISPLAY_CONFIG_SS_ENABLE;
@@ -351,15 +351,15 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 						args.v3.sInput.ucTransmitterID = encoderID;
 						args.v3.sInput.ucEncodeMode = encoderMode;
 						args.v3.sInput.ucDispPllConfig = 0;
-						// TODO : SS and SS % > 0
+						// TODO: SS and SS % > 0
 						if (0) {
 							args.v3.sInput.ucDispPllConfig
 								|= DISPPLL_CONFIG_SS_ENABLE;
 						}
-						// TODO : if ATOM_DEVICE_DFP_SUPPORT
-						// TODO : display port DP
+						// TODO: if ATOM_DEVICE_DFP_SUPPORT
+						// TODO: display port DP
 
-						// TODO : is DP?
+						// TODO: is DP?
 						args.v3.sInput.ucExtTransmitterID = 0;
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -436,8 +436,8 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 
 	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
 
-	uint32 bpc = 8;
-		// TODO : BPC == Digital Depth, EDID 1.4+ on digital displays
+	uint32 bitsPerChannel = 8;
+		// TODO: Digital Depth, EDID 1.4+ on digital displays
 		// isn't in Haiku edid common code?
 
 	switch (tableMinor) {
@@ -490,7 +490,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v5.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_REF_DIV_SRC;
-			switch (bpc) {
+			switch (bitsPerChannel) {
 				case 8:
 				default:
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
@@ -516,7 +516,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v6.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_REF_DIV_SRC;
-			switch (bpc) {
+			switch (bitsPerChannel) {
 				case 8:
 				default:
 					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_24BPP;

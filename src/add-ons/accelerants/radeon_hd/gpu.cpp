@@ -189,7 +189,7 @@ radeon_gpu_mc_halt()
 void
 radeon_gpu_mc_resume()
 {
-	// TODO : do surface addresses disappear on mc halt?
+	// TODO: do surface addresses disappear on mc halt?
 	//Write32(OUT, D1GRPH_PRIMARY_SURFACE_ADDRESS, rdev->mc.vram_start);
 	//Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, rdev->mc.vram_start);
 	//Write32(OUT, D2GRPH_PRIMARY_SURFACE_ADDRESS, rdev->mc.vram_start);
@@ -263,7 +263,7 @@ radeon_gpu_mc_setup()
 status_t
 radeon_gpu_irq_setup()
 {
-	// TODO : Stub for IRQ setup
+	// TODO: Stub for IRQ setup
 
 	// allocate rings via r600_ih_ring_alloc
 
@@ -446,8 +446,8 @@ radeon_gpu_gpio_setup()
 	for (uint32 i = 0; i < numIndices; i++) {
 		ATOM_GPIO_I2C_ASSIGMENT *gpio = &i2c_info->asGPIO_Info[i];
 
-		// TODO : if DCE 4 and i == 7 ... manual override for evergreen
-		// TODO : if DCE 3 and i == 4 ... manual override
+		// TODO: if DCE 4 and i == 7 ... manual override for evergreen
+		// TODO: if DCE 3 and i == 4 ... manual override
 
 		// populate gpio information
 		gGPIOInfo[i]->hw_line

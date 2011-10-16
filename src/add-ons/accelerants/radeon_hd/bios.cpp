@@ -127,15 +127,10 @@ radeon_init_bios(uint8* bios)
 	atom_card_info->reg_read = Read32Cail;
 	atom_card_info->reg_write = Write32Cail;
 
-	if (false) {
-		// TODO : if rio_mem, use ioreg
-		//atom_card_info->ioreg_read = cail_ioreg_read;
-		//atom_card_info->ioreg_write = cail_ioreg_write;
-	} else {
-		TRACE("%s: Cannot find PCI I/O BAR; using MMIO\n", __func__);
-		atom_card_info->ioreg_read = Read32Cail;
-		atom_card_info->ioreg_write = Write32Cail;
-	}
+	// use MMIO instead of PCI I/O BAR
+	atom_card_info->ioreg_read = Read32Cail;
+	atom_card_info->ioreg_write = Write32Cail;
+
 	atom_card_info->mc_read = _read32;
 	atom_card_info->mc_write = _write32;
 	atom_card_info->pll_read = _read32;

@@ -157,7 +157,7 @@ init_registers(register_info* regs, uint8 crtid)
 	}
 
 	// Populate common registers
-	// TODO : Wait.. this doesn't work with Eyefinity > crt 1.
+	// TODO: Wait.. this doesn't work with Eyefinity > crt 1.
 
 	regs->modeCenter
 		= crtid == 1 ? D2MODE_CENTER : D1MODE_CENTER;
@@ -287,7 +287,7 @@ detect_connectors_legacy()
 		// uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
 		// gConnector[i]->line_mux = ci.sucI2cId.ucAccess;
 
-		// TODO : give tv unique connector ids
+		// TODO: give tv unique connector ids
 
 		// Always set CRT1 and CRT2 as VGA, some cards incorrectly set
 		// VGA ports as DVI
@@ -297,7 +297,7 @@ detect_connectors_legacy()
 		gConnector[i]->valid = true;
 		gConnector[i]->encoder.flags = (1 << i);
 
-		// TODO : add the encoder
+		// TODO: add the encoder
 		#if 0
 		radeon_add_atom_encoder(dev,
 			radeon_get_encoder_enum(dev,
@@ -308,9 +308,9 @@ detect_connectors_legacy()
 		#endif
 	}
 
-	// TODO : combine shared connectors
+	// TODO: combine shared connectors
 
-	// TODO : add connectors
+	// TODO: add connectors
 
 	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE_INFO; i++) {
 		if (gConnector[i]->valid == true) {
@@ -408,7 +408,7 @@ detect_connectors()
 
 			uint16 igp_lane_info;
 			if (0)
-				ERROR("%s: TODO : IGP chip connector detection\n", __func__);
+				ERROR("%s: TODO: IGP chip connector detection\n", __func__);
 			else {
 				igp_lane_info = 0;
 				connectorType = connector_convert[con_obj_id];
@@ -436,7 +436,7 @@ detect_connectors()
 
 				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
 					// Found an encoder
-					// TODO : it may be possible to have more then one encoder
+					// TODO: it may be possible to have more then one encoder
 					int32 k;
 					for (k = 0; k < enc_obj->ucNumberOfObjects; k++) {
 						uint16 encoder_obj
@@ -594,7 +594,7 @@ detect_connectors()
 										i2c_config->ucAccess);
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
-									// TODO : HPD (Hot Plug)
+									// TODO: HPD (Hot Plug)
 									break;
 							}
 
@@ -606,7 +606,7 @@ detect_connectors()
 				}
 			}
 
-			// TODO : aux chan transactions
+			// TODO: aux chan transactions
 
 			// record connector information
 			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
@@ -758,7 +758,7 @@ display_get_encoder_mode(uint32 connectorIndex)
 	switch (gConnector[connectorIndex]->type) {
 		case VIDEO_CONNECTOR_DVII:
 		case VIDEO_CONNECTOR_HDMIB: /* HDMI-B is DL-DVI; analog works fine */
-			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
+			// TODO: if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
 			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
 			// if (gConnector[connectorIndex]->use_digital)
 			//	return ATOM_ENCODER_MODE_DVI;
@@ -768,18 +768,19 @@ display_get_encoder_mode(uint32 connectorIndex)
 		case VIDEO_CONNECTOR_DVID:
 		case VIDEO_CONNECTOR_HDMIA:
 		default:
-			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
+			// TODO: if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
 			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
 			return ATOM_ENCODER_MODE_DVI;
 		case VIDEO_CONNECTOR_LVDS:
 			return ATOM_ENCODER_MODE_LVDS;
 		case VIDEO_CONNECTOR_DP:
 			// dig_connector = radeon_connector->con_priv;
-			// if ((dig_connector->dp_sink_type == CONNECTOR_OBJECT_ID_DISPLAYPORT)
+			// if ((dig_connector->dp_sink_type
+			//	== CONNECTOR_OBJECT_ID_DISPLAYPORT)
 			// 	|| (dig_connector->dp_sink_type == CONNECTOR_OBJECT_ID_eDP)) {
 			// 	return ATOM_ENCODER_MODE_DP;
 			// }
-			// TODO : if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
+			// TODO: if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
 			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
 			return ATOM_ENCODER_MODE_DVI;
 		case VIDEO_CONNECTOR_EDP:
