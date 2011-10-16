@@ -15,7 +15,7 @@
 struct command {
 	uint32	opcode;
 
-	uint32 *Data() { return &opcode; }
+	uint32* Data() { return &opcode; }
 };
 
 class QueueCommands {

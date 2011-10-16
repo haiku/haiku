@@ -13,7 +13,7 @@
 
 //#define TRACE_DPMS
 #ifdef TRACE_DPMS
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
@@ -27,21 +27,32 @@ enable_display_plane(bool enable)
 	uint32 planeBControl = read32(INTEL_DISPLAY_B_CONTROL);
 
 	if (enable) {
-		// when enabling the display, the register values are updated automatically
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_CONTROL, planeAControl | DISPLAY_CONTROL_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_CONTROL, planeBControl | DISPLAY_CONTROL_ENABLED);
+		// when enabling the display, the register values are updated
+		// automatically
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_CONTROL,
+				planeAControl | DISPLAY_CONTROL_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_CONTROL,
+				planeBControl | DISPLAY_CONTROL_ENABLED);
+		}
 
 		read32(INTEL_DISPLAY_A_BASE);
 			// flush the eventually cached PCI bus writes
 	} else {
 		// when disabling it, we have to trigger the update using a write to
 		// the display base address
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_CONTROL, planeAControl & ~DISPLAY_CONTROL_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_CONTROL, planeBControl & ~DISPLAY_CONTROL_ENABLED);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_CONTROL,
+				planeAControl & ~DISPLAY_CONTROL_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_CONTROL,
+				planeBControl & ~DISPLAY_CONTROL_ENABLED);
+		}
 
 		set_frame_buffer_base();
 	}
@@ -55,15 +66,25 @@ enable_display_pipe(bool enable)
 	uint32 pipeBControl = read32(INTEL_DISPLAY_B_PIPE_CONTROL);
 
 	if (enable) {
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_PIPE_CONTROL, pipeAControl | DISPLAY_PIPE_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_PIPE_CONTROL, pipeBControl | DISPLAY_PIPE_ENABLED);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_PIPE_CONTROL,
+				pipeAControl | DISPLAY_PIPE_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_PIPE_CONTROL,
+				pipeBControl | DISPLAY_PIPE_ENABLED);
+		}
 	} else {
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_PIPE_CONTROL, pipeAControl & ~DISPLAY_PIPE_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_PIPE_CONTROL, pipeBControl & ~DISPLAY_PIPE_ENABLED);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_PIPE_CONTROL,
+				pipeAControl & ~DISPLAY_PIPE_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_PIPE_CONTROL,
+				pipeBControl & ~DISPLAY_PIPE_ENABLED);
+		}
 	}
 
 	read32(INTEL_DISPLAY_A_BASE);
@@ -167,7 +188,8 @@ set_display_power_mode(uint32 mode)
 		write32(INTEL_DISPLAY_A_ANALOG_PORT,
 			(read32(INTEL_DISPLAY_A_ANALOG_PORT)
 				& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
-			| monitorMode | (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
+			| monitorMode
+			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
 	}
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
 		write32(INTEL_DISPLAY_B_DIGITAL_PORT,

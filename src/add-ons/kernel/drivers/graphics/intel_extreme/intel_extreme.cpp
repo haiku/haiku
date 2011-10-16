@@ -31,7 +31,7 @@
 
 
 static void
-init_overlay_registers(overlay_registers *registers)
+init_overlay_registers(overlay_registers* registers)
 {
 	memset(registers, 0, B_PAGE_SIZE);
 
@@ -46,7 +46,7 @@ read_settings(bool &hardwareCursor)
 {
 	hardwareCursor = false;
 
-	void *settings = load_driver_settings("intel_extreme");
+	void* settings = load_driver_settings("intel_extreme");
 	if (settings != NULL) {
 		hardwareCursor = get_driver_boolean_parameter(settings,
 			"hardware_cursor", true, true);
@@ -72,9 +72,9 @@ release_vblank_sem(intel_info &info)
 
 
 static int32
-intel_interrupt_handler(void *data)
+intel_interrupt_handler(void* data)
 {
-	intel_info &info = *(intel_info *)data;
+	intel_info &info = *(intel_info*)data;
 
 	uint16 identity = read16(info, INTEL_INTERRUPT_IDENTITY);
 	if (identity == 0)
@@ -135,7 +135,7 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = false;
 
 		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
-			&intel_interrupt_handler, (void *)&info, 0);
+			&intel_interrupt_handler, (void*)&info, 0);
 		if (status == B_OK) {
 			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
@@ -162,7 +162,8 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = true;
 
 		// TODO: fake interrupts!
-		TRACE((DEVICE_NAME "Fake interrupt mode (no PCI interrupt line assigned)"));
+		TRACE((DEVICE_NAME "Fake interrupt mode (no PCI interrupt line "
+			"assigned)"));
 		status = B_ERROR;
 	}
 
@@ -185,7 +186,7 @@ intel_free_memory(intel_info &info, addr_t base)
 
 status_t
 intel_allocate_memory(intel_info &info, size_t size, size_t alignment,
-	uint32 flags, addr_t *_base, phys_addr_t *_physicalBase)
+	uint32 flags, addr_t* _base, phys_addr_t* _physicalBase)
 {
 	return gGART->allocate_memory(info.aperture, size, alignment,
 		flags, _base, _physicalBase);
@@ -202,7 +203,7 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("intel extreme shared info",
-		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
+		(void**)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + 3 * B_PAGE_SIZE,
 		B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK) {
@@ -210,7 +211,7 @@ intel_extreme_init(intel_info &info)
 		return info.shared_area;
 	}
 
-	memset((void *)info.shared_info, 0, sizeof(intel_shared_info));
+	memset((void*)info.shared_info, 0, sizeof(intel_shared_info));
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
@@ -233,17 +234,17 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
-		(void *)info.pci->u.h0.base_registers[mmioIndex],
+		(void*)info.pci->u.h0.base_registers[mmioIndex],
 		info.pci->u.h0.base_register_sizes[mmioIndex],
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		(void **)&info.registers);
+		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
 		gGART->unmap_aperture(info.aperture);
 		return info.registers_area;
 	}
 
-	uint32 *blocks = info.shared_info->register_blocks;
+	uint32* blocks = info.shared_info->register_blocks;
 	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
 
 	// setup the register blocks for the different architectures
@@ -278,8 +279,9 @@ intel_extreme_init(intel_info &info)
 	}
 
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
-	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci, PCI_command, 2)
-		| PCI_command_io | PCI_command_memory | PCI_command_master);
+	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci,
+		PCI_command, 2) | PCI_command_io | PCI_command_memory
+		| PCI_command_master);
 
 	// reserve ring buffer memory (currently, this memory is placed in
 	// the graphics memory), but this could bring us problems with
@@ -287,7 +289,7 @@ intel_extreme_init(intel_info &info)
 
 	ring_buffer &primary = info.shared_info->primary_ring_buffer;
 	if (intel_allocate_memory(info, 16 * B_PAGE_SIZE, 0, 0,
-			(addr_t *)&primary.base) == B_OK) {
+			(addr_t*)&primary.base) == B_OK) {
 		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
 		primary.size = 16 * B_PAGE_SIZE;
 		primary.offset = (addr_t)primary.base - info.aperture_base;
@@ -328,7 +330,7 @@ intel_extreme_init(intel_info &info)
 	gGART->get_aperture_info(info.aperture, &apertureInfo);
 
 	info.shared_info->registers_area = info.registers_area;
-	info.shared_info->graphics_memory = (uint8 *)info.aperture_base;
+	info.shared_info->graphics_memory = (uint8*)info.aperture_base;
 	info.shared_info->physical_graphics_memory = apertureInfo.physical_base;
 	info.shared_info->graphics_memory_size = apertureInfo.size;
 	info.shared_info->frame_buffer = 0;
@@ -361,7 +363,7 @@ intel_extreme_init(intel_info &info)
 	if (intel_allocate_memory(info, B_PAGE_SIZE, 0,
 			intel_uses_physical_overlay(*info.shared_info)
 				? B_APERTURE_NEED_PHYSICAL : 0,
-			(addr_t *)&info.overlay_registers,
+			(addr_t*)&info.overlay_registers,
 			&info.shared_info->physical_overlay_registers) == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
 			- info.aperture_base;
@@ -372,13 +374,13 @@ intel_extreme_init(intel_info &info)
 	// Allocate hardware status page and the cursor memory
 
 	if (intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
-			(addr_t *)info.shared_info->status_page,
+			(addr_t*)info.shared_info->status_page,
 			&info.shared_info->physical_status_page) == B_OK) {
 		// TODO: set status page
 	}
 	if (hardwareCursor) {
 		intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
-			(addr_t *)&info.shared_info->cursor_memory,
+			(addr_t*)&info.shared_info->cursor_memory,
 			&info.shared_info->physical_cursor_memory);
 	}
 

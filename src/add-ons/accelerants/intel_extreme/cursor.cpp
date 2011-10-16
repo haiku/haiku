@@ -15,7 +15,7 @@
 
 status_t
 intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
-	uint8 *andMask, uint8 *xorMask)
+	uint8* andMask, uint8* xorMask)
 {
 	if (width > 64 || height > 64)
 		return B_BAD_VALUE;
@@ -23,7 +23,8 @@ intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 	write32(INTEL_CURSOR_CONTROL, 0);
 		// disable cursor
 
-	// In two-color mode, the data is ordered as follows (always 64 bit per line):
+	// In two-color mode, the data is ordered as follows (always 64 bit per
+	// line):
 	//	plane 1: line 0 (AND mask)
 	//	plane 0: line 0 (XOR mask)
 	//	plane 1: line 1 (AND mask)
@@ -33,7 +34,7 @@ intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 	// transparent, for 0x3 it inverts the background, so only the first
 	// two palette entries will be used (since we're using the 2 color mode).
 
-	uint8 *data = gInfo->shared_info->cursor_memory;
+	uint8* data = gInfo->shared_info->cursor_memory;
 	uint8 byteWidth = (width + 7) / 8;
 
 	for (int32 y = 0; y < height; y++) {
@@ -49,10 +50,12 @@ intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 
 	gInfo->shared_info->cursor_format = CURSOR_FORMAT_2_COLORS;
 
-	write32(INTEL_CURSOR_CONTROL, CURSOR_ENABLED | gInfo->shared_info->cursor_format);
+	write32(INTEL_CURSOR_CONTROL,
+		CURSOR_ENABLED | gInfo->shared_info->cursor_format);
 	write32(INTEL_CURSOR_SIZE, height << 12 | width);
 
-	write32(INTEL_CURSOR_BASE, (uint32)gInfo->shared_info->physical_graphics_memory
+	write32(INTEL_CURSOR_BASE,
+		(uint32)gInfo->shared_info->physical_graphics_memory
 		+ gInfo->shared_info->cursor_buffer_offset);
 
 	// changing the hot point changes the cursor position, too
@@ -104,7 +107,8 @@ intel_show_cursor(bool isVisible)
 
 	write32(INTEL_CURSOR_CONTROL, (isVisible ? CURSOR_ENABLED : 0)
 		| gInfo->shared_info->cursor_format);
-	write32(INTEL_CURSOR_BASE, (uint32)gInfo->shared_info->physical_graphics_memory
+	write32(INTEL_CURSOR_BASE,
+		(uint32)gInfo->shared_info->physical_graphics_memory
 		+ gInfo->shared_info->cursor_buffer_offset);
 
 	gInfo->shared_info->cursor_visible = isVisible;

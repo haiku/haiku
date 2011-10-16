@@ -16,7 +16,7 @@
 
 //#define TRACE_MEMORY
 #ifdef TRACE_MEMORY
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;

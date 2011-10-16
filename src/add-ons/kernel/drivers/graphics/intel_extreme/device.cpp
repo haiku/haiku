@@ -36,12 +36,15 @@
 
 /* device hooks prototypes */
 
-static status_t device_open(const char *name, uint32 flags, void **_cookie);
-static status_t device_close(void *data);
-static status_t device_free(void *data);
-static status_t device_ioctl(void *data, uint32 opcode, void *buffer, size_t length);
-static status_t device_read(void *data, off_t offset, void *buffer, size_t *length);
-static status_t device_write(void *data, off_t offset, const void *buffer, size_t *length);
+static status_t device_open(const char* name, uint32 flags, void** _cookie);
+static status_t device_close(void* data);
+static status_t device_free(void* data);
+static status_t device_ioctl(void* data, uint32 opcode, void* buffer,
+	size_t length);
+static status_t device_read(void* data, off_t offset, void* buffer,
+	size_t* length);
+static status_t device_write(void* data, off_t offset, const void* buffer,
+	size_t* length);
 
 
 device_hooks gDeviceHooks = {
@@ -60,7 +63,7 @@ device_hooks gDeviceHooks = {
 
 #ifdef DEBUG_COMMANDS
 static int
-getset_register(int argc, char **argv)
+getset_register(int argc, char** argv)
 {
 	if (argc < 2 || argc > 3) {
 		kprintf("usage: %s <register> [set-to-value]\n", argv[0]);
@@ -96,14 +99,14 @@ getset_register(int argc, char **argv)
 
 
 static status_t
-device_open(const char *name, uint32 /*flags*/, void **_cookie)
+device_open(const char* name, uint32 /*flags*/, void** _cookie)
 {
 	TRACE((DEVICE_NAME ": open(name = %s)\n", name));
 	int32 id;
 
 	// find accessed device
 	{
-		char *thisName;
+		char* thisName;
 
 		// search for device name
 		for (id = 0; (thisName = gDeviceNames[id]) != NULL; id++) {
@@ -114,7 +117,7 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 			return B_BAD_VALUE;
 	}
 
-	intel_info *info = gDeviceInfo[id];
+	intel_info* info = gDeviceInfo[id];
 
 	mutex_lock(&gLock);
 
@@ -142,7 +145,7 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 
 
 static status_t
-device_close(void */*data*/)
+device_close(void* /*data*/)
 {
 	TRACE((DEVICE_NAME ": close\n"));
 	return B_OK;
@@ -150,9 +153,9 @@ device_close(void */*data*/)
 
 
 static status_t
-device_free(void *data)
+device_free(void* data)
 {
-	struct intel_info *info = (intel_info *)data;
+	struct intel_info* info = (intel_info*)data;
 
 	mutex_lock(&gLock);
 
@@ -173,20 +176,20 @@ device_free(void *data)
 
 
 static status_t
-device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
+device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 {
-	struct intel_info *info = (intel_info *)data;
+	struct intel_info* info = (intel_info*)data;
 
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
-			strcpy((char *)buffer, INTEL_ACCELERANT_NAME);
+			strcpy((char*)buffer, INTEL_ACCELERANT_NAME);
 			TRACE((DEVICE_NAME ": accelerant: %s\n", INTEL_ACCELERANT_NAME));
 			return B_OK;
 
 		// needed to share data between kernel and accelerant
 		case INTEL_GET_PRIVATE_DATA:
 		{
-			intel_get_private_data *data = (intel_get_private_data *)buffer;
+			intel_get_private_data* data = (intel_get_private_data* )buffer;
 
 			if (data->magic == INTEL_PRIVATE_DATA_MAGIC) {
 				data->shared_info_area = info->shared_area;
@@ -198,12 +201,12 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 		// needed for cloning
 		case INTEL_GET_DEVICE_NAME:
 #ifdef __HAIKU__
-			if (user_strlcpy((char *)buffer, gDeviceNames[info->id],
+			if (user_strlcpy((char* )buffer, gDeviceNames[info->id],
 					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 #else
-			strncpy((char *)buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH);
-			((char *)buffer)[B_PATH_NAME_LENGTH - 1] = '\0';
+			strncpy((char* )buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH);
+			((char* )buffer)[B_PATH_NAME_LENGTH - 1] = '\0';
 #endif
 			return B_OK;
 
@@ -216,7 +219,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 					sizeof(intel_allocate_graphics_memory)) < B_OK)
 				return B_BAD_ADDRESS;
 #else
-			memcpy(&allocMemory, buffer, sizeof(intel_allocate_graphics_memory));
+			memcpy(&allocMemory, buffer,
+				sizeof(intel_allocate_graphics_memory));
 #endif
 
 			if (allocMemory.magic != INTEL_PRIVATE_DATA_MAGIC)
@@ -224,7 +228,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 
 			status_t status = intel_allocate_memory(*info, allocMemory.size,
 				allocMemory.alignment, allocMemory.flags,
-				(addr_t *)&allocMemory.buffer_base);
+				(addr_t* )&allocMemory.buffer_base);
 			if (status == B_OK) {
 				// copy result
 #ifdef __HAIKU__
@@ -266,7 +270,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 
 
 static status_t
-device_read(void */*data*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
+device_read(void* /*data*/, off_t /*pos*/, void* /*buffer*/, size_t* _length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;
@@ -274,7 +278,8 @@ device_read(void */*data*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
 
 
 static status_t
-device_write(void */*data*/, off_t /*pos*/, const void */*buffer*/, size_t *_length)
+device_write(void* /*data*/, off_t /*pos*/, const void* /*buffer*/,
+	size_t* _length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;

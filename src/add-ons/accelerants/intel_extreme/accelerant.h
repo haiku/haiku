@@ -31,17 +31,17 @@ struct overlay_frame {
 };
 
 struct accelerant_info {
-	uint8			*registers;
+	uint8*			registers;
 	area_id			regs_area;
 
-	intel_shared_info *shared_info;
+	intel_shared_info* shared_info;
 	area_id			shared_info_area;
 
-	display_mode	*mode_list;		// cloned list of standard display modes
+	display_mode*	mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
-	struct overlay_registers *overlay_registers;
-	overlay			*current_overlay;
+	struct overlay_registers* overlay_registers;
+	overlay*		current_overlay;
 	overlay_view	last_overlay_view;
 	overlay_frame	last_overlay_frame;
 	uint32			last_horizontal_overlay_scale;
@@ -69,14 +69,14 @@ struct accelerant_info {
 #define HEAD_MODE_CLONE			0x03
 #define HEAD_MODE_LVDS_PANEL	0x08
 
-extern accelerant_info *gInfo;
+extern accelerant_info* gInfo;
 
 // register access
 
 inline uint32
 read32(uint32 encodedRegister)
 {
-	return *(volatile uint32 *)(gInfo->registers
+	return *(volatile uint32*)(gInfo->registers
 		+ gInfo->shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
 		+ REGISTER_REGISTER(encodedRegister));
 }
@@ -84,7 +84,7 @@ read32(uint32 encodedRegister)
 inline void
 write32(uint32 encodedRegister, uint32 value)
 {
-	*(volatile uint32 *)(gInfo->registers
+	*(volatile uint32*)(gInfo->registers
 		+ gInfo->shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
 		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
@@ -96,7 +96,7 @@ extern void set_display_power_mode(uint32 mode);
 
 // engine.cpp
 extern void uninit_ring_buffer(ring_buffer &ringBuffer);
-extern void setup_ring_buffer(ring_buffer &ringBuffer, const char *name);
+extern void setup_ring_buffer(ring_buffer &ringBuffer, const char* name);
 
 // modes.cpp
 extern void wait_for_vblank(void);

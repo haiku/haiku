@@ -23,7 +23,7 @@
 
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
@@ -63,19 +63,23 @@ split_coefficient(double &coefficient, int32 mantissaSize,
 	int32 maxValue = 1 << mantissaSize;
 	res = 12 - mantissaSize;
 
-	if ((intCoefficient = (int)(absCoefficient * 4 * maxValue + 0.5)) < maxValue) {
+	if ((intCoefficient = (int)(absCoefficient * 4 * maxValue + 0.5))
+			< maxValue) {
 		splitCoefficient.exponent = 3;
 		splitCoefficient.mantissa = intCoefficient << res;
 		coefficient = (double)intCoefficient / (double)(4 * maxValue);
-	} else if ((intCoefficient = (int)(absCoefficient * 2 * maxValue + 0.5)) < maxValue) {
+	} else if ((intCoefficient = (int)(absCoefficient * 2 * maxValue + 0.5))
+			< maxValue) {
 		splitCoefficient.exponent = 2;
 		splitCoefficient.mantissa = intCoefficient << res;
 		coefficient = (double)intCoefficient / (double)(2 * maxValue);
-	} else if ((intCoefficient = (int)(absCoefficient * maxValue + 0.5)) < maxValue) {
+	} else if ((intCoefficient = (int)(absCoefficient * maxValue + 0.5))
+			< maxValue) {
 		splitCoefficient.exponent = 1;
 		splitCoefficient.mantissa = intCoefficient << res;
 		coefficient = (double)intCoefficient / (double)maxValue;
-	} else if ((intCoefficient = (int)(absCoefficient * maxValue * 0.5 + 0.5)) < maxValue) {
+	} else if ((intCoefficient = (int)(absCoefficient * maxValue * 0.5 + 0.5))
+			< maxValue) {
 		splitCoefficient.exponent = 0;
 		splitCoefficient.mantissa = intCoefficient << res;
 		coefficient = (double)intCoefficient / (double)(maxValue / 2);
@@ -94,7 +98,7 @@ split_coefficient(double &coefficient, int32 mantissaSize,
 
 static void
 update_coefficients(int32 taps, double filterCutOff, bool horizontal, bool isY,
-	phase_coefficient *splitCoefficients)
+	phase_coefficient* splitCoefficients)
 {
 	if (filterCutOff < 1)
 		filterCutOff = 1;
@@ -184,7 +188,7 @@ static void
 set_color_key(uint8 red, uint8 green, uint8 blue, uint8 redMask,
 	uint8 greenMask, uint8 blueMask)
 {
-	overlay_registers *registers = gInfo->overlay_registers;
+	overlay_registers* registers = gInfo->overlay_registers;
 
 	registers->color_key_red = red;
 	registers->color_key_green = green;
@@ -197,7 +201,7 @@ set_color_key(uint8 red, uint8 green, uint8 blue, uint8 redMask,
 
 
 static void
-set_color_key(const overlay_window *window)
+set_color_key(const overlay_window* window)
 {
 	switch (gInfo->shared_info->current_mode.space) {
 		case B_CMAP8:
@@ -205,13 +209,13 @@ set_color_key(const overlay_window *window)
 			break;
 		case B_RGB15:
 			set_color_key(window->red.value << 3, window->green.value << 3,
-				window->blue.value << 3, window->red.mask << 3, window->green.mask << 3,
-				window->blue.mask << 3);
+				window->blue.value << 3, window->red.mask << 3,
+				window->green.mask << 3, window->blue.mask << 3);
 			break;
 		case B_RGB16:
 			set_color_key(window->red.value << 3, window->green.value << 2,
-				window->blue.value << 3, window->red.mask << 3, window->green.mask << 2,
-				window->blue.mask << 3);
+				window->blue.value << 3, window->red.mask << 3,
+				window->green.mask << 2, window->blue.mask << 3);
 			break;
 
 		default:
@@ -239,9 +243,11 @@ update_overlay(bool updateCoefficients)
 	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	queue.PutFlush();
 
-	TRACE(("update overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), ERR: %lx\n",
-		read32(INTEL_OVERLAY_UPDATE), read32(INtEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
-		*(((uint32 *)gInfo->overlay_registers) + 0x68/4), read32(0x30168), read32(0x2024)));
+	TRACE(("update overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), "
+		"ERR: %lx\n", read32(INTEL_OVERLAY_UPDATE), read32(INtEL_OVERLAY_TEST),
+		read32(INTEL_OVERLAY_STATUS),
+		*(((uint32*)gInfo->overlay_registers) + 0x68/4), read32(0x30168),
+		read32(0x2024)));
 }
 
 
@@ -259,9 +265,11 @@ show_overlay(void)
 	queue.PutOverlayFlip(COMMAND_OVERLAY_ON, true);
 	queue.PutFlush();
 
-	TRACE(("show overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), ERR: %lx\n",
-		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
-		*(((uint32 *)gInfo->overlay_registers) + 0x68/4), read32(0x30168), read32(0x2024)));
+	TRACE(("show overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), "
+		"ERR: %lx\n", read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST),
+		read32(INTEL_OVERLAY_STATUS),
+		*(((uint32*)gInfo->overlay_registers) + 0x68/4), read32(0x30168),
+		read32(0x2024)));
 }
 
 
@@ -272,7 +280,7 @@ hide_overlay(void)
 		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
 		return;
 
-	overlay_registers *registers = gInfo->overlay_registers;
+	overlay_registers* registers = gInfo->overlay_registers;
 
 	gInfo->shared_info->overlay_active = false;
 	registers->overlay_enabled = false;
@@ -299,7 +307,7 @@ hide_overlay(void)
 
 
 uint32
-intel_overlay_count(const display_mode *mode)
+intel_overlay_count(const display_mode* mode)
 {
 	// TODO: make this depending on the amount of RAM and the screen mode
 	// (and we could even have more than one when using 3D as well)
@@ -307,8 +315,8 @@ intel_overlay_count(const display_mode *mode)
 }
 
 
-const uint32 *
-intel_overlay_supported_spaces(const display_mode *mode)
+const uint32*
+intel_overlay_supported_spaces(const display_mode* mode)
 {
 	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32,
 		B_YCbCr422, 0};
@@ -332,12 +340,12 @@ intel_overlay_supported_features(uint32 colorSpace)
 }
 
 
-const overlay_buffer *
+const overlay_buffer* 
 intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	uint16 height)
 {
-	TRACE(("intel_allocate_overlay_buffer(width %u, height %u, colorSpace %lu)\n",
-		width, height, colorSpace));
+	TRACE(("intel_allocate_overlay_buffer(width %u, height %u, "
+		"colorSpace %lu)\n", width, height, colorSpace));
 
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	uint32 bytesPerPixel;
@@ -359,7 +367,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 			return NULL;
 	}
 
-	struct overlay *overlay = (struct overlay *)malloc(sizeof(struct overlay));
+	struct overlay* overlay = (struct overlay*)malloc(sizeof(struct overlay));
 	if (overlay == NULL)
 		return NULL;
 
@@ -371,7 +379,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	if (sharedInfo.device_type.InGroup(INTEL_TYPE_965))
 		alignment = 0xff;
 
-	overlay_buffer *buffer = &overlay->buffer;
+	overlay_buffer* buffer = &overlay->buffer;
 	buffer->space = colorSpace;
 	buffer->width = width;
 	buffer->height = height;
@@ -400,8 +408,8 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	overlay->buffer_offset = overlay->buffer_base
 		- (addr_t)gInfo->shared_info->graphics_memory;
 
-	buffer->buffer = (uint8 *)overlay->buffer_base;
-	buffer->buffer_dma = (uint8 *)gInfo->shared_info->physical_graphics_memory
+	buffer->buffer = (uint8*)overlay->buffer_base;
+	buffer->buffer_dma = (uint8*)gInfo->shared_info->physical_graphics_memory
 		+ overlay->buffer_offset;
 
 	TRACE(("allocated overlay buffer: base=%x, offset=%x, address=%x, "
@@ -413,11 +421,11 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 
 
 status_t
-intel_release_overlay_buffer(const overlay_buffer *buffer)
+intel_release_overlay_buffer(const overlay_buffer* buffer)
 {
 	TRACE(("intel_release_overlay_buffer(buffer %p)\n", buffer));
 
-	struct overlay *overlay = (struct overlay *)buffer;
+	struct overlay* overlay = (struct overlay*)buffer;
 
 	// TODO: locking!
 
@@ -434,8 +442,8 @@ intel_release_overlay_buffer(const overlay_buffer *buffer)
 
 
 status_t
-intel_get_overlay_constraints(const display_mode *mode,
-	const overlay_buffer *buffer, overlay_constraints *constraints)
+intel_get_overlay_constraints(const display_mode* mode,
+	const overlay_buffer* buffer, overlay_constraints* constraints)
 {
 	TRACE(("intel_get_overlay_constraints(buffer %p)\n", buffer));
 
@@ -525,8 +533,9 @@ intel_release_overlay(overlay_token overlayToken)
 
 
 status_t
-intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer,
-	const overlay_window *window, const overlay_view *view)
+intel_configure_overlay(overlay_token overlayToken,
+	const overlay_buffer* buffer, const overlay_window* window,
+	const overlay_view* view)
 {
 	TRACE(("intel_configure_overlay: buffer %p, window %p, view %p\n",
 		buffer, window, view));
@@ -539,8 +548,8 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		return B_OK;
 	}
 
-	struct overlay *overlay = (struct overlay *)buffer;
-	overlay_registers *registers = gInfo->overlay_registers;
+	struct overlay* overlay = (struct overlay*)buffer;
+	overlay_registers* registers = gInfo->overlay_registers;
 	bool updateCoefficients = false;
 	uint32 bytesPerPixel = 2;
 
@@ -689,7 +698,7 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		}
 
 		gInfo->last_overlay_view = *view;
-		gInfo->last_overlay_frame = *(overlay_frame *)window;
+		gInfo->last_overlay_frame = *(overlay_frame*)window;
 	}
 
 	registers->color_control_output_mode = true;

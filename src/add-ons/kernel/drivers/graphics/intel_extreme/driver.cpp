@@ -86,7 +86,7 @@ mutex gLock;
 
 
 static status_t
-get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
+get_next_intel_extreme(int32* _cookie, pci_info &info, uint32 &type)
 {
 	int32 index = *_cookie;
 
@@ -114,11 +114,11 @@ get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
 }
 
 
-extern "C" const char **
+extern "C" const char**
 publish_devices(void)
 {
 	TRACE((DEVICE_NAME ": publish_devices()\n"));
-	return (const char **)gDeviceNames;
+	return (const char**)gDeviceNames;
 }
 
 
@@ -127,7 +127,7 @@ init_hardware(void)
 {
 	TRACE((DEVICE_NAME ": init_hardware()\n"));
 
-	status_t status = get_module(B_PCI_MODULE_NAME,(module_info **)&gPCI);
+	status_t status = get_module(B_PCI_MODULE_NAME,(module_info**)&gPCI);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": pci module unavailable\n"));
 		return status;
@@ -202,7 +202,7 @@ init_driver(void)
 		gDeviceInfo[found]->init_status = B_NO_INIT;
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
-		gDeviceInfo[found]->registers = (uint8 *)info->u.h0.base_registers[0];
+		gDeviceInfo[found]->registers = (uint8*)info->u.h0.base_registers[0];
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
 

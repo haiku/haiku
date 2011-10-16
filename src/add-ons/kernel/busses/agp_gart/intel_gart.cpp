@@ -34,9 +34,9 @@
 	(sPCI->write_pci_config((info).bus, (info).device, (info).function, \
 		(offset), (size), (value)))
 #define write32(address, data) \
-	(*((volatile uint32 *)(address)) = (data))
+	(*((volatile uint32*)(address)) = (data))
 #define read32(address) \
-	(*((volatile uint32 *)(address)))
+	(*((volatile uint32*)(address)))
 
 
 const struct supported_device {
@@ -109,7 +109,7 @@ struct intel_info {
 };
 
 static intel_info sInfo;
-static pci_module_info *sPCI;
+static pci_module_info* sPCI;
 
 
 static bool
@@ -219,7 +219,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
-				dprintf("intel_gart: getting local memory size not implemented.\n");
+				dprintf("intel_gart: getting local memory size not "
+					"implemented.\n");
 				break;
 			case i830_STOLEN_512K:
 				memorySize >>= 1;
@@ -357,17 +358,17 @@ intel_map(intel_info &info)
 	int fbIndex = 0;
 	int mmioIndex = 1;
 	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
-		// for some reason Intel saw the need to change the order of the mappings
-		// with the introduction of the i9xx family
+		// for some reason Intel saw the need to change the order of the
+		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
 		fbIndex = 2;
 	}
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		(void *)info.display.u.h0.base_registers[mmioIndex],
+		(void*)info.display.u.h0.base_registers[mmioIndex],
 		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&info.registers);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf("agp_intel: could not map memory I/O!\n");
 		return info.registers_area;
@@ -378,7 +379,7 @@ intel_map(intel_info &info)
 		get_pci_config(info.display, PCI_command, 2)
 			| PCI_command_io | PCI_command_memory | PCI_command_master);
 
-	void *scratchAddress;
+	void* scratchAddress;
 	AreaKeeper scratchCreator;
 	info.scratch_area = scratchCreator.Create("intel GMCH scratch",
 		&scratchAddress, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK,
@@ -398,7 +399,8 @@ intel_map(intel_info &info)
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 					+ (2UL << 20);
 		} else
-			info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
+			info.gtt_physical_base
+				= get_pci_config(info.display, i915_GTT_BASE, 4);
 	} else {
 		info.gtt_physical_base = read32(info.registers
 			+ INTEL_PAGE_TABLE_CONTROL) & ~PAGE_TABLE_ENABLED;
@@ -417,13 +419,13 @@ intel_map(intel_info &info)
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
 
-	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_base,
-		gttSize, info.gtt_entries, stolenSize);
+	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n",
+		info.gtt_physical_base, gttSize, info.gtt_entries, stolenSize);
 
 	AreaKeeper gttMapper;
 	info.gtt_area = gttMapper.Map("intel GMCH gtt",
-		(void *)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&info.gtt_base);
+		(void*)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.gtt_base);
 	if (gttMapper.InitCheck() < B_OK) {
 		dprintf("intel_gart: could not map GTT!\n");
 		return info.gtt_area;
@@ -439,22 +441,23 @@ intel_map(intel_info &info)
 		info.aperture_size >> 20, gttSize >> 10);
 
 	dprintf("intel_gart: GTT base = 0x%lx\n", info.gtt_physical_base);
-	dprintf("intel_gart: MMIO base = 0x%lx\n", info.display.u.h0.base_registers[mmioIndex]);
+	dprintf("intel_gart: MMIO base = 0x%lx\n",
+		info.display.u.h0.base_registers[mmioIndex]);
 	dprintf("intel_gart: GMR base = 0x%lx\n", info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
-		(void *)info.aperture_physical_base, info.aperture_size,
+		(void*)info.aperture_physical_base, info.aperture_size,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
-		B_READ_AREA | B_WRITE_AREA, (void **)&info.aperture_base);
+		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
 		// try again without write combining
 		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
 
 		info.aperture_area = apertureMapper.Map("intel graphics aperture",
-			(void *)info.aperture_physical_base, info.aperture_size,
+			(void*)info.aperture_physical_base, info.aperture_size,
 			B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-			(void **)&info.aperture_base);
+			(void**)&info.aperture_base);
 	}
 	if (apertureMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map graphics aperture!\n");
@@ -477,7 +480,7 @@ intel_map(intel_info &info)
 
 status_t
 intel_create_aperture(uint8 bus, uint8 device, uint8 function, size_t size,
-	void **_aperture)
+	void** _aperture)
 {
 	// TODO: we currently only support a single AGP bridge!
 	if ((bus != sInfo.bridge.bus || device != sInfo.bridge.device
@@ -514,14 +517,14 @@ intel_create_aperture(uint8 bus, uint8 device, uint8 function, size_t size,
 
 
 void
-intel_delete_aperture(void *aperture)
+intel_delete_aperture(void* aperture)
 {
 	intel_unmap(sInfo);
 }
 
 
 static status_t
-intel_get_aperture_info(void *aperture, aperture_info *info)
+intel_get_aperture_info(void* aperture, aperture_info* info)
 {
 	if (info == NULL)
 		return B_BAD_VALUE;
@@ -536,14 +539,14 @@ intel_get_aperture_info(void *aperture, aperture_info *info)
 
 
 status_t
-intel_set_aperture_size(void *aperture, size_t size)
+intel_set_aperture_size(void* aperture, size_t size)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-intel_bind_page(void *aperture, uint32 offset, phys_addr_t physicalAddress)
+intel_bind_page(void* aperture, uint32 offset, phys_addr_t physicalAddress)
 {
 	//TRACE("bind_page(offset %lx, physical %lx)\n", offset, physicalAddress);
 
@@ -553,7 +556,7 @@ intel_bind_page(void *aperture, uint32 offset, phys_addr_t physicalAddress)
 
 
 static status_t
-intel_unbind_page(void *aperture, uint32 offset)
+intel_unbind_page(void* aperture, uint32 offset)
 {
 	//TRACE("unbind_page(offset %lx)\n", offset);
 
@@ -565,7 +568,7 @@ intel_unbind_page(void *aperture, uint32 offset)
 
 
 void
-intel_flush_tlbs(void *aperture)
+intel_flush_tlbs(void* aperture)
 {
 	read32(sInfo.gtt_base + sInfo.gtt_entries - 1);
 	asm("wbinvd;");
@@ -580,7 +583,7 @@ intel_init()
 {
 	TRACE("bus manager init\n");
 
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&sPCI) != B_OK)
+	if (get_module(B_PCI_MODULE_NAME, (module_info**)&sPCI) != B_OK)
 		return B_ERROR;
 
 	bool found = false;
@@ -652,7 +655,7 @@ static struct agp_gart_bus_module_info sIntelModuleInfo = {
 	intel_flush_tlbs
 };
 
-module_info *modules[] = {
-	(module_info *)&sIntelModuleInfo,
+module_info* modules[] = {
+	(module_info*)&sIntelModuleInfo,
 	NULL
 };

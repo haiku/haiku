@@ -227,7 +227,8 @@ struct intel_free_graphics_memory {
 // Register definitions, taken from X driver
 
 // PCI bridge memory management
-#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52	// GGC - (G)MCH Graphics Control Register
+#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
+	// GGC - (G)MCH Graphics Control Register
 #define MEMORY_CONTROL_ENABLED			0x0004
 #define MEMORY_MASK						0x0001
 #define STOLEN_MEMORY_MASK				0x00f0

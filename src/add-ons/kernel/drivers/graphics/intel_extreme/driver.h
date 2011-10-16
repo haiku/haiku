@@ -43,7 +43,7 @@ set_pci_config(pci_info* info, uint8 offset, uint8 size, uint32 value)
 static inline uint16
 read16(intel_info &info, uint32 encodedRegister)
 {
-	return *(volatile uint16 *)(info.registers
+	return *(volatile uint16*)(info.registers
 		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
 		+ REGISTER_REGISTER(encodedRegister));
 }
@@ -52,7 +52,7 @@ read16(intel_info &info, uint32 encodedRegister)
 static inline uint32
 read32(intel_info &info, uint32 encodedRegister)
 {
-	return *(volatile uint32 *)(info.registers
+	return *(volatile uint32*)(info.registers
 		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
 		+ REGISTER_REGISTER(encodedRegister));
 }
@@ -61,7 +61,7 @@ read32(intel_info &info, uint32 encodedRegister)
 static inline void
 write16(intel_info &info, uint32 encodedRegister, uint16 value)
 {
-	*(volatile uint16 *)(info.registers
+	*(volatile uint16*)(info.registers
 		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
 		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
@@ -70,7 +70,7 @@ write16(intel_info &info, uint32 encodedRegister, uint16 value)
 static inline void
 write32(intel_info &info, uint32 encodedRegister, uint32 value)
 {
-	*(volatile uint32 *)(info.registers
+	*(volatile uint32*)(info.registers
 		+ info.shared_info->register_blocks[REGISTER_BLOCK(encodedRegister)]
 		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
