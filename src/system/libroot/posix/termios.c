@@ -146,3 +146,15 @@ cfsetospeed(struct termios *termios, speed_t speed)
 	termios->c_cflag |= speed;
 	return 0;
 }
+
+
+void
+cfmakeraw(struct termios *termios)
+{
+	termios->c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR
+		| ICRNL | IXON);
+	termios->c_oflag &= ~OPOST;
+	termios->c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+	termios->c_cflag &= ~(CSIZE | PARENB);
+	termios->c_cflag |= CS8;
+}
