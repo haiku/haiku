@@ -83,8 +83,8 @@ intel_interrupt_handler(void* data)
 	int32 handled = B_HANDLED_INTERRUPT;
 
 	// TODO: verify that these aren't actually the same
-	bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
-	uint16 mask = isSNB ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
+	bool hasPCH = info.device_type.HasPlatformControlHub();
+	uint16 mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
 	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
@@ -93,7 +93,7 @@ intel_interrupt_handler(void* data)
 			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
-	mask = isSNB ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
+	mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
 	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
@@ -145,8 +145,8 @@ init_interrupt_handler(intel_info &info)
 			write16(info, INTEL_INTERRUPT_IDENTITY, ~0);
 
 			// enable interrupts - we only want VBLANK interrupts
-			bool isSNB = info.device_type.InGroup(INTEL_TYPE_SNB);
-			uint16 enable = isSNB
+			bool hasPCH = info.device_type.HasPlatformControlHub();
+			uint16 enable = hasPCH
 				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
 				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
 
@@ -248,7 +248,7 @@ intel_extreme_init(intel_info &info)
 	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
 
 	// setup the register blocks for the different architectures
-	if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
+	if (info.device_type.HasPlatformControlHub()) {
 		// PCH based platforms (IronLake and up)
 		blocks[REGISTER_BLOCK(REGS_INTERRUPT)]
 			= PCH_DE_INTERRUPT_REGISTER_BASE;

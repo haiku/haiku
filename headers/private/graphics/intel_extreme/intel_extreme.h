@@ -119,6 +119,11 @@ struct DeviceType {
 	{
 		return (type & INTEL_TYPE_MODEL_MASK) == model;
 	}
+
+	bool HasPlatformControlHub() const
+	{
+		return InGroup(INTEL_TYPE_SNB);
+	}
 };
 
 // info about PLL on graphics card

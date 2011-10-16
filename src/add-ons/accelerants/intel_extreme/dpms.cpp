@@ -95,14 +95,14 @@ enable_display_pipe(bool enable)
 static void
 enable_lvds_panel(bool enable)
 {
-	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
-	if (isSNB) {
-		// TODO: fix for SNB
+	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	if (hasPCH) {
+		// TODO: fix for PCH
 		return;
 	}
 
-	int controlRegister = isSNB ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
-	int statusRegister = isSNB ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;
+	int controlRegister = hasPCH ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
+	int statusRegister = hasPCH ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;
 
 	uint32 control = read32(controlRegister);
 	uint32 panelStatus;
@@ -110,7 +110,7 @@ enable_lvds_panel(bool enable)
 	if (enable) {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) == 0) {
 			write32(controlRegister, control | PANEL_CONTROL_POWER_TARGET_ON
-				| (isSNB ? PANEL_REGISTER_UNLOCK : 0));
+				| (hasPCH ? PANEL_REGISTER_UNLOCK : 0));
 		}
 
 		do {
@@ -119,7 +119,7 @@ enable_lvds_panel(bool enable)
 	} else {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) != 0) {
 			write32(controlRegister, (control & ~PANEL_CONTROL_POWER_TARGET_ON)
-				| (isSNB ? PANEL_REGISTER_UNLOCK : 0));
+				| (hasPCH ? PANEL_REGISTER_UNLOCK : 0));
 		}
 
 		do {

@@ -209,9 +209,9 @@ intel_init_accelerant(int device)
 	// assume it is the valid panel size..
 	// Later we query for proper EDID info if it exists, or figure something
 	// else out. (Default modes, etc.)
-	bool isSNB = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB);
-	if ((isSNB && (lvds & PCH_LVDS_DETECTED) != 0)
-		|| (!isSNB && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
+	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	if ((hasPCH && (lvds & PCH_LVDS_DETECTED) != 0)
+		|| (!hasPCH && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
 		save_lvds_mode();
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
 	}
