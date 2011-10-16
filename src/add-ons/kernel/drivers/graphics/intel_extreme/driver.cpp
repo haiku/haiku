@@ -73,7 +73,18 @@ const struct supported_device {
 	{0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
 
-	{0x0126, INTEL_TYPE_SNBGM, "SNBGM"},
+	{0x0042, INTEL_TYPE_ILKG, "IronLake Desktop"},
+	{0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+
+	{0x0102, INTEL_TYPE_SNBG, "SandyBridge Desktop GT1"},
+	{0x0112, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2"},
+	{0x0122, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2+"},
+	{0x0106, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT1"},
+	{0x0116, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2"},
+	{0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
+	{0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"}
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;

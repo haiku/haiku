@@ -137,6 +137,7 @@ set_frame_buffer_base()
 
 	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
@@ -239,7 +240,8 @@ get_pll_limits(pll_limits &limits)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)) {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2

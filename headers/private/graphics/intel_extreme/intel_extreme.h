@@ -34,8 +34,10 @@
 #define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x0200)
 #define INTEL_TYPE_G4x			(INTEL_TYPE_9xx | 0x0400)
 #define INTEL_TYPE_IGD			(INTEL_TYPE_9xx | 0x0800)
-#define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x1000)
+#define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x1000)
+#define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x2000)
 // models
+#define INTEL_TYPE_SERVER		0x0004
 #define INTEL_TYPE_MOBILE		0x0008
 #define INTEL_TYPE_915			(INTEL_TYPE_91x)
 #define INTEL_TYPE_915M			(INTEL_TYPE_91x | INTEL_TYPE_MOBILE)
@@ -48,8 +50,11 @@
 #define INTEL_TYPE_GM45			(INTEL_TYPE_G4x | INTEL_TYPE_MOBILE)
 #define INTEL_TYPE_IGDG			(INTEL_TYPE_IGD)
 #define INTEL_TYPE_IGDGM		(INTEL_TYPE_IGD | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_ILKG			(INTEL_TYPE_ILK)
+#define INTEL_TYPE_ILKGM		(INTEL_TYPE_ILK | INTEL_TYPE_MOBILE)
 #define INTEL_TYPE_SNBG			(INTEL_TYPE_SNB)
 #define INTEL_TYPE_SNBGM		(INTEL_TYPE_SNB | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_SNBGS		(INTEL_TYPE_SNB | INTEL_TYPE_SERVER)
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -122,7 +127,7 @@ struct DeviceType {
 
 	bool HasPlatformControlHub() const
 	{
-		return InGroup(INTEL_TYPE_SNB);
+		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB);
 	}
 };
 

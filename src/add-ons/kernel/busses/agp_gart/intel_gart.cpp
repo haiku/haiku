@@ -81,7 +81,20 @@ const struct supported_device {
 	{0xa000, 0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa010, 0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
 
-	{0x0104, 0x0126, INTEL_TYPE_SNBGM, "SNBGM"},
+#if 0
+	{0x0040, 0x0042, INTEL_TYPE_ILKG, "IronLake Desktop"},
+	{0x0044, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0062, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x006a, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+#endif
+
+	{0x0100, 0x0102, INTEL_TYPE_SNBG, "SandyBridge Desktop GT1"},
+	{0x0100, 0x0112, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2"},
+	{0x0100, 0x0122, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2+"},
+	{0x0104, 0x0106, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT1"},
+	{0x0104, 0x0116, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2"},
+	{0x0104, 0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
+	{0x0108, 0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"}
 };
 
 struct intel_info {
@@ -164,7 +177,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 2 << 20;
 				break;
 		}
-	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
+			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK) {
 		switch (memoryConfig & G4X_GTT_MASK) {
 			case G4X_GTT_NONE:
 				gttSize = 0;
@@ -395,6 +409,7 @@ intel_map(intel_info &info)
 
 	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
 		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
+			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK
 			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 					+ (2UL << 20);
@@ -601,7 +616,6 @@ intel_init()
 				sInfo.type = kSupportedDevices[i].type;
 				found = has_display_device(sInfo.display,
 					kSupportedDevices[i].display_id);
-				break;
 			}
 		}
 
