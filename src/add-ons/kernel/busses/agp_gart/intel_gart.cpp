@@ -81,12 +81,10 @@ const struct supported_device {
 	{0xa000, 0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa010, 0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
 
-#if 0
 	{0x0040, 0x0042, INTEL_TYPE_ILKG, "IronLake Desktop"},
 	{0x0044, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
 	{0x0062, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
 	{0x006a, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
-#endif
 
 	{0x0100, 0x0102, INTEL_TYPE_SNBG, "SandyBridge Desktop GT1"},
 	{0x0100, 0x0112, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2"},
