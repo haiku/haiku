@@ -61,6 +61,7 @@ static bool sIsExtended = false;
 
 static int32 sKeyboardRepeatRate;
 static bigtime_t sKeyboardRepeatDelay;
+static uint8 sKeyboardIds[2];
 
 
 static status_t
@@ -306,6 +307,13 @@ probe_keyboard(void)
 					cmdbyte, status);
 		}
 	}
+	
+	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
+			PS2_CMD_GET_DEVICE_ID, NULL, 0, sKeyboardIds, sizeof(sKeyboardIds));
+	
+	if (status != B_OK) {
+		INFO("ps2: cannot read keyboard device id:0x%#08lx\n", status);
+	}
 
 	return B_OK;
 }
@@ -384,6 +392,8 @@ keyboard_close(void *_cookie)
 			sHasKeyboardReader = false;
 		if (cookie->is_debugger)
 			sHasDebugReader = false;
+
+		sKeyboardIds[0] = sKeyboardIds[1] = 0;
 	}
 
 	TRACE("ps2: keyboard_close done\n");
@@ -510,6 +520,11 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case KB_GET_KEYBOARD_ID:
+		{
+			TRACE("ps2: ioctl KB_GET_KEYBOARD_ID\n");
+			return user_memcpy(buffer, &sKeyboardIds, sizeof(sKeyboardIds));
+		}
+
 		case KB_SET_CONTROL_ALT_DEL_TIMEOUT:
 		case KB_CANCEL_CONTROL_ALT_DEL:
 		case KB_DELAY_CONTROL_ALT_DEL:
