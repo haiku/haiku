@@ -237,18 +237,21 @@ pll_compute(pll_info *pll)
 				|| pll->postDiv == 0
 				|| targetClock == 0) {
 				TRACE("%s: Caught division by zero!\n", __func__);
-				TRACE("%s: referenceDiv %" B_PRIu32 "\n", __func__, pll->referenceDiv);
-				TRACE("%s: postDiv      %" B_PRIu32 "\n", __func__, pll->postDiv);
-				TRACE("%s: targetClock  %" B_PRIu32 "\n", __func__, targetClock);
+				TRACE("%s: referenceDiv %" B_PRIu32 "\n",
+					__func__, pll->referenceDiv);
+				TRACE("%s: postDiv      %" B_PRIu32 "\n",
+					__func__, pll->postDiv);
+				TRACE("%s: targetClock  %" B_PRIu32 "\n",
+					__func__, targetClock);
 				return B_ERROR;
 			}
 			uint32 tmp = (referenceFrequency * pll->feedbackDiv)
 				/ (pll->postDiv * pll->referenceDiv);
-			tmp = (tmp * 100000) / targetClock;
+			tmp = (tmp * 1000) / targetClock;
 
-			if (tmp > (100000 + (MAX_TOLERANCE * 10)))
+			if (tmp > (1000 + (MAX_TOLERANCE / 10)))
 				pll->referenceDiv++;
-			else if (tmp >= (100000 - (MAX_TOLERANCE * 10)))
+			else if (tmp >= (1000 - (MAX_TOLERANCE / 10)))
 				break;
 			else
 				pll->referenceDiv++;
@@ -262,9 +265,9 @@ pll_compute(pll_info *pll)
 	}
 
 	uint32 calculatedClock
-		= (referenceFrequency * pll->feedbackDiv)
-		+ (referenceFrequency * pll->feedbackDivFrac)
-		/ (pll->referenceDiv * pll->postDiv);
+		= ((referenceFrequency * pll->feedbackDiv * 10)
+		+ (referenceFrequency * pll->feedbackDivFrac))
+		/ (pll->referenceDiv * pll->postDiv * 10);
 
 	TRACE("%s: pixel clock: %" B_PRIu32 " gives:"
 		" feedbackDivider = %" B_PRIu32 ".%" B_PRIu32
