@@ -69,24 +69,24 @@ pll_limit_probe(pll_info *pll)
 	} else {
 		pll->pllOutMin
 			= B_LENDIAN_TO_HOST_INT32(
-				firmwareInfo->info_12.ulMinPixelClockPLL_Output);
+				firmwareInfo->info_12.ulMinPixelClockPLL_Output) * 10;
 	}
 
 	pll->pllOutMax
 		= B_LENDIAN_TO_HOST_INT32(
-			firmwareInfo->info.ulMaxPixelClockPLL_Output);
+			firmwareInfo->info.ulMaxPixelClockPLL_Output) * 10;
 
 	if (tableMinor >= 4) {
 		pll->lcdPllOutMin
 			= B_LENDIAN_TO_HOST_INT16(
-				firmwareInfo->info_14.usLcdMinPixelClockPLL_Output) * 100;
+				firmwareInfo->info_14.usLcdMinPixelClockPLL_Output) * 1000;
 
 		if (pll->lcdPllOutMin == 0)
 			pll->lcdPllOutMin = pll->pllOutMin;
 
 		pll->lcdPllOutMax
 			= B_LENDIAN_TO_HOST_INT16(
-				firmwareInfo->info_14.usLcdMaxPixelClockPLL_Output) * 100;
+				firmwareInfo->info_14.usLcdMaxPixelClockPLL_Output) * 1000;
 
 		if (pll->lcdPllOutMax == 0)
 			pll->lcdPllOutMax = pll->pllOutMax;
