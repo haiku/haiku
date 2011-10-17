@@ -407,14 +407,6 @@ BTwoDimensionalLayout::SetFrame(BRect frame)
 }
 
 
-void
-BTwoDimensionalLayout::InvalidateLayout(bool children)
-{
-	BLayout::InvalidateLayout(children);
-	fLocalLayouter->InvalidateLayout();
-}
-
-
 status_t
 BTwoDimensionalLayout::Archive(BMessage* into, bool deep) const
 {
@@ -461,6 +453,13 @@ BTwoDimensionalLayout::AllUnarchived(const BMessage* from)
 		err = fLocalLayouter->AlignLayoutsFromArchive(&unarchiver, B_VERTICAL);
 
 	return err;
+}
+
+
+void
+BTwoDimensionalLayout::LayoutInvalidated(bool children)
+{
+	fLocalLayouter->InvalidateLayout();
 }
 
 

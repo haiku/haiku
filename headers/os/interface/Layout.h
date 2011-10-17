@@ -48,7 +48,7 @@ public:
 
 	// Layouting related methods
 
-	virtual	void				InvalidateLayout(bool children = false);
+			void				InvalidateLayout(bool children = false);
 			void				Relayout(bool immediate = false);
 			void				RequireLayout();
 			bool				IsValid();
@@ -73,6 +73,7 @@ protected:
 	// BLayout hook methods
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
+	virtual	void				LayoutInvalidated(bool children);
 	virtual	void				DoLayout() = 0;
 	virtual	void				OwnerChanged(BView* was);
 

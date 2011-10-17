@@ -303,6 +303,7 @@ BLayout::InvalidateLayout(bool children)
 		return;
 
 	fState |= B_LAYOUT_NECESSARY;
+	LayoutInvalidated(children);
 
 	if (children) {
 		for (int32 i = CountItems() - 1; i >= 0; i--)
@@ -518,6 +519,12 @@ BLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 
 void
 BLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
+{
+}
+
+
+void
+BLayout::LayoutInvalidated(bool children)
 {
 }
 

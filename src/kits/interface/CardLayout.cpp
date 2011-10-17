@@ -174,10 +174,8 @@ BCardLayout::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BCardLayout::InvalidateLayout(bool children)
+BCardLayout::LayoutInvalidated(bool children)
 {
-	BLayout::InvalidateLayout(children);
-
 	fMinMaxValid = false;
 }
 

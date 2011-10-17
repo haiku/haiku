@@ -38,8 +38,6 @@ public:
 
 	virtual	void				SetFrame(BRect frame);
 
-	virtual	void				InvalidateLayout(bool children = false);
-
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual status_t			AllArchived(BMessage* into) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
@@ -58,6 +56,7 @@ protected:
 				int32	height;
 			};
 
+	virtual	void				LayoutInvalidated(bool children = false);
 	virtual	void				DoLayout();
 
 			BSize				AddInsets(BSize size);

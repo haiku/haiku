@@ -28,13 +28,12 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout(bool children = false);
-
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 
 protected:
+	virtual	void				LayoutInvalidated(bool children = false);
 	virtual	void				DoLayout();
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);

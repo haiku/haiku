@@ -546,9 +546,21 @@ BSplitLayout::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BSplitLayout::InvalidateLayout(bool children)
+BSplitLayout::LayoutInvalidated(bool children)
 {
-	_InvalidateLayout(true, children);
+	delete fHorizontalLayouter;
+	delete fVerticalLayouter;
+	delete fHorizontalLayoutInfo;
+	delete fVerticalLayoutInfo;
+
+	fHorizontalLayouter = NULL;
+	fVerticalLayouter = NULL;
+	fHorizontalLayoutInfo = NULL;
+	fVerticalLayoutInfo = NULL;
+
+	_InvalidateCachedHeightForWidth();
+
+	fLayoutValid = false;
 }
 
 
@@ -817,28 +829,6 @@ BSplitLayout::ItemRemoved(BLayoutItem* item, int32 atIndex)
 
 	delete _ItemLayoutInfo(item);
 	item->SetLayoutData(NULL);
-}
-
-
-void
-BSplitLayout::_InvalidateLayout(bool invalidateView, bool children)
-{
-	if (invalidateView)
-		BAbstractLayout::InvalidateLayout(children);
-
-	delete fHorizontalLayouter;
-	delete fVerticalLayouter;
-	delete fHorizontalLayoutInfo;
-	delete fVerticalLayoutInfo;
-
-	fHorizontalLayouter = NULL;
-	fVerticalLayouter = NULL;
-	fHorizontalLayoutInfo = NULL;
-	fVerticalLayoutInfo = NULL;
-
-	_InvalidateCachedHeightForWidth();
-
-	fLayoutValid = false;
 }
 
 

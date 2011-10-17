@@ -75,8 +75,7 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout(bool children = false);
-
+	virtual	void				LayoutInvalidated(bool children);
 	virtual	void				DoLayout();
 
 	// interface for BSplitView
