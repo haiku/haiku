@@ -47,7 +47,8 @@ namespace {
 
 	struct ViewRemover {
 		inline void operator()(BView* view) {
-			BView::Private(view).RemoveSelf();
+			if (view)
+				BView::Private(view).RemoveSelf();
 		}
 	};
 }
