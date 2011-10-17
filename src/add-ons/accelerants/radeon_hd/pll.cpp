@@ -127,8 +127,10 @@ pll_compute_post_divider(pll_info *pll)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	if ((pll->flags & PLL_USE_POST_DIV) != 0)
+	if ((pll->flags & PLL_USE_POST_DIV) != 0) {
+		TRACE("%s: using AtomBIOS post divider\n", __func__);
 		return;
+	}
 
 	uint32 vco;
 	if (info.device_chipset < (RADEON_R700 | 0x70)) {
@@ -175,27 +177,43 @@ pll_compute(pll_info *pll)
 
 	pll->feedbackDiv = 0;
 	pll->feedbackDivFrac = 0;
-	pll->referenceDiv = pll->minRefDiv;
-
 	uint32 referenceFrequency = pll->referenceFreq;
 
-	// if RADEON_PLL_USE_REF_DIV
-	//	ref_div = pll->reference_div;
+	if ((pll->flags & PLL_USE_REF_DIV) != 0) {
+		TRACE("%s: using AtomBIOS reference divider\n", __func__);
+		return B_OK;
+	} else {
+		pll->referenceDiv = pll->minRefDiv;
+	}
 
-	// if (pll->flags & RADEON_PLL_USE_FRAC_FB_DIV) {
-	// 	avivo_get_fb_div(pll, targetClock, postDivider, referenceDivider,
-	//  &feedbackDivider, &feedbackDividerFrac);
-	// 	feedbackDividerFrac = (100 * feedbackDividerFrac) / pll->reference_freq;
-	// 	if (frac_fb_div >= 5) {
-	// 		frac_fb_div -= 5;
-	// 		frac_fb_div = frac_fb_div / 10;
-	// 		frac_fb_div++;
-	// 	}
-	// 	if (frac_fb_div >= 10) {
-	// 		fb_div++;
-	// 		frac_fb_div = 0;
-	// 	}
-	// } else {
+	if ((pll->flags & PLL_USE_FRAC_FB_DIV) != 0) {
+		TRACE("%s: using AtomBIOS fractional feedback divider\n", __func__);
+
+		uint32 tmp = pll->postDiv * pll->referenceDiv;
+		tmp *= targetClock;
+		pll->feedbackDiv = tmp / pll->referenceFreq;
+		pll->feedbackDivFrac = tmp % pll->referenceFreq;
+
+		if (pll->feedbackDiv > pll->maxFeedbackDiv)
+			pll->feedbackDiv = pll->maxFeedbackDiv;
+		else if (pll->feedbackDiv < pll->minFeedbackDiv)
+			pll->feedbackDiv = pll->minFeedbackDiv;
+
+		pll->feedbackDivFrac
+			= (100 * pll->feedbackDivFrac) / pll->referenceFreq;
+
+		if (pll->feedbackDivFrac >= 5) {
+			pll->feedbackDivFrac -= 5;
+			pll->feedbackDivFrac /= 10;
+			pll->feedbackDivFrac++;
+		}
+		if (pll->feedbackDivFrac >= 10) {
+			pll->feedbackDiv++;
+			pll->feedbackDivFrac = 0;
+		}
+	} else {
+		TRACE("%s: performing fractional feedback calculations\n", __func__);
+
 		while (pll->referenceDiv <= pll->maxRefDiv) {
 			// get feedback divider
 			uint32 retroEncabulator = pll->postDiv * pll->referenceDiv;
@@ -235,7 +253,7 @@ pll_compute(pll_info *pll)
 			else
 				pll->referenceDiv++;
 		}
-	// }
+	}
 
 	if (pll->referenceDiv == 0 || pll->postDiv == 0) {
 		TRACE("%s: Caught division by zero of post or reference divider\n",
