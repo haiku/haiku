@@ -97,6 +97,7 @@ const struct supported_device {
 	{0x9552, RADEON_R700 | 0x10, true,  "Radeon HD 4300"},
 	{0x9555, RADEON_R700 | 0x10, false, "Radeon HD 4350"},
 	{0x9540, RADEON_R700 | 0x10, false, "Radeon HD 4550"},
+	{0x9480, RADEON_R700 | 0x30, false, "Radeon HD 4650"},
 	{0x9498, RADEON_R700 | 0x30, false, "Radeon HD 4650"},
 	{0x94b4, RADEON_R700 | 0x40, false, "Radeon HD 4700"},
 	{0x9490, RADEON_R700 | 0x30, false, "Radeon HD 4710"},
