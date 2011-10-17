@@ -244,11 +244,11 @@ pll_compute(pll_info *pll)
 			}
 			uint32 tmp = (referenceFrequency * pll->feedbackDiv)
 				/ (pll->postDiv * pll->referenceDiv);
-			tmp = (tmp * 10000) / targetClock;
+			tmp = (tmp * 100000) / targetClock;
 
-			if (tmp > (10000 + MAX_TOLERANCE))
+			if (tmp > (100000 + (MAX_TOLERANCE * 10)))
 				pll->referenceDiv++;
-			else if (tmp >= (10000 - MAX_TOLERANCE))
+			else if (tmp >= (100000 - (MAX_TOLERANCE * 10)))
 				break;
 			else
 				pll->referenceDiv++;
