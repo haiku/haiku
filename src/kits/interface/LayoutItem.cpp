@@ -168,7 +168,7 @@ BLayoutItem::SetLayout(BLayout* layout)
 	fLayout = layout;
 
 	if (oldLayout)
-		DetachedFromLayout(layout);
+		DetachedFromLayout(oldLayout);
 
 	if (BView* view = View()) {
 		if (oldLayout && !fLayout) {
