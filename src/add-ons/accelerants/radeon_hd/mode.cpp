@@ -178,8 +178,7 @@ radeon_set_display_mode(display_mode *mode)
 			// TODO: check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
 		display_crtc_set_dtd(id, mode);
 
-		// TODO: vvvv : atombios_crtc_set_base
-		display_crtc_fb_set_dce1(id, mode);
+		display_crtc_fb_set(id, mode);
 		// atombios_overscan_setup
 		display_crtc_scale(id, mode);
 

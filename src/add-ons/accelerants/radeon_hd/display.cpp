@@ -846,13 +846,18 @@ display_crtc_scale(uint8 crtcID, display_mode *mode)
 
 
 void
-display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode)
+display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	register_info* regs = gDisplay[crtcID]->regs;
 
-	uint32 fb_swap = R600_D1GRPH_SWAP_ENDIAN_NONE;
-	uint32 fb_format;
+	uint32 fbSwap;
+	if (info.device_chipset >= RADEON_R1000)
+		fbSwap = EVERGREEN_GRPH_ENDIAN_SWAP(EVERGREEN_GRPH_ENDIAN_NONE);
+	else
+		fbSwap = R600_D1GRPH_SWAP_ENDIAN_NONE;
+
+	uint32 fbFormat;
 
 	uint32 bytesPerPixel;
 	uint32 bitsPerPixel;
@@ -861,34 +866,63 @@ display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode)
 		case B_CMAP8:
 			bytesPerPixel = 1;
 			bitsPerPixel = 8;
-			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_8BPP
-				| AVIVO_D1GRPH_CONTROL_8BPP_INDEXED;
+			if (info.device_chipset >= RADEON_R1000) { // DCE4
+				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_8BPP)
+					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_INDEXED));
+			} else {
+				fbFormat = AVIVO_D1GRPH_CONTROL_DEPTH_8BPP
+					| AVIVO_D1GRPH_CONTROL_8BPP_INDEXED;
+			}
 			break;
 		case B_RGB15_LITTLE:
 			bytesPerPixel = 2;
 			bitsPerPixel = 15;
-			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_16BPP
-				| AVIVO_D1GRPH_CONTROL_16BPP_ARGB1555;
+			if (info.device_chipset >= RADEON_R1000) { // DCE4
+				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_16BPP)
+					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_ARGB1555));
+			} else {
+				fbFormat = AVIVO_D1GRPH_CONTROL_DEPTH_16BPP
+					| AVIVO_D1GRPH_CONTROL_16BPP_ARGB1555;
+			}
 			break;
 		case B_RGB16_LITTLE:
 			bytesPerPixel = 2;
 			bitsPerPixel = 16;
-			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_16BPP
-				| AVIVO_D1GRPH_CONTROL_16BPP_RGB565;
-			#ifdef __POWERPC__
-			fb_swap = R600_D1GRPH_SWAP_ENDIAN_16BIT;
-			#endif
+
+			if (info.device_chipset >= RADEON_R1000) { // DCE4
+				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_16BPP)
+					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_ARGB565));
+				#ifdef __POWERPC__
+				fbSwap
+					= EVERGREEN_GRPH_ENDIAN_SWAP(EVERGREEN_GRPH_ENDIAN_8IN16);
+				#endif
+			} else {
+				fbFormat = AVIVO_D1GRPH_CONTROL_DEPTH_16BPP
+					| AVIVO_D1GRPH_CONTROL_16BPP_RGB565;
+				#ifdef __POWERPC__
+				fbSwap = R600_D1GRPH_SWAP_ENDIAN_16BIT;
+				#endif
+			}
 			break;
 		case B_RGB24_LITTLE:
 		case B_RGB32_LITTLE:
 		default:
 			bytesPerPixel = 4;
 			bitsPerPixel = 32;
-			fb_format = AVIVO_D1GRPH_CONTROL_DEPTH_32BPP
-				| AVIVO_D1GRPH_CONTROL_32BPP_ARGB8888;
-			#ifdef __POWERPC__
-			fb_swap = R600_D1GRPH_SWAP_ENDIAN_32BIT;
-			#endif
+			if (info.device_chipset >= RADEON_R1000) { // DCE4
+				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_32BPP)
+					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_ARGB8888));
+				#ifdef __POWERPC__
+				fbSwap
+					= EVERGREEN_GRPH_ENDIAN_SWAP(EVERGREEN_GRPH_ENDIAN_8IN32);
+				#endif
+			} else {
+				fbFormat = AVIVO_D1GRPH_CONTROL_DEPTH_32BPP
+					| AVIVO_D1GRPH_CONTROL_32BPP_ARGB8888;
+				#ifdef __POWERPC__
+				fbSwap = R600_D1GRPH_SWAP_ENDIAN_32BIT;
+				#endif
+			}
 			break;
 	}
 
@@ -898,9 +932,6 @@ display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode)
 
 	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
 
-	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
-	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
-
 	if (info.device_chipset >= (RADEON_R700 | 0x70)) {
 		Write32(OUT, regs->grphPrimarySurfaceAddrHigh,
 			(fbAddressInt >> 32) & 0xf);
@@ -908,8 +939,14 @@ display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode)
 			(fbAddressInt >> 32) & 0xf);
 	}
 
-	if (info.device_chipset >= RADEON_R600)
-		Write32(CRT, regs->grphSwapControl, fb_swap);
+	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
+	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
+
+
+	if (info.device_chipset >= RADEON_R600) {
+		Write32(CRT, regs->grphControl, fbFormat);
+		Write32(CRT, regs->grphSwapControl, fbSwap);
+	}
 
 	Write32(CRT, regs->grphSurfaceOffsetX, 0);
 	Write32(CRT, regs->grphSurfaceOffsetY, 0);
@@ -931,18 +968,29 @@ display_crtc_fb_set_dce1(uint8 crtcID, display_mode *mode)
 	Write32(CRT, regs->viewportSize,
 		(viewport_w << 16) | viewport_h);
 
-	uint32 tmp = Read32(CRT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset);
-	tmp &= ~AVIVO_D1GRPH_SURFACE_UPDATE_H_RETRACE_EN;
-	Write32(OUT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset, tmp);
+	// Pageflip setup
+	if (info.device_chipset >= RADEON_R1000) { // DCE4
+		uint32 tmp
+			= Read32(OUT, EVERGREEN_GRPH_FLIP_CONTROL + regs->crtcOffset);
+		tmp &= ~EVERGREEN_GRPH_SURFACE_UPDATE_H_RETRACE_EN;
+		Write32(OUT, EVERGREEN_GRPH_FLIP_CONTROL + regs->crtcOffset, tmp);
 
-	Write32(OUT, AVIVO_D1MODE_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
-		// Pageflip to happen anywhere in vblank
+		Write32(OUT, EVERGREEN_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
+			// Pageflip to happen anywhere in vblank
+
+	} else {
+		uint32 tmp = Read32(OUT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset);
+		tmp &= ~AVIVO_D1GRPH_SURFACE_UPDATE_H_RETRACE_EN;
+		Write32(OUT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset, tmp);
+
+		Write32(OUT, AVIVO_D1MODE_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
+			// Pageflip to happen anywhere in vblank
+	}
 
 	// update shared info
 	gInfo->shared_info->bytes_per_row = bytesPerRow;
 	gInfo->shared_info->current_mode = *mode;
 	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
-
 }
 
 
