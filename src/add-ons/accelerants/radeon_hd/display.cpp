@@ -665,7 +665,7 @@ detect_displays()
 				// There is only one ddc communications path on DVI-I
 				if (encoder_analog_load_detect(id) != true) {
 					TRACE("%s: no analog load on EDID valid connector "
-						"#%" B_PRIu32 "\n", __func__);
+						"#%" B_PRIu32 "\n", __func__, id);
 					continue;
 				}
 			}

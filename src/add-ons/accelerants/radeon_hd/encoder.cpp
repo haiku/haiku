@@ -54,6 +54,7 @@ encoder_assign_crtc(uint8 crtcID)
 
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	switch (tableMajor) {
 		case 1:
@@ -81,24 +82,22 @@ encoder_assign_crtc(uint8 crtcID)
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-							//if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_TV_SUPPORT))
-							//	args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
-							//else if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_CV_SUPPORT))
-							//	args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
-							//else
+							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+								args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
+							} else if ((encoderFlags
+								& ATOM_DEVICE_CV_SUPPORT) != 0) {
+								args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
+							} else
 								args.v1.ucDevice = ATOM_DEVICE_CRT1_INDEX;
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-							//if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_TV_SUPPORT))
-							//	args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
-							//else if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_CV_SUPPORT))
-							//	args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
-							//else
+							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+								args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
+							} else if ((encoderFlags
+								& ATOM_DEVICE_CV_SUPPORT) != 0) {
+								args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
+							} else
 								args.v1.ucDevice = ATOM_DEVICE_CRT2_INDEX;
 							break;
 					}
@@ -140,23 +139,21 @@ encoder_assign_crtc(uint8 crtcID)
 							args.v2.ucEncoderID = ASIC_INT_DVO_ENCODER_ID;
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-							//if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_TV_SUPPORT))
-							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
-							//else if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_CV_SUPPORT))
-							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
-							//else
+							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else if ((encoderFlags
+								& ATOM_DEVICE_CV_SUPPORT) != 0) {
+								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else
 								args.v2.ucEncoderID = ASIC_INT_DAC1_ENCODER_ID;
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-							//if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_TV_SUPPORT))
-							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
-							//else if (radeon_encoder->active_device
-							//	& (ATOM_DEVICE_CV_SUPPORT))
-							//	args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
-							//else
+							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else if ((encoderFlags
+								& ATOM_DEVICE_CV_SUPPORT) != 0) {
+								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else
 								args.v2.ucEncoderID = ASIC_INT_DAC2_ENCODER_ID;
 							break;
 					}

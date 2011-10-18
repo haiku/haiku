@@ -10,16 +10,16 @@ UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 Addon radeon_hd.accelerant :
-	atom.cpp
-	gpu.cpp
 	accelerant.cpp
+	atom.cpp
+	create_display_modes.cpp
+	bios.cpp
+	display.cpp
 	encoder.cpp
 	engine.cpp
+	gpu.cpp
 	hooks.cpp
-	pll.cpp
-	display.cpp
 	mode.cpp
-	bios.cpp
-	create_display_modes.cpp
+	pll.cpp
 	: be libaccelerantscommon.a
 ;

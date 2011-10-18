@@ -97,7 +97,7 @@ pll_limit_probe(pll_info *pll)
 	}
 
 	if (pll->pllOutMin == 0) {
-		pll->pllOutMin = 64800;
+		pll->pllOutMin = 64800 * 10;
 			// Avivo+ limit
 	}
 
