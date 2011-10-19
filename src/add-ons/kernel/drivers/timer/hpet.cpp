@@ -26,7 +26,7 @@
 #endif
 
 #define TEST_HPET
-
+#define HPET64 0
 
 static struct hpet_regs *sHPETRegs;
 static uint64 sHPETPeriod;
@@ -75,7 +75,11 @@ static vint32 sOpenCount;
 static inline bigtime_t
 hpet_convert_timeout(const bigtime_t &relativeTimeout)
 {
+#if HPET64
 	bigtime_t counter = sHPETRegs->u0.counter64;
+#else
+	bigtime_t counter = sHPETRegs->u0.counter32;
+#endif
 	bigtime_t converted = (1000000000ULL / sHPETPeriod) * relativeTimeout;
 
 	dprintf("counter: %lld, relativeTimeout: %lld, converted: %lld\n",
@@ -85,7 +89,7 @@ hpet_convert_timeout(const bigtime_t &relativeTimeout)
 }
 
 
-#define MIN_TIMEOUT 3000
+#define MIN_TIMEOUT 1
 
 static status_t
 hpet_set_hardware_timer(bigtime_t relativeTimeout, volatile hpet_timer *timer)
@@ -98,7 +102,11 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout, volatile hpet_timer *timer)
 
 	//dprintf("comparator: %lld, new value: %lld\n", timer->u0.comparator64, timerValue);
 
+#if HPET64
 	timer->u0.comparator64 = timerValue;
+#else
+	timer->u0.comparator32 = timerValue;
+#endif
 
 	// enable timer interrupt
 	timer->config |= HPET_CONF_TIMER_INT_ENABLE;
@@ -128,7 +136,7 @@ hpet_timer_interrupt(void *arg)
 		sHPETRegs->interrupt_status |= intStatus;
 		hpet_clear_hardware_timer(&sHPETRegs->timer[hpetCookie->number]);
 		
-		release_sem(hpetCookie->sem);
+		release_sem_etc(hpetCookie->sem, 1, B_DO_NOT_RESCHEDULE);
 		return B_HANDLED_INTERRUPT;
 	}
 
@@ -221,18 +229,25 @@ hpet_init_timer(hpet_timer_cookie* cookie)
 	if (interrupt == -1)
 		return B_ERROR;
 
-	timer->config |= (interrupt << HPET_CONF_TIMER_INT_ROUTE_SHIFT)
-		& HPET_CONF_TIMER_INT_ROUTE_MASK;
-
 	// Non-periodic mode
 	timer->config &= ~HPET_CONF_TIMER_TYPE;
 
 	// level triggered
 	timer->config |= HPET_CONF_TIMER_INT_TYPE;
 
-	// Disable FSB/MSI, enable 64 bit mode
+	// Disable FSB/MSI
 	timer->config &= ~HPET_CONF_TIMER_FSB_ENABLE;
+
+#if HPET64
+	//disable 32 bit mode
 	timer->config &= ~HPET_CONF_TIMER_32MODE;
+#else
+	//enable 32 bit mode
+	timer->config |= HPET_CONF_TIMER_32MODE;
+#endif
+
+	timer->config |= (interrupt << HPET_CONF_TIMER_INT_ROUTE_SHIFT)
+		& HPET_CONF_TIMER_INT_ROUTE_MASK;
 
 	cookie->irq = interrupt = HPET_GET_CONF_TIMER_INT_ROUTE(timer);
 	status_t status = install_io_interrupt_handler(interrupt, &hpet_timer_interrupt, cookie, 0);
@@ -250,9 +265,9 @@ hpet_init_timer(hpet_timer_cookie* cookie)
 static status_t
 hpet_test()
 {
-	uint64 initialValue = sHPETRegs->u0.counter64;
+	uint64 initialValue = sHPETRegs->u0.counter32;
 	spin(10);
-	uint64 finalValue = sHPETRegs->u0.counter64;
+	uint64 finalValue = sHPETRegs->u0.counter32;
 
 	if (initialValue == finalValue) {
 		dprintf("hpet_test: counter does not increment\n");
@@ -271,9 +286,11 @@ hpet_init()
 
 	sHPETPeriod = HPET_GET_PERIOD(sHPETRegs);
 
-	TRACE(("hpet_init: HPET is at %p.\n\tVendor ID: %llx, rev: %llx, period: %lld\n",
+	TRACE(("hpet_init: HPET is at %p.\n"
+			"\tVendor ID: %llx, rev: %llx, period: %lld\n"
+			"\tin legacy mode: %s\n",
 		sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs), HPET_GET_REVID(sHPETRegs),
-		sHPETPeriod));
+		sHPETPeriod, sHPETRegs->config & HPET_CONF_MASK_LEGACY ? "yes" : "no"));
 
 	status_t status = hpet_set_enabled(false);
 	if (status != B_OK)
