@@ -14,6 +14,7 @@
 #include <ACPI.h>
 #include <PCI.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,6 +39,7 @@ struct hpet_timer_cookie {
 	int number;
 	int32 irq;
 	sem_id sem;
+	hpet_timer* timer;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +94,7 @@ hpet_convert_timeout(const bigtime_t &relativeTimeout)
 #define MIN_TIMEOUT 1
 
 static status_t
-hpet_set_hardware_timer(bigtime_t relativeTimeout, volatile hpet_timer *timer)
+hpet_set_hardware_timer(bigtime_t relativeTimeout, hpet_timer *timer)
 {
 	// TODO:
 	if (relativeTimeout < MIN_TIMEOUT)
@@ -116,7 +118,7 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout, volatile hpet_timer *timer)
 
 
 static status_t
-hpet_clear_hardware_timer(volatile hpet_timer *timer)
+hpet_clear_hardware_timer(hpet_timer *timer)
 {
 	// Disable timer interrupt
 	timer->config &= ~HPET_CONF_TIMER_INT_ENABLE;
@@ -129,12 +131,14 @@ hpet_timer_interrupt(void *arg)
 {
 	//dprintf("HPET timer_interrupt!!!!\n");
 	hpet_timer_cookie* hpetCookie = (hpet_timer_cookie*)arg;
+	hpet_timer* timer = &sHPETRegs->timer[hpetCookie->number];
 
-	// clear interrupt status
 	int32 intStatus = 1 << hpetCookie->number;
-	if (sHPETRegs->interrupt_status & intStatus) {
+	if (!HPET_GET_CONF_TIMER_INT_IS_LEVEL(timer)
+			|| (sHPETRegs->interrupt_status & intStatus)) {
+		// clear interrupt status
 		sHPETRegs->interrupt_status |= intStatus;
-		hpet_clear_hardware_timer(&sHPETRegs->timer[hpetCookie->number]);
+		hpet_clear_hardware_timer(timer);
 		
 		release_sem_etc(hpetCookie->sem, 1, B_DO_NOT_RESCHEDULE);
 		return B_HANDLED_INTERRUPT;
@@ -159,7 +163,7 @@ static status_t
 hpet_set_legacy(bool enabled)
 {
 	if (!HPET_IS_LEGACY_CAPABLE(sHPETRegs)) {
-		dprintf("hpet_init: HPET doesn't support legacy mode. Skipping.\n");
+		dprintf("hpet_init: HPET doesn't support legacy mode.\n");
 		return B_NOT_SUPPORTED;
 	}
 
@@ -197,7 +201,7 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 	dprintf("\tTimer type: %s\n",
 		timer->config & HPET_CONF_TIMER_TYPE ? "Periodic" : "OneShot");
 	dprintf("\tInterrupt Type: %s\n",
-		timer->config & HPET_CONF_TIMER_INT_TYPE ? "Level" : "Edge");
+		HPET_GET_CONF_TIMER_INT_IS_LEVEL(timer) ? "Level" : "Edge");
 
 	dprintf("\tconfigured IRQ: %lld\n",
 		HPET_GET_CONF_TIMER_INT_ROUTE(timer));
@@ -213,7 +217,7 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 static status_t
 hpet_init_timer(hpet_timer_cookie* cookie)
 {
-	volatile struct hpet_timer *timer = &sHPETRegs->timer[cookie->number];
+	struct hpet_timer *timer = cookie->timer;
 
 	uint32 interrupts = (uint32)HPET_GET_CAP_TIMER_ROUTE(timer);
 
@@ -226,9 +230,10 @@ hpet_init_timer(hpet_timer_cookie* cookie)
 		}
 	}
 
-	if (interrupt == -1)
+	if (interrupt == -1) {
+		dprintf("hpet_init_timer(): timer can't be routed to any interrupt!")
 		return B_ERROR;
-
+	}
 	// Non-periodic mode
 	timer->config &= ~HPET_CONF_TIMER_TYPE;
 
@@ -287,10 +292,9 @@ hpet_init()
 	sHPETPeriod = HPET_GET_PERIOD(sHPETRegs);
 
 	TRACE(("hpet_init: HPET is at %p.\n"
-			"\tVendor ID: %llx, rev: %llx, period: %lld\n"
-			"\tin legacy mode: %s\n",
+			"\tVendor ID: %llx, rev: %llx, period: %lld\n",
 		sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs), HPET_GET_REVID(sHPETRegs),
-		sHPETPeriod, sHPETRegs->config & HPET_CONF_MASK_LEGACY ? "yes" : "no"));
+		sHPETPeriod));
 
 	status_t status = hpet_set_enabled(false);
 	if (status != B_OK)
@@ -302,8 +306,10 @@ hpet_init()
 
 	uint32 numTimers = HPET_GET_NUM_TIMERS(sHPETRegs) + 1;
 
-	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n",
-		numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
+	TRACE(("hpet_init: HPET supports %lu timers, is %s bits wide, "
+			"and is %sin legacy mode.\n",
+			numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32",
+			sHPETRegs->config & HPET_CONF_MASK_LEGACY ? "" : "not "));
 
 	TRACE(("hpet_init: configuration: 0x%llx, timer_interrupts: 0x%llx\n",
 		sHPETRegs->config, sHPETRegs->interrupt_status));
@@ -428,27 +434,44 @@ hpet_open(const char* name, uint32 flags, void** cookie)
 		return B_BUSY;
 	}
 
-	hpet_timer_cookie* hpetCookie = (hpet_timer_cookie*)malloc(sizeof(hpet_timer_cookie));
 	int timerNumber = 2;
+		// TODO
+
+	char semName[B_OS_NAME_LENGTH];
+	snprintf(semName, B_OS_NAME_LENGTH, "hpet_timer %d sem", timerNumber);
+	sem_id sem = create_sem(0, semName);
+	if (sem < 0) {
+		atomic_add(&sOpenCount, -1);
+		return sem;
+	}
+
+	hpet_timer_cookie* hpetCookie = (hpet_timer_cookie*)malloc(sizeof(hpet_timer_cookie));
+	if (hpetCookie == NULL) {
+		delete_sem(sem);
+		atomic_add(&sOpenCount, -1);
+		return B_NO_MEMORY;
+	}
+
 	hpetCookie->number = timerNumber;
-	hpetCookie->sem = create_sem(0, "hpet_timer 2 sem");
+	hpetCookie->timer = &sHPETRegs->timer[timerNumber];
+	hpetCookie->sem = sem;
 	set_sem_owner(hpetCookie->sem, B_SYSTEM_TEAM);
 
 	hpet_set_enabled(false);
 
 	status_t status = hpet_init_timer(hpetCookie);
-	if (status != B_OK) {
+	if (status != B_OK)
 		dprintf("hpet_open: initializing timer failed: %s\n", strerror(status));
-		return status;
-	}
 
 	hpet_set_enabled(true);
 
 	*cookie = hpetCookie;
 
-	if (status != B_OK)
+	if (status != B_OK) {
+		delete_sem(sem);
+		free(hpetCookie);
 		atomic_add(&sOpenCount, -1);
-
+	}
 	return status;
 }
 
