@@ -231,7 +231,7 @@ hpet_init_timer(hpet_timer_cookie* cookie)
 	}
 
 	if (interrupt == -1) {
-		dprintf("hpet_init_timer(): timer can't be routed to any interrupt!")
+		dprintf("hpet_init_timer(): timer can't be routed to any interrupt!");
 		return B_ERROR;
 	}
 	// Non-periodic mode
