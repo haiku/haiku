@@ -248,7 +248,7 @@ atom_get_src_int(atom_exec_context *ctx, uint8 attr, int *ptr,
 			val = gctx->scratch[((gctx->fb_base + idx) / 4)];
 			if ((gctx->fb_base + (idx * 4)) > gctx->scratch_size_bytes) {
 				ERROR("%s: fb tried to read beyond scratch region!"
-					" %" B_PRIu32 " vs. %d\n", __func__,
+					" %" B_PRIu32 " vs. %" B_PRIu32 "\n", __func__,
 					gctx->fb_base + (idx * 4), gctx->scratch_size_bytes);
 				val = 0;
 			} else
@@ -472,7 +472,7 @@ atom_put_dst(atom_exec_context *ctx, int arg, uint8 attr,
 			(*ptr)++;
 			if ((gctx->fb_base + (idx * 4)) > gctx->scratch_size_bytes) {
 				ERROR("%s: fb tried to write beyond scratch region! "
-					"%" B_PRIu32 " vs. %d\n", __func__,
+					"%" B_PRIu32 " vs. %" B_PRIu32 "\n", __func__,
 					gctx->fb_base + (idx * 4), gctx->scratch_size_bytes);
 			} else
 				gctx->scratch[(gctx->fb_base / 4) + idx] = val;

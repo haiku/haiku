@@ -143,7 +143,7 @@ typedef struct atom_context_s {
 	int cs_equal, cs_above;
 	int io_mode;
 	uint32 *scratch;
-	int scratch_size_bytes;
+	uint32 scratch_size_bytes;
 } atom_context;
 
 extern int atom_debug;
