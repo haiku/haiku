@@ -109,14 +109,15 @@ const struct supported_device {
 	{0x9490, 3, 2, RADEON_R700 | 0x30, false, "Radeon HD 4710"},
 	{0x94b3, 3, 2, RADEON_R700 | 0x40, false, "Radeon HD 4770"},
 	{0x94b5, 3, 2, RADEON_R700 | 0x40, false, "Radeon HD 4770"},
-	{0x944a, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4850 Mobile"},
-	{0x944e, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4810"},
-	{0x944c, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4830"},
-	{0x9442, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4850"},
-	{0x9443, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4850 X2"},
-	{0x94a1, 3, 0, RADEON_R700 | 0x90, true,  "Radeon HD 4860"},
-	{0x9440, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4870"},
-	{0x9441, 3, 0, RADEON_R700 | 0x70, false, "Radeon HD 4870 X2"},
+	{0x944a, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4850 Mobile"},
+	{0x944e, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4810"},
+	{0x944c, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4830"},
+	{0x9442, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4850"},
+	{0x9443, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4850 X2"},
+	{0x94a1, 3, 1, RADEON_R700 | 0x90, true,  "Radeon HD 4860"},
+	{0x9440, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4870"},
+	{0x9441, 3, 1, RADEON_R700 | 0x70, false, "Radeon HD 4870 X2"},
+	{0x9460, 3, 1, RADEON_R700 | 0x90, false, "Radeon HD 4890"},
 
 	// From here on AMD no longer used numeric identifiers
 
