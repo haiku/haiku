@@ -66,6 +66,7 @@ const struct supported_device {
 	{0x940a, 2, 0, RADEON_R600 | 0x00, false, "Radeon FireGL V8650"},
 	{0x940b, 2, 0, RADEON_R600 | 0x00, false, "Radeon FireGL V8600"},
 	{0x940f, 2, 0, RADEON_R600 | 0x00, false, "Radeon FireGL V7600"},
+	{0x9616, 2, 0, RADEON_R600 | 0x10, true,  "Radeon HD 3000"},
 	{0x9611, 3, 0, RADEON_R600 | 0x20, true,  "Radeon HD 3100"},
 	{0x9613, 3, 0, RADEON_R600 | 0x20, true,  "Radeon HD 3100"},
 	{0x9610, 2, 0, RADEON_R600 | 0x10, true,  "Radeon HD 3200"},
