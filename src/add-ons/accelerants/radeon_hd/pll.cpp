@@ -125,15 +125,13 @@ pll_limit_probe(pll_info *pll)
 void
 pll_compute_post_divider(pll_info *pll)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
-
 	if ((pll->flags & PLL_USE_POST_DIV) != 0) {
 		TRACE("%s: using AtomBIOS post divider\n", __func__);
 		return;
 	}
 
 	uint32 vco;
-	if (info.device_chipset < (RADEON_R700 | 0x70)) {
+	if ((pll->flags & PLL_PREFER_MINM_OVER_MAXP) != 0) {
 		if ((pll->flags & PLL_IS_LCD) != 0)
 			vco = pll->lcdPllOutMin;
 		else
@@ -150,7 +148,7 @@ pll_compute_post_divider(pll_info *pll)
 	uint32 postDivider = vco / pll->pixelClock;
 	uint32 tmp = vco % pll->pixelClock;
 
-	if (info.device_chipset < (RADEON_R700 | 0x70)) {
+	if ((pll->flags & PLL_PREFER_MINM_OVER_MAXP) != 0) {
 		if (tmp)
 			postDivider++;
 	} else {
@@ -294,10 +292,20 @@ union adjust_pixel_clock {
 void
 pll_setup_flags(pll_info *pll, uint8 crtcID)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	pll->flags |= PLL_PREFER_LOW_REF_DIV;
+	if ((info.dceMajor >= 3 && info.dceMinor >= 2)
+		&& pll->pixelClock > 200000) {
+		pll->flags |= PLL_PREFER_HIGH_FB_DIV;
+	} else
+		pll->flags |= PLL_PREFER_LOW_REF_DIV;
+
+
+	if (info.device_chipset < (RADEON_R700 | 0x70))
+		pll->flags |= PLL_PREFER_MINM_OVER_MAXP;
+
 
 	if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 		pll->flags |= PLL_IS_LCD;

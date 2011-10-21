@@ -176,6 +176,7 @@ encoder_assign_crtc(uint8 crtcID)
 void
 encoder_mode_set(uint8 id, uint32 pixelClock)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
 	switch (gConnector[connectorIndex]->encoder.objectID) {
@@ -189,12 +190,40 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			encoder_digital_setup(id, pixelClock, ATOM_ENABLE);
+			encoder_digital_setup(id, pixelClock, PANEL_ENCODER_ACTION_ENABLE);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+			if (info.dceMajor >= 4) {
+				//atombios_dig_transmitter_setup(encoder,
+				//	ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
+					// TODO: Disable the dig transmitter
+				encoder_dig_setup(id, pixelClock, ATOM_ENCODER_CMD_SETUP);
+					// Setup and enable the dig encoder
+
+				//atombios_dig_transmitter_setup(encoder,
+				//	ATOM_TRANSMITTER_ACTION_ENABLE, 0, 0);
+					// TODO: Enable the dig transmitter
+			} else {
+				//atombios_dig_transmitter_setup(encoder,
+				//	ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
+					// Disable the dig transmitter
+				encoder_dig_setup(id, pixelClock, ATOM_DISABLE);
+					// Disable the dig encoder
+
+				/* setup and enable the encoder and transmitter */
+				encoder_dig_setup(id, pixelClock, ATOM_ENABLE);
+					// Setup and enable the dig encoder
+
+				//atombios_dig_transmitter_setup(encoder,
+				//	ATOM_TRANSMITTER_ACTION_SETUP, 0, 0);
+				//atombios_dig_transmitter_setup(encoder,
+				//	ATOM_TRANSMITTER_ACTION_ENABLE, 0, 0);
+					// TODO: Setup and Enable the dig transmitter
+			}
+
 			TRACE("%s: TODO for DIG encoder setup\n", __func__);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
@@ -334,6 +363,23 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 		return B_ERROR;
 	}
 	return atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+union dig_encoder_control {
+	DIG_ENCODER_CONTROL_PS_ALLOCATION v1;
+	DIG_ENCODER_CONTROL_PARAMETERS_V2 v2;
+	DIG_ENCODER_CONTROL_PARAMETERS_V3 v3;
+	DIG_ENCODER_CONTROL_PARAMETERS_V4 v4;
+};
+
+
+status_t
+encoder_dig_setup(uint8 id, uint32 pixelClock, int command)
+{
+	TRACE("%s: TODO\n", __func__);
+
+	return B_OK;
 }
 
 

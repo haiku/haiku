@@ -117,6 +117,8 @@ radeon_dpms_mode(void)
 void
 radeon_dpms_set(int mode)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	switch(mode) {
 		case B_DPMS_ON:
 			TRACE("%s: ON\n", __func__);
@@ -125,7 +127,8 @@ radeon_dpms_set(int mode)
 					continue;
 				display_crtc_lock(id, ATOM_ENABLE);
 				display_crtc_power(id, ATOM_ENABLE);
-				display_crtc_memreq(id, ATOM_ENABLE);
+				if (info.dceMajor >= 3)
+					display_crtc_memreq(id, ATOM_ENABLE);
 				display_crtc_blank(id, ATOM_DISABLE);
 				display_crtc_lock(id, ATOM_DISABLE);
 			}
@@ -139,7 +142,8 @@ radeon_dpms_set(int mode)
 					continue;
 				display_crtc_lock(id, ATOM_ENABLE);
 				display_crtc_blank(id, ATOM_ENABLE);
-				display_crtc_memreq(id, ATOM_DISABLE);
+				if (info.dceMajor >= 3)
+					display_crtc_memreq(id, ATOM_DISABLE);
 				display_crtc_power(id, ATOM_DISABLE);
 				display_crtc_lock(id, ATOM_DISABLE);
 			}
@@ -152,6 +156,8 @@ radeon_dpms_set(int mode)
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
@@ -169,7 +175,8 @@ radeon_set_display_mode(display_mode *mode)
 		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
 		display_crtc_blank(id, ATOM_ENABLE);
-		display_crtc_memreq(id, ATOM_DISABLE);
+		if (info.dceMajor >= 3)
+			display_crtc_memreq(id, ATOM_DISABLE);
 		display_crtc_power(id, ATOM_DISABLE);
 
 		// *** CRT controler mode set
@@ -187,7 +194,8 @@ radeon_set_display_mode(display_mode *mode)
 
 		// *** CRT controler commit
 		display_crtc_power(id, ATOM_ENABLE);
-		display_crtc_memreq(id, ATOM_ENABLE);
+		if (info.dceMajor >= 3)
+			display_crtc_memreq(id, ATOM_ENABLE);
 		display_crtc_blank(id, ATOM_DISABLE);
 		display_crtc_lock(id, ATOM_DISABLE);
 
