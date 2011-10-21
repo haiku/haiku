@@ -470,6 +470,8 @@ detect_connectors()
 								>> OBJECT_ID_SHIFT;
 
 							uint32 encoderType = VIDEO_ENCODER_NONE;
+							bool encoderExternal = false;
+
 							switch(encoderID) {
 								case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
@@ -519,6 +521,7 @@ detect_connectors()
 								case ENCODER_OBJECT_ID_HDMI_SI1930:
 								case ENCODER_OBJECT_ID_TRAVIS:
 								case ENCODER_OBJECT_ID_NUTMEG:
+									encoderExternal = true;
 									if ((connectorFlags
 										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
 										encoderType = VIDEO_ENCODER_LVDS;
@@ -552,6 +555,8 @@ detect_connectors()
 								= encoderID;
 							gConnector[connectorIndex]->encoder.type
 								= encoderType;
+							gConnector[connectorIndex]->encoder.isExternal
+								= encoderExternal;
 
 							pll_limit_probe(
 								&gConnector[connectorIndex]->encoder.pll);
