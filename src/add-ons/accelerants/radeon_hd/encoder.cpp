@@ -377,9 +377,150 @@ union dig_encoder_control {
 status_t
 encoder_dig_setup(uint8 id, uint32 pixelClock, int command)
 {
-	TRACE("%s: TODO\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
 
-	return B_OK;
+	uint32 connectorIndex = gDisplay[id]->connectorIndex;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+
+	union dig_encoder_control args;
+	int index = 0;
+
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	memset(&args, 0, sizeof(args));
+
+	if (info.dceMajor > 4)
+		index = GetIndexIntoMasterTable(COMMAND, DIGxEncoderControl);
+	else {
+		if (1) // TODO: pick dig encoder
+			index = GetIndexIntoMasterTable(COMMAND, DIG1EncoderControl);
+		else
+			index = GetIndexIntoMasterTable(COMMAND, DIG2EncoderControl);
+	}
+
+	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
+		!= B_OK) {
+		ERROR("%s: cannot parse command table\n", __func__);
+		return B_ERROR;
+	}
+
+	args.v1.ucAction = command;
+	args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+	#if 0
+	if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE) {
+		if (info.dceMajor >= 4 && 0) // TODO: 0 == if DP bridge
+			args.v3.ucPanelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
+		else
+			args.v3.ucPanelMode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
+	} else {
+		args.v1.ucEncoderMode = display_get_encoder_mode(connectorIndex);
+
+	if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+		|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
+		args.v1.ucLaneNum = dp_lane_count;
+	} else if (pixelClock > 165000)
+		args.v1.ucLaneNum = 8;
+	else
+		args.v1.ucLaneNum = 4;
+
+	if (info.dceMajor >= 5) {
+		if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+			|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
+				if (dpClock == 270000) {
+					args.v1.ucConfig
+						|= ATOM_ENCODER_CONFIG_V4_DPLINKRATE_2_70GHZ;
+				} else if (dpClock == 540000) {
+					args.v1.ucConfig
+						|= ATOM_ENCODER_CONFIG_V4_DPLINKRATE_5_40GHZ;
+				}
+		}
+		args.v4.acConfig.ucDigSel = dig->dig_encoder;
+		switch (bpc) {
+			case 0:
+				args.v4.ucBitPerColor = PANEL_BPC_UNDEFINE;
+				break;
+			case 6:
+				args.v4.ucBitPerColor = PANEL_6BIT_PER_COLOR;
+				break;
+			case 8:
+			default:
+				args.v4.ucBitPerColor = PANEL_8BIT_PER_COLOR;
+				break;
+			case 10:
+				args.v4.ucBitPerColor = PANEL_10BIT_PER_COLOR;
+				break;
+			case 12:
+				args.v4.ucBitPerColor = PANEL_12BIT_PER_COLOR;
+				break;
+			case 16:
+				args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
+				break;
+		}
+
+		//if (hpdID == RADEON_HPD_NONE)
+		if (1)
+			args.v4.ucHPD_ID = 0;
+		else
+			args.v4.ucHPD_ID = hpd_id + 1;
+
+	} else if (info.dceMajor >= 4) {
+		if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+			&& dp_clock == 270000) {
+			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_V3_DPLINKRATE_2_70GHZ;
+		}
+
+		args.v3.acConfig.ucDigSel = dig->dig_encoder;
+		switch (bpc) {
+			case 0:
+				args.v3.ucBitPerColor = PANEL_BPC_UNDEFINE;
+				break;
+			case 6:
+				args.v3.ucBitPerColor = PANEL_6BIT_PER_COLOR;
+				break;
+			case 8:
+			default:
+				args.v3.ucBitPerColor = PANEL_8BIT_PER_COLOR;
+				break;
+			case 10:
+				args.v3.ucBitPerColor = PANEL_10BIT_PER_COLOR;
+				break;
+			case 12:
+				args.v3.ucBitPerColor = PANEL_12BIT_PER_COLOR;
+				break;
+			case 16:
+				args.v3.ucBitPerColor = PANEL_16BIT_PER_COLOR;
+				break;
+		}
+
+	} else {
+		if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+			&& dp_clock == 270000) {
+			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
+		}
+	#endif
+		switch (encoderID) {
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+				args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER1;
+				break;
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+			case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+				args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER2;
+				break;
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+				args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER3;
+				break;
+		}
+	#if 0
+		if (dig->linkb)
+			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKB;
+		else
+			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKA;
+	}
+	#endif
+
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
