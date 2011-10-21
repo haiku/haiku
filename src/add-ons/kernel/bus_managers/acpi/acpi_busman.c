@@ -97,6 +97,8 @@ acpi_std_ops(int32 op,...)
 					true, true);
 				acpiAvoidFullInit = get_driver_boolean_parameter(settings,
 					"acpi_avoid_full_init", false, false);
+				AcpiGbl_CopyDsdtLocally = get_driver_boolean_parameter(settings,
+					"acpi_copy_dsdt", false, false);
 				unload_driver_settings(settings);
 			}
 
