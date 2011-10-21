@@ -846,7 +846,7 @@ display_crtc_scale(uint8 crtcID, display_mode *mode)
 	args.ucScaler = crtcID;
 	args.ucEnable = ATOM_SCALER_EXPANSION;
 
-	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
@@ -857,7 +857,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 	register_info* regs = gDisplay[crtcID]->regs;
 
 	uint32 fbSwap;
-	if (info.device_chipset >= RADEON_R1000)
+	if (info.dceMajor >= 4)
 		fbSwap = EVERGREEN_GRPH_ENDIAN_SWAP(EVERGREEN_GRPH_ENDIAN_NONE);
 	else
 		fbSwap = R600_D1GRPH_SWAP_ENDIAN_NONE;
@@ -871,7 +871,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 		case B_CMAP8:
 			bytesPerPixel = 1;
 			bitsPerPixel = 8;
-			if (info.device_chipset >= RADEON_R1000) { // DCE4
+			if (info.dceMajor >= 4) {
 				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_8BPP)
 					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_INDEXED));
 			} else {
@@ -882,7 +882,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 		case B_RGB15_LITTLE:
 			bytesPerPixel = 2;
 			bitsPerPixel = 15;
-			if (info.device_chipset >= RADEON_R1000) { // DCE4
+			if (info.dceMajor >= 4) {
 				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_16BPP)
 					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_ARGB1555));
 			} else {
@@ -894,7 +894,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 			bytesPerPixel = 2;
 			bitsPerPixel = 16;
 
-			if (info.device_chipset >= RADEON_R1000) { // DCE4
+			if (info.dceMajor >= 4) {
 				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_16BPP)
 					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_ARGB565));
 				#ifdef __POWERPC__
@@ -914,7 +914,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 		default:
 			bytesPerPixel = 4;
 			bitsPerPixel = 32;
-			if (info.device_chipset >= RADEON_R1000) { // DCE4
+			if (info.dceMajor >= 4) {
 				fbFormat = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_32BPP)
 					| EVERGREEN_GRPH_FORMAT(EVERGREEN_GRPH_FORMAT_ARGB8888));
 				#ifdef __POWERPC__
@@ -974,7 +974,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 		(viewport_w << 16) | viewport_h);
 
 	// Pageflip setup
-	if (info.device_chipset >= RADEON_R1000) { // DCE4
+	if (info.dceMajor >= 4) {
 		uint32 tmp
 			= Read32(OUT, EVERGREEN_GRPH_FLIP_CONTROL + regs->crtcOffset);
 		tmp &= ~EVERGREEN_GRPH_SURFACE_UPDATE_H_RETRACE_EN;
