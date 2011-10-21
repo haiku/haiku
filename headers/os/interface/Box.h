@@ -71,7 +71,8 @@ class BBox : public BView {
 		virtual	BSize		MaxSize();
 		virtual	BSize		PreferredSize();
 
-		virtual	void		InvalidateLayout(bool descendants = false);
+	protected:
+		virtual	void		LayoutInvalidated(bool descendants = false);
 		virtual	void		DoLayout();
 
 	private:

@@ -650,11 +650,11 @@ BButton::Perform(perform_code code, void* _data)
 			BButton::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BButton::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BButton::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:
@@ -665,16 +665,6 @@ BButton::Perform(perform_code code, void* _data)
 	}
 
 	return BControl::Perform(code, _data);
-}
-
-
-void
-BButton::InvalidateLayout(bool descendants)
-{
-	// invalidate cached preferred size
-	fPreferredSize.Set(-1, -1);
-
-	BControl::InvalidateLayout(descendants);
 }
 
 
@@ -699,6 +689,14 @@ BButton::PreferredSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
 		_ValidatePreferredSize());
+}
+
+
+void
+BButton::LayoutInvalidated(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(-1, -1);
 }
 
 

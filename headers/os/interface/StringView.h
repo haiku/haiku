@@ -41,7 +41,6 @@ public:
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
-	virtual	void				InvalidateLayout(bool descendants = false);
 	virtual	void				ResizeToPreferred();
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
@@ -62,6 +61,8 @@ public:
 	virtual	void				SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);
 
+protected:
+	virtual	void				LayoutInvalidated(bool descendants = false);
 
 private:
 	// FBC padding and forbidden methods

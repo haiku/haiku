@@ -440,16 +440,6 @@ BCheckBox::ResizeToPreferred()
 }
 
 
-void
-BCheckBox::InvalidateLayout(bool descendants)
-{
-	// invalidate cached preferred size
-	fPreferredSize.Set(B_SIZE_UNSET, B_SIZE_UNSET);
-
-	BControl::InvalidateLayout(descendants);
-}
-
-
 BSize
 BCheckBox::MinSize()
 {
@@ -558,11 +548,11 @@ BCheckBox::Perform(perform_code code, void* _data)
 			BCheckBox::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BCheckBox::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BCheckBox::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:
@@ -573,6 +563,14 @@ BCheckBox::Perform(perform_code code, void* _data)
 	}
 
 	return BControl::Perform(code, _data);
+}
+
+
+void
+BCheckBox::LayoutInvalidated(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(B_SIZE_UNSET, B_SIZE_UNSET);
 }
 
 

@@ -4481,11 +4481,11 @@ BView::Perform(perform_code code, void* _data)
 			BView::SetLayout(data->layout);
 			return B_OK;
 		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BView::InvalidateLayout(data->descendants);
+			perform_data_layout_invalidated* data
+				= (perform_data_layout_invalidated*)_data;
+			BView::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
 		case PERFORM_CODE_DO_LAYOUT:
@@ -4697,6 +4697,7 @@ BView::InvalidateLayout(bool descendants)
 
 		fLayoutData->fLayoutValid = false;
 		fLayoutData->fMinMaxValid = false;
+		LayoutInvalidated(descendants);
 
 		if (descendants) {
 			for (BView* child = fFirstChild;
@@ -4787,6 +4788,13 @@ BView::Relayout()
 		if (!fParent || !fParent->fLayoutData->fLayoutInProgress)
 			Layout(false);
 	}
+}
+
+
+void
+BView::LayoutInvalidated(bool descendants)
+{
+	// hook method
 }
 
 
@@ -5772,10 +5780,10 @@ _ReservedView8__5BView(BView* view, BLayout* layout)
 extern "C" void
 _ReservedView9__5BView(BView* view, bool descendants)
 {
-	// InvalidateLayout()
-	perform_data_invalidate_layout data;
+	// LayoutInvalidated()
+	perform_data_layout_invalidated data;
 	data.descendants = descendants;
-	view->Perform(PERFORM_CODE_INVALIDATE_LAYOUT, &data);
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 

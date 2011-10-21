@@ -548,10 +548,10 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
+			void				InvalidateLayout(bool descendants = false);
 	virtual	void				SetLayout(BLayout* layout);
 			BLayout*			GetLayout() const;
 
-	virtual	void				InvalidateLayout(bool descendants = false);
 			void				EnableLayoutInvalidation();
 			void				DisableLayoutInvalidation();
 			bool				IsLayoutValid() const;
@@ -565,6 +565,7 @@ public:
 	class Private;
 
 protected:
+	virtual	void				LayoutInvalidated(bool descendants = false);
 	virtual	void				DoLayout();
 
 public:
