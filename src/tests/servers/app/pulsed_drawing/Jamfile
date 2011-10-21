@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src tests servers app pulsed_drawing ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SimpleTest PulsedDrawing :
+	main.cpp
+	: be $(TARGET_LIBSUPC++) ;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : PulsedDrawing
+		: tests!apps ;
+}
+

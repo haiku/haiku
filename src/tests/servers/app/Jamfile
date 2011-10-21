@@ -216,6 +216,7 @@ SubInclude HAIKU_TOP src tests servers app menu_crash ;
 SubInclude HAIKU_TOP src tests servers app no_pointer_history ;
 SubInclude HAIKU_TOP src tests servers app painter ;
 SubInclude HAIKU_TOP src tests servers app playground ;
+SubInclude HAIKU_TOP src tests servers app pulsed_drawing ;
 SubInclude HAIKU_TOP src tests servers app regularapps ;
 SubInclude HAIKU_TOP src tests servers app resize_limits ;
 SubInclude HAIKU_TOP src tests servers app scrollbar ;
