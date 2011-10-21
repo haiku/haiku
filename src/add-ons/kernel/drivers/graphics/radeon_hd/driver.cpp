@@ -337,6 +337,8 @@ init_driver(void)
 		gDeviceInfo[found]->device_id = kSupportedDevices[type].device_id;
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_chipset = kSupportedDevices[type].chipset;
+		gDeviceInfo[found]->dceMajor = kSupportedDevices[type].dceMajor;
+		gDeviceInfo[found]->dceMinor = kSupportedDevices[type].dceMinor;
 
 		dprintf(DEVICE_NAME ": GPU(%ld) %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);

@@ -378,6 +378,8 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->device_index = info.id;
 	info.shared_info->device_id = info.device_id;
 	info.shared_info->device_chipset = info.device_chipset;
+	info.shared_info->dceMajor = info.dceMajor;
+	info.shared_info->dceMinor = info.dceMinor;
 	info.shared_info->registers_area = info.registers_area;
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 

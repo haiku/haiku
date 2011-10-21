@@ -119,6 +119,8 @@ struct radeon_shared_info {
 	uint16			cursor_hot_y;
 
 	uint16			device_chipset;
+	uint8			dceMajor;
+	uint8			dceMinor;
 	char			device_identifier[32];
 };
 
