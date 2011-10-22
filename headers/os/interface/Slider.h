@@ -156,11 +156,12 @@ public:
 
 	virtual	float				MaxUpdateTextWidth();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
+
+protected:
+	virtual	void				LayoutInvalidated(bool descendants);
 
 private:
 			void				_DrawBlockThumb();

@@ -83,14 +83,13 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-
 			BLayoutItem*		CreateLabelLayoutItem();
 			BLayoutItem*		CreateMenuBarLayoutItem();
 
 	virtual status_t			Perform(perform_code d, void* arg);
 
 protected:
+	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
 
 private:

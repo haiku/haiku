@@ -373,7 +373,6 @@ public:
 	virtual BSize				PreferredSize();
 	virtual BSize				MaxSize();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
 
 protected:
 	virtual	void 				MessageReceived(BMessage* message);
@@ -382,6 +381,7 @@ protected:
 	virtual	void 				WindowActivated(bool active);
 	virtual	void 				Draw(BRect updateRect);
 
+	virtual	void				LayoutInvalidated(bool descendants = false);
 	virtual	void				DoLayout();
 
 private:

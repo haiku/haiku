@@ -841,17 +841,6 @@ BTextControl::PreferredSize()
 }
 
 
-void
-BTextControl::InvalidateLayout(bool descendants)
-{
-	CALLED();
-
-	fLayoutData->valid = false;
-
-	BView::InvalidateLayout(descendants);
-}
-
-
 BLayoutItem*
 BTextControl::CreateLabelLayoutItem()
 {
@@ -867,6 +856,15 @@ BTextControl::CreateTextViewLayoutItem()
 	if (!fLayoutData->text_view_layout_item)
 		fLayoutData->text_view_layout_item = new TextViewLayoutItem(this);
 	return fLayoutData->text_view_layout_item;
+}
+
+
+void
+BTextControl::LayoutInvalidated(bool descendants)
+{
+	CALLED();
+
+	fLayoutData->valid = false;
 }
 
 

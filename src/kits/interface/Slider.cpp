@@ -1736,16 +1736,6 @@ BSlider::MaxUpdateTextWidth()
 // #pragma mark - layout related
 
 
-void
-BSlider::InvalidateLayout(bool descendants)
-{
-	// invalidate cached preferred size
-	fMinSize.Set(-1, -1);
-
-	BControl::InvalidateLayout(descendants);
-}
-
-
 BSize
 BSlider::MinSize()
 {
@@ -1775,6 +1765,14 @@ BSlider::PreferredSize()
 	else
 		preferredSize.height = max_c(100.0, preferredSize.height);
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
+}
+
+
+void
+BSlider::LayoutInvalidated(bool descendants)
+{
+	// invalidate cached preferred size
+	fMinSize.Set(-1, -1);
 }
 
 

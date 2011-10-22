@@ -801,17 +801,6 @@ BMenuField::PreferredSize()
 }
 
 
-void
-BMenuField::InvalidateLayout(bool descendants)
-{
-	CALLED();
-
-	fLayoutData->valid = false;
-
-	BView::InvalidateLayout(descendants);
-}
-
-
 BLayoutItem*
 BMenuField::CreateLabelLayoutItem()
 {
@@ -903,6 +892,15 @@ BMenuField::Perform(perform_code code, void* _data)
 	}
 
 	return BView::Perform(code, _data);
+}
+
+
+void
+BMenuField::LayoutInvalidated(bool descendants)
+{
+	CALLED();
+
+	fLayoutData->valid = false;
 }
 
 

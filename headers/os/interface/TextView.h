@@ -220,9 +220,8 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-
 protected:
+	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
 
 public:

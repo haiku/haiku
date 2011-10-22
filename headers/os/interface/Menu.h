@@ -77,8 +77,6 @@ public:
 	virtual	void				DoLayout();
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
-			void				InvalidateLayout();
-	virtual	void				InvalidateLayout(bool descendants);
 
 	virtual void				MakeFocus(bool focus = true);
 
@@ -138,6 +136,8 @@ protected:
 								BMenu(BRect frame, const char* name,
 									uint32 resizeMask, uint32 flags,
 									menu_layout layout, bool resizeToFit);
+
+	virtual	void				LayoutInvalidated(bool descendants);
 
 	virtual	BPoint				ScreenLocation();
 

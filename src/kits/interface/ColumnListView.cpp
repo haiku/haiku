@@ -1886,9 +1886,8 @@ BColumnListView::MaxSize()
 
 
 void
-BColumnListView::InvalidateLayout(bool descendants)
+BColumnListView::LayoutInvalidated(bool descendants)
 {
-	BView::InvalidateLayout(descendants);
 }
 
 

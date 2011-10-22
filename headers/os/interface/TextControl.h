@@ -88,12 +88,11 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
-	virtual	void				InvalidateLayout(bool descendants = false);
-
 			BLayoutItem*		CreateLabelLayoutItem();
 			BLayoutItem*		CreateTextViewLayoutItem();
 
 protected:
+	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
 
 private:

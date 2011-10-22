@@ -667,23 +667,6 @@ BMenu::FrameResized(float new_width, float new_height)
 }
 
 
-void
-BMenu::InvalidateLayout()
-{
-	InvalidateLayout(false);
-}
-
-
-void
-BMenu::InvalidateLayout(bool descendants)
-{
-	fUseCachedMenuLayout = false;
-	fLayoutData->preferred.Set(B_SIZE_UNSET, B_SIZE_UNSET);
-
-	BView::InvalidateLayout(descendants);
-}
-
-
 // #pragma mark -
 
 
@@ -2268,6 +2251,14 @@ BMenu::_ComputeMatrixLayout(BRect &frame)
 			frame.bottom = max_c(frame.bottom, item->Frame().bottom);
 		}
 	}
+}
+
+
+void
+BMenu::LayoutInvalidated(bool descendants)
+{
+	fUseCachedMenuLayout = false;
+	fLayoutData->preferred.Set(B_SIZE_UNSET, B_SIZE_UNSET);
 }
 
 

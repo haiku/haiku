@@ -2782,13 +2782,11 @@ BTextView::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BTextView::InvalidateLayout(bool descendants)
+BTextView::LayoutInvalidated(bool descendants)
 {
 	CALLED();
 
 	fLayoutData->valid = false;
-
-	BView::InvalidateLayout(descendants);
 }
 
 
