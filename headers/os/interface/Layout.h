@@ -48,7 +48,7 @@ public:
 
 	// Layouting related methods
 
-			void				InvalidateLayout(bool children = false);
+	virtual	void				InvalidateLayout(bool children = false);
 			void				Relayout(bool immediate = false);
 			void				RequireLayout();
 			bool				IsValid();

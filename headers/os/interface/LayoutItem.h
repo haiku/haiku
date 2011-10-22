@@ -59,10 +59,11 @@ public:
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
 protected:
-
 			void				SetLayout(BLayout* layout);
 
 	// hook methods
+	virtual	void				LayoutInvalidated(bool children);
+
 	virtual	void				AttachedToLayout();
 	virtual	void				DetachedFromLayout(BLayout* layout);
 

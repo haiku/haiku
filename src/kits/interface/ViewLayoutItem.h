@@ -36,7 +36,6 @@ public:
 
 	virtual	BView*				View();
 
-	virtual	void				InvalidateLayout(bool children = false);
 	virtual	void				Relayout(bool immediate = false);
 
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
@@ -45,6 +44,7 @@ public:
 	static	BArchivable*		Instantiate(BMessage* from);
 
 protected:
+	virtual	void				LayoutInvalidated(bool children);
 	virtual void				AncestorVisibilityChanged(bool shown);
 
 private:

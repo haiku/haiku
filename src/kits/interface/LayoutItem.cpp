@@ -72,6 +72,7 @@ BLayoutItem::View()
 void
 BLayoutItem::InvalidateLayout(bool children)
 {
+	LayoutInvalidated(children);
 	if (fLayout)
 		fLayout->InvalidateLayout(children);
 }
@@ -180,6 +181,13 @@ BLayoutItem::SetLayout(BLayout* layout)
 	
 	if (fLayout)
 		AttachedToLayout();
+}
+
+
+void
+BLayoutItem::LayoutInvalidated(bool children)
+{
+	// hook method
 }
 
 
