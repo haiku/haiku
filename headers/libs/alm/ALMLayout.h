@@ -122,11 +122,12 @@ public:
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
 
-	virtual	void				InvalidateLayout(bool children = false);
-
+protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
-	virtual	void				DerivedLayoutItems();
+
+	virtual	void				LayoutInvalidated(bool children);
+	virtual	void				DoLayout();
 
 private:
 			/*! Add a view without initialize the Area. */
