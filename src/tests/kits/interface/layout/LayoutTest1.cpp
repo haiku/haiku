@@ -338,7 +338,7 @@ struct GroupLayoutTest1 : public Test {
 
 				// row 2
 				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 2)
-					.GetView(&toggledRow)
+					.GetLayout(&toggledRow)
 					.Add(new TestView())
 					.Add(new TestView())
 					.Add(new TestView())
@@ -362,10 +362,7 @@ struct GroupLayoutTest1 : public Test {
 		switch (message->what) {
 			case MSG_TOGGLE_1:
 			{
-				if (toggledRow->IsHidden(toggledRow))
-					toggledRow->Show();
-				else
-					toggledRow->Hide();
+				toggledRow->SetVisible(!toggledRow->IsVisible());
 				break;
 			}
 
@@ -387,7 +384,7 @@ struct GroupLayoutTest1 : public Test {
 private:
 	BButton*	toggleRowButton;
 	BButton*	toggleViewButton;
-	BView*		toggledRow;
+	BGroupLayout* toggledRow;
 	TestView*	toggledView;
 };
 
