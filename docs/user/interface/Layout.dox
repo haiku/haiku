@@ -386,7 +386,7 @@ topLayout->AddItem(nestedLayoutWithView);
 	is given more or less space than it previously had, or an object in this
 	layout has had its InvalidateLayout() method called.
 
-	\see BView::InvalidateLayout() BLayoutItem::InvalidateLayout()
+	\sa BView::InvalidateLayout(), BLayoutItem::InvalidateLayout()
 */
 
 

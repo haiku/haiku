@@ -256,9 +256,14 @@
 /*!
 	\fn void BLayoutItem::InvalidateLayout(bool children = false)
 	\brief Invalidate the layout of this item, or the object it represents.
+	\param children Whether or not to invalidate children of this object.
 
-	If \a children is \c true, then you should also invalidate any child
-	objects.
+	Although this method is virtual, you should not override it in your classes,
+	override LayoutInvalidated() instead. This method will take care of calling
+	the InvalidateLayout() methods of affected views/layouts/items. However, if
+	there is an object that is somehow connected to this one by means other than
+	the standard mechanisms provided by the Haiku API, you should use
+	the LayoutInvalidated() hook to do this.
 */
 
 
@@ -307,6 +312,19 @@
 
 
 //! @{
+
+
+/*!
+	\fn void BLayoutItem::LayoutInvalidated(bool children)
+	\brief Hook called from InvalidateLayout().
+
+	Override this method to clean out an cached layout info. It is good
+	practice to recreate such info only on demand, eg when MinSize() or friends
+	are called.
+
+	If \a children is \c true, then you should invalidate any information on
+	child objects as well, and propagate the invalidation to them.
+*/
 
 
 /*!
