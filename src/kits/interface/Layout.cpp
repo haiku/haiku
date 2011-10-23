@@ -299,8 +299,10 @@ BLayout::InvalidateLayout(bool children)
 	// printf("BLayout(%p)::InvalidateLayout(%i) : state %x, disabled %li\n",
 	// this, children, (unsigned int)fState, fInvalidationDisabled);
 
-	if (!InvalidationLegal())
+	if (fInvalidationDisabled > 0
+		|| (fState & B_LAYOUT_INVALIDATION_ILLEGAL) != 0) {
 		return;
+	}
 
 	fState |= B_LAYOUT_NECESSARY;
 	LayoutInvalidated(children);
@@ -310,23 +312,15 @@ BLayout::InvalidateLayout(bool children)
 			ItemAt(i)->InvalidateLayout(children);
 	}
 
-	if (fOwner && BView::Private(fOwner).MinMaxValid())
+	if (fOwner)
 		fOwner->InvalidateLayout(children);
 
 	if (BLayout* nestedIn = Layout()) {
-		if (nestedIn->InvalidationLegal())
-			nestedIn->InvalidateLayout();
+		nestedIn->InvalidateLayout();
 	} else if (fOwner) {
 		// If we weren't added as a BLayoutItem, we still have to invalidate
 		// whatever layout our owner is in.
-		BView* ownerParent = fOwner->fParent;
-		if (ownerParent) {
-			BLayout* layout = ownerParent->GetLayout();
-			if (layout && layout->fNestedLayouts.CountItems() > 0)
-				layout->InvalidateLayoutsForView(fOwner);
-			else if (BView::Private(ownerParent).MinMaxValid())
-				ownerParent->InvalidateLayout(false);
-		}
+		fOwner->_InvalidateParentLayout();
 	}
 }
 
@@ -588,31 +582,6 @@ BLayoutContext*
 BLayout::LayoutContext() const
 {
 	return fContext;
-}
-
-
-bool
-BLayout::InvalidateLayoutsForView(BView* view)
-{
-	BView::Private viewPrivate(view);
-	int32 count = viewPrivate.CountLayoutItems();
-	if (count == 0)
-		return false;
-
-	for (int32 i = 0; i < count; i++) {
-		BLayout* layout = viewPrivate.LayoutItemAt(i)->Layout();
-		if (layout->InvalidationLegal())
-			layout->InvalidateLayout();
-	}
-	return true;
-}
-
-
-bool
-BLayout::InvalidationLegal()
-{
-	return fInvalidationDisabled <= 0
-		&& (fState & B_LAYOUT_INVALIDATION_ILLEGAL) == 0;
 }
 
 

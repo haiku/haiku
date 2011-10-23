@@ -90,8 +90,6 @@ protected:
 private:
 			friend class BView;
 
-			bool				InvalidateLayoutsForView(BView* view);
-			bool				InvalidationLegal();
 			void				SetOwner(BView* owner);
 			void				SetTarget(BView* target);
 

@@ -4692,32 +4692,30 @@ BView::InvalidateLayout(bool descendants)
 	//	this, descendants, fLayoutData->fLayoutValid,
 	//	fLayoutData->fLayoutInProgress);
 
-	if (fLayoutData->fMinMaxValid && !fLayoutData->fLayoutInProgress
- 		&& fLayoutData->fLayoutInvalidationDisabled == 0) {
+	if (!fLayoutData->fMinMaxValid || fLayoutData->fLayoutInProgress
+ 			|| fLayoutData->fLayoutInvalidationDisabled > 0) {
+		return;
+	}
 
-		fLayoutData->fLayoutValid = false;
-		fLayoutData->fMinMaxValid = false;
-		LayoutInvalidated(descendants);
+	fLayoutData->fLayoutValid = false;
+	fLayoutData->fMinMaxValid = false;
+	LayoutInvalidated(descendants);
 
-		if (descendants) {
-			for (BView* child = fFirstChild;
-				child; child = child->fNextSibling) {
-				child->InvalidateLayout(descendants);
-			}
-		}
-
-		if (fLayoutData->fLayout && fLayoutData->fLayout->InvalidationLegal())
-			fLayoutData->fLayout->InvalidateLayout(descendants);
-		else if (!fLayoutData->fLayout && fParent) {
-			_InvalidateParentLayout();
-		}
-
-		if (fTopLevelView) {
-			// trigger layout process
-			if (fOwner)
-				fOwner->PostMessage(B_LAYOUT_WINDOW);
+	if (descendants) {
+		for (BView* child = fFirstChild;
+			child; child = child->fNextSibling) {
+			child->InvalidateLayout(descendants);
 		}
 	}
+
+	if (fLayoutData->fLayout)
+		fLayoutData->fLayout->InvalidateLayout(descendants);
+	else if (fParent) {
+		_InvalidateParentLayout();
+	}
+
+	if (fTopLevelView && fOwner)
+		fOwner->PostMessage(B_LAYOUT_WINDOW);
 }
 
 
@@ -4936,12 +4934,18 @@ BView::_LayoutLeft(BLayout* deleted)
 void
 BView::_InvalidateParentLayout()
 {
+	if (!fParent)
+		return;
+
 	BLayout* layout = fLayoutData->fLayout;
 	BLayout* layoutParent = layout ? layout->Layout() : NULL;
-	if (layoutParent && layoutParent->InvalidationLegal()) {
-		layout->Layout()->InvalidateLayout();
-	} else if (fParent && fParent->fLayoutData->fLayout) {
-		fParent->fLayoutData->fLayout->InvalidateLayoutsForView(this);
+	if (layoutParent) {
+		layoutParent->InvalidateLayout();
+	} else if (fLayoutData->fLayoutItems.CountItems() > 0) {
+		int32 count = fLayoutData->fLayoutItems.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			fLayoutData->fLayoutItems.ItemAt(i)->Layout()->InvalidateLayout();
+		}
 	} else if (fParent) {
 		fParent->InvalidateLayout();
 	}
