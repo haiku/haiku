@@ -63,9 +63,12 @@ radeon_hd_getbios(radeon_info &info)
 	uint32 romConfig = 0;
 
 	if (info.isIGP == true) {
-		romBase = info.pci->u.h1.memory_base;
+		// IGP chipsets don't have a PCI rom BAR.
+		// On post, the bios puts a copy of the IGP
+		// AtomBIOS at the start of the video ram
+		romBase = info.pci->u.h0.base_registers[RHD_FB_BAR];
 		romSize = 256 * 1024;
-			// a complete guess
+			// romSize an educated guess
 	} else {
 		// Enable ROM decoding for PCI bar rom
 		romConfig = get_pci_config(info.pci, PCI_rom_base, 4);
