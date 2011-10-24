@@ -121,6 +121,7 @@ struct radeon_shared_info {
 	uint16			device_chipset;
 	uint8			dceMajor;
 	uint8			dceMinor;
+	bool			isIGP;
 	char			device_identifier[32];
 };
 

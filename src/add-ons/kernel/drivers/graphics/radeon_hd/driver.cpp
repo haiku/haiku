@@ -43,7 +43,7 @@ const struct supported_device {
 	uint8		dceMajor;	// Display block family
 	uint8		dceMinor;	// Display block family
 	uint16		chipset;
-	bool		igp;
+	bool		isIGP;
 	const char*	name;
 } kSupportedDevices[] = {
 	// R400 Series  (Radeon) DCE 0.0 (*very* early AtomBIOS)
@@ -339,6 +339,7 @@ init_driver(void)
 		gDeviceInfo[found]->device_chipset = kSupportedDevices[type].chipset;
 		gDeviceInfo[found]->dceMajor = kSupportedDevices[type].dceMajor;
 		gDeviceInfo[found]->dceMinor = kSupportedDevices[type].dceMinor;
+		gDeviceInfo[found]->isIGP = kSupportedDevices[type].isIGP;
 
 		dprintf(DEVICE_NAME ": GPU(%ld) %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);

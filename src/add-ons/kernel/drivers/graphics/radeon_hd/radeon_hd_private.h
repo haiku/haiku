@@ -46,6 +46,7 @@ struct radeon_info {
 	uint16			device_chipset;
 	uint8			dceMajor;
 	uint8			dceMinor;
+	bool			isIGP;
 };
 
 

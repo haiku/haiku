@@ -34,6 +34,7 @@
 #	define TRACE(x) ;
 #endif
 
+#define ERROR(x...) dprintf("radeon_hd: " x)
 
 //	#pragma mark -
 
@@ -57,99 +58,109 @@ radeon_hd_getbios(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
-	// Enable ROM decoding
-	uint32 rom_config = get_pci_config(info.pci, PCI_rom_base, 4);
-	rom_config |= PCI_rom_enable;
-	set_pci_config(info.pci, PCI_rom_base, 4, rom_config);
+	uint32 romBase;
+	uint32 romSize;
+	uint32 romConfig = 0;
 
-	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
-	if (flags & PCI_rom_enable)
-		TRACE("%s: PCI ROM decode enabled successfully\n", __func__);
+	if (info.isIGP == true) {
+		romBase = info.pci->u.h1.memory_base;
+		romSize = 256 * 1024;
+			// a complete guess
+	} else {
+		// Enable ROM decoding for PCI bar rom
+		romConfig = get_pci_config(info.pci, PCI_rom_base, 4);
+		romConfig |= PCI_rom_enable;
+		set_pci_config(info.pci, PCI_rom_base, 4, romConfig);
 
-	uint32 rom_base = info.pci->u.h0.rom_base;
-	uint32 rom_size = info.pci->u.h0.rom_size;
+		uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
+		if (flags & PCI_rom_enable)
+			TRACE("%s: PCI ROM decode enabled successfully\n", __func__);
 
-	if (rom_base == 0) {
-		TRACE("%s: no PCI rom, trying shadow rom\n", __func__);
-		// ROM has been copied by BIOS
-		rom_base = 0xC0000;
-		if (rom_size == 0) {
-			rom_size = 0x7FFF;
-			// A guess at maximum shadow bios size
+		romBase = info.pci->u.h0.rom_base;
+		romSize = info.pci->u.h0.rom_size;
+
+		if (romBase == 0) {
+			TRACE("%s: no PCI rom, trying shadow rom\n", __func__);
+			// ROM has been copied by BIOS
+			romBase = 0xC0000;
+			if (romSize == 0) {
+				romSize = 0x7FFF;
+				// A guess at maximum shadow bios size
+			}
 		}
 	}
 
 	TRACE("%s: seeking rom at 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
-		__func__, rom_base, rom_size);
+		__func__, romBase, romSize);
 
 	uint8* bios;
 	status_t result = B_ERROR;
-	if (rom_base == 0 || rom_size == 0) {
+	if (romBase == 0 || romSize == 0) {
 		// FAIL: we never found a base to work off of.
-		dprintf(DEVICE_NAME ": %s: no rom address located.\n", __func__);
+		ERROR("%s: no rom address located.\n", __func__);
 		result = B_ERROR;
 	} else {
 		area_id rom_area = map_physical_memory("radeon hd rom",
-			rom_base, rom_size, B_ANY_KERNEL_ADDRESS, B_READ_AREA,
+			romBase, romSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA,
 			(void **)&bios);
 
 		if (info.rom_area < B_OK) {
 			// FAIL : rom area wasn't mapped for access
-			dprintf(DEVICE_NAME ": failed to map rom\n");
+			ERROR("%s: failed to map rom\n", __func__);
 			result = B_ERROR;
 		} else {
 			if (bios[0] != 0x55 || bios[1] != 0xAA) {
 				// FAIL : not a PCI rom
 				uint16 id = bios[0] + (bios[1] << 8);
-				dprintf(DEVICE_NAME ": %s: this isn't a PCI rom (%X)\n",
+				ERROR("%s: this isn't a PCI rom (%X)\n",
 					__func__, id);
 				result = B_ERROR;
 			} else if (isAtomBIOS(bios)) {
 				info.rom_area = create_area("radeon hd AtomBIOS",
 					(void **)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
-					rom_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+					romSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
 				if (info.rom_area < 0) {
 					// FAIL : couldn't create kernel AtomBIOS area
-					dprintf(DEVICE_NAME ": %s: Error creating kernel"
+					ERROR("%s: Error creating kernel"
 						" AtomBIOS area!\n", __func__);
 					result = B_ERROR;
 				} else {
-					memset((void*)info.atom_buffer, 0, rom_size);
+					memset((void*)info.atom_buffer, 0, romSize);
 						// Prevent unknown code execution by AtomBIOS parser
-					memcpy(info.atom_buffer, (void *)bios, rom_size);
+					memcpy(info.atom_buffer, (void *)bios, romSize);
 						// Copy AtomBIOS to kernel area
 
 					if (isAtomBIOS(info.atom_buffer)) {
 						// SUCCESS : bios copied and verified
-						dprintf(DEVICE_NAME ": %s: AtomBIOS mapped!\n",
-							__func__);
+						ERROR("%s: AtomBIOS mapped!\n", __func__);
 						set_area_protection(info.rom_area, B_READ_AREA);
 							// Lock it down
 						result = B_OK;
 					} else {
 						// FAIL : bios didn't copy properly for some reason
-						dprintf(DEVICE_NAME ": %s: AtomBIOS not mapped!\n",
-							__func__);
+						ERROR("%s: AtomBIOS not mapped!\n", __func__);
 						result = B_ERROR;
 					}
 				}
 			} else {
-				dprintf(DEVICE_NAME ": %s: rom found wasn't identified"
-				" as AtomBIOS!\n", __func__);
+				ERROR("%s: rom found wasn't identified"
+					" as AtomBIOS!\n", __func__);
 				result = B_ERROR;
 			}
 		delete_area(rom_area);
 		}
 	}
 
-	// Disable ROM decoding
-	rom_config &= ~PCI_rom_enable;
-	set_pci_config(info.pci, PCI_rom_base, 4, rom_config);
+	if (info.isIGP == false) {
+		// Disable ROM decoding
+		romConfig &= ~PCI_rom_enable;
+		set_pci_config(info.pci, PCI_rom_base, 4, romConfig);
+	}
 
 	if (result == B_OK) {
-		info.shared_info->rom_phys = rom_base;
-		info.shared_info->rom_size = rom_size;
+		info.shared_info->rom_phys = romBase;
+		info.shared_info->rom_size = romSize;
 	}
 
 	return result;
@@ -323,9 +334,9 @@ radeon_hd_init(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
-	dprintf(DEVICE_NAME ": card(%ld): "
+	ERROR("%s: card(%ld): "
 		"Radeon r%" B_PRIX16 " 1002:%" B_PRIX32 "\n",
-		info.id, info.device_chipset, info.device_id);
+		__func__, info.id, info.device_chipset, info.device_id);
 
 	// *** Map shared info
 	AreaKeeper sharedCreator;
@@ -333,8 +344,8 @@ radeon_hd_init(radeon_info &info)
 		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sizeof(radeon_shared_info)), B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK) {
-		dprintf(DEVICE_NAME ": card (%ld): couldn't map shared area!\n",
-			info.id);
+		ERROR("%s: card (%ld): couldn't map shared area!\n",
+			__func__, info.id);
 		return info.shared_area;
 	}
 
@@ -348,8 +359,8 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": card (%ld): couldn't map memory I/O!\n",
-			info.id);
+		ERROR("%s: card (%ld): couldn't map memory I/O!\n",
+			__func__, info.id);
 		return info.registers_area;
 	}
 
@@ -361,8 +372,8 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void **)&info.shared_info->frame_buffer);
 	if (frambufferMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": card(%ld): couldn't map framebuffer!\n",
-			info.id);
+		ERROR("%s: card(%ld): couldn't map framebuffer!\n",
+			__func__, info.id);
 		return info.framebuffer_area;
 	}
 
@@ -380,6 +391,7 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->device_chipset = info.device_chipset;
 	info.shared_info->dceMajor = info.dceMajor;
 	info.shared_info->dceMinor = info.dceMinor;
+	info.shared_info->isIGP = info.isIGP;
 	info.shared_info->registers_area = info.registers_area;
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 
@@ -407,12 +419,12 @@ radeon_hd_init(radeon_info &info)
 
 	// Check if a valid AtomBIOS image was found.
 	if (biosStatus != B_OK) {
-		dprintf(DEVICE_NAME ": card (%ld): couldn't find AtomBIOS rom!\n",
-			info.id);
-		dprintf(DEVICE_NAME ": card (%ld): exiting. Please open a bug ticket"
+		ERROR("%s: card (%ld): couldn't find AtomBIOS rom!\n",
+			__func__, info.id);
+		ERROR("%s: card (%ld): exiting. Please open a bug ticket"
 			" at haiku-os.org with your /var/log/syslog\n",
-			info.id);
-		// Fallback to VESA
+			__func__, info.id);
+		// Fallback to VESA (more likely crash app_server)
 		return B_ERROR;
 	}
 
