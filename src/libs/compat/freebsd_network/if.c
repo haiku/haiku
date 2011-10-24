@@ -406,7 +406,6 @@ if_freemulti(struct ifmultiaddr *ifma)
 
 	if (ifma->ifma_lladdr != NULL)
 		free(ifma->ifma_lladdr);
-	free(ifma->ifma_addr);
 	free(ifma);
 }
 
