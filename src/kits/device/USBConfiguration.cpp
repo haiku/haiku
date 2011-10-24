@@ -8,12 +8,9 @@
 
 #include <USBKit.h>
 #include <usb_raw.h>
-
-#include <new>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-
+#include <string.h>
+#include <new>
 
 
 BUSBConfiguration::BUSBConfiguration(BUSBDevice *device, uint32 index, int rawFD)
@@ -21,36 +18,14 @@ BUSBConfiguration::BUSBConfiguration(BUSBDevice *device, uint32 index, int rawFD
 		fIndex(index),
 		fRawFD(rawFD),
 		fInterfaces(NULL),
-		fConfigurationString(NULL),
-		fFullDescriptor(NULL)
+		fConfigurationString(NULL)
 {
 	usb_raw_command command;
 	command.config.descriptor = &fDescriptor;
 	command.config.config_index = fIndex;
-	
-	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR, 
-		&command, sizeof(command)) 
-		|| command.config.status != B_USB_RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR, &command,
+		sizeof(command)) || command.config.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
-	} else {
-		// Got the descriptor header, retrieve the whole descriptor
-		size_t length = fDescriptor.total_length;
-		fFullDescriptor = (usb_configuration_descriptor*)malloc(length);
-
-		if (fFullDescriptor != NULL) {
-			command.config_etc.descriptor = fFullDescriptor;
-			command.config_etc.config_index = fIndex;
-			command.config_etc.length = length;
-
-			if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC, 
-				&command, sizeof(command)) 
-				|| command.config_etc.status != B_USB_RAW_STATUS_SUCCESS) {
-
-				free(fFullDescriptor);
-				fFullDescriptor = NULL;
-			}
-		}
-	}
 
 	fInterfaces = new(std::nothrow) BUSBInterface *[
 		fDescriptor.number_interfaces];
@@ -66,8 +41,6 @@ BUSBConfiguration::BUSBConfiguration(BUSBDevice *device, uint32 index, int rawFD
 
 BUSBConfiguration::~BUSBConfiguration()
 {
-	free(fFullDescriptor);
-
 	delete[] fConfigurationString;
 	if (fInterfaces != NULL) {
 		for (int32 i = 0; i < fDescriptor.number_interfaces; i++)
@@ -112,7 +85,7 @@ BUSBConfiguration::ConfigurationString() const
 const usb_configuration_descriptor *
 BUSBConfiguration::Descriptor() const
 {
-	return (fFullDescriptor != NULL) ? fFullDescriptor : &fDescriptor;
+	return &fDescriptor;
 }
 
 

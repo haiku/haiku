@@ -204,8 +204,7 @@ friend	class BUSBDevice;
 
 mutable	char *						fConfigurationString;
 
-		usb_configuration_descriptor*	fFullDescriptor;
-		uint32						fReserved[9];
+		uint32						fReserved[10];
 };
 
 

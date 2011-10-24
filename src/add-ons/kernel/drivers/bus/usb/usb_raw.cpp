@@ -300,18 +300,9 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR:
-		case B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC:
 		{
 			if (length < sizeof(command->config))
 				return B_BUFFER_OVERFLOW;
-
-			size_t descriptorLength = sizeof(usb_configuration_descriptor);
-			if (op == B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC) {
-				if (length < sizeof(command->config_etc))
-					return B_BUFFER_OVERFLOW;
-
-				descriptorLength = command->config_etc.length;
-			}
 
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device, command->config.config_index,
@@ -319,17 +310,13 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (configurationInfo == NULL)
 				return B_OK;
 
-			const usb_configuration_descriptor* descriptor 
-				= configurationInfo->descr;
-			if (user_memcpy(command->config.descriptor, descriptor,
-					min_c(descriptorLength, descriptor->total_length)) != B_OK) {
+			if (user_memcpy(command->config.descriptor,
+					configurationInfo->descr,
+					sizeof(usb_configuration_descriptor)) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
-			if (op == B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC
-				&& descriptor->total_length > descriptorLength)
-				command->config.status = B_USB_RAW_STATUS_NO_MEMORY;
-			else
-				command->config.status = B_USB_RAW_STATUS_SUCCESS;
+
+			command->config.status = B_USB_RAW_STATUS_SUCCESS;
 			return B_OK;
 		}
 
