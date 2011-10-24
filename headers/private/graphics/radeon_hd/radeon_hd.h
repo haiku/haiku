@@ -27,6 +27,7 @@
 
 #define VENDOR_ID_ATI	0x1002
 
+// Card models
 #define RADEON_R520		0x0520	// Fudo
 #define RADEON_R580		0x0580	// Rodin
 #define RADEON_R600		0x0600	// Pele
@@ -36,7 +37,12 @@
 #define RADEON_R3000	0x3000	// Southern Islands
 #define RADEON_R4000	0x4000	// Not yet known / used
 
-#define RADEON_VBIOS_SIZE 0x10000
+// Card chipset flags
+#define CHIP_STD		(1 << 0) // Standard chipset
+#define CHIP_IGP		(1 << 1) // IGP chipset
+#define CHIP_MOBILE		(1 << 2) // Mobile chipset
+#define CHIP_DISCREET	(1 << 3) // Discreet chipset
+#define CHIP_APU		(1 << 4) // APU chipset
 
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"
@@ -119,9 +125,9 @@ struct radeon_shared_info {
 	uint16			cursor_hot_y;
 
 	uint16			device_chipset;
+	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;
-	bool			isIGP;
 	char			device_identifier[32];
 };
 

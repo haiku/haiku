@@ -44,9 +44,9 @@ struct radeon_info {
 	const char*		device_identifier;
 	uint32			device_id;
 	uint16			device_chipset;
+	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;
-	bool			isIGP;
 };
 
 

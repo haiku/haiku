@@ -62,7 +62,7 @@ radeon_hd_getbios(radeon_info &info)
 	uint32 romSize;
 	uint32 romConfig = 0;
 
-	if (info.isIGP == true) {
+	if ((info.chipsetFlags & CHIP_IGP) != 0) {
 		// IGP chipsets don't have a PCI rom BAR.
 		// On post, the bios puts a copy of the IGP
 		// AtomBIOS at the start of the video ram
@@ -155,7 +155,7 @@ radeon_hd_getbios(radeon_info &info)
 		}
 	}
 
-	if (info.isIGP == false) {
+	if ((info.chipsetFlags & CHIP_IGP) == 0) {
 		// Disable ROM decoding
 		romConfig &= ~PCI_rom_enable;
 		set_pci_config(info.pci, PCI_rom_base, 4, romConfig);
@@ -392,9 +392,9 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->device_index = info.id;
 	info.shared_info->device_id = info.device_id;
 	info.shared_info->device_chipset = info.device_chipset;
+	info.shared_info->chipsetFlags = info.chipsetFlags;
 	info.shared_info->dceMajor = info.dceMajor;
 	info.shared_info->dceMinor = info.dceMinor;
-	info.shared_info->isIGP = info.isIGP;
 	info.shared_info->registers_area = info.registers_area;
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 
