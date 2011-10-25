@@ -43,13 +43,77 @@
 #define RHD_MMIO_BAR 2
 
 
-inline bool
-isAtomBIOS(uint8* bios)
+status_t
+mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 {
-	uint16 bios_header = RADEON_BIOS16(bios, 0x48);
+	TRACE("%s: seeking AtomBIOS @ 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
+		__func__, romBase, romSize);
 
-	return !memcmp(&bios[bios_header + 4], "ATOM", 4) ||
-		!memcmp(&bios[bios_header + 4], "MOTA", 4);
+	uint8* rom;
+
+	// attempt to access area specified
+	area_id testArea = map_physical_memory("radeon hd rom probe",
+		romBase, romSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA,
+		(void **)&rom);
+
+	if (testArea < 0) {
+		ERROR("%s: couldn't map potential rom @ 0x%" B_PRIX32
+			"\n", __func__, romBase);
+		return B_NO_MEMORY;
+	}
+
+	// check for valid BIOS signature
+	if (rom[0] != 0x55 || rom[1] != 0xAA) {
+		uint16 id = rom[0] + (rom[1] << 8);
+		TRACE("%s: BIOS signature incorrect @ 0x%" B_PRIX32 " (%X)\n",
+			__func__, romBase, id);
+		delete_area(testArea);
+		return B_ERROR;
+	}
+
+	// see if valid AtomBIOS rom
+	uint16 romHeader = RADEON_BIOS16(rom, 0x48);
+	bool romValid = !memcmp(&rom[romHeader + 4], "ATOM", 4)
+		|| !memcmp(&rom[romHeader + 4], "MOTA", 4);
+
+	if (romValid == false) {
+		// FAIL : a PCI VGA bios but not AtomBIOS
+		uint16 id = rom[0] + (rom[1] << 8);
+		TRACE("%s: not AtomBIOS rom at 0x%" B_PRIX32 "(%X)\n",
+			__func__, romBase, id);
+		delete_area(testArea);
+		return B_ERROR;
+	}
+
+	info.rom_area = create_area("radeon hd AtomBIOS",
+		(void **)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
+		romSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+	if (info.rom_area < 0) {
+		ERROR("%s: unable to map kernel AtomBIOS space!\n",
+			__func__);
+		delete_area(testArea);
+		return B_NO_MEMORY;
+	}
+
+	memset((void*)info.atom_buffer, 0, romSize);
+		// Prevent unknown code execution by AtomBIOS parser
+	memcpy(info.atom_buffer, (void*)rom, romSize);
+		// Copy AtomBIOS to kernel area
+
+	// validate copied rom is valid
+	romHeader = RADEON_BIOS16(info.atom_buffer, 0x48);
+	romValid = !memcmp(&info.atom_buffer[romHeader + 4], "ATOM", 4)
+		|| !memcmp(&info.atom_buffer[romHeader + 4], "MOTA", 4);
+
+	if (romValid == true) {
+		set_area_protection(info.rom_area, B_READ_AREA);
+		ERROR("%s: AtomBIOS verified and locked\n", __func__);
+	} else
+		ERROR("%s: AtomBIOS memcpy failed!\n", __func__);
+
+	delete_area(testArea);
+	return romValid ? B_OK : B_ERROR;
 }
 
 
@@ -58,115 +122,77 @@ radeon_hd_getbios(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
-	uint32 romBase;
-	uint32 romSize;
-	uint32 romConfig = 0;
+	uint32 romBase = 0;
+	uint32 romSize = 0;
+	uint32 romMethod = 0;
 
-	if ((info.chipsetFlags & CHIP_IGP) != 0) {
-		// IGP chipsets don't have a PCI rom BAR.
-		// On post, the bios puts a copy of the IGP
-		// AtomBIOS at the start of the video ram
-		romBase = info.pci->u.h0.base_registers[RHD_FB_BAR];
-		romSize = 256 * 1024;
-			// romSize an educated guess
-	} else {
-		// Enable ROM decoding for PCI bar rom
-		romConfig = get_pci_config(info.pci, PCI_rom_base, 4);
-		romConfig |= PCI_rom_enable;
-		set_pci_config(info.pci, PCI_rom_base, 4, romConfig);
+	status_t mapResult = B_ERROR;
 
-		uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
-		if (flags & PCI_rom_enable)
-			TRACE("%s: PCI ROM decode enabled successfully\n", __func__);
+	// first we try to find the AtomBIOS rom via various methods
+	for (romMethod = 0; romMethod < 3; romMethod++) {
+		switch(romMethod) {
+			case 0:
+				// TODO: *** New ACPI method
+				ERROR("%s: ACPI ATRM AtomBIOS TODO\n", __func__);
+				break;
+			case 1:
+				// *** Discreet card on IGP, check PCI BAR 0
+				// On post, the bios puts a copy of the IGP
+				// AtomBIOS at the start of the video ram
+				romBase = info.pci->u.h0.base_registers[RHD_FB_BAR];
+				romSize = 256 * 1024;
 
-		romBase = info.pci->u.h0.rom_base;
-		romSize = info.pci->u.h0.rom_size;
-
-		if (romBase == 0) {
-			TRACE("%s: no PCI rom, trying shadow rom\n", __func__);
-			// ROM has been copied by BIOS
-			romBase = 0xC0000;
-			if (romSize == 0) {
-				romSize = 0x7FFF;
-				// A guess at maximum shadow bios size
-			}
-		}
-	}
-
-	TRACE("%s: seeking rom at 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
-		__func__, romBase, romSize);
-
-	uint8* bios;
-	status_t result = B_ERROR;
-	if (romBase == 0 || romSize == 0) {
-		// FAIL: we never found a base to work off of.
-		ERROR("%s: no rom address located.\n", __func__);
-		result = B_ERROR;
-	} else {
-		area_id rom_area = map_physical_memory("radeon hd rom",
-			romBase, romSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA,
-			(void **)&bios);
-
-		if (info.rom_area < B_OK) {
-			// FAIL : rom area wasn't mapped for access
-			ERROR("%s: failed to map rom\n", __func__);
-			result = B_ERROR;
-		} else {
-			if (bios[0] != 0x55 || bios[1] != 0xAA) {
-				// FAIL : not a PCI rom
-				uint16 id = bios[0] + (bios[1] << 8);
-				ERROR("%s: this isn't a PCI rom (%X)\n",
-					__func__, id);
-				result = B_ERROR;
-			} else if (isAtomBIOS(bios)) {
-				info.rom_area = create_area("radeon hd AtomBIOS",
-					(void **)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
-					romSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-
-				if (info.rom_area < 0) {
-					// FAIL : couldn't create kernel AtomBIOS area
-					ERROR("%s: Error creating kernel"
-						" AtomBIOS area!\n", __func__);
-					result = B_ERROR;
+				if (romBase == 0 || romSize == 0) {
+					ERROR("%s: No base found at PCI FB BAR\n", __func__);
 				} else {
-					memset((void*)info.atom_buffer, 0, romSize);
-						// Prevent unknown code execution by AtomBIOS parser
-					memcpy(info.atom_buffer, (void *)bios, romSize);
-						// Copy AtomBIOS to kernel area
-
-					if (isAtomBIOS(info.atom_buffer)) {
-						// SUCCESS : bios copied and verified
-						ERROR("%s: AtomBIOS mapped!\n", __func__);
-						set_area_protection(info.rom_area, B_READ_AREA);
-							// Lock it down
-						result = B_OK;
-					} else {
-						// FAIL : bios didn't copy properly for some reason
-						ERROR("%s: AtomBIOS not mapped!\n", __func__);
-						result = B_ERROR;
-					}
+					mapResult = mapAtomBIOS(info, romBase, romSize);
 				}
-			} else {
-				ERROR("%s: rom found wasn't identified"
-					" as AtomBIOS!\n", __func__);
-				result = B_ERROR;
+				break;
+			case 2:
+			{
+				// *** PCI ROM BAR
+				// Enable ROM decoding for PCI BAR rom
+				uint32 pciConfig = get_pci_config(info.pci, PCI_rom_base, 4);
+				pciConfig |= PCI_rom_enable;
+				set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
+
+				uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
+				if ((flags & PCI_rom_enable) != 0)
+					TRACE("%s: PCI ROM decode enabled\n", __func__);
+
+				romBase = info.pci->u.h0.rom_base;
+				romSize = info.pci->u.h0.rom_size;
+
+				if (romBase == 0 || romSize == 0) {
+					ERROR("%s: No base found at PCI ROM BAR\n", __func__);
+				} else {
+					mapResult = mapAtomBIOS(info, romBase, romSize);
+				}
+
+				// Disable ROM decoding
+				pciConfig &= ~PCI_rom_enable;
+				set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
+				break;
 			}
-		delete_area(rom_area);
+		}
+
+		if (mapResult == B_OK) {
+			ERROR("%s: AtomBIOS found using active method %" B_PRIu32
+				" at 0x%" B_PRIX32 "\n", __func__, romMethod, romBase);
+			break;
+		} else {
+			ERROR("%s: AtomBIOS not found using active method %" B_PRIu32
+				" at 0x%" B_PRIX32 "\n", __func__, romMethod, romBase);
 		}
 	}
 
-	if ((info.chipsetFlags & CHIP_IGP) == 0) {
-		// Disable ROM decoding
-		romConfig &= ~PCI_rom_enable;
-		set_pci_config(info.pci, PCI_rom_base, 4, romConfig);
-	}
-
-	if (result == B_OK) {
+	if (mapResult == B_OK) {
 		info.shared_info->rom_phys = romBase;
 		info.shared_info->rom_size = romSize;
-	}
+	} else
+		ERROR("%s: Active AtomBIOS search failed.\n", __func__);
 
-	return result;
+	return mapResult;
 }
 
 
@@ -195,8 +221,37 @@ radeon_hd_getbios_ni(radeon_info &info)
 
 	write32(info.registers + R600_ROM_CNTL, (rom_cntl | R600_SCK_OVERWRITE));
 
-	// try to grab the bios
-	status_t result = radeon_hd_getbios(info);
+	// try to grab the bios via PCI ROM bar
+	// Enable ROM decoding for PCI BAR rom
+	uint32 pciConfig = get_pci_config(info.pci, PCI_rom_base, 4);
+	pciConfig |= PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
+
+	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
+	if (flags & PCI_rom_enable)
+		TRACE("%s: PCI ROM decode enabled\n", __func__);
+
+	uint32 romBase = info.pci->u.h0.rom_base;
+	uint32 romSize = info.pci->u.h0.rom_size;
+
+	status_t result = B_OK;
+	if (romBase == 0 || romSize == 0) {
+		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		result = B_ERROR;
+	} else {
+		result = mapAtomBIOS(info, romBase, romSize);
+	}
+
+	if (result == B_OK) {
+		ERROR("%s: AtomBIOS found using disabled method at 0x%" B_PRIX32
+			" [size: 0x%" B_PRIX32 "]\n", __func__, romBase, romSize);
+		info.shared_info->rom_phys = romBase;
+		info.shared_info->rom_size = romSize;
+	}
+
+	// Disable ROM decoding
+	pciConfig &= ~PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
 
 	// restore regs
 	write32(info.registers + R600_BUS_CNTL, bus_cntl);
@@ -238,8 +293,37 @@ radeon_hd_getbios_r700(radeon_info &info)
 
 	write32(info.registers + R600_ROM_CNTL, (rom_cntl | R600_SCK_OVERWRITE));
 
-	// try to grab the bios
-	status_t result = radeon_hd_getbios(info);
+	// try to grab the bios via PCI ROM bar
+	// Enable ROM decoding for PCI BAR rom
+	uint32 pciConfig = get_pci_config(info.pci, PCI_rom_base, 4);
+	pciConfig |= PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
+
+	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
+	if (flags & PCI_rom_enable)
+		TRACE("%s: PCI ROM decode enabled\n", __func__);
+
+	uint32 romBase = info.pci->u.h0.rom_base;
+	uint32 romSize = info.pci->u.h0.rom_size;
+
+	status_t result = B_OK;
+	if (romBase == 0 || romSize == 0) {
+		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		result = B_ERROR;
+	} else {
+		result = mapAtomBIOS(info, romBase, romSize);
+	}
+
+	if (result == B_OK) {
+		ERROR("%s: AtomBIOS found using disabled method at 0x%" B_PRIX32
+			" [size: 0x%" B_PRIX32 "]\n", __func__, romBase, romSize);
+		info.shared_info->rom_phys = romBase;
+		info.shared_info->rom_size = romSize;
+	}
+
+	// Disable ROM decoding
+	pciConfig &= ~PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
 
 	// restore regs
 	write32(info.registers + RADEON_VIPH_CONTROL, viph_control);
@@ -308,7 +392,37 @@ radeon_hd_getbios_r600(radeon_info &info)
 	write32(info.registers + R600_LOWER_GPIO_ENABLE,
 		(lower_gpio_enable | 0x400));
 
-	status_t result = radeon_hd_getbios(info);
+	// try to grab the bios via PCI ROM bar
+	// Enable ROM decoding for PCI BAR rom
+	uint32 pciConfig = get_pci_config(info.pci, PCI_rom_base, 4);
+	pciConfig |= PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
+
+	uint32 flags = get_pci_config(info.pci, PCI_rom_base, 4);
+	if (flags & PCI_rom_enable)
+		TRACE("%s: PCI ROM decode enabled\n", __func__);
+
+	uint32 romBase = info.pci->u.h0.rom_base;
+	uint32 romSize = info.pci->u.h0.rom_size;
+
+	status_t result = B_OK;
+	if (romBase == 0 || romSize == 0) {
+		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		result = B_ERROR;
+	} else {
+		result = mapAtomBIOS(info, romBase, romSize);
+	}
+
+	if (result == B_OK) {
+		ERROR("%s: AtomBIOS found using disabled method at 0x%" B_PRIX32
+			" [size: 0x%" B_PRIX32 "]\n", __func__, romBase, romSize);
+		info.shared_info->rom_phys = romBase;
+		info.shared_info->rom_size = romSize;
+	}
+
+	// Disable ROM decoding
+	pciConfig &= ~PCI_rom_enable;
+	set_pci_config(info.pci, PCI_rom_base, 4, pciConfig);
 
 	// restore regs
 	write32(info.registers + RADEON_VIPH_CONTROL, viph_control);
@@ -405,19 +519,37 @@ radeon_hd_init(radeon_info &info)
 		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
 	// *** AtomBIOS mapping
-
 	// First we try an active bios read
 	status_t biosStatus = radeon_hd_getbios(info);
-	if (biosStatus != B_OK) {
-		// If the active read fails, we do a disabled read
 
-		// TODO : IGP read
+	if (biosStatus != B_OK) {
+		// If the active read fails, we try a disabled read
 		if (info.device_chipset >= (RADEON_R1000 | 0x20))
 			biosStatus = radeon_hd_getbios_ni(info);
 		else if (info.device_chipset >= (RADEON_R700 | 0x70))
 			biosStatus = radeon_hd_getbios_r700(info);
 		else if (info.device_chipset >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
+	}
+
+	if (biosStatus != B_OK) {
+		// *** very last resort, shadow bios VGA rom
+
+		// This works as long as the primary card is what this driver
+		// is loaded for. Multiple cards may pose the risk of loading
+		// the wrong AtomBIOS for the wrong card.
+
+		uint32 romBase = 0xC0000;
+		uint32 romSize = 128 * 1024;
+			// what happens when AtomBIOS goes over 128Kb?
+			// A Radeon HD 6990 has a 128Kb AtomBIOS
+
+		if (mapAtomBIOS(info, romBase, romSize) == B_OK) {
+			ERROR("%s: fallback to shadow VGA rom\n", __func__);
+			info.shared_info->rom_phys = romBase;
+			info.shared_info->rom_size = romSize;
+			biosStatus = B_OK;
+		}
 	}
 
 	// Check if a valid AtomBIOS image was found.

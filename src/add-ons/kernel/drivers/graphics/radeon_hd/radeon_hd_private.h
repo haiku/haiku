@@ -50,7 +50,9 @@ struct radeon_info {
 };
 
 
+status_t mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize);
 extern status_t radeon_hd_init(radeon_info& info);
 extern void radeon_hd_uninit(radeon_info& info);
+
 
 #endif  /* RADEON_RD_PRIVATE_H */
