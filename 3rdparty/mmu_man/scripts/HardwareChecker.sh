@@ -101,13 +101,22 @@ check_pci ()
 			echo "<dd>"
 			echo "<div>$vendor:$device <i>$vendorstr:$devicestr</i></div>"
 			descline="$vendor:$device \"$vendorstr\" \"$devicestr\" $desc"
-			echo "Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$descline' readonly='readonly' size='80' />"
+			echo "<div>Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$descline' readonly='readonly' size='80' /></div>"
 
 			echo "<div>"
+			echo "<table border='0'>"
+			echo "<tr><td>"
 			echo "Status: "
+			echo "</td><td>"
 			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ok' value='ok' /><label for='$bus${devn}_status_ok' class='status_ok'>Working</label>"
+			echo "</td></tr><tr><td></td><td>"
+			#echo "<br />"
 			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ko' value='ko' /><label for='$bus${devn}_status_ko' class='status_ko'>Not working</label>"
+			echo "</td></tr><tr><td></td><td>"
+			#echo "<br />"
 			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_unkn' value='unkn' checked='checked' /><label for='$bus${devn}_status_unkn' class='status_unkn'>Unknown</label>"
+			echo "</td></tr>"
+			echo "</table>"
 			echo "</div>"
 
 			echo "<div>"
@@ -149,15 +158,25 @@ check_usb ()
 	listusb | while read vpid dev desc; do
 		echo "<dt><b>$desc</b></dt>"
 		echo "<dd>"
-		echo "Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$vpid $dev $desc' readonly='readonly' disabled='disabled' size='80' />"
+		echo "<div>Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$vpid $dev $desc' readonly='readonly' size='80' /></div>"
 		if [ "$vpid" != "0000:0000" ]; then
 			enabled=1
 			id=""
+
 			echo "<div>"
+			echo "<table border='0'>"
+			echo "<tr><td>"
 			echo "Status: "
+			echo "</td><td>"
 			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ok' value='ok' /><label for='$bus${devn}_status_ok' class='status_ok'>Working</label>"
+			echo "</td></tr><tr><td></td><td>"
+			#echo "<br />"
 			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ko' value='ko' /><label for='$bus${devn}_status_ko' class='status_ko'>Not working</label>"
+			echo "</td></tr><tr><td></td><td>"
+			#echo "<br />"
 			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_unkn' value='unkn' checked='checked' /><label for='$bus${devn}_status_unkn' class='status_unkn'>Unknown</label>"
+			echo "</td></tr>"
+			echo "</table>"
 			echo "</div>"
 
 			echo "<div>"
@@ -266,7 +285,10 @@ check_all ()
 {
 	echo "<html>"
 	echo "<head>"
+	echo '<meta http-equiv="content-type" content="text/html; charset=utf-8">'
 	echo "<title>Hardware report</title>"
+	#echo '<link rel="stylesheet" type="text/css" href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/welcome/Haiku-doc.css">'
+	
 	echo "<style type='text/css'>"
 	echo ".status_ok { color: #008000 }"
 	echo ".status_ko { color: #800000 }"
@@ -274,6 +296,7 @@ check_all ()
 	echo "</style>"
 	echo "</head>"
 	echo "<body>"
+	echo "<div id='content'>"
 	echo "<form method='POST' action='$report_cgi'>"
 	
 	do_notify 0.1 "Checking for PCI hardware..."
@@ -299,6 +322,7 @@ check_all ()
 	echo "<input type='submit' name='submit' value='submit'>"
 	
 	echo "</form>"
+	echo "</div>"
 	echo "</body>"
 	echo "</html>"
 }
