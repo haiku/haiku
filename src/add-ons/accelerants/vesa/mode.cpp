@@ -189,7 +189,7 @@ vesa_get_display_mode(display_mode* _currentMode)
 status_t
 vesa_get_edid_info(void* info, size_t size, uint32* _version)
 {
-	TRACE(("intel_get_edid_info()\n"));
+	TRACE(("vesa_get_edid_info()\n"));
 
 	if (!gInfo->shared_info->has_edid)
 		return B_ERROR;
