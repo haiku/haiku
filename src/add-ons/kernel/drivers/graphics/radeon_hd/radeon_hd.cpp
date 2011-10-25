@@ -534,6 +534,8 @@ radeon_hd_init(radeon_info &info)
 
 	if (biosStatus != B_OK) {
 		// *** very last resort, shadow bios VGA rom
+		ERROR("%s: Can't find an AtomBIOS rom! Trying shadow rom...\n",
+			__func__);
 
 		// This works as long as the primary card is what this driver
 		// is loaded for. Multiple cards may pose the risk of loading
@@ -545,7 +547,8 @@ radeon_hd_init(radeon_info &info)
 			// A Radeon HD 6990 has a 128Kb AtomBIOS
 
 		if (mapAtomBIOS(info, romBase, romSize) == B_OK) {
-			ERROR("%s: fallback to shadow VGA rom\n", __func__);
+			ERROR("%s: Found AtomBIOS at VGA shadow rom\n", __func__);
+			// Whew!
 			info.shared_info->rom_phys = romBase;
 			info.shared_info->rom_size = romSize;
 			biosStatus = B_OK;
