@@ -13,6 +13,21 @@ netcat=netcat
 report_site=haikuware.con
 report_cgi=http://haikuware.com/hwreport.php
 
+do_notify ()
+{
+	p="$1"
+	m="$2"
+	shift
+	shift
+	notify --type progress \
+		--messageID hwck_$$ \
+		--icon /system/apps/Devices \
+		--app HardwareChecker \
+		--title "progress:" --progress "$p" "$m" "$@"
+	
+	
+}
+
 start_fake_httpd ()
 {
 	report_port=8989
@@ -244,12 +259,23 @@ check_all ()
 	echo "<body>"
 	echo "<form method='POST' action='$report_cgi'>"
 	
+	do_notify 0.1 "Checking for PCI hardware..."
 	check_pci
+	
+	do_notify 0.3 "Checking for USB hardware..."
 	check_usb
+	
+	do_notify 0.5 "Checking for Haiku version..." 
 	check_haiku
+
+	do_notify 0.6 "Checking for utility outputs..." 
 	check_utils
+
+	do_notify 0.8 "Dumping syslog output..." 
 	check_syslog
 	check_sender
+
+	do_notify 1.0 "Done!" 
 	
 	echo "<div><i>Note: this form will only send data that is visible on this page.</i></div>"
 	
@@ -262,6 +288,7 @@ check_all ()
 
 tf=/tmp/hw_checker_$$.html
 
+do_notify 0.0 "Checking for network..."
 detect_network
 
 check_all > "$tf"
