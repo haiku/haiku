@@ -82,7 +82,7 @@ radeon_get_mode_list(display_mode *modeList)
 status_t
 radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 {
-	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
+	// TODO: multi-monitor?  for now we use VESA edid
 
 	TRACE("%s\n", __func__);
 	if (!gInfo->shared_info->has_edid)
@@ -91,6 +91,10 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 		return B_BUFFER_OVERFLOW;
 
 	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
+		// VESA
+	//memcpy(info, &gDisplay[0]->edid_info, sizeof(struct edid1_info));
+		// BitBanged display 0
+
 	*edid_version = EDID_VERSION_1;
 
 	return B_OK;
@@ -158,7 +162,6 @@ radeon_set_display_mode(display_mode *mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id]->active == false)

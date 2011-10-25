@@ -202,7 +202,7 @@ detect_crt_ranges(uint32 crtid)
 {
 	edid1_info *edid = &gDisplay[crtid]->edid_info;
 
-	// Scan each VESA EDID description for monitor ranges
+	// Scan each display EDID description for monitor ranges
 	for (uint32 index = 0; index < EDID1_NUM_DETAILED_MONITOR_DESC; index++) {
 
 		edid1_detailed_monitor *monitor
@@ -742,10 +742,12 @@ debug_connectors()
 		if (gConnector[id]->valid == true) {
 			uint32 connectorType = gConnector[id]->type;
 			uint32 encoderType = gConnector[id]->encoder.type;
+			uint16 encoderID = gConnector[id]->encoder.objectID;
 			uint16 gpioID = gConnector[id]->gpioID;
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
 			ERROR(" + connector:  %s\n", get_connector_name(connectorType));
 			ERROR(" + encoder:    %s\n", get_encoder_name(encoderType));
+			ERROR(" + encoder id: %" B_PRIu16 "\n", encoderID);
 			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpioID);
 			ERROR(" + gpio valid: %s\n",
 				gGPIOInfo[gpioID]->valid ? "true" : "false");
@@ -936,17 +938,24 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 	Write32(OUT, regs->vgaControl, 0);
 
 	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
+	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddressInt);
+
 
 	if (info.device_chipset >= (RADEON_R700 | 0x70)) {
+		TRACE("%s: Set SurfaceAddress High: 0x%" B_PRIX32 "\n",
+			__func__, (fbAddressInt >> 32) & 0xf);
+
 		Write32(OUT, regs->grphPrimarySurfaceAddrHigh,
 			(fbAddressInt >> 32) & 0xf);
 		Write32(OUT, regs->grphSecondarySurfaceAddrHigh,
 			(fbAddressInt >> 32) & 0xf);
 	}
 
+	TRACE("%s: Set SurfaceAddress: 0x%" B_PRIX32 "\n",
+		__func__, (fbAddressInt & 0xFFFFFFFF));
+
 	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
 	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
-
 
 	if (info.device_chipset >= RADEON_R600) {
 		Write32(CRT, regs->grphControl, fbFormat);

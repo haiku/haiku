@@ -174,6 +174,24 @@ encoder_assign_crtc(uint8 crtcID)
 
 
 void
+encoder_apply_quirks(uint8 crtcID)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+	register_info* regs = gDisplay[crtcID]->regs;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
+	// Setting the scaler clears this on some chips...
+	if (info.dceMajor >= 3
+		&& (encoderFlags & ATOM_DEVICE_TV_SUPPORT) == 0) {
+		// TODO: assume non interleave mode for now
+		// en: EVERGREEN_INTERLEAVE_EN : AVIVO_D1MODE_INTERLEAVE_EN
+		Write32(OUT, regs->modeDataFormat, 0);
+	}
+}
+
+
+void
 encoder_mode_set(uint8 id, uint32 pixelClock)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
@@ -235,6 +253,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 			TRACE("%s: TODO for unknown encoder setup!\n", __func__);
 	}
 
+	encoder_apply_quirks(id);
 }
 
 
