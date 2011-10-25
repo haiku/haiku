@@ -101,7 +101,7 @@ check_pci ()
 			echo "<dd>"
 			echo "<div>$vendor:$device <i>$vendorstr:$devicestr</i></div>"
 			descline="$vendor:$device \"$vendorstr\" \"$devicestr\" $desc"
-			echo "Identification: <input type='text' value='$descline' readonly='readonly' size='80' />"
+			echo "Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$descline' readonly='readonly' size='80' />"
 
 			echo "<div>"
 			echo "Status: "
