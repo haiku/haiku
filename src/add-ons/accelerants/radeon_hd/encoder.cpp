@@ -196,6 +196,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[id]->connectorIndex;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
@@ -203,6 +204,12 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
 			encoder_analog_setup(id, pixelClock, ATOM_ENABLE);
+			if ((encoderFlags
+				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) != 0) {
+				encoder_tv_setup(id, pixelClock, ATOM_ENABLE);
+			} else {
+				encoder_tv_setup(id, pixelClock, ATOM_DISABLE);
+			}
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
@@ -254,6 +261,32 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 	}
 
 	encoder_apply_quirks(id);
+}
+
+
+status_t
+encoder_tv_setup(uint8 id, uint32 pixelClock, int command)
+{
+	uint32 connectorIndex = gDisplay[id]->connectorIndex;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
+	TV_ENCODER_CONTROL_PS_ALLOCATION args;
+	memset(&args, 0, sizeof(args));
+
+	int index = GetIndexIntoMasterTable(COMMAND, TVEncoderControl);
+
+	args.sTVEncoder.ucAction = command;
+
+	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+		args.sTVEncoder.ucTvStandard = ATOM_TV_CV;
+	else {
+		// TODO: we assume NTSC for now
+		args.sTVEncoder.ucTvStandard = ATOM_TV_NTSC;
+	}
+
+	args.sTVEncoder.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
