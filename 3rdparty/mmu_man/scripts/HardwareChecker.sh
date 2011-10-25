@@ -35,13 +35,20 @@ start_fake_httpd ()
 	report_ack="<html><body><h1>OK</h1></body></html>"
 	report_cgi=http://127.0.0.1:$report_port/hwreport
 	(
+		# force a previous isntance to close
+		$netcat 127.0.0.1 8989 < /dev/null > /dev/null
 		echo "listening on port $report_port"
 		#
 		(echo -e "HTTP/1.1 100 Continue\r\n\r\n"; echo -e "HTTP/1.1 200 OK\r\nDate: $(date)\r\nContent-Type: text/html\r\nContent-Length: ${#report_ack}\r\n\r\n$report_ack") | $netcat -q 1 -l -p $report_port > "$report_file"
 		
-		open "$report_file"
-		sleep 1
-		alert "A file named $(basename $report_file) has been created on your desktop. You can copy this file to an external drive to submit it with another operating system." "Ok"
+		# make sure we have something
+		if [ -s "$report_file" ]; then
+			open "$report_file"
+			sleep 1
+			alert "A file named $(basename $report_file) has been created on your desktop. You can copy this file to an external drive to submit it with another operating system." "Ok"
+		else
+			rm "$report_file"
+		fi
 	) &
 }
 
@@ -275,7 +282,7 @@ check_all ()
 	check_syslog
 	check_sender
 
-	do_notify 1.0 "Done!" 
+	do_notify 1.0 "Done!" --timeout 3
 	
 	echo "<div><i>Note: this form will only send data that is visible on this page.</i></div>"
 	
