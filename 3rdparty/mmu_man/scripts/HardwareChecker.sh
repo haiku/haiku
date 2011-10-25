@@ -32,7 +32,7 @@ start_fake_httpd ()
 {
 	report_port=8989
 	report_file="$(finddir B_DESKTOP_DIRECTORY)/hwchecker_report_$$.txt"
-	report_ack="<html><body><h1>OK</h1></body></html>"
+	report_ack="<html><head></head><body><h1>Done! You can close this window now.</h1></body></html>"
 	report_cgi=http://127.0.0.1:$report_port/hwreport
 	(
 		# force a previous isntance to close
