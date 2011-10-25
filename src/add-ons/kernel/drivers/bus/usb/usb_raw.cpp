@@ -545,31 +545,21 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				return B_BUFFER_OVERFLOW;
 
 			size_t actualLength = 0;
-			uint8 firstBytes[4];
-			size_t bytesNeeded = 
-				command->descriptor.type == USB_DESCRIPTOR_CONFIGURATION ? 
-					4 : 2;
+			uint8 firstTwoBytes[2];
 
 			if (gUSBModule->get_descriptor(device->device,
 				command->descriptor.type, command->descriptor.index,
-				command->descriptor.language_id, firstBytes, bytesNeeded,
+				command->descriptor.language_id, firstTwoBytes, 2,
 				&actualLength) < B_OK
-				|| actualLength != bytesNeeded
-				|| firstBytes[1] != command->descriptor.type) {
+				|| actualLength != 2
+				|| firstTwoBytes[1] != command->descriptor.type) {
 				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
 				command->descriptor.length = 0;
 				return B_OK;
 			}
 
-			uint8 descriptorLength = firstBytes[0];
-			if (command->descriptor.type == USB_DESCRIPTOR_CONFIGURATION) {
-				// configuration complete descriptor total length is 
-				// bigger than just its header size
-				descriptorLength = 
-					((usb_configuration_descriptor*)firstBytes)->total_length;
-			}
-			descriptorLength = MIN(descriptorLength, command->descriptor.length);
-				
+			uint8 descriptorLength = MIN(firstTwoBytes[0],
+				command->descriptor.length);
 			uint8 *descriptorBuffer = (uint8 *)malloc(descriptorLength);
 			if (descriptorBuffer == NULL) {
 				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
