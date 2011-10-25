@@ -133,7 +133,7 @@ radeon_dpms_set(int mode)
 				display_crtc_power(id, ATOM_ENABLE);
 				if (info.dceMajor >= 3)
 					display_crtc_memreq(id, ATOM_ENABLE);
-				display_crtc_blank(id, ATOM_DISABLE);
+				display_crtc_blank(id, ATOM_BLANKING_OFF);
 				display_crtc_lock(id, ATOM_DISABLE);
 			}
 			break;
@@ -145,7 +145,7 @@ radeon_dpms_set(int mode)
 				if (gDisplay[id]->active == false)
 					continue;
 				display_crtc_lock(id, ATOM_ENABLE);
-				display_crtc_blank(id, ATOM_ENABLE);
+				display_crtc_blank(id, ATOM_BLANKING);
 				if (info.dceMajor >= 3)
 					display_crtc_memreq(id, ATOM_DISABLE);
 				display_crtc_power(id, ATOM_DISABLE);
@@ -177,7 +177,7 @@ radeon_set_display_mode(display_mode *mode)
 
 		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
-		display_crtc_blank(id, ATOM_ENABLE);
+		display_crtc_blank(id, ATOM_BLANKING);
 		if (info.dceMajor >= 3)
 			display_crtc_memreq(id, ATOM_DISABLE);
 		display_crtc_power(id, ATOM_DISABLE);
@@ -199,7 +199,7 @@ radeon_set_display_mode(display_mode *mode)
 		display_crtc_power(id, ATOM_ENABLE);
 		if (info.dceMajor >= 3)
 			display_crtc_memreq(id, ATOM_ENABLE);
-		display_crtc_blank(id, ATOM_DISABLE);
+		display_crtc_blank(id, ATOM_BLANKING_OFF);
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit

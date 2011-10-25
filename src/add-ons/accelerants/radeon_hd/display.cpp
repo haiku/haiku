@@ -832,6 +832,11 @@ display_crtc_blank(uint8 crtcID, int command)
 	args.ucCRTC = crtcID;
 	args.ucBlanking = command;
 
+	// DEBUG: AMD red to know when we are blanked :)
+	args.usBlackColorRCr = 255;
+	args.usBlackColorGY = 0;
+	args.usBlackColorBCb = 0;
+
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
