@@ -105,9 +105,9 @@ check_pci ()
 
 			echo "<div>"
 			echo "Status: "
-			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ok' value='ok' /><label for='$bus${devn}_status_ok'>Working</label>"
-			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ko' value='ko' /><label for='$bus${devn}_status_ko'>Not working</label>"
-			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_unkn' value='unkn' checked='checked' /><label for='$bus${devn}_status_unkn'>Unknown</label>"
+			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ok' value='ok' /><label for='$bus${devn}_status_ok' class='status_ok'>Working</label>"
+			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ko' value='ko' /><label for='$bus${devn}_status_ko' class='status_ko'>Not working</label>"
+			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_unkn' value='unkn' checked='checked' /><label for='$bus${devn}_status_unkn' class='status_unkn'>Unknown</label>"
 			echo "</div>"
 
 			echo "<div>"
@@ -119,6 +119,8 @@ check_pci ()
 			echo "Comment: "
 			echo "<input type='text' name='$bus${devn}_comment' id='$bus${devn}_comment' placeholder='bug, missing feature...' size='30' />"
 			echo "</div>"
+			
+			echo "<br />"
 
 			echo "</dd>"
 
@@ -146,16 +148,16 @@ check_usb ()
 	bus="usb"
 	listusb | while read vpid dev desc; do
 		echo "<dt><b>$desc</b></dt>"
-		echo "Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$vpid $dev $desc' readonly='readonly' disabled='disabled' size='80' />"
 		echo "<dd>"
+		echo "Identification: <input type='text' id='$bus${devn}_desc' name='$bus${devn}_desc' value='$vpid $dev $desc' readonly='readonly' disabled='disabled' size='80' />"
 		if [ "$vpid" != "0000:0000" ]; then
 			enabled=1
 			id=""
 			echo "<div>"
 			echo "Status: "
-			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_unkn' value='unkn' checked='checked' /><label for='$bus${devn}_status_unkn'>Unknown</label>"
-			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ok' value='ok' /><label for='$bus${devn}_status_ok'>Working</label>"
-			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ko' value='ko' /><label for='$bus${devn}_status_ko'>Not working</label>"
+			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ok' value='ok' /><label for='$bus${devn}_status_ok' class='status_ok'>Working</label>"
+			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_ko' value='ko' /><label for='$bus${devn}_status_ko' class='status_ko'>Not working</label>"
+			echo "<input type='radio' name='$bus${devn}_status' id='$bus${devn}_status_unkn' value='unkn' checked='checked' /><label for='$bus${devn}_status_unkn' class='status_unkn'>Unknown</label>"
 			echo "</div>"
 
 			echo "<div>"
@@ -167,10 +169,11 @@ check_usb ()
 			echo "Comment: "
 			echo "<input type='text' name='$bus${devn}_comment' id='$bus${devn}_comment' placeholder='bug, missing feature...' size='30' />"
 			echo "</div>"
-
 		else
-			echo "<i>(virtual device)</i>"
+			echo "<div><i>(virtual device)</i></div>"
 		fi
+
+		echo "<br />"
 		echo "</dd>"
 		devn=$(($devn+1))
 	done
@@ -262,7 +265,14 @@ check_sender ()
 check_all ()
 {
 	echo "<html>"
-	echo "<head><title>Hardware report</title></head>"
+	echo "<head>"
+	echo "<title>Hardware report</title>"
+	echo "<style type='text/css'>"
+	echo ".status_ok { color: #008000 }"
+	echo ".status_ko { color: #800000 }"
+	echo ".status_unkn { color: #000080 }"
+	echo "</style>"
+	echo "</head>"
 	echo "<body>"
 	echo "<form method='POST' action='$report_cgi'>"
 	
