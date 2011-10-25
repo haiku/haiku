@@ -202,7 +202,7 @@ check_usb ()
 check_machine ()
 {
 	echo "<h2>Machine</h2>"
-	echo "Vendor: <input type='text' name='machine_vendor' id='machine_vendor' value='Lenovo,HP,Asus...' />"
+	echo "Vendor: <input type='text' name='machine_vendor' id='machine_vendor' placeholder='Lenovo,HP,Asus...' />"
 	echo "<br />"
 	echo "Model: <input type='text' name='machine_model' id='machine_model' placeholder='T510,l4500r...' />"
 	echo "<br />"
@@ -313,6 +313,8 @@ check_all ()
 
 	do_notify 0.8 "Dumping syslog output..." 
 	check_syslog
+
+	check_machine
 	check_sender
 
 	do_notify 1.0 "Done!" --timeout 3
