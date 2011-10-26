@@ -49,7 +49,8 @@ public:
 	// Layouting related methods
 
 	virtual	void				InvalidateLayout(bool children = false);
-			void				Relayout(bool immediate = false);
+	virtual	void				Relayout(bool immediate = false);
+									// from BLayoutItem
 			void				RequireLayout();
 			bool				IsValid();
 			void				EnableLayoutInvalidation();
