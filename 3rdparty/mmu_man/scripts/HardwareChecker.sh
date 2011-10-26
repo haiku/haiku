@@ -10,7 +10,7 @@
 
 
 netcat=netcat
-report_site=haikuware.con
+report_site=haikuware.com
 report_cgi=http://haikuware.com/hwreport.php
 
 do_notify ()
@@ -79,7 +79,7 @@ You can continue anyway and generate a local file to submit later on, or try to 
 check_pci ()
 {
 	echo "<h2>PCI devices</h2><dl>"
-	echo "<div><i>List ot detected PCI devices. This does not indicate that every probed device is supported by a driver.</i></div><br />"
+	echo "<div><i>List of detected PCI devices. This does not indicate that every probed device is supported by a driver.</i></div><br />"
 	devn=0
 	bus="pci"
 	vendor=''
