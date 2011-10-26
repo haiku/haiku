@@ -832,7 +832,7 @@ display_crtc_blank(uint8 crtcID, int command)
 	args.ucCRTC = crtcID;
 	args.ucBlanking = command;
 
-	// DEBUG: AMD red to know when we are blanked :)
+	// DEBUG: Radeon red to know when we are blanked :)
 	args.usBlackColorRCr = 255;
 	args.usBlackColorGY = 0;
 	args.usBlackColorBCb = 0;
@@ -851,7 +851,7 @@ display_crtc_scale(uint8 crtcID, display_mode *mode)
 	memset(&args, 0, sizeof(args));
 
 	args.ucScaler = crtcID;
-	args.ucEnable = ATOM_SCALER_EXPANSION;
+	args.ucEnable = ATOM_SCALER_DISABLE;
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
@@ -942,25 +942,26 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 
 	Write32(OUT, regs->vgaControl, 0);
 
-	uint64 fbAddressInt = gInfo->shared_info->frame_buffer_int;
-	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddressInt);
+	uint64 fbAddress = gInfo->mc.vramStart;
+	//uint64 fbAddress = gInfo->shared_info->frame_buffer_phys;
 
+	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddress);
 
 	if (info.device_chipset >= (RADEON_R700 | 0x70)) {
 		TRACE("%s: Set SurfaceAddress High: 0x%" B_PRIX32 "\n",
-			__func__, (fbAddressInt >> 32) & 0xf);
+			__func__, (fbAddress >> 32) & 0xf);
 
 		Write32(OUT, regs->grphPrimarySurfaceAddrHigh,
-			(fbAddressInt >> 32) & 0xf);
+			(fbAddress >> 32) & 0xf);
 		Write32(OUT, regs->grphSecondarySurfaceAddrHigh,
-			(fbAddressInt >> 32) & 0xf);
+			(fbAddress >> 32) & 0xf);
 	}
 
 	TRACE("%s: Set SurfaceAddress: 0x%" B_PRIX32 "\n",
-		__func__, (fbAddressInt & 0xFFFFFFFF));
+		__func__, (fbAddress & 0xFFFFFFFF));
 
-	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
-	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddressInt & 0xFFFFFFFF));
+	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddress & 0xFFFFFFFF));
+	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddress & 0xFFFFFFFF));
 
 	if (info.device_chipset >= RADEON_R600) {
 		Write32(CRT, regs->grphControl, fbFormat);

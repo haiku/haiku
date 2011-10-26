@@ -209,16 +209,20 @@ radeon_set_display_mode(display_mode *mode)
 	}
 
 	// for debugging
-	TRACE("D1CRTC_STATUS     Value: 0x%X\n", Read32(CRT, D1CRTC_STATUS));
-	TRACE("D2CRTC_STATUS     Value: 0x%X\n", Read32(CRT, D2CRTC_STATUS));
-	TRACE("D1CRTC_CONTROL    Value: 0x%X\n", Read32(CRT, D1CRTC_CONTROL));
-	TRACE("D2CRTC_CONTROL    Value: 0x%X\n", Read32(CRT, D2CRTC_CONTROL));
-	TRACE("D1GRPH_ENABLE     Value: 0x%X\n", Read32(CRT, D1GRPH_ENABLE));
-	TRACE("D2GRPH_ENABLE     Value: 0x%X\n", Read32(CRT, D2GRPH_ENABLE));
-	TRACE("D1SCL_ENABLE      Value: 0x%X\n", Read32(CRT, D1SCL_ENABLE));
-	TRACE("D2SCL_ENABLE      Value: 0x%X\n", Read32(CRT, D2SCL_ENABLE));
-	TRACE("RV620_DACA_ENABLE Value: 0x%X\n", Read32(CRT, RV620_DACA_ENABLE));
-	TRACE("RV620_DACB_ENABLE Value: 0x%X\n", Read32(CRT, RV620_DACB_ENABLE));
+	TRACE("D1CRTC_STATUS        Value: 0x%X\n", Read32(CRT, D1CRTC_STATUS));
+	TRACE("D2CRTC_STATUS        Value: 0x%X\n", Read32(CRT, D2CRTC_STATUS));
+	TRACE("D1CRTC_CONTROL       Value: 0x%X\n", Read32(CRT, D1CRTC_CONTROL));
+	TRACE("D2CRTC_CONTROL       Value: 0x%X\n", Read32(CRT, D2CRTC_CONTROL));
+	TRACE("D1GRPH_ENABLE        Value: 0x%X\n", Read32(CRT, D1GRPH_ENABLE));
+	TRACE("D2GRPH_ENABLE        Value: 0x%X\n", Read32(CRT, D2GRPH_ENABLE));
+	TRACE("D1SCL_ENABLE         Value: 0x%X\n", Read32(CRT, D1SCL_ENABLE));
+	TRACE("D2SCL_ENABLE         Value: 0x%X\n", Read32(CRT, D2SCL_ENABLE));
+	TRACE("RV620_DACA_ENABLE    Value: 0x%X\n", Read32(CRT, RV620_DACA_ENABLE));
+	TRACE("RV620_DACB_ENABLE    Value: 0x%X\n", Read32(CRT, RV620_DACB_ENABLE));
+	TRACE("D1CRTC_BLANK_CONTROL Value: 0x%X\n",
+		Read32(CRT, D1CRTC_BLANK_CONTROL));
+	TRACE("D2CRTC_BLANK_CONTROL Value: 0x%X\n",
+		Read32(CRT, D2CRTC_BLANK_CONTROL));
 
 	return B_OK;
 }
@@ -240,7 +244,7 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 	TRACE("%s\n", __func__);
 
 	config->frame_buffer = gInfo->shared_info->frame_buffer;
-	config->frame_buffer_dma = (uint8 *)gInfo->shared_info->frame_buffer_phys;
+	config->frame_buffer_dma = (uint8*)gInfo->shared_info->frame_buffer_phys;
 
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 

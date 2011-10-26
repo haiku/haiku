@@ -467,6 +467,7 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	memset((void *)info.shared_info, 0, sizeof(radeon_shared_info));
+	sharedCreator.Detach();
 
 	// *** Map Memory mapped IO
 	AreaKeeper mmioMapper;
@@ -480,16 +481,44 @@ radeon_hd_init(radeon_info &info)
 			__func__, info.id);
 		return info.registers_area;
 	}
+	mmioMapper.Detach();
+
+	// *** Populate frame buffer information
+	if (info.shared_info->device_chipset >= RADEON_R1000) {
+		// R800+ has memory stored in MB
+		info.shared_info->graphics_memory_size
+			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;
+	} else {
+		// R600-R700 has memory stored in bytes
+		info.shared_info->graphics_memory_size
+			= read32(info.registers + R6XX_CONFIG_MEMSIZE) / 1024;
+	}
+
+	uint32 barSize = info.pci->u.h0.base_register_sizes[RHD_FB_BAR] / 1024;
+
+	// if graphics memory is larger then PCI bar, just map bar
+	if (info.shared_info->graphics_memory_size > barSize) {
+		TRACE("%s: shrinking frame buffer to PCI bar...\n",
+			__func__);
+		info.shared_info->frame_buffer_size = barSize;
+	} else {
+		info.shared_info->frame_buffer_size
+			= info.shared_info->graphics_memory_size;
+	}
+
+	TRACE("%s: mapping a frame buffer of %" B_PRIu32 "MB out of %" B_PRIu32
+		"MB video ram\n", __func__, info.shared_info->frame_buffer_size / 1024,
+		info.shared_info->graphics_memory_size / 1024);
 
 	// *** Framebuffer mapping
 	AreaKeeper frambufferMapper;
-	info.framebuffer_area = frambufferMapper.Map("radeon hd framebuffer",
+	info.framebuffer_area = frambufferMapper.Map("radeon hd frame buffer",
 		(void *)info.pci->u.h0.base_registers[RHD_FB_BAR],
-		info.pci->u.h0.base_register_sizes[RHD_FB_BAR],
+		info.shared_info->frame_buffer_size * 1024,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void **)&info.shared_info->frame_buffer);
 	if (frambufferMapper.InitCheck() < B_OK) {
-		ERROR("%s: card(%ld): couldn't map framebuffer!\n",
+		ERROR("%s: card(%ld): couldn't map frame buffer!\n",
 			__func__, info.id);
 		return info.framebuffer_area;
 	}
@@ -498,9 +527,11 @@ radeon_hd_init(radeon_info &info)
 	vm_set_area_memory_type(info.framebuffer_area,
 		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
 
-	sharedCreator.Detach();
-	mmioMapper.Detach();
 	frambufferMapper.Detach();
+
+	info.shared_info->frame_buffer_area = info.framebuffer_area;
+	info.shared_info->frame_buffer_phys
+		= info.pci->u.h0.base_registers[RHD_FB_BAR];
 
 	// Pass common information to accelerant
 	info.shared_info->device_index = info.id;
@@ -511,12 +542,6 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->dceMinor = info.dceMinor;
 	info.shared_info->registers_area = info.registers_area;
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
-
-	info.shared_info->frame_buffer_area = info.framebuffer_area;
-	info.shared_info->frame_buffer_phys
-		= info.pci->u.h0.base_registers[RHD_FB_BAR];
-	info.shared_info->frame_buffer_int
-		= read32(info.registers + R6XX_CONFIG_FB_BASE);
 
 	// *** AtomBIOS mapping
 	// First we try an active bios read
@@ -583,39 +608,6 @@ radeon_hd_init(radeon_info &info)
 			__func__);
 		info.shared_info->has_edid = false;
 	}
-
-	// *** Populate graphics_memory/aperture_size with KB
-	if (info.shared_info->device_chipset >= RADEON_R1000) {
-		// R800+ has memory stored in MB
-		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;
-		info.shared_info->frame_buffer_size
-			= read32(info.registers + R6XX_CONFIG_APER_SIZE) * 1024;
-	} else {
-		// R600-R700 has memory stored in bytes
-		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) / 1024;
-		info.shared_info->frame_buffer_size
-			= read32(info.registers + R6XX_CONFIG_APER_SIZE) / 1024;
-	}
-
-	uint32 barSize = info.pci->u.h0.base_register_sizes[RHD_FB_BAR] / 1024;
-
-	// if graphics memory is larger then PCI bar, just map bar
-	if (info.shared_info->graphics_memory_size > barSize)
-		info.shared_info->frame_buffer_size = barSize;
-	else
-		info.shared_info->frame_buffer_size
-			= info.shared_info->graphics_memory_size;
-
-	int32 memory_size = info.shared_info->graphics_memory_size / 1024;
-	int32 frame_buffer_size = info.shared_info->frame_buffer_size / 1024;
-
-	TRACE("card(%ld): Found %ld MB memory on card\n", info.id,
-		memory_size);
-
-	TRACE("card(%ld): Frame buffer aperture size is %ld MB\n", info.id,
-		frame_buffer_size);
 
 	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
 	return B_OK;

@@ -93,11 +93,10 @@ struct radeon_shared_info {
 	addr_t			physical_status_page;
 	uint32			graphics_memory_size;
 
-	addr_t			frame_buffer_phys;		// card PCI BAR address of FB
-	area_id			frame_buffer_area;		// area of memory mapped FB
-	uint32			frame_buffer_int;		// card internal FB location
-	uint32			frame_buffer_size;		// card internal FB aperture size
 	uint8*			frame_buffer;			// virtual memory mapped FB
+	area_id			frame_buffer_area;		// area of memory mapped FB
+	addr_t			frame_buffer_phys;		// card PCI BAR address of FB
+	uint32			frame_buffer_size;		// FB size mapped
 
 	bool			has_edid;
 	edid1_info		edid_info;
