@@ -1465,7 +1465,11 @@ actions BuildCDBootPPCImage1 bind MAPS
 	# -hfs -hfs-bless .
 	mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
 		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -prep-boot \
-		ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+		ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd \
+	|| \
+	genisoimage -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
+		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -prep-boot \
+		ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd 
 	#$(RM) -R $(HAIKU_OUTPUT_DIR)/cd
 }
 
