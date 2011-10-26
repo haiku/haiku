@@ -1,8 +1,8 @@
-##	BeOS and Haiku Generic Makefile Engine v2.4.0
+##	BeOS and Haiku Generic Makefile Engine v2.5.0
 ##	Does all the hard work for the Generic Makefile
 ##	which simply defines the project parameters
 
-##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4 
+##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4, 2.5 
 
 #	determine wheather running on x86 or ppc
 MACHINE=$(shell uname -m)
@@ -142,17 +142,21 @@ SRC_PATHS += $(sort $(foreach file, $(SRCS), $(dir $(file))))
 VPATH :=
 VPATH += $(addprefix :, $(subst  ,:, $(filter-out $($(subst, :, ,$(VPATH))), $(SRC_PATHS))))
 
-#	SETTING: build the local and system include paths
+#	SETTING: build the local and system include paths, compose C++ libs
 ifeq ($(CPU), x86)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
  ifeq ($(CC_VER), 2)
 	INCLUDES = $(LOC_INCLUDES)
 	INCLUDES += -I-
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
+	
+	STDCPPLIBS = stdc++.r4
  else
 	INCLUDES = -iquote./
 	INCLUDES += $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -iquote, $(path)))
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -isystem, $(path)))
+	
+	STDCPPLIBS = stdc++ supc++
  endif
 else
 ifeq ($(CPU), ppc)
@@ -310,7 +314,7 @@ $(CATALOGS_DIR)/%.catalog : $(CATKEYS_DIR)/%.catkeys
 
 # rule to preprocess program sources into file ready for collecting catkeys 
 $(OBJ_DIR)/$(NAME).pre : $(SRCS)
-	-cat $(SRCS) | $(CC) -E $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
+	-cat $(SRCS) | $(CC) -E -x c++ $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
 
 # rules to collect localization catkeys
 catkeys : $(CATKEYS_DIR)/en.catkeys
