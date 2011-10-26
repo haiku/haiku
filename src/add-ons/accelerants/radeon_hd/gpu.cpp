@@ -241,6 +241,8 @@ radeon_gpu_mc_setup_r600()
 	Write32(OUT, HDP_REG_COHERENCY_FLUSH_CNTL, 0);
 
 	// idle the memory controller
+	radeon_gpu_mc_halt();
+	
 	uint32 idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
 		TRACE("%s: Cannot modify non-idle MC! idleState: 0x%" B_PRIX32 "\n",
