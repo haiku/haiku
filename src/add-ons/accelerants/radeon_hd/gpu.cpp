@@ -245,9 +245,9 @@ radeon_gpu_mc_setup_r600()
 	
 	uint32 idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
-		TRACE("%s: Cannot modify non-idle MC! idleState: 0x%" B_PRIX32 "\n",
+		ERROR("%s: Cannot modify non-idle MC! idleState: 0x%" B_PRIX32 "\n",
 			__func__, idleState);
-		return B_ERROR;
+		//return B_ERROR;
 	}
 
 	// TODO: Memory Controller AGP
@@ -277,9 +277,9 @@ radeon_gpu_mc_setup_r600()
 
 	idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
-		TRACE("%s: Cannot modify non-idle MC! idleState: 0x%" B_PRIX32 "\n",
+		ERROR("%s: Cannot modify non-idle MC! idleState: 0x%" B_PRIX32 "\n",
 			__func__, idleState);
-		return B_ERROR;
+		//return B_ERROR;
 	}
 	radeon_gpu_mc_resume();
 
