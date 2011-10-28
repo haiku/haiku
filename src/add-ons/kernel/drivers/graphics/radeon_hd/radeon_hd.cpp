@@ -36,11 +36,8 @@
 
 #define ERROR(x...) dprintf("radeon_hd: " x)
 
+
 //	#pragma mark -
-
-
-#define RHD_FB_BAR   0
-#define RHD_MMIO_BAR 2
 
 
 status_t
@@ -139,7 +136,7 @@ radeon_hd_getbios(radeon_info &info)
 				// *** Discreet card on IGP, check PCI BAR 0
 				// On post, the bios puts a copy of the IGP
 				// AtomBIOS at the start of the video ram
-				romBase = info.pci->u.h0.base_registers[RHD_FB_BAR];
+				romBase = info.pci->u.h0.base_registers[PCI_BAR_FB];
 				romSize = 256 * 1024;
 
 				if (romBase == 0 || romSize == 0) {
@@ -472,8 +469,8 @@ radeon_hd_init(radeon_info &info)
 	// *** Map Memory mapped IO
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
-		(void *)info.pci->u.h0.base_registers[RHD_MMIO_BAR],
-		info.pci->u.h0.base_register_sizes[RHD_MMIO_BAR],
+		(void *)info.pci->u.h0.base_registers[PCI_BAR_MMIO],
+		info.pci->u.h0.base_register_sizes[PCI_BAR_MMIO],
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
@@ -494,7 +491,7 @@ radeon_hd_init(radeon_info &info)
 			= read32(info.registers + CONFIG_MEMSIZE) / 1024;
 	}
 
-	uint32 barSize = info.pci->u.h0.base_register_sizes[RHD_FB_BAR] / 1024;
+	uint32 barSize = info.pci->u.h0.base_register_sizes[PCI_BAR_FB] / 1024;
 
 	// if graphics memory is larger then PCI bar, just map bar
 	if (info.shared_info->graphics_memory_size > barSize) {
@@ -513,7 +510,7 @@ radeon_hd_init(radeon_info &info)
 	// *** Framebuffer mapping
 	AreaKeeper frambufferMapper;
 	info.framebuffer_area = frambufferMapper.Map("radeon hd frame buffer",
-		(void *)info.pci->u.h0.base_registers[RHD_FB_BAR],
+		(void *)info.pci->u.h0.base_registers[PCI_BAR_FB],
 		info.shared_info->frame_buffer_size * 1024,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void **)&info.shared_info->frame_buffer);
@@ -525,13 +522,13 @@ radeon_hd_init(radeon_info &info)
 
 	// Turn on write combining for the frame buffer area
 	vm_set_area_memory_type(info.framebuffer_area,
-		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
+		info.pci->u.h0.base_registers[PCI_BAR_FB], B_MTR_WC);
 
 	frambufferMapper.Detach();
 
 	info.shared_info->frame_buffer_area = info.framebuffer_area;
 	info.shared_info->frame_buffer_phys
-		= info.pci->u.h0.base_registers[RHD_FB_BAR];
+		= info.pci->u.h0.base_registers[PCI_BAR_FB];
 
 	// Pass common information to accelerant
 	info.shared_info->device_index = info.id;
@@ -551,7 +548,7 @@ radeon_hd_init(radeon_info &info)
 		// If the active read fails, we try a disabled read
 		if (info.device_chipset >= (RADEON_R1000 | 0x20))
 			biosStatus = radeon_hd_getbios_ni(info);
-		else if (info.device_chipset >= (RADEON_R700 | 0x70))
+		else if (info.device_chipset >= RADEON_R700)
 			biosStatus = radeon_hd_getbios_r700(info);
 		else if (info.device_chipset >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
