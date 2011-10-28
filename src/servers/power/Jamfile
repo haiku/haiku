@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src servers power ;
 
+UsePrivateHeaders app ;
+
 AddResources power_daemon : power_daemon.rdef ;
 
 Server power_daemon :
