@@ -104,7 +104,7 @@ PRIVATE_SYSTEM_LIBS =
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
-	notification_server print_server print_addon_server registrar syslog_daemon
+	notification_server power_daemon print_server print_addon_server registrar syslog_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
@@ -186,7 +186,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 	# WiMAX drivers
 	$(GPL_ONLY)usb_beceemwmx
 ;
-#SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
+SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
 	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
@@ -273,7 +273,7 @@ AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
 AddDriversToHaikuImage misc			: <driver>poke <driver>mem ;
 AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 AddDriversToHaikuImage ports		: usb_serial ;
-#AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
+AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
 AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
