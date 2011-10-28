@@ -15,6 +15,7 @@
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
+#include "InterfaceDefs.h"
 #include "ServerApp.h"
 #include "Window.h"
 #include "Workspace.h"
@@ -207,7 +208,8 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 		_DarkenColor(white);
 	}
 	if (window == fSelectedWindow) {
-		frameColor = navColor;
+		frameColor = ui_color(B_WINDOW_BORDER_COLOR);
+		//frameColor = navColor;
 	}
 
 	if (tabFrame.left < frame.left)

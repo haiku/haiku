@@ -54,7 +54,10 @@ static ColorDescription sColorDescriptionTable[] =
 	{ B_WINDOW_TEXT_COLOR, B_TRANSLATE_MARK("Window tab text") },
 	{ B_WINDOW_INACTIVE_TAB_COLOR, B_TRANSLATE_MARK("Inactive window tab") },
 	{ B_WINDOW_INACTIVE_TEXT_COLOR,
-		B_TRANSLATE_MARK("Inactive window tab text") }
+		B_TRANSLATE_MARK("Inactive window tab text") },
+	{ B_WINDOW_BORDER_COLOR, B_TRANSLATE_MARK("Window border") },
+	{ B_WINDOW_INACTIVE_BORDER_COLOR,
+		B_TRANSLATE_MARK("Inactive window border") }
 };
 
 const int32 sColorDescriptionCount = sizeof(sColorDescriptionTable)
@@ -117,7 +120,6 @@ ColorSet::DefaultColorSet(void)
 		set.fColors[which] =
 			BPrivate::kDefaultColors[color_which_to_index(which)];
 	}
-
 	return set;
 }
 

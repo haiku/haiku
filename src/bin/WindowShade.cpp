@@ -63,6 +63,8 @@ static struct option const kLongOptions[] = {
 	I(window_text_color, B_WINDOW_TEXT_COLOR),
 	I(window_inactive_tab_color, B_WINDOW_INACTIVE_TAB_COLOR),
 	I(window_inactive_text_color, B_WINDOW_INACTIVE_TEXT_COLOR),
+	I(window_border_color, B_WINDOW_BORDER_COLOR),
+	I(window_inactive_border_color, B_WINDOW_INACTIVE_BORDER_COLOR),
 	{"sum", required_argument, 0, 's'},
 	{"refresh", no_argument, 0, 'r'},
 	{"help", no_argument, 0, 'h'},
