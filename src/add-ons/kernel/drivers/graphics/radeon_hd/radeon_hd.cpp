@@ -485,13 +485,13 @@ radeon_hd_init(radeon_info &info)
 
 	// *** Populate frame buffer information
 	if (info.shared_info->device_chipset >= RADEON_R1000) {
-		// R800+ has memory stored in MB
+		// Evergreen+ has memory stored in MB
 		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) * 1024;
+			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
 	} else {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
-			= read32(info.registers + R6XX_CONFIG_MEMSIZE) / 1024;
+			= read32(info.registers + CONFIG_MEMSIZE) / 1024;
 	}
 
 	uint32 barSize = info.pci->u.h0.base_register_sizes[RHD_FB_BAR] / 1024;

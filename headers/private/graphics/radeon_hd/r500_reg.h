@@ -398,11 +398,7 @@
  */
 #define AVIVO_D1GRPH_LUT_SEL                                    0x6108
 #define AVIVO_D1GRPH_PRIMARY_SURFACE_ADDRESS                    0x6110
-#define R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH                0x6914
-#define R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH                0x6114
 #define AVIVO_D1GRPH_SECONDARY_SURFACE_ADDRESS                  0x6118
-#define R700_D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH              0x691c
-#define R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH              0x611c
 #define AVIVO_D1GRPH_PITCH                                      0x6120
 #define AVIVO_D1GRPH_SURFACE_OFFSET_X                           0x6124
 #define AVIVO_D1GRPH_SURFACE_OFFSET_Y                           0x6128

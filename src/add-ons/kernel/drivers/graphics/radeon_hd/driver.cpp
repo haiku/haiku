@@ -122,8 +122,6 @@ const struct supported_device {
 
 	// From here on AMD no longer used numeric identifiers
 
-	// TODO: These don't work yet, no video. (maybe FB issue?)
-	# if 0
 	// R1000 series (HD54xx - HD63xx)
 	// Codename: Evergreen
 	//  Cedar
@@ -199,7 +197,6 @@ const struct supported_device {
 	{0x671F, 5, 0, RADEON_R2000 | 0x30, CHIP_STD, "Radeon HD 6900"},
 	//  Antilles
 	{0x671d, 5, 0, RADEON_R2000 | 0x40, CHIP_STD, "Radeon HD 6990"}
-	#endif
 
 	// R3000 series (HD74xx - HD79xx)
 	// Codename: Southern Islands

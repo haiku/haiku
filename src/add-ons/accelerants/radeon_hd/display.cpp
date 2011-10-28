@@ -34,7 +34,7 @@ extern "C" void _sPrintf(const char *format, ...);
 
 /*! Populate regs with device dependant register locations */
 status_t
-init_registers(register_info* regs, uint8 crtid)
+init_registers(register_info* regs, uint8 crtcID)
 {
 	memset(regs, 0, sizeof(register_info));
 
@@ -43,112 +43,157 @@ init_registers(register_info* regs, uint8 crtid)
 	if (info.device_chipset >= RADEON_R1000) {
 		uint32 offset = 0;
 
-		// AMD Eyefinity on Evergreen GPUs
-		if (crtid == 1) {
-			offset = EVERGREEN_CRTC1_REGISTER_OFFSET;
-			regs->vgaControl = D2VGA_CONTROL;
-		} else if (crtid == 2) {
-			offset = EVERGREEN_CRTC2_REGISTER_OFFSET;
-			regs->vgaControl = EVERGREEN_D3VGA_CONTROL;
-		} else if (crtid == 3) {
-			offset = EVERGREEN_CRTC3_REGISTER_OFFSET;
-			regs->vgaControl = EVERGREEN_D4VGA_CONTROL;
-		} else if (crtid == 4) {
-			offset = EVERGREEN_CRTC4_REGISTER_OFFSET;
-			regs->vgaControl = EVERGREEN_D5VGA_CONTROL;
-		} else if (crtid == 5) {
-			offset = EVERGREEN_CRTC5_REGISTER_OFFSET;
-			regs->vgaControl = EVERGREEN_D6VGA_CONTROL;
-		} else {
-			offset = EVERGREEN_CRTC0_REGISTER_OFFSET;
-			regs->vgaControl = D1VGA_CONTROL;
+		switch(crtcID) {
+			case 0:
+				offset = EVERGREEN_CRTC0_REGISTER_OFFSET;
+				regs->vgaControl = AVIVO_D1VGA_CONTROL;
+				break;
+			case 1:
+				offset = EVERGREEN_CRTC1_REGISTER_OFFSET;
+				regs->vgaControl = AVIVO_D2VGA_CONTROL;
+				break;
+			case 2:
+				offset = EVERGREEN_CRTC2_REGISTER_OFFSET;
+				regs->vgaControl = EVERGREEN_D3VGA_CONTROL;
+				break;
+			case 3:
+				offset = EVERGREEN_CRTC3_REGISTER_OFFSET;
+				regs->vgaControl = EVERGREEN_D4VGA_CONTROL;
+				break;
+			case 4:
+				offset = EVERGREEN_CRTC4_REGISTER_OFFSET;
+				regs->vgaControl = EVERGREEN_D5VGA_CONTROL;
+				break;
+			case 5:
+				offset = EVERGREEN_CRTC5_REGISTER_OFFSET;
+				regs->vgaControl = EVERGREEN_D6VGA_CONTROL;
+				break;
+			default:
+				ERROR("%s: Unknown CRTC %" B_PRIu32 "\n",
+					__func__, crtcID);
+				return B_ERROR;
 		}
 
 		regs->crtcOffset = offset;
 
-		// Evergreen+ is crtoffset + register
-		regs->grphEnable = offset + EVERGREEN_GRPH_ENABLE;
-		regs->grphControl = offset + EVERGREEN_GRPH_CONTROL;
-		regs->grphSwapControl = offset + EVERGREEN_GRPH_SWAP_CONTROL;
+		regs->grphEnable = EVERGREEN_GRPH_ENABLE + offset;
+		regs->grphControl = EVERGREEN_GRPH_CONTROL + offset;
+		regs->grphSwapControl = EVERGREEN_GRPH_SWAP_CONTROL + offset;
 
 		regs->grphPrimarySurfaceAddr
-			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS;
+			= EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS + offset;
 		regs->grphSecondarySurfaceAddr
-			= offset + EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS;
+			= EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS + offset;
 		regs->grphPrimarySurfaceAddrHigh
-			= offset + EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+			= EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS_HIGH + offset;
 		regs->grphSecondarySurfaceAddrHigh
-			= offset + EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
+			= EVERGREEN_GRPH_SECONDARY_SURFACE_ADDRESS_HIGH + offset;
 
-		regs->grphPitch = offset + EVERGREEN_GRPH_PITCH;
+		regs->grphPitch = EVERGREEN_GRPH_PITCH + offset;
 		regs->grphSurfaceOffsetX
-			= offset + EVERGREEN_GRPH_SURFACE_OFFSET_X;
+			= EVERGREEN_GRPH_SURFACE_OFFSET_X + offset;
 		regs->grphSurfaceOffsetY
-			= offset + EVERGREEN_GRPH_SURFACE_OFFSET_Y;
-		regs->grphXStart = offset + EVERGREEN_GRPH_X_START;
-		regs->grphYStart = offset + EVERGREEN_GRPH_Y_START;
-		regs->grphXEnd = offset + EVERGREEN_GRPH_X_END;
-		regs->grphYEnd = offset + EVERGREEN_GRPH_Y_END;
-		regs->crtControl = offset + EVERGREEN_CRTC_CONTROL;
-		regs->modeDesktopHeight = offset + EVERGREEN_DESKTOP_HEIGHT;
-		regs->modeDataFormat = offset + EVERGREEN_DATA_FORMAT;
-		regs->viewportStart = offset + EVERGREEN_VIEWPORT_START;
-		regs->viewportSize = offset + EVERGREEN_VIEWPORT_SIZE;
+			= EVERGREEN_GRPH_SURFACE_OFFSET_Y + offset;
+		regs->grphXStart = EVERGREEN_GRPH_X_START + offset;
+		regs->grphYStart = EVERGREEN_GRPH_Y_START + offset;
+		regs->grphXEnd = EVERGREEN_GRPH_X_END + offset;
+		regs->grphYEnd = EVERGREEN_GRPH_Y_END + offset;
+		regs->modeDesktopHeight = EVERGREEN_DESKTOP_HEIGHT + offset;
+		regs->modeDataFormat = EVERGREEN_DATA_FORMAT + offset;
+		regs->viewportStart = EVERGREEN_VIEWPORT_START + offset;
+		regs->viewportSize = EVERGREEN_VIEWPORT_SIZE + offset;
 
-	} else if (info.device_chipset >= RADEON_R600
-		&& info.device_chipset < RADEON_R1000) {
+	} else if (info.device_chipset >= RADEON_R700) {
+		uint32 offset = 0;
 
-		// r600 - r700 are D1 or D2 based on primary / secondary crt
-		regs->vgaControl
-			= crtid == 1 ? D2VGA_CONTROL : D1VGA_CONTROL;
-		regs->grphEnable
-			= crtid == 1 ? D2GRPH_ENABLE : D1GRPH_ENABLE;
-		regs->grphControl
-			= crtid == 1 ? D2GRPH_CONTROL : D1GRPH_CONTROL;
-		regs->grphSwapControl
-			= crtid == 1 ? D2GRPH_SWAP_CNTL : D1GRPH_SWAP_CNTL;
+		switch(crtcID) {
+			case 0:
+				offset = R600_CRTC0_REGISTER_OFFSET;
+				regs->vgaControl = AVIVO_D1VGA_CONTROL;
+				regs->grphPrimarySurfaceAddrHigh
+					= D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+				break;
+			case 1:
+				offset = R600_CRTC1_REGISTER_OFFSET;
+				regs->vgaControl = AVIVO_D2VGA_CONTROL;
+				regs->grphPrimarySurfaceAddrHigh
+					= D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+				break;
+			default:
+				ERROR("%s: Unknown CRTC %" B_PRIu32 "\n",
+					__func__, crtcID);
+				return B_ERROR;
+		}
+
+		regs->crtcOffset = offset;
+
+		regs->grphEnable = AVIVO_D1GRPH_ENABLE + offset;
+		regs->grphControl = AVIVO_D1GRPH_CONTROL + offset;
+		regs->grphSwapControl = D1GRPH_SWAP_CNTL + offset;
+
 		regs->grphPrimarySurfaceAddr
-			= crtid == 1 ? D2GRPH_PRIMARY_SURFACE_ADDRESS
-				: D1GRPH_PRIMARY_SURFACE_ADDRESS;
+			= D1GRPH_PRIMARY_SURFACE_ADDRESS + offset;
 		regs->grphSecondarySurfaceAddr
-			= crtid == 1 ? D2GRPH_SECONDARY_SURFACE_ADDRESS
-				: D1GRPH_SECONDARY_SURFACE_ADDRESS;
+			= D1GRPH_SECONDARY_SURFACE_ADDRESS + offset;
 
-		regs->crtcOffset
-			= crtid == 1 ? (D2GRPH_X_END - D1GRPH_X_END) : 0;
+		regs->grphPitch = AVIVO_D1GRPH_PITCH + offset;
+		regs->grphSurfaceOffsetX = AVIVO_D1GRPH_SURFACE_OFFSET_X + offset;
+		regs->grphSurfaceOffsetY = AVIVO_D1GRPH_SURFACE_OFFSET_Y + offset;
+		regs->grphXStart = AVIVO_D1GRPH_X_START + offset;
+		regs->grphYStart = AVIVO_D1GRPH_Y_START + offset;
+		regs->grphXEnd = AVIVO_D1GRPH_X_END + offset;
+		regs->grphYEnd = AVIVO_D1GRPH_Y_END + offset;
 
-		// Surface Address high only used on r770+
-		regs->grphPrimarySurfaceAddrHigh
-			= crtid == 1 ? D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH
-				: D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
-		regs->grphSecondarySurfaceAddrHigh
-			= crtid == 1 ? D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH
-				: D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH;
+		regs->modeDesktopHeight = AVIVO_D1MODE_DESKTOP_HEIGHT + offset;
+		regs->modeDataFormat = AVIVO_D1MODE_DATA_FORMAT + offset;
+		regs->viewportStart = AVIVO_D1MODE_VIEWPORT_START + offset;
+		regs->viewportSize = AVIVO_D1MODE_VIEWPORT_SIZE + offset;
 
-		regs->grphPitch
-			= crtid == 1 ? D2GRPH_PITCH : D1GRPH_PITCH;
-		regs->grphSurfaceOffsetX
-			= crtid == 1 ? D2GRPH_SURFACE_OFFSET_X : D1GRPH_SURFACE_OFFSET_X;
-		regs->grphSurfaceOffsetY
-			= crtid == 1 ? D2GRPH_SURFACE_OFFSET_Y : D1GRPH_SURFACE_OFFSET_Y;
-		regs->grphXStart
-			= crtid == 1 ? D2GRPH_X_START : D1GRPH_X_START;
-		regs->grphYStart
-			= crtid == 1 ? D2GRPH_Y_START : D1GRPH_Y_START;
-		regs->grphXEnd
-			= crtid == 1 ? D2GRPH_X_END : D1GRPH_X_END;
-		regs->grphYEnd
-			= crtid == 1 ? D2GRPH_Y_END : D1GRPH_Y_END;
-		regs->crtControl
-			= crtid == 1 ? D2CRTC_CONTROL : D1CRTC_CONTROL;
-		regs->modeDesktopHeight
-			= crtid == 1 ? D2MODE_DESKTOP_HEIGHT : D1MODE_DESKTOP_HEIGHT;
-		regs->modeDataFormat
-			= crtid == 1 ? D2MODE_DATA_FORMAT : D1MODE_DATA_FORMAT;
-		regs->viewportStart
-			= crtid == 1 ? D2MODE_VIEWPORT_START : D1MODE_VIEWPORT_START;
-		regs->viewportSize
-			= crtid == 1 ? D2MODE_VIEWPORT_SIZE : D1MODE_VIEWPORT_SIZE;
+	} else if (info.device_chipset >= RADEON_R600) {
+		uint32 offset = 0;
+
+		switch(crtcID) {
+			case 0:
+				offset = R600_CRTC0_REGISTER_OFFSET;
+				regs->vgaControl = AVIVO_D1VGA_CONTROL;
+				break;
+			case 1:
+				offset = R600_CRTC1_REGISTER_OFFSET;
+				regs->vgaControl = AVIVO_D2VGA_CONTROL;
+				break;
+			default:
+				ERROR("%s: Unknown CRTC %" B_PRIu32 "\n",
+					__func__, crtcID);
+				return B_ERROR;
+		}
+
+		regs->crtcOffset = offset;
+
+		regs->grphEnable = AVIVO_D1GRPH_ENABLE + offset;
+		regs->grphControl = AVIVO_D1GRPH_CONTROL + offset;
+		regs->grphSwapControl = D1GRPH_SWAP_CNTL + offset;
+
+		regs->grphPrimarySurfaceAddr
+			= D1GRPH_PRIMARY_SURFACE_ADDRESS + offset;
+		regs->grphSecondarySurfaceAddr
+			= D1GRPH_SECONDARY_SURFACE_ADDRESS + offset;
+
+		// Surface Address high only used on r700 and higher
+		regs->grphPrimarySurfaceAddrHigh = 0xDEAD;
+		regs->grphSecondarySurfaceAddrHigh = 0xDEAD;
+
+		regs->grphPitch = AVIVO_D1GRPH_PITCH + offset;
+		regs->grphSurfaceOffsetX = AVIVO_D1GRPH_SURFACE_OFFSET_X + offset;
+		regs->grphSurfaceOffsetY = AVIVO_D1GRPH_SURFACE_OFFSET_Y + offset;
+		regs->grphXStart = AVIVO_D1GRPH_X_START + offset;
+		regs->grphYStart = AVIVO_D1GRPH_Y_START + offset;
+		regs->grphXEnd = AVIVO_D1GRPH_X_END + offset;
+		regs->grphYEnd = AVIVO_D1GRPH_Y_END + offset;
+
+		regs->modeDesktopHeight = AVIVO_D1MODE_DESKTOP_HEIGHT + offset;
+		regs->modeDataFormat = AVIVO_D1MODE_DATA_FORMAT + offset;
+		regs->viewportStart = AVIVO_D1MODE_VIEWPORT_START + offset;
+		regs->viewportSize = AVIVO_D1MODE_VIEWPORT_SIZE + offset;
 	} else {
 		// this really shouldn't happen unless a driver PCIID chipset is wrong
 		TRACE("%s, unknown Radeon chipset: r%X\n", __func__,
@@ -156,42 +201,8 @@ init_registers(register_info* regs, uint8 crtid)
 		return B_ERROR;
 	}
 
-	// Populate common registers
-	// TODO: Wait.. this doesn't work with Eyefinity > crt 1.
-
-	regs->modeCenter
-		= crtid == 1 ? D2MODE_CENTER : D1MODE_CENTER;
-	regs->grphUpdate
-		= crtid == 1 ? D2GRPH_UPDATE : D1GRPH_UPDATE;
-	regs->crtHPolarity
-		= crtid == 1 ? D2CRTC_H_SYNC_A_CNTL : D1CRTC_H_SYNC_A_CNTL;
-	regs->crtVPolarity
-		= crtid == 1 ? D2CRTC_V_SYNC_A_CNTL : D1CRTC_V_SYNC_A_CNTL;
-	regs->crtHTotal
-		= crtid == 1 ? D2CRTC_H_TOTAL : D1CRTC_H_TOTAL;
-	regs->crtVTotal
-		= crtid == 1 ? D2CRTC_V_TOTAL : D1CRTC_V_TOTAL;
-	regs->crtHSync
-		= crtid == 1 ? D2CRTC_H_SYNC_A : D1CRTC_H_SYNC_A;
-	regs->crtVSync
-		= crtid == 1 ? D2CRTC_V_SYNC_A : D1CRTC_V_SYNC_A;
-	regs->crtHBlank
-		= crtid == 1 ? D2CRTC_H_BLANK_START_END : D1CRTC_H_BLANK_START_END;
-	regs->crtVBlank
-		= crtid == 1 ? D2CRTC_V_BLANK_START_END : D1CRTC_V_BLANK_START_END;
-	regs->crtInterlace
-		= crtid == 1 ? D2CRTC_INTERLACE_CONTROL : D1CRTC_INTERLACE_CONTROL;
-	regs->crtCountControl
-		= crtid == 1 ? D2CRTC_COUNT_CONTROL : D1CRTC_COUNT_CONTROL;
-	regs->sclUpdate
-		= crtid == 1 ? D2SCL_UPDATE : D1SCL_UPDATE;
-	regs->sclEnable
-		= crtid == 1 ? D2SCL_ENABLE : D1SCL_ENABLE;
-	regs->sclTapControl
-		= crtid == 1 ? D2SCL_TAP_CONTROL : D1SCL_TAP_CONTROL;
-
 	TRACE("%s, registers for ATI chipset r%X crt #%d loaded\n", __func__,
-		info.device_chipset, crtid);
+		info.device_chipset, crtcID);
 
 	return B_OK;
 }
@@ -943,11 +954,10 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 	Write32(OUT, regs->vgaControl, 0);
 
 	uint64 fbAddress = gInfo->mc.vramStart;
-	//uint64 fbAddress = gInfo->shared_info->frame_buffer_phys;
 
 	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddress);
 
-	if (info.device_chipset >= (RADEON_R700 | 0x70)) {
+	if (info.device_chipset >= RADEON_R700) {
 		TRACE("%s: Set SurfaceAddress High: 0x%" B_PRIX32 "\n",
 			__func__, (fbAddress >> 32) & 0xf);
 
