@@ -285,16 +285,11 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 bool
 is_mode_supported(display_mode *mode)
 {
-	TRACE("MODE: %d ; %d %d %d %d ; %d %d %d %d\n",
-		mode->timing.pixel_clock, mode->timing.h_display,
-		mode->timing.h_sync_start, mode->timing.h_sync_end,
-		mode->timing.h_total, mode->timing.v_display,
-		mode->timing.v_sync_start, mode->timing.v_sync_end,
-		mode->timing.v_total);
+	bool sane = true;
 
 	// Validate modeline is within a sane range
 	if (is_mode_sane(mode) != B_OK)
-		return false;
+		sane = false;
 
 	// TODO: is_mode_supported on *which* display?
 	uint32 crtid = 0;
@@ -303,34 +298,33 @@ is_mode_supported(display_mode *mode)
 	if (gInfo->shared_info->has_edid
 		&& gDisplay[crtid]->found_ranges) {
 
+		// validate horizontal frequency range
 		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
 		if (hfreq > gDisplay[crtid]->hfreq_max + 1
 			|| hfreq < gDisplay[crtid]->hfreq_min - 1) {
-			TRACE("!!! hfreq : %d , hfreq_min : %d, hfreq_max : %d\n",
-				hfreq, gDisplay[crtid]->hfreq_min, gDisplay[crtid]->hfreq_max);
-			TRACE("!!! %dx%d falls outside of CRT %d's valid "
-				"horizontal range.\n", mode->timing.h_display,
-				mode->timing.v_display, crtid);
-			return false;
+			//TRACE("!!! mode below falls outside of hfreq range!\n");
+			sane = false;
 		}
 
+		// validate vertical frequency range
 		uint32 vfreq = mode->timing.pixel_clock / ((mode->timing.v_total
 			* mode->timing.h_total) / 1000);
-
 		if (vfreq > gDisplay[crtid]->vfreq_max + 1
 			|| vfreq < gDisplay[crtid]->vfreq_min - 1) {
-			TRACE("!!! vfreq : %d , vfreq_min : %d, vfreq_max : %d\n",
-				vfreq, gDisplay[crtid]->vfreq_min, gDisplay[crtid]->vfreq_max);
-			TRACE("!!! %dx%d falls outside of CRT %d's valid vertical range\n",
-				mode->timing.h_display, mode->timing.v_display, crtid);
-			return false;
+			//TRACE("!!! mode below falls outside of vfreq range!\n");
+			sane = false;
 		}
 	}
 
-	TRACE("%dx%d is within CRT %d's valid frequency range\n",
-		mode->timing.h_display, mode->timing.v_display, crtid);
+	TRACE("MODE: %d ; %d %d %d %d ; %d %d %d %d is %s\n",
+		mode->timing.pixel_clock, mode->timing.h_display,
+		mode->timing.h_sync_start, mode->timing.h_sync_end,
+		mode->timing.h_total, mode->timing.v_display,
+		mode->timing.v_sync_start, mode->timing.v_sync_end,
+		mode->timing.v_total,
+		sane ? "OK." : "BAD, out of range!");
 
-	return true;
+	return sane;
 }
 
 
