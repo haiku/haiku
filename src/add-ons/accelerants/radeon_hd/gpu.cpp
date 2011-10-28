@@ -317,17 +317,19 @@ radeon_gpu_mc_setup_r700()
 		//return B_ERROR;
 	}
 
+	Write32(OUT, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE);
+
 	// TODO: Memory Controller AGP
-	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
+	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
 		gInfo->mc.vramStart >> 12);
-	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_HIGH_ADDR,
+	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_HIGH_ADDR,
 		gInfo->mc.vramEnd >> 12);
 
-	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR, 0);
+	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR, 0);
 	uint32 tmp = ((gInfo->mc.vramEnd >> 24) & 0xFFFF) << 16;
 	tmp |= ((gInfo->mc.vramStart >> 24) & 0xFFFF);
 
-	Write32(OUT, R600_MC_VM_FB_LOCATION, tmp);
+	Write32(OUT, R700_MC_VM_FB_LOCATION, tmp);
 	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->mc.vramStart >> 8));
 	Write32(OUT, HDP_NONSURFACE_INFO, (2 << 7));
 	Write32(OUT, HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
@@ -338,9 +340,9 @@ radeon_gpu_mc_setup_r700()
 	//	WREG32(MC_VM_AGP_BOT, rdev->mc.gtt_start >> 22);
 	//	WREG32(MC_VM_AGP_BASE, rdev->mc.agp_base >> 22);
 	// else?
-	Write32(OUT, R600_MC_VM_AGP_BASE, 0);
-	Write32(OUT, R600_MC_VM_AGP_TOP, 0x0FFFFFFF);
-	Write32(OUT, R600_MC_VM_AGP_BOT, 0x0FFFFFFF);
+	Write32(OUT, R700_MC_VM_AGP_BASE, 0);
+	Write32(OUT, R700_MC_VM_AGP_TOP, 0x0FFFFFFF);
+	Write32(OUT, R700_MC_VM_AGP_BOT, 0x0FFFFFFF);
 
 	idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
@@ -362,6 +364,13 @@ radeon_gpu_mc_init()
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
+	uint32 fbVMLocationReg;
+	if (info.device_chipset >= RADEON_R700) {
+		fbVMLocationReg = R700_MC_VM_FB_LOCATION;
+	} else {
+		fbVMLocationReg = R600_MC_VM_FB_LOCATION;
+	}
+
 	if (gInfo->shared_info->frame_buffer_size > 0)
 		gInfo->mc.valid = true;
 
@@ -370,7 +379,7 @@ radeon_gpu_mc_init()
 	uint64 vramBase = gInfo->shared_info->frame_buffer_phys;
 
 	if ((info.chipsetFlags & CHIP_IGP) != 0) {
-		vramBase = Read32(OUT, R600_MC_VM_FB_LOCATION) & 0xFFFF;
+		vramBase = Read32(OUT, fbVMLocationReg) & 0xFFFF;
 		vramBase <<= 24;
 	}
 
