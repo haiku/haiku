@@ -582,7 +582,7 @@ EHCI::Start()
 			TRACE("frame list size 256\n");
 			break;
 		default:
-			TRACE("unknown frame list size\n");
+			TRACE_ALWAYS("unknown frame list size\n");
 	}
 
 	bool running = false;
@@ -599,7 +599,7 @@ EHCI::Start()
 	}
 
 	if (!running) {
-		TRACE("host controller didn't start\n");
+		TRACE_ERROR("host controller didn't start\n");
 		return B_ERROR;
 	}
 
