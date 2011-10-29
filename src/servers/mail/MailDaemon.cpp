@@ -725,6 +725,7 @@ MailDaemonApp::_RemoveAccount(AccountMap::const_iterator it)
 	delete it->second.outboundProtocol;
 	unload_add_on(it->second.inboundImage);
 	unload_add_on(it->second.outboundImage);
+	fAccounts.erase(it->first);
 }
 
 
