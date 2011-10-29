@@ -19,7 +19,15 @@ Application Login :
 	LoginWindow.cpp
 	LoginView.cpp
 	main.cpp
-	: be tracker $(mu_libs) $(TARGET_LIBSTDC++)
+	: be tracker $(mu_libs) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Login.rdef
 ;
 
+DoCatalogs Login :
+	x-vnd.Haiku-Login
+	:
+	LoginApp.cpp
+	DesktopWindow.cpp
+	LoginView.cpp
+	LoginWindow.cpp
+;
