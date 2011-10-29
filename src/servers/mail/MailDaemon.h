@@ -50,18 +50,18 @@ public:
 								MailDaemonApp();
 	virtual						~MailDaemonApp();
 
-	virtual	void				MessageReceived(BMessage* message);
+	virtual void				ReadyToRun();
 	virtual	void				RefsReceived(BMessage* message);
+	virtual	void				MessageReceived(BMessage* message);
 
 	virtual void				Pulse();
 	virtual bool				QuitRequested();
-	virtual void				ReadyToRun();
 
 			void				InstallDeskbarIcon();
 			void				RemoveDeskbarIcon();
 
-			void				SendPendingMessages(BMessage* message);
 			void				GetNewMessages(BMessage* message);
+			void				SendPendingMessages(BMessage* message);
 
 			void				MakeMimeTypes(bool remakeMIMETypes = false);
 
@@ -82,6 +82,7 @@ private:
 			OutboundProtocolThread*	_FindOutboundProtocol(int32 account);
 
 			void				_UpdateAutoCheck(bigtime_t interval);
+
 	static	bool				_IsPending(BNode& node);
 	static	bool				_IsEntryInTrash(BEntry& entry);
 
@@ -97,8 +98,8 @@ private:
 				// account.
 				// Set to TRUE by the 'mcbp' message that the mail Notification
 				// filter sends us, cleared when the beep is done.
-			BObjectList<BMessage>	fFetchDoneRespondents;
-			BObjectList<BQuery>		fQueries;
+			BObjectList<BMessage> fFetchDoneRespondents;
+			BObjectList<BQuery>	fQueries;
 
 			LEDAnimation*		fLEDAnimation;
 
