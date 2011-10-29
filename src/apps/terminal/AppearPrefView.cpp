@@ -125,8 +125,10 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(5, 5, 5, 5)
 		.AddGrid(5, 5)
-			.AddTextControl(fTabTitle, 0, 0, B_ALIGN_RIGHT)
-			.AddTextControl(fWindowTitle, 0, 1, B_ALIGN_RIGHT)
+			.Add(fTabTitle->CreateLabelLayoutItem(), 0, 0)
+			.Add(fTabTitle->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fWindowTitle->CreateLabelLayoutItem(), 0, 1)
+			.Add(fWindowTitle->CreateTextViewLayoutItem(), 1, 1)
 			.Add(fFont->CreateLabelLayoutItem(), 0, 2)
 			.Add(fFont->CreateMenuBarLayoutItem(), 1, 2)
 			.Add(fFontSize->CreateLabelLayoutItem(), 0, 3)
@@ -141,6 +143,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 			B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 		.Add(fWarnOnExit);
 
+	fTabTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	fWindowTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fFont->SetAlignment(B_ALIGN_RIGHT);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
