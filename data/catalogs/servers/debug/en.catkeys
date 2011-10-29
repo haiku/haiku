@@ -1,4 +1,0 @@
-1	english	x-vnd.Haiku-debug_server	1035915338
-OK	DebugServer		OK
-Debug	DebugServer		Debug
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.
