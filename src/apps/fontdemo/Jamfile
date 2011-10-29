@@ -6,6 +6,19 @@ Application FontDemo :
 	ControlView.cpp
 	FontDemo.cpp
 	FontDemoView.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: FontDemo.rdef
 	;
+
+DoCatalogs FontDemo :
+	x-vnd.Haiku-FontDemo
+	:
+	FontDemo.cpp
+	ControlView.cpp
+	FontDemoView.cpp
+;
+
+AddCatalogEntryAttribute FontDemo
+	:
+	x-vnd.Haiku-FontDemo:FontDemo:FontDemo
+;
