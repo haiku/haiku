@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2011 Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,7 +18,7 @@
 #include <Screen.h>
 #include <View.h>
 
-// load_settings
+
 status_t
 load_settings(BMessage* message, const char* fileName, const char* folder)
 {
@@ -41,7 +41,7 @@ load_settings(BMessage* message, const char* fileName, const char* folder)
 	return ret;
 }
 
-// save_settings
+
 status_t
 save_settings(BMessage* message, const char* fileName, const char* folder)
 {
@@ -53,7 +53,8 @@ save_settings(BMessage* message, const char* fileName, const char* folder)
 			if (folder && (ret = path.Append(folder)) == B_OK)
 				ret = create_directory(path.Path(), 0777);
 			if (ret == B_OK && (ret = path.Append(fileName)) == B_OK) {
-				BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+				BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE
+					| B_ERASE_FILE);
 				if ((ret = file.InitCheck()) == B_OK) {
 					ret = message->Flatten(&file);
 					file.Unset();
@@ -64,10 +65,10 @@ save_settings(BMessage* message, const char* fileName, const char* folder)
 	return ret;
 }
 
-// stroke_frame
+
 void
-stroke_frame(BView* v, BRect r, rgb_color left, rgb_color top,
-			 rgb_color right, rgb_color bottom)
+stroke_frame(BView* v, BRect r, rgb_color left, rgb_color top, rgb_color right,
+	rgb_color bottom)
 {
 	if (v && r.IsValid()) {
 		v->BeginLineArray(4);
@@ -83,11 +84,13 @@ stroke_frame(BView* v, BRect r, rgb_color left, rgb_color top,
 	}
 }
 
-// make_sure_frame_is_on_screen
+
 bool
 make_sure_frame_is_on_screen(BRect& frame, BWindow* window)
 {
-	BScreen* screen = window ? new BScreen(window) : new BScreen(B_MAIN_SCREEN_ID);
+	BScreen* screen = window != NULL ? new BScreen(window)
+		: new BScreen(B_MAIN_SCREEN_ID);
+
 	bool success = false;
 	if (frame.IsValid() && screen->IsValid()) {
 		BRect screenFrame = screen->Frame();
