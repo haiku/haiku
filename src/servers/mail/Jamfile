@@ -7,10 +7,8 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
-UsePrivateHeaders mail ;
-UsePrivateHeaders shared ;
-
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
+UsePrivateHeaders mail shared tracker ;
+SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 AddResources mail_daemon : mail_daemon.rdef DeskbarViewIcons.rdef ;
 
