@@ -1,7 +1,8 @@
 resource app_signature "application/x-vnd.Haiku-MarkAs";
 
 resource file_types message {
-	"types" = "text/x-email"
+	"types" = "text/x-email",
+	"types" = "text/x-partial-email"
 };
 
 resource app_version {
