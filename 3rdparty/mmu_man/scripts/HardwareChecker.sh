@@ -10,7 +10,7 @@
 
 
 netcat=netcat
-report_site=haikuware.com
+report_site=fake.haikuware.com
 report_cgi=http://haikuware.com/hwreport.php
 
 do_notify ()
