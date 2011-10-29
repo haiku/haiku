@@ -316,9 +316,11 @@ main(int argc, char** argv)
 				c = getchar();
 				if (c != -1)
 					break;
+
+				snooze(10000);
 			}
 
-			if (c != '\n' && c != 'y')
+			if (c != '\n' && tolower(c) != 'y')
 				screenMode.Revert();
 		}
 	} else {
