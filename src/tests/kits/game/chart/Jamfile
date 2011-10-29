@@ -8,9 +8,16 @@ Application Chart :
 	ChartRender.cpp
 	ChartView.cpp
 	ChartWindow.cpp
-	: be game $(TARGET_LIBSUPC++)
+	: be game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: Chart.rdef
 	;
+
+DoCatalogs Chart :
+    x-vnd.Be.ChartDemo
+    :
+	Chart.cpp
+	ChartWindow.cpp
+;
 
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Chart
