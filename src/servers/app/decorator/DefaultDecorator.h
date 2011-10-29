@@ -188,8 +188,6 @@ protected:
 	static	const rgb_color		kFrameColors[4];
 
 			const rgb_color		kFocusFrameColor;
-			const rgb_color		kFocusFrameColorBevel;
-			const rgb_color		kFocusFrameColorDark;
 
 			const rgb_color		kFocusTabColor;
 			const rgb_color		kFocusTabColorLight;
@@ -198,8 +196,6 @@ protected:
 			const rgb_color		kFocusTextColor;
 
 			const rgb_color		kNonFocusFrameColor;
-			const rgb_color		kNonFocusFrameColorBevel;
-			const rgb_color		kNonFocusFrameColorDark;
 
 			const rgb_color		kNonFocusTabColor;
 			const rgb_color		kNonFocusTabColorLight;
