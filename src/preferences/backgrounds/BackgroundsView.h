@@ -65,116 +65,116 @@ enum frame_parts {
 
 class FramePart : public BView {
 public:
-							FramePart(int32 part);
+								FramePart(int32 part);
 
-			void			Draw(BRect rect);
-			void			SetDesktop(bool isDesktop);
+			void				Draw(BRect rect);
+			void				SetDesktop(bool isDesktop);
 
 private:
-			void			_SetSizeAndAlignment();
+			void				_SetSizeAndAlignment();
 
-			int32			fFramePart;
-			bool			fIsDesktop;
+			int32				fFramePart;
+			bool				fIsDesktop;
 };
 
 
-class PreView : public BControl {
+class Preview : public BControl {
 public:
-							PreView();
+								Preview();
 
-			BPoint			fPoint;
-			BRect			fImageBounds;
+			BPoint				fPoint;
+			BRect				fImageBounds;
 
 protected:
-			void			MouseDown(BPoint point);
-			void			MouseUp(BPoint point);
-			void			MouseMoved(BPoint point, uint32 transit,
-								const BMessage* message);
-			void			AttachedToWindow();
+			void				MouseDown(BPoint point);
+			void				MouseUp(BPoint point);
+			void				MouseMoved(BPoint point, uint32 transit,
+									const BMessage* message);
+			void				AttachedToWindow();
 
-			BPoint			fOldPoint;
-			float			fXRatio;
-			float			fYRatio;
-			display_mode	fMode;
+			BPoint				fOldPoint;
+			float				fXRatio;
+			float				fYRatio;
+			display_mode		fMode;
 };
 
 
 class BackgroundsView : public BBox {
 public:
-							BackgroundsView();
-							~BackgroundsView();
+								BackgroundsView();
+								~BackgroundsView();
 
-			void			AllAttached();
-			void			MessageReceived(BMessage* msg);
+			void				AllAttached();
+			void				MessageReceived(BMessage* msg);
 
-			void			RefsReceived(BMessage* msg);
+			void				RefsReceived(BMessage* msg);
 
-			void			SaveSettings();
-			void			WorkspaceActivated(uint32 oldWorkspaces,
-								bool active);
-			int32			AddImage(BPath path);
-			Image*			GetImage(int32 imageIndex);
+			void				SaveSettings();
+			void				WorkspaceActivated(uint32 oldWorkspaces,
+									bool active);
+			int32				AddImage(BPath path);
+			Image*				GetImage(int32 imageIndex);
 
-			bool			FoundPositionSetting();
+			bool				FoundPositionSetting();
 
 protected:
-			void			_Save();
-			void			_NotifyServer();
-			void			_LoadSettings();
-			void			_LoadDesktopFolder();
-			void			_LoadDefaultFolder();
-			void			_LoadFolder(bool isDesktop);
-			void			_LoadRecentFolder(BPath path);
-			void			_UpdateWithCurrent();
-			void			_UpdatePreview();
-			void			_UpdateButtons();
-			void			_SetDesktop(bool isDesktop);
-			int32			_AddPath(BPath path);
+			void				_Save();
+			void				_NotifyServer();
+			void				_LoadSettings();
+			void				_LoadDesktopFolder();
+			void				_LoadDefaultFolder();
+			void				_LoadFolder(bool isDesktop);
+			void				_LoadRecentFolder(BPath path);
+			void				_UpdateWithCurrent();
+			void				_UpdatePreview();
+			void				_UpdateButtons();
+			void				_SetDesktop(bool isDesktop);
+			int32				_AddPath(BPath path);
 
-	static	int32			_NotifyThread(void* data);
+	static	int32				_NotifyThread(void* data);
 
 			BGImageMenuItem*	_FindImageItem(const int32 imageIndex);
 
-			bool			_AddItem(BGImageMenuItem* item);
+			bool				_AddItem(BGImageMenuItem* item);
 
 			BackgroundImage::Mode	_FindPlacementMode();
 
-			BColorControl*	fPicker;
-			BButton*		fApply;
-			BButton*		fRevert;
-			BCheckBox*		fIconLabelOutline;
-			BMenu*			fPlacementMenu;
-			BMenu*			fImageMenu;
-			BMenu*			fWorkspaceMenu;
-			BTextControl*	fXPlacementText;
-			BTextControl*	fYPlacementText;
-			PreView*		fPreView;
-			BBox*			fPreview;
-			BFilePanel*		fFolderPanel;
-			ImageFilePanel*	fPanel;
+			BColorControl*		fPicker;
+			BButton*			fApply;
+			BButton*			fRevert;
+			BCheckBox*			fIconLabelOutline;
+			BMenu*				fPlacementMenu;
+			BMenu*				fImageMenu;
+			BMenu*				fWorkspaceMenu;
+			BTextControl*		fXPlacementText;
+			BTextControl*		fYPlacementText;
+			Preview*			fPreview;
+			BBox*				fPreviewBox;
+			BFilePanel*			fFolderPanel;
+			ImageFilePanel*		fPanel;
 
 			BackgroundImage*	fCurrent;
 
 			BackgroundImage::BackgroundImageInfo*	fCurrentInfo;
 
-			entry_ref		fCurrentRef;
-			int32			fLastImageIndex;
-			int32			fLastWorkspaceIndex;
-			BMessage		fSettings;
+			entry_ref			fCurrentRef;
+			int32				fLastImageIndex;
+			int32				fLastWorkspaceIndex;
+			BMessage			fSettings;
 
 			BObjectList<BPath>	fPathList;
 			BObjectList<Image>	fImageList;
 
-			FramePart*		fTopLeft;
-			FramePart*		fTop;
-			FramePart*		fTopRight;
-			FramePart*		fLeft;
-			FramePart*		fRight;
-			FramePart*		fBottomLeft;
-			FramePart*		fBottom;
-			FramePart*		fBottomRight;
+			FramePart*			fTopLeft;
+			FramePart*			fTop;
+			FramePart*			fTopRight;
+			FramePart*			fLeft;
+			FramePart*			fRight;
+			FramePart*			fBottomLeft;
+			FramePart*			fBottom;
+			FramePart*			fBottomRight;
 
-			bool			fFoundPositionSetting;
+			bool				fFoundPositionSetting;
 };
 
 #endif	// BACKGROUNDS_VIEW_H
