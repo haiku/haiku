@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <Buffer.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <MediaRoster.h>
 #include <ParameterWeb.h>
@@ -26,6 +27,10 @@
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AudioMixer"
 
 
 // the range of the gain sliders (in dB)
@@ -1696,71 +1701,104 @@ AudioMixer::UpdateParameterWeb()
 	MixerOutput *out;
 	char buf[50];
 
-	top = web->MakeGroup("Gain controls");
+	top = web->MakeGroup(B_TRANSLATE("Gain controls"));
 
 	out = fCore->Output();
 	group = top->MakeGroup("");
-	group->MakeNullParameter(PARAM_STR1(0), B_MEDIA_RAW_AUDIO, "Master output", B_WEB_BUFFER_INPUT);
+	group->MakeNullParameter(PARAM_STR1(0), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Master output"), B_WEB_BUFFER_INPUT);
 	if (!out) {
-		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("not connected"), B_GENERIC);
 	} else {
-		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, StringForFormat(buf, out), B_GENERIC);
-		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
-		if (fCore->Settings()->UseBalanceControl() && out->GetOutputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO,
+			StringForFormat(buf, out), B_GENERIC);
+		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("Mute"), B_MUTE);
+		if (fCore->Settings()->UseBalanceControl()
+			&& out->GetOutputChannelCount() == 2 && 1
+			/*channel mask is stereo */) {
 			// single channel control + balance
-			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1);
-			group->MakeContinuousParameter(PARAM_BALANCE(0), B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
+			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO,
+				B_TRANSLATE("Gain"), B_MASTER_GAIN, B_TRANSLATE("dB"),
+				DB_MIN, DB_MAX, 0.1);
+			group->MakeContinuousParameter(PARAM_BALANCE(0), B_MEDIA_RAW_AUDIO,
+				"", B_BALANCE, "", 0, 100, 1);
 		} else {
 			// multi channel control
-			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
-										   ->SetChannelCount(out->GetOutputChannelCount());
+			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO,
+				B_TRANSLATE("Gain"), B_MASTER_GAIN, B_TRANSLATE("dB"),
+				DB_MIN, DB_MAX, 0.1)
+				   ->SetChannelCount(out->GetOutputChannelCount());
 		}
-		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To output", B_WEB_BUFFER_OUTPUT);
+		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("To output"), B_WEB_BUFFER_OUTPUT);
 	}
 
 	for (int i = 0; (in = fCore->Input(i)); i++) {
 		group = top->MakeGroup("");
-		group->MakeNullParameter(PARAM_STR1(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_WEB_BUFFER_INPUT);
-		group->MakeNullParameter(PARAM_STR2(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(buf, in), B_GENERIC);
-		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
+		group->MakeNullParameter(PARAM_STR1(in->ID()), B_MEDIA_RAW_AUDIO,
+			in->MediaInput().name, B_WEB_BUFFER_INPUT);
+		group->MakeNullParameter(PARAM_STR2(in->ID()), B_MEDIA_RAW_AUDIO,
+			StringForFormat(buf, in), B_GENERIC);
+		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("Mute"), B_MUTE);
 		// XXX the gain control is ugly once you have more than two channels,
 		//     as you don't know what channel each slider controls. Tooltips might help...
 		if (fCore->Settings()->InputGainControls() == 0) {
 			// Physical input channels
-			if (fCore->Settings()->UseBalanceControl() && in->GetInputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+			if (fCore->Settings()->UseBalanceControl()
+				&& in->GetInputChannelCount() == 2 && 1
+				/*channel mask is stereo */) {
 				// single channel control + balance
-				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1);
-				group->MakeContinuousParameter(PARAM_BALANCE(in->ID()), B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()),
+					B_MEDIA_RAW_AUDIO, B_TRANSLATE("Gain"), B_GAIN,
+					B_TRANSLATE("dB"), DB_MIN, DB_MAX, 0.1);
+				group->MakeContinuousParameter(PARAM_BALANCE(in->ID()),
+					B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
 			} else {
 				// multi channel control
-				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
-											   ->SetChannelCount(in->GetInputChannelCount());
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()),
+					B_MEDIA_RAW_AUDIO, B_TRANSLATE("Gain"), B_GAIN,
+					B_TRANSLATE("dB"), DB_MIN, DB_MAX, 0.1)
+						->SetChannelCount(in->GetInputChannelCount());
 			}
 		} else {
 			// Virtual output channels
-			if (fCore->Settings()->UseBalanceControl() && in->GetMixerChannelCount() == 2 && 1 /*channel mask is stereo */) {
+			if (fCore->Settings()->UseBalanceControl()
+				&& in->GetMixerChannelCount() == 2 && 1
+				/*channel mask is stereo */) {
 				// single channel control + balance
-				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1);
-				group->MakeContinuousParameter(PARAM_BALANCE(in->ID()), B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()),
+					B_MEDIA_RAW_AUDIO, B_TRANSLATE("Gain"), B_GAIN,
+					B_TRANSLATE("dB"), DB_MIN, DB_MAX, 0.1);
+				group->MakeContinuousParameter(PARAM_BALANCE(in->ID()),
+					B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
 			} else {
 				// multi channel control
-				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
-											   ->SetChannelCount(in->GetMixerChannelCount());
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()),
+					B_MEDIA_RAW_AUDIO, B_TRANSLATE("Gain"), B_GAIN,
+					B_TRANSLATE("dB"), DB_MIN, DB_MAX, 0.1)
+						->SetChannelCount(in->GetMixerChannelCount());
 			}
 		}
-		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To master", B_WEB_BUFFER_OUTPUT);
+		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("To master"), B_WEB_BUFFER_OUTPUT);
 	}
 
 	if (fCore->Settings()->AllowOutputChannelRemapping()) {
-		top = web->MakeGroup("Output mapping"); // top level group
+		top = web->MakeGroup(B_TRANSLATE("Output mapping")); // top level group
 		outputchannels = top->MakeGroup("");
-		outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO, "Output channel sources", B_GENERIC);
+		outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("Output channel sources"), B_GENERIC);
 
 		group = outputchannels->MakeGroup("");
-		group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO, "Master output", B_GENERIC);
+		group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("Master output"), B_GENERIC);
 		group = group->MakeGroup("");
 		if (!out) {
-			group->MakeNullParameter(PARAM_STR6(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+			group->MakeNullParameter(PARAM_STR6(0), B_MEDIA_RAW_AUDIO,
+				B_TRANSLATE("not connected"), B_GENERIC);
 		} else {
 			for (int chan = 0; chan < out->GetOutputChannelCount(); chan++) {
 				subgroup = group->MakeGroup("");
@@ -1782,52 +1820,67 @@ AudioMixer::UpdateParameterWeb()
 	}
 
 	if (fCore->Settings()->AllowInputChannelRemapping()) {
-		top = web->MakeGroup("Input mapping"); // top level group
+		top = web->MakeGroup(B_TRANSLATE("Input mapping")); // top level group
 		inputchannels = top->MakeGroup("");
-		inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input channel destinations", B_GENERIC);
+		inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO,
+			B_TRANSLATE("Input channel destinations"), B_GENERIC);
 
 		for (int i = 0; (in = fCore->Input(i)); i++) {
 			group = inputchannels->MakeGroup("");
-			group->MakeNullParameter(PARAM_STR4(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC);
+			group->MakeNullParameter(PARAM_STR4(in->ID()), B_MEDIA_RAW_AUDIO,
+				in->MediaInput().name, B_GENERIC);
 			group = group->MakeGroup("");
 
 			for (int chan = 0; chan < in->GetInputChannelCount(); chan++) {
 				subgroup = group->MakeGroup("");
-				subgroup->MakeNullParameter(PARAM_DST_STR(in->ID(), chan), B_MEDIA_RAW_AUDIO,
-											StringForChannelType(buf, in->GetInputChannelType(chan)), B_GENERIC);
+				subgroup->MakeNullParameter(PARAM_DST_STR(in->ID(), chan),
+					B_MEDIA_RAW_AUDIO, StringForChannelType(buf,
+					in->GetInputChannelType(chan)), B_GENERIC);
 				for (int dst = 0; dst < MAX_CHANNEL_TYPES; dst++) {
-					subgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO, StringForChannelType(buf, dst), B_ENABLE);
+					subgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(),
+					chan, dst), B_MEDIA_RAW_AUDIO, StringForChannelType(buf, dst),
+					B_ENABLE);
 				}
 			}
 		}
 	}
 
-	top = web->MakeGroup("Setup"); // top level group
+	top = web->MakeGroup(B_TRANSLATE("Setup")); // top level group
 	group = top->MakeGroup("");
 
-	group->MakeDiscreteParameter(PARAM_ETC(10), B_MEDIA_RAW_AUDIO, "Attenuate mixer output by 3dB (like BeOS R5)", B_ENABLE);
-	group->MakeDiscreteParameter(PARAM_ETC(20), B_MEDIA_RAW_AUDIO, "Use non linear gain sliders (like BeOS R5)", B_ENABLE);
-	group->MakeDiscreteParameter(PARAM_ETC(30), B_MEDIA_RAW_AUDIO, "Display balance control for stereo connections", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(10), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Attenuate mixer output by 3dB (like BeOS R5)"), B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(20), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Use non linear gain sliders (like BeOS R5)"), B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(30), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Display balance control for stereo connections"),
+		B_ENABLE);
 
-	group->MakeDiscreteParameter(PARAM_ETC(40), B_MEDIA_RAW_AUDIO, "Allow output channel remapping", B_ENABLE);
-	group->MakeDiscreteParameter(PARAM_ETC(50), B_MEDIA_RAW_AUDIO, "Allow input channel remapping", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(40), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Allow output channel remapping"), B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(50), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Allow input channel remapping"), B_ENABLE);
 
-	dp = group->MakeDiscreteParameter(PARAM_ETC(60), B_MEDIA_RAW_AUDIO, "Input gain controls represent", B_INPUT_MUX);
-	dp->AddItem(0, "Physical input channels");
-	dp->AddItem(1, "Virtual output channels");
+	dp = group->MakeDiscreteParameter(PARAM_ETC(60), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Input gain controls represent"), B_INPUT_MUX);
+	dp->AddItem(0, B_TRANSLATE("Physical input channels"));
+	dp->AddItem(1, B_TRANSLATE("Virtual output channels"));
 
-	dp = group->MakeDiscreteParameter(PARAM_ETC(70), B_MEDIA_RAW_AUDIO, "Resampling algorithm", B_INPUT_MUX);
-	dp->AddItem(0, "Drop/repeat samples");
-	dp->AddItem(2, "Linear interpolation");
+	dp = group->MakeDiscreteParameter(PARAM_ETC(70), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Resampling algorithm"), B_INPUT_MUX);
+	dp->AddItem(0, B_TRANSLATE("Drop/repeat samples"));
+	dp->AddItem(2, B_TRANSLATE("Linear interpolation"));
 
 	// Note: The following code is outcommented on purpose
 	// and is about to be modified at a later point
 	/*
-	dp->AddItem(1, "Drop/repeat samples (template based)");
-	dp->AddItem(3, "17th order filtering");
+	dp->AddItem(1, B_TRANSLATE("Drop/repeat samples (template based)"));
+	dp->AddItem(3, B_TRANSLATE("17th order filtering"));
 	*/
-	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);
-	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO, "Refuse input format changes", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Refuse output format changes"), B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO,
+		B_TRANSLATE("Refuse input format changes"), B_ENABLE);
 
 	fCore->Unlock();
 	SetParameterWeb(web);
