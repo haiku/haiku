@@ -35,6 +35,10 @@
 #define B_TRANSLATE_CONTEXT "MailDaemon"
 
 
+using std::map;
+using std::vector;
+
+
 struct send_mails_info {
 	send_mails_info()
 	{
@@ -97,10 +101,6 @@ addAttribute(BMessage& msg, const char* name, const char* publicName,
 
 
 //	#pragma mark -
-
-
-using std::map;
-using std::vector;
 
 
 MailDaemonApp::MailDaemonApp()
