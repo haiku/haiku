@@ -16,9 +16,11 @@
 #include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <debug_support.h>
 #include <Entry.h>
 #include <Invoker.h>
+#include <Locale.h>
 
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
@@ -29,6 +31,9 @@
 
 #define HANDOVER_USE_GDB 1
 //#define HANDOVER_USE_DEBUGGER 1
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DebugServer"
 
 #define USE_GUI true
 	// define to false if the debug server shouldn't use GUI (i.e. an alert)
@@ -605,14 +610,16 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		_NotifyAppServer(fTeam);
 		_NotifyRegistrar(fTeam, true, false);
 
-		char buffer[1024];
-		snprintf(buffer, sizeof(buffer), "The application:\n\n      %s\n\n"
+		BString buffer(
+			B_TRANSLATE("The application:\n\n      %app\n\n"
 			"has encountered an error which prevents it from continuing. Haiku "
-			"will terminate the application and clean up.", fTeamInfo.args);
+			"will terminate the application and clean up."));
+		buffer.ReplaceFirst("%app", fTeamInfo.args);
 
 		// TODO: It would be nice if the alert would go away automatically
 		// if someone else kills our teams.
-		BAlert *alert = new BAlert(NULL, buffer, "Debug", "OK", NULL,
+		BAlert *alert = new BAlert(NULL, buffer.String(),
+			B_TRANSLATE("Debug"), B_TRANSLATE("OK"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
 		kill = (result == 1);
