@@ -1225,6 +1225,8 @@ AboutView::_CreateCreditsView()
 
 	BPath mitPath;
 	_GetLicensePath("MIT", mitPath);
+	BPath lgplPath;
+	_GetLicensePath("GNU LGPL v2.1", lgplPath);
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
@@ -1236,14 +1238,18 @@ AboutView::_CreateCreditsView()
 		"respective license.]\n\n"));
 
 	// Haiku license
-	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to Haiku, "
-		"especially the kernel and all code that applications may link "
-		"against, is distributed under the terms of the %MIT license%. "
+	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to "
+		"Haiku, especially the kernel and all code that applications may link "
+		"against, is distributed under the terms of the <MIT license>. "
 		"Some system libraries contain third party code distributed under the "
-		"LGPL license. You can find the copyrights to third party code below.\n"
-		"\n", "%MIT license% isn't a variable and has to be translated.");
-	int32 licensePart1 = haikuLicense.FindFirst("%");
-	int32 licensePart2 = haikuLicense.FindLast("%");
+		"<LGPL license>. You can find the copyrights to third party code below."
+		"\n\n", "<MIT license> and <LGPL license> aren't variables and can be "
+		"translated. However, please, don't remove < and > as they're needed "
+		"as placeholders for proper hypertext functionality.");
+	int32 licensePart1 = haikuLicense.FindFirst("<");
+	int32 licensePart2 = haikuLicense.FindFirst(">");
+	int32 licensePart3 = haikuLicense.FindLast("<");
+	int32 licensePart4 = haikuLicense.FindLast(">");
 	BString part;
 	haikuLicense.CopyInto(part, 0, licensePart1);
 	fCreditsView->Insert(part);
@@ -1254,8 +1260,18 @@ AboutView::_CreateCreditsView()
 	fCreditsView->InsertHyperText(part, new OpenFileAction(mitPath.Path()));
 
 	part.Truncate(0);
-	haikuLicense.CopyInto(part, licensePart2 + 1, haikuLicense.Length() - 1
+	haikuLicense.CopyInto(part, licensePart2 + 1, licensePart3 - 1
 		- licensePart2);
+	fCreditsView->Insert(part);
+	
+	part.Truncate(0);
+	haikuLicense.CopyInto(part, licensePart3 + 1, licensePart4 - 1
+		- licensePart3);
+	fCreditsView->InsertHyperText(part, new OpenFileAction(lgplPath.Path()));
+
+	part.Truncate(0);
+	haikuLicense.CopyInto(part, licensePart4 + 1, haikuLicense.Length() - 1
+		- licensePart4);
 	fCreditsView->Insert(part);
 
 	// GNU copyrights
