@@ -34,8 +34,6 @@ class BCursorTester : public TestCase
 		void Instantiate2();
 		void Archive1();
 		void Archive2();
-		void Perform1();
-		void Perform2();
 
 		static Test* Suite();
 };
