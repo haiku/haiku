@@ -3,6 +3,7 @@
 #include <View.h>
 #include <Window.h>
 #include <stdio.h>
+#include <string.h>
 
 uint32 kBitmapBits[] = {
 	0x00777477, 0x00777477, 0x00777477, 0x00777477, 0x00777477, 0x00777477,
