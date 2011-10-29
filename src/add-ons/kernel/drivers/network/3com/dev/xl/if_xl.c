@@ -1206,6 +1206,9 @@ xl_attach(device_t dev)
 		sc->xl_flags |= XL_FLAG_PHYOK;
 
 	switch (did) {
+#ifdef __HAIKU__
+	case TC_DEVICEID_BOOMERANG_10BT_COMBO:
+#endif
 	case TC_DEVICEID_BOOMERANG_10_100BT:	/* 3c905-TX */
 	case TC_DEVICEID_HURRICANE_575A:
 	case TC_DEVICEID_HURRICANE_575B:
@@ -1457,6 +1460,11 @@ xl_attach(device_t dev)
 	sc->xl_xcvr = xcvr[0] | xcvr[1] << 16;
 	sc->xl_xcvr &= XL_ICFG_CONNECTOR_MASK;
 	sc->xl_xcvr >>= XL_ICFG_CONNECTOR_BITS;
+
+#ifdef __HAIKU__
+	if (did == TC_DEVICEID_BOOMERANG_10BT_COMBO)
+		sc->xl_xcvr = XL_XCVR_10BT;
+#endif
 
 	xl_mediacheck(sc);
 
