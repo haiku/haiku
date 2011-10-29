@@ -65,20 +65,29 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	:
 	BHashMapCatalog(signature, language, fingerprint)
 {
-	// give highest priority to catalog living in sub-folder of app's folder:
+	status_t status;
+
 	app_info appInfo;
 	be_app->GetAppInfo(&appInfo);
-	node_ref nref;
-	nref.device = appInfo.ref.device;
-	nref.node = appInfo.ref.directory;
-	BDirectory appDir(&nref);
-	BString catalogName("locale/");
-	catalogName << kCatFolder
-		<< "/" << fSignature
-		<< "/" << fLanguageName
-		<< kCatExtension;
-	BPath catalogPath(&appDir, catalogName.String());
-	status_t status = ReadFromFile(catalogPath.Path());
+
+	// give highest priority to catalog embedded as resource in application
+	// executable:
+	status = ReadFromResource(&appInfo.ref);
+
+	// search for catalog living in sub-folder of app's folder:
+	if (status != B_OK) {
+		node_ref nref;
+		nref.device = appInfo.ref.device;
+		nref.node = appInfo.ref.directory;
+		BDirectory appDir(&nref);
+		BString catalogName("locale/");
+		catalogName << kCatFolder
+			<< "/" << fSignature
+			<< "/" << fLanguageName
+			<< kCatExtension;
+		BPath catalogPath(&appDir, catalogName.String());
+		status = ReadFromFile(catalogPath.Path());
+	}
 
 	if (status != B_OK) {
 		// search in data folders
@@ -92,8 +101,8 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 		for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 			BPath path;
 			if (find_directory(which[i], &path) == B_OK) {
-				catalogName = BString(path.Path())
-					<< "/locale/" << kCatFolder
+				BString catalogName(path.Path());
+				catalogName << "/locale/" << kCatFolder
 					<< "/" << fSignature
 					<< "/" << fLanguageName
 					<< kCatExtension;
