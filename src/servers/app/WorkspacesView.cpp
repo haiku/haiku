@@ -213,9 +213,6 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 		_DarkenColor(frameColor);
 		_DarkenColor(white);
 	}
-	//if (window == fSelectedWindow) {
-	//	frameColor = ui_color(B_WINDOW_BORDER_COLOR);
-	//}
 
 	if (tabFrame.left < frame.left)
 		tabFrame.left = frame.left;
