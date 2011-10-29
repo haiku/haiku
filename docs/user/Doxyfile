@@ -488,6 +488,7 @@ INPUT                  = . \
 						 ../../headers/os/interface/Layout.h \
 						 ../../headers/os/interface/LayoutBuilder.h \
 						 ../../headers/os/interface/LayoutItem.h \
+						 ../../headers/os/interface/Screen.h \
 						 ../../headers/os/interface/TwoDimensionalLayout.h \
                          ../../headers/os/locale \
                          ../../headers/os/midi2 \
