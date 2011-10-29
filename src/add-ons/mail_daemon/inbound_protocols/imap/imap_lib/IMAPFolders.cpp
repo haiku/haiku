@@ -29,16 +29,16 @@ IMAPFolders::GetFolders(FolderList& folders)
 	status_t status = _GetAllFolders(allFolders);
 	if (status != B_OK)
 		return status;
-	StringList subscibedFolders;
-	status = _GetSubscribedFolders(subscibedFolders);
+	StringList subscribedFolders;
+	status = _GetSubscribedFolders(subscribedFolders);
 	if (status != B_OK)
 		return status;
 
 	for (unsigned int i = 0; i < allFolders.size(); i++) {
 		FolderInfo info;
 		info.folder = allFolders[i];
-		for (unsigned int a = 0; a < subscibedFolders.size(); a++) {
-			if (allFolders[i] == subscibedFolders[a]
+		for (unsigned int a = 0; a < subscribedFolders.size(); a++) {
+			if (allFolders[i] == subscribedFolders[a]
 				|| allFolders[i].ICompare("INBOX") == 0) {
 				info.subscribed = true;
 				break;
@@ -48,10 +48,10 @@ IMAPFolders::GetFolders(FolderList& folders)
 	}
 
 	// you could be subscribed to a folder which not exist currently, add them:
-	for (unsigned int a = 0; a < subscibedFolders.size(); a++) {
+	for (unsigned int a = 0; a < subscribedFolders.size(); a++) {
 		bool isInlist = false;
 		for (unsigned int i = 0; i < allFolders.size(); i++) {
-			if (subscibedFolders[a] == allFolders[i]) {
+			if (subscribedFolders[a] == allFolders[i]) {
 				isInlist = true;
 				break;
 			}
@@ -60,7 +60,7 @@ IMAPFolders::GetFolders(FolderList& folders)
 			continue;
 
 		FolderInfo info;
-		info.folder = subscibedFolders[a];
+		info.folder = subscribedFolders[a];
 		info.subscribed = true;
 		folders.push_back(info);
 	}
@@ -86,7 +86,7 @@ IMAPFolders::UnsubscribeFolder(const char* folder)
 
 
 status_t
-IMAPFolders::GetQuota(double& used, double& total)
+IMAPFolders::GetQuota(uint64& used, uint64& total)
 {
 	if (fCapabilityHandler.Capabilities() == "")
 		ProcessCommand(fCapabilityHandler.Command());
@@ -100,7 +100,7 @@ IMAPFolders::GetQuota(double& used, double& total)
 
 	used = quotaCommand.UsedStorage();
 	total = quotaCommand.TotalStorage();
-	return status;
+	return B_OK;
 }
 
 

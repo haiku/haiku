@@ -12,12 +12,11 @@
 
 
 #define DEBUG_IMAP_MAILBOX
-
 #ifdef DEBUG_IMAP_MAILBOX
-#include <stdio.h>
-#define TRACE(x...) printf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
-#define TRACE(x...) /* nothing */
+#	define TRACE(x...) ;
 #endif
 
 
@@ -26,6 +25,9 @@ MinMessage::MinMessage()
 	uid = 0;
 	flags = 0;
 }
+
+
+// #pragma mark -
 
 
 IMAPMailbox::IMAPMailbox(IMAPStorage& storage)

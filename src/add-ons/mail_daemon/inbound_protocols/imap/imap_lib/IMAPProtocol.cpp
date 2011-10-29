@@ -12,13 +12,13 @@
 #else
 #define TRACE(x...) /* nothing */
 #endif
-     
+
 
 ConnectionReader::ConnectionReader(ServerConnection* connection)
 	:
 	fServerConnection(connection)
 {
-	
+
 }
 
 
@@ -130,6 +130,9 @@ ConnectionReader::_ExtractTillEndOfLine(BString& out)
 }
 
 
+// #pragma mark -
+
+
 IMAPProtocol::IMAPProtocol()
 	:
 	fServerConnection(&fOwnServerConnection),
@@ -138,7 +141,6 @@ IMAPProtocol::IMAPProtocol()
 	fStopNow(0),
 	fIsConnected(false)
 {
-
 }
 
 
@@ -150,7 +152,6 @@ IMAPProtocol::IMAPProtocol(IMAPProtocol& connection)
 	fStopNow(0),
 	fIsConnected(false)
 {
-
 }
 
 
@@ -320,7 +321,7 @@ IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout, bool disconnect
 				TRACE("S:read error %s", line.String());
 				_Disconnect();
 			} else if (disconnectOnTimeout) {
-				_Disconnect();				
+				_Disconnect();
 			}
 			return status;
 		}

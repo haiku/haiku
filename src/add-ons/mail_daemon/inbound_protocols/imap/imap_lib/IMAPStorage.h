@@ -82,13 +82,13 @@ public:
 			status_t			ReadUniqueID(BNode& node, int32& uid);
 
 private:
-	friend 	int32				ReadDirThreadFunction(void *data);
-
-			status_t			_ReadFilesThread();
+	static	status_t			_ReadFilesThreadFunction(void* data);
+			status_t			_ReadFiles();
 
 			status_t			_WriteFlags(int32 flags, BNode& node);
 			status_t			_WriteUniqueID(BNode& node, int32 uid);
 
+private:
 			BPath				fMailboxPath;
 
 			sem_id				fLoadDatabaseLock;
@@ -104,6 +104,7 @@ public:
 			status_t			Sync(IMAPStorage& storage,
 									 IMAPMailbox& mailbox);
 	const	MessageNumberList&	ToFetchList() { return fToFetchList; }
+
 private:
 			MessageNumberList	fToFetchList;
 };

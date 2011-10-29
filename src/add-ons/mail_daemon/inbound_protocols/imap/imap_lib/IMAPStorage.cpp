@@ -1,3 +1,11 @@
+/*
+ * Copyright 2010-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2010 Clemens Zeidler. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "IMAPStorage.h"
 
 #include <stdlib.h>
@@ -13,12 +21,11 @@
 
 
 #define DEBUG_IMAP_STORAGE
-
 #ifdef DEBUG_IMAP_STORAGE
-#include <stdio.h>
-#define TRACE(x...) printf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
-#define TRACE(x...) /* nothing */
+#	define TRACE(x...) /* nothing */
 #endif
 
 
@@ -100,12 +107,7 @@ IMAPMailboxSync::Sync(IMAPStorage& storage, IMAPMailbox& mailbox)
 }
 
 
-int32
-ReadDirThreadFunction(void *data)
-{
-	IMAPStorage* storage = (IMAPStorage*)data;
-	return storage->_ReadFilesThread();
-}
+// #pragma mark -
 
 
 IMAPStorage::IMAPStorage()
@@ -134,7 +136,7 @@ IMAPStorage::StartReadDatabase()
 	if (status != B_OK)
 		return status;
 
-	thread_id id = spawn_thread(ReadDirThreadFunction, "read mailbox",
+	thread_id id = spawn_thread(_ReadFilesThreadFunction, "read mailbox",
 		B_LOW_PRIORITY, this);
 	if (id < 0)
 		return id;
@@ -417,7 +419,15 @@ IMAPStorage::UIDToRef(int32 uid, entry_ref& ref)
 
 
 status_t
-IMAPStorage::_ReadFilesThread()
+IMAPStorage::_ReadFilesThreadFunction(void* data)
+{
+	IMAPStorage* storage = (IMAPStorage*)data;
+	return storage->_ReadFiles();
+}
+
+
+status_t
+IMAPStorage::_ReadFiles()
 {
 	fMailEntryMap.clear();
 
