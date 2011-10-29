@@ -14,6 +14,7 @@
 
 const rgb_color kBlack= { 0, 0, 0, 255 };
 const rgb_color kWhite = { 255, 255, 255, 255 };
+const rgb_color kGreen = { 0, 255, 0, 255 };
 
 const struct color_schema kBlackOnWhite = {
 	B_TRANSLATE("Black on White"),
@@ -36,6 +37,15 @@ const struct color_schema kWhiteOnBlack = {
 	kWhite
 };
 
+const struct color_schema kGreenOnBlack = {
+	B_TRANSLATE("Green on Black"),
+	kGreen,
+	kBlack,
+	kBlack,
+	kGreen,
+	kBlack,
+	kGreen
+};
 
 struct color_schema gCustomSchema = {
 	B_TRANSLATE("Custom")
@@ -44,6 +54,7 @@ struct color_schema gCustomSchema = {
 const color_schema* gPredefinedSchemas[] = {
 		&kBlackOnWhite,
 		&kWhiteOnBlack,
+		&kGreenOnBlack,
 		&gCustomSchema,
 		NULL
 };
