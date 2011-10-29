@@ -1,3 +1,11 @@
+/*
+ * Copyright 2010-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2010 Clemens Zeidler. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "IMAPProtocol.h"
 
 #include "IMAPHandler.h"
@@ -5,12 +13,11 @@
 
 
 #define DEBUG_IMAP_PROTOCOL
-
 #ifdef DEBUG_IMAP_PROTOCOL
-#include <stdio.h>
-#define TRACE(x...) printf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
-#define TRACE(x...) /* nothing */
+#	define TRACE(x...) ;
 #endif
 
 
@@ -18,7 +25,6 @@ ConnectionReader::ConnectionReader(ServerConnection* connection)
 	:
 	fServerConnection(connection)
 {
-
 }
 
 
@@ -137,7 +143,7 @@ IMAPProtocol::IMAPProtocol()
 	:
 	fServerConnection(&fOwnServerConnection),
 	fConnectionReader(fServerConnection),
-	fCommandId(0),
+	fCommandID(0),
 	fStopNow(0),
 	fIsConnected(false)
 {
@@ -148,7 +154,7 @@ IMAPProtocol::IMAPProtocol(IMAPProtocol& connection)
 	:
 	fServerConnection(connection.fServerConnection),
 	fConnectionReader(fServerConnection),
-	fCommandId(0),
+	fCommandID(0),
 	fStopNow(0),
 	fIsConnected(false)
 {
@@ -285,13 +291,13 @@ IMAPProtocol::ProcessCommand(const char* command, bigtime_t timeout)
 
 
 status_t
-IMAPProtocol::SendCommand(const char* command, int32 commandId)
+IMAPProtocol::SendCommand(const char* command, int32 commandID)
 {
 	if (strlen(command) + 10 > 256)
 		return B_NO_MEMORY;
 
 	static char cmd[256];
-	::sprintf(cmd, "A%.7ld %s"CRLF, commandId, command);
+	::sprintf(cmd, "A%.7ld %s"CRLF, commandID, command);
 
 	TRACE("_SendCommand: %s\n", cmd);
 	int commandLength = strlen(cmd);
@@ -301,13 +307,14 @@ IMAPProtocol::SendCommand(const char* command, int32 commandId)
 		return B_ERROR;
 	}
 
-	fOngoingCommands.push_back(commandId);
+	fOngoingCommands.push_back(commandID);
 	return B_OK;
 }
 
 
 status_t
-IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout, bool disconnectOnTimeout)
+IMAPProtocol::HandleResponse(int32 commandID, bigtime_t timeout,
+	bool disconnectOnTimeout)
 {
 	status_t commandStatus = B_ERROR;
 
@@ -342,7 +349,7 @@ IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout, bool disconnect
 			static char idString[8];
 			::sprintf(idString, "A%.7ld", *it);
 			if (line.FindFirst(idString) >= 0) {
-				if (*it == commandId) {
+				if (*it == commandID) {
 					BString result = IMAPParser::ExtractElementAfter(line,
 						idString);
 					if (result == "OK")
@@ -379,10 +386,10 @@ IMAPProtocol::ProcessAfterQuacks(bigtime_t timeout)
 
 
 int32
-IMAPProtocol::NextCommandId()
+IMAPProtocol::NextCommandID()
 {
-	fCommandId++;
-	return fCommandId;
+	fCommandID++;
+	return fCommandID;
 }
 
 
@@ -408,12 +415,12 @@ status_t
 IMAPProtocol::_ProcessCommandWithoutAfterQuake(const char* command,
 	bigtime_t timeout)
 {
-	int32 commandId = NextCommandId();
-	status_t status = SendCommand(command, commandId);
+	int32 commandID = NextCommandID();
+	status_t status = SendCommand(command, commandID);
 	if (status != B_OK)
 		return status;
 
-	return HandleResponse(commandId, timeout);
+	return HandleResponse(commandID, timeout);
 }
 
 

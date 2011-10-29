@@ -81,10 +81,10 @@ private:
 			MinMessageList		fMessageList;
 
 			IMAPStorage&		fStorage;
-			IMAPMailboxListener*	fIMAPMailboxListener;
-			IMAPMailboxListener		fNULLListener;
+			IMAPMailboxListener* fIMAPMailboxListener;
+			IMAPMailboxListener	fNULLListener;
 
-			MailboxSelectHandler	fMailboxSelectHandler;
+			MailboxSelectHandler fMailboxSelectHandler;
 			CapabilityHandler	fCapabilityHandler;
 			ExistsHandler		fExistsHandler;
 			ExpungeHandler		fExpungeHandler;
