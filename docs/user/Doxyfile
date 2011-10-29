@@ -494,6 +494,7 @@ INPUT                  = . \
                          ../../headers/os/midi2 \
 						 ../../headers/os/storage/AppFileInfo.h \
 						 ../../headers/os/storage/FindDirectory.h \
+						 ../../headers/os/storage/Node.h \
                          ../../headers/os/support \
                          ../../headers/posix/syslog.h
 

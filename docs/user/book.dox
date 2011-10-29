@@ -7,10 +7,10 @@
   - \ref drivers
   - \ref interface | \link interface_intro \em Introduction \endlink
   - \ref locale | \link locale_intro \em Introduction \endlink
-  - \ref media | \link media_intro \em Introduction \endlink
+  - \ref media | \em Introduction
   - \ref midi1
   - \ref midi2 | \link midi2_intro \em Introduction \endlink
-  - \ref storage | \link storage_intro \em Introduction \endlink
+  - \ref storage | \em Introduction 
   - \ref support | \link support_intro \em Introduction \endlink
 
   \section notes General Notes and Information
@@ -26,9 +26,11 @@
   \defgroup drivers Drivers
   \defgroup interface Interface Kit
   \brief API for displaying a graphical user interface.
+  \defgroup media
   \defgroup midi2 MIDI 2 Kit
   \brief API for producing and consuming MIDI events.
   \defgroup libmidi2 (libmidi2.so)
+  \defgroup storage
   \defgroup support Support Kit
   \brief Collection of utility classes that are used throughout the API.
   \defgroup libbe (libbe.so)
