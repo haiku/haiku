@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -22,7 +22,8 @@
 App::App()
 	:
 	BApplication("application/x-vnd.Haiku-LaunchBox"),
-	fSettingsChanged(false)
+	fSettingsChanged(false),
+	fNamePanelSize(200, 50)
 {
 	SetPulseRate(3000000);
 }
@@ -47,7 +48,7 @@ App::ReadyToRun()
 	bool windowAdded = false;
 	BRect frame(50.0, 50.0, 65.0, 100.0);
 
-	BMessage settings('sett');
+	BMessage settings;
 	status_t status = load_settings(&settings, "main_settings", "LaunchBox");
 	if (status >= B_OK) {
 		BMessage windowMessage;
@@ -65,8 +66,11 @@ App::ReadyToRun()
 			frame.OffsetBy(10.0, 10.0);
 			windowMessage.MakeEmpty();
 		}
+		BSize size;
+		if (settings.FindSize("name panel size", &size) == B_OK)
+			fNamePanelSize = size;
 	}
-	
+
 	if (!windowAdded) {
 		MainWindow* window = new MainWindow(B_TRANSLATE("Pad 1"), frame, true);
 		window->Show();
@@ -111,6 +115,28 @@ App::Pulse()
 
 
 void
+App::SetNamePanelSize(const BSize& size)
+{
+	if (Lock()) {
+		fNamePanelSize = size;
+		Unlock();
+	}
+}
+
+
+BSize
+App::NamePanelSize()
+{
+	BSize size;
+	if (Lock()) {
+		size = fNamePanelSize;
+		Unlock();
+	}
+	return size;
+}
+
+
+void
 App::_StoreSettingsIfNeeded()
 {
 	if (!fSettingsChanged)
@@ -127,6 +153,8 @@ App::_StoreSettingsIfNeeded()
 			}
 		}
 	}
+	settings.AddSize("name panel size", fNamePanelSize);
+
 	save_settings(&settings, "main_settings", "LaunchBox");
 
 	fSettingsChanged = false;
