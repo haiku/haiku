@@ -1,0 +1,58 @@
+/*
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *
+ * Corresponds to:
+ *		/trunk/headers/os/locale/DurationFormat.h	 rev 42944
+ *		/trunk/src/kits/locale/DurationFormat.cpp	 rev 42944
+ */
+
+
+/*!
+  \class BDurationFormat
+  \ingroup locale
+  \brief Formatter for time interfals
+
+  BDurationFormat is a formatter for time intervals. A time interval is defined
+  by its start and end values, and the result is a string such as
+  "1 hour, 2 minutes, 28 seconds".
+*/
+
+
+/*!
+  \fn BDurationFormat::BDurationFormat(const BString& separator)
+  \brief Constructor.
+
+  \warning Creating a BDurationFormat is a costly operation. Most of the time,
+  you most likely want to use the default one through the BLocale class.
+
+  The separator string will be appended between the elements of formated
+  durations.
+*/
+
+
+/*!
+  \fn void BDurationFormat::SetSeparator(cosnt BString& separator)
+  \brief Replace the spearator for this formatter.
+*/
+
+
+/*!
+  \fn status_t BDurationForamt::SetLocale(const BLocale* locale)
+  \brief Sets the locale for this formatter.
+*/
+
+
+/*!
+  \fn status_t BDurationFormat::Format(bigtime_t startValue,
+  	bigtime_t endValue, BString* buffer, time_unit_style = B_TIME_UNIT_FULL)
+	const;
+  \brief Formats a duration defined by its start and end values.
+
+The start and end values are in milliseconds. The result is appeded to the
+buffer. The full time style uses full words (hours, minuts, seconds), while the
+shot one uses units (h, m, s).
+*/
