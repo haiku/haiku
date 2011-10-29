@@ -41,6 +41,8 @@ public:
 			BLooper*			LooperForName(const char* name);
 			BLooper*			LooperForPort(port_id port);
 
+			void				InitAfterFork();
+
 private:
 	struct LooperData {
 		LooperData();

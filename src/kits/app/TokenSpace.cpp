@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -168,5 +168,14 @@ BTokenSpace::AcquireHandlerTarget(int32 token, BDirectMessageTarget** _target)
 	*_target = iterator->second.target;
 	return B_OK;
 }
+
+
+void
+BTokenSpace::InitAfterFork()
+{
+	// We need to reinitialize the locker to get a new semaphore
+	new (this) BTokenSpace();
+}
+
 
 }	// namespace BPrivate

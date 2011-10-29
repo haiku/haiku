@@ -51,6 +51,8 @@ public:
 			status_t			AcquireHandlerTarget(int32 token,
 									BDirectMessageTarget** _target);
 
+			void				InitAfterFork();
+
 private:
 	struct token_info {
 		int16	type;
