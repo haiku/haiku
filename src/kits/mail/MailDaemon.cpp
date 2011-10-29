@@ -17,7 +17,7 @@
 status_t
 BMailDaemon::CheckMail(int32 accountID)
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
@@ -30,7 +30,7 @@ BMailDaemon::CheckMail(int32 accountID)
 status_t
 BMailDaemon::CheckAndSendQueuedMail(int32 accountID)
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
@@ -43,7 +43,7 @@ BMailDaemon::CheckAndSendQueuedMail(int32 accountID)
 status_t
 BMailDaemon::SendQueuedMail()
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 	
@@ -54,7 +54,7 @@ BMailDaemon::SendQueuedMail()
 int32
 BMailDaemon::CountNewMessages(bool wait_for_fetch_completion)
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
@@ -73,7 +73,7 @@ BMailDaemon::CountNewMessages(bool wait_for_fetch_completion)
 status_t
 BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, read_flags flag)
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
@@ -89,7 +89,7 @@ BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, read_flags flag)
 status_t
 BMailDaemon::FetchBody(const entry_ref& ref, BMessenger* listener)
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
@@ -106,7 +106,7 @@ BMailDaemon::FetchBody(const entry_ref& ref, BMessenger* listener)
 status_t
 BMailDaemon::Quit()
 {
-	BMessenger daemon("application/x-vnd.Be-POST");
+	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 	

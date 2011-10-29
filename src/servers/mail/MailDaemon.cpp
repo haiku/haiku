@@ -105,7 +105,7 @@ addAttribute(BMessage& msg, const char* name, const char* publicName,
 
 MailDaemonApp::MailDaemonApp()
 	:
-	BApplication("application/x-vnd.Be-POST"),
+	BApplication(B_MAIL_DAEMON_SIGNATURE),
 
 	fAutoCheckRunner(NULL)
 {
@@ -423,7 +423,7 @@ MailDaemonApp::InstallDeskbarIcon()
 		BRoster roster;
 		entry_ref ref;
 
-		status_t status = roster.FindApp("application/x-vnd.Be-POST", &ref);
+		status_t status = roster.FindApp(B_MAIL_DAEMON_SIGNATURE, &ref);
 		if (status < B_OK) {
 			fprintf(stderr, "Can't find application to tell deskbar: %s\n",
 				strerror(status));

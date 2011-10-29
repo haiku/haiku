@@ -948,7 +948,7 @@ BEmailMessage::Send(bool sendNow)
 			// TODO!
 		}
 
-		BMessenger daemon("application/x-vnd.Be-POST");
+		BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
 		if (!daemon.IsValid())
 			return B_MAIL_NO_DAEMON;
 

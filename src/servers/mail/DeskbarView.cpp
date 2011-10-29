@@ -122,7 +122,7 @@ void DeskbarView::AttachedToWindow()
 
 	SetLowColor(ViewColor());
 
-	if (be_roster->IsRunning("application/x-vnd.Be-POST")) {
+	if (be_roster->IsRunning(B_MAIL_DAEMON_SIGNATURE)) {
 		_RefreshMailQuery();
 	} else {
 		BDeskbar deskbar;
@@ -203,7 +203,7 @@ status_t DeskbarView::Archive(BMessage *data,bool deep) const
 {
 	BView::Archive(data, deep);
 
-	data->AddString("add_on", "application/x-vnd.Be-POST");
+	data->AddString("add_on", B_MAIL_DAEMON_SIGNATURE);
 	return B_NO_ERROR;
 }
 
