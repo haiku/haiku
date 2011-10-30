@@ -1,11 +1,10 @@
-//
-//	PaletteWindow.cpp
-//
-//	This is a part of...
-//	CannaIM
-//	version 1.0
-//	(c) 1999 M.Kawamura
-//
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
+
 
 #include "CannaCommon.h"
 #include "PaletteWindow.h"

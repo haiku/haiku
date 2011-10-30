@@ -1,9 +1,11 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2007-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 1999 M.Kawamura
  */
+
+
 #ifndef CANNA_LOOPER_H
 #define CANNA_LOOPER_H
 

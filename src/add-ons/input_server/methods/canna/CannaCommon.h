@@ -1,8 +1,10 @@
-//
-// CannaCommon.h
-//		Common data and variable definition for CannaIM
-//		(c) 1999 Masao Kawamura
-//
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
+
 
 #ifndef _CANNACOMMON_H
 #define _CANNACOMMON_H
