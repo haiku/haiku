@@ -244,13 +244,13 @@ TBeMenu::AddStandardBeMenuItems()
 		AddSeparatorItem();
 	}
 
-#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+// One of them is used if HAIKU_DISTRO_COMPATIBILITY_OFFICIAL, and the other if
+// not. However, we want both of them to end up in the catalog, so we have to
+// put them outside of the ifdef block.
 	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
 		"About Haiku");
-#else
 	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
 		"About this system");
-#endif
 
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
@@ -305,9 +305,9 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
-#ifdef APM_SUPPORT
+	// String outside of ifdef block for collectcatkeys purposes
 	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
-
+#ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
 		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSuspendMenuItemStr),
 			new BMessage(kSuspendSystem));
