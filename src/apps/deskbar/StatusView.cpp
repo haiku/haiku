@@ -692,10 +692,10 @@ TReplicantTray::RemoveItem(int32 id)
 		BPath path(&item->entryRef);
 		BString storedPath;
 		for (int32 i = 0; 
-			fAddOnSettings->FindString(kReplicantPathField, i, &storedPath)
+			fAddOnSettings.FindString(kReplicantPathField, i, &storedPath)
 				== B_OK; i++) {
 			if (storedPath == path.Path()) {
-				fAddOnSettings->RemoveItem(kReplicantPathField, i);
+				fAddOnSettings.RemoveData(kReplicantPathField, i);
 				break;
 			}
 		}
@@ -1202,7 +1202,7 @@ TReplicantTray::SetMultiRow(bool state)
 }
 
 
-void
+status_t
 TReplicantTray::_SaveSettings()
 {
 	status_t result;
