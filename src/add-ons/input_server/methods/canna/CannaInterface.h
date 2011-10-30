@@ -60,7 +60,7 @@ private:
 	uint32				UpdateKanjiStatus();
 	void				InitializeCanna();
 
-	
+
 public:
 						CannaInterface( char *basepath );
 						~CannaInterface();

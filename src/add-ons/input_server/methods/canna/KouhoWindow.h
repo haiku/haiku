@@ -49,7 +49,7 @@ class KouhoIndexView : public BBox
 {
 private:
 	float				lineHeight;
-	int32				fontOffset; //for vertical centering 
+	int32				fontOffset; //for vertical centering
 	bool				hideNumber;
 public:
 						KouhoIndexView( BRect rect, float height );
