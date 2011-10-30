@@ -12,7 +12,6 @@
 #include <Alert.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -247,6 +246,7 @@ PairsWindow::MessageReceived(BMessage* message)
 					view->SetFontAndColor(0,
 						strlen(B_TRANSLATE_SYSTEM_NAME("Pairs")), &font);
 					view->ResizeToPreferred();
+					alert->SetShortcut(0, B_ESCAPE);
 
 					if (alert->Go() == 0) {
 						// New game
