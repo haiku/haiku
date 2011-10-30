@@ -146,6 +146,8 @@ private:
 	BPoint LocationForReplicant(int32 index, float width);
 	BShelf* Shelf() const;
 
+	status_t _SaveSettings();
+
 	friend class TReplicantShelf;
 
 	TTimeView* fClock;
@@ -199,8 +201,6 @@ public:
 	bool IsDragging() {return IsTracking();}
 
 private:
-	status_t _SaveSettings();
-
 	TBarView* fBarView;
 	BView* fChild;
 	BPoint fPreviousPosition;
