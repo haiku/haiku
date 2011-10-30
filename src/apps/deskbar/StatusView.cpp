@@ -84,7 +84,7 @@ using std::max;
 const char* const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
 const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
 const char* const kReplicantSettingsFile = "Deskbar_replicants";
-const char* const kReplicantRefField = "replicant";
+const char* const kReplicantPathField = "replicant_path";
 
 float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
@@ -413,20 +413,20 @@ TReplicantTray::InitAddOnSupport()
 
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
-			entry_ref ref;
 			status_t result;
 			BEntry entry;
 			int32 id;
+			BString path;
 			if (fAddOnSettings.Unflatten(&file) == B_OK) {
-				for (int32 i = 0; fAddOnSettings.FindRef(kReplicantRefField, 
-					i, &ref) == B_OK; i++) {
-					if (entry.SetTo(&ref) == B_OK && entry.Exists()) {
+				for (int32 i = 0; fAddOnSettings.FindString(kReplicantPathField, 
+					i, &path) == B_OK; i++) {
+					if (entry.SetTo(path.String()) == B_OK && entry.Exists()) {
 						result = LoadAddOn(&entry, &id, false);
 					} else 
 						result = B_ENTRY_NOT_FOUND;
 					
 					if (result != B_OK) {
-						fAddOnSettings.RemoveData(kReplicantRefField, i);
+						fAddOnSettings.RemoveData(kReplicantPathField, i);
 						--i;
 					}
 				}
@@ -627,7 +627,7 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 	if (addToSettings) {
 		entry_ref ref;
 		if (entry->GetRef(&ref) == B_OK)
-			fAddOnSettings.AddRef(kReplicantRefField, &ref);
+			fAddOnSettings.AddString(kReplicantPathField, path.Path());
 	}
 	
 	return B_OK;
