@@ -86,6 +86,12 @@ if [ -z "$gccVersion" ]; then
 	exit 1
 fi
 
+# touch all info files in order to avoid the dependency on makeinfo
+# (which apparently doesn't work reliably on all the different host 
+# configurations and changes files which in turn appear as local changes
+# to the VCS).
+find $binutilsSourceDir -name \*.info -print0 | xargs -0 touch
+find $gccSourceDir -name \*.info -print0 | xargs -0 touch
 
 # create the object and installation directories for the cross compilation tools
 installDir=$haikuOutputDir/cross-tools
