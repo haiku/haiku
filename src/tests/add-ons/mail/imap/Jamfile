@@ -1,0 +1,29 @@
+SubDir HAIKU_TOP src tests add-ons mail imap ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders mail shared ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems
+	fs_shell ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons mail_daemon inbound_protocols
+	imap imap_lib ] ;
+
+local libSources = IMAPFolders.cpp IMAPHandler.cpp IMAPMailbox.cpp
+	IMAPParser.cpp IMAPProtocol.cpp IMAPStorage.cpp ;
+
+SimpleTest imap_tester :
+	imap_tester.cpp
+	$(libSources)
+
+	# from fs_shell
+	argv.c
+
+	: be $(TARGET_LIBSUPC++) mail
+;
+
+SEARCH on [ FGristFiles $(libSources) ]
+	= [ FDirName $(HAIKU_TOP) src add-ons mail_daemon inbound_protocols imap
+		imap_lib ] ;
+
+SEARCH on [ FGristFiles argv.c ] = [ FDirName $(HAIKU_TOP) src tests add-ons
+	kernel file_systems fs_shell ] ;
