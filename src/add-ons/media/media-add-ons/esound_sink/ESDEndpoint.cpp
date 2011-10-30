@@ -33,6 +33,7 @@
 #include <File.h>
 #include <Path.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -142,9 +143,22 @@ ESDEndpoint::Connect(const char *host, uint16 port)
 	err = resume_thread(fConnectThread);
 
 	// TODO: return now instead and move Connect() call
-	wait_for_thread(fConnectThread, &err);
+	//wait_for_thread(fConnectThread, &err);
 
 	return err;
+}
+
+
+status_t
+ESDEndpoint::WaitForConnect()
+{
+	status_t err;
+	int32 ret;
+	err = wait_for_thread(fConnectThread, &ret);
+	if (err < B_OK)
+		return err;
+
+	return ret;
 }
 
 
@@ -162,6 +176,9 @@ ESDEndpoint::ConnectThread(void)
 	uint16 port = fPort;
 	status_t err;
 	int flag;
+	struct timeval oldTimeout;
+	socklen_t oldTimeoutLen = sizeof(struct timeval);
+	struct timeval timeout = { 10, 0 }; // 10s should be enough on a LAN
 	CALLED();
 	
 	struct hostent *he;
@@ -188,9 +205,14 @@ ESDEndpoint::ConnectThread(void)
 	setsockopt(fSocket, SOL_SOCKET, SO_SNDBUF, &flag, sizeof(flag));
 	setsockopt(fSocket, SOL_SOCKET, SO_RCVBUF, &flag, sizeof(flag));
 	*/
+
+	if (getsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&oldTimeout, &oldTimeoutLen) >= 0) {
+		setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
+	}
 	
 	err = connect(fSocket, (struct sockaddr *) &sin, sizeof(sin));
 	PRINT(("connect: %ld, %s\n", err, strerror(errno)));
+	setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&oldTimeout, sizeof(struct timeval));
 	if (err < 0)
 		return errno;
 	
@@ -217,7 +239,7 @@ ESDEndpoint::ConnectThread(void)
 	err = write(fSocket, &cmd, sizeof(cmd));
 	if (err < 0)
 		return errno;
-	if (err < sizeof(cmd))
+	if ((unsigned)err < sizeof(cmd))
 		return EIO;
 	
 	read(fSocket, &result, sizeof(result));
@@ -240,7 +262,7 @@ ESDEndpoint::ConnectThread(void)
 	err = write(fSocket, &cmd, sizeof(cmd));
 	if (err < 0)
 		return errno;
-	if (err < sizeof(cmd))
+	if ((unsigned)err < sizeof(cmd))
 		return EIO;
 	
 	read(fSocket, &result, sizeof(result));
@@ -257,7 +279,7 @@ ESDEndpoint::ConnectThread(void)
 	
 	
 	flag = 1;
-	int len;
+	//int len;
 	/* disable Nagle */
 	setsockopt(fSocket, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
 	//setsockopt(fSocket, SOL_SOCKET, SO_NONBLOCK, &flag, sizeof(flag));
@@ -306,7 +328,7 @@ ESDEndpoint::SetFormat(int bits, int channels, float rate)
 	CALLED();
 	if (fDefaultCommandSent)
 		return EALREADY;
-	PRINT(("SetFormat(%d,%d,%d)\n", bits, channels, rate));
+	PRINT(("SetFormat(%d,%d,%f)\n", bits, channels, rate));
 	switch (bits) {
 	case 8:
 		fmt |= ESD_BITS8;
@@ -328,7 +350,7 @@ ESDEndpoint::SetFormat(int bits, int channels, float rate)
 		return EINVAL;
 	}
 	fmt |= ESD_STREAM | ESD_FUNC_PLAY;
-	PRINT(("SetFormat: %08lx\n", fmt));
+	PRINT(("SetFormat: %08lx\n", (long)fmt));
 	fDefaultFormat = fmt;
 	fDefaultRate = rate;
 	return B_OK;
@@ -347,8 +369,18 @@ ESDEndpoint::GetServerInfo()
 	err = SendCommand(ESD_PROTO_SERVER_INFO, (const uint8 *)&si, 0, (uint8 *)&si, sizeof(si));
 	if (err < 0)
 		return err;
-	PRINT(("err %d, version: %lu, rate: %lu, fmt: %lu\n", err, si.ver, si.rate, si.fmt));
+	PRINT(("err 0x%08lx, version: %lu, rate: %lu, fmt: %lu\n", err, si.ver, si.rate, si.fmt));
 	return B_OK;
+}
+
+
+void
+ESDEndpoint::GetFriendlyName(BString &name)
+{
+	name = "ESounD Out";
+	name << " (" << Host();
+	name << ":" << Port() << ")";
+
 }
 
 bool
@@ -381,8 +413,8 @@ ESDEndpoint::Write(const void *buffer, size_t size)
 		size *= 2;
 	}
 	err = write(fSocket, buffer, size);
-	if (err != size) {
-		fprintf(stderr, "ESDEndpoint::Write: sent only %d of %d!\n", err, size);
+	if ((unsigned)err != size) {
+		fprintf(stderr, "ESDEndpoint::Write: sent only %ld of %ld!\n", err, size);
 		if (err < 0)
 			fprintf(stderr, "ESDEndpoint::Write: %s\n", strerror(errno));
 	}

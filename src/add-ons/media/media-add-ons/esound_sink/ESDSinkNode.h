@@ -353,6 +353,7 @@ private:
 		
 		BString				fHostname;
 		uint16				fPort;
+		bool				fEnabled;
 		ESDEndpoint		 	*fDevice;
 		
 		//multi_description	MD;
