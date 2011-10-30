@@ -45,6 +45,7 @@ private:
 			void				_WriteRTCSettings();
 			void				_UpdateGmtSettings();
 			void 				_UpdateDateTime(BMessage* message);
+			void 				_NotifyClockSettingChanged();
 			void				_Revert();
 			time_t				_PrefletUptime() const;
 

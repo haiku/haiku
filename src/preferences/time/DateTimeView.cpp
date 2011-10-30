@@ -78,6 +78,8 @@ DateTimeView::AttachedToWindow()
 
 		fCalendarView->SetTarget(this);
 	}
+
+	_NotifyClockSettingChanged();
 }
 
 
@@ -290,6 +292,8 @@ DateTimeView::_UpdateGmtSettings()
 {
 	_WriteRTCSettings();
 
+	_NotifyClockSettingChanged();
+
 	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
 }
 
@@ -325,3 +329,13 @@ DateTimeView::_UpdateDateTime(BMessage* message)
 		fTimeEdit->SetTime(hour, minute, second);
 	}
 }
+
+
+void
+DateTimeView::_NotifyClockSettingChanged()
+{
+	BMessage msg(kMsgClockSettingChanged);
+	msg.AddBool("UseGMT", fUseGmtTime);
+	Window()->PostMessage(&msg);
+}
+

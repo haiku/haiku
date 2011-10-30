@@ -162,6 +162,16 @@ TimeZoneView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case H_HIDE_PREVIEW:
+			fCurrent->Hide();
+			fPreview->Hide();
+			break;
+
+		case H_SHOW_PREVIEW:
+			fCurrent->Show();
+			fPreview->Show();
+			break;
+
 		case kMsgRevert:
 			_Revert();
 			break;
