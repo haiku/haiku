@@ -102,7 +102,8 @@ SizeSlider::SizeSlider(const char* name, const char* label,
 	fEndOffset(maxValue),
 	fMaxPartitionSize(maxValue)
 {
-	SetBarColor((rgb_color){ 0, 80, 255, 255 });
+	rgb_color fillColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	UseFillColor(true, &fillColor);
 	char minString[64];
 	char maxString[64];
 	snprintf(minString, sizeof(minString), B_TRANSLATE("Offset: %ld MB"),
