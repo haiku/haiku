@@ -310,8 +310,10 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
-	// String outside of ifdef block for collectcatkeys purposes
+#if defined(APM_SUPPORT) || defined(B_COLLECTING_CATKEYS)
 	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
+#endif
+
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
 		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSuspendMenuItemStr),
