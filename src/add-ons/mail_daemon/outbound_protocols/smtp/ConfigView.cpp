@@ -43,9 +43,12 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 #endif
 		)
 {
+#if defined(USE_SSL) || defined(B_COLLECTING_CATKEYS)
 	static const char* kUnencryptedStr = B_TRANSLATE_MARK("Unencrypted");
 	static const char* kSSLStr = B_TRANSLATE_MARK("SSL");
 	static const char* kSTARTTLSStr = B_TRANSLATE_MARK("STARTTLS");
+#endif
+
 #ifdef USE_SSL
 	AddFlavor(B_TRANSLATE_NOCOLLECT(kUnencryptedStr));
 	AddFlavor(B_TRANSLATE(kSSLStr));

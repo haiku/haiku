@@ -58,18 +58,6 @@ All rights reserved.
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
-
-// One of them is used if HAIKU_DISTRO_COMPATIBILITY_OFFICIAL, and the other if
-// not. However, we want both of them to end up in the catalog, so we have to
-// put them outside of the ifdef block.
-static const char* skSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
-static const char* skAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
-	"About Haiku");
-static const char* skAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
-	"About this system");
-
-
-
 #ifdef MOUNT_MENU_IN_DESKBAR
 
 class DeskbarMountMenu : public BPrivate::MountMenu {
@@ -256,11 +244,24 @@ TBeMenu::AddStandardBeMenuItems()
 		AddSeparatorItem();
 	}
 
+// One of them is used if HAIKU_DISTRO_COMPATIBILITY_OFFICIAL, and the other if
+// not. However, we want both of them to end up in the catalog, so we have to
+// make them visible to collectcatkeys in either case.
+#if defined(B_COLLECTING_CATKEYS)||defined(HAIKU_DISTRO_COMPATIBILITY_OFFICIAL)
+	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
+		"About Haiku");
+#endif
+
+#if defined(B_COLLECTING_CATKEYS)||!defined(HAIKU_DISTRO_COMPATIBILITY_OFFICIAL)
+	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
+		"About this system");
+#endif
+
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	B_TRANSLATE_NOCOLLECT(skAboutHaikuMenuItemStr)
+	B_TRANSLATE_NOCOLLECT(kAboutHaikuMenuItemStr)
 #else
-	B_TRANSLATE_NOCOLLECT(skAboutThisSystemMenuItemStr)
+	B_TRANSLATE_NOCOLLECT(kAboutThisSystemMenuItemStr)
 #endif
 		, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
@@ -309,9 +310,11 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
+	// String outside of ifdef block for collectcatkeys purposes
+	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
-		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(skSuspendMenuItemStr),
+		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSuspendMenuItemStr),
 			new BMessage(kSuspendSystem));
 		item->SetEnabled(!dragging);
 		shutdownMenu->AddItem(item);
