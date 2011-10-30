@@ -1028,6 +1028,13 @@ TBarView::AddItem(BMessage* item, DeskbarShelf, int32* id)
 }
 
 
+status_t
+TBarView::AddItem(BEntry* entry, DeskbarShelf, int32* id)
+{
+	return fReplicantTray->LoadAddOn(entry, id);
+}
+
+
 void
 TBarView::RemoveItem(int32 id)
 {
