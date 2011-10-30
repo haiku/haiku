@@ -199,6 +199,8 @@ public:
 	bool IsDragging() {return IsTracking();}
 
 private:
+	status_t _SaveSettings();
+
 	TBarView* fBarView;
 	BView* fChild;
 	BPoint fPreviousPosition;
