@@ -1263,7 +1263,7 @@ AboutView::_CreateCreditsView()
 	haikuLicense.CopyInto(part, licensePart2 + 1, licensePart3 - 1
 		- licensePart2);
 	fCreditsView->Insert(part);
-	
+
 	part.Truncate(0);
 	haikuLicense.CopyInto(part, licensePart3 + 1, licensePart4 - 1
 		- licensePart3);
@@ -1296,8 +1296,10 @@ AboutView::_CreateCreditsView()
 		"telnetd, traceroute\n"
 		COPYRIGHT_STRING "1994-2008 The FreeBSD Project. "
 		"All rights reserved."),
+		StringVector("BSD (2-clause)", "BSD (3-clause)", "BSD (4-clause)",
+			NULL),
+		StringVector(),
 		"http://www.freebsd.org");
-			// TODO: License!
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
@@ -1384,8 +1386,9 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI.",
 			COPYRIGHT_STRING "2006-2009 Project Vine.",
 			B_TRANSLATE("MIT license. All rights reserved."),
-			NULL));
-			// TODO: License!
+			NULL)
+		.SetLicense("BSD (3-clause)")
+		.SetURL("http://vlgothic.dicey.org/"));
 
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")
@@ -1441,13 +1444,14 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("atftp")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000 Jean-Pierre "
 			"ervbefeL and Remi Lefebvre."))
-		.SetLicense("GNU GPL v2"));
-			// TODO: URL!
+		.SetLicense("GNU GPL v2")
+		.SetURL("http://freecode.com/projects/atftp"));
 
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
-		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit.")
+		.SetLicense("Public Domain")
+		.SetURL("http://nc110.sourceforge.net/"));
 
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("acpica")
@@ -1498,8 +1502,8 @@ AboutView::_CreateCreditsView()
 
 	// CannaIM copyrights
 	_AddPackageCredit(PackageCredit("CannaIM")
-		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura.")
+		.SetLicense("MIT"));
 
 	// libxml2, libxslt, libexslt copyrights
 	_AddPackageCredit(PackageCredit("libxml2, libxslt")
@@ -1570,7 +1574,6 @@ AboutView::_CreateCreditsView()
 			"Vivek Mohan. All rights reserved."))
 		.SetLicense(B_TRANSLATE("BSD (2-clause)"))
 		.SetURL("http://udis86.sourceforge.net"));
-			// TODO: License! - Project website refers to BSD License
 #endif
 
 #ifdef __INTEL__
