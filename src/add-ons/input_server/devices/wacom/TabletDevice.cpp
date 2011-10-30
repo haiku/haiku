@@ -10,6 +10,7 @@
  *		Frans van Nispen	<frans@xentronix.com>
  *		Stefan Werner		<stefan@keindesign.de>
  *		Hiroyuki Tsutsumi	<???>
+ *		Jeroen Oortwijn		<???>
  */
 
 #include <stdio.h>
@@ -237,6 +238,21 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 			break;
 		case 0xD4:	// Wacom Bamboo 4x5 (from Linux Wacom Project)
 			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD6:	// Wacom Bamboo CTH-460/K (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD7:	// Wacom Bamboo CTH-461/S (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD8:	// Wacom Bamboo CTH-661/S1 (from Linux Wacom Project)
+			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xDA:	// Wacom Bamboo CTH-461/L (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xDB:	// Wacom Bamboo CTH-661 (from Linux Wacom Project)
+			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
 			break;
 		default:
 			status = B_BAD_VALUE;
@@ -815,6 +831,21 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0xD4:
 			*name = "Wacom Bamboo 4x5\" USB";
+			break;
+		case 0xD6:
+			*name = "Wacom Bamboo (CTH-460/K)";
+			break;
+		case 0xD7:
+			*name = "Wacom Bamboo (CTH-461/S)";
+			break;
+		case 0xD8:
+			*name = "Wacom Bamboo (CTH-661/S1)";
+			break;
+		case 0xDA:
+			*name = "Wacom Bamboo (CTH-461/L)";
+			break;
+		case 0xDB:
+			*name = "Wacom Bamboo (CTH-661)";
 			break;
 
 		default:
