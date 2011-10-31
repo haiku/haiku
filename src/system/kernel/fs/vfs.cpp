@@ -1689,7 +1689,7 @@ normalize_flock(struct file_descriptor* descriptor, struct flock* flock)
 			status_t status;
 
 			if (!HAS_FS_CALL(vnode, read_stat))
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 
 			status = FS_CALL(vnode, read_stat, &stat);
 			if (status != B_OK)
@@ -2444,7 +2444,7 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	// parent directory for the vnode, if the caller let us.
 
 	if (parent == NULL)
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	void* cookie;
 
@@ -4170,7 +4170,7 @@ vfs_read_stat(int fd, const char* path, bool traverseLeafLink,
 		if (descriptor->ops->fd_read_stat)
 			status = descriptor->ops->fd_read_stat(descriptor, stat);
 		else
-			status = B_NOT_SUPPORTED;
+			status = B_UNSUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -5231,7 +5231,7 @@ static int
 open_attr_dir_vnode(struct vnode* vnode, bool kernel)
 {
 	if (!HAS_FS_CALL(vnode, open_attr_dir))
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	void* cookie;
 	status_t status = FS_CALL(vnode, open_attr_dir, &cookie);
@@ -5462,7 +5462,7 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 		{
 			// stat() the node
 			if (!HAS_FS_CALL(vnode, read_stat))
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 
 			struct stat stat;
 			status_t status = FS_CALL(vnode, read_stat, &stat);
@@ -5716,7 +5716,7 @@ dir_read(struct io_context* ioContext, struct vnode* vnode, void* cookie,
 	struct dirent* buffer, size_t bufferSize, uint32* _count)
 {
 	if (!HAS_FS_CALL(vnode, read_dir))
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	status_t error = FS_CALL(vnode, read_dir, cookie, buffer, bufferSize,
 		_count);
@@ -5746,7 +5746,7 @@ dir_rewind(struct file_descriptor* descriptor)
 		return FS_CALL(vnode, rewind_dir, descriptor->cookie);
 	}
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -5876,7 +5876,7 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				status = FS_CALL(vnode, set_flags, descriptor->cookie,
 					(int)argument);
 			} else
-				status = B_NOT_SUPPORTED;
+				status = B_UNSUPPORTED;
 
 			if (status == B_OK) {
 				// update this descriptor's open_mode field
@@ -5969,7 +5969,7 @@ common_sync(int fd, bool kernel)
 	if (HAS_FS_CALL(vnode, fsync))
 		status = FS_CALL_NO_PARAMS(vnode, fsync);
 	else
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 
 	put_fd(descriptor);
 	return status;
@@ -6063,7 +6063,7 @@ common_create_symlink(int fd, char* path, const char* toPath, int mode,
 		status = FS_CALL(vnode, create_symlink, name, toPath, mode);
 	else {
 		status = HAS_FS_CALL(vnode, write)
-			? B_NOT_SUPPORTED : B_READ_ONLY_DEVICE;
+			? B_UNSUPPORTED : B_READ_ONLY_DEVICE;
 	}
 
 	put_vnode(vnode);
@@ -6359,7 +6359,7 @@ attr_dir_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 		return FS_CALL(vnode, read_attr_dir, descriptor->cookie, buffer,
 			bufferSize, _count);
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -6373,7 +6373,7 @@ attr_dir_rewind(struct file_descriptor* descriptor)
 	if (HAS_FS_CALL(vnode, rewind_attr_dir))
 		return FS_CALL(vnode, rewind_attr_dir, descriptor->cookie);
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -6443,7 +6443,7 @@ attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 	}
 
 	if (!HAS_FS_CALL(vnode, open_attr)) {
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 		goto err;
 	}
 
@@ -6505,7 +6505,7 @@ attr_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 		*length));
 
 	if (!HAS_FS_CALL(vnode, read_attr))
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	return FS_CALL(vnode, read_attr, descriptor->cookie, pos, buffer, length);
 }
@@ -6519,7 +6519,7 @@ attr_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 
 	FUNCTION(("attr_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
 	if (!HAS_FS_CALL(vnode, write_attr))
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	return FS_CALL(vnode, write_attr, descriptor->cookie, pos, buffer, length);
 }
@@ -6541,7 +6541,7 @@ attr_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 		{
 			struct vnode* vnode = descriptor->u.vnode;
 			if (!HAS_FS_CALL(vnode, read_stat))
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 
 			struct stat stat;
 			status_t status = FS_CALL(vnode, read_attr_stat, descriptor->cookie,
@@ -6576,7 +6576,7 @@ attr_read_stat(struct file_descriptor* descriptor, struct stat* stat)
 	FUNCTION(("attr_read_stat: stat 0x%p\n", stat));
 
 	if (!HAS_FS_CALL(vnode, read_attr_stat))
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	return FS_CALL(vnode, read_attr_stat, descriptor->cookie, stat);
 }
@@ -6685,7 +6685,7 @@ index_dir_open(dev_t mountID, bool kernel)
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, open_index_dir)) {
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 		goto error;
 	}
 
@@ -6748,7 +6748,7 @@ index_dir_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 			bufferSize, _count);
 	}
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -6760,7 +6760,7 @@ index_dir_rewind(struct file_descriptor* descriptor)
 	if (HAS_FS_MOUNT_CALL(mount, rewind_index_dir))
 		return FS_MOUNT_CALL(mount, rewind_index_dir, descriptor->cookie);
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -6798,9 +6798,9 @@ index_read_stat(struct file_descriptor* descriptor, struct stat* stat)
 	// ToDo: currently unused!
 	FUNCTION(("index_read_stat: stat 0x%p\n", stat));
 	if (!HAS_FS_CALL(vnode, read_index_stat))
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 	//return FS_CALL(vnode, read_index_stat, descriptor->cookie, stat);
 }
 
@@ -6831,7 +6831,7 @@ index_name_read_stat(dev_t mountID, const char* name, struct stat* stat,
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, read_index_stat)) {
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 		goto out;
 	}
 
@@ -6887,7 +6887,7 @@ query_open(dev_t device, const char* query, uint32 flags, port_id port,
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, open_query)) {
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 		goto error;
 	}
 
@@ -6951,7 +6951,7 @@ query_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 			bufferSize, _count);
 	}
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -6963,7 +6963,7 @@ query_rewind(struct file_descriptor* descriptor)
 	if (HAS_FS_MOUNT_CALL(mount, rewind_query))
 		return FS_MOUNT_CALL(mount, rewind_query, descriptor->cookie);
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 
@@ -8230,7 +8230,7 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 		if (descriptor->ops->fd_write_stat)
 			status = descriptor->ops->fd_write_stat(descriptor, stat, statMask);
 		else
-			status = B_NOT_SUPPORTED;
+			status = B_UNSUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -9143,7 +9143,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 		if (descriptor->ops->fd_read_stat)
 			status = descriptor->ops->fd_read_stat(descriptor, &stat);
 		else
-			status = B_NOT_SUPPORTED;
+			status = B_UNSUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -9204,7 +9204,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 			status = descriptor->ops->fd_write_stat(descriptor, &stat,
 				statMask);
 		} else
-			status = B_NOT_SUPPORTED;
+			status = B_UNSUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -9284,7 +9284,7 @@ _user_stat_attr(int fd, const char* attribute, struct attr_info* userAttrInfo)
 	if (descriptor->ops->fd_read_stat)
 		status = descriptor->ops->fd_read_stat(descriptor, &stat);
 	else
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 
 	put_fd(descriptor);
 	_user_close(attr);
