@@ -39,6 +39,8 @@ public:
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
 protected:
 	virtual	void				OwnerChanged(BView* was);
 	virtual	void				AncestorVisibilityChanged(bool shown);

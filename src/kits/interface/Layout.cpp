@@ -618,3 +618,10 @@ BLayout::SetTarget(BView* target)
 	}
 }
 
+
+status_t
+BLayout::Perform(perform_code code, void* _data)
+{
+	return BLayoutItem::Perform(code, _data);
+}
+

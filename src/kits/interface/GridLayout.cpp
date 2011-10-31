@@ -787,3 +787,11 @@ BGridLayout::_LayoutDataForItem(BLayoutItem* item) const
 		return NULL;
 	return (ItemLayoutData*)item->LayoutData();
 }
+
+
+status_t
+BGridLayout::Perform(perform_code d, void* arg)
+{
+	return BTwoDimensionalLayout::Perform(d, arg);
+}
+

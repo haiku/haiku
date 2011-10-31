@@ -33,6 +33,8 @@ public:
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
 private:
 			BSize				fMinSize;
 			BSize				fMaxSize;

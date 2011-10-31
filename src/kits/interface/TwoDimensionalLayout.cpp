@@ -1407,3 +1407,11 @@ BTwoDimensionalLayout::LocalLayouter::LayoutContextLeft(BLayoutContext* context)
 	fHorizontalLayoutContext = NULL;
 	fHorizontalLayoutWidth = -1;
 }
+
+
+status_t
+BTwoDimensionalLayout::Perform(perform_code code, void* _data)
+{
+	return BAbstractLayout::Perform(code, _data);
+}
+

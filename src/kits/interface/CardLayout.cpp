@@ -297,3 +297,11 @@ BCardLayout::_ValidateMinMax()
 	fMinMaxValid = true;
 	ResetLayoutInvalidation();
 }
+
+
+status_t
+BCardLayout::Perform(perform_code d, void* arg)
+{
+	return BAbstractLayout::Perform(d, arg);
+}
+

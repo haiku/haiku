@@ -88,6 +88,8 @@ protected:
 	// To be called when layout data is known to be good
 			void				ResetLayoutInvalidation();
 
+	virtual status_t			Perform(perform_code d, void* arg);
+
 private:
 			friend class BView;
 

@@ -42,6 +42,8 @@ public:
 	virtual status_t			AllArchived(BMessage* into) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
+	virtual status_t			Perform(perform_code d, void* arg);
+
 protected:
 			struct ColumnRowConstraints {
 				float	weight;

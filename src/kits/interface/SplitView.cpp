@@ -323,3 +323,11 @@ BSplitView::_DrawDefaultSplitter(BView* view, BRect frame,
 	be_control_look->DrawSplitter(view, frame, updateRect, view->ViewColor(),
 		orientation, flags, 0);
 }
+
+
+status_t
+BSplitView::Perform(perform_code d, void* arg)
+{
+	return BView::Perform(d, arg);
+}
+

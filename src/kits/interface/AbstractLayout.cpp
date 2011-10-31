@@ -458,3 +458,10 @@ BAbstractLayout::AncestorVisibilityChanged(bool shown)
 	BLayout::AncestorVisibilityChanged(shown);
 }
 
+
+status_t
+BAbstractLayout::Perform(perform_code code, void* _data)
+{
+	return BLayout::Perform(code, _data);
+}
+

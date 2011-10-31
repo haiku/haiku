@@ -66,6 +66,8 @@ public:
 	virtual status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
 protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
@@ -81,7 +83,6 @@ protected:
 									ColumnRowConstraints* constraints);
 	virtual	void				GetItemDimensions(BLayoutItem* item,
 									Dimensions* dimensions);
-
 private:
 			class DummyLayoutItem;
 			class RowInfoArray;

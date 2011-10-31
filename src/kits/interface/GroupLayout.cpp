@@ -326,3 +326,11 @@ BGroupLayout::_LayoutDataForItem(BLayoutItem* item) const
 		return NULL;
 	return (ItemLayoutData*)item->LayoutData();
 }
+
+
+status_t
+BGroupLayout::Perform(perform_code code, void* _data)
+{
+	return BTwoDimensionalLayout::Perform(code, _data);
+}
+

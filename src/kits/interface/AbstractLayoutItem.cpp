@@ -152,3 +152,11 @@ BAbstractLayoutItem::Archive(BMessage* into, bool deep) const
 
 	return archiver.Finish(err);
 }
+
+
+status_t
+BAbstractLayoutItem::Perform(perform_code d, void* arg)
+{
+	return BLayoutItem::Perform(d, arg);
+}
+

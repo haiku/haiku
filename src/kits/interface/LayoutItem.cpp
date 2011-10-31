@@ -184,6 +184,13 @@ BLayoutItem::SetLayout(BLayout* layout)
 }
 
 
+status_t
+BLayoutItem::Perform(perform_code code, void* _data)
+{
+	return BArchivable::Perform(code, _data);
+}
+
+
 void
 BLayoutItem::LayoutInvalidated(bool children)
 {
