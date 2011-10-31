@@ -2137,15 +2137,6 @@ heap_init_post_area()
 status_t
 heap_init_post_sem()
 {
-#if PARANOID_KERNEL_MALLOC
-	vm_block_address_range("uninitialized heap memory",
-		(void *)ROUNDDOWN(0xcccccccc, B_PAGE_SIZE), B_PAGE_SIZE * 64);
-#endif
-#if PARANOID_KERNEL_FREE
-	vm_block_address_range("freed heap memory",
-		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
-#endif
-
 	sHeapGrowSem = create_sem(0, "heap_grow_sem");
 	if (sHeapGrowSem < 0) {
 		panic("heap_init_post_sem(): failed to create heap grow sem\n");

@@ -3739,6 +3739,15 @@ vm_init(kernel_args* args)
 	void* lastPage = (void*)ROUNDDOWN(~(addr_t)0, B_PAGE_SIZE);
 	vm_block_address_range("overflow protection", lastPage, B_PAGE_SIZE);
 
+#if PARANOID_KERNEL_MALLOC
+	vm_block_address_range("uninitialized heap memory",
+		(void *)ROUNDDOWN(0xcccccccc, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
+#if PARANOID_KERNEL_FREE
+	vm_block_address_range("freed heap memory",
+		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
+
 	// create the object cache for the page mappings
 	gPageMappingsObjectCache = create_object_cache_etc("page mappings",
 		sizeof(vm_page_mapping), 0, 0, 64, 128, CACHE_LARGE_SLAB, NULL, NULL,
