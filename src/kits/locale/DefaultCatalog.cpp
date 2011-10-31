@@ -56,35 +56,6 @@ const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
 	// give highest priority to our embedded catalog-add-on
 
 
-void DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
-{
-	// figure out mimetype from image
-	BFile objectFile(&catalogOwner, B_READ_ONLY);
-	BAppFileInfo objectInfo(&objectFile);
-	char objectSignature[B_MIME_TYPE_LENGTH];
-	if (objectInfo.GetSignature(objectSignature) != B_OK) {
-		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
-			" localization.", catalogOwner.name);
-		fSignature = "";
-		return;
-	}
-
-	// drop supertype from mimetype (should be "application/"):
-	char* stripSignature = objectSignature;
-	while (*stripSignature != '/' && *stripSignature != '\0')
-		stripSignature ++;
-
-	if (*stripSignature == '\0')
-		stripSignature = objectSignature;
-	else
-		stripSignature ++;
-
-	log_team(LOG_DEBUG, "Image %s requested catalog with mimetype %s",
-		catalogOwner.name, stripSignature);
-	fSignature = stripSignature;
-}
-
-
 /*!	Constructs a DefaultCatalog with given signature and language and reads
 	the catalog from disk.
 	InitCheck() will be B_OK if catalog could be loaded successfully, it will
@@ -184,6 +155,36 @@ DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 
 DefaultCatalog::~DefaultCatalog()
 {
+}
+
+
+void
+DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
+{
+	// figure out mimetype from image
+	BFile objectFile(&catalogOwner, B_READ_ONLY);
+	BAppFileInfo objectInfo(&objectFile);
+	char objectSignature[B_MIME_TYPE_LENGTH];
+	if (objectInfo.GetSignature(objectSignature) != B_OK) {
+		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
+			" localization.", catalogOwner.name);
+		fSignature = "";
+		return;
+	}
+
+	// drop supertype from mimetype (should be "application/"):
+	char* stripSignature = objectSignature;
+	while (*stripSignature != '/' && *stripSignature != '\0')
+		stripSignature ++;
+
+	if (*stripSignature == '\0')
+		stripSignature = objectSignature;
+	else
+		stripSignature ++;
+
+	log_team(LOG_DEBUG, "Image %s requested catalog with mimetype %s",
+		catalogOwner.name, stripSignature);
+	fSignature = stripSignature;
 }
 
 

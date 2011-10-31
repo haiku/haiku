@@ -56,45 +56,20 @@ static int16 kCatArchiveVersion = 1;
 	// version of the catalog archive structure, bump this if you change it!
 
 
-const char* getCatalogSignature(const entry_ref &catalogOwner)
-{
-	// figure out mimetype from image
-	BFile objectFile(&catalogOwner, B_READ_ONLY);
-	BAppFileInfo objectInfo(&objectFile);
-	char objectSignature[B_MIME_TYPE_LENGTH];
-	if (objectInfo.GetSignature(objectSignature) != B_OK) {
-		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
-			" localization.", catalogOwner.name);
-		return NULL;
-	}
-
-	// drop supertype from mimetype (should be "application/"):
-	char* stripSignature = objectSignature;
-	while (*stripSignature != '/')
-		stripSignature ++;
-	stripSignature ++;
-
-	log_team(LOG_DEBUG, "Image %s requested catalog with mimetype %s",
-		catalogOwner.name, stripSignature);
-
-	return stripSignature;
-}
-
-
 /*!	Constructs a DefaultCatalog with given signature and language and reads
 	the catalog from disk.
 	InitCheck() will be B_OK if catalog could be loaded successfully, it will
 	give an appropriate error-code otherwise.
 */
-DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *language,
-	uint32 fingerprint)
+DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner,
+	const char *language, uint32 fingerprint)
 	:
-	BHashMapCatalog(getCatalogSignature(catalogOwner), language, fingerprint)
+	BHashMapCatalog("", language, fingerprint)
 {
 	fInitCheck = B_NOT_SUPPORTED;
 	fprintf(stderr,
 		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
-		getCatalogSignature(catalogOwner), language, strerror(fInitCheck));
+		"", language, strerror(fInitCheck));
 }
 
 
@@ -130,6 +105,14 @@ DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 
 DefaultCatalog::~DefaultCatalog()
 {
+}
+
+
+void
+DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
+{
+	// Not allowed for the build-tool version.
+	return;
 }
 
 
