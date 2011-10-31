@@ -15,8 +15,8 @@ _progress 0.0 "desktop files"
 
 for f in $(/bin/finddir B_DESKTOP_DIRECTORY 2>/dev/null\
 	|| echo "/boot/home/Desktop")/*; do
-	if [ -f $f ]; then
-		mimeset -f $f
+	if [ -f "$f" ]; then
+		mimeset -f "$f"
 	fi
 done
 
