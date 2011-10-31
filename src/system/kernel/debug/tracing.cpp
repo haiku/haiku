@@ -737,17 +737,6 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 //	#pragma mark -
 
 
-AbstractTraceEntry::AbstractTraceEntry()
-{
-	Thread* thread = thread_get_current_thread();
-	if (thread != NULL) {
-		fThread = thread->id;
-		if (thread->team)
-			fTeam = thread->team->id;
-	}
-	fTime = system_time();
-}
-
 AbstractTraceEntry::~AbstractTraceEntry()
 {
 }
@@ -774,6 +763,38 @@ AbstractTraceEntry::Dump(TraceOutput& out)
 void
 AbstractTraceEntry::AddDump(TraceOutput& out)
 {
+}
+
+
+void
+AbstractTraceEntry::_Init()
+{
+	Thread* thread = thread_get_current_thread();
+	if (thread != NULL) {
+		fThread = thread->id;
+		if (thread->team)
+			fTeam = thread->team->id;
+	}
+	fTime = system_time();
+}
+
+
+//	#pragma mark - AbstractTraceEntryWithStackTrace
+
+
+
+AbstractTraceEntryWithStackTrace::AbstractTraceEntryWithStackTrace(
+	size_t stackTraceDepth, size_t skipFrames, bool kernelOnly)
+{
+	fStackTrace = capture_tracing_stack_trace(stackTraceDepth, skipFrames + 1,
+		kernelOnly);
+}
+
+
+void
+AbstractTraceEntryWithStackTrace::DumpStackTrace(TraceOutput& out)
+{
+	out.PrintStackTrace(fStackTrace);
 }
 
 

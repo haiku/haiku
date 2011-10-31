@@ -92,23 +92,70 @@ class TraceEntry {
 
 
 class AbstractTraceEntry : public TraceEntry {
-	public:
-		AbstractTraceEntry();
-		virtual ~AbstractTraceEntry();
+public:
+	AbstractTraceEntry()
+	{
+		_Init();
+	}
 
-		virtual void Dump(TraceOutput& out);
+	// dummy, ignores all arguments
+	AbstractTraceEntry(size_t, size_t, bool)
+	{
+		_Init();
+	}
 
-		virtual void AddDump(TraceOutput& out);
+	virtual ~AbstractTraceEntry();
 
-		thread_id ThreadID() const	{ return fThread; }
-		thread_id TeamID() const	{ return fTeam; }
-		bigtime_t Time() const		{ return fTime; }
+	virtual void Dump(TraceOutput& out);
 
-	protected:
-		thread_id	fThread;
-		team_id		fTeam;
-		bigtime_t	fTime;
+	virtual void AddDump(TraceOutput& out);
+
+	thread_id ThreadID() const	{ return fThread; }
+	thread_id TeamID() const	{ return fTeam; }
+	bigtime_t Time() const		{ return fTime; }
+
+protected:
+	typedef AbstractTraceEntry TraceEntryBase;
+
+private:
+	void _Init();
+
+protected:
+	thread_id	fThread;
+	team_id		fTeam;
+	bigtime_t	fTime;
 };
+
+
+class AbstractTraceEntryWithStackTrace : public AbstractTraceEntry {
+public:
+	AbstractTraceEntryWithStackTrace(size_t stackTraceDepth,
+		size_t skipFrames, bool kernelOnly);
+
+	virtual void DumpStackTrace(TraceOutput& out);
+
+protected:
+	typedef AbstractTraceEntryWithStackTrace TraceEntryBase;
+
+private:
+	tracing_stack_trace* fStackTrace;
+};
+
+
+template<bool stackTraceDepth>
+struct AbstractTraceEntrySelector {
+	typedef AbstractTraceEntryWithStackTrace Type;
+};
+
+
+template<>
+struct AbstractTraceEntrySelector<0> {
+	typedef AbstractTraceEntry Type;
+};
+
+
+#define TRACE_ENTRY_SELECTOR(stackTraceDepth) \
+	AbstractTraceEntrySelector<stackTraceDepth>::Type
 
 
 class LazyTraceOutput : public TraceOutput {
