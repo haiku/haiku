@@ -14,6 +14,7 @@
 
 #include <String.h>
 #include <View.h>
+#include <stdio.h>
 
 
 class TTZDisplay : public BView {

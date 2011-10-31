@@ -89,11 +89,8 @@ TTimeWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgChange:
-			_SetRevertStatus();
-			break;
-
-		case kMsgClockSettingChanged:
 		{
+			_SetRevertStatus();
 			bool useGMTTime = true;
 			message->FindBool("UseGMT", &useGMTTime);
 			if (useGMTTime) {
@@ -103,7 +100,11 @@ TTimeWindow::MessageReceived(BMessage* message)
 				BMessage hide(H_HIDE_PREVIEW);
 				fTimeZoneView->MessageReceived(&hide);
 			}
+			break;
 		}
+
+		case kMsgClockSettingChanged:
+			break;
 
 		default:
 			BWindow::MessageReceived(message);

@@ -183,7 +183,7 @@ TAnalogClock::MaxSize()
 BSize
 TAnalogClock::MinSize()
 {
-	return BSize(0, 0);
+	return BSize(64.f, 64.f);
 }
 
 

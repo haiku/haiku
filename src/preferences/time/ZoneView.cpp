@@ -35,9 +35,11 @@
 #include <MutableLocaleRoster.h>
 #include <OutlineListView.h>
 #include <Path.h>
+#include <RadioButton.h>
 #include <ScrollView.h>
 #include <StorageDefs.h>
 #include <String.h>
+#include <StringView.h>
 #include <TimeZone.h>
 #include <ToolTip.h>
 #include <View.h>
@@ -80,11 +82,14 @@ private:
 TimeZoneView::TimeZoneView(const char* name)
 	:
 	BGroupView(name, B_HORIZONTAL, B_USE_DEFAULT_SPACING),
+	fGmtTime(NULL),
 	fToolTip(NULL),
+	fUseGmtTime(false),
 	fCurrentZoneItem(NULL),
 	fOldZoneItem(NULL),
 	fInitialized(false)
 {
+	_ReadRTCSettings();
 	_InitView();
 }
 
@@ -92,7 +97,10 @@ TimeZoneView::TimeZoneView(const char* name)
 bool
 TimeZoneView::CheckCanRevert()
 {
-	return fCurrentZoneItem != fOldZoneItem;
+	// check GMT vs Local setting
+	bool enable = fUseGmtTime != fOldUseGmtTime;
+
+	return enable || fCurrentZoneItem != fOldZoneItem;
 }
 
 
@@ -100,6 +108,7 @@ TimeZoneView::~TimeZoneView()
 {
 	if (fToolTip != NULL)
 		fToolTip->ReleaseReference();
+	_WriteRTCSettings();
 }
 
 
@@ -158,7 +167,7 @@ TimeZoneView::MessageReceived(BMessage* message)
 		case H_SET_TIME_ZONE:
 		{
 			_SetSystemTimeZone();
-			Looper()->PostMessage(new BMessage(kMsgChange));
+			_NotifyClockSettingChanged();
 			break;
 		}
 
@@ -177,6 +186,8 @@ TimeZoneView::MessageReceived(BMessage* message)
 			break;
 
 		case kRTCUpdate:
+			fUseGmtTime = fGmtTime->Value() == B_CONTROL_ON;
+			_UpdateGmtSettings();
 			_UpdateCurrent();
 			_UpdatePreview();
 			break;
@@ -248,6 +259,7 @@ TimeZoneView::_InitView()
 	_BuildZoneMenu();
 	BScrollView* scrollList = new BScrollView("scrollList", fZoneList,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
+	scrollList->SetExplicitMinSize(BSize(200, 0));
 
 	fCurrent = new TTZDisplay("currentTime", B_TRANSLATE("Current time:"));
 	fPreview = new TTZDisplay("previewTime", B_TRANSLATE("Preview time:"));
@@ -258,6 +270,20 @@ TimeZoneView::_InitView()
 	fSetZone->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
+	BStringView* text = new BStringView("clockSetTo",
+		B_TRANSLATE("Hardware clock set to:"));
+	fLocalTime = new BRadioButton("localTime",
+		B_TRANSLATE("Local time (Windows compatible)"), new BMessage(kRTCUpdate));
+	fGmtTime = new BRadioButton("greenwichMeanTime",
+		B_TRANSLATE("GMT (UNIX compatible)"), new BMessage(kRTCUpdate));
+
+	if (fUseGmtTime)
+		fGmtTime->SetValue(B_CONTROL_ON);
+	else
+		fLocalTime->SetValue(B_CONTROL_ON);
+	fOldUseGmtTime = fUseGmtTime;
+
+
 	const float kInset = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
@@ -265,6 +291,11 @@ TimeZoneView::_InitView()
 			.Add(fCurrent)
 			.Add(fPreview)
 			.AddGlue()
+			.Add(text)
+			.AddGroup(B_VERTICAL, kInset)
+				.Add(fLocalTime)
+				.Add(fGmtTime)
+			.End()
 			.Add(fSetZone)
 		.End()
 		.SetInsets(kInset, kInset, kInset, kInset);
@@ -463,6 +494,13 @@ TimeZoneView::_Revert()
 		fZoneList->DeselectAll();
 	fZoneList->ScrollToSelection();
 
+	fUseGmtTime = fOldUseGmtTime;
+	if (fUseGmtTime)
+		fGmtTime->SetValue(B_CONTROL_ON);
+	else
+		fLocalTime->SetValue(B_CONTROL_ON);
+
+	_UpdateGmtSettings();
 	_SetSystemTimeZone();
 	_UpdatePreview();
 	_UpdateCurrent();
@@ -555,3 +593,65 @@ TimeZoneView::_FormatTime(const BTimeZone& timeZone)
 
 	return result;
 }
+
+
+void
+TimeZoneView::_ReadRTCSettings()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	path.Append("RTC_time_settings");
+
+	BEntry entry(path.Path());
+	if (entry.Exists()) {
+		BFile file(&entry, B_READ_ONLY);
+		if (file.InitCheck() == B_OK) {
+			char buffer[6];
+			file.Read(buffer, 6);
+			if (strncmp(buffer, "gmt", 3) == 0)
+				fUseGmtTime = true;
+		}
+	}
+}
+
+
+void
+TimeZoneView::_WriteRTCSettings()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+		return;
+
+	path.Append("RTC_time_settings");
+
+	BFile file(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	if (file.InitCheck() == B_OK) {
+		if (fUseGmtTime)
+			file.Write("gmt", 3);
+		else
+			file.Write("local", 5);
+	}
+}
+
+
+void
+TimeZoneView::_UpdateGmtSettings()
+{
+	_WriteRTCSettings();
+
+	_NotifyClockSettingChanged();
+
+	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
+}
+
+
+void
+TimeZoneView::_NotifyClockSettingChanged()
+{
+	BMessage msg(kMsgChange);
+	msg.AddBool("UseGMT", fUseGmtTime);
+	Window()->PostMessage(&msg);
+}
+
