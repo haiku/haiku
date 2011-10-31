@@ -2088,9 +2088,10 @@ BWindow::DecoratorFrame() const
 		settings.FindFloat("border width", &borderWidth);
 	} else {
 		// probably no-border window look
-		if (fLook == B_NO_BORDER_WINDOW_LOOK) {
-			borderWidth = 0.0;
-		}
+		if (fLook == B_NO_BORDER_WINDOW_LOOK)
+			borderWidth = 0.f;
+		else if (fLook == B_BORDERED_WINDOW_LOOK)
+			borderWidth = 1.f;
 		// else use fall-back values from above
 	}
 

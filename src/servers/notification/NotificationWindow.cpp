@@ -55,14 +55,17 @@ const float kSmallPadding			= 2;
 NotificationWindow::NotificationWindow()
 	:
 	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_MARK("Notification"), 
-		kLeftTitledWindowLook, B_FLOATING_ALL_WINDOW_FEEL, B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE 
-		| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_NOT_MOVABLE, 
+		B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL, B_AVOID_FRONT
+		| B_AVOID_FOCUS | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
+		| B_NOT_RESIZABLE | B_NOT_MOVABLE, 
 		B_ALL_WORKSPACES)
 {
 	fBorder = new BorderView(Bounds(), "Notification");
 
 	AddChild(fBorder);
 	
+	// Needed so everything gets the right size - we should switch to layout
+	// mode...
 	Show();
 	Hide();
 
@@ -379,6 +382,7 @@ NotificationWindow::SetPosition()
 	float rightOffset = bounds.right - Frame().right;
 	float bottomOffset = bounds.bottom - Frame().bottom;
 		// Size of the borders around the window
+	printf("%f %f %f %f\n",leftOffset, topOffset, rightOffset, bottomOffset);
 	
 	float x = Frame().left, y = Frame().top;
 		// If we can't guess, don't move...

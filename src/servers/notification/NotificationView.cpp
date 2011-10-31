@@ -105,8 +105,8 @@ NotificationView::NotificationView(NotificationWindow* win,
 			break;
 		case B_PROGRESS_NOTIFICATION:
 		{
-			BRect frame(kIconStripeWidth + 8, Bounds().bottom - 36,
-				Bounds().right - 8, Bounds().bottom - 8);
+			BRect frame(kIconStripeWidth + 9, Bounds().bottom - 36,
+				Bounds().right - 8, Bounds().bottom - 10);
 			BStatusBar* progress = new BStatusBar(frame, "progress");
 			progress->SetBarHeight(12.0f);
 			progress->SetMaxValue(1.0f);
