@@ -10,6 +10,7 @@
 #include "Volume.h"
 #include "Journal.h"
 #include "Inode.h"
+#include "Attribute.h"
 #include "Query.h"
 
 
@@ -412,19 +413,28 @@ Volume::Mount(const char* deviceName, uint32 flags)
 				// we don't use the vnode layer to access the indices node
 			}
 
-			// all went fine
-			opener.Keep();
-			return B_OK;
 		} else
+		  {
 			FATAL(("could not create root node: publish_vnode() failed!\n"));
+			delete fRootNode;
+			return status;
+		  }
 
-		delete fRootNode;
 	} else {
 		status = B_BAD_VALUE;
 		FATAL(("could not create root node!\n"));
+		return status;
 	}
 
-	return status;
+	if (!(fFlags & VOLUME_READ_ONLY)) {
+		Attribute attr(fRootNode);
+		if (attr.Get ("be:volume_id") == B_ENTRY_NOT_FOUND)
+			CreateVolumeID();
+	}
+
+	// all went fine
+	opener.Keep();
+	return B_OK;
 }
 
 
@@ -499,6 +509,33 @@ Volume::CreateIndicesRoot(Transaction& transaction)
 	fSuperBlock.indices = ToBlockRun(id);
 	return WriteSuperBlock();
 }
+
+
+status_t
+Volume::CreateVolumeID()
+{
+	Attribute attr(fRootNode);
+	status_t status;
+	attr_cookie* cookie;
+	status = attr.Create("be:volume_id", B_UINT64_TYPE, O_RDWR, &cookie);
+	if (status == B_OK) {
+		static bool seeded = false;
+		if (!seeded) {
+			// seed the random number generator for the be:volume_id attribute.
+			srand(time(NULL));
+			seeded = true;
+		}
+		uint64_t id;
+		size_t len = sizeof (id);
+		id = ((uint64_t) rand () << 32) | rand ();
+		Transaction transaction(this, fRootNode->BlockNumber());
+		fRootNode->WriteLockInTransaction(transaction);
+		attr.Write(transaction, cookie, 0, (uint8_t *) &id, &len, NULL);
+		transaction.Done();
+	}
+	return status;
+}
+
 
 
 status_t
@@ -731,6 +768,8 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 		if (status < B_OK)
 			return status;
 	}
+
+	CreateVolumeID();
 
 	WriteSuperBlock();
 	transaction.Done();
