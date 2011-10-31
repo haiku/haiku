@@ -54,10 +54,12 @@ static ConditionVariable sMaintenanceCondition;
 
 namespace SlabObjectCacheTracing {
 
-class ObjectCacheTraceEntry : public AbstractTraceEntry {
+class ObjectCacheTraceEntry
+	: public TRACE_ENTRY_SELECTOR(SLAB_OBJECT_CACHE_TRACING_STACK_TRACE) {
 	public:
 		ObjectCacheTraceEntry(ObjectCache* cache)
 			:
+			TraceEntryBase(SLAB_OBJECT_CACHE_TRACING_STACK_TRACE, 0, true),
 			fCache(cache)
 		{
 		}
@@ -668,7 +670,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 		void* object = object_depot_obtain(&cache->depot);
 		if (object) {
 			T(Alloc(cache, flags, object));
-			return object;
+			return fill_allocated_block(object, cache->object_size);
 		}
 	}
 
@@ -717,7 +719,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 
 	void* object = link_to_object(link, cache->object_size);
 	T(Alloc(cache, flags, object));
-	return object;
+	return fill_allocated_block(object, cache->object_size);
 }
 
 
@@ -729,7 +731,24 @@ object_cache_free(object_cache* cache, void* object, uint32 flags)
 
 	T(Free(cache, object));
 
-	if (!(cache->flags & CACHE_NO_DEPOT)) {
+#if PARANOID_KERNEL_FREE
+	// TODO: allow forcing the check even if we don't find deadbeef
+	if (*(uint32*)object == 0xdeadbeef) {
+		if (!cache->AssertObjectNotFreed(object))
+			return;
+
+		if ((cache->flags & CACHE_NO_DEPOT) == 0) {
+			if (object_depot_contains_object(&cache->depot, object)) {
+				panic("object_cache: object %p is already freed", object);
+				return;
+			}
+		}
+	}
+
+	fill_freed_block(object, cache->object_size);
+#endif
+
+	if ((cache->flags & CACHE_NO_DEPOT) == 0) {
 		object_depot_store(&cache->depot, object, flags);
 		return;
 	}

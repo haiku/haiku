@@ -107,6 +107,10 @@ public:
 			void				FreePages(void* pages);
 			status_t			EarlyAllocatePages(void** pages, uint32 flags);
 			void				EarlyFreePages(void* pages);
+
+#if PARANOID_KERNEL_FREE
+			bool				AssertObjectNotFreed(void* object);
+#endif
 };
 
 

@@ -45,6 +45,10 @@ void object_depot_store(object_depot* depot, void* object, uint32 flags);
 
 void object_depot_make_empty(object_depot* depot, uint32 flags);
 
+#if PARANOID_KERNEL_FREE
+bool object_depot_contains_object(object_depot* depot, void* object);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

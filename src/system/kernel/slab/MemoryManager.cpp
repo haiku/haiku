@@ -617,7 +617,11 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 					? CREATE_AREA_DONT_WAIT : 0)
 				| CREATE_AREA_DONT_CLEAR,
 			&virtualRestrictions, &physicalRestrictions, &_pages);
-		return area >= 0 ? B_OK : area;
+
+		status_t result = area >= 0 ? B_OK : area;
+		if (result == B_OK)
+			fill_allocated_block(_pages, size);
+		return result;
 	}
 
 	// determine chunk size (small or medium)
@@ -655,6 +659,8 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 
 	chunk->reference = (addr_t)chunkAddress + size - 1;
 	_pages = (void*)chunkAddress;
+
+	fill_allocated_block(_pages, size);
 
 	TRACE("MemoryManager::AllocateRaw() done: %p (meta chunk: %d, chunk %d)\n",
 		_pages, int(metaChunk - area->metaChunks),

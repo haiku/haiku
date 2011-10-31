@@ -84,4 +84,41 @@ slab_internal_free(void* buffer, uint32 flags)
 }
 
 
+#if PARANOID_KERNEL_MALLOC || PARANOID_KERNEL_FREE
+static inline void*
+fill_block(void* buffer, size_t size, uint32 pattern)
+{
+	if (buffer == NULL)
+		return NULL;
+
+	size &= ~(sizeof(pattern) - 1);
+	for (size_t i = 0; i < size / sizeof(pattern); i++)
+		((uint32*)buffer)[i] = pattern;
+
+	return buffer;
+}
+#endif
+
+
+static inline void*
+fill_allocated_block(void* buffer, size_t size)
+{
+#if PARANOID_KERNEL_MALLOC
+	return fill_block(buffer, size, 0xcccccccc);
+#else
+	return buffer;
+#endif
+}
+
+
+static inline void*
+fill_freed_block(void* buffer, size_t size)
+{
+#if PARANOID_KERNEL_FREE
+	return fill_block(buffer, size, 0xdeadbeef);
+#else
+	return buffer;
+#endif
+}
+
 #endif	// SLAB_PRIVATE_H

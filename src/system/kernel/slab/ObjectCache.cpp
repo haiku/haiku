@@ -238,3 +238,32 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 		partial.Add(source);
 	}
 }
+
+
+#if PARANOID_KERNEL_FREE
+
+bool
+ObjectCache::AssertObjectNotFreed(void* object)
+{
+	MutexLocker locker(lock);
+
+	slab* source = ObjectSlab(object);
+	if (!partial.Contains(source) && !full.Contains(source)) {
+		panic("object_cache: to be freed object slab not part of cache!");
+		return false;
+	}
+
+	object_link* link = object_to_link(object, object_size);
+	for (object_link* freeLink = source->free; freeLink != NULL;
+			freeLink = freeLink->next) {
+		if (freeLink == link) {
+			panic("object_cache: double free of %p (slab %p, cache %p)",
+				object, source, this);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+#endif // PARANOID_KERNEL_FREE
