@@ -61,6 +61,7 @@ private:
 			uint32				fModifiers;
 			uint32				fCommandKey;
 			uint32				fControlKey;
+			uint16				fKeyboardID;
 
 	volatile bool				fUpdateSettings;
 	volatile uint32				fSettingsCommand;

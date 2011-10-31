@@ -510,7 +510,10 @@ InputServer::MessageReceived(BMessage* message)
 			status = HandleGetSetMouseMap(message, &reply);
 			break;
 		case IS_GET_KEYBOARD_ID:
-			status = HandleGetKeyboardID(message, &reply);
+			status = HandleGetSetKeyboardID(message, &reply);
+			break;
+		case IS_SET_KEYBOARD_ID:
+			status = HandleGetSetKeyboardID(message, &reply);
 			break;
 		case IS_GET_CLICK_SPEED:
 			status = HandleGetSetClickSpeed(message, &reply);
@@ -870,8 +873,14 @@ InputServer::HandleGetSetMouseMap(BMessage* message, BMessage* reply)
 
 
 status_t
-InputServer::HandleGetKeyboardID(BMessage* message, BMessage* reply)
+InputServer::HandleGetSetKeyboardID(BMessage* message, BMessage* reply)
 {
+	int16 id;
+message->PrintToStream();
+	if (message->FindInt16("id", &id) == B_OK) {
+		fKeyboardID = (uint16)id;
+		return B_OK;
+	}
 	return reply->AddInt16("id", fKeyboardID);
 }
 

@@ -131,6 +131,7 @@ KeyboardDevice::KeyboardDevice(KeyboardInputDevice* owner, const char* path)
 	fThread(-1),
 	fActive(false),
 	fInputMethodStarted(false),
+	fKeyboardID(0),
 	fUpdateSettings(false),
 	fSettingsCommand(0),
 	fKeymapLock("keymap lock")
@@ -280,6 +281,14 @@ KeyboardDevice::_ControlThread()
 	bool ctrlAltDelPressed = false;
 
 	memset(states, 0, sizeof(states));
+
+	if (fKeyboardID == 0) {
+		if (ioctl(fFD, KB_GET_KEYBOARD_ID, &fKeyboardID) == 0) {
+			BMessage message(IS_SET_KEYBOARD_ID);
+			message.AddInt16("id", fKeyboardID);
+			be_app->PostMessage(&message);
+		}
+	}
 
 	while (fActive) {
 		if (ioctl(fFD, KB_READ, &keyInfo, sizeof(keyInfo)) != B_OK) {

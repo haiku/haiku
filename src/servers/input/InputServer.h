@@ -137,7 +137,7 @@ class InputServer : public BApplication {
 		status_t HandleGetSetMouseSpeed(BMessage* message, BMessage* reply);
 		status_t HandleSetMousePosition(BMessage* message, BMessage* reply);
 		status_t HandleGetSetMouseMap(BMessage* message, BMessage* reply);
-		status_t HandleGetKeyboardID(BMessage* message, BMessage* reply);
+		status_t HandleGetSetKeyboardID(BMessage* message, BMessage* reply);
 		status_t HandleGetSetClickSpeed(BMessage* message, BMessage* reply);
 		status_t HandleGetSetKeyRepeatRate(BMessage* message, BMessage* reply);
 		status_t HandleGetSetKeyMap(BMessage* message, BMessage* reply);
