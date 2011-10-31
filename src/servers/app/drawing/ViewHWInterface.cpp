@@ -104,6 +104,7 @@ run_app_thread(void* cookie)
 	if (BApplication* app = (BApplication*)cookie) {
 		app->Lock();
 		app->Run();
+		delete app;
 	}
 	return 0;
 }
