@@ -964,7 +964,7 @@ SMTPProtocol::ReceiveResponse(BString &out)
             result = 1;
         else
 #endif
-            result = select(32, &fds, NULL, NULL, &tv);
+            result = select(1, &fds, NULL, NULL, &tv);
 	if (result < 0)
 		return errno;
 
