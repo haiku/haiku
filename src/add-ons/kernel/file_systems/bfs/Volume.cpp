@@ -6,12 +6,12 @@
 //! super block, mounting, etc.
 
 
-#include "Debug.h"
-#include "Volume.h"
-#include "Journal.h"
-#include "Inode.h"
 #include "Attribute.h"
+#include "Debug.h"
+#include "Inode.h"
+#include "Journal.h"
 #include "Query.h"
+#include "Volume.h"
 
 
 static const int32 kDesiredAllocationGroups = 56;
@@ -412,14 +412,11 @@ Volume::Mount(const char* deviceName, uint32 flags)
 			} else {
 				// we don't use the vnode layer to access the indices node
 			}
-
-		} else
-		  {
+		} else {
 			FATAL(("could not create root node: publish_vnode() failed!\n"));
 			delete fRootNode;
 			return status;
-		  }
-
+		}
 	} else {
 		status = B_BAD_VALUE;
 		FATAL(("could not create root node!\n"));
@@ -428,7 +425,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	if (!(fFlags & VOLUME_READ_ONLY)) {
 		Attribute attr(fRootNode);
-		if (attr.Get ("be:volume_id") == B_ENTRY_NOT_FOUND)
+		if (attr.Get("be:volume_id") == B_ENTRY_NOT_FOUND)
 			CreateVolumeID();
 	}
 
@@ -526,11 +523,11 @@ Volume::CreateVolumeID()
 			seeded = true;
 		}
 		uint64_t id;
-		size_t len = sizeof (id);
-		id = ((uint64_t) rand () << 32) | rand ();
+		size_t length = sizeof(id);
+		id = ((uint64_t)rand() << 32) | rand();
 		Transaction transaction(this, fRootNode->BlockNumber());
 		fRootNode->WriteLockInTransaction(transaction);
-		attr.Write(transaction, cookie, 0, (uint8_t *) &id, &len, NULL);
+		attr.Write(transaction, cookie, 0, (uint8_t *)&id, &length, NULL);
 		transaction.Done();
 	}
 	return status;
