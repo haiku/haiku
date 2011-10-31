@@ -42,7 +42,7 @@ print_formatting_conventions()
 {
 	BFormattingConventions conventions;
 	BLocale::Default()->GetFormattingConventions(&conventions);
-	printf("%s_%s.UTF-8", conventions.LanguageCode(), conventions.CountryCode());
+	printf("%s_%s.UTF-8\n", conventions.LanguageCode(), conventions.CountryCode());
 }
 
 
@@ -75,10 +75,10 @@ main(int argc, char **argv)
 	while ((c = getopt_long(argc, argv, "lcfh", longopts, NULL)) != -1) {
 		switch (c) {
 			case 'l':
-				printf("%s", preferred_language());
+				printf("%s\n", preferred_language());
 				break;
 			case 'c':
-				printf("%s.UTF-8", preferred_language());
+				printf("%s.UTF-8\n", preferred_language());
 				break;
 			case 'f':
 				print_formatting_conventions();
