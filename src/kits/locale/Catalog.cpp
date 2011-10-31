@@ -26,10 +26,10 @@ BCatalog::BCatalog()
 }
 
 
-BCatalog::BCatalog(const char *signature, const char *language,
+BCatalog::BCatalog(const entry_ref &catalogOwner, const char *language,
 	uint32 fingerprint)
 {
-	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(signature, language,
+	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner, language,
 		fingerprint);
 }
 
@@ -98,12 +98,12 @@ BCatalog::GetData(uint32 id, BMessage *msg)
 
 
 status_t
-BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
+BCatalog::SetCatalog(const entry_ref &catalogOwner, uint32 fingerprint)
 {
 	// This is not thread safe. It is used only in ReadOnlyBootPrompt and should
 	// not do harm there, but not sure what to do about it…
 	MutableLocaleRoster::Default()->UnloadCatalog(fCatalog);
-	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(signature, NULL,
+	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner, NULL,
 		fingerprint);
 
 	return B_OK;

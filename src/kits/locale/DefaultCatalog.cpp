@@ -12,6 +12,7 @@
 #include <new>
 #include <syslog.h>
 
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <DataIO.h>
 #include <Directory.h>
@@ -55,16 +56,47 @@ const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
 	// give highest priority to our embedded catalog-add-on
 
 
+void DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
+{
+	// figure out mimetype from image
+	BFile objectFile(&catalogOwner, B_READ_ONLY);
+	BAppFileInfo objectInfo(&objectFile);
+	char objectSignature[B_MIME_TYPE_LENGTH];
+	if (objectInfo.GetSignature(objectSignature) != B_OK) {
+		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
+			" localization.", catalogOwner.name);
+		fSignature = "";
+		return;
+	}
+
+	// drop supertype from mimetype (should be "application/"):
+	char* stripSignature = objectSignature;
+	while (*stripSignature != '/' && *stripSignature != '\0')
+		stripSignature ++;
+
+	if (*stripSignature == '\0')
+		stripSignature = objectSignature;
+	else
+		stripSignature ++;
+
+	log_team(LOG_DEBUG, "Image %s requested catalog with mimetype %s",
+		catalogOwner.name, stripSignature);
+	fSignature = stripSignature;
+}
+
+
 /*!	Constructs a DefaultCatalog with given signature and language and reads
 	the catalog from disk.
 	InitCheck() will be B_OK if catalog could be loaded successfully, it will
 	give an appropriate error-code otherwise.
 */
-DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
+DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *language,
 	uint32 fingerprint)
 	:
-	BHashMapCatalog(signature, language, fingerprint)
+	BHashMapCatalog("", language, fingerprint)
 {
+	// We created the catalog with an invalid signature, but we fix that now.
+	SetSignature(catalogOwner);
 	status_t status;
 
 	app_info appInfo;
@@ -116,7 +148,7 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	fInitCheck = status;
 	log_team(LOG_DEBUG,
 		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
-		signature, language, strerror(fInitCheck));
+		fSignature.String(), language, strerror(fInitCheck));
 }
 
 
@@ -555,23 +587,11 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 
 
 BCatalogAddOn *
-DefaultCatalog::Instantiate(const char *signature, const char *language,
+DefaultCatalog::Instantiate(const entry_ref &catalogOwner, const char *language,
 	uint32 fingerprint)
 {
 	DefaultCatalog *catalog
-		= new(std::nothrow) DefaultCatalog(signature, language, fingerprint);
-	if (catalog && catalog->InitCheck() != B_OK) {
-		delete catalog;
-		return NULL;
-	}
-	return catalog;
-}
-
-
-BCatalogAddOn *
-DefaultCatalog::InstantiateEmbedded(entry_ref *appOrAddOnRef)
-{
-	DefaultCatalog *catalog = new(std::nothrow) DefaultCatalog(appOrAddOnRef);
+		= new(std::nothrow) DefaultCatalog(catalogOwner, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;

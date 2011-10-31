@@ -31,10 +31,11 @@ BCatalog::BCatalog()
 }
 
 
-BCatalog::BCatalog(const char *signature, const char *language,
+BCatalog::BCatalog(const entry_ref& catalogOwner, const char *language,
 	uint32 fingerprint)
 {
-	//fCatalog = be_locale_roster->LoadCatalog(signature, language, fingerprint);
+	// Unsupported - the build tools can't (and don't need to) load anything
+	// this way.
 }
 
 

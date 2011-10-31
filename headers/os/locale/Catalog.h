@@ -20,7 +20,7 @@ struct entry_ref;
 class BCatalog {
 public:
 								BCatalog();
-								BCatalog(const char* signature,
+								BCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									uint32 fingerprint = 0);
 	virtual						~BCatalog();
@@ -42,7 +42,7 @@ public:
 			status_t			GetLanguage(BString* language);
 			status_t			GetFingerprint(uint32* fingerprint);
 
-			status_t			SetCatalog(const char* signature,
+			status_t			SetCatalog(const entry_ref& catalogOwner,
 									uint32 fingerprint);
 
 			status_t			InitCheck() const;

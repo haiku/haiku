@@ -51,7 +51,6 @@ CatalogAddOnInfo::CatalogAddOnInfo(const BString& name, const BString& path,
 	uint8 priority)
 	:
 	fInstantiateFunc(NULL),
-	fInstantiateEmbeddedFunc(NULL),
 	fCreateFunc(NULL),
 	fLanguagesFunc(NULL),
 	fName(name),
@@ -87,8 +86,6 @@ CatalogAddOnInfo::MakeSureItsLoaded()
 		if (fAddOnImage >= B_OK) {
 			get_image_symbol(fAddOnImage, "instantiate_catalog",
 				B_SYMBOL_TYPE_TEXT, (void**)&fInstantiateFunc);
-			get_image_symbol(fAddOnImage, "instantiate_embedded_catalog",
-				B_SYMBOL_TYPE_TEXT, (void**)&fInstantiateEmbeddedFunc);
 			get_image_symbol(fAddOnImage, "create_catalog",
 				B_SYMBOL_TYPE_TEXT, (void**)&fCreateFunc);
 			get_image_symbol(fAddOnImage, "get_available_languages",
@@ -115,7 +112,6 @@ CatalogAddOnInfo::UnloadIfPossible()
 		unload_add_on(fAddOnImage);
 		fAddOnImage = B_NO_INIT;
 		fInstantiateFunc = NULL;
-		fInstantiateEmbeddedFunc = NULL;
 		fCreateFunc = NULL;
 		fLanguagesFunc = NULL;
 //		log_team(LOG_DEBUG, "catalog-add-on %s has been unloaded",
@@ -360,8 +356,6 @@ RosterData::_InitializeCatalogAddOns()
 		return B_NO_MEMORY;
 
 	defaultCatalogAddOnInfo->fInstantiateFunc = DefaultCatalog::Instantiate;
-	defaultCatalogAddOnInfo->fInstantiateEmbeddedFunc
-		= DefaultCatalog::InstantiateEmbedded;
 	defaultCatalogAddOnInfo->fCreateFunc = DefaultCatalog::Create;
 	fCatalogAddOnInfos.AddItem((void*)defaultCatalogAddOnInfo);
 
@@ -794,7 +788,10 @@ MutableLocaleRoster::GetSystemCatalog(BCatalogAddOn** catalog) const
 {
 	if (!catalog)
 		return B_BAD_VALUE;
-	*catalog = LoadCatalog("system");
+	// get libbe entry_ref
+	entry_ref ref;
+	BEntry("/boot/system/lib/libbe.so").GetRef(&ref);
+	*catalog = LoadCatalog(ref);
 	return B_OK;
 }
 
@@ -849,12 +846,9 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
  * NULL is returned if no matching catalog could be found.
  */
 BCatalogAddOn*
-MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
+MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner, const char* language,
 	int32 fingerprint) const
 {
-	if (!signature)
-		return NULL;
-
 	BAutolock lock(RosterData::Default()->fLock);
 	if (!lock.IsLocked())
 		return NULL;
@@ -877,7 +871,7 @@ MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
 		BCatalogAddOn* catalog = NULL;
 		const char* lang;
 		for (int32 l=0; languages.FindString("language", l, &lang)==B_OK; ++l) {
-			catalog = info->fInstantiateFunc(signature, lang, fingerprint);
+			catalog = info->fInstantiateFunc(catalogOwner, lang, fingerprint);
 			if (catalog)
 				info->fLoadedCatalogs.AddItem(catalog);
 			// Chain-load catalogs for languages that depend on
@@ -889,12 +883,12 @@ MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
 			int32 pos;
 			BString langName(lang);
 			BCatalogAddOn* currCatalog = catalog;
-			BCatalogAddOn* nextCatalog;
+			BCatalogAddOn* nextCatalog = NULL;
 			while ((pos = langName.FindLast('_')) >= 0) {
 				// language is based on parent, so we load that, too:
 				// (even if the parent catalog was not found)
 				langName.Truncate(pos);
-				nextCatalog = info->fInstantiateFunc(signature,
+				nextCatalog = info->fInstantiateFunc(catalogOwner,
 					langName.String(), fingerprint);
 				if (nextCatalog) {
 					info->fLoadedCatalogs.AddItem(nextCatalog);
@@ -907,43 +901,6 @@ MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
 			}
 			if (catalog != NULL)
 				return catalog;
-		}
-		info->UnloadIfPossible();
-	}
-
-	return NULL;
-}
-
-
-/*
- * Loads an embedded catalog from the given entry-ref (which is usually an
- * app- or add-on-file. The request to load the catalog is dispatched to all
- * add-ons in turn, until an add-on reports success.
- * NULL is returned if no embedded catalog could be found.
- */
-BCatalogAddOn*
-MutableLocaleRoster::LoadEmbeddedCatalog(entry_ref* appOrAddOnRef)
-{
-	if (!appOrAddOnRef)
-		return NULL;
-
-	BAutolock lock(RosterData::Default()->fLock);
-	if (!lock.IsLocked())
-		return NULL;
-
-	int32 count = RosterData::Default()->fCatalogAddOnInfos.CountItems();
-	for (int32 i = 0; i < count; ++i) {
-		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
-			RosterData::Default()->fCatalogAddOnInfos.ItemAt(i);
-
-		if (!info->MakeSureItsLoaded() || !info->fInstantiateEmbeddedFunc)
-			continue;
-
-		BCatalogAddOn* catalog = NULL;
-		catalog = info->fInstantiateEmbeddedFunc(appOrAddOnRef);
-		if (catalog) {
-			info->fLoadedCatalogs.AddItem(catalog);
-			return catalog;
 		}
 		info->UnloadIfPossible();
 	}
