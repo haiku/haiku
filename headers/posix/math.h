@@ -234,7 +234,7 @@ extern long double	fmal(long double x, long double y, long double z);
 extern long double	fmaxl(long double x, long double y);
 extern long double	fminl(long double x, long double y);
 extern long double	fmodl(long double x, long double y);
-extern long double	frexpl(long double num, int *exp);
+extern long double	frexpl(long double num, int *_exponent);
 extern long double	hypotl(long double x, long double y);
 extern int			ilogbl(long double x);
 extern long double	ldexpl(long double x, int exponent);

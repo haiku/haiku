@@ -225,29 +225,29 @@ extern "C" {
 
 
 /* signal management (actions and block masks) */
-__sighandler_t signal(int signal, __sighandler_t signalHandler);
-int     sigaction(int signal, const struct sigaction* action,
+__sighandler_t signal(int _signal, __sighandler_t signalHandler);
+int     sigaction(int _signal, const struct sigaction* action,
 			struct sigaction* oldAction);
-__sighandler_t sigset(int signal, __sighandler_t signalHandler);
-int		sigignore(int signal);
-int		siginterrupt(int signal, int flag);
+__sighandler_t sigset(int _signal, __sighandler_t signalHandler);
+int		sigignore(int _signal);
+int		siginterrupt(int _signal, int flag);
 
 int     sigprocmask(int how, const sigset_t* set, sigset_t* oldSet);
 int		pthread_sigmask(int how, const sigset_t* set, sigset_t* oldSet);
-int		sighold(int signal);
-int		sigrelse(int signal);
+int		sighold(int _signal);
+int		sigrelse(int _signal);
 
 /* sending signals */
-int     raise(int signal);
-int     kill(pid_t pid, int signal);
-int		killpg(pid_t processGroupID, int signal);
-int		sigqueue(pid_t pid, int signal, const union sigval userValue);
-int		pthread_kill(pthread_t thread, int signal);
+int     raise(int _signal);
+int     kill(pid_t pid, int _signal);
+int		killpg(pid_t processGroupID, int _signal);
+int		sigqueue(pid_t pid, int _signal, const union sigval userValue);
+int		pthread_kill(pthread_t thread, int _signal);
 
 /* querying and waiting for signals */
 int     sigpending(sigset_t* set);
 int     sigsuspend(const sigset_t* mask);
-int		sigpause(int signal);
+int		sigpause(int _signal);
 int 	sigwait(const sigset_t* set, int* _signal);
 int		sigwaitinfo(const sigset_t* set, siginfo_t* info);
 int		sigtimedwait(const sigset_t* set, siginfo_t* info,
@@ -259,13 +259,13 @@ int		sigaltstack(const stack_t* stack, stack_t* oldStack);
 /* signal set (sigset_t) manipulation */
 int     sigemptyset(sigset_t* set);
 int     sigfillset(sigset_t* set);
-int 	sigaddset(sigset_t* set, int signal);
-int 	sigdelset(sigset_t* set, int signal);
-int 	sigismember(const sigset_t* set, int signal);
+int 	sigaddset(sigset_t* set, int _signal);
+int 	sigdelset(sigset_t* set, int _signal);
+int 	sigismember(const sigset_t* set, int _signal);
 
 /* printing signal names */
 void	psiginfo(const siginfo_t* info, const char* message);
-void	psignal(int signal, const char* message);
+void	psignal(int _signal, const char* message);
 
 /* implementation private */
 int		__signal_get_sigrtmin();
