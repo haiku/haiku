@@ -420,7 +420,6 @@ ViewHWInterface::~ViewHWInterface()
 
 	be_app->Lock();
 	be_app->Quit();
-	delete be_app;
 }
 
 
