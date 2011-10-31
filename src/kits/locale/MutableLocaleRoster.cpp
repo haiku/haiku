@@ -16,6 +16,7 @@
 #include <syslog.h>
 
 #include <AppFileInfo.h>
+#include <Application.h>
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Collator.h>
@@ -788,10 +789,32 @@ MutableLocaleRoster::GetSystemCatalog(BCatalogAddOn** catalog) const
 {
 	if (!catalog)
 		return B_BAD_VALUE;
-	// get libbe entry_ref
+
+	// figure out libbe-image (shared object) by name
+	image_info info;
+	int32 cookie = 0;
+	bool found = false;
+
+	while (get_next_image_info(0, &cookie, &info) == B_OK) {
+		if (info.data < (void*)&be_app
+			&& (char*)info.data + info.data_size > (void*)&be_app) {
+			found = true;
+			break;
+		}
+	}
+
+	if (!found) {
+		log_team(LOG_DEBUG, "Unable to find libbe-image!");
+
+		return B_ERROR;
+	}
+
+	// load the catalog for libbe and return it to the app
 	entry_ref ref;
-	BEntry("/boot/system/lib/libbe.so").GetRef(&ref);
+	BEntry(info.name).GetRef(&ref);
+
 	*catalog = LoadCatalog(ref);
+
 	return B_OK;
 }
 
