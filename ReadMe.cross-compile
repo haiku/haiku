@@ -1,16 +1,16 @@
-Building on a non-BeOS platform
-===============================
+Building on a non-Haiku platform
+================================
 
-We currently support these non-BeOS platforms:
+We currently support these non-Haiku platforms:
  * Linux
  * FreeBSD
  * Mac OS X Intel (gcc 4 builds only)
 
-To build Haiku on a non-BeOS platform you must first check out and build the
-cross-compiler. The easiest method for doing so is to check it out in the
-parent directory of your Haiku repository:
+To build Haiku on a platform other than Haiku, you must first check out and
+build the cross-compiler. The easiest method for doing so is to check it out in
+the parent directory of your Haiku repository:
 
-  svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools
+  svn checkout http://svn.haiku-os.org/haiku/buildtools/trunk buildtools
 
 You should now have a 'buildtools' folder that contains folders named
 'binutils', 'gcc', and 'jam' among others.
@@ -46,10 +46,11 @@ Change to the buildtools folder and we will start to build 'jam' which is a
 requirement for building Haiku. Run the following commands to generate and
 install the tool:
 
-  cd  buildtools/jam  
+  cd  buildtools/jam
   make
   sudo ./jam0 install
-
+    -- or --
+  ./jam0 -sBINDIR=$HOME/bin install
 
 Building binutils
 =================
@@ -68,7 +69,7 @@ frequent build issues. The commands for configuration are,
 GCC 2.95
 --------
 
-  cd haiku 
+  cd haiku
   ./configure --build-cross-tools ../buildtools/
 
 GCC 4.x

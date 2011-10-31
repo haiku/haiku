@@ -1,15 +1,14 @@
-Building on BeOS
-================
+Building on Haiku
+=================
 
-For building on BeOS you need the development tools from:
+For building on Haiku, all of the necessary development tools are included in
+both official releases (R1 alpha 1 for instance) and the nightly builds.
 
-  http://haiku-os.org/downloads
+Official releases can be obtained from www.haiku-os.org/get-haiku
+The nightly builds are available at http://www.haiku-files.org
 
-Please always use the most recent versions. They are required to build Haiku.
-
-
-Building on a non-BeOS platform
-===============================
+Building on a non-Haiku platform
+================================
 
 Please read the file 'ReadMe.cross-compile' before continuing. It describes
 how to build the cross-compilation tools and configure the build system for
@@ -17,19 +16,13 @@ building Haiku. After following the instructions you can directly continue
 with the section Building.
 
 
-Configuring on BeOS
-===================
+Configuring on Haiku
+====================
 
 Open a Terminal and change to your Haiku trunk folder. To configure the build
 you can run configure like this:
 
-  ./configure --target=TARGET
-
-Where "TARGET" is the target platform that the compiled code should run on:
-  * haiku (default)
-  * r5
-  * bone
-  * dano (also for Zeta)
+  ./configure
 
 The configure script generates a file named "BuildConfig" in the
 "generated/build" directory. As long as configure is not modified (!), there
@@ -78,13 +71,12 @@ Bootable CD-ROM Image
 This _requires_ having the mkisofs tool installed.
 On Debian GNU/Linux for example you can install it with:
   apt-get install mkisofs
-On BeOS you can get it from http://bebits.com/app/3964 along with cdrecord.
 
 This creates a bootable 'haiku-cd.iso' in your 'generated/' folder:
 
   jam -q haiku-cd
 
-Under Unix/Linux, and BeOS you can use cdrecord to create a CD with:
+Under Unix/Linux, and Haiku you can use cdrecord to create a CD with:
 
   cdrecord dev=x,y,z -v -eject -dao -data generated/haiku-cd.iso
 
