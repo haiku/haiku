@@ -10,7 +10,7 @@
  *		Frans van Nispen	<frans@xentronix.com>
  *		Stefan Werner		<stefan@keindesign.de>
  *		Hiroyuki Tsutsumi	<???>
- *		Jeroen Oortwijn		<???>
+ *		Jeroen Oortwijn		<oortwijn@gmail.com>
  */
 
 #include <stdio.h>
