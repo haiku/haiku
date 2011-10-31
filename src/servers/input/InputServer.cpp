@@ -876,7 +876,6 @@ status_t
 InputServer::HandleGetSetKeyboardID(BMessage* message, BMessage* reply)
 {
 	int16 id;
-message->PrintToStream();
 	if (message->FindInt16("id", &id) == B_OK) {
 		fKeyboardID = (uint16)id;
 		return B_OK;
