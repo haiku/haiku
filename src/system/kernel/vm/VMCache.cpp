@@ -611,7 +611,7 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 #if DEBUG_CACHE_LIST
 	mutex_lock(&sCacheListLock);
 
-	if (gDebugCacheList)
+	if (gDebugCacheList != NULL)
 		gDebugCacheList->debug_previous = this;
 	debug_next = gDebugCacheList;
 	gDebugCacheList = this;
