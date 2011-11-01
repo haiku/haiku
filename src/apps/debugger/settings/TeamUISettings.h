@@ -15,7 +15,7 @@ class BMessage;
 class TeamUISettings {
 public:
 								TeamUISettings();
-								~TeamUISettings();
+	virtual						~TeamUISettings();
 
 	virtual	const char*			ID() const = 0;
 	virtual	status_t			SetTo(const BMessage& archive) = 0;
