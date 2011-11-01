@@ -729,7 +729,7 @@ analyze_allocation_callers(heap_allocator *heap)
 					caller_info *callerInfo = get_caller_info(info->caller);
 					if (callerInfo == NULL) {
 						kprintf("out of space for caller infos\n");
-						return 0;
+						return false;
 					}
 
 					callerInfo->count++;
