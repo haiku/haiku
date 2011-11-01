@@ -127,7 +127,7 @@ main(int argc, char *argv[])
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 	size_t decodedSize = 0;
 	size_t partPos = 0;
-	size_t pos = pushGameSound.CurrentPosition();
+	size_t pos = 0; /*pushGameSound.CurrentPosition();*/
 	key_info keyInfo;
 
 	while (true) {
@@ -159,6 +159,7 @@ main(int argc, char *argv[])
 			printf("\rtime: %.2f",
 				(double)mediaTrack->CurrentTime() / 1000000LL);
 			fflush(stdout);
+
 			continue;
 		}
 
@@ -168,9 +169,11 @@ main(int argc, char *argv[])
 		if (bufferSize <= pos)
 			pos = 0;
 
-		// playback sync
-		while (pushGameSound.CurrentPosition() == pos)
-			snooze(100);
+		// playback sync - wait for the buffer part we're about to fill to be
+		// played
+		while (pushGameSound.CurrentPosition() >= pos + bufferPartSize
+			|| pushGameSound.CurrentPosition() < pos)
+			snooze(1000 * framesPerBufferPart / gsFormat.frame_rate);
 
 		// check escape key state
 		if (get_key_info(&keyInfo) != B_OK) {
