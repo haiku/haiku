@@ -82,7 +82,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
 	BHashMapCatalog("", "", 0)
 {
-	fInitCheck = ReadFromResource(appOrAddOnRef);
+	fInitCheck = ReadFromResource(*appOrAddOnRef);
 	// fprintf(stderr,
 	//	"trying to load embedded catalog from resources results in %s",
 	//	strerror(fInitCheck));
@@ -180,14 +180,14 @@ DefaultCatalog::ReadFromFile(const char *path)
 	future...
 */
 status_t
-DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
+DefaultCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 status_t
-DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
+DefaultCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -229,14 +229,14 @@ DefaultCatalog::WriteToFile(const char *path)
 	future...
 */
 status_t
-DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
+DefaultCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 status_t
-DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
+DefaultCatalog::WriteToResource(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }

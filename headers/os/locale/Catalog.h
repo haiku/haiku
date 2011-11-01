@@ -305,11 +305,15 @@ public:
 	virtual	status_t			SetData(uint32 id, BMessage* msg);
 
 	virtual	status_t			ReadFromFile(const char* path = NULL);
-	virtual	status_t			ReadFromAttribute(entry_ref* appOrAddOnRef);
-	virtual	status_t			ReadFromResource(entry_ref* appOrAddOnRef);
+	virtual	status_t			ReadFromAttribute(
+									const entry_ref& appOrAddOnRef);
+	virtual	status_t			ReadFromResource(
+									const entry_ref& appOrAddOnRef);
 	virtual	status_t			WriteToFile(const char* path = NULL);
-	virtual	status_t			WriteToAttribute(entry_ref* appOrAddOnRef);
-	virtual	status_t			WriteToResource(entry_ref* appOrAddOnRef);
+	virtual	status_t			WriteToAttribute(
+									const entry_ref& appOrAddOnRef);
+	virtual	status_t			WriteToResource(
+									const entry_ref& appOrAddOnRef);
 
 	virtual	void				MakeEmpty();
 	virtual	int32				CountItems() const;
@@ -475,11 +479,15 @@ public:
 			status_t			SetData(uint32 id, BMessage* msg);
 
 			status_t			ReadFromFile(const char* path = NULL);
-			status_t			ReadFromAttribute(entry_ref* appOrAddOnRef);
-			status_t			ReadFromResource(entry_ref* appOrAddOnRef);
+			status_t			ReadFromAttribute(
+									const entry_ref& appOrAddOnRef);
+			status_t			ReadFromResource(
+									const entry_ref& appOrAddOnRef);
 			status_t			WriteToFile(const char* path = NULL);
-			status_t			WriteToAttribute(entry_ref* appOrAddOnRef);
-			status_t			WriteToResource(entry_ref* appOrAddOnRef);
+			status_t			WriteToAttribute(
+									const entry_ref& appOrAddOnRef);
+			status_t			WriteToResource(
+									const entry_ref& appOrAddOnRef);
 
 			void				MakeEmpty();
 

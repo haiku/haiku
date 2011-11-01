@@ -211,14 +211,14 @@ BCatalogAddOn::ReadFromFile(const char *path)
 
 
 status_t
-BCatalogAddOn::ReadFromAttribute(entry_ref *appOrAddOnRef)
+BCatalogAddOn::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-BCatalogAddOn::ReadFromResource(entry_ref *appOrAddOnRef)
+BCatalogAddOn::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
@@ -232,14 +232,14 @@ BCatalogAddOn::WriteToFile(const char *path)
 
 
 status_t
-BCatalogAddOn::WriteToAttribute(entry_ref *appOrAddOnRef)
+BCatalogAddOn::WriteToAttribute(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-BCatalogAddOn::WriteToResource(entry_ref *appOrAddOnRef)
+BCatalogAddOn::WriteToResource(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
@@ -335,7 +335,7 @@ EditableCatalog::ReadFromFile(const char *path)
 
 
 status_t
-EditableCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
+EditableCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	if (!fCatalog)
 		return B_NO_INIT;
@@ -344,7 +344,7 @@ EditableCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 
 
 status_t
-EditableCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
+EditableCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	if (!fCatalog)
 		return B_NO_INIT;
@@ -362,7 +362,7 @@ EditableCatalog::WriteToFile(const char *path)
 
 
 status_t
-EditableCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
+EditableCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
 {
 	if (!fCatalog)
 		return B_NO_INIT;
@@ -371,7 +371,7 @@ EditableCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 
 
 status_t
-EditableCatalog::WriteToResource(entry_ref *appOrAddOnRef)
+EditableCatalog::WriteToResource(const entry_ref &appOrAddOnRef)
 {
 	if (!fCatalog)
 		return B_NO_INIT;

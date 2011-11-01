@@ -123,7 +123,7 @@ main(int argc, char **argv)
 			BEntry entry(outputFile.String());
 			entry_ref eref;
 			entry.GetRef(&eref);
-			res = targetCatImpl.WriteToAttribute(&eref);
+			res = targetCatImpl.WriteToAttribute(eref);
 			if (res != B_OK) {
 				fprintf(stderr,
 					"couldn't write target-attribute to %s - error: %s\n",
@@ -136,7 +136,7 @@ main(int argc, char **argv)
 			BEntry entry(outputFile.String());
 			entry_ref eref;
 			entry.GetRef(&eref);
-			res = targetCatImpl.WriteToResource(&eref);
+			res = targetCatImpl.WriteToResource(eref);
 			if (res != B_OK) {
 				fprintf(stderr,
 					"couldn't write target-resource to %s - error: %s\n",

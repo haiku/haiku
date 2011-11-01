@@ -70,27 +70,18 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *langua
 	SetSignature(catalogOwner);
 	status_t status;
 
-	app_info appInfo;
-	be_app->GetAppInfo(&appInfo);
-
-	// give highest priority to catalog embedded as resource in application
-	// executable:
-	status = ReadFromResource(&appInfo.ref);
-
 	// search for catalog living in sub-folder of app's folder:
-	if (status != B_OK) {
-		node_ref nref;
-		nref.device = appInfo.ref.device;
-		nref.node = appInfo.ref.directory;
-		BDirectory appDir(&nref);
-		BString catalogName("locale/");
-		catalogName << kCatFolder
-			<< "/" << fSignature
-			<< "/" << fLanguageName
-			<< kCatExtension;
-		BPath catalogPath(&appDir, catalogName.String());
-		status = ReadFromFile(catalogPath.Path());
-	}
+	node_ref nref;
+	nref.device = catalogOwner.device;
+	nref.node = catalogOwner.directory;
+	BDirectory appDir(&nref);
+	BString catalogName("locale/");
+	catalogName << kCatFolder
+		<< "/" << fSignature
+		<< "/" << fLanguageName
+		<< kCatExtension;
+	BPath catalogPath(&appDir, catalogName.String());
+	status = ReadFromFile(catalogPath.Path());
 
 	if (status != B_OK) {
 		// search in data folders
@@ -116,6 +107,12 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *langua
 		}
 	}
 
+	if (status != B_OK) {
+		// give lowest priority to catalog embedded as resource in application
+		// executable, so they can be overridden easily.
+		status = ReadFromResource(catalogOwner);
+	}
+
 	fInitCheck = status;
 	log_team(LOG_DEBUG,
 		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
@@ -132,7 +129,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
 	BHashMapCatalog("", "", 0)
 {
-	fInitCheck = ReadFromResource(appOrAddOnRef);
+	fInitCheck = ReadFromResource(*appOrAddOnRef);
 	log_team(LOG_DEBUG,
 		"trying to load embedded catalog from resources results in %s",
 		strerror(fInitCheck));
@@ -255,22 +252,22 @@ DefaultCatalog::ReadFromFile(const char *path)
  * this method is not currently being used, but it may be useful in the future...
  */
 status_t
-DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
+DefaultCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	BNode node;
-	status_t res = node.SetTo(appOrAddOnRef);
+	status_t res = node.SetTo(&appOrAddOnRef);
 	if (res != B_OK) {
 		log_team(LOG_ERR,
 			"couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
-			appOrAddOnRef->device, appOrAddOnRef->directory,
-			appOrAddOnRef->name);
+			appOrAddOnRef.device, appOrAddOnRef.directory,
+			appOrAddOnRef.name);
 		return B_ENTRY_NOT_FOUND;
 	}
 
 	log_team(LOG_DEBUG,
 		"looking for embedded catalog-attribute in app/add-on"
-		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef->device,
-		appOrAddOnRef->directory, appOrAddOnRef->name);
+		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef.device,
+		appOrAddOnRef.directory, appOrAddOnRef.name);
 
 	attr_info attrInfo;
 	res = node.GetAttrInfo(BLocaleRoster::kEmbeddedCatAttr, &attrInfo);
@@ -305,22 +302,22 @@ DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 
 
 status_t
-DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
+DefaultCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	BFile file;
-	status_t res = file.SetTo(appOrAddOnRef, B_READ_ONLY);
+	status_t res = file.SetTo(&appOrAddOnRef, B_READ_ONLY);
 	if (res != B_OK) {
 		log_team(LOG_ERR,
 			"couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
-			appOrAddOnRef->device, appOrAddOnRef->directory,
-			appOrAddOnRef->name);
+			appOrAddOnRef.device, appOrAddOnRef.directory,
+			appOrAddOnRef.name);
 		return B_ENTRY_NOT_FOUND;
 	}
 
 	log_team(LOG_DEBUG,
 		"looking for embedded catalog-resource in app/add-on"
-		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef->device,
-		appOrAddOnRef->directory, appOrAddOnRef->name);
+		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef.device,
+		appOrAddOnRef.directory, appOrAddOnRef.name);
 
 	BResources rsrc;
 	res = rsrc.SetTo(&file);
@@ -329,9 +326,11 @@ DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
 		return res;
 	}
 
+	int mangledLanguage = CatKey::HashFun(fLanguageName.String(), 0);
+
 	size_t sz;
-	const void *buf = rsrc.LoadResource(B_MESSAGE_TYPE,
-		BLocaleRoster::kEmbeddedCatResId, &sz);
+	const void *buf = rsrc.LoadResource('CADA',
+		mangledLanguage, &sz);
 	if (!buf) {
 		log_team(LOG_DEBUG, "file has no catalog-resource");
 		return B_NAME_NOT_FOUND;
@@ -379,10 +378,10 @@ DefaultCatalog::WriteToFile(const char *path)
  * future...
  */
 status_t
-DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
+DefaultCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
 {
 	BNode node;
-	status_t res = node.SetTo(appOrAddOnRef);
+	status_t res = node.SetTo(&appOrAddOnRef);
 	if (res != B_OK)
 		return res;
 
@@ -405,10 +404,10 @@ DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 
 
 status_t
-DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
+DefaultCatalog::WriteToResource(const entry_ref &appOrAddOnRef)
 {
 	BFile file;
-	status_t res = file.SetTo(appOrAddOnRef, B_READ_WRITE);
+	status_t res = file.SetTo(&appOrAddOnRef, B_READ_WRITE);
 	if (res != B_OK)
 		return res;
 
@@ -422,9 +421,12 @@ DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 
+	int mangledLanguage = CatKey::HashFun(fLanguageName.String(), 0);
+
 	if (res == B_OK) {
-		res = rsrc.AddResource(B_MESSAGE_TYPE, BLocaleRoster::kEmbeddedCatResId,
-			mallocIO.Buffer(), mallocIO.BufferLength(), "embedded catalog");
+		res = rsrc.AddResource('CADA', mangledLanguage,
+			mallocIO.Buffer(), mallocIO.BufferLength(),
+			BString(fLanguageName) << " catalog");
 	}
 
 	return res;

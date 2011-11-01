@@ -206,14 +206,14 @@ BCatalogAddOn::ReadFromFile(const char *path)
 
 
 status_t
-BCatalogAddOn::ReadFromAttribute(entry_ref *appOrAddOnRef)
+BCatalogAddOn::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-BCatalogAddOn::ReadFromResource(entry_ref *appOrAddOnRef)
+BCatalogAddOn::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
@@ -227,14 +227,14 @@ BCatalogAddOn::WriteToFile(const char *path)
 
 
 status_t
-BCatalogAddOn::WriteToAttribute(entry_ref *appOrAddOnRef)
+BCatalogAddOn::WriteToAttribute(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-BCatalogAddOn::WriteToResource(entry_ref *appOrAddOnRef)
+BCatalogAddOn::WriteToResource(const entry_ref &appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
