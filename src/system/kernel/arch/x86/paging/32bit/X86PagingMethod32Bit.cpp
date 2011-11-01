@@ -263,7 +263,7 @@ status_t
 X86PagingMethod32Bit::Init(kernel_args* args,
 	VMPhysicalPageMapper** _physicalPageMapper)
 {
-	TRACE("vm_translation_map_init: entry\n");
+	TRACE("X86PagingMethod32Bit::Init(): entry\n");
 
 	// page hole set up in stage2
 	fPageHole = (page_table_entry*)args->arch_args.page_hole;
@@ -310,7 +310,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
 	}
 
-	TRACE("vm_translation_map_init: done\n");
+	TRACE("X86PagingMethod32Bit::Init(): done\n");
 
 	*_physicalPageMapper = fPhysicalPageMapper;
 	return B_OK;
