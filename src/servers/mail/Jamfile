@@ -19,7 +19,6 @@ Server mail_daemon :
 	MailDaemon.cpp
 	main.cpp
 	Notifier.cpp
-	StatusWindow.cpp
 	: be libmail.so tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
 		$(TARGET_NETWORK_LIBS)
 ;
@@ -37,5 +36,4 @@ DoCatalogs mail_daemon :
 	DeskbarView.cpp
 	MailDaemon.cpp
 	Notifier.cpp
-	StatusWindow.cpp
 ;

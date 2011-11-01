@@ -24,6 +24,9 @@
 #include "Notifier.h"
 
 
+class BNotification;
+
+
 struct account_protocols {
 	account_protocols() {
 		inboundImage = -1;
@@ -108,7 +111,7 @@ private:
 			AccountMap			fAccounts;
 
 			ErrorLogWindow*		fErrorLogWindow;
-			MailStatusWindow*	fMailStatusWindow;
+			BNotification*		fNotification;
 };
 
 

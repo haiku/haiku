@@ -20,6 +20,7 @@
 #include <FindDirectory.h>
 #include <fs_index.h>
 #include <NodeMonitor.h>
+#include <Notification.h>
 #include <Path.h>
 #include <Roster.h>
 #include <StringList.h>
@@ -111,8 +112,6 @@ MailDaemonApp::MailDaemonApp()
 {
 	fErrorLogWindow = new ErrorLogWindow(BRect(200, 200, 500, 250),
 		B_TRANSLATE("Mail daemon status log"), B_TITLED_WINDOW);
-	fMailStatusWindow = new MailStatusWindow(BRect(40, 400, 360, 400),
-		B_TRANSLATE("Mail Status"), fSettingsFile.ShowStatusWindow());
 	// install MimeTypes, attributes, indices, and the
 	// system beep add startup
 	MakeMimeTypes();
@@ -129,6 +128,7 @@ MailDaemonApp::~MailDaemonApp()
 		delete fQueries.ItemAt(i);
 
 	delete fLEDAnimation;
+	delete fNotification;
 
 	AccountMap::const_iterator it = fAccounts.begin();
 	for (; it != fAccounts.end(); it++)
@@ -190,7 +190,10 @@ MailDaemonApp::ReadyToRun()
 		string = B_TRANSLATE("No new messages");
 
 	fCentralBeep = false;
-	fMailStatusWindow->SetDefaultMessage(string);
+
+	fNotification = new BNotification(B_INFORMATION_NOTIFICATION);
+	fNotification->SetApplication("Mail daemon");
+	fNotification->SetTitle(string);
 
 	fLEDAnimation = new LEDAnimation;
 	SetPulseRate(1000000);
@@ -200,7 +203,7 @@ MailDaemonApp::ReadyToRun()
 void
 MailDaemonApp::RefsReceived(BMessage* message)
 {
-	fMailStatusWindow->Activate(true);
+	be_roster->Notify(*fNotification, 3);
 
 	entry_ref ref;
 	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
@@ -250,7 +253,6 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 		case kMsgSettingsUpdated:
 			fSettingsFile.Reload();
 			_UpdateAutoCheck(fSettingsFile.AutoCheckInterval());
-			fMailStatusWindow->SetShowCriterion(fSettingsFile.ShowStatusWindow());
 			break;
 
 		case kMsgAccountsChanged:
@@ -258,12 +260,12 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgSetStatusWindowMode:	// when to show the status window
-		{
+		{/*
 			int32 mode;
 			if (msg->FindInt32("ShowStatusWindow", &mode) == B_OK)
 				fMailStatusWindow->SetShowCriterion(mode);
 			break;
-		}
+		*/}
 
 		case kMsgMarkMessageAsRead:
 		{
@@ -282,11 +284,6 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 
 		case kMsgFetchBody:
 			RefsReceived(msg);
-			break;
-
-		case 'lkch':	// status window look changed
-		case 'wsch':	// workspace changed
-			fMailStatusWindow->PostMessage(msg);
 			break;
 
 		case 'stwg':	// Status window gone
@@ -386,7 +383,7 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			else
 				string << B_TRANSLATE("No new messages.");
 
-			fMailStatusWindow->SetDefaultMessage(string.String());
+			fNotification->SetTitle(string.String());
 			break;
 		}
 
@@ -648,7 +645,7 @@ MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 	}
 	if (account.inboundProtocol) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), true,
-			fErrorLogWindow, fMailStatusWindow);
+			fErrorLogWindow);
 		account.inboundProtocol->SetMailNotifier(notifier);
 
 		account.inboundThread = new InboundProtocolThread(
@@ -665,7 +662,7 @@ MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 	}
 	if (account.outboundProtocol) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), false,
-			fErrorLogWindow, fMailStatusWindow);
+			fErrorLogWindow);
 		account.outboundProtocol->SetMailNotifier(notifier);
 
 		account.outboundThread = new OutboundProtocolThread(

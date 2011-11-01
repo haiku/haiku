@@ -7,6 +7,7 @@
 #define NOTIFIER_H
 
 
+#include <Notification.h>
 #include <String.h>
 
 #include "MailProtocol.h"
@@ -18,8 +19,7 @@
 class DefaultNotifier : public MailNotifier {
 public:
 								DefaultNotifier(const char* accountName,
-									bool inbound, ErrorLogWindow* errorWindow,
-									MailStatusWindow* statusWindow);
+									bool inbound, ErrorLogWindow* errorWindow);
 								~DefaultNotifier();
 
 			MailNotifier*		Clone();
@@ -37,8 +37,12 @@ private:
 			BString				fAccountName;
 			bool				fIsInbound;
 			ErrorLogWindow*		fErrorWindow;
-			MailStatusWindow*	fStatusWindow;
-			MailStatusView*		fStatusView;
+			BNotification		fNotification;
+
+			int					fTotalItems;
+			int					fItemsDone;
+			int					fTotalSize;
+			int					fSizeDone;
 };
 
 #endif //NOTIFIER_H
