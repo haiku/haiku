@@ -635,7 +635,7 @@ typedef enum PropertyNumbersEnum
   PN_MAX
 } PropertyNumbers;
 
-static char * g_PropertyNames [PN_MAX] =
+static const char * g_PropertyNames [PN_MAX] =
 {
   "DatabaseFile",
   "Spam",
@@ -863,7 +863,7 @@ typedef enum ScoringModeEnum
   SM_MAX
 } ScoringModes;
 
-static char * g_ScoringModeNames [SM_MAX] =
+static const char * g_ScoringModeNames [SM_MAX] =
 {
   "Robinson",
   "ChiSquared"
@@ -885,7 +885,7 @@ typedef enum TokenizeModeEnum
   TM_MAX
 } TokenizeModes;
 
-static char * g_TokenizeModeNames [TM_MAX] =
+static const char * g_TokenizeModeNames [TM_MAX] =
 {
   "All",
   "Plain text",
@@ -6097,7 +6097,7 @@ void ControlsView::AttachedToWindow ()
   float         RowHeight;
   float         RowTop;
   ScoringModes  ScoringMode;
-  char         *StringPntr;
+  const char   *StringPntr;
   BMenuItem    *TempMenuItemPntr;
   BRect         TempRect;
   char          TempString [PATH_MAX];
