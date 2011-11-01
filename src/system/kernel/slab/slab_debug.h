@@ -47,11 +47,6 @@
 struct object_depot;
 
 
-void		dump_object_depot(object_depot* depot);
-int			dump_object_depot(int argCount, char** args);
-int			dump_depot_magazine(int argCount, char** args);
-
-
 #if SLAB_ALLOCATION_TRACKING_AVAILABLE
 
 class AllocationTrackingInfo {
@@ -92,6 +87,14 @@ public:
 };
 
 #endif // SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+
+void		dump_object_depot(object_depot* depot);
+int			dump_object_depot(int argCount, char** args);
+int			dump_depot_magazine(int argCount, char** args);
+
+bool		slab_debug_add_allocation_for_caller(
+				const AllocationTrackingInfo* info, size_t allocationSize);
 
 
 #if PARANOID_KERNEL_MALLOC || PARANOID_KERNEL_FREE

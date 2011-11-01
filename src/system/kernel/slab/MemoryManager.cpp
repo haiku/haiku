@@ -22,7 +22,6 @@
 #include "kernel_debug_config.h"
 
 #include "ObjectCache.h"
-#include "slab_debug.h"
 #include "slab_private.h"
 
 
@@ -865,6 +864,44 @@ MemoryManager::PerformMaintenance()
 		}
 	}
 }
+
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+/*static*/ bool
+MemoryManager::AnalyzeAllocationCallers()
+{
+	for (AreaTable::Iterator it = sAreaTable.GetIterator();
+			Area* area = it.Next();) {
+		for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
+			MetaChunk* metaChunk = area->metaChunks + i;
+			if (metaChunk->chunkSize == 0)
+				continue;
+
+			for (uint32 k = 0; k < metaChunk->chunkCount; k++) {
+				Chunk* chunk = metaChunk->chunks + k;
+
+				// skip free chunks
+				if (_IsChunkFree(metaChunk, chunk))
+					continue;
+
+				addr_t reference = chunk->reference;
+				if ((reference & 1) == 0 || reference == 1)
+					continue;
+
+				addr_t chunkAddress = _ChunkAddress(metaChunk, chunk);
+				size_t size = reference - chunkAddress + 1;
+
+				slab_debug_add_allocation_for_caller(
+					_TrackingInfoFor((void*)chunkAddress, size), size);
+			}
+		}
+	}
+
+	return true;
+}
+
+#endif	// SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 
 
 /*static*/ status_t
@@ -1989,9 +2026,7 @@ void
 MemoryManager::_AddTrackingInfo(void* allocation, size_t size,
 	AbstractTraceEntryWithStackTrace* traceEntry)
 {
-	AllocationTrackingInfo* info = (AllocationTrackingInfo*)
-		((uint8*)allocation + size - sizeof(AllocationTrackingInfo));
-	info->Init(traceEntry);
+	_TrackingInfoFor(allocation, size)->Init(traceEntry);
 }
 
 #endif // SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING

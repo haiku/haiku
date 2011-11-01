@@ -14,8 +14,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
-#include "kernel_debug_config.h"
-#include "tracing_config.h"
+#include "slab_debug.h"
 
 
 class AbstractTraceEntryWithStackTrace;
@@ -60,6 +59,8 @@ public:
 
 	static	bool				MaintenanceNeeded();
 	static	void				PerformMaintenance();
+
+	static	bool				AnalyzeAllocationCallers();
 
 private:
 			struct Tracing;
@@ -195,9 +196,11 @@ private:
 	static	int					_DumpArea(int argc, char** argv);
 	static	int					_DumpAreas(int argc, char** argv);
 
-#if SLAB_ALLOCATION_TRACKING && SLAB_MEMORY_MANAGER_TRACING
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 	static	void				_AddTrackingInfo(void* allocation, size_t size,
 									AbstractTraceEntryWithStackTrace* entry);
+	static	AllocationTrackingInfo* _TrackingInfoFor(void* allocation,
+									size_t size);
 #endif
 
 private:
@@ -271,6 +274,18 @@ MemoryManager::MetaChunk::GetArea() const
 {
 	return _AreaForAddress((addr_t)this);
 }
+
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+/*static*/ inline AllocationTrackingInfo*
+MemoryManager::_TrackingInfoFor(void* allocation, size_t size)
+{
+	return (AllocationTrackingInfo*)((uint8*)allocation + size
+		- sizeof(AllocationTrackingInfo));
+}
+
+#endif	// SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 
 
 #endif	// MEMORY_MANAGER_H

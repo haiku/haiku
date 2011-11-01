@@ -329,9 +329,6 @@ dump_cache_info(int argc, char* argv[])
 
 #if SLAB_ALLOCATION_TRACKING_AVAILABLE
 
-#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-	// until memory manager tracking is analyzed
-
 static caller_info*
 get_caller_info(addr_t caller)
 {
@@ -353,8 +350,6 @@ get_caller_info(addr_t caller)
 	return info;
 }
 
-#endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-
 
 static int
 caller_info_compare_size(const void* _a, const void* _b)
@@ -374,39 +369,47 @@ caller_info_compare_count(const void* _a, const void* _b)
 }
 
 
+bool
+slab_debug_add_allocation_for_caller(const AllocationTrackingInfo* info,
+	size_t allocationSize)
+{
+	if (!info->IsInitialized())
+		return true;
+
+	addr_t caller = 0;
+	AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+
+	if (traceEntry != NULL && info->IsTraceEntryValid()) {
+		caller = tracing_find_caller_in_stack_trace(
+			traceEntry->StackTrace(), kSlabCodeAddressRanges,
+			kSlabCodeAddressRangeCount);
+	}
+
+	caller_info* callerInfo = get_caller_info(caller);
+	if (callerInfo == NULL) {
+		kprintf("out of space for caller infos\n");
+		return false;
+	}
+
+	callerInfo->count++;
+	callerInfo->size += allocationSize;
+
+	return true;
+}
+
+
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 
 static bool
-analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
-	size_t& _totalAllocationSize, size_t& _totalAllocationCount)
+analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList)
 {
 	for (SlabList::ConstIterator it = slabList.GetIterator();
 			slab* slab = it.Next();) {
 		for (uint32 i = 0; i < slab->size; i++) {
-			AllocationTrackingInfo* info = &slab->tracking[i];
-			if (!info->IsInitialized())
-				continue;
-
-			_totalAllocationSize += cache->object_size;
-			_totalAllocationCount++;
-
-			addr_t caller = 0;
-			AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
-
-			if (traceEntry != NULL && info->IsTraceEntryValid()) {
-				caller = tracing_find_caller_in_stack_trace(
-					traceEntry->StackTrace(), kSlabCodeAddressRanges,
-					kSlabCodeAddressRangeCount);
-			}
-
-			caller_info* callerInfo = get_caller_info(caller);
-			if (callerInfo == NULL) {
-				kprintf("out of space for caller infos\n");
+			if (!slab_debug_add_allocation_for_caller(&slab->tracking[i],
+					cache->object_size)) {
 				return false;
 			}
-
-			callerInfo->count++;
-			callerInfo->size += cache->object_size;
 		}
 	}
 
@@ -415,13 +418,10 @@ analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
 
 
 static bool
-analyze_allocation_callers(ObjectCache* cache, size_t& _totalAllocationSize,
-	size_t& _totalAllocationCount)
+analyze_allocation_callers(ObjectCache* cache)
 {
-	return analyze_allocation_callers(cache, cache->full, _totalAllocationSize,
-			_totalAllocationCount)
-		&& analyze_allocation_callers(cache, cache->partial,
-			_totalAllocationSize, _totalAllocationCount);
+	return analyze_allocation_callers(cache, cache->full)
+		&& analyze_allocation_callers(cache, cache->partial);
 }
 
 #endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
@@ -453,12 +453,10 @@ dump_allocations_per_caller(int argc, char **argv)
 
 	sCallerInfoCount = 0;
 
-	size_t totalAllocationSize = 0;
-	size_t totalAllocationCount = 0;
 	if (cache != NULL) {
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-		analyze_allocation_callers(cache, totalAllocationSize,
-			totalAllocationCount);
+		if (!analyze_allocation_callers(cache))
+			return 0;
 #else
 		kprintf("Object cache allocation tracking not available. "
 			"SLAB_OBJECT_CACHE_TRACING (%d) and "
@@ -471,9 +469,14 @@ dump_allocations_per_caller(int argc, char **argv)
 		ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 		while (it.HasNext()) {
-			analyze_allocation_callers(it.Next(), totalAllocationSize,
-				totalAllocationCount);
+			if (!analyze_allocation_callers(it.Next()))
+				return 0;
 		}
+#endif
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+		if (!MemoryManager::AnalyzeAllocationCallers())
+			return 0;
 #endif
 	}
 
@@ -483,6 +486,9 @@ dump_allocations_per_caller(int argc, char **argv)
 
 	kprintf("%ld different callers, sorted by %s...\n\n", sCallerInfoCount,
 		sortBySize ? "size" : "count");
+
+	size_t totalAllocationSize = 0;
+	size_t totalAllocationCount = 0;
 
 	kprintf("     count        size      caller\n");
 	kprintf("----------------------------------\n");
@@ -503,6 +509,9 @@ dump_allocations_per_caller(int argc, char **argv)
 				exactMatch ? "" : " (nearest)");
 		} else
 			kprintf("\n");
+
+		totalAllocationCount += info.count;
+		totalAllocationSize += info.size;
 	}
 
 	kprintf("\ntotal allocations: %" B_PRIuSIZE ", %" B_PRIuSIZE " bytes\n",
