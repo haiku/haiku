@@ -425,8 +425,12 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	if (!(fFlags & VOLUME_READ_ONLY)) {
 		Attribute attr(fRootNode);
-		if (attr.Get("be:volume_id") == B_ENTRY_NOT_FOUND)
-			CreateVolumeID();
+		if (attr.Get("be:volume_id") == B_ENTRY_NOT_FOUND) {
+			Transaction transaction(this, fRootNode->BlockNumber());
+			fRootNode->WriteLockInTransaction(transaction);
+			CreateVolumeID(transaction);
+			transaction.Done();
+		}
 	}
 
 	// all went fine
@@ -509,7 +513,7 @@ Volume::CreateIndicesRoot(Transaction& transaction)
 
 
 status_t
-Volume::CreateVolumeID()
+Volume::CreateVolumeID(Transaction& transaction)
 {
 	Attribute attr(fRootNode);
 	status_t status;
@@ -525,10 +529,7 @@ Volume::CreateVolumeID()
 		uint64_t id;
 		size_t length = sizeof(id);
 		id = ((uint64_t)rand() << 32) | rand();
-		Transaction transaction(this, fRootNode->BlockNumber());
-		fRootNode->WriteLockInTransaction(transaction);
 		attr.Write(transaction, cookie, 0, (uint8_t *)&id, &length, NULL);
-		transaction.Done();
 	}
 	return status;
 }
@@ -766,7 +767,7 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 			return status;
 	}
 
-	CreateVolumeID();
+	CreateVolumeID(transaction);
 
 	WriteSuperBlock();
 	transaction.Done();
