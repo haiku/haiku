@@ -869,7 +869,7 @@ MemoryManager::PerformMaintenance()
 #if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 
 /*static*/ bool
-MemoryManager::AnalyzeAllocationCallers()
+MemoryManager::AnalyzeAllocationCallers(bool resetAllocationInfos)
 {
 	for (AreaTable::Iterator it = sAreaTable.GetIterator();
 			Area* area = it.Next();) {
@@ -893,7 +893,8 @@ MemoryManager::AnalyzeAllocationCallers()
 				size_t size = reference - chunkAddress + 1;
 
 				slab_debug_add_allocation_for_caller(
-					_TrackingInfoFor((void*)chunkAddress, size), size);
+					_TrackingInfoFor((void*)chunkAddress, size), size,
+					resetAllocationInfos);
 			}
 		}
 	}

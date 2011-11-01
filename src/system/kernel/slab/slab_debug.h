@@ -93,8 +93,13 @@ void		dump_object_depot(object_depot* depot);
 int			dump_object_depot(int argCount, char** args);
 int			dump_depot_magazine(int argCount, char** args);
 
+#if SLAB_ALLOCATION_TRACKING_AVAILABLE
+
 bool		slab_debug_add_allocation_for_caller(
-				const AllocationTrackingInfo* info, size_t allocationSize);
+				AllocationTrackingInfo* info, size_t allocationSize,
+				bool resetAllocationInfos);
+
+#endif // SLAB_ALLOCATION_TRACKING_AVAILABLE
 
 
 #if PARANOID_KERNEL_MALLOC || PARANOID_KERNEL_FREE

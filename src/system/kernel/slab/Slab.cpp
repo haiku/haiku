@@ -370,8 +370,8 @@ caller_info_compare_count(const void* _a, const void* _b)
 
 
 bool
-slab_debug_add_allocation_for_caller(const AllocationTrackingInfo* info,
-	size_t allocationSize)
+slab_debug_add_allocation_for_caller(AllocationTrackingInfo* info,
+	size_t allocationSize, bool resetAllocationInfos)
 {
 	if (!info->IsInitialized())
 		return true;
@@ -394,6 +394,9 @@ slab_debug_add_allocation_for_caller(const AllocationTrackingInfo* info,
 	callerInfo->count++;
 	callerInfo->size += allocationSize;
 
+	if (resetAllocationInfos)
+		info->Clear();
+
 	return true;
 }
 
@@ -401,13 +404,14 @@ slab_debug_add_allocation_for_caller(const AllocationTrackingInfo* info,
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 
 static bool
-analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList)
+analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
+	bool resetAllocationInfos)
 {
 	for (SlabList::ConstIterator it = slabList.GetIterator();
 			slab* slab = it.Next();) {
 		for (uint32 i = 0; i < slab->size; i++) {
 			if (!slab_debug_add_allocation_for_caller(&slab->tracking[i],
-					cache->object_size)) {
+					cache->object_size, resetAllocationInfos)) {
 				return false;
 			}
 		}
@@ -418,10 +422,11 @@ analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList)
 
 
 static bool
-analyze_allocation_callers(ObjectCache* cache)
+analyze_allocation_callers(ObjectCache* cache, bool resetAllocationInfos)
 {
-	return analyze_allocation_callers(cache, cache->full)
-		&& analyze_allocation_callers(cache, cache->partial);
+	return analyze_allocation_callers(cache, cache->full, resetAllocationInfos)
+		&& analyze_allocation_callers(cache, cache->partial,
+			resetAllocationInfos);
 }
 
 #endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
@@ -431,6 +436,7 @@ static int
 dump_allocations_per_caller(int argc, char **argv)
 {
 	bool sortBySize = true;
+	bool resetAllocationInfos = false;
 	ObjectCache* cache = NULL;
 
 	for (int32 i = 1; i < argc; i++) {
@@ -445,6 +451,8 @@ dump_allocations_per_caller(int argc, char **argv)
 			}
 
 			cache = (ObjectCache*)(addr_t)cacheAddress;
+		} else if (strcmp(argv[i], "-r") == 0) {
+			resetAllocationInfos = true;
 		} else {
 			print_debugger_command_usage(argv[0]);
 			return 0;
@@ -455,7 +463,7 @@ dump_allocations_per_caller(int argc, char **argv)
 
 	if (cache != NULL) {
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-		if (!analyze_allocation_callers(cache))
+		if (!analyze_allocation_callers(cache, resetAllocationInfos))
 			return 0;
 #else
 		kprintf("Object cache allocation tracking not available. "
@@ -469,13 +477,13 @@ dump_allocations_per_caller(int argc, char **argv)
 		ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 		while (it.HasNext()) {
-			if (!analyze_allocation_callers(it.Next()))
+			if (!analyze_allocation_callers(it.Next(), resetAllocationInfos))
 				return 0;
 		}
 #endif
 
 #if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
-		if (!MemoryManager::AnalyzeAllocationCallers())
+		if (!MemoryManager::AnalyzeAllocationCallers(resetAllocationInfos))
 			return 0;
 #endif
 	}
@@ -1061,12 +1069,14 @@ slab_init_post_area()
 	add_debugger_command_etc("allocations_per_caller",
 		&dump_allocations_per_caller,
 		"Dump current heap allocations summed up per caller",
-		"[ \"-c\" ] [ -o <object cache> ]\n"
+		"[ -c ] [ -o <object cache> ] [ -r ]\n"
 		"The current allocations will by summed up by caller (their count and\n"
 		"size) printed in decreasing order by size or, if \"-c\" is\n"
 		"specified, by allocation count. If given <object cache> specifies\n"
-		"the address of the object cache for which to print the allocations.\n",
-		0);
+		"the address of the object cache for which to print the allocations.\n"
+		"If \"-r\" is given, the allocation infos are reset after gathering\n"
+		"the information, so the next command invocation will only show the\n"
+		"allocations made after the reset.\n", 0);
 #endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
 }
 

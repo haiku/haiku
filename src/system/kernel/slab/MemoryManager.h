@@ -60,7 +60,8 @@ public:
 	static	bool				MaintenanceNeeded();
 	static	void				PerformMaintenance();
 
-	static	bool				AnalyzeAllocationCallers();
+	static	bool				AnalyzeAllocationCallers(
+									bool resetAllocationInfos);
 
 private:
 			struct Tracing;
