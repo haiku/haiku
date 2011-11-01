@@ -7,7 +7,6 @@
 
 #include <tracing.h>
 
-#include <stdarg.h>
 #include <stdlib.h>
 
 #include <algorithm>
@@ -57,6 +56,26 @@ static const uint32 kMetaDataMagic3 = 'cing';
 // the maximum we can address with the trace_entry::[previous_]size fields
 static const size_t kMaxTracingEntryByteSize
 	= ((1 << 13) - 1) * sizeof(trace_entry);
+
+
+struct TraceOutputPrint {
+	TraceOutputPrint(TraceOutput& output)
+		:
+		fOutput(output)
+	{
+	}
+
+	void operator()(const char* format,...) const
+	{
+		va_list args;
+		va_start(args, format);
+		fOutput.PrintArgs(format, args);
+		va_end(args);
+	}
+
+private:
+	TraceOutput&	fOutput;
+};
 
 
 class TracingMetaData {
@@ -110,6 +129,33 @@ static bool sTracingDataRecovered = false;
 
 
 // #pragma mark -
+
+
+template<typename Print>
+static void
+print_stack_trace(struct tracing_stack_trace* stackTrace,
+	const Print& print)
+{
+	if (stackTrace == NULL || stackTrace->depth <= 0)
+		return;
+
+	for (int32 i = 0; i < stackTrace->depth; i++) {
+		addr_t address = stackTrace->return_addresses[i];
+
+		const char* symbol;
+		const char* imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			print("  %p  %s + 0x%lx (%s)%s\n", (void*)address, symbol,
+				address - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			print("  %p\n", (void*)address);
+	}
+}
 
 
 // #pragma mark - TracingMetaData
@@ -618,20 +664,14 @@ TraceOutput::Clear()
 
 
 void
-TraceOutput::Print(const char* format,...)
+TraceOutput::PrintArgs(const char* format, va_list args)
 {
 #if ENABLE_TRACING
 	if (IsFull())
 		return;
 
-	if (fSize < fCapacity) {
-		va_list args;
-		va_start(args, format);
-		size_t length = vsnprintf(fBuffer + fSize, fCapacity - fSize, format,
-			args);
-		fSize += std::min(length, fCapacity - fSize - 1);
-		va_end(args);
-	}
+	size_t length = vsnprintf(fBuffer + fSize, fCapacity - fSize, format, args);
+	fSize += std::min(length, fCapacity - fSize - 1);
 #endif
 }
 
@@ -640,6 +680,7 @@ void
 TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
 {
 #if ENABLE_TRACING
+	print_stack_trace(stackTrace, TraceOutputPrint(*this));
 	if (stackTrace == NULL || stackTrace->depth <= 0)
 		return;
 
@@ -1631,6 +1672,13 @@ tracing_find_caller_in_stack_trace(struct tracing_stack_trace* stackTrace,
 	}
 
 	return 0;
+}
+
+
+void
+tracing_print_stack_trace(struct tracing_stack_trace* stackTrace)
+{
+	print_stack_trace(stackTrace, kprintf);
 }
 
 

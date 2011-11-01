@@ -10,6 +10,7 @@
 #include <SupportDefs.h>
 #include <KernelExport.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "tracing_config.h"
@@ -41,30 +42,31 @@ struct tracing_stack_trace {
 
 
 class TraceOutput {
-	public:
-		TraceOutput(char* buffer, size_t bufferSize, uint32 flags);
+public:
+	TraceOutput(char* buffer, size_t bufferSize, uint32 flags);
 
-		void Clear();
-		void Print(const char* format,...)
-			__attribute__ ((format (__printf__, 2, 3)));
-		void PrintStackTrace(tracing_stack_trace* stackTrace);
-		bool IsFull() const	{ return fSize >= fCapacity; }
+	void Clear();
+	void Print(const char* format,...)
+		__attribute__ ((format (__printf__, 2, 3)));
+	void PrintArgs(const char* format, va_list args);
+	void PrintStackTrace(tracing_stack_trace* stackTrace);
+	bool IsFull() const	{ return fSize >= fCapacity; }
 
-		char* Buffer() const	{ return fBuffer; }
-		size_t Capacity() const	{ return fCapacity; }
-		size_t Size() const		{ return fSize; }
+	char* Buffer() const	{ return fBuffer; }
+	size_t Capacity() const	{ return fCapacity; }
+	size_t Size() const		{ return fSize; }
 
-		uint32 Flags() const	{ return fFlags; }
+	uint32 Flags() const	{ return fFlags; }
 
-		void SetLastEntryTime(bigtime_t time);
-		bigtime_t LastEntryTime() const;
+	void SetLastEntryTime(bigtime_t time);
+	bigtime_t LastEntryTime() const;
 
-	private:
-		char*		fBuffer;
-		size_t		fCapacity;
-		size_t		fSize;
-		uint32		fFlags;
-		bigtime_t	fLastEntryTime;
+private:
+	char*		fBuffer;
+	size_t		fCapacity;
+	size_t		fSize;
+	uint32		fFlags;
+	bigtime_t	fLastEntryTime;
 };
 
 
@@ -251,6 +253,16 @@ private:
 };
 
 
+inline void
+TraceOutput::Print(const char* format,...)
+{
+	va_list args;
+	va_start(args, format);
+	PrintArgs(format, args);
+	va_end(args);
+}
+
+
 int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
 
 bool tracing_is_entry_valid(TraceEntry* entry, bigtime_t entryTime);
@@ -272,6 +284,7 @@ struct tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
 addr_t tracing_find_caller_in_stack_trace(
 	struct tracing_stack_trace* stackTrace, const addr_t excludeRanges[],
 	uint32 excludeRangeCount);
+void tracing_print_stack_trace(struct tracing_stack_trace* stackTrace);
 
 void lock_tracing_buffer();
 void unlock_tracing_buffer();
