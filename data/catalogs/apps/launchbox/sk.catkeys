@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-LaunchBox	1440389990
+1	slovak	x-vnd.Haiku-LaunchBox	2567299959
 Add button here	LaunchBox		Pridať tlačidlo sem
 Auto-raise	LaunchBox		Automaticky aktivovať
 Bummer	LaunchBox		Škoda
@@ -7,9 +7,8 @@ Clear button	LaunchBox		Tlačidlo Vyčistiť
 Clone	LaunchBox		Klonovať
 Close	LaunchBox		Zatvoriť
 Description for '%3'	LaunchBox		Popis „%3“
-Failed to launch '%1'.\n\nError: 	LaunchBox		Nepodarilo sa spustiť „%1“.\n\nChyba:
+Failed to launch '%1'.\n\nError:	LaunchBox		Nepodarilo sa spustiť „%1“.\n\nChyba:
 Failed to launch 'something',error in Pad data.	LaunchBox		Nepodarilo sa spustiť „niečo“, chyba v dátach Oblasti.
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Nepodarilo sa spustiť aplikáciu so signatúrou „%2“.\n\nChyba:
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodarilo sa poslať príkaz „otvoriť priečinok“ Trackeru.\n\nChyba:
 Horizontal layout	LaunchBox		Vodorovné rozloženie
 Icon size	LaunchBox		Veľkosť ikon
