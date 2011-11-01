@@ -63,6 +63,8 @@ static const int32 kCallerInfoTableSize = 1024;
 static caller_info sCallerInfoTable[kCallerInfoTableSize];
 static int32 sCallerInfoCount = 0;
 
+static caller_info* get_caller_info(addr_t caller);
+
 
 RANGE_MARKER_FUNCTION_PROTOTYPES(slab_allocator)
 RANGE_MARKER_FUNCTION_PROTOTYPES(SlabHashedObjectCache)
@@ -327,7 +329,68 @@ dump_cache_info(int argc, char* argv[])
 }
 
 
+// #pragma mark - AllocationTrackingCallback
+
+
 #if SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+AllocationTrackingCallback::~AllocationTrackingCallback()
+{
+}
+
+#endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+
+// #pragma mark -
+
+
+#if SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+namespace {
+
+class AllocationCollectorCallback : public AllocationTrackingCallback {
+public:
+	AllocationCollectorCallback(bool resetInfos)
+		:
+		fResetInfos(resetInfos)
+	{
+	}
+
+	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
+		size_t allocationSize)
+	{
+		if (!info->IsInitialized())
+			return true;
+
+		addr_t caller = 0;
+		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+
+		if (traceEntry != NULL && info->IsTraceEntryValid()) {
+			caller = tracing_find_caller_in_stack_trace(
+				traceEntry->StackTrace(), kSlabCodeAddressRanges,
+				kSlabCodeAddressRangeCount);
+		}
+
+		caller_info* callerInfo = get_caller_info(caller);
+		if (callerInfo == NULL) {
+			kprintf("out of space for caller infos\n");
+			return false;
+		}
+
+		callerInfo->count++;
+		callerInfo->size += allocationSize;
+
+		if (fResetInfos)
+			info->Clear();
+
+		return true;
+	}
+
+private:
+	bool	fResetInfos;
+};
+
+}	// unnamed namespace
 
 static caller_info*
 get_caller_info(addr_t caller)
@@ -369,49 +432,17 @@ caller_info_compare_count(const void* _a, const void* _b)
 }
 
 
-bool
-slab_debug_add_allocation_for_caller(AllocationTrackingInfo* info,
-	size_t allocationSize, bool resetAllocationInfos)
-{
-	if (!info->IsInitialized())
-		return true;
-
-	addr_t caller = 0;
-	AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
-
-	if (traceEntry != NULL && info->IsTraceEntryValid()) {
-		caller = tracing_find_caller_in_stack_trace(
-			traceEntry->StackTrace(), kSlabCodeAddressRanges,
-			kSlabCodeAddressRangeCount);
-	}
-
-	caller_info* callerInfo = get_caller_info(caller);
-	if (callerInfo == NULL) {
-		kprintf("out of space for caller infos\n");
-		return false;
-	}
-
-	callerInfo->count++;
-	callerInfo->size += allocationSize;
-
-	if (resetAllocationInfos)
-		info->Clear();
-
-	return true;
-}
-
-
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 
 static bool
 analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
-	bool resetAllocationInfos)
+	AllocationTrackingCallback& callback)
 {
 	for (SlabList::ConstIterator it = slabList.GetIterator();
 			slab* slab = it.Next();) {
 		for (uint32 i = 0; i < slab->size; i++) {
-			if (!slab_debug_add_allocation_for_caller(&slab->tracking[i],
-					cache->object_size, resetAllocationInfos)) {
+			if (!callback.ProcessTrackingInfo(&slab->tracking[i],
+					cache->object_size)) {
 				return false;
 			}
 		}
@@ -422,11 +453,11 @@ analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
 
 
 static bool
-analyze_allocation_callers(ObjectCache* cache, bool resetAllocationInfos)
+analyze_allocation_callers(ObjectCache* cache,
+	AllocationTrackingCallback& callback)
 {
-	return analyze_allocation_callers(cache, cache->full, resetAllocationInfos)
-		&& analyze_allocation_callers(cache, cache->partial,
-			resetAllocationInfos);
+	return analyze_allocation_callers(cache, cache->full, callback)
+		&& analyze_allocation_callers(cache, cache->partial, callback);
 }
 
 #endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
@@ -463,7 +494,8 @@ dump_allocations_per_caller(int argc, char **argv)
 
 	if (cache != NULL) {
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-		if (!analyze_allocation_callers(cache, resetAllocationInfos))
+		AllocationCollectorCallback callback(resetAllocationInfos);
+		if (!analyze_allocation_callers(cache, callback))
 			return 0;
 #else
 		kprintf("Object cache allocation tracking not available. "
@@ -473,17 +505,18 @@ dump_allocations_per_caller(int argc, char **argv)
 		return 0;
 #endif
 	} else {
+		AllocationCollectorCallback callback(resetAllocationInfos);
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-		ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
-		while (it.HasNext()) {
-			if (!analyze_allocation_callers(it.Next(), resetAllocationInfos))
+		for (ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
+				it.HasNext();) {
+			if (!analyze_allocation_callers(it.Next(), callback))
 				return 0;
 		}
 #endif
 
 #if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
-		if (!MemoryManager::AnalyzeAllocationCallers(resetAllocationInfos))
+		if (!MemoryManager::AnalyzeAllocationCallers(callback))
 			return 0;
 #endif
 	}

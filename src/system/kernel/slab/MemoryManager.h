@@ -61,7 +61,7 @@ public:
 	static	void				PerformMaintenance();
 
 	static	bool				AnalyzeAllocationCallers(
-									bool resetAllocationInfos);
+									AllocationTrackingCallback& callback);
 
 private:
 			struct Tracing;
