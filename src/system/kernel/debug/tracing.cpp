@@ -23,12 +23,6 @@
 #include <vm/vm.h>
 
 
-struct tracing_stack_trace {
-	int32	depth;
-	addr_t	return_addresses[0];
-};
-
-
 #if ENABLE_TRACING
 
 //#define TRACE_TRACING
@@ -1616,6 +1610,30 @@ capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool kernelOnly)
 }
 
 
+addr_t
+tracing_find_caller_in_stack_trace(struct tracing_stack_trace* stackTrace,
+	const addr_t excludeRanges[], uint32 excludeRangeCount)
+{
+	for (int32 i = 0; i < stackTrace->depth; i++) {
+		addr_t returnAddress = stackTrace->return_addresses[i];
+
+		bool inRange = false;
+		for (uint32 j = 0; j < excludeRangeCount; j++) {
+			if (returnAddress >= excludeRanges[j * 2 + 0]
+				&& returnAddress < excludeRanges[j * 2 + 1]) {
+				inRange = true;
+				break;
+			}
+		}
+
+		if (!inRange)
+			return returnAddress;
+	}
+
+	return 0;
+}
+
+
 int
 dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 {
@@ -1624,6 +1642,26 @@ dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 #else
 	return 0;
 #endif
+}
+
+
+bool
+tracing_is_entry_valid(TraceEntry* candidate, bigtime_t entryTime)
+{
+#if ENABLE_TRACING
+	TraceEntryIterator iterator;
+	while (TraceEntry* entry = iterator.Next()) {
+		AbstractTraceEntry* abstract = dynamic_cast<AbstractTraceEntry*>(entry);
+		if (abstract == NULL)
+			continue;
+
+		// TODO: This could be better by additionally checking if the
+		// candidate entry address falls within the valid entry range.
+		return abstract == candidate || abstract->Time() < entryTime;
+	}
+#endif
+
+	return false;
 }
 
 

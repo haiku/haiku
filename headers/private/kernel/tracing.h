@@ -21,7 +21,11 @@ struct trace_entry {
 	uint32	flags			: 6;
 };
 
-struct tracing_stack_trace;
+struct tracing_stack_trace {
+	int32	depth;
+	addr_t	return_addresses[0];
+};
+
 
 #ifdef __cplusplus
 
@@ -134,6 +138,11 @@ public:
 
 	virtual void DumpStackTrace(TraceOutput& out);
 
+	tracing_stack_trace* StackTrace() const
+	{
+		return fStackTrace;
+	}
+
 protected:
 	typedef AbstractTraceEntryWithStackTrace TraceEntryBase;
 
@@ -244,7 +253,10 @@ private:
 
 int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
 
+bool tracing_is_entry_valid(TraceEntry* entry, bigtime_t entryTime);
+
 #endif	// __cplusplus
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -254,8 +266,13 @@ uint8* alloc_tracing_buffer(size_t size);
 uint8* alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user);
 char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 			bool user);
+
 struct tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
 			int32 skipFrames, bool kernelOnly);
+addr_t tracing_find_caller_in_stack_trace(
+	struct tracing_stack_trace* stackTrace, const addr_t excludeRanges[],
+	uint32 excludeRangeCount);
+
 void lock_tracing_buffer();
 void unlock_tracing_buffer();
 status_t tracing_init(void);
