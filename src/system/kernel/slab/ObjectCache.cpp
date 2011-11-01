@@ -141,7 +141,7 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 	CREATE_PARANOIA_CHECK_SET(slab, "slab");
 
-	
+
 	for (size_t i = 0; i < slab->size; i++) {
 		status_t status = B_OK;
 		if (constructor)
@@ -242,6 +242,13 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 		full.Remove(source);
 		partial.Add(source);
 	}
+}
+
+
+void*
+ObjectCache::ObjectAtIndex(slab* source, int32 index) const
+{
+	return (uint8*)source->pages + source->offset + index * object_size;
 }
 
 

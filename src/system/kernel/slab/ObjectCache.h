@@ -106,6 +106,7 @@ public:
 
 			void				ReturnObjectToSlab(slab* source, void* object,
 									uint32 flags);
+			void*				ObjectAtIndex(slab* source, int32 index) const;
 
 			bool				Lock()	{ return mutex_lock(&lock) == B_OK; }
 			void				Unlock()	{ mutex_unlock(&lock); }
