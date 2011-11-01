@@ -31,10 +31,6 @@ const uint32 H_TM_CHANGED = 'obTC';
 // notice for user changes
 const uint32 H_USER_CHANGE = 'obUC';
 
-// notices to hide or show the time zone preview
-const uint32 H_HIDE_PREVIEW = 'hipr';
-const uint32 H_SHOW_PREVIEW = 'shpr';
-
 // local/ gmt radiobuttons
 const uint32 kRTCUpdate = '_rtc';
 

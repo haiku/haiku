@@ -171,16 +171,6 @@ TimeZoneView::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case H_HIDE_PREVIEW:
-			fCurrent->Hide();
-			fPreview->Hide();
-			break;
-
-		case H_SHOW_PREVIEW:
-			fCurrent->Show();
-			fPreview->Show();
-			break;
-
 		case kMsgRevert:
 			_Revert();
 			break;
@@ -281,6 +271,7 @@ TimeZoneView::_InitView()
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
 		fLocalTime->SetValue(B_CONTROL_ON);
+	_ShowOrHidePreview();
 	fOldUseGmtTime = fUseGmtTime;
 
 
@@ -288,14 +279,14 @@ TimeZoneView::_InitView()
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
 		.AddGroup(B_VERTICAL, kInset)
-			.Add(fCurrent)
-			.Add(fPreview)
-			.AddGlue()
 			.Add(text)
 			.AddGroup(B_VERTICAL, kInset)
 				.Add(fLocalTime)
 				.Add(fGmtTime)
 			.End()
+			.AddGlue()
+			.Add(fCurrent)
+			.Add(fPreview)
 			.Add(fSetZone)
 		.End()
 		.SetInsets(kInset, kInset, kInset, kInset);
@@ -499,6 +490,7 @@ TimeZoneView::_Revert()
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
 		fLocalTime->SetValue(B_CONTROL_ON);
+	_ShowOrHidePreview();
 
 	_UpdateGmtSettings();
 	_SetSystemTimeZone();
@@ -641,6 +633,7 @@ TimeZoneView::_UpdateGmtSettings()
 {
 	_WriteRTCSettings();
 
+	_ShowOrHidePreview();
 	_NotifyClockSettingChanged();
 
 	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
@@ -648,10 +641,26 @@ TimeZoneView::_UpdateGmtSettings()
 
 
 void
+TimeZoneView::_ShowOrHidePreview()
+{
+	if (fUseGmtTime) {
+		// Hardware clock uses GMT time, changing timezone will adjust the
+		// offset and we need to display a preview
+		fCurrent->Show();
+		fPreview->Show();
+	} else {
+		// Hardware clock uses local time, changing timezone will adjust the
+		// clock and there is no offset to manage, thus, no preview.
+		fCurrent->Hide();
+		fPreview->Hide();
+	}
+}
+
+
+void
 TimeZoneView::_NotifyClockSettingChanged()
 {
-	BMessage msg(kMsgChange);
-	msg.AddBool("UseGMT", fUseGmtTime);
+	BMessage msg(kMsgClockSettingChanged);
 	Window()->PostMessage(&msg);
 }
 

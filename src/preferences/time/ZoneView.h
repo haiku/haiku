@@ -52,6 +52,7 @@ private:
 			void 				_ReadRTCSettings();
 			void				_WriteRTCSettings();
 			void				_UpdateGmtSettings();
+			void				_ShowOrHidePreview();
 
 			void				_InitView();
 			void				_BuildZoneMenu();
