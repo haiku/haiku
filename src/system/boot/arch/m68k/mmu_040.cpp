@@ -23,7 +23,7 @@
 #include "arch_040_mmu.h"
 
 
-//#define TRACE_MMU
+#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
@@ -33,10 +33,52 @@
 
 extern page_root_entry *gPageRoot;
 
+//XXX: the milan BIOS uses the mmu for itself,
+// likely to virtualize missing Atari I/O ports...
+// tcr: c000 (enabled, 8k pages :()
+// dtt0: 803fe140	0x80000000 & ~0x3f... en ignFC2 U=1 CI,S  RW
+// dtt1: 403fe060	0x40000000 & ~0x3f... en ignFC2 U=0 CI,NS RW
+// itt0: 803fe040	0x80000000 & ~0x3f... en ignFC2 U=0 CI,S  RW
+// itt1: 403fe000	0x40000000 & ~0x3f... en ignFC2 U=0 C,WT  RW
+// srp:  00dfde00
+// urp:  00dfde00
+
+static void
+dump_mmu(void)
+{
+	uint32 dttr0, dttr1;
+	uint32 ittr0, ittr1;
+	uint32 srp, urp;
+	uint32 tcr;
+
+	TRACE(("mmu_040:dump:\n"));
+
+	asm volatile("movec %%tcr,%0\n" : "=d"(tcr) :);
+	TRACE(("tcr:\t%08lx\n", tcr));
+
+	asm volatile("movec %%dtt0,%0\n" : "=d"(dttr0) :);
+	TRACE(("dtt0:\t%08lx\n", dttr0));
+	asm volatile("movec %%dtt1,%0\n" : "=d"(dttr1) :);
+	TRACE(("dtt1:\t%08lx\n", dttr1));
+
+	asm volatile("movec %%itt0,%0\n" : "=d"(ittr0) :);
+	TRACE(("itt0:\t%08lx\n", ittr0));
+	asm volatile("movec %%itt1,%0\n" : "=d"(ittr1) :);
+	TRACE(("itt1:\t%08lx\n", ittr1));
+
+	asm volatile("movec %%srp,%0\n" : "=d"(srp) :);
+	TRACE(("srp:\t%08lx\n", srp));
+	asm volatile("movec %%urp,%0\n" : "=d"(urp) :);
+	TRACE(("urp:\t%08lx\n", urp));
+
+	TRACE(("mmu_040:dump:\n"));
+}
+
 
 static void
 initialize(void)
 {
+	dump_mmu();
 	TRACE(("mmu_040:initialize\n"));
 }
 
