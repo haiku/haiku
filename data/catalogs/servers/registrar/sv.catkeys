@@ -1,23 +1,23 @@
 1	swedish	application/x-vnd.Haiku-Registrar	2599857937
 %action%?	ShutdownProcess		%action%?
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Applikationen "%appName%" avbröt nerstängningen.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet "%appName%" avbröt avstängningen.
 Asking \"%appName%\" to quit.	ShutdownProcess		Ber "%appName%" att avsluta.
-Asking background applications to quit.	ShutdownProcess		Ber bakgrunds applikationerna att avsluta.
+Asking background applications to quit.	ShutdownProcess		Ber bakgrundsprogrammen att avsluta.
 Asking other processes to quit.	ShutdownProcess		Ber alla processer att avsluta.
 Cancel	ShutdownProcess		Avbryt
-Cancel shutdown	ShutdownProcess		Avbryt nerstängning
+Cancel shutdown	ShutdownProcess		Avbryt avstängning
 Do you really want to restart the system?	ShutdownProcess		Vill du verkligen starta om systemet?
-Do you really want to shut down the system?	ShutdownProcess		Är du säker på att du vill avsluta systemet?
+Do you really want to shut down the system?	ShutdownProcess		Är du säker på att du vill stänga av Haiku?
 It's now safe to turn off the computer.	ShutdownProcess		Nu är det säkert att slå av datorn.
-Kill application	ShutdownProcess		Avsluta applikation
+Kill application	ShutdownProcess		Avsluta program
 OK	ShutdownProcess		OK
 Restart	ShutdownProcess		Starta om
 Restart system	ShutdownProcess		Starta om
 Restarting…	ShutdownProcess		Startar om...
 Shut down	ShutdownProcess		Stäng av
-Shutdown aborted	ShutdownProcess		Avslutningen avbröts
+Shutdown aborted	ShutdownProcess		Avstängningen avbröts
 Shutdown status	ShutdownProcess		Avslutar Haiku
 Shutting down…	ShutdownProcess		Stänger av...
-System is shut down	ShutdownProcess		Systemet är avslutat
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Applikationen "%appName%" kan vara blockerad av en dialogruta.
+System is shut down	ShutdownProcess		Systemet är avstängt
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Programmet "%appName%" kan vara blockerad av en dialogruta.
 Tidying things up a bit.	ShutdownProcess		Städar upp lite.
