@@ -70,6 +70,7 @@ The following darwin ports need to be installed:
  * gettext
  * libiconv
  * gnuregex
+ * gsed
 
 More information about individual distributions of Linux and BSD can be found
 at http://haiku-os.org/guides/building/pre-reqs
