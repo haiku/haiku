@@ -357,7 +357,7 @@ public:
 	}
 
 	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
-		size_t allocationSize)
+		void* allocation, size_t allocationSize)
 	{
 		if (!info->IsInitialized())
 			return true;
@@ -388,6 +388,45 @@ public:
 
 private:
 	bool	fResetInfos;
+};
+
+
+class AllocationDetailPrinterCallback : public AllocationTrackingCallback {
+public:
+	AllocationDetailPrinterCallback(addr_t caller)
+		:
+		fCaller(caller)
+	{
+	}
+
+	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
+		void* allocation, size_t allocationSize)
+	{
+		if (!info->IsInitialized())
+			return true;
+
+		addr_t caller = 0;
+		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+
+		if (traceEntry != NULL && info->IsTraceEntryValid()) {
+			caller = tracing_find_caller_in_stack_trace(
+				traceEntry->StackTrace(), kSlabCodeAddressRanges,
+				kSlabCodeAddressRangeCount);
+		}
+
+		if (caller != fCaller)
+			return true;
+
+		kprintf("allocation %p, size: %" B_PRIuSIZE "\n", allocation,
+			allocationSize);
+		if (traceEntry != NULL)
+			tracing_print_stack_trace(traceEntry->StackTrace());
+
+		return true;
+	}
+
+private:
+	addr_t	fCaller;
 };
 
 }	// unnamed namespace
@@ -442,7 +481,7 @@ analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
 			slab* slab = it.Next();) {
 		for (uint32 i = 0; i < slab->size; i++) {
 			if (!callback.ProcessTrackingInfo(&slab->tracking[i],
-					cache->object_size)) {
+					cache->ObjectAtIndex(slab, i), cache->object_size)) {
 				return false;
 			}
 		}
@@ -468,11 +507,23 @@ dump_allocations_per_caller(int argc, char **argv)
 {
 	bool sortBySize = true;
 	bool resetAllocationInfos = false;
+	bool printDetails = false;
 	ObjectCache* cache = NULL;
+	addr_t caller = 0;
 
 	for (int32 i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-c") == 0) {
 			sortBySize = false;
+		} else if (strcmp(argv[i], "-d") == 0) {
+			uint64 callerAddress;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &callerAddress, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			caller = callerAddress;
+			printDetails = true;
 		} else if (strcmp(argv[i], "-o") == 0) {
 			uint64 cacheAddress;
 			if (++i >= argc
@@ -492,9 +543,14 @@ dump_allocations_per_caller(int argc, char **argv)
 
 	sCallerInfoCount = 0;
 
+	AllocationCollectorCallback collectorCallback(resetAllocationInfos);
+	AllocationDetailPrinterCallback detailsCallback(caller);
+	AllocationTrackingCallback& callback = printDetails
+		? (AllocationTrackingCallback&)detailsCallback
+		: (AllocationTrackingCallback&)collectorCallback;
+
 	if (cache != NULL) {
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
-		AllocationCollectorCallback callback(resetAllocationInfos);
 		if (!analyze_allocation_callers(cache, callback))
 			return 0;
 #else
@@ -505,7 +561,6 @@ dump_allocations_per_caller(int argc, char **argv)
 		return 0;
 #endif
 	} else {
-		AllocationCollectorCallback callback(resetAllocationInfos);
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 
 		for (ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
@@ -520,6 +575,9 @@ dump_allocations_per_caller(int argc, char **argv)
 			return 0;
 #endif
 	}
+
+	if (printDetails)
+		return 0;
 
 	// sort the array
 	qsort(sCallerInfoTable, sCallerInfoCount, sizeof(caller_info),
@@ -1102,11 +1160,13 @@ slab_init_post_area()
 	add_debugger_command_etc("allocations_per_caller",
 		&dump_allocations_per_caller,
 		"Dump current heap allocations summed up per caller",
-		"[ -c ] [ -o <object cache> ] [ -r ]\n"
+		"[ -c ] [ -d <caller> ] [ -o <object cache> ] [ -r ]\n"
 		"The current allocations will by summed up by caller (their count and\n"
 		"size) printed in decreasing order by size or, if \"-c\" is\n"
 		"specified, by allocation count. If given <object cache> specifies\n"
 		"the address of the object cache for which to print the allocations.\n"
+		"If \"-d\" is given, each allocation for caller <caller> is printed\n"
+		"including the respective stack trace.\n"
 		"If \"-r\" is given, the allocation infos are reset after gathering\n"
 		"the information, so the next command invocation will only show the\n"
 		"allocations made after the reset.\n", 0);

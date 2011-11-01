@@ -95,6 +95,7 @@ public:
 
 	virtual	bool				ProcessTrackingInfo(
 									AllocationTrackingInfo* info,
+									void* allocation,
 									size_t allocationSize) = 0;
 };
 

@@ -893,7 +893,8 @@ MemoryManager::AnalyzeAllocationCallers(AllocationTrackingCallback& callback)
 				size_t size = reference - chunkAddress + 1;
 
 				if (!callback.ProcessTrackingInfo(
-						_TrackingInfoFor((void*)chunkAddress, size), size)) {
+						_TrackingInfoFor((void*)chunkAddress, size),
+						(void*)chunkAddress, size)) {
 					return false;
 				}
 			}
