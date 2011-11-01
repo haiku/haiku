@@ -574,11 +574,13 @@ mmu_init(void)
 	gKernelArgs.num_physical_allocated_ranges = 1;
 		// remember the start of the allocated physical pages
 
+	TRACE(("mmu_init: enabling transparent translation\n"));
 	// enable transparent translation of the first 256 MB
 	gMMUOps->set_tt(0, ATARI_CHIPRAM_BASE, 0x10000000, 0);
 	// enable transparent translation of the 16MB ST shadow range for I/O
 	gMMUOps->set_tt(1, ATARI_SHADOW_BASE, 0x01000000, 0);
 
+	TRACE(("mmu_init: init rtdir\n"));
 	init_page_directory();
 #if 0//XXX:HOLE
 
