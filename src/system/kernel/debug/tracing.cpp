@@ -1678,7 +1678,9 @@ tracing_find_caller_in_stack_trace(struct tracing_stack_trace* stackTrace,
 void
 tracing_print_stack_trace(struct tracing_stack_trace* stackTrace)
 {
+#if ENABLE_TRACING
 	print_stack_trace(stackTrace, kprintf);
+#endif
 }
 
 
