@@ -112,6 +112,7 @@ private:
 
 			ErrorLogWindow*		fErrorLogWindow;
 			BNotification*		fNotification;
+			uint32				fNotifyMode;
 };
 
 

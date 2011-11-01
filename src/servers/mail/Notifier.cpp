@@ -4,7 +4,10 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <Catalog.h>
+#include <IconUtils.h>
+#include <MailDaemon.h>
 #include <Roster.h>
 
 #include "Notifier.h"
@@ -15,12 +18,13 @@
 
 
 DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
-	ErrorLogWindow* errorWindow)
+	ErrorLogWindow* errorWindow, uint32& showMode)
 	:
 	fAccountName(accountName),
 	fIsInbound(inbound),
 	fErrorWindow(errorWindow),
 	fNotification(B_PROGRESS_NOTIFICATION),
+	fShowMode(showMode),
 	fTotalItems(0),
 	fItemsDone(0),
 	fTotalSize(0),
@@ -34,10 +38,19 @@ DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
     desc.ReplaceFirst("%name", fAccountName);
 
 	BString identifier;
-	identifier << (int)this;
-		// This should get us an unique value for each notifier running
+	identifier << accountName << inbound;
+		// Two windows for each acocunt : one for sending and the other for
+		// receiving mails
 	fNotification.SetMessageID(identifier);
-	fNotification.SetApplication("Mail daemon");
+	fNotification.SetApplication(B_TRANSLATE("Mail Status"));
+	fNotification.SetTitle(desc);
+
+	app_info info;
+	be_roster->GetAppInfo(B_MAIL_DAEMON_SIGNATURE, &info);
+	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+	BNode node(&info.ref);
+	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
+	fNotification.SetIcon(&icon);
 }
 
 
@@ -49,7 +62,7 @@ DefaultNotifier::~DefaultNotifier()
 MailNotifier*
 DefaultNotifier::Clone()
 {
-	return new DefaultNotifier(fAccountName, fIsInbound, fErrorWindow);
+	return new DefaultNotifier(fAccountName, fIsInbound, fErrorWindow, fShowMode);
 }
 
 
@@ -98,19 +111,23 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 	}
 
 	fItemsDone += messages;
+
 	BString progress;
+
+	progress << message << "\t";
+
 	if (fTotalItems > 0)
 		progress << fItemsDone << "/" << fTotalItems;
 
 	fNotification.SetContent(progress);
 
-	if (message != NULL)
-		fNotification.SetTitle(message);
-
 	int timeout = 0; // Default timeout
 	if (fItemsDone == fTotalItems && fTotalItems != 0)
 		timeout = 1; // We're done, make the window go away faster
-	be_roster->Notify(fNotification, timeout);
+
+	if ((!fIsInbound && fShowMode | B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING)
+		|| (fIsInbound && fShowMode | B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE))
+		be_roster->Notify(fNotification, timeout);
 }
 
 
@@ -119,6 +136,6 @@ DefaultNotifier::ResetProgress(const char* message)
 {
 	fNotification.SetProgress(0);
 	if (message != NULL)
-		fNotification.SetContent(message);
+		fNotification.SetTitle(message);
 	be_roster->Notify(fNotification, 0);
 }

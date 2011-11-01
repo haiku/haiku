@@ -19,6 +19,7 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <fs_index.h>
+#include <IconUtils.h>
 #include <NodeMonitor.h>
 #include <Notification.h>
 #include <Path.h>
@@ -150,8 +151,6 @@ MailDaemonApp::ReadyToRun()
 	fNewMessages = 0;
 
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		//{char name[255];volume.GetName(name);printf("Volume: %s\n",name);}
-
 		BQuery* query = new BQuery;
 
 		query->SetTarget(this);
@@ -192,8 +191,16 @@ MailDaemonApp::ReadyToRun()
 	fCentralBeep = false;
 
 	fNotification = new BNotification(B_INFORMATION_NOTIFICATION);
-	fNotification->SetApplication("Mail daemon");
+	fNotification->SetApplication(B_TRANSLATE("Mail status"));
 	fNotification->SetTitle(string);
+	fNotification->SetMessageID("daemon_status");
+
+	app_info info;
+	be_roster->GetAppInfo(B_MAIL_DAEMON_SIGNATURE, &info);
+	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+	BNode node(&info.ref);
+	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
+	fNotification->SetIcon(&icon);
 
 	fLEDAnimation = new LEDAnimation;
 	SetPulseRate(1000000);
@@ -203,8 +210,6 @@ MailDaemonApp::ReadyToRun()
 void
 MailDaemonApp::RefsReceived(BMessage* message)
 {
-	be_roster->Notify(*fNotification, 3);
-
 	entry_ref ref;
 	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
 		BNode node(&ref);
@@ -260,12 +265,12 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgSetStatusWindowMode:	// when to show the status window
-		{/*
+		{
 			int32 mode;
 			if (msg->FindInt32("ShowStatusWindow", &mode) == B_OK)
-				fMailStatusWindow->SetShowCriterion(mode);
+				fNotifyMode = mode;
 			break;
-		*/}
+		}
 
 		case kMsgMarkMessageAsRead:
 		{
@@ -384,6 +389,8 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 				string << B_TRANSLATE("No new messages.");
 
 			fNotification->SetTitle(string.String());
+			if (fNotifyMode != B_MAIL_SHOW_STATUS_WINDOW_NEVER)
+				be_roster->Notify(*fNotification);
 			break;
 		}
 
@@ -645,7 +652,7 @@ MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 	}
 	if (account.inboundProtocol) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), true,
-			fErrorLogWindow);
+			fErrorLogWindow, fNotifyMode);
 		account.inboundProtocol->SetMailNotifier(notifier);
 
 		account.inboundThread = new InboundProtocolThread(
@@ -662,7 +669,7 @@ MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 	}
 	if (account.outboundProtocol) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), false,
-			fErrorLogWindow);
+			fErrorLogWindow, fNotifyMode);
 		account.outboundProtocol->SetMailNotifier(notifier);
 
 		account.outboundThread = new OutboundProtocolThread(

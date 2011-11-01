@@ -19,7 +19,8 @@
 class DefaultNotifier : public MailNotifier {
 public:
 								DefaultNotifier(const char* accountName,
-									bool inbound, ErrorLogWindow* errorWindow);
+									bool inbound, ErrorLogWindow* errorWindow,
+									uint32& showMode);
 								~DefaultNotifier();
 
 			MailNotifier*		Clone();
@@ -38,6 +39,7 @@ private:
 			bool				fIsInbound;
 			ErrorLogWindow*		fErrorWindow;
 			BNotification		fNotification;
+			uint32&				fShowMode;
 
 			int					fTotalItems;
 			int					fItemsDone;
