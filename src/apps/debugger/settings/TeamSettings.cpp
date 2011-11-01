@@ -15,6 +15,7 @@
 #include "ArchivingUtils.h"
 #include "BreakpointSetting.h"
 #include "Team.h"
+#include "TeamUISettings.h"
 #include "UserBreakpoint.h"
 
 
@@ -98,6 +99,12 @@ TeamSettings::SetTo(const BMessage& archive)
 			return error;
 		}
 	}
+	
+	// add UI settings
+	for (int32 i = 0; archive.FindMessage("uisettings", i, &childArchive)
+		== B_OK; i++) {
+		
+	}
 
 	return B_OK;
 }
@@ -140,6 +147,20 @@ TeamSettings::BreakpointAt(int32 index) const
 }
 
 
+int32
+TeamSettings::CountUISettings() const
+{
+	return fUISettings.CountItems();
+}
+
+
+const TeamUISettings*
+TeamSettings::UISettingAt(int32 index) const
+{
+	return fUISettings.ItemAt(index);
+}
+
+
 TeamSettings&
 TeamSettings::operator=(const TeamSettings& other)
 {
@@ -160,6 +181,16 @@ TeamSettings::operator=(const TeamSettings& other)
 		}
 	}
 
+	for (int32 i = 0; TeamUISettings* uiSetting
+			= other.fUISettings.ItemAt(i); i++) {
+		TeamUISettings* clonedSetting
+			= uiSetting->Clone();
+		if (!fUISettings.AddItem(clonedSetting)) {
+			delete clonedSetting;
+			throw std::bad_alloc();
+		}
+	}
+
 	return *this;
 }
 
@@ -171,7 +202,12 @@ TeamSettings::_Unset()
 			i++) {
 		delete breakpoint;
 	}
+	
+	for (int32 i = 0; TeamUISettings* uiSetting = fUISettings.ItemAt(i); i++)
+		delete uiSetting;
+
 	fBreakpoints.MakeEmpty();
+	fUISettings.MakeEmpty();
 
 	fTeamName.Truncate(0);
 }
