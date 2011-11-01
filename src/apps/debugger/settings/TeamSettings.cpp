@@ -16,6 +16,7 @@
 #include "BreakpointSetting.h"
 #include "Team.h"
 #include "TeamUISettings.h"
+#include "TeamUISettingsFactory.h"
 #include "UserBreakpoint.h"
 
 
@@ -103,7 +104,14 @@ TeamSettings::SetTo(const BMessage& archive)
 	// add UI settings
 	for (int32 i = 0; archive.FindMessage("uisettings", i, &childArchive)
 		== B_OK; i++) {
-		
+		TeamUISettings* setting = NULL;
+		error = TeamUISettingsFactory::Create(childArchive, setting);
+		if (error == B_OK && !fUISettings.AddItem(setting))
+			error = B_NO_MEMORY;
+		if (error != B_OK) {
+			delete setting;
+			return error;
+		}		
 	}
 
 	return B_OK;
@@ -117,14 +125,25 @@ TeamSettings::WriteTo(BMessage& archive) const
 	if (error != B_OK)
 		return error;
 
+	BMessage childArchive;
 	for (int32 i = 0; BreakpointSetting* breakpoint = fBreakpoints.ItemAt(i);
 			i++) {
-		BMessage childArchive;
 		error = breakpoint->WriteTo(childArchive);
 		if (error != B_OK)
 			return error;
 
 		error = archive.AddMessage("breakpoints", &childArchive);
+		if (error != B_OK)
+			return error;
+	}
+	
+	for (int32 i = 0; TeamUISettings* uiSetting = fUISettings.ItemAt(i);
+			i++) {
+		error = uiSetting->WriteTo(childArchive);
+		if (error != B_OK)
+			return error;
+			
+		error = archive.AddMessage("uisettings", &childArchive);
 		if (error != B_OK)
 			return error;
 	}

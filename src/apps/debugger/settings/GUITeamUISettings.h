@@ -17,12 +17,14 @@ class BMessage;
 
 class GUITeamUISettings : public TeamUISettings {
 public:
+								GUITeamUISettings();
 								GUITeamUISettings(const char* settingsID);
 								GUITeamUISettings(const GUITeamUISettings&
 									other);
 									// throws std::bad_alloc
 								~GUITeamUISettings();
 
+	virtual team_ui_settings_type Type() const;
 	virtual	const char*			ID() const;
 	virtual	status_t			SetTo(const BMessage& archive);
 	virtual	status_t			WriteTo(BMessage& archive) const;

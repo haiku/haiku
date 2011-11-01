@@ -7,6 +7,11 @@
 #include <Message.h>
 
 
+GUITeamUISettings::GUITeamUISettings()
+{
+}
+
+
 GUITeamUISettings::GUITeamUISettings(const char* settingsID)
 	:
 	fID(settingsID)
@@ -22,6 +27,13 @@ GUITeamUISettings::GUITeamUISettings(const GUITeamUISettings& other)
 
 GUITeamUISettings::~GUITeamUISettings()
 {
+}
+
+
+team_ui_settings_type
+GUITeamUISettings::Type() const
+{
+	return TEAM_UI_SETTINGS_TYPE_GUI;
 }
 
 
@@ -45,6 +57,10 @@ status_t
 GUITeamUISettings::WriteTo(BMessage& archive) const
 {
 	status_t error = archive.AddString("ID", fID);
+	if (error != B_OK)
+		return error;
+		
+	error = archive.AddInt32("type", Type());
 	
 	return error;
 }

@@ -140,10 +140,11 @@ Application Debugger :
 
 	# settings
 	BreakpointSetting.cpp
+	GUITeamUISettings.cpp
 	SettingsManager.cpp
 	TeamSettings.cpp
 	TeamUISettings.cpp
-	GUITeamUISettings.cpp
+	TeamUISettingsFactory.cpp
 
 	# settings/generic
 	Setting.cpp

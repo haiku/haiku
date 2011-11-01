@@ -12,11 +12,18 @@
 class BMessage;
 
 
+enum team_ui_settings_type {
+	TEAM_UI_SETTINGS_TYPE_GUI,
+	TEAM_UI_SETTINGS_TYPE_CLI
+};
+
+
 class TeamUISettings {
 public:
 								TeamUISettings();
 	virtual						~TeamUISettings();
 
+	virtual team_ui_settings_type Type() const = 0;
 	virtual	const char*			ID() const = 0;
 	virtual	status_t			SetTo(const BMessage& archive) = 0;
 	virtual	status_t			WriteTo(BMessage& archive) const = 0;
