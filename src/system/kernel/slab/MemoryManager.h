@@ -60,8 +60,10 @@ public:
 	static	bool				MaintenanceNeeded();
 	static	void				PerformMaintenance();
 
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 	static	bool				AnalyzeAllocationCallers(
 									AllocationTrackingCallback& callback);
+#endif
 
 private:
 			struct Tracing;
