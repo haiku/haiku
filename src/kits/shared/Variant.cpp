@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -96,6 +97,12 @@ BVariant::SetToTypedData(const void* data, type_code type)
 			break;
 		case B_STRING_TYPE:
 			return _SetTo((const char*)data, 0) ? B_OK : B_NO_MEMORY;
+		case B_RECT_TYPE:
+		{
+			BRect *rect = (BRect *)data;
+			_SetTo(rect->left, rect->top, rect->right, rect->bottom);
+			break;
+		}
 		default:
 			return B_BAD_TYPE;
 	}
@@ -169,6 +176,9 @@ BVariant::operator==(const BVariant& other) const
 			if (fString == NULL || other.fString == NULL)
 				return fString == other.fString;
 			return strcmp(fString, other.fString) == 0;
+		case B_RECT_TYPE:
+			return BRect(fLeft, fTop, fRight, fBottom) == BRect(
+				other.fLeft, other.fTop, other.fRight, other.fBottom);
 		default:
 			return false;
 	}
@@ -303,6 +313,13 @@ BVariant::ToDouble() const
 }
 
 
+BRect
+BVariant::ToRect() const
+{
+	return BRect(fLeft, fTop, fRight, fBottom);
+}
+
+
 void*
 BVariant::ToPointer() const
 {
@@ -387,6 +404,9 @@ BVariant::AddToMessage(BMessage& message, const char* fieldName) const
 			return message.AddPointer(fieldName, fPointer);
 		case B_STRING_TYPE:
 			return message.AddString(fieldName, fString);
+		case B_RECT_TYPE:
+			return message.AddRect(fieldName, BRect(fLeft, fTop, fRight,
+				fBottom));
 		default:
 			return B_UNSUPPORTED;
 	}
@@ -443,6 +463,8 @@ BVariant::SizeOfType(type_code type)
 			return sizeof(double);
 		case B_POINTER_TYPE:
 			return sizeof(void*);
+		case B_RECT_TYPE:
+			return sizeof(BRect);
 		default:
 			return 0;
 	}
@@ -603,6 +625,18 @@ BVariant::_SetTo(double value)
 	fType = B_DOUBLE_TYPE;
 	fFlags = 0;
 	fDouble = value;
+}
+
+
+void
+BVariant::_SetTo(float left, float top, float right, float bottom)
+{
+	fType = B_RECT_TYPE;
+	fFlags = 0;
+	fLeft = left;
+	fTop = top;
+	fRight = right;
+	fBottom = bottom;
 }
 
 
