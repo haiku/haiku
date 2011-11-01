@@ -16,6 +16,7 @@
 #include <smp.h>
 #include <util/AutoLock.h>
 
+#include "slab_debug.h"
 #include "slab_private.h"
 
 
@@ -42,6 +43,9 @@ struct depot_cpu_store {
 	DepotMagazine*	loaded;
 	DepotMagazine*	previous;
 };
+
+
+RANGE_MARKER_FUNCTION_BEGIN(SlabObjectDepot)
 
 
 bool
@@ -458,3 +462,6 @@ dump_depot_magazine(int argCount, char** args)
 
 	return 0;
 }
+
+
+RANGE_MARKER_FUNCTION_END(SlabObjectDepot)

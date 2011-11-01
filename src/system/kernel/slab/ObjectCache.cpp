@@ -14,7 +14,11 @@
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 
+#include "MemoryManager.h"
 #include "slab_private.h"
+
+
+RANGE_MARKER_FUNCTION_BEGIN(SlabObjectCache)
 
 
 static void
@@ -137,6 +141,7 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 	CREATE_PARANOIA_CHECK_SET(slab, "slab");
 
+	
 	for (size_t i = 0; i < slab->size; i++) {
 		status_t status = B_OK;
 		if (constructor)
@@ -267,3 +272,43 @@ ObjectCache::AssertObjectNotFreed(void* object)
 }
 
 #endif // PARANOID_KERNEL_FREE
+
+
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+status_t
+ObjectCache::AllocateTrackingInfos(slab* slab, size_t byteCount, uint32 flags)
+{
+	void* pages;
+	size_t objectCount = byteCount / object_size;
+	status_t result = MemoryManager::AllocateRaw(
+		objectCount * sizeof(AllocationTrackingInfo), flags, pages);
+	if (result == B_OK) {
+		slab->tracking = (AllocationTrackingInfo*)pages;
+		for (size_t i = 0; i < objectCount; i++)
+			slab->tracking[i].Clear();
+	}
+
+	return result;
+}
+
+
+void
+ObjectCache::FreeTrackingInfos(slab* slab, uint32 flags)
+{
+	MemoryManager::FreeRawOrReturnCache(slab->tracking, flags);
+}
+
+
+AllocationTrackingInfo*
+ObjectCache::TrackingInfoFor(void* object) const
+{
+	slab* objectSlab = ObjectSlab(object);
+	return &objectSlab->tracking[((addr_t)object - objectSlab->offset
+		- (addr_t)objectSlab->pages) / object_size];
+}
+
+#endif // SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+
+RANGE_MARKER_FUNCTION_END(SlabObjectCache)

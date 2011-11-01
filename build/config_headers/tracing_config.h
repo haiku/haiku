@@ -47,6 +47,7 @@
 #define SCHEDULING_ANALYSIS_TRACING				0
 #define SIGNAL_TRACING							0
 #define SLAB_MEMORY_MANAGER_TRACING				0
+#define SLAB_MEMORY_MANAGER_TRACING_STACK_TRACE	0	/* stack trace depth */
 #define SLAB_OBJECT_CACHE_TRACING				0
 #define SLAB_OBJECT_CACHE_TRACING_STACK_TRACE	0	/* stack trace depth */
 #define SWAP_TRACING							0

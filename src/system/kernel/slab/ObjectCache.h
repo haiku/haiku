@@ -14,7 +14,11 @@
 #include <slab/Slab.h>
 #include <util/DoublyLinkedList.h>
 
+#include "kernel_debug_config.h"
+#include "slab_debug.h"
 
+
+class AllocationTrackingInfo;
 struct ResizeRequest;
 
 
@@ -28,6 +32,9 @@ struct slab : DoublyLinkedListLinkImpl<slab> {
 	size_t			count;		// free objects
 	size_t			offset;
 	object_link*	free;
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	AllocationTrackingInfo*	tracking;
+#endif
 };
 
 typedef DoublyLinkedList<slab> SlabList;
@@ -111,6 +118,15 @@ public:
 #if PARANOID_KERNEL_FREE
 			bool				AssertObjectNotFreed(void* object);
 #endif
+
+			status_t			AllocateTrackingInfos(slab* slab,
+									size_t byteCount, uint32 flags);
+			void				FreeTrackingInfos(slab* slab, uint32 flags);
+
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+			AllocationTrackingInfo*
+								TrackingInfoFor(void* object) const;
+#endif
 };
 
 
@@ -145,5 +161,21 @@ check_cache_quota(ObjectCache* cache)
 	return (cache->usage + cache->slab_size) <= cache->maximum;
 }
 
+
+#if !SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+inline status_t
+ObjectCache::AllocateTrackingInfos(slab* slab, size_t byteCount, uint32 flags)
+{
+	return B_OK;
+}
+
+
+inline void
+ObjectCache::FreeTrackingInfos(slab* slab, uint32 flags)
+{
+}
+
+#endif // !SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 
 #endif	// OBJECT_CACHE_H

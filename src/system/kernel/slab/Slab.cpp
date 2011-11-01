@@ -17,6 +17,7 @@
 #include <KernelExport.h>
 
 #include <condition_variable.h>
+#include <elf.h>
 #include <kernel.h>
 #include <low_resource_manager.h>
 #include <slab/ObjectDepot.h>
@@ -30,6 +31,7 @@
 
 #include "HashedObjectCache.h"
 #include "MemoryManager.h"
+#include "slab_debug.h"
 #include "slab_private.h"
 #include "SmallObjectCache.h"
 
@@ -47,6 +49,47 @@ static mutex sMaintenanceLock
 	= MUTEX_INITIALIZER("object cache resize requests");
 static MaintenanceQueue sMaintenanceQueue;
 static ConditionVariable sMaintenanceCondition;
+
+
+#if SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+struct caller_info {
+	addr_t		caller;
+	size_t		count;
+	size_t		size;
+};
+
+static const int32 kCallerInfoTableSize = 1024;
+static caller_info sCallerInfoTable[kCallerInfoTableSize];
+static int32 sCallerInfoCount = 0;
+
+
+RANGE_MARKER_FUNCTION_PROTOTYPES(slab_allocator)
+RANGE_MARKER_FUNCTION_PROTOTYPES(SlabHashedObjectCache)
+RANGE_MARKER_FUNCTION_PROTOTYPES(SlabMemoryManager)
+RANGE_MARKER_FUNCTION_PROTOTYPES(SlabObjectCache)
+RANGE_MARKER_FUNCTION_PROTOTYPES(SlabObjectDepot)
+RANGE_MARKER_FUNCTION_PROTOTYPES(Slab)
+RANGE_MARKER_FUNCTION_PROTOTYPES(SlabSmallObjectCache)
+
+
+static const addr_t kSlabCodeAddressRanges[] = {
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(slab_allocator),
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(SlabHashedObjectCache),
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(SlabMemoryManager),
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(SlabObjectCache),
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(SlabObjectDepot),
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(Slab),
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(SlabSmallObjectCache)
+};
+
+static const uint32 kSlabCodeAddressRangeCount
+	= sizeof(kSlabCodeAddressRanges) / sizeof(kSlabCodeAddressRanges[0]) / 2;
+
+#endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+
+RANGE_MARKER_FUNCTION_BEGIN(Slab)
 
 
 #if SLAB_OBJECT_CACHE_TRACING
@@ -283,6 +326,205 @@ dump_cache_info(int argc, char* argv[])
 	return 0;
 }
 
+
+#if SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	// until memory manager tracking is analyzed
+
+static caller_info*
+get_caller_info(addr_t caller)
+{
+	// find the caller info
+	for (int32 i = 0; i < sCallerInfoCount; i++) {
+		if (caller == sCallerInfoTable[i].caller)
+			return &sCallerInfoTable[i];
+	}
+
+	// not found, add a new entry, if there are free slots
+	if (sCallerInfoCount >= kCallerInfoTableSize)
+		return NULL;
+
+	caller_info* info = &sCallerInfoTable[sCallerInfoCount++];
+	info->caller = caller;
+	info->count = 0;
+	info->size = 0;
+
+	return info;
+}
+
+#endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+
+static int
+caller_info_compare_size(const void* _a, const void* _b)
+{
+	const caller_info* a = (const caller_info*)_a;
+	const caller_info* b = (const caller_info*)_b;
+	return (int)(b->size - a->size);
+}
+
+
+static int
+caller_info_compare_count(const void* _a, const void* _b)
+{
+	const caller_info* a = (const caller_info*)_a;
+	const caller_info* b = (const caller_info*)_b;
+	return (int)(b->count - a->count);
+}
+
+
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+static bool
+analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
+	size_t& _totalAllocationSize, size_t& _totalAllocationCount)
+{
+	for (SlabList::ConstIterator it = slabList.GetIterator();
+			slab* slab = it.Next();) {
+		for (uint32 i = 0; i < slab->size; i++) {
+			AllocationTrackingInfo* info = &slab->tracking[i];
+			if (!info->IsInitialized())
+				continue;
+
+			_totalAllocationSize += cache->object_size;
+			_totalAllocationCount++;
+
+			addr_t caller = 0;
+			AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+
+			if (traceEntry != NULL && info->IsTraceEntryValid()) {
+				caller = tracing_find_caller_in_stack_trace(
+					traceEntry->StackTrace(), kSlabCodeAddressRanges,
+					kSlabCodeAddressRangeCount);
+			}
+
+			caller_info* callerInfo = get_caller_info(caller);
+			if (callerInfo == NULL) {
+				kprintf("out of space for caller infos\n");
+				return false;
+			}
+
+			callerInfo->count++;
+			callerInfo->size += cache->object_size;
+		}
+	}
+
+	return true;
+}
+
+
+static bool
+analyze_allocation_callers(ObjectCache* cache, size_t& _totalAllocationSize,
+	size_t& _totalAllocationCount)
+{
+	return analyze_allocation_callers(cache, cache->full, _totalAllocationSize,
+			_totalAllocationCount)
+		&& analyze_allocation_callers(cache, cache->partial,
+			_totalAllocationSize, _totalAllocationCount);
+}
+
+#endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+
+static int
+dump_allocations_per_caller(int argc, char **argv)
+{
+	bool sortBySize = true;
+	ObjectCache* cache = NULL;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-c") == 0) {
+			sortBySize = false;
+		} else if (strcmp(argv[i], "-o") == 0) {
+			uint64 cacheAddress;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &cacheAddress, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			cache = (ObjectCache*)(addr_t)cacheAddress;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	sCallerInfoCount = 0;
+
+	size_t totalAllocationSize = 0;
+	size_t totalAllocationCount = 0;
+	if (cache != NULL) {
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+		analyze_allocation_callers(cache, totalAllocationSize,
+			totalAllocationCount);
+#else
+		kprintf("Object cache allocation tracking not available. "
+			"SLAB_OBJECT_CACHE_TRACING (%d) and "
+			"SLAB_OBJECT_CACHE_TRACING_STACK_TRACE (%d) must be enabled.\n",
+			SLAB_OBJECT_CACHE_TRACING, SLAB_OBJECT_CACHE_TRACING_STACK_TRACE);
+		return 0;
+#endif
+	} else {
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+		ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
+
+		while (it.HasNext()) {
+			analyze_allocation_callers(it.Next(), totalAllocationSize,
+				totalAllocationCount);
+		}
+#endif
+	}
+
+	// sort the array
+	qsort(sCallerInfoTable, sCallerInfoCount, sizeof(caller_info),
+		sortBySize ? &caller_info_compare_size : &caller_info_compare_count);
+
+	kprintf("%ld different callers, sorted by %s...\n\n", sCallerInfoCount,
+		sortBySize ? "size" : "count");
+
+	kprintf("     count        size      caller\n");
+	kprintf("----------------------------------\n");
+	for (int32 i = 0; i < sCallerInfoCount; i++) {
+		caller_info& info = sCallerInfoTable[i];
+		kprintf("%10" B_PRIuSIZE "  %10" B_PRIuSIZE "  %p", info.count,
+			info.size, (void*)info.caller);
+
+		const char *symbol;
+		const char *imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(info.caller, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			kprintf("  %s + %#" B_PRIxADDR " (%s)%s\n", symbol,
+				info.caller - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			kprintf("\n");
+	}
+
+	kprintf("\ntotal allocations: %" B_PRIuSIZE ", %" B_PRIuSIZE " bytes\n",
+		totalAllocationCount, totalAllocationSize);
+
+	return 0;
+}
+
+#endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
+
+
+void
+add_alloc_tracing_entry(ObjectCache* cache, uint32 flags, void* object)
+{
+#if SLAB_OBJECT_CACHE_TRACING
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	cache->TrackingInfoFor(object)->Init(T(Alloc(cache, flags, object)));
+#else
+	T(Alloc(cache, flags, object));
+#endif
+#endif
+}
 
 // #pragma mark -
 
@@ -669,7 +911,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
 		void* object = object_depot_obtain(&cache->depot);
 		if (object) {
-			T(Alloc(cache, flags, object));
+			add_alloc_tracing_entry(cache, flags, object);
 			return fill_allocated_block(object, cache->object_size);
 		}
 	}
@@ -718,7 +960,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 	}
 
 	void* object = link_to_object(link, cache->object_size);
-	T(Alloc(cache, flags, object));
+	add_alloc_tracing_entry(cache, flags, object);
 	return fill_allocated_block(object, cache->object_size);
 }
 
@@ -746,6 +988,10 @@ object_cache_free(object_cache* cache, void* object, uint32 flags)
 	}
 
 	fill_freed_block(object, cache->object_size);
+#endif
+
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	cache->TrackingInfoFor(object)->Clear();
 #endif
 
 	if ((cache->flags & CACHE_NO_DEPOT) == 0) {
@@ -802,6 +1048,17 @@ slab_init_post_area()
 		"dump contents of an object depot");
 	add_debugger_command("slab_magazine", dump_depot_magazine,
 		"dump contents of a depot magazine");
+#if SLAB_ALLOCATION_TRACKING_AVAILABLE
+	add_debugger_command_etc("allocations_per_caller",
+		&dump_allocations_per_caller,
+		"Dump current heap allocations summed up per caller",
+		"[ \"-c\" ] [ -o <object cache> ]\n"
+		"The current allocations will by summed up by caller (their count and\n"
+		"size) printed in decreasing order by size or, if \"-c\" is\n"
+		"specified, by allocation count. If given <object cache> specifies\n"
+		"the address of the object cache for which to print the allocations.\n",
+		0);
+#endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
 }
 
 
@@ -832,3 +1089,6 @@ slab_init_post_thread()
 
 	resume_thread(objectCacheResizer);
 }
+
+
+RANGE_MARKER_FUNCTION_END(Slab)

@@ -12,6 +12,9 @@
 #include "slab_private.h"
 
 
+RANGE_MARKER_FUNCTION_BEGIN(SlabHashedObjectCache)
+
+
 static inline int
 __fls0(size_t value)
 {
@@ -109,8 +112,9 @@ HashedObjectCache::CreateSlab(uint32 flags)
 
 	HashedSlab* slab = allocate_slab(flags);
 	if (slab != NULL) {
-		void* pages;
-		if (MemoryManager::Allocate(this, flags, pages) == B_OK) {
+		void* pages = NULL;
+		if (MemoryManager::Allocate(this, flags, pages) == B_OK
+			&& AllocateTrackingInfos(slab, slab_size, flags) == B_OK) {
 			Lock();
 			if (InitSlab(slab, pages, slab_size, flags)) {
 				hash_table.InsertUnchecked(slab);
@@ -118,8 +122,11 @@ HashedObjectCache::CreateSlab(uint32 flags)
 				return slab;
 			}
 			Unlock();
-			MemoryManager::Free(pages, flags);
+			FreeTrackingInfos(slab, flags);
 		}
+
+		if (pages != NULL)
+			MemoryManager::Free(pages, flags);
 
 		free_slab(slab, flags);
 	}
@@ -140,6 +147,7 @@ HashedObjectCache::ReturnSlab(slab* _slab, uint32 flags)
 	UninitSlab(slab);
 
 	Unlock();
+	FreeTrackingInfos(slab, flags);
 	MemoryManager::Free(slab->pages, flags);
 	free_slab(slab, flags);
 	Lock();
@@ -180,3 +188,6 @@ HashedObjectCache::_ResizeHashTableIfNeeded(uint32 flags)
 		}
 	}
 }
+
+
+RANGE_MARKER_FUNCTION_END(SlabHashedObjectCache)

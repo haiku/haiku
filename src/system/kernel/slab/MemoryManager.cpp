@@ -22,6 +22,7 @@
 #include "kernel_debug_config.h"
 
 #include "ObjectCache.h"
+#include "slab_debug.h"
 #include "slab_private.h"
 
 
@@ -58,6 +59,9 @@ MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryDontWait;
 bool MemoryManager::sMaintenanceNeeded;
 
 
+RANGE_MARKER_FUNCTION_BEGIN(SlabMemoryManager)
+
+
 // #pragma mark - kernel tracing
 
 
@@ -67,9 +71,12 @@ bool MemoryManager::sMaintenanceNeeded;
 //namespace SlabMemoryManagerCacheTracing {
 struct MemoryManager::Tracing {
 
-class MemoryManagerTraceEntry : public AbstractTraceEntry {
+class MemoryManagerTraceEntry
+	: public TRACE_ENTRY_SELECTOR(SLAB_MEMORY_MANAGER_TRACING_STACK_TRACE) {
 public:
 	MemoryManagerTraceEntry()
+		:
+		TraceEntryBase(SLAB_MEMORY_MANAGER_TRACING_STACK_TRACE, 0, true)
 	{
 	}
 };
@@ -592,7 +599,14 @@ MemoryManager::Free(void* pages, uint32 flags)
 /*static*/ status_t
 MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 {
+#if SLAB_MEMORY_MANAGER_TRACING
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+	AbstractTraceEntryWithStackTrace* traceEntry = T(AllocateRaw(size, flags));
+	size += sizeof(AllocationTrackingInfo);
+#else
 	T(AllocateRaw(size, flags));
+#endif
+#endif
 
 	size = ROUNDUP(size, SLAB_CHUNK_SIZE_SMALL);
 
@@ -619,8 +633,13 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 			&virtualRestrictions, &physicalRestrictions, &_pages);
 
 		status_t result = area >= 0 ? B_OK : area;
-		if (result == B_OK)
+		if (result == B_OK) {
 			fill_allocated_block(_pages, size);
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+			_AddTrackingInfo(_pages, size, traceEntry);
+#endif
+		}
+
 		return result;
 	}
 
@@ -661,6 +680,9 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 	_pages = (void*)chunkAddress;
 
 	fill_allocated_block(_pages, size);
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+	_AddTrackingInfo(_pages, size, traceEntry);
+#endif
 
 	TRACE("MemoryManager::AllocateRaw() done: %p (meta chunk: %d, chunk %d)\n",
 		_pages, int(metaChunk - area->metaChunks),
@@ -1959,3 +1981,20 @@ MemoryManager::_DumpAreas(int argc, char** argv)
 
 	return 0;
 }
+
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+void
+MemoryManager::_AddTrackingInfo(void* allocation, size_t size,
+	AbstractTraceEntryWithStackTrace* traceEntry)
+{
+	AllocationTrackingInfo* info = (AllocationTrackingInfo*)
+		((uint8*)allocation + size - sizeof(AllocationTrackingInfo));
+	info->Init(traceEntry);
+}
+
+#endif // SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+
+RANGE_MARKER_FUNCTION_END(SlabMemoryManager)

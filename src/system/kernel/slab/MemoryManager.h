@@ -14,7 +14,11 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include "kernel_debug_config.h"
+#include "tracing_config.h"
 
+
+class AbstractTraceEntryWithStackTrace;
 struct kernel_args;
 struct ObjectCache;
 struct VMArea;
@@ -190,6 +194,11 @@ private:
 	static	int					_DumpMetaChunks(int argc, char** argv);
 	static	int					_DumpArea(int argc, char** argv);
 	static	int					_DumpAreas(int argc, char** argv);
+
+#if SLAB_ALLOCATION_TRACKING && SLAB_MEMORY_MANAGER_TRACING
+	static	void				_AddTrackingInfo(void* allocation, size_t size,
+									AbstractTraceEntryWithStackTrace* entry);
+#endif
 
 private:
 	static	const size_t		kAreaAdminSize
