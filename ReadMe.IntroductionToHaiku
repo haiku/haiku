@@ -43,8 +43,26 @@ contributing code to Haiku.
 
 Haiku Translation Assistant (HTA)
 ---------------------------------
-http://hta.polytech.org
+http://hta.polytect.org/
 
 This is the current solution to assisting people in translating Haiku's
 on screen text to other languages. Consult the [haiku-i18n] mailing list
 for additional information: http://www.freelists.org/list/haiku-i18n
+
+
+HaikuPorts
+----------
+http://ports.haiku-files.org
+
+"HaikuPorts is a centralized collection of software ported to the Haiku
+platform." If you are interested in porting software to Haiku, then this
+is the site for you!
+
+
+ohloh
+-----
+http://www.ohloh.net/p/haiku
+
+"Ohloh is a free public directory of open source software and people." On
+there, you can view detailed reports and analysis of Haiku (and other open
+source software projects).
