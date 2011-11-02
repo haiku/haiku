@@ -117,6 +117,13 @@ BSplitView::SetSplitterSize(float size)
 }
 
 
+int32
+BSplitView::CountItems() const
+{
+	return fSplitLayout->CountItems();
+}
+
+
 float
 BSplitView::ItemWeight(int32 index) const
 {

@@ -35,6 +35,7 @@ public:
 			float				SplitterSize() const;
 			void				SetSplitterSize(float size);
 
+			int32				CountItems() const;
 			float				ItemWeight(int32 index) const;
 			float				ItemWeight(BLayoutItem* item) const;
 			void				SetItemWeight(int32 index, float weight,
