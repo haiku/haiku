@@ -724,6 +724,22 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 }
 
 
+# DMIDecode
+if [ IsOptionalHaikuImagePackageAdded DMIDecode ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package DMIDecode available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			dmidecode-2.11-x86-gcc4-2011-11-02.zip
+			: http://revolf.free.fr/beos/dmidecode-2.11-x86-gcc4-2011-11-02.zip ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			dmidecode-2.11-x86-gcc2-2011-11-02.zip
+			: http://revolf.free.fr/beos/dmidecode-2.11-x86-gcc2-2011-11-02.zip ;
+	}
+}
+
+
 # Doxygen
 if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 	if $(TARGET_ARCH) != x86 {
