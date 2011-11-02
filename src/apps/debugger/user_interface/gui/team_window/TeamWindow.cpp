@@ -339,12 +339,28 @@ status_t
 TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 {
 	BVariant value;
-	status_t result = settings->Value("teamWindowFrame", value);
-	if (result == B_OK) {
+	status_t error = settings->Value("teamWindowFrame", value);
+	if (error == B_OK) {
 		BRect rect = value.ToRect();
 		ResizeTo(rect.Width(), rect.Height());
 		MoveTo(rect.left, rect.top);
 	}
+
+	error = settings->Value("teamWindowSourceSplit0", value);
+	if (error == B_OK)
+		fSourceSplitView->SetItemWeight(0L, value.ToFloat(), false);
+
+	error = settings->Value("teamWindowSourceSplit1", value);
+	if (error == B_OK)
+		fSourceSplitView->SetItemWeight(1L, value.ToFloat(), true);
+
+	error = settings->Value("teamWindowFunctionSplit0", value);
+	if (error == B_OK)
+		fFunctionSplitView->SetItemWeight(0L, value.ToFloat(), false);
+
+	error = settings->Value("teamWindowFunctionSplit1", value);
+	if (error == B_OK)
+		fFunctionSplitView->SetItemWeight(1L, value.ToFloat(), true);
 
 	return B_OK;
 }
@@ -353,9 +369,26 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 status_t
 TeamWindow::SaveSettings(GUITeamUISettings* settings)
 {
-	status_t error = settings->SetValue("teamWindowFrame", Frame());
+	if (!settings->SetValue("teamWindowFrame", Frame()))
+		return B_NO_MEMORY;
 
-	return error;
+	if (!settings->SetValue("teamWindowSourceSplit0",
+		fSourceSplitView->ItemWeight(0L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowSourceSplit1",
+		fSourceSplitView->ItemWeight(1L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowFunctionSplit0",
+		fFunctionSplitView->ItemWeight(0L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowFunctionSplit1",
+		fFunctionSplitView->ItemWeight(1L)))
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -502,6 +535,7 @@ TeamWindow::_Init()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fMenuBar = new BMenuBar("Menu"))
 		.AddSplit(B_VERTICAL, 3.0f)
+			.GetSplitView(&fFunctionSplitView)
 			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
 			.AddGroup(B_VERTICAL, 4.0f)
@@ -516,6 +550,7 @@ TeamWindow::_Init()
 					"source path",
 					"Source path unavailable."), 4.0f)
 				.AddSplit(B_HORIZONTAL, 3.0f)
+					.GetSplitView(&fSourceSplitView)
 					.Add(sourceScrollView = new BScrollView("source scroll",
 						NULL, 0, true, true), 3.0f)
 					.Add(fLocalsTabView = new BTabView("locals view"))

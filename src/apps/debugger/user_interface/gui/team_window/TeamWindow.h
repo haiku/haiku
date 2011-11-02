@@ -24,6 +24,7 @@
 
 class BButton;
 class BMenuBar;
+class BSplitView;
 class BStringView;
 class BTabView;
 class GUITeamUISettings;
@@ -169,6 +170,8 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			BSplitView*			fFunctionSplitView;
+			BSplitView*			fSourceSplitView;
 			InspectorWindow*	fInspectorWindow;
 };
 
