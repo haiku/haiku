@@ -41,6 +41,45 @@ style. Learning and utilizing the coding guidelines is essential to
 contributing code to Haiku.
 
 
+Haiku API documentation
+-----------------------
+http://api.haiku-os.org
+Old BeBook API: http://www.haiku-os.org/legacy-docs/bebook
+
+This is the current (and in-progress) documentation for Haiku's API. As Haiku
+was formed on the idea of implementing binary compatibility with BeOS R5, the
+BeBook is fairly accurate. Contributions to Haiku's API book are encouraged.
+
+
+Learning to Program with Haiku
+------------------------------
+http://www.haiku-os.org/development/learning_to_program_with_haiku
+
+A developer, DarkWyrm has published a book that is " aimed at people who want
+to be able to write simple programs to get stuff done, but never had anyone
+around teach them". He has chosen to distribute he PDF versions of the book
+under a Creative Commons license for noncommercial purposes.
+
+
+Programming with Haiku
+----------------------
+http://www.haiku-os.org/tags/programmingwithhaiku
+
+Another series from Darkwyrm. It is "aimed at current codemonkeys who want to
+break into development for Haiku. Here begins a new series of programming
+lessons aimed at people who already have a basic grasp on C++: Programming with
+Haiku."
+
+
+ohloh
+-----
+http://www.ohloh.net/p/haiku
+
+"Ohloh is a free public directory of open source software and people." On
+there, you can view detailed reports and analysis of Haiku (and other open
+source software projects).
+
+
 Haiku Translation Assistant (HTA)
 ---------------------------------
 http://hta.polytect.org/
@@ -53,16 +92,19 @@ for additional information: http://www.freelists.org/list/haiku-i18n
 HaikuPorts
 ----------
 http://ports.haiku-files.org
+http://ports-space.haiku-files.org
 
 "HaikuPorts is a centralized collection of software ported to the Haiku
 platform." If you are interested in porting software to Haiku, then this
 is the site for you!
 
 
-ohloh
------
-http://www.ohloh.net/p/haiku
+Haikuware
+---------
+http://www.haikuware.com
 
-"Ohloh is a free public directory of open source software and people." On
-there, you can view detailed reports and analysis of Haiku (and other open
-source software projects).
+Haikuware is a website, which provides direct downloads for Haiku software.
+In addition to comments on application pages there are blogs and forums.
+Haikuware also holds a recurring Thank You Award and helps fund development
+through bounty programs.
+
