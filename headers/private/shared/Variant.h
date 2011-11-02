@@ -159,13 +159,14 @@ private:
 				void*			fPointer;
 				char*			fString;
 				BReferenceable*	fReferenceable;
-				uint8			fBytes[8];
+				struct {
+					float		left;
+					float		top;
+					float		right;
+					float		bottom;
+				}				fRect;
+				uint8			fBytes[sizeof(float) * 4];
 			};
-			
-			float				fLeft;
-			float				fTop;
-			float				fRight;
-			float				fBottom;
 };
 
 

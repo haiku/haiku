@@ -177,8 +177,9 @@ BVariant::operator==(const BVariant& other) const
 				return fString == other.fString;
 			return strcmp(fString, other.fString) == 0;
 		case B_RECT_TYPE:
-			return BRect(fLeft, fTop, fRight, fBottom) == BRect(
-				other.fLeft, other.fTop, other.fRight, other.fBottom);
+			return BRect(fRect.left, fRect.top, fRect.right, fRect.bottom)
+				== BRect(other.fRect.left, other.fRect.top, other.fRect.right,
+					other.fRect.bottom);
 		default:
 			return false;
 	}
@@ -316,7 +317,7 @@ BVariant::ToDouble() const
 BRect
 BVariant::ToRect() const
 {
-	return BRect(fLeft, fTop, fRight, fBottom);
+	return BRect(fRect.left, fRect.top, fRect.right, fRect.bottom);
 }
 
 
@@ -405,8 +406,8 @@ BVariant::AddToMessage(BMessage& message, const char* fieldName) const
 		case B_STRING_TYPE:
 			return message.AddString(fieldName, fString);
 		case B_RECT_TYPE:
-			return message.AddRect(fieldName, BRect(fLeft, fTop, fRight,
-				fBottom));
+			return message.AddRect(fieldName, BRect(fRect.left, fRect.top,
+				fRect.right, fRect.bottom));
 		default:
 			return B_UNSUPPORTED;
 	}
@@ -633,10 +634,10 @@ BVariant::_SetTo(float left, float top, float right, float bottom)
 {
 	fType = B_RECT_TYPE;
 	fFlags = 0;
-	fLeft = left;
-	fTop = top;
-	fRight = right;
-	fBottom = bottom;
+	fRect.left = left;
+	fRect.top = top;
+	fRect.right = right;
+	fRect.bottom = bottom;
 }
 
 
