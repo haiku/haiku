@@ -478,8 +478,11 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	irc: ?
 	im: http://tools.ietf.org/html/rfc3860
 	
-	svn: ?
-	cvs: ?
+	svn: handled by checkitout
+	cvs: handled by checkitout
+	git: handled by checkitout
+	rsync: handled by checkitout - http://tools.ietf.org/html/rfc5781
+
 	smb: cifsmount ?
 	nfs: mount_nfs ? http://tools.ietf.org/html/rfc2224
 	ipp: http://tools.ietf.org/html/rfc3510
@@ -489,6 +492,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	pop: http://tools.ietf.org/html/rfc2384
 	mid: cid: as per RFC 2392
 	http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid
+	message:<MID> http://daringfireball.net/2007/12/message_urls_leopard_mail
 
 	itps: pcast: podcast: s//http/ + parse xml to get url to mp3 stream...
 	audio: s//http:/ + default MediaPlayer
@@ -499,8 +503,6 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	webcal: (is http: to .ics file)
 
 	data: (but it's dangerous)
-
-	rsync: http://tools.ietf.org/html/rfc5781
 
 	*/
 	
