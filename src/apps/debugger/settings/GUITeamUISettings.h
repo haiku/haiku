@@ -6,13 +6,13 @@
 #define GUI_TEAM_UI_SETTINGS_H
 
 
+#include <Message.h>
 #include <String.h>
 
 #include <ObjectList.h>
 
+#include "Setting.h"
 #include "TeamUISettings.h"
-
-class BMessage;
 
 
 class GUITeamUISettings : public TeamUISettings {
@@ -30,12 +30,25 @@ public:
 	virtual	status_t			WriteTo(BMessage& archive) const;
 	virtual TeamUISettings*		Clone() const;
 
+			status_t			AddSetting(Setting* setting);
+			bool				SetValue(const Setting* setting,
+									const BVariant& value);
+			BVariant			Value(const Setting* setting) const;
+			BVariant			Value(const char* settingID) const;
+
 			GUITeamUISettings&	operator=(const GUITeamUISettings& other);
 									// throws std::bad_alloc
 
 private:
+			typedef BObjectList<Setting> SettingsList;
+private:
 
-			BString				fID;			
+			status_t			_SetTo(const GUITeamUISettings& other);
+			void				_Unset();
+
+			SettingsList		fSettings;
+			BMessage			fValues;
+			BString				fID;
 };
 
 
