@@ -12,7 +12,7 @@ namespace IMAP {
 
 ArgumentList::ArgumentList()
 	:
-	fArguments(5, true)
+	BObjectList<Argument>(5, true)
 {
 }
 
@@ -22,12 +22,26 @@ ArgumentList::~ArgumentList()
 }
 
 
+bool
+ArgumentList::Contains(const char* string) const
+{
+	for (int32 i = 0; i < CountItems(); i++) {
+		if (StringArgument* argument
+				= dynamic_cast<StringArgument*>(ItemAt(i))) {
+			if (argument->String().ICompare(string) == 0)
+				return true;
+		}
+	}
+	return false;
+}
+
+
 BString
 ArgumentList::StringAt(int32 index) const
 {
-	if (index >= 0 && index < fArguments.CountItems()) {
-		if (StringArgument* argument = dynamic_cast<StringArgument*>(
-				fArguments.ItemAt(index)))
+	if (index >= 0 && index < CountItems()) {
+		if (StringArgument* argument
+				= dynamic_cast<StringArgument*>(ItemAt(index)))
 			return argument->String();
 	}
 	return "";
@@ -37,8 +51,8 @@ ArgumentList::StringAt(int32 index) const
 bool
 ArgumentList::IsStringAt(int32 index) const
 {
-	if (index >= 0 && index < fArguments.CountItems()) {
-		if (dynamic_cast<StringArgument*>(fArguments.ItemAt(index)) != NULL)
+	if (index >= 0 && index < CountItems()) {
+		if (dynamic_cast<StringArgument*>(ItemAt(index)) != NULL)
 			return true;
 	}
 	return false;
@@ -48,20 +62,19 @@ ArgumentList::IsStringAt(int32 index) const
 bool
 ArgumentList::EqualsAt(int32 index, const char* string) const
 {
-	return StringAt(index).ICompare(string);
+	return StringAt(index).ICompare(string) == 0;
 }
 
 
-const ArgumentList&
+ArgumentList&
 ArgumentList::ListAt(int32 index) const
 {
-	if (index >= 0 && index < fArguments.CountItems()) {
-		if (ListArgument* argument = dynamic_cast<ListArgument*>(
-				fArguments.ItemAt(index)))
+	if (index >= 0 && index < CountItems()) {
+		if (ListArgument* argument = dynamic_cast<ListArgument*>(ItemAt(index)))
 			return argument->List();
 	}
 
-	static ArgumentList empty(0, true);
+	static ArgumentList empty;
 	return empty;
 }
 
@@ -69,9 +82,8 @@ ArgumentList::ListAt(int32 index) const
 bool
 ArgumentList::IsListAt(int32 index) const
 {
-	if (index >= 0 && index < fArguments.CountItems()) {
-		if (ListArgument* argument = dynamic_cast<ListArgument*>(
-				fArguments.ItemAt(index)))
+	if (index >= 0 && index < CountItems()) {
+		if (ListArgument* argument = dynamic_cast<ListArgument*>(ItemAt(index)))
 			return true;
 	}
 	return false;
@@ -81,9 +93,8 @@ ArgumentList::IsListAt(int32 index) const
 bool
 ArgumentList::IsListAt(int32 index, char kind) const
 {
-	if (index >= 0 && index < fArguments.CountItems()) {
-		if (ListArgument* argument = dynamic_cast<ListArgument*>(
-				fArguments.ItemAt(index)))
+	if (index >= 0 && index < CountItems()) {
+		if (ListArgument* argument = dynamic_cast<ListArgument*>(ItemAt(index)))
 			return argument->Kind() == kind;
 	}
 	return false;
@@ -109,6 +120,20 @@ ArgumentList::IsIntegerAt(int32 index) const
 }
 
 
+BString
+ArgumentList::ToString() const
+{
+	BString string;
+
+	for (int32 i = 0; i < CountItems(); i++) {
+		if (i > 0)
+			string += ", ";
+		string += ItemAt(i)->ToString();
+	}
+	return string;
+}
+
+
 // #pragma mark -
 
 
@@ -122,40 +147,12 @@ Argument::~Argument()
 }
 
 
-/*static*/ BString
-Argument::ToString(const ArgumentList& arguments)
-{
-	BString string;
-
-	for (int32 i = 0; i < arguments.CountItems(); i++) {
-		if (i > 0)
-			string += ", ";
-		string += arguments.ItemAt(i)->ToString();
-	}
-	return string;
-}
-
-
-bool
-Argument::Contains(const ArgumentList& arguments, const char* string) const
-{
-	for (int32 i = 0; i < arguments.CountItems(); i++) {
-		if (StringArgument* argument = dynamic_cast<StringArgument*>(
-				arguments.ItemAt(i))) {
-			if (argument->String().ICompare(string))
-				return true;
-		}
-	}
-	return false;
-}
-
-
 // #pragma mark -
 
 
-ListArgument::ListArgument()
+ListArgument::ListArgument(char kind)
 	:
-	fList(5, true)
+	fKind(kind)
 {
 }
 
@@ -163,9 +160,9 @@ ListArgument::ListArgument()
 BString
 ListArgument::ToString() const
 {
-	BString string("(");
-	string += Argument::ToString(response.Arguments());
-	string += ")";
+	BString string(fKind == '[' ? "[" : "(");
+	string += fList.ToString();
+	string += fKind == '[' ? "]" : ")";
 
 	return string;
 }
@@ -177,6 +174,13 @@ ListArgument::ToString() const
 StringArgument::StringArgument(const BString& string)
 	:
 	fString(string)
+{
+}
+
+
+StringArgument::StringArgument(const StringArgument& other)
+	:
+	fString(other.fString)
 {
 }
 
@@ -227,8 +231,7 @@ ExpectedParseException::ExpectedParseException(char expected, char instead)
 Response::Response()
 	:
 	fTag(0),
-	fArguments(5, true),
-	fContinued(false)
+	fContinuation(false)
 {
 }
 
@@ -243,7 +246,7 @@ Response::SetTo(const char* line) throw(ParseException)
 {
 	MakeEmpty();
 	fTag = 0;
-	fContinued = false;
+	fContinuation = false;
 
 	if (line[0] == '*') {
 		// Untagged response
@@ -252,7 +255,7 @@ Response::SetTo(const char* line) throw(ParseException)
 	} else if (line[0] == '+') {
 		// Continuation
 		Consume(line, '+');
-		fContinued = true;
+		fContinuation = true;
 	} else {
 		// Tagged response
 		Consume(line, 'A');
@@ -262,7 +265,7 @@ Response::SetTo(const char* line) throw(ParseException)
 		Consume(line, ' ');
 	}
 
-	char c = ParseLine(this, line);
+	char c = ParseLine(*this, line);
 	if (c != '\0')
 		throw ExpectedParseException('\0', c);
 }
@@ -271,7 +274,7 @@ Response::SetTo(const char* line) throw(ParseException)
 bool
 Response::IsCommand(const char* command) const
 {
-	return IsStringAt(0, command);
+	return IsUntagged() && EqualsAt(0, command);
 }
 
 

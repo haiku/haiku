@@ -18,37 +18,25 @@ namespace IMAP {
 class Argument;
 
 
-class ArgumentList {
+class ArgumentList : public BObjectList<Argument> {
 public:
 								ArgumentList();
 								~ArgumentList();
 
-			size_t				CountItems()
-									{ return (size_t)fArguments.CountItems(); }
-			Argument&			ItemAt(size_t index) const
-									{ return *fArguments.ItemAt(index); }
-			void				MakeEmpty()
-									{ fArguments.MakeEmpty(); }
-			bool				AddItem(Argument* argument)
-									{ return fArguments.AddItem(argument); }
-			Argument*			RemoveItem(size_t index)
-									{ return fArguments.RemoveItemAt(index); }
-
-			BString				ToString() const;
 			bool				Contains(const char* string) const;
-
 			BString				StringAt(int32 index) const;
 			bool				IsStringAt(int32 index) const;
 			bool				EqualsAt(int32 index,
 									const char* string) const;
-			const ArgumentList&	ListAt(int32 index) const;
+
+			ArgumentList&		ListAt(int32 index) const;
 			bool				IsListAt(int32 index) const;
 			bool				IsListAt(int32 index, char kind) const;
+
 			int32				IntegerAt(int32 index) const;
 			bool				IsIntegerAt(int32 index) const;
 
-private:
-			BObjectList<Argument> fArguments;
+			BString				ToString() const;
 };
 
 
@@ -79,6 +67,7 @@ private:
 class StringArgument : public Argument {
 public:
 								StringArgument(const BString& string);
+								StringArgument(const StringArgument& other);
 
 			const BString&		String() { return fString; }
 
@@ -122,7 +111,7 @@ public:
 			bool				IsUntagged() const { return fTag == 0; }
 			int32				Tag() const { return fTag; }
 			bool				IsCommand(const char* command) const;
-			bool				IsContinued() const { return fContinued; }
+			bool				IsContinuation() const { return fContinuation; }
 
 protected:
 			char				ParseLine(ArgumentList& arguments,
@@ -140,7 +129,7 @@ protected:
 
 protected:
 			int32				fTag;
-			bool				fContinued;
+			bool				fContinuation;
 };
 
 
