@@ -1,0 +1,50 @@
+Greetings.
+
+This document is intended to serve as an introduction to the Haiku project.
+As such, this is only the tip of the iceburg.
+
+Haiku project website
+---------------------
+http://www.haiku-os.org
+
+This is the main website for the Haiku project. It contains news posts from
+the project, blog posts (from developers, Google Summer of Code participants,
+and other frequent contributors), forums, and vast collection of information.
+
+
+Development tracker
+-------------------
+http://dev.haiku-os.org/
+
+This is the Haiku project's development tracker.
+ * Bug reports
+ * Browse source
+ * Review changesets
+ * Development related wiki (limited write access)
+
+
+{OpenGrok
+---------
+http://haiku.it.su.se:8180/source
+
+Graciously provided by <name>.
+This allows you to quickly and easily search Haiku's source code.
+
+
+Coding Guidelines
+------------------
+http://www.haiku-os.org/development/coding-guidelines
+
+The Haiku project takes pride in code quality. Both in terms of implementing
+the correct code, as well as ensuring the code is written in a consistent
+style. Learning and utilizing the coding guidelines is essential to
+contributing code to Haiku.
+
+
+Haiku Translation Assistant (HTA)
+---------------------------------
+http://hta.polytech.org
+
+This is the current solution to assisting people in translating Haiku's
+on screen text to other languages. Consult the [haiku-i18n] mailing list
+for additional information: http://www.freelists.org/list/haiku-i18n
