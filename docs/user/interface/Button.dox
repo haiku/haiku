@@ -1,12 +1,12 @@
 /*
  * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Distributed under the terms of the MIT License.
  *
  * Documentation by:
- *  John Scipione <jscipione@gmail.com>
+ *		John Scipione, jscipione@gmail.com
  * Corresponds to:
- *  /trunk/headers/os/interface/Button.h
- *  /trunk/src/kits/interface/Button.cpp
+ *		/trunk/headers/os/interface/Button.h	 rev 42794
+ *		/trunk/src/kits/interface/Button.cpp	 rev 42794
 
 
 /*!
@@ -141,59 +141,51 @@
 
 
 /*! \fn BButton::BButton(BMessage* archive)
-	\brief Creates a new BButton from an \a archive.
+	\brief Constructs a BButton object from an \a archive message.
 
-	If the message is a valid button then an instance of BButton created
-	from the passed in \a archive will be returned. Otherwise this method
-	will return \c NULL.
+	This method is usually not called directly. If you want to build a
+	button from a message you should call Instantiate() which can
+	handle errors properly.
 
-	\returns An instance of BButton if the \a archive is valid or \c NULL.
-*/
+	If the \a archive deep, the BButton object will also unarchive each
+	of its child views recursively.
 
-
-/*!
-	\fn BArchivable* BButton::Instantiate(BMessage* archive)
-	\brief Instantiates a BButton from a BMessage.
-
-	\param archive The \c archive message to instantiate the BButton.
-
-	\returns a BArchivable object of the BButton.
-*/
-
-
-/*!
-	\fn status_t BButton::Archive(BMessage* archive, bool deep) const
-	\brief Archives the BButton into \a archive.
-
-	\param archive The target \a archive which the BButton data will
-		go into.
-	\param deep Whether or not to recursively archive the BButton's children.
-
-	\retval B_OK The archive operation was successful.
-	\retval B_BAD_VALUE The archive operation failed.
+	\param archive The \a archive message to restore from.
 */
 
 
 /*!
 	\fn void BButton::Draw(BRect updateRect)
-	\brief Draws the button and sets its label.
+	\brief Draws the area of the button that intersects \a updateRect and
+		sets the label.
 
-	\param updateRect The BRect which the button is drawn into.
+	\note This is an hook method called by the Interface Kit, you don't
+	have to call it yourself. If you need to forcefully redraw the button
+	consider calling Invalidate() instead.
+
+	\param updateRect The rectangular area to be drawn.
+
+	\sa BView::Draw()
 */
 
 
 /*!
 	\fn void BButton::MouseDown(BPoint point)
-	\brief Hook method to respond to a MouseDown event.
+	\brief Hook method that is called when a mouse button is pressed.
 
-	\param point The point on the screen that the mouse pointer is located at.
+	\param point The point on the screen where to mouse pointer is when
+		the mouse button is pressed.
+
+	\sa BView::MouseDown()
 */
 
 
 /*!
 	\fn void BButton::AttachedToWindow()
-	\brief Hook method that is called when the BButton view is attached
-	to the window.
+	\brief Hook method that is called when the object is attached to a
+		window.
+
+	\sa BControl::AttachedToWindow()
 */
 
 
@@ -236,50 +228,6 @@
 
 
 /*!
-	\fn void BButton::MessageReceived(BMessage *message)
-	\brief Hook method that is called when a message is received by the BButton.
-
-	\param message The message received.
-*/
-
-
-/*!
-	\fn void BButton::WindowActivated(bool active)
-	\brief Sets the window that the BButton is attached to as activated or not.
-
-	\param active if \c true the window is activated, if \c false the window is
-		deactivated.
-*/
-
-
-/*!
-	\fn void BButton::MouseMoved(BPoint point, uint32 transit,
-		const BMessage *message)
-	\brief Hook method that is called when the mouse is moved.
-
-	\param point The point on the screen that the mouse pointer is located at.
-	\param transit ???
-	\param message The message that is received when the mouse is moved.
-*/
-
-
-/*!
-	\fn void BButton::MouseUp(BPoint point)
-	\brief Hook method that is called when a mouse button is unpressed.
-
-	\param point The point on the screen that the mouse pointer is located at.
-*/
-
-
-/*!
-	\fn void BButton::DetachedFromWindow()
-	\brief Detaches the BButton from the window.
-
-	\see BControl::DetachedFromWindow()
-*/
-
-
-/*!
 	\fn void BButton::SetValue(int32 value)
 	\brief Sets the value of the BButton.
 
@@ -314,7 +262,7 @@
 	\fn void BButton::ResizeToPreferred()
 	\brief Resizes the BButton to its preferred size.
 
-	\see BControl::ResizeToPreferred()
+	\see BView::ResizeToPreferred()
 */
 
 
@@ -343,7 +291,7 @@
 	\param newLocation The location on the screen that the BButton
 		is moved to.
 
-	\see BControl::FrameMoved();
+	\see BView::FrameMoved();
 */
 
 
@@ -354,7 +302,7 @@
 	\param width the new \a width of the BButton
 	\param height the new \a height of the BButton
 
-	\see BControl::FrameResized();
+	\see BView::FrameResized();
 */
 
 
@@ -362,44 +310,10 @@
 	\fn void BButton::MakeFocus(bool focused)
 	\brief Focus or unfocus the BButton.
 
-	\param focused If \c true focus the BButton, otherwise unfocus the BButton.
+	\param focused If \c true focus the button, otherwise remove focus from
+		the button.
 
 	\see BControl::MakeFocus()
-*/
-
-
-/*!
-	\fn void BButton::AllAttached()
-	\brief Hook method that is called when the BButton is attached.
-
-	\see BControl::AllAttached()
-*/
-
-
-/*!
-	\fn void BButton::AllDetached()
-	\brief Hook method that is called when the BButton is deattached.
-
-	\see BControl::AllDetached()
-*/
-
-
-/*!
-	\fn BHandler* BButton::ResolveSpecifier(BMessage *message, int32 index,
-		BMessage *specifier, int32 what, property)
-	\brief Resolves specifiers for properties.
-	\see BHandler::ResolveSpecifier()
-*/
-
-
-/*!
-	\fn status_t BButton::GetSupportedSuites(BMessage *message)
-	\brief Reports the suites of messages and specifiers that derived classes
-		understand.
-
-	\param message The message to report the suite of messages and specifiers.
-
-	\see BWindow::GetSupportedSuites()
 */
 
 
@@ -453,4 +367,3 @@
 
 	\returns The preferred BButton size as a BSize
 */
-

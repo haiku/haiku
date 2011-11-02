@@ -1,0 +1,343 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gabe Yoder, gyoder@stny.rr.com
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/app/Clipboard.h	 rev 42274
+ *		/trunk/src/kits/app/Clipboard.cpp	 rev 42274
+ */
+
+
+/*!
+	\file Clipboard.h
+	\brief Provides the BClipboard class.
+*/
+
+
+/*!
+	\var be_clipboard
+	\brief Global system clipboard object.
+*/
+
+
+/*!
+	\class BClipboard
+	\ingroup app
+	\brief Used for short-term data storage between documents and
+		applications via copy and paste operations.
+
+	Clipboards are differentiated by their name. In order for two
+	applications to share a clipboard they simply have to create a
+	BClipboard object with the same name. However, it is rarely necessary
+	to create your own clipboard, instead you can use the \c be_clipboard
+	system clipboard object.
+
+	\remark To access the system clipboard without a BApplication object,
+	create a BClipboard object with the name "system". You should avoid
+	creating a custom clipboard with the name "system" for your own use.
+
+	To access the clipboard data call the Data() method. The BMessage object
+	returned by the Data() method has the following properties:
+		- The \c what value is unused.
+		- The clipboard data is stored in a message field typed as
+			\c B_MIME_TYPE.
+		- The MIME type of the data is used as the name of the field that
+			holds the data.
+		- Each field in the data message contains the same data with a
+			different format.
+
+	To read and write to the clipboard you must first lock the BClipboard
+	object. If you fail to lock the BClipboard object then the Data() method
+	will return \c NULL instead of a pointer to a BMessage object.
+
+	Below is an example of reading a string from the system clipboard.
+\code
+const char *string;
+int32 stringLen;
+if (be_clipboard->Lock()) {
+	// Get the clipboard BMessage
+	BMessage *clip = be_clipboard->Data();
+
+	// Read the string from the clipboard data message
+	clip->FindData("text/plain", B_MIME_TYPE, (const void **)&string,
+		&stringLen);
+
+	be_clipboard->Unlock();
+} else
+	fprintf(stderr, "could not lock clipboard.\n");
+\endcode
+
+	Below is an example of writing a string to the system clipboard.
+\code
+const char* string = "Some clipboard data";
+
+if (be_clipboard->Lock()) {
+	// Clear the clipboard data
+	be_clipboard->Clear();
+
+	// Get the clipboard data message
+	BMessage *clip = be_clipboard->Data();
+
+	// Write string data to the clipboard data message
+	clip->AddData("text/plain", B_MIME_TYPE, string, strlen(string));
+
+	// Commit the data to the clipboard
+	status = be_clipboard->Commit();
+	if (status != B_OK)
+		fprintf(stderr, "could not commit data to clipboard.\n");
+
+	be_clipboard->Unlock();
+} else
+	fprintf(stderr, "could not lock clipboard.\n");
+\endcode
+*/
+
+
+/*!
+	\fn BClipboard::BClipboard(const char *name, bool transient = false)
+	\brief Create a BClipboard object with the given \a name.
+
+	If the \a name parameter is \c NULL then the "system" BClipboard object
+	is constructed instead.
+
+	\param name The \a name of the clipboard.
+	\param transient If \c true, lose data after a reboot (currently unused).
+*/
+
+
+/*!
+	\fn BClipboard::~BClipboard()
+	\brief Destroys the BClipboard object. The clipboard data is not destroyed.
+*/
+
+
+/*!
+	\fn const char* BClipboard::Name() const
+	\brief Returns the name of the BClipboard object.
+
+	\returns The name of the clipboard.
+*/
+
+
+/*!
+	\name Commit Count Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn uint32 BClipboard::LocalCount() const
+	\brief Returns the (locally cached) number of commits to the clipboard.
+
+	The returned value is the number of successful Commit() invocations for
+	the clipboard represented by this object, either invoked on this object
+	or another (even from another application). This method returns a locally
+	cached value, which might already be obsolete. For an up-to-date value
+	use SystemCount().
+
+	\return The number of commits to the clipboard.
+
+	\sa SystemCount()
+*/
+
+
+/*!
+	\fn uint32 BClipboard::SystemCount() const
+	\brief Returns the number of commits to the clipboard.
+
+	The returned value is the number of successful Commit() invocations for
+	the clipboard represented by this object, either invoked on this object
+	or another (even from another application). This method retrieves the
+	value directly from the system service managing the clipboards, so it is
+	more expensive, but more up-to-date than LocalCount(), which returns a
+	locally cached value.
+
+	\return The number of commits to the clipboard.
+
+	\sa LocalCount()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Monitoring Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BClipboard::StartWatching(BMessenger target)
+	\brief Start watching the BClipboard object for changes.
+
+	When a change in the clipboard occurs, most like as the result of a cut
+	or copy action, a \a B_CLIPBOARD_CHANGED message is sent to \a target.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a target is invalid.
+	\retval B_ERROR An error occured.
+
+	\sa StopWatching()
+*/
+
+
+/*!
+	\fn status_t BClipboard::StopWatching(BMessenger target)
+	\brief Stop watching the BClipboard object for changes.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a target is invalid.
+	\retval B_ERROR An error occurred.
+
+	\sa StartWatching()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Locking Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BClipboard::Lock()
+	\brief Locks the clipboard so that no other tread can read from it or
+		write to it.
+
+	You should call Lock() before reading or writing to the clipboard.
+
+	\returns \c true if the clipboard was locked, \c false otherwise.
+
+	\sa Unlock()
+*/
+
+
+/*!
+	\fn void BClipboard::Unlock()
+	\brief Unlocks the clipboard.
+
+	\sa Lock()
+*/
+
+
+/*!
+	\fn bool BClipboard::IsLocked() const
+	\brief Returns whether or not the clipboard is locked.
+
+	\returns \c true if the clipboard is locked, \c false if it is unlocked.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Clipboard Data Transaction Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BClipboard::Clear()
+	\brief Clears out all data from the clipboard.
+
+	You should call Clear() before adding new data to the BClipboard object.
+
+	\retval B_OK Everything went find.
+	\retval B_NOT_ALLOWED The clipboard is not locked.
+	\retval B_NO_MEMORY Ran out of memory initializing the data message.
+	\retval B_ERROR Another error occurred.
+*/
+
+
+/*!
+	\fn status_t BClipboard::Commit()
+	\brief Commits the clipboard data to the BClipboard object.
+
+	\retval B_OK Everything went find.
+	\retval B_NOT_ALLOWED The clipboard is not locked.
+	\retval B_ERROR Another error occurred.
+*/
+
+
+/*!
+	\fn status_t BClipboard::Commit(bool failIfChanged)
+	\brief Commits the clipboard data to the BClipboard object with the
+		option to fail if there is a change to the clipboard data.
+
+	\param failIfChanged Whether or not to fail to commit the changes
+		if there is a change in the clipboard data.
+
+	\retval B_OK Everything went find.
+	\retval B_NOT_ALLOWED The clipboard is not locked.
+	\retval B_ERROR Another error occurred.
+*/
+
+
+/*!
+	\fn status_t BClipboard::Revert()
+	\brief Reverts the clipboard data.
+
+	The method should be used in the case that you have made a change to the
+	clipboard data message and then decide to revert the change instead of
+	committing it.
+
+	\retval B_OK Everything went find.
+	\retval B_NOT_ALLOWED The clipboard is not locked.
+	\retval B_NO_MEMORY Ran out of memory initializing the data message.
+	\retval B_ERROR Another error occurred.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Clipboard Data Message Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BMessenger BClipboard::DataSource() const
+	\brief Gets a BMessenger object targeting the application that last
+		modified the clipboard.
+
+	The clipboard object does not need to be locked to call this method.
+
+	\returns A BMessenger object that targets the application that last
+		modified the clipboard.
+*/
+
+
+/*!
+	\fn BMessage* BClipboard::Data() const
+	\brief Gets a pointer to the BMessage object that holds the clipboard
+		data.
+
+	If the BClipboard object is not locked this method returns \c NULL.
+
+	\returns A pointer to the BMessage object that holds the clipboard
+		data or \c NULL if the clipboard is not locked.
+*/
+
+
+//! @}

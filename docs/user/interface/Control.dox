@@ -1,0 +1,422 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		/trunk/headers/os/interface/Control.h	 rev 42794
+ *		/trunk/src/kits/interface/Control.cpp	 rev 42794
+ */
+
+/*!
+	\file Control.h
+	\brief BControl class definition and support enums.
+*/
+
+
+/*!
+	\var B_CONTROL_ON
+	Control on
+*/
+
+
+/*!
+	\var B_CONTROL_OFF
+	Control off
+*/
+
+
+/*!
+	\class BControl
+	\ingroup interface
+	\ingroup libbe
+	\brief BControl is the base class for user-event handling objects.
+
+	Simple controls such as BCheckBox and BButton deviate only a bit from
+	BControl, whereas more complicated controls such as BColorControl and
+	BSlider re-implement much more functionality. Whether you are building
+	a simple control or something more complicated you should inherit from
+	BControl as it provides a common set of methods for intercepting
+	received messages from mouse and keyboard events.
+
+	Controls have state which they keep in their value. The value of a
+	control, stored as an int32, is read and set by the virtual Value() and
+	SetValue() methods. BControl defines \c B_CONTROL_ON and \c B_CONTROL_OFF
+	values that you can use as a convenience if your control has a simple
+	on/off state. If your BControl derived class stores a larger set of
+	states then you should define your own integer values instead.
+*/
+
+
+/*!
+	\fn BControl::BControl(BRect frame, const char *name, const char *label,
+						   BMessage *message, uint32 resizingMode,
+						   uint32 flags)
+	\brief Construct a control in the \a frame with a \a name, \a label,
+		model \a message, \a resizingMode, and creation \a flags.
+
+	The initial value of the control is set to 0 (\c B_CONTROL_OFF).
+	The \a label and the \a message parameters can be set to \c NULL.
+
+	\param frame The \a frame to draw the control in.
+	\param name The \a name of the control.
+	\param label The \a label displayed along with the control.
+	\param message The \a message to send when the control is activated.
+	\param resizingMode Defines the behavior of the control as the parent
+		view resizes.
+	\param flags Behavior \a flags for the control. See BView for details.
+*/
+
+
+/*!
+	\fn BControl::BControl(const char *name, const char *label,
+						   BMessage *message, uint32 flags)
+	\brief Construct a control with a \a name, \a label, model \a message,
+		and creation \a flags suitable for use with the Layout API.
+
+	The initial value of the control is set to 0 (\c B_CONTROL_OFF).
+	The \a label and the \a message parameters can be set to \c NULL.
+
+	\param name The \a name of the control.
+	\param label The \a label displayed along with the control.
+	\param message The \a message to send when the control is activated.
+	\param flags Behavior \a flags for the control. See BView for details.
+*/
+
+
+/*!
+	\fn BControl::~BControl()
+	\brief Frees all memory used by the BControl object including the memory
+		used by the model message.
+*/
+
+
+/*!
+	\fn BControl::BControl(BMessage *archive)
+	\brief Constructs a BControl object from an \a archive message.
+
+	This method is usually not called directly. If you want to build a
+	control from a message you should call Instantiate() which can
+	handle errors properly.
+
+	If the \a archive deep, the BControl object will also unarchive each
+	of its child views recursively.
+
+	\param archive The \a archive message to restore from.
+*/
+
+
+/*!
+	\fn BArchivable* BControl::Instantiate(BMessage *archive)
+	\brief Creates a new object from an \a archive.
+
+	If the message is a valid object then the instance created from the
+	passed in \a archive will be returned. Otherwise this method will
+	return \c NULL.
+
+	\param archive The \a archive message.
+
+	\returns An instance of the object if \a archive is valid or \c NULL.
+
+	\sa BArchivable::Instantiate()
+*/
+
+
+/*!
+	\fn status_t BControl::Archive(BMessage *archive, bool deep) const
+	\brief Archives the object into \a archive.
+
+	\param archive The target \a archive that the data will go into.
+	\param deep Whether or not to recursively archive child views.
+	
+	\retval B_OK The archive operation was successful.
+	\retval B_BAD_VALUE \c NULL \a archive message.
+	\retval B_ERROR The archive operation failed.
+
+	\sa BArchivable::Archive()
+*/
+
+
+/*!
+	\fn void BControl::WindowActivated(bool active)
+	\brief Hook method that is called when the attached window becomes
+		activated or deactivated.
+
+	The BControl is redrawn if it is a child of the focused view.
+
+	\param active \c true if the window becomes activated, \c false if the
+		window becomes deactivated.
+
+	\sa BView::WindowActivated()
+*/
+
+
+/*!
+	\fn void BControl::AttachedToWindow()
+	\brief Hook method that is called when the object is attached to a
+		window.
+
+	This method overrides BView::AttachedToWindow() setting the low color
+	and view color of the BControl so that it matches the view color of the
+	control's parent view. It also makes the attached window the default
+	target for Invoke() as long as another target has not already been set.
+
+	\sa BView::AttachedToWindow()
+	\sa Invoke()
+	\sa BInvoker::SetTarget()
+*/
+
+
+/*!
+	\fn void BControl::DetachedFromWindow()
+	\brief Hook method that is called when the object is detached from a
+		window.
+
+	\sa BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BControl::AllAttached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+		all child views have already been attached to a window.
+
+	\sa BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BControl::AllDetached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+		all child views have already been detached from a window.
+
+	\sa BView::AllDetached()
+*/
+
+
+/*!
+	\fn void BControl::MakeFocus(bool focused)
+	\brief Gives or removes focus from the control.
+
+	BControl::MakeFocus() overrides BView::MakeFocus() to call Draw() when
+	the focus changes. Derived classes generally don't have to re-implement
+	MakeFocus().
+
+	IsFocusChanging() returns \c true when Draw() is called from this method.
+
+	\param focused \a true to set focus, \a false to remove it.
+
+	\sa BView::MakeFocus()
+	\sa IsFocusChanging()
+*/
+
+
+/*!
+	\fn void BControl::KeyDown(const char *bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is pressed.
+
+	Overrides BView::KeyDown() to toggle the control value and then
+	calls Invoke() for \c B_SPACE or \c B_ENTER. If this is not desired
+	you should override this method in derived classes.
+
+	The KeyDown() method is only called if the BControl is the focus view
+	in the active window. If the window has a default button, \c B_ENTER
+	will be passed to that object instead of the focus view.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+
+	\sa BView::KeyDown()
+	\sa MakeFocus()
+*/
+
+
+/*!
+	\fn void BControl::MouseDown(BPoint point)
+	\brief Hook method that is called when a mouse button is pressed.
+
+	\param point The point on the screen where to mouse pointer is when
+		the mouse button is pressed.
+
+	\sa BView::MouseDown()
+*/
+
+
+/*!
+	\fn void BControl::MouseUp(BPoint point)
+	\brief Hook method that is called when a mouse button is released.
+
+	\param point The point on the screen where to mouse pointer is when
+		the mouse button is released.
+
+	\sa BView::MouseUp()
+*/
+
+
+/*!
+	\fn void BControl::MouseMoved(BPoint point, uint32 transit,
+								  const BMessage *message)
+	\brief Hook method that is called when the mouse is moved.
+
+	\sa BView::MouseMoved()
+*/
+
+
+/*!
+	\fn void BControl::SetLabel(const char *label)
+	\brief Sets the \a label of the control.
+
+	If the \a label changes the control is redrawn.
+
+	\param label The \a label to set, can be \c NULL.
+*/
+
+
+/*!
+	\fn const char* BControl::Label() const
+	\brief Gets the label of the control.
+
+	returns The control's label.
+*/
+
+
+/*!
+	\fn void BControl::SetValue(int32 value)
+	\brief Sets the value of the control.
+
+	If the \a value changes the control is redrawn.
+
+	\param value The \a value to set.
+
+	\sa SetValueNoUpdate()
+*/
+
+
+/*!
+	\fn void BControl::SetValueNoUpdate(int32 value)
+	\brief Sets the value of the control without redrawing.
+
+	\param value The \a value to set.
+
+	\sa SetValue()
+*/
+
+
+/*!
+	\fn int32 BControl::Value() const
+	\brief Gets the value of the control.
+
+	\returns The control's value.
+*/
+
+
+/*!
+	\fn void BControl::SetEnabled(bool enabled)
+	\brief Enables or disables the control.
+
+	BControl objects are enabled by default. If the control changes enabled
+	state then it is redrawn.
+
+	Disabled controls generally won't allow the user to focus on them
+	(The \c B_NAVIGABLE flag is turned off), and don't post any messages.
+
+	Disabled controls in derived classes should be drawn in subdued colors
+	to visually indicate that they are disabled and should not respond to
+	keyboard or mouse events.
+
+	\param enabled If \c true enables the control, if \c false, disables it.
+*/
+
+
+/*!
+	\fn bool BControl::IsEnabled() const
+	\brief Gets whether or not the control is currently enabled.
+
+	\returns \c true if the control is enabled, \c false if it is disabled.
+*/
+
+
+/*!
+	\fn void BControl::GetPreferredSize(float *_width, float *_height)
+	\brief Fill out the preferred width and height of the control
+		into the \a _width and \a _height parameters.
+
+	Derived classes can override this method to set the preferred
+	width and height of the control.
+
+	\param _width Pointer to a \c float to hold the width of the control.
+	\param _height Pointer to a \c float to hold the height of the control.
+
+	\sa BView::GetPreferredSize()
+*/
+
+
+/*!
+	\fn void BControl::ResizeToPreferred()
+	\brief Resize the control to its preferred size.
+
+	\sa BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn status_t BControl::Invoke(BMessage *message)
+	\brief Sends a copy of the model \a message to the designated target.
+
+	BControl::Invoke() overrides BInvoker::Invoke(). Derived classes
+	should use this method in their MouseDown() and KeyDown() methods
+	and should call IsEnabled() to check if the control is enabled
+	before calling Invoke().
+
+	The following fields added to the BMessage:
+		- "when"	\c B_INT64_TYPE	system_time()
+		- "source"	\c B_POINTER_TYPE	A pointer to the BControl object.
+
+	\param message The \a message to send.
+
+	\sa BInvoker::Invoke()
+	\sa IsEnabled()
+*/
+
+
+/*!
+	\fn BHandler* BControl::ResolveSpecifier(BMessage *message, int32 index,
+											 BMessage *specifier, int32 what,
+											 const char *property)
+	\brief Determine the proper specifier for scripting messages.
+
+	\sa BHandler::ResolveSpecifier()
+*/
+
+
+/*!
+	\fn status_t BControl::GetSupportedSuites(BMessage *message)
+	\brief Report the suites of understood messages.
+
+	\sa BHandler::GetSupportedSuites();
+*/
+
+
+/*!
+	\fn status_t BControl::Perform(perform_code code, void* _data)
+	\brief Perform some action. (Internal Method)
+
+	The following perform codes are recognized:
+		- \c PERFORM_CODE_MIN_SIZE
+		- \c PERFORM_CODE_MAX_SIZE
+		- \c PERFORM_CODE_PREFERRED_SIZE
+		- \c PERFORM_CODE_LAYOUT_ALIGNMENT
+		- \c PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH
+		- \c PERFORM_CODE_GET_HEIGHT_FOR_WIDTH
+		- \c PERFORM_CODE_SET_LAYOUT
+		- \c PERFORM_CODE_INVALIDATE_LAYOUT
+		- \c PERFORM_CODE_DO_LAYOUT
+
+	\param code The perform code.
+	\param _data A pointer to store some data.
+
+	\returns A status code.
+
+	\sa BHandler::Perform()
+*/

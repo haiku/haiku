@@ -1,0 +1,239 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT Licence.
+ *
+ * Documentation by:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Marc Flerackers, mflerackers@androme.be
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		/trunk/headers/os/interface/CheckBox.h	 rev 42794
+ *		/trunk/src/kits/interface/CheckBox.cpp	 rev 42794
+ */
+
+/*!
+	\file CheckBox.h
+	\brief Defines the BCheckBox class
+*/
+
+
+/*!
+	\class BCheckBox
+	\ingroup interface
+	\ingroup libbe
+	\brief BCheckBox is a user interface element used to make a binary
+		decision.
+
+	A BCheckBox object is used to draw a checkbox element. This simple control
+	has 2 states, \c B_CONTROL_OFF when the checkbox is unchecked and
+	\c B_CONTROL_ON when the checkbox is checked. A checkbox can also have a
+	descriptive label drawn to the right of the checkbox.
+
+	When the checkbox is checked it has an X drawn inside of it. The checkbox
+	can be checked by a mouse click or by pushing \key{Space} on the
+	keyboard when the checkbox has focus. A checkbox object with focus
+	is surrounded by a blue border. A checkbox can also be set
+	programmatically by calling the SetValue() method.
+
+	A few checkbox examples can be seen below in unchecked state, checked
+	state, and another unchecked checkbox with focus on it.
+
+	\image html BCheckBox_example.png
+*/
+
+
+/*!
+	\fn BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
+							 BMessage *message, uint32 resizingMode,
+							 uint32 flags)
+	\brief Construct a checkbox in the \a frame with a \a name, \a label,
+		model \a message, \a resizingMode, and creation \a flags.
+
+	The initial value of the checkbox is set to 0 (\c B_CONTROL_OFF).
+	The \a label and the \a message parameters can be set to \c NULL.
+
+	\param frame The frame to draw the checkbox in.
+	\param name The name of the checkbox.
+	\param label The label displayed along with the checkbox.
+	\param message The message to send when the checkbox is activated.
+	\param resizingMode Defines the behavior of the checkbox as the parent
+		view resizes.
+	\param flags Behavior flags for the checkbox. See BView for details.
+*/
+
+
+/*!
+	\fn BCheckBox::BCheckBox(const char *name, const char *label,
+							 BMessage *message, uint32 flags)
+	\brief Construct a checkbox with a \a name, \a label, model \a message,
+		and creation \a flags suitable for use with the Layout API.
+
+	The initial value of the checkbox is set to 0 (\c B_CONTROL_OFF).
+	The \a label and the \a message parameters can be set to \c NULL.
+
+	\param name The name of the checkbox.
+	\param label The label displayed along with the checkbox.
+	\param message The message to send when the checkbox is activated.
+	\param flags Behavior flags for the checkbox. See BView for details.
+*/
+
+
+/*!
+	\fn BCheckBox::BCheckBox(const char *label, BMessage *message)
+	\brief Constructs a BCheckBox object with just a \a label and model
+		\a message.
+
+	The initial value of the checkbox is set to 0 (\c B_CONTROL_OFF).
+	The \a label and the \a message parameters can be set to \c NULL.
+
+	\param label The label displayed along with the checkbox.
+	\param message The message to send when the checkbox is activated.
+*/
+
+
+/*!
+	\fn BCheckBox::BCheckBox(BMessage *archive)
+	\brief Constructs a BCheckBox object from an \a archive message.
+
+	This method is usually not called directly. If you want to build a
+	checkbox from a message you should call Instantiate() which can
+	handle errors properly.
+
+	If the \a archive deep, the BCheckBox object will also unarchive each
+	of its child views recursively.
+
+	\param archive The \a archive message to restore from.
+*/
+
+
+/*!
+	\fn BCheckBox::~BCheckBox()
+	\brief Destructor Method.
+*/
+
+
+/*!
+	\fn void BCheckBox::Draw(BRect updateRect)
+	\brief Draws the area of the checkbox that intersects \a updateRect.
+
+	\note This is an hook method called by the Interface Kit, you don't
+	have to call it yourself. If you need to forcefully redraw the checkbox
+	consider calling Invalidate() instead.
+
+	\param updateRect The rectangular area to be drawn.
+
+	\sa BView::Draw()
+*/
+
+
+/*!
+	\fn void BCheckBox::FrameMoved(BPoint newLocation)
+	\brief Hook method that gets called when the checkbox is moved.
+
+	\param newLocation The point that the top left corner of the frame
+		is moved to.
+
+	\sa BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BCheckBox::FrameResized(float width, float height)
+	\brief Hook method that gets called when the checkbox is resized.
+
+	\param width The new \a width of the checkbox.
+	\param height The new \a height of the checkbox.
+
+	\sa BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BCheckBox::GetPreferredSize(float* _width, float* _height)
+	\brief Fill out the preferred width and height of the checkbox
+		into the \a _width and \a _height parameters.
+
+	\param _width Pointer to a \c float to hold the width of the checkbox.
+	\param _height Pointer to a \c float to hold the height of the checkbox.
+
+	\sa BView::GetPreferredSize()
+*/
+
+
+/*!
+	\fn void BCheckBox::ResizeToPreferred()
+	\brief Resize the checkbox to its preferred size.
+
+	\sa BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn void BCheckBox::InvalidateLayout(bool descendants)
+	\brief \brief Redraws the checkbox.
+
+	\param descendants Redraw child views as well.
+
+	\sa BLayout::InvalidateLayout()
+*/
+
+
+/*!
+	\fn BSize BCheckBox::MinSize()
+	\brief Get the minimum size of the checkbox.
+
+	\return The minimum size of the checkbox as a BSize.
+
+	\sa BAbstractLayout::MinSize()
+*/
+
+
+/*!
+	\fn BSize BCheckBox::MaxSize()
+	\brief Get the maximum size of the checkbox.
+
+	\return The maximum size of the checkbox as a BSize.
+
+	\sa BAbstractLayout::MaxSize()
+*/
+
+
+/*!
+	\fn BSize BCheckBox::PreferredSize()
+	\brief Get the preferred size of the checkbox.
+
+	\return The preferred size of the checkbox as a BSize.
+
+	\sa BAbstractLayout::PreferredSize()
+*/
+
+
+/*!
+	\fn void BCheckBox::MakeFocus(bool focused)
+	\brief Gives or removes focus from the checkbox.
+
+	\param focused \a true to set focus, \a false to remove it.
+
+	\sa BControl::MakeFocus()
+*/
+
+
+/*!
+	\fn void BCheckBox::SetValue(int32 value)
+	\brief Turn the checkbox on or off.
+
+	\param value The value to set the checkbox to, should be
+		either \c B_CONTROL_ON or \c B_CONTROL_OFF.
+
+	\sa BControl::SetValue()
+*/
+
+
+/*!
+	\fn status_t BCheckBox::Invoke(BMessage *message)
+	\brief Tells the messenger to send a message.
+
+	\param message The \a message to send.
+
+	\sa BInvoker::Invoke()
+*/

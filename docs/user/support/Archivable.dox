@@ -63,7 +63,8 @@
 */
 
 
-/*!	\fn BArchivable::BArchivable(BMessage* from)
+/*!
+	\fn BArchivable::BArchivable(BMessage* from)
 	\brief Constructor. Does important behind-the-scenes work in the unarchiving
 		process.
 	
@@ -74,17 +75,20 @@
 */
 
 
-/*!	\fn BArchivable::BArchivable()
+/*!
+	\fn BArchivable::BArchivable()
 	\brief Constructor. Does nothing.
 */
 
 
-/*!	\fn BArchivable::~BArchivable()
+/*!
+	\fn BArchivable::~BArchivable()
 	\brief Destructor. Does nothing.
 */
 
 
-/*!	\fn virtual status_t BArchivable::Archive(BMessage* into,
+/*!
+	\fn virtual status_t BArchivable::Archive(BMessage* into,
 		 bool deep = true) const
 	\brief Archive the object into a BMessage.
 	
@@ -94,20 +98,23 @@
 	\param into The message you store your object in.
 	\param deep If \c true, all children of this object should be archived as
 		well.
-	\retval B_OK The archiving succeeded.
-	\retval "error codes" The archiving did not succeed.
+
+	\retval B_OK The archive operation was successful.
+	\retval B_BAD_VALUE \c NULL \a archive message.
+	\retval B_ERROR The archive operation failed.
 */
 
 
-/*!	\fn static BArchivable* BArchivable::Instantiate(BMessage* archive)
+/*!
+	\fn static BArchivable* BArchivable::Instantiate(BMessage* archive)
 	\brief Static member to restore objects from messages.
-	
+
 	You should always check that the \a archive argument actually corresponds to
 	your class. The automatic functions, such as #instantiate_object() and
 	BUnarchiver::InstantiateObject() will not choose the wrong class but manual
 	calls to this member might be faulty. You can verify that \c archive
 	stores an object of your calss with the validate_instantiation() function.
-	
+
 	\param archive The message with the data of the object to restore.
 	\retval You should return a pointer to the object you create with
 		\c archive, or \c NULL if unarchival fails.
@@ -120,15 +127,24 @@
 */
 
 
-/*!	\fn virtual status_t BArchivable::Perform(perform_code d, void* arg)
-	\brief Internal method defined for binary compatibility purposes.
+/*!
+	\fn virtual status_t BArchivable::Perform(perform_code d, void* arg)
+	\brief Perform some action (Internal method defined for binary
+		compatibility purposes).
+
 	\internal This method is defined for binary compatibility purposes, it is
 		used to ensure that the correct AllUnarchived() and AllArchived()
 		methods are called for objects, as those methods are new to Haiku.
+
+	\param d The perform code.
+	\param arg A pointer to store some data.
+
+	\returns A status code.
 */
 
 
-/*!	\fn virtual status_t BArchivable::AllUnarchived(const BMessage* archive)
+/*!
+	\fn virtual status_t BArchivable::AllUnarchived(const BMessage* archive)
 	\brief Method relating to the use of \c BUnarchiver.
 
 	This hook function is called triggered in the BUnarchiver::Finish() method.
@@ -180,7 +196,8 @@
 */
 
 
-/*!	\fn BArchivable* instantiate_object(BMessage *from, image_id *id)
+/*!
+	\fn BArchivable* instantiate_object(BMessage *from, image_id *id)
 	\brief Instantiate an archived object with the object being defined in a
 		different application or library.
 	
@@ -194,7 +211,8 @@
 */
 
 
-/*!	\fn BArchivable* instantiate_object(BMessage *from)
+/*!
+	\fn BArchivable* instantiate_object(BMessage *from)
 	\brief Instantiate an archived object.
 	
 	This global function will determine the base class, based on the \a from
@@ -209,26 +227,30 @@
 */
 
 
-/*!	\fn bool validate_instantiation(BMessage* from, const char* className)
+/*!
+	\fn bool validate_instantiation(BMessage* from, const char* className)
 	\brief Internal function that checks if the \a className is the same as the
 		one stored in the \a from message.
 */
 
 
-/*!	\fn instantiation_func find_instantiation_func(const char* className,
+/*!
+	\fn instantiation_func find_instantiation_func(const char* className,
 		const char* signature)
 	\brief Internal function that searches for the instantiation func with a
 		specific signature. Use instantiate_object() instead.
 */
 
 
-/*!	\fn instantiation_func find_instantiation_func(const char* className)
+/*!
+	\fn instantiation_func find_instantiation_func(const char* className)
 	\brief Internal function that searches for the instantiation func of a
 		specific class. Use instantiate_object() instead.
 */
 
 
-/*!	\fn instantiation_func find_instantiation_func(BMessage* archive)
+/*!
+	\fn instantiation_func find_instantiation_func(BMessage* archive)
 	\brief Internal function that searches for the instantiation func that
 		works on the specified \a archive. Use instantiate_object() instead.
 */

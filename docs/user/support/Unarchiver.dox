@@ -11,7 +11,8 @@
  */
 
 
-/*!	\class BUnarchiver
+/*!
+	\class BUnarchiver
 	\ingroup support
 	\ingroup libbe
 	\brief A class that simplifies the unarchiving of complicated BArchivable
@@ -39,7 +40,8 @@
 */
 
 
-/*!	\fn BUnarchiver::BUnarchiver(const BMessage* archive)
+/*!
+	\fn BUnarchiver::BUnarchiver(const BMessage* archive)
 	\brief Constructs a BUnarchiver object to manage \c archive.
 
 	\note To guarantee that your AllUnarchived() method will be called during
@@ -55,14 +57,16 @@
 */
 
 
-/*!	\fn BUnarchiver::~BUnarchiver()
+/*!
+	\fn BUnarchiver::~BUnarchiver()
 	\brief Destroys a BUnarchiver object.
 
 	Calls this objects Finish() method, if it has not yet been called.
 */
 
 
-/*!	\fn status_t BUnarchiver::EnsureUnarchived(int32 token)
+/*!
+	\fn status_t BUnarchiver::EnsureUnarchived(int32 token)
 	\brief Ensure the object represented by \a token is unarchived and
 		instantiated.
 
@@ -70,7 +74,8 @@
 */
 
 
-/*!	\fn status_t BUnarchiver::EnsureUnarchived(const char* name,
+/*!
+	\fn status_t BUnarchiver::EnsureUnarchived(const char* name,
 		int32 index = 0)
 	\brief Ensure the object archived under \a name at \a index is unarchived
 		and instantiated.
@@ -80,7 +85,8 @@
 */
 
 
-/*!	\fn bool BUnarchiver::IsInstantiated(int32 token)
+/*!
+	\fn bool BUnarchiver::IsInstantiated(int32 token)
 	\brief Checks whether the object represented by \c token has been
 		instantiated in this session.
 
@@ -88,7 +94,8 @@
 */
 
 
-/*!	\fn bool BUnarchiver::IsInstantiated(const char* name, int32 index = 0)
+/*!
+	\fn bool BUnarchiver::IsInstantiated(const char* name, int32 index = 0)
 	\brief Checks whether the object archived under \a name at \a index has been
 		instantiated in this session.
 
@@ -97,9 +104,9 @@
  */
 
 
-/*!	\fn template<class T> status_t BUnarchiver::GetObject(int32 token,
+/*!
+	\fn template<class T> status_t BUnarchiver::GetObject(int32 token,
 		ownership_policy owning, T*& object)
-
 	\brief Recover an object by token that was archived by a BArchiver object.
 	If the object has not yet been instantiated, and this request is not coming
 	from an AllUnarchived() implementation, the object will be instantiated now.
@@ -121,9 +128,9 @@
 */
 
 
-/*!	\fn template<class T> status_t BUnarchiver::GetObject(int32 token,
+/*!
+	\fn template<class T> status_t BUnarchiver::GetObject(int32 token,
 		T*& object)
-
 	\brief Recover and take ownership of an object represented by \a token.
 
 	Equivalent to calling GetObject(token, \c B_ASSUME_OWNERSHIP, object)
@@ -142,11 +149,12 @@
 /*!
 	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		int32 index, ownership_policy owning, T*& object)
-
 	\brief Recover an object that had previously been archived using
-		the BArchiver::AddArchivable() method. If the object has not yet been
-		instantiated, and this request is not coming from an AllUnarchived()
-		implementation, the object will be instantiated now.
+		the BArchiver::AddArchivable() method.
+
+	If the object has not yet been instantiated, and this request is not
+	coming from an AllUnarchived() implementation, the object will be
+	instantiated now.
 
 	If the retrieved object is not of the type T, then this method will fail.
 	If this method fails, you will not receive ownership of the object, no
@@ -167,9 +175,9 @@
 */
 
 
-/*!	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		int32 index, T*& object)
-
 	\brief Recover and take ownership of an object that had previously been
 		archived using the BArchiver::AddArchivable() method.
 
@@ -186,9 +194,9 @@
 */
 
 
-/*!	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		ownership_policy owning, T*& object)
-
 	\brief Recover an object at index \c 0 that had previously been
 		archived using the BArchiver::AddArchivable() method.
 
@@ -207,9 +215,9 @@
 */
 
 
-/*!	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		T*& object)
-
 	\brief Recover and take ownership of an object at index \c 0 that had
 		previously been archived using the BArchiver::AddArchivable() method.
 
@@ -227,7 +235,8 @@
 */
 
 
-/*!	\fn status_t BUnarchiver::Finish(status_t err = B_OK);
+/*!
+	\fn status_t BUnarchiver::Finish(status_t err = B_OK);
 	\brief Report any unarchiving errors and possibly complete the archiving
 		session.
 
@@ -260,8 +269,8 @@
 */
 
 
-/*!	\fn static bool BUnarchiver::IsArchiveManaged(const BMessage* archive)
-
+/*!
+	\fn static bool BUnarchiver::IsArchiveManaged(const BMessage* archive)
 	\brief Checks whether \a archive was managed by a BArchiver object.
 
 	This method can be used to maintain archive backwards-compatibility for a
@@ -293,7 +302,8 @@ MyArchivableClas::MyArchivableClass(BMessage* archive)
 */
 
 
-/*!	\fn static BMessage* BUnarchiver::PrepareArchive(BMessage* &archive)
+/*!
+	\fn static BMessage* BUnarchiver::PrepareArchive(BMessage* &archive)
 	\brief Prepares \c archive for use by a BUnarchiver.
 
 	This method must be called if you plan to use a BUnarchiver on an archive.
@@ -319,7 +329,8 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 */
 
 
-/*!	\fn void BUnarchiver::AssumeOwnership(BArchivable* archivable)
+/*!
+	\fn void BUnarchiver::AssumeOwnership(BArchivable* archivable)
 	\brief Become the owner of \a archivable.
 
 	After calling this method you are responsible for deleting the
@@ -329,7 +340,8 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 */
 
 
-/*!	\fn void BUnarchiver::RelinquishOwnership(BArchivable* archivable)
+/*!
+	\fn void BUnarchiver::RelinquishOwnership(BArchivable* archivable)
 	\brief Relinquish ownership of \a archivable. If \a archivable remains
 		unclaimed at the end of the unarchiving session, it will be deleted
 		(unless it is the root object).
@@ -338,7 +350,8 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 */
 
 
-/*!	\fn template<class T> status_t BUnarchiver::InstantiateObject(
+/*!
+	\fn template<class T> status_t BUnarchiver::InstantiateObject(
 		BMessage* from, T*& object)
 	\brief Attempt to instantiate an object of type T from BMessage*
 		\a from.

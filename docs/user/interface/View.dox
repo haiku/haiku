@@ -1,0 +1,297 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		/trunk/headers/os/interface/View.h	 rev 42794
+ *		/trunk/src/kits/interface/View.cpp	 rev 42794
+ */
+
+
+/*!
+	\file View.h
+	\brief BView class definition and support enums.
+*/
+
+
+/*!
+	\class BView
+	\ingroup interface
+	\ingroup libbe
+
+	\brief View base class.
+*/
+
+
+/*!
+	\fn void BView::AttachedToWindow()
+	\brief Hook method that is called when the object is attached to a
+		window.
+*/
+
+
+/*!
+	\fn void BView::AllAttached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+		all child views have already been attached to a window.
+*/
+
+
+/*!
+	\fn void BView::DetachedFromWindow()
+	\brief Hook method that is called when the object is detached from a
+		window.
+*/
+
+/*!
+	\fn void BView::AllDetached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+		all child views have already been detached from a window.
+*/
+
+/*!
+	\fn void BView::Draw(BRect updateRect)
+	\brief Draws the area of the view that intersects \a updateRect.
+
+	Derived classes should override this method to draw their view.
+
+	\note This is an hook method called by the Interface Kit, you don't
+	have to call it yourself. If you need to forcefully redraw the view
+	consider calling Invalidate() instead.
+
+	\param updateRect The rectangular area to be drawn.
+*/
+
+
+/*!
+	\fn void BView::DrawAfterChildren(BRect r)
+	\brief Perform any drawing that needs to be done after child view have
+		already been drawn.
+
+	\param r The rectangular area to be drawn.
+*/
+
+
+/*!
+	\fn void BView::FrameMoved(BPoint newPosition)
+	\brief Hook method that gets called when the view is moved.
+
+	\param newPosition The point of the top left corner of the frame
+		that the view has been moved to.
+*/
+
+
+/*!
+	\fn void BView::FrameResized(float newWidth, float newHeight)
+	\brief Hook method that gets called when the view is resized.
+
+	\param newWidth The new \a width of the view.
+	\param newHeight The new \a height of the view.
+*/
+
+
+/*!
+	\fn void BView::GetPreferredSize(float* _width, float* _height)
+	\brief Fill out the preferred width and height of the view
+		into the \a _width and \a _height parameters.
+
+	Derived classes should override this method to set the preferred
+	size of object.
+
+	\note Either the \a _width or \a _height parameter may be set to \c NULL
+		if you only want to get the other one.
+
+	\param[out] _width Pointer to a \c float to store the width of the view.
+	\param[out] _height Pointer to a \c float to store the height of the view.
+*/
+
+
+/*!
+	\fn void BView::ResizeToPreferred()
+	\brief Resize the view to its preferred size.
+*/
+
+
+/*!
+	\fn void BView::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is pressed.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+*/
+
+
+/*!
+	\fn void BView::KeyUp(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is released.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+*/
+
+
+/*!
+	\fn void BView::MouseDown(BPoint where)
+	\brief Hook method that is called when a mouse button is pressed.
+
+	\param where The point on the screen where to mouse pointer is when
+		the mouse button is pressed.
+*/
+
+
+/*!
+	\fn void BView::MouseUp(BPoint where)
+	\brief Hook method that is called when a mouse button is released.
+
+	\param where The point on the screen where to mouse pointer is when
+		the mouse button is released.
+*/
+
+
+/*!
+	\fn void BView::MouseMoved(BPoint where, uint32 code,
+		const BMessage* a_message)
+	\brief Hook method that is called when the mouse is moved.
+*/
+
+
+/*!
+	\fn void BView::Pulse()
+	\brief Hook method that gets invoked when the view receives a
+		\c B_PULSE message.
+
+	An action is performed each time the App Server calls the Pulse() method. 
+	The pulse rate is set by SetPulseRate(). You can implement Pulse() to do
+	anything you want. The default version does nothing. The pulse granularity
+	is no better than once per 100,000 microseconds.
+
+	\sa SetPulseRate()
+*/
+
+
+/*!
+	\fn void BView::WindowActivated(bool state)
+	\brief Hook method that is called when the attached window becomes
+		activated or deactivated.
+
+	\param state \c true if the window becomes activated, \c false if the
+		window becomes deactivated.
+*/
+
+
+/*!
+	\fn void BView::MakeFocus(bool focusState)
+	\brief Gives or removes focus from the control.
+
+	\param focusState \a true to set focus, \a false to remove it.
+*/
+
+
+/*!
+	\fn status_t BView::Perform(perform_code code, void* _data)
+	\brief Perform some action. (Internal Method)
+
+	The following perform codes are recognized:
+		- \c PERFORM_CODE_MIN_SIZE:
+		- \c PERFORM_CODE_MAX_SIZE:
+		- \c PERFORM_CODE_PREFERRED_SIZE:
+		- \c PERFORM_CODE_LAYOUT_ALIGNMENT:
+		- \c PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+		- \c PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		- \c PERFORM_CODE_SET_LAYOUT:
+		- \c PERFORM_CODE_INVALIDATE_LAYOUT:
+		- \c PERFORM_CODE_DO_LAYOUT:
+		- \c PERFORM_CODE_GET_TOOL_TIP_AT:
+		- \c PERFORM_CODE_ALL_UNARCHIVED:
+		- \c PERFORM_CODE_ALL_ARCHIVED:
+
+	\param code The perform code.
+	\param _data A pointer to store some data.
+
+	\returns A status code.
+
+	\sa BHandler::Perform()
+*/
+
+
+/*!
+	\fn BSize BView::MinSize()
+	\brief Get the minimum size of the view.
+
+	\return The minimum size of the view as a BSize.
+
+	\sa BAbstractLayout::MinSize()
+*/
+
+
+/*!
+	\fn BSize BView::MaxSize()
+	\brief Get the maximum size of the view.
+
+	\return The maximum size of the view as a BSize.
+
+	\sa BAbstractLayout::MaxSize()
+*/
+
+
+/*!
+	\fn BSize BView::PreferredSize()
+	\brief Get the preferred size of the view.
+
+	\return The preferred size of the view as a BSize.
+
+	\sa BAbstractLayout::PreferredSize()
+*/
+
+
+/*!
+	\fn void BView::SetExplicitMinSize(BSize size)
+	\brief Set this item's explicit min size, to be used by MinSize().
+
+	\sa BAbstractLayout::SetExplicitMinSize()
+*/
+
+
+/*!
+	\fn void BView::SetExplicitMaxSize(BSize size)
+	\brief Set this item's explicit max size, to be used by MaxSize().
+
+	\sa BAbstractLayout::SetExplicitMaxSize()
+*/
+
+
+/*!
+	\fn void BView::SetExplicitPreferredSize(BSize size)
+	\brief Set this item's explicit preferred size, to be used by
+		PreferredSize().
+
+	\sa BAbstractLayout::SetExplicitPreferredSize()
+*/
+
+
+/*!
+	\fn void BView::SetExplicitAlignment(BAlignment alignment)
+	\brief Set this item's explicit alignment, to be used by Alignment().
+
+	\sa BAbstractLayout::SetExplicitAlignment()
+*/
+
+
+/*!
+	\fn void BView::SetLayout(BLayout* layout)
+	\brief Set the \a layout of the view.
+
+	\param layout The \a layout to set.
+*/
+
+
+/*!
+	\fn BLayout* BView::GetLayout() const
+	\brief Get the layout of the view.
+
+	\returns The layout of the view.
+*/
+
+

@@ -1,0 +1,132 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler, ejakowatz@users.sourceforge.net
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/storage/EntryList.h	 rev 42794
+ *		/trunk/src/kits/storage/EntryList.cpp	 rev 42794
+ */
+
+
+/*!
+	\file EntryList.h
+	\brief Defines the BEntryList class.
+*/
+
+
+/*!
+	\class BEntryList
+	\ingroup storage
+	\ingroup libbe
+	\brief Interface for iterating through a list of filesystem entries.
+
+	Defines a general interface for iterating through a list of entries
+	i.e. files in a folder.
+*/
+
+
+/*!
+	\fn BEntryList::BEntryList()
+	\brief Creates a BEntryList object.
+
+	Does nothing at this time.
+*/
+
+
+/*!
+	\fn BEntryList::~BEntryList()
+	\brief Frees all resources associated with the BEntryList object.
+
+	Does nothing at this time.
+*/
+
+
+/*!
+	\fn status_t BEntryList::GetNextEntry(BEntry *entry, bool traverse)
+	\brief Returns the BEntryList's next entry as a BEntry.
+
+	Places the next entry in the list in \a entry, traversing symlinks if
+	\a traverse is \c true.
+
+	\param entry a pointer to a BEntry to be initialized with the found entry.
+	\param traverse specifies whether to follow it, if the found entry
+		   is a symbolic link.
+
+	\note The iterator used by this method is the same one used by
+		  GetNextRef(), GetNextDirents(), Rewind() and CountEntries().
+
+	\retval B_OK if successful
+	\retval B_ENTRY_NOT_FOUND when at the end of the list
+	\retval B_ERROR or another error code (depending on the implementation
+		of the derived class).
+*/
+
+
+/*!
+	\fn status_t BEntryList::GetNextRef(entry_ref *ref)
+	\brief Returns the BEntryList's next entry as an entry_ref.
+
+	Places an entry_ref to the next entry in the list into \a ref.
+
+	\param ref a pointer to an entry_ref to be filled in with the data of the
+		   found entry.
+
+	\note The iterator used by this method is the same one used by
+		  GetNextEntry(), GetNextDirents(), Rewind() and CountEntries().
+
+	\retval B_OK if successful
+	\retval B_ENTRY_NOT_FOUND when at the end of the list
+	\retval B_ERROR or another error code (depending on the implementation
+		of the derived class).
+*/
+
+
+/*!
+	\fn int32 BEntryList::GetNextDirents(struct dirent *buf, size_t length,
+										 int32 count)
+	\brief Returns the BEntryList's next entries as dirent structures.
+
+	Reads a number of entries into the array of dirent structures pointed
+	to by \a buf. Reads as many but no more than \a count entries, as many
+	entries as remain, or as many entries as will fit into the array at
+	\a buf with given length \a length (in bytes), whichever is smallest.
+
+	\param buf A pointer to a buffer to be filled with dirent structures of
+		the found entries.
+	\param length The length of the \a buf array.
+	\param count the maximum number of entries to be read.
+
+	\note The iterator used by this method is the same one used by
+		  GetNextEntry(), GetNextRef(), Rewind() and CountEntries().
+
+	\returns
+		- The number of dirent structures stored in the buffer or 0 when
+			there are no more entries to be read.
+		- an error code (depending on the implementation of the derived class)
+			if an error occurred.
+*/
+
+
+/*!
+	\fn status_t BEntryList::Rewind()
+	\brief Rewinds the list pointer to the beginning of the list.
+
+	\retval B_OK if successful
+	\retval B_ERROR or another error code (depending on the implementation
+		of the derived class).
+*/
+
+
+/*!
+	\fn int32 BEntryList::CountEntries()
+	\brief Returns the number of entries in the list
+
+	\retval B_OK if successful
+	\retval B_ENTRY_NOT_FOUND when at the end of the list
+	\retval B_ERROR or another error code (depending on the implementation
+		of the derived class).
+*/

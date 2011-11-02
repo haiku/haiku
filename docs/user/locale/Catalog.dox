@@ -8,8 +8,8 @@
  *		Oliver Tappe, zooey@hirschkaefer.de
  * 
  * Corresponds to:
- *		/trunk/headers/os/locale/Catalog.h	 rev 42274
- *		/trunk/src/kits/locale/Catalog.cpp	 rev 42274
+ *		/trunk/headers/os/locale/Catalog.h	 rev 43095
+ *		/trunk/src/kits/locale/Catalog.cpp	 rev 43095
  */
 
 
@@ -73,13 +73,9 @@
 
 
 /*!
-	\fn BCatalog::BCatalog(const char* signature, const char* language = NULL,
-		uint32 fingerprint = 0)
-	\brief Construct a catalog for the given application.
-
-	This constructor builds a catalog for the application with the given mime
-	signature. In Haiku, the mime signature is used as a way to uniquely
-	identify a catalog and match it with the corresponding application.
+	\fn BCatalog::Catalog(const entry_ref& catalogOwner,
+		const char* language = NULL, uint32 fingerprint = 0);
+	\brief Construct a catalog for the given \a catalogOwner.
 
 	If you don't specify a language, the system default list will be used.
 	The language is passed here as a 2 letter ISO code.
@@ -92,9 +88,8 @@
 	different versions of your application, it may be useful to separate their
 	catalogs.
 
-	\param signature Mime-signature of the application for which to load a
-		catalog.
-	\param language The language of the catalog to load. If NULL, the user
+	\param catalogOwner entry_ref for which to load a catalog.
+	\param language The language of the catalog to load. If \c NULL, the user
 		settings will be used.
 	\param fingerprint The fingerprint version-info for the catalog to load.
 		If \c 0, the fingerprint will not be checked,and any version of the
@@ -146,7 +141,7 @@
 	\fn status_t BCatalog::GetData(const char* name, BMessage* msg)
 	\brief Get custom data from the catalog.
 
-	This function allows you to localize something else than raw text. This
+	This method allows you to localize something else than raw text. This
 	may include pictures, sounds, videos, or anything else. Note there is no
 	support for generating a catalog with such data inside, and the current
 	format may not support it. If you need to localize data that is not text,
@@ -167,7 +162,7 @@
 	but is faster.
 
 	Note the current catalog format doesn't allow storing custom data in
-	catalogs, so the only way to use this function is providing your own
+	catalogs, so the only way to use this method is providing your own
 	catalog add-on for storing the data.
 */
 
@@ -176,7 +171,7 @@
 	\fn status_t BCatalog::GetSignature(BString* sig)
 	\brief Get the catalog mime-signature.
 
-	This function fills the sig string with the mime-signature associated to the
+	This method fills the sig string with the mime-signature associated to the
 	catalog.
 
 	\param sig The string where to copy the signature.
@@ -189,7 +184,7 @@
 	\fn status_t BCatalog::GetLanguage(BString* lang)
 	\brief Get the catalog language.
 
-	This function fills the lang string with the language name for the catalog.
+	This method fills the lang string with the language name for the catalog.
 
 	\param lang The string where to copy the language.
 
@@ -201,7 +196,7 @@
 	\fn status_t BCatalog::GetFingerprint(uint32* fp)
 	\brief Get the catalog fingerprint.
 
-	This function setsfp to the fingerprint of the catalog. This allows you
+	This method setsfp to the fingerprint of the catalog. This allows you
 	to check which version of the sourcecode this catalog was generated from.
 
 	\param fp The integer to set to the fingerprint value.
@@ -211,12 +206,13 @@
 
 
 /*!
-	\fn status_t BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
+	\fn status_t BCatalog::SetCatalog(const entry_ref& catalogOwner,
+	    uint32 fingerprint)
 	\brief Reload the string data.
 
-	This function reloads the data for the given signature and fingerprint.
+	This method reloads the data for the given signature and fingerprint.
 
-	\param signature The signature of the catalog youwant to load
+	\param catalogOwner The entry_ref of the catalog that you want to load.
 	\param fingerprint The fingerprint of the catalog you want to load.
 
 	\returns An error code.

@@ -1369,21 +1369,21 @@
 */
 
 /*!
-	\fn BString& BString::ReplaceSet(const char *setOfChars, char with)
+	\fn BString& BString::ReplaceSet(const char *setOfBytes, char with)
 	\brief Replaces characters that are in a certain set with a chosen
 		character.
 
-	\param setOfChars The set of characters that need to be replaced.
+	\param setOfBytes The set of characters that need to be replaced.
 	\param with The character to replace the occurences with.
 
 	\return This method always returns \c *this.
 */
 
 /*!
-	\fn BString& BString::ReplaceSet(const char *setOfChars, const char *with)
+	\fn BString& BString::ReplaceSet(const char *setOfBytes, const char *with)
 	\brief Replaces characters that are in a certain set with a chosen string.
 
-	\param setOfChars The set of characters that need to be replaced.
+	\param setOfBytes The set of characters that need to be replaced.
 	\param with The string to replace the occurences with.
 
 	\return This method always returns \c *this.
