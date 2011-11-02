@@ -266,7 +266,7 @@
 		- \c B_WEEKDAY_TUESDAY
 		- \c B_WEEKDAY_WEDNESDAY
 		- \c B_WEEKDAY_THURSDAY
-		- \c B_WEEKDAY_THURSDAY
+		- \c B_WEEKDAY_FRIDAY
 		- \c B_WEEKDAY_SATURDAY
 
 	\returns A status code.
