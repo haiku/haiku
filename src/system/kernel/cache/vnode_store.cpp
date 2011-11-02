@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <file_cache.h>
+#include <slab/Slab.h>
 #include <vfs.h>
 #include <vm/vm.h>
 
@@ -163,4 +164,11 @@ VMVnodeCache::Dump(bool showPages) const
 
 	kprintf("  vnode:        %p <%" B_PRIdDEV ", %" B_PRIdINO ">\n", fVnode,
 		fDevice, fInode);
+}
+
+
+void
+VMVnodeCache::DeleteObject()
+{
+	object_cache_delete(gVnodeCacheObjectCache, this);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -24,6 +24,9 @@ public:
 	virtual	status_t			Write(off_t offset, const iovec* vecs,
 									size_t count, uint32 flags,
 						  			size_t* _numBytes);
+
+protected:
+	virtual	void				DeleteObject();
 
 private:
 			addr_t				fBaseAddress;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -14,6 +14,7 @@
 #include <arch_config.h>
 #include <heap.h>
 #include <KernelExport.h>
+#include <slab/Slab.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
 
@@ -182,4 +183,11 @@ VMAnonymousNoSwapCache::MergeStore(VMCache* _source)
 		vm_unreserve_memory(committed_size - actualSize);
 		committed_size = actualSize;
 	}
+}
+
+
+void
+VMAnonymousNoSwapCache::DeleteObject()
+{
+	object_cache_delete(gAnonymousNoSwapCacheObjectCache, this);
 }

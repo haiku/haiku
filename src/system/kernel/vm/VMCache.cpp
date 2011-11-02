@@ -20,6 +20,7 @@
 #include <heap.h>
 #include <int.h>
 #include <kernel.h>
+#include <slab/Slab.h>
 #include <smp.h>
 #include <tracing.h>
 #include <util/khash.h>
@@ -31,6 +32,13 @@
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
+
+// needed for the factory only
+#include "VMAnonymousCache.h"
+#include "VMAnonymousNoSwapCache.h"
+#include "VMDeviceCache.h"
+#include "VMNullCache.h"
+#include "../cache/vnode_store.h"
 
 
 //#define TRACE_VM_CACHE
@@ -46,6 +54,13 @@ VMCache* gDebugCacheList;
 #endif
 static mutex sCacheListLock = MUTEX_INITIALIZER("global VMCache list");
 	// The lock is also needed when the debug feature is disabled.
+
+ObjectCache* gCacheRefObjectCache;
+ObjectCache* gAnonymousCacheObjectCache;
+ObjectCache* gAnonymousNoSwapCacheObjectCache;
+ObjectCache* gVnodeCacheObjectCache;
+ObjectCache* gDeviceCacheObjectCache;
+ObjectCache* gNullCacheObjectCache;
 
 
 struct VMCache::PageEventWaiter {
@@ -465,6 +480,30 @@ command_cache_stack(int argc, char** argv)
 status_t
 vm_cache_init(kernel_args* args)
 {
+	// Create object caches for the structures we allocate here.
+	gCacheRefObjectCache = create_object_cache("cache refs", sizeof(VMCacheRef),
+		0, NULL, NULL, NULL);
+	gAnonymousCacheObjectCache = create_object_cache("anon caches",
+		sizeof(VMAnonymousCache), 0, NULL, NULL, NULL);
+	gAnonymousNoSwapCacheObjectCache = create_object_cache(
+		"anon no-swap caches", sizeof(VMAnonymousNoSwapCache), 0, NULL, NULL,
+		NULL);
+	gVnodeCacheObjectCache = create_object_cache("vnode caches",
+		sizeof(VMVnodeCache), 0, NULL, NULL, NULL);
+	gDeviceCacheObjectCache = create_object_cache("device caches",
+		sizeof(VMDeviceCache), 0, NULL, NULL, NULL);
+	gNullCacheObjectCache = create_object_cache("null caches",
+		sizeof(VMNullCache), 0, NULL, NULL, NULL);
+
+	if (gCacheRefObjectCache == NULL || gAnonymousCacheObjectCache == NULL
+		|| gAnonymousNoSwapCacheObjectCache == NULL
+		|| gVnodeCacheObjectCache == NULL
+		|| gDeviceCacheObjectCache == NULL
+		|| gNullCacheObjectCache == NULL) {
+		panic("vm_cache_init(): Failed to create object caches!");
+		return B_NO_MEMORY;
+	}
+
 	return B_OK;
 }
 
@@ -558,9 +597,8 @@ VMCacheRef::VMCacheRef(VMCache* cache)
 bool
 VMCache::_IsMergeable() const
 {
-	return (areas == NULL && temporary
-		&& !list_is_empty(const_cast<list*>(&consumers))
-		&& consumers.link.next == consumers.link.prev);
+	return areas == NULL && temporary && !consumers.IsEmpty()
+		&& consumers.Head() == consumers.Tail();
 }
 
 
@@ -573,7 +611,7 @@ VMCache::VMCache()
 
 VMCache::~VMCache()
 {
-	delete fCacheRef;
+	object_cache_delete(gCacheRefObjectCache, fCacheRef);
 }
 
 
@@ -581,10 +619,6 @@ status_t
 VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 {
 	mutex_init(&fLock, "VMCache");
-
-	VMCache dummyCache;
-	list_init_etc(&consumers, offset_of_member(dummyCache, consumer_link));
-		// TODO: This is disgusting! Use DoublyLinkedList!
 
 	areas = NULL;
 	fRefCount = 1;
@@ -604,7 +638,7 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 		// initialize in case the following fails
 #endif
 
-	fCacheRef = new(malloc_flags(allocationFlags)) VMCacheRef(this);
+	fCacheRef = new(gCacheRefObjectCache, allocationFlags) VMCacheRef(this);
 	if (fCacheRef == NULL)
 		return B_NO_MEMORY;
 
@@ -628,7 +662,7 @@ VMCache::Delete()
 {
 	if (areas != NULL)
 		panic("cache %p to be deleted still has areas", this);
-	if (!list_is_empty(&consumers))
+	if (!consumers.IsEmpty())
 		panic("cache %p to be deleted still has consumers", this);
 
 	T(Delete(this));
@@ -672,7 +706,7 @@ VMCache::Delete()
 
 	mutex_unlock(&sCacheListLock);
 
-	delete this;
+	DeleteObject();
 }
 
 
@@ -680,7 +714,7 @@ void
 VMCache::Unlock(bool consumerLocked)
 {
 	while (fRefCount == 1 && _IsMergeable()) {
-		VMCache* consumer = (VMCache*)list_get_first_item(&consumers);
+		VMCache* consumer = consumers.Head();
 		if (consumerLocked) {
 			_MergeWithOnlyConsumer();
 		} else if (consumer->TryLock()) {
@@ -698,7 +732,7 @@ VMCache::Unlock(bool consumerLocked)
 
 			if (consumerLockedTemp) {
 				if (fRefCount == 1 && _IsMergeable()
-						&& consumer == list_get_first_item(&consumers)) {
+						&& consumer == consumers.Head()) {
 					// nothing has changed in the meantime -- merge
 					_MergeWithOnlyConsumer();
 				}
@@ -901,7 +935,7 @@ VMCache::AddConsumer(VMCache* consumer)
 	T(AddConsumer(this, consumer));
 
 	consumer->source = this;
-	list_add_item(&consumers, consumer);
+	consumers.Add(consumer);
 
 	AcquireRefLocked();
 	AcquireStoreRef();
@@ -1312,9 +1346,8 @@ VMCache::Dump(bool showPages) const
 	}
 
 	kprintf("  consumers:\n");
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item((list*)&consumers,
-			consumer)) != NULL) {
+	for (ConsumerList::ConstIterator it = consumers.GetIterator();
+		 	VMCache* consumer = it.Next();) {
 		kprintf("\t%p\n", consumer);
 	}
 
@@ -1365,7 +1398,7 @@ VMCache::_NotifyPageEvents(vm_page* page, uint32 events)
 void
 VMCache::_MergeWithOnlyConsumer()
 {
-	VMCache* consumer = (VMCache*)list_remove_head_item(&consumers);
+	VMCache* consumer = consumers.RemoveHead();
 
 	TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
 		this, this->fRefCount, consumer));
@@ -1381,8 +1414,8 @@ VMCache::_MergeWithOnlyConsumer()
 
 		newSource->Lock();
 
-		list_remove_item(&newSource->consumers, this);
-		list_add_item(&newSource->consumers, consumer);
+		newSource->consumers.Remove(this);
+		newSource->consumers.Add(consumer);
 		consumer->source = newSource;
 		source = NULL;
 
@@ -1416,7 +1449,7 @@ VMCache::_RemoveConsumer(VMCache* consumer)
 
 	// remove the consumer from the cache, but keep its reference until later
 	Lock();
-	list_remove_item(&consumers, consumer);
+	consumers.Remove(consumer);
 	consumer->source = NULL;
 
 	ReleaseRefAndUnlock();
@@ -1425,15 +1458,6 @@ VMCache::_RemoveConsumer(VMCache* consumer)
 
 // #pragma mark - VMCacheFactory
 	// TODO: Move to own source file!
-
-
-#include <heap.h>
-
-#include "VMAnonymousCache.h"
-#include "VMAnonymousNoSwapCache.h"
-#include "VMDeviceCache.h"
-#include "VMNullCache.h"
-#include "../cache/vnode_store.h"
 
 
 /*static*/ status_t
@@ -1449,7 +1473,7 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 #if ENABLE_SWAP_SUPPORT
 	if (swappable) {
 		VMAnonymousCache* cache
-			= new(malloc_flags(allocationFlags)) VMAnonymousCache;
+			= new(gAnonymousCacheObjectCache, allocationFlags) VMAnonymousCache;
 		if (cache == NULL)
 			return B_NO_MEMORY;
 
@@ -1468,7 +1492,8 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 #endif
 
 	VMAnonymousNoSwapCache* cache
-		= new(malloc_flags(allocationFlags)) VMAnonymousNoSwapCache;
+		= new(gAnonymousNoSwapCacheObjectCache, allocationFlags)
+			VMAnonymousNoSwapCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
@@ -1493,7 +1518,8 @@ VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 		| HEAP_DONT_LOCK_KERNEL_SPACE;
 		// Note: Vnode cache creation is never VIP.
 
-	VMVnodeCache* cache = new(malloc_flags(allocationFlags)) VMVnodeCache;
+	VMVnodeCache* cache
+		= new(gVnodeCacheObjectCache, allocationFlags) VMVnodeCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
@@ -1517,7 +1543,8 @@ VMCacheFactory::CreateDeviceCache(VMCache*& _cache, addr_t baseAddress)
 		| HEAP_DONT_LOCK_KERNEL_SPACE;
 		// Note: Device cache creation is never VIP.
 
-	VMDeviceCache* cache = new(malloc_flags(allocationFlags)) VMDeviceCache;
+	VMDeviceCache* cache
+		= new(gDeviceCacheObjectCache, allocationFlags) VMDeviceCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
@@ -1542,7 +1569,8 @@ VMCacheFactory::CreateNullCache(int priority, VMCache*& _cache)
 	if (priority >= VM_PRIORITY_VIP)
 		allocationFlags |= HEAP_PRIORITY_VIP;
 
-	VMNullCache* cache = new(malloc_flags(allocationFlags)) VMNullCache;
+	VMNullCache* cache
+		= new(gNullCacheObjectCache, allocationFlags) VMNullCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 

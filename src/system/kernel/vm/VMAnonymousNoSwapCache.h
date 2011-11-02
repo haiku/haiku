@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -36,6 +36,9 @@ public:
 									off_t offset);
 
 	virtual	void				MergeStore(VMCache* source);
+
+protected:
+	virtual	void				DeleteObject();
 
 private:
 			bool				fCanOvercommit;

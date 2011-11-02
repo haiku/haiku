@@ -9,6 +9,8 @@
 
 #include "VMDeviceCache.h"
 
+#include <slab/Slab.h>
+
 
 status_t
 VMDeviceCache::Init(addr_t baseAddress, uint32 allocationFlags)
@@ -33,4 +35,11 @@ VMDeviceCache::Write(off_t offset, const iovec* vecs, size_t count,
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return B_OK;
+}
+
+
+void
+VMDeviceCache::DeleteObject()
+{
+	object_cache_delete(gDeviceCacheObjectCache, this);
 }
