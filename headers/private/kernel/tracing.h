@@ -265,7 +265,8 @@ TraceOutput::Print(const char* format,...)
 
 int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
 
-bool tracing_is_entry_valid(TraceEntry* entry, bigtime_t entryTime);
+bool tracing_is_entry_valid(AbstractTraceEntry* entry,
+	bigtime_t entryTime = -1);
 
 #endif	// __cplusplus
 

@@ -100,6 +100,8 @@ public:
 
 			trace_entry*		AllocateEntry(size_t size, uint16 flags);
 
+			bool				IsInBuffer(void* address, size_t size);
+
 private:
 			bool				_FreeFirstEntry();
 			bool				_MakeSpace(size_t needed);
@@ -282,6 +284,25 @@ TracingMetaData::AllocateEntry(size_t size, uint16 flags)
 		fAfterLastEntry, fFirstEntry, fEntries));
 
 	return entry;
+}
+
+
+bool
+TracingMetaData::IsInBuffer(void* address, size_t size)
+{
+	if (fEntries == 0)
+		return false;
+
+	addr_t start = (addr_t)address;
+	addr_t end = start + size;
+
+	if (start < (addr_t)fBuffer || end > (addr_t)(fBuffer + kBufferSize))
+		return false;
+
+	if (fFirstEntry > fAfterLastEntry)
+		return start >= (addr_t)fFirstEntry || end <= (addr_t)fAfterLastEntry;
+
+	return start >= (addr_t)fFirstEntry && end <= (addr_t)fAfterLastEntry;
 }
 
 
@@ -495,8 +516,8 @@ bool
 TracingMetaData::_InitPreviousTracingData()
 {
 	// TODO: ATM re-attaching the previous tracing buffer doesn't work very
-	// well. The entries should checked more thoroughly for validity -- e.g. the
-	// pointers to the entries' vtable pointers could be invalid, which can
+	// well. The entries should be checked more thoroughly for validity -- e.g.
+	// the pointers to the entries' vtable pointers could be invalid, which can
 	// make the "traced" command quite unusable. The validity of the entries
 	// could be checked in a safe environment (i.e. with a fault handler) with
 	// typeid() and call of a virtual function.
@@ -1696,18 +1717,25 @@ dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 
 
 bool
-tracing_is_entry_valid(TraceEntry* candidate, bigtime_t entryTime)
+tracing_is_entry_valid(AbstractTraceEntry* candidate, bigtime_t entryTime)
 {
 #if ENABLE_TRACING
+	if (!sTracingMetaData->IsInBuffer(candidate, sizeof(*candidate)))
+		return false;
+
+	if (entryTime < 0)
+		return true;
+
 	TraceEntryIterator iterator;
 	while (TraceEntry* entry = iterator.Next()) {
 		AbstractTraceEntry* abstract = dynamic_cast<AbstractTraceEntry*>(entry);
 		if (abstract == NULL)
 			continue;
 
-		// TODO: This could be better by additionally checking if the
-		// candidate entry address falls within the valid entry range.
-		return abstract == candidate || abstract->Time() < entryTime;
+		if (abstract != candidate && abstract->Time() > entryTime)
+			return false;
+
+		return candidate->Time() == entryTime;
 	}
 #endif
 
