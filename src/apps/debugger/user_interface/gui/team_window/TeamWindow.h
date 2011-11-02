@@ -172,6 +172,8 @@ private:
 			BStringView*		fSourcePathView;
 			BSplitView*			fFunctionSplitView;
 			BSplitView*			fSourceSplitView;
+			BSplitView*			fImageSplitView;
+			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
 };
 

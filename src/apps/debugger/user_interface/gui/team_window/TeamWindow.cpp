@@ -362,6 +362,22 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 	if (error == B_OK)
 		fFunctionSplitView->SetItemWeight(1L, value.ToFloat(), true);
 
+	error = settings->Value("teamWindowImageSplit0", value);
+	if (error == B_OK)
+		fImageSplitView->SetItemWeight(0L, value.ToFloat(), false);
+
+	error = settings->Value("teamWindowImageSplit1", value);
+	if (error == B_OK)
+		fImageSplitView->SetItemWeight(1L, value.ToFloat(), true);
+
+	error = settings->Value("teamWindowThreadSplit0", value);
+	if (error == B_OK)
+		fThreadSplitView->SetItemWeight(0L, value.ToFloat(), false);
+
+	error = settings->Value("teamWindowThreadSplit1", value);
+	if (error == B_OK)
+		fThreadSplitView->SetItemWeight(1L, value.ToFloat(), true);
+
 	return B_OK;
 }
 
@@ -386,6 +402,22 @@ TeamWindow::SaveSettings(GUITeamUISettings* settings)
 
 	if (!settings->SetValue("teamWindowFunctionSplit1",
 		fFunctionSplitView->ItemWeight(1L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowImageSplit0",
+		fImageSplitView->ItemWeight(0L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowImageSplit1",
+		fImageSplitView->ItemWeight(1L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowThreadSplit0",
+		fThreadSplitView->ItemWeight(0L)))
+		return B_NO_MEMORY;
+
+	if (!settings->SetValue("teamWindowThreadSplit1",
+		fThreadSplitView->ItemWeight(1L)))
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -566,6 +598,7 @@ TeamWindow::_Init()
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
+		.GetSplitView(&fThreadSplitView)
 		.Add(fThreadListView = ThreadListView::Create(fTeam, this))
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
@@ -574,6 +607,7 @@ TeamWindow::_Init()
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
+		.GetSplitView(&fImageSplitView)
 		.Add(fImageListView = ImageListView::Create(fTeam, this))
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
