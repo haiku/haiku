@@ -17,7 +17,7 @@
 
 
 status_t
-VMVnodeCache::Init(struct vnode *vnode, uint32 allocationFlags)
+VMVnodeCache::Init(struct vnode* vnode, uint32 allocationFlags)
 {
 	status_t error = VMCache::Init(CACHE_TYPE_VNODE, allocationFlags);
 	if (error != B_OK)
@@ -42,8 +42,8 @@ VMVnodeCache::HasPage(off_t offset)
 
 
 status_t
-VMVnodeCache::Read(off_t offset, const generic_io_vec *vecs, size_t count,
-	uint32 flags, generic_size_t *_numBytes)
+VMVnodeCache::Read(off_t offset, const generic_io_vec* vecs, size_t count,
+	uint32 flags, generic_size_t* _numBytes)
 {
 	generic_size_t bytesUntouched = *_numBytes;
 
@@ -82,8 +82,8 @@ VMVnodeCache::Read(off_t offset, const generic_io_vec *vecs, size_t count,
 
 
 status_t
-VMVnodeCache::Write(off_t offset, const generic_io_vec *vecs, size_t count,
-	uint32 flags, generic_size_t *_numBytes)
+VMVnodeCache::Write(off_t offset, const generic_io_vec* vecs, size_t count,
+	uint32 flags, generic_size_t* _numBytes)
 {
 	return vfs_write_pages(fVnode, NULL, offset, vecs, count, flags, _numBytes);
 }
@@ -99,7 +99,7 @@ VMVnodeCache::WriteAsync(off_t offset, const generic_io_vec* vecs, size_t count,
 
 
 status_t
-VMVnodeCache::Fault(struct VMAddressSpace *aspace, off_t offset)
+VMVnodeCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 {
 	if (!HasPage(offset))
 		return B_BAD_ADDRESS;
@@ -128,7 +128,7 @@ VMVnodeCache::AcquireUnreferencedStoreRef()
 	if (fVnodeDeleted)
 		return B_BUSY;
 
-	struct vnode *vnode;
+	struct vnode* vnode;
 	status_t status = vfs_get_vnode(fDevice, fInode, false, &vnode);
 
 	// If successful, update the store's vnode pointer, so that release_ref()

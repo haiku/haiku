@@ -15,24 +15,24 @@ struct file_cache_ref;
 
 class VMVnodeCache : public VMCache {
 public:
-			status_t			Init(struct vnode *vnode,
+			status_t			Init(struct vnode* vnode,
 									uint32 allocationFlags);
 
 	virtual	bool				HasPage(off_t offset);
 
-	virtual	status_t			Read(off_t offset, const generic_io_vec *vecs,
+	virtual	status_t			Read(off_t offset, const generic_io_vec* vecs,
 									size_t count, uint32 flags,
-									generic_size_t *_numBytes);
-	virtual	status_t			Write(off_t offset, const generic_io_vec *vecs,
+									generic_size_t* _numBytes);
+	virtual	status_t			Write(off_t offset, const generic_io_vec* vecs,
 									size_t count, uint32 flags,
-									generic_size_t *_numBytes);
+									generic_size_t* _numBytes);
 	virtual	status_t			WriteAsync(off_t offset,
 									const generic_io_vec* vecs, size_t count,
 									generic_size_t numBytes, uint32 flags,
 									AsyncIOCallback* callback);
 	virtual	bool				CanWritePage(off_t offset);
 
-	virtual	status_t			Fault(struct VMAddressSpace *aspace,
+	virtual	status_t			Fault(struct VMAddressSpace* aspace,
 									off_t offset);
 
 	virtual	status_t			AcquireUnreferencedStoreRef();

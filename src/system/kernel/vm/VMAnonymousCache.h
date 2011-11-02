@@ -64,6 +64,9 @@ public:
 
 	virtual	void				Merge(VMCache* source);
 
+protected:
+	virtual	void				DeleteObject();
+
 private:
 			class WriteCallback;
 			friend class WriteCallback;
