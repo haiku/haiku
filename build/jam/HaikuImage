@@ -505,7 +505,6 @@ local keyboardLayoutsDir
 local keyboardLayoutFiles =
 	"Generic 104-key"
 	"Generic 105-key International"
-	"IBM Laptop International"
 	"Kinesis Advantage"
 	"Kinesis Ergo Elan International"
 	"TypeMatrix 2030" ;
@@ -529,6 +528,25 @@ appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
 SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
 AddFilesToHaikuImage system data KeyboardLayouts Apple\ Aluminum
 	: $(appleAluminumFiles) ;
+
+# Add ThinkPad keyboard layout files to the image in a ThinkPad
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local thinkpadDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
+local thinkPadFiles =
+	"ThinkPad (US)"
+	"ThinkPad International"
+	"ThinkPad T400s (US)"
+	"ThinkPad T400s International"
+	"ThinkPad X1 (US)"
+	"ThinkPad X1 International"
+	"ThinkPad X100e (US)"
+	"ThinkPad X100e International" ;
+thinkPadFiles = $(thinkPadFiles:G=keyboard-layout) ;
+SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts ThinkPad
+	: $(thinkPadFiles) ;
 
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)
