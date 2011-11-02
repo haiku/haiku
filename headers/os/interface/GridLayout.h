@@ -98,6 +98,19 @@ private:
 			ItemLayoutData*		_LayoutDataForItem(BLayoutItem* item) const;
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedGridLayout1();
+	virtual	void				_ReservedGridLayout2();
+	virtual	void				_ReservedGridLayout3();
+	virtual	void				_ReservedGridLayout4();
+	virtual	void				_ReservedGridLayout5();
+	virtual	void				_ReservedGridLayout6();
+	virtual	void				_ReservedGridLayout7();
+	virtual	void				_ReservedGridLayout8();
+	virtual	void				_ReservedGridLayout9();
+	virtual	void				_ReservedGridLayout10();
+
 			BLayoutItem***		fGrid;
 			int32				fColumnCount;
 			int32				fRowCount;
@@ -107,6 +120,8 @@ private:
 
 			int32				fMultiColumnItems;
 			int32				fMultiRowItems;
+
+			uint32				_reserved[5];
 };
 
 

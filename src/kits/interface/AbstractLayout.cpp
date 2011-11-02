@@ -459,9 +459,24 @@ BAbstractLayout::AncestorVisibilityChanged(bool shown)
 }
 
 
+// Binary compatibility stuff
+
+
 status_t
 BAbstractLayout::Perform(perform_code code, void* _data)
 {
 	return BLayout::Perform(code, _data);
 }
+
+
+void BAbstractLayout::_ReservedAbstractLayout1() {}
+void BAbstractLayout::_ReservedAbstractLayout2() {}
+void BAbstractLayout::_ReservedAbstractLayout3() {}
+void BAbstractLayout::_ReservedAbstractLayout4() {}
+void BAbstractLayout::_ReservedAbstractLayout5() {}
+void BAbstractLayout::_ReservedAbstractLayout6() {}
+void BAbstractLayout::_ReservedAbstractLayout7() {}
+void BAbstractLayout::_ReservedAbstractLayout8() {}
+void BAbstractLayout::_ReservedAbstractLayout9() {}
+void BAbstractLayout::_ReservedAbstractLayout10() {}
 

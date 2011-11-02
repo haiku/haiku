@@ -334,3 +334,15 @@ BGroupLayout::Perform(perform_code code, void* _data)
 	return BTwoDimensionalLayout::Perform(code, _data);
 }
 
+
+void BGroupLayout::_ReservedGroupLayout1() {}
+void BGroupLayout::_ReservedGroupLayout2() {}
+void BGroupLayout::_ReservedGroupLayout3() {}
+void BGroupLayout::_ReservedGroupLayout4() {}
+void BGroupLayout::_ReservedGroupLayout5() {}
+void BGroupLayout::_ReservedGroupLayout6() {}
+void BGroupLayout::_ReservedGroupLayout7() {}
+void BGroupLayout::_ReservedGroupLayout8() {}
+void BGroupLayout::_ReservedGroupLayout9() {}
+void BGroupLayout::_ReservedGroupLayout10() {}
+

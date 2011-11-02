@@ -72,10 +72,23 @@ protected:
 	virtual void				AncestorVisibilityChanged(bool shown);
 
 private:
+	virtual	void				_ReservedLayoutItem1();
+	virtual	void				_ReservedLayoutItem2();
+	virtual	void				_ReservedLayoutItem3();
+	virtual	void				_ReservedLayoutItem4();
+	virtual	void				_ReservedLayoutItem5();
+	virtual	void				_ReservedLayoutItem6();
+	virtual	void				_ReservedLayoutItem7();
+	virtual	void				_ReservedLayoutItem8();
+	virtual	void				_ReservedLayoutItem9();
+	virtual	void				_ReservedLayoutItem10();
+
 			friend class BLayout;
 
 			BLayout*			fLayout;
 			void*				fLayoutData;
+
+			uint32				_reserved[5];
 };
 
 

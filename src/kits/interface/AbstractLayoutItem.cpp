@@ -160,3 +160,15 @@ BAbstractLayoutItem::Perform(perform_code d, void* arg)
 	return BLayoutItem::Perform(d, arg);
 }
 
+
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem1() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem2() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem3() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem4() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem5() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem6() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem7() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem8() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem9() {}
+void BAbstractLayoutItem::_ReservedAbstractLayoutItem10() {}
+

@@ -331,3 +331,15 @@ BSplitView::Perform(perform_code d, void* arg)
 	return BView::Perform(d, arg);
 }
 
+
+void BSplitView::_ReservedSplitView1() {}
+void BSplitView::_ReservedSplitView2() {}
+void BSplitView::_ReservedSplitView3() {}
+void BSplitView::_ReservedSplitView4() {}
+void BSplitView::_ReservedSplitView5() {}
+void BSplitView::_ReservedSplitView6() {}
+void BSplitView::_ReservedSplitView7() {}
+void BSplitView::_ReservedSplitView8() {}
+void BSplitView::_ReservedSplitView9() {}
+void BSplitView::_ReservedSplitView10() {}
+

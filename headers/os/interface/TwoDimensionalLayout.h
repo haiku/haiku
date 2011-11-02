@@ -97,7 +97,22 @@ protected:
 			float				fVSpacing;
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedTwoDimensionalLayout1();
+	virtual	void				_ReservedTwoDimensionalLayout2();
+	virtual	void				_ReservedTwoDimensionalLayout3();
+	virtual	void				_ReservedTwoDimensionalLayout4();
+	virtual	void				_ReservedTwoDimensionalLayout5();
+	virtual	void				_ReservedTwoDimensionalLayout6();
+	virtual	void				_ReservedTwoDimensionalLayout7();
+	virtual	void				_ReservedTwoDimensionalLayout8();
+	virtual	void				_ReservedTwoDimensionalLayout9();
+	virtual	void				_ReservedTwoDimensionalLayout10();
+
 			LocalLayouter*		fLocalLayouter;
+
+			uint32				_reserved[5];
 };
 
 #endif // _TWO_DIMENSIONAL_LAYOUT_H

@@ -62,12 +62,27 @@ protected:
 									Dimensions* dimensions);
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedGroupLayout1();
+	virtual	void				_ReservedGroupLayout2();
+	virtual	void				_ReservedGroupLayout3();
+	virtual	void				_ReservedGroupLayout4();
+	virtual	void				_ReservedGroupLayout5();
+	virtual	void				_ReservedGroupLayout6();
+	virtual	void				_ReservedGroupLayout7();
+	virtual	void				_ReservedGroupLayout8();
+	virtual	void				_ReservedGroupLayout9();
+	virtual	void				_ReservedGroupLayout10();
+
 			struct ItemLayoutData;
 
 			ItemLayoutData*		_LayoutDataForItem(BLayoutItem* item) const;
 
 			orientation			fOrientation;
 			BList				fVisibleItems;
+
+			uint32				_reserved[5];
 };
 
 #endif	// _GROUP_LAYOUT_H

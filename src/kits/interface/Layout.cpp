@@ -619,9 +619,24 @@ BLayout::SetTarget(BView* target)
 }
 
 
+// Binary compatibility stuff
+
+
 status_t
 BLayout::Perform(perform_code code, void* _data)
 {
 	return BLayoutItem::Perform(code, _data);
 }
+
+
+void BLayout::_ReservedLayout1() {}
+void BLayout::_ReservedLayout2() {}
+void BLayout::_ReservedLayout3() {}
+void BLayout::_ReservedLayout4() {}
+void BLayout::_ReservedLayout5() {}
+void BLayout::_ReservedLayout6() {}
+void BLayout::_ReservedLayout7() {}
+void BLayout::_ReservedLayout8() {}
+void BLayout::_ReservedLayout9() {}
+void BLayout::_ReservedLayout10() {}
 

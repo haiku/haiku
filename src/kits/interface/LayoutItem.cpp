@@ -218,3 +218,18 @@ BLayoutItem::AncestorVisibilityChanged(bool shown)
 	// hook method
 }
 
+
+// Binary compatibility stuff
+
+
+void BLayoutItem::_ReservedLayoutItem1() {}
+void BLayoutItem::_ReservedLayoutItem2() {}
+void BLayoutItem::_ReservedLayoutItem3() {}
+void BLayoutItem::_ReservedLayoutItem4() {}
+void BLayoutItem::_ReservedLayoutItem5() {}
+void BLayoutItem::_ReservedLayoutItem6() {}
+void BLayoutItem::_ReservedLayoutItem7() {}
+void BLayoutItem::_ReservedLayoutItem8() {}
+void BLayoutItem::_ReservedLayoutItem9() {}
+void BLayoutItem::_ReservedLayoutItem10() {}
+

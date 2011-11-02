@@ -795,3 +795,15 @@ BGridLayout::Perform(perform_code d, void* arg)
 	return BTwoDimensionalLayout::Perform(d, arg);
 }
 
+
+void BGridLayout::_ReservedGridLayout1() {}
+void BGridLayout::_ReservedGridLayout2() {}
+void BGridLayout::_ReservedGridLayout3() {}
+void BGridLayout::_ReservedGridLayout4() {}
+void BGridLayout::_ReservedGridLayout5() {}
+void BGridLayout::_ReservedGridLayout6() {}
+void BGridLayout::_ReservedGridLayout7() {}
+void BGridLayout::_ReservedGridLayout8() {}
+void BGridLayout::_ReservedGridLayout9() {}
+void BGridLayout::_ReservedGridLayout10() {}
+

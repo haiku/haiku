@@ -91,6 +91,19 @@ protected:
 	virtual status_t			Perform(perform_code d, void* arg);
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedLayout1();
+	virtual	void				_ReservedLayout2();
+	virtual	void				_ReservedLayout3();
+	virtual	void				_ReservedLayout4();
+	virtual	void				_ReservedLayout5();
+	virtual	void				_ReservedLayout6();
+	virtual	void				_ReservedLayout7();
+	virtual	void				_ReservedLayout8();
+	virtual	void				_ReservedLayout9();
+	virtual	void				_ReservedLayout10();
+
 			friend class BView;
 
 			void				SetOwner(BView* owner);
@@ -107,6 +120,8 @@ private:
 			BView*				fTarget;
 			BList				fItems;
 			BList				fNestedLayouts;
+
+			uint32				_reserved[10];
 };
 
 

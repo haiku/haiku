@@ -41,13 +41,28 @@ protected:
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
 private:
+
+			void				_ValidateMinMax();
+
+	// FBC padding
+	virtual	void				_ReservedCardLayout1();
+	virtual	void				_ReservedCardLayout2();
+	virtual	void				_ReservedCardLayout3();
+	virtual	void				_ReservedCardLayout4();
+	virtual	void				_ReservedCardLayout5();
+	virtual	void				_ReservedCardLayout6();
+	virtual	void				_ReservedCardLayout7();
+	virtual	void				_ReservedCardLayout8();
+	virtual	void				_ReservedCardLayout9();
+	virtual	void				_ReservedCardLayout10();
+
 			BSize				fMin;
 			BSize				fMax;
 			BSize				fPreferred;
 			BLayoutItem*		fVisibleItem;
 			bool				fMinMaxValid;
 
-			void				_ValidateMinMax();
+			uint32				_reserved[5];
 };
 
 #endif	// _CARD_LAYOUT_H

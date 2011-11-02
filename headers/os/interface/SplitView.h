@@ -80,6 +80,19 @@ protected:
 									bool pressed);
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedSplitView1();
+	virtual	void				_ReservedSplitView2();
+	virtual	void				_ReservedSplitView3();
+	virtual	void				_ReservedSplitView4();
+	virtual	void				_ReservedSplitView5();
+	virtual	void				_ReservedSplitView6();
+	virtual	void				_ReservedSplitView7();
+	virtual	void				_ReservedSplitView8();
+	virtual	void				_ReservedSplitView9();
+	virtual	void				_ReservedSplitView10();
+
 	static	void				_DrawDefaultSplitter(BView* view, BRect frame,
 									const BRect& updateRect,
 									enum orientation orientation,
@@ -87,6 +100,7 @@ private:
 
 private:
 			BSplitLayout*		fSplitLayout;
+			uint32				_reserved[3];
 };
 
 

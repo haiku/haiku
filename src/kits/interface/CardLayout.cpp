@@ -305,3 +305,15 @@ BCardLayout::Perform(perform_code d, void* arg)
 	return BAbstractLayout::Perform(d, arg);
 }
 
+
+void BCardLayout::_ReservedCardLayout1() {}
+void BCardLayout::_ReservedCardLayout2() {}
+void BCardLayout::_ReservedCardLayout3() {}
+void BCardLayout::_ReservedCardLayout4() {}
+void BCardLayout::_ReservedCardLayout5() {}
+void BCardLayout::_ReservedCardLayout6() {}
+void BCardLayout::_ReservedCardLayout7() {}
+void BCardLayout::_ReservedCardLayout8() {}
+void BCardLayout::_ReservedCardLayout9() {}
+void BCardLayout::_ReservedCardLayout10() {}
+

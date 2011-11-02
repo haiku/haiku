@@ -1430,3 +1430,4 @@ BSplitLayout::_SubtractInsets(BSize size)
 
 	return size;
 }
+

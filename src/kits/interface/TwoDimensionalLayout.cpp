@@ -1415,3 +1415,15 @@ BTwoDimensionalLayout::Perform(perform_code code, void* _data)
 	return BAbstractLayout::Perform(code, _data);
 }
 
+
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout1() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout2() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout3() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout4() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout5() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout6() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout7() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout8() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout9() {}
+void BTwoDimensionalLayout::_ReservedTwoDimensionalLayout10() {}
+
