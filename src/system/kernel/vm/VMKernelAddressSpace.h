@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VM_KERNEL_ADDRESS_SPACE_H
@@ -9,6 +9,9 @@
 #include <vm/VMAddressSpace.h>
 
 #include "VMKernelArea.h"
+
+
+struct ObjectCache;
 
 
 struct VMKernelAddressSpace : VMAddressSpace {
@@ -89,6 +92,8 @@ private:
 			RangeList			fRangeList;
 			RangeFreeList*		fFreeLists;
 			int					fFreeListCount;
+			ObjectCache*		fAreaObjectCache;
+			ObjectCache*		fRangesObjectCache;
 };
 
 
