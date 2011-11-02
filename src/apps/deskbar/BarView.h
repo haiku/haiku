@@ -142,7 +142,8 @@ class TBarView : public BView {
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
 		TDragRegion* DragRegion() const { return fDragRegion; }
-			
+		void AddExpandedItem(const char* signature);
+
 	private:
 		friend class TBeMenu;
 		friend class PreferencesWindow;
@@ -152,6 +153,9 @@ class TBarView : public BView {
 		void PlaceBeMenu();
 		void PlaceTray(bool vertSwap, bool leftSwap, BRect screenFrame);
 		void PlaceApplicationBar(BRect screenFrame);
+		void SaveExpandedItems();
+		void RemoveExpandedItems();
+		void ExpandItems();
 
 		TBarMenuBar* fBarMenuBar;
 		TExpandoMenuBar* fExpando;
@@ -178,6 +182,7 @@ class TBarView : public BView {
 		uint32 fMaxRecentApps;
 
 		TTeamMenuItem* fLastDragItem;
+		BList fExpandedItems;
 };
 
 
