@@ -391,6 +391,66 @@ private:
 };
 
 
+class AllocationInfoPrinterCallback : public AllocationTrackingCallback {
+public:
+	AllocationInfoPrinterCallback(bool printStackTrace, addr_t addressFilter,
+		team_id teamFilter, thread_id threadFilter)
+		:
+		fPrintStackTrace(printStackTrace),
+		fAddressFilter(addressFilter),
+		fTeamFilter(teamFilter),
+		fThreadFilter(threadFilter)
+	{
+	}
+
+	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
+		void* allocation, size_t allocationSize)
+	{
+		if (!info->IsInitialized())
+			return true;
+
+		if (fAddressFilter != 0 && (addr_t)allocation != fAddressFilter)
+			return true;
+
+		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+		if (traceEntry != NULL && !info->IsTraceEntryValid())
+			traceEntry = NULL;
+
+		if (traceEntry != NULL) {
+			if (fTeamFilter != -1 && traceEntry->TeamID() != fTeamFilter)
+				return true;
+			if (fThreadFilter != -1 && traceEntry->ThreadID() != fThreadFilter)
+				return true;
+		} else {
+			// we need the info if we have filters set
+			if (fTeamFilter != -1 || fThreadFilter != -1)
+				return true;
+		}
+
+		kprintf("allocation %p, size: %" B_PRIuSIZE, allocation,
+			allocationSize);
+
+		if (traceEntry != NULL) {
+			kprintf(", team: %" B_PRId32 ", thread %" B_PRId32
+				", time %" B_PRId64 "\n", traceEntry->TeamID(),
+				traceEntry->ThreadID(), traceEntry->Time());
+
+			if (fPrintStackTrace)
+				tracing_print_stack_trace(traceEntry->StackTrace());
+		} else
+			kprintf("\n");
+
+		return true;
+	}
+
+private:
+	bool		fPrintStackTrace;
+	addr_t		fAddressFilter;
+	team_id		fTeamFilter; 
+	thread_id	fThreadFilter;
+};
+
+
 class AllocationDetailPrinterCallback : public AllocationTrackingCallback {
 public:
 	AllocationDetailPrinterCallback(addr_t caller)
@@ -407,8 +467,10 @@ public:
 
 		addr_t caller = 0;
 		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+		if (traceEntry != NULL && !info->IsTraceEntryValid())
+			traceEntry = NULL;
 
-		if (traceEntry != NULL && info->IsTraceEntryValid()) {
+		if (traceEntry != NULL) {
 			caller = tracing_find_caller_in_stack_trace(
 				traceEntry->StackTrace(), kSlabCodeAddressRanges,
 				kSlabCodeAddressRangeCount);
@@ -474,17 +536,28 @@ caller_info_compare_count(const void* _a, const void* _b)
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 
 static bool
+analyze_allocation_callers(ObjectCache* cache, slab* slab,
+	AllocationTrackingCallback& callback)
+{
+	for (uint32 i = 0; i < slab->size; i++) {
+		if (!callback.ProcessTrackingInfo(&slab->tracking[i],
+				cache->ObjectAtIndex(slab, i), cache->object_size)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+static bool
 analyze_allocation_callers(ObjectCache* cache, const SlabList& slabList,
 	AllocationTrackingCallback& callback)
 {
 	for (SlabList::ConstIterator it = slabList.GetIterator();
 			slab* slab = it.Next();) {
-		for (uint32 i = 0; i < slab->size; i++) {
-			if (!callback.ProcessTrackingInfo(&slab->tracking[i],
-					cache->ObjectAtIndex(slab, i), cache->object_size)) {
-				return false;
-			}
-		}
+		if (!analyze_allocation_callers(cache, slab, callback))
+			return false;
 	}
 
 	return true;
@@ -500,6 +573,129 @@ analyze_allocation_callers(ObjectCache* cache,
 }
 
 #endif	// SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+
+static int
+dump_allocation_infos(int argc, char **argv)
+{
+	ObjectCache* cache = NULL;
+	slab* slab = NULL;
+	addr_t addressFilter = 0;
+	team_id teamFilter = -1;
+	thread_id threadFilter = -1;
+	bool printStackTraces = false;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--stacktrace") == 0)
+			printStackTraces = true;
+		else if (strcmp(argv[i], "-a") == 0) {
+			uint64 address;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &address, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			addressFilter = address;
+		} else if (strcmp(argv[i], "-o") == 0) {
+			uint64 cacheAddress;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &cacheAddress, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			cache = (ObjectCache*)(addr_t)cacheAddress;
+		} else if (strcasecmp(argv[i], "-s") == 0) {
+			uint64 slabAddress;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &slabAddress, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			void* slabPages = (void*)slabAddress;
+			if (strcmp(argv[i], "-s") == 0) {
+				slab = (struct slab*)(addr_t)slabAddress;
+				slabPages = slab->pages;
+			}
+
+			cache = MemoryManager::DebugObjectCacheForAddress(slabPages);
+			if (cache == NULL) {
+				kprintf("Couldn't find object cache for address %p.\n",
+					slabPages);
+				return 0;
+			}
+
+			if (slab == NULL) {
+				slab = cache->ObjectSlab(slabPages);
+
+				if (slab == NULL) {
+					kprintf("Couldn't find slab for address %p.\n", slabPages);
+					return 0;
+				}
+			}
+		} else if (strcmp(argv[i], "--team") == 0) {
+			uint64 team;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &team, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			teamFilter = team;
+		} else if (strcmp(argv[i], "--thread") == 0) {
+			uint64 thread;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &thread, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			threadFilter = thread;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	AllocationInfoPrinterCallback callback(printStackTraces, addressFilter,
+		teamFilter, threadFilter);
+
+	if (slab != NULL || cache != NULL) {
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+		if (slab != NULL) {
+			if (!analyze_allocation_callers(cache, slab, callback))
+				return 0;
+		} else if (cache != NULL) {
+			if (!analyze_allocation_callers(cache, callback))
+				return 0;
+		}
+#else
+		kprintf("Object cache allocation tracking not available. "
+			"SLAB_OBJECT_CACHE_TRACING (%d) and "
+			"SLAB_OBJECT_CACHE_TRACING_STACK_TRACE (%d) must be enabled.\n",
+			SLAB_OBJECT_CACHE_TRACING, SLAB_OBJECT_CACHE_TRACING_STACK_TRACE);
+		return 0;
+#endif
+	} else {
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+		for (ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
+				it.HasNext();) {
+			if (!analyze_allocation_callers(it.Next(), callback))
+				return 0;
+		}
+#endif
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+		if (!MemoryManager::AnalyzeAllocationCallers(callback))
+			return 0;
+#endif
+	}
+
+	return 0;
+}
 
 
 static int
@@ -1159,7 +1355,7 @@ slab_init_post_area()
 #if SLAB_ALLOCATION_TRACKING_AVAILABLE
 	add_debugger_command_etc("allocations_per_caller",
 		&dump_allocations_per_caller,
-		"Dump current heap allocations summed up per caller",
+		"Dump current slab allocations summed up per caller",
 		"[ -c ] [ -d <caller> ] [ -o <object cache> ] [ -r ]\n"
 		"The current allocations will by summed up by caller (their count and\n"
 		"size) printed in decreasing order by size or, if \"-c\" is\n"
@@ -1170,6 +1366,22 @@ slab_init_post_area()
 		"If \"-r\" is given, the allocation infos are reset after gathering\n"
 		"the information, so the next command invocation will only show the\n"
 		"allocations made after the reset.\n", 0);
+	add_debugger_command_etc("allocation_infos",
+		&dump_allocation_infos,
+		"Dump current slab allocations",
+		"[ --stacktrace ] [ -o <object cache> | -s <slab> | -S <address> ] "
+		"[ -a <allocation> ] [ --team <team ID> ] [ --thread <thread ID> ]\n"
+		"The current allocations filtered by optional values will be printed.\n"
+		"If given, <object cache> specifies the address of the object cache\n"
+		"or <slab> specifies the address of a slab, for which to print the\n"
+		"allocations. Alternatively <address> specifies any address within\n"
+		"a slab allocation range.\n"
+		"The optional \"-a\" address filters for a specific allocation,\n"
+		"with \"--team\" and \"--thread\" allocations by specific teams\n"
+		"and/or threads can be filtered (these only work if a corresponding\n"
+		"tracing entry is still available).\n"
+		"If \"--stacktrace\" is given, then stack traces of the allocation\n"
+		"callers are printed, where available\n", 0);
 #endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
 }
 
