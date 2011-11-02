@@ -20,6 +20,12 @@ resource app_version {
 
 resource app_flags B_SINGLE_LAUNCH;
 
+resource(1, "BEOS:FILE_TYPES") message
+{
+	/* cf. http://tools.ietf.org/html/rfc2838 */
+	"types" =  "application/x-vnd.Be.URL.tv"
+};
+
 resource vector_icon {
 	$"6E6369660D03010000020006023C55B638309FBA16573E39B049E9FF43840A00"
 	$"FFB3B3FFA53E3E020006023C57B5364381B785863DA4F54B27C349B7BB005304"
