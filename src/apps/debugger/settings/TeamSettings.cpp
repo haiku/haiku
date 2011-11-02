@@ -100,7 +100,7 @@ TeamSettings::SetTo(const BMessage& archive)
 			return error;
 		}
 	}
-	
+
 	// add UI settings
 	for (int32 i = 0; archive.FindMessage("uisettings", i, &childArchive)
 		== B_OK; i++) {
@@ -111,7 +111,7 @@ TeamSettings::SetTo(const BMessage& archive)
 		if (error != B_OK) {
 			delete setting;
 			return error;
-		}		
+		}
 	}
 
 	return B_OK;
@@ -136,13 +136,13 @@ TeamSettings::WriteTo(BMessage& archive) const
 		if (error != B_OK)
 			return error;
 	}
-	
+
 	for (int32 i = 0; TeamUISettings* uiSetting = fUISettings.ItemAt(i);
 			i++) {
 		error = uiSetting->WriteTo(childArchive);
 		if (error != B_OK)
 			return error;
-			
+
 		error = archive.AddMessage("uisettings", &childArchive);
 		if (error != B_OK)
 			return error;
@@ -177,6 +177,29 @@ const TeamUISettings*
 TeamSettings::UISettingAt(int32 index) const
 {
 	return fUISettings.ItemAt(index);
+}
+
+
+const TeamUISettings*
+TeamSettings::UISettingFor(const char* id) const
+{
+	for (int32 i = 0; i < fUISettings.CountItems(); i++) {
+		TeamUISettings* settings = fUISettings.ItemAt(i);
+		if (strcmp(settings->ID(), id) == 0)
+			return settings;
+	}
+
+	return NULL;
+}
+
+
+status_t
+TeamSettings::AddUISettings(TeamUISettings* settings)
+{
+	if (!fUISettings.AddItem(settings))
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -221,7 +244,7 @@ TeamSettings::_Unset()
 			i++) {
 		delete breakpoint;
 	}
-	
+
 	for (int32 i = 0; TeamUISettings* uiSetting = fUISettings.ItemAt(i); i++)
 		delete uiSetting;
 

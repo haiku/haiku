@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +9,7 @@
 
 #include <Alert.h>
 
+#include "GUITeamUISettings.h"
 #include "TeamWindow.h"
 #include "Tracing.h"
 
@@ -23,6 +25,13 @@ GraphicalUserInterface::GraphicalUserInterface()
 GraphicalUserInterface::~GraphicalUserInterface()
 {
 	delete fTeamWindowMessenger;
+}
+
+
+const char*
+GraphicalUserInterface::ID() const
+{
+	return "GraphicalUserInterface";
 }
 
 
@@ -55,6 +64,28 @@ GraphicalUserInterface::Terminate()
 	// quit window
 	if (fTeamWindowMessenger && fTeamWindowMessenger->LockTarget())
 		fTeamWindow->Quit();
+}
+
+
+status_t
+GraphicalUserInterface::LoadSettings(const TeamUISettings* settings)
+{
+	// TODO: restore settings
+
+	return B_OK;
+}
+
+
+status_t
+GraphicalUserInterface::SaveSettings(TeamUISettings*& settings) const
+{
+	settings = new(std::nothrow) GUITeamUISettings(ID());
+	if (settings == NULL)
+		return B_NO_MEMORY;
+
+	// TODO: fill in settings
+
+	return B_OK;
 }
 
 

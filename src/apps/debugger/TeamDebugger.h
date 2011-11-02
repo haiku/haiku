@@ -13,6 +13,7 @@
 
 #include "DebugEvent.h"
 #include "Team.h"
+#include "TeamSettings.h"
 #include "ThreadHandler.h"
 #include "UserInterface.h"
 #include "Worker.h"
@@ -155,6 +156,7 @@ private:
 			UserInterface*		fUserInterface;
 	volatile bool				fTerminating;
 			bool				fKillTeamOnQuit;
+			TeamSettings		fTeamSettings;
 };
 
 
