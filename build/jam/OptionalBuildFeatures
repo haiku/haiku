@@ -81,13 +81,13 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	# extract libraries
 	HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
 		:
-		libicudata.so.48.1
-		libicui18n.so.48.1
-		libicuio.so.48.1
-		libicule.so.48.1
-		libiculx.so.48.1
-		libicutu.so.48.1
-		libicuuc.so.48.1
+		libicudata.so.48.1.1
+		libicui18n.so.48.1.1
+		libicuio.so.48.1.1
+		libicule.so.48.1.1
+		libiculx.so.48.1.1
+		libicutu.so.48.1.1
+		libicuuc.so.48.1.1
 		: $(zipFile)
 		: extracted-icu
 	] ;
