@@ -346,37 +346,10 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 		MoveTo(rect.left, rect.top);
 	}
 
-	error = settings->Value("teamWindowSourceSplit0", value);
-	if (error == B_OK)
-		fSourceSplitView->SetItemWeight(0L, value.ToFloat(), false);
-
-	error = settings->Value("teamWindowSourceSplit1", value);
-	if (error == B_OK)
-		fSourceSplitView->SetItemWeight(1L, value.ToFloat(), true);
-
-	error = settings->Value("teamWindowFunctionSplit0", value);
-	if (error == B_OK)
-		fFunctionSplitView->SetItemWeight(0L, value.ToFloat(), false);
-
-	error = settings->Value("teamWindowFunctionSplit1", value);
-	if (error == B_OK)
-		fFunctionSplitView->SetItemWeight(1L, value.ToFloat(), true);
-
-	error = settings->Value("teamWindowImageSplit0", value);
-	if (error == B_OK)
-		fImageSplitView->SetItemWeight(0L, value.ToFloat(), false);
-
-	error = settings->Value("teamWindowImageSplit1", value);
-	if (error == B_OK)
-		fImageSplitView->SetItemWeight(1L, value.ToFloat(), true);
-
-	error = settings->Value("teamWindowThreadSplit0", value);
-	if (error == B_OK)
-		fThreadSplitView->SetItemWeight(0L, value.ToFloat(), false);
-
-	error = settings->Value("teamWindowThreadSplit1", value);
-	if (error == B_OK)
-		fThreadSplitView->SetItemWeight(1L, value.ToFloat(), true);
+	_LoadSplitSettings(fSourceSplitView, "Source", settings);
+	_LoadSplitSettings(fFunctionSplitView, "Function", settings);
+	_LoadSplitSettings(fImageSplitView, "Image", settings);
+	_LoadSplitSettings(fThreadSplitView, "Thread", settings);
 
 	return B_OK;
 }
@@ -388,36 +361,16 @@ TeamWindow::SaveSettings(GUITeamUISettings* settings)
 	if (!settings->SetValue("teamWindowFrame", Frame()))
 		return B_NO_MEMORY;
 
-	if (!settings->SetValue("teamWindowSourceSplit0",
-		fSourceSplitView->ItemWeight(0L)))
+	if (_SaveSplitSettings(fSourceSplitView, "Source", settings) != B_OK)
 		return B_NO_MEMORY;
 
-	if (!settings->SetValue("teamWindowSourceSplit1",
-		fSourceSplitView->ItemWeight(1L)))
+	if (_SaveSplitSettings(fFunctionSplitView, "Function", settings) != B_OK)
 		return B_NO_MEMORY;
 
-	if (!settings->SetValue("teamWindowFunctionSplit0",
-		fFunctionSplitView->ItemWeight(0L)))
+	if (_SaveSplitSettings(fImageSplitView, "Image", settings) != B_OK)
 		return B_NO_MEMORY;
 
-	if (!settings->SetValue("teamWindowFunctionSplit1",
-		fFunctionSplitView->ItemWeight(1L)))
-		return B_NO_MEMORY;
-
-	if (!settings->SetValue("teamWindowImageSplit0",
-		fImageSplitView->ItemWeight(0L)))
-		return B_NO_MEMORY;
-
-	if (!settings->SetValue("teamWindowImageSplit1",
-		fImageSplitView->ItemWeight(1L)))
-		return B_NO_MEMORY;
-
-	if (!settings->SetValue("teamWindowThreadSplit0",
-		fThreadSplitView->ItemWeight(0L)))
-		return B_NO_MEMORY;
-
-	if (!settings->SetValue("teamWindowThreadSplit1",
-		fThreadSplitView->ItemWeight(1L)))
+	if (_SaveSplitSettings(fThreadSplitView, "Thead", settings) != B_OK)
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -1174,4 +1127,43 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
 		}
 	}
+}
+
+
+void
+TeamWindow::_LoadSplitSettings(BSplitView* view, const char* name,
+	const GUITeamUISettings* settings)
+{
+	BString settingName;
+	BVariant value;
+
+	settingName.SetToFormat("teamWindow%sSplit0", name);
+	status_t error = settings->Value(settingName.String(), value);
+	if (error == B_OK)
+		view->SetItemWeight(0L, value.ToFloat(), false);
+
+	settingName.SetToFormat("teamWindow%sSplit1", name);
+	error = settings->Value(settingName.String(), value);
+	if (error == B_OK)
+		view->SetItemWeight(1L, value.ToFloat(), true);
+}
+
+
+status_t
+TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
+	GUITeamUISettings* settings)
+{
+	BString settingName;
+
+	settingName.SetToFormat("teamWindow%sSplit0", name);
+	if (!settings->SetValue(settingName.String(),
+		view->ItemWeight(0L)))
+		return B_NO_MEMORY;
+
+	settingName.SetToFormat("teamWindow%sSplit1", name);
+	if (!settings->SetValue(settingName.String(),
+		view->ItemWeight(1L)))
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
