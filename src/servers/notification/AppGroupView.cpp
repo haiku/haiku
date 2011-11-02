@@ -24,7 +24,7 @@
 
 AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
 	:
-	BBox(B_FANCY_BORDER, (fView = new BGroupView(B_VERTICAL, 10))),
+	BBox(B_FANCY_BORDER, (fView = new BGroupView(B_VERTICAL, 0))),
 	fLabel(label),
 	fParent(win),
 	fCollapsed(false)

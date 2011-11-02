@@ -14,6 +14,9 @@
  */
 
 #include <ControlLook.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <Layout.h>
 #include <LayoutUtils.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -59,6 +62,9 @@ NotificationView::NotificationView(NotificationWindow* win,
 	if (fTimeout <= 0)
 		fTimeout = fParent->Timeout() * 1000000;
 
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+
 	SetText();
 
 	switch (fNotification->Type()) {
@@ -72,9 +78,7 @@ NotificationView::NotificationView(NotificationWindow* win,
 			break;
 		case B_PROGRESS_NOTIFICATION:
 		{
-			BRect frame(kIconStripeWidth + 9, Bounds().bottom - 36,
-				Bounds().right - 8, Bounds().bottom - 10);
-			BStatusBar* progress = new BStatusBar(frame, "progress");
+			BStatusBar* progress = new BStatusBar("progress");
 			progress->SetBarHeight(12.0f);
 			progress->SetMaxValue(1.0f);
 			progress->Update(fNotification->Progress());
@@ -82,8 +86,10 @@ NotificationView::NotificationView(NotificationWindow* win,
 			BString label = "";
 			label << (int)(fNotification->Progress() * 100) << " %";
 			progress->SetTrailingText(label);
-			
-			AddChild(progress);
+
+			BGroupLayoutBuilder b(layout);
+				b.AddGlue()
+				.Add(progress);
 		}
 		// fall through
 		default:
@@ -410,8 +416,9 @@ NotificationView::GetSupportedSuites(BMessage* msg)
 void
 NotificationView::SetText(float newMaxWidth)
 {
-	if (newMaxWidth < 0)
-		newMaxWidth = Bounds().Width() - (kEdgePadding * 2);
+	if (newMaxWidth < 0) {
+		newMaxWidth = 200;
+	}
 
 	// Delete old lines
 	LineInfoList::iterator lIt;
@@ -447,7 +454,7 @@ NotificationView::SetText(float newMaxWidth)
 		+ ceilf(fh.ascent);
 
 	// Split text into chunks between certain characters and compose the lines.
-	const char kSeparatorCharacters[] = " \n-\\/";
+	const char kSeparatorCharacters[] = " \n-\\";
 	BString textBuffer = fNotification->Content();
 	textBuffer.ReplaceAll("\t", "    ");
 	const char* chunkStart = textBuffer.String();
@@ -512,6 +519,11 @@ NotificationView::SetText(float newMaxWidth)
 		if (fHeight < minHeight)
 			fHeight = minHeight;
 	}
+
+	// Make sure the progress bar is below the text, and the window is big
+	// enough.
+	static_cast<BGroupLayout*>(GetLayout())->SetInsets(kIconStripeWidth + 8,
+		fHeight, 8, 8);
 }
 
 
@@ -528,7 +540,7 @@ NotificationView::_CalculateSize()
 	BSize size;
 
 	// Parent width, minus the edge padding, minus the pensize
-	size.width = fParent->Width() - (kEdgePadding * 2) - (kPenSize * 2);
+	size.width = B_SIZE_UNLIMITED;
 	size.height = fHeight;
 
 	if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {

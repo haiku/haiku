@@ -62,7 +62,7 @@ NotificationWindow::NotificationWindow()
 		| B_NOT_RESIZABLE | B_NOT_MOVABLE | B_AUTO_UPDATE_SIZE_LIMITS, 
 		B_ALL_WORKSPACES)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL, 10));
+	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	Hide();
 	Show();
@@ -359,7 +359,6 @@ NotificationWindow::SetPosition()
 	float rightOffset = bounds.right - Frame().right;
 	float bottomOffset = bounds.bottom - Frame().bottom;
 		// Size of the borders around the window
-	printf("%f %f %f %f\n",leftOffset, topOffset, rightOffset, bottomOffset);
 	
 	float x = Frame().left, y = Frame().top;
 		// If we can't guess, don't move...
