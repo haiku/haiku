@@ -9,7 +9,7 @@ http://www.haiku-os.org
 
 This is the main website for the Haiku project. It contains news posts from
 the project, blog posts (from developers, Google Summer of Code participants,
-and other frequent contributors), forums, and vast collection of information.
+and other frequent contributors), forums, and a vast collection of information.
 
 
 Development tracker
@@ -18,7 +18,7 @@ http://dev.haiku-os.org/
 
 This is the Haiku project's development tracker.
  * Bug reports
- * Browse source
+ * Browse the source
  * Review changesets
  * Development related wiki (limited write access)
 
@@ -57,7 +57,7 @@ http://www.haiku-os.org/development/learning_to_program_with_haiku
 
 A developer, DarkWyrm has published a book that is " aimed at people who want
 to be able to write simple programs to get stuff done, but never had anyone
-around teach them". He has chosen to distribute he PDF versions of the book
+around teach them". He has chosen to distribute the PDF versions of the book
 under a Creative Commons license for noncommercial purposes.
 
 
@@ -87,6 +87,15 @@ http://hta.polytect.org/
 This is the current solution to assisting people in translating Haiku's
 on screen text to other languages. Consult the [haiku-i18n] mailing list
 for additional information: http://www.freelists.org/list/haiku-i18n
+
+
+Haiku User Guide Translation
+----------------------------
+http://i18n.haiku-os.org/userguide/
+
+Similar to HTA, this site is for coordinating the efforts of translating Haiku's
+User Guide and Welcome page to other spoken languages. Subscribe to the 
+[haiku-doc] mailing list: http://www.freelists.org/list/haiku-doc
 
 
 HaikuPorts
