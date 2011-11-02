@@ -1137,15 +1137,14 @@ TeamWindow::_LoadSplitSettings(BSplitView* view, const char* name,
 	BString settingName;
 	BVariant value;
 
-	settingName.SetToFormat("teamWindow%sSplit0", name);
-	status_t error = settings->Value(settingName.String(), value);
-	if (error == B_OK)
-		view->SetItemWeight(0L, value.ToFloat(), false);
-
-	settingName.SetToFormat("teamWindow%sSplit1", name);
-	error = settings->Value(settingName.String(), value);
-	if (error == B_OK)
-		view->SetItemWeight(1L, value.ToFloat(), true);
+	for (int32 i = 0; i < view->CountItems(); i++) {
+		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
+		status_t error = settings->Value(settingName.String(), value);
+		if (error == B_OK) {
+			view->SetItemWeight(i, value.ToFloat(),
+				i == view->CountItems() - 1);
+		}
+	}
 }
 
 
@@ -1155,15 +1154,12 @@ TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
 {
 	BString settingName;
 
-	settingName.SetToFormat("teamWindow%sSplit0", name);
-	if (!settings->SetValue(settingName.String(),
-		view->ItemWeight(0L)))
+	for (int32 i = 0; i < view->CountItems(); i++) {
+		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
+		if (!settings->SetValue(settingName.String(),
+			view->ItemWeight(i)))
 		return B_NO_MEMORY;
-
-	settingName.SetToFormat("teamWindow%sSplit1", name);
-	if (!settings->SetValue(settingName.String(),
-		view->ItemWeight(1L)))
-		return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }
