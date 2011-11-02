@@ -1,29 +1,50 @@
+/*
+ * Copyright 2010-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "ServerConnection.h"
 
-#include <arpa/inet.h>
-#include <netdb.h>
+#include <errno.h>
+#include <sys/poll.h>
 #include <unistd.h>
 
 #ifdef USE_SSL
-#include <openssl/ssl.h>
-#include <openssl/rand.h>
-#else
-#include <string.h>
-#include <sys/time.h>
+#	include <openssl/ssl.h>
+#	include <openssl/rand.h>
 #endif
 
 #include <Autolock.h>
 #include <Locker.h>
+#include <NetworkAddress.h>
 
 
 #define DEBUG_SERVER_CONNECTION
-
 #ifdef DEBUG_SERVER_CONNECTION
-#include <stdio.h>
-#define TRACE(x...) printf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
-#define TRACE(x...) /* nothing */
+#	define TRACE(x...) ;
 #endif
+
+
+namespace BPrivate {
+
+
+class AbstractConnection {
+public:
+	virtual						~AbstractConnection();
+
+	virtual status_t			Connect(const char* server, uint32 port) = 0;
+	virtual status_t			Disconnect() = 0;
+
+	virtual status_t			WaitForData(bigtime_t timeout) = 0;
+
+	virtual ssize_t				Read(char* buffer, uint32 length) = 0;
+	virtual ssize_t				Write(const char* buffer, uint32 length) = 0;
+};
 
 
 class SocketConnection : public AbstractConnection {
@@ -35,8 +56,8 @@ public:
 
 			status_t			WaitForData(bigtime_t timeout);
 
-			int32				Read(char* buffer, uint32 nBytes);
-			int32				Write(const char* buffer, uint32 nBytes);
+			ssize_t				Read(char* buffer, uint32 length);
+			ssize_t				Write(const char* buffer, uint32 length);
 
 protected:
 			int					fSocket;
@@ -44,6 +65,8 @@ protected:
 
 
 #ifdef USE_SSL
+
+
 class InitSSL {
 public:
 	InitSSL()
@@ -62,8 +85,7 @@ public:
 	};
 
 
-	status_t
-	InitCheck()
+	status_t InitCheck()
 	{
 		return fInit ? B_OK : B_ERROR;
 	}
@@ -71,9 +93,6 @@ public:
 private:
 			bool				fInit;
 };
-
-
-static InitSSL gInitSSL;
 
 
 class SSLConnection : public SocketConnection {
@@ -85,34 +104,40 @@ public:
 
 			status_t			WaitForData(bigtime_t timeout);
 
-			int32				Read(char* buffer, uint32 nBytes);
-			int32				Write(const char* buffer, uint32 nBytes);
+			ssize_t				Read(char* buffer, uint32 length);
+			ssize_t				Write(const char* buffer, uint32 length);
 
 private:
 			SSL_CTX*			fCTX;
 			SSL*				fSSL;
 			BIO*				fBIO;
 };
-#endif
+
+
+static InitSSL gInitSSL;
+
+
+#endif	// USE_SSL
 
 
 AbstractConnection::~AbstractConnection()
 {
-
 }
+
+
+// #pragma mark -
 
 
 ServerConnection::ServerConnection()
 	:
 	fConnection(NULL)
 {
-
 }
 
 
 ServerConnection::~ServerConnection()
 {
-	if (fConnection)
+	if (fConnection != NULL)
 		fConnection->Disconnect();
 	delete fConnection;
 }
@@ -158,7 +183,7 @@ ServerConnection::WaitForData(bigtime_t timeout)
 }
 
 
-int32
+ssize_t
 ServerConnection::Read(char* buffer, uint32 nBytes)
 {
 	if (fConnection == NULL)
@@ -167,7 +192,7 @@ ServerConnection::Read(char* buffer, uint32 nBytes)
 }
 
 
-int32
+ssize_t
 ServerConnection::Write(const char* buffer, uint32 nBytes)
 {
 	if (fConnection == NULL)
@@ -176,11 +201,13 @@ ServerConnection::Write(const char* buffer, uint32 nBytes)
 }
 
 
+// #pragma mark -
+
+
 SocketConnection::SocketConnection()
 	:
 	fSocket(-1)
 {
-
 }
 
 
@@ -191,29 +218,20 @@ SocketConnection::Connect(const char* server, uint32 port)
 		Disconnect();
 
 	TRACE("SocketConnection to server %s:%i\n", server, (int)port);
-	uint32 hostIP = inet_addr(server);
-		// first see if we can parse it as a numeric address
-	if (hostIP == 0 || hostIP == (uint32)-1) {
-		struct hostent *he = gethostbyname(server);
-		hostIP = he ? *((uint32*)he->h_addr) : 0;
-	}
-	if (hostIP == 0)
-		return B_ERROR;
 
-	fSocket = socket(AF_INET, SOCK_STREAM, 0);
+	BNetworkAddress address;
+	status_t status = address.SetTo(server, port);
+	if (status != B_OK)
+		return status;
+
+	fSocket = socket(address.Family(), SOCK_STREAM, 0);
 	if (fSocket < 0)
-		return B_ERROR;
+		return errno;
 
-	sockaddr_in saAddr;
-	memset(&saAddr, 0, sizeof(saAddr));
-	saAddr.sin_family = AF_INET;
-	saAddr.sin_port = htons(port);
-	saAddr.sin_addr.s_addr = hostIP;
-	int result = connect(fSocket, (struct sockaddr*)&saAddr,
-		sizeof(saAddr));
+	int result = connect(fSocket, address, address.Length());
 	if (result < 0) {
 		close(fSocket);
-		return B_ERROR;
+		return errno;
 	}
 
 	TRACE("SocketConnection: connected\n");
@@ -234,47 +252,58 @@ SocketConnection::Disconnect()
 status_t
 SocketConnection::WaitForData(bigtime_t timeout)
 {
-	timeval tv;
-	fd_set fds;
-	tv.tv_sec = long(timeout / 1e6);
-	tv.tv_usec = long(timeout - (tv.tv_sec * 1e6));
+	struct pollfd entry;
+	entry.fd = fSocket;
+	entry.events = POLLIN;
 
-	/* Initialize (clear) the socket mask. */
-	FD_ZERO(&fds);
-	/* Set the socket in the mask. */
-	FD_SET(fSocket, &fds);
+	int timeoutMillis = -1;
+	if (timeout > 0)
+		timeoutMillis = timeout / 1000;
 
-	int result = select(fSocket + 1, &fds, NULL, NULL, &tv);
+	int result = poll(&entry, 1, timeoutMillis);
 	if (result == 0)
 		return B_TIMED_OUT;
 	if (result < 0)
-		return B_ERROR;
+		return errno;
+
 	return B_OK;
 }
 
 
-int32
-SocketConnection::Read(char* buffer, uint32 nBytes)
+ssize_t
+SocketConnection::Read(char* buffer, uint32 length)
 {
-	return recv(fSocket, buffer, nBytes, 0);
+	ssize_t bytesReceived = recv(fSocket, buffer, length, 0);
+	if (bytesReceived < 0)
+		return errno;
+
+	return bytesReceived;
 }
 
 
-int32
-SocketConnection::Write(const char* buffer, uint32 nBytes)
+ssize_t
+SocketConnection::Write(const char* buffer, uint32 length)
 {
-	return send(fSocket, buffer, nBytes, 0);
+	ssize_t bytesWritten = send(fSocket, buffer, length, 0);
+	if (bytesWritten < 0)
+		return errno;
+
+	return bytesWritten;
 }
+
+
+// #pragma mark -
 
 
 #ifdef USE_SSL
+
+
 SSLConnection::SSLConnection()
 	:
 	fCTX(NULL),
 	fSSL(NULL),
 	fBIO(NULL)
 {
-	
 }
 
 
@@ -329,31 +358,46 @@ SSLConnection::Disconnect()
 status_t
 SSLConnection::WaitForData(bigtime_t timeout)
 {
-	if (!fSSL)
-		return B_ERROR;
-	if (SSL_pending(fSSL) > 0) {
+	if (fSSL == NULL)
+		return B_NO_INIT;
+	if (SSL_pending(fSSL) > 0)
 		return B_OK;
-	}
+
 	return SocketConnection::WaitForData(timeout);
 }
 
 
-int32
-SSLConnection::Read(char* buffer, uint32 nBytes)
+ssize_t
+SSLConnection::Read(char* buffer, uint32 length)
 {
-	if (!fSSL)
-		return B_ERROR;
-	return SSL_read(fSSL, buffer, nBytes);
+	if (fSSL == NULL)
+		return B_NO_INIT;
+
+	int bytesRead = SSL_read(fSSL, buffer, length);
+	if (bytesRead > 0)
+		return bytesRead;
+
+	// TODO: translate SSL error codes!
+	return B_ERROR;
 }
 
 
-int32
-SSLConnection::Write(const char* buffer, uint32 nBytes)
+ssize_t
+SSLConnection::Write(const char* buffer, uint32 length)
 {
-	if (!fSSL)
-		return B_ERROR;
-	return SSL_write(fSSL, buffer, nBytes);
+	if (fSSL == NULL)
+		return B_NO_INIT;
+
+	int bytesWritten = SSL_write(fSSL, buffer, length);
+	if (bytesWritten > 0)
+		return bytesWritten;
+
+	// TODO: translate SSL error codes!
+	return B_ERROR;
 }
 
 
-#endif
+#endif	// USE_SSL
+
+
+}	// namespace BPrivate
