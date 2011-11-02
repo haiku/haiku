@@ -13,6 +13,9 @@
 
 #include <algorithm>
 
+#include <GroupLayout.h>
+#include <GroupView.h>
+
 #include "AppGroupView.h"
 
 #include "NotificationWindow.h"
@@ -21,13 +24,16 @@
 
 AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
 	:
-	BView(BRect(0, 0, win->ViewWidth(), 1), label, B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW|B_FULL_UPDATE_ON_RESIZE|B_FRAME_EVENTS),
+	BBox(B_FANCY_BORDER, (fView = new BGroupView(B_VERTICAL, 10))),
 	fLabel(label),
 	fParent(win),
 	fCollapsed(false)
 {
-	Show();
+	// If no group was specified we don't have any border or label
+	if (label == NULL)
+		SetBorder(B_NO_BORDER);
+	else
+		SetLabel(label);
 }
 
 
@@ -36,6 +42,7 @@ AppGroupView::~AppGroupView()
 }
 
 
+/*
 void
 AppGroupView::AttachedToWindow()
 {
@@ -43,8 +50,9 @@ AppGroupView::AttachedToWindow()
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 }
+*/
 
-
+/*
 void
 AppGroupView::Draw(BRect updateRect)
 {
@@ -120,7 +128,7 @@ AppGroupView::Draw(BRect updateRect)
 
 	Sync();	
 }
-
+*/
 
 void
 AppGroupView::MouseDown(BPoint point)
@@ -131,7 +139,7 @@ AppGroupView::MouseDown(BPoint point)
 
 		int32 children = fInfo.size();
 		for (int32 i = 0; i < children; i++) {
-			fInfo[i]->RemoveSelf();
+			fView->GetLayout()->RemoveView(fInfo[i]);
 			delete fInfo[i];
 		}
 		fInfo.clear();
@@ -143,38 +151,8 @@ AppGroupView::MouseDown(BPoint point)
 	}
 
 	if (changed) {
-		ResizeViews();
-		Invalidate();
+		_ResizeViews();
 	}
-}
-
-
-void
-AppGroupView::GetPreferredSize(float* width, float* height)
-{
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-
-	float h = fh.ascent + fh.leading + fh.leading;
-	h += kEdgePadding * 2; // Padding between top and bottom of label
-
-	if (!fCollapsed) {
-		int32 children = fInfo.size();
-
-		for (int32 i = 0; i < children; i++) {
-			float childHeight = 0;
-			float childWidth = 0;
-			
-			fInfo[i]->GetPreferredSize(&childWidth, &childHeight);
-			
-			h += childHeight;
-		}
-	}
-
-	h += kEdgePadding;
-
-	*width = fParent->ViewWidth();
-	*height = h;
 }
 
 
@@ -192,16 +170,14 @@ AppGroupView::MessageReceived(BMessage* msg)
 
 			if (vIt != fInfo.end()) {
 				fInfo.erase(vIt);
-				view->RemoveSelf();
+				fView->GetLayout()->RemoveView(view);
 				delete view;
 			}
 
-			ResizeViews();
-			Invalidate();
+			if (Window() != NULL)
+				Window()->PostMessage(msg);
 
-			// When all the views are destroy, save app filters
-			if (fInfo.size() == 0)
-				dynamic_cast<NotificationWindow*>(Window())->SaveAppFilters();
+			_ResizeViews();
 			break;
 		}
 		default:
@@ -214,13 +190,14 @@ void
 AppGroupView::AddInfo(NotificationView* view)
 {
 	BString id = view->MessageID();
+	bool found = false;
+
 	if (id.Length() > 0) {
 		int32 children = fInfo.size();
-		bool found = false;
 
 		for (int32 i = 0; i < children; i++) {
-			if (fInfo[i]->HasMessageID(id.String())) {
-				fInfo[i]->RemoveSelf();
+			if (id == fInfo[i]->MessageID()) {
+				fView->GetLayout()->RemoveView(fInfo[i]);
 				delete fInfo[i];
 				
 				fInfo[i] = view;
@@ -229,28 +206,23 @@ AppGroupView::AddInfo(NotificationView* view)
 				break;
 			}
 		}
+	}
 
-		if (!found)
-			fInfo.push_back(view);
-	} else
+	if (!found)
 		fInfo.push_back(view);
+	fView->GetLayout()->AddView(view);
 
-	if (fParent->IsHidden())
-		fParent->Show();
 	if (IsHidden())
 		Show();
 	if (view->IsHidden())
 		view->Show();
 
-	AddChild(view);
-
-	ResizeViews();
-	Invalidate();
+	_ResizeViews();
 }
 
 
 void
-AppGroupView::ResizeViews()
+AppGroupView::_ResizeViews()
 {
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
@@ -268,22 +240,14 @@ AppGroupView::ResizeViews()
 			offset += fInfo[i]->Bounds().Height();
 			if (fInfo[i]->IsHidden())
 				fInfo[i]->Show();
-			fInfo[i]->SetPosition(false, false);
-		};
+		}
 	} else {
 		for (int32 i = 0; i < children; i++)
 			if (!fInfo[i]->IsHidden())
 				fInfo[i]->Hide();
 	}
 
-	if (children == 1)
-		fInfo[0]->SetPosition(true, true);
-	else if (children > 1) {
-		fInfo[0]->SetPosition(true, false);
-		fInfo[children - 1]->SetPosition(false, true);
-	}
-
-	ResizeTo(fParent->ViewWidth(), offset);
+	ResizeTo(fParent->Width(), offset);
 	float labelOffset = fh.ascent + fh.leading;
 
 	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
@@ -299,8 +263,6 @@ AppGroupView::ResizeViews()
 	fCloseRect.top += kEdgePadding * 1.5;
 	fCloseRect.left = fCloseRect.right - kCloseSize;
 	fCloseRect.bottom = fCloseRect.top + kCloseSize;
-
-	fParent->ResizeAll();
 }
 
 

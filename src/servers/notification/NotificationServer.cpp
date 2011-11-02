@@ -24,12 +24,18 @@ const char* kSoundNames[] = {
 NotificationServer::NotificationServer()
 	: BApplication(kNotificationServerSignature)
 {
-	fWindow = new NotificationWindow();
 }
 
 
 NotificationServer::~NotificationServer()
 {
+}
+
+
+void
+NotificationServer::ReadyToRun()
+{
+	fWindow = new NotificationWindow();
 }
 
 
@@ -58,17 +64,6 @@ NotificationServer::MessageReceived(BMessage* message)
 		default:
 			BApplication::MessageReceived(message);
 	}
-}
-
-
-bool
-NotificationServer::QuitRequested()
-{
-	if (fWindow && fWindow->Lock()) {
-		fWindow->Quit();
-		fWindow = NULL;
-	}
-	return true;
 }
 
 
@@ -110,8 +105,8 @@ main(int argc, char* argv[])
 		add_system_beep_event(kSoundNames[i++], 0);
 
 	// Start!
-	NotificationServer* server = new NotificationServer();
-	server->Run();
+	NotificationServer server;
+	server.Run();
 
 	return 0;
 }

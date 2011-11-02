@@ -191,7 +191,7 @@ MailDaemonApp::ReadyToRun()
 	fCentralBeep = false;
 
 	fNotification = new BNotification(B_INFORMATION_NOTIFICATION);
-	fNotification->SetApplication(B_TRANSLATE("Mail status"));
+	fNotification->SetGroup(B_TRANSLATE("Mail status"));
 	fNotification->SetTitle(string);
 	fNotification->SetMessageID("daemon_status");
 
@@ -390,7 +390,7 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 
 			fNotification->SetTitle(string.String());
 			if (fNotifyMode != B_MAIL_SHOW_STATUS_WINDOW_NEVER)
-				be_roster->Notify(*fNotification);
+				fNotification->Send();
 			break;
 		}
 

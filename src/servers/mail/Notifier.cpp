@@ -42,7 +42,7 @@ DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
 		// Two windows for each acocunt : one for sending and the other for
 		// receiving mails
 	fNotification.SetMessageID(identifier);
-	fNotification.SetApplication(B_TRANSLATE("Mail Status"));
+	fNotification.SetGroup(B_TRANSLATE("Mail Status"));
 	fNotification.SetTitle(desc);
 
 	app_info info;
@@ -127,7 +127,7 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 
 	if ((!fIsInbound && fShowMode | B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING)
 		|| (fIsInbound && fShowMode | B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE))
-		be_roster->Notify(fNotification, timeout);
+		fNotification.Send(timeout);
 }
 
 
@@ -137,5 +137,5 @@ DefaultNotifier::ResetProgress(const char* message)
 	fNotification.SetProgress(0);
 	if (message != NULL)
 		fNotification.SetTitle(message);
-	be_roster->Notify(fNotification, 0);
+	fNotification.Send(0);
 }

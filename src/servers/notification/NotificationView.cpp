@@ -13,27 +13,15 @@
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  */
 
-#include <stdlib.h>
-
 #include <ControlLook.h>
-#include <Font.h>
-#include <IconUtils.h>
+#include <LayoutUtils.h>
 #include <Messenger.h>
-#include <Picture.h>
-#include <PropertyInfo.h>
-#include <Region.h>
-#include <Resources.h>
+#include <Path.h>
 #include <Roster.h>
 #include <StatusBar.h>
-#include <StringView.h>
-#include <TranslationUtils.h>
 
 #include "NotificationView.h"
 #include "NotificationWindow.h"
-
-const char* kSmallIconAttribute	= "BEOS:M:STD_ICON";
-const char* kLargeIconAttribute	= "BEOS:L:STD_ICON";
-const char* kIconAttribute		= "BEOS:ICON";
 
 static const int kIconStripeWidth = 32;
 
@@ -55,46 +43,25 @@ property_info message_prop_list[] = {
 
 
 NotificationView::NotificationView(NotificationWindow* win,
-	notification_type type, const char* app, const char* title, const char* text,
-	BMessage* details)
+	BNotification* notification, bigtime_t timeout)
 	:
-	BView(BRect(0, 0, win->ViewWidth(), 1), "NotificationView",
-		B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+	BView("NotificationView", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
 		| B_FRAME_EVENTS),
 	fParent(win),
-	fType(type),
+	fNotification(notification),
+	fTimeout(timeout),
 	fRunner(NULL),
-	fProgress(0.0f),
-	fMessageID(""),
-	fDetails(details),
-	fBitmap(NULL),
-	fIsFirst(false),
-	fIsLast(false)
+	fBitmap(NULL)
 {
-	BMessage iconMsg;
-	if (fDetails->FindMessage("icon", &iconMsg) == B_OK)
-		fBitmap = new BBitmap(&iconMsg);
+	if (fNotification->Icon() != NULL)
+		fBitmap = new BBitmap(fNotification->Icon());
 
-	if (!fBitmap)
-		_LoadIcon();
+	if (fTimeout <= 0)
+		fTimeout = fParent->Timeout() * 1000000;
 
-	const char* messageID = NULL;
-	if (fDetails->FindString("messageID", &messageID) == B_OK)
-		fMessageID = messageID;
+	SetText();
 
-	if (fDetails->FindFloat("progress", &fProgress) != B_OK)
-		fProgress = 0.0f;
-
-	// Progress is between 0 and 1
-	if (fProgress < 0.0f)
-		fProgress = 0.0f;
-	if (fProgress > 1.0f)
-		fProgress = 1.0f;
-
-	SetText(app, title, text);
-	ResizeToPreferred();
-
-	switch (type) {
+	switch (fNotification->Type()) {
 		case B_IMPORTANT_NOTIFICATION:
 			SetViewColor(255, 255, 255);
 			SetLowColor(255, 255, 255);
@@ -110,18 +77,18 @@ NotificationView::NotificationView(NotificationWindow* win,
 			BStatusBar* progress = new BStatusBar(frame, "progress");
 			progress->SetBarHeight(12.0f);
 			progress->SetMaxValue(1.0f);
-			progress->Update(fProgress);
+			progress->Update(fNotification->Progress());
 			
 			BString label = "";
-			label << (int)(fProgress * 100) << " %";
+			label << (int)(fNotification->Progress() * 100) << " %";
 			progress->SetTrailingText(label);
 			
 			AddChild(progress);
 		}
+		// fall through
 		default:
 			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			break;
 	}
 }
 
@@ -129,8 +96,8 @@ NotificationView::NotificationView(NotificationWindow* win,
 NotificationView::~NotificationView()
 {
 	delete fRunner;
-	delete fDetails;
 	delete fBitmap;
+	delete fNotification;
 
 	LineInfoList::iterator lIt;
 	for (lIt = fLines.begin(); lIt != fLines.end(); lIt++)
@@ -143,13 +110,8 @@ NotificationView::AttachedToWindow()
 {
 	BMessage msg(kRemoveView);
 	msg.AddPointer("view", this);
-	bigtime_t timeout = -1;
 
-	if (fDetails->FindInt64("timeout", &timeout) != B_OK)
-		timeout = fParent->Timeout() * 1000000;
-
-	if (timeout > 0)
-		fRunner = new BMessageRunner(BMessenger(Parent()), &msg, timeout, 1);
+	fRunner = new BMessageRunner(BMessenger(Parent()), &msg, fTimeout, 1);
 }
 
 
@@ -171,19 +133,19 @@ NotificationView::MessageReceived(BMessage* msg)
 
 			if (msgOkay) {
 				if (strcmp(property, "type") == 0)
-					reply.AddInt32("result", fType);
+					reply.AddInt32("result", fNotification->Type());
 
-				if (strcmp(property, "app") == 0)
-					reply.AddString("result", fApp);
+				if (strcmp(property, "group") == 0)
+					reply.AddString("result", fNotification->Group());
 
 				if (strcmp(property, "title") == 0)
-					reply.AddString("result", fTitle);
+					reply.AddString("result", fNotification->Title());
 
 				if (strcmp(property, "content") == 0)
-					reply.AddString("result", fText);
+					reply.AddString("result", fNotification->Content());
 
 				if (strcmp(property, "progress") == 0)
-					reply.AddFloat("result", fProgress);
+					reply.AddFloat("result", fNotification->Progress());
 
 				if ((strcmp(property, "icon") == 0) && fBitmap) {
 					BMessage archive;
@@ -213,14 +175,19 @@ NotificationView::MessageReceived(BMessage* msg)
 				msgOkay = false;
 
 			if (msgOkay) {
-				if (strcmp(property, "app") == 0)
-					msg->FindString("data", &fApp);
+				const char* value = NULL;
+
+				if (strcmp(property, "group") == 0)
+					if (msg->FindString("data", &value) == B_OK)
+						fNotification->SetGroup(value);
 
 				if (strcmp(property, "title") == 0)
-					msg->FindString("data", &fTitle);
+					if (msg->FindString("data", &value) == B_OK)
+						fNotification->SetTitle(value);
 
 				if (strcmp(property, "content") == 0)
-					msg->FindString("data", &fText);
+					if (msg->FindString("data", &value) == B_OK)
+						fNotification->SetContent(value);
 
 				if (strcmp(property, "icon") == 0) {
 					BMessage archive;
@@ -230,7 +197,7 @@ NotificationView::MessageReceived(BMessage* msg)
 					}
 				}
 
-				SetText(Application(), Title(), Text());
+				SetText();
 				Invalidate();
 
 				reply.AddInt32("error", B_OK);
@@ -242,29 +209,8 @@ NotificationView::MessageReceived(BMessage* msg)
 			msg->SendReply(&reply);
 			break;
 		}
-		case kRemoveView:
-		{
-			BMessage remove(kRemoveView);
-			remove.AddPointer("view", this);
-			BMessenger msgr(Window());
-			msgr.SendMessage( &remove );
-			break;
-		}
 		default:
 			BView::MessageReceived(msg);
-	}
-}
-
-
-void
-NotificationView::GetPreferredSize(float* w, float* h)
-{
-	*w = fParent->ViewWidth();
-	*h = fHeight;
-
-	if (fType == B_PROGRESS_NOTIFICATION) {
-		*h += 16 + kEdgePadding;
-			// 16 is progress bar default size as stated in the BeBook
 	}
 }
 
@@ -295,7 +241,7 @@ NotificationView::Draw(BRect updateRect)
 		float iy = (Bounds().Height() - iconSize) / 4.0;
 			// Icon is vertically centered in view
 
-		if (fType == B_PROGRESS_NOTIFICATION)
+		if (fNotification->Type() == B_PROGRESS_NOTIFICATION)
 		{
 			// Move icon up by half progress bar height if it's present
 			iy -= (progRect.Height() + kEdgePadding);
@@ -363,46 +309,44 @@ NotificationView::MouseDown(BPoint point)
 				BList messages;
 				entry_ref ref;
 
-				if (fDetails->FindString("onClickApp", &launchString) == B_OK)
-					if (be_roster->FindApp(launchString.String(), &appRef) == B_OK)
-						useArgv = true;
-				if (fDetails->FindRef("onClickFile", &launchRef) == B_OK) {
-					if (be_roster->FindApp(&launchRef, &appRef) == B_OK)
-						useArgv = true;
+				if (fNotification->OnClickApp() != NULL
+					&& be_roster->FindApp(fNotification->OnClickApp(), &appRef)
+				   		== B_OK) {
+					useArgv = true;
 				}
 
-				if (fDetails->FindRef("onClickRef", &ref) == B_OK) {
-					for (int32 i = 0; fDetails->FindRef("onClickRef", i, &ref) == B_OK; i++)
-						refMsg.AddRef("refs", &ref);
-
-					messages.AddItem((void*)&refMsg);
+				if (fNotification->OnClickFile() != NULL
+					&& be_roster->FindApp(
+							(entry_ref*)fNotification->OnClickFile(), &appRef)
+				   		== B_OK) {
+					useArgv = true;
 				}
+
+				for (int32 i = 0; i < fNotification->CountOnClickRefs(); i++)
+					refMsg.AddRef("refs", fNotification->OnClickRefAt(i));
+				messages.AddItem((void*)&refMsg);
 
 				if (useArgv) {
-					type_code type;
-					int32 argc = 0;
+					int32 argc = fNotification->CountOnClickArgs() + 1;
 					BString arg;
 
 					BPath p(&appRef);
 					argMsg.AddString("argv", p.Path());
 
-					fDetails->GetInfo("onClickArgv", &type, &argc);
-					argMsg.AddInt32("argc", argc + 1);
+					argMsg.AddInt32("argc", argc);
 
-					for (int32 i = 0; fDetails->FindString("onClickArgv", i, &arg) == B_OK; i++)
-						argMsg.AddString("argv", arg);
+					for (int32 i = 0; i < argc - 1; i++) {
+						argMsg.AddString("argv",
+							fNotification->OnClickArgAt(i));
+					}
 
 					messages.AddItem((void*)&argMsg);
 				}
 
-				BMessage tmp;
-				for (int32 i = 0; fDetails->FindMessage("onClickMsg", i, &tmp) == B_OK; i++)
-					messages.AddItem((void*)&tmp);
-
-				if (fDetails->FindString("onClickApp", &launchString) == B_OK)
-					be_roster->Launch(launchString.String(), &messages);
+				if (fNotification->OnClickApp() != NULL)
+					be_roster->Launch(fNotification->OnClickApp(), &messages);
 				else
-					be_roster->Launch(&launchRef, &messages);
+					be_roster->Launch(fNotification->OnClickFile(), &messages);
 			}
 
 			// Remove the info view after a click
@@ -417,15 +361,31 @@ NotificationView::MouseDown(BPoint point)
 }
 
 
-void
-NotificationView::FrameResized( float w, float /*h*/)
+BSize
+NotificationView::MinSize()
 {
-	SetText(Application(), Title(), Text());
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _CalculateSize());
+}
+
+
+BSize
+NotificationView::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), _CalculateSize());
+}
+
+
+BSize
+NotificationView::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		_CalculateSize());
 }
 
 
 BHandler*
-NotificationView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec, int32 form, const char* prop)
+NotificationView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
+	int32 form, const char* prop)
 {
 	BPropertyInfo prop_info(message_prop_list);
 	if (prop_info.FindMatch(msg, index, spec, form, prop) >= 0) {
@@ -447,30 +407,8 @@ NotificationView::GetSupportedSuites(BMessage* msg)
 }
 
 
-const char*
-NotificationView::Application() const
-{
-	return fApp.Length() > 0 ? fApp.String() : NULL;
-}
-
-
-const char*
-NotificationView::Title() const
-{
-	return fTitle.Length() > 0 ? fTitle.String() : NULL;
-}
-
-
-const char*
-NotificationView::Text() const
-{
-	return fText.Length() > 0 ? fText.String() : NULL;
-}
-
-
 void
-NotificationView::SetText(const char* app, const char* title, const char* text,
-	float newMaxWidth)
+NotificationView::SetText(float newMaxWidth)
 {
 	if (newMaxWidth < 0)
 		newMaxWidth = Bounds().Width() - (kEdgePadding * 2);
@@ -480,10 +418,6 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 	for (lIt = fLines.begin(); lIt != fLines.end(); lIt++)
 		delete (*lIt);
 	fLines.clear();
-
-	fApp = app;
-	fTitle = title;
-	fText = text;
 
 	float iconRight = kIconStripeWidth;
 	if (fBitmap != NULL)
@@ -499,7 +433,7 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 
 	// Title
 	LineInfo* titleLine = new LineInfo;
-	titleLine->text = fTitle;
+	titleLine->text = fNotification->Title();
 	titleLine->font = *be_bold_font;
 
 	titleLine->location = BPoint(iconRight, y);
@@ -514,7 +448,7 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 
 	// Split text into chunks between certain characters and compose the lines.
 	const char kSeparatorCharacters[] = " \n-\\/";
-	BString textBuffer = fText;
+	BString textBuffer = fNotification->Content();
 	textBuffer.ReplaceAll("\t", "    ");
 	const char* chunkStart = textBuffer.String();
 	float maxWidth = newMaxWidth - kEdgePadding - iconRight;
@@ -523,8 +457,7 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 	while (chunkStart - textBuffer.String() < length) {
 		size_t chunkLength = strcspn(chunkStart, kSeparatorCharacters) + 1;
 
-		// Start a new line if either we didn't start one before,
-		// the current offset
+		// Start a new line if we didn't start one before
 		BString tempText;
 		if (line != NULL)
 			tempText.SetTo(line->text);
@@ -539,20 +472,21 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 			fLines.push_front(line);
 			y += fontHeight;
 
-			// Skip the eventual new-line character at the beginning of this
-			// chunk.
+			// Skip the eventual new-line character at the beginning of this chunk
 			if (chunkStart[0] == '\n') {
 				chunkStart++;
 				chunkLength--;
 			}
-			// Skip more new-line characters and move the line further down.
+
+			// Skip more new-line characters and move the line further down
 			while (chunkStart[0] == '\n') {
 				chunkStart++;
 				chunkLength--;
 				line->location.y += fontHeight;
 				y += fontHeight;
 			}
-			// Strip space at beginning of a new line.
+
+			// Strip space at beginning of a new line
 			while (chunkStart[0] == ' ') {
 				chunkLength--;
 				chunkStart++;
@@ -563,7 +497,7 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 			break;
 
 		// Append the chunk to the current line, which was either a new
-		// line or the one from the previous iteration.
+		// line or the one from the previous iteration
 		line->text.Append(chunkStart, chunkLength);
 
 		chunkStart += chunkLength;
@@ -573,130 +507,36 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 
 	// Make sure icon fits
 	if (fBitmap != NULL) {
-		float minHeight = 0;
-		if (fParent->Layout() == TitleAboveIcon) {
-			LineInfo* appLine = fLines.back();
-			font_height fh;
-			appLine->font.GetHeight(&fh);
-			minHeight = appLine->location.y + fh.descent;
-		}
+		float minHeight = fBitmap->Bounds().Height() + 2 * kEdgePadding;
 
-		minHeight += fBitmap->Bounds().Height() + 2 * kEdgePadding;
 		if (fHeight < minHeight)
 			fHeight = minHeight;
 	}
-
-	BMessenger messenger(Parent());
-	messenger.SendMessage(kResizeToFit);
-}
-
-
-bool
-NotificationView::HasMessageID(const char* id)
-{
-	return fMessageID == id;
 }
 
 
 const char*
-NotificationView::MessageID()
+NotificationView::MessageID() const
 {
-	return fMessageID.String();
+	return fNotification->MessageID();
 }
 
 
-void
-NotificationView::SetPosition(bool first, bool last)
+BSize
+NotificationView::_CalculateSize()
 {
-	fIsFirst = first;
-	fIsLast = last;
-}
+	BSize size;
 
+	// Parent width, minus the edge padding, minus the pensize
+	size.width = fParent->Width() - (kEdgePadding * 2) - (kPenSize * 2);
+	size.height = fHeight;
 
-BBitmap*
-NotificationView::_ReadNodeIcon(const char* fileName, icon_size size)
-{
-	BEntry entry(fileName, true);
-
-	entry_ref ref;
-	entry.GetRef(&ref);
-
-	BNode node(BPath(&ref).Path());
-
-	BBitmap* ret = new BBitmap(BRect(0, 0, (float)size - 1, (float)size - 1), B_RGBA32);
-	if (BIconUtils::GetIcon(&node, kIconAttribute, kSmallIconAttribute,
-		kLargeIconAttribute, size, ret) != B_OK) {
-		delete ret;
-		ret = NULL;
+	if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {
+		font_height fh;
+		be_plain_font->GetHeight(&fh);
+		float fontHeight = fh.ascent + fh.descent + fh.leading;
+		size.height += (kSmallPadding * 2) + (kEdgePadding * 1) + fontHeight;
 	}
 
-	return ret;
-}
-
-
-void
-NotificationView::_LoadIcon()
-{
-	// First try to get the icon from the caller application
-	app_info info;
-	BMessenger msgr = fDetails->ReturnAddress();
-
-	if (msgr.IsValid())
-		be_roster->GetRunningAppInfo(msgr.Team(), &info);
-	else if (fType == B_PROGRESS_NOTIFICATION)
-		be_roster->GetAppInfo("application/x-vnd.Haiku-notification_server",
-			&info);
-
-	BPath path;
-	path.SetTo(&info.ref);
-
-	fBitmap = _ReadNodeIcon(path.Path(), fParent->IconSize());
-	if (fBitmap)
-		return;
-
-	// If that failed get icons from app_server
-	if (find_directory(B_BEOS_SERVERS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append("app_server");
-
-	BFile file(path.Path(), B_READ_ONLY);
-	if (file.InitCheck() != B_OK)
-		return;
-
-	BResources res(&file);
-	if (res.InitCheck() != B_OK)
-		return;
-
-	// Which one should we choose?
-	const char* iconName = "";
-	switch (fType) {
-		case B_INFORMATION_NOTIFICATION:
-			iconName = "info";
-			break;
-		case B_ERROR_NOTIFICATION:
-			iconName = "stop";
-			break;
-		case B_IMPORTANT_NOTIFICATION:
-			iconName = "warn";
-			break;
-		default:
-			return;
-	}
-
-	// Allocate the bitmap
-	fBitmap = new BBitmap(BRect(0, 0, (float)B_LARGE_ICON - 1,
-		(float)B_LARGE_ICON - 1), B_RGBA32);
-	if (!fBitmap || fBitmap->InitCheck() != B_OK) {
-		fBitmap = NULL;
-		return;
-	}
-
-	// Load raw icon data
-	size_t size = 0;
-	const uint8* data = (const uint8*)res.LoadResource(B_VECTOR_ICON_TYPE,
-		iconName, &size);
-	if ((data == NULL
-		|| BIconUtils::GetVectorIcon(data, size, fBitmap) != B_OK))
-		fBitmap = NULL;
+	return size;
 }

@@ -19,15 +19,17 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
-#include <Debug.h>
 #include <File.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <Layout.h>
 #include <NodeMonitor.h>
+#include <Path.h>
 #include <PropertyInfo.h>
 #include <private/interface/WindowPrivate.h>
 
 #include "AppGroupView.h"
 #include "AppUsage.h"
-#include "BorderView.h"
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "NotificationWindow"
@@ -54,23 +56,19 @@ const float kSmallPadding			= 2;
 
 NotificationWindow::NotificationWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_MARK("Notification"), 
+	BWindow(BRect(0, 0, -1, -1), B_TRANSLATE_MARK("Notification"), 
 		B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL, B_AVOID_FRONT
 		| B_AVOID_FOCUS | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
-		| B_NOT_RESIZABLE | B_NOT_MOVABLE, 
+		| B_NOT_RESIZABLE | B_NOT_MOVABLE | B_AUTO_UPDATE_SIZE_LIMITS, 
 		B_ALL_WORKSPACES)
 {
-	fBorder = new BorderView(Bounds(), "Notification");
+	SetLayout(new BGroupLayout(B_VERTICAL, 10));
 
-	AddChild(fBorder);
-	
-	// Needed so everything gets the right size - we should switch to layout
-	// mode...
-	Show();
 	Hide();
+	Show();
 
-	LoadSettings(true);
-	LoadAppFilters(true);
+	_LoadSettings(true);
+	_LoadAppFilters(true);
 }
 
 
@@ -101,7 +99,7 @@ NotificationWindow::WorkspaceActivated(int32 /*workspace*/, bool active)
 {
 	// Ensure window is in the correct position
 	if (active)
-		ResizeAll();
+		_ResizeAll();
 }
 
 
@@ -111,13 +109,10 @@ NotificationWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_NODE_MONITOR:
 		{
-			LoadSettings();
-			LoadAppFilters();
+			_LoadSettings();
+			_LoadAppFilters();
 			break;
 		}
-		case kResizeToFit:
-			ResizeAll();
-			break;
 		case B_COUNT_PROPERTIES:
 		{
 			BMessage reply(B_REPLY);
@@ -145,60 +140,55 @@ NotificationWindow::MessageReceived(BMessage* message)
 		case B_CREATE_PROPERTY:
 		case kNotificationMessage:
 		{
-			int32 type;
-			const char* content = NULL;
-			const char* title = NULL;
-			const char* app = NULL;
 			BMessage reply(B_REPLY);
-			bool messageOkay = true;
+			BNotification* notification = new BNotification(message);
 
-			if (message->FindInt32("type", &type) != B_OK)
-				type = B_INFORMATION_NOTIFICATION;
-			if (message->FindString("content", &content) != B_OK)
-				messageOkay = false;
-			if (message->FindString("title", &title) != B_OK)
-				messageOkay = false;
-			if (message->FindString("app", &app) != B_OK
-				&& message->FindString("appTitle", &app) != B_OK)
-				messageOkay = false;
+			if (notification->InitCheck() == B_OK) {
+				bigtime_t timeout;
+				if (message->FindInt64("timeout", &timeout) != B_OK)
+					timeout = -1;
+				BMessenger messenger = message->ReturnAddress();
+				app_info info;
 
-			if (messageOkay) {
+				if (messenger.IsValid())
+					be_roster->GetRunningAppInfo(messenger.Team(), &info);
+				else
+					be_roster->GetAppInfo("application/x-vnd.Be-SHEL", &info);
+
 				NotificationView* view = new NotificationView(this,
-					(notification_type)type, app, title, content,
-					new BMessage(*message));
+					notification, timeout);
 
-				appfilter_t::iterator fIt = fAppFilters.find(app);
 				bool allow = false;
-				if (fIt == fAppFilters.end()) {
-					app_info info;
-					BMessenger messenger = message->ReturnAddress();
-					if (messenger.IsValid())
-						be_roster->GetRunningAppInfo(messenger.Team(), &info);
-					else
-						be_roster->GetAppInfo("application/x-vnd.Be-SHEL", &info);
+				appfilter_t::iterator it = fAppFilters.find(info.signature);
 
-					AppUsage* appUsage = new AppUsage(info.ref, app, true);
-					fAppFilters[app] = appUsage;
+				if (it == fAppFilters.end()) {
+					AppUsage* appUsage = new AppUsage(notification->Group(),
+						true);
 
-					appUsage->Allowed(title, (notification_type)type);
-
+					appUsage->Allowed(notification->Title(),
+							notification->Type());
+					fAppFilters[info.signature] = appUsage;
 					allow = true;
-				} else
-					allow = fIt->second->Allowed(title, (notification_type)type);
+				} else {
+					allow = it->second->Allowed(notification->Title(),
+						notification->Type());
+				}
 
 				if (allow) {
-					appview_t::iterator aIt = fAppViews.find(app);
+					BString groupName(notification->Group());
+					appview_t::iterator aIt = fAppViews.find(groupName);
 					AppGroupView* group = NULL;
 					if (aIt == fAppViews.end()) {
-						group = new AppGroupView(this, app);
-						fAppViews[app] = group;
-						fBorder->AddChild(group);
+						group = new AppGroupView(this,
+							groupName == "" ? NULL : groupName.String());
+						fAppViews[groupName] = group;
+						GetLayout()->AddView(group);
 					} else
 						group = aIt->second;
 
 					group->AddInfo(view);
 
-					ResizeAll();
+					_ResizeAll();
 
 					reply.AddInt32("error", B_OK);
 				} else
@@ -213,22 +203,16 @@ NotificationWindow::MessageReceived(BMessage* message)
 		}
 		case kRemoveView:
 		{
-			void* _ptr;
-			message->FindPointer("view", &_ptr);
+			NotificationView* view = NULL;
+			if (message->FindPointer("view", (void**)&view) != B_OK)
+				return;
 
-			NotificationView* info
-				= reinterpret_cast<NotificationView*>(_ptr);
+			views_t::iterator it = find(fViews.begin(), fViews.end(), view);
 
-			fBorder->RemoveChild(info);
+			if (it != fViews.end())
+				fViews.erase(it);
 
-			std::vector<NotificationView*>::iterator i
-				= find(fViews.begin(), fViews.end(), info);
-			if (i != fViews.end())
-				fViews.erase(i);
-
-			delete info;
-
-			ResizeAll();
+			_ResizeAll();
 			break;
 		}
 		default:
@@ -297,22 +281,15 @@ NotificationWindow::Timeout()
 }
 
 
-infoview_layout
-NotificationWindow::Layout()
-{
-	return fLayout;
-}
-
-
 float
-NotificationWindow::ViewWidth()
+NotificationWindow::Width()
 {
 	return fWidth;
 }
 
 
 void
-NotificationWindow::ResizeAll()
+NotificationWindow::_ResizeAll()
 {
 	if (fAppViews.empty()) {
 		if (!IsHidden())
@@ -365,7 +342,7 @@ NotificationWindow::ResizeAll()
 		}
 	}
 
-	ResizeTo(ViewWidth(), height);
+	ResizeTo(Width(), height);
 	PopupAnimation();
 }
 
@@ -429,14 +406,14 @@ NotificationWindow::PopupAnimation()
 {
 	SetPosition();
 
-	if (IsHidden() && fViews.size() != 0)
+	if (IsHidden())
 		Show();
 	// Activate();// it hides floaters from apps :-(
 }
 
 
 void
-NotificationWindow::LoadSettings(bool startMonitor)
+NotificationWindow::_LoadSettings(bool startMonitor)
 {
 	_LoadGeneralSettings(startMonitor);
 	_LoadDisplaySettings(startMonitor);
@@ -444,7 +421,7 @@ NotificationWindow::LoadSettings(bool startMonitor)
 
 
 void
-NotificationWindow::LoadAppFilters(bool startMonitor)
+NotificationWindow::_LoadAppFilters(bool startMonitor)
 {
 	BPath path;
 
@@ -491,7 +468,7 @@ NotificationWindow::LoadAppFilters(bool startMonitor)
 
 
 void
-NotificationWindow::SaveAppFilters()
+NotificationWindow::_SaveAppFilters()
 {
 	BPath path;
 
@@ -543,7 +520,6 @@ NotificationWindow::_LoadGeneralSettings(bool startMonitor)
 	views_t::iterator it;
 	for (it = fViews.begin(); it != fViews.end(); ++it) {
 		NotificationView* view = (*it);
-		view->SetText(view->Application(), view->Title(), view->Text());
 		view->Invalidate();
 	}
 
@@ -589,26 +565,10 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 	else
 		fIconSize = (icon_size)setting;
 
-	if (settings.FindInt32(kLayoutName, &setting) != B_OK)
-		fLayout = kDefaultLayout;
-	else {
-		switch (setting) {
-			case 0:
-				fLayout = TitleAboveIcon;
-				break;
-			case 1:
-				fLayout = AllTextRightOfIcon;
-				break;
-			default:
-				fLayout = kDefaultLayout;
-		}
-	}
-
 	// Notify the view about the change
 	views_t::iterator it;
 	for (it = fViews.begin(); it != fViews.end(); ++it) {
 		NotificationView* view = (*it);
-		view->SetText(view->Application(), view->Title(), view->Text());
 		view->Invalidate();
 	}
 

@@ -27,9 +27,8 @@ AppUsage::AppUsage()
 }
 
 
-AppUsage::AppUsage(entry_ref ref, const char* name, bool allow)
+AppUsage::AppUsage(const char* name, bool allow)
 	:
-	fRef(ref),
 	fName(name),
 	fAllow(allow)
 {	
@@ -38,7 +37,7 @@ AppUsage::AppUsage(entry_ref ref, const char* name, bool allow)
 
 AppUsage::~AppUsage()
 {
-	notify_t::iterator nIt;
+	notification_t::iterator nIt;
 	for (nIt = fNotifications.begin(); nIt != fNotifications.end(); nIt++)
 		delete nIt->second;
 }
@@ -55,13 +54,12 @@ status_t
 AppUsage::Flatten(void* buffer, ssize_t numBytes) const
 {
 	BMessage msg;
-	msg.AddString("app_name", fName);
-	msg.AddRef("app_ref", &fRef);
-	msg.AddBool("app_allow", fAllow);
+	msg.AddString("signature", fName);
+	msg.AddBool("allow", fAllow);
 
-	notify_t::const_iterator nIt;
+	notification_t::const_iterator nIt;
 	for (nIt = fNotifications.begin(); nIt != fNotifications.end(); nIt++)
-		msg.AddFlat("notify", nIt->second);
+		msg.AddFlat("notification", nIt->second);
 
 	if (numBytes < msg.FlattenedSize())
 		return B_ERROR;
@@ -74,13 +72,12 @@ ssize_t
 AppUsage::FlattenedSize() const
 {
 	BMessage msg;
-	msg.AddString("app_name", fName);
-	msg.AddRef("app_ref", &fRef);
-	msg.AddBool("app_allow", fAllow);
+	msg.AddString("signature", fName);
+	msg.AddBool("allow", fAllow);
 
-	notify_t::const_iterator nIt;
+	notification_t::const_iterator nIt;
 	for (nIt = fNotifications.begin(); nIt != fNotifications.end(); nIt++)
-		msg.AddFlat("notify", nIt->second);
+		msg.AddFlat("notification", nIt->second);
 
 	return msg.FlattenedSize();
 }
@@ -113,21 +110,20 @@ AppUsage::Unflatten(type_code code, const void* buffer,
 	status = msg.Unflatten((const char*)buffer);
 
 	if (status == B_OK) {
-		msg.FindString("app_name", &fName);
-		msg.FindRef("app_ref", &fRef);
-		msg.FindBool("app_allow", &fAllow);
+		msg.FindString("signature", &fName);
+		msg.FindBool("allow", &fAllow);
 
 		type_code type;
 		int32 count = 0;
 
-		status = msg.GetInfo("notify", &type, &count);
+		status = msg.GetInfo("notification", &type, &count);
 		if (status != B_OK)
 			return status;
 
 		for (int32 i = 0; i < count; i++) {
-			NotificationReceived *notify = new NotificationReceived();
-			msg.FindFlat("notify", i, notify);
-			fNotifications[notify->Title()] = notify;
+			NotificationReceived *notification = new NotificationReceived();
+			msg.FindFlat("notification", i, notification);
+			fNotifications[notification->Title()] = notification;
 		}
 
 		status = B_OK;
@@ -137,13 +133,6 @@ AppUsage::Unflatten(type_code code, const void* buffer,
 }
 
 						
-entry_ref
-AppUsage::Ref()
-{
-	return fRef;
-}
-
-
 const char*
 AppUsage::Name()
 {
@@ -157,7 +146,7 @@ AppUsage::Allowed(const char* title, notification_type type)
 	bool allowed = fAllow;
 
 	if (allowed) {
-		notify_t::iterator nIt = fNotifications.find(title);
+		notification_t::iterator nIt = fNotifications.find(title);
 		if (nIt == fNotifications.end()) {
 			allowed = true;		
 			fNotifications[title] = new NotificationReceived(title, type);
@@ -182,7 +171,7 @@ AppUsage::Allowed()
 NotificationReceived*
 AppUsage::NotificationAt(int32 index)
 {
-	notify_t::iterator nIt = fNotifications.begin();
+	notification_t::iterator nIt = fNotifications.begin();
 	for (int32 i = 0; i < index; i++)
 		nIt++;
 
