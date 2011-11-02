@@ -68,4 +68,30 @@ void object_cache_get_usage(object_cache* cache, size_t* _allocatedMemory);
 }
 #endif
 
+
+#ifdef __cplusplus
+
+#include <new>
+
+
+inline void*
+operator new(size_t size, ObjectCache* objectCache, uint32 flags) throw()
+{
+	return object_cache_alloc(objectCache, flags);
+}
+
+
+template<typename Type>
+inline void
+object_cache_delete(ObjectCache* objectCache, Type* object, uint32 flags = 0)
+{
+	if (object != NULL) {
+		object->~Type();
+		object_cache_free(objectCache, object, flags);
+	}
+}
+
+#endif	// __cplusplus
+
+
 #endif	/* _SLAB_SLAB_H_ */
