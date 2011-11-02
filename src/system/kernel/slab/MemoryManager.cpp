@@ -907,6 +907,36 @@ MemoryManager::AnalyzeAllocationCallers(AllocationTrackingCallback& callback)
 #endif	// SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 
 
+/*static*/ ObjectCache*
+MemoryManager::DebugObjectCacheForAddress(void* address)
+{
+	// get the area
+	addr_t areaBase = _AreaBaseAddressForAddress((addr_t)address);
+	Area* area = sAreaTable.Lookup(areaBase);
+
+	if (area == NULL)
+		return NULL;
+
+	MetaChunk* metaChunk = &area->metaChunks[
+		((addr_t)address % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
+
+	// get the chunk
+	if (metaChunk->chunkSize == 0)
+		return NULL;
+	if ((addr_t)address < metaChunk->chunkBase)
+		return NULL;
+
+	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)address);
+	Chunk* chunk = &metaChunk->chunks[chunkIndex];
+
+	addr_t reference = chunk->reference;
+	if ((reference & 1) == 0)
+		return (ObjectCache*)reference;
+
+	return NULL;
+}
+
+
 /*static*/ status_t
 MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 	uint32 flags, MetaChunk*& _metaChunk, Chunk*& _chunk)

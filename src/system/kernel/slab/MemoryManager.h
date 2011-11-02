@@ -65,6 +65,8 @@ public:
 									AllocationTrackingCallback& callback);
 #endif
 
+	static	ObjectCache*		DebugObjectCacheForAddress(void* address);
+
 private:
 			struct Tracing;
 
