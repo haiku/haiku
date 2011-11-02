@@ -32,6 +32,7 @@
 #include <MediaAddOn.h>
 #include <MediaTheme.h>
 #include <TimeSource.h>
+#include <BufferGroup.h>
 
 #include "GameProducer.h"
 #include "GameSoundBuffer.h"
@@ -271,7 +272,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 	pan[1] = fPanLeft;
 	
 	char * buffer = new char[fFrameSize * frames];
-			
+
 	FillBuffer(buffer, frames);
 	
 	switch (fFormat.format) {
@@ -533,11 +534,17 @@ SimpleSoundBuffer::FillBuffer(void * data, int64 frames)
 
 // StreamingSoundBuffer ------------------------------------------------------
 StreamingSoundBuffer::StreamingSoundBuffer(const gs_audio_format * format,
-						const void * streamHook)
+	const void * streamHook, size_t inBufferFrameCount,
+	size_t inBufferCount)
 	:
 	GameSoundBuffer(format),
 	fStreamHook(const_cast<void *>(streamHook))	
 {
+	if (inBufferFrameCount != 0 && inBufferCount  != 0) {
+		BBufferGroup *bufferGroup = new BBufferGroup(inBufferFrameCount
+				* fFrameSize, inBufferCount);
+		fNode->SetBufferGroup(fConnection->source, bufferGroup);
+	}
 }
 
 
@@ -554,4 +561,3 @@ StreamingSoundBuffer::FillBuffer(void * buffer, int64 frames)
 	size_t bytes = fFrameSize * frames;	
 	object->FillBuffer(buffer, bytes);
 }
-

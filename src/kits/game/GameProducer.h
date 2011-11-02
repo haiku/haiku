@@ -146,6 +146,7 @@ private:
 	size_t 				fFrameSize;
 	int64				fFramesSent;
 	GameSoundBuffer *	fObject;	
+	size_t				fBufferSize;
 };
 
 #endif

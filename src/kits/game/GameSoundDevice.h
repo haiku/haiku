@@ -51,7 +51,9 @@ public:
 										int64 frames);
 	virtual status_t				CreateBuffer(gs_id * sound,
 										const void * object,
-										const gs_audio_format * format);
+										const gs_audio_format * format,
+										size_t inBufferFrameCount = 0,
+										size_t inBufferCount = 0);
 	virtual void					ReleaseBuffer(gs_id sound);
 	
 	virtual status_t				Buffer(gs_id sound,
@@ -73,6 +75,7 @@ protected:
 			void					SetInitError(status_t error);
 				
 			gs_audio_format			fFormat;											
+
 private:
 			int32					AllocateSound();
 			

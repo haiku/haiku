@@ -106,7 +106,8 @@ BStreamingGameSound::SetParameters(size_t inBufferFrameCount,
 						  size_t inBufferCount)
 {
 	gs_id sound;
-	status_t error = Device()->CreateBuffer(&sound, this, format);
+	status_t error = Device()->CreateBuffer(&sound, this, format,
+		inBufferFrameCount, inBufferCount);
 	if (error != B_OK) return error;
 	
 	return BGameSound::Init(sound);

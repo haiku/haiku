@@ -161,7 +161,8 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 
 status_t
 BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object, 
-	const gs_audio_format* format)
+	const gs_audio_format* format, size_t inBufferFrameCount,
+	size_t inBufferCount)
 {
 	if (!object || !sound)
 		return B_BAD_VALUE;
@@ -172,7 +173,8 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object,
 	if (position >= 0) {
 		media_node systemMixer;
 		BMediaRoster::Roster()->GetAudioMixer(&systemMixer);
-		fSounds[position] = new StreamingSoundBuffer(format, object);
+		fSounds[position] = new StreamingSoundBuffer(format, object,
+			inBufferFrameCount, inBufferCount);
 		err = fSounds[position]->Connect(&systemMixer);
 	}
 
