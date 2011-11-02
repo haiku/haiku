@@ -30,23 +30,19 @@ public:
 	virtual	status_t			WriteTo(BMessage& archive) const;
 	virtual TeamUISettings*		Clone() const;
 
-			status_t			AddSetting(Setting* setting);
-			bool				SetValue(const Setting* setting,
+			bool				SetValue(const char* settingID,
 									const BVariant& value);
-			BVariant			Value(const Setting* setting) const;
-			BVariant			Value(const char* settingID) const;
+			status_t			Value(const char* settingID,
+									BVariant& value) const;
 
 			GUITeamUISettings&	operator=(const GUITeamUISettings& other);
 									// throws std::bad_alloc
 
 private:
-			typedef BObjectList<Setting> SettingsList;
-private:
 
 			status_t			_SetTo(const GUITeamUISettings& other);
 			void				_Unset();
 
-			SettingsList		fSettings;
 			BMessage			fValues;
 			BString				fID;
 };

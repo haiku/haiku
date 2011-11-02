@@ -379,8 +379,6 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 	}
 
-	Activate();
-
 	// if requested, stop the given thread
 	if (threadID >= 0) {
 		if (stopInMain) {
@@ -548,6 +546,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 		case MSG_LOAD_SETTINGS:
 			_LoadSettings();
+			Activate();
 			break;
 
 		default:

@@ -30,6 +30,7 @@
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "FileSourceCode.h"
+#include "GUITeamUISettings.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "InspectorWindow.h"
@@ -331,6 +332,30 @@ bool
 TeamWindow::QuitRequested()
 {
 	return fListener->UserInterfaceQuitRequested();
+}
+
+
+status_t
+TeamWindow::LoadSettings(const GUITeamUISettings* settings)
+{
+	BVariant value;
+	status_t result = settings->Value("teamWindowFrame", value);
+	if (result == B_OK) {
+		BRect rect = value.ToRect();
+		ResizeTo(rect.Width(), rect.Height());
+		MoveTo(rect.left, rect.top);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+TeamWindow::SaveSettings(GUITeamUISettings* settings)
+{
+	status_t error = settings->SetValue("teamWindowFrame", Frame());
+
+	return error;
 }
 
 

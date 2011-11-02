@@ -26,6 +26,7 @@ class BButton;
 class BMenuBar;
 class BStringView;
 class BTabView;
+class GUITeamUISettings;
 class Image;
 class InspectorWindow;
 class RegistersView;
@@ -54,6 +55,12 @@ public:
 									BHandler* handler);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
+
+			status_t			LoadSettings(
+									const GUITeamUISettings* settings);
+			status_t			SaveSettings(
+									GUITeamUISettings* settings);
+
 
 private:
 	enum ActiveSourceObject {

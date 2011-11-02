@@ -41,6 +41,10 @@ GraphicalUserInterface::Init(Team* team, UserInterfaceListener* listener)
 	try {
 		fTeamWindow = TeamWindow::Create(team, listener);
 		fTeamWindowMessenger = new BMessenger(fTeamWindow);
+
+		// start the message loop
+		fTeamWindow->Hide();
+		fTeamWindow->Show();
 	} catch (...) {
 		// TODO: Notify the user!
 		ERROR("Error: Failed to create team window!\n");
@@ -70,9 +74,9 @@ GraphicalUserInterface::Terminate()
 status_t
 GraphicalUserInterface::LoadSettings(const TeamUISettings* settings)
 {
-	// TODO: restore settings
+	status_t result = fTeamWindow->LoadSettings((GUITeamUISettings*)settings);
 
-	return B_OK;
+	return result;
 }
 
 
@@ -83,7 +87,7 @@ GraphicalUserInterface::SaveSettings(TeamUISettings*& settings) const
 	if (settings == NULL)
 		return B_NO_MEMORY;
 
-	// TODO: fill in settings
+	fTeamWindow->SaveSettings((GUITeamUISettings*)settings);
 
 	return B_OK;
 }
