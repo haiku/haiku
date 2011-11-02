@@ -246,7 +246,7 @@ BVariant::BVariant(double value)
 
 BVariant::BVariant(const BRect& value)
 {
-	_SetTo(value);
+	_SetTo(value.left, value.top, value.right, value.bottom);
 }
 
 
