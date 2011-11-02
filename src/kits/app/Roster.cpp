@@ -37,8 +37,6 @@
 #include <Mime.h>
 #include <Node.h>
 #include <NodeInfo.h>
-#include <Notification.h>
-#include <notification/Notifications.h>
 #include <OS.h>
 #include <Path.h>
 #include <Query.h>
@@ -1653,83 +1651,6 @@ BRoster::AddToRecentFolders(const entry_ref* folder, const char* appSig) const
 	if (err)
 		DBG(OUT("WARNING: BRoster::AddToRecentDocuments() failed with error 0x%lx\n", err));
 }
-
-/*! \brief Sends a notification to the notification_server.
-
-	The notification is delivered asynchronously to the notification_server,
-	which will displays it according to its settings and filters.
-
-	\param notification Notification message.
-	\param timeout Seconds after the message fades out.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_BAD_PORT_ID: A connection to notification_server could not be
-	  established or the server is not up and running anymore.
-	- \c Other errors: Building the message from the notification failed.
-*/
-status_t
-BRoster::Notify(const BNotification& notification, bigtime_t timeout) const
-{
-	// TODO: Add BArchivable support to BNotification and use it here.
-	BMessage msg(kNotificationMessage);
-	status_t ret = msg.AddInt32("type", (int32)notification.Type());
-	if (ret == B_OK)
-		ret = msg.AddString("app", notification.Application());
-	if (ret == B_OK)
-		ret = msg.AddString("title", notification.Title());
-	if (ret == B_OK)
-		ret = msg.AddString("content", notification.Content());
-
-	if (ret == B_OK && notification.MessageID() != NULL)
-		ret = msg.AddString("messageID", notification.MessageID());
-
-	if (ret == B_OK && notification.Type() == B_PROGRESS_NOTIFICATION)
-		ret = msg.AddFloat("progress", notification.Progress());
-
-	if (ret == B_OK && notification.OnClickApp() != NULL)
-		ret = msg.AddString("onClickApp", notification.OnClickApp());
-	if (ret == B_OK && notification.OnClickFile() != NULL)
-		ret = msg.AddRef("onClickFile", notification.OnClickFile());
-
-	if (ret == B_OK) {
-		for (int32 i = 0; i < notification.CountOnClickRefs(); i++) {
-			ret = msg.AddRef("onClickRef", notification.OnClickRefAt(i));
-			if (ret != B_OK)
-				break;
-		}
-	}
-
-	if (ret == B_OK) {
-		for (int32 i = 0; i < notification.CountOnClickArgs(); i++) {
-			ret = msg.AddString("onClickArgv", notification.OnClickArgAt(i));
-			if (ret != B_OK)
-				break;
-		}
-	}
-
-	if (ret == B_OK) {
-		const BBitmap* icon = notification.Icon();
-		if (icon != NULL) {
-			BMessage archive;
-			ret = icon->Archive(&archive);
-			if (ret == B_OK)
-				ret = msg.AddMessage("icon", &archive);
-		}
-	}
-
-	// Custom time out
-	if (ret == B_OK && timeout > 0)
-		ret = msg.AddInt64("timeout", timeout);
-
-	// Send message
-	if (ret == B_OK) {
-		BMessenger server(kNotificationServerSignature);
-		ret = server.SendMessage(&msg);
-	}
-
-	return ret;
-}
-
 
 //	#pragma mark - Private or reserved
 
