@@ -101,12 +101,13 @@ GameSoundBuffer::~GameSoundBuffer()
 	BMediaRoster* roster = BMediaRoster::Roster();
 	
 	if (fIsConnected) {
-		// Ordinarily we'd stop *all* of the nodes in the chain at this point.  However,
-		// one of the nodes is the System Mixer, and stopping the Mixer is a Bad Idea (tm).
-		// So, we just disconnect from it, and release our references to the nodes that
-		// we're using.  We *are* supposed to do that even for global nodes like the Mixer.
+		// Ordinarily we'd stop *all* of the nodes in the chain at this point.
+		// However, one of the nodes is the System Mixer, and stopping the Mixer
+		// is a Bad Idea (tm). So, we just disconnect from it, and release our
+		// references to the nodes that we're using.  We *are* supposed to do
+		// that even for global nodes like the Mixer.
 		roster->Disconnect(fConnection->producer.node, fConnection->source,
-							fConnection->consumer.node, fConnection->destination);
+			fConnection->consumer.node, fConnection->destination);
 		
 		roster->ReleaseNode(fConnection->producer);
 		roster->ReleaseNode(fConnection->consumer);
@@ -390,9 +391,10 @@ GameSoundBuffer::Connect(media_node * consumer)
 	if (err != B_OK)
                 return err;	
 
-	err = roster->SetTimeSourceFor(fConnection->producer.node, fConnection->timeSource.node);
-        if (err != B_OK)
-                return err;
+	err = roster->SetTimeSourceFor(fConnection->producer.node,
+		fConnection->timeSource.node);
+	if (err != B_OK)
+		return err;
 	// got the nodes; now we find the endpoints of the connection
 	media_input mixerInput;
 	media_output soundOutput;
