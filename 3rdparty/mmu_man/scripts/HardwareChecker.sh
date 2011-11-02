@@ -201,7 +201,10 @@ check_usb ()
 
 check_dmidecode () {
 	which dmidecode >/dev/null 2>&1 || return
-	
+
+	# make sure /dev/mem is published
+	ls -l /dev/misc/mem > /dev/null
+
 	echo "<h2>DMIdecode output</h2>"
 	echo "<i>The output of dmidecode gives exact vendor and device identification.</i>"
 
