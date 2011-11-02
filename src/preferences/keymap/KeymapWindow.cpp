@@ -375,7 +375,6 @@ BMenuBar*
 KeymapWindow::_CreateMenu()
 {
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "menubar");
-	BMenuItem* item;
 
 	// Create the File menu
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
@@ -391,12 +390,6 @@ KeymapWindow::_CreateMenu()
 
 	// Create keyboard layout menu
 	fLayoutMenu = new BMenu(B_TRANSLATE("Layout"));
-	fLayoutMenu->SetRadioMode(true);
-	fLayoutMenu->AddItem(item = new BMenuItem(
-		fKeyboardLayoutView->GetKeyboardLayout()->Name(),
-		new BMessage(kChangeKeyboardLayout)));
-	item->SetMarked(true);
-
 	_AddKeyboardLayouts(fLayoutMenu);
 	menuBar->AddItem(fLayoutMenu);
 
@@ -531,49 +524,60 @@ KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
 		path.Append("KeyboardLayouts");
 
 		BDirectory directory;
-		if (directory.SetTo(path.Path()) == B_OK) {
-			entry_ref ref;
-			while (directory.GetNextRef(&ref) == B_OK) {
-				if (menu->FindItem(ref.name) != NULL)
-					continue;
+		if (directory.SetTo(path.Path()) == B_OK)
+			_AddKeyboardLayoutMenu(menu, directory);
+	}
+}
 
-				BMessage* message = new BMessage(kChangeKeyboardLayout);
-				message->AddRef("ref", &ref);
 
-				menu->AddItem(new BMenuItem(ref.name, message));
-			}
+/*!	Adds a menu populated with the keyboard layouts found in the passed
+	in directory to the passed in menu. Each subdirectory in the passed
+	in directory is added as a submenu recursively.
+*/
+void
+KeymapWindow::_AddKeyboardLayoutMenu(BMenu* menu, BDirectory directory)
+{
+	entry_ref ref;
+
+	while (directory.GetNextRef(&ref) == B_OK) {
+		if (menu->FindItem(ref.name) != NULL)
+			continue;
+
+		BDirectory subdirectory;
+		subdirectory.SetTo(&ref);
+		if (subdirectory.InitCheck() == B_OK) {
+			BMenu* submenu = new BMenu(ref.name);
+
+			_AddKeyboardLayoutMenu(submenu, subdirectory);
+			menu->AddItem(submenu);
+		} else {
+			BMessage* message = new BMessage(kChangeKeyboardLayout);
+
+			message->AddRef("ref", &ref);
+			menu->AddItem(new BMenuItem(ref.name, message));
 		}
 	}
 }
 
 
+/*!	Sets the keyboard layout with the passed in path and marks the
+	corresponding menu item. If the path is not found in the menu this method
+	sets the default keyboard layout and marks the corresponding menu item.
+*/
 status_t
 KeymapWindow::_SetKeyboardLayout(const char* path)
 {
-	status_t status = B_OK;
+	status_t status = fKeyboardLayoutView->GetKeyboardLayout()->Load(path);
 
-	if (path != NULL && path[0] != '\0') {
-		status = fKeyboardLayoutView->GetKeyboardLayout()->Load(path);
-		if (status == B_OK) {
-			// select item
-			for (int32 i = fLayoutMenu->CountItems(); i-- > 0;) {
-				BMenuItem* item = fLayoutMenu->ItemAt(i);
-				BMessage* message = item->Message();
-				entry_ref ref;
-				if (message->FindRef("ref", &ref) == B_OK) {
-					BPath layoutPath(&ref);
-					if (layoutPath == path) {
-						item->SetMarked(true);
-						break;
-					}
-				}
-			}
-		}
-	}
+	// mark a menu item (unmarking all others)
+	_MarkKeyboardLayoutItem(path, fLayoutMenu);
 
-	if (path == NULL || status != B_OK) {
+	if (path == NULL || path[0] == '\0' || status != B_OK) {
 		fKeyboardLayoutView->GetKeyboardLayout()->SetDefault();
-		fLayoutMenu->ItemAt(0)->SetMarked(true);
+		BMenuItem* item = fLayoutMenu->FindItem(
+			fKeyboardLayoutView->GetKeyboardLayout()->Name());
+		if (item != NULL)
+			item->SetMarked(true);
 	}
 
 	// Refresh currently set layout
@@ -581,6 +585,42 @@ KeymapWindow::_SetKeyboardLayout(const char* path)
 		fKeyboardLayoutView->GetKeyboardLayout());
 
 	return status;
+}
+
+
+/*!	Marks a keyboard layout item by iterating through the menus recursively
+	searching for the menu item with the passed in path. This method always
+	iterates through all menu items and unmarks them. If no item with the
+	passed in path is found it is up to the caller to set the default keyboard
+	layout and mark item corresponding to the default keyboard layout path.
+*/
+void
+KeymapWindow::_MarkKeyboardLayoutItem(const char* path, BMenu* menu)
+{
+	BMenuItem* item = NULL;
+	entry_ref ref;
+
+	for (int32 i = 0; i < menu->CountItems(); i++) {
+		item = menu->ItemAt(i);
+		if (item == NULL)
+			continue;
+
+		// Unmark each item initially
+		item->SetMarked(false);
+
+		BMenu* submenu = item->Submenu();
+		if (submenu != NULL)
+			_MarkKeyboardLayoutItem(path, submenu);
+		else {
+			if (item->Message()->FindRef("ref", &ref) == B_OK) {
+				BPath layoutPath(&ref);
+				if (path != NULL && path[0] != '\0' && layoutPath == path) {
+					// Found it, mark the item
+					item->SetMarked(true);
+				}
+			}
+		}
+	}
 }
 
 
@@ -922,7 +962,7 @@ KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
 
 
 status_t
-KeymapWindow::_SaveSettings() const
+KeymapWindow::_SaveSettings()
 {
 	BFile file;
 	status_t status
@@ -933,13 +973,41 @@ KeymapWindow::_SaveSettings() const
 	BMessage settings('keym');
 	settings.AddRect("window frame", Frame());
 
-	BMenuItem* item = fLayoutMenu->FindMarked();
-	entry_ref ref;
-	if (item != NULL && item->Message()->FindRef("ref", &ref) == B_OK) {
-		BPath path(&ref);
-		if (path.InitCheck() == B_OK)
-			settings.AddString("keyboard layout", path.Path());
-	}
+	BPath path = _GetMarkedKeyboardLayoutPath(fLayoutMenu);
+	if (path.InitCheck() == B_OK)
+		settings.AddString("keyboard layout", path.Path());
 
 	return settings.Flatten(&file);
+}
+
+
+/*!	Gets the path of the currently marked keyboard layout item
+	by searching through each of the menus recursively until
+	a marked item is found.
+*/
+BPath
+KeymapWindow::_GetMarkedKeyboardLayoutPath(BMenu* menu)
+{
+	BPath path;
+	BMenuItem* item = NULL;
+	entry_ref ref;
+
+	for (int32 i = 0; i < menu->CountItems(); i++) {
+		item = menu->ItemAt(i);
+		if (item == NULL)
+			continue;
+
+		BMenu* submenu = item->Submenu();
+		if (submenu != NULL)
+			return _GetMarkedKeyboardLayoutPath(submenu);
+		else {
+			if (item->IsMarked()
+			    && item->Message()->FindRef("ref", &ref) == B_OK) {
+				path.SetTo(&ref);
+		        return path;
+			}
+		}
+	}
+
+	return path;
 }

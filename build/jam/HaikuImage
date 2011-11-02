@@ -499,10 +499,36 @@ AddSymlinkToHaikuImage system data Keymaps : Swedish : Finnish ;
 AddSymlinkToHaikuImage system data Keymaps : Slovene : Croatian ;
 AddSymlinkToHaikuImage system data Keymaps : US-International : Brazilian ;
 
+# Copy keyboard layout files to the image one-by-one.
 local keyboardLayoutsDir
 	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
-local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
-AddFilesToHaikuImage system data KeyboardLayouts : $(keyboardLayouts) ;
+local keyboardLayoutFiles =
+	"Generic 104-key"
+	"Generic 105-key International"
+	"IBM Laptop International"
+	"Kinesis Advantage"
+	"Kinesis Ergo Elan International"
+	"TypeMatrix 2030" ;
+keyboardLayoutFiles = $(keyboardLayoutFiles:G=keyboard-layout) ;
+SEARCH on $(keyboardLayoutFiles) = $(keyboardLayoutsDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts
+	: $(keyboardLayoutFiles) ;
+
+# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local appleAluminumDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
+		Apple\ Aluminum ] ;
+local appleAluminumFiles =
+	"Apple Aluminium Extended International"
+	"Apple Aluminium International"
+	"Apple Aluminum (US)"
+	"Apple Aluminum Extended (US)" ;
+appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
+SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts Apple\ Aluminum
+	: $(appleAluminumFiles) ;
 
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)
