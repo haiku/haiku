@@ -283,7 +283,7 @@ switch $(HAIKU_CPU) {
 			}
 		}
 		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 260 ; # in kB
 		HAIKU_NO_WERROR = 1 ;
 			# we use #warning as placeholders for things to write...
 	}
