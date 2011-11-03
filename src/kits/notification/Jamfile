@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src kits notification ;
-
-UsePrivateHeaders notification ;
-
-StaticLibrary libnotification.a :
-	AppUsage.cpp
-	NotificationReceived.cpp
-	Notifications.cpp
-;
