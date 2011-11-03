@@ -1,7 +1,7 @@
 #!/bin/sh
 
 _progress () {
-	notify --type progress --app mimeset \
+	notify --type progress --group "MIME type updater" \
 	--timeout ${3:-30} \
 	--icon /boot/system/apps/DiskProbe \
 	--messageID $0_$$ \
