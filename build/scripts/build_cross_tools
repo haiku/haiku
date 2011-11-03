@@ -1,6 +1,9 @@
 #!/bin/sh
 
-# parameters <haiku sourcedir> <buildtools dir> <haiku output dir>
+# Parameters <haiku sourcedir> <buildtools dir> <haiku output dir>
+# Influential environmental variable:
+# * haikuRequiredLegacyGCCVersion: The requrired version of the gcc. Will be
+#   checked against the version in the buildtools directory.
 
 # get and check the parameters
 if [ $# -lt 3 ]; then
@@ -19,21 +22,37 @@ additionalMakeArgs=$*
 
 
 if [ ! -d $haikuSourceDir ]; then
-	echo "No such directory: \"$haikuSourceDir\"" >&2
+	echo "ERROR: No such directory: \"$haikuSourceDir\"" >&2
 	exit 1
 fi
 
 if [ ! -d $buildToolsDir ]; then
-	echo "No such directory: \"$buildToolsDir\"" >&2
+	echo "ERROR: No such directory: \"$buildToolsDir\"" >&2
 	exit 1
 fi
 
-if ! grep "$haikuRequiredLegacyGCCVersion" \
-		$buildToolsDir/gcc/gcc/version.c >/dev/null 2>&1 ; then
-	echo "*** Mismatching compiler versions between configure script and" >&2
-	echo "*** $buildToolsDir/gcc/gcc/version.c" >&2
-	echo "*** Did you perhaps update only one of haiku & buildtools?" >&2
-	exit 1
+# verify or extract the gcc version
+gccVersionDotC="$buildToolsDir/gcc/gcc/version.c"
+if [ -n "$haikuRequiredLegacyGCCVersion" ]; then
+	# haikuRequiredLegacyGCCVersion has been specified. Check whether the
+	# version of the gcc in the given build tools directory matches.
+	if ! grep "$haikuRequiredLegacyGCCVersion" \
+			"$gccVersionDotC" >/dev/null 2>&1 ; then
+		echo "*** Mismatching compiler versions between configure script and" \
+			>&2
+		echo "*** $gccVersionDotC" >&2
+		echo "*** Did you perhaps update only one of haiku & buildtools?" >&2
+		exit 1
+	fi
+else
+	# haikuRequiredLegacyGCCVersion wasn't specified. Extract the version string
+	# from the gcc's version.c.
+	haikuRequiredLegacyGCCVersion=`grep "2.95.3-haiku-" "$gccVersionDotC" \
+		| sed 's@.*\"\(.*\)\".*@\1@'`
+	if [ -z "$haikuRequiredLegacyGCCVersion" ]; then
+		echo "ERROR: Failed to extract version string from $gccVersionDotC" >&2
+		exit 1
+	fi
 fi
 
 
