@@ -84,7 +84,7 @@
 #define VBR_PAGE_OFFSET 1024
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
-static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
+static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 // working page directory and page table
 addr_t gPageRoot = 0;
@@ -377,8 +377,7 @@ mmu_free(void *virtualAddress, size_t size)
 		// get number of pages to map
 
 	// is the address within the valid range?
-	if (address < KERNEL_BASE
-		|| address + size >= KERNEL_BASE + kMaxKernelSize) {
+	if (address < KERNEL_BASE) {
 		panic("mmu_free: asked to unmap out of range region (%p, size %lx)\n",
 			(void *)address, size);
 	}
