@@ -12,6 +12,7 @@
 
 #include "BreakpointsView.h"
 #include "Function.h"
+#include "GUITeamUISettings.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
 #include "SourceView.h"
@@ -27,7 +28,6 @@ class BMenuBar;
 class BSplitView;
 class BStringView;
 class BTabView;
-class GUITeamUISettings;
 class Image;
 class InspectorWindow;
 class RegistersView;
@@ -150,6 +150,8 @@ private:
 									const char* name,
 									GUITeamUISettings* settings);
 
+			status_t			_SaveInspectorSettings(
+									const BMessage* settings);
 private:
 			::Team*				fTeam;
 			::Thread*			fActiveThread;
@@ -182,6 +184,7 @@ private:
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
+			GUITeamUISettings	fUISettings;
 };
 
 

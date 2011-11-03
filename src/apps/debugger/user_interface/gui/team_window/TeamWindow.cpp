@@ -219,8 +219,10 @@ TeamWindow::MessageReceived(BMessage* message)
 			try {
 				fInspectorWindow = InspectorWindow::Create(fTeam, fListener,
 					this);
-				if (fInspectorWindow != NULL)
+				if (fInspectorWindow != NULL) {
+					fInspectorWindow->LoadSettings(&fUISettings);
 					fInspectorWindow->Show();
+				}
            	} catch (...) {
            		// TODO: notify user
            	}
@@ -228,7 +230,9 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_INSPECTOR_WINDOW_CLOSED:
 		{
+			_SaveInspectorSettings(CurrentMessage());
 			fInspectorWindow = NULL;
+
 		}
 		case B_REFS_RECEIVED:
 		{
@@ -351,6 +355,8 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 	_LoadSplitSettings(fImageSplitView, "Image", settings);
 	_LoadSplitSettings(fThreadSplitView, "Thread", settings);
 
+	fUISettings = *settings;
+
 	return B_OK;
 }
 
@@ -358,6 +364,23 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 status_t
 TeamWindow::SaveSettings(GUITeamUISettings* settings)
 {
+	// save the settings from the cached copy first,
+	// then overwrite them with our most current set
+	// this is necessary in order to preserve the settings
+	// of things like the inspector in case we haven't actually
+	// invoked them at all in this session
+	const BMessage& values = fUISettings.Values();
+	char *name;
+	type_code type;
+	BVariant value;
+	for (int32 i = 0; values.GetInfo(B_ANY_TYPE, i, &name, &type) == B_OK;
+		i++) {
+		if (value.SetFromMessage(values, name) == B_OK) {
+			if (!settings->SetValue(name, value))
+				return B_NO_MEMORY;
+		}
+	}
+
 	if (!settings->SetValue("teamWindowFrame", Frame()))
 		return B_NO_MEMORY;
 
@@ -1159,6 +1182,25 @@ TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
 		if (!settings->SetValue(settingName.String(),
 			view->ItemWeight(i)))
 		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+TeamWindow::_SaveInspectorSettings(const BMessage* settings)
+{
+	char *name;
+	type_code type;
+	BVariant value;
+
+	for (int32 i = 0; settings->GetInfo(B_ANY_TYPE, i, &name, &type) == B_OK;
+		i++) {
+		if (value.SetFromMessage(*settings, name) == B_OK) {
+			if (!fUISettings.SetValue(name, value))
+				return B_NO_MEMORY;
+		}
 	}
 
 	return B_OK;
