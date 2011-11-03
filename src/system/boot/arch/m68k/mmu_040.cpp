@@ -133,7 +133,7 @@ load_rp(addr_t pa)
 		return EINVAL;
 	}
 	// make sure it's empty
-	page_directory_entry_scalar *pr = (page_directory_entry_scalar *)pa;
+	page_directory_entry *pr = (page_directory_entry *)pa;
 	for (int32 j = 0; j < NUM_ROOTENT_PER_TBL; j++)
 		pr[j] = DFL_ROOTENT_VAL;
 	
@@ -163,11 +163,10 @@ allocate_kernel_pgdirs(void)
 			tbl += SIZ_DIRTBL;
 		else
 			tbl = mmu_get_next_page_tables();
-		pr[i].addr = TA_TO_PREA(tbl);
-		pr[i].type = DT_ROOT;
+		pr[i] = DT_ROOT | TA_TO_PREA(tbl);
 		pd = (page_directory_entry *)tbl;
 		for (int32 j = 0; j < NUM_DIRENT_PER_TBL; j++)
-			*(page_directory_entry_scalar *)(&pd[j]) = DFL_DIRENT_VAL;
+			pd[j] = DFL_DIRENT_VAL;
 	}
 	return B_OK;
 }
@@ -203,11 +202,11 @@ add_page_table(addr_t virtualAddress)
 	// thanks to transparent translation
 
 	index = VADDR_TO_PRENT(virtualAddress);
-	if (pr[index].type != DT_ROOT)
+	if (PRE_TYPE(pr[index]) != DT_ROOT)
 		panic("invalid page root entry %d\n", index);
 #if 0
 	// not needed anymore
-	if (pr[index].type != DT_ROOT) {
+	if (PRE_TYPE(pr[index]) != DT_ROOT) {
 		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
 		//TRACE(("missing page root entry %d ai %d\n", index, aindex));
 		tbl = mmu_get_next_page_tables();
@@ -231,7 +230,7 @@ add_page_table(addr_t virtualAddress)
 	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
 
 	index = VADDR_TO_PDENT(virtualAddress);
-	if (pd[index].type != DT_DIR) {
+	if (PDE_TYPE(pd[index]) != DT_DIR) {
 		unsigned aindex = index & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
 		//TRACE(("missing page dir entry %d ai %d\n", index, aindex));
 		tbl = mmu_get_next_page_tables();
@@ -240,13 +239,12 @@ add_page_table(addr_t virtualAddress)
 		// for each pgdir on the allocated page:
 		for (i = 0; i < NUM_PAGETBL_PER_PAGE; i++) {
 			page_directory_entry *apd = &pd[aindex + i];
-			apd->addr = TA_TO_PDEA(tbl);
-			apd->type = DT_DIR;
+			pd[aindex + i] = DT_DIR | TA_TO_PDEA(tbl);
 			// clear the table
 			//TRACE(("clearing table[%d]\n", i));
 			pt = (page_table_entry *)tbl;
 			for (int32 j = 0; j < NUM_PAGEENT_PER_TBL; j++)
-				*(page_table_entry_scalar *)(&pt[j]) = DFL_PAGEENT_VAL;
+				pt[j] = DFL_PAGEENT_VAL;
 			tbl += SIZ_PAGETBL;
 		}
 	}
@@ -271,18 +269,18 @@ lookup_pte(addr_t virtualAddress)
 	uint32 rindex, dindex, pindex;
 
 	rindex = VADDR_TO_PRENT(virtualAddress);
-	if (pr[rindex].type != DT_ROOT)
+	if (PRE_TYPE(pr[rindex]) != DT_ROOT)
 		panic("lookup_pte: invalid entry pgrt[%d]", rindex);
 	pd = (page_directory_entry *)PRE_TO_TA(pr[rindex]);
 
 	dindex = VADDR_TO_PDENT(virtualAddress);
-	if (pd[dindex].type != DT_DIR)
+	if (PDE_TYPE(pd[dindex]) != DT_DIR)
 		panic("lookup_pte: invalid entry pgrt[%d] prdir[%d]", rindex, dindex);
 	pt = (page_table_entry *)PDE_TO_TA(pd[dindex]);
 	
 	pindex = VADDR_TO_PTENT(virtualAddress);
 #if 0 // of course, it's used in map_page!
-	if (pt[pindex].type != DT_PAGE)
+	if (PTE_TYPE(pt[pindex]) != DT_PAGE)
 		panic("lookup_pte: invalid entry pgrt[%d] prdir[%d] pgtbl[%d]",
 			rindex, dindex, pindex);
 #endif
@@ -305,12 +303,11 @@ unmap_page(addr_t virtualAddress)
 	// unmap the page from the correct page table
 	pt = lookup_pte(virtualAddress);
 
-	if (pt->type != DT_PAGE)
+	if (PTE_TYPE(*pt) != DT_PAGE)
 		panic("unmap_page: asked to map non-existing page for %08x\n",
 			virtualAddress);
 
-	pt->addr = TA_TO_PTEA(0xdeadb00b);
-	pt->type = DT_INVALID;
+	*pt = DT_INVALID | TA_TO_PTEA(0xdeadb00b);
 
 	// flush ATC
 	asm volatile("pflush (%0)" : : "a" (virtualAddress));
@@ -332,7 +329,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	pt = lookup_pte(virtualAddress);
 
-	if (pt->type != DT_INVALID)
+	if (PTE_TYPE(*pt) != DT_INVALID)
 		panic("map_page: asked to map existing page for %08x\n",
 			virtualAddress);
 
@@ -340,12 +337,12 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 		pt, physicalAddress));
 
 
-	pt->addr = TA_TO_PTEA(physicalAddress);
-	pt->supervisor = 1;
+	*pt = DT_PAGE
+		| TA_TO_PTEA(physicalAddress)
 #ifdef MMU_HAS_GLOBAL_PAGES
-	pt->global = 1;
+		| M68K_PTE_GLOBAL
 #endif
-	pt->type = DT_PAGE;
+		| M68K_PTE_SUPERVISOR;
 	// XXX: are flags needed ? ro ? global ?
 
 	// flush ATC
