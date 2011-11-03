@@ -10,6 +10,7 @@
 
 #include <net/if_media.h>
 #include <lock.h>
+#include <stdio.h>
 
 #include "Driver.h"
 #include "Settings.h"
@@ -90,7 +91,7 @@ Device::Open(uint32 flags)
 				fPCIInfo.u.h0.interrupt_line);
 	}
 
-	_SetRxMode(false);
+	_SetRxMode();
 
 	// enable al known interrupts
 	WritePCI32(IntMask, knownInterruptsMask);
@@ -206,13 +207,13 @@ Device::Control(uint32 op, void *buffer, size_t length)
 			return B_OK;
 
 		case ETHER_SETPROMISC:
-			TRACE("ETHER_SETPROMISC\n");
-			return _SetRxMode(*((uint8*)buffer));
+			return _SetRxMode((uint8*)buffer);
 
 		case ETHER_ADDMULTI:
+			return _ModifyMulticastTable(true, (ether_address_t*)buffer);
+
 		case ETHER_REMMULTI:
-			TRACE_ALWAYS("Multicast operations are not implemented.\n");
-			return B_ERROR;
+			return _ModifyMulticastTable(false, (ether_address_t*)buffer);
 
 		case ETHER_SET_LINK_STATE_SEM:
 			fLinkStateChangeSem = *(sem_id *)buffer;
@@ -408,19 +409,38 @@ Device::GetLinkState(ether_link_state *linkState)
 
 
 status_t
-Device::_SetRxMode(bool isPromiscuousModeOn)
+Device::_SetRxMode(uint8* setPromiscuousOn)
 {
-	// clean the Rx MAC Control register
-	WritePCI16(RxMACControl, (ReadPCI16(RxMACControl) & ~RXM_Mask));
+	uint16 rxMode = ReadPCI16(RxMACControl);
 
-	uint16 rxMode = RXM_Broadcast | RXM_Multicast | RXM_Physical;
-	if (isPromiscuousModeOn) {
-		rxMode |= RXM_AllPhysical;
+	// clean the Rx MAC Control register
+	WritePCI16(RxMACControl, rxMode & ~RXM_Mask);
+	
+	rxMode &= RXM_Mask;
+	
+	if (setPromiscuousOn != NULL) {
+		if (*setPromiscuousOn != 0)
+			rxMode |= RXM_AllPhysical;
+		else
+			rxMode &= ~RXM_AllPhysical;
 	}
 
+	uint32  multicastFilter[2] = { 0 };
+	if ((rxMode & RXM_AllPhysical) == 0	&& fMulticastHashes.Count() <= 128)	{
+		
+		for (int32 i = 0; i < fMulticastHashes.Count(); i++) {
+			uint32 hash = fMulticastHashes[i];
+			multicastFilter[hash >> 31] |= 1 << ((hash >> 26) & 0x1f);
+		}
+
+	} else 
+		multicastFilter[0] = multicastFilter[1] = 0xffffffff;
+
+	rxMode |= RXM_Broadcast | RXM_Multicast | RXM_Physical;
+	
 	// set multicast filters
-	WritePCI32(RxHashTable, 0xffffffff);
-	WritePCI32(RxHashTable + 4, 0xffffffff);
+	WritePCI32(RxHashTable, multicastFilter[0]);
+	WritePCI32(RxHashTable + 4, multicastFilter[1]);
 
 	// update rx mode
 	WritePCI16(RxMACControl, ReadPCI16(RxMACControl) | rxMode);
@@ -518,6 +538,9 @@ Device::_InitRxFilter()
 	for (size_t i = 0; i < _countof(fMACAddress.ebyte); i++) {
 		WritePCI8(RxMACAddress + i, fMACAddress.ebyte[i]);
 	}
+
+	// clear promiscuous bit on initialization
+	filter &= ~RXM_AllPhysical;
 
 	// enable packet filtering
 	WritePCI16(RxMACControl, filter);
@@ -620,6 +643,52 @@ Device::ReadMACAddress(ether_address_t& address)
 
 	TRACE_ALWAYS("ISA bridge was not found.\n");
 	return B_ERROR;
+}
+
+
+uint32
+Device::_EthernetCRC32(const uint8* buffer, size_t length)
+{
+	uint32 result = 0xffffffff;
+	for (size_t i = 0; i < length; i++) {
+		uint8 data = *buffer++;
+		for (int bit = 0; bit < 8; bit++, data >>= 1) {
+			uint32 carry = ((result & 0x80000000) ? 1 : 0) ^ (data & 0x01);
+			result <<= 1;
+			if (carry != 0)
+				result = (result ^ 0x04c11db6) | carry;
+		}
+	}
+	return result;
+}
+
+
+status_t
+Device::_ModifyMulticastTable(bool join, ether_address_t* group)
+{
+	char groupName[6 * 3 + 1] = { 0 };
+	sprintf(groupName, "%02x:%02x:%02x:%02x:%02x:%02x",
+		group->ebyte[0], group->ebyte[1], group->ebyte[2],
+		group->ebyte[3], group->ebyte[4], group->ebyte[5]);
+	TRACE("%s multicast group %s\n", join ? "Joining" : "Leaving", groupName);
+
+	uint32 hash = _EthernetCRC32(group->ebyte, 6);
+	bool isInTable = fMulticastHashes.Find(hash) != fMulticastHashes.End();
+
+	if (isInTable && join)
+		return B_OK; // already listed - nothing to do
+
+	if (!isInTable && !join) {
+		TRACE_ALWAYS("Cannot leave unlisted multicast group %s!\n", groupName);
+		return B_ERROR;
+	}
+
+	if (join)
+		fMulticastHashes.PushBack(hash);
+	else
+		fMulticastHashes.Remove(hash);
+
+	return _SetRxMode();
 }
 
 

@@ -8,6 +8,8 @@
 #define _SiS19X_DEVICE_H_
 
 
+#include <util/Vector.h>
+
 #include "Driver.h"
 #include "MIIBus.h"
 #include "Registers.h"
@@ -83,7 +85,10 @@ protected:
 		status_t			ReadMACAddress(ether_address_t& address);
 		uint16				_ReadEEPROM(uint32 address);
 		void				_InitRxFilter();
-		status_t			_SetRxMode(bool isPromiscuousModeOn);
+		status_t			_SetRxMode(uint8* setPromiscuousOn = NULL);
+		uint32				_EthernetCRC32(const uint8* buffer, size_t length);
+		status_t			_ModifyMulticastTable(bool add,
+								ether_address_t* group);
 
 static	int32				_TimerHandler(struct timer* timer);		
 		
@@ -103,6 +108,8 @@ static	int32				_TimerHandler(struct timer* timer);
 
 		// connection data
 		ether_address_t		fMACAddress;
+		
+		Vector<uint32>		fMulticastHashes;
 		
 public:
 				
