@@ -48,8 +48,7 @@ property_info message_prop_list[] = {
 NotificationView::NotificationView(NotificationWindow* win,
 	BNotification* notification, bigtime_t timeout)
 	:
-	BView("NotificationView", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
-		| B_FRAME_EVENTS),
+	BView("NotificationView", B_WILL_DRAW),
 	fParent(win),
 	fNotification(notification),
 	fTimeout(timeout),
@@ -64,8 +63,6 @@ NotificationView::NotificationView(NotificationWindow* win,
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
-
-	SetText();
 
 	switch (fNotification->Type()) {
 		case B_IMPORTANT_NOTIFICATION:
@@ -87,15 +84,15 @@ NotificationView::NotificationView(NotificationWindow* win,
 			label << (int)(fNotification->Progress() * 100) << " %";
 			progress->SetTrailingText(label);
 
-			BGroupLayoutBuilder b(layout);
-				b.AddGlue()
-				.Add(progress);
+			layout->AddView(progress);
 		}
 		// fall through
 		default:
 			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
+
+	SetText();
 }
 
 
@@ -284,8 +281,8 @@ NotificationView::Draw(BRect updateRect)
 	PopState();
 
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-	BPoint left(Bounds().left, Bounds().bottom - 1);
-	BPoint right(Bounds().right, Bounds().bottom - 1);
+	BPoint left(Bounds().left, Bounds().top);
+	BPoint right(Bounds().right, Bounds().top);
 	StrokeLine(left, right);
 
 	Sync();
@@ -367,17 +364,19 @@ NotificationView::MouseDown(BPoint point)
 }
 
 
+/*
 BSize
 NotificationView::MinSize()
 {
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _CalculateSize());
+//	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _CalculateSize());
+	return _CalculateSize();
 }
 
 
 BSize
 NotificationView::MaxSize()
 {
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), _CalculateSize());
+	return _CalculateSize();
 }
 
 
@@ -387,6 +386,7 @@ NotificationView::PreferredSize()
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
 		_CalculateSize());
 }
+*/
 
 
 BHandler*
@@ -524,6 +524,8 @@ NotificationView::SetText(float newMaxWidth)
 	// enough.
 	static_cast<BGroupLayout*>(GetLayout())->SetInsets(kIconStripeWidth + 8,
 		fHeight, 8, 8);
+
+	_CalculateSize();
 }
 
 
@@ -539,16 +541,19 @@ NotificationView::_CalculateSize()
 {
 	BSize size;
 
-	// Parent width, minus the edge padding, minus the pensize
-	size.width = B_SIZE_UNLIMITED;
+	size.width = 300;
 	size.height = fHeight;
 
 	if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {
 		font_height fh;
 		be_plain_font->GetHeight(&fh);
 		float fontHeight = fh.ascent + fh.descent + fh.leading;
-		size.height += (kSmallPadding * 2) + (kEdgePadding * 1) + fontHeight;
+		size.height += 9 + (kSmallPadding * 2) + (kEdgePadding * 1)
+			+ fontHeight * 2;
 	}
+
+	SetExplicitMinSize(size);
+	SetExplicitMaxSize(size);
 
 	return size;
 }

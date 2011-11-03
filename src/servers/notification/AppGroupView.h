@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include <Box.h>
+#include <GroupView.h>
 #include <String.h>
 
 class BGroupView;
@@ -20,13 +20,13 @@ class NotificationView;
 
 typedef std::vector<NotificationView*> infoview_t;
 
-class AppGroupView : public BBox {
+class AppGroupView : public BGroupView {
 public:
 								AppGroupView(NotificationWindow* win, const char* label);
-								~AppGroupView();
 
 	virtual	void				MouseDown(BPoint point);
 	virtual	void				MessageReceived(BMessage* msg);
+			void				Draw(BRect updateRect);
 
 			bool				HasChildren();
 
@@ -37,7 +37,6 @@ private:
 
 			BString				fLabel;
 			NotificationWindow*	fParent;
-			BGroupView*			fView;
 			infoview_t			fInfo;
 			bool				fCollapsed;
 			BRect				fCloseRect;

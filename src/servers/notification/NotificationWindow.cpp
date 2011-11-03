@@ -64,11 +64,12 @@ NotificationWindow::NotificationWindow()
 {
 	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
-	Hide();
-	Show();
-
 	_LoadSettings(true);
 	_LoadAppFilters(true);
+
+	// Start the message loop
+	Hide();
+	Show();
 }
 
 
@@ -189,6 +190,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 					group->AddInfo(view);
 
 					_ResizeAll();
+					SetPosition();
 
 					reply.AddInt32("error", B_OK);
 				} else
@@ -213,6 +215,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 				fViews.erase(it);
 
 			_ResizeAll();
+			SetPosition();
 			break;
 		}
 		default:
@@ -317,45 +320,31 @@ NotificationWindow::_ResizeAll()
 	if (IsHidden())
 		Show();
 
-	float width = 0;
-	float height = 0;
-
 	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
 		AppGroupView* view = aIt->second;
-		float w = -1;
-		float h = -1;
 
 		if (!view->HasChildren()) {
 			if (!view->IsHidden())
 				view->Hide();
 		} else {
-			view->GetPreferredSize(&w, &h);
-			width = max_c(width, h);
-
-			view->ResizeToPreferred();
-			view->MoveTo(0, height);
-
-			height += h;
-
 			if (view->IsHidden())
 				view->Show();
 		}
 	}
-
-	ResizeTo(Width(), height);
-	PopupAnimation();
 }
 
 
 void
 NotificationWindow::SetPosition()
 {
+	Layout(true);
+
 	BRect bounds = DecoratorFrame();
 	float width = Bounds().Width() + 1;
 	float height = Bounds().Height() + 1;
-	
+
 	float leftOffset = Frame().left - bounds.left;
-	float topOffset = Frame().top - bounds.top;
+	float topOffset = Frame().top - bounds.top + 1;
 	float rightOffset = bounds.right - Frame().right;
 	float bottomOffset = bounds.bottom - Frame().bottom;
 		// Size of the borders around the window
@@ -370,27 +359,27 @@ NotificationWindow::SetPosition()
 		case B_DESKBAR_TOP:
 			// Put it just under, top right corner
 			y = frame.bottom + topOffset;
-			x = frame.right - width - rightOffset;
+			x = frame.right - width + rightOffset;
 			break;
 		case B_DESKBAR_BOTTOM:
 			// Put it just above, lower left corner
 			y = frame.top - height - bottomOffset;
-			x = frame.right - width - rightOffset;
+			x = frame.right - width + rightOffset;
 			break;
 		case B_DESKBAR_RIGHT_TOP:
 			x = frame.left - width - rightOffset;
-			y = frame.top + topOffset;
+			y = frame.top - topOffset;
 			break;
 		case B_DESKBAR_LEFT_TOP:
 			x = frame.right + leftOffset;
-			y = frame.top + topOffset;
+			y = frame.top - topOffset;
 			break;
 		case B_DESKBAR_RIGHT_BOTTOM:
-			y = frame.bottom - height - bottomOffset;
+			y = frame.bottom - height + bottomOffset;
 			x = frame.left - width - rightOffset;
 			break;
 		case B_DESKBAR_LEFT_BOTTOM:
-			y = frame.bottom - height - bottomOffset;
+			y = frame.bottom - height + bottomOffset;
 			x = frame.right + leftOffset;
 			break;
 		default:
@@ -398,16 +387,6 @@ NotificationWindow::SetPosition()
 	}
 
 	MoveTo(x, y);
-}
-
-void
-NotificationWindow::PopupAnimation()
-{
-	SetPosition();
-
-	if (IsHidden())
-		Show();
-	// Activate();// it hides floaters from apps :-(
 }
 
 

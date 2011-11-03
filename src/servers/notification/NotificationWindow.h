@@ -60,7 +60,6 @@ private:
 	friend class AppGroupView;
 
 			void					SetPosition();
-			void					PopupAnimation();
 			void					_LoadSettings(bool startMonitor = false);
 			void					_LoadAppFilters(bool startMonitor = false);
 			void					_SaveAppFilters();

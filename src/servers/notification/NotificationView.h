@@ -31,9 +31,11 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint point);
 
+/*
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize 				PreferredSize();
+*/
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
 									BMessage* specifier, int32 form,
