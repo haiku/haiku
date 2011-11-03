@@ -19,4 +19,11 @@ DoCatalogs notification_server :
 	NotificationWindow.cpp
 ;
 
+# Stuff shared with the preflet
+StaticLibrary libnotification.a :
+	AppUsage.cpp
+	NotificationReceived.cpp
+	Notifications.cpp
+;
+
 Depends notification_server : libnotification.a ;
