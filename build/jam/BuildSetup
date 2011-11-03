@@ -164,14 +164,10 @@ HAIKU_LINK = $(HAIKU_CC) ;
 HAIKU_LINKFLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
 
 HAIKU_HDRS = [ FStandardHeaders ] ;
-
-HAIKU_CUSTOM_CCFLAGS = $(HAIKU_CCFLAGS) ;
-HAIKU_CUSTOM_C++FLAGS = $(HAIKU_C++FLAGS) ;
-
-HAIKU_CCFLAGS = $(HAIKU_GCC_BASE_FLAGS) $(HAIKU_CUSTOM_CCFLAGS) -nostdinc ;
-HAIKU_C++FLAGS = $(HAIKU_GCC_BASE_FLAGS) $(HAIKU_CUSTOM_C++FLAGS) -nostdinc ;
-HAIKU_KERNEL_CCFLAGS = $(HAIKU_GCC_BASE_FLAGS) $(HAIKU_CUSTOM_CCFLAGS) ;
-HAIKU_KERNEL_C++FLAGS = $(HAIKU_GCC_BASE_FLAGS) $(HAIKU_CUSTOM_C++FLAGS) ;
+HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
+HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
+HAIKU_CCFLAGS += $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
+HAIKU_C++FLAGS += $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
 HAIKU_DEFINES = __HAIKU__ ;
 HAIKU_NO_WERROR ?= 0 ;
 
@@ -365,15 +361,10 @@ switch $(HAIKU_ARCH) {
 	}
 	case x86 :
 	{
-		if $(HAIKU_CUSTOM_CCFLAGS) = '' {
-			HAIKU_CCFLAGS += -march=pentium ;
-			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
-		}
-
-		if $(HAIKU_CUSTOM_C++FLAGS) = '' {
-			HAIKU_C++FLAGS += -march=pentium ;
-			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
-		}
+		HAIKU_CCFLAGS += -march=pentium ;
+		HAIKU_C++FLAGS += -march=pentium ;
+		HAIKU_KERNEL_CCFLAGS += -march=pentium ;
+		HAIKU_KERNEL_C++FLAGS += -march=pentium ;
 
 		# Enable use of the gcc built-in atomic functions instead of atomic_*().
 		# The former are inlined and have thus less overhead. They are not
