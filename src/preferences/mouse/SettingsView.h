@@ -42,10 +42,14 @@ class SettingsView : public BBox {
 
 		const MouseSettings &fSettings;
 
-		BPopUpMenu	*fTypeMenu, *fFocusMenu, *fFocusFollowsMouseMenu;
-		BCheckBox	*fAcceptFirstClickBox;
-		MouseView	*fMouseView;
-		BSlider		*fClickSpeedSlider, *fMouseSpeedSlider, *fAccelerationSlider;
+		BPopUpMenu*	fTypeMenu;
+		BPopUpMenu*	fFocusMenu;
+		BPopUpMenu*	fFocusFollowsMouseMenu;
+		BCheckBox*	fAcceptFirstClickBox;
+		MouseView*	fMouseView;
+		BSlider*	fClickSpeedSlider;
+		BSlider*	fMouseSpeedSlider;
+		BSlider*	fAccelerationSlider;
 };
 
 #endif	/* SETTINGS_VIEW_H */
