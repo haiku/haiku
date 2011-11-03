@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +20,7 @@
 
 #include "debug_utils.h"
 
+#include "CommandLineUserInterface.h"
 #include "GraphicalUserInterface.h"
 #include "MessageCodes.h"
 #include "SettingsManager.h"
@@ -173,6 +175,44 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 }
 
 
+static TeamDebugger*
+start_team_debugger(team_id teamID, SettingsManager* settingsManager,
+	TeamDebugger::Listener* listener, thread_id threadID = -1,
+	bool stopInMain = false, bool useCLI = false)
+{
+	if (teamID < 0)
+		return NULL;
+
+	UserInterface* userInterface = useCLI
+		? (UserInterface*)new(std::nothrow)	CommandLineUserInterface
+		: (UserInterface*)new(std::nothrow)	GraphicalUserInterface;
+
+	if (userInterface == NULL) {
+		// TODO: Notify the user!
+		fprintf(stderr, "Error: Out of memory!\n");
+		return NULL;
+	}
+	BReference<UserInterface> userInterfaceReference(userInterface, true);
+
+	status_t error = B_NO_MEMORY;
+
+	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(listener,
+		userInterface, settingsManager);
+	if (debugger)
+		error = debugger->Init(teamID, threadID, stopInMain);
+
+	if (error != B_OK) {
+		printf("Error: debugger for team %ld failed to init: %s!\n",
+			teamID, strerror(error));
+		delete debugger;
+		return NULL;
+	} else
+		printf("debugger for team %ld created and initialized successfully!\n",
+			teamID);
+
+	return debugger;
+}
+
 // #pragma mark - Debugger application class
 
 
@@ -198,9 +238,7 @@ private:
 	virtual void 				Quit();
 
 			TeamDebugger* 		_FindTeamDebugger(team_id teamID) const;
-			TeamDebugger* 		_StartTeamDebugger(team_id teamID,
-									thread_id threadID = -1,
-									bool stopInMain = false);
+
 private:
 			SettingsManager		fSettingsManager;
 			TeamDebuggerList	fTeamDebuggers;
@@ -273,7 +311,7 @@ Debugger::MessageReceived(BMessage* message)
 			if (message->FindInt32("team", &teamID) != B_OK)
 				break;
 
-			_StartTeamDebugger(teamID);
+			start_team_debugger(teamID, &fSettingsManager, this);
 			break;
 		}
 		case MSG_TEAM_DEBUGGER_QUIT:
@@ -359,7 +397,7 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	_StartTeamDebugger(team, thread, stopInMain);
+	start_team_debugger(team, &fSettingsManager, this, thread, stopInMain);
 }
 
 
@@ -441,62 +479,34 @@ Debugger::_FindTeamDebugger(team_id teamID) const
 }
 
 
-TeamDebugger*
-Debugger::_StartTeamDebugger(team_id teamID, thread_id threadID,
-	bool stopInMain)
-{
-	if (teamID < 0)
-		return NULL;
-
-	UserInterface* userInterface = new(std::nothrow) GraphicalUserInterface;
-	if (userInterface == NULL) {
-		// TODO: Notify the user!
-		fprintf(stderr, "Error: Out of memory!\n");
-		return NULL;
-	}
-	BReference<UserInterface> userInterfaceReference(userInterface, true);
-
-	status_t error = B_NO_MEMORY;
-
-	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(this, userInterface,
-		&fSettingsManager);
-	if (debugger)
-		error = debugger->Init(teamID, threadID, stopInMain);
-
-	if (error != B_OK) {
-		printf("Error: debugger for team %ld failed to init: %s!\n",
-			teamID, strerror(error));
-		delete debugger;
-		return NULL;
-	} else
-		printf("debugger for team %ld created and initialized successfully!\n",
-			teamID);
-
-	return debugger;
-}
-
-
 // #pragma mark -
 
 int
 main(int argc, const char* const* argv)
 {
-	// We test-parse the arguments here, so, when we're started from the
+	// We test-parse the arguments here, so that, when we're started from the
 	// terminal and there's an instance already running, we can print an error
 	// message to the terminal, if something's wrong with the arguments.
-	{
-		Options options;
-		parse_arguments(argc, argv, false, options);
-	}
+	// Otherwise, the arguments are reparsed in the actual application,
+	// unless the option to use the command line interface was chosen.
 
-	Debugger app;
-	status_t error = app.Init();
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to init application: %s\n",
-			strerror(error));
+	Options options;
+	parse_arguments(argc, argv, false, options);
+
+	if (options.useCLI) {
+		// TODO: implement
+		fprintf(stderr, "Error: Command line interface unimplemented\n");
 		return 1;
-	}
+	} else {
+		Debugger app;
+		status_t error = app.Init();
+		if (error != B_OK) {
+			fprintf(stderr, "Error: Failed to init application: %s\n",
+				strerror(error));
+			return 1;
+		}
 
-	app.Run();
+		app.Run();
+	}
 	return 0;
 }
