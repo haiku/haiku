@@ -35,6 +35,8 @@ public:
 			status_t			Value(const char* settingID,
 									BVariant& value) const;
 
+			const BMessage&		Values() const;
+
 			GUITeamUISettings&	operator=(const GUITeamUISettings& other);
 									// throws std::bad_alloc
 

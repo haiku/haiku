@@ -112,6 +112,13 @@ GUITeamUISettings::Value(const char* settingID, BVariant &value) const
 }
 
 
+const BMessage&
+GUITeamUISettings::Values() const
+{
+	return fValues;
+}
+
+
 GUITeamUISettings&
 GUITeamUISettings::operator=(const GUITeamUISettings& other)
 {
