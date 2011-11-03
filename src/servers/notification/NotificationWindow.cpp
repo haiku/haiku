@@ -190,7 +190,6 @@ NotificationWindow::MessageReceived(BMessage* message)
 					group->AddInfo(view);
 
 					_ResizeAll();
-					SetPosition();
 
 					reply.AddInt32("error", B_OK);
 				} else
@@ -215,7 +214,6 @@ NotificationWindow::MessageReceived(BMessage* message)
 				fViews.erase(it);
 
 			_ResizeAll();
-			SetPosition();
 			break;
 		}
 		default:
@@ -294,12 +292,6 @@ NotificationWindow::Width()
 void
 NotificationWindow::_ResizeAll()
 {
-	if (fAppViews.empty()) {
-		if (!IsHidden())
-			Hide();
-		return;
-	}
-
 	appview_t::iterator aIt;
 	bool shouldHide = true;
 
@@ -317,9 +309,6 @@ NotificationWindow::_ResizeAll()
 		return;
 	}
 
-	if (IsHidden())
-		Show();
-
 	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
 		AppGroupView* view = aIt->second;
 
@@ -331,6 +320,11 @@ NotificationWindow::_ResizeAll()
 				view->Show();
 		}
 	}
+
+	SetPosition();
+
+	if (IsHidden())
+		Show();
 }
 
 
@@ -464,13 +458,6 @@ NotificationWindow::_SaveAppFilters()
 		settings.AddFlat("app_usage", fIt->second);
 
 	settings.Flatten(&file);
-}
-
-
-void NotificationWindow::Show()
-{
-	BWindow::Show();
-	SetPosition();
 }
 
 
