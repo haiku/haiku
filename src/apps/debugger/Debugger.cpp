@@ -54,6 +54,7 @@ static const char* kUsage =
 	"\n"
 	"Options:\n"
 	"  -h, --help    - Print this usage info and exit.\n"
+	"  -c, --cli     - Use command line user interface (not yet implemented)\n"
 ;
 
 
@@ -71,13 +72,15 @@ struct Options {
 	const char* const*	commandLineArgv;
 	team_id				team;
 	thread_id			thread;
+	bool				useCLI;
 
 	Options()
 		:
 		commandLineArgc(0),
 		commandLineArgv(NULL),
 		team(-1),
-		thread(-1)
+		thread(-1),
+		useCLI(false)
 	{
 	}
 };
@@ -94,16 +97,21 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 			{ "help", no_argument, 0, 'h' },
 			{ "team", required_argument, 0, 't' },
 			{ "thread", required_argument, 0, 'T' },
+			{ "cli", no_argument, 0, 'c' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
 
-		int c = getopt_long(argc, (char**)argv, "+h", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+ch", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'c':
+				options.useCLI = true;
+				break;
+
 			case 'h':
 				if (noOutput)
 					return false;
@@ -324,6 +332,10 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		stopInMain = true;
 	}
 
+	// no parameters given, prompt the user to attach to a team
+	if (team < 0 && thread < 0)
+		return;
+
 	// If we've got
 	if (team < 0) {
 		printf("no team yet, getting thread info...\n");
@@ -430,7 +442,8 @@ Debugger::_FindTeamDebugger(team_id teamID) const
 
 
 TeamDebugger*
-Debugger::_StartTeamDebugger(team_id teamID, thread_id threadID, bool stopInMain)
+Debugger::_StartTeamDebugger(team_id teamID, thread_id threadID,
+	bool stopInMain)
 {
 	if (teamID < 0)
 		return NULL;
