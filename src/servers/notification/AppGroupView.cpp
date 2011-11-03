@@ -35,9 +35,6 @@ AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
 {
 	SetFlags(Flags() | B_WILL_DRAW);
 
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-
 	static_cast<BGroupLayout*>(GetLayout())->SetInsets(0, kHeaderSize, 0, 0);
 }
 
