@@ -37,6 +37,8 @@ enum {
 
 // Raw port based communication
 enum {
+	GENERAL_PURPOSE_WAKEUP = 0,	// when no action but wait termination needed
+	
 	ADD_ON_SERVER_RESCAN_ADD_ON_FLAVORS = 0x50,
 	ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY,
 	ADD_ON_SERVER_INSTANTIATE_DORMANT_NODE,

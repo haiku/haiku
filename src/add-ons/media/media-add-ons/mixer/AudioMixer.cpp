@@ -1,7 +1,7 @@
 /*
  * Copyright 2002 David Shipman,
  * Copyright 2003-2007 Marcus Overhagen
- * Copyright 2007-2010 Haiku Inc. All rights reserved.
+ * Copyright 2007-2011 Haiku Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -113,7 +113,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 	fDownstreamLatency(1),
 	fInternalLatency(1),
 	fDisableStop(false),
-	fLastLateNotification(0)
+	fLastLateNotification(0),
+	fLastLateness(0)
 {
 	BMediaNode::AddNodeKind(B_SYSTEM_MIXER);
 
@@ -319,11 +320,11 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 void
 AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 {
-	if (lateness > kMaxJitter) {
-		debug_printf("Received buffer %Ld usec late\n", lateness);
+	if (lateness > kMaxJitter && lateness > fLastLateness) {
+		debug_printf("AudioMixer: Dequeued input buffer %Ld usec late\n", lateness);
 		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
 			|| RunMode() == B_INCREASE_LATENCY) {
-			debug_printf("sending notify\n");
+			debug_printf("AudioMixer: sending notify\n");
 
 			// Build a media_source out of the header data
 			media_source source = media_source::null;
@@ -333,13 +334,12 @@ AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 			NotifyLateProducer(source, lateness, TimeSource()->Now());
 
 			if (RunMode() == B_DROP_DATA) {
-				debug_printf("dropping buffer\n");
+				debug_printf("AudioMixer: dropping buffer\n");
 				return;
 			}
 		}
 	}
-
-	//	printf("Received buffer with lateness %Ld\n", lateness);
+	fLastLateness = lateness;
 
 	fCore->Lock();
 	fCore->BufferReceived(buffer, lateness);
@@ -1006,18 +1006,19 @@ AudioMixer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 
 	if (what == fCore->Output()->MediaOutput().source
 		&& RunMode() == B_INCREASE_LATENCY) {
-		// We need to ignore subsequent notices whose performance time
-		// lies before the performance time of the last notification
+		// We need to ignore subsequent notices whose arrival time here
+		// lies within the last lateness, because queued-up buffers will all be 'late'
 		if (performanceTime < fLastLateNotification)
 			return;
 
 		fInternalLatency += howMuch;
 
 		// At some point a too large latency can get annoying
+		// (actually more than annoying, as there won't be enough buffers long before this!)
 		if (fInternalLatency > kMaxLatency)
 			fInternalLatency = kMaxLatency;
 
-		fLastLateNotification = TimeSource()->Now();
+		fLastLateNotification = TimeSource()->Now() + howMuch;
 
 		debug_printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
 		SetEventLatency(fDownstreamLatency + fInternalLatency);
