@@ -235,139 +235,139 @@ static DaemonCondition sPageDaemonCondition;
 namespace PageAllocationTracing {
 
 class ReservePages : public AbstractTraceEntry {
-	public:
-		ReservePages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	ReservePages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page reserve:   %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page reserve:   %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class UnreservePages : public AbstractTraceEntry {
-	public:
-		UnreservePages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	UnreservePages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page unreserve: %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page unreserve: %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class AllocatePage : public AbstractTraceEntry {
-	public:
-		AllocatePage()
-		{
-			Initialized();
-		}
+public:
+	AllocatePage()
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page alloc");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page alloc");
+	}
 };
 
 
 class AllocatePageRun : public AbstractTraceEntry {
-	public:
-		AllocatePageRun(uint32 length)
-			:
-			fLength(length)
-		{
-			Initialized();
-		}
+public:
+	AllocatePageRun(uint32 length)
+		:
+		fLength(length)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page alloc run: length: %ld", fLength);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page alloc run: length: %ld", fLength);
+	}
 
-	private:
-		uint32		fLength;
+private:
+	uint32		fLength;
 };
 
 
 class FreePage : public AbstractTraceEntry {
-	public:
-		FreePage()
-		{
-			Initialized();
-		}
+public:
+	FreePage()
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page free");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page free");
+	}
 };
 
 
 class ScrubbingPages : public AbstractTraceEntry {
-	public:
-		ScrubbingPages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	ScrubbingPages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page scrubbing: %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page scrubbing: %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class ScrubbedPages : public AbstractTraceEntry {
-	public:
-		ScrubbedPages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	ScrubbedPages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page scrubbed:  %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page scrubbed:  %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class StolenPage : public AbstractTraceEntry {
-	public:
-		StolenPage()
-		{
-			Initialized();
-		}
+public:
+	StolenPage()
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page stolen");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page stolen");
+	}
 };
 
 }	// namespace PageAllocationTracing
