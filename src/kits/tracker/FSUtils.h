@@ -247,7 +247,8 @@ bool FSIsDeskDir(const BEntry *);
 // the second one in the "To do action" sentence.
 bool ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 	const char *ifYouDoAction, const char *toDoAction,
-	bool dontAsk = false, int32 *confirmedAlready = NULL);
+	const char *toConfirmAction, bool dontAsk = false,
+	int32 *confirmedAlready = NULL);
 
 bool CheckDevicesEqual(const entry_ref *entry, const Model *targetModel);
 

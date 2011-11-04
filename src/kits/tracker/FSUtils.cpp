@@ -135,12 +135,6 @@ bool DirectoryMatches(const BEntry *, const char *additionalPath,
 
 status_t empty_trash(void *);
 
-#ifdef __HAIKU__
-	#define OS_NAME	"Haiku"
-#else
-	#define OS_NAME "BeOS"
-#endif
-
 
 static const char* kDeleteConfirmationStr =
 	B_TRANSLATE_MARK("Are you sure you want to delete the "
@@ -612,8 +606,9 @@ enum {
 
 
 bool
-ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction,
-	const char *toDoAction, bool dontAsk, int32 *confirmedAlready)
+ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
+	const char *ifYouDoAction, const char *toDoAction,
+	const char *toConfirmAction, bool dontAsk, int32 *confirmedAlready)
 {
 	// Don't let the user casually move/change important files/folders
 	//
@@ -638,21 +633,22 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction
 	if (DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)) {
 		warning.SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the system folder or its "
-			"contents, you won't be able to boot " OS_NAME "! Are you sure you "
-			"want to do this? To %toDoAction the system folder or its contents "
-			"anyway, hold down the Shift key and click \"Do it\"."));
+			"contents, you won't be able to boot Haiku! Are you sure you "
+			"want to do this? To %toDoAction the system folder or its "
+			"contents anyway, hold down the Shift key and click "
+			"\"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_COMMON_DIRECTORY)) {
 		warning.SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the common folder, " OS_NAME
-			" may not behave properly! Are you sure you want to do this? "
+			B_TRANSLATE("If you %ifYouDoAction the common folder, Haiku "
+			"may not behave properly! Are you sure you want to do this? "
 			"To %toDoAction the common folder anyway, hold down the "
-			"Shift key and click \"Do it\"."));
+			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning .SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the home folder, " OS_NAME
-			" may not behave properly! Are you sure you want to do this? "
+			B_TRANSLATE("If you %ifYouDoAction the home folder, Haiku "
+			"may not behave properly! Are you sure you want to do this? "
 			"To %toDoAction the home folder anyway, hold down the "
-			"Shift key and click \"Do it\"."));
+			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
 		|| DirectoryMatchesOrContains(entry, B_COMMON_SETTINGS_DIRECTORY)) {
 
@@ -661,22 +657,25 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
 				B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the mime settings, " OS_NAME
-				" may not behave properly! Are you sure you want to do this? "
-				"To %toDoAction the mime settings anyway, click \"Do it\"."));
+				B_TRANSLATE("If you %ifYouDoAction the mime settings, Haiku "
+				"may not behave properly! Are you sure you want to do this? "
+				"To %toDoAction the mime settings anyway, click "
+				"\"%toConfirmAction\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the config folder, " OS_NAME
-				" may not behave properly! Are you sure you want to do this? "
-				"To %toDoAction the config folder anyway, click \"Do it\"."));
+				B_TRANSLATE("If you %ifYouDoAction the config folder, Haiku "
+				"may not behave properly! Are you sure you want to do this? "
+				"To %toDoAction the config folder anyway, click "
+				"\"%toConfirmAction\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the settings folder, " OS_NAME
-				" may not behave properly! Are you sure you want to do this? "
-				"To %toDoAction the settings folder anyway, click \"Do it\"."));
+				B_TRANSLATE("If you %ifYouDoAction the settings folder, Haiku "
+				"may not behave properly! Are you sure you want to do this? "
+				"To %toDoAction the settings folder anyway, click "
+				"\"%toConfirmAction\"."));
 			requireOverride = false;
 		}
 	}
@@ -694,9 +693,18 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction
 
 	warning.ReplaceFirst("%ifYouDoAction", ifYouDoAction);
 	warning.ReplaceFirst("%toDoAction", toDoAction);
+	warning.ReplaceFirst("%toConfirmAction",
+		BString(toConfirmAction).Capitalize().String());
+	warning.ReplaceLast("%toConfirmAction",
+		BString(toConfirmAction).Capitalize().String());
+
+	BString buttonLabel(B_TRANSLATE_COMMENT("%toConfirmAction",
+		"Action label for the button, e.g. Rename"));
+	buttonLabel.ReplaceFirst("%toConfirmAction",
+		BString(toConfirmAction).Capitalize().String());
 
 	OverrideAlert *alert = new OverrideAlert("", warning.String(),
-		B_TRANSLATE("Do it"), (requireOverride ? B_SHIFT_KEY : 0),
+		buttonLabel.String(), (requireOverride ? B_SHIFT_KEY : 0),
 		B_TRANSLATE("Cancel"), 0, NULL, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->SetShortcut(1, B_ESCAPE);
 	if (alert->Go() == 1) {
@@ -756,8 +764,14 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 		}
 		if (moveMode == kMoveSelectionTo
 			&& !ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE_COMMENT("move", "As in 'If you move ...'"),
-				B_TRANSLATE_COMMENT("move", "As in 'To move ...'"),
+				B_TRANSLATE_COMMENT("move",
+					"As in 'if you move this folder...' (en) "
+					"'Wird dieser Ordner verschoben...' (de)"),
+				B_TRANSLATE_COMMENT("move",
+					"As in 'to move this folder...' (en) "
+					"Um diesen Ordner zu verschieben...' (de)"),
+				B_TRANSLATE_COMMENT("move",
+					"Button label, 'Move' (en), 'Verschieben' (de)"),
 				false, &askOnceOnly)) {
 			return B_ERROR;
 		}

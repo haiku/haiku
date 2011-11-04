@@ -433,8 +433,14 @@ BInfoWindow::MessageReceived(BMessage *message)
 			BEntry entry(fModel->EntryRef());
 			if (!fModel->HasLocalizedName()
 				&& ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
-				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'")))
+				B_TRANSLATE_COMMENT("rename",
+					"As in 'if you rename this folder...' (en) "
+					"'Wird dieser Ordner umbenannt...' (de)"),
+				B_TRANSLATE_COMMENT("rename",
+					"As in 'to rename this folder...' (en) "
+					"'Um diesen Ordner umzubenennen...' (de)"),
+				B_TRANSLATE_COMMENT("rename",
+					"Button label, 'Rename' (en), 'Umbenennen' (de)")));
 				fAttributeView->BeginEditingTitle();
 			break;
 		}
@@ -799,7 +805,8 @@ BInfoWindow::OpenFilePanel(const entry_ref *ref)
 		if (fFilePanel != NULL) {
 			fFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Select"));
 			fFilePanel->Window()->ResizeTo(500, 300);
-			BString title(B_TRANSLATE_COMMENT("Link \"%name\" to:", "File dialog title for new sym link"));
+			BString title(B_TRANSLATE_COMMENT("Link \"%name\" to:",
+				"File dialog title for new sym link"));
 			title.ReplaceFirst("%name", fModel->Name());
 			fFilePanel->Window()->SetTitle(title.String());
 			fFilePanel->Show();
@@ -1223,9 +1230,15 @@ AttributeView::MouseDown(BPoint point)
 	} else if (fTitleRect.Contains(point)) {
 		if (!fModel->HasLocalizedName()
 			&& ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
-				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'"), true)
-			&& fTitleEditView == 0)
+				B_TRANSLATE_COMMENT("rename",
+					"As in 'if you rename this folder...' (en) "
+					"'Wird dieser Ordner umbenannt...' (de)"),
+				B_TRANSLATE_COMMENT("rename",
+					"As in 'to rename this folder...' (en) "
+					"'Um diesen Ordner umzubenennen...' (de)"),
+				B_TRANSLATE_COMMENT("rename",
+					"Button label, 'Rename' (en), 'Umbenennen' (de)"), true)
+			&& fTitleEditView == 0);
 			BeginEditingTitle();
 	} else if (fTitleEditView) {
 		FinishEditingTitle(true);
