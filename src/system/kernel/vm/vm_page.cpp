@@ -275,26 +275,31 @@ private:
 class AllocatePage
 	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
 public:
-	AllocatePage()
+	AllocatePage(page_num_t pageNumber)
 		:
-		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true)
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
+		fPageNumber(pageNumber)
 	{
 		Initialized();
 	}
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page alloc");
+		out.Print("page alloc: %#" B_PRIxPHYSADDR, fPageNumber);
 	}
+
+private:
+	page_num_t	fPageNumber;
 };
 
 
 class AllocatePageRun
 	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
 public:
-	AllocatePageRun(uint32 length)
+	AllocatePageRun(page_num_t startPage, uint32 length)
 		:
 		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
+		fStartPage(startPage),
 		fLength(length)
 	{
 		Initialized();
@@ -302,10 +307,12 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page alloc run: length: %ld", fLength);
+		out.Print("page alloc run: start %#" B_PRIxPHYSADDR " length: %"
+			B_PRIu32, fStartPage, fLength);
 	}
 
 private:
+	page_num_t	fStartPage;
 	uint32		fLength;
 };
 
@@ -313,17 +320,21 @@ private:
 class FreePage
 	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
 public:
-	FreePage()
+	FreePage(page_num_t pageNumber)
 		:
-		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true)
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
+		fPageNumber(pageNumber)
 	{
 		Initialized();
 	}
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page free");
+		out.Print("page free: %#" B_PRIxPHYSADDR, fPageNumber);
 	}
+
+private:
+	page_num_t	fPageNumber;
 };
 
 
@@ -1165,7 +1176,7 @@ free_page(vm_page* page, bool clear)
 	if (fromQueue != NULL)
 		fromQueue->RemoveUnlocked(page);
 
-	TA(FreePage());
+	TA(FreePage(page->physical_page_number));
 
 	ReadLocker locker(sFreePageQueuesLock);
 
@@ -3127,8 +3138,6 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 		otherQueue = &sClearPageQueue;
 	}
 
-	TA(AllocatePage());
-
 	ReadLocker locker(sFreePageQueuesLock);
 
 	vm_page* page = queue->RemoveHeadUnlocked();
@@ -3180,6 +3189,7 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 	if ((flags & VM_PAGE_ALLOC_CLEAR) != 0 && oldPageState != PAGE_STATE_CLEAR)
 		clear_page(page);
 
+	TA(AllocatePage(page->physical_page_number));
 	return page;
 }
 
@@ -3232,8 +3242,6 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	ASSERT(pageState != PAGE_STATE_FREE);
 	ASSERT(pageState != PAGE_STATE_CLEAR);
 	ASSERT(start + length <= sNumPages);
-
-	TA(AllocatePageRun(length));
 
 	// Pull the free/clear pages out of their respective queues. Cached pages
 	// are allocated later.
@@ -3359,6 +3367,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	// Note: We don't unreserve the pages since we pulled them out of the
 	// free/clear queues without adjusting sUnreservedFreePages.
 
+	TA(AllocatePageRun(start, length));
 	return length;
 }
 
