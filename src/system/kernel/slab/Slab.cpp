@@ -792,8 +792,8 @@ dump_allocations_per_caller(int argc, char **argv)
 		kprintf("%10" B_PRIuSIZE "  %10" B_PRIuSIZE "  %p", info.count,
 			info.size, (void*)info.caller);
 
-		const char *symbol;
-		const char *imageName;
+		const char* symbol;
+		const char* imageName;
 		bool exactMatch;
 		addr_t baseAddress;
 
