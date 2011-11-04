@@ -31,6 +31,6 @@ BuildPlatformMain <build>unzip :
 	unzip.c
 	unreduce.c
 	unshrink.c
-	: <build>libunzip.a $(HOST_LIBBE) $(HOST_LIBSUPC++)
+	: <build>libunzip.a $(HOST_LIBBE) $(HOST_LIBROOT) $(HOST_LIBSUPC++)
 ;
 
