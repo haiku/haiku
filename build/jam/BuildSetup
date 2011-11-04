@@ -619,6 +619,9 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 # analyze GCC version
 HOST_GCC_VERSION = [ FAnalyzeGCCVersion HOST_GCC_RAW_VERSION ] ;
 
+# fix for new changes to DSO linking policies
+HOST_LINKFLAGS += -Xlinker --no-as-needed ;
+
 # set variables for gcc header options
 SetIncludePropertiesVariables HOST ;
 
