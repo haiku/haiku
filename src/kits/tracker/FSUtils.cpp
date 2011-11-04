@@ -693,15 +693,11 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 
 	warning.ReplaceFirst("%ifYouDoAction", ifYouDoAction);
 	warning.ReplaceFirst("%toDoAction", toDoAction);
-	warning.ReplaceFirst("%toConfirmAction",
-		BString(toConfirmAction).Capitalize().String());
-	warning.ReplaceLast("%toConfirmAction",
-		BString(toConfirmAction).Capitalize().String());
+	warning.ReplaceFirst("%toConfirmAction", toConfirmAction);
 
 	BString buttonLabel(B_TRANSLATE_COMMENT("%toConfirmAction",
 		"Action label for the button, e.g. Rename"));
-	buttonLabel.ReplaceFirst("%toConfirmAction",
-		BString(toConfirmAction).Capitalize().String());
+	buttonLabel.ReplaceFirst("%toConfirmAction", toConfirmAction);
 
 	OverrideAlert *alert = new OverrideAlert("", warning.String(),
 		buttonLabel.String(), (requireOverride ? B_SHIFT_KEY : 0),
@@ -770,7 +766,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 				B_TRANSLATE_COMMENT("move",
 					"As in 'to move this folder...' (en) "
 					"Um diesen Ordner zu verschieben...' (de)"),
-				B_TRANSLATE_COMMENT("move",
+				B_TRANSLATE_COMMENT("Move",
 					"Button label, 'Move' (en), 'Verschieben' (de)"),
 				false, &askOnceOnly)) {
 			return B_ERROR;

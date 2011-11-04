@@ -439,7 +439,7 @@ BInfoWindow::MessageReceived(BMessage *message)
 				B_TRANSLATE_COMMENT("rename",
 					"As in 'to rename this folder...' (en) "
 					"'Um diesen Ordner umzubenennen...' (de)"),
-				B_TRANSLATE_COMMENT("rename",
+				B_TRANSLATE_COMMENT("Rename",
 					"Button label, 'Rename' (en), 'Umbenennen' (de)")));
 				fAttributeView->BeginEditingTitle();
 			break;
@@ -1236,7 +1236,7 @@ AttributeView::MouseDown(BPoint point)
 				B_TRANSLATE_COMMENT("rename",
 					"As in 'to rename this folder...' (en) "
 					"'Um diesen Ordner umzubenennen...' (de)"),
-				B_TRANSLATE_COMMENT("rename",
+				B_TRANSLATE_COMMENT("Rename",
 					"Button label, 'Rename' (en), 'Umbenennen' (de)"), true)
 			&& fTitleEditView == 0);
 			BeginEditingTitle();
