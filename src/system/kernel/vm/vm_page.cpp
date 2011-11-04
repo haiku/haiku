@@ -272,9 +272,12 @@ private:
 };
 
 
-class AllocatePage : public AbstractTraceEntry {
+class AllocatePage
+	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
 public:
 	AllocatePage()
+		:
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true)
 	{
 		Initialized();
 	}
@@ -286,10 +289,12 @@ public:
 };
 
 
-class AllocatePageRun : public AbstractTraceEntry {
+class AllocatePageRun
+	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
 public:
 	AllocatePageRun(uint32 length)
 		:
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
 		fLength(length)
 	{
 		Initialized();
@@ -305,9 +310,12 @@ private:
 };
 
 
-class FreePage : public AbstractTraceEntry {
+class FreePage
+	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
 public:
 	FreePage()
+		:
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true)
 	{
 		Initialized();
 	}
