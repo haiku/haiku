@@ -110,5 +110,8 @@
 // When set limits the amount of available RAM (in MB).
 //#define LIMIT_AVAILABLE_MEMORY		256
 
+// Enables tracking of page allocations.
+#define VM_PAGE_ALLOCATION_TRACKING		0
+
 
 #endif	// KERNEL_DEBUG_CONFIG_H
