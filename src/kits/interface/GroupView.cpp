@@ -62,3 +62,23 @@ BGroupView::GroupLayout() const
 {
 	return dynamic_cast<BGroupLayout*>(GetLayout());
 }
+
+
+status_t
+BGroupView::Perform(perform_code code, void* _data)
+{
+	return BView::Perform(code, _data);
+}
+
+
+void BGroupView::_ReservedGroupView1() {}
+void BGroupView::_ReservedGroupView2() {}
+void BGroupView::_ReservedGroupView3() {}
+void BGroupView::_ReservedGroupView4() {}
+void BGroupView::_ReservedGroupView5() {}
+void BGroupView::_ReservedGroupView6() {}
+void BGroupView::_ReservedGroupView7() {}
+void BGroupView::_ReservedGroupView8() {}
+void BGroupView::_ReservedGroupView9() {}
+void BGroupView::_ReservedGroupView10() {}
+

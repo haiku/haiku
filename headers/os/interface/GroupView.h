@@ -26,11 +26,27 @@ public:
 
 	static	BArchivable*		Instantiate(BMessage* from);
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
 private:
+
+	// FBC padding
+	virtual	void				_ReservedGroupView1();
+	virtual	void				_ReservedGroupView2();
+	virtual	void				_ReservedGroupView3();
+	virtual	void				_ReservedGroupView4();
+	virtual	void				_ReservedGroupView5();
+	virtual	void				_ReservedGroupView6();
+	virtual	void				_ReservedGroupView7();
+	virtual	void				_ReservedGroupView8();
+	virtual	void				_ReservedGroupView9();
+	virtual	void				_ReservedGroupView10();
 
 	// forbidden methods
 								BGroupView(const BGroupView&);
 			void				operator =(const BGroupView&);
+
+			uint32				_reserved[2];
 };
 
 
