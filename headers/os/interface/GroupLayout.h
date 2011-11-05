@@ -36,6 +36,7 @@ public:
 									float weight);
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			AllArchived(BMessage* into) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 

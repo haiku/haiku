@@ -496,6 +496,20 @@ BGridLayout::Archive(BMessage* into, bool deep) const
 }
 
 
+status_t
+BGridLayout::AllArchived(BMessage* into) const
+{
+	return BTwoDimensionalLayout::AllArchived(into);
+}
+
+
+status_t
+BGridLayout::AllUnarchived(const BMessage* from)
+{
+	return BTwoDimensionalLayout::AllUnarchived(from);
+}
+
+
 BArchivable*
 BGridLayout::Instantiate(BMessage* from)
 {

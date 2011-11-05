@@ -155,6 +155,48 @@ BAbstractLayoutItem::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BAbstractLayoutItem::AllUnarchived(const BMessage* archive)
+{
+	return BLayoutItem::AllUnarchived(archive);
+}
+
+
+status_t
+BAbstractLayoutItem::AllArchived(BMessage* archive) const
+{
+	return BLayoutItem::AllArchived(archive);
+}
+
+
+void
+BAbstractLayoutItem::LayoutInvalidated(bool children)
+{
+	BLayoutItem::LayoutInvalidated(children);
+}
+
+
+void
+BAbstractLayoutItem::AttachedToLayout()
+{
+	BLayoutItem::AttachedToLayout();
+}
+
+
+void
+BAbstractLayoutItem::DetachedFromLayout(BLayout* layout)
+{
+	BLayoutItem::DetachedFromLayout(layout);
+}
+
+
+void
+BAbstractLayoutItem::AncestorVisibilityChanged(bool shown)
+{
+	BLayoutItem::AncestorVisibilityChanged(shown);
+}
+
+
+status_t
 BAbstractLayoutItem::Perform(perform_code d, void* arg)
 {
 	return BLayoutItem::Perform(d, arg);

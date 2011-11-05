@@ -453,6 +453,13 @@ BLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BLayout::AllArchived(BMessage* archive) const
+{
+	return BArchivable::AllArchived(archive);
+}
+
+
+status_t
 BLayout::AllUnarchived(const BMessage* from)
 {
 	BUnarchiver unarchiver(from);

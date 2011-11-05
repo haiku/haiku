@@ -32,8 +32,18 @@ public:
 	virtual	BAlignment			BaseAlignment();
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual	status_t 			AllUnarchived(const BMessage* archive);
+	virtual	status_t 			AllArchived(BMessage* archive) const;
 
 	virtual	status_t			Perform(perform_code d, void* arg);
+
+protected:
+	virtual	void				LayoutInvalidated(bool children);
+
+	virtual	void				AttachedToLayout();
+	virtual	void				DetachedFromLayout(BLayout* layout);
+
+	virtual void				AncestorVisibilityChanged(bool shown);
 
 private:
 	virtual	void				_ReservedAbstractLayoutItem1();

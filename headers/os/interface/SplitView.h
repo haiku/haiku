@@ -58,16 +58,20 @@ public:
 									float weight);
 
 	virtual	void				Draw(BRect updateRect);
+	virtual	void				DrawAfterChildren(BRect updateRect);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* message);
+
+	virtual	void				MessageReceived(BMessage* message);
 
 
 	virtual	void				SetLayout(BLayout* layout);
 									// overridden to avoid use
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual	status_t			AllArchived(BMessage* into) const;
 	virtual status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 

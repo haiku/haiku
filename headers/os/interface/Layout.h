@@ -63,6 +63,7 @@ public:
 	// Archiving methods
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual	status_t			AllArchived(BMessage* archive) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,

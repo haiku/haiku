@@ -199,6 +199,13 @@ BGroupLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BGroupLayout::AllArchived(BMessage* into) const
+{
+	return BTwoDimensionalLayout::AllArchived(into);
+}
+
+
+status_t
 BGroupLayout::AllUnarchived(const BMessage* from)
 {
 	return BTwoDimensionalLayout::AllUnarchived(from);

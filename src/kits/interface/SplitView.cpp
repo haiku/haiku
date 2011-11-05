@@ -223,6 +223,13 @@ BSplitView::Draw(BRect updateRect)
 
 
 void
+BSplitView::DrawAfterChildren(BRect r)
+{
+	return BView::DrawAfterChildren(r);
+}
+
+
+void
 BSplitView::MouseDown(BPoint where)
 {
 	SetMouseEventMask(B_POINTER_EVENTS,
@@ -270,6 +277,13 @@ BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 
 
 void
+BSplitView::MessageReceived(BMessage* message)
+{
+	return BView::MessageReceived(message);
+}
+
+
+void
 BSplitView::SetLayout(BLayout* layout)
 {
 	// not allowed
@@ -280,6 +294,13 @@ status_t
 BSplitView::Archive(BMessage* into, bool deep) const
 {
 	return BView::Archive(into, deep);
+}
+
+
+status_t
+BSplitView::AllArchived(BMessage* archive) const
+{
+	return BView::AllArchived(archive);
 }
 
 

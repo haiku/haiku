@@ -213,6 +213,13 @@ BCardLayout::Archive(BMessage* into, bool deep) const
 
 
 status_t
+BCardLayout::AllArchived(BMessage* archive) const
+{
+	return BAbstractLayout::AllArchived(archive);
+}
+
+
+status_t
 BCardLayout::AllUnarchived(const BMessage* from)
 {
 	status_t err = BLayout::AllUnarchived(from);

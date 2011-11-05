@@ -456,6 +456,24 @@ BTwoDimensionalLayout::AllUnarchived(const BMessage* from)
 }
 
 
+status_t
+BTwoDimensionalLayout::ItemArchived(BMessage* into, BLayoutItem* item,
+	int32 index) const
+{
+	return BAbstractLayout::ItemArchived(into, item, index);
+}
+
+
+status_t
+BTwoDimensionalLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
+	int32 index)
+{
+	return BAbstractLayout::ItemUnarchived(from, item, index);
+}
+
+
+
+
 void
 BTwoDimensionalLayout::LayoutInvalidated(bool children)
 {
