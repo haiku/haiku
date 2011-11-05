@@ -4493,6 +4493,11 @@ BView::Perform(perform_code code, void* _data)
 			BView::DoLayout();
 			return B_OK;
 		}
+		case PERFORM_CODE_LAYOUT_CHANGED:
+		{
+			BView::LayoutChanged();
+			return B_OK;
+		}
 		case PERFORM_CODE_GET_TOOL_TIP_AT:
 		{
 			perform_data_get_tool_tip_at* data
@@ -4880,6 +4885,13 @@ BView::GetToolTipAt(BPoint point, BToolTip** _tip)
 
 
 void
+BView::LayoutChanged()
+{
+	// hook method
+}
+
+
+void
 BView::_Layout(bool force, BLayoutContext* context)
 {
 //printf("%p->BView::_Layout(%d, %p)\n", this, force, context);
@@ -4908,6 +4920,8 @@ BView::_Layout(bool force, BLayoutContext* context)
 			if (!child->IsHidden(child))
 				child->_Layout(force, context);
 		}
+
+		LayoutChanged();
 
 		fLayoutData->fLayoutContext = oldContext;
 
@@ -5811,6 +5825,14 @@ _ReservedView11__5BView(BView* view, BPoint point, BToolTip** _toolTip)
 }
 
 
+extern "C" void
+_ReservedView12__5BView(BView* view)
+{
+	// LayoutChanged();
+	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+}
+
+
 #elif __GNUC__ > 2
 
 
@@ -5828,7 +5850,6 @@ _ZN5BView15_ReservedView11Ev(BView* view, BPoint point, BToolTip** _toolTip)
 
 #endif	// __GNUC__ > 2
 
-void BView::_ReservedView12() {}
 void BView::_ReservedView13() {}
 void BView::_ReservedView14() {}
 void BView::_ReservedView15() {}

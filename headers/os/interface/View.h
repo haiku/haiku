@@ -581,6 +581,8 @@ public:
 protected:
 	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 
+	virtual	void				LayoutChanged();
+
 private:
 			void				_Layout(bool force, BLayoutContext* context);
 			void				_LayoutLeft(BLayout* deleted);
@@ -588,7 +590,6 @@ private:
 
 private:
 	// FBC padding and forbidden methods
-	virtual	void				_ReservedView12();
 	virtual	void				_ReservedView13();
 	virtual	void				_ReservedView14();
 	virtual	void				_ReservedView15();
