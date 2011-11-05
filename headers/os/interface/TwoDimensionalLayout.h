@@ -110,6 +110,11 @@ private:
 	virtual	void				_ReservedTwoDimensionalLayout9();
 	virtual	void				_ReservedTwoDimensionalLayout10();
 
+	// forbidden methods
+								BTwoDimensionalLayout(
+									const BTwoDimensionalLayout&);
+			void				operator =(const BTwoDimensionalLayout&);
+
 			LocalLayouter*		fLocalLayouter;
 
 			uint32				_reserved[5];

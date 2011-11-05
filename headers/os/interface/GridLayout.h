@@ -111,6 +111,10 @@ private:
 	virtual	void				_ReservedGridLayout9();
 	virtual	void				_ReservedGridLayout10();
 
+	// forbidden methods
+								BGridLayout(const BGridLayout&);
+			void				operator =(const BGridLayout&);
+
 			BLayoutItem***		fGrid;
 			int32				fColumnCount;
 			int32				fRowCount;

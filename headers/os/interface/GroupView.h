@@ -25,6 +25,12 @@ public:
 			BGroupLayout*		GroupLayout() const;
 
 	static	BArchivable*		Instantiate(BMessage* from);
+
+private:
+
+	// forbidden methods
+								BGroupView(const BGroupView&);
+			void				operator =(const BGroupView&);
 };
 
 

@@ -75,6 +75,10 @@ private:
 	virtual	void				_ReservedGroupLayout9();
 	virtual	void				_ReservedGroupLayout10();
 
+	// forbidden methods
+								BGroupLayout(const BGroupLayout&);
+			void				operator =(const BGroupLayout&);
+
 			struct ItemLayoutData;
 
 			ItemLayoutData*		_LayoutDataForItem(BLayoutItem* item) const;

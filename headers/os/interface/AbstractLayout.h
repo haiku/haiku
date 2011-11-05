@@ -57,6 +57,10 @@ private:
 	virtual	void				_ReservedAbstractLayout9();
 	virtual	void				_ReservedAbstractLayout10();
 
+	// forbidden methods
+								BAbstractLayout(const BAbstractLayout&);
+			void				operator =(const BAbstractLayout&);
+
 			struct	Proxy;
 			struct	ViewProxy;
 			struct	DataProxy;

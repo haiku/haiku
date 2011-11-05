@@ -93,6 +93,10 @@ private:
 	virtual	void				_ReservedSplitView9();
 	virtual	void				_ReservedSplitView10();
 
+	// forbidden methods
+								BSplitView(const BSplitView&);
+			void				operator =(const BSplitView&);
+
 	static	void				_DrawDefaultSplitter(BView* view, BRect frame,
 									const BRect& updateRect,
 									enum orientation orientation,

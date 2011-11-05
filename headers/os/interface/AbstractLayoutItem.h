@@ -47,6 +47,10 @@ private:
 	virtual	void				_ReservedAbstractLayoutItem9();
 	virtual	void				_ReservedAbstractLayoutItem10();
 
+	// forbidden methods
+								BAbstractLayoutItem(const BAbstractLayoutItem&);
+			void				operator =(const BAbstractLayoutItem&);
+
 			BSize				fMinSize;
 			BSize				fMaxSize;
 			BSize				fPreferredSize;

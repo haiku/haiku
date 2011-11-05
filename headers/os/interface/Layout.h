@@ -104,6 +104,10 @@ private:
 	virtual	void				_ReservedLayout9();
 	virtual	void				_ReservedLayout10();
 
+	// forbidden methods
+								BLayout(const BLayout&);
+			void				operator =(const BLayout&);
+
 			friend class BView;
 
 			void				SetOwner(BView* owner);

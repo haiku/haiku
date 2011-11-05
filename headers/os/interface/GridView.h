@@ -24,6 +24,12 @@ public:
 			BGridLayout*		GridLayout() const;
 
 	static	BArchivable*		Instantiate(BMessage* from);
+
+private:
+
+	// forbidden methods
+								BGridView(const BGridView&);
+			void				operator =(const BGridView&);
 };
 
 
