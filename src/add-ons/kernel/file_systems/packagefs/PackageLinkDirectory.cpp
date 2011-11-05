@@ -175,11 +175,12 @@ PackageLinkDirectory::_Update(PackageLinksListener* listener)
 	// Always remove all dependency links -- if there's still a package, they
 	// will be re-created below.
 	while (DependencyLink* link = fDependencyLinks.RemoveHead()) {
-		NodeWriteLocker selfLinkLocker(link);
+		NodeWriteLocker linkLocker(link);
 		if (listener != NULL)
 			listener->PackageLinkNodeRemoved(link);
 
 		RemoveChild(link);
+		linkLocker.Unlock();
 		link->ReleaseReference();
 	}
 
@@ -193,6 +194,7 @@ PackageLinkDirectory::_Update(PackageLinksListener* listener)
 				listener->PackageLinkNodeRemoved(fSelfLink);
 
 			RemoveChild(fSelfLink);
+			selfLinkLocker.Unlock();
 			fSelfLink->ReleaseReference();
 			fSelfLink = NULL;
 		}
