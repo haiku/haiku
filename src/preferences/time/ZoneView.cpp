@@ -167,7 +167,6 @@ TimeZoneView::MessageReceived(BMessage* message)
 		case H_SET_TIME_ZONE:
 		{
 			_SetSystemTimeZone();
-			_NotifyClockSettingChanged();
 			break;
 		}
 
@@ -634,7 +633,6 @@ TimeZoneView::_UpdateGmtSettings()
 	_WriteRTCSettings();
 
 	_ShowOrHidePreview();
-	_NotifyClockSettingChanged();
 
 	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
 }
@@ -654,13 +652,5 @@ TimeZoneView::_ShowOrHidePreview()
 		fCurrent->Hide();
 		fPreview->Hide();
 	}
-}
-
-
-void
-TimeZoneView::_NotifyClockSettingChanged()
-{
-	BMessage msg(kMsgClockSettingChanged);
-	Window()->PostMessage(&msg);
 }
 

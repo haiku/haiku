@@ -73,8 +73,6 @@ DateTimeView::AttachedToWindow()
 
 		fCalendarView->SetTarget(this);
 	}
-
-	_NotifyClockSettingChanged();
 }
 
 
@@ -233,13 +231,5 @@ DateTimeView::_UpdateDateTime(BMessage* message)
 		fClock->SetTime(hour, minute, second);
 		fTimeEdit->SetTime(hour, minute, second);
 	}
-}
-
-
-void
-DateTimeView::_NotifyClockSettingChanged()
-{
-	BMessage msg(kMsgClockSettingChanged);
-	Window()->PostMessage(&msg);
 }
 

@@ -92,9 +92,6 @@ TTimeWindow::MessageReceived(BMessage* message)
 			_SetRevertStatus();
 			break;
 
-		case kMsgClockSettingChanged:
-			break;
-
 		default:
 			BWindow::MessageReceived(message);
 			break;

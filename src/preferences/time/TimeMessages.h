@@ -49,8 +49,5 @@ const uint32 kMsgChange = 'chng';
 // change time finished
 const uint32 kChangeTimeFinished = 'tcfi';
 
-// GMT or localtime setting was changed
-const uint32 kMsgClockSettingChanged = 'tsch';
-
 #endif	// _TIME_MESSAGES_H
 

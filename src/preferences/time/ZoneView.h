@@ -46,7 +46,6 @@ private:
 
 			void				_UpdatePreview();
 			void				_UpdateCurrent();
-			void 				_NotifyClockSettingChanged();
 			BString				_FormatTime(const BTimeZone& timeZone);
 
 			void 				_ReadRTCSettings();
