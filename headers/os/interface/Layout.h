@@ -70,6 +70,8 @@ public:
 	virtual	status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
 
+	virtual status_t			Perform(perform_code d, void* arg);
+
 protected:
 	// BLayout hook methods
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
@@ -87,8 +89,6 @@ protected:
 			void				VisibilityChanged(bool show);
 	// To be called when layout data is known to be good
 			void				ResetLayoutInvalidation();
-
-	virtual status_t			Perform(perform_code d, void* arg);
 
 private:
 
