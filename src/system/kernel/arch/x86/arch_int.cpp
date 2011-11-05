@@ -84,6 +84,7 @@ static desc_table* sIDTs[B_MAX_CPU_COUNT];
 
 // table with functions handling respective interrupts
 typedef void interrupt_handler_function(struct iframe* frame);
+
 #define INTERRUPT_HANDLER_TABLE_SIZE 256
 interrupt_handler_function* gInterruptHandlerTable[
 	INTERRUPT_HANDLER_TABLE_SIZE];
@@ -652,6 +653,8 @@ arch_int_init(struct kernel_args *args)
 
 	set_trap_gate(0, 98, &trap98);	// for performance testing only
 	set_trap_gate(0, 99, &trap99);	// syscall interrupt
+
+	reserve_io_interrupt_vectors(2, 98);
 
 	// configurable msi or msi-x interrupts
 	set_interrupt_gate(0, 100, &trap100);

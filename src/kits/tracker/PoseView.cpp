@@ -2409,6 +2409,28 @@ BPoseView::MessageReceived(BMessage *message)
 				be_clipboard->Unlock();
 			}
 			break;
+
+		case kArrangeBy:
+		{
+			uint32 attrHash;
+			if (message->FindInt32("attr_hash", (int32*)&attrHash) == B_OK) {
+				if (ColumnFor(attrHash) == NULL)
+					HandleAttrMenuItemSelected(message);
+
+				if (PrimarySort() == attrHash)
+					attrHash = 0;
+					
+				SetPrimarySort(attrHash);
+				SetSecondarySort(0);
+				Cleanup(true);
+			}
+			break;
+		}
+		case kArrangeReverseOrder:
+			SetReverseSort(!fViewState->ReverseSort());
+			Cleanup(true);
+			break;
+
 		case kAttributeItem:
 			HandleAttrMenuItemSelected(message);
 			break;
@@ -2988,10 +3010,8 @@ BPoseView::SetViewMode(uint32 newMode)
 		AddToVSList(pose);
 	}
 
-	// sort poselist if we are switching to list mode
-	if (newMode == kListMode)
-		SortPoses();
-	else
+	SortPoses();
+	if (newMode != kListMode)
 		RecalcExtent();
 
 	UpdateScrollRange();
@@ -6586,6 +6606,11 @@ BPoseView::_BeginSelectionRect(const BPoint& point, bool shouldExtend)
 	fSelectionRectInfo.startPoint = point;
 	fSelectionRectInfo.lastPoint = point;
 	fSelectionRectInfo.isDragging = true;
+
+	if (fAutoScrollState == kAutoScrollOff) {
+		fAutoScrollState = kAutoScrollOn;
+		Window()->SetPulseRate(20000);
+	}
 }
 
 
@@ -6621,8 +6646,6 @@ BPoseView::_UpdateSelectionRect(const BPoint& point)
 			fSelectionRectInfo.startPoint.x);
 
 		fIsDrawingSelectionRect = true;
-
-		CheckAutoScroll(point, true, true);
 
 		// use current selection rectangle to scan poses
 		if (ViewMode() == kListMode) {
@@ -9293,8 +9316,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 
 
 bool
-BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
-	bool selectionScrolling)
+BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll)
 {
 	if (!fShouldAutoScroll)
 		return false;
@@ -9302,10 +9324,6 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 	// make sure window is in front before attempting scrolling
 	BContainerWindow* window = ContainerWindow();
 	if (window == NULL)
-		return false;
-
-	// selection scrolling will also work if the window is inactive
-	if (!selectionScrolling && !window->IsActive())
 		return false;
 
 	BRect bounds(Bounds());
@@ -9320,6 +9338,8 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 	border.top -= kBorderHeight;
 	if (ViewMode() == kListMode)
 		border.top -= kTitleViewHeight;
+
+	bool selectionScrolling = fSelectionRectInfo.isDragging;
 
 	if (bounds.top > extent.top) {
 		if (selectionScrolling) {
@@ -9425,6 +9445,11 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 			}
 		}
 	}
+
+	// Force selection rect update to account for the new scrolled coords
+	// without a mouse move
+	if (selectionScrolling)
+		_UpdateSelectionRect(mouseLoc);
 
 	return wouldScroll;
 }

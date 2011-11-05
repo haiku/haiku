@@ -2250,7 +2250,7 @@ idle_scan_active_pages(page_stats& pageStats)
 		if (cache == NULL)
 			continue;
 
-		if (cache == NULL || page->State() != PAGE_STATE_ACTIVE) {
+		if (page->State() != PAGE_STATE_ACTIVE) {
 			// page is no longer in the cache or in this queue
 			cache->ReleaseRefAndUnlock();
 			continue;

@@ -18,12 +18,17 @@ public:
 								GraphicalUserInterface();
 	virtual						~GraphicalUserInterface();
 
+	virtual	const char*			ID() const;
+
 	virtual	status_t			Init(Team* team,
 									UserInterfaceListener* listener);
 	virtual	void				Show();
 	virtual	void				Terminate();
 									// shut down the UI *now* -- no more user
 									// feedback
+
+	virtual status_t			LoadSettings(const TeamUISettings* settings);
+	virtual status_t			SaveSettings(TeamUISettings*& settings)	const;
 
 	virtual	void				NotifyUser(const char* title,
 									const char* message,

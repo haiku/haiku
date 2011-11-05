@@ -39,9 +39,7 @@ All rights reserved.
 #include "Utilities.h"
 #include "ContainerWindow.h"
 
-#ifdef __HAIKU__
-#	include <IconUtils.h>
-#endif
+#include <IconUtils.h>
 
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -163,7 +161,8 @@ DisallowMetaKeys(BTextView *textView)
 
 
 PeriodicUpdatePoses::PeriodicUpdatePoses()
-	:	fPoseList(20, true)
+	:
+	fPoseList(20, true)
 {
 	fLock = new Benaphore("PeriodicUpdatePoses");
 }
@@ -234,6 +233,7 @@ PeriodicUpdatePoses::DoPeriodicUpdate(bool forceRedraw)
 
 
 PeriodicUpdatePoses gPeriodicUpdatePoses;
+
 
 }	// namespace BPrivate
 
@@ -471,13 +471,13 @@ OffscreenBitmap::View() const
 
 namespace BPrivate {
 
-/** Changes the alpha value of the given bitmap to create a nice
- *	horizontal fade out in the specified region.
- *	"from" is always transparent, "to" opaque.
- */
-
+/*!	Changes the alpha value of the given bitmap to create a nice
+	horizontal fade out in the specified region.
+	"from" is always transparent, "to" opaque.
+*/
 void
-FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from, int32 to)
+FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from,
+	int32 to)
 {
 	// check parameters
 	if (width < 0 || height < 0 || from < 0 || to < 0)
@@ -505,13 +505,13 @@ FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from, int32 
 }
 
 
-/** Changes the alpha value of the given bitmap to create a nice
- *	vertical fade out in the specified region.
- *	"from" is always transparent, "to" opaque.
- */
-
+/*!	Changes the alpha value of the given bitmap to create a nice
+	vertical fade out in the specified region.
+	"from" is always transparent, "to" opaque.
+*/
 void
-FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from, int32 to)
+FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from,
+	int32 to)
 {
 	// check parameters
 	if (width < 0 || height < 0 || from < 0 || to < 0)
@@ -541,6 +541,7 @@ FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from, int32 to
 	}
 }
 
+
 }	// namespace BPrivate
 
 
@@ -550,7 +551,8 @@ FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from, int32 to
 DraggableIcon::DraggableIcon(BRect rect, const char *name, const char *mimeType,
 		icon_size size, const BMessage *message, BMessenger target,
 		uint32 resizeMask, uint32 flags)
-	: BView(rect, name, resizeMask, flags),
+	:
+	BView(rect, name, resizeMask, flags),
 	fMessage(*message),
 	fTarget(target)
 {
@@ -593,7 +595,7 @@ void
 DraggableIcon::AttachedToWindow()
 {
 	BView *parent = Parent();
-	if (parent) {
+	if (parent != NULL) {
 		SetViewColor(parent->ViewColor());
 		SetLowColor(parent->LowColor());
 	}
@@ -641,12 +643,8 @@ DraggableIcon::DragStarted(BMessage *)
 void
 DraggableIcon::Draw(BRect)
 {
-#ifdef __HAIKU__
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-#else
-	SetDrawingMode(B_OP_OVER);
-#endif
 	DrawBitmap(fBitmap);
 }
 
@@ -656,7 +654,8 @@ DraggableIcon::Draw(BRect)
 
 FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char *name,
 		const char *text, uint32 resizeFlags, uint32 flags)
-	: BStringView(bounds, name, text, resizeFlags, flags),
+	:
+	BStringView(bounds, name, text, resizeFlags, flags),
 	fBitmap(NULL),
 	fOrigBitmap(NULL)
 {
@@ -665,7 +664,8 @@ FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char *name,
 
 FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char *name,
 		const char *text, BBitmap *inBitmap, uint32 resizeFlags, uint32 flags)
-	: BStringView(bounds, name, text, resizeFlags, flags),
+	:
+	BStringView(bounds, name, text, resizeFlags, flags),
 	fBitmap(NULL),
 	fOrigBitmap(inBitmap)
 {
@@ -715,10 +715,8 @@ FlickerFreeStringView::Draw(BRect)
 		edge_info eInfo;
 		switch (Alignment()) {
 			case B_ALIGN_LEFT:
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			case B_ALIGN_HORIZONTAL_UNSET:
 			case B_ALIGN_USE_FULL_WIDTH:
-#endif
 			{
 				// If the first char has a negative left edge give it
 				// some more room by shifting that much more to the right.
@@ -791,7 +789,8 @@ FlickerFreeStringView::SetLowColor(rgb_color color)
 
 
 TitledSeparatorItem::TitledSeparatorItem(const char *label)
-	: BMenuItem(label, 0)
+	:
+	BMenuItem(label, 0)
 {
 	_inherited::SetEnabled(false);
 }
@@ -858,7 +857,8 @@ TitledSeparatorItem::Draw()
 
 	// first calculate the length of the stub part of the
 	// divider line, so we can use it for secondStartX
-	float firstEndX = ((endX - startX) - maxStringWidth) / 2 - kStubToStringSlotX;
+	float firstEndX = ((endX - startX) - maxStringWidth) / 2
+		- kStubToStringSlotX;
 	if (firstEndX < 0)
 		firstEndX = 0;
 
@@ -902,7 +902,8 @@ TitledSeparatorItem::Draw()
 	parent->GetFontHeight(&finfo);
 
 	parent->SetLowColor(parent->ViewColor());
-	BPoint loc(firstEndX + kStubToStringSlotX, ContentLocation().y + finfo.ascent);
+	BPoint loc(firstEndX + kStubToStringSlotX,
+		ContentLocation().y + finfo.ascent);
 
 	parent->MovePenTo(loc + BPoint(1, 1));
 	parent->SetHighColor(ShiftMenuBackgroundColor(B_DARKEN_1_TINT));
@@ -921,7 +922,8 @@ TitledSeparatorItem::Draw()
 
 ShortcutFilter::ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
 		uint32 shortcutWhat, BHandler *target)
-	: BMessageFilter(B_KEY_DOWN),
+	:
+	BMessageFilter(B_KEY_DOWN),
 	fShortcutKey(shortcutKey),
 	fShortcutModifier(shortcutModifier),
 	fShortcutWhat(shortcutWhat),
@@ -964,6 +966,7 @@ ShortcutFilter::Filter(BMessage *message, BHandler **)
 
 
 namespace BPrivate {
+
 
 void
 EmbedUniqueVolumeInfo(BMessage *message, const BVolume *volume)
@@ -1143,7 +1146,8 @@ bool
 ContainsEntryRef(const BMessage *message, const entry_ref *ref)
 {
 	entry_ref match;
-	for (int32 index = 0; (message->FindRef("refs", index, &match) == B_OK); index++) {
+	for (int32 index = 0; (message->FindRef("refs", index, &match) == B_OK);
+			index++) {
 		if (*ref == match)
 			return true;
 	}
@@ -1162,8 +1166,8 @@ EachEntryRef(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
 typedef entry_ref *(*EachEntryIteratee)(entry_ref *, void *);
 
 const entry_ref *
-EachEntryRef(const BMessage *message, const entry_ref *(*func)(const entry_ref *, void *),
-	void *passThru)
+EachEntryRef(const BMessage *message,
+	const entry_ref *(*func)(const entry_ref *, void *), void *passThru)
 {
 	return EachEntryRefCommon(const_cast<BMessage *>(message),
 		(EachEntryIteratee)func, passThru, -1);
@@ -1179,8 +1183,9 @@ EachEntryRef(BMessage *message, entry_ref *(*func)(entry_ref *, void *),
 
 
 const entry_ref *
-EachEntryRef(const BMessage *message, const entry_ref *(*func)(const entry_ref *, void *),
-	void *passThru, int32 maxCount)
+EachEntryRef(const BMessage *message,
+	const entry_ref *(*func)(const entry_ref *, void *), void *passThru,
+	int32 maxCount)
 {
 	return EachEntryRefCommon(const_cast<BMessage *>(message),
 		(EachEntryIteratee)func, passThru, maxCount);
@@ -1229,26 +1234,6 @@ StringToScalar(const char *text)
 	return val;
 }
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI && !defined(__HAIKU__)
-
-bool
-operator==(const rgb_color &a, const rgb_color &b)
-{
-	return a.red == b.red
-		&& a.green == b.green
-		&& a.blue == b.blue
-		&& a.alpha == b.alpha;
-}
-
-
-bool
-operator!=(const rgb_color &a, const rgb_color &b)
-{
-	return !operator==(a, b);
-}
-
-#endif
-
 
 static BRect
 LineBounds(BPoint where, float length, bool vertical)
@@ -1265,8 +1250,10 @@ LineBounds(BPoint where, float length, bool vertical)
 }
 
 
-SeparatorLine::SeparatorLine(BPoint where, float length, bool vertical, const char *name)
-	: BView(LineBounds(where, length, vertical), name,
+SeparatorLine::SeparatorLine(BPoint where, float length, bool vertical,
+	const char *name)
+	:
+	BView(LineBounds(where, length, vertical), name,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -1284,10 +1271,12 @@ SeparatorLine::Draw(BRect)
 	BeginLineArray(2);
 	if (vertical) {
 		AddLine(bounds.LeftTop(), bounds.LeftBottom(), hiliteColor);
-		AddLine(bounds.LeftTop() + BPoint(1, 0), bounds.LeftBottom() + BPoint(1, 0), kWhite);
+		AddLine(bounds.LeftTop() + BPoint(1, 0),
+			bounds.LeftBottom() + BPoint(1, 0), kWhite);
 	} else {
 		AddLine(bounds.LeftTop(), bounds.RightTop(), hiliteColor);
-		AddLine(bounds.LeftTop() + BPoint(0, 1), bounds.RightTop() + BPoint(0, 1), kWhite);
+		AddLine(bounds.LeftTop() + BPoint(0, 1),
+			bounds.RightTop() + BPoint(0, 1), kWhite);
 	}
 	EndLineArray();
 }
@@ -1503,7 +1492,8 @@ EachMenuItem(BMenu *menu, bool recursive, BMenuItem *(*func)(BMenuItem *))
 
 
 extern const BMenuItem *
-EachMenuItem(const BMenu *menu, bool recursive, BMenuItem *(*func)(const BMenuItem *))
+EachMenuItem(const BMenu *menu, bool recursive,
+	BMenuItem *(*func)(const BMenuItem *))
 {
 	int32 count = menu->CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -1525,14 +1515,15 @@ EachMenuItem(const BMenu *menu, bool recursive, BMenuItem *(*func)(const BMenuIt
 
 PositionPassingMenuItem::PositionPassingMenuItem(const char *title,
 		BMessage *message, char shortcut, uint32 modifiers)
-	: BMenuItem(title, message, shortcut, modifiers)
+	:
+	BMenuItem(title, message, shortcut, modifiers)
 {
 }
 
 
-PositionPassingMenuItem::PositionPassingMenuItem(BMenu *menu,
-		BMessage *message)
-	: BMenuItem(menu, message)
+PositionPassingMenuItem::PositionPassingMenuItem(BMenu *menu, BMessage *message)
+	:
+	BMenuItem(menu, message)
 {
 }
 
@@ -1639,7 +1630,8 @@ ComputeTypeAheadScore(const char *text, const char *match, bool wordMode)
 
 
 void
-_ThrowOnError(status_t error, const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
+_ThrowOnError(status_t error, const char *DEBUG_ONLY(file),
+	int32 DEBUG_ONLY(line))
 {
 	if (error != B_OK) {
 		PRINT(("failing %s at %s:%d\n", strerror(error), file, (int)line));
@@ -1649,7 +1641,8 @@ _ThrowOnError(status_t error, const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(lin
 
 
 void
-_ThrowIfNotSize(ssize_t size, const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
+_ThrowIfNotSize(ssize_t size, const char *DEBUG_ONLY(file),
+	int32 DEBUG_ONLY(line))
 {
 	if (size < B_OK) {
 		PRINT(("failing %s at %s:%d\n", strerror(size), file, (int)line));
@@ -1668,5 +1661,6 @@ _ThrowOnError(status_t error, const char *DEBUG_ONLY(debugString),
 		throw error;
 	}
 }
+
 
 } // namespace BPrivate

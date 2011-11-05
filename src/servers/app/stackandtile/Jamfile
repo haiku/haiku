@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src servers app stackandtile ;
+
+UseLibraryHeaders agg lp_solve linprog ;
+UsePrivateHeaders app graphics interface shared kernel ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseFreeTypeHeaders ;
+
+StaticLibrary libstackandtile.a :
+	SATDecorator.cpp
+	SATGroup.cpp
+	SATWindow.cpp
+	StackAndTile.cpp
+	Stacking.cpp
+	Tiling.cpp
+;

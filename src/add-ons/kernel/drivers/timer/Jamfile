@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src add-ons kernel drivers timer ;
+
+UsePrivateHeaders drivers ;
+
+KernelAddon <driver>hpet :
+	hpet.cpp ;

@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-About	2709881985
+1	brazilian_portuguese	x-vnd.Haiku-About	2864423596
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inacessíveis
 ... and the many people making donations!\n\n	AboutView		... e as muitas pessoas que fizeram doações!\n\n
@@ -11,7 +11,6 @@ Source Code: 	AboutView		Código fonte:
 The BeGeistert team\n	AboutView		A equipe BeGeistert\n
 The Haiku-Ports team\n	AboutView		A equipe Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		A equipe do Haikuware e o seu programa de recompensas\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Este código do Haiku é único, especialmente o kernel e todo o código que pode ser ligado nos aplicativos, são distribuídos sob os termos da %MIT licence%. Algumas bibliotecas do sistema contém código de terceiros distribuído sob a licença LGPL. Você pode encontrar os direitos autorais para o código de terceiros abaixo.\n\n
 Time running:	AboutView		Tempo de funcionamento:
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e seu kernel NewOS)\n
 Website, marketing & documentation:\n	AboutView		Website, marketing e documentação:\n

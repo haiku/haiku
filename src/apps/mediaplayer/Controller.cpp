@@ -966,8 +966,8 @@ Controller::RemoveListener(Listener* listener)
 void
 Controller::_AdoptGlobalSettings()
 {
-	mpSettings settings = Settings::CurrentSettings();
-		// thread safe
+	mpSettings settings;
+	Settings::Default()->Get(settings);
 
 	fAutoplaySetting = settings.autostart;
 	// not yet used:

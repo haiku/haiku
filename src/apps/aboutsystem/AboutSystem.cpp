@@ -922,9 +922,9 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(B_TRANSLATE("The copyright to the Haiku code is "
 		"property of Haiku, Inc. or of the respective authors where expressly "
-		"noted in the source. Haiku" B_UTF8_TRADEMARK
+		"noted in the source. Haiku" B_UTF8_REGISTERED
 		" and the HAIKU logo" B_UTF8_REGISTERED
-		" are (registered) trademarks of Haiku, Inc."
+		" are registered trademarks of Haiku, Inc."
 		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
@@ -971,6 +971,7 @@ AboutView::_CreateCreditsView()
 		"Michael Pfeiffer\n"
 		"François Revol\n"
 		"Philippe Saint-Pierre\n"
+		"John Scipione\n"
 		"Andrej Spielmann\n"
 		"Jonas Sundström\n"
 		"Oliver Tappe\n"
@@ -1059,6 +1060,7 @@ AboutView::_CreateCreditsView()
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
 		"Christophe Huriaux\n"
+		"Jian Jiang\n"
 		"Ma Jie\n"
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
@@ -1107,7 +1109,6 @@ AboutView::_CreateCreditsView()
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Ralf Schülke\n"
-		"John Scipione\n"
 		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
 		"Caitlin Shaw\n"
@@ -1206,6 +1207,8 @@ AboutView::_CreateCreditsView()
 
 	BPath mitPath;
 	_GetLicensePath("MIT", mitPath);
+	BPath lgplPath;
+	_GetLicensePath("GNU LGPL v2.1", lgplPath);
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
@@ -1217,26 +1220,40 @@ AboutView::_CreateCreditsView()
 		"respective license.]\n\n"));
 
 	// Haiku license
-	BString haikuLicence = B_TRANSLATE("The code that is unique to Haiku, "
-		"especially the kernel and all code that applications may link "
-		"against, is distributed under the terms of the %MIT licence%. "
+	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to "
+		"Haiku, especially the kernel and all code that applications may link "
+		"against, is distributed under the terms of the <MIT license>. "
 		"Some system libraries contain third party code distributed under the "
-		"LGPL license. You can find the copyrights to third party code below.\n"
-		"\n");
-	int32 licencePart1 = haikuLicence.FindFirst("%");
-	int32 licencePart2 = haikuLicence.FindLast("%");
+		"<LGPL license>. You can find the copyrights to third party code below."
+		"\n\n", "<MIT license> and <LGPL license> aren't variables and can be "
+		"translated. However, please, don't remove < and > as they're needed "
+		"as placeholders for proper hypertext functionality.");
+	int32 licensePart1 = haikuLicense.FindFirst("<");
+	int32 licensePart2 = haikuLicense.FindFirst(">");
+	int32 licensePart3 = haikuLicense.FindLast("<");
+	int32 licensePart4 = haikuLicense.FindLast(">");
 	BString part;
-	haikuLicence.CopyCharsInto(part, 0, licencePart1 );
+	haikuLicense.CopyInto(part, 0, licensePart1);
 	fCreditsView->Insert(part);
 
 	part.Truncate(0);
-	haikuLicence.CopyCharsInto(part, licencePart1 + 1, licencePart2 - 1
-		- licencePart1);
+	haikuLicense.CopyInto(part, licensePart1 + 1, licensePart2 - 1
+		- licensePart1);
 	fCreditsView->InsertHyperText(part, new OpenFileAction(mitPath.Path()));
 
 	part.Truncate(0);
-	haikuLicence.CopyCharsInto(part, licencePart2 + 1, haikuLicence.CountChars()
-		- licencePart2);
+	haikuLicense.CopyInto(part, licensePart2 + 1, licensePart3 - 1
+		- licensePart2);
+	fCreditsView->Insert(part);
+
+	part.Truncate(0);
+	haikuLicense.CopyInto(part, licensePart3 + 1, licensePart4 - 1
+		- licensePart3);
+	fCreditsView->InsertHyperText(part, new OpenFileAction(lgplPath.Path()));
+
+	part.Truncate(0);
+	haikuLicense.CopyInto(part, licensePart4 + 1, haikuLicense.Length() - 1
+		- licensePart4);
 	fCreditsView->Insert(part);
 
 	// GNU copyrights
@@ -1261,8 +1278,10 @@ AboutView::_CreateCreditsView()
 		"telnetd, traceroute\n"
 		COPYRIGHT_STRING "1994-2008 The FreeBSD Project. "
 		"All rights reserved."),
+		StringVector("BSD (2-clause)", "BSD (3-clause)", "BSD (4-clause)",
+			NULL),
+		StringVector(),
 		"http://www.freebsd.org");
-			// TODO: License!
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
@@ -1349,8 +1368,9 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI.",
 			COPYRIGHT_STRING "2006-2009 Project Vine.",
 			B_TRANSLATE("MIT license. All rights reserved."),
-			NULL));
-			// TODO: License!
+			NULL)
+		.SetLicense("BSD (3-clause)")
+		.SetURL("http://vlgothic.dicey.org/"));
 
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")
@@ -1406,13 +1426,14 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("atftp")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000 Jean-Pierre "
 			"ervbefeL and Remi Lefebvre."))
-		.SetLicense("GNU GPL v2"));
-			// TODO: URL!
+		.SetLicense("GNU GPL v2")
+		.SetURL("http://freecode.com/projects/atftp"));
 
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
-		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit.")
+		.SetLicense("Public Domain")
+		.SetURL("http://nc110.sourceforge.net/"));
 
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("acpica")
@@ -1463,8 +1484,8 @@ AboutView::_CreateCreditsView()
 
 	// CannaIM copyrights
 	_AddPackageCredit(PackageCredit("CannaIM")
-		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura.")
+		.SetLicense("MIT"));
 
 	// libxml2, libxslt, libexslt copyrights
 	_AddPackageCredit(PackageCredit("libxml2, libxslt")
@@ -1535,7 +1556,6 @@ AboutView::_CreateCreditsView()
 			"Vivek Mohan. All rights reserved."))
 		.SetLicense(B_TRANSLATE("BSD (2-clause)"))
 		.SetURL("http://udis86.sourceforge.net"));
-			// TODO: License! - Project website refers to BSD License
 #endif
 
 #ifdef __INTEL__

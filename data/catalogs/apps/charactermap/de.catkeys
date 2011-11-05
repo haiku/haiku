@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	2137207616
+1	german	x-vnd.Haiku-CharacterMap	4082916013
 Aegean numbers	UnicodeBlocks		Ägäische Zahlen
 Alphabetic presentation forms	UnicodeBlocks		Alphabetische Präsentationsformen
 Ancient Greek musical notation	UnicodeBlocks		Antike griechische musikalische Notation
@@ -43,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		Kombinierende diakritische
 Combining half marks	UnicodeBlocks		Kombinierende halbe diakritische Zeichen
 Control pictures	UnicodeBlocks		Steuerzeichensymbole
 Coptic	UnicodeBlocks		Koptisch
+Copy as escaped byte string	CharacterView		Zeichen als Byte-Code kopieren
+Copy character	CharacterView		Zeichen kopieren
 Counting rod numerals	UnicodeBlocks		Rechenstab-Numerale
 Cuneiform	UnicodeBlocks		Keilschrift
 Cuneiform numbers and punctuation	UnicodeBlocks		Keilförmige Nummern und Zeichensetzung

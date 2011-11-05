@@ -46,13 +46,14 @@ typedef struct {
 #define DRIVER_MODULE_NAME(name, busname) \
 	__fbsd_ ## name ## _ ## busname
 
-status_t _fbsd_init_hardware(driver_t *driver);
-status_t _fbsd_init_driver(driver_t *driver);
-void _fbsd_uninit_driver(driver_t *driver);
+status_t _fbsd_init_hardware(driver_t *driver[]);
+status_t _fbsd_init_drivers(driver_t *driver[]);
+status_t _fbsd_uninit_drivers(driver_t *driver[]);
 
 extern const char *gDriverName;
 driver_t *__haiku_select_miibus_driver(device_t dev);
 driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[]);
+status_t __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[]));
 
 status_t init_wlan_stack(void);
 void uninit_wlan_stack(void);
@@ -62,27 +63,28 @@ status_t wlan_control(void*, uint32, void*, size_t);
 status_t wlan_close(void*);
 status_t wlan_if_l2com_alloc(void*);
 
-/* we define the driver methods with HAIKU_FBSD_DRIVER_GLUE to
+/* we define the driver methods with HAIKU_FBSD_DRIVERS_GLUE to
  * force the rest of the stuff to be linked back with the driver.
  * While gcc 2.95 packs everything from the static library onto
  * the final binary, gcc 4.x rightfuly doesn't. */
 
-#define HAIKU_FBSD_DRIVER_GLUE(publicname, name, busname)				\
+#define HAIKU_FBSD_DRIVERS_GLUE(publicname)								\
 	extern const char *gDeviceNameList[];								\
 	extern device_hooks gDeviceHooks;									\
-	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
 	const char *gDriverName = #publicname;								\
 	int32 api_version = B_CUR_DRIVER_API_VERSION;						\
 	status_t init_hardware()											\
 	{																	\
-		return _fbsd_init_hardware(DRIVER_MODULE_NAME(name, busname));	\
+		return __haiku_handle_fbsd_drivers_list(_fbsd_init_hardware);	\
 	}																	\
 	status_t init_driver()												\
 	{																	\
-		return _fbsd_init_driver(DRIVER_MODULE_NAME(name, busname));	\
+		return __haiku_handle_fbsd_drivers_list(_fbsd_init_drivers);	\
 	}																	\
 	void uninit_driver()												\
-		{ _fbsd_uninit_driver(DRIVER_MODULE_NAME(name, busname)); }		\
+	{																	\
+		__haiku_handle_fbsd_drivers_list(_fbsd_uninit_drivers);			\
+	}																	\
 	const char **publish_devices()										\
 		{ return gDeviceNameList; }										\
 	device_hooks *find_device(const char *name)							\
@@ -102,26 +104,49 @@ status_t wlan_if_l2com_alloc(void*);
 	status_t wlan_if_l2com_alloc(void* ifp)								\
 		{ return B_OK; }
 
-#define HAIKU_FBSD_WLAN_DRIVER_GLUE(publicname, name, busname)			\
+#define HAIKU_FBSD_DRIVER_GLUE(publicname, name, busname)				\
+	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
+	status_t __haiku_handle_fbsd_drivers_list(status_t (*proc)(driver_t *[])) {\
+		driver_t *drivers[] = {											\
+			DRIVER_MODULE_NAME(name, busname),							\
+			NULL														\
+		};																\
+		return (*proc)(drivers);										\
+	}																	\
+	HAIKU_FBSD_DRIVERS_GLUE(publicname);
+
+#define HAIKU_FBSD_WLAN_DRIVERS_GLUE(publicname)						\
 	extern const char *gDeviceNameList[];								\
 	extern device_hooks gDeviceHooks;									\
-	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
 	const char *gDriverName = #publicname;								\
 	int32 api_version = B_CUR_DRIVER_API_VERSION;						\
 	status_t init_hardware()											\
 	{																	\
-		return _fbsd_init_hardware(DRIVER_MODULE_NAME(name, busname));	\
+		return __haiku_handle_fbsd_drivers_list(_fbsd_init_hardware);	\
 	}																	\
 	status_t init_driver()												\
 	{																	\
-		return _fbsd_init_driver(DRIVER_MODULE_NAME(name, busname));	\
+		return __haiku_handle_fbsd_drivers_list(_fbsd_init_drivers);	\
 	}																	\
 	void uninit_driver()												\
-		{ _fbsd_uninit_driver(DRIVER_MODULE_NAME(name, busname)); }		\
+	{																	\
+		__haiku_handle_fbsd_drivers_list(_fbsd_uninit_drivers);			\
+	}																	\
 	const char **publish_devices()										\
 		{ return gDeviceNameList; }										\
 	device_hooks *find_device(const char *name)							\
 		{ return &gDeviceHooks; }
+
+#define HAIKU_FBSD_WLAN_DRIVER_GLUE(publicname, name, busname)			\
+	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
+	status_t __haiku_handle_fbsd_drivers_list(status_t (*proc)(driver_t *[])) {\
+		driver_t *drivers[] = {											\
+			DRIVER_MODULE_NAME(name, busname),							\
+			NULL														\
+		};																\
+		return (*proc)(drivers);										\
+	}																	\
+	HAIKU_FBSD_WLAN_DRIVERS_GLUE(publicname);
 
 #define HAIKU_FBSD_RETURN_MII_DRIVER(drivers)					\
 	driver_t *__haiku_select_miibus_driver(device_t dev)		\

@@ -11,8 +11,8 @@
 #include "accelerant.h"
 
 
-extern "C" void *
-get_accelerant_hook(uint32 feature, void *data)
+extern "C" void*
+get_accelerant_hook(uint32 feature, void* data)
 {
 	switch (feature) {
 		/* general */
@@ -115,7 +115,9 @@ get_accelerant_hook(uint32 feature, void *data)
 				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_94x)
 				|| gInfo->shared_info->device_type.IsModel(INTEL_TYPE_965M)
 				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD))
+				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB))
 				return NULL;
 
 			return (void*)intel_allocate_overlay_buffer;

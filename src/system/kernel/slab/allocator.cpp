@@ -44,6 +44,9 @@ static size_t sBootStrapMemorySize = 0;
 static size_t sUsedBootStrapMemory = 0;
 
 
+RANGE_MARKER_FUNCTION_BEGIN(slab_allocator)
+
+
 static int
 size_to_index(size_t size)
 {
@@ -272,3 +275,6 @@ realloc(void* address, size_t newSize)
 
 
 #endif	// USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+
+RANGE_MARKER_FUNCTION_END(slab_allocator)

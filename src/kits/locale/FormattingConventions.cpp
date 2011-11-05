@@ -1,7 +1,7 @@
 /*
  * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009-2010, Adrien Destugues, pulkomandy@gmail.com.
- * Copyright 2010, Oliver Tappe <zooey@hirschkaefer.de>.
+ * Copyright 2010-2011, Oliver Tappe <zooey@hirschkaefer.de>.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,9 +30,6 @@
 #include <new>
 #include <stdarg.h>
 #include <stdlib.h>
-
-
-#define ICU_VERSION icu_44
 
 
 // #pragma mark - helpers
@@ -191,7 +188,7 @@ BFormattingConventions::BFormattingConventions(const char* id)
 	fCachedUse24HourClock(CLOCK_HOURS_UNSET),
 	fExplicitUse24HourClock(CLOCK_HOURS_UNSET),
 	fUseStringsFromPreferredLanguage(false),
-	fICULocale(new ICU_VERSION::Locale(id))
+	fICULocale(new icu::Locale(id))
 {
 }
 
@@ -206,7 +203,7 @@ BFormattingConventions::BFormattingConventions(
 	fExplicitMonetaryFormat(other.fExplicitMonetaryFormat),
 	fExplicitUse24HourClock(other.fExplicitUse24HourClock),
 	fUseStringsFromPreferredLanguage(other.fUseStringsFromPreferredLanguage),
-	fICULocale(new ICU_VERSION::Locale(*other.fICULocale))
+	fICULocale(new icu::Locale(*other.fICULocale))
 {
 	for (int s = 0; s < B_DATE_FORMAT_STYLE_COUNT; ++s)
 		fCachedDateFormats[s] = other.fCachedDateFormats[s];
@@ -227,7 +224,7 @@ BFormattingConventions::BFormattingConventions(const BMessage* archive)
 {
 	BString conventionsID;
 	status_t status = archive->FindString("conventions", &conventionsID);
-	fICULocale = new ICU_VERSION::Locale(conventionsID);
+	fICULocale = new icu::Locale(conventionsID);
 
 	for (int s = 0; s < B_DATE_FORMAT_STYLE_COUNT && status == B_OK; ++s) {
 		BString format;
@@ -345,6 +342,13 @@ BFormattingConventions::CountryCode() const
 		return NULL;
 
 	return country;
+}
+
+
+bool
+BFormattingConventions::AreCountrySpecific() const
+{
+	return CountryCode() != NULL;
 }
 
 

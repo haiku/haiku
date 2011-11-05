@@ -1,3 +1,21 @@
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *   Alex Wilson <yourpalal2@gmail.com>
+ * Corresponds to:
+ *   /trunk/headers/os/interface/LayoutItem.h  rev 38207
+ *   /trunk/src/kits/interface/LayoutItem.cpp  rev 38207
+ */
+
+
+/*!
+	\file LayoutItem.h
+	Describes the BLayoutItem class
+*/
+
+
 /*!
 	\class BLayoutItem
 	\ingroup interface
@@ -20,7 +38,7 @@
 	\fn BLayoutItem::BLayoutItem(BMessage* archive)
 	\brief Archive constructor.
 
-	Creates a Bunarchiver for \a archive and calls its Finish() method.
+	Creates a BLayoutItem from the \a archive message.
 */
 
 
@@ -31,9 +49,20 @@
 
 
 /*!
-	\name Reporting size and alignment constraints to a BLayout
-	@{
+	\fn BLayout::~BLayout()
+	\brief Destructor method.
+
+	Standard Destructor.
 */
+
+
+/*!
+	\name Reporting size and alignment constraints to a BLayout
+*/
+
+
+//! @{
+
 
 /*!
 	\fn BSize BLayoutItem::MinSize() = 0
@@ -67,7 +96,7 @@
 
 /*!
 	\fn bool BLayoutItem::HasHeightForWidth()
-	\brief Returns whether or not this BLayoutItem's height constraints are
+	\brief Returns whether or not this BLayoutItem&apos;s height constraints are
 		dependent on its width.
 	
 	\note By default, this method returns \c false.
@@ -77,18 +106,18 @@
 /*!
 	\fn void BLayoutItem::GetHeightForWidth(float width, float* min,
 		float* max, float* preferred)
-	\brief Get this BLayoutItem's height constraints for a given \a width.
+	\brief Get this BLayoutItem&apos;s height constraints for a given \a width.
 
 	If a BLayoutItem does not have height for width constraints
 	(HasHeightForWidth() returns \c false) it does not need to implement this
 	method.
 
-	\note It is prudent to compare \a min, \a max, \a preferred to NULL before
-	dereferencing them.
+	\note It is prudent to compare \a min, \a max, \a preferred to \c NULL
+	before dereferencing them.
 */
 
 
-//@}
+//! @}
 
 
 /*!
@@ -100,9 +129,10 @@
 	in when reporting these constraints. It is recommended that all subclasses
 	do this as well, the BAbstractLayoutItem class provides any easy way to
 	include this behaviour in your class.
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -130,7 +160,7 @@
 */
 
 
-//@}
+//! @}
 
 
 /*!
@@ -138,9 +168,10 @@
 
 	These methods take into account only the local visibility of this
 	item, not the visibility of its ancestors. \n
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -160,15 +191,15 @@
 */
 
 
-//@}
+//! @}
 
 
 /*!
-	\name Getting and setting the current on-screen positioning of \
-		a BLayoutItem.
-
-	@{
+	\name Getting and setting the current on-screen positioning of a BLayoutItem.
 */
+
+
+//! @{
 
 
 /*!
@@ -191,21 +222,21 @@
 	\fn void BLayoutItem::SetFrame(BRect frame) = 0
 	\brief Set the bounding frame of this item.
 
-	\a frame is in the coordinate system of the target view of the 
-	BLayout this item belongs to.
+	\a frame is in the coordinate system of the target view of the BLayout
+		that this item belongs to.
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\fn BView* BLayoutItem::View()
-	\brief Return the BView this item is representing, or NULL if it does not
+	\brief Return the BView this item is representing, or \c NULL if it does not
 		represent any view.
 
 	When a BLayoutItem is added to a BLayout, this method is called, and the
-	returned BView will be added to the BLayout's target view.
+	returned BView will be added to the BLayout&apos;s target view.
 */
 
 
@@ -216,9 +247,10 @@
 	BLayout. In some implementations they may be handled directly by this
 	BLayoutItem, but many implementations will forward these events to
 	another object.
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -237,16 +269,17 @@
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Utility methods for BLayout subclasses
 	\brief Utility methods for the BLayout class to attach and retrieve
 		arbitrary data for a BLayoutItem.
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -265,13 +298,15 @@
 */
 
 
-//@}
+//! @}
 
 
-/*! \name Hook methods
-
-	@{
+/*!
+	\name Hook methods
 */
+
+
+//! @{
 
 
 /*!
@@ -288,16 +323,17 @@
 	\fn void BLayoutItem::DetachedFromLayout(BLayout* layout)
 	\brief Hook called when this object is attached to a BLayout (via
 		BLayout::RemoveItem())
-	\param layout The BLayout you were previously attached to.
 
 	\warning You should not use this hook to reattach \c this to \a BLayout,
 		doing so will cause undefined behaviour (probably a crash).
+
+	\param layout The BLayout you were previously attached to.
 */
 
 
 /*!
 	\fn void BLayoutItem::AncestorVisibilityChanged(bool shown)
-	\brief Hook called when this BLayoutItem's ancestors change visibility,
+	\brief Hook called when this BLayoutItem&apos;s ancestors change visibility,
 		effectively hiding or showing this item.
 
 	Implementations of this method should alter the onscreen visibility of this
@@ -306,7 +342,9 @@
 
 	\note This method should not effect the value returned by this object's
 		IsVisible() method.
+
+	\param shown \c true to show, \c false to hide.
 */
 
 
-//@}
+//! @}

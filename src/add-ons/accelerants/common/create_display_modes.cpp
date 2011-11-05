@@ -71,6 +71,7 @@ static const display_mode kBaseModeList[] = {
 
 	{{147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
 
+	{{172000, 1920, 2040, 2248, 2576, 1080, 1081, 1084, 1118, POSITIVE_SYNC}, B_CMAP8, 1920, 1080, 0, 0, MODE_FLAGS}, /* 1920x1080 60Hz */
 	//{{160000, 1920, 2010, 2060, 2110, 1200, 1202, 1208, 1235, POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 	{{193160, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 };
@@ -399,7 +400,7 @@ ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 			!= B_OK)
 		return;
 
-	fill_display_mode(&mode);
+	fill_display_mode(width, height, &mode);
 
 	_AddMode(mode);
 }
@@ -518,11 +519,11 @@ create_display_modes(const char* name, edid1_info* edid,
 
 
 void
-fill_display_mode(display_mode* mode)
+fill_display_mode(uint32 width, uint32 height, display_mode* mode)
 {
 	mode->space = B_CMAP8;
-	mode->virtual_width = mode->timing.h_display;
-	mode->virtual_height = mode->timing.v_display;
+	mode->virtual_width = width;
+	mode->virtual_height = height;
 	mode->h_display_start = 0;
 	mode->v_display_start = 0;
 	mode->flags = MODE_FLAGS;

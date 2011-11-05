@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-Keyboard	1078858058
+1	ukrainian	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		По замовчуванню
 Delay until key repeat	KeyboardView		Затримка при повторі
 Fast	KeyboardView		Швидко
 Key repeat rate	KeyboardView		Швидкість повтору клавіші
+Keyboard	System name		Клавіатура
 Long	KeyboardView		Довго
 OK	KeyboardApplication		Гаразд
 Revert	KeyboardWindow		Повернути

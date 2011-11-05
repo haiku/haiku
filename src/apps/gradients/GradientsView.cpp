@@ -34,15 +34,15 @@ GradientsView::Draw(BRect update)
 		case BGradient::TYPE_LINEAR:
 			DrawLinear(update);
 			break;
-		
+
 		case BGradient::TYPE_RADIAL:
 			DrawRadial(update);
 			break;
-		
+
 		case BGradient::TYPE_RADIAL_FOCUS:
 			DrawRadialFocus(update);
 			break;
-		
+
 		case BGradient::TYPE_DIAMOND:
 			DrawDiamond(update);
 			break;
@@ -95,7 +95,7 @@ GradientsView::DrawLinear(BRect update)
 	FillTriangle(BPoint(60, 230), BPoint(10, 330), BPoint(110, 330));
 	gradient.SetStart(BPoint(60, 230));
 	gradient.SetEnd(BPoint(60, 330));
-	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330), 
+	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330),
 		gradient);
 
 	// Ellipse
@@ -111,24 +111,15 @@ void
 GradientsView::DrawRadial(BRect update)
 {
 	BGradientRadial gradient;
-	rgb_color c;
-	c.red = 255;
-	c.green = 0;
-	c.blue = 0;
-	gradient.AddColor(c, 0);
-	c.red = 0;
-	c.green = 255;
-	c.blue = 0;
-	gradient.AddColor(c, 127);
-	c.red = 0;
-	c.green = 0;
-	c.blue = 255;
-	gradient.AddColor(c, 255);
+	gradient.AddColor(make_color(255, 0, 0), 0);
+	gradient.AddColor(make_color(0, 255, 0), 127);
+	gradient.AddColor(make_color(0, 0, 255), 255);
 
 	// RoundRect
 	SetHighColor(0, 0, 0);
 	FillRoundRect(BRect(10, 10, 110, 110), 5, 5);
 	gradient.SetCenter(BPoint(170, 60));
+	gradient.SetRadius(50);
 	FillRoundRect(BRect(120, 10, 220, 110), 5, 5, gradient);
 
 	// Rect
@@ -141,7 +132,7 @@ GradientsView::DrawRadial(BRect update)
 	SetHighColor(0, 0, 0);
 	FillTriangle(BPoint(60, 230), BPoint(10, 330), BPoint(110, 330));
 	gradient.SetCenter(BPoint(170, 280));
-	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330), 
+	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330),
 		gradient);
 
 	// Ellipse
@@ -186,7 +177,7 @@ GradientsView::DrawRadialFocus(BRect update)
 	SetHighColor(0, 0, 0);
 	FillTriangle(BPoint(60, 230), BPoint(10, 330), BPoint(110, 330));
 	gradient.SetCenter(BPoint(170, 280));
-	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330), 
+	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330),
 		gradient);
 
 	// Ellipse
@@ -231,7 +222,7 @@ GradientsView::DrawDiamond(BRect update)
 	SetHighColor(0, 0, 0);
 	FillTriangle(BPoint(60, 230), BPoint(10, 330), BPoint(110, 330));
 	gradient.SetCenter(BPoint(170, 280));
-	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330), 
+	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330),
 		gradient);
 
 	// Ellipse
@@ -276,7 +267,7 @@ GradientsView::DrawConic(BRect update)
 	SetHighColor(0, 0, 0);
 	FillTriangle(BPoint(60, 230), BPoint(10, 330), BPoint(110, 330));
 	gradient.SetCenter(BPoint(170, 280));
-	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330), 
+	FillTriangle(BPoint(170, 230), BPoint(120, 330), BPoint(220, 330),
 		gradient);
 
 	// Ellipse

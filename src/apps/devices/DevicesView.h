@@ -21,6 +21,7 @@
 #include "Device.h"
 #include "DevicePCI.h"
 #include "DeviceACPI.h"
+#include "DeviceSCSI.h"
 #include "PropertyList.h"
 #include "PropertyListPlain.h"
 

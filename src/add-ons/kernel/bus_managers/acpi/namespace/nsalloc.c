@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -341,7 +341,7 @@ AcpiNsInstallNode (
              * modified the namespace. This is used for cleanup when the
              * method exits.
              */
-            WalkState->MethodDesc->Method.Flags |= AOPOBJ_MODIFIED_NAMESPACE;
+            WalkState->MethodDesc->Method.InfoFlags |= ACPI_METHOD_MODIFIED_NAMESPACE;
         }
     }
 
@@ -459,12 +459,21 @@ AcpiNsDeleteNamespaceSubtree (
 {
     ACPI_NAMESPACE_NODE     *ChildNode = NULL;
     UINT32                  Level = 1;
+    ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_TRACE (NsDeleteNamespaceSubtree);
 
 
     if (!ParentNode)
+    {
+        return_VOID;
+    }
+
+    /* Lock namespace for possible update */
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
+    if (ACPI_FAILURE (Status))
     {
         return_VOID;
     }
@@ -521,6 +530,7 @@ AcpiNsDeleteNamespaceSubtree (
         }
     }
 
+    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return_VOID;
 }
 

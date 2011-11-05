@@ -12,8 +12,12 @@
 
 #include "lock.h"
 
-#include "rhd_regs.h"
+#include "radeon_reg.h"
+
+#include "avivo.h"
+#include "r500_reg.h"
 #include "r600_reg.h"
+#include "r700_reg.h"
 #include "r800_reg.h"
 
 #include <Accelerant.h>
@@ -22,13 +26,24 @@
 #include <PCI.h>
 
 
-#define VENDOR_ID_ATI			0x1002
+#define VENDOR_ID_ATI	0x1002
 
-#define RADEON_R600	0x0600
-#define RADEON_R700	0x0700
-#define RADEON_R800	0x0800
+// Card models
+#define RADEON_R520		0x0520	// Fudo
+#define RADEON_R580		0x0580	// Rodin
+#define RADEON_R600		0x0600	// Pele
+#define RADEON_R700		0x0700	// Wekiva
+#define RADEON_R1000	0x1000	// Evergreen
+#define RADEON_R2000	0x2000  // Northern Islands
+#define RADEON_R3000	0x3000	// Southern Islands
+#define RADEON_R4000	0x4000	// Not yet known / used
 
-#define RADEON_VBIOS_SIZE 0x10000
+// Card chipset flags
+#define CHIP_STD		(1 << 0) // Standard chipset
+#define CHIP_IGP		(1 << 1) // IGP chipset
+#define CHIP_MOBILE		(1 << 2) // Mobile chipset
+#define CHIP_DISCREET	(1 << 3) // Discreet chipset
+#define CHIP_APU		(1 << 4) // APU chipset
 
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"
@@ -41,15 +56,6 @@
 #define RHD_POWER_RESET    1   /* off temporarily */
 #define RHD_POWER_SHUTDOWN 2   /* long term shutdown */
 #define RHD_POWER_UNKNOWN  3   /* initial state */
-
-
-// info about PLL on graphics card
-struct pll_info {
-	uint32			reference_frequency;
-	uint32			max_frequency;
-	uint32			min_frequency;
-	uint32			divisor_register;
-};
 
 
 struct ring_buffer {
@@ -67,9 +73,16 @@ struct overlay_registers;
 
 
 struct radeon_shared_info {
+	uint32			device_index;		// accelerant index
 	uint32			device_id;			// device pciid
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
+
+	bool			has_rom;			// was rom mapped?
+	area_id			rom_area;			// area of mapped rom
+	uint32			rom_phys;			// rom base location
+	uint32			rom_size;			// rom size
+	uint8*			rom;				// cloned, memory mapped PCI ROM
 
 	display_mode	current_mode;
 	uint32			bytes_per_row;
@@ -81,10 +94,10 @@ struct radeon_shared_info {
 	addr_t			physical_status_page;
 	uint32			graphics_memory_size;
 
-	addr_t			frame_buffer_phys;		// card PCI BAR address of FB
-	area_id			frame_buffer_area;		// area of memory mapped FB
-	uint32			frame_buffer_size;		// card internal FB aperture size
 	uint8*			frame_buffer;			// virtual memory mapped FB
+	area_id			frame_buffer_area;		// area of memory mapped FB
+	addr_t			frame_buffer_phys;		// card PCI BAR address of FB
+	uint32			frame_buffer_size;		// FB size mapped
 
 	bool			has_edid;
 	edid1_info		edid_info;
@@ -112,8 +125,10 @@ struct radeon_shared_info {
 	uint16			cursor_hot_y;
 
 	uint16			device_chipset;
+	uint32			chipsetFlags;
+	uint8			dceMajor;
+	uint8			dceMinor;
 	char			device_identifier[32];
-	struct pll_info	pll_info;
 };
 
 //----------------- ioctl() interface ----------------
@@ -154,57 +169,7 @@ struct radeon_free_graphics_memory {
 // registers
 #define R6XX_CONFIG_APER_SIZE			0x5430	// r600>
 #define OLD_CONFIG_APER_SIZE			0x0108	// <r600
-
-#define R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH	0x6914
-#define R700_D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH	0x691c
-#define R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH	0x6114
-#define R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH	0x611c
-
-// cursor
-#define RADEON_CURSOR_CONTROL			0x70080
-#define RADEON_CURSOR_BASE				0x70084
-#define RADEON_CURSOR_POSITION			0x70088
-#define RADEON_CURSOR_PALETTE			0x70090 // (- 0x7009f)
-#define RADEON_CURSOR_SIZE				0x700a0
-#define CURSOR_ENABLED					(1UL << 31)
-#define CURSOR_FORMAT_2_COLORS			(0UL << 24)
-#define CURSOR_FORMAT_3_COLORS			(1UL << 24)
-#define CURSOR_FORMAT_4_COLORS			(2UL << 24)
-#define CURSOR_FORMAT_ARGB				(4UL << 24)
-#define CURSOR_FORMAT_XRGB				(5UL << 24)
-#define CURSOR_POSITION_NEGATIVE		0x8000
-#define CURSOR_POSITION_MASK			0x3fff
-
-// overlay flip
-#define COMMAND_OVERLAY_FLIP			(0x11 << 23)
-#define COMMAND_OVERLAY_CONTINUE		(0 << 21)
-#define COMMAND_OVERLAY_ON				(1 << 21)
-#define COMMAND_OVERLAY_OFF				(2 << 21)
-#define OVERLAY_UPDATE_COEFFICIENTS		0x1
-
-// 2D acceleration
-#define XY_COMMAND_SOURCE_BLIT			0x54c00006
-#define XY_COMMAND_COLOR_BLIT			0x54000004
-#define XY_COMMAND_SETUP_MONO_PATTERN	0x44400007
-#define XY_COMMAND_SCANLINE_BLIT		0x49400001
-#define COMMAND_COLOR_BLIT				0x50000003
-#define COMMAND_BLIT_RGBA				0x00300000
-
-#define COMMAND_MODE_SOLID_PATTERN		0x80
-#define COMMAND_MODE_CMAP8				0x00
-#define COMMAND_MODE_RGB15				0x02
-#define COMMAND_MODE_RGB16				0x01
-#define COMMAND_MODE_RGB32				0x03
-
-// display
-
-#define DISPLAY_CONTROL_ENABLED			(1UL << 31)
-#define DISPLAY_CONTROL_GAMMA			(1UL << 30)
-#define DISPLAY_CONTROL_COLOR_MASK		(0x0fUL << 26)
-#define DISPLAY_CONTROL_CMAP8			(2UL << 26)
-#define DISPLAY_CONTROL_RGB15			(4UL << 26)
-#define DISPLAY_CONTROL_RGB16			(5UL << 26)
-#define DISPLAY_CONTROL_RGB32			(6UL << 26)
+#define CONFIG_MEMSIZE                  0x5428	// r600>
 
 // PCI bridge memory management
 

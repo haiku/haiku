@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -15,16 +15,18 @@
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "LaunchBox"
+
+
 enum {
 	MSG_PANEL_OK,
 	MSG_PANEL_CANCEL,
 };
 
-// constructor
+
 NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
-		BHandler* target, BMessage* message, BRect frame)
+		BHandler* target, BMessage* message, const BSize& size)
 	:
-	Panel(frame, B_TRANSLATE("Name Panel"),
+	Panel(BRect(B_ORIGIN, size), B_TRANSLATE("Name Panel"),
 		B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
@@ -37,6 +39,10 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 	BButton* cancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(MSG_PANEL_CANCEL));
 	fNameTC = new BTextControl(label, text, NULL);
+	BLayoutItem* inputItem = fNameTC->CreateTextViewLayoutItem();
+	inputItem->SetExplicitMinSize(
+		BSize(fNameTC->StringWidth("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+			B_SIZE_UNSET));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
 		.AddGlue()
@@ -47,7 +53,7 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 
 			// text control
 			.Add(fNameTC->CreateLabelLayoutItem())
-			.Add(fNameTC->CreateTextViewLayoutItem())
+			.Add(inputItem)
 			.AddStrut(5)
 			.End()
 
@@ -74,11 +80,6 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 	}	
 
 	AddToSubset(fWindow);
-
-	if (!frame.IsValid())
-		CenterOnScreen();
-
-	Show();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -65,6 +65,8 @@ image_id load_library(char const* path, uint32 flags, bool addOn,
 status_t unload_library(void* handle, image_id imageID, bool addOn);
 status_t get_nth_symbol(image_id imageID, int32 num, char* nameBuffer,
 	int32* _nameLength, int32* _type, void** _location);
+status_t get_symbol_at_address(void* address, image_id* _imageID,
+	char* nameBuffer, int32* _nameLength, int32* _type, void** _location);
 status_t get_symbol(image_id imageID, char const* symbolName, int32 symbolType,
 	bool recursive, image_id* _inImage, void** _location);
 status_t get_library_symbol(void* handle, void* caller, const char* symbolName,

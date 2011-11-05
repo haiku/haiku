@@ -182,7 +182,7 @@ copy_attributes(int fromFd, int toFd)
 
 	DIR *attributes = fs_fopen_attr_dir(fromFd);
 	if (attributes == NULL)
-		return -1;
+		return errno == B_UNSUPPORTED ? 0 : -1;
 
 	while ((dirent = fs_read_attr_dir(attributes)) != NULL) {
 		struct stat stat;

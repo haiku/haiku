@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -767,7 +767,7 @@ AcpiPsLinkModuleCode (
         MethodObj->Method.AmlStart = AmlStart;
         MethodObj->Method.AmlLength = AmlLength;
         MethodObj->Method.OwnerId = OwnerId;
-        MethodObj->Method.Flags |= AOPOBJ_MODULE_LEVEL;
+        MethodObj->Method.InfoFlags |= ACPI_METHOD_MODULE_LEVEL;
 
         /*
          * Save the parent node in NextObject. This is cheating, but we

@@ -1082,11 +1082,13 @@ FrameMoved(origin);
 
 				// we notify the input server if we are gaining or losing focus
 				// from a view which has the B_INPUT_METHOD_AWARE on a window
-				// (de)activation
+				// activation
+				if (!active)
+					break;
 				bool inputMethodAware = false;
 				if (fFocus)
 					inputMethodAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
-				BMessage msg(active && inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+				BMessage msg(inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
 				BMessenger messenger(fFocus);
 				BMessage reply;
 				if (fFocus)
@@ -1184,16 +1186,6 @@ FrameMoved(origin);
 		case B_MOUSE_DOWN:
 		{
 			BView* view = dynamic_cast<BView*>(target);
-
-			// Close an eventually opened menu
-			// unless the target is the menu itself
-			BMenu* menu = dynamic_cast<BMenu*>(fFocus);
-			MenuPrivate privMenu(menu);
-			if (menu != NULL && menu != view
-				&& privMenu.State() != MENU_STATE_CLOSED) {
-				privMenu.QuitTracking();
-				return;
-			}
 
 			if (view != NULL) {
 				BPoint where;
@@ -2076,14 +2068,35 @@ BRect
 BWindow::DecoratorFrame() const
 {
 	BRect decoratorFrame(Frame());
-	float borderWidth;
-	float tabHeight;
-	_GetDecoratorSize(&borderWidth, &tabHeight);
-	// TODO: Broken for tab on left window side windows...
-	decoratorFrame.top -= tabHeight;
-	decoratorFrame.left -= borderWidth;
-	decoratorFrame.right += borderWidth;
-	decoratorFrame.bottom += borderWidth;
+	BRect tabRect(0, 0, 0, 0);
+
+	float borderWidth = 5.0;
+
+	BMessage settings;
+	if (GetDecoratorSettings(&settings) == B_OK) {
+		settings.FindRect("tab frame", &tabRect);
+		settings.FindFloat("border width", &borderWidth);
+	} else {
+		// probably no-border window look
+		if (fLook == B_NO_BORDER_WINDOW_LOOK)
+			borderWidth = 0.f;
+		else if (fLook == B_BORDERED_WINDOW_LOOK)
+			borderWidth = 1.f;
+		// else use fall-back values from above
+	}
+
+	if (fLook & kLeftTitledWindowLook) {
+		decoratorFrame.top -= borderWidth;
+		decoratorFrame.left -= tabRect.Width();
+		decoratorFrame.right += borderWidth;
+		decoratorFrame.bottom += borderWidth;
+	} else {
+		decoratorFrame.top -= tabRect.Height();
+		decoratorFrame.left -= borderWidth;
+		decoratorFrame.right += borderWidth;
+		decoratorFrame.bottom += borderWidth;
+	}
+
 	return decoratorFrame;
 }
 
@@ -3042,6 +3055,9 @@ BWindow::task_looper()
 							DispatchMessage(fLastMessage, handler);
 					}
 
+					if (!cookie.tokens_scanned)
+						continue;
+
 					// Delete the current message
 					delete fLastMessage;
 					fLastMessage = NULL;
@@ -3198,7 +3214,7 @@ BWindow::_SetFocus(BView* focusView, bool notifyInputServer)
 	// we notify the input server if we are passing focus
 	// from a view which has the B_INPUT_METHOD_AWARE to a one
 	// which does not, or vice-versa
-	if (notifyInputServer) {
+	if (notifyInputServer && fActive) {
 		bool inputMethodAware = false;
 		if (focusView)
 			inputMethodAware = focusView->Flags() & B_INPUT_METHOD_AWARE;

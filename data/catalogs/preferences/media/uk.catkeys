@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Media	293613603
+1	ukrainian	x-vnd.Haiku-Media	1473363280
 <none>	Media views		<немає>
 Audio input:	Media views		Вхід звуку:
 Audio mixer	Media Window		Аудіо міксер
@@ -11,6 +11,7 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо д�
 Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
 Defaults	Media views		По замовчуванню
 Done shutting down.	Media Window		Відбувається закриття.
+Media	System name		Mедіа
 OK	Media Window		Гаразд
 Quit	Media Window		Вихід
 Ready for use…	Media Window		Готовий для використання…

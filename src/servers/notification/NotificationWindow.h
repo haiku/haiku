@@ -26,8 +26,6 @@
 
 class AppGroupView;
 class AppUsage;
-class BorderView;
-class SettingsFile;
 
 typedef std::map<BString, AppGroupView*> appview_t;
 typedef std::map<BString, AppUsage*> appfilter_t;
@@ -39,8 +37,6 @@ extern const float kCloseSize;
 extern const float kExpandSize;
 extern const float kPenSize;
 
-const uint32 kResizeToFit = 'IWrf';
-
 class NotificationWindow : public BWindow {
 public:
 									NotificationWindow();
@@ -51,27 +47,27 @@ public:
 	virtual	void 					WorkspaceActivated(int32, bool);
 	virtual	BHandler*				ResolveSpecifier(BMessage*, int32, BMessage*,
 										int32, const char*);
+										
+			void					Show();
 
 			icon_size				IconSize();
 			int32					Timeout();
-			infoview_layout 		Layout();
-			float					ViewWidth();
+			float					Width();
 
-			void					ResizeAll();
+			void					_ResizeAll();
 
 private:
 	friend class AppGroupView;
 
-			void					PopupAnimation(float, float);
-			void					LoadSettings(bool startMonitor = false);
-			void					LoadAppFilters(bool startMonitor = false);
-			void					SaveAppFilters();
+			void					SetPosition();
+			void					PopupAnimation();
+			void					_LoadSettings(bool startMonitor = false);
+			void					_LoadAppFilters(bool startMonitor = false);
+			void					_SaveAppFilters();
 			void					_LoadGeneralSettings(bool startMonitor);
 			void					_LoadDisplaySettings(bool startMonitor);
 
 			views_t					fViews;
-			BorderView*				fBorder;
-
 			appview_t				fAppViews;
 
 			BString					fStatusText;
@@ -80,7 +76,6 @@ private:
 			float					fWidth;
 			icon_size				fIconSize;
 			int32					fTimeout;
-			infoview_layout			fLayout;
 
 			appfilter_t				fAppFilters;
 };

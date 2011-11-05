@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All rights reserved.
+ * Copyright 2010-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TIME_ZONE_H
@@ -9,7 +9,7 @@
 #include <String.h>
 
 
-namespace icu_44 {
+namespace icu {
 	class Locale;
 	class TimeZone;
 }
@@ -46,8 +46,8 @@ public:
 private:
 	friend	class Private;
 
-			icu_44::TimeZone*	fICUTimeZone;
-			icu_44::Locale*		fICULocale;
+			icu::TimeZone*		fICUTimeZone;
+			icu::Locale*		fICULocale;
 			status_t			fInitStatus;
 
 	mutable uint32				fInitializedFields;

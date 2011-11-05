@@ -66,13 +66,13 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 
 	SetTo(settings);
 
-	((BControl *)(FindView("leave_mail_on_server")))->SetValue(B_CONTROL_ON);
-	((BControl *)(FindView("leave_mail_on_server")))->Hide();
+	((BControl*)(FindView("leave_mail_on_server")))->SetValue(B_CONTROL_ON);
+	((BControl*)(FindView("leave_mail_on_server")))->Hide();
 
 	BRect frame = FindView("delete_remote_when_local")->Frame();
 
-	((BControl *)(FindView("delete_remote_when_local")))->SetEnabled(true);
-	((BControl *)(FindView("delete_remote_when_local")))->MoveBy(0, -25);
+	((BControl*)(FindView("delete_remote_when_local")))->SetEnabled(true);
+	((BControl*)(FindView("delete_remote_when_local")))->MoveBy(0, -25);
 
 	fIMAPFolderButton = new BButton(frame, "IMAP Folders", B_TRANSLATE(
 		"IMAP Folders"), new BMessage(kMsgOpenIMAPFolder));
@@ -83,7 +83,7 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 	BPath defaultFolder = BPrivate::default_mail_directory();
 	defaultFolder.Append(accountSettings.Name());
 
-	fFileView =  new BMailFileConfigView(B_TRANSLATE("Destination:"),
+	fFileView = new BMailFileConfigView(B_TRANSLATE("Destination:"),
 		"destination", false, defaultFolder.Path());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
@@ -95,7 +95,6 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 
 IMAPConfig::~IMAPConfig()
 {
-
 }
 
 
@@ -119,18 +118,18 @@ void
 IMAPConfig::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case kMsgOpenIMAPFolder:
-	{
-		BMessage settings;
-		Archive(&settings);
-		BWindow* window = new FolderConfigWindow(Window()->Frame(),
-			settings);
-		window->Show();
-		break;
-	}
+		case kMsgOpenIMAPFolder:
+		{
+			BMessage settings;
+			Archive(&settings);
+			BWindow* window = new FolderConfigWindow(Window()->Frame(),
+				settings);
+			window->Show();
+			break;
+		}
 
-	default:
-		BMailProtocolConfigView::MessageReceived(message);
+		default:
+			BMailProtocolConfigView::MessageReceived(message);
 	}
 }
 
@@ -140,6 +139,9 @@ IMAPConfig::AttachedToWindow()
 {
 	fIMAPFolderButton->SetTarget(this);
 }
+
+
+// #pragma mark -
 
 
 BView*

@@ -25,195 +25,175 @@
 #endif
 
 
+atom_context *gAtomContext;
+
+
+void
+radeon_bios_init_scratch()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint32 biosScratch2;
+	uint32 biosScratch6;
+
+	if (info.device_chipset >= RADEON_R600) {
+		biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
+		biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
+	} else {
+		biosScratch2 = Read32(OUT, RADEON_BIOS_2_SCRATCH);
+		biosScratch6 = Read32(OUT, RADEON_BIOS_6_SCRATCH);
+	}
+
+	biosScratch2 &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
+		// bios should control backlight
+	biosScratch6 |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
+		// bios shouldn't handle mode switching
+
+	if (info.device_chipset >= RADEON_R600) {
+		Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
+		Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
+	} else {
+		Write32(OUT, RADEON_BIOS_2_SCRATCH, biosScratch2);
+		Write32(OUT, RADEON_BIOS_6_SCRATCH, biosScratch6);
+	}
+}
+
+
+bool
+radeon_bios_isposted()
+{
+	// aka, is primary graphics card that POST loaded
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 reg;
+
+	if (info.device_chipset == (RADEON_R1000 | 0x50)) {
+		// palms
+		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
+			+ EVERGREEN_CRTC0_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+			+ EVERGREEN_CRTC1_REGISTER_OFFSET);
+		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
+			return true;
+	} else if (info.device_chipset >= RADEON_R1000) {
+		// evergreen or higher
+		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC0_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC1_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC2_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC3_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC4_REGISTER_OFFSET)
+			| Read32(OUT, EVERGREEN_CRTC_CONTROL
+				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
+		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
+			return true;
+	} else if (info.device_chipset > RADEON_R580) {
+		// avivio through r700
+		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
+			Read32(OUT, AVIVO_D2CRTC_CONTROL);
+		if ((reg & AVIVO_CRTC_EN) != 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 status_t
-AtomParser(void *parameterSpace, uint8_t index, void *handle, void *biosBase)
+radeon_init_bios(uint8* bios)
 {
-	DEVICE_DATA deviceData;
+	radeon_shared_info &info = *gInfo->shared_info;
 
-	deviceData.pParameterSpace = (UINT32*)parameterSpace;
-	deviceData.CAIL = handle;
-	deviceData.pBIOS_Image = (UINT8*)biosBase;
-	deviceData.format = TABLE_FORMAT_BIOS;
-
-	switch (ParseTable(&deviceData, index)) {
-		case CD_SUCCESS:
-			TRACE("%s: CD_SUCCESS : success\n", __func__);
-			return B_OK;
-			break;
-		case CD_CALL_TABLE:
-			TRACE("%s: CD_CALL_TABLE : success\n", __func__);
-			return B_OK;
-			break;
-		case CD_COMPLETED:
-			TRACE("%s: CD_COMPLETED : success\n", __func__);
-			return B_OK;
-			break;
-		default:
-			TRACE("%s: UNKNOWN ERROR\n", __func__);
-	}
-	return B_ERROR;
-}
-
-
-/*	Begin AtomBIOS OS callbacks
-	These functions are used by AtomBios to access
-	functions and data provided by the accelerant
-*/
-extern "C" {
-
-
-VOID*
-CailAllocateMemory(VOID *CAIL, UINT16 size)
-{
-	TRACE("AtomBios callback %s, size = %d\n", __func__, size);
-	return malloc(size);
-}
-
-
-VOID
-CailReleaseMemory(VOID *CAIL, VOID *addr)
-{
-	TRACE("AtomBios callback %s\n", __func__);
-	free(addr);
-}
-
-
-VOID
-CailDelayMicroSeconds(VOID *CAIL, UINT32 delay)
-{
-	usleep(delay);
-}
-
-
-UINT32
-CailReadATIRegister(VOID* CAIL, UINT32 idx)
-{
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx << 2);
-	return Read32(OUT, idx << 2);
-}
-
-
-VOID
-CailWriteATIRegister(VOID *CAIL, UINT32 idx, UINT32 data)
-{
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx << 2);
-
-	// TODO : save MMIO via atomSaveRegisters in CailWriteATIRegister
-	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMMIO, idx << 2);
-	Write32(OUT, idx << 2, data);
-}
-
-
-VOID
-CailReadPCIConfigData(VOID *CAIL, VOID* ret, UINT32 idx, UINT16 size)
-{
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
-	// TODO : CailReadPCIConfigData
-
-	// pci_device_cfg_read(RHDPTRI((atomBiosHandlePtr)CAIL)->PciInfo,
-	//	ret, idx << 2 , size >> 3, NULL);
-}
-
-
-VOID
-CailWritePCIConfigData(VOID *CAIL, VOID *src, UINT32 idx, UINT16 size)
-{
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
-	// TODO : CailWritePCIConfigData
-
-	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPCICFG, idx << 2);
-	// pci_device_cfg_write(RHDPTRI((atomBiosHandlePtr)CAIL)->PciInfo,
-	//	src, idx << 2, size >> 3, NULL);
-}
-
-
-ULONG
-CailReadPLL(VOID *CAIL, ULONG address)
-{
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
-	return Read32(PLL, address);
-}
-
-
-VOID
-CailWritePLL(VOID *CAIL, ULONG address, ULONG data)
-{
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
-
-	// TODO : save PLL registers
-	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPLL, address);
-	// TODO : Assumed screen index 0
-	Write32(PLL, address, data);
-}
-
-
-ULONG
-CailReadMC(VOID *CAIL, ULONG address)
-{
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
-	// TODO : CailReadMC
-
-	ULONG ret = 0;
-
-	// ret = RHDReadMC(((atomBiosHandlePtr)CAIL), address | MC_IND_ALL);
-	return ret;
-}
-
-
-VOID
-CailWriteMC(VOID *CAIL, ULONG address, ULONG data)
-{
-	TRACE("AtomBios callback %s, addr (0x%X)\n", __func__, address);
-	// TODO : CailWriteMC
-
-	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMC, address);
-	// RHDWriteMC(((atomBiosHandlePtr)CAIL),
-	//	address | MC_IND_ALL | MC_IND_WR_EN, data);
-}
-
-
-UINT32
-CailReadFBData(VOID* CAIL, UINT32 idx)
-{
-	// TODO : This should work only in theory and needs tested
-
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
-
-	UINT32 ret = 0;
-
-	uint32_t fbLocation
-		= gInfo->shared_info->frame_buffer_phys & 0xffffffff;
-
-	// If we have a physical offset for our frame buffer, use it
-	if (fbLocation > 0)
-		ret = Read32(PLL, fbLocation + idx);
-	else {
-		TRACE("%s: ERROR: Frame Buffer offset not defined\n",
-			__func__);
-		return 0;
+	if (info.has_rom == false) {
+		TRACE("%s: called even though has_rom == false\n", __func__);
+		return B_ERROR;
 	}
 
-	return ret;
-}
+	#ifdef TRACE_ATOM
+	radeon_dump_bios();
+	#endif
 
+	struct card_info *atom_card_info
+		= (card_info*)malloc(sizeof(card_info));
 
-VOID
-CailWriteFBData(VOID *CAIL, UINT32 idx, UINT32 data)
-{
-	// TODO : This should work only in theory and needs tested
+	if (!atom_card_info)
+		return B_NO_MEMORY;
 
-	TRACE("AtomBios callback %s, idx (0x%X)\n", __func__, idx);
+	atom_card_info->reg_read = Read32Cail;
+	atom_card_info->reg_write = Write32Cail;
 
-	uint32_t fbLocation
-		= gInfo->shared_info->frame_buffer_phys & 0xffffffff;
+	// use MMIO instead of PCI I/O BAR
+	atom_card_info->ioreg_read = Read32Cail;
+	atom_card_info->ioreg_write = Write32Cail;
 
-	// If we have a physical offset for our frame buffer, use it
-	if (fbLocation > 0)
-		Write32(OUT, fbLocation + idx, data);
-	else
-		TRACE("%s: ERROR: Frame Buffer offset not defined\n",
+	atom_card_info->mc_read = _read32;
+	atom_card_info->mc_write = _write32;
+	atom_card_info->pll_read = _read32;
+	atom_card_info->pll_write = _write32;
+
+	// Point AtomBIOS parser to card bios and malloc gAtomContext
+	gAtomContext = atom_parse(atom_card_info, bios);
+
+	if (gAtomContext == NULL) {
+		TRACE("%s: couldn't parse system AtomBIOS\n", __func__);
+		return B_ERROR;
+	}
+
+	if ((gAtomContext->exec_sem = create_sem(1, "AtomBIOS_exec"))
+		< B_NO_ERROR) {
+		TRACE("%s: couldn't create semaphore for AtomBIOS exec thread!\n",
 			__func__);
+		return B_ERROR;
+	}
+
+	radeon_bios_init_scratch();
+	atom_allocate_fb_scratch(gAtomContext);
+
+	// post card atombios if needed
+	if (radeon_bios_isposted() == false) {
+		TRACE("%s: init AtomBIOS for this card as it is not not posted\n",
+			__func__);
+		// radeon_gpu_reset();	// <= r500 only?
+		atom_asic_init(gAtomContext);
+	} else {
+		TRACE("%s: AtomBIOS is already posted\n",
+			__func__);
+	}
+
+	return B_OK;
 }
 
 
-} // end extern "C"
+status_t
+radeon_dump_bios()
+{
+	// For debugging use, dump card AtomBIOS
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	TRACE("%s: Dumping AtomBIOS as ATOM_DEBUG is set...\n",
+		__func__);
+
+	FILE* fp;
+	char filename[255];
+	sprintf(filename, "/boot/common/cache/tmp/radeon_hd_bios_1002_%" B_PRIx32
+		"_%" B_PRIu32 ".bin", info.device_id, info.device_index);
+
+	fp = fopen(filename, "wb");
+	if (fp == NULL) {
+		TRACE("%s: Cannot create AtomBIOS blob at %s\n", __func__, filename);
+		return B_ERROR;
+	}
+
+	fwrite(gInfo->rom, info.rom_size, 1, fp);
+
+	fclose(fp);
+
+	TRACE("%s: AtomBIOS dumped to %s\n", __func__, filename);
+
+	return B_OK;
+}

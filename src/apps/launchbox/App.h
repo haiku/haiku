@@ -1,14 +1,18 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef APP_H
 #define APP_H
 
+
 #include <Application.h>
 #include <List.h>
+#include <Size.h>
+
 
 class MainWindow;
+
 
 class App : public BApplication {
 public:
@@ -20,10 +24,16 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				Pulse();
 
+			void				SetNamePanelSize(const BSize& size);
+			BSize				NamePanelSize();
+
 private:
 			void				_StoreSettingsIfNeeded();
 
 			bool				fSettingsChanged;
+
+			BSize				fNamePanelSize;
 };
+
 
 #endif // APP_H

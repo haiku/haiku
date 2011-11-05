@@ -1,6 +1,6 @@
 //
-// CannaIM - Canna-based Input Method Add-on for BeOS R4 
-// 
+// CannaIM - Canna-based Input Method Add-on for BeOS R4
+//
 
 #include <List.h>
 #include <Looper.h>
@@ -61,12 +61,12 @@ status_t
 CannaMethod::MethodActivated( bool active )
 {
 	BMessage msg( CANNA_METHOD_ACTIVATED );
-	
+
 	if ( active )
 		msg.AddBool( "active", true );
-		
+
 	cannaLooper.SendMessage( &msg );
-	
+
 	return B_OK;
 }
 
@@ -75,7 +75,7 @@ CannaMethod::Filter( BMessage *msg, BList *outList )
 {
 	if ( msg->what != B_KEY_DOWN )
 		return B_DISPATCH_MESSAGE;
-	
+
 	cannaLooper.SendMessage( msg );
 	return B_SKIP_MESSAGE;
 }
@@ -99,7 +99,7 @@ CannaMethod::InitCheck()
 	else
 	SERIAL_PRINT(( "CannaLooper::InitCheck() success.\n" ));
 #endif
-	
+
 	return err;
 }
 
@@ -133,7 +133,7 @@ void CannaMethod::WriteSettings()
 	BMessage pref;
 	BFile preffile( CANNAIM_SETTINGS_FILE,
 			B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-	
+
 	if ( preffile.InitCheck() == B_NO_ERROR )
 	{
 		pref.AddBool( "arrowkey", gSettings.convert_arrowkey );

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011 Haiku, Inc. All Rights Reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -29,7 +29,7 @@
 CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("DeskCalc"), B_TITLED_WINDOW,
-	B_ASYNCHRONOUS_CONTROLS)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ANCHORED_ON_ACTIVATE)
 {
 	// create calculator view with calculator description and
 	// desktop background color

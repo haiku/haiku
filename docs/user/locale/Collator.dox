@@ -1,154 +1,225 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		/trunk/headers/os/locale/Collator.h	 rev 42274
+ *		/trunk/src/kits/locale/Collator.cpp	 rev 42274
+ */
+
+
 /*!
-\class BCollator
-\ingroup locale
-\brief Class for handling collation of string
+	\file Collator.h
+	\brief Provides the BCollator class.
+*/
 
-BCatalog is designed to handle collations (sorting) of strings.
-The collation is done using a set of rules that changes from a country to another.
-For example, in spanish, 'ch' is consiidered as a letter and is sorted between 'c' and 'd'.
-This class is alsoable to perform natural sorting, so that '2' is sorted before '10',
-which is not the case when you do a simple ASCII sort.
 
-\warning This class is not multithread-safe, as Compare() and GetKey() change
-the ICUCollator (the strength). So if you want to use a BCollator from
-more than one thread, you need to protect it with a lock.
+/*!
+	\class BCollator
+	\ingroup locale
+	\brief Class for handling collation of string
 
+	BCatalog is designed to handle collations (sorting) of strings.
+	The collation is done using a set of rules that changes from a country
+	to another.  For example, in spanish, 'ch' is consiidered as a letter
+	and is sorted between 'c' and 'd'. This class is alsoable to perform
+	natural sorting, so that '2' is sorted before '10', which is not the
+	case when you do a simple ASCII sort.
+
+	\warning This class is not multithread-safe, as Compare() and GetKey()
+	change the ICUCollator (the strength). So if you want to use a
+	BCollator from more than one thread, you need to protect it with a lock.
 */
 
 /*!
-\fn BCollator::BCollator()
-\brief Construct a collator for the default locale.
+	\fn BCollator::BCollator()
+	\brief Construct a collator for the default locale.
+
+	Empty contructor.
 */
 
 /*!
-\fn BCollator::BCollator(const char* locale, int8 strength = B_COLLATE_PRIMARY, bool ignorePunctiation = false)
-\brief Construct a collator for the given locale.
+	\fn BCollator::BCollator(const char* locale,
+		int8 strength = B_COLLATE_PRIMARY, bool ignorePunctuation = false)
+	\brief Construct a collator for the given locale.
 
-This constructor loads the data for the given locale. You can also adjust the strength and
-tell if the collator should take punctuation into account when sorting.
+	This constructor loads the data for the given locale. You can also
+	adjust the strength and tell if the collator should take punctuation
+	into account when sorting.
+
+	\param locale The \a locale.
+	\param strength The collator class provide four level of strength. These
+		define the handling of various things.
+		\li \c B_COLLATE_PRIMARY doesn't differentiate e from é,
+		\li \c B_COLLATE_SECONDARY takes letter accents into account,
+		\li \c B_COLLATE_TERTIARY is case sensitive,
+		\li \c B_COLLATE_QUATERNARY is very strict. Most of the time you
+			shouldn't need to go that far.
+	\param ignorePunctuation Ignore punctuation in the Collator when sorting.
 */
 
 /*!
-\fn BCollator::BCollator(BMessage* archive)
-\brief Unarchive a collator.
+	\fn BCollator::BCollator(BMessage* archive)
+	\brief Unarchive a collator from a message.
+
+	\param archive The message to unarchive the BCollator from.
 */
 
 /*!
-\fn BCollator::BCollator(const BCollator& other)
-\brief Copy constructor.
+	\fn BCollator::BCollator(const BCollator& other)
+	\brief Copy constructor.
+
+	Constructs a BCollator by making a copy of another BCollator.
+
+	\param other The BCollator to copy from.
 */
 
 /*!
-\fn BCollator::~Bcollator()
-\brief Destructor.
+	\fn BCollator::~BCollator()
+	\brief Destructor.
+
+	Standard destructor method.
 */
 
 /*!
-\fn Bcollator& BCollator::operator=(const BColltr& other)
-\brief Assignment operator.
+	\fn Bcollator& BCollator::operator=(const BCollator& other)
+	\brief Assignment operator.
+
+	\param other the BCollator to assign from.
 */
 
 /*!
-\fn void BCollator::SetDefaultStrength(int8 strength)
-\brief Set the strength of the collator.
+	\fn void BCollator::SetDefaultStrength(int8 strength)
+	\brief Set the strength of the collator.
 
-The collator class provide four level of strength. These define the handling of
-various things.
-\item B_COLLATE_PRIMARY doesn't differenciate e from é,
-\item B_COLLATE_SECONDARY takes them into account,
-\item B_COLLATE_TERTIARY is case sensitive,
-\item B_COLLATE_QUATERNARY is very strict. Most of the time you shouldn't need
-to go that far.
+	Note that the \a strength can also be given on a case-by-case basis
+	when calling other methods.
 
-Note the strength can also be given on a case-by-case basis when calling other
-methods.
-
-\param strength The strength the catalog should use as default.
+	\param strength The collator class provide four level of strength.
+	These define the handling of various things.
+	 \li \c B_COLLATE_PRIMARY doesn't differentiate e from é,
+	 \li \c B_COLLATE_SECONDARY takes letter accents into account,
+	 \li \c B_COLLATE_TERTIARY is case sensitive,
+	 \li \c B_COLLATE_QUATERNARY is very strict. Most of the time you
+		 shouldn't need to go that far.
 */
 
 /*!
-\fn int8 BCollator::DefaultStrength() const
-\brief Returns the current strength of this catalog.
+	\fn int8 BCollator::DefaultStrength() const
+	\brief Get the current strength of this catalog.
+
+	\returns the current strength of this catalog.
 */
 
 /*!
-\fn void BCollator::SetIgnorePunctuation(bool ignore)
-\brief Enable or disable punctuation handling
+	\fn void BCollator::SetIgnorePunctuation(bool ignore)
+	\brief Enable or disable punctuation handling
 
-This function enables or disables the handling of punctuations.
+	This function enables or disables the handling of punctuations.
 
-\param ignore Boolean telling if the punctuation should be ignored.
+	\param ignore Boolean telling if the punctuation should be ignored.
 */
 
 /*!
-\fn bool BCollator::IgnorePunctuation() const
-\brief Return the behaviour ofthe collator regarding punctuation.
+	\fn bool BCollator::IgnorePunctuation() const
+	\brief Gets the behavior of the collator regarding punctuation.
 
-This function returns true if the collator will take punctuation into account
-when sorting.
+	This function returns \c true if the collator will take punctuation into
+	account when sorting.
 */
 
 /*!
-\fn satus_t BCollator::GetSortKey(const char* string, BString* key, int8 strength) const
-\brief Compute the sortkey of a string
+	\fn satus_t BCollator::GetSortKey(const char* string, BString* key,
+		int8 strength) const
+	\brief Compute the sortkey of a string.
 
-A sortkey is a modified version of the string that you can use for faster
-comparison with other sortkeys, using strcmp or a similar ASCII comparison. If
-you need to compare a string with other ones a lot of times, storing the sortkey
-will allow you to do the comparisons faster.
+	A sortkey is a modified version of the string that you can use for faster
+	comparison with other sortkeys, using strcmp or a similar ASCII comparison.
+	If you need to compare a string with other ones a lot of times, storing
+	the sortkey will allow you to do the comparisons faster.
 
-\param string String from which to compute the sortkey.
-\param key The resulting sortkey.
-\param strength The strength to use for computing the sortkey.
+	\param string String from which to compute the sortkey.
+	\param key The resulting sortkey.
+	\param strength The \a strength to use for computing the sortkey.
 
-\returns B_OK if everything went well.
+	\returns B_OK if everything went well.
 */
 
 /*!
-\fn int BCollator::Compare(const char* s1, const char* s2, int8 strength) const
-\brief Compare two strings.
+	\fn int BCollator::Compare(const char* s1, const char* s2,
+		int8 strength) const
+	\brief Compare two strings.
 
-This function returns the difference betweens the two strings, in a way similar
-to strcmp.
+	Returns the difference betweens the two strings similar to strcmp().
 
-\param s1,s2 The strings to compare.
-\returns The comparison value. 0 if the strings are equal, negative if s1<s2,
-positive if s1>s2.
+	\param s1 The first string to compare.
+	\param s2 The second string to compare.
+	\param strength The \a strength to use for comparing the strings.
+
+	\retval 0 if the strings are equal.
+	\retval <0 if s1 is less than s2.
+	\retval >0 if s1 is greater than s2.
 */
 
 /*!
-\fn bool BCollator::Equal(const char* s1, const char* s2, int8 strength) const
-\brief Checks two strings for equality.
+	\fn bool BCollator::Equal(const char* s1, const char* s2,
+		int8 strength) const
+	\brief Checks two strings for equality.
 
-Compares two strings for equality. Note that different strings may end up being
-equal, for example if the differences are only in case and punctuation,
-depending on the strenght used. Quaterary strength will make this function
-return true only if the strings are byte-for-byte identical.
+	Compares two strings for equality. Note that different strings may end
+	up being equal, for example if the differences are only in case and
+	punctuation, depending on the strength used. Quaterary strength will
+	make this function return true only if the strings are byte-for-byte
+	identical.
 
-\returns True if the two strings are identical.
+	\param s1 The first string to compare.
+	\param s2 The second string to compare.
+	\param strength The \a strength to use for comparing the strings.
+
+	\returns \c true if the strings are identical, otherwise \c false.
 */
 
 /*!
-\fn bool BCollator::Greater(cosnt char* s1, const char* s2, int8 strength) const)
-\brief Tell if a string is greater than another.
+	\fn bool BCollator::Greater(cosnt char* s1, const char* s2,
+		int8 strength) const
+	\brief Determine if a string is greater than another.
 
-\returns True if s1 is greater (not equal) than s2.
+	\note !Greater(s1, s2) does the same thing as Greater(s2, s1)
 
-\note !Greater(s1, s2) does the same thing as Greater(s2, s1)
+	\param s1 The first string to compare.
+	\param s2 The second string to compare.
+	\param strength The \a strength to use for comparing the strings.
+
+	\returns \c true if s1 is greater than, but not equal to, s2.
 */
 
 /*!
-\fn bool BCollator::GreaterOrEqual(cosnt char* s1, const char* s2, int8 strength) const)
-\brief Tell if a string is greater than another.
+	\fn bool BCollator::GreaterOrEqual(cosnt char* s1, const char* s2,
+		int8 strength) const
+	\brief Tell if a string is greater than another.
 
-\returns True if s1 is greater or equal to s2.
+	\param s1 The first string to compare.
+	\param s2 The second string to compare.
+	\param strength The \a strength to use for comparing the strings.
+
+	\returns \c true if s1 is greater or equal than s2.
 */
 
 /*!
-\fn static BArchivable* BCollator::Instanciate(BMessage* archive)
-\brief Unarchive the collator
+	\fn static BArchivable* BCollator::Instantiate(BMessage* archive)
+	\brief Unarchive the collator
 
-Thif function allows you to restore a collator that you previously archived. It
-is faster to do that than to buid a collator and set it up by hand every time
-you need it with the same settings.
+	This function allows you to restore a collator that you previously
+	archived. It is faster to do that than to buid a collator and set
+	it up by hand every time you need it with the same settings.
+
+	\param archive The message to restore the collator from.
+
+	\returns A BArchivable object containing the BCollator or \c NULL.
 */
+

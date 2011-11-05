@@ -6,6 +6,12 @@ Application BSnow :
 	Flakes.cpp
 	SnowView.cpp
 	SnowApp.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: BSnow.rdef
+	;
+
+DoCatalogs BSnow :
+    x-vnd.mmu_man.BSnow
+    :
+	SnowView.h
 	;

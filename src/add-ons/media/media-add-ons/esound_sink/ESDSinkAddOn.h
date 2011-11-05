@@ -34,7 +34,7 @@
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
 
-#define SETTINGS_FILE					"Media/esd_sink_settings"
+#define SETTINGS_FILE					"Media/esound_sink_settings"
 
 class ESDSinkAddOn :
     public BMediaAddOn

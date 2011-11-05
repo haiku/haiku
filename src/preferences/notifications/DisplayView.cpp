@@ -52,16 +52,6 @@ DisplayView::DisplayView(SettingsHost* host)
 	fIconSize->SetLabelFromMarked(true);
 	fIconSizeField = new BMenuField(B_TRANSLATE("Icon size:"), fIconSize);
 
-	// Title position
-	fTitlePosition = new BMenu("titlePosition");
-	fTitlePosition->AddItem(new BMenuItem(B_TRANSLATE("Above icon"),
-		new BMessage(kSettingChanged)));
-	fTitlePosition->AddItem(new BMenuItem(B_TRANSLATE("Right of icon"),
-		new BMessage(kSettingChanged)));
-	fTitlePosition->SetLabelFromMarked(true);
-	fTitlePositionField = new BMenuField(B_TRANSLATE("Title position:"),
-		fTitlePosition);
-
 	// Load settings
 	Load();
 
@@ -74,9 +64,7 @@ DisplayView::DisplayView(SettingsHost* host)
 		.Add(fWindowWidth->CreateTextViewLayoutItem(), 1, 0)
 		.Add(fIconSizeField->CreateLabelLayoutItem(), 0, 1)
 		.Add(fIconSizeField->CreateMenuBarLayoutItem(), 1, 1)
-		.Add(fTitlePositionField->CreateLabelLayoutItem(), 0, 2)
-		.Add(fTitlePositionField->CreateMenuBarLayoutItem(), 1, 2)
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2, 1)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2, 2, 1)
 	);
 }
 
@@ -86,7 +74,6 @@ DisplayView::AttachedToWindow()
 {
 	fWindowWidth->SetTarget(this);
 	fIconSize->SetTargetForItems(this);
-	fTitlePosition->SetTargetForItems(this);
 }
 
 
@@ -150,25 +137,6 @@ DisplayView::Load()
 	if (item)
 		item->SetMarked(true);
 
-	infoview_layout layout;
-	if (settings.FindInt32(kLayoutName, &setting) != B_OK)
-		layout = kDefaultLayout;
-	else {
-		switch (setting) {
-			case 0:
-				layout = TitleAboveIcon;
-				break;
-			case 1:
-				layout = AllTextRightOfIcon;
-				break;
-			default:
-				layout = kDefaultLayout;
-		}
-	}
-	item = fTitlePosition->ItemAt(layout);
-	if (item)
-		item->SetMarked(true);
-
 	return B_OK;
 }
 
@@ -198,11 +166,6 @@ DisplayView::Save()
 			iconSize = B_LARGE_ICON;
 	}
 	settings.AddInt32(kIconSizeName, (int32)iconSize);
-
-	int32 layout = fTitlePosition->IndexOf(fTitlePosition->FindMarked());
-	if (layout == B_ERROR)
-		layout = (int32)kDefaultLayout;
-	settings.AddInt32(kLayoutName, layout);
 
 	// Save settings file
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);

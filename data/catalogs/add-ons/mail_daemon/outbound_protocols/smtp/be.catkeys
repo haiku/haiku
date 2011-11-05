@@ -1,0 +1,13 @@
+1	belarusian	x-vnd.Haiku-SMTP	1052586247
+. The server said:\n	smtp		. Паведамленне сервера:\n
+. The server says:\n	smtp		. Паведамленне сервера:\n
+: Connection refused or host not found.	smtp		: Адмоўлена ў злучэнні ці сервер не знойдзены.
+Connecting to server…	smtp		Далучэнне да сервера…
+Destination:	ConfigView		Прызначэнне:
+ESMTP	ConfigView		ESMTP
+Error while logging in to %serv	smtp		Памылка падчас лагіну ў %serv
+Error while opening connection to %serv	smtp		Памылка падчас далучэння да %serv
+None	ConfigView		Няма
+POP3 authentication failed. The server said:\n	smtp		Аўтэнтыфікацыя не ўдалася. Паведамленне сервера:\n
+POP3 before SMTP	ConfigView		POP3 перад SMTP
+SMTP server:	ConfigView		Сервер SMTP:

@@ -6,6 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics interface kernel shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 UseFreeTypeHeaders ;

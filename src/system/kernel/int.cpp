@@ -1,4 +1,7 @@
 /*
+ * Copyright 2011, Michael Lotz, mmlr@mlotz.ch.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -17,6 +20,7 @@
 #include <arch/int.h>
 #include <boot/kernel_args.h>
 #include <elf.h>
+#include <util/AutoLock.h>
 #include <util/kqueue.h>
 #include <smp.h>
 
@@ -56,6 +60,9 @@ struct io_vector {
 };
 
 static struct io_vector sVectors[NUM_IO_VECTORS];
+static bool sAllocatedIOInterruptVectors[NUM_IO_VECTORS];
+static mutex sIOInterruptVectorAllocationLock
+	= MUTEX_INITIALIZER("io_interrupt_vector_allocation");
 
 
 #if DEBUG_INTERRUPTS
@@ -421,3 +428,102 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	return status;
 }
 
+
+/*	Mark \a count contigous interrupts starting at \a startVector as in use.
+	This will prevent them from being allocated by others. Only use this when
+	the reserved range is hardwired to the given vector, otherwise allocate
+	vectors using allocate_io_interrupt_vectors() instead.
+*/
+status_t
+reserve_io_interrupt_vectors(long count, long startVector)
+{
+	MutexLocker locker(&sIOInterruptVectorAllocationLock);
+
+	for (long i = 0; i < count; i++) {
+		if (sAllocatedIOInterruptVectors[startVector + i]) {
+			panic("reserved interrupt vector range %ld-%ld overlaps already "
+				"allocated vector %ld", startVector, startVector + count - 1,
+				startVector + i);
+			free_io_interrupt_vectors(i, startVector);
+			return B_BUSY;
+		}
+
+		sAllocatedIOInterruptVectors[startVector + i] = true;
+	}
+
+	dprintf("reserve_io_interrupt_vectors: reserved %ld vectors starting "
+		"from %ld\n", count, startVector);
+	return B_OK;
+}
+
+
+/*!	Allocate \a count contigous interrupt vectors. The vectors are allocated
+	as available so that they do not overlap with any other reserved vector.
+	The first vector to be used is returned in \a startVector on success.
+*/
+status_t
+allocate_io_interrupt_vectors(long count, long *startVector)
+{
+	MutexLocker locker(&sIOInterruptVectorAllocationLock);
+
+	long vector = 0;
+	bool runFound = true;
+	for (long i = 0; i < NUM_IO_VECTORS - (count - 1); i++) {
+		if (sAllocatedIOInterruptVectors[i])
+			continue;
+
+		vector = i;
+		runFound = true;
+		for (uint16 j = 1; j < count; j++) {
+			if (sAllocatedIOInterruptVectors[i + j]) {
+				runFound = false;
+				i += j;
+				break;
+			}
+		}
+
+		if (runFound)
+			break;
+	}
+
+	if (!runFound) {
+		dprintf("found no free vectors to allocate %ld io interrupts\n", count);
+		return B_NO_MEMORY;
+	}
+
+	for (long i = 0; i < count; i++)
+		sAllocatedIOInterruptVectors[vector + i] = true;
+
+	*startVector = vector;
+	dprintf("allocate_io_interrupt_vectors: allocated %ld vectors starting "
+		"from %ld\n", count, vector);
+	return B_OK;
+}
+
+
+/*!	Free/unreserve interrupt vectors previously allocated with the
+	{reserve|allocate}_io_interrupt_vectors() functions. The \a count and
+	\a startVector can be adjusted from the allocation calls to partially free
+	a vector range.
+*/
+void
+free_io_interrupt_vectors(long count, long startVector)
+{
+	if (startVector + count > NUM_IO_VECTORS) {
+		panic("invalid start vector %ld or count %ld supplied to "
+			"free_io_interrupt_vectors\n", startVector, count);
+	}
+
+	dprintf("free_io_interrupt_vectors: freeing %ld vectors starting "
+		"from %ld\n", count, startVector);
+
+	MutexLocker locker(sIOInterruptVectorAllocationLock);
+	for (long i = 0; i < count; i++) {
+		if (!sAllocatedIOInterruptVectors[startVector + i]) {
+			panic("io interrupt vector %ld was not allocated\n",
+				startVector + i);
+		}
+
+		sAllocatedIOInterruptVectors[startVector + i] = false;
+	}
+}

@@ -81,7 +81,6 @@ SubInclude HAIKU_TOP src kits media ;
 SubInclude HAIKU_TOP src kits midi ;
 SubInclude HAIKU_TOP src kits midi2 ;
 SubInclude HAIKU_TOP src kits network ;
-SubInclude HAIKU_TOP src kits notification ;
 SubInclude HAIKU_TOP src kits opengl ;
 SubInclude HAIKU_TOP src kits package ;
 SubInclude HAIKU_TOP src kits print ;

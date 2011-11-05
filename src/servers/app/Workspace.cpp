@@ -7,14 +7,17 @@
  */
 
 
-#include "Desktop.h"
 #include "Workspace.h"
-#include "WorkspacePrivate.h"
-#include "Window.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <Debug.h>
+
+#include "Desktop.h"
+#include "WorkspacePrivate.h"
+#include "Window.h"
 
 
 static rgb_color kDefaultColor = (rgb_color){ 51, 102, 152, 255 };
@@ -82,7 +85,7 @@ Workspace::Workspace(Desktop& desktop, int32 index)
 	fDesktop(desktop),
 	fCurrentWorkspace(index == desktop.CurrentWorkspace())
 {
-	ASSERT_MULTI_LOCKED(desktop.WindowLocker());
+	ASSERT(desktop.IsLocked());
 	RewindWindows();
 }
 

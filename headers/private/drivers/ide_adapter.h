@@ -101,7 +101,7 @@ typedef struct ide_adapter_channel_info {
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
 
-	ide_channel ide_channel;
+	ide_channel ideChannel;
 	device_node *node;
 
 	int32 (*inthand)( void *arg );

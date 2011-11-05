@@ -2,6 +2,7 @@
  * Copyright 2008, François Revol, <revol@free.fr>. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#include <Catalog.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <Window.h>
@@ -13,6 +14,9 @@
 
 #include "LoginApp.h"
 #include "LoginView.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Login View"
 
 #define LW 120
 #define CSEP 15
@@ -57,19 +61,19 @@ LoginView::LoginView(BRect frame)
 
 	r.Set(LW + 30, Bounds().top + CSEP,
 		Bounds().right - CSEP, Bounds().top + CSEP + CSEP);
-	fLoginControl = new BTextControl(r, "login", "Login:", "",
+	fLoginControl = new BTextControl(r, "login", B_TRANSLATE("Login:"), "",
 		new BMessage(kLoginEdited));
 	AddChild(fLoginControl);
 
 	r.OffsetBySelf(0, CSEP + CSEP);
-	fPasswordControl = new BTextControl(r, "password", "Password:", "",
-		new BMessage(kPasswordEdited));
+	fPasswordControl = new BTextControl(r, "password",
+		B_TRANSLATE("Password:"), "", new BMessage(kPasswordEdited));
 	fPasswordControl->TextView()->HideTyping(true);
 	AddChild(fPasswordControl);
 
 	r.OffsetBySelf(0, CSEP + CSEP);
-	fHidePasswordCheckBox = new BCheckBox(r, "hidepw", "Hide password",
-		new BMessage(kHidePassword));
+	fHidePasswordCheckBox = new BCheckBox(r, "hidepw",
+		B_TRANSLATE("Hide password"), new BMessage(kHidePassword));
 	fHidePasswordCheckBox->SetValue(1);
 	AddChild(fHidePasswordCheckBox);
 
@@ -79,12 +83,12 @@ LoginView::LoginView(BRect frame)
 		buttonWidth, Bounds().bottom);
 	buttonRect.OffsetBySelf(CSEP, -CSEP);
 
-	fHaltButton = new BButton(buttonRect, "halt", "Halt",
+	fHaltButton = new BButton(buttonRect, "halt", B_TRANSLATE("Halt"),
 		new BMessage(kHaltAction));
 	AddChild(fHaltButton);
 
 	buttonRect.OffsetBySelf(CSEP + buttonWidth, 0);
-	fRebootButton = new BButton(buttonRect, "reboot", "Reboot",
+	fRebootButton = new BButton(buttonRect, "reboot", B_TRANSLATE("Reboot"),
 		new BMessage(kRebootAction));
 	AddChild(fRebootButton);
 
@@ -93,7 +97,7 @@ LoginView::LoginView(BRect frame)
 
 	buttonRect.OffsetToSelf(Bounds().Width() - CSEP - buttonWidth,
 		Bounds().Height() - CSEP - BH);
-	fLoginButton = new BButton(buttonRect, "ok", "OK",
+	fLoginButton = new BButton(buttonRect, "ok", B_TRANSLATE("OK"),
 		new BMessage(kAttemptLogin));
 	AddChild(fLoginButton);
 
@@ -175,7 +179,7 @@ LoginView::MessageReceived(BMessage *message)
 		case kLoginBad:
 			fPasswordControl->SetText("");
 			EnableControls(false);
-			fInfoView->SetText("Invalid login!");
+			fInfoView->SetText(B_TRANSLATE("Invalid login!"));
 			if (Window()) {
 				BPoint savedPos = Window()->Frame().LeftTop();
 				for (int i = 0; i < 10; i++) {

@@ -13,7 +13,8 @@
 #include <ddc.h>
 #include <edid.h>
 
-#include "mc.h"
+#include "gpu.h"
+
 
 #define T_POSITIVE_SYNC (B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 
@@ -23,12 +24,15 @@
 #define FMT2_REG_OFFSET 0x800
 
 #define OVERSCAN 0
-	// TODO : Overscan and scaling support
+	// TODO: Overscan and scaling support
 
-status_t detect_crt_ranges();
+
 status_t create_mode_list(void);
 bool is_mode_supported(display_mode* mode);
 status_t is_mode_sane(display_mode *mode);
+uint32 radeon_dpms_capabilities(void);
+uint32 radeon_dpms_mode(void);
+void radeon_dpms_set(int mode);
 
 
 #endif /*RADEON_HD_MODE_H*/

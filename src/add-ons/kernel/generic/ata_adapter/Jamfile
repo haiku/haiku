@@ -3,6 +3,6 @@ SubDir HAIKU_TOP src add-ons kernel generic ata_adapter ;
 UsePrivateHeaders drivers kernel ;
 
 KernelAddon ata_adapter :
-	ata_adapter.c
+	ata_adapter.cpp
 	;
 

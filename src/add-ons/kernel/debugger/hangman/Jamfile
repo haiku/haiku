@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel debugger hangman ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # UsePrivateHeaders drivers ;
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
 
 
 KernelAddon <kdebug>hangman :

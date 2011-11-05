@@ -7,7 +7,6 @@
 
 #include <Application.h>
 #include <Catalog.h>
-#include <Locale.h>
 
 #include "Pairs.h"
 #include "PairsWindow.h"

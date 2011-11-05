@@ -290,7 +290,7 @@ reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
 		VMCache* cache = ref->cache;
 		cache->Lock();
 
-		if (list_is_empty(&cache->consumers) && cache->areas == NULL
+		if (cache->consumers.IsEmpty() && cache->areas == NULL
 			&& access_is_sequential(ref)) {
 			// we are not mapped, and we're accessed sequentially
 

@@ -1,0 +1,24 @@
+name = Apple Aluminum (US)
+
+# Size shortcuts
+default-size = 10,10
+$back = 17,10
+$fn = 10.5,6
+$b = 2,12
+$f = 10,20
+$two = 20,10
+$last = 10,12
+$cmd = 14,12
+$arrow = 10,6
+
+# Key rows
+[ 0,0;  4,5:-; d$fn:0x01; $fn:+12; ]
+[ 0,6;  4,5:-; :0x11+12; d$back:+; ]
+[ 0,16; 4,5:-; d17,10:0x26; :+13; ]
+[ 0,26; 4,5:led-caps; # integrated into caps key
+	d19,10:0x3b; :+11; d18,10:0x47; ]
+[ 0,36; 4,5:-; d24,10:0x4b; :+10; d23,10:+1; ]
+[ 0,46; 4,5:-; d$last:-; # fn key
+	d$last:0x5c; d$last:0x5d; d$cmd:0x66; 49,12:0x5e; d$cmd:0x67;
+	d$last:0x5f; $arrow:-; d$arrow:0x57; $arrow:-; ]
+[ 121,52; d$arrow:0x61+2; ]

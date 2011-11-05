@@ -35,7 +35,8 @@ edid_dump(edid1_info *edid)
 		edid->version.revision);
 
 	dprintf("Type: %s\n", edid->display.input_type ? "Digital" : "Analog");
-	dprintf("Size: %d cm x %d cm\n", edid->display.h_size, edid->display.v_size);
+	dprintf("Size: %d cm x %d cm\n", edid->display.h_size,
+		edid->display.v_size);
 	dprintf("Gamma=%.3f\n", (edid->display.gamma + 100) / 100.0);
 	dprintf("White (X,Y)=(%.3f,%.3f)\n", edid->display.white_x / 1024.0,
 		edid->display.white_y / 1024.0);
@@ -151,21 +152,29 @@ edid_dump(edid1_info *edid)
 			case EDID1_IS_DETAILED_TIMING:
 			{
 				edid1_detailed_timing *timing = &monitor->data.detailed_timing;
+				if (timing->h_active + timing->h_blank == 0
+					|| timing->v_active + timing->v_blank == 0) {
+					dprintf("Invalid video mode (%dx%d)\n", timing->h_active,
+						timing->v_active);
+					continue;
+				}
 				dprintf("Additional Video Mode (%dx%d@%dHz):\n",
 					timing->h_active, timing->v_active,
 					(timing->pixel_clock * 10000
-					/ (timing->h_active + timing->h_blank)
-					/ (timing->v_active + timing->v_blank)));
+						/ (timing->h_active + timing->h_blank)
+						/ (timing->v_active + timing->v_blank)));
 					// Refresh rate = pixel clock in MHz / Htotal / Vtotal
 
 				dprintf("clock=%f MHz\n", timing->pixel_clock / 100.0);
 				dprintf("h: (%d, %d, %d, %d)\n",
 					timing->h_active, timing->h_active + timing->h_sync_off,
-					timing->h_active + timing->h_sync_off + timing->h_sync_width,
+					timing->h_active + timing->h_sync_off
+						+ timing->h_sync_width,
 					timing->h_active + timing->h_blank);
 				dprintf("v: (%d, %d, %d, %d)\n",
 					timing->v_active, timing->v_active + timing->v_sync_off,
-					timing->v_active + timing->v_sync_off + timing->v_sync_width,
+					timing->v_active + timing->v_sync_off
+						+ timing->v_sync_width,
 					timing->v_active + timing->v_blank);
 				dprintf("size: %.1f cm x %.1f cm\n",
 					timing->h_size / 10.0, timing->v_size / 10.0);

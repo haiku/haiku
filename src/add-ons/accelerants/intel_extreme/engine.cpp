@@ -161,7 +161,7 @@ uninit_ring_buffer(ring_buffer &ringBuffer)
 
 
 void
-setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
+setup_ring_buffer(ring_buffer &ringBuffer, const char* name)
 {
 	TRACE(("Setup ring buffer %s, offset %lx, size %lx\n", name,
 		ringBuffer.offset, ringBuffer.size));
@@ -197,8 +197,8 @@ intel_accelerant_engine_count(void)
 
 
 status_t
-intel_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token *syncToken,
-	engine_token **_engineToken)
+intel_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token* syncToken,
+	engine_token** _engineToken)
 {
 	TRACE(("intel_acquire_engine()\n"));
 	*_engineToken = &sEngineToken;
@@ -214,7 +214,7 @@ intel_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token *syncToken,
 
 
 status_t
-intel_release_engine(engine_token *engineToken, sync_token *syncToken)
+intel_release_engine(engine_token* engineToken, sync_token* syncToken)
 {
 	TRACE(("intel_release_engine()\n"));
 	if (syncToken != NULL)
@@ -264,7 +264,7 @@ intel_wait_engine_idle(void)
 
 
 status_t
-intel_get_sync_token(engine_token *engineToken, sync_token *syncToken)
+intel_get_sync_token(engine_token* engineToken, sync_token* syncToken)
 {
 	TRACE(("intel_get_sync_token()\n"));
 	return B_OK;
@@ -272,7 +272,7 @@ intel_get_sync_token(engine_token *engineToken, sync_token *syncToken)
 
 
 status_t
-intel_sync_to_token(sync_token *syncToken)
+intel_sync_to_token(sync_token* syncToken)
 {
 	TRACE(("intel_sync_to_token()\n"));
 	intel_wait_engine_idle();
@@ -284,7 +284,7 @@ intel_sync_to_token(sync_token *syncToken)
 
 
 void
-intel_screen_to_screen_blit(engine_token *token, blit_params *params,
+intel_screen_to_screen_blit(engine_token* token, blit_params* params,
 	uint32 count)
 {
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
@@ -304,8 +304,8 @@ intel_screen_to_screen_blit(engine_token *token, blit_params *params,
 
 
 void
-intel_fill_rectangle(engine_token *token, uint32 color,
-	fill_rect_params *params, uint32 count)
+intel_fill_rectangle(engine_token* token, uint32 color,
+	fill_rect_params* params, uint32 count)
 {
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 
@@ -323,7 +323,7 @@ intel_fill_rectangle(engine_token *token, uint32 color,
 
 
 void
-intel_invert_rectangle(engine_token *token, fill_rect_params *params,
+intel_invert_rectangle(engine_token* token, fill_rect_params* params,
 	uint32 count)
 {
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
@@ -342,14 +342,14 @@ intel_invert_rectangle(engine_token *token, fill_rect_params *params,
 
 
 void
-intel_fill_span(engine_token *token, uint32 color, uint16* _params,
+intel_fill_span(engine_token* token, uint32 color, uint16* _params,
 	uint32 count)
 {
 	struct params {
 		uint16	top;
 		uint16	left;
 		uint16	right;
-	} *params = (struct params *)_params;
+	} *params = (struct params*)_params;
 
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 

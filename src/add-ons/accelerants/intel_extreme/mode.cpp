@@ -21,11 +21,12 @@
 #include <create_display_modes.h>
 #include <ddc.h>
 #include <edid.h>
+#include <validate_display_mode.h>
 
 
 #define TRACE_MODE
 #ifdef TRACE_MODE
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
@@ -98,13 +99,17 @@ set_i2c_signals(void* cookie, int clock, int data)
 
 	if (data != 0)
 		value |= I2C_DATA_DIRECTION_MASK;
-	else
-		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT | I2C_DATA_VALUE_MASK;
+	else {
+		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT
+			| I2C_DATA_VALUE_MASK;
+	}
 
 	if (clock != 0)
 		value |= I2C_CLOCK_DIRECTION_MASK;
-	else
-		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT | I2C_CLOCK_VALUE_MASK;
+	else {
+		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT
+			| I2C_CLOCK_VALUE_MASK;
+	}
 
 	write32(ioRegister, value);
 	read32(ioRegister);
@@ -131,7 +136,9 @@ set_frame_buffer_base()
 	}
 
 	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)) {
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -177,14 +184,14 @@ create_mode_list(void)
 			// We could not read any EDID info. Fallback to creating a list with
 			// only the mode set up by the BIOS.
 			// TODO: support lower modes via scaling and windowing
-			if (gInfo->head_mode & HEAD_MODE_LVDS_PANEL
-					&& ((gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0)) {
+			if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0
+					&& (gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0) {
 				size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
 					& ~(B_PAGE_SIZE - 1);
 
-				display_mode *list;
+				display_mode* list;
 				area_id area = create_area("intel extreme modes",
-					(void **)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
+					(void**)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
 					B_READ_AREA | B_WRITE_AREA);
 				if (area < B_OK)
 					return area;
@@ -201,7 +208,7 @@ create_mode_list(void)
 	}
 
 	// Otherwise return the 'real' list of modes
-	display_mode *list;
+	display_mode* list;
 	uint32 count = 0;
 	gInfo->mode_list_area = create_display_modes("intel extreme modes",
 		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
@@ -233,7 +240,17 @@ get_pll_limits(pll_limits &limits)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)) {
+		// TODO: support LVDS output limits as well
+		static const pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{  5,  1, 10, false,  1,  79, 12,  5},	// min
+			{ 80,  8,  5, true,   5, 127, 22,  9},	// max
+			225000, 1760000, 3510000
+		};
+		limits = kLimits;
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
@@ -274,12 +291,14 @@ get_pll_limits(pll_limits &limits)
 		limits = kLimits;
 	}
 
-	TRACE(("PLL limits, min: p %lu (p1 %lu, p2 %lu), n %lu, m %lu (m1 %lu, m2 %lu)\n",
-		limits.min.post, limits.min.post1, limits.min.post2, limits.min.n,
-		limits.min.m, limits.min.m1, limits.min.m2));
-	TRACE(("PLL limits, max: p %lu (p1 %lu, p2 %lu), n %lu, m %lu (m1 %lu, m2 %lu)\n",
-		limits.max.post, limits.max.post1, limits.max.post2, limits.max.n,
-		limits.max.m, limits.max.m1, limits.max.m2));
+	TRACE(("PLL limits, min: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
+		"(m1 %lu, m2 %lu)\n", limits.min.post, limits.min.post1,
+		limits.min.post2, limits.min.n, limits.min.m, limits.min.m1,
+		limits.min.m2));
+	TRACE(("PLL limits, max: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
+		"(m1 %lu, m2 %lu)\n", limits.max.post, limits.max.post1,
+		limits.max.post2, limits.max.n, limits.max.m, limits.max.m1,
+		limits.max.m2));
 }
 
 
@@ -305,7 +324,8 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 	bool isLVDS)
 {
 	float requestedPixelClock = current.timing.pixel_clock / 1000.0f;
-	float referenceClock = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
+	float referenceClock
+		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 	pll_limits limits;
 	get_pll_limits(limits);
 
@@ -333,7 +353,8 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 	pll_divisors bestDivisors;
 
 	bool is_igd = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD);
-	for (divisors.m1 = limits.min.m1; divisors.m1 <= limits.max.m1; divisors.m1++) {
+	for (divisors.m1 = limits.min.m1; divisors.m1 <= limits.max.m1;
+			divisors.m1++) {
 		for (divisors.m2 = limits.min.m2; divisors.m2 <= limits.max.m2
 				&& ((divisors.m2 < divisors.m1) || is_igd); divisors.m2++) {
 			for (divisors.n = limits.min.n; divisors.n <= limits.max.n;
@@ -347,7 +368,8 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 						continue;
 
 					float error = fabs(requestedPixelClock
-						- ((referenceClock * divisors.m) / divisors.n) / divisors.post);
+						- ((referenceClock * divisors.m) / divisors.n)
+						/ divisors.post);
 					if (error < best) {
 						best = error;
 						bestDivisors = divisors;
@@ -362,7 +384,8 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 
 	divisors = bestDivisors;
 
-	TRACE(("found: %g MHz, p = %lu (p1 = %lu, p2 = %lu), n = %lu, m = %lu (m1 = %lu, m2 = %lu)\n",
+	TRACE(("found: %g MHz, p = %lu (p1 = %lu, p2 = %lu), n = %lu, m = %lu "
+		"(m1 = %lu, m2 = %lu)\n",
 		((referenceClock * divisors.m) / divisors.n) / divisors.post,
 		divisors.post, divisors.post1, divisors.post2, divisors.n,
 		divisors.m, divisors.m1, divisors.m2));
@@ -419,7 +442,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
 			>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
 		divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
-			>> DISPLAY_PLL_N_DIVISOR_SHIFT;		
+			>> DISPLAY_PLL_N_DIVISOR_SHIFT;
 	}
 
 	pll_limits limits;
@@ -428,7 +451,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
 			divisors.post1 = (pll & DISPLAY_PLL_IGD_POST1_DIVISOR_MASK)
-				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;			
+				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 		} else {
 			divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
 				>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
@@ -574,6 +597,27 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 }
 
 
+static bool
+sanitize_display_mode(display_mode& mode)
+{
+	// TODO: verify constraints - these are more or less taken from the
+	// radeon driver!
+	const display_constraints constraints = {
+		// resolution
+		320, 8192, 200, 4096,
+		// pixel clock
+		gInfo->shared_info->pll_info.min_frequency,
+		gInfo->shared_info->pll_info.max_frequency,
+		// horizontal
+		{8, 16, 8160, 24, 504, 15, 8192},
+		{1, 1, 4092, 2, 63, 1, 4096}
+	};
+
+	return sanitize_display_mode(mode, constraints,
+		gInfo->has_edid ? &gInfo->edid_info : NULL);
+}
+
+
 //	#pragma mark -
 
 
@@ -586,7 +630,7 @@ intel_accelerant_mode_count(void)
 
 
 status_t
-intel_get_mode_list(display_mode *modeList)
+intel_get_mode_list(display_mode* modeList)
 {
 	TRACE(("intel_get_mode_info()\n"));
 	memcpy(modeList, gInfo->mode_list,
@@ -596,32 +640,20 @@ intel_get_mode_list(display_mode *modeList)
 
 
 status_t
-intel_propose_display_mode(display_mode *target, const display_mode *low,
-	const display_mode *high)
+intel_propose_display_mode(display_mode* target, const display_mode* low,
+	const display_mode* high)
 {
 	TRACE(("intel_propose_display_mode()\n"));
 
-	// just search for the specified mode in the list
+	sanitize_display_mode(*target);
 
-	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
-		display_mode *mode = &gInfo->mode_list[i];
-
-		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
-
-		if (target->virtual_width != mode->virtual_width
-			|| target->virtual_height != mode->virtual_height
-			|| target->space != mode->space)
-			continue;
-
-		*target = *mode;
-		return B_OK;
-	}
-	return B_BAD_VALUE;
+	return is_display_mode_within_bounds(*target, *low, *high)
+		? B_OK : B_BAD_VALUE;
 }
 
 
 status_t
-intel_set_display_mode(display_mode *mode)
+intel_set_display_mode(display_mode* mode)
 {
 	TRACE(("intel_set_display_mode(%ldx%ld)\n", mode->virtual_width,
 		mode->virtual_height));
@@ -634,8 +666,10 @@ intel_set_display_mode(display_mode *mode)
 	// TODO: it may be acceptable to continue when using panel fitting or
 	// centering, since the data from propose_display_mode will not actually be
 	// used as is in this case.
-	if (intel_propose_display_mode(&target, mode, mode))
+	if (sanitize_display_mode(target)) {
+		TRACE(("intel_extreme: invalid mode set!\n"));
 		return B_BAD_VALUE;
+	}
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
@@ -690,7 +724,7 @@ if (first) {
 	}
 
 	// clear frame buffer before using it
-	memset((uint8 *)base, 0, bytesPerRow * target.virtual_height);
+	memset((uint8*)base, 0, bytesPerRow * target.virtual_height);
 	sharedInfo.frame_buffer = base;
 	sharedInfo.frame_buffer_offset = base - (addr_t)sharedInfo.graphics_memory;
 
@@ -749,9 +783,11 @@ if (first) {
 
 		// Compute bitmask from p1 value
 		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
-			dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
+			dpll |= (1 << (divisors.post1 - 1))
+				<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 		} else {
-			dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+			dpll |= (1 << (divisors.post1 - 1))
+				<< DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 		}
 		switch (divisors.post2) {
 			case 5:
@@ -779,15 +815,15 @@ if (first) {
 					| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
 						& DISPLAY_PLL_M1_DIVISOR_MASK)
 					| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-						& DISPLAY_PLL_M2_DIVISOR_MASK));				
+						& DISPLAY_PLL_M2_DIVISOR_MASK));
 			}
 			write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
 			read32(INTEL_DISPLAY_B_PLL);
 			spin(150);
 		}
 
-		uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT)
-			| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
+		uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT) | LVDS_PORT_EN
+			| LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
 
 		lvds |= LVDS_18BIT_DITHER;
 			// TODO: do not do this if the connected panel is 24-bit
@@ -801,7 +837,7 @@ if (first) {
 		if (divisors.post2 == LVDS_POST2_RATE_FAST)
 			lvds |= LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP;
 		else
-			lvds &= ~( LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
+			lvds &= ~(LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
 
 		write32(INTEL_DISPLAY_LVDS_PORT, lvds);
 		read32(INTEL_DISPLAY_LVDS_PORT);
@@ -819,7 +855,7 @@ if (first) {
 				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
 					& DISPLAY_PLL_M1_DIVISOR_MASK)
 				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M2_DIVISOR_MASK));	
+					& DISPLAY_PLL_M2_DIVISOR_MASK));
 		}
 
 		write32(INTEL_DISPLAY_B_PLL, dpll);
@@ -895,8 +931,8 @@ if (first) {
 					<< 16)
 				| ((uint32)target.timing.v_display
 					+ borderHeight / 2 - 1));
-			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(syncCenter
-					+ syncHeight / 2 - 1) << 16)
+			write32(INTEL_DISPLAY_B_VSYNC,
+				((uint32)(syncCenter + syncHeight / 2 - 1) << 16)
 				| ((uint32)syncCenter - syncHeight / 2 - 1));
 
 			// This is useful for debugging: it sets the border to red, so you
@@ -910,8 +946,8 @@ if (first) {
 			write32(INTEL_DISPLAY_B_HBLANK,
 				((uint32)(target.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HSYNC, (
-				(uint32)(target.timing.h_sync_end - 1) << 16)
+			write32(INTEL_DISPLAY_B_HSYNC,
+				((uint32)(target.timing.h_sync_end - 1) << 16)
 				| ((uint32)target.timing.h_sync_start - 1));
 
 			write32(INTEL_DISPLAY_B_VTOTAL,
@@ -926,8 +962,8 @@ if (first) {
 		}
 
 		write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-			((uint32)(target.timing.h_display - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
+			((uint32)(target.virtual_width - 1) << 16)
+			| ((uint32)target.virtual_height - 1));
 
 		write32(INTEL_DISPLAY_B_POS, 0);
 		write32(INTEL_DISPLAY_B_PIPE_SIZE,
@@ -1025,8 +1061,8 @@ if (first) {
 			| ((uint32)target.timing.v_sync_start - 1));
 
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE,
-			((uint32)(target.timing.h_display - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
+			((uint32)(target.virtual_width - 1) << 16)
+			| ((uint32)target.virtual_height - 1));
 
 		write32(INTEL_DISPLAY_A_ANALOG_PORT,
 			(read32(INTEL_DISPLAY_A_ANALOG_PORT)
@@ -1049,8 +1085,8 @@ if (first) {
 
 		if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
 			write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-				((uint32)(target.timing.h_display - 1) << 16)
-				| ((uint32)target.timing.v_display - 1));
+				((uint32)(target.virtual_width - 1) << 16)
+				| ((uint32)target.virtual_height - 1));
 
 			write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
 					& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
@@ -1081,7 +1117,7 @@ if (first) {
 
 
 status_t
-intel_get_display_mode(display_mode *_currentMode)
+intel_get_display_mode(display_mode* _currentMode)
 {
 	TRACE(("intel_get_display_mode()\n"));
 
@@ -1107,7 +1143,7 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 
 
 status_t
-intel_get_frame_buffer_config(frame_buffer_config *config)
+intel_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE(("intel_get_frame_buffer_config()\n"));
 
@@ -1115,7 +1151,7 @@ intel_get_frame_buffer_config(frame_buffer_config *config)
 
 	config->frame_buffer = gInfo->shared_info->graphics_memory + offset;
 	config->frame_buffer_dma
-		= (uint8 *)gInfo->shared_info->physical_graphics_memory + offset;
+		= (uint8*)gInfo->shared_info->physical_graphics_memory + offset;
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	return B_OK;
@@ -1123,13 +1159,14 @@ intel_get_frame_buffer_config(frame_buffer_config *config)
 
 
 status_t
-intel_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
+intel_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 {
 	TRACE(("intel_get_pixel_clock_limits()\n"));
 
 	if (_low != NULL) {
 		// lower limit of about 48Hz vertical refresh
-		uint32 totalClocks = (uint32)mode->timing.h_total * (uint32)mode->timing.v_total;
+		uint32 totalClocks = (uint32)mode->timing.h_total
+			* (uint32)mode->timing.v_total;
 		uint32 low = (totalClocks * 48L) / 1000L;
 		if (low < gInfo->shared_info->pll_info.min_frequency)
 			low = gInfo->shared_info->pll_info.min_frequency;
@@ -1170,7 +1207,7 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 
 
 status_t
-intel_get_timing_constraints(display_timing_constraints *constraints)
+intel_get_timing_constraints(display_timing_constraints* constraints)
 {
 	TRACE(("intel_get_timing_contraints()\n"));
 	return B_ERROR;
@@ -1178,9 +1215,10 @@ intel_get_timing_constraints(display_timing_constraints *constraints)
 
 
 void
-intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
+intel_set_indexed_colors(uint count, uint8 first, uint8* colors, uint32 flags)
 {
-	TRACE(("intel_set_indexed_colors(colors = %p, first = %u)\n", colors, first));
+	TRACE(("intel_set_indexed_colors(colors = %p, first = %u)\n", colors,
+		first));
 
 	if (colors == NULL)
 		return;
@@ -1191,10 +1229,8 @@ intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 		uint32 color = colors[0] << 16 | colors[1] << 8 | colors[2];
 		colors += 3;
 
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_PALETTE + first * sizeof(uint32), color);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_PALETTE + first * sizeof(uint32), color);
+		write32(INTEL_DISPLAY_A_PALETTE + first * sizeof(uint32), color);
+		write32(INTEL_DISPLAY_B_PALETTE + first * sizeof(uint32), color);
 	}
 }
 

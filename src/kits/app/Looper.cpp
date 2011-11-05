@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,9 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 /*!	BLooper class spawns a thread that runs a message loop. */
+
 
 #include <AppMisc.h>
 #include <AutoLocker.h>
@@ -51,7 +53,7 @@ static BLocker sDebugPrintLocker("BLooper debug print");
 #define FILTER_LIST_BLOCK_SIZE	5
 #define DATA_BLOCK_SIZE			5
 
-// Globals ---------------------------------------------------------------------
+
 using BPrivate::gDefaultTokens;
 using BPrivate::gLooperList;
 using BPrivate::BLooperList;
@@ -63,7 +65,7 @@ enum {
 	BLOOPER_HANDLER_BY_INDEX
 };
 
-static property_info gLooperPropInfo[] = {
+static property_info sLooperPropInfo[] = {
 	{
 		"Handler",
 			{},
@@ -622,7 +624,7 @@ BLooper::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 			string comparisons -- which wouldn't tell the whole story anyway,
 			because of the same name being used for multiple properties.
  */
- 	BPropertyInfo propertyInfo(gLooperPropInfo);
+ 	BPropertyInfo propertyInfo(sLooperPropInfo);
 	uint32 data;
 	status_t err = B_OK;
 	const char* errMsg = "";
@@ -677,7 +679,7 @@ BLooper::GetSupportedSuites(BMessage* data)
 
 	status_t status = data->AddString("suites", "suite/vnd.Be-looper");
 	if (status == B_OK) {
-		BPropertyInfo PropertyInfo(gLooperPropInfo);
+		BPropertyInfo PropertyInfo(sLooperPropInfo);
 		status = data->AddFlat("messages", &PropertyInfo);
 		if (status == B_OK)
 			status = BHandler::GetSupportedSuites(data);

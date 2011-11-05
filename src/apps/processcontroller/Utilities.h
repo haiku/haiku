@@ -44,6 +44,5 @@ void move_to_deskbar(BDeskbar& deskbar);
 void make_window_visible(BWindow* window, bool mayResize = false);
 
 extern const uchar k_cpu_mini[];
-extern const uchar k_app_mini[];
 
 #endif // UTILITIES_H

@@ -130,8 +130,8 @@ Registrar::ReadyToRun()
 	// create message deliverer
 	status_t error = MessageDeliverer::CreateDefault();
 	if (error != B_OK) {
-		FATAL(("Registrar::ReadyToRun(): Failed to create the message "
-			"deliverer: %s\n", strerror(error)));
+		FATAL("Registrar::ReadyToRun(): Failed to create the message "
+			"deliverer: %s\n", strerror(error));
 	}
 
 	// create event queue
@@ -162,8 +162,8 @@ Registrar::ReadyToRun()
 	// create the messaging service
 	error = MessagingService::CreateDefault();
 	if (error != B_OK) {
-		ERROR(("Registrar::ReadyToRun(): Failed to init messaging service "
-			"(that's by design when running under R5): %s\n", strerror(error)));
+		ERROR("Registrar::ReadyToRun(): Failed to init messaging service "
+			"(that's by design when running under R5): %s\n", strerror(error));
 	}
 
 	// create and schedule the sanity message event
@@ -215,7 +215,7 @@ Registrar::_MessageReceived(BMessage *message)
 		// general requests
 		case B_REG_GET_MIME_MESSENGER:
 		{
-			PRINT(("B_REG_GET_MIME_MESSENGER\n"));
+			PRINT("B_REG_GET_MIME_MESSENGER\n");
 			BMessenger messenger(NULL, fMIMEManager);
 			BMessage reply(B_REG_SUCCESS);
 			reply.AddMessenger("messenger", messenger);
@@ -225,7 +225,7 @@ Registrar::_MessageReceived(BMessage *message)
 
 		case B_REG_GET_CLIPBOARD_MESSENGER:
 		{
-			PRINT(("B_REG_GET_CLIPBOARD_MESSENGER\n"));
+			PRINT("B_REG_GET_CLIPBOARD_MESSENGER\n");
 			BMessenger messenger(fClipboardHandler);
 			BMessage reply(B_REG_SUCCESS);
 			reply.AddMessenger("messenger", messenger);
@@ -236,7 +236,7 @@ Registrar::_MessageReceived(BMessage *message)
 		// shutdown process
 		case B_REG_SHUT_DOWN:
 		{
-			PRINT(("B_REG_SHUT_DOWN\n"));
+			PRINT("B_REG_SHUT_DOWN\n");
 
 			_HandleShutDown(message);
 			break;
@@ -425,7 +425,7 @@ main()
 	// rename the main thread
 	rename_thread(find_thread(NULL), kRosterThreadName);
 
-	PRINT(("app->Run()...\n"));
+	PRINT("app->Run()...\n");
 
 	try {
 		app->Run();
@@ -438,7 +438,7 @@ main()
 		debugger("registrar main() caught unknown exception");
 	}
 
-	PRINT(("delete app...\n"));
+	PRINT("delete app...\n");
 	delete app;
 
 	FUNCTION_END();

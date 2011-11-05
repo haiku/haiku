@@ -16,6 +16,9 @@
 #include "keyboard.h"
 
 
+static bool sForceBW = false;	// force black & white for Milan
+
+
 // TOS emulates a VT52
 
 class ConsoleHandle : public CharHandle {
@@ -163,6 +166,33 @@ InputConsoleHandle::GetChar()
 //	#pragma mark -
 
 
+static void
+dump_colors()
+{
+	int bg, fg;
+	dprintf("colors:\n");
+	for (bg = 0; bg < 16; bg++) {
+		for (fg = 0; fg < 16; fg++) {
+			console_set_color(fg, bg);
+			dprintf("#");
+		}
+		console_set_color(0, 15);
+		dprintf("\n");
+	}
+}
+
+
+static int32
+dump_milan_modes(SCREENINFO *info, uint32 flags)
+{
+	dprintf("mode: %d '%s':\n flags %08lx @%08lx %dx%d (%dx%d)\n%d planes %d colors fmt %08lx\n",
+		info->devID, info->name, info->scrFlags, info->frameadr,
+		info->scrWidth, info->scrHeight,
+		info->virtWidth, info->virtHeight,
+		info->scrPlanes, info->scrColors, info->scrFormat);
+	return ENUMMODE_CONT;
+}
+
 status_t
 console_init(void)
 {
@@ -172,6 +202,17 @@ console_init(void)
 	// now that we're initialized, enable stdio functionality
 	stdin = (FILE *)&sInput;
 	stdout = stderr = (FILE *)&sOutput;
+
+	if (tos_find_cookie('_MIL')) {
+		dprintf("Milan detected... forcing black & white\n");
+		/*
+		dprintf("Getrez() = %d\n", Getrez());
+		Setscreen(-1, &dump_milan_modes, MI_MAGIC, CMD_ENUMMODES);
+		Setscreen((void*)-1, (void*)-1, 0, 0);
+		*/
+		sForceBW = true;
+	}
+	//dump_colors();
 
 	return B_OK;
 }
@@ -253,6 +294,15 @@ void
 console_set_color(int32 foreground, int32 background)
 {
 	char buff[] = "\033b \033c ";
+	if (sForceBW) {
+		if (background == 0)
+			foreground = 15;
+		else {
+			background = 15;
+			foreground = 0;
+		}
+
+	}
 	buff[2] += (char)translate_color(foreground);
 	buff[5] += (char)translate_color(background);
 	sInput.WriteAt(NULL, 0LL, buff, 6);

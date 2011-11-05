@@ -406,7 +406,12 @@ if_freemulti(struct ifmultiaddr *ifma)
 
 	if (ifma->ifma_lladdr != NULL)
 		free(ifma->ifma_lladdr);
-	free(ifma->ifma_addr);
+
+	// Haiku note: We use a field in the ifmultiaddr struct (ifma_addr_storage)
+	// to store the address and let ifma_addr point to that. We therefore do not
+	// free it here, as it will be freed as part of freeing the if_multiaddr.
+	//free(ifma->ifma_addr);
+
 	free(ifma);
 }
 

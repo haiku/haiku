@@ -590,7 +590,7 @@ ieee80211_notify_node_join(struct ieee80211_node* ni, int newassoc)
 		KMessage message;
 		message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 		message.AddInt32("opcode", B_NETWORK_WLAN_JOINED);
-		message.AddString("interface", ifp->if_xname);
+		message.AddString("interface", ifp->device_name);
 		// TODO: add data about the node
 
 		sNotificationModule->send_notification(&message);
@@ -614,7 +614,7 @@ ieee80211_notify_node_leave(struct ieee80211_node* ni)
 		KMessage message;
 		message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 		message.AddInt32("opcode", B_NETWORK_WLAN_LEFT);
-		message.AddString("interface", ifp->if_xname);
+		message.AddString("interface", ifp->device_name);
 		// TODO: add data about the node
 
 		sNotificationModule->send_notification(&message);
@@ -635,7 +635,7 @@ ieee80211_notify_scan_done(struct ieee80211vap* vap)
 		KMessage message;
 		message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 		message.AddInt32("opcode", B_NETWORK_WLAN_SCANNED);
-		message.AddString("interface", vap->iv_ifp->if_xname);
+		message.AddString("interface", vap->iv_ifp->device_name);
 
 		sNotificationModule->send_notification(&message);
 	}

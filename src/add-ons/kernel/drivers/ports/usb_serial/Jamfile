@@ -15,6 +15,7 @@ KernelAddon usb_serial :
 	FTDI.cpp
 	KLSI.cpp
 	Prolific.cpp
+	Silicon.cpp
 ;
 
 AddResources usb_serial : usb_serial.rdef ;

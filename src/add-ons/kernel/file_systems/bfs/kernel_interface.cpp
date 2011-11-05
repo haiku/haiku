@@ -1030,7 +1030,7 @@ bfs_link(fs_volume* _volume, fs_vnode* dir, const char* name, fs_vnode* node)
 	FUNCTION_START(("name = \"%s\"\n", name));
 
 	// This one won't be implemented in a binary compatible BFS
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 

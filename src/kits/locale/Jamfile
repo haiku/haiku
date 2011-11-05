@@ -74,7 +74,7 @@ SEARCH on [ FGristFiles PrintJob.cpp ] += [ FDirName $(HAIKU_TOP) src kits inter
 SEARCH on [ FGristFiles ZombieReplicantView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 
 DoCatalogs liblocale.so
-	: system
+	: x-vnd.Haiku-libbe
 	:
 	AboutMenuItem.cpp
 	AboutWindow.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef NAME_PANEL_H
@@ -11,12 +11,9 @@ class BTextControl;
 
 class NamePanel : public Panel {
 public:
-							NamePanel(const char* label,
-									  const char* text,
-									  BWindow* window,
-									  BHandler* target,
-									  BMessage* message,
-									  BRect frame = BRect(-1000.0, -1000.0, -900.0, -900.0));
+							NamePanel(const char* label, const char* text,
+								BWindow* window, BHandler* target,
+								BMessage* message, const BSize& size);
 	virtual					~NamePanel();
 
 	virtual void			MessageReceived(BMessage *message);

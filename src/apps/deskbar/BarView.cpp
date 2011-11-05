@@ -68,6 +68,7 @@ const int32 kDefaultRecentAppCount = 10;
 
 const int32 kMenuTrackMargin = 20;
 
+
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		bool showInterval, uint32 state, float, bool showTime)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
@@ -99,6 +100,8 @@ TBarView::~TBarView()
 {
 	delete fDragMessage;
 	delete fCachedTypesList;
+
+	RemoveExpandedItems();
 }
 
 
@@ -405,10 +408,10 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 			windowHeight = screenFrame.bottom;
 			windowWidth = fBarMenuBar->Frame().Width();
 		} else if (fState == kExpandoState) {
-			if (fVertical)
+			if (fVertical) {
 				// top left or right
 				windowHeight = fExpando->Frame().bottom;
-			else {
+			} else {
 				// top or bottom, full
 				fExpando->CheckItemSizes(0);
 				windowHeight = kHModeHeight;
@@ -528,58 +531,103 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	PlaceDeskbarMenu();
 	PlaceTray(vertSwap, leftSwap, screenFrame);
 
-	// We need to keep track of what apps are expanded.
-	BList expandedItems;
-	BString* signature = NULL;
-	if (fVertical && Expando()
-		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
-		// Get a list of the signatures of expanded apps. Can't use
-		// team_id because there can be more than one team per application
-		if (fVertical && Expando() && vertical && fExpando) {
-			for (int index = 0; index < fExpando->CountItems(); index++) {
-				TTeamMenuItem* item
-					= dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(index));
-				if (item != NULL && item->IsExpanded()) {
-					signature = new BString(item->Signature());
-					expandedItems.AddItem((void*)signature);
-				}
-			}
-		}
-	}
+	// Keep track of which apps are expanded
+	SaveExpandedItems();
 
 	PlaceApplicationBar(screenFrame);
 	SizeWindow(screenFrame);
 	PositionWindow(screenFrame);
 	Window()->UpdateIfNeeded();
 
-	// Re-expand those apps.
-	if (expandedItems.CountItems() > 0) {
-		for (int sigIndex = expandedItems.CountItems(); sigIndex-- > 0;) {
-			signature = static_cast<BString*>(expandedItems.ItemAt(sigIndex));
-			if (signature == NULL)
-				continue;
+	// Re-expand apps
+	ExpandItems();
+	Invalidate();
+}
 
-			// Start at the 'bottom' of the list working up.
-			// Prevents being thrown off by expanding items.
-			for (int teamIndex = fExpando->CountItems(); teamIndex-- > 0;) {
-				TTeamMenuItem* item
-					= dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(teamIndex));
-				if (item != NULL && !signature->Compare(item->Signature())) {
-					item->ToggleExpandState(false);
+
+void
+TBarView::SaveExpandedItems()
+{
+	if (fExpando == NULL || fExpando->CountItems() <= 0)
+		return;
+
+	// Get a list of the signatures of expanded apps. Can't use
+	// team_id because there can be more than one team per application
+	for (int32 i = 0; i < fExpando->CountItems(); i++) {
+		TTeamMenuItem* teamItem
+			= dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(i));
+
+		if (teamItem != NULL && teamItem->IsExpanded())
+			AddExpandedItem(teamItem->Signature());
+	}
+}
+
+
+void
+TBarView::RemoveExpandedItems()
+{
+	while (!fExpandedItems.IsEmpty())
+		delete static_cast<BString*>(fExpandedItems.RemoveItem((int32)0));
+	fExpandedItems.MakeEmpty();
+}
+
+
+void
+TBarView::ExpandItems()
+{
+	if (fExpando == NULL || !fVertical || !Expando()
+		|| !static_cast<TBarApp*>(be_app)->Settings()->superExpando
+		|| fExpandedItems.CountItems() <= 0)
+		return;
+
+	// Start at the 'bottom' of the list working up.
+	// Prevents being thrown off by expanding items.
+	for (int32 i = fExpando->CountItems() - 1; i >= 0; i--) {
+		TTeamMenuItem* teamItem
+			= dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(i));
+
+		if (teamItem != NULL) {
+			// Start at the 'bottom' of the fExpandedItems list working up
+			// matching the order of the fExpando list in the outer loop.
+			for (int32 j = fExpandedItems.CountItems() - 1; j >= 0; j--) {
+				BString* itemSig =
+					static_cast<BString*>(fExpandedItems.ItemAt(j));
+
+				if (itemSig->Compare(teamItem->Signature()) == 0) {
+					// Found it, expand the item and delete signature from
+					// the list so that we don't consider it for later items.
+					teamItem->ToggleExpandState(false);
+					fExpandedItems.RemoveItem(j);
+					delete itemSig;
 					break;
 				}
 			}
 		}
-
-		// Clean up expanded signature list.
-		while (!expandedItems.IsEmpty()) {
-			delete static_cast<BString*>(expandedItems.RemoveItem((int32)0));
-		}
-
-		fExpando->SizeWindow();
 	}
 
-	Invalidate();
+	// Clean up the expanded items list
+	RemoveExpandedItems();
+
+	fExpando->SizeWindow();
+}
+
+
+void
+TBarView::AddExpandedItem(const char* signature)
+{
+	bool shouldAdd = true;
+
+	for (int32 i = 0; i < fExpandedItems.CountItems(); i++) {
+		BString *itemSig = static_cast<BString*>(fExpandedItems.ItemAt(i));
+		if (itemSig->Compare(signature) == 0) {
+			// already in the list, don't add the signature
+			shouldAdd = false;
+			break;
+		}
+	}
+
+	if (shouldAdd)
+		fExpandedItems.AddItem(static_cast<void*>(new BString(signature)));
 }
 
 
@@ -1025,6 +1073,13 @@ status_t
 TBarView::AddItem(BMessage* item, DeskbarShelf, int32* id)
 {
 	return fReplicantTray->AddIcon(item, id);
+}
+
+
+status_t
+TBarView::AddItem(BEntry* entry, DeskbarShelf, int32* id)
+{
+	return fReplicantTray->LoadAddOn(entry, id);
 }
 
 

@@ -44,10 +44,26 @@ typedef std::vector<Attribute> Attributes;
 
 
 typedef enum {
-	CAT_NONE = 0,
-	CAT_BUS = 6,
-	CAT_COMPUTER = 0x12,
-	CAT_ACPI = 0x13
+	CAT_NONE,		// 0x00
+	CAT_MASS,		// 0x01
+	CAT_NETWORK,	// 0x02
+	CAT_DISPLAY,	// 0x03
+	CAT_MULTIMEDIA,	// 0x04
+	CAT_MEMORY,		// 0x05
+	CAT_BUS,		// 0x06
+	CAT_COMM,		// 0x07
+	CAT_GENERIC,	// 0x08
+	CAT_INPUT,		// 0x09
+	CAT_DOCK,		// 0x0A
+	CAT_CPU,		// 0x0B
+	CAT_SERIAL,		// 0x0C
+	CAT_WIRELESS,	// 0x0D
+	CAT_INTEL,		// 0x0E
+	CAT_SATELLITE,	// 0x0F
+	CAT_CRYPTO,		// 0x10
+	CAT_SIGNAL,		// 0x11
+	CAT_COMPUTER,	// 0x12
+	CAT_ACPI		// 0x13
 } Category;
 
 
@@ -57,8 +73,8 @@ extern const char* kCategoryString[];
 class Device : public BStringItem {
 public:
 							Device(Device* physicalParent,
-								BusType busType=BUS_NONE, 
-								Category category=CAT_NONE, 
+								BusType busType = BUS_NONE,
+								Category category = CAT_NONE,
 								const BString& name = "unknown",
 								const BString& manufacturer = "unknown",
 								const BString& driverUsed = "unknown",

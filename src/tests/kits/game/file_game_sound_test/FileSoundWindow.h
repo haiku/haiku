@@ -4,15 +4,22 @@
 	@version 1.0
  */
 
+
 #ifndef FILE_SOUND_WINDOW
 #define FILE_SOUND_WINDOW
 
-#include <Window.h>
-#include <Rect.h>
-#include <Message.h>
-#include <FileGameSound.h>
+
+#include <Button.h>
+#include <CheckBox.h>
 #include <Entry.h>
+#include <FileGameSound.h>
 #include <FilePanel.h>
+#include <Message.h>
+#include <Rect.h>
+#include <TextControl.h>
+#include <Window.h>
+
+
 //message constants
 #define BROWSE_MSG 1
 #define PLAY_MSG 2

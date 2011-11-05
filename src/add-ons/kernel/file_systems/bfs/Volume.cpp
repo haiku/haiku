@@ -6,11 +6,12 @@
 //! super block, mounting, etc.
 
 
+#include "Attribute.h"
 #include "Debug.h"
-#include "Volume.h"
-#include "Journal.h"
 #include "Inode.h"
+#include "Journal.h"
 #include "Query.h"
+#include "Volume.h"
 
 
 static const int32 kDesiredAllocationGroups = 56;
@@ -356,7 +357,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
-	fJournal = new Journal(this);
+	fJournal = new(std::nothrow) Journal(this);
 	if (fJournal == NULL)
 		return B_NO_MEMORY;
 
@@ -384,15 +385,17 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	fRootNode = new Inode(this, ToVnode(Root()));
+	fRootNode = new(std::nothrow) Inode(this, ToVnode(Root()));
 	if (fRootNode != NULL && fRootNode->InitCheck() == B_OK) {
 		status = publish_vnode(fVolume, ToVnode(Root()), (void*)fRootNode,
 			&gBFSVnodeOps, fRootNode->Mode(), 0);
 		if (status == B_OK) {
 			// try to get indices root dir
 
-			if (!Indices().IsZero())
-				fIndicesNode = new Inode(this, ToVnode(Indices()));
+			if (!Indices().IsZero()) {
+				fIndicesNode = new(std::nothrow) Inode(this,
+					ToVnode(Indices()));
+			}
 
 			if (fIndicesNode == NULL
 				|| fIndicesNode->InitCheck() < B_OK
@@ -409,20 +412,30 @@ Volume::Mount(const char* deviceName, uint32 flags)
 			} else {
 				// we don't use the vnode layer to access the indices node
 			}
-
-			// all went fine
-			opener.Keep();
-			return B_OK;
-		} else
+		} else {
 			FATAL(("could not create root node: publish_vnode() failed!\n"));
-
-		delete fRootNode;
+			delete fRootNode;
+			return status;
+		}
 	} else {
 		status = B_BAD_VALUE;
 		FATAL(("could not create root node!\n"));
+		return status;
 	}
 
-	return status;
+	if (!(fFlags & VOLUME_READ_ONLY)) {
+		Attribute attr(fRootNode);
+		if (attr.Get("be:volume_id") == B_ENTRY_NOT_FOUND) {
+			Transaction transaction(this, fRootNode->BlockNumber());
+			fRootNode->WriteLockInTransaction(transaction);
+			CreateVolumeID(transaction);
+			transaction.Done();
+		}
+	}
+
+	// all went fine
+	opener.Keep();
+	return B_OK;
 }
 
 
@@ -497,6 +510,30 @@ Volume::CreateIndicesRoot(Transaction& transaction)
 	fSuperBlock.indices = ToBlockRun(id);
 	return WriteSuperBlock();
 }
+
+
+status_t
+Volume::CreateVolumeID(Transaction& transaction)
+{
+	Attribute attr(fRootNode);
+	status_t status;
+	attr_cookie* cookie;
+	status = attr.Create("be:volume_id", B_UINT64_TYPE, O_RDWR, &cookie);
+	if (status == B_OK) {
+		static bool seeded = false;
+		if (!seeded) {
+			// seed the random number generator for the be:volume_id attribute.
+			srand(time(NULL));
+			seeded = true;
+		}
+		uint64_t id;
+		size_t length = sizeof(id);
+		id = ((uint64_t)rand() << 32) | rand();
+		attr.Write(transaction, cookie, 0, (uint8_t *)&id, &length, NULL);
+	}
+	return status;
+}
+
 
 
 status_t
@@ -690,7 +727,7 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
-	fJournal = new Journal(this);
+	fJournal = new(std::nothrow) Journal(this);
 	if (fJournal == NULL || fJournal->InitCheck() < B_OK)
 		RETURN_ERROR(B_ERROR);
 
@@ -729,6 +766,8 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 		if (status < B_OK)
 			return status;
 	}
+
+	CreateVolumeID(transaction);
 
 	WriteSuperBlock();
 	transaction.Done();

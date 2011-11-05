@@ -16,6 +16,7 @@
 #include <smp.h>
 #include <util/AutoLock.h>
 
+#include "slab_debug.h"
 #include "slab_private.h"
 
 
@@ -31,6 +32,10 @@ public:
 
 	inline	void*				Pop();
 	inline	bool				Push(void* object);
+
+#if PARANOID_KERNEL_FREE
+			bool				ContainsObject(void* object) const;
+#endif
 };
 
 
@@ -38,6 +43,9 @@ struct depot_cpu_store {
 	DepotMagazine*	loaded;
 	DepotMagazine*	previous;
 };
+
+
+RANGE_MARKER_FUNCTION_BEGIN(SlabObjectDepot)
 
 
 bool
@@ -70,6 +78,22 @@ DepotMagazine::Push(void* object)
 	rounds[current_round++] = object;
 	return true;
 }
+
+
+#if PARANOID_KERNEL_FREE
+
+bool
+DepotMagazine::ContainsObject(void* object) const
+{
+	for (uint16 i = 0; i < current_round; i++) {
+		if (rounds[i] == object)
+			return true;
+	}
+
+	return false;
+}
+
+#endif // PARANOID_KERNEL_FREE
 
 
 // #pragma mark -
@@ -352,6 +376,40 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 }
 
 
+#if PARANOID_KERNEL_FREE
+
+bool
+object_depot_contains_object(object_depot* depot, void* object)
+{
+	WriteLocker writeLocker(depot->outer_lock);
+
+	int cpuCount = smp_get_num_cpus();
+	for (int i = 0; i < cpuCount; i++) {
+		depot_cpu_store& store = depot->stores[i];
+
+		if (store.loaded != NULL && !store.loaded->IsEmpty()) {
+			if (store.loaded->ContainsObject(object))
+				return true;
+		}
+
+		if (store.previous != NULL && !store.previous->IsEmpty()) {
+			if (store.previous->ContainsObject(object))
+				return true;
+		}
+	}
+
+	for (DepotMagazine* magazine = depot->full; magazine != NULL;
+			magazine = magazine->next) {
+		if (magazine->ContainsObject(object))
+			return true;
+	}
+
+	return false;
+}
+
+#endif // PARANOID_KERNEL_FREE
+
+
 // #pragma mark - private kernel API
 
 
@@ -404,3 +462,6 @@ dump_depot_magazine(int argCount, char** args)
 
 	return 0;
 }
+
+
+RANGE_MARKER_FUNCTION_END(SlabObjectDepot)

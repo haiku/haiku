@@ -1559,13 +1559,13 @@ devfs_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 
 			case B_GET_NEXT_OPEN_DEVICE:
 				dprintf("devfs: unsupported legacy ioctl B_GET_NEXT_OPEN_DEVICE\n");
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 			case B_ADD_FIXED_DRIVER:
 				dprintf("devfs: unsupported legacy ioctl B_ADD_FIXED_DRIVER\n");
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 			case B_REMOVE_FIXED_DRIVER:
 				dprintf("devfs: unsupported legacy ioctl B_REMOVE_FIXED_DRIVER\n");
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 
 		}
 

@@ -27,19 +27,16 @@
 #include <stdlib.h>
 
 
-#define ICU_VERSION icu_44
-
-
 BCountry::BCountry(const char* countryCode)
 	:
-	fICULocale(new ICU_VERSION::Locale("", countryCode))
+	fICULocale(new icu::Locale("", countryCode))
 {
 }
 
 
 BCountry::BCountry(const BCountry& other)
 	:
-	fICULocale(new ICU_VERSION::Locale(*other.fICULocale))
+	fICULocale(new icu::Locale(*other.fICULocale))
 {
 }
 

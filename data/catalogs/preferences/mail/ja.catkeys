@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Mail	954305167
+1	japanese	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		アカウント名:
 Account name:	E-Mail		アカウント名:
 Account settings	AutoConfigWindow		アカウント設定
@@ -10,6 +10,7 @@ Always	Config Window		常に
 Apply	Config Window		適用
 Back	AutoConfigWindow		前へ
 Check every	Config Window		メールを
+Choose Protocol	E-Mail		プロトコルを選択してください
 Create new account	AutoConfigWindow		新規アカウント作成
 E-mail	System name		メール
 E-mail address:	E-Mail		E-mail アドレス
@@ -24,6 +25,7 @@ Incoming mail filters	Config Views		受信メールフィルター
 Login name:	E-Mail		ログイン名:
 Mail checking	Config Window		メールチェック
 Miscellaneous	Config Window		その他
+Never	Config Window	show status window	表示しない
 Next	AutoConfigWindow		次へ
 OK	AutoConfigWindow		OK
 OK	Config Views		OK
@@ -49,10 +51,10 @@ While sending	Config Window		送信中に
 While sending and receiving	Config Window		送受信中に
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定をもとに戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成してください。\n\n削除ボタンで選択したアカウントを削除してください。\n\nリストのアイテムを選択して、設定を変更してください。
+\t\t· E-mail filters	Config Window		\t\t· メールフィルタ
+\t\t· Incoming	Config Window		\t\t· 受信
+\t\t· Outgoing	Config Window		\t\t· 送信
 days	Config Window		日毎にチェック
 hours	Config Window		時間毎にチェック
 minutes	Config Window		分毎にチェック
-never	Config Window		手動でチェック
-· E-mail filters	Config Window		· メールフィルタ
-· Incoming	Config Window		· 受信
-· Outgoing	Config Window		· 送信
+never	Config Window	mail checking frequency	手動でチェック

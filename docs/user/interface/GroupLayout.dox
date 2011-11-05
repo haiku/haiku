@@ -1,3 +1,20 @@
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *   Alex Wilson <yourpalal2@gmail.com>
+ * Corresponds to:
+ *   /trunk/headers/os/interface/GroupLayout.h  rev 38207
+ *   /trunk/src/kits/interface/GroupLayout.cpp  rev 38207
+ */
+
+
+/*!	\file GroupLayout.h
+	Describes the BGroupLayout class
+*/
+
+
 /*! \class BGroupLayout
 	\ingroup interface
 	\ingroup layout
@@ -29,118 +46,111 @@
 */
 
 
-/*!
-	\fn BGroupLayout::BGroupLayout(enum orientation, float spacing)
+/*!	\fn BGroupLayout::BGroupLayout(enum orientation orientation, float spacing)
 	\brief Creates a new BGroupLayout.
 
-	\param orientation The orientation of this BGroupLayout.
+	\param orientation The #orientation of this BGroupLayout.
 	\param spacing The spacing between BLayoutItems in this BGroupLayout.
 */
 
 
-/*!
-	\fn BGroupLayout::BGroupLayout(BMessage* from)
-	\brief Archive constructor.
+/*! \fn BGroupLayout::~BGroupLayout()
+	\brief Destructor method.
+
+	Standard Destructor.
 */
 
 
-/*!
-	\fn float BGroupLayout::Spacing() const
+/*!	\fn BGroupLayout::BGroupLayout(BMessage* from)
+	\brief Archive constructor.
+
+	\param from The message to construct the BGroupLayout from.
+*/
+
+
+/*!	\fn float BGroupLayout::Spacing() const
 	\brief Get the amount of spacing (in pixels) between each item.
 */
 
 
-/*!
-	\fn void BGroupLayout::SetSpacing(float spacing)
+/*!	\fn void BGroupLayout::SetSpacing(float spacing)
 	\brief Set the amount of spacing (in pixels) between each item.
 */
 
 
-/*!
-	\fn orientation BGroupLayout::Orientation() const
-	\brief Get the orientation of this BGroupLayout.
+/*!	\fn orientation BGroupLayout::Orientation() const
+	\brief Get the #orientation of this BGroupLayout.
 */
 
 
-/*!
-	\fn void BGroupLayout::SetOrientation(enum orientation)
-	\brief Set the orientation of this BGroupLayout.
-	\param orientation The new orientation of this BGroupLayout.
+/*!	\fn void BGroupLayout::SetOrientation(enum orientation orientation)
+	\brief Set the #orientation of this BGroupLayout.
+	\param orientation The new #orientation of this BGroupLayout.
 */
 
 
-/*!
-	\fn float BGroupLayout::ItemWeight(int32 index) const
-	\brief Get the weight of the item at \c index.
+/*!	\fn float BGroupLayout::ItemWeight(int32 index) const
+	\brief Get the weight of the item at \a index.
 */
 
 
-/*!
-	\fn void BGroupLayout::SetItemWeight(int32 index, float weight)
-	\brief Set the weight of the item at \c index.
+/*!	\fn void BGroupLayout::SetItemWeight(int32 index, float weight)
+	\brief Set the weight of the item at \a index.
 */
 
 
-/*!
-	\fn BLayoutItem* BGroupLayout::AddView(BView* child)
+/*!	\fn BLayoutItem* BGroupLayout::AddView(BView* child)
 	\brief Adds \a child to this layout as the last item. In a vertical
-		BGroupLayout, \c child will be on the right, in a horizontal
-		BGroupLayout, \c child will be at the bottom.
+		BGroupLayout, \a child will be on the right, in a horizontal
+		BGroupLayout, \a child will be at the bottom.
 
-	\c child will have a weight of 1.0f.
+	\a child will have a weight of \c 1.0f.
 */
 
 
-/*!
-	\fn BLayoutItem* BGroupLayout::AddView(int32 index, BView* child)
-	\brief Adds \c child to this layout at \c index.
+/*!	\fn BLayoutItem* BGroupLayout::AddView(int32 index, BView* child)
+	\brief Adds \a child to this layout at \a index.
 
-	\c child will have a weight of 1.0f.
+	\a child will have a weight of \c 1.0f.
 */
 
 
-/*!
-	\fn BLayoutItem* BGroupLayout::AddView(BView* child, float weight)
-	\brief Adds \c child to the end of this layout with a weight of
-		\c weight.
+/*!	\fn BLayoutItem* BGroupLayout::AddView(BView* child, float weight)
+	\brief Adds \a child to the end of this layout with a weight of
+		\a weight.
 */ 
 
 
-/*!	
-	\fn BLayoutItem* BGroupLayout::AddView(int32 index, BView* child,
+/*!	\fn BLayoutItem* BGroupLayout::AddView(int32 index, BView* child, 
 		float weight)
-	\brief Adds \c child this layout at \c index with a weight of
-		\c weight.
+	\brief Adds \a child this layout at \a index with a weight of
+		\a weight.
 */
 
 
-/*!
-	\fn bool BGroupLayout::AddItem(BLayoutItem* item)
+/*!	\fn bool BGroupLayout::AddItem(BLayoutItem* item)
 	\brief Adds \a item to this layout as the last item. In a vertical
-		BGroupLayout, \c item will be on the right, in a horizontal
-		BGroupLayout, \c item will be at the bottom.
+		BGroupLayout, \a item will be on the right, in a horizontal
+		BGroupLayout, \a item will be at the bottom.
 
-	\c item will have a weight of 1.0f.
+	\a item will have a weight of \c 1.0f.
 */
 
 
-/*!
-	\fn bool BGroupLayout::AddItem(int32 index, BLayoutItem* item)
-	\brief Adds \c item to this layout at \c index.
+/*!	\fn bool BGroupLayout::AddItem(int32 index, BLayoutItem* item)
+	\brief Adds \a item to this layout at \a index.
 
-	\c item will have a weight of 1.0f.
+	\a item will have a weight of \c 1.0f.
 */
 
 
-/*!
-	\fn bool BGroupLayout::AddItem(BLayoutItem* item, float weight)
-	\brief Adds \c item to the end of this layout with a weight of
-		\c weight.
+/*!	\fn bool BGroupLayout::AddItem(BLayoutItem* item, float weight)
+	\brief Adds \a item to the end of this layout with a weight of
+		\a weight.
 */
 
 
-/*!
-	\fn bool BGroupLayout::AddItem(int32 index, BLayoutItem* item, float weight)
-	\brief Adds \c item this layout at \c index with a weight of
-		\c weight.
+/*!	\fn bool BGroupLayout::AddItem(int32 index, BLayoutItem* item, float weight)
+	\brief Adds \a item this layout at \a index with a weight of
+		\a weight.
 */

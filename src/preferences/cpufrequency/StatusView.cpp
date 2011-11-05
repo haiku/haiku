@@ -217,22 +217,20 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 	fStorage(storage),
 	fInterface(interface)
 {
-	BCatalog catalog("x-vnd.Haiku-CPUFrequencyPref");
 	fDynamicPerformance = new BMenuItem(
-		catalog.GetString("Dynamic performance", B_TRANSLATE_CONTEXT),
+		B_TRANSLATE("Dynamic performance"),
 		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem(
-		catalog.GetString("High performance", B_TRANSLATE_CONTEXT),
+		B_TRANSLATE("High performance"),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem(catalog.GetString("Low energy",
-		B_TRANSLATE_CONTEXT), new BMessage(kMsgPolicyLowEnergy));
+	fLowEnergie = new BMenuItem(B_TRANSLATE("Low energy"),
+		new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu(catalog.GetString("Set state",
-		B_TRANSLATE_CONTEXT));
+	fCustomStateMenu = new BMenu(B_TRANSLATE("Set state"));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -376,8 +374,7 @@ StatusView::StatusView(BRect frame,	bool inDeskbar,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
 	fCurrentFrequency(NULL),
-	fDragger(NULL),
-	fCatalog("x-vnd.Haiku-CPUFrequencyPref")
+	fDragger(NULL)
 {
 	if (!inDeskbar) {
 		// we were obviously added to a standard window - let's add a dragger
@@ -406,8 +403,7 @@ StatusView::StatusView(BMessage* archive)
 	: BView(archive),
 	fInDeskbar(false),
 	fCurrentFrequency(NULL),
-	fDragger(NULL),
-	fCatalog("x-vnd.Haiku-CPUFrequencyPref")
+	fDragger(NULL)
 {
 	app_info info;
 	if (be_app->GetAppInfo(&info) == B_OK
@@ -431,10 +427,10 @@ StatusView::~StatusView()
 void
 StatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", fCatalog.GetString("CPUFrequency\n"
+	BAlert *alert = new BAlert("about", B_TRANSLATE("CPUFrequency\n"
 			"\twritten by Clemens Zeidler\n"
-			"\tCopyright 2009, Haiku, Inc.\n", B_TRANSLATE_CONTEXT),
-		fCatalog.GetString("Ok", B_TRANSLATE_CONTEXT));
+			"\tCopyright 2009, Haiku, Inc.\n"),
+		B_TRANSLATE("Ok"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -514,15 +510,15 @@ StatusView::AttachedToWindow()
 	fPreferencesMenu->SetFont(be_plain_font);
 
 	fPreferencesMenu->AddSeparatorItem();
-	fOpenPrefItem = new BMenuItem(fCatalog.GetString(
-			"Open Speedstep preferences" B_UTF8_ELLIPSIS, B_TRANSLATE_CONTEXT),
+	fOpenPrefItem = new BMenuItem(B_TRANSLATE(
+			"Open Speedstep preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
 
 	if (fInDeskbar) {
-		fQuitItem= new BMenuItem(fCatalog.GetString("Quit",
-			B_TRANSLATE_CONTEXT), new BMessage(B_QUIT_REQUESTED));
+		fQuitItem= new BMenuItem(B_TRANSLATE("Quit"),
+			new BMessage(B_QUIT_REQUESTED));
 		fPreferencesMenu->AddItem(fQuitItem);
 		fQuitItem->SetTarget(this);
 	}

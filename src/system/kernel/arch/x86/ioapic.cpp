@@ -767,6 +767,14 @@ ioapic_init(kernel_args* args)
 			ioapic_enable_io_interrupt(i);
 	}
 
+	// mark the interrupt vectors reserved so they aren't used for other stuff
+	current = sIOAPICs;
+	while (current != NULL) {
+		reserve_io_interrupt_vectors(current->max_redirection_entry + 1,
+			current->global_interrupt_base);
+		current = current->next;
+	}
+
 	// prefer the ioapic over the normal pic
 	dprintf("using io-apics for interrupt routing\n");
 	arch_int_set_interrupt_controller(ioapicController);

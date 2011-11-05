@@ -13,7 +13,7 @@
 
 //#define TRACE_DPMS
 #ifdef TRACE_DPMS
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
@@ -27,21 +27,32 @@ enable_display_plane(bool enable)
 	uint32 planeBControl = read32(INTEL_DISPLAY_B_CONTROL);
 
 	if (enable) {
-		// when enabling the display, the register values are updated automatically
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_CONTROL, planeAControl | DISPLAY_CONTROL_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_CONTROL, planeBControl | DISPLAY_CONTROL_ENABLED);
+		// when enabling the display, the register values are updated
+		// automatically
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_CONTROL,
+				planeAControl | DISPLAY_CONTROL_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_CONTROL,
+				planeBControl | DISPLAY_CONTROL_ENABLED);
+		}
 
 		read32(INTEL_DISPLAY_A_BASE);
 			// flush the eventually cached PCI bus writes
 	} else {
 		// when disabling it, we have to trigger the update using a write to
 		// the display base address
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_CONTROL, planeAControl & ~DISPLAY_CONTROL_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_CONTROL, planeBControl & ~DISPLAY_CONTROL_ENABLED);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_CONTROL,
+				planeAControl & ~DISPLAY_CONTROL_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_CONTROL,
+				planeBControl & ~DISPLAY_CONTROL_ENABLED);
+		}
 
 		set_frame_buffer_base();
 	}
@@ -55,15 +66,25 @@ enable_display_pipe(bool enable)
 	uint32 pipeBControl = read32(INTEL_DISPLAY_B_PIPE_CONTROL);
 
 	if (enable) {
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_PIPE_CONTROL, pipeAControl | DISPLAY_PIPE_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_PIPE_CONTROL, pipeBControl | DISPLAY_PIPE_ENABLED);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_PIPE_CONTROL,
+				pipeAControl | DISPLAY_PIPE_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_PIPE_CONTROL,
+				pipeBControl | DISPLAY_PIPE_ENABLED);
+		}
 	} else {
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_PIPE_CONTROL, pipeAControl & ~DISPLAY_PIPE_ENABLED);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_PIPE_CONTROL, pipeBControl & ~DISPLAY_PIPE_ENABLED);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+			write32(INTEL_DISPLAY_A_PIPE_CONTROL,
+				pipeAControl & ~DISPLAY_PIPE_ENABLED);
+		}
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_PIPE_CONTROL,
+				pipeBControl & ~DISPLAY_PIPE_ENABLED);
+		}
 	}
 
 	read32(INTEL_DISPLAY_A_BASE);
@@ -74,26 +95,35 @@ enable_display_pipe(bool enable)
 static void
 enable_lvds_panel(bool enable)
 {
-	uint32 control = read32(INTEL_PANEL_CONTROL);
+	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	if (hasPCH) {
+		// TODO: fix for PCH
+		return;
+	}
+
+	int controlRegister = hasPCH ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
+	int statusRegister = hasPCH ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;
+
+	uint32 control = read32(controlRegister);
 	uint32 panelStatus;
 
 	if (enable) {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) == 0) {
-			write32(INTEL_PANEL_CONTROL, control
-				| PANEL_CONTROL_POWER_TARGET_ON);
+			write32(controlRegister, control | PANEL_CONTROL_POWER_TARGET_ON
+				| (hasPCH ? PANEL_REGISTER_UNLOCK : 0));
 		}
 
 		do {
-			panelStatus = read32(INTEL_PANEL_STATUS);
+			panelStatus = read32(statusRegister);
 		} while ((panelStatus & PANEL_STATUS_POWER_ON) == 0);
 	} else {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) != 0) {
-			write32(INTEL_PANEL_CONTROL, control
-				& ~PANEL_CONTROL_POWER_TARGET_ON);
+			write32(controlRegister, (control & ~PANEL_CONTROL_POWER_TARGET_ON)
+				| (hasPCH ? PANEL_REGISTER_UNLOCK : 0));
 		}
 
 		do {
-			panelStatus = read32(INTEL_PANEL_STATUS);
+			panelStatus = read32(statusRegister);
 		} while ((panelStatus & PANEL_STATUS_POWER_ON) != 0);
 	}
 }
@@ -155,13 +185,16 @@ set_display_power_mode(uint32 mode)
 	}
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		write32(INTEL_DISPLAY_A_ANALOG_PORT, (read32(INTEL_DISPLAY_A_ANALOG_PORT)
-			& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
-			| monitorMode | (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
+		write32(INTEL_DISPLAY_A_ANALOG_PORT,
+			(read32(INTEL_DISPLAY_A_ANALOG_PORT)
+				& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
+			| monitorMode
+			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
 	}
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-		write32(INTEL_DISPLAY_B_DIGITAL_PORT, (read32(INTEL_DISPLAY_B_DIGITAL_PORT)
-			& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
+		write32(INTEL_DISPLAY_B_DIGITAL_PORT,
+			(read32(INTEL_DISPLAY_B_DIGITAL_PORT)
+				& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
 			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
 			// TODO: monitorMode?
 	}
@@ -179,7 +212,7 @@ set_display_power_mode(uint32 mode)
 			| DISPLAY_PLL_ENABLED);
 
 		read32(INTEL_DISPLAY_B_PLL);
-			// flush the eventually cached PCI bus writes
+			// flush the possibly cached PCI bus writes
 
 		spin(150);
 	}
@@ -188,7 +221,7 @@ set_display_power_mode(uint32 mode)
 		enable_lvds_panel(mode == B_DPMS_ON);
 
 	read32(INTEL_DISPLAY_A_BASE);
-		// flush the eventually cached PCI bus writes
+		// flush the possibly cached PCI bus writes
 }
 
 

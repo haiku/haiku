@@ -55,7 +55,7 @@ GameProducer::GameProducer(GameSoundBuffer* object,
 	fPreferredFormat.u.raw_audio.channel_count = format->channel_count;
 	fPreferredFormat.u.raw_audio.frame_rate = format->frame_rate;		// measured in Hertz
 	fPreferredFormat.u.raw_audio.byte_order = format->byte_order;
-//	fPreferredFormat.u.raw_audio.channel_mask = B_CHANNEL_LEFT & B_CHANNEL_RIGHT;
+//	fPreferredFormat.u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 //	fPreferredFormat.u.raw_audio.valid_bits = 32;
 //	fPreferredFormat.u.raw_audio.matrix_mask = B_MATRIX_AMBISONIC_WXYZ;
 	
@@ -186,7 +186,7 @@ GameProducer::PrepareToConnect(const media_source& what, const media_destination
 	fOutput.destination = where;
 	fOutput.format = *format;
 	*out_source = fOutput.source;
-	strncpy(out_name, fOutput.name, B_MEDIA_NAME_LENGTH);
+	strlcpy(out_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 	return B_OK;
 }
 
@@ -207,18 +207,22 @@ GameProducer::Connect(status_t error, const media_source& source, const media_de
 	// that we agreed on, and report our connection name again.
 	fOutput.destination = destination;
 	fOutput.format = format;
-	strncpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
+	strlcpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(fOutput.destination, &fLatency, &id);
 
+	if (!fBufferGroup)
+		fBufferSize = fOutput.format.u.raw_audio.buffer_size;
+			// Have to set it before latency calculating
+
 	// Use a dry run to see how long it takes me to fill a buffer of data
 		
 	// The first step to setup the buffer
 	bigtime_t start, produceLatency;
-	int32 frames = int32(fOutput.format.u.raw_audio.buffer_size / fFrameSize);
+	int32 frames = int32(fBufferSize / fFrameSize);
 	float* data = new float[frames * 2];
 	
 	// Second, fill the buffer
@@ -243,9 +247,8 @@ GameProducer::Connect(status_t error, const media_source& source, const media_de
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  
 	if (!fBufferGroup) {
-		size_t size = fOutput.format.u.raw_audio.buffer_size;
 		int32 count = int32(fLatency / BufferDuration() + 2);
-		fBufferGroup = new BBufferGroup(size, count);
+		fBufferGroup = new BBufferGroup(fBufferSize, count);
 	}
 }
 
@@ -292,12 +295,18 @@ GameProducer::SetBufferGroup(const media_source& for_source, BBufferGroup* newGr
 	if (newGroup != NULL) {
 		// we were given a valid group; just use that one from now on
 		fBufferGroup = newGroup;
+
+		// get buffer length from the first buffer
+		BBuffer *buffers[1];
+		if (newGroup->GetBufferList(1, buffers) != B_OK)
+			return B_BAD_VALUE;
+		fBufferSize = buffers[0]->SizeAvailable();
 	} else {
 		// we were passed a NULL group pointer; that means we construct
 		// our own buffer group to use from now on
-		size_t size = fOutput.format.u.raw_audio.buffer_size;
+		fBufferSize = fOutput.format.u.raw_audio.buffer_size;
 		int32 count = int32(fLatency / BufferDuration() + 2);
-		fBufferGroup = new BBufferGroup(size, count);
+		fBufferGroup = new BBufferGroup(fBufferSize, count);
 	}
 
 	return B_OK;
@@ -336,7 +345,7 @@ GameProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much, b
 			// The other run modes dictate various strategies for sacrificing data quality
 			// in the interests of timely data delivery.  The way *we* do this is to skip
 			// a buffer, which catches us up in time by one buffer duration.
-			size_t nSamples = fOutput.format.u.raw_audio.buffer_size / fFrameSize;
+			size_t nSamples = fBufferSize / fFrameSize;
 			fFramesSent += nSamples;
 		}
 	}
@@ -393,7 +402,7 @@ GameProducer::NodeRegistered()
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.node = Node();
-	::strcpy(fOutput.name, "GameProducer Output");
+	strlcpy(fOutput.name, "GameProducer Output", B_MEDIA_NAME_LENGTH);
 }
 
 
@@ -460,7 +469,7 @@ GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 				}
 				
 				// track how much media we've delivered so far
-				size_t nFrames = fOutput.format.u.raw_audio.buffer_size / fFrameSize;
+				size_t nFrames = fBufferSize / fFrameSize;
 				fFramesSent += nFrames;
 
 				// The buffer is on its way; now schedule the next one to go
@@ -479,9 +488,9 @@ GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 
 BBuffer* 
 GameProducer::FillNextBuffer(bigtime_t event_time)
-{	
+{
 	// get a buffer from our buffer group
-	BBuffer* buf = fBufferGroup->RequestBuffer(fOutput.format.u.raw_audio.buffer_size, BufferDuration());
+	BBuffer* buf = fBufferGroup->RequestBuffer(fBufferSize, BufferDuration());
 
 	// if we fail to get a buffer (for example, if the request times out), we skip this
 	// buffer and go on to the next, to avoid locking up the control thread
@@ -489,8 +498,8 @@ GameProducer::FillNextBuffer(bigtime_t event_time)
 		return NULL;
 
 	// we need to discribe the buffer
-	int64 frames = int64(fOutput.format.u.raw_audio.buffer_size / fFrameSize);
-	memset(buf->Data(), 0, fOutput.format.u.raw_audio.buffer_size);
+	int64 frames = int64(fBufferSize / fFrameSize);
+	memset(buf->Data(), 0, fBufferSize);
 		
 	// now fill the buffer with data, continuing where the last buffer left off
 	fObject->Play(buf->Data(), frames);
@@ -498,7 +507,7 @@ GameProducer::FillNextBuffer(bigtime_t event_time)
 	// fill in the buffer header
 	media_header* hdr = buf->Header();
 	hdr->type = B_MEDIA_RAW_AUDIO;
-	hdr->size_used = fOutput.format.u.raw_audio.buffer_size;
+	hdr->size_used = fBufferSize;
 	hdr->time_source = TimeSource()->ID();
 	
 	bigtime_t stamp;

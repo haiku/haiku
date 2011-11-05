@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -408,27 +408,6 @@ AcpiInitializeObjects (
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
-        }
-    }
-
-    /*
-     * Initialize the GPE blocks defined in the FADT (GPE block 0 and 1).
-     * The runtime GPEs are enabled here.
-     *
-     * This is where the _PRW methods are executed for the GPEs. These
-     * methods can only be executed after the SCI and Global Lock handlers are
-     * installed and initialized.
-     *
-     * GPEs can only be enabled after the _REG, _STA, and _INI methods have
-     * been run. This ensures that all Operation Regions and all Devices have
-     * been initialized and are ready.
-     */
-    if (!(Flags & ACPI_NO_EVENT_INIT))
-    {
-        Status = AcpiEvInstallFadtGpes ();
-        if (ACPI_FAILURE (Status))
-        {
-            return (Status);
         }
     }
 

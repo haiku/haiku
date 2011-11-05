@@ -1,18 +1,47 @@
 /*
+ * Copyright 1999, Be Incorporated.
+ * Copyright (c) 1999-2000, Eric Moon.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions, and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+/*
 	ToneProducer.h
 
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-	
 	NOTES eamoon@meadgroup.com 11june99
 	- this node has some holes in it, but it's pretty useful starting
 	  point for writing producers.
 	- I've tried to clean up the format negotiation a bit, which didn't
 	  fare too well when faced with an apathetic downstream node
 	  (LoggingConsumer.)
-	  
+
 	KNOWN BUGS
-	  eamoon 17jun99	  
+	  eamoon 17jun99
 	  * Can't handle 2 channels, but is too polite to refuse.
 	    How embarrassing.
 
@@ -58,7 +87,7 @@ public:
 		bigtime_t when,
 		const void* value,
 		size_t size);
-		
+
 	status_t StartControlPanel(
 		BMessenger* pMessenger);
 
@@ -111,7 +140,7 @@ public:
 		char* out_name);
 
 	void Connect(
-		status_t error, 
+		status_t error,
 		const media_source& source,
 		const media_destination& destination,
 		const media_format& format,
@@ -186,7 +215,7 @@ protected:
 
 	// Workaround for a Metrowerks PPC compiler bug
 	void ControlLoop();
-		
+
 	// Workaround for a Metrowerks PPC compiler bug
 	status_t DeleteHook(BMediaNode* node);
 */
@@ -220,7 +249,7 @@ private:
 	bigtime_t mGainLastChanged;
 	bigtime_t mFreqLastChanged;
 	bigtime_t mWaveLastChanged;
-	
+
 	// host addon
 	// [8jun99] e.moon
 	BMediaAddOn*		m_pAddOn;

@@ -18,7 +18,6 @@
 
 #define READ_RETRIES 4		// number of retries to read ddc data
 
-
 #define TRACE_DDC
 #ifdef TRACE_DDC
 extern void _sPrintf(const char* format, ...);
@@ -26,7 +25,6 @@ extern void _sPrintf(const char* format, ...);
 #else
 #	define TRACE(x...) ;
 #endif
-
 
 
 //! Verify checksum of DDC data.
@@ -43,12 +41,12 @@ verify_checksum(const uint8 *data, size_t len)
 	}
 
 	if (allOr == 0) {
-		TRACE("verify_checksum() DDC information contains zeros only\n");
+		TRACE("%s: DDC information contains zeros only\n", __func__);
 		return B_ERROR;
 	}
 
 	if (sum != 0) {
-		TRACE("verify_checksum() Checksum error in DDC information\n");
+		TRACE("%s: Checksum error in DDC information\n", __func__);
 		return B_IO_ERROR;
 	}
 
@@ -64,7 +62,7 @@ ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
 	uint8 writeBuffer[2];
 	int i;
 
-	writeBuffer[0] = start & 0xff;	
+	writeBuffer[0] = start & 0xff;
 	writeBuffer[1] = (start >> 8) & 0xff;
 
 	for (i = 0; i < READ_RETRIES; ++i) {
@@ -72,14 +70,14 @@ ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
 			start < 0x100 ? 1 : 2, buffer, length);
 
 		if (status != B_OK)
-			TRACE("ddc2_read(): DDC information read failure\n");
+			TRACE("%s: DDC information read failure\n", __func__);
 
 		if (status == B_OK) {
 			status = verify_checksum(buffer, length);
 			if (status == B_OK)
 				break;
 
-			dprintf("DDC checksum incorrect!\n");
+			dprintf("%s: DDC checksum incorrect!\n", __func__);
 		}
 	}
 
@@ -88,23 +86,23 @@ ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
 
 
 /*!
-	Reading VDIF has not been tested. 
+	Reading VDIF has not been tested.
 	it seems that almost noone supports VDIF which makes testing hard,
 	but what's the point anyway?
 */
 #if 0
 static status_t
-ddc2_read_vdif(const i2c_bus *bus, int start, 
+ddc2_read_vdif(const i2c_bus *bus, int start,
 	void **vdif, size_t *vdif_len)
 {
 	status_t res;
 	uint8 *data, *cur_data;
 	int i;
 	uint8 buffer[64];
-	
+
 	*vdif = NULL;
 	*vdif_len = 0;
-	
+
 	res = ddc2_read(bus, start, buffer, 64);
 	SHOW_INFO(2, "%x", buffer[0]);
 	if (res != B_OK || buffer[0] == 0)
@@ -150,7 +148,7 @@ ddc2_init_timing(i2c_bus *bus)
 
 //! Read EDID and VDIF from monitor via ddc2
 status_t
-ddc2_read_edid1(const i2c_bus *bus, edid1_info *edid, 
+ddc2_read_edid1(const i2c_bus *bus, edid1_info *edid,
 	void **vdif, size_t *vdifLength)
 {
 	edid1_raw raw;
@@ -159,7 +157,7 @@ ddc2_read_edid1(const i2c_bus *bus, edid1_info *edid,
 		return status;
 
 	if (raw.version.version != 1 || raw.version.revision > 4) {
-		TRACE("ddc2_read_edid1() EDID version or revision out of range\n");
+		TRACE("%s: EDID version or revision out of range\n", __func__);
 		return B_ERROR;
 	}
 

@@ -1,3 +1,35 @@
+/*
+ * Copyright 1991-1999, Be Incorporated.
+ * Copyright (c) 1999-2000, Eric Moon.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions, and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
 // LogWriter.cpp
 
 #include "LogWriter.h"
@@ -114,7 +146,7 @@ LogWriter::~LogWriter()
 //
 // This method, called by the client, really just enqueues a message to the writer thread,
 // which will deal with it in the HandleMessage() method.
-void 
+void
 LogWriter::Log(log_what what, const log_message& data)
 {
 	bigtime_t now = ::system_time();
@@ -124,7 +156,7 @@ LogWriter::Log(log_what what, const log_message& data)
 }
 
 // Enable or disable a particular log_what code's output
-void 
+void
 LogWriter::SetEnabled(log_what what, bool enable)
 {
 	if (enable)	 mFilters.erase(what);
@@ -132,7 +164,7 @@ LogWriter::SetEnabled(log_what what, bool enable)
 }
 
 // enabling everything means just clearing out the filter set
-void 
+void
 LogWriter::EnableAllMessages()
 {
 	mFilters.clear();
@@ -140,7 +172,7 @@ LogWriter::EnableAllMessages()
 
 // disabling everything is more tedious -- we have to add them all to the
 // filter set, one by one
-void 
+void
 LogWriter::DisableAllMessages()
 {
 //	mFilters.insert(LOG_QUIT);				// don't disable our quit messages
@@ -191,7 +223,7 @@ LogWriter::DisableAllMessages()
 
 // Writer thread's message handling function -- this is where messages are actuall
 // formatted and written to the log file
-void 
+void
 LogWriter::HandleMessage(log_what what, const log_message& msg)
 {
 	char buf[256];		// scratch buffer for building logged output

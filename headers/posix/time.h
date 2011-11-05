@@ -90,10 +90,10 @@ extern char 		*strptime(const char *buf, const char *format, struct tm *tm);
 
 /* clock functions */
 int		clock_getres(clockid_t clockID, struct timespec* resolution);
-int		clock_gettime(clockid_t clockID, struct timespec* time);
-int		clock_settime(clockid_t clockID, const struct timespec* time);
+int		clock_gettime(clockid_t clockID, struct timespec* _time);
+int		clock_settime(clockid_t clockID, const struct timespec* _time);
 int		clock_nanosleep(clockid_t clockID, int flags,
-			const struct timespec* time, struct timespec* remainingTime);
+			const struct timespec* _time, struct timespec* remainingTime);
 int		clock_getcpuclockid(pid_t pid, clockid_t* _clockID);
 
 /* timer functions */

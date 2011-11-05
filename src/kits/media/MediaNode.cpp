@@ -377,6 +377,8 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	TRACE("BMediaNode::WaitForMessage request is: %#lx, node %ld, this %p\n",
 		message, fNodeID, this);
 
+	if (message == GENERAL_PURPOSE_WAKEUP) return B_OK;	// no action needed
+
 	if (message > NODE_MESSAGE_START && message < NODE_MESSAGE_END) {
 		TRACE("BMediaNode::WaitForMessage calling BMediaNode\n");
 		if (B_OK == BMediaNode::HandleMessage(message, data, size))

@@ -23,14 +23,14 @@
 
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
 #endif
 
 
-struct accelerant_info *gInfo;
+struct accelerant_info* gInfo;
 
 
 class AreaCloner {
@@ -38,7 +38,7 @@ public:
 							AreaCloner();
 							~AreaCloner();
 
-			area_id			Clone(const char *name, void **_address,
+			area_id			Clone(const char* name, void** _address,
 								uint32 spec, uint32 protection,
 								area_id sourceArea);
 			status_t		InitCheck()
@@ -65,7 +65,7 @@ AreaCloner::~AreaCloner()
 
 
 area_id
-AreaCloner::Clone(const char *name, void **_address, uint32 spec,
+AreaCloner::Clone(const char* name, void** _address, uint32 spec,
 	uint32 protection, area_id sourceArea)
 {
 	fArea = clone_area(name, _address, spec, protection, sourceArea);
@@ -91,7 +91,7 @@ init_common(int device, bool isClone)
 {
 	// initialize global accelerant info structure
 
-	gInfo = (accelerant_info *)malloc(sizeof(accelerant_info));
+	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
 	if (gInfo == NULL)
 		return B_NO_MEMORY;
 
@@ -113,7 +113,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner sharedCloner;
 	gInfo->shared_info_area = sharedCloner.Clone("intel extreme shared info",
-		(void **)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		data.shared_info_area);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
@@ -123,7 +123,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner regsCloner;
 	gInfo->regs_area = regsCloner.Clone("intel extreme regs",
-		(void **)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->registers, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
@@ -137,7 +137,7 @@ init_common(int device, bool isClone)
 	// The overlay registers, hardware status, and cursor memory share
 	// a single area with the shared_info
 
-	gInfo->overlay_registers = (struct overlay_registers *)
+	gInfo->overlay_registers = (struct overlay_registers*)
 		(gInfo->shared_info->graphics_memory
 		+ gInfo->shared_info->overlay_offset);
 
@@ -209,7 +209,9 @@ intel_init_accelerant(int device)
 	// assume it is the valid panel size..
 	// Later we query for proper EDID info if it exists, or figure something
 	// else out. (Default modes, etc.)
-	if ((lvds & DISPLAY_PIPE_ENABLED) != 0) {
+	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	if ((hasPCH && (lvds & PCH_LVDS_DETECTED) != 0)
+		|| (!hasPCH && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
 		save_lvds_mode();
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
 	}
@@ -240,7 +242,7 @@ intel_accelerant_clone_info_size(void)
 
 
 void
-intel_get_accelerant_clone_info(void *info)
+intel_get_accelerant_clone_info(void* info)
 {
 	TRACE(("intel_get_accelerant_clone_info()\n"));
 	ioctl(gInfo->device, INTEL_GET_DEVICE_NAME, info, B_PATH_NAME_LENGTH);
@@ -248,7 +250,7 @@ intel_get_accelerant_clone_info(void *info)
 
 
 status_t
-intel_clone_accelerant(void *info)
+intel_clone_accelerant(void* info)
 {
 	TRACE(("intel_clone_accelerant()\n"));
 
@@ -256,9 +258,9 @@ intel_clone_accelerant(void *info)
 	char path[B_PATH_NAME_LENGTH];
 	strcpy(path, "/dev/");
 #ifdef __HAIKU__
-	strlcat(path, (const char *)info, sizeof(path));
+	strlcat(path, (const char*)info, sizeof(path));
 #else
-	strcat(path, (const char *)info);
+	strcat(path, (const char*)info);
 #endif
 
 	int fd = open(path, B_READ_WRITE);
@@ -271,7 +273,7 @@ intel_clone_accelerant(void *info)
 
 	// get read-only clone of supported display modes
 	status = gInfo->mode_list_area = clone_area(
-		"intel extreme cloned modes", (void **)&gInfo->mode_list,
+		"intel extreme cloned modes", (void**)&gInfo->mode_list,
 		B_ANY_ADDRESS, B_READ_AREA, gInfo->shared_info->mode_list_area);
 	if (status < B_OK)
 		goto err2;
@@ -310,7 +312,7 @@ intel_uninit_accelerant(void)
 
 
 status_t
-intel_get_accelerant_device_info(accelerant_device_info *info)
+intel_get_accelerant_device_info(accelerant_device_info* info)
 {
 	TRACE(("intel_get_accelerant_device_info()\n"));
 

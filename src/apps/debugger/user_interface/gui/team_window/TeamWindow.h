@@ -12,6 +12,7 @@
 
 #include "BreakpointsView.h"
 #include "Function.h"
+#include "GUITeamUISettings.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
 #include "SourceView.h"
@@ -24,6 +25,7 @@
 
 class BButton;
 class BMenuBar;
+class BSplitView;
 class BStringView;
 class BTabView;
 class Image;
@@ -54,6 +56,12 @@ public:
 									BHandler* handler);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
+
+			status_t			LoadSettings(
+									const GUITeamUISettings* settings);
+			status_t			SaveSettings(
+									GUITeamUISettings* settings);
+
 
 private:
 	enum ActiveSourceObject {
@@ -135,6 +143,15 @@ private:
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
 
+			void				_LoadSplitSettings(BSplitView* view,
+									const char* name,
+									const GUITeamUISettings* settings);
+			status_t			_SaveSplitSettings(BSplitView* view,
+									const char* name,
+									GUITeamUISettings* settings);
+
+			status_t			_SaveInspectorSettings(
+									const BMessage* settings);
 private:
 			::Team*				fTeam;
 			::Thread*			fActiveThread;
@@ -162,7 +179,12 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			BSplitView*			fFunctionSplitView;
+			BSplitView*			fSourceSplitView;
+			BSplitView*			fImageSplitView;
+			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
+			GUITeamUISettings	fUISettings;
 };
 
 

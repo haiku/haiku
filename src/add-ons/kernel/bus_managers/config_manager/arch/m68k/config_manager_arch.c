@@ -11,7 +11,7 @@
 #include <OS.h>
 #include <config_manager.h>
 
-status_t config_manager_scan_hardcoded(struct device_info **info, int32 *count)
+int config_manager_scan_hardcoded(struct device_info **info, int32 *count)
 {
 	//XXX
 	return atari_hardcoded(info, count);

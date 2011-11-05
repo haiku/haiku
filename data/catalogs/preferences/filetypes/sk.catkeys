@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	3046973565
+1	slovak	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1 typ aplikácie
 %ld Application type%s could be removed.	Application Types Window		%ld Typ aplikácie %s možno ostrániť.
 %s file type	FileType Window		typ súboru %s
@@ -49,6 +49,7 @@ Default application	FileType Window		Predvolená aplikácia
 Description	FileTypes Window		Popis
 Description:	Application Types Window		Popis:
 Description:	FileTypes Window		Popis:
+Development	Application Type Window		Vývoj
 Development	Application Types Window		Vývojové
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Zobraziť ako:
 Do you want to save the changes?	Application Type Window		Chcete uložiť zmeny?
@@ -74,6 +75,7 @@ FileTypes request	FileTypes		Požiadavka Typy súborov
 FileTypes request	FileTypes Window		Požiadavka Typy súborov
 FileTypes request	Preferred App Menu		Požiadavka Typy súborov
 Final	Application Type Window		Finálne
+Final	Application Types Window		Finálne
 Gamma	Application Type Window		Gama
 Gamma	Application Types Window		Gama
 Golden master	Application Type Window		Hlavný originál
@@ -141,6 +143,7 @@ Signature:	Application Types Window		Podpis:
 Single launch	Application Type Window		Jednoduché spustenie
 Special:	Attribute Window		Špeciálne:
 Supported types	Application Type Window		Podporované typy
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplikácia „%s“ nepodporuje tento typ súboru.\nSte si istý, že ju chcete nastaviť napriek tomu?
 This file type already exists	New File Type Window		Tento typ súboru už existuje
 Type name:	FileTypes Window		Názov typu:
 Type:	Attribute Window		Typ:

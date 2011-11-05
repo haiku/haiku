@@ -223,6 +223,7 @@ extern speed_t	cfgetispeed(const struct termios *termios);
 extern speed_t	cfgetospeed(const struct termios *termios);
 extern int		cfsetispeed(struct termios *termios, speed_t speed);
 extern int		cfsetospeed(struct termios *termios, speed_t speed);
+extern void		cfmakeraw(struct termios *termios);
 extern int		tcgetattr(int fd, struct termios *termios);
 extern int		tcsetattr(int fd, int option, const struct termios *termios);
 extern int		tcsendbreak(int fd, int duration);

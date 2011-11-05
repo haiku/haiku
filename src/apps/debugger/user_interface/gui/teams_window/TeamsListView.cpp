@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <AppMisc.h>
 #include <Bitmap.h>
 #include <ColumnTypes.h>
 #include <FindDirectory.h>
@@ -200,37 +201,51 @@ TeamRow::TeamRow(team_id team)
 }
 
 
+bool
+TeamRow::NeedsUpdate(team_info& info)
+{
+	// Check if we need to rebuilt the row's fields because the team critical 
+	// info (basically, app image running under that team ID) has changed
+	
+	if (info.argc != fTeamInfo.argc 
+		|| strncmp(info.args, fTeamInfo.args, sizeof(fTeamInfo.args)) != 0) {
+		_SetTo(info);
+		return true;
+	}
+	
+	return false;
+}			
+
+
 status_t
 TeamRow::_SetTo(team_info& info)
 {
-	BPath systemPath;
 	team_info teamInfo = fTeamInfo = info;
-
-	find_directory(B_BEOS_SYSTEM_DIRECTORY, &systemPath);
 
 	// strip any trailing space(s)...
 	for (int len = strlen(teamInfo.args) - 1;
 			len >= 0 && teamInfo.args[len] == ' '; len--) {
 		teamInfo.args[len] = 0;
 	}
-
+	
 	app_info appInfo;
 	status_t status = be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-
-	if (status == B_OK || teamInfo.team == B_SYSTEM_TEAM) {
+	if (status != B_OK) {
+		// Not an application known to be_roster
+		
 		if (teamInfo.team == B_SYSTEM_TEAM) {
-			// Get icon and name from kernel
+			// Get icon and name from kernel image
 			system_info	systemInfo;
 			get_system_info(&systemInfo);
 
-			BPath kernelPath(systemPath);
+			BPath kernelPath;
+			find_directory(B_BEOS_SYSTEM_DIRECTORY, &kernelPath);
 			kernelPath.Append(systemInfo.kernel_name);
 
 			get_ref_for_path(kernelPath.Path(), &appInfo.ref);
-		}
-	} else {
-		BEntry entry(teamInfo.args, true);
-		entry.GetRef(&appInfo.ref);
+		
+		} else
+			BPrivate::get_app_ref(teamInfo.team, &appInfo.ref);
 	}
 
 	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
@@ -428,7 +443,11 @@ TeamsListView::_UpdateList()
 				row = dynamic_cast<TeamRow*>(RowAt(index));
 		}
 
-		if (row == NULL || tmi.team != row->TeamID()) {
+		if (row != NULL && tmi.team == row->TeamID()
+			&& row->NeedsUpdate(tmi)) {
+			// The team image app could have change due after an exec*() call, 
+			UpdateRow(row);
+		} else if (row == NULL || tmi.team != row->TeamID()) {
 			// Team not found in previously known teams list: insert a new row
 			TeamRow* newRow = new(std::nothrow) TeamRow(tmi);
 			if (newRow != NULL) {

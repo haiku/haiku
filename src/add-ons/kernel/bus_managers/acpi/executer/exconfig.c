@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -206,8 +206,11 @@ AcpiExAddTable (
     AcpiNsExecModuleCodeList ();
     AcpiExEnterInterpreter ();
 
-    /* Update GPEs for any new _PRW or _Lxx/_Exx methods. Ignore errors */
-
+    /*
+     * Update GPEs for any new _Lxx/_Exx methods. Ignore errors. The host is
+     * responsible for discovering any new wake GPEs by running _PRW methods
+     * that may have been loaded by this table.
+     */
     Status = AcpiTbGetOwnerId (TableIndex, &OwnerId);
     if (ACPI_SUCCESS (Status))
     {

@@ -9,7 +9,6 @@
 
 #include <SupportDefs.h>
 
-#include "Lock.h"
 #include "bfs.h"
 
 
@@ -27,7 +26,7 @@ class Volume {
 		block_run ToBlockRun(off_t block) const { return block_run::Run(0,0,block); }
 
 		static void Panic();
-	
+
 	private:
 		BFile	*fFile;
 };

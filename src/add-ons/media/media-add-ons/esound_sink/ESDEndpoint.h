@@ -50,6 +50,7 @@ status_t	SendAuthKey();
 
 bool		Connected() const;
 status_t	Connect(const char *host, uint16 port=ESD_DEFAULT_PORT);
+status_t	WaitForConnect();
 status_t	Disconnect();
 	
 	/* set the default command and format for BDataIO interface */
@@ -63,6 +64,7 @@ status_t	GetServerInfo();
 bigtime_t	GetLatency() const { return fLatency; };
 const char	*Host() const { return fHost.String(); };
 uint16		Port() const { return fPort; };
+void		GetFriendlyName(BString &name);
 
 bool		CanSend();
 

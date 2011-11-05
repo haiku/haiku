@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Mail	3850363888
+1	italian	x-vnd.Haiku-Mail	1980480499
 Account name:	Config Views		Nome account:
 Account settings	Config Views		Impostazioni account
 Accounts	Config Window		Account
@@ -27,7 +27,3 @@ While sending and receiving	Config Window		Durante l'invio e la ricezione
 days	Config Window		giorni
 hours	Config Window		ore
 minutes	Config Window		minuti
-never	Config Window		mai
-· E-mail filters	Config Window		E-mail filtri
-· Incoming	Config Window		In entrata
-· Outgoing	Config Window		In uscita

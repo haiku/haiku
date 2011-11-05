@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -20,8 +20,45 @@
 #include "WindowList.h"
 
 #include <ObjectList.h>
+#include <Referenceable.h>
 #include <Region.h>
 #include <String.h>
+
+
+class Window;
+
+
+typedef	BObjectList<Window>	StackWindows;
+
+
+class WindowStack : public BReferenceable {
+public:
+								WindowStack(::Decorator* decorator);
+								~WindowStack();
+
+			void				SetDecorator(::Decorator* decorator);
+			::Decorator*		Decorator();
+
+	const	StackWindows&		WindowList() const { return fWindowList; }
+	const	StackWindows&		LayerOrder() const { return fWindowLayerOrder; }
+
+			Window*				TopLayerWindow() const;
+
+			int32				CountWindows();
+			Window*				WindowAt(int32 index);
+			bool				AddWindow(Window* window,
+									int32 position = -1);
+			bool				RemoveWindow(Window* window);
+
+			bool				MoveToTopLayer(Window* window);
+			bool				Move(int32 from, int32 to);
+private:
+			::Decorator*		fDecorator;
+
+			StackWindows		fWindowList;
+			StackWindows		fWindowLayerOrder;
+};
+
 
 namespace BPrivate {
 	class PortLink;
@@ -65,7 +102,7 @@ public:
 			Window*				PreviousWindow(int32 index) const;
 
 			::Desktop*			Desktop() const { return fDesktop; }
-			::Decorator*		Decorator() const { return fDecorator; }
+			::Decorator*		Decorator() const;
 			::ServerWindow*		ServerWindow() const { return fWindow; }
 			::EventTarget&		EventTarget() const
 									{ return fWindow->EventTarget(); }
@@ -88,9 +125,10 @@ public:
 			void				GetBorderRegion(BRegion* region);
 			void				GetContentRegion(BRegion* region);
 
-			void				MoveBy(int32 x, int32 y);
+			void				MoveBy(int32 x, int32 y, bool moveStack = true);
 			void				ResizeBy(int32 x, int32 y,
-									BRegion* dirtyRegion);
+									BRegion* dirtyRegion,
+									bool resizeStack = true);
 
 			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 
@@ -191,7 +229,8 @@ public:
 									int32* minHeight, int32* maxHeight) const;
 
 								// 0.0 -> left .... 1.0 -> right
-			bool				SetTabLocation(float location, BRegion& dirty);
+			bool				SetTabLocation(float location, bool isShifting,
+									BRegion& dirty);
 			float				TabLocation() const;
 
 			bool				SetDecoratorSettings(const BMessage& settings,
@@ -254,6 +293,19 @@ public:
 	static	uint32				ValidWindowFlags();
 	static	uint32				ValidWindowFlags(window_feel feel);
 
+			// Window stack methods.
+			WindowStack*		GetWindowStack();
+
+			bool				DetachFromWindowStack(
+									bool ownStackNeeded = true);
+			bool				AddWindowToStack(Window* window);
+			Window*				StackedWindowAt(const BPoint& where);
+			Window*				TopLayerStackWindow();
+
+			int32				PositionInStack() const;
+			bool				MoveToTopStackLayer();
+			bool				MoveToStackPosition(int32 index,
+									bool isMoving);
 protected:
 			void				_ShiftPartOfRegion(BRegion* region,
 									BRegion* regionToShift, int32 xOffset,
@@ -307,7 +359,6 @@ protected:
 			BObjectList<Window> fSubsets;
 
 			WindowBehaviour*	fWindowBehaviour;
-			::Decorator*		fDecorator;
 			View*				fTopView;
 			::ServerWindow*		fWindow;
 			DrawingEngine*		fDrawingEngine;
@@ -377,6 +428,12 @@ protected:
 			int32				fWorkspacesViewCount;
 
 		friend class DecorManager;
+
+private:
+			WindowStack*		_InitWindowStack();
+
+			BReference<WindowStack>		fCurrentStack;
 };
+
 
 #endif // WINDOW_H

@@ -356,8 +356,8 @@ public:
 
 	status_t PushMessage(Message *message, int32 token)
 	{
-PRINT(("MessageDeliverer::TargetPort::PushMessage(port: %ld, %p, %ld)\n",
-fPortID, message, token));
+PRINT("MessageDeliverer::TargetPort::PushMessage(port: %ld, %p, %ld)\n",
+fPortID, message, token);
 		// create a target message
 		TargetMessage *targetMessage
 			= new(nothrow) TargetMessage(message, token);
@@ -390,8 +390,8 @@ fPortID, message, token));
 	void PopMessage()
 	{
 		if (fMessages.Head()) {
-PRINT(("MessageDeliverer::TargetPort::PopMessage(): port: %ld, %p\n",
-fPortID, fMessages.Head()->GetMessage()));
+PRINT("MessageDeliverer::TargetPort::PopMessage(): port: %ld, %p\n",
+fPortID, fMessages.Head()->GetMessage());
 			_RemoveMessage(fMessages.Head());
 		}
 	}
@@ -405,8 +405,8 @@ fPortID, fMessages.Head()->GetMessage()));
 			if (message->GetMessage()->TimeoutTime() > now)
 				break;
 
-PRINT(("MessageDeliverer::TargetPort::DropTimedOutMessages(): port: %ld: "
-"message %p timed out\n", fPortID, message->GetMessage()));
+PRINT("MessageDeliverer::TargetPort::DropTimedOutMessages(): port: %ld: "
+"message %p timed out\n", fPortID, message->GetMessage());
 			_RemoveMessage(message);
 		}
 	}
@@ -433,15 +433,15 @@ private:
 	{
 		// message count
 		while (fMessageCount > kMaxMessagesPerPort) {
-PRINT(("MessageDeliverer::TargetPort::_EnforceLimits(): port: %ld: hit maximum "
-"message count limit.\n", fPortID));
+PRINT("MessageDeliverer::TargetPort::_EnforceLimits(): port: %ld: hit maximum "
+"message count limit.\n", fPortID);
 			PopMessage();
 		}
 
 		// message size
 		while (fMessageSize > kMaxDataPerPort) {
-PRINT(("MessageDeliverer::TargetPort::_EnforceLimits(): port: %ld: hit maximum "
-"message size limit.\n", fPortID));
+PRINT("MessageDeliverer::TargetPort::_EnforceLimits(): port: %ld: hit maximum "
+"message size limit.\n", fPortID);
 			PopMessage();
 		}
 	}
@@ -735,8 +735,8 @@ MessageDeliverer::_SendMessage(Message *message, port_id portID, int32 token)
 {
 	status_t error = BMessage::Private::SendFlattenedMessage(message->Data(),
 		message->DataSize(), portID, token, 0);
-//PRINT(("MessageDeliverer::_SendMessage(%p, port: %ld, token: %ld): %lx\n",
-//message, portID, token, error));
+//PRINT("MessageDeliverer::_SendMessage(%p, port: %ld, token: %ld): %lx\n",
+//message, portID, token, error);
 	return error;
 }
 
@@ -773,8 +773,8 @@ MessageDeliverer::_DelivererThread()
 					error = _SendMessage(message, port->PortID(), token);
 //				} else {
 //					// timeout, drop message
-//					PRINT(("MessageDeliverer::_DelivererThread(): port %ld, "
-//						"message %p timed out\n", port->PortID(), message));
+//					PRINT("MessageDeliverer::_DelivererThread(): port %ld, "
+//						"message %p timed out\n", port->PortID(), message);
 //				}
 
 				if (error == B_OK) {

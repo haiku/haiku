@@ -1,17 +1,26 @@
-1	finnish	x-vnd.Haiku-Time	453699369
+1	finnish	x-vnd.Haiku-Time	3739720453
 <Other>	Time		<Muut>
 Add	Time		Lisää
+Africa	Time		Afrikka
+America	Time		Amerikka
+Antarctica	Time		Etelänapamanner
+Arctic	Time		Pohjoinen napaseutu
+Asia	Time		Aasia
+Atlantic	Time		Atlantin valtameri
+Australia	Time		Australia
 Could not contact server	Time		Ei voitu ottaa yhteyttä palvelimeen
 Could not create socket	Time		Ei voitu luoda pistoketta
 Current time:	Time		Nykyinen aika:
 Date and time	Time		Päivämäärä ja aika
-Etc	Time		Jne
+Europe	Time		Eurooppa
 GMT	Time		Greenwichin aika
 Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
+Indian	Time		Intia
 Local time	Time		Paikallinen aika
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
 Network time	Time		Verkkoaika
 OK	Time		Valmis
+Pacific	Time		Tyyni valtameri
 Preview time:	Time		Esikatseluaika:
 Received invalid time	Time		Vastaanotettiin virheellinen aika
 Remove	Time		Poista

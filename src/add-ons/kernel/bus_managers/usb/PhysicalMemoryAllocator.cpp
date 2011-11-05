@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku Inc. All rights reserved.
+ * Copyright 2006-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,7 +27,8 @@
 PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	size_t minSize, size_t maxSize, uint32 minCountPerBlock)
 	:	fOverhead(0),
-		fStatus(B_NO_INIT)
+		fStatus(B_NO_INIT),
+		fMemoryWaitersCount(0)
 {
 	fName = strdup(name);
 	mutex_init_etc(&fLock, fName, MUTEX_FLAG_CLONE_NAME);
@@ -90,6 +91,8 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	}
 
 	fPhysicalBase = physicalEntry.address;
+
+	fNoMemoryCondition.Init(this, "USB PMA");
 	fStatus = B_OK;
 }
 
@@ -164,11 +167,10 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 		}
 	}
 
-	int32 retries = 5000;
-	while (retries-- > 0) {
-		if (!_Lock())
-			return B_ERROR;
+	if (!_Lock())
+		return B_ERROR;
 
+	while (true) {
 		TRACE(("PMA: will use array %ld (blocksize: %ld) to allocate %ld bytes\n", arrayToUse, fBlockSize[arrayToUse], size));
 		uint8 *targetArray = fArray[arrayToUse];
 		uint32 arrayOffset = fArrayOffset[arrayToUse] % arrayLength;
@@ -207,14 +209,23 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 			}
 		}
 
-		// no slot found
+		// no slot found, we need to wait
+
+		ConditionVariableEntry entry;
+		fNoMemoryCondition.Add(&entry);
+		fMemoryWaitersCount++;
+
 		_Unlock();
 
-		TRACE_ERROR(("PMA: found no free slot to store %ld bytes (%ld tries left)\n", size, retries));
-		// we provide a scratch space here, memory will probably be freed
-		// as soon as some other transfer is completed and cleaned up.
-		// just wait a bit to give other threads a chance to free some slots.
-		snooze(100);
+		TRACE_ERROR(("PMA: found no free slot to store %ld bytes, waiting\n",
+			size));
+
+		entry.Wait();
+
+		if (!_Lock())
+			return B_ERROR;
+
+		fMemoryWaitersCount--;
 	}
 
 	return B_NO_MEMORY;
@@ -291,6 +302,9 @@ PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 
 		arrayIndex >>= 1;
 	}
+
+	if (fMemoryWaitersCount > 0)
+		fNoMemoryCondition.NotifyAll();
 
 	_Unlock();
 	return B_OK;

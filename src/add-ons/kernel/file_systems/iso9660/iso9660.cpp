@@ -526,7 +526,7 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 				// Relocated directory, we should skip.
 				TRACE(("RR: found RE, length %u\n", length));
 				if (!relocated)
-					return B_NOT_SUPPORTED;
+					return B_UNSUPPORTED;
 				break;
 
 			case 'TF':
@@ -540,7 +540,7 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 			case 'SF':
 				TRACE(("RR: found SF, sparse files not supported!\n"));
 				// TODO: support sparse files
-				return B_NOT_SUPPORTED;
+				return B_UNSUPPORTED;
 
 			default:
 				if (buffer[0] == '\0') {
@@ -750,7 +750,7 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 				&bytesRead);
 
 			// if we hit an entry that we don't support, we just skip it
-			if (result != B_OK && result != B_NOT_SUPPORTED)
+			if (result != B_OK && result != B_UNSUPPORTED)
 				break;
 
 			if (result == B_OK && (node.flags & ISO_IS_ASSOCIATED_FILE) == 0) {
@@ -870,7 +870,8 @@ InitNode(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 	// for relocated directories we take the name from the placeholder entry
 	if (!relocated) {
 		node->name_length = nameLength;
-		TRACE(("InitNode - file id length is %u\n", node->name_length));
+		TRACE(("InitNode - file id length is %" B_PRIu32 "\n",
+			node->name_length));
 	}
 
 	// Set defaults, in case there is no RockRidge stuff.

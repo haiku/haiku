@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-About	2763068380
+1	dutch	x-vnd.Haiku-About	2917609991
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totaal
 %d MiB used (%d%%)	AboutView		%d MiB gebruikt (%d%%)
@@ -24,7 +24,6 @@ The BeGeistert team\n	AboutView		Het BeGeistert-team\n
 The Haiku-Ports team\n	AboutView		Het Haiku-Ports-team\n
 The Haikuware team and their bounty program\n	AboutView		Het Haikuware-team en hun bountyprogramma\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		De Universiteit van Auckland en Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		De code die uniek van Haiku is, in het bijzonder de kernel en alle code waar applicaties naar kunnen linken, wordt verspreid onder de %MIT-licence%. Sommige systeembibliotheken bevatten code van een derde partij, verspreid onder de LGPL-licentie. U kunt de copyrights van de code van derde partijen hieronder vinden.\n\n
 Time running:	AboutView		Looptijd:
 Translations:\n	AboutView		Vertalingen:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (en zijn NewOS kernel)\n

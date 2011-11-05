@@ -592,7 +592,7 @@ class BPoseView : public BView {
 
 		// scrolling
 		void HandleAutoScroll();
-		bool CheckAutoScroll(BPoint mouseLoc, bool shouldScroll, bool selectionScrolling = false);
+		bool CheckAutoScroll(BPoint mouseLoc, bool shouldScroll);
 
 		// view extent handling
 		void RecalcExtent();

@@ -20,8 +20,6 @@
 
 
 using BPrivate::BCalendarView;
-using BPrivate::B_WEEK_START_SUNDAY;
-using BPrivate::B_WEEK_START_MONDAY;
 
 
 enum {
@@ -88,8 +86,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	fCalendarView(NULL),
 	fSuppressFirstClose(true)
 {
-	BPrivate::week_start startOfWeek
-		= (BPrivate::week_start)BLocale::Default()->StartOfWeek();
+	SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
@@ -97,8 +94,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	fYearLabel = new BStringView("year", "");
 	fMonthLabel = new BStringView("month", "");
 
-	fCalendarView = new BCalendarView(Bounds(), "calendar",
-		startOfWeek, B_FOLLOW_ALL);
+	fCalendarView = new BCalendarView(Bounds(), "calendar", B_FOLLOW_ALL);
 	fCalendarView->SetInvocationMessage(new BMessage(kInvokationMessage));
 
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);

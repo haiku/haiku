@@ -7,6 +7,8 @@
 
 #include "AutoConfigView.h"
 
+#include <pwd.h>
+
 #include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -85,6 +87,10 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 		B_TRANSLATE("Real name:"), "", NULL);
 	AddChild(fNameView);
 	fNameView->SetDivider(divider);
+
+	struct passwd* passwd = getpwent();
+	if (passwd != NULL)
+		fNameView->SetText(passwd->pw_gecos);
 }
 
 

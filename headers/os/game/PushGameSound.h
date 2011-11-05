@@ -11,6 +11,7 @@
 
 #include <StreamingGameSound.h>
 
+class BList;
 
 class BPushGameSound : public BStreamingGameSound {
 public:

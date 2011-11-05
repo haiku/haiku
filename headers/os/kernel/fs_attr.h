@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2011, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_ATTR_H
@@ -35,6 +35,7 @@ extern int		fs_fopen_attr(int fd, const char *attribute, uint32 type,
 extern int		fs_close_attr(int fd);
 
 extern DIR		*fs_open_attr_dir(const char *path);
+extern DIR		*fs_lopen_attr_dir(const char *path);
 extern DIR		*fs_fopen_attr_dir(int fd);
 extern int		fs_close_attr_dir(DIR *dir);
 extern struct dirent *fs_read_attr_dir(DIR *dir);
@@ -43,5 +44,6 @@ extern void		fs_rewind_attr_dir(DIR *dir);
 #ifdef  __cplusplus
 }
 #endif
+
 
 #endif	/* _FS_ATTR_H */

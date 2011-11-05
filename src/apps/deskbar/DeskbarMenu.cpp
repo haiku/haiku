@@ -248,9 +248,15 @@ TDeskbarMenu::AddStandardDeskbarMenuItems()
 		AddSeparatorItem();
 	}
 
-#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK("About Haiku");
-#else
+// One of them is used if HAIKU_DISTRO_COMPATIBILITY_OFFICIAL, and the other if
+// not. However, we want both of them to end up in the catalog, so we have to
+// make them visible to collectcatkeys in either case.
+#if defined(B_COLLECTING_CATKEYS)||defined(HAIKU_DISTRO_COMPATIBILITY_OFFICIAL)
+	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
+		"About Haiku");
+#endif
+
+#if defined(B_COLLECTING_CATKEYS)||!defined(HAIKU_DISTRO_COMPATIBILITY_OFFICIAL)
 	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
 		"About this system");
 #endif
@@ -308,9 +314,11 @@ TDeskbarMenu::AddStandardDeskbarMenuItems()
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
-#ifdef APM_SUPPORT
+#if defined(APM_SUPPORT) || defined(B_COLLECTING_CATKEYS)
 	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
+#endif
 
+#ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
 		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSuspendMenuItemStr),
 			new BMessage(kSuspendSystem));

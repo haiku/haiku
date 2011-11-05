@@ -1,0 +1,640 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT Licence.
+ *
+ * Documentation by:
+ *		Stefano Ceccherini, burton666@libero.it
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		/trunk/headers/os/interface/Screen.h	 rev 42759
+ *		/trunk/src/kits/interface/Screen.cpp	 rev 42759
+ */
+
+
+/*!
+	\file Screen.h
+	\brief Defines the BScreen class and support structures.
+*/
+
+
+/*!
+	\class BScreen
+	\ingroup interface
+	\brief The BScreen class provides methods to retrieve and change display
+		settings.
+
+	Each BScreen object describes one display connected to the computer.
+	Multiple BScreen objects can represent the same physical display.
+
+	\attention Haiku currently supports only a single display. The main
+	screen with id \c B_MAIN_SCREEN_ID contains the origin in its top left
+	corner. Additional displays, when they become supported, will extend
+	the coordinates of the main screen.
+
+	Some utility methods provided by this class are ColorSpace() to get the
+	color space of the screen, Frame() to get the frame rectangle, and ID()
+	to get the identifier of the screen.
+
+	Methods to convert between 8-bit and 32-bit colors are provided by
+	IndexForColor() and ColorForIndex().
+
+	You can also use this class to take a screenshot of the entire screen or
+	a particular portion of it. To take a screenshot use either the GetBitmap()
+	or ReadBitmap() method.
+
+	Furthermore, you can use this class get and set the background color of a
+	workspace. To get the background color call DesktopColor() or to set the
+	background color use SetDesktopColor().
+
+	This class provides methods to get and set the resolution, pixel depth,
+	and color map of a display. To get a list of the display modes supported
+	by the graphics card use the GetModeList() method. You can get and set
+	the screen resolution by calling the GetMode() and SetMode() methods.
+	The color map of the display can be retrieved by calling the ColorMap()
+	method.
+
+	You can use this class to get information about the graphics card and
+	monitor connected to the computer by calling the GetDeviceInfo() and
+	GetMonitorInfo() methods.
+
+	VESA Display Power Management Signaling support allow you to put the
+	monitor into a low-power mode. Call DPMSCapabilites() to check what
+	modes are supported by your monitor. DPMSState() tells you what state
+	your monitor is currently in and SetDPMS() allows you to change it.
+*/
+
+
+/*!
+	\fn BScreen::BScreen(screen_id id)
+	\brief Creates a BScreen object which represents the display
+	 	connected to the computer with the given screen_id.
+
+	In the current implementation, there is only one display
+	(\c B_MAIN_SCREEN_ID). To be sure that the object was constructed
+	correctly, call IsValid().
+
+	\param id The screen_id of the screen to create a BScreen object from.
+*/
+
+
+/*!
+	\fn BScreen::BScreen(BWindow* window)
+	\brief Creates a BScreen object which represents the display that
+		contains \a window.
+
+	In the current implementation, there is only one display
+	(\c B_MAIN_SCREEN_ID). To be sure that the object was constructed
+	correctly, call IsValid().
+
+	\param window A BWindow object.
+*/
+
+
+/*!
+	\fn BScreen::~BScreen()
+	\brief Frees the resources used by the BScreen object and unlocks the
+		screen.
+
+	\note The main screen object will never go away, even if you disconnect
+		all monitors.
+*/
+
+
+/*!
+	\name Utility Methods
+*/
+
+
+//! @{
+
+
+/*! 
+	\fn bool BScreen::IsValid()
+	\brief Checks that the BScreen object represents a real display that is
+		connected to the computer.
+
+	\return \c true if the BScreen object is valid, \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BScreen::SetToNext()
+	\brief Sets the BScreen object to the next display in the screen list.
+
+	\return \c B_OK if successful, otherwise \c B_ERROR.
+*/
+
+
+/*!	\fn color_space BScreen::ColorSpace()
+	\brief Gets the color_space of the display.
+
+	\return \c B_CMAP8, \c B_RGB15, \c B_RGB32, or \c B_NO_COLOR_SPACE
+		if the BScreen object is invalid.
+*/
+
+
+/*!
+	\fn BRect BScreen::Frame()
+	\brief Gets the frame of the screen in the screen's coordinate system.
+
+	For example if the BScreen object points to the main screen with a
+	resolution of 1,366x768 then this method returns
+	BRect(0.0, 0.0, 1365.0, 767.0). If the BScreen object is invalid then
+	this method returns an empty rectangle i.e. BRect(0.0, 0.0, 0.0, 0.0)
+
+	You can set the frame programmatically by calling the SetMode() method.
+
+	\return a BRect frame of the screen in the screen's coordinate system.
+*/
+
+
+/*!
+	\fn screen_id BScreen::ID()
+	\brief Gets the identifier of the display.
+
+	In the current implementation this method returns \c B_MAIN_SCREEN_ID
+	even if the object is invalid.
+
+	\return A screen_id that identifies the screen.
+*/
+
+
+/*!
+	\fn status_t BScreen::WaitForRetrace()
+	\brief Blocks until the monitor has finished its current vertical retrace.
+
+	\return \c B_OK or \c B_ERROR if the screen object is invalid.
+*/
+
+
+/*!
+	\fn status_t BScreen::WaitForRetrace(bigtime_t timeout)
+	\brief Blocks until the monitor has finished its current vertical retrace
+		or until \a timeout has expired.
+
+	\param timeout The amount of time to wait before returning.
+
+	\return \c B_OK if the monitor has retraced in the given \a timeout
+		duration, \c B_ERROR otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Color Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn inline uint8 BScreen::IndexForColor(rgb_color color)
+	\brief Gets the 8-bit color index that most closely matches a
+		32-bit \a color.
+
+	\param color The 32-bit \a color to get the 8-bit index of.
+
+	\return An 8-bit color index in the screen's color_map.
+*/
+
+
+/*!
+	\fn uint8 BScreen::IndexForColor(uint8 red, uint8 green, uint8 blue,
+									 uint8 alpha)
+	\brief Gets the 8-bit color index that most closely matches a set of
+		\a red, \a green, \a blue, and \a alpha values.
+
+	\param red The \a red value.
+	\param green The \a green value.
+	\param blue The \a blue value.
+	\param alpha The \a alpha value.
+
+	\return An 8-bit color index in the screen's color_map.
+*/
+
+
+/*!
+	\fn rgb_color BScreen::ColorForIndex(const uint8 index)
+	\brief Gets the 32-bit color representation of an 8-bit color \a index.
+
+	\param index The 8-bit color \a index to convert to a 32-bit color.
+
+	\return A 32-bit rgb_color structure.
+*/
+
+
+/*!
+	\fn uint8 BScreen::InvertIndex(uint8 index)
+	\brief Gets the "Inversion" of an 8-bit color \a index.
+
+	Inverted colors are useful for highlighting.
+
+	\param index The 8-bit color \a index.
+
+	\return An 8-bit color \a index that represents the "Inversion" of the
+		given color in the screen's color_map.
+*/
+
+
+/*!
+	\fn const color_map* BScreen::ColorMap()
+	\brief Gets the color_map of the BScreen.
+
+	\return A pointer to the BScreen object's color_map.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Bitmap Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BScreen::GetBitmap(BBitmap** _bitmap, bool drawCursor,
+									BRect* bounds)
+	\brief Allocates a BBitmap and copies the contents of the screen into it.
+
+	\note GetBitmap() will allocate a BBitmap object for you while
+		ReadBitmap() requires you to pre-allocate a BBitmap object first.
+
+	\note The caller is responsible for freeing the BBitmap object.
+
+	\param _bitmap A pointer to a BBitmap pointer where this method will
+		store the contents of the display.
+	\param drawCursor Specifies whether or not to draw the cursor.
+	\param bounds Specifies the screen area that you want copied. If
+		\a bounds is \c NULL then the entire screen is copied.
+
+	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+*/
+
+
+/*!
+	\fn status_t BScreen::ReadBitmap(BBitmap* bitmap, bool drawCursor,
+									 BRect* bounds)
+	\brief Copies the contents of the screen into a BBitmap.
+
+	\note ReadBitmap() requires you to pre-allocate a BBitmap object first,
+		while GetBitmap() will allocate a BBitmap object for you.
+
+	\param bitmap A pointer to a pre-allocated BBitmap where this
+		method will store the contents of the display.
+	\param drawCursor Specifies whether or not to draw the cursor.
+	\param bounds Specifies the screen area that you want copied. If
+		\a bounds is \c NULL then the entire screen is copied.
+
+	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Desktop Color Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn rgb_color BScreen::DesktopColor()
+	\brief Gets the background color of the current workspace.
+
+	\return A 32-bit rgb_color structure containing the background color
+		of the current workspace.
+*/
+
+
+/*!
+	\fn rgb_color BScreen::DesktopColor(uint32 workspace)
+	\brief Gets the background color of the specified \a workspace.
+
+	\param workspace The \a workspace index to get the desktop background
+		color of.
+
+	\return An 32-bit rgb_color structure containing the background color
+		of the specified \a workspace.
+*/
+
+
+/*!
+	\fn void BScreen::SetDesktopColor(rgb_color color, bool stick)
+	\brief Set the background \a color of the current workspace.
+
+	\param color The 32-bit \a color to paint the desktop background.
+	\param stick Whether or not the \a color will stay after a reboot.
+*/
+
+
+/*!
+	\fn void BScreen::SetDesktopColor(rgb_color color, uint32 workspace,
+									  bool stick)
+	\brief Set the background \a color of the specified \a workspace.
+
+	\param color The 32-bit \a color to paint the desktop background.
+	\param workspace The \a workspace index to update.
+	\param stick Whether or not the \a color will stay after a reboot.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Display Mode Methods
+
+	The following methods retrieve and alter the display_mode structure
+	of a screen. The display_mode structure contains screen size,
+	pixel depth, and display timings settings.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BScreen::ProposeMode(display_mode* target,
+									  const display_mode* low,
+									  const display_mode* high)
+	\brief Adjust the \a target mode to make it a supported mode.
+
+	The list of supported modes for the graphics card is supplied by
+	the GetModeList() method.
+
+	\param target The mode you want adjust.
+	\param low The lower display mode limit.
+	\param high The higher display mode limit.
+
+	\retval B_OK if \a target is supported and falls within the
+		\a low and \a high limits.
+	\retval B_BAD_VALUE if \a target is supported but does not
+		fall within the \a low and \a high limits.
+	\retval B_ERROR if the target mode isn't supported.
+*/
+
+
+/*!
+	\fn status_t BScreen::GetModeList(display_mode** _modeList, uint32* _count)
+	\brief Allocates and returns a list of the display modes supported by the
+		graphics card into \a _modeList.
+
+	\warning The monitor may not be able to display all of the modes that
+		GetModeList() retrieves.
+
+	\note The caller is responsible for freeing the display_mode object.
+
+	\param _modeList A pointer to a display_mode pointer, where the function
+		will allocate an array of display_mode structures.
+	\param _count A pointer to an integer used to store the count of
+		available display modes.
+
+	\retval B_OK if the operation was successful.
+	\retval B_ERROR if \a modeList or \a count is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+/*!
+	\fn status_t BScreen::GetMode(display_mode* mode)
+	\brief Fills out the display_mode struct from the current workspace.
+
+	\param mode A pointer to a display_mode struct to copy into.
+
+	\retval B_OK if the operation was successful.
+	\retval B_BAD_VALUE if \a mode is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+/*!
+	\fn status_t BScreen::GetMode(uint32 workspace, display_mode* mode)
+	\brief Fills out the display_mode struct from the specified
+		\a workspace.
+
+	\param workspace The index of the \a workspace to query.
+	\param mode A pointer to a display_mode structure to copy into.
+
+	\retval B_OK if the operation was successful
+	\retval B_BAD_VALUE if \a mode is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+/*!
+	\fn status_t BScreen::SetMode(display_mode* mode, bool makeDefault)
+	\brief Sets the screen in the current workspace to the given \a mode.
+
+	\param mode A pointer to a display_mode struct.
+	\param makeDefault Whether or not \a mode is set as the default.
+
+	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+*/
+
+
+/*!
+	\fn status_t BScreen::SetMode(uint32 workspace, display_mode* mode,
+								  bool makeDefault)
+	\brief Set the screen in the specified \a workspace to the given \a mode.
+
+	\param workspace The index of the workspace to set the \a mode of.
+	\param mode A pointer to a display_mode struct.
+	\param makeDefault Whether or not the \a mode is set as the default
+		for the specified \a workspace.
+
+	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Display and Graphics Card Info Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BScreen::GetDeviceInfo(accelerant_device_info* info)
+	\brief Fills out the \a info struct with information about a graphics card.
+
+	\param info An accelerant_device_info struct to store the device
+		\a info.
+
+	\retval B_OK if the operation was successful.
+	\retval B_BAD_VALUE if \a info is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+/*!
+	\fn status_t BScreen::GetMonitorInfo(monitor_info* info)
+	\brief Fills out the \a info struct with information about a monitor.
+
+	\param info A monitor_info struct to store the monitor \a info.
+
+	\retval B_OK if the operation was successful.
+	\retval B_BAD_VALUE if \a info is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+/*!
+	\fn status_t BScreen::GetPixelClockLimits(display_mode* mode,
+											  uint32* _low, uint32* _high)
+	\brief Gets the minimum and maximum pixel clock rates that are possible
+		for the specified \a mode.
+
+	\param mode A pointer to a display_mode structure.
+	\param _low A pointer to a uint32 where the method stores the lowest
+		available pixel clock.
+	\param _high A pointer to a uint32 where the method stores the highest
+		available pixel clock.
+
+	\retval B_OK if the operation was successful.
+	\retval B_BAD_VALUE if \a mode, \a low, or \a high is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+/*!
+	\fn status_t BScreen::GetTimingConstraints(display_timing_constraints*
+											   constraints)
+	\brief Fills out the \a constraints structure with the timing constraints
+		of the current display mode.
+
+	\param constraints A pointer to a display_timing_constraints structure
+		to store the timing constraints.
+
+	\retval B_OK if the operation was successful.
+	\retval B_BAD_VALUE if \a constraints is invalid.
+	\retval B_ERROR for all other errors.
+*/
+
+
+//! @}
+
+
+/*!
+	\name VESA Display Power Management Signaling Settings
+
+	VESA Display Power Management Signaling (or DPMS) is a standard from the
+	VESA consortium for managing the power usage of displays through the
+	graphics card. DPMS allows you to shut off the display after the computer
+	has been unused for some time to save power.
+
+	DPMS states include:
+		- \c B_DPMS_ON Normal display operation.
+		- \c B_DPMS_STAND_BY Image not visible normal operation and returns to
+			normal after ~1 second.
+		- \c B_DPMS_SUSPEND Image not visible, returns to normal after ~5
+			seconds.
+		- \c B_DPMS_OFF Image not visible, display is off except for power to
+			monitoring circuitry. Returns to normal after ~8-20 seconds.
+
+	Power usage in each of the above states depends on the monitor used. CRT
+	monitors typically receive larger power savings than LCD monitors in
+	low-power states.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BScreen::SetDPMS(uint32 dpmsState)
+	\brief Sets the VESA Display Power Management Signaling (DPMS) state for
+		the display.
+
+	\param dpmsState The DPMS state to set.
+		valid values are:
+		- \c B_DPMS_ON
+		- \c B_DPMS_STAND_BY
+		- \c B_DPMS_SUSPEND
+		- \c B_DPMS_OFF
+
+	\return \c B_OK if the operation was successful, otherwise an error code.
+*/
+
+
+/*!
+	\fn uint32 BScreen::DPMSState()
+	\brief Gets the current VESA Display Power Management Signaling (DPMS)
+		state of the screen.
+
+	\return The current VESA Display Power Management Signaling (DPMS) state
+		of the display or 0 in the case of an error.
+*/
+
+
+
+/*!
+	\fn uint32 BScreen::DPMSCapabilites()
+	\brief Gets the VESA Display Power Management Signaling (DPMS)
+		modes that the display supports as a bit mask.
+
+	- \c B_DPMS_ON is worth 1
+	- \c B_DPMS_STAND_BY is worth 2
+	- \c B_DPMS_SUSPEND is worth 4
+	- \c B_DPMS_OFF is worth 8
+
+	\return A bit mask of the VESA Display Power Management Signaling (DPMS)
+		modes that the display supports or 0 in the case of an error.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Deprecated methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BPrivate::BPrivateScreen* BScreen::private_screen()
+	\brief Returns the BPrivateScreen used by the BScreen object.
+
+	\return A pointer to the BPrivateScreen class internally used by the BScreen
+		object.
+*/
+
+
+/*!
+	\fn status_t BScreen::ProposeDisplayMode(display_mode* target,
+											 const display_mode* low,
+											 const display_mode* high)
+	\brief Deprecated, use ProposeMode() instead.
+*/
+
+
+/*!
+	\fn void* BScreen::BaseAddress()
+	\brief Returns the base address of the frame buffer.
+*/
+
+
+/*!
+	\fn uint32 BScreen::BytesPerRow()
+	\brief Returns the bytes per row of the frame buffer.
+*/
+
+
+//! @}

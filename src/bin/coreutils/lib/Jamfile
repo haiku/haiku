@@ -24,6 +24,7 @@ StaticLibrary libfetish.a :
 	basename.c
 	basename-lgpl.c
 	buffer-lcm.c
+	c-ctype.c
 	c-strcasecmp.c
 	c-strtod.c
 	c-strtold.c

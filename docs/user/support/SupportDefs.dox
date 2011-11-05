@@ -21,7 +21,7 @@
 //! @{
 
 /*!
-  \typedef	typedef __haiku_int8			int8
+	\typedef typedef __haiku_int8			int8
 */
 
 /*!
@@ -29,7 +29,7 @@
 */
 
 /*!
-	\typedef	typedef __haiku_int16			int16
+	\typedef typedef __haiku_int16			int16
 */
 
 /*!
@@ -37,7 +37,7 @@
 */
 
 /*!
-	\typedef	typedef __haiku_int32			int32
+	\typedef typedef __haiku_int32			int32
 */
 
 /*!
@@ -45,7 +45,7 @@
 */
 
 /*!
-	\typedef	typedef __haiku_int64			int64
+	\typedef typedef __haiku_int64			int64
 */
 
 /*!
@@ -137,9 +137,7 @@
 //! @}
 
 
-/*!
-  \name Character Type Formats
-*/
+/*!	\name Character Type Formats */
 
 //! @{
 
@@ -153,20 +151,18 @@
 
 //! @}
 
-/*!
-  \name Descriptive Type Formats
-*/
+/*!	\name Descriptive Type Formats */
 
 //! @{
 
 /*!
-  \typedef typedef int32					status_t
-  \brief Represents one of the status codes defined in Error.h
+	\typedef typedef int32					status_t
+	\brief Represents one of the status codes defined in Error.h
 */
 
 /*!
-  \typedef typedef int64					bigtime_t
-  \brief Represents time. The unit depends on the context of the function.
+	\typedef typedef int64					bigtime_t
+	\brief Represents time. The unit depends on the context of the function.
 */
 
 /*!
@@ -175,23 +171,21 @@
 */
 
 /*!
-  \typedef typedef uint32					type_code
-  \brief Represents a certain type of data. See TypeConstants.h for possible
-    values.
+	\typedef typedef uint32					type_code
+	\brief Represents a certain type of data. See TypeConstants.h for
+		possible values.
 */
 
 /*!
-  \typedef typedef uint32					perform_code
-  \brief Unused. Defined by Be to support 'hidden' commands or
-    extensions to classes. The Haiku API has none of these.
+	\typedef typedef uint32					perform_code
+	\brief Unused. Defined by Be to support 'hidden' commands or
+		extensions to classes. The Haiku API has none of these.
 */
   
 //! @}
  
 
-/*!
-	\name Format strings for printf()/scanf()
-*/
+/*!	\name Format strings for printf()/scanf() */
 
 //! @{
 
@@ -374,9 +368,7 @@
 //! @}
 
 
-/*!
-	\name  Format strings for several standard types
-*/
+/*!	\name  Format strings for several standard types */
 
 //! @{
 
@@ -474,41 +466,35 @@
 
 //////////////// Odds and ends
   
-/*!
-  \var const char *B_EMPTY_STRING
-  \brief Defines an empty string. Currently defined as the C-string "".
+/*!	\var const char *B_EMPTY_STRING
+	\brief Defines an empty string. Currently defined as the string "".
 */
 
-/*!
-  \def min_c(a,b)
-  \brief Returns the minimum of the values a and b.
+/*!	\def min_c(a,b)
+	\brief Returns the minimum of the values a and b.
 
-  \note When including this header in a C file, use the C equivalent called 
-    \c min(a,b).
+	\note When including this header in a C file, use the C equivalent called 
+		\c min(a,b).
 */
 
-/*!
-  \def max_c(a,b)
-  \brief Returns the maximum of values a and b.
+/*!	\def max_c(a,b)
+	\brief Returns the maximum of values a and b.
 
-  \note When including this header in a C file, use the C equivalent called 
-    \c max(a,b).
+	\note When including this header in a C file, use the C equivalent called 
+		\c max(a,b).
 */
 
-/*!
-  \def NULL
-  \brief Defines the constant \c NULL if it hasn't been defined anywhere before. 
+/*!	\def NULL
+	\brief Defines the constant \c NULL if it hasn't been defined
+		anywhere before. 
 */
 
-/*!
-  \addtogroup support_globals
-*/
+/*!	\addtogroup support_globals */
 
 //! @{
 
-/*!
-  \fn int32	atomic_set(vint32 *value, int32 newValue)
-  \brief Atomically set the variable \a value to \a newvalue.
+/*!	\fn int32 atomic_set(vint32 *value, int32 newValue)
+	\brief Atomically set the variable \a value to \a newvalue.
   
 	This is a thread-safe way of performing the \c *value \c = \c newValue
 	operation. You should use these function when two or more threads might
@@ -518,29 +504,28 @@
 	\return The original value of \c value.	
 	
 	\sa atomic_set64() for a version that works on \c long \c long
-  \sa atomic_test_and_set(), atomic_add(), atomic_and(),
-    atomic_or(), atomic_get()
+	\sa atomic_test_and_set(), atomic_add(), atomic_and(), atomic_or(),
+		atomic_get()
 */
 
-/*!
-  \fn int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst)
-  \brief Atomically set the variable \a value to \a newValue if the current
+/*!	\fn int32 atomic_test_and_set(vint32 *value, int32 newValue,
+		int32 testAgainst)
+	\brief Atomically set the variable \a value to \a newValue if the current
          value is \a testAgainst.
   
 	This is a thread-safe way of conditionally performing the \c *value \c += 
-	\c newValue operation. You should use these function when two or more threads
-	might access the variable simultaneously. You don't have to use a semaphore
-	or a mutex in this case. 
+	\c newValue operation. You should use these function when two or more
+	threads might access the variable simultaneously. You don't have to use
+	a semaphore or a mutex in this case. 
 	
 	\return The original value of \c value.
-  \sa atomic_test_and_set64() for a version that works on \c long \c long
-  \sa atomic_set(), atomic_add(), atomic_and(),
-    atomic_or(), atomic_get()
+
+	\sa atomic_test_and_set64() for a version that works on \c long \c long
+	\sa atomic_set(), atomic_add(), atomic_and(), atomic_or(), atomic_get()
 */
 
-/*!
-  \fn int32	atomic_add(vint32 *value, int32 addValue)
-  \brief Atomically add the value of \a addValue to \a value.
+/*!	\fn int32 atomic_add(vint32 *value, int32 addValue)
+	\brief Atomically add the value of \a addValue to \a value.
   
 	This is a thread-safe way of performing the \c *value \c += \c addValue
 	operation. You should use these function when two or more threads might
@@ -548,14 +533,14 @@
 	mutex in this case. 
 	
 	\return The original value of \c value.
-  \sa atomic_add64() for a version that works on \c long \c long
-  \sa atomic_set(), atomic_test_and_set(), atomic_and(),
-    atomic_or(), atomic_get()
+
+	\sa atomic_add64() for a version that works on \c long \c long
+	\sa atomic_set(), atomic_test_and_set(), atomic_and(), atomic_or(),	
+		atomic_get()
 */
 
-/*!
-  \fn int32	atomic_and(vint32 *value, int32 andValue)
-  \brief Atomically perform a bitwise AND operation of \a andValue to the 
+/*!	\fn int32 atomic_and(vint32 *value, int32 andValue)
+	\brief Atomically perform a bitwise AND operation of \a andValue to the 
          variable \a andValue.
 
 	This is a thread-safe way of performing the \c *value \c &amp;= \c andValue
@@ -564,15 +549,15 @@
 	mutex in this case. 
 
 	\return The original value of \c value.
-  \sa atomic_and64() for a version that works on \c long \c long
-  \sa atomic_set(), atomic_test_and_set(), atomic_add(),
-    atomic_or(), atomic_get()
+
+	\sa atomic_and64() for a version that works on \c long \c long
+	\sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_or(),	
+		atomic_get()
 */
 
 
-/*!
-  \fn int32	atomic_or(vint32 *value, int32 orValue)
-  \brief Atomically perform a bitwise OR operation of \a orValue to the 
+/*!	\fn int32 atomic_or(vint32 *value, int32 orValue)
+	\brief Atomically perform a bitwise OR operation of \a orValue to the 
          variable \a andValue.
 
 	This is a thread-safe way of performing the \c *value \c |= \c orValue
@@ -581,14 +566,14 @@
 	mutex in this case. 
 
 	\return The original value of \c value.
-  \sa atomic_or64() for a version that works on \c long \c long
-  \sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
-    atomic_get()
+
+	\sa atomic_or64() for a version that works on \c long \c long
+	\sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
+		atomic_get()
 */
 
-/*!
-  \fn int32	atomic_get(vint32 *value)
-  \brief Atomically return the value of \c value.
+/*!	\fn int32 atomic_get(vint32 *value)
+	\brief Atomically return the value of \c value.
 
 	This is a thread-safe way of reading the contents of the \c value
 	operation. You should use these function when two or more threads might
@@ -596,14 +581,14 @@
 	mutex in this case. 
 
 	\return The original value of \c value.
-  \sa atomic_get64() for a version that works on \c long \c long
-  \sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
-    atomic_or()
+
+	\sa atomic_get64() for a version that works on \c long \c long
+	\sa atomic_set(), atomic_test_and_set(), atomic_add(), atomic_and(),
+		atomic_or()
 */
 
-/*!
-  \fn int64	atomic_set64(vint64 *value, int64 newValue)
-  \brief Atomically set the variable \a value to \a newvalue.
+/*!	\fn int64 atomic_set64(vint64 *value, int64 newValue)
+	\brief Atomically set the variable \a value to \a newvalue.
 
 	This is a thread-safe way of performing the \c *value \c = \c newValue
 	operation. You should use these function when two or more threads might
@@ -612,30 +597,30 @@
 
 	\return The original value of \c value.
 
-  \sa atomic_set() for a version that works on an \c int32
-  \sa atomic_test_and_set64(), atomic_add64(), atomic_and64(),
-    atomic_or64(), atomic_get64()
+	\sa atomic_set() for a version that works on an \c int32
+	\sa atomic_test_and_set64(), atomic_add64(), atomic_and64(),
+		atomic_or64(), atomic_get64()
 */
 
-/*!
-  \fn int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
-  \brief Atomically set the variable \a value to \a newValue if the current
+/*!	\fn int64 atomic_test_and_set64(vint64 *value, int64 newValue,
+		int64 testAgainst)
+	\brief Atomically set the variable \a value to \a newValue if the current
          value is \a testAgainst.
   
-	This is a thread-safe way of conditionally performing the \c *value \c += 
-	\c newValue operation. You should use these function when two or more threads
-	might access the variable simultaneously. You don't have to use a semaphore
-	or a mutex in this case. 
-	
+	This is a thread-safe way of conditionally performing the \c *value
+	\c += \c newValue operation. You should use these function when two
+	or more threads might access the variable simultaneously. You don't
+	have to use a semaphore or a mutex in this case. 
+
 	\return The original value of \c value.
-  \sa atomic_test_and_set() for a version that works on an \c int32
-  \sa atomic_set64(), atomic_add64(), atomic_and64(),
-    atomic_or64(), atomic_get64()
+
+	\sa atomic_test_and_set() for a version that works on an \c int32
+	\sa atomic_set64(), atomic_add64(), atomic_and64(),
+		atomic_or64(), atomic_get64()
 */
 
-/*!
-  \fn int64	atomic_add64(vint64 *value, int64 addValue)
-  \brief Atomically add the value of \a addValue to \a value.
+/*!	\fn int64 atomic_add64(vint64 *value, int64 addValue)
+	\brief Atomically add the value of \a addValue to \a value.
   
 	This is a thread-safe way of performing the \c *value \c += \c addValue
 	operation. You should use these function when two or more threads might
@@ -643,14 +628,14 @@
 	mutex in this case. 
 	
 	\return The original value of \c value.
-  \sa atomic_add() for a version that works on an \c int32
-  \sa atomic_set64(), atomic_test_and_set64(), atomic_and64(),
-    atomic_or64(), atomic_get64()
+
+	\sa atomic_add() for a version that works on an \c int32
+	\sa atomic_set64(), atomic_test_and_set64(), atomic_and64(),
+		atomic_or64(), atomic_get64()
 */
 
-/*!
-  \fn int64	atomic_and64(vint64 *value, int64 andValue)
-  \brief Atomically perform a bitwise AND operation of \a andValue to the 
+/*!	\fn int64 atomic_and64(vint64 *value, int64 andValue)
+	\brief Atomically perform a bitwise AND operation of \a andValue to the 
          variable \a andValue.
 
 	This is a thread-safe way of performing the \c *value \c &amp;= \c andValue
@@ -659,14 +644,14 @@
 	mutex in this case. 
 
 	\return The original value of \c value.
-  \sa atomic_and() for a version that works on an \c int32
-  \sa atomic_set64(), atomic_test_and_set64(), atomic_add64(),
-    atomic_or64(), atomic_get64()
+
+	\sa atomic_and() for a version that works on an \c int32
+	\sa atomic_set64(), atomic_test_and_set64(), atomic_add64(),
+		atomic_or64(), atomic_get64()
 */
 
-/*!
-  \fn int64	atomic_or64(vint64 *value, int64 orValue)
-  \brief Atomically perform a bitwise OR operation of \a orValue to the 
+/*!	\fn int64 atomic_or64(vint64 *value, int64 orValue)
+	\brief Atomically perform a bitwise OR operation of \a orValue to the 
          variable \a andValue.
 
 	This is a thread-safe way of performing the \c *value \c |= \c orValue
@@ -675,14 +660,14 @@
 	mutex in this case. 
 
 	\return The original value of \c value.
-  \sa atomic_or() for a version that works on an \c int32
-  \sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
-    atomic_get64()
+
+	\sa atomic_or() for a version that works on an \c int32
+	\sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
+		atomic_get64()
 */
 
-/*!
-  \fn int64	atomic_get64(vint64 *value)
-  \brief Atomically return the value of \c value.
+/*!	\fn int64 atomic_get64(vint64 *value)
+	\brief Atomically return the value of \c value.
 
 	This is a thread-safe way of reading the contents of the \c value
 	operation. You should use these function when two or more threads might
@@ -690,33 +675,30 @@
 	mutex in this case. 
 
 	\return The original value of \c value.
-  \sa atomic_get() for a version that works on an \c int32
-  \sa atomic_set64(), atomic_test_and_set64(), atomic_add64(), atomic_and64(),
-    atomic_or64()
+
+	\sa atomic_get() for a version that works on an \c int32
+	\sa atomic_set64(), atomic_test_and_set64(), atomic_add64(),
+		atomic_and64(), atomic_or64()
 */
 
 //! @}
 
-/*!
-  \fn void*	get_stack_frame(void)
+/*!	\fn void* get_stack_frame(void)
   \brief Internal function.
   \internal
 */
 
-/*!
-	\name Deprecated defines
-*/
+/*!  \name Deprecated defines */
 
 //! @{
 
-/*!
-  \def FALSE
-  \brief Obsolete. Use \c false.
+/*!	\def FALSE
+	\brief Obsolete. Use \c false.
 */
 
-/*!
-  \def TRUE
-  \brief Obsolete. Use \c true.
+/*!	\def TRUE
+	\brief Obsolete. Use \c true.
 */
 
 //! @}
+

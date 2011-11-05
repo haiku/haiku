@@ -38,7 +38,7 @@ DevicesView::CreateLayout()
 	BMenu* menu = new BMenu(B_TRANSLATE("Devices"));
 	BMenuItem* item;
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh devices"),
-		 new BMessage(kMsgRefresh), 'R'));
+		new BMessage(kMsgRefresh), 'R'));
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Report compatibility"),
 		new BMessage(kMsgReportCompatibility)));
 	item->SetEnabled(false);
@@ -133,7 +133,7 @@ DevicesView::RescanDevices()
 void
 DevicesView::DeleteDevices()
 {
-	while(fDevices.size() > 0) {
+	while (fDevices.size() > 0) {
 		delete fDevices.back();
 		fDevices.pop_back();
 	}
@@ -149,7 +149,7 @@ DevicesView::CreateCategoryMap()
 		const char* categoryName = kCategoryString[category];
 
 		iter = fCategoryMap.find(category);
-		if( iter == fCategoryMap.end() ) {
+		if (iter == fCategoryMap.end()) {
 			// This category has not yet been added, add it.
 			fCategoryMap[category] = new Device(NULL, BUS_NONE, CAT_NONE,
 				categoryName);
@@ -162,7 +162,7 @@ void
 DevicesView::DeleteCategoryMap()
 {
 	CategoryMapIterator iter;
-	for(iter = fCategoryMap.begin(); iter != fCategoryMap.end(); iter++) {
+	for (iter = fCategoryMap.begin(); iter != fCategoryMap.end(); iter++) {
 		delete iter->second;
 	}
 	fCategoryMap.clear();
@@ -173,14 +173,14 @@ int
 DevicesView::SortItemsCompare(const BListItem *item1,
 	const BListItem *item2)
 {
- 	const BStringItem* stringItem1 = dynamic_cast<const BStringItem*>(item1);
+	const BStringItem* stringItem1 = dynamic_cast<const BStringItem*>(item1);
 	const BStringItem* stringItem2 = dynamic_cast<const BStringItem*>(item2);
 	if (!(stringItem1 && stringItem2)) {
 		// is this check necessary?
 		std::cerr << "Could not cast BListItem to BStringItem, file a bug\n";
 		return 0;
 	}
-	return Compare(stringItem1->Text(),stringItem2->Text());
+	return Compare(stringItem1->Text(), stringItem2->Text());
 }
 
 
@@ -198,8 +198,7 @@ DevicesView::RebuildDevicesOutline()
 				AddChildrenToOutlineByConnection(fDevices[i]);
 			}
 		}
-	}
-	else if (fOrderBy == ORDER_BY_CATEGORY) {
+	} else if (fOrderBy == ORDER_BY_CATEGORY) {
 		// Add all categories to the outline
 		CategoryMapIterator iter;
 		for (iter = fCategoryMap.begin(); iter != fCategoryMap.end(); iter++) {
@@ -211,11 +210,11 @@ DevicesView::RebuildDevicesOutline()
 			Category category = fDevices[i]->GetCategory();
 
 			iter = fCategoryMap.find(category);
-			if(iter == fCategoryMap.end()) {
-				std::cerr << "Tried to add device without category, file a bug\n";
+			if (iter == fCategoryMap.end()) {
+				std::cerr
+					<< "Tried to add device without category, file a bug\n";
 				continue;
-			}
-			else {
+			} else {
 				fDevicesOutline->AddUnder(fDevices[i], iter->second);
 			}
 		}
@@ -280,54 +279,75 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		// Devices Root
 		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
-				&& attributes[i].fValue == "Devices Root") {
+			&& attributes[i].fValue == "Devices Root") {
 			newDevice = new Device(parent, BUS_NONE,
-									CAT_COMPUTER, B_TRANSLATE("Computer"));
+				CAT_COMPUTER, B_TRANSLATE("Computer"));
 			break;
 		}
 
 		// ACPI Controller
 		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
-				&& attributes[i].fValue == "ACPI") {
+			&& attributes[i].fValue == "ACPI") {
 			newDevice = new Device(parent, BUS_ACPI,
-									CAT_BUS, B_TRANSLATE("ACPI bus"));
+				CAT_BUS, B_TRANSLATE("ACPI bus"));
 			break;
 		}
 
 		// PCI bus
 		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
-				&& attributes[i].fValue == "PCI") {
+			&& attributes[i].fValue == "PCI") {
 			newDevice = new Device(parent, BUS_PCI,
-									CAT_BUS, B_TRANSLATE("PCI bus"));
+				CAT_BUS, B_TRANSLATE("PCI bus"));
 			break;
 		}
 
 		// ISA bus
 		if (attributes[i].fName == B_DEVICE_BUS
-				&& attributes[i].fValue == "isa") {
+			&& attributes[i].fValue == "isa") {
 			newDevice = new Device(parent, BUS_ISA,
-									CAT_BUS, B_TRANSLATE("ISA bus"));
+				CAT_BUS, B_TRANSLATE("ISA bus"));
 			break;
 		}
 
 		// PCI device
 		if (attributes[i].fName == B_DEVICE_BUS
-				&& attributes[i].fValue == "pci") {
+			&& attributes[i].fValue == "pci") {
 			newDevice = new DevicePCI(parent);
 			break;
 		}
 
 		// ACPI device
 		if (attributes[i].fName == B_DEVICE_BUS
-				&& attributes[i].fValue == "acpi") {
+			&& attributes[i].fValue == "acpi") {
 			newDevice = new DeviceACPI(parent);
+			break;
+		}
+
+		// ATA / SCSI / IDE controller
+		if (attributes[i].fName == "controller_name") {
+			newDevice = new Device(parent, BUS_PCI,
+				CAT_MASS, attributes[i].fValue);
+		}
+
+		// SCSI device node
+		if (attributes[i].fName == B_DEVICE_BUS
+			&& attributes[i].fValue == "scsi") {
+			newDevice = new DeviceSCSI(parent);
+			break;
+		}
+
+		// Last resort, lets look for a pretty name
+		if (attributes[i].fName == B_DEVICE_PRETTY_NAME) {
+			newDevice = new Device(parent, BUS_NONE,
+				CAT_NONE, attributes[i].fValue);
 			break;
 		}
 	}
 
+	// A completely unknown device
 	if (newDevice == NULL) {
 		newDevice = new Device(parent, BUS_NONE,
-									CAT_NONE, B_TRANSLATE("Unknown device"));
+			CAT_NONE, B_TRANSLATE("Unknown device"));
 	}
 
 	// Add its attributes to the device, initialize it and add to the list.

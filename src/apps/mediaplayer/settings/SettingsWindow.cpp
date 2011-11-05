@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,7 +41,7 @@ enum {
 
 
 #define SPACE 10
-#define SPACEING 7 
+#define SPACEING 7
 #define BUTTONHEIGHT 20
 
 
@@ -61,9 +61,9 @@ SettingsWindow::SettingsWindow(BRect frame)
 
 	BStringView* playModeLabel = new BStringView("stringViewPlayMode",
 		B_TRANSLATE("Play mode"));
-	BStringView* viewOptionsLabel = new BStringView("stringViewViewOpions", 
+	BStringView* viewOptionsLabel = new BStringView("stringViewViewOpions",
 		B_TRANSLATE("View options"));
-	BStringView* bgMoviesModeLabel = new BStringView("stringViewPlayBackg", 
+	BStringView* bgMoviesModeLabel = new BStringView("stringViewPlayBackg",
 		B_TRANSLATE("Volume of background clips"));
 	BAlignment alignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER);
 	playModeLabel->SetExplicitAlignment(alignment);
@@ -73,14 +73,14 @@ SettingsWindow::SettingsWindow(BRect frame)
 	bgMoviesModeLabel->SetExplicitAlignment(alignment);
 	bgMoviesModeLabel->SetFont(be_bold_font);
 
-	fAutostartCB = new BCheckBox("chkboxAutostart", 
-		B_TRANSLATE("Automatically start playing"), 
+	fAutostartCB = new BCheckBox("chkboxAutostart",
+		B_TRANSLATE("Automatically start playing"),
 		new BMessage(M_SETTINGS_CHANGED));
 
-	fCloseWindowMoviesCB = new BCheckBox("chkBoxCloseWindowMovies", 
+	fCloseWindowMoviesCB = new BCheckBox("chkBoxCloseWindowMovies",
 		B_TRANSLATE("Close window after playing video"),
 		new BMessage(M_SETTINGS_CHANGED));
-	fCloseWindowSoundsCB = new BCheckBox("chkBoxCloseWindowSounds", 
+	fCloseWindowSoundsCB = new BCheckBox("chkBoxCloseWindowSounds",
 		B_TRANSLATE("Close window after playing audio"),
 		new BMessage(M_SETTINGS_CHANGED));
 
@@ -120,17 +120,17 @@ SettingsWindow::SettingsWindow(BRect frame)
 
 	fFullVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
 		B_TRANSLATE("Full volume"), new BMessage(M_SETTINGS_CHANGED));
-	
-	fHalfVolumeBGMoviesRB = new BRadioButton("rdbtnhalfvolume", 
+
+	fHalfVolumeBGMoviesRB = new BRadioButton("rdbtnhalfvolume",
 		B_TRANSLATE("Low volume"), new BMessage(M_SETTINGS_CHANGED));
-	
+
 	fMutedVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
 		B_TRANSLATE("Muted"), new BMessage(M_SETTINGS_CHANGED));
 
-	fRevertB = new BButton("revert", B_TRANSLATE("Revert"), 
+	fRevertB = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(M_SETTINGS_REVERT));
 
-	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"), 
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(M_SETTINGS_CANCEL));
 
 	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
@@ -208,7 +208,7 @@ SettingsWindow::Show()
 	// The Settings that we want to be able to revert to is the state at which
 	// the SettingsWindow was shown. So the current settings are stored in
 	// fLastSettings.
-	Settings::Default()->LoadSettings(fLastSettings);
+	Settings::Default()->Get(fLastSettings);
 	fSettings = fLastSettings;
 	AdoptSettings();
 
@@ -313,7 +313,7 @@ SettingsWindow::ApplySettings()
 			= mpSettings::BG_MOVIES_MUTED;
 	}
 
-	Settings::Default()->SaveSettings(fSettings);
+	Settings::Default()->Update(fSettings);
 
 	fRevertB->SetEnabled(IsRevertable());
 }
@@ -324,7 +324,7 @@ SettingsWindow::Revert()
 {
 	fSettings = fLastSettings;
 	AdoptSettings();
-	Settings::Default()->SaveSettings(fSettings);
+	Settings::Default()->Update(fSettings);
 }
 
 

@@ -1,5 +1,13 @@
-/*!
-	\class BLayoutBuilder::Base<>
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *   Alex Wilson <yourpalal2@gmail.com>
+ */
+
+
+/*!	\class BLayoutBuilder::Base<>
 	\ingroup interface
 	\ingroup layout
 	\brief Base for all other layout builders in the BLayoutBuilder namespace.

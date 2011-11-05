@@ -20,6 +20,7 @@ const window_feel kDesktopWindowFeel = window_feel(1024);
 const window_feel kMenuWindowFeel = window_feel(1025);
 const window_feel kWindowScreenFeel = window_feel(1026);
 const window_feel kPasswordWindowFeel = window_feel(1027);
+const window_feel kOffscreenWindowFeel = window_feel(1028);
 
 /* Private window types */
 

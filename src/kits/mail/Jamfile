@@ -13,6 +13,7 @@ UsePrivateHeaders textencoding ;
 
 
 local sources =
+	b_mail_message.cpp
 	c_mail_api.cpp
 	crypt.cpp
 	des.c
@@ -52,9 +53,7 @@ AddResources libmail.so : libmail.rdef ;
 SharedLibrary libmail.so :
 	$(sources)
 	:
-	be
-	libtextencoding.so
-	tracker
+	be libbnetapi.so libtextencoding.so tracker
 	$(TARGET_LIBSTDC++)
 	$(TARGET_NETWORK_LIBS)
 	$(TARGET_SELECT_UNAME_ETC_LIB)

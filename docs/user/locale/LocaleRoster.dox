@@ -1,92 +1,214 @@
-/*!
-\class BLocaleRoster
-\ingroup locale
-\brief Main class for accessing the locale kit data
+/*
+ * Copyright 2003-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Oliver Tappe, zooey@hirschkaefer.de
+ *
+ * Corresponds to:
+ *		/trunk/headers/os/locale/LocaleRoster.h	 rev 42274
+ *		/trunk/src/kits/locale/LocaleRoster.cpp	 rev 42274
+ */
 
-The Locale Roster is the central part of the locale kit.
-It is a global object (be_locale_roster) storing all the useful locale
-data. Other classes from the Locale Kit can be constructed on their own,
-but only the Locale Roster allows you to do so while taking account of
-the user's locale settings.
+
+/*!
+	\class BLocaleRoster
+	\ingroup locale
+	\brief Main class for accessing the locale kit data
+
+	The Locale Roster is the central part of the locale kit. It is a global
+	object (\c be_locale_roster) storing all the useful locale data. Other
+	classes from the Locale Kit can be constructed on their own, but only the
+	Locale Roster allows you to do so while taking account of the user's locale
+	settings.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetDefaultCollator(BCollator* collator) const
-\brief Get the default collator.
+	\fn BLocaleRoster::BLocaleRoster()
+	\brief Constructor. Does nothing.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetDefaultLocale(BLocale* locale) const
-\brief Get the default locale.
+	\fn BLocaleRoster::~BLocaleRoster()
+	\brief Destructor. Does nothing.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetDefaultCountry(BCountry* country) const
-\brief Get the default country.
+	\fn BLocaleRoster* BLocaleRoster::Default()
+	\brief Returns default BLocalRoster.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetDefaultLanguage(BLanguage* language) const
-\brief Get the default language.
+	\fn status_t BLocaleRoster::Refresh()
+	\brief Refreshes the BLocalRoster.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetDefaultTimeZone(BTimeZone* timezone) const
-\brief Get the default timezone.
+	\fn status_t BLocaleRoster::GetDefaultTimeZone(BTimeZone* timezone) const
+	\brief Get the default timezone.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetLanguage(const char* languagecode, BLanguage** _language) const
-\brief Instanciate a language from its code.
+	\fn status_t BLocaleRoster::GetLanguage(const char* languagecode,
+		BLanguage** _language) const
+	\brief Instantiate a language from its code.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetAvailableLanguages(BMessage* message) const
-\brief List the available languages
+	\fn status_t BLocaleRoster::GetPreferredLanguages(BMessage* message) const
+	\brief Return the list of user preferred languages.
 
-This function fills the passed BMessage with one or more 'language' string
-fields, containing the language(s) ID(s).
-
+	This function fills in the given message with one or more language string
+	fields. They constitute the ordered list of user-selected languages to use
+	for string translation.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetAvailableCountries(BMessage* message) const
-\brief List the available countries
-
-This function filles the passed BMessage with one or more 'country' string
-fields, containing the (ISO-639) code of each country.
-
+	\fn status_t BLocaleRoster::GetAvailableLanguages(BMessage* message) const
+	\brief Fills \c message with 'language'-fields containing the language
+		ID(s) of all available languages.
 */
 
+
 /*!
-\fn status_t BLocaleRoster::GetInstalledCatalogs(BMessage* message, const char* sigPattern = NULL, const char* langPattern = NULL, int32 fingerprint = 0) const
-\brief Get the available locales and catalogs
-
-This function fills the passed BMessage with one or more 'locale' string
-fields, containing the locale names.
-
-The optional parameters can be used to filter the list and only get the
-locales for which a catalog is available for the given app (sigPattern, fingerprint),
-or the locales with a given language.
+	\fn status_t BLocaleRoster::GetAvailableCountries(BMessage* message) const
+	\brief Fills in the passed in \a message with one or more 'country'
+		string fields, containing the (ISO-639) code of each country.
 */
 
+
 /*!
-\fn BCatalog* BLocaleRoster::GetCatalog()
-\brief Get the current image catalog.
+	\fn status_t BLocaleRoster::GetAvailableTimeZones(BMessage* timeZones) const
+	\brief Fills in the passed in \a timeZones message with all time zone
+		strings for the locale.
 
-This function returns the catalog for the calling image (application, add-on, or shared
-library). Note that it doesn't allow to specify a fingerprint. The language will be
-selected from the user preferences.
-
-\returns The catalog, if it was loaded successfully.
-\warning This function needs the image to be lined with liblocalestub.a
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE A \c NULL \a timeZones message was passed in.
+	\retval B_ERROR An error occurred trying to retrieve the localized time zone
+		strings.
 */
 
-/*!
-\fn status_t BLocaleRoster::GetPreferredLanguages(BMessage* message) const
-\brief Return the list of user preferred languages.
 
-This function fills in the given message with one or more language string
-fields. They constitute the ordered list of user-selected languages to use for
-string translation.
+/*!
+	\fn status_t BLocaleRoster::GetAvailableTimeZonesForCountry(
+		BMessage* timeZones, const char* countryCode) const
+	\brief Fills in the passed in \a timeZones message with one or more
+		time zone strings containing the time zones for the
+		country specified by \a countryCode for the locale.
+
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE A \c NULL \a timeZones message was passed in.
+	\retval B_ERROR An error occurred trying to retrieve the localized time
+		zones most likely due to an invalid \a countryCode.
+*/
+
+
+/*!
+	\fn status_t BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon,
+		const char* countryCode)
+	\brief Sets \a flagIcon to the flag for the passed in \a countryCode.
+
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE A \c NULL or invalid \a countryCode was passed in.
+	\retval B_ERROR Error locking the default RosterData.
+	\retval B_NAME_NOT_FOUND The flag could not be found for the
+		\a countryCode.
+*/
+
+
+/*!
+	\fn status_t BLocaleRoster::GetFlagIconForLanguage(BBitmap* flagIcon,
+		const char* languageCode)
+	\brief Sets \a flagIcon to the flag for the passed in \a languageCode.
+
+	If a flag could not be located for the passed in \a languageCode then
+	GetFlagIconForLanguage() attempts to locate the default country's flag for
+	the \a languageCode instead. The default country flag for a language is
+	usually set to the country of the languages origin such as Germany for
+	German or Spain for Spanish.
+
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE A \c NULL or invalid \a languageCode was passed in.
+	\retval B_ERROR Error locking the default RosterData.
+	\retval B_NAME_NOT_FOUND The flag could not be found for the
+		default country's flag for the \a languageCode.
+*/
+
+
+/*!
+	\fn status_t BLocaleRoster::GetAvailableCatalogs(BMessage* languageList,
+		const char* sigPattern,	const char* langPattern,
+		int32 fingerprint) const
+	\brief Get the available locales and catalogs.
+
+	Fills the passed \a languageList message with one or more 'locale' string
+	fields containing the locale names.
+
+	The optional parameters can be used to filter the list and only get the
+	locales for which a catalog is available for the given app (sigPattern,
+	fingerprint), or the locales with a given language.
+
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE A \c NULL \a languageList message was passed in.
+	\retval B_ERROR Error locking the default RosterData.
+*/
+
+
+/*!
+	\fn bool BLocaleRoster::IsFilesystemTranslationPreferred() const
+	\brief Returns whether or not filesystem translation is preferred.
+
+	\returns \c B_ERROR if there was an error locking the default RosterData.
+*/
+
+
+/*!
+	\fn status_t BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
+		const entry_ref& ref, bool traverse)
+	\brief Looks up a localized filename from a catalog.
+
+	Attribute format:  "signature:context:string"
+	(no colon in any of signature, context and string)
+
+	Lookup is done for the top preferred language only.
+	Lookup fails if a comment is present in the catalog entry.
+
+	\param localizedFileName A pre-allocated BString object for the result
+		of the lookup.
+	\param ref An entry_ref with an attribute holding data for catalog lookup.
+	\param traverse Determines if symlinks should be traversed.
+
+	\returns A status code.
+	\retval B_OK: success
+	\retval B_ENTRY_NOT_FOUND: failure. Attribute not found, entry not found
+		in catalog, etc.
+*/
+
+
+/*!
+	\fn BCatalog* BLocaleRoster::_GetCatalog()
+	\brief Get the current image catalog.
+
+	This function returns the catalog for the calling image (application,
+	add-on, or shared library). Note that it doesn't allow to specify a
+	fingerprint. The language will be selected from the user preferences.
+
+	\warning This function needs the image to be lined with liblocalestub.a
+
+	\returns The catalog, if it was loaded successfully.
 */

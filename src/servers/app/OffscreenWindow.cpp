@@ -14,6 +14,8 @@
 
 #include <Debug.h>
 
+#include <WindowPrivate.h>
+
 #include "BitmapHWInterface.h"
 #include "DrawingEngine.h"
 #include "ServerBitmap.h"
@@ -24,7 +26,7 @@ using std::nothrow;
 OffscreenWindow::OffscreenWindow(ServerBitmap* bitmap,
 		const char* name, ::ServerWindow* window)
 	: Window(bitmap->Bounds(), name,
-			B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_NO_BORDER_WINDOW_LOOK, kOffscreenWindowFeel,
 			0, 0, window, new (nothrow) DrawingEngine()),
 	fBitmap(bitmap),
 	fHWInterface(new (nothrow) BitmapHWInterface(fBitmap))

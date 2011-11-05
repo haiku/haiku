@@ -15,5 +15,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers ports ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power ;
 SubInclude HAIKU_TOP src add-ons kernel drivers printer ;
 SubInclude HAIKU_TOP src add-ons kernel drivers random ;
+SubInclude HAIKU_TOP src add-ons kernel drivers timer ;
 SubInclude HAIKU_TOP src add-ons kernel drivers tty ;
 SubInclude HAIKU_TOP src add-ons kernel drivers video ;

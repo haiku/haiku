@@ -44,8 +44,7 @@ ICUNumericData::SetTo(const Locale& locale, const char* posixLocaleName)
 	if (result == B_OK) {
 		UErrorCode icuStatus = U_ZERO_ERROR;
 		DecimalFormat* numberFormat = dynamic_cast<DecimalFormat*>(
-			NumberFormat::createInstance(locale, DecimalFormat::kNumberStyle,
-				icuStatus));
+			NumberFormat::createInstance(locale, UNUM_DECIMAL, icuStatus));
 		if (!U_SUCCESS(icuStatus))
 			return B_UNSUPPORTED;
 		if (!numberFormat)

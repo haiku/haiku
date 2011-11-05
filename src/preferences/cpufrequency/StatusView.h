@@ -130,8 +130,6 @@ private:
 			
 			BString				fFreqString;
 			BDragger*			fDragger;
-
-			BCatalog			fCatalog;
 };
 
 #endif	// STATUS_VIEW_H

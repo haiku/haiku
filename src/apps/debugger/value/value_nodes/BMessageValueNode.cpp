@@ -9,6 +9,7 @@
 #include <new>
 
 #include <AutoDeleter.h>
+#include <MessageAdapter.h>
 #include <MessagePrivate.h>
 
 #include "Architecture.h"
@@ -258,6 +259,10 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		headerAddress.ToUInt64(), error);
 	if (error != B_OK)
 		return error;
+
+	if (fHeader->format != MESSAGE_FORMAT_HAIKU
+		|| (fHeader->flags & MESSAGE_FLAG_VALID) == 0)
+		return B_NOT_A_MESSAGE;
 
 	if (fIsFlatMessage)
 		what.SetTo(fHeader->what);

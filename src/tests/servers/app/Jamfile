@@ -18,15 +18,19 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 # headers/build/private/kernel is needed for safemode.h and syscalls.h.
 # headers/private/kernel for the util/* stuff.
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
-UsePrivateHeaders kernel ;
+UsePrivateHeaders kernel support ;
 
 local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 
+UseHeaders [ FDirName $(appServerDir) decorator ] ;
 UseHeaders [ FDirName $(appServerDir) drawing ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
+UseHeaders [ FDirName $(appServerDir) font ] ;
+UseHeaders [ FDirName $(appServerDir) stackandtile ] ;
 UseFreeTypeHeaders ;
+UseLibraryHeaders agg lp_solve linprog ;
 
 # This overrides the definitions in private/servers/app/ServerConfig.h
 local defines = [ FDefines TEST_MODE=1 ] ;
@@ -36,8 +40,11 @@ SubDirCcFlags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO
 SubDirC++Flags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 
 SEARCH_SOURCE += $(appServerDir) ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) decorator ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing Painter ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) font ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) stackandtile ] ;
 
 SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
@@ -71,8 +78,9 @@ SharedLibrary libtestappserver.so :
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
-	DesktopSettings.cpp
+	DesktopListener.cpp
 	DirectWindowInfo.cpp
+	DrawingEngine.cpp
 	DrawState.cpp
 	FontCache.cpp
 	FontCacheEntry.cpp
@@ -93,27 +101,34 @@ SharedLibrary libtestappserver.so :
 	SystemPalette.cpp
 
 	# drawing
+	drawing_support.cpp
 	PatternHandler.cpp
 
 #	trace.c
 
 	# libraries
-	: be libpainter.a libtextencoding.so libfreetype.so libshared.a
+	: be libpainter.a libagg.a libtextencoding.so libfreetype.so libshared.a
 ;
 
 AddResources test_app_server : app_server.rdef ;
 
 Server test_app_server :
 	# Misc. Sources
-	Decorator.cpp
 	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
 	MessageLooper.cpp
 
+	# Decorator
+	Decorator.cpp
+	DecorManager.cpp
+	DefaultDecorator.cpp
+	DefaultWindowBehaviour.cpp
+	MagneticBorder.cpp
+	WindowBehaviour.cpp
+
 	# Manager Classes
 	BitmapManager.cpp
-	DecorManager.cpp
 	InputManager.cpp
 	ScreenManager.cpp
 
@@ -129,12 +144,11 @@ Server test_app_server :
 	BitmapBuffer.cpp
 	BitmapDrawingEngine.cpp
 	drawing_support.cpp
-	DrawingEngine.cpp
 	MallocBuffer.cpp
 
+	DesktopSettings.cpp
 	VirtualScreen.cpp
 	BitmapHWInterface.cpp
-	DefaultDecorator.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
 	RegionPool.cpp
@@ -147,11 +161,19 @@ Server test_app_server :
 	Workspace.cpp
 	WorkspacesView.cpp
 
+	# stack and tile
+	SATDecorator.cpp
+	SATGroup.cpp
+	SATWindow.cpp
+	StackAndTile.cpp
+	Stacking.cpp
+	Tiling.cpp
+
 	# libraries
 	:
-	z libtestappserver.so libpainter.a be
-	libhwinterface.so libhwinterfaceimpl.so
-	libagg.a libfreetype.so libtextencoding.so
+	z libtestappserver.so be
+	libhwinterface.so libhwinterfaceimpl.so liblinprog.a
+	libfreetype.so libtextencoding.so
 	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;
 
@@ -194,6 +216,7 @@ SubInclude HAIKU_TOP src tests servers app menu_crash ;
 SubInclude HAIKU_TOP src tests servers app no_pointer_history ;
 SubInclude HAIKU_TOP src tests servers app painter ;
 SubInclude HAIKU_TOP src tests servers app playground ;
+SubInclude HAIKU_TOP src tests servers app pulsed_drawing ;
 SubInclude HAIKU_TOP src tests servers app regularapps ;
 SubInclude HAIKU_TOP src tests servers app resize_limits ;
 SubInclude HAIKU_TOP src tests servers app scrollbar ;

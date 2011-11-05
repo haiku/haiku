@@ -19,6 +19,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <MailDaemon.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -72,7 +73,7 @@ BMailSettings::Save(bigtime_t /*timeout*/)
 	if (result < B_OK)
 		return result;
 
-	BMessenger("application/x-vnd.Be-POST").SendMessage('mrrs');
+	BMessenger(B_MAIL_DAEMON_SIGNATURE).SendMessage('mrrs');
 
 	return B_OK;
 }
@@ -224,7 +225,7 @@ BMailSettings::SetStatusWindowWorkspaces(int32 workspace)
 
 	BMessage msg('wsch');
 	msg.AddInt32("StatusWindowWorkSpace",workspace);
-	BMessenger("application/x-vnd.Be-POST").SendMessage(&msg);
+	BMessenger(B_MAIL_DAEMON_SIGNATURE).SendMessage(&msg);
 }
 
 
@@ -243,7 +244,7 @@ BMailSettings::SetStatusWindowLook(int32 look)
 
 	BMessage msg('lkch');
 	msg.AddInt32("StatusWindowLook", look);
-	BMessenger("application/x-vnd.Be-POST").SendMessage(&msg);
+	BMessenger(B_MAIL_DAEMON_SIGNATURE).SendMessage(&msg);
 }
 
 

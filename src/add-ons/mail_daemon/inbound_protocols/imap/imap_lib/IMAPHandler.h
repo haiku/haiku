@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2011, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -74,10 +74,10 @@ private:
 
 
 struct MinMessage {
-				MinMessage();
+	MinMessage();
 
-	int32		uid;
-	int32		flags;
+	int32	uid;
+	int32	flags;
 };
 
 
@@ -99,6 +99,7 @@ public:
 	static	bool				ParseMinMessage(const BString& response,
 									MinMessage& minMessage);
 	static	int32				ExtractFlags(const BString& response);
+
 private:
 			int32				fMessage;
 			int32				fEndMessage;
@@ -169,6 +170,7 @@ public:
 			bool				Handle(const BString& response);
 
 	static	BString				GenerateFlagList(int32 flags);
+
 private:
 			int32				fMessage;
 			int32				fFlags;
@@ -183,6 +185,7 @@ public:
 
 			BString				Command();
 			bool				Handle(const BString& response);
+
 private:
 			BPositionIO&		fMessageData;
 			off_t				fDataSize;
@@ -287,15 +290,14 @@ public:
 			BString				Command();
 			bool				Handle(const BString& response);
 
-			double				UsedStorage();
-			double				TotalStorage();
+			uint64				UsedStorage();
+			uint64				TotalStorage();
 private:
 			BString				fMailboxName;
 
-			double				fUsedStorage;
-			double				fTotalStorage;
+			uint64				fUsedStorage;
+			uint64				fTotalStorage;
 };
-
 
 
 #endif // IMAP_HANDLER_H

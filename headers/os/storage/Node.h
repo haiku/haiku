@@ -14,13 +14,6 @@ class BString;
 struct entry_ref;
 
 
-//! Reference structure to a particular vnode on a particular device
-/*! <b>node_ref</b> - A node reference.
-
-	@author <a href="mailto:tylerdauwalder@users.sf.net">Tyler Dauwalder</a>
-	@author Be Inc.
-	@version 0.0.0
-*/
 struct node_ref {
 	node_ref();
 	node_ref(const node_ref &ref);
@@ -34,17 +27,6 @@ struct node_ref {
 };
 
 
-//! A BNode represents a chunk of data in the filesystem.
-/*! The BNode class provides an interface for manipulating the data and attributes
-	belonging to filesystem entries. The BNode is unaware of the name that refers
-	to it in the filesystem (i.e. its entry); a BNode is solely concerned with
-	the entry's data and attributes.
-
-
-	@author <a href='mailto:tylerdauwalder@users.sf.net'>Tyler Dauwalder</a>
-	@version 0.0.0
-
-*/
 class BNode : public BStatable {
 public:
 	BNode();

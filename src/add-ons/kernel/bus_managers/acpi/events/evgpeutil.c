@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -236,6 +236,51 @@ AcpiEvValidGpeEvent (
     }
 
     return (FALSE);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiEvGetGpeDevice
+ *
+ * PARAMETERS:  GPE_WALK_CALLBACK
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Matches the input GPE index (0-CurrentGpeCount) with a GPE
+ *              block device. NULL if the GPE is one of the FADT-defined GPEs.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiEvGetGpeDevice (
+    ACPI_GPE_XRUPT_INFO     *GpeXruptInfo,
+    ACPI_GPE_BLOCK_INFO     *GpeBlock,
+    void                    *Context)
+{
+    ACPI_GPE_DEVICE_INFO    *Info = Context;
+
+
+    /* Increment Index by the number of GPEs in this block */
+
+    Info->NextBlockBaseIndex += GpeBlock->GpeCount;
+
+    if (Info->Index < Info->NextBlockBaseIndex)
+    {
+        /*
+         * The GPE index is within this block, get the node. Leave the node
+         * NULL for the FADT-defined GPEs
+         */
+        if ((GpeBlock->Node)->Type == ACPI_TYPE_DEVICE)
+        {
+            Info->GpeDevice = GpeBlock->Node;
+        }
+
+        Info->Status = AE_OK;
+        return (AE_CTRL_END);
+    }
+
+    return (AE_OK);
 }
 
 

@@ -5,9 +5,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 /*!	API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
 	rendering pipe-lines for stroke, fills, bitmap and text rendering.
 */
+
 
 #include "Painter.h"
 
@@ -81,8 +83,88 @@ using std::nothrow;
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 #define CHECK_CLIPPING_NO_RETURN	if (!fValidClipping) return;
 
+// Defines for SIMD support.
+#define APPSERVER_SIMD_MMX	(1 << 0)
+#define APPSERVER_SIMD_SSE	(1 << 1)
 
-// constructor
+// Prototypes for assembler routines
+extern "C" {
+	void bilinear_scale_xloop_mmxsse(const uint8* src, void* dst,
+		void* xWeights, uint32 xmin, uint32 xmax, uint32 wTop, uint32 srcBPR);
+}
+
+static uint32 detect_simd();
+
+static uint32 sSIMDFlags = detect_simd();
+
+
+/*!	Detect SIMD flags for use in AppServer. Checks all CPUs in the system
+	and chooses the minimum supported set of instructions.
+*/
+static uint32
+detect_simd()
+{
+#if __INTEL__
+	// Only scan CPUs for which we are certain the SIMD flags are properly
+	// defined.
+	const char* vendorNames[] = {
+		"GenuineIntel",
+		"AuthenticAMD",
+		"CentaurHauls", // Via CPUs, MMX and SSE support
+		"RiseRiseRise", // should be MMX-only
+		"CyrixInstead", // MMX-only, but custom MMX extensions
+		"GenuineTMx86", // MMX and SSE
+		0
+	};
+
+	system_info systemInfo;
+	if (get_system_info(&systemInfo) != B_OK)
+		return 0;
+
+	// We start out with all flags set and end up with only those flags
+	// supported across all CPUs found.
+	uint32 systemSIMD = 0xffffffff;
+
+	for (int32 cpu = 0; cpu < systemInfo.cpu_count; cpu++) {
+		cpuid_info cpuInfo;
+		get_cpuid(&cpuInfo, 0, cpu);
+
+		// Get the vendor string and terminate it manually
+		char vendor[13];
+		memcpy(vendor, cpuInfo.eax_0.vendor_id, 12);
+		vendor[12] = 0;
+
+		bool vendorFound = false;
+		for (uint32 i = 0; vendorNames[i] != 0; i++) {
+			if (strcmp(vendor, vendorNames[i]) == 0)
+				vendorFound = true;
+		}
+
+		uint32 cpuSIMD = 0;
+		uint32 maxStdFunc = cpuInfo.regs.eax;
+		if (vendorFound && maxStdFunc >= 1) {
+			get_cpuid(&cpuInfo, 1, 0);
+			uint32 edx = cpuInfo.regs.edx;
+			if (edx & (1 << 23))
+				cpuSIMD |= APPSERVER_SIMD_MMX;
+			if (edx & (1 << 25))
+				cpuSIMD |= APPSERVER_SIMD_SSE;
+		} else {
+			// no flags can be identified
+			cpuSIMD = 0;
+		}
+		systemSIMD &= cpuSIMD;
+	}
+	return systemSIMD;
+#else	// !__INTEL__
+	return 0;
+#endif
+}
+
+
+// #pragma mark -
+
+
 Painter::Painter()
 	:
 	fBuffer(),
@@ -2314,7 +2396,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 	int codeSelect = kUseDefaultVersion;
 
 	uint32 neededSIMDFlags = APPSERVER_SIMD_MMX | APPSERVER_SIMD_SSE;
-	if ((gAppServerSIMDFlags & neededSIMDFlags) == neededSIMDFlags)
+	if ((sSIMDFlags & neededSIMDFlags) == neededSIMDFlags)
 		codeSelect = kUseSIMDVersion;
 	else {
 		if (xScale == yScale && (xScale == 1.5 || xScale == 2.0

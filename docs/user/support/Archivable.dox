@@ -16,15 +16,13 @@
  */
 
 
-/*!
-	\file Archivable.h
+/*!	\file Archivable.h
 	\brief Provides the BArchivable interface and declares the BArchiver and
 		BUnarchiver classes.
 */
 
 
-/*!
-	\class BArchivable
+/*!	\class BArchivable
 	\ingroup support
 	\ingroup libbe
 	\brief Interface for objects that can be archived into a BMessage.
@@ -100,21 +98,23 @@
 	\param into The message you store your object in.
 	\param deep If \c true, all children of this object should be archived as
 		well.
-	\retval B_OK The archiving succeeded.
-	\retval "error codes" The archiving did not succeed.
+
+	\retval B_OK The archive operation was successful.
+	\retval B_BAD_VALUE \c NULL \a archive message.
+	\retval B_ERROR The archive operation failed.
 */
 
 
 /*!
 	\fn static BArchivable* BArchivable::Instantiate(BMessage* archive)
 	\brief Static member to restore objects from messages.
-	
+
 	You should always check that the \a archive argument actually corresponds to
 	your class. The automatic functions, such as #instantiate_object() and
 	BUnarchiver::InstantiateObject() will not choose the wrong class but manual
 	calls to this member might be faulty. You can verify that \c archive
 	stores an object of your calss with the validate_instantiation() function.
-	
+
 	\param archive The message with the data of the object to restore.
 	\retval You should return a pointer to the object you create with
 		\c archive, or \c NULL if unarchival fails.
@@ -129,15 +129,22 @@
 
 /*!
 	\fn virtual status_t BArchivable::Perform(perform_code d, void* arg)
-	\brief Internal method.
+	\brief Perform some action (Internal method defined for binary
+		compatibility purposes).
+
 	\internal This method is defined for binary compatibility purposes, it is
 		used to ensure that the correct AllUnarchived() and AllArchived()
 		methods are called for objects, as those methods are new to Haiku.
+
+	\param d The perform code.
+	\param arg A pointer to store some data.
+
+	\returns A status code.
 */
 
 
 /*!
-	\fn virtual	status_t BArchivable::AllUnarchived(const BMessage* archive)
+	\fn virtual status_t BArchivable::AllUnarchived(const BMessage* archive)
 	\brief Method relating to the use of \c BUnarchiver.
 
 	This hook function is called triggered in the BUnarchiver::Finish() method.
@@ -146,32 +153,31 @@
 	Implementations of this method should call the implementation of
 	their parent class, the same as for the Archive() method.
 
-	\note To guarantee that your AllUnarchived() method will be called during
-		unarchival, you must create a BUnarchiver object in your archive
-		constructor.
+	\warning To guarantee that your AllUnarchived() method will be called
+		during unarchival, you must create a BUnarchiver object in your
+		archive constructor.
 
 	\see BUnarchiver, BUnarchiver::Finish()
 */
 
 
-/*!
-	\fn virtual status_t BArchivable::AllArchived(BMessage* into) const
+/*! \fn virtual status_t BArchivable::AllArchived(BMessage* into) const
 	\brief Method relating to the use of \c BArchiver.
 
 	This hook function is called once the first BArchiver that was created in
-	an archiving session is either destroyed, or has its \c Finish() method
+	an archiving session is either destroyed, or has its Finish() method
 	called. Implementations of this method can be used, in conjunction with
 	BArchiver::IsArchived(), to reference objects in your archive that you
 	do not own, depending on whether or not those objects were archived by their
 	owners. Implementations of this method should call the implementation of
 	their parent class, the same as for the Archive() method.
 
-	\note To guarantee that your AllArchived() method will be called during
-		archival, you must create a BArchiver object in your Archive()
-		implementation.
+	\warning To guarantee that your AllArchived() method will be called
+		during archival, you must create a BArchiver object in your
+		Archive() implementation.
 
-	\note You should archive any objects you own in your Archive() method 
-		implementation, \b NOT your AllArchived() method.
+	\warning You should archive any objects you own in your Archive()
+		method implementation, and \b NOT your AllArchived() method.
 
 	\see BArchiver BArchiver::Finish()
 */
@@ -184,8 +190,7 @@
 */
 
 
-/*!
-	\typedef typedef BArchivable* (*instantiation_func)(BMessage*)
+/*!	\typedef typedef BArchivable* (*instantiation_func)(BMessage*)
 	\brief Internal definition of a function that can instantiate objects that
 		have been created with the BArchivable API.
 */

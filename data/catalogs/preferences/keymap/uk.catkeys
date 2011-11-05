@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Keymap	3858687220
+1	ukrainian	x-vnd.Haiku-Keymap	1259868356
 (Current)	Keymap window		(Активна)
 Acute trigger	Keymap window		Акюте
 Circumflex trigger	Keymap window		Ціркумфлекс
@@ -6,6 +6,7 @@ Diaeresis trigger	Keymap window		Діарезіс
 File	Keymap window		Файл
 Font	Keymap window		Шрифт
 Grave trigger	Keymap window		Апостроф
+Keymap	System name		Розкладка
 Layout	Keymap window		Макет
 Open…	Keymap window		Відкрити…
 Quit	Keymap window		Вихід

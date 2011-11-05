@@ -150,6 +150,7 @@ class BContainerWindow : public BWindow {
 		void AddMimeTypesToMenu();
 		virtual	void MarkAttributeMenu(BMenu *);
 		void MarkAttributeMenu();
+		void MarkArrangeByMenu(BMenu *);
 		BMenuItem *NewAttributeMenuItem(const char *label, const char *name,
 			int32 type, float width, int32 align, bool editable, bool statField);
 		BMenuItem *NewAttributeMenuItem(const char *label, const char *name,
@@ -216,11 +217,12 @@ class BContainerWindow : public BWindow {
 		virtual void AddTrashContextMenus(BMenu *);
 
 		virtual void RepopulateMenus();
+		void PopulateArrangeByMenu(BMenu* );
 
 		virtual	void SetCutItem(BMenu *);
 		virtual	void SetCopyItem(BMenu *);
 		virtual	void SetPasteItem(BMenu *);
-		virtual	void SetCleanUpItem(BMenu *);
+		virtual	void SetArrangeMenu(BMenu *);
 		virtual void SetCloseItem(BMenu *);
 		virtual	void SetupNavigationMenu(const entry_ref *, BMenu *);
 		virtual	void SetupMoveCopyMenus(const entry_ref *, BMenu *);
@@ -268,6 +270,7 @@ class BContainerWindow : public BWindow {
 		BMenu *fAttrMenu;
 		BMenu *fWindowMenu;
 		BMenu *fFileMenu;
+		BMenu *fArrangeByMenu;
 
 		SelectionWindow *fSelectionWindow;
 

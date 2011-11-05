@@ -42,7 +42,7 @@
 #define DEBUG_FILE_MAP					KDEBUG_LEVEL_1
 
 
-// heap
+// heap / slab
 
 // Initialize newly allocated memory with something non zero.
 #define PARANOID_KERNEL_MALLOC			KDEBUG_LEVEL_2
@@ -56,6 +56,9 @@
 // Store size, thread and team info at the end of each allocation block.
 // Enables the "allocations*" debugger commands.
 #define KERNEL_HEAP_LEAK_CHECK			0
+
+// Enables the "allocations*" debugger commands for the slab.
+#define SLAB_ALLOCATION_TRACKING		0
 
 
 // interrupts

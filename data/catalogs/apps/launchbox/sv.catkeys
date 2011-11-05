@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	1440389990
+1	swedish	x-vnd.Haiku-LaunchBox	3172696206
 Add button here	LaunchBox		Lägg till knapp
 Auto-raise	LaunchBox		Upphöj automatiskt
 Bummer	LaunchBox		Hoppsan
@@ -7,9 +7,8 @@ Clear button	LaunchBox		Rensa knapp
 Clone	LaunchBox		Klona
 Close	LaunchBox		Stäng
 Description for '%3'	LaunchBox		Beskrivning för '%3'
-Failed to launch '%1'.\n\nError: 	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
+Failed to launch '%1'.\n\nError:	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
 Failed to launch 'something',error in Pad data.	LaunchBox		Misslyckades att starta 'någonting'. Fel på knappen.
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Misslyckades att starta programmet med signaturen '%2'.\n\nFel:
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:
 Horizontal layout	LaunchBox		Horisontal utformning
 Icon size	LaunchBox		Ikonstorlek
@@ -30,5 +29,6 @@ Show on all workspaces	LaunchBox		Visa på alla arbetsytor
 Show window border	LaunchBox		Visa fönsterkant
 Vertical layout	LaunchBox		Vertikal utformning
 You can drag an icon here.	LaunchBox		Du kan dra en ikon hit.
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunde inte starta programmet med signaturen '%2'.\n\nFel:
 last chance	LaunchBox		sista chansen
 launch popup	LaunchBox		starta popup

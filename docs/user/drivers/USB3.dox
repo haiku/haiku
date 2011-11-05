@@ -9,218 +9,218 @@
  */
 
 /*!
-  \file USB3.h
-  \ingroup drivers
-  \brief Interface for the USB module.
+	\file USB3.h
+	\ingroup drivers
+	\brief Interface for the USB module.
 */
 
 /*! 
-  \typedef struct usb_module_info usb_module_info
-  \brief The main interface object. See the usb_module_info documentation.
+	\typedef struct usb_module_info usb_module_info
+	\brief The main interface object. See the usb_module_info documentation.
 */
 
 /*!
-  \typedef uint32 usb_id
-  \brief Uniquely identify various USB objects that are used in the module.
+	\typedef uint32 usb_id
+	\brief Uniquely identify various USB objects that are used in the module.
 */
 
 /*!
-  \typedef usb_id usb_device
-  \brief Uniquely identify USB devices.
+	\typedef usb_id usb_device
+	\brief Uniquely identify USB devices.
 */
 
 /*!
-  \typedef usb_id usb_interface
-  \brief Uniquely identify USB interfaces.
+	\typedef usb_id usb_interface
+	\brief Uniquely identify USB interfaces.
 */
 
 /*!
-  \typedef usb_id usb_pipe
-  \brief Uniquely identify USB pipes.
+	\typedef usb_id usb_pipe
+	\brief Uniquely identify USB pipes.
 */
 
 /*!
-  \typedef struct usb_endpoint_info usb_endpoint_info
-  \brief Container for USB endpoint descriptors.
-  \see Documentation for usb_endpoint_info.
+	\typedef struct usb_endpoint_info usb_endpoint_info
+	\brief Container for USB endpoint descriptors.
+	\see Documentation for usb_endpoint_info.
 */
 
 /*!
-  \typedef struct usb_interface_info usb_interface_info
-  \brief Container for USB interface descriptors.
-  \see Documentation for usb_interface_info.
+	\typedef struct usb_interface_info usb_interface_info
+	\brief Container for USB interface descriptors.
+	\see Documentation for usb_interface_info.
 */
 
 /*!
-  \typedef struct usb_interface_list usb_interface_list
-  \brief Container that holds a list of USB interface descriptors.
-  \see Documentation for usb_interface_list.
+	\typedef struct usb_interface_list usb_interface_list
+	\brief Container that holds a list of USB interface descriptors.
+	\see Documentation for usb_interface_list.
 */
 
 /*!
-  \typedef struct usb_configuration_info usb_configuration_info
-  \brief Container for USB configuration descriptors.
-  \see Documentation for usb_configuration_info.
+	\typedef struct usb_configuration_info usb_configuration_info
+	\brief Container for USB configuration descriptors.
+	\see Documentation for usb_configuration_info.
 */
 
 ///// usb_notify_hooks /////
 
 /*!
-  \struct usb_notify_hooks
-  \brief Hooks that the USB stack can callback in case of events.
+	\struct usb_notify_hooks
+	\brief Hooks that the USB stack can callback in case of events.
 */
 
 /*!
-  \fn status_t (*usb_notify_hooks::device_added)(usb_device device, void **cookie)
-  \brief Called by the stack in case a device is added.
-  
-  Once you have registered hooks using the 
-  usb_module_info::install_notify() method, this hook will be called as soon as
-  a device is inserted that matches your provided usb_support_descriptor.
-  
-  \param device A unique id that identifies this USB device.
-  \param[in] cookie You can store a pointer to an object in this variable.
-    When the device is removed, this cookie will be provided to you.
-  \return You should return \c B_OK in case of success. The USB stack will then
-    request the kernel to republish your device names so that the new device
-    will be shown in the \c /dev tree. If you return an error value, the 
-    \a device id will become invalid and you will not be notified if this
-    device is removed.
-  \see device_removed()
+	\fn status_t (*usb_notify_hooks::device_added)(usb_device device, void **cookie)
+	\brief Called by the stack in case a device is added.
+	
+	Once you have registered hooks using the 
+	usb_module_info::install_notify() method, this hook will be called as soon as
+	a device is inserted that matches your provided usb_support_descriptor.
+	
+	\param device A unique id that identifies this USB device.
+	\param[in] cookie You can store a pointer to an object in this variable.
+	  When the device is removed, this cookie will be provided to you.
+	\return You should return \c B_OK in case of success. The USB stack will then
+	  request the kernel to republish your device names so that the new device
+	  will be shown in the \c /dev tree. If you return an error value, the 
+	  \a device id will become invalid and you will not be notified if this
+	  device is removed.
+	\see device_removed()
 */
 
 /*!
-  \var status_t (*usb_notify_hooks::device_removed)(void *cookie)
-  \brief Called by the stack in case a device you are using is removed.
-  
-  If you have accepted a device in the device_added() hook, this hook will
-  be called as soon as the device is removed.
-  
-  \param cookie The cookie you provided in the device_added() hook. Make sure
-    that you free the cookie if necessary.
-  \return Currently the return value of this hook is ignored. It is recommended
-    to return \c B_OK though.
+	\var status_t (*usb_notify_hooks::device_removed)(void *cookie)
+	\brief Called by the stack in case a device you are using is removed.
+	
+	If you have accepted a device in the device_added() hook, this hook will
+	be called as soon as the device is removed.
+	
+	\param cookie The cookie you provided in the device_added() hook. Make sure
+	  that you free the cookie if necessary.
+	\return Currently the return value of this hook is ignored. It is recommended
+	  to return \c B_OK though.
 */
-  
+	
 ///// usb_support_descriptor /////
-  
+	
 /*!
-  \struct usb_support_descriptor
-  \brief Description of device descriptor that the driver can handle.
-  
-  Support descriptors can be used to match any form of class, subclass or
-  protocol, or they can be used to match a vendor and/or product.
-  If any field has the value \c 0, it is treated as a wildcard.
-  
-  For example, if you want to watch for all the hubs, which have a device
-  class of \c 0x09, you would pass this descriptor:
-  
-  \code
-  usb_support_descriptor hub_devs = { 9, 0, 0, 0, 0 };
-  \endcode
-  
-  See usb_module_info::register_driver() for more information on how to use
-  this object.
+	\struct usb_support_descriptor
+	\brief Description of device descriptor that the driver can handle.
+	
+	Support descriptors can be used to match any form of class, subclass or
+	protocol, or they can be used to match a vendor and/or product.
+	If any field has the value \c 0, it is treated as a wildcard.
+	
+	For example, if you want to watch for all the hubs, which have a device
+	class of \c 0x09, you would pass this descriptor:
+	
+	\code
+	usb_support_descriptor hub_devs = { 9, 0, 0, 0, 0 };
+	\endcode
+	
+	See usb_module_info::register_driver() for more information on how to use
+	this object.
 */
-  
+	
 /*!
-  \var usb_support_descriptor::dev_class
-  \brief The supported device classes.
-*/
-
-/*!
-  \var usb_support_descriptor::dev_subclass
-  \brief The supported device subclasses.
+	\var usb_support_descriptor::dev_class
+	\brief The supported device classes.
 */
 
 /*!
-  \var usb_support_descriptor::dev_protocol
-  \brief The supported device protocols.
+	\var usb_support_descriptor::dev_subclass
+	\brief The supported device subclasses.
 */
 
 /*!
-  \var usb_support_descriptor::vendor
-  \brief The supported device vendor.
+	\var usb_support_descriptor::dev_protocol
+	\brief The supported device protocols.
 */
 
 /*!
-  \var usb_support_descriptor::product
-  \brief The supported device products.
+	\var usb_support_descriptor::vendor
+	\brief The supported device vendor.
+*/
+
+/*!
+	\var usb_support_descriptor::product
+	\brief The supported device products.
 */
 
 ///// usb_endpoint_info /////
 
 /*!
-  \struct usb_endpoint_info
-  \brief Container for endpoint descriptors and their Haiku USB stack
-    identifiers.
+	\struct usb_endpoint_info
+	\brief Container for endpoint descriptors and their Haiku USB stack
+	  identifiers.
 */
 
 /*!
-  \var usb_endpoint_descriptor *usb_endpoint_info::descr
-  \brief Pointer to the descriptor of the endpoint.
+	\var usb_endpoint_descriptor *usb_endpoint_info::descr
+	\brief Pointer to the descriptor of the endpoint.
 */
 
 /*!
-  \var usb_pipe usb_endpoint_info::handle
-  \brief Handle to use when using the stack to transfer data to and from this
-    endpoint.
+	\var usb_pipe usb_endpoint_info::handle
+	\brief Handle to use when using the stack to transfer data to and from this
+	  endpoint.
 */
 
 ///// usb_interface_info /////
 
 /*!
-  \struct usb_interface_info
-  \brief Container for interface descriptors and their Haiku USB stack
-    identifiers.
+	\struct usb_interface_info
+	\brief Container for interface descriptors and their Haiku USB stack
+	  identifiers.
 */
 
 //! @{
 
 /*!
-  \var usb_interface_descriptor *usb_interface_info::descr
-  \brief Pointer to the descriptor of the interface.
+	\var usb_interface_descriptor *usb_interface_info::descr
+	\brief Pointer to the descriptor of the interface.
 */
 
 /*!
-  \var usb_interface usb_interface_info::handle
-  \brief Handle to use when using the stack to manipulate this interface.
+	\var usb_interface usb_interface_info::handle
+	\brief Handle to use when using the stack to manipulate this interface.
 */
 
 //! @}
 
 /*!
-  \name Endpoints
+	\name Endpoints
 */
 
 //! @{
 
 /*!
-  \var size_t usb_interface_info::endpoint_count
-  \brief The number of endpoints in this interface.
+	\var size_t usb_interface_info::endpoint_count
+	\brief The number of endpoints in this interface.
 */
 
 /*!
-  \var usb_endpoint_info *usb_interface_info::endpoint
-  \brief An array of endpoints that are associated to this interface.
+	\var usb_endpoint_info *usb_interface_info::endpoint
+	\brief An array of endpoints that are associated to this interface.
 */
 
 //! @}
 
 /*!
-  \name Unparsed descriptors
+	\name Unparsed descriptors
 */
 
 //! @{
 
 /*!
-  \var size_t usb_interface_info::generic_count
-  \brief The number of unparsed descriptors in this interface.
+	\var size_t usb_interface_info::generic_count
+	\brief The number of unparsed descriptors in this interface.
 */
 
 /*!
-  \var usb_descriptor **usb_interface_info::generic
-  \brief Unparsed descriptors in this interface.
+	\var usb_descriptor **usb_interface_info::generic
+	\brief Unparsed descriptors in this interface.
 */
 
 //! @}
@@ -228,444 +228,447 @@
 ///// usb_interface_list /////
 
 /*!
-  \struct usb_interface_list
-  \brief List of interfaces available to a configuration.
+	\struct usb_interface_list
+	\brief List of interfaces available to a configuration.
 */
 
 /*!
-  \var size_t usb_interface_list::alt_count
-  \brief Number of available interfaces.
+	\var size_t usb_interface_list::alt_count
+	\brief Number of available interfaces.
 */
 
 /*!
-  \var usb_interface_info *usb_interface_list::alt
-  \brief Array of available interfaces.
+	\var usb_interface_info *usb_interface_list::alt
+	\brief Array of available interfaces.
 */
 
 /*!
-  \var usb_interface_info *usb_interface_list::active
-  \brief Pointer to active interface.
+	\var usb_interface_info *usb_interface_list::active
+	\brief Pointer to active interface.
 */
 
 ///// usb_configuration_info /////
 
 /*!
-  \struct usb_configuration_info
-  \brief Container for a specific configuration descriptor of a device.
+	\struct usb_configuration_info
+	\brief Container for a specific configuration descriptor of a device.
 */
 
 /*!
-  \var usb_configuration_descriptor *usb_configuration_info::descr
-  \brief The configuration descriptor.
+	\var usb_configuration_descriptor *usb_configuration_info::descr
+	\brief The configuration descriptor.
 */
 
 /*!
-  \var size_t usb_configuration_info::interface_count
-  \brief The number of interfaces in this configuration.
+	\var size_t usb_configuration_info::interface_count
+	\brief The number of interfaces in this configuration.
 */
 
 /*!
-  \var usb_interface_list *usb_configuration_info::interface
-  \brief The list of interfaces available to this configuration.
+	\var usb_interface_list *usb_configuration_info::interface
+	\brief The list of interfaces available to this configuration.
 */
 
 ///// usb_iso_packet_descriptor /////
 
 /*!
-  \struct usb_iso_packet_descriptor
-  \brief The descriptor for data packets of isochronous transfers.
+	\struct usb_iso_packet_descriptor
+	\brief The descriptor for data packets of isochronous transfers.
 */
 
 /*!
-  \var int16 usb_iso_packet_descriptor::req_len
-  \brief Length of the request.
+	\var int16 usb_iso_packet_descriptor::request_length
+	\brief Length of the request.
 */
 
 /*!
-  \var int16 usb_iso_packet_descriptor::act_len
-  \brief The USB stack writes the actual transferred length in this variable.
+	\var int16 usb_iso_packet_descriptor::actual_length
+	\brief The USB stack writes the actual transferred length in this variable.
 */
 
 /*!
-  \var status_t	usb_iso_packet_descriptor::status
-  \brief The status of the transfer.
+	\var status_t	usb_iso_packet_descriptor::status
+	\brief The status of the transfer.
 */
-  
+
 ///// usb_callback_func /////
 
 /*!
-  \typedef typedef void (*usb_callback_func)(void *cookie, status_t status, void *data, size_t actualLength)
-  \brief Callback function for asynchronous transfers.
-
-  \param cookie The cookie you supplied when you queued the transfer.
-  \param status The status of the transfer. This is one of the following:
-    <table>
-      <tr>
-        <td><em>B_OK</em></td><td>The transfer succeeded.</td>
-      </tr>
-      <tr>
-        <td><em>B_CANCELED</em></td><td>The transfer was cancelled by the user
-          via a usb_module_info::cancel_queued_transfers() call.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_MULTIPLE_ERRORS</em></td><td>More than one of the errors
-          below occurred. Unfortunately, the stack cannot give you more
-          information.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_STALLED</em></td><td>The endpoint is stalled. You can use
-          usb_module_info::clear_feature() method with the associated pipe and
-          the USB_FEATURE_ENDPOINT_HALT arguments.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_DATA_OVERRUN</em></td><td>Incoming transfer: more data
-          flowing in than the size of the buffer.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_DATA_UNDERRUN</em></td><td>Outgoing transfer: more data
-          is flowing out than the endpoint accepts.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_CRC_ERROR</em></td><td>The internal data consistency
-          checks of the USB protocol failed. It is best to retry. If you keep
-          on getting this error there might be something wrong with the
-          device.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_UNEXPECTED_PID</em></td><td>There was an internal error.
-          You should retry your transfer.</td>
-      </tr>
-      <tr>
-        <td><em>B_DEV_FIFO_OVERRUN</em></td><td>internal error.
-          You should retry your transfer.</td>
-      </tr>
-      <tr>
-         <td><em>B_DEV_FIFO_UNDERRUN</em></td><td>There was an internal error.
-           You should retry your transfer.</td>
-      </tr>
-    </table>
-  \param data The provided buffer.
-  \param actualLength The amount of bytes read or written during the transfer.
+	\typedef typedef void (*usb_callback_func)(void *cookie, status_t status, void *data, size_t actualLength)
+	\brief Callback function for asynchronous transfers.
+	 \param cookie The cookie you supplied when you queued the transfer.
+	\param status The status of the transfer. This is one of the following:
+	  <table>
+	    <tr>
+	      <td><em>B_OK</em></td><td>The transfer succeeded.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_CANCELED</em></td><td>The transfer was cancelled by the user
+	        via a usb_module_info::cancel_queued_transfers() call.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_MULTIPLE_ERRORS</em></td><td>More than one of the errors
+	        below occurred. Unfortunately, the stack cannot give you more
+	        information.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_STALLED</em></td><td>The endpoint is stalled. You can
+	        use usb_module_info::clear_feature() method with the associated pipe
+	        and the USB_FEATURE_ENDPOINT_HALT arguments.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_DATA_OVERRUN</em></td><td>Incoming transfer: more data
+	        flowing in than the size of the buffer.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_DATA_UNDERRUN</em></td><td>Outgoing transfer: more data
+	        is flowing out than the endpoint accepts.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_CRC_ERROR</em></td><td>The internal data consistency
+	        checks of the USB protocol failed. It is best to retry. If you keep
+	        on getting this error there might be something wrong with the
+	        device.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_UNEXPECTED_PID</em></td><td>There was an internal error.
+	        You should retry your transfer.</td>
+	    </tr>
+	    <tr>
+	      <td><em>B_DEV_FIFO_OVERRUN</em></td><td>internal error.
+	        You should retry your transfer.</td>
+	    </tr>
+	    <tr>
+	       <td><em>B_DEV_FIFO_UNDERRUN</em></td><td>There was an internal error.
+	         You should retry your transfer.</td>
+	    </tr>
+	  </table>
+	\param data The provided buffer.
+	\param actualLength The amount of bytes read or written during the transfer.
 */
 
 ///// usb_module_info /////
 
 /*!
-  \struct usb_module_info
-  \brief Interface for drivers to interact with Haiku's USB stack.
+	\struct usb_module_info
+	\brief Interface for drivers to interact with Haiku's USB stack.
 */
 
 /*!
-  \var usb_module_info::binfo
-  \brief Instance of the bus_manager_info object.
+	\var usb_module_info::binfo
+	\brief Instance of the bus_manager_info object.
 */
 
 /*!
-  \fn status_t (*usb_module_info::register_driver)(const char *driverName, const usb_support_descriptor *supportDescriptors, size_t supportDescriptorCount, const char *optionalRepublishDriverName)
-  \brief Register your driver.
-  
-  To let the USB stack know that a driver is available to support devices, a
-  driver needs to register itself first. To let the stack know about devices
-  it needs to notify the driver of, have a look at usb_support_descriptor.
-  
-  It is possible to supply a list of support constructors. You should allocate
-  an array of support constructors and give the amount of constructors in the
-  array using the \a supportDescriptorCount parameter.
-  
-  In case your driver supports all devices or, more likely, you want to
-  monitor all devices plugged in and removed, it is safe to pass \c NULL to the
-  \a supportDescriptors paramater and zero (0) to \a supportDescriptorCount.
-  
-  \param driverName A unique name that identifies your driver. Avoid names like
-    \c webcam or \c mouse, instead use vendor names and device types to avoid
-    nameclashes. The install_notify() and uninstall_notify() functions use the
-    driver name as an identifier.
-  \param supportDescriptors An array of the type usb_support_descriptor. Pass
-    the amount of objects in the next parameter.
-  \param supportDescriptorCount The number of objects in the array supplied in
-    the previous parameter.
-  \param optionalRepublishDriverName Unused parameter. You should pass \c NULL.
-  \retval B_OK The driver is registered. You can now call install_notify()
-  \retval B_BAD_VALUE You passed \c NULL as \a driverName.
-  \retval B_ERROR General internal error in the USB stack. You may retry the
-    request in this case.
-  \retval B_NO_MEMORY Error allocating some internal objects. The system is
-    out of memory.
+	\fn status_t (*usb_module_info::register_driver)(const char *driverName, const usb_support_descriptor *supportDescriptors, size_t supportDescriptorCount, const char *optionalRepublishDriverName)
+	\brief Register your driver.
+	
+	To let the USB stack know that a driver is available to support devices, a
+	driver needs to register itself first. To let the stack know about devices
+	it needs to notify the driver of, have a look at usb_support_descriptor.
+	
+	It is possible to supply a list of support constructors. You should allocate
+	an array of support constructors and give the amount of constructors in the
+	array using the \a supportDescriptorCount parameter.
+	
+	In case your driver supports all devices or, more likely, you want to
+	monitor all devices plugged in and removed, it is safe to pass \c NULL to
+	the \a supportDescriptors paramater and zero (0) to
+	\a supportDescriptorCount.
+	
+	\param driverName A unique name that identifies your driver. Avoid names
+	like \c webcam or \c mouse, instead use vendor names and device types to
+	avoid nameclashes. The install_notify() and uninstall_notify() functions use
+	the driver name as an identifier.
+
+	\param supportDescriptors An array of the type usb_support_descriptor. Pass
+		the amount of objects in the next parameter.
+	\param supportDescriptorCount The number of objects in the array supplied in
+		the previous parameter.
+	\param optionalRepublishDriverName Unused parameter. You should pass
+		\c NULL.
+
+	\retval B_OK The driver is registered. You can now call install_notify()
+	\retval B_BAD_VALUE You passed \c NULL as \a driverName.
+	\retval B_ERROR General internal error in the USB stack. You may retry the
+	  request in this case.
+	\retval B_NO_MEMORY Error allocating some internal objects. The system is
+	  out of memory.
 */
 
 /*!
-  \fn status_t (*usb_module_info::install_notify)(const char *driverName, const usb_notify_hooks *hooks)
-  \brief Install notify hooks for your driver.
-  
-  After your driver is registered, you need to pass hooks to your driver that
-  are called whenever a device that matches your \link usb_support_descriptor
-  support descriptor \endlink . 
-  
-  As soon as the hooks are installed, you'll receive callbacks for devices that
-  are already attached; so make sure your driver is initialized properly when
-  calling this method. 
-  
-  \param driverName The name you passed in register_driver(). 
-  \param hooks The hooks the stack should call in case the status of devices
-    that match your support descriptor changes.
-  \retval B_OK Hooks are installed succesfully.
-  \retval B_NAME_NOT_FOUND Invalid \a driverName. 
-  
-  \see usb_notify_hooks for information on how your hooks should behave.
-  \see uninstall_notify()
+	\fn status_t (*usb_module_info::install_notify)(const char *driverName, const usb_notify_hooks *hooks)
+	\brief Install notify hooks for your driver.
+	
+	After your driver is registered, you need to pass hooks to your driver that
+	are called whenever a device that matches your \link usb_support_descriptor
+	support descriptor \endlink . 
+	
+	As soon as the hooks are installed, you'll receive callbacks for devices
+	that are already attached; so make sure your driver is initialized properly
+	when calling this method. 
+	
+	\param driverName The name you passed in register_driver(). 
+	\param hooks The hooks the stack should call in case the status of devices
+		that match your support descriptor changes.
+
+	\retval B_OK Hooks are installed succesfully.
+	\retval B_NAME_NOT_FOUND Invalid \a driverName. 
+	
+	\see usb_notify_hooks for information on how your hooks should behave.
+	\see uninstall_notify()
 */
 
 /*!
-  \fn status_t (*usb_module_info::uninstall_notify)(const char *driverName)
-  \brief Uninstall notify hooks for your driver.
-  
-  If your driver needs to stop, you can uninstall the notifier hooks. This will
-  clear the stored hooks in the driver, and you will not receive any
-  notifications when new devices are attached. This method will also call
-  usb_notify_hooks::device_removed() for all the devices that you are using and
-  all the stack's resources that are allocated to your driver are cleared.
-  
-  \param driverName The name you passed in register_driver().
-  \retval B_OK Hooks are uninstalled.
-  \retval B_NAME_NOT_FOUND Invalid \a driverName.
+	\fn status_t (*usb_module_info::uninstall_notify)(const char *driverName)
+	\brief Uninstall notify hooks for your driver.
+	
+	If your driver needs to stop, you can uninstall the notifier hooks. This
+	will clear the stored hooks in the driver, and you will not receive any
+	notifications when new devices are attached. This method will also call
+	usb_notify_hooks::device_removed() for all the devices that you are using
+	and all the stack's resources that are allocated to your driver are
+	cleared.
+	
+	\param driverName The name you passed in register_driver().
+	\retval B_OK Hooks are uninstalled.
+	\retval B_NAME_NOT_FOUND Invalid \a driverName.
 */
 
 /*!
-  \fn const usb_device_descriptor *(*usb_module_info::get_device_descriptor)(usb_device device)
-  \brief Get the device descriptor.
-  
-  \param device The id of the device you want to query. 
-  \return The standard usb_device_descriptor, or \c NULL in case of an error.
+	\fn const usb_device_descriptor *(*usb_module_info::get_device_descriptor)(usb_device device)
+	\brief Get the device descriptor.
+	
+	\param device The id of the device you want to query. 
+	\return The standard usb_device_descriptor, or \c NULL in case of an error.
 */
 
 /*!
-  \fn const usb_configuration_info	*(*usb_module_info::get_nth_configuration)(usb_device device, uint index)
-  \brief Get a configuration descriptor by index.
-  
-  \param device The id of the device you want to query.
-  \param index The (zero based) offset of the list of configurations.
-  \return This will normally return the usb_configuration_info with the
-    standard usb configuration descriptor.  \c NULL will be returned if the
-    \a id is invalid or the \a index is out of bounds.
+	\fn const usb_configuration_info	*(*usb_module_info::get_nth_configuration)(usb_device device, uint index)
+	\brief Get a configuration descriptor by index.
+	
+	\param device The id of the device you want to query.
+	\param index The (zero based) offset of the list of configurations.
+	\return This will normally return the usb_configuration_info with the
+	  standard usb configuration descriptor.  \c NULL will be returned if the
+	  \a id is invalid or the \a index is out of bounds.
 */
 
 /*!
-  \fn const usb_configuration_info	*(*usb_module_info::get_configuration)(usb_device device)
-  \brief Get the current configuration.
-  
-  \param id The id of the device you want to query.
-  \retval This will return usb_configuration_info with the standard usb
-    configuration descriptor, or it will return\c NULL if the \a id is invalid.
+	\fn const usb_configuration_info	*(*usb_module_info::get_configuration)(usb_device device)
+	\brief Get the current configuration.
+	
+	\param id The id of the device you want to query.
+	\retval This will return usb_configuration_info with the standard usb
+	  configuration descriptor, or it will return\c NULL if the \a id is invalid.
 */
 
 /*!
-  \fn status_t (*usb_module_info::set_configuration)(usb_device device, const usb_configuration_info *configuration)
-  \brief Change the current configuration.
-  
-  Changing the configuration will destroy all the current endpoints. If the
-  \a configuration points to the current configuration, the request will be
-  ignored and \c B_OK will be returned. 
-  
-  \param device The id of the device you want to query.
-  \param configuration The pointer to the new configuration you want to set.
-  \retval B_OK The new configuration is set succesfully.
-  \retval B_DEV_INVALID_PIPE The \a device parameter is invalid.
-  \retval B_BAD_VALUE The configuration does not exist.
-  
-  \note This method also allows you to completely unconfigure the device, which
-    means that all the current endpoints, pipes and transfers will be freed.
-    Pass \c NULL to the parameter \a configuration if you want to do that.
+	\fn status_t (*usb_module_info::set_configuration)(usb_device device, const usb_configuration_info *configuration)
+	\brief Change the current configuration.
+	
+	Changing the configuration will destroy all the current endpoints. If the
+	\a configuration points to the current configuration, the request will be
+	ignored and \c B_OK will be returned. 
+	
+	\param device The id of the device you want to query.
+	\param configuration The pointer to the new configuration you want to set.
+	\retval B_OK The new configuration is set succesfully.
+	\retval B_DEV_INVALID_PIPE The \a device parameter is invalid.
+	\retval B_BAD_VALUE The configuration does not exist.
+	
+	\note This method also allows you to completely unconfigure the device, which
+	  means that all the current endpoints, pipes and transfers will be freed.
+	  Pass \c NULL to the parameter \a configuration if you want to do that.
 */
 
 /*!
-  \fn status_t (*usb_module_info::set_alt_interface)(usb_device device, const usb_interface_info *interface)
-  \brief Set an alternative interface. Not implemented.
-  
-  This method currently always returns \c B_ERROR.
+	\fn status_t (*usb_module_info::set_alt_interface)(usb_device device, const usb_interface_info *interface)
+	\brief Set an alternative interface. Not implemented.
+	
+	This method currently always returns \c B_ERROR.
 */
 
 /*!
-  \fn status_t (*usb_module_info::set_feature)(usb_id handle, uint16 selector)
-  \brief Convenience function for standard control pipe set feature requests.  
-
-  Both the set_feature() and clear_feature() requests work on all the Stack's
-  objects: devices, interfaces and pipes.
-  
-  \param handle The object you want to query.
-  \param selector The value you want to pass in the feature request. 
-  \return \c B_OK in case the request succeeded and the device responded
-    positively, or an error code in case it failed.
+	\fn status_t (*usb_module_info::set_feature)(usb_id handle, uint16 selector)
+	\brief Convenience function for standard control pipe set feature requests.  
+	 Both the set_feature() and clear_feature() requests work on all the Stack's
+	objects: devices, interfaces and pipes.
+	
+	\param handle The object you want to query.
+	\param selector The value you want to pass in the feature request. 
+	\return \c B_OK in case the request succeeded and the device responded
+	  positively, or an error code in case it failed.
 */
 
 /*!
-  \fn status_t (*usb_module_info::clear_feature)(usb_id handle, uint16 selector)
-  \brief Convenience function for standard control pipe clear feature requests.
-  
-  \see set_feature() to see how this method works.
+	\fn status_t (*usb_module_info::clear_feature)(usb_id handle, uint16 selector)
+	\brief Convenience function for standard control pipe clear feature requests.
+	
+	\see set_feature() to see how this method works.
 */
 
 /*!
-  \fn status_t (*usb_module_info::get_status)(usb_id handle, uint16 *status)
-  \brief Convenience function for standard usb status requests. 
-  
-  \param[in] handle The object you want to query.
-  \param[out] status A variable in which the device can store it's status.
-  \return \c B_OK is returned in case the request succeeded and the device
-   responded positively, or an error code is returned in case it failed.
+	\fn status_t (*usb_module_info::get_status)(usb_id handle, uint16 *status)
+	\brief Convenience function for standard usb status requests. 
+	
+	\param[in] handle The object you want to query.
+	\param[out] status A variable in which the device can store it's status.
+	\return \c B_OK is returned in case the request succeeded and the device
+	 responded positively, or an error code is returned in case it failed.
 */
-  
+	
 /*!
-  \fn status_t (*usb_module_info::get_descriptor)(usb_device device, uint8 descriptorType, uint8 index, uint16 languageID, void *data, size_t dataLength,  size_t *actualLength)
-  \brief Convenience function to get a descriptor from a device.
-  
-  \param[in] device The device you want to query.
-  \param[in] descriptorType The type of descriptor you are requesting.
-  \param[in] index In case there are multiple descriptors of this type, you
-    select which one you want.
-  \param[in] languageID The language you want the descriptor in (if applicable,
-    as with string_descriptors). 
-  \param[out] data The buffer in which the descriptor can be written.
-  \param[in] dataLength The size of the buffer (in bytes).
-  \param[out] actualLength A pointer to a variable in which the actual number
-    of bytes written can be stored.
-  \retval B_OK The request succeeded, and the descriptor is written.
-  \retval B_DEV_INVALID_PIPE Invalid \a device parameter.
-  \retval "other errors" Request failed.
+	\fn status_t (*usb_module_info::get_descriptor)(usb_device device, uint8 descriptorType, uint8 index, uint16 languageID, void *data, size_t dataLength,  size_t *actualLength)
+	\brief Convenience function to get a descriptor from a device.
+	
+	\param[in] device The device you want to query.
+	\param[in] descriptorType The type of descriptor you are requesting.
+	\param[in] index In case there are multiple descriptors of this type, you
+	  select which one you want.
+	\param[in] languageID The language you want the descriptor in (if applicable,
+	  as with string_descriptors). 
+	\param[out] data The buffer in which the descriptor can be written.
+	\param[in] dataLength The size of the buffer (in bytes).
+	\param[out] actualLength A pointer to a variable in which the actual number
+	  of bytes written can be stored.
+	\retval B_OK The request succeeded, and the descriptor is written.
+	\retval B_DEV_INVALID_PIPE Invalid \a device parameter.
+	\retval "other errors" Request failed.
 */
-  
+	
 /*!
-  \fn status_t (*usb_module_info::send_request)(usb_device device, uint8 requestType, uint8 request, uint16 value, uint16 index, uint16 length, void *data, size_t *actualLength)
-  \brief Send a generic, synchronous request over the default control pipe.
-  
-  See queue_request() for an asynchronous version of this method.
-  
-  Most of the standard values of a request are defined in USB_spec.h.
-  
-  \param[in] device The device you want to query.
-  \param[in] requestType The request type.
-  \param[in] request The request you want to perform.
-  \param[in] value The value of the request.
-  \param[in] index The index for the request.
-  \param[in] length  The size of the buffer pointed by \a data
-  \param[out] data The buffer where to put the result in. 
-  \param[out] actualLength The actual numbers of bytes written.
-  
-  \retval B_OK The request succeeded.
-  \retval B_DEV_INVALID_PIPE Invalid \a device parameter.
-  \retval "other errors" Request failed.
-*/
-
-/*!
-  \fn status_t (*usb_module_info::queue_interrupt)(usb_pipe pipe, void *data, size_t dataLength, usb_callback_func callback, void *callbackCookie)
-  \brief Asynchronously queue an interrupt transfer.
-  
-  \param pipe The id of the pipe you want to query. 
-  \param data The data buffer you want to pass.
-  \param dataLength The size of the data buffer.
-  \param callback The callback function the stack should call after finishing.
-  \param callbackCookie A cookie that will be supplied to your callback
-    function when the transfer is finished.
-  
-  \return This will return a value indicating whether or not the queueing of
-    the transfer went well. The return value won't tell you if the transfer
-    actually succeeded.
-  \retval B_OK The interrupt transfer is queued.
-  \retval B_NO_MEMORY Error allocating objects.
-  \retval B_DEV_INVALID_PIPE The \a pipe is not a valid interrupt pipe.
+	\fn status_t (*usb_module_info::send_request)(usb_device device, uint8 requestType, uint8 request, uint16 value, uint16 index, uint16 length, void *data, size_t *actualLength)
+	\brief Send a generic, synchronous request over the default control pipe.
+	
+	See queue_request() for an asynchronous version of this method.
+	
+	Most of the standard values of a request are defined in USB_spec.h.
+	
+	\param[in] device The device you want to query.
+	\param[in] requestType The request type.
+	\param[in] request The request you want to perform.
+	\param[in] value The value of the request.
+	\param[in] index The index for the request.
+	\param[in] length  The size of the buffer pointed by \a data
+	\param[out] data The buffer where to put the result in. 
+	\param[out] actualLength The actual numbers of bytes written.
+	
+	\retval B_OK The request succeeded.
+	\retval B_DEV_INVALID_PIPE Invalid \a device parameter.
+	\retval "other errors" Request failed.
 */
 
 /*!
-  \fn status_t (*usb_module_info::queue_bulk)(usb_pipe pipe, void *data, size_t dataLength, usb_callback_func callback, void *callbackCookie)
-  \brief Asynchronously queue a bulk transfer.
-  
-  This method behaves like the queue_interrupt() method, except that it queues
-  a bulk transfer.
+	\fn status_t (*usb_module_info::queue_interrupt)(usb_pipe pipe, void *data, size_t dataLength, usb_callback_func callback, void *callbackCookie)
+	\brief Asynchronously queue an interrupt transfer.
+	
+	\param pipe The id of the pipe you want to query. 
+	\param data The data buffer you want to pass.
+	\param dataLength The size of the data buffer.
+	\param callback The callback function the stack should call after finishing.
+	\param callbackCookie A cookie that will be supplied to your callback
+	  function when the transfer is finished.
+	
+	\return This will return a value indicating whether or not the queueing of
+	  the transfer went well. The return value won't tell you if the transfer
+	  actually succeeded.
+	\retval B_OK The interrupt transfer is queued.
+	\retval B_NO_MEMORY Error allocating objects.
+	\retval B_DEV_INVALID_PIPE The \a pipe is not a valid interrupt pipe.
 */
 
 /*!
-  \fn status_t (*usb_module_info::queue_bulk_v)(usb_pipe pipe, iovec *vector, size_t vectorCount, usb_callback_func callback, void *callbackCookie)
-  \brief Asynchronously queue a bulk vector.
-  
-  This method behaves like the queue_interrupt() method, except that it queues
-  bulk transfers and that it is based on an (array of) io vectors.
-  
-  \param vector One or more io vectors. IO vectors are standard POSIX entities.
-  \param vectorCount The number of elements in the \a vector array.
+	\fn status_t (*usb_module_info::queue_bulk)(usb_pipe pipe, void *data, size_t dataLength, usb_callback_func callback, void *callbackCookie)
+	\brief Asynchronously queue a bulk transfer.
+	
+	This method behaves like the queue_interrupt() method, except that it queues
+	a bulk transfer.
 */
 
 /*!
-  \fn status_t (*usb_module_info::queue_isochronous)(usb_pipe pipe, void *data, size_t dataLength, usb_iso_packet_descriptor *packetDesc, uint32 packetCount, uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback, void *callbackCookie)
-  \brief Asynchronously queue a isochronous transfer. Not implemented.
-  
-  This is not implemented in the current Haiku USB Stack.
+	\fn status_t (*usb_module_info::queue_bulk_v)(usb_pipe pipe, iovec *vector, size_t vectorCount, usb_callback_func callback, void *callbackCookie)
+	\brief Asynchronously queue a bulk vector.
+	
+	This method behaves like the queue_interrupt() method, except that it queues
+	bulk transfers and that it is based on an (array of) io vectors.
+	
+	\param vector One or more io vectors. IO vectors are standard POSIX entities.
+	\param vectorCount The number of elements in the \a vector array.
 */
 
 /*!
-  \fn status_t (*usb_module_info::queue_request)(usb_device device, uint8 requestType, uint8 request, uint16 value, uint16 index, uint16 length, void *data, usb_callback_func callback, void *callbackCookie)
-  \brief Asynchronously queue a control pipe request.
-  
-  This method does roughly the same as send_request(), however, it works
-  asynchronously. This means that the method will return as soon as the
-  transfer is queued. 
-  
-  \param callback The callback function for when the transfer is done.
-  \param callbackCookie The cookie that the stack should pass to your callback
-    function.
-    \return Whether or not the queueing of the transfer went well. The return
-   value won't tell you if the transfer actually succeeded.
-  \retval B_OK The control transfer is queued.
-  \retval B_NO_MEMORY Error allocating objects.
-  \retval B_DEV_INVALID_PIPE The \a device argument is invalid.
+	\fn status_t (*usb_module_info::queue_isochronous)(usb_pipe pipe, void *data, size_t dataLength, usb_iso_packet_descriptor *packetDesc, uint32 packetCount, uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback, void *callbackCookie)
+	\brief Asynchronously queue a isochronous transfer. Not implemented.
+	
+	This is not implemented in the current Haiku USB Stack.
 */
 
 /*!
-  \fn status_t (*usb_module_info::set_pipe_policy)(usb_pipe pipe, uint8 maxNumQueuedPackets, uint16 maxBufferDurationMS, uint16 sampleSize) 
-  \brief Set some pipe features.
-  
-  The USB standard specifies some properties that should be able to be set on
-  isochronous pipes. If your driver requires the properties to be changed, you
-  should use this method. 
-  
-  \param pipe The id of the isochronous pipe you want to alter.
-  \param maxNumQueuedPackets The maximum number of queued packets allowed on
-    this pipe.
-  \param maxBufferDurationMS The maximum time in ms that the buffers are valid.
-  \param sampleSize The size of the samples through this pipe.
-  \retval B_OK Pipe policy changed.
-  \retval B_DEV_INVALID_PIPE The \a pipe argument is invalid or not an
-    isochronous pipe.
+	\fn status_t (*usb_module_info::queue_request)(usb_device device, uint8 requestType, uint8 request, uint16 value, uint16 index, uint16 length, void *data, usb_callback_func callback, void *callbackCookie)
+	\brief Asynchronously queue a control pipe request.
+	
+	This method does roughly the same as send_request(), however, it works
+	asynchronously. This means that the method will return as soon as the
+	transfer is queued. 
+	
+	\param callback The callback function for when the transfer is done.
+	\param callbackCookie The cookie that the stack should pass to your callback
+	  function.
+	  \return Whether or not the queueing of the transfer went well. The return
+	 value won't tell you if the transfer actually succeeded.
+	\retval B_OK The control transfer is queued.
+	\retval B_NO_MEMORY Error allocating objects.
+	\retval B_DEV_INVALID_PIPE The \a device argument is invalid.
 */
 
 /*!
-  \fn status_t (*usb_module_info::cancel_queued_transfers)(usb_pipe pipe)
-  \brief Cancel pending transfers on a pipe.
-
-  All the pending transfers will be cancelled. The stack will perform the
-  callback on all of them that are cancelled. 
-  
-  \attention There might be transfers that are being executed the moment you
-    call this method. These will be executed, and their callbacks will be
-    performed. Make sure you don't delete any buffers that could still be used
-    by these transfers.
-  
-  \param pipe The id of the pipe to clear.
-  
-  \retval B_OK All the pending transfers on this pipe are deleted.
-  \retval B_DEV_INVALID_PIPE The supplied usb_id is not a valid pipe.
-  \retval "other errors" There was an error clearing the pipe.
+	\fn status_t (*usb_module_info::set_pipe_policy)(usb_pipe pipe, uint8 maxNumQueuedPackets, uint16 maxBufferDurationMS, uint16 sampleSize) 
+	\brief Set some pipe features.
+	
+	The USB standard specifies some properties that should be able to be set on
+	isochronous pipes. If your driver requires the properties to be changed, you
+	should use this method. 
+	
+	\param pipe The id of the isochronous pipe you want to alter.
+	\param maxNumQueuedPackets The maximum number of queued packets allowed on
+	  this pipe.
+	\param maxBufferDurationMS The maximum time in ms that the buffers are valid.
+	\param sampleSize The size of the samples through this pipe.
+	\retval B_OK Pipe policy changed.
+	\retval B_DEV_INVALID_PIPE The \a pipe argument is invalid or not an
+	  isochronous pipe.
 */
 
 /*!
-  \fn status_t (*usb_module_info::usb_ioctl)(uint32 opcode, void *buffer, size_t bufferSize)
-  \brief Low level commands to the USB stack.
-  
-  This method is used to give lowlevel commands to the Stack. There are
-  currently no uses documented.
+	\fn status_t (*usb_module_info::cancel_queued_transfers)(usb_pipe pipe)
+	\brief Cancel pending transfers on a pipe.
+	 All the pending transfers will be cancelled. The stack will perform the
+	callback on all of them that are cancelled. 
+	
+	\attention There might be transfers that are being executed the moment you
+	  call this method. These will be executed, and their callbacks will be
+	  performed. Make sure you don't delete any buffers that could still be used
+	  by these transfers.
+	
+	\param pipe The id of the pipe to clear.
+	
+	\retval B_OK All the pending transfers on this pipe are deleted.
+	\retval B_DEV_INVALID_PIPE The supplied usb_id is not a valid pipe.
+	\retval "other errors" There was an error clearing the pipe.
+*/
+
+/*!
+	\fn status_t (*usb_module_info::usb_ioctl)(uint32 opcode, void *buffer, size_t bufferSize)
+	\brief Low level commands to the USB stack.
+	
+	This method is used to give lowlevel commands to the Stack. There are
+	currently no uses documented.
 */
 
 ///// B_USB_MODULE_NAME /////
 
 /*!
-  \def B_USB_MODULE_NAME
-  \brief The identifier string for the USB Stack interface module.
+	\def B_USB_MODULE_NAME
+	\brief The identifier string for the USB Stack interface module.
 */

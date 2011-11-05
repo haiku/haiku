@@ -12,7 +12,7 @@
 
 #include <debug.h>
 #include <kernel.h>
-#include <util/list.h>
+#include <util/DoublyLinkedList.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 
@@ -20,6 +20,7 @@
 
 
 struct kernel_args;
+class ObjectCache;
 
 
 enum {
@@ -32,6 +33,14 @@ enum {
 enum {
 	PAGE_EVENT_NOT_BUSY	= 0x01		// page not busy anymore
 };
+
+
+extern ObjectCache* gCacheRefObjectCache;
+extern ObjectCache* gAnonymousCacheObjectCache;
+extern ObjectCache* gAnonymousNoSwapCacheObjectCache;
+extern ObjectCache* gVnodeCacheObjectCache;
+extern ObjectCache* gDeviceCacheObjectCache;
+extern ObjectCache* gNullCacheObjectCache;
 
 
 struct VMCachePagesTreeDefinition {
@@ -63,7 +72,10 @@ struct VMCachePagesTreeDefinition {
 typedef IteratableSplayTree<VMCachePagesTreeDefinition> VMCachePagesTree;
 
 
-struct VMCache {
+struct VMCache : public DoublyLinkedListLinkImpl<VMCache> {
+public:
+	typedef DoublyLinkedList<VMCache> ConsumerList;
+
 public:
 								VMCache();
 	virtual						~VMCache();
@@ -163,10 +175,12 @@ public:
 
 	virtual	void				Dump(bool showPages) const;
 
+protected:
+	virtual	void				DeleteObject() = 0;
+
 public:
 			VMArea*				areas;
-			list_link			consumer_link;
-			list				consumers;
+			ConsumerList		consumers;
 				// list of caches that use this cache as a source
 			VMCachePagesTree	pages;
 			VMCache*			source;

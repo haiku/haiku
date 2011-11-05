@@ -1,3 +1,21 @@
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *   Alex Wilson <yourpalal2@gmail.com>
+ * Corresponds to:
+ *   /trunk/headers/os/interface/TwoDimensionalLayout.h  rev 38207
+ *   /trunk/src/kits/interface/TwoDimensionalLayout.cpp  rev 38207
+ */
+
+
+/*!
+	\file TwoDimensionalLayout.h
+	\brief Defines the BTwoDimensionalLayout class.
+*/
+
+
 /*!
 	\class BTwoDimensionalLayout
 	\ingroup interface
@@ -8,9 +26,9 @@
 
 	This class manages all the tricky work of actually positioning/resizing
 	items, as well as calculating size constraints and providing extra features,
-	such as spacing/insets and alignment of multiple BTwoDimensionalLayouts.
-	Derived classes need only implement a few hook methods to get a working
-	layout.
+	such as spacing/insets and alignment of multiple
+	BTwoDimensionalLayout&apos;s. Derived classes need only implement a few hook
+	methods to get a working layout.
 
 	\warning This class is not yet finalized, if you use it in your software
 	assume that it will break some time in the future.
@@ -35,23 +53,23 @@
 
 /*!
 	\fn void BTwoDimensionalLayout::AlignLayoutWith(
-		BTwoDimensionalLayout* other, enum orientation)
-	\brief Align the BLayoutItems in two BTwoDimensionalLayouts with each other
-		within a certain orientation.
+		BTwoDimensionalLayout* other, enum orientation orientation)
+	\brief Align the BLayoutItem&apos;s in the specified \a orientation within
+		two or more BTwoDimensionalLayout&apos;s.
 
-	When two (or more) BTwoDimensionalLayouts are aligned within a certain
-	orientation, then the BLayoutItems within those BTwoDimensionalLayouts will
-	have identical widths or heights (depending on how the
-	BTwoDimensionalLayouts are aligned).
+	When two (or more) BTwoDimensionalLayout&apos;s are aligned within a
+	certain \a orientation, then the BLayoutItem&apos;s within those
+	BTwoDimensionalLayout&apos;s will have identical widths or heights
+	(depending on how the BTwoDimensionalLayout&apos;s are aligned.)
 
-	If you align two BGroupLayouts horizontally, for example, then the
-	BLayoutItems at index 0 in both BGroupLayouts will be given the same
-	horizontal area. The same is true for the BLayoutItems at index 1, 2, etc..
-	Not all BTwoDimensionalLayouts have to have an item at each index for the
-	alignment to proceed.
+	If you align two BGroupLayout&apos;s horizontally for example, then the
+	BLayoutItem at index 0 in both BGroupLayout&apos;s will be given the same
+	horizontal area. The same is true for the BLayoutItem at index 1,
+	2, etc. Not all BTwoDimensionalLayout&apos;s have to have an item at each
+	index for the alignment to proceed.
 
 	\param other The BTwoDimensionalLayout to be aligned with.
-	\param orientation The orientation on which to be aligned.
+	\param orientation The \a orientation on which to be aligned.
 */
 
 
@@ -61,7 +79,7 @@
 	\brief Set the insets for this BTwoDimensionalLayout (in pixels).
 
 	Set the spacing around the edges of this BTwoDimensionalLayout. If you
-	pass B_USE_DEFAULT_SPACING for a certain parameter, that parameter will
+	pass \c B_USE_DEFAULT_SPACING for a certain parameter, that parameter will
 	be replaced with the value returned by BControlLook::DefaultItemSpacing().
 
 	\see BTwoDimensionalLayout::GetInsets();
@@ -71,9 +89,9 @@
 /*!
 	\fn void BTwoDimensionalLayout::GetInsets(float* left, float* top,
 		float* right, float* bottom) const
-	\brief Get the insets for this BTwoDimensionalLayout (in pixels).
+	\brief Get the insets for the BTwoDimensionalLayout (in pixels).
 
-	Passing NULL for any paramater is not an error, such parameters will
+	Passing \c NULL for any parameter is not an error, those parameters will
 	be ignored.
 
 	\see BTwoDimensionalLayout::SetInsets();
@@ -85,16 +103,17 @@
 
 	These methods are called automatically as needed during layout, and
 	provide the BTwoDimensionalLayout class with the necessary information
-	to properly layout the BLayoutItems in this BTwoDimensionalLayout.
-
-	@{
+	to properly layout the BLayoutItem in this BTwoDimensionalLayout.
 */
 
 
+//! @{
+
+
 /*!
-	\fn void BTwoDimensionalLayout::PrepareItems(enum orientation)
-	\brief Prepare the BLayoutItems in this BTwoDimensionalLayout subclass
-		for layout within a certain orientation.
+	\fn void BTwoDimensionalLayout::PrepareItems(enum orientation orientation)
+	\brief Prepare the BLayoutItem in this BTwoDimensionalLayout subclass
+		for layout within a certain \a orientation.
 
 	This is a good place to update cache information that will be used in
 	other hook methods, for example.
@@ -104,7 +123,7 @@
 /*!
 	\fn bool BTwoDimensionalLayout::HasMultiColumnItems()
 	\brief Tests whether or not this BTwoDimensionalLayout contains any
-		BLayoutItems spanning more than one column.
+		BLayoutItem&apos;s spanning more than one column.
 
 	The BTwoDimensionalLayout implementation returns false.
 */
@@ -113,7 +132,7 @@
 /*!
 	\fn bool BTwoDimensionalLayout::HasMultiRowItems()
 	\brief Tests whether or not this BTwoDimensionalLayout contains any
-		BLayoutItems spanning more than one row.
+		BLayoutItem&apos;s spanning more than one row.
 
 	The BTwoDimensionalLayout implementation returns false.
 */
@@ -121,33 +140,37 @@
 
 /*!
 	\fn int32 BTwoDimensionalLayout::InternalCountColumns()
-	\brief Return the number of columns in this BTwoDimensionalLayout.
+	\brief Get the number of columns in the BTwoDimensionalLayout.
+
+	\returns The number of columns in the BTwoDimensionalLayout.
 */
 
 
 /*!
 	\fn int32 BTwoDimensionalLayout::InternalCountRows()
-	\brief Return the number of rows in this BTwoDimensionalLayout.
+	\brief Get the number of rows in the BTwoDimensionalLayout.
+
+	\returns The number of rows in the BTwoDimensionalLayout.
 */
 
 
 /*!
-	\fn void BTwoDimensionalLayout::GetColumnRowConstraints(enum orientation,
-		int32 index, ColumnRowConstraints* constraints)
+	\fn void BTwoDimensionalLayout::GetColumnRowConstraints(enum orientation 
+		orientation, int32 index, ColumnRowConstraints* constraints)
 	\brief Fill in the ColumnRowConstraints for a certain column or row in
-		this BTwoDimensionalLayout.
+		the BTwoDimensionalLayout.
 
 	This method is used to communicate the size constraints and weight for
-	a given row/column in this BTwoDimensionalLayout.
+	a given row/column in the BTwoDimensionalLayout.
 */
 
 
 /*!
 	\fn void BTwoDimensionalLayout::GetItemDimensions(BLayoutItem* item,
 		Dimensions* dimensions)
-	\brief Tell the base class what column and row a BLayoutItem is in, as
+	\brief Tell the base class what column and row a BLayoutItem is in as
 		well as how many columns and rows it covers.
 */
 
 
-//@}
+//! @}

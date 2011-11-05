@@ -99,9 +99,11 @@ SizeSlider::SizeSlider(const char* name, const char* label,
 	BSlider(name, label, message, minValue, maxValue,
 	B_HORIZONTAL, B_TRIANGLE_THUMB),
 	fStartOffset(minValue),
-	fEndOffset(maxValue)
+	fEndOffset(maxValue),
+	fMaxPartitionSize(maxValue)
 {
-	SetBarColor((rgb_color){ 0, 80, 255, 255 });
+	rgb_color fillColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	UseFillColor(true, &fillColor);
 	char minString[64];
 	char maxString[64];
 	snprintf(minString, sizeof(minString), B_TRANSLATE("Offset: %ld MB"),
@@ -142,4 +144,10 @@ SizeSlider::Offset()
 	// TODO: This should be the changed offset once a double
 	// headed slider is implemented.
 	return fStartOffset;
+}
+
+int32
+SizeSlider::MaxPartitionSize()
+{
+	return fMaxPartitionSize;
 }

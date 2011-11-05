@@ -12,13 +12,14 @@
 #include <Message.h>
 #include <OS.h>
 
-#include <Application.h>
 #include <Alert.h>
-#include <Menu.h>
-#include <MenuItem.h>
+#include <Application.h>
+#include <Autolock.h>
 #include <Handler.h>
 #include <Locker.h>
-#include <Autolock.h>
+#include <Menu.h>
+#include <MenuItem.h>
+#include <String.h>
 
 
 #include <add-ons/input_server/InputServerMethod.h>

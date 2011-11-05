@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CharacterMap	2137207616
+1	finnish	x-vnd.Haiku-CharacterMap	4082916013
 Aegean numbers	UnicodeBlocks		Aegean-numerot
 Alphabetic presentation forms	UnicodeBlocks		Aakkosellinen esitysmuoto
 Ancient Greek musical notation	UnicodeBlocks		Antiikin kreikan nuottikirjoitus 
@@ -43,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		Yhdistettyjen diakriittist
 Combining half marks	UnicodeBlocks		Yhdistetyt puolimerkit
 Control pictures	UnicodeBlocks		Ohjainkuvat
 Coptic	UnicodeBlocks		Kopti
+Copy as escaped byte string	CharacterView		Kopioi koodinvaihtotavumerkkijonona
+Copy character	CharacterView		Kopioi merkki
 Counting rod numerals	UnicodeBlocks		Laskentatankonumerraalit
 Cuneiform	UnicodeBlocks		Nuolenpääkirjoitus
 Cuneiform numbers and punctuation	UnicodeBlocks		Nuolenpääkirjoituksen numerot ja välimerkit

@@ -1,24 +1,38 @@
-1	ukrainian	x-vnd.Haiku-Mail	2363284004
+1	ukrainian	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		Ім'я аккаунта:
 Account name:	E-Mail		Ім'я акаунту:
+Account settings	AutoConfigWindow		Настройка аакунта
 Account settings	Config Views		Настройка аккаунта
 Accounts	Config Window		Аккаунти
 Add	Config Window		Додати
 Add filter	Config Views		Додати фільтр
 Always	Config Window		Завжди
 Apply	Config Window		Прийняти
+Back	AutoConfigWindow		Назад
 Check every	Config Window		Перевіряти кожні
 Choose Protocol	E-Mail		Вибрати протокол
+Create new account	AutoConfigWindow		Створити новий аккаунт
+E-mail	System name		Пошта
 E-mail address:	E-Mail		Адреса E-mail :
 Edit mailbox menu…	Config Window		Редагувати почтове меню…
+Enter a valid e-mail address.	AutoConfigWindow		Введіть дійсну поштову адресу.
 Error	Config Window		Помилка
 Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
+Finish	AutoConfigWindow		Фініш
+Incoming	Config Window		Вхідні
+Incoming	E-Mail		Вхідні
 Incoming mail filters	Config Views		Вхідний поштовий фільтр
 Login name:	E-Mail		Логін:
 Mail checking	Config Window		Перевірка пошти
 Miscellaneous	Config Window		Змішаний
+Never	Config Window	show status window	Ніколи
+Next	AutoConfigWindow		Наступне
+OK	AutoConfigWindow		Гаразд
 OK	Config Views		Гаразд
 OK	Config Window		Гаразд
+Only when dial-up is connected	Config Window		Тільки при включеному діалапі
+Outgoing	Config Window		Вихідні
+Outgoing	E-Mail		Вихідні
 Outgoing mail filters	Config Views		Фільтри вихідної пошти
 Password:	E-Mail		Пароль:
 Real name:	Config Views		Справжнє ім'я:
@@ -36,7 +50,11 @@ The filter could not be moved. Deleting filter.	Config Views		Фільтр не�
 While sending	Config Window		Поки відправляється
 While sending and receiving	Config Window		При відправці і отриманні
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопку Додати .\n\nВидаліть аккаунт при допомозі кнопки Видалити на вибраному пункті\n\nВиберіть пункт зі списку при необхідності змініть його налаштувань.
+\t\t· E-mail filters	Config Window		\t\t· поштовий фільтр
+\t\t· Incoming	Config Window		\t\t· Вхідні
+\t\t· Outgoing	Config Window		\t\t· Вхідні
 days	Config Window		днів
 hours	Config Window		годин
 minutes	Config Window		хвилин
-never	Config Window		ніколи
+never	Config Window	mail checking frequency	ніколи

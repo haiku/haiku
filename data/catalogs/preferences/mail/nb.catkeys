@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Mail	777369824
+1	norwegian_bokmål	x-vnd.Haiku-Mail	3202453731
 Account name:	Config Views		Kontonavn
 Account settings	Config Views		Kontoinnstillinger
 Accounts	Config Window		Kontoer
@@ -27,7 +27,3 @@ While sending and receiving	Config Window		Under sending og mottak
 days	Config Window		dager
 hours	Config Window		timer
 minutes	Config Window		minutter
-never	Config Window		aldri
-· E-mail filters	Config Window		E-postfiltre
-· Incoming	Config Window		Innkommende
-· Outgoing	Config Window		Utgående

@@ -31,7 +31,7 @@
 
 
 static void
-init_overlay_registers(overlay_registers *registers)
+init_overlay_registers(overlay_registers* registers)
 {
 	memset(registers, 0, B_PAGE_SIZE);
 
@@ -46,7 +46,7 @@ read_settings(bool &hardwareCursor)
 {
 	hardwareCursor = false;
 
-	void *settings = load_driver_settings("intel_extreme");
+	void* settings = load_driver_settings("intel_extreme");
 	if (settings != NULL) {
 		hardwareCursor = get_driver_boolean_parameter(settings,
 			"hardware_cursor", true, true);
@@ -72,34 +72,38 @@ release_vblank_sem(intel_info &info)
 
 
 static int32
-intel_interrupt_handler(void *data)
+intel_interrupt_handler(void* data)
 {
-	intel_info &info = *(intel_info *)data;
+	intel_info &info = *(intel_info*)data;
 
-	uint32 identity = read16(info.registers + INTEL_INTERRUPT_IDENTITY);
+	uint16 identity = read16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY));
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
 	int32 handled = B_HANDLED_INTERRUPT;
 
-	if ((identity & INTERRUPT_VBLANK_PIPEA) != 0) {
+	// TODO: verify that these aren't actually the same
+	bool hasPCH = info.device_type.HasPlatformControlHub();
+	uint16 mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
+	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
-		write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
+		write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
 			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
-	if ((identity & INTERRUPT_VBLANK_PIPEB) != 0) {
+	mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
+	if ((identity & mask) != 0) {
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
-		write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
+		write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
 	// setting the bit clears it!
-	write16(info.registers + INTEL_INTERRUPT_IDENTITY, identity);
+	write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), identity);
 
 	return handled;
 }
@@ -131,20 +135,23 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = false;
 
 		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
-			&intel_interrupt_handler, (void *)&info, 0);
+			&intel_interrupt_handler, (void*)&info, 0);
 		if (status == B_OK) {
-			write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
+			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
+			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			write16(info.registers + INTEL_INTERRUPT_IDENTITY, ~0);
+
+			write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
 
 			// enable interrupts - we only want VBLANK interrupts
-			write16(info.registers + INTEL_INTERRUPT_ENABLED,
-				read16(info.registers + INTEL_INTERRUPT_ENABLED)
-				| INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
-			write16(info.registers + INTEL_INTERRUPT_MASK,
-				~(INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB));
+			bool hasPCH = info.device_type.HasPlatformControlHub();
+			uint16 enable = hasPCH
+				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
+				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
+
+			write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
+			write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
 		}
 	}
 	if (status < B_OK) {
@@ -154,7 +161,8 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = true;
 
 		// TODO: fake interrupts!
-		TRACE((DEVICE_NAME "Fake interrupt mode (no PCI interrupt line assigned)"));
+		TRACE((DEVICE_NAME "Fake interrupt mode (no PCI interrupt line "
+			"assigned)"));
 		status = B_ERROR;
 	}
 
@@ -177,7 +185,7 @@ intel_free_memory(intel_info &info, addr_t base)
 
 status_t
 intel_allocate_memory(intel_info &info, size_t size, size_t alignment,
-	uint32 flags, addr_t *_base, phys_addr_t *_physicalBase)
+	uint32 flags, addr_t* _base, phys_addr_t* _physicalBase)
 {
 	return gGART->allocate_memory(info.aperture, size, alignment,
 		flags, _base, _physicalBase);
@@ -194,7 +202,7 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("intel extreme shared info",
-		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
+		(void**)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + 3 * B_PAGE_SIZE,
 		B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK) {
@@ -202,7 +210,7 @@ intel_extreme_init(intel_info &info)
 		return info.shared_area;
 	}
 
-	memset((void *)info.shared_info, 0, sizeof(intel_shared_info));
+	memset((void*)info.shared_info, 0, sizeof(intel_shared_info));
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
@@ -225,19 +233,50 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
-		(void *)info.pci->u.h0.base_registers[mmioIndex],
+		(void*)info.pci->u.h0.base_registers[mmioIndex],
 		info.pci->u.h0.base_register_sizes[mmioIndex],
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		(void **)&info.registers);
+		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
 		gGART->unmap_aperture(info.aperture);
 		return info.registers_area;
 	}
 
+	uint32* blocks = info.shared_info->register_blocks;
+	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
+
+	// setup the register blocks for the different architectures
+	if (info.device_type.HasPlatformControlHub()) {
+		// PCH based platforms (IronLake and up)
+		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
+			= PCH_NORTH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
+			= PCH_NORTH_PIPE_AND_PORT_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]
+			= PCH_NORTH_PLANE_CONTROL_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]
+			= PCH_SOUTH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]
+			= PCH_SOUTH_TRANSCODER_AND_PORT_REGISTER_BASE;
+	} else {
+		// (G)MCH/ICH based platforms
+		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
+			= MCH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
+			= MCH_PIPE_AND_PORT_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]
+			= MCH_PLANE_CONTROL_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]
+			= ICH_SHARED_REGISTER_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]
+			= ICH_PORT_REGISTER_BASE;
+	}
+
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
-	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci, PCI_command, 2)
-		| PCI_command_io | PCI_command_memory | PCI_command_master);
+	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci,
+		PCI_command, 2) | PCI_command_io | PCI_command_memory
+		| PCI_command_master);
 
 	// reserve ring buffer memory (currently, this memory is placed in
 	// the graphics memory), but this could bring us problems with
@@ -245,7 +284,7 @@ intel_extreme_init(intel_info &info)
 
 	ring_buffer &primary = info.shared_info->primary_ring_buffer;
 	if (intel_allocate_memory(info, 16 * B_PAGE_SIZE, 0, 0,
-			(addr_t *)&primary.base) == B_OK) {
+			(addr_t*)&primary.base) == B_OK) {
 		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
 		primary.size = 16 * B_PAGE_SIZE;
 		primary.offset = (addr_t)primary.base - info.aperture_base;
@@ -256,24 +295,30 @@ intel_extreme_init(intel_info &info)
 	// TODO: clean this up
 	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
 		dprintf("i965GM/i965GME quirk\n");
-		write32(info.registers + 0x6204, (1L << 29));
+		write32(info, 0x6204, (1L << 29));
+	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
+		dprintf("SandyBridge clock gating\n");
+		write32(info, 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
+	} else if (info.device_type.InGroup(INTEL_TYPE_ILK)) {
+		dprintf("IronLake clock gating\n");
+		write32(info, 0x42020, (1L << 7) | (1L << 5));
 	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
 		dprintf("G4x clock gating\n");
-		write32(info.registers + 0x6204, 0);
-		write32(info.registers + 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
-		write32(info.registers + 0x6210, 0);
+		write32(info, 0x6204, 0);
+		write32(info, 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
+		write32(info, 0x6210, 0);
 
 		uint32 gateValue = (1L << 28) | (1L << 3) | (1L << 2);
 		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
 			dprintf("G4x mobile clock gating\n");
 		    gateValue |= 1L << 18;
 		}
-		write32(info.registers + 0x6200, gateValue);
+		write32(info, 0x6200, gateValue);
 	} else {
 		dprintf("i965 quirk\n");
-		write32(info.registers + 0x6204, (1L << 29) | (1L << 23));
+		write32(info, 0x6204, (1L << 29) | (1L << 23));
 	}
-	write32(info.registers + 0x7408, 0x10);
+	write32(info, 0x7408, 0x10);
 
 	// no errors, so keep areas and mappings
 	sharedCreator.Detach();
@@ -283,7 +328,7 @@ intel_extreme_init(intel_info &info)
 	gGART->get_aperture_info(info.aperture, &apertureInfo);
 
 	info.shared_info->registers_area = info.registers_area;
-	info.shared_info->graphics_memory = (uint8 *)info.aperture_base;
+	info.shared_info->graphics_memory = (uint8*)info.aperture_base;
 	info.shared_info->physical_graphics_memory = apertureInfo.physical_base;
 	info.shared_info->graphics_memory_size = apertureInfo.size;
 	info.shared_info->frame_buffer = 0;
@@ -316,7 +361,7 @@ intel_extreme_init(intel_info &info)
 	if (intel_allocate_memory(info, B_PAGE_SIZE, 0,
 			intel_uses_physical_overlay(*info.shared_info)
 				? B_APERTURE_NEED_PHYSICAL : 0,
-			(addr_t *)&info.overlay_registers,
+			(addr_t*)&info.overlay_registers,
 			&info.shared_info->physical_overlay_registers) == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
 			- info.aperture_base;
@@ -327,13 +372,13 @@ intel_extreme_init(intel_info &info)
 	// Allocate hardware status page and the cursor memory
 
 	if (intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
-			(addr_t *)info.shared_info->status_page,
+			(addr_t*)info.shared_info->status_page,
 			&info.shared_info->physical_status_page) == B_OK) {
 		// TODO: set status page
 	}
 	if (hardwareCursor) {
 		intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
-			(addr_t *)&info.shared_info->cursor_memory,
+			(addr_t*)&info.shared_info->cursor_memory,
 			&info.shared_info->physical_cursor_memory);
 	}
 
@@ -351,8 +396,8 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		write16(info.registers + INTEL_INTERRUPT_ENABLED, 0);
-		write16(info.registers + INTEL_INTERRUPT_MASK, ~0);
+		write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+		write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
 
 		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			intel_interrupt_handler, &info);

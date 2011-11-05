@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011, Alexander von Gluck, kallisti5@unixzen.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -38,10 +39,10 @@ static uint32 sBootOptions;
 
 static void
 call_ctors(void)
-{ 
+{
 	void (**f)(void);
 
-	for (f = &__ctor_list; f < &__ctor_end; f++) {		
+	for (f = &__ctor_list; f < &__ctor_end; f++) {
 		(**f)();
 	}
 }
@@ -54,7 +55,7 @@ clear_bss(void)
 }
 
 
-static void 
+static void
 determine_machine(void)
 {
 	gMachine = MACHINE_UNKNOWN;
@@ -62,25 +63,32 @@ determine_machine(void)
 	int root = of_finddevice("/");
 	char buffer[64];
 	int length;
+
+	// TODO : Probe other OpenFirmware platforms and set gMachine as needed
+
 	if ((length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1))
-			== OF_FAILED)
-		return;
-	buffer[length] = '\0';
-
-	// ToDo: add more, and be as generic as possible
-
-	if (!strcasecmp("chrp", buffer))
-		gMachine = MACHINE_CHRP;
-	else if (!strcasecmp("bootrom", buffer))
+		!= OF_FAILED) {
+		buffer[length] = '\0';
+		if (!strcasecmp("chrp", buffer))
+			gMachine = MACHINE_CHRP;
+		else if (!strcasecmp("bootrom", buffer))
+			gMachine = MACHINE_MAC;
+	} else
 		gMachine = MACHINE_MAC;
 
 	if ((length = of_getprop(root, "model", buffer, sizeof(buffer) - 1))
-			== OF_FAILED)
-		return;
-	buffer[length] = '\0';
+		!= OF_FAILED) {
+		buffer[length] = '\0';
+		if (!strcasecmp("pegasos", buffer))
+			gMachine |= MACHINE_PEGASOS;
+	}
 
-	if (!strcasecmp("pegasos", buffer))
-		gMachine |= MACHINE_PEGASOS;
+	if ((length = of_getprop(root, "name", buffer, sizeof(buffer) - 1))
+		!= OF_FAILED) {
+		buffer[length] = '\0';
+		if (!strcasecmp("openbiosteam,openbios", buffer))
+			gMachine |= MACHINE_QEMU;
+	}
 }
 
 
@@ -94,7 +102,7 @@ platform_start_kernel(void)
 	printf("kernel entry at %p\n", (void*)kernelEntry);
 	printf("kernel stack top: %p\n", (void*)stackTop);
 
-	/* TODO: ? 
+	/* TODO: ?
 	mmu_init_for_kernel();
 	smp_boot_other_cpus();
 	*/
@@ -155,6 +163,13 @@ start(void *openFirmwareEntry)
 
 	determine_machine();
 	console_init();
+
+	if ((gMachine & MACHINE_QEMU) != 0)
+		dprintf("OpenBIOS (QEMU?) OpenFirmware machine detected\n");
+	else if ((gMachine & MACHINE_PEGASOS) != 0)
+		dprintf("Pegasos PowerPC machine detected\n");
+	else
+		dprintf("Apple PowerPC machine assumed\n");
 
 	// Initialize and take over MMU and set the OpenFirmware callbacks - it
 	// will ask us for memory after that instead of maintaining it itself

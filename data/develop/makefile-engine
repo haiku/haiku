@@ -1,8 +1,8 @@
-##	BeOS and Haiku Generic Makefile Engine v2.4.0
+##	BeOS and Haiku Generic Makefile Engine v2.5.0
 ##	Does all the hard work for the Generic Makefile
 ##	which simply defines the project parameters
 
-##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4 
+##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4, 2.5 
 
 #	determine wheather running on x86 or ppc
 MACHINE=$(shell uname -m)
@@ -43,20 +43,20 @@ endif
 	C++			:=	g++
 
 #	SETTING: set the CFLAGS for each binary type
-	ifeq ($(TYPE), DRIVER)
+	ifeq ($(strip $(TYPE)), DRIVER)
 		CFLAGS	+= -D_KERNEL_MODE=1 -no-fpic
 	else
 		CFLAGS +=
 	endif
 
 #	SETTING: set the proper optimization level
-	ifeq ($(OPTIMIZE), FULL)
+	ifeq ($(strip $(OPTIMIZE)), FULL)
 		OPTIMIZER	= -O3
 	else
-	ifeq ($(OPTIMIZE), SOME)
+	ifeq ($(strip $(OPTIMIZE)), SOME)
 		OPTIMIZER	= -O1
 	else
-	ifeq ($(OPTIMIZE), NONE)
+	ifeq ($(strip $(OPTIMIZE)), NONE)
 		OPTIMIZER	= -O0
 	else
 #		OPTIMIZE not set so set to full
@@ -66,7 +66,7 @@ endif
 	endif
 
 #	SETTING: set proper debugger flags
-	ifeq ($(DEBUGGER), TRUE)
+	ifeq ($(strip $(DEBUGGER)), TRUE)
 		DEBUG += -g
 		OPTIMIZER = -O0
 	endif
@@ -74,10 +74,10 @@ endif
 	CFLAGS += $(OPTIMIZER) $(DEBUG)
 
 #	SETTING: set warning level
-	ifeq ($(WARNINGS), ALL)
+	ifeq ($(strip $(WARNINGS)), ALL)
 		CFLAGS += -Wall -Wno-multichar -Wno-ctor-dtor-privacy
 	else
-	ifeq ($(WARNINGS), NONE)
+	ifeq ($(strip $(WARNINGS)), NONE)
 		CFLAGS += -w
 	endif
 	endif
@@ -89,13 +89,13 @@ endif
 	LDFLAGS		+= $(DEBUG)
 
 #	SETTING: set linker flags for each binary type
-	ifeq ($(TYPE), APP)
+	ifeq ($(strip $(TYPE)), APP)
 		LDFLAGS += -Xlinker -soname=_APP_
 	else
-	ifeq ($(TYPE), SHARED)
+	ifeq ($(strip $(TYPE)), SHARED)
 		LDFLAGS += -nostart -Xlinker -soname=$(NAME)
 	else
-	ifeq ($(TYPE), DRIVER)
+	ifeq ($(strip $(TYPE)), DRIVER)
 		LDFLAGS += -nostdlib /boot/develop/lib/x86/_KERNEL_ \
 					/boot/develop/lib/x86/haiku_version_glue.o
 	endif
@@ -142,17 +142,21 @@ SRC_PATHS += $(sort $(foreach file, $(SRCS), $(dir $(file))))
 VPATH :=
 VPATH += $(addprefix :, $(subst  ,:, $(filter-out $($(subst, :, ,$(VPATH))), $(SRC_PATHS))))
 
-#	SETTING: build the local and system include paths
+#	SETTING: build the local and system include paths, compose C++ libs
 ifeq ($(CPU), x86)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
  ifeq ($(CC_VER), 2)
 	INCLUDES = $(LOC_INCLUDES)
 	INCLUDES += -I-
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
+	
+	STDCPPLIBS = stdc++.r4
  else
 	INCLUDES = -iquote./
 	INCLUDES += $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -iquote, $(path)))
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -isystem, $(path)))
+	
+	STDCPPLIBS = stdc++ supc++
  endif
 else
 ifeq ($(CPU), ppc)
@@ -191,7 +195,7 @@ LDFLAGS += $(LINKER_FLAGS)
 
 #	SETTING: use the archive tools if building a static library
 #	otherwise use the linker
-ifeq ($(TYPE), STATIC)
+ifeq ($(strip $(TYPE)), STATIC)
 	BUILD_LINE = ar -cru "$(TARGET)" $(OBJS)
 else
 	BUILD_LINE = $(LD) -o "$@" $(OBJS) $(LDFLAGS)
@@ -310,7 +314,7 @@ $(CATALOGS_DIR)/%.catalog : $(CATKEYS_DIR)/%.catkeys
 
 # rule to preprocess program sources into file ready for collecting catkeys 
 $(OBJ_DIR)/$(NAME).pre : $(SRCS)
-	-cat $(SRCS) | $(CC) -E $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
+	-cat $(SRCS) | $(CC) -E -x c++ $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
 
 # rules to collect localization catkeys
 catkeys : $(CATKEYS_DIR)/en.catkeys
@@ -346,7 +350,7 @@ USER_BIN_PATH = /boot/home/config/add-ons/kernel/drivers/bin
 USER_DEV_PATH = /boot/home/config/add-ons/kernel/drivers/dev
 
 driverinstall :: default
-ifeq ($(TYPE), DRIVER)
+ifeq ($(strip $(TYPE)), DRIVER)
 	copyattr --data $(TARGET) $(USER_BIN_PATH)/$(NAME)
 	mkdir -p $(USER_DEV_PATH)/$(DRIVER_PATH)
 	ln -sf $(USER_BIN_PATH)/$(NAME) $(USER_DEV_PATH)/$(DRIVER_PATH)/$(NAME)

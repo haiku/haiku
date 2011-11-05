@@ -101,6 +101,7 @@ public:
 
 	bool Owning() const;
 	bool ReplaceItem(int32, void *);
+	bool MoveItem(int32 from, int32 to);
 
 protected:
 	bool owning;
@@ -154,6 +155,7 @@ public:
 									// same as ReplaceItem, except does not
 									// delete old item at <index>, returns it
 									// instead
+			bool				MoveItem(int32 from, int32 to);
 
 			T*					FirstItem() const;
 			T*					LastItem() const;
@@ -549,6 +551,14 @@ BObjectList<T>::SwapWithItem(int32 index, T* newItem)
 	T* result = ItemAt(index);
 	_PointerList_::ReplaceItem(index, (void*)newItem);
 	return result;
+}
+
+
+template<class T>
+bool
+BObjectList<T>::MoveItem(int32 from, int32 to)
+{
+	return _PointerList_::MoveItem(from, to);
 }
 
 

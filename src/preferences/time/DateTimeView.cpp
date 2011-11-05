@@ -26,7 +26,6 @@
 #include <FindDirectory.h>
 #include <Message.h>
 #include <Path.h>
-#include <RadioButton.h>
 #include <StringView.h>
 #include <Window.h>
 
@@ -46,14 +45,11 @@ using BPrivate::B_LOCAL_TIME;
 
 
 DateTimeView::DateTimeView(const char* name)
-	: 
+	:
 	BGroupView(name, B_HORIZONTAL, 5),
-	fGmtTime(NULL),
-	fUseGmtTime(false),
 	fInitialized(false),
 	fSystemTimeAtStart(system_time())
 {
-	_ReadRTCSettings();
 	_InitView();
 
 	// record the current time to enable revert.
@@ -63,7 +59,6 @@ DateTimeView::DateTimeView(const char* name)
 
 DateTimeView::~DateTimeView()
 {
-	_WriteRTCSettings();
 }
 
 
@@ -78,30 +73,8 @@ DateTimeView::AttachedToWindow()
 
 		fCalendarView->SetTarget(this);
 	}
-}
 
-
-void
-DateTimeView::Draw(BRect /*updateRect*/)
-{
-	rgb_color viewcolor = ViewColor();
-	rgb_color dark = tint_color(viewcolor, B_DARKEN_4_TINT);
-	rgb_color light = tint_color(viewcolor, B_LIGHTEN_MAX_TINT);
-
-	// draw a separator line
-	BRect bounds(Bounds());
-	BPoint start(bounds.Width() / 2.0f, bounds.top + 5.0f);
-	BPoint end(bounds.Width() / 2.0, bounds.bottom - 5.0f);
-
-	BeginLineArray(2);
-		AddLine(start, end, dark);
-		start.x++;
-		end.x++;
-		AddLine(start, end, light);
-	EndLineArray();
-
-	fTimeEdit->Draw(bounds);
-	fDateEdit->Draw(bounds);
+	_NotifyClockSettingChanged();
 }
 
 
@@ -132,11 +105,6 @@ DateTimeView::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kRTCUpdate:
-			fUseGmtTime = fGmtTime->Value() == B_CONTROL_ON;
-			_UpdateGmtSettings();
-			break;
-
 		case kMsgRevert:
 			_Revert();
 			break;
@@ -145,6 +113,9 @@ DateTimeView::MessageReceived(BMessage* message)
 			if (fClock->IsChangingTime())
 				fTimeEdit->MakeFocus(false);
 			fClock->ChangeTimeFinished();
+			break;
+
+		case kRTCUpdate:
 			break;
 
 		default:
@@ -157,15 +128,12 @@ DateTimeView::MessageReceived(BMessage* message)
 bool
 DateTimeView::CheckCanRevert()
 {
-	// check GMT vs Local setting
-	bool enable = fUseGmtTime != fOldUseGmtTime;
-
 	// check for changed time
 	time_t unchangedNow = fTimeAtStart + _PrefletUptime();
 	time_t changedNow;
 	time(&changedNow);
 
-	return enable || (changedNow != unchangedNow);
+	return changedNow != unchangedNow;
 }
 
 
@@ -174,14 +142,6 @@ DateTimeView::_Revert()
 {
 	// Set the clock and calendar as they were at launch time +
 	// time elapsed since application launch.
-
-	fUseGmtTime = fOldUseGmtTime;
-	_UpdateGmtSettings();
-
-	if (fUseGmtTime)
-		fGmtTime->SetValue(B_CONTROL_ON);
-	else
-		fLocalTime->SetValue(B_CONTROL_ON);
 
 	time_t timeNow = fTimeAtStart + _PrefletUptime();
 	struct tm result;
@@ -219,29 +179,9 @@ DateTimeView::_InitView()
 	fDateEdit = new TDateEdit("dateEdit", 3);
 	fTimeEdit = new TTimeEdit("timeEdit", 4);
 	fClock = new TAnalogClock("analogClock");
-	
+
 	BTime time(BTime::CurrentTime(B_LOCAL_TIME));
 	fClock->SetTime(time.Hour(), time.Minute(), time.Second());
-
-	BStringView* text = new BStringView("clockSetTo",
-		B_TRANSLATE("Hardware clock set to:"));
-	text->SetToolTip(B_TRANSLATE(
-		"This setting controls how Haiku will display your time based on how\n"
-		"time is measured in the computer's hardware clock. Windows is usually\n"
-		"set to local time, meaning the hardware clock is measured in the same\n"
-		"time as the configured time zone. When this is set to GMT it means the\n"
-		"hardware clock is measured based on GMT and Haiku will adjust the time\n"
-		"it shows based on the configured time zone."));
-	fLocalTime = new BRadioButton("localTime",
-		B_TRANSLATE("Local time"), new BMessage(kRTCUpdate));
-	fGmtTime = new BRadioButton("greenwichMeanTime",
-		B_TRANSLATE("GMT"), new BMessage(kRTCUpdate));
-
-	if (fUseGmtTime)
-		fGmtTime->SetValue(B_CONTROL_ON);
-	else
-		fLocalTime->SetValue(B_CONTROL_ON);
-	fOldUseGmtTime = fUseGmtTime;
 
 	BBox* divider = new BBox(BRect(0, 0, 1, 1),
 		B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
@@ -258,63 +198,8 @@ DateTimeView::_InitView()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fTimeEdit)
 			.Add(fClock)
-			.Add(text)
-			.AddGroup(B_HORIZONTAL, kInset)
-				.Add(fLocalTime)
-				.Add(fGmtTime)
-			.End()
 		.End()
 		.SetInsets(kInset, kInset, kInset, kInset);
-}
-
-
-void
-DateTimeView::_ReadRTCSettings()
-{
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append("RTC_time_settings");
-
-	BEntry entry(path.Path());
-	if (entry.Exists()) {
-		BFile file(&entry, B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			char buffer[6];
-			file.Read(buffer, 6);
-			if (strncmp(buffer, "gmt", 3) == 0)
-				fUseGmtTime = true;
-		}
-	}
-}
-
-
-void
-DateTimeView::_WriteRTCSettings()
-{
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
-		return;
-
-	path.Append("RTC_time_settings");
-
-	BFile file(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
-	if (file.InitCheck() == B_OK) {
-		if (fUseGmtTime)
-			file.Write("gmt", 3);
-		else
-			file.Write("local", 5);
-	}
-}
-
-
-void
-DateTimeView::_UpdateGmtSettings()
-{
-	_WriteRTCSettings();
-
-	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
 }
 
 
@@ -327,8 +212,16 @@ DateTimeView::_UpdateDateTime(BMessage* message)
 	if (message->FindInt32("month", &month) == B_OK
 		&& message->FindInt32("day", &day) == B_OK
 		&& message->FindInt32("year", &year) == B_OK) {
-		fDateEdit->SetDate(year, month, day);
-		fCalendarView->SetDate(year, month, day);
+		static int32 lastDay;
+		static int32 lastMonth;
+		static int32 lastYear;
+		if (day != lastDay || month != lastMonth || year != lastYear) {
+			fDateEdit->SetDate(year, month, day);
+			fCalendarView->SetDate(year, month, day);
+			lastDay = day;
+			lastMonth = month;
+			lastYear = year;
+		}
 	}
 
 	int32 hour;
@@ -341,3 +234,12 @@ DateTimeView::_UpdateDateTime(BMessage* message)
 		fTimeEdit->SetTime(hour, minute, second);
 	}
 }
+
+
+void
+DateTimeView::_NotifyClockSettingChanged()
+{
+	BMessage msg(kMsgClockSettingChanged);
+	Window()->PostMessage(&msg);
+}
+

@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/jme/if_jmereg.h,v 1.6 2008/12/04 02:16:53 yongari Exp $
+ * $FreeBSD: src/sys/dev/jme/if_jmereg.h,v 1.6.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $
  */
 
 #ifndef	_IF_JMEREG_H
@@ -275,8 +275,8 @@
 #define	RXCSR_RXQ2		2
 #define	RXCSR_RXQ3		3
 #define	RXCSR_DESC_RT_CNT(x)	\
-	((((x) / 4) << RXCSR_DESC_RT_CNT_SHIFT) & RXCSR_DESC_RT_CNT_MASK)
-#define	RXCSR_DESC_RT_CNT_DEFAULT	32
+	(((x) << RXCSR_DESC_RT_CNT_SHIFT) & RXCSR_DESC_RT_CNT_MASK)
+#define	RXCSR_DESC_RT_CNT_DEFAULT	0
 
 /* Rx queue descriptor base address. 16bytes alignment needed. */
 #define	JME_RXDBA_LO		0x0024

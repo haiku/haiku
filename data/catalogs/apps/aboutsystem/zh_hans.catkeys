@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-About	3511832710
+1	simplified_chinese	x-vnd.Haiku-About	3666374321
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		总计%d MiB
 %d MiB used (%d%%)	AboutView		已用 %d MiB (%d%%)
@@ -69,7 +69,6 @@ The BeGeistert team\n	AboutView		BeGeistert 小组 \n
 The Haiku-Ports team\n	AboutView		 Haiku-Ports 小组\n
 The Haikuware team and their bounty program\n	AboutView		 Haikuware 小组及其维护程序\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		奥克兰大学与 Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		专用于 Haiku 的代码在 %MIT协议% 下发布，特别是内核与所有应用程序可能链接使用的代码。某些系统库可能包含在 LGPL协议 下发布的第三方代码。在下面的介绍中，您可以找到第三方代码所使用的授权协议。\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Haiku 源代码版权是 Haiku, Inc 和源码中声明的贡献者所拥有的财产。Haiku™ 和 HAIKU logo® 是 Haiku, Inc 的（注册）商标。\n\n
 Time running:	AboutView		运行时间：
 Translations:\n	AboutView		翻译：\n

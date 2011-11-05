@@ -11,7 +11,22 @@
 
 #include "Volume.h"
 #include "Debug.h"
+#include "Utility.h"
+
 #include "cache.h"
+
+
+class TransactionListener
+	: public DoublyLinkedListLinkImpl<TransactionListener> {
+public:
+								TransactionListener();
+	virtual						~TransactionListener();
+
+	virtual void				TransactionDone(bool success) = 0;
+	virtual void				RemovedFromTransaction() = 0;
+};
+
+typedef DoublyLinkedList<TransactionListener> TransactionListeners;
 
 
 class Transaction {
@@ -38,5 +53,6 @@ class Transaction {
 	protected:
 		Volume	*fVolume;
 };
+
 
 #endif	/* JOURNAL_H */

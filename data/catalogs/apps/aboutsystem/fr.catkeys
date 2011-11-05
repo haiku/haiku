@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	128117018
+1	french	x-vnd.Haiku-About	282658629
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d Mio au total
 %d MiB used (%d%%)	AboutView		%d Mio utilisés (%d%%)
@@ -70,7 +70,6 @@ The BeGeistert team\n	AboutView		L'équipe BeGeistert\n
 The Haiku-Ports team\n	AboutView		L'équipe de Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		L'équipe Haikuware et son programme de récompenses\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		L'université d'Auckland et Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Le code source spécifique à Haiku, en particulier, celui du noyau et des applications liées, est distribué suivant les termes de la %licence MIT%. Quelques librairies systèmes contiennent du code tiers, distribué sous licence LGPL. Vous pouvez trouver les copyrights de ce code ci-dessous.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Les droits d'auteurs sur le code d'Haiku sont la propriété d'Haiku, Inc ou de ses auteurs respectifs, conformément à ce qui est expressément indiqué dans les sources. Haiku™ et le logo HAIKU ® sont des marques (déposées) de Haiku, Inc\n\n
 Time running:	AboutView		Temps depuis le démarrage :
 Translations:\n	AboutView		Traductions :\n

@@ -277,21 +277,8 @@ BDeskbar::AddItem(entry_ref *addon, int32 *_id)
 	BMessage request(kMsgAddAddOn);
 	request.AddRef("addon", addon);
 
-	// Note: to make Deskbar items persistent, they need to have the attribute
-	// set. The Deskbar will remove the attribute automatically when needed.
-	// ToDo: move this functionality into the Deskbar itself!
-
-	BNode node;
-	status_t status = node.SetTo(addon);
-	if (status < B_OK)
-		return status;
-
-	if ((status = node.WriteAttr("be:deskbar_item_status", B_STRING_TYPE,
-			0, "enabled", strlen("enabled"))) < B_OK)
-		return status;
-
 	BMessage reply;
-	status = fMessenger->SendMessage(&request, &reply);
+	status_t status = fMessenger->SendMessage(&request, &reply);
 	if (status == B_OK) {
 		if (_id != NULL)
 			status = reply.FindInt32("id", _id);

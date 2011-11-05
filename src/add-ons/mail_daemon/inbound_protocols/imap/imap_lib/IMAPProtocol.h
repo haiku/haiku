@@ -97,7 +97,7 @@ protected:
 									bigtime_t timeout = kIMAP4ClientTimeout,
 									bool disconnectOnTimeout = true);
 			void				ProcessAfterQuacks(bigtime_t timeout);
-			int32				NextCommandId();
+			int32				NextCommandID();
 
 			ServerConnection*	fServerConnection;
 			ServerConnection	fOwnServerConnection;
@@ -115,7 +115,7 @@ private:
 									bigtime_t timeout = kIMAP4ClientTimeout);
 			status_t			_Disconnect();
 
-			int32				fCommandId;
+			int32				fCommandID;
 			std::vector<int32>	fOngoingCommands;
 
 			BString				fCommandError;

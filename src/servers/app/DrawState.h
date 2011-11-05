@@ -17,7 +17,6 @@
 #include <Point.h>
 #include <View.h> // for B_FONT_ALL
 
-#include "FontManager.h"
 #include "ServerFont.h"
 #include "PatternHandler.h"
 

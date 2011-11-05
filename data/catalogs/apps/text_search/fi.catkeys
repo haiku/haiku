@@ -1,5 +1,5 @@
 1	finnish	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ei voitu avata yhtä tai useampaa kansiota.
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ei voinut avata yhtä tai useampaa kansiota.
 %s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
 %s: There was a problem running grep.	Grepper		%s: Pulma grep-ohjelmaa suoritettaessa.
 Actions	GrepWindow		Toiminnot

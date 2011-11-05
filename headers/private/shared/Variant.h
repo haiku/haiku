@@ -1,11 +1,13 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _VARIANT_H
 #define _VARIANT_H
 
 
+#include <Rect.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 
@@ -36,6 +38,9 @@ public:
 	inline						BVariant(uint64 value);
 	inline						BVariant(float value);
 	inline						BVariant(double value);
+	inline						BVariant(const BRect &value);
+	inline						BVariant(float left, float top, float right,
+									float bottom);
 	inline						BVariant(const void* value);
 	inline						BVariant(const char* value,
 									uint32 flags = 0);
@@ -56,6 +61,9 @@ public:
 	inline	void				SetTo(uint64 value);
 	inline	void				SetTo(float value);
 	inline	void				SetTo(double value);
+	inline	void				SetTo(const BRect& value);
+	inline	void				SetTo(float left, float top, float right,
+									float bottom);
 	inline	void				SetTo(const void* value);
 	inline	void				SetTo(const char* value,
 									uint32 flags = 0);
@@ -92,6 +100,7 @@ public:
 			double				ToDouble() const;
 			void*				ToPointer() const;
 			const char*			ToString() const;
+			BRect				ToRect() const;
 			BReferenceable*		ToReferenceable() const;
 
 			void				SwapEndianess();
@@ -123,6 +132,8 @@ private:
 			void				_SetTo(float value);
 			void				_SetTo(double value);
 			void				_SetTo(const void* value);
+			void				_SetTo(float left, float top, float right,
+									float bottom);
 			bool				_SetTo(const char* value,
 									uint32 flags);
 			void				_SetTo(BReferenceable* value, type_code type);
@@ -148,7 +159,13 @@ private:
 				void*			fPointer;
 				char*			fString;
 				BReferenceable*	fReferenceable;
-				uint8			fBytes[8];
+				struct {
+					float		left;
+					float		top;
+					float		right;
+					float		bottom;
+				}				fRect;
+				uint8			fBytes[sizeof(float) * 4];
 			};
 };
 
@@ -224,6 +241,18 @@ BVariant::BVariant(float value)
 BVariant::BVariant(double value)
 {
 	_SetTo(value);
+}
+
+
+BVariant::BVariant(const BRect& value)
+{
+	_SetTo(value.left, value.top, value.right, value.bottom);
+}
+
+
+BVariant::BVariant(float left, float top, float right, float bottom)
+{
+	_SetTo(left, top, right, bottom);
 }
 
 
@@ -360,6 +389,22 @@ BVariant::SetTo(double value)
 {
 	Unset();
 	_SetTo(value);
+}
+
+
+void
+BVariant::SetTo(const BRect& value)
+{
+	Unset();
+	_SetTo(value.left, value.top, value.right, value.bottom);
+}
+
+
+void
+BVariant::SetTo(float left, float top, float right, float bottom)
+{
+	Unset();
+	_SetTo(left, top, right, bottom);
 }
 
 

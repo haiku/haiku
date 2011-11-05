@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Documentation by:
- *  Alex Wilson <yourpalal2@gmail.com>
+ *   Alex Wilson <yourpalal2@gmail.com>
  * Corresponds to:
  *   /trunk/headers/os/interface/Layout.h  rev 38207
  *   /trunk/src/kits/interface/Layout.cpp  rev 38207
@@ -11,21 +11,22 @@
 
 
 /*!
-\file Layout.h
-\brief Defines the BLayout class.
+	\file Layout.h
+	\brief Defines the BLayout class.
 */
 
 
-/*! \class BLayout
+/*!
+	\class BLayout
 	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief The BLayout class provides an interface, and some basic
-		implementation to manage the positioning and sizing of BLayoutItems.
+		implementation to manage the positioning and sizing of BLayoutItem s.
 
-	BLayouts can be attached to a BView, managing the BLayoutItems and BViews
-	that reside in that view, or can be nested within another BLayout as a
-	BLayoutItem.
+	BLayouts can be attached to a BView, managing the BLayoutItem&apos;s and
+	BView&apos;s that reside in that view, or can be nested within another
+	BLayout as a BLayoutItem.
 
 	Before adding a BLayoutItem to a BLayout, that layout must have a target
 	view. When a BLayout is attached directly to a BView via BView::SetLayout()
@@ -34,7 +35,7 @@
 	target of the layout it's nested in, if it does not have a target already.
 	You can retrieve the target view for a layout with the TargetView() method.
 	When adding a BLayoutItem to a BLayout, the item's view (as returned by
-	BLayoutItem::View()) is added to the layout's target view.
+	BLayoutItem::View()) is added to the BLayout&apos;s target view.
 
 \code
 BView* topView = new BGroupView();
@@ -64,71 +65,80 @@ topLayout->AddItem(nestedLayoutWithView);
 	assume that it will break some time in the future.
 */
 
-								
-/*! \fn BLayout::BLayout()
+
+/*!
+	\fn BLayout::BLayout()
 	\brief Default constructor.
 
-	After this constructor has finished, this BLayout holds no BLayoutItems and
-	does not have a target BView.
+	After this constructor has finished, this BLayout holds no
+	BLayoutItem&apos;s and does not have a target BView.
 	
 	\warning Because a new BLayout does not have a target BView, calls to the
 		AddItem() and AddView() will fail methods will fail.
 */
 
 
-/*! \fn BLayout::BLayout(BMessage* archive)
+/*!
+	\fn BLayout::BLayout(BMessage* archive)
 	\brief Archive constructor.
+
+	\param archive The archive message.
 */
 
 
-/*! \fn BLayout::~BLayout()
-	\brief Destructor, deletes all BLayoutItems that this layout manages,
-		and detaches from this BLayout's owner view if there is one.
+/*!
+	\fn BLayout::~BLayout()
+	\brief Destructor, deletes all BLayoutItem&apos;s that this layout manages,
+		and detaches from this BLayout&apos;s owner view if there is one.
 
-	Each BLayoutItem's BView (as returned by BLayoutItem::View()) is also
+	Each BLayoutItem&apos;s BView (as returned by BLayoutItem::View()) is also
 	removed from their parent.
 
-	\note Because nested BLayouts are treated as BLayoutItems, any layouts
-	nested in this BLayout will be deleted.
+	\note Because nested BLayout&apos;s are treated as BLayoutItem&apos;s,
+	any layouts nested in this BLayout will be deleted.
 */
 
 
 /*!
 	\name BView targeting and attachment information.
-
-	@{
 */
 
 
-/*! \fn BView* BLayout::Owner() const
+//! @{
+
+
+/*!
+	\fn BView* BLayout::Owner() const
 	\brief Returns the Owner of this layout, i.e. the view this layout manages.
 */
 
 
-/*! \fn BView* BLayout::TargetView() const
+/*!
+	\fn BView* BLayout::TargetView() const
 	\brief Returns the target view of this layout.
 
-	The target view of a layout becomes the parent of any BViews in this layout,
-	as well as the BViews returned by BLayoutItem::View() for each BLayoutItem
-	in this layout.
+	The target view of a layout becomes the parent of any BView&apos;s in this
+	layout, as well as the BView&apos;s returned by BLayoutItem::View() for
+	each BLayoutItem in this layout.
 */
-
-
-/*! \fn BView* BLayout::View()
-	\brief Returns the same BView* as BLayout::Owner(), this method is inherited
-		 from BLayoutItem.
-*/
-
-
-//@}
 
 
 /*!
-	\name Adding, removing, counting and accessing BViews and BLayoutItems in \
-		this BLayout.
-
-	@{
+	\fn BView* BLayout::View()
+	\brief Returns the same BView* as BLayout::Owner(), this method is
+		inherited from BLayoutItem.
 */
+
+
+//! @}
+
+
+/*!
+	\name Adding, removing, counting and accessing BLayout children
+*/
+
+
+//! @{
 
 
 /*!
@@ -136,25 +146,26 @@ topLayout->AddItem(nestedLayoutWithView);
 	\brief Creates a BLayoutItem to represent a BView, and adds that item to
 		this layout.
 		
-	\a child is added to this layout's target view.
+	\a child is added to this BLayout&apos;s target view.
 	
-	\returns The BLayoutItem created to represent \a child is, or NULL if there
-		was an error.
+	\returns The BLayoutItem created to represent \a child is, or \c NULL if
+		there was an error.
 
 	\param child The BView to be added to this BLayout. 
 */
 
 
-/*! \fn	BLayoutItem* BLayout::AddView(int32 index, BView* child)
+/*!
+	\fn	BLayoutItem* BLayout::AddView(int32 index, BView* child)
 	\brief Creates a BLayoutItem to represent \a child, and adds that item at
-		\a index to	this layout. \a child is added to this layout's target view.
+		\a index to	this layout. \a child is added to this BLayout&apos;s target view.
 */
 
 
 /*!
 	\fn bool BLayout::AddItem(BLayoutItem* item)
 	\brief Adds a BLayoutItem to this layout, and adds the BView it represents
-		to this layout's target view.
+		to this BLayout&apos;s target view.
 
 	\param item The BLayoutItem to be added.
 	\retval true success
@@ -165,7 +176,7 @@ topLayout->AddItem(nestedLayoutWithView);
 /*!
 	\fn bool BLayout::AddItem(int32 index, BLayoutItem* item)
 	\brief Adds \a item to this layout, and adds the BView \a item represents
-		to this layout's target view.
+		to this BLayout&apos;s target view.
 
 	\param item The BLayoutItem to be added.
 	\param index The index at which to add \c item.
@@ -181,8 +192,8 @@ topLayout->AddItem(nestedLayoutWithView);
 
 /*!
 	\fn bool BLayout::RemoveView(BView* child)
-	\brief Removes and deletes all BLayoutItems representing a BView from this
-		layout.
+	\brief Removes and deletes all BLayoutItem representing a BView from
+		this layout.
 
 	\param child The BView to be removed.
 
@@ -193,10 +204,10 @@ topLayout->AddItem(nestedLayoutWithView);
 
 /*!
 	\fn	bool BLayout::RemoveItem(BLayoutItem* item)
-	\brief Removes a BLayoutITem from this layout, and also removes the view 
-		it represents from this layout's target view.
+	\brief Removes a BLayoutItem from this layout, and also removes the view 
+		it represents from this BLayout&apos;s target view.
 
-	\param item The BLayoutitem to be removed
+	\param item The BLayoutItem to be removed
 	
 	\warning \a item is not deleted, you must delete it manually, or add it	to
 		another BLayout.
@@ -206,7 +217,8 @@ topLayout->AddItem(nestedLayoutWithView);
 */
 
 
-/*! \fn BLayoutItem* BLayout::RemoveItem(int32 index)
+/*!
+	\fn BLayoutItem* BLayout::RemoveItem(int32 index)
 	\brief Remove the BLayoutItem at \a index.
 
 	\see RemoveItem(BLayoutItem*)
@@ -224,7 +236,7 @@ topLayout->AddItem(nestedLayoutWithView);
 
 /*!
 	\fn int32 BLayout::CountItems() const
-	\brief Get the number of BLayoutItems in this layout.
+	\brief Get the number of BLayoutItem s in this layout.
 */
 
 
@@ -248,26 +260,28 @@ topLayout->AddItem(nestedLayoutWithView);
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Subclass helpers.
 	\brief These methods are meant to ease the development of BLayout
 		subclasses.
-
-	@{
 */
 
 
-/*! \fn bool BLayout::AncestorsVisible()
+//! @{
+
+
+/*!
+	\fn bool BLayout::AncestorsVisible()
 	\brief Get the visibility of the ancestors of this layout.
 
 	If a BLayout is connected to a BView, this will always return \c true.
 	If a BLayout is nested in another layout (it was passed to AddItem()), then
-	this will reflect the visibility of this layout's parent layout. If any
-	layout is hidden (by BLayout::SetVisible()) between this layout and its
-	target view's layout, then this method will return \c false.
+	this will reflect the visibility of this BLayout&apos;s parent layout. If
+	any layout is hidden (by BLayout::SetVisible()) between this layout and its
+	target BView&apos;s layout, then this method will return \c false.
 */
 
 
@@ -276,8 +290,8 @@ topLayout->AddItem(nestedLayoutWithView);
 	\brief Returns the on-screen area this layout has received to lay out its
 		items in.
 
-	The return value is in the coordinate space of this layout's target view.
-	If this BLayout is attached directly to a BView, then
+	The return value is in the coordinate space of this BLayout&apos;s target
+	view. If this BLayout is attached directly to a BView, then
 	<tt> LayoutArea().LeftTop() == B_ORIGIN </tt>.
 */
 
@@ -287,27 +301,34 @@ topLayout->AddItem(nestedLayoutWithView);
 	\brief Method to be called by derived classes in their SetVisible()
 		implementation. Calls AncestorVisibilityChanged() on the items in this
 		BLayout.
+
+	\param show \c true to show, \c false to hide.
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Methods triggering or related to laying out this BLayout.
-
-//@{
 */
 
 
-/*!	\fn void BLayout::Relayout(bool immediate = false)
+//! @{
+
+
+/*!
+	\fn void BLayout::Relayout(bool immediate = false)
 	\brief Request this BLayout to reposition and resize its items as required.
 
 	If \a immediate is \c false, and there is already a request to have the
 	window this layout resides in re-laid-out, then the layout will happen at
 	that time. If \a immediate is \c true, and there is no such pending
-	request, nor is this layout's parent layout in the process of laying out
-	its items, then this BLayout will now layout its items.
+	request, nor is this BLayout&apos;s parent layout in the process of laying
+	out its items, then this BLayout will now layout its items.
+
+	\param immediate Whether or not to Relayout immediately or wait for pending
+		requests first.
 */
 
 
@@ -315,10 +336,12 @@ topLayout->AddItem(nestedLayoutWithView);
 	\fn void BLayout::LayoutItems(bool force = false)
 	\brief If there is no layout currently ongoing, and \a force is \c false,
 		creates a new BLayoutContext and calls the DerivedLayoutItems() method
-		of this BLayout and any BLayouts nested in this BLayout.
+		of this BLayout and any BLayout s nested in this BLayout.
 	
 	If method also guarantees that the owner view of this layout (as returned
 	by BLayout::Owner()) performs a layout as well (if it is suitable to do so).
+
+	\param force Force the LayoutItems.
 */
 
 
@@ -329,14 +352,15 @@ topLayout->AddItem(nestedLayoutWithView);
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Invalidation and state mutators and accessors.
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -352,7 +376,7 @@ topLayout->AddItem(nestedLayoutWithView);
 		to positioning and sizing of its items.
 
 	Invalidating a BLayout also invalidates the view it is connected to
-	(if there is one) and the BLayout this layout (or this layout's view)
+	(if there is one) and the BLayout this layout (or this BLayout&apos;s view)
 	resides in.
 
 	This method should be called whenever the layout becomes invalid. This might
@@ -379,7 +403,8 @@ topLayout->AddItem(nestedLayoutWithView);
 */
 
 
-/*! \fn void BLayout::DisableLayoutInvalidation()
+/*!
+	\fn void BLayout::DisableLayoutInvalidation()
 	\brief Disable layout invalidation notifications, i.e. calls to
 		this object's InvalidateLayout() method.
 */
@@ -393,18 +418,19 @@ topLayout->AddItem(nestedLayoutWithView);
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name Archiving methods
 	\brief These methods relate to the archiving or unarchiving of this object
-		and the BLayoutItems it contains
-
-	@{
+		and the BLayoutItem&apos;s it contains
 */
 
-	
+
+//! @{
+
+
 /*!
 	\fn status_t BLayout::Archive(BMessage* archive, bool deep = true) const
 	\brief Archives this layout into \a archive. If deep is true, also archives
@@ -414,8 +440,8 @@ topLayout->AddItem(nestedLayoutWithView);
 
 /*!
 	\fn status_t BLayout::AllUnarchived(const BMessage* from)
-	\brief Unarchives the BLayoutItems for this layout, calling ItemUnarchived()
-		for each one.
+	\brief Unarchives the BLayoutItem&apos;s for this layout, calling
+		ItemUnarchived() for each one.
 */
 
 
@@ -442,14 +468,15 @@ topLayout->AddItem(nestedLayoutWithView);
 */
 
 
-//@}
+//! @}
 
 
 /*!
 	\name BLayout Hook methods
-
-	@{
 */
+
+
+//! @{
 
 
 /*!
@@ -490,23 +517,23 @@ topLayout->AddItem(nestedLayoutWithView);
 	\fn void BLayout::OwnerChanged(BView* was)
 	\brief Hook method called when this layout is attached to a BView.
 
-	\param was The previous owner of this BLayout, for new BLayouts, this will
-	be NULL.
+	\param was The previous owner of this BLayout, for new BLayout s, this
+		will be \c NULL.
 */
 
 
 /*!
 	\fn void BLayout::AttachedToLayout()
-	\brief Hook method inherited from BLayoutItem, classes derived from BLayout
-		must include the BLayout version of this method in their
+	\brief Hook method inherited from BLayoutItem, classes derived from
+		BLayout must include the BLayout version of this method in their
 		implementation.
 */
 
 
 /*!
 	\fn void BLayout::DetachedFromLayout(BLayout* layout)
-	\brief Hook method inherited from BLayoutItem, classes derived from BLayout
-		must include the BLayout version of this method in their
+	\brief Hook method inherited from BLayoutItem, classes derived from
+		BLayout must include the BLayout version of this method in their
 		implementation.
 
 	\param layout The BLayout that this BLayout was detached from.
@@ -515,11 +542,10 @@ topLayout->AddItem(nestedLayoutWithView);
 
 /*!
 	\fn void BLayout::AncestorVisibilityChanged(bool shown)
-	\brief Hook method inherited from BLayoutItem, classes derived from BLayout
-		must include the BLayout version of this method in their
+	\brief Hook method inherited from BLayoutItem, classes derived from
+		BLayout must include the BLayout version of this method in their
 		implementation.
 */
 
 
-//@}
-
+//! @}

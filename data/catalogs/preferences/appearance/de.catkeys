@@ -1,8 +1,11 @@
-1	german	x-vnd.Haiku-Appearance	3187486915
+1	german	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		Über
+About Decerator	DecorSettingsView		Über Dekorator
 Antialiasing	APRWindow		Kantenglättung
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
 Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
 Appearance	System name		Erscheinungsbild
+Choose Decorator	DecorSettingsView		Dekorator wählen
 Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Control border	Colors tab		Steuerelement - Rahmen
@@ -23,6 +26,7 @@ Menu item text	Colors tab		Menü - Text
 Monospaced fonts only	AntialiasingSettingsView		Nur nicht-proportionale Schriften
 Navigation base	Colors tab		Navigation - Grundfarbe
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		Aus
 On	AntialiasingSettingsView		Ein
 Panel background	Colors tab		Oberfläche - Hintergrund
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Erfolg
 Tooltip background	Colors tab		Tooltip - Hintergrund
 Tooltip text	Colors tab		Tooltip - Text
+Window Decorator	APRWindow		Dekorator
+Window Decorator:	DecorSettingsView		Fenster-Dekorator:
 Window tab	Colors tab		Reiter
 Window tab text	Colors tab		Reiter - Text

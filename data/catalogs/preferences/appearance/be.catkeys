@@ -1,8 +1,11 @@
-1	belarusian	x-vnd.Haiku-Appearance	3187486915
+1	belarusian	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		Пра Праграму
+About Decerator	DecorSettingsView		Пра Дэкаратар
 Antialiasing	APRWindow		Згладжванне
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
 Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
 Appearance	System name		Афармленне
+Choose Decorator	DecorSettingsView		Абраць Дэкаратар
 Colors	APRWindow		Колеры
 Control background	Colors tab		Фон кнопак
 Control border	Colors tab		Аблямоўка кнопак
@@ -23,6 +26,7 @@ Menu item text	Colors tab		Тэкст пунктаў меню
 Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
 Navigation base	Colors tab		Базавы колер навігацыі
 Navigation pulse	Colors tab		Колер падсветкі навігацыі
+OK	DecorSettingsView		Так
 Off	AntialiasingSettingsView		Выкл.
 On	AntialiasingSettingsView		Укл.
 Panel background	Colors tab		Фон панэлі
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Паспяхова
 Tooltip background	Colors tab		Фон падказкі
 Tooltip text	Colors tab		Тэкст падказак
+Window Decorator	APRWindow		Дэкаратар Вакон
+Window Decorator:	DecorSettingsView		Дэкаратар Вакон:
 Window tab	Colors tab		Ўкладка вакна
 Window tab text	Colors tab		Тэкст загалоўку акна

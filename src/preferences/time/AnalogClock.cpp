@@ -98,7 +98,7 @@ TAnalogClock::MouseDown(BPoint point)
 		BView::MouseDown(point);
 		return;
 	}
-	
+
 	if (InMinuteHand(point)) {
 		fMinuteDragging = true;
 		fDirty = true;
@@ -124,7 +124,7 @@ TAnalogClock::MouseUp(BPoint point)
 		BView::MouseUp(point);
 		return;
 	}
-	
+
 	if (fHourDragging || fMinuteDragging) {
 		int32 hour, minute, second;
 		GetTime(&hour, &minute, &second);
@@ -160,7 +160,7 @@ TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 
 
 void
-TAnalogClock::FrameResized(float, float)
+TAnalogClock::DoLayout()
 {
 	BRect bounds = Bounds();
 
@@ -168,8 +168,7 @@ TAnalogClock::FrameResized(float, float)
 	// (important when drawing with B_SUBPIXEL_PRECISE)
 	fCenterX = floorf((bounds.left + bounds.right) / 2 + 0.5) + 0.5;
 	fCenterY = floorf((bounds.top + bounds.bottom) / 2 + 0.5) + 0.5;
-	fRadius = floorf((MIN(bounds.Width(), bounds.Height()) / 2.0)) - 2.5;
-	fRadius -= 3;
+	fRadius = floorf((MIN(bounds.Width(), bounds.Height()) / 2.0)) - 5.5;
 }
 
 
@@ -184,7 +183,7 @@ TAnalogClock::MaxSize()
 BSize
 TAnalogClock::MinSize()
 {
-	return BSize(0, 0);
+	return BSize(64.f, 64.f);
 }
 
 
@@ -202,7 +201,7 @@ TAnalogClock::SetTime(int32 hour, int32 minute, int32 second)
 	// don't set the time if the hands are in a drag action
 	if (fHourDragging || fMinuteDragging || fTimeChangeIsOngoing)
 		return;
-	
+
 	if (fHours == hour && fMinutes == minute && fSeconds == second)
 		return;
 
@@ -254,7 +253,7 @@ TAnalogClock::DrawClock()
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 	SetHighColor(background);
 	FillRect(bounds);
-	
+
 	bounds.Set(fCenterX - fRadius, fCenterY - fRadius,
 		fCenterX + fRadius, fCenterY + fRadius);
 
@@ -459,7 +458,7 @@ TAnalogClock::_DrawHands(float x, float y, float radius,
 		offsetY = (radius * 0.95) * cosf((fSeconds * M_PI) / 30.0);
 		StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
 	}
-	
+
 	// draw the center knob
 	SetHighColor(knobColor);
 	FillEllipse(BPoint(x, y), radius * 0.06, radius * 0.06);

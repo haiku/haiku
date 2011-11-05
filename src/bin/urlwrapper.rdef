@@ -7,6 +7,7 @@ resource(1, "BEOS:FILE_TYPES") message
 	"types" =  "application/x-vnd.Be-bookmark",
 	"types" = "text/x-url",
 	"types" = "text/x-webloc",
+	"types" = "application/x-vnd.Be.URL.about",
 	"types" = "application/x-vnd.Be.URL.file",
 	"types" = "application/x-vnd.Be.URL.http",
 	"types" = "application/x-vnd.Be.URL.https",

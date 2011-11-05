@@ -212,7 +212,7 @@ check_ascii(const char *locname)
 			printf("%s: '\\x%x': not 1 returned\n", locname, c);
 			++res;
 		} else if (wc != (wchar_t) c) {
-			printf("%s: '\\x%x': wc != L'\\x%x'\n", locname, c, c);
+			printf("%s: '\\x%x' != wc != L'\\x%x'\n", locname, c, wc);
 			++res;
 		}
 	}

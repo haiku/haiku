@@ -1,4 +1,6 @@
-1	ukrainian	x-vnd.Haiku-cmd-dstconfig	1891332014
+1	ukrainian	x-vnd.Haiku-cmd-dstconfig	2337923203
 .\n\nIs this the correct time?	dstcheck		.\n\nЦей час правильний?
-Ask me later	dstcheck		Запитати мене пізніше
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Увага!\n\nЧерез перехід з літнього часу, годинник вашого комп’ютера може бути зміщеним на годину.\nВін думає, що зараз
+Ask me later	dstcheck		Запитати пізніше
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Увага!\n\nЧерез перехід з літнього часу, годинник вашого комп’ютера може бути зміщеним на годину.\nВін думає, що зараз це є
+Manually adjust time…	dstcheck		Ручна зміна часу…
+Use this time	dstcheck		Використовувати цей час

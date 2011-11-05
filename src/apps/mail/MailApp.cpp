@@ -165,7 +165,7 @@ TMailApp::ArgvReceived(int32 argc, char **argv)
 			|| strcmp(argv[loop], "--help") == 0)
 		{
 			printf(" usage: %s [ mailto:<address> ] [ -subject \"<text>\" ] [ ccto:<address> ] [ bccto:<address> ] "
-				"[ -body \"<body text\" ] [ enclosure:<path> ] [ <message to read> ...] \n",
+				"[ -body \"<body text>\" ] [ enclosure:<path> ] [ <message to read> ...] \n",
 				argv[0]);
 			fPrintHelpAndExit = true;
 			be_app->PostMessage(B_QUIT_REQUESTED);

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ShowImage	2105704395
+1	slovak	x-vnd.Haiku-ShowImage	2479358163
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekúnd
 Browse	Menus		Prechádzať
 Cancel	ClosePrompt		Zrušiť
@@ -49,6 +49,7 @@ ShowImage	System name		ZobraziťObrázok
 Slide delay	Menus		Oneskorenie snímku
 Slide show	Menus		Prezentácia
 Stretch to window	Menus		Roztiahnuť do okna
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ bol zmenený. Chcete dokument zatvoriť?
 The file '%s' could not be written.	SaveToFile		Súbor „%s“ nebolo možné zapísať.
 Undo	Menus		Vrátiť späť

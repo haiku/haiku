@@ -26,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/jme/if_jme.c,v 1.10 2008/12/04 02:16:53 yongari Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/jme/if_jme.c,v 1.11.2.8.2.1 2010/12/21 17:09:25 kensmith Exp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -201,13 +201,6 @@ static struct resource_spec jme_irq_spec_legacy[] = {
 
 static struct resource_spec jme_irq_spec_msi[] = {
 	{ SYS_RES_IRQ,		1,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		2,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		3,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		4,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		5,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		6,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		7,		RF_ACTIVE },
-	{ SYS_RES_IRQ,		8,		RF_ACTIVE },
 	{ -1,			0,		0 }
 };
 
@@ -224,13 +217,8 @@ jme_miibus_readreg(device_t dev, int phy, int reg)
 	sc = device_get_softc(dev);
 
 	/* For FPGA version, PHY address 0 should be ignored. */
-	if ((sc->jme_flags & JME_FLAG_FPGA) != 0) {
-		if (phy == 0)
-			return (0);
-	} else {
-		if (sc->jme_phyaddr != phy)
-			return (0);
-	}
+	if ((sc->jme_flags & JME_FLAG_FPGA) != 0 && phy == 0)
+		return (0);
 
 	CSR_WRITE_4(sc, JME_SMI, SMI_OP_READ | SMI_OP_EXECUTE |
 	    SMI_PHY_ADDR(phy) | SMI_REG_ADDR(reg));
@@ -260,13 +248,8 @@ jme_miibus_writereg(device_t dev, int phy, int reg, int val)
 	sc = device_get_softc(dev);
 
 	/* For FPGA version, PHY address 0 should be ignored. */
-	if ((sc->jme_flags & JME_FLAG_FPGA) != 0) {
-		if (phy == 0)
-			return (0);
-	} else {
-		if (sc->jme_phyaddr != phy)
-			return (0);
-	}
+	if ((sc->jme_flags & JME_FLAG_FPGA) != 0 && phy == 0)
+		return (0);
 
 	CSR_WRITE_4(sc, JME_SMI, SMI_OP_WRITE | SMI_OP_EXECUTE |
 	    ((val << SMI_DATA_SHIFT) & SMI_DATA_MASK) |
@@ -306,6 +289,10 @@ jme_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr)
 
 	sc = ifp->if_softc;
 	JME_LOCK(sc);
+	if ((ifp->if_flags & IFF_UP) == 0) {
+		JME_UNLOCK(sc);
+		return;
+	}
 	mii = device_get_softc(sc->jme_miibus);
 
 	mii_pollstat(mii);
@@ -461,7 +448,7 @@ jme_reg_macaddr(struct jme_softc *sc)
 		    "generating fake ethernet address.\n");
 		par0 = arc4random();
 		/* Set OUI to JMicron. */
-		sc->jme_eaddr[0] = 0x00;
+		sc->jme_eaddr[0] = 0x02;	/* U/L bit set. */
 		sc->jme_eaddr[1] = 0x1B;
 		sc->jme_eaddr[2] = 0x8C;
 		sc->jme_eaddr[3] = (par0 >> 16) & 0xff;
@@ -592,11 +579,16 @@ jme_attach(device_t dev)
 		device_printf(dev, "MSI count : %d\n", msic);
 	}
 
+	/* Use 1 MSI/MSI-X. */
+	if (msixc > 1)
+		msixc = 1;
+	if (msic > 1)
+		msic = 1;
 	/* Prefer MSIX over MSI. */
 	if (msix_disable == 0 || msi_disable == 0) {
-		if (msix_disable == 0 && msixc == JME_MSIX_MESSAGES &&
+		if (msix_disable == 0 && msixc > 0 &&
 		    pci_alloc_msix(dev, &msixc) == 0) {
-			if (msic == JME_MSIX_MESSAGES) {
+			if (msixc == 1) {
 				device_printf(dev, "Using %d MSIX messages.\n",
 				    msixc);
 				sc->jme_flags |= JME_FLAG_MSIX;
@@ -605,9 +597,8 @@ jme_attach(device_t dev)
 				pci_release_msi(dev);
 		}
 		if (msi_disable == 0 && (sc->jme_flags & JME_FLAG_MSIX) == 0 &&
-		    msic == JME_MSI_MESSAGES &&
-		    pci_alloc_msi(dev, &msic) == 0) {
-			if (msic == JME_MSI_MESSAGES) {
+		    msic > 0 && pci_alloc_msi(dev, &msic) == 0) {
+			if (msic == 1) {
 				device_printf(dev, "Using %d MSI messages.\n",
 				    msic);
 				sc->jme_flags |= JME_FLAG_MSI;
@@ -747,9 +738,11 @@ jme_attach(device_t dev)
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/* Set up MII bus. */
-	if ((error = mii_phy_probe(dev, &sc->jme_miibus, jme_mediachange,
-	    jme_mediastatus)) != 0) {
-		device_printf(dev, "no PHY found!\n");
+	error = mii_attach(dev, &sc->jme_miibus, ifp, jme_mediachange,
+	    jme_mediastatus, BMSR_DEFCAPMASK, sc->jme_phyaddr, MII_OFFSET_ANY,
+	    MIIF_DOPAUSE);
+	if (error != 0) {
+		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
 	}
 
@@ -779,7 +772,7 @@ jme_attach(device_t dev)
 
 	/* VLAN capability setup */
 	ifp->if_capabilities |= IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING |
-	    IFCAP_VLAN_HWCSUM;
+	    IFCAP_VLAN_HWCSUM | IFCAP_VLAN_HWTSO;
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/* Tell the upper layer(s) we support long frames. */
@@ -798,13 +791,7 @@ jme_attach(device_t dev)
 	taskqueue_start_threads(&sc->jme_tq, 1, PI_NET, "%s taskq",
 	    device_get_nameunit(sc->jme_dev));
 
-	if ((sc->jme_flags & JME_FLAG_MSIX) != 0)
-		msic = JME_MSIX_MESSAGES;
-	else if ((sc->jme_flags & JME_FLAG_MSI) != 0)
-		msic = JME_MSI_MESSAGES;
-	else
-		msic = 1;
-	for (i = 0; i < msic; i++) {
+	for (i = 0; i < 1; i++) {
 		error = bus_setup_intr(dev, sc->jme_irq[i],
 		    INTR_TYPE_NET | INTR_MPSAFE, jme_intr, NULL, sc,
 		    &sc->jme_intrhand[i]);
@@ -832,7 +819,7 @@ jme_detach(device_t dev)
 {
 	struct jme_softc *sc;
 	struct ifnet *ifp;
-	int i, msic;
+	int i;
 
 	sc = device_get_softc(dev);
 
@@ -867,14 +854,7 @@ jme_detach(device_t dev)
 		sc->jme_ifp = NULL;
 	}
 
-	msic = 1;
-	if ((sc->jme_flags & JME_FLAG_MSIX) != 0)
-		msic = JME_MSIX_MESSAGES;
-	else if ((sc->jme_flags & JME_FLAG_MSI) != 0)
-		msic = JME_MSI_MESSAGES;
-	else
-		msic = 1;
-	for (i = 0; i < msic; i++) {
+	for (i = 0; i < 1; i++) {
 		if (sc->jme_intrhand[i] != NULL) {
 			bus_teardown_intr(dev, sc->jme_irq[i],
 			    sc->jme_intrhand[i]);
@@ -1585,8 +1565,10 @@ jme_resume(device_t dev)
 		    pmc + PCIR_POWER_STATUS, pmstat, 2);
 	}
 	ifp = sc->jme_ifp;
-	if ((ifp->if_flags & IFF_UP) != 0)
+	if ((ifp->if_flags & IFF_UP) != 0) {
+		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		jme_init_locked(sc);
+	}
 
 	JME_UNLOCK(sc);
 
@@ -1659,11 +1641,12 @@ jme_encap(struct jme_softc *sc, struct mbuf **m_head)
 			*m_head = NULL;
 			return (ENOBUFS);
 		}
-		tcp = (struct tcphdr *)(mtod(m, char *) + poff);
 		/*
 		 * Reset IP checksum and recompute TCP pseudo
 		 * checksum that NDIS specification requires.
 		 */
+		ip = (struct ip *)(mtod(m, char *) + ip_off);
+		tcp = (struct tcphdr *)(mtod(m, char *) + poff);
 		ip->ip_sum = 0;
 		if (poff + (tcp->th_off << 2) == m->m_pkthdr.len) {
 			tcp->th_sum = in_pseudo(ip->ip_src.s_addr,
@@ -1861,6 +1844,7 @@ jme_watchdog(struct jme_softc *sc)
 	if ((sc->jme_flags & JME_FLAG_LINK) == 0) {
 		if_printf(sc->jme_ifp, "watchdog timeout (missed link)\n");
 		ifp->if_oerrors++;
+		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		jme_init_locked(sc);
 		return;
 	}
@@ -1875,6 +1859,7 @@ jme_watchdog(struct jme_softc *sc)
 
 	if_printf(sc->jme_ifp, "watchdog timeout\n");
 	ifp->if_oerrors++;
+	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	jme_init_locked(sc);
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
 		taskqueue_enqueue(sc->jme_tq, &sc->jme_tx_task);
@@ -1917,8 +1902,10 @@ jme_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 				VLAN_CAPABILITIES(ifp);
 			}
 			ifp->if_mtu = ifr->ifr_mtu;
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
+				ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 				jme_init_locked(sc);
+			}
 			JME_UNLOCK(sc);
 		}
 		break;
@@ -1990,6 +1977,9 @@ jme_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		if ((mask & IFCAP_VLAN_HWCSUM) != 0 &&
 		    (ifp->if_capabilities & IFCAP_VLAN_HWCSUM) != 0)
 			ifp->if_capenable ^= IFCAP_VLAN_HWCSUM;
+		if ((mask & IFCAP_VLAN_HWTSO) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTSO) != 0)
+			ifp->if_capenable ^= IFCAP_VLAN_HWTSO;
 		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
 		    (IFCAP_VLAN_HWTAGGING & ifp->if_capabilities) != 0) {
 			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
@@ -2034,12 +2024,10 @@ jme_mac_config(struct jme_softc *sc)
 		txmac &= ~(TXMAC_COLL_ENB | TXMAC_CARRIER_SENSE |
 		    TXMAC_BACKOFF | TXMAC_CARRIER_EXT |
 		    TXMAC_FRAME_BURST);
-#ifdef notyet
 		if ((IFM_OPTIONS(mii->mii_media_active) & IFM_ETH_TXPAUSE) != 0)
 			txpause |= TXPFC_PAUSE_ENB;
 		if ((IFM_OPTIONS(mii->mii_media_active) & IFM_ETH_RXPAUSE) != 0)
 			rxmac |= RXMAC_FC_ENB;
-#endif
 		/* Disable retry transmit timer/retry limit. */
 		CSR_WRITE_4(sc, JME_TXTRHD, CSR_READ_4(sc, JME_TXTRHD) &
 		    ~(TXTRHD_RT_PERIOD_ENB | TXTRHD_RT_LIMIT_ENB));
@@ -2642,6 +2630,8 @@ jme_init_locked(struct jme_softc *sc)
 	ifp = sc->jme_ifp;
 	mii = device_get_softc(sc->jme_miibus);
 
+	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		return;
 	/*
 	 * Cancel any pending I/O.
 	 */
@@ -3122,7 +3112,7 @@ jme_set_filter(struct jme_softc *sc)
 	rxcfg |= RXMAC_MULTICAST;
 	bzero(mchash, sizeof(mchash));
 
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &sc->jme_ifp->if_multiaddrs, ifma_link) {
 		if (ifma->ifma_addr->sa_family != AF_LINK)
 			continue;
@@ -3135,7 +3125,7 @@ jme_set_filter(struct jme_softc *sc)
 		/* Set the corresponding bit in the hash table. */
 		mchash[crc >> 5] |= 1 << (crc & 0x1f);
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
 	CSR_WRITE_4(sc, JME_MAR0, mchash[0]);
 	CSR_WRITE_4(sc, JME_MAR1, mchash[1]);

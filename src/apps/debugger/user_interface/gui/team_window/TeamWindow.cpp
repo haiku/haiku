@@ -30,6 +30,7 @@
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "FileSourceCode.h"
+#include "GUITeamUISettings.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "InspectorWindow.h"
@@ -218,8 +219,10 @@ TeamWindow::MessageReceived(BMessage* message)
 			try {
 				fInspectorWindow = InspectorWindow::Create(fTeam, fListener,
 					this);
-				if (fInspectorWindow != NULL)
+				if (fInspectorWindow != NULL) {
+					fInspectorWindow->LoadSettings(&fUISettings);
 					fInspectorWindow->Show();
+				}
            	} catch (...) {
            		// TODO: notify user
            	}
@@ -227,7 +230,9 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_INSPECTOR_WINDOW_CLOSED:
 		{
+			_SaveInspectorSettings(CurrentMessage());
 			fInspectorWindow = NULL;
+
 		}
 		case B_REFS_RECEIVED:
 		{
@@ -331,6 +336,67 @@ bool
 TeamWindow::QuitRequested()
 {
 	return fListener->UserInterfaceQuitRequested();
+}
+
+
+status_t
+TeamWindow::LoadSettings(const GUITeamUISettings* settings)
+{
+	BVariant value;
+	status_t error = settings->Value("teamWindowFrame", value);
+	if (error == B_OK) {
+		BRect rect = value.ToRect();
+		ResizeTo(rect.Width(), rect.Height());
+		MoveTo(rect.left, rect.top);
+	}
+
+	_LoadSplitSettings(fSourceSplitView, "Source", settings);
+	_LoadSplitSettings(fFunctionSplitView, "Function", settings);
+	_LoadSplitSettings(fImageSplitView, "Image", settings);
+	_LoadSplitSettings(fThreadSplitView, "Thread", settings);
+
+	fUISettings = *settings;
+
+	return B_OK;
+}
+
+
+status_t
+TeamWindow::SaveSettings(GUITeamUISettings* settings)
+{
+	// save the settings from the cached copy first,
+	// then overwrite them with our most current set
+	// this is necessary in order to preserve the settings
+	// of things like the inspector in case we haven't actually
+	// invoked them at all in this session
+	const BMessage& values = fUISettings.Values();
+	char *name;
+	type_code type;
+	BVariant value;
+	for (int32 i = 0; values.GetInfo(B_ANY_TYPE, i, &name, &type) == B_OK;
+		i++) {
+		if (value.SetFromMessage(values, name) == B_OK) {
+			if (!settings->SetValue(name, value))
+				return B_NO_MEMORY;
+		}
+	}
+
+	if (!settings->SetValue("teamWindowFrame", Frame()))
+		return B_NO_MEMORY;
+
+	if (_SaveSplitSettings(fSourceSplitView, "Source", settings) != B_OK)
+		return B_NO_MEMORY;
+
+	if (_SaveSplitSettings(fFunctionSplitView, "Function", settings) != B_OK)
+		return B_NO_MEMORY;
+
+	if (_SaveSplitSettings(fImageSplitView, "Image", settings) != B_OK)
+		return B_NO_MEMORY;
+
+	if (_SaveSplitSettings(fThreadSplitView, "Thead", settings) != B_OK)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -477,6 +543,7 @@ TeamWindow::_Init()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fMenuBar = new BMenuBar("Menu"))
 		.AddSplit(B_VERTICAL, 3.0f)
+			.GetSplitView(&fFunctionSplitView)
 			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
 			.AddGroup(B_VERTICAL, 4.0f)
@@ -491,6 +558,7 @@ TeamWindow::_Init()
 					"source path",
 					"Source path unavailable."), 4.0f)
 				.AddSplit(B_HORIZONTAL, 3.0f)
+					.GetSplitView(&fSourceSplitView)
 					.Add(sourceScrollView = new BScrollView("source scroll",
 						NULL, 0, true, true), 3.0f)
 					.Add(fLocalsTabView = new BTabView("locals view"))
@@ -506,6 +574,7 @@ TeamWindow::_Init()
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
+		.GetSplitView(&fThreadSplitView)
 		.Add(fThreadListView = ThreadListView::Create(fTeam, this))
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
@@ -514,6 +583,7 @@ TeamWindow::_Init()
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
+		.GetSplitView(&fImageSplitView)
 		.Add(fImageListView = ImageListView::Create(fTeam, this))
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
@@ -1080,4 +1150,58 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
 		}
 	}
+}
+
+
+void
+TeamWindow::_LoadSplitSettings(BSplitView* view, const char* name,
+	const GUITeamUISettings* settings)
+{
+	BString settingName;
+	BVariant value;
+
+	for (int32 i = 0; i < view->CountItems(); i++) {
+		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
+		status_t error = settings->Value(settingName.String(), value);
+		if (error == B_OK) {
+			view->SetItemWeight(i, value.ToFloat(),
+				i == view->CountItems() - 1);
+		}
+	}
+}
+
+
+status_t
+TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
+	GUITeamUISettings* settings)
+{
+	BString settingName;
+
+	for (int32 i = 0; i < view->CountItems(); i++) {
+		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
+		if (!settings->SetValue(settingName.String(),
+			view->ItemWeight(i)))
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+TeamWindow::_SaveInspectorSettings(const BMessage* settings)
+{
+	char *name;
+	type_code type;
+	BVariant value;
+
+	for (int32 i = 0; settings->GetInfo(B_ANY_TYPE, i, &name, &type) == B_OK;
+		i++) {
+		if (value.SetFromMessage(*settings, name) == B_OK) {
+			if (!fUISettings.SetValue(name, value))
+				return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
 }

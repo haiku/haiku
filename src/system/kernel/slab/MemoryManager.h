@@ -14,7 +14,10 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include "slab_debug.h"
 
+
+class AbstractTraceEntryWithStackTrace;
 struct kernel_args;
 struct ObjectCache;
 struct VMArea;
@@ -56,6 +59,13 @@ public:
 
 	static	bool				MaintenanceNeeded();
 	static	void				PerformMaintenance();
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+	static	bool				AnalyzeAllocationCallers(
+									AllocationTrackingCallback& callback);
+#endif
+
+	static	ObjectCache*		DebugObjectCacheForAddress(void* address);
 
 private:
 			struct Tracing;
@@ -191,6 +201,13 @@ private:
 	static	int					_DumpArea(int argc, char** argv);
 	static	int					_DumpAreas(int argc, char** argv);
 
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+	static	void				_AddTrackingInfo(void* allocation, size_t size,
+									AbstractTraceEntryWithStackTrace* entry);
+	static	AllocationTrackingInfo* _TrackingInfoFor(void* allocation,
+									size_t size);
+#endif
+
 private:
 	static	const size_t		kAreaAdminSize
 									= ROUNDUP(sizeof(Area), B_PAGE_SIZE);
@@ -262,6 +279,18 @@ MemoryManager::MetaChunk::GetArea() const
 {
 	return _AreaForAddress((addr_t)this);
 }
+
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+/*static*/ inline AllocationTrackingInfo*
+MemoryManager::_TrackingInfoFor(void* allocation, size_t size)
+{
+	return (AllocationTrackingInfo*)((uint8*)allocation + size
+		- sizeof(AllocationTrackingInfo));
+}
+
+#endif	// SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
 
 
 #endif	// MEMORY_MANAGER_H

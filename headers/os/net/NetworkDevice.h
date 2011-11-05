@@ -28,6 +28,7 @@ struct wireless_network {
 
 // flags
 #define B_NETWORK_IS_ENCRYPTED			0x01
+#define B_NETWORK_IS_PERSISTENT			0x02
 
 // authentication modes
 enum {

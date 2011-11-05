@@ -87,6 +87,7 @@ switch_to_command_mode(dialup_device* device)
 }
 
 
+#if 0
 static status_t
 switch_to_data_mode(dialup_device* device)
 {
@@ -106,6 +107,7 @@ switch_to_data_mode(dialup_device* device)
 	device->data_mode = true;
 	return B_OK;
 }
+#endif
 
 
 static status_t

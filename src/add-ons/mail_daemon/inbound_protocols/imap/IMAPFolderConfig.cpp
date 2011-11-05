@@ -39,14 +39,6 @@ protected:
 };
 
 
-EditableListItem::EditableListItem()
-	:
-	fListView(NULL)
-{
-
-}
-
-
 class CheckBoxItem : public BStringItem, public EditableListItem {
 public:
 								CheckBoxItem(const char* text, bool checked);
@@ -64,6 +56,67 @@ private:
 			bool				fMouseDown;
 };
 
+
+class EditListView : public BListView {
+public:
+								EditListView(const char* name,
+									list_view_type type
+										= B_SINGLE_SELECTION_LIST,
+									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
+										| B_NAVIGABLE);
+
+	virtual void				MouseDown(BPoint where);
+	virtual void				MouseUp(BPoint where);
+	virtual void				FrameResized(float newWidth, float newHeight);
+
+private:
+			EditableListItem*	fLastMouseDown;
+};
+
+
+class StatusWindow : public BWindow {
+public:
+	StatusWindow(const char* text)
+		:
+		BWindow(BRect(0, 0, 10, 10), B_TRANSLATE("status"), B_MODAL_WINDOW_LOOK,
+			B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE
+				| B_AVOID_FRONT | B_NOT_RESIZABLE)
+	{
+		BView* rootView = new BView(Bounds(), "root", B_FOLLOW_ALL,
+			B_WILL_DRAW);
+		AddChild(rootView);
+		rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		float spacing = be_control_look->DefaultItemSpacing();
+		BALMLayout* layout = new BALMLayout(spacing);
+		rootView->SetLayout(layout);
+		layout->SetInset(spacing);
+
+		BStringView* string = new BStringView("text", text);
+		layout->AddView(string, layout->Left(), layout->Top(), layout->Right(),
+			layout->Bottom());
+		BSize min = layout->MinSize();
+		ResizeTo(min.Width(), min.Height());
+		CenterOnScreen();
+	}
+};
+
+
+const uint32 kMsgApplyButton = '&Abu';
+const uint32 kMsgInit = '&Ini';
+
+
+// #pragma mark -
+
+
+EditableListItem::EditableListItem()
+	:
+	fListView(NULL)
+{
+
+}
+
+
+// #pragma mark -
 
 
 CheckBoxItem::CheckBoxItem(const char* text, bool checked)
@@ -134,21 +187,7 @@ CheckBoxItem::MouseUp(BPoint where)
 }
 
 
-class EditListView : public BListView {
-public:
-								EditListView(const char* name,
-									list_view_type type
-										= B_SINGLE_SELECTION_LIST,
-									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
-										| B_NAVIGABLE);
-
-	virtual void				MouseDown(BPoint where);
-	virtual void				MouseUp(BPoint where);
-	virtual void				FrameResized(float newWidth, float newHeight);
-
-private:
-			EditableListItem*	fLastMouseDown;
-};
+// #pragma mark -
 
 
 EditListView::EditListView(const char* name, list_view_type type, uint32 flags)
@@ -156,7 +195,7 @@ EditListView::EditListView(const char* name, list_view_type type, uint32 flags)
 	BListView(name, type, flags),
 	fLastMouseDown(NULL)
 {
-	
+
 }
 
 
@@ -201,42 +240,14 @@ EditListView::FrameResized(float newWidth, float newHeight)
 }
 
 
-class StatusWindow : public BWindow {
-public:
-	StatusWindow(const char* text)
-		:
-		BWindow(BRect(0, 0, 10, 10), B_TRANSLATE("status"), B_MODAL_WINDOW_LOOK,
-			B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE
-			| B_AVOID_FRONT | B_NOT_RESIZABLE)
-	{
-		BView* rootView = new BView(Bounds(), "root", B_FOLLOW_ALL,
-			B_WILL_DRAW);
-		AddChild(rootView);
-		rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		float spacing = be_control_look->DefaultItemSpacing();
-		BALMLayout* layout = new BALMLayout(spacing);
-		rootView->SetLayout(layout);
-		layout->SetInset(spacing);
-
-		BStringView* string = new BStringView("text", text);
-		layout->AddView(string, layout->Left(), layout->Top(), layout->Right(),
-			layout->Bottom());
-		BSize min = layout->MinSize();
-		ResizeTo(min.Width(), min.Height());
-		CenterOnScreen();
-	}
-};
-
-
-const uint32 kMsgApplyButton = '&Abu';
-const uint32 kMsgInit = '&Ini';
+// #pragma mark -
 
 
 FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	:
 	BWindow(BRect(0, 0, 300, 300), B_TRANSLATE("IMAP Folders"),
-		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION
-		| B_NOT_ZOOMABLE | B_AVOID_FRONT),
+		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+		B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE | B_AVOID_FRONT),
 	fSettings(settings)
 {
 	BView* rootView = new BView(Bounds(), "root", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -316,7 +327,7 @@ FolderConfigWindow::_LoadFolders()
 
 	BString password;
 	char* passwd = get_passwd(&fSettings, "cpasswd");
-	if (passwd) {
+	if (passwd != NULL) {
 		password = passwd;
 		delete[] passwd;
 	}
@@ -331,7 +342,7 @@ FolderConfigWindow::_LoadFolders()
 		item->SetListView(fFolderListView);
 	}
 
-	double used, total;
+	uint64 used, total;
 	if (fIMAPFolders.GetQuota(used, total) == B_OK) {
 		char buffer[256];
 		BString quotaString = "Server storage: ";

@@ -386,6 +386,9 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 				// the operation is complete and has succeeded
 				return B_OK;
 			} else {
+				if (operation == SCSI_REQUEST_SENSE_6)
+					return B_ERROR;
+
 				// the operation is complete but has failed at the SCSI level
 				if (operation != SCSI_TEST_UNIT_READY_6) {
 					TRACE_ALWAYS("operation 0x%02x failed at the SCSI level\n",
@@ -704,7 +707,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 					continue;
 
 				if (!hasIn && (endpoint->descr->endpoint_address
-					& USB_ENDPOINT_ADDR_DIR_IN)) {
+					& USB_ENDPOINT_ADDR_DIR_IN) != 0) {
 					device->bulk_in = endpoint->handle;
 					hasIn = true;
 				} else if (!hasOut && (endpoint->descr->endpoint_address

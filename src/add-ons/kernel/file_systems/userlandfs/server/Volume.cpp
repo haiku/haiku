@@ -97,7 +97,7 @@ Volume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 status_t
 Volume::GetVNodeType(void* node, int* type)
 {
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 

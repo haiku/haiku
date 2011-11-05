@@ -316,7 +316,7 @@ init_driver(void)
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
 		USB_REQUEST_HID_GET_REPORT,
 		0x0100 | report_id, interfaceNumber, device->total_report_size,
-		device->buffer, device->total_report_size, &actual);
+		device->buffer, &actual);
   \endcode
   
   \warning Both the \link usb_module_info::send_request() \a send_request()

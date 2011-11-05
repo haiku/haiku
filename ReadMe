@@ -1,35 +1,115 @@
-Building on BeOS
-================
+Building Haiku from source
+==========================
 
-For building on BeOS you need the development tools from:
+This is a overview into the process of building HAIKU from source.
+An online version is available at http://www.haiku-os.org/guides/building/
 
-  http://haiku-os.org/downloads
+Official releases of Haiku are at http://www.haiku-os.org/get-haiku
+The (unstable) nightly builds are available at http://www.haiku-files.org
 
-Please always use the most recent versions. They are required to build Haiku.
+To build Haiku, you will need to
+ * ensure pre-requisite software is installed
+ * download sources
+ * configure your build
+ * run jam to initiate the build process
+
+We currently support these platforms:
+ * Haiku
+ * Linux
+ * FreeBSD
+ * Mac OS X Intel
+
+Pre-requisite software
+======================
+
+Tools provided within Haiku's repositories
+
+ * Jam (Jam 2.5-haiku-20090626)
+ * Haiku's cross-compiler (needed only for non-Haiku platforms)
+
+The tools to compile Haiku will vary, depending on the platform that you are
+using to build Haiku. When building from Haiku, all of the necessary
+development tools are included in official releases (e.g. R1 alpha 1) and in the
+(unstable) nightly builds.
+
+ * Subversion client
+ * SSH client (for developers with commit access)
+ * gcc and the binutils (as, ld, etc., required by gcc)
+ * make (GNU make)
+ * bison
+ * flex and lex (usually a mini shell script invoking flex)
+ * makeinfo (part of texinfo, needed for building gcc 4 only)
+ * autoheader (part of autoconf, needed for building gcc)
+ * automake
+ * gawk
+ * yasm (http://www.tortall.net/projects/yasm/wiki/Download)
+ * wget
+ * (un)zip
+ * cdrtools (not genisoimage!)
+ * case-sensitive file system
+
+Whether they are installed can be tested for instance by running them in the
+shell with the "--version" parameter.
+
+Specific: Haiku for the ARM platform
+------------------------------------
+
+The following tools are needed to compile Haiku for the ARM platform
+
+ * mkimage (http://www.denx.de/wiki/UBoot)
+ * Mtools (http://www.gnu.org/software/mtools/intro.html)
+ * sfdisk
+
+Specific: Mac OS X
+------------------
+
+Disk Utility can create a case-sensitive disk image of at least 3 GiB in size.
+The following darwin ports need to be installed:
+ * expat
+ * gawk
+ * gettext
+ * libiconv
+ * gnuregex
+ * gsed
+
+More information about individual distributions of Linux and BSD can be found
+at http://haiku-os.org/guides/building/pre-reqs
 
 
-Building on a non-BeOS platform
-===============================
+Download Haiku's sources
+========================
 
-Please read the file 'ReadMe.cross-compile' before continuing. It describes
-how to build the cross-compilation tools and configure the build system for
-building Haiku. After following the instructions you can directly continue
-with the section Building.
+There are two parts to Haiku's sources -- the code for Haiku itself and a set
+of build tools for compiling Haiku on an operating system other than Haiku.
+The buildtools are needed only for non-Haiku platform.
+
+Anonymous checkout:
+  svn co http://svn.haiku-os.org/haiku/haiku/trunk haiku
+  svn co http://svn.haiku-os.org/haiku/buildtools/trunk buildtools
+
+Developer with commit access:
+  svn co svn+ssh://<developer-account>@svn.haiku-os.org/srv/svn/repos/haiku/haiku/trunk haiku
+  svn co svn+ssh://<developer-account>@svn.haiku-os.org/srv/svn/repos/haiku/buildtools/trunk buildtools
 
 
-Configuring on BeOS
-===================
+Building the Jam executable
+===========================
 
-Open a Terminal and change to your Haiku trunk folder. To configure the build
-you can run configure like this:
+This step applies only to non-Haiku platforms.
 
-  ./configure --target=TARGET
+Change to the buildtools folder and we will start to build 'jam' which is a
+requirement for building Haiku. Run the following commands to generate and
+install the tool:
 
-Where "TARGET" is the target platform that the compiled code should run on:
-  * haiku (default)
-  * r5
-  * bone
-  * dano (also for Zeta)
+  cd  buildtools/jam
+  make
+  sudo ./jam0 install
+    -- or --
+  ./jam0 -sBINDIR=$HOME/bin install
+
+
+Configuring your build
+======================
 
 The configure script generates a file named "BuildConfig" in the
 "generated/build" directory. As long as configure is not modified (!), there
@@ -37,23 +117,84 @@ is no need to call it again. That is for re-building you only need to invoke
 jam (see below). If you don't update the source tree very frequently, you may
 want to execute 'configure' after each update just to be on the safe side.
 
+Depending on your goal, there are several different ways to configure Haiku.
+You can either call configure from within your Haiku trunk folder. That will
+prepare a folder named 'generated', which will contain the compiled objects.
+Another option is to manually created one or more 'generated.*' folders and run
+configure from within them. For example imagine the following directory setup
 
-Building
-========
+  buildtools-trunk/
+  haiku-trunk/
+  haiku-trunk/generated.x86gcc2
+  haiku-trunk/generated.x86gcc4
+
+Configure a GCC 2.95 Hybrid, from non-Haiku platform
+----------------------------------------------------
+
+  cd haiku-trunk/generated.x86gcc4
+  ../configure --use-gcc-pipe --use-xattr \
+    --build-cross-tools-gcc4 x86 ../../buildtools/ \
+    --alternative-gcc-output-dir ../generated.x86gcc2
+  cd ../generated.x86gcc2
+  ../configure --use-gcc-pipe --use-xattr \
+    --build-cross-tools ../../buildtools/ \
+    --alternative-gcc-output-dir ../generated.x86gcc4
+
+Configure a GCC 2.95 Hybrid, from within Haiku
+----------------------------------------------
+
+  cd haiku-trunk/generated.x86gcc4
+  ../configure --use-gcc-pipe \
+    --alternative-gcc-output-dir ../generated.x86gcc2 \
+    --cross-tools-prefix /boot/develop/abi/x86/gcc4/tools/current/bin/
+  cd ../generated.x86gcc2
+  ../configure --use-gcc-pipe \
+    --alternative-gcc-output-dir ../generated.x86gcc4 \
+    --cross-tools-prefix /boot/develop/abi/x86/gcc2/tools/current/bin/
+
+Additional information about GCC Hybrids can be found on the website,
+http://www.haiku-os.org/guides/building/gcc-hybrid
+
+Configure options
+-----------------
+
+The various runtime options for configure are documented in it's onscreen help
+
+  ./configure --help
+
+
+Building via Jam
+================
 
 Haiku can be built in either of two ways, as disk image file (e.g. for use
-with emulators) or as installation in a directory.
+with emulators, to be written directly to a usb stick, burned as a compact
+disc) or as installation in a directory.
 
-Image File
-----------
+Running Jam
+-----------
 
-  jam -q haiku-image
+There are various ways in which you can run jam.
 
-This generates an image file named 'haiku.image' in your output directory
-under 'generated/'.
+ * If you have a single generated folder,
+   you can run 'jam' from the top level of Haiku's trunk.
+ * If you have one or more generated folders,
+   (e.g. generated.x86gcc2), you can cd into that directory and run 'jam'
+ * In either case, you can cd into a certain folder in the source tree (e.g.
+   src/apps/debugger) and run jam -sHAIKU_OUTPUT_DIR=<path to generated folder>
 
-VMware Image File
------------------
+Be sure to read build/jam/UserBuildConfig.ReadMe and UserBuildConfig.sample,
+as they contain information on customizing your build of Haiku.
+
+Building a Haiku anyboot file
+---------------------------
+
+  jam -q haiku-anyboot-image
+
+This generates an image file named 'haiku-anyboot.image' in your output
+directory under 'generated/'.
+
+Building a VMware image file
+----------------------------
 
   jam -q haiku-vmware-image
 
@@ -69,56 +210,40 @@ Installs all Haiku components into the volume mounted at "/Haiku" and
 automatically marks it as bootable. To create a partition in the first place
 use DriveSetup and initialize it to BFS.
 
-Note that installing Haiku in a directory only works as expected under BeOS,
-but it is not yet supported under Linux and other non-BeOS platforms.
+Note that installing Haiku in a directory only works as expected under Haiku,
+but it is not yet supported under Linux and other non-Haiku platforms.
 
-Bootable CD-ROM Image
----------------------
-
-This _requires_ having the mkisofs tool installed.
-On Debian GNU/Linux for example you can install it with:
-  apt-get install mkisofs
-On BeOS you can get it from http://bebits.com/app/3964 along with cdrecord.
-
-This creates a bootable 'haiku-cd.iso' in your 'generated/' folder:
-
-  jam -q haiku-cd
-
-Under Unix/Linux, and BeOS you can use cdrecord to create a CD with:
-
-  cdrecord dev=x,y,z -v -eject -dao -data generated/haiku-cd.iso
-
-Here x,y,z is the device number as found with cdrecord -scanbus, it can also
-be a device path on Linux.
-
-Building Components
--------------------
+Building individual components
+------------------------------
 
 If you don't want to build the complete Haiku, but only a certain
 app/driver/etc. you can specify it as argument to jam, e.g.:
 
-  jam Pulse
+  jam Debugger
 
 Alternatively, you can 'cd' to the directory of the component you want to
-build and run 'jam' from there.
+build and run 'jam' from there. Note: if your generated directory named
+something other than "generated/", you will need to tell jam where it is.
+
+  jam -sHAIKU_OUTPUT_DIR=<path to generated folder>
 
 You can also force rebuilding of a component by using the "-a" parameter:
 
-  jam -a Pulse
+  jam -a Debugger
 
 
 Running
 =======
 
 Generally there are two ways of running Haiku. On real hardware using a
-partition and on emulated hardware using an emulator like Bochs or QEmu.
+partition and on emulated hardware using an emulator like Bochs or QEMU.
 
 On Real Hardware
 ----------------
 
 If you have installed Haiku to its own partition you can include this
 partition in your bootmanager and try to boot Haiku like any other OS you
-have installed. To include a new partition in the BeOS bootmanager run this
+have installed. To include a new partition in the Haiku bootmanager run this
 in a Terminal:
 
   bootman
@@ -127,34 +252,9 @@ On Emulated Hardware
 --------------------
 
 For emulated hardware you should build disk image (see above). How to setup
-this image depends on your emulater. A tutorial for Bochs on BeOS is below.
-If you use QEmu, you can usually just provide the path to the image as
-command line argument to the "qemu" executable.
-
-Bochs
------
-
-Version 2.2 of Bochs for BeOS (BeBochs) can be downloaded from BeBits:
-
-  http://www.bebits.com/app/3324
-
-The package installs to: /boot/apps/BeBochs2.2
-
-You have to set up a configuration for Bochs. You should edit the ".bochsrc" to
-include the following:
-
-ata0-master: type=disk, path="/path/to/haiku.image", cylinders=122, heads=16, spt=63
-boot: disk
-
-Now you can start Bochs:
-
-  $ cd /boot/apps/BeBochs2.2
-  $ ./bochs
-
-Answer with RETURN and with some patience you will see Haiku booting.
-If booting into the graphical evironment fails you can try to hit "space" at the
-very beginning of the boot process. The Haiku bootloader should then come up and
-you can select some safe mode options.
+this image depends on your emulater. If you use QEMU, you can usually just
+provide the path to the image as command line argument to the "qemu"
+executable.
 
 
 Docbook documentation

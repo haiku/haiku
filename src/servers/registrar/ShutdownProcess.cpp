@@ -670,7 +670,7 @@ ShutdownProcess::~ShutdownProcess()
 status_t
 ShutdownProcess::Init(BMessage* request)
 {
-	PRINT(("ShutdownProcess::Init()\n"));
+	PRINT("ShutdownProcess::Init()\n");
 
 	// create and add the quit request reply handler
 	fQuitRequestReplyHandler = new(nothrow) QuitRequestReplyHandler(this);
@@ -720,7 +720,7 @@ ShutdownProcess::Init(BMessage* request)
 
 	resume_thread(fWorker);
 
-	PRINT(("ShutdownProcess::Init() done\n"));
+	PRINT("ShutdownProcess::Init() done\n");
 
 	return B_OK;
 }
@@ -739,8 +739,8 @@ ShutdownProcess::MessageReceived(BMessage* message)
 				return;
 			}
 
-			PRINT(("ShutdownProcess::MessageReceived(): B_SOME_APP_QUIT: %ld\n",
-				team));
+			PRINT("ShutdownProcess::MessageReceived(): B_SOME_APP_QUIT: %ld\n",
+				team);
 
 			// remove the app info from the respective list
 			int32 phase;
@@ -774,7 +774,7 @@ ShutdownProcess::MessageReceived(BMessage* message)
 			// get the phase the event is intended for
 			int32 phase = TimeoutEvent::GetMessagePhase(message);
 			team_id team = TimeoutEvent::GetMessageTeam(message);;
-			PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
+			PRINT("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team);
 
 			BAutolock _(fWorkerLock);
 
@@ -837,10 +837,10 @@ ShutdownProcess::MessageReceived(BMessage* message)
 
 			BAutolock _(fWorkerLock);
 			if (open) {
-				PRINT(("B_REG_TEAM_DEBUGGER_ALERT: insert %ld\n", team));
+				PRINT("B_REG_TEAM_DEBUGGER_ALERT: insert %ld\n", team);
 				fDebuggedTeams.insert(team);
 			} else {
-				PRINT(("B_REG_TEAM_DEBUGGER_ALERT: remove %ld\n", team));
+				PRINT("B_REG_TEAM_DEBUGGER_ALERT: remove %ld\n", team);
 				fDebuggedTeams.erase(team);
 				_PushEvent(DEBUG_EVENT, -1, fCurrentPhase);
 			}
@@ -947,8 +947,8 @@ ShutdownProcess::_InitShutdownWindow()
 			_AddShutdownWindowApps(fUserApps);
 			_AddShutdownWindowApps(fSystemApps);
 		} else {
-			WARNING(("ShutdownProcess::Init(): Failed to create or init "
-				"shutdown window."));
+			WARNING("ShutdownProcess::Init(): Failed to create or init "
+				"shutdown window.");
 
 			fHasGUI = false;
 		}
@@ -969,18 +969,18 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList& infos)
 		BFile file;
 		status_t error = file.SetTo(&info->ref, B_READ_ONLY);
 		if (error != B_OK) {
-			WARNING(("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
+			WARNING("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
 				"open file for app %s: %s\n", info->signature,
-				strerror(error)));
+				strerror(error));
 			continue;
 		}
 
 		BAppFileInfo appFileInfo;
 		error = appFileInfo.SetTo(&file);
 		if (error != B_OK) {
-			WARNING(("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
+			WARNING("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
 				"init app file info for app %s: %s\n", info->signature,
-				strerror(error)));
+				strerror(error));
 		}
 
 		// get the application icons
@@ -1017,8 +1017,8 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList& infos)
 		// add the app
 		error = fWindow->AddApp(info->team, miniIcon, largeIcon);
 		if (error != B_OK) {
-			WARNING(("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
-				"add app to the shutdown window: %s\n", strerror(error)));
+			WARNING("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
+				"add app to the shutdown window: %s\n", strerror(error));
 		}
 	}
 }
@@ -1126,7 +1126,7 @@ ShutdownProcess::_PrepareShutdownMessage(BMessage& message) const
 status_t
 ShutdownProcess::_ShutDown()
 {
-	PRINT(("Invoking _kern_shutdown(%d)\n", fReboot));
+	PRINT("Invoking _kern_shutdown(%d)\n", fReboot);
 	RETURN_ERROR(_kern_shutdown(fReboot));
 }
 
@@ -1136,7 +1136,7 @@ ShutdownProcess::_PushEvent(uint32 eventType, team_id team, int32 phase)
 {
 	InternalEvent* event = new(nothrow) InternalEvent(eventType, team, phase);
 	if (!event) {
-		ERROR(("ShutdownProcess::_PushEvent(): Failed to create event!\n"));
+		ERROR("ShutdownProcess::_PushEvent(): Failed to create event!\n");
 
 		return B_NO_MEMORY;
 	}
@@ -1214,8 +1214,8 @@ ShutdownProcess::_Worker()
 		_WorkerDoShutdown();
 		fShutdownError = B_OK;
 	} catch (status_t error) {
-		PRINT(("ShutdownProcess::_Worker(): error while shutting down: %s\n",
-			strerror(error)));
+		PRINT("ShutdownProcess::_Worker(): error while shutting down: %s\n",
+			strerror(error));
 
 		fShutdownError = error;
 	}
@@ -1232,7 +1232,7 @@ ShutdownProcess::_Worker()
 void
 ShutdownProcess::_WorkerDoShutdown()
 {
-	PRINT(("ShutdownProcess::_WorkerDoShutdown()\n"));
+	PRINT("ShutdownProcess::_WorkerDoShutdown()\n");
 
 	// If we are here, the shutdown process has been initiated successfully,
 	// that is, if an asynchronous BRoster::Shutdown() was requested, we
@@ -1336,7 +1336,7 @@ ShutdownProcess::_WorkerDoShutdown()
 	_ShutDown();
 	_SetShutdownWindowWaitForShutdown();
 
-	PRINT(("  _kern_shutdown() failed\n"));
+	PRINT("  _kern_shutdown() failed\n");
 
 	// shutdown failed: This can happen for power off mode -- reboot should
 	// always work.
@@ -1397,8 +1397,8 @@ ShutdownProcess::_WaitForApp(team_id team, AppInfoList* list, bool systemApps)
 					return false;
 			} else {
 				// The app returned false in QuitRequested().
-				PRINT(("ShutdownProcess::_WaitForApp(): shutdown cancelled "
-					"by team %ld (-1 => user)\n", eventTeam));
+				PRINT("ShutdownProcess::_WaitForApp(): shutdown cancelled "
+					"by team %ld (-1 => user)\n", eventTeam);
 
 				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
@@ -1417,8 +1417,8 @@ ShutdownProcess::_WaitForApp(team_id team, AppInfoList* list, bool systemApps)
 void
 ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 {
-	PRINT(("ShutdownProcess::_QuitApps(%s)\n",
-		(systemApps ? "system" : "user")));
+	PRINT("ShutdownProcess::_QuitApps(%s)\n",
+		(systemApps ? "system" : "user"));
 
 	if (systemApps) {
 		_SetShutdownWindowCancelButtonEnabled(false);
@@ -1433,8 +1433,8 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 				throw_error(error);
 
 			if (event == ABORT_EVENT) {
-				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
-					"team %ld (-1 => user)\n", team));
+				PRINT("ShutdownProcess::_QuitApps(): shutdown cancelled by "
+					"team %ld (-1 => user)\n", team);
 
 				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
@@ -1459,8 +1459,8 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 				throw_error(error);
 
 			if (!systemApps && event == ABORT_EVENT) {
-				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
-					"team %ld (-1 => user)\n", team));
+				PRINT("ShutdownProcess::_QuitApps(): shutdown cancelled by "
+					"team %ld (-1 => user)\n", team);
 
 				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
@@ -1488,7 +1488,7 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 		}
 
 		if (team < 0) {
-			PRINT(("ShutdownProcess::_QuitApps() done\n"));
+			PRINT("ShutdownProcess::_QuitApps() done\n");
 			return;
 		}
 
@@ -1499,8 +1499,8 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 		_SetShutdownWindowCurrentApp(team);
 
 		// send the shutdown message to the app
-		PRINT(("  sending team %ld (port: %ld) a shutdown message\n", team,
-			port));
+		PRINT("  sending team %ld (port: %ld) a shutdown message\n", team,
+			port);
 		SingleMessagingTargetSet target(port, B_PREFERRED_TOKEN);
 		MessageDeliverer::Default()->DeliverMessage(&message, target);
 
@@ -1533,7 +1533,7 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 void
 ShutdownProcess::_QuitBackgroundApps()
 {
-	PRINT(("ShutdownProcess::_QuitBackgroundApps()\n"));
+	PRINT("ShutdownProcess::_QuitBackgroundApps()\n");
 
 	_SetShutdownWindowText(
 		B_TRANSLATE("Asking background applications to quit."));
@@ -1548,26 +1548,26 @@ ShutdownProcess::_QuitBackgroundApps()
 	AppInfoListMessagingTargetSet targetSet(fBackgroundApps);
 
 	if (targetSet.HasNext()) {
-		PRINT(("  sending shutdown message to %ld apps\n",
-			fBackgroundApps.CountInfos()));
+		PRINT("  sending shutdown message to %ld apps\n",
+			fBackgroundApps.CountInfos());
 
 		status_t error = MessageDeliverer::Default()->DeliverMessage(
 			&message, targetSet);
 		if (error != B_OK) {
-			WARNING(("_QuitBackgroundApps::_Worker(): Failed to deliver "
+			WARNING("_QuitBackgroundApps::_Worker(): Failed to deliver "
 				"shutdown message to all applications: %s\n",
-				strerror(error)));
+				strerror(error));
 		}
 	}
 
-	PRINT(("ShutdownProcess::_QuitBackgroundApps() done\n"));
+	PRINT("ShutdownProcess::_QuitBackgroundApps() done\n");
 }
 
 
 void
 ShutdownProcess::_WaitForBackgroundApps()
 {
-	PRINT(("ShutdownProcess::_WaitForBackgroundApps()\n"));
+	PRINT("ShutdownProcess::_WaitForBackgroundApps()\n");
 
 	// wait for user apps
 	bool moreApps = true;
@@ -1594,14 +1594,14 @@ ShutdownProcess::_WaitForBackgroundApps()
 		}
 	}
 
-	PRINT(("ShutdownProcess::_WaitForBackgroundApps() done\n"));
+	PRINT("ShutdownProcess::_WaitForBackgroundApps() done\n");
 }
 
 
 void
 ShutdownProcess::_KillBackgroundApps()
 {
-	PRINT(("ShutdownProcess::_KillBackgroundApps()\n"));
+	PRINT("ShutdownProcess::_KillBackgroundApps()\n");
 
 	while (true) {
 		// eat events (we need to be responsive for an abort event)
@@ -1631,7 +1631,7 @@ ShutdownProcess::_KillBackgroundApps()
 
 
 		if (team < 0) {
-			PRINT(("ShutdownProcess::_KillBackgroundApps() done\n"));
+			PRINT("ShutdownProcess::_KillBackgroundApps() done\n");
 			return;
 		}
 
@@ -1645,7 +1645,7 @@ ShutdownProcess::_KillBackgroundApps()
 void
 ShutdownProcess::_QuitNonApps()
 {
-	PRINT(("ShutdownProcess::_QuitNonApps()\n"));
+	PRINT("ShutdownProcess::_QuitNonApps()\n");
 
 	_SetShutdownWindowText(B_TRANSLATE("Asking other processes to quit."));
 
@@ -1654,7 +1654,7 @@ ShutdownProcess::_QuitNonApps()
 	team_info teamInfo;
 	while (get_next_team_info(&cookie, &teamInfo) == B_OK) {
 		if (fVitalSystemApps.find(teamInfo.team) == fVitalSystemApps.end()) {
-			PRINT(("  sending team %ld TERM signal\n", teamInfo.team));
+			PRINT("  sending team %ld TERM signal\n", teamInfo.team);
 
 			#ifdef __HAIKU__
 				// Note: team ID == team main thread ID under Haiku
@@ -1675,7 +1675,7 @@ ShutdownProcess::_QuitNonApps()
 	cookie = 0;
 	while (get_next_team_info(&cookie, &teamInfo) == B_OK) {
 		if (fVitalSystemApps.find(teamInfo.team) == fVitalSystemApps.end()) {
-			PRINT(("  killing team %ld\n", teamInfo.team));
+			PRINT("  killing team %ld\n", teamInfo.team);
 
 			#ifdef __HAIKU__
 				kill_team(teamInfo.team);
@@ -1686,7 +1686,7 @@ ShutdownProcess::_QuitNonApps()
 		}
 	}
 
-	PRINT(("ShutdownProcess::_QuitNonApps() done\n"));
+	PRINT("ShutdownProcess::_QuitNonApps() done\n");
 }
 
 
@@ -1735,8 +1735,8 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 
 			if (event == ABORT_EVENT) {
 				if (cancelAllowed || debugged) {
-					PRINT(("ShutdownProcess::_QuitBlockingApp(): shutdown "
-						"cancelled by team %ld (-1 => user)\n", eventTeam));
+					PRINT("ShutdownProcess::_QuitBlockingApp(): shutdown "
+						"cancelled by team %ld (-1 => user)\n", eventTeam);
 
 					if (!debugged)
 						_DisplayAbortingApp(eventTeam);
@@ -1758,7 +1758,7 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 	}
 
 	// kill the app
-	PRINT(("  killing team %ld\n", team));
+	PRINT("  killing team %ld\n", team);
 
 	kill_team(team);
 
@@ -1797,8 +1797,8 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 	}
 
 	if (!foundApp) {
-		PRINT(("ShutdownProcess::_DisplayAbortingApp(): Didn't find the app "
-			"that has cancelled the shutdown.\n"));
+		PRINT("ShutdownProcess::_DisplayAbortingApp(): Didn't find the app "
+			"that has cancelled the shutdown.\n");
 		return;
 	}
 
@@ -1842,14 +1842,14 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 void
 ShutdownProcess::_WaitForDebuggedTeams()
 {
-	PRINT(("ShutdownProcess::_WaitForDebuggedTeams()\n"));
+	PRINT("ShutdownProcess::_WaitForDebuggedTeams()\n");
 	{
 		BAutolock _(fWorkerLock);
 		if (fDebuggedTeams.empty())
 			return;
 	}
 
-	PRINT(("  not empty!\n"));
+	PRINT("  not empty!\n");
 
 	// wait for something to happen
 	while (true) {
@@ -1865,7 +1865,7 @@ ShutdownProcess::_WaitForDebuggedTeams()
 
 		BAutolock _(fWorkerLock);
 		if (fDebuggedTeams.empty()) {
-			PRINT(("  out empty"));
+			PRINT("  out empty");
 			return;
 		}
 	}

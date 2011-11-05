@@ -618,7 +618,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
-			&& list_is_empty(&cache->consumers)
+			&& cache->consumers.IsEmpty()
 			&& cache->type == CACHE_TYPE_RAM) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
@@ -2442,7 +2442,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 		// Make sure the area (respectively, if we're going to call
 		// vm_copy_on_write_area(), all areas of the cache) doesn't have any
 		// wired ranges.
-		if (!isWritable && becomesWritable && !list_is_empty(&cache->consumers)) {
+		if (!isWritable && becomesWritable && !cache->consumers.IsEmpty()) {
 			for (VMArea* otherArea = cache->areas; otherArea != NULL;
 					otherArea = otherArea->cache_next) {
 				if (wait_if_area_is_wired(otherArea, &locker, &cacheLocker)) {
@@ -2490,7 +2490,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	} else if (!isWritable && becomesWritable) {
 		// !writable -> writable
 
-		if (!list_is_empty(&cache->consumers)) {
+		if (!cache->consumers.IsEmpty()) {
 			// There are consumers -- we have to insert a new cache. Fortunately
 			// vm_copy_on_write_area() does everything that's needed.
 			changePageProtection = false;
@@ -2885,9 +2885,8 @@ dump_cache_tree_recursively(VMCache* cache, int level,
 		kprintf("%p\n", cache);
 
 	// recursively print its consumers
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-			consumer)) != NULL) {
+	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
+			VMCache* consumer = it.Next();) {
 		dump_cache_tree_recursively(consumer, level + 1, highlightCache);
 	}
 }
@@ -2947,9 +2946,8 @@ update_cache_info_recursively(VMCache* cache, cache_info& info)
 		info.committed += cache->committed_size;
 
 	// recurse
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-			consumer)) != NULL) {
+	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
+			VMCache* consumer = it.Next();) {
 		update_cache_info_recursively(consumer, info);
 	}
 }
@@ -3012,9 +3010,8 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 	kputs("\n");
 
 	// recurse
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-			consumer)) != NULL) {
+	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
+			VMCache* consumer = it.Next();) {
 		dump_caches_recursively(consumer, info, level + 1);
 	}
 }
@@ -3687,7 +3684,7 @@ vm_init(kernel_args* args)
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
 
-	// initialize the hash table that stores the pages mapped to caches
+	// initialize the cache allocators
 	vm_cache_init(args);
 
 	{
@@ -3738,6 +3735,15 @@ vm_init(kernel_args* args)
 
 	void* lastPage = (void*)ROUNDDOWN(~(addr_t)0, B_PAGE_SIZE);
 	vm_block_address_range("overflow protection", lastPage, B_PAGE_SIZE);
+
+#if PARANOID_KERNEL_MALLOC
+	vm_block_address_range("uninitialized heap memory",
+		(void *)ROUNDDOWN(0xcccccccc, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
+#if PARANOID_KERNEL_FREE
+	vm_block_address_range("freed heap memory",
+		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
 
 	// create the object cache for the page mappings
 	gPageMappingsObjectCache = create_object_cache_etc("page mappings",

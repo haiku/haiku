@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
-** Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+** Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
 ** All rights reserved. Distributed under the terms of the OpenBeOS License.
 */
 
@@ -16,6 +16,8 @@
 #include <MutableLocaleRoster.h>
 #include <TimeZone.h>
 
+#include <ICUWrapper.h>
+
 #include <unicode/datefmt.h>
 #include <unicode/dcfmtsym.h>
 #include <unicode/decimfmt.h>
@@ -23,17 +25,11 @@
 #include <unicode/numfmt.h>
 #include <unicode/smpdtfmt.h>
 #include <unicode/ustring.h>
-#include <ICUWrapper.h>
 
 #include <vector>
 
 
-#define ICU_VERSION icu_44
-
-
 using BPrivate::ObjectDeleter;
-using BPrivate::B_WEEK_START_MONDAY;
-using BPrivate::B_WEEK_START_SUNDAY;
 
 
 BLocale::BLocale(const BLanguage* language,
@@ -268,15 +264,15 @@ BLocale::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 
 	fieldPositions = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::FieldPositionIterator positionIterator;
+	icu::FieldPositionIterator positionIterator;
 	UnicodeString icuString;
 	dateFormatter->format((UDate)time * 1000, icuString, &positionIterator,
 		error);
 
 	if (error != U_ZERO_ERROR)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
-	ICU_VERSION::FieldPosition field;
+	icu::FieldPosition field;
 	std::vector<int> fieldPosStorage;
 	fieldCount  = 0;
 	while (positionIterator.next(field)) {
@@ -315,16 +311,16 @@ BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
 
 	fields = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::FieldPositionIterator positionIterator;
+	icu::FieldPositionIterator positionIterator;
 	UnicodeString icuString;
 	time_t now;
 	dateFormatter->format((UDate)time(&now) * 1000, icuString,
 		&positionIterator, error);
 
 	if (U_FAILURE(error))
-		return B_ERROR;
+		return B_BAD_VALUE;
 
-	ICU_VERSION::FieldPosition field;
+	icu::FieldPosition field;
 	std::vector<int> fieldPosStorage;
 	fieldCount  = 0;
 	while (positionIterator.next(field)) {
@@ -355,26 +351,54 @@ BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
 }
 
 
-int
-BLocale::StartOfWeek() const
+status_t
+BLocale::GetStartOfWeek(BWeekday* startOfWeek) const
 {
+	if (startOfWeek == NULL)
+		return B_BAD_VALUE;
+
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
 	UErrorCode err = U_ZERO_ERROR;
-	Calendar* c = Calendar::createInstance(
-		*BFormattingConventions::Private(&fConventions).ICULocale(),
-		err);
+	ObjectDeleter<Calendar> calendar = Calendar::createInstance(
+		*BFormattingConventions::Private(&fConventions).ICULocale(), err);
 
-	if (err == U_ZERO_ERROR && c->getFirstDayOfWeek(err) == UCAL_SUNDAY) {
-		delete c;
-		return B_WEEK_START_SUNDAY;
-	} else {
-		delete c;
-		// Might be another day, but BeAPI will not handle it
-		return B_WEEK_START_MONDAY;
+	if (U_FAILURE(err))
+		return B_ERROR;
+
+	UCalendarDaysOfWeek icuWeekStart = calendar->getFirstDayOfWeek(err);
+	if (U_FAILURE(err))
+		return B_ERROR;
+
+	switch (icuWeekStart) {
+		case UCAL_SUNDAY:
+			*startOfWeek = B_WEEKDAY_SUNDAY;
+			break;
+		case UCAL_MONDAY:
+			*startOfWeek = B_WEEKDAY_MONDAY;
+			break;
+		case UCAL_TUESDAY:
+			*startOfWeek = B_WEEKDAY_TUESDAY;
+			break;
+		case UCAL_WEDNESDAY:
+			*startOfWeek = B_WEEKDAY_WEDNESDAY;
+			break;
+		case UCAL_THURSDAY:
+			*startOfWeek = B_WEEKDAY_THURSDAY;
+			break;
+		case UCAL_FRIDAY:
+			*startOfWeek = B_WEEKDAY_FRIDAY;
+			break;
+		case UCAL_SATURDAY:
+			*startOfWeek = B_WEEKDAY_SATURDAY;
+			break;
+		default:
+			return B_ERROR;
 	}
+
+	return B_OK;
 }
 
 
@@ -534,15 +558,15 @@ BLocale::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 
 	fieldPositions = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::FieldPositionIterator positionIterator;
+	icu::FieldPositionIterator positionIterator;
 	UnicodeString icuString;
 	timeFormatter->format((UDate)time * 1000, icuString, &positionIterator,
 		error);
 
 	if (error != U_ZERO_ERROR)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
-	ICU_VERSION::FieldPosition field;
+	icu::FieldPosition field;
 	std::vector<int> fieldPosStorage;
 	fieldCount  = 0;
 	while (positionIterator.next(field)) {
@@ -580,16 +604,16 @@ BLocale::GetTimeFields(BDateElement*& fields, int& fieldCount,
 
 	fields = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::FieldPositionIterator positionIterator;
+	icu::FieldPositionIterator positionIterator;
 	UnicodeString icuString;
 	time_t now;
 	timeFormatter->format((UDate)time(&now) * 1000,	icuString,
 		&positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
-	ICU_VERSION::FieldPosition field;
+	icu::FieldPosition field;
 	std::vector<int> fieldPosStorage;
 	fieldCount  = 0;
 	while (positionIterator.next(field)) {
@@ -651,12 +675,12 @@ BLocale::FormatNumber(BString* string, double value) const
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter(NumberFormat::createInstance(
 		*BFormattingConventions::Private(&fConventions).ICULocale(),
-		NumberFormat::kNumberStyle, err));
+		UNUM_DECIMAL, err));
 
 	if (numberFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 	if (U_FAILURE(err))
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	UnicodeString icuString;
 	numberFormatter->format(value, icuString);
@@ -691,12 +715,12 @@ BLocale::FormatNumber(BString* string, int32 value) const
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter(NumberFormat::createInstance(
 		*BFormattingConventions::Private(&fConventions).ICULocale(),
-		NumberFormat::kNumberStyle, err));
+		UNUM_DECIMAL, err));
 
 	if (numberFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 	if (U_FAILURE(err))
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	UnicodeString icuString;
 	numberFormatter->format((int32_t)value, icuString);
@@ -740,7 +764,7 @@ BLocale::FormatMonetary(BString* string, double value) const
 	if (numberFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 	if (U_FAILURE(err))
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	UnicodeString icuString;
 	numberFormatter->format(value, icuString);

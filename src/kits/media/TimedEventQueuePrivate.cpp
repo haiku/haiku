@@ -29,15 +29,18 @@
 
 /* Implements _event_queue_imp used by BTimedEventQueue, not thread save!
  */
-#include <TimedEventQueue.h>
+#include <string.h>
+
 #include <Autolock.h>
 #include <Buffer.h>
 #include <InterfaceDefs.h> //defines B_DELETE
+#include <TimedEventQueue.h>
+#include <TimeSource.h>
+
 #include "TimedEventQueuePrivate.h"
+
 #include "Debug.h"
 #include "debug.h"
-
-#include <string.h>
 
 _event_queue_imp::_event_queue_imp() :
 	fLock(new BLocker("BTimedEventQueue locker")),
@@ -74,6 +77,8 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 	if (event.type <= 0) {
 		 return B_BAD_VALUE;
 	}
+	
+	*(bigtime_t *)&event.queued_time = BTimeSource::RealTime();
 
 	//create a new queue
 	if (fFirstEntry == NULL) {

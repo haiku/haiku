@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Mail	2923655424
+1	simplified_chinese	x-vnd.Haiku-Mail	1053772035
 Account name:	Config Views		用户名：
 Account name:	E-Mail		用户名：
 Account settings	Config Views		用户设置
@@ -42,7 +42,3 @@ While sending and receiving	Config Window		在发送和接收时
 days	Config Window		天
 hours	Config Window		小时
 minutes	Config Window		分
-never	Config Window		从不
-· E-mail filters	Config Window		邮件过滤器
-· Incoming	Config Window		接收
-· Outgoing	Config Window		发送

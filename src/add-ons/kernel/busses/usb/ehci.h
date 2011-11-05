@@ -195,6 +195,7 @@ static	pci_module_info *			sPCIModule;
 		pci_info *					fPCIInfo;
 		Stack *						fStack;
 		uint32						fEnabledInterrupts;
+		uint32						fThreshold;
 
 		// Periodic transfer framelist and interrupt entries
 		area_id						fPeriodicFrameListArea;
@@ -218,6 +219,7 @@ static	pci_module_info *			sPCIModule;
 		sem_id						fCleanupSem;
 		thread_id					fCleanupThread;
 		bool						fStopThreads;
+		int32						fNextStartingFrame;
 
 		// fFrameBandwidth[n] holds the available bandwidth
 		// of the nth frame in microseconds

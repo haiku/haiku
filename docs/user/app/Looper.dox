@@ -147,7 +147,7 @@
 	\warning This constructor does no type check whatsoever. Since you can pass
 		any BMessage, you should - if you are not sure about the exact type -
 		use the Instantiate() method, which does check the type.
-	
+
 	\see Instantiate()
 	\see Archive()
 */
@@ -710,13 +710,20 @@
 /*!
 	\fn BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 		BMessage* specifier, int32 form, const char* property)
-	\brief Undocumented.
+	\brief Determine the proper handler for a scripting message.
+
+	\see BHandler::ResolveSpecifier()
 */
 
 
 /*!
 	\fn status_t BLooper::GetSupportedSuites(BMessage* data)
-	\brief Undocumented.
+	\brief Reports the suites of messages and specifiers that derived classes
+		understand.
+
+	\param data The message to report the suite of messages and specifiers.
+
+	\see BHandler::GetSupportedSuites()
 */
 
 
@@ -799,7 +806,7 @@
 
 /*!
 	\fn BMessage* BLooper::MessageFromPort(bigtime_t timeout)
-	\brief Hook function to retrieve a message from the looper's port.
+	\brief Hook method to retrieve a message from the looper's port.
 	
 	The default implementation is called by the internal message looping thread
 	and retrieves the next message from the port that belongs to this looper.
@@ -813,5 +820,3 @@
 	arriving at the default port.
 */
 
-
-	

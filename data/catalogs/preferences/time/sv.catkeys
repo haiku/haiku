@@ -1,17 +1,26 @@
-1	swedish	x-vnd.Haiku-Time	453699369
+1	swedish	x-vnd.Haiku-Time	3739720453
 <Other>	Time		<annan>
 Add	Time		Lägg till
+Africa	Time		Afrika
+America	Time		Amerika
+Antarctica	Time		Antarktis
+Arctic	Time		Arktis
+Asia	Time		Asien
+Atlantic	Time		Atlanten
+Australia	Time		Australien
 Could not contact server	Time		Kunde inte kontakta servern
 Could not create socket	Time		Kunde inte skapa en socket
 Current time:	Time		Aktuell tid:
 Date and time	Time		Datum och tid
-Etc	Time		Etc
+Europe	Time		Europa
 GMT	Time		GMT standardtid
 Hardware clock set to:	Time		Hårdvaruklockans tid:
+Indian	Time		Indien
 Local time	Time		Lokal tid
 Message receiving failed	Time		Kunde inte ta emot meddelandet
 Network time	Time		Internettid
 OK	Time		OK
+Pacific	Time		Stilla havet
 Preview time:	Time		Förhandsvisa tid:
 Received invalid time	Time		Tog emot en ogiltig tid
 Remove	Time		Ta bort

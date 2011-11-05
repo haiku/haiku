@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2011, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -40,71 +40,6 @@ BTokenSpace gTokenSpace;
 uint32 gAppServerSIMDFlags = 0;
 
 
-/*!	Detect SIMD flags for use in AppServer. Checks all CPUs in the system
-	and chooses the minimum supported set of instructions.
-*/
-static void
-detect_simd()
-{
-#if __INTEL__
-	// Only scan CPUs for which we are certain the SIMD flags are properly
-	// defined.
-	const char* vendorNames[] = {
-		"GenuineIntel",
-		"AuthenticAMD",
-		"CentaurHauls", // Via CPUs, MMX and SSE support
-		"RiseRiseRise", // should be MMX-only
-		"CyrixInstead", // MMX-only, but custom MMX extensions
-		"GenuineTMx86", // MMX and SSE
-		0
-	};
-
-	system_info systemInfo;
-	if (get_system_info(&systemInfo) != B_OK)
-		return;
-
-	// We start out with all flags set and end up with only those flags
-	// supported across all CPUs found.
-	uint32 appServerSIMD = 0xffffffff;
-
-	for (int32 cpu = 0; cpu < systemInfo.cpu_count; cpu++) {
-		cpuid_info cpuInfo;
-		get_cpuid(&cpuInfo, 0, cpu);
-
-		// Get the vendor string and terminate it manually
-		char vendor[13];
-		memcpy(vendor, cpuInfo.eax_0.vendor_id, 12);
-		vendor[12] = 0;
-
-		bool vendorFound = false;
-		for (uint32 i = 0; vendorNames[i] != 0; i++) {
-			if (strcmp(vendor, vendorNames[i]) == 0)
-				vendorFound = true;
-		}
-
-		uint32 cpuSIMD = 0;
-		uint32 maxStdFunc = cpuInfo.regs.eax;
-		if (vendorFound && maxStdFunc >= 1) {
-			get_cpuid(&cpuInfo, 1, 0);
-			uint32 edx = cpuInfo.regs.edx;
-			if (edx & (1 << 23))
-				cpuSIMD |= APPSERVER_SIMD_MMX;
-			if (edx & (1 << 25))
-				cpuSIMD |= APPSERVER_SIMD_SSE;
-		} else {
-			// no flags can be identified
-			cpuSIMD = 0;
-		}
-		appServerSIMD &= cpuSIMD;
-	}
-	gAppServerSIMDFlags = appServerSIMD;
-#endif	// __INTEL__
-}
-
-
-//	#pragma mark -
-
-
 /*!	\brief Constructor
 
 	This loads the default fonts, allocates all the major global variables,
@@ -127,9 +62,6 @@ AppServer::AppServer()
 	fLink.SetReceiverPort(fMessagePort);
 
 	sAppServer = this;
-
-	// Initialize SIMD flags
-	detect_simd();
 
 	gInputManager = new InputManager();
 

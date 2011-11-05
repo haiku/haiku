@@ -4,11 +4,10 @@ UsePrivateHeaders notification ;
 
 Server notification_server :
 	AppGroupView.cpp
-	BorderView.cpp
 	NotificationServer.cpp
 	NotificationView.cpp
 	NotificationWindow.cpp
-	: be $(TARGET_LIBSTDC++) libicon.a libnotification.a $(HAIKU_LOCALE_LIBS)
+	: be translation $(TARGET_LIBSTDC++) libnotification.a $(HAIKU_LOCALE_LIBS)
 	: notification_server.rdef
 ;
 
@@ -20,5 +19,11 @@ DoCatalogs notification_server :
 	NotificationWindow.cpp
 ;
 
-Depends notification_server : libicon.a ;
+# Stuff shared with the preflet
+StaticLibrary libnotification.a :
+	AppUsage.cpp
+	NotificationReceived.cpp
+	Notifications.cpp
+;
+
 Depends notification_server : libnotification.a ;

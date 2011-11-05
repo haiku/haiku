@@ -10,7 +10,6 @@
 #include <SupportDefs.h>
 #include <File.h>
 
-#include "Lock.h"
 #include "bfs.h"
 
 
@@ -23,7 +22,7 @@ class Inode {
 		Inode(const char *name,int32 mode = S_STR_INDEX | S_ALLOW_DUPS);
 		~Inode();
 
-		ReadWriteLock &Lock() { return fLock; }
+		rw_lock &Lock() { return fLock; }
 
 		status_t FindBlockRun(off_t pos,block_run &run,off_t &offset);
 		status_t Append(Transaction *,off_t bytes);
@@ -48,9 +47,9 @@ class Inode {
 		Volume	*fVolume;
 		BFile	fFile;
 		off_t	fSize;
-		ReadWriteLock	fLock;
+		rw_lock	fLock;
 		int32	fMode;
-		
+
 		// for dump_inode() only:
 		off_t	fOldSize;
 		off_t	fOldLastModified;

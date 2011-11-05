@@ -28,6 +28,7 @@ KernelAddon <usb>ehci :
 
 KernelAddon <usb>xhci :
 	xhci.cpp
+	xhci_rh.cpp
 	: libusb.a
 	: xhci.rdef
 	;

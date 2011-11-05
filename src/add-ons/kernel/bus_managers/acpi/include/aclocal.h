@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -165,25 +165,6 @@ union acpi_parse_object;
 #define ACPI_MAX_MUTEX                  7
 #define ACPI_NUM_MUTEX                  ACPI_MAX_MUTEX+1
 
-#if defined(ACPI_DEBUG_OUTPUT) || defined(ACPI_DEBUGGER)
-#ifdef DEFINE_ACPI_GLOBALS
-
-/* Debug names for the mutexes above */
-
-static char                 *AcpiGbl_MutexNames[ACPI_NUM_MUTEX] =
-{
-    "ACPI_MTX_Interpreter",
-    "ACPI_MTX_Namespace",
-    "ACPI_MTX_Tables",
-    "ACPI_MTX_Events",
-    "ACPI_MTX_Caches",
-    "ACPI_MTX_Memory",
-    "ACPI_MTX_CommandComplete",
-    "ACPI_MTX_CommandReady"
-};
-
-#endif
-#endif
 
 /* Lock structure for reader/writer interfaces */
 
@@ -502,6 +483,7 @@ typedef struct acpi_predefined_data
     char                        *Pathname;
     const ACPI_PREDEFINED_INFO  *Predefined;
     union acpi_operand_object   *ParentPackage;
+    ACPI_NAMESPACE_NODE         *Node;
     UINT32                      Flags;
     UINT8                       NodeFlags;
 
@@ -537,18 +519,25 @@ typedef struct acpi_predefined_data
 
 /* Dispatch info for each GPE -- either a method or handler, cannot be both */
 
-typedef struct acpi_handler_info
+typedef struct acpi_gpe_handler_info
 {
-    ACPI_EVENT_HANDLER              Address;        /* Address of handler, if any */
+    ACPI_GPE_HANDLER                Address;        /* Address of handler, if any */
     void                            *Context;       /* Context to be passed to handler */
     ACPI_NAMESPACE_NODE             *MethodNode;    /* Method node for this GPE level (saved) */
+    UINT8                           OriginalFlags;  /* Original (pre-handler) GPE info */
+    BOOLEAN                         OriginallyEnabled; /* True if GPE was originally enabled */
 
-} ACPI_HANDLER_INFO;
+} ACPI_GPE_HANDLER_INFO;
 
+/*
+ * GPE dispatch info. At any time, the GPE can have at most one type
+ * of dispatch - Method, Handler, or Implicit Notify.
+ */
 typedef union acpi_gpe_dispatch_info
 {
     ACPI_NAMESPACE_NODE             *MethodNode;    /* Method node for this GPE level */
-    struct acpi_handler_info        *Handler;
+    struct acpi_gpe_handler_info    *Handler;       /* Installed GPE handler */
+    ACPI_NAMESPACE_NODE             *DeviceNode;    /* Parent _PRW device for implicit notify */
 
 } ACPI_GPE_DISPATCH_INFO;
 
@@ -594,6 +583,7 @@ typedef struct acpi_gpe_block_info
     UINT32                          RegisterCount;  /* Number of register pairs in block */
     UINT16                          GpeCount;       /* Number of individual GPEs in block */
     UINT8                           BlockBaseNumber;/* Base GPE number for this block */
+    BOOLEAN                         Initialized;    /* TRUE if this block is initialized */
 
 } ACPI_GPE_BLOCK_INFO;
 
@@ -614,7 +604,6 @@ typedef struct acpi_gpe_walk_info
     ACPI_GPE_BLOCK_INFO             *GpeBlock;
     UINT16                          Count;
     ACPI_OWNER_ID                   OwnerId;
-    BOOLEAN                         EnableThisGpe;
     BOOLEAN                         ExecuteByOwnerId;
 
 } ACPI_GPE_WALK_INFO;
@@ -1282,6 +1271,7 @@ typedef struct acpi_db_method_info
     UINT32                          NumLoops;
     char                            Pathname[128];
     char                            **Args;
+    ACPI_OBJECT_TYPE                *Types;
 
     /*
      * Arguments to be passed to method for the command
@@ -1290,6 +1280,7 @@ typedef struct acpi_db_method_info
      *   Index of current thread inside all them created.
      */
     char                            InitArgs;
+    ACPI_OBJECT_TYPE                ArgTypes[4];
     char                            *Arguments[4];
     char                            NumThreadsStr[11];
     char                            IdOfThreadStr[11];

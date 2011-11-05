@@ -518,7 +518,7 @@ TBarWindow::CountItems(BMessage* message)
 void
 TBarWindow::AddItem(BMessage* message)
 {
-	DeskbarShelf shelf;
+	DeskbarShelf shelf = B_DESKBAR_TRAY; 
 	entry_ref ref;
 	int32 id = 999;
 	BMessage reply;
@@ -527,24 +527,17 @@ TBarWindow::AddItem(BMessage* message)
 	BMessage archivedView;
 	if (message->FindMessage("view", &archivedView) == B_OK) {
 #if SHELF_AWARE
-		if (message->FindInt32("shelf", (int32*)&shelf) != B_OK)
+		message->FindInt32("shelf", &shelf);
 #endif
-			shelf = B_DESKBAR_TRAY;
-
 		BMessage* archive = new BMessage(archivedView);
 		err = fBarView->AddItem(archive, shelf, &id);
 		if (err < B_OK)
 			delete archive;
 	} else if (message->FindRef("addon", &ref) == B_OK) {
-		//	exposing the name of the view here is not so great
-		TReplicantTray* tray
-			= dynamic_cast<TReplicantTray*>(FindView("Status"));
-		if (tray) {
-			// Force this into the deskbar even if the security code is wrong
-			// This is OK because the user specifically asked for this replicant
-			BEntry entry(&ref);
-			err = tray->LoadAddOn(&entry, &id, true);
-		}
+		BEntry entry(&ref);
+		err = entry.InitCheck();
+		if (err == B_OK)
+			err = fBarView->AddItem(&entry, shelf, &id);
 	}
 
 	if (err == B_OK)

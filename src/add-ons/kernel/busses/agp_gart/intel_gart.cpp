@@ -34,9 +34,9 @@
 	(sPCI->write_pci_config((info).bus, (info).device, (info).function, \
 		(offset), (size), (value)))
 #define write32(address, data) \
-	(*((volatile uint32 *)(address)) = (data))
+	(*((volatile uint32*)(address)) = (data))
 #define read32(address) \
-	(*((volatile uint32 *)(address)))
+	(*((volatile uint32*)(address)))
 
 
 const struct supported_device {
@@ -77,9 +77,22 @@ const struct supported_device {
 	{0x2e30, 0x2e32, INTEL_TYPE_G45, "G41"},
 	{0x2e40, 0x2e42, INTEL_TYPE_G45, "B43"},
 	{0x2e90, 0x2e92, INTEL_TYPE_G45, "B43"},
-	
+
 	{0xa000, 0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa010, 0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
+
+	{0x0040, 0x0042, INTEL_TYPE_ILKG, "IronLake Desktop"},
+	{0x0044, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0062, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x006a, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+
+	{0x0100, 0x0102, INTEL_TYPE_SNBG, "SandyBridge Desktop GT1"},
+	{0x0100, 0x0112, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2"},
+	{0x0100, 0x0122, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2+"},
+	{0x0104, 0x0106, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT1"},
+	{0x0104, 0x0116, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2"},
+	{0x0104, 0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
+	{0x0108, 0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"}
 };
 
 struct intel_info {
@@ -107,7 +120,7 @@ struct intel_info {
 };
 
 static intel_info sInfo;
-static pci_module_info *sPCI;
+static pci_module_info* sPCI;
 
 
 static bool
@@ -131,8 +144,11 @@ static void
 determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 {
 	// read stolen memory from the PCI configuration of the PCI bridge
-	uint16 memoryConfig = get_pci_config(info.bridge,
-		INTEL_GRAPHICS_MEMORY_CONTROL, 2);
+	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
+	if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB)
+		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
+
+	uint16 memoryConfig = get_pci_config(info.bridge, controlRegister, 2);
 	size_t memorySize = 1 << 20; // 1 MB
 	gttSize = 0;
 	stolenSize = 0;
@@ -159,7 +175,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 2 << 20;
 				break;
 		}
-	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
+			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK) {
 		switch (memoryConfig & G4X_GTT_MASK) {
 			case G4X_GTT_NONE:
 				gttSize = 0;
@@ -178,6 +195,18 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 4 << 20;
 				break;
 		}
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
+		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
+			case SNB_GTT_SIZE_NONE:
+				gttSize = 0;
+				break;
+			case SNB_GTT_SIZE_1MB:
+				gttSize = 1 << 20;
+				break;
+			case SNB_GTT_SIZE_2MB:
+				gttSize = 2 << 20;
+				break;
+		}
 	} else {
 		// older models have the GTT as large as their frame buffer mapping
 		// TODO: check if the i9xx version works with the i8xx chips as well
@@ -191,7 +220,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		} else if ((info.type & INTEL_TYPE_9xx) != 0)
 			frameBufferSize = info.display.u.h0.base_register_sizes[2];
 
-		TRACE(("frame buffer size %lu MB\n", frameBufferSize >> 20));
+		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
 		gttSize = frameBufferSize / 1024;
 	}
 
@@ -202,7 +231,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
-				dprintf("intel_gart: getting local memory size not implemented.\n");
+				dprintf("intel_gart: getting local memory size not "
+					"implemented.\n");
 				break;
 			case i830_STOLEN_512K:
 				memorySize >>= 1;
@@ -212,6 +242,57 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				break;
 			case i830_STOLEN_8M:
 				memorySize *= 8;
+				break;
+		}
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
+		switch (memoryConfig & SNB_STOLEN_MEMORY_MASK) {
+			case SNB_STOLEN_MEMORY_32MB:
+				memorySize *= 32;
+				break;
+			case SNB_STOLEN_MEMORY_64MB:
+				memorySize *= 64;
+				break;
+			case SNB_STOLEN_MEMORY_96MB:
+				memorySize *= 96;
+				break;
+			case SNB_STOLEN_MEMORY_128MB:
+				memorySize *= 128;
+				break;
+			case SNB_STOLEN_MEMORY_160MB:
+				memorySize *= 160;
+				break;
+			case SNB_STOLEN_MEMORY_192MB:
+				memorySize *= 192;
+				break;
+			case SNB_STOLEN_MEMORY_224MB:
+				memorySize *= 224;
+				break;
+			case SNB_STOLEN_MEMORY_256MB:
+				memorySize *= 256;
+				break;
+			case SNB_STOLEN_MEMORY_288MB:
+				memorySize *= 288;
+				break;
+			case SNB_STOLEN_MEMORY_320MB:
+				memorySize *= 320;
+				break;
+			case SNB_STOLEN_MEMORY_352MB:
+				memorySize *= 352;
+				break;
+			case SNB_STOLEN_MEMORY_384MB:
+				memorySize *= 384;
+				break;
+			case SNB_STOLEN_MEMORY_416MB:
+				memorySize *= 416;
+				break;
+			case SNB_STOLEN_MEMORY_448MB:
+				memorySize *= 448;
+				break;
+			case SNB_STOLEN_MEMORY_480MB:
+				memorySize *= 480;
+				break;
+			case SNB_STOLEN_MEMORY_512MB:
+				memorySize *= 512;
 				break;
 		}
 	} else if (info.type == INTEL_TYPE_85x
@@ -289,17 +370,17 @@ intel_map(intel_info &info)
 	int fbIndex = 0;
 	int mmioIndex = 1;
 	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
-		// for some reason Intel saw the need to change the order of the mappings
-		// with the introduction of the i9xx family
+		// for some reason Intel saw the need to change the order of the
+		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
 		fbIndex = 2;
 	}
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		(void *)info.display.u.h0.base_registers[mmioIndex],
+		(void*)info.display.u.h0.base_registers[mmioIndex],
 		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&info.registers);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf("agp_intel: could not map memory I/O!\n");
 		return info.registers_area;
@@ -310,7 +391,7 @@ intel_map(intel_info &info)
 		get_pci_config(info.display, PCI_command, 2)
 			| PCI_command_io | PCI_command_memory | PCI_command_master);
 
-	void *scratchAddress;
+	void* scratchAddress;
 	AreaKeeper scratchCreator;
 	info.scratch_area = scratchCreator.Create("intel GMCH scratch",
 		&scratchAddress, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK,
@@ -325,11 +406,14 @@ intel_map(intel_info &info)
 		return B_ERROR;
 
 	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
-		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
+		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
+			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK
+			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 					+ (2UL << 20);
 		} else
-			info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
+			info.gtt_physical_base
+				= get_pci_config(info.display, i915_GTT_BASE, 4);
 	} else {
 		info.gtt_physical_base = read32(info.registers
 			+ INTEL_PAGE_TABLE_CONTROL) & ~PAGE_TABLE_ENABLED;
@@ -348,13 +432,13 @@ intel_map(intel_info &info)
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
 
-	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_base,
-		gttSize, info.gtt_entries, stolenSize);
+	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n",
+		info.gtt_physical_base, gttSize, info.gtt_entries, stolenSize);
 
 	AreaKeeper gttMapper;
 	info.gtt_area = gttMapper.Map("intel GMCH gtt",
-		(void *)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&info.gtt_base);
+		(void*)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.gtt_base);
 	if (gttMapper.InitCheck() < B_OK) {
 		dprintf("intel_gart: could not map GTT!\n");
 		return info.gtt_area;
@@ -370,22 +454,23 @@ intel_map(intel_info &info)
 		info.aperture_size >> 20, gttSize >> 10);
 
 	dprintf("intel_gart: GTT base = 0x%lx\n", info.gtt_physical_base);
-	dprintf("intel_gart: MMIO base = 0x%lx\n", info.display.u.h0.base_registers[mmioIndex]);
+	dprintf("intel_gart: MMIO base = 0x%lx\n",
+		info.display.u.h0.base_registers[mmioIndex]);
 	dprintf("intel_gart: GMR base = 0x%lx\n", info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
-		(void *)info.aperture_physical_base, info.aperture_size,
+		(void*)info.aperture_physical_base, info.aperture_size,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
-		B_READ_AREA | B_WRITE_AREA, (void **)&info.aperture_base);
+		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
 		// try again without write combining
 		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
 
 		info.aperture_area = apertureMapper.Map("intel graphics aperture",
-			(void *)info.aperture_physical_base, info.aperture_size,
+			(void*)info.aperture_physical_base, info.aperture_size,
 			B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-			(void **)&info.aperture_base);
+			(void**)&info.aperture_base);
 	}
 	if (apertureMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map graphics aperture!\n");
@@ -408,7 +493,7 @@ intel_map(intel_info &info)
 
 status_t
 intel_create_aperture(uint8 bus, uint8 device, uint8 function, size_t size,
-	void **_aperture)
+	void** _aperture)
 {
 	// TODO: we currently only support a single AGP bridge!
 	if ((bus != sInfo.bridge.bus || device != sInfo.bridge.device
@@ -445,14 +530,14 @@ intel_create_aperture(uint8 bus, uint8 device, uint8 function, size_t size,
 
 
 void
-intel_delete_aperture(void *aperture)
+intel_delete_aperture(void* aperture)
 {
 	intel_unmap(sInfo);
 }
 
 
 static status_t
-intel_get_aperture_info(void *aperture, aperture_info *info)
+intel_get_aperture_info(void* aperture, aperture_info* info)
 {
 	if (info == NULL)
 		return B_BAD_VALUE;
@@ -467,14 +552,14 @@ intel_get_aperture_info(void *aperture, aperture_info *info)
 
 
 status_t
-intel_set_aperture_size(void *aperture, size_t size)
+intel_set_aperture_size(void* aperture, size_t size)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-intel_bind_page(void *aperture, uint32 offset, phys_addr_t physicalAddress)
+intel_bind_page(void* aperture, uint32 offset, phys_addr_t physicalAddress)
 {
 	//TRACE("bind_page(offset %lx, physical %lx)\n", offset, physicalAddress);
 
@@ -484,7 +569,7 @@ intel_bind_page(void *aperture, uint32 offset, phys_addr_t physicalAddress)
 
 
 static status_t
-intel_unbind_page(void *aperture, uint32 offset)
+intel_unbind_page(void* aperture, uint32 offset)
 {
 	//TRACE("unbind_page(offset %lx)\n", offset);
 
@@ -496,7 +581,7 @@ intel_unbind_page(void *aperture, uint32 offset)
 
 
 void
-intel_flush_tlbs(void *aperture)
+intel_flush_tlbs(void* aperture)
 {
 	read32(sInfo.gtt_base + sInfo.gtt_entries - 1);
 	asm("wbinvd;");
@@ -511,7 +596,7 @@ intel_init()
 {
 	TRACE("bus manager init\n");
 
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&sPCI) != B_OK)
+	if (get_module(B_PCI_MODULE_NAME, (module_info**)&sPCI) != B_OK)
 		return B_ERROR;
 
 	bool found = false;
@@ -529,7 +614,6 @@ intel_init()
 				sInfo.type = kSupportedDevices[i].type;
 				found = has_display_device(sInfo.display,
 					kSupportedDevices[i].display_id);
-				break;
 			}
 		}
 
@@ -583,7 +667,7 @@ static struct agp_gart_bus_module_info sIntelModuleInfo = {
 	intel_flush_tlbs
 };
 
-module_info *modules[] = {
-	(module_info *)&sIntelModuleInfo,
+module_info* modules[] = {
+	(module_info*)&sIntelModuleInfo,
 	NULL
 };

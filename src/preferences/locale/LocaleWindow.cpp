@@ -89,6 +89,7 @@ LocaleWindow::LocaleWindow()
 
 	fLanguageListView->SetInvocationMessage(new BMessage(kMsgLanguageInvoked));
 	fLanguageListView->SetDragMessage(new BMessage(kMsgLanguageDragged));
+	fLanguageListView->SetGlobalDropTargetIndicator(true);
 
 	BFont font;
 	fLanguageListView->GetFont(&font);
@@ -98,7 +99,7 @@ LocaleWindow::LocaleWindow()
 	if (BLocaleRoster::Default()->GetAvailableLanguages(&availableLanguages)
 			== B_OK) {
 		BString currentID;
-		LanguageListItem* lastAddedCountryItem = NULL;
+		LanguageListItem* currentToplevelItem = NULL;
 
 		for (int i = 0; availableLanguages.FindString("language", i, &currentID)
 				== B_OK; i++) {
@@ -119,20 +120,23 @@ LocaleWindow::LocaleWindow()
 				}
 			}
 
-			LanguageListItem* item = new LanguageListItem(name,
-				currentID.String(), currentLanguage.Code(),
-				currentLanguage.CountryCode());
-			if (currentLanguage.IsCountrySpecific()
-				&& lastAddedCountryItem != NULL
-				&& lastAddedCountryItem->Code() == item->Code()) {
-				fLanguageListView->AddUnder(item, lastAddedCountryItem);
+			LanguageListItem* item;
+			if (currentLanguage.IsCountrySpecific()) {
+				item = new LanguageListItemWithFlag(name, currentID.String(),
+					currentLanguage.Code(), currentLanguage.CountryCode());
 			} else {
-				// This is a language variant, add it at top-level
+				item = new LanguageListItem(name, currentID.String(),
+					currentLanguage.Code());
+			}
+			if (currentLanguage.IsCountrySpecific()
+				&& currentToplevelItem != NULL
+				&& currentToplevelItem->Code() == item->Code()) {
+				fLanguageListView->AddUnder(item, currentToplevelItem);
+			} else {
+				// This is a generic language, add it at top-level
 				fLanguageListView->AddItem(item);
-				if (!currentLanguage.IsCountrySpecific()) {
-					item->SetExpanded(false);
-					lastAddedCountryItem = item;
-				}
+				item->SetExpanded(false);
+				currentToplevelItem = item;
 			}
 		}
 
@@ -181,38 +185,42 @@ LocaleWindow::LocaleWindow()
 		new BMessage(kMsgConventionsSelection));
 
 	// get all available formatting conventions (by language)
-	BFormattingConventions defaultConventions;
-	BLocale::Default()->GetFormattingConventions(&defaultConventions);
-	BString conventionID;
+	BFormattingConventions initialConventions;
+	BLocale::Default()->GetFormattingConventions(&initialConventions);
+	BString conventionsID;
 	fInitialConventionsItem = NULL;
-	LanguageListItem* lastAddedConventionsItem = NULL;
+	LanguageListItem* currentToplevelItem = NULL;
 	for (int i = 0;
-		availableLanguages.FindString("language", i, &conventionID) == B_OK;
+		availableLanguages.FindString("language", i, &conventionsID) == B_OK;
 		i++) {
-		BFormattingConventions convention(conventionID);
-		BString conventionName;
-		convention.GetName(conventionName);
+		BFormattingConventions conventions(conventionsID);
+		BString conventionsName;
+		conventions.GetName(conventionsName);
 
-		LanguageListItem* item = new LanguageListItem(conventionName,
-			conventionID, convention.LanguageCode(), convention.CountryCode());
-		if (!strcmp(conventionID, "en_US"))
+		LanguageListItem* item;
+		if (conventions.AreCountrySpecific()) {
+			item = new LanguageListItemWithFlag(conventionsName, conventionsID,
+				conventions.LanguageCode(), conventions.CountryCode());
+		} else {
+			item = new LanguageListItem(conventionsName, conventionsID,
+				conventions.LanguageCode());
+		}
+		if (!strcmp(conventionsID, "en_US"))
 			fDefaultConventionsItem = item;
-		if (conventionID.FindFirst('_') >= 0
-			&& lastAddedConventionsItem != NULL
-			&& lastAddedConventionsItem->Code() == item->Code()) {
-			if (!strcmp(conventionID, defaultConventions.ID())) {
-				fConventionsListView->Expand(lastAddedConventionsItem);
+		if (conventions.AreCountrySpecific()
+			&& currentToplevelItem != NULL
+			&& currentToplevelItem->Code() == item->Code()) {
+			if (!strcmp(conventionsID, initialConventions.ID())) {
+				fConventionsListView->Expand(currentToplevelItem);
 				fInitialConventionsItem = item;
 			}
-			fConventionsListView->AddUnder(item, lastAddedConventionsItem);
+			fConventionsListView->AddUnder(item, currentToplevelItem);
 		} else {
 			// This conventions-item isn't country-specific, add it at top-level
 			fConventionsListView->AddItem(item);
-			if (conventionID.FindFirst('_') < 0) {
-				item->SetExpanded(false);
-				lastAddedConventionsItem = item;
-			}
-			if (!strcmp(conventionID, defaultConventions.ID()))
+			item->SetExpanded(false);
+			currentToplevelItem = item;
+			if (!strcmp(conventionsID, initialConventions.ID()))
 				fInitialConventionsItem = item;
 		}
 	}
@@ -328,7 +336,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
 					i++) {
 				LanguageListItem* item = static_cast<LanguageListItem*>(
-					fLanguageListView->FullListItemAt(index));
+					fLanguageListView->ItemAt(index));
 				_InsertPreferredLanguage(item, dropIndex++);
 			}
 			break;
@@ -356,15 +364,18 @@ LocaleWindow::MessageReceived(BMessage* message)
 				// change ordering
 				int32 dropIndex = message->FindInt32("drop_index");
 				int32 index = 0;
-				if (message->FindInt32("index", &index) == B_OK
-					&& dropIndex != index) {
+				for (int32 i = 0;
+						message->FindInt32("index", i, &index) == B_OK;
+						i++, dropIndex++) {
+					if (dropIndex > index) {
+						dropIndex--;
+						index -= i;
+					}
 					BListItem* item = fPreferredListView->RemoveItem(index);
-					if (dropIndex > index)
-						index--;
 					fPreferredListView->AddItem(item, dropIndex);
-
-					_PreferredLanguagesChanged();
 				}
+
+				_PreferredLanguagesChanged();
 				break;
 			}
 
@@ -378,13 +389,18 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 			// Remove from preferred languages
 			int32 index = 0;
-			if (message->FindInt32("index", &index) == B_OK) {
-				delete fPreferredListView->RemoveItem(index);
-				_PreferredLanguagesChanged();
+			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
+					i++) {
+				delete fPreferredListView->RemoveItem(index - i);
 
-				if (message->what == kMsgPreferredLanguageDeleted)
-					fPreferredListView->Select(index);
+				if (message->what == kMsgPreferredLanguageDeleted) {
+					int32 count = fPreferredListView->CountItems();
+					fPreferredListView->Select(
+						index < count ? index : count - 1);
+				}
 			}
+
+			_PreferredLanguagesChanged();
 			break;
 		}
 
@@ -419,7 +435,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 		{
 			MutableLocaleRoster::Default()->SetFilesystemTranslationPreferred(
 				fFilesystemTranslationCheckbox->Value());
-				
+
 			BAlert* alert = new BAlert(B_TRANSLATE("Locale"),
 				B_TRANSLATE("Deskbar and Tracker need to be restarted for this "
 				"change to take effect. Would you like to restart them now?"),
@@ -430,7 +446,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 				NULL, be_app));
 			break;
 		}
-		
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -488,10 +504,9 @@ LocaleWindow::_PreferredLanguagesChanged()
 {
 	BMessage preferredLanguages;
 	int index = 0;
-	while (index < fPreferredListView->FullListCountItems()) {
-		// only include subitems: we can guess the superitem from them anyway
+	while (index < fPreferredListView->CountItems()) {
 		LanguageListItem* item = static_cast<LanguageListItem*>(
-			fPreferredListView->FullListItemAt(index));
+			fPreferredListView->ItemAt(index));
 		if (item != NULL)
 			preferredLanguages.AddString("language", item->ID());
 		index++;

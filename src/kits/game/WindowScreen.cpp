@@ -844,9 +844,9 @@ BWindowScreen::_GetCardInfo()
 	fCardInfo.height = mode.virtual_height;
 
 	if (mode.space & 0x10)
-		strncpy(fCardInfo.rgba_order, "rgba", 4);
+		memcpy(fCardInfo.rgba_order, "rgba", 4);
 	else
-		strncpy(fCardInfo.rgba_order, "bgra", 4);
+		memcpy(fCardInfo.rgba_order, "bgra", 4);
 
 	fCardInfo.flags = 0;
 	if (mode.flags & B_SCROLL)

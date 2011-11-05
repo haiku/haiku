@@ -16,6 +16,7 @@
 
 #include "DrawingEngine.h"
 #include "DrawState.h"
+#include "FontManager.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"

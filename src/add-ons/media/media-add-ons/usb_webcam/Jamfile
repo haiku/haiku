@@ -35,7 +35,7 @@ addonSources =
 	QuickCamDevice.cpp
 	SonixCamDevice.cpp
 	NW80xCamDevice.cpp
-#	UVCCamDevice.cpp
+#	UVCCamDevice.cpp UVCDeframer.cpp
 ;
 
 ## colorspace transforms sources

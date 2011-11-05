@@ -23,6 +23,9 @@
 #include "ProcessController.h"
 #include "icons.h"
 
+#ifdef __HAIKU__
+	#include <AppMisc.h>
+#endif
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Deskbar.h>
@@ -53,9 +56,9 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 
 	app_info info;
 	status_t status = be_roster->GetRunningAppInfo(infoPack.team_info.team, &info);
-	if (status == B_OK || infoPack.team_info.team == B_SYSTEM_TEAM) {
+	if (status != B_OK) {
 		if (infoPack.team_info.team == B_SYSTEM_TEAM) {
-			// Get icon and name from kernel
+			// Get icon and name from kernel image
 			system_info	systemInfo;
 			get_system_info(&systemInfo);
 
@@ -63,15 +66,21 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 			kernelPath.Append(systemInfo.kernel_name);
 			get_ref_for_path(kernelPath.Path(), &info.ref);
 			nameFromArgs = true;
-		}
-	} else {
-		BEntry entry(infoPack.team_info.args, true);
-		status = entry.GetRef(&info.ref);
-		if (status != B_OK
-			|| strncmp(infoPack.team_info.args, systemPath.Path(),
-				strlen(systemPath.Path())) != 0)
+		} else {
+#ifdef __HAIKU__
+			status = BPrivate::get_app_ref(infoPack.team_info.team, &info.ref);
 			nameFromArgs = true;
-		tryTrackerIcon = (status == B_OK);
+#else
+
+			BEntry entry(infoPack.team_info.args, true);
+			status = entry.GetRef(&info.ref);
+			if (status != B_OK
+				|| strncmp(infoPack.team_info.args, systemPath.Path(),
+					strlen(systemPath.Path())) != 0)
+				nameFromArgs = true;
+#endif
+			tryTrackerIcon = (status == B_OK);
+		}
 	}
 
 	strncpy(infoPack.team_name, nameFromArgs ? infoPack.team_info.args : info.ref.name,
@@ -86,8 +95,8 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 		if (!tryTrackerIcon
 			|| BNodeInfo::GetTrackerIcon(&info.ref, infoPack.team_icon,
 				B_MINI_ICON) != B_OK) {
-			// TODO: don't hardcode the "app" icon!
-			infoPack.team_icon->SetBits(k_app_mini, 256, 0, B_CMAP8);
+			BMimeType genericAppType(B_APP_MIME_TYPE);
+			status = genericAppType.GetIcon(infoPack.team_icon, B_MINI_ICON);
 		}
 	} else
 		infoPack.team_icon = NULL;

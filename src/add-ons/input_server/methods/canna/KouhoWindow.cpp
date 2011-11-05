@@ -1,11 +1,10 @@
-//
-//	KouhoWindow.cpp
-//
-//	This is a part of...
-//	CannaIM
-//	version 1.0
-//	(c) 1999 M.Kawamura
-//
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
+
 
 #include <string.h>
 
@@ -19,7 +18,7 @@
 
 KouhoWindow::KouhoWindow( BFont *font, BLooper *looper )
 	:BWindow(	DUMMY_RECT,
-				"kouho", B_MODAL_WINDOW_LOOK, 
+				"kouho", B_MODAL_WINDOW_LOOK,
 				B_FLOATING_ALL_WINDOW_FEEL,
 				B_NOT_RESIZABLE | B_NOT_CLOSABLE |
 				B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AVOID_FOCUS |
@@ -38,15 +37,15 @@ KouhoWindow::KouhoWindow( BFont *font, BLooper *looper )
 	strcpy( style, "Regular" );
 	indexfont.SetFamilyAndStyle( family, style );
 	indexfont.SetSize( 10 );
-	
+
 #ifdef DEBUG
 SERIAL_PRINT(( "kouhoWindow: Constructor called.\n" ));
 #endif
-	
+
 	//setup main pane
 	indexWidth = indexfont.StringWidth( "W" ) + INDEXVIEW_SIDE_MARGIN * 2;
 	minimumWidth = indexfont.StringWidth( "ギリシャ  100/100" );
-	
+
 	frame = Bounds();
 	frame.left = indexWidth + 2;
 	frame.bottom -= INFOVIEW_HEIGHT;
@@ -64,7 +63,7 @@ SERIAL_PRINT(( "kouhoWindow: Constructor called.\n" ));
 	indexView = new KouhoIndexView( frame, fontHeight );
 	indexView->SetFont( &indexfont );
 	AddChild( indexView );
-	
+
 	frame = Bounds();
 	frame.top = frame.bottom - INFOVIEW_HEIGHT + 1;
 	infoView = new KouhoInfoView( frame );
@@ -78,7 +77,7 @@ void KouhoWindow::MessageReceived( BMessage* msg )
 	float height, width, x, y, w;
 	BPoint point;
 	BRect screenrect, frame;
-	
+
 	switch( msg->what )
 	{
 		case KOUHO_WINDOW_HIDE:
@@ -91,36 +90,36 @@ SERIAL_PRINT(( "kouhoWindow: KOUHO_WINDOW_HIDE recieved.\n" ));
 				standalone_mode = false;
 			}
 			break;
-			
+
 		case KOUHO_WINDOW_SHOW:
 #ifdef DEBUG
 SERIAL_PRINT(( "kouhoWindow: KOUHO_WINDOW_SHOW recieved.\n" ));
 #endif
 			ShowWindow();
 			break;
-			
+
 		case KOUHO_WINDOW_SHOW_ALONE:
 			standalone_mode = true;
 			frame = Frame();
 			screenrect = BScreen().Frame();
 			frame.OffsetTo( gSettings.standalone_loc.x, gSettings.standalone_loc.y );
-	
+
 			x = screenrect.right - frame.right;
 			y = screenrect.bottom - frame.bottom;
-	
+
 			if ( x < 0 )
 				frame.OffsetBy( x, 0 );
-		
+
 			if ( y < 0 )
 				frame.OffsetBy( 0, y );
-			
+
 			gSettings.standalone_loc.x = frame.left;
 			gSettings.standalone_loc.y = frame.top;
 			point = frame.LeftTop();
 			MoveTo( point );
 			ShowWindow();
 			break;
-			
+
 		case KOUHO_WINDOW_SHOWAT:
 #ifdef DEBUG
 SERIAL_PRINT(( "kouhoWindow: KOUHO_WINDOW_SHOWAT recieved.\n" ));
@@ -129,24 +128,24 @@ SERIAL_PRINT(( "kouhoWindow: KOUHO_WINDOW_SHOWAT recieved.\n" ));
 			msg->FindFloat( "height", &height );
 			ShowAt( point, height );
 			break;
-			
+
 		case KOUHO_WINDOW_SETTEXT:
 			const char* newtext;
 			bool hideindex, limitsize;
 			msg->FindString( "text", &newtext );
 			kouhoView->SetText( newtext );
-			
+
 			msg->FindBool( "index", &hideindex );
 			indexView->HideNumberDisplay( hideindex );
 
 			msg->FindBool( "limit", &limitsize );
 			height = kouhoView->TextHeight( 0, kouhoView->TextLength() );
 			height += INFOVIEW_HEIGHT;
-			
+
 			msg->FindString( "info", &newtext );
 			infoView->SetText( newtext );
 			// calculate widest line width
-			width = 0; 
+			width = 0;
 			for ( int32 line = 0, numlines = kouhoView->CountLines() ;
 				line < numlines ; line++ )
 			{
@@ -174,13 +173,13 @@ SERIAL_PRINT(( "kouhoWindow: KOUHO_WINDOW_SETTEXT(partial) received. rev = %d to
 				msg->FindInt32( "kouhorev", &kouhorevline );
 				kouhoView->HighlightLine( kouhorevline );
 			}
-			
+
 			break;
-		
+
 		case NUM_SELECTED_FROM_KOUHO_WIN:
 			cannaLooper->PostMessage( msg );
 			break;
-			
+
 		default:
 			BWindow::MessageReceived( msg );
 	}
@@ -194,7 +193,7 @@ void KouhoWindow::ShowAt( BPoint revpoint, float height )
 
 	kouhowidth = Frame().IntegerWidth();
 	kouhoheight = Frame().IntegerHeight();
-	
+
 	screenrect = BScreen( this ).Frame();
 #ifdef DEBUG
 SERIAL_PRINT(( "KouhoWindow: ShowAt activated. point x= %f, y= %f, height= %f", revpoint.x, revpoint.y, height ));
@@ -209,16 +208,16 @@ SERIAL_PRINT(( "KouhoWindow: ShowAt activated. point x= %f, y= %f, height= %f", 
 		point.y = revpoint.y - kouhoheight - WINDOW_BORDER_WIDTH_V;
 //	else
 //		point.y = revpoint.y + height;
-		
+
 	if ( point.x + kouhowidth > screenrect.right )
 		point.x = point.x - (screenrect.right - (point.x + kouhowidth ));
-//		point.x = revpoint.x 
+//		point.x = revpoint.x
 //			- ( revpoint.x + kouhowidth + WINDOW_BORDER_WIDTH - screenrect.right );
 //	else
 //		point.x = revpoint.x;
-	
+
 	MoveTo( point );
-	ShowWindow();	
+	ShowWindow();
 }
 
 void
@@ -260,7 +259,7 @@ void KouhoView::HighlightLine( int32 line )
 	BRegion region;
 
 	if ( line != -1 )
-	{	
+	{
 		begin = OffsetAt( line );
 		if ( line == CountLines() - 1 )
 			end = TextLength() + 1;
@@ -273,9 +272,9 @@ void KouhoView::HighlightLine( int32 line )
 		//extend highlihght region to right end
 		highlightRect.right = Bounds().right;
 		Invalidate( highlightRect );
-		
+
 	}
-		
+
 }
 
 void
@@ -286,7 +285,7 @@ KouhoView::HighlightPartial( int32 begin, int32 end )
 	highlightRect = region.RectAt( 0 );
 	Invalidate( highlightRect );
 }
-	
+
 void KouhoView::Draw( BRect rect )
 {
 	BTextView::Draw( rect );
@@ -303,7 +302,7 @@ void KouhoView::MouseDown( BPoint point )
 	iview = (KouhoIndexView *)(Window()->FindView( "index" ));
 	if ( iview->IsNumberDisplayHidden() )
 		return;
-	
+
 	int32 number;
 	number = LineAt( point );
 	BMessage msg( NUM_SELECTED_FROM_KOUHO_WIN );
@@ -325,7 +324,7 @@ KouhoIndexView::KouhoIndexView( BRect frame, float fontheight )
 	indexfontheight = ht.ascent + ht.descent + ht.leading;
 	if ( indexfontheight < lineHeight )
 		fontOffset = (int32)((lineHeight - indexfontheight) / 2 + 1.5);
-//printf("line height=%f, index font height=%f, offset=%d\n", lineHeight, indexfontheight, fontOffset );	
+//printf("line height=%f, index font height=%f, offset=%d\n", lineHeight, indexfontheight, fontOffset );
 
 }
 

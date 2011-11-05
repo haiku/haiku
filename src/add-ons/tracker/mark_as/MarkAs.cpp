@@ -7,9 +7,12 @@
 #include <new>
 
 #include <Directory.h>
+#include <E-mail.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <InterfaceDefs.h>
+#include <MailDaemon.h>
+#include <mail_util.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Node.h>
@@ -84,6 +87,7 @@ process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 		return;
 
 	BString status = item->Label();
+	//TODO:This won't work anymore when the menu gets translated! Use index!
 
 	entry_ref ref;
 	for (int i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
@@ -92,13 +96,41 @@ process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 
 		if (node.InitCheck() == B_OK
 			&& node.ReadAttrString("BEOS:TYPE", &type) == B_OK
-			&& type == "text/x-email") {
+			&& (type == B_MAIL_TYPE || type == B_PARTIAL_MAIL_TYPE)) {
 			BString previousStatus;
+			read_flags previousRead;
+			
+			// Update the MAIL:read flag
+			if (status == "New") {
+				if (read_read_attr(node, previousRead) != B_OK ||
+					previousRead != B_UNREAD)
+					write_read_attr(node, B_UNREAD);
+			}
+			else if (status == "Read") {
+				// if we're marking it via the add-on, we haven't really read it
+				// so use B_SEEN instead of B_READ
+				// Check both B_SEEN and B_READ
+				// (so we don't overwrite B_READ with B_SEEN)
+				if (read_read_attr(node, previousRead) != B_OK ||
+					(previousRead != B_SEEN && previousRead != B_READ)) {
+					int32 account;
+					if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE,
+						0LL, &account, sizeof(account)) == sizeof(account))
+						BMailDaemon::MarkAsRead(account, ref, B_SEEN);
+					else
+						write_read_attr(node, B_SEEN);
+				}
+			}
+			// ignore "Replied"; no matching MAIL:read status
 
+			// We want to keep the previous behavior of updating the status
+			// string, but write_read_attr will only change the status string
+			// if it's one of "New", "Seen", or "Read" (and not, for example,
+			// "Replied"), so we change the status string here
 			// Only update the attribute if there is an actual change
-			if (node.ReadAttrString("MAIL:status", &previousStatus) != B_OK
+			if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &previousStatus) != B_OK
 				|| previousStatus != status)
-				node.WriteAttrString("MAIL:status", &status);
+				node.WriteAttrString(B_MAIL_ATTR_STATUS, &status);
 		}
 	}
 }

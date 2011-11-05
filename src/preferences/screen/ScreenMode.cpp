@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,14 +8,15 @@
 
 
 #include "ScreenMode.h"
-#include "gtf.h"
-
-#include <InterfaceDefs.h>
-#include <String.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <InterfaceDefs.h>
+#include <String.h>
+
+#include <compute_display_timing.h>
 
 
 /* Note, this headers defines a *private* interface to the Radeon accelerant.
@@ -238,6 +239,36 @@ ScreenMode::GetOriginalMode(screen_mode& mode, int32 workspace) const
 	mode = fOriginal[workspace];
 
 	return B_OK;
+}
+
+
+status_t
+ScreenMode::Set(const display_mode& mode, int32 workspace)
+{
+	if (!fUpdatedModes)
+		UpdateOriginalModes();
+
+	BScreen screen(fWindow);
+
+	if (workspace == ~0)
+		workspace = current_workspace();
+
+	// BScreen::SetMode() needs a non-const display_mode
+	display_mode nonConstMode;
+	memcpy(&nonConstMode, &mode, sizeof(display_mode));
+	return screen.SetMode(workspace, &nonConstMode, true);
+}
+
+
+status_t
+ScreenMode::Get(display_mode& mode, int32 workspace) const
+{
+	BScreen screen(fWindow);
+
+	if (workspace == ~0)
+		workspace = current_workspace();
+
+	return screen.GetMode(workspace, &mode);
 }
 
 
@@ -557,6 +588,18 @@ ScreenMode::ModeAt(int32 index)
 }
 
 
+const display_mode&
+ScreenMode::DisplayModeAt(int32 index)
+{
+	if (index < 0)
+		index = 0;
+	else if (index >= (int32)fModeCount)
+		index = fModeCount - 1;
+
+	return fModeList[index];
+}
+
+
 int32
 ScreenMode::CountModes()
 {
@@ -564,6 +607,9 @@ ScreenMode::CountModes()
 }
 
 
+/*!	Searches for a similar mode in the reported mode list, and if that does not
+	find a matching mode, it will compute the mode manually using the GTF.
+*/
 bool
 ScreenMode::_GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 {
@@ -626,9 +672,8 @@ ScreenMode::_GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 	// For the mode selected by the width, height, and refresh rate, compute
 	// the video timing parameters for the mode by using the VESA Generalized
 	// Timing Formula (GTF).
-
-	ComputeGTFVideoTiming(displayMode.timing.h_display,
-		displayMode.timing.v_display, mode.refresh, displayMode.timing);
+	compute_display_timing(mode.width, mode.height, mode.refresh, false,
+		&displayMode.timing);
 
 	return true;
 }

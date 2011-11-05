@@ -1,15 +1,10 @@
-/* mail util - header parsing
-**
-** Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 
 
-#include <UTF8.h>
-#include <Message.h>
-#include <String.h>
-#include <Locker.h>
-#include <DataIO.h>
-#include <List.h>
+#include <mail_util.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,27 +13,30 @@
 #include <regex.h>
 #include <ctype.h>
 #include <errno.h>
+
+#include <List.h>
+#include <Locker.h>
 #include <parsedate.h>
+#include <String.h>
+#include <UTF8.h>
 
 #include <mail_encoding.h>
-
-#include <mail_util.h>
 
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 
+
 using namespace BPrivate;
+
 
 #define CRLF   "\r\n"
 
-struct CharsetConversionEntry
-{
+struct CharsetConversionEntry {
 	const char *charset;
 	uint32 flavor;
 };
 
-extern const CharsetConversionEntry mail_charsets [] =
-{
+extern const CharsetConversionEntry mail_charsets[] = {
 	// In order of authority, so when searching for the name for a particular
 	// numbered conversion, start at the beginning of the array.
 	{"iso-8859-1",  B_ISO1_CONVERSION}, // MIME STANDARD
@@ -86,239 +84,16 @@ extern const CharsetConversionEntry mail_charsets [] =
 };
 
 
-status_t
-write_read_attr(BNode& node, read_flags flag)
-{
-	if (node.WriteAttr(B_MAIL_ATTR_READ, B_INT32_TYPE, 0, &flag, sizeof(int32))
-		< 0)
-		return B_ERROR;
-
-#if R5_COMPATIBLE
-	// manage the status string only if it currently has a "read" status
-	BString currentStatus;
-	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK) {
-		if (currentStatus.ICompare("New") != 0
-			&& currentStatus.ICompare("Read") != 0
-			&& currentStatus.ICompare("Seen") != 0)
-			return B_OK;
-	}
-
-	const char* statusString = (flag == B_READ) ? "Read"
-		: (flag  == B_SEEN) ? "Seen" : "New";
-	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
-		strlen(statusString)) < 0)
-		return B_ERROR;
-#endif
-	return B_OK;
-}
+static int32 gLocker = 0;
+static size_t gNsub = 1;
+static re_pattern_buffer gRe;
+static re_pattern_buffer *gRebuf = NULL;
+static unsigned char gTranslation[256];
 
 
-status_t
-read_read_attr(BNode& node, read_flags& flag)
-{
-	if (node.ReadAttr(B_MAIL_ATTR_READ, B_INT32_TYPE, 0, &flag, sizeof(int32))
-		== sizeof(int32))
-		return B_OK;
-
-#if R5_COMPATIBLE
-	BString statusString;
-	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &statusString) == B_OK) {
-		if (statusString.ICompare("New"))
-			flag = B_UNREAD;
-		else
-			flag = B_READ;
-
-		return B_OK;
-	}
-#endif
-	return B_ERROR;
-}
-
-
-// The next couple of functions are our wrapper around convert_to_utf8 and
-// convert_from_utf8 so that they can also convert from UTF-8 to UTF-8 by
-// specifying the B_MAIL_UTF8_CONVERSION constant as the conversion operation.  It
-// also lets us add new conversions, like B_MAIL_US_ASCII_CONVERSION.
-
-_EXPORT status_t mail_convert_to_utf8 (
-	uint32 srcEncoding,
-	const char *src,
-	int32 *srcLen,
-	char *dst,
-	int32 *dstLen,
-	int32 *state,
-	char substitute)
-{
-	int32    copyAmount;
-	char    *originalDst = dst;
-	status_t returnCode = -1;
-
-	if (srcEncoding == B_MAIL_UTF8_CONVERSION) {
-		copyAmount = *srcLen;
-		if (*dstLen < copyAmount)
-			copyAmount = *dstLen;
-		memcpy (dst, src, copyAmount);
-		*srcLen = copyAmount;
-		*dstLen = copyAmount;
-		returnCode = B_OK;
-	} else if (srcEncoding == B_MAIL_US_ASCII_CONVERSION) {
-		int32 i;
-		unsigned char letter;
-		copyAmount = *srcLen;
-		if (*dstLen < copyAmount)
-			copyAmount = *dstLen;
-		for (i = 0; i < copyAmount; i++) {
-			letter = *src++;
-			if (letter > 0x80U)
-				// Invalid, could also use substitute, but better to strip high bit.
-				*dst++ = letter - 0x80U;
-			else if (letter == 0x80U)
-				// Can't convert to 0x00 since that's NUL, which would cause problems.
-				*dst++ = substitute;
-			else
-				*dst++ = letter;
-		}
-		*srcLen = copyAmount;
-		*dstLen = copyAmount;
-		returnCode = B_OK;
-	} else
-		returnCode = convert_to_utf8 (srcEncoding, src, srcLen,
-			dst, dstLen, state, substitute);
-
-	if (returnCode == B_OK) {
-		// Replace spurious NUL bytes, which should normally not be in the
-		// output of the decoding (not normal UTF-8 characters, and no NULs are
-		// in our usual input strings).  They happen for some odd ISO-2022-JP
-		// byte pair combinations which are improperly handled by the BeOS
-		// routines.  Like "\e$ByD\e(B" where \e is the ESC character $1B, the
-		// first ESC $ B switches to a Japanese character set, then the next
-		// two bytes "yD" specify a character, then ESC ( B switches back to
-		// the ASCII character set.  The UTF-8 conversion yields a NUL byte.
-		int32 i;
-		for (i = 0; i < *dstLen; i++)
-			if (originalDst[i] == 0)
-				originalDst[i] = substitute;
-	}
-	return returnCode;
-}
-
-
-_EXPORT status_t mail_convert_from_utf8 (
-	uint32 dstEncoding,
-	const char *src,
-	int32 *srcLen,
-	char *dst,
-	int32 *dstLen,
-	int32 *state,
-	char substitute)
-{
-	int32		copyAmount;
-	status_t	errorCode;
-	int32		originalDstLen = *dstLen;
-	int32		tempDstLen;
-	int32		tempSrcLen;
-
-	if (dstEncoding == B_MAIL_UTF8_CONVERSION)
-	{
-		copyAmount = *srcLen;
-		if (*dstLen < copyAmount)
-			copyAmount = *dstLen;
-		memcpy (dst, src, copyAmount);
-		*srcLen = copyAmount;
-		*dstLen = copyAmount;
-		return B_OK;
-	}
-
-	if (dstEncoding == B_MAIL_US_ASCII_CONVERSION)
-	{
-		int32			characterLength;
-		int32			dstRemaining = *dstLen;
-		unsigned char	letter;
-		int32			srcRemaining = *srcLen;
-
-		// state contains the number of source bytes to skip, left over from a
-		// partial UTF-8 character split over the end of the buffer from last
-		// time.
-		if (srcRemaining <= *state) {
-			*state -= srcRemaining;
-			*dstLen = 0;
-			return B_OK;
-		}
-		srcRemaining -= *state;
-		src += *state;
-		*state = 0;
-
-		while (true) {
-			if (srcRemaining <= 0 || dstRemaining <= 0)
-				break;
-			letter = *src;
-			if (letter < 0x80)
-				characterLength = 1; // Regular ASCII equivalent code.
-			else if (letter < 0xC0)
-				characterLength = 1; // Invalid in-between data byte 10xxxxxx.
-			else if (letter < 0xE0)
-				characterLength = 2;
-			else if (letter < 0xF0)
-				characterLength = 3;
-			else if (letter < 0xF8)
-				characterLength = 4;
-			else if (letter < 0xFC)
-				characterLength = 5;
-			else if (letter < 0xFE)
-				characterLength = 6;
-			else
-				characterLength = 1; // 0xFE and 0xFF are invalid in UTF-8.
-			if (letter < 0x80)
-				*dst++ = *src;
-			else
-				*dst++ = substitute;
-			dstRemaining--;
-			if (srcRemaining < characterLength) {
-				// Character split past the end of the buffer.
-				*state = characterLength - srcRemaining;
-				srcRemaining = 0;
-			} else {
-				src += characterLength;
-				srcRemaining -= characterLength;
-			}
-		}
-		// Update with the amounts used.
-		*srcLen = *srcLen - srcRemaining;
-		*dstLen = *dstLen - dstRemaining;
-		return B_OK;
-	}
-
-	errorCode = convert_from_utf8 (dstEncoding, src, srcLen, dst, dstLen, state, substitute);
-	if (errorCode != B_OK)
-		return errorCode;
-
-	if (dstEncoding != B_JIS_CONVERSION)
-		return B_OK;
-
-	// B_JIS_CONVERSION (ISO-2022-JP) works by shifting between different
-	// character subsets.  For E-mail headers (and other uses), it needs to be
-	// switched back to ASCII at the end (otherwise the last character gets
-	// lost or other weird things happen in the headers).  Note that we can't
-	// just append the escape code since the convert_from_utf8 "state" will be
-	// wrong.  So we append an ASCII letter and throw it away, leaving just the
-	// escape code.  Well, it actually switches to the Roman character set, not
-	// ASCII, but that should be OK.
-
-	tempDstLen = originalDstLen - *dstLen;
-	if (tempDstLen < 3) // Not enough space remaining in the output.
-		return B_OK; // Sort of an error, but we did convert the rest OK.
-	tempSrcLen = 1;
-	errorCode = convert_from_utf8 (dstEncoding, "a", &tempSrcLen,
-		dst + *dstLen, &tempDstLen, state, substitute);
-	if (errorCode != B_OK)
-		return errorCode;
-	*dstLen += tempDstLen - 1 /* don't include the ASCII letter */;
-	return B_OK;
-}
-
-
-
-static int handle_non_rfc2047_encoding(char **buffer,size_t *bufferLength,size_t *sourceLength)
+static int
+handle_non_rfc2047_encoding(char **buffer, size_t *bufferLength,
+	size_t *sourceLength)
 {
 	char *string = *buffer;
 	int32 length = *sourceLength;
@@ -374,7 +149,230 @@ static int handle_non_rfc2047_encoding(char **buffer,size_t *bufferLength,size_t
 }
 
 
-_EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
+// #pragma mark -
+
+
+status_t
+write_read_attr(BNode& node, read_flags flag)
+{
+	if (node.WriteAttr(B_MAIL_ATTR_READ, B_INT32_TYPE, 0, &flag, sizeof(int32))
+			< 0)
+		return B_ERROR;
+
+	// manage the status string only if it currently has a "read" status
+	BString currentStatus;
+	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK) {
+		if (currentStatus.ICompare("New") != 0
+			&& currentStatus.ICompare("Read") != 0
+			&& currentStatus.ICompare("Seen") != 0)
+			return B_OK;
+	}
+
+	const char* statusString = flag == B_READ ? "Read"
+		: flag  == B_SEEN ? "Seen" : "New";
+	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
+			strlen(statusString)) < 0)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
+status_t
+read_read_attr(BNode& node, read_flags& flag)
+{
+	if (node.ReadAttr(B_MAIL_ATTR_READ, B_INT32_TYPE, 0, &flag, sizeof(int32))
+			== sizeof(int32))
+		return B_OK;
+
+	BString statusString;
+	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &statusString) == B_OK) {
+		if (statusString.ICompare("New"))
+			flag = B_UNREAD;
+		else
+			flag = B_READ;
+
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+// The next couple of functions are our wrapper around convert_to_utf8 and
+// convert_from_utf8 so that they can also convert from UTF-8 to UTF-8 by
+// specifying the B_MAIL_UTF8_CONVERSION constant as the conversion operation.
+// It also lets us add new conversions, like B_MAIL_US_ASCII_CONVERSION.
+
+
+status_t
+mail_convert_to_utf8(uint32 srcEncoding, const char *src, int32 *srcLen,
+	char *dst, int32 *dstLen, int32 *state, char substitute)
+{
+	int32 copyAmount;
+	char *originalDst = dst;
+	status_t returnCode = -1;
+
+	if (srcEncoding == B_MAIL_UTF8_CONVERSION) {
+		copyAmount = *srcLen;
+		if (*dstLen < copyAmount)
+			copyAmount = *dstLen;
+		memcpy (dst, src, copyAmount);
+		*srcLen = copyAmount;
+		*dstLen = copyAmount;
+		returnCode = B_OK;
+	} else if (srcEncoding == B_MAIL_US_ASCII_CONVERSION) {
+		int32 i;
+		unsigned char letter;
+		copyAmount = *srcLen;
+		if (*dstLen < copyAmount)
+			copyAmount = *dstLen;
+		for (i = 0; i < copyAmount; i++) {
+			letter = *src++;
+			if (letter > 0x80U)
+				// Invalid, could also use substitute, but better to strip high bit.
+				*dst++ = letter - 0x80U;
+			else if (letter == 0x80U)
+				// Can't convert to 0x00 since that's NUL, which would cause problems.
+				*dst++ = substitute;
+			else
+				*dst++ = letter;
+		}
+		*srcLen = copyAmount;
+		*dstLen = copyAmount;
+		returnCode = B_OK;
+	} else
+		returnCode = convert_to_utf8 (srcEncoding, src, srcLen,
+			dst, dstLen, state, substitute);
+
+	if (returnCode == B_OK) {
+		// Replace spurious NUL bytes, which should normally not be in the
+		// output of the decoding (not normal UTF-8 characters, and no NULs are
+		// in our usual input strings).  They happen for some odd ISO-2022-JP
+		// byte pair combinations which are improperly handled by the BeOS
+		// routines.  Like "\e$ByD\e(B" where \e is the ESC character $1B, the
+		// first ESC $ B switches to a Japanese character set, then the next
+		// two bytes "yD" specify a character, then ESC ( B switches back to
+		// the ASCII character set.  The UTF-8 conversion yields a NUL byte.
+		int32 i;
+		for (i = 0; i < *dstLen; i++)
+			if (originalDst[i] == 0)
+				originalDst[i] = substitute;
+	}
+	return returnCode;
+}
+
+
+status_t
+mail_convert_from_utf8(uint32 dstEncoding, const char *src, int32 *srcLen,
+	char *dst, int32 *dstLen, int32 *state, char substitute)
+{
+	int32 copyAmount;
+	status_t errorCode;
+	int32 originalDstLen = *dstLen;
+	int32 tempDstLen;
+	int32 tempSrcLen;
+
+	if (dstEncoding == B_MAIL_UTF8_CONVERSION) {
+		copyAmount = *srcLen;
+		if (*dstLen < copyAmount)
+			copyAmount = *dstLen;
+		memcpy (dst, src, copyAmount);
+		*srcLen = copyAmount;
+		*dstLen = copyAmount;
+		return B_OK;
+	}
+
+	if (dstEncoding == B_MAIL_US_ASCII_CONVERSION) {
+		int32 characterLength;
+		int32 dstRemaining = *dstLen;
+		unsigned char letter;
+		int32 srcRemaining = *srcLen;
+
+		// state contains the number of source bytes to skip, left over from a
+		// partial UTF-8 character split over the end of the buffer from last
+		// time.
+		if (srcRemaining <= *state) {
+			*state -= srcRemaining;
+			*dstLen = 0;
+			return B_OK;
+		}
+		srcRemaining -= *state;
+		src += *state;
+		*state = 0;
+
+		while (true) {
+			if (srcRemaining <= 0 || dstRemaining <= 0)
+				break;
+			letter = *src;
+			if (letter < 0x80)
+				characterLength = 1; // Regular ASCII equivalent code.
+			else if (letter < 0xC0)
+				characterLength = 1; // Invalid in-between data byte 10xxxxxx.
+			else if (letter < 0xE0)
+				characterLength = 2;
+			else if (letter < 0xF0)
+				characterLength = 3;
+			else if (letter < 0xF8)
+				characterLength = 4;
+			else if (letter < 0xFC)
+				characterLength = 5;
+			else if (letter < 0xFE)
+				characterLength = 6;
+			else
+				characterLength = 1; // 0xFE and 0xFF are invalid in UTF-8.
+			if (letter < 0x80)
+				*dst++ = *src;
+			else
+				*dst++ = substitute;
+			dstRemaining--;
+			if (srcRemaining < characterLength) {
+				// Character split past the end of the buffer.
+				*state = characterLength - srcRemaining;
+				srcRemaining = 0;
+			} else {
+				src += characterLength;
+				srcRemaining -= characterLength;
+			}
+		}
+		// Update with the amounts used.
+		*srcLen = *srcLen - srcRemaining;
+		*dstLen = *dstLen - dstRemaining;
+		return B_OK;
+	}
+
+	errorCode = convert_from_utf8(dstEncoding, src, srcLen, dst, dstLen, state,
+		substitute);
+	if (errorCode != B_OK)
+		return errorCode;
+
+	if (dstEncoding != B_JIS_CONVERSION)
+		return B_OK;
+
+	// B_JIS_CONVERSION (ISO-2022-JP) works by shifting between different
+	// character subsets.  For E-mail headers (and other uses), it needs to be
+	// switched back to ASCII at the end (otherwise the last character gets
+	// lost or other weird things happen in the headers).  Note that we can't
+	// just append the escape code since the convert_from_utf8 "state" will be
+	// wrong.  So we append an ASCII letter and throw it away, leaving just the
+	// escape code.  Well, it actually switches to the Roman character set, not
+	// ASCII, but that should be OK.
+
+	tempDstLen = originalDstLen - *dstLen;
+	if (tempDstLen < 3) // Not enough space remaining in the output.
+		return B_OK; // Sort of an error, but we did convert the rest OK.
+	tempSrcLen = 1;
+	errorCode = convert_from_utf8(dstEncoding, "a", &tempSrcLen,
+		dst + *dstLen, &tempDstLen, state, substitute);
+	if (errorCode != B_OK)
+		return errorCode;
+	*dstLen += tempDstLen - 1 /* don't include the ASCII letter */;
+	return B_OK;
+}
+
+
+ssize_t
+rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 {
 	char *head, *tail;
 	char *charset, *encoding, *end;
@@ -384,7 +382,7 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 		return -1;
 
 	char *string = *bufp;
-	
+
 	//---------Handle *&&^%*&^ non-RFC compliant, 8bit mail
 	if (handle_non_rfc2047_encoding(bufp,bufLen,&strLen))
 		return strLen;
@@ -434,25 +432,25 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 		end += 2;
 
 		// find the charset this text is in now
-		size_t		cLen = encoding - 1 - charset;
-		bool		base64encoded = toupper(*encoding) == 'B';
+		size_t cLen = encoding - 1 - charset;
+		bool base64encoded = toupper(*encoding) == 'B';
 
-		uint32 convert_id = B_MAIL_NULL_CONVERSION;
-		char charset_string[cLen+1];
-		memcpy(charset_string, charset, cLen);
-		charset_string[cLen] = '\0';
-		if (strcasecmp(charset_string, "us-ascii") == 0) {
-			convert_id = B_MAIL_US_ASCII_CONVERSION;
-		} else if (strcasecmp(charset_string, "utf-8") == 0) {
-			convert_id = B_MAIL_UTF8_CONVERSION;
+		uint32 convertID = B_MAIL_NULL_CONVERSION;
+		char charsetName[cLen + 1];
+		memcpy(charsetName, charset, cLen);
+		charsetName[cLen] = '\0';
+		if (strcasecmp(charsetName, "us-ascii") == 0) {
+			convertID = B_MAIL_US_ASCII_CONVERSION;
+		} else if (strcasecmp(charsetName, "utf-8") == 0) {
+			convertID = B_MAIL_UTF8_CONVERSION;
 		} else {
-			const BCharacterSet * cs = BCharacterSetRoster::FindCharacterSetByName(charset_string);
-			if (cs != NULL) {
-				convert_id = cs->GetConversionID();
+			const BCharacterSet* charSet
+				= BCharacterSetRoster::FindCharacterSetByName(charsetName);
+			if (charSet != NULL) {
+				convertID = charSet->GetConversionID();
 			}
 		}
-		if (convert_id == B_MAIL_NULL_CONVERSION)
-		{
+		if (convertID == B_MAIL_NULL_CONVERSION) {
 			// unidentified charset
 			// what to do? doing nothing skips the encoded text;
 			// but we should keep it: we copy it to the output.
@@ -469,7 +467,7 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 
 		// decode text, get decoded length (reducing xforms)
 		srcLen = !base64encoded ? decode_qp(src, src, srcLen, 1)
-				: decode_base64(src, src, srcLen);
+			: decode_base64(src, src, srcLen);
 
 		// allocate space for the converted text
 		int32 dstLen = end-string + *bufLen-strLen;
@@ -480,9 +478,9 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 		//
 		// do the conversion
 		//
-		ret = mail_convert_to_utf8(convert_id, src, &cvLen, dst, &dstLen, &convState);
-		if (ret != B_OK)
-		{
+		ret = mail_convert_to_utf8(convertID, src, &cvLen, dst, &dstLen,
+			&convState);
+		if (ret != B_OK) {
 			// what to do? doing nothing skips the encoded text
 			// but we should keep it: we copy it to the output.
 
@@ -524,10 +522,8 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 			continue;
 		}
 		*/
-		else
-		{
-			if (dstLen > end-string)
-			{
+		else {
+			if (dstLen > end-string) {
 				// copy the string forward...
 				memmove(string+dstLen, end, strLen - (end-head) + 1);
 				strLen += string+dstLen - end;
@@ -553,7 +549,9 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 }
 
 
-_EXPORT ssize_t utf8_to_rfc2047 (char **bufp, ssize_t length, uint32 charset, char encoding) {
+ssize_t
+utf8_to_rfc2047 (char **bufp, ssize_t length, uint32 charset, char encoding)
+{
 	struct word {
 		BString	originalWord;
 		BString	convertedWord;
@@ -748,16 +746,15 @@ _EXPORT ssize_t utf8_to_rfc2047 (char **bufp, ssize_t length, uint32 charset, ch
 }
 
 
-//====================================================================
-
-void FoldLineAtWhiteSpaceAndAddCRLF (BString &string)
+void
+FoldLineAtWhiteSpaceAndAddCRLF(BString &string)
 {
-	int			inputLength = string.Length();
-	int			lineStartIndex;
-	const int	maxLineLength = 78; // Doesn't include CRLF.
-	BString		output;
-	int			splitIndex;
-	int			tempIndex;
+	int inputLength = string.Length();
+	int lineStartIndex;
+	const int maxLineLength = 78; // Doesn't include CRLF.
+	BString output;
+	int splitIndex;
+	int tempIndex;
 
 	lineStartIndex = 0;
 	while (true) {
@@ -827,21 +824,18 @@ void FoldLineAtWhiteSpaceAndAddCRLF (BString &string)
 }
 
 
-//====================================================================
-
-_EXPORT ssize_t readfoldedline(FILE *file, char **buffer, size_t *buflen)
+ssize_t
+readfoldedline(FILE *file, char **buffer, size_t *buflen)
 {
 	ssize_t len = buflen && *buflen ? *buflen : 0;
 	char * buf = buffer && *buffer ? *buffer : NULL;
 	ssize_t cnt = 0; // Number of characters currently in the buffer.
 	int c;
 
-	while (true)
-	{
+	while (true) {
 		// Make sure there is space in the buffer for two more characters (one
 		// for the next character, and one for the end of string NUL byte).
-		if (buf == NULL || cnt + 2 >= len)
-		{
+		if (buf == NULL || cnt + 2 >= len) {
 			char *temp = (char *)realloc(buf, len + 64);
 			if (temp == NULL) {
 				// Out of memory, however existing buffer remains allocated.
@@ -898,7 +892,6 @@ _EXPORT ssize_t readfoldedline(FILE *file, char **buffer, size_t *buflen)
 		}
 	}
 
-
 	if (buf != NULL && cnt >= 0)
 		buf[cnt] = '\0';
 
@@ -914,9 +907,8 @@ _EXPORT ssize_t readfoldedline(FILE *file, char **buffer, size_t *buflen)
 }
 
 
-//====================================================================
-
-_EXPORT ssize_t readfoldedline(BPositionIO &in, char **buffer, size_t *buflen)
+ssize_t
+readfoldedline(BPositionIO &in, char **buffer, size_t *buflen)
 {
 	ssize_t len = buflen && *buflen ? *buflen : 0;
 	char * buf = buffer && *buffer ? *buffer : NULL;
@@ -924,12 +916,10 @@ _EXPORT ssize_t readfoldedline(BPositionIO &in, char **buffer, size_t *buflen)
 	char c;
 	status_t errorCode;
 
-	while (true)
-	{
+	while (true) {
 		// Make sure there is space in the buffer for two more characters (one
 		// for the next character, and one for the end of string NUL byte).
-		if (buf == NULL || cnt + 2 >= len)
-		{
+		if (buf == NULL || cnt + 2 >= len) {
 			char *temp = (char *)realloc(buf, len + 64);
 			if (temp == NULL) {
 				// Out of memory, however existing buffer remains allocated.
@@ -1005,7 +995,7 @@ _EXPORT ssize_t readfoldedline(BPositionIO &in, char **buffer, size_t *buflen)
 }
 
 
-_EXPORT ssize_t
+ssize_t
 nextfoldedline(const char** header, char **buffer, size_t *buflen)
 {
 	ssize_t len = buflen && *buflen ? *buflen : 0;
@@ -1085,7 +1075,7 @@ nextfoldedline(const char** header, char **buffer, size_t *buflen)
 }
 
 
-_EXPORT void
+void
 trim_white_space(BString &string)
 {
 	int32 i;
@@ -1105,12 +1095,11 @@ trim_white_space(BString &string)
 }
 
 
-/** Tries to return a human-readable name from the specified
- *	header parameter (should be from "To:" or "From:").
- *	Tries to return the name rather than the eMail address.
- */
-
-_EXPORT void
+/*!	Tries to return a human-readable name from the specified
+	header parameter (should be from "To:" or "From:").
+	Tries to return the name rather than the eMail address.
+*/
+void
 extract_address_name(BString &header)
 {
 	BString name;
@@ -1198,19 +1187,13 @@ extract_address_name(BString &header)
 }
 
 
-
-// Given a subject in a BString, remove the extraneous RE: re: and other stuff
-// to get down to the core subject string, which should be identical for all
-// messages posted about a topic.  The input string is modified in place to
-// become the output core subject string.
-
-static int32				gLocker = 0;
-static size_t				gNsub = 1;
-static re_pattern_buffer	gRe;
-static re_pattern_buffer   *gRebuf = NULL;
-static unsigned char					gTranslation[256];
-
-_EXPORT void SubjectToThread (BString &string)
+/*!	Given a subject in a BString, remove the extraneous RE: re: and other stuff
+	to get down to the core subject string, which should be identical for all
+	messages posted about a topic.  The input string is modified in place to
+	become the output core subject string.
+*/
+void
+SubjectToThread (BString &string)
 {
 // a regex that matches a non-ASCII UTF8 character:
 #define U8C \
@@ -1230,8 +1213,7 @@ _EXPORT void SubjectToThread (BString &string)
 	"|^(  +| *(\\<(\\w|" U8C "){2,3} *(\\[[^\\]]*\\])? *:)+ *)" \
 	"| *\\(fwd\\) *$"
 
-	if (gRebuf == NULL && atomic_add(&gLocker,1) == 0)
-	{
+	if (gRebuf == NULL && atomic_add(&gLocker, 1) == 0) {
 		// the idea is to compile the regexp once to speed up testing
 
 		for (int i=0; i<256; ++i) gTranslation[i]=i;
@@ -1256,16 +1238,13 @@ _EXPORT void SubjectToThread (BString &string)
 			gRebuf = &gRe;
 		else
 			fprintf(stderr, "Failed to compile the regex: %s\n", err);
-	}
-	else
-	{
+	} else {
 		int32 tries = 200;
 		while (gRebuf == NULL && tries-- > 0)
 			snooze(10000);
 	}
 
-	if (gRebuf)
-	{
+	if (gRebuf) {
 		struct re_registers regs;
 		// can't be static if this function is to be thread-safe
 
@@ -1273,11 +1252,8 @@ _EXPORT void SubjectToThread (BString &string)
 		regs.start = (regoff_t*)malloc(gNsub*sizeof(regoff_t));
 		regs.end = (regoff_t*)malloc(gNsub*sizeof(regoff_t));
 
-		for (int start=0;
-		    (start=re_search(gRebuf, string.String(), string.Length(),
-							0, string.Length(), &regs)) >= 0;
-			)
-		{
+		for (int start = 0; (start = re_search(gRebuf, string.String(),
+				string.Length(), 0, string.Length(), &regs)) >= 0;) {
 			//
 			// we found something
 			//
@@ -1287,7 +1263,8 @@ _EXPORT void SubjectToThread (BString &string)
 				start = regs.start[2];
 
 			string.Remove(start,regs.end[0]-start);
-			if (start) string.Insert(' ',1,start);
+			if (start)
+				string.Insert(' ',1,start);
 
 			// TODO: for some subjects this results in an endless loop, check
 			// why this happen.
@@ -1306,19 +1283,19 @@ _EXPORT void SubjectToThread (BString &string)
 }
 
 
-
-// Converts a date to a time.  Handles numeric time zones too, unlike
-// parsedate.  Returns -1 if it fails.
-
-_EXPORT time_t ParseDateWithTimeZone (const char *DateString)
+/*!	Converts a date to a time.  Handles numeric time zones too, unlike
+	parsedate().  Returns -1 if it fails.
+*/
+time_t
+ParseDateWithTimeZone(const char *DateString)
 {
-	time_t	currentTime;
-	time_t	dateAsTime;
-	char	tempDateString [80];
-	char	tempZoneString [6];
-	time_t	zoneDeltaTime;
-	int		zoneIndex;
-	char   *zonePntr;
+	time_t currentTime;
+	time_t dateAsTime;
+	char tempDateString[80];
+	char tempZoneString[6];
+	time_t zoneDeltaTime;
+	int zoneIndex;
+	char *zonePntr;
 
 	// See if we can remove the time zone portion.  parsedate understands time
 	// zone 3 letter names, but doesn't understand the numeric +9999 time zone
@@ -1349,7 +1326,7 @@ _EXPORT time_t ParseDateWithTimeZone (const char *DateString)
 				return -1; // Empty string.
 		}
 	}
-	
+
 	// Look for a numeric time zone like  Tue, 30 Dec 2003 05:01:40 +0000
 	for (zoneIndex = strlen (tempDateString); zoneIndex >= 0; zoneIndex--)
 	{
@@ -1390,10 +1367,9 @@ _EXPORT time_t ParseDateWithTimeZone (const char *DateString)
 }
 
 
-/** Parses a mail header and fills the headers BMessage
- */
-
-_EXPORT status_t
+/*! Parses a mail header and fills the headers BMessage
+*/
+status_t
 parse_header(BMessage &headers, BPositionIO &input)
 {
 	char *buffer = NULL;
@@ -1417,10 +1393,12 @@ parse_header(BMessage &headers, BPositionIO &input)
 			// unified case for later fetch
 
 		delimiter++; // Skip the colon.
-		while (isspace (*delimiter))
-			delimiter++; // Skip over leading white space and tabs.  To do: (comments in brackets).
+		// Skip over leading white space and tabs.
+		// TODO: (comments in brackets).
+		while (isspace(*delimiter))
+			delimiter++;
 
-		// ToDo: implement joining of multiple header tags (i.e. multiple "Cc:"s)
+		// TODO: implement joining of multiple header tags (i.e. multiple "Cc:"s)
 		headers.AddString(header.String(), delimiter);
 	}
 	free(buffer);
@@ -1429,7 +1407,7 @@ parse_header(BMessage &headers, BPositionIO &input)
 }
 
 
-_EXPORT status_t
+status_t
 extract_from_header(const BString& header, const BString& field,
 	BString& target)
 {
@@ -1440,7 +1418,7 @@ extract_from_header(const BString& header, const BString& field,
 		if (pos < 0)
 			return B_BAD_VALUE;
 		fieldEndPos = pos + field.Length();
-		
+
 		if (pos != 0 && header.ByteAt(pos - 1) != '\n')
 			continue;
 		if (header.ByteAt(fieldEndPos) == ':')
@@ -1475,18 +1453,20 @@ extract_from_header(const BString& header, const BString& field,
 	size_t length = rfc2047_to_utf8(&buffer, &bufferSize, bufferSize);
 	target.UnlockBuffer(length);
 
+	trim_white_space(target);
+
 	return B_OK;
 }
 
 
-_EXPORT void
+void
 extract_address(BString &address)
 {
 	const char *string = address.String();
 	int32 first;
 
 	// first, remove all quoted text
-	
+
 	if ((first = address.FindFirst('"')) >= 0) {
 		int32 last = first + 1;
 		while (string[last] && string[last] != '"')
@@ -1526,8 +1506,9 @@ extract_address(BString &address)
 }
 
 
-_EXPORT void
-get_address_list(BList &list, const char *string, void (*cleanupFunc)(BString &))
+void
+get_address_list(BList &list, const char *string,
+	void (*cleanupFunc)(BString &))
 {
 	if (string == NULL || !string[0])
 		return;

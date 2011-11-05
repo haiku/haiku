@@ -182,8 +182,8 @@ TRoster::HandleAddApplication(BMessage* request)
 	if (request->FindBool("full_registration", &fullReg) != B_OK)
 		fullReg = false;
 
-	PRINT(("team: %ld, signature: %s\n", team, signature));
-	PRINT(("full registration: %d\n", fullReg));
+	PRINT("team: %ld, signature: %s\n", team, signature);
+	PRINT("full registration: %d\n", fullReg);
 
 	if (fShuttingDown)
 		error = B_SHUTTING_DOWN;
@@ -202,8 +202,8 @@ TRoster::HandleAddApplication(BMessage* request)
 
 	// entry_ref
 	if (error == B_OK) {
-		PRINT(("flags: %lx\n", flags));
-		PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+		PRINT("flags: %lx\n", flags);
+		PRINT("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name);
 		// check single/exclusive launchers
 		RosterAppInfo* info = NULL;
 		if ((launchFlags == B_SINGLE_LAUNCH
@@ -252,15 +252,15 @@ TRoster::HandleAddApplication(BMessage* request)
 			// add it to the right list
 			bool addingSuccess = false;
 			if (team >= 0) {
-				PRINT(("added ref: %ld, %lld, %s\n", info->ref.device,
-					info->ref.directory, info->ref.name));
+				PRINT("added ref: %ld, %lld, %s\n", info->ref.device,
+					info->ref.directory, info->ref.name);
 				addingSuccess = (AddApp(info) == B_OK);
 				if (addingSuccess && fullReg)
 					_AppAdded(info);
 			} else {
 				token = info->token = _NextToken();
 				addingSuccess = fEarlyPreRegisteredApps.AddInfo(info);
-				PRINT(("added to early pre-regs, token: %lu\n", token));
+				PRINT("added to early pre-regs, token: %lu\n", token);
 			}
 			if (!addingSuccess)
 				SET_ERROR(error, B_NO_MEMORY);
@@ -384,8 +384,8 @@ TRoster::HandleIsAppRegistered(BMessage* request)
 	if (request->FindInt32("token", (int32*)&token) != B_OK)
 		token = 0;
 
-	PRINT(("team: %ld, token: %lu\n", team, token));
-	PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+	PRINT("team: %ld, token: %lu\n", team, token);
+	PRINT("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name);
 
 	// check the parameters
 	// entry_ref
@@ -399,24 +399,24 @@ TRoster::HandleIsAppRegistered(BMessage* request)
 	RosterAppInfo* info = NULL;
 	if (error == B_OK) {
 		if ((info = fRegisteredApps.InfoFor(team)) != NULL) {
-			PRINT(("found team in fRegisteredApps\n"));
+			PRINT("found team in fRegisteredApps\n");
 			_ReplyToIARRequest(request, info);
 		} else if (token > 0
 			&& (info = fEarlyPreRegisteredApps.InfoForToken(token)) != NULL) {
-			PRINT(("found ref in fEarlyRegisteredApps (by token)\n"));
+			PRINT("found ref in fEarlyRegisteredApps (by token)\n");
 			// pre-registered and has no team ID assigned yet -- queue the
 			// request
 			be_app->DetachCurrentMessage();
 			_AddIARRequest(fIARRequestsByToken, token, request);
 		} else if (team >= 0
 			&& (info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL) {
-			PRINT(("found ref in fEarlyRegisteredApps (by ref)\n"));
+			PRINT("found ref in fEarlyRegisteredApps (by ref)\n");
 			// pre-registered and has no team ID assigned yet -- queue the
 			// request
 			be_app->DetachCurrentMessage();
 			_AddIARRequest(fIARRequestsByID, team, request);
 		} else {
-			PRINT(("didn't find team or ref\n"));
+			PRINT("didn't find team or ref\n");
 			// team not registered, ref/token not early pre-registered
 			_ReplyToIARRequest(request, NULL);
 		}
@@ -485,7 +485,7 @@ TRoster::HandleRemoveApp(BMessage* request)
 	if (request->FindInt32("team", &team) != B_OK)
 		team = -1;
 
-	PRINT(("team: %ld\n", team));
+	PRINT("team: %ld\n", team);
 
 	// remove the app
 	if (error == B_OK) {
@@ -537,7 +537,7 @@ TRoster::HandleSetThreadAndTeam(BMessage* request)
 	if (error == B_OK && team < 0)
 		SET_ERROR(error, B_BAD_VALUE);
 
-	PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
+	PRINT("team: %ld, thread: %ld, token: %lu\n", team, thread, token);
 
 	// update the app_info
 	if (error == B_OK) {
@@ -666,11 +666,11 @@ TRoster::HandleGetAppInfo(BMessage* request)
 		hasSignature = false;
 
 if (hasTeam)
-PRINT(("team: %ld\n", team));
+PRINT("team: %ld\n", team);
 if (hasRef)
-PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+PRINT("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name);
 if (hasSignature)
-PRINT(("signature: %s\n", signature));
+PRINT("signature: %s\n", signature);
 
 	// get the info
 	RosterAppInfo* info = NULL;
@@ -982,7 +982,7 @@ TRoster::HandleGetRecentApps(BMessage* request)
 	BAutolock _(fLock);
 
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleGetRecentApps(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleGetRecentApps(NULL) called\n"));
 		return;
 	}
 
@@ -1010,7 +1010,7 @@ TRoster::HandleAddToRecentDocuments(BMessage* request)
 	BAutolock _(fLock);
 
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleAddToRecentDocuments(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleAddToRecentDocuments(NULL) called\n"));
 		return;
 	}
 
@@ -1041,7 +1041,7 @@ TRoster::HandleAddToRecentFolders(BMessage* request)
 	BAutolock _(fLock);
 
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleAddToRecentFolders(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleAddToRecentFolders(NULL) called\n"));
 		return;
 	}
 
@@ -1072,7 +1072,7 @@ TRoster::HandleAddToRecentApps(BMessage* request)
 	BAutolock _(fLock);
 
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleAddToRecentApps(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleAddToRecentApps(NULL) called\n"));
 		return;
 	}
 
@@ -1097,7 +1097,7 @@ TRoster::HandleLoadRecentLists(BMessage* request)
 	BAutolock _(fLock);
 
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleLoadRecentLists(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleLoadRecentLists(NULL) called\n"));
 		return;
 	}
 
@@ -1122,7 +1122,7 @@ TRoster::HandleSaveRecentLists(BMessage* request)
 	BAutolock _(fLock);
 
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleSaveRecentLists(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleSaveRecentLists(NULL) called\n"));
 		return;
 	}
 
@@ -1684,7 +1684,7 @@ TRoster::_ReplyToIARRequest(BMessage* request, const RosterAppInfo* info)
 	BMessage reply(B_REG_SUCCESS);
 	reply.AddBool("registered", (bool)info);
 	reply.AddBool("pre-registered", preRegistered);
-	PRINT(("_ReplyToIARRequest(): pre-registered: %d\n", preRegistered));
+	PRINT("_ReplyToIARRequest(): pre-registered: %d\n", preRegistered);
 	if (info)
 		_AddMessageAppInfo(&reply, info);
 	request->SendReply(&reply);
@@ -1699,7 +1699,7 @@ TRoster::_HandleGetRecentEntries(BMessage* request)
 {
 	FUNCTION_START();
 	if (!request) {
-		D(PRINT(("WARNING: TRoster::HandleGetRecentFolders(NULL) called\n")));
+		D(PRINT("WARNING: TRoster::HandleGetRecentFolders(NULL) called\n"));
 		return;
 	}
 
@@ -1760,9 +1760,9 @@ TRoster::_HandleGetRecentEntries(BMessage* request)
 			    break;
 
 			default:
-				D(PRINT(("WARNING: TRoster::_HandleGetRecentEntries(): "
+				D(PRINT("WARNING: TRoster::_HandleGetRecentEntries(): "
 					"unexpected request->what value of 0x%lx\n",
-					request->what)));
+					request->what));
 				error = B_BAD_VALUE;
 				break;
 		}
@@ -1981,8 +1981,8 @@ TRoster::_LoadRosterSettings(const char* path)
 		);
 	}
 	if (error) {
-		D(PRINT(("WARNING: TRoster::_LoadRosterSettings(): error loading roster "
-			"settings from '%s', 0x%lx\n", settingsPath, error)));
+		D(PRINT("WARNING: TRoster::_LoadRosterSettings(): error loading roster "
+			"settings from '%s', 0x%lx\n", settingsPath, error));
 	}
 	return error;
 }
@@ -2004,18 +2004,18 @@ TRoster::_SaveRosterSettings(const char* path)
 		status_t saveError;
 		saveError = fRecentDocuments.Save(file, "Recent documents", "RecentDoc");
 		if (saveError) {
-			D(PRINT(("TRoster::_SaveRosterSettings(): recent documents save "
-				"failed with error 0x%lx\n", saveError)));
+			D(PRINT("TRoster::_SaveRosterSettings(): recent documents save "
+				"failed with error 0x%lx\n", saveError));
 		}
 		saveError = fRecentFolders.Save(file, "Recent folders", "RecentFolder");
 		if (saveError) {
-			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save "
-				"failed with error 0x%lx\n", saveError)));
+			D(PRINT("TRoster::_SaveRosterSettings(): recent folders save "
+				"failed with error 0x%lx\n", saveError));
 		}
 		saveError = fRecentApps.Save(file);
 		if (saveError) {
-			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save "
-				"failed with error 0x%lx\n", saveError)));
+			D(PRINT("TRoster::_SaveRosterSettings(): recent folders save "
+				"failed with error 0x%lx\n", saveError));
 		}
 		fclose(file);
 	}

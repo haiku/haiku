@@ -38,8 +38,7 @@ enum {
 
 #define B_MAX_ISA_DMA_COUNT	0x10000
 
-typedef struct isa_module_info isa_module_info;
-struct isa_module_info {
+typedef struct isa_module_info {
 	bus_manager_info	binfo;
 
 	uint8			(*read_io_8) (int mapped_io_addr);
@@ -73,7 +72,7 @@ struct isa_module_info {
 						);
 	long			(*lock_isa_dma_channel) (long channel);
 	long			(*unlock_isa_dma_channel) (long channel);
-};
+} isa_module_info;
 	
 #define	B_ISA_MODULE_NAME		"bus_managers/isa/v1"
 

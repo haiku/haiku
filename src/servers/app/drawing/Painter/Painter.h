@@ -7,9 +7,9 @@
  * rendering pipe-lines for stroke, fills, bitmap and text rendering.
  *
  */
- 
 #ifndef PAINTER_H
 #define PAINTER_H
+
 
 #include "AGGTextRenderer.h"
 #include "FontManager.h"
@@ -24,14 +24,6 @@
 #include <Font.h>
 #include <Rect.h>
 
-
-// Prototypes for assembler routines
-extern "C" {
-	void bilinear_scale_xloop_mmxsse(const uint8* src, void* dst, void* xWeights,
-		uint32 xmin, uint32 xmax, uint32 wTop, uint32 srcBPR );
-}
-
-extern uint32 gAppServerSIMDFlags;
 
 class BBitmap;
 class BRegion;
@@ -115,14 +107,14 @@ public:
 			BRect				FillTriangle(BPoint pt1, BPoint pt2,
 									BPoint pt3,
 									const BGradient& gradient) const;
-	
+
 								// polygons
 			BRect				DrawPolygon(BPoint* ptArray, int32 numPts,
 									bool filled, bool closed) const;
 			BRect				FillPolygon(BPoint* ptArray, int32 numPts,
 									const BGradient& gradient,
 									bool closed) const;
-	
+
 								// bezier curves
 			BRect				DrawBezier(BPoint* controlPoints,
 									bool filled) const;
@@ -141,7 +133,7 @@ public:
 									const BGradient& gradient,
 									const BPoint& viewToScreenOffset,
 									float viewScale) const;
-	
+
 								// rects
 			BRect				StrokeRect(const BRect& r) const;
 
@@ -156,14 +148,14 @@ public:
 			// fills a solid rect with color c, no blending
 			void				FillRect(const BRect& r,
 									const rgb_color& c) const;
-			
+
 			// fills a rect with a linear gradient, the caller should be
 			// sure that the gradient is indeed vertical. The start point of
 			// the gradient should be above the end point, or this function
 			// will not draw anything.
 			void				FillRectVerticalGradient(BRect r,
 									const BGradientLinear& gradient) const;
-			
+
 			// fills a solid rect with color c, no blending, no clipping
 			void				FillRectNoClipping(const clipping_rect& r,
 									const rgb_color& c) const;
@@ -177,7 +169,7 @@ public:
 			BRect				FillRoundRect(const BRect& r, float xRadius,
 									float yRadius,
 									const BGradient& gradient) const;
-	
+
 								// ellipses
 			void				AlignEllipseRect(BRect* rect,
 									bool filled) const;
@@ -197,7 +189,7 @@ public:
 			BRect				FillArc(BPoint center, float xRadius,
 									float yRadius, float angle, float span,
 									const BGradient& gradient) const;
-	
+
 								// strings
 			BRect				DrawString(const char* utf8String,
 									uint32 length, BPoint baseLine,
@@ -310,7 +302,7 @@ private:
 			void				_MakeGradient(const BGradient& gradient,
 									int32 colorCount, uint32* colors,
 									int32 arrayOffset, int32 arraySize) const;
-			
+
 			template<class Array>
 			void				_MakeGradient(Array& array,
 									const BGradient& gradient) const;
@@ -332,7 +324,7 @@ private:
 			template<class VertexSource>
 			void				_FillPathGradientConic(VertexSource& path,
 									const BGradientConic& conic) const;
-	
+
 	mutable	agg::rendering_buffer fBuffer;
 
 	// AGG rendering and rasterization classes
@@ -404,5 +396,3 @@ Painter::AlignAndClipRect(BRect rect) const
 
 
 #endif // PAINTER_H
-
-

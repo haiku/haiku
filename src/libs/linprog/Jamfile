@@ -1,12 +1,12 @@
 SubDir HAIKU_TOP src libs linprog ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
+SetSubDirSupportedPlatforms haiku haiku_host libbe_test ;
 
 UseLibraryHeaders lp_solve linprog ;
 UsePrivateHeaders shared ;
 
 
-StaticLibrary liblinprog.a : 
+StaticLibrary liblinprog.a :
 	ActiveSetSolver.cpp
 	Constraint.cpp
 	LayoutOptimizer.cpp

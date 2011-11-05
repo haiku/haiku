@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -250,8 +250,8 @@ AcpiNsRootInitialize (
 #else
                 /* Mark this as a very SPECIAL method */
 
-                ObjDesc->Method.MethodFlags = AML_METHOD_INTERNAL_ONLY;
-                ObjDesc->Method.Extra.Implementation = AcpiUtOsiImplementation;
+                ObjDesc->Method.InfoFlags = ACPI_METHOD_INTERNAL_ONLY;
+                ObjDesc->Method.Dispatch.Implementation = AcpiUtOsiImplementation;
 #endif
                 break;
 

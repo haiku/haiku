@@ -85,6 +85,10 @@ const uint32 kOpenParentDir = 'Topt';
 const uint32 kOpenDir = 'Topd';
 const uint32 kCleanup = 'Tcln';
 const uint32 kCleanupAll = 'Tcla';
+
+const uint32 kArrangeBy = 'ARBY';
+const uint32 kArrangeReverseOrder = 'ARRO';
+
 const uint32 kResizeToFit = 'Trtf';
 const uint32 kSelectMatchingEntries = 'Tsme';
 const uint32 kShowSelectionWindow = 'Tssw';

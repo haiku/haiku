@@ -528,8 +528,8 @@ init_driver()
 		PRINTER_INTERFACE_CLASS,
 		PRINTER_INTERFACE_SUBCLASS,
 		0, // any protocol
-		0, // any product
-		0  // any vendor
+		0, // any vendor
+		0  // any product
 	};
 
 	gDeviceList = NULL;

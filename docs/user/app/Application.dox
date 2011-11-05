@@ -1,0 +1,551 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/app/Application.h	 rev 42794
+ *		/trunk/src/kits/app/Application.cpp	 rev 42794
+ */
+
+
+/*!
+	\file Application.h
+	\brief Provides the BApplication class.
+*/
+
+
+/*!
+	\class BApplication
+	\ingroup app
+	\ingroup libbe
+	\brief A container object for an application.
+
+	A BApplication establishes a connection between the application and the
+	Application Server.
+
+	The most common task performed by a BApplication object is to handle
+	messages sent to it. The BApplication object also is used
+	to get information about your application such as the number of windows
+	it has, its signature, executable location, and launch flags.
+
+	The BApplication object is automatically assigned to the global \c be_app
+	variable. The \c be_app variable allows you to refer to your BApplication
+	object from anywhere in the code.
+
+	To use a BApplication you first construct the object and then begin its
+	message loop by calling the Run() method. The Run() method
+	continues until the application is told to quit. Once Run() returns you
+	should then delete the BApplication object to free its memory usage.
+
+	Typically, you initialize the BApplication object in the programs main()
+	function. A typical main() function looks something like this:
+
+	\code
+#include Application.h
+
+main()
+{
+	/* Vendor is your vendor name, application is your application name */
+	BApplication app("application/x-vnd.vendor-application");
+	app->Run();
+	delete app;
+
+	return 0;
+}
+	\endcode
+*/
+
+
+/*!
+	\fn BApplication::BApplication(const char *signature)
+	\brief Initialize a BApplication with the passed in \a signature.
+
+	The new BApplication is, by default, not running yet. If you have
+	everything set up properly call Run() to start the application.
+
+	You should call InitCheck() to check for constructor initialization
+	errors.
+
+	\param signature The \a signature of the application.
+*/
+
+
+/*!
+	\fn BApplication::BApplication(const char *signature, status_t *_error)
+	\brief Initialize a BApplication with the passed in \a signature and a
+		pointer to an error message.
+
+	Any error that occurs while constructing the BApplication will be
+	set to the \a _error pointer. If \a _error points to a \c status_t
+	error then you should not call Run().
+
+	Alternately, you can call InitCheck() to check for constructor 
+	initialization errors.
+
+	\param signature The \a signature of the application.
+	\param _error A pointer to a \c status_t set by the BApplication
+		constructor.
+*/
+
+/*!
+	\fn status_t BApplication::InitCheck() const
+	\brief Returns the status of the constructor.
+
+	\returns If initialization succeeded returns \c B_OK, otherwise returns an
+		error status.
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BApplication::BApplication(BMessage *data)
+	\brief Initialize a BApplication object from a message.
+
+	The message must contain the signature of the application you wish to
+	initialize in the "mime_sig" variable.
+
+	\param data The message to initialize the BApplication from.
+*/
+
+
+/*!
+	\fn status_t BApplication::Archive(BMessage *data, bool deep) const
+	\brief Archive the BApplication object into a BMessage.
+
+	\sa BArchivable::Archive()
+*/
+
+
+/*!
+	\fn BArchivable* BApplication::Instantiate(BMessage* data)
+	\brief Restores the BApplication object from a BMessage.
+
+	\sa BArchivable::Instantiate()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn BApplication::~BApplication()
+	\brief Destructor Method
+*/
+
+
+/*!
+	\name Message Loop Control
+*/
+
+
+//! @{
+
+
+/*!
+	\fn thread_id BApplication::Run()
+	\brief Starts the message loop in the thread that it is called from,
+		and doesn't return until the message loop stops. Run() does not spawn
+		a new thread.
+
+	\returns the thread_id of the thread that the BApplication is called from.
+*/
+
+
+/*!
+	\fn void BApplication::Quit()
+	\brief Tells the thread to finish processing the message queue, disallowing
+		any new messages.
+
+	Quit() doesn't kill the looper thread. After Quit() returns, it doesn't wait
+	for the message queue to empty. Run() will be then able to return. 
+
+	Quit() doesn't delete the BApplication object after Run() is called. You
+	should delete the BApplication object yourself one Run() returns.
+	However Quit() does delete the object if it's called before the message loop
+	starts i.e. before Run() is called.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BApplication::QuitRequested()
+	\brief Hook method that gets invoked when the BApplication receives a
+		\c B_QUIT_REQUESTED message.
+
+	BApplication sends a QuitRequested() message to each of its BWindow objects.
+	If all of the BWindow s return \c true then the windows are
+	each destroyed (through BWindow::Quit()) and QuitRequested() returns
+	\c true. If any of the BWindow returns \c false, the BWindow s
+	are not destroyed and QuitRequested() returns \c false.
+
+	\retval true The application quit.
+	\retval false The application failed to quit.
+*/
+
+
+/*!
+	\fn void BApplication::ReadyToRun()
+	\brief Hook method that's invoked when the BApplication receives a
+		\c B_READY_TO_RUN message.
+
+	The ReadyToRun() method is automatically called by the Run() method. It is
+	sent after the initial \c B_REFS_RECEIVED and \c B_ARGV_RECEIVED messages
+	(if any) have already been handled. ReadyToRun() is the only message that
+	every running application is guaranteed to receive.
+
+	The default version of ReadyToRun() is empty. You should override the
+	ReadyToRun() method to do whatever you want to do. If you haven't
+	constructed any windows in your application yet then this would be a good
+	place to do so.
+*/
+
+
+/*!
+	\fn void BApplication::ArgvReceived(int32 argc, char **argv)
+	\brief Hook method that gets invoked when the application receives a
+		\c B_ARGV_RECEIVED message.
+
+	If command line arguments are specified when the application is launched
+	from the the shell, or if \c argv/argc values are passed to
+	BRoster::Launch(), then this method is executed.
+
+	\warning ArgvReceived() is not called if no command line arguments are
+	specified, or if BRoster::Launch() was called without any \c argv/argc
+	values.
+
+	The arguments passed to ArgvReceived() are the constructed in the same way
+	as those passed to command line programs. The number of command line
+	arguments is passed in \a argc and the arguments themselves are passed as an
+	array of strings in \a argv. The first \a argv string is the name of the
+	program and the rest of the strings are the command line arguments.
+
+	BRoster::Launch() adds the program name to the front of the \a argv array
+	and increments the \a argc value.
+
+	The \c B_ARGV_RECEIVED message (if sent) is sent only once, just
+	before the \c B_READY_TO_RUN message is sent. However, if you try to
+	relaunch an application that is already running and the application is set
+	to \c B_EXCLUSIVE_LAUNCH or \c B_SINGLE_LAUNCH then the application will
+	generate a \c B_ARGV_RECEIVED message and send it to the already running
+	instance. Thus in this case the \c B_ARGV_RECEIVED message can show
+	up at any time.
+*/
+
+
+/*!
+	\fn void BApplication::AppActivated(bool active)
+	\brief Hook method that gets invoked when the application receives
+	\c B_APP_ACTIVATED message.
+
+	The message is sent whenever the application changes its active application
+	status. The active flag set to is \c true when the application becomes
+	active and is set to \c false when the application becomes inactive.
+
+	The application becomes activated in response to a user action such as
+	clicking on or unhiding one of its windows. The application can have its
+	active status set programmatically by calling either the BWindow::Activate()
+	or BRoster::ActivateApp() methods.
+
+	This method is called after ReadyToRun() provided the application is
+	displaying a window that can be set active.
+*/
+
+
+/*!
+	\fn void BApplication::RefsReceived(BMessage *message)
+	\brief Hook method that gets invoked when the application receives a
+		\c B_REFS_RECEIVED message.
+
+	The message is sent in response to a user action such as a user
+	drag-and-dropping a file on your app's icon or opening a file that the
+	application is set to handle. You can use the IsLaunching() method to
+	discern whether the message arrived when the application is launched or
+	after the application has already been running.
+
+	The default implementation is empty. You can override this method to do
+	something with the received refs. Typically you create BEntry or BFile
+	objects from the passed in refs.
+
+	\param message contains a single field named "be:refs" that contains one or
+		more entry_ref (\c B_REF_TYPE) items, one for each file sent.
+*/
+
+
+/*!
+	\fn void BApplication::AboutRequested()
+	\brief Hook method that gets invoked when the BApplication receives a
+	\c B_ABOUT_REQUESTED message.
+
+	You should override this method to pop an alert to provide information
+	about the application.
+
+	The default implementation pops a basic alert dialog.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Cursor
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BApplication::ShowCursor()
+	\brief Restores the cursor.
+*/
+
+
+/*!
+	\fn void BApplication::HideCursor()
+	\brief Hides the cursor from the screen.
+*/
+
+
+/*!
+	\fn void BApplication::ObscureCursor()
+	\brief Hides the cursor until the mouse is moved.
+*/
+
+
+/*!
+	\fn bool BApplication::IsCursorHidden() const
+	\brief Returns whether or not the cursor is hidden.
+
+	\returns \c true if the cursor is hidden, \c false if not.
+*/
+
+
+/*!
+	\fn void BApplication::SetCursor(const void *cursor)
+	\brief Sets the \a cursor to be used when the application is active.
+
+	You can pass one of the pre-defined cursor constants such as
+	\c B_HAND_CURSOR or \c B_I_BEAM_CURSOR or you can create your own pass
+	in your own cursor image. The cursor data format is described in the BCursor
+	class.
+
+	\param cursor The cursor data to set the cursor to.
+*/
+
+
+/*!
+	\fn void BApplication::SetCursor(const BCursor *cursor, bool sync)
+	\brief Sets the \a cursor to be used when the application is active
+		with \a sync immediately option.
+
+	The default BCursors to use are \c B_CURSOR_SYSTEM_DEFAULT for the hand
+	cursor and \c B_CURSOR_I_BEAM for the I-beam cursor.
+
+	\param cursor A BCursor object to set the \a cursor to.
+	\param sync synchronize the cursor immediately.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Info
+*/
+
+
+//! @{
+
+
+/*!
+	\fn int32 BApplication::CountWindows() const
+	\brief Returns the number of windows created by the application.
+
+	\returns the number of windows created by the application.
+*/
+
+
+/*!
+	\fn BWindow* BApplication::WindowAt(int32 index) const
+	\brief Returns the BWindow object at the specified index in the
+		application's window list.
+		
+	If index is out of range, this function returns \c NULL.
+
+	\warning Locking the BApplication object doesn't lock the window list.
+
+	\param index The \a index of the desired BWindow.
+
+	\returns The BWindow object at the specified \a index or \c NULL
+		if the \a index is out of range.
+*/
+
+
+/*!
+	\fn int32 BApplication::CountLoopers() const
+	\brief Returns the number of BLoopers created by the application.
+
+	\warning This method may return \c B_ERROR.
+
+	\returns The number of BLoopers in the application.
+*/
+
+
+/*!
+	\fn BLooper* BApplication::LooperAt(int32 index) const
+	\brief Returns the BLooper object at the specified index in the
+		application's looper list.
+
+	If index is out of range, this function returns \c NULL.
+
+	\returns The BLooper object at the specified \a index or \c NULL
+		if the \a index is out of range.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Status
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BApplication::IsLaunching() const
+	\brief Returns whether or not the application is in the process of
+		launching.
+
+	\returns \c true if the application is launching, \c false if the
+		application is already running.
+*/
+
+
+/*!
+	\fn status_t BApplication::GetAppInfo(app_info *info) const
+	\brief Fills out the \a info parameter with information about the
+		application.
+
+	This is equivalent to
+	be_roster->GetRunningAppInfo(be_app->Team(), info);
+
+	\returns \c B_NO_INIT on an error or \c B_OK if all goes well.
+
+	\sa BRoster::GetAppInfo()
+*/
+
+
+/*!
+	\fn BResources* BApplication::AppResources()
+	\brief Returns a BResources object for the application.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Message Mechanics
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BApplication::MessageReceived(BMessage *message)
+	\sa BHandler::MessageReceived()
+*/
+
+
+/*!
+	\fn void BApplication::DispatchMessage(BMessage *message,
+		BHandler *handler)
+	\sa BLooper::DispatchMessage()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Pulse
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BApplication::Pulse()
+	\brief Hook method that gets invoked when the BApplication receives a
+		\c B_PULSE message.
+
+	An action is performed each time app_server calls the Pulse() method. 
+	The pulse rate is set by SetPulseRate(). You can implement Pulse() to do
+	anything you want. The default version does nothing. The pulse granularity
+	is no better than once per 100,000 microseconds.
+
+	\sa SetPulseRate()
+*/
+
+
+/*!
+	\fn void BApplication::SetPulseRate(bigtime_t rate)
+	\brief Sets the interval that the \c B_PULSE messages are sent.
+
+	If the \a rate is set to 0 then the \c B_PULSE messages are not sent.
+	The pulse rate can be no faster than once per 100,000 microseconds or so.
+
+	\param rate The rate \a B_PULSE messages are sent to the application.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Scripting
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHandler* BApplication::ResolveSpecifier(BMessage *message, int32 index,
+		BMessage *specifier, int32 what, const char *property)
+	\sa BHandler::ResolveSpecifier()
+*/
+
+
+/*!
+	\fn status_t BApplication::GetSupportedSuites(BMessage *data)
+	\sa BHandler::GetSupportedSuites()
+*/
+
+
+//! @}

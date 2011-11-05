@@ -1,0 +1,26 @@
+1	belarusian	x-vnd.Be-POST	1358359182
+%.1f / %.1f kb (%d / %d messages)	StatusWindow		%.1f / %.1f kb (%d / %d паведамленняў)
+%d / %d messages	StatusWindow		%d / %d паведамленняў
+%num new message	DeskbarView		%num новае паведамленне
+%num new message for %name\n	MailDaemon		%num новых паведамленняў для %name\n
+%num new message.	MailDaemon		%num новае паведамленне.
+%num new messages	DeskbarView		%num новых паведамленняў
+%num new messages for %name\n	MailDaemon		%num новых паведамленняў для %name\n
+%num new messages.	MailDaemon		%num новых паведамленняў.
+<no accounts>	DeskbarView		<няма рахункаў>
+Check for mail now	DeskbarView		Праверыць пошту
+Check for mails only	DeskbarView		Толькі праверыць пошту
+Check mail now	StatusWindow		Праверыць пошту
+Create new message…	DeskbarView		Стварыць новае паведамленне…
+Fetching mail for %name	Notifier		Атрымліваю пошту для %name
+Mail Status	MailDaemon		Статус Пошты
+Mail daemon status log	MailDaemon		Пратакол паштовай службы
+New Messages	MailDaemon		Новыя паведамленні
+No new messages	DeskbarView		Няма новых паведамленняў
+No new messages	MailDaemon		Няма новых паведамленняў
+No new messages.	MailDaemon		Няма новых паведамленняў.
+No new messages.	StatusWindow		Няма новых паведамленняў.
+Preferences…	DeskbarView		Наладкі…
+Send pending mails	DeskbarView		Даслаць паведамленні што чакаюць
+Sending mail for %name	Notifier		Дасылаю пошту для %name
+Shutdown mail services	DeskbarView		Спыніць паштовыя службы

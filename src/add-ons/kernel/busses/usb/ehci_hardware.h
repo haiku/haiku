@@ -112,8 +112,8 @@
 #define EHCI_HCCPARAMS_PPCEC	(1 << 18)	// Per-Port Change Event
 #define EHCI_HCCPARAMS_LPM		(1 << 17)	// Link Power Management
 #define EHCI_HCCPARAMS_HP		(1 << 16)	// Hardware Prefetch
-#define EHCI_HCCPARAMS_IPT_SHIFT	4		// Isochronous Periodic Threshold
-#define EHCI_HCCPARAMS_IPT_MASK	0xf
+#define EHCI_HCCPARAMS_FRAME_CACHE(x)	((x >> 7) & 0x1)	// Isochronous Periodic Threshold
+#define EHCI_HCCPARAMS_IPT(x)	((x >> 4) & 0x7)	// Isochronous Periodic Threshold
 
 
 // Data Structures (EHCI Spec 3)
@@ -161,10 +161,12 @@ typedef struct ehci_itd {
 #define EHCI_ITD_ENDPOINT_MASK	0xf
 #define EHCI_ITD_DIR_SHIFT	11
 #define EHCI_ITD_MUL_SHIFT	0
+#define EHCI_ITD_MUL_MASK	0x3
 #define EHCI_ITD_BUFFERPOINTER_SHIFT	12
 #define EHCI_ITD_BUFFERPOINTER_MASK	0xfffff
 #define EHCI_ITD_MAXPACKETSIZE_SHIFT	0
 #define EHCI_ITD_MAXPACKETSIZE_MASK	0x7ff
+#define EHCI_ITD_MAXPACKETSIZE_LENGTH	11
 
 
 // Split Transaction Isochronous Transfer Descriptors (siTD, EHCI Spec 3.3)

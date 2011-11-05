@@ -443,7 +443,7 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 	}
 
 	if (info != NULL && info->color >= 0 && level == 0)
-		colorIdx = info->color;
+		colorIdx = info->color % kBasePieColorCount;
 	else if (info != NULL)
 		info->color = colorIdx;
 

@@ -35,7 +35,6 @@ extern const char* kVersionName;
 extern const int kCurrentVersion;
 
 
-extern const uchar k_app_mini[];
 extern const char* kProgramName;
 extern const char* kPCSemaphoreName;
 

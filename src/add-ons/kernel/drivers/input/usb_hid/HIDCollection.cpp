@@ -41,7 +41,8 @@ HIDCollection::HIDCollection(HIDCollection *parent, uint8 type,
 		// this is just a logical grouping collection
 		usageValue.u.extended = 0;
 	} else {
-		TRACE_ALWAYS("non of the possible usages for the collection are set\n");
+		TRACE_ALWAYS("none of the possible usages for the collection are "
+			"set\n");
 	}
 
 	fUsage = usageValue.u.extended;

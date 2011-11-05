@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_DURATION_FORMAT_H_
@@ -13,7 +13,7 @@
 
 class BTimeZone;
 
-namespace icu_44 {
+namespace icu {
 	class GregorianCalendar;
 }
 
@@ -42,7 +42,7 @@ public:
 private:
 			BString				fSeparator;
 			BTimeUnitFormat		fTimeUnitFormat;
-			icu_44::GregorianCalendar*	fCalendar;
+			icu::GregorianCalendar*	fCalendar;
 };
 
 

@@ -211,8 +211,7 @@ MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	MoveBy(pos * 25, pos * 25);
 	pos = (pos + 1) % 15;
 
-	BRect frame = Settings::Default()->CurrentSettings()
-		.audioPlayerWindowFrame;
+	BRect frame = Settings::Default()->AudioPlayerWindowFrame();
 	if (frame.IsValid()) {
 		if (isFirstWindow) {
 			if (message == NULL) {
@@ -2585,8 +2584,8 @@ MainWin::_MarkItem(BMenu* menu, uint32 command, bool mark)
 void
 MainWin::_AdoptGlobalSettings()
 {
-	mpSettings settings = Settings::CurrentSettings();
-		// thread safe
+	mpSettings settings;
+	Settings::Default()->Get(settings);
 
 	fCloseWhenDonePlayingMovie = settings.closeWhenDonePlayingMovie;
 	fCloseWhenDonePlayingSound = settings.closeWhenDonePlayingSound;

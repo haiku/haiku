@@ -12,23 +12,23 @@
 #define _TIME_MESSAGES_H
 
 
-//Timezone messages
+// Timezone messages
 const uint32 H_CITY_CHANGED = 'h_CC';
 const uint32 H_CITY_SET = 'h_CS';
 
-//SetButton
+// SetButton
 const uint32 H_SET_TIME_ZONE = 'hSTZ';
 
-//local and GMT settings
+// local and GMT settings
 const uint32 RTC_SETTINGS = 'RTse';
 
 // clock tick message
 const uint32 H_TIME_UPDATE ='obTU';
 
-//notice for clock ticks
+// notice for clock ticks
 const uint32 H_TM_CHANGED = 'obTC';
 
-//notice for user changes
+// notice for user changes
 const uint32 H_USER_CHANGE = 'obUC';
 
 // local/ gmt radiobuttons
@@ -49,6 +49,8 @@ const uint32 kMsgChange = 'chng';
 // change time finished
 const uint32 kChangeTimeFinished = 'tcfi';
 
+// GMT or localtime setting was changed
+const uint32 kMsgClockSettingChanged = 'tsch';
 
 #endif	// _TIME_MESSAGES_H
 

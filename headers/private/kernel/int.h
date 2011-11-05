@@ -53,4 +53,8 @@ are_interrupts_enabled(void)
 #define restore_interrupts(status)	arch_int_restore_interrupts(status)
 
 
+status_t reserve_io_interrupt_vectors(long count, long startVector);
+status_t allocate_io_interrupt_vectors(long count, long *startVector);
+void free_io_interrupt_vectors(long count, long startVector);
+
 #endif /* _KERNEL_INT_H */

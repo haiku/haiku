@@ -207,15 +207,15 @@
 /*!
 	\fn void BHandler::MessageReceived(BMessage *message)
 	\brief Handle a message that has been received by the associated looper.
-	
-	This method is reimplemented in your subclasses. If the messages that have
+
+	This method is reimplemented by subclasses. If the messages that have
 	been received by a looper pass through the filters, then they end up in
 	the MessageReceived() methods.
-	
-	The example shows a very common way to handle message. Usually, this
-	involves parsing the BMessage::what constant and then perform an action
-	based on that. 
-	
+
+	The example below shows a very common way to handle message. Usually,
+	this involves parsing the BMessage::what constant and then perform an
+	action based on that. 
+
 \code
 void
 ShowImageApp::MessageReceived(BMessage *message)
@@ -239,14 +239,14 @@ ShowImageApp::MessageReceived(BMessage *message)
 }
 \endcode
 
-	If your handler cannot process this message, you should pass it on to the
-	base class. Eventually, it will reach the default implementation, which
-	will reply with a \c B_MESSAGE_NOT_UNDERSTOOD constant. 
-	
-	\attention If you want to keep or manipulate the \a message, have a look
-		at the \link BLooper::DetachCurrentMessage() DetachCurrentMessage() \endlink
-		method to get ownership of the message.
-	
+	If your handler cannot process this message, you should pass it on
+	to the base class. Eventually, it will reach the base implementation,
+	which will reply with \c B_MESSAGE_NOT_UNDERSTOOD.
+
+	\attention If you want to keep or manipulate the \a message, have a
+		look at BLooper::DetachCurrentMessage() to receive ownership of
+		the message.
+
 	\param message The message that needs to be handled.
 */
 
@@ -254,7 +254,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 /*!
 	\fn BLooper *BHandler::Looper() const
 	\brief Return a pointer to the looper that this handler is associated with.
-	
+
 	\return If the handler is not yet associated with a looper, it will return
 		\c NULL.
 	\see BLooper::AddHandler()
@@ -444,13 +444,14 @@ ShowImageApp::MessageReceived(BMessage *message)
 /*!
 	\fn BHandler * BHandler::ResolveSpecifier(BMessage *msg, int32 index,
 		BMessage *specifier, int32 form, const char *property)
-	\brief Undocumented.
+	\brief Determine the proper handler for a scripting message.
 */
 
 
 /*!
 	\fn status_t BHandler::GetSupportedSuites(BMessage *data)
-	\brief Undocumented.
+	\brief Reports the suites of messages and specifiers that derived classes
+		understand.
 */
 
 

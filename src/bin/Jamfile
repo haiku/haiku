@@ -6,7 +6,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app shared storage support usb ;
+UsePrivateHeaders app interface shared storage support usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 UseLibraryHeaders ncurses ;

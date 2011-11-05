@@ -13,6 +13,9 @@
 
 #include <algorithm>
 
+#include <GroupLayout.h>
+#include <GroupView.h>
+
 #include "AppGroupView.h"
 
 #include "NotificationWindow.h"
@@ -21,13 +24,16 @@
 
 AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
 	:
-	BView(BRect(0, 0, win->ViewWidth(), 1), label, B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW|B_FULL_UPDATE_ON_RESIZE|B_FRAME_EVENTS),
+	BBox(B_FANCY_BORDER, (fView = new BGroupView(B_VERTICAL, 0))),
 	fLabel(label),
 	fParent(win),
 	fCollapsed(false)
 {
-	Show();
+	// If no group was specified we don't have any border or label
+	if (label == NULL)
+		SetBorder(B_NO_BORDER);
+	else
+		SetLabel(label);
 }
 
 
@@ -36,6 +42,7 @@ AppGroupView::~AppGroupView()
 }
 
 
+/*
 void
 AppGroupView::AttachedToWindow()
 {
@@ -43,8 +50,9 @@ AppGroupView::AttachedToWindow()
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 }
+*/
 
-
+/*
 void
 AppGroupView::Draw(BRect updateRect)
 {
@@ -58,14 +66,14 @@ AppGroupView::Draw(BRect updateRect)
 	be_bold_font->GetHeight(&fh);
 	float labelOffset = fh.ascent + fh.leading;
 
-	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
-	borderRect.top = labelOffset;
 
-	BRect textRect = borderRect;
-	textRect.left = kEdgePadding * 2;
-	textRect.right = textRect.left + be_bold_font->StringWidth(label.String())
-		+ (kEdgePadding * 3);
-	textRect.bottom = labelOffset;
+	BRect textRect = Bounds();
+	//textRect.right = textRect.left + be_bold_font->StringWidth(label.String())
+	//	+ (kEdgePadding * 3);
+	textRect.bottom = 2 * labelOffset;
+	
+	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
+	borderRect.top = 2 * labelOffset;
 
 	BRect closeCross = fCloseRect;
 	closeCross.InsetBy(kSmallPadding, kSmallPadding);
@@ -74,108 +82,53 @@ AppGroupView::Draw(BRect updateRect)
 	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
 	// detailCol = tint_color(detailCol, B_LIGHTEN_1_TINT);
 
+	PushState();
+	SetFont(be_bold_font);
+	SetPenSize(kPenSize);
+
 	if (fCollapsed) {
+		// Draw the expand widget
 		PushState();
-			SetFont(be_bold_font);
-			SetPenSize(kPenSize);
-			float linePos = textRect.top + textRect.Height() / 2;
-
-			// Draw the line to the expand widget			
-			PushState();
-				SetHighColor(detailCol);				
-				StrokeLine(BPoint(kEdgePadding, linePos), BPoint(fCollapseRect.left, linePos));
-			PopState();
+			SetHighColor(detailCol);
+			StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
 			
-			// Draw the expand widget
-			PushState();
-				SetHighColor(detailCol);
-				StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
-				
-				BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-				BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);			
-				StrokeLine(expandHorStart, expandHorEnd);
-				
-				BPoint expandVerStart(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.top + kSmallPadding);
-				BPoint expandVerEnd(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.bottom - kSmallPadding);				
-				StrokeLine(expandVerStart, expandVerEnd);
-			PopState();
+			BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
+			BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);			
+			StrokeLine(expandHorStart, expandHorEnd);
 			
-			// Draw the app title
-			DrawString(label.String(), BPoint(fCollapseRect.right + kEdgePadding, labelOffset + kEdgePadding));
-			
-			// Draw the line from the label to the close widget
-			PushState();
-				SetHighColor(detailCol);
-				
-				BPoint lineSeg2Start(textRect.right + kSmallPadding / 2, linePos);
-				BPoint lineSeg2End(fCloseRect.left, linePos);
-				StrokeLine(lineSeg2Start, lineSeg2End);
-			PopState();
-
-			// Draw the dismiss widget
-			PushState();
-				SetHighColor(detailCol);
-
-				StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-
-				StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-				StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
-			PopState();
-
-			// Draw the line from the dismiss widget
-			PushState();
-				SetHighColor(detailCol);
-
-				BPoint lineSeg3Start(fCloseRect.right, linePos);
-				BPoint lineSeg3End(borderRect.right, linePos);
-				StrokeLine(lineSeg3Start, lineSeg3End);
-			PopState();
-
+			BPoint expandVerStart(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.top + kSmallPadding);
+			BPoint expandVerEnd(fCollapseRect.Width() / 2 + fCollapseRect.left, fCollapseRect.bottom - kSmallPadding);				
+			StrokeLine(expandVerStart, expandVerEnd);
 		PopState();
+		
+		SetHighColor(tint_color(ui_color(B_PANEL_TEXT_COLOR), B_LIGHTEN_1_TINT));
 	} else {
-		PushState();
-			SetFont(be_bold_font);
-			SetPenSize(kPenSize);
+		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		FillRect(textRect, B_SOLID_LOW);
+			
+		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 
-			// Draw the border
-			PushState();
-				SetHighColor(detailCol);
-				// StrokeRoundRect(borderRect, kEdgePadding, kEdgePadding * 2);
-				StrokeRect(borderRect);
-			PopState();
+		// Draw the collapse widget
+		StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
 
-			FillRect(textRect, B_SOLID_LOW);
+		BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
+		BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
 
-			// Draw the collapse widget
-			PushState();
-				SetHighColor(detailCol);
-				StrokeRoundRect(fCollapseRect, kSmallPadding, kSmallPadding);
-
-				BPoint expandHorStart(fCollapseRect.left + kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-				BPoint expandHorEnd(fCollapseRect.right - kSmallPadding, fCollapseRect.Height() / 2 + fCollapseRect.top);
-
-				StrokeLine(expandHorStart, expandHorEnd);
-			PopState();
-
-			// Draw the dismiss widget
-			PushState();
-				SetHighColor(detailCol);			
-				FillRect(fCloseRect, B_SOLID_LOW);
-
-				StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-
-				StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-				StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
-			PopState();
-
-			// Draw the label
-			DrawString(label.String(), BPoint(fCollapseRect.right + kEdgePadding, labelOffset + kEdgePadding));
-		PopState();
+		StrokeLine(expandHorStart, expandHorEnd);
 	}
+	// Draw the dismiss widget
+	StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
+
+	StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
+	StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
+
+	// Draw the label
+	DrawString(label.String(), BPoint(fCollapseRect.right + 2 * kEdgePadding, labelOffset + kEdgePadding));
+	PopState();
 
 	Sync();	
 }
-
+*/
 
 void
 AppGroupView::MouseDown(BPoint point)
@@ -186,7 +139,7 @@ AppGroupView::MouseDown(BPoint point)
 
 		int32 children = fInfo.size();
 		for (int32 i = 0; i < children; i++) {
-			fInfo[i]->RemoveSelf();
+			fView->GetLayout()->RemoveView(fInfo[i]);
 			delete fInfo[i];
 		}
 		fInfo.clear();
@@ -198,38 +151,8 @@ AppGroupView::MouseDown(BPoint point)
 	}
 
 	if (changed) {
-		ResizeViews();
-		Invalidate();
+		_ResizeViews();
 	}
-}
-
-
-void
-AppGroupView::GetPreferredSize(float* width, float* height)
-{
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-
-	float h = fh.ascent + fh.leading + fh.leading;
-	h += kEdgePadding * 2; // Padding between top and bottom of label
-
-	if (!fCollapsed) {
-		int32 children = fInfo.size();
-
-		for (int32 i = 0; i < children; i++) {
-			float childHeight = 0;
-			float childWidth = 0;
-			
-			fInfo[i]->GetPreferredSize(&childWidth, &childHeight);
-			
-			h += childHeight;
-		}
-	}
-
-	h += kEdgePadding;
-
-	*width = fParent->ViewWidth();
-	*height = h;
 }
 
 
@@ -247,16 +170,14 @@ AppGroupView::MessageReceived(BMessage* msg)
 
 			if (vIt != fInfo.end()) {
 				fInfo.erase(vIt);
-				view->RemoveSelf();
+				fView->GetLayout()->RemoveView(view);
 				delete view;
 			}
 
-			ResizeViews();
-			Invalidate();
+			if (Window() != NULL)
+				Window()->PostMessage(msg);
 
-			// When all the views are destroy, save app filters
-			if (fInfo.size() == 0)
-				dynamic_cast<NotificationWindow*>(Window())->SaveAppFilters();
+			_ResizeViews();
 			break;
 		}
 		default:
@@ -269,13 +190,14 @@ void
 AppGroupView::AddInfo(NotificationView* view)
 {
 	BString id = view->MessageID();
+	bool found = false;
+
 	if (id.Length() > 0) {
 		int32 children = fInfo.size();
-		bool found = false;
 
 		for (int32 i = 0; i < children; i++) {
-			if (fInfo[i]->HasMessageID(id.String())) {
-				fInfo[i]->RemoveSelf();
+			if (id == fInfo[i]->MessageID()) {
+				fView->GetLayout()->RemoveView(fInfo[i]);
 				delete fInfo[i];
 				
 				fInfo[i] = view;
@@ -284,33 +206,28 @@ AppGroupView::AddInfo(NotificationView* view)
 				break;
 			}
 		}
+	}
 
-		if (!found)
-			fInfo.push_back(view);
-	} else
+	if (!found)
 		fInfo.push_back(view);
+	fView->GetLayout()->AddView(view);
 
-	if (fParent->IsHidden())
-		fParent->Show();
 	if (IsHidden())
 		Show();
 	if (view->IsHidden())
 		view->Show();
 
-	AddChild(view);
-
-	ResizeViews();
-	Invalidate();
+	_ResizeViews();
 }
 
 
 void
-AppGroupView::ResizeViews()
+AppGroupView::_ResizeViews()
 {
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
 
-	float offset = fh.ascent + fh.leading + fh.descent;
+	float offset = 2 * kEdgePadding + fh.ascent + fh.leading + fh.descent;
 	int32 children = fInfo.size();
 
 	if (!fCollapsed) {
@@ -318,31 +235,23 @@ AppGroupView::ResizeViews()
 
 		for (int32 i = 0; i < children; i++) {
 			fInfo[i]->ResizeToPreferred();
-			fInfo[i]->MoveTo(kEdgePadding + kPenSize, offset);
+			fInfo[i]->MoveTo(0, offset);
 			
 			offset += fInfo[i]->Bounds().Height();
 			if (fInfo[i]->IsHidden())
 				fInfo[i]->Show();
-			fInfo[i]->SetPosition(false, false);
-		};
+		}
 	} else {
 		for (int32 i = 0; i < children; i++)
 			if (!fInfo[i]->IsHidden())
 				fInfo[i]->Hide();
 	}
 
-	if (children == 1)
-		fInfo[0]->SetPosition(true, true);
-	else if (children > 1) {
-		fInfo[0]->SetPosition(true, false);
-		fInfo[children - 1]->SetPosition(false, true);
-	}
-
-	ResizeTo(fParent->ViewWidth(), offset);
+	ResizeTo(fParent->Width(), offset);
 	float labelOffset = fh.ascent + fh.leading;
 
 	BRect borderRect = Bounds().InsetByCopy(kEdgePadding, kEdgePadding);
-	borderRect.top = labelOffset;
+	borderRect.top = 2*labelOffset;
 
 	fCollapseRect = borderRect;
 	fCollapseRect.right = fCollapseRect.left + kExpandSize;
@@ -350,12 +259,10 @@ AppGroupView::ResizeViews()
 	fCollapseRect.OffsetTo(kEdgePadding * 2, kEdgePadding * 1.5);
 
 	fCloseRect = borderRect;
-	fCloseRect.right -= kEdgePadding * 4;
+	fCloseRect.right -= kEdgePadding * 2;
+	fCloseRect.top += kEdgePadding * 1.5;
 	fCloseRect.left = fCloseRect.right - kCloseSize;
 	fCloseRect.bottom = fCloseRect.top + kCloseSize;
-	fCloseRect.OffsetTo(fCloseRect.left, kEdgePadding * 1.5);
-
-	fParent->ResizeAll();
 }
 
 

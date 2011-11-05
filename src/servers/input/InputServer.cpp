@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -510,7 +510,10 @@ InputServer::MessageReceived(BMessage* message)
 			status = HandleGetSetMouseMap(message, &reply);
 			break;
 		case IS_GET_KEYBOARD_ID:
-			status = HandleGetKeyboardID(message, &reply);
+			status = HandleGetSetKeyboardID(message, &reply);
+			break;
+		case IS_SET_KEYBOARD_ID:
+			status = HandleGetSetKeyboardID(message, &reply);
 			break;
 		case IS_GET_CLICK_SPEED:
 			status = HandleGetSetClickSpeed(message, &reply);
@@ -870,8 +873,13 @@ InputServer::HandleGetSetMouseMap(BMessage* message, BMessage* reply)
 
 
 status_t
-InputServer::HandleGetKeyboardID(BMessage* message, BMessage* reply)
+InputServer::HandleGetSetKeyboardID(BMessage* message, BMessage* reply)
 {
+	int16 id;
+	if (message->FindInt16("id", &id) == B_OK) {
+		fKeyboardID = (uint16)id;
+		return B_OK;
+	}
 	return reply->AddInt16("id", fKeyboardID);
 }
 
@@ -1016,12 +1024,17 @@ InputServer::SetNextMethod(bool direction)
 	gInputMethodListLocker.Lock();
 
 	int32 index = gInputMethodList.IndexOf(fActiveMethod);
+	int32 oldIndex = index;
+
 	index += (direction ? 1 : -1);
 
 	if (index < -1)
 		index = gInputMethodList.CountItems() - 1;
 	if (index >= gInputMethodList.CountItems())
 		index = -1;
+
+	if (index == oldIndex)
+		return B_BAD_INDEX;
 
 	BInputServerMethod *method = &gKeymapMethod;
 
@@ -1461,6 +1474,9 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 				// to next input method
 				// (pressing "shift" will let us switch to the previous method)
 
+				// If there is only one input method, SetNextMethod will return
+				// B_BAD_INDEX and the event will be forwarded to the user.
+
 				PRINT(("SanitizeEvents: %lx, %x\n", fKeyInfo.modifiers,
 					fKeyInfo.key_states[KEY_Spacebar >> 3]));
 
@@ -1468,10 +1484,10 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 				if (event->FindInt8("byte", (int8*)&byte) < B_OK)
 					byte = 0;
 
-				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-					|| byte == B_HANKAKU_ZENKAKU) {
-					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
-
+				if ((((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
+						|| byte == B_HANKAKU_ZENKAKU)
+					&& SetNextMethod((fKeyInfo.modifiers & B_SHIFT_KEY) == 0)
+							== B_OK) {
 					// this event isn't sent to the user
 					events.RemoveItemAt(index);
 					delete event;

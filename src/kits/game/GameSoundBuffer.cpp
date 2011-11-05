@@ -32,6 +32,7 @@
 #include <MediaAddOn.h>
 #include <MediaTheme.h>
 #include <TimeSource.h>
+#include <BufferGroup.h>
 
 #include "GameProducer.h"
 #include "GameSoundBuffer.h"
@@ -101,12 +102,13 @@ GameSoundBuffer::~GameSoundBuffer()
 	BMediaRoster* roster = BMediaRoster::Roster();
 	
 	if (fIsConnected) {
-		// Ordinarily we'd stop *all* of the nodes in the chain at this point.  However,
-		// one of the nodes is the System Mixer, and stopping the Mixer is a Bad Idea (tm).
-		// So, we just disconnect from it, and release our references to the nodes that
-		// we're using.  We *are* supposed to do that even for global nodes like the Mixer.
+		// Ordinarily we'd stop *all* of the nodes in the chain at this point.
+		// However, one of the nodes is the System Mixer, and stopping the Mixer
+		// is a Bad Idea (tm). So, we just disconnect from it, and release our
+		// references to the nodes that we're using.  We *are* supposed to do
+		// that even for global nodes like the Mixer.
 		roster->Disconnect(fConnection->producer.node, fConnection->source,
-							fConnection->consumer.node, fConnection->destination);
+			fConnection->consumer.node, fConnection->destination);
 		
 		roster->ReleaseNode(fConnection->producer);
 		roster->ReleaseNode(fConnection->consumer);
@@ -270,7 +272,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 	pan[1] = fPanLeft;
 	
 	char * buffer = new char[fFrameSize * frames];
-			
+
 	FillBuffer(buffer, frames);
 	
 	switch (fFormat.format) {
@@ -390,9 +392,10 @@ GameSoundBuffer::Connect(media_node * consumer)
 	if (err != B_OK)
                 return err;	
 
-	err = roster->SetTimeSourceFor(fConnection->producer.node, fConnection->timeSource.node);
-        if (err != B_OK)
-                return err;
+	err = roster->SetTimeSourceFor(fConnection->producer.node,
+		fConnection->timeSource.node);
+	if (err != B_OK)
+		return err;
 	// got the nodes; now we find the endpoints of the connection
 	media_input mixerInput;
 	media_output soundOutput;
@@ -531,11 +534,17 @@ SimpleSoundBuffer::FillBuffer(void * data, int64 frames)
 
 // StreamingSoundBuffer ------------------------------------------------------
 StreamingSoundBuffer::StreamingSoundBuffer(const gs_audio_format * format,
-						const void * streamHook)
+	const void * streamHook, size_t inBufferFrameCount,
+	size_t inBufferCount)
 	:
 	GameSoundBuffer(format),
 	fStreamHook(const_cast<void *>(streamHook))	
 {
+	if (inBufferFrameCount != 0 && inBufferCount  != 0) {
+		BBufferGroup *bufferGroup = new BBufferGroup(inBufferFrameCount
+				* fFrameSize, inBufferCount);
+		fNode->SetBufferGroup(fConnection->source, bufferGroup);
+	}
 }
 
 
@@ -552,4 +561,3 @@ StreamingSoundBuffer::FillBuffer(void * buffer, int64 frames)
 	size_t bytes = fFrameSize * frames;	
 	object->FillBuffer(buffer, bytes);
 }
-

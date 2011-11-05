@@ -1,11 +1,10 @@
-//
-//	PaletteWindow.cpp
-//
-//	This is a part of...
-//	CannaIM
-//	version 1.0
-//	(c) 1999 M.Kawamura
-//
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
+
 
 #include "CannaCommon.h"
 #include "PaletteWindow.h"
@@ -19,7 +18,7 @@
 PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	:BWindow( rect, B_EMPTY_STRING, kLeftTitledWindowLook,
 			B_FLOATING_ALL_WINDOW_FEEL,
-			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE | 
+			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE |
 			B_AVOID_FOCUS | B_WILL_ACCEPT_FIRST_CLICK )
 {
 	cannaLooper = looper;
@@ -31,7 +30,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	frame.right += 3;
 	back = new BBox( frame );
 	AddChild( back );
-	
+
 	BRect largerect( 0, 0, HexOnwidth - 1, HexOnheight - 1 );
 	BRect smallrect( 0, 0, HiraOnwidth - 1, HiraOnheight - 1);
 	int32 largebytes = HexOnbytesperpixel * HexOnwidth * HexOnheight;
@@ -43,9 +42,9 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 //printf( "smallbytes = %d\n", smallbytes );
 	smallimage = new BBitmap( smallrect, cspace );
 	largeimage = new BBitmap( largerect, cspace );
-	
+
 	back->MovePenTo( 0, 0 );
-	
+
 	smallimage->SetBits( HiraOnbits, smallbytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( smallimage );
@@ -59,7 +58,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	HiraButton = new BPictureButton( BRect( 4, 4, 4 + HiraOnwidth - 1, 4 + HiraOnheight - 1), "hira",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( HiraButton );
-	
+
 	smallimage->SetBits( KataOnbits, smallbytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( smallimage );
@@ -73,7 +72,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	KataButton = new BPictureButton( BRect( 26, 4, 26 + HiraOnwidth - 1, 4 + HiraOnheight - 1 ), "kata",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( KataButton );
-	
+
 	smallimage->SetBits( ZenAlphaOnbits, smallbytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( smallimage );
@@ -87,7 +86,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	ZenAlphaButton = new BPictureButton( BRect( 48, 4, 48 + HiraOnwidth - 1, 4 + HiraOnheight - 1 ), "zenalpha",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( ZenAlphaButton );
-	
+
 	smallimage->SetBits( HanAlphaOnbits, smallbytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( smallimage );
@@ -101,7 +100,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	HanAlphaButton = new BPictureButton( BRect( 70, 4, 70 + HiraOnwidth - 1, 4 + HiraOnheight - 1 ), "hanalpha",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( HanAlphaButton );
-	
+
 	largeimage->SetBits( ExtendOnbits, largebytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( largeimage );
@@ -115,7 +114,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	ExtendButton = new BPictureButton( BRect( 94, 4, 94 + HexOnwidth -1 , 4 + HexOnheight - 1 ), "extend",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( ExtendButton );
-	
+
 	largeimage->SetBits( KigoOnbits, largebytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( largeimage );
@@ -129,7 +128,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	KigoButton = new BPictureButton( BRect( 4, 26, 4 + HexOnwidth -1, 26 + HexOnheight - 1 ), "kigo",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( KigoButton );
-	
+
 	largeimage->SetBits( HexOnbits, largebytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( largeimage );
@@ -143,7 +142,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	HexButton = new BPictureButton( BRect( 34, 26, 34 + HexOnwidth -1, 26 + HexOnheight - 1 ), "hex",
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( HexButton );
-	
+
 	largeimage->SetBits( BushuOnbits, largebytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( largeimage );
@@ -158,7 +157,7 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 						offpict, onpict, msg, B_TWO_STATE_BUTTON );
 	back->AddChild( BushuButton );
 
-/*	
+/*
 	largeimage->SetBits( TorokuOnbits, largebytes, 0, cspace );
 	back->BeginPicture( new BPicture );
 	back->DrawBitmap( largeimage );
@@ -178,10 +177,10 @@ PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
 	delete largeimage;
 	delete offpict;
 	delete onpict;
-	
+
 }
 
- 
+
 void PaletteWindow::MessageReceived( BMessage *msg )
 {
 	int32 mode;
@@ -191,23 +190,23 @@ void PaletteWindow::MessageReceived( BMessage *msg )
 			if ( !IsHidden() )
 				Hide();
 				break;
-		
+
 		case PALETTE_WINDOW_SHOW:
 			if ( IsHidden() )
 			{
 				BRect frame = Frame();
 				BRect screenrect = BScreen().Frame();
 				float x, y;
-	
+
 				x = screenrect.right - frame.right;
 				y = screenrect.bottom - frame.bottom;
-	
+
 				if ( x < 0 )
 					frame.OffsetBy( x, 0 );
-		
+
 				if ( y < 0 )
 					frame.OffsetBy( 0, y );
-				
+
 				MoveTo( frame.left, frame.top );
 				SetWorkspaces( B_CURRENT_WORKSPACE );
 				Show();
@@ -270,13 +269,13 @@ void PaletteWindow::MessageReceived( BMessage *msg )
 					break;
 			}
 			break;
-			
-		
+
+
 		default:
 			BWindow::MessageReceived( msg );
 	}
 }
-	
+
 void PaletteWindow::AllButtonOff()
 {
 	HiraButton->SetValue( B_CONTROL_OFF );

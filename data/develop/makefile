@@ -1,4 +1,4 @@
-## BeOS Generic Makefile v2.4 ##
+## BeOS Generic Makefile v2.5 ##
 
 ## Fill in this file to specify the project being created, and the referenced
 ## makefile-engine will do all of the hard work for you.  This handles both
@@ -55,6 +55,9 @@ RSRCS=
 #	-	if your library follows the naming pattern of:
 #		libXXX.so or libXXX.a you can simply specify XXX
 #		library: libbe.so entry: be
+#
+#	-	for version-independent linking of standard C++ libraries please add
+#		$(STDCPPLIBS) instead of raw "stdc++[.r4] [supc++]" library names
 #
 #	-	for localization support add following libs:
 #		locale localestub

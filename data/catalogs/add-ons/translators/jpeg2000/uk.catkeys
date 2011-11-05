@@ -1,6 +1,13 @@
-1	ukrainian	x-vnd.Haiku-JPEG2000Translator	3397102117
+1	ukrainian	x-vnd.Haiku-JPEG2000Translator	547915409
 About	JPEG2000Translator		Про
 Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bitmap Format (Перетворювач JPEG2000)
+High	JPEG2000Translator		Висока
+JPEG2000 images	JPEG2000Translator		Зображення JPEG2000
+Low	JPEG2000Translator		Низька
 Output only codestream (.jpc)	JPEG2000Translator		Виводити тільки кодовий потік (.jpc)
 Output quality	JPEG2000Translator		Якість вихідних
+Read	JPEG2000Translator		Читати
+Read greyscale images as RGB32	JPEG2000Translator		Читати сірі зображення як RGB32
+Write	JPEG2000Translator		Записати
 Write black-and-white images as RGB24	JPEG2000Translator		Записати чорно-білі зображення як RGB24
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nБазоване на бібліотеці JasPer:\n© 1999-2000, Image Power, Inc. і\nуніверситету Британської Колумбії, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 кодек був використаний як  \"tutorial\".\n\thttp://www.imagemagick.org/\n

@@ -13,8 +13,11 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
+#include "bios.h"
 #include "utility.h"
 #include "mode.h"
+#include "display.h"
+#include "pll.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -35,10 +38,10 @@ extern "C" void _sPrintf(const char *format, ...);
 status_t
 create_mode_list(void)
 {
+	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
+
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
-
-	detect_crt_ranges();
 
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
 		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
@@ -79,6 +82,8 @@ radeon_get_mode_list(display_mode *modeList)
 status_t
 radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 {
+	// TODO: multi-monitor?  for now we use VESA edid
+
 	TRACE("%s\n", __func__);
 	if (!gInfo->shared_info->has_edid)
 		return B_ERROR;
@@ -86,279 +91,140 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 		return B_BUFFER_OVERFLOW;
 
 	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
+		// VESA
+	//memcpy(info, &gDisplay[0]->edid_info, sizeof(struct edid1_info));
+		// BitBanged display 0
+
 	*edid_version = EDID_VERSION_1;
 
 	return B_OK;
 }
 
 
-static void
-get_color_space_format(const display_mode &mode, uint32 &colorMode,
-	uint32 &bytesPerRow, uint32 &bitsPerPixel)
+uint32
+radeon_dpms_capabilities(void)
 {
-	uint32 bytesPerPixel;
-
-	switch (mode.space) {
-		case B_RGB32_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB32;
-			bytesPerPixel = 4;
-			bitsPerPixel = 32;
-			break;
-		case B_RGB16_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB16;
-			bytesPerPixel = 2;
-			bitsPerPixel = 16;
-			break;
-		case B_RGB15_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB15;
-			bytesPerPixel = 2;
-			bitsPerPixel = 15;
-			break;
-		case B_CMAP8:
-		default:
-			colorMode = DISPLAY_CONTROL_CMAP8;
-			bytesPerPixel = 1;
-			bitsPerPixel = 8;
-			break;
-	}
-
-	bytesPerRow = mode.virtual_width * bytesPerPixel;
+	// These should be pretty universally supported on Radeon HD cards
+	return B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF;
 }
 
 
-// Blacks the screen out, useful for mode setting
-static void
-CardBlankSet(uint8 crtid, bool blank)
+uint32
+radeon_dpms_mode(void)
 {
-	int blackColorReg
-		= crtid == 1 ? D2CRTC_BLACK_COLOR : D1CRTC_BLACK_COLOR;
-	int blankControlReg
-		= crtid == 1 ? D2CRTC_BLANK_CONTROL : D1CRTC_BLANK_CONTROL;
-
-	Write32(CRT, blackColorReg, 0);
-	Write32Mask(CRT, blankControlReg, blank ? 1 << 8 : 0, 1 << 8);
+	// TODO: this really isn't a good long-term solution
+	// we may need to look at the encoder dpms scratch registers
+	return gInfo->dpms_mode;
 }
 
 
-static void
-CardFBSet(display_mode *mode)
+void
+radeon_dpms_set(int mode)
 {
-	uint32 colorMode;
-	uint32 bytesPerRow;
-	uint32 bitsPerPixel;
+	radeon_shared_info &info = *gInfo->shared_info;
 
-	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
-
-	#if 0
-	// TMDSAllIdle	// DVI / HDMI
-	// LVTMAAllIdle	// DVI
-	DACAllIdle();
-
-	// Set the inital frame buffer location in the memory controler
-	uint32 mcFbSize;
-	MCFBLocation(0, &mcFbSize);
-	MCFBSetup(Read32(OUT, R6XX_CONFIG_FB_BASE), mcFbSize);
-	#endif
-
-	Write32(CRT, gRegister->grphUpdate, (1<<16));
-		// Lock for update (isn't this normally the other way around on VGA?
-
-	// framebuffersize = w * h * bpp  =  fb bits / 8 = bytes needed
-	uint64_t fbAddress = gInfo->shared_info->frame_buffer_phys;
-
-	// Tell GPU which frame buffer address to draw from
-	Write32(CRT, gRegister->grphPrimarySurfaceAddr,
-		fbAddress & 0xffffffff);
-	Write32(CRT, gRegister->grphSecondarySurfaceAddr,
-		fbAddress & 0xffffffff);
-
-	if (gInfo->shared_info->device_chipset >= (RADEON_R700 | 0x70)) {
-		Write32(CRT, gRegister->grphPrimarySurfaceAddrHigh,
-			(fbAddress >> 32) & 0xf);
-		Write32(CRT, gRegister->grphSecondarySurfaceAddrHigh,
-			(fbAddress >> 32) & 0xf);
-	}
-
-	Write32(CRT, gRegister->grphControl, 0);
-		// Reset stored depth, format, etc
-
-	// set color mode on video card
-	switch (mode->space) {
-		case B_CMAP8:
-			Write32Mask(CRT, gRegister->grphControl,
-				0, 0x00000703);
+	switch(mode) {
+		case B_DPMS_ON:
+			TRACE("%s: ON\n", __func__);
+			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+				if (gDisplay[id]->active == false)
+					continue;
+				display_crtc_lock(id, ATOM_ENABLE);
+				display_crtc_power(id, ATOM_ENABLE);
+				if (info.dceMajor >= 3)
+					display_crtc_memreq(id, ATOM_ENABLE);
+				display_crtc_blank(id, ATOM_BLANKING_OFF);
+				display_crtc_lock(id, ATOM_DISABLE);
+			}
 			break;
-		case B_RGB15_LITTLE:
-			Write32Mask(CRT, gRegister->grphControl,
-				0x000001, 0x00000703);
-			break;
-		case B_RGB16_LITTLE:
-			Write32Mask(CRT, gRegister->grphControl,
-				0x000101, 0x00000703);
-			break;
-		case B_RGB24_LITTLE:
-		case B_RGB32_LITTLE:
-		default:
-			Write32Mask(CRT, gRegister->grphControl,
-				0x000002, 0x00000703);
+		case B_DPMS_STAND_BY:
+		case B_DPMS_SUSPEND:
+		case B_DPMS_OFF:
+			TRACE("%s: OFF\n", __func__);
+			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+				if (gDisplay[id]->active == false)
+					continue;
+				display_crtc_lock(id, ATOM_ENABLE);
+				display_crtc_blank(id, ATOM_BLANKING);
+				if (info.dceMajor >= 3)
+					display_crtc_memreq(id, ATOM_DISABLE);
+				display_crtc_power(id, ATOM_DISABLE);
+				display_crtc_lock(id, ATOM_DISABLE);
+			}
 			break;
 	}
-
-	Write32(CRT, gRegister->grphSwapControl, 0);
-		// only for chipsets > r600
-		// R5xx - RS690 case is GRPH_CONTROL bit 16
-
-	Write32Mask(CRT, gRegister->grphEnable, 1, 0x00000001);
-		// Enable graphics
-
-	Write32(CRT, gRegister->grphSurfaceOffsetX, 0);
-	Write32(CRT, gRegister->grphSurfaceOffsetY, 0);
-	Write32(CRT, gRegister->grphXStart, 0);
-	Write32(CRT, gRegister->grphYStart, 0);
-	Write32(CRT, gRegister->grphXEnd, mode->virtual_width);
-	Write32(CRT, gRegister->grphYEnd, mode->virtual_height);
-	Write32(CRT, gRegister->grphPitch, bytesPerRow / 4);
-
-	Write32(CRT, gRegister->modeDesktopHeight, mode->virtual_height);
-
-	Write32(CRT, gRegister->grphUpdate, 0);
-		// Unlock changed registers
-
-	// update shared info
-	gInfo->shared_info->bytes_per_row = bytesPerRow;
-	gInfo->shared_info->current_mode = *mode;
-	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
-}
-
-
-static void
-CardModeSet(display_mode *mode)
-{
-	display_timing& displayTiming = mode->timing;
-
-	TRACE("%s called to do %dx%d\n",
-		__func__, displayTiming.h_display, displayTiming.v_display);
-
-	// enable read requests
-	Write32Mask(CRT, gRegister->grphControl, 0, 0x01000000);
-
-	// *** Horizontal
-	Write32(CRT, gRegister->crtHTotal,
-		displayTiming.h_total - 1);
-
-	// Blanking
-	uint16 blankStart = displayTiming.h_total
-		+ displayTiming.h_display - displayTiming.h_sync_start;
-	uint16 blankEnd = displayTiming.h_total - displayTiming.h_sync_start;
-
-	Write32(CRT, gRegister->crtHBlank,
-		blankStart | (blankEnd << 16));
-
-	Write32(CRT, gRegister->crtHSync,
-		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
-
-	// set flag for neg. H sync. M76 Register Reference Guide 2-256
-	Write32Mask(CRT, gRegister->crtHPolarity,
-		displayTiming.flags & B_POSITIVE_HSYNC ? 0 : 1, 0x1);
-
-	// *** Vertical
-	Write32(CRT, gRegister->crtVTotal,
-		displayTiming.v_total - 1);
-
-	blankStart = displayTiming.v_total
-		+ displayTiming.v_display - displayTiming.v_sync_start;
-	blankEnd = displayTiming.v_total - displayTiming.v_sync_start;
-
-	Write32(CRT, gRegister->crtVBlank,
-		blankStart | (blankEnd << 16));
-
-	// Set Interlace if specified within mode line
-	if (displayTiming.flags & B_TIMING_INTERLACED) {
-		Write32(CRT, gRegister->crtInterlace, 0x1);
-		Write32(CRT, gRegister->modeDataFormat, 0x1);
-	} else {
-		Write32(CRT, gRegister->crtInterlace, 0x0);
-		Write32(CRT, gRegister->modeDataFormat, 0x0);
-	}
-
-	Write32(CRT, gRegister->crtVSync,
-		(displayTiming.v_sync_end - displayTiming.v_sync_start) << 16);
-
-	// set flag for neg. V sync. M76 Register Reference Guide 2-258
-	Write32Mask(CRT, gRegister->crtVPolarity,
-		displayTiming.flags & B_POSITIVE_VSYNC ? 0 : 1, 0x1);
-
-	/*	set D1CRTC_HORZ_COUNT_BY2_EN to 0;
-		should only be set to 1 on 30bpp DVI modes
-	*/
-	Write32Mask(CRT, gRegister->crtCountControl, 0x0, 0x1);
-}
-
-
-static void
-CardModeScale(display_mode *mode)
-{
-	// No scaling
-	Write32(CRT, gRegister->sclUpdate, (1<<16));// Lock
-
-	#if 0
-	Write32(CRT, D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
-		(OVERSCAN << 16) | OVERSCAN); // LEFT | RIGHT
-	Write32(CRT, D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
-		(OVERSCAN << 16) | OVERSCAN); // TOP | BOTTOM
-	#endif
-
-	Write32(CRT, gRegister->viewportStart, 0);
-	Write32(CRT, gRegister->viewportSize,
-		mode->timing.v_display | (mode->timing.h_display << 16));
-	Write32(CRT, gRegister->sclEnable, 0);
-	Write32(CRT, gRegister->sclTapControl, 0);
-	Write32(CRT, gRegister->modeCenter, 2);
-	// D1MODE_DATA_FORMAT?
-	Write32(CRT, gRegister->sclUpdate, 0);		// Unlock
+	gInfo->dpms_mode = mode;
 }
 
 
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	uint8 crtNumber = 0;
-	uint8 dacNumber = 0;
+	radeon_shared_info &info = *gInfo->shared_info;
 
-	init_registers(crtNumber);
+	// Set mode on each display
+	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+		if (gDisplay[id]->active == false)
+			continue;
 
-	// TODO Populate gCRT with interface connection
-	if (DACSense(0))
-		dacNumber = 0;
-	else if (DACSense(1))
-		dacNumber = 1;
+		uint16 connectorIndex = gDisplay[id]->connectorIndex;
 
-	TMDSSense(0);	// DVI / HDMI
+		// *** encoder prep
+		encoder_output_lock(true);
+		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.objectID,
+			B_DPMS_OFF);
+		encoder_assign_crtc(id);
 
-	CardFBSet(mode);
-	CardModeSet(mode);
-	CardModeScale(mode);
+		// *** CRT controler prep
+		display_crtc_lock(id, ATOM_ENABLE);
+		display_crtc_blank(id, ATOM_BLANKING);
+		if (info.dceMajor >= 3)
+			display_crtc_memreq(id, ATOM_DISABLE);
+		display_crtc_power(id, ATOM_DISABLE);
 
-	PLLSet(dacNumber, mode->timing.pixel_clock);
-		// Set pixel clock
+		// *** CRT controler mode set
+		// TODO: program SS
+		pll_set(ATOM_PPLL1, mode->timing.pixel_clock, id);
+			// TODO: check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
+		display_crtc_set_dtd(id, mode);
 
-	Write32(CRT, D1GRPH_LUT_SEL, 0);
+		display_crtc_fb_set(id, mode);
+		// atombios_overscan_setup
+		display_crtc_scale(id, mode);
 
-	DACSet(dacNumber, crtNumber);
+		// *** encoder mode set
+		encoder_mode_set(id, mode->timing.pixel_clock);
 
-	// TODO : Shutdown unused PLL/DAC
+		// *** CRT controler commit
+		display_crtc_power(id, ATOM_ENABLE);
+		if (info.dceMajor >= 3)
+			display_crtc_memreq(id, ATOM_ENABLE);
+		display_crtc_blank(id, ATOM_BLANKING_OFF);
+		display_crtc_lock(id, ATOM_DISABLE);
 
-	// Power up the output
-	PLLPower(dacNumber, RHD_POWER_ON);
-	DACPower(dacNumber, RHD_POWER_ON);
+		// *** encoder commit
+		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.objectID,
+			B_DPMS_ON);
+		encoder_output_lock(false);
+	}
 
-	// Ensure screen isn't blanked
-	CardBlankSet(crtNumber, false);
-
-	int32 crtstatus = Read32(CRT, D1CRTC_STATUS);
-	TRACE("CRT0 Status: 0x%X\n", crtstatus);
-	crtstatus = Read32(CRT, D2CRTC_STATUS);
-	TRACE("CRT1 Status: 0x%X\n", crtstatus);
+	// for debugging
+	TRACE("D1CRTC_STATUS        Value: 0x%X\n", Read32(CRT, D1CRTC_STATUS));
+	TRACE("D2CRTC_STATUS        Value: 0x%X\n", Read32(CRT, D2CRTC_STATUS));
+	TRACE("D1CRTC_CONTROL       Value: 0x%X\n", Read32(CRT, D1CRTC_CONTROL));
+	TRACE("D2CRTC_CONTROL       Value: 0x%X\n", Read32(CRT, D2CRTC_CONTROL));
+	TRACE("D1GRPH_ENABLE        Value: 0x%X\n",
+		Read32(CRT, AVIVO_D1GRPH_ENABLE));
+	TRACE("D2GRPH_ENABLE        Value: 0x%X\n",
+		Read32(CRT, AVIVO_D2GRPH_ENABLE));
+	TRACE("D1SCL_ENABLE         Value: 0x%X\n",
+		Read32(CRT, AVIVO_D1SCL_SCALER_ENABLE));
+	TRACE("D2SCL_ENABLE         Value: 0x%X\n",
+		Read32(CRT, AVIVO_D2SCL_SCALER_ENABLE));
+	TRACE("D1CRTC_BLANK_CONTROL Value: 0x%X\n",
+		Read32(CRT, AVIVO_D1CRTC_BLANK_CONTROL));
+	TRACE("D2CRTC_BLANK_CONTROL Value: 0x%X\n",
+		Read32(CRT, AVIVO_D1CRTC_BLANK_CONTROL));
 
 	return B_OK;
 }
@@ -380,7 +246,7 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 	TRACE("%s\n", __func__);
 
 	config->frame_buffer = gInfo->shared_info->frame_buffer;
-	config->frame_buffer_dma = (uint8 *)gInfo->shared_info->frame_buffer_phys;
+	config->frame_buffer_dma = (uint8*)gInfo->shared_info->frame_buffer_phys;
 
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
@@ -399,16 +265,16 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 			*(uint32)mode->timing.v_total;
 		uint32 low = (totalClocks * 48L) / 1000L;
 
-		if (low < gInfo->shared_info->pll_info.min_frequency)
-			low = gInfo->shared_info->pll_info.min_frequency;
-		else if (low > gInfo->shared_info->pll_info.max_frequency)
+		if (low < PLL_MIN_DEFAULT)
+			low = PLL_MIN_DEFAULT;
+		else if (low > PLL_MAX_DEFAULT)
 			return B_ERROR;
 
 		*_low = low;
 	}
 
 	if (_high != NULL)
-		*_high = gInfo->shared_info->pll_info.max_frequency;
+		*_high = PLL_MAX_DEFAULT;
 
 	//*_low = 48L;
 	//*_high = 100 * 1000000L;
@@ -419,49 +285,46 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 bool
 is_mode_supported(display_mode *mode)
 {
-	TRACE("MODE: %d ; %d %d %d %d ; %d %d %d %d\n",
+	bool sane = true;
+
+	// Validate modeline is within a sane range
+	if (is_mode_sane(mode) != B_OK)
+		sane = false;
+
+	// TODO: is_mode_supported on *which* display?
+	uint32 crtid = 0;
+
+	// if we have edid info, check frequency adginst crt reported valid ranges
+	if (gInfo->shared_info->has_edid
+		&& gDisplay[crtid]->found_ranges) {
+
+		// validate horizontal frequency range
+		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
+		if (hfreq > gDisplay[crtid]->hfreq_max + 1
+			|| hfreq < gDisplay[crtid]->hfreq_min - 1) {
+			//TRACE("!!! mode below falls outside of hfreq range!\n");
+			sane = false;
+		}
+
+		// validate vertical frequency range
+		uint32 vfreq = mode->timing.pixel_clock / ((mode->timing.v_total
+			* mode->timing.h_total) / 1000);
+		if (vfreq > gDisplay[crtid]->vfreq_max + 1
+			|| vfreq < gDisplay[crtid]->vfreq_min - 1) {
+			//TRACE("!!! mode below falls outside of vfreq range!\n");
+			sane = false;
+		}
+	}
+
+	TRACE("MODE: %d ; %d %d %d %d ; %d %d %d %d is %s\n",
 		mode->timing.pixel_clock, mode->timing.h_display,
 		mode->timing.h_sync_start, mode->timing.h_sync_end,
 		mode->timing.h_total, mode->timing.v_display,
 		mode->timing.v_sync_start, mode->timing.v_sync_end,
-		mode->timing.v_total);
+		mode->timing.v_total,
+		sane ? "OK." : "BAD, out of range!");
 
-	// Validate modeline is within a sane range
-	if (is_mode_sane(mode) != B_OK)
-		return false;
-
-	uint32 crtid = 0;
-
-	// if we have edid info, check frequency adginst crt reported valid ranges
-	if (gInfo->shared_info->has_edid) {
-
-		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
-		if (hfreq > gCRT[crtid]->hfreq_max + 1
-			|| hfreq < gCRT[crtid]->hfreq_min - 1) {
-			TRACE("!!! hfreq : %d , hfreq_min : %d, hfreq_max : %d\n",
-				hfreq, gCRT[crtid]->hfreq_min, gCRT[crtid]->hfreq_max);
-			TRACE("!!! %dx%d falls outside of CRT %d's valid "
-				"horizontal range.\n", mode->timing.h_display,
-				mode->timing.v_display, crtid);
-			return false;
-		}
-
-		uint32 vfreq = mode->timing.pixel_clock / ((mode->timing.v_total
-			* mode->timing.h_total) / 1000);
-
-		if (vfreq > gCRT[crtid]->vfreq_max + 1
-			|| vfreq < gCRT[crtid]->vfreq_min - 1) {
-			TRACE("!!! vfreq : %d , vfreq_min : %d, vfreq_max : %d\n",
-				vfreq, gCRT[crtid]->vfreq_min, gCRT[crtid]->vfreq_max);
-			TRACE("!!! %dx%d falls outside of CRT %d's valid vertical range\n",
-				mode->timing.h_display, mode->timing.v_display, crtid);
-			return false;
-		}
-		TRACE("%dx%d is within CRT %d's valid frequency range\n",
-			mode->timing.h_display, mode->timing.v_display, crtid);
-	}
-
-	return true;
+	return sane;
 }
 
 
@@ -518,33 +381,3 @@ is_mode_sane(display_mode *mode)
 }
 
 
-// TODO : Move to a new "monitors.c" file
-status_t
-detect_crt_ranges()
-{
-	edid1_info *edid = &gInfo->shared_info->edid_info;
-
-	int crtid = 0;
-		// edid indexes are not in order
-
-	for (uint32 index = 0; index < MAX_CRT; index++) {
-
-		edid1_detailed_monitor *monitor
-				= &edid->detailed_monitor[index];
-
-		if (monitor->monitor_desc_type
-			== EDID1_MONITOR_RANGES) {
-			edid1_monitor_range range = monitor->data.monitor_range;
-			gCRT[crtid]->vfreq_min = range.min_v;	/* in Hz */
-			gCRT[crtid]->vfreq_max = range.max_v;
-			gCRT[crtid]->hfreq_min = range.min_h;	/* in kHz */
-			gCRT[crtid]->hfreq_max = range.max_h;
-			TRACE("CRT %d : v_min %d : v_max %d : h_min %d : h_max %d\n",
-				crtid, gCRT[crtid]->vfreq_min, gCRT[crtid]->vfreq_max,
-				gCRT[crtid]->hfreq_min, gCRT[crtid]->hfreq_max);
-			crtid++;
-		}
-
-	}
-	return B_OK;
-}

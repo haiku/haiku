@@ -440,30 +440,6 @@ case "${platform}" in
 			exit 1 ;;
 esac
 
-# check yasm version
-if [ $targetArch = "x86" ]; then
-	$HAIKU_YASM --version > /dev/null || {
-		echo "The yasm assembler version 0.7.0 or later must be installed."
-		echo "Download from: http://www.tortall.net/projects/yasm/wiki/Download"
-		exit 1
-	}
-
-	set -- $($HAIKU_YASM --version | head -n 1)
-	versionOK=0
-	case $2 in
-		0.[0-6].*)		;;
-		*)				versionOK=1 ;;
-	esac
-versionOK=1
-
-	if [ $versionOK = 0 ]; then
-		echo "The yasm assembler version 0.7.0 or later must be installed."
-		echo "The installed version is $2."
-		echo "Download from: http://www.tortall.net/projects/yasm/wiki/Download"
-		exit 1
-	fi
-fi
-
 # check common locations for sfdisk
 for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do
 	if [ -e ${sfdiskDir}/${SFDISK_BINARY} ]; then

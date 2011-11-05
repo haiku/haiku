@@ -7,20 +7,20 @@ StringReplaceTest::StringReplaceTest(std::string name) :
 {
 }
 
- 
+
 
 StringReplaceTest::~StringReplaceTest()
 {
 }
 
 
-void 
+void
 StringReplaceTest::PerformTest(void)
 {
 	BString *str1;
 	const int32 sz = 1024*50;
 	char* buf;
-	
+
 	//&ReplaceFirst(char, char);
 	NextSubTest();
 	str1 = new BString("test string");
@@ -62,6 +62,12 @@ StringReplaceTest::PerformTest(void)
 
 	NextSubTest();
 	str1 = new BString("test string");
+	str1->ReplaceAll('t', 't');
+	CPPUNIT_ASSERT(strcmp(str1->String(), "test string") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("test string");
 	str1->ReplaceAll('t', 'i', 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "tesi siring") == 0);
 	delete str1;
@@ -71,6 +77,12 @@ StringReplaceTest::PerformTest(void)
 	str1 = new BString("she sells sea shells on the sea shore");
 	str1->Replace('s', 't', 4, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "she tellt tea thells on the sea shore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the sea shore");
+	str1->Replace('s', 's', 4, 2);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "she sells sea shells on the sea shore") == 0);
 	delete str1;
 
 	NextSubTest();
@@ -113,8 +125,13 @@ StringReplaceTest::PerformTest(void)
 	NextSubTest();
 	str1 = new BString("abc abc abc");
 	str1->ReplaceAll("ab", "abc");
-	CPPUNIT_ASSERT(strcmp(str1->String(),
-		"abcc abcc abcc") == 0);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "abcc abcc abcc") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("abc abc abc");
+	str1->ReplaceAll("abc", "abc");
+	CPPUNIT_ASSERT(strcmp(str1->String(), "abc abc abc") == 0);
 	delete str1;
 
 	NextSubTest();
@@ -130,7 +147,14 @@ StringReplaceTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(),
 		"she sells sea shells on the theshore") == 0);
 	delete str1;
-	
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->IReplaceAll("sea", "sea", 11);
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the seashore") == 0);
+	delete str1;
+
 	//&IReplaceFirst(char, char);
 	NextSubTest();
 	str1 = new BString("test string");
@@ -165,6 +189,12 @@ StringReplaceTest::PerformTest(void)
 	delete str1;
 
 	NextSubTest();
+	str1 = new BString("TEST string");
+	str1->IReplaceAll('t', 'T');
+	CPPUNIT_ASSERT(strcmp(str1->String(), "TEST sTring") == 0);
+	delete str1;
+
+	NextSubTest();
 	str1 = new BString("test string");
 	str1->IReplaceAll('x', 'b');
 	CPPUNIT_ASSERT(strcmp(str1->String(), "test string") == 0);
@@ -181,6 +211,12 @@ StringReplaceTest::PerformTest(void)
 	str1 = new BString("She sells Sea shells on the sea shore");
 	str1->IReplace('s', 't', 4, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "She tellt tea thells on the sea shore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("She sells Sea shells on the sea shore");
+	str1->IReplace('s', 's', 4, 2);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "She sells sea shells on the sea shore") == 0);
 	delete str1;
 
 	NextSubTest();
@@ -205,7 +241,7 @@ StringReplaceTest::PerformTest(void)
 	delete str1;
 
 	//&IReplaceLast(const char*, const char*)
-#ifndef TEST_R5	
+#ifndef TEST_R5
 	NextSubTest();
 	str1 = new BString("she sells sea shells on the SEashore");
 	str1->IReplaceLast("sea", "the");
@@ -241,20 +277,26 @@ StringReplaceTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(),
 		"she sells SeA shells on the theshore") == 0);
 	delete str1;
-	
+
 	//ReplaceSet(const char*, char)
 	NextSubTest();
 	str1 = new BString("abc abc abc");
 	str1->ReplaceSet("ab", 'x');
 	CPPUNIT_ASSERT(strcmp(str1->String(), "xxc xxc xxc") == 0);
 	delete str1;
-	
+
 	NextSubTest();
 	str1 = new BString("abcabcabcbababc");
 	str1->ReplaceSet("abc", 'c');
 	CPPUNIT_ASSERT(strcmp(str1->String(), "ccccccccccccccc") == 0);
 	delete str1;
-	
+
+	NextSubTest();
+	str1 = new BString("abcabcabcbababc");
+	str1->ReplaceSet("c", 'c');
+	CPPUNIT_ASSERT(strcmp(str1->String(), "abcabcabcbababc") == 0);
+	delete str1;
+
 #ifndef TEST_R5
 	//ReplaceSet(const char*, const char*)
 	NextSubTest();
@@ -282,7 +324,7 @@ StringReplaceTest::PerformTest(void)
 	delete str1;
 #endif
 
-	// we repeat some test, but this time with a bit of data 
+	// we repeat some test, but this time with a bit of data
 	// to test the performance:
 
 	// ReplaceSet(const char*, const char*)
@@ -336,9 +378,9 @@ StringReplaceTest::PerformTest(void)
 
 
 CppUnit::Test *StringReplaceTest::suite(void)
-{	
+{
 	typedef CppUnit::TestCaller<StringReplaceTest>
 		StringReplaceTestCaller;
-		
+
 	return(new StringReplaceTestCaller("BString::Replace Test", &StringReplaceTest::PerformTest));
 }

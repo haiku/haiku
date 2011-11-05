@@ -1,12 +1,19 @@
-1	ukrainian	x-vnd.Be-TSKB	900486640
+1	ukrainian	x-vnd.Be-TSKB	4265681964
 <Be folder is empty>	BeMenu		<Папка Ве пуста>
+About this system	BeMenu		Про систему
 Always on top	PreferencesWindow		Завжди зверху
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Додатки
 Applications	PreferencesWindow		Додатки
+Auto-hide	PreferencesWindow		Автозникнення
 Auto-raise	PreferencesWindow		Автоспливання
 Change time…	TimeView		Змінити час…
 Clock	PreferencesWindow		Годинник
 Close all	WindowMenu		Закрити все
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
+Deskbar	System name		Deskbar
+Deskbar preferences	PreferencesWindow		Налаштування Deskbar
 Deskbar preferences…	BeMenu		Налаштування Deskbar…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Аплети екрану
 Edit menu…	PreferencesWindow		Редагувати меню…
 Expand new applications	PreferencesWindow		Розпакувати нові додатки
 Find…	BeMenu		Знайти…
@@ -16,6 +23,7 @@ Menu	PreferencesWindow		Меню
 Mount	BeMenu		Змонтувати
 No windows	WindowMenu		Немає вікон
 Power off	BeMenu		Вимкнути
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
 Quit application	WindowMenu		Вийти з додатку
 Recent applications	BeMenu		Недавні додатки
 Recent applications:	PreferencesWindow		Недавні додатки:

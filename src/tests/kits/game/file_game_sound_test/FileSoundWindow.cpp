@@ -4,16 +4,21 @@
 	@version 1.0
  */
 
+
 #include "FileSoundWindow.h"
+
+#include <Alert.h>
 #include <Application.h>
 #include <Box.h>
-#include <TextControl.h>
 #include <Button.h>
 #include <CheckBox.h>
-#include <Alert.h>
+#include <Entry.h>
 #include <Path.h>
+#include <TextControl.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+
 
 FileSoundWindow::FileSoundWindow(BRect windowBounds)
 					:BWindow(windowBounds,"BFileGameSound test",B_TITLED_WINDOW,B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
@@ -195,7 +200,7 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 			if (pausedValue != BFileGameSound::B_PAUSE_IN_PROGRESS)
 			{
 				status_t error;
-				char *label;
+				const char *label;
 				if (paused)
 				{
 					paused = false;

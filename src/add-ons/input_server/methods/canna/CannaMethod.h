@@ -1,6 +1,6 @@
 //
-// CannaIM - Canna-based Input Method Add-on for BeOS R4 
-// 
+// CannaIM - Canna-based Input Method Add-on for BeOS R4
+//
 
 #ifndef _CANNAMETHOD_H
 #define _CANNAMETHOD_H

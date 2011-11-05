@@ -1,154 +1,550 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de.
+ *		John Scipione, jscipione@gmail.com
+ *		Oliver Tappe, zooey@hirschkaefer.de.
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/locale/Locale.h	 rev 43095
+ *		/trunk/src/kits/locale/Locale.cpp	 rev 43095
+ */
+
+
 /*!
-\class BLocale
-\ingroup locale
-\brief Class for representing a locale and its settings.
-
-A locale is defined by the combination of a country and a language. Using these
-two informations, it is possible to determine the format to use for date, time,
-and number formatting. The BLocale class also provide collators, which allows
-you to sort a list of strings properly depending on a set of rules about
-accented chars and other special cases that vary over the different locales.
-
-BLocale is also the class to use when you want to perform formatting or parsing
-of dates, times, and numbers, in the natural language of the user.
-
+	\file Locale.h
+	\brief Provides the BLocale class.
 */
 
-/*!
-\fn const BCollator* BLocale::Collator() const
-\brief Returns the collator associated to this locale.
 
-Returns the collator in use for this locale, allowing you to use it to sort a
-set of strings.
+/*!	\class BLocale
+	\ingroup locale
+	\brief Class for representing a locale and its settings.
 
+	A locale is defined by the combination of a country and a language.
+	Using these two informations, it is possible to determine the format
+	to use for date, time, and number formatting. The BLocale class also
+	provide collators, which allows you to sort a list of strings properly
+	depending on a set of rules about accented chars and other special
+	cases that vary over the different locales.
+
+	BLocale is also the class to use when you want to perform formatting
+	or parsing of dates, times, and numbers, in the natural language of
+	the user.
 */
 
+
 /*!
-\fn const BCountry* BLocale::Country() const
-\brief Returns the country associated to this locale.
-
-A locale is defined by the combination of a country and a language. This
-method gets the country part of this information, so you can access the
-data that is not language-dependant (such as the country flag).
-
+	\fn BLocale::BLocale(const BLanguage* language,
+		const BFormattingConventions* conventions)
+	\brief Initializes a BLocale object corresponding to the passed in
+		\a language and \a conventions.
 */
 
-/*!
-\fn const BLanguage* BLocale::Language() const
-\brief Returns the language associated to this locale.
 
+/*!
+	\fn BLocale::BLocale(const BLocale& other)
+	\brief Initializes a BLocale object.
 */
 
-/*!
-\fn const char* BLocale::Code() const
-\brief Returns the locale code.
 
-This function returns the locale name (such as en_US for united states english).
+/*!
+	status_t BLocale::GetCollator(BCollator* collator) const
+	\brief Gets the collator associated to this locale.
+
+	Returns the collator in use for this locale, allowing you to use it
+	to sort a set of strings.
 */
 
-/*!
-\fn bool BLocale::GetName(BString& name) const
-\brief Get the name of the locale.
 
-This function fills the name string with the localized name of this locale.
-For example, if the locale us en_US and the user language is french, this function will return "anglais (Etats-Unis)".
+/*!
+	\fn BLocale& BLocale::operator=(const BLocale& other)
 */
 
+
 /*!
-\fn void BLocale::SetCountry(const BCountry& newCountry)
-\brief Set the country for this locale.
+	\fn BLocale::~BLocale()
+	\brief Destructor method.
 */
 
+
 /*!
-\fn void BLocale::SetCollator(const BCollator& newCollator)
-\brief Set the collator for this locale.
+	\fn status_t BLocale::GetCollator(BCollator* collator) const
+	\brief Sets \a collator object to the default collator for the BLocale.
+
+	\param collator A pointer to a BCollator object to fill out.
+
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE \c NULL \a collator object passed in.
+	\retval B_ERROR Unable to lock the BLocale. 
 */
 
+
 /*!
-\fn void BLocale::SetLanguage(const char* languageCode)
-\brief Set the language for this locale.
+	\fn status_t BLocale::GetLanguage(BLanguage* language) const
+	\brief Sets \a language object to the default language for the BLocale.
+
+	\param language A pointer to a BLanguage object to fill out.
+
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE \c NULL \a language object passed in.
+	\retval B_ERROR Unable to lock the BLocale. 
 */
 
+
 /*!
-\fn status_t BLocale::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
-\brief Format a date.
+	\fn status_t BLocale::GetFormattingConventions(
+		BFormattingConventions* conventions) const
+	\brief Sets \a conventions object to the default formatting conventions
+		for the BLocale.
 
-Fills in the string with a formatted date. The longFormat parameter allows you
-to select the short or the full format.
+	\param conventions A pointer to a BFormattingConventions object to fill out.
 
-\param string The string buffer to fill with the formated date.
-\param maxSize The size of the buffer.
-\param time The time (in seconds since epoch) to format
-\param longFormat If true, uses the long format (with day name, full month name). If false, use the short format, 08/12/2010 or similar.
+	\returns A status code.
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE \c NULL \a conventions object passed in.
+	\retval B_ERROR Unable to lock the BLocale.
 */
 
+
 /*!
-\fn status_t BLocale::FormatDate(BString* string, time_t time, bool longFormat)
-\brief Formats a date to a BString.
+	\fn const char* BLocale::GetString(uint32 id) const
+	\brief Gets the language string for the locale.
+
+	\param id The locale \a id to get the language of.
+
+	\internal Assumes a certain order of the string bases.
+
+	\returns a blank string in the case of an error or the string "UTF-8"
+		if there is \a id is set to \a B_CODESET.
 */
 
+
 /*!
-\fn status_t BLocale::FormatDate(BString* string, int*& fieldPositions, int& fieldCount, time_t time, bool longFormat)
-\brief Format a date and get information about the different fields.
+	\fn void BLocale::SetFormattingConventions(
+		const BFormattingConventions& conventions)
+	\brief Sets the formatting convention for this locale.
 
-This works the same way as the other FormatDatz methods, but also gives you the
-offset of the beginning of each field in the date. This is useful if you need to
-split the date in different parts for an user-modifiable area (see the Time
-preflet for an example).
+	If unable to lock the BLocale \a conventions is left untouched.
 
-To identify the content of each field, you can use GetDateFields.
-
-This function allocates the fieldPositions arrays, you have to free it when you
-are finished with it.
-
-\sa GetDateFields
+	\param conventions The formatting convention to set.
 */
 
+
 /*!
-\fn status_t BLocale::GetDateFields(BDateElement*& fields, int& fieldCount, bool longFormat) const
-\brief Get the type of each field in this date format
+	\fn void BLocale::SetCollator(const BCollator& newCollator)
+	\brief Set the collator for this locale.
 
-This function is most often used in combination with FormatDate. FormatDate
-gives you the offset of each field in a formated string, anf GetDateFields gives
-you the type of the field at a given offset. With these informations, you can
-handle the formatted date string as a list of fields that you can split and
-alter at will.
+	If unable to lock the BLocale \a newCollator is left untouched.
 
+	\param newCollator The collator to set.
 */
 
-/*!
-\fn status_t BLocale::GetDateFormat(BString& format, bool longFormat) const
-\brief Get the date format string
 
-This function returns the string used internally to represent a date format.
+/*!
+	\fn void BLocale::SetLanguage(const BLanguage& newLanguage)
+	\brief Set the language for this locale.
+
+	If unable to lock the BLocale \a newLanguage is left untouched.
+
+	\param newLanguage The code of the language to set to locale to.
 */
 
-/*!
-\fn status_t BLocale::SetDateFormat(const char* formatString, bool longFormat)
-\brief Set the date format for this locale
 
-Thisfunction allows you to define your own date format for specific purposes.
+/*!
+	\fn ssize_t BLocale::FormatDate(char* string, size_t maxSize, time_t time,
+		BDateFormatStyle style) const
+	\brief Fills in \a string with a formatted date up to \a maxSize bytes for
+		the given \a time and \a style for the locale.
+
+	\param string The string buffer to fill with the formatted date.
+	\param maxSize The size of the buffer.
+	\param time The time (in seconds since epoch) to format
+	\param style Specify the long format (with day name, full
+		month name) or the short format, 08/12/2010 or similar.
+
+	\returns The number of bytes written during the date formatting.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+
+	\sa BLocale::FormatDateTime(char* target, size_t maxSize,
+		time_t time, BDateFormatStyle dateStyle,
+		BTimeFormatStyle timeStyle) const
+	\sa BLocale::FormatTime(char* string, size_t maxSize, time_t time,
+		BTimeFormatStyle style) const
 */
 
-/*!
-\fn int BLocale::StartOfWeek() const
-\brief Returns the day used as start of week in this locale.
 
+/*!
+	\fn status_t BLocale::FormatDate(BString *string, time_t time,
+		BDateFormatStyle style, const BTimeZone* timeZone) const
+	\brief Fills in \a string with a formatted date for the given
+		\a time, \a style, and \a timeZone for the locale.
+
+	\param string The string buffer to fill with the formatted date.
+	\param time The time (in seconds since epoch) to format
+	\param style Specify the long format (with day name, full
+		month name) or the short format, 08/12/2010 or similar.
+	\param timeZone The time zone.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+
+	\sa BLocale::FormatDateTime(BString* target, time_t time,
+		BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
+		const BTimeZone* timeZone) const
+	\sa status_t BLocale::FormatTime(BString* string, time_t time,
+		BTimeFormatStyle style, const BTimeZone* timeZone) const
 */
 
+
 /*!
-\fn int BLocale::StringCompare(const char* s1, const char* s2) const
-\fn int BLocale::StringCompare(const BString* s1, const BString* s2) const
-\brief Compares two strings using the locale's collator
+	\fn status_t BLocale::FormatDate(BString* string, int*& fieldPositions,
+		int& fieldCount, time_t time, BDateFormatStyle style) const
+	\brief Fills in \a string with a formatted date for the given
+		\a time and \a style for the locale.
 
-These methods are short-hands to Collator()->StringCompare.
+	\param string The string buffer to fill with the formatted date.
+	\param fieldPositions ???
+	\param fieldCount The number of fields.
+	\param time The time (in seconds since epoch) to format
+	\param style Specify the long format (with day name, full
+		month name) or the short format, 08/12/2010 or similar.
 
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred while performing the date formatting.
+
+	\sa BLocale::FormatTime(BString* string, int*& fieldPositions,
+		int& fieldCount, time_t time, BTimeFormatStyle style) const
 */
 
+
 /*!
-\fn void BLocale::GetSortKey(const char* string, BString* key) const
-\brief Computes the sort key of a string
+	\fn status_t BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
+		BDateFormatStyle style) const
+	\brief Get the type of each field in the date format of the locale.
 
-This method is a short-hand to Collator()->GetSortKey.
+	This method is most often used in combination with FormatDate().
+	FormatDate() gives you the offset of each field in a formatted string,
+	and GetDateFields() gives you the type of the field at a given offset.
+	With these informations, you can handle the formatted date string as
+	a list of fields that you can split and alter at will.
 
+	\param fields Pointer to the fields object.
+	\param fieldCount The number of fields.
+	\param style Specify the long format (with day name, full
+		month name) or the short format, 08/12/2010 or similar.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred while getting the date fields.
+
+	\sa BLocale::GetTimeFields(BDateElement*& fields, int& fieldCount,
+		BTimeFormatStyle style) const
+*/
+
+
+/*!
+	\fn status_t BLocale::GetStartOfWeek(BWeekday* startOfWeek) const
+	\brief Returns the day used as the start of week in this locale.
+
+	Possible values for \a startOfWeek include:
+		- \c B_WEEKDAY_SUNDAY
+		- \c B_WEEKDAY_MONDAY
+		- \c B_WEEKDAY_TUESDAY
+		- \c B_WEEKDAY_WEDNESDAY
+		- \c B_WEEKDAY_THURSDAY
+		- \c B_WEEKDAY_FRIDAY
+		- \c B_WEEKDAY_SATURDAY
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a startOfWeek is \c NULL.
+	\retval B_ERROR Unable to lock the BLocale or another error occurred.
+*/
+
+
+/*!
+	\fn ssize_t BLocale::FormatDateTime(char* target, size_t maxSize,
+		time_t time, BDateFormatStyle dateStyle,
+		BTimeFormatStyle timeStyle) const
+	\brief Fills in \a string with a formatted datetime up to \a maxSize bytes
+		for the given \a time and \a style for the locale.
+
+	\param target The string buffer to fill with the formatted datetime.
+	\param maxSize The size of the buffer.
+	\param time The time (in seconds since epoch) to format
+	\param dateStyle Specify the long format or the short format of the date.
+	\param timeStyle Specify the long format or the short format of the time.
+
+	\returns The number of bytes written during the datetime formatting.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+
+	\sa BLocale::FormatDate(char* string, size_t maxSize, time_t time,
+		BDateFormatStyle style) const
+	\sa BLocale::FormatTime(char* string, size_t maxSize, time_t time,
+		BTimeFormatStyle style) const
+*/
+
+
+/*!
+	\fn status_t BLocale::FormatDateTime(BString* target, time_t time,
+		BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
+		const BTimeZone* timeZone) const
+	\brief Fills in \a string with a formatted datetime for the given
+		\a time, \a timeStyle, and \a timeZone for the locale.
+
+	\param target The string buffer to fill with the formatted date.
+	\param time The time (in seconds since epoch) to format
+	\param dateStyle Specify the long format or the short format of the date.
+	\param timeStyle Specify the long format or the short format of the time.
+	\param timeZone The time zone.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+
+	\sa BLocale::FormatDate(BString *string, time_t time,
+		BDateFormatStyle style, const BTimeZone* timeZone) const
+	\sa status_t BLocale::FormatTime(BString* string, time_t time,
+		BTimeFormatStyle style, const BTimeZone* timeZone) const
+*/
+
+
+/*!
+	\fn ssize_t BLocale::FormatTime(char* string, size_t maxSize, time_t time,
+		BTimeFormatStyle style) const
+	\brief Fills in \a string with a formatted date up to \a maxSize bytes for
+		the given \a time and \a style for the locale.
+
+	\param string The string buffer to fill with the formatted time.
+	\param maxSize The size of the buffer.
+	\param time The time (in seconds since epoch) to format
+	\param style Specify the long format or the short format.
+
+	\returns The number of bytes written during the time formatting.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+
+	\sa BLocale::FormatDate(char* string, size_t maxSize, time_t time,
+		BDateFormatStyle style) const
+	\sa BLocale::FormatDateTime(char* target, size_t maxSize,
+		time_t time, BDateFormatStyle dateStyle,
+		BTimeFormatStyle timeStyle) const
+*/
+
+
+/*!
+	\fn status_t BLocale::FormatTime(BString* string, time_t time,
+		BTimeFormatStyle style, const BTimeZone* timeZone) const
+	\brief Fills in \a string with a formatted time for the given
+		\a time, \a style, and \a timeZone for the locale.
+
+	\param string The string buffer to fill with the formatted date.
+	\param time The time (in seconds since epoch) to format
+	\param style Specify the long format or the short format.
+	\param timeZone The time zone.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+
+	\sa BLocale::FormatDate(BString *string, time_t time,
+		BDateFormatStyle style, const BTimeZone* timeZone) const
+	\sa BLocale::FormatDateTime(BString* target, time_t time,
+		BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
+		const BTimeZone* timeZone) const
+*/
+
+
+/*!
+	\fn status_t BLocale::FormatTime(BString* string, int*& fieldPositions,
+		int& fieldCount, time_t time, BTimeFormatStyle style) const
+	\brief Fills in \a string with a formatted time for the given
+		\a time and \a style for the locale.
+
+	\param string The string buffer to fill with the formatted time.
+	\param fieldPositions ???
+	\param fieldCount ???
+	\param time The time (in seconds since epoch) to format.
+	\param style Specify the long format or the short format.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred during time formatting.
+
+	\sa BLocale::FormatDate(BString* string, int*& fieldPositions,
+		int& fieldCount, time_t time, BDateFormatStyle style) const
+*/
+
+
+/*!
+	\fn status_t BLocale::GetTimeFields(BDateElement*& fields, int& fieldCount,
+		BTimeFormatStyle style) const
+	\brief Get the type of each field in the time format of the locale.
+
+	This method is used most often in combination with FormatTime().
+	FormatTime() gives you the offset of each field in a formatted string,
+	and GetTimeFields() gives you the type of the field at a given offset.
+	With this information you can handle the formatted date string as
+	a list of fields that you can split and alter at will.
+
+	\param fields Pointer to the fields object.
+	\param fieldCount The number of fields.
+	\param style Specify the long format or the short format.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred while getting the time fields.
+
+	\sa BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
+		BDateFormatStyle style) const
+*/
+
+
+/*!
+	\fn ssize_t BLocale::FormatNumber(char* string, size_t maxSize,
+		double value) const
+	\brief Format the \c double \a value as a string and put the result
+		into \a string up to \a maxSize bytes in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param maxSize The maximum of bytes to copy into \a string.
+	\param value The number that you want to get a formatted version of.
+
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BLocale::FormatNumber(char* string, size_t maxSize,
+		int32 value) const
+	\sa ssize_t BLocale::FormatMonetary(char* string, size_t maxSize,
+		double value) const
+*/
+
+
+/*!
+	\fn status_t BLocale::FormatNumber(BString* string, double value) const
+	\brief \brief Format the \c double \a value as a string and put the
+		result into \a string in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param value The number that you want to get a formatted version of.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BLocale::FormatNumber(BString* string, int32 value) const
+	\sa BLocale::FormatMonetary(BString* string, double value) const
+*/
+
+
+/*!
+	\fn ssize_t BLocale::FormatNumber(char* string, size_t maxSize,
+		int32 value) const
+	\brief Format the \c int32 \a value as a string and put the result
+		into \a string up to \a maxSize bytes in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param maxSize The maximum of bytes to copy into \a string.
+	\param value The number that you want to get a formatted version of.
+
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat 
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BLocale::FormatNumber(char* string, size_t maxSize,
+		double value) const
+	\sa BLocale::FormatMonetary(char* string, size_t maxSize,
+		double value) const
+*/
+
+
+/*!
+	\fn status_t BLocale::FormatNumber(BString* string, int32 value) const
+	\brief \brief Format the \c int32 \a value as a string and put the result
+		into \a string in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param value The number that you want to get a formatted version of.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BLocale::FormatNumber(BString* string, double value) const
+	\sa BLocale::FormatMonetary(BString* string, double value) const
+*/
+
+
+/*!
+	\fn ssize_t BLocale::FormatMonetary(char* string, size_t maxSize,
+		double value) const
+	\brief Format the \c double \a value as a monetary string and put the
+		result into \a string up to \a maxSize bytes in the current locale.
+
+	\param string The \a string to put the monetary formatted number into.
+	\param maxSize The maximum of bytes to copy into \a string.
+	\param value The number to format as a monetary \a value.
+
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BLocale::FormatNumber(char* string, size_t maxSize, double value) const
+	\sa BLocale::FormatNumber(char* string, size_t maxSize, int32 value) const
+*/
+
+
+/*!
+	\fn status_t BLocale::FormatMonetary(BString* string, double value) const
+	\brief \brief Format the \c double \a value as a monetary string and put
+		the result into \a string in the current locale.
+
+	\param string The \a string to put the monetary formatted number into.
+	\param value The number to format as a monetary \a value.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BLocale::FormatNumber(BString* string, double value) const
+	\sa BLocale::FormatNumber(BString* string, int32 value) const
 */

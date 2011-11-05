@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	1943893993
+1	swedish	x-vnd.Haiku-Devices	865240481
 ACPI Information	DeviceACPI		ACPI-information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor-namnrymd '%2'
 ACPI System Bus	DeviceACPI		ACPI systembuss
@@ -8,35 +8,47 @@ ACPI bus	Device		ACPI-buss
 ACPI bus	DevicesView		ACPI-buss
 ACPI controller	Device		ACPI-kontroller
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
+Array	DeviceSCSI		Matris
 Basic information	DevicesView		Grundläggande information
 Bridge	Device		Brygga
+Bridge	DeviceSCSI		Brygga
 Bus	DevicesView		Buss
 Bus Information	Device		Bussinformation
+CD-ROM	DeviceSCSI		CD-ROM
+Card Reader	DeviceSCSI		Kortläsare
 Category	DevicesView		Kategori
+Changer	DeviceSCSI		Växlare
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klassinformation:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klassinformation:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Klassinformation
 Communication controller	Device		Kommunikationskontroller
+Communications	DeviceSCSI		Kommunikations
 Computer	Device		Dator
 Computer	DevicesView		Dator
 Connection	DevicesView		Anslutning
 Detailed	DevicesView		Detaljerat
 Device	Device		Enhet
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnamn\t\t\t\t: %Name%\nTillverkare\t\t\t: %Manufacturer%\nDrivrutin\t\t\t\t: %DriverUsed%\nEnhetssökväg\t: %DevicePaths%
+Device class	DeviceSCSI		Enhetsklass
 Device name	Device		Enhetsnamn
 Device name	DeviceACPI		Enhetsnamn
 Device name	DevicePCI		Enhetsnamn
+Device name	DeviceSCSI		Enhetsnamn
 Device name:	Device		Enhetsnamn:
 Device paths	Device		Enhetssökväg
 Device paths	DevicePCI		Enhetssökväg
 Devices	DevicesView		Enheter
 Devices	System name		Enheter
+Disk Drive	DeviceSCSI		Diskenhet
 Display controller	Device		Skärmkontroller
 Docking station	Device		Dockningsstation
 Driver used	Device		Drivrutin använd
 Driver used	DevicePCI		Använd drivrutin
+Enclosure	DeviceSCSI		Hölje
 Encryption controller	Device		Krypteringskontroller
 Generate system information	DevicesView		Generera systeminformation
 Generic system peripheral	Device		Allmänt systemtillbehör
+Graphics Peripheral	DeviceSCSI		Grafisk kringutrustning
 ISA bus	Device		ISA-buss
 ISA bus	DevicesView		ISA-buss
 Input device controller	Device		Indataenhetskontroller
@@ -44,6 +56,7 @@ Intelligent controller	Device		Intelligent kontroller
 Manufacturer	Device		Tillverkare
 Manufacturer	DeviceACPI		Tillverkare
 Manufacturer	DevicePCI		Tillverkare
+Manufacturer	DeviceSCSI		Tillverkare
 Manufacturer:	Device		Tillverkare:
 Mass storage controller	Device		Lagringskontroller
 Memory controller	Device		Minneskontroller
@@ -53,21 +66,30 @@ Network controller	Device		Nätverkskontroller
 None	Device		Ingen
 Not implemented	DeviceACPI		Inte implementerat
 Not implemented	DevicePCI		Inte implementerat
+Optical Drive	DeviceSCSI		Optisk enhet
 Order by:	DevicesView		Sortera efter:
+Other	DeviceSCSI		Annan
 PCI Information	DevicePCI		PCI-information
 PCI bus	Device		PCI-buss
 PCI bus	DevicesView		PCI-buss
+Printer	DeviceSCSI		Skrivare
 Processor	Device		Processor
+Processor	DeviceSCSI		Processor
 Quit	DevicesView		Avsluta
+RBC	DeviceSCSI		RBC
 Refresh devices	DevicesView		Uppdatera enhetsvy
 Report compatibility	DevicesView		Rapportera kompatibilitet
+SCSI Information	DeviceSCSI		SCSI information
 Satellite communications controller	Device		Satelitkommunikationskontroller
+Scanner	DeviceSCSI		Skanner
 Serial bus controller	Device		Seriell kontroller
 Signal processing controller	Device		Signalbehandlingskontroller
+Tape Drive	DeviceSCSI		Bandstation
 Unclassified device	Device		Oklassificerad enhet
 Unknown	DevicePCI		Okänt
 Unknown device	Device		Okänd enhet
 Unknown device	DevicesView		Okänd enhet
 Value	PropertyList		Värde
 Wireless controller	Device		Trådlös kontroller
+Worm	DeviceSCSI		Mask
 unknown	Device		okänd

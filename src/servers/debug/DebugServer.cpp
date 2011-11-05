@@ -16,10 +16,12 @@
 #include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <debug_support.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Invoker.h>
+#include <Locale.h>
 #include <Path.h>
 
 #include <RegistrarDefs.h>
@@ -28,6 +30,12 @@
 
 #include <util/DoublyLinkedList.h>
 
+
+#define HANDOVER_USE_GDB 1
+//#define HANDOVER_USE_DEBUGGER 1
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DebugServer"
 
 #define USE_GUI true
 	// define to false if the debug server shouldn't use GUI (i.e. an alert)
@@ -107,6 +115,8 @@ private:
 	status_t _PopMessage(DebugMessage *&message);
 
 	thread_id _EnterDebugger();
+	void _SetupGDBArguments(const char **argv, int &argc, char *teamString,
+		size_t teamStringSize, bool usingConsoled);
 	void _KillTeam();
 
 	bool _HandleMessage(DebugMessage *message);
@@ -425,13 +435,80 @@ TeamDebugHandler::_PopMessage(DebugMessage *&message)
 }
 
 
+void
+TeamDebugHandler::_SetupGDBArguments(const char **argv, int &argc,
+	char *teamString, size_t teamStringSize, bool usingConsoled)
+{
+	// prepare the argument vector
+	snprintf(teamString, teamStringSize, "--pid=%ld", fTeam);
+
+	status_t error;
+	BPath terminalPath;
+	if (usingConsoled) {
+		error = find_directory(B_SYSTEM_BIN_DIRECTORY, &terminalPath);
+		if (error != B_OK) {
+			debug_printf("debug_server: can't find system-bin directory: %s\n",
+				strerror(error));
+			return;
+		}
+		error = terminalPath.Append("consoled");
+		if (error != B_OK) {
+			debug_printf("debug_server: can't append to system-bin path: %s\n",
+				strerror(error));
+			return;
+		}
+	} else {
+		error = find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath);
+		if (error != B_OK) {
+			debug_printf("debug_server: can't find system-apps directory: %s\n",
+				strerror(error));
+			return;
+		}
+		error = terminalPath.Append("Terminal");
+		if (error != B_OK) {
+			debug_printf("debug_server: can't append to system-apps path: %s\n",
+				strerror(error));
+			return;
+		}
+	}
+
+	argv[argc++] = terminalPath.Path();
+
+	if (!usingConsoled) {
+		char windowTitle[64];
+		snprintf(windowTitle, sizeof(windowTitle), "Debug of Team %ld: %s",
+			fTeam, _LastPathComponent(fExecutablePath));
+		argv[argc++] = "-t";
+		argv[argc++] = windowTitle;
+	}
+
+	BPath gdbPath;
+	error = find_directory(B_SYSTEM_BIN_DIRECTORY, &gdbPath);
+	if (error != B_OK) {
+		debug_printf("debug_server: can't find system-bin directory: %s\n",
+			strerror(error));
+		return;
+	}
+	error = gdbPath.Append("gdb");
+	if (error != B_OK) {
+		debug_printf("debug_server: can't append to system-bin path: %s\n",
+			strerror(error));
+		return;
+	}
+
+	argv[argc++] = gdbPath.Path();
+	argv[argc++] = teamString;
+	if (strlen(fExecutablePath) > 0)
+		argv[argc++] = fExecutablePath;
+	argv[argc] = NULL;
+}
+
+
 thread_id
 TeamDebugHandler::_EnterDebugger()
 {
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld\n",
 		fTeam));
-
-	bool debugInConsoled = _IsGUIServer() || !_AreGUIServersAlive();
 
 	// prepare a debugger handover
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): preparing "
@@ -445,79 +522,55 @@ TeamDebugHandler::_EnterDebugger()
 		return error;
 	}
 
-	// prepare the argument vector
-	char teamString[32];
-	snprintf(teamString, sizeof(teamString), "--pid=%ld", fTeam);
-
-	BPath terminalPath;
-	if (debugInConsoled) {
-		error = find_directory(B_SYSTEM_BIN_DIRECTORY, &terminalPath);
-		if (error != B_OK) {
-			debug_printf("debug_server: can't find system-bin directory: %s\n",
-				strerror(error));
-			return error;
-		}
-		error = terminalPath.Append("consoled");
-		if (error != B_OK) {
-			debug_printf("debug_server: can't append to system-bin path: %s\n",
-				strerror(error));
-			return error;
-		}
-	} else {
-		error = find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath);
-		if (error != B_OK) {
-			debug_printf("debug_server: can't find system-apps directory: %s\n",
-				strerror(error));
-			return error;
-		}
-		error = terminalPath.Append("Terminal");
-		if (error != B_OK) {
-			debug_printf("debug_server: can't append to system-apps path: %s\n",
-				strerror(error));
-			return error;
-		}
-	}
-
 	const char *argv[16];
 	int argc = 0;
+	char teamString[32];
+	bool debugInConsoled = _IsGUIServer() || !_AreGUIServersAlive();
+#ifdef HANDOVER_USE_GDB
 
-	argv[argc++] = terminalPath.Path();
-
-	if (!debugInConsoled) {
-		char windowTitle[64];
-		snprintf(windowTitle, sizeof(windowTitle), "Debug of Team %ld: %s",
-			fTeam, _LastPathComponent(fExecutablePath));
-		argv[argc++] = "-t";
-		argv[argc++] = windowTitle;
-	}
-
-	BPath gdbPath;
-	error = find_directory(B_SYSTEM_BIN_DIRECTORY, &gdbPath);
-	if (error != B_OK) {
-		debug_printf("debug_server: can't find system-bin directory: %s\n",
-			strerror(error));
-		return error;
-	}
-	error = gdbPath.Append("gdb");
-	if (error != B_OK) {
-		debug_printf("debug_server: can't append to system-bin path: %s\n",
-			strerror(error));
-		return error;
-	}
-
-	argv[argc++] = gdbPath.Path();
-	argv[argc++] = teamString;
-	if (strlen(fExecutablePath) > 0)
-		argv[argc++] = fExecutablePath;
-	argv[argc] = NULL;
+	_SetupGDBArguments(argv, argc, teamString, sizeof(teamString),
+		debugInConsoled);
 
 	// start the terminal
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
 		"terminal (debugger) for team %ld...\n", fTeam));
 
+#elif defined(HANDOVER_USE_DEBUGGER)
+	if (debugInConsoled) {
+		_SetupGDBArguments(argv, argc, teamString, sizeof(teamString),
+			debugInConsoled);
+	} else {
+		// prepare the argument vector
+		snprintf(teamString, sizeof(teamString), "%ld", fTeam);
+
+		BPath debuggerPath;
+		error = find_directory(B_SYSTEM_APPS_DIRECTORY, &debuggerPath);
+		if (error != B_OK) {
+			debug_printf("debug_server: can't find system-apps directory: %s\n",
+				strerror(error));
+			return error;
+		}
+		error = debuggerPath.Append("Debugger");
+		if (error != B_OK) {
+			debug_printf("debug_server: can't append to system-apps path: %s\n",
+				strerror(error));
+			return error;
+		}
+
+		argv[argc++] = debuggerPath.Path();
+		argv[argc++] = "--team";
+		argv[argc++] = teamString;
+		argv[argc] = NULL;
+
+		// start the debugger
+		TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
+			"graphical debugger for team %ld...\n", fTeam));
+	}
+#endif
+
 	thread_id thread = load_image(argc, argv, (const char**)environ);
 	if (thread < 0) {
-		debug_printf("debug_server: Failed to start consoled + gdb: %s\n",
+		debug_printf("debug_server: Failed to start debugger: %s\n",
 			strerror(thread));
 		return thread;
 	}
@@ -607,14 +660,16 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		_NotifyAppServer(fTeam);
 		_NotifyRegistrar(fTeam, true, false);
 
-		char buffer[1024];
-		snprintf(buffer, sizeof(buffer), "The application:\n\n      %s\n\n"
+		BString buffer(
+			B_TRANSLATE("The application:\n\n      %app\n\n"
 			"has encountered an error which prevents it from continuing. Haiku "
-			"will terminate the application and clean up.", fTeamInfo.args);
+			"will terminate the application and clean up."));
+		buffer.ReplaceFirst("%app", fTeamInfo.args);
 
 		// TODO: It would be nice if the alert would go away automatically
 		// if someone else kills our teams.
-		BAlert *alert = new BAlert(NULL, buffer, "Debug", "OK", NULL,
+		BAlert *alert = new BAlert(NULL, buffer.String(),
+			B_TRANSLATE("Debug"), B_TRANSLATE("OK"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
 		kill = (result == 1);

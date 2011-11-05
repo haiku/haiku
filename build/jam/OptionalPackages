@@ -81,7 +81,8 @@
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 #	WonderBrush				- native graphics application
-#	WQY-MicroHei				- Chinese font
+#	wpa_supplicant			- a WPA Supplicant with support for WPA and WPA2
+#	WQY-MicroHei			- Chinese font
 #	XZ-Utils				- file archiving utility
 #	Yasm					- the assembler utility
 
@@ -618,6 +619,22 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 }
 
 
+# DMIDecode
+if [ IsOptionalHaikuImagePackageAdded DMIDecode ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package DMIDecode available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			dmidecode-2.11-x86-gcc4-2011-11-02.zip
+			: http://revolf.free.fr/beos/dmidecode-2.11-x86-gcc4-2011-11-02.zip ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			dmidecode-2.11-x86-gcc2-2011-11-02.zip
+			: http://revolf.free.fr/beos/dmidecode-2.11-x86-gcc2-2011-11-02.zip ;
+	}
+}
+
+
 # Doxygen
 if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 	if $(TARGET_ARCH) != x86 {
@@ -678,10 +695,6 @@ if [ IsOptionalHaikuImagePackageAdded Fastdep ] {
 if [ IsOptionalHaikuImagePackageAdded friss ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package friss available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage friss-0.5pre7-x86-gcc4.zip
-			: $(baseURL)/friss-0.5pre7-x86-gcc4.zip
-			: : true ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
@@ -807,7 +820,7 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 	local arch = $(TARGET_ARCH) ;
 	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
 	for abiVersionedLib in $(HAIKU_ICU_LIBS) {
-		abiVersionedLib = $(abiVersionedLib:G=) ;
+		abiVersionedLib = $(abiVersionedLib:B:G=) ;
 		local lib = $(abiVersionedLib:B) ;
 		AddSymlinkToHaikuImage develop abi $(arch) $(abi) lib
 			: /system/lib $(abiVersionedLib) ;
@@ -1144,8 +1157,8 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				openssh-5.8p2-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/openssh-5.8p2-r1a3-x86-gcc4-2011-05-24.zip ;
+				openssh-5.9p1-x86-gcc4-2011-09-08.zip
+				: $(baseURL)/openssh-5.9p1-x86-gcc4-2011-09-08.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				openssh-5.8p2-1-x86_gcc2.hpkg
@@ -1382,8 +1395,8 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				subversion-1.6.15-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/subversion-1.6.15-r1a3-x86-gcc4-2011-05-24.zip
+				subversion-1.6.17-x86-gcc4-2011-08-03.zip
+				: $(baseURL)/subversion-1.6.17-x86-gcc4-2011-08-03.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -1582,11 +1595,9 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	AddFilesToHaikuImage system packages : haiku-userguide.hpkg ;
 	AddFilesToHaikuImage system packages : haiku-welcome.hpkg ;
 
-	AddSymlinkToHaikuImage home Desktop
-		: /boot/system/documentation/welcome/welcome_en.html
+	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/welcome
 		: Welcome ;
-	AddSymlinkToHaikuImage home Desktop
-		: /boot/system/documentation/userguide/en/contents.html
+	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/userguide
 		: User\ Guide ;
 }
 
@@ -1655,6 +1666,22 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 #			: common apps ;
 #		AddSymlinkToHaikuImage home config settings deskbar Applications
 #			: /boot/apps/WonderBrush/WonderBrush ;
+	}
+}
+
+
+# wpa_supplicant
+if [ IsOptionalHaikuImagePackageAdded wpa_supplicant ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package wpa_supplicant available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			wpa_supplicant-0.7.3-x86-gcc4-2011-10-05.zip
+			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2011-10-05.zip ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			wpa_supplicant-0.7.3-x86-gcc2-2011-10-05.zip
+			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc2-2011-10-05.zip ;
 	}
 }
 

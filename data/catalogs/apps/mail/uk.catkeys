@@ -1,7 +1,12 @@
-1	ukrainian	x-vnd.Be-MAIL	3539940090
+1	ukrainian	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - поштова адреса
+%e wrote:\\n	Mail			%e написано:\\n
 %n - Full name	Mail		%n - Повне ім'я
+(Address unavailable)	Mail		(Адреса недоступна)
+(Date unavailable)	Mail		(Дата недоступна)
+(Name unavailable)	Mail		(Ім'я недоступне)
+<none>	Mail		<жодного>
 Account from mail	Mail		Аккаунт для пошти
 Account:	Mail		Аккаунт:
 Accounts…	Mail		Аккаунти…
@@ -12,20 +17,25 @@ An error occurred trying to open this signature.	Mail		Помилка при с�
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
 Attach attributes:	Mail		Додати атрибути:
+Attachments:	Mail		Вкладення:
 Auto signature:	Mail		Автопідпис:
+Automatic	Mail		Автоматично
 Automatically mark mail as read:	Mail		Автоматично помітити як прочитане:
 Bcc:	Mail		Bcc:
 Beginner	Mail		Початківець
 Button bar:	Mail		Панель кнопок:
 Cancel	Mail		Відмінити
+Cc:	Mail		Cc:
 Check spelling	Mail		Перевірити правопис
 Close	Mail		Закрити
+Close and 	Mail		Закрити і
 Colored quotes:	Mail		Забарвлення цитат:
 Copy	Mail		Копіювати
 Copy link location	Mail		Скопіювати розміщення посилання
 Copy to new	Mail		Копіювати до нового
-Couldn't open this signature. Sorry.	Mail		Прикро,неможливо відкрити цей підпис.
+Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
 Cut	Mail		Вирізати
+Date:	Mail		Дата:
 Decoding:	Mail		Розкодування:
 Default account:	Mail		Аккаунт по замовчуванню:
 Delete	Mail		Видалити
@@ -54,6 +64,7 @@ Initial spell check mode:	Mail		Режим перевірки правопису
 Leave as '%s'	Mail		Зберегти як '%s'
 Leave as New	Mail		Зберегти як новий
 Leave same	Mail		Зберегти саме це
+Mail	System name		Пошта
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
 Mail preferences	Mail		Настройки пошти
 Mailing	Mail		Відправлення
@@ -65,8 +76,11 @@ New mail message	Mail		Новий лист
 Next	Mail		Наступний
 Next message	Mail		Наступний лист
 No file attributes, just plain data	Mail		Жодних атрибутів,тільки чисті дані
-None	Mail		Жоден
+No matches	Mail		Не відповідати
+None	Mail		Жодного
 OK	Mail		Гаразд
+Off	Mail		Вимкнути
+On	Mail		Включити
 Only files can be added as attachments.	Mail		Тільки файли можуть бути додані як вкладення.
 Open	Mail		Відкрити
 Open attachment	Mail		Відкрити вкладення
@@ -79,10 +93,12 @@ Previous	Mail		Попередній
 Previous message	Mail		Попередній лист
 Print	Mail		Друкувати
 Print…	Mail		Друкувати…
+Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю папку.
 Queries	Mail		Запити
 Quit	Mail		Завершити
 Quote	Mail		Цитата
 Random	Mail		Випадковий
+Read 	Mail		Читати 
 Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
 Redo	Mail		Відмінити відміну
 Remove attachment	Mail		Видалити вкладення
@@ -116,10 +132,12 @@ Signature:	Mail		Підпис
 Signatures	Mail		Підписи
 Size:	Mail		Розмір:
 Sorry	Mail		Вибачте
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте не знайдено жодного додатка що підтримує дані типу 'Person'.
 Start now	Mail		Запустити зараз
 Subject:	Mail		Тема:
 Text wrapping:	Mail		Обтікання тексту:
 The mail_daemon could not be started:\n\t	Mail		 Mail_daemon не запущено:\n\t
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.
 There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL
 Title:	Mail		Назва:
 To:	Mail		До:
@@ -132,3 +150,11 @@ View	Mail		Вигляд
 Warn unencodable:	Mail		Увага нерозкодоване:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію.
 \\n - Newline	Mail		\\n - Нова стрічка
+draft	B_USER_DIRECTORY/mail/draft		чорновик
+helpful message	Mail		щасливе повідомлення
+in	B_USER_DIRECTORY/mail/in		вхідні
+mail	B_USER_DIRECTORY/mail		пошта
+out	B_USER_DIRECTORY/mail/out		вихідні
+queries	B_USER_DIRECTORY/mail/queries		запити
+sent	B_USER_DIRECTORY/mail/sent		відіслати
+spam	B_USER_DIRECTORY/mail/spam		спам

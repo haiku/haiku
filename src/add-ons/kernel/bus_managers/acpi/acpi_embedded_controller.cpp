@@ -197,7 +197,7 @@ embedded_controller_free(void* cookie)
 //	#pragma mark - driver module API
 
 
-int32
+static int32
 acpi_get_type(device_node* dev)
 {
 	const char *bus;
@@ -481,12 +481,30 @@ struct device_module_info embedded_controller_device_module = {
 // #pragma mark -
 
 
+static acpi_status
+EcCheckStatus(struct acpi_ec_cookie* sc, const char* msg, EC_EVENT event)
+{
+	acpi_status status = AE_NO_HARDWARE_RESPONSE;
+	EC_STATUS ec_status = EC_GET_CSR(sc);
+
+	if (sc->ec_burstactive && !(ec_status & EC_FLAG_BURST_MODE)) {
+		TRACE("burst disabled in waitevent (%s)\n", msg);
+		sc->ec_burstactive = false;
+	}
+	if (EVENT_READY(event, ec_status)) {
+		TRACE("%s wait ready, status %#x\n", msg, ec_status);
+		status = AE_OK;
+	}
+	return status;
+}
+
+
 static void
 EcGpeQueryHandler(void* context)
 {
 	struct acpi_ec_cookie* sc = (struct acpi_ec_cookie*)context;
 
-	ASSERT(context != NULL);//, ("EcGpeQueryHandler called with NULL"));
+	ASSERT(context != NULL);
 
 	// Serialize user access with EcSpaceHandler().
 	status_t status = EcLock(sc);
@@ -500,7 +518,17 @@ EcGpeQueryHandler(void* context)
 	// interrupt source since we are edge-triggered.  To prevent the GPE
 	// that may arise from running the query from causing another query
 	// to be queued, we clear the pending flag only after running it.
-	acpi_status acpi_status = EcCommand(sc, EC_COMMAND_QUERY);
+	int sci_enqueued = sc->ec_sci_pending;
+	acpi_status acpi_status;
+	for (uint8 retry = 0; retry < 2; retry++) {
+		acpi_status = EcCommand(sc, EC_COMMAND_QUERY);
+		if (acpi_status == AE_OK)
+			break;
+		if (EcCheckStatus(sc, "retr_check",
+			EC_EVENT_INPUT_BUFFER_EMPTY) != AE_OK)
+			break;
+	}
+
 	sc->ec_sci_pending = FALSE;
 	if (acpi_status != AE_OK) {
 		EcUnlock(sc);
@@ -527,6 +555,14 @@ EcGpeQueryHandler(void* context)
 	if (status != B_OK) {
 		TRACE("evaluation of query method %s failed\n", qxx);
 	}
+	
+    // Reenable runtime GPE if its execution was deferred.
+	if (sci_enqueued) {
+		status = sc->ec_acpi_module->finish_gpe(sc->ec_gpehandle, sc->ec_gpebit);
+		if (status != B_OK)
+			ERROR("reenabling runtime GPE failed.\n");
+	}
+
 }
 
 
@@ -534,7 +570,7 @@ EcGpeQueryHandler(void* context)
 	called from an unknown lock context.
 */
 static uint32
-EcGpeHandler(void* context)
+EcGpeHandler(acpi_handle gpeDevice, uint32 gpeNumber, void* context)
 {
 	struct acpi_ec_cookie* sc = (acpi_ec_cookie*)context;
 
@@ -550,10 +586,10 @@ EcGpeHandler(void* context)
 
 	// If the EC_SCI bit of the status register is set, queue a query handler.
 	// It will run the query and _Qxx method later, under the lock.
-	EC_STATUS EcStatus = EC_GET_CSR(sc);
-	if ((EcStatus & EC_EVENT_SCI) && !sc->ec_sci_pending) {
+	EC_STATUS ecStatus = EC_GET_CSR(sc);
+	if ((ecStatus & EC_EVENT_SCI) && !sc->ec_sci_pending) {
 		TRACE("gpe queueing query handler\n");
-		ACPI_STATUS status = AcpiOsExecute(OSL_GPE_HANDLER, EcGpeQueryHandler,
+		acpi_status status = AcpiOsExecute(OSL_GPE_HANDLER, EcGpeQueryHandler,
 			context);
 		if (status == AE_OK)
 			sc->ec_sci_pending = TRUE;
@@ -585,23 +621,16 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 {
 	TRACE("enter EcSpaceHandler\n");
 	struct acpi_ec_cookie* sc = (struct acpi_ec_cookie*)context;
-	uint8 ecData;
 
+	if (function != ACPI_READ && function != ACPI_WRITE) return AE_BAD_PARAMETER;
 	if (width % 8 != 0 || value == NULL || context == NULL)
 		return AE_BAD_PARAMETER;
-	if (address + (width / 8) - 1 > 0xFF)
+	if (address + width / 8 > 256)
 		return AE_BAD_ADDRESS;
 
-	if (function == ACPI_READ)
-		*value = 0;
-	uint8 ecAddr = address;
-	acpi_status status = AE_ERROR;
-
-	/*
-	 * If booting, check if we need to run the query handler.  If so, we
-	 * we call it directly here as scheduling and dpc might not be up yet.
-	 * (Not sure if it's needed)
-	 */
+	// If booting, check if we need to run the query handler.  If so, we
+	// we call it directly here as scheduling and dpc might not be up yet.
+	// (Not sure if it's needed)
 
 	if (gKernelStartup || gKernelShutdown || sc->ec_suspending) {
 		if ((EC_GET_CSR(sc) & EC_EVENT_SCI)) {
@@ -611,50 +640,46 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	}
 
 	// Serialize with EcGpeQueryHandler() at transaction granularity.
-	status = EcLock(sc);
+	acpi_status status = EcLock(sc);
 	if (status != B_OK)
 		return AE_NOT_ACQUIRED;
 
+	// If we can't start burst mode, continue anyway.
+	status = EcCommand(sc, EC_COMMAND_BURST_ENABLE);
+	if (status == B_OK) {
+		if (EC_GET_DATA(sc) == EC_BURST_ACK) {
+			TRACE("burst enabled.\n");
+			sc->ec_burstactive = TRUE;
+		}
+	}
+
 	// Perform the transaction(s), based on width.
-	for (uint32 i = 0; i < width; i += 8, ecAddr++) {
+	acpi_physical_address ecAddr = address;
+	uint8* ecData = (uint8 *) value;
+	if (function == ACPI_READ)
+		*value = 0;
+	do {
 		switch (function) {
 			case ACPI_READ:
-				status = EcRead(sc, ecAddr, &ecData);
-				if (status == AE_OK)
-					*value |= ((int) ecData) << i;
+				status = EcRead(sc, ecAddr, ecData);
 				break;
 			case ACPI_WRITE:
-				ecData = (uint8)((*value) >> i);
-				status = EcWrite(sc, ecAddr, &ecData);
-				break;
-			default:
-				TRACE("invalid EcSpaceHandler function\n");
-				status = AE_BAD_PARAMETER;
+				status = EcWrite(sc, ecAddr, *ecData);
 				break;
 		}
 		if (status != AE_OK)
 			break;
+		ecAddr++;
+		ecData++;
+	} while (ecAddr < address + width / 8);
+
+	if (sc->ec_burstactive) {
+		sc->ec_burstactive = FALSE;
+		if (EcCommand(sc, EC_COMMAND_BURST_DISABLE) == AE_OK)
+			TRACE("disabled burst ok.");
 	}
 
 	EcUnlock(sc);
-	return status;
-}
-
-
-static acpi_status
-EcCheckStatus(struct acpi_ec_cookie* sc, const char* msg, EC_EVENT event)
-{
-	acpi_status status = AE_NO_HARDWARE_RESPONSE;
-	EC_STATUS ec_status = EC_GET_CSR(sc);
-
-	if (sc->ec_burstactive && !(ec_status & EC_FLAG_BURST_MODE)) {
-		TRACE("burst disabled in waitevent (%s)\n", msg);
-		sc->ec_burstactive = false;
-	}
-	if (EVENT_READY(event, ec_status)) {
-		TRACE("%s wait ready, status %#x\n", msg, ec_status);
-		status = AE_OK;
-	}
 	return status;
 }
 
@@ -668,7 +693,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 	// int need_poll = cold || rebooting || ec_polled_mode || sc->ec_suspending;
 	int needPoll = ec_polled_mode || sc->ec_suspending || gKernelStartup || gKernelShutdown;
 
-	// The main CPU should be much faster than the EC.  So the status should
+	// Wait for event by polling or GPE (interrupt).
 	// be "not ready" when we start waiting.  But if the main CPU is really
 	// slow, it's possible we see the current "ready" response.  Since that
 	// can't be distinguished from the previous response in polled mode,
@@ -695,7 +720,6 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 		count = (ec_timeout * 1000) / EC_POLL_DELAY;
 		if (count == 0)
 			count = 1;
-
 		for (i = 0; i < count; i++) {
 			status = EcCheckStatus(sc, "poll", event);
 			if (status == AE_OK)
@@ -727,7 +751,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 
 		// We finished waiting for the GPE and it never arrived.  Try to
 		// read the register once and trust whatever value we got.  This is
-		// the best we can do at this point.  Then, force polled mode on
+		// the best we can do at this point.
 		// since this system doesn't appear to generate GPEs.
 		if (status != AE_OK) {
 			status = EcCheckStatus(sc, "sleep_end", event);
@@ -736,6 +760,8 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 			ec_polled_mode = TRUE;
 		}
 	}
+
+
 	if (status != AE_OK)
 		TRACE("error: ec wait timed out\n");
 
@@ -767,11 +793,17 @@ EcCommand(struct acpi_ec_cookie* sc, EC_COMMAND cmd)
 			return AE_BAD_PARAMETER;
 	}
 
+	// Ensure empty input buffer before issuing command.
+	// Use generation count of zero to force a quick check.
+	acpi_status status = EcWaitEvent(sc, EC_EVENT_INPUT_BUFFER_EMPTY, 0);
+	if (status != AE_OK)
+		return status;
+
 	// Run the command and wait for the chosen event.
 	TRACE("running command %#x\n", cmd);
-	u_int gen_count = sc->ec_gencount;
+	int32 generationCount = sc->ec_gencount;
 	EC_SET_CSR(sc, cmd);
-	acpi_status status = EcWaitEvent(sc, event, gen_count);
+	status = EcWaitEvent(sc, event, generationCount);
 	if (status == AE_OK) {
 		// If we succeeded, burst flag should now be present.
 		if (cmd == EC_COMMAND_BURST_ENABLE) {
@@ -791,60 +823,39 @@ EcRead(struct acpi_ec_cookie* sc, uint8 address, uint8* readData)
 {
 	TRACE("read from %#x\n", address);
 
-	// If we can't start burst mode, continue anyway.
-	acpi_status status = EcCommand(sc, EC_COMMAND_BURST_ENABLE);
-	if (status == AE_OK) {
-		uint8 data = EC_GET_DATA(sc);
-		if (data == EC_BURST_ACK) {
-			TRACE("burst enabled\n");
-			sc->ec_burstactive = TRUE;
-		}
-	}
-
-	status = EcCommand(sc, EC_COMMAND_READ);
-	if (status != AE_OK)
-		return status;
-
-	u_int generationCount = sc->ec_gencount;
-
-	EC_SET_DATA(sc, address);
-	status = EcWaitEvent(sc, EC_EVENT_OUTPUT_BUFFER_FULL, generationCount);
-	if (status != AE_OK) {
-		TRACE("EcRead: failed waiting to get data\n");
-		return status;
-	}
-	*readData = EC_GET_DATA(sc);
-
-	if (sc->ec_burstactive) {
-		sc->ec_burstactive = FALSE;
-		status = EcCommand(sc, EC_COMMAND_BURST_DISABLE);
+	acpi_status status;
+	for (uint8 retry = 0; retry < 2; retry++) {
+		acpi_status status = EcCommand(sc, EC_COMMAND_READ);
 		if (status != AE_OK)
 			return status;
-		TRACE("disabled burst ok\n");
+
+		int32 generationCount = sc->ec_gencount;
+		EC_SET_DATA(sc, address);
+		status = EcWaitEvent(sc, EC_EVENT_OUTPUT_BUFFER_FULL, generationCount);
+		if (status != AE_OK) {
+			if (EcCheckStatus(sc, "retr_check",
+				EC_EVENT_INPUT_BUFFER_EMPTY) == AE_OK)
+				continue;
+			else
+				break;
+		}
+		*readData = EC_GET_DATA(sc);
+		return AE_OK;
 	}
 
-	return AE_OK;
+	TRACE("EcRead: failed waiting to get data\n");
+	return status;
 }
 
 
 static acpi_status
-EcWrite(struct acpi_ec_cookie* sc, uint8 address, uint8* writeData)
+EcWrite(struct acpi_ec_cookie* sc, uint8 address, uint8 writeData)
 {
-	/* If we can't start burst mode, continue anyway. */
-	acpi_status status = EcCommand(sc, EC_COMMAND_BURST_ENABLE);
-	if (status == AE_OK) {
-		uint8 data = EC_GET_DATA(sc);
-		if (data == EC_BURST_ACK) {
-			TRACE("burst enabled\n");
-			sc->ec_burstactive = TRUE;
-		}
-	}
-
-	status = EcCommand(sc, EC_COMMAND_WRITE);
+	acpi_status status = EcCommand(sc, EC_COMMAND_WRITE);
 	if (status != AE_OK)
 		return status;
 
-	u_int generationCount = sc->ec_gencount;
+	int32 generationCount = sc->ec_gencount;
 	EC_SET_DATA(sc, address);
 	status = EcWaitEvent(sc, EC_EVENT_INPUT_BUFFER_EMPTY, generationCount);
 	if (status != AE_OK) {
@@ -853,19 +864,11 @@ EcWrite(struct acpi_ec_cookie* sc, uint8 address, uint8* writeData)
 	}
 
 	generationCount = sc->ec_gencount;
-	EC_SET_DATA(sc, *writeData);
+	EC_SET_DATA(sc, writeData);
 	status = EcWaitEvent(sc, EC_EVENT_INPUT_BUFFER_EMPTY, generationCount);
 	if (status != AE_OK) {
 		TRACE("EcWrite: failed waiting for sent data\n");
 		return status;
-	}
-
-	if (sc->ec_burstactive) {
-		sc->ec_burstactive = FALSE;
-		status = EcCommand(sc, EC_COMMAND_BURST_DISABLE);
-		if (status != AE_OK)
-			return (status);
-		TRACE("disabled burst ok\n");
 	}
 
 	return AE_OK;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,7 @@
 #include "DecorManager.h"
 #include "DesktopSettingsPrivate.h"
 #include "DrawingEngine.h"
+#include "FontManager.h"
 #include "HWInterface.h"
 #include "InputManager.h"
 #include "Screen.h"
@@ -450,6 +451,8 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 	fLink.SetReceiverPort(fMessagePort);
 
 	// register listeners
+	RegisterListener(&fStackAndTile);
+
 	const DesktopListenerList& newListeners
 		= gDecorManager.GetDesktopListeners();
 	for (int i = 0; i < newListeners.CountItems(); i++)
@@ -583,6 +586,7 @@ Desktop::BroadcastToAllWindows(int32 code)
 filter_result
 Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 {
+	filter_result result = B_DISPATCH_MESSAGE;
 	if (LockAllWindows()) {
 		Window* window = MouseEventWindow();
 		if (window == NULL)
@@ -593,13 +597,13 @@ Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 				window->ModifiersChanged(modifiers);
 		}
 
+		if (NotifyKeyPressed(what, key, modifiers))
+			result = B_SKIP_MESSAGE;
+
 		UnlockAllWindows();
 	}
 
-	if (NotifyKeyPressed(what, key, modifiers))
-		return B_SKIP_MESSAGE;
-
-	return B_DISPATCH_MESSAGE;
+	return result;
 }
 
 
@@ -1117,15 +1121,12 @@ Desktop::ActivateWindow(Window* window)
 		}
 	}
 
-	// we don't need to redraw what is currently
-	// visible of the window
-	BRegion clean(window->VisibleRegion());
 	WindowList windows(kWorkingList);
-
 	Window* frontmost = window->Frontmost();
 
 	CurrentWindows().RemoveWindow(window);
 	windows.AddWindow(window);
+	window->MoveToTopStackLayer();
 
 	if (frontmost != NULL && frontmost->IsModal()) {
 		// all modal windows follow their subsets to the front
@@ -1155,10 +1156,15 @@ Desktop::ActivateWindow(Window* window)
 
 
 void
-Desktop::SendWindowBehind(Window* window, Window* behindOf)
+Desktop::SendWindowBehind(Window* window, Window* behindOf, bool sendStack)
 {
 	if (!LockAllWindows())
 		return;
+
+	Window* orgWindow = window;
+	WindowStack* stack = window->GetWindowStack();
+	if (sendStack && stack != NULL)
+		window = stack->TopLayerWindow();
 
 	// TODO: should the "not in current workspace" be handled anyway?
 	//	(the code below would have to be changed then, though)
@@ -1186,10 +1192,13 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 	BRegion dummy;
 	_RebuildClippingForAllWindows(dummy);
 
-	// mark everything dirty that is no longer visible
-	BRegion clean(window->VisibleRegion());
-	dirty.Exclude(&clean);
-	MarkDirty(dirty);
+	// only redraw the top layer window to avoid flicker
+	if (sendStack) {
+		// mark everything dirty that is no longer visible
+		BRegion clean(window->VisibleRegion());
+		dirty.Exclude(&clean);
+		MarkDirty(dirty);
+	}
 
 	_UpdateFronts();
 	if (fSettings->MouseMode() == B_FOCUS_FOLLOWS_MOUSE)
@@ -1203,7 +1212,16 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 
 	_WindowChanged(window);
 
-	NotifyWindowSentBehind(window, behindOf);
+	if (sendStack && stack != NULL) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* stackWindow = stack->LayerOrder().ItemAt(i);
+			if (stackWindow == window)
+				continue;
+			SendWindowBehind(stackWindow, behindOf, false);
+		}
+	}
+
+	NotifyWindowSentBehind(orgWindow, behindOf);
 
 	UnlockAllWindows();
 
@@ -1252,7 +1270,7 @@ Desktop::ShowWindow(Window* window)
 
 
 void
-Desktop::HideWindow(Window* window)
+Desktop::HideWindow(Window* window, bool fromMinimize)
 {
 	if (window->IsHidden())
 		return;
@@ -1301,6 +1319,8 @@ Desktop::HideWindow(Window* window)
 		}
 	}
 
+	NotifyWindowHidden(window, fromMinimize);
+
 	UnlockAllWindows();
 
 	if (window == fWindowUnderMouse)
@@ -1315,7 +1335,7 @@ Desktop::MinimizeWindow(Window* window, bool minimize)
 		return;
 
 	if (minimize && !window->IsHidden()) {
-		HideWindow(window);
+		HideWindow(window, true);
 		window->SetMinimized(minimize);
 		NotifyWindowMinimized(window, minimize);
 	} else if (!minimize && window->IsHidden()) {
@@ -1334,8 +1354,11 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	if (x == 0 && y == 0)
 		return;
 
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
+
+	Window* topWindow = window->TopLayerStackWindow();
+	if (topWindow)
+		window = topWindow;
 
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
@@ -1353,7 +1376,6 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 			window->MoveBy((int32)x, (int32)y);
 
 		NotifyWindowMoved(window);
-		UnlockAllWindows();
 		return;
 	}
 
@@ -1408,8 +1430,6 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	}
 
 	NotifyWindowMoved(window);
-
-	UnlockAllWindows();
 }
 
 
@@ -1419,13 +1439,15 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	if (x == 0 && y == 0)
 		return;
 
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
+
+	Window* topWindow = window->TopLayerStackWindow();
+	if (topWindow)
+		window = topWindow;
 
 	if (!window->IsVisible()) {
 		window->ResizeBy((int32)x, (int32)y, NULL);
 		NotifyWindowResized(window);
-		UnlockAllWindows();
 		return;
 	}
 
@@ -1468,22 +1490,20 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	}
 
 	NotifyWindowResized(window);
-
-	UnlockAllWindows();
 }
 
 
 bool
-Desktop::SetWindowTabLocation(Window* window, float location)
+Desktop::SetWindowTabLocation(Window* window, float location, bool isShifting)
 {
 	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
-	bool changed = window->SetTabLocation(location, dirty);
+	bool changed = window->SetTabLocation(location, isShifting, dirty);
 	if (changed)
 		RebuildAndRedrawAfterWindowChange(window, dirty);
 
-	NotifyWindowTabLocationChanged(window, location);
+	NotifyWindowTabLocationChanged(window, location, isShifting);
 
 	return changed;
 }
@@ -1723,6 +1743,8 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 	if (window == FocusWindow() && !window->IsVisible())
 		SetFocusWindow();
 
+	NotifyWindowFeelChanged(window, newFeel);
+
 	UnlockAllWindows();
 }
 
@@ -1765,7 +1787,7 @@ Desktop::WindowAt(BPoint where)
 	for (Window* window = CurrentWindows().LastWindow(); window;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->IsVisible() && window->VisibleRegion().Contains(where))
-			return window;
+			return window->StackedWindowAt(where);
 	}
 
 	return NULL;
@@ -2046,18 +2068,18 @@ Desktop::RedrawBackground()
 
 
 bool
-Desktop::ReloadDecor()
+Desktop::ReloadDecor(DecorAddOn* oldDecor)
 {
 	AutoWriteLocker _(fWindowLock);
 
 	bool returnValue = true;
 
-	// TODO it is assumed all listeners are registered by one decor
-	// unregister old listeners
-	const DesktopListenerDLList& currentListeners = GetDesktopListenerList();
-	for (DesktopListener* listener = currentListeners.First();
-		listener != NULL; listener = currentListeners.GetNext(listener))
-		UnregisterListener(listener);
+	if (oldDecor != NULL) {
+		const DesktopListenerList* oldListeners
+			= &oldDecor->GetDesktopListeners();
+		for (int i = 0; i < oldListeners->CountItems(); i++)
+			UnregisterListener(oldListeners->ItemAt(i));
+	}
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
@@ -2648,7 +2670,7 @@ Desktop::AllWindows()
 Window*
 Desktop::WindowForClientLooperPort(port_id port)
 {
-	ASSERT(fWindowLock.IsReadLocked());
+	ASSERT_MULTI_LOCKED(fWindowLock);
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
@@ -3185,6 +3207,7 @@ void
 Desktop::RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 	BRegion& dirty)
 {
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
 	if (!changedWindow->IsVisible() || dirty.CountRects() == 0)
 		return;
 

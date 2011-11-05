@@ -19,7 +19,9 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <FormattingConventions.h>
+#include <GradientLinear.h>
 #include <LocaleRoster.h>
+#include <Region.h>
 #include <Window.h>
 
 
@@ -30,101 +32,130 @@
 #define B_TRANSLATE_CONTEXT "LanguageListView"
 
 
-static const float kFlagWidth = 17.0;
+static const float kLeftInset = 4;
 
 LanguageListItem::LanguageListItem(const char* text, const char* id,
-	const char* code, const char* countryCode)
+	const char* languageCode)
 	:
 	BStringItem(text),
 	fID(id),
-	fCode(code)
+	fCode(languageCode)
 {
-	fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-	if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
-			countryCode) != B_OK) {
-		delete fIcon;
-		fIcon = NULL;
-	}
 }
 
 
 LanguageListItem::LanguageListItem(const LanguageListItem& other)
 	:
 	BStringItem(other.Text()),
-	fID(other.ID()),
-	fCode(other.Code()),
-	fIcon(NULL)
+	fID(other.fID),
+	fCode(other.fCode)
 {
-	if (other.fIcon != NULL)
-		fIcon = new BBitmap(*other.fIcon);
-}
-
-
-LanguageListItem::~LanguageListItem()
-{
-	delete fIcon;
 }
 
 
 void
 LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
-	rgb_color kHighlight = {140, 140, 140, 0};
-	rgb_color kBlack = {0, 0, 0, 0};
+	DrawItemWithTextOffset(owner, frame, complete, 0);
+}
 
+
+void
+LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
+	bool complete, float textOffset)
+{
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
-			color = kHighlight;
+			color = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
 		else
 			color = owner->ViewColor();
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 		owner->FillRect(frame);
-		owner->SetHighColor(kBlack);
 	} else
 		owner->SetLowColor(owner->ViewColor());
 
 	BString text = Text();
 	if (IsEnabled())
-		owner->SetHighColor(kBlack);
+		owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 	else {
 		owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_3_TINT));
-		text += "   [";
-		text += B_TRANSLATE("already chosen");
-		text += "]";
+		text << "   [" << B_TRANSLATE("already chosen") << "]";
 	}
 
-	BFont font = be_plain_font;
-	font_height	finfo;
-	font.GetHeight(&finfo);
-	owner->SetFont(&font);
-	// TODO: the position is unnecessarily complicated, and not correct either
-	owner->MovePenTo(frame.left + 8, frame.top
-		+ (frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2
-		+ (finfo.ascent + finfo.descent) - 1);
+	owner->MovePenTo(frame.left + kLeftInset + textOffset,
+		frame.top + BaselineOffset());
 	owner->DrawString(text.String());
+}
 
-	// Draw the icon
-	frame.left = frame.right - kFlagWidth;
-	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top + 1, iconFrame.left + kFlagWidth - 2,
-		iconFrame.top + kFlagWidth - 1);
 
-	if (fIcon != NULL && fIcon->IsValid()) {
-		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(fIcon, iconFrame);
-		owner->SetDrawingMode(B_OP_COPY);
-	}
+// #pragma mark -
 
+
+LanguageListItemWithFlag::LanguageListItemWithFlag(const char* text,
+	const char* id, const char* languageCode, const char* countryCode)
+	:
+	LanguageListItem(text, id, languageCode),
+	fCountryCode(countryCode),
+	fIcon(NULL)
+{
+}
+
+
+LanguageListItemWithFlag::LanguageListItemWithFlag(
+	const LanguageListItemWithFlag& other)
+	:
+	LanguageListItem(other),
+	fCountryCode(other.fCountryCode),
+	fIcon(other.fIcon != NULL ? new BBitmap(*other.fIcon) : NULL)
+{
+}
+
+
+LanguageListItemWithFlag::~LanguageListItemWithFlag()
+{
+	delete fIcon;
 }
 
 
 void
-LanguageListItem::Update(BView* owner, const BFont* font)
+LanguageListItemWithFlag::Update(BView* owner, const BFont* font)
 {
-	BStringItem::Update(owner, font);
-	SetWidth(Width() + kFlagWidth);
+	LanguageListItem::Update(owner, font);
+
+	float iconSize = Height();
+	SetWidth(Width() + iconSize + 4);
+
+	if (fCountryCode.IsEmpty())
+		return;
+
+	fIcon = new(std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
+		B_RGBA32);
+	if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
+			fCountryCode.String()) != B_OK) {
+		delete fIcon;
+		fIcon = NULL;
+	}
+}
+
+
+void
+LanguageListItemWithFlag::DrawItem(BView* owner, BRect frame, bool complete)
+{
+	if (fIcon == NULL || !fIcon->IsValid()) {
+		DrawItemWithTextOffset(owner, frame, complete, 0);
+		return;
+	}
+
+	float iconSize = fIcon->Bounds().Width();
+	DrawItemWithTextOffset(owner, frame, complete, iconSize + 4);
+
+	BRect iconFrame(frame.left + kLeftInset, frame.top,
+		frame.left + kLeftInset + iconSize - 1, frame.top + iconSize - 1);
+	owner->SetDrawingMode(B_OP_OVER);
+	owner->DrawBitmap(fIcon, iconFrame);
+	owner->SetDrawingMode(B_OP_COPY);
 }
 
 
@@ -135,6 +166,8 @@ LanguageListView::LanguageListView(const char* name, list_view_type type)
 	:
 	BOutlineListView(name, type),
 	fDropIndex(-1),
+	fDropTargetHighlightFrame(),
+	fGlobalDropTargetIndicator(false),
 	fDeleteMessage(NULL),
 	fDragMessage(NULL)
 {
@@ -199,6 +232,13 @@ LanguageListView::SetDragMessage(BMessage* message)
 
 
 void
+LanguageListView::SetGlobalDropTargetIndicator(bool isGlobal)
+{
+	fGlobalDropTargetIndicator = isGlobal;
+}
+
+
+void
 LanguageListView::AttachedToWindow()
 {
 	BOutlineListView::AttachedToWindow();
@@ -214,10 +254,37 @@ LanguageListView::MessageReceived(BMessage* message)
 		BMessage dragMessage(*message);
 		dragMessage.AddInt32("drop_index", fDropIndex);
 		dragMessage.AddPointer("drop_target", this);
-
-		Invoke(&dragMessage);
+		Messenger().SendMessage(&dragMessage);
 	} else
 		BOutlineListView::MessageReceived(message);
+}
+
+
+void
+LanguageListView::Draw(BRect updateRect)
+{
+	BOutlineListView::Draw(updateRect);
+
+	if (fDropIndex >= 0 && fDropTargetHighlightFrame.IsValid()) {
+		// TODO: decide if drawing of a drop target indicator should be moved
+		//       into ControlLook
+		BGradientLinear gradient;
+		int step = fGlobalDropTargetIndicator ? 64 : 128;
+		for (int i = 0; i < 256; i += step)
+			gradient.AddColor(i % (step * 2) == 0
+				? ViewColor() : ui_color(B_CONTROL_HIGHLIGHT_COLOR), i);
+		gradient.AddColor(ViewColor(), 255);
+		gradient.SetStart(fDropTargetHighlightFrame.LeftTop());
+		gradient.SetEnd(fDropTargetHighlightFrame.RightBottom());
+		if (fGlobalDropTargetIndicator) {
+			BRegion region(fDropTargetHighlightFrame);
+			region.Exclude(fDropTargetHighlightFrame.InsetByCopy(2.0, 2.0));
+			ConstrainClippingRegion(&region);
+			FillRect(fDropTargetHighlightFrame, gradient);
+			ConstrainClippingRegion(NULL);
+		} else
+			FillRect(fDropTargetHighlightFrame, gradient);
+	}
 }
 
 
@@ -228,7 +295,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 	if (fDragMessage == NULL)
 		return false;
 
-	BListItem* item = FullListItemAt(CurrentSelection(0));
+	BListItem* item = ItemAt(CurrentSelection(0));
 	if (item == NULL) {
 		// workaround for a timing problem
 		// TODO: this should support extending the selection
@@ -243,7 +310,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 	message.AddPointer("listview", this);
 
 	for (int32 i = 0;; i++) {
-		int32 index = FullListCurrentSelection(i);
+		int32 index = CurrentSelection(i);
 		if (index < 0)
 			break;
 
@@ -259,7 +326,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 	// figure out, how many items fit into our bitmap
 	for (int32 i = 0, index; message.FindInt32("index", i, &index) == B_OK;
 			i++) {
-		BListItem* item = FullListItemAt(index);
+		BListItem* item = ItemAt(index);
 		if (item == NULL)
 			break;
 
@@ -285,7 +352,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 		for (int32 i = 0; i < numItems; i++) {
 			int32 index = message.FindInt32("index", i);
 			LanguageListItem* item
-				= static_cast<LanguageListItem*>(FullListItemAt(index));
+				= static_cast<LanguageListItem*>(ItemAt(index));
 			itemBounds.bottom = itemBounds.top + ceilf(item->Height());
 			if (itemBounds.bottom > dragRect.bottom)
 				itemBounds.bottom = dragRect.bottom;
@@ -345,43 +412,63 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit,
 			case B_ENTERED_VIEW:
 			case B_INSIDE_VIEW:
 			{
-				// set drop target through virtual function
-				// offset where by half of item height
-				BRect r = ItemFrame(0);
-				where.y += r.Height() / 2.0;
+				BRect highlightFrame;
 
-				int32 index = FullListIndexOf(where);
-				if (index < 0)
-					index = FullListCountItems();
-				if (fDropIndex != index) {
-					fDropIndex = index;
-					if (fDropIndex >= 0) {
-// TODO: find out what this was intended for (as it doesn't have any effect)
-//						int32 count = FullListCountItems();
-//						if (fDropIndex == count) {
-//							BRect r;
-//							if (FullListItemAt(count - 1)) {
-//								r = ItemFrame(count - 1);
-//								r.top = r.bottom;
-//								r.bottom = r.top + 1.0;
-//							} else {
-//								r = Bounds();
-//								r.bottom--;
-//									// compensate for scrollbars moved slightly
-//									// out of window
-//							}
-//						} else {
-//							BRect r = ItemFrame(fDropIndex);
-//							r.top--;
-//							r.bottom = r.top + 1.0;
-//						}
+				if (fGlobalDropTargetIndicator) {
+					highlightFrame = Bounds();
+					fDropIndex = 0;
+				} else {
+					// offset where by half of item height
+					BRect r = ItemFrame(0);
+					where.y += r.Height() / 2.0;
+
+					int32 index = IndexOf(where);
+					if (index < 0)
+						index = CountItems();
+					highlightFrame = ItemFrame(index);
+					if (highlightFrame.IsValid())
+						highlightFrame.bottom = highlightFrame.top;
+					else {
+						highlightFrame = ItemFrame(index - 1);
+						if (highlightFrame.IsValid())
+							highlightFrame.top = highlightFrame.bottom;
+						else {
+							// empty view, show indicator at top
+							highlightFrame = Bounds();
+							highlightFrame.bottom = highlightFrame.top;
+						}
 					}
+					fDropIndex = index;
 				}
-				break;
+
+				if (fDropTargetHighlightFrame != highlightFrame) {
+					Invalidate(fDropTargetHighlightFrame);
+					fDropTargetHighlightFrame = highlightFrame;
+					Invalidate(fDropTargetHighlightFrame);
+				}
+
+				BOutlineListView::MouseMoved(where, transit, dragMessage);
+				return;
 			}
 		}
-	} else
-		BOutlineListView::MouseMoved(where, transit, dragMessage);
+	}
+
+	if (fDropTargetHighlightFrame.IsValid()) {
+		Invalidate(fDropTargetHighlightFrame);
+		fDropTargetHighlightFrame = BRect();
+	}
+	BOutlineListView::MouseMoved(where, transit, dragMessage);
+}
+
+
+void
+LanguageListView::MouseUp(BPoint point)
+{
+	BOutlineListView::MouseUp(point);
+	if (fDropTargetHighlightFrame.IsValid()) {
+		Invalidate(fDropTargetHighlightFrame);
+		fDropTargetHighlightFrame = BRect();
+	}
 }
 
 

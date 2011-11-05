@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 #ifndef ZOIDBERG_GARGOYLE_MAIL_UTIL_H
@@ -10,9 +11,10 @@
 
 #include <stdio.h>
 
-#include <Node.h>
-
+#include <DataIO.h>
 #include <E-mail.h>
+#include <Message.h>
+#include <Node.h>
 
 
 // TODO: this should only be preserved for gcc2 compatibility
@@ -60,7 +62,7 @@ ssize_t utf8_to_rfc2047(char **bufp, ssize_t length,uint32 charset, char encodin
 // Unidentified charsets and conversion errors cause
 // the offending text to be skipped.
 
-void FoldLineAtWhiteSpaceAndAddCRLF (BString &string);
+void FoldLineAtWhiteSpaceAndAddCRLF(BString &string);
 // Insert CRLF at various spots in the given string (before white space) so
 // that the line length is mostly under 78 bytes.  Also makes sure there is a
 // CRLF at the very end.

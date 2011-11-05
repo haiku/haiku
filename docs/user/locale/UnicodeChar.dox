@@ -1,167 +1,245 @@
+/*
+ * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the OpenBeOS License.
+ *
+ * Authors:
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		John Scipione <jscipione@gmail.com>
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/locale/UnicodeChar.h	 rev 42274
+ *		/trunk/src/kits/locale/UnicodeChar.cpp	 rev 42274
+ */
+
 /*!
-\class BUnicodeChar
-\ingroup locale
+	\class BUnicodeChar
+	\ingroup locale
 
-\brief Management of all information about characters.
+	\brief Management of all information about characters.
 
-This class provide a set of tools for managing the whole set of characters
-defined in unicode. This include informations such as knowing if the character is
-whitespace, if it is alphanumeric, or solething else ; what is the uppercase
-equivalent of a character ; or wether it can be ornamented with accents.
+	This class provide a set of tools for managing the whole set of characters
+	defined by unicode. This include information about special sets of
+	characters such as if the character is whitespace, or alphanumeric. It also
+	provides the uppercase equivalent of a character and determines whether a
+	character can be ornamented with accents.
 
-This class consists entirely of static methods, which means you don't have to
-instanciate it. Just call one of the methods with the char you want examinated.
+	This class consists entirely of static methods, so you do not have to
+	instantiate it. You can call one of the methods passing in the character
+	that you want to be examined.
 
-Note all the function work with chars encoded in utf-32. This is not the most usual
-way to handle characters, but it is the faster. To convert an utf-8 string to an
-utf-32 character, pass it to the FromUTF8 function.
-
+	Note all the function work with chars encoded in utf-32. This is not the
+	most usual way to handle characters, but it is the fastest. To convert an
+	utf-8 string to an utf-32 character use the FromUTF8() method.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsAlpha(uint32 c)
-\brief Tell if the character is alphabetic.
+	\fn static bool BUnicodeChar::IsAlpha(uint32 c)
+	\brief Determine if \a c is alphabetic.
+
+	\returns \c true if the specified unicode character is an
+		alphabetic character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsAlNum(uint32 c)
-\brief Tell if the character is alphanumeric.
+	\fn static bool BUnicodeChar::IsAlNum(uint32 c)
+	\brief Determine if \a c is alphanumeric.
+
+	\returns \c true if the specified unicode character is a
+		alphabetic or numeric character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsDigit(uint32 c)
-\brief Tell if the caracter is numeric.
+	\fn static bool BUnicodeChar::IsDigit(uint32 c)
+	\brief Determine if \a c is numeric.
+
+	\returns \c true if the specified unicode character is a
+		number character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsHexDigit(uint32 c)
-\brief Tell if the character is numeric in base 16.
+	\fn static bool BUnicodeChar::IsHexDigit(uint32 c)
+	\brief Determine if \a c is a hexadecimal digit.
+
+	\returns \c true if the specified unicode character is a
+		hexadecimal number character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsUpper(uint32 c)
-\brief Tell if the character is uppercase.
+	\fn static bool BUnicodeChar::IsUpper(uint32 c)
+	\brief Determine if \a c is uppercase.
+
+	\returns \c true if the specified unicode character is an
+		uppercase character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsLower(uint32 c)
-\brief Tell if the character is lowercase.
+	\fn static bool BUnicodeChar::IsLower(uint32 c)
+	\brief Determine if \a c is lowercase.
+
+	\returns \c true if the specified unicode character is a
+		lowercase character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsSpace(uint32 c)
-\brief Tell if the character is space.
+	\fn static bool BUnicodeChar::IsSpace(uint32 c)
+	\brief Determine if \a c is a space.
 
-Unlike IsWhitespace, this function will return true for non-breakable
-spaces. It is the one to use for determining if the character will render
-as an empty space on screen and can be stretched to make the text look
-nicer.
+	Unlike IsWhitespace() this function will return \c true for non-breakable
+	spaces. This method is useful for determining if the character will render
+	as an empty space which can be stretched on-screen.
+
+	\returns \c true if the specified unicode character is some
+		kind of a space character.
+
+	\sa IsWhitespace()
 */
 
 /*!
-\fn static bool BUnicodeChar::IsWhitespace(uint32 c)
-\brief Tell if the character is whitespace.
+	\fn static bool BUnicodeChar::IsWhitespace(uint32 c)
+	\brief Determine if \a c is whitespace.
 
-Unlike IsSpace, this method will return false for non-breakable spaces.
-It is the one to use for selecting where to insert line breaks.
+	This method is essentially the same as IsSpace(), but excludes all
+	non-breakable spaces.
+
+	\returns \c true if the specified unicode character is a whitespace
+		character.
+
+	\sa IsSpace()
 */
 
 /*!
-\fn static bool BUnicodeChar::IsControl(uint32 c)
-\brief Tell if the character is a control character.
+	\fn static bool BUnicodeChar::IsControl(uint32 c)
+	\brief Determine if \a c is a control character.
 
-Example control characters are the non-printable ASCII characters 0 to 0x1F.
+	Example control characters are the non-printable ASCII characters from
+	0x0 to 0x1F.
+
+	\returns \c true if the specified unicode character is a control
+		character.
+
+	\sa IsPrintable()
 */
 
 /*!
-\fn static bool BUnicodeChar::IsPunctuation(uint32 c)
-\brief Tell if the character is a punctuation.
+	\fn static bool BUnicodeChar::IsPunctuation(uint32 c)
+	\brief Determine if \a c is punctuation character.
+
+	\returns \c true if the specified unicode character is a
+		punctuation character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsPrintable(uint32 c)
-\brief Tell if the character is printable.
+	\fn static bool BUnicodeChar::IsPrintable(uint32 c)
+	\brief Determine if \a c is printable.
+
+	Printable characters are not control characters.
+
+	\returns \c true if the specified unicode character is a printable
+		character.
+
+	\sa IsControl()
 */
 
 /*!
-\fn static bool BUnicodeChar::IsTitle(uint32 c)
-\brief Tell if the character is title case.
+	\fn static bool BUnicodeChar::IsTitle(uint32 c)
+	\brief Determine if \a c is title case.
 
-Title case is usually a smaller version of upercase letters.
+	Title case characters are a smaller version of normal uppercase letters.
+
+	\returns \c true if the specified unicode character is a title case
+		character.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsDefined(uint32 c)
-\brief Tell if the character is defined at all.
+	\fn static bool BUnicodeChar::IsDefined(uint32 c)
+	\brief Determine if \a c is defined.
 
-In unicode, some codes are not valid, or not attributed yet.
-For these, this method wil lreturn false.
+	In unicode some codes are not valid or not attributed yet.
+	For these codes this method will return \c false.
+
+	\returns \c true if the specified unicode character is defined.
 */
 
 /*!
-\fn static bool BUnicodeChar::IsBase(uint32 c)
-\brief Tell if the character can be used with a diacritic.
+	\fn static bool BUnicodeChar::IsBase(uint32 c)
+	\brief Determine if \a c can be used with a diacritic.
+
+	\note IsBase() does not determine if a unicode character is distinct.
+
+	\returns \c true if the specified unicode character is a base
+		form character that can be used with a diacritic.
 */
 
 /*!
-\fn static int8 BUnicodeChar::Type(uint32 c)
-\brief Returns the type of the character.
+	\fn static int8 BUnicodeChar::Type(uint32 c)
+	\brief Gets the type of a character.
 
-Return value is a member of the unicode_char_category enum.
+	\returns A member of the \c unicode_char_category enum.
 */
 
 /*!
-\fn static uint32 ToLower(uint32 c);
-\brief Returns the lowercase version of a character.
+	\fn uint32  BUnicodeChar::ToLower(uint32 c)
+	\brief Transforms \a c to lowercase.
+
+	\returns The lowercase version of the specified unicode character.
 */
 
 /*!
-\fn static uint32 ToUpper(uint32 c);
-\brief Returns the uppercase version of a character.
+	\fn uint32 BUnicodeChar::ToUpper(uint32 c)
+	\brief Transforms \a c to uppercase.
+
+	\returns The uppercase version of the specified unicode character.
 */
 
 /*!
-\fn static uint32 ToTitle(uint32 c);
-\brief Returns the titlecase version of a character.
+	\fn uint32 BUnicodeChar::ToTitle(uint32 c)
+	\brief Transforms \a c to title case.
+
+	\returns The title case version of the specified unicode character.
 */
 
 /*!
-\fn static int32 DigitValue(uint32 c);
-\brief Returns the numeric value of the character.
+	\fn int32 BUnicodeChar::DigitValue(uint32 c)
+	\brief Gets the numeric value \a c.
+
+	\returns The numeric version of the specified unicode character.
 */
 
 /*!
-\fn static void ToUTF8(uint32c, char Ã¹**ou
-\brief Convert a character to utf8 encoding.
+	\fn void BUnicodeChar::ToUTF8(uint32 c, char **out)
+	\brief Transform a character to utf-8 encoding.
+
+	\returns The utf-8 encoding of the specified unicode character.
 */
 
 /*!
-\fn static uint32 FromUTF8(const char** in)
-\brief Convert an utf-8 string to an utf-32 character.
+	\fn uint32 BUnicodeChar::FromUTF8(const char **in)
+	\brief Transform a utf-8 string to an utf-32 character.
 
-If the string contains multiple characters, only the fist one is used.
-This function updates the in pointer so that it points on the next
-character for the following call.
+	If the string contains multiple characters, only the fist one is used.
+	This function updates the in pointer so that it points on the next
+	character for the following call.
+
+	\returns The utf-32 encoded version of \a in.
 */
 
 /*!
-\fn static uint32 FromUTF8(const char* in)
-\brief Convert an utfÃ-8 string to an utfÃ-32 character.
+	\fn size_t BUnicodeChar::UTF8StringLength(const char *str)
+	\brief Counts the characters in the given \c NUL terminated string.
 
-If the string contains multiple characters, only the first one is used.
-The in pointer is not modified.
+	\returns the number of utf-8 characters in the \c NUL terminated string.
+
+	\sa BString::CountChars()
 */
 
 /*!
-\fn static size_t UTF8StringLength(const char* str)
-\brief This function counts the characters in the given null-terminated string.
+	\fn size_t BUnicodeChar::UTF8StringLength(const char *str, size_t maxLength)
+	\brief Counts the characters in the given string up to \a maxLength
+		characters.
 
-\sa BString::CountChars()
-*/
+	The string does not need to be \c NUL terminated if you specify a
+	\a maxLength that is shorter than the maximum length of the string.
 
-/*!
-\fn static size_t UTF8StringLength(const char* str, size_t maxLength)
-\brief This function counts the characters in the given string.
-
-The string does not need to be null-terminated if you specify the length.
+	\returns the number of utf-8 characters in the \c NUL terminated string
+		up to \a maxLength characters.
 */

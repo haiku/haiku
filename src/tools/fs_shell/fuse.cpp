@@ -602,6 +602,9 @@ main(int argc, char* argv[])
 	if (fuse_opt_parse(&fuseArgs, &config, fsOptions, process_options) < 0)
 		return 1;
 
+	if (!config.mntPoint)
+		print_usage_and_exit(fuseArgs.argv[0]);
+
 	if (!modules[0]) {
 		fprintf(stderr, "Error: Couldn't find FS module!\n");
 		return 1;

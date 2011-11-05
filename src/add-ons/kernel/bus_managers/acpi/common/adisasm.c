@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -667,7 +667,7 @@ AdCreateTableHeader (
 
         if (ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_DSDT))
         {
-            AcpiOsPrintf (" **** ACPI 1.0, no 64-bit math support");
+            AcpiOsPrintf (" **** 32-bit table (V1), no 64-bit math support");
         }
         break;
 

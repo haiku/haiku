@@ -1,1 +1,41 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	0
+1	ukrainian	x-vnd.Haiku-MediaConverter	283511503
+%d bit 	MediaFileInfo		%d біт
+%d byte 	MediaFileInfo		%d біт
+Audio:	MediaConverter-FileInfo		Аудіо:
+Cancel	MediaConverter		Відмінити
+Cancelling	MediaConverter		Відміна
+Cancelling…	MediaConverter		Відміна…
+Continue	MediaConverter		Продовжити
+Conversion cancelled	MediaConverter		Конверсію відмінено
+Conversion completed	MediaConverter		Конверсія завершена
+Encoder parameters	MediaConverter-EncoderWindow		Параметри декодера
+End   [ms]: 	MediaConverter		Кінець   [ms]:
+Error	MediaConverter		Помилка
+Error converting '%filename'	MediaConverter		Помилка перетворення '%filename'
+Error creating '%filename'	MediaConverter		Помилка створення '%filename'
+Error loading a file	MediaConverter		Помилка загрузки файла
+Error loading files	MediaConverter		Помилка загрузки файлів
+Error writing audio frame %Ld	MediaConverter		Помилка запису аудіо фрагменту %Ld
+File Error	MediaConverter-FileInfo		Помилка файлу
+File details	MediaConverter		Деталі файлу
+File format:	MediaConverter		Формат файлу:
+Low	MediaConverter		Низька
+No audio	Audio codecs list		без звуку
+No video	Video codecs list		Немає відео
+None available	Audio codecs		Не доступний жоден
+None available	Video codecs		Недоступний
+OK	MediaConverter		Гаразд
+OK	MediaConverter-FileInfo		Гаразд
+Open…	Menu		Відкрити…
+Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
+Output format	MediaConverter		Вихідний формат
+Preview	MediaConverter		Попередній перегляд
+Quit	Menu		Вийти
+Select	MediaConverter		Вибрати
+Select this folder	MediaConverter		Вибрати цю папку
+Source files	MediaConverter		Джерело файлів
+Start [ms]: 	MediaConverter		Старт [ms]:
+Video encoding:	MediaConverter		Кодування відео:
+Video quality not supported	MediaConverter			Якість відео не підтримується
+Video:	MediaConverter-FileInfo		Відео:
+seconds	MediaFileInfo		секунд

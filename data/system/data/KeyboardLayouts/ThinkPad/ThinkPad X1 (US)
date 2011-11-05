@@ -1,0 +1,28 @@
+name = ThinkPad X1 (US)
+
+# Size shortcuts
+default-size = 18,18
+$s = 15,10
+$s2 = 23.5,10
+$backspace = 38,18
+$tab = 28,18
+$caps = 32,18
+$enter = d42,18
+$lshift = 42,18
+$rshift = 50,18
+$lctrl = 24,20
+$bottom = 18,20
+$space = 90,20
+$sarrow = 16,10
+$arrow = 18,10
+
+# Key rows
+[ 0,0; $s2:0x01; $s:+12; $s:0x20; $s:0x35; $s:0x1f; $s2:0x34; ]
+[ 0,10; :0x11+12; $backspace:+1; ]
+[ 0,28; $tab:0x26; :+12; 28,18:+1; ]
+[ 0,46; $caps:0x3b; :+11; $enter:0x47; ]
+[ 0,64; $lshift:0x4b; :0x4c+9; $rshift:+1 ]
+[ 0,82; $bottom:-; $lctrl:0x5c; $bottom:0x66; $bottom:0x5d; $space:+1;
+	$bottom:+1; $bottom:0x0e; $bottom:0x60; $sarrow:0x21; $arrow:0x57;
+	$sarrow:0x36; ]
+[ 222,92; $sarrow:0x61; $arrow:0x62; $sarrow:0x63; ]

@@ -17,7 +17,6 @@
 #include <syslog.h>
 
 #include <Autolock.h>
-#include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <Collator.h>
@@ -465,7 +464,7 @@ BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
 	if (status != B_OK)
 		return status;
 
-	BCatalog catalog(signature);
+	BCatalog catalog(ref);
 	const char* temp = catalog.GetString(string, context);
 
 	if (temp == NULL)
@@ -505,28 +504,11 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 			catalog);
 		return catalog;
 	}
-	// figure out mimetype from image
-	BFile objectFile(info.name, B_READ_ONLY);
-	BAppFileInfo objectInfo(&objectFile);
-	char objectSignature[B_MIME_TYPE_LENGTH];
-	if (objectInfo.GetSignature(objectSignature) != B_OK) {
-		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
-			" localization.", info.name);
-		return catalog;
-	}
-
-	// drop supertype from mimetype (should be "application/"):
-	char* stripSignature = objectSignature;
-	while (*stripSignature != '/')
-		stripSignature ++;
-	stripSignature ++;
-
-	log_team(LOG_DEBUG,
-		"Image %s (address %x) requested catalog with mimetype %s",
-		info.name, catalog, stripSignature);
 
 	// load the catalog for this mimetype and return it to the app
-	catalog->SetCatalog(stripSignature, 0);
+	entry_ref ref;
+	BEntry(info.name).GetRef(&ref);
+	catalog->SetCatalog(ref, 0);
 	*catalogInitStatus = true;
 
 	return catalog;

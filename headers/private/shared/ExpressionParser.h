@@ -59,6 +59,7 @@ class ExpressionParser {
 									int32 argumentCount);
 			MAPM				_ParseFunction(const Token& token);
 			MAPM				_ParseAtom();
+			MAPM				_ParseFactorial(MAPM value);
 
 			void				_EatToken(int32 type);
 

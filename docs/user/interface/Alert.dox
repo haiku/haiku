@@ -1,0 +1,390 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		John Scipione <jscipione@gmail.com>
+ * Corresponds to:
+ *		/trunk/headers/os/interface/Alert.h	 rev 42274
+ *		/trunk/src/kits/interface/Alert.cpp	 rev 42274
+ */
+
+
+/*!
+	\file Alert.h
+	\brief BAlert class definition and support enums.
+*/
+
+
+/*!
+	\enum alert_type
+	Determines which icon (if any) is displayed in the alert dialog.
+	Choose one option. If the constructor doesn't include an
+	alert_type argument than \c B_EMPTY_ALERT is used.
+*/
+
+/*!
+	\var alert_type B_EMPTY_ALERT
+	No icon
+*/
+
+/*!
+	\var alert_type B_INFO_ALERT
+	\image html http://api.haiku-os.org/images/alert_info_32.png
+	Info icon
+*/
+
+/*!
+	\var alert_type B_IDEA_ALERT
+	\image html http://api.haiku-os.org/images/alert_idea_32.png
+	Idea icon
+*/
+
+/*!
+	\var alert_type B_WARNING_ALERT
+	\image html http://api.haiku-os.org/images/alert_warning_32.png
+	Warning icon
+*/
+
+/*!
+	\var alert_type B_STOP_ALERT
+	\image html http://api.haiku-os.org/images/alert_stop_32.png
+	Stop icon
+*/
+
+/*!
+	\enum button_spacing
+	Determines how the buttons on the alert dialog are spaced relative
+	to each other. Choose one option. If the constructor doesn't include a
+	button_spacing argument than \c B_EVEN_SPACING is used.
+*/
+
+/*!
+	\var button_spacing B_EVEN_SPACING
+	If the alert dialog has more than one button than the buttons are
+	spaced evenly across the bottom of the alert dialog.
+*/
+
+/*!
+	\var button_spacing B_OFFSET_SPACING
+	If the alert dialog has more than one button than the leftmost button
+	is offset to the left-hand side of the dialog while the rest of the
+	buttons are grouped on the right. This is useful to separate off a
+	leftmost "Cancel" or "Delete" button.
+*/
+
+
+/*!
+	\class BAlert
+	\ingroup interface
+	\ingroup libbe
+	\brief The BAlert class defines a modal alert dialog which displays a short
+		message and provides a set of labeled buttons that allow the user to
+		respond.
+
+	The alert can be configured with a set of one to three buttons. These
+	buttons are assigned indexes 0, 1, and 2 from right-to-left respectively
+	and are automatically positioned by the system. The user can either click
+	on one of the buttons or use a shortcut key to select a button.
+
+	The layout of the buttons can be configured by setting the #button_width
+	and #button_spacing properties in the BAlert constructor. The icon displayed
+	in the alert can also be configured by setting the #alert_type property. The
+	right-most button (index 0) is the default button which can be activated
+	by pushing the \key{Enter} key.
+
+	Below is an example of an unsaved changes alert dialog:
+
+	\image html BAlert_example.png
+
+	When the user responds by selecting one of the buttons the alert window is
+	removed from the screen. The index of the selected button is returned to
+	the calling application and the BAlert object is deleted.
+
+	The code used to create and display an alert dialog like the one shown
+	above is shown below:
+
+	\code
+BAlert* alert = new BAlert("Close and save dialog", "Save changes to...",
+	"Cancel", "Don't save", "Save", B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+	B_WARNING_ALERT);
+alert->SetShortcut(0, B_ESCAPE);
+int32 button_index = alert->Go();
+	\endcode
+
+	The messaged displayed in the dialog window along with the button labels
+	are set by the strings in the contructor. The Cancel button is offset to
+	the left relative to the other buttons by setting the \c B_OFFSET_SPACING
+	flag.  The \c B_WARNING_ALERT flag displays the exclamation mark icon in
+	the dialog.
+
+	Any alert with a Cancel button should map the \key{Escape} key as shown in
+	the example above. You can setup additional shortcut keys for the buttons
+	with the SetShortcut() method.
+
+	The Go() method does the work of loading up and removing the alert
+	window and returns the index of the button that the user selected.
+*/
+
+
+/*!
+	\fn BAlert::BAlert(const char *title, const char *text,
+		const char *button1, const char *button2, const char *button3,
+		button_width width, alert_type type)
+	\brief Creates and initializes a BAlert dialog.
+
+	\param title The title of the window. Since the alert window doesn't have
+		   a title tab, the title is not actually displayed anywhere but is
+		   useful for debugging purposes.
+	\param text The text that is displayed at the top of the window.
+	\param button1 Button 1 label
+	\param button2 Button 2 label
+	\param button3 Button 3 label
+	\param width A constant that describes how the button should be sized.
+		Options are
+		\li \c B_WIDTH_AS_USUAL
+		\li \c B_WIDTH_FROM_WIDEST
+		\li \c B_WIDTH_FROM_LABEL
+
+		See button_width for details.
+	\param type Constant that determines which alert icon is displayed.
+		Options are
+		\li \c B_EMPTY_ALERT
+		\li \c B_INFO_ALERT
+		\li \c B_IDEA_ALERT
+		\li \c B_WARNING_ALERT
+		\li \c B_STOP_ALERT
+
+		See alert_type for details.
+*/
+
+/*!
+	\fn BAlert::BAlert(const char *title, const char *text, const char *button1,
+		const char *button2, const char *button3, button_width width,
+		button_spacing spacing, alert_type type)
+	\brief Creates and initializes a BAlert dialog.
+
+	You can also set the \a spacing with this constructor.
+
+	\param title The title of the window. Since the alert window doesn't have
+		   a title tab, the title is not actually displayed anywhere but is
+		   useful for debugging purposes.
+	\param text The text that is displayed at the top of the window.
+	\param button1 Button 1 label
+	\param button2 Button 2 label
+	\param button3 Button 3 label
+	\param width A constant that describes how the button should be sized.
+		Options are
+		\li \c B_WIDTH_AS_USUAL
+		\li \c B_WIDTH_FROM_WIDEST
+		\li \c B_WIDTH_FROM_LABEL
+
+		See button_width for details.
+	\param spacing Determines how the buttons are spaced. Options are
+		\li \c B_EVEN_SPACING
+		\li \c B_OFFSET_SPACING 
+
+		See button_spacing for details.
+	\param type Constant that determines which alert icon is displayed.
+		Options are
+		\li \c B_EMPTY_ALERT
+		\li \c B_INFO_ALERT
+		\li \c B_IDEA_ALERT
+		\li \c B_WARNING_ALERT
+		\li \c B_STOP_ALERT
+
+		See alert_type for details.
+*/
+
+/*!
+	\fn BAlert::BAlert(BMessage* data)
+	\brief Unarchives an alert from a BMessage.
+
+	\param data The archive.
+*/
+
+/*!
+	\fn BAlert::~BAlert()
+	\brief Destructor method.
+
+	Standard Destructor method to delete a BAlert.
+*/
+
+/*!
+	\fn BArchivable* BAlert::Instantiate(BMessage* data)
+	\brief Instantiates a BAlert from a BMessage.
+	\param data The message to instantiate the BAlert.
+	\returns a BArchivable object of the BAlert.
+*/
+
+/*!
+	\fn status_t BAlert::Archive(BMessage* data, bool deep) const
+	\brief Archives the BAlert into \a archive.
+
+	\param data The target archive which the BAlert \a data will go into.
+	\param deep Whether or not to recursively archive the BAlert's children.
+	\retval B_OK The archive operation was successful.
+	\retval B_BAD_VALUE The archive operation failed.
+*/
+
+/*!
+	\fn void BAlert::SetShortcut(int32 index, char key)
+	\brief Sets the shortcut character which is mapped to a button at the
+	specified \a index.
+
+	A button can only have one shortcut except for the rightmost button which,
+	in addition to the shortcut you set, is always mapped to \c B_ENTER.
+
+	If you create a "Cancel" button then you should set its shortcut to
+	\c B_ESCAPE.
+
+	\param index The \a index of the button to set the shortcut to.
+	\param key The shortcut character to set.
+*/
+
+/*!
+	\fn char BAlert::Shortcut(int32 index) const
+	\brief Gets the shortcut character which is mapped to a button at the 
+	specified \a index.
+
+	\param index The \a index of the button to get the shortcut of.
+
+	\return The shortcut character mapped to the button at the specified
+		\a index.
+*/
+
+/*!
+	\fn int32 BAlert::Go()
+	\brief Displays the alert window.
+
+	This version of Go() that does not include an invoker is
+	synchronous. Go() returns once the user has clicked a button and
+	the panel has been removed from the screen. The BAlert object is
+	deleted before the method returns.
+
+	If the BAlert is sent a \c B_QUIT_REQUESTED message while the alert
+	window is still on screen then Go() returns -1.
+
+	\returns The index of the button clicked.
+*/
+
+/*!
+	\fn status_t BAlert::Go(BInvoker* invoker)
+	\brief Displays the alert window from a specified \a invoker.
+
+	This version of Go() with an \a invoker is asynchronous. It returns
+	immediately with \c B_OK and the button \a index is set to the field
+	of the BMessage that is sent to the target of the \a invoker.
+
+	Go() deletes the BAlert object after the message is sent.
+
+	If you call Go() with a \c NULL invoker argument than the BMessage
+	is not sent.
+
+	If the BAlert is sent a \c B_QUIT_REQUESTED method while the alert
+	window is still on screen then the message is not sent.
+
+	\returns A status code.
+*/
+
+/*!
+	\fn void BAlert::MessageReceived(BMessage* msg)
+	\brief Initiates an action from a received message.
+
+	\param msg The message
+
+	\see BWindow::MessagedReceived()
+*/
+
+/*!
+	\fn void BAlert::FrameResized(float newWidth, float newHeight)
+	\brief Resizes the alert dialog.
+
+	\param newWidth The new alert dialog width.
+	\param newHeight The new alert dialog height.
+
+	\see BWindow::FrameResized()
+*/
+
+/*!
+	\fn BButton* BAlert::ButtonAt(int32 index) const
+	\brief Returns a pointer to the BButton at the specified \a index.
+
+	The \a index of the buttons begins at \c 0 and counts from left to right.
+	If a BButton does not exist for the specified \a index then \c NULL is
+	returned.
+
+	\param index The \a index of the desired button.
+
+	\return A pointer to the BButton at the specified \a index.
+*/
+
+/*!
+	\fn BTextView* BAlert::TextView() const
+	\brief Returns a TextView containing the text of the Alert.
+*/
+
+/*!
+	\fn BHandler* BAlert::ResolveSpecifier(BMessage* msg, int32 index,
+		BMessage* specifier, int32 form, const char* property)
+	\brief Resolves specifiers for properties.
+	\see BHandler::ResolveSpecifier()
+*/
+
+/*!
+	\fn status_t BAlert::GetSupportedSuites(BMessage* data)
+	\brief Reports the suites of messages and specifiers that derived classes
+		understand.
+	
+	\param data The message to report the suite of messages and specifiers.
+
+	\see BWindow::GetSupportedSuites()
+*/
+
+/*!
+	\fn void BAlert::DispatchMessage(BMessage* msg, BHandler* handler)
+	\brief Sends out a message.
+
+	\see BWindow::DispatchMessage()
+*/
+
+/*!
+	\fn void BAlert::Quit()
+	\brief Quits the window closing it.
+
+	\see BWindow::Quit()
+*/
+
+/*!
+	\fn bool BAlert::QuitRequested()
+	\brief Hook method that gets called with the window is closed.
+
+	\returns \c true if the window closes.
+
+	\see BWindow::QuitRequested()
+*/
+
+/*!
+	\fn BPoint BAlert::AlertPosition(float width, float height)
+	\brief Resizes the Alert window to the width and height specified and
+	return the Point of the top-left corner of the Alert window.
+
+	\param width The desired \a width of the alert window.
+	\param height The desired \a height of the alert window.
+
+	\returns The BPoint of the top-left corner of the Alert window.
+*/
+
+/*!
+	\fn status_t BAlert::Perform(perform_code code, void* _data)
+	\brief Performs an action give a perform_code and data
+
+	Currently the only perform code available is \c PERFORM_CODE_SET_LAYOUT.
+
+	\param code The perform code
+	\param _data A pointer to some data to perform on
+
+	\return A status code.
+
+	\see BWindow::Perform().
+*/

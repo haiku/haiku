@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	15913470
+1	ukrainian	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1 тип додатку
 %ld Application type%s could be removed.	Application Types Window		%ld Додаток type%s Неможливо видалити.
 %s file type	FileType Window		%s тип файлу
@@ -12,15 +12,18 @@ Add icon…	Icon View		Додати іконку…
 Add new group	New File Type Window		Додати нову групу
 Add type	New File Type Window		Додати тип
 Add…	Application Type Window		Додати…
+Add…	FileTypes Window		Додати…
 Alignment:	Attribute Window		Вирівнювання:
 Alpha	Application Type Window		Альфа
 Alpha	Application Types Window		Aльфа
 Application flags	Application Type Window		Флаги додатку
 Application type	Application Type Window		Тип додатку
 Application types	Application Types Window		Типи додатків
+Application types…	FileTypes Window		Типи додатків…
 Args only	Application Type Window		Тільки аргументи
 Attribute	Attribute Window		Атрибут
 Attribute name:	Attribute Window		Ім'я атрибута:
+Background app	Application Type Window		Додаток Тло
 Beta	Application Type Window		Бета
 Beta	Application Types Window		Бета
 Cancel	Application Type Window		Відмінити
@@ -67,6 +70,7 @@ File could not be opened	Preferred App Menu		Файл неможливо від�
 File recognition	FileTypes Window		Розпізнання файлу
 File type	FileType Window		Тип файлу
 FileTypes	FileTypes		Типи Файлів
+FileTypes	System name		Типи файлів
 FileTypes request	FileTypes		Запит Типів Файлів
 FileTypes request	FileTypes Window		Запит Типів Файлів 
 FileTypes request	Preferred App Menu		Запит Типів Файлів 
@@ -98,6 +102,7 @@ New resource file…	FileTypes Window		Новий файл ресурсів…
 None	FileTypes Window		Немає
 OK	FileTypes		Гаразд
 Open file	FileTypes		Відкрити файл
+Open…	FileTypes Window		Відкрити…
 Path:	Application Types Window		Шлях:
 Preferred application	FileType Window		Бажаний додаток
 Preferred application	FileTypes Window		Бажаний додаток
@@ -114,6 +119,9 @@ Removing a super type cannot be reverted.\nAll file types that belong to this su
 Removing uninstalled application types	Application Types Window		Видалення типів для невстановлених додатків
 Right	Attribute Window	Attribute column alignment in Tracker	Вправо
 Rule:	FileTypes Window		Правило:
+Same as…	FileType Window	The same APPLICATION as ...	Такий як…  Заувага: такий додаток як ...
+Same as…	FileType Window	The same TYPE as ...	Такий як… Заувага: такий тип як ...
+Same as…	FileTypes Window		Такий як…
 Save	Application Type Window		Зберегти
 Save into resource file…	Application Type Window		Зберегти інформацію про джерело файлу…
 Save request	Application Type Window		Зберегти запит
@@ -121,8 +129,9 @@ Select preferred application	FileType Window		Вибрати бажаний до
 Select preferred application	FileTypes Window		Вибрати бажаний додаток
 Select same preferred application as	FileType Window		Вибрати за бажаний додаток
 Select same preferred application as	FileTypes Window		Вибрати такий самий бажаний додаток як 
-Select same type as	FileType Window		Вибрати такий самий тип як
+Select same type as	FileType Window		Вибрати такий тип як
 Select…	FileType Window		Вибрати…
+Select…	FileTypes Window		Вибрати…
 Set Preferred Application	Preferred App Menu		Встановити бажаний додаток
 Settings	FileTypes Window		Налаштування
 Short description:	Application Type Window		Короткий опис:

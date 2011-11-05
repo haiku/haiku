@@ -69,9 +69,22 @@ const struct supported_device {
 	{0x2e32, INTEL_TYPE_G45, "G41"},
 	{0x2e42, INTEL_TYPE_G45, "B43"},
 	{0x2e92, INTEL_TYPE_G45, "B43"},
-	
+
 	{0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
 	{0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
+
+	{0x0042, INTEL_TYPE_ILKG, "IronLake Desktop"},
+	{0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+
+	{0x0102, INTEL_TYPE_SNBG, "SandyBridge Desktop GT1"},
+	{0x0112, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2"},
+	{0x0122, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2+"},
+	{0x0106, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT1"},
+	{0x0116, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2"},
+	{0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
+	{0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"}
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -84,7 +97,7 @@ mutex gLock;
 
 
 static status_t
-get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
+get_next_intel_extreme(int32* _cookie, pci_info &info, uint32 &type)
 {
 	int32 index = *_cookie;
 
@@ -112,11 +125,11 @@ get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
 }
 
 
-extern "C" const char **
+extern "C" const char**
 publish_devices(void)
 {
 	TRACE((DEVICE_NAME ": publish_devices()\n"));
-	return (const char **)gDeviceNames;
+	return (const char**)gDeviceNames;
 }
 
 
@@ -125,7 +138,7 @@ init_hardware(void)
 {
 	TRACE((DEVICE_NAME ": init_hardware()\n"));
 
-	status_t status = get_module(B_PCI_MODULE_NAME,(module_info **)&gPCI);
+	status_t status = get_module(B_PCI_MODULE_NAME,(module_info**)&gPCI);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": pci module unavailable\n"));
 		return status;
@@ -200,7 +213,7 @@ init_driver(void)
 		gDeviceInfo[found]->init_status = B_NO_INIT;
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
-		gDeviceInfo[found]->registers = (uint8 *)info->u.h0.base_registers[0];
+		gDeviceInfo[found]->registers = (uint8*)info->u.h0.base_registers[0];
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
 

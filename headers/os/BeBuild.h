@@ -80,4 +80,8 @@
 #define B_DEFINE_SYMBOL_VERSION(function, versionedSymbol)	\
 	__asm__(".symver " function "," versionedSymbol)
 
+#define B_DEFINE_WEAK_ALIAS(name, alias_name)	\
+	__typeof (name) alias_name __attribute__ ((weak, alias (#name)))
+
+
 #endif	/* _BE_BUILD_H */

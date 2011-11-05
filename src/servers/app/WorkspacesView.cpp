@@ -177,7 +177,7 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 	Decorator *decorator = window->Decorator();
 	BRect tabFrame(0, 0, 0, 0);
 	if (decorator != NULL)
-		tabFrame = decorator->TabRect();
+		tabFrame = decorator->TitleBarRect();
 
 	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		tabFrame, tabFrame.LeftTop() - offset);

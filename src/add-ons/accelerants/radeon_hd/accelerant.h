@@ -10,18 +10,37 @@
 #define RADEON_HD_ACCELERANT_H
 
 
+#include "atom.h"
+#include "encoder.h"
 #include "mode.h"
 #include "radeon_hd.h"
 #include "pll.h"
-#include "dac.h"
-#include "tmds.h"
 
 
+#include <ByteOrder.h>
 #include <edid.h>
 
 
-#define MAX_CRT 6
-	// eyefinity limit
+#define MAX_DISPLAY 2
+	// Maximum displays (more then two requires AtomBIOS)
+
+
+struct gpu_state_info {
+	uint32 d1vga_control;
+	uint32 d2vga_control;
+	uint32 vga_render_control;
+	uint32 vga_hdp_control;
+	uint32 d1crtc_control;
+	uint32 d2crtc_control;
+};
+
+
+struct mc_info {
+	bool		valid;
+	uint64		vramStart;
+	uint64		vramEnd;
+	uint64		vramSize;
+};
 
 
 struct accelerant_info {
@@ -34,11 +53,19 @@ struct accelerant_info {
 	display_mode	*mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
+	uint8*			rom;
+	area_id			rom_area;
+
 	edid1_info		edid_info;
 	bool			has_edid;
 
 	int				device;
 	bool			is_clone;
+
+	struct gpu_state_info gpu_info;	// used for last known gpu state
+	struct mc_info	mc;				// used for memory controller info
+
+	volatile uint32	dpms_mode;		// current driver dpms mode
 
 	// LVDS panel mode passed from the bios/startup.
 	display_mode	lvds_panel_mode;
@@ -46,15 +73,14 @@ struct accelerant_info {
 
 
 struct register_info {
-	uint16	crtid;
+	uint16	crtcOffset;
 	uint16	vgaControl;
 	uint16	grphEnable;
-	uint16	grphUpdate;
 	uint16	grphControl;
 	uint16	grphSwapControl;
 	uint16	grphPrimarySurfaceAddr;
-	uint16	grphPrimarySurfaceAddrHigh;
 	uint16	grphSecondarySurfaceAddr;
+	uint16	grphPrimarySurfaceAddrHigh;
 	uint16	grphSecondarySurfaceAddrHigh;
 	uint16	grphPitch;
 	uint16	grphSurfaceOffsetX;
@@ -63,57 +89,90 @@ struct register_info {
 	uint16	grphYStart;
 	uint16	grphXEnd;
 	uint16	grphYEnd;
-	uint16	crtControl;
-	uint16	crtCountControl;
-	uint16	crtInterlace;
-	uint16	crtHPolarity;
-	uint16	crtVPolarity;
-	uint16	crtHSync;
-	uint16	crtVSync;
-	uint16	crtHBlank;
-	uint16	crtVBlank;
-	uint16	crtHTotal;
-	uint16	crtVTotal;
 	uint16	modeDesktopHeight;
 	uint16	modeDataFormat;
-	uint16	modeCenter;
 	uint16	viewportStart;
 	uint16	viewportSize;
-	uint16	sclUpdate;
-	uint16	sclEnable;
-	uint16	sclTapControl;
 };
 
 
 typedef struct {
-	uint16	location;
-	uint16	locationIndex;
-	uint32	vfreq_max;
-	uint32	vfreq_min;
-	uint32	hfreq_max;
-	uint32	hfreq_min;
-} crt_info;
+	bool	valid;
+
+	bool	hw_capable;
+	uint32	hw_line;
+
+	uint32	mask_scl_reg;
+	uint32	mask_sda_reg;
+	uint32	mask_scl_mask;
+	uint32	mask_sda_mask;
+
+	uint32	en_scl_reg;
+	uint32	en_sda_reg;
+	uint32	en_scl_mask;
+	uint32	en_sda_mask;
+
+	uint32	y_scl_reg;
+	uint32	y_sda_reg;
+	uint32	y_scl_mask;
+	uint32	y_sda_mask;
+
+	uint32	a_scl_reg;
+	uint32	a_sda_reg;
+	uint32	a_scl_mask;
+	uint32	a_sda_mask;
+} gpio_info;
 
 
-#define HEAD_MODE_A_ANALOG		0x01
-#define HEAD_MODE_B_DIGITAL		0x02
-#define HEAD_MODE_CLONE			0x03
-#define HEAD_MODE_LVDS_PANEL	0x08
+struct encoder_info {
+	bool		valid;
+	uint16		objectID;
+	uint32		type;
+	uint32		flags;
+	bool		isExternal;
+	bool		isHDMI;
+	bool		isTV;
+	struct pll_info	pll;
+};
+
+
+typedef struct {
+	bool		valid;
+	uint16		objectID;
+	uint32		type;
+	uint32		flags;
+	uint16		gpioID;
+	struct encoder_info encoder;
+	// TODO struct radeon_hpd hpd;
+} connector_info;
+
+
+typedef struct {
+	bool			active;
+	uint32			connectorIndex; // matches connector id in connector_info
+	register_info	*regs;
+	bool			found_ranges;
+	uint32			vfreq_max;
+	uint32			vfreq_min;
+	uint32			hfreq_max;
+	uint32			hfreq_min;
+	edid1_info		edid_info;
+} display_info;
+
 
 // register MMIO modes
-#define OUT 0x1	// direct MMIO calls
-#define CRT 0x2	// crt controler calls
-#define VGA 0x3 // vga calls
+#define OUT 0x1	// Direct MMIO calls
+#define CRT 0x2	// Crt controller calls
+#define VGA 0x3 // Vga calls
 #define PLL 0x4 // PLL calls
-#define MC	0x5 // Memory Controler calls
+#define MC	0x5 // Memory controller calls
 
 
 extern accelerant_info *gInfo;
-extern register_info *gRegister;
-extern crt_info *gCRT[MAX_CRT];
-
-
-status_t init_registers(uint8 crtid);
+extern atom_context *gAtomContext;
+extern display_info *gDisplay[MAX_DISPLAY];
+extern connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+extern gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access
@@ -132,19 +191,18 @@ _write32(uint32 offset, uint32 value)
 }
 
 
+// AtomBIOS cail register calls (are *4... no clue why)
 inline uint32
-_read32PLL(uint16 offset)
+Read32Cail(uint32 offset)
 {
-	_write32(CLOCK_CNTL_INDEX, offset & PLL_ADDR);
-	return _read32(CLOCK_CNTL_DATA);
+	return _read32(offset * 4);
 }
 
 
 inline void
-_write32PLL(uint16 offset, uint32 data)
+Write32Cail(uint32 offset, uint32 value)
 {
-	_write32(CLOCK_CNTL_INDEX, (offset & PLL_ADDR) | PLL_WR_EN);
-	_write32(CLOCK_CNTL_DATA, data);
+	_write32(offset * 4, value);
 }
 
 
@@ -155,13 +213,11 @@ Read32(uint32 subsystem, uint32 offset)
 		default:
 		case OUT:
 		case VGA:
-		case MC:
-			return _read32(offset);
 		case CRT:
-			return _read32(offset);
 		case PLL:
 			return _read32(offset);
-			//return _read32PLL(offset);
+		case MC:
+			return _read32(offset);
 	};
 }
 
@@ -173,15 +229,12 @@ Write32(uint32 subsystem, uint32 offset, uint32 value)
 		default:
 		case OUT:
 		case VGA:
-		case MC:
-			_write32(offset, value);
-			return;
 		case CRT:
-			_write32(offset, value);
-			return;
 		case PLL:
 			_write32(offset, value);
-			//_write32PLL(offset, value);
+			return;
+		case MC:
+			_write32(offset, value);
 			return;
 	};
 }

@@ -5,6 +5,7 @@
 
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Screen.h>
 #include <String.h>
 #include <View.h>
@@ -25,6 +26,8 @@
 #include "multiuser_utils.h"
 #endif
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Login App"
 
 const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
 
@@ -48,11 +51,12 @@ LoginApp::ReadyToRun()
 	BScreen screen;
 
 	if (fEditShelfMode) {
-		(new BAlert("Info", "You can customize the desktop shown "
-			"behind the Login application by dropping replicants onto it.\n"
+		(new BAlert(B_TRANSLATE("Info"), B_TRANSLATE("You can customize the "
+			"desktop shown behind the Login application by dropping replicants"
+			" onto it.\n"
 			"\n"
-			"When you are finished just quit the application (Alt-Q).",
-			"OK"))->Go(NULL);
+			"When you are finished just quit the application (Alt-Q)."),
+			B_TRANSLATE("OK")))->Go(NULL);
 	} else {
 		BRect frame(0, 0, 400, 150);
 		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2,
@@ -88,14 +92,15 @@ LoginApp::MessageReceived(BMessage *message)
 			BRoster::Private rosterPrivate(roster);
 			status_t error = rosterPrivate.ShutDown(reboot, false, false);
 			if (error < B_OK) {
-				BString msg("Error: ");
-				msg << strerror(error);
-				(new BAlert("Error", msg.String(), "OK"))->Go();
+				BString msg(B_TRANSLATE("Error: %1"));
+				msg.ReplaceFirst("%1", strerror(error));
+				(new BAlert(("Error"), msg.String(), B_TRANSLATE("OK")))->Go();
 			}
 			break;
 		}
 		case kSuspendAction:
-			(new BAlert("Error", "Unimplemented", "OK"))->Go();
+			(new BAlert(B_TRANSLATE("Error"), B_TRANSLATE("Unimplemented"),
+				B_TRANSLATE("OK")))->Go();
 			break;
 #endif
 	default:
@@ -115,11 +120,11 @@ LoginApp::ArgvReceived(int32 argc, char **argv)
 		else if (arg == "--nonmodal")
 			fModalMode = false;
 		else /*if (arg == "--help")*/ {
-			printf("Login application for Haiku\nUsage:\n");
+			printf(B_TRANSLATE("Login application for Haiku\nUsage:\n"));
 			printf("%s [--nonmodal] [--edit]\n", argv[0]);
-			printf("--nonmodal	Do not make the window modal\n");
-			printf("--edit	Launch in shelf editting mode to "
-				"allow customizing the desktop.\n");
+			printf(B_TRANSLATE("--nonmodal	Do not make the window modal\n"));
+			printf(B_TRANSLATE("--edit	Launch in shelf editting mode to "
+				"allow customizing the desktop.\n"));
 			// just return to the shell
 			exit((arg == "--help") ? 0 : 1);
 			return;
@@ -139,7 +144,9 @@ LoginApp::TryLogin(BMessage *message)
 		if (message->FindString("password", &password) < B_OK)
 			password = NULL;
 		err = ValidateLogin(login, password);
-		printf("ValidateLogin: %s\n", strerror(err));
+		printf(B_TRANSLATE_COMMENT("ValidateLogin: %s\n",
+			"A message returned from the ValidateLogin function. "
+			"It can be \"B_OK\"."), strerror(err));
 		if (err == B_OK) {
 			reply.what = kLoginOk;
 			message->SendReply(&reply);
@@ -224,6 +231,3 @@ LoginApp::getpty(char *pty, char *tty)
 
 	return fd;
 }
-
-
-

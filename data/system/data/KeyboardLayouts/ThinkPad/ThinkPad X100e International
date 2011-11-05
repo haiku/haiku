@@ -1,0 +1,29 @@
+name = ThinkPad X100e International
+
+# Size shortcuts
+default-size = 19,18
+$s = 15.5,10
+$gap = 2.125,10
+$backspace = 25,18
+$tab = 27,18
+$caps = 33,18
+$small = 16,18
+$enter = dl23,36,15
+$lshift = 22,18
+$rshift = 41,18
+$bottom = 19,20
+$space = 105,20
+$sarrow = 17,10
+$arrow = 19,10
+
+# Key rows
+[ 0,0; $s:0x01; $gap:-; $s:+4; $gap:-; $s:+4; $gap:-; $s:+4; $gap:-; $s:0x1f;
+	$s:0x34; $s:0x20; $s:0x35; ]
+[ 0,10; :0x11+12; $backspace:+1; ]
+[ 0,28; $tab:0x26; :+10; $small:+1; $small:+1; $enter:0x47; ]
+[ 0,46; $caps:0x3b; :+10; $small:+1; $small:0x33; ]
+[ 0,64; $lshift:0x4b; :0x69; :0x4c+9; $rshift:+1; ]
+[ 0,82; $bottom:-; $bottom:0x5c; $bottom:0x66; $bottom:0x5d; $space:+1;
+	$bottom:+1; $bottom:0x60; 17,9:0x21; $arrow:0x57;
+	17,9:0x36; ]
+[ 219,92; $sarrow:0x61; $arrow:0x62; $sarrow:0x63; ]

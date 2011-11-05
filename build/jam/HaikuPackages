@@ -42,7 +42,7 @@ AddFilesToPackage add-ons kernel busses scsi : ahci ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
-	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm
+	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm <kdebug>hangman
 	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
@@ -79,7 +79,7 @@ AddDriversToPackage input			: ps2_hid usb_hid wacom ;
 AddDriversToPackage misc			: <driver>poke <driver>mem ;
 AddDriversToPackage net				: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 AddDriversToPackage ports			: usb_serial ;
-#AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
+AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
 AddFilesToPackage : <revisioned>kernel_$(TARGET_ARCH) ;
@@ -215,10 +215,54 @@ AddSymlinkToPackage data Keymaps : Swedish : Finnish ;
 AddSymlinkToPackage data Keymaps : Slovene : Croatian ;
 AddSymlinkToPackage data Keymaps : US-International : Brazilian ;
 
+# Copy keyboard layout files to the image one-by-one.
 local keyboardLayoutsDir
 	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
-local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
-AddFilesToPackage data KeyboardLayouts : $(keyboardLayouts) ;
+local keyboardLayoutFiles =
+	"Generic 104-key"
+	"Generic 105-key International"
+	"Kinesis Advantage"
+	"Kinesis Ergo Elan International"
+	"TypeMatrix 2030" ;
+keyboardLayoutFiles = $(keyboardLayoutFiles:G=keyboard-layout) ;
+SEARCH on $(keyboardLayoutFiles) = $(keyboardLayoutsDir) ;
+AddFilesToPackage data KeyboardLayouts
+	: $(keyboardLayoutFiles) ;
+
+# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local appleAluminumDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
+		Apple\ Aluminum ] ;
+local appleAluminumFiles =
+	"Apple Aluminium Extended International"
+	"Apple Aluminium International"
+	"Apple Aluminum (US)"
+	"Apple Aluminum Extended (US)" ;
+appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
+SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
+AddFilesToPackage data KeyboardLayouts Apple\ Aluminum
+	: $(appleAluminumFiles) ;
+
+# Add ThinkPad keyboard layout files to the image in a ThinkPad
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local thinkpadDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
+local thinkPadFiles =
+	"ThinkPad (US)"
+	"ThinkPad International"
+	"ThinkPad T400s (US)"
+	"ThinkPad T400s International"
+	"ThinkPad X1 (US)"
+	"ThinkPad X1 International"
+	"ThinkPad X100e (US)"
+	"ThinkPad X100e International" ;
+thinkPadFiles = $(thinkPadFiles:G=keyboard-layout) ;
+SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
+AddFilesToPackage data KeyboardLayouts ThinkPad
+	: $(thinkPadFiles) ;
 
 # boot loader
 AddFilesToPackage : haiku_loader ;
@@ -402,6 +446,8 @@ HaikuPackage $(haikuUserGuidePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs userguide ]
 	: userguide : -x .svn ;
+SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : userguide ;
 
 BuildHaikuPackage $(haikuUserGuidePackage) : haiku-userguide ;
 
@@ -414,6 +460,8 @@ HaikuPackage $(haikuWelcomePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs welcome ]
 	: welcome : -x .svn ;
+SEARCH on welcome = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : welcome ;
 
 BuildHaikuPackage $(haikuWelcomePackage) : haiku-welcome ;
 

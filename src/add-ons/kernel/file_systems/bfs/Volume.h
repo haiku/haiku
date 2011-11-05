@@ -92,6 +92,8 @@ public:
 
 			status_t		CreateIndicesRoot(Transaction& transaction);
 
+			status_t		CreateVolumeID(Transaction& transaction);
+
 			InodeList&		RemovedInodes() { return fRemovedInodes; }
 				// This list is guarded by the transaction lock
 

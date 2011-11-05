@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2699246155
+1	german	x-vnd.Haiku-libtracker	3486294898
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld Bytes
@@ -38,6 +38,7 @@ An item named \"%name\" already exists in this folder. Would you like to replace
 And	FindPanel		Und
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sollen die ausgewählten Objekte wirklich gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sollen die ausgewählten Dateien wirklich in diesen Ordner kopiert oder bewegt werden?
+Arrange by	ContainerWindow		Icons ordnen nach
 Ask before delete	SettingsView		Vor dem Leeren nachfragen
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Bei %func \nfind_directory() fehlgeschlagen \nGrund: %error
 Attributes	ContainerWindow		Attribute
@@ -301,6 +302,7 @@ Resize to fit	QueryContainerWindow		Optimale Größe
 Resize to fit	VolumeWindow		Optimale Größe
 Restore	ContainerWindow		Wiederherstellen
 Restoring: 	StatusWindow		Wiederherstellen von:
+Reverse order	ContainerWindow		Reihenfolge umkehren
 Revert	TrackerSettingsWindow		Rückgängig
 Save	FilePanelPriv		Speichern
 Save	FindPanel		Speichern

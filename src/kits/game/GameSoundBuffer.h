@@ -65,10 +65,11 @@ protected:
 			
 			size_t					fFrameSize;
 			
-private:
-			
 			Connection *			fConnection;
 			GameProducer *			fNode;
+
+private:
+			
 			bool					fIsConnected;
 			bool					fIsPlaying;
 			
@@ -103,7 +104,9 @@ private:
 class StreamingSoundBuffer : public GameSoundBuffer {
 public:
 								StreamingSoundBuffer(const gs_audio_format * format,
-													 const void * streamHook);
+													 const void * streamHook,
+													 size_t inBufferFrameCount,
+													 size_t inBufferCount);
 	virtual						~StreamingSoundBuffer();
 	
 protected:

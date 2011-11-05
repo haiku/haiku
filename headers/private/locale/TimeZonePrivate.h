@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2010-2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TIME_ZONE_PRIVATE_H
@@ -23,7 +23,7 @@ public:
 		fTimeZone = timeZone;
 	}
 
-	icu_44::TimeZone*
+	icu::TimeZone*
 	ICUTimeZone()
 	{
 		return fTimeZone->fICUTimeZone;

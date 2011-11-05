@@ -117,6 +117,8 @@
 #define EVERGREEN_GRPH_Y_START                          0x6830
 #define EVERGREEN_GRPH_X_END                            0x6834
 #define EVERGREEN_GRPH_Y_END                            0x6838
+#define EVERGREEN_GRPH_FLIP_CONTROL                     0x6848
+#       define EVERGREEN_GRPH_SURFACE_UPDATE_H_RETRACE_EN (1 << 0)
 #define EVERGREEN_CUR_CONTROL                           0x6998
 #       define EVERGREEN_CURSOR_EN                      (1 << 0)
 #       define EVERGREEN_CURSOR_MODE(x)                 (((x) & 0x3) << 8)
@@ -180,6 +182,7 @@
 #define EVERGREEN_CRTC_CONTROL                          0x6e70
 #       define EVERGREEN_CRTC_MASTER_EN                 (1 << 0)
 #define EVERGREEN_CRTC_UPDATE_LOCK                      0x6ed4
+#define EVERGREEN_MASTER_UPDATE_MODE                    0x6ef8
 #define EVERGREEN_DC_GPIO_HPD_MASK                      0x64b0
 #define EVERGREEN_DC_GPIO_HPD_A                         0x64b4
 #define EVERGREEN_DC_GPIO_HPD_EN                        0x64b8

@@ -27,3 +27,8 @@
 
 # Add the optional package WonderBrush to the image.
 #AddOptionalHaikuImagePackages WonderBrush ;
+
+# Add an example optional gfx driver and its accelerant.
+# (Drivers just have a special rule because of the need for the symlink in dev/)
+#AddDriversToHaikuImage graphics : optional_driver ;
+#AddFilesToHaikuImage system add-ons accelerants : optional_driver.accelerant ;

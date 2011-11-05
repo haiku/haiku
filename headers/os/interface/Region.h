@@ -56,6 +56,7 @@ public:
 
 			void				PrintToStream() const;
 
+			void				OffsetBy(const BPoint& point);
 			void				OffsetBy(int32 x, int32 y);
 
 			void				MakeEmpty();

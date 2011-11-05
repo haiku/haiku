@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Mail	1746145370
+1	swedish	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		Kontonamn:
 Account name:	E-Mail		Kontonamn:
 Account settings	AutoConfigWindow		Kontoinställningar
@@ -25,6 +25,7 @@ Incoming mail filters	Config Views		Inkommande e-postfilter
 Login name:	E-Mail		Inloggningsnamn:
 Mail checking	Config Window		Kontrollera e-post
 Miscellaneous	Config Window		Diverse
+Never	Config Window	show status window	Aldrig
 Next	AutoConfigWindow		Nästa
 OK	AutoConfigWindow		OK
 OK	Config Views		OK
@@ -50,10 +51,10 @@ While sending	Config Window		När sändning sker
 While sending and receiving	Config Window		När sändning och mottagning sker
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nSkapa ett nytt konto via Lägg till-knappen.\n\nTa bort ett konto med Ta bort-knappen vid den valda objektet.\n\nVälj ett listobjekt för att ändra dess inställningar.
+\t\t· E-mail filters	Config Window		\t\t· E-postfilter
+\t\t· Incoming	Config Window		\t\t· Inkommande
+\t\t· Outgoing	Config Window		\t\t· Utgående
 days	Config Window		dagar
 hours	Config Window		timmar
 minutes	Config Window		minuter
-never	Config Window		aldrig
-· E-mail filters	Config Window		· E-postfilter
-· Incoming	Config Window		· Inkommande
-· Outgoing	Config Window		· Utgående
+never	Config Window	mail checking frequency	aldrig

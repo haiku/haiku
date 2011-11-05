@@ -72,60 +72,31 @@ dlerror(void)
 
 
 int
-dladdr(void *addr, Dl_info *info)
+dladdr(void *address, Dl_info *info)
 {
-// TODO: This can be implemented more efficiently in the runtime loader.
-// get_library_symbol() already has the code doing that.
-	char curSymName[NAME_MAX];
-	static char symName[NAME_MAX];
-	static char imageName[MAXPATHLEN];
-	void *symLocation;
-	int32 cookie;
-	int32 symType, symNameLength;
-	uint32 symIndex;
-	image_info imageInfo;
+	static char sImageName[MAXPATHLEN];
+	static char sSymbolName[NAME_MAX];
 
-	if (info == NULL)
+	image_id image;
+	int32 nameLength = sizeof(sSymbolName);
+	void* location;
+	image_info imageInfo;
+	sStatus = __gRuntimeLoader->get_symbol_at_address(address, &image,
+		sSymbolName, &nameLength, NULL, &location);
+	if (sStatus != B_OK)
 		return 0;
 
-	imageName[0] = '\0';
-	symName[0] = '\0';
-	info->dli_fname = imageName;
-	info->dli_saddr = NULL;
-	info->dli_sname = symName;
+	sStatus = get_image_info(image, &imageInfo);
+	if (sStatus != B_OK)
+		return 0;
 
-	cookie = 0;
-	while (get_next_image_info(0, &cookie, &imageInfo) == B_OK) {
-		// check if the image holds the symbol
-		if ((addr_t)addr >= (addr_t)imageInfo.text
-			&& (addr_t)addr < (addr_t)imageInfo.text + imageInfo.text_size)  {
-			strlcpy(imageName, imageInfo.name, MAXPATHLEN);
-			info->dli_fbase = imageInfo.text;
-			symIndex = 0;
-			symNameLength = NAME_MAX;
+	strlcpy(sImageName, imageInfo.name, MAXPATHLEN);
+	info->dli_fname = sImageName;
+	info->dli_fbase = imageInfo.text;
+	info->dli_sname = sSymbolName;
+	info->dli_saddr = location;
 
-			while (get_nth_image_symbol(imageInfo.id, symIndex, curSymName,
-					&symNameLength, &symType, &symLocation) == B_OK) {
-				// check if symbol is the nearest until now
-				if (symLocation <= addr && symLocation >= info->dli_saddr) {
-					strlcpy(symName, curSymName, NAME_MAX);
-					info->dli_saddr = symLocation;
-
-					// stop here if exact match
-					if (info->dli_saddr == addr)
-						return 1;
-				}
-				symIndex++;
-				symNameLength = NAME_MAX;
-			}
-			break;
-		}
-	}
-
-	if (info->dli_saddr != NULL)
-		return 1;
-
-	return 0;
+	return 1;
 }
 
 

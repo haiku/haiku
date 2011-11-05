@@ -20,7 +20,6 @@
 #include <FindDirectory.h>
 #include <IconUtils.h>
 #include <List.h>
-#include <Locale.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -171,8 +170,12 @@ PairsView::_ReadRandomIcons()
 			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Pairs did not find "
 				"enough vector icons in the system; it needs at least %d."),
 				fNumOfCards / 2);
-			BAlert* alert = new BAlert("fatal", buffer, B_TRANSLATE("OK"),
-				NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
+			BString msgStr(buffer);
+			msgStr << "\n";
+			BAlert* alert = new BAlert("Fatal", msgStr.String(),
+				B_TRANSLATE("OK"), 	NULL, NULL, B_WIDTH_FROM_WIDEST,
+				B_STOP_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 			exit(1);
 		}

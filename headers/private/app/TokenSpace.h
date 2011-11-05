@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,12 +10,11 @@
 #define _TOKEN_SPACE_H
 
 
-#include <BeBuild.h>
-#include <Locker.h>
-#include <SupportDefs.h>
-
 #include <map>
 #include <stack>
+
+#include <Locker.h>
+#include <SupportDefs.h>
 
 
 // token types as specified in targets
@@ -30,38 +29,47 @@
 
 namespace BPrivate {
 
+
 class BDirectMessageTarget;
 
 
 class BTokenSpace : public BLocker {
-	public:
-		BTokenSpace();
-		~BTokenSpace();
+public:
+								BTokenSpace();
+								~BTokenSpace();
 
-		int32		NewToken(int16 type, void* object);
-		bool		SetToken(int32 token, int16 type, void* object);
+			int32				NewToken(int16 type, void* object);
+			bool				SetToken(int32 token, int16 type, void* object);
 
-		bool		RemoveToken(int32 token);
-		bool		CheckToken(int32 token, int16 type) const;
-		status_t	GetToken(int32 token, int16 type, void** _object) const;
+			bool				RemoveToken(int32 token);
+			bool				CheckToken(int32 token, int16 type) const;
+			status_t			GetToken(int32 token, int16 type,
+									void** _object) const;
 
-		status_t	SetHandlerTarget(int32 token, BDirectMessageTarget* target);
-		status_t	AcquireHandlerTarget(int32 token, BDirectMessageTarget** _target);
+			status_t			SetHandlerTarget(int32 token,
+									BDirectMessageTarget* target);
+			status_t			AcquireHandlerTarget(int32 token,
+									BDirectMessageTarget** _target);
 
-	private:
-		struct token_info {
-			int16	type;
-			void*	object;
-			BDirectMessageTarget* target;
-		};
-		typedef std::map<int32, token_info> TokenMap;
+			void				InitAfterFork();
 
-		TokenMap	fTokenMap;
-		int32		fTokenCount;
+private:
+	struct token_info {
+		int16	type;
+		void*	object;
+		BDirectMessageTarget* target;
+	};
+	typedef std::map<int32, token_info> TokenMap;
+
+			TokenMap			fTokenMap;
+			int32				fTokenCount;
 };
+
 
 extern BTokenSpace gDefaultTokens;
 
+
 }	// namespace BPrivate
+
 
 #endif	// _TOKEN_SPACE_H

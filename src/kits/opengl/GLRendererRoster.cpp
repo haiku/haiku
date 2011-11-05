@@ -150,7 +150,12 @@ GLRendererRoster::AddPath(const char* path)
 	int32 files = 0;
 
 	entry_ref ref;
+	BEntry entry;
 	while (directory.GetNextRef(&ref) == B_OK) {
+		entry.SetTo(&ref);
+		if (entry.InitCheck() == B_OK && !entry.IsFile())
+			continue;
+
 		if (CreateRenderer(ref) == B_OK)
 			count++;
 

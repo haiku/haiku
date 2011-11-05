@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc.
+ * Copyright 2003-2011, Haiku, Inc.
  * Distributed under the terms of the MIT Licence.
  */
 #ifndef _COLLATOR_H_
@@ -10,7 +10,7 @@
 #include <SupportDefs.h>
 
 
-namespace icu_44 {
+namespace icu {
 	class Collator;
 	class RuleBasedCollator;
 };
@@ -75,7 +75,7 @@ public:
 private:
 			status_t			_SetStrength(int8 strength) const;
 
-			mutable icu_44::Collator*	fICUCollator;
+			mutable icu::Collator*	fICUCollator;
 			int8				fDefaultStrength;
 			bool				fIgnorePunctuation;
 };

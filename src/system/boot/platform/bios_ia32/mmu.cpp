@@ -676,7 +676,12 @@ mmu_init(void)
 				if (end <= base)
 					continue;
 
-				if (insert_physical_memory_range(base, end - base) != B_OK) {
+				status_t status = insert_physical_memory_range(base, end - base);
+				if (status == B_ENTRY_NOT_FOUND) {
+					panic("mmu_init(): Failed to add physical memory range "
+						"%#" B_PRIx64 " - %#" B_PRIx64 " : all %d entries are "
+						"used already!\n", base, end, MAX_PHYSICAL_MEMORY_RANGE);
+				} else if (status != B_OK) {
 					panic("mmu_init(): Failed to add physical memory range "
 						"%#" B_PRIx64 " - %#" B_PRIx64 "\n", base, end);
 				}

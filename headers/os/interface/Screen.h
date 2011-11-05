@@ -52,20 +52,20 @@ public:
 									BRect* frame = NULL);
 
 			rgb_color			DesktopColor();
-			rgb_color			DesktopColor(uint32 index);
+			rgb_color			DesktopColor(uint32 workspace);
 			void				SetDesktopColor(rgb_color color,
-									bool makeDefault = true);
+									bool stick = true);
 			void				SetDesktopColor(rgb_color color,
-									uint32 index, bool makeDefault = true);
+									uint32 workspace, bool stick = true);
 
 			status_t			ProposeMode(display_mode* target,
 									const display_mode* low,
 									const display_mode* high);
 			status_t			GetModeList(display_mode** _modeList,
 									uint32* _count);
-			status_t			GetMode(display_mode* _mode);
+			status_t			GetMode(display_mode* mode);
 			status_t			GetMode(uint32 workspace,
-									display_mode* _mode);
+									display_mode* mode);
 			status_t			SetMode(display_mode* mode,
 									bool makeDefault = false);
 			status_t			SetMode(uint32 workspace,
@@ -74,7 +74,7 @@ public:
 			status_t			GetDeviceInfo(accelerant_device_info* info);
 			status_t			GetMonitorInfo(monitor_info* info);
 			status_t			GetPixelClockLimits(display_mode* mode,
-									uint32* low, uint32* high);
+									uint32* _low, uint32* _high);
 			status_t			GetTimingConstraints(
 									display_timing_constraints*
 										timingConstraints);

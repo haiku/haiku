@@ -33,6 +33,7 @@ OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL 
 OptionalPackageDependencies Transmission : LibEvent Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Vim : GetText LibIconv ;
 OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
+OptionalPackageDependencies wpa_supplicant : OpenSSL ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 
 OptionalPackageDependencies MandatoryPackages : ICU Sed Tar ;

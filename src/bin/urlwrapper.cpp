@@ -244,6 +244,23 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	PRINT(("PASS='%s'\n", pass.String()));
 	PRINT(("PATH='%s'\n", path.String()));
 
+	if (proto == "about") {
+		app_info info;
+		BString sig;
+		// BUrl could get an accessor for the full - proto part...
+		sig = host << "/" << path;
+		BMessage msg(B_ABOUT_REQUESTED);
+		if (be_roster->GetAppInfo(sig.String(), &info) == B_OK) {
+			BMessenger msgr(sig.String());
+			msgr.SendMessage(&msg);
+			return;
+		}
+		if (be_roster->Launch(sig.String(), &msg) == B_OK)
+			return;
+		be_roster->Launch("application/x-vnd.Haiku-About");
+		return;
+	}
+	
 	if (proto == "telnet") {
 		BString cmd("telnet ");
 		if (url.HasUser())
@@ -448,26 +465,47 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	// Audio: ?
 
-	// vnc: ?
-	// irc: ?
-	// 
-	// svn: ?
-	// cvs: ?
-	// smb: cifsmount ?
-	// nfs: mount_nfs ?
-	//
-	// mailto: ? Mail & Beam both handle it already (not fully though).
-	//
-	// mid: cid: as per RFC 2392
-	// http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid
-	//
-	// itps: pcast: podcast: s//http/ + parse xml to get url to mp3 stream...
-	// audio: s//http:/ + default MediaPlayer
-	// -- see http://forums.winamp.com/showthread.php?threadid=233130
-	//
-	// gps: ? I should submit an RFC for that one :)
+	/*
+
+	More ?
+	cf. http://en.wikipedia.org/wiki/URI_scheme
+	cf. http://www.iana.org/assignments/uri-schemes.html
+
+	Audio: (SoundPlay specific, identical to http:// to a shoutcast server)
+
+	vnc: ?
+	irc: ?
+	im: http://tools.ietf.org/html/rfc3860
+	
+	svn: handled by checkitout
+	cvs: handled by checkitout
+	git: handled by checkitout
+	rsync: handled by checkitout - http://tools.ietf.org/html/rfc5781
+
+	smb: cifsmount ?
+	nfs: mount_nfs ? http://tools.ietf.org/html/rfc2224
+	ipp: http://tools.ietf.org/html/rfc3510
+
+	mailto: ? Mail & Beam both handle it already (not fully though).
+	imap: to describe mail accounts ? http://tools.ietf.org/html/rfc5092
+	pop: http://tools.ietf.org/html/rfc2384
+	mid: cid: as per RFC 2392
+	http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid
+	message:<MID> http://daringfireball.net/2007/12/message_urls_leopard_mail
+
+	itps: pcast: podcast: s//http/ + parse xml to get url to mp3 stream...
+	audio: s//http:/ + default MediaPlayer
+	-- see http://forums.winamp.com/showthread.php?threadid=233130
+
+	gps: ? I should submit an RFC for that one :)
+
+	webcal: (is http: to .ics file)
+
+	data: (but it's dangerous)
+
+	*/
+	
 
 }
 

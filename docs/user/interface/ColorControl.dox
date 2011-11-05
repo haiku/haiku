@@ -1,0 +1,316 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		/trunk/headers/os/interface/ColorControl.h	 rev 42794
+ *		/trunk/src/kits/interface/ColorControl.cpp	 rev 42794
+ */
+
+
+/*!
+	\file ColorControl.h
+	\brief BColorControl class definition and support enums.
+*/
+
+
+/*! \enum color_control_layout
+	Enumeration of the color control layout options.
+*/
+
+/*!
+	\var color_control_layout B_CELLS_4x64
+	cells are arranged in 4 columns, 64 rows.
+*/
+
+/*!
+	\var color_control_layout B_CELLS_8x32
+	cells are arranged in 8 columns, 32 rows.
+*/
+
+/*!
+	\var color_control_layout B_CELLS_16x16
+	cells are arranged in 16 columns, 16 rows.
+*/
+
+/*!
+	\var color_control_layout B_CELLS_32x8
+	cells are arranged in 32 columns, 8 rows.
+*/
+
+/*!
+	\var color_control_layout B_CELLS_64x4
+	cells are arranged in 64 columns, 4 rows.
+*/
+
+
+/*!
+	\class BColorControl
+	\ingroup interface
+	\ingroup libbe
+
+	\brief BColorControl displays an on-screen color picker.
+
+	The value of the color control is a rgb_color data structure
+	containing a 32-bit color. If a message is specified in the
+	constructor then the message is sent to a target in response to
+	changes in the color value.
+
+	The color value is initially set to 0 which corresponds to black.
+	To set the color of the color control use the SetValue() method.
+
+	An example of creating a color control looks like this:
+\code
+colorControl = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0,
+	"ColorControl", new BMessage(kValueChanged));
+colorControl->SetValue(0x336698);
+\endcode
+
+	A BColorControl contains four color ramps to set the red, green,
+	and blue components of the color control value. A greyscale slider
+	is provided to easily select black, white, and shades of grey. The color
+	control also contains three child BTextControl objects used to set the
+	color by typing in a number between 0 and 255 for the red, green, and
+	blue components of the color value.
+
+	\image html BColorControl_example.png
+
+	If the screen is set to 8-bit (256) colors then the color ramps are
+	replaced with a palette of color cells.
+
+	\image html BColorControl_example_256_colors.png
+
+	You can set the size of these cells by calling the SetCellSize() method.
+*/
+
+
+/*!
+	\fn BColorControl::BColorControl(BPoint leftTop,
+		color_control_layout layout, float cellSize, const char *name,
+		BMessage *message = NULL, bool bufferedDrawing = false)
+	\brief Constructs a new color control object.
+
+	\param leftTop location of the left top corner of the frame rectangle
+		relative to the parent view.
+	\param layout The \a layout of the BColorControl. See the
+		#color_control_layout enum for more information. Color control
+		layout options include:
+			- \c B_CELLS_4x64
+			- \c B_CELLS_8x32
+			- \c B_CELLS_16x16
+			- \c B_CELLS_32x8
+			- \c B_CELLS_32x8
+	\param cellSize The size of the sides of the color cell.
+	\param name The name of the color control.
+	\param message The optional \a message to send to a target in response
+		to a change in color value.
+	\param bufferedDrawing If \c true, all on-screen changes are first
+		made to an off-screen bitmap and then copied to the screen
+		making the drawing smoother, but requiring more memory
+		(currently unused).
+*/
+
+
+/*!
+	\fn BColorControl::BColorControl(BMessage* archive)
+	\brief Constructs a BColorControl object from an \a archive message.
+
+	This method is usually not called directly. If you want to build a
+	color control from a message you should call Instantiate() which can
+	handle errors properly.
+
+	If the \a archive deep, the BColorControl object will also unarchive
+	each of its child views recursively.
+
+	\param archive The \a archive message to restore from.
+*/
+
+
+/*!
+	\fn BColorControl::~BColorControl()
+	\brief Destructor method.
+*/
+
+
+/*!
+	\fn void BColorControl::SetLayout(BLayout* layout)
+	\brief Set the layout of the BColorControl object to \a layout.
+
+	\param layout The \a layout to set.
+
+	\sa BView::SetLayout()
+*/
+
+
+/*!
+	\fn void BColorControl::SetLayout(color_control_layout layout)
+	\brief Set the layout of the color control.
+
+	Color control layout options include:
+		- \c B_CELLS_4x64
+		- \c B_CELLS_8x32
+		- \c B_CELLS_16x16
+		- \c B_CELLS_32x8
+		- \c B_CELLS_32x8
+
+	\param layout The color control layout to set.
+*/
+
+
+
+/*!
+	\fn void BColorControl::SetValue(int32 value)
+	\brief Set the color of the BColorControl to \a value.
+
+	\param value The 32-bit color value to set.
+*/
+
+
+/*!
+	\fn inline void BColorControl::SetValue(rgb_color color)
+	\brief Set the color of the BColorControl to \a color.
+
+	\param color The rgb_color to set.
+*/
+
+
+/*!
+	\fn rgb_color BColorControl::ValueAsColor()
+	\brief Return the current color value as an rgb_color.
+
+	\returns The current color as an rgb_color.
+*/
+
+
+/*!
+	\fn void BColorControl::SetEnabled(bool enabled)
+	\brief Enable and disable the color control.
+
+	\param enabled Whether to enable or disable the color control.
+*/
+
+
+/*!
+	\fn void BColorControl::AttachedToWindow()
+	\brief Hook method that is called when the object is attached to a
+		window.
+
+	This method also sets the view color and low color of the color control
+	to be the same as its parent's view color and sets the red, green, and
+	blue BTextControl color values.
+
+	\sa BControl::AttachedToWindow()
+	\sa BView::SetViewColor()
+*/
+
+
+/*!
+	\fn void BColorControl::Draw(BRect updateRect)
+	\brief Draws the area of the color control that intersects \a updateRect.
+
+	\note This is an hook method called by the Interface Kit, you don't
+	have to call it yourself. If you need to forcefully redraw the color
+	control consider calling Invalidate() instead.
+
+	\param updateRect The area to be drawn.
+
+	\sa BView::Draw()
+*/
+
+
+/*!
+	\fn void BColorControl::SetCellSize(float cellSide)
+	\brief Set the size of the color cell in the color control.
+
+	\param cellSide The cell size to set.
+*/
+
+
+/*!
+	\fn float BColorControl::CellSize() const
+	\brief Get the current color cell size.
+
+	\returns the current color cell size as a float.
+*/
+
+
+/*!
+	\fn color_control_layout BColorControl::Layout() const
+	\brief Get the current color control layout.
+
+	\returns The current color_control_layout
+*/
+
+
+/*!
+	\fn void BColorControl::DetachedFromWindow()
+	\brief Hook method that is called when the object is detached from a
+		window.
+
+	\sa BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BColorControl::GetPreferredSize(float *_width, float *_height)
+	\brief Fill out the preferred width and height of the checkbox
+		into the \a _width and \a _height parameters.
+
+	\param _width Pointer to a \c float to hold the width of the checkbox.
+	\param _height Pointer to a \c float to hold the height of the checkbox.
+
+	\sa BView::GetPreferredSize()
+*/
+
+
+/*!
+	\fn void BColorControl::ResizeToPreferred()
+	\brief Resize the color control to its preferred size.
+
+	\sa BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn status_t BColorControl::Invoke(BMessage *msg)
+	\brief Tells the messenger to send a message.
+
+	\param msg The message to send.
+
+	\sa BControl::Invoke()
+*/
+
+
+/*!
+	\fn void BColorControl::FrameMoved(BPoint new_position)
+	\brief Hook method that gets called when the color control is moved.
+
+	\param new_position The point that the top left corner of the frame
+		is moved to.
+
+	\sa BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BColorControl::FrameResized(float new_width, float new_height)
+	\brief Hook method that gets called when the checkbox is resized.
+
+	\param new_width The new width of the checkbox.
+	\param new_height The new height of the checkbox.
+
+	\sa BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BColorControl::MakeFocus(bool state)
+	\brief Gives focus to or removes focus from the color control.
+
+	\param state \a true to set focus, \a false to remove it.
+
+	\sa BControl::MakeFocus()
+
+*/

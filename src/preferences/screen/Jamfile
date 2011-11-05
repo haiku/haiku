@@ -3,13 +3,13 @@ SubDir HAIKU_TOP src preferences screen ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders interface ;
 
 Preference Screen :
 	AlertView.cpp
 	AlertWindow.cpp
-	gtf.cpp
 	MonitorView.cpp
 	multimon.cpp
 	RefreshSlider.cpp
@@ -19,7 +19,7 @@ Preference Screen :
 	ScreenSettings.cpp
 	ScreenWindow.cpp
 	Utility.cpp
-	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) libaccelerantscommon.a
 	: Screen.rdef
 	;
 

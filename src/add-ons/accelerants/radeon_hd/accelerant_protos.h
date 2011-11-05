@@ -18,11 +18,13 @@
 extern "C" {
 #endif
 
+
 void spin(bigtime_t delay);
 
 // general
 status_t radeon_init_accelerant(int fd);
 void radeon_uninit_accelerant(void);
+status_t radeon_get_accelerant_device_info(accelerant_device_info *di);
 
 // modes & constraints
 uint32 radeon_accelerant_mode_count(void);

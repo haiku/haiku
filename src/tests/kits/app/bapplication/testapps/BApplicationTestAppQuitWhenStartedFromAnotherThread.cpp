@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <signal.h>
+#include <unistd.h>
 #include <Application.h>
 
 static thread_id gBAppThreadID;

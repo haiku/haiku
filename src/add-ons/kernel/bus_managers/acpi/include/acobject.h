@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -170,8 +170,6 @@
 #define AOPOBJ_OBJECT_INITIALIZED   0x08    /* Region is initialized, _REG was run */
 #define AOPOBJ_SETUP_COMPLETE       0x10    /* Region setup is complete */
 #define AOPOBJ_INVALID              0x20    /* Host OS won't allow a Region address */
-#define AOPOBJ_MODULE_LEVEL         0x40    /* Method is actually module-level code */
-#define AOPOBJ_MODIFIED_NAMESPACE   0x80    /* Method modified the namespace */
 
 
 /******************************************************************************
@@ -284,7 +282,7 @@ typedef struct acpi_object_region
 typedef struct acpi_object_method
 {
     ACPI_OBJECT_COMMON_HEADER
-    UINT8                           MethodFlags;
+    UINT8                           InfoFlags;
     UINT8                           ParamCount;
     UINT8                           SyncLevel;
     union acpi_operand_object       *Mutex;
@@ -293,13 +291,21 @@ typedef struct acpi_object_method
     {
         ACPI_INTERNAL_METHOD            Implementation;
         union acpi_operand_object       *Handler;
-    } Extra;
+    } Dispatch;
 
     UINT32                          AmlLength;
     UINT8                           ThreadCount;
     ACPI_OWNER_ID                   OwnerId;
 
 } ACPI_OBJECT_METHOD;
+
+/* Flags for InfoFlags field above */
+
+#define ACPI_METHOD_MODULE_LEVEL        0x01    /* Method is actually module-level code */
+#define ACPI_METHOD_INTERNAL_ONLY       0x02    /* Method is implemented internally (_OSI) */
+#define ACPI_METHOD_SERIALIZED          0x04    /* Method is serialized */
+#define ACPI_METHOD_SERIALIZED_PENDING  0x08    /* Method is to be marked serialized */
+#define ACPI_METHOD_MODIFIED_NAMESPACE  0x10    /* Method modified the namespace */
 
 
 /******************************************************************************

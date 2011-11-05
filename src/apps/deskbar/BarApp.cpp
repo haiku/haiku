@@ -95,6 +95,8 @@ TBarApp::TBarApp()
 	InitSettings();
 	InitIconPreloader();
 
+	fBarWindow = new TBarWindow();
+
 	be_roster->StartWatching(this);
 
 	gLocalizedNamePreferred
@@ -119,8 +121,14 @@ TBarApp::TBarApp()
 
 	fSwitcherMessenger = BMessenger(new TSwitchManager(fSettings.switcherLoc));
 
-	fBarWindow = new TBarWindow();
 	fBarWindow->Show();
+
+	// Call UpdatePlacement() after the window is shown because expanded apps
+	// need to resize the window.
+	if (fBarWindow->Lock()) {
+		BarView()->UpdatePlacement();
+		fBarWindow->Unlock();
+	}
 
 	// this messenger now targets the barview instead of the
 	// statusview so that all additions to the tray
@@ -644,6 +652,9 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 		appMime.GetTrackerIcon(barInfo->icon, B_MINI_ICON);
 
 	sBarTeamInfoList.AddItem(barInfo);
+
+	if (fSettings.expandNewTeams)
+		BarView()->AddExpandedItem(sig);
 
 	int32 subsCount = sSubscribers.CountItems();
 	if (subsCount > 0) {

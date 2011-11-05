@@ -63,17 +63,19 @@ private:
 class TeamRow : public BRow {
 	typedef BRow Inherited;
 public:
-								TeamRow(team_info & teamInfo);
+								TeamRow(team_info& teamInfo);
 								TeamRow(team_id teamId);
 
 public:
 			team_id				TeamID() const 				{ return fTeamInfo.team; }
 
+			bool				NeedsUpdate(team_info& info);
+
 	virtual	void				SetEnabled(bool enabled) 	{ fEnabled = enabled; }
 			bool				IsEnabled() const			{ return fEnabled; }
 
 private:
-			status_t			_SetTo(team_info & info);
+			status_t			_SetTo(team_info& info);
 
 private:
 			bool				fEnabled;

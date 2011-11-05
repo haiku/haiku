@@ -90,6 +90,7 @@ arch_smp_init(kernel_args *args)
 
 	if (args->num_cpus > 1) {
 		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
+		reserve_io_interrupt_vectors(3, 0xfd - ARCH_INTERRUPT_BASE);
 		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);

@@ -567,6 +567,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow> *list,
 	fAttrMenu(NULL),
 	fWindowMenu(NULL),
 	fFileMenu(NULL),
+	fArrangeByMenu(NULL),
 	fSelectionWindow(NULL),
 	fTaskLoop(NULL),
 	fIsTrash(false),
@@ -885,6 +886,8 @@ BContainerWindow::RepopulateMenus()
 	NewAttributeMenu(fAttrMenu);
 	if (PoseView()->ViewMode() == kListMode)
 		ShowAttributeMenu();
+
+	PopulateArrangeByMenu(fArrangeByMenu);
 
 	int32 selectCount = PoseView()->SelectionList()->CountItems();
 
@@ -1748,25 +1751,30 @@ BContainerWindow::SetPasteItem(BMenu *menu)
 
 
 void
-BContainerWindow::SetCleanUpItem(BMenu *menu)
+BContainerWindow::SetArrangeMenu(BMenu *menu)
 {
 	BMenuItem *item;
 	if ((item = menu->FindItem(kCleanup)) == NULL
 		&& (item = menu->FindItem(kCleanupAll)) == NULL)
 		return;
 
-	item->SetEnabled(PoseView()->CountItems() > 0
+	item->Menu()->SetEnabled(PoseView()->CountItems() > 0
 		&& (PoseView()->ViewMode() != kListMode));
+
+	BMenu* arrangeMenu;
 
 	if (modifiers() & B_SHIFT_KEY) {
 		item->SetLabel(B_TRANSLATE("Clean up all"));
 		item->SetShortcut('K', B_COMMAND_KEY | B_SHIFT_KEY);
 		item->SetMessage(new BMessage(kCleanupAll));
+		arrangeMenu = item->Menu();
 	} else {
 		item->SetLabel(B_TRANSLATE("Clean up"));
 		item->SetShortcut('K', B_COMMAND_KEY);
 		item->SetMessage(new BMessage(kCleanup));
+		arrangeMenu = item->Menu();
 	}
+	MarkArrangeByMenu(arrangeMenu);
 }
 
 
@@ -1818,6 +1826,7 @@ BContainerWindow::AddMenus()
 	// just create the attribute, decide to add it later
 	fAttrMenu = new BMenu(B_TRANSLATE("Attributes"));
 	NewAttributeMenu(fAttrMenu);
+	PopulateArrangeByMenu(fArrangeByMenu);
 }
 
 
@@ -1977,9 +1986,8 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(this);
 	menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Clean up"), new BMessage(kCleanup), 'K');
-	item->SetTarget(PoseView());
-	menu->AddItem(item);
+	fArrangeByMenu = new BMenu(B_TRANSLATE("Arrange by"));
+	menu->AddItem(fArrangeByMenu);
 
 	item = new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
@@ -2744,8 +2752,11 @@ BContainerWindow::AddWindowContextMenus(BMenu *menu)
 	menu->AddItem(pasteItem);
 	menu->AddSeparatorItem();
 #endif
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"),
-		new BMessage(kCleanup), 'K'));
+	BMenu* arrangeBy = new BMenu(B_TRANSLATE("Arrange by"));
+	PopulateArrangeByMenu(arrangeBy);
+
+	menu->AddItem(arrangeBy);
+
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
@@ -3062,7 +3073,7 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 		MarkNamedMenuItem(menu, kMiniIconMode, viewMode == kMiniIconMode);
 
 		SetCloseItem(menu);
-		SetCleanUpItem(menu);
+		SetArrangeMenu(menu);
 		SetPasteItem(menu);
 
 		EnableNamedMenuItem(menu, kOpenParentDir, !TargetModel()->IsRoot());
@@ -3259,6 +3270,26 @@ BContainerWindow::MarkAttributeMenu(BMenu *menu)
 						item->SetMarked(false);
 				}
 			}
+		}
+	}
+}
+
+
+void
+BContainerWindow::MarkArrangeByMenu(BMenu* menu)
+{
+	if (!menu)
+		return;
+
+	int32 count = menu->CountItems();
+	for (int32 index = 0; index < count; index++) {
+		BMenuItem* item = menu->ItemAt(index);
+		if (item->Message()) {
+			uint32 attrHash;
+			if (item->Message()->FindInt32("attr_hash", (int32*)&attrHash) == B_OK)
+				item->SetMarked(PoseView()->PrimarySort() == attrHash);
+			else if (item->Command() == kArrangeReverseOrder)
+				item->SetMarked(PoseView()->ReverseSort());		
 		}
 	}
 }
@@ -3995,6 +4026,44 @@ BContainerWindow::PulseTaskLoop()
 {
 	if (fTaskLoop)
 		fTaskLoop->PulseMe();
+}
+
+
+void
+BContainerWindow::PopulateArrangeByMenu(BMenu* menu)
+{
+	if (!fAttrMenu || !menu)
+		return;
+	// empty fArrangeByMenu...
+	BMenuItem* item;
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
+		delete item;
+
+	int32 itemCount = fAttrMenu->CountItems();
+	for (int32 i = 0; i < itemCount; i++) {
+		item = fAttrMenu->ItemAt(i);
+		if (item->Command() == kAttributeItem) {
+			BMessage* message = new BMessage(*(item->Message()));
+			message->what = kArrangeBy;
+			BMenuItem* newItem = new BMenuItem(item->Label(), message);
+			newItem->SetTarget(PoseView());
+			menu->AddItem(newItem);			
+		}
+	}
+
+	menu->AddSeparatorItem();
+
+	item = new BMenuItem(B_TRANSLATE("Reverse order"),
+		new BMessage(kArrangeReverseOrder));
+
+	item->SetTarget(PoseView());
+	menu->AddItem(item);
+	menu->AddSeparatorItem();
+
+
+	item = new BMenuItem(B_TRANSLATE("Clean up"), new BMessage(kCleanup), 'K');
+	item->SetTarget(PoseView());
+	menu->AddItem(item);
 }
 
 

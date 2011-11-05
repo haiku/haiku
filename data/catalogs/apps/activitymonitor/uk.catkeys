@@ -1,9 +1,10 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	3373427116
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	3704566709
 %.1f KB/s	DataSource		%.1f KB/іек
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f помилок/сек
 %lld ms	SettingsWindow		%lld мілісек.
 %lld sec.	SettingsWindow		%lld сек.
+ActivityMonitor	System name		Монітор активності
 Add graph	ActivityWindow		Додати графік
 Additional items	ActivityView		Додаткові елементи
 Apps	DataSource		Додатки
@@ -26,6 +27,7 @@ Page faults	DataSource		Помилки на сторінці
 Ports	DataSource		Порти
 Quit	ActivityWindow		Вийти
 RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard	DataSource		Буфер обміну
 Receiving	DataSource		Отримання
 Remove graph	ActivityView		Видалити графік
 Running applications	DataSource		Запущені додатки
@@ -39,6 +41,7 @@ Swap	DataSource		Підкачка
 Swap space	DataSource		Розмір підкачки
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		Команди
+Text clipboard	DataSource		Буфер обміну тексту
 Threads	DataSource		Потоки
 Update time interval:	SettingsWindow		Інтервал часу поновлення:
 Used memory	DataSource		Використана пам'ять

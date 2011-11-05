@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -205,7 +205,8 @@ status_t	_user_access(int fd, const char *path, int mode,
 ssize_t		_user_select(int numfds, fd_set *readSet, fd_set *writeSet,
 				fd_set *errorSet, bigtime_t timeout, const sigset_t *sigMask);
 ssize_t		_user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
-int			_user_open_attr_dir(int fd, const char *path);
+int			_user_open_attr_dir(int fd, const char *path,
+				bool traverseLeafLink);
 ssize_t		_user_read_attr(int fd, const char *attribute, off_t pos,
 				void *buffer, size_t readBytes);
 ssize_t		_user_write_attr(int fd, const char *attribute, uint32 type,

@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src tests add-ons ;
 SubInclude HAIKU_TOP src tests add-ons input_server ;
 SubInclude HAIKU_TOP src tests add-ons index_server ;
 SubInclude HAIKU_TOP src tests add-ons kernel ;
+SubInclude HAIKU_TOP src tests add-ons mail ;
 SubInclude HAIKU_TOP src tests add-ons media ;
 SubInclude HAIKU_TOP src tests add-ons opengl ;
 SubInclude HAIKU_TOP src tests add-ons print ;

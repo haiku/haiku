@@ -1,0 +1,369 @@
+/*
+ * Copyright 2011, Haiku inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		/trunk/headers/os/interface/Button.h	 rev 42794
+ *		/trunk/src/kits/interface/Button.cpp	 rev 42794
+
+
+/*!
+	\file Button.h
+	\brief Describes the BButton class.
+*/
+
+
+/*!
+	\class BButton Button.h
+	\ingroup interface
+	\brief A BButton is a labeled on-screen button.
+
+	A BButton control is used to initiate an action. An action is activated
+	by clicking on the button with the mouse or by a keyboard button.
+	If the BButton is the default button for the active window then you can
+	activate it by pushing the <span class="keycap">Enter</span> key.
+
+	\image html BButton_example.png
+
+	A BButton, unlike other user interface elements such as check boxes and
+	radio buttons has only a single state. During a click event the
+	BButton's value is set to \c 1, (\c B_CONTROL_ON) otherwise this value
+	is \c 0 (\c B_CONTROL_OFF).
+
+	BButton inherits from the BControl class.
+*/
+
+
+/*!
+	\fn BButton::BButton(BRect frame, const char* name, const char* label,
+		BMessage* message, uint32 resizingMode, uint32 flags)
+	\brief Creates and initializes a BButton control.
+
+	\note A BButton created with a constructor that includes a frame
+	parameter does \b not utilize the Layout Kit to position and size the
+	control.
+
+	BControl initializes the button's label and assigns it a message that 
+	identifies the action that should be carried out when the button is
+	pressed. When the button is attached to a window it is resizes to the
+	height of the button's frame rectangle to fit the button's border and
+	label in the button's font.
+
+	The \a frame, \a name, \a resizingMode, and \a flags parameters are
+	passed up the inheritance chain to the BView class.
+
+	\param frame The frame rectangle that the button is draw into.
+	\param name The name of the button
+	\param label The button label text
+	\param message The BButtons's action message
+	\param resizingMode Mask sets the parameters by which the BButton can be
+		resized. It should be set to one option for vertical resizing combined
+		with one option for horizontal resizing.
+		\n\n Horizontal resizing options are
+			\li \c B_FOLLOW_LEFT
+			\li \c B_FOLLOW_RIGHT
+			\li \c B_FOLLOW_LEFT_RIGHT
+			\li \c B_FOLLOW_H_CENTER
+
+		Vertical resizing options are
+			\li \c B_FOLLOW_TOP
+			\li \c B_FOLLOW_BOTTOM
+			\li \c B_FOLLOW_TOP_BOTTOM
+			\li \c B_FOLLOW_V_CENTER
+
+		There are two other possibilities
+			\li \c B_FOLLOW_ALL_SIDES
+			\li \c B_FOLLOW_NONE
+
+		See BView for more information on resizing options.
+	\param flags The flags mask sets what notifications the BButton can receive.
+			\n\n Any combination of the following options is allowed
+			\li \c B_WILL_DRAW
+			\li \c B_PULSE_NEEDED
+			\li \c B_FRAME_EVENTS
+			\li \c B_FULL_UPDATE_ON_RESIZE
+			\li \c B_NAVIAGBLE
+			\li \c B_NAVIAGBLE_JUMP
+			\li \c B_SUBPIXEL_PRECISE
+
+		See BView for more information on \a flags.
+*/
+
+
+/*!
+	\fn BButton::BButton(const char* name, const char* label, BMessage* message,
+		uint32 flags)
+	\brief Creates and initializes a BButton control.
+
+	BControl initializes the button's label and assigns it a message that 
+	identifies the action that should be carried out when the button is
+	pressed. When the button is attached to a window it is resizes to the
+	height of the button's frame rectange to fit the button's border and
+	label in the button's font.
+	
+	\param name The \a name of the button
+	\param label The button's \a label text
+	\param message The button's action \a message
+	\param flags The \a flags mask sets what notifications the button can
+		receive. Any combination of the following options is allowed:
+			\li \c B_WILL_DRAW
+			\li \c B_PULSE_NEEDED
+			\li \c B_FRAME_EVENTS
+			\li \c B_FULL_UPDATE_ON_RESIZE
+			\li \c B_NAVIAGBLE
+			\li \c B_NAVIAGBLE_JUMP
+			\li \c B_SUBPIXEL_PRECISE
+
+			See BView for more information on \a flags.
+*/
+
+
+/*!
+	\fn BButton::BButton(const char* label, BMessage* message)
+	\brief Creates and initializes a BButton control.
+
+	Creates the button with the specified \a label. The action carried out
+	by the button is specified by the \a message.
+
+	\param label The button's \a label text
+	\param message The buttons action \a message
+*/
+
+
+/*!
+	\fn BButton::~BButton()
+	\brief Destructor method.
+
+	Standard Destructor.
+*/
+
+
+/*! \fn BButton::BButton(BMessage* archive)
+	\brief Constructs a BButton object from an \a archive message.
+
+	This method is usually not called directly. If you want to build a
+	button from a message you should call Instantiate() which can
+	handle errors properly.
+
+	If the \a archive deep, the BButton object will also unarchive each
+	of its child views recursively.
+
+	\param archive The \a archive message to restore from.
+*/
+
+
+/*!
+	\fn void BButton::Draw(BRect updateRect)
+	\brief Draws the area of the button that intersects \a updateRect and
+		sets the label.
+
+	\note This is an hook method called by the Interface Kit, you don't
+	have to call it yourself. If you need to forcefully redraw the button
+	consider calling Invalidate() instead.
+
+	\param updateRect The rectangular area to be drawn.
+
+	\sa BView::Draw()
+*/
+
+
+/*!
+	\fn void BButton::MouseDown(BPoint point)
+	\brief Hook method that is called when a mouse button is pressed.
+
+	\param point The point on the screen where to mouse pointer is when
+		the mouse button is pressed.
+
+	\sa BView::MouseDown()
+*/
+
+
+/*!
+	\fn void BButton::AttachedToWindow()
+	\brief Hook method that is called when the object is attached to a
+		window.
+
+	\sa BControl::AttachedToWindow()
+*/
+
+
+/*!
+	\fn void BButton::KeyDown(const char *bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is pushed down.
+		to the window.
+	
+	\param bytes The key pressed.
+	\param numBytes The number of keys pressed.
+*/
+
+
+/*!
+	\fn void BButton::MakeDefault(bool flag)
+	\brief Make the BButton the default button i.e. it will be activated
+		when the user pushes the \key{Enter} key.
+	
+	\param flag Pass in \c B_SUPPORTS_LAYOUT if the BButton is positioned
+		by the Layout Kit.
+*/
+
+
+/*!
+	\fn void BButton::SetLabel(const char *string)
+	\brief Sets the BButton's label.
+	
+	\param string The string to set the label to.
+*/
+
+
+/*!
+	\fn bool BButton::IsDefault() const
+	\brief Returns whether or not the BButton is the default button or not, i.e.
+	it responds to the \key{Enter} key.
+	
+	\retval true The button is the default button.
+	\retval false The button is \b not the default button.
+*/
+
+
+/*!
+	\fn void BButton::SetValue(int32 value)
+	\brief Sets the value of the BButton.
+
+	\note This method can be overridden in order to take a different action
+	when the value changes.
+
+	\param value The value to set to the BButton to. Options include:
+		\li \c 0 (\c B_CONTROL_OFF)
+		\li \c 1 (\c B_CONTROL_ON)
+
+	\see BControl::SetValue()
+*/
+
+
+/*!
+	\fn void BButton::GetPreferredSize(float *_width, float *_height)
+	\brief Gets the dimensions that the BButton would prefer to be.
+
+	The size is computed from the children sizes, unless it was explicitly set
+	for the BButton (which can be done only if the BButton is configured to
+	use the Layout Kit).
+
+	\note Either the \a _width or \a _height parameter may be set to \c NULL
+		if you only want to get the other one.
+
+	\param[out] _width  The width of the preferred size is placed in here.
+	\param[out] _height The height of the preferred size is placed in here.
+*/
+
+
+/*!
+	\fn void BButton::ResizeToPreferred()
+	\brief Resizes the BButton to its preferred size.
+
+	\see BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn status_t BButton::Invoke(BMessage *message)
+	\brief The BButton is invoked from a message.
+
+	This method is used to post a message when the button is clicked or
+	activated by a keyboard button. You can set the object that will
+	handle the message by calling a BControl::SetTarget() from a
+	BInvoker inherited control. A model for the message is set by the
+	BButton constructor or by the BControl::SetMessage() method
+	inherited from BInvoker.
+
+	\returns B_OK If the BButton was invoked, otherwise an error
+		\a status_t flag is returned.
+
+	\see BControl::Invoke()
+*/
+
+
+/*!
+	\fn void BButton::FrameMoved(BPoint newLocation)
+	\brief Hook method that is called when the BButton has moved.
+
+	\param newLocation The location on the screen that the BButton
+		is moved to.
+
+	\see BView::FrameMoved();
+*/
+
+
+/*!
+	\fn void BButton::FrameResized(float width, float height)
+	\brief Hook method that is called when the BButton changes size.
+
+	\param width the new \a width of the BButton
+	\param height the new \a height of the BButton
+
+	\see BView::FrameResized();
+*/
+
+
+/*!
+	\fn void BButton::MakeFocus(bool focused)
+	\brief Focus or unfocus the BButton.
+
+	\param focused If \c true focus the button, otherwise remove focus from
+		the button.
+
+	\see BControl::MakeFocus()
+*/
+
+
+/*!
+	\fn status_t BButton::Perform(perform_code code, void* _data)
+	\brief Perform an action on the BButton.
+
+	\param code The \a perform_code. One of the following:
+		\li \c PERFORM_CODE_MIN_SIZE
+		\li \c PERFORM_CODE_MAX_SIZE
+		\li \c PERFORM_CODE_PREFERRED_SIZE
+		\li \c PERFORM_CODE_LAYOUT_ALIGNMENT
+		\li \c PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH
+		\li \c PERFORM_CODE_GET_HEIGHT_FOR_WIDTH
+		\li \c PERFORM_CODE_SET_LAYOUT
+		\li \c PERFORM_CODE_INVALIDATE_LAYOUT
+		\li \c PERFORM_CODE_DO_LAYOUT
+	\param _data Data to use to act on.
+
+	\returns \c B_OK if the action was successful or an error code if not.
+*/
+
+
+/*!
+	\fn void BButton::InvalidateLayout(bool descendants)
+	\brief Redraws the BButton.
+
+	\param descendants Redraw subviews as well.
+*/
+
+
+/*!
+	\fn BSize BButton::MinSize()
+	\brief Returns the minimum size of the BButton.
+
+	\returns The minimum BButton size as a BSize
+*/
+
+
+/*!
+	\fn BSize BButton::MaxSize()
+	\brief Returns the maximum size of the BButton.
+
+	\returns The maximum BButton size as a BSize
+*/
+
+
+/*!
+	\fn BSize BButton::PreferredSize()
+	\brief Returns the preferred size of the BButton.
+
+	\returns The preferred BButton size as a BSize
+*/

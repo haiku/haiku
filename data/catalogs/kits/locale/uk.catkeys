@@ -1,15 +1,34 @@
-1	ukrainian	system	845452856
+1	ukrainian	x-vnd.Haiku-libbe	180647795
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d байт
+<empty>	Menu		<пусто>
+About %app%	AboutMenuItem		Про %app%
+About %app…	Dragger		Про %app…
 About…	AboutWindow		Про…
 Blue:	ColorControl		Синій:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Неможливо видалити реплікант з рідного додатку. Життя продовжується.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%опису\".\n%помилки
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити додаток для репліканту. Незнайдено сигнатуру додатку.\n%помилка
 Close	AboutWindow		Закрити
 Copy	TextView		Копіювати
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Вирізати
+Error	PrintJob		Помилка
+Error	ZombieReplicantView		Помилка
 Green:	ColorControl		Зелений:
+No Pages to print!	PrintJob		Жодної сторінки для друку!
+OK	Dragger		Гаразд
+OK	PrintJob		Гаразд
+OK	ZombieReplicantView		Гаразд
+Paste	TextView		Вставити
+Print Server is not responding.	PrintJob		Принт сервер недоступний.
 Red:	ColorControl		Червоний:
 Redo	TextView		Відмінити відміну
+Remove replicant	Dragger		Видалити реплікант
+Select All	TextView		Вибрати все
 Undo	TextView		Відмінити
+Warning	Dragger		Увага
 Written by:	AboutWindow		Автор:

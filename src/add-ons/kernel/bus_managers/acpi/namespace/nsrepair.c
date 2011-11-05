@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2010, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -149,7 +149,6 @@
  *
  * Additional possible repairs:
  *
- * Optional/unnecessary NULL package elements removed
  * Required package elements that are NULL replaced by Integer/String/Buffer
  * Incorrect standalone package wrapped with required outer package
  *
@@ -756,17 +755,13 @@ AcpiNsRemoveNullElements (
 
 
     /*
-     * PTYPE1 packages contain no subpackages.
-     * PTYPE2 packages contain a variable number of sub-packages. We can
-     * safely remove all NULL elements from the PTYPE2 packages.
+     * We can safely remove all NULL elements from these package types:
+     * PTYPE1_VAR packages contain a variable number of simple data types.
+     * PTYPE2 packages contain a variable number of sub-packages.
      */
     switch (PackageType)
     {
-    case ACPI_PTYPE1_FIXED:
     case ACPI_PTYPE1_VAR:
-    case ACPI_PTYPE1_OPTION:
-        return;
-
     case ACPI_PTYPE2:
     case ACPI_PTYPE2_COUNT:
     case ACPI_PTYPE2_PKG_COUNT:
@@ -776,6 +771,8 @@ AcpiNsRemoveNullElements (
         break;
 
     default:
+    case ACPI_PTYPE1_FIXED:
+    case ACPI_PTYPE1_OPTION:
         return;
     }
 

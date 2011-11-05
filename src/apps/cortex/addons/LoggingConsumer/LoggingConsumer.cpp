@@ -1,3 +1,35 @@
+/*
+ * Copyright 1991-1999, Be Incorporated.
+ * Copyright (c) 1999-2000, Eric Moon.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions, and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
 // LoggingConsumer.cpp
 
 #include "LoggingConsumer.h"
@@ -61,7 +93,7 @@ static BParameterWeb* build_parameter_web()
 LoggingConsumer::LoggingConsumer(
 	const entry_ref& logFile,
 	BMediaAddOn* pAddOn)
-	
+
 	:	BMediaNode("LoggingConsumer"),
 		BBufferConsumer(B_MEDIA_UNKNOWN_TYPE),
 		BControllable(),
@@ -104,19 +136,19 @@ LoggingConsumer::~LoggingConsumer()
 // Log message filtering control
 //
 
-void 
+void
 LoggingConsumer::SetEnabled(log_what what, bool enable)
 {
 	mLogger->SetEnabled(what, enable);
 }
 
-void 
+void
 LoggingConsumer::EnableAllMessages()
 {
 	mLogger->EnableAllMessages();
 }
 
-void 
+void
 LoggingConsumer::DisableAllMessages()
 {
 	mLogger->DisableAllMessages();
@@ -139,7 +171,7 @@ LoggingConsumer::AddOn(int32 *internal_id) const
 		return NULL;
 }
 
-void 
+void
 LoggingConsumer::SetRunMode(run_mode mode)
 {
 	// !!! Need to handle offline mode etc. properly!
@@ -150,7 +182,7 @@ LoggingConsumer::SetRunMode(run_mode mode)
 	BMediaEventLooper::SetRunMode(mode);
 }
 
-void 
+void
 LoggingConsumer::Preroll()
 {
 	log_message logMsg;
@@ -160,7 +192,7 @@ LoggingConsumer::Preroll()
 	BMediaEventLooper::Preroll();
 }
 
-void 
+void
 LoggingConsumer::SetTimeSource(BTimeSource* time_source)
 {
 	log_message logMsg;
@@ -170,7 +202,7 @@ LoggingConsumer::SetTimeSource(BTimeSource* time_source)
 	BMediaNode::SetTimeSource(time_source);
 }
 
-status_t 
+status_t
 LoggingConsumer::RequestCompleted(const media_request_info &info)
 {
 	log_message logMsg;
@@ -180,7 +212,7 @@ LoggingConsumer::RequestCompleted(const media_request_info &info)
 	return BMediaNode::RequestCompleted(info);
 }
 
-// e.moon [11jun99; testing add-on]	
+// e.moon [11jun99; testing add-on]
 status_t
 LoggingConsumer::DeleteHook(BMediaNode* pNode) {
 	PRINT(("LoggingConsumer::DeleteHook(%p)\n", pNode));
@@ -194,7 +226,7 @@ LoggingConsumer::DeleteHook(BMediaNode* pNode) {
 // BControllable methods
 //
 
-status_t 
+status_t
 LoggingConsumer::GetParameterValue(int32 id, bigtime_t* last_change, void* value, size_t* ioSize)
 {
 	log_message logMsg;
@@ -235,7 +267,7 @@ LoggingConsumer::GetParameterValue(int32 id, bigtime_t* last_change, void* value
 	return B_OK;
 }
 
-void 
+void
 LoggingConsumer::SetParameterValue(int32 id, bigtime_t performance_time, const void* value, size_t size)
 {
 	log_message logMsg;
@@ -267,7 +299,7 @@ LoggingConsumer::SetParameterValue(int32 id, bigtime_t performance_time, const v
 // BBufferConsumer methods
 //
 
-status_t 
+status_t
 LoggingConsumer::HandleMessage(int32 message, const void *data, size_t size)
 {
 	log_message logMsg;
@@ -284,7 +316,7 @@ LoggingConsumer::HandleMessage(int32 message, const void *data, size_t size)
 
 // all of these next methods are pure virtual in BBufferConsumer
 
-status_t 
+status_t
 LoggingConsumer::AcceptFormat(const media_destination& dest, media_format* format)
 {
 	char formatStr[256];
@@ -303,14 +335,14 @@ LoggingConsumer::AcceptFormat(const media_destination& dest, media_format* forma
 	return B_OK;
 }
 
-status_t 
+status_t
 LoggingConsumer::GetNextInput(int32* cookie, media_input* out_input)
 {
 	// we have a single hardcoded input that can accept any kind of media data
 	if (0 == *cookie)
 	{
 		mInput.format.type = B_MEDIA_UNKNOWN_TYPE;		// accept any format
-		
+
 		*out_input = mInput;
 		*cookie = 1;
 		return B_OK;
@@ -318,14 +350,14 @@ LoggingConsumer::GetNextInput(int32* cookie, media_input* out_input)
 	else return B_BAD_INDEX;
 }
 
-void 
+void
 LoggingConsumer::DisposeInputCookie(int32 /*cookie*/ )
 {
 	// we don't use any kind of state or extra storage for iterating over our
 	// inputs, so we don't have to do any special disposal of input cookies.
 }
 
-void 
+void
 LoggingConsumer::BufferReceived(BBuffer* buffer)
 {
 	bigtime_t bufferStart = buffer->Header()->start_time;
@@ -362,7 +394,7 @@ LoggingConsumer::BufferReceived(BBuffer* buffer)
 	}
 }
 
-void 
+void
 LoggingConsumer::ProducerDataStatus(const media_destination& for_whom, int32 status, bigtime_t at_performance_time)
 {
 	log_message logMsg;
@@ -378,7 +410,7 @@ LoggingConsumer::ProducerDataStatus(const media_destination& for_whom, int32 sta
 	}
 }
 
-status_t 
+status_t
 LoggingConsumer::GetLatencyFor(const media_destination& for_whom, bigtime_t* out_latency, media_node_id* out_timesource)
 {
 	// make sure this is one of my valid inputs
@@ -391,7 +423,7 @@ LoggingConsumer::GetLatencyFor(const media_destination& for_whom, bigtime_t* out
 	return B_OK;
 }
 
-status_t 
+status_t
 LoggingConsumer::Connected(
 	const media_source& producer,
 	const media_destination& where,
@@ -423,7 +455,7 @@ LoggingConsumer::Connected(
 	return B_OK;
 }
 
-void 
+void
 LoggingConsumer::Disconnected(
 	const media_source& producer,
 	const media_destination& where)
@@ -436,7 +468,7 @@ LoggingConsumer::Disconnected(
 	memset(&mInput, 0, sizeof(mInput));
 }
 
-status_t 
+status_t
 LoggingConsumer::FormatChanged(
 	const media_source& producer,
 	const media_destination& consumer,
@@ -450,7 +482,7 @@ LoggingConsumer::FormatChanged(
 	return B_OK;
 }
 
-status_t 
+status_t
 LoggingConsumer::SeekTagRequested(
 	const media_destination& destination,
 	bigtime_t in_target_time,
@@ -470,7 +502,7 @@ LoggingConsumer::SeekTagRequested(
 // BMediaEventLooper virtual methods
 //
 
-void 
+void
 LoggingConsumer::NodeRegistered()
 {
 	log_message logMsg;
@@ -492,7 +524,7 @@ LoggingConsumer::NodeRegistered()
 	strcpy(mInput.name, "Logged input");
 }
 
-void 
+void
 LoggingConsumer::Start(bigtime_t performance_time)
 {
 	PRINT(("LoggingConsumer::Start(%Ld): now %Ld\n", performance_time, TimeSource()->Now()));
@@ -504,7 +536,7 @@ LoggingConsumer::Start(bigtime_t performance_time)
 	BMediaEventLooper::Start(performance_time);
 }
 
-void 
+void
 LoggingConsumer::Stop(bigtime_t performance_time, bool immediate)
 {
 	log_message logMsg;
@@ -514,7 +546,7 @@ LoggingConsumer::Stop(bigtime_t performance_time, bool immediate)
 	BMediaEventLooper::Stop(performance_time, immediate);
 }
 
-void 
+void
 LoggingConsumer::Seek(bigtime_t media_time, bigtime_t performance_time)
 {
 	log_message logMsg;
@@ -524,7 +556,7 @@ LoggingConsumer::Seek(bigtime_t media_time, bigtime_t performance_time)
 	BMediaEventLooper::Seek(media_time, performance_time);
 }
 
-void 
+void
 LoggingConsumer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
 {
 	log_message logMsg;
@@ -534,7 +566,7 @@ LoggingConsumer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
 	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
 }
 
-void 
+void
 LoggingConsumer::HandleEvent(const media_timed_event *event, bigtime_t /* lateness */, bool /* realTimeEvent */)
 {
 	log_message logMsg;
@@ -597,12 +629,12 @@ LoggingConsumer::HandleEvent(const media_timed_event *event, bigtime_t /* latene
 		break;
 
 	// !!! change to B_PARAMETER as soon as it's available
-	
+
 	// +++++ e.moon [16jun99]
 	// !!! this can't be right: the parameter value is accessed by the pointer
 	//     originally passed to SetParameterValue().  there's no guarantee that
 	//     value's still valid, is there?
-	
+
 	case BTimedEventQueue::B_USER_EVENT:
 		{
 			size_t dataSize = size_t(event->data);

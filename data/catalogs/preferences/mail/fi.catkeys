@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mail	1746145370
+1	finnish	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		Tilin nimi:
 Account name:	E-Mail		Tilinimi:
 Account settings	AutoConfigWindow		Tiliasetukset
@@ -25,6 +25,7 @@ Incoming mail filters	Config Views		Tulevan postin suodattimet
 Login name:	E-Mail		Kirjautumisnimi:
 Mail checking	Config Window		Sähköpostin tarkistus
 Miscellaneous	Config Window		Sekalaiset
+Never	Config Window	show status window	Ei koskaan
 Next	AutoConfigWindow		Seuraava
 OK	AutoConfigWindow		Valmis
 OK	Config Views		Valmis
@@ -50,10 +51,10 @@ While sending	Config Window		Lähetettäessä
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili ”Lisää”-painikkeella.\n\nPoista tili ”Poista”-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
+\t\t· E-mail filters	Config Window		\t\t· Sähköpostisuodattimet
+\t\t· Incoming	Config Window		\t\t· Tuleva
+\t\t· Outgoing	Config Window		\t\t· Lähtevä
 days	Config Window		päivä
 hours	Config Window		tunti
 minutes	Config Window		minuutti
-never	Config Window		älä tarkista
-· E-mail filters	Config Window		· Sähköpostisuodattimet
-· Incoming	Config Window		· Tuleva
-· Outgoing	Config Window		· Lähtevä
+never	Config Window	mail checking frequency	ei koskaan

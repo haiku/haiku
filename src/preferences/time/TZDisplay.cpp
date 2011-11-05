@@ -55,7 +55,7 @@ TTZDisplay::Draw(BRect)
 
 	BRect bounds = Bounds();
 	FillRect(Bounds(), B_SOLID_LOW);
-	
+
 	font_height height;
 	GetFontHeight(&height);
 	float fontHeight = ceilf(height.descent + height.ascent +
@@ -164,5 +164,6 @@ TTZDisplay::_CalcPrefSize()
 		StringWidth(" ") + StringWidth(fTime.String()) + padding);
 	float secondLine = ceilf(StringWidth(fText.String()) + padding);
 	size.width = firstLine > secondLine ? firstLine : secondLine;
+
 	return size;
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,6 +40,7 @@
 #include "TeamMemoryBlock.h"
 #include "TeamMemoryBlockManager.h"
 #include "TeamSettings.h"
+#include "TeamUISettings.h"
 #include "Tracing.h"
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"
@@ -378,8 +379,6 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 	}
 
-	Activate();
-
 	// if requested, stop the given thread
 	if (threadID >= 0) {
 		if (stopInMain) {
@@ -547,6 +546,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 		case MSG_LOAD_SETTINGS:
 			_LoadSettings();
+			Activate();
 			break;
 
 		default:
@@ -1370,13 +1370,12 @@ TeamDebugger::_LoadSettings()
 	locker.Unlock();
 
 	// load the settings
-	TeamSettings settings;
-	if (fSettingsManager->LoadTeamSettings(teamName, settings) != B_OK)
+	if (fSettingsManager->LoadTeamSettings(teamName, fTeamSettings) != B_OK)
 		return;
 
 	// create the saved breakpoints
 	for (int32 i = 0; const BreakpointSetting* breakpointSetting
-			= settings.BreakpointAt(i); i++) {
+			= fTeamSettings.BreakpointAt(i); i++) {
 		if (breakpointSetting->GetFunctionID() == NULL)
 			continue;
 
@@ -1404,6 +1403,11 @@ TeamDebugger::_LoadSettings()
 		fBreakpointManager->InstallUserBreakpoint(breakpoint,
 			breakpointSetting->IsEnabled());
 	}
+
+	const TeamUISettings* uiSettings = fTeamSettings.UISettingFor(
+		fUserInterface->ID());
+	if (uiSettings != NULL)
+			fUserInterface->LoadSettings(uiSettings);
 }
 
 
@@ -1415,6 +1419,22 @@ TeamDebugger::_SaveSettings()
 	TeamSettings settings;
 	if (settings.SetTo(fTeam) != B_OK)
 		return;
+
+	TeamUISettings* uiSettings = NULL;
+	if (fUserInterface->SaveSettings(uiSettings) != B_OK)
+		return;
+	if (uiSettings != NULL)
+		settings.AddUISettings(uiSettings);
+
+	// preserve the UI settings from our cached copy.
+	for (int32 i = 0; i < fTeamSettings.CountUISettings(); i++) {
+		const TeamUISettings* oldUISettings = fTeamSettings.UISettingAt(i);
+		if (strcmp(oldUISettings->ID(), fUserInterface->ID()) != 0) {
+			TeamUISettings* clonedSettings = oldUISettings->Clone();
+			if (clonedSettings != NULL)
+				settings.AddUISettings(clonedSettings);
+		}
+	}
 	locker.Unlock();
 
 	// save the settings

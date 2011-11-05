@@ -61,6 +61,7 @@ static bool sIsExtended = false;
 
 static int32 sKeyboardRepeatRate;
 static bigtime_t sKeyboardRepeatDelay;
+static uint8 sKeyboardIds[2];
 
 
 static status_t
@@ -289,6 +290,31 @@ probe_keyboard(void)
 //		return B_ERROR;
 //	}
 
+// Some controllers set the disble keyboard command bit to "on" after resetting
+// the keyboard device. Read #7973 #6313 for more details.
+// So check the command byte now and re-enable the keyboard if it is the case.
+	uint8 cmdbyte = 0;
+	status = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
+
+	if (status != B_OK) {
+		INFO("ps2: cannot read CMD byte on kbd probe:0x%#08lx\n", status);
+	} else
+	if ((cmdbyte & PS2_BITS_KEYBOARD_DISABLED) == PS2_BITS_KEYBOARD_DISABLED) {
+		cmdbyte &= ~PS2_BITS_KEYBOARD_DISABLED;
+		status = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
+		if (status != B_OK) {
+			INFO("ps2: cannot write 0x%02x to CMD byte on kbd probe:0x%08lx\n",
+					cmdbyte, status);
+		}
+	}
+	
+	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
+			PS2_CMD_GET_DEVICE_ID, NULL, 0, sKeyboardIds, sizeof(sKeyboardIds));
+	
+	if (status != B_OK) {
+		INFO("ps2: cannot read keyboard device id:0x%#08lx\n", status);
+	}
+
 	return B_OK;
 }
 
@@ -366,6 +392,8 @@ keyboard_close(void *_cookie)
 			sHasKeyboardReader = false;
 		if (cookie->is_debugger)
 			sHasDebugReader = false;
+
+		sKeyboardIds[0] = sKeyboardIds[1] = 0;
 	}
 
 	TRACE("ps2: keyboard_close done\n");
@@ -492,6 +520,12 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case KB_GET_KEYBOARD_ID:
+		{
+			TRACE("ps2: ioctl KB_GET_KEYBOARD_ID\n");
+			uint16 keyboardId = sKeyboardIds[1] << 8 | sKeyboardIds[0];
+			return user_memcpy(buffer, &keyboardId, sizeof(keyboardId));
+		}
+
 		case KB_SET_CONTROL_ALT_DEL_TIMEOUT:
 		case KB_CANCEL_CONTROL_ALT_DEL:
 		case KB_DELAY_CONTROL_ALT_DEL:

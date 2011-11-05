@@ -1,46 +1,555 @@
 /*!
-  \mainpage The Haiku Book
+	\mainpage Welcome to the Haiku Book
 
-  \section kits Kits and Servers
+	Below you will find documentation on the Application Programming
+	Interface (API) of the Haiku operating system. This API describes
+	the internals of the operating system allowing developers to write
+	native C++ applications and device drivers. See the
+	<a href="http://api.haiku-os.org">online version</a> for the most
+	updated version of this document. If you would like to help contribute
+	contact the <a href="http://www.freelists.org/list/haiku-doc">documentation
+	mailing list</a>. For guidelines on how to help document the API see
+	the \link apidoc Documenting the API\endlink page. A list of
+	contributors can be found \ref credits page. Documenting the API is
+	an ongoing process so contributions are greatly appreciated.
 
-  - \ref app | \link app_intro \em Introduction \endlink
-  - \ref drivers
-  - \ref interface | \link interface_intro \em Introduction \endlink
-  - \ref locale | \link locale_intro \em Introduction \endlink
-  - \ref midi1
-  - \ref midi2 | \link midi2_intro \em Introduction \endlink
-  - \ref support | \link support_intro \em Introduction \endlink
+	The Haiku API is based on the BeOS R5 API but changes and additions have
+	been included where appropriate. Important compatibility differences are
+	detailed on the \ref compatibility page. New classes and methods
+	and incompatible API changes to the BeOS R5 API are noted in the
+	appropriate sections.
+	
+	A complete reference to the BeOS R5 API is available on the web in
+	<a href="http://haiku-os.org/legacy-docs/bebook/">The Be Book</a>.
+	The Be Book is used with permission from
+	<a href="http://www.access-company.com/">Access Co.</a>, the current
+	owners of Be's intellectual property.
 
-  \section notes General Notes and Information
-  - \ref compatibility
-  - \ref apidoc
-  - \ref credits
+	\section kits Kits and Servers
+
+	The API is split into several kits and servers each detailing a different
+	aspect of the operating system.
+		- The \ref app is the starting point for developing applications
+			and includes classes for messaging and for interacting with
+			the rest of the system.
+		- The \ref interface is used to create responsive and attractive
+			graphical user interfaces building on the messaging facilities
+			provided by the Application Kit.
+			- The \link layout_intro Layout API \endlink is a new addition
+				to the Interface Kit in Haiku which provides resources to
+				layout your application flexibly and easily.
+		- The \ref locale includes classes to localize your application to
+			different languages, timezones, number formatting conventions and
+			much more.
+		- The \ref media provides a unified and consistent interface for media
+			streams and applications to intercommunicate.
+		- The \ref midi2 describes an interface to generating, processing,
+			and playing music in MIDI format. For reference documentation on the
+			\ref midi1 is also included.
+		- The \ref storage is a collection of classes that deal with storing and
+			retrieving information from disk.
+		- The \ref support contains support classes to use in your application
+			including resources for thread safety, IO, and serialization.
+
+	\section special_topics Special Topics
+
+	- \ref drivers
 */
 
 ///// Define main kits /////
 
 /*!
-  \defgroup app Application Kit
-  \defgroup drivers Drivers
-  \defgroup interface Interface Kit
-  \brief API for displaying a graphical user interface.
-  \defgroup midi2 MIDI 2 Kit
-  \brief API for producing and consuming MIDI events.
-  \defgroup libmidi2 (libmidi2.so)
-  \defgroup support Support Kit
-  \brief Collection of utility classes that are used throughout the API.
-  \defgroup libbe (libbe.so)
-  \defgroup libroot (libroot.so)
-  \defgroup locale Locale Kit
-  \brief Collection of classes for localizing applications.
+	\defgroup app Application Kit
+	\brief The Application Kit is the starting point for writing native Haiku
+		GUI applications.
+
+	The application kit is exactly what its name suggests &mdash; it is the
+	basis of Haiku applications. You should first read through this document
+	and the references here before moving on to the other parts of the API.
+
+	The Application Kit classes can be divided into two groups: the messaging
+	classes and the system interaction classes. The larger of the two groups is
+	the messaging classes. Since the Haiku API relies on pervasive
+	multithreading messaging is an essential topic for any application. Have a
+	look at the \link app_messaging Introduction to Messaging \endlink for more
+	information.
+
+	The following messaging classes which allow you to easily and securely
+	communicate between threads.
+		- BHandler
+		- BInvoker
+		- BLooper
+		- BMessage
+		- BMessageFilter
+		- BMessageQueue
+		- BMessageRunner
+		- BMessenger
+ 
+	The second group is the system interaction classes. These classes
+	provide hooks for your application to interact with the rest of the system.
+	The most important class in this group is BApplication. Below is a list of
+	all system interaction classes:
+		- BApplication
+		- BClipboard
+		- BCursor
+		- BPropertyInfo
+		- BRoster
+
+
+	\defgroup drivers Device Drivers
+
+
+	\defgroup interface Interface Kit
+	\brief API for displaying a graphical user interface.
+
+	The Interface Kit holds all the classes you'll need to develop a GUI.
+	Building on the messaging facilities provided by the Application Kit,
+	the Interface Kit can be used to create a responsive and attractive
+	graphical user interface.
+
+ 	The most important class in the Interface Kit is the BView class, which
+	handles drawing and user interaction. Pointer and keyboard events are
+	processed in this class.
+
+	Another important class is the BWindow class, which holds BViews and makes
+	them visible to the user. The BWindow class also handles BView focusing
+	and BMessage dispatching, among other things.
+
+	A new addition Haiku has added over the BeOS API is the Layout API, which
+	is based around the BLayoutItem and BLayout classes. These classes will
+	take care of making sure all your GUI widgets end up where you want them,
+	with enough space to be useful. You can start learning the Layout API
+	by reading the \link layout_intro introduction \endlink.
+
+
+	\defgroup locale Locale Kit
+	\brief Collection of classes for localizing applications.
+
+	The Locale Kit provides a set of tools for internationalizing,
+	localizing and translating your software. This includes not only
+	replacing string with their translations at runtime, but also more
+	complex tasks such as formatting numbers, dates, and times in a way
+	that match the locale preferences of the user.
+
+	The main way to access locale data is through the be_locale_roster.
+	This is a global instance of the BLocaleRoster class, storing the data
+	for localizing an application according to the user's preferred settings.
+	The locale roster also acts as a factory to instantiate most of the other
+	classes. However, there are some cases where you will need to instantiate
+	another class by yourself, to use it with custom settings. For example, you
+	may need to format a date with a fixed format in english for including in an
+	e-mail header, as it is the only format accepted there.
+
+	Unlike the other kits in Haiku, the Locale kit does not live in libbe.
+	When building a localized application, you have to link it to
+	liblocale.so. If you want to use the catalog macros, you also have to
+	link each of your images (that is, applications, libraries and add-ons)
+	to liblocalestub.a.
+
+	\defgroup media Media Kit
+	\brief Collection of classes that deal with audio and video.
+
+
+	\defgroup midi1 The old MIDI Kit (libmidi.so)
+	\brief The old MIDI kit.
+
+
+	\defgroup midi2 MIDI 2 Kit
+	\brief The Midi Kit is the API that implements support for generating,
+		processing, and playing music in MIDI format.
+
+	<A HREF="http://www.midi.org/">MIDI</A>, which  stands for 'Musical
+	Instrument Digital Interface', is a well-established  standard for
+	representing and communicating musical data. This document serves as
+	an overview. If you would like to see all the components, please look
+	at \link midi2 the list with classes \endlink.
+
+	\section midi2twokits A Tale of Two MIDI Kits
+
+	BeOS comes with two different, but compatible Midi Kits. This
+	documentation focuses on the "new" Midi Kit, or midi2 as we like to
+	call it, that was  introduced with BeOS R5. The old kit, which we'll
+	refer to as midi1, is more complete than the new kit, but less powerful.
+
+	Both kits let you create so-called MIDI endpoints, but the endpoints
+	from midi1 cannot be shared between different applications. The midi2
+	kit solves that  problem, but unlike midi1 it does not include a General
+	MIDI softsynth, nor does it have a facility for reading and playing
+	Standard MIDI Files. Don't worry: both kits are compatible and you can
+	mix-and-match them in your applications.
+
+	The main differences between the two kits:
+		- Instead of one BMidi object that both produces and consumes events,
+			we have BMidiProducer and BMidiConsumer.
+		- Applications are capable of sharing MIDI producers and consumers
+			with other applications via the centralized Midi Roster.
+		- Physical MIDI ports are now sharable without apps "stealing" events
+			from each other.
+		- Applications can now send/receive raw MIDI byte streams (useful if
+			an application has its own MIDI parser/engine).
+		- Channels are numbered 0&ndash;15, not 1&ndash;16
+		- Timing is now specified in microseconds rather than milliseconds.
+
+	\section midi2concepts Midi Kit Concepts
+
+	A brief overview of the elements that comprise the Midi Kit:
+		- \b Endpoints. This is what the Midi Kit is all about: sending MIDI
+			messages between endpoints. An endpoint is like a MIDI In or MIDI
+			Out socket on your equipment; it either receives information or it
+			sends information. Endpoints that send MIDI events are called
+			\b producers; the endpoints that receive those events are called
+			\b consumers. An endpoint that is created by your own application
+			is called \b local; endpoints from other applications are
+			\b remote. You can access remote endpoints using \b proxies.
+		- \b Filters. A filter is an object that has a consumer and a producer
+			endpoint. It reads incoming events from its consumer, performs some
+			operation, and tells its producer to send out the results. In its
+			current form, the Midi  Kit doesn't provide any special facilities
+			for writing filters.
+		- \b Midi \b Roster. The roster is the list of all published producers
+			and consumers. By publishing an endpoint, you allow other
+			applications to talk to it. You are not required to publish your
+			endpoints, in which case only your own application can use them.
+		- \b Midi \b Server. The Midi Server does the behind-the-scenes work.
+			It manages the roster, it connects endpoints, it makes sure that
+			endpoints can communicate, and so on. The Midi Server is started
+			automatically when BeOS boots, and you never have to deal with it
+			directly. Just remember that it runs the show.
+		- \b libmidi. The BMidi* classes live inside two shared libraries:
+			libmidi.so and libmidi2.so. If you write an application that uses
+			old Midi Kit, you must link it to libmidi.so. Applications that use
+			the new Midi Kit must link to libmidi2.so. If you want to
+			mix-and-match both kits, you should also link to both libraries.
+
+	Here is a pretty picture:
+
+	\image html midi2concepts.png
+
+	\section midi2mediakit Midi Kit != Media Kit
+
+	Be chose not to integrate the Midi Kit into the Media Kit as another media
+	type, mainly because MIDI doesn't require any of the format negotiation that
+	other media types need. Although the two kits look similar -- both have a
+	"roster" for finding or registering "consumers" and "producers" -- there are
+	some very important differences.
+
+	The first and most important point to note is that BMidiConsumer and
+	BMidiProducer in the Midi Kit are \b NOT directly analogous to
+	BBufferConsumer and  BBufferProducer in the Media Kit! In the Media Kit,
+	consumers and producers are the data consuming and producing properties
+	of a media node. A filter in the Media Kit, therefore, inherits from both
+	BBufferConsumer and BBufferProducer, and implements their virtual member
+	functions to do its work.
+
+	In the Midi Kit, consumers and producers act as endpoints of MIDI data
+	connections, much as media_source and media_destination do in the Media Kit.
+	Thus, a MIDI filter does not derive from BMidiConsumer and BMidiProducer;
+	instead, it contains BMidiConsumer and BMidiProducer objects for each of its
+	distinct endpoints that connect to other MIDI objects. The Midi Kit does not
+	allow the use of multiple virtual inheritance, so you can't create an object
+	that's both a BMidiConsumer and a BMidiProducer.
+
+	This also contrasts with the old Midi Kit's conception of a BMidi object,
+	which stood for an object that both received and sent MIDI data. In the new
+	Midi Kit, the endpoints of MIDI connections are all that matters. What lies
+	between the endpoints, i.e. how a MIDI filter is actually structured, is
+	entirely at your discretion.
+
+	Also, rather than use token structs like media_node to make connections
+	via the MediaRoster, the new kit makes the connections directly via the
+	BMidiProducer object.
+
+	\section midi2remotelocal Remote vs. Local Objects
+
+	The Midi Kit makes a distinction between remote and local MIDI objects.
+	You can  only create local MIDI endpoints, which derive from either
+	BMidiLocalConsumer or BMidiLocalProducer. Remote endpoints are endpoints
+	that live in other applications, and you access them through BMidiRoster.
+
+	BMidiRoster only gives you access to BMidiEndpoints, BMidiConsumers, and
+	BMidiProducers. When you want to talk to remote MIDI objects, you do so
+	through the proxy objects that BMidiRoster provides. Unlike
+	BMidiLocalConsumer and BMidiLocalProducer, these classes do not provide a
+	lot of functions. That is intentional. In order to hide the details of
+	communication with MIDI endpoints in other applications, the Midi Kit must
+	hide the details of how a particular endpoint is implemented.
+
+	So what can you do with remote objects? Only what BMidiConsumer,
+	BMidiProducer, and BMidiEndpoint will let you do. You can connect
+	objects, get the properties of these objects -- and that's about it.
+
+	\section midi2lifespan Creating and Destroying Objects
+
+	The constructors and destructors of most midi2 classes are private,
+	which means that you cannot directly create them using the C++
+	<CODE>new</CODE> operator, on the  stack, or as globals. Nor can you
+	<CODE>delete</CODE> them. Instead, these objects are obtained through
+	BMidiRoster. The only two exceptions to this rule are BMidiLocalConsumer
+	and BMidiLocalProducer. These two objects may be directly created and
+	subclassed by developers.
+
+	\section midi2refcount Reference Counting
+
+	Each MIDI endpoint has a reference count associated with it, so that
+	the Midi Roster can do proper bookkeeping. When you construct a
+	BMidiLocalProducer or  BMidiLocalConsumer endpoint, it starts with a
+	reference count of 1. In addition, BMidiRoster increments the reference
+	count of any object it hands to you as a result of
+	\link BMidiRoster::NextEndpoint() NextEndpoint() \endlink or
+	\link BMidiRoster::FindEndpoint() FindEndpoint() \endlink.
+	Once the count hits  0, the endpoint will be deleted.
+
+	This means that, to delete an endpoint, you don't call the
+	<CODE>delete</CODE>  operator directly; instead, you call
+	\link BMidiEndpoint::Release() Release() \endlink.
+	To balance this call, there's also an
+	\link BMidiEndpoint::Acquire() Acquire() \endlink, in case you have two
+	disparate parts of your application working with the endpoint, and you
+	don't want to have to keep track of who needs to Release() the endpoint.
+
+	When you're done with any endpoint object, you must Release() it.
+	This is true  for both local and remote objects. Repeat after me:
+	Release() when you're done.
+
+	\section midi2events MIDI Events
+
+	To make some actual music, you need to
+	\link BMidiProducer::Connect() Connect() \endlink your consumers to
+	your producers. Then you tell the producer to "spray" MIDI events to all
+	the connected consumers. The consumers are notified of these incoming
+	events through a set of hook functions.
+
+	The Midi Kit already provides a set of commonly used spray functions,
+	such as  \link BMidiLocalProducer::SprayNoteOn() SprayNoteOn() \endlink,
+	\link BMidiLocalProducer::SprayControlChange() SprayControlChange()
+	\endlink, and so on. These correspond one-to-one with the message types
+	from the MIDI spec. You don't need to be a MIDI expert to use the kit, but
+	of course some knowledge of the protocol helps. If you are really hardcore,
+	you can also use the
+	\link BMidiLocalProducer::SprayData() SprayData() \endlink to send raw MIDI
+	events to the consumers.
+
+	At the consumer side, a dedicated thread invokes a hook function for every
+	incoming MIDI event. For every spray function, there is a corresponding hook
+	function, e.g. \link BMidiLocalConsumer::NoteOn() NoteOn() \endlink and
+	\link  BMidiLocalConsumer::ControlChange() ControlChange() \endlink.
+	The hardcore MIDI fanatics among you will be pleased to know that you can
+	also tap into the \link BMidiLocalConsumer::Data() Data() \endlink hook and
+	get your hands dirty with the raw MIDI data.
+
+	\section midi2time Time
+
+	The spray and hook functions accept a bigtime_t parameter named "time". This
+	indicates when the MIDI event should be performed. The time is given in
+	microseconds since the computer booted. To get the current tick measurement,
+	you call the system_time() function from the Kernel Kit.
+
+	If you override a hook function in one of your consumer objects, it should
+	look  at the time argument, wait until the designated time, and then perform
+	its action. The preferred method is to use the Kernel Kit's
+	<CODE>snooze_until()</CODE> function, which sends the consumer thread to
+	sleep  until the requested time has come. (Or, if the time has already
+	passed, returns immediately.)
+
+	Like this:
+
+	\code
+void MyConsumer::NoteOn(
+    uchar channel, uchar note, uchar velocity, bigtime_t time)
+{
+    snooze_until(time, B_SYSTEM_TIMEBASE);
+    ...do your thing...
+}
+	\endcode
+
+	If you want your producers to run in real time, i.e. they produce MIDI data
+	that needs to be performed immediately, you should pass time 0 to the spray
+	functions (which also happens to be the default value). Since time 0 has
+	already passed, <CODE>snooze_until()</CODE> returns immediately, and the
+	consumer will process the events as soon as they are received.
+
+	To schedule MIDI events for a performance time that lies somewhere in the
+	future, the producer must take into account the consumer's latency.
+	Producers  should attempt to get notes to the consumer by or before
+	<I>(scheduled_performance_time - latency)</I>. The time argument is still
+	the scheduled performance time, so if your consumer has latency, it should
+	snooze like this before it starts to perform the events:
+
+	\code
+snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
+	\endcode
+
+	Note that a typical producer sends out its events as soon as it can;
+	unlike a consumer, it does not have to snooze.
+
+	\section midi2ports Other Timing Issues
+
+	Each consumer object uses a Kernel Kit port to receive MIDI events from
+	connected producers. The queue for this port is only 1 message deep.
+	This means that if the consumer thread is asleep in a
+	<CODE>snooze_until()</CODE>, it will not read its port. Consequently,
+	any producer that tries to write a new event to this port will block until
+	the consumer thread is ready to receive a new message. This is intentional,
+	because it prevents producers from generating and queueing up thousands of
+	events.
+
+	This mechanism, while simple, puts on the producer the responsibility
+	for sorting the events in time. Suppose your producer sends three Note
+	On events, the first on t + 0, the second on t + 4, and the third on t + 2.
+	This last event won't be received until after t + 4, so it will be two ticks
+	too late. If this sort of thing can happen with your producer, you should
+	somehow sort the events before you spray them. Of course, if you have two or
+	more producers connected to the same consumer, it is nearly impossible to
+	sort this all out (pardon the pun). So it is not wise to send the same kinds
+	of events from more than one producer to one consumer at the same time.
+
+	The article Introduction to MIDI, Part 2 in <A
+	HREF="http://open-beos.sourceforge.net/nsl.php?mode=display&id=36">OpenBeOS
+	Newsletter 36</A> describes this problem in more detail, and provides a
+	solution. Go read it now!
+
+	\section midi2filters Writing a Filter
+
+	A typical filter contains a consumer and a producer endpoint. It receives
+	events from the consumer, processes them, and sends them out again using the
+	producer. The consumer endpoint is a subclass of BMidiLocalConsumer, whereas
+	the producer is simply a BMidiLocalProducer, not a subclass. This is a
+	common  configuration, because consumers work by overriding the event hooks
+	to do work  when MIDI data arrives. Producers work by sending an event when
+	you call their  member functions. You should hardly ever need to derive from
+	BMidiLocalProducer (unless you need to know when the producer gets connected
+	or disconnected, perhaps), but you'll always have to override one or more of
+	BMidiLocalConsumer's member functions to do something useful with incoming
+	data.
+
+	Filters should ignore the time argument from the spray and hook functions,
+	and  simply pass it on unchanged. Objects that only filter data should
+	process the  event as quickly as possible and be done with it. Do not
+	<CODE>snooze_until()</CODE> in the consumer endpoint of a filter!	
+
+	\section midi2apidiffs API Differences
+
+	As far as the end user is concerned, the Haiku Midi Kit is mostly the same
+	as the BeOS R5 kits, although there are a few small differences in the API
+	(mostly bug fixes):
+		- BMidiEndpoint::IsPersistent() always returns false.
+		- The B_MIDI_CHANGE_LATENCY notification is now properly sent. The Be
+			kit  incorrectly set be:op to B_MIDI_CHANGED_NAME, even though the
+			rest of the  message was properly structured.
+		- If creating a local endpoint fails, you can still Release() the object
+		  without crashing into the debugger.
+
+	\section midi2seealso See also
+
+	More about the Midi Kit:
+		- \ref Midi2Defs.h
+		- Be Newsletter Volume 3, Issue 47 - Motor Mix sample code
+		- Be Newsletter Volume 4, Issue 3 - Overview of the new kit
+		- <A HREF="http://haiku-os.org/documents/dev/introduction_to_midi_part_1">Newsletter
+		  33</A>, Introduction to MIDI, Part 1
+		- <A HREF="http://haiku-os.org/documents/dev/introduction_to_midi_part_2">Newsletter
+		  36</A>, Introduction to MIDI, Part 2
+		- Sample code and other goodies at the
+		  <A HREF="http://haiku-os.org/about/teams/midi_kit">Haiku Midi Kit team page</A>
+
+	Information about MIDI in general:
+		- <A HREF="http://www.midi.org">MIDI Manufacturers Association</A>
+		- <A HREF="http://www.borg.com/~jglatt/tutr/miditutr.htm">MIDI Tutorials</A>
+		- <A HREF="http://www.borg.com/~jglatt/tech/midispec.htm">MIDI Specification</A>
+		- <A HREF="http://www.borg.com/~jglatt/tech/midifile.htm">Standard MIDI File Format</A>
+		- <A HREF="http://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</A>
+
+
+	\defgroup libmidi2 (libmidi2.so)
+
+
+	\defgroup storage Storage Kit
+	\brief Collection of classes that deal with storing and retrieving
+		information from disk.
+
+
+	\defgroup support Support Kit
+	\brief Collection of utility classes that are used throughout the API.
+
+	The Support Kit provides a handy set of classes that you can use in your
+	applications. These classes provide:
+		- \b Thread \b Safety. Haiku can execute multiple threads of an
+			application in parallel, letting certain parts of an application
+			continue when one part is stalled, as well as letting an application
+			process multiple pieces of data at the same time on multicore or
+			multiprocessor systems. However, there are times when multiple
+			threads desire to work on the same piece of data at the same time,
+			potentially causing a conflict where variables or pointers are
+			changed by one thread causing another to execute incorrectly. To
+			prevent this, Haiku implements a \"locking\" mechanism, allowing one
+			thread to \"lock out\" other threads from executing code that might
+			modify the same data.
+		  - \b Archiving \b and \b IO. These classes allow a programmer to
+			convert objects into a form that can more easily be transferred to
+			other applications or stored to disk, as well as performing basic
+			input and output operations.
+		  - \b Memory \b Allocation. This class allows a programmer to hand off
+			some of the duties of memory accounting and management.
+		  - \b Common \b Datatypes. To avoid unnecessary duplication of code
+			and to make life easier for programmers, Haiku includes classes that
+			handle management of ordered lists and strings.
+
+	There are also a number of utility functions to time actions, play system
+	alert sounds, compare strings, and atomically manipulate integers. Have a
+	look at the overview, or go straight to the complete
+	\link support list of components \endlink of this kit.
+
+	\section Overview
+		- Thread Safety:
+			- BLocker provides a semaphore-like locking mechanism allowing for
+				recursive locks.
+			- BAutolock provides a simple method of automatically removing a
+				lock when a function ends.
+			- \ref TLS.h "Thread Local Storage" allows a global variable\'s
+				content to be sensitive to thread context.
+		- Archiving and IO:
+			- BArchivable provides an interface for \"archiving\" objects so
+				that they may be sent to other applications where an identical
+				copy will be recreated.
+			- BArchiver simplifies archiving of BArchivable hierarchies.
+			- BUnarchiver simplifies unarchiving hierarchies that have been
+				archived using BArchiver.
+			- BFlattenable provides an interface for \"flattening\" objects so
+				that they may be easily stored to disk.
+		- BDataIO provides an interface for generalized read/write streams.
+			- BPositionIO extends BDataIO to allow seeking within the data.
+			- BBufferIO creates a buffer and attaches it to a BPositionIO
+				stream, allowing for reduced load on the underlying stream.
+			- BMemoryIO allows operation on an already-existing buffer.
+			- BMallocIO creates and allows operation on a buffer.
+		- Memory Allocation:
+			- BBlockCache allows an application to allocate a \"pool\" of
+				memory blocks that the application can fetch and dispose of as
+				it pleases, letting the application make only a few large memory
+				allocations, instead of many small expensive allocations.
+		- Common Datatypes:
+			- BList allows simple ordered lists and provides common access,
+				modification, and comparison functions.
+			- BString allows strings and provides common access, modification,
+				and comparison functions.
+		- BStopWatch allows an application to measure the time an action takes.
+			- \ref support_globals "Global functions"
+			- \ref TypeConstants.h "Common types and constants"
+			- Error codes for all kits
+
+
+	\defgroup libbe (libbe.so)
+
+
+	\defgroup libroot (libroot.so)
 */
 
 ///// Subgroups /////
 
 /*!
-  \defgroup support_globals Global functions in the support kit
-  \ingroup support
+	\defgroup support_globals Global functions in the support kit
+	\ingroup support
 
-  \defgroup layout Layout classes in the Interface Kit
-  \ingroup interface
+	\defgroup layout Layout classes in the Interface Kit
+	\ingroup interface
 */
