@@ -194,8 +194,8 @@
 .align 8; \
 FUNCTION(name): \
 	pushl	$vector; \
-	pushl	$-1; \
-	pushl	$-1; \
+	pushl	%edx; \
+	pushl	%eax; \
 	jmp		int_bottom;	\
 FUNCTION_END(name)
 
