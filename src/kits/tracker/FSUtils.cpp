@@ -702,9 +702,7 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 	warning.ReplaceFirst("%toDoAction", toDoAction);
 	warning.ReplaceFirst("%toConfirmAction", toConfirmAction);
 
-	BString buttonLabel(B_TRANSLATE_COMMENT("%toConfirmAction",
-		"Action label for the button, e.g. Rename"));
-	buttonLabel.ReplaceFirst("%toConfirmAction", toConfirmAction);
+	BString buttonLabel(toConfirmAction);
 
 	OverrideAlert *alert = new OverrideAlert("", warning.String(),
 		buttonLabel.String(), (requireOverride ? B_SHIFT_KEY : 0),
