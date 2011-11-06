@@ -1,4 +1,4 @@
-##	BeOS and Haiku Generic Makefile Engine v2.5.0
+##	BeOS and Haiku Generic Makefile Engine v2.5.1
 ##	Does all the hard work for the Generic Makefile
 ##	which simply defines the project parameters
 
@@ -115,7 +115,12 @@ endif
 
 # NOTE: make doesn't find the target if its name is enclosed in
 #       quotation marks
+ifeq ($(strip $(TYPE)), STATIC)
+	TARGET		:= $(TARGET_DIR)/$(NAME).a
+else	
 	TARGET		:= $(TARGET_DIR)/$(NAME)
+endif
+
 
 # psuedo-function for converting a list of source files in SRCS variable
 # to a corresponding list of object files in $(OBJ_DIR)/xxx.o
@@ -368,4 +373,8 @@ endif
 catalogsinstall :: catalogs
 	mkdir -p "/boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)"
 	-cp $(CATALOGS_DIR)/*.catalog /boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)
+
+# alternative way of storing localization catalogs - bind into program executable's resources
+bindcatalogs :
+	for lc in $(LOCALES); do linkcatkeys -o $(TARGET) -s $(APP_MIME_SIG) -tr -l $$lc $(CATKEYS_DIR)/$$lc.catkeys; done
 
