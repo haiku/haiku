@@ -787,7 +787,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0);
 
-									if (strcmp(wInfo->name, item->Label()) != 0)
+									if (strcasecmp(wInfo->name,
+										item->FullTitle()) != 0)
 										item->SetLabel(wInfo->name);
 
 									if (item->ChangedState())

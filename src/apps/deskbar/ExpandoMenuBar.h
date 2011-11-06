@@ -84,7 +84,7 @@ class TExpandoMenuBar : public BMenuBar {
 		void CheckForSizeOverrun();
 
 	private:
-		static int CompareByName( const void* first, const void* second);
+		static int CompareByName(const void* first, const void* second);
 		static int32 monitor_team_windows(void* arg);
 
 		void AddTeam(BList* team, BBitmap* icon, char* name, char* signature);

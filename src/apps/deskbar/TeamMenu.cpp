@@ -33,9 +33,10 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
 #include <string.h>
+
 #include <Application.h>
+#include <Debug.h>
 #include <Roster.h>
 
 #include "BarApp.h"

@@ -116,13 +116,12 @@ TWindowMenu::AttachedToWindow()
 
 	int32 parentMenuItems = 0;
 
-	int32 numTeams = fTeam->CountItems();
-	for (int32 i = 0; i < numTeams; i++) {
-		team_id	theTeam = (team_id)fTeam->ItemAt(i);
-		int32 count = 0;
-		int32* tokens = get_token_list(theTeam, &count);
+	for (int32 i = 0; i < fTeam->CountItems(); i++) {
+		team_id theTeam = (team_id)fTeam->ItemAt(i);
+		int32 tokenCount = 0;
+		int32* tokens = get_token_list(theTeam, &tokenCount);
 
-		for (int32 j = 0; j < count; j++) {
+		for (int32 j = 0; j < tokenCount; j++) {
 			client_window_info* wInfo = get_window_info(tokens[j]);
 			if (wInfo == NULL)
 				continue;
@@ -131,11 +130,13 @@ TWindowMenu::AttachedToWindow()
 				&& (wInfo->show_hide_level <= 0 || wInfo->is_mini)) {
 				// Don't add new items if we're expanded. We've already done
 				// this, they've just been moved.
-				int32 numItems = CountItems();
-				int32 addIndex = 0;
-				for (; addIndex < numItems; addIndex++)
-					if (strcasecmp(ItemAt(addIndex)->Label(), wInfo->name) > 0)
+				for (int32 addIndex = 0; addIndex < CountItems(); addIndex++) {
+					TWindowMenuItem* item
+						= static_cast<TWindowMenuItem*>(ItemAt(addIndex));
+					if (item != NULL
+						&& strcasecmp(item->FullTitle(), wInfo->name) > 0)
 						break;
+				}
 
 				if (!fExpanded) {
 					TWindowMenuItem* item = new TWindowMenuItem(wInfo->name,
@@ -180,19 +181,17 @@ TWindowMenu::AttachedToWindow()
 			= new TWindowMenuItem(B_TRANSLATE("No windows"), -1, false, false);
 
 		noWindowsItem->SetEnabled(false);
-
 		AddItem(noWindowsItem);
 
-		// if an application has no windows, this feature makes it easy to quit
-		// it. (but we only add this option if the application is not Tracker.)
+		// Add a 'Quit application' item if no windows are open
+		// unless the application is Tracker
 		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
 			AddSeparatorItem();
 			AddItem(new TShowHideMenuItem(B_TRANSLATE("Quit application"),
 				fTeam, B_QUIT_REQUESTED));
 		}
 	} else {
-		// if we are in drag mode, then don't add the window controls
-		// to the menu
+		// Only add the window controls to the menu if we are in drag mode
 		if (!dragging) {
 			TShowHideMenuItem* hide
 				= new TShowHideMenuItem(B_TRANSLATE("Hide all"), fTeam,
