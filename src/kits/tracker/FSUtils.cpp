@@ -68,6 +68,7 @@ respective holders. All rights reserved.
 
 #include <fs_attr.h>
 #include <fs_info.h>
+#include <sys/utsname.h>
 
 #include "Attributes.h"
 #include "Bitmaps.h"
@@ -633,19 +634,19 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 	if (DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)) {
 		warning.SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the system folder or its "
-			"contents, you won't be able to boot Haiku! Are you sure you "
+			"contents, you won't be able to boot %osName! Are you sure you "
 			"want to do this? To %toDoAction the system folder or its "
 			"contents anyway, hold down the Shift key and click "
 			"\"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_COMMON_DIRECTORY)) {
 		warning.SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the common folder, Haiku "
+			B_TRANSLATE("If you %ifYouDoAction the common folder, %osName "
 			"may not behave properly! Are you sure you want to do this? "
 			"To %toDoAction the common folder anyway, hold down the "
 			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning .SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the home folder, Haiku "
+			B_TRANSLATE("If you %ifYouDoAction the home folder, %osName "
 			"may not behave properly! Are you sure you want to do this? "
 			"To %toDoAction the home folder anyway, hold down the "
 			"Shift key and click \"%toConfirmAction\"."));
@@ -657,14 +658,14 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
 				B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the mime settings, Haiku "
-				"may not behave properly! Are you sure you want to do this? "
-				"To %toDoAction the mime settings anyway, click "
+				B_TRANSLATE("If you %ifYouDoAction the mime settings, "
+				"%osName may not behave properly! Are you sure you want to "
+				"do this? To %toDoAction the mime settings anyway, click "
 				"\"%toConfirmAction\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the config folder, Haiku "
+				B_TRANSLATE("If you %ifYouDoAction the config folder, %osName "
 				"may not behave properly! Are you sure you want to do this? "
 				"To %toDoAction the config folder anyway, click "
 				"\"%toConfirmAction\"."));
@@ -672,9 +673,9 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the settings folder, Haiku "
-				"may not behave properly! Are you sure you want to do this? "
-				"To %toDoAction the settings folder anyway, click "
+				B_TRANSLATE("If you %ifYouDoAction the settings folder, "
+				"%osName may not behave properly! Are you sure you want to "
+				"do this? To %toDoAction the settings folder anyway, click "
 				"\"%toConfirmAction\"."));
 			requireOverride = false;
 		}
@@ -690,6 +691,12 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 		&& !requireOverride)
 		// we already warned about moving home this time around
 		return true;
+
+	struct utsname name;
+	if (uname(&name) == -1)
+		warning.ReplaceFirst("%osName", "Haiku");
+	else
+		warning.ReplaceFirst("%osName", name.sysname);
 
 	warning.ReplaceFirst("%ifYouDoAction", ifYouDoAction);
 	warning.ReplaceFirst("%toDoAction", toDoAction);
