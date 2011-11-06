@@ -20,7 +20,7 @@ CalcOptions::CalcOptions()
 	:
 	auto_num_lock(false),
 	audio_feedback(false),
-	show_keypad(true)
+	keypad_mode(KEYPAD_MODE_BASIC)
 {
 }
 
@@ -29,6 +29,7 @@ void
 CalcOptions::LoadSettings(const BMessage* archive)
 {
 	bool option;
+	uint8 keypad_mode_option;
 
 	if (archive->FindBool("auto num lock", &option) == B_OK)
 		auto_num_lock = option;
@@ -36,8 +37,8 @@ CalcOptions::LoadSettings(const BMessage* archive)
 	if (archive->FindBool("audio feedback", &option) == B_OK)
 		audio_feedback = option;
 
-	if (archive->FindBool("show keypad", &option) == B_OK)
-		show_keypad = option;
+	if (archive->FindUInt8("keypad mode", &keypad_mode_option) == B_OK)
+		keypad_mode = keypad_mode_option;
 }
 
 
@@ -50,7 +51,7 @@ CalcOptions::SaveSettings(BMessage* archive) const
 		ret = archive->AddBool("audio feedback", audio_feedback);
 
 	if (ret == B_OK)
-		ret = archive->AddBool("show keypad", show_keypad);
+		ret = archive->AddUInt8("keypad mode", keypad_mode);
 
 	return ret;
 }

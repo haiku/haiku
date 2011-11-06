@@ -21,6 +21,7 @@ class CalcWindow : public BWindow {
 								CalcWindow(BRect frame, BMessage* settings);
 	virtual						~CalcWindow();
 
+	virtual void				MessageReceived(BMessage* message);
 	virtual	void				Show();
 	virtual	bool				QuitRequested();
 

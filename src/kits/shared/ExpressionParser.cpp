@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -159,7 +159,7 @@ class Tokenizer {
 			}
 
 			// optional exponent part
-			if (*fCurrentChar == 'e' || *fCurrentChar == 'E') {
+			if (*fCurrentChar == 'E') {
 				temp << *fCurrentChar;
 				fCurrentChar++;
 
@@ -205,6 +205,13 @@ class Tokenizer {
 			int32 length = fCurrentChar - begin;
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_IDENTIFIER);
+
+		} else if ((unsigned char)fCurrentChar[0] == 0xCF
+			&& (unsigned char)fCurrentChar[1] == 0x80) {
+			// UTF-8 small greek letter PI
+			fCurrentToken = Token(fCurrentChar, 2, _CurrentPos() - 1,
+				TOKEN_IDENTIFIER);
+			fCurrentChar += 2;
 
 		} else {
 			int32 type = TOKEN_NONE;
@@ -568,10 +575,14 @@ ExpressionParser::_InitArguments(MAPM values[], int32 argumentCount)
 MAPM
 ExpressionParser::_ParseFunction(const Token& token)
 {
-	if (strcasecmp("e", token.string.String()) == 0)
+	if (strcmp("e", token.string.String()) == 0)
 		return _ParseFactorial(MAPM(MM_E));
-	else if (strcasecmp("pi", token.string.String()) == 0)
+	else if (strcasecmp("pi", token.string.String()) == 0
+		|| ((unsigned char)token.string.String()[0] == 0xCF 
+			&& (unsigned char)token.string.String()[1] == 0x80)) {
+		// UTF-8 small greek letter PI
 		return _ParseFactorial(MAPM(MM_PI));
+	}
 
 	// hard coded cases for different count of arguments
 	// supports functions with 3 arguments at most

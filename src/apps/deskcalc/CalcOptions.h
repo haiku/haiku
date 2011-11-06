@@ -13,12 +13,18 @@
 
 #include <SupportDefs.h>
 
+enum {
+	KEYPAD_MODE_COMPACT,
+	KEYPAD_MODE_BASIC,
+	KEYPAD_MODE_SCIENTIFIC
+};
+
 class BMessage;
 
 struct CalcOptions {
 	bool auto_num_lock;		// automatically activate numlock
 	bool audio_feedback;	// provide audio feedback
-	bool show_keypad;		// show or hide the buttons
+	uint8 keypad_mode;		// keypad mode options
 
 				CalcOptions();
 

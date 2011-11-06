@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -188,7 +188,7 @@ ExpressionTextView::SetValue(BString value)
 	uint32 mode = B_FONT_ALL;
 	GetFontAndColor(&font, &mode);
 	float stringWidth = font.StringWidth(value);
-	
+
 	// make the string shorter if it does not fit in the view
 	float viewWidth = Frame().Width();
 	if (value.CountChars() > 3 && stringWidth > viewWidth) {
@@ -207,20 +207,20 @@ ExpressionTextView::SetValue(BString value)
 			if (offset == firstDigit + 1) {
 				// if the value is 0.01 or larger then scientific notation
 				// won't shorten the string
-				if (value[firstDigit] != '0' || value[firstDigit+2] != '0' 
+				if (value[firstDigit] != '0' || value[firstDigit + 2] != '0' 
 					|| value[firstDigit + 3] != '0') {
 					exponent = 0;
 				} else {
 					// remove the period
 					value.Remove(offset, 1);
-					
+
 					// check for negative exponent value
 					exponent = 0;
 					while (value[firstDigit] == '0') {
 						value.Remove(firstDigit, 1);
 						exponent--;
 					}
-					
+
 					// add the period
 					value.Insert('.', 1, firstDigit + 1);
 				}
@@ -241,12 +241,12 @@ ExpressionTextView::SetValue(BString value)
 				}
 			}
 		}
-		
+
 		// add the exponent
 		offset = value.CountChars() - 1;
 		if (exponent != 0)
 			value << "E" << exponent;
-		
+
 		// reduce the number of digits until the string fits or can not be
 		// made any shorter
 		stringWidth = font.StringWidth(value);
@@ -257,13 +257,13 @@ ExpressionTextView::SetValue(BString value)
 			value.Remove(offset--, 1);
 			stringWidth = font.StringWidth(value);
 		}
-		
+
 		// there is no need to keep the period if no digits follow
 		if (value[offset] == '.') {
 			value.Remove(offset, 1);
 			offset--;
 		}
-		
+
 		// take care of proper rounding of the result
 		int digit = (int)lastRemovedDigit - '0'; // ascii to int
 		if (digit >= 5) {
@@ -282,14 +282,14 @@ ExpressionTextView::SetValue(BString value)
 					value[firstDigit] = '.';
 				}
 				value.Insert('1', 1, firstDigit);
-				
+
 				// remove the exponent value and the last digit
 				offset = value.FindFirst('E');
 				if (offset == B_ERROR) 
 					offset = value.CountChars();
 				value.Truncate(--offset);
 				offset--; // offset now points to the last digit
-				
+
 				// increase the exponent and add it back to the string
 				exponent++;
 				value << 'E' << exponent;
@@ -298,11 +298,11 @@ ExpressionTextView::SetValue(BString value)
 				value[offset] = char(digit + 48);
 			}
 		}
-		
+
 		// remove trailing zeros
 		while (value[offset] == '0')
 			value.Remove(offset--, 1);
-		
+
 		// there is no need to keep the period if no digits follow
 		if (value[offset] == '.')
 			value.Remove(offset, 1);
