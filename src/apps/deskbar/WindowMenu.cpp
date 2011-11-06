@@ -191,7 +191,7 @@ TWindowMenu::AttachedToWindow()
 				fTeam, B_QUIT_REQUESTED));
 		}
 	} else {
-		// Only add the window controls to the menu if we are in drag mode
+		// Only add the window controls to the menu if we are not in drag mode
 		if (!dragging) {
 			TShowHideMenuItem* hide
 				= new TShowHideMenuItem(B_TRANSLATE("Hide all"), fTeam,
