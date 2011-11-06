@@ -393,7 +393,7 @@ TeamWindow::SaveSettings(GUITeamUISettings* settings)
 	if (_SaveSplitSettings(fImageSplitView, "Image", settings) != B_OK)
 		return B_NO_MEMORY;
 
-	if (_SaveSplitSettings(fThreadSplitView, "Thead", settings) != B_OK)
+	if (_SaveSplitSettings(fThreadSplitView, "Thread", settings) != B_OK)
 		return B_NO_MEMORY;
 
 	return B_OK;
