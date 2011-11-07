@@ -42,7 +42,7 @@ DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
 		// Two windows for each acocunt : one for sending and the other for
 		// receiving mails
 	fNotification.SetMessageID(identifier);
-	fNotification.SetGroup(B_TRANSLATE("Mail Status"));
+	fNotification.SetGroup(B_TRANSLATE("Mail status"));
 	fNotification.SetTitle(desc);
 
 	app_info info;
@@ -104,9 +104,15 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 	fSizeDone += bytes;
 	if (fTotalSize > 0)
 		fNotification.SetProgress(fSizeDone / (float)fTotalSize);
-	else {
-		// Likely we should set it as an INFORMATION_NOTIFICATION in that case,
-		// but this can't be done after object creation...
+	else if (fTotalItems > 0) {
+		// No size information available
+		// Report progress in terms of message count instead
+		
+		fNotification.SetProgress(fItemsDone / (float)fTotalITems);
+	} else {
+		// No message count information either
+		// TODO we should use a B_INFORMATION_NOTIFICATION here, but it is not
+		// possible to change the BNotification type after creating it...
 		fNotification.SetProgress(0);
 	}
 
