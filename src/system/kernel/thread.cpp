@@ -121,7 +121,7 @@ public:
 	void Notify(uint32 eventCode, team_id teamID, thread_id threadID,
 		Thread* thread = NULL)
 	{
-		char eventBuffer[128];
+		char eventBuffer[180];
 		KMessage event;
 		event.SetTo(eventBuffer, sizeof(eventBuffer), THREAD_MONITOR);
 		event.AddInt32("event", eventCode);

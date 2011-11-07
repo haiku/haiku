@@ -367,7 +367,7 @@ PortNotificationService::PortNotificationService()
 void
 PortNotificationService::Notify(uint32 opcode, port_id port)
 {
-	char eventBuffer[64];
+	char eventBuffer[128];
 	KMessage event;
 	event.SetTo(eventBuffer, sizeof(eventBuffer), PORT_MONITOR);
 	event.AddInt32("event", opcode);
