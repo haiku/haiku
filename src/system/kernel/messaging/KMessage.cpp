@@ -963,7 +963,7 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 		if (newSize > fBufferCapacity) {
 			// if we don't own the buffer, we can't resize it
 			if (!(fFlags & KMESSAGE_OWNS_BUFFER)) {
-#ifdef _KERNEL_MODE && 0
+#if defined(_KERNEL_MODE) && 0
 				// optional debugging to find insufficiently sized KMessage
 				// buffers (e.g. for in-kernel notifications)
 				panic("KMessage: out of space: available: %" B_PRId32
