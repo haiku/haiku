@@ -243,7 +243,14 @@ private:
 			void				_SetIgnoreHidden(bool on);
 			void				_SetStickyMode(bool on);
 			bool				_IsStickyMode() const;
-			void				_GetIsAltCommandKey(bool &value) const;
+
+			// Methods to get the current modifier keycode
+			void				_GetShiftKey(uint32 &value) const;
+			void				_GetControlKey(uint32 &value) const;
+			void				_GetCommandKey(uint32 &value) const;
+			void				_GetOptionKey(uint32 &value) const;
+			void				_GetMenuKey(uint32 &value) const;
+
 			void				_CalcTriggers();
 			bool				_ChooseTrigger(const char* title, int32& index,
 									uint32& trigger,
@@ -260,7 +267,14 @@ private:
 			void				_QuitTracking(bool onlyThis = true);
 
 	static	menu_info			sMenuInfo;
-	static	bool				sAltAsCommandKey;
+
+			// Variables to keep track of what code is currently assigned to
+			// each modifier key
+	static	uint32				sShiftKey;
+	static	uint32				sControlKey;
+	static	uint32				sOptionKey;
+	static	uint32				sCommandKey;
+	static	uint32				sMenuKey;
 
 			BMenuItem*			fChosenItem;
 			BList				fItems;
