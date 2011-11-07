@@ -175,8 +175,10 @@ TeamDebugger::~TeamDebugger()
 		wait_for_thread(fDebugEventListener, NULL);
 
 	// terminate UI
-	fUserInterface->Terminate();
-	fUserInterface->ReleaseReference();
+	if (fUserInterface != NULL) {
+		fUserInterface->Terminate();
+		fUserInterface->ReleaseReference();
+	}
 
 	ThreadHandler* threadHandler = fThreadHandlers.Clear(true);
 	while (threadHandler != NULL) {
@@ -185,11 +187,13 @@ TeamDebugger::~TeamDebugger()
 		threadHandler = next;
 	}
 
-	ImageHandler* imageHandler = fImageHandlers->Clear(true);
-	while (imageHandler != NULL) {
-		ImageHandler* next = imageHandler->fNext;
-		imageHandler->ReleaseReference();
-		imageHandler = next;
+	if (fImageHandlers != NULL) {
+		ImageHandler* imageHandler = fImageHandlers->Clear(true);
+		while (imageHandler != NULL) {
+			ImageHandler* next = imageHandler->fNext;
+			imageHandler->ReleaseReference();
+			imageHandler = next;
+		}
 	}
 
 	delete fImageHandlers;
