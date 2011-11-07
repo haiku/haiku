@@ -39,6 +39,7 @@
 #include "KeymapListItem.h"
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Keymap window"
 
 
@@ -55,7 +56,7 @@ static const uint32 kMsgSystemMapSelected = 'SmST';
 static const uint32 kMsgUserMapSelected = 'UmST';
 
 static const uint32 kMsgRevertKeymap = 'Rvrt';
-static const uint32 kMsgKeymapUpdated = 'upkM';
+static const uint32 kMsgKeymapUpdated = 'kMup';
 
 static const uint32 kMsgDeadKeyAcuteChanged = 'dkAc';
 static const uint32 kMsgDeadKeyCircumflexChanged = 'dkCc';
@@ -222,6 +223,9 @@ KeymapWindow::MessageReceived(BMessage* message)
 		case kMsgMenuFileSaveAs:
 			fSavePanel->Show();
 			break;
+		case kMsgShowModifierKeysWindow:
+			be_app->PostMessage(kMsgShowModifierKeysWindow);
+			break;
 
 		case kChangeKeyboardLayout:
 		{
@@ -292,6 +296,36 @@ KeymapWindow::MessageReceived(BMessage* message)
 			_RevertKeymap();
 			_UpdateButtons();
 			break;
+
+		case kMsgUpdateModifiers:
+		{
+			uint32 keycode;
+
+			if (message->FindUInt32("caps_key", &keycode) == B_OK)
+				fCurrentMap.Map().caps_key = keycode;
+
+			if (message->FindUInt32("left_control_key", &keycode) == B_OK)
+				fCurrentMap.Map().left_control_key = keycode;
+
+			if (message->FindUInt32("right_control_key", &keycode) == B_OK)
+				fCurrentMap.Map().right_control_key = keycode;
+
+			if (message->FindUInt32("left_option_key", &keycode) == B_OK)
+				fCurrentMap.Map().left_option_key = keycode;
+
+			if (message->FindUInt32("right_option_key", &keycode) == B_OK)
+				fCurrentMap.Map().right_option_key = keycode;
+
+			if (message->FindUInt32("left_command_key", &keycode) == B_OK)
+				fCurrentMap.Map().left_command_key = keycode;
+
+			if (message->FindUInt32("right_command_key", &keycode) == B_OK)
+				fCurrentMap.Map().right_command_key = keycode;
+
+			_UpdateButtons();
+			fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+			break;
+		}
 
 		case kMsgKeymapUpdated:
 			_UpdateButtons();
@@ -380,9 +414,12 @@ KeymapWindow::_CreateMenu()
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileOpen), 'O'));
-	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileSaveAs)));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Set Modifiers Keys" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgShowModifierKeysWindow)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));

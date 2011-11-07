@@ -11,6 +11,7 @@ Preference Keymap :
 	KeymapApplication.cpp
 	KeymapListItem.cpp
 	KeymapWindow.cpp
+	ModifierKeysWindow.cpp
 
 	: be tracker $(HAIKU_LOCALE_LIBS) libshared.a $(TARGET_LIBSTDC++)
 	: Keymap.rdef
