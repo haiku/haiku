@@ -335,13 +335,19 @@ TeamWindow::MessageReceived(BMessage* message)
 bool
 TeamWindow::QuitRequested()
 {
-	return fListener->UserInterfaceQuitRequested();
+	fListener->UserInterfaceQuitRequested();
+
+	return false;
 }
 
 
 status_t
 TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 {
+	AutoLocker<BWindow> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	BVariant value;
 	status_t error = settings->Value("teamWindowFrame", value);
 	if (error == B_OK) {
@@ -364,6 +370,10 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 status_t
 TeamWindow::SaveSettings(GUITeamUISettings* settings)
 {
+	AutoLocker<BWindow> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	// save the settings from the cached copy first,
 	// then overwrite them with our most current set
 	// this is necessary in order to preserve the settings

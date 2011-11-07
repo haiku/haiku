@@ -9,7 +9,7 @@
 
 #include <Alert.h>
 #include <Application.h>
-#include <Autolock.h>
+#include <AutoLocker.h>
 #include <Button.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
@@ -277,7 +277,7 @@ InspectorWindow::QuitRequested()
 void
 InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	BAutolock lock(this);
+	AutoLocker<BLooper> lock(this);
 	if (lock.IsLocked()) {
 		fCurrentBlock = block;
 		fMemoryView->SetTargetAddress(block, fCurrentAddress);
@@ -290,6 +290,10 @@ InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 status_t
 InspectorWindow::LoadSettings(const GUITeamUISettings* settings)
 {
+	AutoLocker<BLooper> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	BVariant value;
 	if (settings->Value("inspectorWindowFrame", value) == B_OK) {
 		BRect frameRect = value.ToRect();
@@ -308,6 +312,10 @@ InspectorWindow::LoadSettings(const GUITeamUISettings* settings)
 status_t
 InspectorWindow::SaveSettings(BMessage* settings)
 {
+	AutoLocker<BLooper> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	status_t error = settings->AddRect("inspectorWindowFrame", Frame());
 	if (error != B_OK)
 		return error;
