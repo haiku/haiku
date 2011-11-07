@@ -106,6 +106,12 @@ smp_mp_probe(uint32 base, uint32 limit)
 static status_t
 smp_do_mp_config(mp_floating_struct *floatingStruct)
 {
+	if (floatingStruct->config_length != 1) {
+		TRACE(("smp: unsupported structure length of %" B_PRIu8 " units\n",
+			floatingStruct->config_length));
+		return B_UNSUPPORTED;
+	}
+
 	TRACE(("smp: intel mp version %s, %s",
 		(floatingStruct->spec_revision == 1) ? "1.1" : "1.4",
 		(floatingStruct->mp_feature_2 & 0x80)
@@ -139,6 +145,18 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 	mp_config_table *config = floatingStruct->config_table;
 	gKernelArgs.num_cpus = 0;
 
+	if (config->signature != MP_CONFIG_TABLE_SIGNATURE) {
+		TRACE(("smp: invalid config table signature, aborting\n"));
+		return B_ERROR;
+	}
+
+	if (config->base_table_length < sizeof(mp_config_table)) {
+		TRACE(("smp: config table length %" B_PRIu16
+			" too short for structure, aborting\n",
+			config->base_table_length));
+		return B_ERROR;
+	}
+
 	// print our new found configuration.
 	TRACE(("smp: oem id: %.8s product id: %.12s\n", config->oem,
 		config->product));
@@ -146,6 +164,12 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		config->num_base_entries, config->ext_length));
 
 	gKernelArgs.arch_args.apic_phys = (uint32)config->apic;
+	if ((gKernelArgs.arch_args.apic_phys % 4096) != 0) {
+		// MP specs mandate a 4K alignment for the local APIC(s)
+		TRACE(("smp: local apic %p has bad alignment, aborting\n",
+			(void *)gKernelArgs.arch_args.apic_phys));
+		return B_ERROR;
+	}
 
 	char *pointer = (char *)((uint32)config + sizeof(struct mp_config_table));
 	for (int32 i = 0; i < config->num_base_entries; i++) {
@@ -203,8 +227,15 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 				struct mp_base_ioapic *io = (struct mp_base_ioapic *)pointer;
 				pointer += sizeof(struct mp_base_ioapic);
 
-				if (gKernelArgs.arch_args.ioapic_phys == 0)
+				if (gKernelArgs.arch_args.ioapic_phys == 0) {
 					gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
+					if (gKernelArgs.arch_args.ioapic_phys % 1024) {
+						// MP specs mandate a 1K alignment for the IO-APICs
+						TRACE(("smp: io apic %p has bad alignment, aborting\n",
+							(void *)gKernelArgs.arch_args.ioapic_phys));
+						return B_ERROR;
+					}
+				}
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
@@ -230,12 +261,17 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		}
 	}
 
+	if (gKernelArgs.num_cpus == 0) {
+		TRACE(("smp: didn't find any processors, aborting\n"));
+		return B_ERROR;
+	}
+
 	dprintf("smp: apic @ %p, i/o apic @ %p, total %ld processors detected\n",
 		(void *)gKernelArgs.arch_args.apic_phys,
 		(void *)gKernelArgs.arch_args.ioapic_phys,
 		gKernelArgs.num_cpus);
 
-	return gKernelArgs.num_cpus > 0 ? B_OK : B_ERROR;
+	return B_OK;
 }
 
 
@@ -637,6 +673,9 @@ smp_init(void)
 			return;
 	}
 
-	// everything failed or we are not running an SMP system
+	// Everything failed or we are not running an SMP system, reset anything
+	// that might have been set through an incomplete configuration attempt.
+	gKernelArgs.arch_args.apic_phys = 0;
+	gKernelArgs.arch_args.ioapic_phys = 0;
 	gKernelArgs.num_cpus = 1;
 }
