@@ -41,7 +41,8 @@ radeon_gpu_reset()
 	TRACE("%s: GPU software reset in progress...\n", __func__);
 
 	// Halt memory controller
-	radeon_gpu_mc_halt();
+	struct gpu_state gpuState;
+	radeon_gpu_mc_halt(&gpuState);
 
 	if (radeon_gpu_mc_idlecheck() > 0) {
 		ERROR("%s: Timeout waiting for MC to idle!\n", __func__);
@@ -156,21 +157,21 @@ radeon_gpu_reset()
 	}
 
 	// Resume memory controller
-	radeon_gpu_mc_resume();
+	radeon_gpu_mc_resume(&gpuState);
 	return B_OK;
 }
 
 
 void
-radeon_gpu_mc_halt()
+radeon_gpu_mc_halt(gpu_state *gpuState)
 {
 	// Backup current memory controller state
-	gInfo->gpu_info.d1vga_control = Read32(OUT, D1VGA_CONTROL);
-	gInfo->gpu_info.d2vga_control = Read32(OUT, D2VGA_CONTROL);
-	gInfo->gpu_info.vga_render_control = Read32(OUT, VGA_RENDER_CONTROL);
-	gInfo->gpu_info.vga_hdp_control = Read32(OUT, VGA_HDP_CONTROL);
-	gInfo->gpu_info.d1crtc_control = Read32(OUT, D1CRTC_CONTROL);
-	gInfo->gpu_info.d2crtc_control = Read32(OUT, D2CRTC_CONTROL);
+	gpuState->d1vga_control = Read32(OUT, D1VGA_CONTROL);
+	gpuState->d2vga_control = Read32(OUT, D2VGA_CONTROL);
+	gpuState->vga_render_control = Read32(OUT, VGA_RENDER_CONTROL);
+	gpuState->vga_hdp_control = Read32(OUT, VGA_HDP_CONTROL);
+	gpuState->d1crtc_control = Read32(OUT, D1CRTC_CONTROL);
+	gpuState->d2crtc_control = Read32(OUT, D2CRTC_CONTROL);
 
 	// halt all memory controller actions
 	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
@@ -187,28 +188,28 @@ radeon_gpu_mc_halt()
 
 
 void
-radeon_gpu_mc_resume()
+radeon_gpu_mc_resume(gpu_state *gpuState)
 {
-	Write32(OUT, D1GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->mc.vramStart);
-	Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->mc.vramStart);
-	Write32(OUT, D2GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->mc.vramStart);
-	Write32(OUT, D2GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->mc.vramStart);
-	Write32(OUT, VGA_MEMORY_BASE_ADDRESS, gInfo->mc.vramStart);
+	Write32(OUT, D1GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, D2GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, D2GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, VGA_MEMORY_BASE_ADDRESS, gInfo->fb.vramStart);
 
 	// Unlock host access
-	Write32(OUT, VGA_HDP_CONTROL, gInfo->gpu_info.vga_hdp_control);
+	Write32(OUT, VGA_HDP_CONTROL, gpuState->vga_hdp_control);
 	snooze(1);
 
 	// Restore memory controller state
-	Write32(OUT, D1VGA_CONTROL, gInfo->gpu_info.d1vga_control);
-	Write32(OUT, D2VGA_CONTROL, gInfo->gpu_info.d2vga_control);
+	Write32(OUT, D1VGA_CONTROL, gpuState->d1vga_control);
+	Write32(OUT, D2VGA_CONTROL, gpuState->d2vga_control);
 	Write32(OUT, D1CRTC_UPDATE_LOCK, 1);
 	Write32(OUT, D2CRTC_UPDATE_LOCK, 1);
-	Write32(OUT, D1CRTC_CONTROL, gInfo->gpu_info.d1crtc_control);
-	Write32(OUT, D2CRTC_CONTROL, gInfo->gpu_info.d2crtc_control);
+	Write32(OUT, D1CRTC_CONTROL, gpuState->d1crtc_control);
+	Write32(OUT, D2CRTC_CONTROL, gpuState->d2crtc_control);
 	Write32(OUT, D1CRTC_UPDATE_LOCK, 0);
 	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
-	Write32(OUT, VGA_RENDER_CONTROL, gInfo->gpu_info.vga_render_control);
+	Write32(OUT, VGA_RENDER_CONTROL, gpuState->vga_render_control);
 }
 
 
@@ -241,7 +242,8 @@ radeon_gpu_mc_setup_r600()
 	Write32(OUT, HDP_REG_COHERENCY_FLUSH_CNTL, 0);
 
 	// idle the memory controller
-	radeon_gpu_mc_halt();
+	struct gpu_state gpuState;
+	radeon_gpu_mc_halt(&gpuState);
 
 	uint32 idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
@@ -252,24 +254,23 @@ radeon_gpu_mc_setup_r600()
 
 	// TODO: Memory Controller AGP
 	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
-		gInfo->mc.vramStart >> 12);
+		gInfo->fb.vramStart >> 12);
 	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_HIGH_ADDR,
-		gInfo->mc.vramEnd >> 12);
+		gInfo->fb.vramEnd >> 12);
 
 	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR, 0);
-	uint32 tmp = ((gInfo->mc.vramEnd >> 24) & 0xFFFF) << 16;
-	tmp |= ((gInfo->mc.vramStart >> 24) & 0xFFFF);
+	uint32 tmp = ((gInfo->fb.vramEnd >> 24) & 0xFFFF) << 16;
+	tmp |= ((gInfo->fb.vramStart >> 24) & 0xFFFF);
 
 	Write32(OUT, R600_MC_VM_FB_LOCATION, tmp);
-	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->mc.vramStart >> 8));
+	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
 	Write32(OUT, HDP_NONSURFACE_INFO, (2 << 7));
 	Write32(OUT, HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
 
-	// TODO: AGP gtt start / end / agp base
 	// is AGP?
-	//	WREG32(MC_VM_AGP_TOP, rdev->mc.gtt_end >> 22);
-	//	WREG32(MC_VM_AGP_BOT, rdev->mc.gtt_start >> 22);
-	//	WREG32(MC_VM_AGP_BASE, rdev->mc.agp_base >> 22);
+	//	Write32(OUT, R600_MC_VM_AGP_TOP, gInfo->fb.gartEnd >> 22);
+	//	Write32(OUT, R600_MC_VM_AGP_BOT, gInfo->fb.gartStart >> 22);
+	//	Write32(OUT, R600_MC_VM_AGP_BASE, gInfo->fb.agpBase >> 22);
 	// else?
 	Write32(OUT, R600_MC_VM_AGP_BASE, 0);
 	Write32(OUT, R600_MC_VM_AGP_TOP, 0x0FFFFFFF);
@@ -281,7 +282,7 @@ radeon_gpu_mc_setup_r600()
 			__func__, idleState);
 		//return B_ERROR;
 	}
-	radeon_gpu_mc_resume();
+	radeon_gpu_mc_resume(&gpuState);
 
 	// disable render control
 	Write32(OUT, 0x000300, Read32(OUT, 0x000300) & 0xFFFCFFFF);
@@ -308,7 +309,8 @@ radeon_gpu_mc_setup_r700()
 	Read32(OUT, HDP_DEBUG1);
 
 	// idle the memory controller
-	radeon_gpu_mc_halt();
+	struct gpu_state gpuState;
+	radeon_gpu_mc_halt(&gpuState);
 
 	uint32 idleState = radeon_gpu_mc_idlecheck();
 	if (idleState > 0) {
@@ -321,24 +323,23 @@ radeon_gpu_mc_setup_r700()
 
 	// TODO: Memory Controller AGP
 	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
-		gInfo->mc.vramStart >> 12);
+		gInfo->fb.vramStart >> 12);
 	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_HIGH_ADDR,
-		gInfo->mc.vramEnd >> 12);
+		gInfo->fb.vramEnd >> 12);
 
 	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR, 0);
-	uint32 tmp = ((gInfo->mc.vramEnd >> 24) & 0xFFFF) << 16;
-	tmp |= ((gInfo->mc.vramStart >> 24) & 0xFFFF);
+	uint32 tmp = ((gInfo->fb.vramEnd >> 24) & 0xFFFF) << 16;
+	tmp |= ((gInfo->fb.vramStart >> 24) & 0xFFFF);
 
 	Write32(OUT, R700_MC_VM_FB_LOCATION, tmp);
-	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->mc.vramStart >> 8));
+	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
 	Write32(OUT, HDP_NONSURFACE_INFO, (2 << 7));
 	Write32(OUT, HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
 
-	// TODO: AGP gtt start / end / agp base
 	// is AGP?
-	//	WREG32(MC_VM_AGP_TOP, rdev->mc.gtt_end >> 22);
-	//	WREG32(MC_VM_AGP_BOT, rdev->mc.gtt_start >> 22);
-	//	WREG32(MC_VM_AGP_BASE, rdev->mc.agp_base >> 22);
+	//	Write32(OUT, R700_MC_VM_AGP_TOP, gInfo->fb.gartEnd >> 22);
+	//	Write32(OUT, R700_MC_VM_AGP_BOT, gInfo->fb.gartStart >> 22);
+	//	Write32(OUT, R700_MC_VM_AGP_BASE, gInfo->fb.agpBase >> 22);
 	// else?
 	Write32(OUT, R700_MC_VM_AGP_BASE, 0);
 	Write32(OUT, R700_MC_VM_AGP_TOP, 0x0FFFFFFF);
@@ -350,7 +351,7 @@ radeon_gpu_mc_setup_r700()
 			__func__, idleState);
 		//return B_ERROR;
 	}
-	radeon_gpu_mc_resume();
+	radeon_gpu_mc_resume(&gpuState);
 
 	// disable render control
 	Write32(OUT, 0x000300, Read32(OUT, 0x000300) & 0xFFFCFFFF);
@@ -372,7 +373,7 @@ radeon_gpu_mc_init()
 	}
 
 	if (gInfo->shared_info->frame_buffer_size > 0)
-		gInfo->mc.valid = true;
+		gInfo->fb.valid = true;
 
 	// TODO: 0 should be correct here... but it gets me vertical stripes
 	//uint64 vramBase = 0;
@@ -383,9 +384,9 @@ radeon_gpu_mc_init()
 		vramBase <<= 24;
 	}
 
-	gInfo->mc.vramStart = vramBase;
-	gInfo->mc.vramSize = gInfo->shared_info->frame_buffer_size * 1024;
-	gInfo->mc.vramEnd = (vramBase + gInfo->mc.vramSize) - 1;
+	gInfo->fb.vramStart = vramBase;
+	gInfo->fb.vramSize = gInfo->shared_info->frame_buffer_size * 1024;
+	gInfo->fb.vramEnd = (vramBase + gInfo->fb.vramSize) - 1;
 }
 
 
@@ -397,13 +398,13 @@ radeon_gpu_mc_setup()
 	radeon_gpu_mc_init();
 		// init video ram ranges for memory controler
 
-	if (gInfo->mc.valid != true) {
+	if (gInfo->fb.valid != true) {
 		ERROR("%s: Memory Controller init failed.\n", __func__);
 		return B_ERROR;
 	}
 
 	TRACE("%s: vramStart: 0x%" B_PRIX64 ", vramEnd: 0x%" B_PRIX64 "\n",
-		__func__, gInfo->mc.vramStart, gInfo->mc.vramEnd);
+		__func__, gInfo->fb.vramStart, gInfo->fb.vramEnd);
 
 	if (info.device_chipset >= RADEON_R700)
 		return radeon_gpu_mc_setup_r700();

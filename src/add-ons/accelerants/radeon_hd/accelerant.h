@@ -25,7 +25,7 @@
 	// Maximum displays (more then two requires AtomBIOS)
 
 
-struct gpu_state_info {
+struct gpu_state {
 	uint32 d1vga_control;
 	uint32 d2vga_control;
 	uint32 vga_render_control;
@@ -35,11 +35,16 @@ struct gpu_state_info {
 };
 
 
-struct mc_info {
+struct fb_info {
 	bool		valid;
 	uint64		vramStart;
 	uint64		vramEnd;
 	uint64		vramSize;
+
+	uint64		gartStart;
+	uint64		gartEnd;
+	uint64		gartSize;
+	uint64		agpBase;
 };
 
 
@@ -62,8 +67,7 @@ struct accelerant_info {
 	int				device;
 	bool			is_clone;
 
-	struct gpu_state_info gpu_info;	// used for last known gpu state
-	struct mc_info	mc;				// used for memory controller info
+	struct fb_info	fb;	// used for frame buffer info within MC
 
 	volatile uint32	dpms_mode;		// current driver dpms mode
 

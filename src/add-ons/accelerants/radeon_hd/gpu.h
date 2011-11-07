@@ -169,8 +169,8 @@
 
 
 status_t radeon_gpu_reset();
-void radeon_gpu_mc_halt();
-void radeon_gpu_mc_resume();
+void radeon_gpu_mc_halt(struct gpu_state *gpuState);
+void radeon_gpu_mc_resume(struct gpu_state *gpuState);
 uint32 radeon_gpu_mc_idlecheck();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_irq_setup();

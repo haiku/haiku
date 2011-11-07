@@ -953,7 +953,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 
 	Write32(OUT, regs->vgaControl, 0);
 
-	uint64 fbAddress = gInfo->mc.vramStart;
+	uint64 fbAddress = gInfo->fb.vramStart;
 
 	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddress);
 
