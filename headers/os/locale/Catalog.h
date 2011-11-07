@@ -443,8 +443,9 @@ BCatalogAddOn::Next()
 }
 
 inline const char *
-BCatalogAddOn::MarkForTranslation(const char *str, const char *ctx,
-	const char *cmt)
+BCatalogAddOn::MarkForTranslation(const char *str,
+	const char * /*ctx __attribute__ ((unused))*/,
+	const char * /*cmt __attribute__ ((unused))*/)
 {
 	return str;
 }
