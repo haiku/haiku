@@ -108,7 +108,7 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 		// No size information available
 		// Report progress in terms of message count instead
 		
-		fNotification.SetProgress(fItemsDone / (float)fTotalITems);
+		fNotification.SetProgress(fItemsDone / (float)fTotalItems);
 	} else {
 		// No message count information either
 		// TODO we should use a B_INFORMATION_NOTIFICATION here, but it is not
