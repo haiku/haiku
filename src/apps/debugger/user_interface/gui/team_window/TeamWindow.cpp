@@ -1108,6 +1108,7 @@ TeamWindow::_HandleSourceCodeChanged()
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
 	LocatableFile* sourceFile = NULL;
 	BString sourceText;
+	BString truncatedText;
 	if (sourceCode == NULL)
 		sourceCode = fActiveFunction->GetSourceCode();
 
@@ -1121,7 +1122,12 @@ TeamWindow::_HandleSourceCodeChanged()
 		&& sourceFile != NULL) {
 		sourceText.Prepend("Click to locate source file '");
 		sourceText += "'";
-		fSourcePathView->SetText(sourceText.String());
+		truncatedText = sourceText;
+		fSourcePathView->TruncateString(&truncatedText, B_TRUNCATE_MIDDLE,
+			fSourcePathView->Bounds().Width());
+		if (sourceText != truncatedText)
+			fSourcePathView->SetToolTip(sourceText.String());
+		fSourcePathView->SetText(truncatedText.String());
 	} else if (sourceFile != NULL) {
 		sourceText.Prepend("File: ");
 		fSourcePathView->SetText(sourceText.String());
