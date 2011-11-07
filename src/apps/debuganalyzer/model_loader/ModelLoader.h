@@ -106,6 +106,10 @@ private:
 
 			ExtendedThreadSchedulingState* _AddThread(
 									system_profiler_thread_added* event);
+			ExtendedThreadSchedulingState* _AddUnknownThread(
+									thread_id threadID);
+			Model::Team*		_AddUnknownTeam();
+			
 			void				_AddThreadWaitObject(
 									ExtendedThreadSchedulingState* thread,
 									uint32 type, addr_t object);
