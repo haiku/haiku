@@ -67,7 +67,7 @@ radeon_bios_isposted()
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 reg;
 
-	if (info.device_chipset == (RADEON_R1000 | 0x50)) {
+	if (info.device_chipset == RADEON_PALM) {
 		// palms
 		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
 			+ EVERGREEN_CRTC0_REGISTER_OFFSET)
@@ -75,7 +75,7 @@ radeon_bios_isposted()
 			+ EVERGREEN_CRTC1_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.device_chipset >= RADEON_R1000) {
+	} else if (info.device_chipset >= RADEON_CEDAR) {
 		// evergreen or higher
 		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
 				+ EVERGREEN_CRTC0_REGISTER_OFFSET)
@@ -91,7 +91,7 @@ radeon_bios_isposted()
 				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.device_chipset > RADEON_R580) {
+	} else if (info.device_chipset >= RADEON_R420) {
 		// avivio through r700
 		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
 			Read32(OUT, AVIVO_D2CRTC_CONTROL);

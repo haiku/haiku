@@ -18,7 +18,8 @@
 #include "r500_reg.h"
 #include "r600_reg.h"
 #include "r700_reg.h"
-#include "r800_reg.h"
+#include "evergreen_reg.h"
+#include "evergreend.h"
 
 #include <Accelerant.h>
 #include <Drivers.h>
@@ -27,16 +28,6 @@
 
 
 #define VENDOR_ID_ATI	0x1002
-
-// Card models
-#define RADEON_R520		0x0520	// Fudo
-#define RADEON_R580		0x0580	// Rodin
-#define RADEON_R600		0x0600	// Pele
-#define RADEON_R700		0x0700	// Wekiva
-#define RADEON_R1000	0x1000	// Evergreen
-#define RADEON_R2000	0x2000  // Northern Islands
-#define RADEON_R3000	0x3000	// Southern Islands
-#define RADEON_R4000	0x4000	// Not yet known / used
 
 // Card chipset flags
 #define CHIP_STD		(1 << 0) // Standard chipset
@@ -56,6 +47,47 @@
 #define RHD_POWER_RESET    1   /* off temporarily */
 #define RHD_POWER_SHUTDOWN 2   /* long term shutdown */
 #define RHD_POWER_UNKNOWN  3   /* initial state */
+
+
+// Radeon Chipsets
+enum radeon_chipset {
+	RADEON_R420 = 0,	//r400, Radeon X700-X850
+	RADEON_RV515,
+	RADEON_R520,		//r500, Radeon X1300-X1950
+	RADEON_RV530,
+	RADEON_RV560,
+	RADEON_RV570,
+	RADEON_R580,
+	RADEON_R600,		//r600, Radeon HD 2000, 3000
+	RADEON_RV610,
+	RADEON_RV630,
+	RADEON_RV670,
+	RADEON_RV620,
+	RADEON_RV635,
+	RADEON_RS780,
+	RADEON_RS880,
+	RADEON_RV770,		//r700, Radeon HD 4000
+	RADEON_RV730,
+	RADEON_RV710,
+	RADEON_RV740,
+	RADEON_CEDAR,		//Evergreen, Radeon HD 5000
+	RADEON_REDWOOD,
+	RADEON_JUNIPER,
+	RADEON_CYPRESS,
+	RADEON_HEMLOCK,
+	RADEON_PALM,		//Fusion APU (NI), Radeon HD 6000
+	RADEON_SUMO,
+	RADEON_SUMO2,
+	RADEON_CAICOS,		//Nothern Islands, Radeon HD 6000
+	RADEON_TURKS,
+	RADEON_BARTS,
+	RADEON_CAYMAN,
+	RADEON_ANTILLES,
+	RADEON_LOMBOK,		//Southern Islands, Radeon HD 7000
+	RADEON_THAMES,
+	RADEON_TAHITI,
+	RADEON_NEWZEALAND
+};
 
 
 struct ring_buffer {

@@ -481,7 +481,7 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 
 	// *** Populate frame buffer information
-	if (info.shared_info->device_chipset >= RADEON_R1000) {
+	if (info.shared_info->device_chipset >= RADEON_CEDAR) {
 		// Evergreen+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
@@ -546,12 +546,13 @@ radeon_hd_init(radeon_info &info)
 
 	if (biosStatus != B_OK) {
 		// If the active read fails, we try a disabled read
-		if (info.device_chipset >= (RADEON_R1000 | 0x20))
+		if (info.device_chipset >= RADEON_BARTS)
 			biosStatus = radeon_hd_getbios_ni(info);
-		else if (info.device_chipset >= RADEON_R700)
+		else if (info.device_chipset >= RADEON_RV770)
 			biosStatus = radeon_hd_getbios_r700(info);
 		else if (info.device_chipset >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
+		// else avivo_read_disabled_bios
 	}
 
 	if (biosStatus != B_OK) {

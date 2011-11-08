@@ -40,7 +40,8 @@ init_registers(register_info* regs, uint8 crtcID)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	if (info.device_chipset >= RADEON_R1000) {
+	if (info.device_chipset >= RADEON_CEDAR) {
+		// Evergreen
 		uint32 offset = 0;
 
 		switch(crtcID) {
@@ -103,7 +104,8 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->viewportStart = EVERGREEN_VIEWPORT_START + offset;
 		regs->viewportSize = EVERGREEN_VIEWPORT_SIZE + offset;
 
-	} else if (info.device_chipset >= RADEON_R700) {
+	} else if (info.device_chipset >= RADEON_RV770) {
+		// R700 series
 		uint32 offset = 0;
 
 		switch(crtcID) {
@@ -150,6 +152,7 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->viewportSize = AVIVO_D1MODE_VIEWPORT_SIZE + offset;
 
 	} else if (info.device_chipset >= RADEON_R600) {
+		// R600 series+
 		uint32 offset = 0;
 
 		switch(crtcID) {
@@ -957,7 +960,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 
 	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddress);
 
-	if (info.device_chipset >= RADEON_R700) {
+	if (info.device_chipset >= RADEON_RV770) {
 		TRACE("%s: Set SurfaceAddress High: 0x%" B_PRIX32 "\n",
 			__func__, (fbAddress >> 32) & 0xf);
 

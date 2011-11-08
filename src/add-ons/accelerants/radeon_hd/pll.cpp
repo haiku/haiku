@@ -303,7 +303,7 @@ pll_setup_flags(pll_info *pll, uint8 crtcID)
 		pll->flags |= PLL_PREFER_LOW_REF_DIV;
 
 
-	if (info.device_chipset < RADEON_R700)
+	if (info.device_chipset < RADEON_RV770)
 		pll->flags |= PLL_PREFER_MINM_OVER_MAXP;
 
 
@@ -339,7 +339,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
 
-	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
+	if (info.dceMajor >= 3) {
 		union adjust_pixel_clock args;
 
 		uint8 tableMajor;
