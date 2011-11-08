@@ -39,12 +39,12 @@
 
 // list of supported devices
 const struct supported_device {
-	uint32		device_id;
+	uint32		pciID;
 	uint8		dceMajor;	// Display block family
 	uint8		dceMinor;	// Display block family
-	uint16		chipset;
+	uint16		chipsetID;
 	uint32		chipsetFlags;
-	const char*	name;
+	const char*	deviceName;
 } kSupportedDevices[] = {
 	// R400 Series  (Radeon) DCE 0.0 (*very* early AtomBIOS)
 	// R500 Series  (Radeon Xxxx) DCE 1.0
@@ -233,7 +233,7 @@ get_next_radeon_hd(int32 *_cookie, pci_info &info, uint32 &type)
 		// check device
 		for (uint32 i = 0; i < sizeof(kSupportedDevices)
 				/ sizeof(kSupportedDevices[0]); i++) {
-			if (info.device_id == kSupportedDevices[i].device_id) {
+			if (info.device_id == kSupportedDevices[i].pciID) {
 				type = i;
 				*_cookie = index + 1;
 				return B_OK;
@@ -327,15 +327,15 @@ init_driver(void)
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
 		gDeviceInfo[found]->registers = (uint8 *)info->u.h0.base_registers[0];
-		gDeviceInfo[found]->device_id = kSupportedDevices[type].device_id;
-		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
-		gDeviceInfo[found]->device_chipset = kSupportedDevices[type].chipset;
+		gDeviceInfo[found]->pciID = kSupportedDevices[type].pciID;
+		gDeviceInfo[found]->deviceName = kSupportedDevices[type].deviceName;
+		gDeviceInfo[found]->chipsetID = kSupportedDevices[type].chipsetID;
 		gDeviceInfo[found]->dceMajor = kSupportedDevices[type].dceMajor;
 		gDeviceInfo[found]->dceMinor = kSupportedDevices[type].dceMinor;
 		gDeviceInfo[found]->chipsetFlags = kSupportedDevices[type].chipsetFlags;
 
 		dprintf(DEVICE_NAME ": GPU(%ld) %s, revision = 0x%x\n", found,
-			kSupportedDevices[type].name, info->revision);
+			kSupportedDevices[type].deviceName, info->revision);
 
 		found++;
 	}

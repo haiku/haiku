@@ -303,7 +303,7 @@ pll_setup_flags(pll_info *pll, uint8 crtcID)
 		pll->flags |= PLL_PREFER_LOW_REF_DIV;
 
 
-	if (info.device_chipset < RADEON_RV770)
+	if (info.chipsetID < RADEON_RV770)
 		pll->flags |= PLL_PREFER_MINM_OVER_MAXP;
 
 

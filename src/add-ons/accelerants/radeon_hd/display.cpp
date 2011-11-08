@@ -40,7 +40,7 @@ init_registers(register_info* regs, uint8 crtcID)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	if (info.device_chipset >= RADEON_CEDAR) {
+	if (info.chipsetID >= RADEON_CEDAR) {
 		// Evergreen
 		uint32 offset = 0;
 
@@ -104,7 +104,7 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->viewportStart = EVERGREEN_VIEWPORT_START + offset;
 		regs->viewportSize = EVERGREEN_VIEWPORT_SIZE + offset;
 
-	} else if (info.device_chipset >= RADEON_RV770) {
+	} else if (info.chipsetID >= RADEON_RV770) {
 		// R700 series
 		uint32 offset = 0;
 
@@ -151,7 +151,7 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->viewportStart = AVIVO_D1MODE_VIEWPORT_START + offset;
 		regs->viewportSize = AVIVO_D1MODE_VIEWPORT_SIZE + offset;
 
-	} else if (info.device_chipset >= RADEON_R600) {
+	} else if (info.chipsetID >= RADEON_R600) {
 		// R600 series+
 		uint32 offset = 0;
 
@@ -199,13 +199,13 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->viewportSize = AVIVO_D1MODE_VIEWPORT_SIZE + offset;
 	} else {
 		// this really shouldn't happen unless a driver PCIID chipset is wrong
-		TRACE("%s, unknown Radeon chipset: r%X\n", __func__,
-			info.device_chipset);
+		TRACE("%s, unknown Radeon chipset: %s\n", __func__,
+			info.chipsetName);
 		return B_ERROR;
 	}
 
-	TRACE("%s, registers for ATI chipset r%X crt #%d loaded\n", __func__,
-		info.device_chipset, crtcID);
+	TRACE("%s, registers for ATI chipset %s crt #%d loaded\n", __func__,
+		info.chipsetName, crtcID);
 
 	return B_OK;
 }
@@ -960,7 +960,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 
 	TRACE("%s: Framebuffer at: 0x%" B_PRIX64 "\n", __func__, fbAddress);
 
-	if (info.device_chipset >= RADEON_RV770) {
+	if (info.chipsetID >= RADEON_RV770) {
 		TRACE("%s: Set SurfaceAddress High: 0x%" B_PRIX32 "\n",
 			__func__, (fbAddress >> 32) & 0xf);
 
@@ -976,7 +976,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddress & 0xFFFFFFFF));
 	Write32(OUT, regs->grphSecondarySurfaceAddr, (fbAddress & 0xFFFFFFFF));
 
-	if (info.device_chipset >= RADEON_R600) {
+	if (info.chipsetID >= RADEON_R600) {
 		Write32(CRT, regs->grphControl, fbFormat);
 		Write32(CRT, regs->grphSwapControl, fbSwap);
 	}

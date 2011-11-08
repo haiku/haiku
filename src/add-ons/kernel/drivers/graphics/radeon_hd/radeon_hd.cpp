@@ -37,6 +37,46 @@
 #define ERROR(x...) dprintf("radeon_hd: " x)
 
 
+static const char radeon_chip_name[][16] = {
+	"R420",
+	"RV515",
+	"R520",
+	"RV530",
+	"RV560",
+	"RV570",
+	"R580",
+	"R600",
+	"RV610",
+	"RV630",
+	"RV670",
+	"RV620",
+	"RV635",
+	"RS780",
+	"RS880",
+	"RV770",
+	"RV730",
+	"RV710",
+	"RV740",
+	"Cedar",
+	"Redwood",
+	"Juniper",
+	"Cypress",
+	"Hemlock",
+	"Palm",
+	"Sumo",
+	"Sumo2",
+	"Caicos",
+	"Turks",
+	"Barts",
+	"Cayman",
+	"Antilles",
+	"Lombok",
+	"Thames",
+	"Tahiti",
+	"New Zealand"
+};
+
+
 //	#pragma mark -
 
 
@@ -449,8 +489,8 @@ radeon_hd_init(radeon_info &info)
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
 	ERROR("%s: card(%ld): "
-		"Radeon r%" B_PRIX16 " 1002:%" B_PRIX32 "\n",
-		__func__, info.id, info.device_chipset, info.device_id);
+		"Radeon %s 1002:%" B_PRIX32 "\n", __func__, info.id,
+		radeon_chip_name[info.chipsetID], info.pciID);
 
 	// *** Map shared info
 	AreaKeeper sharedCreator;
@@ -481,7 +521,7 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 
 	// *** Populate frame buffer information
-	if (info.shared_info->device_chipset >= RADEON_CEDAR) {
+	if (info.shared_info->chipsetID >= RADEON_CEDAR) {
 		// Evergreen+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
@@ -531,14 +571,16 @@ radeon_hd_init(radeon_info &info)
 		= info.pci->u.h0.base_registers[PCI_BAR_FB];
 
 	// Pass common information to accelerant
-	info.shared_info->device_index = info.id;
-	info.shared_info->device_id = info.device_id;
-	info.shared_info->device_chipset = info.device_chipset;
+	info.shared_info->deviceIndex = info.id;
+	info.shared_info->pciID = info.pciID;
+	info.shared_info->chipsetID = info.chipsetID;
 	info.shared_info->chipsetFlags = info.chipsetFlags;
 	info.shared_info->dceMajor = info.dceMajor;
 	info.shared_info->dceMinor = info.dceMinor;
 	info.shared_info->registers_area = info.registers_area;
-	strcpy(info.shared_info->device_identifier, info.device_identifier);
+	strcpy(info.shared_info->deviceName, info.deviceName);
+	strcpy(info.shared_info->chipsetName,
+		radeon_chip_name[info.chipsetID]);
 
 	// *** AtomBIOS mapping
 	// First we try an active bios read
@@ -546,11 +588,11 @@ radeon_hd_init(radeon_info &info)
 
 	if (biosStatus != B_OK) {
 		// If the active read fails, we try a disabled read
-		if (info.device_chipset >= RADEON_BARTS)
+		if (info.chipsetID >= RADEON_BARTS)
 			biosStatus = radeon_hd_getbios_ni(info);
-		else if (info.device_chipset >= RADEON_RV770)
+		else if (info.chipsetID >= RADEON_RV770)
 			biosStatus = radeon_hd_getbios_r700(info);
-		else if (info.device_chipset >= RADEON_R600)
+		else if (info.chipsetID >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
 		// else avivo_read_disabled_bios
 	}

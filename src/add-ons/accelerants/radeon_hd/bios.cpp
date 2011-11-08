@@ -36,7 +36,7 @@ radeon_bios_init_scratch()
 	uint32 biosScratch2;
 	uint32 biosScratch6;
 
-	if (info.device_chipset >= RADEON_R600) {
+	if (info.chipsetID >= RADEON_R600) {
 		biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
 		biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
 	} else {
@@ -49,7 +49,7 @@ radeon_bios_init_scratch()
 	biosScratch6 |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
 		// bios shouldn't handle mode switching
 
-	if (info.device_chipset >= RADEON_R600) {
+	if (info.chipsetID >= RADEON_R600) {
 		Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
 		Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
 	} else {
@@ -67,7 +67,7 @@ radeon_bios_isposted()
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 reg;
 
-	if (info.device_chipset == RADEON_PALM) {
+	if (info.chipsetID == RADEON_PALM) {
 		// palms
 		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
 			+ EVERGREEN_CRTC0_REGISTER_OFFSET)
@@ -75,7 +75,7 @@ radeon_bios_isposted()
 			+ EVERGREEN_CRTC1_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.device_chipset >= RADEON_CEDAR) {
+	} else if (info.chipsetID >= RADEON_CEDAR) {
 		// evergreen or higher
 		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
 				+ EVERGREEN_CRTC0_REGISTER_OFFSET)
@@ -91,7 +91,7 @@ radeon_bios_isposted()
 				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.device_chipset >= RADEON_R420) {
+	} else if (info.chipsetID >= RADEON_R420) {
 		// avivio through r700
 		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
 			Read32(OUT, AVIVO_D2CRTC_CONTROL);
@@ -181,7 +181,7 @@ radeon_dump_bios()
 	FILE* fp;
 	char filename[255];
 	sprintf(filename, "/boot/common/cache/tmp/radeon_hd_bios_1002_%" B_PRIx32
-		"_%" B_PRIu32 ".bin", info.device_id, info.device_index);
+		"_%" B_PRIu32 ".bin", info.pciID, info.deviceIndex);
 
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {

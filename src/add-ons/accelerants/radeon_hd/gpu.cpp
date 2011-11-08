@@ -48,7 +48,7 @@ radeon_gpu_reset()
 		ERROR("%s: Timeout waiting for MC to idle!\n", __func__);
 	}
 
-	if (info.device_chipset < RADEON_CEDAR) {
+	if (info.chipsetID < RADEON_CEDAR) {
 		Write32(OUT, CP_ME_CNTL, CP_ME_HALT);
 			// Disable Command Processor parsing / prefetching
 
@@ -444,9 +444,9 @@ radeon_gpu_mc_init()
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	uint32 fbVMLocationReg;
-	if (info.device_chipset >= RADEON_CEDAR) {
+	if (info.chipsetID >= RADEON_CEDAR) {
 		fbVMLocationReg = EVERGREEN_MC_VM_FB_LOCATION;
-	} else if (info.device_chipset >= RADEON_RV770) {
+	} else if (info.chipsetID >= RADEON_RV770) {
 		fbVMLocationReg = R700_MC_VM_FB_LOCATION;
 	} else {
 		fbVMLocationReg = R600_MC_VM_FB_LOCATION;
@@ -486,11 +486,11 @@ radeon_gpu_mc_setup()
 	TRACE("%s: vramStart: 0x%" B_PRIX64 ", vramEnd: 0x%" B_PRIX64 "\n",
 		__func__, gInfo->fb.vramStart, gInfo->fb.vramEnd);
 
-	if (info.device_chipset >= RADEON_CEDAR)
+	if (info.chipsetID >= RADEON_CEDAR)
 		return radeon_gpu_mc_setup_evergreen();
-	if (info.device_chipset >= RADEON_RV770)
+	if (info.chipsetID >= RADEON_RV770)
 		return radeon_gpu_mc_setup_r700();
-	else if (info.device_chipset >= RADEON_R600)
+	else if (info.chipsetID >= RADEON_R600)
 		return radeon_gpu_mc_setup_r600();
 
 	return B_ERROR;

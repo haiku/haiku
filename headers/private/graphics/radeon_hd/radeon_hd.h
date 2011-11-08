@@ -105,8 +105,8 @@ struct overlay_registers;
 
 
 struct radeon_shared_info {
-	uint32			device_index;		// accelerant index
-	uint32			device_id;			// device pciid
+	uint32			deviceIndex;		// accelerant index
+	uint32			pciID;				// device pciid
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
@@ -156,11 +156,12 @@ struct radeon_shared_info {
 	uint16			cursor_hot_x;
 	uint16			cursor_hot_y;
 
-	uint16			device_chipset;
+	char			deviceName[32];
+	uint16			chipsetID;
+	char			chipsetName[16];
 	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;
-	char			device_identifier[32];
 };
 
 //----------------- ioctl() interface ----------------
