@@ -91,10 +91,10 @@ radeon_bios_isposted()
 				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.chipsetID >= RADEON_R420) {
+	} else {
 		// avivio through r700
-		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
-			Read32(OUT, AVIVO_D2CRTC_CONTROL);
+		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL)
+			| Read32(OUT, AVIVO_D2CRTC_CONTROL);
 		if ((reg & AVIVO_CRTC_EN) != 0) {
 			return true;
 		}
