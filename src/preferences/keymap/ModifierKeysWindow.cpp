@@ -6,6 +6,7 @@
  *		John Scipione, jscipione@gmail.com
  */
 
+
 #include "ModifierKeysWindow.h"
 
 #include <stdio.h>
@@ -25,8 +26,9 @@
 
 #include "KeymapApplication.h"
 
+
 enum {
-	MENU_ITEM_CAPS_LOCK,
+	MENU_ITEM_CAPS_LOCK = 0,
 	MENU_ITEM_CONTROL,
 	MENU_ITEM_OPTION,
 	MENU_ITEM_COMMAND,
@@ -34,40 +36,20 @@ enum {
 	MENU_ITEM_DISABLED
 };
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Modifier keys window"
-
-
-static const uint32 kMsgCapsLockCapsLock	= 'clcl';
-static const uint32 kMsgCapsLockControl		= 'clct';
-static const uint32 kMsgCapsLockOption		= 'clop';
-static const uint32 kMsgCapsLockCommand		= 'clcm';
-static const uint32 kMsgCapsLockDisabled	= 'clds';
-
-static const uint32 kMsgControlCapsLock		= 'ctcl';
-static const uint32 kMsgControlControl		= 'ctct';
-static const uint32 kMsgControlOption		= 'ctop';
-static const uint32 kMsgControlCommand		= 'ctcm';
-
-static const uint32 kMsgOptionCapsLock		= 'opcl';
-static const uint32 kMsgOptionControl		= 'opct';
-static const uint32 kMsgOptionOption		= 'opop';
-static const uint32 kMsgOptionCommand		= 'opcm';
-
-static const uint32 kMsgCommmandCapsLock	= 'cmcl';
-static const uint32 kMsgCommmandControl		= 'cmct';
-static const uint32 kMsgCommmandOption		= 'cmop';
-static const uint32 kMsgCommmandCommand		= 'cmcm';
-
+static const uint32 kMsgUpdateModifier		= 'upmd';
 static const uint32 kMsgApplyModifiers 		= 'apmd';
 static const uint32 kMsgRevertModifiers		= 'rvmd';
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Modifier Keys window"
+
+
 ModifierKeysWindow::ModifierKeysWindow()
 	:
-	BWindow(BRect(80, 50, 400, 260), B_TRANSLATE("Modifiers Keys"),
+	BWindow(BRect(80, 50, 400, 260), B_TRANSLATE("Modifier Keys"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	get_key_map(&fCurrentMap, &fCurrentBuffer);
 	get_key_map(&fSavedMap, &fSavedBuffer);
@@ -130,8 +112,6 @@ ModifierKeysWindow::ModifierKeysWindow()
 		.SetInsets(10, 10, 10, 10)
 	);
 
-	_MarkMenuItems();
-
 	CenterOnScreen();
 }
 
@@ -146,120 +126,68 @@ void
 ModifierKeysWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		// Caps Lock
-		case kMsgCapsLockCapsLock:
-			fCurrentMap->caps_key = 0x3b;
-			fCapsLockMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+		case kMsgUpdateModifier:
+		{
+			int32 menu = MENU_ITEM_CAPS_LOCK;
+			int32 key = -1;
 
-		case kMsgCapsLockControl:
-			fCurrentMap->caps_key = 0x5c;
-			fCapsLockMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+			for (; menu <= MENU_ITEM_COMMAND; menu++) {
+				if (message->FindInt32(_KeyToString(menu), &key) == B_OK)
+					break;
+			}
 
-		case kMsgCapsLockOption:
-			fCurrentMap->caps_key = 0x66;
-			fCapsLockMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+			if (key == -1) {
+				// No option was found, don't update
+				return;
+			}
 
-		case kMsgCapsLockCommand:
-			fCurrentMap->caps_key = 0x5d;
-			fCapsLockMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+			// Now 'menu' contains the menu we want to set and 'key' contains
+			// the option we want to set it to.
 
-		case kMsgCapsLockDisabled:
-			fCurrentMap->caps_key = 0;
-			fCapsLockMenu->ItemAt(MENU_ITEM_DISABLED)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+			switch (menu) {
+				case MENU_ITEM_CAPS_LOCK:
+					fCurrentMap->caps_key = _KeyToKeyCode(key);
+					fCapsLockMenu->ItemAt(key)->SetMarked(true);
+					break;
 
-		// Control
-		case kMsgControlCapsLock:
-			fCurrentMap->left_control_key = 0x3b;
-			fControlMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+				case MENU_ITEM_CONTROL:
+					fCurrentMap->left_control_key
+						= _KeyToKeyCode(key);
+					if (key != MENU_ITEM_CAPS_LOCK) {
+						fCurrentMap->right_control_key
+							= _KeyToKeyCode(key, true);
+					}
 
-		case kMsgControlControl:
-			fCurrentMap->left_control_key = 0x5c;
-			fCurrentMap->right_control_key = 0x60;
-			fControlMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+					fControlMenu->ItemAt(key)->SetMarked(true);
+					break;
 
-		case kMsgControlOption:
-			fCurrentMap->left_control_key = 0x66;
-			fCurrentMap->right_control_key = 0x67;
-			fControlMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+				case MENU_ITEM_OPTION:
+					fCurrentMap->left_option_key
+						= _KeyToKeyCode(key);
+					if (key != MENU_ITEM_CAPS_LOCK) {
+						fCurrentMap->right_option_key
+							= _KeyToKeyCode(key, true);
+					}
 
-		case kMsgControlCommand:
-			fCurrentMap->left_control_key = 0x5d;
-			fCurrentMap->right_control_key = 0x5f;
-			fControlMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+					fOptionMenu->ItemAt(key)->SetMarked(true);
+					break;
 
-		// Option
-		case kMsgOptionCapsLock:
-			fCurrentMap->left_option_key = 0x3b;
-			fOptionMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+				case MENU_ITEM_COMMAND:
+					fCurrentMap->left_command_key
+						= _KeyToKeyCode(key);
+					if (key != MENU_ITEM_CAPS_LOCK) {
+						fCurrentMap->right_command_key
+							= _KeyToKeyCode(key, true);
+					}
 
-		case kMsgOptionControl:
-			fCurrentMap->left_option_key = 0x5c;
-			fCurrentMap->right_option_key = 0x60;
-			fOptionMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+					fCommandMenu->ItemAt(key)->SetMarked(true);
+					break;
+			}
 
-		case kMsgOptionOption:
-			fCurrentMap->left_option_key = 0x66;
-			fCurrentMap->right_option_key = 0x67;
-			fOptionMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-			_EnableRevertButton();
+			fRevertButton->SetEnabled(memcmp(fCurrentMap, fSavedMap,
+				sizeof(key_map)));
 			break;
-
-		case kMsgOptionCommand:
-			fCurrentMap->left_option_key = 0x5d;
-			fCurrentMap->right_option_key = 0x5f;
-			fOptionMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-			_EnableRevertButton();
-			break;
-
-		// Command
-		case kMsgCommmandCapsLock:
-			fCurrentMap->left_command_key = 0x3b;
-			fCommandMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-			_EnableRevertButton();
-			break;
-
-		case kMsgCommmandControl:
-			fCurrentMap->left_command_key = 0x5c;
-			fCurrentMap->right_command_key = 0x60;
-			fCommandMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-			_EnableRevertButton();
-			break;
-
-		case kMsgCommmandOption:
-			fCurrentMap->left_command_key = 0x66;
-			fCurrentMap->right_command_key = 0x67;
-			fCommandMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-			_EnableRevertButton();
-			break;
-
-		case kMsgCommmandCommand:
-			fCurrentMap->left_command_key = 0x5d;
-			fCurrentMap->right_command_key = 0x5f;
-			fCommandMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-			_EnableRevertButton();
-			break;
+		}
 
 		// Ok button
 		case kMsgApplyModifiers:
@@ -301,20 +229,17 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 					fCurrentMap->right_command_key);
 			}
 
+			// Tell KeymapWindow to update the modifier keys 
 			be_app->PostMessage(updateModifiers);
+
+			// We are done here, close the window
 			this->PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
 
 		// Revert button
 		case kMsgRevertModifiers:
-			fCurrentMap->caps_key = fSavedMap->caps_key;
-			fCurrentMap->left_control_key = fSavedMap->left_control_key;
-			fCurrentMap->right_control_key = fSavedMap->right_control_key;
-			fCurrentMap->left_option_key = fSavedMap->left_option_key;
-			fCurrentMap->right_option_key = fSavedMap->right_option_key;
-			fCurrentMap->left_command_key = fSavedMap->left_command_key;
-			fCurrentMap->right_command_key = fSavedMap->right_command_key;
+			memcpy(fCurrentMap, fSavedMap, sizeof(key_map));
 
 			_MarkMenuItems();
 			fRevertButton->SetEnabled(false);
@@ -329,30 +254,26 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 BMenuField*
 ModifierKeysWindow::_CreateCapsLockMenuField()
 {
-	fCapsLockMenu = new BPopUpMenu(B_TRANSLATE("Caps Lock"), true, true);
+	fCapsLockMenu = new BPopUpMenu(
+		B_TRANSLATE(_KeyToString(MENU_ITEM_CAPS_LOCK)), true, true);
 
-	BMenuItem* capsLock = new BMenuItem(B_TRANSLATE("Caps Lock"),
-		new BMessage(kMsgCapsLockCapsLock));
-	fCapsLockMenu->AddItem(capsLock, MENU_ITEM_CAPS_LOCK);
+	for (int32 key = MENU_ITEM_CAPS_LOCK; key <= MENU_ITEM_DISABLED; key++) {
+		if (key == MENU_ITEM_SEPERATOR) {
+			BSeparatorItem* separator = new BSeparatorItem;
+			fCapsLockMenu->AddItem(separator, key);
+		} else {
+			BMessage* message = new BMessage(kMsgUpdateModifier);
+			message->AddInt32(_KeyToString(MENU_ITEM_CAPS_LOCK), key);
 
-	BMenuItem* control = new BMenuItem(B_TRANSLATE("Control"),
-		new BMessage(kMsgCapsLockControl));
-	fCapsLockMenu->AddItem(control, MENU_ITEM_CONTROL);
+			BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
+				message);
 
-	BMenuItem* option = new BMenuItem(B_TRANSLATE("Option"),
-		new BMessage(kMsgCapsLockOption));
-	fCapsLockMenu->AddItem(option, MENU_ITEM_OPTION);
+			if (fCurrentMap->caps_key == _KeyToKeyCode(key))
+				item->SetMarked(true);
 
-	BMenuItem* command = new BMenuItem(B_TRANSLATE("Command"),
-		new BMessage(kMsgCapsLockCommand));
-	fCapsLockMenu->AddItem(command, MENU_ITEM_COMMAND);
-
-	BSeparatorItem* separator = new BSeparatorItem;
-	fCapsLockMenu->AddItem(separator, MENU_ITEM_SEPERATOR);
-
-	BMenuItem* disabled = new BMenuItem(B_TRANSLATE("Disabled"),
-		new BMessage(kMsgCapsLockDisabled));
-	fCapsLockMenu->AddItem(disabled, MENU_ITEM_DISABLED);
+			fCapsLockMenu->AddItem(item, key);
+		}
+	}
 
 	return new BMenuField(NULL, fCapsLockMenu);
 }
@@ -361,23 +282,21 @@ ModifierKeysWindow::_CreateCapsLockMenuField()
 BMenuField*
 ModifierKeysWindow::_CreateControlMenuField()
 {
-	fControlMenu = new BPopUpMenu(B_TRANSLATE("Control"), true, true);
+	fControlMenu = new BPopUpMenu(
+		B_TRANSLATE(_KeyToString(MENU_ITEM_CONTROL)), true, true);
 
-	BMenuItem* capsLock = new BMenuItem(B_TRANSLATE("Caps Lock"),
-		new BMessage(kMsgControlCapsLock));
-	fControlMenu->AddItem(capsLock, MENU_ITEM_CAPS_LOCK);
+	for (int32 key = MENU_ITEM_CAPS_LOCK; key <= MENU_ITEM_COMMAND; key++) {
+		BMessage* message = new BMessage(kMsgUpdateModifier);
+		message->AddInt32(_KeyToString(MENU_ITEM_CONTROL), key);
 
-	BMenuItem* control = new BMenuItem(B_TRANSLATE("Control"),
-		new BMessage(kMsgControlControl));
-	fControlMenu->AddItem(control, MENU_ITEM_CONTROL);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
+			message);
 
-	BMenuItem* option = new BMenuItem(B_TRANSLATE("Option"),
-		new BMessage(kMsgControlOption));
-	fControlMenu->AddItem(option, MENU_ITEM_OPTION);
+		if (fCurrentMap->left_control_key == _KeyToKeyCode(key))
+			item->SetMarked(true);
 
-	BMenuItem* command = new BMenuItem(B_TRANSLATE("Command"),
-		new BMessage(kMsgControlCommand));
-	fControlMenu->AddItem(command, MENU_ITEM_COMMAND);
+		fControlMenu->AddItem(item, key);
+	}
 
 	return new BMenuField(NULL, fControlMenu);
 }
@@ -386,23 +305,21 @@ ModifierKeysWindow::_CreateControlMenuField()
 BMenuField*
 ModifierKeysWindow::_CreateOptionMenuField()
 {
-	fOptionMenu = new BPopUpMenu(B_TRANSLATE("Option"), true, true);
+	fOptionMenu = new BPopUpMenu(
+		B_TRANSLATE(_KeyToString(MENU_ITEM_OPTION)), true, true);
 
-	BMenuItem* capsLock = new BMenuItem(B_TRANSLATE("Caps Lock"),
-		new BMessage(kMsgOptionCapsLock));
-	fOptionMenu->AddItem(capsLock, MENU_ITEM_CAPS_LOCK);
+	for (int32 key = MENU_ITEM_CAPS_LOCK; key <= MENU_ITEM_COMMAND; key++) {
+		BMessage* message = new BMessage(kMsgUpdateModifier);
+		message->AddInt32(_KeyToString(MENU_ITEM_OPTION), key);
 
-	BMenuItem* control = new BMenuItem(B_TRANSLATE("Control"),
-		new BMessage(kMsgOptionControl));
-	fOptionMenu->AddItem(control, MENU_ITEM_CONTROL);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
+			message);
 
-	BMenuItem* option = new BMenuItem(B_TRANSLATE("Option"),
-		new BMessage(kMsgOptionOption));
-	fOptionMenu->AddItem(option, MENU_ITEM_OPTION);
+		if (fCurrentMap->left_option_key == _KeyToKeyCode(key))
+			item->SetMarked(true);
 
-	BMenuItem* command = new BMenuItem(B_TRANSLATE("Command"),
-		new BMessage(kMsgOptionCommand));
-	fOptionMenu->AddItem(command, MENU_ITEM_COMMAND);
+		fOptionMenu->AddItem(item, key);
+	}
 
 	return new BMenuField(NULL, fOptionMenu);
 }
@@ -411,23 +328,21 @@ ModifierKeysWindow::_CreateOptionMenuField()
 BMenuField*
 ModifierKeysWindow::_CreateCommandMenuField()
 {
-	fCommandMenu = new BPopUpMenu(B_TRANSLATE("Command"), true, true);
+	fCommandMenu = new BPopUpMenu(
+		B_TRANSLATE(_KeyToString(MENU_ITEM_COMMAND)), true, true);
 
-	BMenuItem* capsLock = new BMenuItem(B_TRANSLATE("Caps Lock"),
-		new BMessage(kMsgCommmandCapsLock));
-	fCommandMenu->AddItem(capsLock, MENU_ITEM_CAPS_LOCK);
+	for (int32 key = MENU_ITEM_CAPS_LOCK; key <= MENU_ITEM_COMMAND; key++) {
+		BMessage* message = new BMessage(kMsgUpdateModifier);
+		message->AddInt32(_KeyToString(MENU_ITEM_COMMAND), key);
 
-	BMenuItem* control = new BMenuItem(B_TRANSLATE("Control"),
-		new BMessage(kMsgCommmandControl));
-	fCommandMenu->AddItem(control, MENU_ITEM_CONTROL);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
+			message);
 
-	BMenuItem* option = new BMenuItem(B_TRANSLATE("Option"),
-		new BMessage(kMsgCommmandOption));
-	fCommandMenu->AddItem(option, MENU_ITEM_OPTION);
+		if (fCurrentMap->left_command_key == _KeyToKeyCode(key))
+			item->SetMarked(true);
 
-	BMenuItem* command = new BMenuItem(B_TRANSLATE("Command"),
-		new BMessage(kMsgCommmandCommand));
-	fCommandMenu->AddItem(command, MENU_ITEM_COMMAND);
+		fCommandMenu->AddItem(item, key);
+	}
 
 	return new BMenuField(NULL, fCommandMenu);
 }
@@ -436,61 +351,70 @@ ModifierKeysWindow::_CreateCommandMenuField()
 void
 ModifierKeysWindow::_MarkMenuItems()
 {
-	// Caps Lock Menu
-	if (fCurrentMap->caps_key == 0x3b)
-		fCapsLockMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-	else if (fCurrentMap->caps_key == 0x5c)
-		fCapsLockMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-	else if (fCurrentMap->caps_key == 0x66)
-		fCapsLockMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-	else if (fCurrentMap->caps_key == 0x5d)
-		fCapsLockMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-	else if (fCurrentMap->caps_key == 0)
+	for (int32 key = MENU_ITEM_CAPS_LOCK; key <= MENU_ITEM_COMMAND; key++) {
+		if (fCurrentMap->caps_key == _KeyToKeyCode(key))
+			fCapsLockMenu->ItemAt(key)->SetMarked(true);
+
+		if (fCurrentMap->left_control_key == _KeyToKeyCode(key)
+			&& fCurrentMap->right_control_key == _KeyToKeyCode(key, true))
+			fControlMenu->ItemAt(key)->SetMarked(true);
+
+		if (fCurrentMap->left_option_key == _KeyToKeyCode(key)
+			&& fCurrentMap->right_option_key == _KeyToKeyCode(key, true))
+			fOptionMenu->ItemAt(key)->SetMarked(true);
+
+		if (fCurrentMap->left_command_key == _KeyToKeyCode(key)
+			&& fCurrentMap->right_command_key == _KeyToKeyCode(key, true))
+			fCommandMenu->ItemAt(key)->SetMarked(true);
+	}
+
+	// Check if caps lock is disabled
+	if (fCurrentMap->caps_key == _KeyToKeyCode(MENU_ITEM_DISABLED))
 		fCapsLockMenu->ItemAt(MENU_ITEM_DISABLED)->SetMarked(true);
-
-	// Control Menu
-	if (fCurrentMap->left_control_key == 0x3b)
-		fControlMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-	else if (fCurrentMap->left_control_key == 0x5c)
-		fControlMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-	else if (fCurrentMap->left_control_key == 0x66)
-		fControlMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-	else if (fCurrentMap->left_control_key == 0x5d)
-		fControlMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-
-	// Option Menu
-	if (fCurrentMap->left_option_key == 0x3b)
-		fOptionMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-	else if (fCurrentMap->left_option_key == 0x5c)
-		fOptionMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-	else if (fCurrentMap->left_option_key == 0x66)
-		fOptionMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-	else if (fCurrentMap->left_option_key == 0x5d)
-		fOptionMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
-
-	// Command menu
-	if (fCurrentMap->left_command_key == 0x3b)
-		fCommandMenu->ItemAt(MENU_ITEM_CAPS_LOCK)->SetMarked(true);
-	else if (fCurrentMap->left_command_key == 0x5c)
-		fCommandMenu->ItemAt(MENU_ITEM_CONTROL)->SetMarked(true);
-	else if (fCurrentMap->left_command_key == 0x66)
-		fCommandMenu->ItemAt(MENU_ITEM_OPTION)->SetMarked(true);
-	else if (fCurrentMap->left_command_key == 0x5d)
-		fCommandMenu->ItemAt(MENU_ITEM_COMMAND)->SetMarked(true);
 }
 
 
-void
-ModifierKeysWindow::_EnableRevertButton()
+const char*
+ModifierKeysWindow::_KeyToString(int32 key)
 {
-	if (fCurrentMap->caps_key != fSavedMap->caps_key
-		|| fCurrentMap->left_control_key != fSavedMap->left_control_key
-		|| fCurrentMap->right_control_key != fSavedMap->right_control_key
-		|| fCurrentMap->left_option_key != fSavedMap->left_option_key
-		|| fCurrentMap->right_option_key != fSavedMap->right_option_key
-		|| fCurrentMap->left_command_key != fSavedMap->left_command_key
-		|| fCurrentMap->right_command_key != fSavedMap->right_command_key)
-		fRevertButton->SetEnabled(true);
-	else
-		fRevertButton->SetEnabled(false);
+	switch (key) {
+		case MENU_ITEM_CAPS_LOCK:
+			return "Caps Lock";
+		case MENU_ITEM_CONTROL:
+			return "Control";
+		case MENU_ITEM_OPTION:
+			return "Option";
+		case MENU_ITEM_COMMAND:
+			return "Command";
+		case MENU_ITEM_DISABLED:
+			return "Disabled";
+	}
+
+	return "";
+}
+
+
+uint32
+ModifierKeysWindow::_KeyToKeyCode(int32 key, bool right = false)
+{
+	switch (key) {
+		case MENU_ITEM_CAPS_LOCK:
+			return 0x3b;
+		case MENU_ITEM_CONTROL:
+			if (right)
+				return 0x60;
+			return 0x5c;
+		case MENU_ITEM_OPTION:
+			if (right)
+				return 0x67;
+			return 0x66;
+		case MENU_ITEM_COMMAND:
+			if (right)
+				return 0x5f;
+			return 0x5d;
+		case MENU_ITEM_DISABLED:
+			return 0;
+	}
+
+	return 0;
 }

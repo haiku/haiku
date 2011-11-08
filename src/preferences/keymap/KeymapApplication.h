@@ -12,12 +12,13 @@
 
 
 #include "KeymapWindow.h"
-#include "ModifierKeysWindow.h"
 
 #include <Application.h>
 #include <Catalog.h>
 #include <Entry.h>
 #include <Locale.h>
+
+#include "ModifierKeysWindow.h"
 
 
 static const uint32 kMsgShowModifierKeysWindow = 'smkw';

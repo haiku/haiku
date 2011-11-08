@@ -30,7 +30,8 @@ protected:
 			BMenuField*		_CreateCommandMenuField();
                             
 			void			_MarkMenuItems();
-			void			_EnableRevertButton();
+			const char*		_KeyToString(int32 key);
+			uint32			_KeyToKeyCode(int32 key, bool right = false);
 
 private:                    
 			BPopUpMenu*		fCapsLockMenu;
@@ -48,5 +49,6 @@ private:
 			char*			fCurrentBuffer;
 			char*			fSavedBuffer;
 };
+
 
 #endif	// MODIFIER_KEYS_WINDOW_H

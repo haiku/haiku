@@ -12,8 +12,9 @@
 
 
 KeymapApplication::KeymapApplication()
-	:	BApplication("application/x-vnd.Haiku-Keymap"),
-		fModifierKeysWindow(NULL)
+	:
+	BApplication("application/x-vnd.Haiku-Keymap"),
+	fModifierKeysWindow(NULL)
 {
 	// create the window
 	fWindow = new KeymapWindow();
