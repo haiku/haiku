@@ -292,7 +292,8 @@ ModifierKeysWindow::_CreateControlMenuField()
 		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
 			message);
 
-		if (fCurrentMap->left_control_key == _KeyToKeyCode(key))
+		if (fCurrentMap->left_control_key == _KeyToKeyCode(key)
+			&& fCurrentMap->right_control_key == _KeyToKeyCode(key, true))
 			item->SetMarked(true);
 
 		fControlMenu->AddItem(item, key);
@@ -315,7 +316,8 @@ ModifierKeysWindow::_CreateOptionMenuField()
 		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
 			message);
 
-		if (fCurrentMap->left_option_key == _KeyToKeyCode(key))
+		if (fCurrentMap->left_option_key == _KeyToKeyCode(key)
+			&& fCurrentMap->right_option_key == _KeyToKeyCode(key, true))
 			item->SetMarked(true);
 
 		fOptionMenu->AddItem(item, key);
@@ -338,7 +340,8 @@ ModifierKeysWindow::_CreateCommandMenuField()
 		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
 			message);
 
-		if (fCurrentMap->left_command_key == _KeyToKeyCode(key))
+		if (fCurrentMap->left_command_key == _KeyToKeyCode(key)
+			&& fCurrentMap->right_command_key == _KeyToKeyCode(key, true))
 			item->SetMarked(true);
 
 		fCommandMenu->AddItem(item, key);
