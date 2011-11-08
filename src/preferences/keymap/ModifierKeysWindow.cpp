@@ -398,7 +398,7 @@ ModifierKeysWindow::_KeyToString(int32 key)
 
 
 uint32
-ModifierKeysWindow::_KeyToKeyCode(int32 key, bool right = false)
+ModifierKeysWindow::_KeyToKeyCode(int32 key, bool right)
 {
 	switch (key) {
 		case MENU_ITEM_CAPS_LOCK:
