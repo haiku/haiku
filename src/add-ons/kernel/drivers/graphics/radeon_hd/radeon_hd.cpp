@@ -521,7 +521,7 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 
 	// *** Populate frame buffer information
-	if (info.shared_info->chipsetID >= RADEON_CEDAR) {
+	if (info.chipsetID >= RADEON_CEDAR) {
 		// Evergreen+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
