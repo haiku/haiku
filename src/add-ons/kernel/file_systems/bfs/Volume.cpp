@@ -423,16 +423,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	if (!(fFlags & VOLUME_READ_ONLY)) {
-		Attribute attr(fRootNode);
-		if (attr.Get("be:volume_id") == B_ENTRY_NOT_FOUND) {
-			Transaction transaction(this, fRootNode->BlockNumber());
-			fRootNode->WriteLockInTransaction(transaction);
-			CreateVolumeID(transaction);
-			transaction.Done();
-		}
-	}
-
 	// all went fine
 	opener.Keep();
 	return B_OK;
