@@ -77,6 +77,8 @@ table {
 td, th {
 	vertical-align: top;
 	text-align: left;
+	padding: 4px;
+	font-size: 14.4px;
 }
 
 caption {

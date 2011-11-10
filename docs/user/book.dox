@@ -54,6 +54,7 @@
 	\section special_topics Special Topics
 
 	- \ref drivers
+	- \ref keyboard
 */
 
 ///// Define main kits /////
@@ -94,9 +95,6 @@
 		- BCursor
 		- BPropertyInfo
 		- BRoster
-
-
-	\defgroup drivers Device Drivers
 
 
 	\defgroup interface Interface Kit
@@ -553,3 +551,9 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	\defgroup layout Layout classes in the Interface Kit
 	\ingroup interface
 */
+
+
+///// Special Topics /////
+
+\defgroup drivers Device Drivers
+\defgroup keyboard Keyboard

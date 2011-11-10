@@ -602,6 +602,7 @@ INPUT                  = . \
                          app \
                          drivers \
                          interface \
+                         keyboard \
                          locale \
                          media \
                          midi \
@@ -701,6 +702,7 @@ EXAMPLE_RECURSIVE      = NO
 
 IMAGE_PATH             = . \
                          interface \
+                         keyboard \
                          midi2
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
