@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	3739720453
+1	swedish	x-vnd.Haiku-Time	3493650184
 <Other>	Time		<annan>
 Add	Time		Lägg till
 Africa	Time		Afrika
@@ -13,10 +13,10 @@ Could not create socket	Time		Kunde inte skapa en socket
 Current time:	Time		Aktuell tid:
 Date and time	Time		Datum och tid
 Europe	Time		Europa
-GMT	Time		GMT standardtid
+GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
 Hardware clock set to:	Time		Hårdvaruklockans tid:
 Indian	Time		Indien
-Local time	Time		Lokal tid
+Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)
 Message receiving failed	Time		Kunde inte ta emot meddelandet
 Network time	Time		Internettid
 OK	Time		OK
@@ -34,7 +34,6 @@ Synchronize again	Time		Synkronisera igen
 Synchronize at boot	Time		Synkronisera vid uppstart
 The following error occured while synchronizing:r\n%s	Time		Följande fel uppstod vid synkronisering:r\n%s
 The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
-This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Denna inställning kontrollerar hur Haiku visar sin tid baserat på hur\ntiden är sparad i datorns hårdvaruklocka. Windows är normalt inställd\npå lokal tid, vilket betyder att hårdvaruklockan använder samma tid\nsom den inställda tidzonen. När denna är inställd på GMT betyder\ndet att hårdvaruklockan också sparar sin tid som GMT. Haiku kommer\ndärmed att justera tiden den visar baserad på den inställda tidzonen.
 Time	System name		Tid
 Time	Time		Tid
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Tid, skrivet av:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.

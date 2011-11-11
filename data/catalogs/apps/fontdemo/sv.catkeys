@@ -1,0 +1,19 @@
+1	swedish	x-vnd.Haiku-FontDemo	3491224702
+Antialiased text	ControlView		Kantutjämnad text
+Controls	FontDemo		Kontroller
+Cycle fonts	ControlView		Rotera typsnitt
+Drawing mode:	ControlView		Ritläge:
+Font:	ControlView		Typsnitt:
+FontDemo	FontDemo		TypsnittDemo
+Haiku, Inc.	ControlView		Haiku, Inc.
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Outline:	ControlView		Kontur:
+Outline: %d	ControlView		Kontur: %d
+Rotation: %d	ControlView		Rotation: %d
+Rotation: 0	ControlView		Rotation: 0
+Size: %d	ControlView		Storlek: %d
+Size: 50	ControlView		Storlek: 50
+Spacing: %d	ControlView		Avstånd: %d
+Spacing: 0	ControlView		Avstånd: 0
+Stop cycling	ControlView		Sluta rotera
+Text:	ControlView		Text:

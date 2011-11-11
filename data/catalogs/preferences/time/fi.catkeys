@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	3739720453
+1	finnish	x-vnd.Haiku-Time	3493650184
 <Other>	Time		<Muut>
 Add	Time		Lisää
 Africa	Time		Afrikka
@@ -13,10 +13,10 @@ Could not create socket	Time		Ei voitu luoda pistoketta
 Current time:	Time		Nykyinen aika:
 Date and time	Time		Päivämäärä ja aika
 Europe	Time		Eurooppa
-GMT	Time		Greenwichin aika
+GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
 Indian	Time		Intia
-Local time	Time		Paikallinen aika
+Local time (Windows compatible)	Time		Paikallinen aika (Windows-yhteensopiva)
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
 Network time	Time		Verkkoaika
 OK	Time		Valmis
@@ -34,7 +34,6 @@ Synchronize again	Time		Synkronoi uudelleen
 Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
 The following error occured while synchronizing:r\n%s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s
 The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
-This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Tämä asetus ohjaa sitä, kuinka Haiku näyttää ajan perustuen siihen kuinka\naika on mitattu tietokoneeen laitteistokellossa. Ikkunat asetetaan\nnormaalisti paikalliseen aikaan, mikä tarkoittaa että laitteistokello mittaa samaa\naikaa asetetussa aikavyöhykkeessä. Kun tämä aika on asetettu Greenwichin aikaan,\nse tarkoittaa, että mittaus perustuu siihen ja Haiku voi säätää aikaa\nasetettuun aikavyöhykkeeseen perustuen.
 Time	System name		Aika-asetukset
 Time	Time		Aika
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.

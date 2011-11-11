@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-SMTP	1052586247
+1	german	x-vnd.Haiku-SMTP	2740407895
 . The server said:\n	smtp		. Servermeldung:\n
 . The server says:\n	smtp		. Servermeldung:\n
 : Connection refused or host not found.	smtp		: Verbindung abgelehnt oder Host nicht gefunden.
@@ -11,3 +11,6 @@ None	ConfigView		Keine
 POP3 authentication failed. The server said:\n	smtp		POP3-Authentifizierung fehlgeschlagen. Servermeldung:\n
 POP3 before SMTP	ConfigView		POP3 vor SMTP
 SMTP server:	ConfigView		SMTP-Server:
+SSL	ConfigView		SSL
+STARTTLS	ConfigView		STARTTLS
+Unencrypted	ConfigView		Unverschlüsselt

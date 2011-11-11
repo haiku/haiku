@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	1943893993
+1	german	x-vnd.Haiku-Devices	865240481
 ACPI Information	DeviceACPI		ACPI-Information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Prozessor Namespace '%2'
 ACPI System Bus	DeviceACPI		ACPI Systembus
@@ -8,35 +8,47 @@ ACPI bus	Device		ACPI-Bus
 ACPI bus	DevicesView		ACPI-Bus
 ACPI controller	Device		ACPI-Controller
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
+Array	DeviceSCSI		Anordnung
 Basic information	DevicesView		Basisinformation
 Bridge	Device		Schnittstellen
+Bridge	DeviceSCSI		Schnittstellen
 Bus	DevicesView		Bus
 Bus Information	Device		Bus-Information
+CD-ROM	DeviceSCSI		CD-ROM
+Card Reader	DeviceSCSI		Kartenleser
 Category	DevicesView		Kategorie
+Changer	DeviceSCSI		Wechsler
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klassen-Info:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klassen-Info:\t\t\t\t: %classinfo%
 Class info	DevicePCI		Klassen-Info
 Communication controller	Device		Kommunikationscontroller
+Communications	DeviceSCSI		Kommunikation
 Computer	Device		Computer
 Computer	DevicesView		Rechner
 Connection	DevicesView		Verbindung
 Detailed	DevicesView		Details
 Device	Device		Gerät
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Gerätename\t\t\t\t: %Name%\nHersteller\t\t\t: %Manufacturer%\nBenutzter Treiber\t\t\t\t: %DriverUsed%\nPfade für Treiber\t: %DevicePaths%
+Device class	DeviceSCSI		Geräteklasse
 Device name	Device		Gerätename
 Device name	DeviceACPI		Gerätename
 Device name	DevicePCI		Gerätename
+Device name	DeviceSCSI		Gerätename
 Device name:	Device		Gerätename:
 Device paths	Device		Gerätepfade
 Device paths	DevicePCI		Gerätepfad
 Devices	DevicesView		Geräte
 Devices	System name		Geräte
+Disk Drive	DeviceSCSI		Laufwerk
 Display controller	Device		Anzeige-Controller
 Docking station	Device		Andockstation
 Driver used	Device		Treiber benutzt
 Driver used	DevicePCI		Benutzter Treiber
+Enclosure	DeviceSCSI		Gehäuse
 Encryption controller	Device		Verschlüsselungscontroller
 Generate system information	DevicesView		Systeminformationen erstellen
 Generic system peripheral	Device		Peripheriegeräte
+Graphics Peripheral	DeviceSCSI		Grafik-Peripheriegerät
 ISA bus	Device		ISA-Bus
 ISA bus	DevicesView		ISA-Bus
 Input device controller	Device		Eingabegeräte-Kontroller
@@ -44,6 +56,7 @@ Intelligent controller	Device		Intelligenter Controller
 Manufacturer	Device		Hersteller
 Manufacturer	DeviceACPI		Hersteller
 Manufacturer	DevicePCI		Hersteller
+Manufacturer	DeviceSCSI		Hersteller
 Manufacturer:	Device		Hersteller:
 Mass storage controller	Device		Massenspeicher-Controller
 Memory controller	Device		Speichercontroller
@@ -53,21 +66,30 @@ Network controller	Device		Netzwerk-Controller
 None	Device		Kein
 Not implemented	DeviceACPI		Nicht implementiert
 Not implemented	DevicePCI		Nicht implementiert
+Optical Drive	DeviceSCSI		Optisches Laufwerk
 Order by:	DevicesView		Sortieren nach:
+Other	DeviceSCSI		Andere
 PCI Information	DevicePCI		PCI-Information
 PCI bus	Device		PCI-Bus
 PCI bus	DevicesView		PCI-Bus
+Printer	DeviceSCSI		Drucker
 Processor	Device		Prozessor
+Processor	DeviceSCSI		Prozessor
 Quit	DevicesView		Beenden
+RBC	DeviceSCSI		RBC
 Refresh devices	DevicesView		Geräte aktualisieren
 Report compatibility	DevicesView		Kompatibilität anzeigen
+SCSI Information	DeviceSCSI		SCSI-Information
 Satellite communications controller	Device		Satellitenkommunikations-Controller
+Scanner	DeviceSCSI		Scanner
 Serial bus controller	Device		Serieller Bus-Controller
 Signal processing controller	Device		Signalverarbeitungscontroller
+Tape Drive	DeviceSCSI		Bandlaufwerk
 Unclassified device	Device		Sonstige Geräte
 Unknown	DevicePCI		Unbekannt
 Unknown device	Device		Unbekanntes Gerät
 Unknown device	DevicesView		Unbekanntes Gerät
 Value	PropertyList		Wert
 Wireless controller	Device		Funknetzwerk-Controller
+Worm	DeviceSCSI		WORM
 unknown	Device		unbekannt

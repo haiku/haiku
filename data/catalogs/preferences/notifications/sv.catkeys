@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		Ovanför ikon
+1	swedish	x-vnd.Haiku-Notifications	3631903554
 Allowed	NotificationView		Tillåten
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att hårddiskutrymmet håller på att ta slut.
 Application	NotificationView		Applikation
@@ -28,6 +27,7 @@ Mini icon	DisplayView		Miniikon
 No	NotificationView		Nej
 Notifications	GeneralView		Aviseringar
 Notifications	NotificationView		Aviseringar
+Notifications	PrefletView		Aviseringar
 Notifications	System name		Aviseringar
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aviseringarna kunde inte stoppas eftersom servern inte kunde nås.
 OK	DisplayView		OK
@@ -35,7 +35,6 @@ OK	GeneralView		OK
 OK	NotificationView		OK
 Progress	NotificationView		Progress
 Revert	PrefletWin		Återgå
-Right of icon	DisplayView		Till höger om ikon
 Save	PrefletWin		Spara
 Search:	NotificationView		Sök:
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Aviseringsservern hittas ej. Det betyder att din InfoPopper installation inte avslutades korrekt.
@@ -44,7 +43,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att du saknar behörighet att skriva till inställningsmappen.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att du saknar behörighet att skriva till inställningsmappen.
 Title	NotificationView		Titel
-Title position:	DisplayView		Titelposition:
 Type	NotificationView		Typ
 Unknown	NotificationView		Okänd
 Window width:	DisplayView		Fönsterbredd:

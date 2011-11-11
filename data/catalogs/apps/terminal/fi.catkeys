@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2225488941
+1	finnish	x-vnd.Haiku-Terminal	2763377662
 %app% settings	Terminal PrefWindow	window title	%app%-asetukset
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help tulosta tämä opaste\n -t, --title aseta ikkunan otsikko\n -f, --fullscreen aloita kokoruututilassa\n
 Abort	Terminal Shell		Keskeytä
@@ -36,6 +36,7 @@ Find previous	Terminal TermWindow		Löydä edellinen
 Find…	Terminal TermWindow		Etsi...
 Font:	Terminal AppearancePrefView		Kirjasintyyppi:
 Full screen	Terminal TermWindow		Kokoruutunäyttö
+Green on Black	Terminal colors schema		Vihreä mustalla
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Pääteikkuna\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KOMENTOTULKKI]\n
 Increase	Terminal TermWindow		Kasvata
 Insert path	Terminal TermView		Lisää polku

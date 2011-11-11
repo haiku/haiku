@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	1133193730
+1	finnish	x-vnd.Haiku-About	2717523515
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d mebitavua yhteensä
 %d MiB used (%d%%)	AboutView		%d mebitavua käytetty (%d%%)
@@ -71,7 +71,8 @@ The BeGeistert team\n	AboutView		BeGeistert-ryhmä\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports -ryhmä\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Aucklandin yliopisto ja Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT license%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView	%MIT license% isn't a variable and has to be translated.	Haikulle uniikki koodi, erityisesti ydin ja kaikki koodi, johon sovellukset ehkä linkitetään, jaellaan %MIT licence%-lisenssin ehtojen alla. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan LGPL-lisenssin alla. Löydät kolmannen osapuolen tekijänoikeustiedot alta.\n\nHuomautus: %MIT license% ei ole muuttuja ja se on suomennettava.
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Koodi, joka on uniikkia Haikulle, erityisesti ydinkoodi ja kaikki koodi, johon sovellukset linkittyvät, jaetaan <MIT license>-lisenssin ehtojen mukaisesti. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan <LGPL license>-lisenssin alaisena. Voit löytää kolmannen osapuolen koodin copyrights-tiedot alla.\n\n
+Huomaa: <MIT license>-lisenssi ja <LGPL license>-lisenssi eivät ole muuttujia ja niitä ei suomenneta. Älä kuitenkaan poista hakasulkua < eikä > koska niitä tarvitaan hypertekstitoiminnon korvaajina.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai vastaavien lähdekoodissa nimenomaisesti ilmaistujen tekijöiden omaisuutta. Haiku® ja HAIKU logo® ovat Haiku, Inc.-yrityksen rekisteröityjä tavaramerkkejä.\n\n
 Time running:	AboutView		Käynnissäoloaika:
 Translations:\n	AboutView		Käännökset:\n

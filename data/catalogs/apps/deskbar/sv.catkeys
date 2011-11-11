@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Be-TSKB	4265681964
+1	swedish	x-vnd.Be-TSKB	1669813373
 <Be folder is empty>	BeMenu		<mappen är tom>
+About Haiku	BeMenu		Om Haiku
 About this system	BeMenu		Om Haiku
 Always on top	PreferencesWindow		Alltid överst
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
@@ -41,5 +42,6 @@ Show replicants	BeMenu		Visa replikanthandtag
 Show seconds	PreferencesWindow		Visa sekunder
 Shutdown…	BeMenu		Avsluta Haiku...
 Sort running applications	PreferencesWindow		Sortera aktiva program
+Suspend	BeMenu		Viloläge
 Tracker always first	PreferencesWindow		Visa Tracker först
 Window	PreferencesWindow		Fönster

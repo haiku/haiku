@@ -1,0 +1,42 @@
+1	finnish	x-vnd.Be.ChartDemo	819116577
+(high) 100% 	ChartWindow		(korkea) 100 %
+0.6 f/s  (logarythmic scale)	ChartWindow		0,6 f/s (logaritminen skaala)
+2 threads	ChartWindow		2 säiettä
+5% (low)	ChartWindow		5 % (alhainen)
+600.0 f/s	ChartWindow		600,0 f/s
+Amas	ChartWindow		Amas
+Animation:	ChartWindow		Animaatio:
+Auto demo	ChartWindow		Automaattinen esittely
+Battle	ChartWindow		Taistelu
+Blue	ChartWindow		Sininen
+CPU load	ChartWindow		Prosessorikuorma
+Chaos	ChartWindow		Kaaos
+Chart	System name		Taulukko
+Colors	ChartWindow		Värit
+Comet	ChartWindow		Komeetta
+DirectWindow	ChartWindow		DirectWindow
+Display:	ChartWindow		Näyttö:
+DrawBitmap	ChartWindow		DrawBitmap
+Fast motion	ChartWindow		Nopea liike
+Frames/s	ChartWindow		Kehyksiä/s
+Free motion	ChartWindow		Vapaa liike
+Full screen	ChartWindow		Kokoruutu
+Green	ChartWindow		Vihreä
+LineArray	ChartWindow		LineArray
+None	ChartWindow		Ei mikään
+Novas	ChartWindow		Novat
+Off	ChartWindow		Pois käytöstä
+Orange	ChartWindow		Oranssi
+Pink	ChartWindow		Vaaleanpunainen
+Red	ChartWindow		Punainen
+Refresh rate	ChartWindow		Virkistystaajuus
+Slow motion	ChartWindow		Hidas liike
+Slow rotation	ChartWindow		Hidas kierto
+Space color	ChartWindow		Tilaväri
+Space:	ChartWindow		Avaruus:
+Special	ChartWindow		Erityinen
+Spiral	ChartWindow		Spiraali
+Star density	ChartWindow		Tähtitiheys
+Status	ChartWindow		Tila
+White	ChartWindow		Valkoinen
+Yellow	ChartWindow		Keltainen

@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		Kuvakkeen yläpuolella
+1	finnish	x-vnd.Haiku-Notifications	3631903554
 Allowed	NotificationView		Sallittu
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
 Application	NotificationView		Sovellus
@@ -27,7 +26,8 @@ Last Received	NotificationView		Viimeksi vastaanotettu
 Mini icon	DisplayView		Minikuvake
 No	NotificationView		Ei
 Notifications	GeneralView		Ilmoitukset
-Notifications	NotificationView		Ilmoitukset
+Notifications	NotificationView		Ilmoitusasetukset
+Notifications	PrefletView		Ilmoitusasetukset
 Notifications	System name		Ilmoitusasetukset
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoituksia ei voi pysäyttää, koska palvelinta ei tavoiteta.
 OK	DisplayView		Valmis
@@ -35,7 +35,6 @@ OK	GeneralView		Valmis
 OK	NotificationView		Valmis
 Progress	NotificationView		Edistyminen
 Revert	PrefletWin		Palauta
-Right of icon	DisplayView		Kuvakkeen oikealla puolella
 Save	PrefletWin		Tallenna
 Search:	NotificationView		Etsintä:
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoituspalvelinta ei löytynyt. Tämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
@@ -44,7 +43,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 Title	NotificationView		Otsikko
-Title position:	DisplayView		Otsikkosijainti:
 Type	NotificationView		Tyyppi
 Unknown	NotificationView		Tuntematon
 Window width:	DisplayView		Ikkunaleveys:

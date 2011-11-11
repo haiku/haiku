@@ -1,0 +1,4 @@
+1	swedish	x-vnd.Haiku-debug_server	1035915338
+Debug	DebugServer		Felsök
+OK	DebugServer		OK
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programmet:\n\n %app\n\nhar stött på ett fel som förhindrar den från att fortsätta. Haiku kommer att avsluta programmet och stöda upp.

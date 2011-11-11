@@ -1,5 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		Über dem Icon
+1	german	x-vnd.Haiku-Notifications	3631903554
 Allowed	NotificationView		Erlaubt
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Beim Speichern der Einstellungen ist ein Fehler aufgetreten.\nVermutlich ist nicht mehr genügend Speicher auf dem Datenträger verfügbar.
 Application	NotificationView		Anwendung
@@ -28,6 +27,7 @@ Mini icon	DisplayView		Kleines Icon
 No	NotificationView		Nein
 Notifications	GeneralView		Notifications - Benachrichtigungen
 Notifications	NotificationView		Notifications
+Notifications	PrefletView		Benachrichtigungen
 Notifications	System name		Benachrichtigungen
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Benachrichtigungen können nicht angehalten werden, weil der Server nicht erreicht werden kann.
 OK	DisplayView		OK
@@ -35,7 +35,6 @@ OK	GeneralView		OK
 OK	NotificationView		OK
 Progress	NotificationView		Fortschritt
 Revert	PrefletWin		Anfangswerte
-Right of icon	DisplayView		Rechts vom Icon
 Save	PrefletWin		Speichern
 Search:	NotificationView		Suchen:
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Der Benachrichtiguns-Server wurde nicht gefunden.\nWahrscheinlich war die Installation nicht erfolgreich.
@@ -44,7 +43,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Beim Speichern der Einstellungen trat ein Problem auf.\nWahrscheinlich fehlt die Schreibberechtigung auf den Einstellungs-Ordner.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Beim Speichern der Einstellungen trat ein Problem auf.\nWahrscheinlich fehlt die Schreibberechtigung auf den Einstellungs-Ordner.
 Title	NotificationView		Titel
-Title position:	DisplayView		Titelposition:
 Type	NotificationView		Typ
 Unknown	NotificationView		Unbekannt
 Window width:	DisplayView		Fensterbreite:
