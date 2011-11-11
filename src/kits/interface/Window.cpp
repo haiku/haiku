@@ -3055,9 +3055,6 @@ BWindow::task_looper()
 							DispatchMessage(fLastMessage, handler);
 					}
 
-					if (!cookie.tokens_scanned)
-						continue;
-
 					// Delete the current message
 					delete fLastMessage;
 					fLastMessage = NULL;
