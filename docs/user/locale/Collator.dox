@@ -210,8 +210,8 @@
 		int8 strength) const
 	\brief Determine if a string is greater than another.
 
-	\note This method is commutative meaning that !Greater(s1, s2)
-		is the same as Greater(s2, s1).
+	\note !Greater(s1, s2) is the same as GreaterOrEqual(s2, s1). This means
+	there is no need for Lesser(s1, s2) and LesserOrEqual(s1, s2) methods.
 
 	\param s1 The first string to compare.
 	\param s2 The second string to compare.
@@ -226,8 +226,7 @@
 		int8 strength) const
 	\brief Determines if one string is greater than another.
 
-	\note This method is commutative meaning that !GreaterOrEqual(s1, s2)
-		is the same as GreaterOrEqual(s2, s1).
+	\note !GreaterOrEqual(s1, s2) is the same as Greater(s2, s1).
 
 	\param s1 The first string to compare.
 	\param s2 The second string to compare.
