@@ -19,7 +19,7 @@ rarely, four bytes.
 Each key on the keyboard is assigned a numeric code to identify it to the
 operating system. Most of the time you should not have to access these
 codes directly, instead use one of the constants defined in InterfaceDefs.h
-such \c B_BACKSPACE or \c B_ENTER or read the character  from the \c key_map
+such \c B_BACKSPACE or \c B_ENTER or read the character from the \c key_map
 struct.
 
 The following diagram shows the key codes as they appear on a US 104-key
@@ -37,8 +37,8 @@ different locations.
 
 \section modifiers Modifier Keys
 
-Modifier keys are keys that have no effect on their own but when combined with
-another key they modify the usual behavior of that key.
+Modifier keys are keys which have no effect on their own but when combined with
+another key modify the usual behavior of that key.
 
 The following modifier keys are defined in InterfaceDefs.h
 
@@ -47,7 +47,7 @@ The following modifier keys are defined in InterfaceDefs.h
 		<td>\c B_SHIFT_KEY</td>
 		<td>
 			Transforms lowercase case characters into uppercase characters
-			or chooses an alternative punctuation character. The shift key
+			or chooses alternative punctuation characters. The shift key
 			is also used in combination with \c B_COMMAND_KEY to produce
 			keyboard shortcuts.
 		</td>
@@ -132,7 +132,7 @@ released. They are defined by the following constants:
 To get the currently active modifiers use the modifiers() function defined
 in InterfaceDefs.h. This function returns a bitmap containing the currently
 active modifier keys. You can create a bit mask of the above constants to
-determine if the keys you are interested in are active.
+determine which modifiers are active.
 
 
 \section other_constants Other Constants
@@ -203,7 +203,7 @@ For Japanese keyboard two more constants are defined:
 The characters produced by each of the key codes is determined by the keymap.
 The usual way to for the user to choose and modify their keymap is the
 Keymap preference application. A number of alternative keymaps such as dvorak
-as well as keymaps for different locales are available.
+and keymaps for different locales are available.
 
 \image html keymap.png
 
@@ -220,10 +220,10 @@ To get the current system keymap create a pointer to a \c key_map struct and
 \c key_map struct will be filled out with the current system keymap and the
 \c char array will be filled out with the UTF-8 character encodings.
 
-The \c key_map struct contains a number of fields. These fields are described
+The \c key_map struct contains a number of fields. Each field is described
 in several sections below.
 
-The first section contains a version number and the codes assigned to each of
+The first section contains a version number and the code assigned to each of
 the modifier keys.
 
 <table>
@@ -286,7 +286,7 @@ set_keyboard_locks() function.
 
 The next section of the \c key_map struct contains maps of offsets
 into the array of UTF-8 character encodings filled out in the second
-parameter by get_key_map(). Since the character maps are filled with UTF-8
+parameter of get_key_map(). Since the character maps are filled with UTF-8
 characters they may be 1, 2, 3, or rarely 4 bytes long. The characters are
 contained in non-\c NUL terminated Pascal strings. The first byte of the
 string indicates how many bytes the character is made up of. For example the
@@ -296,13 +296,16 @@ string for a horizontal ellipses (...) character looks like this:
 x03xE2x80xA6
 \endcode
 
-The first byte is 03 meaning that the character is 3 bytes long. The bytes
-E2 80 A6 is the UTF-8 byte representation of the horizontal ellipses character.
-Recall that there is no terminating \c NUL character for these strings.
+The first byte is 03 meaning that the character is 3 bytes long. The
+remaining bytes E2 80 A6 are the UTF-8 byte representation of the horizontal
+ellipses character. Recall that there is no terminating \c NUL character for
+these strings.
 
 Not every key is mapped to a character. If a key is unmapped the character
 array contains a 0-byte string. Unmapped keys do not produce \c B_KEY_DOWN
-messages. Modifier keys should not be mapped into the character array.
+messages.
+
+Modifier keys should not be mapped into the character array.
 
 The following character maps are defined:
 <table>
@@ -356,16 +359,16 @@ The following character maps are defined:
 \section dead_keys Dead Keys
 
 Dead keys are keys that do not produce a character until they are combined
-with another key. Because the key does not produce a character on their own
-they are considered "dead" until they are brought to life by being combined
-with another key. These dead keys are generally used to produce accented
+with another key. Because these keys do not produce a character on their own
+they are considered "dead" until they are "brought to life" by being combined
+with another key. Dead keys are generally used to produce accented
 characters.
 
 Each of the fields below is a 32-byte array of dead key characters. The dead
-keys are organized into pairs in the array so each dead key array can contain
+keys are organized into pairs in the array. Each dead key array can contain
 up to 16 pairs of dead key characters. The first pair in the array should
 contain \c B_SPACE followed by and the accent character in the second offset.
-This serves to identify what accent character is contained in the array
+This serves to identify which accent character is contained in the array
 and serves to define a space followed by accent pair to represent the unadorned
 accent character.
 
@@ -395,7 +398,7 @@ followed by the accent character.
 	</tr>
 </table>
 
-The final section contains a bitmap that indicate which character table is
+The final section contains bitmaps that indicate which character table is
 used for each of the above dead keys. The bitmap can contain any of the
 following constants:
 	- \c B_CONTROL_TABLE
@@ -408,29 +411,29 @@ following constants:
 	- \c B_NORMAL_TABLE
 	- \c B_OPTION_TABLE
 
-The bitmap often contains \c B_OPTION_TABLE because accent characters are
-typically produced in combination with the \c B_OPTION_KEY.
+The bitmaps often contain \c B_OPTION_TABLE because accent characters are
+generally produced by combining a letter with \c B_OPTION_KEY.
 
 <table>
 	<tr>
 		<td>\c acute_tables</td>
-		<td>Acute dead keys array</td>
+		<td>Acute dead keys table bitmap</td>
 	</tr>
 	<tr>
 		<td>\c grave_tables</td>
-		<td>Grave dead keys array</td>
+		<td>Grave dead keys table bitmap</td>
 	</tr>
 	<tr>
 		<td>\c circumflex_tables</td>
-		<td>Circumflex dead keys array</td>
+		<td>Circumflex dead keys table bitmap</td>
 	</tr>
 	<tr>
 		<td>\c dieresis_tables</td>
-		<td>Deeresis dead keys array</td>
+		<td>Dieresis dead keys table bitmap</td>
 	</tr>
 	<tr>
 		<td>\c tilde_tables</td>
-		<td>Tilde dead keys array</td>
+		<td>Tilde dead keys table bitmap</td>
 	</tr>
 </table>
 
