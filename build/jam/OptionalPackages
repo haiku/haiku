@@ -843,13 +843,13 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				git-1.7.5-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/git-1.7.5-r1a3-x86-gcc4-2011-05-24.zip
+				git-1.7.7.2-x86-gcc4-2011-11-04.zip
+				: $(baseURL)/git-1.7.7.2-x86-gcc4-2011-11-04.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				git-1.7.5-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/git-1.7.5-r1a3-x86-gcc2-2011-05-18.zip
+				git-1.7.7.2-x86-gcc2-2011-11-04.zip
+				: $(baseURL)/git-1.7.7.2-x86-gcc2-2011-11-04.zip
 				: : true ;
 		}
 	}
