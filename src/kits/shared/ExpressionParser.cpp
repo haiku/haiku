@@ -652,6 +652,9 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return _ParseFactorial(values[0].sqrt());
 	} else if (strcasecmp("tan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		MAPM divided_by_half_pi = values[0] / MM_HALF_PI;
+		if (divided_by_half_pi.is_integer() && divided_by_half_pi.is_odd())
+			throw ParseException("out of domain", token.position);
 		return _ParseFactorial(values[0].tan());
 	} else if (strcasecmp("tanh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
