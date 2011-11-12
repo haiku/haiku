@@ -44,8 +44,13 @@ rule KernelLd
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
 
-	# Remove any preset LINKLIBS, but link against libgcc.a
-	LINKLIBS on $(1) = $(TARGET_STATIC_LIBSUPC++) $(TARGET_GCC_LIBGCC) ;
+	# Remove any preset LINKLIBS, but link against libgcc.a. Linking against
+	# libsupc++ is opt-out.
+	local libs ;
+	if ! [ on $(1) return HAIKU_NO_LIBSUPC++ ] {
+		libs += $(TARGET_STATIC_LIBSUPC++) ;
+	}
+	LINKLIBS on $(1) =  $(libs) $(TARGET_GCC_LIBGCC) ;
 
 	# TODO: Do we really want to invoke SetupKernel here? The objects should
 	# have been compiled with KernelObjects anyway, so we're doing that twice.
