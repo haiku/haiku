@@ -217,7 +217,7 @@ switch $(HAIKU_CPU) {
 	case ppc :
 	{
 		HAIKU_DEFINES += __POWERPC__ ;
-		HAIKU_BOOT_PLATFORM = openfirmware ;
+		HAIKU_BOOT_PLATFORM ?= openfirmware ;
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
