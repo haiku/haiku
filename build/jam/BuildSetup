@@ -544,7 +544,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 HOST_PLATFORM_IS_64_BIT = ;
 switch $(HOST_GCC_MACHINE) {
 	case amd64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
-	case i686-apple-darwin10 :	HOST_PLATFORM_IS_64_BIT = 1 ;
+	case i686-apple-darwin* :	HOST_PLATFORM_IS_64_BIT = 1 ;
 	case x86_64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
 }
 
