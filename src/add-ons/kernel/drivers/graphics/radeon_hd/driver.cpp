@@ -46,9 +46,28 @@ const struct supported_device {
 	uint32		chipsetFlags;
 	const char*	deviceName;
 } kSupportedDevices[] = {
-	// R400 Series  (Radeon) DCE 0.0 (*very* early AtomBIOS)
-	// R500 Series  (Radeon Xxxx) DCE 1.0
-	// R600 series	(HD24xx - HD42xx)
+	// Marketing Names: Radeon X?00
+	// Intorduced: 2004
+	// Codename: Loki
+	// R420 Series  (Radeon) DCE 0.0 (*very* early AtomBIOS)
+
+	// Marketing Names: Radeon X1?00
+	// Introduced: 2005
+	// Codename: Fudo
+	#if 0
+	{0x7140, 1, 0, RADEON_RV515, CHIP_STD, "Radeon X1600"},
+	{0x7100, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	{0x7104, 1, 0, RADEON_R520,  CHIP_STD, "FireGL v7200"},
+	{0x7109, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	{0x710a, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	{0x710b, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	{0x710c, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	{0x7120, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	{0x7129, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
+	#endif
+
+	// Marketing Names: Radeon HD 24xx - HD 42xx
+	// Introduced: 2006
 	// Codename: Pele
 	{0x94c7, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2350"},
 	{0x94c1, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 2400"},
@@ -97,7 +116,8 @@ const struct supported_device {
 	{0x9712, 3, 0, RADEON_RV620, CHIP_IGP, "Radeon HD 4270"},
 	{0x9714, 3, 0, RADEON_RV620, CHIP_IGP, "Radeon HD 4290"},
 
-	// R700 series	(HD4330 - HD4890, HD51xx, HD5xxV)
+	// Marketing Names: Radeon HD 4330 - HD 4890, HD 51xx, HD 5xxV
+	// Introduced: 2008
 	// Codename: Wekiva
 	//	Radeon 4330		- RV710
 	{0x954f, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4300"},
@@ -122,7 +142,8 @@ const struct supported_device {
 
 	// From here on AMD no longer used numeric identifiers
 
-	// R1000 series (HD54xx - HD63xx)
+	// Marketing Names: Radeon HD 54xx - HD 63xx
+	// Introduced: 2009
 	// Codename: Evergreen
 	//  Cedar
 	{0x68e1, 4, 0, RADEON_CEDAR, CHIP_STD, "Radeon HD 5430"},
@@ -150,7 +171,8 @@ const struct supported_device {
 	{0x9802, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9803, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 
-	// R2000 series (HD64xx - HD69xx)
+	// Radeon HD 64xx - HD 69xx
+	// Introduced: 2010
 	// Codename: Nothern Islands
 	//  Caicos
 	{0x6760, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6470M"},
@@ -163,10 +185,11 @@ const struct supported_device {
 	{0x6767, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD CAICOS"},
 	{0x6768, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD CAICOS"},
 	{0x6770, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 6400"},
+	{0x6778, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD CAICOS"},
 	{0x6779, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 6450"},
 	//  Turks
-	{0x6740, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6700M"},
-	{0x6741, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6600M"},
+	{0x6740, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6770M"},
+	{0x6741, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6650M"},
 	{0x6742, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6625M"},
 	{0x6743, 5, 0, RADEON_TURKS, CHIP_DISCREET, "Radeon HD E6760"},
 	{0x6744, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD TURKS M"},
@@ -175,6 +198,8 @@ const struct supported_device {
 	{0x6747, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD TURKS"},
 	{0x6748, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD TURKS"},
 	{0x6749, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro v4900"},
+	{0x6750, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6500"},
+	{0x6758, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6670"},
 	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570"},
 	//  Barts
 	{0x673e, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6790"},
@@ -185,9 +210,9 @@ const struct supported_device {
 	{0x6701, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x6702, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x6703, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
-	{0x6704, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
+	{0x6704, 5, 0, RADEON_CAYMAN, CHIP_STD, "FirePro v????"},
 	{0x6705, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
-	{0x6706, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
+	{0x6706, 5, 0, RADEON_CAYMAN, CHIP_STD, "FirePro v????"},
 	{0x6707, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x6708, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x6709, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
@@ -198,7 +223,8 @@ const struct supported_device {
 	//  Antilles
 	{0x671d, 5, 0, RADEON_ANTILLES, CHIP_STD, "Radeon HD 6990"}
 
-	// R3000 series (HD74xx - HD79xx)
+	// Marketing Names: Radeon HD 74xx - HD 79xx
+	// Introduced: 2011?
 	// Codename: Southern Islands
 	//  Lombok
 	//  Thames
