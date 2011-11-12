@@ -98,6 +98,7 @@
 #define STATE_IDLEEXIT	0x80	// IDLEMODE_EXIT
 #define STATE_HALT		0x00	// SHUTDOWN_EXIT
 
+
 const uint8 kInvalidRequest = 0xff;
 
 // version of bcm driver this was based upon + end .1
