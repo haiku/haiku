@@ -39,6 +39,13 @@
 
 static const char radeon_chip_name[][16] = {
 	"R420",
+	"R423",
+	"RV410",
+	"RS400",
+	"RS480",
+	"RS600",
+	"RS690",
+	"RS740",
 	"RV515",
 	"R520",
 	"RV530",
@@ -525,10 +532,30 @@ radeon_hd_init(radeon_info &info)
 		// Evergreen+ has memory stored in MB
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
-	} else {
+	} else if (info.chipsetID >= RADEON_R600) {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + CONFIG_MEMSIZE) / 1024;
+	} else {
+		// R420 - R600 cards
+		// older cards use RADEON_CONFIG_MEMSIZE vs CONFIG_MEMSIZE
+		if ((info.chipsetFlags & CHIP_IGP) != 0) {
+			// NB_TOM holds amount of ram stolen for GPU
+			uint32 tom = read32(info.registers + RADEON_NB_TOM);
+			info.shared_info->graphics_memory_size
+				= (((tom >> 16) - (tom & 0xffff) + 1) << 16);
+			write32(info.registers + RADEON_CONFIG_MEMSIZE,
+				info.shared_info->graphics_memory_size);
+		} else {
+			info.shared_info->graphics_memory_size
+				= read32(info.registers + RADEON_CONFIG_MEMSIZE);
+			if (info.shared_info->graphics_memory_size == 0) {
+				// known bug if video memory == 8MB
+				info.shared_info->graphics_memory_size = 8192;
+				write32(info.registers + RADEON_CONFIG_MEMSIZE,
+					info.shared_info->graphics_memory_size * 1024);
+			}
+		}
 	}
 
 	uint32 barSize = info.pci->u.h0.base_register_sizes[PCI_BAR_FB] / 1024;

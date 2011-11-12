@@ -55,6 +55,15 @@ const struct supported_device {
 	// Introduced: 2005
 	// Codename: Fudo
 	#if 0
+	{0x791e, 1, 0, RADEON_RS690, CHIP_IGP, "Radeon X1200"},
+	{0x791f, 1, 0, RADEON_RS690, CHIP_IGP, "Radeon X1200"},
+	{0x793f, 1, 0, RADEON_RS600, CHIP_IGP, "Radeon X1200"},
+	{0x7941, 1, 0, RADEON_RS600, CHIP_IGP, "Radeon X1200"},
+	{0x7942, 1, 0, RADEON_RS600, CHIP_IGP, "Radeon X1250"},
+	{0x796c, 1, 0, RADEON_RS740, CHIP_IGP, "Radeon RS740"},
+	{0x796d, 1, 0, RADEON_RS740, CHIP_IGP, "Radeon RS740"},
+	{0x796e, 1, 0, RADEON_RS740, CHIP_IGP, "Radeon 2100"},
+	{0x796f, 1, 0, RADEON_RS740, CHIP_IGP, "Radeon RS740"},
 	{0x7140, 1, 0, RADEON_RV515, CHIP_STD, "Radeon X1600"},
 	{0x7100, 1, 0, RADEON_R520,  CHIP_STD, "Radeon X1800"},
 	{0x7104, 1, 0, RADEON_R520,  CHIP_STD, "FireGL v7200"},
