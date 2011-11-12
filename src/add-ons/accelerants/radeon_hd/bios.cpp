@@ -91,14 +91,29 @@ radeon_bios_isposted()
 				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else {
+	} else if (info.chipsetID >= RADEON_RS600) {
 		// avivio through r700
 		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL)
 			| Read32(OUT, AVIVO_D2CRTC_CONTROL);
 		if ((reg & AVIVO_CRTC_EN) != 0) {
 			return true;
 		}
+	} else {
+		// early cards
+		reg = Read32(OUT, RADEON_CRTC_GEN_CNTL)
+			| Read32(OUT, RADEON_CRTC2_GEN_CNTL);
+		if ((reg & RADEON_CRTC_EN) != 0)
+			return true;
 	}
+
+	// also check memory size incase crt controlers are disabled
+	if (info.chipsetID >= RADEON_R600)
+		reg = Read32(OUT, R600_CONFIG_MEMSIZE);
+	else
+		reg = Read32(OUT, RADEON_CONFIG_MEMSIZE);
+
+	if (reg)
+		return true;
 
 	return false;
 }
