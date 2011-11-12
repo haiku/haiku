@@ -32,7 +32,7 @@ using to build Haiku. When building from Haiku, all of the necessary
 development tools are included in official releases (e.g. R1 alpha 1) and in the
 (unstable) nightly builds.
 
- * Subversion client
+ * Git client
  * SSH client (for developers with commit access)
  * gcc and the binutils (as, ld, etc., required by gcc)
  * make (GNU make)
@@ -84,12 +84,12 @@ of build tools for compiling Haiku on an operating system other than Haiku.
 The buildtools are needed only for non-Haiku platform.
 
 Anonymous checkout:
-  svn co http://svn.haiku-os.org/haiku/haiku/trunk haiku
-  svn co http://svn.haiku-os.org/haiku/buildtools/trunk buildtools
+  git clone git://git.haiku-os.org/haiku
+  git clone git://git.haiku-os.org/buildtools
 
 Developer with commit access:
-  svn co svn+ssh://<developer-account>@svn.haiku-os.org/srv/svn/repos/haiku/haiku/trunk haiku
-  svn co svn+ssh://<developer-account>@svn.haiku-os.org/srv/svn/repos/haiku/buildtools/trunk buildtools
+  git clone ssh://git.haiku-os.org/haiku
+  git clone ssh://git.haiku-os.org/buildtools
 
 
 Building the Jam executable
