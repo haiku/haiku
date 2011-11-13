@@ -161,7 +161,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -240,7 +240,7 @@ radeon_hd_getbios(radeon_info &info)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios_ni(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -280,7 +280,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 
 	status_t result = B_OK;
 	if (romBase == 0 || romSize == 0) {
-		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
 		result = mapAtomBIOS(info, romBase, romSize);
@@ -308,7 +308,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios_r700(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -352,7 +352,7 @@ radeon_hd_getbios_r700(radeon_info &info)
 
 	status_t result = B_OK;
 	if (romBase == 0 || romSize == 0) {
-		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
 		result = mapAtomBIOS(info, romBase, romSize);
@@ -381,7 +381,7 @@ radeon_hd_getbios_r700(radeon_info &info)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios_r600(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -451,7 +451,7 @@ radeon_hd_getbios_r600(radeon_info &info)
 
 	status_t result = B_OK;
 	if (romBase == 0 || romSize == 0) {
-		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
 		result = mapAtomBIOS(info, romBase, romSize);
@@ -485,6 +485,79 @@ radeon_hd_getbios_r600(radeon_info &info)
 	write32(info.registers + R600_CTXSW_VID_LOWER_GPIO_CNTL,
 		ctxsw_vid_lower_gpio_cntl);
 	write32(info.registers + R600_LOWER_GPIO_ENABLE, lower_gpio_enable);
+
+	return result;
+}
+
+
+static status_t
+radeon_hd_getbios_avivo(radeon_info &info)
+{
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	uint32 sepromControl = read32(info.registers + RADEON_SEPROM_CNTL1);
+	uint32 viphControl = read32(info.registers + RADEON_VIPH_CONTROL);
+	uint32 busControl = read32(info.registers + RV370_BUS_CNTL);
+	uint32 d1vgaControl = read32(info.registers + AVIVO_D1VGA_CONTROL);
+	uint32 d2vgaControl = read32(info.registers + AVIVO_D2VGA_CONTROL);
+	uint32 vgaRenderControl
+		= read32(info.registers + AVIVO_VGA_RENDER_CONTROL);
+	uint32 gpioPadA = read32(info.registers + RADEON_GPIOPAD_A);
+	uint32 gpioPadEN = read32(info.registers + RADEON_GPIOPAD_EN);
+	uint32 gpioPadMask = read32(info.registers + RADEON_GPIOPAD_MASK);
+
+	write32(info.registers + RADEON_SEPROM_CNTL1,
+		((sepromControl & ~RADEON_SCK_PRESCALE_MASK)
+		| (0xc << RADEON_SCK_PRESCALE_SHIFT)));
+	write32(info.registers + RADEON_GPIOPAD_A, 0);
+	write32(info.registers + RADEON_GPIOPAD_EN, 0);
+	write32(info.registers + RADEON_GPIOPAD_MASK, 0);
+
+	// disable VIP
+	write32(info.registers + RADEON_VIPH_CONTROL,
+		(viphControl & ~RADEON_VIPH_EN));
+
+	// enable the ROM
+	write32(info.registers + RV370_BUS_CNTL,
+		(busControl & ~RV370_BUS_BIOS_DIS_ROM));
+
+	// disable VGA
+	write32(info.registers + AVIVO_D1VGA_CONTROL,
+		(d1vgaControl & ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+		| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_D2VGA_CONTROL,
+		(d2vgaControl & ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+		| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
+		(vgaRenderControl & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
+
+	uint32 romBase = info.pci->u.h0.rom_base;
+	uint32 romSize = info.pci->u.h0.rom_size;
+
+	status_t result = B_OK;
+	if (romBase == 0 || romSize == 0) {
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
+		result = B_ERROR;
+	} else {
+		result = mapAtomBIOS(info, romBase, romSize);
+	}
+
+	if (result == B_OK) {
+		ERROR("%s: AtomBIOS found using disabled method at 0x%" B_PRIX32
+			" [size: 0x%" B_PRIX32 "]\n", __func__, romBase, romSize);
+		info.shared_info->rom_phys = romBase;
+		info.shared_info->rom_size = romSize;
+	}
+
+	// restore registers
+	write32(info.registers + RADEON_SEPROM_CNTL1, sepromControl);
+	write32(info.registers + RADEON_VIPH_CONTROL, viphControl);
+	write32(info.registers + RV370_BUS_CNTL, busControl);
+	write32(info.registers + AVIVO_D1VGA_CONTROL, d1vgaControl);
+	write32(info.registers + AVIVO_D2VGA_CONTROL, d2vgaControl);
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL, vgaRenderControl);
+	write32(info.registers + RADEON_GPIOPAD_A, gpioPadA);
+	write32(info.registers + RADEON_GPIOPAD_EN, gpioPadEN);
+	write32(info.registers + RADEON_GPIOPAD_MASK, gpioPadMask);
 
 	return result;
 }
@@ -621,7 +694,9 @@ radeon_hd_init(radeon_info &info)
 			biosStatus = radeon_hd_getbios_r700(info);
 		else if (info.chipsetID >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
-		// else avivo_read_disabled_bios
+		else if (info.chipsetID >= RADEON_RS600)
+			biosStatus = radeon_hd_getbios_avivo(info);
+		// else legacy_read_disabled_bios
 	}
 
 	if (biosStatus != B_OK) {
