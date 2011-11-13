@@ -365,6 +365,8 @@ vm_page::IncrementWiredCount()
 inline void
 vm_page::DecrementWiredCount()
 {
+	ASSERT(fWiredCount > 0);
+
 	if (--fWiredCount == 0)
 		cache_ref->cache->DecrementWiredPagesCount();
 }
