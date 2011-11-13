@@ -653,6 +653,8 @@ radeon_gpu_i2c_attach(uint32 id, uint8 hw_line)
 status_t
 radeon_gpu_gpio_setup()
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
 
 	uint8 tableMajor;
@@ -683,8 +685,25 @@ radeon_gpu_gpio_setup()
 	for (uint32 i = 0; i < numIndices; i++) {
 		ATOM_GPIO_I2C_ASSIGMENT *gpio = &i2c_info->asGPIO_Info[i];
 
-		// TODO: if DCE 4 and i == 7 ... manual override for evergreen
-		// TODO: if DCE 3 and i == 4 ... manual override
+		if (info.dceMajor >= 3) {
+			if (i == 4 && B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex)
+				== 0x1fda && gpio->sucI2cId.ucAccess == 0x94) {
+				gpio->sucI2cId.ucAccess = 0x14;
+				TRACE("%s: BUG: GPIO override for DCE 3 occured\n", __func__);
+			}
+		}
+
+		if (info.dceMajor >= 4) {
+			if (i == 7 && B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex)
+				== 0x1936 && gpio->sucI2cId.ucAccess == 0) {
+				gpio->sucI2cId.ucAccess = 0x97;
+				gpio->ucDataMaskShift = 8;
+				gpio->ucDataEnShift = 8;
+				gpio->ucDataY_Shift = 8;
+				gpio->ucDataA_Shift = 8;
+				TRACE("%s: BUG: GPIO override for DCE 4 occured\n", __func__);
+			}
+		}
 
 		// populate gpio information
 		gGPIOInfo[i]->hw_line
