@@ -199,7 +199,7 @@ void
 ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 {
 	if (source == NULL) {
-		panic("object_cache: free'd object has no slab");
+		panic("object_cache: free'd object %p has no slab", object);
 		return;
 	}
 
@@ -210,7 +210,7 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 	if (object < objectsStart
 		|| object >= objectsStart + source->size * object_size
 		|| ((uint8*)object - objectsStart) % object_size != 0) {
-		panic("object_cache: tried to free invalid object pointer");
+		panic("object_cache: tried to free invalid object pointer %p", object);
 		return;
 	}
 #endif // KDEBUG
@@ -261,7 +261,8 @@ ObjectCache::AssertObjectNotFreed(void* object)
 
 	slab* source = ObjectSlab(object);
 	if (!partial.Contains(source) && !full.Contains(source)) {
-		panic("object_cache: to be freed object slab not part of cache!");
+		panic("object_cache: to be freed object %p: slab not part of cache!",
+			object);
 		return false;
 	}
 
