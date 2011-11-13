@@ -256,6 +256,12 @@ radeon_init_accelerant(int device)
 
 	// detect physical connectors
 	status = detect_connectors();
+
+	if (status != B_OK) {
+		TRACE("%s: falling back to legacy connector detection.\n", __func__);
+		status = detect_connectors_legacy();
+	}
+
 	if (status != B_OK) {
 		TRACE("%s: couldn't detect supported connectors!\n", __func__);
 		return status;

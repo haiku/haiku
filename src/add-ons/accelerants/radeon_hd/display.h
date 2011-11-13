@@ -58,7 +58,7 @@ const int connector_convert[] = {
 };
 
 status_t init_registers(register_info* reg, uint8 crtid);
-// status_t detect_connectors_legacy();
+status_t detect_connectors_legacy();
 status_t detect_connectors();
 status_t detect_crt_ranges(uint32 crtid);
 status_t detect_displays();

@@ -21,6 +21,8 @@ void encoder_output_lock(bool lock);
 void encoder_crtc_scratch(uint8 crtcID);
 void encoder_dpms_scratch(uint8 crtcID, bool power);
 void encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode);
+uint32 encoder_object_lookup(uint32 encoderFlags, uint8 dacID);
+
 
 
 #endif /* RADEON_HD_ENCODER_H */

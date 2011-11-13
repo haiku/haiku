@@ -237,8 +237,6 @@ detect_crt_ranges(uint32 crtid)
 }
 
 
-// TODO: only used on r4xx, r5xx, and rs600/rs690/rs740
-#if 0
 union atom_supported_devices {
 	struct _ATOM_SUPPORTED_DEVICES_INFO info;
 	struct _ATOM_SUPPORTED_DEVICES_INFO_2 info_2;
@@ -261,21 +259,28 @@ detect_connectors_legacy()
 		return B_ERROR;
 	}
 
-	union atom_supported_devices *supported_devices;
-	supported_devices
-		= (union atom_supported_devices *)
+	union atom_supported_devices *supportedDevices;
+	supportedDevices = (union atom_supported_devices *)
 		(gAtomContext->bios + tableOffset);
 
-	uint16 device_support
-		= B_LENDIAN_TO_HOST_INT16(supported_devices->info.usDeviceSupport);
+	uint16 deviceSupport
+		= B_LENDIAN_TO_HOST_INT16(supportedDevices->info.usDeviceSupport);
 
-	int32 i;
-	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+	uint32 maxDevice;
 
-		gConnector[i]->valid = false;
+	if (tableMajor > 1)
+		maxDevice = ATOM_MAX_SUPPORTED_DEVICE;
+	else
+		maxDevice = ATOM_MAX_SUPPORTED_DEVICE_INFO;
+
+	uint32 i;
+	uint32 connectorIndex = 0;
+	for (i = 0; i < maxDevice; i++) {
+
+		gConnector[connectorIndex]->valid = false;
 
 		// check if this connector is used
-		if ((device_support & (1 << i)) == 0)
+		if ((deviceSupport & (1 << i)) == 0)
 			continue;
 
 		if (i == ATOM_DEVICE_CV_INDEX) {
@@ -285,57 +290,63 @@ detect_connectors_legacy()
 		}
 
 		ATOM_CONNECTOR_INFO_I2C ci
-			= supported_devices->info.asConnInfo[i];
+			= supportedDevices->info.asConnInfo[i];
 
-		gConnector[i]->type
-			= connector_convert_legacy[
-				ci.sucConnectorInfo.sbfAccess.bfConnectorType];
+		gConnector[connectorIndex]->type = connector_convert_legacy[
+			ci.sucConnectorInfo.sbfAccess.bfConnectorType];
 
-		if (gConnector[i]->type == VIDEO_CONNECTOR_UNKNOWN) {
+		if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_UNKNOWN) {
 			TRACE("%s: skipping unknown connector at %" B_PRId32
 				" of 0x%" B_PRIX8 "\n", __func__, i,
 				ci.sucConnectorInfo.sbfAccess.bfConnectorType);
 			continue;
 		}
 
-		// uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
-		// gConnector[i]->line_mux = ci.sucI2cId.ucAccess;
 
 		// TODO: give tv unique connector ids
 
 		// Always set CRT1 and CRT2 as VGA, some cards incorrectly set
 		// VGA ports as DVI
 		if (i == ATOM_DEVICE_CRT1_INDEX || i == ATOM_DEVICE_CRT2_INDEX)
-			gConnector[i]->type = VIDEO_CONNECTOR_VGA;
+			gConnector[connectorIndex]->type = VIDEO_CONNECTOR_VGA;
 
-		gConnector[i]->valid = true;
-		gConnector[i]->encoder.flags = (1 << i);
+		uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
+		uint32 encoderObject = encoder_object_lookup((1 << i), dac);
 
-		// TODO: add the encoder
-		#if 0
-		radeon_add_atom_encoder(dev,
-			radeon_get_encoder_enum(dev,
-				(1 << i),
-				dac),
-			(1 << i),
-			0);
-		#endif
+		gConnector[connectorIndex]->valid = true;
+		gConnector[connectorIndex]->encoder.flags = (1 << i);
+		gConnector[connectorIndex]->encoder.valid = true;
+		gConnector[connectorIndex]->encoder.objectID
+			= (encoderObject & OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+
+		radeon_gpu_i2c_attach(connectorIndex, ci.sucI2cId.ucAccess);
+
+		//gConnector[connectorIndex]->encoder.isExternal
+		//	= encoderExternal;
+
+		pll_limit_probe(&gConnector[connectorIndex]->encoder.pll);
+
+		connectorIndex++;
 	}
 
 	// TODO: combine shared connectors
 
 	// TODO: add connectors
 
-	for (i = 0; i < ATOM_MAX_SUPPORTED_DEVICE_INFO; i++) {
+	for (i = 0; i < maxDevice; i++) {
 		if (gConnector[i]->valid == true) {
 			TRACE("%s: connector #%" B_PRId32 " is %s\n", __func__, i,
 				get_connector_name(gConnector[i]->type));
 		}
 	}
 
+	if (connectorIndex == 0) {
+		TRACE("%s: zero connectors found using legacy detection\n", __func__);
+		return B_ERROR;
+	}
+
 	return B_OK;
 }
-#endif
 
 
 // r600+
