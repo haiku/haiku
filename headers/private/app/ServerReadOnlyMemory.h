@@ -40,8 +40,10 @@ index_to_color_which(int32 index)
 	if (index >= 0 && index < kNumColors) {
 		if ((color_which)index < B_WINDOW_INACTIVE_BORDER_COLOR)
 			return (color_which)(index + 1);
-		else 
-			return (color_which)(index + B_SUCCESS_COLOR - B_WINDOW_INACTIVE_BORDER_COLOR);
+		else {
+			return (color_which)(index + B_SUCCESS_COLOR
+			  - B_WINDOW_INACTIVE_BORDER_COLOR);
+		}
 	}
 
 	return (color_which)-1;
