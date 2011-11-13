@@ -9,7 +9,6 @@
 
 #include <Message.h>
 
-#include "Encoding.h"
 #include "TermConst.h"
 
 

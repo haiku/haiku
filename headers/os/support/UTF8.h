@@ -39,6 +39,7 @@ enum {
 	B_ISO15_CONVERSION,
 	B_BIG5_CONVERSION,				// Chinese Big5
 	B_GBK_CONVERSION,				// Chinese GB18030
+	B_UTF16_CONVERSION				// Unicode UTF-16
 };
 
 

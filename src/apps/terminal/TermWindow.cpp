@@ -17,6 +17,8 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 #include <Clipboard.h>
 #include <Dragger.h>
 #include <File.h>
@@ -35,13 +37,13 @@
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <UTF8.h>
 
 #include <AutoLocker.h>
 
 #include "ActiveProcessInfo.h"
 #include "Arguments.h"
 #include "AppearPrefView.h"
-#include "Encoding.h"
 #include "FindWindow.h"
 #include "Globals.h"
 #include "PrefWindow.h"
@@ -70,6 +72,7 @@ static const uint32 kTabTitleChanged = 'TTch';
 static const uint32 kWindowTitleChanged = 'WTch';
 static const uint32 kUpdateSwitchTerminalsMenuItem = 'Ustm';
 
+using namespace BPrivate ; // BCharacterSet stuff
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Terminal TermWindow"
@@ -376,12 +379,20 @@ void
 TermWindow::MenusBeginning()
 {
 	TermView* view = _ActiveTermView();
-
+		
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	BMenuItem* item = fEncodingMenu->FindItem(
-		EncodingAsString(view->Encoding()));
-	if (item != NULL)
-		item->SetMarked(true);
+	const BCharacterSet* charset
+		= BCharacterSetRoster::GetCharacterSetByConversionID(view->Encoding());
+	if (charset != NULL) {
+		BString name(charset->GetPrintName());
+		const char* mime = charset->GetMIMEName();
+		if (mime)
+			name << " (" << mime << ")";
+
+		BMenuItem* item = fEncodingMenu->FindItem(name);
+		if (item != NULL)
+			item->SetMarked(true);
+	}
 
 	BFont font;
 	view->GetTermFont(&font);
@@ -403,16 +414,27 @@ TermWindow::_MakeEncodingMenu()
 	if (menu == NULL)
 		return NULL;
 
-	int encoding;
-	int i = 0;
-	while (get_next_encoding(i, &encoding) == B_OK) {
+	BCharacterSetRoster roster;
+	BCharacterSet charset;
+	while (roster.GetNextCharacterSet(&charset) == B_OK) {
+		int encoding = M_UTF8;
+		const char* mime = charset.GetMIMEName();
+		if (mime == NULL || strcasecmp(mime, "UTF-8") != 0)
+			encoding = charset.GetConversionID();
+
+		// filter out currently (???) not supported USC-2 and UTF-16
+		if (encoding == B_UTF16_CONVERSION || encoding == B_UNICODE_CONVERSION)
+			continue;
+
+		BString name(charset.GetPrintName());
+		if (mime)
+			name << " (" << mime << ")";
+
 		BMessage *message = new BMessage(MENU_ENCODING);
 		if (message != NULL) {
 			message->AddInt32("op", (int32)encoding);
-			menu->AddItem(new BMenuItem(EncodingAsString(encoding),
-				message));
+			menu->AddItem(new BMenuItem(name, message));
 		}
-		i++;
 	}
 
 	menu->SetRadioMode(true);
@@ -1135,8 +1157,12 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		fTabView->AddTab(scrollView, tab);
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 		view->SetMouseClipboard(gMouseClipboard);
-		view->SetEncoding(EncodingID(
-			PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
+
+		const BCharacterSet* charset
+			= BCharacterSetRoster::FindCharacterSetByName(
+				PrefHandler::Default()->getString(PREF_TEXT_ENCODING));
+		if (charset != NULL)
+			view->SetEncoding(charset->GetConversionID());
 
 		_SetTermColors(containerView);
 

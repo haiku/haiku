@@ -81,6 +81,7 @@ private:
 	void _DecPrivateModeReset(int value);
 	void _DecSaveCursor();
 	void _DecRestoreCursor();
+	int* _GuessGroundTable(int encoding);
 
 	int fFd;
 
