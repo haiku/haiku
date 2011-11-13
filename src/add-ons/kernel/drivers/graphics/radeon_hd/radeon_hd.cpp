@@ -615,7 +615,7 @@ radeon_hd_init(radeon_info &info)
 
 	if (biosStatus != B_OK) {
 		// If the active read fails, we try a disabled read
-		if (info.chipsetID >= RADEON_BARTS)
+		if (info.chipsetID >= RADEON_CAICOS)
 			biosStatus = radeon_hd_getbios_ni(info);
 		else if (info.chipsetID >= RADEON_RV770)
 			biosStatus = radeon_hd_getbios_r700(info);
