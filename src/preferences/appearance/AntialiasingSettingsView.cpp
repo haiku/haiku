@@ -56,6 +56,10 @@ enum {
 	HINTING_MODE_MONOSPACED_ONLY
 };
 
+static const uint8 kDefaultHintingMode = HINTING_MODE_ON;
+static const unsigned char kDefaultAverageWeight = 120;
+static const bool kDefaultSubpixelAntialiasing = false;
+
 extern void set_subpixel_antialiasing(bool subpix);
 extern status_t get_subpixel_antialiasing(bool* subpix);
 extern void set_hinting_mode(uint8 hinting);
@@ -72,15 +76,15 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 {
 	// collect the current system settings
 	if (get_subpixel_antialiasing(&fCurrentSubpixelAntialiasing) != B_OK)
-		fCurrentSubpixelAntialiasing = false;
+		fCurrentSubpixelAntialiasing = kDefaultSubpixelAntialiasing;
 	fSavedSubpixelAntialiasing = fCurrentSubpixelAntialiasing;
 
 	if (get_hinting_mode(&fCurrentHinting) != B_OK)
-		fCurrentHinting = HINTING_MODE_ON;
+		fCurrentHinting = kDefaultHintingMode;
 	fSavedHinting = fCurrentHinting;
 
 	if (get_average_weight(&fCurrentAverageWeight) != B_OK)
-		fCurrentAverageWeight = 100;
+		fCurrentAverageWeight = kDefaultAverageWeight;
 	fSavedAverageWeight = fCurrentAverageWeight;
 
 	// create the controls
@@ -188,6 +192,8 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			if (msg->FindBool("antialiasing", &subpixelAntialiasing) != B_OK
 				|| subpixelAntialiasing == fCurrentSubpixelAntialiasing)
 				break;
+
+			fSavedSubpixelAntialiasing = fCurrentSubpixelAntialiasing;
 			fCurrentSubpixelAntialiasing = subpixelAntialiasing;
 			fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
 
@@ -203,6 +209,7 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 				|| hinting == fCurrentHinting)
 				break;
 
+			fSavedHinting = fCurrentHinting;
 			fCurrentHinting = hinting;
 			set_hinting_mode(fCurrentHinting);
 
@@ -215,6 +222,7 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			if (averageWeight == fCurrentAverageWeight)
 				break;
 
+			fSavedAverageWeight = fCurrentAverageWeight;
 			fCurrentAverageWeight = averageWeight;
 
 			set_average_weight(fCurrentAverageWeight);
@@ -320,13 +328,29 @@ AntialiasingSettingsView::_SetCurrentAverageWeight()
 void
 AntialiasingSettingsView::SetDefaults()
 {
+	if (!IsDefaultable())
+		return;
+
+	fCurrentSubpixelAntialiasing = kDefaultSubpixelAntialiasing;
+	fCurrentHinting = kDefaultHintingMode;
+	fCurrentAverageWeight = kDefaultAverageWeight;
+
+	set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
+	set_hinting_mode(fCurrentHinting);
+	set_average_weight(fCurrentAverageWeight);
+
+	_SetCurrentAntialiasing();
+	_SetCurrentHinting();
+	_SetCurrentAverageWeight();
 }
 
 
 bool
 AntialiasingSettingsView::IsDefaultable()
 {
-	return false;
+	return fCurrentSubpixelAntialiasing != kDefaultSubpixelAntialiasing
+		|| fCurrentHinting != kDefaultHintingMode
+		|| fCurrentAverageWeight != kDefaultAverageWeight;
 }
 
 

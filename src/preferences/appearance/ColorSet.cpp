@@ -10,12 +10,14 @@
 
 #include <stdio.h>
 #include <Catalog.h>
+#include <DefaultColors.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <InterfaceDefs.h>
 #include <Locale.h>
 #include <Message.h>
+#include <ServerReadOnlyMemory.h>
 #include <String.h>
 #include "ColorSet.h"
 
@@ -109,31 +111,12 @@ ColorSet
 ColorSet::DefaultColorSet(void)
 {
 	ColorSet set;
-	set.fColors[B_PANEL_BACKGROUND_COLOR] = make_color(216, 216, 216);
-	set.fColors[B_PANEL_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_DOCUMENT_BACKGROUND_COLOR] = make_color(255,255, 255);
-	set.fColors[B_DOCUMENT_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_CONTROL_BACKGROUND_COLOR] = make_color(245, 245, 245);
-	set.fColors[B_CONTROL_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_CONTROL_BORDER_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_CONTROL_HIGHLIGHT_COLOR] = make_color(102, 152, 203);
-	set.fColors[B_NAVIGATION_BASE_COLOR] = make_color(0, 0, 229);
-	set.fColors[B_NAVIGATION_PULSE_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_SHINE_COLOR] = make_color(255, 255, 255);
-	set.fColors[B_SHADOW_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_MENU_BACKGROUND_COLOR] = make_color(216, 216, 216);
-	set.fColors[B_MENU_SELECTED_BACKGROUND_COLOR] = make_color(115, 120, 184);
-	set.fColors[B_MENU_ITEM_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_MENU_SELECTED_ITEM_TEXT_COLOR] = make_color(255, 255, 255);
-	set.fColors[B_MENU_SELECTED_BORDER_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_TOOL_TIP_BACKGROUND_COLOR] = make_color(255, 255, 0);
-	set.fColors[B_TOOL_TIP_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_SUCCESS_COLOR] = make_color(0, 255, 0);
-	set.fColors[B_FAILURE_COLOR] = make_color(255, 0, 0);
-	set.fColors[B_WINDOW_TAB_COLOR] = make_color(255, 203, 0);
-	set.fColors[B_WINDOW_TEXT_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_WINDOW_INACTIVE_TAB_COLOR] = make_color(232, 232, 232);
-	set.fColors[B_WINDOW_INACTIVE_TEXT_COLOR] = make_color(80, 80, 80);
+	
+	for (int i = 0; i < sColorDescriptionCount; i++) {
+		color_which which = get_color_description(i)->which;
+		set.fColors[which] =
+			BPrivate::kDefaultColors[color_which_to_index(which)];
+	}
 
 	return set;
 }
