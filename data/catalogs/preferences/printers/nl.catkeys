@@ -1,31 +1,32 @@
-1	dutch	x-vnd.Be-PRNT	407752036
-%.2f KB	JobListView		%.2f KB
-1 pending job.	PrinterListView		1 taak in de wachtrij
-<pick one>	AddPrinterDialog		<kies één>
-Add	AddPrinterDialog		Toevoegen
-Add printer	AddPrinterDialog		Printer toevoegen
-Add …	PrintersWindow		Toevoegen...
-Cancel	AddPrinterDialog		Annuleren
-Cancel job	PrintersWindow		Taak annuleren
-Completed	JobListView		Voltooid
-Connected to:	AddPrinterDialog		Verbonden met:
-Default Printer	PrinterListView		Standaardprinter
-Driver: %driver%	PrinterListView		Stuurprogramma: %driver%
-Failed	JobListView		Mislukt
-Make default	PrintersWindow		Standaard maken
-No pending jobs.	PrinterListView		Geen taken in de wachtrij.
-No printer found!	TransportMenu		Er werd geen printer gevonden!
-Print jobs for 	PrintersWindow		Afdruktaken voor
-Print jobs: No printer selected	PrintersWindow		Afdruktaken: Geen printer geselecteerd
-Printer name:	AddPrinterDialog		Printernaam:
-Printer type:	AddPrinterDialog		Printertype:
-Printers	PrintersWindow		Printers
-Processing	JobListView		Bezig met verwerken
-Remove	PrintersWindow		Verwijderen
-Restart job	PrintersWindow		Taak herstarten
-Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-Unknown status	JobListView		Onbekende status
+1	dutch; flemish	x-vnd.Be-PRNT	1182140394
 Waiting	JobListView		Bezig met wachten
 page	JobListView		pagina
+Cancel	AddPrinterDialog		Annuleren
+Add printer	AddPrinterDialog		Printer toevoegen
+Printers	PrintersWindow		Printers
+Default Printer	PrinterListView		Standaardprinter
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+No pending jobs.	PrinterListView		Geen taken in de wachtrij.
 pages	JobListView		pagina's
-pending jobs.	PrinterListView		taken in de wachtrij.
+Printers	System name		Printers
+Processing	JobListView		Bezig met verwerken
+Printer name:	AddPrinterDialog		Printernaam:
+Driver: %driver%	PrinterListView		Stuurprogramma: %driver%
+Restart job	PrintersWindow		Taak herstarten
+Add	AddPrinterDialog		Toevoegen
+Make default	PrintersWindow		Standaard maken
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Cancel job	PrintersWindow		Taak annuleren
+1 pending job.	PrinterListView		1 taak in de wachtrij
+Remove	PrintersWindow		Verwijderen
+<pick one>	AddPrinterDialog		<kies één>
+Add …	PrintersWindow		Toevoegen...
+Print jobs for 	PrintersWindow		Afdruktaken voor
+Failed	JobListView		Mislukt
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Voltooid
+No printer found!	TransportMenu		Er werd geen printer gevonden!
+Print jobs: No printer selected	PrintersWindow		Afdruktaken: Geen printer geselecteerd
+Unknown status	JobListView		Onbekende status
+Connected to:	AddPrinterDialog		Verbonden met:
+Printer type:	AddPrinterDialog		Printertype:

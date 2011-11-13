@@ -1,6 +1,6 @@
-1	dutch	x-vnd.Haiku-CDPlayer	3757937427
+1	dutch; flemish	x-vnd.Haiku-CDPlayer	3757937427
 Audio CD	CDPlayer		Audio-cd
-CD drive is empty	CDPlayer		cd-station is leeg
-Disc: --:-- / --:--	CDPlayer		Schijf: --:-- / --:--
 It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Het lijkt erop dat uw computer geen cd-station heeft, of dat er geen ondersteunende systeemsoftware voor aanwezig is. Sorry.
 Track: --:-- / --:--	CDPlayer		Track: --:-- / --:--
+Disc: --:-- / --:--	CDPlayer		Schijf: --:-- / --:--
+CD drive is empty	CDPlayer		cd-station is leeg

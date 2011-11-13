@@ -1,45 +1,40 @@
-1	dutch	x-vnd.Haiku-PowerStatus	1335646776
-About	PowerStatus		over
-About…	PowerStatus		Over...
-Battery charging	PowerStatus		Accu laadt
-Battery discharging	PowerStatus		Accu bezig met ontladen
-Battery info	PowerStatus		Accu-info
-Battery info…	PowerStatus		Accu-info...
-Battery unused	PowerStatus		Accu ongebruikt
-Capacity granularity 1: 	PowerStatus		Capaciteit van granulariteit 1:
-Capacity granularity 2: 	PowerStatus		Capaciteit van granulariteit 2:
-Capacity: 	PowerStatus		Capaciteit
-Current rate: 	PowerStatus		Huidige stroom:
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	4203845861
 Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
-Design capacity warning: 	PowerStatus		Waarschuwing ontwerpcapaciteit:
-Design capacity: 	PowerStatus		Ontwerpcapaciteit
-Design voltage: 	PowerStatus		Ontwerpvoltage:
-Empty battery slot	PowerStatus		Accuvak is leeg
-Extended battery info	PowerStatus		Uitgebreide accu-informatie
-Install in Deskbar	PowerStatus		Installeer in Deskbar
-Last full charge: 	PowerStatus		Laatst compleet opgeladen:
-Model number: 	PowerStatus		Modelnummer
-OEM info: 	PowerStatus		OEM-info:
-OK	PowerStatus		Oké
-Power status box	PowerStatus		Stroomstatus-display
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\ndoor Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Afsluiten
-Run in window	PowerStatus		Actief in venster
-Serial number: 	PowerStatus		Serienummer:
 Show percent	PowerStatus		Toon percentage
-Show status icon	PowerStatus		Toon status-icoon
-Show text label	PowerStatus		Toon tekstlabel
-Show time	PowerStatus		Toon de tijd
-Technology: 	PowerStatus		Techniek:
+Design capacity: 	PowerStatus		Ontwerpcapaciteit
 Type: 	PowerStatus		Type:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
-charging	PowerStatus		bezig met laden
-discharging	PowerStatus		Bezig met ontladen
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		geen accu
 non-rechargeable	PowerStatus		Niet-oplaadbaar
+Empty battery slot	PowerStatus		Accuvak is leeg
+Run in window	PowerStatus		Actief in venster
+About	PowerStatus		over
+Battery info…	PowerStatus		Accu-info...
+Show time	PowerStatus		Toon de tijd
+Last full charge: 	PowerStatus		Laatst compleet opgeladen:
+Battery unused	PowerStatus		Accu ongebruikt
+Extended battery info	PowerStatus		Uitgebreide accu-informatie
+Current rate: 	PowerStatus		Huidige stroom:
+discharging	PowerStatus		Bezig met ontladen
+Show text label	PowerStatus		Toon tekstlabel
+About…	PowerStatus		Over...
+Model number: 	PowerStatus		Modelnummer
+Install in Deskbar	PowerStatus		Installeer in Deskbar
+Capacity: 	PowerStatus		Capaciteit
+Battery discharging	PowerStatus		Accu bezig met ontladen
+Serial number: 	PowerStatus		Serienummer:
+Capacity granularity 1: 	PowerStatus		Capaciteit van granulariteit 1:
+OK	PowerStatus		Oké
+OEM info: 	PowerStatus		OEM-info:
+Design voltage: 	PowerStatus		Ontwerpvoltage:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\ndoor Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Accu laadt
+Design capacity warning: 	PowerStatus		Waarschuwing ontwerpcapaciteit:
+Battery info	PowerStatus		Accu-info
+Quit	PowerStatus		Afsluiten
 rechargeable	PowerStatus		oplaadbaar
+charging	PowerStatus		bezig met laden
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
+Power status box	PowerStatus		Stroomstatus-display
+Show status icon	PowerStatus		Toon status-icoon
+Capacity granularity 2: 	PowerStatus		Capaciteit van granulariteit 2:
+Technology: 	PowerStatus		Techniek:
+no battery	PowerStatus		geen accu

@@ -1,40 +1,52 @@
-1	dutch	x-vnd.Haiku-Devices	2172461257
-ACPI Information	DeviceACPI		ACPI-informatie
-ACPI controller	Device		ACPI-controller
-Basic information	DevicesView		Basisinformatie
-Bridge	Device		Bridge
-Bus	DevicesView		Bus
-Category	DevicesView		Categorie
-Communication controller	Device		Communicatie-controller
-Computer	Device		Computer
-Connection	DevicesView		Verbinding
-Detailed	DevicesView		Gedetailleerd
-Device name	Device		Apparaatnaam
-Device name:	Device		Apparaatnaam:
-Device paths	Device		Apparaatpaden
-Devices	DevicesView		Devices
-Display controller	Device		Displaycontroller
-Docking station	Device		Dockingstation
-Driver used	Device		Gebruikte driver
-Encryption controller	Device		Encryptie-controller
-Generate system information	DevicesView		Genereer systeeminformatie
-Generic system peripheral	Device		Generiek systeem-randapparaat
-Input device controller	Device		Inputapparaat-controller
-Intelligent controller	Device		Intelligente controller
-Manufacturer	Device		Fabrikant
-Manufacturer:	Device		Fabrikant
-Mass storage controller	Device		Massa-opslagcontroller
-Memory controller	Device		Geheugencontroller
-Multimedia controller	Device		Multimedia-controller
-Network controller	Device		Netwerkcontroller
+1	dutch; flemish	x-vnd.Haiku-Devices	3585507465
+Manufacturer	DeviceSCSI		Fabrikant
 Order by:	DevicesView		Rangschik op:
-PCI Information	DevicePCI		PCI-informatie
-Processor	Device		Processor
+ACPI controller	Device		ACPI-controller
+Memory controller	Device		Geheugencontroller
+Driver used	DevicePCI		Gebruikte driver
+Docking station	Device		Dockingstation
+Computer	Device		Computer
+Processor	DeviceSCSI		Processor
+Detailed	DevicesView		Gedetailleerd
+Category	DevicesView		Categorie
 Quit	DevicesView		Afsluiten
-Refresh devices	DevicesView		Apparaten her-initialiseren
+Device paths	Device		Apparaatpaden
+Processor	Device		Processor
+Bridge	DeviceSCSI		Bridge
+ACPI Information	DeviceACPI		ACPI-informatie
+Generic system peripheral	Device		Generiek systeem-randapparaat
+Device name	DevicePCI		Apparaatnaam
+Display controller	Device		Displaycontroller
+Mass storage controller	Device		Massa-opslagcontroller
+Input device controller	Device		Inputapparaat-controller
+Network controller	Device		Netwerkcontroller
+Device name	DeviceACPI		Apparaatnaam
+Driver used	Device		Gebruikte driver
+Bus	DevicesView		Bus
+Communication controller	Device		Communicatie-controller
+Manufacturer	DeviceACPI		Fabrikant
+Basic information	DevicesView		Basisinformatie
+PCI Information	DevicePCI		PCI-informatie
+Manufacturer:	Device		Fabrikant
+Devices	System name		Devices
+Multimedia controller	Device		Multimedia-controller
+Device name:	Device		Apparaatnaam:
+Computer	DevicesView		Computer
 Report compatibility	DevicesView		Rapporteer compatibiliteit
-Satellite communications controller	Device		Satellietcommunicatie-controller
-Serial bus controller	Device		Seriële-bus-controller
 Signal processing controller	Device		Signaalverwerkings-controller 
-Unclassified device	Device		Ongeclassificeerd apparaat
+Serial bus controller	Device		Seriële-bus-controller
 Wireless controller	Device		Draadloze controller
+Device name	Device		Apparaatnaam
+Manufacturer	Device		Fabrikant
+Manufacturer	DevicePCI		Fabrikant
+Intelligent controller	Device		Intelligente controller
+Satellite communications controller	Device		Satellietcommunicatie-controller
+Bridge	Device		Bridge
+Refresh devices	DevicesView		Apparaten her-initialiseren
+Connection	DevicesView		Verbinding
+Generate system information	DevicesView		Genereer systeeminformatie
+Encryption controller	Device		Encryptie-controller
+Unclassified device	Device		Ongeclassificeerd apparaat
+Device name	DeviceSCSI		Apparaatnaam
+Device paths	DevicePCI		Apparaatpaden
+Devices	DevicesView		Devices

@@ -1,27 +1,27 @@
-1	dutch	x-vnd.Haiku-Media	128032530
-<none>	Media views		<geen>
-Audio input:	Media views		Audio-input:
-Audio mixer	Media Window		Audiomixer
-Audio output:	Media views		Audio-output:
-Audio settings	Media Window		Audio-instellingen
-Channel:	Media views		Kanaal:
-Cleaning up.	Media Window		Bezig met opschonen.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
-Defaults	Media views		Standaardwaarden
-Done shutting down.	Media Window		Uitzetten voltooid.
-OK	Media Window		Oké
-Quit	Media Window		Afsluiten
+1	dutch; flemish	x-vnd.Haiku-Media	128032530
 Ready for use…	Media Window		Klaar voor gebruik...
-Restart media services	Media views		Mediaservices herstarten
-Restarting media services\nShutting down media server\n	Media Window		Mediaservices worden opnieuw gestart\nMedia-server wordt afgesloten\n
-Restarting media services\nStarting media server…\n	Media Window		Media-services herstarten\nMediaserver start…\n
-Show volume control on Deskbar	Media views		Toon volumebediening in Deskbar
-Start media server	Media Window		Mediaserver starten
-Starting media server…	Media Window		Mediaserver starten…
-Stopping media server…	Media Window		Mediaserver stoppen…
-Telling media_addon_server to quit.	Media Window		media_addon_server laten afsluiten.
-This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.
 Video input:	Media views		Video-invoer:
-Video output:	Media views		Video-output:
-Video settings	Media Window		Video-instellingen
 Waiting for media_server to quit.	Media Window		Wachten op afsluiting van media_server.
+Cleaning up.	Media Window		Bezig met opschonen.
+Defaults	Media views		Standaardwaarden
+Stopping media server…	Media Window		Mediaserver stoppen…
+Quit	Media Window		Afsluiten
+OK	Media Window		Oké
+Starting media server…	Media Window		Mediaserver starten…
+Done shutting down.	Media Window		Uitzetten voltooid.
+Video settings	Media Window		Video-instellingen
+Video output:	Media views		Video-output:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
+Restart media services	Media views		Mediaservices herstarten
+Telling media_addon_server to quit.	Media Window		media_addon_server laten afsluiten.
+Audio mixer	Media Window		Audiomixer
+This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.
+Audio output:	Media views		Audio-output:
+Restarting media services\nStarting media server…\n	Media Window		Media-services herstarten\nMediaserver start…\n
+Audio settings	Media Window		Audio-instellingen
+Start media server	Media Window		Mediaserver starten
+Restarting media services\nShutting down media server\n	Media Window		Mediaservices worden opnieuw gestart\nMedia-server wordt afgesloten\n
+<none>	Media views		<geen>
+Channel:	Media views		Kanaal:
+Show volume control on Deskbar	Media views		Toon volumebediening in Deskbar
+Audio input:	Media views		Audio-input:

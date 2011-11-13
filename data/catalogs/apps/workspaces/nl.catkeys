@@ -1,9 +1,9 @@
-1	dutch	x-vnd.Be-WORK	1661620612
-About Workspaces…	Workspaces		Over Workspaces...
-Auto-raise	Workspaces		Automatisch naar boven
-Change workspace count…	Workspaces		Verander het aantal werkplekken...
+1	dutch; flemish	x-vnd.Be-WORK	1661620612
 Invalid argument: %s\n	Workspaces		Ongeldig argument: %s\n
-OK	Workspaces		Oké
-Show window border	Workspaces		Toon de vensterrand
+Change workspace count…	Workspaces		Verander het aantal werkplekken...
 Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Gebruik: %s [options] [workspaces]\nwaar \"opties\" onderdeel is van:\n --notitle\t\ttitelbalk verwijderd, rand en grootte behouden.\n --noborder\t\ttitel, rand en grootte verwijderd.\n --avoidfocus\t\tvoorkomt dat het venster op toetsenbordacties reageert.\n --alwaysontop\t\thoudt het venster op de voorgrond.\n --notmovable\t\thet venster kan niet verplaatst worden.\n --autoraise\t\tBreng het werkplekvenster automatisch naar de voorgrond worden wanneer het zich in de hoek van het scherm bevindt.\n --help\t\ttoon deze helptekst en sluit af\nen \"workspace\" is het nummer van de werkplek die u wilt veranderen (0-31)\n
+About Workspaces…	Workspaces		Over Workspaces...
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Werkplekken\ndoor %1 en %2.\n\nCopyright %3, Haiku.\n\nStuur vensters naar de achtergrond door de optie-toets te gebruiken. Verplaats vensters naar de voorgrond door de Control-toets te gebruiken.\n
+Show window border	Workspaces		Toon de vensterrand
+Auto-raise	Workspaces		Automatisch naar boven
+OK	Workspaces		Oké

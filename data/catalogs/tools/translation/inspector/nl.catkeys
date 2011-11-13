@@ -1,32 +1,32 @@
-1	dutch	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Actieve Translators
-Active Translators	InspectorApp		Actieve Translators
-Bummer	ImageWindow		Pech hebben
-File	ImageWindow		Bestand
-First Page	ImageWindow		Eerste pagina
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Afbeelding: %1\nKleurmodel: %2 (%3)\nAfmetingen: %4 x %5\nBytes per rij: %6\nTotaal aantal Bytes: %7\n\nIdentiteitsinfo:\nID String: %8\nMIME-type: %9\nType: '%10' (%11)\n Translator ID: %12\nGroep: '%13' (%14)\nKwaliteit: %15\nVermogen: %16\n\nExtensie-info:\n
-Info	ImageWindow		Info
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Infovenster
-Last Page	ImageWindow		Laatste pagina
-Next Page	ImageWindow		Volgende pagina
+1	dutch; flemish	x.vnd.OBOS-Inspector	2075781936
+User Translators	ActiveTranslatorsWindow		Gebruiker-Translators
 No image available to save.	ImageWindow		Geen afbeelding beschikbaar voor opslag.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Aantal documenten: %1\n\nTranslator:\nNaam: %2\nInfo: %3\nVersie: %4\n
-OK	ImageView		Oké
-OK	ImageWindow		Oké
-Open...	ImageWindow		Open...
-Previous Page	ImageWindow		Vorige pagina
-Quit	ImageWindow		Stoppen
-Save feature not implemented yet.	ImageWindow		De functie om op te slaan is nog niet geïmplementeerd.
-Save...	ImageWindow		Opslaan...
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Geselecteerd document: %1\n\nTranslator:\nNaam: %2\nInfo: %3\nVersie: %4\n
-Sorry, unable to load the image.	ImageView		Sorry, het is niet mogelijk om de afbeelding te laden
 Sorry, unable to write the image file.	ImageView		Sorry, het is niet mogelijk om het beeldbestand te schrijven.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Aantal documenten: %1\n\nTranslator:\nNaam: %2\nInfo: %3\nVersie: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nType: '%1' (%2)\nGroep: '%3' (%4)\nKwaliteit: %5\nVermogen: %6\nMIME Type: %7\nNaam: %8\n
+Bummer	ImageWindow		Pech hebben
+Last Page	ImageWindow		Laatste pagina
+\nInput Formats:	ImageView		\nInvoerformaten:
+Sorry, unable to load the image.	ImageView		Sorry, het is niet mogelijk om de afbeelding te laden
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Infovenster
+Active Translators	InspectorApp		Actieve Translators
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Afbeelding: %1\nKleurmodel: %2 (%3)\nAfmetingen: %4 x %5\nBytes per rij: %6\nTotaal aantal Bytes: %7\n\nIdentiteitsinfo:\nID String: %8\nMIME-type: %9\nType: '%10' (%11)\n Translator ID: %12\nGroep: '%13' (%14)\nKwaliteit: %15\nVermogen: %16\n\nExtensie-info:\n
+\nOutput Formats:	ImageView		\nUitvoerformaten:
+Save feature not implemented yet.	ImageWindow		De functie om op te slaan is nog niet geïmplementeerd.
+First Page	ImageWindow		Eerste pagina
+Next Page	ImageWindow		Volgende pagina
+Open...	ImageWindow		Open...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nGebruikte Translator:\nNaam: %1\nInfo: %2\nVersie: %3\n
+Save...	ImageWindow		Opslaan...
+Info	ImageWindow		Info
+OK	ImageWindow		Oké
+Window	ImageWindow		Venster
+Quit	ImageWindow		Stoppen
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Geselecteerd document: %1\n\nTranslator:\nNaam: %2\nInfo: %3\nVersie: %4\n
+Active Translators	ImageWindow		Actieve Translators
+View	ImageWindow		Bekijken
+Previous Page	ImageWindow		Vorige pagina
+OK	ImageView		Oké
 System Translators	ActiveTranslatorsWindow		Systeem-Translators
 Unknown	ImageView		Onbekend
-User Translators	ActiveTranslatorsWindow		Gebruiker-Translators
-View	ImageWindow		Bekijken
-Window	ImageWindow		Venster
-\nInput Formats:	ImageView		\nInvoerformaten:
-\nOutput Formats:	ImageView		\nUitvoerformaten:
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nGebruikte Translator:\nNaam: %1\nInfo: %2\nVersie: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nType: '%1' (%2)\nGroep: '%3' (%4)\nKwaliteit: %5\nVermogen: %6\nMIME Type: %7\nNaam: %8\n
+File	ImageWindow		Bestand

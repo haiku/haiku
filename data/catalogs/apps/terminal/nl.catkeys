@@ -1,100 +1,99 @@
-1	dutch	x-vnd.Haiku-Terminal	1196419230
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help toon hulp\n -t, --title stel venstertitel in\n -f, --fullscreen open volledig scherm\n
-Abort	Terminal Shell		Afbreken
-Appearance	Terminal PrefWindow		Uiterlijk
-Background	Terminal AppearancePrefView		Achtergrond
-Black on White	Terminal colors schema		Zwart op Wit
-Cancel	Terminal PrefWindow		Annuleren
-Cancel	Terminal SetTitleWindow		Annuleren
-Cancel	Terminal TermView		Annuleren
-Cancel	Terminal TermWindow		Annuleren
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
-Change directory	Terminal TermView		Directory veranderen
-Clear all	Terminal TermWindow		Alles wissen
-Close	Terminal TermWindow		Sluiten
-Close active tab	Terminal TermWindow		Het actieve tabblad sluiten
-Close other tabs	Terminal TermWindow		Andere tabs sluiten
-Close tab	Terminal TermWindow		De tab sluiten
-Close window	Terminal TermWindow		Venster sluiten
-Color schema:	Terminal AppearancePrefView		Kleurschema:
-Color:	Terminal AppearancePrefView		Kleur:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Afsluiten bevestigen als er programma's actief zijn
-Copy	Terminal TermWindow		Kopiëren
-Copy here	Terminal TermView		Hierheen kopiëren
-Create link here	Terminal TermView		Hier een link maken
-Custom	Terminal colors schema		Aangepast
-Decrease	Terminal TermWindow		Verminderen
-Don't save	Terminal PrefWindow		Niet opslaan
-Edit	Terminal TermWindow		Aanpassen
-Edit tab title…	Terminal TermWindow		Tabtitel aanpassen...
-Error!	Terminal getString		Fout!
-Find	Terminal FindWindow		Zoeken
-Find failed	Terminal TermWindow		Zoeken is mislukt
-Find next	Terminal TermWindow		Volgende zoeken
-Find previous	Terminal TermWindow		Vorige zoeken
-Find…	Terminal TermWindow		Zoeken...
-Font:	Terminal AppearancePrefView		Lettertype:
-Full screen	Terminal TermWindow		Volledig scherm
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui en Takashi Murai.\n\nGebruik: %s [OPTIE][SHELL]\n
-Increase	Terminal TermWindow		Vermeerderen
-Insert path	Terminal TermView		Voeg pad in
-Match case	Terminal FindWindow		Hoofd-/kleine-lettergevoelig
-Match word	Terminal FindWindow		Volledig woord moet overeenkomen
-Move here	Terminal TermView		Hierheen verplaatsen
-New Terminal	Terminal TermWindow		Nieuwe Terminal
-New tab	Terminal TermWindow		Nieuwe tab
-No search string was entered.	Terminal TermWindow		Er werd geen zoektekst ingevoerd.
+1	dutch; flemish	x-vnd.Haiku-Terminal	191545666
 Not found.	Terminal TermWindow		Niet gevonden.
-Nothing is selected.	Terminal TermWindow		Er is niets geselecteerd.
-OK	Terminal PrefWindow		Oké
-OK	Terminal SetTitleWindow		Oké
-OK	Terminal TermApp		Oké
-OK	Terminal TermWindow		Oké
-Page setup…	Terminal TermWindow		Paginaconfiguratie
-Paste	Terminal TermWindow		Plakken
-Print	Terminal TermWindow		Afdrukken
-Print cancelled.	Terminal TermWindow		Afdrukken geannuleerd.
-Quit	Terminal TermWindow		Afsluiten
-Really close?	Terminal TermWindow		Bent u zeker dat u wilt sluiten?
-Save	Terminal PrefWindow		Opslaan
-Save as default	Terminal TermWindow		Opslaan als standaard
-Save changes to this settings panel?	Terminal PrefWindow		Wilt u de wijzigingen uit dit instellingenpaneel opslaan?
-Save to file…	Terminal PrefWindow		Opslaan naar bestand...
-Search forward	Terminal FindWindow		Vooruit zoeken
-Select all	Terminal TermWindow		Alles selecteren
-Selected background	Terminal AppearancePrefView		Geselecteerde achtergrond
-Selected text	Terminal AppearancePrefView		Geselecteerde tekst
-Set tab title	Terminal TermWindow		De tabtitel instellen
-Set window title	Terminal TermWindow		Venstertitel instellen
-Settings	Terminal TermWindow		Instellingen
-Settings…	Terminal TermWindow		Instellingen...
-Shell 	Terminal TermWindow		Shell
-Size:	Terminal AppearancePrefView		Grootte:
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
-Tab title:	Terminal AppearancePrefView		Tabtitel:
-Tab title:	Terminal TermWindow		Tabtitel:
+Change directory	Terminal TermView		Directory veranderen
+OK	Terminal TermWindow		Oké
+New Terminal	Terminal TermWindow		Nieuwe Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kon de shell niet starten. Sorry.
-Text	Terminal AppearancePrefView		Tekst
-Text encoding	Terminal TermWindow		Tekstcodering
-Text not found.	Terminal TermWindow		De tekst werd niet gevonden
 Text size	Terminal TermWindow		Tekstgrootte
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		De volgende processen zijn nog gaande:\n\n%1\n\nAls u Terminal sluit, zullen de processen afgebroken worden.
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de titel van de huidige tab bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de tabtitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de venstertitel bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de venstertitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u Terminal sluit, zal het proces afgebroken worden.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u de tab sluit, zal het proces afgebroken worden.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Niet-herkende optie \"%s\"\n
-Use default	Terminal SetTitleWindow		De standaard gebruiken
+Match case	Terminal FindWindow		Hoofd-/kleine-lettergevoelig
+Quit	Terminal TermWindow		Afsluiten
 Use default shell	Terminal Shell		Standaard shell gebruiken
-Use selection	Terminal FindWindow		Gebruik selectie
-Use text:	Terminal FindWindow		Tekst gebruiken:
-White on Black	Terminal colors schema		Wit op Zwart
-Window size	Terminal TermWindow		Venstergrootte
+Confirm exit if active programs exist	Terminal AppearancePrefView		Afsluiten bevestigen als er programma's actief zijn
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de titel van de huidige tab bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
+Select all	Terminal TermWindow		Alles selecteren
+Close tab	Terminal TermWindow		De tab sluiten
+Custom	Terminal colors schema		Aangepast
+Save to file…	Terminal PrefWindow		Opslaan naar bestand...
+OK	Terminal PrefWindow		Oké
+Black on White	Terminal colors schema		Zwart op Wit
 Window title:	Terminal AppearancePrefView		Venstertitel:
+Font:	Terminal AppearancePrefView		Lettertype:
+Copy here	Terminal TermView		Hierheen kopiëren
+Really close?	Terminal TermWindow		Bent u zeker dat u wilt sluiten?
+Copy	Terminal TermWindow		Kopiëren
 Window title:	Terminal TermWindow		Venstertitel:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Niet-herkende optie \"%s\"\n
+Print cancelled.	Terminal TermWindow		Afdrukken geannuleerd.
+Cancel	Terminal SetTitleWindow		Annuleren
+Increase	Terminal TermWindow		Vermeerderen
+Settings	Terminal TermWindow		Instellingen
+Window size	Terminal TermWindow		Venstergrootte
+Selected text	Terminal AppearancePrefView		Geselecteerde tekst
+Find	Terminal FindWindow		Zoeken
+Appearance	Terminal PrefWindow		Uiterlijk
+Tab title:	Terminal AppearancePrefView		Tabtitel:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de venstertitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
+Color schema:	Terminal AppearancePrefView		Kleurschema:
+OK	Terminal SetTitleWindow		Oké
+Background	Terminal AppearancePrefView		Achtergrond
+Use selection	Terminal FindWindow		Gebruik selectie
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u de tab sluit, zal het proces afgebroken worden.
+Size:	Terminal AppearancePrefView		Grootte:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
+Full screen	Terminal TermWindow		Volledig scherm
 Window title…	Terminal TermWindow		Venstertitel...
+Page setup…	Terminal TermWindow		Paginaconfiguratie
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		De volgende processen zijn nog gaande:\n\n%1\n\nAls u Terminal sluit, zullen de processen afgebroken worden.
+Insert path	Terminal TermView		Voeg pad in
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui en Takashi Murai.\n\nGebruik: %s [OPTIE][SHELL]\n
+No search string was entered.	Terminal TermWindow		Er werd geen zoektekst ingevoerd.
+Don't save	Terminal PrefWindow		Niet opslaan
+Set window title	Terminal TermWindow		Venstertitel instellen
+Close other tabs	Terminal TermWindow		Andere tabs sluiten
+Match word	Terminal FindWindow		Volledig woord moet overeenkomen
+Nothing is selected.	Terminal TermWindow		Er is niets geselecteerd.
+Text not found.	Terminal TermWindow		De tekst werd niet gevonden
+Find…	Terminal TermWindow		Zoeken...
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u Terminal sluit, zal het proces afgebroken worden.
+Move here	Terminal TermView		Hierheen verplaatsen
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces in de \n\t\thuidige tab. Optioneel kan het maximale aantal padonderdelen\n\t\tworden opgegeven. Bijvoorbeeld '%2d' voor maximaal 2 onderdelen.\n\t%i\t-\tDe index van het venster.\n\t%p\t-\tDe naam van het actieve proces in de huidige tab.\n\t%t\t-\tDe titel van de huidige tab.\n\t%%\t-\tHet karakter '%'.
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces.\n\t\t\tOptioneel kan het maximale aantal padonderdelen\n\t\tworden opgegeven. Bijvoorbeeld '%2d' voor maximaal 2 onderdelen.\n\t%i\t-\tDe index van de tab.\n\t%p\t-\tDe naam van het actieve proces.\n\t%%\t-\tHet karakter '%'.
+White on Black	Terminal colors schema		Wit op Zwart
+Error!	Terminal getString		Fout!
+New tab	Terminal TermWindow		Nieuwe tab
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de tabtitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
+Selected background	Terminal AppearancePrefView		Geselecteerde achtergrond
+Decrease	Terminal TermWindow		Verminderen
+Create link here	Terminal TermView		Hier een link maken
+Close	Terminal TermWindow		Sluiten
+Text	Terminal AppearancePrefView		Tekst
+Clear all	Terminal TermWindow		Alles wissen
+Text encoding	Terminal TermWindow		Tekstcodering
 size	Terminal TermView		grootte
+Close window	Terminal TermWindow		Venster sluiten
+Save as default	Terminal TermWindow		Opslaan als standaard
+Set tab title	Terminal TermWindow		De tabtitel instellen
+Settings…	Terminal TermWindow		Instellingen...
+Abort	Terminal Shell		Afbreken
+Edit	Terminal TermWindow		Aanpassen
+Color:	Terminal AppearancePrefView		Kleur:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de venstertitel bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
+Print	Terminal TermWindow		Afdrukken
+Use text:	Terminal FindWindow		Tekst gebruiken:
+Cancel	Terminal TermWindow		Annuleren
+OK	Terminal TermApp		Oké
+Find failed	Terminal TermWindow		Zoeken is mislukt
+Search forward	Terminal FindWindow		Vooruit zoeken
+Edit tab title…	Terminal TermWindow		Tabtitel aanpassen...
+Find previous	Terminal TermWindow		Vorige zoeken
+Tab title:	Terminal TermWindow		Tabtitel:
+Find next	Terminal TermWindow		Volgende zoeken
+Close active tab	Terminal TermWindow		Het actieve tabblad sluiten
+Paste	Terminal TermWindow		Plakken
+Save changes to this settings panel?	Terminal PrefWindow		Wilt u de wijzigingen uit dit instellingenpaneel opslaan?
+Cancel	Terminal PrefWindow		Annuleren
+Shell 	Terminal TermWindow		Shell
+Save	Terminal PrefWindow		Opslaan
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces.\n\t\t\tOptioneel kan het maximale aantal padonderdelen\n\t\tworden opgegeven. Bijvoorbeeld '%2d' voor maximaal 2 onderdelen.\n\t%i\t-\tDe index van de tab.\n\t%p\t-\tDe naam van het actieve proces.\n\t%%\t-\tHet karakter '%'.
+Cancel	Terminal TermView		Annuleren
+Use default	Terminal SetTitleWindow		De standaard gebruiken

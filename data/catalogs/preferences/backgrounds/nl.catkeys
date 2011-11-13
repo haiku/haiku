@@ -1,24 +1,24 @@
-1	dutch	x-vnd.Haiku-Backgrounds	4220509773
-All workspaces	Main View		Alle werkruimtes
-Apply	Main View		Toepassen
-Center	Main View		Centreren
-Current workspace	Main View		Huidige werkruimte
+1	dutch; flemish	x-vnd.Haiku-Backgrounds	4220509773
+X:	Main View		X:
+Resolution: 	Image Filepanel		Resolutie:
+pick one	Main View		maak een keuze
 Default	Main View		Standaard
-Default folder	Main View		Standaardmap
-Folder: 	Main View		Map: 
-Icon label outline	Main View		Contour icoonlabel
-Image:	Main View		Afbeelding:
+Center	Main View		Centreren
 Manual	Main View		Handmatig
+Default folder	Main View		Standaardmap
+Revert	Main View		Herstellen
 None	Main View		Geen
-Other folder…	Main View		Andere map…
+All workspaces	Main View		Alle werkruimtes
+Icon label outline	Main View		Contour icoonlabel
 Other…	Main View		Andere…
+Current workspace	Main View		Huidige werkruimte
+Folder: 	Main View		Map: 
+Apply	Main View		Toepassen
+Other folder…	Main View		Andere map…
+Y:	Main View		Y:
+Tile	Main View		Tegelen
+Select	Main View		Selecteren
+Scale to fit	Main View		Passend maken
 Placement:	Main View		Plaatsing:
 Preview	Main View		Voorbeeld
-Resolution: 	Image Filepanel		Resolutie:
-Revert	Main View		Herstellen
-Scale to fit	Main View		Passend maken
-Select	Main View		Selecteren
-Tile	Main View		Tegelen
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		maak een keuze
+Image:	Main View		Afbeelding:

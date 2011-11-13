@@ -1,6 +1,6 @@
-1	dutch	x-vnd.Haiku-ReadOnlyBootPrompt	1972532432
+1	dutch; flemish	x-vnd.Haiku-ReadOnlyBootPrompt	1972532432
 Desktop (Live-CD)	BootPromptWindow		Bureaublad (Live-CD)
-Keymap	BootPromptWindow		Toetsenbordindeling
 Language	BootPromptWindow		Taal
-Run Installer	BootPromptWindow		Activeer Installer
 Welcome to Haiku!	BootPromptWindow		Welkom bij Haiku!
+Run Installer	BootPromptWindow		Activeer Installer
+Keymap	BootPromptWindow		Toetsenbordindeling

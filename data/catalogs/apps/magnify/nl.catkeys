@@ -1,24 +1,22 @@
-1	dutch	x-vnd.Haiku-Magnify	219016360
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
-Add a crosshair	Magnify-Main		Een dradenkruis toevoegen
-Copy image	Magnify-Main		Afbeelding kopiëren
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopiëren/opslaan:\n kopiëren - kopieert het huidige beeld naar het klembord\n opslaan - vraagt de gebruiker naar een bestand om in te bewaren en produceert\n de databits van de afbeelding\n
-Decrease pixel size	Magnify-Main		Pixelgrootte verkleinen
-Decrease window size	Magnify-Main		Venster verkleinen
-Freeze/Unfreeze image	Magnify-Main		Beeld vastzetten/loszetten
-General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Algemeen:\n 32 x 32 - de nummers linksboven geven het aantal zichtbare\n pixels weer (breedte x hoogte)\n 8 pixels/pixel - geeft het aantal pixels aan dat\n gebruikt wordt om een pixel te vergroten\n R:152 G:52 B:10 - de RGB-waarden voor de pixel onder\n het rode vierkant\n
-Hide/Show grid	Magnify-Main		Raster verbergen/tonen
-Hide/Show info	Magnify-Main		Info verbergen/tonen
-Increase pixel size	Magnify-Main		Pixelformaat vergroten
-Increase window size	Magnify-Main		Venster vergroten
-Info	Magnify-Main		Info
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n verbergen/tonen info - verbergt/toont al deze nieuwe kenmerken\n opmerking: in 'tonen'-modus zal er een rood vierkant zichtbaar zijn dat aangeeft van welke pixel de rgb-waarden aangeduid worden\n toevoegen/verwijderen draadkruizen - 2 draadkruizen kunnen worden toegevoegd (of verwijderd)\n om te helpen bij de uitlijning en plaatsing van objecten.\n De draadkruizen worden weergegeven door blauwe vierkanten en blauwe lijnen.\n verbergen/tonen raster - verbergt/toont het raster dat pixels van elkaar scheidt. 
-Magnify help	Magnify-Help		Magnify help
+1	dutch; flemish	x-vnd.Haiku-Magnify	2992853047
 Make square	Magnify-Main		Vierkant maken
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigatie:\n pijltoetsen - verplaats de huidige selectie (rgb indicatie of draadkruis)\n met 1 pixel per keer\n option-pijltoets - verplaatst de muislocatie 1 pixel per keer\n selectiemarkering met x - de huidige selectie bevat een 'x'\n
-Remove a crosshair	Magnify-Main		Een dradenkruis verwijderen
-Save image	Magnify-Main		Afbeelding opslaan
-Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Vormen/omvormen:\n vierkant maken - stelt de breedte en de hoogte in\n naar de langste van die twee om er\n een vierkant beeld mee te maken.\n toenemen/afnemen venstergrootte - laat het venstergrootte\n toenemen of afnemen met 4 pixels.\n toenemen/afnemen pixelgrootte - laat het aantal\n pixels dat gebruikt wordt om een 'echte' pixel te vergroten, toenemen of afnemen. Begrensd tussen 1 en 16.\n
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		vastzetten - vastzetten/loszetten vergroting van dat wat er\n op dat moment onder de cursor zit\n 
+Copy image	Magnify-Main		Afbeelding kopiëren
+Magnify help	Magnify-Help		Magnify help
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n verbergen/tonen info - verbergt/toont al deze nieuwe kenmerken\n opmerking: in 'tonen'-modus zal er een rood vierkant zichtbaar zijn dat aangeeft van welke pixel de rgb-waarden aangeduid worden\n toevoegen/verwijderen draadkruizen - 2 draadkruizen kunnen worden toegevoegd (of verwijderd)\n om te helpen bij de uitlijning en plaatsing van objecten.\n De draadkruizen worden weergegeven door blauwe vierkanten en blauwe lijnen.\n verbergen/tonen raster - verbergt/toont het raster dat pixels van elkaar scheidt. 
+Hide/Show grid	Magnify-Main		Raster verbergen/tonen
 magnify: size must be a multiple of 4\n	Console		vergroten: grootte moet een veelvoud van 4 zijn\n
-size must be > 4 and a multiple of 4\n	Console		grootte moet > 4 zijn en een veelvoud van 4\n
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Algemeen:\n 32 x 32 - de nummers linksboven geven het aantal zichtbare\n pixels weer (breedte x hoogte)\n 8 pixels/pixel - geeft het aantal pixels aan dat\n gebruikt wordt om een pixel te vergroten\n R:152 G:52 B:10 - de RGB-waarden voor de pixel onder\n het rode vierkant\n
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Vormen/omvormen:\n vierkant maken - stelt de breedte en de hoogte in\n naar de langste van die twee om er\n een vierkant beeld mee te maken.\n toenemen/afnemen venstergrootte - laat het venstergrootte\n toenemen of afnemen met 4 pixels.\n toenemen/afnemen pixelgrootte - laat het aantal\n pixels dat gebruikt wordt om een 'echte' pixel te vergroten, toenemen of afnemen. Begrensd tussen 1 en 16.\n
+Decrease pixel size	Magnify-Main		Pixelgrootte verkleinen
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
+Info	Magnify-Main		Info
+Remove a crosshair	Magnify-Main		Een dradenkruis verwijderen
+Freeze/Unfreeze image	Magnify-Main		Beeld vastzetten/loszetten
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopiëren/opslaan:\n kopiëren - kopieert het huidige beeld naar het klembord\n opslaan - vraagt de gebruiker naar een bestand om in te bewaren en produceert\n de databits van de afbeelding\n
+Hide/Show info	Magnify-Main		Info verbergen/tonen
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigatie:\n pijltoetsen - verplaats de huidige selectie (rgb indicatie of draadkruis)\n met 1 pixel per keer\n option-pijltoets - verplaatst de muislocatie 1 pixel per keer\n selectiemarkering met x - de huidige selectie bevat een 'x'\n
+Save image	Magnify-Main		Afbeelding opslaan
+Increase window size	Magnify-Main		Venster vergroten
+Decrease window size	Magnify-Main		Venster verkleinen
+Increase pixel size	Magnify-Main		Pixelformaat vergroten
+Add a crosshair	Magnify-Main		Een dradenkruis toevoegen

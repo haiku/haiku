@@ -1,42 +1,42 @@
-1	dutch	x-vnd.Haiku-Appearance	1227622574
-Antialiasing	APRWindow		Anti-aliasing
-Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
+1	dutch; flemish	x-vnd.Haiku-Appearance	1227622574
+Control highlight	Colors tab		Keuze-accent
+Control border	Colors tab		Keuzerand
 Antialiasing type:	AntialiasingSettingsView		Anti-aliasingtype:
+Shadow	Colors tab		Schaduw
+On	AntialiasingSettingsView		Aan
+Defaults	APRWindow		Standaardwaarden
+Grayscale	AntialiasingSettingsView		Grijswaarden
+Shine	Colors tab		Glans
+Off	AntialiasingSettingsView		Uit
+Success	Colors tab		Gelukt
+Inactive window tab text	Colors tab		Tabtekst niet-actief venster
+Failure	Colors tab		Mislukt
+Hinting menu	AntialiasingSettingsView		Hinting-menu
+Document background	Colors tab		Achtergrond document
+Revert	APRWindow		Herstellen
+Window tab	Colors tab		Venstertab
+Tooltip background	Colors tab		Achtergrond Tooltip
+Selected menu item background	Colors tab		Achtergrond geselecteerd menu-item
+Antialiasing	APRWindow		Anti-aliasing
+Navigation base	Colors tab		Basis navigatie
+Window tab text	Colors tab		Tekst venstertab
+Document text	Colors tab		Tekst document
+Navigation pulse	Colors tab		Puls navigatie
+Selected menu item text	Colors tab		Tekst geselecteerd menu-item
+Menu background	Colors tab		Achtergrond menu
+Panel background	Colors tab		Achtergrond paneel
 Colors	APRWindow		Kleuren
 Control background	Colors tab		Achtergrond keuze
-Control border	Colors tab		Keuzerand
-Control highlight	Colors tab		Keuze-accent
-Control text	Colors tab		Tekst keuze
-Defaults	APRWindow		Standaardwaarden
-Document background	Colors tab		Achtergrond document
-Document text	Colors tab		Tekst document
-Failure	Colors tab		Mislukt
-Glyph hinting:	AntialiasingSettingsView		Glyph hinting:
-Grayscale	AntialiasingSettingsView		Grijswaarden
-Hinting menu	AntialiasingSettingsView		Hinting-menu
 Inactive window tab	Colors tab		Niet-actieve venstertab
-Inactive window tab text	Colors tab		Tabtekst niet-actief venster
-LCD subpixel	AntialiasingSettingsView		LCD-subpixel
-Menu background	Colors tab		Achtergrond menu
-Menu item text	Colors tab		Tekst menu-item
-Monospaced fonts only	AntialiasingSettingsView		Alleen niet-proportionele lettertypes
-Navigation base	Colors tab		Basis navigatie
-Navigation pulse	Colors tab		Puls navigatie
-Off	AntialiasingSettingsView		Uit
-On	AntialiasingSettingsView		Aan
-Panel background	Colors tab		Achtergrond paneel
-Panel text	Colors tab		Tekst paneel
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reductie filtersterkte gekleurde randen:
-Revert	APRWindow		Herstellen
-Selected menu item background	Colors tab		Achtergrond geselecteerd menu-item
-Selected menu item border	Colors tab		Rand geselecteerd menu-item
-Selected menu item text	Colors tab		Tekst geselecteerd menu-item
-Shadow	Colors tab		Schaduw
-Shine	Colors tab		Glans
-Strong	AntialiasingSettingsView		Sterk
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-gebaseerde anti-aliasing in combinatie met glyph hinting is niet beschikbaar in deze versie van Haiku, om eventuele patentkwesties te voorkomen. Om deze optie in te kunnen zetten zult u Haiku zelf moeten compileren en bepaalde opties in libfreetype's configuratie-header moeten inschakelen.
-Success	Colors tab		Gelukt
-Tooltip background	Colors tab		Achtergrond Tooltip
+Control text	Colors tab		Tekst keuze
 Tooltip text	Colors tab		Tekst Tooltip
-Window tab	Colors tab		Venstertab
-Window tab text	Colors tab		Tekst venstertab
+Menu item text	Colors tab		Tekst menu-item
+LCD subpixel	AntialiasingSettingsView		LCD-subpixel
+Selected menu item border	Colors tab		Rand geselecteerd menu-item
+Strong	AntialiasingSettingsView		Sterk
+Panel text	Colors tab		Tekst paneel
+Monospaced fonts only	AntialiasingSettingsView		Alleen niet-proportionele lettertypes
+Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
+Glyph hinting:	AntialiasingSettingsView		Glyph hinting:

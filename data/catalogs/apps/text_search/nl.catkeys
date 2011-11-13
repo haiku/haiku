@@ -1,29 +1,29 @@
-1	dutch	x-vnd.Haiku.TextSearch	2369757330
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
-%s: There was a problem running grep.	Grepper		%s: Er was een probleem bij het uitvoeren van grep.
-Actions	GrepWindow		Acties
-Cancel	GrepWindow		Annuleren
-Case-sensitive	GrepWindow		Hoofd-/kleine lettergevoelig
+1	dutch; flemish	x-vnd.Haiku.TextSearch	2369757330
+Trim to selection	GrepWindow		Beperken tot selectie
 Close	GrepWindow		Sluiten
+Cancel	GrepWindow		Annuleren
+The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
+Set target…	GrepWindow		Doel instellen...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Kies alstublieft de bestanden die u in Tracker geselecteerd wilt hebben.
+Open files in Pe	GrepWindow		Open bestanden in Pe
 Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
+Settings	GrepWindow		Instellingen
+Select all	GrepWindow		Alles selecteren
+OK	GrepWindow		Oké
+Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
+Search	GrepWindow		Zoeken
+Open selection	GrepWindow		Selectie openen
+Look in sub-folders	GrepWindow		In submappen zoeken
+Actions	GrepWindow		Acties
 File	GrepWindow		Bestand
 History	GrepWindow		Geschiedenis
-Look in sub-folders	GrepWindow		In submappen zoeken
+%s: There was a problem running grep.	Grepper		%s: Er was een probleem bij het uitvoeren van grep.
 New window	GrepWindow		Nieuw venster
-OK	GrepWindow		Oké
-Open files in Pe	GrepWindow		Open bestanden in Pe
-Open selection	GrepWindow		Selectie openen
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Kies alstublieft de bestanden die u in Tracker geselecteerd wilt hebben.
 Please select the files you wish to keep searching.	GrepWindow		Selecteer alstublieft de bestanden waarin u wilt blijven zoeken. 
-Quit	GrepWindow		Afsluiten
-Search	GrepWindow		Zoeken
-Select all	GrepWindow		Alles selecteren
-Set target…	GrepWindow		Doel instellen...
-Settings	GrepWindow		Instellingen
-Show files in Tracker	GrepWindow		Toon bestanden in Tracker
-Show lines	GrepWindow		Toon regels
-Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
-Text files only	GrepWindow		Alleen tekstbestanden
 TextSearch	GrepWindow		Text_search
-The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
-Trim to selection	GrepWindow		Beperken tot selectie
+Quit	GrepWindow		Afsluiten
+Show files in Tracker	GrepWindow		Toon bestanden in Tracker
+Case-sensitive	GrepWindow		Hoofd-/kleine lettergevoelig
+Text files only	GrepWindow		Alleen tekstbestanden
+Show lines	GrepWindow		Toon regels

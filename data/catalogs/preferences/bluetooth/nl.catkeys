@@ -1,52 +1,52 @@
-1	dutch	x-vnd.Haiku-BluetoothPrefs	4163353570
-15 secs	Settings view		15 sec.
-61 secs	Settings view		61 sec.
+1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	4163353570
 About Bluetooth…	Window		Over Bluetooth…
-Add device to list	Inquiry panel		Apparaat aan lijst toevoegen
-Add…	Remote devices		Toevoegen…
-Always ask	Settings view		Altijd vragen
-As blocked	Remote devices		Als geblokkeerd
-Authenticate	Extended local device view		Verifieer
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Controleer of de Bluetoothmogelijkheden van uw externe apparaat zijn ingeschakeld. Klik op 'Onderzoek' om het afzoeken te starten. De benodigde tijd voor het ophalen van de namen is onbekend, al zou dat korter dan 3 seconden per apparaat moeten zijn. Daarna kunt u ze toevoegen aan uw hoofdlijst, waarvandaan u eraan kunt koppelen.
-Connections & channels…	Window		Connecties & kanalen...
-Default inquiry time:	Settings view		Standaard onderzoekstijd:
-Defaults	Window		Standaardwaarden
-Desktop	Settings view		Bureaublad
-Disconnect	Remote devices		Verbreek verbinding
-Discoverable	Extended local device view		Zichtbaar
-From all devices	Settings view		Van alle apparaten
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth systeem, (ARCE)\n\ndoor Oliver Ruiz Dorantes\n\nMet steun van:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nDank aan degenen die hielpen...\n\nDoor het opsturen/doneren van hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nOp economisch gebied:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMet verbeteringen:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nDoor te testen:\n\t- Petter H. Juliussen\nMet alle doorgegeven kennis:\n\t- het yellowTAB team
 Handheld	Settings view		Handheld
-Help	Window		Help
+Default inquiry time:	Settings view		Standaard onderzoekstijd:
+Add device to list	Inquiry panel		Apparaat aan lijst toevoegen
+Starting scan...	Inquiry panel		Afzoeken wordt gestart...
+Show bluetooth console…	Window		Toon bluetoothconsole…
+Smart phone	Settings view		Smartphone
+Server	Settings view		Server
+Stop bluetooth services…	Window		Bluetooth-diensten stoppen…
 Identify host as:	Settings view		Identificeer host als:
-Identify us as...	Settings view		Identificeer ons als...
-Incoming connections policy:	Settings view		Beleid inkomende verbindingen:
-Inquiry	Inquiry panel		Onderzoek
-Laptop	Settings view		Laptop
-Local devices found on system:	Settings view		Lokale apparaten, gevonden op systeem:
-OK	main		Oké
-Only from trusted devices	Settings view		Alleen van vertrouwde apparaten
-Pair…	Remote devices		Koppelen...
-Pick LocalDevice...	Settings view		Kies een lokaal apparaat...
-Policy...	Settings view		Beleid...
-Refresh LocalDevices…	Window		Lokale apparaten herladen…
+View	Window		Bekijken
 Refresh…	Remote devices		Vernieuwen…
-Remote devices	Window		Externe apparaten
+Pair…	Remote devices		Koppelen...
+Incoming connections policy:	Settings view		Beleid inkomende verbindingen:
+From all devices	Settings view		Van alle apparaten
+Show name	Extended local device view		Toon naam
+Local devices found on system:	Settings view		Lokale apparaten, gevonden op systeem:
+Server	Window		Server
+Scanning completed.	Inquiry panel		Afzoeken voltooid.
+OK	main		Oké
 Remote devices list…	Window		Lijst van externe apparaten…
 Remove	Remote devices		Verwijderen
-Retrieving names...	Inquiry panel		Namen ophalen...
-Revert	Window		Herstellen
-Scanning completed.	Inquiry panel		Afzoeken voltooid.
-Scanning progress	Inquiry panel		Afzoek-voortgang
-Server	Settings view		Server
-Server	Window		Server
-Service classes: 	Device View		Service-klassen:
-Settings	Window		Instellingen
-Show bluetooth console…	Window		Toon bluetoothconsole…
-Show name	Extended local device view		Toon naam
-Smart phone	Settings view		Smartphone
+15 secs	Settings view		15 sec.
 Start bluetooth services…	Window		Start bluetooth-diensten…
-Starting scan...	Inquiry panel		Afzoeken wordt gestart...
-Stop bluetooth services…	Window		Bluetooth-diensten stoppen…
+Policy...	Settings view		Beleid...
+61 secs	Settings view		61 sec.
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth systeem, (ARCE)\n\ndoor Oliver Ruiz Dorantes\n\nMet steun van:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nDank aan degenen die hielpen...\n\nDoor het opsturen/doneren van hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nOp economisch gebied:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMet verbeteringen:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nDoor te testen:\n\t- Petter H. Juliussen\nMet alle doorgegeven kennis:\n\t- het yellowTAB team
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Er is geen lokaal Bluetooth-apparaat geregistreerd op het systeem.
-View	Window		Bekijken
+Identify us as...	Settings view		Identificeer ons als...
+As blocked	Remote devices		Als geblokkeerd
+Disconnect	Remote devices		Verbreek verbinding
+Pick LocalDevice...	Settings view		Kies een lokaal apparaat...
+Defaults	Window		Standaardwaarden
+Inquiry	Inquiry panel		Onderzoek
+Desktop	Settings view		Bureaublad
+Revert	Window		Herstellen
+Remote devices	Window		Externe apparaten
+Laptop	Settings view		Laptop
+Discoverable	Extended local device view		Zichtbaar
+Service classes: 	Device View		Service-klassen:
+Connections & channels…	Window		Connecties & kanalen...
+Refresh LocalDevices…	Window		Lokale apparaten herladen…
+Settings	Window		Instellingen
+Only from trusted devices	Settings view		Alleen van vertrouwde apparaten
+Scanning progress	Inquiry panel		Afzoek-voortgang
+Always ask	Settings view		Altijd vragen
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Controleer of de Bluetoothmogelijkheden van uw externe apparaat zijn ingeschakeld. Klik op 'Onderzoek' om het afzoeken te starten. De benodigde tijd voor het ophalen van de namen is onbekend, al zou dat korter dan 3 seconden per apparaat moeten zijn. Daarna kunt u ze toevoegen aan uw hoofdlijst, waarvandaan u eraan kunt koppelen.
+Authenticate	Extended local device view		Verifieer
+Retrieving names...	Inquiry panel		Namen ophalen...
+Help	Window		Help
+Add…	Remote devices		Toevoegen…

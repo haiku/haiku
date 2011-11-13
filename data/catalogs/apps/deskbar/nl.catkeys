@@ -1,38 +1,39 @@
-1	dutch	x-vnd.Be-TSKB	3232664655
-<Be folder is empty>	BeMenu		<Be-map is leeg>
-Always on top	PreferencesWindow		Altijd bovenop
-Applications	PreferencesWindow		Toepassingen
-Auto-raise	PreferencesWindow		Automatisch naar boven
-Change time…	TimeView		Tijd aanpassen...
-Clock	PreferencesWindow		Klok
-Close all	WindowMenu		Alles sluiten
-Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
-Deskbar preferences…	BeMenu		Deskbar-voorkeuren...
+1	dutch; flemish	x-vnd.Be-TSKB	3173476438
 Edit menu…	PreferencesWindow		Bewerk menu...
-Expand new applications	PreferencesWindow		Toon nieuwe toepassingen
-Find…	BeMenu		Vind...
-Hide all	WindowMenu		Alles verbergen
-Hide time	TimeView		Tijd verbergen
-Menu	PreferencesWindow		Menu
-Mount	BeMenu		Betrek
-No windows	WindowMenu		Geen vensters
-Power off	BeMenu		Uitzetten
-Quit application	WindowMenu		Programma afsluiten
-Recent applications	BeMenu		Recente toepassingen
-Recent applications:	PreferencesWindow		Recente toepassingen:
-Recent documents	BeMenu		Recente documenten
+Applications	PreferencesWindow		Toepassingen
 Recent documents:	PreferencesWindow		Recente documenten:
 Recent folders	BeMenu		Recente mappen
-Recent folders:	PreferencesWindow		Recente mappen:
-Restart Tracker	BeMenu		Tracker herstarten
-Restart system	BeMenu		Systeem herstarten
-Show Time	Tray		Toon tijd
-Show all	WindowMenu		Toon alles
-Show application expander	PreferencesWindow		Toon toepassing-expander
-Show calendar…	TimeView		Toon kalender
-Show replicants	BeMenu		Toon replicants
-Show seconds	PreferencesWindow		Toon seconden
-Shutdown…	BeMenu		Afsluiten...
 Sort running applications	PreferencesWindow		Sorteer lopende toepassingen
-Tracker always first	PreferencesWindow		Tracker altijd eerst
+Recent applications	BeMenu		Recente toepassingen
+Change time…	TimeView		Tijd aanpassen...
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Toepassingen
+<Be folder is empty>	BeMenu		<Be-map is leeg>
 Window	PreferencesWindow		Venster
+Menu	PreferencesWindow		Menu
+Show seconds	PreferencesWindow		Toon seconden
+Always on top	PreferencesWindow		Altijd bovenop
+Show all	WindowMenu		Toon alles
+No windows	WindowMenu		Geen vensters
+Power off	BeMenu		Uitzetten
+Auto-raise	PreferencesWindow		Automatisch naar boven
+Hide time	TimeView		Tijd verbergen
+Recent folders:	PreferencesWindow		Recente mappen:
+Deskbar preferences…	BeMenu		Deskbar-voorkeuren...
+Show application expander	PreferencesWindow		Toon toepassing-expander
+Close all	WindowMenu		Alles sluiten
+Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
+Mount	BeMenu		Betrek
+Recent applications:	PreferencesWindow		Recente toepassingen:
+Tracker always first	PreferencesWindow		Tracker altijd eerst
+Show calendar…	TimeView		Toon kalender
+Restart system	BeMenu		Systeem herstarten
+Find…	BeMenu		Vind...
+Restart Tracker	BeMenu		Tracker herstarten
+Show Time	Tray		Toon tijd
+Expand new applications	PreferencesWindow		Toon nieuwe toepassingen
+Clock	PreferencesWindow		Klok
+Recent documents	BeMenu		Recente documenten
+Hide all	WindowMenu		Alles verbergen
+Shutdown…	BeMenu		Afsluiten...
+Quit application	WindowMenu		Programma afsluiten
+Show replicants	BeMenu		Toon replicants

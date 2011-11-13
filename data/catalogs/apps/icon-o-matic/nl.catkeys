@@ -1,148 +1,153 @@
-1	dutch	x-vnd.haiku-icon_o_matic	3702650529
-<modify path>	Icon-O-Matic-PathCmd		<pad aanpassen>
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<niets om opnieuw te doen>
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<niets om ongedaan te maken>
-<unavailable>	Icon-O-Matic-StyleTypes		<onbeschikbaar>
-<unkown property>	Icon-O-Matic-PropertyNames		<onbekende eigenschap>
-Add	Icon-O-Matic-PathsList		Toevoegen
-Add	Icon-O-Matic-StylesList		Toevoegen
-Add	Icon-O-Matic-TransformersList		Toevoegen
-Add Control Point	Icon-O-Matic-AddPointCmd		Controlepunt toevoegen
-Add Path	Icon-O-Matic-AddPathsCmd		Pad toevoegen
-Add Paths	Icon-O-Matic-AddPathsCmd		Paden toevoegen
-Add Shape	Icon-O-Matic-AddShapesCmd		Vorm toevoegen
-Add Shapes	Icon-O-Matic-AddShapesCmd		Vormen toevoegen
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	1817510175
+Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
-Add Styles	Icon-O-Matic-AddStylesCmd		Stijlen toevoegen
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Omzetter toevoegen
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Omzetters toevoegen
-Add circle	Icon-O-Matic-PathsList		Cirkel toevoegen
-Add rect	Icon-O-Matic-PathsList		Rechthoek toevoegen
-Add shape with path	Icon-O-Matic-Menu-Shape		Pad met vorm toevoegen
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Vorm met pad & stijl toevoegen
-Add shape with style	Icon-O-Matic-Menu-Shape		Vorm met stijl toevoegen
-Add with path	Icon-O-Matic-ShapesList		Toevoegen met pad
-Add with path & style	Icon-O-Matic-ShapesList		Toevoegen met pad en stijl
-Add with style	Icon-O-Matic-ShapesList		Toevoegen met stijl
-Append…	Icon-O-Matic-Menu-File		Toepassen...
-Assign Path	Icon-O-Matic-AddPathsCmd		Pad toekennen
-Assign Paths	Icon-O-Matic-AddPathsCmd		Paden toekennen
-Assign Style	Icon-O-Matic-AssignStyleCmd		Stijl toekennen
-Bleep!	Exporter - Continue in error dialog		Bliep!
-Bummer	Cancel button - error alert		Pech hebben
-Cancel	Icon-O-Matic-ColorPicker		Annuleren
-Cancel	Icon-O-Matic-SVGExport		Annuleren
-Caps	Icon-O-Matic-PropertyNames		Hoofdletters
-Change Color	Icon-O-Matic-SetColorCmd		Kleur veranderen
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pad opruimen
-Clean up	Icon-O-Matic-PathsList		Opruimen
-Click on a shape above	Empty transformers list - 1st line		Klik op een vorm hierboven
-Color	Icon-O-Matic-PropertyNames		Kleur
-Color	Icon-O-Matic-StyleTypes		Kleur
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kleur (#%02x%02x%02x)
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
-Conic	Icon-O-Matic-StyleTypes		Kegelvormig
-Copy	Icon-O-Matic-Properties		Kopiëren
-Detect Orient.	Icon-O-Matic-PropertyNames		Oriëntatie opmerken.
-Diamond	Icon-O-Matic-StyleTypes		Diamantvormig
-Duplicate	Icon-O-Matic-PathsList		Dupliceren
-Duplicate	Icon-O-Matic-ShapesList		Dupliceren
-Duplicate	Icon-O-Matic-StylesList		Dupliceren
-Edit	Icon-O-Matic-Menus		Aanpassen
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradiënt aanpassen
-Error: 	Icon-O-Matic-Exporter		Fout:
-Error: 	Icon-O-Matic-Main		Fout:
-Export	Icon-O-Matic-Menu-File		Exporteren
-Export Icon	Dialog title		Icoon exporteren
-Export as…	Icon-O-Matic-Menu-File		Exporteren als...
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Kon het bestand '%s' niet als SVG-document openen.\n\nFout: %s
-File	Icon-O-Matic-Menus		Bestand
-Gradient	Icon-O-Matic-StyleTypes		Gradiënt
-Gradient type	Icon-O-Matic-StyleTypes		Gradiënttype
-Height	Icon-O-Matic-PropertyNames		Hoogte
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Tijdens het laden heeft Icon-O-Matic mogelijk niet alle data van de SVG geïnterpreteerd. Door het originele bestand te overschrijven, zou deze informatie nu verloren zijn.
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Controlepunt invoegen
-Invert selection	Icon-O-Matic-Properties		Selectie omkeren
-Joins	Icon-O-Matic-PropertyNames		Hechtpunten
-Linear	Icon-O-Matic-StyleTypes		Lineair
-Max LOD	Icon-O-Matic-PropertyNames		Max. LOD
-Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Controlepunt aanpassen
-Move	Icon-O-Matic-TransformationBoxStates		Verplaatsen
-Move Path	Icon-O-Matic-MovePathsCmd		Pad verplaatsen
-Move Paths	Icon-O-Matic-MovePathsCmd		Paden verplaatsen
+Add	Icon-O-Matic-StylesList		Toevoegen
 Move Shape	Icon-O-Matic-MoveShapesCommand		Vorm verplaatsen
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Vormen verplaatsen
-Move Style	Icon-O-Matic-MoveStylesCmd		Vorm verplaatsen
-Multi Paste Properties	Icon-O-Matic-Properties		Eigenschappen van meervoudig plakken
-Multi paste	Icon-O-Matic-Properties		Meervoudig plakken
-Name	Icon-O-Matic-PropertyNames		Naam
-New	Icon-O-Matic-Menu-File		Nieuw
-None	Icon-O-Matic-Properties		Geen
-OK	Icon-O-Matic-ColorPicker		Oké
-OK	Icon-O-Matic-SVGImport		Oké
-Opacity	Icon-O-Matic-PropertyNames		Opaciteit
 Opening the document failed!	Icon-O-Matic-Main		Openen van het document is mislukt!
+Reset transformation	Icon-O-Matic-ShapesList		Transformatie opnieuw instellen
+Move Paths	Icon-O-Matic-MovePathsCmd		Paden verplaatsen
+None	Icon-O-Matic-Properties		Geen
+New	Icon-O-Matic-Menu-File		Nieuw
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Tijdens het laden heeft Icon-O-Matic mogelijk niet alle data van de SVG geïnterpreteerd. Door het originele bestand te overschrijven, zou deze informatie nu verloren zijn.
+Paste Properties	Icon-O-Matic-Properties		Plak-eigenschappen
+Save Icon	Dialog title		Icoon opslaan
+Remove Path	Icon-O-Matic-RemovePathsCmd		Pad verwijderen
+Add shape with path	Icon-O-Matic-Menu-Shape		Pad met vorm toevoegen
+Select	Icon-O-Matic-Properties		Selecteren
+Height	Icon-O-Matic-PropertyNames		Hoogte
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Transformers verwijderen
+Width	Icon-O-Matic-PropertyNames		Breedte
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformatie
+Duplicate	Icon-O-Matic-ShapesList		Dupliceren
+<unkown property>	Icon-O-Matic-PropertyNames		<onbekende eigenschap>
+Linear	Icon-O-Matic-StyleTypes		Lineair
+Assign Path	Icon-O-Matic-AddPathsCmd		Pad toekennen
+Move	Icon-O-Matic-TransformationBoxStates		Verplaatsen
+warning	Icon-O-Matic-SVGExport		waarschuwing
+Copy	Icon-O-Matic-Properties		Kopiëren
+OK	Icon-O-Matic-ColorPicker		Oké
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Controlepunt verwijderen
+Bleep!	Exporter - Continue in error dialog		Bliep!
+Add circle	Icon-O-Matic-PathsList		Cirkel toevoegen
+Shorten	Icon-O-Matic-PropertyNames		Afkorten
+bad news	Title of error alert		slecht nieuws
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Paden verwijderen
+Add Control Point	Icon-O-Matic-AddPointCmd		Controlepunt toevoegen
+Save as…	Icon-O-Matic-Menu-File		Opslaan als...
+Change Color	Icon-O-Matic-SetColorCmd		Kleur veranderen
+Style	Icon-O-Matic-Menus		Stijl
+<modify path>	Icon-O-Matic-PathCmd		<pad aanpassen>
 Opening the icon failed!	Icon-O-Matic-Main		Openen van het icoon is mislukt!
+Error: 	Icon-O-Matic-Main		Fout:
+Name	Icon-O-Matic-PropertyNames		Naam
+bad news	Icon-O-Matic-Exporter		slecht nieuws
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<niets om ongedaan te maken>
+Joins	Icon-O-Matic-PropertyNames		Hechtpunten
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Stijl verwijderen
+Set 	Set (property name)		Instellen
+Cancel	Icon-O-Matic-SVGExport		Annuleren
+Add shape with style	Icon-O-Matic-Menu-Shape		Vorm met stijl toevoegen
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Vorm verwijderen
+Multi Paste Properties	Icon-O-Matic-Properties		Eigenschappen van meervoudig plakken
+Undo	Icon-O-Matic-Main		Ongedaan maken
+Click on a shape above	Empty transformers list - 1st line		Klik op een vorm hierboven
+Add Shape	Icon-O-Matic-AddShapesCmd		Vorm toevoegen
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<niets om opnieuw te doen>
+Perspective	Transformation		Perspectief
+Opacity	Icon-O-Matic-PropertyNames		Opaciteit
+Add with path	Icon-O-Matic-ShapesList		Toevoegen met pad
+Gradient type	Icon-O-Matic-StyleTypes		Gradiënttype
+Cancel	Icon-O-Matic-Menu-Settings		Annuleren
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Controlepunt aanpassen
+Saving your document failed!	Icon-O-Matic-Exporter		Opslaan van uw document is mislukt!
+edit it's properties here.	Empty property list - 3rd line		pas hier diens eigenschappen aan.
+Split	Icon-O-Matic-PathManipulator		Splitsen
+Remove	Icon-O-Matic-StylesList		Verwijderen
+Add with path & style	Icon-O-Matic-ShapesList		Toevoegen met pad en stijl
+Rotate	Icon-O-Matic-TransformationBoxStates		Roteren
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Verwijder Omzetter
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Omzetter toevoegen
+Remove	Icon-O-Matic-PathsList		Verwijderen
+Pick a color	Icon-O-Matic-ColorPicker		Kleur kiezen
+Quit	Icon-O-Matic-Menu-File		Afsluiten
+Export	Icon-O-Matic-Menu-File		Exporteren
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Pad ontzeggen
+load error	Icon-O-Matic-SVGImport		laadfout
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Vormen verplaatsen
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stijlen verwijderen
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		De tekst die u wilt importeren is nogal lang, bent u zeker?
+Add	Icon-O-Matic-TransformersList		Toevoegen
+Export Icon	Dialog title		Icoon exporteren
+Color	Icon-O-Matic-StyleTypes		Kleur
+Settings…	Icon-O-Matic-SavePanel		Instellingen...
+Remove	Icon-O-Matic-PathManipulator		Verwijderen
+Radial	Icon-O-Matic-StyleTypes		Radiaal
+Perspective	Icon-O-Matic-TransformersList		Perspectief
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Vorm met pad & stijl toevoegen
+Gradient	Icon-O-Matic-StyleTypes		Gradiënt
+Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
+Invert selection	Icon-O-Matic-Properties		Selectie omkeren
+Export as…	Icon-O-Matic-Menu-File		Exporteren als...
+Transformation	Transformation		Transformatie
+Reset transformation	Icon-O-Matic-StylesList		Transformatie opnieuw instellen
+Max LOD	Icon-O-Matic-PropertyNames		Max. LOD
+Conic	Icon-O-Matic-StyleTypes		Kegelvormig
+Save	Icon-O-Matic-Menu-Settings		Opslaan
+Cancel	Icon-O-Matic-ColorPicker		Annuleren
+Paste	Icon-O-Matic-Properties		Plakken
+Shape	Icon-O-Matic-Menus		Vorm
+Properties	Icon-O-Matic-Menus		Eigenschappen
+Path	Icon-O-Matic-Menus		Pad
+File	Icon-O-Matic-Menus		Bestand
+Error: 	Icon-O-Matic-Exporter		Fout:
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Omzetters toevoegen
+Diamond	Icon-O-Matic-StyleTypes		Diamantvormig
+Path	Icon-O-Matic-PropertyNames		Pad
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Kon het bestand '%s' niet als SVG-document openen.\n\nFout: %s
+<unavailable>	Icon-O-Matic-StyleTypes		<onbeschikbaar>
+Rotation	Icon-O-Matic-PropertyNames		Rotatie
+Add with style	Icon-O-Matic-ShapesList		Toevoegen met stijl
+Add	Icon-O-Matic-PathsList		Toevoegen
+Add Shapes	Icon-O-Matic-AddShapesCmd		Vormen toevoegen
+Move Style	Icon-O-Matic-MoveStylesCmd		Vorm verplaatsen
+Bummer	Cancel button - error alert		Pech hebben
+Snap to grid	Icon-O-Matic-Menu-Settings		Naar rasterpunten
+Remove	Icon-O-Matic-ShapesList		Verwijderen
+Yes	Icon-O-Matic-StyledTextImport		Ja
+Transformation	Icon-O-Matic-TransformersList		Transformatie
+Add Styles	Icon-O-Matic-AddStylesCmd		Stijlen toevoegen
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Controlepunten verwijderen
+Add rect	Icon-O-Matic-PathsList		Rechthoek toevoegen
+Edit	Icon-O-Matic-Menus		Aanpassen
+Duplicate	Icon-O-Matic-StylesList		Dupliceren
+Caps	Icon-O-Matic-PropertyNames		Hoofdletters
+Transform	Icon-O-Matic-PathManipulator		Transformeren
+Add Paths	Icon-O-Matic-AddPathsCmd		Paden toevoegen
+Style type	Icon-O-Matic-StyleTypes		Stijltype
+too big	Icon-O-Matic-StyledTextImport		te groot
+Assign Style	Icon-O-Matic-AssignStyleCmd		Stijl toekennen
+Add Path	Icon-O-Matic-AddPathsCmd		Pad toevoegen
+Color	Icon-O-Matic-PropertyNames		Kleur
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Controlepunt invoegen
+Redo	Icon-O-Matic-Main		Opnieuw doen
+Assign Paths	Icon-O-Matic-AddPathsCmd		Paden toekennen
+OK	Icon-O-Matic-SVGImport		Oké
+Multi paste	Icon-O-Matic-Properties		Meervoudig plakken
+Reverse Path	Icon-O-Matic-ReversePathCmd		Pad omkeren
+Scale	Icon-O-Matic-TransformationBoxStates		Schaal veranderen
+Duplicate	Icon-O-Matic-PathsList		Dupliceren
+Save	Icon-O-Matic-Menu-File		Opslaan
+Append…	Icon-O-Matic-Menu-File		Toepassen...
+Move Path	Icon-O-Matic-MovePathsCmd		Pad verplaatsen
+Overwrite	Icon-O-Matic-SVGExport		Overschrijven
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Controlepunt splitsen
 Open…	Icon-O-Matic-Menu-File		Openen...
 Options	Icon-O-Matic-Menus		Opties
-Overwrite	Icon-O-Matic-SVGExport		Overschrijven
-Paste	Icon-O-Matic-Properties		Plakken
-Paste Properties	Icon-O-Matic-Properties		Plak-eigenschappen
-Path	Icon-O-Matic-Menus		Pad
-Path	Icon-O-Matic-PropertyNames		Pad
-Perspective	Icon-O-Matic-TransformersList		Perspectief
-Pick a color	Icon-O-Matic-ColorPicker		Kleur kiezen
-Properties	Icon-O-Matic-Menus		Eigenschappen
-Quit	Icon-O-Matic-Menu-File		Afsluiten
-Radial	Icon-O-Matic-StyleTypes		Radiaal
-Redo	Icon-O-Matic-Main		Opnieuw doen
-Remove	Icon-O-Matic-PathManipulator		Verwijderen
-Remove	Icon-O-Matic-PathsList		Verwijderen
-Remove	Icon-O-Matic-ShapesList		Verwijderen
-Remove	Icon-O-Matic-StylesList		Verwijderen
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Controlepunt verwijderen
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Controlepunten verwijderen
-Remove Path	Icon-O-Matic-RemovePathsCmd		Pad verwijderen
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Paden verwijderen
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Vorm verwijderen
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kleur (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradiënt aanpassen
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pad opruimen
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Vormen verwijderen
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Stijl verwijderen
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stijlen verwijderen
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Verwijder Omzetter
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Transformers verwijderen
-Reset transformation	Icon-O-Matic-ShapesList		Transformatie opnieuw instellen
-Reverse Path	Icon-O-Matic-ReversePathCmd		Pad omkeren
-Rotate	Icon-O-Matic-TransformationBoxStates		Roteren
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
-Rotation	Icon-O-Matic-PropertyNames		Rotatie
-Save	Icon-O-Matic-Menu-File		Opslaan
-Save Icon	Dialog title		Icoon opslaan
-Save as…	Icon-O-Matic-Menu-File		Opslaan als...
-Saving your document failed!	Icon-O-Matic-Exporter		Opslaan van uw document is mislukt!
-Scale	Icon-O-Matic-TransformationBoxStates		Schaal veranderen
-Select	Icon-O-Matic-Properties		Selecteren
-Select All	Icon-O-Matic-PathManipulator		Alles selecteren
-Set 	Set (property name)		Instellen
-Settings…	Icon-O-Matic-SavePanel		Instellingen...
-Shape	Icon-O-Matic-Menus		Vorm
-Shorten	Icon-O-Matic-PropertyNames		Afkorten
-Snap to grid	Icon-O-Matic-Menu-Settings		Naar rasterpunten
-Split	Icon-O-Matic-PathManipulator		Splitsen
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Controlepunt splitsen
-Style	Icon-O-Matic-Menus		Stijl
-Style type	Icon-O-Matic-StyleTypes		Stijltype
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		De tekst die u wilt importeren is nogal lang, bent u zeker?
-Transform	Icon-O-Matic-PathManipulator		Transformeren
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformatie
-Transformation	Icon-O-Matic-TransformersList		Transformatie
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Pad ontzeggen
-Undo	Icon-O-Matic-Main		Ongedaan maken
-Width	Icon-O-Matic-PropertyNames		Breedte
-Yes	Icon-O-Matic-StyledTextImport		Ja
-bad news	Icon-O-Matic-Exporter		slecht nieuws
-bad news	Title of error alert		slecht nieuws
-edit it's properties here.	Empty property list - 3rd line		pas hier diens eigenschappen aan.
-load error	Icon-O-Matic-SVGImport		laadfout
-too big	Icon-O-Matic-StyledTextImport		te groot
-warning	Icon-O-Matic-SVGExport		waarschuwing
+Clean up	Icon-O-Matic-PathsList		Opruimen
+Detect Orient.	Icon-O-Matic-PropertyNames		Oriëntatie opmerken.

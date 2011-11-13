@@ -1,17 +1,17 @@
-1	dutch	x-vnd.haiku.zip-o-matic	829498916
-%ld files added.	file:ZipOMaticWindow.cpp		%ld bestanden toegevoegd.
+1	dutch; flemish	x-vnd.haiku.zip-o-matic	829498916
 1 file added.	file:ZipOMaticWindow.cpp		1 bestand toegevoegd.
-Archive	file:ZipperThread.cpp		Archief
-Archive created OK	file:ZipOMaticWindow.cpp		Creatie van archief gelukt
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Bent u zeker dat u de creatie van dit archief wilt stoppen?
-Continue	file:ZipOMaticWindow.cpp		Doorgaan
+Stop	file:ZipOMaticWindow.cpp		Stop
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creëert archief: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Wilt u ze stoppen?
-Error creating archive	file:ZipOMaticWindow.cpp		Fout bij creatie van archief
+Continue	file:ZipOMaticWindow.cpp		Doorgaan
+Preparing to archive	file:ZipperThread.cpp		Archivering voorbereiden
 Filename: %s	file:ZipOMaticWindow.cpp		Bestandsnaam: %s
 Let them continue	file:ZipOMatic.cpp		Laat ze doorgaan
-Preparing to archive	file:ZipperThread.cpp		Archivering voorbereiden
-Stop	file:ZipOMaticWindow.cpp		Stop
-Stop them	file:ZipOMatic.cpp		Stoppen
+Do you want to stop them?	file:ZipOMatic.cpp		Wilt u ze stoppen?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Bent u zeker dat u de creatie van dit archief wilt stoppen?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld bestanden toegevoegd.
 Stopped	file:ZipOMaticWindow.cpp		Gestopt
+Archive	file:ZipperThread.cpp		Archief
+Error creating archive	file:ZipOMaticWindow.cpp		Fout bij creatie van archief
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Uw %ld Zip-O-Matic zijn actief.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Creatie van archief gelukt
+Stop them	file:ZipOMatic.cpp		Stoppen

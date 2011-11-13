@@ -1,11 +1,11 @@
-1	dutch	x-vnd.Haiku-Fonts	2475492793
-Bold font:	Font view		Vet lettertype:
-Defaults	Main window		Standaardwaarden
-Fixed font:	Font view		Niet-proportioneel lettertype:
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Menu-lettertype:
-OK	main		Oké
+1	dutch; flemish	x-vnd.Haiku-Fonts	2475492793
 Plain font:	Font view		Normaal lettertype:
+Defaults	Main window		Standaardwaarden
+OK	main		Oké
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Herstellen
 Size:	Font Selection view		Grootte:
+Menu font:	Font view		Menu-lettertype:
+Fixed font:	Font view		Niet-proportioneel lettertype:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa’s wijze lynx bezag vroom het fikse aquaduct
+Bold font:	Font view		Vet lettertype:

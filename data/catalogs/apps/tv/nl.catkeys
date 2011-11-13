@@ -1,25 +1,26 @@
-1	dutch	x-vnd.Haiku.TV	3398834257
-Always on top	MainWin		Altijd op de voorgrond
+1	dutch; flemish	x-vnd.Haiku.TV	2422560392
+TV	MainWin		TV
 Channel	MainWin		Kanaal
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting tv
-Debug	MainWin		Debuggen
-Error, connecting to interface failed:\n\n	MainWin		Fout, verbinden naar interface is mislukt:\n\n
-Error, interface is busy:\n\n	MainWin		Fout, interface is bezig:\n\n
-Full screen	MainWin		Volledig scherm
+Settings…	MainWin		Instellingen...
 Interface	MainWin		Interface
 Keep aspect ratio	MainWin		Beeldverhouding behouden
-Next channel	MainWin		Volgend kanaal
-No border	MainWin		Randloos
-No menu	MainWin		Geen menu
-None	MainWin		Geen
-OK	MainWin		Oké
 Previous channel	MainWin		Vorig kanaal
-Quit	MainWin		Sluiten
-Scale to native size	MainWin		Schalen tot oorspronkelijke grootte
 Settings	MainWin		Instellingen
-Settings…	MainWin		Instellingen...
-TV	MainWin		TV
-force 544 x 576, display aspect 4:3	MainWin		Forceer 544 x 576, beeldverhouding 4:3
-force 704 x 576, display aspect 4:3	MainWin		Forceer 704 x 576, beeldverhouding 4:3
-pixel aspect ratio	MainWin		pixelverhouding
+TV	System name		TV
+No border	MainWin		Randloos
+Always on top	MainWin		Altijd op de voorgrond
+OK	MainWin		Oké
+Quit	MainWin		Sluiten
+Full screen	MainWin		Volledig scherm
+Debug	MainWin		Debuggen
+Scale to native size	MainWin		Schalen tot oorspronkelijke grootte
 unknown	MainWin		onbekend
+Next channel	MainWin		Volgend kanaal
+Error, interface is busy:\n\n	MainWin		Fout, interface is bezig:\n\n
+None	MainWin		Geen
+force 704 x 576, display aspect 4:3	MainWin		Forceer 704 x 576, beeldverhouding 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting tv
+force 544 x 576, display aspect 4:3	MainWin		Forceer 544 x 576, beeldverhouding 4:3
+pixel aspect ratio	MainWin		pixelverhouding
+No menu	MainWin		Geen menu
+Error, connecting to interface failed:\n\n	MainWin		Fout, verbinden naar interface is mislukt:\n\n

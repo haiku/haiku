@@ -1,36 +1,36 @@
-1	dutch	x-vnd.Haiku-ActivityMonitor	1437495034
-Add graph	ActivityWindow		Voeg grafiek toe
-Additional items	ActivityView		Toegevoegde items
-Apps	DataSource		Toepassingen
-Block cache	DataSource		Blok-cache
-Block cache memory	DataSource		Geheugen blok-cache
-CPU	DataSource		CPU
-CPU usage	DataSource		CPU-gebruik
-CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
-Cache	DataSource		Cache
-Cached memory	DataSource		Geheugen in cache
-File	ActivityWindow		Bestand
-Hide legend	ActivityView		Verberg legenda
-Media nodes	DataSource		Media-eenheid
-Memory	DataSource		Geheugen
-Network receive	DataSource		Netwerk (ontvangst)
-Network send	DataSource		Netwerk (uitgaand)
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1437495034
 P-faults	DataSource		P-onderbrekingen
-Page faults	DataSource		Page-onderbrekingen
-Ports	DataSource		Poorten
-Quit	ActivityWindow		Afsluiten
+Media nodes	DataSource		Media-eenheid
+Threads	DataSource		Threads
+Add graph	ActivityWindow		Voeg grafiek toe
+Teams	DataSource		Teams
+Hide legend	ActivityView		Verberg legenda
+Network send	DataSource		Netwerk (uitgaand)
+CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
+CPU	DataSource		CPU
+Used memory	DataSource		Gebruikt geheugen
+Cached memory	DataSource		Geheugen in cache
+Apps	DataSource		Toepassingen
+Show legend	ActivityView		Toon legenda
+Settings	ActivityWindow		Instellingen
 Receiving	DataSource		Ontvangend
+Settings…	ActivityWindow		Instellingen...
+Ports	DataSource		Poorten
+Page faults	DataSource		Page-onderbrekingen
+Sending	DataSource		Versturend
+Cache	DataSource		Cache
+Update time interval:	SettingsWindow		Interval bijwerktijd:
+Quit	ActivityWindow		Afsluiten
+Block cache memory	DataSource		Geheugen blok-cache
 Remove graph	ActivityView		Verwijder grafiek
+CPU usage	DataSource		CPU-gebruik
+Sems	DataSource		Semaforen
 Running applications	DataSource		Lopende toepassingen
 Semaphores	DataSource		Semaforen
-Sems	DataSource		Semaforen
-Sending	DataSource		Versturend
-Settings	ActivityWindow		Instellingen
-Settings…	ActivityWindow		Instellingen...
-Show legend	ActivityView		Toon legenda
-Swap	DataSource		Swap
+Block cache	DataSource		Blok-cache
 Swap space	DataSource		Swap-ruimte
-Teams	DataSource		Teams
-Threads	DataSource		Threads
-Update time interval:	SettingsWindow		Interval bijwerktijd:
-Used memory	DataSource		Gebruikt geheugen
+Swap	DataSource		Swap
+File	ActivityWindow		Bestand
+Additional items	ActivityView		Toegevoegde items
+Network receive	DataSource		Netwerk (ontvangst)
+Memory	DataSource		Geheugen

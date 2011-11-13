@@ -1,33 +1,33 @@
-1	dutch	x-vnd.Haiku-ProcessController	2585863409
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Over ProcessController...
-Cancel	ProcessController		Annuleren
-Damned!	ProcessController		Verdomme!
-Debug this thread!	ProcessController		Deze thread debuggen!
-Debug thread	ProcessController		Thread debuggen
-Do you really want to kill the team \"%s\"?	ProcessController		Wilt u echt team \"%s\" afbreken?
-Error saving file	ProcessController		Fout bij bestandsopslag
-Gone teams…	ProcessController		Verdwenen teams...
-Install in Deskbar	ProcessController		Installeren in Deskbar
-Kill this thread!	ProcessController		Thread afbreken!
-Live in the Deskbar	ProcessController		Actief in Deskbar
+1	dutch; flemish	x-vnd.Haiku-ProcessController	2585863409
 Memory usage	ProcessController		Geheugengebruik
-New Terminal	ProcessController		Nieuwe Terminal
-OK	ProcessController		Oké
-Ok!	ProcessController		Oké!
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController is al in Deskbar geïnstalleerd.
-Processor %d	ProcessController		Processor %d
-Quit an application	ProcessController		Een toepassing afsluiten
-Quit application	ProcessController		Toepassing afsluiten
+Do you really want to kill the team \"%s\"?	ProcessController		Wilt u echt team \"%s\" afbreken?
 Restart Deskbar	ProcessController		Deskbar herstarten
-Restart Tracker	ProcessController		Tracker herstarten
-Run in window	ProcessController		Actief in venster
-That's no Fun!	ProcessController		Da's niet Leuk!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Dit is de laatste actieve processor...\nU kunt hem niet uitschakelen!
+Debug thread	ProcessController		Thread debuggen
 This team is already gone…	ProcessController		Dit team is al verdwenen...
+Error saving file	ProcessController		Fout bij bestandsopslag
 This thread is already gone…	ProcessController		Deze thread is al weg...
-Threads and CPU usage	ProcessController		Threads en CPU-gebruik
-Usage: %s [-deskbar]\n	ProcessController		Gebruik: %s [-deskbar]\n
+Cancel	ProcessController		Annuleren
+Run in window	ProcessController		Actief in venster
+Processor %d	ProcessController		Processor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController is al in Deskbar geïnstalleerd.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Dit is de laatste actieve processor...\nU kunt hem niet uitschakelen!
+Quit application	ProcessController		Toepassing afsluiten
 What do you want to do with the thread \"%s\"?	ProcessController		Wat wilt u met de thread doen?
+Gone teams…	ProcessController		Verdwenen teams...
+Restart Tracker	ProcessController		Tracker herstarten
+Live in the Deskbar	ProcessController		Actief in Deskbar
+Kill this thread!	ProcessController		Thread afbreken!
+Debug this thread!	ProcessController		Deze thread debuggen!
+New Terminal	ProcessController		Nieuwe Terminal
+About ProcessController…	ProcessController		Over ProcessController...
+Ok!	ProcessController		Oké!
+Quit an application	ProcessController		Een toepassing afsluiten
+Install in Deskbar	ProcessController		Installeren in Deskbar
+Threads and CPU usage	ProcessController		Threads en CPU-gebruik
+OK	ProcessController		Oké
+Damned!	ProcessController		Verdomme!
+Usage: %s [-deskbar]\n	ProcessController		Gebruik: %s [-deskbar]\n
 Yes, kill this team!	ProcessController		Ja, breek dit team af!
+That's no Fun!	ProcessController		Da's niet Leuk!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		U kunt ProcessController in een venster actief hebben, of in Deskbar installeren.

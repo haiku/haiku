@@ -1,23 +1,23 @@
-1	dutch	x-vnd.Haiku-Mouse	3904912604
-...by Andrew Edward McCall	MouseApplication		...door Andrew Edward McCall
-1-Button	SettingsView		1-Knops
+1	dutch; flemish	x-vnd.Haiku-Mouse	3904912604
+Mouse type:	SettingsView		Muistype:
+Warp	SettingsView		Verspringen
 2-Button	SettingsView		2-Knops
-3-Button	SettingsView		3-Knops
-Accept first click	SettingsView		Accepteer eerste klik
+Double-click test area	SettingsView		Dubbelklik-testgebied
+Revert	MouseWindow		Herstellen
+...by Andrew Edward McCall	MouseApplication		...door Andrew Edward McCall
+Mouse acceleration	SettingsView		Muisacceleratie
 Click to focus	SettingsView		Klik voor focus
 Click to focus and raise	SettingsView		Klik voor focus en voorgrond
-Defaults	MouseWindow		Standaardwaarden
-Dig Deal	MouseApplication		Zal best
-Double-click speed	SettingsView		Dubbelkliksnelheid
-Double-click test area	SettingsView		Dubbelklik-testgebied
-Fast	SettingsView		Snel
-Focus follows mouse	SettingsView		Focus volgt muis
+3-Button	SettingsView		3-Knops
+Mouse speed	SettingsView		Muissnelheid
 Focus mode:	SettingsView		Focuswijze:
 Instant warp	SettingsView		Direct verspringen
-Mouse acceleration	SettingsView		Muisacceleratie
-Mouse speed	SettingsView		Muissnelheid
-Mouse type:	SettingsView		Muistype:
+Dig Deal	MouseApplication		Zal best
+1-Button	SettingsView		1-Knops
+Double-click speed	SettingsView		Dubbelkliksnelheid
+Defaults	MouseWindow		Standaardwaarden
+Focus follows mouse	SettingsView		Focus volgt muis
+Accept first click	SettingsView		Accepteer eerste klik
+Fast	SettingsView		Snel
 Normal	SettingsView		Normaal
-Revert	MouseWindow		Herstellen
 Slow	SettingsView		Langzaam
-Warp	SettingsView		Verspringen

@@ -1,15 +1,13 @@
-1	dutch; flemish	x-vnd.haiku-screenshot	1721618877
+1	dutch; flemish	x-vnd.haiku-screenshot	731699482
 seconds	ScreenshotWindow		seconden
 Desktop	ScreenshotWindow		Bureaublad
 Include window border	ScreenshotWindow		Vensterrand insluiten
-Screenshot	System name		
 Select	ScreenshotWindow		Selecteren
 Capture active window	ScreenshotWindow		Leg het actieve venster vast
 Cancel	ScreenshotWindow		Annuleren
 Name:	ScreenshotWindow		Naam:
 Choose folder	ScreenshotWindow		Kies map
 Save	ScreenshotWindow		Opslaan
-Overwrite	ScreenshotWindow		
 Choose folder...	ScreenshotWindow		Kies map...
 Please select	ScreenshotWindow		Kies alstublieft
 Save as:	ScreenshotWindow		Opslaan als:

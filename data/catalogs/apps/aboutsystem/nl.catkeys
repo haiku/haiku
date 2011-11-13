@@ -1,35 +1,35 @@
-1	dutch	x-vnd.Haiku-About	2917609991
-%.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB totaal
-%d MiB used (%d%%)	AboutView		%d MiB gebruikt (%d%%)
-%ld MHz	AboutView		%ld MHz
+1	dutch; flemish	x-vnd.Haiku-About	2917609991
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (en zijn NewOS kernel)\n
 %ld Processors:	AboutView		%ld Processors:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totaal, %ontoegankelijk MiB ontoegankelijk 
-... and the many people making donations!\n\n	AboutView		... en de vele mensen die doneerden!\n\n
-About this system	AboutWindow		Over dit systeem
-Contributors:\n	AboutView		Bijdragers:\n
-Current maintainers:\n	AboutView		Huidige handhavers:\n
-GCC %d Hybrid	AboutView		GCC %d Hybride
-Google & their Google Summer of Code program\n	AboutView		Google & hun 'Google Summer of Code' programma\n
-Kernel:	AboutView		Kernel:
-License: 	AboutView		Licentie: 
-Licenses: 	AboutView		Licenties: 
-Memory:	AboutView		Geheugen:
+%d MiB total	AboutView		%d MiB totaal
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projectstichter)\n\n
-Past maintainers:\n	AboutView		Gewezen handhavers:\n
-Processor:	AboutView		Processor:
+The Haiku-Ports team\n	AboutView		Het Haiku-Ports-team\n
+%d MiB used (%d%%)	AboutView		%d MiB gebruikt (%d%%)
+Website, marketing & documentation:\n	AboutView		Website, marketing & documentatie:\n
 Revision	AboutView		Revisie
 Source Code: 	AboutView		Broncode: 
-The BeGeistert team\n	AboutView		Het BeGeistert-team\n
-The Haiku-Ports team\n	AboutView		Het Haiku-Ports-team\n
-The Haikuware team and their bounty program\n	AboutView		Het Haikuware-team en hun bountyprogramma\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		De Universiteit van Auckland en Christof Lutteroth\n\n
-Time running:	AboutView		Looptijd:
-Translations:\n	AboutView		Vertalingen:\n
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (en zijn NewOS kernel)\n
+Processor:	AboutView		Processor:
+Kernel:	AboutView		Kernel:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totaal, %ontoegankelijk MiB ontoegankelijk 
+Contributors:\n	AboutView		Bijdragers:\n
 Unknown	AboutView		Onbekend
-Version:	AboutView		Versie:
-Website, marketing & documentation:\n	AboutView		Website, marketing & documentatie:\n
-[Click a license name to read the respective license.]\n\n	AboutView		[Klik op een licentienaam om de bijbehorende licentie te lezen.]\n\n
-\nCopyrights\n\n	AboutView		\nCopyrights\n\n
+... and the many people making donations!\n\n	AboutView		... en de vele mensen die doneerden!\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Geheugen:
+Past maintainers:\n	AboutView		Gewezen handhavers:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nBijzondere dank aan:\n
+Licenses: 	AboutView		Licenties: 
+Google & their Google Summer of Code program\n	AboutView		Google & hun 'Google Summer of Code' programma\n
+\nCopyrights\n\n	AboutView		\nCopyrights\n\n
+Current maintainers:\n	AboutView		Huidige handhavers:\n
+Time running:	AboutView		Looptijd:
+The Haikuware team and their bounty program\n	AboutView		Het Haikuware-team en hun bountyprogramma\n
+About this system	AboutWindow		Over dit systeem
+Version:	AboutView		Versie:
+The BeGeistert team\n	AboutView		Het BeGeistert-team\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		De Universiteit van Auckland en Christof Lutteroth\n\n
+%ld MHz	AboutView		%ld MHz
+[Click a license name to read the respective license.]\n\n	AboutView		[Klik op een licentienaam om de bijbehorende licentie te lezen.]\n\n
+License: 	AboutView		Licentie: 
+GCC %d Hybrid	AboutView		GCC %d Hybride
+Translations:\n	AboutView		Vertalingen:\n

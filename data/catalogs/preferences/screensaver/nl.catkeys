@@ -1,22 +1,22 @@
-1	dutch	x-vnd.Haiku-ScreenSaver	799085334
-30 seconds	ScreenSaver		30 seconden
-Add…	ScreenSaver		Toevoegen...
-Blackness	ScreenSaver		Blackness
-Cancel	ScreenSaver		Annuleren
-Confirm password:	ScreenSaver		Bevestig paswoord:
+1	dutch; flemish	x-vnd.Haiku-ScreenSaver	799085334
 Could not load screen saver	ScreenSaver		Kon screensaver niet laden
-Don't fade when	ScreenSaver		Niet wegvagen zodra
-Done	ScreenSaver		Klaar
-Fade now when	ScreenSaver		Wegvagen zodra
-No options available	ScreenSaver		Geen opties aanwezig
-OK	ScreenSaver		Oké
-Password Window	ScreenSaver		Paspoortvenster
-Password lock	ScreenSaver		Paswoordslot
-Password:	ScreenSaver		Paswoord:
-Passwords don't match. Please try again.	ScreenSaver		Paswoorden komen niet overeen. Probeer het nogmaals, alstublieft.
+30 seconds	ScreenSaver		30 seconden
 Password…	ScreenSaver		Paswoord...
-Test	ScreenSaver		Test
-Turn off screen	ScreenSaver		Scherm uit
-Use custom password	ScreenSaver		Gebruik gelegenheids-paswoord
-Use network password	ScreenSaver		Gebruik netwerkpaswoord
+Password:	ScreenSaver		Paswoord:
+Password lock	ScreenSaver		Paswoordslot
+Add…	ScreenSaver		Toevoegen...
 mouse is here	ScreenSaver		muis hier is
+Test	ScreenSaver		Test
+Cancel	ScreenSaver		Annuleren
+Turn off screen	ScreenSaver		Scherm uit
+No options available	ScreenSaver		Geen opties aanwezig
+Password Window	ScreenSaver		Paspoortvenster
+Fade now when	ScreenSaver		Wegvagen zodra
+Passwords don't match. Please try again.	ScreenSaver		Paswoorden komen niet overeen. Probeer het nogmaals, alstublieft.
+OK	ScreenSaver		Oké
+Don't fade when	ScreenSaver		Niet wegvagen zodra
+Blackness	ScreenSaver		Blackness
+Use custom password	ScreenSaver		Gebruik gelegenheids-paswoord
+Done	ScreenSaver		Klaar
+Confirm password:	ScreenSaver		Bevestig paswoord:
+Use network password	ScreenSaver		Gebruik netwerkpaswoord

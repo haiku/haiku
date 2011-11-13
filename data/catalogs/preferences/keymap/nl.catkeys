@@ -1,21 +1,21 @@
-1	dutch	x-vnd.Haiku-Keymap	3858687220
-(Current)	Keymap window		(Huidig)
-Acute trigger	Keymap window		Accent aigu-activeerder
+1	dutch; flemish	x-vnd.Haiku-Keymap	3858687220
+Tilde trigger	Keymap window		Tilde-activeerder
+Grave trigger	Keymap window		Accent grave-activeerder
+Select dead keys	Keymap window		Selecteer dode toetsen
+Quit	Keymap window		Afsluiten
+Switch shortcut keys to Haiku mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Haiku-modus
 Circumflex trigger	Keymap window		Circumflex-activeerder
 Diaeresis trigger	Keymap window		Trema-activeerder
-File	Keymap window		Bestand
-Font	Keymap window		Lettertype
-Grave trigger	Keymap window		Accent grave-activeerder
-Layout	Keymap window		Lay-out
 Open…	Keymap window		Openen...
-Quit	Keymap window		Afsluiten
-Revert	Keymap window		Herstellen
-Sample and clipboard:	Keymap window		Voorbeeld en klembord:
-Save as…	Keymap window		Opslaan als...
-Select dead keys	Keymap window		Selecteer dode toetsen
-Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
-Switch shortcut keys to Haiku mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Haiku-modus
-Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
 System:	Keymap window		Systeem:
-Tilde trigger	Keymap window		Tilde-activeerder
+Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
 User:	Keymap window		Gebruiker:
+Sample and clipboard:	Keymap window		Voorbeeld en klembord:
+Layout	Keymap window		Lay-out
+Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
+Revert	Keymap window		Herstellen
+Save as…	Keymap window		Opslaan als...
+File	Keymap window		Bestand
+(Current)	Keymap window		(Huidig)
+Font	Keymap window		Lettertype
+Acute trigger	Keymap window		Accent aigu-activeerder

@@ -1,128 +1,127 @@
-1	dutch	x-vnd.Haiku-DiskProbe	3357434700
-%ld (native)	ProbeView		%ld (native)
-(native)	ProbeView		(native)
-15 bit	TypeEditors		15-bit
-16 bit	TypeEditors		16-bit
-16 bit signed value:	TypeEditors		16-bit-signed-waarde:
-16 bit unsigned value:	TypeEditors		16-bit-unsigned-waarde:
-32 bit	TypeEditors		32-bit
-32 bit signed value:	TypeEditors		32-bit-signed-waarde
-32 bit size or status:	TypeEditors		32-bit-grootte of -status:
-32 bit unsigned pointer:	TypeEditors		32-bit-unsigned-pointer:
-32 bit unsigned size:	TypeEditors		32-bit-unsigned-grootte
-32 bit unsigned value:	TypeEditors		32-bit-unsigned-waarde
-64 bit signed offset:	TypeEditors		64-bit-signed-offset:
-64 bit signed value:	TypeEditors		64-bit-signed-waarde:
-64 bit unsigned value:	TypeEditors		64-bit-unsigned-waarde:
-8 bit palette	TypeEditors		8-bit-palet
-8 bit signed value:	TypeEditors		8-bit-signed-waarde:
-8 bit unsigned value:	TypeEditors		8-bit-unsigned-waarde:
-Add	ProbeView		Toevoegen
-Attribute	AttributeWindow		Eigenschap
-Attribute	ProbeView		Eigenschap
-Attribute offset: 	ProbeView		Eigenschap-offset:
-Attribute type: 	ProbeView		Eigenschap-type:
-Attribute: 	ProbeView		Eigenschap:
-Attributes	ProbeView		Eigenschappen
-Back	ProbeView		Terug
-Block	ProbeView		Blokkeren
-Block %Ld (0x%Lx)	ProbeView		Blokkeer %Ld (0x%Lx)
-Block 0x%Lx	ProbeView		Block 0x%Lx
-Block: 	ProbeView		Blokkeer:
-Bookmarks	ProbeView		Bladwijzers
-Boolean	TypeEditors	This is the type of editor	Boolean
-Boolean editor	TypeEditors		Boolean-editor
-Boolean value:	TypeEditors		Boolean-waarde:
-Cancel	AttributeWindow		Annuleren
-Cancel	OpenWindow		Annuleren
-Cancel	ProbeView		Annuleren
-Case sensitive	FindWindow		Hoofdlettergevoelig
-Close	AttributeWindow		Sluiten
-Close	FileWindow		Sluiten
-Close	ProbeView		Sluiten
-Contents:	TypeEditors		Inhoud:
-Copy	ProbeView		Kopiëren
-Could not find search string.	ProbeView		Kon zoekopdracht niet vinden
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kon \"%s\" niet openen:\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Kon bestand  \"%s\" niet openen: %s\n
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kon afbeelding niet lezen
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimaal
-Device	ProbeView		Apparaat
-Device offset: 	ProbeView		Apparaat-offset:
-Device: 	ProbeView		Apparaat:
-DiskProbe request	AttributeWindow		DiskProbe-aanvraag
-DiskProbe request	DiskProbe		DiskProbe-aanvraag
-DiskProbe request	ProbeView		DiskProbe-aanvraag
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Weet u zeker dat u de eigenschap \"%s\" van het bestand \"%s\" wilt verwijderen?\n\nU kunt dit niet ongedaan maken.
-Don't save	ProbeView		Niet opslaan
-Double precision floating-point value:	TypeEditors		Dubbele precisie zwevendekomma-getal
-Edit	ProbeView		Bewerken
-Examine device:	OpenWindow		Onderzoek apparaat:
-File	FileWindow		Bestand
-File	ProbeView		Bestand
+1	dutch; flemish	x-vnd.Haiku-DiskProbe	2622062166
 File offset: 	ProbeView		Bestand-offset:
-File: 	ProbeView		Bestand:
-Find	FindWindow		Zoeken
+%ld (native)	ProbeView		%ld (native)
+64 bit unsigned value:	TypeEditors		64-bit-unsigned-waarde:
 Find again	ProbeView		Nogmaals zoeken
-Find…	ProbeView		Zoek...
-Fit	ProbeView	Size of fonts, fits to available room	Aanpassen
-Flattened bitmap	TypeEditors		Afgeplatte bitmap
-Floating-point value:	TypeEditors		Zwevendekomma-waarde
-Font size	ProbeView		Tekengrootte
-Grayscale	TypeEditors		Grijstinten
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimaal
-Icon	TypeEditors		Icoon
-Icon view	TypeEditors		Icoonweergave
-Image	TypeEditors	This is the type of view	Afbeelding
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Afbeelding-beeld
-MIME type editor	TypeEditors		MIME-typebewerker
-MIME type:	TypeEditors		MIME type:
-Message	TypeEditors	This is the type of view	Bericht
-Message View	TypeEditors		Berichten-beeld
-Mode:	FindWindow		Modus:
-Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
-Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
-New…	FileWindow		Nieuw...
-Next	ProbeView		Volgende
-No type editor available	AttributeWindow		Geen type-editor beschikbaar
-Number	TypeEditors	This is the type of editor	Getal
-Number editor	TypeEditors		Getal-editor
-Number:	TypeEditors		Getal:
-OK	DiskProbe		Oké
-OK	ProbeView		OK
-Offset: 	ProbeView		Offset:
-Open device	FileWindow		Apparaat openen
-Open file…	FileWindow		Bestand openen...
-PNG format	TypeEditors		PNG-formaat
-Page setup…	ProbeView		Pagina-instellingen...
-Paste	ProbeView		Plakken
-Previous	ProbeView		Vorige
-Print…	ProbeView		Afdrukken...
-Probe device	OpenWindow		Apparaat afzoeken
-Probe file…	OpenWindow		Onderzoek bestand...
-Quit	FileWindow		Afsluiten
-Raw editor	AttributeWindow		Onbewerkt-editor
-Redo	ProbeView		Opnieuw uitvoeren
-Remove	AttributeWindow		Verwijderen
-Remove from file	AttributeWindow		Uit bestand verwijderen
-Save	ProbeView		Opslaan
-Save changes before closing?	ProbeView		Wijzigingen opslaan voordat u afsluit?
-Select all	ProbeView		Alles selecteren
-Selection	ProbeView		Selectie
-Stop	ProbeView		Stop
-String editor	TypeEditors		Woord-editor
-Swapped: %Ld (0x%0*Lx)	ProbeView		Verwisseld: %Ld (0x%0*Lx)
-Swapped: 0x%0*Lx	ProbeView		Verwisseld: 0x%0*Lx
 Text	FindWindow		Tekst
-Text	TypeEditors	This is the type of editor	Tekst
-Type editor	AttributeWindow		Type-editor
-Type editor	ProbeView		Type-editor
-Type editor not supported	ProbeView		Typebewerker niet ondersteund
-Undo	ProbeView		Ongedaan maken
-Unknown format	TypeEditors		Onbekend formaat
-Unknown type	TypeEditors		Onbekend type
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Schrijven naar bestand mislukt:\n%s\n\nAlle veranderingen gaan verloren als u afsluit.
-none	ProbeView	No attributes	geen
-of 	ProbeView		van 
+Find…	ProbeView		Zoek...
+Case sensitive	FindWindow		Hoofdlettergevoelig
+Cancel	OpenWindow		Annuleren
+Close	AttributeWindow		Sluiten
+File	ProbeView		Bestand
+Attribute	ProbeView		Eigenschap
+Floating-point value:	TypeEditors		Zwevendekomma-waarde
+16 bit	TypeEditors		16-bit
+Attributes	ProbeView		Eigenschappen
+Device offset: 	ProbeView		Apparaat-offset:
+Selection	ProbeView		Selectie
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	wat voor: '%.4s'\n\n
+File	FileWindow		Bestand
+OK	DiskProbe		Oké
+Boolean	TypeEditors	This is the type of editor	Boolean
+Paste	ProbeView		Plakken
+PNG format	TypeEditors		PNG-formaat
+Font size	ProbeView		Tekengrootte
+Attribute type: 	ProbeView		Eigenschap-type:
+Attribute	AttributeWindow		Eigenschap
+8 bit signed value:	TypeEditors		8-bit-signed-waarde:
+Number:	TypeEditors		Getal:
+Save	ProbeView		Opslaan
+Stop	ProbeView		Stop
+Number editor	TypeEditors		Getal-editor
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+No type editor available	AttributeWindow		Geen type-editor beschikbaar
+Double precision floating-point value:	TypeEditors		Dubbele precisie zwevendekomma-getal
+Device: 	ProbeView		Apparaat:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Weet u zeker dat u de eigenschap \"%s\" van het bestand \"%s\" wilt verwijderen?\n\nU kunt dit niet ongedaan maken.
+Text	TypeEditors	This is the type of editor	Tekst
+8 bit unsigned value:	TypeEditors		8-bit-unsigned-waarde:
+Block	ProbeView		Blokkeren
+Back	ProbeView		Terug
+Device	ProbeView		Apparaat
+Unknown type	TypeEditors		Onbekend type
+Block 0x%Lx	ProbeView		Block 0x%Lx
+Quit	FileWindow		Afsluiten
+Undo	ProbeView		Ongedaan maken
+Close	ProbeView		Sluiten
+Number	TypeEditors	This is the type of editor	Getal
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimaal
+16 bit signed value:	TypeEditors		16-bit-signed-waarde:
+String editor	TypeEditors		Woord-editor
+64 bit signed offset:	TypeEditors		64-bit-signed-offset:
+Boolean editor	TypeEditors		Boolean-editor
+Copy	ProbeView		Kopiëren
+none	ProbeView	No attributes	geen
+Boolean value:	TypeEditors		Boolean-waarde:
+32 bit size or status:	TypeEditors		32-bit-grootte of -status:
+8 bit palette	TypeEditors		8-bit-palet
+Fit	ProbeView	Size of fonts, fits to available room	Aanpassen
+Probe device	OpenWindow		Apparaat afzoeken
+Unknown format	TypeEditors		Onbekend formaat
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimaal
+MIME type:	TypeEditors		MIME type:
+Page setup…	ProbeView		Pagina-instellingen...
+New…	FileWindow		Nieuw...
+DiskProbe request	AttributeWindow		DiskProbe-aanvraag
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kon afbeelding niet lezen
+Save changes before closing?	ProbeView		Wijzigingen opslaan voordat u afsluit?
+Type editor	AttributeWindow		Type-editor
+Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
+Raw editor	AttributeWindow		Onbewerkt-editor
+Message View	TypeEditors		Berichten-beeld
+DiskProbe request	ProbeView		DiskProbe-aanvraag
+32 bit unsigned size:	TypeEditors		32-bit-unsigned-grootte
+Flattened bitmap	TypeEditors		Afgeplatte bitmap
+Open file…	FileWindow		Bestand openen...
+Next	ProbeView		Volgende
+Close	FileWindow		Sluiten
+Attribute: 	ProbeView		Eigenschap:
+Remove from file	AttributeWindow		Uit bestand verwijderen
+Don't save	ProbeView		Niet opslaan
+Previous	ProbeView		Vorige
+64 bit signed value:	TypeEditors		64-bit-signed-waarde:
+Icon	TypeEditors		Icoon
+Block: 	ProbeView		Blokkeer:
+Examine device:	OpenWindow		Onderzoek apparaat:
+Offset: 	ProbeView		Offset:
+OK	ProbeView		OK
+Add	ProbeView		Toevoegen
+Edit	ProbeView		Bewerken
+Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32-bit-unsigned-waarde
+Message	TypeEditors	This is the type of view	Bericht
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kon \"%s\" niet openen:\n%s
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Afbeelding-beeld
+Cancel	AttributeWindow		Annuleren
+Type editor not supported	ProbeView		Typebewerker niet ondersteund
+MIME type editor	TypeEditors		MIME-typebewerker
+Swapped: %Ld (0x%0*Lx)	ProbeView		Verwisseld: %Ld (0x%0*Lx)
+Find	FindWindow		Zoeken
+Remove	AttributeWindow		Verwijderen
+Print…	ProbeView		Afdrukken...
+Block %Ld (0x%Lx)	ProbeView		Blokkeer %Ld (0x%Lx)
+Image	TypeEditors	This is the type of view	Afbeelding
+Could not open file \"%s\": %s\n	DiskProbe		Kon bestand  \"%s\" niet openen: %s\n
+Select all	ProbeView		Alles selecteren
+Probe file…	OpenWindow		Onderzoek bestand...
+Icon view	TypeEditors		Icoonweergave
+Bookmarks	ProbeView		Bladwijzers
+Mode:	FindWindow		Modus:
+15 bit	TypeEditors		15-bit
+Open device	FileWindow		Apparaat openen
+Could not find search string.	ProbeView		Kon zoekopdracht niet vinden
+16 bit unsigned value:	TypeEditors		16-bit-unsigned-waarde:
+Attribute offset: 	ProbeView		Eigenschap-offset:
+Redo	ProbeView		Opnieuw uitvoeren
+File: 	ProbeView		Bestand:
+32 bit unsigned pointer:	TypeEditors		32-bit-unsigned-pointer:
+of 	ProbeView		van 
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Schrijven naar bestand mislukt:\n%s\n\nAlle veranderingen gaan verloren als u afsluit.
+32 bit	TypeEditors		32-bit
+Cancel	ProbeView		Annuleren
+Swapped: 0x%0*Lx	ProbeView		Verwisseld: 0x%0*Lx
+Grayscale	TypeEditors		Grijstinten
+32 bit signed value:	TypeEditors		32-bit-signed-waarde
+DiskProbe request	DiskProbe		DiskProbe-aanvraag
+Type editor	ProbeView		Type-editor
+Contents:	TypeEditors		Inhoud:

@@ -1,12 +1,12 @@
-1	dutch	x-vnd.Haiku-Time	2504086546
-<Other>	Time		<Anders>
-Current time:	Time		Huidige tijd:
-Etc	Time		Etc.
+1	dutch; flemish	x-vnd.Haiku-Time	45909004
 OK	Time		Oké
+\nNow: 	Time		\nNu:
 Preview time:	Time		Voorvertoning tijd:
+about	Time		over
 Set time zone	Time		Tijdzone instellen
 Time	Time		Tijd
+Time	System name		Tijd
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, door:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+<Other>	Time		<Anders>
+Current time:	Time		Huidige tijd:
 Time zone	Time		Tijdzone
-\nNow: 	Time		\nNu:
-about	Time		over

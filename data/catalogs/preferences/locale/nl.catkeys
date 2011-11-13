@@ -1,25 +1,26 @@
-1	dutch	x-vnd.Haiku-Locale	2295953467
-12 hour	TimeFormatSettings		12-uurs
-24 hour	TimeFormatSettings		24-uurs
+1	dutch; flemish	x-vnd.Haiku-Locale	3534121428
 Available languages	Locale Preflet Window		Beschikbare talen
-Currency	TimeFormatSettings		Valuta
-Date	TimeFormatSettings		Datum
-Defaults	Locale Preflet Window		Standaardwaarden
-Formatting	Locale Preflet Window		Opmaak
-Full format:	TimeFormatSettings		Volledig formaat:
-Language	Locale Preflet Window		Taal
-Locale	Locale Preflet		Locale
-Locale	Locale Preflet Window		Lokaal
-Long format:	TimeFormatSettings		Lange notatie:
-Medium format:	TimeFormatSettings		Medium-formaat:
 Negative:	TimeFormatSettings		Negatief:
-Numbers	TimeFormatSettings		Nummers
-OK	Locale Preflet Window		Oké
-Positive:	TimeFormatSettings		Positief:
-Preferred languages	Locale Preflet Window		Voorkeurstalen
-Revert	Locale Preflet Window		Herstellen
-Short format:	TimeFormatSettings		Korte notatie:
-Time	TimeFormatSettings		Tijd
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Beschikbare talen werden niet gevonden. U kunt deze preflet niet gebruiken.
-Use month/day-names from preferred language	TimeFormatSettings		Gebruik maand/dag-namen van de verkozen taal
 already chosen	LanguageListView		al gekozen
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Beschikbare talen werden niet gevonden. U kunt deze preflet niet gebruiken.
+Long format:	TimeFormatSettings		Lange notatie:
+Currency	TimeFormatSettings		Valuta
+Locale	System name		Lokaal
+Short format:	TimeFormatSettings		Korte notatie:
+Language	Locale Preflet Window		Taal
+Preferred languages	Locale Preflet Window		Voorkeurstalen
+Use month/day-names from preferred language	TimeFormatSettings		Gebruik maand/dag-namen van de verkozen taal
+Formatting	Locale Preflet Window		Opmaak
+Locale	Locale Preflet Window		Lokaal
+Numbers	TimeFormatSettings		Nummers
+24 hour	TimeFormatSettings		24-uurs
+OK	Locale Preflet Window		Oké
+Full format:	TimeFormatSettings		Volledig formaat:
+Defaults	Locale Preflet Window		Standaardwaarden
+Revert	Locale Preflet Window		Herstellen
+Medium format:	TimeFormatSettings		Medium-formaat:
+12 hour	TimeFormatSettings		12-uurs
+Time	TimeFormatSettings		Tijd
+Date	TimeFormatSettings		Datum
+Positive:	TimeFormatSettings		Positief:
+Locale	Locale Preflet		Locale
