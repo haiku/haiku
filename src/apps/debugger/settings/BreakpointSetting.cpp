@@ -102,6 +102,8 @@ BreakpointSetting::WriteTo(BMessage& archive) const
 	if (fFunctionID == NULL)
 		return B_BAD_VALUE;
 
+	archive.MakeEmpty();
+
 	status_t error;
 	if ((error = ArchivingUtils::ArchiveChild(fFunctionID, archive, "function"))
 			!= B_OK
