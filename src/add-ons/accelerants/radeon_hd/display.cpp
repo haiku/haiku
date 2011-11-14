@@ -151,8 +151,8 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->viewportStart = AVIVO_D1MODE_VIEWPORT_START + offset;
 		regs->viewportSize = AVIVO_D1MODE_VIEWPORT_SIZE + offset;
 
-	} else if (info.chipsetID >= RADEON_R600) {
-		// R600 series+
+	} else if (info.chipsetID >= RADEON_RS600) {
+		// Avivo+
 		uint32 offset = 0;
 
 		switch(crtcID) {
@@ -302,7 +302,6 @@ detect_connectors_legacy()
 			continue;
 		}
 
-
 		// TODO: give tv unique connector ids
 
 		// Always set CRT1 and CRT2 as VGA, some cards incorrectly set
@@ -312,17 +311,18 @@ detect_connectors_legacy()
 
 		uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
 		uint32 encoderObject = encoder_object_lookup((1 << i), dac);
+		uint32 encoderID = (encoderObject & OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
 		gConnector[connectorIndex]->valid = true;
 		gConnector[connectorIndex]->encoder.flags = (1 << i);
 		gConnector[connectorIndex]->encoder.valid = true;
-		gConnector[connectorIndex]->encoder.objectID
-			= (encoderObject & OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+		gConnector[connectorIndex]->encoder.objectID = encoderID;
+		gConnector[connectorIndex]->encoder.type
+			= encoder_type_lookup(encoderID, (1 << i));
+		gConnector[connectorIndex]->encoder.isExternal
+			= encoder_isexternal(encoderID);
 
 		radeon_gpu_i2c_attach(connectorIndex, ci.sucI2cId.ucAccess);
-
-		//gConnector[connectorIndex]->encoder.isExternal
-		//	= encoderExternal;
 
 		pll_limit_probe(&gConnector[connectorIndex]->encoder.pll);
 
@@ -491,80 +491,18 @@ detect_connectors()
 								record = (ATOM_COMMON_RECORD_HEADER *)
 									((char *)record + record->ucRecordSize);
 							}
+
 							uint32 encoderID = (encoder_obj & OBJECT_ID_MASK)
 								>> OBJECT_ID_SHIFT;
 
-							uint32 encoderType = VIDEO_ENCODER_NONE;
-							bool encoderExternal = false;
-
-							switch(encoderID) {
-								case ENCODER_OBJECT_ID_INTERNAL_LVDS:
-								case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
-								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
-								case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-									if ((connectorFlags
-										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
-										encoderType = VIDEO_ENCODER_LVDS;
-										// radeon_atombios_get_lvds_info
-									} else {
-										encoderType = VIDEO_ENCODER_TMDS;
-										// radeon_atombios_set_dig_info
-									}
-									break;
-								case ENCODER_OBJECT_ID_INTERNAL_DAC1:
-									encoderType = VIDEO_ENCODER_DAC;
-									break;
-								case ENCODER_OBJECT_ID_INTERNAL_DAC2:
-								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-									encoderType = VIDEO_ENCODER_TVDAC;
-									break;
-								case ENCODER_OBJECT_ID_INTERNAL_DVO1:
-								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
-								case ENCODER_OBJECT_ID_INTERNAL_DDI:
-								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
-								case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
-								case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
-									if ((connectorFlags
-										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
-										encoderType = VIDEO_ENCODER_LVDS;
-									} else if ((connectorFlags
-										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
-										encoderType = VIDEO_ENCODER_DAC;
-									} else {
-										encoderType = VIDEO_ENCODER_TMDS;
-									}
-									// drm_encoder_helper_add
-									break;
-								case ENCODER_OBJECT_ID_SI170B:
-								case ENCODER_OBJECT_ID_CH7303:
-								case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
-								case ENCODER_OBJECT_ID_EXTERNAL_SDVOB:
-								case ENCODER_OBJECT_ID_TITFP513:
-								case ENCODER_OBJECT_ID_VT1623:
-								case ENCODER_OBJECT_ID_HDMI_SI1930:
-								case ENCODER_OBJECT_ID_TRAVIS:
-								case ENCODER_OBJECT_ID_NUTMEG:
-									encoderExternal = true;
-									if ((connectorFlags
-										& ATOM_DEVICE_LCD_SUPPORT) != 0) {
-										encoderType = VIDEO_ENCODER_LVDS;
-									} else if ((connectorFlags
-										& ATOM_DEVICE_CRT_SUPPORT) != 0) {
-										encoderType = VIDEO_ENCODER_DAC;
-									} else {
-										encoderType = VIDEO_ENCODER_TMDS;
-									}
-									// drm_encoder_helper_add
-									break;
-							}
+							uint32 encoderType = encoder_type_lookup(encoderID,
+								connectorFlags);
 
 							if (encoderType == VIDEO_ENCODER_NONE) {
 								ERROR("%s: Path #%" B_PRId32 ":"
 									"skipping unknown encoder.\n",
 									__func__, i);
-									continue;
+								continue;
 							}
 
 							// Set up encoder on connector if valid
@@ -572,16 +510,16 @@ detect_connectors()
 								"%s\n", __func__, i,
 								get_encoder_name(encoderType));
 
-							gConnector[connectorIndex]->encoder.flags
-								= connectorFlags;
 							gConnector[connectorIndex]->encoder.valid
 								= true;
+							gConnector[connectorIndex]->encoder.flags
+								= connectorFlags;
 							gConnector[connectorIndex]->encoder.objectID
 								= encoderID;
 							gConnector[connectorIndex]->encoder.type
 								= encoderType;
 							gConnector[connectorIndex]->encoder.isExternal
-								= encoderExternal;
+								= encoder_isexternal(encoderID);
 
 							pll_limit_probe(
 								&gConnector[connectorIndex]->encoder.pll);

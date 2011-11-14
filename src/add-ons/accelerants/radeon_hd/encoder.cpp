@@ -935,7 +935,7 @@ uint32
 encoder_object_lookup(uint32 encoderFlags, uint8 dacID)
 {
 	// used on older cards to take a guess at the encoder
-	// objectID
+	// object
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -1004,4 +1004,79 @@ encoder_object_lookup(uint32 encoderFlags, uint8 dacID)
 	}
 
 	return ret;
+}
+
+
+uint32
+encoder_type_lookup(uint32 encoderID, uint32 connectorFlags)
+{
+	switch(encoderID) {
+		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
+		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
+		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
+				return VIDEO_ENCODER_LVDS;
+			else
+				return VIDEO_ENCODER_TMDS;
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
+			return VIDEO_ENCODER_DAC;
+		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+			return VIDEO_ENCODER_TVDAC;
+		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+		case ENCODER_OBJECT_ID_INTERNAL_DDI:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
+				return VIDEO_ENCODER_LVDS;
+			else if ((connectorFlags & ATOM_DEVICE_CRT_SUPPORT) != 0)
+				return VIDEO_ENCODER_DAC;
+			else
+				return VIDEO_ENCODER_TMDS;
+			break;
+		case ENCODER_OBJECT_ID_SI170B:
+		case ENCODER_OBJECT_ID_CH7303:
+		case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
+		case ENCODER_OBJECT_ID_EXTERNAL_SDVOB:
+		case ENCODER_OBJECT_ID_TITFP513:
+		case ENCODER_OBJECT_ID_VT1623:
+		case ENCODER_OBJECT_ID_HDMI_SI1930:
+		case ENCODER_OBJECT_ID_TRAVIS:
+		case ENCODER_OBJECT_ID_NUTMEG:
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
+				return VIDEO_ENCODER_LVDS;
+			else if ((connectorFlags & ATOM_DEVICE_CRT_SUPPORT) != 0)
+				return VIDEO_ENCODER_DAC;
+			else
+				return VIDEO_ENCODER_TMDS;
+			break;
+	}
+
+	return VIDEO_ENCODER_NONE;
+}
+
+
+bool
+encoder_isexternal(uint32 encoderID)
+{
+	switch (encoderID) {
+		case ENCODER_OBJECT_ID_SI170B:
+		case ENCODER_OBJECT_ID_CH7303:
+		case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
+		case ENCODER_OBJECT_ID_EXTERNAL_SDVOB:
+		case ENCODER_OBJECT_ID_TITFP513:
+		case ENCODER_OBJECT_ID_VT1623:
+		case ENCODER_OBJECT_ID_HDMI_SI1930:
+		case ENCODER_OBJECT_ID_TRAVIS:
+		case ENCODER_OBJECT_ID_NUTMEG:
+			return true;
+	}
+
+	return false;
 }
