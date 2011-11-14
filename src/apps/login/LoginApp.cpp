@@ -58,7 +58,7 @@ LoginApp::ReadyToRun()
 			"When you are finished just quit the application (Alt-Q)."),
 			B_TRANSLATE("OK")))->Go(NULL);
 	} else {
-		BRect frame(0, 0, 400, 150);
+		BRect frame(0, 0, 450, 150);
 		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2,
 			screen.Frame().Height()/2 - frame.Height()/2);
 		fLoginWindow = new LoginWindow(frame);
