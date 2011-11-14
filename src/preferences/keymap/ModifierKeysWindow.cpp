@@ -81,7 +81,7 @@ ModifierKeysWindow::ModifierKeysWindow()
 		new BMessage(kMsgRevertModifiers));
 	fRevertButton->SetEnabled(false);
 
-	fOkButton = new BButton("OkButton", B_TRANSLATE("Ok"),
+	fOkButton = new BButton("OkButton", B_TRANSLATE("OK"),
 		new BMessage(kMsgApplyModifiers));
 	fOkButton->MakeDefault(true);
 
