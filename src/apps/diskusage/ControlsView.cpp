@@ -16,7 +16,9 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <String.h>
 #include <SupportDefs.h>
+#include <View.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 #include <Window.h>
@@ -77,12 +79,17 @@ VolumeTab::DrawLabel(BView* owner, BRect frame)
 			(frame.top + frame.bottom - fIcon->Bounds().Height()) / 2.0);
 		owner->DrawBitmap(fIcon);
 	}
-
+	owner->SetDrawingMode(B_OP_COPY);
 	font_height fh;
 	owner->GetFontHeight(&fh);
 
+	BString label = Label();
+
+	owner->TruncateString(&label, B_TRUNCATE_END,
+		frame.Width() - IconWidth() - kSmallHMargin);
+
 	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-	owner->DrawString(Label(),
+	owner->DrawString(label,
 		BPoint(frame.left + IconWidth() + kSmallHMargin,
 			(frame.top + frame.bottom - fh.ascent - fh.descent) / 2.0
 				+ fh.ascent));
@@ -138,15 +145,68 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 {
 	float height = BTabView::TabFrame(index).Height();
 	float x = 0.0f;
-	for (int32 i = 0; i < index; i++) {
-		x += StringWidth(TabAt(i)->Label()) + 3.0f * kSmallHMargin
-			+ ((VolumeTab*)TabAt(i))->IconWidth();
+	float width = 0.0f;
+	float minStringWidth = StringWidth("Haiku");
+
+	int	countTabs = CountTabs();
+
+	// calculate the total width if no truncation is made at all
+	float averageWidth = Frame().Width() / countTabs;
+	
+	// margins are the deltas with the average widths	
+	float* margins = new float[countTabs];
+	for (int32 i = 0; i < countTabs; i++) {
+		float tabLabelWidth = StringWidth(TabAt(i)->Label());
+		if (tabLabelWidth < minStringWidth)
+			tabLabelWidth = minStringWidth;
+		float tabWidth = tabLabelWidth + 3.0f * kSmallHMargin
+				+ ((VolumeTab*)TabAt(i))->IconWidth();
+	
+		margins[i] = tabWidth - averageWidth;
+		width += tabWidth;
 	}
 
-	return BRect(x, 0.0f,
-		x + StringWidth(TabAt(index)->Label()) + 3.0f * kSmallHMargin
-			+ ((VolumeTab*)TabAt(index))->IconWidth(),
-		height);
+	// determine how much we should shave to show all tabs (truncating)
+	float toShave = width - Frame().Width();
+
+	if (toShave > 0.0f) {
+		// the thinest a tab can be to hold the minimum string
+		float minimumMargin = minStringWidth + 3.0f * kSmallHMargin
+			- averageWidth;
+
+		float averageToShave;
+		float oldToShave;
+		/* 
+			we might have to do multiple passes because of the minimum
+			tab width we are imposing.
+			we could also fail to totally fit all tabs.
+			TODO: allow paging.
+		*/
+
+		do {
+			averageToShave = toShave / countTabs;
+			oldToShave = toShave;
+			for (int32 i = 0; i < countTabs; i++) {
+				float iconWidth = ((VolumeTab*)TabAt(i))->IconWidth();
+				float newMargin = margins[i] - averageToShave;
+
+				toShave -= averageToShave;
+				if (newMargin < minimumMargin + iconWidth) {
+					toShave += minimumMargin - newMargin + iconWidth;
+					newMargin = minimumMargin + iconWidth;
+				}
+				margins[i] = newMargin;
+			}
+		} while (toShave > 0 && oldToShave != toShave);
+	}
+
+	for (int i = 0; i < index; i++)
+		x += averageWidth + margins[i];
+
+	float margin = margins[index];
+	delete[] margins;
+
+	return BRect(x, 0.0f, x + averageWidth + margin, height);
 }
 
 
