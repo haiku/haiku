@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -107,7 +107,8 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fRunButton(NULL),
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
-	fStepOutButton(NULL)
+	fStepOutButton(NULL),
+	fSourceLocatePanel(NULL)
 {
 	fTeam->Lock();
 	BString name = fTeam->Name();
@@ -138,6 +139,8 @@ TeamWindow::~TeamWindow()
 	_SetActiveStackTrace(NULL);
 	_SetActiveImage(NULL);
 	_SetActiveThread(NULL);
+	
+	delete fSourceLocatePanel;
 }
 
 
@@ -247,13 +250,15 @@ TeamWindow::MessageReceived(BMessage* message)
 				&& fActiveFunction->GetFunctionDebugInfo()
 					->SourceFile() != NULL && fActiveSourceCode != NULL
 				&& fActiveSourceCode->GetSourceFile() == NULL) {
-				BFilePanel* panel = NULL;
 				try {
-					panel = new BFilePanel(B_OPEN_PANEL,
-						new BMessenger(this));
-					panel->Show();
+					if (fSourceLocatePanel == NULL) {	
+						fSourceLocatePanel = new BFilePanel(B_OPEN_PANEL,
+							new BMessenger(this));
+					}
+					fSourceLocatePanel->Show();
 				} catch (...) {
-					delete panel;
+					delete fSourceLocatePanel;
+					fSourceLocatePanel = NULL;
 				}
 			}
 			break;

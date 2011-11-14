@@ -3664,6 +3664,9 @@ vm_init(kernel_args* args)
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
+	slab_init(args);
+
+#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	size_t heapSize = INITIAL_HEAP_SIZE;
 	// try to accomodate low memory systems
 	while (heapSize > sAvailableMemory / 8)
@@ -3671,9 +3674,6 @@ vm_init(kernel_args* args)
 	if (heapSize < 1024 * 1024)
 		panic("vm_init: go buy some RAM please.");
 
-	slab_init(args);
-
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
