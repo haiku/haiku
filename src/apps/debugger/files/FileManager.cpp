@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -152,7 +153,7 @@ public:
 				// parent already located -- locate the entry in the parent
 				BString locatedDirectoryPath;
 				if (directory->GetLocatedPath(locatedDirectoryPath))
-					_LocateEntryInParentDir(file, locatedDirectoryPath);
+					_LocateEntryInParentDir(file, locatedDirectoryPath, true);
 			}
 		}
 
@@ -200,17 +201,17 @@ private:
 	}
 
 	bool _LocateDirectory(LocatableDirectory* directory,
-		const BString& locatedPath)
+		const BString& locatedPath, bool implicit)
 	{
 		if (directory == NULL
 			|| directory->State() != LOCATABLE_ENTRY_UNLOCATED) {
 			return false;
 		}
 
-		if (!_LocateEntry(directory, locatedPath, true, true))
+		if (!_LocateEntry(directory, locatedPath, implicit, true))
 			return false;
 
-		_LocateEntries(directory, locatedPath);
+		_LocateEntries(directory, locatedPath, implicit);
 
 		return true;
 	}
@@ -244,14 +245,14 @@ private:
 			BString locatedName;
 			_SplitPath(locatedPath, locatedDirectory, locatedName);
 			if (locatedName == entry->Name())
-				_LocateDirectory(entry->Parent(), locatedDirectory);
+				_LocateDirectory(entry->Parent(), locatedDirectory, implicit);
 		}
 
 		return true;
 	}
 
 	bool _LocateEntryInParentDir(LocatableEntry* entry,
-		const BString& locatedDirectoryPath)
+		const BString& locatedDirectoryPath, bool implicit)
 	{
 		// construct the located entry path
 		BString locatedEntryPath(locatedDirectoryPath);
@@ -260,11 +261,11 @@ private:
 			locatedEntryPath << '/';
 		locatedEntryPath << entry->Name();
 
-		return _LocateEntry(entry, locatedEntryPath, true, false);
+		return _LocateEntry(entry, locatedEntryPath, implicit, false);
 	}
 
 	void _LocateEntries(LocatableDirectory* directory,
-		const BString& locatedPath)
+		const BString& locatedPath, bool implicit)
 	{
 		for (LocatableEntryList::ConstIterator it
 				= directory->Entries().GetIterator();
@@ -272,13 +273,13 @@ private:
 			if (entry->State() == LOCATABLE_ENTRY_LOCATED_EXPLICITLY)
 				continue;
 
-			 if (_LocateEntryInParentDir(entry, locatedPath)) {
+			 if (_LocateEntryInParentDir(entry, locatedPath, implicit)) {
 				// recurse for directories
 				if (LocatableDirectory* subDir
 						= dynamic_cast<LocatableDirectory*>(entry)) {
 					BString locatedEntryPath;
 					if (subDir->GetLocatedPath(locatedEntryPath))
-						_LocateEntries(subDir, locatedEntryPath);
+						_LocateEntries(subDir, locatedEntryPath, implicit);
 				}
 			}
 		}
@@ -313,6 +314,8 @@ private:
 			directory->ReleaseReference();
 			return NULL;
 		}
+		
+		directory->AddEntry(file);
 
 		fEntries.Insert(file);
 		return file;
@@ -361,8 +364,11 @@ private:
 			&& parentDirectory->State() != LOCATABLE_ENTRY_UNLOCATED) {
 			BString locatedDirectoryPath;
 			if (parentDirectory->GetLocatedPath(locatedDirectoryPath))
-				_LocateEntryInParentDir(directory, locatedDirectoryPath);
+				_LocateEntryInParentDir(directory, locatedDirectoryPath, true);
 		}
+		
+		if (parentDirectory != NULL)
+			parentDirectory->AddEntry(directory);
 
 		fEntries.Insert(directory);
 		return directory;

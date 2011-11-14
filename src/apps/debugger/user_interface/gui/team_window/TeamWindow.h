@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -24,6 +24,7 @@
 
 
 class BButton;
+class BFilePanel;
 class BMenuBar;
 class BSplitView;
 class BStringView;
@@ -185,6 +186,7 @@ private:
 			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
 			GUITeamUISettings	fUISettings;
+			BFilePanel*			fSourceLocatePanel;
 };
 
 
