@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Message.h>
 #include <MessageRunner.h>
@@ -18,6 +19,8 @@
 
 
 #define FORWARD_TO_PARENT
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BSnow"
 
 
 SnowView::SnowView()
@@ -234,8 +237,9 @@ void SnowView::Draw(BRect ur)
 			SetLowColor(ViewColor());
 			SetHighColor(0,0,0);
 			SetFontSize(12);
-			DrawString(MSG_DRAG_ME, BPoint(15,25));
-			BPoint arrowHead(Bounds().RightBottom()+BPoint(-10,-10));
+			DrawString(B_TRANSLATE("Drag me on your desktop"B_UTF8_ELLIPSIS),
+				BPoint(15,25));
+			BPoint arrowHead(Bounds().RightBottom() + BPoint(-10,-10));
 			StrokeLine(arrowHead, arrowHead - BPoint(7,0));
 			StrokeLine(arrowHead, arrowHead - BPoint(0,7));
 			StrokeLine(arrowHead, arrowHead - BPoint(12,12));
@@ -244,7 +248,8 @@ void SnowView::Draw(BRect ur)
 			SetLowColor(ViewColor());
 			SetHighColor(0,0,0);
 			SetFontSize(12);
-			DrawString(MSG_CLICK_ME, BPoint(15,25));
+			DrawString(B_TRANSLATE("Click me to remove BSnow"B_UTF8_ELLIPSIS),
+				BPoint(15,25));
 			return;
 		}
 	}

@@ -3,7 +3,6 @@
 
 
 #include <Bitmap.h>
-#include <Catalog.h>
 #include <Dragger.h>
 #include <List.h>
 #include <MessageRunner.h>
@@ -26,12 +25,6 @@
 #define WIND_MAX_DURATION 10000000
 #define FALLEN_HEIGHT 30
 #define INVALIDATOR_THREAD_NAME "You're Neo? I'm the Snow Maker!"
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BSnow"
-
-#define MSG_DRAG_ME B_TRANSLATE("Drag me on your desktop...")
-#define MSG_CLICK_ME B_TRANSLATE("Click me to remove BSnow...")
 
 
 typedef struct flake {
