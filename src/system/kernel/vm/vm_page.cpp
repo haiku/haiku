@@ -4053,9 +4053,11 @@ vm_page_num_unused_pages(void)
 void
 vm_page_get_stats(system_info *info)
 {
-	// TODO: there's no locking protecting any of the queues or counters here,
-	// so we run the risk of getting bogus values when evaluating them at
-	// throughout this function...
+	// Note: there's no locking protecting any of the queues or counters here,
+	// so we run the risk of getting bogus values when evaluating them
+	// throughout this function. As these stats are for informational purposes
+	// only, it is not really worth introducing such locking. Therefore we just
+	// ensure that we don't under- or overflow any of the values.
 
 	// The pages used for the block cache buffers. Those should not be counted
 	// as used but as cached pages.
@@ -4079,8 +4081,16 @@ vm_page_get_stats(system_info *info)
 	//	active + inactive + unused + wired + modified + cached + free + clear
 	// So taking out the cached (including modified non-temporary), free and
 	// clear ones leaves us with all used pages.
-	info->used_pages = info->max_pages - info->cached_pages
-		- sFreePageQueue.Count() - sClearPageQueue.Count();
+	int32 subtractPages = info->cached_pages + sFreePageQueue.Count()
+		+ sClearPageQueue.Count();
+	info->used_pages = subtractPages > info->max_pages
+		? 0 : info->max_pages - subtractPages;
+
+	if (info->used_pages + info->cached_pages > info->max_pages) {
+		// Something was shuffled around while we were summing up the counts.
+		// Make the values sane, preferring the worse case of more used pages.
+		info->cached_pages = info->max_pages - info->used_pages;
+	}
 
 	info->page_faults = vm_num_page_faults();
 	info->ignored_pages = sIgnoredPages;
