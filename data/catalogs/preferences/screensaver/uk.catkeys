@@ -1,18 +1,25 @@
-1	ukrainian	x-vnd.Haiku-ScreenSaver	3383293506
+1	ukrainian	x-vnd.Haiku-ScreenSaver	2463114237
 30 seconds	ScreenSaver		30 секунд
+Add…	ScreenSaver		Додати…
 Blackness	ScreenSaver		Чорнота
 Cancel	ScreenSaver		Відмінити
 Confirm password:	ScreenSaver		Підтвердіть пароль:
 Could not load screen saver	ScreenSaver		Не вдалося загрузити заставку
 Don't fade when	ScreenSaver		Не зникати коли
 Done	ScreenSaver		Готово
+Enable screensaver	ScreenSaver		Використати зберігач
 Fade now when	ScreenSaver		Зникнути зараз коли
+General	ScreenSaver		Основний
 No options available	ScreenSaver		Опції недоступні
 OK	ScreenSaver		Гаразд
 Password Window	ScreenSaver		Вікно паролю
 Password lock	ScreenSaver		Використати пароль
 Password:	ScreenSaver		Пароль:
 Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
+Password…	ScreenSaver		Пароль…
+ScreenSaver	System name		Зберігач екрану
+Screensavers	ScreenSaver		Зберігачі екрану
+Start screensaver	ScreenSaver		Запустити зберігач
 Test	ScreenSaver		Тест
 Turn off screen	ScreenSaver		Вимкнути екран
 Use custom password	ScreenSaver		Використовувати пароль користувача

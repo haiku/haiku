@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Be-PSRV	3898050106
+1	ukrainian	x-vnd.Be-PSRV	1761631281
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер з цим іменем існує, але його неможливо повністю використати! Замінити?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер з цим іменем існує, але драйвер для нього не знайдено! Замінити?
 A0	ConfigWindow	ISO 216 paper size	A0
 A1	ConfigWindow	ISO 216 paper size	A1
 A2	ConfigWindow	ISO 216 paper size	A2

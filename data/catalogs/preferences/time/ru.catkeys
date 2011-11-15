@@ -1,16 +1,24 @@
-1	russian	x-vnd.Haiku-Time	2447986513
+1	russian	x-vnd.Haiku-Time	2106196689
 <Other>	Time		<Другой>
 Add	Time		Добавить
+Africa	Time		Африка
+America	Time		Америка
+Antarctica	Time		Антарктида
+Arctic	Time		Арктика
+Asia	Time		Азия
+Atlantic	Time		Атлантика
+Australia	Time		Австралия
 Could not contact server	Time		Ну удалось связаться с сервером
 Could not create socket	Time		Не удалось создать сокет
 Current time:	Time		Текущее время:
 Date and time	Time		Дата и время
-GMT	Time		GMT
+Europe	Time		Европа
 Hardware clock set to:	Time		Часы настроены на:
-Local time	Time		Местное время
+Indian	Time		Индийский океан
 Message receiving failed	Time		Не удалось получить данные
 Network time	Time		Синхронизация времени
 OK	Time		ОК
+Pacific	Time		Тихий океан
 Preview time:	Time		Предварительное время:
 Received invalid time	Time		Получено неверное время
 Remove	Time		Удалить

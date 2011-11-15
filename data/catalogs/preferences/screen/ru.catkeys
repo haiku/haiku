@@ -19,7 +19,7 @@ Current workspace	Screen		Текущий рабочий стол
 Do you wish to keep these settings?	Screen		Вы хотите сохранить эти настройки?
 Done	Screen		Готово
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц
-Hz	Screen		 Гц
+Hz	Screen		Гц
 Keep	Screen		Сохранить
 OK	Screen		ОК
 Other…	Screen		Другое…

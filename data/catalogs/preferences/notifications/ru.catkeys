@@ -1,5 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		Над значком
+1	russian	x-vnd.Haiku-Notifications	299049300
 Allowed	NotificationView		Разрешено
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Произошла ошибка при сохранении настроек\nВозможно, что закончилось свободное место на диске.
 Application	NotificationView		Приложение
@@ -35,7 +34,6 @@ OK	GeneralView		ОК
 OK	NotificationView		ОК
 Progress	NotificationView		Прогресс
 Revert	PrefletWin		Вернуть
-Right of icon	DisplayView		Справа от значка
 Save	PrefletWin		Сохранить
 Search:	NotificationView		Поиск:
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
@@ -44,7 +42,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Возникла проблема при сохранении настроек.\nВвозможно у вас нет прав на запись в директорию настроек загрузки.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Возникла проблема при сохранении настроек.\nвозможно у вас нет прав на запись в директорию настроек загрузки.
 Title	NotificationView		Заголовок
-Title position:	DisplayView		Позиция заголовка:
 Type	NotificationView		Тип
 Unknown	NotificationView		Неизвестно
 Window width:	DisplayView		Ширина окна:

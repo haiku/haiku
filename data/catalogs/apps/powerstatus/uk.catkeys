@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	1335646776
+1	ukrainian	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		про
 About…	PowerStatus		Про…
 Battery charging	PowerStatus		Батарея заряджається
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Градація ємності 1:
 Capacity granularity 2: 	PowerStatus		Градація ємності 2:
 Capacity: 	PowerStatus		Ємність:
 Current rate: 	PowerStatus		Біжучий розряд:
+Damaged battery	PowerStatus		Батарея знищена
 Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності:
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність:
 Design capacity: 	PowerStatus		Проектна ємність: 
@@ -22,6 +23,8 @@ Model number: 	PowerStatus		Номер моделі:
 OEM info: 	PowerStatus		Дані OEM:
 OK	PowerStatus		Гаразд
 Power status box	PowerStatus		Вікно стану живлення
+PowerStatus	PowerStatus		Стан живлення
+PowerStatus	System name		Стан живлення
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nавтори Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Вийти
 Run in window	PowerStatus		Запустити у вікні

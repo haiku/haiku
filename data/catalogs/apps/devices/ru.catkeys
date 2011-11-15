@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	1943893993
+1	russian	x-vnd.Haiku-Devices	1474720746
 ACPI Information	DeviceACPI		Информация ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Пространство имен процессора ACPI '%2'
 ACPI System Bus	DeviceACPI		Системная шина ACPI
@@ -8,35 +8,44 @@ ACPI bus	Device		Шина ACPI
 ACPI bus	DevicesView		Шина ACPI
 ACPI controller	Device		Контроллер ACPI
 ACPI node '%1'	DeviceACPI		ACPI нода '%1'
+Array	DeviceSCSI		Массив
 Basic information	DevicesView		Основная информация
 Bridge	Device		Мост
+Bridge	DeviceSCSI		Мост
 Bus	DevicesView		Шина
 Bus Information	Device		Информация о шине
+CD-ROM	DeviceSCSI		Компакт диск
+Card Reader	DeviceSCSI		Кардридер
 Category	DevicesView		категориям
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Информация о классе:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Информация о классе
 Communication controller	Device		Контроллер связи
+Communications	DeviceSCSI		Устройства связи
 Computer	Device		Компьютер
 Computer	DevicesView		Компьютер
 Connection	DevicesView		подключению
 Detailed	DevicesView		Подробности
 Device	Device		Устройство
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Имя устройства\t\t\t\t: %Name%\nПроизводитель\t\t\t: %Manufacturer%\nИспользуемый драйвер\t\t\t\t: %DriverUsed%\nПути устройства\t: %DevicePaths%
+Device class	DeviceSCSI		Класс устройства
 Device name	Device		Название устройства
 Device name	DeviceACPI		Название устройства
 Device name	DevicePCI		Название устройства
+Device name	DeviceSCSI		Имя устройства
 Device name:	Device		Название устройства:
 Device paths	Device		Путь к устройству
 Device paths	DevicePCI		Пути устройства
 Devices	DevicesView		Устройства
 Devices	System name		Устройства
+Disk Drive	DeviceSCSI		Дисковод
 Display controller	Device		Контроллер дисплея
 Docking station	Device		Кредл
 Driver used	Device		Используемый драйвер
 Driver used	DevicePCI		Используемый драйвер
 Encryption controller	Device		Контроллер шифрования
-Generate system information	DevicesView		Сгенерировать системную информацию
+Generate system information	DevicesView		Сгенерировать информацию о системе
 Generic system peripheral	Device		Общая системная периферия
+Graphics Peripheral	DeviceSCSI		Переферийная графика
 ISA bus	Device		Шина ISA
 ISA bus	DevicesView		Шина ISA
 Input device controller	Device		Контроллер устройств ввода
@@ -44,6 +53,7 @@ Intelligent controller	Device		Интеллектуальный контролл
 Manufacturer	Device		Производитель 
 Manufacturer	DeviceACPI		Производитель
 Manufacturer	DevicePCI		Производитель
+Manufacturer	DeviceSCSI		Производитель
 Manufacturer:	Device		Производитель:
 Mass storage controller	Device		Контроллер накопителей
 Memory controller	Device		Контроллер памяти
@@ -53,17 +63,24 @@ Network controller	Device		Сетевой контроллер
 None	Device		Отсутствует
 Not implemented	DeviceACPI		Не реализовано
 Not implemented	DevicePCI		Не реализовано
+Optical Drive	DeviceSCSI		Оптический привод
 Order by:	DevicesView		Сортировать по:
+Other	DeviceSCSI		Другие
 PCI Information	DevicePCI		PCI информация 
 PCI bus	Device		Шина PCI
 PCI bus	DevicesView		Шина PCI
+Printer	DeviceSCSI		Принтер
 Processor	Device		Процессор
+Processor	DeviceSCSI		Процессор
 Quit	DevicesView		Выход
 Refresh devices	DevicesView		Обновить список устройств
 Report compatibility	DevicesView		Отчет о совместимости
+SCSI Information	DeviceSCSI		SCSI информация
 Satellite communications controller	Device		Контроллер спутниковой связи
+Scanner	DeviceSCSI		Сканер
 Serial bus controller	Device		Контроллер последовательной шины
 Signal processing controller	Device		Контроллер обработки сигналов
+Tape Drive	DeviceSCSI		Накопитель на ленте
 Unclassified device	Device		Неклассифицированные устройства
 Unknown	DevicePCI		Неизвестное
 Unknown device	Device		Неизвестное устройство

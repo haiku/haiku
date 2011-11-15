@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	2699246155
+1	belarusian	x-vnd.Haiku-libtracker	939953658
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld Б
 %Ld bytes	WidgetAttributeText		%Ld байтаў
@@ -7,10 +7,6 @@
 %num items	CountView		%num элементаў
 (%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed з %TotalSize, %BytesPerSecond/s)
 (%bytes bytes)	InfoWindow		(%bytes байтаў)
-(Finish: %time - %finishtime minutes left)	StatusWindow		(Завяршэнне: %time - %finishtime хвілін засталося)
-(Finish: %time - %finishtime seconds left)	StatusWindow		(Завяршэнне: %time - %finishtime секунд засталося)
-(Finish: %time - Over %finishtime days left)	StatusWindow		(Завяршэнне: %time - %finishtime дзён засталося)
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(Завяршэнне: %time - Больш за %finishtime гадзін засталося)
 (Finish: %time)	StatusWindow		(Завяршэнне: %time)
 1 item	CountView		1 элемент
 32 x 32	ContainerWindow		32 x 32
@@ -38,6 +34,7 @@ An item named \"%name\" already exists in this folder. Would you like to replace
 And	FindPanel		І
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы ўпэўненыя, что жадаеце беззваротна выдаліць выбраны(я) элемент(ы)?
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы ўпэўнены, што жадаеце перамясціць або скапіяваць выбраныя элементы у каталог?
+Arrange by	ContainerWindow		Сартаваць па
 Ask before delete	SettingsView		Пытаць перад выдаленнем
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		у %func \nfind_directory() не ўдалося. \nПрычына: %error
 Attributes	ContainerWindow		Атрыбуты
@@ -110,7 +107,6 @@ Disk mount settings	AutoMounterSettings		Наладкі мантавання д�
 Disk mounting during boot	AutoMounterSettings		Мантаванне дыскаў падчас запуску
 Disks	DirMenu		Дыскі
 Disks	Model		Дыскі
-Do it	FSUtils		Давай
 Does not handle file	OpenWithWindow		Не працуе з файлам
 Don't automount	AutoMounterSettings		Не мантаваць аўтаматычна
 Don't move files to Trash	SettingsView		Не перамяшчаць файлы ў Сметніцу
@@ -169,12 +165,6 @@ Icon view	DeskWindow		Від іконак
 Icon view	VolumeWindow		Від іконак
 Identify	ContainerWindow		Ідэнтыфікаваць
 Identify	InfoWindow		Ідэнтыфікаваць
-If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Калі вы %ifYouDoAction агульны каталог, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction агульны каталог, націсніце кнопку Shift і клікніце \"Давай\".
-If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction каталог канфігурацый, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction каталог канфігурацый, клікніце \"Давай\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Калі вы %ifYouDoAction хатні каталог, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction хатні каталог, націсніце кнопку Shift і клікніце \"Давай\".
-If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction наладкі mime, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction наладкі mime, клікніце \"Давай\".
-If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction каталог наладак, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction каталог наладак, клікніце \"Давай\".
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Калі вы %ifYouDoAction сістэмны каталог або яго змест, вы не зможаце запусціць Haiku! Вы ўпэўнены, што жадаеце працягваць? Каб %toDoAction сістэмны каталог або яго змест, трымайце Shift і клікайце \"Давай\".
 Ignore case	SelectionWindow		Не ўлічваць рэгістр
 Include trash	FindPanel		Уключыць файлы са Сметніцы
 Increase size	ContainerWindow		Павялічыць памер
@@ -301,6 +291,7 @@ Resize to fit	QueryContainerWindow		Расцягнуць каб умясціць
 Resize to fit	VolumeWindow		Расцягнуць 
 Restore	ContainerWindow		Аднавіць
 Restoring: 	StatusWindow		Аднаўленне:
+Reverse order	ContainerWindow		Адваротны парадак
 Revert	TrackerSettingsWindow		Вярнуць
 Save	FilePanelPriv		Захаваць
 Save	FindPanel		Захаваць
@@ -430,8 +421,6 @@ less than	FindPanel		менш за
 link	FSUtils	filename link	спасылка
 matches regular expression	SelectionWindow		супадае з рэгулярным выразам
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
-move	FSUtils	As in 'If you move ...'	перамесціце
-move	FSUtils	As in 'To move ...'	перамясціць
 moving	FSUtils		перамяшчаеце
 multiple disks	FindPanel		множныя дыскі
 no items	CountView		няма элементаў
@@ -440,10 +429,6 @@ of %items	StatusWindow		з %items
 optional	/boot/optional		дадатковы
 parent folder	NavMenu		бацькоўскі каталог
 preferences	B_PREFERENCES_DIRECTORY		наладкі
-rename	InfoWindow	As in 'If you rename ...'	перайменуеце
-rename	InfoWindow	As in 'To rename ...'	перайменаваць
-rename	TextWidget	As in 'If you rename ...'	перайменуеце
-rename	TextWidget	As in 'To rename ...'	перайменаваць
 save text	FilePanelPriv		захаваць тэкст
 starts with	FindPanel		пачынаецца з
 starts with	SelectionWindow		пачынаецца з

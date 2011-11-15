@@ -1,26 +1,38 @@
-1	russian	x-vnd.Haiku-Mail	458432473
+1	russian	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		Имя аккаунта:
 Account name:	E-Mail		Имя аккаунта:
+Account settings	AutoConfigWindow		Настройки аккаунта
 Account settings	Config Views		Настройки аккаунта
 Accounts	Config Window		Аккаунты
 Add	Config Window		Добавить
 Add filter	Config Views		Добавить фильтр
 Always	Config Window		Всегда
 Apply	Config Window		Применить
+Back	AutoConfigWindow		Назад
 Check every	Config Window		Проверять каждые
 Choose Protocol	E-Mail		Выберите протокол
+Create new account	AutoConfigWindow		Создать новый аккаунт
 E-mail	System name		Почта
 E-mail address:	E-Mail		E-mail адрес:
 Edit mailbox menu…	Config Window		Изменить меню…
+Enter a valid e-mail address.	AutoConfigWindow		Введите действительный почтовый адрес
 Error	Config Window		Ошибка
 Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
+Finish	AutoConfigWindow		Завершить
+Incoming	Config Window		Входящие
+Incoming	E-Mail		Входящие
 Incoming mail filters	Config Views		Фильтры входящей почты
 Login name:	E-Mail		Имя пользователя:
 Mail checking	Config Window		Проверка почты
 Miscellaneous	Config Window		Разное
+Never	Config Window	show status window	никогда
+Next	AutoConfigWindow		Вперед
+OK	AutoConfigWindow		ОК
 OK	Config Views		ОК
 OK	Config Window		ОК
 Only when dial-up is connected	Config Window		Только при наличии связи
+Outgoing	Config Window		Исходящие
+Outgoing	E-Mail		Исходящие
 Outgoing mail filters	Config Views		Фильтры исходящей почты
 Password:	E-Mail		Пароль:
 Real name:	Config Views		Настоящее имя:
@@ -39,6 +51,10 @@ While sending	Config Window		во время отправки
 While sending and receiving	Config Window		во время отправки и получения
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
+\t\t· E-mail filters	Config Window		\t\t· Фильтры
+\t\t· Incoming	Config Window		\t\t· Входящие
+\t\t· Outgoing	Config Window		\t\t· Исходящие
 days	Config Window		дней
 hours	Config Window		часов
 minutes	Config Window		минут
+never	Config Window	mail checking frequency	никогда

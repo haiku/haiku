@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-Screen	4170414367
+1	ukrainian	x-vnd.Haiku-Screen	2033930135
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sSerial no.: %s
+/other…	Screen		/інше…
 15 bits/pixel, 32768 colors	Screen		15 біт/пікселів, 32768 кольорів
 16 bits/pixel, 65536 colors	Screen		16 біт/піксель, 65536 кольорів
 24 bits/pixel, 16 Million colors	Screen		24біт/піксель, 16 міліонів кольорів
@@ -18,14 +19,18 @@ Current workspace	Screen		Поточний робочий простір
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?
 Done	Screen		Готово
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu kHz\nВертикальна частота:\t%lu - %lu Hz\n\nМаксимально пікселів:\t%g MHz
+Hz	Screen		Hz
 Keep	Screen		Зберегти
 OK	Screen		Гаразд
+Other…	Screen		Інше…
 Refresh rate	Screen		Частота обновлення
 Refresh rate:	Screen		Частота обновлення:
 Resolution:	Screen		Роздільча здатність:
 Revert	Screen		Повернути
 Rows:	Screen		Стрічки:
 Screen	Screen		Екран
+Screen	System name		Екран
+Screen preferences by the Haiku team	Screen		Настройки Екрану  від команди Haiku
 Set background…	Screen		Встановити тло…
 Settings will revert in %seconds seconds.	Screen		Настройки будуть повернуті через %seconds секунд
 Swap displays:	Screen		Поміняти дисплеї:
@@ -35,8 +40,10 @@ Undo	Screen		Скасувати
 Unknown mode	Screen		Невідомий режим
 Use laptop panel:	Screen		Використовувати панель ноутбука:
 Video format:	Screen		Відео формат:
+Warning	Screen		Увага
 Workspaces	Screen		Робочі простори
 always	Screen		завжди
+bits/pixel	Screen		бітів/піксель
 disable	Screen		Вимкнути
 horizontally	Screen		горизонтально
 if needed	Screen		якщо потрібно

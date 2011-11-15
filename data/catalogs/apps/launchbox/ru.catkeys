@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-LaunchBox	1440389990
+1	russian	x-vnd.Haiku-LaunchBox	3172696206
 Add button here	LaunchBox		Добавить кнопку
 Auto-raise	LaunchBox		Всплывать при наведении
 Bummer	LaunchBox		Облом
@@ -7,9 +7,8 @@ Clear button	LaunchBox		Очистить кнопку
 Clone	LaunchBox		Дублировать
 Close	LaunchBox		Закрыть
 Description for '%3'	LaunchBox		Описание для '%3'
-Failed to launch '%1'.\n\nError: 	LaunchBox		Не удалось запустить '%1'.\n\nОшибка: 
+Failed to launch '%1'.\n\nError:	LaunchBox		Не удалось запустить '%1'.\n\nОшибка:
 Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Не удалось запустить приложение с сигнатурой '%2'.\n\nОшибка: 
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка:
 Horizontal layout	LaunchBox		Расположить горизонтально
 Icon size	LaunchBox		Размер значков
@@ -30,5 +29,6 @@ Show on all workspaces	LaunchBox		Отображать на всех рабоч�
 Show window border	LaunchBox		Отображать рамку окна
 Vertical layout	LaunchBox		Расположить вертикально
 You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе удалось запустить приложение с сигнатурой '%2'.\n\nОшибка:
 last chance	LaunchBox		последний шанс
 launch popup	LaunchBox		launch popup

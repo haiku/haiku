@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PRNT	3684149067
+1	ukrainian	x-vnd.Be-PRNT	2065133853
 %.2f KB	JobListView		%.2f KB
 1 pending job.	PrinterListView		1 завдання в черзі.
 <pick one>	AddPrinterDialog		<виберіть>
@@ -20,15 +20,19 @@ Magenta	TestPageView		Магента
 Make default	PrintersWindow		Зробити по замовчуванню
 No pending jobs.	PrinterListView		Немає черги завдань.
 No printer found!	TransportMenu		Принтера не знайдено!
+Print jobs for 	PrintersWindow		Завдання на друк для
 Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтера не знайдено
+Print test page	PrintersWindow		Друк пробної сторінки
 Printer name:	AddPrinterDialog		Ім'я принтера:
 Printer type:	AddPrinterDialog		Тип принтера:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Printers	PrintersWindow		Принтери
+Printers	System name		Принтери
 Processing	JobListView		Виконання
 Red	TestPageView		Червоний
 Remove	PrintersWindow		Видалити
 Restart job	PrintersWindow		Перезапустити завдання
+Test Page	PrintersWindow		Пробна сторінка
 Test Page	TestPageView		Пробна сторінка
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
@@ -37,3 +41,4 @@ Waiting	JobListView		Очікування
 Yellow	TestPageView		Жовтий
 page	JobListView		стор.
 pages	JobListView		Стор.
+pending jobs.	PrinterListView		черга завдань.

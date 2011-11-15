@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2699246155
+1	russian	x-vnd.Haiku-libtracker	939953658
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/с
 %Ld B	WidgetAttributeText		%Ld байт
 %Ld bytes	WidgetAttributeText		%Ld байт
@@ -7,10 +7,6 @@
 %num items	CountView		объектов: %num
 (%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed из %TotalSize, %BytesPerSecond/с)
 (%bytes bytes)	InfoWindow		(%bytes байт)
-(Finish: %time - %finishtime minutes left)	StatusWindow		(Осталось: %time - %finishtime минут)
-(Finish: %time - %finishtime seconds left)	StatusWindow		(Осталось: %time - %finishtime секунд)
-(Finish: %time - Over %finishtime days left)	StatusWindow		(Осталось: %time - Более %finishtime дней)
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(Осталось: %time - Более %finishtime часов)
 (Finish: %time)	StatusWindow		(Осталось: %time)
 1 item	CountView		объектов: 1
 32 x 32	ContainerWindow		32 x 32
@@ -38,6 +34,7 @@ An item named \"%name\" already exists in this folder. Would you like to replace
 And	FindPanel		и
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы уверены, что хотите удалить выделенные объекты? Эту операцию будет невозможно отменить.
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объекты в эту папку?
+Arrange by	ContainerWindow		Выстроить по
 Ask before delete	SettingsView		Спрашивать перед удалением
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Не удалось выполнить %func в find_directory(). \nПричина: %error
 Attributes	ContainerWindow		Атрибуты
@@ -110,7 +107,6 @@ Disk mount settings	AutoMounterSettings		Настройка подключени
 Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
 Disks	DirMenu		Диски
 Disks	Model		Диски
-Do it	FSUtils		Сделать это
 Does not handle file	OpenWithWindow		Не поддерживает этот файл
 Don't automount	AutoMounterSettings		Не подключать автоматически
 Don't move files to Trash	SettingsView		Не помещать файлы в корзину
@@ -169,12 +165,6 @@ Icon view	DeskWindow		Большие значки
 Icon view	VolumeWindow		Большие значки
 Identify	ContainerWindow		Опознать
 Identify	InfoWindow		Опознать
-If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку common, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку common, зажмите клавишу Shift и нажмите \"Сделать это\".
-If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку config, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку config нажмите \"Сделать это\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку home, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку home, зажмите клавишу Shift и нажмите \"Сделать это\".
-If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction настройки mime, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction настройки mime нажмите \"Сделать это\".
-If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку settings, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку settings нажмите \"Сделать это\".
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %ifYouDoAction папку system или её содержимое, Haiku больше не сможет загружаться! Вы уверены, что хотите сделать это? Чтобы %toDoAction папку system или её содержимое, зажмите клавишу Shift и нажмите \"Сделать это\".
 Ignore case	SelectionWindow		Игнорировать регистр
 Include trash	FindPanel		Включая корзину
 Increase size	ContainerWindow		Увеличить размер
@@ -301,6 +291,7 @@ Resize to fit	QueryContainerWindow		Подогнать размер окна
 Resize to fit	VolumeWindow		Подогнать размер окна
 Restore	ContainerWindow		Восстановить
 Restoring: 	StatusWindow		Восстановление: 
+Reverse order	ContainerWindow		В обратном порядке
 Revert	TrackerSettingsWindow		Вернуть
 Save	FilePanelPriv		Сохранить
 Save	FindPanel		Сохранить
@@ -430,8 +421,6 @@ less than	FindPanel		меньше чем
 link	FSUtils	filename link	ссылка
 matches regular expression	SelectionWindow		совпадает с регулярным выражением
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
-move	FSUtils	As in 'If you move ...'	переместите
-move	FSUtils	As in 'To move ...'	переместить
 moving	FSUtils		перемещаемый
 multiple disks	FindPanel		нескольких дисках
 no items	CountView		нет объектов
@@ -440,10 +429,6 @@ of %items	StatusWindow		из %items
 optional	/boot/optional		Опциональные
 parent folder	NavMenu		родительский каталог
 preferences	B_PREFERENCES_DIRECTORY		Настройки
-rename	InfoWindow	As in 'If you rename ...'	переименуете
-rename	InfoWindow	As in 'To rename ...'	переименовать
-rename	TextWidget	As in 'If you rename ...'	переименуете
-rename	TextWidget	As in 'To rename ...'	переименовать
 save text	FilePanelPriv		сохранить текст
 starts with	FindPanel		начинается на
 starts with	SelectionWindow		начинается на

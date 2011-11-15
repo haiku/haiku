@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Terminal	128712336
+1	ukrainian	x-vnd.Haiku-Terminal	3235811530
+-h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help друкувати цю довідку\n -t, --title              встановити заголовок вікна\n -f, --fullscreen запустити у повний екран\n
 Abort	Terminal Shell		Зупинити
 Appearance	Terminal PrefWindow		Зовн. вигляд
 Background	Terminal AppearancePrefView		Тло
@@ -7,6 +8,7 @@ Cancel	Terminal PrefWindow		Відміна
 Cancel	Terminal SetTitleWindow		Відміна
 Cancel	Terminal TermView		Відміна
 Cancel	Terminal TermWindow		Відміна
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
 Change directory	Terminal TermView		Змінити каталог
 Clear all	Terminal TermWindow		Очистити все
 Close	Terminal TermWindow		Закрити
@@ -37,6 +39,7 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 Increase	Terminal TermWindow		Збільшити
 Insert path	Terminal TermView		Введіть шлях
 Match case	Terminal FindWindow		Враховувати регістр
+Match word	Terminal FindWindow		Слово повністю
 Move here	Terminal TermView		Перемістити сюди
 New Terminal	Terminal TermWindow		Новий термінал
 New tab	Terminal TermWindow		Нова вкладка

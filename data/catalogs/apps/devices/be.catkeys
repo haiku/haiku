@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Devices	1943893993
+1	belarusian	x-vnd.Haiku-Devices	865240481
 ACPI Information	DeviceACPI		Інфармацыя ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
 ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
@@ -8,35 +8,47 @@ ACPI bus	Device		Шына ACPI
 ACPI bus	DevicesView		Шына ACPI
 ACPI controller	Device		Кантролер ACPI
 ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
+Array	DeviceSCSI		Массыў
 Basic information	DevicesView		Асноўная інфармацыя
 Bridge	Device		Мост
+Bridge	DeviceSCSI		Мост
 Bus	DevicesView		Шына
 Bus Information	Device		Інфармацыя шыны
+CD-ROM	DeviceSCSI		CD-ROM
+Card Reader	DeviceSCSI		Чытальнік картак
 Category	DevicesView		Катэгорыя
+Changer	DeviceSCSI		Чэйнджэр
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфа класа:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Инфа класа:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Інфа класа
 Communication controller	Device		Кантролер камунікацый
+Communications	DeviceSCSI		Камунікацыі
 Computer	Device		Кампутар
 Computer	DevicesView		Кампутар
 Connection	DevicesView		Спалучэнне
 Detailed	DevicesView		Падрабязна
 Device	Device		Прылада
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Імя прылады\t\t\t\t: %Name%\nВытворца\t\t\t: %Manufacturer%\nБягучы драйвер\t\t\t\t: %DriverUsed%\nПуці прылады\t: %DevicePaths%
+Device class	DeviceSCSI		Клас прылады
 Device name	Device		Імя прылады
 Device name	DeviceACPI		Імя прылады
 Device name	DevicePCI		Імя прылады
+Device name	DeviceSCSI		Імя прылады
 Device name:	Device		Імя прылады:
 Device paths	Device		Пуці прыладаў
 Device paths	DevicePCI		Пуці прыладаў
 Devices	DevicesView		Прылады
 Devices	System name		Прылады
+Disk Drive	DeviceSCSI		Прывад дыскау
 Display controller	Device		Кантролер экрану
 Docking station	Device		Док-станцыя
 Driver used	Device		Ужыты драйвер
 Driver used	DevicePCI		Ужыты драйвер
+Enclosure	DeviceSCSI		Уключэнне
 Encryption controller	Device		Кантролер шыфравання
 Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
 Generic system peripheral	Device		Агульная перыферыя
+Graphics Peripheral	DeviceSCSI		Графічная перыферыя
 ISA bus	Device		Шына ISA
 ISA bus	DevicesView		Шына ISA
 Input device controller	Device		Кантролер прылад уводу
@@ -44,6 +56,7 @@ Intelligent controller	Device		Інтэлектуальны кантролер
 Manufacturer	Device		Вытворца
 Manufacturer	DeviceACPI		Вытворца
 Manufacturer	DevicePCI		Вытворца
+Manufacturer	DeviceSCSI		Вытворца
 Manufacturer:	Device		Вытворца:
 Mass storage controller	Device		Кантролер прылад захавання даных
 Memory controller	Device		Кантролер памяці
@@ -53,21 +66,30 @@ Network controller	Device		Сеткавы кантролер
 None	Device		Адсутнічае
 Not implemented	DeviceACPI		Не рэалізавана
 Not implemented	DevicePCI		Не рэалізавана
+Optical Drive	DeviceSCSI		Аптычны дыск
 Order by:	DevicesView		Парадкаваць па:
+Other	DeviceSCSI		Іншы(я)
 PCI Information	DevicePCI		Інфармацыя PCI
 PCI bus	Device		Шына PCI
 PCI bus	DevicesView		Шына PCI
+Printer	DeviceSCSI		Друкарка
 Processor	Device		Працэсар
+Processor	DeviceSCSI		Працэсар
 Quit	DevicesView		Выйсці
+RBC	DeviceSCSI		RBC
 Refresh devices	DevicesView		Абнавіць прылады
 Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
+SCSI Information	DeviceSCSI		Инфа SCSI
 Satellite communications controller	Device		Кантролер спадарожнікавай сувязі
+Scanner	DeviceSCSI		Сканэр
 Serial bus controller	Device		Кантролер серыйнай шыны
 Signal processing controller	Device		Кантролер апрацоўкі сігналаў
+Tape Drive	DeviceSCSI		Прывад ленты
 Unclassified device	Device		Невызначаная прылада
 Unknown	DevicePCI		Невядомы
 Unknown device	Device		Невядомая прылада
 Unknown device	DevicesView		Невядомая прылада
 Value	PropertyList		Велічыня
 Wireless controller	Device		Бесшнуравы кантролер
+Worm	DeviceSCSI		Ворм
 unknown	Device		невядома

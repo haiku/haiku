@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-About	1133193730
+1	belarusian	x-vnd.Haiku-About	3681208101
 %.2f GHz	AboutView		%.2f ГГц
 %d MiB total	AboutView		%d MiB усяго
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
@@ -71,7 +71,6 @@ The BeGeistert team\n	AboutView		Каманада BeGeistert\n
 The Haiku-Ports team\n	AboutView		Каманда Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Каманда Haikuware і ихнія ахвяраванні\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland and Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT license%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView	%MIT license% isn't a variable and has to be translated.	Код, унікальны для Haiku, асабіста ядро і ўвесь код, да якога могуць звяртацца праграмы, распаўсюджваецца ў межах %ліцэнзіі MIT%. Некаторыя сістэмныя бібліятэкі змяшчаюць код, які распаўсюджваецца ў межах ліцэнзіі LGPL. Аўтарскія правы на код трэціх старон глядзіце ніжэй.\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Аўтарскія правы на зыходны код Haiku належаць Haiku, Inc. ці суадносным аўтарам якія пазначаны ў зыходных тэкстах. Haiku® і HAIKU logo® з´яўляюцца зарэгістраванымі гандлёвымі знакамі Haiku, Inc.\n\n
 Time running:	AboutView		Час працы:
 Translations:\n	AboutView		Пераклады:\n

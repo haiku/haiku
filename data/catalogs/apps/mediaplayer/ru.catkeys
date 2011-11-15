@@ -101,8 +101,8 @@ Save as…	MediaPlayer-PlaylistWindow		Сохранить как…
 Save error	MediaPlayer-PlaylistWindow		Ошибка сохранения
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка сохранения плейлиста.\n\nОшибка: 
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка при сохранени плейлиста:\n\nОшибка: 
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления при работе во весь экран
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштабировать видео плавно (режим без оверлея)
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления в полноэкранном режиме
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштабировать видео плавно (в режиме без оверлея)
 Select all	MediaPlayer-PlaylistWindow		Выделить все
 Settings…	MediaPlayer-Main		Настройки…
 Skip to the next track.	MediaPlayer-Main		Прыгнуть к следующему треку

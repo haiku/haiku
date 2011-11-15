@@ -1,6 +1,4 @@
-1	ukrainian	x-vnd.Be-POST	1358359182
-%.1f / %.1f kb (%d / %d messages)	StatusWindow		%.1f / %.1f kb (%d / %d повідомлень)
-%d / %d messages	StatusWindow		%d / %d повідомлень
+1	ukrainian	x-vnd.Be-POST	2677298309
 %num new message	DeskbarView		%num нове повідомлення
 %num new message for %name\n	MailDaemon		%num нове повідомлення для %name\n
 %num new message.	MailDaemon		%num нове повідомлення.
@@ -10,16 +8,14 @@
 <no accounts>	DeskbarView		<акаунти відсутні>
 Check for mail now	DeskbarView		Перевірити пошту зараз
 Check for mails only	DeskbarView		Перевірити тільки пошту
-Check mail now	StatusWindow		Перевірити пошту зараз
 Create new message…	DeskbarView		Створити нове повідомлення…
 Fetching mail for %name	Notifier		Отримання пошти для %name
-Mail Status	MailDaemon		Стан пошти
 Mail daemon status log	MailDaemon		Лог стану почтового демона
+Mail status	MailDaemon		Стан пошти
 New Messages	MailDaemon		Нові повідомлення
 No new messages	DeskbarView		Немає нових повідомлень
 No new messages	MailDaemon		Немає нових повідомлень
 No new messages.	MailDaemon		Немає нових повідомлень.
-No new messages.	StatusWindow		Немає нових повідомлень.
 Preferences…	DeskbarView		Настройки…
 Send pending mails	DeskbarView		Відправити чергову пошту 
 Sending mail for %name	Notifier		Відправка пошти для %name
