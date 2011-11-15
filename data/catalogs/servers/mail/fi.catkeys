@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-POST	2865617627
+1	finnish	x-vnd.Be-POST	2300302075
 %num new message	DeskbarView		%num uusi viesti
 %num new message for %name\n	MailDaemon		%num uusi viesti käyttäjälle %name\n
 %num new message.	MailDaemon		%num uusi viesti.
@@ -10,9 +10,9 @@ Check for mail now	DeskbarView		Tarkista sähköposti nyt
 Check for mails only	DeskbarView		Tarkista vain sähköpostit
 Create new message…	DeskbarView		Luo uusi viesti...
 Fetching mail for %name	Notifier		Noudetaan sähköpostia vastaanottajalle %name
-Mail Status	Notifier		Sähköpostitila
 Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki
 Mail status	MailDaemon		Sähköpostitila
+Mail status	Notifier		Sähköpostitila
 New Messages	MailDaemon		Uudet viestit
 No new messages	DeskbarView		Ei uusia viestejä
 No new messages	MailDaemon		Ei uusia viestejä
