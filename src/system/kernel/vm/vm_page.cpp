@@ -1724,7 +1724,7 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 				VMPageQueue& queue = page->State() == PAGE_STATE_FREE
 					? sFreePageQueue : sClearPageQueue;
 				queue.Remove(page);
-				page->SetState(wired ? PAGE_STATE_UNUSED : PAGE_STATE_UNUSED);
+				page->SetState(wired ? PAGE_STATE_WIRED : PAGE_STATE_UNUSED);
 				page->busy = false;
 				atomic_add(&sUnreservedFreePages, -1);
 				DEBUG_PAGE_ACCESS_END(page);
