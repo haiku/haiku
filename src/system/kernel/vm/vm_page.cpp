@@ -3230,7 +3230,7 @@ vm_page_init_num_pages(kernel_args *args)
 	sNonExistingPages = 0;
 	sIgnoredPages = args->ignored_physical_memory / B_PAGE_SIZE;
 
-	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+	for (uint32 i = 1; i < args->num_physical_memory_ranges; i++) {
 		page_num_t start = args->physical_memory_range[i].start / B_PAGE_SIZE;
 		if (start > physicalPagesEnd)
 			sNonExistingPages += start - physicalPagesEnd;
