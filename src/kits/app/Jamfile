@@ -57,5 +57,9 @@ MergeObject <libbe>app_kit.o :
 	ServerMemoryAllocator.cpp
 	TokenSpace.cpp
 	TypeConstants.cpp
+
+	# KeyStore implementation
+	Key.cpp
+	KeyStore.cpp
 ;
 
