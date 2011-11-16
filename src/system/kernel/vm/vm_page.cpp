@@ -3236,17 +3236,22 @@ vm_page_init_num_pages(kernel_args *args)
 			sNonExistingPages += start - physicalPagesEnd;
 		physicalPagesEnd = start
 			+ args->physical_memory_range[i].size / B_PAGE_SIZE;
+
+#ifdef LIMIT_AVAILABLE_MEMORY
+		page_num_t available
+			= physicalPagesEnd - sPhysicalPageOffset - sNonExistingPages;
+		if (available > LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE)) {
+			physicalPagesEnd = sPhysicalPageOffset + sNonExistingPages
+				+ LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE);
+			break;
+		}
+#endif
 	}
 
 	TRACE(("first phys page = %#" B_PRIxPHYSADDR ", end %#" B_PRIxPHYSADDR "\n",
 		sPhysicalPageOffset, physicalPagesEnd));
 
 	sNumPages = physicalPagesEnd - sPhysicalPageOffset;
-
-#ifdef LIMIT_AVAILABLE_MEMORY
-	if (sNumPages > LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE))
-		sNumPages = LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE);
-#endif
 }
 
 
