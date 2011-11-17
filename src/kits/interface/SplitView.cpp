@@ -180,6 +180,20 @@ BSplitView::SetCollapsible(int32 first, int32 last, bool collapsible)
 }
 
 
+bool
+BSplitView::GetItemVisible(int32 index) const
+{
+	return fSplitLayout->GetItemVisible(index);
+}
+
+
+void
+BSplitView::SetItemVisible(int32 index, bool visible)
+{
+	fSplitLayout->SetItemVisible(index, visible);
+}
+
+
 void
 BSplitView::AddChild(BView* child, BView* sibling)
 {

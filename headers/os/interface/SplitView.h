@@ -48,6 +48,9 @@ public:
 			void				SetCollapsible(int32 first, int32 last,
 									bool collapsible);
 
+			bool				GetItemVisible(int32 index) const;
+			void				SetItemVisible(int32 index, bool visible);
+
 //			void				AddChild(BView* child);
 			void				AddChild(BView* child, BView* sibling = NULL);
 			bool				AddChild(BView* child, float weight);

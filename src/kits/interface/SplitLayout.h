@@ -67,6 +67,9 @@ public:
 			void				SetCollapsible(int32 first, int32 last,
 									bool collapsible);
 
+			bool				GetItemVisible(int32 index) const;
+			void				SetItemVisible(int32 index, bool visible);
+
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();
 	virtual	BSize				BasePreferredSize();
