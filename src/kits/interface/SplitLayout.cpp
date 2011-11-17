@@ -463,7 +463,7 @@ BSplitLayout::SetItemWeight(BLayoutItem* item, float weight)
 
 
 bool
-BSplitLayout::GetCollapsible(int32 index) const
+BSplitLayout::IsCollapsible(int32 index) const
 {
 	if (index < 0)
 		index = 0;
@@ -502,7 +502,7 @@ BSplitLayout::SetCollapsible(int32 first, int32 last, bool collapsible)
 
 
 bool
-BSplitLayout::GetItemVisible(int32 index) const
+BSplitLayout::IsItemCollapsed(int32 index) const
 {
 	if (index < 0)
 		index = 0;
@@ -514,14 +514,14 @@ BSplitLayout::GetItemVisible(int32 index) const
 
 
 void
-BSplitLayout::SetItemVisible(int32 index, bool visible)
+BSplitLayout::SetItemCollapsed(int32 index, bool collapsed)
 {
 	if (index < 0)
 		index = 0;
 	if (index > CountItems())
 		index = CountItems() - 1;
 
-	ItemAt(index)->SetVisible(visible);
+	ItemAt(index)->SetVisible(collapsed);
 
 	InvalidateLayout(true);
 }

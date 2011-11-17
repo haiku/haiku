@@ -42,14 +42,14 @@ public:
 									bool invalidateLayout);
 			void				SetItemWeight(BLayoutItem* item, float weight);
 
-			bool				GetCollapsible(int32 index) const;
+			bool				IsCollapsible(int32 index) const;
 			void				SetCollapsible(bool collapsible);
 			void				SetCollapsible(int32 index, bool collapsible);
 			void				SetCollapsible(int32 first, int32 last,
 									bool collapsible);
 
-			bool				GetItemVisible(int32 index) const;
-			void				SetItemVisible(int32 index, bool visible);
+			bool				IsItemCollapsed(int32 index) const;
+			void				SetItemCollapsed(int32 index, bool collapsed);
 
 //			void				AddChild(BView* child);
 			void				AddChild(BView* child, BView* sibling = NULL);
