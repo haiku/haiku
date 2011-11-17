@@ -139,7 +139,7 @@ TeamWindow::~TeamWindow()
 	_SetActiveStackTrace(NULL);
 	_SetActiveImage(NULL);
 	_SetActiveThread(NULL);
-	
+
 	delete fSourceLocatePanel;
 }
 
@@ -251,7 +251,7 @@ TeamWindow::MessageReceived(BMessage* message)
 					->SourceFile() != NULL && fActiveSourceCode != NULL
 				&& fActiveSourceCode->GetSourceFile() == NULL) {
 				try {
-					if (fSourceLocatePanel == NULL) {	
+					if (fSourceLocatePanel == NULL) {
 						fSourceLocatePanel = new BFilePanel(B_OPEN_PANEL,
 							new BMessenger(this));
 					}
@@ -1188,6 +1188,16 @@ TeamWindow::_LoadSplitSettings(BSplitView* view, const char* name,
 			view->SetItemWeight(i, value.ToFloat(),
 				i == view->CountItems() - 1);
 		}
+
+		settingName.SetToFormat("teamWindow%sCollapsed%d", name, i);
+		error = settings->Value(settingName.String(), value);
+		if (error == B_OK)
+			view->SetCollapsible(i, value.ToBool());
+
+		settingName.SetToFormat("teamWindow%sVisible%d", name, i);
+		error = settings->Value(settingName.String(), value);
+		if (error == B_OK)
+			view->SetItemVisible(i, value.ToBool());
 	}
 }
 
@@ -1202,7 +1212,16 @@ TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
 		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
 		if (!settings->SetValue(settingName.String(),
 			view->ItemWeight(i)))
-		return B_NO_MEMORY;
+			return B_NO_MEMORY;
+
+		settingName.SetToFormat("teamWindow%sCollapsible%d", name, i);
+		if (!settings->SetValue(settingName.String(), view->GetCollapsible(i)))
+			return B_NO_MEMORY;
+
+
+		settingName.SetToFormat("teamWindow%sVisible%d", name, i);
+		if (!settings->SetValue(settingName.String(), view->GetItemVisible(i)))
+			return B_NO_MEMORY;
 	}
 
 	return B_OK;
