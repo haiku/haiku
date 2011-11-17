@@ -42,6 +42,7 @@ public:
 									bool invalidateLayout);
 			void				SetItemWeight(BLayoutItem* item, float weight);
 
+			bool				GetCollapsible(int32 index) const;
 			void				SetCollapsible(bool collapsible);
 			void				SetCollapsible(int32 index, bool collapsible);
 			void				SetCollapsible(int32 first, int32 last,

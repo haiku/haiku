@@ -152,6 +152,13 @@ BSplitView::SetItemWeight(BLayoutItem* item, float weight)
 }
 
 
+bool
+BSplitView::GetCollapsible(int32 index) const
+{
+	return fSplitLayout->GetCollapsible(index);
+}
+
+
 void
 BSplitView::SetCollapsible(bool collapsible)
 {
