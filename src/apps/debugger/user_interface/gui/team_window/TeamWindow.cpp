@@ -1192,12 +1192,7 @@ TeamWindow::_LoadSplitSettings(BSplitView* view, const char* name,
 		settingName.SetToFormat("teamWindow%sCollapsed%d", name, i);
 		error = settings->Value(settingName.String(), value);
 		if (error == B_OK)
-			view->SetCollapsible(i, value.ToBool());
-
-		settingName.SetToFormat("teamWindow%sVisible%d", name, i);
-		error = settings->Value(settingName.String(), value);
-		if (error == B_OK)
-			view->SetItemVisible(i, value.ToBool());
+			view->SetItemCollapsed(i, value.ToBool());
 	}
 }
 
@@ -1214,13 +1209,9 @@ TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
 			view->ItemWeight(i)))
 			return B_NO_MEMORY;
 
-		settingName.SetToFormat("teamWindow%sCollapsible%d", name, i);
-		if (!settings->SetValue(settingName.String(), view->GetCollapsible(i)))
-			return B_NO_MEMORY;
-
-
-		settingName.SetToFormat("teamWindow%sVisible%d", name, i);
-		if (!settings->SetValue(settingName.String(), view->GetItemVisible(i)))
+		settingName.SetToFormat("teamWindow%sCollapsed%d", name, i);
+		if (!settings->SetValue(settingName.String(), 
+			view->IsItemCollapsed(i)))
 			return B_NO_MEMORY;
 	}
 
