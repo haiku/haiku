@@ -192,8 +192,8 @@ read_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index)
 
 
 void
-write_ds_channel_data(ice1712 *ice, uint8 channel,
-        ds8_register index, uint32 data)
+write_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index,
+	uint32 data)
 {
 	uint8 ds8_channel_index = channel << 4 | index;
 
@@ -470,7 +470,7 @@ ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 	snooze(GPIO_I2C_DELAY);
 
 	write_gpio_byte(ice, ((AK45xx_CHIP_ADDRESS & 0x03) << 6) | 0x20
-                    | (reg_addr & 0x1F), tmp);
+		| (reg_addr & 0x1F), tmp);
 	write_gpio_byte(ice, data, tmp);
 
 	tmp |= chip_select;
@@ -512,7 +512,7 @@ cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select)
 	snooze(GPIO_I2C_DELAY);
 
 	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7F) << 1,
-                tmp); //For writing the MAP
+		tmp); //For writing the MAP
 	write_gpio_byte(ice, reg_addr & 0x7F, tmp); //Do not Increment
 
 	tmp |= chip_select; //Deselect the chip
@@ -524,7 +524,7 @@ cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select)
 	snooze(GPIO_I2C_DELAY);
 
 	write_gpio_byte(ice, (CS84xx_CHIP_ADDRESS & 0x7F) << 1 | 1,
-                tmp); //For writing the MAP
+		tmp); //For writing the MAP
 	data = read_gpio_byte(ice, tmp); //For reading
 
 	tmp |= chip_select; //Deselect the chip

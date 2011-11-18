@@ -8,9 +8,9 @@
  * All rights reserved
  * Distributed under the terms of the MIT license.
  */
-
 #ifndef _ICE1712_H_
 #define _ICE1712_H_
+
 
 #include <PCI.h>
 #include "hmulti_audio.h"
@@ -41,6 +41,7 @@ typedef enum product_t {
 #define MAX_BUFFER_FRAMES			2048
 
 #define MAX_HARDWARE_VOLUME			10
+#define ICE1712_MUTE_VALUE 			0x7F
 
 #define PLAYBACK_BUFFER_SIZE		(MAX_BUFFER_FRAMES * MAX_DAC * SAMPLE_SIZE)
 #define RECORD_BUFFER_SIZE			(MAX_BUFFER_FRAMES * MAX_ADC * SAMPLE_SIZE)
