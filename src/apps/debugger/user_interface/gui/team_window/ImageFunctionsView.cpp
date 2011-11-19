@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +16,7 @@
 #include "table/TableColumns.h"
 
 #include "FunctionInstance.h"
+#include "GUISettingsUtils.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
@@ -388,6 +390,32 @@ ImageFunctionsView::SetFunction(FunctionInstance* function)
 		fFunctionsTable->ScrollToNode(path);
 	} else
 		fFunctionsTable->DeselectAllNodes();
+}
+
+
+void
+ImageFunctionsView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("functionsTable", &tableSettings) == B_OK) {
+		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+			fFunctionsTable);
+	}
+}
+
+
+status_t
+ImageFunctionsView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+		fFunctionsTable);
+	if (result == B_OK)
+		result = settings.AddMessage("functionsTable", &tableSettings);
+
+	return result;
 }
 
 

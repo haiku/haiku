@@ -35,6 +35,9 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 	// BreakpointListView::Listener
 	virtual	void				BreakpointSelectionChanged(

@@ -267,7 +267,7 @@ bool
 InspectorWindow::QuitRequested()
 {
 	BMessage settings(MSG_INSPECTOR_WINDOW_CLOSED);
-	SaveSettings(&settings);
+	SaveSettings(settings);
 
 	BMessenger(fTarget).SendMessage(&settings);
 	return true;
@@ -288,35 +288,40 @@ InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 
 
 status_t
-InspectorWindow::LoadSettings(const GUITeamUISettings* settings)
+InspectorWindow::LoadSettings(const GUITeamUISettings& settings)
 {
 	AutoLocker<BLooper> lock(this);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BVariant value;
-	if (settings->Value("inspectorWindowFrame", value) == B_OK) {
-		BRect frameRect = value.ToRect();
+	BMessage inspectorSettings;
+	if (settings.Settings("inspectorWindow", inspectorSettings) == B_OK)
+		return B_OK;
+
+	BRect frameRect;
+	if (inspectorSettings.FindRect("frame", &frameRect) == B_OK) {
 		ResizeTo(frameRect.Width(), frameRect.Height());
 		MoveTo(frameRect.left, frameRect.top);
 	}
 
-	_LoadMenuFieldMode(fHexMode, "Hex", settings);
-	_LoadMenuFieldMode(fEndianMode, "Endian", settings);
-	_LoadMenuFieldMode(fTextMode, "Text", settings);
+	_LoadMenuFieldMode(fHexMode, "Hex", inspectorSettings);
+	_LoadMenuFieldMode(fEndianMode, "Endian", inspectorSettings);
+	_LoadMenuFieldMode(fTextMode, "Text", inspectorSettings);
 
 	return B_OK;
 }
 
 
 status_t
-InspectorWindow::SaveSettings(BMessage* settings)
+InspectorWindow::SaveSettings(BMessage& settings)
 {
 	AutoLocker<BLooper> lock(this);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	status_t error = settings->AddRect("inspectorWindowFrame", Frame());
+	settings.MakeEmpty();
+
+	status_t error = settings.AddRect("frame", Frame());
 	if (error != B_OK)
 		return error;
 
@@ -338,17 +343,16 @@ InspectorWindow::SaveSettings(BMessage* settings)
 
 void
 InspectorWindow::_LoadMenuFieldMode(BMenuField* field, const char* name,
-	const GUITeamUISettings* settings)
+	const BMessage& settings)
 {
-	BVariant value;
 	BString fieldName;
-	fieldName.SetToFormat("inspectorWindow%sMode", name);
-	status_t error = settings->Value(fieldName.String(), value);
-	if (error == B_OK) {
+	int32 mode;
+	fieldName.SetToFormat("%sMode", name);
+	if (settings.FindInt32(fieldName.String(), &mode) == B_OK) {
 		BMenu* menu = field->Menu();
 		for (int32 i = 0; i < menu->CountItems(); i++) {
 			BInvoker* item = menu->ItemAt(i);
-			if (item->Message()->FindInt32("mode") == value.ToInt32()) {
+			if (item->Message()->FindInt32("mode") == mode) {
 				item->Invoke();
 				break;
 			}
@@ -359,14 +363,14 @@ InspectorWindow::_LoadMenuFieldMode(BMenuField* field, const char* name,
 
 status_t
 InspectorWindow::_SaveMenuFieldMode(BMenuField* field, const char* name,
-	BMessage* settings)
+	BMessage& settings)
 {
 	BMenuItem* item = field->Menu()->FindMarked();
 	if (item && item->Message()) {
 		int32 mode = item->Message()->FindInt32("mode");
 		BString fieldName;
-		fieldName.SetToFormat("inspectorWindow%sMode", name);
-		return settings->AddInt32(fieldName.String(), mode);
+		fieldName.SetToFormat("%sMode", name);
+		return settings.AddInt32(fieldName.String(), mode);
 	}
 
 	return B_OK;

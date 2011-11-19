@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -123,6 +124,30 @@ BreakpointsView::AttachedToWindow()
 {
 	fToggleBreakpointButton->SetTarget(this);
 	fRemoveBreakpointButton->SetTarget(this);
+}
+
+
+void
+BreakpointsView::LoadSettings(const BMessage& settings)
+{
+	BMessage breakpointListSettings;
+	if (settings.FindMessage("breakpointList", &breakpointListSettings)
+		== B_OK)
+		fListView->LoadSettings(breakpointListSettings);
+}
+
+
+status_t
+BreakpointsView::SaveSettings(BMessage& settings)
+{
+	BMessage breakpointListSettings;
+	if (fListView->SaveSettings(breakpointListSettings) != B_OK)
+		return B_NO_MEMORY;
+
+	if (settings.AddMessage("breakpointList", &breakpointListSettings) != B_OK)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 

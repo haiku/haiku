@@ -33,6 +33,9 @@ public:
 			void				UserBreakpointChanged(
 									UserBreakpoint* breakpoint);
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 			class BreakpointsTableModel;
 

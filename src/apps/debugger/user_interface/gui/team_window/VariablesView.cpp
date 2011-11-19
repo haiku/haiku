@@ -22,6 +22,7 @@
 #include "Architecture.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
+#include "GUISettingsUtils.h"
 #include "MessageCodes.h"
 #include "SettingsMenu.h"
 #include "StackFrame.h"
@@ -1517,6 +1518,34 @@ VariablesView::DetachedFromWindow()
 {
 	_FinishContextMenu(true);
 }
+
+
+void
+VariablesView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("variableTable", &tableSettings) == B_OK) {
+		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+			fVariableTable);
+	}
+}
+
+
+status_t
+VariablesView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+		fVariableTable);
+	if (result == B_OK)
+		result = settings.AddMessage("variableTable", &tableSettings);
+
+	return result;
+}
+
+
 
 
 void

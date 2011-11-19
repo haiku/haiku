@@ -224,7 +224,8 @@ TeamWindow::MessageReceived(BMessage* message)
 				fInspectorWindow = InspectorWindow::Create(fTeam, fListener,
 					this);
 				if (fInspectorWindow != NULL) {
-					fInspectorWindow->LoadSettings(&fUISettings);
+					BMessage settings;
+					fInspectorWindow->LoadSettings(fUISettings);
 					fInspectorWindow->Show();
 				}
            	} catch (...) {
@@ -354,22 +355,50 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BVariant value;
-	status_t error = settings->Value("teamWindowFrame", value);
-	if (error == B_OK) {
-		BRect rect = value.ToRect();
-		ResizeTo(rect.Width(), rect.Height());
-		MoveTo(rect.left, rect.top);
+	BMessage teamWindowSettings;
+	// no settings stored yet
+	if (settings->Settings("teamWindow", teamWindowSettings) != B_OK)
+		return B_OK;
+
+	BRect frame;
+	if (teamWindowSettings.FindRect("frame", &frame) == B_OK) {
+		ResizeTo(frame.Width(), frame.Height());
+		MoveTo(frame.left, frame.top);
 	}
 
-	GUISettingsUtils::UnarchiveSplitView(Name(), "Source", settings,
-		fSourceSplitView);
-	GUISettingsUtils::UnarchiveSplitView(Name(), "Function", settings,
-		fFunctionSplitView);
-	GUISettingsUtils::UnarchiveSplitView(Name(), "Image", settings,
-		fImageSplitView);
-	GUISettingsUtils::UnarchiveSplitView(Name(), "Thread", settings,
-		fThreadSplitView);
+	BMessage archive;
+	if (teamWindowSettings.FindMessage("sourceSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fSourceSplitView);
+
+	if (teamWindowSettings.FindMessage("functionSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fFunctionSplitView);
+
+	if (teamWindowSettings.FindMessage("imageSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fImageSplitView);
+
+	if (teamWindowSettings.FindMessage("threadSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fThreadSplitView);
+
+	if (teamWindowSettings.FindMessage("imageListView", &archive) == B_OK)
+		fImageListView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("imageFunctionsView", &archive) == B_OK)
+		fImageFunctionsView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("threadListView", &archive) == B_OK)
+		fThreadListView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("variablesView", &archive) == B_OK)
+		fVariablesView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("registersView", &archive) == B_OK)
+		fRegistersView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("stackTraceView", &archive) == B_OK)
+		fStackTraceView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("breakpointsView", &archive) == B_OK)
+		fBreakpointsView->LoadSettings(archive);
 
 	fUISettings = *settings;
 
@@ -384,40 +413,73 @@ TeamWindow::SaveSettings(GUITeamUISettings* settings)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	// save the settings from the cached copy first,
-	// then overwrite them with our most current set
-	// this is necessary in order to preserve the settings
-	// of things like the inspector in case we haven't actually
-	// invoked them at all in this session
-	const BMessage& values = fUISettings.Values();
-	char *name;
-	type_code type;
-	BVariant value;
-	for (int32 i = 0; values.GetInfo(B_ANY_TYPE, i, &name, &type) == B_OK;
-		i++) {
-		if (value.SetFromMessage(values, name) == B_OK) {
-			if (!settings->SetValue(name, value))
-				return B_NO_MEMORY;
-		}
+	BMessage inspectorSettings;
+	if (fUISettings.Settings("inspectorWindow", inspectorSettings) == B_OK) {
+		if (!settings->AddSettings("inspectorWindow", inspectorSettings))
+			return B_NO_MEMORY;
 	}
 
-	if (!settings->SetValue("teamWindowFrame", Frame()))
+	BMessage archive;
+	BMessage teamWindowSettings;
+	if (teamWindowSettings.AddRect("frame", Frame()) != B_OK)
 		return B_NO_MEMORY;
 
-	if (GUISettingsUtils::ArchiveSplitView(Name(), "Source",
-		settings, fSourceSplitView) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(archive, fSourceSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("sourceSplit", &archive) != B_OK)
 		return B_NO_MEMORY;
 
-	if (GUISettingsUtils::ArchiveSplitView(Name(), "Function",
-		settings, fFunctionSplitView) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(archive, fFunctionSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("functionSplit", &archive) != B_OK)
 		return B_NO_MEMORY;
 
-	if (GUISettingsUtils::ArchiveSplitView(Name(), "Image",
-		settings, fImageSplitView) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(archive, fImageSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("imageSplit", &archive))
 		return B_NO_MEMORY;
 
-	if (GUISettingsUtils::ArchiveSplitView(Name(), "Thread",
-		settings, fThreadSplitView) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(archive, fThreadSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("threadSplit", &archive))
+		return B_NO_MEMORY;
+
+	if (fImageListView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("imageListView", &archive))
+		return B_NO_MEMORY;
+
+	if (fImageFunctionsView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("imageFunctionsView", &archive))
+		return B_NO_MEMORY;
+
+	if (fThreadListView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("threadListView", &archive))
+		return B_NO_MEMORY;
+
+	if (fVariablesView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("variablesView", &archive))
+		return B_NO_MEMORY;
+
+	if (fRegistersView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("registersView", &archive))
+		return B_NO_MEMORY;
+
+	if (fStackTraceView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("stackTraceView", &archive))
+		return B_NO_MEMORY;
+
+	if (fBreakpointsView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("breakpointsView", &archive))
+		return B_NO_MEMORY;
+
+	if (!settings->AddSettings("teamWindow", teamWindowSettings))
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -1186,17 +1248,8 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 status_t
 TeamWindow::_SaveInspectorSettings(const BMessage* settings)
 {
-	char *name;
-	type_code type;
-	BVariant value;
-
-	for (int32 i = 0; settings->GetInfo(B_ANY_TYPE, i, &name, &type) == B_OK;
-		i++) {
-		if (value.SetFromMessage(*settings, name) == B_OK) {
-			if (!fUISettings.SetValue(name, value))
-				return B_NO_MEMORY;
-		}
-	}
+	if (fUISettings.AddSettings("inspectorWindow", *settings) != B_OK)
+		return B_NO_MEMORY;
 
 	return B_OK;
 }

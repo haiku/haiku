@@ -41,18 +41,18 @@ public:
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
 
 			status_t			LoadSettings(
-									const GUITeamUISettings* settings);
+									const GUITeamUISettings& settings);
 			status_t			SaveSettings(
-									BMessage* settings);
+									BMessage& settings);
 private:
 	void						_Init();
 
 	void						_LoadMenuFieldMode(BMenuField* field,
 									const char* name,
-									const GUITeamUISettings* settings);
+									const BMessage& settings);
 	status_t					_SaveMenuFieldMode(BMenuField* field,
 									const char* name,
-									BMessage* settings);
+									BMessage& settings);
 
 private:
 	UserInterfaceListener*		fListener;

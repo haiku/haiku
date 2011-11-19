@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +15,7 @@
 #include <ObjectList.h>
 
 #include "FunctionID.h"
+#include "GUISettingsUtils.h"
 #include "LocatableFile.h"
 #include "table/TableColumns.h"
 #include "Team.h"
@@ -231,6 +233,32 @@ void
 BreakpointListView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	fBreakpointsTableModel->Update(breakpoint);
+}
+
+
+void
+BreakpointListView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("breakpointsTable", &tableSettings) == B_OK) {
+		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+			fBreakpointsTable);
+	}
+}
+
+
+status_t
+BreakpointListView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+		fBreakpointsTable);
+	if (result == B_OK)
+		result = settings.AddMessage("breakpointsTable", &tableSettings);
+
+	return result;
 }
 
 

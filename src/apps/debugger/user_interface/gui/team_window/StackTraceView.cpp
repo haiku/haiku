@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +16,7 @@
 #include "table/TableColumns.h"
 
 #include "FunctionInstance.h"
+#include "GUISettingsUtils.h"
 #include "Image.h"
 #include "StackTrace.h"
 #include "TargetAddressTableColumn.h"
@@ -193,6 +195,32 @@ StackTraceView::SetStackFrame(StackFrame* stackFrame)
 	}
 
 	fFramesTable->DeselectAllRows();
+}
+
+
+void
+StackTraceView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("framesTable", &tableSettings) == B_OK) {
+		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+			fFramesTable);
+	}
+}
+
+
+status_t
+StackTraceView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+		fFramesTable);
+	if (result == B_OK)
+		result = settings.AddMessage("framesTable", &tableSettings);
+
+	return result;
 }
 
 
