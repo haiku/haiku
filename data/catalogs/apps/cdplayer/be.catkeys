@@ -1,14 +1,14 @@
 1	belarusian	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Аўдыё CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		CD прывад пусты
 CDPlayer	System name		Праігравальнік CD
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Дыск: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Дыск: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Дыск: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Выходзіць, што у Вашай сістэме няма CD прывадаў або сістэмных сродкаў для работы з імі. Прабачце. 
 OK	CDPlayer		ОК
 Track %whichTrack%: %trackAt%	CDPlayer		Трэк %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Аўдыё CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Выходзіць, што у Вашай сістэме няма CD прывадаў або сістэмных сродкаў для работы з імі. Прабачце. 
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Трэк: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Трэк: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Трэк: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Трэк: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Дыск: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Дыск: --:-- / --:--
+CD drive is empty	CDPlayer		CD прывад пусты

@@ -1,12 +1,12 @@
 1	russian	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Жирный шрифт:
-Defaults	Main window		По умолчанию
-Fixed font:	Font view		Моноширинный шрифт:
-Fonts	System name		Шрифты
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Шрифт меню:
-OK	main		ОК
 Plain font:	Font view		Простой шрифт:
+Defaults	Main window		По умолчанию
+OK	main		ОК
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Вернуть
 Size:	Font Selection view		Размер:
+Menu font:	Font view		Шрифт меню:
+Fixed font:	Font view		Моноширинный шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
+Bold font:	Font view		Жирный шрифт:
+Fonts	System name		Шрифты

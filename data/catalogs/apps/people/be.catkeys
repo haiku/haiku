@@ -1,49 +1,49 @@
 1	belarusian	x-vnd.Be-PEPL	2993050801
-%name% picture	People		Выява %name%
-Address	People		Адрас
-Cancel	People		Адмена
-City	People		Горад
-Close	People		Закрыць
-Company	People		Кампанія
-Configure attributes	People		Сканфігураваць атрыбуты
-Contact information for a person.	Long mimetype description		Кантактная інфармацыя для персоны.
-Contact name	People		Имя кантакта
-Copy	People		Капіяваць
-Could not create %s.	People		Не ўдалося стварыць %s.
-Country	People		Краіна
-Cut	People		Выразаць
-Drop an image here,\nor use the contextual menu.	People		Перацягніце выяву сюды,\nці выкарыстайце кантэкстнае меню.
-E-mail	People		Эл. пошта
 Edit	People		Правіць
 Error	People		Памылка
-Fax	People		Факс
-File	People		Файл
-Group	People		Група
-Home phone	People		Хатні тэлефон
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не ўдалося запусціць наладкі FileTypes каб сканфігураваць атрыбуты файла Асобы.\n\nПамылка:
-Load image…	People		Загрузіць выяву…
-Name	People		Імя
-New person	People		Новая персона
-New person…	People		Новая персона
-Nickname	People		Нік
-OK	People		ОК
-Paste	People		Уставіць
-People	System name		Персоны
-Person	Short mimetype description		Персона
-Quit	People		Выйсці
-Redo	People		Перарабіць
-Remove image	People		Выдаліць выяву
-Revert	People		Вярнуць
-Save	People		Захаваць
-Save as…	People		Захаваць як...
-Save changes before quitting?	People		Захаваць змены перад выхадам?
-Select all	People		Выбраць усё
-Sorry	People		Sorry
-State	People		Вобласць
+City	People		Горад
 The file '%name%' could not be written.	People		Немагчыма запісаць файл '%name%'.
-URL	People		URL
-Undo	People		Адмяніць
-Unnamed person	People		Неназваная асоба
-Work phone	People		Рабочы тэлефон
-Zip	People		Zip-код
 none	Groups list		няма
+Configure attributes	People		Сканфігураваць атрыбуты
+Company	People		Кампанія
+%name% picture	People		Выява %name%
+Work phone	People		Рабочы тэлефон
+People	System name		Персоны
+New person	People		Новая персона
+Select all	People		Выбраць усё
+File	People		Файл
+Unnamed person	People		Неназваная асоба
+Could not create %s.	People		Не ўдалося стварыць %s.
+Country	People		Краіна
+Close	People		Закрыць
+Group	People		Група
+Nickname	People		Нік
+Quit	People		Выйсці
+Name	People		Імя
+Revert	People		Вярнуць
+Undo	People		Адмяніць
+E-mail	People		Эл. пошта
+Save changes before quitting?	People		Захаваць змены перад выхадам?
+Load image…	People		Загрузіць выяву…
+OK	People		ОК
+Remove image	People		Выдаліць выяву
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не ўдалося запусціць наладкі FileTypes каб сканфігураваць атрыбуты файла Асобы.\n\nПамылка:
+Home phone	People		Хатні тэлефон
+Save as…	People		Захаваць як...
+Redo	People		Перарабіць
+Paste	People		Уставіць
+Drop an image here,\nor use the contextual menu.	People		Перацягніце выяву сюды,\nці выкарыстайце кантэкстнае меню.
+Save	People		Захаваць
+Person	Short mimetype description		Персона
+New person…	People		Новая персона
+Address	People		Адрас
+URL	People		URL
+Sorry	People		Sorry
+Zip	People		Zip-код
+Contact information for a person.	Long mimetype description		Кантактная інфармацыя для персоны.
+Fax	People		Факс
+Contact name	People		Имя кантакта
+Cut	People		Выразаць
+Cancel	People		Адмена
+State	People		Вобласць
+Copy	People		Капіяваць

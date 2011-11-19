@@ -1,25 +1,25 @@
 1	slovak	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Všetky pracovné plochy
-Apply	Main View		Použiť
 Backgrounds	System name		Pozadia
-Center	Main View		Stred
-Current workspace	Main View		Aktuálna pracovná plocha
+X:	Main View		X:
+Resolution: 	Image Filepanel		Rozlíšenie:
+pick one	Main View		vyberte jedno
 Default	Main View		Predvolené
-Default folder	Main View		Predvolený priečinok
-Folder: 	Main View		Priečinok:
-Icon label outline	Main View		Obrys titulku ikony
-Image:	Main View		Obrázok:
+Center	Main View		Stred
 Manual	Main View		Ručne
+Default folder	Main View		Predvolený priečinok
+Revert	Main View		Vrátiť
 None	Main View		Žiadne
-Other folder…	Main View		Iný priečinok...
+All workspaces	Main View		Všetky pracovné plochy
+Icon label outline	Main View		Obrys titulku ikony
 Other…	Main View		Iné...
+Current workspace	Main View		Aktuálna pracovná plocha
+Folder: 	Main View		Priečinok:
+Apply	Main View		Použiť
+Other folder…	Main View		Iný priečinok...
+Y:	Main View		Y:
+Tile	Main View		Dlaždice
+Select	Main View		Vybrať
+Scale to fit	Main View		Zmeniť veľkosť, aby zodpovedala
 Placement:	Main View		Umiestnenie
 Preview	Main View		Náhľad
-Resolution: 	Image Filepanel		Rozlíšenie:
-Revert	Main View		Vrátiť
-Scale to fit	Main View		Zmeniť veľkosť, aby zodpovedala
-Select	Main View		Vybrať
-Tile	Main View		Dlaždice
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		vyberte jedno
+Image:	Main View		Obrázok:

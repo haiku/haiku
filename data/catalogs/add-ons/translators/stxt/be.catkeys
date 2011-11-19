@@ -1,7 +1,7 @@
 1	belarusian	x-vnd.Haiku-STXTTranslator	4053395273
 Be styled text file	STXTTranslator		Тэкставы файл са стылямі (Be styled)
+StyledEdit files translator	STXTTranslator		Канвртар файлаў StyledEdit
 Plain text file	STXTTranslator		Файл з простым тэкстам
-STXT Settings	STXTMain		Наладкі STXT
 STXTTranslator Settings	STXTTranslator		Наладкі канвертара STXT
 StyledEdit files	STXTTranslator		Файлы StyledEdit
-StyledEdit files translator	STXTTranslator		Канвртар файлаў StyledEdit
+STXT Settings	STXTMain		Наладкі STXT

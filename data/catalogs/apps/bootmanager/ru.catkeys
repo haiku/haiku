@@ -1,65 +1,65 @@
 1	russian	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для восстановления загрузочной записи (MBR) раздела %disk из файла %file. Хотите продолжить?
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Все готово для записи загрузочного меню на диск. Вы уверены, что хотите продолжить?
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для записи загрузочного меню на загрузочный диск (%s). Пожалуйста, проверьте информацию ниже перед тем как продолжить.
-After five seconds	DefaultPartitionPage		5 секунд
-After four seconds	DefaultPartitionPage		4 секунды
-After one minute	DefaultPartitionPage		1 минута
-After one second	DefaultPartitionPage		1 секунда
-After three seconds	DefaultPartitionPage		3 секунды
+The boot manager has been successfully installed on your system.	BootManagerController		Менеджер загрузки был успешно установлен.
 After two seconds	DefaultPartitionPage		2 секунды
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Произошла ошибка при записи загрузочного меню. Загрузочная запись (MBR) может быть повреждена. Вы должны восстановить её (MBR) прямо сейчас!
+Uninstall Boot Manager	UninstallPage	Title	Удаление Менеджер Загрузки
 At least one partition must be selected!	BootManagerController		Как минимум один раздел должен быть выбран!
-Back	BootManagerController	Button	Назад
-Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
-Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
-BootManager	System name		Менеджер загрузки
-Cannot access!	DrivesPage	Cannot install	Невозможно получить доступ!
-Default Partition	DefaultPartitionPage	Title	Раздел по умолчанию
-Default Partition:	DefaultPartitionPage	Menu field label	Раздел по умолчанию:
-Done	BootManagerController	Button	Готово
-Drives	DrivesPage	Title	Диски
-Error reading partition table	BootManagerController	Title	Ошибка чтения таблицы разделов
-File:	FileSelectionPage	Text control label	Файл:
+The old Master Boot Record could not be saved to %s	BootManagerController		Предыдущая загрузочная запись (MBR) не может быть сохранена в %s
+Restore MBR	BootManagerController	Button	Восстановить загрузочную запись (MBR)
 Hard Drive	DrivesPage	Default disk name	Жесткий диск
-Immediately	DefaultPartitionPage		Без ожидания
-Install	DrivesPage	Button	Установить
-Installation of boot menu completed	BootManagerController	Title	Установка загрузочного меню завершена
-Installation of boot menu failed	BootManagerController	Title	Удаление загрузочного меню завершено
-Never	DefaultPartitionPage		бесконечно
-Next	WizardView	Button	Далее
-No space available!	DrivesPage	Cannot install	Невозможно записать MBR!
-OK	BootManagerController	Button	ОК
-Old Master Boot Record Saved failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
-Old Master Boot Record saved	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
-Partition table not compatible	BootManagerController	Title	Несовместимая таблица разделов
-Partitions	DefaultPartitionPage	Pop up menu title	Разделы
+USB Drive	DrivesPage	Default disk name	USB диск
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Загрузочная запись (MBR) устройства:\n\t%s\nсейчас будет записана на диск. Пожалуйста, выберите файл, в который будет сохранена загрузочная запись.\n\nЕсли что-то пойдет не так во время установки или если позже вы захотите удалить загрузочное меню, просто запустите программу Менеджер загрузки и нажмите кнопку 'Удалить.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для восстановления загрузочной записи (MBR) раздела %disk из файла %file. Хотите продолжить?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Произошла ошибка при записи загрузочного меню. Загрузочная запись (MBR) может быть повреждена. Вы должны восстановить её (MBR) прямо сейчас!
 Partitions	PartitionsPage	Title	Разделы
+Timeout: %s	DefaultPartitionPage		Время ожидания: %s
+Select	FileSelectionPage	Button	Выбрать
+Cannot access!	DrivesPage	Cannot install	Невозможно получить доступ!
+Uninstall boot manager	BootManagerController	Title	Удалить менеджер загрузки
+After four seconds	DefaultPartitionPage		4 секунды
+Uninstallation of boot menu failed	BootManagerController	Title	Не удалось удалить загрузочное меню
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Пожалуйста, выберите файл, содержащий загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Пожалуйста, выберите файл, содержащий главную загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
+Next	WizardView	Button	Далее
+Uninstallation of boot menu completed	BootManagerController	Title	Удаление загрузочного меню завершено
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Пожалуйста, выберите диск, на который вы хотите установить или с которого вы хотите удалить менеджер загрузки.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Пожалуйста, укажите раздел по умолчанию и время ожидания.\nЗагрузочное меню передаст управление этому разделу по истечении времени ожидания, если только вы не выберите другой раздел.\nЗажмите клавишу 'ALT' при загрузке для отключения ожидания.
-Previous	WizardView	Button	Назад
-Quit	DrivesPage	Button	Выход
-Restore MBR	BootManagerController	Button	Восстановить загрузочную запись (MBR)
-Select	FileSelectionPage	Button	Выбрать
-Summary	BootManagerController	Title	Итог
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Загрузочная запись (MBR) устройства:\n\t%s\nсейчас будет записана на диск. Пожалуйста, выберите файл, в который будет сохранена загрузочная запись.\n\nЕсли что-то пойдет не так во время установки или если позже вы захотите удалить загрузочное меню, просто запустите программу Менеджер загрузки и нажмите кнопку 'Удалить.
-The Master Boot Record could not be restored!	BootManagerController		Невозможно восстановить загрузочную запись (MBR)!
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузочная запись (MBR) устройства (%DISK) была успешна восстановлена из файла %s.
-The boot manager has been successfully installed on your system.	BootManagerController		Менеджер загрузки был успешно установлен.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Были обнаружены следующие разделы. Пожалуйста, отметьте разделы, которые должны отображаться в загрузочном меню. Вы также можете присвоить имена разделам, которые будут отображаться в этом меню.
-The old Master Boot Record could not be saved to %s	BootManagerController		Предыдущая загрузочная запись (MBR) не может быть сохранена в %s
-The old Master Boot Record was successfully saved to %s.	BootManagerController		Предыдущая загрузочная запись (MBR) была успешна сохранена в %s.
+After one second	DefaultPartitionPage		1 секунда
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблица разделов первого жесткого диска несовместима с менеджером загрузки.\nМенеджеру загрузки требуется 2 Кбайт свободного места перед первым разделом.
-Timeout: %s	DefaultPartitionPage		Время ожидания: %s
-USB Drive	DrivesPage	Default disk name	USB диск
-Uninstall	DrivesPage	Button	Удалить
-Uninstall Boot Manager	UninstallPage	Title	Удаление Менеджер Загрузки
-Uninstall boot manager	BootManagerController	Title	Удалить менеджер загрузки
-Uninstallation of boot menu completed	BootManagerController	Title	Удаление загрузочного меню завершено
-Uninstallation of boot menu failed	BootManagerController	Title	Не удалось удалить загрузочное меню
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Неизвестная файловая система
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
-Update	DrivesPage	Button	Обновить
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Были обнаружены следующие разделы. Пожалуйста, отметьте разделы, которые должны отображаться в загрузочном меню. Вы также можете присвоить имена разделам, которые будут отображаться в этом меню.
+After one minute	DefaultPartitionPage		1 минута
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузочная запись (MBR) устройства (%DISK) была успешна восстановлена из файла %s.
 Write boot menu	BootManagerController	Button	Записать загрузочное меню
+The Master Boot Record could not be restored!	BootManagerController		Невозможно восстановить загрузочную запись (MBR)!
+Uninstall	DrivesPage	Button	Удалить
+Default Partition	DefaultPartitionPage	Title	Раздел по умолчанию
+After five seconds	DefaultPartitionPage		5 секунд
+Back	BootManagerController	Button	Назад
+Installation of boot menu completed	BootManagerController	Title	Установка загрузочного меню завершена
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
+File:	FileSelectionPage	Text control label	Файл:
+Previous	WizardView	Button	Назад
+Install	DrivesPage	Button	Установить
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для записи загрузочного меню на загрузочный диск (%s). Пожалуйста, проверьте информацию ниже перед тем как продолжить.
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Неизвестная файловая система
+Update	DrivesPage	Button	Обновить
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Пожалуйста, выберите файл, содержащий главную загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
+Old Master Boot Record Saved failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
+Drives	DrivesPage	Title	Диски
+No space available!	DrivesPage	Cannot install	Невозможно записать MBR!
+Never	DefaultPartitionPage		бесконечно
+Partition table not compatible	BootManagerController	Title	Несовместимая таблица разделов
+Old Master Boot Record saved	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
+Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
+Error reading partition table	BootManagerController	Title	Ошибка чтения таблицы разделов
+Installation of boot menu failed	BootManagerController	Title	Удаление загрузочного меню завершено
+Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
+Quit	DrivesPage	Button	Выход
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Все готово для записи загрузочного меню на диск. Вы уверены, что хотите продолжить?
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Предыдущая загрузочная запись (MBR) была успешна сохранена в %s.
+Default Partition:	DefaultPartitionPage	Menu field label	Раздел по умолчанию:
+Partitions	DefaultPartitionPage	Pop up menu title	Разделы
+BootManager	System name		Менеджер загрузки
+Summary	BootManagerController	Title	Итог
+OK	BootManagerController	Button	ОК
+Immediately	DefaultPartitionPage		Без ожидания
+Done	BootManagerController	Button	Готово
+After three seconds	DefaultPartitionPage		3 секунды

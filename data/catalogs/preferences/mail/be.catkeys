@@ -1,60 +1,60 @@
 1	belarusian	x-vnd.Haiku-Mail	3957822883
-Account name:	Config Views		Імя акаунту
-Account name:	E-Mail		Імя акаунта:
-Account settings	AutoConfigWindow		Наладкі рахунка
-Account settings	Config Views		Наладкі акаунту
-Accounts	Config Window		Акаунты
-Add	Config Window		Дадаць
-Add filter	Config Views		Дадаць фільтр
-Always	Config Window		Заўсёды
-Apply	Config Window		Прымяніць
-Back	AutoConfigWindow		Назад
-Check every	Config Window		Правяраць кожныя
-Choose Protocol	E-Mail		Выбраць пратакол
-Create new account	AutoConfigWindow		Стварыць новы рахунак
-E-mail	System name		Е-Пошта
-E-mail address:	E-Mail		Адрас E-mail
-Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні...
-Enter a valid e-mail address.	AutoConfigWindow		Увядзіце адрас е-пошты.
-Error	Config Window		Памылка
-Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n
-Finish	AutoConfigWindow		Скончыць
-Incoming	Config Window		Уваходны
-Incoming	E-Mail		Уваходны
-Incoming mail filters	Config Views		Уваходныя фільтры пошты
-Login name:	E-Mail		Імя карыстача:
 Mail checking	Config Window		Праверка пошты
-Miscellaneous	Config Window		Розныя
-Never	Config Window	show status window	Ніколі
-Next	AutoConfigWindow		Далей
-OK	AutoConfigWindow		ОК
-OK	Config Views		ОК
-OK	Config Window		ОК
-Only when dial-up is connected	Config Window		Толькі пры падключаным дайл-апе
-Outgoing	Config Window		Выходны
-Outgoing	E-Mail		Выходны
-Outgoing mail filters	Config Views		Фільтры выходнай пошты
-Password:	E-Mail		Пароль:
-Real name:	Config Views		Рэальнае імя:
-Real name:	E-Mail		Рэальнае імя:
-Remove	Config Views		Выдаліць
-Remove	Config Window		Выдаліць
-Return address:	Config Views		Адрас звароту:
-Revert	Config Window		Адмяніць
-Schedule outgoing mail when dial-up is disconnected	Config Window		Запланаваць адпраўку пошты на час падключэння дайл-апу
-Server Name:	E-Mail		Імя сервера:
 Settings	Config Window		Наладкі
-Show connection status window:	Config Window		Паказваць статус спалучэння:
-Start mail services on startup	Config Window		Запускаць паштовыя службы пры загрузцы
-The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
-While sending	Config Window		Пры адапраўленні
+Never	Config Window	show status window	Ніколі
+Only when dial-up is connected	Config Window		Толькі пры падключаным дайл-апе
 While sending and receiving	Config Window		Пры адпраўцы і атрыманні
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nАгульныя опцыі немагчыма адмяніць.\n\nПамылка пры атрыманні агульных опцый:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтварыце акаунт з дапамогай кнопкі Дадаць.\n\nВыдаліце акаунт кнопкай Выдаліць.\n\nВыберыце элемент у спісе, каб змяніць яго параметры.
-\t\t· E-mail filters	Config Window		\t\t· Фільтры е-пошты
-\t\t· Incoming	Config Window		\t\t· Уваходны
-\t\t· Outgoing	Config Window		\t\t· Выходны
 days	Config Window		дзен
+Incoming	Config Window		Уваходны
+OK	Config Window		ОК
+Start mail services on startup	Config Window		Запускаць паштовыя службы пры загрузцы
+E-mail address:	E-Mail		Адрас E-mail
+Account name:	E-Mail		Імя акаунта:
+Account name:	Config Views		Імя акаунту
+Create new account	AutoConfigWindow		Стварыць новы рахунак
+OK	Config Views		ОК
+The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
+Revert	Config Window		Адмяніць
+Login name:	E-Mail		Імя карыстача:
+Incoming	E-Mail		Уваходны
+Password:	E-Mail		Пароль:
+Accounts	Config Window		Акаунты
+Finish	AutoConfigWindow		Скончыць
+Remove	Config Window		Выдаліць
+Miscellaneous	Config Window		Розныя
+Show connection status window:	Config Window		Паказваць статус спалучэння:
+Server Name:	E-Mail		Імя сервера:
+While sending	Config Window		Пры адапраўленні
+Schedule outgoing mail when dial-up is disconnected	Config Window		Запланаваць адпраўку пошты на час падключэння дайл-апу
 hours	Config Window		гадзін
-minutes	Config Window		хвілін
+Enter a valid e-mail address.	AutoConfigWindow		Увядзіце адрас е-пошты.
+Add	Config Window		Дадаць
+Account settings	AutoConfigWindow		Наладкі рахунка
+E-mail	System name		Е-Пошта
 never	Config Window	mail checking frequency	ніколі
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nАгульныя опцыі немагчыма адмяніць.\n\nПамылка пры атрыманні агульных опцый:\n%s\n
+Real name:	Config Views		Рэальнае імя:
+\t\t· Outgoing	Config Window		\t\t· Выходны
+Choose Protocol	E-Mail		Выбраць пратакол
+Return address:	Config Views		Адрас звароту:
+Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні...
+Outgoing	E-Mail		Выходны
+\t\t· E-mail filters	Config Window		\t\t· Фільтры е-пошты
+Remove	Config Views		Выдаліць
+\t\t· Incoming	Config Window		\t\t· Уваходны
+Next	AutoConfigWindow		Далей
+Check every	Config Window		Правяраць кожныя
+Back	AutoConfigWindow		Назад
+Incoming mail filters	Config Views		Уваходныя фільтры пошты
+Account settings	Config Views		Наладкі акаунту
+minutes	Config Window		хвілін
+Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n
+Real name:	E-Mail		Рэальнае імя:
+Apply	Config Window		Прымяніць
+Always	Config Window		Заўсёды
+OK	AutoConfigWindow		ОК
+Add filter	Config Views		Дадаць фільтр
+Outgoing	Config Window		Выходны
+Outgoing mail filters	Config Views		Фільтры выходнай пошты
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтварыце акаунт з дапамогай кнопкі Дадаць.\n\nВыдаліце акаунт кнопкай Выдаліць.\n\nВыберыце элемент у спісе, каб змяніць яго параметры.
+Error	Config Window		Памылка

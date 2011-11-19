@@ -1,47 +1,47 @@
 1	russian	x-vnd.Be-TSKB	1669813373
-<Be folder is empty>	BeMenu		<Папка Be пуста>
-About Haiku	BeMenu		О системе Haiku
-About this system	BeMenu		Об этой системе
-Always on top	PreferencesWindow		Всегда сверху
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
-Applications	PreferencesWindow		Приложения
-Auto-hide	PreferencesWindow		Скрывать автоматически
-Auto-raise	PreferencesWindow		Всплывать при наведении
-Change time…	TimeView		Настроить часы…
-Clock	PreferencesWindow		Часы
-Close all	WindowMenu		Закрыть все
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
-Deskbar	System name		Deskbar
-Deskbar preferences	PreferencesWindow		Настройки Deskbar
-Deskbar preferences…	BeMenu		Настроить Deskbar…
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Апплеты
 Edit menu…	PreferencesWindow		Изменить меню…
-Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
-Find…	BeMenu		Найти…
-Hide all	WindowMenu		Скрыть все
-Hide time	TimeView		Скрыть часы
-Menu	PreferencesWindow		Меню
-Mount	BeMenu		Подключить
-No windows	WindowMenu		Нет окон
-Power off	BeMenu		Выключить компьютер
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
-Quit application	WindowMenu		Закрыть приложение
-Recent applications	BeMenu		Недавние приложения
-Recent applications:	PreferencesWindow		Недавние приложения:
-Recent documents	BeMenu		Недавние документы
+Applications	PreferencesWindow		Приложения
+About this system	BeMenu		Об этой системе
 Recent documents:	PreferencesWindow		Недавние документы:
 Recent folders	BeMenu		Недавние папки
-Recent folders:	PreferencesWindow		Недавние папки:
-Restart Tracker	BeMenu		Перезапустить Tracker
-Restart system	BeMenu		Перезагрузить компьютер
-Show Time	Tray		Отображать время
-Show all	WindowMenu		Показать все
-Show application expander	PreferencesWindow		Отображать список окон приложений
-Show calendar…	TimeView		Показать календарь…
-Show replicants	BeMenu		Отображать репликанты
-Show seconds	PreferencesWindow		Отображать секунды
-Shutdown…	BeMenu		Завершение работы…
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
-Suspend	BeMenu		Приостановить
-Tracker always first	PreferencesWindow		Tracker всегда первый
+Recent applications	BeMenu		Недавние приложения
+Change time…	TimeView		Настроить часы…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
+<Be folder is empty>	BeMenu		<Папка Be пуста>
 Window	PreferencesWindow		Окно
+Menu	PreferencesWindow		Меню
+Show seconds	PreferencesWindow		Отображать секунды
+Auto-hide	PreferencesWindow		Скрывать автоматически
+Always on top	PreferencesWindow		Всегда сверху
+Show all	WindowMenu		Показать все
+No windows	WindowMenu		Нет окон
+Deskbar	System name		Deskbar
+Power off	BeMenu		Выключить компьютер
+Auto-raise	PreferencesWindow		Всплывать при наведении
+Hide time	TimeView		Скрыть часы
+Recent folders:	PreferencesWindow		Недавние папки:
+Deskbar preferences…	BeMenu		Настроить Deskbar…
+Show application expander	PreferencesWindow		Отображать список окон приложений
+Close all	WindowMenu		Закрыть все
+Deskbar preferences	PreferencesWindow		Настройки Deskbar
+Mount	BeMenu		Подключить
+Recent applications:	PreferencesWindow		Недавние приложения:
+Tracker always first	PreferencesWindow		Tracker всегда первый
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
+About Haiku	BeMenu		О системе Haiku
+Show calendar…	TimeView		Показать календарь…
+Restart system	BeMenu		Перезагрузить компьютер
+Find…	BeMenu		Найти…
+Restart Tracker	BeMenu		Перезапустить Tracker
+Show Time	Tray		Отображать время
+Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
+Clock	PreferencesWindow		Часы
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
+Recent documents	BeMenu		Недавние документы
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Апплеты
+Hide all	WindowMenu		Скрыть все
+Shutdown…	BeMenu		Завершение работы…
+Suspend	BeMenu		Приостановить
+Quit application	WindowMenu		Закрыть приложение
+Show replicants	BeMenu		Отображать репликанты

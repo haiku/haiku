@@ -1,33 +1,33 @@
 1	russian	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не смог открыть одну папку или более
 %s: Not enough room to escape the filename.	Grepper		%s: Недостаточно места для экранирования имени файла.
-%s: There was a problem running grep.	Grepper		%s: Возникла ошибка при работе grep.
-Actions	GrepWindow		Действия
-Cancel	GrepWindow		Стоп
-Case-sensitive	GrepWindow		Учитывать регистр
-Close	GrepWindow		Закрыть
-Copy text to clipboard	GrepWindow		Скопировать текст в буфер
-Encoding	GrepWindow		Кодировка
-Escape search text	GrepWindow		Экранировать текст поиска
-File	GrepWindow		Файл
-Follow symbolic links	GrepWindow		Переходить по ссылкам
-History	GrepWindow		История
-Look in sub-folders	GrepWindow		Искать в подпапках
-New window	GrepWindow		Новое окно
-OK	GrepWindow		ОК
-Open files in Pe	GrepWindow		Открывать файлы в Pe
-Open selection	GrepWindow		Открыть выделенные файлы
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Пожалуйста, выберите файлы, которые вы хотите увидеть выделенными в Tracker.
-Please select the files you wish to keep searching.	GrepWindow		Пожалуйста, выберите файлы, в которых вы хотите продолжить поиск.
-Quit	GrepWindow		Выход
-Search	GrepWindow		Искать
-Select all	GrepWindow		Выделить все
-Set target…	GrepWindow		Выбрать цель…
-Settings	GrepWindow		Настройки
-Show files in Tracker	GrepWindow		Показать файлы в Tracker
-Show lines	GrepWindow		Показывать строки
-Skip folders starting with a dot	GrepWindow		Не искать в папках, начинающихся с точки
-Text files only	GrepWindow		Только текстовые файлы
-TextSearch	GrepWindow		Текстовый поиск
-The unselected files will be removed from the list.	GrepWindow		Невыделенные файлы будут удалены из списка.
 Trim to selection	GrepWindow		Искать в выделенных
+Follow symbolic links	GrepWindow		Переходить по ссылкам
+Close	GrepWindow		Закрыть
+Cancel	GrepWindow		Стоп
+The unselected files will be removed from the list.	GrepWindow		Невыделенные файлы будут удалены из списка.
+Set target…	GrepWindow		Выбрать цель…
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Пожалуйста, выберите файлы, которые вы хотите увидеть выделенными в Tracker.
+Open files in Pe	GrepWindow		Открывать файлы в Pe
+Copy text to clipboard	GrepWindow		Скопировать текст в буфер
+Settings	GrepWindow		Настройки
+Select all	GrepWindow		Выделить все
+OK	GrepWindow		ОК
+Skip folders starting with a dot	GrepWindow		Не искать в папках, начинающихся с точки
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не смог открыть одну папку или более
+Escape search text	GrepWindow		Экранировать текст поиска
+Search	GrepWindow		Искать
+Open selection	GrepWindow		Открыть выделенные файлы
+Look in sub-folders	GrepWindow		Искать в подпапках
+Actions	GrepWindow		Действия
+File	GrepWindow		Файл
+Encoding	GrepWindow		Кодировка
+History	GrepWindow		История
+%s: There was a problem running grep.	Grepper		%s: Возникла ошибка при работе grep.
+New window	GrepWindow		Новое окно
+Please select the files you wish to keep searching.	GrepWindow		Пожалуйста, выберите файлы, в которых вы хотите продолжить поиск.
+TextSearch	GrepWindow		Текстовый поиск
+Quit	GrepWindow		Выход
+Show files in Tracker	GrepWindow		Показать файлы в Tracker
+Case-sensitive	GrepWindow		Учитывать регистр
+Text files only	GrepWindow		Только текстовые файлы
+Show lines	GrepWindow		Показывать строки

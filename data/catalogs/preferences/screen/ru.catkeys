@@ -1,52 +1,52 @@
 1	russian	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Гц
-%sSerial no.: %s	Screen		%sСерийный №: %s
-/other…	Screen		/другое…
-15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
-16 bits/pixel, 65536 colors	Screen		16 бит на пиксель, 65536 цветов
-24 bits/pixel, 16 Million colors	Screen		24 бита на пиксель, 16 миллионов цветов
-32 bits/pixel, 16 Million colors	Screen		32 бита на пиксель, 16 миллионов цветов
-8 bits/pixel, 256 colors	Screen		8 бит на пиксель, 256 цветов
-About	Screen		О программе
-All workspaces	Screen		Все рабочие столы
-Apply	Screen		Применить
-Cancel	Screen		Отмена
-Colors:	Screen		Цвета:
-Columns:	Screen		Столбцы:
-Combine displays:	Screen		Совместить экраны:
-Could not write VESA mode settings file:\n\t	Screen		Ну удалось записать файл настроек VESA режима:\n\t
-Current workspace	Screen		Текущий рабочий стол
-Do you wish to keep these settings?	Screen		Вы хотите сохранить эти настройки?
-Done	Screen		Готово
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц
-Hz	Screen		Гц
-Keep	Screen		Сохранить
-OK	Screen		ОК
-Other…	Screen		Другое…
-Refresh rate	Screen		частота обновления
-Refresh rate:	Screen		Частота обновления:
-Resolution:	Screen		Разрешение:
-Revert	Screen		Вернуть
-Rows:	Screen		Ряды:
-Screen	Screen		Экран
-Screen	System name		Экран
-Screen preferences by the Haiku team	Screen		Настройки экрана от команды Haiku
-Set background…	Screen		Изменить фон…
-Settings will revert in %seconds seconds.	Screen		Настройки будут отменены через %seconds секунд.
-Swap displays:	Screen		Поменять экраны местами:
-The screen mode could not be set:\n\t%s\n	Screen		Не возможно установить этот режим:\n\t%s\
-Type or use the left and right arrow keys.	Screen		Наберите число или используйте левую или правую стрелку.
-Undo	Screen		Отменить
-Unknown mode	Screen		Неизвестный режим
-Use laptop panel:	Screen		Использовать экран ноутбука:
-Video format:	Screen		Видео формат:
-Warning	Screen		Предупреждение
-Workspaces	Screen		Рабочие столы
-always	Screen		всегда
-bits/pixel	Screen		бита на пиксель
-disable	Screen		отключить
-horizontally	Screen		горизонтально
-if needed	Screen		если требуется
-no	Screen		нет
-vertically	Screen		вертикально
 yes	Screen		да
+Use laptop panel:	Screen		Использовать экран ноутбука:
+15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
+/other…	Screen		/другое…
+16 bits/pixel, 65536 colors	Screen		16 бит на пиксель, 65536 цветов
+Revert	Screen		Вернуть
+Swap displays:	Screen		Поменять экраны местами:
+Combine displays:	Screen		Совместить экраны:
+Done	Screen		Готово
+Set background…	Screen		Изменить фон…
+Undo	Screen		Отменить
+if needed	Screen		если требуется
+Screen preferences by the Haiku team	Screen		Настройки экрана от команды Haiku
+Screen	System name		Экран
+OK	Screen		ОК
+Workspaces	Screen		Рабочие столы
+The screen mode could not be set:\n\t%s\n	Screen		Не возможно установить этот режим:\n\t%s\
+no	Screen		нет
+Could not write VESA mode settings file:\n\t	Screen		Ну удалось записать файл настроек VESA режима:\n\t
+Type or use the left and right arrow keys.	Screen		Наберите число или используйте левую или правую стрелку.
+Warning	Screen		Предупреждение
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц
+Keep	Screen		Сохранить
+Unknown mode	Screen		Неизвестный режим
+disable	Screen		отключить
+Columns:	Screen		Столбцы:
+All workspaces	Screen		Все рабочие столы
+always	Screen		всегда
+32 bits/pixel, 16 Million colors	Screen		32 бита на пиксель, 16 миллионов цветов
+Current workspace	Screen		Текущий рабочий стол
+About	Screen		О программе
+24 bits/pixel, 16 Million colors	Screen		24 бита на пиксель, 16 миллионов цветов
+horizontally	Screen		горизонтально
+Other…	Screen		Другое…
+Cancel	Screen		Отмена
+bits/pixel	Screen		бита на пиксель
+Settings will revert in %seconds seconds.	Screen		Настройки будут отменены через %seconds секунд.
+Refresh rate:	Screen		Частота обновления:
+Hz	Screen		Гц
+Do you wish to keep these settings?	Screen		Вы хотите сохранить эти настройки?
+Rows:	Screen		Ряды:
+vertically	Screen		вертикально
+Resolution:	Screen		Разрешение:
+Screen	Screen		Экран
+%.1f Hz	Screen		%.1f Гц
+8 bits/pixel, 256 colors	Screen		8 бит на пиксель, 256 цветов
+Apply	Screen		Применить
+Refresh rate	Screen		частота обновления
+%sSerial no.: %s	Screen		%sСерийный №: %s
+Colors:	Screen		Цвета:
+Video format:	Screen		Видео формат:

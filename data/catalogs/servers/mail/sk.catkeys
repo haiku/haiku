@@ -1,22 +1,19 @@
-1	slovak	x-vnd.Be-POST	2900218551
-%num new message	DeskbarView		%num nová správa
-%num new message for %name\n	MailDaemon		%num nová správa pre %name\n
-%num new message.	MailDaemon		%num nová správa.
-%num new messages	DeskbarView		%num nových správ
-%num new messages for %name\n	MailDaemon		%num nových správ pre %name\n
-%num new messages.	MailDaemon		%num nových správ.
-<no accounts>	DeskbarView		<žiadne účty>
-Check for mail now	DeskbarView		Skontrolovať poštu teraz
+1	slovak	x-vnd.Be-POST	1719005250
 Check for mails only	DeskbarView		Iba skontrolovať poštu
-Check mail now	StatusWindow		Skontrolovať poštu teraz
-Create new message…	DeskbarView		Vytvoriť novú správu...
-Mail Status	MailDaemon		Stav pošty
-Mail daemon status log	MailDaemon		Stavový záznam poštového démona
-New Messages	MailDaemon		Nové správy
-No new messages	DeskbarView		Žiadne nové správy
-No new messages	MailDaemon		Žiadne nové správy
-No new messages.	MailDaemon		Žiadne nové správy.
-No new messages.	StatusWindow		Žiadne nové správy.
-Preferences…	DeskbarView		Nastavenia...
 Send pending mails	DeskbarView		Poslať čakajúcu poštu
+New Messages	MailDaemon		Nové správy
+<no accounts>	DeskbarView		<žiadne účty>
+%num new messages	DeskbarView		%num nových správ
 Shutdown mail services	DeskbarView		Vypnúť poštové služby
+%num new message	DeskbarView		%num nová správa
+Preferences…	DeskbarView		Nastavenia...
+%num new messages.	MailDaemon		%num nových správ.
+%num new message.	MailDaemon		%num nová správa.
+Create new message…	DeskbarView		Vytvoriť novú správu...
+%num new message for %name\n	MailDaemon		%num nová správa pre %name\n
+No new messages	MailDaemon		Žiadne nové správy
+Check for mail now	DeskbarView		Skontrolovať poštu teraz
+No new messages	DeskbarView		Žiadne nové správy
+%num new messages for %name\n	MailDaemon		%num nových správ pre %name\n
+Mail daemon status log	MailDaemon		Stavový záznam poštového démona
+No new messages.	MailDaemon		Žiadne nové správy.

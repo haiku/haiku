@@ -1,52 +1,52 @@
 1	slovak	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%sSériové č.: %s
-/other…	Screen		/iné...
-15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
-16 bits/pixel, 65536 colors	Screen		16 bitov/pixel, 65536 farieb
-24 bits/pixel, 16 Million colors	Screen		24 bitov/pixel, 16 miliónov farieb
-32 bits/pixel, 16 Million colors	Screen		32 bitov/pixel, 16 miliónov farieb
-8 bits/pixel, 256 colors	Screen		8 bitov/pixel, 256 farieb
-About	Screen		O aplikácii
-All workspaces	Screen		Všetky pracovné plochy
-Apply	Screen		Použiť
-Cancel	Screen		Zrušiť
-Colors:	Screen		Farieb:
-Columns:	Screen		Stĺpce:
-Combine displays:	Screen		Skombinovať displeje:
-Could not write VESA mode settings file:\n\t	Screen		Nepodarilo sa zapísať súbor režimu VESA:\n\t
-Current workspace	Screen		Aktuálna pracovná plocha
-Do you wish to keep these settings?	Screen		Chcete tieto nastavenia zachovať?
-Done	Screen		Hotovo
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vodorovná frekvencia:\t%lu - %lu kHz\nZvislá frekvencia:\t%lu - %lu Hz\n\nMaximálne časovanie pixlov:\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Ponechať
-OK	Screen		OK
-Other…	Screen		Iné...
-Refresh rate	Screen		Obnovovacia frekvencia
-Refresh rate:	Screen		Obnovovacia frekvencia:
-Resolution:	Screen		Rozlíšenie:
-Revert	Screen		Vrátiť
-Rows:	Screen		Riadkov:
-Screen	Screen		Obrazovka
-Screen	System name		Obrazovka
-Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku 
-Set background…	Screen		Nastaviť pozadie...
-Settings will revert in %seconds seconds.	Screen		Nastavenia sa vrátia späť o %seconds sekúnd.
-Swap displays:	Screen		Vymeniť displeje:
-The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nebolo možné nastaviť:\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Napíšte alebo použite šípky doprava a doľava.
-Undo	Screen		Vrátiť späť
-Unknown mode	Screen		Neznámy režim
-Use laptop panel:	Screen		Použiť panel noteboku:
-Video format:	Screen		Formát videa:
-Warning	Screen		Upozornenie
-Workspaces	Screen		Pracovné plochy
-always	Screen		vždy
-bits/pixel	Screen		bitov/pixel
-disable	Screen		vypnúť
-horizontally	Screen		vodorovne
-if needed	Screen		ak treba
-no	Screen		nie
-vertically	Screen		zvisle
 yes	Screen		áno
+Use laptop panel:	Screen		Použiť panel noteboku:
+15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
+/other…	Screen		/iné...
+16 bits/pixel, 65536 colors	Screen		16 bitov/pixel, 65536 farieb
+Revert	Screen		Vrátiť
+Swap displays:	Screen		Vymeniť displeje:
+Combine displays:	Screen		Skombinovať displeje:
+Done	Screen		Hotovo
+Set background…	Screen		Nastaviť pozadie...
+Undo	Screen		Vrátiť späť
+if needed	Screen		ak treba
+Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku 
+Screen	System name		Obrazovka
+OK	Screen		OK
+Workspaces	Screen		Pracovné plochy
+The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nebolo možné nastaviť:\n\t%s\n
+no	Screen		nie
+Could not write VESA mode settings file:\n\t	Screen		Nepodarilo sa zapísať súbor režimu VESA:\n\t
+Type or use the left and right arrow keys.	Screen		Napíšte alebo použite šípky doprava a doľava.
+Warning	Screen		Upozornenie
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vodorovná frekvencia:\t%lu - %lu kHz\nZvislá frekvencia:\t%lu - %lu Hz\n\nMaximálne časovanie pixlov:\t%g MHz
+Keep	Screen		Ponechať
+Unknown mode	Screen		Neznámy režim
+disable	Screen		vypnúť
+Columns:	Screen		Stĺpce:
+All workspaces	Screen		Všetky pracovné plochy
+always	Screen		vždy
+32 bits/pixel, 16 Million colors	Screen		32 bitov/pixel, 16 miliónov farieb
+Current workspace	Screen		Aktuálna pracovná plocha
+About	Screen		O aplikácii
+24 bits/pixel, 16 Million colors	Screen		24 bitov/pixel, 16 miliónov farieb
+horizontally	Screen		vodorovne
+Other…	Screen		Iné...
+Cancel	Screen		Zrušiť
+bits/pixel	Screen		bitov/pixel
+Settings will revert in %seconds seconds.	Screen		Nastavenia sa vrátia späť o %seconds sekúnd.
+Refresh rate:	Screen		Obnovovacia frekvencia:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Chcete tieto nastavenia zachovať?
+Rows:	Screen		Riadkov:
+vertically	Screen		zvisle
+Resolution:	Screen		Rozlíšenie:
+Screen	Screen		Obrazovka
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bitov/pixel, 256 farieb
+Apply	Screen		Použiť
+Refresh rate	Screen		Obnovovacia frekvencia
+%sSerial no.: %s	Screen		%sSériové č.: %s
+Colors:	Screen		Farieb:
+Video format:	Screen		Formát videa:

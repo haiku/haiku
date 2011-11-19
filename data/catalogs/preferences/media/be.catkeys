@@ -1,30 +1,30 @@
 1	belarusian	x-vnd.Haiku-Media	1473363280
-<none>	Media views		<няма>
-Audio input:	Media views		Гукавы ўваход:
-Audio mixer	Media Window		Аўдыё мікшар
-Audio output:	Media views		Гукавы выхад:
-Audio settings	Media Window		Наладкі гука
-Channel:	Media views		Канал:
-Cleaning up.	Media Window		Прыборка.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера\n Жадаеце яго стартаваць?\n
 Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося дадаць элемент кіравання гучнасцю у Deskbar: %s\n
-Couldn't remove volume control in Deskbar: %s\n	Media views		Не ўдалося выдаліць элемент кіравання гучнасцю з Deskbar: %s\n
-Defaults	Media views		Прадвызначаныя
-Done shutting down.	Media Window		Медыясервер спынены.
-Media	System name		Медыя
-OK	Media Window		ОК
-Quit	Media Window		Выйсці
 Ready for use…	Media Window		Гатовы да карыстання…
-Restart media services	Media views		Перазапусціць медыясервер
-Restarting media services\nShutting down media server\n	Media Window		Запуск медыяслужбаў наноў\nЗакрыццё медыясервера\n
-Restarting media services\nStarting media server…\n	Media Window		Запуск Медыя службаў наноў\nЗапуск Медыя Сервера…\n
-Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
-Start media server	Media Window		Запусціць медыясервер
-Starting media server…	Media Window		Запускаецца медыясервер…
-Stopping media server…	Media Window		Спыненне медыясервера…
-Telling media_addon_server to quit.	Media Window		Адпраўка каманды выхаду да media_addon_server.
-This hardware has no controls.	Media Window		Гэтая апаратура не мае элементаў кіравання.
 Video input:	Media views		Відэа ўваход:
-Video output:	Media views		Відэа Выхад:
-Video settings	Media Window		Наладкі відэа
 Waiting for media_server to quit.	Media Window		Чакаецца выключэнне media_server
+Cleaning up.	Media Window		Прыборка.
+Defaults	Media views		Прадвызначаныя
+Stopping media server…	Media Window		Спыненне медыясервера…
+Quit	Media Window		Выйсці
+OK	Media Window		ОК
+Starting media server…	Media Window		Запускаецца медыясервер…
+Done shutting down.	Media Window		Медыясервер спынены.
+Video settings	Media Window		Наладкі відэа
+Video output:	Media views		Відэа Выхад:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера\n Жадаеце яго стартаваць?\n
+Restart media services	Media views		Перазапусціць медыясервер
+Couldn't remove volume control in Deskbar: %s\n	Media views		Не ўдалося выдаліць элемент кіравання гучнасцю з Deskbar: %s\n
+Media	System name		Медыя
+Telling media_addon_server to quit.	Media Window		Адпраўка каманды выхаду да media_addon_server.
+Audio mixer	Media Window		Аўдыё мікшар
+This hardware has no controls.	Media Window		Гэтая апаратура не мае элементаў кіравання.
+Audio output:	Media views		Гукавы выхад:
+Restarting media services\nStarting media server…\n	Media Window		Запуск Медыя службаў наноў\nЗапуск Медыя Сервера…\n
+Audio settings	Media Window		Наладкі гука
+Start media server	Media Window		Запусціць медыясервер
+Restarting media services\nShutting down media server\n	Media Window		Запуск медыяслужбаў наноў\nЗакрыццё медыясервера\n
+<none>	Media views		<няма>
+Channel:	Media views		Канал:
+Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
+Audio input:	Media views		Гукавы ўваход:

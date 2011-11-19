@@ -1,24 +1,23 @@
-1	belarusian	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
-%d file	Status View		%d файл
-%d files	Status View		%d файлаў
-9999.99 GB	Status View		9999.99 ГБ
-Created	Info Window		Створаны
-DiskUsage	System name		Статыстыка дыскаў
-Free on %refName%	Scanner		Вольна на %refName%
-Get Info	Pie View		Узяць інфу
+1	belarusian	x-vnd.Haiku-DiskUsage	3634416251
+Scanning %refName%	Scanner		Сканаванне %refName%
+Size	Info Window		Памер
+Rescan	Pie View		Перасканаваць
+Rescan	Volume View		Перасканаваць
+Outdated view	Pie View		Від састарэў
 Kind	Info Window		Тып
+file unavailable	Pie View		файл недаступны
+no supporting apps	Pie View		няма падтрымліваючых праграм
+%d file	Status View		%d файл
+Path	Info Window		Пуць
+Scan	Status View		Скан
+9999.99 GB	Status View		9999.99 ГБ
+file unavailable	Status View		файл недаступны
+Get Info	Pie View		Узяць інфу
+DiskUsage	System name		Статыстыка дыскаў
+%d files	Status View		%d файлаў
+Created	Info Window		Створаны
 Modified	Info Window		Мадыфікаваны
 Open	Pie View		Адкрыць
 Open With	Pie View		Адкрыць з дапамогай
-Outdated view	Pie View		Від састарэў
-Path	Info Window		Пуць
-Rescan	Pie View		Перасканаваць
-Rescan	Volume View		Перасканаваць
-Scan	Status View		Скан
-Scanning %refName%	Scanner		Сканаванне %refName%
-Size	Info Window		Памер
-file unavailable	Pie View		файл недаступны
-file unavailable	Status View		файл недаступны
-in %d files	Info Window		ў %d файлаў
-no supporting apps	Pie View		няма падтрымліваючых праграм
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Вольна на %refName%

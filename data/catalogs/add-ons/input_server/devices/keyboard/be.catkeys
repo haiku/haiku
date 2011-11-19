@@ -1,10 +1,10 @@
 1	belarusian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-(This team is a system component)	Team monitor		(гэта сістэмны працэс)
-Cancel	Team monitor		Скасаваць
-Force reboot	Team monitor		Перагрузіць
-If the application will not quit you may have to kill it.	Team monitor		Калі праграма не спыніцца вам магчыма прыдзецца знішчыць яе.
 Kill application	Team monitor		Знішчыць праграму
 Quit application	Team monitor		Спыніць праграму
-Restart the desktop	Team monitor		Перазапусціць дэсктоп
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Абярыце праграму ў спісе і націсніце кнопку 'Знішчыць праграму' альбо 'Спыніць праграму' каб яе спыніць.\n\nНацісніце і трымайце CTRL-ALT-DELETE %ld сэкунд каб перагрузіць сістэму.
+If the application will not quit you may have to kill it.	Team monitor		Калі праграма не спыніцца вам магчыма прыдзецца знішчыць яе.
+Force reboot	Team monitor		Перагрузіць
 Team monitor	Team monitor		Манітор працэсаў
+(This team is a system component)	Team monitor		(гэта сістэмны працэс)
+Restart the desktop	Team monitor		Перазапусціць дэсктоп
+Cancel	Team monitor		Скасаваць

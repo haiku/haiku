@@ -1,15 +1,15 @@
 1	belarusian	x-vnd.Haiku-GIFTranslator	829368084
-Automatic (from alpha channel)	GIFView		Аўтаматычна (з альфа каналу)
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Фармат бітмапу BeOS (канвертар GIF)
-BeOS system	GIFView		сістэма BeOS
-Colors	GIFView		Колеры
-GIF Settings	GIFTranslator		Наладкі GIF
-GIF image	GIFTranslator		Выявы GIF
-Greyscale	GIFView		Шэракаляровы
+Websafe	GIFView		Прыдатны для Web
+Write interlaced images	GIFView		Запісваць выявы з чаргаваннем
 Optimal	GIFView		Аптымальны
+Greyscale	GIFView		Шэракаляровы
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Фармат бітмапу BeOS (канвертар GIF)
+GIF image	GIFTranslator		Выявы GIF
+Write transparent images	GIFView		Запісваць выявы з празрыстасцю
 Palette	GIFView		Палета
 Use RGB color	GIFView		Выкарыстоўваць RGB колеры
 Use dithering	GIFView		Выкарыстоўваць згладжванне
-Websafe	GIFView		Прыдатны для Web
-Write interlaced images	GIFView		Запісваць выявы з чаргаваннем
-Write transparent images	GIFView		Запісваць выявы з празрыстасцю
+GIF Settings	GIFTranslator		Наладкі GIF
+BeOS system	GIFView		сістэма BeOS
+Automatic (from alpha channel)	GIFView		Аўтаматычна (з альфа каналу)
+Colors	GIFView		Колеры

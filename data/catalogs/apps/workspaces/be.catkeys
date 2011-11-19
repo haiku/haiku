@@ -1,13 +1,13 @@
 1	belarusian	x-vnd.Be-WORK	3592128290
-About Workspaces…	Workspaces		Пра Рабочыя сталы...
-Always on top	Workspaces		Заўсёды ў фокусе
-Auto-raise	Workspaces		Аўта-выплыванне
-Change workspace count…	Workspaces		Змяніць колькасць рабочых сталоў...
 Invalid argument: %s\n	Workspaces		Няправільны аргумент: %s\n
-OK	Workspaces		ОК
 Quit	Workspaces		Выйсці
-Show window border	Workspaces		Паказваць межы вокнаў
-Show window tab	Workspaces		Паказваць закладкі вакон
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Карыстанне: %s [опцыі] [стол]\nдзе \"опцыі\" адно з:\n --notitle\t\tНе паказваць назву вакна, захоўваючы яго межы.\n --noborder\t\тое ж, але ўжо без захавання межаў.\n --avoidfocus\t\tне рабіць вакно актыўным для клавіятуры.\n --alwaysontop\t\tзаўседы ў фокусе\n --notmovable\t\tвокны нельга перамяшчаць\n --autoraise\t\tвакно рабочага стала усплыве, калі будзе знаходзіцца каля краю экрана\n --help\t\tпаказаць гэты тэкст і выйсці\nі \"стол\" - нумар аднаго з пажаданых рабочых сталоў(0-31)\n
 Workspaces	System name		Рабочыя сталы
+Change workspace count…	Workspaces		Змяніць колькасць рабочых сталоў...
+Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Карыстанне: %s [опцыі] [стол]\nдзе \"опцыі\" адно з:\n --notitle\t\tНе паказваць назву вакна, захоўваючы яго межы.\n --noborder\t\тое ж, але ўжо без захавання межаў.\n --avoidfocus\t\tне рабіць вакно актыўным для клавіятуры.\n --alwaysontop\t\tзаўседы ў фокусе\n --notmovable\t\tвокны нельга перамяшчаць\n --autoraise\t\tвакно рабочага стала усплыве, калі будзе знаходзіцца каля краю экрана\n --help\t\tпаказаць гэты тэкст і выйсці\nі \"стол\" - нумар аднаго з пажаданых рабочых сталоў(0-31)\n
+About Workspaces…	Workspaces		Пра Рабочыя сталы...
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Рабочыя сталы\nАўтары - %1 і %2.\n\nCopyright %3, Haiku.\n\nАдпраўляйце вокны ў фон кнопкай Option. Выносьце вакно ў фокус кнопкай Control.\n
+Show window border	Workspaces		Паказваць межы вокнаў
+Auto-raise	Workspaces		Аўта-выплыванне
+OK	Workspaces		ОК
+Always on top	Workspaces		Заўсёды ў фокусе
+Show window tab	Workspaces		Паказваць закладкі вакон

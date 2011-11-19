@@ -1,62 +1,62 @@
 1	belarusian	x-vnd.Haiku-ShowImage	886873119
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS сэкунд
-Browse	Menus		Праглядзець
-Cancel	ClosePrompt		Адмена
-Clear selection	Menus		Ачысціць выдзяленне
-Close	ClosePrompt		Закрыць
-Close	Menus		Закрыць
-Close document	ClosePrompt		Закрыць дакумент
-Copy	Menus		Капіяваць
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Немагчыма загрузіць выяву. Не існуе або сам файл, або канвертар для яго.
-DPI:	PrintOptionsWindow		DPI:
-Edit	Menus		Правіць
+Use as background…	Menus		Ужыць як фон...
 File	Menus		Файл
-First page	Menus		Першая старонка
-Fit image to page	PrintOptionsWindow		Умясціць выяву на старонцы
-Fit to window	Menus		Умясціць у вакно
-Flip left to right	Menus		Адлюстраваць злева направа
-Flip top to bottom	Menus		Адлюстраваць зверху наніз
+Slide delay	Menus		Затрымка слайду
+Selection mode	Menus		Рэжым Выдзялення
+Zoom in	Menus		Павялічыць
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' зменены. Вы жадаеце яго закрыць?
+Page setup…	Menus		Наладкі старонкі...
+Print…	Menus		Друкаваць...
+OK	SaveToFile		ОК
+Previous page	Menus		Папярэдняя старонка
+View	Menus		Від
 Full screen	Menus		Поўны экран
 Go to page	Menus		Перайсці да старонкі
-Height: 	PrintOptionsWindow		Вышыня:
-High-quality zooming	Menus		Высокаякаснае павелічэнне
-Image	Menus		Выява
-Job setup	PrintOptionsWindow		Наладка заданняў
-Last page	Menus		Апошняя старонка
-Leave full screen	Menus		Пакінуць рэжым поўнага экрана
-Next file	Menus		Наступны файл
-Next page	Menus		Наступная старонка
-OK	Alerts		ОК
-OK	SaveToFile		ОК
-Open…	Menus		Адкрыць...
-Original size	Menus		Пачатковы памер
-Page setup…	Menus		Наладкі старонкі...
-Previous file	Menus		Папярэдні файл
-Previous page	Menus		Папярэдняя старонка
-Print options	PrintOptionsWindow		Опцыі друку
-Print…	Menus		Друкаваць...
-Progress monitor	ProgressWindow		Манітор прагрэсу
-Quit	Menus		Выйсці
-Rating	Menus		Рэйтынг
-Resize to (in 1/72 inches):	PrintOptionsWindow		Змяніць памер (у 1/72 дзюйма):
-Rotate clockwise	Menus		Павярнуць па гадзіннікавай стрэлцы
-Rotate counterclockwise	Menus		Павярнуць супраць гадзіннікавай стрэлкі
-Save as…	Menus		Захаваць як...
-Select all	Menus		Выбраць усё
-Selection mode	Menus		Рэжым Выдзялення
-Show caption in full screen mode	Menus		Паказваць меткі ў паўнаэкранным меню
-Show tool bar	Menus		Паказаць панэль інструментаў
-ShowImage	System name		Выявы
-Slide delay	Menus		Затрымка слайду
-Slide show	Menus		Слайд шоу
-Stretch to window	Menus		Расцягнуць да вакна
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' (старонка %d) зменены. Вы жадаеце яго закрыць?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' зменены. Вы жадаеце яго закрыць?
-The file '%s' could not be written.	SaveToFile		Немагчыма запісаць файл '%s'.
-Undo	Menus		Адмяніць
-Use as background…	Menus		Ужыць як фон...
-View	Menus		Від
-Width:	PrintOptionsWindow		Шырыня:
-Zoom factor in %:	PrintOptionsWindow		Мера павелічэння, %
-Zoom in	Menus		Павялічыць
 Zoom out	Menus		Паменшыць
+Quit	Menus		Выйсці
+Rotate counterclockwise	Menus		Павярнуць супраць гадзіннікавай стрэлкі
+High-quality zooming	Menus		Высокаякаснае павелічэнне
+Browse	Menus		Праглядзець
+Edit	Menus		Правіць
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Немагчыма загрузіць выяву. Не існуе або сам файл, або канвертар для яго.
+First page	Menus		Першая старонка
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' (старонка %d) зменены. Вы жадаеце яго закрыць?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS сэкунд
+Leave full screen	Menus		Пакінуць рэжым поўнага экрана
+Close	Menus		Закрыць
+Close	ClosePrompt		Закрыць
+Undo	Menus		Адмяніць
+Resize to (in 1/72 inches):	PrintOptionsWindow		Змяніць памер (у 1/72 дзюйма):
+Rating	Menus		Рэйтынг
+Flip left to right	Menus		Адлюстраваць злева направа
+Show caption in full screen mode	Menus		Паказваць меткі ў паўнаэкранным меню
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Адкрыць...
+Next file	Menus		Наступны файл
+Clear selection	Menus		Ачысціць выдзяленне
+Close document	ClosePrompt		Закрыць дакумент
+Height: 	PrintOptionsWindow		Вышыня:
+The file '%s' could not be written.	SaveToFile		Немагчыма запісаць файл '%s'.
+Cancel	ClosePrompt		Адмена
+Show tool bar	Menus		Паказаць панэль інструментаў
+Fit to window	Menus		Умясціць у вакно
+Print options	PrintOptionsWindow		Опцыі друку
+Copy	Menus		Капіяваць
+Progress monitor	ProgressWindow		Манітор прагрэсу
+Last page	Menus		Апошняя старонка
+Stretch to window	Menus		Расцягнуць да вакна
+Previous file	Menus		Папярэдні файл
+ShowImage	System name		Выявы
+Slide show	Menus		Слайд шоу
+Fit image to page	PrintOptionsWindow		Умясціць выяву на старонцы
+Flip top to bottom	Menus		Адлюстраваць зверху наніз
+Select all	Menus		Выбраць усё
+Zoom factor in %:	PrintOptionsWindow		Мера павелічэння, %
+Width:	PrintOptionsWindow		Шырыня:
+Image	Menus		Выява
+OK	Alerts		ОК
+Rotate clockwise	Menus		Павярнуць па гадзіннікавай стрэлцы
+Job setup	PrintOptionsWindow		Наладка заданняў
+Original size	Menus		Пачатковы памер
+Next page	Menus		Наступная старонка
+Save as…	Menus		Захаваць як...

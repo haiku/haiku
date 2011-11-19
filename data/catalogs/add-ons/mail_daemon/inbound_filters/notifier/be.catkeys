@@ -1,16 +1,16 @@
 1	belarusian	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num новae паведамленнe
 %num new messages	filter		%num новых паведамленняў
-Alert	ConfigView		Папярэджанне
-Beep	ConfigView		Біп
-Central alert	ConfigView		Цэнтральная папярэджанне
-Central beep	ConfigView		Цэнтральны гук
 Keyboard LEDs	ConfigView		Клавіятурныя LED
-Log window	ConfigView		Вакно пратаколу
-Method:	ConfigView		Метад:
-New mails notification	ConfigView		Інфа пра новыя паведамленні
-New messages	filter		Новыя паведамленні
-OK	filter		ОК
-You have %num new message for %name.	filter		Вы маеце %num новae паведамленнe для %name
 You have %num new messages for %name.	filter		Вы маеце %num новых паведамленняў для %name
+You have %num new message for %name.	filter		Вы маеце %num новae паведамленнe для %name
+Log window	ConfigView		Вакно пратаколу
+Central beep	ConfigView		Цэнтральны гук
+Beep	ConfigView		Біп
+Method:	ConfigView		Метад:
+Central alert	ConfigView		Цэнтральная папярэджанне
+Alert	ConfigView		Папярэджанне
 none	ConfigView		няма
+New messages	filter		Новыя паведамленні
+New mails notification	ConfigView		Інфа пра новыя паведамленні
+OK	filter		ОК

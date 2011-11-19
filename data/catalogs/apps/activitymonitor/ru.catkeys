@@ -1,48 +1,48 @@
 1	russian	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f Кбайт/с
-%.1f MB	DataSource		%.1f Мбайт
-%.1f faults/s	DataSource		%.1f ошибок/с
-%lld ms	SettingsWindow		%lld мс
-%lld sec.	SettingsWindow		%lld сек.
-ActivityMonitor	System name		Монитор активности
-Add graph	ActivityWindow		Добавить график
-Additional items	ActivityView		Дополнительные графики
-Apps	DataSource		Приложения
-Block cache	DataSource		Блоковый кэш
-Block cache memory	DataSource		Память блокового кэша
-CPU	DataSource		ЦПУ
-CPU usage	DataSource		Использование ЦПУ
-CPU usage (combined)	DataSource		Использование ЦПУ (всего)
-Cache	DataSource		Кэш
-Cached memory	DataSource		Кэшируемая память
-File	ActivityWindow		Файл
-Hide legend	ActivityView		Скрыть легенду
-MB	DataSource		Мбайт
-Media nodes	DataSource		Медиа узлы
-Memory	DataSource		Память
-Network receive	DataSource		Входящий трафик
-Network send	DataSource		Исходящий трафик
 P-faults	DataSource		Ошибки страниц
-Page faults	DataSource		Ошибки страниц
-Ports	DataSource		Порты
-Quit	ActivityWindow		Выход
-RX	DataSource	Shorter version for Receiving.	Прием
-Raw clipboard	DataSource		Полный буфер обмена
+Media nodes	DataSource		Медиа узлы
+Threads	DataSource		Потоки
+MB	DataSource		Мбайт
+Add graph	ActivityWindow		Добавить график
+Teams	DataSource		Процессы
+Hide legend	ActivityView		Скрыть легенду
+Network send	DataSource		Исходящий трафик
+CPU usage (combined)	DataSource		Использование ЦПУ (всего)
+CPU	DataSource		ЦПУ
+Used memory	DataSource		Использованная память
+Cached memory	DataSource		Кэшируемая память
+Apps	DataSource		Приложения
+Show legend	ActivityView		Показать легенду
+Text clipboard	DataSource		Текстовый буфер обмена
+Settings	ActivityWindow		Настройки
 Receiving	DataSource		Прием
+Settings…	ActivityWindow		Настройки…
+Ports	DataSource		Порты
+Page faults	DataSource		Ошибки страниц
+Sending	DataSource		Передача
+Cache	DataSource		Кэш
+%.1f faults/s	DataSource		%.1f ошибок/с
+Update time interval:	SettingsWindow		Интервал обновления:
+TX	DataSource	Shorter version for Sending	Передача
+Quit	ActivityWindow		Выход
+Block cache memory	DataSource		Память блокового кэша
 Remove graph	ActivityView		Удалить график
+%.1f MB	DataSource		%.1f Мбайт
+%lld sec.	SettingsWindow		%lld сек.
+%lld ms	SettingsWindow		%lld мс
+CPU usage	DataSource		Использование ЦПУ
+Raw clipboard	DataSource		Полный буфер обмена
+Sems	DataSource		Семафоры
+ActivityMonitor	System name		Монитор активности
 Running applications	DataSource		Запущенные приложения
 Semaphores	DataSource		Семафоры
-Sems	DataSource		Семафоры
-Sending	DataSource		Передача
-Settings	ActivityWindow		Настройки
-Settings…	ActivityWindow		Настройки…
-Show legend	ActivityView		Показать легенду
-Swap	DataSource		Файл подкачки
+Block cache	DataSource		Блоковый кэш
 Swap space	DataSource		Размер файла подкачки
-TX	DataSource	Shorter version for Sending	Передача
-Teams	DataSource		Процессы
-Text clipboard	DataSource		Текстовый буфер обмена
-Threads	DataSource		Потоки
-Update time interval:	SettingsWindow		Интервал обновления:
-Used memory	DataSource		Использованная память
+Swap	DataSource		Файл подкачки
+File	ActivityWindow		Файл
 usage	DataSource		(загрузка)
+Additional items	ActivityView		Дополнительные графики
+Network receive	DataSource		Входящий трафик
+%.1f KB/s	DataSource		%.1f Кбайт/с
+Memory	DataSource		Память
+RX	DataSource	Shorter version for Receiving.	Прием

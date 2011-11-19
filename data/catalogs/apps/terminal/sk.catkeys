@@ -1,102 +1,101 @@
-1	slovak	x-vnd.Haiku-Terminal	2225488941
-%app% settings	Terminal PrefWindow	window title	%app% - nastavenia
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help vypísať tento text pomocníka\n -t, --title nastaviť názov okna\n -f, --fullscreen spustiť celoobrazovkový režim\n
-Abort	Terminal Shell		Zrušiť
-Appearance	Terminal PrefWindow		Vzhľad
-Background	Terminal AppearancePrefView		Pozadie
-Black on White	Terminal colors schema		Čierna na bielej
-Cancel	Terminal PrefWindow		Zrušiť
-Cancel	Terminal SetTitleWindow		Zrušiť
-Cancel	Terminal TermView		Zrušiť
-Cancel	Terminal TermWindow		Zrušiť
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie je možné vykonať „%command“:\n\t%error
-Change directory	Terminal TermView		Zmeniť adresár
-Clear all	Terminal TermWindow		Vyčistiť všetko
-Close	Terminal TermWindow		Zatvoriť
-Close active tab	Terminal TermWindow		Zatvoriť aktívnu kartu
-Close other tabs	Terminal TermWindow		Zatvoriť ostatné karty
-Close tab	Terminal TermWindow		Zatvoriť okno
-Close window	Terminal TermWindow		Zatvoriť okno
-Color schema:	Terminal AppearancePrefView		Farebná schéma:
-Color:	Terminal AppearancePrefView		Farba:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Potvrdiť ukončenie ak existujú aktívne programy
-Copy	Terminal TermWindow		Skopírovať
-Copy here	Terminal TermView		Skopírovať sem
-Create link here	Terminal TermView		Vytvoriť tu odkaz
-Custom	Terminal colors schema		Vlastné
-Decrease	Terminal TermWindow		Zmenšiť
-Don't save	Terminal PrefWindow		Neukladať
-Edit	Terminal TermWindow		Upraviť
-Edit tab title…	Terminal TermWindow		Upraviť titulok karty...
-Error!	Terminal getString		Chyba!
-Find	Terminal FindWindow		Nájsť
-Find failed	Terminal TermWindow		Hľadanie zlyhalo
-Find next	Terminal TermWindow		Nájsť ďalší
-Find previous	Terminal TermWindow		Nájsť predošlý
-Find…	Terminal TermWindow		Nájsť...
-Font:	Terminal AppearancePrefView		Písmo:
-Full screen	Terminal TermWindow		Celoobrazovkový režim
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminál Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a Takashi Murai.\n\nPoužitie: %s [VOĽBA] [SHELL]\n
-Increase	Terminal TermWindow		Zväčšiť
-Insert path	Terminal TermView		Vložiť cestu
-Match case	Terminal FindWindow		Rozlišovať veľkosť písmen
-Match word	Terminal FindWindow		Nájsť slovo
-Move here	Terminal TermView		Presunúť sem
-New Terminal	Terminal TermWindow		Nový terminál
-New tab	Terminal TermWindow		Nová karta
-No search string was entered.	Terminal TermWindow		Nebol zadaný vyhľadávací reťazec.
+1	slovak	x-vnd.Haiku-Terminal	1220615377
 Not found.	Terminal TermWindow		Nenájdené.
-Nothing is selected.	Terminal TermWindow		Nič nie je vybrané.
-OK	Terminal PrefWindow		OK
-OK	Terminal SetTitleWindow		OK
-OK	Terminal TermApp		OK
-OK	Terminal TermWindow		OK
-Page setup…	Terminal TermWindow		Nastavenie stránky
-Paste	Terminal TermWindow		Vložiť
-Print	Terminal TermWindow		Tlačiť
-Print cancelled.	Terminal TermWindow		Tlačenie zrušené.
-Quit	Terminal TermWindow		Ukončiť
-Really close?	Terminal TermWindow		Skutočne zatvoriť?
-Save	Terminal PrefWindow		Uložiť
-Save as default	Terminal TermWindow		Uložiť ako predvolené
-Save changes to this settings panel?	Terminal PrefWindow		Uložiť zmeny tohto panelu nastavení?
-Save to file…	Terminal PrefWindow		Uložiť do súboru...
-Search forward	Terminal FindWindow		Hľadať vpred
-Select all	Terminal TermWindow		Vybrať všetky
-Selected background	Terminal AppearancePrefView		Vybrané pozadie
-Selected text	Terminal AppearancePrefView		Vybraný text
-Set tab title	Terminal TermWindow		Nastaviť titulok okna
-Set window title	Terminal TermWindow		Nastaviť titulok okna
-Settings	Terminal TermWindow		Nastavenia
-Settings…	Terminal TermWindow		Nastavenia...
-Shell 	Terminal TermWindow		Shell
-Size:	Terminal AppearancePrefView		Veľkosť:
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
-Tab title:	Terminal AppearancePrefView		Titulok karty:
-Tab title:	Terminal TermWindow		Titulok karty:
-Terminal	System name		Terminál
+Change directory	Terminal TermView		Zmeniť adresár
+OK	Terminal TermWindow		OK
+New Terminal	Terminal TermWindow		Nový terminál
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminálu sa nepodarilo spustiť shell. Ľutujeme.
-Text	Terminal AppearancePrefView		Text
-Text encoding	Terminal TermWindow		Kódovanie textu
-Text not found.	Terminal TermWindow		Text nenájdený.
 Text size	Terminal TermWindow		Veľkosť textu
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Nasledovné procesy ešte stále bežia:\n\n\t%1.\n\nAk zatvoríte Terminál, procesy budú zabité.
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci názov aktuálnej karty. Možno použiť\nnasledovné zástupné symboly:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky kariet. Možno použiť\nnasledovné zástupné symboly:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte Terminál, proces bude zabitý.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte kartu, proces bude zabitý.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba „%s“\n
-Use default	Terminal SetTitleWindow		Použiť predvolené
+Match case	Terminal FindWindow		Rozlišovať veľkosť písmen
+Quit	Terminal TermWindow		Ukončiť
 Use default shell	Terminal Shell		Použiť predvolený shell
-Use selection	Terminal FindWindow		Použiť výber
-Use text:	Terminal FindWindow		Použiť text:
-White on Black	Terminal colors schema		Biela na čiernej
-Window size	Terminal TermWindow		Veľkosť okna
+Confirm exit if active programs exist	Terminal AppearancePrefView		Potvrdiť ukončenie ak existujú aktívne programy
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci názov aktuálnej karty. Možno použiť\nnasledovné zástupné symboly:\n
+Select all	Terminal TermWindow		Vybrať všetky
+Close tab	Terminal TermWindow		Zatvoriť okno
+Custom	Terminal colors schema		Vlastné
+Save to file…	Terminal PrefWindow		Uložiť do súboru...
+OK	Terminal PrefWindow		OK
+Black on White	Terminal colors schema		Čierna na bielej
 Window title:	Terminal AppearancePrefView		Titulok okna:
+Font:	Terminal AppearancePrefView		Písmo:
+Copy here	Terminal TermView		Skopírovať sem
+Really close?	Terminal TermWindow		Skutočne zatvoriť?
+Copy	Terminal TermWindow		Skopírovať
 Window title:	Terminal TermWindow		Titulok okna:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba „%s“\n
+Print cancelled.	Terminal TermWindow		Tlačenie zrušené.
+%app% settings	Terminal PrefWindow	window title	%app% - nastavenia
+Cancel	Terminal SetTitleWindow		Zrušiť
+Increase	Terminal TermWindow		Zväčšiť
+Settings	Terminal TermWindow		Nastavenia
+Window size	Terminal TermWindow		Veľkosť okna
+Selected text	Terminal AppearancePrefView		Vybraný text
+Find	Terminal FindWindow		Nájsť
+Appearance	Terminal PrefWindow		Vzhľad
+Tab title:	Terminal AppearancePrefView		Titulok karty:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
+Color schema:	Terminal AppearancePrefView		Farebná schéma:
+OK	Terminal SetTitleWindow		OK
+Background	Terminal AppearancePrefView		Pozadie
+Use selection	Terminal FindWindow		Použiť výber
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte kartu, proces bude zabitý.
+Size:	Terminal AppearancePrefView		Veľkosť:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie je možné vykonať „%command“:\n\t%error
+Full screen	Terminal TermWindow		Celoobrazovkový režim
 Window title…	Terminal TermWindow		Titulok okna...
+Page setup…	Terminal TermWindow		Nastavenie stránky
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Nasledovné procesy ešte stále bežia:\n\n\t%1.\n\nAk zatvoríte Terminál, procesy budú zabité.
+Insert path	Terminal TermView		Vložiť cestu
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminál Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a Takashi Murai.\n\nPoužitie: %s [VOĽBA] [SHELL]\n
+No search string was entered.	Terminal TermWindow		Nebol zadaný vyhľadávací reťazec.
+Don't save	Terminal PrefWindow		Neukladať
+Set window title	Terminal TermWindow		Nastaviť titulok okna
+Terminal	System name		Terminál
+Close other tabs	Terminal TermWindow		Zatvoriť ostatné karty
+Match word	Terminal FindWindow		Nájsť slovo
+Nothing is selected.	Terminal TermWindow		Nič nie je vybrané.
+Text not found.	Terminal TermWindow		Text nenájdený.
+Find…	Terminal TermWindow		Nájsť...
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte Terminál, proces bude zabitý.
+Move here	Terminal TermView		Presunúť sem
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu\n\t\t\tv aktuálnej karte. Nepovinne je možné určiť maximálny počet\n\t\t\tzložiek cesty. Napr. „%2d“ pre najviac dve zložky.\n\t%i\t-\tIndex okna.\n\t%p\t-\tNázov aktívneho procesu v aktuálnej karte.\n\t%t\t-\tTitulok aktuálnej karty.\n\t%%\t-\tZnak „%“.
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu.\n\t\t\tNepovinne je možné určiť maximálny počet\n\t\t\tzložiek cesty. Napr. „%2d“ pre najviac dve zložky.\n\t%i\t-\tIndex karty.\n\t%p\t-\tNázov aktívneho procesu.\n\t%%\t-\tZnak „%“.
+White on Black	Terminal colors schema		Biela na čiernej
+Error!	Terminal getString		Chyba!
+New tab	Terminal TermWindow		Nová karta
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky kariet. Možno použiť\nnasledovné zástupné symboly:\n
+Selected background	Terminal AppearancePrefView		Vybrané pozadie
+Decrease	Terminal TermWindow		Zmenšiť
+Create link here	Terminal TermView		Vytvoriť tu odkaz
+Close	Terminal TermWindow		Zatvoriť
+Text	Terminal AppearancePrefView		Text
+Clear all	Terminal TermWindow		Vyčistiť všetko
+Text encoding	Terminal TermWindow		Kódovanie textu
 size	Terminal TermView		veľkosť
+Close window	Terminal TermWindow		Zatvoriť okno
+Save as default	Terminal TermWindow		Uložiť ako predvolené
+Set tab title	Terminal TermWindow		Nastaviť titulok okna
+Settings…	Terminal TermWindow		Nastavenia...
+Abort	Terminal Shell		Zrušiť
+Edit	Terminal TermWindow		Upraviť
+Color:	Terminal AppearancePrefView		Farba:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
+Print	Terminal TermWindow		Tlačiť
+Use text:	Terminal FindWindow		Použiť text:
+Cancel	Terminal TermWindow		Zrušiť
+OK	Terminal TermApp		OK
+Find failed	Terminal TermWindow		Hľadanie zlyhalo
+Search forward	Terminal FindWindow		Hľadať vpred
+Edit tab title…	Terminal TermWindow		Upraviť titulok karty...
+Find previous	Terminal TermWindow		Nájsť predošlý
+Tab title:	Terminal TermWindow		Titulok karty:
+Find next	Terminal TermWindow		Nájsť ďalší
+Close active tab	Terminal TermWindow		Zatvoriť aktívnu kartu
+Paste	Terminal TermWindow		Vložiť
+Save changes to this settings panel?	Terminal PrefWindow		Uložiť zmeny tohto panelu nastavení?
+Cancel	Terminal PrefWindow		Zrušiť
+Shell 	Terminal TermWindow		Shell
+Save	Terminal PrefWindow		Uložiť
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu.\n\t\t\tNepovinne je možné určiť maximálny počet\n\t\t\tzložiek cesty. Napr. „%2d“ pre najviac dve zložky.\n\t%i\t-\tIndex karty.\n\t%p\t-\tNázov aktívneho procesu.\n\t%%\t-\tZnak „%“.
+Cancel	Terminal TermView		Zrušiť
+Use default	Terminal SetTitleWindow		Použiť predvolené

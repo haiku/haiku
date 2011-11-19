@@ -1,21 +1,21 @@
 1	belarusian	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<не знойдзена бесшнуравых сетак>
-Adapter:	EthernetSettingsView		Адаптар:
-Apply	EthernetSettingsView		Ужыць
-Auto-configuring failed: 	EthernetSettingsView		Аўтаканфігурацыі не ўдалася:
 Choose automatically	EthernetSettingsView		Выбіраць аўтаматычна
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS #1:
-DNS #2:	EthernetSettingsView		DNS #2:
-Disabled	EthernetSettingsView		Выключаны
-Domain:	EthernetSettingsView		Домен:
 Gateway:	EthernetSettingsView		Шлюз
-IP address:	EthernetSettingsView		IP адрас:
-Mode:	EthernetSettingsView		Рэжым:
 Netmask:	EthernetSettingsView		Маска сеткі:
-Network	System name		Сетка
-Network:	EthernetSettingsView		Сетка:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Ужыць
 OK	EthernetSettingsView		ОК
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		IP адрас:
+Adapter:	EthernetSettingsView		Адаптар:
+Domain:	EthernetSettingsView		Домен:
 Revert	EthernetSettingsView		Вярнуць
-Static	EthernetSettingsView		Статычны
+<no wireless networks found>	EthernetSettingsView		<не знойдзена бесшнуравых сетак>
+Network	System name		Сетка
+Mode:	EthernetSettingsView		Рэжым:
+Network:	EthernetSettingsView		Сетка:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Неабходна запусціць net_server для аўтаканфігурацыі!
+Disabled	EthernetSettingsView		Выключаны
+Auto-configuring failed: 	EthernetSettingsView		Аўтаканфігурацыі не ўдалася:
+Static	EthernetSettingsView		Статычны

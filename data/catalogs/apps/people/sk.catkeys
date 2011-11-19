@@ -1,49 +1,49 @@
 1	slovak	x-vnd.Be-PEPL	2993050801
-%name% picture	People		Obrázok %name%
-Address	People		Adresa
-Cancel	People		Zrušiť
-City	People		Mesto
-Close	People		Zatvoriť
-Company	People		Spoločnosť
-Configure attributes	People		Nastaviť atribúty
-Contact information for a person.	Long mimetype description		Kontaktné informácie osoby
-Contact name	People		Meno kontaktu
-Copy	People		Kopírovať
-Could not create %s.	People		Nebolo možné vytvoriť %s.
-Country	People		Krajina
-Cut	People		Vystrihnúť
-Drop an image here,\nor use the contextual menu.	People		Sem pretiahnite obrázok\nalebo použite kontextové menu.
-E-mail	People		E-mail
 Edit	People		Upraviť
 Error	People		Chyba
-Fax	People		Fax
-File	People		Súbor
-Group	People		Skupina
-Home phone	People		Telefón domov
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spustenie nastavenia typov súborov, aby sa nastavili atribúty Osoby, zlyhalo.\n\nChyba:
-Load image…	People		Načítať obrázok...
-Name	People		Meno
-New person	People		Nová osoba
-New person…	People		Nová osoba...
-Nickname	People		Prezývka
-OK	People		OK
-Paste	People		Vložiť
-People	System name		Ľudia
-Person	Short mimetype description		Osoba
-Quit	People		Ukončiť
-Redo	People		Opakovať
-Remove image	People		Odstrániť obrázok
-Revert	People		Vrátiť
-Save	People		Uložiť
-Save as…	People		Uložiť ako...
-Save changes before quitting?	People		Uložiť zmeny pred ukončením?
-Select all	People		Vybrať všetky
-Sorry	People		Prepáčte
-State	People		Štát
+City	People		Mesto
 The file '%name%' could not be written.	People		Súbor „%name%“ nebolo možné zapísať.
-URL	People		URL
-Undo	People		Späť
-Unnamed person	People		Nepomenovaná osoba
-Work phone	People		Telefón do práce
-Zip	People		PSČ
 none	Groups list		žiadne
+Configure attributes	People		Nastaviť atribúty
+Company	People		Spoločnosť
+%name% picture	People		Obrázok %name%
+Work phone	People		Telefón do práce
+People	System name		Ľudia
+New person	People		Nová osoba
+Select all	People		Vybrať všetky
+File	People		Súbor
+Unnamed person	People		Nepomenovaná osoba
+Could not create %s.	People		Nebolo možné vytvoriť %s.
+Country	People		Krajina
+Close	People		Zatvoriť
+Group	People		Skupina
+Nickname	People		Prezývka
+Quit	People		Ukončiť
+Name	People		Meno
+Revert	People		Vrátiť
+Undo	People		Späť
+E-mail	People		E-mail
+Save changes before quitting?	People		Uložiť zmeny pred ukončením?
+Load image…	People		Načítať obrázok...
+OK	People		OK
+Remove image	People		Odstrániť obrázok
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spustenie nastavenia typov súborov, aby sa nastavili atribúty Osoby, zlyhalo.\n\nChyba:
+Home phone	People		Telefón domov
+Save as…	People		Uložiť ako...
+Redo	People		Opakovať
+Paste	People		Vložiť
+Drop an image here,\nor use the contextual menu.	People		Sem pretiahnite obrázok\nalebo použite kontextové menu.
+Save	People		Uložiť
+Person	Short mimetype description		Osoba
+New person…	People		Nová osoba...
+Address	People		Adresa
+URL	People		URL
+Sorry	People		Prepáčte
+Zip	People		PSČ
+Contact information for a person.	Long mimetype description		Kontaktné informácie osoby
+Fax	People		Fax
+Contact name	People		Meno kontaktu
+Cut	People		Vystrihnúť
+Cancel	People		Zrušiť
+State	People		Štát
+Copy	People		Kopírovať

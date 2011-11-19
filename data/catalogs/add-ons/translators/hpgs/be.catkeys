@@ -1,12 +1,12 @@
 1	belarusian	x-vnd.Haiku-HPGSTranslator	3633584048
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Грунтуецца на распрацоўках праекту HPGS (http://hpgs.berlios.de)
-Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Памылка: Немагчыма далучыць прыладу малявання да чытача: %s\n
+Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		Памылка: Немагчыма апрацаваць даныя малюнку %s\n
 HPGS image	HPGSTranslator		выява HPGS
-HPGS image translator	HPGSTranslator		Канвертар выяваў HPGS
+HPGSTranslator Settings	ConfigView		Наладкі канвертара HPGS
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Памылка: Немагчыма далучыць прыладу малявання да чытача: %s\n
 HPGS images	ConfigView		выявы HPGS
 HPGS images	HPGSTranslator		выявы HPGS
-HPGSTranslator Settings	ConfigView		Наладкі канвертара HPGS
-Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		Памылка запісу %s\n
 no hpgs\n	HPGSTranslator		не hpgs\n
+HPGS image translator	HPGSTranslator		Канвертар выяваў HPGS
+Write error %s\n	HPGSTranslator		Памылка запісу %s\n

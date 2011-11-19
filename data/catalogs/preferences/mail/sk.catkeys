@@ -1,55 +1,55 @@
 1	slovak	x-vnd.Haiku-Mail	4171229277
-Account name:	Config Views		Názov účtu:
-Account name:	E-Mail		Názov účtu:
-Account settings	AutoConfigWindow		Nastavenie účtu
-Account settings	Config Views		Nastavenia účtu
-Accounts	Config Window		Účty
-Add	Config Window		Pridať
-Add filter	Config Views		Pridať server
-Always	Config Window		Vždy
-Apply	Config Window		Použiť
-Back	AutoConfigWindow		Späť
-Check every	Config Window		Kontrolovať každých
-Choose Protocol	E-Mail		Vybrať protokol
-Create new account	AutoConfigWindow		Vytvoriť nový účet
-E-mail	System name		Email
-E-mail address:	E-Mail		Emailová adresa:
-Edit mailbox menu…	Config Window		Upraviť menu poštovej schránky...
-Enter a valid e-mail address.	AutoConfigWindow		Zadajte platnú emailovú adresu.
-Error	Config Window		Chyba
-Error retrieving general settings: %s\n	Config Window		Chyba pri získavaní všeobecných nastavení: %s\n
-Finish	AutoConfigWindow		Dokončiť
-Incoming	Config Window		Prichádzajúce
-Incoming	E-Mail		Prichádzajúce
-Incoming mail filters	Config Views		Filtre prichádzajúcej pošty
-Login name:	E-Mail		Prihlasovacie meno:
 Mail checking	Config Window		Kontrola pošty
-Miscellaneous	Config Window		Rozličné
-Next	AutoConfigWindow		Ďalej
-OK	AutoConfigWindow		OK
-OK	Config Views		OK
-OK	Config Window		OK
-Only when dial-up is connected	Config Window		Iba ak je vytočené spojenie
-Outgoing	Config Window		Odchádzajúce
-Outgoing	E-Mail		Odchádzajúce
-Outgoing mail filters	Config Views		Filtre odchádzajúcej pošty
-Password:	E-Mail		Heslo:
-Real name:	Config Views		Skutočné meno:
-Real name:	E-Mail		Skutočné meno:
-Remove	Config Views		Odstrániť
-Remove	Config Window		Odstrániť
-Return address:	Config Views		Návratová adresa:
-Revert	Config Window		Vrátiť
-Schedule outgoing mail when dial-up is disconnected	Config Window		Naplánovať odchádzajúcu poštu pri odpojení vytáčaného spojenia
-Server Name:	E-Mail		Názov servera:
 Settings	Config Window		Nastavenie
-Show connection status window:	Config Window		Zobraziť okno stavu spojenia:
-Start mail services on startup	Config Window		Spustiť služby pošty pri štarte
-The filter could not be moved. Deleting filter.	Config Views		Filter nebolo možné presunúť. Filter sa zmaže.
-While sending	Config Window		Počas odosielania
+Only when dial-up is connected	Config Window		Iba ak je vytočené spojenie
 While sending and receiving	Config Window		Počas odosielania a prijímania
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nVšeobecné nastavenia nebolo možné vrátiť.\n\nChyba pri získavaní všeobecných nastavení:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNový účet vytvoríte tlačidlom Pridať.\n\nÚčet odstránite tlačidlom odstrániť na vybranej položke.\n\nNastavenia položky zmeníte jej vybraním v zozname.
 days	Config Window		dní
+Incoming	Config Window		Prichádzajúce
+OK	Config Window		OK
+Start mail services on startup	Config Window		Spustiť služby pošty pri štarte
+E-mail address:	E-Mail		Emailová adresa:
+Account name:	E-Mail		Názov účtu:
+Account name:	Config Views		Názov účtu:
+Create new account	AutoConfigWindow		Vytvoriť nový účet
+OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		Filter nebolo možné presunúť. Filter sa zmaže.
+Revert	Config Window		Vrátiť
+Login name:	E-Mail		Prihlasovacie meno:
+Incoming	E-Mail		Prichádzajúce
+Password:	E-Mail		Heslo:
+Accounts	Config Window		Účty
+Finish	AutoConfigWindow		Dokončiť
+Remove	Config Window		Odstrániť
+Miscellaneous	Config Window		Rozličné
+Show connection status window:	Config Window		Zobraziť okno stavu spojenia:
+Server Name:	E-Mail		Názov servera:
+While sending	Config Window		Počas odosielania
+Schedule outgoing mail when dial-up is disconnected	Config Window		Naplánovať odchádzajúcu poštu pri odpojení vytáčaného spojenia
 hours	Config Window		hodín
+Enter a valid e-mail address.	AutoConfigWindow		Zadajte platnú emailovú adresu.
+Add	Config Window		Pridať
+Account settings	AutoConfigWindow		Nastavenie účtu
+E-mail	System name		Email
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nVšeobecné nastavenia nebolo možné vrátiť.\n\nChyba pri získavaní všeobecných nastavení:\n%s\n
+Real name:	Config Views		Skutočné meno:
+Choose Protocol	E-Mail		Vybrať protokol
+Return address:	Config Views		Návratová adresa:
+Edit mailbox menu…	Config Window		Upraviť menu poštovej schránky...
+Outgoing	E-Mail		Odchádzajúce
+Remove	Config Views		Odstrániť
+Next	AutoConfigWindow		Ďalej
+Check every	Config Window		Kontrolovať každých
+Back	AutoConfigWindow		Späť
+Incoming mail filters	Config Views		Filtre prichádzajúcej pošty
+Account settings	Config Views		Nastavenia účtu
 minutes	Config Window		minút
+Error retrieving general settings: %s\n	Config Window		Chyba pri získavaní všeobecných nastavení: %s\n
+Real name:	E-Mail		Skutočné meno:
+Apply	Config Window		Použiť
+Always	Config Window		Vždy
+OK	AutoConfigWindow		OK
+Add filter	Config Views		Pridať server
+Outgoing	Config Window		Odchádzajúce
+Outgoing mail filters	Config Views		Filtre odchádzajúcej pošty
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNový účet vytvoríte tlačidlom Pridať.\n\nÚčet odstránite tlačidlom odstrániť na vybranej položke.\n\nNastavenia položky zmeníte jej vybraním v zozname.
+Error	Config Window		Chyba

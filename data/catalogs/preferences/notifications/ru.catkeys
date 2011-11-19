@@ -1,49 +1,49 @@
 1	russian	x-vnd.Haiku-Notifications	299049300
-Allowed	NotificationView		Разрешено
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Произошла ошибка при сохранении настроек\nВозможно, что закончилось свободное место на диске.
-Application	NotificationView		Приложение
-Applications	NotificationView		Приложения
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Невозможно добавить уведомления в автозагрузку, возможно у вас нет прав на запись в директорию настроек загрузки.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Невозможно сохранить настройки, возможно у вас нет прав на запись в директорию настроек загрузки.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Невозможно сохранить параметры, возможно у вас нет прав на запись в директорию настроек или диск переполнен.
-Cannot disable notifications because the server can't be reached.	GeneralView		Невозможно отключить уведомления, потому что сервер уведомлений недоступен.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Невозможно включить уведомления, потому что сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
-Disable notifications	GeneralView		Отключить уведомления
-Display	PrefletView		Отображение
-Enable notifications	GeneralView		Включить уведомления
-Enable notifications at startup	GeneralView		Добавить уведомления в автозагрузку
-Enabled	NotificationView		Включено
-Error	NotificationView		Ошибка
-Events are not notified	GeneralView		События не уведомляются
-Events are notified	GeneralView		События уведомляются
-General	PrefletView		Основные
-Hide notifications from screen after	GeneralView		Скрывать уведомления после
-Icon size:	DisplayView		Размер значков:
-Important	NotificationView		Важно
-Information	NotificationView		Информация
-Large icon	DisplayView		Большие значки
-Last Received	NotificationView		Последнее полученное
-Mini icon	DisplayView		Мелкие значки
-No	NotificationView		Нет
 Notifications	GeneralView		Уведомления
-Notifications	NotificationView		Уведомления
-Notifications	System name		Уведомления
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Невозможно остановить уведомления, потому что сервер уведомлений недоступен.
-OK	DisplayView		ОК
-OK	GeneralView		ОК
-OK	NotificationView		ОК
-Progress	NotificationView		Прогресс
+seconds of inactivity	GeneralView		секунд бездействия
 Revert	PrefletWin		Вернуть
+Mini icon	DisplayView		Мелкие значки
+Enable notifications	GeneralView		Включить уведомления
+Error	NotificationView		Ошибка
+OK	GeneralView		ОК
+Events are not notified	GeneralView		События не уведомляются
 Save	PrefletWin		Сохранить
+Type	NotificationView		Тип
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Невозможно остановить уведомления, потому что сервер уведомлений недоступен.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Невозможно включить уведомления, потому что сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
+OK	NotificationView		ОК
+Important	NotificationView		Важно
+Cannot disable notifications because the server can't be reached.	GeneralView		Невозможно отключить уведомления, потому что сервер уведомлений недоступен.
+Progress	NotificationView		Прогресс
+Last Received	NotificationView		Последнее полученное
+General	PrefletView		Основные
+Display	PrefletView		Отображение
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Невозможно добавить уведомления в автозагрузку, возможно у вас нет прав на запись в директорию настроек загрузки.
 Search:	NotificationView		Поиск:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Не найден сервер уведомлений.\nЭто означает, что сервер уведомлений может быть поврежден.
+Allowed	NotificationView		Разрешено
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Невозможно сохранить параметры, возможно у вас нет прав на запись в директорию настроек или диск переполнен.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Возникла проблема при сохранении настроек.\nВозможно у вас нет прав на запись в директорию настроек.
+Yes	NotificationView		Да
+Large icon	DisplayView		Большие значки
+Icon size:	DisplayView		Размер значков:
+Hide notifications from screen after	GeneralView		Скрывать уведомления после
+Disable notifications	GeneralView		Отключить уведомления
+Notifications	System name		Уведомления
+Notifications	NotificationView		Уведомления
+No	NotificationView		Нет
+Title	NotificationView		Заголовок
+Information	NotificationView		Информация
+Window width:	DisplayView		Ширина окна:
+Application	NotificationView		Приложение
+Enabled	NotificationView		Включено
+OK	DisplayView		ОК
+Unknown	NotificationView		Неизвестно
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Невозможно сохранить настройки, возможно у вас нет прав на запись в директорию настроек загрузки.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Возникла проблема при сохранении настроек.\nВвозможно у вас нет прав на запись в директорию настроек загрузки.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Возникла проблема при сохранении настроек.\nвозможно у вас нет прав на запись в директорию настроек загрузки.
-Title	NotificationView		Заголовок
-Type	NotificationView		Тип
-Unknown	NotificationView		Неизвестно
-Window width:	DisplayView		Ширина окна:
-Yes	NotificationView		Да
-seconds of inactivity	GeneralView		секунд бездействия
+Enable notifications at startup	GeneralView		Добавить уведомления в автозагрузку
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
+Applications	NotificationView		Приложения
+Events are notified	GeneralView		События уведомляются

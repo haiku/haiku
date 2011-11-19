@@ -1,9 +1,9 @@
 1	belarusian	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Версія %d.%d.%d %s
-WBI Settings	WonderBrushMain		Наладкі WBI
-WBI Settings	WonderBrushTranslator		Наладкі WBI
-WonderBrush image	WonderBrushTranslator		выява WonderBrush
 WonderBrush image translator	WonderBrushTranslator		Канвертар выяваў WonderBrush
-WonderBrush image translator	WonderBrushView		Канвертар выяваў WonderBrush
+WBI Settings	WonderBrushTranslator		Наладкі WBI
+WBI Settings	WonderBrushMain		Наладкі WBI
+Version %d.%d.%d %s	WonderBrushView		Версія %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		Выявы WonderBrush
+WonderBrush image	WonderBrushTranslator		выява WonderBrush
+WonderBrush image translator	WonderBrushView		Канвертар выяваў WonderBrush
 written by:	WonderBrushView		распрацаваны:

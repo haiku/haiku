@@ -1,61 +1,61 @@
 1	slovak	x-vnd.Haiku-ShowImage	2479358163
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekúnd
-Browse	Menus		Prechádzať
-Cancel	ClosePrompt		Zrušiť
-Clear selection	Menus		Vyčistiť výber
-Close	ClosePrompt		Zatvoriť
-Close	Menus		Zatvoriť
-Close document	ClosePrompt		Zatvoriť dokument
-Copy	Menus		Kopírovať
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepodarilo sa načítať obrázok! Buď súbor alebo prekladač preň neexistuje.
-DPI:	PrintOptionsWindow		DPI:
-Edit	Menus		Upraviť
+Use as background…	Menus		Použiť ako pozadie...
 File	Menus		Súbor
-Fit image to page	PrintOptionsWindow		Prispôsobiť obrázok stránke
-Fit to window	Menus		Vmestiť do okna
-Flip left to right	Menus		Obrátiť zľava doprava
-Flip top to bottom	Menus		Obrátiť zhora dolu
+Slide delay	Menus		Oneskorenie snímku
+Selection mode	Menus		Režim výberu
+Zoom in	Menus		Priblížiť
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ bol zmenený. Chcete dokument zatvoriť?
+Page setup…	Menus		Nastavenie stránky...
+Print…	Menus		Tlačiť...
+OK	SaveToFile		OK
+Previous page	Menus		Predošlá stránka
+View	Menus		Zobraziť
 Full screen	Menus		Celoobrazovkový režim
 Go to page	Menus		Prejsť na stránku
-Height: 	PrintOptionsWindow		Výška:
-High-quality zooming	Menus		Priblíženie vo vysokej kvalite
-Image	Menus		Obrázok
-Job setup	PrintOptionsWindow		Nastavenie úlohy
-Last page	Menus		Posledná stránka
-Leave full screen	Menus		Opustiť celoobrazovkový režim
-Next file	Menus		Ďalší súbor
-Next page	Menus		Ďalšia stránka
-OK	Alerts		OK
-OK	SaveToFile		OK
-Open…	Menus		Otvoriť...
-Original size	Menus		Pôvodná veľkosť
-Page setup…	Menus		Nastavenie stránky...
-Previous file	Menus		Predošlý súbor
-Previous page	Menus		Predošlá stránka
-Print options	PrintOptionsWindow		Možnosti tlačenia
-Print…	Menus		Tlačiť...
-Progress monitor	ProgressWindow		Monitor priebehu
-Quit	Menus		Ukončiť
-Rating	Menus		Hodnotenie
-Resize to (in 1/72 inches):	PrintOptionsWindow		Zmeniť veľkosť na (v 1/72 palca):
-Rotate clockwise	Menus		Otočiť v smere hodinových ručičiek
-Rotate counterclockwise	Menus		Otočiť proti smeru hodinových ručičiek
-Save as…	Menus		Uložiť ako...
-Select all	Menus		Vybrať všetky
-Selection mode	Menus		Režim výberu
-Show caption in full screen mode	Menus		Zobraziť nadpis v celoobrazovkovom režime
-Show tool bar	Menus		Zobraziť panel nástrojov
-ShowImage	System name		ZobraziťObrázok
-Slide delay	Menus		Oneskorenie snímku
-Slide show	Menus		Prezentácia
-Stretch to window	Menus		Roztiahnuť do okna
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ bol zmenený. Chcete dokument zatvoriť?
-The file '%s' could not be written.	SaveToFile		Súbor „%s“ nebolo možné zapísať.
-Undo	Menus		Vrátiť späť
-Use as background…	Menus		Použiť ako pozadie...
-View	Menus		Zobraziť
-Width:	PrintOptionsWindow		Šírka:
-Zoom factor in %:	PrintOptionsWindow		Priblíženie v %:
-Zoom in	Menus		Priblížiť
 Zoom out	Menus		Oddialiť
+Quit	Menus		Ukončiť
+Rotate counterclockwise	Menus		Otočiť proti smeru hodinových ručičiek
+High-quality zooming	Menus		Priblíženie vo vysokej kvalite
+Browse	Menus		Prechádzať
+Edit	Menus		Upraviť
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepodarilo sa načítať obrázok! Buď súbor alebo prekladač preň neexistuje.
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekúnd
+Leave full screen	Menus		Opustiť celoobrazovkový režim
+Close	Menus		Zatvoriť
+Close	ClosePrompt		Zatvoriť
+Undo	Menus		Vrátiť späť
+Resize to (in 1/72 inches):	PrintOptionsWindow		Zmeniť veľkosť na (v 1/72 palca):
+Rating	Menus		Hodnotenie
+Flip left to right	Menus		Obrátiť zľava doprava
+Show caption in full screen mode	Menus		Zobraziť nadpis v celoobrazovkovom režime
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Otvoriť...
+Next file	Menus		Ďalší súbor
+Clear selection	Menus		Vyčistiť výber
+Close document	ClosePrompt		Zatvoriť dokument
+Height: 	PrintOptionsWindow		Výška:
+The file '%s' could not be written.	SaveToFile		Súbor „%s“ nebolo možné zapísať.
+Cancel	ClosePrompt		Zrušiť
+Show tool bar	Menus		Zobraziť panel nástrojov
+Fit to window	Menus		Vmestiť do okna
+Print options	PrintOptionsWindow		Možnosti tlačenia
+Copy	Menus		Kopírovať
+Progress monitor	ProgressWindow		Monitor priebehu
+Last page	Menus		Posledná stránka
+Stretch to window	Menus		Roztiahnuť do okna
+Previous file	Menus		Predošlý súbor
+ShowImage	System name		ZobraziťObrázok
+Slide show	Menus		Prezentácia
+Fit image to page	PrintOptionsWindow		Prispôsobiť obrázok stránke
+Flip top to bottom	Menus		Obrátiť zhora dolu
+Select all	Menus		Vybrať všetky
+Zoom factor in %:	PrintOptionsWindow		Priblíženie v %:
+Width:	PrintOptionsWindow		Šírka:
+Image	Menus		Obrázok
+OK	Alerts		OK
+Rotate clockwise	Menus		Otočiť v smere hodinových ručičiek
+Job setup	PrintOptionsWindow		Nastavenie úlohy
+Original size	Menus		Pôvodná veľkosť
+Next page	Menus		Ďalšia stránka
+Save as…	Menus		Uložiť ako...

@@ -1,13 +1,13 @@
 1	slovak	x-vnd.Haiku-SMTP	1052586247
-. The server said:\n	smtp		. Server povedal:\n
-. The server says:\n	smtp		. Server hovorí:\n
-: Connection refused or host not found.	smtp		: Spojenie odmietnuté alebo hostiteľ nenájdený.
-Connecting to server…	smtp		Pripájanie k serveru...
-Destination:	ConfigView		Cieľ:
-ESMTP	ConfigView		ESMTP
-Error while logging in to %serv	smtp		Chyba pri prihlasovaní k %serv
-Error while opening connection to %serv	smtp		Chyba počas otvárania spojenia s %serv
-None	ConfigView		Žiadne
-POP3 authentication failed. The server said:\n	smtp		Autentifikácia POP3 zlyhala. Server povedal:\n
-POP3 before SMTP	ConfigView		POP3, potom SMTP
 SMTP server:	ConfigView		Server SMTP:
+Error while logging in to %serv	smtp		Chyba pri prihlasovaní k %serv
+. The server says:\n	smtp		. Server hovorí:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Pripájanie k serveru...
+Error while opening connection to %serv	smtp		Chyba počas otvárania spojenia s %serv
+POP3 authentication failed. The server said:\n	smtp		Autentifikácia POP3 zlyhala. Server povedal:\n
+Destination:	ConfigView		Cieľ:
+: Connection refused or host not found.	smtp		: Spojenie odmietnuté alebo hostiteľ nenájdený.
+None	ConfigView		Žiadne
+POP3 before SMTP	ConfigView		POP3, potom SMTP
+. The server said:\n	smtp		. Server povedal:\n

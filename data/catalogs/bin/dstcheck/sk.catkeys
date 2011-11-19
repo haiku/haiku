@@ -1,6 +1,6 @@
 1	slovak	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nJe toto správny čas?
-Ask me later	dstcheck		Spýtať sa ma neskôr
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Pozor!\n\nZ dôvodu prechodu na letný čas môžu byť hodiny vášho počítača o hodinu posunuté.\nVáš počítač si myslí, že je 
-Manually adjust time…	dstcheck		Ručne nastaviť čas...
 Use this time	dstcheck		Použiť tento čas
+Ask me later	dstcheck		Spýtať sa ma neskôr
+Manually adjust time…	dstcheck		Ručne nastaviť čas...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Pozor!\n\nZ dôvodu prechodu na letný čas môžu byť hodiny vášho počítača o hodinu posunuté.\nVáš počítač si myslí, že je 
+.\n\nIs this the correct time?	dstcheck		.\n\nJe toto správny čas?

@@ -1,20 +1,20 @@
 1	belarusian	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		Паказнік стану частаты працэсара
-CPUFrequency	System name		Частата Працэсара
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tбыў распрацаваны Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Прадвызначаныя
-Dynamic performance	Status view		Дынамічная прадукцыйнасць
-Dynamic stepping	CPU Frequency View		Дынамічны рэжым пакрокавай рэгуляцыі
-High performance	Status view		Вышэйшая прадукцыйнасць
-Install replicant into Deskbar	CPU Frequency View		Усталяваць рэплікант у Deskbar
-Integration time [ms]: 	CPU Frequency View		Квант інтэграцыі [ms]:
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Немагчыма запусціць канфігурацыйную праграму!\n\nКод памылкі:
-Low energy	Status view		Экономия энергии
 Ok	Status view		Так
-Open Speedstep preferences…	Status view		Паказаць наладкі Speedstep…
-Quit	Status view		Выйсце
-Revert	Pref Window		Вярнуць
+CPU frequency status view	CPU Frequency View		Паказнік стану частаты працэсара
 Set state	Status view		Пазначыць стан
-Step up by CPU usage	Color Step View		Актывізаваць у залежнасьці ад занятасці працэсара
+Defaults	Pref Window		Прадвызначаныя
+Install replicant into Deskbar	CPU Frequency View		Усталяваць рэплікант у Deskbar
+Quit	Status view		Выйсце
+High performance	Status view		Вышэйшая прадукцыйнасць
 Stepping policy	CPU Frequency View		Палітыка пакрокавай рэгуляцыі
+Dynamic performance	Status view		Дынамічная прадукцыйнасць
+Step up by CPU usage	Color Step View		Актывізаваць у залежнасьці ад занятасці працэсара
+Dynamic stepping	CPU Frequency View		Дынамічны рэжым пакрокавай рэгуляцыі
 Stepping policy: 	CPU Frequency View		Палітыка пакрокавай рэгуляцыі: 
+Integration time [ms]: 	CPU Frequency View		Квант інтэграцыі [ms]:
+Open Speedstep preferences…	Status view		Паказаць наладкі Speedstep…
+Revert	Pref Window		Вярнуць
+Low energy	Status view		Экономия энергии
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Немагчыма запусціць канфігурацыйную праграму!\n\nКод памылкі:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tбыў распрацаваны Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		Частата Працэсара

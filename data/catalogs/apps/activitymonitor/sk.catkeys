@@ -1,48 +1,48 @@
 1	slovak	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f KB/s
-%.1f MB	DataSource		%.1f MB
-%.1f faults/s	DataSource		%.1f výpadkov/s
-%lld ms	SettingsWindow		%lld ms
-%lld sec.	SettingsWindow		%lld sek.
-ActivityMonitor	System name		Monitor aktivity
-Add graph	ActivityWindow		Pridať graf
-Additional items	ActivityView		Ďalšie položky
-Apps	DataSource		Aplikácie
-Block cache	DataSource		Bloková cache
-Block cache memory	DataSource		Bloková vyrovnávacia pamäť
-CPU	DataSource		CPU
-CPU usage	DataSource		Využitie CPU
-CPU usage (combined)	DataSource		Využitie CPU (kombinované)
-Cache	DataSource		Vyrovnávacia pamäť
-Cached memory	DataSource		Pamäť v cache
-File	ActivityWindow		Súbor
-Hide legend	ActivityView		Skryť legendu
-MB	DataSource		MB
-Media nodes	DataSource		Mediálne uzly
-Memory	DataSource		Pamäť
-Network receive	DataSource		Sieť - prijaté
-Network send	DataSource		Sieť - odoslané
 P-faults	DataSource		P-fault
-Page faults	DataSource		Výpadky stránok
-Ports	DataSource		Porty
-Quit	ActivityWindow		Ukončiť
-RX	DataSource	Shorter version for Receiving.	RX
-Raw clipboard	DataSource		Schránka bez formátu
+Media nodes	DataSource		Mediálne uzly
+Threads	DataSource		Vlákna
+MB	DataSource		MB
+Add graph	ActivityWindow		Pridať graf
+Teams	DataSource		Tímy
+Hide legend	ActivityView		Skryť legendu
+Network send	DataSource		Sieť - odoslané
+CPU usage (combined)	DataSource		Využitie CPU (kombinované)
+CPU	DataSource		CPU
+Used memory	DataSource		Využitá pamäť
+Cached memory	DataSource		Pamäť v cache
+Apps	DataSource		Aplikácie
+Show legend	ActivityView		Zobraziť legendu
+Text clipboard	DataSource		Textová schránka
+Settings	ActivityWindow		Nastavenia
 Receiving	DataSource		Prijíma sa
+Settings…	ActivityWindow		Nastavenia...
+Ports	DataSource		Porty
+Page faults	DataSource		Výpadky stránok
+Sending	DataSource		Posiela sa
+Cache	DataSource		Vyrovnávacia pamäť
+%.1f faults/s	DataSource		%.1f výpadkov/s
+Update time interval:	SettingsWindow		Časový interval aktualizácie:
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Ukončiť
+Block cache memory	DataSource		Bloková vyrovnávacia pamäť
 Remove graph	ActivityView		Odstrániť graf
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld sek.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Využitie CPU
+Raw clipboard	DataSource		Schránka bez formátu
+Sems	DataSource		Semafory
+ActivityMonitor	System name		Monitor aktivity
 Running applications	DataSource		Bežiace aplikácie
 Semaphores	DataSource		Semafory
-Sems	DataSource		Semafory
-Sending	DataSource		Posiela sa
-Settings	ActivityWindow		Nastavenia
-Settings…	ActivityWindow		Nastavenia...
-Show legend	ActivityView		Zobraziť legendu
-Swap	DataSource		Odkladací priestor
+Block cache	DataSource		Bloková cache
 Swap space	DataSource		Odkladací priestor
-TX	DataSource	Shorter version for Sending	TX
-Teams	DataSource		Tímy
-Text clipboard	DataSource		Textová schránka
-Threads	DataSource		Vlákna
-Update time interval:	SettingsWindow		Časový interval aktualizácie:
-Used memory	DataSource		Využitá pamäť
+Swap	DataSource		Odkladací priestor
+File	ActivityWindow		Súbor
 usage	DataSource		využitie
+Additional items	ActivityView		Ďalšie položky
+Network receive	DataSource		Sieť - prijaté
+%.1f KB/s	DataSource		%.1f KB/s
+Memory	DataSource		Pamäť
+RX	DataSource	Shorter version for Receiving.	RX

@@ -1,24 +1,23 @@
-1	russian	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
-%d file	Status View		%d файл
-%d files	Status View		%d файлов
-9999.99 GB	Status View		9999.99 Гбайт
-Created	Info Window		Создан
-DiskUsage	System name		Использование диска
-Free on %refName%	Scanner		Свободно на разделе %refName%
-Get Info	Pie View		Информация
+1	russian	x-vnd.Haiku-DiskUsage	3634416251
+Scanning %refName%	Scanner		Сканируется раздел %refName%
+Size	Info Window		Размер
+Rescan	Pie View		Пересканировать
+Rescan	Volume View		Пересканировать
+Outdated view	Pie View		График устарел
 Kind	Info Window		Тип
+file unavailable	Pie View		файл недоступен
+no supporting apps	Pie View		нет поддерживающих программ
+%d file	Status View		%d файл
+Path	Info Window		Путь
+Scan	Status View		Сканировать
+9999.99 GB	Status View		9999.99 Гбайт
+file unavailable	Status View		файл недоступен
+Get Info	Pie View		Информация
+DiskUsage	System name		Использование диска
+%d files	Status View		%d файлов
+Created	Info Window		Создан
 Modified	Info Window		Изменен
 Open	Pie View		Открыть
 Open With	Pie View		Открыть в
-Outdated view	Pie View		График устарел
-Path	Info Window		Путь
-Rescan	Pie View		Пересканировать
-Rescan	Volume View		Пересканировать
-Scan	Status View		Сканировать
-Scanning %refName%	Scanner		Сканируется раздел %refName%
-Size	Info Window		Размер
-file unavailable	Pie View		файл недоступен
-file unavailable	Status View		файл недоступен
-in %d files	Info Window		в %d файлах
-no supporting apps	Pie View		нет поддерживающих программ
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Свободно на разделе %refName%

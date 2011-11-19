@@ -1,20 +1,20 @@
 1	slovak	x-vnd.mmu_man.filepanel	1802971238
-%s not a valid option\n	FilePanelApp		%s nie je platná voľba\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: NEIMPLEMENTOVANÉ\n
-%s: this option requires a parameter\n	FilePanelApp		%s: táto voľba vyžaduje parameter\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tumožní vybrať iba jeden súbor\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tneimplementované\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\totvoriť v <priečinok>\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tneimplementované\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tzobrazí použitie\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tdruh položiek, ktoré je možné otvoriť: ľubovoľná kombinácia f, d, s (súbor (predvolené), adresár, symbolický odkaz)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tpoužiť FilePanel načítanie (predvolené)\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\turobí FilePanel modálny\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tnastaviť predvolený názov na ukladanie\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-l\t--load\tpoužiť FilePanel ukladanie\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tnastaví titulok okna FilePanel\n
 display a load/save file panel\n	FilePanelApp		zobraziť panel načítať/uložiť súbor\n
 options:\n	FilePanelApp		možnosti:\n
-short\tlong\tdescription\n	FilePanelApp		krátky\tdlhý\tpopis\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		použitie: %s [--help] [--directory priečinok] [--load|--save] [--title titulok] [--single] [--modal] [--allow vzor] [--forbid vzor]\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tdruh položiek, ktoré je možné otvoriť: ľubovoľná kombinácia f, d, s (súbor (predvolené), adresár, symbolický odkaz)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		použitie: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a vzor] [-f vzor]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\totvoriť v <priečinok>\n
+%s not a valid option\n	FilePanelApp		%s nie je platná voľba\n
+short\tlong\tdescription\n	FilePanelApp		krátky\tdlhý\tpopis\n
+%s: this option requires a parameter\n	FilePanelApp		%s: táto voľba vyžaduje parameter\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tpoužiť FilePanel načítanie (predvolené)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tneimplementované\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-l\t--load\tpoužiť FilePanel ukladanie\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tnastaviť predvolený názov na ukladanie\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\turobí FilePanel modálny\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tzobrazí použitie\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tneimplementované\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tumožní vybrať iba jeden súbor\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tnastaví titulok okna FilePanel\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NEIMPLEMENTOVANÉ\n

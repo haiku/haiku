@@ -1,82 +1,82 @@
 1	slovak	x-vnd.Haiku-About	2175207182
-%.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB celkom
-%d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
-%ld MHz	AboutView		 %ld MHz
-%ld Processors:	AboutView		%ld procesory:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB celkom, %inaccessible MiB neprístupných
-... and the many people making donations!\n\n	AboutView		... a mnohí ďalší, ktorí prispeli darom!\n\n
-About this system	AboutWindow		O tomto systéme
-AboutSystem	System name		O systéme
-BSD (2-clause)	AboutView		BSD (2-bodová)
-BSD (3-clause)	AboutView		BSD (3-bodová)
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autori Gutenprint. Všetky práva vyhradené.
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (a jeho jadro NewOS)\n
 BSD (4-clause)	AboutView		BSD (4-bodová)
+%ld Processors:	AboutView		%ld procesory:
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL a Remi Lefebvre.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Všetky práva vyhradené.
+%d MiB total	AboutView		%d MiB celkom
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (zakladateľ projektu)\n\n
+The Haiku-Ports team\n	AboutView		Tím Haiku-Ports\n
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Všetky práva vyhradené.
+%d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
+Website, marketing & documentation:\n	AboutView		Webová stránka, marketing a dokumentácia:\n
+AboutSystem	System name		O systéme
+MIT (no promotion)	AboutView		MIT (nie je reklama)
+Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe a ďalší.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Všetky práva vyhradené.
+Revision	AboutView		Revízia:
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, divízia Lucas Digital Ltd. LLC.
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. a jeho tímu vývojárov za vytvorenie BeOS!\n\n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Všetky práva vyhradené.
+Source Code: 	AboutView		Zdrojový kód:
+Processor:	AboutView		Procesor:
+Kernel:	AboutView		Jadro:
+BSD (3-clause)	AboutView		BSD (3-bodová)
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. Všetky práva vyhradené.
+Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Licencia Software FreeB od SGI. Všetky práva vyhradené.
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nVšetky práva vyhradené.
+Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Časti tohto softvéru sú chránené autorským právom. Copyright © 1996-2006 Projekt FreeType. Všetky práva vyhradené.
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB celkom, %inaccessible MiB neprístupných
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
+Contributors:\n	AboutView		Prispievatelia:\n
+Unknown	AboutView		Neznáme
+Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 správci Expat.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Všetky práva vyhradené.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Všetky práva vyhradené.
+... and the many people making donations!\n\n	AboutView		... a mnohí ďalší, ktorí prispeli darom!\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… a mnoho ďalších, ktorých sme zabudli uviesť (prepáčte!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Pamäť:
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Všetky práva vyhradené.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Tento softvér je sčasti zaločený na práci Independent JPEG Group.
+Past maintainers:\n	AboutView		Minulí vývojári:\n
+\n\nSpecial thanks to:\n	AboutView		\n\nŠpecialne poďakovanie:\n
+Licenses: 	AboutView		Licencie:
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly a Mark Adler.
+Google & their Google Summer of Code program\n	AboutView		Google a jeho program Google Summer of Code\n
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Všetky práva vyhradené.
+\nCopyrights\n\n	AboutView		\nAutorské práva\n\n
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Všetky práva vyhradené.
+Current maintainers:\n	AboutView		Aktívni vývojári:\n
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. Všetky práva vyhradené.
+Time running:	AboutView		Čas behu:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Obsahuje softvér, ktorý vyvinula NetBSD Foundation, Inc. a jej prispievatelia:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Všetky práva vyhradené.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Obsahuje softvér z projektu FreeBSD, vydaný pod licenciou BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 Projekt FreeBSD. Všetky práva vyhradené.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Obsahuje softvér z projektu GNU, vydaný pod licenciami GPL a LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
-Contributors:\n	AboutView		Prispievatelia:\n
-Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nVšetky práva vyhradené.
-Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Všetky práva vyhradené.
-Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, University of Tokyo.
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Licencia Software FreeB od SGI. Všetky práva vyhradené.
-Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Všetky práva vyhradené.
-Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Všetky práva vyhradené.
-Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Tento softvér je sčasti zaločený na práci Independent JPEG Group.
-Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Všetky práva vyhradené.
-Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Všetky práva vyhradené.
-Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly a Mark Adler.
-Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Všetky práva vyhradené.
-Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Všetky práva vyhradené.
-Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH a Thomas Merz. Všetky práva vyhradené.\nPDFlib a logo PDFlib sú registrované obchodné známky PDFlib GmbH.
-Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd a Clark Cooper.
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Všetky práva vyhradené.
-Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Všetky práva vyhradené.
-Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Všetky práva vyhradené.
-Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Všetky práva vyhradené.
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autori Gutenprint. Všetky práva vyhradené.
-Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL a Remi Lefebvre.
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. Všetky práva vyhradené.
-Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 správci Expat.
-Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Všetky práva vyhradené.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Všetky práva vyhradené.
-Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, divízia Lucas Digital Ltd. LLC.
-Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
-Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Všetky práva vyhradené.
-Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe a ďalší.
-Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Všetky práva vyhradené.
-Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Všetky práva vyhradené.
-Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. Všetky práva vyhradené.
-Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Všetky práva vyhradené.
-Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Všetky práva vyhradené.
-Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Všetky práva vyhradené.
-Current maintainers:\n	AboutView		Aktívni vývojári:\n
-GCC %d Hybrid	AboutView		GCC %d Hybrid
-Google & their Google Summer of Code program\n	AboutView		Google a jeho program Google Summer of Code\n
-Kernel:	AboutView		Jadro:
-License: 	AboutView		Licencia:
-Licenses: 	AboutView		Licencie:
-MIT (no promotion)	AboutView		MIT (nie je reklama)
-MIT license. All rights reserved.	AboutView		Licencia MIT. Všetky práva vyhradené.
-Memory:	AboutView		Pamäť:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (zakladateľ projektu)\n\n
-Past maintainers:\n	AboutView		Minulí vývojári:\n
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Časti tohto softvéru sú chránené autorským právom. Copyright © 1996-2006 Projekt FreeType. Všetky práva vyhradené.
-Processor:	AboutView		Procesor:
-Revision	AboutView		Revízia:
-Source Code: 	AboutView		Zdrojový kód:
-The BeGeistert team\n	AboutView		Tím BeGeistert\n
-The Haiku-Ports team\n	AboutView		Tím Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland a Christof Lutteroth\n\n
-Time running:	AboutView		Čas behu:
-Translations:\n	AboutView		Preklady:\n
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (a jeho jadro NewOS)\n
-Unknown	AboutView		Neznáme
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Všetky práva vyhradené.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Všetky práva vyhradené.
+About this system	AboutWindow		O tomto systéme
+BSD (2-clause)	AboutView		BSD (2-bodová)
 Version:	AboutView		Verzia:
-Website, marketing & documentation:\n	AboutView		Webová stránka, marketing a dokumentácia:\n
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Všetky práva vyhradené.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd a Clark Cooper.
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Všetky práva vyhradené.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Všetky práva vyhradené.
+The BeGeistert team\n	AboutView		Tím BeGeistert\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland a Christof Lutteroth\n\n
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, University of Tokyo.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Všetky práva vyhradené.
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Všetky práva vyhradené.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Všetky práva vyhradené.
+%ld MHz	AboutView		 %ld MHz
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH a Thomas Merz. Všetky práva vyhradené.\nPDFlib a logo PDFlib sú registrované obchodné známky PDFlib GmbH.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Obsahuje softvér z projektu GNU, vydaný pod licenciami GPL a LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+MIT license. All rights reserved.	AboutView		Licencia MIT. Všetky práva vyhradené.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kliknite na názov licencie a prečítajte si príslušnú licenciu.]\n\n
-\nCopyrights\n\n	AboutView		\nAutorské práva\n\n
-\n\nSpecial thanks to:\n	AboutView		\n\nŠpecialne poďakovanie:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… a mnoho ďalších, ktorých sme zabudli uviesť (prepáčte!)\n\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Všetky práva vyhradené.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Všetky práva vyhradené.
+License: 	AboutView		Licencia:
+GCC %d Hybrid	AboutView		GCC %d Hybrid
+Translations:\n	AboutView		Preklady:\n

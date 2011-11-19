@@ -1,68 +1,67 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	424866547
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц %ld каналаў / %lld фрэймаў
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў
+1	belarusian	x-vnd.Haiku-MediaConverter	3564609505
+Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
+Video encoding:	MediaConverter		Кадаванне відэа:
+No audio	Audio codecs list		Няма аўдыё
+Error	MediaConverter		Памылка
+Error loading a file	MediaConverter		Немагчыма адкрыць файл
+File Error	MediaConverter-FileInfo		Памылка файла
+Open…	Menu		Адкрыць…
+Start [ms]: 	MediaConverter		Пачатак [мсек]: 
+Output file '%filename' created	MediaConverter		Выходны файл '%filename' быў створаны
+Output format	MediaConverter		Выходны фармат
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стэрэа / %lld фрэймаў
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлаў не былі прызнаныя як медыя, іх немагчыма апрацаваць:
-%d bit 	MediaFileInfo		%d біт
+End   [ms]: 	MediaConverter		Канец [мсек]: 
+MediaConverter	System name		Канвертар медыя
+No video	Video codecs list		Няма відэа
+Duration:	MediaConverter-FileInfo		Працягласць:
+OK	MediaConverter		ОК
+Error writing audio frame %Ld	MediaConverter		Немагчыма запісаць кард %Ld аўдыёпатоку
+Error converting '%filename'	MediaConverter		Немагчыма канвертаваць '%filename'
+Low	MediaConverter		Нізкая
+Conversion completed	MediaConverter		Апрацоўка завершана
+Audio:	MediaConverter-FileInfo		Аўдыё:
+OK	MediaConverter-FileInfo		ОК
+Source files	MediaConverter		Зыходныя файлы
+Cancelling	MediaConverter		Адмена
 %d byte 	MediaFileInfo		%d байтаў
+Error loading files	MediaConverter		Немагчыма загрузіць файлы
+Cancel	MediaConverter		Адмена
+None available	Video codecs		Не даступна
+Conversion cancelled	MediaConverter		Канвертаванне адменена
+No file selected	MediaConverter-FileInfo		Не абрана ні воднага файла
+Error writing video frame %Ld	MediaConverter		Немагчыма запісаць кард %Ld відэапатоку
+Select this folder	MediaConverter		Абраць гэтую папку
+Continue	MediaConverter		Працяг
+Encoder parameters	MediaConverter-EncoderWindow		Параметры кадыроўшчыка
+Video:	MediaConverter-FileInfo		Відэа:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f fps / %Ld фрэймаў
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка :
+%d bit 	MediaFileInfo		%d біт
+Error creating '%filename'	MediaConverter		Немагчыма стварыць '%filename'
+Video quality not supported	MediaConverter		Якасць відэа не падтрымліваецца
+Cancelling…	MediaConverter		Адмена…
+File details	MediaConverter		Падрабязнасці пра файл
+Select	MediaConverter		Абраць
+Writing video track: %ld%% complete	MediaConverter		Запіс відэа трэку: выканана на %Ld%%
+Quit	Menu		Выйсці
+Preview	MediaConverter		Прагляд
+File format:	MediaConverter		Фармат файла:
+None available	Audio codecs		Не даступны
+MediaConverter+:SaveDirectory	MediaConverter		КанвертарМедыя+:Захаваць папку
+Error read audio frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у аўдыёпатоку
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц %ld каналаў / %lld фрэймаў
+Error launching: %strError%	MediaConverter		Немагчыма запусціць: %strError%
+High	MediaConverter		Найвышэйшая
+The file was not recognized as a supported media file:	MediaConverter		Гэты файл немагчыма апрацаваць, ён не быў прызнаны як медыя:
+Drop media files onto this window	MediaConverter		Перацягніце медыя файлы на гэтае вакно
 Audio encoding:	MediaConverter		Аўдыё кадаванне:
 Audio quality not supported	MediaConverter		Якасць аўдыё не падтрымліваецца
-Audio quality: %3d%%	MediaConverter		Якасць аўдыё: %3d%%
-Audio:	MediaConverter-FileInfo		Аўдыё:
-Cancel	MediaConverter		Адмена
-Cancelling	MediaConverter		Адмена
-Cancelling…	MediaConverter		Адмена…
-Continue	MediaConverter		Працяг
-Conversion cancelled	MediaConverter		Канвертаванне адменена
-Conversion completed	MediaConverter		Апрацоўка завершана
-Convert	MediaConverter		Канвертаваць
-Drop media files onto this window	MediaConverter		Перацягніце медыя файлы на гэтае вакно
-Duration:	MediaConverter-FileInfo		Працягласць:
-Encoder parameters	MediaConverter-EncoderWindow		Параметры кадыроўшчыка
-End   [ms]: 	MediaConverter		Канец [мсек]: 
-Error	MediaConverter		Памылка
-Error converting '%filename'	MediaConverter		Немагчыма канвертаваць '%filename'
-Error creating '%filename'	MediaConverter		Немагчыма стварыць '%filename'
-Error launching: %strError%	MediaConverter		Немагчыма запусціць: %strError%
-Error loading a file	MediaConverter		Немагчыма адкрыць файл
-Error loading files	MediaConverter		Немагчыма загрузіць файлы
-Error read audio frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у аўдыёпатоку
-Error read video frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у відэапатоку
-Error writing audio frame %Ld	MediaConverter		Немагчыма запісаць кард %Ld аўдыёпатоку
-Error writing video frame %Ld	MediaConverter		Немагчыма запісаць кард %Ld відэапатоку
 File	Menu		Файл
-File Error	MediaConverter-FileInfo		Памылка файла
-File details	MediaConverter		Падрабязнасці пра файл
-File format:	MediaConverter		Фармат файла:
-High	MediaConverter		Найвышэйшая
-Low	MediaConverter		Нізкая
-MediaConverter	System name		Канвертар медыя
-MediaConverter+:SaveDirectory	MediaConverter		КанвертарМедыя+:Захаваць папку
-No audio	Audio codecs list		Няма аўдыё
-No file selected	MediaConverter-FileInfo		Не абрана ні воднага файла
-No video	Video codecs list		Няма відэа
-None available	Audio codecs		Не даступны
-None available	Video codecs		Не даступна
-OK	MediaConverter		ОК
-OK	MediaConverter-FileInfo		ОК
-Open…	Menu		Адкрыць…
-Output file '%filename' created	MediaConverter		Выходны файл '%filename' быў створаны
-Output folder	MediaConverter		Папка для выходных файлаў
-Output format	MediaConverter		Выходны фармат
-Preview	MediaConverter		Прагляд
-Quit	Menu		Выйсці
-Select	MediaConverter		Абраць
-Select this folder	MediaConverter		Абраць гэтую папку
-Source files	MediaConverter		Зыходныя файлы
-Start [ms]: 	MediaConverter		Пачатак [мсек]: 
-The file was not recognized as a supported media file:	MediaConverter		Гэты файл немагчыма апрацаваць, ён не быў прызнаны як медыя:
-Video encoding:	MediaConverter		Кадаванне відэа:
-Video quality not supported	MediaConverter		Якасць відэа не падтрымліваецца
-Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
-Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
-Video:	MediaConverter-FileInfo		Відэа:
+Convert	MediaConverter		Канвертаваць
 Writing audio track: %ld%% complete	MediaConverter		Запіс аўдыё трэку: выканана на %Ld%%
-Writing video track: %ld%% complete	MediaConverter		Запіс відэа трэку: выканана на %Ld%%
-seconds	MediaFileInfo		секунд
+Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
+Output folder	MediaConverter		Папка для выходных файлаў
+Audio quality: %3d%%	MediaConverter		Якасць аўдыё: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка :
+Error read video frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у відэапатоку
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлаў не былі прызнаныя як медыя, іх немагчыма апрацаваць:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў

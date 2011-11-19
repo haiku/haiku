@@ -1,8 +1,8 @@
 1	russian	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Установленные пакеты
 No package selected.	UninstallView		Нет выбранных пакетов.
-OK	UninstallView		ОК
-Package description	UninstallView		Описание пакета
 Remove	UninstallView		Удалить
+Package description	UninstallView		Описание пакета
+InstalledPackages	System name		Установленные пакеты
 The package you selected has been successfully removed from your system.	UninstallView		Выбранный пакет был успешно удален из системы.
+OK	UninstallView		ОК
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Выбранный пакет не был удален из вашей системы. Возможно поврежден файл сведений об установке.

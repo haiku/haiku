@@ -1,26 +1,26 @@
 1	belarusian	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Каталог малюнкаў
-Cancel	ScreenshotWindow		Адмена
-Capture active window	ScreenshotWindow		Захваціць актыўнае вакно
-Choose folder	ScreenshotWindow		Выберыце каталог
-Choose folder...	ScreenshotWindow		Выберыце каталог...
-Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
-Delay:	ScreenshotWindow		Затрымка:
+seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочы стол
-Home folder	ScreenshotWindow		Хатні каталог
-Include mouse pointer	ScreenshotWindow		Уключыць курсор мышы
 Include window border	ScreenshotWindow		Уключыць мяжу вакна
-Name:	ScreenshotWindow		Імя:
-New screenshot	ScreenshotWindow		Новы здымак экрану
-Please select	ScreenshotWindow		Калі ласка, выберыце
-Save	ScreenshotWindow		Захаваць
-Save as:	ScreenshotWindow		Захаваць як:
-Save in:	ScreenshotWindow		Захаваць у:
 Screenshot	System name		Здымак экрана
 Select	ScreenshotWindow		Выбраць
-Settings…	ScreenshotWindow		Наладкі...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Файл ужо існуе.\n Сапраўды перазапісаць яго?
-Translator Settings	ScreenshotWindow		Наладкі канвертара
-overwrite	ScreenshotWindow		перазапіс
+Capture active window	ScreenshotWindow		Захваціць актыўнае вакно
+Cancel	ScreenshotWindow		Адмена
+Name:	ScreenshotWindow		Імя:
+Choose folder	ScreenshotWindow		Выберыце каталог
+Save	ScreenshotWindow		Захаваць
+Choose folder...	ScreenshotWindow		Выберыце каталог...
+Please select	ScreenshotWindow		Калі ласка, выберыце
+Save as:	ScreenshotWindow		Захаваць як:
+Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
+Save in:	ScreenshotWindow		Захаваць у:
 screenshot	Screenshot	Base filename of screenshot files	здымак
-seconds	ScreenshotWindow		секунд
+New screenshot	ScreenshotWindow		Новы здымак экрану
+Artwork folder	ScreenshotWindow		Каталог малюнкаў
+Home folder	ScreenshotWindow		Хатні каталог
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Файл ужо існуе.\n Сапраўды перазапісаць яго?
+Settings…	ScreenshotWindow		Наладкі...
+overwrite	ScreenshotWindow		перазапіс
+Delay:	ScreenshotWindow		Затрымка:
+Include mouse pointer	ScreenshotWindow		Уключыць курсор мышы
+Translator Settings	ScreenshotWindow		Наладкі канвертара

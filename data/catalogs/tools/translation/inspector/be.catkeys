@@ -1,32 +1,32 @@
 1	belarusian	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Актыўныя Канвертары:
-Active Translators	InspectorApp		Актыўныя канвертары
-Bummer	ImageWindow		Якая дасада!
-File	ImageWindow		Файл
-First Page	ImageWindow		Першая старонка
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Выява: %1\nКолеры: %2 (%3)\nПамеры: %4 x %5\nБайтаў у Радку: %6\nУсяго байтаў: %7\n\nІнфа:\nID страка: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nГрупа: '%13' (%14)\nЯкасць: %15\nМагчымасці: %16\n\nІнфа пра пашырэнне:\n
-Info	ImageWindow		Інфа
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Інфавакно
-Last Page	ImageWindow		Апошняя старонка
-Next Page	ImageWindow		Наступная старонка
+User Translators	ActiveTranslatorsWindow		Канвертары Карыстача
 No image available to save.	ImageWindow		Няма выяў для захавання
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Колькасць Дакументаў: %1\n\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
-OK	ImageView		ОК
-OK	ImageWindow		ОК
-Open...	ImageWindow		Адкрыць...
-Previous Page	ImageWindow		Папярэдняя старонка
-Quit	ImageWindow		Выйсці
-Save feature not implemented yet.	ImageWindow		Функцыя захавання пакуль не здзейснена
-Save...	ImageWindow		Захаваць...
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбраны Дакумент: %1\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
-Sorry, unable to load the image.	ImageView		Прабачце, немагчыма загрузіць выяву.
 Sorry, unable to write the image file.	ImageView		Прабачце, немагчыма запісаць файл выявы.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Колькасць Дакументаў: %1\n\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТып: '%1' (%2)\nГрупа: '%3' (%4)\nЯкасць: %5\nМагчымасці: %6\nMIME Type: %7\nІмя: %8\n
+Bummer	ImageWindow		Якая дасада!
+Last Page	ImageWindow		Апошняя старонка
+\nInput Formats:	ImageView		\nФарматы ўводу:
+Sorry, unable to load the image.	ImageView		Прабачце, немагчыма загрузіць выяву.
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Інфавакно
+Active Translators	InspectorApp		Актыўныя канвертары
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Выява: %1\nКолеры: %2 (%3)\nПамеры: %4 x %5\nБайтаў у Радку: %6\nУсяго байтаў: %7\n\nІнфа:\nID страка: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nГрупа: '%13' (%14)\nЯкасць: %15\nМагчымасці: %16\n\nІнфа пра пашырэнне:\n
+\nOutput Formats:	ImageView		Фарматы вываду
+Save feature not implemented yet.	ImageWindow		Функцыя захавання пакуль не здзейснена
+First Page	ImageWindow		Першая старонка
+Next Page	ImageWindow		Наступная старонка
+Open...	ImageWindow		Адкрыць...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nУжыты Канвертар:\nІмя: %1\nІнфа: %2\nВерсія: %3\n
+Save...	ImageWindow		Захаваць...
+Info	ImageWindow		Інфа
+OK	ImageWindow		ОК
+Window	ImageWindow		Вакно
+Quit	ImageWindow		Выйсці
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбраны Дакумент: %1\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
+Active Translators	ImageWindow		Актыўныя Канвертары:
+View	ImageWindow		Від
+Previous Page	ImageWindow		Папярэдняя старонка
+OK	ImageView		ОК
 System Translators	ActiveTranslatorsWindow		Сістэмныя Канвертары
 Unknown	ImageView		Невядомы
-User Translators	ActiveTranslatorsWindow		Канвертары Карыстача
-View	ImageWindow		Від
-Window	ImageWindow		Вакно
-\nInput Formats:	ImageView		\nФарматы ўводу:
-\nOutput Formats:	ImageView		Фарматы вываду
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nУжыты Канвертар:\nІмя: %1\nІнфа: %2\nВерсія: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТып: '%1' (%2)\nГрупа: '%3' (%4)\nЯкасць: %5\nМагчымасці: %6\nMIME Type: %7\nІмя: %8\n
+File	ImageWindow		Файл

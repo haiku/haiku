@@ -1,25 +1,25 @@
 1	russian	x-vnd.Haiku-WebPTranslator	3630570850
-Based on libwebp v0.1,	ConfigView		Основано на libwebp v0.1,
 Compression method:	ConfigView		Метод сжатия
-Default	ConfigView		По умолчанию
-Drawing	ConfigView		Рисунок
-Fast	ConfigView		Быстрое
-High	ConfigView		Высокое
-Icon	ConfigView		Значок
-Low	ConfigView		Низкое
-Output preset:	ConfigView		Пресет вывода:
-Output quality:	ConfigView		Качество вывода:
-Photo	ConfigView		Фотография
-Picture	ConfigView		Изображение
-Preprocessing filter	ConfigView		Фильтр предварительной обработки
+Based on libwebp v0.1,	ConfigView		Основано на libwebp v0.1,
 Preset	ConfigView		Пресет
-Slower but better	ConfigView		Медленнее, но лучше
-Text	ConfigView		Текст
 WebP Images	ConfigView		Транслятор WebP изображений
-WebP Settings	main		Настройки WebP транслятора
-WebP image	WebPTranslator		WebP изображение
-WebP image translator	WebPTranslator		Транслятор WebP изображений
 WebP images	WebPTranslator		WebP изображения
 WebPTranslator Settings	ConfigView		Настройки WebP транслятора
-©2010-2011 Google Inc.	ConfigView		Все права защищены ©2010-2011 Google Inc.
+Output quality:	ConfigView		Качество вывода:
+WebP Settings	main		Настройки WebP транслятора
+Text	ConfigView		Текст
+Slower but better	ConfigView		Медленнее, но лучше
+WebP image	WebPTranslator		WebP изображение
 ©2010-2011 Haiku Inc.	ConfigView		Все права защищены ©2010-2011 Haiku Inc.
+Output preset:	ConfigView		Пресет вывода:
+Picture	ConfigView		Изображение
+Low	ConfigView		Низкое
+High	ConfigView		Высокое
+Drawing	ConfigView		Рисунок
+Default	ConfigView		По умолчанию
+Fast	ConfigView		Быстрое
+Photo	ConfigView		Фотография
+Preprocessing filter	ConfigView		Фильтр предварительной обработки
+©2010-2011 Google Inc.	ConfigView		Все права защищены ©2010-2011 Google Inc.
+WebP image translator	WebPTranslator		Транслятор WebP изображений
+Icon	ConfigView		Значок

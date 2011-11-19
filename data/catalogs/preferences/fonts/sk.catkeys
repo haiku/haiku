@@ -1,11 +1,10 @@
-1	slovak	x-vnd.Haiku-Fonts	4201385398
+1	slovak	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Hrubé písmo:
 Defaults	Main window		Predvolené
 Fixed font:	Font view		Písmo s pevnou šírkou znaku:
 Fonts	System name		Písma
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Písma\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Písmo menu:
-OK	main		OK
 OK	main		OK
 Plain font:	Font view		Čisté písmo
 Revert	Main window		Vrátiť

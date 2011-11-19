@@ -1,61 +1,60 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	4055730587
-15 secs	Settings view		15 сек
-61 secs	Settings view		61 сек
+1	russian	x-vnd.Haiku-BluetoothPrefs	2526531136
 About Bluetooth…	Window		О программе…
-Add device to list	Inquiry panel		Добавить устройство в список
-Add…	Remote devices		Добавить…
-Always ask	Settings view		Всегда спрашивать
-As blocked	Remote devices		Как блокированный
-Authenticate	Extended local device view		Аутентифицировать
-Bluetooth	System name		Bluetooth
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку \"Запрос\". Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
-Connections & channels…	Window		Список подключений и каналов…
-Default inquiry time:	Settings view		Время запроса по умолчанию:
-Defaults	Window		По умолчанию
-Desktop	Settings view		Рабочий стол
-Disconnect	Remote devices		Отключить
-Discoverable	Extended local device view		Видимый
-From all devices	Settings view		От всех устройств
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Bluetooth Haiku стек, (ARCE)\n\nРазработл Oliver Ruiz Dorantes\n\nПри поддержке:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nСпасибо всем тем, кто оказывал помощь…\n\nПрисылал/жертвовал оборудование:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\tи Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПоддерживал финансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисылал патчи:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестировал:\n\t- Petter H. Juliussen\nТем, кто дал мне все знания:\n\t- команде yellowTAB
 Handheld	Settings view		Переносной
-Help	Window		Помощь
-Identify host as:	Settings view		Идентифицировать как:
-Identify us as...	Settings view		Идентифицировать нас как…
-Incoming connections policy:	Settings view		Политика входящих соединений:
-Inquiry	Inquiry panel		Запрос
-Laptop	Settings view		Ноутбук
-Local devices found on system:	Settings view		Локальные устройства, найденные в системе:
+Default inquiry time:	Settings view		Время запроса по умолчанию:
 Manufacturer: 	Device View		Производитель:
-OK	main		ОК
-Only from trusted devices	Settings view		Только от доверенных устройств
-Pair…	Remote devices		Пара…
-Pick LocalDevice...	Settings view		Выбор локального устройства…
-Policy...	Settings view		Политика…
-Quit	main		Выход
-Refresh LocalDevices…	Window		Обновление локальных устройств…
+Add device to list	Inquiry panel		Добавить устройство в список
+Starting scan...	Inquiry panel		Начало сканирования…
+Show bluetooth console…	Window		Показать консоль bluetooth…
+Smart phone	Settings view		Смартфон
+Server	Settings view		Сервер
+Stop bluetooth services…	Window		Остановить службу bluetooth…
+Identify host as:	Settings view		Идентифицировать как:
+View	Window		Вид
 Refresh…	Remote devices		Обновить…
+Pair…	Remote devices		Пара…
+Incoming connections policy:	Settings view		Политика входящих соединений:
+From all devices	Settings view		От всех устройств
+Show name	Extended local device view		Показывать имя
+Local devices found on system:	Settings view		Локальные устройства, найденные в системе:
 Remaining %1 seconds	Inquiry panel		Осталось %1 секунд
-Remote devices	Window		Удалённые устройства
+Server	Window		Сервер
+Scanning completed.	Inquiry panel		Сканирование завершено.
+OK	main		ОК
 Remote devices list…	Window		Список внешних устройств…
 Remove	Remote devices		Удалить
-Retrieving name of %1	Inquiry panel		Получение имени %1
-Retrieving names...	Inquiry panel		Получение имен…
-Revert	Window		Вернуть
-Scanning completed.	Inquiry panel		Сканирование завершено.
-Scanning progress	Inquiry panel		Прогресс сканирования
-Server	Settings view		Сервер
-Server	Window		Сервер
-Service classes: 	Device View		Служебные классы: 
-Settings	Window		Настройки
-Show bluetooth console…	Window		Показать консоль bluetooth…
-Show name	Extended local device view		Показывать имя
-Smart phone	Settings view		Смартфон
-Start bluetooth services…	Window		Запуск службы bluetooth…
+Quit	main		Выход
+15 secs	Settings view		15 сек
 Start please	main		Запустить
-Starting scan...	Inquiry panel		Начало сканирования…
-Stop bluetooth services…	Window		Остановить службу bluetooth…
+Start bluetooth services…	Window		Запуск службы bluetooth…
+Policy...	Settings view		Политика…
+61 secs	Settings view		61 сек
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Bluetooth Haiku стек, (ARCE)\n\nРазработл Oliver Ruiz Dorantes\n\nПри поддержке:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nСпасибо всем тем, кто оказывал помощь…\n\nПрисылал/жертвовал оборудование:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\tи Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПоддерживал финансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисылал патчи:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестировал:\n\t- Petter H. Juliussen\nТем, кто дал мне все знания:\n\t- команде yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
-View	Window		Вид
+Identify us as...	Settings view		Идентифицировать нас как…
+As blocked	Remote devices		Как блокированный
+Bluetooth	System name		Bluetooth
+Disconnect	Remote devices		Отключить
+Pick LocalDevice...	Settings view		Выбор локального устройства…
+Defaults	Window		По умолчанию
+Inquiry	Inquiry panel		Запрос
+Desktop	Settings view		Рабочий стол
+Revert	Window		Вернуть
+Remote devices	Window		Удалённые устройства
+Laptop	Settings view		Ноутбук
+Discoverable	Extended local device view		Видимый
 Work offline	main		Оставить выключенным
 bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server не запущен на этой системе. Хотите его запустить или оставить его выключенным
-packets: 	Device View		пакетов:
+Service classes: 	Device View		Служебные классы: 
+Connections & channels…	Window		Список подключений и каналов…
+Refresh LocalDevices…	Window		Обновление локальных устройств…
+Settings	Window		Настройки
+Only from trusted devices	Settings view		Только от доверенных устройств
+Scanning progress	Inquiry panel		Прогресс сканирования
+Always ask	Settings view		Всегда спрашивать
+Retrieving name of %1	Inquiry panel		Получение имени %1
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку \"Запрос\". Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
+Authenticate	Extended local device view		Аутентифицировать
+Retrieving names...	Inquiry panel		Получение имен…
+Help	Window		Помощь
+Add…	Remote devices		Добавить…

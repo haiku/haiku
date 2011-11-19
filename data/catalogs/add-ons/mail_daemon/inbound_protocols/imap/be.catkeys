@@ -1,9 +1,9 @@
 1	belarusian	x-vnd.Haiku-IMAP	3892875357
-Apply	IMAPFolderConfig		Прымяніць
 Destination:	imap_config		Прызначэнне:
-Failed to fetch available storage.	IMAPFolderConfig		Памылка падчас атрымання дадзеных
+status	IMAPFolderConfig		статус
+Apply	IMAPFolderConfig		Прымяніць
+IMAP Folders	imap_config		Папкі IMAP
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Атрыманне IMAP папак, пачакайце...
 IMAP Folders	IMAPFolderConfig		IMAP папкі
-IMAP Folders	imap_config		Папкі IMAP
 Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Апрацоўка IMAP папак, пачакайце...
-status	IMAPFolderConfig		статус
+Failed to fetch available storage.	IMAPFolderConfig		Памылка падчас атрымання дадзеных

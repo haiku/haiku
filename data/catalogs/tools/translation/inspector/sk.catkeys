@@ -1,32 +1,32 @@
 1	slovak	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Aktívne prekladače
-Active Translators	InspectorApp		Aktívne prekladače
-Bummer	ImageWindow		Škoda
-File	ImageWindow		Súbor
-First Page	ImageWindow		Prvá stránka
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Obrázok: %1\nFarebný priestor: %2 (%3)\nRozmery: %4 x %5\nBajtov na riadok: %6\nBajtov celkom: %7\n\nIdent. info:\nID reťazec: %8\nTyp MIME: %9\nTyp: '%10' (%11)\nID prekladača: %12\nSkupina: '%13' (%14)\nKvalita: %15\nSchopnosti: %16\n\nInfo rozš.:\n
-Info	ImageWindow		Info
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Info okno
-Last Page	ImageWindow		Posledná stránka
-Next Page	ImageWindow		Ďalšia stránka
+User Translators	ActiveTranslatorsWindow		Používateľské prekladače
 No image available to save.	ImageWindow		Žiaden obrázok nie je dostupný na uloženie.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Počet dokumentov: %1\n\nPoužitý prekladač:\nNázov: %2\nInfo: %3\nVerzia: %4\n
-OK	ImageView		OK
-OK	ImageWindow		OK
-Open...	ImageWindow		Otvoriť...
-Previous Page	ImageWindow		Predošlá stránka
-Quit	ImageWindow		Ukončiť
-Save feature not implemented yet.	ImageWindow		Možnosť ukladania zatiaľ nie je implementovaná.
-Save...	ImageWindow		Uložiť...
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Vybraný dokument: %1\n\nPoužitý prekladač:\nNázov: %2\nInfo: %3\nVerzia: %4\n
-Sorry, unable to load the image.	ImageView		Ľutujeme, nebolo možné načítať obrázok.
 Sorry, unable to write the image file.	ImageView		Ľutujeme, nebolo možné zapísať súbor obrázka.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Počet dokumentov: %1\n\nPoužitý prekladač:\nNázov: %2\nInfo: %3\nVerzia: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTyp: „%1“ (%2)\nSkupina: „%3“ (%4)\nKvalita: %5\nSchopnosti: %6\nTyp MIME: %7\nNázov: %8\n
+Bummer	ImageWindow		Škoda
+Last Page	ImageWindow		Posledná stránka
+\nInput Formats:	ImageView		\nVstupné formáty:
+Sorry, unable to load the image.	ImageView		Ľutujeme, nebolo možné načítať obrázok.
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Info okno
+Active Translators	InspectorApp		Aktívne prekladače
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Obrázok: %1\nFarebný priestor: %2 (%3)\nRozmery: %4 x %5\nBajtov na riadok: %6\nBajtov celkom: %7\n\nIdent. info:\nID reťazec: %8\nTyp MIME: %9\nTyp: '%10' (%11)\nID prekladača: %12\nSkupina: '%13' (%14)\nKvalita: %15\nSchopnosti: %16\n\nInfo rozš.:\n
+\nOutput Formats:	ImageView		\nVýstupné formáty:
+Save feature not implemented yet.	ImageWindow		Možnosť ukladania zatiaľ nie je implementovaná.
+First Page	ImageWindow		Prvá stránka
+Next Page	ImageWindow		Ďalšia stránka
+Open...	ImageWindow		Otvoriť...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nPoužitý prekladač:\nNázov: %1\nInfo: %2\nVerzia: %3\n
+Save...	ImageWindow		Uložiť...
+Info	ImageWindow		Info
+OK	ImageWindow		OK
+Window	ImageWindow		Okno
+Quit	ImageWindow		Ukončiť
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Vybraný dokument: %1\n\nPoužitý prekladač:\nNázov: %2\nInfo: %3\nVerzia: %4\n
+Active Translators	ImageWindow		Aktívne prekladače
+View	ImageWindow		Zobraziť
+Previous Page	ImageWindow		Predošlá stránka
+OK	ImageView		OK
 System Translators	ActiveTranslatorsWindow		Systémové prekladače
 Unknown	ImageView		Neznámy
-User Translators	ActiveTranslatorsWindow		Používateľské prekladače
-View	ImageWindow		Zobraziť
-Window	ImageWindow		Okno
-\nInput Formats:	ImageView		\nVstupné formáty:
-\nOutput Formats:	ImageView		\nVýstupné formáty:
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nPoužitý prekladač:\nNázov: %1\nInfo: %2\nVerzia: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTyp: „%1“ (%2)\nSkupina: „%3“ (%4)\nKvalita: %5\nSchopnosti: %6\nTyp MIME: %7\nNázov: %8\n
+File	ImageWindow		Súbor

@@ -1,29 +1,27 @@
-1	slovak	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixlov/pixel
-Add a crosshair	Magnify-Main		Pridať mušku
+1	slovak	x-vnd.Haiku-Magnify	2227745383
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		správa prázdna schránka\n
+Make square	Magnify-Main		Urobiť štvorec
 Copy image	Magnify-Main		Kopírovať obrázok
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopírovať/Uložiť:\n kopírovať - skopíruje aktuálny obraz do schránky\n uložiť - vyzve používateľa, aby zadal súbor, kam sa majú uložiť\n bity obrázka a zapíše ho\n
-Decrease pixel size	Magnify-Main		Zmenšiť veľkosť pixla
-Decrease window size	Magnify-Main		Zmenšiť veľkosť okna
-Freeze/Unfreeze image	Magnify-Main		Zmraziť/rozmraziť obraz
+Magnify help	Magnify-Help		Pomoc k Lupe
+usage: magnify [size] (magnify size * size pixels)\n	Console		použitie: magnify [veľkosť] (veľkosť zväčšenia * veľkosť pixlov)\n
+Stick coordinates	Magnify-Main		Prilepiť súradnice
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n info skryť/zobraziť - skryje/zobrazí všetky tieto nové vlastnosti\n pozn.: pri zobrazovaní sa objaví červený štvorček označujúci\n ktorého pixla hodnoty RGB sa zobrazia\n pridať/skryť mušku - je možné pridať (alebo odstrániť) dve mušky,\n ktoré môžu pomôcť pri zarovnaní a umiestňovaní objektov.\n Mušky predstavujú modré štvorčeky a modré čiary.\n skryť/zobraziť mriežku - skryje/zobrazí mriežku oddeľujúcu jednotlivé pixle\n
+Hide/Show grid	Magnify-Main		Skryť/zobraziť mriežku
+magnify: size must be a multiple of 4\n	Console		lupa: veľkosť musí byť násobok 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Všeobecné:\n 32 x 32 - čísla vľavo hore sú počet viditeľných\n pixlov (šírka x výška)\n 8 pixlov/pixel - predstavuje počet pixlov, ktoré sa\n používajú na zväčšenie pixla\n R:152 G:52 B:10 - hodnoty RGB pixla pod\n červeným štvorcom\n
 Help	Magnify-Main		Pomoc
-Hide/Show grid	Magnify-Main		Skryť/zobraziť mriežku
-Hide/Show info	Magnify-Main		Skryť/zobraziť info
-Increase pixel size	Magnify-Main		Zväčšiť veľkosť pixla
-Increase window size	Magnify-Main		Zväčšiť veľkosť okna
-Info	Magnify-Main		Info
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n info skryť/zobraziť - skryje/zobrazí všetky tieto nové vlastnosti\n pozn.: pri zobrazovaní sa objaví červený štvorček označujúci\n ktorého pixla hodnoty RGB sa zobrazia\n pridať/skryť mušku - je možné pridať (alebo odstrániť) dve mušky,\n ktoré môžu pomôcť pri zarovnaní a umiestňovaní objektov.\n Mušky predstavujú modré štvorčeky a modré čiary.\n skryť/zobraziť mriežku - skryje/zobrazí mriežku oddeľujúcu jednotlivé pixle\n
-Magnify	System name		Lupa
-Magnify help	Magnify-Help		Pomoc k Lupe
-Make square	Magnify-Main		Urobiť štvorec
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigácia:\n klávesy šípok - presunúť aktuálny výber (indikátor RGB alebo mušku)\n o 1 pixel naraz\n option-kláves šípky - presunie umiestnenie myši o 1 pixel naraz\n x označuje výber - aktuálny výber má v sebe „x“\n
-Remove a crosshair	Magnify-Main		Odstrániť mušku
-Save image	Magnify-Main		Uložiť obrázok
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Zmena veľkosti:\n urobiť štvorec - nastaví šírku a výšku na väčšiu z týchto\n hodnôt, čím vytvorí štvorcový obraz\n zväčšiť/zmenšiť veľkosť okna - zväčší alebo zmenší veľkosť\n okna po 4 pixloch.\n pozn.: veľkosť tohto okna tiež možno zmeniť na ľubovoľnú veľkosť \n zmenou veľkosti okna\n zväčšiť/zmenšiť veľkosť pixla - zväčší alebo zmenší počet pixlov\n použitých na zväčšenie „skutočného“ pixla. Rozsah je od 1 do 16.\n
-Stick coordinates	Magnify-Main		Prilepiť súradnice
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		zmraziť - zmrazí/rozmrazí zväčšenie čohokoľvek,\n nad čím je práve kurzor\n
-magnify: size must be a multiple of 4\n	Console		lupa: veľkosť musí byť násobok 4\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		správa prázdna schránka\n
-size must be > 4 and a multiple of 4\n	Console		veľkosť musí byť > 4 a násobkom 4\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		použitie: magnify [veľkosť] (veľkosť zväčšenia * veľkosť pixlov)\n
+Decrease pixel size	Magnify-Main		Zmenšiť veľkosť pixla
+Magnify	System name		Lupa
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixlov/pixel
+Info	Magnify-Main		Info
+Remove a crosshair	Magnify-Main		Odstrániť mušku
+Freeze/Unfreeze image	Magnify-Main		Zmraziť/rozmraziť obraz
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopírovať/Uložiť:\n kopírovať - skopíruje aktuálny obraz do schránky\n uložiť - vyzve používateľa, aby zadal súbor, kam sa majú uložiť\n bity obrázka a zapíše ho\n
+Hide/Show info	Magnify-Main		Skryť/zobraziť info
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigácia:\n klávesy šípok - presunúť aktuálny výber (indikátor RGB alebo mušku)\n o 1 pixel naraz\n option-kláves šípky - presunie umiestnenie myši o 1 pixel naraz\n x označuje výber - aktuálny výber má v sebe „x“\n
+Save image	Magnify-Main		Uložiť obrázok
+Increase window size	Magnify-Main		Zväčšiť veľkosť okna
+Decrease window size	Magnify-Main		Zmenšiť veľkosť okna
+Increase pixel size	Magnify-Main		Zväčšiť veľkosť pixla
+Add a crosshair	Magnify-Main		Pridať mušku

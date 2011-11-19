@@ -1,52 +1,52 @@
 1	slovak	x-vnd.Haiku-Shortcuts	621368175
-(Choose application with file requester)	ShortcutsWindow		(Vyberte aplikáciu pomocou žiadača súboru)
-*Beep	ShortcutsWindow		*Pípnutie
-*InsertString \"Your Text Here\"	ShortcutsWindow		*VložiťReťazec \"Váš text sem\"
-*LaunchHandler text/html	ShortcutsWindow		*SpustiťObsluhu text/html
-*MouseButton 1	ShortcutsWindow		*TlačidloMyši 1
-*MouseDown	ShortcutsWindow		*MyšDolu
-*MouseUp	ShortcutsWindow		*MyšHore
-*MoveMouse +20 +0	ShortcutsWindow		*PresunúťMyš +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*PresunúťMyšNa 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*PresunúťMyšNa 100% 0\" \"*TlačidloMyši 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*PoslaťSprávu application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Prodať novú skratku
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Pridať
-Append KeySet…	ShortcutsWindow		Pridať SaduKláves...
-Application	ShortcutsWindow		Aplikácia
-Beep	ShortcutsSpec		Pípnutie
-Cancel	ShortcutsWindow		Zrušiť
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Don't save	ShortcutsWindow		Neukladať
 Error, NULL state description?\n	ShortcutsSpec		Chyba, NULL popis stavu?\n
-File	ShortcutsWindow		Súbor
-InsertString	ShortcutsSpec		VložiťReťazec
-Key	ShortcutsWindow		Kláves
-LaunchHandler	ShortcutsSpec		SpustiťObsluhu
-MouseButton	ShortcutsSpec		TlačidloMyši
-MouseDown	ShortcutsSpec		MyšDolu
-MouseUp	ShortcutsSpec		MyšHore
 MoveMouse	ShortcutsSpec		PosunúťMyš
-MoveMouseTo	ShortcutsSpec		PresunúťMyšNa
-Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Ó, nie
-Open	ShortcutsWindow		Otvoriť
-Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves...
-Quit	ShortcutsWindow		Ukončiť
-Really quit without saving your changes?	ShortcutsWindow		Skutočne ukončiť bez uloženia vašich zmien?
-Remove selected shortcut	ShortcutsWindow		Odstrániť vybranú skratku
-Revert to saved	ShortcutsWindow		Vrátiť spať uložené
-Save	ShortcutsWindow		Uložiť
-Save & apply	ShortcutsWindow		Uložiť a použiť
-Save KeySet as…	ShortcutsWindow		Uložiť SaduKláves ako...
-Select	ShortcutsWindow		Vybrať
-SendMessage	ShortcutsSpec		PoslaťSprávu
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	System name		Skratky
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Aplikácia Skratky nedokázala otvoriť váš súbor SadaKláves!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala prečítať formát vášho súboru SadaKláves!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala uložiť váš súbor SadaKláves!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Aplikácia Skratky nedokázala uložiť vašu sadu kláves.
+Cancel	ShortcutsWindow		Zrušiť
+InsertString	ShortcutsSpec		VložiťReťazec
+Append KeySet…	ShortcutsWindow		Pridať SaduKláves...
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Key	ShortcutsWindow		Kláves
+Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves...
+MouseUp	ShortcutsSpec		MyšHore
+Revert to saved	ShortcutsWindow		Vrátiť spať uložené
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*VložiťReťazec \"Váš text sem\"
+*MouseUp	ShortcutsWindow		*MyšHore
+(Choose application with file requester)	ShortcutsWindow		(Vyberte aplikáciu pomocou žiadača súboru)
 Window	ShortcutsSpec	Name for modifier on keyboard	Okno
+*LaunchHandler text/html	ShortcutsWindow		*SpustiťObsluhu text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Aplikácia Skratky nedokázala otvoriť váš súbor SadaKláves!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*PresunúťMyšNa 100% 0\" \"*TlačidloMyši 1\"
+SendMessage	ShortcutsSpec		PoslaťSprávu
+MoveMouseTo	ShortcutsSpec		PresunúťMyšNa
+Save	ShortcutsWindow		Uložiť
+*MouseButton 1	ShortcutsWindow		*TlačidloMyši 1
+*MoveMouse +20 +0	ShortcutsWindow		*PresunúťMyš +20 +0
+MouseDown	ShortcutsSpec		MyšDolu
+Remove selected shortcut	ShortcutsWindow		Odstrániť vybranú skratku
+MouseButton	ShortcutsSpec		TlačidloMyši
+Add new shortcut	ShortcutsWindow		Prodať novú skratku
+Save & apply	ShortcutsWindow		Uložiť a použiť
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*PoslaťSprávu application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Pridať
+File	ShortcutsWindow		Súbor
+Beep	ShortcutsSpec		Pípnutie
+Quit	ShortcutsWindow		Ukončiť
+*MouseDown	ShortcutsWindow		*MyšDolu
+Don't save	ShortcutsWindow		Neukladať
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Aplikácia
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Pípnutie
+*MoveMouseTo 50% 50%	ShortcutsWindow		*PresunúťMyšNa 50% 50%
+Save KeySet as…	ShortcutsWindow		Uložiť SaduKláves ako...
+Open	ShortcutsWindow		Otvoriť
+Really quit without saving your changes?	ShortcutsWindow		Skutočne ukončiť bez uloženia vašich zmien?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala prečítať formát vášho súboru SadaKláves!
+Select	ShortcutsWindow		Vybrať
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala uložiť váš súbor SadaKláves!
+Oh no	ShortcutsWindow		Ó, nie
+LaunchHandler	ShortcutsSpec		SpustiťObsluhu
+Shortcuts	System name		Skratky

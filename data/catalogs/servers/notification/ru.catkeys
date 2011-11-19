@@ -1,8 +1,8 @@
 1	russian	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Невозможно запустить настройки дисплея.\nФильтр изменений в реальном времени отключен.
 Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Не удалось запустить фильтр монитора. Фильтр изменений в реальном времени отключен.
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Невозможно запустить общие настройки монитора.\nФильтр изменений в реальном времени отключен.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Невозможно запустить настройки дисплея.\nФильтр изменений в реальном времени отключен.
 Darn.	NotificationWindow		Проклятье.
-Notification	NotificationWindow		Уведомление
-OK	NotificationWindow		ОК
 Warning	NotificationWindow		Предупреждение
+OK	NotificationWindow		ОК
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Невозможно запустить общие настройки монитора.\nФильтр изменений в реальном времени отключен.
+Notification	NotificationWindow		Уведомление

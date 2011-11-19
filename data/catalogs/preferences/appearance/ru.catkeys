@@ -1,49 +1,49 @@
 1	russian	x-vnd.Haiku-Appearance	3577998894
-About	DecorSettingsView		О декораторе
-About Decerator	DecorSettingsView		О декораторе
-Antialiasing	APRWindow		Сглаживание
-Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
-Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
-Appearance	System name		Внешний вид
-Choose Decorator	DecorSettingsView		Выберите декоратор
-Colors	APRWindow		Цвета
-Control background	Colors tab		Фон элемента
-Control border	Colors tab		Граница элемента
 Control highlight	Colors tab		Подсветка элемента
-Control text	Colors tab		Текст элемента
-Defaults	APRWindow		По умолчанию
-Document background	Colors tab		Фон документа
-Document text	Colors tab		Текст документа
-Failure	Colors tab		Неудача
-Glyph hinting:	AntialiasingSettingsView		Уточнение:
-Grayscale	AntialiasingSettingsView		Оттенки серого
-Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
-Inactive window tab	Colors tab		Заголовок неактивного окна
-Inactive window tab text	Colors tab		Текст заголовка неактивного окна
-LCD subpixel	AntialiasingSettingsView		Субпиксельное сглаживание
-Menu background	Colors tab		Фон меню
-Menu item text	Colors tab		Текст пункта меню
-Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
-Navigation base	Colors tab		Основа навигации
-Navigation pulse	Colors tab		Навигационная пульсация
-OK	DecorSettingsView		ОК
-Off	AntialiasingSettingsView		Выключить
-On	AntialiasingSettingsView		Включить
-Panel background	Colors tab		Фон панели
-Panel text	Colors tab		Текст панели
-Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
-Revert	APRWindow		Вернуть
-Selected menu item background	Colors tab		Фон выбранного пункта меню
-Selected menu item border	Colors tab		Рамка выделенного пункта меню
-Selected menu item text	Colors tab		Текст выделенного пункта меню
+Control border	Colors tab		Граница элемента
+Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
 Shadow	Colors tab		Тень
+On	AntialiasingSettingsView		Включить
+Defaults	APRWindow		По умолчанию
+Grayscale	AntialiasingSettingsView		Оттенки серого
 Shine	Colors tab		Сияние
-Strong	AntialiasingSettingsView		Сильная
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпиксельное сглаживание в комбинации с уточнением недоступно в этой сборке Haiku во избежание возможных патентных проблем. Для включения этой возможности вам необходимо собрать Haiku самостоятельно, включив особые опции в заголовке конфигурации FreeType.
+About	DecorSettingsView		О декораторе
+Off	AntialiasingSettingsView		Выключить
+Choose Decorator	DecorSettingsView		Выберите декоратор
 Success	Colors tab		Успех
-Tooltip background	Colors tab		Фон подсказки
-Tooltip text	Colors tab		Текст подсказки
+Inactive window tab text	Colors tab		Текст заголовка неактивного окна
+Failure	Colors tab		Неудача
+Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
 Window Decorator	APRWindow		Оконный декоратор
 Window Decorator:	DecorSettingsView		Оконный декоратор:
+Document background	Colors tab		Фон документа
+Revert	APRWindow		Вернуть
 Window tab	Colors tab		Заголовок окна
+Tooltip background	Colors tab		Фон подсказки
+Selected menu item background	Colors tab		Фон выбранного пункта меню
+Antialiasing	APRWindow		Сглаживание
+Navigation base	Colors tab		Основа навигации
 Window tab text	Colors tab		Текст заголовка окна
+Document text	Colors tab		Текст документа
+Navigation pulse	Colors tab		Навигационная пульсация
+Selected menu item text	Colors tab		Текст выделенного пункта меню
+Menu background	Colors tab		Фон меню
+OK	DecorSettingsView		ОК
+Panel background	Colors tab		Фон панели
+Colors	APRWindow		Цвета
+Control background	Colors tab		Фон элемента
+About Decerator	DecorSettingsView		О декораторе
+Inactive window tab	Colors tab		Заголовок неактивного окна
+Appearance	System name		Внешний вид
+Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпиксельное сглаживание в комбинации с уточнением недоступно в этой сборке Haiku во избежание возможных патентных проблем. Для включения этой возможности вам необходимо собрать Haiku самостоятельно, включив особые опции в заголовке конфигурации FreeType.
+Control text	Colors tab		Текст элемента
+Tooltip text	Colors tab		Текст подсказки
+Menu item text	Colors tab		Текст пункта меню
+LCD subpixel	AntialiasingSettingsView		Субпиксельное сглаживание
+Selected menu item border	Colors tab		Рамка выделенного пункта меню
+Strong	AntialiasingSettingsView		Сильная
+Panel text	Colors tab		Текст панели
+Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
+Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
+Glyph hinting:	AntialiasingSettingsView		Уточнение:

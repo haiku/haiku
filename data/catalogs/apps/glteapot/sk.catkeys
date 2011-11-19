@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-GLTeapot	2093126480
+1	slovak	x-vnd.Haiku-GLTeapot	2890609668
 Add a teapot	TeapotWindow		Pridať konvicu
 Backface culling	TeapotWindow		Orezávanie zadnej strany
 Blue	TeapotWindow		Modrá
@@ -13,7 +13,6 @@ Lighting	TeapotWindow		Osvetlenie
 Lights	TeapotWindow		Svetlá
 Lower left	TeapotWindow		Vľavo dolu
 Off	TeapotWindow		Vypnuté
-Options	TeapotWindow		Možnosti
 Options	TeapotWindow		Možnosti
 Perspective	TeapotWindow		Perspektíva
 Quit	TeapotWindow		Ukončiť

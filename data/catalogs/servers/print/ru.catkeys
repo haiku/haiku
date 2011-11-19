@@ -1,27 +1,27 @@
 1	russian	x-vnd.Be-PSRV	3659516843
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
-All pages	ConfigWindow		Все страницы
-All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
-Cancel	ConfigWindow		Отмена
+Undefined	ConfigWindow		не определены
 Cancel	PrintServerApp		Отмена
-Landscape	ConfigWindow		Альбом
-No	PrintServerApp		Нет
-OK	ConfigWindow		ОК
-OK	PrintServerApp		ОК
 Page %1 to %2	ConfigWindow		Страница %1 из %2
-Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
-Page setup	ConfigWindow		Настройка печати
 Page setup:	ConfigWindow		Настройки печати:
-Paper setup:	ConfigWindow		Параметры бумаги:
+OK	ConfigWindow		ОК
+Cancel	ConfigWindow		Отмена
+Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
+Yes	PrintServerApp		Да
+Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
 Portrait	ConfigWindow		Портрет
-Print setup	ConfigWindow		Настройка печати
+All pages	ConfigWindow		Все страницы
+There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
 Printer:	ConfigWindow		Принтер:
 Select a printer	ConfigWindow		Выберите принтер
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоид
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
+No	PrintServerApp		Нет
+Landscape	ConfigWindow		Альбом
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
-There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
-Undefined	ConfigWindow		не определены
+All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
+OK	PrintServerApp		ОК
+Print setup	ConfigWindow		Настройка печати
 Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
-Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
-Yes	PrintServerApp		Да
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоид
+Page setup	ConfigWindow		Настройка печати
+Paper setup:	ConfigWindow		Параметры бумаги:

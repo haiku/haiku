@@ -1,49 +1,48 @@
-1	belarusian	x-vnd.Haiku-Expander	187676748
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
-Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
-Automatically show contents listing	ExpanderPreferences		Аўтаматычна паказваць змесціва
-Cancel	ExpanderPreferences		Адмена
-Cancel	ExpanderWindow		Скасаваць
-Close	ExpanderMenu		Закрыць
-Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
-Continue	ExpanderWindow		Працягваць
-Creating listing for '%s'	ExpanderWindow		Стварэнне спіса для '%s'
-Destination	ExpanderWindow		Прызначэнне
-Destination folder:	ExpanderPreferences		Папка прызначэння:
-Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
+1	belarusian	x-vnd.Haiku-Expander	1852295567
 Expand	ExpanderMenu		Распакаваць
-Expand	ExpanderWindow		Распакаваць
-Expander	System name		Распакоўшчык
-Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
-Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
+Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
+Set destination…	ExpanderMenu		Задаць прызначэнне…
+Use:	ExpanderPreferences		Выкарыстаць:
+File expanded	ExpanderWindow		Файл распакаваны
+The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
 Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
+Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
+Select current	DirectoryFilePanel		Пазначыць бягучы
+Source	ExpanderWindow		Крыніца
+Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
+Hide contents	ExpanderWindow		Схаваць змест
+Cancel	ExpanderWindow		Скасаваць
+Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
+Creating listing for '%s'	ExpanderWindow		Стварэнне спіса для '%s'
+Continue	ExpanderWindow		Працягваць
+The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
+Cancel	ExpanderPreferences		Адмена
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
+Select	DirectoryFilePanel		Пазначыць
+Destination folder:	ExpanderPreferences		Папка прызначэння:
+Same directory as source (archive) file	ExpanderPreferences		Папка ў якой знаходзіцца зыходны архіў
 Expanding '%s'	ExpanderWindow		Распакоўка '%s'
 Expansion:	ExpanderPreferences		Распакоўка:
-File	ExpanderMenu		Файл
-File expanded	ExpanderWindow		Файл распакаваны
-Hide contents	ExpanderWindow		Схаваць змест
-Leave destination folder path empty	ExpanderPreferences		Пакінуць пуць да пакі прызначэння пустым
-OK	ExpanderPreferences		ОК
-Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
-Other:	ExpanderPreferences		Другі:
-Same directory as source (archive) file	ExpanderPreferences		Папка ў якой знаходзіцца зыходны архіў
-Select	DirectoryFilePanel		Пазначыць
-Select	ExpanderPreferences		Пазначыць
-Select '%s'	DirectoryFilePanel		Пазначыць '%s'
-Select current	DirectoryFilePanel		Пазначыць бягучы
-Set destination…	ExpanderMenu		Задаць прызначэнне…
-Set source…	ExpanderMenu		Задаць крыніцу…
 Settings	ExpanderMenu		Налады
 Settings…	ExpanderMenu		Налады…
-Show contents	ExpanderMenu		Паказаць змест
+Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
+Select	ExpanderPreferences		Пазначыць
 Show contents	ExpanderWindow		Паказаць змест
-Source	ExpanderWindow		Крыніца
-Stop	ExpanderMenu		Спыніць
-Stop	ExpanderWindow		Спыніць
-The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
-The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
-The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
-The file doesn't exist	ExpanderWindow		Гэты файл не існуе
+Automatically show contents listing	ExpanderPreferences		Аўтаматычна паказваць змесціва
+OK	ExpanderPreferences		ОК
+Leave destination folder path empty	ExpanderPreferences		Пакінуць пуць да пакі прызначэння пустым
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Гэты каталёг быў перамешчаны, перайменаваны, або не\n падтрымліваецца.
-Use:	ExpanderPreferences		Выкарыстаць:
-is not supported	ExpanderWindow		не падтрымліваецца
+The file doesn't exist	ExpanderWindow		Гэты файл не існуе
+Stop	ExpanderMenu		Спыніць
+File	ExpanderMenu		Файл
+Other:	ExpanderPreferences		Другі:
+Expander	System name		Распакоўшчык
+Expand	ExpanderWindow		Распакаваць
+Close	ExpanderMenu		Закрыць
+The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
+Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
+Set source…	ExpanderMenu		Задаць крыніцу…
+Select '%s'	DirectoryFilePanel		Пазначыць '%s'
+Show contents	ExpanderMenu		Паказаць змест
+Stop	ExpanderWindow		Спыніць
+Destination	ExpanderWindow		Прызначэнне

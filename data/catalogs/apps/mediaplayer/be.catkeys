@@ -1,137 +1,137 @@
 1	belarusian	x-vnd.Haiku-MediaPlayer	138551800
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася ўнутраная памылка %app%. Файл не можа быць адкрыты.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
-100% scale	MediaPlayer-Main		Маштаб 100%
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
-200% scale	MediaPlayer-Main		Маштаб 200%
-300% scale	MediaPlayer-Main		Маштаб 300%
-400% scale	MediaPlayer-Main		Маштаб 400%
-50% scale	MediaPlayer-Main		Маштаб 50%
-<nothing to redo>	MediaPlayer-PlaylistWindow		<няма чаго перарабляць>
-<nothing to undo>	MediaPlayer-PlaylistWindow		<няма чаго адмяняць>
-<unknown>	PlaylistItem-album		<невядома>
-<unknown>	PlaylistItem-author		<невядомы>
-<unnamed>	PlaylistItem-name		<неназваны>
-<untitled>	PlaylistItem-title		<неназваны>
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць усе файлы ў Сметніцу.
-Always on top	MediaPlayer-Main		Заўседы наверсе
-Aspect ratio	MediaPlayer-Main		Суадносіны бакоў
-Attributes	MediaPlayer-Main		Атрыбуты
-Audio	MediaPlayer-Main		Аўдыё
-Audio track	MediaPlayer-Main		Аўдыё дарожка
-Automatically start playing	MediaPlayer-SettingsWindow		Пачынаць прайгранне аўтаматычна
-Bottom of screen	MediaPlayer-SettingsWindow		Ніз экрана
-Bottom of video	MediaPlayer-SettingsWindow		Ніз відэа
-Cancel	MediaPlayer-SettingsWindow		Адмена
-Close	MediaPlayer-Main		Закрыць
-Close	MediaPlayer-PlaylistWindow		Закрыць
-Close window after playing audio	MediaPlayer-SettingsWindow		Закрыць вакно пасля заканчэння аўдыё-праігравання
-Close window after playing video	MediaPlayer-SettingsWindow		Закрыць вакно пасля заканчэння прагляду выдэа
-Copy Entries	MediaPlayer-CopyPLItemsCmd		Капіяваць Элементы
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Капіяваць элемент
-Drop files to play	MediaPlayer-Main		Перацягніце файлы, якія жадаеце прайграць
-Edit	MediaPlayer-PlaylistWindow		Правіць
-Error: 	MediaPlayer-Main		Памылка:
-Error: 	MediaPlayer-RemovePLItemsCmd		Памылка:
-File Info	MediaPlayer-InfoWin		Інфармацыя файла
-File info…	MediaPlayer-Main		Інфармацыя пра файл...
-Full screen	MediaPlayer-Main		Поўны экран
-Full volume	MediaPlayer-SettingsWindow		Поўная гучнасць
-Gets the URI of the currently playing item.	MediaPlayer-Main		Вызначае URI цякучага элемента.
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Вызначае/прызначае гучнасць (0.0-2.0).
-Hide interface	MediaPlayer-Main		Схаваць элементы кіравання
-Import Entries	MediaPlayer-ImportPLItemsCmd		Імпартаваць Элементы
-Import Entry	MediaPlayer-ImportPLItemsCmd		Імпартаваць Элемент
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унутраная памылка (блакаванне не атрымалася). Плэйліст не захаваны.
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унутраная памылка (няправільнае паведамленне). Плэйліст не захаваны.
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унтураная памылка (недастаткова памяці). Плэйліст не захаваны.
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Медыясервер, відаць, не запушчаны.\nЗапусціць яго?
-Large	MediaPlayer-SettingsWindow		Буйны
-Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
-Loop audio	MediaPlayer-SettingsWindow		Закальцаваць аўдыё
-Loop video	MediaPlayer-SettingsWindow		Закальцаваць відэа
-Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
-MediaPlayer	System name		Праігравальнік Медыя
-MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
-Medium	MediaPlayer-SettingsWindow		Сярэдняе
-Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
-Move Entry	MediaPlayer-MovePLItemsCmd		Перамясціць элемент
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Памылка Адпраўкі Ў Сметніцу
-Move file to Trash	MediaPlayer-PlaylistWindow		Перасунуць файл у Сметніцу
-Mute	MediaPlayer-Main		Выкл. гук
-Muted	MediaPlayer-SettingsWindow		Гук выключаны
-New player…	MediaPlayer-Main		Новы плеер
-Next	MediaPlayer-Main		Наступны
-No aspect correction	MediaPlayer-Main		Не карэктаваць суадносіны бакоў
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ніводны з файлаў, якія вы жадалі прайграць, не падобны да медыяфайла.
-Nothing to Play	MediaPlayer-Main		Няма чаго іграць
-OK	MediaPlayer-Main		ОК
-OK	MediaPlayer-PlaylistWindow		ОК
-OK	MediaPlayer-RemovePLItemsCmd		ОК
-OK	MediaPlayer-SettingsWindow		ОК
-Off	Subtitles menu		Выкл.
-Open	MediaPlayer-Main		Адкрыць
-Open	MediaPlayer-PlaylistWindow		Адкрыць
-Open Clips	MediaPlayer-Main		Адкрыць Кліпы
-Open Playlist	MediaPlayer-PlaylistWindow		Адкрыць плэйліст
-Open file…	MediaPlayer-Main		Адкрыць файл...
-Open…	MediaPlayer-PlaylistWindow		Адкрыць...
-Pause	MediaPlayer-Main		Прыпыніць
-Pause playback.	MediaPlayer-Main		Прыпыніць прайгранне.
-Play	MediaPlayer-Main		Прайграць
-Play mode	MediaPlayer-SettingsWindow		Рэжым прайграння
-Playlist	MediaPlayer-PlaylistWindow		Плэйліст
-Playlist…	MediaPlayer-Main		Плэйліст
-Prev	MediaPlayer-Main		Папярэдні
-Quit	MediaPlayer-Main		Выйсці
-Randomize	MediaPlayer-PlaylistWindow		Перамяшаць
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Перамяшаць элементы
-Rating	MediaPlayer-Main		Рэйтынг
-Redo	MediaPlayer-PlaylistWindow		Перарабіць
-Remove	MediaPlayer-PlaylistWindow		Выдаліць
-Remove Entries	MediaPlayer-RemovePLItemsCmd		Убраць Элементы
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элементы ў Сметніцу
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Убраць Элемент
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элемент у Сметніцу
-Revert	MediaPlayer-SettingsWindow		Вярнуць
-Save	MediaPlayer-Main		Захаваць
-Save	MediaPlayer-PlaylistWindow		Захаваць
-Save Playlist	MediaPlayer-PlaylistWindow		Захаваць плэйліст
-Save as…	MediaPlayer-PlaylistWindow		Захаваць як...
-Save error	MediaPlayer-PlaylistWindow		Памылка захавання
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст.\n\nПамылка:
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст:\n\nПамылка:
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Паказваць рэгулятары ў рэжыме поўнага экрану
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Маштабаваць фільмы плаўна (рэжым без накладання)
-Select all	MediaPlayer-PlaylistWindow		Пазначыць усе
-Settings…	MediaPlayer-Main		Наладкі...
-Skip to the next track.	MediaPlayer-Main		Пераскочыць да наступнай дарожкі
-Skip to the previous track.	MediaPlayer-Main		Пераскочць да папярэдняй дарожкі.
-Small	MediaPlayer-SettingsWindow		Маленькі
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць некаторыя файлы ў Сметніцу.
-Start media server	MediaPlayer-Main		Запусціць медыясервер
-Start playing.	MediaPlayer-Main		Пачаць прайгранне.
-Stop	MediaPlayer-Main		Спыніць
-Stop playing.	MediaPlayer-Main		Спыніць прайгранне.
 Stream settings	MediaPlayer-Main		Наладкі патоку
-Subtitle placement:	MediaPlayer-SettingsWindow		Месцазнаходжанне субтытраў:
-Subtitle size:	MediaPlayer-SettingsWindow		Памер субтытраў:
-Subtitles	MediaPlayer-Main		Субтытры
+<unknown>	PlaylistItem-album		<невядома>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' немагчыма адкрыць.\n\n
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не ўстаноўлены неабходны для фармата гэтага файла дэкодэр, або ён канфліктуе з асабістай версіяй фармата.
-Toggle mute.	MediaPlayer-Main		Укл/Выкл гук.
-Toggle pause/play.	MediaPlayer-Main		Прыпыніць/працягваць.
-TogglePlaying	MediaPlayer-Main		Укл/Выкл Прайгранне
-Track	Audio Track Menu		Дарожка
-Track	Video Track Menu		Дарожка
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Паказваць рэгулятары ў рэжыме поўнага экрану
+Subtitle size:	MediaPlayer-SettingsWindow		Памер субтытраў:
+Save Playlist	MediaPlayer-PlaylistWindow		Захаваць плэйліст
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ніводны з файлаў, якія вы жадалі прайграць, не падобны да медыяфайла.
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст.\n\nПамылка:
+New player…	MediaPlayer-Main		Новы плеер
+100% scale	MediaPlayer-Main		Маштаб 100%
+Subtitle placement:	MediaPlayer-SettingsWindow		Месцазнаходжанне субтытраў:
+Close	MediaPlayer-Main		Закрыць
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць некаторыя файлы ў Сметніцу.
+Open	MediaPlayer-Main		Адкрыць
+Next	MediaPlayer-Main		Наступны
+OK	MediaPlayer-SettingsWindow		ОК
 Track %d	MediaPlayer-Main		Дарожка %d
-URI	MediaPlayer-Main		URI
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
+Medium	MediaPlayer-SettingsWindow		Сярэдняе
+Close	MediaPlayer-PlaylistWindow		Закрыць
+Open…	MediaPlayer-PlaylistWindow		Адкрыць...
+Toggle mute.	MediaPlayer-Main		Укл/Выкл гук.
 Undo	MediaPlayer-PlaylistWindow		Адмяніць
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Карыстацца накладаннямі відэа з апаратным паскарэннем, калі магчыма
+File info…	MediaPlayer-Main		Інфармацыя пра файл...
+Pause playback.	MediaPlayer-Main		Прыпыніць прайгранне.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Убраць Элемент
+Close window after playing audio	MediaPlayer-SettingsWindow		Закрыць вакно пасля заканчэння аўдыё-праігравання
+Full volume	MediaPlayer-SettingsWindow		Поўная гучнасць
+Drop files to play	MediaPlayer-Main		Перацягніце файлы, якія жадаеце прайграць
+TogglePlaying	MediaPlayer-Main		Укл/Выкл Прайгранне
+Cancel	MediaPlayer-SettingsWindow		Адмена
+Loop audio	MediaPlayer-SettingsWindow		Закальцаваць аўдыё
+Nothing to Play	MediaPlayer-Main		Няма чаго іграць
+Muted	MediaPlayer-SettingsWindow		Гук выключаны
+Quit	MediaPlayer-Main		Выйсці
 Video	MediaPlayer-Main		Відэа
-Video track	MediaPlayer-Main		Відэа дарожка
-View options	MediaPlayer-SettingsWindow		Опцыі віду
+Start playing.	MediaPlayer-Main		Пачаць прайгранне.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не ўстаноўлены неабходны для фармата гэтага файла дэкодэр, або ён канфліктуе з асабістай версіяй фармата.
+Import Entry	MediaPlayer-ImportPLItemsCmd		Імпартаваць Элемент
+Gets the URI of the currently playing item.	MediaPlayer-Main		Вызначае URI цякучага элемента.
+400% scale	MediaPlayer-Main		Маштаб 400%
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст:\n\nПамылка:
+Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Памылка Адпраўкі Ў Сметніцу
+Audio	MediaPlayer-Main		Аўдыё
+Open Playlist	MediaPlayer-PlaylistWindow		Адкрыць плэйліст
+MediaPlayer	System name		Праігравальнік Медыя
+OK	MediaPlayer-Main		ОК
+Settings…	MediaPlayer-Main		Наладкі...
+MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
+Select all	MediaPlayer-PlaylistWindow		Пазначыць усе
+Move Entry	MediaPlayer-MovePLItemsCmd		Перамясціць элемент
+Open	MediaPlayer-PlaylistWindow		Адкрыць
+Stop playing.	MediaPlayer-Main		Спыніць прайгранне.
+Error: 	MediaPlayer-RemovePLItemsCmd		Памылка:
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унутраная памылка (няправільнае паведамленне). Плэйліст не захаваны.
+Skip to the previous track.	MediaPlayer-Main		Пераскочць да папярэдняй дарожкі.
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася ўнутраная памылка %app%. Файл не можа быць адкрыты.
+Close window after playing video	MediaPlayer-SettingsWindow		Закрыць вакно пасля заканчэння прагляду выдэа
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Маштабаваць фільмы плаўна (рэжым без накладання)
+OK	MediaPlayer-RemovePLItemsCmd		ОК
+50% scale	MediaPlayer-Main		Маштаб 50%
+Subtitles	MediaPlayer-Main		Субтытры
+Prev	MediaPlayer-Main		Папярэдні
 Volume	MediaPlayer-Main		Гучнасць
+Audio track	MediaPlayer-Main		Аўдыё дарожка
+Import Entries	MediaPlayer-ImportPLItemsCmd		Імпартаваць Элементы
+Pause	MediaPlayer-Main		Прыпыніць
+No aspect correction	MediaPlayer-Main		Не карэктаваць суадносіны бакоў
+Automatically start playing	MediaPlayer-SettingsWindow		Пачынаць прайгранне аўтаматычна
+Track	Video Track Menu		Дарожка
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унутраная памылка (блакаванне не атрымалася). Плэйліст не захаваны.
+View options	MediaPlayer-SettingsWindow		Опцыі віду
+Play mode	MediaPlayer-SettingsWindow		Рэжым прайграння
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Убраць Элементы
+Video track	MediaPlayer-Main		Відэа дарожка
+Loop video	MediaPlayer-SettingsWindow		Закальцаваць відэа
+Attributes	MediaPlayer-Main		Атрыбуты
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць усе файлы ў Сметніцу.
+<untitled>	PlaylistItem-title		<неназваны>
+Track	Audio Track Menu		Дарожка
+<nothing to redo>	MediaPlayer-PlaylistWindow		<няма чаго перарабляць>
+Skip to the next track.	MediaPlayer-Main		Пераскочыць да наступнай дарожкі
+Play	MediaPlayer-Main		Прайграць
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элементы ў Сметніцу
+200% scale	MediaPlayer-Main		Маштаб 200%
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Медыясервер, відаць, не запушчаны.\nЗапусціць яго?
+Aspect ratio	MediaPlayer-Main		Суадносіны бакоў
+Error: 	MediaPlayer-Main		Памылка:
+Large	MediaPlayer-SettingsWindow		Буйны
+Bottom of video	MediaPlayer-SettingsWindow		Ніз відэа
+Stop	MediaPlayer-Main		Спыніць
 Volume of background clips	MediaPlayer-SettingsWindow		Гучнасць фонавых кліпаў
-none	Audio track menu		няма
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унтураная памылка (недастаткова памяці). Плэйліст не захаваны.
+Hide interface	MediaPlayer-Main		Схаваць элементы кіравання
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Капіяваць элемент
 none	Subtitles menu		няма
+Move file to Trash	MediaPlayer-PlaylistWindow		Перасунуць файл у Сметніцу
+URI	MediaPlayer-Main		URI
+Mute	MediaPlayer-Main		Выкл. гук
+Toggle pause/play.	MediaPlayer-Main		Прыпыніць/працягваць.
+Small	MediaPlayer-SettingsWindow		Маленькі
+Randomize	MediaPlayer-PlaylistWindow		Перамяшаць
+Off	Subtitles menu		Выкл.
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Перамяшаць элементы
+Revert	MediaPlayer-SettingsWindow		Вярнуць
+Edit	MediaPlayer-PlaylistWindow		Правіць
+Start media server	MediaPlayer-Main		Запусціць медыясервер
+<unnamed>	PlaylistItem-name		<неназваны>
+Open Clips	MediaPlayer-Main		Адкрыць Кліпы
+OK	MediaPlayer-PlaylistWindow		ОК
+none	Audio track menu		няма
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Вызначае/прызначае гучнасць (0.0-2.0).
+Playlist…	MediaPlayer-Main		Плэйліст
+<unknown>	PlaylistItem-author		<невядомы>
+Save as…	MediaPlayer-PlaylistWindow		Захаваць як...
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Капіяваць Элементы
+Redo	MediaPlayer-PlaylistWindow		Перарабіць
+Always on top	MediaPlayer-Main		Заўседы наверсе
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элемент у Сметніцу
+Save	MediaPlayer-Main		Захаваць
+<nothing to undo>	MediaPlayer-PlaylistWindow		<няма чаго адмяняць>
+Save	MediaPlayer-PlaylistWindow		Захаваць
+Remove	MediaPlayer-PlaylistWindow		Выдаліць
+Full screen	MediaPlayer-Main		Поўны экран
+Open file…	MediaPlayer-Main		Адкрыць файл...
+300% scale	MediaPlayer-Main		Маштаб 300%
+Bottom of screen	MediaPlayer-SettingsWindow		Ніз экрана
+Save error	MediaPlayer-PlaylistWindow		Памылка захавання
+Rating	MediaPlayer-Main		Рэйтынг
+Playlist	MediaPlayer-PlaylistWindow		Плэйліст
+Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
+Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
+File Info	MediaPlayer-InfoWin		Інфармацыя файла

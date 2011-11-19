@@ -1,14 +1,14 @@
 1	russian	x-vnd.Haiku-TIFFTranslator	1327609507
 LZW	TIFFView		LZW
-None	TIFFView		Не использовать
-RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Image Translator	TIFFView		Транслятор TIFF изображений
-TIFF Library:	TIFFView		Библиотека TIFF:
-TIFF Settings	TIFFMain		Настройки TIFF транслятора
 TIFF image	TIFFTranslator		TIFF изображение
-TIFF image translator	TIFFTranslator		Транслятор TIFF изображений
+TIFF Library:	TIFFView		Библиотека TIFF:
+TIFF Image Translator	TIFFView		Транслятор TIFF изображений
+None	TIFFView		Не использовать
 TIFF images	TIFFTranslator		TIFF изображения
 TIFFTranslator Settings	TIFFTranslator		Настройки TIFF транслятора
-Use Compression:	TIFFView		Использовать сжатие:
-Version %d.%d.%d %s	TIFFView		Версия %d.%d.%d %s
+TIFF image translator	TIFFTranslator		Транслятор TIFF изображений
+RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Settings	TIFFMain		Настройки TIFF транслятора
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
+Version %d.%d.%d %s	TIFFView		Версия %d.%d.%d %s
+Use Compression:	TIFFView		Использовать сжатие:

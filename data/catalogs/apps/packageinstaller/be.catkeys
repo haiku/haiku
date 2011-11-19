@@ -1,57 +1,57 @@
 1	belarusian	x-vnd.Haiku-PackageInstaller	2709408798
+Install to:	PackageView		Усталяваць у:
+OK	PackageView		ОК
+Accept	PackageTextViewer		Прыняць
+Continue	PackageInstall		Працягваць
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не ўдалося усталяваць абраны пакунак у сістэму. Магчыма праблема з файлам пакунка. Кансультуйцеся, калі ласка, з распрацоўшчыкам пакунка.
+Image not loaded correctly	PackageImageViewer		Вобраз не загружаны
+No package selected.	PackageInfo		Няма абраных пакункаў
+Install	PackageView		Усталяваць
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Падобна, што абраны пакунак ужо усталёваны на вашай сістэме. Жадаеце выдаліць існуючую версію і працягнуць усталёўку?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Жадаеце абраць такое-ж рашэнне для астатніх этапаў усталёўкі?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Падобна, што памер файлу пакунка не адпавядае. Верагодна, што вы маеце пашкоджаны ці наўмысна мадыфікаваны пакунак. Жадаеце працягнуць усталёўку?
+Error while installing the package\n	PackageView		Памылка падчас усталёўкі пакунка\n
+Disclaimer	PackageTextViewer		Адмова
 %.1f GiB	PackageView		%.1f ГіБ
-%.1f KiB	PackageView		%.1f КіБ
-%.1f MiB	PackageView		%.1f МіБ
+The installation of the package has been aborted.	PackageView		Усталёўка пакунка была перарваная.
+Done	PackageInstall		Зроблена
+All existing files will be replaced?	PackageView		Усе існуючыя файлы будуць заменены?
+Preparing package	PackageInstall		Прыгатаванне пакунку
+No package available.	PackageInfo		Няма даступных пакункаў.
+none	PackageView		няма
+Stop	PackageStatus		Спыніць
+Other…	PackageView		Другі…
+No installation type selected	PackageView		Не абраны тып усталёўкі
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Спасылка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
+Installing files and folders	PackageInstall		Усталёўка файлаў і папак
+Package installer	PackageView		Усталёўшчык Пакункаў
+Skip all	PackageView		Абыйсці ўсе
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Элемент '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрыпт '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+Running post-installation scripts	PackageInstall		Запускаюцца усталёўныя скрыпты
 %llu bytes	PackageView		%llu байтаў
+Skip	PackageView		Абыйсці
+%.1f MiB	PackageView		%.1f МіБ
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
+The package you requested has been successfully installed on your system.	PackageView		Абраны пакунак быў паспяхова усталяваны у вашую сістэму.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Памылка! Пуць \"%s\" некарэктны.\n
+Installation type:	PackageView		Тып усталёўкі:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Памылка (%s)! Немагчыма адкрыць \"%s\".\n
+Finishing installation	PackageInstall		Заканчэнне усталёўкі
+Installing package	PackageStatus		Усталеўка пакунка
+Ask again	PackageView		Пытаць ізноў
+Abort	PackageView		Перарваць
+Replace all	PackageView		Замяніць ўсе
+Decline	PackageTextViewer		Знізіць
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+All existing files will be skipped?	PackageView		Усе існуючыя файлы будуць абыйдзены?
+Continue	PackageInfo		Працягваць
+%.1f KiB	PackageView		%.1f КіБ
 (%s free)	PackageView		(%s вольна)
 Abort	PackageInfo		Перарваць
-Abort	PackageInstall		Перарваць
-Abort	PackageView		Перарваць
-Accept	PackageTextViewer		Прыняць
-All existing files will be replaced?	PackageView		Усе існуючыя файлы будуць заменены?
-All existing files will be skipped?	PackageView		Усе існуючыя файлы будуць абыйдзены?
-Ask again	PackageView		Пытаць ізноў
-Continue	PackageInfo		Працягваць
-Continue	PackageInstall		Працягваць
-Continue	PackageTextViewer		Працягваць
-Decline	PackageTextViewer		Знізіць
-Disclaimer	PackageTextViewer		Адмова
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Жадаеце абраць такое-ж рашэнне для астатніх этапаў усталёўкі?\n
-Done	PackageInstall		Зроблена
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Памылка (%s)! Немагчыма адкрыць \"%s\".\n
-Error while installing the package\n	PackageView		Памылка падчас усталёўкі пакунка\n
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Памылка! Пуць \"%s\" некарэктны.\n
-Finishing installation	PackageInstall		Заканчэнне усталёўкі
-Image not loaded correctly	PackageImageViewer		Вобраз не загружаны
-Install	PackageView		Усталяваць
-Install to:	PackageView		Усталяваць у:
-Installation progress	PackageView		Прагрэс усталёўкі
-Installation type:	PackageView		Тып усталёўкі:
-Installing files and folders	PackageInstall		Усталёўка файлаў і папак
-Installing package	PackageStatus		Усталеўка пакунка
-No installation type selected	PackageView		Не абраны тып усталёўкі
-No package available.	PackageInfo		Няма даступных пакункаў.
-No package selected.	PackageInfo		Няма абраных пакункаў
-OK	PackageView		ОК
-Other…	PackageView		Другі…
-Package installer	PackageView		Усталёўшчык Пакункаў
 PackageInstaller	System name		Усталёўшчык пакункаў
-Preparing package	PackageInstall		Прыгатаванне пакунку
+Abort	PackageInstall		Перарваць
+Continue	PackageTextViewer		Працягваць
 Replace	PackageView		Замяніць
-Replace all	PackageView		Замяніць ўсе
-Running post-installation scripts	PackageInstall		Запускаюцца усталёўныя скрыпты
-Skip	PackageView		Абыйсці
-Skip all	PackageView		Абыйсці ўсе
-Stop	PackageStatus		Спыніць
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Падобна, што абраны пакунак ужо усталёваны на вашай сістэме. Жадаеце выдаліць існуючую версію і працягнуць усталёўку?
-The installation of the package has been aborted.	PackageView		Усталёўка пакунка была перарваная.
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Элемент '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+Installation progress	PackageView		Прагрэс усталёўкі
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунку не можа быць прачытаны.\nМагчымая прычына такой памылкі можа быць тое, што ён не з´яўляецца карэктным BeOS .pkg файлам.
-The package you requested has been successfully installed on your system.	PackageView		Абраны пакунак быў паспяхова усталяваны у вашую сістэму.
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не ўдалося усталяваць абраны пакунак у сістэму. Магчыма праблема з файлам пакунка. Кансультуйцеся, калі ласка, з распрацоўшчыкам пакунка.
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрыпт '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Спасылка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Падобна, што памер файлу пакунка не адпавядае. Верагодна, што вы маеце пашкоджаны ці наўмысна мадыфікаваны пакунак. Жадаеце працягнуць усталёўку?
-none	PackageView		няма

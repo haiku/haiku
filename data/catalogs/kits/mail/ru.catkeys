@@ -1,10 +1,10 @@
 1	russian	x-vnd.Haiku-libmail	161731481
-Connection type:	ProtocolConfigView		Тип соединения:
-Leave mail on server	ProtocolConfigView		Оставлять письма на сервере
-Login type:	ProtocolConfigView		Метод аутентификации:
-Mail server:	ProtocolConfigView		Почтовый сервер:
 Partially download messages larger than	ProtocolConfigView		Скачивать частично письма больше чем
 Password:	ProtocolConfigView		Пароль:
 Remove mail from server when deleted	ProtocolConfigView		Удалять письма с сервера при удалении
+Mail server:	ProtocolConfigView		Почтовый сервер:
 Select…	MailKit		Выбрать…
+Connection type:	ProtocolConfigView		Тип соединения:
+Leave mail on server	ProtocolConfigView		Оставлять письма на сервере
 Username:	ProtocolConfigView		Пользователь:
+Login type:	ProtocolConfigView		Метод аутентификации:

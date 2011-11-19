@@ -1,26 +1,26 @@
 1	slovak	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
-Cancel	ScreenshotWindow		Zrušiť
-Capture active window	ScreenshotWindow		Zachytiť aktívne okno
-Choose folder	ScreenshotWindow		Vyberte priečinok
-Choose folder...	ScreenshotWindow		Vyberte priečinok...
-Copy to clipboard	ScreenshotWindow		Skopírovať do schránky
-Delay:	ScreenshotWindow		Oneskorenie:
+seconds	ScreenshotWindow		sekúnd
 Desktop	ScreenshotWindow		Plocha
-Home folder	ScreenshotWindow		Domovský priečinok
-Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši
 Include window border	ScreenshotWindow		Vrátane okraja okna
-Name:	ScreenshotWindow		Názov:
-New screenshot	ScreenshotWindow		Nová snímka obrazovky
-Please select	ScreenshotWindow		Prosím, vyberte
-Save	ScreenshotWindow		Uložiť
-Save as:	ScreenshotWindow		Uložiť ako:
-Save in:	ScreenshotWindow		Uložiť do:
 Screenshot	System name		Snímka obrazovky
 Select	ScreenshotWindow		Vybrať
-Settings…	ScreenshotWindow		Nastavenia...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
-Translator Settings	ScreenshotWindow		Nastavenia prekladača
-overwrite	ScreenshotWindow		prepísať
+Capture active window	ScreenshotWindow		Zachytiť aktívne okno
+Cancel	ScreenshotWindow		Zrušiť
+Name:	ScreenshotWindow		Názov:
+Choose folder	ScreenshotWindow		Vyberte priečinok
+Save	ScreenshotWindow		Uložiť
+Choose folder...	ScreenshotWindow		Vyberte priečinok...
+Please select	ScreenshotWindow		Prosím, vyberte
+Save as:	ScreenshotWindow		Uložiť ako:
+Copy to clipboard	ScreenshotWindow		Skopírovať do schránky
+Save in:	ScreenshotWindow		Uložiť do:
 screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
-seconds	ScreenshotWindow		sekúnd
+New screenshot	ScreenshotWindow		Nová snímka obrazovky
+Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
+Home folder	ScreenshotWindow		Domovský priečinok
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
+Settings…	ScreenshotWindow		Nastavenia...
+overwrite	ScreenshotWindow		prepísať
+Delay:	ScreenshotWindow		Oneskorenie:
+Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši
+Translator Settings	ScreenshotWindow		Nastavenia prekladača

@@ -1,17 +1,17 @@
 1	belarusian	x-vnd.Haiku-mount_server	1422362183
-Cancel	AutoMounter		Адмена
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Немагчыма размантаваць дыск \"%s\":\n\t%s
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Немагчыма размантаваць дыск \"%s\":\n\t%s\n\nРазмантаваць усё роўна?\n\nКалі том зараз ужываецца нейкай праграмай, вы можаце згубіць даныя пры размантаванні.\n
-Error mounting volume:\n\n%s	AutoMounter		Памылка пры мантаванні тома:\n\n%s
-Force unmount	AutoMounter		Размантаваць усё роўна
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Рэкамендуецца мантаваць усе даданыя тамы Haiku у рэжыме толькі для чытання. Гэта прадухіліць страту даных пры памылках у Haiku.
-Mount error	AutoMounter		Памылка мантавання
 Mount read-only	AutoMounter		Мантаваць толькі для чытання
-Mount read/write	AutoMounter		Мантаваць для чытання/запісу
+Error mounting volume:\n\n%s	AutoMounter		Памылка пры мантаванні тома:\n\n%s
+Unmount error	AutoMounter		Памылка пры размантаванні
 Mount warning	AutoMounter		Папярэджанне аб мантаванні
+Mount read/write	AutoMounter		Мантаваць для чытання/запісу
 Mounting volume '%s'\n\n	AutoMounter		Мантуецца том '%s'\n\n
+Cancel	AutoMounter		Адмена
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Немагчыма размантаваць дыск \"%s\":\n\t%s\n\nРазмантаваць усё роўна?\n\nКалі том зараз ужываецца нейкай праграмай, вы можаце згубіць даныя пры размантаванні.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Немагчыма размантаваць дыск \"%s\":\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Мантуецца том <неназваны том>'\n\n
 OK	AutoMounter		ОК
-Previous volumes mounted.	AutoMounter		Змантаваны папярэднія тамы
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файлавая сістэма гэтага тому не з'яўляецца файлавай сістэмай Haiku. Настойліва рэкамендуем мантаваць яго у рэжыме толькі для чытання. Гэта прадухіліць страту даных пры памылках у Haiku.
-Unmount error	AutoMounter		Памылка пры размантаванні
+Previous volumes mounted.	AutoMounter		Змантаваны папярэднія тамы
+Mount error	AutoMounter		Памылка мантавання
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Рэкамендуецца мантаваць усе даданыя тамы Haiku у рэжыме толькі для чытання. Гэта прадухіліць страту даных пры памылках у Haiku.
+Force unmount	AutoMounter		Размантаваць усё роўна

@@ -1,11 +1,11 @@
 1	russian	x-vnd.Haiku-PNGTranslator	2504765797
-Interlace Option	PNGTranslator		Чересстрочные настройки 
-Interlacing type:	PNGTranslator		Тип чередования
-None	PNGTranslator		Без чередования
-PNG Interlace Menu	PNGTranslator		Чересстрочные меню
-PNG Settings	PNGTranslator		Настройки PNG транслятора
-PNG image	PNGTranslator		PNG изображение
-PNG image translator	PNGTranslator		Транслятор PNG изображений
-PNG images	PNGTranslator		PNG изображения
-PNGTranslator Settings	PNGTranslator		Настройки PNG транслятора
 Version %d.%d.%d, %s	PNGTranslator		Версия %d.%d.%d, %s
+Interlace Option	PNGTranslator		Чересстрочные настройки 
+PNG Interlace Menu	PNGTranslator		Чересстрочные меню
+PNG image	PNGTranslator		PNG изображение
+PNG Settings	PNGTranslator		Настройки PNG транслятора
+PNG image translator	PNGTranslator		Транслятор PNG изображений
+None	PNGTranslator		Без чередования
+PNG images	PNGTranslator		PNG изображения
+Interlacing type:	PNGTranslator		Тип чередования
+PNGTranslator Settings	PNGTranslator		Настройки PNG транслятора

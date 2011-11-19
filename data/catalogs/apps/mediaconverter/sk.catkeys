@@ -1,68 +1,67 @@
-1	slovak	x-vnd.Haiku-MediaConverter	424866547
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanál / %lld rámcov
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rámcov
+1	slovak	x-vnd.Haiku-MediaConverter	3564609505
+Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
+Video encoding:	MediaConverter		Kódovanie videa:
+No audio	Audio codecs list		Bez zvuku
+Error	MediaConverter		Chyba
+Error loading a file	MediaConverter		Chyba pri načítaní súboru
+File Error	MediaConverter-FileInfo		Chyba súboru
+Open…	Menu		Otvoriť...
+Start [ms]: 	MediaConverter		Začiatok [ms]:
+Output file '%filename' created	MediaConverter		Vytvorený výstupný súbor „%filename“
+Output format	MediaConverter		Výstupný formát
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld rámcov
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles súborov nebolo rozpoznaných ako podporovaný typ multimédia:
-%d bit 	MediaFileInfo		%d bit
+End   [ms]: 	MediaConverter		Koniec [ms]:
+MediaConverter	System name		Konvertor multimédií
+No video	Video codecs list		Bez videa
+Duration:	MediaConverter-FileInfo		Trvanie:
+OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Chyba pri zápise zvukového rámca %Ld
+Error converting '%filename'	MediaConverter		Chyba pri konverzii „%filename“
+Low	MediaConverter		Nízka
+Conversion completed	MediaConverter		Konverzia dokončená
+Audio:	MediaConverter-FileInfo		Zvuk:
+OK	MediaConverter-FileInfo		OK
+Source files	MediaConverter		Zdrojové súbory
+Cancelling	MediaConverter		Ruší sa
 %d byte 	MediaFileInfo		%d bajt
+Error loading files	MediaConverter		Chyba pri načítaní súborov
+Cancel	MediaConverter		Zrušiť
+None available	Video codecs		Žiadny nie je dostupný
+Conversion cancelled	MediaConverter		Konverzia zrušená
+No file selected	MediaConverter-FileInfo		Žiadny súbor nie je vybraný
+Error writing video frame %Ld	MediaConverter		Chyba pri zápise video rámca %Ld
+Select this folder	MediaConverter		Vybrať tento priečinok
+Continue	MediaConverter		Poračovať
+Encoder parameters	MediaConverter-EncoderWindow		Parametre kódovania
+Video:	MediaConverter-FileInfo		Video:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld rámcov
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla sa chyba pri čítaní informácií súboru.\n\nChyba:
+%d bit 	MediaFileInfo		%d bit
+Error creating '%filename'	MediaConverter		Chyba pri vyváraní „%filename“
+Video quality not supported	MediaConverter		Kvalita videa nie je podporovaná
+Cancelling…	MediaConverter		Ruší sa...
+File details	MediaConverter		Podrobnosti súborov
+Select	MediaConverter		Vybrať
+Writing video track: %ld%% complete	MediaConverter		Zápis video stopy: %ld%% hotovo
+Quit	Menu		Ukončiť
+Preview	MediaConverter		Náhľad
+File format:	MediaConverter		Formát súboru:
+None available	Audio codecs		Žiadne nie sú dostupné
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:AdresárNaUloženie
+Error read audio frame %Ld	MediaConverter		Chyba pri čítaní zvukového rámca %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanál / %lld rámcov
+Error launching: %strError%	MediaConverter		Chyba pri spúšťaní: %strError%
+High	MediaConverter		Vysoká
+The file was not recognized as a supported media file:	MediaConverter		Súbor nebol rozpoznaný ako podporovaný typ multimédia:
+Drop media files onto this window	MediaConverter		Pretiahnite súbory do tohto okna
 Audio encoding:	MediaConverter		Kódovanie zvuku:
 Audio quality not supported	MediaConverter		Kvalita zvuku nie je podporovaná
-Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
-Audio:	MediaConverter-FileInfo		Zvuk:
-Cancel	MediaConverter		Zrušiť
-Cancelling	MediaConverter		Ruší sa
-Cancelling…	MediaConverter		Ruší sa...
-Continue	MediaConverter		Poračovať
-Conversion cancelled	MediaConverter		Konverzia zrušená
-Conversion completed	MediaConverter		Konverzia dokončená
-Convert	MediaConverter		Konvertovať
-Drop media files onto this window	MediaConverter		Pretiahnite súbory do tohto okna
-Duration:	MediaConverter-FileInfo		Trvanie:
-Encoder parameters	MediaConverter-EncoderWindow		Parametre kódovania
-End   [ms]: 	MediaConverter		Koniec [ms]:
-Error	MediaConverter		Chyba
-Error converting '%filename'	MediaConverter		Chyba pri konverzii „%filename“
-Error creating '%filename'	MediaConverter		Chyba pri vyváraní „%filename“
-Error launching: %strError%	MediaConverter		Chyba pri spúšťaní: %strError%
-Error loading a file	MediaConverter		Chyba pri načítaní súboru
-Error loading files	MediaConverter		Chyba pri načítaní súborov
-Error read audio frame %Ld	MediaConverter		Chyba pri čítaní zvukového rámca %Ld
-Error read video frame %Ld	MediaConverter		Chyba pri čítaní video rámca %Ld
-Error writing audio frame %Ld	MediaConverter		Chyba pri zápise zvukového rámca %Ld
-Error writing video frame %Ld	MediaConverter		Chyba pri zápise video rámca %Ld
 File	Menu		Súbor
-File Error	MediaConverter-FileInfo		Chyba súboru
-File details	MediaConverter		Podrobnosti súborov
-File format:	MediaConverter		Formát súboru:
-High	MediaConverter		Vysoká
-Low	MediaConverter		Nízka
-MediaConverter	System name		Konvertor multimédií
-MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:AdresárNaUloženie
-No audio	Audio codecs list		Bez zvuku
-No file selected	MediaConverter-FileInfo		Žiadny súbor nie je vybraný
-No video	Video codecs list		Bez videa
-None available	Audio codecs		Žiadne nie sú dostupné
-None available	Video codecs		Žiadny nie je dostupný
-OK	MediaConverter		OK
-OK	MediaConverter-FileInfo		OK
-Open…	Menu		Otvoriť...
-Output file '%filename' created	MediaConverter		Vytvorený výstupný súbor „%filename“
-Output folder	MediaConverter		Výstupný priečinok
-Output format	MediaConverter		Výstupný formát
-Preview	MediaConverter		Náhľad
-Quit	Menu		Ukončiť
-Select	MediaConverter		Vybrať
-Select this folder	MediaConverter		Vybrať tento priečinok
-Source files	MediaConverter		Zdrojové súbory
-Start [ms]: 	MediaConverter		Začiatok [ms]:
-The file was not recognized as a supported media file:	MediaConverter		Súbor nebol rozpoznaný ako podporovaný typ multimédia:
-Video encoding:	MediaConverter		Kódovanie videa:
-Video quality not supported	MediaConverter		Kvalita videa nie je podporovaná
-Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
-Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
-Video:	MediaConverter-FileInfo		Video:
+Convert	MediaConverter		Konvertovať
 Writing audio track: %ld%% complete	MediaConverter		Zápis zvukovej stopy: %ld%% hotovo
-Writing video track: %ld%% complete	MediaConverter		Zápis video stopy: %ld%% hotovo
-seconds	MediaFileInfo		sekúnd
+Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
+Output folder	MediaConverter		Výstupný priečinok
+Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla sa chyba pri čítaní informácií súboru.\n\nChyba:
+Error read video frame %Ld	MediaConverter		Chyba pri čítaní video rámca %Ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles súborov nebolo rozpoznaných ako podporovaný typ multimédia:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rámcov

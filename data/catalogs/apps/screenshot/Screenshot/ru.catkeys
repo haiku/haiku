@@ -1,26 +1,26 @@
 1	russian	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Папку artwork
-Cancel	ScreenshotWindow		Отмена
-Capture active window	ScreenshotWindow		Захватить активное окно
-Choose folder	ScreenshotWindow		Выбрать папку
-Choose folder...	ScreenshotWindow		Выбрать папку…
-Copy to clipboard	ScreenshotWindow		Скопировать в буфер
-Delay:	ScreenshotWindow		Задержка:
+seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочий стол
-Home folder	ScreenshotWindow		Домашнюю папку
-Include mouse pointer	ScreenshotWindow		Включая курсор
 Include window border	ScreenshotWindow		Включая заголовок окна
-Name:	ScreenshotWindow		Имя:
-New screenshot	ScreenshotWindow		Новый снимок
-Please select	ScreenshotWindow		Пожалуйста выберите
-Save	ScreenshotWindow		Сохранить
-Save as:	ScreenshotWindow		Сохранить как:
-Save in:	ScreenshotWindow		Сохранить в:
 Screenshot	System name		Снимок экрана
 Select	ScreenshotWindow		Выбрать
-Settings…	ScreenshotWindow		Настройки…
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Такой файл уже существует.\nВы уверены, что хотите его перезаписать?
-Translator Settings	ScreenshotWindow		Настройки транслятора
-overwrite	ScreenshotWindow		Перезаписать
+Capture active window	ScreenshotWindow		Захватить активное окно
+Cancel	ScreenshotWindow		Отмена
+Name:	ScreenshotWindow		Имя:
+Choose folder	ScreenshotWindow		Выбрать папку
+Save	ScreenshotWindow		Сохранить
+Choose folder...	ScreenshotWindow		Выбрать папку…
+Please select	ScreenshotWindow		Пожалуйста выберите
+Save as:	ScreenshotWindow		Сохранить как:
+Copy to clipboard	ScreenshotWindow		Скопировать в буфер
+Save in:	ScreenshotWindow		Сохранить в:
 screenshot	Screenshot	Base filename of screenshot files	screenshot
-seconds	ScreenshotWindow		секунд
+New screenshot	ScreenshotWindow		Новый снимок
+Artwork folder	ScreenshotWindow		Папку artwork
+Home folder	ScreenshotWindow		Домашнюю папку
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Такой файл уже существует.\nВы уверены, что хотите его перезаписать?
+Settings…	ScreenshotWindow		Настройки…
+overwrite	ScreenshotWindow		Перезаписать
+Delay:	ScreenshotWindow		Задержка:
+Include mouse pointer	ScreenshotWindow		Включая курсор
+Translator Settings	ScreenshotWindow		Настройки транслятора

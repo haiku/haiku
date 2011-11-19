@@ -1,90 +1,90 @@
 1	russian	x-vnd.Haiku-Devices	1474720746
-ACPI Information	DeviceACPI		Информация ACPI
-ACPI Processor Namespace '%2'	DeviceACPI		Пространство имен процессора ACPI '%2'
-ACPI System Bus	DeviceACPI		Системная шина ACPI
-ACPI System Indicator	DeviceACPI		Системный индикатор ACPI
-ACPI Thermal Zone	DeviceACPI		Термодатчик ACPI 
-ACPI bus	Device		Шина ACPI
-ACPI bus	DevicesView		Шина ACPI
-ACPI controller	Device		Контроллер ACPI
-ACPI node '%1'	DeviceACPI		ACPI нода '%1'
-Array	DeviceSCSI		Массив
-Basic information	DevicesView		Основная информация
-Bridge	Device		Мост
-Bridge	DeviceSCSI		Мост
-Bus	DevicesView		Шина
-Bus Information	Device		Информация о шине
-CD-ROM	DeviceSCSI		Компакт диск
-Card Reader	DeviceSCSI		Кардридер
-Category	DevicesView		категориям
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Информация о классе:\t\t\t\t: %classInfo%
-Class info	DevicePCI		Информация о классе
-Communication controller	Device		Контроллер связи
-Communications	DeviceSCSI		Устройства связи
-Computer	Device		Компьютер
-Computer	DevicesView		Компьютер
-Connection	DevicesView		подключению
-Detailed	DevicesView		Подробности
-Device	Device		Устройство
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Имя устройства\t\t\t\t: %Name%\nПроизводитель\t\t\t: %Manufacturer%\nИспользуемый драйвер\t\t\t\t: %DriverUsed%\nПути устройства\t: %DevicePaths%
-Device class	DeviceSCSI		Класс устройства
-Device name	Device		Название устройства
-Device name	DeviceACPI		Название устройства
-Device name	DevicePCI		Название устройства
-Device name	DeviceSCSI		Имя устройства
-Device name:	Device		Название устройства:
-Device paths	Device		Путь к устройству
-Device paths	DevicePCI		Пути устройства
-Devices	DevicesView		Устройства
-Devices	System name		Устройства
-Disk Drive	DeviceSCSI		Дисковод
-Display controller	Device		Контроллер дисплея
-Docking station	Device		Кредл
-Driver used	Device		Используемый драйвер
-Driver used	DevicePCI		Используемый драйвер
-Encryption controller	Device		Контроллер шифрования
-Generate system information	DevicesView		Сгенерировать информацию о системе
-Generic system peripheral	Device		Общая системная периферия
-Graphics Peripheral	DeviceSCSI		Переферийная графика
-ISA bus	Device		Шина ISA
-ISA bus	DevicesView		Шина ISA
-Input device controller	Device		Контроллер устройств ввода
-Intelligent controller	Device		Интеллектуальный контроллер
-Manufacturer	Device		Производитель 
-Manufacturer	DeviceACPI		Производитель
-Manufacturer	DevicePCI		Производитель
 Manufacturer	DeviceSCSI		Производитель
-Manufacturer:	Device		Производитель:
-Mass storage controller	Device		Контроллер накопителей
-Memory controller	Device		Контроллер памяти
-Multimedia controller	Device		Мультимедийный контроллер
-Name	PropertyList		Имя
-Network controller	Device		Сетевой контроллер
-None	Device		Отсутствует
-Not implemented	DeviceACPI		Не реализовано
-Not implemented	DevicePCI		Не реализовано
-Optical Drive	DeviceSCSI		Оптический привод
 Order by:	DevicesView		Сортировать по:
-Other	DeviceSCSI		Другие
-PCI Information	DevicePCI		PCI информация 
-PCI bus	Device		Шина PCI
-PCI bus	DevicesView		Шина PCI
+ACPI controller	Device		Контроллер ACPI
+Memory controller	Device		Контроллер памяти
+Driver used	DevicePCI		Используемый драйвер
+CD-ROM	DeviceSCSI		Компакт диск
+ISA bus	Device		Шина ISA
+ACPI bus	Device		Шина ACPI
+ISA bus	DevicesView		Шина ISA
+Docking station	Device		Кредл
+Computer	Device		Компьютер
+Unknown device	Device		Неизвестное устройство
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Информация о классе:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Процессор
+Detailed	DevicesView		Подробности
+Category	DevicesView		категориям
+Quit	DevicesView		Выход
+Device paths	Device		Путь к устройству
+Scanner	DeviceSCSI		Сканер
 Printer	DeviceSCSI		Принтер
 Processor	Device		Процессор
-Processor	DeviceSCSI		Процессор
-Quit	DevicesView		Выход
-Refresh devices	DevicesView		Обновить список устройств
-Report compatibility	DevicesView		Отчет о совместимости
-SCSI Information	DeviceSCSI		SCSI информация
-Satellite communications controller	Device		Контроллер спутниковой связи
-Scanner	DeviceSCSI		Сканер
-Serial bus controller	Device		Контроллер последовательной шины
-Signal processing controller	Device		Контроллер обработки сигналов
-Tape Drive	DeviceSCSI		Накопитель на ленте
-Unclassified device	Device		Неклассифицированные устройства
-Unknown	DevicePCI		Неизвестное
-Unknown device	Device		Неизвестное устройство
-Unknown device	DevicesView		Неизвестное устройство
-Value	PropertyList		Значение
-Wireless controller	Device		Беспроводной контроллер
+Optical Drive	DeviceSCSI		Оптический привод
+ACPI Processor Namespace '%2'	DeviceACPI		Пространство имен процессора ACPI '%2'
+Bridge	DeviceSCSI		Мост
 unknown	Device		Неизвестен
+ACPI Information	DeviceACPI		Информация ACPI
+Generic system peripheral	Device		Общая системная периферия
+Not implemented	DevicePCI		Не реализовано
+Disk Drive	DeviceSCSI		Дисковод
+Not implemented	DeviceACPI		Не реализовано
+Device name	DevicePCI		Название устройства
+Display controller	Device		Контроллер дисплея
+Mass storage controller	Device		Контроллер накопителей
+Input device controller	Device		Контроллер устройств ввода
+Network controller	Device		Сетевой контроллер
+Device class	DeviceSCSI		Класс устройства
+Device name	DeviceACPI		Название устройства
+Driver used	Device		Используемый драйвер
+Other	DeviceSCSI		Другие
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Имя устройства\t\t\t\t: %Name%\nПроизводитель\t\t\t: %Manufacturer%\nИспользуемый драйвер\t\t\t\t: %DriverUsed%\nПути устройства\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		Термодатчик ACPI 
+Communications	DeviceSCSI		Устройства связи
+Bus	DevicesView		Шина
+Communication controller	Device		Контроллер связи
+Manufacturer	DeviceACPI		Производитель
+PCI bus	Device		Шина PCI
+ACPI System Indicator	DeviceACPI		Системный индикатор ACPI
+None	Device		Отсутствует
+PCI bus	DevicesView		Шина PCI
+Basic information	DevicesView		Основная информация
+PCI Information	DevicePCI		PCI информация 
+Manufacturer:	Device		Производитель:
+ACPI bus	DevicesView		Шина ACPI
+ACPI System Bus	DeviceACPI		Системная шина ACPI
+Devices	System name		Устройства
+Multimedia controller	Device		Мультимедийный контроллер
+Unknown	DevicePCI		Неизвестное
+Device name:	Device		Название устройства:
+Computer	DevicesView		Компьютер
+Value	PropertyList		Значение
+Report compatibility	DevicesView		Отчет о совместимости
+Device	Device		Устройство
+Signal processing controller	Device		Контроллер обработки сигналов
+Serial bus controller	Device		Контроллер последовательной шины
+Wireless controller	Device		Беспроводной контроллер
+ACPI node '%1'	DeviceACPI		ACPI нода '%1'
+Device name	Device		Название устройства
+Manufacturer	Device		Производитель 
+Name	PropertyList		Имя
+Manufacturer	DevicePCI		Производитель
+Intelligent controller	Device		Интеллектуальный контроллер
+Satellite communications controller	Device		Контроллер спутниковой связи
+SCSI Information	DeviceSCSI		SCSI информация
+Array	DeviceSCSI		Массив
+Bridge	Device		Мост
+Refresh devices	DevicesView		Обновить список устройств
+Unknown device	DevicesView		Неизвестное устройство
+Graphics Peripheral	DeviceSCSI		Переферийная графика
+Tape Drive	DeviceSCSI		Накопитель на ленте
+Bus Information	Device		Информация о шине
+Connection	DevicesView		подключению
+Generate system information	DevicesView		Сгенерировать информацию о системе
+Encryption controller	Device		Контроллер шифрования
+Unclassified device	Device		Неклассифицированные устройства
+Device name	DeviceSCSI		Имя устройства
+Card Reader	DeviceSCSI		Кардридер
+Class info	DevicePCI		Информация о классе
+Device paths	DevicePCI		Пути устройства
+Devices	DevicesView		Устройства

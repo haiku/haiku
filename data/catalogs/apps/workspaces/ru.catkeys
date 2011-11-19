@@ -1,13 +1,13 @@
 1	russian	x-vnd.Be-WORK	3592128290
-About Workspaces…	Workspaces		О программе…
-Always on top	Workspaces		Всегда сверху
-Auto-raise	Workspaces		Всплывать при наведении
-Change workspace count…	Workspaces		Изменить количество столов…
 Invalid argument: %s\n	Workspaces		Неверный аргумент: %s\n
-OK	Workspaces		ОК
 Quit	Workspaces		Выход
-Show window border	Workspaces		Показывать рамку окна
-Show window tab	Workspaces		Показывать заголовок окна
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Использование: %s [опции] [рабочий стол]\nгде \"опции\" - это:\n --notitle\t\tубрать заголовок, оставить рамку и размер.\n --noborder\t\tубрать заголовок, рамку и размер.\n --avoidfocus\t\tотключить реакцию окна на события клавиатуры.\n --alwaysontop\t\tокно всегда сверху\n --notmovable\t\tзакрепить окно на месте\n --autoraise\t\tвыплывать автоматически если оно в углу экрана\n --help\t\t\t\показать эту справку и выйти\n\"рабочий стол\" - это номер рабочего стола, на который нужно переключиться (0-31)\n
 Workspaces	System name		Рабочие столы
+Change workspace count…	Workspaces		Изменить количество столов…
+Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Использование: %s [опции] [рабочий стол]\nгде \"опции\" - это:\n --notitle\t\tубрать заголовок, оставить рамку и размер.\n --noborder\t\tубрать заголовок, рамку и размер.\n --avoidfocus\t\tотключить реакцию окна на события клавиатуры.\n --alwaysontop\t\tокно всегда сверху\n --notmovable\t\tзакрепить окно на месте\n --autoraise\t\tвыплывать автоматически если оно в углу экрана\n --help\t\t\t\показать эту справку и выйти\n\"рабочий стол\" - это номер рабочего стола, на который нужно переключиться (0-31)\n
+About Workspaces…	Workspaces		О программе…
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n\nразработал %1 и %2.\n\nCopyright %3, Haiku.\n\nДля отправки окна в фон используйте клавишу Windows.\nДля активации окна используйте клавишу Ctrl.\n
+Show window border	Workspaces		Показывать рамку окна
+Auto-raise	Workspaces		Всплывать при наведении
+OK	Workspaces		ОК
+Always on top	Workspaces		Всегда сверху
+Show window tab	Workspaces		Показывать заголовок окна

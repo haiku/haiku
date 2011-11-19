@@ -1,18 +1,18 @@
 1	belarusian	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' ўжо існуе ў спісе ўсталяваных канвертараў! Перазапісаць яго?
-Cancel	DataTranslations		Адмена
-Could not install %s:\n%s	DataTranslations		Немагчыма усталяваць %s:\n%s
 DataTranslations	System name		Канвертары
-DataTranslations - Error	DataTranslations		DataTranslations - Памылка
-DataTranslations - Note	DataTranslations		DataTranslations - Нататка
-Info	DataTranslations		інфа
-Info:	DataTranslations		Інфа:
+Cancel	DataTranslations		Адмена
 Name:	DataTranslations		Імя:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Імя: %s \nВерсія: %ld.%ld.%ld\n\nІнфа:\n%s\n\nПуць:\n%s\n
-OK	DataTranslations		ОК
-Overwrite	DataTranslations		Перазапісаць
-Path:	DataTranslations		Пуць:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' не з´яўляецца Канвертарам і таму не можа быць усталяваны.
-The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
+Could not install %s:\n%s	DataTranslations		Немагчыма усталяваць %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		З дапамогай гэтай панэлі прызначце стандартныя наладкі якія будуць выкарыстаны канвертарам, які не прызначае адпаведныя наладкі самастойна.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' ўжо існуе ў спісе ўсталяваных канвертараў! Перазапісаць яго?
+DataTranslations - Note	DataTranslations		DataTranslations - Нататка
+Overwrite	DataTranslations		Перазапісаць
+Info:	DataTranslations		Інфа:
+Info	DataTranslations		інфа
+Path:	DataTranslations		Пуць:
+The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
+DataTranslations - Error	DataTranslations		DataTranslations - Памылка
+OK	DataTranslations		ОК
 Version:	DataTranslations		Версія:

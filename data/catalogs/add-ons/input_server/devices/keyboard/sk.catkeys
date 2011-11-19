@@ -1,10 +1,10 @@
 1	slovak	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-(This team is a system component)	Team monitor		(Tento tím je súčasťou systému)
-Cancel	Team monitor		Zrušiť
-Force reboot	Team monitor		Vynútiť reštart
-If the application will not quit you may have to kill it.	Team monitor		Ak sa aplikácia neukončí, možno ju budete musieť zabiť.
 Kill application	Team monitor		Zabiť aplikáciu
 Quit application	Team monitor		Ukončiť aplikáciu
-Restart the desktop	Team monitor		Reštartovať plochu
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Vyberte aplikáciu zo zoznamu hore a zatvorte aplikáciu kliknutím na jedno z tlačidiel „Zabiť aplikáciu“ alebo „Ukončiť aplikáciu“..\n\nPodržadním CONTROL+ALT+DELETE po dobu %ld sekúnd spustíte reštart.
+If the application will not quit you may have to kill it.	Team monitor		Ak sa aplikácia neukončí, možno ju budete musieť zabiť.
+Force reboot	Team monitor		Vynútiť reštart
 Team monitor	Team monitor		Monitor tímov
+(This team is a system component)	Team monitor		(Tento tím je súčasťou systému)
+Restart the desktop	Team monitor		Reštartovať plochu
+Cancel	Team monitor		Zrušiť

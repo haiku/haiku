@@ -1,52 +1,52 @@
 1	belarusian	x-vnd.Haiku-Shortcuts	621368175
-(Choose application with file requester)	ShortcutsWindow		(Выберыце праграму, якая патрабуе выбара файлу)
-*Beep	ShortcutsWindow		*Гудок
-*InsertString \"Your Text Here\"	ShortcutsWindow		*УставіцьСтраку \"Ваш Тэкст\"
-*LaunchHandler text/html	ShortcutsWindow		*АпрацоўшчыкЗапуску text/html
-*MouseButton 1	ShortcutsWindow		*КнопкаМышы 1
-*MouseDown	ShortcutsWindow		*МышУніз
-*MouseUp	ShortcutsWindow		*МышУверх
-*MoveMouse +20 +0	ShortcutsWindow		*РухацьМыш +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*РухацьМышДа 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Множнае \"*РухацьМышДа 100% 0\" \"*КнопкаМышы 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*АдаслацьПаведамленне application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Дадаць новую гарачую клавішу
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Прычапіць
-Append KeySet…	ShortcutsWindow		Дадаць KeySet…
-Application	ShortcutsWindow		Праграма
-Beep	ShortcutsSpec		Гудок
-Cancel	ShortcutsWindow		Адмена
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Don't save	ShortcutsWindow		Не захоўваць
 Error, NULL state description?\n	ShortcutsSpec		Памылка, апісанне стану NULL?\n
-File	ShortcutsWindow		Файл
-InsertString	ShortcutsSpec		УставіцьСтраку
-Key	ShortcutsWindow		Клавіша
-LaunchHandler	ShortcutsSpec		АпрацоўшчыкЗапуску
-MouseButton	ShortcutsSpec		КнопкаМышы
-MouseDown	ShortcutsSpec		МышУніз
-MouseUp	ShortcutsSpec		МышУверх
 MoveMouse	ShortcutsSpec		РухацьМыш
-MoveMouseTo	ShortcutsSpec		РухацьМышДа
-Multi	ShortcutsSpec		Множнае
 OK	ShortcutsWindow		ОК
-Oh no	ShortcutsWindow		О не!
-Open	ShortcutsWindow		Адкрыць...
-Open KeySet…	ShortcutsWindow		Адкрыць KeySet…
-Quit	ShortcutsWindow		Выйсці
-Really quit without saving your changes?	ShortcutsWindow		Сапраўды выйсці, не захоўваючы змены?
-Remove selected shortcut	ShortcutsWindow		Выдаліць выбраную гарачую клавішу
-Revert to saved	ShortcutsWindow		Вярнуцца да захаванага
-Save	ShortcutsWindow		Захаваць
-Save & apply	ShortcutsWindow		Захаваць і ўжыць
-Save KeySet as…	ShortcutsWindow		Захаваць KeySet як...
-Select	ShortcutsWindow		Выбраць
-SendMessage	ShortcutsSpec		АдаслацьПаведамленне
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	System name		Гарачыя клавішы
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог адкрыць ваш файл KeySet!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог разабраць ваш файл KeySet!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць ваш файл KeySet!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змагла захаваць вашу канфігурацыю (KeySet).
+Cancel	ShortcutsWindow		Адмена
+InsertString	ShortcutsSpec		УставіцьСтраку
+Append KeySet…	ShortcutsWindow		Дадаць KeySet…
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Key	ShortcutsWindow		Клавіша
+Open KeySet…	ShortcutsWindow		Адкрыць KeySet…
+MouseUp	ShortcutsSpec		МышУверх
+Revert to saved	ShortcutsWindow		Вярнуцца да захаванага
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*УставіцьСтраку \"Ваш Тэкст\"
+*MouseUp	ShortcutsWindow		*МышУверх
+(Choose application with file requester)	ShortcutsWindow		(Выберыце праграму, якая патрабуе выбара файлу)
 Window	ShortcutsSpec	Name for modifier on keyboard	Window
+*LaunchHandler text/html	ShortcutsWindow		*АпрацоўшчыкЗапуску text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог адкрыць ваш файл KeySet!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Множнае \"*РухацьМышДа 100% 0\" \"*КнопкаМышы 1\"
+SendMessage	ShortcutsSpec		АдаслацьПаведамленне
+MoveMouseTo	ShortcutsSpec		РухацьМышДа
+Save	ShortcutsWindow		Захаваць
+*MouseButton 1	ShortcutsWindow		*КнопкаМышы 1
+*MoveMouse +20 +0	ShortcutsWindow		*РухацьМыш +20 +0
+MouseDown	ShortcutsSpec		МышУніз
+Remove selected shortcut	ShortcutsWindow		Выдаліць выбраную гарачую клавішу
+MouseButton	ShortcutsSpec		КнопкаМышы
+Add new shortcut	ShortcutsWindow		Дадаць новую гарачую клавішу
+Save & apply	ShortcutsWindow		Захаваць і ўжыць
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*АдаслацьПаведамленне application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Прычапіць
+File	ShortcutsWindow		Файл
+Beep	ShortcutsSpec		Гудок
+Quit	ShortcutsWindow		Выйсці
+*MouseDown	ShortcutsWindow		*МышУніз
+Don't save	ShortcutsWindow		Не захоўваць
+Multi	ShortcutsSpec		Множнае
+Application	ShortcutsWindow		Праграма
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Гудок
+*MoveMouseTo 50% 50%	ShortcutsWindow		*РухацьМышДа 50% 50%
+Save KeySet as…	ShortcutsWindow		Захаваць KeySet як...
+Open	ShortcutsWindow		Адкрыць...
+Really quit without saving your changes?	ShortcutsWindow		Сапраўды выйсці, не захоўваючы змены?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог разабраць ваш файл KeySet!
+Select	ShortcutsWindow		Выбраць
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць ваш файл KeySet!
+Oh no	ShortcutsWindow		О не!
+LaunchHandler	ShortcutsSpec		АпрацоўшчыкЗапуску
+Shortcuts	System name		Гарачыя клавішы

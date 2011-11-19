@@ -1,20 +1,20 @@
 1	russian	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld байт
-Changes will take effect on restart!	SettingsWindow		Изменения вступят в силу после перезагрузки!
-Current swap file size: 	SettingsWindow		Текущий размер файла подкачки: 
-Defaults	SettingsWindow		По умолчанию
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Отключение виртуальной памяти может повлиять на стабильность системы, когда вся память будет израсходована.\nВиртуальная память не влияет на производительность системы пока она не используется.\n\nВы уверены, что хотите выключить ее?
-Enable virtual memory	SettingsWindow		Включить виртуальную память
-GB	SettingsWindow		Гбайт
-Insufficient space for a swap file.	SettingsWindow		Недостаточно места для файла подкачки.
-KB	SettingsWindow		Кбайт
-Keep enabled	SettingsWindow		Оставить включенной
-MB	SettingsWindow		Мбайт
-OK	VirtualMemoryApp		ОК
-Physical memory: 	SettingsWindow		Объем физической памяти: 
-Requested swap file size:	SettingsWindow		Выбранный размер файла подкачки:
-Revert	SettingsWindow		Вернуть
 Turn off	SettingsWindow		Выключить
+GB	SettingsWindow		Гбайт
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Отключение виртуальной памяти может повлиять на стабильность системы, когда вся память будет израсходована.\nВиртуальная память не влияет на производительность системы пока она не используется.\n\nВы уверены, что хотите выключить ее?
+Requested swap file size:	SettingsWindow		Выбранный размер файла подкачки:
+Physical memory: 	SettingsWindow		Объем физической памяти: 
+Changes will take effect on restart!	SettingsWindow		Изменения вступят в силу после перезагрузки!
+Defaults	SettingsWindow		По умолчанию
+KB	SettingsWindow		Кбайт
 Use volume:	SettingsWindow		Использовать раздел:
+Insufficient space for a swap file.	SettingsWindow		Недостаточно места для файла подкачки.
+Keep enabled	SettingsWindow		Оставить включенной
+Revert	SettingsWindow		Вернуть
 VirtualMemory	System name		Виртуальная память
+Current swap file size: 	SettingsWindow		Текущий размер файла подкачки: 
+OK	VirtualMemoryApp		ОК
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\n\tразработал Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Включить виртуальную память
+MB	SettingsWindow		Мбайт
+%Ld B	SettingsWindow		%Ld байт

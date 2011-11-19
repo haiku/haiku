@@ -1,27 +1,27 @@
 1	slovak	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Vždy na vrchu
+TV	MainWin		TV
 Channel	MainWin		Kanál
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-Debug	MainWin		Ladenie
-Error, connecting to interface failed:\n\n	MainWin		Chyba, pripojenie na rozhranie zlyhalo:\n\n
-Error, interface is busy:\n\n	MainWin		Chyba, rozhranie je zaneprázdnené:\n\n
-Full screen	MainWin		Celoobrazovkový režim
+Settings…	MainWin		Nastavenie...
 Interface	MainWin		Rozhranie
 Keep aspect ratio	MainWin		Zachovať pomer strán
-Next channel	MainWin		Ďalší kanál
-No border	MainWin		Bez okraja
-No menu	MainWin		Bez menu
-None	MainWin		Žiadne
-OK	MainWin		OK
 Previous channel	MainWin		Predošlý kanál
-Quit	MainWin		Ukončiť
-Scale to native size	MainWin		Zmeniť mierku na natívnu veľkosť
 Settings	MainWin		Nastavenia
-Settings…	MainWin		Nastavenie...
-TV	MainWin		TV
 TV	System name		TV
-force 544 x 576, display aspect 4:3	MainWin		vynútiť 544 x 576, pomer strán 4:3
-force 704 x 576, display aspect 4:3	MainWin		vynútiť 704 x 576, pomer strán 4:3
-force 720 x 576, display aspect 4:3	MainWin		vynútiť 720 x 576, pomer strán 4:3
-pixel aspect ratio	MainWin		pomer strán pixlov
+No border	MainWin		Bez okraja
+Always on top	MainWin		Vždy na vrchu
+OK	MainWin		OK
+Quit	MainWin		Ukončiť
+Full screen	MainWin		Celoobrazovkový režim
+Debug	MainWin		Ladenie
+Scale to native size	MainWin		Zmeniť mierku na natívnu veľkosť
 unknown	MainWin		neznáme
+Next channel	MainWin		Ďalší kanál
+Error, interface is busy:\n\n	MainWin		Chyba, rozhranie je zaneprázdnené:\n\n
+None	MainWin		Žiadne
+force 704 x 576, display aspect 4:3	MainWin		vynútiť 704 x 576, pomer strán 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+force 544 x 576, display aspect 4:3	MainWin		vynútiť 544 x 576, pomer strán 4:3
+pixel aspect ratio	MainWin		pomer strán pixlov
+No menu	MainWin		Bez menu
+Error, connecting to interface failed:\n\n	MainWin		Chyba, pripojenie na rozhranie zlyhalo:\n\n
+force 720 x 576, display aspect 4:3	MainWin		vynútiť 720 x 576, pomer strán 4:3

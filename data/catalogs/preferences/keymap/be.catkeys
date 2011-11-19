@@ -1,22 +1,22 @@
 1	belarusian	x-vnd.Haiku-Keymap	1259868356
-(Current)	Keymap window		(Бягучая)
-Acute trigger	Keymap window		Acute
+Tilde trigger	Keymap window		Tilde
+Grave trigger	Keymap window		Grave
+Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
+Quit	Keymap window		Выйсці
+Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
 Circumflex trigger	Keymap window		Circumflex
 Diaeresis trigger	Keymap window		Diaeresis
-File	Keymap window		Файл
-Font	Keymap window		Шрыфт
-Grave trigger	Keymap window		Grave
-Keymap	System name		Мапа клавіятуры
-Layout	Keymap window		Расклад клавіятуры
 Open…	Keymap window		Адкрыць…
-Quit	Keymap window		Выйсці
-Revert	Keymap window		Вярнуць
-Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
-Save as…	Keymap window		Захаваць як…
-Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
-Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
-Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
 System:	Keymap window		Сістэмныя:
-Tilde trigger	Keymap window		Tilde
+Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
 User:	Keymap window		Карыстач:
+Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
+Layout	Keymap window		Расклад клавіятуры
+Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
+Revert	Keymap window		Вярнуць
+Save as…	Keymap window		Захаваць як…
+File	Keymap window		Файл
+(Current)	Keymap window		(Бягучая)
+Font	Keymap window		Шрыфт
+Keymap	System name		Мапа клавіятуры
+Acute trigger	Keymap window		Acute

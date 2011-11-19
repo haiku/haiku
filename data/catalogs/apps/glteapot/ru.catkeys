@@ -1,23 +1,23 @@
 1	russian	x-vnd.Haiku-GLTeapot	4001979038
-Add a teapot	TeapotWindow		Добавить чайник
-Blue	TeapotWindow		Голубой
-FPS display	TeapotWindow		Показывать частоту кадров
-File	TeapotWindow		Файл
-Filled polygons	TeapotWindow		Заполненные многоугольники
-Fog	TeapotWindow		Туман
-GLTeapot	System name		Чайник
-Gouraud shading	TeapotWindow		Метод тонирования Гуро
-Green	TeapotWindow		Зеленый
-Lighting	TeapotWindow		Освещение
-Lights	TeapotWindow		Свет
-Lower left	TeapotWindow		Нижний левый угол
-Off	TeapotWindow		Выключить
-Options	TeapotWindow		Опции
-Perspective	TeapotWindow		Перспектива
-Quit	TeapotWindow		Выход
-Red	TeapotWindow		Красный
-Right	TeapotWindow		Справа
 Upper center	TeapotWindow		Сверху на центр
+Lighting	TeapotWindow		Освещение
+Off	TeapotWindow		Выключить
+Lower left	TeapotWindow		Нижний левый угол
 White	TeapotWindow		Белый
 Yellow	TeapotWindow		Желтый
+Blue	TeapotWindow		Голубой
+Gouraud shading	TeapotWindow		Метод тонирования Гуро
+Quit	TeapotWindow		Выход
+Filled polygons	TeapotWindow		Заполненные многоугольники
+Fog	TeapotWindow		Туман
 Z-buffered	TeapotWindow		Z-буферизация
+File	TeapotWindow		Файл
+Options	TeapotWindow		Опции
+Perspective	TeapotWindow		Перспектива
+GLTeapot	System name		Чайник
+Green	TeapotWindow		Зеленый
+Right	TeapotWindow		Справа
+FPS display	TeapotWindow		Показывать частоту кадров
+Add a teapot	TeapotWindow		Добавить чайник
+Red	TeapotWindow		Красный
+Lights	TeapotWindow		Свет

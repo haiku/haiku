@@ -1,8 +1,8 @@
 1	belarusian	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Немагчыма запусціць манітор наладак дысплея\nІмгненныя змены фільтра адключаны.
 Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Немагчыма запусціць манітор фільтра. Імгненныя змены фільтра адключаны.
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Немагчыма запусціць манітор агульных наладак.\nІмгненыя змены фільтра будуць адключаны.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Немагчыма запусціць манітор наладак дысплея\nІмгненныя змены фільтра адключаны.
 Darn.	NotificationWindow		Халера!
-Notification	NotificationWindow		Паведамленне
-OK	NotificationWindow		ОК
 Warning	NotificationWindow		Увага
+OK	NotificationWindow		ОК
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Немагчыма запусціць манітор агульных наладак.\nІмгненыя змены фільтра будуць адключаны.
+Notification	NotificationWindow		Паведамленне

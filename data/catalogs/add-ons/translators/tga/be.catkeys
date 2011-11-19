@@ -1,15 +1,15 @@
 1	belarusian	x-vnd.Haiku-TGATranslator	2221210336
-Ignore TGA alpha channel	TGAView		Игнараваць альфа канал TGA
-Save with RLE Compression	TGAView		Захаваць з RLE сціскваннем
-TGA Settings	TGAMain		Наладкі TGA
-TGA image translator	TGATranslator		Канвертар выяваў TGA
-TGA images	TGATranslator		Выявы TGA
-TGATranslator Settings	TGATranslator		Наладкі канвертара TGA
-Targa image (%d bits RLE colormap)	TGATranslator		Выява Targa (палета колераў RLE %d бітаў)
-Targa image (%d bits RLE gray)	TGATranslator		Выява Targa (шэракаляровы RLE %d бітаў)
-Targa image (%d bits RLE truecolor)	TGATranslator		Выява Targa (поўнакаляровы RLE %d бітаў)
-Targa image (%d bits colormap)	TGATranslator		Выява Targa (палета колераў %d бітаў)
-Targa image (%d bits gray)	TGATranslator		Выява Targa (адценні шэрага %d бітаў)
 Targa image (%d bits truecolor)	TGATranslator		Выява Targa (%d бітаў поўнaкаляровы)
 Version %d.%d.%d %s	TGAView		Версія %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		Игнараваць альфа канал TGA
+Targa image (%d bits colormap)	TGATranslator		Выява Targa (палета колераў %d бітаў)
+Targa image (%d bits RLE colormap)	TGATranslator		Выява Targa (палета колераў RLE %d бітаў)
+Targa image (%d bits gray)	TGATranslator		Выява Targa (адценні шэрага %d бітаў)
 Written by the Haiku Translation Kit Team	TGAView		Распрацаваны Haiku Translation Kit Team
+Targa image (%d bits RLE truecolor)	TGATranslator		Выява Targa (поўнакаляровы RLE %d бітаў)
+TGA images	TGATranslator		Выявы TGA
+TGATranslator Settings	TGATranslator		Наладкі канвертара TGA
+Save with RLE Compression	TGAView		Захаваць з RLE сціскваннем
+TGA image translator	TGATranslator		Канвертар выяваў TGA
+Targa image (%d bits RLE gray)	TGATranslator		Выява Targa (шэракаляровы RLE %d бітаў)
+TGA Settings	TGAMain		Наладкі TGA

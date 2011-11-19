@@ -1,32 +1,32 @@
 1	russian	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Активные трансляторы
-Active Translators	InspectorApp		Активные трансляторы
-Bummer	ImageWindow		Облом
-File	ImageWindow		Файл
-First Page	ImageWindow		Первая страница
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Изображение: %1\nЦветовое пространство: %2 (%3)\nРазмеры: %4 x %5\nБайт на строку: %6\nВсего байт: %7\n\nОпределительная информация:\nID строка %8\nMIME тип: %9\nТип: '%10' (%11)\nID транслятора: %12\nГруппа: '%13' (%14)\nКачество: %15\nВозможности: %16\n\nРасширения:\n
-Info	ImageWindow		Информация
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Информационное окно
-Last Page	ImageWindow		Последняя страница
-Next Page	ImageWindow		Следующая страница
+User Translators	ActiveTranslatorsWindow		Пользовательские трансляторы
 No image available to save.	ImageWindow		Нет изображения для сохранения.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Количество документов: %1\n\nИспользованный транслятор:\nИмя: %2\nИнформация: %3\nВерсия: %4\n
-OK	ImageView		ОК
-OK	ImageWindow		ОК
-Open...	ImageWindow		Открыть…
-Previous Page	ImageWindow		Предыдущая страница
-Quit	ImageWindow		Выход
-Save feature not implemented yet.	ImageWindow		Функция сохранения пока не реализована.
-Save...	ImageWindow		Сохранить…
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбранный документ: %1\n\nИспользованный транслятор:\nИмя: %2\nИнформация: %3\nВерсия: %4\n
-Sorry, unable to load the image.	ImageView		К сожалению, не удалось загрузить изображение.
 Sorry, unable to write the image file.	ImageView		К сожалению, не удалось записать изображения файл.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Количество документов: %1\n\nИспользованный транслятор:\nИмя: %2\nИнформация: %3\nВерсия: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТип: '%1' (%2)\nГруппа: '%3' (%4)\nКачество: %5\nВозможности: %6\nMIME тип: %7\nИмя: %8\n
+Bummer	ImageWindow		Облом
+Last Page	ImageWindow		Последняя страница
+\nInput Formats:	ImageView		\nФорматы ввода:
+Sorry, unable to load the image.	ImageView		К сожалению, не удалось загрузить изображение.
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Информационное окно
+Active Translators	InspectorApp		Активные трансляторы
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Изображение: %1\nЦветовое пространство: %2 (%3)\nРазмеры: %4 x %5\nБайт на строку: %6\nВсего байт: %7\n\nОпределительная информация:\nID строка %8\nMIME тип: %9\nТип: '%10' (%11)\nID транслятора: %12\nГруппа: '%13' (%14)\nКачество: %15\nВозможности: %16\n\nРасширения:\n
+\nOutput Formats:	ImageView		\nФорматы вывода:
+Save feature not implemented yet.	ImageWindow		Функция сохранения пока не реализована.
+First Page	ImageWindow		Первая страница
+Next Page	ImageWindow		Следующая страница
+Open...	ImageWindow		Открыть…
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nИспользованный транслятор:\nИмя: %1\nИнформация: %2\nВерсия: %3\n
+Save...	ImageWindow		Сохранить…
+Info	ImageWindow		Информация
+OK	ImageWindow		ОК
+Window	ImageWindow		Окно
+Quit	ImageWindow		Выход
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбранный документ: %1\n\nИспользованный транслятор:\nИмя: %2\nИнформация: %3\nВерсия: %4\n
+Active Translators	ImageWindow		Активные трансляторы
+View	ImageWindow		Вид
+Previous Page	ImageWindow		Предыдущая страница
+OK	ImageView		ОК
 System Translators	ActiveTranslatorsWindow		Системные трансляторы
 Unknown	ImageView		Неизвестно
-User Translators	ActiveTranslatorsWindow		Пользовательские трансляторы
-View	ImageWindow		Вид
-Window	ImageWindow		Окно
-\nInput Formats:	ImageView		\nФорматы ввода:
-\nOutput Formats:	ImageView		\nФорматы вывода:
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nИспользованный транслятор:\nИмя: %1\nИнформация: %2\nВерсия: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТип: '%1' (%2)\nГруппа: '%3' (%4)\nКачество: %5\nВозможности: %6\nMIME тип: %7\nИмя: %8\n
+File	ImageWindow		Файл

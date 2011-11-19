@@ -1,42 +1,42 @@
 1	belarusian	x-vnd.Haiku-Time	2106196689
-<Other>	Time		<іншае>
-Add	Time		Дадаць
-Africa	Time		Афрыка
-America	Time		Амерыка
-Antarctica	Time		Антарктыка
-Arctic	Time		Арктыка
-Asia	Time		Азія
-Atlantic	Time		Атлантыка
-Australia	Time		Аўстралія
-Could not contact server	Time		Няма далучэння да сервера
-Could not create socket	Time		Немагчыма стварыць сеткавы сокет.
-Current time:	Time		Сапраўдны час:
-Date and time	Time		Дата і Час
-Europe	Time		Эўропа
-Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
-Indian	Time		Індыя
-Message receiving failed	Time		Памылка атрымання паведамлення
-Network time	Time		Сеткавы час
 OK	Time		ОК
-Pacific	Time		Ціхі акіян
-Preview time:	Time		Праглядзець час:
-Received invalid time	Time		Атрыманы несапраўдны час
-Remove	Time		Выдаліць
-Reset	Time		Скінуць
-Revert	Time		Адвярнуць
-Sending request failed	Time		Немагчыма адаслаць запыт.
-Set time zone	Time		Пазначыць часавы пояс
-Stop	Time		Спыніць
-Synchronize	Time		Сінхранізаваць
-Synchronize again	Time		Сінхранізаваць ізноў
-Synchronize at boot	Time		Сінхранізаваць падчас старту
-The following error occured while synchronizing:r\n%s	Time		Памылка падчас сінхранізацыі:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
-Time	System name		Дата і Час
-Time	Time		Час
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, аўтары:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Часавы пояс
-Try all servers	Time		Паспрабаваць усе серверы
-Waiting for answer failed	Time		Памылка падчас чакання адказу
+Asia	Time		Азія
 \nNow: 	Time		\nЗараз:
+Africa	Time		Афрыка
+Stop	Time		Спыніць
+Could not contact server	Time		Няма далучэння да сервера
+Australia	Time		Аўстралія
+Preview time:	Time		Праглядзець час:
+Synchronize	Time		Сінхранізаваць
+Revert	Time		Адвярнуць
+Pacific	Time		Ціхі акіян
+Add	Time		Дадаць
+Date and time	Time		Дата і Час
 about	Time		пра праграму
+Message receiving failed	Time		Памылка атрымання паведамлення
+Set time zone	Time		Пазначыць часавы пояс
+Waiting for answer failed	Time		Памылка падчас чакання адказу
+Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
+The following error occured while synchronizing:r\n%s	Time		Памылка падчас сінхранізацыі:r\n%s
+Europe	Time		Эўропа
+Remove	Time		Выдаліць
+Time	Time		Час
+Indian	Time		Індыя
+Sending request failed	Time		Немагчыма адаслаць запыт.
+Arctic	Time		Арктыка
+Time	System name		Дата і Час
+America	Time		Амерыка
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, аўтары:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Скінуць
+Synchronize at boot	Time		Сінхранізаваць падчас старту
+Received invalid time	Time		Атрыманы несапраўдны час
+Antarctica	Time		Антарктыка
+The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
+<Other>	Time		<іншае>
+Current time:	Time		Сапраўдны час:
+Try all servers	Time		Паспрабаваць усе серверы
+Time zone	Time		Часавы пояс
+Could not create socket	Time		Немагчыма стварыць сеткавы сокет.
+Synchronize again	Time		Сінхранізаваць ізноў
+Network time	Time		Сеткавы час
+Atlantic	Time		Атлантыка

@@ -1,20 +1,20 @@
 1	russian	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		Просмотр состояния частоты ЦП
-CPUFrequency	System name		Частота процессора
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tразработал Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		По умолчанию
-Dynamic performance	Status view		Динамическая производительность
-Dynamic stepping	CPU Frequency View		Динамическое изменение
-High performance	Status view		Высокая производительность
-Install replicant into Deskbar	CPU Frequency View		Установить репликант в Deskbar
-Integration time [ms]: 	CPU Frequency View		Время интеграции [мс]: 
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Не удалось запустить настройки частоты ЦП.\n\nОшибка: 
-Low energy	Status view		Экономия энергии
 Ok	Status view		ОК
-Open Speedstep preferences…	Status view		Настроить частоту процессора…
-Quit	Status view		Выход
-Revert	Pref Window		Вернуть
+CPU frequency status view	CPU Frequency View		Просмотр состояния частоты ЦП
 Set state	Status view		Выбрать состояние
-Step up by CPU usage	Color Step View		Шаг вверх по производительности ЦП:
+Defaults	Pref Window		По умолчанию
+Install replicant into Deskbar	CPU Frequency View		Установить репликант в Deskbar
+Quit	Status view		Выход
+High performance	Status view		Высокая производительность
 Stepping policy	CPU Frequency View		Настройка шага изменения частоты ЦП
+Dynamic performance	Status view		Динамическая производительность
+Step up by CPU usage	Color Step View		Шаг вверх по производительности ЦП:
+Dynamic stepping	CPU Frequency View		Динамическое изменение
 Stepping policy: 	CPU Frequency View		Настройка шага изменения частоты ЦП: 
+Integration time [ms]: 	CPU Frequency View		Время интеграции [мс]: 
+Open Speedstep preferences…	Status view		Настроить частоту процессора…
+Revert	Pref Window		Вернуть
+Low energy	Status view		Экономия энергии
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Не удалось запустить настройки частоты ЦП.\n\nОшибка: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tразработал Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		Частота процессора

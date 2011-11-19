@@ -1,160 +1,159 @@
-1	slovak	x-vnd.Be-MAIL	2276629278
+1	slovak	x-vnd.Be-MAIL	1350013868
+View	Mail		Zobraziť
 %d - Date	Mail		%d - Dátum
-%e - E-mail address	Mail		%e - Emailová adresa
-%e wrote:\\n	Mail		%e napísal:\\n
-%n - Full name	Mail		%n - Plný názov
-(Address unavailable)	Mail		(Adresa nedostupná)
-(Date unavailable)	Mail		(Dátum nedostupný)
-(Name unavailable)	Mail		(Meno nedostupné)
-<none>	Mail		<žiadne>
-Account from mail	Mail		Účet z pošty
-Account:	Mail		Účet:
-Accounts…	Mail		Účty...
-Add	Mail		Pridať
-Add enclosure…	Mail		Pridať prílohu...
-Add signature	Mail		Pridať podpis
-An error occurred trying to open this signature.	Mail		Vyskytla sa chyba pri pokuse otvoriť podpis.
-An error occurred trying to save the attachment.	Mail		Vyskytla sa chyba pri pokuse uložiť prílohu.
-An error occurred trying to save this signature.	Mail		Vyskytla sa chyba pri pokuse o uloženie podpisu.
 Attach attributes:	Mail		Pripojiť atribúty
-Attachments:	Mail		Prílohy:
-Auto signature:	Mail		Auto podpis:
+Inconsistency occurred in the undo/redo buffer.	Mail		V zásobníku vrátení/opakovaní sa vyskytla nekonzistencia.
+An error occurred trying to save the attachment.	Mail		Vyskytla sa chyba pri pokuse uložiť prílohu.
+Copy to new	Mail		Skopírovať ako novú
+Edit	Mail		Upraviť
+Print	Mail		Tlačiť
+<none>	Mail		<žiadne>
+New mail message	Mail		Nová poštová správa
 Automatic	Mail		Automaticky
 Automatically mark mail as read:	Mail		Automaticky označiť poštu ako prečítanú:
-Bcc:	Mail		Skrytá kópia:
-Beginner	Mail		Začiatočník
-Button bar:	Mail		Panel tlačidiel:
-Cancel	Mail		Zrušiť
-Cc:	Mail		Kópia:
-Check spelling	Mail		Skontrolovať pravopis
-Close	Mail		Zatvoriť
-Close and 	Mail		Zatvoriť a
-Colored quotes:	Mail		Zafarbené citácie
-Copy	Mail		Kopírovať
-Copy link location	Mail		Kopírovať adresu odkazu
-Copy to new	Mail		Skopírovať ako novú
-Couldn't open this signature. Sorry.	Mail		Nebolo možné otvoriť tento podpis. Ľutujeme.
-Cut	Mail		Vystrihnúť
-Date:	Mail		Dátum:
-Decoding:	Mail		Dekódovanie:
-Default account:	Mail		Predvolený účet:
-Delete	Mail		Zmazať
-Discard	Mail		Zahodiť
-Do you wish to save this message as a draft before closing?	Mail		Chcete túto správu pred ukončením uložiť medzi rozpísané?
-Do you wish to send this message before closing?	Mail		Želáte si pred zatvorením odoslať túto správu?
-Don't save	Mail		Neukladať
-E-mail draft could not be saved!	Mail		Rozpísanú správu nebolo možné uložiť!
-Edit	Mail		Upraviť
-Edit queries…	Mail		Upraviť požiadavky...
-Edit signatures…	Mail		Upraviť podpisy...
-Encoding:	Mail		Kódovanie:
-Expert	Mail		Expert
-File	Mail		Súbor
-Find	Mail		Nájsť
-Find again	Mail		Nájsť znova
-Find…	Mail		Nájsť...
-Font:	Mail		Písmo:
-Forward	Mail		Preposlať
-Forward without attachments	Mail		Preposlať bez príloh
-From:	Mail		Od:
-Hide	Mail		Skryť
-Include file attributes in attachments	Mail		Prikladať do príloh atribúty súborov
-Inconsistency occurred in the undo/redo buffer.	Mail		V zásobníku vrátení/opakovaní sa vyskytla nekonzistencia.
-Initial spell check mode:	Mail		Režim prvotnej kontroly pravopisu:
-Leave as '%s'	Mail		Ponechať ako „%s“
-Leave as New	Mail		Ponechať ako Nové
-Leave same	Mail		Ponechať rovnaké
-Mail	System name		Pošta
-Mail couldn't find its dictionary.	Mail		Pošta nenašla svoj slovník.
-Mail preferences	Mail		Predvoľby pošty
-Mailing	Mail		Pošta
-Message	Mail		Správa
-Move to trash	Mail		Presunúť do Koša
-Need Tracker to move items to trash	Mail		Na presunutie položiek do Koša je potrebný Tracker
-New	Mail		Nová
-New mail message	Mail		Nová poštová správa
-Next	Mail		Ďalší
-Next message	Mail		Ďalšia správa
-No file attributes, just plain data	Mail		Žiadne atribúty súboru, iba čisté dáta.
-No matches	Mail		Žiadne zhody
-None	Mail		Žiadne
-OK	Mail		OK
-Off	Mail		Vypnúť
-On	Mail		Zapnúť
-Only files can be added as attachments.	Mail		Ako prílohy možno pridať iba súbory.
-Open	Mail		Otvoriť
-Open attachment	Mail		Otvoriť prílohu
-Open draft	Mail		Otvoriť rozpísané
-Open this link	Mail		Otvoriť tento odkaz
-Page setup…	Mail		Nastavenie stránky...
-Paste	Mail		Vložiť
-Preferences…	Mail		Predvoľby...
-Previous	Mail		Predošlé
-Previous message	Mail		Predošlá správa
-Print	Mail		Tlačiť
-Print…	Mail		Tlačiť...
-Put your favorite e-mail queries and query templates in this folder.	Mail		Do tohto priečinka uložte svoje obľúbené požiadavky a šablóny požiadaviek súvisiace s emailom.
-Queries	Mail		Požiadavky
-Quit	Mail		Ukončiť
-Quote	Mail		Citovať
-Random	Mail		Náhodné
-Read 	Mail		Prečítané
-Really delete this signature? This cannot be undone.	Mail		Skutočne zmazať tento podpis? Túto operáciu nemožno vrátiť.
-Redo	Mail		Opakovať
-Remove attachment	Mail		Odstrániť prílohu
-Remove enclosure	Mail		Odstrániť prílohu
-Remove quote	Mail		Odstrániť citát
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Odstránenie príloh z preposlanej pošty zatiaľ nie je implementované!\nZatiaľ nebude správne fungovať.
-Reply	Mail		Odpovedať
-Reply account:	Mail		Účet na odpoveď:
-Reply preamble:	Mail		Úvod odpovede:
-Reply to all	Mail		Odpovedať všetkým
-Reply to sender	Mail		Odpovedať odosielateľovi
-Resend	Mail		Odoslať znova
-Revert	Mail		Vrátiť
-Save	Mail		Uložiť
-Save address	Mail		Uložiť adresu
-Save as draft	Mail		Uložiť ako rozpísané
-Save attachment…	Mail		Uložiť prílohu
-Save changes to this signature?	Mail		Uložiť zmeny tohto podpisu?
-Select all	Mail		Vybrať všetky
-Send	Mail		Odoslať
-Send message	Mail		Poslať správu
-Set to %s	Mail		Nastaviť na %s
-Set to Saved	Mail		Nastaviť na Uložené
-Set to…	Mail		Nastaviť na...
-Show header	Mail		Zobraziť hlavičku
-Show icons & labels	Mail		Zobraziť ikony a menovky
-Show icons only	Mail		Zobraziť iba ikony
-Show raw message	Mail		Zobraziť kód správy
-Signature	Mail		Podpis
-Signature:	Mail		Podpis:
-Signatures	Mail		Podpisy
-Size:	Mail		Veľkosť:
-Sorry	Mail		Ľutujeme
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Ľutujeme, nebola nájdená aplikácia podporujúca dátový typ „Osoba“.
-Start now	Mail		Začať teraz
-Subject:	Mail		Predmet:
-Text wrapping:	Mail		Zalamovanie textu:
-The mail_daemon could not be started:\n\t	Mail		mail_daemon sa nepodarilo spustiť:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon nebeží. Správa bola zaradená do frontu a bude odoslaná po spustení mail_daemon.
-There is no installed handler for URL links.	Mail		Neexistuje žiadna nainštalovaná obsluha odkazov URL.
-Title:	Mail		Názov:
-To:	Mail		Komu:
-Trash	Mail		Kôš
-Undo	Mail		Vrátiť
-Unread	Mail		Neprečítané
-Use default account	Mail		Použiť predvolený účet
-User interface	Mail		Používateľské rozhranie
-View	Mail		Zobraziť
-Warn unencodable:	Mail		Upozorniť na nezakódovateľné:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Váš hlavný text obsahuje %ld znakov, ktoré nebolo možné zakódovať. Možno by bola vhodná iná znaková sada? Ak chcete správu napriek tomu odoslať, stlačte „Odoslať“ (namiesto nezakódovateľných znakov sa použijú náhradné znaky) alebo sa vráťte späť stlačením „Zrušiť“ a pokúste sa to opraviť.
-\\n - Newline	Mail		\\n - Nový riadok
-draft	B_USER_DIRECTORY/mail/draft		rozpísané
 helpful message	Mail		užitočná správa
-in	B_USER_DIRECTORY/mail/in		v
-mail	B_USER_DIRECTORY/mail		pošta
-out	B_USER_DIRECTORY/mail/out		odchádzajúce
-queries	B_USER_DIRECTORY/mail/queries		požiadavky
-sent	B_USER_DIRECTORY/mail/sent		odoslané
+Colored quotes:	Mail		Zafarbené citácie
+Subject:	Mail		Predmet:
+Reply to all	Mail		Odpovedať všetkým
+Show icons & labels	Mail		Zobraziť ikony a menovky
+Remove attachment	Mail		Odstrániť prílohu
+Button bar:	Mail		Panel tlačidiel:
 spam	B_USER_DIRECTORY/mail/spam		spam
+Beginner	Mail		Začiatočník
+Don't save	Mail		Neukladať
+Expert	Mail		Expert
+Reply account:	Mail		Účet na odpoveď:
+Discard	Mail		Zahodiť
+Message	Mail		Správa
+Reply to sender	Mail		Odpovedať odosielateľovi
+There is no installed handler for URL links.	Mail		Neexistuje žiadna nainštalovaná obsluha odkazov URL.
+Signature	Mail		Podpis
+Find again	Mail		Nájsť znova
+Bcc:	Mail		Skrytá kópia:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Váš hlavný text obsahuje %ld znakov, ktoré nebolo možné zakódovať. Možno by bola vhodná iná znaková sada? Ak chcete správu napriek tomu odoslať, stlačte „Odoslať“ (namiesto nezakódovateľných znakov sa použijú náhradné znaky) alebo sa vráťte späť stlačením „Zrušiť“ a pokúste sa to opraviť.
+Signature:	Mail		Podpis:
+Save changes to this signature?	Mail		Uložiť zmeny tohto podpisu?
+Cc:	Mail		Kópia:
+Off	Mail		Vypnúť
+Find	Mail		Nájsť
+Preferences…	Mail		Predvoľby...
+Undo	Mail		Vrátiť
+Date:	Mail		Dátum:
+Leave as New	Mail		Ponechať ako Nové
+An error occurred trying to open this signature.	Mail		Vyskytla sa chyba pri pokuse otvoriť podpis.
+No file attributes, just plain data	Mail		Žiadne atribúty súboru, iba čisté dáta.
+Edit queries…	Mail		Upraviť požiadavky...
+queries	B_USER_DIRECTORY/mail/queries		požiadavky
+Paste	Mail		Vložiť
+in	B_USER_DIRECTORY/mail/in		v
+Save attachment…	Mail		Uložiť prílohu
+Include file attributes in attachments	Mail		Prikladať do príloh atribúty súborov
+OK	Mail		OK
+Send	Mail		Odoslať
+Show icons only	Mail		Zobraziť iba ikony
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Odstránenie príloh z preposlanej pošty zatiaľ nie je implementované!\nZatiaľ nebude správne fungovať.
+Hide	Mail		Skryť
+Forward without attachments	Mail		Preposlať bez príloh
+Previous	Mail		Predošlé
+Redo	Mail		Opakovať
+Add enclosure…	Mail		Pridať prílohu...
+Mail	System name		Pošta
+Print…	Mail		Tlačiť...
+Warn unencodable:	Mail		Upozorniť na nezakódovateľné:
+Quit	Mail		Ukončiť
+%n - Full name	Mail		%n - Plný názov
+Trash	Mail		Kôš
+Default account:	Mail		Predvolený účet:
+Size:	Mail		Veľkosť:
+Account from mail	Mail		Účet z pošty
+Edit signatures…	Mail		Upraviť podpisy...
+New	Mail		Nová
+On	Mail		Zapnúť
+Set to %s	Mail		Nastaviť na %s
+Forward	Mail		Preposlať
+E-mail draft could not be saved!	Mail		Rozpísanú správu nebolo možné uložiť!
+%e wrote:\\n	Mail		%e napísal:\\n
+To:	Mail		Komu:
+Only files can be added as attachments.	Mail		Ako prílohy možno pridať iba súbory.
+Previous message	Mail		Predošlá správa
+Attachments:	Mail		Prílohy:
+Title:	Mail		Názov:
+Find…	Mail		Nájsť...
+Accounts…	Mail		Účty...
+Mail preferences	Mail		Predvoľby pošty
+Initial spell check mode:	Mail		Režim prvotnej kontroly pravopisu:
+Leave same	Mail		Ponechať rovnaké
+Page setup…	Mail		Nastavenie stránky...
+Text wrapping:	Mail		Zalamovanie textu:
+Revert	Mail		Vrátiť
+File	Mail		Súbor
+mail	B_USER_DIRECTORY/mail		pošta
+None	Mail		Žiadne
+(Name unavailable)	Mail		(Meno nedostupné)
+Copy link location	Mail		Kopírovať adresu odkazu
+out	B_USER_DIRECTORY/mail/out		odchádzajúce
+Show header	Mail		Zobraziť hlavičku
+%e - E-mail address	Mail		%e - Emailová adresa
+Resend	Mail		Odoslať znova
+Show raw message	Mail		Zobraziť kód správy
+\\n - Newline	Mail		\\n - Nový riadok
+Start now	Mail		Začať teraz
+Close	Mail		Zatvoriť
+No matches	Mail		Žiadne zhody
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon nebeží. Správa bola zaradená do frontu a bude odoslaná po spustení mail_daemon.
+Really delete this signature? This cannot be undone.	Mail		Skutočne zmazať tento podpis? Túto operáciu nemožno vrátiť.
+Open	Mail		Otvoriť
+draft	B_USER_DIRECTORY/mail/draft		rozpísané
+Quote	Mail		Citovať
+Add	Mail		Pridať
+Next message	Mail		Ďalšia správa
+User interface	Mail		Používateľské rozhranie
+Cancel	Mail		Zrušiť
+Send message	Mail		Poslať správu
+Remove enclosure	Mail		Odstrániť prílohu
+Account:	Mail		Účet:
+Decoding:	Mail		Dekódovanie:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Ľutujeme, nebola nájdená aplikácia podporujúca dátový typ „Osoba“.
+Do you wish to send this message before closing?	Mail		Želáte si pred zatvorením odoslať túto správu?
+Delete	Mail		Zmazať
+Leave as '%s'	Mail		Ponechať ako „%s“
+Copy	Mail		Kopírovať
+Mail couldn't find its dictionary.	Mail		Pošta nenašla svoj slovník.
+Reply preamble:	Mail		Úvod odpovede:
+Signatures	Mail		Podpisy
+Next	Mail		Ďalší
+Set to…	Mail		Nastaviť na...
+Use default account	Mail		Použiť predvolený účet
+Sorry	Mail		Ľutujeme
+Encoding:	Mail		Kódovanie:
+Font:	Mail		Písmo:
+(Address unavailable)	Mail		(Adresa nedostupná)
+Save address	Mail		Uložiť adresu
+Queries	Mail		Požiadavky
+Do you wish to save this message as a draft before closing?	Mail		Chcete túto správu pred ukončením uložiť medzi rozpísané?
+Save	Mail		Uložiť
+Random	Mail		Náhodné
+Close and 	Mail		Zatvoriť a
+Save as draft	Mail		Uložiť ako rozpísané
+The mail_daemon could not be started:\n\t	Mail		mail_daemon sa nepodarilo spustiť:\n\t
+Open attachment	Mail		Otvoriť prílohu
+sent	B_USER_DIRECTORY/mail/sent		odoslané
+(Date unavailable)	Mail		(Dátum nedostupný)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Do tohto priečinka uložte svoje obľúbené požiadavky a šablóny požiadaviek súvisiace s emailom.
+Reply	Mail		Odpovedať
+From:	Mail		Od:
+Couldn't open this signature. Sorry.	Mail		Nebolo možné otvoriť tento podpis. Ľutujeme.
+Open draft	Mail		Otvoriť rozpísané
+Cut	Mail		Vystrihnúť
+Check spelling	Mail		Skontrolovať pravopis
+Set to Saved	Mail		Nastaviť na Uložené
+Open this link	Mail		Otvoriť tento odkaz
+Auto signature:	Mail		Auto podpis:
+Add signature	Mail		Pridať podpis
+Need Tracker to move items to trash	Mail		Na presunutie položiek do Koša je potrebný Tracker
+Mailing	Mail		Pošta
+Unread	Mail		Neprečítané
+Remove quote	Mail		Odstrániť citát
+Move to trash	Mail		Presunúť do Koša
+Select all	Mail		Vybrať všetky
+An error occurred trying to save this signature.	Mail		Vyskytla sa chyba pri pokuse o uloženie podpisu.

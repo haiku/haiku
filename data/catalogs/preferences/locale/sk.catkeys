@@ -1,31 +1,31 @@
 1	slovak	x-vnd.Haiku-Locale	1488345554
-12 hour	TimeFormatSettings		12-hodinový
-24 hour	TimeFormatSettings		24-hodinový
 Available languages	Locale Preflet Window		Dostupné jazyky
-Cancel	Locale Preflet Window		Zrušiť
-Currency	TimeFormatSettings		Mena
-Date	TimeFormatSettings		Dátum
-Defaults	Locale Preflet Window		Predvolené
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Aby sa táto zmena prejavila, je potrebné reštartovať Panel a Tracker. Chcete ich reštartovať teraz?
-Formatting	Locale Preflet Window		Formátovanie
-Full format:	TimeFormatSettings		Plný formát:
-Language	Locale Preflet Window		Jazyk
-Locale	Locale Preflet		Locale
-Locale	Locale Preflet Window		Locale
-Locale	System name		Locale
-Long format:	TimeFormatSettings		Dlhý formát:
-Medium format:	TimeFormatSettings		Stredný formát:
 Negative:	TimeFormatSettings		Záporné čísla
-Numbers	TimeFormatSettings		Čísla
-OK	Locale Preflet Window		OK
-Options	Locale Preflet Window		Možnosti
-Positive:	TimeFormatSettings		Kladné čísla:
-Preferred languages	Locale Preflet Window		Preferované jazyky
-Restart	Locale Preflet Window		Reštartovať
-Revert	Locale Preflet Window		Vrátiť
-Short format:	TimeFormatSettings		Krátky formát:
-Time	TimeFormatSettings		Čas
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Prekladať názvy aplikácií v Paneli a Trackeri.
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nebolo možné nájsť dostupné jazyky! Nie je možné použiť tento konfiguračný nástroj.
-Use month/day-names from preferred language	TimeFormatSettings		Používať názvy mesiacov/dní z preferovaného jazyka
 already chosen	LanguageListView		už zvolené
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nebolo možné nájsť dostupné jazyky! Nie je možné použiť tento konfiguračný nástroj.
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Aby sa táto zmena prejavila, je potrebné reštartovať Panel a Tracker. Chcete ich reštartovať teraz?
+Long format:	TimeFormatSettings		Dlhý formát:
+Currency	TimeFormatSettings		Mena
+Locale	System name		Locale
+Short format:	TimeFormatSettings		Krátky formát:
+Language	Locale Preflet Window		Jazyk
+Preferred languages	Locale Preflet Window		Preferované jazyky
+Use month/day-names from preferred language	TimeFormatSettings		Používať názvy mesiacov/dní z preferovaného jazyka
+Formatting	Locale Preflet Window		Formátovanie
+Locale	Locale Preflet Window		Locale
+Numbers	TimeFormatSettings		Čísla
+24 hour	TimeFormatSettings		24-hodinový
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Reštartovať
+Full format:	TimeFormatSettings		Plný formát:
+Defaults	Locale Preflet Window		Predvolené
+Cancel	Locale Preflet Window		Zrušiť
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Prekladať názvy aplikácií v Paneli a Trackeri.
+Revert	Locale Preflet Window		Vrátiť
+Medium format:	TimeFormatSettings		Stredný formát:
+12 hour	TimeFormatSettings		12-hodinový
+Time	TimeFormatSettings		Čas
+Date	TimeFormatSettings		Dátum
+Positive:	TimeFormatSettings		Kladné čísla:
+Locale	Locale Preflet		Locale
+Options	Locale Preflet Window		Možnosti

@@ -1,10 +1,10 @@
 1	russian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-(This team is a system component)	Team monitor		(Этот процесс является системным компонентом)
-Cancel	Team monitor		Отмена
-Force reboot	Team monitor		Перезагрузить насильно
-If the application will not quit you may have to kill it.	Team monitor		Если приложение не завершится, возможно вам понадобится убить его.
 Kill application	Team monitor		Убить приложение
 Quit application	Team monitor		Завершить приложение
-Restart the desktop	Team monitor		Перезапустить рабочий стол
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Для того, чтобы закрыть приложение выберите его из списка выше и нажмите на кнопку 'Убить приложение' или 'Завершить приложение'.\n\nЗажмите CONTROL+ALT+DELETE на %ld секунд для перезагрузки.
+If the application will not quit you may have to kill it.	Team monitor		Если приложение не завершится, возможно вам понадобится убить его.
+Force reboot	Team monitor		Перезагрузить насильно
 Team monitor	Team monitor		Монитор процессов
+(This team is a system component)	Team monitor		(Этот процесс является системным компонентом)
+Restart the desktop	Team monitor		Перезапустить рабочий стол
+Cancel	Team monitor		Отмена

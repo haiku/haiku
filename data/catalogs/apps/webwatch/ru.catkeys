@@ -1,6 +1,6 @@
 1	russian	x-vnd.mahlzeit.webwatch	1164039487
-About	WatchView		О программе
+WebWatch	System name		Веб часы
 OK	WatchView		ОК
 Quit	WatchView		Выход
-WebWatch	System name		Веб часы
+About	WatchView		О программе
 WebWatch %1\nAn internet time clock for your Deskbar\n\nCreated by Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nThanks to Jason Parks for his help.\n	WatchView		WebWatch %1\nИнтернет-часы для Deskbar\n\Разработал Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nСпасибо Jason Parks за его помощь.\n

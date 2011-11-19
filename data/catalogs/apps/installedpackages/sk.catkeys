@@ -1,8 +1,8 @@
 1	slovak	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Nainštalované balíky
 No package selected.	UninstallView		Nebol vybraný žiadny balík.
-OK	UninstallView		OK
-Package description	UninstallView		Popis balíka
 Remove	UninstallView		Odstrániť
+Package description	UninstallView		Popis balíka
+InstalledPackages	System name		Nainštalované balíky
 The package you selected has been successfully removed from your system.	UninstallView		Balík, ktorý ste vybrali bol úspešne odstránený z vášho systému.
+OK	UninstallView		OK
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný nebol odstránený z vášho systému. Dodané inštalačné informácie balíka mohli byť poškodené.

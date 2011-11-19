@@ -1,44 +1,43 @@
-1	russian	x-vnd.Be-PRNT	2065133853
-%.2f KB	JobListView		%.2f Кбайт
-1 pending job.	PrinterListView		1 задание в очереди.
-<pick one>	AddPrinterDialog		<выбрать>
-Add	AddPrinterDialog		Добавить
-Add printer	AddPrinterDialog		Добавить принтер
-Add …	PrintersWindow		Добавить…
-Black	TestPageView		Черный
-Blue	TestPageView		Синий
-Cancel	AddPrinterDialog		Отмена
-Cancel job	PrintersWindow		Отменить
-Completed	JobListView		Завершено
-Connected to:	AddPrinterDialog		Подключен к:
-Cyan	TestPageView		Циан
-Default Printer	PrinterListView		Принтер по умолчанию
-Driver: %driver%	PrinterListView		Драйвер: %driver%
-Failed	JobListView		Неудача
-Green	TestPageView		Зеленый
-Magenta	TestPageView		Маджента
-Make default	PrintersWindow		Сделать основным
-No pending jobs.	PrinterListView		Нет заданий в очереди
-No printer found!	TransportMenu		Принтер не найден!
-Print jobs for 	PrintersWindow		Задания печати для
-Print jobs: No printer selected	PrintersWindow		Принтер не выбран
-Print test page	PrintersWindow		Пробная страница
-Printer name:	AddPrinterDialog		Название принтера:
-Printer type:	AddPrinterDialog		Тип принтера:
+1	russian	x-vnd.Be-PRNT	2906062670
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
+Waiting	JobListView		Ожидание
+Print test page	PrintersWindow		Пробная страница
+Test Page	TestPageView		Тестовая страница
+Test Page	PrintersWindow		Пробная страница
+page	JobListView		страница
+Cancel	AddPrinterDialog		Отмена
+Add printer	AddPrinterDialog		Добавить принтер
+Green	TestPageView		Зеленый
 Printers	PrintersWindow		Принтеры
+Default Printer	PrinterListView		Принтер по умолчанию
+Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
+No pending jobs.	PrinterListView		Нет заданий в очереди
+pages	JobListView		страниц
 Printers	System name		Принтеры
 Processing	JobListView		Обрабатывается
 Red	TestPageView		Красный
-Remove	PrintersWindow		Удалить
+Printer name:	AddPrinterDialog		Название принтера:
+Driver: %driver%	PrinterListView		Драйвер: %driver%
+Black	TestPageView		Черный
 Restart job	PrintersWindow		Перезапустить
-Test Page	PrintersWindow		Пробная страница
-Test Page	TestPageView		Тестовая страница
-Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
+Add	AddPrinterDialog		Добавить
+Make default	PrintersWindow		Сделать основным
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
-Unknown status	JobListView		Состояние неизвестно
-Waiting	JobListView		Ожидание
+Cancel job	PrintersWindow		Отменить
 Yellow	TestPageView		Жёлтый
-page	JobListView		страница
-pages	JobListView		страниц
-pending jobs.	PrinterListView		заданий в очереди.
+Blue	TestPageView		Синий
+1 pending job.	PrinterListView		1 задание в очереди.
+Remove	PrintersWindow		Удалить
+<pick one>	AddPrinterDialog		<выбрать>
+Add …	PrintersWindow		Добавить…
+Print jobs for 	PrintersWindow		Задания печати для
+Failed	JobListView		Неудача
+%.2f KB	JobListView		%.2f Кбайт
+Magenta	TestPageView		Маджента
+Completed	JobListView		Завершено
+No printer found!	TransportMenu		Принтер не найден!
+Print jobs: No printer selected	PrintersWindow		Принтер не выбран
+Cyan	TestPageView		Циан
+Unknown status	JobListView		Состояние неизвестно
+Connected to:	AddPrinterDialog		Подключен к:
+Printer type:	AddPrinterDialog		Тип принтера:

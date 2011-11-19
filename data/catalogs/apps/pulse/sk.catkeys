@@ -1,48 +1,48 @@
 1	slovak	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nNapísal David Ramsey a Arve Hjønnevåg\nRevidoval Daniel Switkin\n
-About Pulse…	CPUButton		O aplikácii Pulse...
-About Pulse…	PulseView		O aplikácii Pulse...
-Active color	ConfigView		Aktívna farba
-Bar colors	ConfigView		Farby panelov
-CPU progress bar	NormalPulseView		Priebeh CPU
-Defaults	PrefsWindow		Predvolené
-Deskbar	CPUButton		Panel
-Deskbar menu	CPUButton		Menu Panelu
-Deskbar mode	MiniPulseView		Režim Panelu
-Deskbar mode	NormalPulseView		Režim Panelu
-Deskbar mode	PrefsWindow		Režim Panelu
-Error	PulseApp		Chyba
-Fade colors	ConfigView		Farebné prechody
-Frame color	ConfigView		Farba rámca
-Idle color	ConfigView		Farba pri nečinnosti
-Info	CPUButton		Info
-Info	DeskbarPulseView		Info
-Info	PulseApp		Info
-Info	PulseView		Info
-Installing in Deskbar failed\n%s	PulseApp		Inštalácia do Panelu zlyhala.\n%s
-Mini mode	DeskbarPulseView		Režim mini
-Mini mode	NormalPulseView		Režim mini
-Mini mode	PrefsWindow		Režim mini
-Normal mode	DeskbarPulseView		Nermálny režim
-Normal mode	MiniPulseView		Normálny režim
-Normal mode	PrefsWindow		Normálny režim
-OK	CPUButton		OK
-OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
-OK	PulseApp		OK
-OK	PulseView		OK
-Pulse	NormalPulseView		Pulse
-Pulse	PulseApp		Pulse
-Pulse	System name		Pulse
-Pulse settings	PulseWindow		Nastavenia Pulse
 Quit	DeskbarPulseView		Ukončiť
-Quit	MiniPulseView		Ukončiť
+Mini mode	DeskbarPulseView		Režim mini
 Remove replicant	CPUButton		Odstrániť  replikanta
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstránenie z Panelu zlyhalo.\n%s
-Settings…	PulseView		Nastavenia...
+Active color	ConfigView		Aktívna farba
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Pulse [--mini] [-w šírka] [--width=šírka]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Farebné prechody
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nNapísal David Ramsey a Arve Hjønnevåg\nRevidoval Daniel Switkin\n
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Režim Panelu
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Normálny režim
+Defaults	PrefsWindow		Predvolené
+Normal mode	MiniPulseView		Normálny režim
+Error	PulseApp		Chyba
+Info	PulseView		Info
+Deskbar	CPUButton		Panel
+Frame color	ConfigView		Farba rámca
+Mini mode	PrefsWindow		Režim mini
+OK	PulseApp		OK
+Bar colors	ConfigView		Farby panelov
+Settings…	PulseView		Nastavenia...
+You can't disable the last active CPU.	PulseView		Nemôžete vypnúť posledný aktívny CPU.
+Info	PulseApp		Info
+Info	CPUButton		Info
+OK	PulseView		OK
+Deskbar menu	CPUButton		Menu Panelu
+About Pulse…	PulseView		O aplikácii Pulse...
+Deskbar mode	MiniPulseView		Režim Panelu
+Quit	MiniPulseView		Ukončiť
+Pulse	System name		Pulse
+Pulse	NormalPulseView		Pulse
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Režim Panelu
+Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		Šírka ikony:
 You can't disable the last active CPU.	CPUButton		Nemôžete vypnúť posledný aktívny CPU.
-You can't disable the last active CPU.	PulseView		Nemôžete vypnúť posledný aktívny CPU.
+Normal mode	DeskbarPulseView		Nermálny režim
+OK	CPUButton		OK
+About Pulse…	CPUButton		O aplikácii Pulse...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstránenie z Panelu zlyhalo.\n%s
+Mini mode	NormalPulseView		Režim mini
+Info	DeskbarPulseView		Info
+Pulse settings	PulseWindow		Nastavenia Pulse
+Idle color	ConfigView		Farba pri nečinnosti
+Installing in Deskbar failed\n%s	PulseApp		Inštalácia do Panelu zlyhala.\n%s
+CPU progress bar	NormalPulseView		Priebeh CPU
