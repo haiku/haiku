@@ -1,8 +1,13 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems btrfs ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers libs zlib ] ;
+
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 UsePrivateKernelHeaders ;
+SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs zlib ] ;
 
 KernelAddon btrfs :
 	kernel_interface.cpp
@@ -14,4 +19,11 @@ KernelAddon btrfs :
 	DirectoryIterator.cpp
 	Inode.cpp
 	Volume.cpp
+
+	inflate.c
+	inffast.c
+	inftrees.c
+	adler32.c
+	crc32.c
+	zutil.c
 ;
