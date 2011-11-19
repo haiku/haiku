@@ -30,9 +30,8 @@ some specific examples:
 - Likewise, you'll find \c support/byteorder.h and \c support/ByteOrder.h
   in BeOS; Haiku only has ByteOrder.h.
 - If you have subclassed BString and if you are using its \c _privateData
-  member, you might notice that it has been renamed to
-  \link BString::fPrivateData fPrivateData \endlink. However, it's use is
-  deprecated, and it might even be made private in the future.
+  member, you might notice that it is no longer mentioned in the documentation.
+  This is because it has been marked as private.
 - The undocumented functions defined in Alias.h from the storage kit are not
   implemented.
 - The private Device Map API (used by OpenTracker) has been replaced by a
