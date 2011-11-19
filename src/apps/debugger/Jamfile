@@ -200,8 +200,10 @@ Application Debugger :
 	VariablesView.cpp
 
 	# user_interface/gui/util
+	GUISettingsUtils.cpp
 	SettingsMenu.cpp
 	TargetAddressTableColumn.cpp
+
 
 	# user_interface/gui/value
 	TableCellBoolRenderer.cpp
