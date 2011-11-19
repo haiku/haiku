@@ -144,13 +144,6 @@ private:
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
 
-			void				_LoadSplitSettings(BSplitView* view,
-									const char* name,
-									const GUITeamUISettings* settings);
-			status_t			_SaveSplitSettings(BSplitView* view,
-									const char* name,
-									GUITeamUISettings* settings);
-
 			status_t			_SaveInspectorSettings(
 									const BMessage* settings);
 private:

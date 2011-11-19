@@ -30,6 +30,7 @@
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "FileSourceCode.h"
+#include "GUISettingsUtils.h"
 #include "GUITeamUISettings.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
@@ -361,10 +362,14 @@ TeamWindow::LoadSettings(const GUITeamUISettings* settings)
 		MoveTo(rect.left, rect.top);
 	}
 
-	_LoadSplitSettings(fSourceSplitView, "Source", settings);
-	_LoadSplitSettings(fFunctionSplitView, "Function", settings);
-	_LoadSplitSettings(fImageSplitView, "Image", settings);
-	_LoadSplitSettings(fThreadSplitView, "Thread", settings);
+	GUISettingsUtils::UnarchiveSplitView(Name(), "Source", settings,
+		fSourceSplitView);
+	GUISettingsUtils::UnarchiveSplitView(Name(), "Function", settings,
+		fFunctionSplitView);
+	GUISettingsUtils::UnarchiveSplitView(Name(), "Image", settings,
+		fImageSplitView);
+	GUISettingsUtils::UnarchiveSplitView(Name(), "Thread", settings,
+		fThreadSplitView);
 
 	fUISettings = *settings;
 
@@ -399,16 +404,20 @@ TeamWindow::SaveSettings(GUITeamUISettings* settings)
 	if (!settings->SetValue("teamWindowFrame", Frame()))
 		return B_NO_MEMORY;
 
-	if (_SaveSplitSettings(fSourceSplitView, "Source", settings) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(Name(), "Source",
+		settings, fSourceSplitView) != B_OK)
 		return B_NO_MEMORY;
 
-	if (_SaveSplitSettings(fFunctionSplitView, "Function", settings) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(Name(), "Function",
+		settings, fFunctionSplitView) != B_OK)
 		return B_NO_MEMORY;
 
-	if (_SaveSplitSettings(fImageSplitView, "Image", settings) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(Name(), "Image",
+		settings, fImageSplitView) != B_OK)
 		return B_NO_MEMORY;
 
-	if (_SaveSplitSettings(fThreadSplitView, "Thread", settings) != B_OK)
+	if (GUISettingsUtils::ArchiveSplitView(Name(), "Thread",
+		settings, fThreadSplitView) != B_OK)
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -1171,51 +1180,6 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
 		}
 	}
-}
-
-
-void
-TeamWindow::_LoadSplitSettings(BSplitView* view, const char* name,
-	const GUITeamUISettings* settings)
-{
-	BString settingName;
-	BVariant value;
-
-	for (int32 i = 0; i < view->CountItems(); i++) {
-		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
-		status_t error = settings->Value(settingName.String(), value);
-		if (error == B_OK) {
-			view->SetItemWeight(i, value.ToFloat(),
-				i == view->CountItems() - 1);
-		}
-
-		settingName.SetToFormat("teamWindow%sCollapsed%d", name, i);
-		error = settings->Value(settingName.String(), value);
-		if (error == B_OK)
-			view->SetItemCollapsed(i, value.ToBool());
-	}
-}
-
-
-status_t
-TeamWindow::_SaveSplitSettings(BSplitView* view, const char* name,
-	GUITeamUISettings* settings)
-{
-	BString settingName;
-
-	for (int32 i = 0; i < view->CountItems(); i++) {
-		settingName.SetToFormat("teamWindow%sSplit%d", name, i);
-		if (!settings->SetValue(settingName.String(),
-			view->ItemWeight(i)))
-			return B_NO_MEMORY;
-
-		settingName.SetToFormat("teamWindow%sCollapsed%d", name, i);
-		if (!settings->SetValue(settingName.String(), 
-			view->IsItemCollapsed(i)))
-			return B_NO_MEMORY;
-	}
-
-	return B_OK;
 }
 
 
