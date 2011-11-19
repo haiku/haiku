@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Keymap	1259868356
+1	german	x-vnd.Haiku-Keymap	3428686297
 (Current)	Keymap window		(Aktiv)
 Acute trigger	Keymap window		´ Akut
 Circumflex trigger	Keymap window		^ Zirkumflex
@@ -14,6 +14,7 @@ Revert	Keymap window		Anfangswerte
 Sample and clipboard:	Keymap window		Tastenausgabe:
 Save as…	Keymap window		Speichern unter…
 Select dead keys	Keymap window		Auslösetasten definieren
+Set Modifier Keys…	Keymap window		Hilfstasten zuordnen...
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus

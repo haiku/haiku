@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-POST	2865617627
+1	german	x-vnd.Be-POST	2300302075
 %num new message	DeskbarView		%num neue Nachricht
 %num new message for %name\n	MailDaemon		%num neue Nachricht für %name\n
 %num new message.	MailDaemon		%num neue Nachricht.
@@ -10,9 +10,9 @@ Check for mail now	DeskbarView		E-Mails jetzt abrufen
 Check for mails only	DeskbarView		E-Mails nur abrufen für
 Create new message…	DeskbarView		Nachricht verfassen…
 Fetching mail for %name	Notifier		E-Mails für %name abrufen
-Mail Status	Notifier		Email-Status
 Mail daemon status log	MailDaemon		E-Mail-Dienst Statusmeldungen
 Mail status	MailDaemon		E-Mail-Status
+Mail status	Notifier		Email-Status
 New Messages	MailDaemon		Neue Nachrichten
 No new messages	DeskbarView		Keine neuen Nachrichten
 No new messages	MailDaemon		Keine neuen Nachrichten

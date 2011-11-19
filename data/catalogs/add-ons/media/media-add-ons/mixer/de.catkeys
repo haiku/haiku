@@ -1,1 +1,27 @@
-1	german	x-vnd.Haiku-mixer.media_addon	0
+1	german	x-vnd.Haiku-mixer.media_addon	3450667169
+Allow input channel remapping	AudioMixer		Neuzuordnung der Eingangskanäle erlauben
+Allow output channel remapping	AudioMixer		Neuzuordnung der Ausgangskanäle erlauben
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Mixerausgabe um 3dB dämpfen (wie BeOS R5)
+Display balance control for stereo connections	AudioMixer		Balance-Regler für Stereo-Anschlüsse anzeigen 
+Drop/repeat samples	AudioMixer		Samples auslassen/wiederholen
+Gain	AudioMixer		Verstärkung
+Gain controls	AudioMixer		Lautstärke
+Input channel destinations	AudioMixer		Eingangskanalziele
+Input gain controls represent	AudioMixer		Regler für Eingangslautstärke sind 
+Input mapping	AudioMixer		Eingangs-Zuordnung
+Linear interpolation	AudioMixer		Lineare Interpolation
+Master output	AudioMixer		Master-Ausgang
+Mute	AudioMixer		Stumm
+Output channel sources	AudioMixer		Ausgangskanalquellen
+Output mapping	AudioMixer		Ausgangs-Zuordnung
+Physical input channels	AudioMixer		Physische Eingangskanäle
+Refuse input format changes	AudioMixer		Änderungen des Eingangsformats verhindern
+Refuse output format changes	AudioMixer		Änderungen des Ausgabeformats verhindern
+Resampling algorithm	AudioMixer		Resample-Algorithmus
+Setup	AudioMixer		Einstellungen
+To master	AudioMixer		Zum Master
+To output	AudioMixer		Zum Ausgang
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Nicht-lineare Lautstärkeregler (wie BeOS R5)
+Virtual output channels	AudioMixer		Virtuelle Ausgangskanäle
+dB	AudioMixer		dB
+not connected	AudioMixer		nicht verbunden
