@@ -30,10 +30,10 @@ public:
 	virtual	status_t			WriteTo(BMessage& archive) const;
 	virtual TeamUISettings*		Clone() const;
 
-			bool				SetValue(const char* settingID,
-									const BVariant& value);
-			status_t			Value(const char* settingID,
-									BVariant& value) const;
+			bool				AddSettings(const char* settingID,
+									const BMessage& data);
+			status_t			Settings(const char* settingID,
+									BMessage& data) const;
 
 			const BMessage&		Values() const;
 

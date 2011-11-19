@@ -97,18 +97,18 @@ GUITeamUISettings::Clone() const
 
 
 bool
-GUITeamUISettings::SetValue(const char* settingID, const BVariant& value)
+GUITeamUISettings::AddSettings(const char* settingID, const BMessage& data)
 {
 	fValues.RemoveName(settingID);
 
-	return value.AddToMessage(fValues, settingID) == B_OK;
+	return fValues.AddMessage(settingID, &data) == B_OK;
 }
 
 
 status_t
-GUITeamUISettings::Value(const char* settingID, BVariant &value) const
+GUITeamUISettings::Settings(const char* settingID, BMessage &data) const
 {
-	return value.SetFromMessage(fValues, settingID);
+	return fValues.FindMessage(settingID, &data);
 }
 
 
