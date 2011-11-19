@@ -6,28 +6,21 @@
 
 #include "GUISettingsUtils.h"
 
-
+#include <Message.h>
 #include <SplitView.h>
 
-#include "GUITeamUISettings.h"
 #include "table/AbstractTable.h"
 
 
 /*static*/ status_t
-GUISettingsUtils::ArchiveSplitView(const char* sourceName,
-	const char* viewName, GUITeamUISettings* settings, BSplitView* view)
+GUISettingsUtils::ArchiveSplitView(BMessage& settings, BSplitView* view)
 {
-	BString settingName;
-
+	settings.MakeEmpty();
 	for (int32 i = 0; i < view->CountItems(); i++) {
-		settingName.SetToFormat("%s%sSplit%d", sourceName, viewName, i);
-		if (!settings->SetValue(settingName.String(),
-			view->ItemWeight(i)))
+		if (settings.AddFloat("weight", view->ItemWeight(i)) != B_OK)
 			return B_NO_MEMORY;
 
-		settingName.SetToFormat("%s%sCollapsed%d", sourceName, viewName, i);
-		if (!settings->SetValue(settingName.String(),
-			view->IsItemCollapsed(i)))
+		if (settings.AddFloat("collapsed", view->IsItemCollapsed(i)) != B_OK)
 			return B_NO_MEMORY;
 	}
 
@@ -36,54 +29,37 @@ GUISettingsUtils::ArchiveSplitView(const char* sourceName,
 
 
 /*static*/ void
-GUISettingsUtils::UnarchiveSplitView(const char* sourceName,
-	const char* viewName, const GUITeamUISettings* settings, BSplitView* view)
+GUISettingsUtils::UnarchiveSplitView(const BMessage& settings,
+	BSplitView* view)
 {
-	BString settingName;
-	BVariant value;
-
 	for (int32 i = 0; i < view->CountItems(); i++) {
-		settingName.SetToFormat("%s%sSplit%d", sourceName, viewName, i);
-		status_t error = settings->Value(settingName.String(), value);
-		if (error == B_OK) {
-			view->SetItemWeight(i, value.ToFloat(),
-				i == view->CountItems() - 1);
-		}
+		float weight;
+		if (settings.FindFloat("weight", i, &weight) == B_OK)
+			view->SetItemWeight(i, weight, i == view->CountItems() - 1);
 
-		settingName.SetToFormat("%s%sCollapsed%d", sourceName, viewName, i);
-		error = settings->Value(settingName.String(), value);
-		if (error == B_OK)
-			view->SetItemCollapsed(i, value.ToBool());
+		bool collapsed;
+		if (settings.FindBool("collapsed", i, &collapsed) == B_OK)
+			view->SetItemCollapsed(i, collapsed);
 	}
 }
 
 
 /*static*/ status_t
-GUISettingsUtils::ArchiveTableSettings(const char* sourceName,
-	const char* viewName, GUITeamUISettings* settings, AbstractTable* table)
+GUISettingsUtils::ArchiveTableSettings(BMessage& settings,
+	AbstractTable* table)
 {
-	BString settingName;
-	BMessage data;
-
-	settingName.SetToFormat("%s%sTable", sourceName, viewName);
-	table->SaveState(&data);
-	if (!settings->AddSettings(settingName.String(), data))
-		return B_NO_MEMORY;
+	settings.MakeEmpty();
+	table->SaveState(&settings);
 
 	return B_OK;
 }
 
 
 /*static*/ void
-GUISettingsUtils::UnarchiveTableSettings(const char* sourceName,
-	const char* viewName, const GUITeamUISettings* settings,
+GUISettingsUtils::UnarchiveTableSettings(const BMessage& settings,
 	AbstractTable* table)
 {
-	BString settingName;
-	BMessage data;
-
-	settingName.SetToFormat("%s%sTable", sourceName, viewName);
-	if (settings->Settings(settingName.String(), data) == B_OK)
-		table->LoadState(&data);
+	BMessage settingsCopy(settings);
+	table->LoadState(&settingsCopy);
 }
 

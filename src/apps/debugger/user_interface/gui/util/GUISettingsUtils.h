@@ -10,31 +10,24 @@
 
 
 class AbstractTable;
+class BMessage;
 class BSplitView;
-class GUITeamUISettings;
 
 
 class GUISettingsUtils
 {
 public:
 
-	static 	status_t			ArchiveSplitView(const char* sourceName,
-									const char* viewName,
-									GUITeamUISettings* settings,
+	static 	status_t			ArchiveSplitView(BMessage& settings,
 									BSplitView* view);
-	static 	void				UnarchiveSplitView(const char* sourceName,
-									const char* viewName,
-									const GUITeamUISettings* settings,
+	static 	void				UnarchiveSplitView(const BMessage& settings,
 									BSplitView* view);
 
-	static	status_t			ArchiveTableSettings(const char* sourceName,
-									const char* viewName,
-									GUITeamUISettings* settings,
+	static	status_t			ArchiveTableSettings(BMessage& settings,
 									AbstractTable* table);
 
-	static	void				UnarchiveTableSettings(const char* sourceName,
-									const char* viewName,
-									const GUITeamUISettings* settings,
+	static	void				UnarchiveTableSettings(
+									const BMessage& settings,
 									AbstractTable* table);
 
 
