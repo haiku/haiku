@@ -10,6 +10,8 @@
 #include <SplitView.h>
 
 #include "GUITeamUISettings.h"
+#include "table/AbstractTable.h"
+
 
 /*static*/ status_t
 GUISettingsUtils::ArchiveSplitView(const char* sourceName,
@@ -54,3 +56,34 @@ GUISettingsUtils::UnarchiveSplitView(const char* sourceName,
 			view->SetItemCollapsed(i, value.ToBool());
 	}
 }
+
+
+/*static*/ status_t
+GUISettingsUtils::ArchiveTableSettings(const char* sourceName,
+	const char* viewName, GUITeamUISettings* settings, AbstractTable* table)
+{
+	BString settingName;
+	BMessage data;
+
+	settingName.SetToFormat("%s%sTable", sourceName, viewName);
+	table->SaveState(&data);
+	if (!settings->AddSettings(settingName.String(), data))
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+/*static*/ void
+GUISettingsUtils::UnarchiveTableSettings(const char* sourceName,
+	const char* viewName, const GUITeamUISettings* settings,
+	AbstractTable* table)
+{
+	BString settingName;
+	BMessage data;
+
+	settingName.SetToFormat("%s%sTable", sourceName, viewName);
+	if (settings->Settings(settingName.String(), data) == B_OK)
+		table->LoadState(&data);
+}
+

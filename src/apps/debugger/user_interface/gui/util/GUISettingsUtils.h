@@ -9,6 +9,7 @@
 #include <SupportDefs.h>
 
 
+class AbstractTable;
 class BSplitView;
 class GUITeamUISettings;
 
@@ -25,6 +26,18 @@ public:
 									const char* viewName,
 									const GUITeamUISettings* settings,
 									BSplitView* view);
+
+	static	status_t			ArchiveTableSettings(const char* sourceName,
+									const char* viewName,
+									GUITeamUISettings* settings,
+									AbstractTable* table);
+
+	static	void				UnarchiveTableSettings(const char* sourceName,
+									const char* viewName,
+									const GUITeamUISettings* settings,
+									AbstractTable* table);
+
+
 };
 
 
