@@ -486,9 +486,11 @@ radeon_gpu_mc_setup()
 	TRACE("%s: vramStart: 0x%" B_PRIX64 ", vramEnd: 0x%" B_PRIX64 "\n",
 		__func__, gInfo->fb.vramStart, gInfo->fb.vramEnd);
 
-	if (info.chipsetID >= RADEON_CEDAR)
+	if (info.chipsetID >= RADEON_CAYMAN)
+		return radeon_gpu_mc_setup_evergreen();	// also for ni
+	else if (info.chipsetID >= RADEON_CEDAR)
 		return radeon_gpu_mc_setup_evergreen();
-	if (info.chipsetID >= RADEON_RV770)
+	else if (info.chipsetID >= RADEON_RV770)
 		return radeon_gpu_mc_setup_r700();
 	else if (info.chipsetID >= RADEON_R600)
 		return radeon_gpu_mc_setup_r600();
