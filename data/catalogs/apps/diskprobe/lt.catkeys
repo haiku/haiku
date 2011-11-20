@@ -1,0 +1,102 @@
+1	lithuanian	x-vnd.Haiku-DiskProbe	1536869925
+%ld (native)	ProbeView		%ld (prigimtinis)
+15 bit	TypeEditors		15 bitų
+16 bit	TypeEditors		16 bitų
+16 bit signed value:	TypeEditors		16 bitų reikšmė su ženklu:
+16 bit unsigned value:	TypeEditors		16 bitų reikšmė be ženklo:
+32 bit size or status:	TypeEditors		32 bitų dydis arba būsena:
+32 bit unsigned pointer:	TypeEditors		32 bitų rodyklė be ženklo:
+32 bit unsigned size:	TypeEditors		32 bitų dydis be ženklo:
+32 bit unsigned value:	TypeEditors		32 bitų reikšmė be ženklo:
+64 bit signed offset:	TypeEditors		64 bitų poslinkis su ženklu:
+64 bit signed value:	TypeEditors		64 bitų reikšmė su ženklu: 
+64 bit unsigned value:	TypeEditors		64 bitų reikšmė be ženklo:
+8 bit palette	TypeEditors		8 bitų paletė
+8 bit signed value:	TypeEditors		8 bitų skaičius su ženklu:
+8 bit unsigned value:	TypeEditors		8 bitų reikšmė be ženklo:
+Add	ProbeView		Pridėti
+Attribute	AttributeWindow		Požymis
+Attribute	ProbeView		Požymis
+Attribute offset: 	ProbeView		Poslinkis požymyje:
+Attribute type: 	ProbeView		Požymio tipas: 
+Attribute: 	ProbeView		Požymis:
+Attributes	ProbeView		Požymiai
+Back	ProbeView		Grįžti atgal
+Block	ProbeView		Blokas
+Block %Ld (0x%Lx)	ProbeView		%Ld blokas (0x%Lx)
+Block 0x%Lx	ProbeView		Blokas 0x%Lx
+Block: 	ProbeView		Blokas:
+Bookmarks	ProbeView		Žymelės
+Boolean value:	TypeEditors		Loginė reikšmė:
+Cancel	AttributeWindow		Atsisakyti
+Cancel	OpenWindow		Atsisakyti
+Cancel	ProbeView		Atsisakyti
+Case sensitive	FindWindow		Paisyti raidžių registro
+Close	AttributeWindow		Užverti
+Close	FileWindow		Užverti
+Close	ProbeView		Užverti
+Copy	ProbeView		Kopijuoti
+Could not find search string.	ProbeView		Ieškotos sekos rasti nepavyko.
+Could not open file \"%s\": %s\n	DiskProbe		Failo „%s“ atverti nepavyko: %s\n
+Device	ProbeView		Įrenginys
+Device offset: 	ProbeView		Poslinkis įrenginyje: 
+Device: 	ProbeView		Įrenginys: 
+DiskProbe request	AttributeWindow		„DiskProbe“ užklausa
+DiskProbe request	ProbeView		„DiskProbe“ užklausa
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ar tikrai norite pašalinti požymį „%s“ iš failo „%s“?\n\nŠis veiksmas negrįžtamas.
+Don't save	ProbeView		Neįrašyti
+Double precision floating-point value:	TypeEditors		Dvigubo tikslumo slankaus kablelio reikšmė:
+Edit	ProbeView		Taisa
+Examine device:	OpenWindow		Tirti įrenginį:
+File	FileWindow		Failas
+File	ProbeView		Failas
+File offset: 	ProbeView		Poslinkis faile: 
+File: 	ProbeView		Failas:
+Find	FindWindow		Ieškoti
+Find again	ProbeView		Ieškoti toliau
+Find…	ProbeView		Ieškoti…
+Flattened bitmap	TypeEditors		Suplotas paveikslėlis
+Floating-point value:	TypeEditors		Slankiojo kablelio reikšmė:
+Font size	ProbeView		Šrifto dydis
+Icon	TypeEditors		Piktograma
+Icon view	TypeEditors		Piktogramos peržiūra
+MIME type editor	TypeEditors		MIME tipo redaktorius
+MIME type:	TypeEditors		MIME tipas:
+Message View	TypeEditors		Pranešimo rodymas
+Mode:	FindWindow		Veiksena:
+Native: %Ld (0x%0*Lx)	ProbeView		Prigimtinė reikšmė: %Ld (0x%0*Lx)
+Native: 0x%0*Lx	ProbeView		Prigimtinė reikšmė: 0x%0*Lx
+New…	FileWindow		Naujas langas…
+Next	ProbeView		Kitas
+No type editor available	AttributeWindow		Nėra šio tipo požymių redaktoriaus
+Number editor	TypeEditors		Skaičiaus taisymas
+Number:	TypeEditors		Skaičius:
+OK	DiskProbe		Gerai
+OK	ProbeView		Gerai
+Offset: 	ProbeView		Poslinkis:
+Open device	FileWindow		Atverti įrenginį
+Open file…	FileWindow		Atverti failą…
+PNG format	TypeEditors		PNG formatas
+Page setup…	ProbeView		Puslapio nuostatos…
+Paste	ProbeView		Įdėti
+Previous	ProbeView		Ankstesnis
+Print…	ProbeView		Spausdinti…
+Probe device	OpenWindow		Tirti įrenginį
+Probe file…	OpenWindow		Tirti failą…
+Quit	FileWindow		Baigti darbą
+Raw editor	AttributeWindow		Neapdorotų duomenų redaktorius
+Redo	ProbeView		Atstatyti
+Remove	AttributeWindow		Pašalinti
+Remove from file	AttributeWindow		Pašalinti iš failo
+Save	ProbeView		Įrašyti
+Save changes before closing?	ProbeView		Ar įrašyti pakeitimus prieš užveriant?
+Select all	ProbeView		Pažymėti viską
+Selection	ProbeView		Atranka
+Swapped: %Ld (0x%0*Lx)	ProbeView		Sukeitus baitų eiliškumą: %Ld (0x%0*Lx)
+Text	FindWindow		Tekstas
+Type editor	AttributeWindow		Požymio redaktorius
+Type editor not supported	ProbeView		Šio tipo požymių redaktorius nepalaikomas
+Undo	ProbeView		Atšaukti
+Unknown format	TypeEditors		Formatas nežinomas
+Unknown type	TypeEditors		Nežinomas tipas
+of 	ProbeView		iš

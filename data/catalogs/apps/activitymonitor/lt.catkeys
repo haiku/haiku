@@ -1,0 +1,17 @@
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	3249630817
+Additional items	ActivityView		Papildomi elementai
+Apps	DataSource		Programos
+CPU	DataSource		Centrinis procesorius
+CPU usage	DataSource		Centrinio procesoriaus apkrova
+File	ActivityWindow		Failas
+MB	DataSource		MB
+Memory	DataSource		Atmintis
+Network send	DataSource		Išsiunčiami duomenys
+Quit	ActivityWindow		Išeiti
+RX	DataSource	Shorter version for Receiving.	Ats.
+Receiving	DataSource		Atsiunčiami duomenys
+Running applications	DataSource		Veikiančios programos
+Sending	DataSource		Išsiuntimas
+Settings	ActivityWindow		Nuostatos
+TX	DataSource	Shorter version for Sending	Išs.
+Used memory	DataSource		Naudojama atmintis
