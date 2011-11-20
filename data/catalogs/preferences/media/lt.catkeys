@@ -1,34 +1,30 @@
-1	lithuanian	x-vnd.Haiku-Media	2505372198
-Show volume control on Deskbar	Media views		Rodyti garso valdiklį Deskbare
-Audio input:	Media views		Garso įėjimas:
-Restarting media services\nStarting media server…\n	Media Window		Perleidžiamos medija tarnybos (serveriai)\nPaleidžiama medija tarnyba…\n
-Video input:	Media views		Vaizdo įėjimas:
-Waiting for media_server to quit.	Media Window		Laikiama medija tarnybos išsijungimo.
-Defaults	Media views		Numatytieji mazgai
-Stopping media server…	Media Window		Stabdoma medija tarnyba…
-Video output:	Media views		Vaizdo išėjimas:
-Enable real-time audio	Media views		Tikralaikis garsas
-Quit	Media Window		Baigti
-OK	Media Window		Gerai
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Tikralaikio vaizdo įjungimas leidžia sistemai atlikti veiksmus su vaizdu kiek įmanoma sklandžiau. Tam išnaudojant daugiau kompiuterio atminties.\n\nĮjunkitę šią ypatybę, jei jums reikia mažesnės vaizdo delsos.
-Default nodes	Media views		Numatytieji mazgai
-Starting media server…	Media Window		Paleidžiama medija tarnyba…
-Restart the media server to apply changes.	Media views		Pakeitimų įsigaliojimui perleiskite medija tarnybą.
-Done shutting down.	Media Window		Išjungta.
-Cleaning up.	Media Window		Valymas.
-Telling media_addon_server to quit.	Media Window		Išjungiama medija priedėlių tarnyba.
-Enable real-time video	Media views		Tikralaikis vaizdas
-This hardware has no controls.	Media Window		Nederinama įranga.
-Restarting media services\nShutting down media server\n	Media Window		Perleidžiamos medija tarnybos\nIšjungiamos medija tarnybos\n
-Audio output:	Media views		Garso išėjimas:
-Start media server	Media Window		Medija tarnyos paleistis
-Audio settings	Media Window		Garso nustatymai
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Neprisijungiama prie medija tarnybos.\nGal ją reikia paleisti?
-Ready for use…	Media Window		Parengiama…
-Real-time	Media views		Tikralaikis
-Restart media services	Media views		Perkrauti medija tarnybas
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Tikralaikio garso įjungimas leidžia sistemai atlikti veiksmus su garsu kiek įmanoma sklandžiau. Tam išnaudojant daugiau kompiuterio atminties.\n\nĮjunkitę šią ypatybę, jei jums reikia mažesnės garso delsos.
-Couldn't remove volume control in Deskbar: %s\n	Media Window		Garso valdiklio pašalinimas iš deskbaro negalimas : %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Garso valdiklio įdėjimas deskbaran negalimas: %s\n
-Media	Media Window		Garsas ir vaizdas
+1	lithuanian	x-vnd.Haiku-Media	1473363280
+<none>	Media views		<joks>
+Audio input:	Media views		Garso įvestis:
+Audio mixer	Media Window		Garsų maišiklis
+Audio output:	Media views		Garso išvestis:
+Audio settings	Media Window		Garso nuostatos
 Channel:	Media views		Kanalas:
+Cleaning up.	Media Window		Apsitvarkoma.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepavyko prisijungti prie įvairialypės terpės tarnybos.\nAr norite, kad ji būtų paleista?
+Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pridėti į pranešimų sritį: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pašalinti iš pranešimų srities: %s\n
+Defaults	Media views		Numatytai
+Done shutting down.	Media Window		Išjungta.
+Media	System name		Įvairialypė terpė
+OK	Media Window		Gerai
+Quit	Media Window		Baigti darbą
+Ready for use…	Media Window		Parengiama…
+Restart media services	Media views		Perleisti įvairialypės terpės tarnybas
+Restarting media services\nShutting down media server\n	Media Window		Perleidžiamos įvairialypės terpės tarnybos\nIšjungiama įvairialypės terpės tarnyba\n
+Restarting media services\nStarting media server…\n	Media Window		Perleidžiamos įvairialypės terpės tarnybos\nPaleidžiama įvairialypės terpės tarnyba…\n
+Show volume control on Deskbar	Media views		Rodyti garso valdiklį pranešimų srityje
+Start media server	Media Window		Paleisti įvairialypės terpės tarnybą
+Starting media server…	Media Window		Paleidžiama įvairialypės terpės tarnyba…
+Stopping media server…	Media Window		Stabdoma įvairialypės terpės tarnyba…
+Telling media_addon_server to quit.	Media Window		Išjungiama įvairialypės terpės papildinių tarnyba.
+This hardware has no controls.	Media Window		Ši aparatinė įranga nederinama.
+Video input:	Media views		Vaizdo įvestis:
+Video output:	Media views		Vaizdo išvestis:
+Video settings	Media Window		Vaizdo nuostatos
+Waiting for media_server to quit.	Media Window		Laikiama, kol įvairialypės terpės tarnyba baigs darbą.

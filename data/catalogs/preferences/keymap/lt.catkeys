@@ -1,22 +1,23 @@
-1	lithuanian	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Riestinis
-Grave trigger	Keymap window		Kairinis
-Select dead keys	Keymap window		Kombinaciniai klavišai
-Quit	Keymap window		Baigti
-Circumflex trigger	Keymap window		Stogelis
-Diaeresis trigger	Keymap window		Trema
-Open…	Keymap window		Atidaryti…
-System:	Keymap window		Sisteminės:
-Switch shortcut keys	Keymap window		Derinių klavišai
-User:	Keymap window		Vartotojo:
-Switch shortcut keys to Haiku mode	Keymap window		Naudoti derinių klavišus kaip Haiku
-Keymap	Keymap window		Klaviatūros išdėstymas
-Sample and clipboard:	Keymap window		Pavyzdys ir iškarpa:
-Layout	Keymap window		Išdėstymas
-Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti derinių klavišus kaip Windows/Linux
-Revert	Keymap window		Grįžti
-Save as…	Keymap window		Išsaugoti kaip…
-File	Keymap window		Byla
+1	lithuanian	x-vnd.Haiku-Keymap	3428686297
 (Current)	Keymap window		(Esamas)
-Font	Keymap window		Rašmenys
-Acute trigger	Keymap window		Dešininis
+Acute trigger	Keymap window		Dešininis kirtis (akūtas)
+Circumflex trigger	Keymap window		Stogelis
+Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
+File	Keymap window		Failas
+Font	Keymap window		Šriftas
+Grave trigger	Keymap window		Kairinis kirtis (gravis)
+Keymap	System name		Klavišų išdėstymas
+Layout	Keymap window		Klaviatūra
+Open…	Keymap window		Atverti…
+Quit	Keymap window		Baigti darbą
+Revert	Keymap window		Grįžti
+Sample and clipboard:	Keymap window		Pavyzdys ir iškarpa:
+Save as…	Keymap window		Įrašyti kaip…
+Select dead keys	Keymap window		Kombinaciniai klavišai
+Set Modifier Keys…	Keymap window		Keisti valdymo klavišus…
+Switch shortcut keys	Keymap window		Keisti valdymo klavišus
+Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
+Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
+System:	Keymap window		Sisteminiai išdėstymai:
+Tilde trigger	Keymap window		Riestinis kirtis (tildė)
+User:	Keymap window		Naudotojo:

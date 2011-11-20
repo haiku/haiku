@@ -1,13 +1,20 @@
-1	lithuanian	x-vnd.Be-TSKB	3232664655
+1	lithuanian	x-vnd.Be-TSKB	1669813373
 <Be folder is empty>	BeMenu		<Meniu aplankas tuščias>
+About Haiku	BeMenu		Apie „Haiku“
+About this system	BeMenu		Apie šią sistemą
 Always on top	PreferencesWindow		Visuomet viršuje
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
 Applications	PreferencesWindow		Programos
+Auto-hide	PreferencesWindow		Automatiškai slėpti
 Auto-raise	PreferencesWindow		Automatiškai iškilti
 Change time…	TimeView		Keisti laiką…
 Clock	PreferencesWindow		Laikrodis
 Close all	WindowMenu		Užverti visus
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Pavyzdžiai
+Deskbar	System name		Užduočių juosta
 Deskbar preferences	PreferencesWindow		Užduočių juostos parinktys
 Deskbar preferences…	BeMenu		Užduočių juostos parinktys…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Pagalbinės programėlės
 Edit menu…	PreferencesWindow		Taisyti meniu…
 Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
 Find…	BeMenu		Ieškoti…
@@ -17,6 +24,7 @@ Menu	PreferencesWindow		Meniu
 Mount	BeMenu		Prijungti diską
 No windows	WindowMenu		Langų nėra
 Power off	BeMenu		Išjungti
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nuostatos
 Quit application	WindowMenu		Užbaigti programos darbą
 Recent applications	BeMenu		Paskiausiai leistos programos
 Recent applications:	PreferencesWindow		Paskiausios programos:
@@ -34,5 +42,6 @@ Show replicants	BeMenu		Rodyti integravimo rankenėles
 Show seconds	PreferencesWindow		Rodyti sekundes
 Shutdown…	BeMenu		Kompiuterio išjungimas…
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
+Suspend	BeMenu		Pristabdyti
 Tracker always first	PreferencesWindow		„Tracker“ rikiuoti pradžioje
 Window	PreferencesWindow		Langas

@@ -1,40 +1,62 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	2416957986
-Browse	Menus		Naršyti
+1	lithuanian	x-vnd.Haiku-ShowImage	886873119
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sek.
+Browse	Menus		Naršymas
 Cancel	ClosePrompt		Atsisakyti
-Close	ClosePrompt		Uždaryti
-Close document	ClosePrompt		Uždaryti dokumentą
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Paveikslėlis neatidaromas! Trūksta pačios bylos, arba transliatoriaus jai.
-DPI:	PrintOptionsWindow		Raiška (DPI):
+Clear selection	Menus		Panaikinti žymėjimą
+Close	ClosePrompt		Užverti
+Close	Menus		Užverti
+Close document	ClosePrompt		Užverti dokumentą
+Copy	Menus		Kopijuoti
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepavyko įkelti paveikslo! Arba nėra tokio failo, arba nerastas jam tinkamas keitiklis.
+DPI:	PrintOptionsWindow		Raiška (taškais colyje):
+Edit	Menus		Taisa
+File	Menus		Failas
 First page	Menus		Pirmasis puslapis
-Fit image to page	PrintOptionsWindow		Įtalpinti puslapin
-Flip left to right	Menus		Apversti kairę su dešine
-Flip top to bottom	Menus		Apversti viršų su apačia
-Full screen	Menus		Visu ekranu
+Fit image to page	PrintOptionsWindow		Sutalpinti puslapyje
+Fit to window	Menus		Sutalpinti lange
+Flip left to right	Menus		Apversti horizontaliai
+Flip top to bottom	Menus		Apversti vertikaliai
+Full screen	Menus		Visame ekrane
 Go to page	Menus		Pereiti puslapin
 Height: 	PrintOptionsWindow		Aukštis: 
-High-quality zooming	Menus		Aukštos kokybės dida
-Image	Menus		Paveikslėlis
-Job setup	PrintOptionsWindow		Užduoties nustatymai
+High-quality zooming	Menus		Aukštos kokybės didinimas
+Image	Menus		Paveikslas
+Job setup	PrintOptionsWindow		Užduoties nuostatos
 Last page	Menus		Paskutinis puslapis
-Next file	Menus		Kita byla
+Leave full screen	Menus		Normalioji veiksena
+Next file	Menus		Kitas failas
 Next page	Menus		Kitas puslapis
+OK	Alerts		Gerai
 OK	SaveToFile		Gerai
+Open…	Menus		Atverti…
 Original size	Menus		Pirminis dydis
+Page setup…	Menus		Puslapio nuostatos…
 Previous file	Menus		Ankstesnis puslapis
 Previous page	Menus		Ankstesnis puslapis
-Print options	PrintOptionsWindow		Spaudos parinktys
-Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (1/72 colių):
+Print options	PrintOptionsWindow		Spausdinimo nuostatos
+Print…	Menus		Spausdinti…
+Progress monitor	ProgressWindow		Eigos indikatorius
+Quit	Menus		Baigti darbą
+Rating	Menus		Įvertinimas
+Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (po 1/72 colio):
 Rotate clockwise	Menus		Pasukti pagal laikrodžio rodyklę
 Rotate counterclockwise	Menus		Pasukti prieš laikrodžio rodyklę
-Show caption in full screen mode	Menus		Rodyti pavadinimą viso ekrano rodoje
-Slide delay	Menus		Skaidrės užlaikymas
+Save as…	Menus		Įrašyti kaip…
+Select all	Menus		Pažymėti viską
+Selection mode	Menus		Žymėjimo veiksena
+Show caption in full screen mode	Menus		Rodyti pavadinimą viso ekrano veiksenoje
+Show tool bar	Menus		Rodyti mygtukų juostą
+ShowImage	System name		Paveikslų žiūryklė
+Slide delay	Menus		Skaidrių keitimo dažnis
 Slide show	Menus		Skaidrių ratas
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (puslapis %d) pakeistas. Norite uždaryti?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ pakeistas. Norite uždaryti?
+Stretch to window	Menus		Ištempti iki lango dydžio
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (puslapis %d) pakeistas. Ar norite dokumentą užverti?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ pakeistas. Ar norite jį užverti?
+The file '%s' could not be written.	SaveToFile		Failo „%s“ įrašyti nepavyko.
 Undo	Menus		Atšaukti
-Use as background…	Menus		Padaryti darbastalio fonu…
-View	Menus		Roda
+Use as background…	Menus		Naudoti kaip darbalaukio foną…
+View	Menus		Rodymas
 Width:	PrintOptionsWindow		Plotis:
-Zoom factor in %:	PrintOptionsWindow		Didinimas %:
+Zoom factor in %:	PrintOptionsWindow		Mastelis (procentais):
 Zoom in	Menus		Didinti
 Zoom out	Menus		Mažinti
