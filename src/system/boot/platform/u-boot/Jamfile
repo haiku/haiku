@@ -29,6 +29,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 KernelMergeObject boot_platform_u-boot.o :
 	shell.S
+	arch_start_kernel.S
 	start2.cpp
 	debug.cpp
 	console.cpp
@@ -223,7 +224,8 @@ BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
 NotFile haiku-arm-mmc ;
 Depends haiku-arm-mmc : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 
-SEARCH on [ FGristFiles shell.S ]
+# TODO: move to arch/arm
+SEARCH on [ FGristFiles shell.S arch_start_kernel.S ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) arch $(TARGET_ARCH) ] ;
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;

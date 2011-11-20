@@ -70,6 +70,8 @@ SYMBOL(_start_common):
 SYMBOL_END(_start_common)
 
 
+//XXX: doesn't seem to work
+//.data
 
 
 SYMBOL(gUBootGlobalData):
@@ -79,6 +81,9 @@ SYMBOL(gUImage):
 	.long   0
 SYMBOL_END(gUImage)
 SYMBOL(gUBootOS):
-	.byte   0
+//XXX: bug? Using .byte makes the next asm symbol
+// to be at the same address
+//	.byte	0
+	.long   0
 SYMBOL_END(gUBootOS)
 
