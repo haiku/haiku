@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	282658629
+1	french	x-vnd.Haiku-About	2717523515
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d Mio au total
 %d MiB used (%d%%)	AboutView		%d Mio utilisés (%d%%)
@@ -6,6 +6,7 @@
 %ld Processors:	AboutView		%ld Processeurs :
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total Mio au total, %inaccessible Mio inaccessibles
 ... and the many people making donations!\n\n	AboutView		… et nos nombreux donateurs!\n\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 par Andy Ritger selon la « Generalized Timing Formula »
 About this system	AboutWindow		À propos de ce système
 AboutSystem	System name		À propos du système
 BSD (2-clause)	AboutView		BSD (clause-2)
@@ -70,7 +71,8 @@ The BeGeistert team\n	AboutView		L'équipe BeGeistert\n
 The Haiku-Ports team\n	AboutView		L'équipe de Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		L'équipe Haikuware et son programme de récompenses\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		L'université d'Auckland et Christof Lutteroth\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Les droits d'auteurs sur le code d'Haiku sont la propriété d'Haiku, Inc ou de ses auteurs respectifs, conformément à ce qui est expressément indiqué dans les sources. Haiku™ et le logo HAIKU ® sont des marques (déposées) de Haiku, Inc\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Le code source spécifique à Haiku, en particulier, celui du noyau et des applications liées, est distribué suivant les termes de la <licence MIT>. Quelques librairies systèmes contiennent du code tiers, distribué sous <licence LGPL>. Vous pouvez trouver les copyrights de ce code ci-dessous.
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Le code source d'Haiku et les droits d'auteurs afférents sont la propriété de Haiku, Inc ou de ses auteurs respectifs lorsque cela est expressément indiqué dans les sources. Haiku® et le logo® de haïku sont des marques déposées de Haiku, Inc.\n\n
 Time running:	AboutView		Temps depuis le démarrage :
 Translations:\n	AboutView		Traductions :\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n

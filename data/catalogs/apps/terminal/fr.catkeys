@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2225488941
+1	french	x-vnd.Haiku-Terminal	2763377662
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help affiche cette aide\n -t, --title défini le titre de la fenêtre\n -f, --fullscreen démarre en plein écran\n
 Abort	Terminal Shell		Abandonner
@@ -36,6 +36,7 @@ Find previous	Terminal TermWindow		Rechercher le précédent
 Find…	Terminal TermWindow		Rechercher…
 Font:	Terminal AppearancePrefView		Police :
 Full screen	Terminal TermWindow		Plein écran
+Green on Black	Terminal colors schema		Vert sur noir
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
 Increase	Terminal TermWindow		Augmenter
 Insert path	Terminal TermView		Insérer un chemin de recherche

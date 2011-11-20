@@ -1,8 +1,11 @@
-1	french	x-vnd.Be-TSKB	2472557472
+1	french	x-vnd.Be-TSKB	1669813373
 <Be folder is empty>	BeMenu		<Le dossier Be est vide>
+About Haiku	BeMenu		À propos d'Haiku
+About this system	BeMenu		À propos de ce système
 Always on top	PreferencesWindow		Toujours au dessus
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
 Applications	PreferencesWindow		Applications
+Auto-hide	PreferencesWindow		Masquer automatiquement
 Auto-raise	PreferencesWindow		Rehausser automatiquement
 Change time…	TimeView		Régler l'horloge…
 Clock	PreferencesWindow		Horloge
@@ -39,5 +42,6 @@ Show replicants	BeMenu		Montrer les réplicants
 Show seconds	PreferencesWindow		Montrer les secondes
 Shutdown…	BeMenu		Arrêter…
 Sort running applications	PreferencesWindow		Trier les applications lancées
+Suspend	BeMenu		Mise en veille
 Tracker always first	PreferencesWindow		Lister le Tracker en premier
 Window	PreferencesWindow		Fenêtre

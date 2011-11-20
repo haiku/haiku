@@ -1,8 +1,11 @@
-1	french	x-vnd.Haiku-Appearance	3187486915
+1	french	x-vnd.Haiku-Appearance	3577998894
+About	DecorSettingsView		À propos
+About Decerator	DecorSettingsView		À propos du Décorateur
 Antialiasing	APRWindow		Lissage
 Antialiasing menu	AntialiasingSettingsView		Menu lissage
 Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Appearance	System name		Apparence
+Choose Decorator	DecorSettingsView		Choisir un décorateur
 Colors	APRWindow		Couleurs
 Control background	Colors tab		Arrière plan des contrôles
 Control border	Colors tab		Bordure des contrôles
@@ -23,6 +26,7 @@ Menu item text	Colors tab		Texte des éléments de menu
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 Navigation base	Colors tab		Base de navigation
 Navigation pulse	Colors tab		Pulsation de navigation
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		Désactivé
 On	AntialiasingSettingsView		Activé
 Panel background	Colors tab		Arrière plan des panneaux
@@ -39,5 +43,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Réussite
 Tooltip background	Colors tab		Arrière plan des bulles d'aide
 Tooltip text	Colors tab		Texte des bulles d'aide
+Window Decorator	APRWindow		Décorateur de fenêtre
+Window Decorator:	DecorSettingsView		Décorateur de fenêtre :
 Window tab	Colors tab		Titre des fenêtres
 Window tab text	Colors tab		Texte des titres de fenêtres

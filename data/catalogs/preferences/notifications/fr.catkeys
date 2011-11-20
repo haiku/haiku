@@ -1,5 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		Au dessus de l'icône
+1	french	x-vnd.Haiku-Notifications	3631903554
 Allowed	NotificationView		Autorisé
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
 Application	NotificationView		Application
@@ -28,6 +27,7 @@ Mini icon	DisplayView		Petite icône
 No	NotificationView		Non
 Notifications	GeneralView		Notifications
 Notifications	NotificationView		Notifications
+Notifications	PrefletView		Notifications
 Notifications	System name		Notifications
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
 OK	DisplayView		OK
@@ -35,7 +35,6 @@ OK	GeneralView		OK
 OK	NotificationView		OK
 Progress	NotificationView		Progression
 Revert	PrefletWin		Rétablir
-Right of icon	DisplayView		À droite de l'icône
 Save	PrefletWin		Enregistrer
 Search:	NotificationView		Rechercher :
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Impossible de trouver le serveur de notifications.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
@@ -44,7 +43,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 Title	NotificationView		Titre
-Title position:	DisplayView		Position du titre :
 Type	NotificationView		Type
 Unknown	NotificationView		Inconnu
 Window width:	DisplayView		Largeur de la fenêtre
