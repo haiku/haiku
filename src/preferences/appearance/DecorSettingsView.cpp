@@ -137,7 +137,7 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 			infoText.ReplaceFirst("%decorURL", decor->SupportURL().String());
 			infoText.ReplaceFirst("%decorDesc", decor->ShortDescription().String());
 
-			BAlert *infoAlert = new BAlert(B_TRANSLATE("About Decerator"),
+			BAlert *infoAlert = new BAlert(B_TRANSLATE("About Decorator"),
 				infoText.String(), B_TRANSLATE("OK"));
 			infoAlert->SetShortcut(0, B_ESCAPE); 
 			infoAlert->Go(); 
