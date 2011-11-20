@@ -1,0 +1,8 @@
+1	french	x-vnd.Haiku-IMAP	2655366227
+Apply	IMAPFolderConfig		Appliquer
+Destination:	imap_config		Destination :
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Récupération des dossiers IMAP, Merci de patienter…
+IMAP Folders	IMAPFolderConfig		Dossiers IMAP
+IMAP Folders	imap_config		Dossiers IMAP
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Abonnement / désabonnement aux dossiers IMAP, Merci de patienter…
+status	IMAPFolderConfig		état

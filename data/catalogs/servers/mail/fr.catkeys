@@ -1,0 +1,15 @@
+1	french	x-vnd.Be-POST	1990954993
+%num new message.	MailDaemon		%num nouveau message.
+%num new messages	DeskbarView		%num nouveaux messages
+%num new messages.	MailDaemon		%num nouveaux messages.
+<no accounts>	DeskbarView		<Aucun compte>
+Create new message…	DeskbarView		Créer un nouveau message…
+Fetching mail for %name	Notifier		Récupération des mails de %name
+New Messages	MailDaemon		Nouveaux messages
+No new messages	DeskbarView		Aucun nouveau message
+No new messages	MailDaemon		Aucun nouveau message
+No new messages.	MailDaemon		Aucun nouveau message.
+Preferences…	DeskbarView		Préférences…
+Send pending mails	DeskbarView		Envoyer les mails en attente
+Sending mail for %name	Notifier		Envoi des mails de %name
+Shutdown mail services	DeskbarView		Arrêter les services de messagerie
