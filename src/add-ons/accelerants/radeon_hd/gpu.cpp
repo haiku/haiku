@@ -217,10 +217,25 @@ uint32
 radeon_gpu_mc_idlecheck()
 {
 	uint32 idleStatus;
-	if (!((idleStatus = Read32(MC, SRBM_STATUS)) &
-		(VMC_BUSY | MCB_BUSY |
-			MCDZ_BUSY | MCDY_BUSY | MCDX_BUSY | MCDW_BUSY)))
+
+	uint32 busyBits
+		= (VMC_BUSY | MCB_BUSY | MCDZ_BUSY | MCDY_BUSY | MCDX_BUSY | MCDW_BUSY);
+	if (!((idleStatus = Read32(MC, SRBM_STATUS)) & busyBits))
 		return 0;
+
+	bool state;
+	state = (idleStatus & VMC_BUSY) != 0;
+	TRACE("%s: VMC is %s\n", __func__, state ? "busy" : "idle");
+	state = (idleStatus & MCB_BUSY) != 0;
+	TRACE("%s: MCB is %s\n", __func__, state ? "busy" : "idle");
+	state = (idleStatus & MCDZ_BUSY) != 0;
+	TRACE("%s: MCDZ is %s\n", __func__, state ? "busy" : "idle");
+	state = (idleStatus & MCDY_BUSY) != 0;
+	TRACE("%s: MCDY is %s\n", __func__, state ? "busy" : "idle");
+	state = (idleStatus & MCDX_BUSY) != 0;
+	TRACE("%s: MCDX is %s\n", __func__, state ? "busy" : "idle");
+	state = (idleStatus & MCDW_BUSY) != 0;
+	TRACE("%s: MCDW is %s\n", __func__, state ? "busy" : "idle");
 
 	return idleStatus;
 }
