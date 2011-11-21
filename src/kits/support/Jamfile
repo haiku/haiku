@@ -9,10 +9,11 @@ MergeObject <libbe>support_kit.o :
 	ArchivingManagers.cpp
 	Beep.cpp
 	BlockCache.cpp
+	BufferedDataIO.cpp
+	BufferIO.cpp
 	ByteOrder.cpp
 	DataIO.cpp
 	DateTime.cpp
-	BufferIO.cpp
 	Flattenable.cpp
 	List.cpp
 	Locker.cpp
