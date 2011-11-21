@@ -30,6 +30,9 @@ public:
 	virtual	ssize_t				Write(const void* buffer, size_t size);
 
 private:
+								BBufferedDataIO(const BBufferedDataIO& other);
+									// not implemented
+
 	virtual	status_t			_Reserved0(void*);
 	virtual	status_t			_Reserved1(void*);
 	virtual	status_t			_Reserved2(void*);
