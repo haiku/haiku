@@ -17,15 +17,28 @@
 extern "C" void
 panic(const char* format, ...)
 {
+	const char hint[] = "*** PANIC ***";
+	char buffer[512];
 	va_list list;
+	int length;
 
 	platform_switch_to_text_mode();
 
-	puts("*** PANIC ***");
+	serial_puts(hint, sizeof(hint));
+	serial_puts("\n", 1);
+	//fprintf(stderr, "%s", hint);
+	puts(hint);
 
 	va_start(list, format);
-	vprintf(format, list);
+	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
+
+	if (length >= (int)sizeof(buffer))
+		length = sizeof(buffer) - 1;
+
+	serial_puts(buffer, length);
+	//fprintf(stderr, "%s", buffer);
+	puts(buffer);
 
 	puts("\nPress key to reboot.");
 
