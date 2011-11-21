@@ -6,6 +6,20 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
+local sslSources ;
+if $(HAIKU_OPENSSL_ENABLED) {
+	SubDirC++Flags -DOPENSSL_ENABLED ;
+	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	sslSources = SSL.cpp ;
+	Includes [ FGristFiles $(sslSources) SecureSocket.cpp ]
+		: $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
+}
+
 SharedLibrary libbnetapi.so :
 	init.cpp
 	DynamicBuffer.cpp
@@ -14,6 +28,8 @@ SharedLibrary libbnetapi.so :
 	NetBuffer.cpp
 	NetDebug.cpp
 
+	$(sslSources)
+
 	NetworkAddress.cpp
 	NetworkAddressResolver.cpp
 	NetworkCookie.cpp
@@ -21,6 +37,11 @@ SharedLibrary libbnetapi.so :
 	NetworkDevice.cpp
 	NetworkInterface.cpp
 	NetworkRoster.cpp
+
+	AbstractSocket.cpp
+	DatagramSocket.cpp
+	Socket.cpp
+	SecureSocket.cpp
 
 	# TODO: The HTTP stuff should all go into an add-on. It needs linking
 	# against libcrypto.so and only the add-on should link against it.
@@ -43,5 +64,7 @@ SharedLibrary libbnetapi.so :
 #	UrlResult.cpp
 #	UrlSynchronousRequest.cpp
 
-	: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++) libshared.a
+	:
+	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++) $(HAIKU_OPENSSL_LIBS)
+	libshared.a
 ;
