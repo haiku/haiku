@@ -774,3 +774,43 @@ radeon_gpu_gpio_setup()
 
 	return B_OK;
 }
+
+
+int32
+radeon_get_temp()
+{
+	// return GPU temp in millidegrees C
+
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint32 rawTemp = 0;	// temp
+	int32 finalTemp = 0; // actual_temp
+
+	if (info.chipsetID >= RADEON_RV770) {
+		rawTemp = (Read32(OUT, R700_CG_MULT_THERMAL_STATUS) & R700_ASIC_T_MASK)
+			>> R700_ASIC_T_SHIFT;
+		if (rawTemp & 0x400)
+			finalTemp = -256;
+		else if (rawTemp & 0x200)
+			finalTemp = 255;
+		else if (rawTemp & 0x100) {
+			finalTemp = rawTemp & 0x1ff;
+			finalTemp |= ~0x1ff;
+		} else
+			finalTemp = rawTemp & 0xff;
+
+		return (finalTemp * 1000) / 2;
+
+	} else if (info.chipsetID >= RADEON_R600) {
+		rawTemp = (Read32(OUT, R600_CG_THERMAL_STATUS) & R600_ASIC_T_MASK)
+			>> R600_ASIC_T_SHIFT;
+		finalTemp = rawTemp & 0xff;
+
+		if (rawTemp & 0x100)
+			finalTemp -= 256;
+
+		return finalTemp * 1000;
+	}
+
+	return -1;
+}

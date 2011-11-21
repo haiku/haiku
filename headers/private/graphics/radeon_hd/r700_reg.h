@@ -121,25 +121,25 @@
 #define		CMDFIFO_AVAIL_MASK				0x0000000F
 #define		GUI_ACTIVE					(1<<31)
 #define	GRBM_STATUS2					0x8014
-
-#define	CG_MULT_THERMAL_STATUS				0x740
-#define		ASIC_T(x)			        ((x) << 16)
-#define		ASIC_T_MASK			        0x3FF0000
-#define		ASIC_T_SHIFT			        16
 #endif
 
-#define	HDP_HOST_PATH_CNTL				0x2C00
-#define	HDP_NONSURFACE_BASE				0x2C04
-#define	HDP_NONSURFACE_INFO				0x2C08
-#define	HDP_NONSURFACE_SIZE				0x2C0C
-#define HDP_REG_COHERENCY_FLUSH_CNTL			0x54A0
-#define	HDP_TILING_CONFIG				0x2F3C
-#define HDP_DEBUG1                                      0x2F34
+#define	R700_CG_MULT_THERMAL_STATUS			0x740
+#define		R700_ASIC_T(x)			        ((x) << 16)
+#define		R700_ASIC_T_MASK		        0x3FF0000
+#define		R700_ASIC_T_SHIFT		        16
 
-#define R700_MC_SHARED_CHMAP						0x2004
+#define	HDP_HOST_PATH_CNTL					0x2C00
+#define	HDP_NONSURFACE_BASE					0x2C04
+#define	HDP_NONSURFACE_INFO					0x2C08
+#define	HDP_NONSURFACE_SIZE					0x2C0C
+#define HDP_REG_COHERENCY_FLUSH_CNTL		0x54A0
+#define	HDP_TILING_CONFIG					0x2F3C
+#define HDP_DEBUG1							0x2F34
+
+#define R700_MC_SHARED_CHMAP				0x2004
 #define		NOOFCHAN_SHIFT					12
 #define		NOOFCHAN_MASK					0x00003000
-#define R700_MC_SHARED_CHREMAP					0x2008
+#define R700_MC_SHARED_CHREMAP				0x2008
 
 #define	R700_MC_ARB_RAMCFG					0x2760
 #define		NOOFBANK_SHIFT					0

@@ -287,6 +287,9 @@ radeon_init_accelerant(int device)
 
 	radeon_gpu_mc_setup();
 
+	TRACE("%s: Current GPU temperature: %" B_PRId32 " mC\n",
+		__func__, radeon_get_temp());
+
 	TRACE("%s done\n", __func__);
 	return B_OK;
 }

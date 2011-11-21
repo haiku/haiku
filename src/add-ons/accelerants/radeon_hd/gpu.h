@@ -177,6 +177,7 @@ status_t radeon_gpu_irq_setup();
 status_t radeon_gpu_gpio_setup();
 status_t radeon_gpu_i2c_attach(uint32 id, uint8 hw_line);
 bool radeon_gpu_read_edid(uint32 connector, edid1_info *edid);
+int32 radeon_get_temp();
 
 
 #endif
