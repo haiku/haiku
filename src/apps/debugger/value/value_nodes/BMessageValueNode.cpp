@@ -330,9 +330,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 status_t
 BMessageValueNode::CreateChildren()
 {
-	if (!fChildren.IsEmpty())
-		return B_OK;
-
 	DataMember* member = NULL;
 	CompoundType* messageType = dynamic_cast<CompoundType*>(fType);
 	for (int32 i = 0; i < messageType->CountDataMembers(); i++) {
@@ -373,6 +370,8 @@ BMessageValueNode::CreateChildren()
 		node->SetContainer(fContainer);
 		fChildren.AddItem(node);
 	}
+
+	fChildrenCreated = true;
 
 	if (fContainer != NULL)
 		fContainer->NotifyValueNodeChildrenCreated(this);
@@ -655,6 +654,8 @@ BMessageValueNode::BMessageFieldNode::CreateChildren()
 
 		fChildren.AddItem(child);
 	}
+
+	fChildrenCreated = true;
 
 	if (fContainer != NULL)
 		fContainer->NotifyValueNodeChildrenCreated(this);
