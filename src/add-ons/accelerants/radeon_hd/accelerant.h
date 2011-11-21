@@ -26,12 +26,12 @@
 
 
 struct gpu_state {
-	uint32 d1vga_control;
-	uint32 d2vga_control;
-	uint32 vga_render_control;
-	uint32 vga_hdp_control;
-	uint32 d1crtc_control;
-	uint32 d2crtc_control;
+	uint32 d1vgaControl;
+	uint32 d2vgaControl;
+	uint32 vgaRenderControl;
+	uint32 vgaHdpControl;
+	uint32 d1crtcControl;
+	uint32 d2crtcControl;
 };
 
 
