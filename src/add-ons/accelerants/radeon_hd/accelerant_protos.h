@@ -37,6 +37,7 @@ status_t radeon_get_pixel_clock_limits(display_mode *mode,
 status_t radeon_get_edid_info(void* info, size_t size, uint32* edid_version);
 
 // accelerant engine
+uint32 radeon_accelerant_engine_count(void);
 status_t radeon_acquire_engine(uint32 capabilities, uint32 maxWait,
 	sync_token *syncToken, engine_token **_engineToken);
 status_t radeon_release_engine(engine_token *engineToken,
