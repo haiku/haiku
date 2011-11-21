@@ -212,23 +212,23 @@ if $(HAIKU_BOARD_UBOOT_IMAGE) && $(HAIKU_BOARD_UBOOT_IMAGE_URL) {
 # flash image targets
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader :
 	$(ubootFile) ;
-NotFile haiku-arm-image ;
-Depends haiku-arm-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img ;
+NotFile haiku-flash-image ;
+Depends haiku-flash-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img ;
 
 #BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img : boot_loader_u-boot :
 #	$(ubootFile) ;
-#NotFile haiku-arm-elf-image ;
-#Depends haiku-arm-elf-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img ;
+#NotFile haiku-flash-elf-image ;
+#Depends haiku-flash-elf-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img ;
 
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_loader.ub :
 	$(ubootFile) ;
-NotFile haiku-arm-uimage ;
-Depends haiku-arm-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
+NotFile haiku-flash-uimage ;
+Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
 
 # SD/mmc image targets
 BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
-NotFile haiku-arm-mmc ;
-Depends haiku-arm-mmc : haiku-$(HAIKU_BOOT_BOARD).mmc ;
+NotFile haiku-mmc-image ;
+Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 
 # TODO: move to arch/arm
 SEARCH on [ FGristFiles shell.S arch_start_kernel.S ]
