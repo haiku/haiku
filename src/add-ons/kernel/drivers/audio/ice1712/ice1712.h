@@ -40,7 +40,7 @@ typedef enum product_t {
 #define MIN_BUFFER_FRAMES			64
 #define MAX_BUFFER_FRAMES			2048
 
-#define MAX_HARDWARE_VOLUME			10
+#define ICE1712_HARDWARE_VOLUME		10
 #define ICE1712_MUTE_VALUE 			0x7F
 
 #define PLAYBACK_BUFFER_SIZE		(MAX_BUFFER_FRAMES * MAX_DAC * SAMPLE_SIZE)
@@ -54,12 +54,13 @@ typedef enum product_t {
 #define MIXER_OUT_LEFT				10
 #define MIXER_OUT_RIGHT				11
 
-typedef enum {
-	NO_IN_NO_OUT = 0,
-	NO_IN_YES_OUT = 1,
-	YES_IN_NO_OUT = 2,
-	YES_IN_YES_OUT = 3,
-} _spdif_config_ ;
+#define SPDIF_OUT_PRESENT			1
+#define SPDIF_IN_PRESENT			2
+
+#define ICE1712_SAMPLERATE_96K		0x7
+#define ICE1712_SAMPLERATE_48K		0x0
+#define ICE1712_SAMPLERATE_88K2		0xB
+#define ICE1712_SAMPLERATE_44K1		0x8
 
 typedef struct _midi_dev {
 	struct _ice1712_	*card;
@@ -78,32 +79,40 @@ typedef struct _codecCommLines
 	uint8	reserved[4];
 } codecCommLines;
 
-typedef struct ChannelVolume
+typedef struct channel_volume
 {
-	float Volume;
-	bool Mute;
-} ChannelVolume;
+	float volume;
+	bool mute;
+} channel_volume;
 
-typedef struct Ice1712_Settings
+typedef struct ice1712_settings
 {
-	ChannelVolume Playback[MAX_HARDWARE_VOLUME];
-	ChannelVolume Record[MAX_HARDWARE_VOLUME];
+	channel_volume playback[ICE1712_HARDWARE_VOLUME];
+	channel_volume record[ICE1712_HARDWARE_VOLUME];
 
 	//General Settings
-	uint8 Clock; //an index
-	uint8 BufferSize; //an index
-	uint8 DebugMode; //an index for debugging
+	uint8 clock; //an index
+	uint8 bufferSize; //an index
+	uint8 debugMode; //an index for debugging
 
 	//S/PDif Settings
-	uint8 OutFormat; //an index
-	uint8 Emphasis; //an index
-	uint8 CopyMode; //an index
+	uint8 outFormat; //an index
+	uint8 emphasis; //an index
+	uint8 copyMode; //an index
 
 	//Output settings
-	uint8 Output[5]; //an index
+	uint8 output[5]; //an index
 
-	uint8 Reserved[32];
-} Ice1712_Settings;
+	uint8 reserved[32];
+} ice1712_settings;
+
+typedef struct ice1712_hconfig
+{
+	int8 nb_ADC; //Mono Channel
+	int8 nb_DAC; //Mono Channel
+	int8 nb_MPU401;
+	int8 spdif;
+} ice1712_hconfig;
 
 typedef struct ice1712
 {
@@ -119,11 +128,6 @@ typedef struct ice1712
 	uint32 Multi_Track;	//PCI_1C
 
 	uint8 eeprom_data[32];
-
-	int8 nb_ADC; //Mono Channel
-	int8 nb_DAC; //Mono Channel
-	_spdif_config_ spdif_config;
-	int8 nb_MPU401;
 
 	product_t product;
 
@@ -151,7 +155,8 @@ typedef struct ice1712
 	uint8 sampling_rate; //in the format of the register
 	uint32 lock_source;
 
-	Ice1712_Settings settings;
+	ice1712_hconfig 	config;
+	ice1712_settings	settings;
 } ice1712;
 
 status_t applySettings(ice1712 *card);

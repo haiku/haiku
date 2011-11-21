@@ -99,7 +99,7 @@ static status_t midi_open(const char * name, uint32 flags, void ** cookie)
 
 	*cookie = NULL;
 	for (ix = 0; ix < num_cards; ix++) {
-		for (i = 0; i < cards[ix].nb_MPU401; i++)
+		for (i = 0; i < cards[ix].config.nb_MPU401; i++)
 			if (!strcmp(name, cards[ix].midi_interf[i].name)) {
 				used_midi = i;
 				break;
@@ -139,7 +139,7 @@ static status_t midi_free(void * cookie)
 	TRACE("midi_free()\n");
 	f = (*mpu401->free_hook)(cookie);
 	for (ix = 0; ix < num_cards; ix++) {
-		for (i = 0; i < cards[ix].nb_MPU401; i++)
+		for (i = 0; i < cards[ix].config.nb_MPU401; i++)
 			if (cards[ix].midi_interf[i].cookie == cookie) {
 				if (atomic_add(&cards[ix].midi_interf[i].count, -1) == 1) {
 					cards[ix].midi_interf[i].cookie = NULL;

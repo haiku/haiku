@@ -207,9 +207,9 @@ ice1712_setup(ice1712 *ice)
 	// B : Stereo ADC number minus 1 (=> 1 to 4)
 	// A : Stereo DAC number minus 1 (=> 1 to 4)
 
-	ice->nb_DAC = ((reg8 & 0x03) + 1) * 2;
+	ice->config.nb_DAC = ((reg8 & 0x03) + 1) * 2;
 	reg8 >>= 2;
-	ice->nb_ADC = ((reg8 & 0x03) + 1) * 2;
+	ice->config.nb_ADC = ((reg8 & 0x03) + 1) * 2;
 	reg8 >>= 2;
 
 	if ((reg8 & 0x01) != 0) {//Consumer AC'97 Exist
@@ -223,16 +223,16 @@ ice1712_setup(ice1712 *ice)
 		TRACE("Consumer AC'97 does NOT exist\n");
 	}
 	reg8 >>= 1;
-	ice->nb_MPU401 = (reg8 & 0x1) + 1;
+	ice->config.nb_MPU401 = (reg8 & 0x1) + 1;
 
-	for (i = 0; i < ice->nb_MPU401; i++) {
+	for (i = 0; i < ice->config.nb_MPU401; i++) {
 		sprintf(ice->midi_interf[i].name, "midi/ice1712/%ld/%d",
 			ice - cards + 1, i + 1);
 		names[num_names++] = ice->midi_interf[i].name;
 	}
 
 	TRACE("E2PROM_MAP_SPDIF : 0x%x\n", ice->eeprom_data[E2PROM_MAP_SPDIF]);
-	ice->spdif_config	= ice->eeprom_data[E2PROM_MAP_SPDIF];
+	ice->config.spdif = ice->eeprom_data[E2PROM_MAP_SPDIF];
 
 	switch (ice->product) {
 		case ICE1712_SUBDEVICE_DELTA66 :
@@ -312,12 +312,12 @@ ice1712_setup(ice1712 *ice)
 	ice->frames_count = 0;
 	ice->buffer_size = MAX_BUFFER_FRAMES;
 
-	ice->total_output_channels = ice->nb_DAC;
-	if (ice->spdif_config & NO_IN_YES_OUT)
+	ice->total_output_channels = ice->config.nb_DAC;
+	if (ice->config.spdif & SPDIF_OUT_PRESENT)
 		ice->total_output_channels += 2;
 
-	ice->total_input_channels = ice->nb_ADC + 2;
-	if (ice->spdif_config & YES_IN_NO_OUT)
+	ice->total_input_channels = ice->config.nb_ADC + 2;
+	if (ice->config.spdif & SPDIF_IN_PRESENT)
 		ice->total_input_channels += 2;
 
 	//Write bits in the GPIO
@@ -343,7 +343,7 @@ ice1712_setup(ice1712 *ice)
 
 	//Mute all input
 	mute = (ICE1712_MUTE_VALUE << 0) | (ICE1712_MUTE_VALUE << 8);
-	for (i = 0; i < 2 * MAX_HARDWARE_VOLUME; i++) {
+	for (i = 0; i < 2 * ICE1712_HARDWARE_VOLUME; i++) {
 		write_mt_uint8(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, i);
 		write_mt_uint16(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, mute);
 	}
@@ -707,14 +707,14 @@ applySettings(ice1712 *card)
 	uint16 val, mt30 = 0;
 	uint32 mt34 = 0;
 
-	for (i = 0; i < MAX_HARDWARE_VOLUME; i++) {
+	for (i = 0; i < ICE1712_HARDWARE_VOLUME; i++) {
 		//Select the channel
 		write_mt_uint8(card, MT_VOLUME_CONTROL_CHANNEL_INDEX, i);
 
-		if (card->settings.Playback[i].Mute == true) {
+		if (card->settings.playback[i].mute == true) {
 			val = (ICE1712_MUTE_VALUE << 0) | (ICE1712_MUTE_VALUE << 8);
 		} else {
-			unsigned char volume = card->settings.Playback[i].Volume / -1.5;
+			unsigned char volume = card->settings.playback[i].volume / -1.5;
 			if (i & 1) {//a right channel
 				val = ICE1712_MUTE_VALUE << 0; //Mute left volume
 				val |= volume << 8;
@@ -728,15 +728,15 @@ applySettings(ice1712 *card)
 		TRACE_VV("Apply Settings %d : 0x%x\n", i, val);
 	}
 
-	for (i = 0; i < MAX_HARDWARE_VOLUME; i++) {
+	for (i = 0; i < ICE1712_HARDWARE_VOLUME; i++) {
 		//Select the channel
 		write_mt_uint8(card, MT_VOLUME_CONTROL_CHANNEL_INDEX,
-			i + MAX_HARDWARE_VOLUME);
+			i + ICE1712_HARDWARE_VOLUME);
 
-		if (card->settings.Record[i].Mute == true) {
+		if (card->settings.record[i].mute == true) {
 			val = (ICE1712_MUTE_VALUE << 0) | (ICE1712_MUTE_VALUE << 8);
 		} else {
-			unsigned char volume = card->settings.Record[i].Volume / -1.5;
+			uint8 volume = card->settings.record[i].volume / -1.5;
 			if (i & 1) {//a right channel
 				val = ICE1712_MUTE_VALUE << 0; //Mute left volume
 				val |= volume << 8;
@@ -752,11 +752,11 @@ applySettings(ice1712 *card)
 
 	//Analog output selection
 	for (i = 0; i < 4; i++) {
-		uint8 out = card->settings.Output[i];
+		uint8 out = card->settings.output[i];
 		if (out == 0) {
 			TRACE_VV("Output %d is haiku output\n", i);
 			//Nothing to do
-		} else if (out <= (card->nb_ADC / 2)) {
+		} else if (out <= (card->config.nb_ADC / 2)) {
 			uint8 mt34_c;
 			out--;
 			TRACE_VV("Output %d is input %d\n", i, out);
@@ -764,8 +764,8 @@ applySettings(ice1712 *card)
 			mt34_c |= (out * 2 + 1) << 4;
 			mt30 |= 0x0202 << (2*i);
 			mt30 |= mt34_c << (8*i);
-		} else if (out == ((card->nb_ADC / 2) + 1)
-				&& (card->spdif_config & YES_IN_NO_OUT) != 0) {
+		} else if (out == ((card->config.nb_ADC / 2) + 1)
+				&& (card->config.spdif & SPDIF_IN_PRESENT) != 0) {
 			TRACE_VV("Output %d is digital input\n", i);
 			mt30 |= 0x0303 << (2*i);
 			mt34 |= 0x80 << (8*i);
@@ -778,20 +778,20 @@ applySettings(ice1712 *card)
 	write_mt_uint32(card, MT_CAPTURED_DATA, mt34);
 	
 	//Digital output
-	if ((card->spdif_config & NO_IN_YES_OUT) != 0) {
+	if ((card->config.spdif & SPDIF_OUT_PRESENT) != 0) {
 		uint16 mt32 = 0;
-		uint8 out = card->settings.Output[4];
+		uint8 out = card->settings.output[4];
 		if (out == 0) {
 			TRACE_VV("Digital output is haiku output\n");
 			//Nothing to do
-		} else if (out <= (card->nb_ADC / 2)) {
+		} else if (out <= (card->config.nb_ADC / 2)) {
 			out--;
 			TRACE_VV("Digital output is input %d\n", out);
 			mt32 |= 0x0202;
 			mt32 |= (out * 2) << 8;
 			mt32 |= (out * 2 + 1) << 12;
-		} else if (out == ((card->nb_ADC / 2) + 1)
-				&& (card->spdif_config & YES_IN_NO_OUT) != 0) {
+		} else if (out == ((card->config.nb_ADC / 2) + 1)
+				&& (card->config.spdif & SPDIF_IN_PRESENT) != 0) {
 			TRACE_VV("Digital output is digital input\n");
 			mt32 |= 0x800F;
 		} else {

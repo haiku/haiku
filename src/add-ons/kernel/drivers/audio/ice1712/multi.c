@@ -21,7 +21,7 @@
 
 #define AUTHORIZED_RATE (B_SR_SAME_AS_INPUT | B_SR_IS_GLOBAL | B_SR_96000 \
 	| B_SR_88200 | B_SR_48000 | B_SR_44100)
-#define AUTHORIZED_SAMPLE_SIZE (B_FMT_24BIT)
+#define AUTHORIZED_SAMPLE_SIZE (B_FMT_32BIT)
 
 #define MAX_CONTROL	32
 
@@ -160,7 +160,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 	TRACE_VV("request_channel_count = %ld\n", data->request_channel_count);
 
 	if (size <= data->request_channel_count) {
-		for (i = 0; i < card->nb_DAC; i++) {
+		for (i = 0; i < card->config.nb_DAC; i++) {
 		//Analog STEREO output
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_OUTPUT_CHANNEL;
@@ -170,7 +170,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			chan++;
 		}
 
-		if (card->spdif_config & NO_IN_YES_OUT) {
+		if (card->config.spdif & SPDIF_OUT_PRESENT) {
 		//SPDIF STEREO output
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_OUTPUT_CHANNEL;
@@ -186,7 +186,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			chan++;
 		}
 
-		for (i = 0; i < card->nb_ADC; i++) {
+		for (i = 0; i < card->config.nb_ADC; i++) {
 		//Analog STEREO input
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_INPUT_CHANNEL;
@@ -196,7 +196,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			chan++;
 		}
 
-		if (card->spdif_config & YES_IN_NO_OUT) {
+		if (card->config.spdif & SPDIF_IN_PRESENT) {
 		//SPDIF STEREO input
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_INPUT_CHANNEL;
@@ -301,19 +301,19 @@ ice1712_get_global_format(ice1712 *card, multi_format_info *data)
 	uint8 sr = read_mt_uint8(card, MT_SAMPLING_RATE_SELECT);
 
 	switch (sr) {
-		case 0x0:
+		case ICE1712_SAMPLERATE_48K:
 			data->input.rate = data->output.rate = B_SR_48000;
 			data->input.cvsr = data->output.cvsr = 48000.0f;
 			break;
-		case 0x7:
+		case ICE1712_SAMPLERATE_96K:
 			data->input.rate = data->output.rate = B_SR_96000;
 			data->input.cvsr = data->output.cvsr = 96000.0f;
 			break;
-		case 0x8:
+		case ICE1712_SAMPLERATE_44K1:
 			data->input.rate = data->output.rate = B_SR_44100;
 			data->input.cvsr = data->output.cvsr = 44100.0f;
 			break;
-		case 0xB:
+		case ICE1712_SAMPLERATE_88K2:
 			data->input.rate = data->output.rate = B_SR_88200;
 			data->input.cvsr = data->output.cvsr = 88200.0f;
 			break;
@@ -372,23 +372,23 @@ get_combo_cb(ice1712 *card, uint32 index)
 
 	switch (index) {
 		case 0:
-			value = card->settings.Clock;
+			value = card->settings.clock;
 			break;
 
 		case 1:
-			value = card->settings.BufferSize;
+			value = card->settings.bufferSize;
 			break;
 
 		case 2:
-			value = card->settings.OutFormat;
+			value = card->settings.outFormat;
 			break;
 
 		case 3:
-			value = card->settings.Emphasis;
+			value = card->settings.emphasis;
 			break;
 
 		case 4:
-			value = card->settings.CopyMode;
+			value = card->settings.copyMode;
 			break;
 	}
 
@@ -404,12 +404,12 @@ set_combo_cb(ice1712 *card, uint32 index, uint32 value)
 	switch (index) {
 		case 0:
 			if (value < 2)
-				card->settings.Clock = value;
+				card->settings.clock = value;
 			break;
 
 		case 1:
 			if (value < 6) {
-				card->settings.BufferSize = value;
+				card->settings.bufferSize = value;
 //				card->buffer_size = 64 * (1 << value);
 //				ice1712_buffer_force_stop(card);
 //				start_DMA(card);
@@ -418,17 +418,17 @@ set_combo_cb(ice1712 *card, uint32 index, uint32 value)
 
 		case 2:
 			if (value < 2)
-				card->settings.OutFormat = value;
+				card->settings.outFormat = value;
 			break;
 
 		case 3:
 			if (value < 3)
-				card->settings.Emphasis = value;
+				card->settings.emphasis = value;
 			break;
 
 		case 4:
 			if (value < 3)
-				card->settings.CopyMode = value;
+				card->settings.copyMode = value;
 			break;
 	}
 }
@@ -440,7 +440,7 @@ get_output_cb(ice1712 *card, uint32 index)
 	uint32 value = 0;
 
 	if (index < 5)
-		value = card->settings.Output[index];
+		value = card->settings.output[index];
 
 	TRACE_VV("   get_output_cb: %ld, %ld\n", index, value);
 
@@ -452,7 +452,7 @@ static void
 set_output_cb(ice1712 *card, uint32 index, uint32 value)
 {
 	if (index < 5)
-		card->settings.Output[index] = value;
+		card->settings.output[index] = value;
 
 	TRACE_VV("   set_output_cb: %ld, %ld\n", index, value);
 }
@@ -461,23 +461,23 @@ set_output_cb(ice1712 *card, uint32 index, uint32 value)
 static void
 get_volume_cb(ice1712 *card, multi_mix_value *mmv)
 {
-	ChannelVolume *vol;
+	channel_volume *vol;
 	uint32 chan = ICE1712_MULTI_GET_CHANNEL(mmv->id);
 
 	TRACE_VV("   get_volume_cb\n");
 
-	if (chan < MAX_HARDWARE_VOLUME) {
-		vol = card->settings.Playback;
+	if (chan < ICE1712_HARDWARE_VOLUME) {
+		vol = card->settings.playback;
 	}
 	else {
-		vol = card->settings.Record;
-		chan -= MAX_HARDWARE_VOLUME;
+		vol = card->settings.record;
+		chan -= ICE1712_HARDWARE_VOLUME;
 	}
 
-	//chan is normaly <= MAX_HARDWARE_VOLUME
+	//chan is normaly <= ICE1712_HARDWARE_VOLUME
 	switch (ICE1712_MULTI_GET_INDEX(mmv->id)) {
 		case 0: //Mute
-			mmv->u.enable = vol[chan].Mute | vol[chan + 1].Mute;
+			mmv->u.enable = vol[chan].mute | vol[chan + 1].mute;
 			TRACE_VV("\tGet mute %d for channel %d or %d\n",
 				mmv->u.enable, (int)chan, (int)chan + 1);
 			break;
@@ -486,7 +486,7 @@ get_volume_cb(ice1712 *card, multi_mix_value *mmv)
 			chan++;
 			//No break
 		case 1: //Left channel
-			mmv->u.gain = vol[chan].Volume;
+			mmv->u.gain = vol[chan].volume;
 			TRACE_VV("\tGet Volume %f for channel %d\n",
 				mmv->u.gain, (int)chan);
 			break;
@@ -497,24 +497,24 @@ get_volume_cb(ice1712 *card, multi_mix_value *mmv)
 static void
 set_volume_cb(ice1712 *card, multi_mix_value *mmv)
 {
-	ChannelVolume *vol;
+	channel_volume *vol;
 	uint32 chan = ICE1712_MULTI_GET_CHANNEL(mmv->id);
 
 	TRACE_VV("   set_volume_cb\n");
 
-	if (chan < MAX_HARDWARE_VOLUME) {
-		vol = card->settings.Playback;
+	if (chan < ICE1712_HARDWARE_VOLUME) {
+		vol = card->settings.playback;
 	}
 	else {
-		vol = card->settings.Record;
-		chan -= MAX_HARDWARE_VOLUME;
+		vol = card->settings.record;
+		chan -= ICE1712_HARDWARE_VOLUME;
 	}
 
-	//chan is normaly <= MAX_HARDWARE_VOLUME
+	//chan is normaly <= ICE1712_HARDWARE_VOLUME
 	switch (ICE1712_MULTI_GET_INDEX(mmv->id)) {
 		case 0: //Mute
-			vol[chan].Mute = mmv->u.enable;
-			vol[chan + 1].Mute = mmv->u.enable;
+			vol[chan].mute = mmv->u.enable;
+			vol[chan + 1].mute = mmv->u.enable;
 			TRACE_VV("\tChange mute to %d for channel %d and %d\n",
 				mmv->u.enable, (int)chan, (int)chan + 1);
 			break;
@@ -523,7 +523,7 @@ set_volume_cb(ice1712 *card, multi_mix_value *mmv)
 			chan++;
 			//No break
 		case 1: //Left channel
-			vol[chan].Volume = mmv->u.gain;
+			vol[chan].volume = mmv->u.gain;
 			TRACE_VV("\tChange Volume to %f for channel %d\n",
 				mmv->u.gain, (int)chan);
 			break;
@@ -848,7 +848,7 @@ create_output_choice(ice1712 *card, multi_mix_control **p_mmc,
 	nb_control_created++; mmc++;
 
 	//Physical Input
-	for (i = 0; i < card->nb_DAC; i += 2) {
+	for (i = 0; i < card->config.nb_DAC; i += 2) {
 		mmc->id = id++;
 		mmc->flags = B_MULTI_MIX_MUX_VALUE;
 		mmc->parent = parentControl;
@@ -860,7 +860,7 @@ create_output_choice(ice1712 *card, multi_mix_control **p_mmc,
 	}
 
 	//Physical Digital Input
-	if (card->spdif_config & YES_IN_NO_OUT) {
+	if (card->config.spdif & SPDIF_IN_PRESENT) {
 		mmc->id = id++;
 		mmc->flags = B_MULTI_MIX_MUX_VALUE;
 		mmc->parent = parentControl;
@@ -924,11 +924,11 @@ ice1712_list_mix_controls(ice1712 *card, multi_mix_control_info *mmci)
 	//Output Selection Settings
 	parentTabColumn = create_group_control(&mmc, group++, parentTab,
 		S_null, string_list[3]);
-	for (i = 0; i < card->nb_DAC; i += 2) {
+	for (i = 0; i < card->config.nb_DAC; i += 2) {
 		create_output_choice(card, &mmc, i / 2, parentTabColumn);
 	}
 
-	if (card->spdif_config & NO_IN_YES_OUT) {
+	if (card->config.spdif & SPDIF_OUT_PRESENT) {
 		create_output_choice(card, &mmc, 4, parentTabColumn);
 	}
 
@@ -937,31 +937,31 @@ ice1712_list_mix_controls(ice1712 *card, multi_mix_control_info *mmci)
 	parentTab = create_group_control(&mmc, group++, CONTROL_IS_MASTER,
 		S_null, string_list[4]);
 
-	for (i = 0; i < card->nb_DAC; i += 2) {
+	for (i = 0; i < card->config.nb_DAC; i += 2) {
 		parentTabColumn = create_group_control(&mmc, group++, parentTab,
 			S_null, string_list[(i / 2) + 11]);
 		create_channel_control(&mmc, channel++, parentTabColumn, NULL);
 	}
 
-	if (card->spdif_config & NO_IN_YES_OUT) {
+	if (card->config.spdif & SPDIF_OUT_PRESENT) {
 		parentTabColumn = create_group_control(&mmc, group++, parentTab,
 			S_null, string_list[15]);
-		create_channel_control(&mmc, MAX_HARDWARE_VOLUME - 2,
+		create_channel_control(&mmc, ICE1712_HARDWARE_VOLUME - 2,
 			parentTabColumn, NULL);
 	}
 
 	//Input
-	channel = MAX_HARDWARE_VOLUME;
-	for (i = 0; i < card->nb_ADC; i += 2) {
+	channel = ICE1712_HARDWARE_VOLUME;
+	for (i = 0; i < card->config.nb_ADC; i += 2) {
 		parentTabColumn = create_group_control(&mmc, group++, parentTab,
 			 S_null, string_list[(i / 2) + 17]);
 		create_channel_control(&mmc, channel++, parentTabColumn, NULL);
 	}
 
-	if (card->spdif_config & YES_IN_NO_OUT) {
+	if (card->config.spdif & SPDIF_IN_PRESENT) {
 		parentTabColumn = create_group_control(&mmc, group++, parentTab,
 			S_null, string_list[21]);
-		create_channel_control(&mmc, 2 * MAX_HARDWARE_VOLUME - 2,
+		create_channel_control(&mmc, 2 * ICE1712_HARDWARE_VOLUME - 2,
 			parentTabColumn, NULL);
 	}
 
@@ -1006,7 +1006,7 @@ ice1712_get_buffers(ice1712 *card, multi_buffer_list *data)
 		uint32 buf_i = stride_i * card->buffer_size;
 
 		if (data->request_playback_channels == card->total_output_channels) {
-			for (chan_o = 0; chan_o < card->nb_DAC; chan_o++) {
+			for (chan_o = 0; chan_o < card->config.nb_DAC; chan_o++) {
 			//Analog STEREO output
 				data->playback_buffers[buff][chan_o].base = card->log_addr_pb
 					+ buf_o * buff + SAMPLE_SIZE * chan_o;
@@ -1015,7 +1015,7 @@ ice1712_get_buffers(ice1712 *card, multi_buffer_list *data)
 					data->playback_buffers[buff][chan_o].base);
 			}
 
-			if (card->spdif_config & NO_IN_YES_OUT) {
+			if (card->config.spdif & SPDIF_OUT_PRESENT) {
 			//SPDIF STEREO output
 				data->playback_buffers[buff][chan_o].base = card->log_addr_pb
 					+ buf_o * buff + SAMPLE_SIZE * SPDIF_LEFT;
@@ -1034,7 +1034,7 @@ ice1712_get_buffers(ice1712 *card, multi_buffer_list *data)
 		}
 
 		if (data->request_record_channels == card->total_input_channels) {
-			for (chan_i = 0; chan_i < card->nb_ADC; chan_i++) {
+			for (chan_i = 0; chan_i < card->config.nb_ADC; chan_i++) {
 			//Analog STEREO input
 				data->record_buffers[buff][chan_i].base = card->log_addr_rec
 					+ buf_i * buff + SAMPLE_SIZE * chan_i;
@@ -1043,7 +1043,7 @@ ice1712_get_buffers(ice1712 *card, multi_buffer_list *data)
 					data->record_buffers[buff][chan_i].base);
 			}
 
-			if (card->spdif_config & YES_IN_NO_OUT) {
+			if (card->config.spdif & SPDIF_IN_PRESENT) {
 			//SPDIF STEREO input
 				data->record_buffers[buff][chan_i].base = card->log_addr_rec
 					+ buf_i * buff + SAMPLE_SIZE * SPDIF_LEFT;
