@@ -102,7 +102,6 @@ platform_start_kernel(void)
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
 		stackTop);
 
-	dprintf("kernel returned!\n");
 	panic("kernel returned!\n");
 }
 
@@ -152,7 +151,8 @@ start_raw(int argc, const char **argv)
 
 	// if we get passed a uimage, try to find the second blob
 	if (gUImage != NULL
-		&& image_multi_getimg(gUImage, 1, (uint32*)&args.platform.boot_tgz_data,
+		&& image_multi_getimg(gUImage, 1,
+			(uint32*)&args.platform.boot_tgz_data,
 			&args.platform.boot_tgz_size)) {
 		dprintf("Found boot tgz @ %p, %" B_PRIu32 " bytes\n",
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
