@@ -27,9 +27,8 @@ local uImageFakeOS = "netbsd" ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-KernelMergeObject boot_platform_u-boot.o :
-	shell.S
-	arch_start_kernel.S
+# First build the non arch dependent parts
+KernelMergeObject boot_platform_u-boot_common.o :
 	start2.cpp
 	debug.cpp
 	console.cpp
@@ -46,6 +45,13 @@ KernelMergeObject boot_platform_u-boot.o :
 
 	: -fno-pic
 	: boot_platform_generic.a
+;
+
+KernelMergeObject boot_platform_u-boot.o :
+	: :
+	# must come first to have _start_* at correct locations
+	boot_platform_u-boot_$(TARGET_ARCH).o
+	boot_platform_u-boot_common.o
 ;
 
 # include board-specific defs
@@ -233,3 +239,5 @@ SEARCH on [ FGristFiles $(genericPlatformSources) ]
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.
 SEARCH on stage1.bin = $(SUBDIR) ;
+
+SubInclude HAIKU_TOP src system boot platform u-boot arch ;
