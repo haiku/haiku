@@ -18,9 +18,9 @@
 
 #define TRACE_ENGINE
 #ifdef TRACE_ENGINE
-#   define TRACE(x...) _sPrintf("radeon_hd: " x)
+#	define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
-#   define TRACE(x...) ;
+#	define TRACE(x...) ;
 #endif
 
 
