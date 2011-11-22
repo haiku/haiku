@@ -54,11 +54,6 @@ KernelMergeObject boot_platform_u-boot.o :
 	boot_platform_u-boot_common.o
 ;
 
-# include board-specific defs
-SubInclude HAIKU_TOP src system boot platform $(TARGET_BOOT_PLATFORM) board ;
-# reset SubDir
-SubDir HAIKU_TOP src system boot platform u-boot ;
-
 # bootable flash image
 rule BuildUBootFlashImage image : haikuLoader : uboot_image
 {

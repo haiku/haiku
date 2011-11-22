@@ -1,6 +1,0 @@
-SubDir HAIKU_TOP src system boot platform u-boot board ;
-
-if $(TARGET_BOOT_BOARD) {
-        SubInclude HAIKU_TOP src system boot platform $(TARGET_BOOT_PLATFORM) board $(TARGET_BOOT_BOARD) ;
-}
-
