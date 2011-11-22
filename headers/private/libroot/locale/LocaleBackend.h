@@ -31,6 +31,8 @@ struct LocaleCtypeDataBridge {
 	const int*				posixToUpperMap;
 
 	LocaleCtypeDataBridge();
+
+	void setMbCurMax(unsigned short mbCurMax);
 };
 
 

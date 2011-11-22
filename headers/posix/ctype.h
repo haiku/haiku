@@ -72,6 +72,8 @@ extern const int *__ctype_toupper;
 #define isupper(c)	__isctype((c), _ISupper)
 #define isxdigit(c)	__isctype((c), _ISxdigit)
 
+extern unsigned short int __ctype_mb_cur_max;
+
 #ifdef __cplusplus
 }
 #endif
