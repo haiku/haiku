@@ -40,7 +40,7 @@ All rights reserved.
 #include <Window.h>
 
 
-class TBeMenu;
+class TDeskbarMenu;
 class TBarView;
 
 
@@ -59,10 +59,10 @@ public:
 
 			void				SaveSettings();
 			TBarView*			BarView() const { return fBarView; };
-	static	void				SetBeMenu(TBeMenu* menu);
-			TBeMenu*			BeMenu();
+	static	void				SetDeskbarMenu(TDeskbarMenu* menu);
+			TDeskbarMenu*			DeskbarMenu();
 
-			void				ShowBeMenu();
+			void				ShowDeskbarMenu();
 			void				ShowTeamMenu();
 
 			void 				GetLocation(BMessage* message);
@@ -88,7 +88,7 @@ private:
 			bool				_IsFocusMessage(BMessage* message);
 
 private:
-	static	TBeMenu*			sBeMenu;
+	static	TDeskbarMenu*			sDeskbarMenu;
 			TBarView*			fBarView;
 };
 

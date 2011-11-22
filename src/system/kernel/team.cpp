@@ -1541,7 +1541,7 @@ team_create_thread_start_internal(void* args)
 	{
 		// find runtime_loader path
 		KPath runtimeLoaderPath;
-		err = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice, false,
+		err = find_directory(B_SYSTEM_DIRECTORY, gBootDevice, false,
 			runtimeLoaderPath.LockBuffer(), runtimeLoaderPath.BufferSize());
 		if (err < B_OK) {
 			TRACE(("team_create_thread_start: find_directory() failed: %s\n",

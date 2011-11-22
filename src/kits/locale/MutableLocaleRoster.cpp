@@ -361,15 +361,15 @@ RosterData::_InitializeCatalogAddOns()
 	fCatalogAddOnInfos.AddItem((void*)defaultCatalogAddOnInfo);
 
 	directory_which folders[] = {
+		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY,
-		static_cast<directory_which>(-1)
 	};
 	BPath addOnPath;
 	BDirectory addOnFolder;
 	char buf[4096];
 	status_t err;
-	for (int f = 0; folders[f]>=0; ++f) {
+	for (uint32 f = 0; f < sizeof(folders) / sizeof(directory_which); ++f) {
 		find_directory(folders[f], &addOnPath);
 		BString addOnFolderName(addOnPath.Path());
 		addOnFolderName << "/locale/catalogs";

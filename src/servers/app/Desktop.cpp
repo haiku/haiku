@@ -25,8 +25,10 @@
 #include <debugger.h>
 #include <DirectWindow.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <MessageFilter.h>
+#include <Path.h>
 #include <Region.h>
 #include <Roster.h>
 
@@ -2370,7 +2372,12 @@ Desktop::_LaunchInputServer()
 
 	// Could not load input_server by signature, try well-known location
 
-	BEntry entry("/system/servers/input_server");
+	BEntry entry;
+	BPath systemServersDir;
+	if (find_directory(B_SYSTEM_SERVERS_DIRECTORY, &systemServersDir) == B_OK)
+		entry.SetTo(systemServersDir.Path());
+	else
+		entry.SetTo("/system/servers/input_server");
 	entry_ref ref;
 	status_t entryStatus = entry.GetRef(&ref);
 	if (entryStatus == B_OK)

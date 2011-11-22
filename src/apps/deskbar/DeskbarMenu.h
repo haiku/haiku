@@ -33,8 +33,8 @@ holders.
 All rights reserved.
 */
 
-#ifndef _BE_MENU_H_
-#define _BE_MENU_H_
+#ifndef _DESKBAR_MENU_H_
+#define _DESKBAR_MENU_H_
 
 
 #include "NavMenu.h"
@@ -96,9 +96,9 @@ TRecentsMenu::RecentsEnabled()
 }
 
 
-class TBeMenu : public BNavMenu {
+class TDeskbarMenu : public BNavMenu {
 	public:
-		TBeMenu(TBarView* bar);
+		TDeskbarMenu(TBarView* bar);
 
 		void			AttachedToWindow();
 		void			DetachedFromWindow();
@@ -111,13 +111,13 @@ class TBeMenu : public BNavMenu {
 		enum State {
 			kStart,
 			kAddingRecents,
-			kAddingBeMenu,
+			kAddingDeskbarMenu,
 			kDone
 		};
 	protected:
 		BPoint			ScreenLocation();
 
-		bool			AddStandardBeMenuItems();
+		bool			AddStandardDeskbarMenuItems();
 
 	private:
 		virtual bool	StartBuildingItemList();
@@ -130,5 +130,5 @@ class TBeMenu : public BNavMenu {
 		TBarView*		fBarView;
 };
 
-#endif	/* _BE_MENU_H_ */
 
+#endif	/* _DESKBAR_MENU_H_ */

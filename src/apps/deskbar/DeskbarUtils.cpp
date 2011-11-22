@@ -33,14 +33,71 @@ holders.
 All rights reserved.
 */
 
-#ifndef DB_UTILS_H
-#define DB_UTILS_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "tracker_private.h"
+#include <Debug.h>
+#include <Window.h>
+#include <AppFileInfo.h>
+#include <Directory.h>
+#include <FilePanel.h>
+#include <FindDirectory.h>
+#include <List.h>
+#include <Mime.h>
+#include <NodeInfo.h>
+#include <Path.h>
+#include <Screen.h>
+#include <SymLink.h>
 
+#include "BarMenuBar.h"
+#include "DeskbarUtils.h"
+#include "ExpandoMenuBar.h"
 
-void AddRefsToBeMenu(const BMessage* m, entry_ref* subdirectory);
+void
+AddRefsToDeskbarMenu(const BMessage* m, entry_ref* subdirectory)
+{
+	if (m) {
+		int32 count = 0;
+		uint32 type = 0;
+		entry_ref ref;
 
+		m->GetInfo("refs", &type, &count);
+		if (count <= 0)
+			return;
 
-#endif	/* DB_UTILS_H */
+		BPath path;
+		BSymLink link;
+		BDirectory dir;
+		if (subdirectory) {
+			ref = *subdirectory;
+			BEntry entry(&ref);
+			if (entry.Exists()) {
+				// if the ref is a file get the parent and convert it to a ref
+				if (entry.IsFile()) {
+					BEntry parent;
+					entry.GetParent(&parent);
+					parent.GetRef(&ref);
+				}
+			} else
+				return;
+
+			dir.SetTo(&ref);
+		} else {
+			if (find_directory(B_USER_DESKBAR_DIRECTORY, &path) == B_OK)
+				dir.SetTo(path.Path());
+			else
+				return;
+		}
+
+		for (long i = 0; i < count; i++) {
+			if (m->FindRef("refs", i, &ref) == B_NO_ERROR) {
+				BEntry entry(&ref);
+				entry.GetPath(&path);
+
+				dir.CreateSymLink(ref.name, path.Path(), &link);
+			}
+		}
+	}
+}
 

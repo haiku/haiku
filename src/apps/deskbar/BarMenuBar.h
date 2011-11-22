@@ -67,7 +67,7 @@ class TBarMenuBar : public BMenuBar {
 
 	private:
 		TBarView* fBarView;
-		TBarMenuTitle* fBeMenuItem;
+		TBarMenuTitle* fDeskbarMenuItem;
 		TBarMenuTitle* fAppListMenuItem;
 };
 

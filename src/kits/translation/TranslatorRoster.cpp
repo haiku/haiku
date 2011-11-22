@@ -332,10 +332,10 @@ BTranslatorRoster::Private::AddDefaultPaths()
 	const directory_which paths[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY,
 	};
 
-	for (uint32 i = fSafeMode ? 1 : 0; i < sizeof(paths) / sizeof(paths[0]);
+	for (uint32 i = fSafeMode ? 4 : 0; i < sizeof(paths) / sizeof(paths[0]);
 			i++) {
 		BPath path;
 		status_t status = find_directory(paths[i], &path, true);

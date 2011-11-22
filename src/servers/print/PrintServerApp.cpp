@@ -109,7 +109,7 @@ PrintServerApp::PrintServerApp(status_t* err)
 	// Build list of transport addons
 	Transport::Scan(B_USER_ADDONS_DIRECTORY);
 	Transport::Scan(B_COMMON_ADDONS_DIRECTORY);
-	Transport::Scan(B_BEOS_ADDONS_DIRECTORY);
+	Transport::Scan(B_SYSTEM_ADDONS_DIRECTORY);
 
 	SetupPrinterList();
 	RetrieveDefaultPrinter();

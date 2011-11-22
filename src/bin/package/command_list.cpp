@@ -149,9 +149,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 				break;
 
 			case B_PACKAGE_INFO_VERSION:
-				printf("\tversion: %s.%s.%s-%d\n", value.version.major,
-					value.version.minor, value.version.micro,
-					value.version.release);
+				_PrintPackageVersion(value.version);
 				break;
 
 			case B_PACKAGE_INFO_COPYRIGHTS:

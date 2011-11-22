@@ -45,8 +45,8 @@ All rights reserved.
 #include "icons.h"
 #include "icons_logo.h"
 #include "BarWindow.h"
-#include "BeMenu.h"
-#include "DeskBarUtils.h"
+#include "DeskbarMenu.h"
+#include "DeskbarUtils.h"
 #include "ResourceSet.h"
 #include "TeamMenu.h"
 
@@ -58,12 +58,12 @@ TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 
-	TBeMenu* beMenu = new TBeMenu(bar);
-	TBarWindow::SetBeMenu(beMenu);
+	TDeskbarMenu* beMenu = new TDeskbarMenu(bar);
+	TBarWindow::SetDeskbarMenu(beMenu);
 
-	fBeMenuItem = new TBarMenuTitle(frame.Width(), frame.Height(),
+	fDeskbarMenuItem = new TBarMenuTitle(frame.Width(), frame.Height(),
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_LeafLogoBitmap), beMenu);
-	AddItem(fBeMenuItem);
+	AddItem(fDeskbarMenuItem);
 }
 
 
@@ -85,8 +85,8 @@ TBarMenuBar::SmartResize(float width, float height)
 	width -= 1;
 
 	int32 count = CountItems();
-	if (fBeMenuItem)
-		fBeMenuItem->SetWidthHeight(width / count, height);
+	if (fDeskbarMenuItem)
+		fDeskbarMenuItem->SetWidthHeight(width / count, height);
 	if (fAppListMenuItem)
 		fAppListMenuItem->SetWidthHeight(width / count, height);
 
@@ -195,10 +195,10 @@ TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu*, void*),
 	uint32 buttons;
 	GetMouse(&loc, &buttons);
 	// set the hook functions for the two menus
-	// will always have the be menu
+	// will always have the deskbar menu
 	// may have the app menu as well (mini mode)
-	if (fBeMenuItem->Frame().Contains(loc) || both)
-		init_tracking_hook(fBeMenuItem, hookFunction, state);
+	if (fDeskbarMenuItem->Frame().Contains(loc) || both)
+		init_tracking_hook(fDeskbarMenuItem, hookFunction, state);
 
 	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both))
 		init_tracking_hook(fAppListMenuItem, hookFunction, state);

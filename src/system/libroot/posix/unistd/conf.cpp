@@ -15,6 +15,7 @@
 
 #include <SupportDefs.h>
 
+#include <directories.h>
 #include <fs_info.h>
 #include <posix/realtime_sem_defs.h>
 #include <signal_defs.h>
@@ -386,8 +387,8 @@ confstr(int name, char *buffer, size_t length)
 
 	switch (name) {
 		case _CS_PATH:
-			string = "/bin:/boot/system/apps:" \
-				"/boot/common/bin:/boot/develop/bin";
+			string = kGlobalBinDirectory ":" kSystemAppsDirectory ":"
+				kCommonBinDirectory ":" kCommonDevelopToolsBinDirectory;
 			break;
 		default:
 			__set_errno(EINVAL);

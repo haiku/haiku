@@ -70,11 +70,6 @@ using namespace BPrivate;
 //! The maximal period of time an app may be early pre-registered (60 s).
 const bigtime_t kMaximalEarlyPreRegistrationPeriod = 60000000LL;
 
-//! Applications living in these directory are considered "system apps".
-// TODO: move those into a common shared system header
-static const char* const kSystemAppPath = "/boot/system";
-static const char* const kSystemServerPath = "/boot/system/servers";
-
 
 //	#pragma mark - Private local functions
 
@@ -141,6 +136,8 @@ TRoster::TRoster()
 	fLastToken(0),
 	fShuttingDown(false)
 {
+	find_directory(B_SYSTEM_DIRECTORY, &fSystemAppPath);
+	find_directory(B_SYSTEM_SERVERS_DIRECTORY, &fSystemServerPath);
 }
 
 
@@ -1815,8 +1812,8 @@ TRoster::_IsSystemApp(RosterAppInfo* info) const
 	if (path.SetTo(&info->ref) != B_OK || path.GetParent(&path) != B_OK)
 		return false;
 
-	return !strcmp(path.Path(), kSystemAppPath)
-		|| !strcmp(path.Path(), kSystemServerPath);
+	return !strcmp(path.Path(), fSystemAppPath.Path())
+		|| !strcmp(path.Path(), fSystemServerPath.Path());
 }
 
 

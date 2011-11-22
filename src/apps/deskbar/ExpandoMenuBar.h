@@ -52,7 +52,7 @@ class TTeamMenuItem;
 
 enum drag_and_drop_selection {
 	kNoSelection,
-	kBeMenuSelection,
+	kDeskbarMenuSelection,
 	kAppMenuSelection,
 	kAnyMenuSelection
 };
@@ -74,7 +74,7 @@ class TExpandoMenuBar : public BMenuBar {
 
 		TTeamMenuItem* TeamItemAtPoint(BPoint location,
 			BMenuItem** _item = NULL);
-		bool InBeMenu(BPoint) const;
+		bool InDeskbarMenu(BPoint) const;
 
 		void CheckItemSizes(int32 delta);
 
@@ -100,12 +100,12 @@ class TExpandoMenuBar : public BMenuBar {
 		bool fShowTeamExpander : 1;
 		bool fExpandNewTeams : 1;
 
-		float fBeMenuWidth;
+		float fDeskbarMenuWidth;
 
 		TBarView* fBarView;
 		int32 fFirstApp;
 
-		TBarMenuTitle* fBeMenuItem;
+		TBarMenuTitle* fDeskbarMenuItem;
 		TTeamMenuItem* fSeparatorItem;
 		TTeamMenuItem* fPreviousDragTargetItem;
 

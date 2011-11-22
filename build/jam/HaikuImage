@@ -360,8 +360,9 @@ AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 
+AddSymlinkToHaikuImage home config settings : deskbar : be ;
 # Deskbar Application links
-AddDirectoryToHaikuImage home config be Applications ;
+AddDirectoryToHaikuImage home config settings deskbar Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
 	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
@@ -369,32 +370,33 @@ DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
-	AddSymlinkToHaikuImage home config be Applications
+	AddSymlinkToHaikuImage home config settings deskbar Applications
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Desktop applets links
-AddDirectoryToHaikuImage home config be Desktop\ applets ;
+AddDirectoryToHaikuImage home config settings deskbar Desktop\ applets ;
 DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
 	Workspaces
 ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
-	AddSymlinkToHaikuImage home config be Desktop\ applets
+	AddSymlinkToHaikuImage home config settings deskbar Desktop\ applets
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Preferences links
-AddDirectoryToHaikuImage home config be Preferences ;
+AddDirectoryToHaikuImage home config settings deskbar Preferences ;
 DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
-	AddSymlinkToHaikuImage home config be Preferences
-		: /boot/system/preferences/$(linkTarget) : $(linkTarget) ;
+	AddSymlinkToHaikuImage home config settings deskbar Preferences
+		: /boot/system/preferences/$(linkTarget)
+		: $(linkTarget) ;
 }
 
 # Deskbar Demo links
-AddDirectoryToHaikuImage home config be Demos ;
+AddDirectoryToHaikuImage home config settings deskbar Demos ;
 for linkTarget in $(SYSTEM_DEMOS) {
-	AddSymlinkToHaikuImage home config be Demos
+	AddSymlinkToHaikuImage home config settings deskbar Demos
 		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 

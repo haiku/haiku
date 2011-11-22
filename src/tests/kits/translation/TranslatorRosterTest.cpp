@@ -446,7 +446,8 @@ TranslatorRosterTest::AddTranslatorsTest()
 	BTranslatorRoster* proster = new BTranslatorRoster();
 	CPPUNIT_ASSERT(proster);
 	CPPUNIT_ASSERT(proster->AddTranslators(
-		"/boot/home/config/add-ons/Translators/:/system/add-ons/Translators/") == B_OK);
+		"/boot/home/config/add-ons/Translators/:"
+		"/system/add-ons/Translators/") == B_OK);
 
 	NextSubTest();
 	int32 instcount = 0;

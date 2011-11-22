@@ -8,23 +8,32 @@
  *		Marcus Overhagen, marcus@overhagen.de
  *		Jerome Duval, jerome.duval@free.fr
  */
+
+
 #include <KernelExport.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <directories.h>
 #include <OS.h>
+
 #include "debug.h"
 #include "es1370.h"
 
+
 #if DEBUG > 0
-static const char * logfile="/boot/home/es1370.log";
+static const char *logfile = kCommonLogDirectory "/es1370.log";
 static sem_id loglock;
 #endif
+
 
 void debug_printf(const char *text,...);
 void log_printf(const char *text,...);
 void log_create(void);
+
 
 void debug_printf(const char *text,...)
 {
@@ -38,6 +47,7 @@ void debug_printf(const char *text,...)
 	dprintf(DRIVER_NAME ": %s",buf);
 }
 
+
 void log_create()
 {
 #if DEBUG > 0
@@ -48,6 +58,7 @@ void log_create()
 	close(fd);
 #endif
 }
+
 
 void log_printf(const char *text,...)
 {
@@ -73,4 +84,3 @@ void log_printf(const char *text,...)
 	#endif
 #endif
 }
-

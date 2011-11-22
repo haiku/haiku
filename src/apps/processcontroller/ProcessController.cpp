@@ -345,21 +345,45 @@ ProcessController::MessageReceived(BMessage *message)
 			break;
 
 		case 'Trac':
-			launch(kTrackerSig, "/boot/system/Tracker");
+		{
+			BPath trackerPath;
+			if (find_directory(B_SYSTEM_DIRECTORY, &trackerPath) == B_OK
+				&& trackerPath.Append("Tracker") == B_OK) {
+				launch(kTrackerSig, trackerPath.Path());
+			}
 			break;
+		}
 
 		case 'Dbar':
-			launch(kDeskbarSig, "/boot/system/Deskbar");
+		{
+			BPath deskbarPath;
+			if (find_directory(B_SYSTEM_DIRECTORY, &deskbarPath) == B_OK
+				&& deskbarPath.Append("Deskbar") == B_OK) {
+				launch(kDeskbarSig, deskbarPath.Path());
+			}
 			break;
+		}
 
 		case 'Term':
-			launch(kTerminalSig, "/boot/system/apps/Terminal");
+		{
+			BPath terminalPath;
+			if (find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath) == B_OK
+				&& terminalPath.Append("Deskbar") == B_OK) {
+				launch(kTerminalSig, terminalPath.Path());
+			}
+			launch(kTerminalSig, terminalPath.Path());
 			break;
+		}
 
 		case 'AlDb':
 		{
-			if (!be_roster->IsRunning(kDeskbarSig))
-				launch(kDeskbarSig, "/boot/system/Deskbar");
+			if (!be_roster->IsRunning(kDeskbarSig)) {
+				BPath deskbarPath;
+				if (find_directory(B_SYSTEM_DIRECTORY, &deskbarPath) == B_OK
+					&& deskbarPath.Append("Deskbar") == B_OK) {
+					launch(kDeskbarSig, deskbarPath.Path());
+				}
+			}
 			BDeskbar deskbar;
 			if (gInDeskbar || deskbar.HasItem (kDeskbarItemName))
 				deskbar.RemoveItem (kDeskbarItemName);

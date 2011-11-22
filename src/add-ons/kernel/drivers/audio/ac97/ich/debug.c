@@ -25,13 +25,20 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+
 #include <KernelExport.h>
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <directories.h>
 #include <OS.h>
+
 #include "debug.h"
 #include "ich.h"
+
 
 void debug_printf(const char *text,...)
 {
@@ -45,10 +52,11 @@ void debug_printf(const char *text,...)
 	dprintf(DRIVER_NAME ": %s",buf);
 }
 
-#if DEBUG > 0
 
-static const char * logfile="/boot/home/ich_ac97.log";
+#if DEBUG > 0
+static const char *logfile = kCommonLogDirectory "/ich_ac97.log";
 static sem_id loglock;
+
 
 void log_create(void)
 {
@@ -58,6 +66,7 @@ void log_create(void)
 	write(fd,text,strlen(text));
 	close(fd);
 }
+
 
 void log_printf(const char *text,...)
 {
@@ -81,5 +90,4 @@ void log_printf(const char *text,...)
 		snooze(150000);
 	#endif
 }
-
 #endif

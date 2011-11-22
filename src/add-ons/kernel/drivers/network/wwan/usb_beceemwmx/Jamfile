@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers network wwan usb_beceemwmx ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders kernel net ;
+UsePrivateHeaders kernel libroot net ;
 
 KernelAddon usb_beceemwmx :
 	Driver.cpp

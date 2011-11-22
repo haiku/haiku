@@ -70,19 +70,20 @@ status_t PrintTransport::Open(BNode* printerFolder)
 		return B_ERROR;
 	}
 
-	// try first in user add-ons directory
+	const directory_which paths[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY,
+	};
 	BPath path;
-	find_directory(B_USER_ADDONS_DIRECTORY, &path);
+	for (uint32 i = 0; i < sizeof(paths) / sizeof(paths[0]); ++i) {
+		if (find_directory(paths[i], &path) != B_OK)
+			continue;
 	path.Append("Print/transport");
 	path.Append(transportName.String());
 	fAddOnID = load_add_on(path.Path());
-
-	if (fAddOnID < 0) {
-		// on failure try in system add-ons directory
-		find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
-		path.Append("Print/transport");
-		path.Append(transportName.String());
-		fAddOnID = load_add_on(path.Path());
+		if (fAddOnID >= 0)
+			break;
 	}
 
 	if (fAddOnID < 0) {
