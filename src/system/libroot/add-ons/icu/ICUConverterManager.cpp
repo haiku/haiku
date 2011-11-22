@@ -7,6 +7,7 @@
 #include "ICUConverterManager.h"
 
 #include <pthread.h>
+#include <string.h>
 
 #include <new>
 
