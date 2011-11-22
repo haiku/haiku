@@ -16,7 +16,10 @@ namespace Libroot {
 
 class ICUMessagesData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
+
 public:
+								ICUMessagesData(pthread_key_t tlsKey);
+
 	virtual	status_t			SetTo(const Locale& locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();

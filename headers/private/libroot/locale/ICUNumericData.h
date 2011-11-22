@@ -18,7 +18,8 @@ class ICUNumericData : public ICULocaleconvData {
 	typedef	ICULocaleconvData	inherited;
 
 public:
-								ICUNumericData(struct lconv& localeConv);
+								ICUNumericData(pthread_key_t tlsKey,
+									struct lconv& localeConv);
 
 			void				Initialize(LocaleNumericDataBridge* dataBridge);
 

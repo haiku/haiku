@@ -19,7 +19,7 @@ class ICUCollateData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 
 public:
-								ICUCollateData();
+								ICUCollateData(pthread_key_t tlsKey);
 	virtual						~ICUCollateData();
 
 	virtual	status_t			SetTo(const Locale& locale,

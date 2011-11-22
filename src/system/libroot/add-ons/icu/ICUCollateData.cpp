@@ -10,13 +10,16 @@
 
 #include <unicode/unistr.h>
 
+#include "ICUConverterManager.h"
+
 
 namespace BPrivate {
 namespace Libroot {
 
 
-ICUCollateData::ICUCollateData()
+ICUCollateData::ICUCollateData(pthread_key_t tlsKey)
 	:
+	inherited(tlsKey),
 	fCollator(NULL)
 {
 }
@@ -150,8 +153,14 @@ ICUCollateData::_ToUnicodeString(const char* in, UnicodeString& out)
 	if (inLen == 0)
 		return B_OK;
 
+	ICUConverterRef converterRef;
+	status_t result = _GetConverter(converterRef);
+	if (result != B_OK)
+		return result;
+
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	int32_t outLen = ucnv_toUChars(fConverter, NULL, 0, in, inLen, &icuStatus);
+	int32_t outLen = ucnv_toUChars(converterRef->Converter(), NULL, 0, in,
+		inLen, &icuStatus);
 	if (icuStatus != U_BUFFER_OVERFLOW_ERROR)
 		return B_BAD_VALUE;
 	if (outLen < 0)
@@ -161,8 +170,8 @@ ICUCollateData::_ToUnicodeString(const char* in, UnicodeString& out)
 
 	UChar* outBuf = out.getBuffer(outLen + 1);
 	icuStatus = U_ZERO_ERROR;
-	outLen
-		= ucnv_toUChars(fConverter, outBuf, outLen + 1, in, inLen, &icuStatus);
+	outLen = ucnv_toUChars(converterRef->Converter(), outBuf, outLen + 1, in,
+		inLen, &icuStatus);
 	if (!U_SUCCESS(icuStatus)) {
 		out.releaseBuffer(0);
 		return B_BAD_VALUE;

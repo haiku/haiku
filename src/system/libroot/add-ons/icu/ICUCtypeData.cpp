@@ -16,8 +16,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUCtypeData::ICUCtypeData()
+ICUCtypeData::ICUCtypeData(pthread_key_t tlsKey)
 	:
+	inherited(tlsKey),
 	fDataBridge(NULL)
 {
 }
@@ -47,7 +48,14 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
 
-	ucnv_reset(fConverter);
+	ICUConverterRef converterRef;
+	result = _GetConverter(converterRef);
+	if (result != B_OK)
+		return result;
+
+	UConverter* converter = converterRef->Converter();
+
+	ucnv_reset(converter);
 	char buffer[] = { 0, 0 };
 	for (int i = 0; i < 256; ++i) {
 		const char* source = buffer;
@@ -55,7 +63,7 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 		buffer[1] = '\0';
 		icuStatus = U_ZERO_ERROR;
 		UChar32 unicodeChar
-			= ucnv_getNextUChar(fConverter, &source, source + 1, &icuStatus);
+			= ucnv_getNextUChar(converter, &source, source + 1, &icuStatus);
 
 		unsigned short classInfo = 0;
 		unsigned int toLower = i;
@@ -88,13 +96,13 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 
 			UChar lowerChar = u_tolower(unicodeChar);
 			icuStatus = U_ZERO_ERROR;
-			ucnv_fromUChars(fConverter, buffer, 1, &lowerChar, 1, &icuStatus);
+			ucnv_fromUChars(converter, buffer, 1, &lowerChar, 1, &icuStatus);
 			if (U_SUCCESS(icuStatus))
 				toLower = (unsigned char)buffer[0];
 
 			UChar upperChar = u_toupper(unicodeChar);
 			icuStatus = U_ZERO_ERROR;
-			ucnv_fromUChars(fConverter, buffer, 1, &upperChar, 1, &icuStatus);
+			ucnv_fromUChars(converter, buffer, 1, &upperChar, 1, &icuStatus);
 			if (U_SUCCESS(icuStatus))
 				toUpper = (unsigned char)buffer[0];
 		}

@@ -13,6 +13,12 @@ namespace BPrivate {
 namespace Libroot {
 
 
+ICULocaleconvData::ICULocaleconvData(pthread_key_t tlsKey)
+	: inherited(tlsKey)
+{
+}
+
+
 status_t
 ICULocaleconvData::_SetLocaleconvEntry(const DecimalFormatSymbols* formatSymbols,
 	char* destination, FormatSymbol symbol, const char* defaultValue)

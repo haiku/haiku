@@ -28,9 +28,13 @@ CreateInstance()
 
 ICULocaleBackend::ICULocaleBackend()
 	:
-	fMonetaryData(fLocaleConv),
-	fNumericData(fLocaleConv),
-	fTimeData(fLCTimeInfo),
+	fThreadLocalStorageKey(_CreateThreadLocalStorageKey()),
+	fCollateData(fThreadLocalStorageKey),
+	fCtypeData(fThreadLocalStorageKey),
+	fMessagesData(fThreadLocalStorageKey),
+	fMonetaryData(fThreadLocalStorageKey, fLocaleConv),
+	fNumericData(fThreadLocalStorageKey, fLocaleConv),
+	fTimeData(fThreadLocalStorageKey, fLCTimeInfo),
 	fTimeConversion(fTimeData)
 {
 }
@@ -38,6 +42,7 @@ ICULocaleBackend::ICULocaleBackend()
 
 ICULocaleBackend::~ICULocaleBackend()
 {
+	pthread_key_delete(fThreadLocalStorageKey);
 }
 
 
@@ -368,6 +373,26 @@ ICULocaleBackend::_SetPosixLocale(int category)
 	}
 
 	return "POSIX";
+}
+
+
+pthread_key_t
+ICULocaleBackend::_CreateThreadLocalStorageKey()
+{
+	pthread_key_t key;
+
+	pthread_key_create(&key, ICULocaleBackend::_DestroyThreadLocalStorageValue);
+
+	return key;
+}
+
+
+void ICULocaleBackend::_DestroyThreadLocalStorageValue(void* value)
+{
+	ICUThreadLocalStorageValue* tlsValue
+		= static_cast<ICUThreadLocalStorageValue*>(value);
+
+	delete tlsValue;
 }
 
 

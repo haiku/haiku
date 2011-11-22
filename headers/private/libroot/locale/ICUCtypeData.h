@@ -17,7 +17,7 @@ namespace Libroot {
 class ICUCtypeData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 public:
-								ICUCtypeData();
+								ICUCtypeData(pthread_key_t tlsKey);
 	virtual 					~ICUCtypeData();
 
 			void				Initialize(LocaleCtypeDataBridge* dataBridge);

@@ -14,6 +14,12 @@ namespace BPrivate {
 namespace Libroot {
 
 
+ICUMessagesData::ICUMessagesData(pthread_key_t tlsKey)
+	: inherited(tlsKey)
+{
+}
+
+
 void
 ICUMessagesData::Initialize(LocaleMessagesDataBridge* dataBridge)
 {

@@ -15,9 +15,7 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUCategoryData::ICUCategoryData()
-	:
-	fConverter(NULL)
+ICUCategoryData::ICUCategoryData(pthread_key_t tlsKey)
 {
 	*fPosixLocaleName = '\0';
 	*fGivenCharset = '\0';
@@ -26,32 +24,42 @@ ICUCategoryData::ICUCategoryData()
 
 ICUCategoryData::~ICUCategoryData()
 {
-	if (fConverter)
-		ucnv_close(fConverter);
 }
 
 
 status_t
-ICUCategoryData::_SetupConverter()
+ICUCategoryData::_GetConverter(ICUConverterRef& converterRefOut)
 {
-	if (fConverter != NULL) {
-		ucnv_close(fConverter);
-		fConverter = NULL;
+	// we use different converter-IDs per thread in order to avoid converters
+	// being used by more than one thread
+	ICUThreadLocalStorageValue* tlsValue = NULL;
+	status_t result = ICUThreadLocalStorageValue::GetInstanceForKey(
+		fThreadLocalStorageKey, tlsValue);
+	if (result != B_OK)
+		return result;
+
+	ICUConverterRef converterRef;
+	result = ICUConverterManager::Instance()->GetConverter(
+		tlsValue->converterID, converterRef);
+	if (result == B_OK) {
+		if (strcmp(converterRef->Charset(), fGivenCharset) == 0) {
+			converterRefOut = converterRef;
+			return B_OK;
+		}
+
+		// charset no longer matches the converter, we need to dump it and
+		// create a new one
+		ICUConverterManager::Instance()->DropConverter(tlsValue->converterID);
+		tlsValue->converterID = 0;
 	}
 
-	UErrorCode icuStatus = U_ZERO_ERROR;
-	fConverter = ucnv_open(fGivenCharset, &icuStatus);
-	if (fConverter == NULL)
-		return B_NAME_NOT_FOUND;
+	// create a new converter for the current charset
+	result = ICUConverterManager::Instance()->CreateConverter(fGivenCharset,
+		converterRef, tlsValue->converterID);
+	if (result != B_OK)
+		return result;
 
-	icuStatus = U_ZERO_ERROR;
-	ucnv_setToUCallBack(fConverter, UCNV_TO_U_CALLBACK_STOP, NULL, NULL,
-		NULL, &icuStatus);
-	icuStatus = U_ZERO_ERROR;
-	ucnv_setFromUCallBack(fConverter, UCNV_FROM_U_CALLBACK_STOP, NULL, NULL,
-		NULL, &icuStatus);
-	if (!U_SUCCESS(icuStatus))
-		return B_ERROR;
+	converterRefOut = converterRef;
 
 	return B_OK;
 }
@@ -105,10 +113,13 @@ ICUCategoryData::_ConvertUnicodeStringToLocaleconvEntry(
 	const UnicodeString& string, char* destination, int destinationSize,
 	const char* defaultValue)
 {
-	status_t result = B_OK;
-	UErrorCode icuStatus = U_ZERO_ERROR;
+	ICUConverterRef converterRef;
+	status_t result = _GetConverter(converterRef);
+	if (result != B_OK)
+		return result;
 
-	ucnv_fromUChars(fConverter, destination, destinationSize,
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	ucnv_fromUChars(converterRef->Converter(), destination, destinationSize,
 		string.getBuffer(), string.length(), &icuStatus);
 	if (!U_SUCCESS(icuStatus)) {
 		switch (icuStatus) {
@@ -128,6 +139,14 @@ ICUCategoryData::_ConvertUnicodeStringToLocaleconvEntry(
 	}
 
 	return result;
+}
+
+
+status_t
+ICUCategoryData::_SetupConverter()
+{
+	ICUConverterRef converterRef;
+	return _GetConverter(converterRef);
 }
 
 

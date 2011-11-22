@@ -20,8 +20,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUTimeData::ICUTimeData(struct lc_time_t& lcTimeInfo)
+ICUTimeData::ICUTimeData(pthread_key_t tlsKey, struct lc_time_t& lcTimeInfo)
 	:
+	inherited(tlsKey),
 	fLCTimeInfo(lcTimeInfo),
 	fDataBridge(NULL)
 {

@@ -9,6 +9,7 @@
 #include "LocaleBackend.h"
 
 #include <locale.h>
+#include <pthread.h>
 #include <timelocal.h>
 
 #include "ICUCollateData.h"
@@ -57,12 +58,18 @@ private:
 			const char*			_QueryLocale(int category);
 			const char*			_SetPosixLocale(int category);
 
+	static	pthread_key_t		_CreateThreadLocalStorageKey();
+	static	void 				_DestroyThreadLocalStorageValue(void* value);
+
 			// buffer for locale names (up to one per category)
 			char				fLocaleDescription[512];
 
 			// data containers
 			struct lconv 	 	fLocaleConv;
 			struct lc_time_t 	fLCTimeInfo;
+
+			//
+			pthread_key_t		fThreadLocalStorageKey;
 
 			// these work on the data containers above
 			ICUCollateData		fCollateData;

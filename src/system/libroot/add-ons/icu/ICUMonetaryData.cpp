@@ -15,8 +15,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUMonetaryData::ICUMonetaryData(struct lconv& localeConv)
+ICUMonetaryData::ICUMonetaryData(pthread_key_t tlsKey, struct lconv& localeConv)
 	:
+	inherited(tlsKey),
 	fLocaleConv(localeConv),
 	fPosixLocaleConv(NULL)
 {

@@ -21,7 +21,8 @@ namespace Libroot {
 class ICUTimeData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 public:
-								ICUTimeData(struct lc_time_t& lcTimeInfo);
+								ICUTimeData(pthread_key_t tlsKey,
+									struct lc_time_t& lcTimeInfo);
 								~ICUTimeData();
 
 			void				Initialize(LocaleTimeDataBridge* dataBridge);

@@ -21,6 +21,8 @@ class ICULocaleconvData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 
 protected:
+								ICULocaleconvData(pthread_key_t tlsKey);
+
 			status_t			_SetLocaleconvEntry(
 									const DecimalFormatSymbols* formatSymbols,
 									char* destination, FormatSymbol symbol,
