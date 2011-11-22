@@ -23,3 +23,5 @@ MergeObject <libbe>support_kit.o :
 	String.cpp
 	Url.cpp
 ;
+
+StaticLibrary libreferenceable.a : : [ FGristFiles Referenceable.o ] ;
