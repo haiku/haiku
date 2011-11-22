@@ -6,6 +6,7 @@
 #define _WCHAR_H
 
 
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -26,8 +27,8 @@ typedef __WINT_TYPE__ wint_t;
 typedef int wctype_t;
 
 typedef struct {
-	int		__count;
-	wint_t	__value;
+	unsigned int count;
+	unsigned int converterID;
 } mbstate_t;
 
 
