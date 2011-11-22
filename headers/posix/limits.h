@@ -26,6 +26,8 @@
 #define	LLONG_MAX		LONGLONG_MAX
 #define	LLONG_MIN		LONGLONG_MIN
 
+#define MB_LEN_MAX		16
+
 #define OFF_MAX			LLONG_MAX
 #define OFF_MIN			LLONG_MIN
 
