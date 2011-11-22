@@ -2,7 +2,7 @@
 
 # Parameters <haiku sourcedir> <buildtools dir> <haiku output dir>
 # Influential environmental variable:
-# * haikuRequiredLegacyGCCVersion: The requrired version of the gcc. Will be
+# * haikuRequiredLegacyGCCVersion: The required version of the gcc. Will be
 #   checked against the version in the buildtools directory.
 
 # get and check the parameters
