@@ -13,10 +13,5 @@ MergeObject posix_locale.o :
 	localeconv.cpp
 	nl_langinfo.cpp
 	setlocale.cpp
-	#mb_none.c
-	#mblen.c
-	#mbrtowc.c
-	#mbsinit.c
-	#wcrtomb.c
 	wctype.cpp
 ;

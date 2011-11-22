@@ -1,6 +1,20 @@
 SubDir HAIKU_TOP src system libroot posix wchar ;
 
+UsePrivateHeaders
+	[ FDirName libroot ]
+	[ FDirName libroot locale ]
+;
+
 MergeObject posix_wchar.o :
-	wcwidth.c
+	btowc.c
+	mblen.c
+	mbrlen.c
+	mbrtowc.cpp
+	mbsinit.c
+	mbtowc.c
+	wcrtomb.cpp
 	wcswidth.c
+	wctob.c
+	wctomb.c
+	wcwidth.c
 ;

@@ -17,11 +17,14 @@ __BEGIN_DECLS
 
 extern wint_t	__btowc(int);
 
+extern int		__mblen(const char *string, size_t maxSize);
 extern size_t 	__mbrlen(const char *s, size_t n, mbstate_t *ps);
 extern size_t 	__mbrtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *ps);
 extern int		__mbsinit(const mbstate_t *);
 extern size_t	__mbsrtowcs(wchar_t *dst, const char **src, size_t len,
 					mbstate_t *ps);
+extern size_t	__mbstowcs(wchar_t *pwcs, const char *string, size_t maxSize);
+extern int		__mbtowc(wchar_t *pwc, const char *string, size_t maxSize);
 
 extern size_t   __wcrtomb(char *, wchar_t, mbstate_t *);
 extern wchar_t	*__wcscat(wchar_t *, const wchar_t *);
@@ -51,6 +54,8 @@ extern long double			__wcstold(const wchar_t *, wchar_t **);
 extern long long			__wcstoll(const wchar_t *, wchar_t **, int);
 extern unsigned long		__wcstoul(const wchar_t *, wchar_t **, int);
 extern unsigned long long	__wcstoull(const wchar_t *, wchar_t **, int);
+extern size_t	__wcstombs(char *string, const wchar_t *pwcs, size_t maxSize);
+extern int		__wctomb(char *string, wchar_t wchar);
 extern wchar_t	*__wcswcs(const wchar_t *, const wchar_t *);
 extern int		__wcswidth(const wchar_t *, size_t);
 extern size_t	__wcsxfrm(wchar_t *, const wchar_t *, size_t);

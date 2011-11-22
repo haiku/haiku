@@ -15,16 +15,11 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 MergeObject posix_gnu_wcsmbs.o :
-	btowc.c
-	mbrlen.c
-	mbrtowc.c
-	mbsinit.c
 	mbsnrtowcs.c
 	mbsrtowcs.c
 #	mbsrtowcs_l.c
 	wcpcpy.c
 	wcpncpy.c
-	wcrtomb.c
 	wcscasecmp.c
 #	wcscasecmp_l.c
 	wcscat.c
@@ -55,10 +50,7 @@ MergeObject posix_gnu_wcsmbs.o :
 	wcstold.c
 	wcstoul.c
 	wcstoull.c
-#	wcswidth.c
 	wcsxfrm.c
-	wctob.c
-#	wcwidth.c
 	wmemchr.c
 	wmemcmp.c
 	wmemcpy.c
