@@ -152,6 +152,26 @@ ICULocaleBackend::ToWCTrans(wint_t wc, wctrans_t transition, wint_t& result)
 }
 
 
+status_t
+ICULocaleBackend::MultibyteToWchar(wchar_t* wcOut, const char* mb,
+	size_t mbLength, mbstate_t* mbState, size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.MultibyteToWchar(wcOut, mb, mbLength, mbState, lengthOut);
+}
+
+
+status_t
+ICULocaleBackend::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.WcharToMultibyte(mbOut, wc, mbState, lengthOut);
+}
+
+
 const char*
 ICULocaleBackend::GetLanginfo(int index)
 {

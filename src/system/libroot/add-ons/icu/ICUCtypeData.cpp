@@ -54,8 +54,10 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 		return result;
 
 	UConverter* converter = converterRef->Converter();
-
 	ucnv_reset(converter);
+
+	fDataBridge->setMbCurMax(ucnv_getMaxCharSize(converter));
+
 	char buffer[] = { 0, 0 };
 	for (int i = 0; i < 256; ++i) {
 		const char* source = buffer;
@@ -130,6 +132,8 @@ ICUCtypeData::SetToPosix()
 		memcpy(fClassInfo, fDataBridge->posixClassInfo, sizeof(fClassInfo));
 		memcpy(fToLowerMap, fDataBridge->posixToLowerMap, sizeof(fToLowerMap));
 		memcpy(fToUpperMap, fDataBridge->posixToUpperMap, sizeof(fToUpperMap));
+
+		fDataBridge->setMbCurMax(1);
 	}
 
 	return result;
@@ -189,6 +193,94 @@ ICUCtypeData::ToWCTrans(wint_t wc, wctrans_t transition, wint_t& result)
 }
 
 
+status_t
+ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
+	mbstate_t* mbState, size_t& lengthOut)
+{
+	ICUConverterRef converterRef;
+	status_t result = _GetConverterForMbState(mbState, converterRef);
+	if (result != B_OK)
+		return result;
+
+	UConverter* converter = converterRef->Converter();
+
+	// do the conversion
+	UErrorCode icuStatus = U_ZERO_ERROR;
+
+	const char* buffer = mb;
+	UChar targetBuffer[2];
+	UChar* target = targetBuffer;
+	ucnv_toUnicode(converter, &target, target + 1, &buffer, buffer + mbLen,
+		NULL, FALSE, &icuStatus);
+	size_t sourceLengthUsed = buffer - mb;
+	size_t targetLengthUsed = (size_t)(target - targetBuffer);
+
+	if (icuStatus == U_BUFFER_OVERFLOW_ERROR && targetLengthUsed > 0) {
+		// we've got one character, which is all that we wanted
+		icuStatus = U_ZERO_ERROR;
+	}
+
+	UChar32 unicodeChar = 0xBADBEEF;
+
+	if (!U_SUCCESS(icuStatus)) {
+		// conversion failed because of illegal character sequence
+		result = B_BAD_DATA;
+	} else 	if (targetLengthUsed == 0) {
+		mbState->count = sourceLengthUsed;
+		result = B_BAD_INDEX;
+	} else {
+		U16_GET(targetBuffer, 0, 0, 2, unicodeChar);
+
+		if (unicodeChar == 0) {
+			// reset to initial state
+			_DropConverterFromMbState(mbState);
+			memset(mbState, 0, sizeof(mbstate_t));
+			lengthOut = 0;
+		} else {
+			mbState->count = 0;
+			lengthOut = sourceLengthUsed;
+		}
+
+		if (wcOut != NULL)
+			*wcOut = unicodeChar;
+
+		result = B_OK;
+	}
+
+	return result;
+}
+
+
+status_t
+ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ICUConverterRef converterRef;
+	status_t result = _GetConverterForMbState(mbState, converterRef);
+	if (result != B_OK)
+		return result;
+
+	UConverter* converter = converterRef->Converter();
+
+	// do the conversion
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	lengthOut = ucnv_fromUChars(converter, mbOut, MB_LEN_MAX, (UChar*)&wc,
+		1, &icuStatus);
+
+	if (!U_SUCCESS(icuStatus)) {
+		if (icuStatus == U_ILLEGAL_ARGUMENT_ERROR) {
+			// bad converter (shouldn't really happen)
+			return B_BAD_VALUE;
+		}
+
+		// conversion failed because of illegal/unmappable character
+		return B_BAD_DATA;
+	}
+
+	return B_OK;
+}
+
+
 const char*
 ICUCtypeData::GetLanginfo(int index)
 {
@@ -198,6 +290,46 @@ ICUCtypeData::GetLanginfo(int index)
 		default:
 			return "";
 	}
+}
+
+
+status_t
+ICUCtypeData::_GetConverterForMbState(mbstate_t* mbState,
+	ICUConverterRef& converterRefOut)
+{
+	ICUConverterRef converterRef;
+	status_t result = ICUConverterManager::Instance()->GetConverter(
+		mbState->converterID, converterRef);
+	if (result == B_OK) {
+		if (strcmp(converterRef->Charset(), fGivenCharset) == 0) {
+			converterRefOut = converterRef;
+			return B_OK;
+		}
+
+		// charset no longer matches the converter, we need to dump it and
+		// create a new one
+		_DropConverterFromMbState(mbState);
+	}
+
+	// create a new converter for the current charset
+	result = ICUConverterManager::Instance()->CreateConverter(fGivenCharset,
+		converterRef, mbState->converterID);
+	if (result != B_OK)
+		return result;
+
+	converterRefOut = converterRef;
+
+	return B_OK;
+}
+
+
+status_t
+ICUCtypeData::_DropConverterFromMbState(mbstate_t* mbState)
+{
+	ICUConverterManager::Instance()->DropConverter(mbState->converterID);
+	mbState->converterID = 0;
+
+	return B_OK;
 }
 
 

@@ -41,6 +41,12 @@ public:
 	virtual	status_t			ToWCTrans(wint_t wc, wctrans_t transition,
 									wint_t& result);
 
+	virtual status_t			MultibyteToWchar(wchar_t* wcOut, const char* mb,
+									size_t mbLength, mbstate_t* mbState,
+									size_t& lengthOut);
+	virtual status_t			WcharToMultibyte(char* mbOut, wchar_t wc,
+									mbstate_t* mbState, size_t& lengthOut);
+
 	virtual	const char*			GetLanginfo(int index);
 
 	virtual	status_t			Strcoll(const char* a, const char* b, int& out);

@@ -30,9 +30,20 @@ public:
 			status_t			ToWCTrans(wint_t wc, wctrans_t transition,
 									wint_t& result);
 
+			status_t			MultibyteToWchar(wchar_t* wcOut, const char* mb,
+									size_t mbLength, mbstate_t* mbState,
+									size_t& lengthOut);
+			status_t			WcharToMultibyte(char* mbOut, wchar_t wc,
+									mbstate_t* mbState, size_t& lengthOut);
+
 			const char*			GetLanginfo(int index);
 
 private:
+			status_t			_GetConverterForMbState(mbstate_t* mbState,
+									ICUConverterRef& converterRefOut);
+
+			status_t			_DropConverterFromMbState(mbstate_t* mbState);
+
 			/*
 			 * The following arrays have 384 elements where the elements at
 			 * index -128..-2 mirror the elements at index 128..255 (to protect
