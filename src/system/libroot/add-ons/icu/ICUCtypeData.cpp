@@ -277,6 +277,12 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 		return B_BAD_DATA;
 	}
 
+	if (wc == 0) {
+		// reset to initial state
+		_DropConverterFromMbState(mbState);
+		memset(mbState, 0, sizeof(mbstate_t));
+	}
+
 	return B_OK;
 }
 
