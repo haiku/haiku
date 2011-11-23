@@ -16,6 +16,8 @@ namespace Libroot {
 
 
 ICUCategoryData::ICUCategoryData(pthread_key_t tlsKey)
+	:
+	fThreadLocalStorageKey(tlsKey)
 {
 	*fPosixLocaleName = '\0';
 	*fGivenCharset = '\0';
