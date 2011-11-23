@@ -520,14 +520,14 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	# gcc and binutils
 	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage
-			gcc-2.95.3-r1a3-x86-gcc2-2010-08-18.zip
-			: $(baseURL)/gcc-2.95.3-r1a3-x86-gcc2-2010-08-18.zip ;
+			gcc-2.95.3-x86-gcc2-2011-11-22.zip
+			: $(baseURL)/gcc-2.95.3-x86-gcc2-2011-11-22.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# symlink to the appropriate system/lib[/gcc2] folder
 		AddSymlinkToHaikuHybridImage
-			develop abi x86 gcc2 tools gcc-2.95.3-haiku-100818 lib
+			develop abi x86 gcc2 tools gcc-2.95.3-haiku-111122 lib
 			: /system/lib libstdc++.r4.so : : true ;
 	}
 
