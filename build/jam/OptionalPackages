@@ -533,8 +533,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage
-			gcc-4.5.3-r1a3-x86-gcc4-2011-06-20.zip
-			: $(baseURL)/gcc-4.5.3-r1a3-x86-gcc4-2011-06-20.zip ;
+			gcc-4.5.3-x86-gcc4-2011-11-22.zip
+			: $(baseURL)/gcc-4.5.3-x86-gcc4-2011-11-22.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 {
@@ -546,7 +546,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		local libs = libstdc++.so libsupc++.so ;
 		for lib in $(libs) {
 			AddSymlinkToHaikuHybridImage
-				develop abi x86 gcc4 tools gcc-4.5.3-haiku-110620 lib
+				develop abi x86 gcc4 tools gcc-4.5.3-haiku-111122 lib
 				: /system/lib $(lib) : : true ;
 		}
 	}
