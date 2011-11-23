@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_NUMERIC_DATA_H
