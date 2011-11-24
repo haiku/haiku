@@ -159,25 +159,27 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	}
 
 	for (size_t i = 0; i < configuration->interface_count; i++) {
-		usb_interface_info *interface = configuration->interface[i].active;
-		if (interface == NULL)
-			continue;
-
-		if (interface->descr->interface_class == PRINTER_INTERFACE_CLASS
-			&& interface->descr->interface_subclass ==
-				PRINTER_INTERFACE_SUBCLASS
-			&& (interface->descr->interface_protocol == PIT_UNIDIRECTIONAL
-				|| interface->descr->interface_protocol == PIT_BIDIRECTIONAL
-				|| interface->descr->interface_protocol
-					== PIT_1284_4_COMPATIBLE)) {
+		for (size_t j = 0; j < configuration->interface[i].alt_count; j++) {
+			usb_interface_info *interface = &configuration->interface[i].alt[j];
+			if (interface == NULL
+				|| interface->descr->interface_class != PRINTER_INTERFACE_CLASS
+				|| interface->descr->interface_subclass !=
+					PRINTER_INTERFACE_SUBCLASS
+				|| !(interface->descr->interface_protocol == PIT_UNIDIRECTIONAL
+					|| interface->descr->interface_protocol == PIT_BIDIRECTIONAL
+					|| interface->descr->interface_protocol
+						== PIT_1284_4_COMPATIBLE)) {
+				continue;
+			}
 
 			bool hasIn = false;
 			bool hasOut = false;
-			for (size_t j = 0; j < interface->endpoint_count; j++) {
-				usb_endpoint_info *endpoint = &interface->endpoint[j];
+			for (size_t k = 0; k < interface->endpoint_count; k++) {
+				usb_endpoint_info *endpoint = &interface->endpoint[k];
 				if (endpoint == NULL
-					|| endpoint->descr->attributes != USB_ENDPOINT_ATTR_BULK)
+					|| endpoint->descr->attributes != USB_ENDPOINT_ATTR_BULK) {
 					continue;
+				}
 
 				if (!hasIn && (endpoint->descr->endpoint_address
 					& USB_ENDPOINT_ADDR_DIR_IN)) {
@@ -197,6 +199,7 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 				continue;
 
 			device->interface = interface->descr->interface_number;
+			device->alternate = j;
 			device->alternate_setting = interface->descr->alternate_setting;
 
 			break;
@@ -205,6 +208,13 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 
 	if (device->interface == 0xff) {
 		TRACE_ALWAYS("no valid interface found\n");
+		free(device);
+		return B_ERROR;
+	}
+
+	status_t status = gUSBModule->set_alt_interface(newDevice,
+		&configuration->interface[device->interface].alt[device->alternate]);
+	if (status < B_OK) {
 		free(device);
 		return B_ERROR;
 	}
