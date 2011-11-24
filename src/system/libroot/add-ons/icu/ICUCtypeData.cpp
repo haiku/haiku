@@ -12,6 +12,15 @@
 #include <unicode/uchar.h>
 
 
+//#define TRACE_CTYPE
+#ifdef TRACE_CTYPE
+#	include <OS.h>
+#	define TRACE(x) debug_printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 namespace BPrivate {
 namespace Libroot {
 
@@ -199,8 +208,11 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 {
 	ICUConverterRef converterRef;
 	status_t result = _GetConverterForMbState(mbState, converterRef);
-	if (result != B_OK)
+	if (result != B_OK) {
+		TRACE(("MultibyteToWchar(): couldn't get converter for ID %d - %lx\n",
+			mbState->converterID, result));
 		return result;
+	}
 
 	UConverter* converter = converterRef->Converter();
 
@@ -224,8 +236,12 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 
 	if (!U_SUCCESS(icuStatus)) {
 		// conversion failed because of illegal character sequence
+		TRACE(("MultibyteToWchar(): illegal character sequence\n"));
 		result = B_BAD_DATA;
 	} else 	if (targetLengthUsed == 0) {
+		TRACE(("MultibyteToWchar(): incomplete character (len=%lu)\n", mbLen));
+		for (size_t i = 0; i < mbLen; ++i)
+			TRACE(("\tbyte %lu: %x\n", i, mb[i]));
 		mbState->count = sourceLengthUsed;
 		result = B_BAD_INDEX;
 	} else {
@@ -257,8 +273,11 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 {
 	ICUConverterRef converterRef;
 	status_t result = _GetConverterForMbState(mbState, converterRef);
-	if (result != B_OK)
+	if (result != B_OK) {
+		TRACE(("WcharToMultibyte(): couldn't get converter for ID %d - %lx\n",
+			mbState->converterID, result));
 		return result;
+	}
 
 	UConverter* converter = converterRef->Converter();
 
@@ -270,10 +289,12 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 	if (!U_SUCCESS(icuStatus)) {
 		if (icuStatus == U_ILLEGAL_ARGUMENT_ERROR) {
 			// bad converter (shouldn't really happen)
+			TRACE(("MultibyteToWchar(): bad converter\n"));
 			return B_BAD_VALUE;
 		}
 
 		// conversion failed because of illegal/unmappable character
+		TRACE(("MultibyteToWchar(): illegal character sequence\n"));
 		return B_BAD_DATA;
 	}
 

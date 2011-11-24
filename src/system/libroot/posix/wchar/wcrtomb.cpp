@@ -11,6 +11,15 @@
 #include "LocaleBackend.h"
 
 
+//#define TRACE_WCRTOMB
+#ifdef TRACE_WCRTOMB
+#	include <OS.h>
+#	define TRACE(x) debug_printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 using BPrivate::Libroot::gLocaleBackend;
 
 
@@ -53,11 +62,13 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 		return (size_t)-2;
 
 	if (status == B_BAD_DATA) {
+		TRACE(("mbrtowc(): setting errno to EILSEQ\n"));
 		__set_errno(EILSEQ);
 		return (size_t)-1;
 	}
 
 	if (status != B_OK) {
+		TRACE(("wcrtomb(): setting errno to EINVAL (status: %lx)\n", status));
 		__set_errno(EINVAL);
 		return (size_t)-1;
 	}
