@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <stdio.h>
 
+#include <errno_private.h>
 #include <signal_defs.h>
 
 

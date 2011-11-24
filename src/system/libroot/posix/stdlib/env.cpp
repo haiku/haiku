@@ -11,6 +11,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <libroot_private.h>
 #include <locks.h>
 #include <runtime_loader.h>
@@ -249,7 +250,7 @@ setenv(const char *name, const char *value, int overwrite)
 	status_t status;
 
 	if (name == NULL || name[0] == '\0' || strchr(name, '=') != NULL) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
@@ -268,7 +269,7 @@ unsetenv(const char *name)
 	char *env;
 
 	if (name == NULL || name[0] == '\0' || strchr(name, '=') != NULL) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
@@ -285,8 +286,8 @@ unsetenv(const char *name)
 		free(env);
 		memmove(environ + index, environ + index + 1,
 			sizeof(char *) * (count_variables() - index));
-			
-		// search possible another occurence, introduced via putenv() 
+
+		// search possible another occurence, introduced via putenv()
 		// and renamed since
 		env = find_variable(name, length, &index);
 	}
@@ -303,7 +304,7 @@ putenv(const char *string)
 	status_t status;
 
 	if (value == NULL) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 

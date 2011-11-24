@@ -53,8 +53,10 @@
 #	include <varargs.h>
 #endif
 
-#include "local.h"  
-#include "fvwrite.h"  
+#include <errno_private.h>
+
+#include "local.h"
+#include "fvwrite.h"
 
 static void __find_arguments (const char *fmt0, va_list ap,
 	va_list **argtable);
@@ -254,7 +256,7 @@ vfprintf(FILE *fp, const char *fmt0, va_list ap)
 	    flags&LONGINT ? GETARG(u_long) : \
 	    flags&SHORTINT ? (u_long)(u_short)GETARG(int) : \
 	    (u_long)GETARG(u_int))
- 
+
          /*
           * Get * arguments, including the form *nn$.  Preserve the nextarg
           * that the argument can be gotten once the type is determined.
@@ -289,10 +291,10 @@ vfprintf(FILE *fp, const char *fmt0, va_list ap)
 #define GETARG(type) \
 	(((argtable != NULL) ? (void)(ap = argtable[nextarg]) : (void)0), \
 	 nextarg++, va_arg(ap, type))
- 
+
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite(fp)) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 
@@ -412,7 +414,7 @@ reswitch:	switch (ch) {
 			   		__find_arguments(fmt0, orgap,
 					    &argtable);
 			  	}
-				goto rflag; 
+				goto rflag;
 			}
 			width = n;
 			goto reswitch;
@@ -494,7 +496,7 @@ reswitch:	switch (ch) {
 					ch = (ch == 'g') ? 'e' : 'E';
 				else
 					ch = 'g';
-			} 
+			}
 			if (ch <= 'e') {	/* 'e' or 'E' fmt */
 				--expt;
 				expsize = exponent(expstr, expt, ch);
@@ -792,7 +794,7 @@ error:
  * table, indexed by argument number, of pointers to each arguments.  The
  * initial argument table should be an array of STATIC_ARG_TBL_SIZE entries.
  * It will be replaces with a malloc-ed on if it overflows.
- */ 
+ */
 
 static void
 __find_arguments(const char *fmt0, va_list ap, va_list **argtable)
@@ -847,7 +849,7 @@ __find_arguments(const char *fmt0, va_list ap, va_list **argtable)
 	fmt = (char *)fmt0;
 	typetable = stattypetable;
 	tablesize = STATIC_ARG_TBL_SIZE;
-	tablemax = 0; 
+	tablemax = 0;
 	nextarg = 1;
 	memset(typetable, T_UNUSED, STATIC_ARG_TBL_SIZE);
 
@@ -1092,7 +1094,7 @@ __grow_type_table(unsigned char **typetable, int *tablesize)
 	return(0);
 }
 
-  
+
 #ifdef FLOATING_POINT
 
 extern char *__dtoa __P((double, int, int, int *, int *, char **));
@@ -1106,8 +1108,8 @@ cvt(double value, int ndigits, int flags, char *sign, int *decpt, int ch, int *l
 	if (ch == 'f') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
-		/* To obtain ndigits after the decimal point for the 'e' 
-		 * and 'E' formats, round to ndigits + 1 significant 
+		/* To obtain ndigits after the decimal point for the 'e'
+		 * and 'E' formats, round to ndigits + 1 significant
 		 * figures.
 		 */
 		if (ch == 'e' || ch == 'E') {

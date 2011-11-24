@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include <errno_private.h>
 #include <user_thread.h>
 
 #include "tracing_config.h"
@@ -154,7 +155,7 @@ add_address(void* address, size_t size)
 	};
 
 	stack_frame* frame = (stack_frame*)get_stack_frame();
-	
+
 	for (int i = 0; i < HEAP_CALL_STACK_SIZE; i++) {
 		if (frame != NULL) {
 			b->setCallStack(i, frame->return_address);
@@ -272,7 +273,7 @@ malloc(size_t size)
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (addr == NULL) {
 		undefer_signals();
-		errno = B_NO_MEMORY;
+		__set_errno(B_NO_MEMORY);
 		KTRACE("malloc(%lu) -> NULL", size);
 		return NULL;
 	}
@@ -308,7 +309,7 @@ calloc(size_t nelem, size_t elsize)
 	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (ptr == NULL) {
 		undefer_signals();
-		errno = B_NO_MEMORY;
+		__set_errno(B_NO_MEMORY);
 		KTRACE("calloc(%lu, %lu) -> NULL", nelem, elsize);
 		return NULL;
 	}
@@ -373,7 +374,7 @@ memalign(size_t alignment, size_t size)
 		size);
 	if (addr == NULL) {
 		undefer_signals();
-		errno = B_NO_MEMORY;
+		__set_errno(B_NO_MEMORY);
 		KTRACE("memalign(%lu, %lu) -> NULL", alignment, size);
 		return NULL;
 	}
@@ -469,7 +470,7 @@ realloc(void *ptr, size_t size)
 	void *buffer = malloc(size);
 	if (buffer == NULL) {
 		// Allocation failed, leave old block and return
-		errno = B_NO_MEMORY;
+		__set_errno(B_NO_MEMORY);
 		KTRACE("realloc(%p, %lu) -> NULL", ptr, size);
 		return NULL;
 	}

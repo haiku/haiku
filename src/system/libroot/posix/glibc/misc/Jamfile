@@ -10,6 +10,9 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc misc ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
+UsePrivateHeaders libroot ;
+
+
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 MergeObject posix_gnu_misc.o :

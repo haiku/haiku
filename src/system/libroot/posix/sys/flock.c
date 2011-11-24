@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <pthread.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -20,7 +21,7 @@ flock(int fd, int op)
 	pthread_testcancel();
 
 	if (status < B_OK) {
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 

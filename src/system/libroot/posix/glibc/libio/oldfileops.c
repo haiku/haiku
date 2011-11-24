@@ -44,12 +44,6 @@
 #ifdef __STDC__
 #include <stdlib.h>
 #endif
-#ifndef errno
-extern int errno;
-#endif
-#ifndef __set_errno
-# define __set_errno(Val) errno = (Val)
-#endif
 
 
 #ifdef _LIBC

@@ -11,6 +11,7 @@
 
 #include <syscall_utils.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 

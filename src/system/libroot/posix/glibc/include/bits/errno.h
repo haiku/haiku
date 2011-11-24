@@ -17,4 +17,4 @@
    02111-1307 USA.  */
 #include_next <errno.h>
 
-#define __set_errno(val) errno = (val)
+#include <errno_private.h>

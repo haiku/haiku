@@ -15,6 +15,7 @@
 
 #include <symbol_versioning.h>
 
+#include <errno_private.h>
 #include <signal_private.h>
 
 
@@ -41,7 +42,7 @@ __signal_beos(int signal, __sighandler_t signalHandler)
 {
 	// check signal range
 	if (signal < 0 || signal > MAX_SIGNAL_NUMBER_BEOS) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return SIG_ERR;
 	}
 

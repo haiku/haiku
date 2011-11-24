@@ -5,6 +5,7 @@
 
 #include <errno.h>
 
+#include <errno_private.h>
 #include <wchar_private.h>
 
 
@@ -15,7 +16,7 @@ __mbtowc(wchar_t* pwc, const char* s, size_t n)
 
 	int result = mbrtowc(pwc, s, n, &internalMbState);
 	if (result == -2) {
-		errno = EILSEQ;
+		__set_errno(EILSEQ);
 		result = -1;
 	}
 

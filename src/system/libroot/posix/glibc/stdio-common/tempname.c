@@ -24,9 +24,6 @@
 #include <assert.h>
 
 #include <errno.h>
-#ifndef __set_errno
-# define __set_errno(Val) errno = (Val)
-#endif
 
 #include <stdio.h>
 #ifndef P_tmpdir

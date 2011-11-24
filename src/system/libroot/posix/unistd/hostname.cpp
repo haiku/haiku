@@ -12,6 +12,8 @@
 #include <FindDirectory.h>
 #include <StorageDefs.h>
 
+#include <errno_private.h>
+
 
 static status_t
 get_path(char *path, bool create)
@@ -34,7 +36,7 @@ sethostname(const char *hostName, size_t nameSize)
 {
 	char path[B_PATH_NAME_LENGTH];
 	if (get_path(path, false) != B_OK) {
-		errno = B_ERROR;
+		__set_errno(B_ERROR);
 		return -1;
 	}
 
@@ -62,7 +64,7 @@ gethostname(char *hostName, size_t nameSize)
 
 	char path[B_PATH_NAME_LENGTH];
 	if (get_path(path, false) != B_OK) {
-		errno = B_ERROR;
+		__set_errno(B_ERROR);
 		return -1;
 	}
 

@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 

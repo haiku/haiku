@@ -8,6 +8,7 @@
 
 #include <errno.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -20,7 +21,7 @@ remove(const char* path)
 		status = _kern_remove_dir(-1, path);
 
 	if (status != B_OK) {
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 

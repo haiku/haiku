@@ -32,6 +32,8 @@
 #include <time.h>
 #include <wchar.h>
 
+#include <errno_private.h>
+
 
 /*
  * Convert date and time to a wide-character string.
@@ -82,7 +84,7 @@ wcsftime(wchar_t *wcs, size_t maxsize, const wchar_t *format,
 	 */
 	if (SIZE_MAX / MB_CUR_MAX <= maxsize) {
 		/* maxsize is prepostorously large - avoid int. overflow. */
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto error;
 	}
 	if ((dst = malloc(maxsize * MB_CUR_MAX)) == NULL)
@@ -104,7 +106,7 @@ error:
 	sverrno = errno;
 	free(sformat);
 	free(dst);
-	errno = sverrno;
+	__set_errno(sverrno);
 
 	return 0;
 }

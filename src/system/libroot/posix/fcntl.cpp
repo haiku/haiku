@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 #include <umask.h>

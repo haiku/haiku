@@ -15,6 +15,7 @@
 #include <symbol_versioning.h>
 #include <syscalls.h>
 
+#include <errno_private.h>
 #include <signal_private.h>
 
 

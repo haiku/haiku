@@ -17,13 +17,15 @@
 #include <unistd.h>
 #include <pwd.h>
 
+#include <errno_private.h>
+
 
 template<typename T>
 static inline T
 set_errno_if_necessary(const T& result)
 {
 	if (result < 0) {
-		errno = result;
+		__set_errno(result);
 		return -1;
 	}
 
@@ -55,7 +57,7 @@ getgid(void)
 }
 
 
-uid_t 
+uid_t
 getuid(void)
 {
 	return _kern_getuid(false);

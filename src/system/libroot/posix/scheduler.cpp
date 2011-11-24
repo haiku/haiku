@@ -10,6 +10,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -32,7 +33,7 @@ sched_get_priority_min(int policy)
 			return B_LOW_PRIORITY;
 
 		default:
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return -1;
 	}
 }
@@ -49,7 +50,7 @@ sched_get_priority_max(int policy)
 			return B_URGENT_DISPLAY_PRIORITY;
 
 		default:
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return -1;
 	}
 }

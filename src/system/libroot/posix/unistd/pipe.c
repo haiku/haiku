@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
@@ -14,7 +15,7 @@ pipe(int streams[2])
 {
 	status_t error = _kern_create_pipe(streams);
 	if (error != B_OK) {
-		errno = error;
+		__set_errno(error);
 		return -1;
 	}
 

@@ -24,6 +24,7 @@
 #include <user_group.h>
 #include <user_timer_defs.h>
 
+#include <errno_private.h>
 #include <libroot_private.h>
 #include <time_private.h>
 #include <unistd_private.h>
@@ -103,7 +104,7 @@ __sysconf(int name)
 			system_info info;
 			err = get_system_info(&info);
 			if (err < B_OK) {
-				errno = err;
+				__set_errno(err);
 				return -1;
 			}
 			return info.cpu_count;
@@ -115,7 +116,7 @@ __sysconf(int name)
 			int count = 0;
 			err = get_system_info(&info);
 			if (err < B_OK) {
-				errno = err;
+				__set_errno(err);
 				return -1;
 			}
 			for (i = 0; i < info.cpu_count; i++)
@@ -135,7 +136,7 @@ __sysconf(int name)
 			system_info info;
 			err = get_system_info(&info);
 			if (err < B_OK) {
-				errno = err;
+				__set_errno(err);
 				return -1;
 			}
 			return info.max_pages;
@@ -145,7 +146,7 @@ __sysconf(int name)
 			system_info info;
 			err = get_system_info(&info);
 			if (err < B_OK) {
-				errno = err;
+				__set_errno(err);
 				return -1;
 			}
 			return info.max_pages - info.used_pages;
@@ -190,7 +191,7 @@ __sysconf(int name)
 			return 1;
 	}
 
-	errno = EINVAL;
+	__set_errno(EINVAL);
 	return -1;
 }
 
@@ -229,7 +230,7 @@ __pathconf_common(struct statvfs *fs, struct stat *st,
 	int ret;
 	ret = fs_stat_dev(fs->f_fsid, &info);
 	if (ret < 0) {
-		errno = ret;
+		__set_errno(ret);
 		return -1;
 	}
 
@@ -308,7 +309,7 @@ __pathconf_common(struct statvfs *fs, struct stat *st,
 				return 1;
 			return -1;
 #endif
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return -1;
 		}
 
@@ -322,12 +323,12 @@ __pathconf_common(struct statvfs *fs, struct stat *st,
 		case _PC_REC_XFER_ALIGN:
 		case _PC_ALLOC_SIZE_MIN:
 			/* not yet supported */
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return -1;
 
 	}
 
-	errno = EINVAL;
+	__set_errno(EINVAL);
 	return -1;
 }
 
@@ -339,7 +340,7 @@ fpathconf(int fd, int name)
 	struct stat st;
 	int ret;
 	if (fd < 0) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return -1;
 	}
 	ret = fstat(fd, &st);
@@ -359,7 +360,7 @@ pathconf(const char *path, int name)
 	struct stat st;
 	int ret;
 	if (path == NULL) {
-		errno = EFAULT;
+		__set_errno(EFAULT);
 		return -1;
 	}
 	ret = lstat(path, &st);
@@ -379,7 +380,7 @@ confstr(int name, char *buffer, size_t length)
 	char *string = "";
 
 	if (!length || !buffer) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return 0;
 	}
 
@@ -389,7 +390,7 @@ confstr(int name, char *buffer, size_t length)
 				"/boot/common/bin:/boot/develop/bin";
 			break;
 		default:
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return 0;
 	}
 

@@ -13,6 +13,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <system_revision.h>
 
 
@@ -24,7 +25,7 @@ uname(struct utsname *info)
 	const char *haikuRevision;
 
 	if (!info) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 

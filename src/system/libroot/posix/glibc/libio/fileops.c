@@ -50,12 +50,6 @@
 # include <shlib-compat.h>
 #endif
 #endif
-#ifndef errno
-extern int errno;
-#endif
-#ifndef __set_errno
-# define __set_errno(Val) errno = (Val)
-#endif
 
 #ifdef _LIBC
 /*# define open(Name, Flags, Prot) __open (Name, Flags, Prot)

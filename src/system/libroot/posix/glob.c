@@ -87,6 +87,8 @@ static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #include <unistd.h>
 #include <wchar.h>
 
+#include <errno_private.h>
+
 #ifndef __HAIKU__
 #	include "collate.h"
 #endif
@@ -155,7 +157,7 @@ static int	 glob1(Char *, glob_t *, size_t *);
 static int	 glob2(Char *, Char *, Char *, Char *, glob_t *, size_t *);
 static int	 glob3(Char *, Char *, Char *, Char *, Char *, glob_t *, size_t *);
 static int	 globextend(const Char *, glob_t *, size_t *);
-static const Char *	
+static const Char *
 		 globtilde(const Char *, Char *, size_t, glob_t *);
 static int	 globexp1(const Char *, glob_t *, size_t *);
 static int	 globexp2(const Char *, const Char *, glob_t *, int *, size_t *);
@@ -378,8 +380,8 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 	if (*pattern != TILDE || !(pglob->gl_flags & GLOB_TILDE))
 		return pattern;
 
-	/* 
-	 * Copy up to the end of the string or / 
+	/*
+	 * Copy up to the end of the string or /
 	 */
 	eb = &patbuf[patbuf_len - 1];
 	for (p = pattern + 1, h = (char *) patbuf;
@@ -625,7 +627,7 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 	if (pathend > pathend_last)
 		return (GLOB_ABORTED);
 	*pathend = EOS;
-	errno = 0;
+	__set_errno(0);
 
 	if ((dirp = g_opendir(pathbuf, pglob)) == NULL) {
 		/* TODO: don't call for ENOENT or ENOTDIR? */
@@ -711,7 +713,7 @@ globextend(const Char *path, glob_t *pglob, size_t *limit)
 	const Char *p;
 
 	if (*limit && pglob->gl_pathc > *limit) {
-		errno = 0;
+		__set_errno(0);
 		return (GLOB_NOSPACE);
 	}
 
@@ -850,7 +852,7 @@ g_lstat(Char *fn, struct stat *sb, glob_t *pglob)
 	char buf[MAXPATHLEN];
 
 	if (g_Ctoc(fn, buf, sizeof(buf))) {
-		errno = ENAMETOOLONG;
+		__set_errno(ENAMETOOLONG);
 		return (-1);
 	}
 	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
@@ -864,7 +866,7 @@ g_stat(Char *fn, struct stat *sb, glob_t *pglob)
 	char buf[MAXPATHLEN];
 
 	if (g_Ctoc(fn, buf, sizeof(buf))) {
-		errno = ENAMETOOLONG;
+		__set_errno(ENAMETOOLONG);
 		return (-1);
 	}
 	if (pglob->gl_flags & GLOB_ALTDIRFUNC)

@@ -41,6 +41,8 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
 #include <errno.h>
 #include <stdlib.h>
 
+#include <errno_private.h>
+
 /*
  * Swap two areas of size number of bytes.  Although qsort(3) permits random
  * blocks of memory to be sorted, sorting pointers is almost certainly the
@@ -156,7 +158,7 @@ heapsort(void *vbase, size_t nmemb, size_t size, int (*compar)(void const *, voi
 	}
 
 	if (!size) {
-//		errno = EINVAL;
+//		__set_errno(EINVAL);
 		return (-1);
 	}
 

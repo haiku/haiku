@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include <errno_private.h>
 #include "LocaleBackend.h"
 
 
@@ -21,7 +22,7 @@ strxfrm(char *out, const char *in, size_t size)
 		status_t status =  gLocaleBackend->Strxfrm(out, in, size, outSize);
 
 		if (status != B_OK)
-			errno = EINVAL;
+			__set_errno(EINVAL);
 
 		return outSize;
 	}

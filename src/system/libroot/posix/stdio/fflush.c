@@ -40,6 +40,9 @@ static char rcsid[] = "$OpenBSD: fflush.c,v 1.2 1996/08/19 08:32:26 tholo Exp $"
 
 #include <errno.h>
 #include <stdio.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 /* Flush a single file, or (if fp is NULL) all files.  */
@@ -50,7 +53,7 @@ fflush(fp)
 	if (fp == NULL)
 		return (_fwalk(__sflush));
 	if ((fp->_flags & (__SWR | __SRW)) == 0) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 	return (__sflush(fp));

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <wchar.h>
 
+#include <errno_private.h>
 #include "LocaleBackend.h"
 
 
@@ -36,7 +37,7 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 
 		if (wc > 127) {
 			// char is non-ASCII
-			errno = EILSEQ;
+			__set_errno(EILSEQ);
 			return (size_t)-1;
 		}
 
@@ -50,12 +51,14 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 
 	if (status == B_BAD_INDEX)
 		return (size_t)-2;
+
 	if (status == B_BAD_DATA) {
-		errno = EILSEQ;
+		__set_errno(EILSEQ);
 		return (size_t)-1;
 	}
+
 	if (status != B_OK) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return (size_t)-1;
 	}
 

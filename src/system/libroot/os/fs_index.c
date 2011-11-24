@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <dirent_private.h>
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -60,7 +61,7 @@ fs_open_index_dir(dev_t device)
 
 	int fd = _kern_open_index_dir(device);
 	if (fd < 0) {
-		errno = fd;
+		__set_errno(fd);
 		return NULL;
 	}
 

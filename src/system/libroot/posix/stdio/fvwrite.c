@@ -38,6 +38,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 #include "fvwrite.h"
 
@@ -64,7 +67,7 @@ __sfvwrite(fp, uio)
 	}
 	/* make sure we can write */
 	if (cantwrite(fp)) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 

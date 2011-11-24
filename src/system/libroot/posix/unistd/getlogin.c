@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <pwd.h>
 
+#include <errno_private.h>
+
 
 char *getlogin()
 {
@@ -19,7 +21,7 @@ char *getlogin()
 	pw = getpwuid(getuid());
 	if (pw)
 		return pw->pw_name;
-	errno = ENOMEM;
+	__set_errno(ENOMEM);
 	return NULL;
 }
 

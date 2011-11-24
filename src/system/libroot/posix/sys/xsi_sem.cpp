@@ -15,6 +15,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <posix/xsi_semaphore_defs.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
