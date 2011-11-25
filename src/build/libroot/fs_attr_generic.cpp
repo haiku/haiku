@@ -380,7 +380,7 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	void *buffer, size_t readBytes)
 {
 	// open the attribute
-	int attrFD = fs_open_attr(fd, attribute, type, O_RDONLY);
+	int attrFD = fs_fopen_attr(fd, attribute, type, O_RDONLY);
 	if (attrFD < 0)
 		return attrFD;
 
@@ -405,7 +405,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	const void *buffer, size_t readBytes)
 {
 	// open the attribute
-	int attrFD = fs_open_attr(fd, attribute, type,
+	int attrFD = fs_fopen_attr(fd, attribute, type,
 		O_WRONLY | O_CREAT | O_TRUNC);
 	if (attrFD < 0)
 		return attrFD;
