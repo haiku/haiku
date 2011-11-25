@@ -144,16 +144,6 @@ set_fs_register(uint32 segment)
 }
 
 
-static void
-set_tls_context(Thread *thread)
-{
-	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
-
-	set_segment_descriptor_base(&gGDT[entry], thread->user_local_storage);
-	set_fs_register((entry << 3) | DPL_USER);
-}
-
-
 /*!	Returns to the userland environment given by \a frame for a thread not
 	having been userland before.
 
@@ -171,7 +161,7 @@ initial_return_to_userland(Thread* thread, iframe* frame)
 	disable_interrupts();
 
 	i386_set_tss_and_kstack(thread->kernel_stack_top);
-	set_tls_context(thread);
+	x86_set_tls_context(thread);
 	x86_set_syscall_stack(thread->kernel_stack_top);
 
 	// return to userland
@@ -265,6 +255,16 @@ x86_restart_syscall(struct iframe* frame)
 		// (so that it'll be executed again)
 
 	TSYSCALL(RestartSyscall());
+}
+
+
+void
+x86_set_tls_context(Thread *thread)
+{
+	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
+
+	set_segment_descriptor_base(&gGDT[entry], thread->user_local_storage);
+	set_fs_register((entry << 3) | DPL_USER);
 }
 
 
@@ -373,7 +373,7 @@ arch_thread_context_switch(Thread *from, Thread *to)
 	// set TLS GDT entry to the current thread - since this action is
 	// dependent on the current CPU, we have to do it here
 	if (to->user_local_storage != 0)
-		set_tls_context(to);
+		x86_set_tls_context(to);
 
 	struct cpu_ent* cpuData = to->cpu;
 	X86PagingStructures* activePagingStructures
@@ -453,7 +453,7 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	iframe frame = {};
 	frame.type = IFRAME_TYPE_SYSCALL;
 	frame.gs = USER_DATA_SEG;
-	// frame.fs not used -- we call set_tls_context() below
+	// frame.fs not used, we call x86_set_tls_context() on context switch
 	frame.es = USER_DATA_SEG;
 	frame.ds = USER_DATA_SEG;
 	frame.eip = entry;

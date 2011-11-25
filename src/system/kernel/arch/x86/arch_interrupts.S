@@ -601,13 +601,15 @@ STATIC_FUNCTION(int_bottom_vm86):
 	movl	IFRAME_vector(%ebp), %eax
 	call	*gInterruptHandlerTable(, %eax, 4)
 
+	cli								// disable interrupts
+
 	// update the thread's kernel time and return
-	cli
 	UPDATE_THREAD_KERNEL_TIME()
-	lea		20(%ebp), %esp;
-	popa;
-	addl	$16,%esp;
-	iret
+
+	// the above will reset the in_kernel flag to 0, but we actually stay
+	movb	$1, THREAD_in_kernel(%edi);
+
+	POP_IFRAME_AND_RETURN()
 FUNCTION_END(int_bottom_vm86)
 
 
@@ -869,7 +871,7 @@ FUNCTION(x86_vm86_enter):
 
 	// get pointers
 	movl	32(%esp), %esi	// vm86 iframe
-	push	%esi			// ... store iframe addr for x86_vm86_return
+	pushl	%esi			// ... store iframe addr for x86_vm86_return
 	movl	%dr3, %edi		// Thread*
 
 	// make sure eflags are in right shape
@@ -913,13 +915,16 @@ FUNCTION(x86_vm86_return):
 	// adjust kernel_stack_top and tss.esp0
 	movl	%dr3, %edi
 	movl	%eax, THREAD_kernel_stack_top(%edi)
-	push	%eax
+	pushl	%eax
 	call	i386_set_tss_and_kstack
 	addl	$4, %esp
 
 	// restore registers
 	movl %ebx, %eax
-	pop %fs
+
+	// we skip %fs, as this contains the CPU dependent TLS segment
+	addl $4, %esp;
+
 	pop %gs
 	popl %ebx
 	popl %ebp

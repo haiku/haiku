@@ -22,7 +22,9 @@ struct iframe *i386_get_thread_user_iframe(Thread *thread);
 
 uint32 x86_next_page_directory(Thread *from, Thread *to);
 
-void x86_restart_syscall(struct iframe* frame);
+void x86_restart_syscall(struct iframe *frame);
+
+void x86_set_tls_context(Thread *thread);
 
 // override empty macro
 #undef arch_syscall_64_bit_return_value
