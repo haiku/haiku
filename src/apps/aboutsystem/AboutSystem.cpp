@@ -1336,7 +1336,8 @@ AboutView::_CreateCreditsView()
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
-		.SetCopyright(B_TRANSLATE("Portions of this software are copyright. "
+		.SetCopyright(B_TRANSLATE("Portions of this software are under "
+			"copyright.\n"
 			COPYRIGHT_STRING "1996-2006 "
 			"The FreeType Project. All rights reserved."))
 		.SetLicense("FTL")
@@ -1352,8 +1353,7 @@ AboutView::_CreateCreditsView()
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 "
-			"Silicon Graphics, Inc. SGI's Software FreeB license. "
-			"All rights reserved."))
+			"Silicon Graphics, Inc. All rights reserved."))
 		.SetLicense("SGI Free B")
 		.SetURL("http://www.sgi.com/products/software/opengl"));
 
