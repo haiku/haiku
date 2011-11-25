@@ -830,15 +830,15 @@ void
 WorkspacesApp::Usage(const char *programName)
 {
 	printf(B_TRANSLATE("Usage: %s [options] [workspace]\n"
-		"where \"options\" is one of:\n"
-		"  --notitle\t\ttitle bar removed.  border and resize kept.\n"
-		"  --noborder\t\ttitle, border, and resize removed.\n"
+		"where \"options\" are:\n"
+		"  --notitle\t\ttitle bar removed, border and resize kept\n"
+		"  --noborder\t\ttitle, border, and resize removed\n"
 		"  --avoidfocus\t\tprevents the window from being the target of "
-		"keyboard events.\n"
+		"keyboard events\n"
 		"  --alwaysontop\t\tkeeps window on top\n"
 		"  --notmovable\t\twindow can't be moved around\n"
 		"  --autoraise\t\tauto-raise the workspace window when it's at the "
-		"screen corner\n"
+		"screen edge\n"
 		"  --help\t\tdisplay this help and exit\n"
 		"and \"workspace\" is the number of the Workspace to which to switch "
 		"(0-31)\n"),
