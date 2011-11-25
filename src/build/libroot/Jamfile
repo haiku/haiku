@@ -80,11 +80,10 @@ BuildPlatformSharedLibrary libroot_build.so :
 	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 ;
 
-# TODO: This doesn't work with the function remapping.
-#BuildPlatformStaticLibrary libroot_build.a :
-#	:
-#	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
-#;
+BuildPlatformStaticLibrary libroot_build.a :
+	:
+	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
+;
 
 USES_BE_API on [ FGristFiles function_remapper$(SUFOBJ) ] = true ;
 
