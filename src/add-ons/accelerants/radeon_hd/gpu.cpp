@@ -783,10 +783,43 @@ radeon_get_temp()
 
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	uint32 rawTemp = 0;	// temp
-	int32 finalTemp = 0; // actual_temp
+	uint32 rawTemp = 0;
+	int32 finalTemp = 0;
 
-	if (info.chipsetID >= RADEON_RV770) {
+	if (info.chipsetID == RADEON_JUNIPER) {
+		uint32 offset = (Read32(OUT, EVERGREEN_CG_THERMAL_CTRL)
+			& EVERGREEN_TOFFSET_MASK) >> EVERGREEN_TOFFSET_SHIFT;
+		rawTemp = (Read32(OUT, EVERGREEN_CG_TS0_STATUS)
+			& EVERGREEN_TS0_ADC_DOUT_MASK) >> EVERGREEN_TS0_ADC_DOUT_SHIFT;
+
+		if (offset & 0x100)
+			finalTemp = rawTemp / 2 - (0x200 - offset);
+		else
+			finalTemp = rawTemp / 2 + offset;
+
+		return finalTemp * 1000;
+	} else if (info.chipsetID == RADEON_SUMO
+		|| info.chipsetID == RADEON_SUMO2) {
+		uint32 rawTemp = Read32(OUT, EVERGREEN_CG_THERMAL_STATUS) & 0xff;
+		finalTemp = rawTemp - 49;
+
+		return finalTemp * 1000;
+	} else if (info.chipsetID >= RADEON_CEDAR) {
+		rawTemp = (Read32(OUT, EVERGREEN_CG_MULT_THERMAL_STATUS)
+			& EVERGREEN_ASIC_T_MASK) >> EVERGREEN_ASIC_T_SHIFT;
+
+		if (rawTemp & 0x400)
+			finalTemp = -256;
+		else if (rawTemp & 0x200)
+			finalTemp = 255;
+		else if (rawTemp & 0x100) {
+			finalTemp = rawTemp & 0x1ff;
+			finalTemp |= ~0x1ff;
+		} else
+			finalTemp = rawTemp & 0xff;
+
+		return (finalTemp * 1000) / 2;
+	} else if (info.chipsetID >= RADEON_RV770) {
 		rawTemp = (Read32(OUT, R700_CG_MULT_THERMAL_STATUS) & R700_ASIC_T_MASK)
 			>> R700_ASIC_T_SHIFT;
 		if (rawTemp & 0x400)
@@ -800,7 +833,6 @@ radeon_get_temp()
 			finalTemp = rawTemp & 0xff;
 
 		return (finalTemp * 1000) / 2;
-
 	} else if (info.chipsetID >= RADEON_R600) {
 		rawTemp = (Read32(OUT, R600_CG_THERMAL_STATUS) & R600_ASIC_T_MASK)
 			>> R600_ASIC_T_SHIFT;
