@@ -1,4 +1,7 @@
-1	slovak	x-vnd.Haiku-DeskCalc	2021462472
+1	slovak	x-vnd.Haiku-DeskCalc	1916192649
+Compact	CalcView		Kompaktné
+Scientific	CalcView		Vedecké
 DeskCalc	System name		DeskCalc
+Basic	CalcView		Základné
 Enable Num Lock on startup	CalcView		Zapnúť NumLock pri štarte
 Audio Feedback	CalcView		Zvuková spätná väzba

@@ -5,7 +5,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Rescan	MainWindow		Znova preskúmať
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nepodarilo sa získať informácie o diskových oblastiach.
-There's no space on the partition where a child partition could be created.	MainWindow		 Na oblasti nie je miesto, kde by bolo možné vytvoriť podriadenú oblasť.
+There's no space on the partition where a child partition could be created.	MainWindow		Na oblasti nie je miesto, kde by bolo možné vytvoriť podriadenú oblasť.
 %ld MiB	Support		%ld MiB
 <empty>	PartitionList		<prázdne>
 Unable to find the selected partition by ID.	MainWindow		Nebolo možné nájsť vybranú oblasť podľa ID.
@@ -18,21 +18,21 @@ Could not mount partition %s.	MainWindow		Nepodarilo sa pripojiť oblasť %s.
 The partition %s is already unmounted.	MainWindow		Oblasť %s je už odpojená.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa inicializovať oblasť. Žiadne zmeny neboli zapísané na disk.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa zmazať oblasť. Žiadne zmeny neboli zapísané na disk.
-Partition type:	CreateParamsPanel		Typ oblasti
+Partition type:	CreateParamsPanel		Typ oblasti:
 Could not delete the selected partition.	MainWindow		Nepodarilo sa zmazať vybranú oblasť.
 Initialize	MainWindow		Inicializovať
-Error: 	MainWindow	in any error alert	Chyba:
+Error: 	MainWindow	in any error alert	Chyba: 
 Partition %ld	DiskView		Oblasť %ld
 The partition %s has been successfully initialized.\n	MainWindow		Oblasť %s bola úspešne inicializovaná.\n
 <empty>	DiskView		<prázdne>
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nepodarilo sa inicializovať oblasť %s. Žiadne zmeny neboli zapísané na disk.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nepodarilo sa inicializovať oblasť %s. (Žiadne zmeny neboli zapísané na disk.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Mounted at	PartitionList		Pripojené na
 Failed to initialize the partition %s!\n	MainWindow		Nepodarilo sa inicializovať oblasť %s!\n
 There was an error acquiring the partition row.	MainWindow		Vyskytla sa chyba pri získavaní radu oblasti.
 You need to select a partition entry from the list.	MainWindow		Musíte vybrať záznam oblasti zo zoznamu.
 Format (not implemented)	MainWindow		Formát (neimplementované)
-The currently selected partition does not have a parent partition.	MainWindow		Momentálne vybraná oblasť nemá nadradenú oblasť
+The currently selected partition does not have a parent partition.	MainWindow		Momentálne vybraná oblasť nemá nadradenú oblasť.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranom disku budú nenávratne stratené!
 Offset: %ld MB	Support		Ofset: %ld MB
 Write changes	MainWindow		Zapísať zmeny
@@ -40,7 +40,7 @@ There was an error preparing the disk for modifications.	MainWindow		Vyskytla sa
 The partition %s is already mounted.	MainWindow		Oblasť %s je už pripojená.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na disku %s budú nenávratne stratené!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete zmazať vybranú diskovú oblasť?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
-Create…	MainWindow		Vytvoriť...
+Create…	MainWindow		Vytvoriť…
 Disk system \"%s\"\" not found!	MainWindow		Diskový systém „%s“ nenájdený!
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Mount	MainWindow		Pripojiť

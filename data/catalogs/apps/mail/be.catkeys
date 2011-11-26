@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	1350013868
+1	belarusian	x-vnd.Be-MAIL	1835398254
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
@@ -62,12 +62,14 @@ Print…	Mail		Друкаваць…
 Warn unencodable:	Mail		Правяраць кадоўку:
 Quit	Mail		Выйсці
 %n - Full name	Mail		%n - Поўнае імя
+ Read 	Mail		Чытаць
 Trash	Mail		Сметніца
 Default account:	Mail		Прадвызначаны акаунт:
 Size:	Mail		Памер:
 Account from mail	Mail		Акаунт з паведамлення
 Edit signatures…	Mail		Праўка подпісаў…
 New	Mail		Новае
+Attachments: 	Mail		Укладаньні
 On	Mail		Уключыць
 Set to %s	Mail		Паставіць у %s
 Forward	Mail		Пераслаць

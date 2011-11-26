@@ -3,13 +3,13 @@ Compression method:	ConfigView		Spôsob kompresie:
 Based on libwebp v0.1,	ConfigView		Založené na libwebp v0.1,
 Preset	ConfigView		Predvoľby
 WebP Images	ConfigView		Obrázky WebP
-WebP images	WebPTranslator		obrázky WebP
+WebP images	WebPTranslator		Obrázky WebP
 WebPTranslator Settings	ConfigView		Nastavenie WebPTranslator
 Output quality:	ConfigView		Kvalita výstupu:
 WebP Settings	main		Nastavenie WebP
 Text	ConfigView		Text
 Slower but better	ConfigView		Pomalšia, ale lepšia
-WebP image	WebPTranslator		obrázok WebP
+WebP image	WebPTranslator		Obrázok WebP
 ©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.
 Output preset:	ConfigView		Predvoľby výstupu:
 Picture	ConfigView		Obraz

@@ -1,6 +1,6 @@
 1	german	x-vnd.mahlzeit.webwatch	1164039487
-About	WatchView		Über
+WebWatch	System name		WebUhr
 OK	WatchView		OK
 Quit	WatchView		Beenden
-WebWatch	System name		WebUhr
+About	WatchView		Über
 WebWatch %1\nAn internet time clock for your Deskbar\n\nCreated by Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nThanks to Jason Parks for his help.\n	WatchView		WebUhr %1\nEine Uhr, die die Internet-Zeit in der Deskbar anzeigt.\n\nVon Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nDank an Jason Parks für seine Hilfe.\n

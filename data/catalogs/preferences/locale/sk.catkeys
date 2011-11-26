@@ -1,8 +1,8 @@
 1	slovak	x-vnd.Haiku-Locale	1488345554
 Available languages	Locale Preflet Window		Dostupné jazyky
-Negative:	TimeFormatSettings		Záporné čísla
+Negative:	TimeFormatSettings		Záporné čísla:
 already chosen	LanguageListView		už zvolené
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nebolo možné nájsť dostupné jazyky! Nie je možné použiť tento konfiguračný nástroj.
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nebolo možné nájsť dostupné jazyky! Nie je možné použiť tento konfiguračný nástroj!
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Aby sa táto zmena prejavila, je potrebné reštartovať Panel a Tracker. Chcete ich reštartovať teraz?
 Long format:	TimeFormatSettings		Dlhý formát:
 Currency	TimeFormatSettings		Mena

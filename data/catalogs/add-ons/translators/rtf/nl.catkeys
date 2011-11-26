@@ -1,0 +1,9 @@
+1	dutch; flemish	x-vnd.Haiku-RTFTranslator	526958155
+Version %d.%d.%d, %s	ConfigView		Versie %d.%d.%d, %s
+RTF text files	RTFTranslator		RTF tekstbestanden
+RTF-Translator Settings	ConfigView		RTF-Translator instellingen
+Rich Text Format (RTF) files	ConfigView		Rich Text Format (RTF) bestanden
+RTF Settings	main		RTF Instellingen
+RichTextFormat file	RTFTranslator		RichTextFormat bestand
+Rich Text Format Translator	RTFTranslator		Rich Text Format Translator
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format vertaler v%d.%d.%d %s

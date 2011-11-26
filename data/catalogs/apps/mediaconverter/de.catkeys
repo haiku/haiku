@@ -1,68 +1,68 @@
-1	german	x-vnd.Haiku-MediaConverter	424866547
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld Kanal / %lld Frames
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz Mono / %lld Frames
+1	german	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Video benutzt die Parameter aus den Einstellungen
+Video encoding:	MediaConverter		Videokodierung:
+No audio	Audio codecs list		Keine Tonspur
+Error	MediaConverter		Fehler
+Error loading a file	MediaConverter		Fehler beim Laden einer Datei
+File Error	MediaConverter-FileInfo		Dateifehler
+Open…	Menu		Öffnen...
+Start [ms]: 	MediaConverter		Anfang [ms]:
+Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
+Output format	MediaConverter		Ausgabeformat
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz Stereo / %lld Frames
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles Dateien scheinen keine unterstützten Mediadateien zu sein:
-%d bit 	MediaFileInfo		%d Bit
+End   [ms]: 	MediaConverter		Ende [ms]:
+MediaConverter	System name		Media-Konverter
+No video	Video codecs list		Keine Videospur
+Duration:	MediaConverter-FileInfo		Dauer:
+OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Fehler beim Schreiben von Audio-Frame %Ld
+Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%filename'
+Low	MediaConverter		Niedrig
+Conversion completed	MediaConverter		Konvertierung abgeschlossen
+Audio:	MediaConverter-FileInfo		Audio:
+OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		 Sekunden
+Source files	MediaConverter		Quelldateien
+Cancelling	MediaConverter		Abbruch
 %d byte 	MediaFileInfo		%d Byte
+Error loading files	MediaConverter		Fehler beim Laden der Dateien
+Cancel	MediaConverter		Abbrechen
+None available	Video codecs		Keine verfügbar
+Conversion cancelled	MediaConverter		Konvertierung abgebrochen
+No file selected	MediaConverter-FileInfo		Keine Datei ausgewählt
+Error writing video frame %Ld	MediaConverter		Fehler beim Schreiben von Video-Frame %Ld
+Select this folder	MediaConverter		Diesen Ordner wählen
+Continue	MediaConverter		Fortsetzen
+Encoder parameters	MediaConverter-EncoderWindow		Encoder-Parameter
+Video:	MediaConverter-FileInfo		Video:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f Frames/s / %Ld Frames
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
+%d bit 	MediaFileInfo		%d Bit
+Error creating '%filename'	MediaConverter		Fehler beim Erstellen von '%filename'
+Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
+Cancelling…	MediaConverter		Abbruch...
+File details	MediaConverter		Dateidetails
+Select	MediaConverter		Auswählen
+Writing video track: %ld%% complete	MediaConverter		Videospur wird geschrieben: %ld%% fertig
+Quit	Menu		Beenden
+Preview	MediaConverter		Vorschau
+File format:	MediaConverter		Dateiformat:
+None available	Audio codecs		Keine verfügbar
+MediaConverter+:SaveDirectory	MediaConverter		Media-Konverter+:SaveDirectory
+Error read audio frame %Ld	MediaConverter		Fehler beim Einlesen von Audio-Frame %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld Kanal / %lld Frames
+Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
+High	MediaConverter		Hoch
+The file was not recognized as a supported media file:	MediaConverter		Die Datei scheint keine unterstützte Mediadatei zu sein:
+Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenster fallen lassen.
 Audio encoding:	MediaConverter		Audiokodierung:
 Audio quality not supported	MediaConverter		Tonqualität nicht einstellbar
-Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
-Audio:	MediaConverter-FileInfo		Audio:
-Cancel	MediaConverter		Abbrechen
-Cancelling	MediaConverter		Abbruch
-Cancelling…	MediaConverter		Abbruch...
-Continue	MediaConverter		Fortsetzen
-Conversion cancelled	MediaConverter		Konvertierung abgebrochen
-Conversion completed	MediaConverter		Konvertierung abgeschlossen
-Convert	MediaConverter		Konvertieren
-Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenster fallen lassen.
-Duration:	MediaConverter-FileInfo		Dauer:
-Encoder parameters	MediaConverter-EncoderWindow		Encoder-Parameter
-End   [ms]: 	MediaConverter		Ende [ms]:
-Error	MediaConverter		Fehler
-Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%filename'
-Error creating '%filename'	MediaConverter		Fehler beim Erstellen von '%filename'
-Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
-Error loading a file	MediaConverter		Fehler beim Laden einer Datei
-Error loading files	MediaConverter		Fehler beim Laden der Dateien
-Error read audio frame %Ld	MediaConverter		Fehler beim Einlesen von Audio-Frame %Ld
-Error read video frame %Ld	MediaConverter		Fehler beim Einlesen von Video-Frame %Ld
-Error writing audio frame %Ld	MediaConverter		Fehler beim Schreiben von Audio-Frame %Ld
-Error writing video frame %Ld	MediaConverter		Fehler beim Schreiben von Video-Frame %Ld
 File	Menu		Datei
-File Error	MediaConverter-FileInfo		Dateifehler
-File details	MediaConverter		Dateidetails
-File format:	MediaConverter		Dateiformat:
-High	MediaConverter		Hoch
-Low	MediaConverter		Niedrig
-MediaConverter	System name		Media-Konverter
-MediaConverter+:SaveDirectory	MediaConverter		Media-Konverter+:SaveDirectory
-No audio	Audio codecs list		Keine Tonspur
-No file selected	MediaConverter-FileInfo		Keine Datei ausgewählt
-No video	Video codecs list		Keine Videospur
-None available	Audio codecs		Keine verfügbar
-None available	Video codecs		Keine verfügbar
-OK	MediaConverter		OK
-OK	MediaConverter-FileInfo		OK
-Open…	Menu		Öffnen...
-Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
-Output folder	MediaConverter		Ausgabeordner
-Output format	MediaConverter		Ausgabeformat
-Preview	MediaConverter		Vorschau
-Quit	Menu		Beenden
-Select	MediaConverter		Auswählen
-Select this folder	MediaConverter		Diesen Ordner wählen
-Source files	MediaConverter		Quelldateien
-Start [ms]: 	MediaConverter		Anfang [ms]:
-The file was not recognized as a supported media file:	MediaConverter		Die Datei scheint keine unterstützte Mediadatei zu sein:
-Video encoding:	MediaConverter		Videokodierung:
-Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
-Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
-Video using parameters form settings	MediaConverter		Video benutzt die Parameter aus den Einstellungen
-Video:	MediaConverter-FileInfo		Video:
+Convert	MediaConverter		Konvertieren
 Writing audio track: %ld%% complete	MediaConverter		Tonspur wird geschrieben: %ld%% fertig
-Writing video track: %ld%% complete	MediaConverter		Videospur wird geschrieben: %ld%% fertig
-seconds	MediaFileInfo		Sekunden
+Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
+Output folder	MediaConverter		Ausgabeordner
+Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
+Error read video frame %Ld	MediaConverter		Fehler beim Einlesen von Video-Frame %Ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles Dateien scheinen keine unterstützten Mediadateien zu sein:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz Mono / %lld Frames

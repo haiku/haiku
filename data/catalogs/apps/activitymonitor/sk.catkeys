@@ -16,7 +16,7 @@ Show legend	ActivityView		Zobraziť legendu
 Text clipboard	DataSource		Textová schránka
 Settings	ActivityWindow		Nastavenia
 Receiving	DataSource		Prijíma sa
-Settings…	ActivityWindow		Nastavenia...
+Settings…	ActivityWindow		Nastavenia…
 Ports	DataSource		Porty
 Page faults	DataSource		Výpadky stránok
 Sending	DataSource		Posiela sa

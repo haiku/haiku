@@ -5,10 +5,10 @@ OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Aplikácia Skratky nedokázala uložiť vašu sadu kláves.
 Cancel	ShortcutsWindow		Zrušiť
 InsertString	ShortcutsSpec		VložiťReťazec
-Append KeySet…	ShortcutsWindow		Pridať SaduKláves...
+Append KeySet…	ShortcutsWindow		Pridať SaduKláves…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Kláves
-Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves...
+Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves…
 MouseUp	ShortcutsSpec		MyšHore
 Revert to saved	ShortcutsWindow		Vrátiť spať uložené
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -41,7 +41,7 @@ Application	ShortcutsWindow		Aplikácia
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Pípnutie
 *MoveMouseTo 50% 50%	ShortcutsWindow		*PresunúťMyšNa 50% 50%
-Save KeySet as…	ShortcutsWindow		Uložiť SaduKláves ako...
+Save KeySet as…	ShortcutsWindow		Uložiť SaduKláves ako…
 Open	ShortcutsWindow		Otvoriť
 Really quit without saving your changes?	ShortcutsWindow		Skutočne ukončiť bez uloženia vašich zmien?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala prečítať formát vášho súboru SadaKláves!

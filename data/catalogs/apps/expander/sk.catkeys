@@ -1,11 +1,12 @@
-1	slovak	x-vnd.Haiku-Expander	1852295567
+1	slovak	x-vnd.Haiku-Expander	2537908460
 Expand	ExpanderMenu		Rozbaliť
 Close window when done expanding	ExpanderPreferences		Zatvoriť okno po dokončení rozbaľovania
-Set destination…	ExpanderMenu		Nastaviť cieľ...
+Set destination…	ExpanderMenu		Nastaviť cieľ…
 Use:	ExpanderPreferences		Použiť:
 File expanded	ExpanderWindow		Súbor rozbalený
 The destination is read only.	ExpanderWindow		Cieľ je len na čítanie.
 Expander: Open	ExpanderWindow		Rozbaľovač: Otvoriť
+ is not supported	ExpanderWindow		 nie je podporované
 Expander settings	ExpanderPreferences		Nastavenia rozbaľovača
 Select current	DirectoryFilePanel		Vybrať aktuálne
 Source	ExpanderWindow		Zdroj
@@ -24,7 +25,7 @@ Same directory as source (archive) file	ExpanderPreferences		Rovnaký ako zdrojo
 Expanding '%s'	ExpanderWindow		Rozbaľuje sa „%s“
 Expansion:	ExpanderPreferences		Rozbalenie:
 Settings	ExpanderMenu		Nastavenia
-Settings…	ExpanderMenu		Nastavenia...
+Settings…	ExpanderMenu		Nastavenia…
 Expander: Choose destination	DirectoryFilePanel		Rozbaľovač: Vyberte cieľ
 Select	ExpanderPreferences		Vybrať
 Show contents	ExpanderWindow		Zobraziť obsah
@@ -39,9 +40,9 @@ Other:	ExpanderPreferences		Iné:
 Expander	System name		Rozbaľovač
 Expand	ExpanderWindow		Rozbaliť
 Close	ExpanderMenu		Zatvoriť
-The destination is not a folder.	ExpanderWindow		Cieľ nie je priečinok
+The destination is not a folder.	ExpanderWindow		Cieľ nie je priečinok.
 Open destination folder after extraction	ExpanderPreferences		Otvoriť cieľový priečinok po rozbalení
-Set source…	ExpanderMenu		Nastaviť zdroj...
+Set source…	ExpanderMenu		Nastaviť zdroj…
 Select '%s'	DirectoryFilePanel		Vybrať „%s“
 Show contents	ExpanderMenu		Zobraziť obsah
 Stop	ExpanderWindow		Zastaviť

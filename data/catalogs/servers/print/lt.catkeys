@@ -1,21 +1,21 @@
 1	lithuanian	x-vnd.Be-PSRV	3878243268
-All pages	ConfigWindow		Visus puslapius
-Cancel	ConfigWindow		Atsisakyti
+Undefined	ConfigWindow		Neapibrėžta
 Cancel	PrintServerApp		Atsisakyti
-Landscape	ConfigWindow		Gulsčias
-No	PrintServerApp		Nėra
-OK	ConfigWindow		Gerai
-OK	PrintServerApp		Gerai
-Page setup	ConfigWindow		Puslapio nustatymai
 Page setup:	ConfigWindow		Puslapio nustatymai:
-Paper setup:	ConfigWindow		Popieriaus nustatymai:
+OK	ConfigWindow		Gerai
+Cancel	ConfigWindow		Atsisakyti
+Yes	PrintServerApp		Taip
+Would you like to set one up now?	PrintServerApp		Norite pasirinkti kokį dabar?
 Portrait	ConfigWindow		Stačiai
-Print setup	ConfigWindow		Spausdinimo nustatymai
+All pages	ConfigWindow		Visus puslapius
+There is no default printer set up.	PrintServerApp		Nėra numatytojo spausdintuvo.
 Printer:	ConfigWindow		Spausdintuvas:
 Select a printer	ConfigWindow		Pasirinkite spausdintuvą
+No	PrintServerApp		Nėra
+Landscape	ConfigWindow		Gulsčias
 There are no printers set up.	PrintServerApp		Nėra nustatytų spausdintuvų.
-There is no default printer set up.	PrintServerApp		Nėra numatytojo spausdintuvo.
-Undefined	ConfigWindow		Neapibrėžta
+OK	PrintServerApp		Gerai
+Print setup	ConfigWindow		Spausdinimo nustatymai
 Would you like to make @ the default printer?	PrintServerApp		Norite spausdintuvą @ padaryti numatytuoju?
-Would you like to set one up now?	PrintServerApp		Norite pasirinkti kokį dabar?
-Yes	PrintServerApp		Taip
+Page setup	ConfigWindow		Puslapio nustatymai
+Paper setup:	ConfigWindow		Popieriaus nustatymai:

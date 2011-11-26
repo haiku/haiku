@@ -1,18 +1,19 @@
-1	lithuanian	x-vnd.Haiku-MidiPlayer	3885957623
-Cavern	Main Window		Urvas
-Closet	Main Window		Kriauklė
-Could not load song	Main Window		Nepaleidžiama daina
-Drop MIDI file here	Scope View		Įmeskite MIDI bylą šičia
-Dungeon	Main Window		Požemis
-Garage	Main Window		Garažas
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku Midi grotuvas 1.0.0\n\nMaža programa\nPaleidžia jums tūkstančius\n Senokų gaidų
-Igor's lab	Main Window		Igorio laboratorija
-Live input:	Main Window		Tiesioginis įėjimas:
+1	lithuanian	x-vnd.Haiku-MidiPlayer	4180509704
 None	Main Window		Nieko
+Live input:	Main Window		Tiesioginė įvestis:
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	„Haiku“ MIDI grotuvas 1.0.0 beta\n\nŠi maža programėlė\nGeba atkurti tūkstančius\nSenokų gaidų
+Stop	Main Window		Stabdyti
+Cavern	Main Window		Urvas
+Volume:	Main Window		Garsis:
+Reverb:	Main Window		Aidas:
 OK	Main Window		Gerai
 Off	Main Window		Išjungti
+Dungeon	Main Window		Požemis
 Play	Main Window		Groti
-Reverb:	Main Window		Aidas:
+Garage	Main Window		Garažas
+Closet	Main Window		Vonia
+MidiPlayer	System name		MIDI grotuvas
+Drop MIDI file here	Scope View		Numeskite MIDI failą čia
+Igor's lab	Main Window		Igorio laboratorija
 Scope	Main Window		Osciloskopas
-Stop	Main Window		Stop
-Volume:	Main Window		Garsumas:
+Could not load song	Main Window		Kūrinio įkelti nepavyko

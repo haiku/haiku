@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CharacterMap	1331216786
+1	slovak	x-vnd.Haiku-CharacterMap	4082916013
 Enclosed alphanumerics	UnicodeBlocks		Uzavreté alfanumerické znaky
 Basic Latin	UnicodeBlocks		Latinka - základné znaky
 View	CharacterWindow		Zobraziť
@@ -16,6 +16,7 @@ Greek extended	UnicodeBlocks		Gréčtina - ďalšie znaky
 Linear B ideograms	UnicodeBlocks		Lineárne písmo B - ideogramy
 Devanagari	UnicodeBlocks		Dévanágarí
 Armenian	UnicodeBlocks		Arménčina
+Glagotic	UnicodeBlocks		Hlaholika
 Mathematical operators	UnicodeBlocks		Matematické operátory
 General punctuation	UnicodeBlocks		Všeobecná intepunkcia
 Miscellaneous technical	UnicodeBlocks		Rozličné technické
@@ -164,6 +165,7 @@ Ethiopic supplement	UnicodeBlocks		Etiópčina, dodatok
 Latin extended B	UnicodeBlocks		Rozšírená latinka B
 Box drawing	UnicodeBlocks		Kreslenie rámčekov
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematické alfanumerické symboly
+Copy character	CharacterView		Kopírovať znak
 Greek and Coptic	UnicodeBlocks		Gréčtina a koptčina
 Carian	UnicodeBlocks		Carian
 Georgian	UnicodeBlocks		Gruzínčina
@@ -173,6 +175,7 @@ CJK compatibility	UnicodeBlocks		ČJK - kompatibilné formáty
 Malayalam	UnicodeBlocks		Malajálamčina
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Kannadčina
+Copy as escaped byte string	CharacterView		Kopírovať ako reťazec bajtov s únikovými klauzulami
 Phonetic extensions supplement	UnicodeBlocks		Fonetické rozšírenia, doplnok
 Domino tiles	UnicodeBlocks		Kocky domino
 Katakana phonetic extensions	UnicodeBlocks		Katakana - fonetické rozšírenia

@@ -17,5 +17,5 @@ Mode:	EthernetSettingsView		Režim:
 Network:	EthernetSettingsView		Sieť:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Aby bola možná automatická konfigurácia, musí bežať net_server!
 Disabled	EthernetSettingsView		Vypnuté
-Auto-configuring failed: 	EthernetSettingsView		Automatická konfigurácia sa nepodarila:
+Auto-configuring failed: 	EthernetSettingsView		Automatická konfigurácia sa nepodarila: 
 Static	EthernetSettingsView		Statická

@@ -1,44 +1,44 @@
 1	german	x-vnd.Haiku-Time	3493650184
-<Other>	Time		<Andere>
-Add	Time		Hinzu
-Africa	Time		Afrika
-America	Time		Amerika
-Antarctica	Time		Antarktis
-Arctic	Time		Arktis
-Asia	Time		Asien
-Atlantic	Time		Atlantik
-Australia	Time		Australien
-Could not contact server	Time		Server konnte nicht erreicht werden
-Could not create socket	Time		Socket konnte nicht erzeugt werden
-Current time:	Time		Aktuelle Zeit:
-Date and time	Time		Datum und Zeit
-Europe	Time		Europa
 GMT (UNIX compatible)	Time		GMT (Unix-kompatibel)
-Hardware clock set to:	Time		Hardware-Uhr gestellt auf:
-Indian	Time		Indischer Ozean
+OK	Time		OK
+Asia	Time		Asien
+\nNow: 	Time		\nJetzt:
+Africa	Time		Afrika
+Stop	Time		Stopp
+Could not contact server	Time		Server konnte nicht erreicht werden
+Australia	Time		Australien
+Preview time:	Time		Vorschau-Zeit:
+Synchronize	Time		Synchronisieren
+Revert	Time		Anfangswerte
+Pacific	Time		Pazifik
+Add	Time		Hinzu
+Date and time	Time		Datum und Zeit
+about	Time		über
 Local time (Windows compatible)	Time		Lokalzeit (Windows-kompatibel)
 Message receiving failed	Time		Nachricht wurde nicht erhalten
-Network time	Time		Netzwerkzeit
-OK	Time		OK
-Pacific	Time		Pazifik
-Preview time:	Time		Vorschau-Zeit:
-Received invalid time	Time		Ungültige Zeit erhalten
-Remove	Time		Entfernen
-Reset	Time		Reset
-Revert	Time		Anfangswerte
-Sending request failed	Time		Sendeanfrage fehlgeschlagen
 Set time zone	Time		Zeitzone setzen
-Stop	Time		Stopp
-Synchronize	Time		Synchronisieren
-Synchronize again	Time		Nochmal synchronisieren
-Synchronize at boot	Time		Synchronisieren beim Hochfahren
-The following error occured while synchronizing:r\n%s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s: %s
-Time	System name		Datum & Zeit
-Time	Time		Time - Datum & Zeit
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Zeit\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Zeitzone
-Try all servers	Time		Alle Server abfragen
 Waiting for answer failed	Time		Warten auf Antwort fehlgeschlagen
-\nNow: 	Time		\nJetzt:
-about	Time		über
+Hardware clock set to:	Time		Hardware-Uhr gestellt auf:
+The following error occured while synchronizing:r\n%s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s
+Europe	Time		Europa
+Remove	Time		Entfernen
+Time	Time		Time - Datum & Zeit
+Indian	Time		Indischer Ozean
+Sending request failed	Time		Sendeanfrage fehlgeschlagen
+Arctic	Time		Arktis
+Time	System name		Datum & Zeit
+America	Time		Amerika
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Zeit\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Reset
+Synchronize at boot	Time		Synchronisieren beim Hochfahren
+Received invalid time	Time		Ungültige Zeit erhalten
+Antarctica	Time		Antarktis
+The following error occured while synchronizing:r\n%s: %s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s: %s
+<Other>	Time		<Andere>
+Current time:	Time		Aktuelle Zeit:
+Try all servers	Time		Alle Server abfragen
+Time zone	Time		Zeitzone
+Could not create socket	Time		Socket konnte nicht erzeugt werden
+Synchronize again	Time		Nochmal synchronisieren
+Network time	Time		Netzwerkzeit
+Atlantic	Time		Atlantik

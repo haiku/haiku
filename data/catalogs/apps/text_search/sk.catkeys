@@ -5,7 +5,7 @@ Follow symbolic links	GrepWindow		Nasledovať symbolické odkazy
 Close	GrepWindow		Zatvoriť
 Cancel	GrepWindow		Zrušiť
 The unselected files will be removed from the list.	GrepWindow		Nevybrané súbory budú odstránené zo zoznamu.
-Set target…	GrepWindow		Nastaviť cieľ...
+Set target…	GrepWindow		Nastaviť cieľ…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Prosím, vyberte súbory, ktoré chcete mať vybrané v Trackeri.
 Open files in Pe	GrepWindow		Otvoriť súbory v Pe
 Copy text to clipboard	GrepWindow		Skopírovať text do schránky
@@ -14,7 +14,7 @@ Select all	GrepWindow		Vybrať všetky
 OK	GrepWindow		OK
 Skip folders starting with a dot	GrepWindow		Preskakovať priečinky začínajce bodkou
 %APP_NAME couldn't open one or more folders.	GrepWindow		Aplikácii %APP_NAME sa nepodarilo otvoriť jeden alebo viac priečinkov.
-Escape search text	GrepWindow		Vložiť únikové klauzuly do hľadaného textu.
+Escape search text	GrepWindow		Vložiť únikové klauzuly do hľadaného textu
 Search	GrepWindow		Hľadať
 Open selection	GrepWindow		Otvoriť výber
 Look in sub-folders	GrepWindow		Hľadať v podpriečinkoch

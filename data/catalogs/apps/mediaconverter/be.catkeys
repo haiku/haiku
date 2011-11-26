@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	3564609505
+1	belarusian	x-vnd.Haiku-MediaConverter	296071315
 Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
 Video encoding:	MediaConverter		Кадаванне відэа:
 No audio	Audio codecs list		Няма аўдыё
@@ -21,6 +21,7 @@ Low	MediaConverter		Нізкая
 Conversion completed	MediaConverter		Апрацоўка завершана
 Audio:	MediaConverter-FileInfo		Аўдыё:
 OK	MediaConverter-FileInfo		ОК
+ seconds	MediaFileInfo		 секундаў
 Source files	MediaConverter		Зыходныя файлы
 Cancelling	MediaConverter		Адмена
 %d byte 	MediaFileInfo		%d байтаў

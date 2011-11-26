@@ -1,8 +1,8 @@
 1	lithuanian	x-vnd.Haiku-Sounds	157066591
 No such file or directory	HEventList		Nėra tokios bylos ar aplanko
-OK	HEventList		Gerai
-OK	HWindow		Gerai
 OK	SoundsHApp		Gerai
 Sound File:	HWindow		Garsinė byla:
-Stop	HWindow		Stop
+OK	HEventList		Gerai
+OK	HWindow		Gerai
 This is not an audio file.	HWindow		Tai nėra garsinė byla.
+Stop	HWindow		Stop

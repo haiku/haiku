@@ -1,0 +1,11 @@
+1	belarusian	x-vnd.Haiku-mixer.media_addon	1628159278
+Linear interpolation	AudioMixer		Линейная iнтэрпаляцыя
+Virtual output channels	AudioMixer		Вiртуальныя выхадныя каналы
+Output mapping	AudioMixer		Мапа вывадаў
+Resampling algorithm	AudioMixer		Алгарытм рэсэмплінгу
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Аслабiць выхад мiксеру на 3дБ(як у BeOS R5)
+not connected	AudioMixer		Ня злучана
+dB	AudioMixer		дБ
+Mute	AudioMixer		Сцішыць
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Нелінейнае кіраванне гукам (як у BeOS R5)
+Gain	AudioMixer		Узмацненне

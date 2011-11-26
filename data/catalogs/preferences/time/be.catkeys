@@ -1,4 +1,5 @@
-1	belarusian	x-vnd.Haiku-Time	2106196689
+1	belarusian	x-vnd.Haiku-Time	3493650184
+GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
 Asia	Time		Азія
 \nNow: 	Time		\nЗараз:
@@ -13,6 +14,7 @@ Pacific	Time		Ціхі акіян
 Add	Time		Дадаць
 Date and time	Time		Дата і Час
 about	Time		пра праграму
+Local time (Windows compatible)	Time		Лакальны час (як у Windows)
 Message receiving failed	Time		Памылка атрымання паведамлення
 Set time zone	Time		Пазначыць часавы пояс
 Waiting for answer failed	Time		Памылка падчас чакання адказу

@@ -1,31 +1,31 @@
 1	german	x-vnd.Haiku-Locale	1488345554
-12 hour	TimeFormatSettings		12 Stunden
-24 hour	TimeFormatSettings		24 Stunden
 Available languages	Locale Preflet Window		Verfügbare Sprachen
-Cancel	Locale Preflet Window		Abbrechen
-Currency	TimeFormatSettings		Währung
-Date	TimeFormatSettings		Datum
-Defaults	Locale Preflet Window		Standardwerte
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Damit diese Änderungen sichtbar werden, müssen Deskbar und Tracker neu gestartet werden. Sollen sie jetzt neu gestartet werden?
-Formatting	Locale Preflet Window		Formatierung
-Full format:	TimeFormatSettings		Volles Format:
-Language	Locale Preflet Window		Sprache
-Locale	Locale Preflet		Land & Sprache
-Locale	Locale Preflet Window		Land & Sprache
-Locale	System name		Land & Sprache
-Long format:	TimeFormatSettings		Langes Format:
-Medium format:	TimeFormatSettings		Mittleres Format:
 Negative:	TimeFormatSettings		Negativ:
-Numbers	TimeFormatSettings		Zahlen
-OK	Locale Preflet Window		OK
-Options	Locale Preflet Window		Optionen
-Positive:	TimeFormatSettings		Positiv:
-Preferred languages	Locale Preflet Window		Bevorzugte Sprache
-Restart	Locale Preflet Window		Neustart
-Revert	Locale Preflet Window		Anfangswerte
-Short format:	TimeFormatSettings		Kurzes Format:
-Time	TimeFormatSettings		Zeit
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Übersetzte Programm- und Ordnernamen in Deskbar und Tracker verwenden.
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
-Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden
 already chosen	LanguageListView		bereits ausgewählt
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Damit diese Änderungen sichtbar werden, müssen Deskbar und Tracker neu gestartet werden. Sollen sie jetzt neu gestartet werden?
+Long format:	TimeFormatSettings		Langes Format:
+Currency	TimeFormatSettings		Währung
+Locale	System name		Land & Sprache
+Short format:	TimeFormatSettings		Kurzes Format:
+Language	Locale Preflet Window		Sprache
+Preferred languages	Locale Preflet Window		Bevorzugte Sprache
+Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden
+Formatting	Locale Preflet Window		Formatierung
+Locale	Locale Preflet Window		Land & Sprache
+Numbers	TimeFormatSettings		Zahlen
+24 hour	TimeFormatSettings		24 Stunden
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Neustart
+Full format:	TimeFormatSettings		Volles Format:
+Defaults	Locale Preflet Window		Standardwerte
+Cancel	Locale Preflet Window		Abbrechen
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Übersetzte Programm- und Ordnernamen in Deskbar und Tracker verwenden.
+Revert	Locale Preflet Window		Anfangswerte
+Medium format:	TimeFormatSettings		Mittleres Format:
+12 hour	TimeFormatSettings		12 Stunden
+Time	TimeFormatSettings		Zeit
+Date	TimeFormatSettings		Datum
+Positive:	TimeFormatSettings		Positiv:
+Locale	Locale Preflet		Land & Sprache
+Options	Locale Preflet Window		Optionen

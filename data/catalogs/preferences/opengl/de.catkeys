@@ -1,27 +1,27 @@
 1	german	x-vnd.Haiku-OpenGL	209187778
-Attributes stack size:	Capabilities		Attribut-Stackgröße:
-Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
-Available	Extensions		Verfügbar
-Capabilities	Capabilities		Leistungsdaten
-Extensions	Extensions		Erweiterungen
-GLU version:	InfoView		GLU-Version:
-GLUT API version:	InfoView		GLUT-API-Version:
-Information	InfoView		Informationen
 List stack size:	Capabilities		Listen-Stackgröße:
-Max. 2D texture size:	Capabilities		Max. 2D-Texturgröße:
-Max. 3D texture size:	Capabilities		Max. 3D-Texturgröße:
+Information	InfoView		Informationen
 Max. clipping planes:	Capabilities		Max. Clipping-Ebenen:
-Max. convolution:	Capabilities		Max. Faltung:
-Max. evaluators equation order:	Capabilities		Max. Tiefe der Auswertungsformel:
-Max. lights:	Capabilities		Max. Lichter:
-Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
-Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:
 Max. texture units:	Capabilities		Max. Textur-Einheiten:
-Model stack size:	Capabilities		Modell-Stackgröße:
+Renderer name:	InfoView		Renderer-Name:
+Vendor name:	InfoView		Herstellername:
+Attributes stack size:	Capabilities		Attribut-Stackgröße:
+OpenGL version:	InfoView		OpenGL-Version:
 Name stack size:	Capabilities		Namen-Stackgröße:
 OpenGL	System name		OpenGL
-OpenGL version:	InfoView		OpenGL-Version:
+Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
+Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:
+GLU version:	InfoView		GLU-Version:
+Model stack size:	Capabilities		Modell-Stackgröße:
 Projection stack size:	Capabilities		Projektionen-Stackgröße:
-Renderer name:	InfoView		Renderer-Name:
+Max. lights:	Capabilities		Max. Lichter:
+Max. 2D texture size:	Capabilities		Max. 2D-Texturgröße:
+Max. convolution:	Capabilities		Max. Faltung:
+GLUT API version:	InfoView		GLUT-API-Version:
 Texture stack size:	Capabilities		Texturen-Stackgröße:
-Vendor name:	InfoView		Herstellername:
+Max. evaluators equation order:	Capabilities		Max. Tiefe der Auswertungsformel:
+Max. 3D texture size:	Capabilities		Max. 3D-Texturgröße:
+Capabilities	Capabilities		Leistungsdaten
+Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
+Available	Extensions		Verfügbar
+Extensions	Extensions		Erweiterungen

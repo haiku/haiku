@@ -1,20 +1,20 @@
 1	german	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		CPU-Takt-Anzeige
-CPUFrequency	System name		CPU-Takt
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tGeschrieben von Clemens Zeidler.\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Standardwerte
-Dynamic performance	Status view		Dynamische Leistung
-Dynamic stepping	CPU Frequency View		Dynamische Taktung
-High performance	Status view		Hohe Leistung
-Install replicant into Deskbar	CPU Frequency View		Replikant in Deskbar installieren
-Integration time [ms]: 	CPU Frequency View		Messintervall [ms]:
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Das CPU-Takt-Preflet konnte nicht gestartet werden.\n\nFehler:
-Low energy	Status view		Geringer Energieverbrauch
 Ok	Status view		OK
-Open Speedstep preferences…	Status view		Speedstep Einstellungen öffnen…
-Quit	Status view		Beenden
-Revert	Pref Window		Anfangswerte
+CPU frequency status view	CPU Frequency View		CPU-Takt-Anzeige
 Set state	Status view		Fester Takt
-Step up by CPU usage	Color Step View		Taktänderung ab CPU-Auslastung von:
+Defaults	Pref Window		Standardwerte
+Install replicant into Deskbar	CPU Frequency View		Replikant in Deskbar installieren
+Quit	Status view		Beenden
+High performance	Status view		Hohe Leistung
 Stepping policy	CPU Frequency View		Taktungsrichtlinie
+Dynamic performance	Status view		Dynamische Leistung
+Step up by CPU usage	Color Step View		Taktänderung ab CPU-Auslastung von:
+Dynamic stepping	CPU Frequency View		Dynamische Taktung
 Stepping policy: 	CPU Frequency View		Taktungsrichtlinie:
+Integration time [ms]: 	CPU Frequency View		Messintervall [ms]:
+Open Speedstep preferences…	Status view		Speedstep Einstellungen öffnen…
+Revert	Pref Window		Anfangswerte
+Low energy	Status view		Geringer Energieverbrauch
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Das CPU-Takt-Preflet konnte nicht gestartet werden.\n\nFehler:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tGeschrieben von Clemens Zeidler.\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		CPU-Takt

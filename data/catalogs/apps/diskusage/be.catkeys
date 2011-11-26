@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DiskUsage	3634416251
+1	belarusian	x-vnd.Haiku-DiskUsage	3399777733
 Scanning %refName%	Scanner		Сканаванне %refName%
 Size	Info Window		Памер
 Rescan	Pie View		Перасканаваць
@@ -14,6 +14,7 @@ Scan	Status View		Скан
 file unavailable	Status View		файл недаступны
 Get Info	Pie View		Узяць інфу
 DiskUsage	System name		Статыстыка дыскаў
+ in %d files	Info Window		ў %d файлах
 %d files	Status View		%d файлаў
 Created	Info Window		Створаны
 Modified	Info Window		Мадыфікаваны

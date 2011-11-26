@@ -1,10 +1,12 @@
-1	slovak	x-vnd.Haiku-Mail	4171229277
+1	slovak	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Kontrola pošty
 Settings	Config Window		Nastavenie
+Never	Config Window	show status window	Nikdy
 Only when dial-up is connected	Config Window		Iba ak je vytočené spojenie
 While sending and receiving	Config Window		Počas odosielania a prijímania
 days	Config Window		dní
 Incoming	Config Window		Prichádzajúce
+Server name:	E-Mail		Názov servera:
 OK	Config Window		OK
 Start mail services on startup	Config Window		Spustiť služby pošty pri štarte
 E-mail address:	E-Mail		Emailová adresa:
@@ -30,13 +32,17 @@ Enter a valid e-mail address.	AutoConfigWindow		Zadajte platnú emailovú adresu
 Add	Config Window		Pridať
 Account settings	AutoConfigWindow		Nastavenie účtu
 E-mail	System name		Email
+never	Config Window	mail checking frequency	nikdy
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nVšeobecné nastavenia nebolo možné vrátiť.\n\nChyba pri získavaní všeobecných nastavení:\n%s\n
 Real name:	Config Views		Skutočné meno:
+\t\t· Outgoing	Config Window		\t \t · Odchádzajúce
 Choose Protocol	E-Mail		Vybrať protokol
 Return address:	Config Views		Návratová adresa:
-Edit mailbox menu…	Config Window		Upraviť menu poštovej schránky...
+Edit mailbox menu…	Config Window		Upraviť menu poštovej schránky…
 Outgoing	E-Mail		Odchádzajúce
+\t\t· E-mail filters	Config Window		\t \t · Filtre pošty
 Remove	Config Views		Odstrániť
+\t\t· Incoming	Config Window		\t \t · Prichádzajúce
 Next	AutoConfigWindow		Ďalej
 Check every	Config Window		Kontrolovať každých
 Back	AutoConfigWindow		Späť

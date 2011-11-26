@@ -1,26 +1,31 @@
-1	belarusian	x-vnd.Haiku-PowerStatus	751886234
+1	belarusian	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Паведамленне аб нізкай зыходнай ёмістасці
 Show percent	PowerStatus		Паказаць працэнты
 Design capacity: 	PowerStatus		Зыходная ёмістасць
+ mW	PowerStatus		 mW
 Type: 	PowerStatus		Тып
 non-rechargeable	PowerStatus		не перазараджальны
 Empty battery slot	PowerStatus		Пусты слот акумулятара
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Запускаць у вакне
 About	PowerStatus		пра праграму
 PowerStatus	System name		Статус сілкавання
 PowerStatus	PowerStatus		Статус сілкавання
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Інфармацыя пра акумулятар
 Damaged battery	PowerStatus		Пашкоджаны акумулятар
 Show time	PowerStatus		Паказаць час
 Last full charge: 	PowerStatus		Апошняя поўная зарадка
 Battery unused	PowerStatus		Акумулятар не выкарыстоўваецца
 Extended battery info	PowerStatus		Пашыраная інфармацыя пра акумулятар
+ mA	PowerStatus		 mA
 Current rate: 	PowerStatus		Зараз:
 discharging	PowerStatus		разраджаецца
 Show text label	PowerStatus		Паказаць тэкставую метку
 About…	PowerStatus		Пра праграму...
 Model number: 	PowerStatus		Нумар мадэлі
 Install in Deskbar	PowerStatus		Усталяваць у Deskbar
+ mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Ёмістасць
 Battery discharging	PowerStatus		Акумулятар разраджаецца
 Serial number: 	PowerStatus		Серыйны нумар

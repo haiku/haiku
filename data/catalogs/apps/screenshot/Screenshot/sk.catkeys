@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-screenshot	1697748405
+1	slovak	x-vnd.haiku-screenshot	1721618877
 seconds	ScreenshotWindow		sekúnd
 Desktop	ScreenshotWindow		Plocha
 Include window border	ScreenshotWindow		Vrátane okraja okna
@@ -9,6 +9,7 @@ Cancel	ScreenshotWindow		Zrušiť
 Name:	ScreenshotWindow		Názov:
 Choose folder	ScreenshotWindow		Vyberte priečinok
 Save	ScreenshotWindow		Uložiť
+Overwrite	ScreenshotWindow		Prepísať
 Choose folder...	ScreenshotWindow		Vyberte priečinok...
 Please select	ScreenshotWindow		Prosím, vyberte
 Save as:	ScreenshotWindow		Uložiť ako:
@@ -19,7 +20,7 @@ New screenshot	ScreenshotWindow		Nová snímka obrazovky
 Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
 Home folder	ScreenshotWindow		Domovský priečinok
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
-Settings…	ScreenshotWindow		Nastavenia...
+Settings…	ScreenshotWindow		Nastavenia…
 overwrite	ScreenshotWindow		prepísať
 Delay:	ScreenshotWindow		Oneskorenie:
 Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši

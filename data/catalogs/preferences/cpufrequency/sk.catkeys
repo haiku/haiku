@@ -10,11 +10,11 @@ Stepping policy	CPU Frequency View		Politika krokovania
 Dynamic performance	Status view		Dynamický výkon
 Step up by CPU usage	Color Step View		Krokovať podľa využitia CPU
 Dynamic stepping	CPU Frequency View		Dynamické krokovanie
-Stepping policy: 	CPU Frequency View		Politika krokovania:
-Integration time [ms]: 	CPU Frequency View		Čas integrácie [ms]:
-Open Speedstep preferences…	Status view		Otvoriť nastavenia Speedstep...
+Stepping policy: 	CPU Frequency View		Politika krokovania: 
+Integration time [ms]: 	CPU Frequency View		Čas integrácie [ms]: 
+Open Speedstep preferences…	Status view		Otvoriť nastavenia Speedstep…
 Revert	Pref Window		Vrátiť
 Low energy	Status view		Nízky odber
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Spustenie konfiguračného apletu Frekvencia CPU zlyhalo\n\nChyba:
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Spustenie konfiguračného apletu Frekvencia CPU zlyhalo.\n\nChyba: 
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tnapísal Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPUFrequency	System name		Frekvencia CPU

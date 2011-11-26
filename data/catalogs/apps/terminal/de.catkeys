@@ -1,103 +1,103 @@
-1	german	x-vnd.Haiku-Terminal	2763377662
-%app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help diesen Hilfetext anzeigen\n -t, --title Fenstertitel setzen\n -f, --fullscreen Vollbildmodus starten\n
-Abort	Terminal Shell		Abbrechen
-Appearance	Terminal PrefWindow		Darstellung
-Background	Terminal AppearancePrefView		Hintergrund
-Black on White	Terminal colors schema		Schwarz auf Weiß
-Cancel	Terminal PrefWindow		Abbrechen
-Cancel	Terminal SetTitleWindow		Abbrechen
-Cancel	Terminal TermView		Abbrechen
-Cancel	Terminal TermWindow		Abbrechen
-Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" kann nicht ausgeführt werden:\n\t%error
-Change directory	Terminal TermView		Zum Ordner wechseln
-Clear all	Terminal TermWindow		Bildschirm leeren
-Close	Terminal TermWindow		Schließen
-Close active tab	Terminal TermWindow		Aktiven Reiter schließen
-Close other tabs	Terminal TermWindow		Andere Reiter schließen
-Close tab	Terminal TermWindow		Reiter schließen
-Close window	Terminal TermWindow		Fenster schließen
-Color schema:	Terminal AppearancePrefView		Farbschema:
-Color:	Terminal AppearancePrefView		Farbe:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Beenden bestätigen, falls noch aktive Programme laufen
-Copy	Terminal TermWindow		Kopieren
-Copy here	Terminal TermView		Hierher kopieren
-Create link here	Terminal TermView		Verknüpfung hier erstellen
-Custom	Terminal colors schema		Benutzerdefiniert
-Decrease	Terminal TermWindow		Verkleinern
-Don't save	Terminal PrefWindow		Verwerfen
-Edit	Terminal TermWindow		Bearbeiten
-Edit tab title…	Terminal TermWindow		Reiter umbenennen...
-Error!	Terminal getString		Fehler!
-Find	Terminal FindWindow		Suchen
-Find failed	Terminal TermWindow		Suche fehlgeschlagen
-Find next	Terminal TermWindow		Weitersuchen
-Find previous	Terminal TermWindow		Rückwärts suchen
-Find…	Terminal TermWindow		Suchen...
-Font:	Terminal AppearancePrefView		Schriftart:
-Full screen	Terminal TermWindow		Vollbild
-Green on Black	Terminal colors schema		Grün auf Schwarz
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui und Takashi Murai.\n\nGebrauch: %s [OPTION] [SHELL]\n
-Increase	Terminal TermWindow		Vergrößern
-Insert path	Terminal TermView		Pfad einfügen
-Match case	Terminal FindWindow		Groß-/Kleinschreibung beachten
-Match word	Terminal FindWindow		Ganze Wörter suchen
-Move here	Terminal TermView		Hierher verschieben
-New Terminal	Terminal TermWindow		Neues Terminal
-New tab	Terminal TermWindow		Neuer Reiter
-No search string was entered.	Terminal TermWindow		Es wurde kein Suchbegriff eingegeben.
+1	german	x-vnd.Haiku-Terminal	1998056638
 Not found.	Terminal TermWindow		Nicht gefunden.
-Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
-OK	Terminal PrefWindow		OK
-OK	Terminal SetTitleWindow		OK
-OK	Terminal TermApp		OK
-OK	Terminal TermWindow		OK
-Page setup…	Terminal TermWindow		Seiten einrichten...
-Paste	Terminal TermWindow		Einfügen
-Print	Terminal TermWindow		Drucken
-Print cancelled.	Terminal TermWindow		Drucken abgebrochen.
-Quit	Terminal TermWindow		Beenden
-Really close?	Terminal TermWindow		Wirklich schließen?
-Save	Terminal PrefWindow		Speichern
-Save as default	Terminal TermWindow		Als Standard speichern
-Save changes to this settings panel?	Terminal PrefWindow		Änderungen dieser Einstellungen speichern?
-Save to file…	Terminal PrefWindow		In Datei speichern…
-Search forward	Terminal FindWindow		Vorwärts suchen
-Select all	Terminal TermWindow		Alles auswählen
-Selected background	Terminal AppearancePrefView		Auswahl-Hintergrund
-Selected text	Terminal AppearancePrefView		Ausgewählter Text
-Set tab title	Terminal TermWindow		Reiter umbenennen
-Set window title	Terminal TermWindow		Setze Fenstertitel
-Settings	Terminal TermWindow		Einstellungen
-Settings…	Terminal TermWindow		Einstellungen...
-Shell 	Terminal TermWindow		Konsole
-Size:	Terminal AppearancePrefView		Größe:
 Switch Terminals	Terminal TermWindow		Terminals wechseln
-Tab title:	Terminal AppearancePrefView		Reitertitel:
-Tab title:	Terminal TermWindow		Reitertitel:
-Terminal	System name		Terminal
+Change directory	Terminal TermView		Zum Ordner wechseln
+OK	Terminal TermWindow		OK
+New Terminal	Terminal TermWindow		Neues Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Das Terminal konnte die Konsole leider nicht starten.
-Text	Terminal AppearancePrefView		Text
-Text encoding	Terminal TermWindow		Kodierung
-Text not found.	Terminal TermWindow		Der Suchbegriff wurde nicht gefunden.
 Text size	Terminal TermWindow		Textgröße
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Die folgenden Prozesse laufen noch:\n\n\t%1\n\n Wird das Terminal geschlossen, werden auch diese Prozesse abgebrochen.
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für diesen Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird das Terminal geschlossen, wird auch dieser Prozess abgebrochen.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird der Reiter geschlossen, wird auch dieser Prozess abgebrochen.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Unbekannte Option \"%s\"\n
-Use default	Terminal SetTitleWindow		Standardwerte
+Match case	Terminal FindWindow		Groß-/Kleinschreibung beachten
+Quit	Terminal TermWindow		Beenden
 Use default shell	Terminal Shell		Verwende Standard-Konsole
-Use selection	Terminal FindWindow		Verwende Auswahl
-Use text:	Terminal FindWindow		Suchbegriff:
-White on Black	Terminal colors schema		Weiß auf Schwarz
-Window size	Terminal TermWindow		Fenstergröße
+Confirm exit if active programs exist	Terminal AppearancePrefView		Beenden bestätigen, falls noch aktive Programme laufen
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für diesen Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
+Select all	Terminal TermWindow		Alles auswählen
+Close tab	Terminal TermWindow		Reiter schließen
+Custom	Terminal colors schema		Benutzerdefiniert
+Save to file…	Terminal PrefWindow		In Datei speichern…
+OK	Terminal PrefWindow		OK
+Black on White	Terminal colors schema		Schwarz auf Weiß
 Window title:	Terminal AppearancePrefView		Fenstertitel:
+Font:	Terminal AppearancePrefView		Schriftart:
+Copy here	Terminal TermView		Hierher kopieren
+Really close?	Terminal TermWindow		Wirklich schließen?
+Copy	Terminal TermWindow		Kopieren
 Window title:	Terminal TermWindow		Fenstertitel:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Unbekannte Option \"%s\"\n
+Print cancelled.	Terminal TermWindow		Drucken abgebrochen.
+%app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
+Cancel	Terminal SetTitleWindow		Abbrechen
+Increase	Terminal TermWindow		Vergrößern
+Settings	Terminal TermWindow		Einstellungen
+Window size	Terminal TermWindow		Fenstergröße
+Selected text	Terminal AppearancePrefView		Ausgewählter Text
+Find	Terminal FindWindow		Suchen
+Appearance	Terminal PrefWindow		Darstellung
+Tab title:	Terminal AppearancePrefView		Reitertitel:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
+Color schema:	Terminal AppearancePrefView		Farbschema:
+OK	Terminal SetTitleWindow		OK
+Background	Terminal AppearancePrefView		Hintergrund
+Use selection	Terminal FindWindow		Verwende Auswahl
+Green on Black	Terminal colors schema		Grün auf Schwarz
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird der Reiter geschlossen, wird auch dieser Prozess abgebrochen.
+Size:	Terminal AppearancePrefView		Größe:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" kann nicht ausgeführt werden:\n\t%error
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               diesen Hilfetext ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         im Vollbildmodus starten\n
+Full screen	Terminal TermWindow		Vollbild
 Window title…	Terminal TermWindow		Fenstertitel...
+Page setup…	Terminal TermWindow		Seiten einrichten...
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Die folgenden Prozesse laufen noch:\n\n\t%1\n\n Wird das Terminal geschlossen, werden auch diese Prozesse abgebrochen.
+Insert path	Terminal TermView		Pfad einfügen
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui und Takashi Murai.\n\nGebrauch: %s [OPTION] [SHELL]\n
+No search string was entered.	Terminal TermWindow		Es wurde kein Suchbegriff eingegeben.
+Don't save	Terminal PrefWindow		Verwerfen
+Set window title	Terminal TermWindow		Setze Fenstertitel
+Terminal	System name		Terminal
+Close other tabs	Terminal TermWindow		Andere Reiter schließen
+Match word	Terminal FindWindow		Ganze Wörter suchen
+Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
+Text not found.	Terminal TermWindow		Der Suchbegriff wurde nicht gefunden.
+Find…	Terminal TermWindow		Suchen...
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird das Terminal geschlossen, wird auch dieser Prozess abgebrochen.
+Move here	Terminal TermView		Hierher verschieben
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses\n\t\t\t in diesem Reiter. Optional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Fensters.\n\t%p\t-\tDer Titel dieses Reiters.\n\t%%\t-\tDas %-Zeichen.
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses.\n\t\t\tOptional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Reiters.\n\t%p\t-\tDer Name des aktiven Prozesses.\n\t%%\t-\tDas %-Zeichen.
+White on Black	Terminal colors schema		Weiß auf Schwarz
+Error!	Terminal getString		Fehler!
+New tab	Terminal TermWindow		Neuer Reiter
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
+Selected background	Terminal AppearancePrefView		Auswahl-Hintergrund
+Decrease	Terminal TermWindow		Verkleinern
+Create link here	Terminal TermView		Verknüpfung hier erstellen
+Close	Terminal TermWindow		Schließen
+Text	Terminal AppearancePrefView		Text
+Clear all	Terminal TermWindow		Bildschirm leeren
+Text encoding	Terminal TermWindow		Kodierung
 size	Terminal TermView		Größe
+Close window	Terminal TermWindow		Fenster schließen
+Save as default	Terminal TermWindow		Als Standard speichern
+Set tab title	Terminal TermWindow		Reiter umbenennen
+Settings…	Terminal TermWindow		Einstellungen...
+Abort	Terminal Shell		Abbrechen
+Edit	Terminal TermWindow		Bearbeiten
+Color:	Terminal AppearancePrefView		Farbe:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
+Print	Terminal TermWindow		Drucken
+Use text:	Terminal FindWindow		Suchbegriff:
+Cancel	Terminal TermWindow		Abbrechen
+OK	Terminal TermApp		OK
+Find failed	Terminal TermWindow		Suche fehlgeschlagen
+Search forward	Terminal FindWindow		Vorwärts suchen
+Edit tab title…	Terminal TermWindow		Reiter umbenennen...
+Find previous	Terminal TermWindow		Rückwärts suchen
+Tab title:	Terminal TermWindow		Reitertitel:
+Find next	Terminal TermWindow		Weitersuchen
+Close active tab	Terminal TermWindow		Aktiven Reiter schließen
+Paste	Terminal TermWindow		Einfügen
+Save changes to this settings panel?	Terminal PrefWindow		Änderungen dieser Einstellungen speichern?
+Cancel	Terminal PrefWindow		Abbrechen
+Shell 	Terminal TermWindow		Konsole
+Save	Terminal PrefWindow		Speichern
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses.\n\t\t\tOptional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Reiters.\n\t%p\t-\tDer Name des aktiven Prozesses.\n\t%%\t-\tDas %-Zeichen.
+Cancel	Terminal TermView		Abbrechen
+Use default	Terminal SetTitleWindow		Standardwerte

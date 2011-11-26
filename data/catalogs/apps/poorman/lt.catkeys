@@ -1,0 +1,66 @@
+1	lithuanian	x-vnd.Haiku-PoorMan	1267330937
+Website location	PoorMan		Svetainės adresas
+Error Server	PoorMan		Serverio klaida
+Settings…	PoorMan		Nuostatos…
+Create PoorMan log	PoorMan		Sukurkite žurnalo failą
+Shutting down.\n	PoorMan		Išjungiama.\n
+Hits: %lu	PoorMan		Apsilankymų: %lu
+Web folder:	PoorMan		Svetainės aplankas:
+Default	PoorMan		Numatytasis
+Save log console selection	PoorMan		Pažymėtosios pulto žurnalo dalies įrašymas
+Run server	PoorMan		Paleisti serverį
+PoorMan settings	PoorMan		Saityno serverio nuostatos
+Clear hit counter	PoorMan		Išvalyti apsilankymų skaitiklį
+Copy	PoorMan		Kopijuoti
+Max. simultaneous connections:	PoorMan		Daugiausiai vienu metu priimamų ryšių:
+Start page:	PoorMan		Pradžios tinklapis:
+done.\n	PoorMan		baigta.\n
+Create	PoorMan		Sukurti
+Shutting down.	PoorMan		Išjungiama.
+Website options	PoorMan		Svetainės nuostatos
+File Name	PoorMan		Failo vardas
+Clear console log	PoorMan		Išvalyti pulto žurnalą
+Advanced	PoorMan		Išsamiau
+OK	PoorMan		Gerai
+Status: Stopped	PoorMan		Būsena: sustabdytas
+Dir Created	PoorMan		Aplankas sukurtas
+Log to file	PoorMan		Rašyti žurnalą į failą
+Quit	PoorMan		Baigti darbą
+Hits: 0	PoorMan		Apsilankymų: 0
+Save log console	PoorMan		Pulto žurnalo įrašymas
+Edit	PoorMan		Taisa
+Create Log File	PoorMan		Sukurti žurnalo failą
+Log to console	PoorMan		Rodyti žurnalą pulte
+Directory: (none)	PoorMan		Aplankas: (joks)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Pasirinkite aplanką, kurį norite viešinti saityne.\n\nJeigu norite, programa gali sukurti numatytąjį „public_html“ poaplankį Jūsų namų aplanke.\nArba galite pasirinkti vieną iš jau sukurtų aplankų.
+Log To Console	PoorMan		Rodyti žurnalą pulte
+Connections	PoorMan		Ryšiai
+Status: Running	PoorMan		Būsena: veikia
+connections	PoorMan		ryšiai (-ių)
+Controls	PoorMan		Valdymas
+Send file listing if there's no start page	PoorMan		Neradus pradžios tinklalapio, siųsti failų sąrašą
+Error Dir	PoorMan		Aplanko klaida
+Select all	PoorMan		Pažymėti viską
+File	PoorMan		Failas
+File Logging	PoorMan		Žurnalo rašymas į failą
+Save console selections as…	PoorMan		Įrašyti pažymėtąją pulto turinio dalį kaip…
+File logging	PoorMan		Žurnalo rašymas į failą
+Select web folder	PoorMan		Pasirinkite saityne viešintiną aplanką
+Logging view	PoorMan		Žurnalo rodymas
+Logging	PoorMan		Žurnalas
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Numatytasis saityno aplankas „/boot/home/public_html“ sukurtas.\nĮsitikinkite, kad jame yra HTML failas vardu „index.html“.
+Clear log file	PoorMan		Išvalyti žurnalo failą
+Log file name:	PoorMan		Žurnalo failo vardas:
+Directory: 	PoorMan		Aplankas: 
+Log To File	PoorMan		Rašyti žurnalą į failą
+Done	PoorMan		Baigta
+Create log file	PoorMan		Išvalyti žurnalo failą
+Starting up... 	PoorMan		Paleidžiama… 
+Site	PoorMan		Svetainė
+Cancel	PoorMan		Atsisakyti
+Console logging	PoorMan		Žurnalo rodymas pulte
+Cannot start the server	PoorMan		Nepavyko paleisti serverio
+Select	PoorMan		Rinktis
+Save console as…	PoorMan		Įrašyti pulto turinį kaip…
+PoorMan	System name		Saityno serveris
+Console Logging	PoorMan		Žurnalo rodymas pulte

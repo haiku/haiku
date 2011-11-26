@@ -1,14 +1,14 @@
 1	slovak	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Obnoviť snímku
 Could not set Sudoku:\n%s\n	SudokuWindow		Nepodarilo sa nastaviť Sudoku:\n%s\n
-Export as…	SudokuWindow		Exportovať ako...
+Export as…	SudokuWindow		Exportovať ako…
 OK	SudokuWindow		OK
 New	SudokuWindow		Nový
 Abort	ProgressWindow		Zrušiť
 Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		Nebolo možné otvoriť „%s“:\n%s\n
 Easy	SudokuWindow		Jednoduché
-Open file…	SudokuWindow		Otvoriť súbor...
+Open file…	SudokuWindow		Otvoriť súbor…
 Solve single field	SudokuWindow		Vyriešiť jediné pole
 Solve	SudokuWindow		Vyriešiť
 Redo	SudokuWindow		Opakovať

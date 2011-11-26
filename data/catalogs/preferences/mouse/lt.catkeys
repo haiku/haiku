@@ -1,21 +1,21 @@
 1	lithuanian	x-vnd.Haiku-Mouse	2971161829
-...by Andrew Edward McCall	MouseApplication		…sukūrė Andrew Edward McCall'as
-1-Button	SettingsView		1 mygtuko
+Mouse type:	SettingsView		Pelės tipas:
 2-Button	SettingsView		2 mygtukų
-3-Button	SettingsView		3 mygtukų
-Accept first click	SettingsView		Reaguoti į pirmąjį spustelėjimą
+Double-click test area	SettingsView		Vieta dvigubam spustelėjimui bandyti
+Revert	MouseWindow		Grįžti
+...by Andrew Edward McCall	MouseApplication		…sukūrė Andrew Edward McCall'as
+Mouse acceleration	SettingsView		Pelės pagreitis
 Click to focus	SettingsView		Aktyvinti spustelint
 Click to focus and raise	SettingsView		Aktyvinti ir iškelti spustelint
-Defaults	MouseWindow		Numatytai
-Double-click speed	SettingsView		Dvigubo spustelėjimo greitis
-Double-click test area	SettingsView		Vieta dvigubam spustelėjimui bandyti
-Fast	SettingsView		Greitas
-Focus follows mouse	SettingsView		Aktyvinti užvedant žymeklį
-Focus mode:	SettingsView		Langų aktyvinimo būdas:
-Mouse	System name		Pelė
-Mouse acceleration	SettingsView		Pelės pagreitis
+3-Button	SettingsView		3 mygtukų
 Mouse speed	SettingsView		Pelės greitis
-Mouse type:	SettingsView		Pelės tipas:
+Focus mode:	SettingsView		Langų aktyvinimo būdas:
+1-Button	SettingsView		1 mygtuko
+Double-click speed	SettingsView		Dvigubo spustelėjimo greitis
+Defaults	MouseWindow		Numatytai
+Focus follows mouse	SettingsView		Aktyvinti užvedant žymeklį
+Accept first click	SettingsView		Reaguoti į pirmąjį spustelėjimą
+Fast	SettingsView		Greitas
 Normal	SettingsView		Vidutiniškas
-Revert	MouseWindow		Grįžti
+Mouse	System name		Pelė
 Slow	SettingsView		Lėtas

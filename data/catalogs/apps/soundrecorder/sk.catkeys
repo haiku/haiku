@@ -1,16 +1,22 @@
-1	slovak	x-vnd.Haiku-SoundRecorder	4189888707
+1	slovak	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Opakovať
 Cannot find default audio hardware	RecorderWindow		Štandardný zvukový hardvér nenájdený
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nebol nájdený dočasný súbor obsahujúci nový záznam
+Sample size:	RecorderWindow		Veľkosť vzorky:
 Nothing to play	RecorderWindow		Niet čo prehrať
+Duration: 	RecorderWindow		Trvanie: 
 Some of the files don't appear to be audio files	RecorderWindow		Zdá sa, že niektoré súbory nie sú zvukové súbory
 File info	RecorderWindow		Info súboru
 Drop files here	SoundListView		Pretiahnite súbory sem
 Input	RecorderWindow		Vstup
 Stop	RecorderWindow		Zastaviť
+Format:	RecorderWindow		Formát:
 Sound List	RecorderWindow		Zoznam zvukov
+Compression: 	RecorderWindow		Kompresia: 
 Rewind	RecorderWindow		Previnúť
+Sample rate:	RecorderWindow		Vzorkovacia frekvencia:
 Invalid audio files	RecorderWindow		Neplatné zvukové súbory
+ seconds	RecorderWindow		 sekúnd
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Nie je možné otvoriť dočasný súbor pre nový záznam
 None of the files appear to be audio files	RecorderWindow		Zdá sa, že žiadne z týchto súborov nie sú zvukové súbory
@@ -18,19 +24,22 @@ Input:	RecorderWindow		Vstup:
 Forward	RecorderWindow		Vpred
 Play	RecorderWindow		Prehrať
 SoundRecorder	System name		Záznam zvuku
+Channels:	RecorderWindow		Kanály:
+ bits	RecorderWindow		 bitov
 None	RecorderWindow		Žiadne
 Record	RecorderWindow		Záznam
-Sample size: 	RecorderWindow		Veľkosť vzorky:
+Sample size: 	RecorderWindow		Veľkosť vzorky: 
 Cannot recognize this file as a media file	RecorderWindow		Tento súbor nebol rozpoznaný ako multimediálny súbor
-Format: 	RecorderWindow		Formát:
+Format: 	RecorderWindow		Formát: 
+File name: 	RecorderWindow		Názov súboru: 
 Cannot connect to the selected sound input	RecorderWindow		Nie je možné sa pripojiť k vybranému zvukovému vstupu
 Cannot get the file to play	RecorderWindow		Nedá sa získať súbor na prehranie
 Cannot record a sound that long	RecorderWindow		Nie je možné zaznamenať taký dlhý zvuk
 Duration:	RecorderWindow		Trvanie:
 Compression:	RecorderWindow		Kompresia:
 Cannot find an unused name to use for the new recording	RecorderWindow		Nenašlo sa nepoužité meno pre novú nahrávku
-Channels: 	RecorderWindow		Kanály:
+Channels: 	RecorderWindow		Kanály: 
 Save	RecorderWindow		Uložiť
-Sample rate: 	RecorderWindow		Vzorkovacia frekvencia:
+Sample rate: 	RecorderWindow		Vzorkovacia frekvencia: 
 Cannot connect to media server	RecorderWindow		Nie je možné pripojiť sa k multimediálnemu serveru
 File name:	RecorderWindow		Názov súboru:

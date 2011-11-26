@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-DeskCalc	1916192649
-Audio Feedback	CalcView		Audiorückmeldung
-Basic	CalcView		Einfach
 Compact	CalcView		Kompakt
-DeskCalc	System name		Rechner
-Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
 Scientific	CalcView		Wissenschaftlich
+DeskCalc	System name		Rechner
+Basic	CalcView		Einfach
+Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
+Audio Feedback	CalcView		Audiorückmeldung

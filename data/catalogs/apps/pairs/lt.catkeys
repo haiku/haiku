@@ -1,10 +1,14 @@
-1	lithuanian	x-vnd.Haiku-Pairs	794776701
-Beginner (4x4)	PairsWindow		Naujokas (4x4)
-Expert (8x8)	PairsWindow		Žinovas (8x8)
-Game	PairsWindow		Žaidimas
-Intermediate (6x6)	PairsWindow		Pažengęs (6x6)
-New	PairsWindow		Naują
-New game	PairsWindow		Naujas žaidimas
-Quit	PairsWindow		Baigti
+1	lithuanian	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tautorius Ralf Schülke\n\t© 2008-2010, Haiku Inc.\n\nUžbaigti žaidimui jums prireikė %num% spragtelėjimų.\n
+Expert (8x8)	PairsWindow		Žinovas (8×8)
+Beginner (4x4)	PairsWindow		Naujokas (4×4)
 Quit game	PairsWindow		Baigti žaidimą
+Game	PairsWindow		Žaidimas
 Size	PairsWindow		Dydis
+New	PairsWindow		Naujas
+OK	PairsView		Gerai
+Intermediate (6x6)	PairsWindow		Pažengęs (6×6)
+Quit	PairsWindow		Baigti žaidimą
+Pairs	System name		Poros
+New game	PairsWindow		Naujas žaidimas
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Žaidimas „Poros“ sistemoje nerado pakankamo vektorinių piktogramų kiekio. Jų reikia bent %d.

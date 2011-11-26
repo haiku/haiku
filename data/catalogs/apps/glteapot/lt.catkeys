@@ -1,0 +1,24 @@
+1	lithuanian	x-vnd.Haiku-GLTeapot	2890609668
+Upper center	TeapotWindow		Viršuje centre
+Lighting	TeapotWindow		Apšvietimas
+Off	TeapotWindow		Išjungta
+Lower left	TeapotWindow		Apačioje kairėje
+White	TeapotWindow		Balta
+Yellow	TeapotWindow		Geltona
+Blue	TeapotWindow		Mėlyna
+Gouraud shading	TeapotWindow		Guro šešėliavimas
+Quit	TeapotWindow		Baigti darbą
+Filled polygons	TeapotWindow		Užpildyti daugiakampiai
+Fog	TeapotWindow		Rūkas
+Backface culling	TeapotWindow		Nugarėlių atranka
+Z-buffered	TeapotWindow		Z–buferiavimas
+File	TeapotWindow		Failas
+Options	TeapotWindow		Parinktys
+Perspective	TeapotWindow		Perspektyva
+GLTeapot	System name		Arbatinukas
+Green	TeapotWindow		Žalia
+Right	TeapotWindow		Dešinėje
+FPS display	TeapotWindow		Kadrų dažnio indikacija
+Add a teapot	TeapotWindow		Pridėti arbatinuką
+Red	TeapotWindow		Raudona
+Lights	TeapotWindow		Šviesos

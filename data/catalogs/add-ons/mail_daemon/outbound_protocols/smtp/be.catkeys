@@ -1,6 +1,8 @@
-1	belarusian	x-vnd.Haiku-SMTP	1052586247
+1	belarusian	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		Сервер SMTP:
+STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Памылка падчас лагіну ў %serv
+Unencrypted	ConfigView		Незашыфраваны
 . The server says:\n	smtp		. Паведамленне сервера:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Далучэнне да сервера…
@@ -10,4 +12,5 @@ Destination:	ConfigView		Прызначэнне:
 : Connection refused or host not found.	smtp		: Адмоўлена ў злучэнні ці сервер не знойдзены.
 None	ConfigView		Няма
 POP3 before SMTP	ConfigView		POP3 перад SMTP
+SSL	ConfigView		SSL
 . The server said:\n	smtp		. Паведамленне сервера:\n

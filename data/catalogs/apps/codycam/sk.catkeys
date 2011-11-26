@@ -1,8 +1,8 @@
 1	slovak	x-vnd.Haiku-CodyCam	2416864674
-Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok...
+Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok…
 Every 30 seconds	CodyCam		Každých 30 sekúnd
 File name:	CodyCam		Názov súboru:
-Last Capture: 	VideoConsumer.cpp		Posledné zachytenie:
+Last Capture: 	VideoConsumer.cpp		Posledné zachytenie: 
 Server login failed	VideoConsumer.cpp		Prihlásenie k serveru zlyhalo
 Remote host has closed the connection.\n	FtpClient		Vzdialený hostiteľ zatvoril spojenie.\n
 Login:	CodyCam		Prihlasovacie meno:
@@ -11,8 +11,8 @@ Every 2 hours	CodyCam		Každé 2 hodiny
 Closing the window\n	VideoConsumer.cpp		Zatvára sa okno\n
 login ID expected	CodyCam		očakávalo sa prihlasovacie meno
 Rate:	CodyCam		Rýchlosť:
-JPEG image	CodyCam		obrázok JPEG
-Capture Rate Menu	CodyCam		Menu rýchlosti zachytávania:
+JPEG image	CodyCam		Obrázok JPEG
+Capture Rate Menu	CodyCam		Menu rýchlosti zachytávania
 File %s # unterminated quote at end of file\n	SettingsHandler		Súbor %s # neukončená úvodzovka na konci súboru\n
 Password:	CodyCam		Heslo:
 Passive FTP	CodyCam		Pasívne FTP
@@ -21,8 +21,8 @@ password	CodyCam		heslo
 Directory:	CodyCam		Adresár:
 Every minute	CodyCam		Každú minútu
 read: %ld\n	SftpClient		prečítané: %ld\n
-Waiting…	CodyCam		Čaká sa...
-Logging in…	VideoConsumer.cpp		Prihlasuje sa...
+Waiting…	CodyCam		Čaká sa…
+Logging in…	VideoConsumer.cpp		Prihlasuje sa…
 Server:	CodyCam		Server:
 server address expected	CodyCam		očakávala sa adresa servera
 Error creating output file	VideoConsumer.cpp		Chyba pri vytváraní výstupného súboru
@@ -32,7 +32,7 @@ Output	CodyCam		Výstup
 Every 15 minutes	CodyCam		Každých 15 minút
 Cannot find an available video stream	CodyCam		Nenájdený dostupný video stream
 Can't find an available connection to the video window	CodyCam		Nebolo nájdené dostupné spojenie s oknom s videom
-Transmitting…	VideoConsumer.cpp		Prenáša sa...
+Transmitting…	VideoConsumer.cpp		Prenáša sa…
 Cannot get a time source	CodyCam		Nebolo možné získať zdroj času
 Every 8 hours	CodyCam		Každých 8 hodín
 Rename failed	VideoConsumer.cpp		Premenovanie zlyhalo
@@ -55,13 +55,13 @@ Stop video	CodyCam		Zastaviť video
 Locking the window\n	VideoConsumer.cpp		Zamyká sa okno\n
 File %s; Line %ld # %s	SettingsHandler		Súbor %s; riadok %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		Nebol nájdený požadovaný adresár na serveri
-Renaming…	VideoConsumer.cpp		Premenováva sa...
+Renaming…	VideoConsumer.cpp		Premenováva sa…
 Local	CodyCam		Lokálne
 Error setting type of output file	VideoConsumer.cpp		Chyba pri nastavovaní typu výstupu
 upload client name expected	CodyCam		očakával sa názov nahrávacieho klienta
 SFTP	CodyCam		SFTP
-Connected…	VideoConsumer.cpp		Pripojené...
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skryté> (skutočné odoslané heslo)\n
+Connected…	VideoConsumer.cpp		Pripojené…
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skryté>  (skutočné odoslané heslo)\n
 Every 5 minutes	CodyCam		Každých 5 minút
 read: %d\n	SftpClient		prečítané: %d\n
 OK	CodyCam		OK
@@ -70,7 +70,7 @@ Every hour	CodyCam		Každú hodinu
 Cannot connect the video source to the video window	CodyCam		Nebolo možné spojiť zdroj videa s oknom s videom
 capture rate expected	CodyCam		očakávaná rýchlosť zachytávania
 Error getting initial latency for the capture node	CodyCam		Chyba pri zisťovaní úvodnej latencie uzla zachytávania
-Send to…	CodyCam		Poslať kam...
+Send to…	CodyCam		Poslať kam…
 on or off expected	Settings	Do not translate 'on' and 'off'	očakávalo sa „on“ alebo „off“
 Quit	CodyCam		Ukončiť
 cmd: '%s'\n	FtpClient		príkaz: „%s“\n

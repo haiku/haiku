@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		Čiastočne stiahnu�
 Password:	ProtocolConfigView		Heslo:
 Remove mail from server when deleted	ProtocolConfigView		Odstrániť poštu zo servera pri zmazaní
 Mail server:	ProtocolConfigView		Poštový server:
-Select…	MailKit		Vybrať...
+Select…	MailKit		Vybrať…
 Connection type:	ProtocolConfigView		Typ pripojenia:
 Leave mail on server	ProtocolConfigView		Ponechať poštu na serveri
 Username:	ProtocolConfigView		Používateľské meno:

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	1220615377
+1	belarusian	x-vnd.Haiku-Terminal	1758504098
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -39,6 +39,7 @@ Color schema:	Terminal AppearancePrefView		Каляровая схема:
 OK	Terminal SetTitleWindow		ОК
 Background	Terminal AppearancePrefView		Фон
 Use selection	Terminal FindWindow		Карыстаць выдзяленне
+Green on Black	Terminal colors schema		Залёны на Белым
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Працэс \"%1\" яшчэ актыўны.\nКалі вы закрыеце ўкладку, працэс будзе забіты.
 Size:	Terminal AppearancePrefView		Памер:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Немагчыма выканаць \"%command\":\n\t%памылка

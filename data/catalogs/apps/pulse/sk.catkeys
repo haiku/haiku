@@ -2,7 +2,7 @@
 OK	PrefsWindow		OK
 Quit	DeskbarPulseView		Ukončiť
 Mini mode	DeskbarPulseView		Režim mini
-Remove replicant	CPUButton		Odstrániť  replikanta
+Remove replicant	CPUButton		Odstrániť replikanta
 Active color	ConfigView		Aktívna farba
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Pulse [--mini] [-w šírka] [--width=šírka]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Fade colors	ConfigView		Farebné prechody
@@ -20,13 +20,13 @@ Frame color	ConfigView		Farba rámca
 Mini mode	PrefsWindow		Režim mini
 OK	PulseApp		OK
 Bar colors	ConfigView		Farby panelov
-Settings…	PulseView		Nastavenia...
+Settings…	PulseView		Nastavenia…
 You can't disable the last active CPU.	PulseView		Nemôžete vypnúť posledný aktívny CPU.
 Info	PulseApp		Info
 Info	CPUButton		Info
 OK	PulseView		OK
 Deskbar menu	CPUButton		Menu Panelu
-About Pulse…	PulseView		O aplikácii Pulse...
+About Pulse…	PulseView		O aplikácii Pulse…
 Deskbar mode	MiniPulseView		Režim Panelu
 Quit	MiniPulseView		Ukončiť
 Pulse	System name		Pulse
@@ -38,11 +38,11 @@ Width of icon:	ConfigView		Šírka ikony:
 You can't disable the last active CPU.	CPUButton		Nemôžete vypnúť posledný aktívny CPU.
 Normal mode	DeskbarPulseView		Nermálny režim
 OK	CPUButton		OK
-About Pulse…	CPUButton		O aplikácii Pulse...
+About Pulse…	CPUButton		O aplikácii Pulse…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstránenie z Panelu zlyhalo.\n%s
 Mini mode	NormalPulseView		Režim mini
 Info	DeskbarPulseView		Info
 Pulse settings	PulseWindow		Nastavenia Pulse
 Idle color	ConfigView		Farba pri nečinnosti
-Installing in Deskbar failed\n%s	PulseApp		Inštalácia do Panelu zlyhala.\n%s
+Installing in Deskbar failed\n%s	PulseApp		Inštalácia do Panelu zlyhala\n%s
 CPU progress bar	NormalPulseView		Priebeh CPU

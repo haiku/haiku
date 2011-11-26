@@ -1,9 +1,10 @@
-1	dutch; flemish	x-vnd.haiku.zip-o-matic	829498916
+1	dutch; flemish	x-vnd.haiku.zip-o-matic	2207848100
 1 file added.	file:ZipOMaticWindow.cpp		1 bestand toegevoegd.
 Stop	file:ZipOMaticWindow.cpp		Stop
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creëert archief: %s
 Continue	file:ZipOMaticWindow.cpp		Doorgaan
 Preparing to archive	file:ZipperThread.cpp		Archivering voorbereiden
+Drop files here.	file:ZipOMaticWindow.cpp		Plaats de bestanden hier.
 Filename: %s	file:ZipOMaticWindow.cpp		Bestandsnaam: %s
 Let them continue	file:ZipOMatic.cpp		Laat ze doorgaan
 Do you want to stop them?	file:ZipOMatic.cpp		Wilt u ze stoppen?

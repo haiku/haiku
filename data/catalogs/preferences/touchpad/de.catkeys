@@ -1,20 +1,20 @@
 1	german	x-vnd.Haiku-Touchpad	607725922
-Acceleration	TouchpadPrefView		Beschleunigung
-Cancel	TouchpadPrefView		Abbrechen
-Defaults	TouchpadPrefView		Standardwerte
-Fast	TouchpadPrefView		Schnell
-High	TouchpadPrefView		Hoch
-Horizontal	TouchpadPrefView		Horizontal
-Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
-OK	TouchpadPrefView		OK
-Off	TouchpadPrefView		Aus
-Please confirm	TouchpadPrefView		Bitte bestätigen
-Revert	TouchpadPrefView		Anfangswerte
 Scrolling	TouchpadPrefView		Scrollen
-Sensitivity	TouchpadPrefView		Empfindlichkeit
-Slow	TouchpadPrefView		Langsam
-Tapping	TouchpadPrefView		Klicken
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich geändert werden?
 Touchpad	System name		Touchpad
+Revert	TouchpadPrefView		Anfangswerte
+Tapping	TouchpadPrefView		Klicken
+Please confirm	TouchpadPrefView		Bitte bestätigen
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
+Defaults	TouchpadPrefView		Standardwerte
+Slow	TouchpadPrefView		Langsam
 Vertical	TouchpadPrefView		Vertikal
+High	TouchpadPrefView		Hoch
+Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
+Fast	TouchpadPrefView		Schnell
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		Beschleunigung
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich geändert werden?
+Horizontal	TouchpadPrefView		Horizontal
+Off	TouchpadPrefView		Aus
+Sensitivity	TouchpadPrefView		Empfindlichkeit
+Cancel	TouchpadPrefView		Abbrechen

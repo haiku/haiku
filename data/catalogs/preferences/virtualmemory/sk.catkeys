@@ -3,7 +3,7 @@ Turn off	SettingsWindow		Vypnúť
 GB	SettingsWindow		GB
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Vypnutie virtuálnej pamäte bude mať nežiadúce účinky na stabilitu systému v prípade vyčerpania pamäte.\nVirtuálna pamäť nemá vplyv na výkon systému pred dosiahnutím tohto stavu.\n\nSte si naozaj istý, že ju chcete vypnúť?
 Requested swap file size:	SettingsWindow		Požadovaná veľkosť odkladacieho súboru:
-Physical memory: 	SettingsWindow		Fyzická pamäť:
+Physical memory: 	SettingsWindow		Fyzická pamäť: 
 Changes will take effect on restart!	SettingsWindow		Zmeny sa prejavia po reštarte!
 Defaults	SettingsWindow		Predvolené
 KB	SettingsWindow		KB
@@ -12,7 +12,7 @@ Insufficient space for a swap file.	SettingsWindow		Nedostatok miesta pre odklad
 Keep enabled	SettingsWindow		Ponechať zapnuté
 Revert	SettingsWindow		Vrátiť
 VirtualMemory	System name		Virtuálna pamäť
-Current swap file size: 	SettingsWindow		Aktuálna veľkosť odkladacieho súboru:
+Current swap file size: 	SettingsWindow		Aktuálna veľkosť odkladacieho súboru: 
 OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuálna pamäť\n\tnapísal Axel Dörfler\n\tCopyright 2005, Haiku.\n
 Enable virtual memory	SettingsWindow		Zapnúť virtuálnu pamäť

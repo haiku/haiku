@@ -1,7 +1,7 @@
-1	slovak	x-vnd.Be-MAIL	1350013868
+1	slovak	x-vnd.Be-MAIL	1835398254
 View	Mail		Zobraziť
 %d - Date	Mail		%d - Dátum
-Attach attributes:	Mail		Pripojiť atribúty
+Attach attributes:	Mail		Pripojiť atribúty:
 Inconsistency occurred in the undo/redo buffer.	Mail		V zásobníku vrátení/opakovaní sa vyskytla nekonzistencia.
 An error occurred trying to save the attachment.	Mail		Vyskytla sa chyba pri pokuse uložiť prílohu.
 Copy to new	Mail		Skopírovať ako novú
@@ -12,7 +12,7 @@ New mail message	Mail		Nová poštová správa
 Automatic	Mail		Automaticky
 Automatically mark mail as read:	Mail		Automaticky označiť poštu ako prečítanú:
 helpful message	Mail		užitočná správa
-Colored quotes:	Mail		Zafarbené citácie
+Colored quotes:	Mail		Zafarbené citácie:
 Subject:	Mail		Predmet:
 Reply to all	Mail		Odpovedať všetkým
 Show icons & labels	Mail		Zobraziť ikony a menovky
@@ -36,17 +36,17 @@ Save changes to this signature?	Mail		Uložiť zmeny tohto podpisu?
 Cc:	Mail		Kópia:
 Off	Mail		Vypnúť
 Find	Mail		Nájsť
-Preferences…	Mail		Predvoľby...
+Preferences…	Mail		Predvoľby…
 Undo	Mail		Vrátiť
 Date:	Mail		Dátum:
 Leave as New	Mail		Ponechať ako Nové
 An error occurred trying to open this signature.	Mail		Vyskytla sa chyba pri pokuse otvoriť podpis.
-No file attributes, just plain data	Mail		Žiadne atribúty súboru, iba čisté dáta.
-Edit queries…	Mail		Upraviť požiadavky...
+No file attributes, just plain data	Mail		Žiadne atribúty súboru, iba čisté dáta
+Edit queries…	Mail		Upraviť požiadavky…
 queries	B_USER_DIRECTORY/mail/queries		požiadavky
 Paste	Mail		Vložiť
 in	B_USER_DIRECTORY/mail/in		v
-Save attachment…	Mail		Uložiť prílohu
+Save attachment…	Mail		Uložiť prílohu…
 Include file attributes in attachments	Mail		Prikladať do príloh atribúty súborov
 OK	Mail		OK
 Send	Mail		Odoslať
@@ -56,18 +56,20 @@ Hide	Mail		Skryť
 Forward without attachments	Mail		Preposlať bez príloh
 Previous	Mail		Predošlé
 Redo	Mail		Opakovať
-Add enclosure…	Mail		Pridať prílohu...
+Add enclosure…	Mail		Pridať prílohu…
 Mail	System name		Pošta
-Print…	Mail		Tlačiť...
+Print…	Mail		Tlačiť…
 Warn unencodable:	Mail		Upozorniť na nezakódovateľné:
 Quit	Mail		Ukončiť
 %n - Full name	Mail		%n - Plný názov
+ Read 	Mail		 Prečítené 
 Trash	Mail		Kôš
 Default account:	Mail		Predvolený účet:
 Size:	Mail		Veľkosť:
 Account from mail	Mail		Účet z pošty
-Edit signatures…	Mail		Upraviť podpisy...
+Edit signatures…	Mail		Upraviť podpisy…
 New	Mail		Nová
+Attachments: 	Mail		Prílohy: 
 On	Mail		Zapnúť
 Set to %s	Mail		Nastaviť na %s
 Forward	Mail		Preposlať
@@ -78,12 +80,12 @@ Only files can be added as attachments.	Mail		Ako prílohy možno pridať iba s�
 Previous message	Mail		Predošlá správa
 Attachments:	Mail		Prílohy:
 Title:	Mail		Názov:
-Find…	Mail		Nájsť...
-Accounts…	Mail		Účty...
+Find…	Mail		Nájsť…
+Accounts…	Mail		Účty…
 Mail preferences	Mail		Predvoľby pošty
 Initial spell check mode:	Mail		Režim prvotnej kontroly pravopisu:
 Leave same	Mail		Ponechať rovnaké
-Page setup…	Mail		Nastavenie stránky...
+Page setup…	Mail		Nastavenie stránky…
 Text wrapping:	Mail		Zalamovanie textu:
 Revert	Mail		Vrátiť
 File	Mail		Súbor
@@ -122,7 +124,7 @@ Mail couldn't find its dictionary.	Mail		Pošta nenašla svoj slovník.
 Reply preamble:	Mail		Úvod odpovede:
 Signatures	Mail		Podpisy
 Next	Mail		Ďalší
-Set to…	Mail		Nastaviť na...
+Set to…	Mail		Nastaviť na…
 Use default account	Mail		Použiť predvolený účet
 Sorry	Mail		Ľutujeme
 Encoding:	Mail		Kódovanie:
@@ -132,8 +134,8 @@ Save address	Mail		Uložiť adresu
 Queries	Mail		Požiadavky
 Do you wish to save this message as a draft before closing?	Mail		Chcete túto správu pred ukončením uložiť medzi rozpísané?
 Save	Mail		Uložiť
-Random	Mail		Náhodné
-Close and 	Mail		Zatvoriť a
+Random	Mail		Náhodný
+Close and 	Mail		Zatvoriť a 
 Save as draft	Mail		Uložiť ako rozpísané
 The mail_daemon could not be started:\n\t	Mail		mail_daemon sa nepodarilo spustiť:\n\t
 Open attachment	Mail		Otvoriť prílohu

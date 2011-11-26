@@ -1,200 +1,200 @@
 1	german	x-vnd.haiku-icon_o_matic	2326864078
-<modify path>	Icon-O-Matic-PathCmd		<Pfad ändern>
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<nichts zu wiederholen>
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<nichts rückgängig zu machen>
-<unavailable>	Icon-O-Matic-StyleTypes		<nicht verfügbar>
-<unkown property>	Icon-O-Matic-PropertyNames		<unbekannte Eigenschaft>
-Add	Icon-O-Matic-PathsList		Hinzufügen
-Add	Icon-O-Matic-StylesList		Hinzufügen
-Add	Icon-O-Matic-TransformersList		Hinzufügen
-Add Control Point	Icon-O-Matic-AddPointCmd		Kontrollpunkt hinzufügen
-Add Path	Icon-O-Matic-AddPathsCmd		Pfad hinzufügen
-Add Paths	Icon-O-Matic-AddPathsCmd		Pfade hinzufügen
-Add Shape	Icon-O-Matic-AddShapesCmd		Form hinzufügen
-Add Shapes	Icon-O-Matic-AddShapesCmd		Formen hinzufügen
+Select All	Icon-O-Matic-PathManipulator		Alles auswählen
 Add Style	Icon-O-Matic-AddStylesCmd		Stil hinzufügen
-Add Styles	Icon-O-Matic-AddStylesCmd		Stile hinzufügen
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Transformator hinzufügen
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Transformatoren hinzufügen
-Add circle	Icon-O-Matic-PathsList		Kreis hinzufügen
-Add empty	Icon-O-Matic-ShapesList		Hinzufügen
-Add rect	Icon-O-Matic-PathsList		Rechteck hinzufügen
-Add shape with path	Icon-O-Matic-Menu-Shape		Form mit Pfad hinzufügen
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Form mit Pfad & Stil hinzufügen
-Add shape with style	Icon-O-Matic-Menu-Shape		Form mit Stil hinzufügen
-Add with path	Icon-O-Matic-ShapesList		Mit Pfad hinzufügen
-Add with path & style	Icon-O-Matic-ShapesList		Mit Pfad & Stil hinzufügen
-Add with style	Icon-O-Matic-ShapesList		Mit Stil hinzufügen
-All	Icon-O-Matic-Properties		Alle
-Append…	Icon-O-Matic-Menu-File		Anhängen...
-Assign Path	Icon-O-Matic-AddPathsCmd		Pfad zuweisen
-Assign Paths	Icon-O-Matic-AddPathsCmd		Pfade zuordnen
-Assign Style	Icon-O-Matic-AssignStyleCmd		Stil zuordnen
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Attribut
-Bleep!	Exporter - Continue in error dialog		Piep!
-Bummer	Cancel button - error alert		Herrje!
-Cancel	Icon-O-Matic-ColorPicker		Abbrechen
-Cancel	Icon-O-Matic-Menu-Settings		Abbrechen
-Cancel	Icon-O-Matic-SVGExport		Abbrechen
-Caps	Icon-O-Matic-PropertyNames		Enden
-Change Color	Icon-O-Matic-SetColorCmd		Farbe ändern
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pfad aufräumen
-Clean up	Icon-O-Matic-PathsList		Aufräumen
-Click on a shape above	Empty transformers list - 1st line		Erst eine Form oben auswählen,
-Click on an object in	Empty property list - 1st line		Auf ein Objekt klicken in
-Close	Icon-O-Matic-Menu-File		Schließen
-Closed	Icon-O-Matic-PropertyNames		Geschlossen
-Color	Icon-O-Matic-PropertyNames		Farbe
-Color	Icon-O-Matic-StyleTypes		Farbe
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farbe (#%02x%02x%02x)
 Color (#%02x%02x%02x)	Style name after dropping a color		Farbe (#%02x%02x%02x)
-Conic	Icon-O-Matic-StyleTypes		Konisch
-Contour	Transformation		Kontur
-Copy	Icon-O-Matic-Properties		Kopieren
-Detect Orient.	Icon-O-Matic-PropertyNames		Ausrichtung erk.
-Diamond	Icon-O-Matic-StyleTypes		Raute
-Discard	Icon-O-Matic-Menu-Settings		Verwerfen
-Duplicate	Icon-O-Matic-PathsList		Duplizieren
-Duplicate	Icon-O-Matic-ShapesList		Duplizieren
-Duplicate	Icon-O-Matic-StylesList		Duplizieren
-Edit	Icon-O-Matic-Menus		Bearbeiten
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Farbverlauf bearbeiten
-Error: 	Icon-O-Matic-Exporter		Fehler:
-Error: 	Icon-O-Matic-Main		Fehler:
-Export	Icon-O-Matic-Menu-File		Exportieren
-Export Icon	Dialog title		Icon exportieren
-Export as…	Icon-O-Matic-Menu-File		Exportieren als...
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Öffen der Datei '%s' als SVG Dokument fehlgeschlagen.\n\nFehler: %s
-File	Icon-O-Matic-Menus		Datei
-Flip	Icon-O-Matic-PathManipulator		Spiegeln
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Kontrollpunkt spiegeln
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Kontrollpunkte spiegeln
-Format	Icon-O-Matic-SavePanel		Format
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Form einfrieren
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Formen einfrieren
-Freeze transformation	Icon-O-Matic-ShapesList		Transformation einfrieren
-Gradient	Icon-O-Matic-StyleTypes		Farbverlauf
-Gradient type	Icon-O-Matic-StyleTypes		Verlaufstyp:
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-Quellcode
-Height	Icon-O-Matic-PropertyNames		Höhe
-Icon-O-Matic	System name		Icon-O-Matic
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic konnte vielleicht nicht alle Daten aus dem SVG interpretieren, als es geladen wurde. Wird die Originaldatei überschrieben, werden diese Informationen verloren gehen.
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Kontrollpunkt einfügen
-Invert selection	Icon-O-Matic-Properties		Auswahl umkehren
-Joins	Icon-O-Matic-PropertyNames		Verbindungen
-Linear	Icon-O-Matic-StyleTypes		Linear
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Attribut
-Max LOD	Icon-O-Matic-PropertyNames		Max. LOD
-Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
-Miter Limit	Icon-O-Matic-PropertyNames		Gehrungslimit
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Kontrollpunkt verändern
-Move	Icon-O-Matic-TransformationBoxStates		Bewegen
-Move Path	Icon-O-Matic-MovePathsCmd		Pfad umsortieren
-Move Paths	Icon-O-Matic-MovePathsCmd		Pfade umsortieren
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Drehpunkt verschieben
+Add	Icon-O-Matic-StylesList		Hinzufügen
 Move Shape	Icon-O-Matic-MoveShapesCommand		Form umsortieren
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Formen umsortieren
-Move Style	Icon-O-Matic-MoveStylesCmd		Stil umsortieren
-Move Styles	Icon-O-Matic-MoveStylesCmd		Stile umsortieren
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator umsortieren
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Transformatoren umsortieren
-Multi Paste Properties	Icon-O-Matic-Properties		Mehrere Eigenschaften einfügen
-Multi Set 	Multi Set (property name)		Mehrfach-Setzen
-Multi paste	Icon-O-Matic-Properties		Mehrfach-Einfügen
-Name	Icon-O-Matic-PropertyNames		Name
-New	Icon-O-Matic-Menu-File		Neu
-No	Icon-O-Matic-StyledTextImport		Nein
-None	Icon-O-Matic-Properties		Keine
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Kontrollpunkt anstoßen
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Kontrollpunkte anstoßen
-OK	Icon-O-Matic-ColorPicker		OK
-OK	Icon-O-Matic-SVGImport		OK
-Off	Icon-O-Matic-Menu-Settings		Aus
-Opacity	Icon-O-Matic-PropertyNames		Deckkraft
 Opening the document failed!	Icon-O-Matic-Main		Öffnen des Dokuments fehlgeschlagen!
+Reset transformation	Icon-O-Matic-ShapesList		Transformation zurücksetzen
+Move Paths	Icon-O-Matic-MovePathsCmd		Pfade umsortieren
+None	Icon-O-Matic-Properties		Keine
+New	Icon-O-Matic-Menu-File		Neu
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic konnte vielleicht nicht alle Daten aus dem SVG interpretieren, als es geladen wurde. Wird die Originaldatei überschrieben, werden diese Informationen verloren gehen.
+Paste Properties	Icon-O-Matic-Properties		Eigenschaften einfügen
+Stroke	Transformation		Umrandung
+Save Icon	Dialog title		Icon speichern
+Closed	Icon-O-Matic-PropertyNames		Geschlossen
+Remove Path	Icon-O-Matic-RemovePathsCmd		Pfad entfernen
+Add shape with path	Icon-O-Matic-Menu-Shape		Form mit Pfad hinzufügen
+Select	Icon-O-Matic-Properties		Auswählen
+Height	Icon-O-Matic-PropertyNames		Höhe
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Transformer entfernen
+Width	Icon-O-Matic-PropertyNames		Strichstärke
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformation
+Duplicate	Icon-O-Matic-ShapesList		Duplizieren
+<unkown property>	Icon-O-Matic-PropertyNames		<unbekannte Eigenschaft>
+Linear	Icon-O-Matic-StyleTypes		Linear
+Assign Path	Icon-O-Matic-AddPathsCmd		Pfad zuweisen
+Move	Icon-O-Matic-TransformationBoxStates		Bewegen
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Kontrollpunkte spiegeln
+warning	Icon-O-Matic-SVGExport		Warnung
+Copy	Icon-O-Matic-Properties		Kopieren
+Miter Limit	Icon-O-Matic-PropertyNames		Gehrungslimit
+OK	Icon-O-Matic-ColorPicker		OK
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Kontrollpunkt entfernen
+Bleep!	Exporter - Continue in error dialog		Piep!
+Add circle	Icon-O-Matic-PathsList		Kreis hinzufügen
+Shorten	Icon-O-Matic-PropertyNames		Kürzen
+bad news	Title of error alert		Schlechte Nachrichten
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Pfade entfernen
+Scale Y	Icon-O-Matic-PropertyNames		Skalieren in Y-Richtung
+Add Control Point	Icon-O-Matic-AddPointCmd		Kontrollpunkt hinzufügen
+Untitled	Icon-O-Matic-Main		Unbenannt
+Multi Set 	Multi Set (property name)		Mehrfach-Setzen
+any of the other lists to	Empty property list - 2nd line		einer der anderen Listen, um
+Save as…	Icon-O-Matic-Menu-File		Speichern als...
+Change Color	Icon-O-Matic-SetColorCmd		Farbe ändern
+Style	Icon-O-Matic-Menus		Stil
+<modify path>	Icon-O-Matic-PathCmd		<Pfad ändern>
 Opening the icon failed!	Icon-O-Matic-Main		Öffnen des Icons fehlgeschlagen!
+Error: 	Icon-O-Matic-Main		Fehler:
+Rotate indices backwards	Icon-O-Matic-PathsList		Indizes rückwärts rotieren
+Name	Icon-O-Matic-PropertyNames		Name
+bad news	Icon-O-Matic-Exporter		Schlechte Nachrichten
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<nichts rückgängig zu machen>
+Off	Icon-O-Matic-Menu-Settings		Aus
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Form einfrieren
+PNG Set	Icon-O-Matic-SavePanel		PNG Satz
+Joins	Icon-O-Matic-PropertyNames		Verbindungen
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Stil entfernen
+Scale X	Icon-O-Matic-PropertyNames		Skalieren in X-Richtung
+Set 	Set (property name)		Setzen
+Cancel	Icon-O-Matic-SVGExport		Abbrechen
+Add shape with style	Icon-O-Matic-Menu-Shape		Form mit Stil hinzufügen
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Form entfernen
+Reverse	Icon-O-Matic-PathsList		Umkehren
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-Quellcode
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Transformationen zurücksetzen
+All	Icon-O-Matic-Properties		Alle
+Multi Paste Properties	Icon-O-Matic-Properties		Mehrere Eigenschaften einfügen
+Undo	Icon-O-Matic-Main		Rückgängig:
+Click on a shape above	Empty transformers list - 1st line		Erst eine Form oben auswählen,
+Add Shape	Icon-O-Matic-AddShapesCmd		Form hinzufügen
+Contour	Transformation		Kontur
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nichts zu wiederholen>
+Perspective	Transformation		Perspektive
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator umsortieren
+Opacity	Icon-O-Matic-PropertyNames		Deckkraft
+Add with path	Icon-O-Matic-ShapesList		Mit Pfad hinzufügen
+Gradient type	Icon-O-Matic-StyleTypes		Verlaufstyp:
+Icon-O-Matic	System name		Icon-O-Matic
+Cancel	Icon-O-Matic-Menu-Settings		Abbrechen
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Kontrollpunkt verändern
+Saving your document failed!	Icon-O-Matic-Exporter		Speichern des Dokuments fehlgeschlagen!
+edit it's properties here.	Empty property list - 3rd line		Eigenschaften hier zu ändern.
+Split	Icon-O-Matic-PathManipulator		Trennen
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Kontrollpunkte anstoßen
+Remove	Icon-O-Matic-StylesList		Entfernen
+Add with path & style	Icon-O-Matic-ShapesList		Mit Pfad & Stil hinzufügen
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Attribut
+Translation Y	Icon-O-Matic-PropertyNames		Verschiebung Y
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotieren
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Transformator entfernen
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pfadindizes rotieren
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Transformator hinzufügen
+Remove	Icon-O-Matic-PathsList		Entfernen
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Kontrollpunkt anstoßen
+Pick a color	Icon-O-Matic-ColorPicker		Farbe aussuchen
+Quit	Icon-O-Matic-Menu-File		Beenden
+Export	Icon-O-Matic-Menu-File		Exportieren
+No	Icon-O-Matic-StyledTextImport		Nein
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Änderungen am aktuellen Icon speichern?
+Rotate indices forwards	Icon-O-Matic-PathsList		Indizes vorwärts rotieren
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Pfad lösen
+load error	Icon-O-Matic-SVGImport		Ladefehler
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Formen umsortieren
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stile entfernen
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Der zu importierende Text ist ziemlich lang. Trotzdem importieren?
+Add	Icon-O-Matic-TransformersList		Hinzufügen
+Export Icon	Dialog title		Icon exportieren
+Color	Icon-O-Matic-StyleTypes		Farbe
+Settings…	Icon-O-Matic-SavePanel		Einstellungen...
+Remove	Icon-O-Matic-PathManipulator		Entfernen
+Radial	Icon-O-Matic-StyleTypes		Radial
+Perspective	Icon-O-Matic-TransformersList		Perspektive
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Form mit Pfad & Stil hinzufügen
+Gradient	Icon-O-Matic-StyleTypes		Farbverlauf
+Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Attribut
+Invert selection	Icon-O-Matic-Properties		Auswahl umkehren
+Export as…	Icon-O-Matic-Menu-File		Exportieren als...
+Transformation	Transformation		Transformation
+Click on an object in	Empty property list - 1st line		Auf ein Objekt klicken in
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Transformatoren umsortieren
+Move Styles	Icon-O-Matic-MoveStylesCmd		Stile umsortieren
+Reset transformation	Icon-O-Matic-StylesList		Transformation zurücksetzen
+Max LOD	Icon-O-Matic-PropertyNames		Max. LOD
+Transformer	Icon-O-Matic-Menus		Transformator
+Flip	Icon-O-Matic-PathManipulator		Spiegeln
+Conic	Icon-O-Matic-StyleTypes		Konisch
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Kontrollpunkte trennen
+Save	Icon-O-Matic-Menu-Settings		Speichern
+Add empty	Icon-O-Matic-ShapesList		Hinzufügen
+Close	Icon-O-Matic-Menu-File		Schließen
+Cancel	Icon-O-Matic-ColorPicker		Abbrechen
+Paste	Icon-O-Matic-Properties		Einfügen
+Shape	Icon-O-Matic-Menus		Form
+Translation X	Icon-O-Matic-PropertyNames		Verschiebung X
+Properties	Icon-O-Matic-Menus		Eigenschaften
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Drehpunkt verschieben
+Path	Icon-O-Matic-Menus		Pfad
+Freeze transformation	Icon-O-Matic-ShapesList		Transformation einfrieren
+File	Icon-O-Matic-Menus		Datei
+Error: 	Icon-O-Matic-Exporter		Fehler:
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Transformatoren hinzufügen
+Diamond	Icon-O-Matic-StyleTypes		Raute
+Path	Icon-O-Matic-PropertyNames		Pfad
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Öffen der Datei '%s' als SVG Dokument fehlgeschlagen.\n\nFehler: %s
+Discard	Icon-O-Matic-Menu-Settings		Verwerfen
+Swatches	Icon-O-Matic-Menus		Farbfelder
+<unavailable>	Icon-O-Matic-StyleTypes		<nicht verfügbar>
+Rotation	Icon-O-Matic-PropertyNames		Rotation
+Add with style	Icon-O-Matic-ShapesList		Mit Stil hinzufügen
+Add	Icon-O-Matic-PathsList		Hinzufügen
+Add Shapes	Icon-O-Matic-AddShapesCmd		Formen hinzufügen
+Move Style	Icon-O-Matic-MoveStylesCmd		Stil umsortieren
+Bummer	Cancel button - error alert		Herrje!
+Snap to grid	Icon-O-Matic-Menu-Settings		Am Gitter einrasten
+Remove	Icon-O-Matic-ShapesList		Entfernen
+Yes	Icon-O-Matic-StyledTextImport		Ja
+Transformation	Icon-O-Matic-TransformersList		Transformation
+Add Styles	Icon-O-Matic-AddStylesCmd		Stile hinzufügen
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Kontrollpunkte entfernen
+Format	Icon-O-Matic-SavePanel		Format
+Add rect	Icon-O-Matic-PathsList		Rechteck hinzufügen
+Edit	Icon-O-Matic-Menus		Bearbeiten
+Duplicate	Icon-O-Matic-StylesList		Duplizieren
+Caps	Icon-O-Matic-PropertyNames		Enden
+Transform	Icon-O-Matic-PathManipulator		Transformieren
+Add Paths	Icon-O-Matic-AddPathsCmd		Pfade hinzufügen
+Style type	Icon-O-Matic-StyleTypes		Stiltyp:
+too big	Icon-O-Matic-StyledTextImport		zu groß
+Assign Style	Icon-O-Matic-AssignStyleCmd		Stil zuordnen
+Add Path	Icon-O-Matic-AddPathsCmd		Pfad hinzufügen
+Color	Icon-O-Matic-PropertyNames		Farbe
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Kontrollpunkt einfügen
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Kontrollpunkt spiegeln
+Redo	Icon-O-Matic-Main		Wiederholen:
+Assign Paths	Icon-O-Matic-AddPathsCmd		Pfade zuordnen
+OK	Icon-O-Matic-SVGImport		OK
+Multi paste	Icon-O-Matic-Properties		Mehrfach-Einfügen
+to attach transformers.	Empty transformers list - 2nd line		um Transformatoren zuzuweisen.
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Transformation zurücksetzen
+Reverse Path	Icon-O-Matic-ReversePathCmd		Pfad umkehren
+Scale	Icon-O-Matic-TransformationBoxStates		Skalieren
+Duplicate	Icon-O-Matic-PathsList		Duplizieren
+Save	Icon-O-Matic-Menu-File		Speichern
+Append…	Icon-O-Matic-Menu-File		Anhängen...
+Move Path	Icon-O-Matic-MovePathsCmd		Pfad umsortieren
+Overwrite	Icon-O-Matic-SVGExport		Überschreiben
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Formen einfrieren
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Kontrollpunkt trennen
 Open…	Icon-O-Matic-Menu-File		Öffnen...
 Options	Icon-O-Matic-Menus		Optionen
-Overwrite	Icon-O-Matic-SVGExport		Überschreiben
-PNG Set	Icon-O-Matic-SavePanel		PNG Satz
-Paste	Icon-O-Matic-Properties		Einfügen
-Paste Properties	Icon-O-Matic-Properties		Eigenschaften einfügen
-Path	Icon-O-Matic-Menus		Pfad
-Path	Icon-O-Matic-PropertyNames		Pfad
-Perspective	Icon-O-Matic-TransformersList		Perspektive
-Perspective	Transformation		Perspektive
-Pick a color	Icon-O-Matic-ColorPicker		Farbe aussuchen
-Properties	Icon-O-Matic-Menus		Eigenschaften
-Quit	Icon-O-Matic-Menu-File		Beenden
-Radial	Icon-O-Matic-StyleTypes		Radial
-Redo	Icon-O-Matic-Main		Wiederholen:
-Remove	Icon-O-Matic-PathManipulator		Entfernen
-Remove	Icon-O-Matic-PathsList		Entfernen
-Remove	Icon-O-Matic-ShapesList		Entfernen
-Remove	Icon-O-Matic-StylesList		Entfernen
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Kontrollpunkt entfernen
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Kontrollpunkte entfernen
-Remove Path	Icon-O-Matic-RemovePathsCmd		Pfad entfernen
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Pfade entfernen
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Form entfernen
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Formen entfernen
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Stil entfernen
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stile entfernen
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Transformator entfernen
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Transformer entfernen
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Transformation zurücksetzen
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Transformationen zurücksetzen
-Reset transformation	Icon-O-Matic-ShapesList		Transformation zurücksetzen
-Reset transformation	Icon-O-Matic-StylesList		Transformation zurücksetzen
-Reverse	Icon-O-Matic-PathsList		Umkehren
-Reverse Path	Icon-O-Matic-ReversePathCmd		Pfad umkehren
-Rotate	Icon-O-Matic-TransformationBoxStates		Rotieren
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pfadindizes rotieren
-Rotate indices backwards	Icon-O-Matic-PathsList		Indizes rückwärts rotieren
-Rotate indices forwards	Icon-O-Matic-PathsList		Indizes vorwärts rotieren
-Rotation	Icon-O-Matic-PropertyNames		Rotation
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farbe (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Farbverlauf bearbeiten
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pfad aufräumen
 Rounding	Icon-O-Matic-PropertyNames		Rundung
-Save	Icon-O-Matic-Menu-File		Speichern
-Save	Icon-O-Matic-Menu-Settings		Speichern
-Save Icon	Dialog title		Icon speichern
-Save as…	Icon-O-Matic-Menu-File		Speichern als...
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Änderungen am aktuellen Icon speichern?
-Saving your document failed!	Icon-O-Matic-Exporter		Speichern des Dokuments fehlgeschlagen!
-Scale	Icon-O-Matic-TransformationBoxStates		Skalieren
-Scale X	Icon-O-Matic-PropertyNames		Skalieren in X-Richtung
-Scale Y	Icon-O-Matic-PropertyNames		Skalieren in Y-Richtung
-Select	Icon-O-Matic-Properties		Auswählen
-Select All	Icon-O-Matic-PathManipulator		Alles auswählen
-Set 	Set (property name)		Setzen
-Settings…	Icon-O-Matic-SavePanel		Einstellungen...
-Shape	Icon-O-Matic-Menus		Form
-Shorten	Icon-O-Matic-PropertyNames		Kürzen
-Snap to grid	Icon-O-Matic-Menu-Settings		Am Gitter einrasten
-Split	Icon-O-Matic-PathManipulator		Trennen
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Kontrollpunkt trennen
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Kontrollpunkte trennen
-Stroke	Transformation		Umrandung
-Style	Icon-O-Matic-Menus		Stil
-Style type	Icon-O-Matic-StyleTypes		Stiltyp:
-Swatches	Icon-O-Matic-Menus		Farbfelder
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Der zu importierende Text ist ziemlich lang. Trotzdem importieren?
-Transform	Icon-O-Matic-PathManipulator		Transformieren
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformation
-Transformation	Icon-O-Matic-TransformersList		Transformation
-Transformation	Transformation		Transformation
-Transformer	Icon-O-Matic-Menus		Transformator
-Translation X	Icon-O-Matic-PropertyNames		Verschiebung X
-Translation Y	Icon-O-Matic-PropertyNames		Verschiebung Y
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Pfad lösen
-Undo	Icon-O-Matic-Main		Rückgängig:
-Untitled	Icon-O-Matic-Main		Unbenannt
-Width	Icon-O-Matic-PropertyNames		Strichstärke
-Yes	Icon-O-Matic-StyledTextImport		Ja
-any of the other lists to	Empty property list - 2nd line		einer der anderen Listen, um
-bad news	Icon-O-Matic-Exporter		Schlechte Nachrichten
-bad news	Title of error alert		Schlechte Nachrichten
-edit it's properties here.	Empty property list - 3rd line		Eigenschaften hier zu ändern.
-load error	Icon-O-Matic-SVGImport		Ladefehler
-to attach transformers.	Empty transformers list - 2nd line		um Transformatoren zuzuweisen.
-too big	Icon-O-Matic-StyledTextImport		zu groß
-warning	Icon-O-Matic-SVGExport		Warnung
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Formen entfernen
+Clean up	Icon-O-Matic-PathsList		Aufräumen
+Detect Orient.	Icon-O-Matic-PropertyNames		Ausrichtung erk.

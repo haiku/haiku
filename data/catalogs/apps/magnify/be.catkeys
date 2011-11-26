@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Magnify	2227745383
+1	belarusian	x-vnd.Haiku-Magnify	3515889001
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер пусты\n
 Make square	Magnify-Main		Зрабіць квадратным
 Copy image	Magnify-Main		Капіяваць выяву
@@ -24,4 +24,5 @@ Save image	Magnify-Main		Захаваць выяву
 Increase window size	Magnify-Main		Павялічыць памер вакна
 Decrease window size	Magnify-Main		Паменшыць памер вакна
 Increase pixel size	Magnify-Main		Павялічыць памер пікселяў
+  size must be > 4 and a multiple of 4\n	Console		Памер павiнны быць большым за 4 i кратны 4\n
 Add a crosshair	Magnify-Main		Дадаць перакрыжаванне

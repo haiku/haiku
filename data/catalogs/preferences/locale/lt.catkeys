@@ -1,17 +1,21 @@
-1	lithuanian	x-vnd.Haiku-Locale	2023461026
-12 hour	TimeFormatSettings		12 valandų
-24 hour	TimeFormatSettings		24 valnadų
+1	lithuanian	x-vnd.Haiku-Locale	520134956
 Available languages	Locale Preflet Window		Galimos kalbos
-Currency	TimeFormatSettings		Valiuta
-Date	TimeFormatSettings		Data
-Defaults	Locale Preflet Window		Numatytai
-Language	Locale Preflet Window		Kalba
-Locale	Locale Preflet		Kalba
-Long format:	TimeFormatSettings		Pilnai:
-Numbers	TimeFormatSettings		Skaičiai
-OK	Locale Preflet Window		Gerai
-Preferred languages	Locale Preflet Window		Pageidautinos kalbos
-Revert	Locale Preflet Window		Grįžti
-Short format:	TimeFormatSettings		Trumpai:
-Time	TimeFormatSettings		Laikas
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks šituo pasinaudoti!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Kad šis pakeitimas įsigaliotų, reikia perleisti užduočių juostą ir Pėdsekį. Ar norite juos perleisti dabar?
+Long format:	TimeFormatSettings		Pilnai:
+Currency	TimeFormatSettings		Valiuta
+Locale	System name		Kalba
+Short format:	TimeFormatSettings		Trumpai:
+Language	Locale Preflet Window		Kalba
+Preferred languages	Locale Preflet Window		Pageidautinos kalbos
+Locale	Locale Preflet Window		Kalba
+Numbers	TimeFormatSettings		Skaičiai
+24 hour	TimeFormatSettings		24 valnadų
+OK	Locale Preflet Window		Gerai
+Defaults	Locale Preflet Window		Numatytai
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Užduočių juostoje ir Pėdsekyje rodyti išverstus programų ir aplankų pavadinimus.
+Revert	Locale Preflet Window		Grįžti
+12 hour	TimeFormatSettings		12 valandų
+Time	TimeFormatSettings		Laikas
+Date	TimeFormatSettings		Data
+Locale	Locale Preflet		Kalba

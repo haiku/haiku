@@ -1,0 +1,33 @@
+1	lithuanian	x-vnd.haiku-icon_o_matic	3294644028
+Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
+Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
+Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
+Add	Icon-O-Matic-StylesList		Pridėti
+Move Shape	Icon-O-Matic-MoveShapesCommand		Perkelti figūrą
+Opening the document failed!	Icon-O-Matic-Main		Nepavyko atverti dokumento!
+Move Paths	Icon-O-Matic-MovePathsCmd		Perkelti kontūrus
+None	Icon-O-Matic-Properties		Nieko
+New	Icon-O-Matic-Menu-File		Naujas
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gali būti, jog, atverdama šį SVG failą, programa nesuinterpretavo visų jo duomenų. Jeigu perrašysite failą, jūs prarasite tuos duomenis.
+Paste Properties	Icon-O-Matic-Properties		Įklijuoti savybes
+Stroke	Transformation		Linija
+Save Icon	Dialog title		Įrašyti piktogramą
+Closed	Icon-O-Matic-PropertyNames		Uždaras
+Remove Path	Icon-O-Matic-RemovePathsCmd		Pašalinti kontūrą
+Add shape with path	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kontūru
+Select	Icon-O-Matic-Properties		Pažymėti
+Height	Icon-O-Matic-PropertyNames		Aukštis
+Width	Icon-O-Matic-PropertyNames		Plotis
+Duplicate	Icon-O-Matic-ShapesList		Dubliuoti
+<unkown property>	Icon-O-Matic-PropertyNames		<nežinoma savybė>
+Linear	Icon-O-Matic-StyleTypes		Tiesinis
+Assign Path	Icon-O-Matic-AddPathsCmd		Priskirti kontūrą
+Move	Icon-O-Matic-TransformationBoxStates		Perkelti
+warning	Icon-O-Matic-SVGExport		įspėjimas
+Copy	Icon-O-Matic-Properties		Kopijuoti
+OK	Icon-O-Matic-ColorPicker		Gerai
+Bleep!	Exporter - Continue in error dialog		Po velnių!
+bad news	Title of error alert		prastos naujienos
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Pašalinti kontūrus
+OK	Icon-O-Matic-SVGImport		Gerai
+Clean up	Icon-O-Matic-PathsList		Sutvarkyti

@@ -1,20 +1,20 @@
 1	lithuanian	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		CP dažnio indikatorius
-CPUFrequency	System name		CP dažnis
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CP dažnis\n\tsukurtas  Clemens'o Zeidler'io\n\t© 2009, Haiku, Inc.\n
-Defaults	Pref Window		Numatytai
-Dynamic performance	Status view		Prisitaikantis našumas
-Dynamic stepping	CPU Frequency View		Prisitaikančio našumo derinimas
-High performance	Status view		Didelis našumas
-Install replicant into Deskbar	CPU Frequency View		Įdėti indikatorių į pranešimų sritį
-Integration time [ms]: 	CPU Frequency View		Atsistatymo laikas [ms]:
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nepavyko paleisti CP dažnio nuostatų.\n\nKlaida:
-Low energy	Status view		Energijos taupymas
 Ok	Status view		Gerai
-Open Speedstep preferences…	Status view		CP dažnio nuostatos…
-Quit	Status view		Baigti darbą
-Revert	Pref Window		Grįžti
+CPU frequency status view	CPU Frequency View		CP dažnio indikatorius
 Set state	Status view		Pasirinkti
-Step up by CPU usage	Color Step View		Našumo keitimo žingsnis:
+Defaults	Pref Window		Numatytai
+Install replicant into Deskbar	CPU Frequency View		Įdėti indikatorių į pranešimų sritį
+Quit	Status view		Baigti darbą
+High performance	Status view		Didelis našumas
 Stepping policy	CPU Frequency View		Centrinio procesoriaus veiksena
+Dynamic performance	Status view		Prisitaikantis našumas
+Step up by CPU usage	Color Step View		Našumo keitimo žingsnis:
+Dynamic stepping	CPU Frequency View		Prisitaikančio našumo derinimas
 Stepping policy: 	CPU Frequency View		Centrinio procesoriaus veiksena:
+Integration time [ms]: 	CPU Frequency View		Atsistatymo laikas [ms]:
+Open Speedstep preferences…	Status view		CP dažnio nuostatos…
+Revert	Pref Window		Grįžti
+Low energy	Status view		Energijos taupymas
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nepavyko paleisti CP dažnio nuostatų.\n\nKlaida:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CP dažnis\n\tsukurtas  Clemens'o Zeidler'io\n\t© 2009, Haiku, Inc.\n
+CPUFrequency	System name		CP dažnis

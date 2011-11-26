@@ -1,12 +1,12 @@
 1	lithuanian	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Pastorintas šriftas:
-Defaults	Main window		Numatytai
-Fixed font:	Font view		Lygiaplotis šriftas:
-Fonts	System name		Šriftai
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Šriftai\n\t© 2004-2005, Haiku.\n\n
-Menu font:	Font view		Meniu šriftas:
-OK	main		Gerai
 Plain font:	Font view		Paprastas šriftas:
+Defaults	Main window		Numatytai
+OK	main		Gerai
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Šriftai\n\t© 2004-2005, Haiku.\n\n
 Revert	Main window		Grįžti
 Size:	Font Selection view		Dydis:
+Menu font:	Font view		Meniu šriftas:
+Fixed font:	Font view		Lygiaplotis šriftas:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
+Bold font:	Font view		Pastorintas šriftas:
+Fonts	System name		Šriftai

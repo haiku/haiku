@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	299049300
+1	slovak	x-vnd.Haiku-Notifications	3631903554
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám dochádza miesto na disku.
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
@@ -44,6 +44,7 @@ Can't save preferences, you probably don't have write access to the boot setting
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
 Enable notifications at startup	GeneralView		Zapnúť oznamy pri štarte
+Notifications	PrefletView		Oznámenia
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Server oznámení nemožno nájsť. To znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
 Applications	NotificationView		Aplikácie
 Events are notified	GeneralView		Udalosti sa oznamujú

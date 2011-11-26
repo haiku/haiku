@@ -1,14 +1,14 @@
 1	slovak	x-vnd.Haiku-Media	1473363280
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
-Ready for use…	Media Window		Pripravený na použitie...
+Ready for use…	Media Window		Pripravený na použitie…
 Video input:	Media views		Video vstup:
 Waiting for media_server to quit.	Media Window		Čaká sa na ukončenie media_server.
 Cleaning up.	Media Window		Prebieha upratovanie.
 Defaults	Media views		Predvolené
-Stopping media server…	Media Window		Zastavuje sa multimediálny server
+Stopping media server…	Media Window		Zastavuje sa multimediálny server…
 Quit	Media Window		Ukončiť
 OK	Media Window		OK
-Starting media server…	Media Window		Spúšťa sa multimediálny server...
+Starting media server…	Media Window		Spúšťa sa multimediálny server…
 Done shutting down.	Media Window		Vypínanie dokončené.
 Video settings	Media Window		Video nastavenia
 Video output:	Media views		Video výstup:
@@ -18,12 +18,12 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		Nepodarilo sa odstr
 Media	System name		Multimédiá
 Telling media_addon_server to quit.	Media Window		Poslaná žiadosť o ukončenie media_addon_server.
 Audio mixer	Media Window		Zmiešavač zvuku
-This hardware has no controls.	Media Window		Tento hardvér nemá žiadne ovládacie prvky
+This hardware has no controls.	Media Window		Tento hardvér nemá žiadne ovládacie prvky.
 Audio output:	Media views		Zvukový výstup:
 Restarting media services\nStarting media server…\n	Media Window		Reštartujú sa multimediálne služby\nSpúšťa sa multimediálny server...\n
 Audio settings	Media Window		Nastavenia zvuku
 Start media server	Media Window		Spustiť multimediálny server
-Restarting media services\nShutting down media server\n	Media Window		Reštartujú sa multimediálne služby\nVypína sa multimediálny server...\n
+Restarting media services\nShutting down media server\n	Media Window		Reštartujú sa multimediálne služby\nVypína sa multimediálny server\n
 <none>	Media views		<žiadne>
 Channel:	Media views		Kanál:
 Show volume control on Deskbar	Media views		Zobraziť na Paneli ovládanie hlasitosti

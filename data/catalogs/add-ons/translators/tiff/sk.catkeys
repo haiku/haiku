@@ -1,11 +1,11 @@
 1	slovak	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nepodarilo sa nastaviť adresár\n
-TIFF image	TIFFTranslator		Obrázok TIFF:
+TIFF image	TIFFTranslator		Obrázok TIFF
 TIFF Library:	TIFFView		Knižnica TIFF:
-TIFF Image Translator	TIFFView		Prekladač obrázkov TIFF:
+TIFF Image Translator	TIFFView		Prekladač obrázkov TIFF
 None	TIFFView		Žiadne
-TIFF images	TIFFTranslator		Obrázky TIFF:
+TIFF images	TIFFTranslator		Obrázky TIFF
 TIFFTranslator Settings	TIFFTranslator		Nastavenia TIFFTranslator
 TIFF image translator	TIFFTranslator		Prekladač obrázkov TIFF
 RLE (Packbits)	TIFFView		RLE (Packbits)

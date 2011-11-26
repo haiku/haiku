@@ -1,8 +1,34 @@
-1	lithuanian	system	1448968507
-%.2f TiB	StringForSize		%.2f TiB
+1	lithuanian	x-vnd.Haiku-libbe	180647795
+Close	AboutWindow		Užverti
 %3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Sukūrė:
+About %app%	AboutMenuItem		Apie „%app%“
+Cut	TextView		Iškirpti
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nepavyko sukurti „%description“ replikanto.\n%error
+Copy	TextView		Kopijuoti
 %3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-Blue:	ColorControl		Mėlyna:
+%d bytes	StringForSize		%d B
+About…	AboutWindow		Apie programą…
+Error	PrintJob		Klaida
+No Pages to print!	PrintJob		Nėra spausdintinų puslapių!
+OK	Dragger		Gerai
+OK	PrintJob		Gerai
 Green:	ColorControl		Žalia:
+Remove replicant	Dragger		Pašalinti replikantą
+OK	ZombieReplicantView		Gerai
+Print Server is not responding.	PrintJob		Spausdinimo serveris neatsako.
+Paste	TextView		Įdėti
+Copyright © %years% Haiku, Inc.	AboutWindow		© %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nepavyko rasti replikantą suteikiančios programos. Nepateiktas programos identifikatorius.\n%error
+Redo	TextView		Grąžinti
+<empty>	Menu		<tuščia>
+Select All	TextView		Pažymėti viską
+Warning	Dragger		Įspėjimas
+Undo	TextView		Atšaukti
 Red:	ColorControl		Raudona:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Apie programą „%app“…
+Error	ZombieReplicantView		Klaida
+Blue:	ColorControl		Mėlyna:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Šio replikanto pašalinti iš jo pirminės programos nepavyko. Gyvenimas tęsiasi.

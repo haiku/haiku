@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PoorMan	995747556
+1	belarusian	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Месцазнаходжанне вэб-сайта
 Error Server	PoorMan		Сервер Памылак
 Settings…	PoorMan		Наладкі...
@@ -24,13 +24,17 @@ Advanced	PoorMan		Пашыраныя
 OK	PoorMan		ОК
 Status: Stopped	PoorMan		Стан: Спынены
 Dir Created	PoorMan		Дырэкторыя Створана
+Log to file	PoorMan		Пратакол ў файле
 Quit	PoorMan		Выйсці
 Hits: 0	PoorMan		Пераходы: 0
 Save log console	PoorMan		Захаваць лог кансолі
 Edit	PoorMan		Правіць
+Create Log File	PoorMan		Стварыць файл пратаколу
+Log to console	PoorMan		Пратакол на кансоль
 Directory: (none)	PoorMan		Дырэкторыя: (няма)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Калі ласка, выберыце каталог, які трэба апублікаваць.\n\nPoorMan можа стварыць для вас стандартны каталог \"public_html\" у хатнім каталозе.\nАбо вы можаце самі выбраць пажаданы каталог.
 Log To Console	PoorMan		Лог у Кансоль
+Connections	PoorMan		Далучэньні
 Status: Running	PoorMan		Стан: Працуе
 connections	PoorMan		спалучэнні
 Controls	PoorMan		Элементы кіравання
@@ -38,6 +42,7 @@ Send file listing if there's no start page	PoorMan		Адпраўляць спі�
 Error Dir	PoorMan		Каталог Памылак
 Select all	PoorMan		Выбраць усё
 File	PoorMan		Файл
+File Logging	PoorMan		Пратакол ў файл
 Save console selections as…	PoorMan		Захоўваць выдзяленні кансолі як...
 File logging	PoorMan		Пратакаліраванне файлаў
 Select web folder	PoorMan		Выбраць выб-каталог
@@ -53,6 +58,7 @@ Create log file	PoorMan		Стварыць лог
 Starting up... 	PoorMan		Загрузка...
 Site	PoorMan		Сайт
 Cancel	PoorMan		Адмена
+Console logging	PoorMan		Пратакол на кансоль
 Cannot start the server	PoorMan		Нельга запусціць сервер
 Select	PoorMan		Выбраць
 Save console as…	PoorMan		Захаваць кансоль як...

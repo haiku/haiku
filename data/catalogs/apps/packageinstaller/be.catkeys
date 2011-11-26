@@ -1,10 +1,11 @@
-1	belarusian	x-vnd.Haiku-PackageInstaller	2709408798
+1	belarusian	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Усталяваць у:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Прыняць
 Continue	PackageInstall		Працягваць
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не ўдалося усталяваць абраны пакунак у сістэму. Магчыма праблема з файлам пакунка. Кансультуйцеся, калі ласка, з распрацоўшчыкам пакунка.
 Image not loaded correctly	PackageImageViewer		Вобраз не загружаны
+Install 	PackageView		Усталяваць
 No package selected.	PackageInfo		Няма абраных пакункаў
 Install	PackageView		Усталяваць
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Падобна, што абраны пакунак ужо усталёваны на вашай сістэме. Жадаеце выдаліць існуючую версію і працягнуць усталёўку?

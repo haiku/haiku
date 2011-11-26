@@ -4,15 +4,15 @@ Paste	Menus		Vložiť
 OK	LoadAlert		OK
 File	Menus		Súbor
 ???	LoadAlert		???
-Lines:	Statistics		Riadky:
+Lines:	Statistics		Riadkov:
 Italic	Menus		Kurzíva
 Left	Menus		Vľavo
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Vrátiť späť poslednú verziu „%s“?
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Vrátiť späť poslednú verziu „%s“? 
 Search backwards	FindandReplaceWindow		Hľadať dozadu
 Size	Menus		Veľkosť
 Save	QuitAlert		Uložiť
-Page setup…	Menus		Nastavenie stránky...
-Print…	Menus		Tlačiť...
+Page setup…	Menus		Nastavenie stránky…
+Print…	Menus		Tlačiť…
 Can't undo	Menus		Nie je možné vrátiť späť
 Save	Menus		Uložiť
 Replace with:	FindandReplaceWindow		Nahradiť čím:
@@ -20,7 +20,7 @@ Cancel	SaveAlert		Zrušiť
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
 Case-sensitive	FindandReplaceWindow		Rozlišovať veľkosť písmen
 Green	Menus		Zelená
-Revert to saved…	Menus		Vrátiť späť uložené...
+Revert to saved…	Menus		Vrátiť späť uložené…
 Yellow	Menus		Žltá
 Replace in all windows	FindandReplaceWindow		Nahradiť vo všetkých oknách
 Wrap lines	Menus		Zalamovať riadky
@@ -28,29 +28,29 @@ Quit	Menus		Ukončiť
 Document statistics	Statistics		Štatistika dokumentu
 Cancel	RevertToSavedAlert		Zrušiť
 Document	Menus		Dokument
-Save changes to the document \"%s\"? 	QuitAlert		Uložiť zmeny v dokumente „%s“?
+Save changes to the document \"%s\"? 	QuitAlert		Uložiť zmeny v dokumente „%s“? 
 Edit	Menus		Upraviť
 Font	Menus		Písmo
 Replace all	FindandReplaceWindow		Nahradiť všetky
-Statistics…	Menus		Štatistika...
+Statistics…	Menus		Štatistika…
 Default	Open_and_SaveAsPanel		Predvolené
 Replace next	Menus		Nahradiť ďalší
 Cancel	FindandReplaceWindow		Zrušiť
 Close	Menus		Zatvoriť
 Save	SaveAlert		Uložiť
-Words:	Statistics		Slová:
+Words:	Statistics		Slov:
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Chyba pri načítaní „%s“:\n\tNepodporovaný formát
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Neukladať
 Align	Menus		Zarovnať
 Color	Menus		Farba
 Red	Menus		Červená
-Open…	Menus		Otvoriť...
+Open…	Menus		Otvoriť…
 Center	Menus		Stred
 Blue	Menus		Modrá
-Cyan	Menus		azúrová
+Cyan	Menus		Azúrová
 OK	Statistics		OK
-Magenta	Menus		purpurová
+Magenta	Menus		Purpurová
 New	Menus		Nový
 Wrap-around search	FindandReplaceWindow		Pokračovať v hľadaní od začiatku
 Bold	Menus		Hrubé
@@ -62,19 +62,19 @@ Cut	Menus		Vystrihnúť
 Replace	FindandReplaceWindow		Nahradiť
 Find again	Menus		Nájsť znova
 Cancel	QuitAlert		Zrušiť
-Find…	Menus		Nájsť...
+Find…	Menus		Nájsť…
 Select all	Menus		Vyrať všetky
 Don't save	SaveAlert		Neukladať
 Error loading \"%s\":\n\t%s	LoadAlert		Chyba pri načítaní „%s“:\n\t%s
 Undo typing	QuitAlert		Vrátiť späť písanie
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tetnto súbor je označený ako len na čítanie. Uložiť zmeny do dokumentu „%s“?
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tetnto súbor je označený ako len na čítanie. Uložiť zmeny do dokumentu „%s“? 
 Black	Menus		Čierna
-Untitled 	StyledEditWindow		Bez názvu
+Untitled 	StyledEditWindow		Bez názvu 
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Nájsť
 Encoding	Open_and_SaveAsPanel		Kódovanie
 Characters:	Statistics		Znakov:
-Save as…	Menus		Uložiť ako...
+Save as…	Menus		Uložiť ako…
 Redo typing	QuitAlert		Opakovať písanie
-Replace…	Menus		Nahradiť...
+Replace…	Menus		Nahradiť…
 Right	Menus		Vpravo

@@ -32,7 +32,7 @@ Audio/Video	DeviceClass		Zvuk/video
 Glasses	DeviceClass		Okuliare
 Keyboard	DeviceClass		Klávesnica
 Camera	DeviceClass		Fotoaparát
-Major class: 	DeviceClass		Hlavná trieda:
+Major class: 	DeviceClass		Hlavná trieda: 
 50-67% utilized	DeviceClass		50-67% využitých
 Card reader	DeviceClass		Čítačka kariet
 Set-top box	DeviceClass		Set-top box
@@ -43,7 +43,7 @@ SIM card reader	DeviceClass		Čítačka SIM kariet
 Headphones	DeviceClass		Slúchadlá
 Information	DeviceClass		Informácie
 Remote control	DeviceClass		Diaľkové ovládanie
-Service classes: 	DeviceClass		Triedy služieb:
+Service classes: 	DeviceClass		Triedy služieb: 
 Pager	DeviceClass	A small radio device to receive short text messages	Pager
 Object transfer	DeviceClass		Prenos objektov
 Gaming/Toy	DeviceClass		Hra/hračka
@@ -55,7 +55,7 @@ Loudspeaker	DeviceClass		Reproduktor
 Joystick	DeviceClass		Joystick
 LAN access	DeviceClass		Prístup k sieti LAN
 Wrist watch	DeviceClass		Náramkové hodinky
-Minor class: 	DeviceClass		Vedľajšia trieda:
+Minor class: 	DeviceClass		Vedľajšia trieda: 
 Networking	DeviceClass		Sieťové zariadenie
 Portable audio	DeviceClass		Prenosné zvukové zariadenie
 Device conforms to the headset profile	DeviceClass		Zariadenie zodpovedá headset profilu

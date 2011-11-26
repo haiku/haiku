@@ -1,48 +1,48 @@
 1	german	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nvon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin\n
-About Pulse…	CPUButton		Über CPU-Anzeige...
-About Pulse…	PulseView		Über CPU-Anzeige...
-Active color	ConfigView		Aktive Farbe
-Bar colors	ConfigView		Balkenfarbe
-CPU progress bar	NormalPulseView		CPU-Auslastungsbalken
-Defaults	PrefsWindow		Standardwerte
-Deskbar	CPUButton		Deskbar
-Deskbar menu	CPUButton		Deskbar-Menü
-Deskbar mode	MiniPulseView		Deskbar-Modus
-Deskbar mode	NormalPulseView		Deskbar-Modus
-Deskbar mode	PrefsWindow		Deskbar-Modus
-Error	PulseApp		Fehler
-Fade colors	ConfigView		Verblassende Balken
-Frame color	ConfigView		Rahmenfarbe
-Idle color	ConfigView		Leerlauffarbe
-Info	CPUButton		Info
-Info	DeskbarPulseView		Info
-Info	PulseApp		Info
-Info	PulseView		Info
-Installing in Deskbar failed\n%s	PulseApp		Installation in Deskbar fehlgeschlagen.\n%s
-Mini mode	DeskbarPulseView		Mini-Modus
-Mini mode	NormalPulseView		Mini-Modus
-Mini mode	PrefsWindow		Mini-Modus
-Normal mode	DeskbarPulseView		Normal-Modus
-Normal mode	MiniPulseView		Normal-Modus
-Normal mode	PrefsWindow		Normal-Modus
-OK	CPUButton		OK
-OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
-OK	PulseApp		OK
-OK	PulseView		OK
-Pulse	NormalPulseView		CPU-Anzeige
-Pulse	PulseApp		CPU-Anzeige
-Pulse	System name		CPU-Anzeige
-Pulse settings	PulseWindow		CPU-Anzeige Einstellungen
 Quit	DeskbarPulseView		Beenden
-Quit	MiniPulseView		Beenden
+Mini mode	DeskbarPulseView		Mini-Modus
 Remove replicant	CPUButton		Replikant entfernen
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Entfernen aus Deskbar fehlgeschlagen.\n%s
-Settings…	PulseView		Einstellungen...
+Active color	ConfigView		Aktive Farbe
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Gebrauch: Pulse [--mini] [-w Breite] [--width=Breite]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Verblassende Balken
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nvon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin\n
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Deskbar-Modus
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Normal-Modus
+Defaults	PrefsWindow		Standardwerte
+Normal mode	MiniPulseView		Normal-Modus
+Error	PulseApp		Fehler
+Info	PulseView		Info
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Rahmenfarbe
+Mini mode	PrefsWindow		Mini-Modus
+OK	PulseApp		OK
+Bar colors	ConfigView		Balkenfarbe
+Settings…	PulseView		Einstellungen...
+You can't disable the last active CPU.	PulseView		Die letzte aktive CPU kann nicht ausgeschaltet werden.
+Info	PulseApp		Info
+Info	CPUButton		Info
+OK	PulseView		OK
+Deskbar menu	CPUButton		Deskbar-Menü
+About Pulse…	PulseView		Über CPU-Anzeige...
+Deskbar mode	MiniPulseView		Deskbar-Modus
+Quit	MiniPulseView		Beenden
+Pulse	System name		CPU-Anzeige
+Pulse	NormalPulseView		CPU-Anzeige
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Deskbar-Modus
+Pulse	PulseApp		CPU-Anzeige
 Width of icon:	ConfigView		Balkenbreite:
 You can't disable the last active CPU.	CPUButton		Die letzte aktive CPU kann nicht ausgeschaltet werden.
-You can't disable the last active CPU.	PulseView		Die letzte aktive CPU kann nicht ausgeschaltet werden.
+Normal mode	DeskbarPulseView		Normal-Modus
+OK	CPUButton		OK
+About Pulse…	CPUButton		Über CPU-Anzeige...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Entfernen aus Deskbar fehlgeschlagen.\n%s
+Mini mode	NormalPulseView		Mini-Modus
+Info	DeskbarPulseView		Info
+Pulse settings	PulseWindow		CPU-Anzeige Einstellungen
+Idle color	ConfigView		Leerlauffarbe
+Installing in Deskbar failed\n%s	PulseApp		Installation in Deskbar fehlgeschlagen.\n%s
+CPU progress bar	NormalPulseView		CPU-Auslastungsbalken

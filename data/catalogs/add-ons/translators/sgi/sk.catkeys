@@ -5,7 +5,7 @@ SGITranslator Settings	SGITranslator		Nastavenia Prekladača SGI
 None	SGIView		Žiadne
 SGI images	SGITranslator		Obrázky SGI
 SGI image translator	SGITranslator		Prekladač obrázkov SGI
-SGI image	SGITranslator		obrázok SGI
+SGI image	SGITranslator		Obrázok SGI
 RLE	SGIView		RLE
 SGI Settings	SGIMain		Nastavenia SGI
 \n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nzaložené na zásuvnom module SGI v1.5 pre GIMP:\n

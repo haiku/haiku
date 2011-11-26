@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DataTranslations	3820343452
+1	slovak	x-vnd.Haiku-DataTranslations	458105477
 DataTranslations	System name		Preklad dát
 Cancel	DataTranslations		Zrušiť
 Name:	DataTranslations		Názov:
@@ -14,5 +14,6 @@ Info	DataTranslations		Info
 Path:	DataTranslations		Cesta:
 The new translator has been installed successfully.	DataTranslations		Nový prekladač bol úspešne nainštalovaný.
 DataTranslations - Error	DataTranslations		Preklad dát - chyba
+Ok	DataTranslations		OK
 OK	DataTranslations		OK
 Version:	DataTranslations		Verzia:

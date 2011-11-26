@@ -1,29 +1,29 @@
-1	german	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixel/Pixel
-Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen
+1	german	x-vnd.Haiku-Magnify	283320408
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
+Make square	Magnify-Main		Quadratisches Fenster
 Copy image	Magnify-Main		Bild kopieren
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Bild kopieren/speichern:\nKopieren - kopiert das aktuelle Bild in die Zwischenablage\nSpeichern - speichert das Bild als Bits, die in Header-Dateien\nbei der Programmierung genutzt werden können.\n
-Decrease pixel size	Magnify-Main		Pixel verkleinern
-Decrease window size	Magnify-Main		Fenster verkleinern
-Freeze/Unfreeze image	Magnify-Main		Bild einfrieren/freigeben
+Magnify help	Magnify-Help		Magnify-Hilfe
+usage: magnify [size] (magnify size * size pixels)\n	Console		Gebrauch: Magnify [Größe] (Fenstergröße * Pixelgröße)\n
+Stick coordinates	Magnify-Main		Koordinaten einfrieren
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\nInfos aus-/einblenden - blendet Informationen zu Fenster- und Pixelgröße ein/aus.\nDas kleine rote Quadrat markiert den Pixel, dessen Farbe als RGB-Wert angezeigt wird.\nFadenkreuz hinzufügen/entfernen - bis zu zwei Fadenkreuze, dargestellt durch blaue\n Quadrate und Linien, helfen beim Ausrichten von Objekten.\nGitter aus-/einblenden - steuert ein Gitter, das sich über die Pixel legt.\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		Bild einfrieren/freigeben - friert die momentane Darstellung ein \noder gibt sie wieder frei.\n
+Hide/Show grid	Magnify-Main		Gitter aus-/einblenden
+magnify: size must be a multiple of 4\n	Console		magnify: Größe muss ein Vielfaches von 4 sein\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Allgemein:\n32 x 32 - die linken oberen Zahlen sind die Anzahl der sichtbaren\n Pixel (Breite x Höhe)\n8 Pixel/Pixel - steht für die Anzahl der Pixel, mit\nder ein Pixel vergrößert wird.\nR:152 G:52 B:10 - die RGB Werte des Pixels unter\ndem roten Quadrat.\n
 Help	Magnify-Main		Hilfe
-Hide/Show grid	Magnify-Main		Gitter aus-/einblenden
-Hide/Show info	Magnify-Main		Infos aus-/einblenden
-Increase pixel size	Magnify-Main		Pixel vergrößern
-Increase window size	Magnify-Main		Fenster vergrößern
-Info	Magnify-Main		Info
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\nInfos aus-/einblenden - blendet Informationen zu Fenster- und Pixelgröße ein/aus.\nDas kleine rote Quadrat markiert den Pixel, dessen Farbe als RGB-Wert angezeigt wird.\nFadenkreuz hinzufügen/entfernen - bis zu zwei Fadenkreuze, dargestellt durch blaue\n Quadrate und Linien, helfen beim Ausrichten von Objekten.\nGitter aus-/einblenden - steuert ein Gitter, das sich über die Pixel legt.\n
-Magnify	System name		Lupe
-Magnify help	Magnify-Help		Magnify-Hilfe
-Make square	Magnify-Main		Quadratisches Fenster
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigation:\nPfeiltasten - die aktuelle Auswahl bewegen (RGB-Anzeiger oder Fadenkreuz)\nDie aktuelle Auswahl hat ein 'x' im Quadrat.\nOPT+Pfeiltaste - bewegt den Mauszeiger.\n
-Remove a crosshair	Magnify-Main		Fadenkreuz entfernen
-Save image	Magnify-Main		Bild speichern
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Größe ändern:\nQuadratisches Fenster - setzt die Breite und Höhe zur größeren \nder beiden, um ein quadratisches Bild zu bekommen.\nFenster vergrößern/verkleinern - lässt die Fenstergröße\num 4 Pixel wachsen oder schrumpfen.\nPixel vergrößern/verkleinern - erhöht oder senkt die Anzahl\n an Pixeln die benutzt werden, um einen 'echten' Pixel\nzu vergrößern. Der Bereich geht von 1 bis 16.\n
-Stick coordinates	Magnify-Main		Koordinaten einfrieren
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		Bild einfrieren/freigeben - friert die momentane Darstellung ein \noder gibt sie wieder frei.\n
-magnify: size must be a multiple of 4\n	Console		magnify: Größe muss ein Vielfaches von 4 sein\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
-size must be > 4 and a multiple of 4\n	Console		Größe muss > 4 und ein Vielfaches von 4 sein\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		Gebrauch: Magnify [Größe] (Fenstergröße * Pixelgröße)\n
+Decrease pixel size	Magnify-Main		Pixel verkleinern
+Magnify	System name		Lupe
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixel/Pixel
+Info	Magnify-Main		Info
+Remove a crosshair	Magnify-Main		Fadenkreuz entfernen
+Freeze/Unfreeze image	Magnify-Main		Bild einfrieren/freigeben
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Bild kopieren/speichern:\nKopieren - kopiert das aktuelle Bild in die Zwischenablage\nSpeichern - speichert das Bild als Bits, die in Header-Dateien\nbei der Programmierung genutzt werden können.\n
+Hide/Show info	Magnify-Main		Infos aus-/einblenden
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigation:\nPfeiltasten - die aktuelle Auswahl bewegen (RGB-Anzeiger oder Fadenkreuz)\nDie aktuelle Auswahl hat ein 'x' im Quadrat.\nOPT+Pfeiltaste - bewegt den Mauszeiger.\n
+Save image	Magnify-Main		Bild speichern
+Increase window size	Magnify-Main		Fenster vergrößern
+Decrease window size	Magnify-Main		Fenster verkleinern
+Increase pixel size	Magnify-Main		Pixel vergrößern
+  size must be > 4 and a multiple of 4\n	Console		Größe muss > 4 und ein Vielfaches von 4 sein\n
+Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen

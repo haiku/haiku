@@ -1,0 +1,10 @@
+1	lithuanian	x-vnd.Haiku-libmail	161731481
+Partially download messages larger than	ProtocolConfigView		Dalinai parsiųsti laiškus didesnius nei
+Password:	ProtocolConfigView		Slaptažodis:
+Remove mail from server when deleted	ProtocolConfigView		Pašalintus laiškus šalinti ir iš serverio
+Mail server:	ProtocolConfigView		Pašto serveris:
+Select…	MailKit		Rinktis…
+Connection type:	ProtocolConfigView		Ryšio sauga:
+Leave mail on server	ProtocolConfigView		Palikti laiškus serveryje
+Username:	ProtocolConfigView		Naudotojo vardas:
+Login type:	ProtocolConfigView		Tapatumo nustatymas:

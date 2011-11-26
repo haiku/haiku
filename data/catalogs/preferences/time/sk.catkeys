@@ -1,28 +1,39 @@
-1	slovak	x-vnd.Haiku-Time	2926970495
+1	slovak	x-vnd.Haiku-Time	3493650184
+GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
 OK	Time		OK
-\nNow: 	Time		\nTeraz:
+Asia	Time		Ázia
+\nNow: 	Time		\nTeraz: 
+Africa	Time		Afrika
 Stop	Time		Zastaviť
 Could not contact server	Time		Nepodarilo sa kontaktovať server
+Australia	Time		Austrália
 Preview time:	Time		Náhľad času:
 Synchronize	Time		Synchronizovať
 Revert	Time		Vrátiť
+Pacific	Time		Pacifik
 Add	Time		Pridať
 Date and time	Time		Dátum a čas
 about	Time		O aplikácii
+Local time (Windows compatible)	Time		Miestny čas (kompatibilné s Windows)
 Message receiving failed	Time		Prijatie správy zlyhalo
 Set time zone	Time		Nastaviť časové pásmo
 Waiting for answer failed	Time		Čakanie na odpoveď zlyhalo
 Hardware clock set to:	Time		Hardvérové hodiny nastavené na:
 The following error occured while synchronizing:r\n%s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s
+Europe	Time		Európa
 Remove	Time		Odstrániť
 Time	Time		Čas
+Indian	Time		Indický
 Sending request failed	Time		Odoslanie požiadavky zlyhalo
+Arctic	Time		Arktída
 Time	System name		Čas
+America	Time		Amerika
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Dátum a čas, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Obnoviť
 Synchronize at boot	Time		Synchronizovať pri štarte
 Received invalid time	Time		Prijatý neplatný čas
-The following error occured while synchronizing:r\n%s: %s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s
+Antarctica	Time		Antarktída
+The following error occured while synchronizing:r\n%s: %s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s: %s
 <Other>	Time		<Iné>
 Current time:	Time		Aktuálny čas:
 Try all servers	Time		Skúsiť všetky servery
@@ -30,3 +41,4 @@ Time zone	Time		Časové pásmo
 Could not create socket	Time		Nepodarilo sa vytvoriť socket
 Synchronize again	Time		Synchronizovať znova
 Network time	Time		Čas v sieti
+Atlantic	Time		Atlantik

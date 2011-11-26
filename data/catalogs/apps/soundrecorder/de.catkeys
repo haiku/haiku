@@ -1,38 +1,45 @@
-1	german	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		Es konnte keine Verbindung zum Mediaserver aufgebaut werden.
-Cannot connect to the selected sound input	RecorderWindow		Es kann keine Verbindung zur ausgewählten Klangquelle hergestellt werden.
-Cannot find an unused name to use for the new recording	RecorderWindow		Für die neue Aufnahme konnte kein noch nicht verwendeter Name gefunden werden.
+1	german	x-vnd.Haiku-SoundRecorder	2149017672
+Loop	RecorderWindow		Schleife
 Cannot find default audio hardware	RecorderWindow		Standard-Audiohardware wurde nicht gefunden.
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Die temporäre Datei, in der die neue Aufnahme gespeichert wurde, kann nicht gefunden werden.
-Cannot get the file to play	RecorderWindow		Die Datei lässt sich nicht abspielen.
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Die temporäre Datei, in der die neue Aufnahme gespeichert wurde, kann nicht geöffnet werden.
-Cannot recognize this file as a media file	RecorderWindow		Diese Datei wird nicht als Mediadatei erkannt.
-Cannot record a sound that long	RecorderWindow		Die Aufnahme wäre zu lang.
-Channels: 	RecorderWindow		Kanäle:
-Compression:	RecorderWindow		Komprimierung:
-Drop files here	SoundListView		Dateien hier fallen lassen
-Duration:	RecorderWindow		Dauer:
-File info	RecorderWindow		Datei Info
-File name:	RecorderWindow		Dateiname:
-Format: 	RecorderWindow		Format:
-Forward	RecorderWindow		Vorwärts
-Input	RecorderWindow		Eingang
-Input:	RecorderWindow		Eingang:
-Invalid audio files	RecorderWindow		Ungültige Audiodateien
-Loop	RecorderWindow		Schleife
-None	RecorderWindow		Keine
-None of the files appear to be audio files	RecorderWindow		Keine der Dateien scheinen Audiodateien zu sein.
+Sample size:	RecorderWindow		Samplegröße:
 Nothing to play	RecorderWindow		Nichts abzuspielen
-OK	RecorderWindow		OK
-Play	RecorderWindow		Wiedergabe
-Record	RecorderWindow		Aufnahme
-Rewind	RecorderWindow		Zurückspulen
-Sample rate: 	RecorderWindow		Samplerate:
-Sample size: 	RecorderWindow		Samplegröße:
-Save	RecorderWindow		Speichern
+Duration: 	RecorderWindow		Dauer:
 Some of the files don't appear to be audio files	RecorderWindow		Einige der Dateien scheinen keine Audiodateien zu sein.
-Sound List	RecorderWindow		Dateiliste
-SoundRecorder	System name		Audiorekorder
+File info	RecorderWindow		Datei Info
+Drop files here	SoundListView		Dateien hier fallen lassen
+Input	RecorderWindow		Eingang
 Stop	RecorderWindow		Stopp
-bits	RecorderWindow		Bits
-seconds	RecorderWindow		Sekunden
+Format:	RecorderWindow		Format:
+Sound List	RecorderWindow		Dateiliste
+Compression: 	RecorderWindow		Komprimierung:
+Rewind	RecorderWindow		Zurückspulen
+Sample rate:	RecorderWindow		Samplerate:
+Invalid audio files	RecorderWindow		Ungültige Audiodateien
+ seconds	RecorderWindow		Sekunden
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Die temporäre Datei, in der die neue Aufnahme gespeichert wurde, kann nicht geöffnet werden.
+None of the files appear to be audio files	RecorderWindow		Keine der Dateien scheinen Audiodateien zu sein.
+Input:	RecorderWindow		Eingang:
+Forward	RecorderWindow		Vorwärts
+Play	RecorderWindow		Wiedergabe
+SoundRecorder	System name		Audiorekorder
+Channels:	RecorderWindow		Kanäle:
+ bits	RecorderWindow		Bits
+None	RecorderWindow		Keine
+Record	RecorderWindow		Aufnahme
+Sample size: 	RecorderWindow		Samplegröße:
+Cannot recognize this file as a media file	RecorderWindow		Diese Datei wird nicht als Mediadatei erkannt.
+Format: 	RecorderWindow		Format:
+File name: 	RecorderWindow		Dateiname:
+Cannot connect to the selected sound input	RecorderWindow		Es kann keine Verbindung zur ausgewählten Klangquelle hergestellt werden.
+Cannot get the file to play	RecorderWindow		Die Datei lässt sich nicht abspielen.
+Cannot record a sound that long	RecorderWindow		Die Aufnahme wäre zu lang.
+Duration:	RecorderWindow		Dauer:
+Compression:	RecorderWindow		Komprimierung:
+Cannot find an unused name to use for the new recording	RecorderWindow		Für die neue Aufnahme konnte kein noch nicht verwendeter Name gefunden werden.
+Channels: 	RecorderWindow		Kanäle:
+Save	RecorderWindow		Speichern
+Sample rate: 	RecorderWindow		Samplerate:
+Cannot connect to media server	RecorderWindow		Es konnte keine Verbindung zum Mediaserver aufgebaut werden.
+File name:	RecorderWindow		Dateiname:

@@ -40,14 +40,14 @@ Remove Paths	Icon-O-Matic-RemovePathsCmd		Odstrániť cesty
 Scale Y	Icon-O-Matic-PropertyNames		Mierka Y
 Add Control Point	Icon-O-Matic-AddPointCmd		Pridať riadiaci bod
 Untitled	Icon-O-Matic-Main		Bez názvu
-Multi Set 	Multi Set (property name)		Multi množina
+Multi Set 	Multi Set (property name)		Multi množina 
 any of the other lists to	Empty property list - 2nd line		ľubovoľný z ostatných zoznamov na
-Save as…	Icon-O-Matic-Menu-File		Uložiť ako...
+Save as…	Icon-O-Matic-Menu-File		Uložiť ako…
 Change Color	Icon-O-Matic-SetColorCmd		Zmeniť farbu
 Style	Icon-O-Matic-Menus		Štýl
 <modify path>	Icon-O-Matic-PathCmd		<zmeniť cestu>
 Opening the icon failed!	Icon-O-Matic-Main		Otvorenie ikony zlyhalo!
-Error: 	Icon-O-Matic-Main		Chyba:
+Error: 	Icon-O-Matic-Main		Chyba: 
 Rotate indices backwards	Icon-O-Matic-PathsList		Otočiť indexy opačne
 Name	Icon-O-Matic-PropertyNames		Názov
 bad news	Icon-O-Matic-Exporter		zlé správy
@@ -58,7 +58,7 @@ PNG Set	Icon-O-Matic-SavePanel		Množina PNG
 Joins	Icon-O-Matic-PropertyNames		Spoje
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Odstrániť štýl
 Scale X	Icon-O-Matic-PropertyNames		Mierka X
-Set 	Set (property name)		Nastaviť
+Set 	Set (property name)		Nastaviť 
 Cancel	Icon-O-Matic-SVGExport		Zrušiť
 Add shape with style	Icon-O-Matic-Menu-Shape		Pridať tvar so štýlom
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Odstrániť tvar
@@ -108,7 +108,7 @@ The text you are trying to import is quite long,are you sure?	Icon-O-Matic-Style
 Add	Icon-O-Matic-TransformersList		Pridať
 Export Icon	Dialog title		Exportovať ikonu
 Color	Icon-O-Matic-StyleTypes		Farba
-Settings…	Icon-O-Matic-SavePanel		Nastavenia...
+Settings…	Icon-O-Matic-SavePanel		Nastavenia…
 Remove	Icon-O-Matic-PathManipulator		Odstrániť
 Radial	Icon-O-Matic-StyleTypes		Radiálny
 Perspective	Icon-O-Matic-TransformersList		Perspektíva
@@ -117,7 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Farebný prechod
 Min LOD	Icon-O-Matic-PropertyNames		Min. detail
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribút BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Invertovať výber
-Export as…	Icon-O-Matic-Menu-File		Exportovať ako...
+Export as…	Icon-O-Matic-Menu-File		Exportovať ako…
 Transformation	Transformation		Transformácia
 Click on an object in	Empty property list - 1st line		Kliknite na objekt v
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Presunúť transformátory
@@ -140,7 +140,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Presunúť pivot
 Path	Icon-O-Matic-Menus		Cesta
 Freeze transformation	Icon-O-Matic-ShapesList		Zmraziť transformáciu
 File	Icon-O-Matic-Menus		Súbor
-Error: 	Icon-O-Matic-Exporter		Chyba:
+Error: 	Icon-O-Matic-Exporter		Chyba: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Pridať transformátory
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Cesta
@@ -161,7 +161,7 @@ Transformation	Icon-O-Matic-TransformersList		Transformácia
 Add Styles	Icon-O-Matic-AddStylesCmd		Pridať štýly
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Odstrániť riadiace body
 Format	Icon-O-Matic-SavePanel		Formát
-Add rect	Icon-O-Matic-PathsList		Pridať pravouh.
+Add rect	Icon-O-Matic-PathsList		Pridať obdĺžnik
 Edit	Icon-O-Matic-Menus		Upraviť
 Duplicate	Icon-O-Matic-StylesList		Duplikovať
 Caps	Icon-O-Matic-PropertyNames		Zakončenia
@@ -184,12 +184,12 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Obrátiť cestu
 Scale	Icon-O-Matic-TransformationBoxStates		Mierka
 Duplicate	Icon-O-Matic-PathsList		Duplikovať
 Save	Icon-O-Matic-Menu-File		Uložiť
-Append…	Icon-O-Matic-Menu-File		Pripojiť...
+Append…	Icon-O-Matic-Menu-File		Pripojiť…
 Move Path	Icon-O-Matic-MovePathsCmd		Presunúť cestu
 Overwrite	Icon-O-Matic-SVGExport		Prepísať
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zmraziť tvary
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Rozdeliť riadiaci bod
-Open…	Icon-O-Matic-Menu-File		Otvoriť...
+Open…	Icon-O-Matic-Menu-File		Otvoriť…
 Options	Icon-O-Matic-Menus		Možnosti
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farba (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Upraviť farebný prechod

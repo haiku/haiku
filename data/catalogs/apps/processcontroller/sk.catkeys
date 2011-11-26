@@ -5,11 +5,11 @@ Idle priority	ProcessController		Priorita nečinný
 Restart Deskbar	ProcessController		Reštartovať Panel
 Custom priority	ProcessController		Vlastná priorita
 Debug thread	ProcessController		Ladiť vlákno
-This team is already gone…	ProcessController		Táto skupina už je preč...
+This team is already gone…	ProcessController		Táto skupina už je preč…
 Error saving file	ProcessController		Chyba pri ukladaní súboru
 Real-time priority	ProcessController		Priorita v reálnom čase
 Your setting file could not be saved!\n(%s)	ProcessController		Váš súbor s nastavením nebolo možné uložiť!\n(%s)
-This thread is already gone…	ProcessController		Toto vlákno už je preč...
+This thread is already gone…	ProcessController		Toto vlákno už je preč…
 Cancel	ProcessController		Zrušiť
 Display priority	ProcessController		Priorita zobrazenie
 Run in window	ProcessController		Spustiť v okne
@@ -21,7 +21,7 @@ Info	ProcessController		Info
 Quit application	ProcessController		Ukončiť aplikáciu
 Low priority	ProcessController		Nízka priorita
 What do you want to do with the thread \"%s\"?	ProcessController		Čo chcete robiť s vláknom „%s“?
-Gone teams…	ProcessController		Ukončené skupiny...
+Gone teams…	ProcessController		Ukončené skupiny…
 Lowest active priority	ProcessController		Najnižšia aktívna priorita
 Restart Tracker	ProcessController		Reštartovať Tracker
 Live in the Deskbar	ProcessController		Zobrazovať v Paneli
@@ -30,7 +30,7 @@ Debug this thread!	ProcessController		Ladiť toto vlákno!
 Normal priority	ProcessController		Normálna priorita
 New Terminal	ProcessController		Nový terminál
 Urgent priority	ProcessController		Naliehavá priorita
-About ProcessController…	ProcessController		O Správcovi procesov
+About ProcessController…	ProcessController		O Správcovi procesov…
 Ok!	ProcessController		OK
 Quit an application	ProcessController		Ukončiť aplikáciu
 Install in Deskbar	ProcessController		Nainštalovať do Panelu
@@ -43,6 +43,6 @@ ProcessController	System name		Správca procesov
 Real-time display priority	ProcessController		Priorita zobrazenie v reálnom čase
 Please confirm	ProcessController		Prosím, potvrďte
 Yes, kill this team!	ProcessController		Áno, ukončiť túto skupinu!
-System resources & caches…	ProcessController		Zdroje a vyrovnávacia pamäť systému...
+System resources & caches…	ProcessController		Zdroje a vyrovnávacia pamäť systému…
 That's no Fun!	ProcessController		To nie je sranda!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Správcu procesov môžete spúšťať v okne alebo ho nainštalovať do Panelu.

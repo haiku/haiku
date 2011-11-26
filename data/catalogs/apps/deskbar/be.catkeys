@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-TSKB	3755209104
+1	belarusian	x-vnd.Be-TSKB	1669813373
 Edit menu…	PreferencesWindow		Змяніць меню...
 Applications	PreferencesWindow		Праграмы
 About this system	BeMenu		Пра гэтую Сістэму
@@ -42,5 +42,6 @@ Recent documents	BeMenu		Нядаўнія дакументы
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Праграмкі Дэсктопу
 Hide all	WindowMenu		Схаваць усё
 Shutdown…	BeMenu		Выключыць...
+Suspend	BeMenu		Прыпыніць
 Quit application	WindowMenu		Выйсці з праграмы
 Show replicants	BeMenu		Паказаць рэпліканты

@@ -26,6 +26,6 @@ RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bitov big-endian
 Input Color Space	PPMTranslator		Vstupný farebný priestor
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bitov
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Vzorový kód Copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		Nastavenia PPMTranslator 
+PPMTranslator Settings	PPMTranslator		Nastavenia PPMTranslator
 Something is wrong with the PPMTranslator!	PPMMain		Niečo v PPMTranslator sa pokazilo!
 System palette 8 bits	PPMTranslator		Systémová paleta 8 bitov

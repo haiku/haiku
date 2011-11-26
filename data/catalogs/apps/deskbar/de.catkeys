@@ -1,47 +1,47 @@
 1	german	x-vnd.Be-TSKB	1669813373
-<Be folder is empty>	BeMenu		<Be-Ordner ist leer>
-About Haiku	BeMenu		Über Haiku
-About this system	BeMenu		Über dieses System
-Always on top	PreferencesWindow		Immer im Vordergrund
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
-Applications	PreferencesWindow		Anwendungen
-Auto-hide	PreferencesWindow		Automatisch ausblenden
-Auto-raise	PreferencesWindow		Automatisch nach vorn holen
-Change time…	TimeView		Uhrzeit ändern…
-Clock	PreferencesWindow		Uhr
-Close all	WindowMenu		Alle schließen
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
-Deskbar	System name		Deskbar
-Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
-Deskbar preferences…	BeMenu		Deskbar-Einstellungen…
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
 Edit menu…	PreferencesWindow		Menü bearbeiten…
-Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
-Find…	BeMenu		Suchen…
-Hide all	WindowMenu		Alle ausblenden
-Hide time	TimeView		Uhrzeit ausblenden
-Menu	PreferencesWindow		Menü
-Mount	BeMenu		Einhängen
-No windows	WindowMenu		Keine Fenster
-Power off	BeMenu		Ausschalten
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Einstellungen
-Quit application	WindowMenu		Anwendung beenden
-Recent applications	BeMenu		Letzte Anwendungen
-Recent applications:	PreferencesWindow		Letzte Anwendungen:
-Recent documents	BeMenu		Letzte Dokumente
+Applications	PreferencesWindow		Anwendungen
+About this system	BeMenu		Über dieses System
 Recent documents:	PreferencesWindow		Letzte Dokumente:
 Recent folders	BeMenu		Letzte Ordner
-Recent folders:	PreferencesWindow		Letzte Ordner:
-Restart Tracker	BeMenu		Tracker neu starten
-Restart system	BeMenu		Neustarten
-Show Time	Tray		Uhrzeit einblenden
-Show all	WindowMenu		Alle einblenden
-Show application expander	PreferencesWindow		Expander anzeigen
-Show calendar…	TimeView		Kalender anzeigen…
-Show replicants	BeMenu		Replikanten einblenden
-Show seconds	PreferencesWindow		Sekunden anzeigen
-Shutdown…	BeMenu		Herunterfahren...
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren
-Suspend	BeMenu		Ruhezustand
-Tracker always first	PreferencesWindow		Tracker immer zuerst
+Recent applications	BeMenu		Letzte Anwendungen
+Change time…	TimeView		Uhrzeit ändern…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
+<Be folder is empty>	BeMenu		<Be-Ordner ist leer>
 Window	PreferencesWindow		Fenster
+Menu	PreferencesWindow		Menü
+Show seconds	PreferencesWindow		Sekunden anzeigen
+Auto-hide	PreferencesWindow		Automatisch ausblenden
+Always on top	PreferencesWindow		Immer im Vordergrund
+Show all	WindowMenu		Alle einblenden
+No windows	WindowMenu		Keine Fenster
+Deskbar	System name		Deskbar
+Power off	BeMenu		Ausschalten
+Auto-raise	PreferencesWindow		Automatisch nach vorn holen
+Hide time	TimeView		Uhrzeit ausblenden
+Recent folders:	PreferencesWindow		Letzte Ordner:
+Deskbar preferences…	BeMenu		Deskbar-Einstellungen…
+Show application expander	PreferencesWindow		Expander anzeigen
+Close all	WindowMenu		Alle schließen
+Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
+Mount	BeMenu		Einhängen
+Recent applications:	PreferencesWindow		Letzte Anwendungen:
+Tracker always first	PreferencesWindow		Tracker immer zuerst
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Einstellungen
+About Haiku	BeMenu		Über Haiku
+Show calendar…	TimeView		Kalender anzeigen…
+Restart system	BeMenu		Neustarten
+Find…	BeMenu		Suchen…
+Restart Tracker	BeMenu		Tracker neu starten
+Show Time	Tray		Uhrzeit einblenden
+Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
+Clock	PreferencesWindow		Uhr
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
+Recent documents	BeMenu		Letzte Dokumente
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
+Hide all	WindowMenu		Alle ausblenden
+Shutdown…	BeMenu		Herunterfahren...
+Suspend	BeMenu		Ruhezustand
+Quit application	WindowMenu		Anwendung beenden
+Show replicants	BeMenu		Replikanten einblenden

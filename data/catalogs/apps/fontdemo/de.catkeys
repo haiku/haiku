@@ -1,22 +1,22 @@
 1	german	x-vnd.Haiku-FontDemo	1769653414
-Antialiased text	ControlView		Text-Antialiasing
-Bounding boxes	ControlView		Rahmen
-Controls	FontDemo		Bedienelemente
+Outline:	ControlView		Kontur:
+Size: 50	ControlView		Größe: 50
+Stop cycling	ControlView		Schriftwechsel anhalten
+Shear: 90	ControlView		Neigung: 90
+Spacing: 0	ControlView		Abstand: 0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Drehung: %d
+Shear: %d	ControlView		Neigung: %d
+Spacing: %d	ControlView		Abstand: %d
 Cycle fonts	ControlView		Schriften wechseln
-Drawing mode:	ControlView		Zeichenmodus:
 Font:	ControlView		Schrift:
+Rotation: 0	ControlView		Drehung: 0
+Drawing mode:	ControlView		Zeichenmodus:
 FontDemo	FontDemo		Schrift-Demo
 Haiku, Inc.	ControlView		Haiku, Inc.
-Haiku, Inc.	FontDemoView		Haiku, Inc.
-Outline:	ControlView		Kontur:
+Controls	FontDemo		Bedienelemente
 Outline: %d	ControlView		Kontur: %d
-Rotation: %d	ControlView		Drehung: %d
-Rotation: 0	ControlView		Drehung: 0
-Shear: %d	ControlView		Neigung: %d
-Shear: 90	ControlView		Neigung: 90
-Size: %d	ControlView		Größe: %d
-Size: 50	ControlView		Größe: 50
-Spacing: %d	ControlView		Abstand: %d
-Spacing: 0	ControlView		Abstand: 0
-Stop cycling	ControlView		Schriftwechsel anhalten
 Text:	ControlView		Text:
+Antialiased text	ControlView		Text-Antialiasing
+Bounding boxes	ControlView		Rahmen
+Size: %d	ControlView		Größe: %d

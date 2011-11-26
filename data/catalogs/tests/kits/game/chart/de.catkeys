@@ -1,42 +1,42 @@
-1	german	x-vnd.Be.ChartDemo	819116577
-(high) 100% 	ChartWindow		(hoch) 100%
-0.6 f/s  (logarythmic scale)	ChartWindow		0,6 Bilder/s (logarithmische Anzeige)
-2 threads	ChartWindow		2 Threads
-5% (low)	ChartWindow		5% (niedrig)
-600.0 f/s	ChartWindow		600,0 Bilder/s
-Amas	ChartWindow		Amas
-Animation:	ChartWindow		Animation:
-Auto demo	ChartWindow		Auto-Demo
-Battle	ChartWindow		Kampf
-Blue	ChartWindow		Blau
-CPU load	ChartWindow		CPU-Last
-Chaos	ChartWindow		Chaos
-Chart	System name		Sternenhimmel
-Colors	ChartWindow		Farben
+1	german	x-vnd.Be.ChartDemo	986636897
+Slow rotation	ChartWindow		Langsame Drehung
+Pink	ChartWindow		Pink
 Comet	ChartWindow		Kometen
 DirectWindow	ChartWindow		DirectWindow
-Display:	ChartWindow		Anzeige:
-DrawBitmap	ChartWindow		DrawBitmap
-Fast motion	ChartWindow		Schnelle Bewegung
-Frames/s	ChartWindow		Bilder/s
-Free motion	ChartWindow		Freie Bewegung
-Full screen	ChartWindow		Vollbild
-Green	ChartWindow		Grün
-LineArray	ChartWindow		LineArray
-None	ChartWindow		Nichts
-Novas	ChartWindow		Novae
-Off	ChartWindow		Aus
 Orange	ChartWindow		Orange
-Pink	ChartWindow		Pink
-Red	ChartWindow		Rot
 Refresh rate	ChartWindow		Bildwiederholrate
-Slow motion	ChartWindow		Langsame Bewegung
-Slow rotation	ChartWindow		Langsame Drehung
-Space color	ChartWindow		Hintergrundfarbe
-Space:	ChartWindow		Weltraum:
-Special	ChartWindow		Spezial
-Spiral	ChartWindow		Spiralen
-Star density	ChartWindow		Sternendichte
-Status	ChartWindow		Status
-White	ChartWindow		Weiß
+Blue	ChartWindow		Blau
+Colors	ChartWindow		Farben
+Novas	ChartWindow		Novae
+LineArray	ChartWindow		LineArray
+ 0.6 f/s  (logarythmic scale)	ChartWindow		 0,6 Bilder/s  (logarithmische Anzeige)
+Free motion	ChartWindow		Freie Bewegung
+(high) 100% 	ChartWindow		(hoch) 100%
+Green	ChartWindow		Grün
+Amas	ChartWindow		Amas
+2 threads	ChartWindow		2 Threads
 Yellow	ChartWindow		Gelb
+Off	ChartWindow		Aus
+Chaos	ChartWindow		Chaos
+Full screen	ChartWindow		Vollbild
+Spiral	ChartWindow		Spiralen
+Slow motion	ChartWindow		Langsame Bewegung
+ 5% (low)	ChartWindow		 5% (niedrig)
+Fast motion	ChartWindow		Schnelle Bewegung
+Special	ChartWindow		Spezial
+Status	ChartWindow		Status
+Star density	ChartWindow		Sternendichte
+600.0 f/s	ChartWindow		600,0 Bilder/s
+Display:	ChartWindow		Anzeige:
+Space color	ChartWindow		Hintergrundfarbe
+White	ChartWindow		Weiß
+Chart	System name		Sternenhimmel
+Animation:	ChartWindow		Animation:
+Frames/s	ChartWindow		Bilder/s
+Auto demo	ChartWindow		Auto-Demo
+CPU load	ChartWindow		CPU-Last
+DrawBitmap	ChartWindow		DrawBitmap
+Red	ChartWindow		Rot
+None	ChartWindow		Nichts
+Battle	ChartWindow		Kampf
+Space:	ChartWindow		Weltraum:

@@ -1,47 +1,47 @@
 1	lithuanian	x-vnd.Be-TSKB	1669813373
-<Be folder is empty>	BeMenu		<Meniu aplankas tuščias>
-About Haiku	BeMenu		Apie „Haiku“
-About this system	BeMenu		Apie šią sistemą
-Always on top	PreferencesWindow		Visuomet viršuje
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
-Applications	PreferencesWindow		Programos
-Auto-hide	PreferencesWindow		Automatiškai slėpti
-Auto-raise	PreferencesWindow		Automatiškai iškilti
-Change time…	TimeView		Keisti laiką…
-Clock	PreferencesWindow		Laikrodis
-Close all	WindowMenu		Užverti visus
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Pavyzdžiai
-Deskbar	System name		Užduočių juosta
-Deskbar preferences	PreferencesWindow		Užduočių juostos parinktys
-Deskbar preferences…	BeMenu		Užduočių juostos parinktys…
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Pagalbinės programėlės
 Edit menu…	PreferencesWindow		Taisyti meniu…
-Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
-Find…	BeMenu		Ieškoti…
-Hide all	WindowMenu		Slėpti visus
-Hide time	TimeView		Nerodyti laikrodžio
-Menu	PreferencesWindow		Meniu
-Mount	BeMenu		Prijungti diską
-No windows	WindowMenu		Langų nėra
-Power off	BeMenu		Išjungti
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nuostatos
-Quit application	WindowMenu		Užbaigti programos darbą
-Recent applications	BeMenu		Paskiausiai leistos programos
-Recent applications:	PreferencesWindow		Paskiausios programos:
-Recent documents	BeMenu		Paskiausiai atverti dokumentai
+Applications	PreferencesWindow		Programos
+About this system	BeMenu		Apie šią sistemą
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
 Recent folders	BeMenu		Paskiausiai lankyti aplankai
-Recent folders:	PreferencesWindow		Paskiausi aplankai:
-Restart Tracker	BeMenu		Perleisti „Tracker“
-Restart system	BeMenu		Perleisti
-Show Time	Tray		Rodyti laikrodį
-Show all	WindowMenu		Rodyti visus
-Show application expander	PreferencesWindow		Rodyti programų skleistuką
-Show calendar…	TimeView		Rodyti kalendorių…
-Show replicants	BeMenu		Rodyti integravimo rankenėles
-Show seconds	PreferencesWindow		Rodyti sekundes
-Shutdown…	BeMenu		Kompiuterio išjungimas…
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
-Suspend	BeMenu		Pristabdyti
-Tracker always first	PreferencesWindow		„Tracker“ rikiuoti pradžioje
+Recent applications	BeMenu		Paskiausiai leistos programos
+Change time…	TimeView		Keisti laiką…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
+<Be folder is empty>	BeMenu		<Meniu aplankas tuščias>
 Window	PreferencesWindow		Langas
+Menu	PreferencesWindow		Meniu
+Show seconds	PreferencesWindow		Rodyti sekundes
+Auto-hide	PreferencesWindow		Automatiškai slėpti
+Always on top	PreferencesWindow		Visuomet viršuje
+Show all	WindowMenu		Rodyti visus
+No windows	WindowMenu		Langų nėra
+Deskbar	System name		Užduočių juosta
+Power off	BeMenu		Išjungti
+Auto-raise	PreferencesWindow		Automatiškai iškilti
+Hide time	TimeView		Nerodyti laikrodžio
+Recent folders:	PreferencesWindow		Paskiausi aplankai:
+Deskbar preferences…	BeMenu		Užduočių juostos nuostatos…
+Show application expander	PreferencesWindow		Rodyti programų skleistuką
+Close all	WindowMenu		Užverti visus
+Deskbar preferences	PreferencesWindow		Užduočių juostos nuostatos
+Mount	BeMenu		Prijungti diską
+Recent applications:	PreferencesWindow		Paskiausios programos:
+Tracker always first	PreferencesWindow		Pėdsekį rikiuoti pradžioje
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nuostatos
+About Haiku	BeMenu		Apie „Haiku“
+Show calendar…	TimeView		Rodyti kalendorių…
+Restart system	BeMenu		Paleisti iš naujo
+Find…	BeMenu		Ieškoti…
+Restart Tracker	BeMenu		Perleisti Pėdsekį
+Show Time	Tray		Rodyti laikrodį
+Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
+Clock	PreferencesWindow		Laikrodis
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Pavyzdžiai
+Recent documents	BeMenu		Paskiausiai atverti dokumentai
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Pagalbinės programėlės
+Hide all	WindowMenu		Slėpti visus
+Shutdown…	BeMenu		Kompiuterio išjungimas…
+Suspend	BeMenu		Pristabdyti
+Quit application	WindowMenu		Užbaigti programos darbą
+Show replicants	BeMenu		Rodyti replikavimo rankenėles

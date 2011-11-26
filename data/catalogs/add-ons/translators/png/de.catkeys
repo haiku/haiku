@@ -1,11 +1,11 @@
 1	german	x-vnd.Haiku-PNGTranslator	2504765797
-Interlace Option	PNGTranslator		Interlace-Option
-Interlacing type:	PNGTranslator		Interlacing-Art:
-None	PNGTranslator		Kein
-PNG Interlace Menu	PNGTranslator		PNG-Interlace-Menü
-PNG Settings	PNGTranslator		PNG-Einstellungen
-PNG image	PNGTranslator		PNG-Bild
-PNG image translator	PNGTranslator		PNG-Bild-Translator
-PNG images	PNGTranslator		PNG-Bild
-PNGTranslator Settings	PNGTranslator		PNG-Translator-Einstellungen
 Version %d.%d.%d, %s	PNGTranslator		Version %d.%d.%d, %s
+Interlace Option	PNGTranslator		Interlace-Option
+PNG Interlace Menu	PNGTranslator		PNG-Interlace-Menü
+PNG image	PNGTranslator		PNG-Bild
+PNG Settings	PNGTranslator		PNG-Einstellungen
+PNG image translator	PNGTranslator		PNG-Bild-Translator
+None	PNGTranslator		Kein
+PNG images	PNGTranslator		PNG-Bild
+Interlacing type:	PNGTranslator		Interlacing-Art:
+PNGTranslator Settings	PNGTranslator		PNG-Translator-Einstellungen

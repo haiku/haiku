@@ -1,8 +1,8 @@
 1	german	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Installierte Pakete
 No package selected.	UninstallView		Es wurde kein Paket ausgewählt.
-OK	UninstallView		OK
-Package description	UninstallView		Paketbeschreibung
 Remove	UninstallView		Entfernen
+Package description	UninstallView		Paketbeschreibung
+InstalledPackages	System name		Installierte Pakete
 The package you selected has been successfully removed from your system.	UninstallView		Das ausgewählte Paket wurde erfolgreich aus dem System entfernt.
+OK	UninstallView		OK
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Das ausgewählte Paket konnte nicht aus dem System entfernt werden. Die angegebene Installationsdaten-Datei ist möglicherweise beschädigt.

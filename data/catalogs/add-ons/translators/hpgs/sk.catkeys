@@ -3,7 +3,7 @@ Based on HPGS (http://hpgs.berlios.de)	ConfigView		Založené na HPGS (http://hp
 Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		Chyba: Nemožno spracovať dáta výkresu %s\n
 HPGS image	HPGSTranslator		Obrázok HPGS
-HPGSTranslator Settings	ConfigView		Nastavenia HPGSTranslator 
+HPGSTranslator Settings	ConfigView		Nastavenia HPGSTranslator
 Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Chyba: Nemožno vložiť vykresľovacie zariadenie do čítača: %s\n
 HPGS images	ConfigView		Obrázky HPGS
 HPGS images	HPGSTranslator		Obrázky HPGS

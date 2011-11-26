@@ -1,20 +1,20 @@
 1	german	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		Änderungen werden erst nach einem Neustart aktiv!
-Current swap file size: 	SettingsWindow		Aktuelle Größe der Auslagerungsdatei: 
-Defaults	SettingsWindow		Standardwerte
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wird der virtuelle Speicher ausgeschaltet, kann es zu unerwünschten Effekten und Einschränkungen der Systemstabilität kommen, sobald der physische Speicher nahezu aufgebraucht ist.\nVirtueller Speicher hat keine Auswirkungen auf die Systemleistung, bis dieser Punkt erreicht ist.\n\nSoll er trotzdem ausgeschaltet werden?
-Enable virtual memory	SettingsWindow		Virtuellen Speicher aktivieren
-GB	SettingsWindow		GiB
-Insufficient space for a swap file.	SettingsWindow		Nicht genügend freier Speicher für die Auslagerungsdatei.
-KB	SettingsWindow		KiB
-Keep enabled	SettingsWindow		Aktiviert lassen
-MB	SettingsWindow		MiB
-OK	VirtualMemoryApp		OK
-Physical memory: 	SettingsWindow		Physischer Speicher: 
-Requested swap file size:	SettingsWindow		Gewünschte Größe:
-Revert	SettingsWindow		Anfangswerte
 Turn off	SettingsWindow		Ausschalten
+GB	SettingsWindow		GiB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wird der virtuelle Speicher ausgeschaltet, kann es zu unerwünschten Effekten und Einschränkungen der Systemstabilität kommen, sobald der physische Speicher nahezu aufgebraucht ist.\nVirtueller Speicher hat keine Auswirkungen auf die Systemleistung, bis dieser Punkt erreicht ist.\n\nSoll er trotzdem ausgeschaltet werden?
+Requested swap file size:	SettingsWindow		Gewünschte Größe:
+Physical memory: 	SettingsWindow		Physischer Speicher: 
+Changes will take effect on restart!	SettingsWindow		Änderungen werden erst nach einem Neustart aktiv!
+Defaults	SettingsWindow		Standardwerte
+KB	SettingsWindow		KiB
 Use volume:	SettingsWindow		Auf Laufwerk:
+Insufficient space for a swap file.	SettingsWindow		Nicht genügend freier Speicher für die Auslagerungsdatei.
+Keep enabled	SettingsWindow		Aktiviert lassen
+Revert	SettingsWindow		Anfangswerte
 VirtualMemory	System name		Virtueller Speicher
+Current swap file size: 	SettingsWindow		Aktuelle Größe der Auslagerungsdatei: 
+OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtueller Speicher\n\tvon Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Virtuellen Speicher aktivieren
+MB	SettingsWindow		MiB
+%Ld B	SettingsWindow		%Ld B

@@ -1,7 +1,7 @@
 1	slovak	x-vnd.Be-PSRV	1761631281
 Undefined	ConfigWindow		Nedefinované
-Return the number of available transports	PrintServerApp Scripting		Vrátiť počet dostupných transportov:
-Return the number of available printers	PrintServerApp Scripting		Vrátiť počet dostupných tlačiarní:
+Return the number of available transports	PrintServerApp Scripting		Vrátiť počet dostupných transportov
+Return the number of available printers	PrintServerApp Scripting		Vrátiť počet dostupných tlačiarní
 Get currently available ports/devices	Transport Scripting		Zistiť práve dostupné porty/zariadenia
 Retrieve or select the active printer	PrintServerApp Scripting		Zistiť alebo vybrať aktívnu tlačiareň
 Cancel	PrintServerApp		Zrušiť

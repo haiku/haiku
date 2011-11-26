@@ -1,0 +1,8 @@
+1	dutch; flemish	x-vnd.Haiku-PCXTranslator	1002061545
+PCX Settings	main		PCX Instellingen
+PCX translator	PCXTranslator		PCX vertaler
+Version %d.%d.%d, %s	ConfigView		Versie  %d.%d.%d, %s
+PCXTranslator Settings	ConfigView		PCXTranslator Instellingen
+PCX %lu bit image	PCXTranslator		PCX %lu bit afbeelding
+PCX images	ConfigView		PCX afbeeldingen
+PCX images	PCXTranslator		PCX afbeeldingen

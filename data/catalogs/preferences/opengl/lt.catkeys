@@ -1,26 +1,26 @@
 1	lithuanian	x-vnd.Haiku-OpenGL	2272708382
-Attributes stack size:	Capabilities		Požymių dėklo dydis:
-Auxiliary buffer(s):	Capabilities		Pagalbinis buferis (-iai):
-Available	Extensions		Galimi
-Capabilities	Capabilities		Galimybės
-Extensions	Extensions		Plėtiniai
-GLU version:	InfoView		GLU versija:
-GLUT API version:	InfoView		GLUT API sąsajos versija:
-Information	InfoView		Aprašymas
 List stack size:	Capabilities		Sąrašo dėklo dydis:
-Max. 2D texture size:	Capabilities		Didžiausias 2D tekstūros dydis:
-Max. 3D texture size:	Capabilities		Didžiausias 3D tekstūros dydis:
-Max. convolution:	Capabilities		Didž. susukimas:
-Max. evaluators equation order:	Capabilities		Didž. lygčių skaičiuoklio eilė:
-Max. lights:	Capabilities		Daugiausia šviesos šaltinių:
-Max. recommended index elements:	Capabilities		Daugiausia siūlomų sąvado dėmenų:
-Max. recommended vertex elements:	Capabilities		Daugiausia siūlomų viršūnių dėmenų:
+Information	InfoView		Aprašymas
 Max. texture units:	Capabilities		Daugiausia tekstūrinių vienetų:
-Model stack size:	Capabilities		Modelių dėklo dydis:
+Renderer name:	InfoView		Atvaizdavimas:
+Vendor name:	InfoView		Gamintojas:
+Attributes stack size:	Capabilities		Požymių dėklo dydis:
+OpenGL version:	InfoView		OpenGL versija:
 Name stack size:	Capabilities		Vardų dėklo dydis:
 OpenGL	System name		OpenGL
-OpenGL version:	InfoView		OpenGL versija:
+Auxiliary buffer(s):	Capabilities		Pagalbinis buferis (-iai):
+Max. recommended vertex elements:	Capabilities		Daugiausia siūlomų viršūnių dėmenų:
+GLU version:	InfoView		GLU versija:
+Model stack size:	Capabilities		Modelių dėklo dydis:
 Projection stack size:	Capabilities		Projekcijų dėklo dydis:
-Renderer name:	InfoView		Atvaizdavimas:
+Max. lights:	Capabilities		Daugiausia šviesos šaltinių:
+Max. 2D texture size:	Capabilities		Didžiausias 2D tekstūros dydis:
+Max. convolution:	Capabilities		Didž. susukimas:
+GLUT API version:	InfoView		GLUT API sąsajos versija:
 Texture stack size:	Capabilities		Tekstūrų dėklo dydis:
-Vendor name:	InfoView		Gamintojas:
+Max. evaluators equation order:	Capabilities		Didž. lygčių skaičiuoklio eilė:
+Max. 3D texture size:	Capabilities		Didžiausias 3D tekstūros dydis:
+Capabilities	Capabilities		Galimybės
+Max. recommended index elements:	Capabilities		Daugiausia siūlomų sąvado dėmenų:
+Available	Extensions		Galimi
+Extensions	Extensions		Plėtiniai

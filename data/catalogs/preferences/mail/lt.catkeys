@@ -1,18 +1,17 @@
-1	lithuanian	x-vnd.Haiku-Mail	2349748505
-Select account type	Config Views		Rinktis paskyros tipą
+1	lithuanian	x-vnd.Haiku-Mail	573736577
 Mail checking	Config Window		Tikrinamas paštas
 Settings	Config Window		Nustatymai
 Only when dial-up is connected	Config Window		Tik kai veikia tinklas
 While sending and receiving	Config Window		Siunčiant ir gaunant
 days	Config Window		d.
+OK	Config Window		Gerai
 Start mail services on startup	Config Window		Start mail services on startup
-Receive mail only	Config Views		Gauti tik laišką
+Account name:	E-Mail		Paskyros pavadinimas:
 Account name:	Config Views		Paskyros pavadinimas:
 OK	Config Views		Gerai
 The filter could not be moved. Deleting filter.	Config Views		Filtras nėra perkeliamas. Šalinamas filtras.
 Revert	Config Window		Grįžti
 Accounts	Config Window		Paskyros
-Account type:	Config Views		Paskyros tipas:
 Remove	Config Window		Pašalinti
 Miscellaneous	Config Window		Kita
 Show connection status window:	Config Window		Rodyti prisijungimo būsenos langą:
@@ -20,26 +19,23 @@ While sending	Config Window		Siunčiant
 Schedule outgoing mail when dial-up is disconnected	Config Window		Įtraukti darbų tvarkaraštin išsiunčiamą paštą, kai tinklas yra atjungtas
 hours	Config Window		val.
 Add	Config Window		Pridėti
-Send mail only	Config Views		Siųsti tik laišką
-E-mail	Account		El. paštas
-Unnamed	Account		Neįvardinta
+Account settings	AutoConfigWindow		Paskyros nustatymai
+E-mail	System name		El. paštas
+never	Config Window	mail checking frequency	Niekada
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nPagrindiniai nustatymiai yra negrįžtami.\n\nKlaida išgaunant pagrindinius nustatymus:\n%s\n
-Send and receive mail	Config Views		Išsiųsti ir gauti paštą
 Real name:	Config Views		Tikrasis vardas:
 Return address:	Config Views		Atgalinis adresas:
 Edit mailbox menu…	Config Window		Taisyti pašto dėžutės meniu…
 Remove	Config Views		Pašalinti
-Could not create inbound chain.	Account		Nesukuriama gavimo grandinė.
 Check every	Config Window		Tikrinti visada
-never	Config Window		Niekada
 Incoming mail filters	Config Views		Įeinančiųjų laiškų filtrai
 Account settings	Config Views		Paskyros nustatymai
 minutes	Config Window		min.
 Error retrieving general settings: %s\n	Config Window		Klaida išgaunant pagrindinius nustatymus: %s\n
-OK	Account		Gerai
+Real name:	E-Mail		Tikrasis vardas:
 Apply	Config Window		Taikyti
-Could not create outbound chain.	Account		Nesukuriama išsiuntimo grandinė.
 Always	Config Window		Visada
+OK	AutoConfigWindow		Gerai
 Add filter	Config Views		Pridėti filtrą
 Outgoing mail filters	Config Views		Išsiunčiamųjų laiškų filtrai
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNauja paskyra kuriama „Pridėti“ mygtuku.\n\nPašalinama paskyra pasirinkus atitinkamą įrašą ir paspaudus „Pašalinti“ mygtuką.\n\nNustatymų keitimui pasirenkamas atitinkamas dėmuo iš sąrašo.

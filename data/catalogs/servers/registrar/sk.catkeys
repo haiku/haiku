@@ -10,7 +10,7 @@ Asking other processes to quit.	ShutdownProcess		Žiadame ostatné procesy o uko
 Asking \"%appName%\" to quit.	ShutdownProcess		Žiadame „%appName%“ o ukončenie.
 %action%?	ShutdownProcess		%action%?
 Shutdown aborted	ShutdownProcess		Vypínanie zrušené
-Restarting…	ShutdownProcess		Prebieha reštart...
+Restarting…	ShutdownProcess		Prebieha reštart…
 Asking background applications to quit.	ShutdownProcess		Žiadame aplikácie na pozadí o ukončenie.
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikácia „%appName%“ zrušila vypínanie.
 Tidying things up a bit.	ShutdownProcess		Trochu upratujeme.
@@ -20,4 +20,4 @@ Cancel shutdown	ShutdownProcess		Zrušiť vypínanie
 Kill application	ShutdownProcess		Zabiť aplikáciu
 Shut down	ShutdownProcess		Vypnúť
 Restart	ShutdownProcess		Reštartovať
-Shutting down…	ShutdownProcess		Prebieha vypínanie...
+Shutting down…	ShutdownProcess		Prebieha vypínanie…

@@ -1,14 +1,14 @@
 1	german	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Audio-CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		Es befindet sich keine CD im Laufwerk.
 CDPlayer	System name		CD-Player
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		CD: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		CD: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		CD: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Anscheinend sind keine CD-Laufwerke vorhanden oder es ist keine Software dafür installiert.
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Track %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Audio-CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Anscheinend sind keine CD-Laufwerke vorhanden oder es ist keine Software dafür installiert.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Track: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Track: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Track: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Track: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		CD: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		CD: --:-- / --:--
+CD drive is empty	CDPlayer		Es befindet sich keine CD im Laufwerk.

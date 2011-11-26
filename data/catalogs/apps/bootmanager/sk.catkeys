@@ -7,7 +7,7 @@ The old Master Boot Record could not be saved to %s	BootManagerController		Star�
 Restore MBR	BootManagerController	Button	Obnoviť MBR
 Hard Drive	DrivesPage	Default disk name	Pevný disk
 USB Drive	DrivesPage	Default disk name	Disk USB
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR zavádzacieho zariadenia:\n\t%s\nsa teraz uloží na disk. Prosím, zvoľte súbor, kam sa uloží MBR.\n\nAk sa niečo v inštalácii pokazí alebo jednoducho nekôr budetechcieť odstrániť menu zavádzača, jednoducho spustite program Správca zavádzania a zvoľte možnosť „Odinštalovať“.
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR zavádzacieho zariadenia:\n\t %s\nsa teraz uloží na disk. Prosím, zvoľte súbor, kam sa uloží MBR.\n\nAk sa niečo v inštalácii pokazí alebo jednoducho neskôr budete chcieť odstrániť menu zavádzača, jednoducho spustite program Správca zavádzania a zvoľte možnosť „Odinštalovať“.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Chystáte sa obnoviť MBR disku %disk zo súboru %file. Chcete pokračovať?
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Vyskytla sa chyba počas zapisovania menu zavádzača. MBR môže byť zničený. Mali by ste ihneď obnoviť MBR!
 Partitions	PartitionsPage	Title	Oblasti
@@ -35,7 +35,7 @@ After five seconds	DefaultPartitionPage		Po piatich sekundách
 Back	BootManagerController	Button	Späť
 Installation of boot menu completed	BootManagerController	Title	Inštalácia menu zavádzača dokončená
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nepomenovaný %d
-File:	FileSelectionPage	Text control label	Súbor
+File:	FileSelectionPage	Text control label	Súbor:
 Previous	WizardView	Button	Späť
 Install	DrivesPage	Button	Nainštalovať
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Chystá sa zápis nasledovného menu zavádzača na zavádzací disk (%s). Prosím, overte nasledovné informácie predtým, než budete pokračovať.
@@ -55,7 +55,7 @@ Backup Master Boot Record	BootManagerController	Title	Zálohovať MBR
 Quit	DrivesPage	Button	Ukončiť
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Chystá sa zápis menu zavádzača na disk. Ste si istý, že chcete pokračovať?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Starý MBR bol úspešne uložený do %s.
-Default Partition:	DefaultPartitionPage	Menu field label	Predvolená oblasť
+Default Partition:	DefaultPartitionPage	Menu field label	Predvolená oblasť:
 Partitions	DefaultPartitionPage	Pop up menu title	Oblasti
 BootManager	System name		Správca zavádzania
 Summary	BootManagerController	Title	Zhrnutie

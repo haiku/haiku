@@ -1,12 +1,12 @@
-1	slovak	x-vnd.Haiku-ShowImage	2479358163
-Use as background…	Menus		Použiť ako pozadie...
+1	slovak	x-vnd.Haiku-ShowImage	886873119
+Use as background…	Menus		Použiť ako pozadie…
 File	Menus		Súbor
 Slide delay	Menus		Oneskorenie snímku
 Selection mode	Menus		Režim výberu
 Zoom in	Menus		Priblížiť
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ bol zmenený. Chcete dokument zatvoriť?
-Page setup…	Menus		Nastavenie stránky...
-Print…	Menus		Tlačiť...
+Page setup…	Menus		Nastavenie stránky…
+Print…	Menus		Tlačiť…
 OK	SaveToFile		OK
 Previous page	Menus		Predošlá stránka
 View	Menus		Zobraziť
@@ -19,6 +19,7 @@ High-quality zooming	Menus		Priblíženie vo vysokej kvalite
 Browse	Menus		Prechádzať
 Edit	Menus		Upraviť
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepodarilo sa načítať obrázok! Buď súbor alebo prekladač preň neexistuje.
+First page	Menus		Prvá strana
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekúnd
 Leave full screen	Menus		Opustiť celoobrazovkový režim
@@ -30,11 +31,11 @@ Rating	Menus		Hodnotenie
 Flip left to right	Menus		Obrátiť zľava doprava
 Show caption in full screen mode	Menus		Zobraziť nadpis v celoobrazovkovom režime
 DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Otvoriť...
+Open…	Menus		Otvoriť…
 Next file	Menus		Ďalší súbor
 Clear selection	Menus		Vyčistiť výber
 Close document	ClosePrompt		Zatvoriť dokument
-Height: 	PrintOptionsWindow		Výška:
+Height: 	PrintOptionsWindow		Výška: 
 The file '%s' could not be written.	SaveToFile		Súbor „%s“ nebolo možné zapísať.
 Cancel	ClosePrompt		Zrušiť
 Show tool bar	Menus		Zobraziť panel nástrojov
@@ -58,4 +59,4 @@ Rotate clockwise	Menus		Otočiť v smere hodinových ručičiek
 Job setup	PrintOptionsWindow		Nastavenie úlohy
 Original size	Menus		Pôvodná veľkosť
 Next page	Menus		Ďalšia stránka
-Save as…	Menus		Uložiť ako...
+Save as…	Menus		Uložiť ako…

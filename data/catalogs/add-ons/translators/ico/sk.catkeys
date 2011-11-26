@@ -10,5 +10,5 @@ Windows icon translator	ICOTranslator		Prekladač ikon Windows
 pixels in either direction.	ConfigView		pixle v oboch smeroch.
 Write 32 bit images on true color input	ConfigView		Zapisovať 32-btové obrázky na vstup true color
 Icon	ICOTranslator		Ikona
-ICOTranslator Settings	ConfigView		Nastavenia ICOTranslator 
+ICOTranslator Settings	ConfigView		Nastavenia ICOTranslator
 Windows icon images	ICOTranslator		Obrázky ikon Windows

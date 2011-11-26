@@ -1,10 +1,11 @@
-1	slovak	x-vnd.Haiku-PackageInstaller	2709408798
+1	slovak	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Inštalovať do:
 OK	PackageView		OK
 Accept	PackageTextViewer		Prijať
 Continue	PackageInstall		Pokračovať
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Požadovaný balík sa nepodarilo nainštalovať na váš systém. Môže to znamenať problém s cieľovým súborom balíka. Prosím, poraďte sa o probléme s distribútorom balíka.
 Image not loaded correctly	PackageImageViewer		Obraz nebol správne načítaný
+Install 	PackageView		Nainštalovať 
 No package selected.	PackageInfo		Nebol vybraný žiadny balík.
 Install	PackageView		Nainštalovať
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Zdá sa, že uvedený balík je už v systéme nainštalovaný. Chcete existujúci balík odinštalovať a pokračovať v inštalácii?
@@ -20,7 +21,7 @@ Preparing package	PackageInstall		Pripravuje sa balík
 No package available.	PackageInfo		Žiaden balík nie je dostupný.
 none	PackageView		žiadny
 Stop	PackageStatus		Zastaviť
-Other…	PackageView		Iné...
+Other…	PackageView		Iné…
 No installation type selected	PackageView		Nebol vybraný typ inštalácie
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolický odkaz s názvom „%s“ už v danej ceste existuje.\nNahradiť odkaz odkazom z tohto balíka alebo ho preskočiť?
 Installing files and folders	PackageInstall		Inštalujú sa súbory a priečinky

@@ -1,27 +1,27 @@
 1	german	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Immer im Vordergrund
+TV	MainWin		TV
 Channel	MainWin		Kanal
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-Debug	MainWin		Debug
-Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
-Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
-Full screen	MainWin		Vollbild
+Settings…	MainWin		Einstellungen...
 Interface	MainWin		Hardware
 Keep aspect ratio	MainWin		Festes Seitenverhältnis
-Next channel	MainWin		Nächster Kanal
-No border	MainWin		Kein Fensterrahmen
-No menu	MainWin		Kein Menü
-None	MainWin		Kein
-OK	MainWin		OK
 Previous channel	MainWin		Vorheriger Kanal
-Quit	MainWin		Beenden
-Scale to native size	MainWin		Originalgröße
 Settings	MainWin		Einstellungen
-Settings…	MainWin		Einstellungen...
-TV	MainWin		TV
 TV	System name		TV
-force 544 x 576, display aspect 4:3	MainWin		Erzwinge 544 x 576, Seitenverhältnis 4:3
-force 704 x 576, display aspect 4:3	MainWin		Erzwinge 704 x 576, Seitenverhältnis 4:3
-force 720 x 576, display aspect 4:3	MainWin		Erzwinge 720 x 576, Seitenverhältnis 4:3
-pixel aspect ratio	MainWin		Pixel-Seitenverhältnis
+No border	MainWin		Kein Fensterrahmen
+Always on top	MainWin		Immer im Vordergrund
+OK	MainWin		OK
+Quit	MainWin		Beenden
+Full screen	MainWin		Vollbild
+Debug	MainWin		Debug
+Scale to native size	MainWin		Originalgröße
 unknown	MainWin		unbekannt
+Next channel	MainWin		Nächster Kanal
+Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
+None	MainWin		Kein
+force 704 x 576, display aspect 4:3	MainWin		Erzwinge 704 x 576, Seitenverhältnis 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+force 544 x 576, display aspect 4:3	MainWin		Erzwinge 544 x 576, Seitenverhältnis 4:3
+pixel aspect ratio	MainWin		Pixel-Seitenverhältnis
+No menu	MainWin		Kein Menü
+Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
+force 720 x 576, display aspect 4:3	MainWin		Erzwinge 720 x 576, Seitenverhältnis 4:3

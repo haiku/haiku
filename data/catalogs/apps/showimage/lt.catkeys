@@ -1,62 +1,62 @@
 1	lithuanian	x-vnd.Haiku-ShowImage	886873119
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sek.
-Browse	Menus		Naršymas
-Cancel	ClosePrompt		Atsisakyti
-Clear selection	Menus		Panaikinti žymėjimą
-Close	ClosePrompt		Užverti
-Close	Menus		Užverti
-Close document	ClosePrompt		Užverti dokumentą
-Copy	Menus		Kopijuoti
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepavyko įkelti paveikslo! Arba nėra tokio failo, arba nerastas jam tinkamas keitiklis.
-DPI:	PrintOptionsWindow		Raiška (taškais colyje):
-Edit	Menus		Taisa
+Use as background…	Menus		Naudoti kaip darbalaukio foną…
 File	Menus		Failas
-First page	Menus		Pirmasis puslapis
-Fit image to page	PrintOptionsWindow		Sutalpinti puslapyje
-Fit to window	Menus		Sutalpinti lange
-Flip left to right	Menus		Apversti horizontaliai
-Flip top to bottom	Menus		Apversti vertikaliai
+Slide delay	Menus		Skaidrių keitimo dažnis
+Selection mode	Menus		Žymėjimo veiksena
+Zoom in	Menus		Didinti
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ pakeistas. Ar norite jį užverti?
+Page setup…	Menus		Puslapio nuostatos…
+Print…	Menus		Spausdinti…
+OK	SaveToFile		Gerai
+Previous page	Menus		Ankstesnis puslapis
+View	Menus		Rodymas
 Full screen	Menus		Visame ekrane
 Go to page	Menus		Pereiti puslapin
-Height: 	PrintOptionsWindow		Aukštis: 
-High-quality zooming	Menus		Aukštos kokybės didinimas
-Image	Menus		Paveikslas
-Job setup	PrintOptionsWindow		Užduoties nuostatos
-Last page	Menus		Paskutinis puslapis
-Leave full screen	Menus		Normalioji veiksena
-Next file	Menus		Kitas failas
-Next page	Menus		Kitas puslapis
-OK	Alerts		Gerai
-OK	SaveToFile		Gerai
-Open…	Menus		Atverti…
-Original size	Menus		Pirminis dydis
-Page setup…	Menus		Puslapio nuostatos…
-Previous file	Menus		Ankstesnis puslapis
-Previous page	Menus		Ankstesnis puslapis
-Print options	PrintOptionsWindow		Spausdinimo nuostatos
-Print…	Menus		Spausdinti…
-Progress monitor	ProgressWindow		Eigos indikatorius
-Quit	Menus		Baigti darbą
-Rating	Menus		Įvertinimas
-Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (po 1/72 colio):
-Rotate clockwise	Menus		Pasukti pagal laikrodžio rodyklę
-Rotate counterclockwise	Menus		Pasukti prieš laikrodžio rodyklę
-Save as…	Menus		Įrašyti kaip…
-Select all	Menus		Pažymėti viską
-Selection mode	Menus		Žymėjimo veiksena
-Show caption in full screen mode	Menus		Rodyti pavadinimą viso ekrano veiksenoje
-Show tool bar	Menus		Rodyti mygtukų juostą
-ShowImage	System name		Paveikslų žiūryklė
-Slide delay	Menus		Skaidrių keitimo dažnis
-Slide show	Menus		Skaidrių ratas
-Stretch to window	Menus		Ištempti iki lango dydžio
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (puslapis %d) pakeistas. Ar norite dokumentą užverti?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ pakeistas. Ar norite jį užverti?
-The file '%s' could not be written.	SaveToFile		Failo „%s“ įrašyti nepavyko.
-Undo	Menus		Atšaukti
-Use as background…	Menus		Naudoti kaip darbalaukio foną…
-View	Menus		Rodymas
-Width:	PrintOptionsWindow		Plotis:
-Zoom factor in %:	PrintOptionsWindow		Mastelis (procentais):
-Zoom in	Menus		Didinti
 Zoom out	Menus		Mažinti
+Quit	Menus		Baigti darbą
+Rotate counterclockwise	Menus		Pasukti prieš laikrodžio rodyklę
+High-quality zooming	Menus		Aukštos kokybės didinimas
+Browse	Menus		Naršymas
+Edit	Menus		Taisa
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepavyko įkelti paveikslo! Arba nėra tokio failo, arba nerastas jam tinkamas keitiklis.
+First page	Menus		Pirmasis puslapis
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (%d puslapis) pakeistas. Ar norite dokumentą užverti?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sek.
+Leave full screen	Menus		Normalioji veiksena
+Close	Menus		Užverti
+Close	ClosePrompt		Užverti
+Undo	Menus		Atšaukti
+Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (po 1/72 colio):
+Rating	Menus		Įvertinimas
+Flip left to right	Menus		Apversti horizontaliai
+Show caption in full screen mode	Menus		Rodyti pavadinimą viso ekrano veiksenoje
+DPI:	PrintOptionsWindow		Raiška (taškais colyje):
+Open…	Menus		Atverti…
+Next file	Menus		Kitas failas
+Clear selection	Menus		Panaikinti žymėjimą
+Close document	ClosePrompt		Užverti dokumentą
+Height: 	PrintOptionsWindow		Aukštis: 
+The file '%s' could not be written.	SaveToFile		Failo „%s“ įrašyti nepavyko.
+Cancel	ClosePrompt		Atsisakyti
+Show tool bar	Menus		Rodyti mygtukų juostą
+Fit to window	Menus		Sutalpinti lange
+Print options	PrintOptionsWindow		Spausdinimo nuostatos
+Copy	Menus		Kopijuoti
+Progress monitor	ProgressWindow		Eigos indikatorius
+Last page	Menus		Paskutinis puslapis
+Stretch to window	Menus		Ištempti iki lango dydžio
+Previous file	Menus		Ankstesnis puslapis
+ShowImage	System name		Paveikslų žiūryklė
+Slide show	Menus		Skaidrių ratas
+Fit image to page	PrintOptionsWindow		Sutalpinti puslapyje
+Flip top to bottom	Menus		Apversti vertikaliai
+Select all	Menus		Pažymėti viską
+Zoom factor in %:	PrintOptionsWindow		Mastelis (procentais):
+Width:	PrintOptionsWindow		Plotis:
+Image	Menus		Paveikslas
+OK	Alerts		Gerai
+Rotate clockwise	Menus		Pasukti pagal laikrodžio rodyklę
+Job setup	PrintOptionsWindow		Užduoties nuostatos
+Original size	Menus		Pirminis dydis
+Next page	Menus		Kitas puslapis
+Save as…	Menus		Įrašyti kaip…

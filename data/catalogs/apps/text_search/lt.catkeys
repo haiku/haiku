@@ -1,0 +1,33 @@
+1	lithuanian	x-vnd.Haiku.TextSearch	1180598828
+%s: Not enough room to escape the filename.	Grepper		%s: Trūksta vietos kaitos ženklams failo varde.
+Trim to selection	GrepWindow		Apsiriboti pažymėtais failais
+Follow symbolic links	GrepWindow		Sekti simbolinėmis nuorodomis
+Close	GrepWindow		Užverti
+Cancel	GrepWindow		Atsisakyti
+The unselected files will be removed from the list.	GrepWindow		Nepažymėti failai bus pašalinti iš sąrašo
+Set target…	GrepWindow		Paieškos sritis…
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Išrinkite failus, kuriuos norite matyti pažymėtus Pėdsekyje.
+Open files in Pe	GrepWindow		Atverti failus programa „Pe“
+Copy text to clipboard	GrepWindow		Kopijuoti tekstą į iškarpinę
+Settings	GrepWindow		Nuostatos
+Select all	GrepWindow		Pažymėti viską
+OK	GrepWindow		Gerai
+Skip folders starting with a dot	GrepWindow		Praleisti aplankus, kurių vardai prasideda tašku
+%APP_NAME couldn't open one or more folders.	GrepWindow		Programai „%APP_NAME“ nepavyko atverti vieno ar daugiau aplankų.
+Escape search text	GrepWindow		Ieškomame tekste pridėti kaitos ženklus
+Search	GrepWindow		Ieškoti
+Open selection	GrepWindow		Atverti pažymėtus failus
+Look in sub-folders	GrepWindow		Ieškoti poaplankiuose
+Actions	GrepWindow		Veiksmai
+File	GrepWindow		Failas
+Encoding	GrepWindow		Koduotė
+History	GrepWindow		Žurnalas
+%s: There was a problem running grep.	Grepper		%s: Vykdant „grep“, įvyko klaida.
+New window	GrepWindow		Naujas langas
+Please select the files you wish to keep searching.	GrepWindow		Pažymėkite failus, kuriuose norite tęsti paiešką.
+TextSearch	GrepWindow		Teksto paieška
+Quit	GrepWindow		Baigti darbą
+Show files in Tracker	GrepWindow		Parodyti failus Pėdsekyje
+Case-sensitive	GrepWindow		Paisyti raidžių registro
+Text files only	GrepWindow		Ieškoti tik tekstiniuose failuose
+Show lines	GrepWindow		Rodyti eilutes

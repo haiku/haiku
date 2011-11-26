@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Expander	1852295567
+1	belarusian	x-vnd.Haiku-Expander	2537908460
 Expand	ExpanderMenu		Распакаваць
 Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
 Set destination…	ExpanderMenu		Задаць прызначэнне…
@@ -6,6 +6,7 @@ Use:	ExpanderPreferences		Выкарыстаць:
 File expanded	ExpanderWindow		Файл распакаваны
 The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
 Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
+ is not supported	ExpanderWindow		не падтрымлiваецца
 Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
 Select current	DirectoryFilePanel		Пазначыць бягучы
 Source	ExpanderWindow		Крыніца

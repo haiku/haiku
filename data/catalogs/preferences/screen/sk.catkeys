@@ -2,16 +2,16 @@
 yes	Screen		áno
 Use laptop panel:	Screen		Použiť panel noteboku:
 15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
-/other…	Screen		/iné...
+/other…	Screen		/iné…
 16 bits/pixel, 65536 colors	Screen		16 bitov/pixel, 65536 farieb
 Revert	Screen		Vrátiť
 Swap displays:	Screen		Vymeniť displeje:
 Combine displays:	Screen		Skombinovať displeje:
 Done	Screen		Hotovo
-Set background…	Screen		Nastaviť pozadie...
+Set background…	Screen		Nastaviť pozadie…
 Undo	Screen		Vrátiť späť
 if needed	Screen		ak treba
-Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku 
+Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku
 Screen	System name		Obrazovka
 OK	Screen		OK
 Workspaces	Screen		Pracovné plochy
@@ -32,7 +32,7 @@ Current workspace	Screen		Aktuálna pracovná plocha
 About	Screen		O aplikácii
 24 bits/pixel, 16 Million colors	Screen		24 bitov/pixel, 16 miliónov farieb
 horizontally	Screen		vodorovne
-Other…	Screen		Iné...
+Other…	Screen		Iné…
 Cancel	Screen		Zrušiť
 bits/pixel	Screen		bitov/pixel
 Settings will revert in %seconds seconds.	Screen		Nastavenia sa vrátia späť o %seconds sekúnd.

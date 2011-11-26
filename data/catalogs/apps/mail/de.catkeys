@@ -1,160 +1,161 @@
-1	german	x-vnd.Be-MAIL	2276629278
+1	german	x-vnd.Be-MAIL	1835398254
+View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
-%e - E-mail address	Mail		%e - E-Mail-Adresse
-%e wrote:\\n	Mail		%e schrieb:\\n
-%n - Full name	Mail		%n - Voller Name
-(Address unavailable)	Mail		(Adresse nicht verfügbar)
-(Date unavailable)	Mail		(Datum nicht verfügbar)
-(Name unavailable)	Mail		(Name nicht verfügbar)
-<none>	Mail		<kein>
-Account from mail	Mail		Konto der Nachricht
-Account:	Mail		Konto:
-Accounts…	Mail		Konten…
-Add	Mail		Hinzu
-Add enclosure…	Mail		Anhang anfügen…
-Add signature	Mail		Signatur hinzufügen
-An error occurred trying to open this signature.	Mail		Beim Öffnen dieser Signatur ist ein Fehler aufgetreten.
-An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
-An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
 Attach attributes:	Mail		Attribute von Anhängen:
-Attachments:	Mail		Anhänge: 
-Auto signature:	Mail		Automatische Signatur:
+Inconsistency occurred in the undo/redo buffer.	Mail		Es ist ein Fehler im Rückgängig/Wiederherstellen-Puffer aufgetreten.
+An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
+Copy to new	Mail		In neue Nachricht kopieren
+Edit	Mail		Bearbeiten
+Print	Mail		Drucken
+<none>	Mail		<kein>
+New mail message	Mail		Nachricht verfassen
 Automatic	Mail		Automatisch
 Automatically mark mail as read:	Mail		Nachrichten automatisch als gelesen markieren:
-Bcc:	Mail		Blindkopie:
-Beginner	Mail		Anfänger
-Button bar:	Mail		Werkzeugleiste:
-Cancel	Mail		Abbrechen
-Cc:	Mail		Kopie:
-Check spelling	Mail		Rechtschreibung prüfen
-Close	Mail		Schließen
-Close and 	Mail		Schließen und
-Colored quotes:	Mail		Farbige Zitate:
-Copy	Mail		Kopieren
-Copy link location	Mail		Linkadresse kopieren
-Copy to new	Mail		In neue Nachricht kopieren
-Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
-Cut	Mail		Ausschneiden
-Date:	Mail		Datum:
-Decoding:	Mail		Kodierung:
-Default account:	Mail		Standardkonto:
-Delete	Mail		Löschen
-Discard	Mail		Verwerfen
-Do you wish to save this message as a draft before closing?	Mail		Soll die Nachricht als Entwurf gespeichert werden, bevor sie geschlossen wird?
-Do you wish to send this message before closing?	Mail		Soll diese Nachricht gesendet werden, bevor sie geschlossen wird?
-Don't save	Mail		Verwerfen
-E-mail draft could not be saved!	Mail		Der Entwurf konnte nicht gespeichert werden!
-Edit	Mail		Bearbeiten
-Edit queries…	Mail		Queries bearbeiten…
-Edit signatures…	Mail		Signaturen bearbeiten…
-Encoding:	Mail		Zeichenkodierung:
-Expert	Mail		Experte
-File	Mail		Datei
-Find	Mail		Suchen
-Find again	Mail		Weitersuchen
-Find…	Mail		Suchen…
-Font:	Mail		Schriftart:
-Forward	Mail		Weiterleiten
-Forward without attachments	Mail		Mit Anhängen weiterleiten
-From:	Mail		Von:
-Hide	Mail		Ausblenden
-Include file attributes in attachments	Mail		Dateiattribute von Anhängen mitsenden
-Inconsistency occurred in the undo/redo buffer.	Mail		Es ist ein Fehler im Rückgängig/Wiederherstellen-Puffer aufgetreten.
-Initial spell check mode:	Mail		Rechtschreibprüfung:
-Leave as '%s'	Mail		Status '%s' belassen
-Leave as New	Mail		Status 'New' belassen
-Leave same	Mail		Status belassen
-Mail	System name		E-Mail
-Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
-Mail preferences	Mail		E-Mail-Einstellungen
-Mailing	Mail		Nachrichten
-Message	Mail		Nachricht
-Move to trash	Mail		In den Papierkorb verschieben
-Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
-New	Mail		Neu
-New mail message	Mail		Nachricht verfassen
-Next	Mail		Nächste
-Next message	Mail		Nächste Nachricht
-No file attributes, just plain data	Mail		Keine Dateiattribute, nur reine Daten
-No matches	Mail		Keine Treffer
-None	Mail		Keine
-OK	Mail		OK
-Off	Mail		Aus
-On	Mail		Ein
-Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hinzugefügt werden.
-Open	Mail		Öffnen
-Open attachment	Mail		Anhang öffnen
-Open draft	Mail		Entwurf öffnen
-Open this link	Mail		Link öffnen
-Page setup…	Mail		Seite einrichten…
-Paste	Mail		Einfügen
-Preferences…	Mail		Einstellungen…
-Previous	Mail		Vorherige
-Previous message	Mail		Vorherige Nachricht
-Print	Mail		Drucken
-Print…	Mail		Drucken…
-Put your favorite e-mail queries and query templates in this folder.	Mail		In diesem Ordner können E-Mail-Queries und Query-Vorlagen abgelegt werden.
-Queries	Mail		Queries
-Quit	Mail		Beenden
-Quote	Mail		Zitieren
-Random	Mail		Zufällig
-Read 	Mail		Gelesen
-Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Das kann nicht rückgängig gemacht werden.
-Redo	Mail		Wiederholen
-Remove attachment	Mail		Anhang entfernen
-Remove enclosure	Mail		Anhang löschen
-Remove quote	Mail		Zitatebene entfernen
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Anhänge von weitergeleiteten Nachrichten zu entfernen wird noch nicht unterstützt.\nEs wird nicht richtig funktionieren.
-Reply	Mail		Antworten
-Reply account:	Mail		Konto zum Beantworten:
-Reply preamble:	Mail		Einleitung bei Antworten:
-Reply to all	Mail		Allen antworten
-Reply to sender	Mail		Antwort an Absender
-Resend	Mail		Nochmals senden
-Revert	Mail		Anfangswerte
-Save	Mail		Speichern
-Save address	Mail		Adresse speichern
-Save as draft	Mail		Als Entwurf speichern
-Save attachment…	Mail		Anhang speichern…
-Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
-Select all	Mail		Alles auswählen
-Send	Mail		Senden
-Send message	Mail		Nachricht senden
-Set to %s	Mail		Status setzen: %s
-Set to Saved	Mail		Status setzen: Saved
-Set to…	Mail		Status setzen…
-Show header	Mail		Kopfdaten anzeigen
-Show icons & labels	Mail		Icons und Beschriftung anzeigen
-Show icons only	Mail		Nur Icons zeigen
-Show raw message	Mail		Originalformat anzeigen
-Signature	Mail		Signatur
-Signature:	Mail		Signatur:
-Signatures	Mail		Signaturen
-Size:	Mail		Größe:
-Sorry	Mail		Entschuldigung
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
-Start now	Mail		Jetzt starten
-Subject:	Mail		Betreff:
-Text wrapping:	Mail		Zeilenumbruch:
-The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst wieder läuft.
-There is no installed handler for URL links.	Mail		URL-Verweisen ist keine Anwendung zugeordnet.
-Title:	Mail		Titel:
-To:	Mail		An:
-Trash	Mail		Löschen
-Undo	Mail		Rückgängig
-Unread	Mail		Ungelesen
-Use default account	Mail		Standardkonto
-User interface	Mail		Programmoberfläche
-View	Mail		Ansicht
-Warn unencodable:	Mail		Warnung bei nicht-kodierbaren Zeichen:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
-\\n - Newline	Mail		\\n - Zeilenumbruch
-draft	B_USER_DIRECTORY/mail/draft		Entwürfe
 helpful message	Mail		Tipp
-in	B_USER_DIRECTORY/mail/in		Eingang
-mail	B_USER_DIRECTORY/mail		Mail
-out	B_USER_DIRECTORY/mail/out		Ausgang
-queries	B_USER_DIRECTORY/mail/queries		Queries
-sent	B_USER_DIRECTORY/mail/sent		Gesendet
+Colored quotes:	Mail		Farbige Zitate:
+Subject:	Mail		Betreff:
+Reply to all	Mail		Allen antworten
+Show icons & labels	Mail		Icons und Beschriftung anzeigen
+Remove attachment	Mail		Anhang entfernen
+Button bar:	Mail		Werkzeugleiste:
 spam	B_USER_DIRECTORY/mail/spam		Spam
+Beginner	Mail		Anfänger
+Don't save	Mail		Verwerfen
+Expert	Mail		Experte
+Reply account:	Mail		Konto zum Beantworten:
+Discard	Mail		Verwerfen
+Message	Mail		Nachricht
+Reply to sender	Mail		Antwort an Absender
+There is no installed handler for URL links.	Mail		URL-Verweisen ist keine Anwendung zugeordnet.
+Signature	Mail		Signatur
+Find again	Mail		Weitersuchen
+Bcc:	Mail		Blindkopie:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
+Signature:	Mail		Signatur:
+Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
+Cc:	Mail		Kopie:
+Off	Mail		Aus
+Find	Mail		Suchen
+Preferences…	Mail		Einstellungen…
+Undo	Mail		Rückgängig
+Date:	Mail		Datum:
+Leave as New	Mail		Status 'New' belassen
+An error occurred trying to open this signature.	Mail		Beim Öffnen dieser Signatur ist ein Fehler aufgetreten.
+No file attributes, just plain data	Mail		Keine Dateiattribute, nur reine Daten
+Edit queries…	Mail		Queries bearbeiten…
+queries	B_USER_DIRECTORY/mail/queries		Queries
+Paste	Mail		Einfügen
+in	B_USER_DIRECTORY/mail/in		Eingang
+Save attachment…	Mail		Anhang speichern…
+Include file attributes in attachments	Mail		Dateiattribute von Anhängen mitsenden
+OK	Mail		OK
+Send	Mail		Senden
+Show icons only	Mail		Nur Icons zeigen
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Anhänge von weitergeleiteten Nachrichten zu entfernen wird noch nicht unterstützt.\nEs wird nicht richtig funktionieren.
+Hide	Mail		Ausblenden
+Forward without attachments	Mail		Mit Anhängen weiterleiten
+Previous	Mail		Vorherige
+Redo	Mail		Wiederholen
+Add enclosure…	Mail		Anhang anfügen…
+Mail	System name		E-Mail
+Print…	Mail		Drucken…
+Warn unencodable:	Mail		Warnung bei nicht-kodierbaren Zeichen:
+Quit	Mail		Beenden
+%n - Full name	Mail		%n - Voller Name
+ Read 	Mail		 Gelesen 
+Trash	Mail		Löschen
+Default account:	Mail		Standardkonto:
+Size:	Mail		Größe:
+Account from mail	Mail		Konto der Nachricht
+Edit signatures…	Mail		Signaturen bearbeiten…
+New	Mail		Neu
+Attachments: 	Mail		Anhänge: 
+On	Mail		Ein
+Set to %s	Mail		Status setzen: %s
+Forward	Mail		Weiterleiten
+E-mail draft could not be saved!	Mail		Der Entwurf konnte nicht gespeichert werden!
+%e wrote:\\n	Mail		%e schrieb:\\n
+To:	Mail		An:
+Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hinzugefügt werden.
+Previous message	Mail		Vorherige Nachricht
+Attachments:	Mail		Anhänge: 
+Title:	Mail		Titel:
+Find…	Mail		Suchen…
+Accounts…	Mail		Konten…
+Mail preferences	Mail		E-Mail-Einstellungen
+Initial spell check mode:	Mail		Rechtschreibprüfung:
+Leave same	Mail		Status belassen
+Page setup…	Mail		Seite einrichten…
+Text wrapping:	Mail		Zeilenumbruch:
+Revert	Mail		Anfangswerte
+File	Mail		Datei
+mail	B_USER_DIRECTORY/mail		Mail
+None	Mail		Keine
+(Name unavailable)	Mail		(Name nicht verfügbar)
+Copy link location	Mail		Linkadresse kopieren
+out	B_USER_DIRECTORY/mail/out		Ausgang
+Show header	Mail		Kopfdaten anzeigen
+%e - E-mail address	Mail		%e - E-Mail-Adresse
+Resend	Mail		Nochmals senden
+Show raw message	Mail		Originalformat anzeigen
+\\n - Newline	Mail		\\n - Zeilenumbruch
+Start now	Mail		Jetzt starten
+Close	Mail		Schließen
+No matches	Mail		Keine Treffer
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst wieder läuft.
+Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Das kann nicht rückgängig gemacht werden.
+Open	Mail		Öffnen
+draft	B_USER_DIRECTORY/mail/draft		Entwürfe
+Quote	Mail		Zitieren
+Add	Mail		Hinzu
+Next message	Mail		Nächste Nachricht
+User interface	Mail		Programmoberfläche
+Cancel	Mail		Abbrechen
+Send message	Mail		Nachricht senden
+Remove enclosure	Mail		Anhang löschen
+Account:	Mail		Konto:
+Decoding:	Mail		Kodierung:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
+Do you wish to send this message before closing?	Mail		Soll diese Nachricht gesendet werden, bevor sie geschlossen wird?
+Delete	Mail		Löschen
+Leave as '%s'	Mail		Status '%s' belassen
+Copy	Mail		Kopieren
+Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
+Reply preamble:	Mail		Einleitung bei Antworten:
+Signatures	Mail		Signaturen
+Next	Mail		Nächste
+Set to…	Mail		Status setzen…
+Use default account	Mail		Standardkonto
+Sorry	Mail		Entschuldigung
+Encoding:	Mail		Zeichenkodierung:
+Font:	Mail		Schriftart:
+(Address unavailable)	Mail		(Adresse nicht verfügbar)
+Save address	Mail		Adresse speichern
+Queries	Mail		Queries
+Do you wish to save this message as a draft before closing?	Mail		Soll die Nachricht als Entwurf gespeichert werden, bevor sie geschlossen wird?
+Save	Mail		Speichern
+Random	Mail		Zufällig
+Close and 	Mail		Schließen und
+Save as draft	Mail		Als Entwurf speichern
+The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
+Open attachment	Mail		Anhang öffnen
+sent	B_USER_DIRECTORY/mail/sent		Gesendet
+(Date unavailable)	Mail		(Datum nicht verfügbar)
+Put your favorite e-mail queries and query templates in this folder.	Mail		In diesem Ordner können E-Mail-Queries und Query-Vorlagen abgelegt werden.
+Reply	Mail		Antworten
+From:	Mail		Von:
+Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
+Open draft	Mail		Entwurf öffnen
+Cut	Mail		Ausschneiden
+Check spelling	Mail		Rechtschreibung prüfen
+Set to Saved	Mail		Status setzen: Saved
+Open this link	Mail		Link öffnen
+Auto signature:	Mail		Automatische Signatur:
+Add signature	Mail		Signatur hinzufügen
+Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
+Mailing	Mail		Nachrichten
+Unread	Mail		Ungelesen
+Remove quote	Mail		Zitatebene entfernen
+Move to trash	Mail		In den Papierkorb verschieben
+Select all	Mail		Alles auswählen
+An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
