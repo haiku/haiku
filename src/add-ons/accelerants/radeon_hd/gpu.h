@@ -11,6 +11,8 @@
 
 #include "accelerant.h"
 
+#include <video_configuration.h>
+
 
 #define HDP_REG_COHERENCY_FLUSH_CNTL 0x54A0
 #define HDP_NONSURFACE_BASE			0x2C04
