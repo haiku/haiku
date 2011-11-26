@@ -602,9 +602,16 @@ radeon_hd_init(radeon_info &info)
 
 	// *** Populate frame buffer information
 	if (info.chipsetID >= RADEON_CEDAR) {
-		// Evergreen+ has memory stored in MB
-		info.shared_info->graphics_memory_size
-			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
+		if ((info.chipsetFlags & CHIP_APU) != 0
+			|| (info.chipsetFlags & CHIP_IGP) != 0) {
+			// Evergreen+ fusion in bytes
+			info.shared_info->graphics_memory_size
+				= read32(info.registers + CONFIG_MEMSIZE) / 1024;
+		} else {
+			// Evergreen+ has memory stored in MB
+			info.shared_info->graphics_memory_size
+				= read32(info.registers + CONFIG_MEMSIZE) * 1024;
+		}
 	} else if (info.chipsetID >= RADEON_R600) {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
@@ -634,7 +641,12 @@ radeon_hd_init(radeon_info &info)
 	uint32 barSize = info.pci->u.h0.base_register_sizes[PCI_BAR_FB] / 1024;
 
 	// if graphics memory is larger then PCI bar, just map bar
-	if (info.shared_info->graphics_memory_size > barSize) {
+	if (info.shared_info->graphics_memory_size == 0) {
+		// we can recover as we have PCI FB bar, but this should be fixed
+		ERROR("%s: Error: found 0MB video ram, using PCI bar size...\n",
+			__func__);
+		info.shared_info->frame_buffer_size = barSize;
+	} else if (info.shared_info->graphics_memory_size > barSize) {
 		TRACE("%s: shrinking frame buffer to PCI bar...\n",
 			__func__);
 		info.shared_info->frame_buffer_size = barSize;

@@ -185,6 +185,7 @@ const struct supported_device {
 	// Codename: Nothern Islands
 	//  Caicos
 	{0x6760, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6470M"},
+	{0x9648, 5, 0, RADEON_CAICOS, CHIP_APU, "Radeon HD 6480G"},
 	{0x6761, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6430M"},
 	{0x6762, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD CAICOS"},
 	{0x6763, 5, 0, RADEON_CAICOS, CHIP_DISCREET, "Radeon HD E6460"},
