@@ -1018,6 +1018,11 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 
 	DPRINTF(0, ("dosfs_rename called: %Lx/%s->%Lx/%s\n", odir->vnid, oldname, ndir->vnid, newname));
 
+	if (!oldname || !(*oldname) || !newname || !(*newname)) {
+		result = EINVAL;
+		goto bi;
+	}
+
 	if(!is_filename_legal(newname)) {
 		dprintf("dosfs_rename called with invalid name '%s'\n", newname);
 		result = EINVAL;
@@ -1027,11 +1032,6 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("rename called on read-only volume\n");
 		result = EROFS;
-		goto bi;
-	}
-
-	if (!oldname || !(*oldname) || !newname || !(*newname)) {
-		result = EINVAL;
 		goto bi;
 	}
 
