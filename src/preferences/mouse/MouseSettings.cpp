@@ -122,6 +122,7 @@ MouseSettings::_SaveSettings()
 		return status;
 
 	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE);
+	status = file.InitCheck();
 	if (status < B_OK)
 		return status;
 
