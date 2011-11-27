@@ -166,7 +166,7 @@ MainWindow::MessageReceived(BMessage* message)
 					errorMessage = "";
 				}
 			} else if (!launchedByRef) {
-				errorMessage = B_TRANSLATE("Failed to launch 'something',"
+				errorMessage = B_TRANSLATE("Failed to launch 'something', "
 					"error in Pad data.");
 			}
 			if (errorMessage.Length() > 0) {
