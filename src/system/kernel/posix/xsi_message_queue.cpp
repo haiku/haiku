@@ -739,7 +739,7 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 	MutexLocker messageQueueLocker(messageQueue->Lock());
 	messageQueueHashLocker.Unlock();
 
-	if (messageSize < 0 || messageSize > MAX_BYTES_PER_QUEUE) {
+	if (messageSize > MAX_BYTES_PER_QUEUE) {
 		TRACE_ERROR(("xsi_msgrcv: message size is out of range\n"));
 		return EINVAL;
 	}
@@ -837,7 +837,7 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 	MutexLocker messageQueueLocker(messageQueue->Lock());
 	messageQueueHashLocker.Unlock();
 
-	if (messageSize < 0 || messageSize > MAX_BYTES_PER_QUEUE) {
+	if (messageSize > MAX_BYTES_PER_QUEUE) {
 		TRACE_ERROR(("xsi_msgsnd: message size is out of range\n"));
 		return EINVAL;
 	}
