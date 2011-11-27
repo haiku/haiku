@@ -95,7 +95,9 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 			if (msg->FindString("decor", &newDecor) != B_OK)
 				break;
 
-			DecorInfoUtility* decorUtility = new DecorInfoUtility();
+			DecorInfoUtility* decorUtility
+				= new(std::nothrow) DecorInfoUtility();
+
 			if (decorUtility == NULL)
 				return;
 
@@ -113,7 +115,9 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 		}
 		case kMsgDecorInfo:
 		{
-			DecorInfoUtility* decorUtility = new DecorInfoUtility();
+			DecorInfoUtility* decorUtility
+				= new(std::nothrow) DecorInfoUtility();
+
 			if (decorUtility == NULL)
 				return;
 
@@ -203,12 +207,16 @@ DecorSettingsView::_SetCurrentDecor()
 void
 DecorSettingsView::SetDefaults()
 {
-	DecorInfoUtility* decorUtility = new DecorInfoUtility();
-		if (decorUtility == NULL)
-			return;
+	DecorInfoUtility* decorUtility
+		= new(std::nothrow) DecorInfoUtility();
+
+	if (decorUtility == NULL)
+		return;
 	DecorInfo* defaultDecorator(decorUtility->DefaultDecorator());
 	decorUtility->SetDecorator(defaultDecorator);
 	_BuildDecorMenu();
+
+	delete decorUtility;
 }
 
 
