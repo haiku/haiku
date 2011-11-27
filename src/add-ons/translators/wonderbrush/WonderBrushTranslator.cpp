@@ -134,7 +134,8 @@ identify_wbi_header(BPositionIO* inSource, translator_info* outInfo,
 			outInfo->quality = WBI_IN_QUALITY;
 			outInfo->capability = WBI_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/x-wonderbrush");
-			strcpy(outInfo->name, B_TRANSLATE("WonderBrush image"));
+			strncpy(outInfo->name, B_TRANSLATE("WonderBrush image"),
+				sizeof(outInfo->name));
 		}
 	} else {
 		delete wbImage;

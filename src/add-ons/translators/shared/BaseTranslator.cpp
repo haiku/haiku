@@ -305,7 +305,8 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 		outInfo->group = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.2;
 		outInfo->capability = 0.2;
-		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format"));
+		strncpy(outInfo->name, B_TRANSLATE("Be Bitmap Format"),
+			sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 
 		// Look for quality / capability info in fInputFormats

@@ -203,7 +203,8 @@ identify_sgi_header(BPositionIO *inSource, translator_info *outInfo, uint32 outT
 			outInfo->quality = SGI_IN_QUALITY;
 			outInfo->capability = SGI_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/sgi");
-			strcpy(outInfo->name, B_TRANSLATE("SGI image"));
+			strncpy(outInfo->name, B_TRANSLATE("SGI image"),
+				sizeof(outInfo->name));
 		}
 	} else {
 		delete sgiImage;
