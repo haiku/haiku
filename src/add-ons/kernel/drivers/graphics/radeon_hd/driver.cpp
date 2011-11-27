@@ -32,6 +32,8 @@
 #	define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) dprintf("radeon_hd: " x)
+
 #define MAX_CARDS 1
 
 
@@ -308,7 +310,7 @@ init_hardware(void)
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCI);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": ERROR: pci module unavailable\n");
+		ERROR("%s: ERROR: pci module unavailable\n", __func__);
 		return status;
 	}
 
@@ -329,7 +331,7 @@ init_driver(void)
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": ERROR: pci module unavailable\n");
+		ERROR("%s: ERROR: pci module unavailable\n", __func__);
 		return status;
 	}
 
@@ -382,7 +384,7 @@ init_driver(void)
 		gDeviceInfo[found]->dceMinor = kSupportedDevices[type].dceMinor;
 		gDeviceInfo[found]->chipsetFlags = kSupportedDevices[type].chipsetFlags;
 
-		dprintf(DEVICE_NAME ": GPU(%ld) %s, revision = 0x%x\n", found,
+		ERROR("%s: GPU(%ld) %s, revision = 0x%x\n", __func__, found,
 			kSupportedDevices[type].deviceName, info->revision);
 
 		found++;
@@ -394,6 +396,7 @@ init_driver(void)
 		mutex_destroy(&gLock);
 		put_module(B_AGP_GART_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
+		ERROR("%s: no supported devices found\n", __func__);
 		return ENODEV;
 	}
 
@@ -431,6 +434,7 @@ find_device(const char* name)
 			return &gDeviceHooks;
 	}
 
+	ERROR("%s: %s wasn't found!\n", __func__, name);
 	return NULL;
 }
 
