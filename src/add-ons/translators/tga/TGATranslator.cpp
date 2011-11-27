@@ -340,7 +340,7 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 	imagespec.descriptor = buf[17];
 	// images ordered from Right to Left (rather than Left to Right)
 	// are not supported
-	if ((imagespec.descriptor & TGA_ORIGIN_HORZ_BIT) == TGA_ORIGIN_RIGHT)
+	if ((imagespec.descriptor & TGA_ORIGIN_HORZ_BIT) != TGA_ORIGIN_LEFT)
 		return B_NO_TRANSLATOR;
 	// unused descriptor bits, these bits must be zero
 	if (imagespec.descriptor & TGA_DESC_BITS76)
