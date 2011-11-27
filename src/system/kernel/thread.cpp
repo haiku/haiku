@@ -365,17 +365,17 @@ Thread::Init(bool idleThread)
 		return error;
 
 	char temp[64];
-	sprintf(temp, "thread_%ld_retcode_sem", id);
+	snprintf(temp, sizeof(temp), "thread_%ld_retcode_sem", id);
 	exit.sem = create_sem(0, temp);
 	if (exit.sem < 0)
 		return exit.sem;
 
-	sprintf(temp, "%s send", name);
+	snprintf(temp, sizeof(temp), "%s send", name);
 	msg.write_sem = create_sem(1, temp);
 	if (msg.write_sem < 0)
 		return msg.write_sem;
 
-	sprintf(temp, "%s receive", name);
+	snprintf(temp, sizeof(temp), "%s receive", name);
 	msg.read_sem = create_sem(0, temp);
 	if (msg.read_sem < 0)
 		return msg.read_sem;
