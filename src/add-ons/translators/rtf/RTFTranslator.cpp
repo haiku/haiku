@@ -135,7 +135,7 @@ RTFTranslator::Identify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_TEXT;
 	info->quality = RTF_IN_QUALITY;
 	info->capability = RTF_IN_CAPABILITY;
-	strncpy(info->name, B_TRANSLATE("RichTextFormat file"),
+	strlcpy(info->name, B_TRANSLATE("RichTextFormat file"),
 		sizeof(info->name));
 	strcpy(info->MIME, "text/rtf");
 

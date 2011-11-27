@@ -860,7 +860,7 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 	outInfo->group = B_TRANSLATOR_TEXT;
 	outInfo->quality = STXT_IN_QUALITY;
 	outInfo->capability = STXT_IN_CAPABILITY;
-	strncpy(outInfo->name, B_TRANSLATE("Be styled text file"),
+	strlcpy(outInfo->name, B_TRANSLATE("Be styled text file"),
 		sizeof(outInfo->name));
 	strcpy(outInfo->MIME, "text/x-vnd.Be-stxt");
 

@@ -170,14 +170,14 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 		outInfo->type = GIF_TYPE;
 		outInfo->quality = 0.8;
 		outInfo->capability = 0.8;
-		strncpy(outInfo->name, B_TRANSLATE("GIF image"), sizeof(outInfo->name));
+		strlcpy(outInfo->name, B_TRANSLATE("GIF image"), sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/gif");
 	}
 	else {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.3;
 		outInfo->capability = 0.3;
-		strncpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (GIFTranslator)"),
+		strlcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (GIFTranslator)"),
 			sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 	}
