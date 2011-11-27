@@ -714,7 +714,7 @@ Playlist::_MIMEString(const entry_ref* ref)
 Playlist::_BindExtraMedia(PlaylistItem* item)
 {
 	FilePlaylistItem* fileItem = dynamic_cast<FilePlaylistItem*>(item);
-	if (!item)
+	if (!fileItem)
 		return;
 	
 	// If the media file is foo.mp3, _BindExtraMedia() searches foo.avi.
