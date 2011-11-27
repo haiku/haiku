@@ -179,13 +179,25 @@ const struct supported_device {
 	{0x9805, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6290"},
 	{0x9802, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9803, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
+	//  Sumo
+	{0x9640, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO"},
+	{0x9641, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
+	{0x9647, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
+	{0x9648, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD 6480G (M)"},
+	{0x964a, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO"},
+	{0x964e, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
+	{0x964f, 5, 0, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
+	//  Sumo2
+	{0x9642, 5, 0, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2"},
+	{0x9643, 5, 0, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
+	{0x9644, 5, 0, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2"},
+	{0x9645, 5, 0, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
 
 	// Radeon HD 64xx - HD 69xx
 	// Introduced: 2010
 	// Codename: Nothern Islands
 	//  Caicos
 	{0x6760, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6470M"},
-	{0x9648, 5, 0, RADEON_CAICOS, CHIP_APU, "Radeon HD 6480G"},
 	{0x6761, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6430M"},
 	{0x6762, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD CAICOS"},
 	{0x6763, 5, 0, RADEON_CAICOS, CHIP_DISCREET, "Radeon HD E6460"},
