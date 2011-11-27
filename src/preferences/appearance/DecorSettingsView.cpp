@@ -162,7 +162,7 @@ DecorSettingsView::_BuildDecorMenu()
 	DecorInfo* decorator = NULL;
 
 	// collect the current system decor settings
-	DecorInfoUtility* decorUtility = new DecorInfoUtility();
+	DecorInfoUtility* decorUtility = new(std::nothrow) DecorInfoUtility();
 
 	if (decorUtility == NULL) {
 		return;
@@ -174,21 +174,20 @@ DecorSettingsView::_BuildDecorMenu()
 		if (decorator == NULL) {
 			fprintf(stderr, "Decorator : error NULL entry @ %li / %li\n",
 				i, count);
+			continue;
 		}
 
 		BString decorName = decorator->Name();
 
-		if (decorUtility->CurrentDecorator() == decorator)
-			fCurrentDecor = (char*)decorName.String();
-
 		BMessage* message = new BMessage(kMsgSetDecor);
-		message->AddString("decor", decorator->Name());
+		message->AddString("decor", decorName);
 
-		BMenuItem* item
-			= new BMenuItem(decorator->Name(), message);
+		BMenuItem* item = new BMenuItem(decorName, message);
 
 		fDecorMenu->AddItem(item);
 	}
+	fCurrentDecor = (char*)decorUtility->CurrentDecorator()->Name().String();
+	delete decorUtility;
 
 	_SetCurrentDecor();
 }
