@@ -151,7 +151,7 @@ const struct supported_device {
 
 	// From here on AMD no longer used numeric identifiers
 
-	// Marketing Names: Radeon HD 54xx - HD 63xx
+	// Marketing Names: Radeon HD 54xx ~ HD 63xx
 	// Introduced: 2009
 	// Codename: Evergreen
 	//  Cedar
@@ -180,17 +180,17 @@ const struct supported_device {
 	{0x9802, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9803, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	//  Sumo
-	{0x9640, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO"},
+	{0x9640, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6550D"},
 	{0x9641, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
-	{0x9647, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
+	{0x9647, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6520G (M)"},
 	{0x9648, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6480G (M)"},
-	{0x964a, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO"},
+	{0x964a, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6530D"},
 	{0x964e, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
 	{0x964f, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
 	//  Sumo2
-	{0x9642, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2"},
+	{0x9642, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD 6370D"},
 	{0x9643, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
-	{0x9644, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2"},
+	{0x9644, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD 6410D"},
 	{0x9645, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
 
 	// Radeon HD 64xx - HD 69xx
