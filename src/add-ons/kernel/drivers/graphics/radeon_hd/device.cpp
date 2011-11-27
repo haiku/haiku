@@ -28,10 +28,12 @@
 
 #define TRACE_DEVICE
 #ifdef TRACE_DEVICE
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("radeon_hd: " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
+
+#define ERROR(x...) dprintf("radeon_hd: " x)
 
 
 /* device hooks prototypes */
@@ -101,7 +103,7 @@ getset_register(int argc, char **argv)
 static status_t
 device_open(const char *name, uint32 /*flags*/, void **_cookie)
 {
-	TRACE((DEVICE_NAME ": open(name = %s)\n", name));
+	TRACE("%s: open(name = %s)\n", __func__, name);
 	int32 id;
 
 	// find accessed device
@@ -142,7 +144,7 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 static status_t
 device_close(void */*data*/)
 {
-	TRACE((DEVICE_NAME ": close\n"));
+	TRACE("%s: close\n", __func__);
 	return B_OK;
 }
 
@@ -172,7 +174,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
 			strcpy((char *)buffer, RADEON_ACCELERANT_NAME);
-			TRACE((DEVICE_NAME ": accelerant: %s\n", RADEON_ACCELERANT_NAME));
+			TRACE("%s: accelerant: %s\n", __func__, RADEON_ACCELERANT_NAME);
 			return B_OK;
 
 		// needed to share data between kernel and accelerant
@@ -200,8 +202,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 			return B_OK;
 
 		default:
-			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %ld)\n",
-				op, bufferLength));
+			TRACE("%s: ioctl() unknown message %ld (length = %ld)\n",
+				__func__, op, bufferLength);
 			break;
 	}
 
