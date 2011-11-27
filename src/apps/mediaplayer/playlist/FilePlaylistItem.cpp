@@ -437,6 +437,7 @@ FilePlaylistItem::_MoveIntoTrash(vector<entry_ref>* refs,
 	}
 
 	BDirectory trashDir(trashPath);
+	err = trashDir.InitCheck();
 	if (err != B_OK) {
 		fprintf(stderr, "failed to init BDirectory for %s: %s\n",
 			trashPath, strerror(err));
