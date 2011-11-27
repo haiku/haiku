@@ -11,6 +11,7 @@
 
 
 #include "radeon_hd.h"
+#include "sensors.h"
 
 #include "AreaKeeper.h"
 #include "driver.h"
@@ -764,6 +765,10 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
+
+	TRACE("card(%ld): GPU thermal status: %" B_PRId32 "C\n", info.id,
+		radeon_thermal_query(info) / 1000);
+
 	return B_OK;
 }
 
