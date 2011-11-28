@@ -58,8 +58,7 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 			if (session != NULL) {
 				result = 0.9f;
 				delete session;
-			}
-			else
+			} else
 				result = 0.1f;
 
 			*cookie = static_cast<void*>(disc);
