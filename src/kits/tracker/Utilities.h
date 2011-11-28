@@ -502,10 +502,10 @@ void
 ThrowOnInitCheckError(InitCheckable *item)
 {
 	if (!item)
-		throw(status_t) B_ERROR;
+		throw (status_t)B_ERROR;
 	status_t error = item->InitCheck();
 	if (error != B_OK)
-		throw(status_t) error;
+		throw (status_t)error;
 }
 
 #if DEBUG
