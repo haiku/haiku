@@ -823,6 +823,7 @@ add_alloc_tracing_entry(ObjectCache* cache, uint32 flags, void* object)
 {
 #if SLAB_OBJECT_CACHE_TRACING
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	MutexLocker _(cache->lock);
 	cache->TrackingInfoFor(object)->Init(T(Alloc(cache, flags, object)));
 #else
 	T(Alloc(cache, flags, object));
@@ -1220,7 +1221,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 		}
 	}
 
-	MutexLocker _(cache->lock);
+	MutexLocker locker(cache->lock);
 	slab* source = NULL;
 
 	while (true) {
@@ -1264,6 +1265,8 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 	}
 
 	void* object = link_to_object(link, cache->object_size);
+	locker.Unlock();
+
 	add_alloc_tracing_entry(cache, flags, object);
 	return fill_allocated_block(object, cache->object_size);
 }
@@ -1295,7 +1298,9 @@ object_cache_free(object_cache* cache, void* object, uint32 flags)
 #endif
 
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+	mutex_lock(&cache->lock);
 	cache->TrackingInfoFor(object)->Clear();
+	mutex_unlock(&cache->lock);
 #endif
 
 	if ((cache->flags & CACHE_NO_DEPOT) == 0) {
