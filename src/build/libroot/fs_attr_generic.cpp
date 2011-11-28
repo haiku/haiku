@@ -135,7 +135,7 @@ ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
 			// the attribute dir is no directory
 			fprintf(stderr, "ensure_attribute_dir_exists(): Attribute "
 				"directory for node %lld exists, but is no directory!\n",
-				ref.node);
+				(long long)ref.node);
 			return B_FILE_ERROR;
 		}
 
