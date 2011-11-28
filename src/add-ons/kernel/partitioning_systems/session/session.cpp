@@ -54,10 +54,14 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 		if (disc != NULL && disc->InitCheck() == B_OK) {
 			// If we have only a single session then we can let the file system
 			// drivers play directly with the device.
-			if (disc->GetSession(1) != NULL)
+			Session *session = disc->GetSession(1);
+			if (session != NULL) {
 				result = 0.9f;
+				delete session;
+			}
 			else
 				result = 0.1f;
+
 			*cookie = static_cast<void*>(disc);
 		} else
 			delete disc;
