@@ -43,11 +43,15 @@ using namespace BPrivate;
 #	define haiku_host_platform_write	haiku_freebsd_write
 #	define haiku_host_platform_readv	haiku_freebsd_readv
 #	define haiku_host_platform_writev	haiku_freebsd_writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atimespec)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtimespec)
 #else
 #	define haiku_host_platform_read		read
 #	define haiku_host_platform_write	write
 #	define haiku_host_platform_readv	readv
 #	define haiku_host_platform_writev	writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atim)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtim)
 #endif
 
 #define RETURN_AND_SET_ERRNO(err)			\
@@ -1125,8 +1129,10 @@ _haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
 		|| times[1].tv_nsec == UTIME_NOW) {
 		timeval now;
 		gettimeofday(&now, NULL);
-		stat.st_atim.tv_sec = stat.st_mtim.tv_sec = now.tv_sec;
-		stat.st_atim.tv_nsec = stat.st_mtim.tv_nsec = now.tv_usec * 1000;
+		HAIKU_HOST_STAT_ATIM(stat).tv_sec
+			= HAIKU_HOST_STAT_MTIM(stat).tv_sec = now.tv_sec;
+		HAIKU_HOST_STAT_ATIM(stat).tv_nsec
+			= HAIKU_HOST_STAT_MTIM(stat).tv_nsec = now.tv_usec * 1000;
 	}
 
 	if (times != NULL) {
@@ -1139,7 +1145,7 @@ _haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
 					RETURN_AND_SET_ERRNO(EINVAL);
 			}
 
-			stat.st_atim = times[0];
+			HAIKU_HOST_STAT_ATIM(stat) = times[0];
 		}
 
 		// modified time
@@ -1151,7 +1157,7 @@ _haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
 					RETURN_AND_SET_ERRNO(EINVAL);
 			}
 
-			stat.st_mtim = times[1];
+			HAIKU_HOST_STAT_MTIM(stat) = times[1];
 		}
 	} else
 		mask |= B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME;
