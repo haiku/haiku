@@ -227,8 +227,10 @@ PrintersWindow::PrintTestPage(PrinterItem* printer)
 	// job->ConfigJob();
 
 	BMessage* settings = job->Settings();
-	if (settings == NULL)
+	if (settings == NULL) {
+		delete job;	
 		return;
+	}
 
 	// enforce job config properties
 	settings->AddInt32("copies", 1);
