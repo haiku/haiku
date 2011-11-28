@@ -141,7 +141,6 @@ SATWindow::RemovedFromGroup(SATGroup* group, bool stayBelowMouse)
 	if (group->CountItems() == 1)
 		group->WindowAt(0)->_RestoreOriginalSize(false);
 
-	fWindowArea = NULL;
 	return true;
 }
 
@@ -179,6 +178,8 @@ SATWindow::RemovedFromArea(WindowArea* area)
 	fWindow->DetachFromWindowStack(true);
 	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
 		fSATSnappingBehaviourList.ItemAt(i)->RemovedFromArea(area);
+
+	fWindowArea = NULL;
 }
 
 

@@ -342,7 +342,7 @@ StackAndTile::WindowHidden(Window* window, bool fromMinimize)
 	if (group == NULL)
 		return;
 	if (fromMinimize == false && group->CountItems() > 1)
-		group->RemoveWindow(satWindow);
+		group->RemoveWindow(satWindow, false);
 }
 
 
@@ -412,7 +412,7 @@ StackAndTile::WindowFeelChanged(Window* window, window_feel feel)
 	if (!group)
 		return;
 	if (group->CountItems() > 1)
-		group->RemoveWindow(satWindow);
+		group->RemoveWindow(satWindow, false);
 }
 
 
@@ -488,7 +488,7 @@ StackAndTile::_StartSAT()
 	if (!group)
 		return;
 
-	group->RemoveWindow(fCurrentSATWindow);
+	group->RemoveWindow(fCurrentSATWindow, false);
 	// Bring window to the front. (in focus follow mouse this is not
 	// automatically the case)
 	_ActivateWindow(fCurrentSATWindow);
