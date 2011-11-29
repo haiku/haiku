@@ -580,7 +580,7 @@ CDPlayer::_WatchCDState()
 	}
 
 	if (updateTrackGui) {
-		BString currentTrackName(B_TRANSLATE("Track %trackAt%: %whichTrack%"));
+		BString currentTrackName(B_TRANSLATE("Track %whichTrack%: %trackAt%"));
 
 		if (playlistTrack >= 0) {
 			int16 whichTrack = playlistTrack;
