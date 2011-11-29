@@ -455,6 +455,9 @@ profileFiles = $(profileFiles:G=profile-d) ;
 AddDirectoryToHaikuImage common etc profile.d ;
 AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
 
+# TODO: Temporary workaround until package management fully moves the /etc dir
+AddSymlinkToHaikuImage common settings : /boot/common/etc ;
+
 #local bashCompletionFiles = [ Glob $(etcDir)/bash_completion.d : * ] ;
 #local bashCompletionHelperFiles
 #    = [ Glob $(etcDir)/bash_completion.d/helpers : * ] ;
