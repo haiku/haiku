@@ -136,6 +136,8 @@ static const Translation gTranslations[] =
 		"Atharva Lath\n"
 	},
 	{ "hr",
+		"Ivica Koli\n"
+		"Zlatko Sehanović\n"
 		"zvacet\n"
 	},
 	{ "hu",
