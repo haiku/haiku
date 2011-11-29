@@ -96,6 +96,7 @@ static void	rgephy_load_dspcode(struct mii_softc *);
 
 static const struct mii_phydesc rgephys[] = {
 	MII_PHY_DESC(xxREALTEK, RTL8169S),
+	MII_PHY_DESC(xxREALTEK, RTL8201E),
 	MII_PHY_END
 };
 
