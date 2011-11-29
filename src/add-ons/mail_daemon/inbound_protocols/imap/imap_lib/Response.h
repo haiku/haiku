@@ -16,6 +16,7 @@ namespace IMAP {
 
 
 class Argument;
+class ConnectionReader;
 
 
 class ArgumentList : public BObjectList<Argument> {
@@ -33,8 +34,8 @@ public:
 			bool				IsListAt(int32 index) const;
 			bool				IsListAt(int32 index, char kind) const;
 
-			int32				IntegerAt(int32 index) const;
-			bool				IsIntegerAt(int32 index) const;
+			uint32				NumberAt(int32 index) const;
+			bool				IsNumberAt(int32 index) const;
 
 			BString				ToString() const;
 };
@@ -82,7 +83,6 @@ class ParseException : public std::exception {
 public:
 								ParseException();
 								ParseException(const char* message);
-	virtual						~ParseException();
 
 			const char*			Message() const { return fMessage; }
 
@@ -91,7 +91,7 @@ protected:
 };
 
 
-class ExpectedParseException : ParseException {
+class ExpectedParseException : public ParseException {
 public:
 								ExpectedParseException(char expected,
 									char instead);
@@ -101,12 +101,24 @@ protected:
 };
 
 
+class LiteralHandler {
+public:
+								LiteralHandler();
+	virtual						~LiteralHandler();
+
+	virtual void				HandleLiteral(ConnectionReader& reader,
+									off_t length) = 0;
+};
+
+
 class Response : public ArgumentList {
 public:
 								Response();
 								~Response();
 
-			void				SetTo(const char* line) throw(ParseException);
+			void				Parse(ConnectionReader& reader,
+									const char* line, LiteralHandler* handler)
+										throw(ParseException);
 
 			bool				IsUntagged() const { return fTag == 0; }
 			int32				Tag() const { return fTag; }
@@ -128,8 +140,27 @@ protected:
 			BString				ExtractString(const char*& line);
 
 protected:
+			ConnectionReader*	fReader;
+			LiteralHandler*		fLiteralHandler;
 			int32				fTag;
 			bool				fContinuation;
+};
+
+
+class ResponseParser {
+public:
+								ResponseParser(ConnectionReader& reader);
+								~ResponseParser();
+
+			void				SetTo(ConnectionReader& reader);
+			void				SetLiteralHandler(LiteralHandler* handler);
+
+			status_t			NextResponse(Response& response,
+									bigtime_t timeout) throw(ParseException);
+
+protected:
+			ConnectionReader*	fReader;
+			LiteralHandler*		fLiteralHandler;
 };
 
 

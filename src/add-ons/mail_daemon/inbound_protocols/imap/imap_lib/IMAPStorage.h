@@ -16,17 +16,6 @@
 #include <Path.h>
 #include <String.h>
 
-#include "IMAPHandler.h"
-
-
-enum FileFlags {
-	kSeen = 0x01,
-	kAnswered = 0x02,
-	kFlagged = 0x04,
-	kDeleted = 0x08,
-	kDraft = 0x10
-};
-
 
 struct StorageMailEntry {
 	int32		uid;
@@ -73,7 +62,7 @@ public:
 
 			status_t			SetCompleteMessageSize(int32 uid, int32 size);
 
-			bool				BodyFetched(int32 uid);
+			bool				IsBodyFetched(int32 uid);
 
 			StorageMailEntry*	GetEntryForRef(const node_ref& ref);
 			int32				RefToUID(const entry_ref& ref);

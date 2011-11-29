@@ -6,6 +6,19 @@
 
 #include "Response.h"
 
+#include <stdlib.h>
+
+#include "Protocol.h"
+	// TODO: remove again once the ConnectionReader is out
+
+
+#define TRACE_IMAP
+#ifdef TRACE_IMAP
+#	define TRACE(...) printf(__VA_ARGS__)
+#else
+#	define TRACE(...) ;
+#endif
+
 
 namespace IMAP {
 
@@ -82,11 +95,8 @@ ArgumentList::ListAt(int32 index) const
 bool
 ArgumentList::IsListAt(int32 index) const
 {
-	if (index >= 0 && index < CountItems()) {
-		if (ListArgument* argument = dynamic_cast<ListArgument*>(ItemAt(index)))
-			return true;
-	}
-	return false;
+	return index >= 0 && index < CountItems()
+		&& dynamic_cast<ListArgument*>(ItemAt(index)) != NULL;
 }
 
 
@@ -101,15 +111,15 @@ ArgumentList::IsListAt(int32 index, char kind) const
 }
 
 
-int32
-ArgumentList::IntegerAt(int32 index) const
+uint32
+ArgumentList::NumberAt(int32 index) const
 {
-	return atoi(StringAt(index).String());
+	return atoul(StringAt(index).String());
 }
 
 
 bool
-ArgumentList::IsIntegerAt(int32 index) const
+ArgumentList::IsNumberAt(int32 index) const
 {
 	BString string = StringAt(index);
 	for (int32 i = 0; i < string.Length(); i++) {
@@ -209,11 +219,6 @@ ParseException::ParseException(const char* message)
 }
 
 
-ParseException::~ParseException()
-{
-}
-
-
 // #pragma mark -
 
 
@@ -222,6 +227,19 @@ ExpectedParseException::ExpectedParseException(char expected, char instead)
 	snprintf(fBuffer, sizeof(fBuffer), "Expected \"%c\", but got \"%c\"!",
 		expected, instead);
 	fMessage = fBuffer;
+}
+
+
+// #pragma mark -
+
+
+LiteralHandler::LiteralHandler()
+{
+}
+
+
+LiteralHandler::~LiteralHandler()
+{
 }
 
 
@@ -242,9 +260,12 @@ Response::~Response()
 
 
 void
-Response::SetTo(const char* line) throw(ParseException)
+Response::Parse(ConnectionReader& reader, const char* line,
+	LiteralHandler* handler) throw(ParseException)
 {
 	MakeEmpty();
+	fReader = &reader;
+	fLiteralHandler = handler;
 	fTag = 0;
 	fContinuation = false;
 
@@ -384,8 +405,24 @@ Response::ParseQuoted(ArgumentList& arguments, const char*& line)
 void
 Response::ParseLiteral(ArgumentList& arguments, const char*& line)
 {
-	// TODO!
-	throw ParseException("Literals are not yet supported!");
+	Consume(line, '{');
+	off_t size = atoll(ExtractString(line));
+	Consume(line, '}');
+	Consume(line, '\r');
+	Consume(line, '\n');
+
+	if (fLiteralHandler != NULL)
+		fLiteralHandler->HandleLiteral(*fReader, size);
+	else {
+		// The default implementation just throws the data away
+		BMallocIO stream;
+		TRACE("Trying to read literal with %llu bytes.\n", size);
+		status_t status = fReader->ReadToStream(size, stream);
+		if (status == B_OK) {
+			TRACE("LITERAL: %-*s\n", (int)size, (char*)stream.Buffer());
+		} else
+			TRACE("Reading literal failed: %s\n", strerror(status));
+	}
 }
 
 
@@ -401,6 +438,7 @@ Response::ExtractString(const char*& line)
 {
 	const char* start = line;
 
+	// TODO: parse modified UTF-7 as described in RFC 3501, 5.1.3
 	while (line[0] != '\0') {
 		char c = line[0];
 		if (c <= ' ' || strchr("()[]{}\"", c) != NULL)
@@ -410,6 +448,54 @@ Response::ExtractString(const char*& line)
 	}
 
 	throw ParseException("Unexpected end of string");
+}
+
+
+// #pragma mark -
+
+
+ResponseParser::ResponseParser(ConnectionReader& reader)
+	:
+	fLiteralHandler(NULL)
+{
+	SetTo(reader);
+}
+
+
+ResponseParser::~ResponseParser()
+{
+}
+
+
+void
+ResponseParser::SetTo(ConnectionReader& reader)
+{
+	fReader = &reader;
+}
+
+
+void
+ResponseParser::SetLiteralHandler(LiteralHandler* handler)
+{
+	fLiteralHandler = handler;
+}
+
+
+status_t
+ResponseParser::NextResponse(Response& response, bigtime_t timeout)
+	throw(ParseException)
+{
+	BString line;
+	status_t status = fReader->GetNextLine(line, timeout);
+	if (status != B_OK) {
+		TRACE("S: read error %s", line.String());
+		return status;
+	}
+
+	TRACE("S: %s", line.String());
+	response.Parse(*fReader, line, fLiteralHandler);
+
+	return B_OK;
 }
 
 

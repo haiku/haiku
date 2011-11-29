@@ -21,12 +21,10 @@ local sources =
 	IMAPRootInboundProtocol.cpp
 	IMAPFolderConfig.cpp
 	# imap_lib
-	IMAPFolders.cpp
-	IMAPHandler.cpp
-	IMAPMailbox.cpp
-	IMAPParser.cpp
-	IMAPProtocol.cpp
+	Commands.cpp
+	Protocol.cpp
 	IMAPStorage.cpp
+	Response.cpp
 ;
 
 AddResources IMAP : IMAP.rdef ;
@@ -46,8 +44,8 @@ Addon IMAP
 		libshared.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
 
-SEARCH on [ FGristFiles IMAPFolders.cpp IMAPHandler.cpp IMAPMailbox.cpp
-	IMAPParser.cpp IMAPProtocol.cpp IMAPStorage.cpp ServerConnection.cpp ]
+SEARCH on [ FGristFiles Commands.cpp IMAPMailbox.cpp
+		IMAPProtocol.cpp IMAPStorage.cpp Response.cpp ]
 	= [ FDirName $(HAIKU_TOP) src add-ons mail_daemon inbound_protocols imap
 		imap_lib ] ;
 

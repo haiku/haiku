@@ -5,15 +5,11 @@
  */
 
 
-#include "IMAPHandler.h"
+#include "Commands.h"
 
 #include <stdlib.h>
 
 #include <AutoDeleter.h>
-
-#include "IMAPMailbox.h"
-#include "IMAPParser.h"
-#include "IMAPStorage.h"
 
 
 #define DEBUG_IMAP_HANDLER
@@ -28,28 +24,82 @@
 using namespace BPrivate;
 
 
-IMAPCommand::~IMAPCommand()
-{
-}
+namespace IMAP {
 
 
-BString
-IMAPCommand::Command()
-{
-	return "";
-}
+static HandlerListener sEmptyHandler;
 
 
-IMAPMailboxCommand::IMAPMailboxCommand(IMAPMailbox& mailbox)
+Handler::Handler()
 	:
-	fIMAPMailbox(mailbox),
-	fStorage(mailbox.GetStorage()),
-	fConnectionReader(mailbox.GetConnectionReader())
+	fListener(&sEmptyHandler)
 {
 }
 
 
-IMAPMailboxCommand::~IMAPMailboxCommand()
+Handler::~Handler()
+{
+}
+
+
+void
+Handler::SetListener(HandlerListener& listener)
+{
+	fListener = &listener;
+}
+
+
+IMAP::LiteralHandler*
+Handler::LiteralHandler()
+{
+	return NULL;
+}
+
+
+// #pragma mark -
+
+
+Command::~Command()
+{
+}
+
+
+status_t
+Command::HandleTagged(Response& response)
+{
+	if (response.StringAt(0) == "OK")
+		return B_OK;
+	if (response.StringAt(0) == "BAD")
+		return B_BAD_VALUE;
+	if (response.StringAt(0) == "NO")
+		return B_NOT_ALLOWED;
+
+	return B_ERROR;
+}
+
+
+// #pragma mark -
+
+
+HandlerListener::~HandlerListener()
+{
+}
+
+
+void
+HandlerListener::ExpungeReceived(int32 number)
+{
+}
+
+
+void
+HandlerListener::ExistsReceived(int32 number)
+{
+}
+
+
+void
+HandlerListener::FetchBody(Command& command, int32 size)
 {
 }
 
@@ -57,19 +107,83 @@ IMAPMailboxCommand::~IMAPMailboxCommand()
 // #pragma mark -
 
 
-MailboxSelectHandler::MailboxSelectHandler(IMAPMailbox& mailbox)
+RawCommand::RawCommand(const BString& command)
 	:
-	IMAPMailboxCommand(mailbox),
-
-	fMailboxName(""),
-	fNextUID(-1),
-	fUIDValidity(-1)
+	fCommand(command)
 {
 }
 
 
 BString
-MailboxSelectHandler::Command()
+RawCommand::CommandString()
+{
+	return fCommand;
+}
+
+
+// #pragma mark -
+
+
+LoginCommand::LoginCommand(const char* user, const char* password)
+	:
+	fUser(user),
+	fPassword(password)
+{
+}
+
+
+BString
+LoginCommand::CommandString()
+{
+	BString command = "LOGIN ";
+	command << "\"" << fUser << "\" " << "\"" << fPassword << "\"";
+
+	return command;
+}
+
+
+bool
+LoginCommand::HandleUntagged(Response& response)
+{
+	if (!response.EqualsAt(0, "OK") || !response.IsListAt(1, '['))
+		return false;
+
+	// TODO: we only support capabilities at the moment
+	ArgumentList& list = response.ListAt(1);
+	if (!list.EqualsAt(0, "CAPABILITY"))
+		return false;
+
+	fCapabilities.MakeEmpty();
+	while (list.CountItems() > 1)
+		fCapabilities.AddItem(list.RemoveItemAt(1));
+
+	TRACE("CAPABILITY: %s\n", fCapabilities.ToString().String());
+	return true;
+}
+
+
+// #pragma mark -
+
+
+SelectCommand::SelectCommand()
+	:
+	fNextUID(0),
+	fUIDValidity(0)
+{
+}
+
+
+SelectCommand::SelectCommand(const char* name)
+	:
+	fMailboxName(name),
+	fNextUID(0),
+	fUIDValidity(0)
+{
+}
+
+
+BString
+SelectCommand::CommandString()
 {
 	if (fMailboxName == "")
 		return "";
@@ -82,21 +196,19 @@ MailboxSelectHandler::Command()
 
 
 bool
-MailboxSelectHandler::Handle(const BString& response)
+SelectCommand::HandleUntagged(Response& response)
 {
-	BString extracted = IMAPParser::ExtractStringAfter(response,
-		"* OK [UIDVALIDITY");
-	if (extracted != "") {
-		fUIDValidity = IMAPParser::RemoveIntegerFromLeft(extracted);
-		TRACE("UIDValidity %i\n", (int)fUIDValidity);
-		return true;
-	}
-
-	extracted = IMAPParser::ExtractStringAfter(response, "* OK [UIDNEXT");
-	if (extracted != "") {
-		fNextUID = IMAPParser::RemoveIntegerFromLeft(extracted);
-		TRACE("NextUID %i\n", (int)fNextUID);
-		return true;
+	if (response.EqualsAt(0, "OK") && response.IsListAt(1, '[')) {
+		const ArgumentList& arguments = response.ListAt(1);
+		if (arguments.EqualsAt(0, "UIDVALIDITY")
+			&& arguments.IsNumberAt(1)) {
+			fUIDValidity = arguments.NumberAt(1);
+			return true;
+		} else if (arguments.EqualsAt(0, "UIDNEXT")
+			&& arguments.IsNumberAt(1)) {
+			fNextUID = arguments.NumberAt(1);
+			return true;
+		}
 	}
 
 	return false;
@@ -106,42 +218,94 @@ MailboxSelectHandler::Handle(const BString& response)
 // #pragma mark -
 
 
-CapabilityHandler::CapabilityHandler()
-	:
-	fCapabilities("")
-{
-}
-
-
 BString
-CapabilityHandler::Command()
+CapabilityHandler::CommandString()
 {
 	return "CAPABILITY";
 }
 
 
 bool
-CapabilityHandler::Handle(const BString& response)
+CapabilityHandler::HandleUntagged(Response& response)
 {
-	BString cap = IMAPParser::ExtractStringAfter(response, "* CAPABILITY");
-	if (cap == "")
+	if (!response.IsCommand("CAPABILITY"))
 		return false;
-	fCapabilities = cap;
-	TRACE("CAPABILITY: %s\n", fCapabilities.String());
+
+	fCapabilities.MakeEmpty();
+	while (response.CountItems() > 1)
+		fCapabilities.AddItem(response.RemoveItemAt(1));
+
+	TRACE("CAPABILITY: %s\n", fCapabilities.ToString().String());
 	return true;
-}
-
-
-BString&
-CapabilityHandler::Capabilities()
-{
-	return fCapabilities;
 }
 
 
 // #pragma mark -
 
 
+FetchMessageEntriesCommand::FetchMessageEntriesCommand(
+	MessageEntryList& entries, uint32 from, uint32 to)
+	:
+	fEntries(entries),
+	fFrom(from),
+	fTo(to)
+{
+}
+
+
+BString
+FetchMessageEntriesCommand::CommandString()
+{
+	BString command = "UID FETCH ";
+	command << fFrom << ":" << fTo << " FLAGS";
+
+	return command;
+}
+
+
+bool
+FetchMessageEntriesCommand::HandleUntagged(Response& response)
+{
+	if (!response.EqualsAt(1, "FETCH") || !response.IsListAt(2))
+		return false;
+
+	MessageEntry entry;
+
+	ArgumentList& list = response.ListAt(2);
+	for (int32 i = 0; i < list.CountItems(); i += 2) {
+		if (list.EqualsAt(i, "UID") && list.IsNumberAt(i + 1))
+			entry.uid = list.NumberAt(i + 1);
+		else if (list.EqualsAt(i, "FLAGS") && list.IsListAt(i + 1)) {
+			// Parse flags
+			ArgumentList& flags = list.ListAt(i + 1);
+			printf("flags: %s\n", flags.ToString().String());
+			for (int32 j = 0; j < flags.CountItems(); j++) {
+				if (flags.EqualsAt(j, "\\Seen"))
+					entry.flags |= kSeen;
+				else if (flags.EqualsAt(j, "\\Answered"))
+					entry.flags |= kAnswered;
+				else if (flags.EqualsAt(j, "\\Flagged"))
+					entry.flags |= kFlagged;
+				else if (flags.EqualsAt(j, "\\Deleted"))
+					entry.flags |= kDeleted;
+				else if (flags.EqualsAt(j, "\\Draft"))
+					entry.flags |= kDraft;
+			}
+		}
+	}
+
+	if (entry.uid == 0)
+		return false;
+
+	fEntries.push_back(entry);
+	return true;
+}
+
+
+// #pragma mark -
+
+
+#if 0
 FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
 	int32 message, MinMessageList* list, BPositionIO** data)
 	:
@@ -170,7 +334,7 @@ FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
 
 
 BString
-FetchMinMessageCommand::Command()
+FetchMinMessageCommand::CommandString()
 {
 	if (fMessage <= 0)
 		return "";
@@ -186,7 +350,7 @@ FetchMinMessageCommand::Command()
 
 
 bool
-FetchMinMessageCommand::Handle(const BString& response)
+FetchMinMessageCommand::HandleUntagged(const BString& response)
 {
 	BString extracted = response;
 	int32 message;
@@ -256,47 +420,6 @@ FetchMinMessageCommand::ExtractFlags(const BString& response)
 // #pragma mark -
 
 
-FetchMessageListCommand::FetchMessageListCommand(IMAPMailbox& mailbox,
-	MinMessageList* list, int32 nextId)
-	:
-	IMAPMailboxCommand(mailbox),
-
-	fMinMessageList(list),
-	fNextId(nextId)
-{
-}
-
-
-BString
-FetchMessageListCommand::Command()
-{
-	BString command = "UID FETCH 1:";
-	command << fNextId - 1;
-	command << " FLAGS";
-	return command;
-}
-
-
-bool
-FetchMessageListCommand::Handle(const BString& response)
-{
-	BString extracted = response;
-	int32 message;
-	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
-		return false;
-
-	MinMessage minMessage;
-	if (!FetchMinMessageCommand::ParseMinMessage(extracted, minMessage))
-		return false;
-
-	fMinMessageList->push_back(minMessage);
-	return true;
-}
-
-
-// #pragma mark -
-
-
 FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox, int32 message,
 	BPositionIO* data, int32 fetchBodyLimit)
 	:
@@ -335,7 +458,7 @@ FetchMessageCommand::~FetchMessageCommand()
 
 
 BString
-FetchMessageCommand::Command()
+FetchMessageCommand::CommandString()
 {
 	BString command = "FETCH ";
 	command << fMessage;
@@ -349,7 +472,7 @@ FetchMessageCommand::Command()
 
 
 bool
-FetchMessageCommand::Handle(const BString& response)
+FetchMessageCommand::HandleUntagged(const BString& response)
 {
 	BString extracted = response;
 	int32 message;
@@ -454,7 +577,7 @@ FetchBodyCommand::~FetchBodyCommand()
 
 
 BString
-FetchBodyCommand::Command()
+FetchBodyCommand::CommandString()
 {
 	BString command = "FETCH ";
 	command << fMessage;
@@ -464,7 +587,7 @@ FetchBodyCommand::Command()
 
 
 bool
-FetchBodyCommand::Handle(const BString& response)
+FetchBodyCommand::HandleUntagged(const BString& response)
 {
 	if (response.FindFirst("FETCH") < 0)
 		return false;
@@ -521,7 +644,7 @@ SetFlagsCommand::SetFlagsCommand(IMAPMailbox& mailbox, int32 message,
 
 
 BString
-SetFlagsCommand::Command()
+SetFlagsCommand::CommandString()
 {
 	BString command = "STORE ";
 	command << fMessage;
@@ -533,7 +656,7 @@ SetFlagsCommand::Command()
 
 
 bool
-SetFlagsCommand::Handle(const BString& response)
+SetFlagsCommand::HandleUntagged(const BString& response)
 {
 	return false;
 }
@@ -576,7 +699,7 @@ AppendCommand::AppendCommand(IMAPMailbox& mailbox, BPositionIO& message,
 
 
 BString
-AppendCommand::Command()
+AppendCommand::CommandString()
 {
 	BString command = "APPEND ";
 	command << fIMAPMailbox.Mailbox();
@@ -591,7 +714,7 @@ AppendCommand::Command()
 
 
 bool
-AppendCommand::Handle(const BString& response)
+AppendCommand::HandleUntagged(const BString& response)
 {
 	if (response.FindFirst("+") != 0)
 		return false;
@@ -614,21 +737,27 @@ AppendCommand::Handle(const BString& response)
 	fIMAPMailbox.SendRawData(CRLF, strlen(CRLF));
 	return true;
 }
+#endif
 
 
 // #pragma mark -
 
 
-ExistsHandler::ExistsHandler(IMAPMailbox& mailbox)
-	:
-	IMAPMailboxCommand(mailbox)
+ExistsHandler::ExistsHandler()
 {
 }
 
 
 bool
-ExistsHandler::Handle(const BString& response)
+ExistsHandler::HandleUntagged(Response& response)
 {
+	if (!response.EqualsAt(1, "EXISTS") || response.IsNumberAt(0))
+		return false;
+
+	int32 expunge = response.NumberAt(0);
+	Listener().ExistsReceived(expunge);
+
+#if 0
 	if (response.FindFirst("EXISTS") < 0)
 		return false;
 
@@ -654,6 +783,7 @@ ExistsHandler::Handle(const BString& response)
 
 	TRACE("EXISTS %i\n", (int)exists);
 	fIMAPMailbox.SendRawCommand("DONE");
+#endif
 
 	return true;
 }
@@ -662,47 +792,36 @@ ExistsHandler::Handle(const BString& response)
 // #pragma mark -
 
 
-ExpungeCommmand::ExpungeCommmand(IMAPMailbox& mailbox)
-	:
-	IMAPMailboxCommand(mailbox)
+ExpungeCommand::ExpungeCommand()
 {
 }
 
 
 BString
-ExpungeCommmand::Command()
+ExpungeCommand::CommandString()
 {
 	return "EXPUNGE";
-}
-
-
-bool
-ExpungeCommmand::Handle(const BString& response)
-{
-	return false;
 }
 
 
 // #pragma mark -
 
 
-ExpungeHandler::ExpungeHandler(IMAPMailbox& mailbox)
-	:
-	IMAPMailboxCommand(mailbox)
+ExpungeHandler::ExpungeHandler()
 {
 }
 
 
 bool
-ExpungeHandler::Handle(const BString& response)
+ExpungeHandler::HandleUntagged(Response& response)
 {
-	if (response.FindFirst("EXPUNGE") < 0)
+	if (!response.EqualsAt(1, "EXPUNGE") || response.IsNumberAt(0))
 		return false;
 
-	int32 expunge = 0;
-	if (!IMAPParser::ExtractUntagedFromLeft(response, "EXPUNGE", expunge))
-		return false;
+	int32 expunge = response.NumberAt(0);
+	Listener().ExpungeReceived(expunge);
 
+#if 0
 	// remove from storage
 	IMAPStorage& storage = fIMAPMailbox.GetStorage();
 	storage.DeleteMessage(fIMAPMailbox.MessageNumberToUID(expunge));
@@ -717,6 +836,7 @@ ExpungeHandler::Handle(const BString& response)
 	// the watching loop restarts again, we need to watch again to because
 	// some IDLE implementation stop sending notifications
 	fIMAPMailbox.SendRawCommand("DONE");
+#endif
 	return true;
 }
 
@@ -724,6 +844,7 @@ ExpungeHandler::Handle(const BString& response)
 // #pragma mark -
 
 
+#if 0
 FlagsHandler::FlagsHandler(IMAPMailbox& mailbox)
 	:
 	IMAPMailboxCommand(mailbox)
@@ -732,7 +853,7 @@ FlagsHandler::FlagsHandler(IMAPMailbox& mailbox)
 
 
 bool
-FlagsHandler::Handle(const BString& response)
+FlagsHandler::HandleUntagged(const BString& response)
 {
 	if (response.FindFirst("FETCH") < 0)
 		return false;
@@ -749,13 +870,14 @@ FlagsHandler::Handle(const BString& response)
 
 	return true;
 }
+#endif
 
 
 // #pragma mark -
 
 
 BString
-ListCommand::Command()
+ListCommand::CommandString()
 {
 	fFolders.clear();
 	return "LIST \"\" \"*\"";
@@ -763,9 +885,14 @@ ListCommand::Command()
 
 
 bool
-ListCommand::Handle(const BString& response)
+ListCommand::HandleUntagged(Response& response)
 {
-	return ParseList("LIST", response, fFolders);
+	if (response.IsCommand("LIST") && response.IsStringAt(3)) {
+		fFolders.push_back(response.StringAt(3));
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -776,41 +903,11 @@ ListCommand::FolderList()
 }
 
 
-bool
-ListCommand::ParseList(const char* command, const BString& response,
-	StringList& list)
-{
-	int32 textPos = response.FindFirst(command);
-	if (textPos < 0)
-		return false;
-	BString extracted = response;
-
-	extracted.Remove(0, textPos + strlen(command) + 1);
-	extracted.Trim();
-	if (extracted[0] == '(') {
-		BString flags = IMAPParser::ExtractBetweenBrackets(extracted, "(", ")");
-		if (flags.IFindFirst("\\Noselect") >= 0)
-			return true;
-		textPos = extracted.FindFirst(")");
-		extracted.Remove(0, textPos + 1);
-	}
-
-	IMAPParser::RemovePrimitiveFromLeft(extracted);
-	extracted.Trim();
-	// remove quotation marks
-	extracted.Remove(0, 1);
-	extracted.Truncate(extracted.Length() - 1);
-
-	list.push_back(extracted);
-	return true;
-}
-
-
 // #pragma mark -
 
 
 BString
-ListSubscribedCommand::Command()
+ListSubscribedCommand::CommandString()
 {
 	fFolders.clear();
 	return "LSUB \"\" \"*\"";
@@ -818,9 +915,14 @@ ListSubscribedCommand::Command()
 
 
 bool
-ListSubscribedCommand::Handle(const BString& response)
+ListSubscribedCommand::HandleUntagged(Response& response)
 {
-	return ListCommand::ParseList("LSUB", response, fFolders);
+	if (response.IsCommand("LSUB") && response.IsStringAt(3)) {
+		fFolders.push_back(response.StringAt(3));
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -842,19 +944,12 @@ SubscribeCommand::SubscribeCommand(const char* mailboxName)
 
 
 BString
-SubscribeCommand::Command()
+SubscribeCommand::CommandString()
 {
 	BString command = "SUBSCRIBE \"";
 	command += fMailboxName;
 	command += "\"";
 	return command;
-}
-
-
-bool
-SubscribeCommand::Handle(const BString& response)
-{
-	return false;
 }
 
 
@@ -869,19 +964,12 @@ UnsubscribeCommand::UnsubscribeCommand(const char* mailboxName)
 
 
 BString
-UnsubscribeCommand::Command()
+UnsubscribeCommand::CommandString()
 {
 	BString command = "UNSUBSCRIBE \"";
 	command += fMailboxName;
 	command += "\"";
 	return command;
-}
-
-
-bool
-UnsubscribeCommand::Handle(const BString& response)
-{
-	return false;
 }
 
 
@@ -898,7 +986,7 @@ GetQuotaCommand::GetQuotaCommand(const char* mailboxName)
 
 
 BString
-GetQuotaCommand::Command()
+GetQuotaCommand::CommandString()
 {
 	BString command = "GETQUOTA \"";
 	command += fMailboxName;
@@ -908,15 +996,14 @@ GetQuotaCommand::Command()
 
 
 bool
-GetQuotaCommand::Handle(const BString& response)
+GetQuotaCommand::HandleUntagged(Response& response)
 {
-	if (response.FindFirst("QUOTA") < 0)
+	if (!response.IsCommand("QUOTA") || response.IsListAt(1))
 		return false;
 
-	BString data = IMAPParser::ExtractBetweenBrackets(response, "(", ")");
-	IMAPParser::RemovePrimitiveFromLeft(data);
-	fUsedStorage = (uint64)IMAPParser::RemoveIntegerFromLeft(data) * 1024;
-	fTotalStorage = (uint64)IMAPParser::RemoveIntegerFromLeft(data) * 1024;
+	const ArgumentList& arguments = response.ListAt(1);
+	fUsedStorage = (uint64)arguments.NumberAt(0) * 1024;
+	fTotalStorage = (uint64)arguments.NumberAt(1) * 1024;
 
 	return true;
 }
@@ -934,3 +1021,6 @@ GetQuotaCommand::TotalStorage()
 {
 	return fTotalStorage;
 }
+
+
+}	// namespace

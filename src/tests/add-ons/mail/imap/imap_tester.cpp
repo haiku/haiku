@@ -1,14 +1,22 @@
-#include "IMAPFolders.h"
-#include "IMAPMailbox.h"
-#include "IMAPStorage.h"
+/*
+ * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include <stdlib.h>
+
+//#include "IMAPStorage.h"
+#include "Protocol.h"
+#include "Response.h"
 
 #include "argv.h"
 
 
 struct cmd_entry {
-	char*	name;
-	void	(*func)(int argc, char **argv);
-	char*	help;
+	const char*	name;
+	void		(*func)(int argc, char **argv);
+	const char*	help;
 };
 
 
@@ -18,8 +26,8 @@ static void do_help(int argc, char** argv);
 extern const char* __progname;
 static const char* kProgramName = __progname;
 
-static IMAPStorage sStorage;
-static IMAPMailbox sMailbox(sStorage);
+//static IMAPStorage sStorage;
+static IMAP::Protocol sMailbox;//(/*sStorage*/);
 
 
 static void
@@ -56,16 +64,46 @@ do_select(int argc, char** argv)
 static void
 do_folders(int argc, char** argv)
 {
-	IMAPFolders folder(sMailbox);
-	FolderList folders;
-	status_t status = folder.GetFolders(folders);
-	if (status != B_OK)
+	IMAP::FolderList folders;
+
+	status_t status = sMailbox.GetFolders(folders);
+	if (status != B_OK) {
 		error("folders", status);
+		return;
+	}
 
 	for (size_t i = 0; i < folders.size(); i++) {
 		printf(" %s %s\n", folders[i].subscribed ? "*" : " ",
 			folders[i].folder.String());
 	}
+}
+
+
+static void
+do_flags(int argc, char** argv)
+{
+	uint32 from = 1;
+	uint32 to;
+	if (argc < 2) {
+		printf("usage: %s [<from>] [<to>]\n", argv[0]);
+		return;
+	}
+	if (argc > 2) {
+		from = atoul(argv[1]);
+		to = atoul(argv[2]);
+	} else
+		to = atoul(argv[1]);
+
+	IMAP::MessageEntryList entries;
+	IMAP::FetchMessageEntriesCommand command(entries, from, to);
+	status_t status = sMailbox.ProcessCommand(command);
+	if (status != B_OK) {
+		error("flags", status);
+		return;
+	}
+
+	for (size_t i = 0; i < entries.size(); i++)
+		printf(" %lu %lx\n", entries[i].uid, entries[i].flags);
 }
 
 
@@ -82,7 +120,7 @@ do_raw(int argc, char** argv)
 		strlcat(command, argv[i], sizeof(command));
 	}
 
-	class RawCommand : public IMAPCommand {
+	class RawCommand : public IMAP::Command, public IMAP::Handler {
 	public:
 		RawCommand(const char* command)
 			:
@@ -90,13 +128,18 @@ do_raw(int argc, char** argv)
 		{
 		}
 
-		BString Command()
+		BString CommandString()
 		{
 			return fCommand;
 		}
 
-		bool Handle(const BString& response)
+		bool HandleUntagged(IMAP::Response& response)
 		{
+			if (response.IsCommand(fCommand)) {
+				printf("-> %s\n", response.ToString().String());
+				return true;
+			}
+
 			return false;
 		}
 
@@ -104,7 +147,7 @@ do_raw(int argc, char** argv)
 		const char* fCommand;
 	};
 	RawCommand rawCommand(command);
-	status_t status = sMailbox.ProcessCommand(&rawCommand, 60 * 1000);
+	status_t status = sMailbox.ProcessCommand(rawCommand);
 	if (status != B_OK)
 		error("raw", status);
 }
@@ -113,6 +156,8 @@ do_raw(int argc, char** argv)
 static cmd_entry sBuiltinCommands[] = {
 	{"select", do_select, "Selects a mailbox, defaults to INBOX"},
 	{"folders", do_folders, "List of existing folders"},
+	{"flags", do_flags,
+		"List of all mail UIDs in the mailbox with their flags"},
 	{"raw", do_raw, "Issue a raw command to the server"},
 	{"help", do_help, "prints this help text"},
 	{"quit", NULL, "exits the application"},
@@ -145,11 +190,13 @@ main(int argc, char** argv)
 	const char* user = argv[2];
 	const char* password = argv[3];
 	bool useSSL = argc > 4;
-	uint16 port = useSSL ? 995 : 143;
+	uint16 port = useSSL ? 993 : 143;
 
-	printf("Connecting to \"%s\" as %s\n", server, user);
+	BNetworkAddress address(AF_INET, server, port);
+	printf("Connecting to \"%s\" as %s%s, port %u\n", server, user,
+		useSSL ? " with SSL" : "", address.Port());
 
-	status_t status = sMailbox.Connect(server, user, password, useSSL, port);
+	status_t status = sMailbox.Connect(address, user, password, useSSL);
 	if (status != B_OK) {
 		error("connect", status);
 		return 1;

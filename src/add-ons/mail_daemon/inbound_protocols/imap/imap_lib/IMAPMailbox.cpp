@@ -43,7 +43,6 @@ IMAPMailbox::IMAPMailbox(IMAPStorage& storage)
 
 	fFetchBodyLimit(0)
 {
-	fHandlerList.AddItem(&fCapabilityHandler);
 	fIMAPMailboxListener = &fNULLListener;
 }
 
@@ -61,27 +60,6 @@ IMAPMailbox::SetListener(IMAPMailboxListener* listener)
 		fIMAPMailboxListener = &fNULLListener;
 	else
 		fIMAPMailboxListener = listener;
-}
-
-
-status_t
-IMAPMailbox::SelectMailbox(const char* mailbox)
-{
-	TRACE("SELECT %s\n", mailbox);
-	fMailboxSelectHandler.SetTo(mailbox);
-	status_t status = ProcessCommand(&fMailboxSelectHandler);
-	if (status != B_OK)
-		return status;
-	fSelectedMailbox = mailbox;
-
-	if (fCapabilityHandler.Capabilities() != "")
-		return status;
-	//else get them
-	status = ProcessCommand(fCapabilityHandler.Command());
-	if (status != B_OK)
-		return status;
-
-	return B_OK;
 }
 
 
@@ -239,7 +217,7 @@ IMAPMailbox::FetchMessages(int32 firstMessage, int32 lastMessage)
 status_t
 IMAPMailbox::FetchBody(int32 messageNumber)
 {
-	if (fStorage.BodyFetched(MessageNumberToUID(messageNumber)))
+	if (fStorage.IsBodyFetched(MessageNumberToUID(messageNumber)))
 		return B_BAD_VALUE;
 
 	BPositionIO* file;

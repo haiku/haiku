@@ -8,8 +8,20 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons mail_daemon inbound_protocols
 	imap imap_lib ] ;
 
-local libSources = IMAPFolders.cpp IMAPHandler.cpp IMAPMailbox.cpp
-	IMAPParser.cpp IMAPProtocol.cpp IMAPStorage.cpp ;
+local libSources = Commands.cpp Protocol.cpp Response.cpp ;
+#IMAPStorage.cpp
+
+# use OpenSSL, if enabled
+if $(HAIKU_OPENSSL_ENABLED) {
+	SubDirC++Flags -DUSE_SSL ;
+	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
+}
 
 SimpleTest imap_tester :
 	imap_tester.cpp
@@ -18,7 +30,7 @@ SimpleTest imap_tester :
 	# from fs_shell
 	argv.c
 
-	: be [ TargetLibsupc++ ] mail
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] bnetapi mail
 ;
 
 SEARCH on [ FGristFiles $(libSources) ]

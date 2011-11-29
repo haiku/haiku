@@ -14,7 +14,7 @@
 
 #include <MailSettings.h>
 
-#include "IMAPFolders.h"
+#include "Protocol.h"
 
 
 class FolderConfigWindow : public BWindow {
@@ -28,11 +28,11 @@ private:
 			void				_LoadFolders();
 			void				_ApplyChanges();
 
-			IMAPFolders			fIMAPFolders;
+			IMAP::Protocol		fProtocol;
 			BListView*			fFolderListView;
 			BButton*			fApplyButton;
 	const	BMessage			fSettings;
-			FolderList			fFolderList;
+			IMAP::FolderList	fFolderList;
 
 			BStringView*		fQuotaView;
 };

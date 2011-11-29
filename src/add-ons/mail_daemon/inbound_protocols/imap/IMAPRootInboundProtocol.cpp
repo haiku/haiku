@@ -9,8 +9,6 @@
 
 #include <Messenger.h>
 
-#include "IMAPFolders.h"
-
 
 IMAPRootInboundProtocol::IMAPRootInboundProtocol(BMailAccountSettings* settings)
 	:
@@ -34,9 +32,8 @@ IMAPRootInboundProtocol::Connect(const char* server, const char* username,
 	if (status != B_OK)
 		return status;
 
-	IMAPFolders folder(fIMAPMailbox);
 	FolderList folders;
-	folder.GetFolders(folders);
+	fIMAPMailbox.GetFolders(folders);
 	for (unsigned int i = 0; i < folders.size(); i++) {
 		if (!folders[i].subscribed || folders[i].folder == "INBOX")
 			continue;

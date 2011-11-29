@@ -30,7 +30,7 @@ public:
 class IMAPStorage;
 
 
-class IMAPMailbox : public IMAPProtocol {
+class IMAPMailbox : public IMAP::Protocol {
 public:
 								IMAPMailbox(IMAPStorage& storage);
 								~IMAPMailbox();
@@ -39,7 +39,6 @@ public:
 			IMAPMailboxListener&	Listener() { return *fIMAPMailboxListener; }
 
 			/*! Select mailbox and sync with the storage. */
-			status_t			SelectMailbox(const char* mailbox);
 			BString				Mailbox();
 			status_t			Sync();
 
@@ -68,7 +67,7 @@ public:
 
 			int32				GetCurrentMessageCount()
 									{ return fMessageList.size(); }
-	const	MinMessageList&		GetMessageList() { return fMessageList; }
+	const	IMAP::MinMessageList& GetMessageList() { return fMessageList; }
 			IMAPStorage&		GetStorage() { return fStorage; }
 
 			int32				UIDToMessageNumber(int32 uid);
@@ -78,17 +77,15 @@ public:
 private:
 			void				_InstallUnsolicitedHandler(bool install);
 
-			MinMessageList		fMessageList;
+			IMAP::MinMessageList fMessageList;
 
 			IMAPStorage&		fStorage;
 			IMAPMailboxListener* fIMAPMailboxListener;
 			IMAPMailboxListener	fNULLListener;
 
-			MailboxSelectHandler fMailboxSelectHandler;
-			CapabilityHandler	fCapabilityHandler;
-			ExistsHandler		fExistsHandler;
-			ExpungeHandler		fExpungeHandler;
-			FlagsHandler		fFlagsHandler;
+			IMAP::ExistsHandler		fExistsHandler;
+			IMAP::ExpungeHandler		fExpungeHandler;
+//			FlagsHandler		fFlagsHandler;
 
 			int32				fWatching;
 

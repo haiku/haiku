@@ -36,7 +36,7 @@ IMAPMailboxSync::Sync(IMAPStorage& storage, IMAPMailbox& mailbox)
 	const MinMessageList& messages = mailbox.GetMessageList();
 
 	for (MailEntryMap::const_iterator it = files.begin(); it != files.end();
-		it++) {
+			it++) {
 		const StorageMailEntry& mailEntry = (*it).second;
 		bool found = false;
 		for (unsigned int a = 0; a < messages.size(); a++) {
@@ -352,7 +352,7 @@ IMAPStorage::GetEntryForRef(const node_ref& ref)
 
 
 bool
-IMAPStorage::BodyFetched(int32 uid)
+IMAPStorage::IsBodyFetched(int32 uid)
 {
 	MailEntryMap::iterator it = fMailEntryMap.find(uid);
 	if (it == fMailEntryMap.end())
@@ -365,9 +365,8 @@ IMAPStorage::BodyFetched(int32 uid)
 	char buffer[B_MIME_TYPE_LENGTH];
 	BNodeInfo info(&node);
 	info.GetType(buffer);
-	if (strcmp(buffer, B_MAIL_TYPE) == 0)
-		return true;
-	return false;
+
+	return strcmp(buffer, B_MAIL_TYPE) == 0;
 }
 
 

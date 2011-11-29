@@ -329,9 +329,9 @@ FolderConfigWindow::_LoadFolders()
 		delete[] passwd;
 	}
 
-	fIMAPFolders.Connect(server, username, password, useSSL);
+	fProtocol.Connect(server, username, password, useSSL);
 	fFolderList.clear();
-	fIMAPFolders.GetFolders(fFolderList);
+	fProtocol.GetFolders(fFolderList);
 	for (unsigned int i = 0; i < fFolderList.size(); i++) {
 		FolderInfo& info = fFolderList[i];
 		CheckBoxItem* item = new CheckBoxItem(info.folder, info.subscribed);
@@ -340,7 +340,7 @@ FolderConfigWindow::_LoadFolders()
 	}
 
 	uint64 used, total;
-	if (fIMAPFolders.GetQuota(used, total) == B_OK) {
+	if (fProtocol.GetQuota(used, total) == B_OK) {
 		char buffer[256];
 		BString quotaString = "Server storage: ";
 		quotaString += string_for_size(used, buffer, 256);
@@ -377,9 +377,9 @@ FolderConfigWindow::_ApplyChanges()
 		FolderInfo& info = fFolderList[i];
 		CheckBoxItem* item = (CheckBoxItem*)fFolderListView->ItemAt(i);
 		if (info.subscribed && !item->Checked())
-			fIMAPFolders.UnsubscribeFolder(info.folder);
+			fProtocol.UnsubscribeFolder(info.folder);
 		else if (!info.subscribed && item->Checked())
-			fIMAPFolders.SubscribeFolder(info.folder);
+			fProtocol.SubscribeFolder(info.folder);
 	}
 
 	status->PostMessage(B_QUIT_REQUESTED);

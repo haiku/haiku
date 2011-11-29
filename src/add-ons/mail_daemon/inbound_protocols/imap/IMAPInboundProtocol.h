@@ -15,7 +15,7 @@
 
 #include "MailSettings.h"
 
-#include "IMAPMailbox.h"
+#include "Protocol.h"
 #include "IMAPStorage.h"
 
 
