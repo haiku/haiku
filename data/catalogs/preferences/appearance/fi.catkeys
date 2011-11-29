@@ -1,6 +1,6 @@
-1	finnish	x-vnd.Haiku-Appearance	3577998894
+1	finnish	x-vnd.Haiku-Appearance	168322075
 About	DecorSettingsView		Ohjelmasta
-About Decerator	DecorSettingsView		Koristeluohjelmasta
+About Decorator	DecorSettingsView		Koristeluohjelmasta
 Antialiasing	APRWindow		Reunanpehmennys
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
@@ -18,6 +18,7 @@ Failure	Colors tab		Epäonnistuminen
 Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:
 Grayscale	AntialiasingSettingsView		Harmaasävy
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
+Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
 Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
 Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
 LCD subpixel	AntialiasingSettingsView		LCD alipikseli
@@ -45,5 +46,6 @@ Tooltip background	Colors tab		Työkaluvinkin tausta
 Tooltip text	Colors tab		Työkaluvinkin teksti
 Window Decorator	APRWindow		Ikkunakoristelu
 Window Decorator:	DecorSettingsView		Ikkunakoristelu:
+Window border	Colors tab		Ikkunaraja
 Window tab	Colors tab		Ikkunakahva
 Window tab text	Colors tab		Ikkunakahvan teksti
