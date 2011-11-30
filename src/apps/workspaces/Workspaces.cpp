@@ -14,6 +14,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <Deskbar.h>
 #include <Dragger.h>
 #include <Entry.h>
 #include <File.h>
@@ -40,7 +41,9 @@
 #define B_TRANSLATE_CONTEXT "Workspaces"
 
 
+static const char* kDeskbarItemName = "workspaces";
 static const char* kSignature = "application/x-vnd.Be-WORK";
+static const char* kDeskbarSignature = "application/x-vnd.Be-TSKB";
 static const char* kScreenPrefletSignature = "application/x-vnd.Haiku-Screen";
 static const char* kOldSettingFile = "Workspace_data";
 static const char* kSettingsFile = "Workspaces_settings";
@@ -50,9 +53,11 @@ static const uint32 kMsgToggleTitle = 'tgTt';
 static const uint32 kMsgToggleBorder = 'tgBd';
 static const uint32 kMsgToggleAutoRaise = 'tgAR';
 static const uint32 kMsgToggleAlwaysOnTop = 'tgAT';
+static const uint32 kMsgToggleLiveInDeskbar = 'tgDb';
 
 static const float kScreenBorderOffset = 10.0;
 
+extern "C" _EXPORT BView* instantiate_deskbar_item();
 
 class WorkspacesSettings {
 	public:
@@ -89,7 +94,7 @@ class WorkspacesSettings {
 
 class WorkspacesView : public BView {
 	public:
-		WorkspacesView(BRect frame);
+		WorkspacesView(BRect frame, bool showDragger);
 		WorkspacesView(BMessage* archive);
 		~WorkspacesView();
 
@@ -331,19 +336,21 @@ WorkspacesSettings::SetWindowFrame(BRect frame)
 //	#pragma mark -
 
 
-WorkspacesView::WorkspacesView(BRect frame)
+WorkspacesView::WorkspacesView(BRect frame, bool showDragger=true)
 	:
-	BView(frame, "workspaces", B_FOLLOW_ALL,
+	BView(frame, kDeskbarItemName, B_FOLLOW_ALL,
 		kWorkspacesViewFlag | B_FRAME_EVENTS),
 	fParentWhichDrawsOnChildren(NULL),
 	fCurrentFrame(frame)
 {
-	frame.OffsetTo(B_ORIGIN);
-	frame.top = frame.bottom - 7;
-	frame.left = frame.right - 7;
-	BDragger* dragger = new BDragger(frame, this,
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(dragger);
+	if(showDragger) {
+		frame.OffsetTo(B_ORIGIN);
+		frame.top = frame.bottom - 7;
+		frame.left = frame.right - 7;
+		BDragger* dragger = new BDragger(frame, this,
+			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		AddChild(dragger);
+	}
 }
 
 
@@ -498,6 +505,16 @@ WorkspacesView::MessageReceived(BMessage* message)
 			be_roster->Launch(kScreenPrefletSignature);
 			break;
 
+		case kMsgToggleLiveInDeskbar:
+		{
+			// only actually used from the replicant itself
+			// since HasItem() locks up we just remove directly.
+			BDeskbar deskbar;
+			// we shouldn't do this here actually, but it works for now...
+			deskbar.RemoveItem (kDeskbarItemName);
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -554,6 +571,7 @@ WorkspacesView::MouseDown(BPoint where)
 
 	WorkspacesWindow* window = dynamic_cast<WorkspacesWindow*>(Window());
 	if (window != NULL) {
+		// inside Workspaces app
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
@@ -576,6 +594,12 @@ WorkspacesView::MouseDown(BPoint where)
 			new BMessage(kMsgToggleAutoRaise)));
 		if (window->IsAutoRaising())
 			item->SetMarked(true);
+		if (be_roster->IsRunning(kDeskbarSignature)) {
+			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
+			new BMessage(kMsgToggleLiveInDeskbar)));
+			BDeskbar deskbar;
+			item->SetMarked(deskbar.HasItem(kDeskbarItemName));
+		}
 
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(B_TRANSLATE("About Workspaces" 
@@ -583,6 +607,25 @@ WorkspacesView::MouseDown(BPoint where)
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
 			new BMessage(B_QUIT_REQUESTED)));
 		menu->SetTargetForItems(window);
+	} else {
+		// we're replicated in some way...
+		BMenuItem* item;
+
+		menu->AddSeparatorItem();
+
+		// check which way
+		BDragger *dragger = dynamic_cast<BDragger*>(ChildAt(0));
+		if (dragger) {
+			// replicant
+			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Remove replicant"),
+				new BMessage(B_TRASH_TARGET)));
+			item->SetTarget(dragger);
+		} else {
+			// Deskbar item
+			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Remove replicant"),
+				new BMessage(kMsgToggleLiveInDeskbar)));
+			item->SetTarget(this);
+		}
 	}
 
 	changeItem->SetTarget(this);
@@ -773,6 +816,19 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgToggleLiveInDeskbar:
+		{
+			BDeskbar deskbar;
+			if (deskbar.HasItem (kDeskbarItemName))
+				deskbar.RemoveItem (kDeskbarItemName);
+			else {
+				entry_ref ref;
+				be_roster->FindApp(kSignature, &ref);
+				deskbar.AddItem(&ref);
+			}
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -901,6 +957,12 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 				Quit();
 		}
 	}
+}
+
+
+BView* instantiate_deskbar_item()
+{
+	return new WorkspacesView(BRect (0, 0, 75, 15), false);
 }
 
 
