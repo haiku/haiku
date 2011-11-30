@@ -23,132 +23,6 @@
 namespace IMAP {
 
 
-ConnectionReader::ConnectionReader()
-	:
-	fSocket(NULL)
-{
-}
-
-
-void
-ConnectionReader::SetTo(BSocket& socket)
-{
-	fSocket = &socket;
-	fBufferedSocket = new BBufferedDataIO(socket, 32768, false, true);
-}
-
-
-status_t
-ConnectionReader::GetNextLine(BString& line, bigtime_t timeout,
-	int32 maxUnfinishedLine)
-{
-	line.SetTo((const char*)NULL, 0);
-
-	while (true) {
-		status_t status = _GetNextDataBunch(line, timeout);
-		if (status == B_OK)
-			return status;
-		if (status == B_NAME_NOT_FOUND) {
-			if (maxUnfinishedLine < 0 || line.Length() < maxUnfinishedLine)
-				continue;
-			else
-				return status;
-		}
-		return status;
-	}
-	return B_ERROR;
-}
-
-
-status_t
-ConnectionReader::FinishLine(BString& line)
-{
-	while (true) {
-		status_t status = _GetNextDataBunch(line, B_INFINITE_TIMEOUT);
-		if (status == B_OK)
-			return status;
-		if (status == B_NAME_NOT_FOUND)
-			continue;
-		return status;
-	}
-	return B_ERROR;
-}
-
-
-status_t
-ConnectionReader::ReadToStream(int32 size, BDataIO& out)
-{
-	const int32 kBunchSize = 1024; // 1Kb
-	char buffer[kBunchSize];
-
-	int32 readSize = size - fStringBuffer.Length();
-	int32 readed = fStringBuffer.Length();
-	if (readSize < 0) {
-		readed = size;
-	}
-	out.Write(fStringBuffer.String(), readed);
-	fStringBuffer.Remove(0, readed);
-
-	while (readSize > 0) {
-		int32 bunchSize = readSize < kBunchSize ? readSize : kBunchSize;
-		int nReaded = fBufferedSocket->Read(buffer, bunchSize);
-		if (nReaded < 0)
-			return B_ERROR;
-		readSize -= nReaded;
-		out.Write(buffer, nReaded);
-	}
-	return B_OK;
-}
-
-
-status_t
-ConnectionReader::_GetNextDataBunch(BString& line, bigtime_t timeout,
-	uint32 maxNewLength)
-{
-	if (_ExtractTillEndOfLine(line))
-		return B_OK;
-
-	char buffer[maxNewLength];
-//
-//	if (timeout != B_INFINITE_TIMEOUT) {
-//		status_t status = fSocket->WaitForReadable(timeout);
-//		if (status != B_OK)
-//			return status;
-//	}
-
-	int nReaded = fBufferedSocket->Read(buffer, maxNewLength);
-	if (nReaded <= 0)
-		return B_ERROR;
-
-	fStringBuffer.SetTo(buffer, nReaded);
-	if (_ExtractTillEndOfLine(line))
-		return B_OK;
-	return B_NAME_NOT_FOUND;
-}
-
-
-bool
-ConnectionReader::_ExtractTillEndOfLine(BString& out)
-{
-	int32 endPos = fStringBuffer.FindFirst('\n');
-	if (endPos == B_ERROR) {
-		endPos = fStringBuffer.FindFirst(xEOF);
-		if (endPos == B_ERROR) {
-			out += fStringBuffer;
-			fStringBuffer.SetTo((const char*)NULL, 0);
-			return false;
-		}
-	}
-	out.Append(fStringBuffer, endPos + 1);
-	fStringBuffer.Remove(0, endPos + 1);
-
-	return true;
-}
-
-
-// #pragma mark -
-
-
 Protocol::Protocol()
 	:
 	fSocket(NULL),
@@ -209,7 +83,6 @@ Protocol::Connect(const BNetworkAddress& address, const char* username,
 
 	TRACE("Login\n");
 
-	fConnectionReader.SetTo(*fSocket);
 	fIsConnected = true;
 
 	LoginCommand login(username, password);
@@ -400,7 +273,7 @@ status_t
 Protocol::HandleResponse(bigtime_t timeout, bool disconnectOnTimeout)
 {
 	status_t commandStatus = B_OK;
-	IMAP::ResponseParser parser(fConnectionReader);
+	IMAP::ResponseParser parser(*fBufferedSocket);
 	IMAP::Response response;
 
 	bool done = false;
@@ -437,7 +310,7 @@ Protocol::HandleResponse(bigtime_t timeout, bool disconnectOnTimeout)
 				} else
 					printf("Unknown tag S: %s\n", response.ToString().String());
 			}
-		} catch (IMAP::ParseException& exception) {
+		} catch (ParseException& exception) {
 			printf("Error during parsing: %s\n", exception.Message());
 		}
 

@@ -8,9 +8,6 @@
 
 #include <stdlib.h>
 
-#include "Protocol.h"
-	// TODO: remove again once the ConnectionReader is out
-
 
 #define TRACE_IMAP
 #ifdef TRACE_IMAP
@@ -206,15 +203,26 @@ StringArgument::ToString() const
 
 
 ParseException::ParseException()
-	:
-	fMessage(NULL)
 {
+	fBuffer[0] = '\0';
 }
 
 
-ParseException::ParseException(const char* message)
+ParseException::ParseException(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vsnprintf(fBuffer, sizeof(fBuffer), format, args);
+	va_end(args);
+}
+
+
+// #pragma mark -
+
+
+StreamException::StreamException(status_t status)
 	:
-	fMessage(message)
+	ParseException("Error from stream: %s", status)
 {
 }
 
@@ -224,9 +232,19 @@ ParseException::ParseException(const char* message)
 
 ExpectedParseException::ExpectedParseException(char expected, char instead)
 {
-	snprintf(fBuffer, sizeof(fBuffer), "Expected \"%c\", but got \"%c\"!",
-		expected, instead);
-	fMessage = fBuffer;
+	char bufferA[8];
+	char bufferB[8];
+	snprintf(fBuffer, sizeof(fBuffer), "Expected %s, but got %s instead!",
+		CharToString(bufferA, sizeof(bufferA), expected),
+		CharToString(bufferB, sizeof(bufferB), instead));
+}
+
+
+const char*
+ExpectedParseException::CharToString(char* buffer, size_t size, char c)
+{
+	snprintf(buffer, size, isprint(c) ? "\"%c\"" : "(%x)", c);
+	return buffer;
 }
 
 
@@ -249,7 +267,8 @@ LiteralHandler::~LiteralHandler()
 Response::Response()
 	:
 	fTag(0),
-	fContinuation(false)
+	fContinuation(false),
+	fHasNextChar(false)
 {
 }
 
@@ -260,33 +279,29 @@ Response::~Response()
 
 
 void
-Response::Parse(ConnectionReader& reader, const char* line,
-	LiteralHandler* handler) throw(ParseException)
+Response::Parse(BDataIO& stream, LiteralHandler* handler) throw(ParseException)
 {
 	MakeEmpty();
-	fReader = &reader;
 	fLiteralHandler = handler;
 	fTag = 0;
 	fContinuation = false;
+	fHasNextChar = false;
 
-	if (line[0] == '*') {
+	char begin = Next(stream);
+	if (begin == '*') {
 		// Untagged response
-		Consume(line, '*');
-		Consume(line, ' ');
-	} else if (line[0] == '+') {
+		Consume(stream, ' ');
+	} else if (begin == '+') {
 		// Continuation
-		Consume(line, '+');
 		fContinuation = true;
-	} else {
+	} else if (begin == 'A') {
 		// Tagged response
-		Consume(line, 'A');
-		fTag = strtoul(line, (char**)&line, 10);
-		if (line == NULL)
-			ParseException("Invalid tag!");
-		Consume(line, ' ');
-	}
+		fTag = ExtractNumber(stream);
+		Consume(stream, ' ');
+	} else
+		throw ParseException("Unexpected response begin");
 
-	char c = ParseLine(*this, line);
+	char c = ParseLine(*this, stream);
 	if (c != '\0')
 		throw ExpectedParseException('\0', c);
 }
@@ -300,44 +315,47 @@ Response::IsCommand(const char* command) const
 
 
 char
-Response::ParseLine(ArgumentList& arguments, const char*& line)
+Response::ParseLine(ArgumentList& arguments, BDataIO& stream)
 {
-	while (line[0] != '\0') {
-		char c = line[0];
+	while (true) {
+		char c = Peek(stream);
+		if (c == '\0')
+			break;
+
 		switch (c) {
 			case '(':
-				ParseList(arguments, line, '(', ')');
+				ParseList(arguments, stream, '(', ')');
 				break;
 			case '[':
-				ParseList(arguments, line, '[', ']');
+				ParseList(arguments, stream, '[', ']');
 				break;
 			case ')':
 			case ']':
-				Consume(line, c);
+				Consume(stream, c);
 				return c;
 			case '"':
-				ParseQuoted(arguments, line);
+				ParseQuoted(arguments, stream);
 				break;
 			case '{':
-				ParseLiteral(arguments, line);
+				ParseLiteral(arguments, stream);
 				break;
 
 			case ' ':
 			case '\t':
 				// whitespace
-				Consume(line, c);
+				Consume(stream, c);
 				break;
 
 			case '\r':
-				Consume(line, '\r');
-				Consume(line, '\n');
+				Consume(stream, '\r');
+				Consume(stream, '\n');
 				return '\0';
 			case '\n':
-				Consume(line, '\n');
+				Consume(stream, '\n');
 				return '\0';
 
 			default:
-				ParseString(arguments, line);
+				ParseString(arguments, stream);
 				break;
 		}
 	}
@@ -347,55 +365,38 @@ Response::ParseLine(ArgumentList& arguments, const char*& line)
 
 
 void
-Response::Consume(const char*& line, char c)
-{
-	if (line[0] != c)
-		throw ExpectedParseException(c, line[0]);
-
-	line++;
-}
-
-
-void
-Response::ParseList(ArgumentList& arguments, const char*& line, char start,
+Response::ParseList(ArgumentList& arguments, BDataIO& stream, char start,
 	char end)
 {
-	Consume(line, start);
+	Consume(stream, start);
 
 	ListArgument* argument = new ListArgument(start);
 	arguments.AddItem(argument);
 
-	char c = ParseLine(argument->List(), line);
+	char c = ParseLine(argument->List(), stream);
 	if (c != end)
 		throw ExpectedParseException(end, c);
 }
 
 
 void
-Response::ParseQuoted(ArgumentList& arguments, const char*& line)
+Response::ParseQuoted(ArgumentList& arguments, BDataIO& stream)
 {
-	Consume(line, '"');
+	Consume(stream, '"');
 
 	BString string;
-	char* output = string.LockBuffer(strlen(line));
-	int32 index = 0;
-
-	while (line[0] != '\0') {
-		char c = line[0];
+	while (true) {
+		char c = Next(stream);
 		if (c == '\\') {
-			line++;
-			if (line[0] == '\0')
-				break;
+			c = Next(stream);
 		} else if (c == '"') {
-			line++;
-			output[index] = '\0';
-			string.UnlockBuffer(index);
 			arguments.AddItem(new StringArgument(string));
 			return;
 		}
+		if (c == '\0')
+			break;
 
-		output[index++] = c;
-		line++;
+		string += c;
 	}
 
 	throw ParseException("Unexpected end of qouted string!");
@@ -403,62 +404,144 @@ Response::ParseQuoted(ArgumentList& arguments, const char*& line)
 
 
 void
-Response::ParseLiteral(ArgumentList& arguments, const char*& line)
+Response::ParseLiteral(ArgumentList& arguments, BDataIO& stream)
 {
-	Consume(line, '{');
-	off_t size = atoll(ExtractString(line));
-	Consume(line, '}');
-	Consume(line, '\r');
-	Consume(line, '\n');
+	Consume(stream, '{');
+	size_t size = ExtractNumber(stream);
+	Consume(stream, '}');
+	Consume(stream, '\r');
+	Consume(stream, '\n');
 
 	if (fLiteralHandler != NULL)
-		fLiteralHandler->HandleLiteral(*fReader, size);
+		fLiteralHandler->HandleLiteral(stream, size);
 	else {
-		// The default implementation just throws the data away
-		BMallocIO stream;
-		TRACE("Trying to read literal with %llu bytes.\n", size);
-		status_t status = fReader->ReadToStream(size, stream);
-		if (status == B_OK) {
-			TRACE("LITERAL: %-*s\n", (int)size, (char*)stream.Buffer());
-		} else
-			TRACE("Reading literal failed: %s\n", strerror(status));
+		// The default implementation just adds the data as a string
+		TRACE("Trying to read literal with %" B_PRIuSIZE " bytes.\n", size);
+		BString string;
+		char* buffer = string.LockBuffer(size);
+		if (buffer == NULL) {
+			throw ParseException("Not enough memory for literal of %"
+				B_PRIuSIZE " bytes.", size);
+		}
+
+		size_t totalRead = 0;
+		while (totalRead < size) {
+			ssize_t bytesRead = stream.Read(buffer + totalRead,
+				size - totalRead);
+			if (bytesRead == 0)
+				throw ParseException("Unexpected end of literal");
+			if (bytesRead < 0)
+				throw StreamException(bytesRead);
+
+			totalRead += bytesRead;
+		}
+
+		string.UnlockBuffer(size);
+		arguments.AddItem(new StringArgument(string));
 	}
 }
 
 
 void
-Response::ParseString(ArgumentList& arguments, const char*& line)
+Response::ParseString(ArgumentList& arguments, BDataIO& stream)
 {
-	arguments.AddItem(new StringArgument(ExtractString(line)));
+	arguments.AddItem(new StringArgument(ExtractString(stream)));
 }
 
 
 BString
-Response::ExtractString(const char*& line)
+Response::ExtractString(BDataIO& stream)
 {
-	const char* start = line;
+	BString string;
 
 	// TODO: parse modified UTF-7 as described in RFC 3501, 5.1.3
-	while (line[0] != '\0') {
-		char c = line[0];
+	while (true) {
+		char c = Peek(stream);
+		if (c == '\0')
+			break;
 		if (c <= ' ' || strchr("()[]{}\"", c) != NULL)
-			return BString(start, line - start);
+			return string;
 
-		line++;
+		string += Next(stream);
 	}
 
 	throw ParseException("Unexpected end of string");
 }
 
 
+size_t
+Response::ExtractNumber(BDataIO& stream)
+{
+	BString string = ExtractString(stream);
+
+	const char* end;
+	size_t number = strtoul(string.String(), (char**)&end, 10);
+	if (end == NULL || end[0] != '\0')
+		ParseException("Invalid number!");
+
+	return number;
+}
+
+
+void
+Response::Consume(BDataIO& stream, char expected)
+{
+	char c = Next(stream);
+	if (c != expected)
+		throw ExpectedParseException(expected, c);
+}
+
+
+char
+Response::Next(BDataIO& stream)
+{
+	if (fHasNextChar) {
+		fHasNextChar = false;
+		return fNextChar;
+	}
+
+	return Read(stream);
+}
+
+
+char
+Response::Peek(BDataIO& stream)
+{
+	if (fHasNextChar)
+		return fNextChar;
+
+	fNextChar = Read(stream);
+	fHasNextChar = true;
+
+	return fNextChar;
+}
+
+
+char
+Response::Read(BDataIO& stream)
+{
+	char c;
+	ssize_t bytesRead = stream.Read(&c, 1);
+	if (bytesRead == 1) {
+		printf("%c", c);
+		return c;
+	}
+
+	if (bytesRead == 0)
+		throw ParseException("Unexpected end of string");
+
+	throw StreamException(bytesRead);
+}
+
+
 // #pragma mark -
 
 
-ResponseParser::ResponseParser(ConnectionReader& reader)
+ResponseParser::ResponseParser(BDataIO& stream)
 	:
 	fLiteralHandler(NULL)
 {
-	SetTo(reader);
+	SetTo(stream);
 }
 
 
@@ -468,9 +551,9 @@ ResponseParser::~ResponseParser()
 
 
 void
-ResponseParser::SetTo(ConnectionReader& reader)
+ResponseParser::SetTo(BDataIO& stream)
 {
-	fReader = &reader;
+	fStream = &stream;
 }
 
 
@@ -485,16 +568,7 @@ status_t
 ResponseParser::NextResponse(Response& response, bigtime_t timeout)
 	throw(ParseException)
 {
-	BString line;
-	status_t status = fReader->GetNextLine(line, timeout);
-	if (status != B_OK) {
-		TRACE("S: read error %s", line.String());
-		return status;
-	}
-
-	TRACE("S: %s", line.String());
-	response.Parse(*fReader, line, fLiteralHandler);
-
+	response.Parse(*fStream, fLiteralHandler);
 	return B_OK;
 }
 

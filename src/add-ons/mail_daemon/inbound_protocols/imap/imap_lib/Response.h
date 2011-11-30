@@ -8,6 +8,7 @@
 
 #include <stdexcept>
 
+#include <DataIO.h>
 #include <ObjectList.h>
 #include <String.h>
 
@@ -16,7 +17,6 @@ namespace IMAP {
 
 
 class Argument;
-class ConnectionReader;
 
 
 class ArgumentList : public BObjectList<Argument> {
@@ -82,12 +82,18 @@ private:
 class ParseException : public std::exception {
 public:
 								ParseException();
-								ParseException(const char* message);
+								ParseException(const char* format, ...);
 
-			const char*			Message() const { return fMessage; }
+			const char*			Message() const { return fBuffer; }
 
 protected:
-			const char*			fMessage;
+			char				fBuffer[64];
+};
+
+
+class StreamException : public ParseException {
+public:
+								StreamException(status_t status);
 };
 
 
@@ -97,7 +103,7 @@ public:
 									char instead);
 
 protected:
-			char				fBuffer[64];
+			const char*			CharToString(char* buffer, size_t size, char c);
 };
 
 
@@ -106,8 +112,8 @@ public:
 								LiteralHandler();
 	virtual						~LiteralHandler();
 
-	virtual void				HandleLiteral(ConnectionReader& reader,
-									off_t length) = 0;
+	virtual void				HandleLiteral(BDataIO& stream,
+									size_t length) = 0;
 };
 
 
@@ -116,50 +122,60 @@ public:
 								Response();
 								~Response();
 
-			void				Parse(ConnectionReader& reader,
-									const char* line, LiteralHandler* handler)
-										throw(ParseException);
+			void				Parse(BDataIO& stream, LiteralHandler* handler)
+									throw(ParseException);
 
 			bool				IsUntagged() const { return fTag == 0; }
-			int32				Tag() const { return fTag; }
+			uint32				Tag() const { return fTag; }
 			bool				IsCommand(const char* command) const;
 			bool				IsContinuation() const { return fContinuation; }
 
 protected:
 			char				ParseLine(ArgumentList& arguments,
-									const char*& line);
-			void				Consume(const char*& line, char c);
+									BDataIO& stream);
 			void				ParseList(ArgumentList& arguments,
-									const char*& line, char start, char end);
+									BDataIO& stream, char start, char end);
 			void				ParseQuoted(ArgumentList& arguments,
-									const char*& line);
+									BDataIO& stream);
 			void				ParseLiteral(ArgumentList& arguments,
-									const char*& line);
+									BDataIO& stream);
 			void				ParseString(ArgumentList& arguments,
-									const char*& line);
-			BString				ExtractString(const char*& line);
+									BDataIO& stream);
+
+			BString				ExtractString(BDataIO& stream);
+			size_t				ExtractNumber(BDataIO& stream);
+
+			void				Consume(BDataIO& stream, char c);
+
+			char				Next(BDataIO& stream);
+			char				Peek(BDataIO& stream);
+			char				Read(BDataIO& stream);
 
 protected:
-			ConnectionReader*	fReader;
 			LiteralHandler*		fLiteralHandler;
-			int32				fTag;
+			uint32				fTag;
 			bool				fContinuation;
+			bool				fHasNextChar;
+			char				fNextChar;
 };
 
 
 class ResponseParser {
 public:
-								ResponseParser(ConnectionReader& reader);
+								ResponseParser(BDataIO& stream);
 								~ResponseParser();
 
-			void				SetTo(ConnectionReader& reader);
+			void				SetTo(BDataIO& stream);
 			void				SetLiteralHandler(LiteralHandler* handler);
 
 			status_t			NextResponse(Response& response,
 									bigtime_t timeout) throw(ParseException);
 
+private:
+								ResponseParser(const ResponseParser& other);
+
 protected:
-			ConnectionReader*	fReader;
+			BDataIO*			fStream;
 			LiteralHandler*		fLiteralHandler;
 };
 

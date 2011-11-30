@@ -36,39 +36,6 @@ typedef BObjectList<Handler> HandlerList;
 typedef std::map<int32, Command*> CommandIDMap;
 
 
-// TODO: throw this class away, and just use a BBufferedDataIO instead.
-class ConnectionReader {
-public:
-								ConnectionReader();
-
-			void				SetTo(BSocket& socket);
-
-			/*! Try to read line. If no end of line is found at least
-			minUnfinishedLine characters are returned. */
-			status_t			GetNextLine(BString& line,
-									bigtime_t timeout = kIMAP4ClientTimeout,
-									int32 maxUnfinishedLine = -1);
-			/*! Read data and append it to line till the end of file is
-			reached. */
-			status_t			FinishLine(BString& line);
-
-			status_t			ReadToStream(int32 size, BDataIO& out);
-
-private:
-			/*! Try to read till the end of line is reached. To do so maximal
-			maxNewLength bytes are read from the server if needed. */
-			status_t			_GetNextDataBunch(BString& line,
-									bigtime_t timeout,
-									uint32 maxNewLength = 256);
-			bool				_ExtractTillEndOfLine(BString& out);
-
-private:
-			BSocket*			fSocket;
-			BBufferedDataIO*	fBufferedSocket;
-			BString				fStringBuffer;
-};
-
-
 class FolderInfo {
 public:
 	FolderInfo()
@@ -144,7 +111,6 @@ private:
 protected:
 			BSocket* 			fSocket;
 			BBufferedDataIO*	fBufferedSocket;
-			ConnectionReader	fConnectionReader;
 
 			HandlerList			fHandlerList;
 			CommandList			fAfterQuackCommands;

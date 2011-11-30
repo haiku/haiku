@@ -19,7 +19,6 @@ typedef std::vector<BString> StringList;
 namespace IMAP {
 
 
-class ConnectionReader;
 class HandlerListener;
 
 
