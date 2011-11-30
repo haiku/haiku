@@ -69,7 +69,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
 	Icon-O-Matic Installer LaunchBox Magnify Mail MediaConverter MediaPlayer
 	MidiPlayer NetworkStatus PackageInstaller People PoorMan PowerStatus
 	ProcessController Screenshot ShowImage SoundRecorder StyledEdit Terminal
-	TextSearch TV Workspaces
+	TextSearch TV WebWatch Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
