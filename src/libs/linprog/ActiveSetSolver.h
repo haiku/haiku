@@ -27,6 +27,7 @@ public:
 	inline	void				SwapColumn(int32 i, int32 j);
 	inline	void				SwapRow(int32 i, int32 j);
 
+			bool				GaussianElimination();
 			bool				GaussJordan();
 			/*! Gauss Jordan elimination just for one column, the diagonal
 			element must be none zero. */
@@ -39,6 +40,9 @@ public:
 
 			void				Print();
 private:
+	inline	void				_EliminateColumn(int32 column, int32 startRow,
+									int32 endRow);
+
 			int32*				fRowIndices;
 			int32*				fColumnIndices;
 			double**			fMatrix;
