@@ -1267,12 +1267,12 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				openssh-5.9p1-x86-gcc4-2011-09-08.zip
-				: $(baseURL)/openssh-5.9p1-x86-gcc4-2011-09-08.zip ;
+				openssh-5.9p1-x86-gcc4-2011-11-30.zip
+				: $(baseURL)/openssh-5.9p1-x86-gcc4-2011-11-30.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				openssh-5.9p1-x86-gcc2-2011-09-09.zip
-				: $(baseURL)/openssh-5.9p1-x86-gcc2-2011-09-09.zip ;
+				openssh-5.9p1-x86-gcc2-2011-11-30.zip
+				: $(baseURL)/openssh-5.9p1-x86-gcc2-2011-11-30.zip ;
 		}
 
 		AddUserToHaikuImage sshd : 1001 : 100 : /var/empty : /bin/true
