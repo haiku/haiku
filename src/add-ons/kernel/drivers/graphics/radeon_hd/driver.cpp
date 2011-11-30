@@ -176,12 +176,12 @@ const struct supported_device {
 	//  Hemlock
 	{0x689c, 4, 0, RADEON_HEMLOCK, CHIP_STD, "Radeon HD 5900"},
 	// Fusion APUS
-	//  Palms
+	//  Palm
 	{0x9804, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6250"},
 	{0x9805, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6290"},
 	{0x9802, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9803, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
-	//  Sumo
+	//  Sumo (no VGA / LVDS!, only DP)
 	{0x9640, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6550D"},
 	{0x9641, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
 	{0x9647, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6520G (M)"},
@@ -189,7 +189,7 @@ const struct supported_device {
 	{0x964a, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6530D"},
 	{0x964e, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
 	{0x964f, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
-	//  Sumo2
+	//  Sumo2 (no VGA / LVDS!, only DP)
 	{0x9642, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD 6370D"},
 	{0x9643, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
 	{0x9644, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD 6410D"},
