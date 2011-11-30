@@ -10,7 +10,7 @@
 
 #include <ObjectList.h>
 
-#include "../debugger/util/Array.h"
+#include "Array.h"
 
 
 class ListSelectionModel {
