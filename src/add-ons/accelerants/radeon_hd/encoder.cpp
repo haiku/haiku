@@ -39,6 +39,7 @@ union crtc_source_param {
 void
 encoder_assign_crtc(uint8 crtcID)
 {
+	TRACE("%s\n", __func__);
 	int index = GetIndexIntoMasterTable(COMMAND, SelectCRTC_Source);
 	union crtc_source_param args;
 
@@ -176,6 +177,7 @@ encoder_assign_crtc(uint8 crtcID)
 void
 encoder_apply_quirks(uint8 crtcID)
 {
+	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
 	register_info* regs = gDisplay[crtcID]->regs;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
@@ -194,6 +196,7 @@ encoder_apply_quirks(uint8 crtcID)
 void
 encoder_mode_set(uint8 id, uint32 pixelClock)
 {
+	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
@@ -255,6 +258,23 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
 			TRACE("%s: TODO for DVO encoder setup\n", __func__);
+			break;
+		case ENCODER_OBJECT_ID_SI170B:
+		case ENCODER_OBJECT_ID_CH7303:
+		case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
+		case ENCODER_OBJECT_ID_EXTERNAL_SDVOB:
+		case ENCODER_OBJECT_ID_TITFP513:
+		case ENCODER_OBJECT_ID_VT1623:
+		case ENCODER_OBJECT_ID_HDMI_SI1930:
+		case ENCODER_OBJECT_ID_TRAVIS:
+		case ENCODER_OBJECT_ID_NUTMEG:
+			if (info.dceMajor >= 4 && info.dceMinor >= 1) {
+				encoder_external_setup(id, pixelClock,
+					EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
+			} else {
+				encoder_external_setup(id, pixelClock,
+					ATOM_ENABLE);
+			}
 			break;
 		default:
 			TRACE("%s: TODO for unknown encoder setup!\n", __func__);
@@ -330,8 +350,10 @@ encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
 	uint8 tableMinor;
 
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
-		!= B_OK)
+		!= B_OK) {
+		ERROR("%s: cannot parse command table\n", __func__);
 		return B_ERROR;
+	}
 
 	switch (tableMajor) {
 	case 1:
@@ -437,6 +459,7 @@ encoder_dig_setup(uint8 id, uint32 pixelClock, int command)
 	union dig_encoder_control args;
 	int index = 0;
 
+	// Table verson
 	uint8 tableMajor;
 	uint8 tableMinor;
 
@@ -571,6 +594,164 @@ encoder_dig_setup(uint8 id, uint32 pixelClock, int command)
 			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKA;
 	}
 	#endif
+
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+union external_encoder_control {
+	EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION v1;
+	EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION_V3 v3;
+};
+
+
+status_t
+encoder_external_setup(uint8 id, uint32 pixelClock, int command)
+{
+	TRACE("%s\n", __func__);
+
+	int index = GetIndexIntoMasterTable(COMMAND, ExternalEncoderControl);
+	union external_encoder_control args;
+	memset(&args, 0, sizeof(args));
+
+	uint32 connectorIndex = gDisplay[id]->connectorIndex;
+	int connectorObjectID
+		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
+			>> OBJECT_ID_SHIFT;
+
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
+		!= B_OK) {
+		ERROR("%s: Error parsing ExternalEncoderControl table\n", __func__);
+		return B_ERROR;
+	}
+
+	switch (tableMajor) {
+		case 1:
+			// no options needed on table 1.x
+			break;
+		case 2:
+			switch (tableMinor) {
+				case 1:
+				case 2:
+					args.v1.sDigEncoder.ucAction = command;
+					args.v1.sDigEncoder.usPixelClock
+						= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+					args.v1.sDigEncoder.ucEncoderMode
+						= display_get_encoder_mode(connectorIndex);
+					#if 0
+					if (0) { // ENCODER_MODE_IS_DP(v1.sDigEncoder.ucEncoderMode)
+						if (dp_clock == 270000) {
+							args.v1.sDigEncoder.ucConfig
+								|= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
+						}
+						args.v1.sDigEncoder.ucLaneNum = dp_lane_count;
+					} else if (pixelClock > 165000) {
+					#endif
+					if (pixelClock > 165000) {
+						args.v1.sDigEncoder.ucLaneNum = 8;
+					} else {
+						args.v1.sDigEncoder.ucLaneNum = 4;
+					}
+					break;
+				case 3:
+				{
+					args.v3.sExtEncoder.ucAction = command;
+					if (command == EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT) {
+						args.v3.sExtEncoder.usConnectorId
+							= B_HOST_TO_LENDIAN_INT16(connectorObjectID);
+					} else {
+						args.v3.sExtEncoder.usPixelClock
+							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+					}
+
+					args.v3.sExtEncoder.ucEncoderMode
+						= display_get_encoder_mode(connectorIndex);
+
+					#if 0
+					if (ENCODER_MODE_IS_DP(args.v3.sExtEncoder.ucEncoderMode)) {
+						if (dp_clock == 270000) {
+							args.v3.sExtEncoder.ucConfig
+								|=EXTERNAL_ENCODER_CONFIG_V3_DPLINKRATE_2_70GHZ;
+						} else if (dp_clock == 540000) {
+							args.v3.sExtEncoder.ucConfig
+								|=EXTERNAL_ENCODER_CONFIG_V3_DPLINKRATE_5_40GHZ;
+						}
+						args.v3.sExtEncoder.ucLaneNum = dp_lane_count;
+					} else if (pixelClock > 165000) {
+					#endif
+					if (pixelClock > 165000) {
+						args.v3.sExtEncoder.ucLaneNum = 8;
+					} else {
+						args.v3.sExtEncoder.ucLaneNum = 4;
+					}
+
+					uint16 encoderFlags
+						= gConnector[connectorIndex]->encoder.flags;
+					switch ((encoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
+						case GRAPH_OBJECT_ENUM_ID1:
+							TRACE("%s: external encoder 1\n", __func__);
+							args.v3.sExtEncoder.ucConfig
+								|= EXTERNAL_ENCODER_CONFIG_V3_ENCODER1;
+							break;
+						case GRAPH_OBJECT_ENUM_ID2:
+							TRACE("%s: external encoder 2\n", __func__);
+							args.v3.sExtEncoder.ucConfig
+								|= EXTERNAL_ENCODER_CONFIG_V3_ENCODER2;
+							break;
+						case GRAPH_OBJECT_ENUM_ID3:
+							TRACE("%s: external encoder 3\n", __func__);
+							args.v3.sExtEncoder.ucConfig
+								|= EXTERNAL_ENCODER_CONFIG_V3_ENCODER3;
+							break;
+					}
+
+					// TODO: don't set statically
+					uint32 bitsPerColor = 8;
+					switch (bitsPerColor) {
+						case 0:
+							args.v3.sExtEncoder.ucBitPerColor
+								= PANEL_BPC_UNDEFINE;
+							break;
+						case 6:
+							args.v3.sExtEncoder.ucBitPerColor
+								= PANEL_6BIT_PER_COLOR;
+							break;
+						case 8:
+						default:
+							args.v3.sExtEncoder.ucBitPerColor
+								= PANEL_8BIT_PER_COLOR;
+							break;
+						case 10:
+							args.v3.sExtEncoder.ucBitPerColor
+								= PANEL_10BIT_PER_COLOR;
+							break;
+						case 12:
+							args.v3.sExtEncoder.ucBitPerColor
+								= PANEL_12BIT_PER_COLOR;
+							break;
+						case 16:
+							args.v3.sExtEncoder.ucBitPerColor
+								= PANEL_16BIT_PER_COLOR;
+							break;
+					}
+					break;
+				}
+				default:
+					ERROR("%s: Unknown table minor version: "
+						"%" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+						tableMajor, tableMinor);
+					return B_ERROR;
+			}
+			break;
+		default:
+			ERROR("%s: Unknown table major version: "
+				"%" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+				tableMajor, tableMinor);
+			return B_ERROR;
+	}
 
 	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
