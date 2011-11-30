@@ -108,7 +108,8 @@ RowColumnManager::_FindRowFor(Area* area)
 {
 	for (int32 i = 0; i < fRows.CountItems(); i++) {
 		Row* row = fRows.ItemAt(i);
-		if (row->fTop == area->Top() && row->fBottom == area->Bottom())
+		if (row->fTop.Get() == area->Top()
+			&& row->fBottom.Get() == area->Bottom())
 			return row;
 	}
 	return NULL;
@@ -120,7 +121,8 @@ RowColumnManager::_FindColumnFor(Area* area)
 {
 	for (int32 i = 0; i < fColumns.CountItems(); i++) {
 		Column* column = fColumns.ItemAt(i);
-		if (column->fLeft == area->Left() && column->fRight == area->Right())
+		if (column->fLeft.Get() == area->Left()
+			&& column->fRight.Get() == area->Right())
 			return column;
 	}
 	return NULL;

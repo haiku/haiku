@@ -33,8 +33,8 @@ private:
 								Row(LinearSpec* ls, YTab* top, YTab* bottom);
 
 			LinearSpec*			fLS;
-			YTab*				fTop;
-			YTab*				fBottom;
+			BReference<YTab>	fTop;
+			BReference<YTab>	fBottom;
 
 			//! managed by RowColumnManager
 			Constraint*			fPrefSizeConstraint;

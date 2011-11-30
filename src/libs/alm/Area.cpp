@@ -337,7 +337,7 @@ Area::LeftInset() const
 		return fTopLeftInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fLeft == layout->Left())
+	if (fLeft.Get() == layout->Left())
 		return layout->Inset();
 	return layout->Spacing() / 2;
 }
@@ -353,7 +353,7 @@ Area::TopInset() const
 		return fTopLeftInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fTop == layout->Top())
+	if (fTop.Get() == layout->Top())
 		return layout->Inset();
 	return layout->Spacing() / 2;
 }
@@ -369,7 +369,7 @@ Area::RightInset() const
 		return fRightBottomInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fRight == layout->Right())
+	if (fRight.Get() == layout->Right())
 		return layout->Inset();
 	return layout->Spacing() / 2;
 }
@@ -385,7 +385,7 @@ Area::BottomInset() const
 		return fRightBottomInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fBottom == layout->Bottom())
+	if (fBottom.Get() == layout->Bottom())
 		return layout->Inset();
 	return layout->Spacing() / 2;
 }
@@ -497,7 +497,7 @@ Area::InvalidateSizeConstraints()
 
 
 BRect
-Area::Frame()
+Area::Frame() const
 {
 	return BRect(fLeft->Value(), fTop->Value(), fRight->Value(),
 		fBottom->Value());
@@ -505,7 +505,7 @@ Area::Frame()
 
 
 BRect
-Area::ItemFrame()
+Area::ItemFrame() const
 {
 	return fLayoutItem->Frame();
 }
