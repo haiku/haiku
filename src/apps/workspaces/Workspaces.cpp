@@ -596,7 +596,7 @@ WorkspacesView::MouseDown(BPoint where)
 			item->SetMarked(true);
 		if (be_roster->IsRunning(kDeskbarSignature)) {
 			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
-			new BMessage(kMsgToggleLiveInDeskbar)));
+				new BMessage(kMsgToggleLiveInDeskbar)));
 			BDeskbar deskbar;
 			item->SetMarked(deskbar.HasItem(kDeskbarItemName));
 		}
