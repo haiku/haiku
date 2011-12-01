@@ -360,7 +360,7 @@ AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 
-AddSymlinkToHaikuImage home config settings : deskbar : be ;
+AddSymlinkToHaikuImage home config : settings/deskbar : be ;
 # Deskbar Application links
 AddDirectoryToHaikuImage home config settings deskbar Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
