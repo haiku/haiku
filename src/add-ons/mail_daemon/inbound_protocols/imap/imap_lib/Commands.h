@@ -19,9 +19,6 @@ typedef std::vector<BString> StringList;
 namespace IMAP {
 
 
-class HandlerListener;
-
-
 struct MessageEntry {
 	MessageEntry()
 		:
@@ -32,6 +29,7 @@ struct MessageEntry {
 
 	uint32	uid;
 	uint32	flags;
+	uint32	size;
 };
 typedef std::vector<MessageEntry> MessageEntryList;
 
@@ -49,14 +47,7 @@ public:
 								Handler();
 	virtual						~Handler();
 
-			void				SetListener(HandlerListener& listener);
-			HandlerListener&	Listener() { return *fListener; }
-
 	virtual	bool				HandleUntagged(Response& response) = 0;
-	virtual IMAP::LiteralHandler* LiteralHandler();
-
-protected:
-			HandlerListener*	fListener;
 };
 
 
@@ -66,16 +57,6 @@ public:
 
 	virtual	BString				CommandString() = 0;
 	virtual	status_t			HandleTagged(Response& response);
-};
-
-
-class HandlerListener {
-public:
-	virtual						~HandlerListener();
-
-	virtual	void				ExpungeReceived(int32 number);
-	virtual void				ExistsReceived(int32 number);
-	virtual void				FetchBody(Command& command, int32 size);
 };
 
 
@@ -112,8 +93,8 @@ public:
 								SelectCommand();
 								SelectCommand(const char* mailboxName);
 
-			BString				CommandString();
-			bool				HandleUntagged(Response& response);
+	virtual	BString				CommandString();
+	virtual	bool				HandleUntagged(Response& response);
 
 			void				SetTo(const char* mailboxName)
 									{ fMailboxName = mailboxName; }
@@ -154,88 +135,58 @@ private:
 			uint32				fTo;
 };
 
+
+enum FetchMode {
+	kFetchHeader,
+	kFetchBody,
+	kFetchAll
+};
+
+
+class FetchListener {
+public:
+	virtual	bool				FetchData(Response& reponse, uint32 uid,
+									FetchMode mode, BDataIO& stream,
+									size_t length) = 0;
+};
+
+
+class FetchCommand : public Command, public Handler,
+	public LiteralHandler {
+public:
+								FetchCommand(uint32 from, uint32 to,
+									FetchMode mode);
+
+			void				SetListener(FetchListener* listener);
+			FetchListener*		Listener() const { return fListener; }
+
+	virtual	BString				CommandString();
+	virtual	bool				HandleUntagged(Response& response);
+	virtual bool				HandleLiteral(Response& response,
+									BDataIO& stream, size_t length);
+
+private:
+			uint32				fFrom;
+			uint32				fTo;
+			FetchMode			fMode;
+			FetchListener*		fListener;
+};
+
+
+class SetFlagsCommand : public Command, public Handler {
+public:
+								SetFlagsCommand(uint32 uid, uint32 flags);
+
+	virtual	BString				CommandString();
+	virtual	bool				HandleUntagged(Response& response);
+
+private:
+			uint32				fUID;
+			uint32				fFlags;
+};
+
+
 #if 0
-
-
-class FetchMinMessageCommand : public IMAPMailboxCommand {
-public:
-								FetchMinMessageCommand(IMAPMailbox& mailbox,
-									int32 message, MinMessageList* list,
-									BPositionIO** data);
-								FetchMinMessageCommand(IMAPMailbox& mailbox,
-									int32 firstMessage, int32 lastMessage,
-									MinMessageList* list, BPositionIO** data);
-
-			BString				CommandString();
-			bool				HandleUntagged(const BString& response);
-
-	static	bool				ParseMinMessage(const BString& response,
-									MinMessage& minMessage);
-	static	int32				ExtractFlags(const BString& response);
-
-private:
-			int32				fMessage;
-			int32				fEndMessage;
-			MinMessageList*		fMinMessageList;
-			BPositionIO**		fData;
-};
-
-
-class FetchMessageCommand : public IMAPMailboxCommand {
-public:
-								FetchMessageCommand(IMAPMailbox& mailbox,
-									int32 message, BPositionIO* data,
-									int32 fetchBodyLimit = -1);
-			/*! Fetch multiple message within a range. */
-								FetchMessageCommand(IMAPMailbox& mailbox,
-									int32 firstMessage, int32 lastMessage,
-									int32 fetchBodyLimit = -1);
-								~FetchMessageCommand();
-
-			BString				CommandString();
-			bool				HandleUntagged(const BString& response);
-
-private:
-			int32				fMessage;
-			int32				fEndMessage;
-			BPositionIO*		fOutData;
-			int32				fFetchBodyLimit;
-			int32				fUnhandled;
-};
-
-
-class FetchBodyCommand : public IMAPMailboxCommand {
-public:
-								/*! takes ownership of the data */
-								FetchBodyCommand(IMAPMailbox& mailbox,
-									int32 message, BPositionIO* data);
-								~FetchBodyCommand();
-
-			BString				CommandString();
-			bool				HandleUntagged(const BString& response);
-
-private:
-			int32				fMessage;
-			BPositionIO*		fOutData;
-};
-
-
-class SetFlagsCommand : public IMAPMailboxCommand {
-public:
-								SetFlagsCommand(IMAPMailbox& mailbox,
-									int32 message, int32 flags);
-
-			BString				CommandString();
-			bool				HandleUntagged(const BString& response);
-
-	static	BString				GenerateFlagList(int32 flags);
-
-private:
-			int32				fMessage;
-			int32				fFlags;
-};
-
-
 class AppendCommand : public IMAPMailboxCommand {
 public:
 								AppendCommand(IMAPMailbox& mailbox,

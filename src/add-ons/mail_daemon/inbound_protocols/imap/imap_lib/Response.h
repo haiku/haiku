@@ -17,6 +17,7 @@ namespace IMAP {
 
 
 class Argument;
+class Response;
 
 
 class ArgumentList : public BObjectList<Argument> {
@@ -112,8 +113,8 @@ public:
 								LiteralHandler();
 	virtual						~LiteralHandler();
 
-	virtual void				HandleLiteral(BDataIO& stream,
-									size_t length) = 0;
+	virtual bool				HandleLiteral(Response& response,
+									BDataIO& stream, size_t length) = 0;
 };
 
 

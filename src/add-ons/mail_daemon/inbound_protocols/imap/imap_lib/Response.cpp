@@ -412,9 +412,11 @@ Response::ParseLiteral(ArgumentList& arguments, BDataIO& stream)
 	Consume(stream, '\r');
 	Consume(stream, '\n');
 
+	bool handled = false;
 	if (fLiteralHandler != NULL)
-		fLiteralHandler->HandleLiteral(stream, size);
-	else {
+		handled = fLiteralHandler->HandleLiteral(*this, stream, size);
+
+	if (!handled) {
 		// The default implementation just adds the data as a string
 		TRACE("Trying to read literal with %" B_PRIuSIZE " bytes.\n", size);
 		BString string;

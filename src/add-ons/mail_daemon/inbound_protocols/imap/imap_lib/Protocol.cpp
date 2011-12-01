@@ -236,6 +236,8 @@ Protocol::SendCommand(int32 id, const char* command)
 	else
 		length = snprintf(buffer, sizeof(buffer), "%s\r\n", command);
 
+	TRACE("C: %s", buffer);
+
 	ssize_t bytesWritten = fSocket->Write(buffer, length);
 	if (bytesWritten < 0)
 		return bytesWritten;

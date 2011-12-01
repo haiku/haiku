@@ -24,35 +24,68 @@
 using namespace BPrivate;
 
 
+static void
+PutFlag(BString& string, const char* flag)
+{
+	if (!string.IsEmpty())
+		string += " ";
+	string += flag;
+}
+
+
+static BString
+GenerateFlagString(uint32 flags)
+{
+	BString string;
+
+	if ((flags & IMAP::kSeen) != 0)
+		PutFlag(string, "\\Seen ");
+	if ((flags & IMAP::kAnswered) != 0)
+		PutFlag(string, "\\Answered ");
+	if ((flags & IMAP::kFlagged) != 0)
+		PutFlag(string, "\\Flagged ");
+	if ((flags & IMAP::kDeleted) != 0)
+		PutFlag(string, "\\Deleted ");
+	if ((flags & IMAP::kDraft) != 0)
+		PutFlag(string, "\\Draft ");
+
+	return string;
+}
+
+
+static uint32
+ParseFlags(IMAP::ArgumentList& list)
+{
+	uint32 flags = 0;
+	for (int32 i = 0; i < list.CountItems(); i++) {
+		if (list.EqualsAt(i, "\\Seen"))
+			flags |= IMAP::kSeen;
+		else if (list.EqualsAt(i, "\\Answered"))
+			flags |= IMAP::kAnswered;
+		else if (list.EqualsAt(i, "\\Flagged"))
+			flags |= IMAP::kFlagged;
+		else if (list.EqualsAt(i, "\\Deleted"))
+			flags |= IMAP::kDeleted;
+		else if (list.EqualsAt(i, "\\Draft"))
+			flags |= IMAP::kDraft;
+	}
+	return flags;
+}
+
+
+// #pragma mark -
+
+
 namespace IMAP {
 
 
-static HandlerListener sEmptyHandler;
-
-
 Handler::Handler()
-	:
-	fListener(&sEmptyHandler)
 {
 }
 
 
 Handler::~Handler()
 {
-}
-
-
-void
-Handler::SetListener(HandlerListener& listener)
-{
-	fListener = &listener;
-}
-
-
-IMAP::LiteralHandler*
-Handler::LiteralHandler()
-{
-	return NULL;
 }
 
 
@@ -80,7 +113,7 @@ Command::HandleTagged(Response& response)
 
 // #pragma mark -
 
-
+#if 0
 HandlerListener::~HandlerListener()
 {
 }
@@ -96,13 +129,7 @@ void
 HandlerListener::ExistsReceived(int32 number)
 {
 }
-
-
-void
-HandlerListener::FetchBody(Command& command, int32 size)
-{
-}
-
+#endif
 
 // #pragma mark -
 
@@ -257,7 +284,7 @@ BString
 FetchMessageEntriesCommand::CommandString()
 {
 	BString command = "UID FETCH ";
-	command << fFrom << ":" << fTo << " FLAGS";
+	command << fFrom << ":" << fTo << " (FLAGS RFC822.SIZE)";
 
 	return command;
 }
@@ -275,22 +302,12 @@ FetchMessageEntriesCommand::HandleUntagged(Response& response)
 	for (int32 i = 0; i < list.CountItems(); i += 2) {
 		if (list.EqualsAt(i, "UID") && list.IsNumberAt(i + 1))
 			entry.uid = list.NumberAt(i + 1);
+		else if (list.EqualsAt(i, "RFC822.SIZE") && list.IsNumberAt(i + 1))
+			entry.size = list.NumberAt(i + 1);
 		else if (list.EqualsAt(i, "FLAGS") && list.IsListAt(i + 1)) {
 			// Parse flags
 			ArgumentList& flags = list.ListAt(i + 1);
-			printf("flags: %s\n", flags.ToString().String());
-			for (int32 j = 0; j < flags.CountItems(); j++) {
-				if (flags.EqualsAt(j, "\\Seen"))
-					entry.flags |= kSeen;
-				else if (flags.EqualsAt(j, "\\Answered"))
-					entry.flags |= kAnswered;
-				else if (flags.EqualsAt(j, "\\Flagged"))
-					entry.flags |= kFlagged;
-				else if (flags.EqualsAt(j, "\\Deleted"))
-					entry.flags |= kDeleted;
-				else if (flags.EqualsAt(j, "\\Draft"))
-					entry.flags |= kDraft;
-			}
+			entry.flags = ParseFlags(flags);
 		}
 	}
 
@@ -305,339 +322,93 @@ FetchMessageEntriesCommand::HandleUntagged(Response& response)
 // #pragma mark -
 
 
-#if 0
-FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
-	int32 message, MinMessageList* list, BPositionIO** data)
+FetchCommand::FetchCommand(uint32 from, uint32 to,
+	FetchMode mode)
 	:
-	IMAPMailboxCommand(mailbox),
-
-	fMessage(message),
-	fEndMessage(-1),
-	fMinMessageList(list),
-	fData(data)
+	fFrom(from),
+	fTo(to),
+	fMode(mode)
 {
 }
 
 
-FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
-	int32 firstMessage, int32 lastMessage, MinMessageList* list,
-	BPositionIO** data)
-	:
-	IMAPMailboxCommand(mailbox),
-
-	fMessage(firstMessage),
-	fEndMessage(lastMessage),
-	fMinMessageList(list),
-	fData(data)
+void
+FetchCommand::SetListener(FetchListener* listener)
 {
+	fListener = listener;
 }
 
 
 BString
-FetchMinMessageCommand::CommandString()
+FetchCommand::CommandString()
 {
-	if (fMessage <= 0)
-		return "";
-	BString command = "FETCH ";
-	command << fMessage;
-	if (fEndMessage > 0) {
-		command += ":";
-		command << fEndMessage;
-	}
-	command += " (UID FLAGS)";
-	return command;
-}
+	BString command = "UID FETCH ";
+	command << fFrom;
+	if (fFrom != fTo)
+		command << ":" << fTo;
 
-
-bool
-FetchMinMessageCommand::HandleUntagged(const BString& response)
-{
-	BString extracted = response;
-	int32 message;
-	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
-		return false;
-
-	// check if we requested this message
-	int32 end = message;
-	if (fEndMessage > 0)
-		end = fEndMessage;
-	if (message < fMessage && message > end)
-		return false;
-
-	MinMessage minMessage;
-	if (!ParseMinMessage(extracted, minMessage))
-		return false;
-
-	fMinMessageList->push_back(minMessage);
-	fStorage.AddNewMessage(minMessage.uid, minMessage.flags, fData);
-	return true;
-}
-
-
-bool
-FetchMinMessageCommand::ParseMinMessage(const BString& response,
-	MinMessage& minMessage)
-{
-	BString extracted = IMAPParser::ExtractNextElement(response);
-	BString uid = IMAPParser::ExtractElementAfter(extracted, "UID");
-	if (uid == "")
-		return false;
-	minMessage.uid = atoi(uid);
-
-	int32 flags = ExtractFlags(extracted);
-	minMessage.flags = flags;
-
-	return true;
-}
-
-
-int32
-FetchMinMessageCommand::ExtractFlags(const BString& response)
-{
-	int32 flags = 0;
-	BString flagsString = IMAPParser::ExtractElementAfter(response, "FLAGS");
-
-	while (true) {
-		BString flag = IMAPParser::RemovePrimitiveFromLeft(flagsString);
-		if (flag == "")
+	command += " (UID ";
+	switch (fMode) {
+		case kFetchHeader:
+			command += "RFC822.HEADER";
 			break;
-
-		if (flag == "\\Seen")
-			flags |= kSeen;
-		else if (flag == "\\Answered")
-			flags |= kAnswered;
-		else if (flag == "\\Flagged")
-			flags |= kFlagged;
-		else if (flag == "\\Deleted")
-			flags |= kDeleted;
-		else if (flag == "\\Draft")
-			flags |= kDraft;
+		case kFetchBody:
+			command += "BODY.PEEK[TEXT]";
+			break;
+		case kFetchAll:
+			command += "BODY.PEEK[]";
+			break;
 	}
-	return flags;
-}
+	command += ")";
 
-
-// #pragma mark -
-
-
-FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox, int32 message,
-	BPositionIO* data, int32 fetchBodyLimit)
-	:
-	IMAPMailboxCommand(mailbox),
-
-	fMessage(message),
-	fEndMessage(-1),
-	fOutData(data),
-	fFetchBodyLimit(fetchBodyLimit)
-{
-}
-
-
-FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox,
-	int32 firstMessage, int32 lastMessage, int32 fetchBodyLimit)
-	:
-	IMAPMailboxCommand(mailbox),
-
-	fMessage(firstMessage),
-	fEndMessage(lastMessage),
-	fOutData(NULL),
-	fFetchBodyLimit(fetchBodyLimit)
-{
-	if (fEndMessage > 0)
-		fUnhandled = fEndMessage - fMessage + 1;
-	else
-		fUnhandled = 1;
-}
-
-
-FetchMessageCommand::~FetchMessageCommand()
-{
-	for (int32 i = 0; i < fUnhandled; i++)
-		fIMAPMailbox.Listener().FetchEnd();
-}
-
-
-BString
-FetchMessageCommand::CommandString()
-{
-	BString command = "FETCH ";
-	command << fMessage;
-	if (fEndMessage > 0) {
-		command += ":";
-		command << fEndMessage;
-	}
-	command += " (RFC822.SIZE RFC822.HEADER)";
 	return command;
 }
 
 
 bool
-FetchMessageCommand::HandleUntagged(const BString& response)
+FetchCommand::HandleUntagged(Response& response)
 {
-	BString extracted = response;
-	int32 message;
-	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
+	if (!response.EqualsAt(1, "FETCH") || !response.IsListAt(2))
 		return false;
 
-	// check if we requested this message
-	int32 end = message;
-	if (fEndMessage > 0)
-		end = fEndMessage;
-	if (message < fMessage && message > end)
+	// We don't need to parse anything here - all the data is processed via
+	// HandleLiteral().
+	return true;
+}
+
+
+bool
+FetchCommand::HandleLiteral(Response& response, BDataIO& stream,
+	size_t length)
+{
+	if (fListener == NULL || !response.EqualsAt(1, "FETCH")
+		|| !response.IsListAt(2))
 		return false;
 
-	const MinMessageList& list = fIMAPMailbox.GetMessageList();
-	int32 index = message - 1;
-	if (index < 0 || index >= (int32)list.size())
-		return false;
-	const MinMessage& minMessage = list[index];
+	uint32 uid = 0;
 
-	BPositionIO* data = fOutData;
-	ObjectDeleter<BPositionIO> deleter;
-	if (!data) {
-		status_t status = fStorage.OpenMessage(minMessage.uid, &data);
-		if (status != B_OK) {
-			status = fStorage.AddNewMessage(minMessage.uid, minMessage.flags,
-				&data);
+	// Get current UID
+	ArgumentList& list = response.ListAt(2);
+	for (int32 i = 0; i < list.CountItems(); i += 2) {
+		if (list.EqualsAt(i, "UID") && list.IsNumberAt(i + 1)) {
+			uid = list.NumberAt(i + 1);
+			break;
 		}
-		if (status != B_OK)
-			return false;
-		deleter.SetTo(data);
 	}
 
-	// read message size
-	BString messageSizeString = IMAPParser::ExtractElementAfter(extracted,
-		"RFC822.SIZE");
-	int32 messageSize = atoi(messageSizeString);
-	fStorage.SetCompleteMessageSize(minMessage.uid, messageSize);
-
-	// read header
-	int32 headerPos = extracted.FindFirst("RFC822.HEADER");
-	if (headerPos < 0) {
-		if (!fOutData)
-			fStorage.DeleteMessage(minMessage.uid);
+	if (uid == 0)
 		return false;
-	}
-	extracted.Remove(0, headerPos + strlen("RFC822.HEADER") + 1);
-	BString headerSize = IMAPParser::RemovePrimitiveFromLeft(extracted);
-	headerSize = IMAPParser::ExtractNextElement(headerSize);
-	int32 size = atoi(headerSize);
 
-	status_t status = fConnectionReader.ReadToFile(size, data);
-	if (status != B_OK) {
-		if (!fOutData)
-			fStorage.DeleteMessage(minMessage.uid);
-		return false;
-	}
-
-	// read last ")" line
-	BString lastLine;
-	fConnectionReader.GetNextLine(lastLine);
-
-	fUnhandled--;
-
-	bool bodyIsComing = true;
-	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)
-		bodyIsComing = false;
-
-	int32 uid = fIMAPMailbox.MessageNumberToUID(message);
-	if (uid >= 0)
-		fIMAPMailbox.Listener().HeaderFetched(uid, data, bodyIsComing);
-
-	if (!bodyIsComing)
-		return true;
-
-	deleter.Detach();
-	FetchBodyCommand* bodyCommand = new FetchBodyCommand(fIMAPMailbox, message,
-		data);
-	fIMAPMailbox.AddAfterQuakeCommand(bodyCommand);
-
-	return true;
+	return fListener->FetchData(response, uid, fMode, stream, length);
 }
 
 
 // #pragma mark -
 
 
-FetchBodyCommand::FetchBodyCommand(IMAPMailbox& mailbox, int32 message,
-	BPositionIO* data)
+SetFlagsCommand::SetFlagsCommand(uint32 uid, uint32 flags)
 	:
-	IMAPMailboxCommand(mailbox),
-
-	fMessage(message),
-	fOutData(data)
-{
-}
-
-
-FetchBodyCommand::~FetchBodyCommand()
-{
-	delete fOutData;
-}
-
-
-BString
-FetchBodyCommand::CommandString()
-{
-	BString command = "FETCH ";
-	command << fMessage;
-	command += " (FLAGS BODY.PEEK[TEXT])";
-	return command;
-}
-
-
-bool
-FetchBodyCommand::HandleUntagged(const BString& response)
-{
-	if (response.FindFirst("FETCH") < 0)
-		return false;
-
-	BString extracted = response;
-	int32 message;
-	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
-		return false;
-	if (message != fMessage)
-		return false;
-
-	int32 flags = FetchMinMessageCommand::ExtractFlags(extracted);
-	fStorage.SetFlags(fIMAPMailbox.MessageNumberToUID(message), flags);
-
-	int32 textPos = extracted.FindFirst("BODY[TEXT]");
-	if (textPos < 0)
-		return false;
-	extracted.Remove(0, textPos + strlen("BODY[TEXT]") + 1);
-	BString bodySize = IMAPParser::ExtractBetweenBrackets(extracted, "{", "}");
-	bodySize = IMAPParser::ExtractNextElement(bodySize);
-	int32 size = atoi(bodySize);
-	TRACE("Body size %i\n", (int)size);
-	fOutData->Seek(0, SEEK_END);
-	status_t status = fConnectionReader.ReadToFile(size, fOutData);
-	if (status != B_OK)
-		return false;
-
-	// read last ")" line
-	BString lastLine;
-	fConnectionReader.GetNextLine(lastLine);
-
-	int32 uid = fIMAPMailbox.MessageNumberToUID(message);
-	if (uid >= 0)
-		fIMAPMailbox.Listener().BodyFetched(uid, fOutData);
-	else
-		fIMAPMailbox.Listener().FetchEnd();
-
-	return true;
-}
-
-
-// #pragma mark -
-
-
-SetFlagsCommand::SetFlagsCommand(IMAPMailbox& mailbox, int32 message,
-	int32 flags)
-	:
-	IMAPMailboxCommand(mailbox),
-
-	fMessage(message),
+	fUID(uid),
 	fFlags(flags)
 {
 }
@@ -647,44 +418,24 @@ BString
 SetFlagsCommand::CommandString()
 {
 	BString command = "STORE ";
-	command << fMessage;
-	command += " FLAGS (";
-	command += GenerateFlagList(fFlags);
-	command += ")";
+	command << fUID << " FLAGS (" << GenerateFlagString(fFlags) << ")";
+
 	return command;
 }
 
 
 bool
-SetFlagsCommand::HandleUntagged(const BString& response)
+SetFlagsCommand::HandleUntagged(Response& response)
 {
-	return false;
-}
-
-
-BString
-SetFlagsCommand::GenerateFlagList(int32 flags)
-{
-	BString flagList;
-
-	if ((flags & kSeen) != 0)
-		flagList += "\\Seen ";
-	if ((flags & kAnswered) != 0)
-		flagList += "\\Answered ";
-	if ((flags & kFlagged) != 0)
-		flagList += "\\Flagged ";
-	if ((flags & kDeleted) != 0)
-		flagList += "\\Deleted ";
-	if ((flags & kDraft) != 0)
-		flagList += "\\Draft ";
-
-	return flagList.Trim();
+	// We're not that interested in the outcome, apparently
+	return response.EqualsAt(1, "FETCH");
 }
 
 
 // #pragma mark -
 
 
+#if 0
 AppendCommand::AppendCommand(IMAPMailbox& mailbox, BPositionIO& message,
 	off_t size, int32 flags, time_t time)
 	:
@@ -754,10 +505,10 @@ ExistsHandler::HandleUntagged(Response& response)
 	if (!response.EqualsAt(1, "EXISTS") || response.IsNumberAt(0))
 		return false;
 
-	int32 expunge = response.NumberAt(0);
+//	int32 expunge = response.NumberAt(0);
+#if 0
 	Listener().ExistsReceived(expunge);
 
-#if 0
 	if (response.FindFirst("EXISTS") < 0)
 		return false;
 
@@ -818,10 +569,10 @@ ExpungeHandler::HandleUntagged(Response& response)
 	if (!response.EqualsAt(1, "EXPUNGE") || response.IsNumberAt(0))
 		return false;
 
-	int32 expunge = response.NumberAt(0);
+//	int32 expunge = response.NumberAt(0);
+#if 0
 	Listener().ExpungeReceived(expunge);
 
-#if 0
 	// remove from storage
 	IMAPStorage& storage = fIMAPMailbox.GetStorage();
 	storage.DeleteMessage(fIMAPMailbox.MessageNumberToUID(expunge));
