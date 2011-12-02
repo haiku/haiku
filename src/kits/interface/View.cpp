@@ -4023,10 +4023,13 @@ bool
 BView::RemoveSelf()
 {
 	if (fParent && fParent->fLayoutData->fLayout) {
-		int32 itemCount = fLayoutData->fLayoutItems.CountItems();
-		for (int32 i = 0; i < itemCount; i++) {
-			BLayoutItem* item = fLayoutData->fLayoutItems.ItemAt(i);
+		int32 itemsRemaining = fLayoutData->fLayoutItems.CountItems();
+		while (itemsRemaining-- > 0) {
+			BLayoutItem* item = fLayoutData->fLayoutItems.ItemAt(0);
+				// always remove item at index 0, since items are shuffled
+				// downwards by BObjectList
 			item->Layout()->RemoveItem(item);
+				// removes item from fLayoutItems list
 			delete item;
 		}
 	}
