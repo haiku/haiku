@@ -399,10 +399,13 @@ function GetBuildFile()
 	if ! [ -f ${baseDir}/${buildfile} ] ; then
 		echo "Fetching ${buildfile} ..."
 		cd ${baseDir}
-		local baseURL=http://dev.haiku-os.org/export/
-		local revision=`uname -v | awk '{print $1}' | sed -e 's/r//'`
-		local url="${baseURL}${revision}/haiku/trunk/build/jam/${buildfile}"
-		wget -q ${url} || ErrorExit "...failed to download $buildfile"
+		local baseURL=http://cgit.haiku-os.org/haiku/plain
+		local revisionTag=`uname -v | awk '{print $1}' | sed -e 's/-.*//'`
+			# the sed invocation above drops potential dirty markers off the
+			# revision tag
+		local url="${baseURL}/build/jam/${buildfile}?id=${revisionTag}"
+		wget -q ${url} -O ${buildfile} \
+			|| ErrorExit "...failed to download $buildfile"
 	fi
 }
 
