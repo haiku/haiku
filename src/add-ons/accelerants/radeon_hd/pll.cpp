@@ -338,6 +338,15 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	bool dpBridge = false;
+
+	if ((encoderFlags & (ATOM_DEVICE_LCD_SUPPORT | ATOM_DEVICE_DFP_SUPPORT))
+		|| encoder_is_dp_bridge(encoderID)) {
+		TRACE("%s: external DP bridge detected!\n", __func__);
+		dpBridge = true;
+	}
+
 
 	if (info.dceMajor >= 3) {
 		union adjust_pixel_clock args;
@@ -385,13 +394,43 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 							args.v3.sInput.ucDispPllConfig
 								|= DISPPLL_CONFIG_SS_ENABLE;
 						}
-						// TODO: if ATOM_DEVICE_DFP_SUPPORT
-						// TODO: display port DP
 
-						// TODO: is DP?
-						args.v3.sInput.ucExtTransmitterID = 0;
+						// Handle DP adjustments
+						if (encoderMode == ATOM_ENCODER_MODE_DP
+							|| encoderMode == ATOM_ENCODER_MODE_DP_MST) {
+							TRACE("%s: encoderMode is DP\n", __func__);
+							args.v3.sInput.ucDispPllConfig
+								|= DISPPLL_CONFIG_COHERENT_MODE;
+							/* 16200 or 27000 */
+							uint32 dpLinkSpeed
+								= encoder_get_dp_link_clock(connectorIndex);
+							args.v3.sInput.usPixelClock
+								= B_LENDIAN_TO_HOST_INT16(dpLinkSpeed / 10);
+						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
+							!= 0) {
+							TRACE("%s: encoderFlags are DFP but not DP mode.\n",
+								__func__);
+							#if 0
+							if (encoderMode == ATOM_ENCODER_MODE_HDMI) {
+								/* deep color support */
+								args.v3.sInput.usPixelClock =
+									cpu_to_le16((mode->clock * bpc / 8) / 10);
+							}
+							#endif
+							if (pixelClock > 165000) {
+								args.v3.sInput.ucDispPllConfig
+									|= DISPPLL_CONFIG_DUAL_LINK;
+							}
+							if (1) {	// dig coherent mode?
+								args.v3.sInput.ucDispPllConfig
+									|= DISPPLL_CONFIG_COHERENT_MODE;
+							}
+						}
+
+						args.v3.sInput.ucExtTransmitterID = dpBridge ? 1 : 0;
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
+
 						// get returned adjusted clock
 						pll->pixelClock
 							= B_LENDIAN_TO_HOST_INT32(

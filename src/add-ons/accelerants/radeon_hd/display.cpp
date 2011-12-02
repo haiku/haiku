@@ -320,7 +320,7 @@ detect_connectors_legacy()
 		gConnector[connectorIndex]->encoder.type
 			= encoder_type_lookup(encoderID, (1 << i));
 		gConnector[connectorIndex]->encoder.isExternal
-			= encoder_isexternal(encoderID);
+			= encoder_is_external(encoderID);
 
 		radeon_gpu_i2c_attach(connectorIndex, ci.sucI2cId.ucAccess);
 
@@ -519,7 +519,7 @@ detect_connectors()
 							gConnector[connectorIndex]->encoder.type
 								= encoderType;
 							gConnector[connectorIndex]->encoder.isExternal
-								= encoder_isexternal(encoderID);
+								= encoder_is_external(encoderID);
 
 							pll_limit_probe(
 								&gConnector[connectorIndex]->encoder.pll);

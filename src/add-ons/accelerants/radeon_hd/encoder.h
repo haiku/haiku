@@ -24,7 +24,9 @@ void encoder_dpms_scratch(uint8 crtcID, bool power);
 void encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode);
 uint32 encoder_object_lookup(uint32 encoderFlags, uint8 dacID);
 uint32 encoder_type_lookup(uint32 encoderID, uint32 connectorFlags);
-bool encoder_isexternal(uint32 encoderID);
+bool encoder_is_external(uint32 encoderID);
+bool encoder_is_dp_bridge(uint32 encoderID);
+uint32 encoder_get_dp_link_clock(uint32 connectorIndex);
 
 
 #endif /* RADEON_HD_ENCODER_H */

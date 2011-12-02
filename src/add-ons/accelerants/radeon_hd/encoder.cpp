@@ -1250,7 +1250,7 @@ encoder_type_lookup(uint32 encoderID, uint32 connectorFlags)
 
 
 bool
-encoder_isexternal(uint32 encoderID)
+encoder_is_external(uint32 encoderID)
 {
 	switch (encoderID) {
 		case ENCODER_OBJECT_ID_SI170B:
@@ -1266,4 +1266,27 @@ encoder_isexternal(uint32 encoderID)
 	}
 
 	return false;
+}
+
+
+bool
+encoder_is_dp_bridge(uint32 encoderID) {
+	switch (encoderID) {
+		case ENCODER_OBJECT_ID_TRAVIS:
+		case ENCODER_OBJECT_ID_NUTMEG:
+			return true;
+	}
+	return false;
+}
+
+
+uint32
+encoder_get_dp_link_clock(uint32 connectorIndex) {
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
+
+	if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
+		return 270000;
+
+	// TODO: calculate DisplayPort max pixel clock based on bpp and DP channels
+	return 162000;
 }
