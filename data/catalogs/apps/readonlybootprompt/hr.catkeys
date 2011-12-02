@@ -1,0 +1,7 @@
+1	croatian	x-vnd.Haiku-ReadOnlyBootPrompt	2686989872
+Custom	BootPromptWindow		Prilagođeno
+Desktop (Live-CD)	BootPromptWindow		Desktop (Live-CD)
+Keymap	BootPromptWindow		Tipkovnica
+Language	BootPromptWindow		Jezik
+Run Installer	BootPromptWindow		Pokreni instalacijski program
+Welcome to Haiku!	BootPromptWindow		Dobro došli u Haiku!

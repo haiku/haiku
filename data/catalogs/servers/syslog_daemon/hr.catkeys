@@ -1,0 +1,5 @@
+1	croatian	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		 poruka sustava i zapisuje ih u system-wide log na \"%s\".\n\n
+
+OK	SyslogDaemon		U redu
+Syslog Daemon	SyslogDaemon		Syslog Daemon

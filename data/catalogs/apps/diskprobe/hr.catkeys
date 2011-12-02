@@ -1,0 +1,64 @@
+1	croatian	x-vnd.Haiku-DiskProbe	3035937767
+15 bit	TypeEditors		15 bit
+16 bit	TypeEditors		16 bit
+32 bit	TypeEditors		32 bit
+Add	ProbeView		Dodaj
+Attribute	ProbeView		Atribut
+Attribute: 	ProbeView		Atribut:
+Attributes	ProbeView		Atributi
+Back	ProbeView		Natrag
+Bookmarks	ProbeView		Zabilješke
+Cancel	AttributeWindow		Otkaži
+Cancel	OpenWindow		Otkaži
+Cancel	ProbeView		Otkaži
+Close	AttributeWindow		Zatvori
+Close	FileWindow		Zatvori
+Close	ProbeView		Zatvori
+Contents:	TypeEditors		Sadržaj:
+Copy	ProbeView		Kopiraj
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Ne mogu čitati sliku
+Device	ProbeView		Uređaj
+Device: 	ProbeView		Uređaj:
+Don't save	ProbeView		Nemoj spremiti
+Examine device:	OpenWindow		Pregledaj uređaj:
+File	FileWindow		Datoteka
+File	ProbeView		Datoteka
+File: 	ProbeView		Datoteka:
+Find	FindWindow		Nađi
+Find again	ProbeView		Nađi ponovno
+Find…	ProbeView		Nađi...
+Font size	ProbeView		Veličina fonta
+Grayscale	TypeEditors		Sivo
+Icon	TypeEditors		Ikona
+Icon view	TypeEditors		Pogled ikona
+Image	TypeEditors	This is the type of view	Slika
+Message	TypeEditors	This is the type of view	Poruka
+Mode:	FindWindow		Način rada:
+New…	FileWindow		Nova...
+Next	ProbeView		Slijedeće
+Number	TypeEditors	This is the type of editor	Broj
+Number editor	TypeEditors		Uređivač-broja
+Number:	TypeEditors		Broj:
+OK	DiskProbe		U redu
+OK	ProbeView		U redu
+Open device	FileWindow		Otvori uređaj
+Open file…	FileWindow		Otvori datoteku...
+PNG format	TypeEditors		PNG format
+Page setup…	ProbeView		Postavljanje stranice...
+Paste	ProbeView		Zalijepi
+Previous	ProbeView		Prethodno
+Print…	ProbeView		Ispisuj...
+Quit	FileWindow		Isključi
+Remove	AttributeWindow		Ukloni
+Remove from file	AttributeWindow		Ukloni iz datoteke
+Save	ProbeView		Spremi
+Save changes before closing?	ProbeView		Spremiti izmjene prije zatvaranja?
+Selection	ProbeView		Odabir
+Stop	ProbeView		Stani
+Text	FindWindow		Tekst
+Text	TypeEditors	This is the type of editor	Tekst
+Unknown format	TypeEditors		Nepoznati format
+Unknown type	TypeEditors		Nepoznati tip
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Pogled
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Pisanje u datoteku nije uspjelo:\n%s\n\nSve promjene će biti izgubljene kada isključite.
+none	ProbeView	No attributes	nijedan

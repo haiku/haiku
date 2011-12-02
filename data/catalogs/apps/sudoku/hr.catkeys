@@ -1,0 +1,34 @@
+1	croatian	x-vnd.Haiku-Sudoku	2463385585
+Abort	ProgressWindow		Prekini
+Advanced	SudokuWindow		Napredno
+Blank	SudokuWindow		Prazno
+Copy	SudokuWindow		Kopiraj
+Could not open \"%s\":\n%s\n	SudokuWindow		Ne mogu otvoriti \"%s\":\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Ne mogu postaviti Sudoku:\n%s\n
+Creating solvable field	SudokuGenerator		Stvori riješivo polje
+Easy	SudokuWindow		Lagano
+Export as…	SudokuWindow		Izvezi kao...
+File	SudokuWindow		Datoteka
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Teško
+Help	SudokuWindow		Pomoć
+Mark invalid values	SudokuWindow		Označo netočne vrijednosti
+Mark valid hints	SudokuWindow		Označi valjane nagovještaje
+New	SudokuWindow		Novo
+OK	SudokuWindow		Ok
+Open file…	SudokuWindow		Otvori datoteku...
+Progress monitor	ProgressWindow		Pregled napretka
+Quit	SudokuWindow		Izlaz
+Redo	SudokuWindow		Uradi ponovno
+Restore snapshot	SudokuWindow		Vrati sliku
+Searching for removable values	SudokuGenerator		Traženje za uklonjive vrijednosti
+Snapshot current	SudokuWindow		Slikaj trenutno
+Solve	SudokuWindow		Riješi
+Solve single field	SudokuWindow		Riješi jedno polje
+Start again	SudokuWindow		Kreni ponovo
+Sudoku	System name		Sudoku
+Sudoku request	SudokuWindow		Sudoku zahtijev
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku riješen - čestitamo!\n
+Text	SudokuWindow		Tekst
+Undo	SudokuWindow		Poništi
+View	SudokuWindow		Pregled

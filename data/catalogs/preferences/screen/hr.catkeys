@@ -1,0 +1,51 @@
+1	croatian	x-vnd.Haiku-Screen	3347611655
+%.1f Hz	Screen		%.1f Hz
+%sSerial no.: %s	Screen		%sSerial no.: %s
+/other…	Screen		/ostalo...
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 boja
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 boja
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Miliona boja
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Miliona boja
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 boja
+About	Screen		O programu
+All workspaces	Screen		Svi radni prostori
+Apply	Screen		Primjeni
+Cancel	Screen		Poništi
+Colors:	Screen		Boje:
+Columns:	Screen		Kolone:
+Combine displays:	Screen		Koristi ekrane zajedno:
+Could not write VESA mode settings file:\n\t	Screen		Nije moguće zapisati datoteku postavki VESA načina rada :\n\t
+Current workspace	Screen		Trenutni radni prostor
+Do you wish to keep these settings?	Screen		Da li želite zadržati ove postavke?
+Done	Screen		Završeno
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontalna frekvencija:\t%lu - %lu kHZ\nVerikalna frekvencija:\n%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz
+Hz	Screen		Hz
+OK	Screen		U redu
+Other…	Screen		Drugo...
+Refresh rate	Screen		Vrijeme osveženja
+Refresh rate:	Screen		Vrijeme osvježenja:
+Resolution:	Screen		Rezolucija:
+Revert	Screen		Preokreni
+Rows:	Screen		Redovi:
+Screen	Screen		Ekran
+Screen	System name		Ekran
+Screen preferences by the Haiku team	Screen		Osobitosti ekrana koje je načinio Haiku tim
+Set background…	Screen		Postavi pozadinu...
+Settings will revert in %seconds seconds.	Screen		Postavke će se vratiti za %seconds sekundi.
+Swap displays:	Screen		Zamjeni ekrane:
+The screen mode could not be set:\n\t%s\n	Screen		Način rada ekrana se ne može postaviti:\n\t%s\n
+Type or use the left and right arrow keys.	Screen		Tipkaj ili koristi tipku lijeve i desne strelice.
+Undo	Screen		Poništi
+Unknown mode	Screen		Nepoznati način rada
+Use laptop panel:	Screen		Koristi laptop ploču:
+Video format:	Screen		Format videa:
+Warning	Screen		Upozorenje
+Workspaces	Screen		Radni prostori
+always	Screen		uvijek
+bits/pixel	Screen		bit/pixel
+disable	Screen		onemogući
+horizontally	Screen		horizontalno
+if needed	Screen		ako je potrebno
+no	Screen		ne
+vertically	Screen		vertikalno
+yes	Screen		da

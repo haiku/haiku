@@ -1,0 +1,8 @@
+1	croatian	x-vnd.Haiku-IMAP	2976242043
+Apply	IMAPFolderConfig		Primjeni
+Destination:	imap_config		Odredište
+Failed to fetch available storage.	IMAPFolderConfig		Nisam uspio dohvatiti dostupnu pohranu.
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Dohvaćam IMAP mape,budite strpljivi...
+IMAP Folders	IMAPFolderConfig		IMAP mape
+IMAP Folders	imap_config		IMAP mape
+status	IMAPFolderConfig		stanje

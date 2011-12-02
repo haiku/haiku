@@ -1,0 +1,13 @@
+1	croatian	x-vnd.Haiku-Mouse	675836341
+...by Andrew Edward McCall	MouseApplication		...Andrew Edward McCall
+1-Button	SettingsView		1-tipka
+2-Button	SettingsView		2-tipka
+3-Button	SettingsView		3-tipka
+Accept first click	SettingsView		Prihvati prvi klik
+Defaults	MouseWindow		Zadano
+Double-click speed	SettingsView		Brzina dvostrukog klika
+Fast	SettingsView		Brzo
+Mouse acceleration	SettingsView		Ubrzanje miša
+Mouse type:	SettingsView		Tip miša:
+Normal	SettingsView		Normalno
+Slow	SettingsView		Sporo

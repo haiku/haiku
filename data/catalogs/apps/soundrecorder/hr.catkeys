@@ -1,0 +1,33 @@
+1	croatian	x-vnd.Haiku-SoundRecorder	3469062366
+Cannot connect to media server	RecorderWindow		Nije moguće spojiti se na medijski poslužitelj
+Cannot connect to the selected sound input	RecorderWindow		Nije se moguće spojiti sa odagranim zvučnim ulazom
+Cannot find an unused name to use for the new recording	RecorderWindow		Nemoguće naći nekorišteno ime za novu snimku
+Cannot find default audio hardware	RecorderWindow		Progam ne može naći zadani audio hardware
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Program nemože naći privremenu datoteku koja je kreirana da čuva novi snimak.
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nemoguće otvoriti privremeni file kreiran da sadrži novi snimak
+Cannot recognize this file as a media file	RecorderWindow		 Nemoguće prepoznati datoteku kao medijsku datoteku
+Cannot record a sound that long	RecorderWindow		Nemoguće snimiti zvuk tako dugo
+Channels: 	RecorderWindow		Kanali:
+Compression:	RecorderWindow		Kompresija:
+Drop files here	SoundListView		Spusti datoteke ovdje
+Duration:	RecorderWindow		Trajanje:
+File info	RecorderWindow		Informacije o datoteci
+File name:	RecorderWindow		Ime datoteke:
+Format: 	RecorderWindow		Format:
+Forward	RecorderWindow		Naprijed
+Input	RecorderWindow		Ulaz
+Input:	RecorderWindow		Ulaz:
+Loop	RecorderWindow		Petlja
+None	RecorderWindow		Nijedan
+None of the files appear to be audio files	RecorderWindow		Nijedna od datoteka ne izgleda kao audio datoteka
+Nothing to play	RecorderWindow		Ništa za izvođenje
+OK	RecorderWindow		U redu
+Play	RecorderWindow		Pokreni
+Record	RecorderWindow		Snimi
+Rewind	RecorderWindow		Premotaj
+Save	RecorderWindow		Spremi
+Some of the files don't appear to be audio files	RecorderWindow		Izgleda da neke datoteke nisu audio datoteke
+Sound List	RecorderWindow		Lista zvukova
+Stop	RecorderWindow		Zaustavi
+bits	RecorderWindow		biti
+seconds	RecorderWindow		sekundi

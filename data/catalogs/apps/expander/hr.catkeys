@@ -1,0 +1,47 @@
+1	croatian	x-vnd.Haiku-Expander	3325257262
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Jeste li sigurni da želite zaustaviti proširivanje ove\narhive?Proširene stavke možda neće biti kompletne.
+Automatically expand files	ExpanderPreferences		Automatski proširi datoteke
+Automatically show contents listing	ExpanderPreferences		Automatski pokaži izlistavanje sadržaja
+Cancel	ExpanderPreferences		Otkaži
+Cancel	ExpanderWindow		Otkaži
+Close	ExpanderMenu		Zatvori
+Close window when done expanding	ExpanderPreferences		Zatvori prozor kada je proširivanje završeno
+Continue	ExpanderWindow		Nastavi
+Destination	ExpanderWindow		Odredište
+Destination folder:	ExpanderPreferences		Odredišna mapa
+Error when expanding archive	ExpanderWindow		Greška pri proširivanju arhive
+Expand	ExpanderMenu		Proširi
+Expand	ExpanderWindow		Proširi
+Expander	System name		Proširivač
+Expander settings	ExpanderPreferences		Postavke proširivača
+Expander: Choose destination	DirectoryFilePanel		Proširivač:Izaberite odredište
+Expander: Open	ExpanderWindow		Proširivač:Otvori
+Expanding '%s'	ExpanderWindow		Proširujem '%s'
+Expansion:	ExpanderPreferences		Proširenje
+File	ExpanderMenu		Datoteka
+File expanded	ExpanderWindow		Datoteka je proširena
+Hide contents	ExpanderWindow		Sakrij sadržaj
+Leave destination folder path empty	ExpanderPreferences		Ostavi putnju odredišne mape praznom
+OK	ExpanderPreferences		U redu
+Open destination folder after extraction	ExpanderPreferences		Otvori odredišnu mapu nakon raspakiranja
+Other:	ExpanderPreferences		Ostalo:
+Same directory as source (archive) file	ExpanderPreferences		Isti direktorij kao i izvorna (arhiva) datoteka
+Select	DirectoryFilePanel		Odaberi
+Select	ExpanderPreferences		Odaberi
+Select '%s'	DirectoryFilePanel		Odaberi '%s'
+Select current	DirectoryFilePanel		Odaberi trenutno
+Set destination…	ExpanderMenu		Postavi odredište...
+Set source…	ExpanderMenu		Postavi izvor...
+Settings	ExpanderMenu		Postavke
+Settings…	ExpanderMenu		Postavke...
+Show contents	ExpanderMenu		Pokaži sadržaj
+Show contents	ExpanderWindow		Pokaži sadržaj
+Source	ExpanderWindow		Izvor
+Stop	ExpanderMenu		Zaustavi
+Stop	ExpanderWindow		Zaustavi
+The destination is not a folder.	ExpanderWindow		Odredište nije mapa.
+The destination is read only.	ExpanderWindow		Odredište je samo za čitanje
+The file doesn't exist	ExpanderWindow		Datoteka ne postoji
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mapa je ili premještena,preimenovana ili nije\npodržana.
+Use:	ExpanderPreferences		Korisiti:
+is not supported	ExpanderWindow		nije podržano

@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Be-WORK	932379173
+About Workspaces…	Workspaces		O radnim prostorima...
+Always on top	Workspaces		Uvijek na vrhu
+Auto-raise	Workspaces		Samopodizanje
+Change workspace count…	Workspaces		Promjeni broj radnih prostora...
+Invalid argument: %s\n	Workspaces		Neispravan argument : %s\n
+OK	Workspaces		U redu
+Quit	Workspaces		Isključi
+Show window border	Workspaces		Pokaži rub prozora
+Show window tab	Workspaces		Prikaži karticu prozora
+Workspaces	System name		Radni prostori
+Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\nNapisao %1, and %2. \n\nAutorska prava %3,Haiku.\n\nPošalji prozor u pozadinu korištenjem Option tipke. Pomakni prozor prema naprijed korištenjem Control tipke.\n

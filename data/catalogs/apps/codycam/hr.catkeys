@@ -1,0 +1,64 @@
+1	croatian	x-vnd.Haiku.CodyCam	3121399776
+Can't find an available connection to the video window	CodyCam		Ne mogu naći dostupnu vezu prema video prozoru
+Cannot create a video window	CodyCam		Ne mogu napraviti video prozor
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ne mogu naći video izvor.Treba vam web kamera da biste koristili CodyCam. 
+Cannot start the video source	CodyCam		Ne mogu pokrenuti video izvor
+Cannot start the video window	CodyCam		Ne mogu pokrenuti video prozor
+Closing the window\n	VideoConsumer.cpp		Zatvaranje prozora\n
+CodyCam	System name		CodyCam
+Connected…	VideoConsumer.cpp		Spojen...
+Couldn't find requested directory on server	VideoConsumer.cpp		Nisam mogao nać traženi direktorij na poslužitelju
+Directory:	CodyCam		Direktorij:
+Error creating output file	VideoConsumer.cpp		Greška pri izradi izlazne datoteke
+Error writing output file	VideoConsumer.cpp		Greška pri pisanju izlazne datoteke
+Every 10 minutes	CodyCam		Svakih 10 minuta
+Every 15 minutes	CodyCam		Svakih 15 minuta
+Every 15 seconds	CodyCam		Svakih 15 sekundi
+Every 2 hours	CodyCam		Svaka 2 sata
+Every 24 hours	CodyCam		Svaka 24 sata
+Every 30 minutes	CodyCam		Svakih 30 minuta
+Every 30 seconds	CodyCam		Svakih 30 sekunda
+Every 4 hours	CodyCam		Svakih 4 sata
+Every 5 minutes	CodyCam		Svakih 5 minuta
+Every 8 hours	CodyCam		Svakih 8 sati
+Every hour	CodyCam		Svaki sat
+Every minute	CodyCam		Svake minute
+FTP	CodyCam		FTP
+File	CodyCam		Datoteka
+File %s; Line %ld # %s	SettingsHandler		Datoteka %s; Redak %ld # %s
+File name:	CodyCam		Ime datoteke:
+File transmission failed	VideoConsumer.cpp		Neuspjeli FTP prijenos
+Format:	CodyCam		Format:
+Image Format Menu	CodyCam		Izbornik formata slika
+JPEG image	CodyCam		JPEG slika
+Locking the window\n	VideoConsumer.cpp		Zaključavanje prozora\n
+Logging in…	VideoConsumer.cpp		Prijavljujem se...
+Login:	CodyCam		Prijava:
+Never	CodyCam		Nikada
+OK	CodyCam		U redu
+Output	CodyCam		Izlaz
+Passive FTP	CodyCam		Pasivni FTP
+Password:	CodyCam		Lozinka:
+Quit	CodyCam		Isključi
+Remote host has closed the connection.\n	FtpClient		Udaljeno računalo je prekinlo vezu.\n
+Rename failed	VideoConsumer.cpp		Neuspjelo preimenovanje
+Renaming…	VideoConsumer.cpp		Preimenovanje...
+SFTP	CodyCam		SFTP
+Send to…	CodyCam		Pošalji ka...
+Server login failed	VideoConsumer.cpp		Neuspjela prijava poslužitelja
+Server:	CodyCam		Poslužitelj
+Start video	CodyCam		Pokreni video
+Stop video	CodyCam		Zaustavi video
+Transmitting…	VideoConsumer.cpp		Prenosim...
+Type:	CodyCam		Tip:
+Video settings	CodyCam		Video postavke
+Waiting…	CodyCam		Čekam...
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+on or off expected	Settings	Do not translate 'on' and 'off'	očekivano on ili off
+password	CodyCam		lozinka
+password expected	CodyCam		očekivana lozinka
+read: %d\n	SftpClient		čitaj: %d\n
+read: %ld\n	SftpClient		čitaj: %ld\n
+reply: %d, %d\n	FtpClient		odgovor: %d, %d\n
+reply: '%s'\n	SftpClient		odgovor: '%s'\n
+unknown command	SettingsHandler		nepoznata naredba

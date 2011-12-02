@@ -1,0 +1,22 @@
+1	croatian	x-vnd.Haiku-Locale	292140445
+12 hour	TimeFormatSettings		12 sati
+24 hour	TimeFormatSettings		24 sata
+Available languages	Locale Preflet Window		Dostupni jezici
+Currency	TimeFormatSettings		Valuta
+Date	TimeFormatSettings		Datum
+Defaults	Locale Preflet Window		Zadano
+Formatting	Locale Preflet Window		Formatiram
+Full format:	TimeFormatSettings		Puni format
+Language	Locale Preflet Window		Jezik
+Long format:	TimeFormatSettings		Dugi format
+Medium format:	TimeFormatSettings		Srednji format
+Negative:	TimeFormatSettings		Negativno:
+Numbers	TimeFormatSettings		Brojevi
+OK	Locale Preflet Window		U redu
+Positive:	TimeFormatSettings		Pozitivno:
+Preferred languages	Locale Preflet Window		Poželjni jezici
+Revert	Locale Preflet Window		Vrati
+Short format:	TimeFormatSettings		Kratki format
+Time	TimeFormatSettings		Vrijeme
+Use month/day-names from preferred language	TimeFormatSettings		Koristi mjesec/dan-imena iz poželjnih jezika
+already chosen	LanguageListView		već izabran
