@@ -43,7 +43,7 @@
 #define kCommonAddonsDirectory 			"/boot/common/add-ons"
 #define kCommonBinDirectory 			"/boot/common/bin"
 #define kCommonDevelopToolsBinDirectory "/boot/develop/tools/current/bin"
-#define kCommonEtcDirectory 			"/boot/common/settings/etc"
+#define kCommonEtcDirectory 			"/boot/common/etc"
 #define kCommonLibDirectory 			"/boot/common/lib"
 #define kCommonPackagesDirectory 		"/boot/common/packages"
 #define kCommonSettingsDirectory 		"/boot/common/settings"
