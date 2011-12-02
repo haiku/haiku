@@ -1,0 +1,41 @@
+1	croatian	x-vnd.Haiku-Pulse	3125035622
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nNapravili David Ramsey and Arve Hjønnevåg\nPregledao Daniel Switkin\n
+About Pulse…	CPUButton		O Pulse...
+About Pulse…	PulseView		O Pulse...
+Active color	ConfigView		Aktivna boja
+Bar colors	ConfigView		Boje trake
+Defaults	PrefsWindow		Zadano
+Deskbar	CPUButton		Deskbar
+Deskbar menu	CPUButton		Deskbar izbornik
+Error	PulseApp		Greška
+Frame color	ConfigView		Boja okvira
+Info	CPUButton		Info
+Info	DeskbarPulseView		Info
+Info	PulseApp		Info
+Info	PulseView		Info
+Installing in Deskbar failed\n%s	PulseApp		Neuspjelo instaliranje Deskbara\n%s
+Mini mode	DeskbarPulseView		Mini način rada
+Mini mode	NormalPulseView		Mini način rada
+Mini mode	PrefsWindow		Mini način rada
+Normal mode	DeskbarPulseView		Normalan način rada
+Normal mode	MiniPulseView		Normalan način rada
+Normal mode	PrefsWindow		Normalan način rada
+OK	CPUButton		U redu
+OK	DeskbarPulseView		U redu
+OK	PrefsWindow		U redu
+OK	PulseApp		U redu
+OK	PulseView		U redu
+Pulse	NormalPulseView		Pulse
+Pulse	PulseApp		Pulse
+Pulse	System name		Pulse
+Pulse settings	PulseWindow		Pulse postavke
+Quit	DeskbarPulseView		Izađi
+Quit	MiniPulseView		Izađi
+Remove replicant	CPUButton		Ukloni replikanta
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Neuspjelo uklanjanje sa  Deskbara .\n%s
+Settings…	PulseView		Postavke...
+Width of icon:	ConfigView		Širina ikone:
+You can't disable the last active CPU.	CPUButton		Ne možete onemogućiti zadnji aktivni procesor.
+You can't disable the last active CPU.	PulseView		Ne možete onemogućiti zadnji aktivni procesor.

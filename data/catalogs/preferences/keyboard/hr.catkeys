@@ -1,0 +1,9 @@
+1	croatian	x-vnd.Haiku-Keyboard	2326436249
+Defaults	KeyboardWindow		Zadano
+Fast	KeyboardView		Brzo
+Long	KeyboardView		Dugo
+OK	KeyboardApplication		U redu
+Revert	KeyboardWindow		Obrnuto
+Short	KeyboardView		Kratko
+Slow	KeyboardView		Sporo
+Written by Andrew Edward McCall	KeyboardApplication		Napisao Andrew Edward McCall

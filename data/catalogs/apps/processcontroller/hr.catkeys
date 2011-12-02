@@ -1,0 +1,27 @@
+1	croatian	x-vnd.Haiku-ProcessController	526648275
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Cancel	ProcessController		Otkaži
+Custom priority	ProcessController		Prilagođeni prioritet
+Do you really want to kill the team \"%s\"?	ProcessController		 Želite li doista ugasiti tim \"%s\"?
+Error saving file	ProcessController		Greška pri spremanju datoteke
+Info	ProcessController		Informacije
+Install in Deskbar	ProcessController		Instaliraj u Deskbar
+Low priority	ProcessController		Niski prioritet
+Lowest active priority	ProcessController		Najniži aktivni prioritet
+Memory usage	ProcessController		Upotreba memorije
+New Terminal	ProcessController		Novi terminal
+Normal priority	ProcessController		Normalni prioritet
+Ok!	ProcessController		U redu!
+Please confirm	ProcessController		Molim potvrdite
+Processor %d	ProcessController		Procesor %d
+Quit an application	ProcessController		Ugasi program
+Quit application	ProcessController		Izađi iz programa
+Real-time priority	ProcessController		 Prioritet stvarnog vremena
+Restart Deskbar	ProcessController		Ponovno pokreni Deskabar
+Run in window	ProcessController		Pokreni u prozoru
+That's no Fun!	ProcessController		To nije zabavno!
+This is the last active processor...\nYou can't turn it off!	ProcessController		Ovo je zadnji aktivni procesor...\nNe možete ga isključiti!
+Urgent priority	ProcessController		Hitni prioritet
+Usage: %s [-deskbar]\n	ProcessController		Upotreba: %s [-deskbar]\n
+Yes, kill this team!	ProcessController		Da, ugasi ovaj tim!
+Your setting file could not be saved!\n(%s)	ProcessController		Vaša datoteka postavki nije mogla biti spremljena!\n(%s)

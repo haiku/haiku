@@ -1,0 +1,24 @@
+1	croatian	x-vnd.Haiku-ActivityMonitor	2463799300
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+Additional items	ActivityView		Dodatne stavke
+Apps	DataSource		Programi
+CPU	DataSource		CPU
+CPU usage	DataSource		CPU upotreba 
+CPU usage (combined)	DataSource		CPU upotreba (kombinirano)
+File	ActivityWindow		Datoteka
+MB	DataSource		MB
+Memory	DataSource		Memorija
+Ports	DataSource		Portovi
+Quit	ActivityWindow		Isključi
+Receiving	DataSource		Primaanje
+Running applications	DataSource		Pokretanje programa
+Semaphores	DataSource		Semafori
+Sending	DataSource		Slanje
+Settings	ActivityWindow		Postavke
+Settings…	ActivityWindow		Postavke...
+Swap	DataSource		Swap
+Swap space	DataSource		Swap prostor
+Update time interval:	SettingsWindow		Dopuni vremenski interval
+Used memory	DataSource		Korištena memorija
+usage	DataSource		upotreba

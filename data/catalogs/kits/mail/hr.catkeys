@@ -1,0 +1,10 @@
+1	croatian	x-vnd.Haiku-libmail	161731481
+Connection type:	ProtocolConfigView		Vrsta veze:
+Leave mail on server	ProtocolConfigView		Ostavi poštu na poslužitelju
+Login type:	ProtocolConfigView		Vrsta prijave:
+Mail server:	ProtocolConfigView		Poslužitelj pošte:
+Partially download messages larger than	ProtocolConfigView		Djelomično preuzmi poruke veće od
+Password:	ProtocolConfigView		Lozinka:
+Remove mail from server when deleted	ProtocolConfigView		Ukloni poštu sa poslužitelja kada je izbrisana
+Select…	MailKit		Odaberi...
+Username:	ProtocolConfigView		Korisničko ime:

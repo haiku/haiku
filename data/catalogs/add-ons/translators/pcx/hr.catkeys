@@ -1,0 +1,8 @@
+1	croatian	x-vnd.Haiku-PCXTranslator	1002061545
+PCX %lu bit image	PCXTranslator		PCX %lu bit slika
+PCX Settings	main		PCX postavke
+PCX images	ConfigView		PCX slike
+PCX images	PCXTranslator		PCX slike
+PCX translator	PCXTranslator		PCX prevoditelj
+PCXTranslator Settings	ConfigView		Postavke PCXTranslatora 
+Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s

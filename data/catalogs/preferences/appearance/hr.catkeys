@@ -1,0 +1,28 @@
+1	croatian	x-vnd.Haiku-Appearance	1813943384
+About	DecorSettingsView		O programu
+About Decorator	DecorSettingsView		O dekoratoru
+Appearance	System name		Izgled
+Choose Decorator	DecorSettingsView		Odaberite dekorator
+Colors	APRWindow		Boje
+Defaults	APRWindow		Zadano
+Document background	Colors tab		Pozadina dokumenta
+Document text	Colors tab		Tekst dokumenta
+Failure	Colors tab		Neuspjeh
+Grayscale	AntialiasingSettingsView		Sivo
+Inactive window tab	Colors tab		Neaktivna kartica prozora
+Inactive window tab text	Colors tab		Tekst neaktivne kartice prozora
+Menu background	Colors tab		Pozadina izbornika
+Menu item text	Colors tab		Tekst stavke izbornika
+OK	DecorSettingsView		U redu
+Off	AntialiasingSettingsView		Isključeno
+Panel background	Colors tab		Pozadina ploče
+Panel text	Colors tab		Tekst ploče
+Revert	APRWindow		Obrnuto
+Selected menu item background	Colors tab		Odabrana pozadina stavke izbornika
+Selected menu item text	Colors tab		Tekst odabrane stavke izbornika
+Shadow	Colors tab		Sjena
+Shine	Colors tab		Sjaj
+Success	Colors tab		Uspjeh
+Window Decorator	APRWindow		Dekorator prozora
+Window tab	Colors tab		Kartica prozora
+Window tab text	Colors tab		Tekst kartice prozora

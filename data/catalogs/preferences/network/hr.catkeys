@@ -1,0 +1,14 @@
+1	croatian	x-vnd.Haiku-Network	554025248
+<no wireless networks found>	EthernetSettingsView		<nije pronađena nijedna bežična mreža>
+Apply	EthernetSettingsView		Primjeni
+Choose automatically	EthernetSettingsView		Odaberi automatski
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS #1:
+DNS #2:	EthernetSettingsView		DNS #2:
+Disabled	EthernetSettingsView		Onemogućeno
+Domain:	EthernetSettingsView		Domena:
+IP address:	EthernetSettingsView		IP adresa:
+Netmask:	EthernetSettingsView		Mrežna maska:
+Network:	EthernetSettingsView		Mreža:
+OK	EthernetSettingsView		U redu
+Revert	EthernetSettingsView		Obrnuto

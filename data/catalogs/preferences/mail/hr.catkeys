@@ -1,0 +1,55 @@
+1	croatian	x-vnd.Haiku-Mail	2106513116
+Account name:	Config Views		Ime računa:
+Account name:	E-Mail		Ime računa:
+Account settings	AutoConfigWindow		Postavke računa
+Account settings	Config Views		Postavke računa
+Accounts	Config Window		Računi
+Add	Config Window		Dodaj
+Add filter	Config Views		Dodaj filter
+Always	Config Window		Uvijek
+Apply	Config Window		Primjeni
+Back	AutoConfigWindow		Natrag
+Check every	Config Window		Provjeri svakih
+Choose Protocol	E-Mail		Odaberite protokol
+Create new account	AutoConfigWindow		Napravite novi račun
+E-mail	System name		Elektronička pošta
+E-mail address:	E-Mail		Adresa elektroničke pošte:
+Enter a valid e-mail address.	AutoConfigWindow		Unesite valjanu adresu elektroničke pošte.
+Error	Config Window		Greška
+Finish	AutoConfigWindow		Kraj
+Incoming	Config Window		Dolazno
+Incoming	E-Mail		Dolazno
+Incoming mail filters	Config Views		Filteri dolazne pošte
+Login name:	E-Mail		Ime prijave:
+Mail checking	Config Window		Provjera pošte
+Miscellaneous	Config Window		Razno
+Never	Config Window	show status window	Nikada
+Next	AutoConfigWindow		Slijedeće
+OK	AutoConfigWindow		U redu
+OK	Config Views		U redu
+OK	Config Window		U redu
+Only when dial-up is connected	Config Window		Samo kada je spojen dial-up
+Outgoing	E-Mail		Odlazno
+Outgoing mail filters	Config Views		Filteri odlazne pošte
+Password:	E-Mail		Lozinka:
+Real name:	Config Views		Pravo ime:
+Real name:	E-Mail		Pravo ime:
+Remove	Config Views		Ukloni
+Remove	Config Window		Ukloni
+Return address:	Config Views		Povratna adresa:
+Revert	Config Window		Obrnuto
+Server Name:	E-Mail		Ime poslužitelja:
+Settings	Config Window		Postavke
+Show connection status window:	Config Window		Pokaži prozor stanja veze
+Start mail services on startup	Config Window		Pokreni servise pošte pri pokretanju računala
+The filter could not be moved. Deleting filter.	Config Views		Filter se ne može maknuti.Brišem filter.
+While sending	Config Window		Prilikom slanja
+While sending and receiving	Config Window		Za vrijeme slanja i primanja
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNapravite novi račun sa Dodaj tipkom.\n\nUkloni račun sa Ukloni tipkom na odabranoj stavci.\n\Odaberite stavku na listi da biste promjenili njezine postavke.
+\t\t· E-mail filters	Config Window		\t\t· Filteri ekektroničke pošte
+\t\t· Incoming	Config Window		\t\t· Dolazno
+\t\t· Outgoing	Config Window		\t\t· Odlazno
+days	Config Window		dani
+hours	Config Window		sati
+minutes	Config Window		minute
+never	Config Window	mail checking frequency	nikada
