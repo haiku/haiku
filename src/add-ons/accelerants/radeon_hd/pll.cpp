@@ -427,7 +427,8 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 							}
 						}
 
-						args.v3.sInput.ucExtTransmitterID = dpBridge ? 1 : 0;
+						args.v3.sInput.ucExtTransmitterID
+							= dpBridge ? encoderID : 0;
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 
