@@ -235,6 +235,22 @@ BCardLayout::AllUnarchived(const BMessage* from)
 }
 
 
+status_t
+BCardLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
+{
+	return BAbstractLayout::ItemArchived(into, item, index);
+}
+
+
+status_t
+BCardLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
+	int32 index)
+{
+	return BAbstractLayout::ItemUnarchived(from, item, index);
+}
+
+
+
 BArchivable*
 BCardLayout::Instantiate(BMessage* from)
 {

@@ -39,6 +39,22 @@ public:
 	static	BArchivable*		Instantiate(BMessage* from);
 
 private:
+	// FBC padding
+	virtual	void				_ReservedSpaceLayoutItem1();
+	virtual	void				_ReservedSpaceLayoutItem2();
+	virtual	void				_ReservedSpaceLayoutItem3();
+	virtual	void				_ReservedSpaceLayoutItem4();
+	virtual	void				_ReservedSpaceLayoutItem5();
+	virtual	void				_ReservedSpaceLayoutItem6();
+	virtual	void				_ReservedSpaceLayoutItem7();
+	virtual	void				_ReservedSpaceLayoutItem8();
+	virtual	void				_ReservedSpaceLayoutItem9();
+	virtual	void				_ReservedSpaceLayoutItem10();
+
+	// forbidden methods
+								BSpaceLayoutItem(const BSpaceLayoutItem&);
+			void				operator =(const BSpaceLayoutItem&);
+
 			BRect				fFrame;
 			BSize				fMinSize;
 			BSize				fMaxSize;

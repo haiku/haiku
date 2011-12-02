@@ -226,3 +226,15 @@ BSpaceLayoutItem::Instantiate(BMessage* from)
 	return NULL;
 }
 
+
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem1() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem2() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem3() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem4() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem5() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem6() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem7() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem8() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem9() {}
+void BSpaceLayoutItem::_ReservedSpaceLayoutItem10() {}
+

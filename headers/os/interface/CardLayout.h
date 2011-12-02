@@ -37,6 +37,11 @@ protected:
 	virtual	status_t			AllArchived(BMessage* archive) const;
 	virtual status_t			AllUnarchived(const BMessage* from);
 
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+
 	virtual	void				LayoutInvalidated(bool children = false);
 	virtual	void				DoLayout();
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
@@ -57,6 +62,10 @@ private:
 	virtual	void				_ReservedCardLayout8();
 	virtual	void				_ReservedCardLayout9();
 	virtual	void				_ReservedCardLayout10();
+
+	// forbidden methods
+								BCardLayout(const BCardLayout&);
+			void				operator =(const BCardLayout&);
 
 			BSize				fMin;
 			BSize				fMax;

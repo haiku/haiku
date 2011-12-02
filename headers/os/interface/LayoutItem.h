@@ -85,6 +85,10 @@ private:
 	virtual	void				_ReservedLayoutItem9();
 	virtual	void				_ReservedLayoutItem10();
 
+	// forbidden methods
+								BLayoutItem(const BLayoutItem&);
+			void				operator =(const BLayoutItem&);
+
 			friend class BLayout;
 
 			BLayout*			fLayout;
