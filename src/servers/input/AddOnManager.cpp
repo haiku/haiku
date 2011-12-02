@@ -276,7 +276,7 @@ AddOnManager::_RegisterAddOns()
 	BDirectory directory;
 	BPath path;
 	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
-	for (uint32 i = fSafeMode ? 4 : 0;
+	for (uint32 i = fSafeMode ? 2 : 0;
 			i < sizeof(directories) / sizeof(directory_which); i++) {
 		for (int32 j = 0; j < subDirectoryCount; j++) {
 			if (find_directory(directories[i], &path) == B_OK
