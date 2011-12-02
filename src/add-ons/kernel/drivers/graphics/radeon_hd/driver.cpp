@@ -120,6 +120,7 @@ const struct supported_device {
 	{0x9507, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3830"},
 	{0x9505, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3850"},
 	{0x9513, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3850 X2"},
+	{0x9515, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3850"},
 	{0x9501, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3870"},
 	{0x950F, 2, 0, RADEON_RV670, CHIP_STD, "Radeon HD 3870 X2"},
 	{0x9710, 3, 0, RADEON_RV620, CHIP_IGP, "Radeon HD 4200"},
