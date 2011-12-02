@@ -34,8 +34,6 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
-	virtual status_t			AllArchived(BMessage* into) const;
-	virtual status_t			AllUnarchived(const BMessage* from);
 
 	virtual	void				Draw(BRect update);
 	virtual	void				AttachedToWindow();
@@ -89,6 +87,9 @@ public:
 	virtual status_t			Perform(perform_code d, void* arg);
 
 protected:
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual status_t			AllUnarchived(const BMessage* from);
+
 	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
 

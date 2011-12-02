@@ -29,13 +29,14 @@ public:
 									float* max, float* preferred);
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
-	virtual	status_t			AllArchived(BMessage* archive) const;
-	virtual status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 
 	virtual	status_t			Perform(perform_code d, void* arg);
 
 protected:
+	virtual	status_t			AllArchived(BMessage* archive) const;
+	virtual status_t			AllUnarchived(const BMessage* from);
+
 	virtual	void				LayoutInvalidated(bool children = false);
 	virtual	void				DoLayout();
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);

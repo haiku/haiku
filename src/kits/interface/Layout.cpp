@@ -381,7 +381,6 @@ BLayout::Relayout(bool immediate)
 }
 
 
-
 void
 BLayout::_LayoutWithinContext(bool force, BLayoutContext* context)
 {

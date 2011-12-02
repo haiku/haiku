@@ -36,8 +36,6 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
-	virtual	status_t			AllArchived(BMessage* into) const;
-	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual	void				SetText(const char* text);
 			const char*			Text() const;
@@ -92,6 +90,9 @@ public:
 			BLayoutItem*		CreateTextViewLayoutItem();
 
 protected:
+	virtual	status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
+
 	virtual	void				LayoutInvalidated(bool descendants);
 	virtual	void				DoLayout();
 

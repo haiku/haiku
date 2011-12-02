@@ -55,13 +55,13 @@ public:
 			void				AlignInFrame(BRect frame);
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
-	virtual status_t			AllArchived(BMessage* into) const;
-	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual status_t			Perform(perform_code d, void* arg);
 
 protected:
-			void				SetLayout(BLayout* layout);
+	// archiving methods
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	// hook methods
 	virtual	void				LayoutInvalidated(bool children);
@@ -72,6 +72,8 @@ protected:
 	virtual void				AncestorVisibilityChanged(bool shown);
 
 private:
+			void				SetLayout(BLayout* layout);
+
 	virtual	void				_ReservedLayoutItem1();
 	virtual	void				_ReservedLayoutItem2();
 	virtual	void				_ReservedLayoutItem3();
