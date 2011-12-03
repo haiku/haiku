@@ -53,8 +53,12 @@ do_select(int argc, char** argv)
 	if (argc > 1)
 		folder = argv[1];
 
-	status_t status = sProtocol.SelectMailbox(folder);
-	if (status != B_OK)
+	IMAP::SelectCommand command(folder);
+	status_t status = sProtocol.ProcessCommand(command);
+	if (status == B_OK) {
+		printf("Next UID: %" B_PRIu32 ", UID validity: %" B_PRIu32 "\n",
+			command.NextUID(), command.UIDValidity());
+	} else
 		error("select", status);
 }
 

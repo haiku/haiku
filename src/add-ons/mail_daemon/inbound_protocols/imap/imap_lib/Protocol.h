@@ -55,11 +55,6 @@ public:
 								Protocol();
 								~Protocol();
 
-			/*! Indicates that the current action should be interrupted because
-			we are going to be deleted. */
-			void				SetStopNow();
-			bool				StopNow();
-
 			status_t			Connect(const BNetworkAddress& address,
 									const char* username, const char* password,
 									bool useSSL = true);
@@ -70,17 +65,12 @@ public:
 			status_t			SendCommand(int32 id, const char* command);
 			ssize_t				SendData(const char* buffer, uint32 length);
 
+			// Some convenience methods
 			status_t			GetFolders(FolderList& folders);
 			status_t			SubscribeFolder(const char* folder);
 			status_t			UnsubscribeFolder(const char* folder);
-
-			status_t			SelectMailbox(const char* mailbox);
-			const BString&		Mailbox() const { return fMailbox; }
-
 			status_t			GetQuota(uint64& used, uint64& total);
 
-			/*! Install a temporary handler at first position in the handler
-			list. */
 			status_t			ProcessCommand(Command& command,
 									bigtime_t timeout = kIMAP4ClientTimeout);
 
@@ -117,12 +107,10 @@ protected:
 			ArgumentList		fCapabilities;
 
 private:
-			BString				fMailbox;
 			int32				fCommandID;
 			CommandIDMap		fOngoingCommands;
 			BString				fCommandError;
 
-			vint32				fStopNow;
 			bool				fIsConnected;
 };
 

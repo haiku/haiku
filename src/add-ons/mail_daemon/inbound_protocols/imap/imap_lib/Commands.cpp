@@ -216,6 +216,7 @@ SelectCommand::CommandString()
 		return "";
 
 	BString command = "SELECT \"";
+	// TODO: properly quote the string!
 	command += fMailboxName;
 	command += "\"";
 	return command;

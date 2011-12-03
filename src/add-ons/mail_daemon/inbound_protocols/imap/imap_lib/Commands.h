@@ -39,6 +39,7 @@ enum MessageFlags {
 	kFlagged	= 0x04,
 	kDeleted	= 0x08,
 	kDraft		= 0x10
+	// \Recent doesn't really have any useful meaning, so we just ignore it
 };
 
 

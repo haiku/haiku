@@ -28,7 +28,6 @@ Protocol::Protocol()
 	fSocket(NULL),
 	fBufferedSocket(NULL),
 	fCommandID(0),
-	fStopNow(0),
 	fIsConnected(false)
 {
 }
@@ -41,21 +40,6 @@ Protocol::~Protocol()
 
 	delete fSocket;
 	delete fBufferedSocket;
-}
-
-
-
-void
-Protocol::SetStopNow()
-{
-	atomic_set(&fStopNow, 1);
-}
-
-
-bool
-Protocol::StopNow()
-{
-	return (atomic_get(&fStopNow) != 0);
 }
 
 
@@ -93,6 +77,16 @@ Protocol::Connect(const BNetworkAddress& address, const char* username,
 	}
 
 	_ParseCapabilities(login.Capabilities());
+
+	if (fCapabilities.IsEmpty()) {
+		CapabilityHandler capabilityHandler;
+		status = ProcessCommand(capabilityHandler);
+		if (status != B_OK)
+			return status;
+
+		_ParseCapabilities(capabilityHandler.Capabilities());
+	}
+
 	return B_OK;
 }
 
@@ -176,29 +170,6 @@ Protocol::UnsubscribeFolder(const char* folder)
 {
 	UnsubscribeCommand command(folder);
 	return ProcessCommand(command);
-}
-
-
-status_t
-Protocol::SelectMailbox(const char* mailbox)
-{
-	TRACE("SELECT %s\n", mailbox);
-	SelectCommand command(mailbox);
-	status_t status = ProcessCommand(command);
-	if (status != B_OK)
-		return status;
-
-	if (fCapabilities.IsEmpty()) {
-		CapabilityHandler capabilityHandler;
-		status = ProcessCommand(capabilityHandler);
-		if (status != B_OK)
-			return status;
-
-		_ParseCapabilities(capabilityHandler.Capabilities());
-	}
-
-	fMailbox = mailbox;
-	return B_OK;
 }
 
 
