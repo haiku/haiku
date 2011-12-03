@@ -165,6 +165,8 @@ static const Translation gTranslations[] =
 	},
 	{ "lt",
 		"Algirdas Buckus\n"
+		"Simonas Kazlauskas\n"
+		"Rimas Kudelis\n"
 	},
 	{ "pl",
 		"Szymon Barczak\n"
