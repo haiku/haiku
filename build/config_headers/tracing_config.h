@@ -28,6 +28,8 @@
 #define BMESSAGE_TRACING						0
 #define FILE_DESCRIPTOR_TRACING					0
 #define FILE_DESCRIPTOR_TRACING_STACK_TRACE		0	/* stack trace depth */
+#define GUARDED_HEAP_TRACING					0
+#define GUARDED_HEAP_TRACING_STACK_TRACE		0	/* stack trace depth */
 #define IO_CONTEXT_TRACING						0
 #define IO_CONTEXT_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define KERNEL_HEAP_TRACING						0

@@ -101,11 +101,27 @@
 // Enables swap support.
 #define ENABLE_SWAP_SUPPORT				1
 
-// Use the slab allocator as generic memory allocator (malloc()/free()).
+// Use the selected allocator as generic memory allocator (malloc()/free()).
+#define USE_DEBUG_HEAP_FOR_MALLOC		0
+	// Heap implementation with additional debugging facilities.
+#define USE_GUARDED_HEAP_FOR_MALLOC		0
+	// Heap implementation that allocates memory so that the end of the
+	// allocation always coincides with a page end and is followed by a guard
+	// page which is marked non-present. Out of bounds access (both read and
+	// write) therefore cause a crash (unhandled page fault). Note that this
+	// allocator is neither speed nor space efficient, indeed it wastes huge
+	// amounts of pages and address space so it is quite easy to hit limits.
 #define USE_SLAB_ALLOCATOR_FOR_MALLOC	1
+	// Heap implementation based on the slab allocator (for production use).
 
 // Enables additional sanity checks in the slab allocator's memory manager.
 #define DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS	0
+
+// Disables memory re-use in the guarded heap (freed memory is never reused and
+// stays invalid causing every access to crash). Note that this is a magnitude
+// more space inefficient than the guarded heap itself. Fully booting may not
+// work at all due to address space waste.
+#define DEBUG_GUARDED_HEAP_DISABLE_MEMORY_REUSE		0
 
 // When set limits the amount of available RAM (in MB).
 //#define LIMIT_AVAILABLE_MEMORY		256

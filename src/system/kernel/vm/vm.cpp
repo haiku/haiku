@@ -3786,7 +3786,7 @@ vm_init(kernel_args* args)
 
 	slab_init(args);
 
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	size_t heapSize = INITIAL_HEAP_SIZE;
 	// try to accomodate low memory systems
 	while (heapSize > sAvailableMemory / 8)
@@ -3816,7 +3816,7 @@ vm_init(kernel_args* args)
 	VMAddressSpace::Init();
 	reserve_boot_loader_ranges(args);
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	heap_init_post_area();
 #endif
 
@@ -3829,7 +3829,7 @@ vm_init(kernel_args* args)
 
 	// allocate areas to represent stuff that already exists
 
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -3937,7 +3937,7 @@ vm_init_post_sem(kernel_args* args)
 
 	slab_init_post_sem();
 
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	heap_init_post_sem();
 #endif
 
