@@ -1378,7 +1378,7 @@ copy_user_process_args(const char* const* userFlatArgs, size_t flatArgsSize,
 		return B_BAD_ADDRESS;
 
 	// allocate kernel memory
-	char** flatArgs = (char**)malloc(flatArgsSize);
+	char** flatArgs = (char**)malloc(_ALIGN(flatArgsSize));
 	if (flatArgs == NULL)
 		return B_NO_MEMORY;
 
