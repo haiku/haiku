@@ -1,7 +1,8 @@
-1	belarusian	x-vnd.Haiku-SoundRecorder	1515868707
+1	belarusian	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Зацыкліць
 Cannot find default audio hardware	RecorderWindow		Немагчыма знайсці стандартную аўдыё апаратуру
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Немагчыма знайсці часовы файл, створаны для захавання новага запісу
+Sample size:	RecorderWindow		Памер сэмплу:
 Nothing to play	RecorderWindow		Няма чаго іграць
 Duration: 	RecorderWindow		Працягласць:
 Some of the files don't appear to be audio files	RecorderWindow		Некаторыя з файлаў не падобныя да аўдыё файлаў
@@ -13,6 +14,7 @@ Format:	RecorderWindow		Фармат:
 Sound List	RecorderWindow		Спіс Гуку
 Compression: 	RecorderWindow		Сцiск:
 Rewind	RecorderWindow		Назад
+Sample rate:	RecorderWindow		Частата сэмплаў:
 Invalid audio files	RecorderWindow		Няправільныя аўдыё файлы
  seconds	RecorderWindow		 секунды
 OK	RecorderWindow		ОК

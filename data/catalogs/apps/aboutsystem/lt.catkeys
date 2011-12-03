@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	2717523515
+1	lithuanian	x-vnd.Haiku-About	3434348710
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		© 1999-2010 „Gutenprint“ autoriai. Visos teisės saugomos.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis'ui Geiselbrecht'ui (už „NewOS“ branduolį)\n
 BSD (4-clause)	AboutView		BSD (4 punktų)
@@ -24,10 +24,9 @@ Processor:	AboutView		Procesorius:
 Kernel:	AboutView		Branduolys:
 BSD (3-clause)	AboutView		BSD (3 punktų)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		© 2001-2002 Thomas Broyer, Charlie Bozeman ir Daniel Veillard. Visos teisės saugomos.
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		© 1991-2000 Silicon Graphics, Inc. Visos teisės saugomos.
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Dalies šios progarminės įrangos autorių teisės priklauso © 1996-2006 The FreeType Project. Visos teisės saugomos.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Visos autorių teisės į „Haiku“ pirminius tekstus priklauso „Haiku, Inc.“ arba konkretiems tuose tekstuose paminėtiems autoriams. „Haiku“® ir „HAIKU“® logotipas yra registruoti „Haiku, Inc.“ prekės ženklai.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		© 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nVisos teisės saugomos.
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Dalies šios progarminės įrangos autorių teisės priklauso © 1996-2006 The FreeType Project. Visos teisės saugomos.
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB iš viso, %inaccessible MiB nepasiekiama
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		© 2000-2007 Fabrice Bellard ir kiti.
 Contributors:\n	AboutView		Talkininkai:\n
@@ -74,6 +73,7 @@ Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		© 2
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		© 2003-2006 Intel Corporation. Visos teisės saugomos.
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		© 1997-2006 PDFlib GmbH ir Thomas Merz. Visos teisės saugomos.\n„PDFlib“ and „PDFlib“ logotipas yra „PDFlib GmbH“ registruoti prekės ženklai.
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		© 1991-2000 Silicon Graphics, Inc. Visos teisės saugomos.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Dalis pateiktos programinės įrangos yra iš GNU projekto ir platinama pagal GPL ir LGPL licencijas:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\n© The Free Software Foundation.
 MIT license. All rights reserved.	AboutView		MIT licencija. Visos teisės saugomos.
 [Click a license name to read the respective license.]\n\n	AboutView		[Norėdami perskaityti licenciją, spustelėkite jos pavadinimą.]\n\n

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	3577998894
+1	russian	x-vnd.Haiku-Appearance	2811701284
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
 Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
@@ -32,11 +32,9 @@ OK	DecorSettingsView		ОК
 Panel background	Colors tab		Фон панели
 Colors	APRWindow		Цвета
 Control background	Colors tab		Фон элемента
-About Decerator	DecorSettingsView		О декораторе
 Inactive window tab	Colors tab		Заголовок неактивного окна
 Appearance	System name		Внешний вид
 Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпиксельное сглаживание в комбинации с уточнением недоступно в этой сборке Haiku во избежание возможных патентных проблем. Для включения этой возможности вам необходимо собрать Haiku самостоятельно, включив особые опции в заголовке конфигурации FreeType.
 Control text	Colors tab		Текст элемента
 Tooltip text	Colors tab		Текст подсказки
 Menu item text	Colors tab		Текст пункта меню

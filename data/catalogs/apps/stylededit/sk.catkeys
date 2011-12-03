@@ -63,7 +63,7 @@ Replace	FindandReplaceWindow		Nahradiť
 Find again	Menus		Nájsť znova
 Cancel	QuitAlert		Zrušiť
 Find…	Menus		Nájsť…
-Select all	Menus		Vyrať všetky
+Select all	Menus		Vybrať všetky
 Don't save	SaveAlert		Neukladať
 Error loading \"%s\":\n\t%s	LoadAlert		Chyba pri načítaní „%s“:\n\t%s
 Undo typing	QuitAlert		Vrátiť späť písanie

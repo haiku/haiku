@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	417671691
+1	dutch; flemish	x-vnd.Be-MAIL	361254796
 View	Mail		Bekijken
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attributen bijvoegen:
@@ -7,7 +7,9 @@ An error occurred trying to save the attachment.	Mail		Er is een fout ontstaan b
 Copy to new	Mail		Kopiëren naar nieuw
 Edit	Mail		Aanpassen
 Print	Mail		Afdrukken
+<none>	Mail		<geen>
 New mail message	Mail		Nieuw mailbericht
+Automatic	Mail		Automatisch
 Automatically mark mail as read:	Mail		Automatisch markeren als gelezen:
 Colored quotes:	Mail		Quotes in kleur:
 Subject:	Mail		Onderwerp:
@@ -15,6 +17,7 @@ Reply to all	Mail		Allen beantwoorden
 Show icons & labels	Mail		Toon iconen & tekst
 Remove attachment	Mail		Verwijder bijlage
 Button bar:	Mail		Knoppenbalk:
+spam	B_USER_DIRECTORY/mail/spam		spam
 Beginner	Mail		Beginner
 Don't save	Mail		Niet opslaan
 Expert	Mail		Expert
@@ -33,11 +36,14 @@ Cc:	Mail		Cc:
 Find	Mail		Zoeken
 Preferences…	Mail		Voorkeuren...
 Undo	Mail		Ongedaan maken
+Date:	Mail		Datum:
 Leave as New	Mail		Als Nieuw laten
 An error occurred trying to open this signature.	Mail		Er is een fout ontstaan bij het openen van dit onderschift.
 No file attributes, just plain data	Mail		Geen bestandskenmerken, alleen gewone gegevens
 Edit queries…	Mail		Zoektermen aanpassen…
+queries	B_USER_DIRECTORY/mail/queries		queries
 Paste	Mail		Plakken
+in	B_USER_DIRECTORY/mail/in		in
 Save attachment…	Mail		Bewaar bijlage…
 Include file attributes in attachments	Mail		Bestandskenmerken onderdeel van bijlagen maken
 OK	Mail		Oké
@@ -49,19 +55,24 @@ Forward without attachments	Mail		Doorsturen zonder bijlagen
 Previous	Mail		Vorige
 Redo	Mail		Herstellen
 Add enclosure…	Mail		Bijlage toevoegen...
+Mail	System name		Mail
 Print…	Mail		Afdrukken…
 Warn unencodable:	Mail		Waarschuwen oncodeerbaar:
 Quit	Mail		Afsluiten
 %n - Full name	Mail		%n - Volledige naam
+ Read 	Mail		Lezen
 Trash	Mail		Prullenbak
 Default account:	Mail		Standaard-account:
 Size:	Mail		Grootte:
 Account from mail	Mail		Account van mail
 Edit signatures…	Mail		Pas onderschriften aan…
 New	Mail		Nieuw
+Attachments: 	Mail		Bijlagen: 
+On	Mail		Aan
 Set to %s	Mail		Instellen als  %s
 Forward	Mail		Doorsturen
 E-mail draft could not be saved!	Mail		E-mailconcept kon niet bewaard worden!
+%e wrote:\\n	Mail		%e schreef:\\n
 To:	Mail		Aan:
 Only files can be added as attachments.	Mail		Alleen bestanden kunnen bijlagen worden.
 Previous message	Mail		Vorig bericht
@@ -76,8 +87,11 @@ Page setup…	Mail		Pagina-opzet…
 Text wrapping:	Mail		Tekstafbreking:
 Revert	Mail		Herstellen
 File	Mail		Bestand
+mail	B_USER_DIRECTORY/mail		mail
 None	Mail		Geen
+(Name unavailable)	Mail		(Naam niet beschikbaar)
 Copy link location	Mail		Linklocatie kopiëren
+out	B_USER_DIRECTORY/mail/out		uit
 Show header	Mail		Koptekst tonen
 %e - E-mail address	Mail		%e - E-mailadres
 Resend	Mail		Opnieuw versturen
@@ -85,9 +99,11 @@ Show raw message	Mail		Toon onbewerkt bericht
 \\n - Newline	Mail		\\n - Newline
 Start now	Mail		Nu beginnen
 Close	Mail		Sluiten
+No matches	Mail		Geen resultaten
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		De mail_daemon is niet actief. Het bericht staat in de wachtrij en zal worden verzonden zodra de mail_daemon is gestart.
 Really delete this signature? This cannot be undone.	Mail		Dit onderschrift werkelijk verwijderen? Dit kan niet ongedaan gemaakt worden.
 Open	Mail		Openen
+draft	B_USER_DIRECTORY/mail/draft		concept
 Quote	Mail		Citeren
 Add	Mail		Toevoegen
 Next message	Mail		Volgend bericht
@@ -111,6 +127,7 @@ Use default account	Mail		Standaard-account gebruiken
 Sorry	Mail		Sorry
 Encoding:	Mail		Coderen:
 Font:	Mail		Lettertype:
+(Address unavailable)	Mail		(Adres niet beschikbaar)
 Save address	Mail		Adres opslaan
 Queries	Mail		Zoektermen
 Do you wish to save this message as a draft before closing?	Mail		Wilt u dit bericht als concept opslaan voordat u afsluit?
@@ -120,6 +137,8 @@ Close and 	Mail		Sluiten en
 Save as draft	Mail		Bewaren als concept
 The mail_daemon could not be started:\n\t	Mail		De mail_daemon kon niet worden gestart:\n\t
 Open attachment	Mail		Bijlage openen
+sent	B_USER_DIRECTORY/mail/sent		verzonden
+(Date unavailable)	Mail		(Datum niet beschikbaar)
 Reply	Mail		Beantwoorden
 From:	Mail		Van:
 Couldn't open this signature. Sorry.	Mail		Kon dit onderschrift niet openen. Sorry.

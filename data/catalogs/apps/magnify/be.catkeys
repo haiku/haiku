@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Magnify	3515889001
+1	belarusian	x-vnd.Haiku-Magnify	283320408
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер пусты\n
 Make square	Magnify-Main		Зрабіць квадратным
 Copy image	Magnify-Main		Капіяваць выяву
@@ -6,6 +6,7 @@ Magnify help	Magnify-Help		Дапамога Magnify
 usage: magnify [size] (magnify size * size pixels)\n	Console		карыстанне: magnify [size] (павялічыць size * size пікселяў)\n
 Stick coordinates	Magnify-Main		Прыляпіць каардынаты
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інфа:\n hide/show info - хавае/паказвае новыя магчымасці\n увага: чырвоны квадрат што з´яўляецца падчас прагляду паказвае\n якія RGB велічыні пікселяў будуць адлюстраваны\n add/remove crosshairs - можна дадаць ці выдаліць 2 перакрыжаванні\n каб спрасціць выраўнованне ды размяшчэнне аб´ектаў.\n Перакрыжаванні адлюстраваны блакітнымі квадратамі і блакітнымі лініямі.\n hide/show grid - паказаць ці схаваць сетку, што падзяляе выяву на пікселі\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		  freeze - блакуе/разблакуе павялiчванне\n    дзе бы нi знахадзiўся курсор\n
 Hide/Show grid	Magnify-Main		Схаваць/Паказаць сетку
 magnify: size must be a multiple of 4\n	Console		magnify: памер павінен быць кратны 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Агульныя:\n 32 x32 - верхнія левыя лічбы - колькасць бачных\n пікселяў (шырыня x вышыня)\n 8 пікселяў на піксель - паказвае, колькі пікселяў\n выкарыстана, каб павялічыць адзін піксель\n R:152 G:52 B:10 - RGB значэнні пікселя пад чырвоным квадратам\n

@@ -1,47 +1,46 @@
-1	lithuanian	x-vnd.Be-TSKB	1669813373
+1	lithuanian	x-vnd.Be-TSKB	2311697004
+Power off	DeskbarMenu		Išjungti
 Edit menu…	PreferencesWindow		Taisyti meniu…
+Suspend	DeskbarMenu		Pristabdyti
 Applications	PreferencesWindow		Programos
-About this system	BeMenu		Apie šią sistemą
+About Haiku	DeskbarMenu		Apie „Haiku“
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
-Recent folders	BeMenu		Paskiausiai lankyti aplankai
+Recent applications	DeskbarMenu		Paskiausiai leistos programos
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
-Recent applications	BeMenu		Paskiausiai leistos programos
 Change time…	TimeView		Keisti laiką…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
-<Be folder is empty>	BeMenu		<Meniu aplankas tuščias>
+Find…	DeskbarMenu		Ieškoti…
 Window	PreferencesWindow		Langas
 Menu	PreferencesWindow		Meniu
+Recent documents	DeskbarMenu		Paskiausiai atverti dokumentai
 Show seconds	PreferencesWindow		Rodyti sekundes
 Auto-hide	PreferencesWindow		Automatiškai slėpti
 Always on top	PreferencesWindow		Visuomet viršuje
 Show all	WindowMenu		Rodyti visus
 No windows	WindowMenu		Langų nėra
 Deskbar	System name		Užduočių juosta
-Power off	BeMenu		Išjungti
+Restart system	DeskbarMenu		Paleisti iš naujo
 Auto-raise	PreferencesWindow		Automatiškai iškilti
 Hide time	TimeView		Nerodyti laikrodžio
 Recent folders:	PreferencesWindow		Paskiausi aplankai:
-Deskbar preferences…	BeMenu		Užduočių juostos nuostatos…
 Show application expander	PreferencesWindow		Rodyti programų skleistuką
+Restart Tracker	DeskbarMenu		Perleisti Pėdsekį
 Close all	WindowMenu		Užverti visus
 Deskbar preferences	PreferencesWindow		Užduočių juostos nuostatos
-Mount	BeMenu		Prijungti diską
+Mount	DeskbarMenu		Prijungti diską
 Recent applications:	PreferencesWindow		Paskiausios programos:
+Shutdown…	DeskbarMenu		Kompiuterio išjungimas…
 Tracker always first	PreferencesWindow		Pėdsekį rikiuoti pradžioje
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nuostatos
-About Haiku	BeMenu		Apie „Haiku“
+Recent folders	DeskbarMenu		Paskiausiai lankyti aplankai
+About this system	DeskbarMenu		Apie šią sistemą
 Show calendar…	TimeView		Rodyti kalendorių…
-Restart system	BeMenu		Paleisti iš naujo
-Find…	BeMenu		Ieškoti…
-Restart Tracker	BeMenu		Perleisti Pėdsekį
+Deskbar preferences…	DeskbarMenu		Užduočių juostos nuostatos…
 Show Time	Tray		Rodyti laikrodį
 Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
+Show replicants	DeskbarMenu		Rodyti replikavimo rankenėles
 Clock	PreferencesWindow		Laikrodis
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Pavyzdžiai
-Recent documents	BeMenu		Paskiausiai atverti dokumentai
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Pagalbinės programėlės
 Hide all	WindowMenu		Slėpti visus
-Shutdown…	BeMenu		Kompiuterio išjungimas…
-Suspend	BeMenu		Pristabdyti
 Quit application	WindowMenu		Užbaigti programos darbą
-Show replicants	BeMenu		Rodyti replikavimo rankenėles

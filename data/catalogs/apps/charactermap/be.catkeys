@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	4082916013
+1	belarusian	x-vnd.Haiku-CharacterMap	1545664922
 Enclosed alphanumerics	UnicodeBlocks		Закрытыя літары і лічбы
 Basic Latin	UnicodeBlocks		Простая лацінка
 View	CharacterWindow		Від
@@ -125,7 +125,6 @@ Yi Radicals	UnicodeBlocks		Радыкалы Yi
 Cyrillic extended B	UnicodeBlocks		Кірыліца пашыраная B
 Quit	CharacterWindow		Выйсці
 Braille patterns	UnicodeBlocks		Шрыфт Брайля
-Muscial symbols	UnicodeBlocks		Музыкальныя сімвалы
 New Tai Lue	UnicodeBlocks		Новы Tai Lue
 Runic	UnicodeBlocks		Руны
 Miscellaneous mathematical symbols B	UnicodeBlocks		Розныя матэматычныя сімвалы B

@@ -14,7 +14,7 @@ Numbers	TimeFormatSettings		Skaičiai
 OK	Locale Preflet Window		Gerai
 Defaults	Locale Preflet Window		Numatytai
 Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Užduočių juostoje ir Pėdsekyje rodyti išverstus programų ir aplankų pavadinimus.
-Revert	Locale Preflet Window		Grįžti
+Revert	Locale Preflet Window		Atšaukti pakeitimus
 12 hour	TimeFormatSettings		12 valandų
 Time	TimeFormatSettings		Laikas
 Date	TimeFormatSettings		Data

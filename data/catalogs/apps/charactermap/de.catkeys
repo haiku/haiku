@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	4082916013
+1	german	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Eingeschlossene alphanumerische Zeichen
 Basic Latin	UnicodeBlocks		Lateinisch
 View	CharacterWindow		Ansicht
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanuwa
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Syrisch
 CJK compatibility ideographs Supplement	UnicodeBlocks		CJK: Kompatibilitätsideogramme (Ergänzung)
+Musical symbols	UnicodeBlocks		Musik-Symbole
 Hangul syllables	UnicodeBlocks		Hangul-Silben
 Coptic	UnicodeBlocks		Koptisch
 Tai Le	UnicodeBlocks		Tai Le
@@ -125,7 +126,6 @@ Yi Radicals	UnicodeBlocks		Yi-Radikale
 Cyrillic extended B	UnicodeBlocks		Kyrillisch (Erweiterung B)
 Quit	CharacterWindow		Beenden
 Braille patterns	UnicodeBlocks		Braille
-Muscial symbols	UnicodeBlocks		Musikalische Symbole
 New Tai Lue	UnicodeBlocks		Neu-Tai-Lue
 Runic	UnicodeBlocks		Runisch
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse mathematische Symbole B

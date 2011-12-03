@@ -1,15 +1,23 @@
-1	belarusian	x-vnd.Haiku-Keymap	1259868356
+1	belarusian	x-vnd.Haiku-Keymap	3895282621
+Caps Lock:	Modifier Keys window		Caps Lock
+OK	Modifier Keys window		Так
 Tilde trigger	Keymap window		Tilde
+Modifier Keys	Modifier Keys window		Клавішы-мадыфікатары
 Grave trigger	Keymap window		Grave
 Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
+Option:	Modifier Keys window		Option:
+Revert	Modifier Keys window		Адвярнуць
 Quit	Keymap window		Выйсці
 Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
 Circumflex trigger	Keymap window		Circumflex
+Cancel	Modifier Keys window		Скасаваць
 Diaeresis trigger	Keymap window		Diaeresis
 Open…	Keymap window		Адкрыць…
 System:	Keymap window		Сістэмныя:
 Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
+Set Modifier Keys…	Keymap window		Пазначыць клавішы-мадыфікатары
 User:	Keymap window		Карыстач:
+Control:	Modifier Keys window		Control:
 Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
 Layout	Keymap window		Расклад клавіятуры
 Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
@@ -19,4 +27,5 @@ File	Keymap window		Файл
 (Current)	Keymap window		(Бягучая)
 Font	Keymap window		Шрыфт
 Keymap	System name		Мапа клавіятуры
+Command:	Modifier Keys window		Command:
 Acute trigger	Keymap window		Acute

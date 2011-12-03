@@ -1,11 +1,11 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3275103303
+1	lithuanian	x-vnd.Haiku-libtracker	1319179540
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
 Add-ons	FilePanelPriv		Priedai
 Desktop	Model		Darbalaukis
 Identify	ContainerWindow		Atpažinti
-Warning space color	SettingsView		Užimtos vietos spalva (įspėjant)
+Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
 Close	VolumeWindow		Užverti
 Open	OpenWithWindow		Atverti
 Tracker status	StatusWindow		Pėdsekio būsena
@@ -155,10 +155,11 @@ no supporting apps	OpenWithWindow		palaikančių programų nėra
 That name is already taken. Please type another one.	InfoWindow		Toks vardas jau naudojamas. Įveskite kitą.
 Sorry, you can't create links in the Trash.	PoseView		Deja, šiukšlinėje kurti nuorodų neleidžiama.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Aplankas vardu „%name“ jau egzistuoja šiame aplanke ir gali būti, jog jame yra kitų objektų sutampančiais vardais. Ar norite šiuos konfliktinius objektus pakeisti esančiais aplanke, kurį %verb?
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Nukreipti „%name“ į:
 Mount settings…	VolumeWindow		Tomų prijungimo nuostatos…
 Select…	VolumeWindow		Pažymėti…
 All disks	FindPanel		Visuose tomuose
-Revert	TrackerSettingsWindow		Grįžti
+Revert	TrackerSettingsWindow		Atšaukti pakeitimus
 Invert selection	QueryContainerWindow		Invertuoti žymėjimą
 Execute	FilePermissionsView		Vykdyti
 Size	FindPanel		Dydis
@@ -230,6 +231,7 @@ Version	OpenWithWindow		Versija
 Default application	InfoWindow		numatytąją programą
 Preparing to copy items…	StatusWindow		Rengiamasi kopijuoti objektus…
 Show folder location in title tab	SettingsView		Rodyti pilną aplanko kelią lango antraštėje
+Proceed	FSUtils		Vykdyti
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Šiame aplanke, jau yra objektų, kurių vardai sutampa su objektų, kuriuos %verb, pavadinimais.\n\nAr norite visus konfliktinius objektus pakeisti tais, kuriuos %verb, ar geriau Jūsų atsiklausti dėl kiekvieno atskirai?
 The mount server could not be contacted.	AutoMounterSettings		Nepavyko susisiekti su tomų prijungimo tarnyba.
 Error deleting items	FSUtils		Klaida šalinant objektus

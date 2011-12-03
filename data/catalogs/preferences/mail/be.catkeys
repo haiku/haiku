@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Mail	3957822883
+1	belarusian	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Праверка пошты
 Settings	Config Window		Наладкі
 Never	Config Window	show status window	Ніколі
@@ -6,6 +6,7 @@ Only when dial-up is connected	Config Window		Толькі пры падключ
 While sending and receiving	Config Window		Пры адпраўцы і атрыманні
 days	Config Window		дзен
 Incoming	Config Window		Уваходны
+Server name:	E-Mail		Імя серверу:
 OK	Config Window		ОК
 Start mail services on startup	Config Window		Запускаць паштовыя службы пры загрузцы
 E-mail address:	E-Mail		Адрас E-mail

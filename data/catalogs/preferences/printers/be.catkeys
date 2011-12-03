@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PRNT	2906062670
+1	belarusian	x-vnd.Be-PRNT	2674539197
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Чаканне
 Print test page	PrintersWindow		Надрукаваць тэставую старонку
@@ -18,6 +18,7 @@ Processing	JobListView		Апрацоўка
 Red	TestPageView		Чырвоны
 Printer name:	AddPrinterDialog		Імя прынтэра:
 Driver: %driver%	PrinterListView		Драйвер: %driver%
+ pending jobs.	PrinterListView		 заданні ў чарзе.
 Black	TestPageView		Чорны
 Restart job	PrintersWindow		Пачаць нанова
 Add	AddPrinterDialog		Дадаць

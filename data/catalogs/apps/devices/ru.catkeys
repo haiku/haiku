@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	1474720746
+1	russian	x-vnd.Haiku-Devices	2473502333
 Manufacturer	DeviceSCSI		Производитель
 Order by:	DevicesView		Сортировать по:
 ACPI controller	Device		Контроллер ACPI
@@ -48,6 +48,7 @@ PCI bus	Device		Шина PCI
 ACPI System Indicator	DeviceACPI		Системный индикатор ACPI
 None	Device		Отсутствует
 PCI bus	DevicesView		Шина PCI
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Информация о классе:\t\t\t\t: %classInfo%
 Basic information	DevicesView		Основная информация
 PCI Information	DevicePCI		PCI информация 
 Manufacturer:	Device		Производитель:

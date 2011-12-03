@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DataTranslations	3820343452
+1	belarusian	x-vnd.Haiku-DataTranslations	458105477
 DataTranslations	System name		Канвертары
 Cancel	DataTranslations		Адмена
 Name:	DataTranslations		Імя:
@@ -14,5 +14,6 @@ Info	DataTranslations		інфа
 Path:	DataTranslations		Пуць:
 The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
 DataTranslations - Error	DataTranslations		DataTranslations - Памылка
+Ok	DataTranslations		Так
 OK	DataTranslations		ОК
 Version:	DataTranslations		Версія:

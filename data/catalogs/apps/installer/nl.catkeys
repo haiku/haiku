@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	3335683494
+1	dutch; flemish	x-vnd.Haiku-Installer	1384722558
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Voeg dus achter de andere menu-onderdelen aan de onderkant van het bestand iets soortgelijks als dit toe:
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Bent u zeker dat u de installatie wilt afbreken en het systeem wilt herstarten?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -14,6 +14,7 @@ Stop	InstallerWindow	In alert after pressing Stop	Stop
 Install progress:  	InstallerWindow		Voortgang installatie:  
 Starting Installation.	InstallProgress		Installatie wordt gestart.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dit is software van alfakwaliteit! Dat betekent dat er een hoog risico is om belangrijke data te verliezen. Maak geregeld back-ups! U bent gewaarschuwd.\n\n\n
+Are you sure you want to abort the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Bent u zeker dat u op de huidige opstartschijf wilt installeren? Als u doorgaat zal Installer uw computer moeten heropstarten.
 Quit Boot Manager	InstallerWindow		Boot Manager afsluiten
 Stop	InstallerWindow		Stop
@@ -40,6 +41,7 @@ Set up boot menu	InstallerWindow		Boot-menu opzetten
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		De eerste logische partitie heeft altijd het nummer \"4\", ongeacht het aantal primaire partities.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB's schema voor naamgeving is nog steeds: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <uw favoriete editor> /boot/grub/menu.lst\n\n
+Abort	InstallerWindow		Afbreken
 Finishing Installation.	InstallProgress		Installatie wordt beëindigd.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <uw favoriete editor> /etc/default/grub\n\n
 README	InstallerApp		LEESMIJ
@@ -61,6 +63,7 @@ Unknown Type	InstallProgress	Partition content type	Onbekend Type
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		U zult opmerken dat GRUB een andere naamgevingsstrategie voor harde schijven gebruikt dan Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" is het partitienummer, ook beginnend met \"0\".\n
 Installation canceled.	InstallProgress		Installatie geannuleerd.
+Installer	System name		Installatieprogramma
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		U kunt de inhoud van een schijf niet op zichzelf installeren. Kies alstublieft een andere schijf.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" is het partitienummer, dat voor GRUB2 begint met \"1\"\n
@@ -95,6 +98,7 @@ No optional packages available.	PackagesView		Geen optionele paketten beschikbaa
 All hard disks start with \"hd\".\n	InstallerApp		Alle harde schijven beginnen met \"hd\".\n
 Continue	InstallerApp		Doorgaan
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Wanneer u Haiku voor het eerst met succes start, zorgt u er dan voor om onze \"Welkom\" documentatie te lezen; er staat een link op het bureaublad.\n\n
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, de toepassing van de Haiku opstartmenu configureren, kon niet worden gestart.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Configureer uw /boot/grub/menu.lst door uw favoriete editor te starten vanaf een Terminal, op deze manier:\n\n
 Boot sector not written because of an internal error.	InstallProgress		De Boot sector werd niet geschreven vanwege een interne fout.
 Additional disk space required: %s	InstallerWindow		Benodigde aanvullende schijfruimte: %s

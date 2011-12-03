@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-CharacterMap	4082916013
+1	lithuanian	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Įrėminti teksto ženklai
 Basic Latin	UnicodeBlocks		Baziniai lotynų
 View	CharacterWindow		Rodymas
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanva
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Sirų
 CJK compatibility ideographs Supplement	UnicodeBlocks		CJK suderinamumo papildomos ideogramos
+Musical symbols	UnicodeBlocks		Muzikiniai simboliai
 Hangul syllables	UnicodeBlocks		Hangulo skiemenys
 Coptic	UnicodeBlocks		Koptų
 Tai Le	UnicodeBlocks		Tai Le
@@ -78,12 +79,12 @@ Supplementary private use area B	UnicodeBlocks		Papildoma privačioji sritis B
 CJK unified ideographs extension A	UnicodeBlocks		CJK unifikuotų ideogramų plėtinys A
 Filter:	CharacterWindow		Filtras:
 Hangul compatibility Jamo	UnicodeBlocks		Hangulo suderinamumo rašmenys
-Ideographic description characters	UnicodeBlocks		Ideograminų aprašų ženklai
+Ideographic description characters	UnicodeBlocks		Ideograminių aprašų ženklai
 Arabic presentation forms B	UnicodeBlocks		Arabų atvaizdavimo formos B
 CJK compatibility forms	UnicodeBlocks		CJK suderinamumo formos
 Hiragana	UnicodeBlocks		Hiragana
 Tagalog	UnicodeBlocks		Tagalų
-Control pictures	UnicodeBlocks		Valdymo ženklų atvaizdavimo glifai
+Control pictures	UnicodeBlocks		Valdymo ženklų atvaizdavimo simboliai
 Variation selectors	UnicodeBlocks		Variacijų parinkimo ženklai
 Linear B syllabary	UnicodeBlocks		Linijiniai B skiemenys
 Buginese	UnicodeBlocks		Lontara
@@ -125,7 +126,6 @@ Yi Radicals	UnicodeBlocks		Ji ideogramų elementai
 Cyrillic extended B	UnicodeBlocks		Kirilicos papildomi B
 Quit	CharacterWindow		Baigti darbą
 Braille patterns	UnicodeBlocks		Brailio raštas
-Muscial symbols	UnicodeBlocks		Muzikiniai simboliai
 New Tai Lue	UnicodeBlocks		Naujasis Tai Liu
 Runic	UnicodeBlocks		Runos
 Miscellaneous mathematical symbols B	UnicodeBlocks		Įvairūs matematiniai simboliai B

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	941484531
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	3131325102
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
 Stream settings	MediaPlayer-Main		Stream-instellingen
 <unknown>	PlaylistItem-album		<onbekend>
@@ -7,6 +7,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Afspeellijst bewaren
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Geen van de bestanden die u wilde afspelen lijken mediabestanden te zijn.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan van de afspeellijst is mislukt.\n\nFout:
 New player…	MediaPlayer-Main		Nieuwe speler...
+100% scale	MediaPlayer-Main		100% schaal
 Close	MediaPlayer-Main		Afsluiten
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Sommige bestanden konden niet naar Trash worden verplaatst.
 Open	MediaPlayer-Main		Openen
@@ -34,6 +35,7 @@ Start playing.	MediaPlayer-Main		Begin met afspelen.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Er is geen decoder geïnstalleerd die met het bestandstype kan omgaan, ofwel heeft de decoder moeite met de specifieke versie van het type. 
 Import Entry	MediaPlayer-ImportPLItemsCmd		Onderdeel importeren
 Gets the URI of the currently playing item.	MediaPlayer-Main		Haalt de URI op van het nu afspelende item.
+400% scale	MediaPlayer-Main		400% schaal
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan afspeellijst is mislukt:\n\nFout:
 Move Entries	MediaPlayer-MovePLItemsCmd		Onderdelen verplaatsen
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naar Trash
@@ -42,6 +44,7 @@ Open Playlist	MediaPlayer-PlaylistWindow		Afspeellijst openen
 OK	MediaPlayer-Main		Oké
 Settings…	MediaPlayer-Main		Instellingen...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-instellingen
+Select all	MediaPlayer-PlaylistWindow		Alles selecteren
 Move Entry	MediaPlayer-MovePLItemsCmd		Onderdeel verplaatsen
 Open	MediaPlayer-PlaylistWindow		Openen
 Stop playing.	MediaPlayer-Main		Stop afspelen.
@@ -49,6 +52,7 @@ Error: 	MediaPlayer-RemovePLItemsCmd		Fout:
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (misvormd bericht). Opslaan van de afspeellijst is mislukt.
 Skip to the previous track.	MediaPlayer-Main		Overslaan tot de vorige track.
 OK	MediaPlayer-RemovePLItemsCmd		Oké
+50% scale	MediaPlayer-Main		50% schaal
 Subtitles	MediaPlayer-Main		Ondertitels
 Prev	MediaPlayer-Main		Vor.
 Volume	MediaPlayer-Main		Volume
@@ -66,9 +70,11 @@ Attributes	MediaPlayer-Main		Attributen
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niet alle bestanden konden Trash in.
 <untitled>	PlaylistItem-title		<zonder titel>
 Track	Audio Track Menu		Track
+<nothing to redo>	MediaPlayer-PlaylistWindow		<niets om opnieuw te doen>
 Skip to the next track.	MediaPlayer-Main		Overslaan naar de volgende track
 Play	MediaPlayer-Main		Afspelen
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen naar Trash
+200% scale	MediaPlayer-Main		200% schaal
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Het lijkt erop dat de mediaserver niet actief is.\nWilt u hem starten ?
 Aspect ratio	MediaPlayer-Main		Aspect-ratio
 Error: 	MediaPlayer-Main		Fout:
@@ -103,11 +109,14 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar
 Save	MediaPlayer-Main		Opslaan
 <nothing to undo>	MediaPlayer-PlaylistWindow		<niets om ongedaan te maken>
 Save	MediaPlayer-PlaylistWindow		Opslaan
+Remove	MediaPlayer-PlaylistWindow		Verwijderen
 Full screen	MediaPlayer-Main		Volledig scherm
 Open file…	MediaPlayer-Main		Open bestand...
+300% scale	MediaPlayer-Main		300% schaal
 Bottom of screen	MediaPlayer-SettingsWindow		Onderaan scherm
 Save error	MediaPlayer-PlaylistWindow		Fout opslaan
 Rating	MediaPlayer-Main		Waardering
 Playlist	MediaPlayer-PlaylistWindow		Afspeellijst
 Lock Peaks	MediaPlayer-PeakView		Pieken fixeren
 Low volume	MediaPlayer-SettingsWindow		Laag volume
+File Info	MediaPlayer-InfoWin		Bestandsinfo

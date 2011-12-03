@@ -1,8 +1,8 @@
 1	slovak	x-vnd.Haiku-DiskUsage	3399777733
 Scanning %refName%	Scanner		Prehľadáva sa %refName%
 Size	Info Window		Veľkosť
-Rescan	Pie View		Preskúmať znova
-Rescan	Volume View		Preskúmať znova
+Rescan	Pie View		Znovu preskúmať
+Rescan	Volume View		Znovu preskúmať
 Outdated view	Pie View		Neaktuálne zobrazenie
 Kind	Info Window		Druh
 file unavailable	Pie View		súbor nedostupný

@@ -1,14 +1,10 @@
-1	russian	x-vnd.Be-TSKB	1669813373
+1	russian	x-vnd.Be-TSKB	1662766351
 Edit menu…	PreferencesWindow		Изменить меню…
 Applications	PreferencesWindow		Приложения
-About this system	BeMenu		Об этой системе
 Recent documents:	PreferencesWindow		Недавние документы:
-Recent folders	BeMenu		Недавние папки
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
-Recent applications	BeMenu		Недавние приложения
 Change time…	TimeView		Настроить часы…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
-<Be folder is empty>	BeMenu		<Папка Be пуста>
 Window	PreferencesWindow		Окно
 Menu	PreferencesWindow		Меню
 Show seconds	PreferencesWindow		Отображать секунды
@@ -17,31 +13,20 @@ Always on top	PreferencesWindow		Всегда сверху
 Show all	WindowMenu		Показать все
 No windows	WindowMenu		Нет окон
 Deskbar	System name		Deskbar
-Power off	BeMenu		Выключить компьютер
 Auto-raise	PreferencesWindow		Всплывать при наведении
 Hide time	TimeView		Скрыть часы
 Recent folders:	PreferencesWindow		Недавние папки:
-Deskbar preferences…	BeMenu		Настроить Deskbar…
 Show application expander	PreferencesWindow		Отображать список окон приложений
 Close all	WindowMenu		Закрыть все
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
-Mount	BeMenu		Подключить
 Recent applications:	PreferencesWindow		Недавние приложения:
 Tracker always first	PreferencesWindow		Tracker всегда первый
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
-About Haiku	BeMenu		О системе Haiku
 Show calendar…	TimeView		Показать календарь…
-Restart system	BeMenu		Перезагрузить компьютер
-Find…	BeMenu		Найти…
-Restart Tracker	BeMenu		Перезапустить Tracker
 Show Time	Tray		Отображать время
 Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
 Clock	PreferencesWindow		Часы
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
-Recent documents	BeMenu		Недавние документы
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Апплеты
 Hide all	WindowMenu		Скрыть все
-Shutdown…	BeMenu		Завершение работы…
-Suspend	BeMenu		Приостановить
 Quit application	WindowMenu		Закрыть приложение
-Show replicants	BeMenu		Отображать репликанты

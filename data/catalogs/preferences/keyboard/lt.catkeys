@@ -3,7 +3,7 @@ Written by Andrew Edward McCall	KeyboardApplication		Sukurta Andrew Edward McCal
 Typing test area	KeyboardView		Vieta pabandymui
 Defaults	KeyboardWindow		Numatytai
 Key repeat rate	KeyboardView		Simbolio kartojimo dažnis
-Revert	KeyboardWindow		Grįžti
+Revert	KeyboardWindow		Atšaukti pakeitimus
 Delay until key repeat	KeyboardView		Kartojimo uždelsimas
 Keyboard	System name		Klaviatūra
 OK	KeyboardApplication		Gerai

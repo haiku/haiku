@@ -36,7 +36,7 @@ Deskbar mode	NormalPulseView		Režim Panelu
 Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		Šírka ikony:
 You can't disable the last active CPU.	CPUButton		Nemôžete vypnúť posledný aktívny CPU.
-Normal mode	DeskbarPulseView		Nermálny režim
+Normal mode	DeskbarPulseView		Normálny režim
 OK	CPUButton		OK
 About Pulse…	CPUButton		O aplikácii Pulse…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstránenie z Panelu zlyhalo.\n%s

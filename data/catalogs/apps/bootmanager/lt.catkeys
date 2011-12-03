@@ -61,5 +61,5 @@ BootManager	System name		Paleidyklė
 Summary	BootManagerController	Title	Suvestinė
 OK	BootManagerController	Button	Gerai
 Immediately	DefaultPartitionPage		Nelaukti
-Done	BootManagerController	Button	Baigta
+Done	BootManagerController	Button	Atlikta
 After three seconds	DefaultPartitionPage		trys sekundės

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	3294644028
+1	lithuanian	x-vnd.haiku-icon_o_matic	2200575344
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -29,5 +29,8 @@ OK	Icon-O-Matic-ColorPicker		Gerai
 Bleep!	Exporter - Continue in error dialog		Po velnių!
 bad news	Title of error alert		prastos naujienos
 Remove Paths	Icon-O-Matic-RemovePathsCmd		Pašalinti kontūrus
+Cancel	Icon-O-Matic-SVGExport		Atsisakyti
+Cancel	Icon-O-Matic-Menu-Settings		Atsisakyti
+Cancel	Icon-O-Matic-ColorPicker		Atsisakyti
 OK	Icon-O-Matic-SVGImport		Gerai
 Clean up	Icon-O-Matic-PathsList		Sutvarkyti

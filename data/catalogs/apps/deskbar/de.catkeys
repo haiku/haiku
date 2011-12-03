@@ -1,14 +1,10 @@
-1	german	x-vnd.Be-TSKB	1669813373
+1	german	x-vnd.Be-TSKB	1662766351
 Edit menu…	PreferencesWindow		Menü bearbeiten…
 Applications	PreferencesWindow		Anwendungen
-About this system	BeMenu		Über dieses System
 Recent documents:	PreferencesWindow		Letzte Dokumente:
-Recent folders	BeMenu		Letzte Ordner
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren
-Recent applications	BeMenu		Letzte Anwendungen
 Change time…	TimeView		Uhrzeit ändern…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
-<Be folder is empty>	BeMenu		<Be-Ordner ist leer>
 Window	PreferencesWindow		Fenster
 Menu	PreferencesWindow		Menü
 Show seconds	PreferencesWindow		Sekunden anzeigen
@@ -17,31 +13,20 @@ Always on top	PreferencesWindow		Immer im Vordergrund
 Show all	WindowMenu		Alle einblenden
 No windows	WindowMenu		Keine Fenster
 Deskbar	System name		Deskbar
-Power off	BeMenu		Ausschalten
 Auto-raise	PreferencesWindow		Automatisch nach vorn holen
 Hide time	TimeView		Uhrzeit ausblenden
 Recent folders:	PreferencesWindow		Letzte Ordner:
-Deskbar preferences…	BeMenu		Deskbar-Einstellungen…
 Show application expander	PreferencesWindow		Expander anzeigen
 Close all	WindowMenu		Alle schließen
 Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
-Mount	BeMenu		Einhängen
 Recent applications:	PreferencesWindow		Letzte Anwendungen:
 Tracker always first	PreferencesWindow		Tracker immer zuerst
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Einstellungen
-About Haiku	BeMenu		Über Haiku
 Show calendar…	TimeView		Kalender anzeigen…
-Restart system	BeMenu		Neustarten
-Find…	BeMenu		Suchen…
-Restart Tracker	BeMenu		Tracker neu starten
 Show Time	Tray		Uhrzeit einblenden
 Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
 Clock	PreferencesWindow		Uhr
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
-Recent documents	BeMenu		Letzte Dokumente
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
 Hide all	WindowMenu		Alle ausblenden
-Shutdown…	BeMenu		Herunterfahren...
-Suspend	BeMenu		Ruhezustand
 Quit application	WindowMenu		Anwendung beenden
-Show replicants	BeMenu		Replikanten einblenden

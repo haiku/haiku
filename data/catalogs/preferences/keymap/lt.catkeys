@@ -2,7 +2,7 @@
 Tilde trigger	Keymap window		Riestinis kirtis (tildė)
 Grave trigger	Keymap window		Kairinis kirtis (gravis)
 Select dead keys	Keymap window		Kombinaciniai klavišai
-Revert	Modifier Keys window		Grįžti
+Revert	Modifier Keys window		Atšaukti pakeitimus
 Quit	Keymap window		Baigti darbą
 Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
 Circumflex trigger	Keymap window		Stogelis
@@ -15,7 +15,7 @@ User:	Keymap window		Naudotojo:
 Sample and clipboard:	Keymap window		Pavyzdys ir iškarpa:
 Layout	Keymap window		Klaviatūra
 Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
-Revert	Keymap window		Grįžti
+Revert	Keymap window		Atšaukti pakeitimus
 Save as…	Keymap window		Įrašyti kaip…
 File	Keymap window		Failas
 (Current)	Keymap window		(Esamas)

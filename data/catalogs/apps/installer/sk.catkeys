@@ -97,7 +97,7 @@ Write boot sector	InstallerWindow		Zapísať zavádzací sektor
 Cancel	InstallerWindow		Zrušiť
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
-All hard disks start with \"hd\".\n	InstallerApp		Všetky pecné disky začínajú „hd“.\n
+All hard disks start with \"hd\".\n	InstallerApp		Všetky pevné disky začínajú „hd“.\n
 Continue	InstallerApp		Pokračovať
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3)   Keď prvýkrát úspešne naštartujete do Haiku, určite si prečítajte našu dokumentáciu „Vitajte“. Odkaz na ňu nájdete na Ploche.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správca zavádzania (aplikácia na nastavenie zavádzacieho menu Haiku) sa nedal spustiť.

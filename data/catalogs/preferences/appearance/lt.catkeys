@@ -1,42 +1,50 @@
-1	lithuanian	x-vnd.Haiku-Appearance	1227622574
+1	lithuanian	x-vnd.Haiku-Appearance	2547306525
 Control highlight	Colors tab		Valdiklių paryškinimas
 Control border	Colors tab		Valdiklių rėmeliai
-Antialiasing type:	AntialiasingSettingsView		Glodinimo rūšis:
-Shadow	Colors tab		Šešėlis
-On	AntialiasingSettingsView		Įjungtas
+Antialiasing type:	AntialiasingSettingsView		Glodinimo būdas:
+Shadow	Colors tab		Šešėliai
+On	AntialiasingSettingsView		įjungta
 Defaults	APRWindow		Numatytosios reikšmės
-Grayscale	AntialiasingSettingsView		Pilkumo tonai
+Grayscale	AntialiasingSettingsView		pilkumo tonai
 Shine	Colors tab		Švytėjimas
-Off	AntialiasingSettingsView		Išjungtas
+About	DecorSettingsView		Apie
+Off	AntialiasingSettingsView		išjungta
+Choose Decorator	DecorSettingsView		Išsirinkite dekoruoklį
 Success	Colors tab		Sėkminga baigtis
 Inactive window tab text	Colors tab		Neaktyvių langų antraščių tekstas
+About Decorator	DecorSettingsView		Apie dekoruoklį
 Failure	Colors tab		Nesėkminga baigtis
 Hinting menu	AntialiasingSettingsView		Taškinės korekcijos meniu
+Window Decorator	APRWindow		Langų dekoruoklis
+Window Decorator:	DecorSettingsView		Langų dekoruoklis:
 Document background	Colors tab		Dokumento fonas
-Revert	APRWindow		Atsisakyti pakeitimų
-Window tab	Colors tab		Lango antraštė
+Revert	APRWindow		Atšaukti pakeitimus
+Window tab	Colors tab		Veikiamojo lango antraštė
 Tooltip background	Colors tab		Iškylančiųjų paaiškinimų fonas
-Selected menu item background	Colors tab		Pažymėtojo meniu elemento fonas
+Selected menu item background	Colors tab		Veikiamojo meniu elemento fonas
 Antialiasing	APRWindow		Glodinimas
-Navigation base	Colors tab		Aktyvaus elemento rėmelis
-Window tab text	Colors tab		Lango antraštės tekstas
+Navigation base	Colors tab		Veikiamojo elemento (židinio) rėmelis
+Window border	Colors tab		Veikiamojo lango rėmelis
+Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
 Document text	Colors tab		Dokumento tekstas
-Navigation pulse	Colors tab		Aktyvaus elemento žybsniai
-Selected menu item text	Colors tab		Pažymėtojo meniu elemento tekstas
+Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
+Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
 Menu background	Colors tab		Meniu fonas
+OK	DecorSettingsView		Gerai
 Panel background	Colors tab		Skydelių fonas
 Colors	APRWindow		Spalvos
 Control background	Colors tab		Valdiklių fonas
-Inactive window tab	Colors tab		Neaktyvaus lango antraštė
+Inactive window tab	Colors tab		Foninių lango antraštės
+Appearance	System name		Išvaizda
 Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro intensyvumas:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glodinimas kartu su taškinė korekcija šioje „Haiku“ versijoje yra neprieinamas, dėl galimų patentinių problemų. Norėdami įjungti šią galimybę, turite savarankiškai sukompiliuoti „Haiku“, įjungdami atitinkamas savybes „FreeType“bibliotekos (libfreetype) antraštiniame derinimo faile.
 Control text	Colors tab		Valdiklių tekstas
 Tooltip text	Colors tab		Iškylančiųjų paaiškinimų tekstas
+Inactive window border	Colors tab		Foninių langų rėmeliai
 Menu item text	Colors tab		Meniu elementų tekstas
-LCD subpixel	AntialiasingSettingsView		Subpikselinis LCD
-Selected menu item border	Colors tab		Pažymėtojo meniu elemento rėmelis
-Strong	AntialiasingSettingsView		Stiprus
+LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
+Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
+Strong	AntialiasingSettingsView		Intensyvus
 Panel text	Colors tab		Skydelių tekstas
-Monospaced fonts only	AntialiasingSettingsView		Tik lygiapločiams šriftams
+Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
 Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
 Glyph hinting:	AntialiasingSettingsView		Rašmenų taškinė korekcija:

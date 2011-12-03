@@ -9,7 +9,7 @@ DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		IP adresas:
 Adapter:	EthernetSettingsView		Tinklo plokštė:
 Domain:	EthernetSettingsView		Sritis:
-Revert	EthernetSettingsView		Grįžti
+Revert	EthernetSettingsView		Atšaukti pakeitimus
 Mode:	EthernetSettingsView		Veiksena:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Nusistatymui reikalingas paleistas net_server'is!!
 Auto-configuring failed: 	EthernetSettingsView		Nusistatyti nepavyko:

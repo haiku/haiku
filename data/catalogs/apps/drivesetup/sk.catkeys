@@ -2,7 +2,7 @@
 DriveSetup	System name		Nastavenie diskových oblastí
 Delete	MainWindow		Zmazať
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
-Rescan	MainWindow		Znova preskúmať
+Rescan	MainWindow		Znovu preskúmať
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nepodarilo sa získať informácie o diskových oblastiach.
 There's no space on the partition where a child partition could be created.	MainWindow		Na oblasti nie je miesto, kde by bolo možné vytvoriť podriadenú oblasť.
@@ -56,11 +56,11 @@ Mount all	MainWindow		Pripojiť všetky
 Cancel	MainWindow		Zrušiť
 Delete partition	MainWindow		Zmazať oblasť
 End: %ld MB	Support		Koniec: %ld MB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ste si istý, že chcete inicializovať diskovú oblasť „%s“? Znova sa vás spýtame pre zapísaním zmien na disk.
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ste si istý, že chcete inicializovať diskovú oblasť „%s“? Znova sa vás spýtame pred zapísaním zmien na disk.
 Eject	MainWindow		Vysunúť
 Partition	MainWindow		Oblasť
 File system	PartitionList		Súborový systém
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Ste si istý, že chcete inicializovať diskovú oblasť? Znova sa vás spýtame pre zapísaním zmien na disk.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Ste si istý, že chcete inicializovať diskovú oblasť? Znova sa vás spýtame pred zapísaním zmien na disk.
 Validation of the given creation parameters failed.	MainWindow		Overenie zadaných parametrov vytvorenia zlyhalo.
 Size	PartitionList		Veľkosť
 Validation of the given initialization parameters failed.	MainWindow		Overenie zadaných parametrov inicializácie zlyhalo.

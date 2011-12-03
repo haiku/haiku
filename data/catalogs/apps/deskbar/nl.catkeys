@@ -1,39 +1,38 @@
-1	dutch; flemish	x-vnd.Be-TSKB	3173476438
+1	dutch; flemish	x-vnd.Be-TSKB	329281930
+Power off	DeskbarMenu		Uitzetten
 Edit menu…	PreferencesWindow		Bewerk menu...
 Applications	PreferencesWindow		Toepassingen
 Recent documents:	PreferencesWindow		Recente documenten:
-Recent folders	BeMenu		Recente mappen
+Recent applications	DeskbarMenu		Recente toepassingen
 Sort running applications	PreferencesWindow		Sorteer lopende toepassingen
-Recent applications	BeMenu		Recente toepassingen
 Change time…	TimeView		Tijd aanpassen...
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Toepassingen
-<Be folder is empty>	BeMenu		<Be-map is leeg>
+Find…	DeskbarMenu		Vind...
 Window	PreferencesWindow		Venster
 Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Recente documenten
 Show seconds	PreferencesWindow		Toon seconden
 Always on top	PreferencesWindow		Altijd bovenop
 Show all	WindowMenu		Toon alles
 No windows	WindowMenu		Geen vensters
-Power off	BeMenu		Uitzetten
+Restart system	DeskbarMenu		Systeem herstarten
 Auto-raise	PreferencesWindow		Automatisch naar boven
 Hide time	TimeView		Tijd verbergen
 Recent folders:	PreferencesWindow		Recente mappen:
-Deskbar preferences…	BeMenu		Deskbar-voorkeuren...
 Show application expander	PreferencesWindow		Toon toepassing-expander
+Restart Tracker	DeskbarMenu		Tracker herstarten
 Close all	WindowMenu		Alles sluiten
 Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
-Mount	BeMenu		Betrek
+Mount	DeskbarMenu		Betrek
 Recent applications:	PreferencesWindow		Recente toepassingen:
+Shutdown…	DeskbarMenu		Afsluiten...
 Tracker always first	PreferencesWindow		Tracker altijd eerst
+Recent folders	DeskbarMenu		Recente mappen
 Show calendar…	TimeView		Toon kalender
-Restart system	BeMenu		Systeem herstarten
-Find…	BeMenu		Vind...
-Restart Tracker	BeMenu		Tracker herstarten
+Deskbar preferences…	DeskbarMenu		Deskbar-voorkeuren...
 Show Time	Tray		Toon tijd
 Expand new applications	PreferencesWindow		Toon nieuwe toepassingen
+Show replicants	DeskbarMenu		Toon replicants
 Clock	PreferencesWindow		Klok
-Recent documents	BeMenu		Recente documenten
 Hide all	WindowMenu		Alles verbergen
-Shutdown…	BeMenu		Afsluiten...
 Quit application	WindowMenu		Programma afsluiten
-Show replicants	BeMenu		Toon replicants

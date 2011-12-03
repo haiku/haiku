@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MidiPlayer	3885957623
+1	dutch; flemish	x-vnd.Haiku-MidiPlayer	4180509704
 None	Main Window		Geen
 Live input:	Main Window		Live input:
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku's MidiPlayer 1.0.0 beta\n\nMiniscuul proggie\nspeelt voor u uit duizenden\ngoedkope deuntjes
@@ -12,6 +12,7 @@ Dungeon	Main Window		Kerker
 Play	Main Window		Afspelen
 Garage	Main Window		Garage
 Closet	Main Window		WC
+MidiPlayer	System name		MidiPlayer
 Drop MIDI file here	Scope View		Sleep MIDI-bestand hierheen
 Igor's lab	Main Window		Igor's lab
 Scope	Main Window		Scoop

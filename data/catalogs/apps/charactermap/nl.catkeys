@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	2557312451
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	20061360
 Enclosed alphanumerics	UnicodeBlocks		Alfanumeriek omcirkeld
 Basic Latin	UnicodeBlocks		Basis-Latijns
 Latin-1 supplement	UnicodeBlocks		Latijns-1 (toevoeging)
@@ -121,7 +121,6 @@ Yi Radicals	UnicodeBlocks		Yi-basiskarakters
 Cyrillic extended B	UnicodeBlocks		Cyrillisch (uitgebreid) B
 Quit	CharacterWindow		Afsluiten
 Braille patterns	UnicodeBlocks		Braille-patronen
-Muscial symbols	UnicodeBlocks		Muzieksymbolen
 New Tai Lue	UnicodeBlocks		Nieuw Tai Lue
 Runic	UnicodeBlocks		Runen
 Miscellaneous mathematical symbols B	UnicodeBlocks		Gevarieerde wiskundige symbolen B

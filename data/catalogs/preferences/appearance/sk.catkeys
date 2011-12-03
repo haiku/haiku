@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Appearance	2785147561
+1	slovak	x-vnd.Haiku-Appearance	2547306525
 Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
 Control border	Colors tab		Okraj ovládacieho prvku
 Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
@@ -12,6 +12,7 @@ Off	AntialiasingSettingsView		Vypnutý
 Choose Decorator	DecorSettingsView		Vyberte dekorátor
 Success	Colors tab		Úspešné
 Inactive window tab text	Colors tab		Text záložky neaktívneho okna
+About Decorator	DecorSettingsView		O dekorátore
 Failure	Colors tab		Zlyhanie
 Hinting menu	AntialiasingSettingsView		Menu s tipmi
 Window Decorator	APRWindow		Dekorátor okna
@@ -33,11 +34,9 @@ OK	DecorSettingsView		OK
 Panel background	Colors tab		Pozadie panelu
 Colors	APRWindow		Farby
 Control background	Colors tab		Pozadie ovládacieho prvku
-About Decerator	DecorSettingsView		O dekorátore
 Inactive window tab	Colors tab		Záložka neaktívneho okna
 Appearance	System name		Vzhľad
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmenšiť silu filtra farebných hrán:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixlový antialiasing v kombinácii s tipmi grafém nie je dostupný v tomto zostavení Haiku, aby sme sa vyhli možným patentovým problémom. Ak chcete zapnúť túto možnosť, musíte si Haiku zostaviť sami a zapnúť určité voľby v konfiguračných hlavičkách libfreetype.
 Control text	Colors tab		Text ovládacieho prvku
 Tooltip text	Colors tab		Text tipu
 Inactive window border	Colors tab		Okraj neaktívneho okna

@@ -104,7 +104,7 @@ Small	MediaPlayer-SettingsWindow		Mažas
 Randomize	MediaPlayer-PlaylistWindow		Sumaišyti
 Off	Subtitles menu		Išjungti
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Sumaišyti įrašus
-Revert	MediaPlayer-SettingsWindow		Grįžti
+Revert	MediaPlayer-SettingsWindow		Atšaukti pakeitimus
 Edit	MediaPlayer-PlaylistWindow		Taisa
 Start media server	MediaPlayer-Main		Paleisti įvairialypės terpės tarnybą
 <unnamed>	PlaylistItem-name		<be pavadinimo>

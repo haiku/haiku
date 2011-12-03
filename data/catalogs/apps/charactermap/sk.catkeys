@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CharacterMap	4082916013
+1	slovak	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Uzavreté alfanumerické znaky
 Basic Latin	UnicodeBlocks		Latinka - základné znaky
 View	CharacterWindow		Zobraziť
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanwa
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Sýrčina
 CJK compatibility ideographs Supplement	UnicodeBlocks		ČJK - kompatibilné idiogramy, doplnok
+Musical symbols	UnicodeBlocks		Hudobné symboly
 Hangul syllables	UnicodeBlocks		Hangul - slabiky
 Coptic	UnicodeBlocks		Koptčina
 Tai Le	UnicodeBlocks		Tai Le
@@ -70,7 +71,7 @@ Latin extended C	UnicodeBlocks		Rozšírená latinka C
 Ancient smbols	UnicodeBlocks		Staroveké symboly
 Bopomofo extended	UnicodeBlocks		Bopomofo - ďalšie znaky
 Lycian	UnicodeBlocks		Lycian
-Font size:	CharacterWindow		Veľksť písma:
+Font size:	CharacterWindow		Veľkosť písma:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiópčina
 Bengali	UnicodeBlocks		Bengálčina
@@ -125,7 +126,6 @@ Yi Radicals	UnicodeBlocks		Yi - radikály
 Cyrillic extended B	UnicodeBlocks		Cyrillika, rozšírená A
 Quit	CharacterWindow		Ukončiť
 Braille patterns	UnicodeBlocks		Braillove vzory
-Muscial symbols	UnicodeBlocks		Hudobné symboly
 New Tai Lue	UnicodeBlocks		New Tai Lue
 Runic	UnicodeBlocks		Runy
 Miscellaneous mathematical symbols B	UnicodeBlocks		Rozličné matematické symboly B
@@ -149,7 +149,7 @@ Lao	UnicodeBlocks		Laoština
 Gothic	UnicodeBlocks		Gotické
 Limbu	UnicodeBlocks		Limbu
 Rejang	UnicodeBlocks		Rejang
-Show private blocks	CharacterWindow		Zobrziť privátne bloky
+Show private blocks	CharacterWindow		Zobraziť privátne bloky
 Phoenician	UnicodeBlocks		Fenické
 Mongolian	UnicodeBlocks		Mongolské
 Supplemental arrows A	UnicodeBlocks		Šípky, doplnok A

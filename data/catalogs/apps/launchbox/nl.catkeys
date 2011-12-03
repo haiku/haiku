@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-LaunchBox	1713579432
+1	dutch; flemish	x-vnd.Haiku-LaunchBox	1140884576
 New	LaunchBox		Nieuw
 Set description…	LaunchBox		Naamgeving...
 Vertical layout	LaunchBox		Verticale lay-out
@@ -17,8 +17,11 @@ Bummer	LaunchBox		Pech hebben
 Cancel	LaunchBox		Annuleren
 Remove button	LaunchBox		Knop verwijderen
 Horizontal layout	LaunchBox		Horizontale lay-out
+Failed to launch '%1'.\n\nError:	LaunchBox		zie vorige
 Name Panel	LaunchBox		Naampaneel
 Add button here	LaunchBox		Voeg hier knop toe
+Description for '%3'	LaunchBox		Beschrijving voor '%3'
+Settings	LaunchBox		Instellingen
 Failed to launch 'something',error in Pad data.	LaunchBox		Starten van 'something' is mislukt, fout in Pad-data.
 Close	LaunchBox		Sluiten
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Open map'-commando kon niet naar Tracker gestuurd worden.\n\nError: 

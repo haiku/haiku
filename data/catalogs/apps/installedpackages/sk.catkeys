@@ -5,4 +5,4 @@ Package description	UninstallView		Popis balíka
 InstalledPackages	System name		Nainštalované balíky
 The package you selected has been successfully removed from your system.	UninstallView		Balík, ktorý ste vybrali bol úspešne odstránený z vášho systému.
 OK	UninstallView		OK
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný nebol odstránený z vášho systému. Dodané inštalačné informácie balíka mohli byť poškodené.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný balík nebol odstránený z vášho systému. Dodané inštalačné informácie balíka mohli byť poškodené.
