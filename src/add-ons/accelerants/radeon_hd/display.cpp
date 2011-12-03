@@ -710,7 +710,8 @@ debug_connectors()
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
 			ERROR(" + connector:  %s\n", get_connector_name(connectorType));
 			ERROR(" + encoder:    %s\n", get_encoder_name(encoderType));
-			ERROR(" + encoder id: %" B_PRIu16 "\n", encoderID);
+			ERROR(" + encoder id: %" B_PRIu16 " (%s)\n", encoderID,
+				encoder_name_lookup(encoderID));
 			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpioID);
 			ERROR(" + gpio valid: %s\n",
 				gGPIOInfo[gpioID]->valid ? "true" : "false");

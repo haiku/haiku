@@ -1118,6 +1118,55 @@ encoder_output_lock(bool lock)
 }
 
 
+static const char *encoder_name_matrix[36] = {
+	"NONE",
+	"Internal Radeon LVDS",
+	"Internal Radeon TMDS1",
+	"Internal Radeon TMDS2",
+	"Internal Radeon DAC1",
+	"Internal Radeon DAC2 (TV)",
+	"Internal Radeon SDVOA",
+	"Internal Radeon SDVOB",
+	"External 3rd party SI170B",
+	"External 3rd party CH7303",
+	"External 3rd party CH7301",
+	"Internal Radeon DVO1",
+	"External 3rd party SDVOA",
+	"External 3rd party SDVOB",
+	"External 3rd party TITFP513",
+	"Internal LVTM1",
+	"External 3rd party VT1623",
+	"External HDMI SI1930",
+	"Internal HDMI",
+	"Internal Kaleidoscope TMDS1",
+	"Internal Kaleidoscope DVO1",
+	"Internal Kaleidoscope DAC1",
+	"Internal Kaleidoscope DAC2",
+	"External Kaleidoscope SI178",
+	"MVPU FPGA",
+	"Internal Kaleidoscope DDI",
+	"External Kaleidoscope VT1625",
+	"External Kaleidoscope HDMI SI1932",
+	"External Kaleidoscope DP AN9801",
+	"External Kaleidoscope DP DP501",
+	"Internal Kaleidoscope UNIPHY",
+	"Internal Kaleidoscope LVTMA",
+	"Internal Kaleidoscope UNIPHY1",
+	"Internal Kaleidoscope UNIPHY2",
+	"External Travis Bridge",
+	"External Nutmeg Bridge"
+};
+
+
+const char*
+encoder_name_lookup(uint32 encoderID) {
+	if (encoderID <= sizeof(encoder_name_matrix))
+		return encoder_name_matrix[encoderID];
+	else
+		return "Unknown";
+}
+
+
 uint32
 encoder_object_lookup(uint32 encoderFlags, uint8 dacID)
 {
