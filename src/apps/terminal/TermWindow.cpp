@@ -517,7 +517,11 @@ TermWindow::_GetWindowPositionFile(BFile* file, uint32 openMode)
 	if (status != B_OK)
 		return status;
 
-	status = path.Append("Terminal_windows");
+	status = path.Append("Terminal");
+	if (status != B_OK)
+		return status;
+
+	status = path.Append("Windows");
 	if (status != B_OK)
 		return status;
 
@@ -1035,23 +1039,19 @@ TermWindow::_DoPageSetup()
 void
 TermWindow::_DoPrint()
 {
-	if (!fPrintSettings || _DoPageSetup() != B_OK) {
-		BAlert* alert = new BAlert(B_TRANSLATE("Cancel"),
-			B_TRANSLATE("Print cancelled."), B_TRANSLATE("OK"));
-		alert->SetShortcut(0, B_ESCAPE);
-		alert->Go();
-		return;
-	}
-
 	BPrintJob job("Print");
-	job.SetSettings(new BMessage(*fPrintSettings));
+	if (fPrintSettings)
+		job.SetSettings(new BMessage(*fPrintSettings));
+
+	if (job.ConfigJob() != B_OK)
+		return;
 
 	BRect pageRect = job.PrintableRect();
 	BRect curPageRect = pageRect;
 
 	int pHeight = (int)pageRect.Height();
 	int pWidth = (int)pageRect.Width();
-	float w,h;
+	float w, h;
 	_ActiveTermView()->GetFrameSize(&w, &h);
 	int xPages = (int)ceil(w / pWidth);
 	int yPages = (int)ceil(h / pHeight);
